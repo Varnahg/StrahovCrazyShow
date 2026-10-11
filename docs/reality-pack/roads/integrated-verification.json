@@ -1,0 +1,34 @@
+{
+  "checkedAt": "2026-10-10T21:43:05.2138227Z",
+  "targetedTests": {
+    "failed": 0,
+    "command": "pnpm exec tsx --test tests/streets.test.ts tests/surface-transitions.test.ts tests/road-calibration.test.ts",
+    "passed": 12
+  },
+  "typecheck": {
+    "command": "pnpm exec tsc --noEmit",
+    "exitCode": 0
+  },
+  "sourceOsmSha256": "7ff214452c91162fffc77809bd7c07f9511e694d2a7b48bc316d7b5865cedb62",
+  "calibrationSha256": "b794e4f06f7dfa58e1ec3c34845f6b5b8a8551743231d4ad09da49c70b3e7b76",
+  "streetsSha256": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14",
+  "pidDataSha256": "66c4f8f5aebce2f5fb244e0fad54b514a32e41bdbc19415c75c488335d7867ce",
+  "metrics": {
+    "maxSliverWidth": 0.0011046751486363839,
+    "calibratedSamples": 232,
+    "outsideCorridor": 0,
+    "roundingSlivers": 1,
+    "pidSamples": 803,
+    "materialTransitions": 818,
+    "rawOsmFeatures": 380,
+    "roadSegments": 14,
+    "offAsphalt": 0,
+    "pavementTriangles": 165938,
+    "documentedApronCutouts": 2,
+    "continuousJunctions": 432,
+    "buildingOverlap": 0,
+    "unchangedCoordinateTolerance": 0.0014142135623730952,
+    "surfaceArea": 99219.54
+  },
+  "scope": "Targeted geometry tests and TypeScript only; no full suite/build/GPU benchmark/physical collision rebuild in this agent."
+}

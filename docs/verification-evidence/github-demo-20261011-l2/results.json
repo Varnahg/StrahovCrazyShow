@@ -1,0 +1,33 @@
+{
+  "status": "passed",
+  "sourceSnapshotId": "c4586de83cef2b7406122c75eed04abf89796765cc338c0b7dabc92a9c7ad658",
+  "files": 8060,
+  "tests": {
+    "total": 372,
+    "passed": 372,
+    "failed": 0
+  },
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 80.7290506,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 49.8670228,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 17.9911702,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "sourceCheck": "source-check.json",
+  "gpu": "No new matched GPU/FPS result for this combined checkpoint. Historical K4 is documented separately.",
+  "privacy": "User-triggered local diagnostics are excluded from the public repository."
+}

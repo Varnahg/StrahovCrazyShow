@@ -1,0 +1,7 @@
+*** Begin Patch
+*** Update File: client/art-lighting.ts
+@@
+-    light.setEnabled(enabled);
++    // Light.setEnabled resyncs every scene mesh even if its state is unchanged.
++    if (light.isEnabled(false) !== enabled) light.setEnabled(enabled);
+*** End Patch

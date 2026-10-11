@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Strahov – skutečné materiálové styky cest</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #1b292d;
+      color: #edf0e3;
+      font: 14px system-ui;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    aside {
+      position: fixed;
+      left: 18px;
+      top: 18px;
+      width: min(390px, calc(100vw - 36px));
+      padding: 18px;
+      background: #17252bef;
+      border: 1px solid #64756c;
+      border-radius: 12px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 19px;
+    }
+    p {
+      line-height: 1.45;
+      margin: 10px 0;
+    }
+    select,
+    button {
+      padding: 8px;
+      background: #344c46;
+      color: #fff;
+      border: 1px solid #809086;
+      border-radius: 7px;
+      max-width: 100%;
+    }
+    button[aria-pressed="true"] {
+      background: #637853;
+    }
+    a {
+      color: #c4dfb2;
+    }
+    details {
+      font-size: 11px;
+    }
+    pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      max-height: 35vh;
+      overflow: auto;
+      color: #bacac5;
+    }
+    #loading {
+      color: #dfca91;
+    }
+  </style>
+  <canvas id="world"></canvas>
+  <aside>
+    <h1>Chodník navazuje na komunikaci</h1>
+    <label
+      >Skutečný styk ze zdrojových polygonů<br /><select id="view"></select
+    ></label>
+    <p>
+      <button id="day" aria-pressed="true">Denní materiálový náhled</button>
+      <button id="actual" aria-pressed="false">Skutečný čas</button>
+    </p>
+    <p><button id="wet" aria-pressed="false">Ukázka mokrého povrchu</button></p>
+    <p id="location"></p>
+    <p id="loading">Načítání původních CC0 textur…</p>
+    <p id="weather"></p>
+    <p>
+      Spára je plochý materiálový detail na sdíleném terénu, nikoli zaměřená
+      nebo zvýšená obruba. Dlažba, kostky a nezpevněná cesta mají odlišné
+      původní CC0 mapy. Měřítko nových rodin je doložené jako výtvarný odhad.
+    </p>
+    <p>
+      <a href="../../streets/strahov-ortho-2024.jpg" target="_blank"
+        >IPR ortofoto 8. 6. 2024</a
+      >
+      ·
+      <a href="../../world-architecture/atlas.html" target="_blank"
+        >Atlas podkladů</a
+      >
+    </p>
+    <details>
+      <summary>Ověřovací údaje</summary>
+      <pre id="diagnostics"></pre>
+    </details>
+  </aside>
+  <script type="module" src="./street-preview.ts"></script>
+</html>

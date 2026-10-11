@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>Strahov · čitelnost povrchů a značení</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: #14201e;
+      color: #eee;
+      font: 13px system-ui;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    aside {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      background: #122021ec;
+      padding: 12px;
+      width: 245px;
+      border-radius: 8px;
+    }
+    h1 {
+      font-size: 16px;
+      margin: 0 0 8px;
+    }
+    button,
+    select {
+      font: inherit;
+      padding: 5px;
+      margin: 3px 0;
+      max-width: 100%;
+    }
+    label {
+      display: block;
+    }
+    p {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    details {
+      max-height: 40vh;
+      overflow: auto;
+    }
+    pre {
+      font-size: 10px;
+      white-space: pre-wrap;
+    }
+    .scene-labels {
+      display: none;
+    }
+  </style>
+  <canvas
+    tabindex="0"
+    aria-label="Skutečná hra · ulice a dopravní značení"
+  ></canvas>
+  <div class="scene-labels" data-label-layer></div>
+  <aside>
+    <h1>Ulice podle podkladů</h1>
+    <p>
+      Skutečný Game, materiály a astronomické světlo. Kontrolní kamera není FPS
+      benchmark ani zkouška řízení.
+    </p>
+    <label
+      >Pohled
+      <select id="view">
+        <option value="corridor">Vaníčkova · oba směry</option>
+        <option value="bike">Cyklopiktogramy · shora</option>
+        <option value="crossing">Přechod Koleje Strahov</option>
+        <option value="bus-front">Označník · čelo</option>
+        <option value="bus-back">Označník · záda</option>
+        <option value="parking">Parkoviště · značka P</option>
+        <option value="surfaces">Vozovka / chodník / trávník</option>
+      </select></label
+    >
+    <label
+      >Světlo
+      <select id="light">
+        <option value="day">11. 10. 2026 · 12:00 Praha</option>
+        <option value="night">11. 10. 2026 · 02:00 Praha</option>
+      </select></label
+    >
+    <label
+      >Podmínky
+      <select id="weather">
+        <option value="dry">Sucho · oblačnost 20 %</option>
+        <option value="overcast">Sucho · zataženo</option>
+        <option value="wet">Déšť · 2 mm/h</option>
+      </select></label
+    >
+    <label
+      >Kvalita
+      <select id="quality">
+        <option value="low">Nízká</option>
+        <option value="medium" selected>Střední</option>
+        <option value="high">Vysoká</option>
+      </select></label
+    >
+    <details>
+      <summary>Kontrolní údaje</summary>
+      <pre id="report">Načítám skutečnou hru…</pre>
+    </details>
+  </aside>
+  <script type="module" src="./road-details-preview.ts"></script>
+</html>

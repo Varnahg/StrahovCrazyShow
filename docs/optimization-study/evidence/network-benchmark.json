@@ -1,0 +1,74 @@
+{
+  "capturedAt": "2026-10-10T16:33:57.140Z",
+  "endpoint": "http://127.0.0.1:2568",
+  "node": "v24.19.0",
+  "platform": "win32",
+  "context": "Dedicated server from .cache/optimization-study-snapshot; loopback; development execution; no artificial network latency/loss. Not a browser FPS or Internet RTT test.",
+  "metricsNote": "Bytes are binary Colyseus message payloads as exposed by WebSocket message events; transport/IP/TLS overhead excluded. latestAckSampleAge measures send-to-observation of newest ack in a received motion message, not ping RTT or end-to-end input-to-photon latency. Server acknowledges latest input state, not a replayable queue.",
+  "stages": [
+    {
+      "clients": 1,
+      "durationMs": 6004.254,
+      "motionSamples": 90,
+      "motionHz": 14.989,
+      "motionGapMedianMs": 47.418,
+      "motionGapP95Ms": 93.564,
+      "motionGapMaxMs": 95.706,
+      "bytesPerMotionMedian": 103,
+      "monitorDownKBps": 1.546,
+      "aggregateMotionDownKBps": 1.546,
+      "monitorInputHz": 21.651,
+      "monitorInputGapMedianMs": 46.402,
+      "monitorUpKBps": 0.902,
+      "monitorBufferedBytesMax": 42,
+      "latestAckSampleAgeMedianMs": 93.28,
+      "latestAckSampleAgeP95Ms": 94.436
+    },
+    {
+      "clients": 8,
+      "durationMs": 6009.831,
+      "motionSamples": 91,
+      "motionHz": 15.142,
+      "motionGapMedianMs": 47.329,
+      "motionGapP95Ms": 93.696,
+      "motionGapMaxMs": 94.545,
+      "bytesPerMotionMedian": 762,
+      "monitorDownKBps": 11.539,
+      "aggregateMotionDownKBps": 92.31,
+      "monitorInputHz": 21.631,
+      "monitorInputGapMedianMs": 46.317,
+      "monitorUpKBps": 0.917,
+      "monitorBufferedBytesMax": 43,
+      "latestAckSampleAgeMedianMs": 93.091,
+      "latestAckSampleAgeP95Ms": 95.102
+    },
+    {
+      "clients": 16,
+      "durationMs": 6001.853,
+      "motionSamples": 90,
+      "motionHz": 14.995,
+      "motionGapMedianMs": 48.453,
+      "motionGapP95Ms": 94.33,
+      "motionGapMaxMs": 124.198,
+      "bytesPerMotionMedian": 1484,
+      "monitorDownKBps": 22.49,
+      "aggregateMotionDownKBps": 359.836,
+      "monitorInputHz": 21.16,
+      "monitorInputGapMedianMs": 46.483,
+      "monitorUpKBps": 0.91,
+      "monitorBufferedBytesMax": 43,
+      "latestAckSampleAgeMedianMs": 94.057,
+      "latestAckSampleAgeP95Ms": 97.719
+    }
+  ],
+  "initialHealth": {
+    "ok": true,
+    "worldId": "8svMCWXQT",
+    "online": 0
+  },
+  "finalHealth": {
+    "ok": true,
+    "worldId": "8svMCWXQT",
+    "online": 0
+  }
+}

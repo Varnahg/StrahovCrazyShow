@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Strahov · kontrola komunikací</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #1e292c;
+        color: #f2f0e7;
+        font: 14px system-ui;
+      }
+      canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+        touch-action: none;
+      }
+      .panel {
+        position: fixed;
+        left: 18px;
+        top: 18px;
+        max-width: 350px;
+        padding: 18px;
+        background: #172125ed;
+        border: 1px solid #718077;
+        border-radius: 12px;
+      }
+      h1 {
+        font-size: 21px;
+        margin: 0 0 10px;
+      }
+      p {
+        line-height: 1.45;
+        margin: 8px 0;
+      }
+      a {
+        color: #c5e5d2;
+      }
+      button {
+        border: 1px solid #a6b9ab;
+        background: #344e43;
+        color: white;
+        padding: 9px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 4px 4px 0 0;
+      }
+      .small {
+        font-size: 12px;
+        color: #b3c5ba;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="world"></canvas>
+    <div class="panel">
+      <h1>Ulice a chodníky Strahova</h1>
+      <p id="audit">Načítání skutečné sítě OSM…</p>
+      <p>
+        Žlutá svítidla jsou pouze na 15 doložených OSM bodech. Budovy zde slouží
+        k ověření průchodů; detaily fasád nejsou součástí náhledu.
+      </p>
+      <button id="top">Půdorys</button><button id="oblique">Prostorově</button
+      ><button id="night">Večer</button>
+      <p>
+        <a href="./survey-overlay.jpg" target="_blank"
+          >Ortofoto s kontrolními trasami</a
+        >
+        ·
+        <a href="./strahov-ortho-2024.jpg" target="_blank">Čistý podklad IPR</a>
+      </p>
+      <p class="small">
+        © OpenStreetMap contributors · ODbL 1.0<br />datový podklad © IPR Praha,
+        8. 6. 2024<br />Plochý demonstrační terén; většina šířek je odhad.
+      </p>
+    </div>
+    <script type="module">
+      import { Engine } from "@babylonjs/core/Engines/engine";
+      import { Scene } from "@babylonjs/core/scene";
+      import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+      import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+      import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+      import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+      import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+      import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+      import { Mesh } from "@babylonjs/core/Meshes/mesh";
+      import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
+      import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+      import earcut from "earcut";
+      import { buildStreets } from "/client/streets-renderer.ts";
+      import { STREETS } from "/shared/streets.ts";
+      import { BUILDINGS } from "/shared/world.ts";
+      const engine = new Engine(document.querySelector("canvas"), true),
+        scene = new Scene(engine);
+      scene.useRightHandedSystem = true;
+      scene.clearColor = new Color4(0.65, 0.72, 0.74, 1);
+      const camera = new ArcRotateCamera(
+        "survey camera",
+        -Math.PI / 2,
+        0.05,
+        445,
+        new Vector3(100, 0, -10),
+        scene,
+      );
+      camera.attachControl(document.querySelector("canvas"), true);
+      camera.minZ = 0.1;
+      camera.wheelPrecision = 12;
+      camera.lowerRadiusLimit = 15;
+      camera.upperRadiusLimit = 800;
+      const light = new HemisphericLight(
+        "ambient",
+        new Vector3(0, 1, 0),
+        scene,
+      );
+      light.intensity = 0.9;
+      const sun = new DirectionalLight("sun", new Vector3(0.3, -1, 0.3), scene);
+      sun.intensity = 0.5;
+      const ground = MeshBuilder.CreateGround(
+        "neutral-ground",
+        { width: 540, height: 360 },
+        scene,
+      );
+      ground.position.set(100, -0.01, -10);
+      const earth = new StandardMaterial("earth", scene);
+      earth.diffuseColor = Color3.FromHexString("#8a927c");
+      earth.specularColor.setAll(0);
+      ground.material = earth;
+      const mats = new Map();
+      const mat = (hex) => {
+        if (mats.has(hex)) return mats.get(hex);
+        const m = new StandardMaterial("m" + hex, scene);
+        m.diffuseColor = Color3.FromHexString(hex);
+        m.specularColor.setAll(0.02);
+        mats.set(hex, m);
+        return m;
+      };
+      for (const building of BUILDINGS) {
+        const points = building.points.slice(0, -1),
+          flat = points.flat(),
+          tri = earcut(flat),
+          p = [],
+          ix = [];
+        for (const [x, z] of points) p.push(x, 0, z);
+        for (const [x, z] of points) p.push(x, building.height, z);
+        const n = points.length;
+        for (let i = 0; i < n; i++) {
+          const j = (i + 1) % n;
+          ix.push(i, j, n + j, i, n + j, n + i);
+        }
+        for (let i = 0; i < tri.length; i += 3)
+          ix.push(n + tri[i], n + tri[i + 2], n + tri[i + 1]);
+        const d = new VertexData();
+        d.positions = p;
+        d.indices = ix;
+        const normals = [];
+        VertexData.ComputeNormals(p, ix, normals);
+        d.normals = normals;
+        const m = new Mesh("b" + building.id, scene);
+        d.applyToMesh(m);
+        m.material = mat("#d0cfc5");
+        m.material.backFaceCulling = false;
+        m.material.disableLighting = true;
+        m.material.emissiveColor.setAll(0.65);
+      }
+      const lights = [];
+      const result = buildStreets({ scene, mat, lights });
+      document.querySelector("#audit").textContent =
+        `${STREETS.features.length} úseků · ${STREETS.parking.length} parkovacích ploch · ${result.lamps} mapovaných lamp. Souvislé povrchy s otvory podle obrysů budov.`;
+      document.querySelector("#top").onclick = () => {
+        camera.alpha = -Math.PI / 2;
+        camera.beta = 0.02;
+        camera.radius = 445;
+      };
+      document.querySelector("#oblique").onclick = () => {
+        camera.alpha = -2.0;
+        camera.beta = 0.72;
+        camera.radius = 360;
+      };
+      let night = false;
+      document.querySelector("#night").onclick = () => {
+        night = !night;
+        light.intensity = night ? 0.18 : 0.9;
+        sun.intensity = night ? 0 : 0.5;
+        scene.clearColor = night
+          ? new Color4(0.03, 0.06, 0.1, 1)
+          : new Color4(0.65, 0.72, 0.74, 1);
+        mat("#f7d590").emissiveColor = night
+          ? new Color3(0.94, 0.74, 0.43)
+          : Color3.Black();
+        scene.getMaterialByName("art:lamp-pool").alpha = night ? 0.6 : 0;
+      };
+      engine.runRenderLoop(() => scene.render());
+      window.addEventListener("resize", () => engine.resize());
+      window.streetPreview = { scene, result, engine };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Strahov — kontrola přirozenosti chůze</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #17232b;
+      color: #f1ede3;
+      font: 14px system-ui;
+    }
+    header {
+      padding: 12px 18px;
+    }
+    h1 {
+      font-size: 19px;
+      margin: 0 0 5px;
+    }
+    p {
+      margin: 0;
+      color: #c2cbc9;
+    }
+    main {
+      height: calc(100vh - 75px);
+      display: grid;
+      grid-template-columns: 1fr 290px;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      outline: none;
+    }
+    aside {
+      padding: 10px;
+      overflow: auto;
+      background: #25353a;
+    }
+    button {
+      padding: 8px;
+      margin: 3px;
+      border: 1px solid #87948e;
+      border-radius: 5px;
+      color: #f7f1e5;
+      background: #40534f;
+      cursor: pointer;
+    }
+    h2 {
+      font-size: 14px;
+      margin: 14px 0 6px;
+    }
+    pre {
+      white-space: pre-wrap;
+      font-size: 11px;
+    }
+    label {
+      display: block;
+      padding: 5px;
+    }
+    select {
+      padding: 6px;
+    }
+    small {
+      color: #bcc9bf;
+    }
+  </style>
+  <header>
+    <h1>Kontrola lokomoce · vlevo původní, vpravo upravená</h1>
+    <p>
+      Stejné produkční modely a oděvy · pohyb měřený podle vzdálenosti · kamera
+      myší · žádné změny zdrojových assetů
+    </p>
+  </header>
+  <main>
+    <canvas aria-label="Srovnání přirozenosti chůze a běhu"></canvas>
+    <aside>
+      <h2>Pohyb</h2>
+      <div id="actions"></div>
+      <button id="steady">Přejít do ustáleného kroku</button
+      ><button id="pause">Pozastavit</button
+      ><button id="step">Jeden snímek</button>
+      <h2>Pohled</h2>
+      <div id="views"></div>
+      <h2>Postava</h2>
+      <select id="preset"></select>
+      <h2>Podklad</h2>
+      <select id="terrain">
+        <option value="flat">Rovná silnice</option>
+        <option value="slope">Svah 12 %</option>
+        <option value="stairs">
+          Schody 15 / 35 cm — zátěžový test
+        </option></select
+      ><label
+        ><input type="checkbox" id="before" checked /> Zobrazit původní</label
+      ><small
+        >Ustálení je kinematický zahřívací krok, nikoli měření FPS. Schody
+        používají předepsanou trasu, nejde o průchod celé hry s fyzikou.</small
+      >
+      <pre id="metrics">Načítání…</pre>
+    </aside>
+  </main>
+  <script type="module" src="./preview.ts"></script>
+</html>

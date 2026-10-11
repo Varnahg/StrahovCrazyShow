@@ -1,0 +1,1014 @@
+$ tsx --test tests/*.test.ts
+✔ startup shaders do not immediately lower quality; sustained overload does (6.9294ms)
+✔ a single long frame and moderate timing jitter do not cause degradation (11.3321ms)
+✔ slow frames use real elapsed windows at 60 and 144 FPS goals (34.0036ms)
+✔ continuous GPU overload reaches a bounded floor, preserving world budgets (7.4635ms)
+✔ measured CPU limit lowers scene detail before reducing pixels (1.2951ms)
+✔ without an actual GPU timing query, RAF and CPU durations cannot prove CPU bound (1.1201ms)
+✔ manual quality remains fixed even at low FPS and switching back resumes adaptation (2.4126ms)
+✔ hidden tabs and fixed-condition benchmarks cannot poison quality history (3.5105ms)
+✔ long tab gaps and invalid clock samples reset or leave measurements unchanged (6.1042ms)
+✔ recovery waits for sustained healthy presentation and failed probes back off (6.6234ms)
+✔ targets do not impose a 60 FPS cap and only an independent ceiling limits the goal (12.8363ms)
+✔ limited scaling still permits lower scene detail; presets and validators are explicit (3.2864ms)
+✔ idle presentation cadence recognizes 60 and 144 Hz without deriving a ceiling from the game (70.6378ms)
+✔ presentation preflight never starts timers without a browser (0.857ms)
+BJS - [09:17:51]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:53]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:53]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:53]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:53]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:53]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:53]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:53]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:53]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:54]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:54]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:54]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:54]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:54]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:54]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:54]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:55]: Babylon.js v9.30.0 - Null engine
+✔ real rig walks, runs and sprints from measured travel at 30/60/144 FPS (2255.9449ms)
+✔ stopping against an obstacle settles both limbs without root bob or time-driven steps (171.9713ms)
+✔ body rotation takes the shortest path across the minus-pi/plus-pi seam (58.038ms)
+✔ gestures remain in the shoulders and smoothly return both arms to idle (174.7956ms)
+✔ teleports, sleeping tabs and vehicle transitions cannot become a rapid stride (110.4679ms)
+✔ articulated knees/elbows/ankles preserve human proportions and closed shared silhouettes (204.434ms)
+✔ planted feet stay at their world anchors while knees bend and the body moves (241.7528ms)
+✔ jump folds knees and returns to stable grounded contact without moving the root (152.0942ms)
+✔ authored facial relief has outward normals and explicit Blender winding in either scene handedness (399.9816ms)
+✔ skin, cloth, hair and eyes have shared role-specific linear PBR materials without losing chosen colours (330.7344ms)
+✔ all six hairstyles leave both pupils visible and expose a stable first-person eye height (268.8816ms)
+BJS - [09:17:34]: Babylon.js v9.30.0 - Null engine
+Reality geometry audit {
+  buildings: 120,
+  windows: 3258,
+  detailTriangles: 109498,
+  farTriangles: 10942,
+  source: 'shared/data/facade-reality.json',
+  measured: false
+} { meshes: 1106 }
+BJS - [09:17:36]: Babylon.js v9.30.0 - Null engine
+✔ photo interpreted window pitch fits every original edge and retains outward normals (44.8655ms)
+✔ B6 north end preserves broad blank piers and sparse core openings (6.9492ms)
+✔ B12 three levels retain narrow transom windows, B1 and shops have no dorm grid (1.0242ms)
+✔ 007 doorway is at southeast club, reception and R-ko POI retain explicit uncertainty (0.5645ms)
+✔ architecture batches remain bounded (2100.1587ms)
+✔ B6 north reception shell preserves the canonical opening and closes the former west entry (794.0656ms)
+BJS - [09:17:31]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:31]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:31]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:31]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:31]: Babylon.js v9.30.0 - Null engine
+✔ exact moonless 02:00 reserves headlight and B6 slots without raising the four-light material cap (199.48ms)
+✔ lit lunar key reserves one street slot immediately for driving and restores it immediately on exit (18.7106ms)
+✔ real dusk keeps solar key, hemisphere, B6 and car by reducing street capacity to zero (9.7733ms)
+✔ daytime car request consumes no beam slot and low quality retains at most one mapped street lamp (9.1137ms)
+✔ nearest movement retains its half-second cadence while a capacity change immediately refreshes the nearest lamp (103.9507ms)
+BJS - [09:17:29]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:29]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:29]: Babylon.js v9.30.0 - Null engine
+✔ Babylon Light override still scans identical toggles but steady ArtLighting no longer does (172.4478ms)
+✔ lamp guard retains exact two-nearest night states, movement, quality and new-mesh lighting (104.7367ms)
+✔ lamp guard compares requested own state beneath an inactive parent and preserves parent reactivation (65.5177ms)
+Source/public asset metadata {
+  kind: 'environment',
+  bytes: 14874,
+  sha256: 'c1e8ce89a4d42fde0fcf1996d475b535e859ad06b3fbba824b1fd7a3b0f62af7'
+}
+Source/public asset metadata {
+  kind: 'b6',
+  bytes: 6826,
+  sha256: '299b5a62b3f7da36a21f90d4a98233871d1608d6c748a41f3ea4c0e97d6fc1ef'
+}
+Source/public asset metadata {
+  kind: 'surfaces',
+  bytes: 10986,
+  sha256: 'c3cf978e1db6e20f21946a8cb3e0d5716dbc730f671b09151f27ad373013d474'
+}
+Source/public asset metadata {
+  kind: 'transit',
+  bytes: 2520,
+  sha256: '6c8ac02219def228c438726a6a8cf6b5d7cda991f98e6281dc288417e34417d0'
+}
+✔ environment imported manifest is byte-identical to its public counterpart and satisfies the runtime schema (18.7261ms)
+✔ b6 imported manifest is byte-identical to its public counterpart and satisfies the runtime schema (5.4097ms)
+✔ surfaces imported manifest is byte-identical to its public counterpart and satisfies the runtime schema (9.7986ms)
+✔ transit imported manifest is byte-identical to its public counterpart and satisfies the runtime schema (3.3108ms)
+✔ runtime module graph imports metadata from source rather than the Vite public directory (2367.6947ms)
+✔ public-import guard catches module edges while allowing public asset fetch URLs (2.8382ms)
+BJS - [09:17:56]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:56]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:56]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:57]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:57]: Babylon.js v9.30.0 - Null engine
+{"nearInstances100":1767,"nearSceneMeshes":1800,"farInstances100":100,"farSceneMeshes":139,"sharedFarSources100":6,"presets":[{"preset":0,"near":17,"medium":7,"far":1,"registered":1,"nearTriangles":26130,"mediumTriangles":10896,"farTriangles":192},{"preset":1,"near":18,"medium":7,"far":1,"registered":1,"nearTriangles":26850,"mediumTriangles":10896,"farTriangles":192},{"preset":2,"near":17,"medium":7,"far":1,"registered":1,"nearTriangles":33938,"mediumTriangles":13020,"farTriangles":192},{"preset":3,"near":19,"medium":9,"far":1,"registered":1,"nearTriangles":26720,"mediumTriangles":15074,"farTriangles":204},{"preset":4,"near":18,"medium":7,"far":1,"registered":1,"nearTriangles":27150,"mediumTriangles":11140,"farTriangles":192},{"preset":5,"near":17,"medium":7,"far":1,"registered":1,"nearTriangles":26130,"mediumTriangles":10896,"farTriangles":192}]}
+BJS - [09:18:00]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:00]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:00]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:00]: Skeleton "person 0 continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+✔ LOD changes actual scene traversal candidates and returns every original detail nearby (320.7465ms)
+✔ distance hysteresis prevents boundary flutter and quality expands detail distances (154.7583ms)
+✔ far proxy preserves palette, height and positions for all six distinct presets (458.02ms)
+✔ far geometry is closed, finite, non-pickable and vertex-coloured (85.1029ms)
+✔ 100 online avatar identities remain represented with shared cached far geometry (2912.6495ms)
+✔ vehicle/first-person visibility hides every LOD and reentry restores the same identity (33.6941ms)
+✔ medium IK uses accumulated elapsed time at 30 Hz; far IK stops and near returns safely (93.9244ms)
+✔ Babylon active-mesh evaluation renders a far instance whose cached source is invisible (201.9096ms)
+BJS - [09:17:35]: Babylon.js v9.30.0 - Null engine
+✔ exterior tread material uses original CC0 channels, linear tint and metre-correct UVs in the actual controller (2102.7612ms)
+BJS - [09:17:55]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:38]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:38]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:39]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:41]: Babylon.js v9.30.0 - Null engine
+✔ B6 calibrated bay family records illustrative counts, uncertainty and shared window pitch (5.8596ms)
+✔ twelve inferred north entrance risers use the same analytic NPC height and landing (11.5303ms)
+✔ photographic B6 pack remains continuously walkable from outside steps to first floor with all prop collisions (6347.3349ms)
+✔ B6 north door is physically open and the former west entry is solid (125.5359ms)
+✔ window openings are physically glazed and the interior renderer does not paint opaque walls over them (1900.4737ms)
+✔ east rooms beside both plan-derived stair cores retain the continuous flat main corridor on all six floors (23955.9829ms)
+✔ both schematic dogleg cores continuously climb two floors and descend without jumping or teleporting (16890.248ms)
+✔ stair render buffers preserve every physical source vertex and expose upward treads with continuous soffits (83.5099ms)
+✔ floor finishes use only upward faces and original floor triangles become smooth painted ceilings without duplicate shells (1251.2665ms)
+✔ original Blender sanitary/reception assets exist with conservative shared collision envelopes (165.8674ms)
+✔ opaque B6 construction detaches beyond facade LOD, restores conservatively near the building, and disposes materials/textures (1527.0576ms)
+BJS - [09:18:49]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:50]: Babylon.js v9.30.0 - Null engine
+✔ exterior B6 entry stays visible from the north approach at every quality before and after actual GLB loading and root attachment (4531.5353ms)
+✔ photo-interpreted covered B6 portal preserves a continuous whole-world KCC arrival at reception and return to outdoor terrain (3576.0212ms)
+✔ opaque upper B6 rooms and roof survive an outside ground-level observer without filling legitimate glass openings (1281.7351ms)
+✔ bedrooms beside both service cores have actual opaque and physical closing side partitions (1286.5545ms)
+✔ B6 source-supported north small windows and west stair glazing share exact facade/collider openings while room pitch stays explicit (29.3654ms)
+✔ canonical structural mesh factory omits only duplicate outer facade faces and preserves inner walls and entry frontage (1.0123ms)
+Mapped platform route {
+  target: 'stadium191a',
+  metres: 503.1423913163508,
+  startConnector: 1.5797003000668015,
+  endConnector: 0.4179581318744597,
+  wayIds: [
+    '785663896',
+    '573681963',
+    '25920432',
+    '106402081',
+    '1219495683',
+    '408313961',
+    '1219495685'
+  ],
+  mappedSamples: 1043
+}
+Mapped platform route {
+  target: 'stadium191b',
+  metres: 641.8466362827828,
+  startConnector: 1.5797003000668015,
+  endConnector: 0.18153122417439604,
+  wayIds: [
+    '785663896',  '573681963',
+    '25920432',   '106402081',
+    '1219495683', '1219495684',
+    '437247893',  '1561361283',
+    '374233872',  '408510603',
+    '479784159',  '434329306',
+    '320586063',  '408313962'
+  ],
+  mappedSamples: 1337
+}
+✔ legacy procedural baseline follows connected OSM pedestrian ways to both PID 191 platforms (51.1448ms)
+✔ campus graph never invents connections or pedestrian access across nearby roads (3.5363ms)
+Legacy procedural continuous physics {
+  mode: 'legacy-procedural-dmr',
+  start: { x: 22, y: 0.10300001502037048, z: -14 },
+  productionPhotogrammetry: false,
+  target: 'stadium191a',
+  ticks: 6678,
+  seconds: 111.3,
+  routeMetres: 503.1423913163508,
+  travelled: 502.7443814514207,
+  maxStep: 0.07703191332260438,
+  minGroundGap: 0.8198943280158346,
+  maxGroundGap: 0.994999997317791,
+  groundedSamples: 6672,
+  steepSamples: 385,
+  finalPosition: DI {
+    x: -241.8406219482422,
+    y: 3.941310405731201,
+    z: 254.44451904296875
+  },
+  routeSha256: '7b81710035d1d5dd08b6bbe2c24666412e1dc36d49fa55ff7ac39fdf65196b9e',
+  streetsSha256: 'd1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14',
+  terrainSha256: '5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03'
+}
+Legacy procedural continuous physics {
+  mode: 'legacy-procedural-dmr',
+  start: { x: 22, y: 0.10300001502037048, z: -14 },
+  productionPhotogrammetry: false,
+  target: 'stadium191b',
+  ticks: 8485,
+  seconds: 141.41666666666666,
+  routeMetres: 641.8466362827828,
+  travelled: 641.1749011092134,
+  maxStep: 0.07706066160105261,
+  minGroundGap: 0.8175527680432424,
+  maxGroundGap: 0.994999997317791,
+  groundedSamples: 8479,
+  steepSamples: 478,
+  finalPosition: DI {
+    x: -281.92779541015625,
+    y: 2.9324052333831787,
+    z: 273.72857666015625
+  },
+  routeSha256: 'd65e6c2b6b7408fdb8c2aab2441e55fa28cd408a7d4f0bebf5a00c71e5e47c76',
+  streetsSha256: 'd1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14',
+  terrainSha256: '5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03'
+}
+✔ legacy procedural baseline Rapier walk from historical sidewalk start to stadium191a never teleports or falls through DMR terrain (6572.6362ms)
+✔ legacy procedural baseline Rapier walk from historical sidewalk start to stadium191b never teleports or falls through DMR terrain (4463.3158ms)
+BJS - [09:17:48]: Babylon.js v9.30.0 - Null engine
+✔ court overlays retain all six real OSM footprints and the two photographed blue insets (7.0403ms)
+✔ paint and colored surfaces lie on the exact current DEM triangles rather than bridging slopes (85.9001ms)
+✔ north B6 tennis replacement has source red core, disjoint green runoff and merged white line geometry on its canonical terrain (116.3752ms)
+✔ fences preserve existing pedestrian widths plus capsule clearance and expose eight honest adaptation gates (930.2197ms)
+✔ all exterior triangles are finite, bounded, valid and budgeted separately from the unchanged finest source plan (36.9856ms)
+✔ opaque batched renderer switches detail without decimating or mutating its source geometry (642.3025ms)
+✔ Rapier capsule passes every open gate and is stopped by the identical shared visible fence boundary (1946.6208ms)
+BJS - [09:17:38]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:39]: Babylon.js v9.30.0 - Null engine
+✔ five shared opaque far shadow geometries preserve all original render masters and refcount cleanup (1491.2987ms)
+BJS - [09:17:41]: Babylon.js v9.30.0 - Null engine
+✔ only low quality enables proxy casters, with no duplicate visible-car casters or disabled-root leaks (1249.8917ms)
+BJS - [09:17:41]: Babylon.js v9.30.0 - Null engine
+✔ shadow body and all four wheels inherit the exact actual root, steering, spin and suspension transforms (655.5344ms)
+BJS - [09:17:42]: Babylon.js v9.30.0 - Null engine
+✔ actual Babylon normal camera rejects layerMask0 while explicit shadow renderer dispatches the five proxies (976.9979ms)
+✔ actual Cinematic caster selection keeps proxy source receivers disabled without instance setter warnings (525.2214ms)
+BJS - [09:17:42]: Babylon.js v9.30.0 - Null engine
+✔ source, reviewed near GLB and editable highest master remain byte-for-byte unchanged (116.7934ms)
+✔ medium/far retain every frozen J body attribute, PBR material, node/pivot and embedded image (1667.0056ms)
+✔ all 32 actual exported wheel parts have closed, consistently wound topology and no degenerate triangles (869.7983ms)
+✖ source weld preserves every corner UV and avoids all export-time geometry repairs (1.0649ms)
+✔ real Babylon GLB importer loads all three levels and independent wheel nodes with current manifest sizes (804.2208ms)
+BJS - [09:17:37]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:37]: Babylon.js v9.30.0 - Null engine
+✔ campus artistic surfaces keep bounded physical-scale variation without added resources (105.8229ms)
+✔ cinematic grade remains shared with every quality and never changes time/weather (7.8792ms)
+BJS - [09:17:41]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:41]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:41]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:41]: Babylon.js v9.30.0 - Null engine
+✔ PBR channel scales retain metres, rectangular concrete and authored paving joints (16.0344ms)
+✔ real material conversion preserves tint/joints and never treats grayscale roughness as metal (146.8679ms)
+✔ paved and stone surfaces use matching real channels and return to their dry tint after rain (20.1748ms)
+✔ sky cubemap stores linear colours once and matches each hemisphere (258.2391ms)
+✔ shadow projection is stable for sub-texel motion including the solar zenith (5.6948ms)
+✔ shadow metadata rejects ground, transparent glass and arbitrary custom sky shaders (12.4898ms)
+✔ B6 Fresnel reflection preserves warm masks/alpha and night never keeps solar shadows (49.4727ms)
+BJS - [09:17:48]: Babylon.js v9.30.0 - Null engine
+✔ A projects left and D projects right in the actual right-handed camera at every yaw (58.2946ms)
+BJS - [09:17:49]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:49]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:49]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:49]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:50]: Babylon.js v9.30.0 - Null engine
+✔ vehicle D physically steers toward camera-right and A toward camera-left (927.9133ms)
+✔ vehicle chase follows the short heading arc consistently at different rendering rates (1.385ms)
+✔ vehicle camera respects manual look, held drag, standstill and open UI before following (3.779ms)
+✔ A and D steer the actual forward and reversing chassis to the requested screen side at cardinal headings (1064.9493ms)
+✔ channel authorization, accepted contacts and blocking apply server-side (7.949ms)
+✔ event membership and ownership cannot be forged (1.9961ms)
+✔ event time boundaries and Prague DST calendar (105.4516ms)
+✔ week calendar does not shift Monday across the autumn DST change (2.0843ms)
+✔ untrusted input and profiles are bounded (1.7316ms)
+✔ station measurements and timestamp are parsed, forecast is not treated as measured cloud cover (3.9589ms)
+✔ astronomical cycle changes daylight over the actual Prague day (1.3292ms)
+BJS - [09:18:12]: Babylon.js v9.30.0 - Null engine
+✔ production Game import registers the complete Babylon GPU timer contract without needing GPU support (11.2938ms)
+✔ GPU diagnostics identify actual Intel and GTX renderers, not the high-performance request (5.9858ms)
+✔ software renderer takes precedence and ambiguous GPU names remain unknown (0.8708ms)
+✔ unavailable driver data or unknown options do not invent a GPU selection (4.0208ms)
+✔ daylight never lights the scene from below the horizon (16.7702ms)
+✔ night moonlight is bounded and overcast has lower direct contrast (0.6814ms)
+✔ weather fog remains bounded and sunrise has no discontinuous lighting step (1.7576ms)
+✔ clockwise and counterclockwise footprints keep outward facade normals (6.4396ms)
+✔ catalogued dormitories retain long facades while B1 and Potraviny remain other types (3.1004ms)
+BJS - [09:17:48]: Babylon.js v9.30.0 - Null engine
+✔ short left click selects while dragging either main button orbits, middle button stays free (3.9613ms)
+✔ left-click ray selects rendered avatar across camera rotations and render resolutions (77.181ms)
+✔ selection uses nearest visible capsule, has a distance limit and cannot select through a wall (1.7853ms)
+✔ typing, modals and map keyboard focus suppress walking, while a free canvas accepts it (0.8773ms)
+✔ co-located projects remain accessible as one cluster at every scale (75.8638ms)
+✔ journal references all resolve in both directions without a shared/world dependency (15.2677ms)
+✔ all current directory projects are covered; closed projects are not advertised as open (6.2547ms)
+✔ search handles Czech diacritics, multiple terms, venue labels, and bookmark filtering (1.5162ms)
+✔ untrusted or old local progress cannot inject unknown IDs or damage the reader (0.8812ms)
+✔ laundry guidance reflects the 2025 central service rather than obsolete block machines (0.4494ms)
+✔ real photos have date, credit, reuse licence and unchanged local bytes (51.5142ms)
+✔ public references never need a game account and budget is explicitly a versioned plan (2.4071ms)
+BJS - [09:17:51]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+BJS - [09:17:52]: Babylon.js v9.30.0 - Null engine
+✔ new labels start hidden and names behind the camera do not consume visible slots (441.1295ms)
+✔ crowd labels have stable membership and range hysteresis without hiding avatars (17.3688ms)
+✔ range and occlusion boundaries have hysteresis, and behind-camera labels hide immediately (5.0304ms)
+✔ 100 LOS candidates are fairly refreshed with at most four casts per rendered frame (79.1753ms)
+✔ label projection uses the rendered camera, CSS dimensions and subpixel deadzone (7.0226ms)
+✔ nearby landmarks stay on the map while distant place names have a stable visibility band (5.8607ms)
+✔ stacked place names do not overlap or consume player-name slots (17.9455ms)
+✔ remote/off-floor labels skip camera projections without changing name/LOS budgets (9.6975ms)
+BJS - [09:18:01]: Babylon.js v9.30.0 - Null engine
+✔ B1 keeps the full original Z footprint and three documented storeys instead of OSM's single-storey default (37.2159ms)
+✔ common reception entrances use the mapped western projections, preserving separate B6 and special blocks (33.5227ms)
+✔ the canopy, door and twelve stair levels share one coherent landing elevation (18.1158ms)
+✔ stadium ray sections retain the mapped open bowl with exterior beyond the field edge (564.6961ms)
+✔ visible landmark solids and Rapier collision triangles come from one finite bounded plan (17.1943ms)
+✔ landmark component switches geometric tiers using the shared quality radius and disposes every mesh (278.4786ms)
+✔ the actual game capsule continuously climbs B2's twelve exterior steps on the DEM and stops at its closed door (5290.8319ms)
+✔ virtual camera projection preserves only finite bounded geometry metadata (70.616ms)
+✔ collector is absent by default and fails closed for unsafe/incomplete configuration (904.7372ms)
+✔ exact origin/preflight and same-origin browser GET Referer are handled before wildcard CORS (157.4143ms)
+✔ atomic local record contains only whitelisted metrics and trusted metadata, never paths/identities (245.8141ms)
+✔ stale/development/null sources and filename/path/personal payloads cannot write a record (373.0658ms)
+✔ finite metrics, cohort 1/30, ten-second duration, JSON content type and 3/min limit are enforced (1011.3389ms)
+✔ 256 KiB limit covers declared and chunked bodies without creating files (103.0728ms)
+✔ north and heading-up maps project Strahov coordinates without mirroring at every facing (4.0324ms)
+✔ wheel zoom keeps the exact world point under the pointer across rotations (0.7776ms)
+✔ dragging moves mapped points with the pointer, including a rotated map (0.8399ms)
+✔ bounded map cameras keep every viewport corner inside the actual expanding world (2.8886ms)
+✔ offscreen objective indicators preserve direction and remain accessible inside the map (4.7844ms)
+✔ derived bus LODs and repaired basin contain no collapsed triangles; the licensed original remains immutable (452.9236ms)
+BJS - [09:18:07]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:08]: Babylon.js v9.30.0 - Null engine
+Native separate parking DMR support {
+  cars: 24,
+  minimumTyreGapMetres: 0.001870555501686244,
+  maximumTyreGapMetres: 0.015063899745586085
+}
+BJS - [09:18:08]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:08]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:09]: Babylon.js v9.30.0 - Null engine
+✔ actual compact GLB creates independent identified vehicle roots instead of a baked campus mesh (857.6567ms)
+✔ all source parking transforms match the DMR collider placement and keep wheel bottoms close to ground (346.8171ms)
+✔ driving and suspension animation never mutates any separate parked car (199.9621ms)
+✔ native model materials distinguish reflective dielectric glass from shared paint variants (303.562ms)
+✔ parking opt-out, driving visibility and loader disposal do not leave baked or orphan geometry (906.8301ms)
+✔ diagonal movement has the same direction before and after transport at every camera angle (89.6072ms)
+✔ fixed simulation time does not depend on irregular callback count (6.3944ms)
+✔ input queue does not lose batched commands, repeat jumps, reset acknowledgments or speed up simulation (2.5725ms)
+✔ restore and replay reproduce the local movement and jumping state (6591.4755ms)
+✔ remote snapshots interpolate time and take the short rotational path (1.2661ms)
+✔ walking avatars do not create an inconsistent crowd collision wall (2185.0438ms)
+BJS - [09:18:04]: Babylon.js v9.30.0 - Null engine
+✔ 02:00 Prague on 11 October is an astronomical, almost new-moon night (6.6818ms)
+✔ night lunar lighting requires a known lit phase above the horizon and clouds attenuate it (1.4164ms)
+✔ twilight is continuous to -18 degrees and daytime overcast still has useful diffuse fill (189.3273ms)
+✔ actual Babylon scene gets dark sky, zero celestial key, retained local lamps and masked room lights (568.952ms)
+BJS - [09:18:03]: Babylon.js v9.30.0 - Null engine
+✔ added parking lamps have unchanged historical photo evidence, recoverable pixels and explicit uncertainty (9.7624ms)
+✔ clean parking fixtures and collisions use shared bases, and practical PBR light has the same bounded falloff as Standard (10308.5929ms)
+Local derived ground repair geometry { patches: 13, area: 94.88675441528903, triangles: 646, batches: 1 }
+✔ only an audited public footway ground interval is repaired; source arrays, XZ and UV stay untouched (14.4322ms)
+✔ higher objects, vertical trunks and real curbs are not flattened; welded curb vertices remain continuous (2.6858ms)
+✔ original old-spawn triangle 1056 is preserved as a possible actual court fence, not misclassified as a bad ground hump (26.6754ms)
+✔ source-proven pedestrian gap patches stay within existing street polygons and have identical render/collision heights (421.6287ms)
+BJS - [09:18:08]: Babylon.js v9.30.0 - Null engine
+✔ real Rapier rays hit the very same small patch surface and not an invented global fallback plane (587.0166ms)
+✔ derived patch renderer uses shared arrays and disposes its batches cleanly (60.9355ms)
+BJS - [09:18:09]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:09]: Babylon.js v9.30.0 - Null engine
+✔ night annotations retain their original-source provenance and actual slope-dependent facade heights (53.494ms)
+✔ the source-fragment mask rejects roof, ground, wall bands, bright wall pixels, foliage and remote surfaces (1.2882ms)
+✔ Prague fictional occupancy follows real UTC instants and source daytime has zero emission (1.4937ms)
+✔ source tile broad phase never drops an annotated original leaf (17.3115ms)
+✔ material integration preserves source texture/UV color handling and adds no facade geometry (55.7171ms)
+✔ lamp light budget uses mapped poles only, disables by day, changes quality, and disposes (11.6393ms)
+✔ browser HTTP Content-Encoding already decoded PCM is accepted without a second gzip pass (7.2138ms)
+✔ raw gzip file payload from a host without Content-Encoding is decoded exactly once (402.4739ms)
+✔ an HTML error page cannot be mistaken for a valid physics source (9.396ms)
+BJS - [09:18:15]: Babylon.js v9.30.0 - Null engine
+✔ the actual IPR archive retains every declared original and the complete finest source (4810.6941ms)
+✔ I3S decoder preserves position, UV order, winding and full UInt64 feature IDs (1.0674ms)
+✔ I3S decoder rejects truncated, nonfinite or incompatible buffers (1.5303ms)
+✔ Mercator XY converts to physical metres while Bpv height remains unscaled (1.2639ms)
+✔ source east/north triangle retains its upward normal in the right-handed game (0.5588ms)
+✔ original sampled geometry and JPEG hashes match every declared source level (60.669ms)
+✔ the selected source forest reaches every finest tile exactly once (60.7852ms)
+✔ all quality levels request original finest tiles at the player and retain coarser distant coverage (16.6976ms)
+✔ cache pressure retains staged children until the original finest branch can become visible (2.3808ms)
+✔ a missing child or JPEG failure retains the parent without partial overlapping coverage (1.241ms)
+✔ LRU-evicted hidden parents preserve complete descendant coverage until a coarser replacement arrives (1.0745ms)
+✔ an interior source-region split preserves every retained vertex index and triangle winding (1.5657ms)
+✔ the actual B6 source roof spans the surveyed seventy-metre slab in game coordinates (267.4447ms)
+✔ PBR scan material preserves gamma atlas colors and explicitly describes baked daylight (125.5925ms)
+✔ rigid-only stepping preserves the complete current campus, stair and traffic world byte for byte (11933.7583ms)
+✔ steering, braking, reversing and car exit preserve all native dynamics with the traversal removed (10477.4552ms)
+✔ a real Rapier soft body uses standard wrapper mapping and safely returns to rigid-only stepping after removal (46.8202ms)
+DEM outdoor coverage { checked: 4309, belowOldZero: 1840, slopes: 1187 }
+✔ sampled accessible outdoor ground follows actual DEM heights without holes or fallback teleports (19822.8402ms)
+✔ walking and the actual driven chassis approach but cannot tunnel through a solid wall (2974.1416ms)
+✔ terrain-relative outer barriers retain walkers and the car below the old absolute fall threshold (3153.3484ms)
+✔ B6 exterior north twelve-step entry and first-floor route are continuously walkable without teleporting (2207.5792ms)
+✔ every catalogued B6 room has a supported doorway approach and passage into that actual room (4400.1948ms)
+✔ B6 catalogued room floors, basement and every stair flight remain supported at the raised foundation (4461.9424ms)
+✔ B6 real glass collider prevents a window exit above furniture and roof stops a genuine jump (2174.6894ms)
+BJS - [09:18:19]: Babylon.js v9.30.0 - Null engine
+✔ retained source is exact CC0 master and all published LOD bytes match the canonical manifest (191.8628ms)
+BJS - [09:18:21]: Babylon.js v9.30.0 - Null engine
+✔ real GLB import fits current wheel physics and keeps four independent round tyres with finite valid geometry (1280.8241ms)
+BJS - [09:18:21]: Babylon.js v9.30.0 - Null engine
+✔ scene consumers share one source upload and actual palette materials across independent car entities (398.7953ms)
+Reviewed car parking actual DMR support {
+  minimum: 0.001870555501686244,
+  maximum: 0.015063899745586085,
+  cars: 24,
+  paletteMaterials: 6
+}
+BJS - [09:18:22]: Babylon.js v9.30.0 - Null engine
+✔ production loadCar adapter uses the reviewed shared pack with 24 independent grounded parking cars (802.0454ms)
+BJS - [09:18:22]: Babylon.js v9.30.0 - Null engine
+✔ actual Babylon instance LOD selects retained near, medium and far without extra per-car instances (347.4598ms)
+✔ night emission belongs only to main source lenses and parked, reversing, brake, glass and paint stay dark (432.8554ms)
+BJS - [09:18:16]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:17]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:20]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:20]: Babylon.js v9.30.0 - Null engine
+✔ surface maintenance visits changed meshes only and still catches async/material reassignment (762.8401ms)
+✔ shadow draw callback uses actual light frustum, keeps crossing boxes and switches disabled LOD immediately (2885.6759ms)
+✔ conservative shadow AABB culling agrees with real Babylon frusta and protects wind margin (100.6744ms)
+BJS - [09:18:20]: Babylon.js v9.30.0 - Null engine
+✔ glass maintenance catches late B6 material once and removes its scene observers (294.8976ms)
+✔ structural render inventory separates shared geometry, disabled LOD and light assignments (15.6845ms)
+✔ Vanickova photo correction retains raw OSM widths and independently attributed IPR geometry (7.8567ms)
+✔ both photographed sections use their actual footprint and local width, with no global road dilation (1.5425ms)
+BJS - [09:18:23]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:25]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:26]: Babylon.js v9.30.0 - Null engine
+✔ CC0 anatomy source is preserved with bundled explicit licence and immutable hash (377.1157ms)
+✔ source derivatives have finite human-sized geometry, normalized normals and four normalized GPU weights (256.444ms)
+✔ medium reduction preserves every material and cuff seam with identical skin weights (136.4167ms)
+✔ actual Babylon bone matrices preserve bind pose and deform welded elbow/knee seams while existing IK plants feet (2151.7584ms)
+✔ six custom presets share anatomy buffers and keep material, head and camera customization (624.96ms)
+✔ material pruning retains detached far-body resources until the last owner is disposed (139.7525ms)
+DEM resting stability [
+  {
+    x: 26,
+    z: 79,
+    oscillation: 0.0008072853088378906,
+    clearanceError: -0.00023357720093186707
+  },
+  {
+    x: 191,
+    z: -75,
+    oscillation: 0.0005254745483398438,
+    clearanceError: 0.00022792267089988272
+  },
+  {
+    x: 22,
+    z: -14,
+    oscillation: 0.0017338059842586517,
+    clearanceError: 0.0004543213527031312
+  },
+  {
+    x: 36.01,
+    z: -130,
+    oscillation: 7.152557373046875e-7,
+    clearanceError: -0.00034436028926898565
+  },
+  {
+    x: 32.01,
+    z: -116,
+    oscillation: 0.000011205673217773438,
+    clearanceError: -0.000013591702455517662
+  },
+  {
+    x: 16.01,
+    z: -100,
+    oscillation: 0.0012727677822113037,
+    clearanceError: 0.001088257200727638
+  },
+  {
+    x: -7.05,
+    z: -80,
+    oscillation: 0,
+    clearanceError: -5.016326909412783e-8
+  },
+  {
+    x: 36,
+    z: 20,
+    oscillation: 0.00012649595737457275,
+    clearanceError: 0.00022616675564895994
+  }
+]
+DEM walking clearance {
+  heightChange: 0.5212175846099854,
+  residualRange: 0.00024873514065237856
+}
+✔ rain wraps coherently without flashing eighteen-meter segments (23.3083ms)
+✔ resting walkable DEM contact stays within three millimetres at former trouble points and grid seams (4618.8824ms)
+✔ walking across real DEM grid seams follows terrain without extra eye-height vibration (3397.6172ms)
+✔ steep actual embankment slides downhill while remaining supported instead of being misclassified as rest vibration (2770.5991ms)
+✔ photo-correct east pavilion preserves the OSM outline and owns its actual DEM base (3.6938ms)
+✔ east curtain wall has unequal horizontal rows, a broad opaque band and narrow clerestory, with separately authored far geometry (2.2713ms)
+BJS - [09:18:30]: Babylon.js v9.30.0 - Null engine
+Photo-correct stadium component geometry {
+  meshCount: 69,
+  nearTriangles: 26741,
+  farTriangles: 13215,
+  collisionTriangles: 14336,
+  commonEntrances: 8,
+  b1Height: 9.6,
+  stadiumRows: 22,
+  stadiumMeshes: 13,
+  pavilion: {
+    osmId: '480849465',
+    baseY: 3.179767465591432,
+    height: 20,
+    frontageMetres: 126.17434309637262,
+    columns: 17,
+    glazingBays: 50,
+    stairFlights: 2,
+    stairStepsPerFlight: 28,
+    stairCenter: [ -138.08, 3.179767465591432, 17.520000000000007 ],
+    stairProfiles: [ [Array], [Array] ]
+  }
+}
+✔ recessed pavilion piers leave a real covered ground-level service portal rather than a hidden solid wall (732.2726ms)
+✔ actual production KCC walks continuously under the east cantilever and central covered service portal (3305.9285ms)
+✔ both interpreted exterior flights are continuous physical stairs with an open arch below (2710.9743ms)
+✔ stadium silhouette materials stay batched and every LOD uses the original full-detail source (390.9743ms)
+Fallback pavement precision audit {
+  triangles: 166059,
+  roundingSlivers: 1,
+  maxSliverWidth: 0.0011046751486363839,
+  sourceCoordinateQuantum: 0.001
+}
+Fallback junction audit {
+  checked: 432,
+  apronMasked: 2,
+  maximumSourceApron: 0.032778174593052024
+}
+BJS - [09:18:39]: Babylon.js v9.30.0 - Null engine
+✔ source tags retain named streets, a real width, underground exclusion and separate sidewalks (4.3365ms)
+✔ joined pavement has upward triangle normals, preserves holes and avoids footprint interiors (14905.5423ms)
+✔ real shared junction nodes outside documented building cutouts have a continuous fallback rendered surface (406.1212ms)
+✔ PID route samples inside expanded campus stay aligned with fallback Vaníčkova pavement (92.5794ms)
+✔ mapped and photo-interpreted lamps share exact pole/base collisions and unmarked crossings gain no zebra (10596.3372ms)
+BJS - [09:18:29]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:31]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:31]: Babylon.js v9.30.0 - Null engine
+Maximum posed opening/forearm radial ratios: 1.0810595489674626 1.2988694485680141
+BJS - [09:18:55]: Babylon.js v9.30.0 - Null engine
+Maximum posed cuff/opening centre separation metres: 0.025342433774138112
+✔ garment review preserves pinned anatomy and documents genuine CC0 fitting and painted weights (149.3863ms)
+✔ sewn source garments retain UVs, finite outward data and normalized thirteen-bone GPU weights (622.1523ms)
+✔ opt-in clothing changes preserve head, hair, eye height, skeleton and chosen colours for all six presets (1557.1059ms)
+✔ production creates sewn clothes directly and near/medium/far never reactivate obsolete anatomical outfits (427.6613ms)
+✔ posed wrist opening and adjacent forearm keep source-scale radius and axial overlap, not bell distortions (23563.7064ms)
+✔ actual posed cuffs remain attached to unchanged wrist/upper-arm openings while waving (332.7624ms)
+✔ flush joints follow one shared material edge, regardless of ring orientation (11.2785ms)
+✔ same-material continuations, gaps and empty footprint holes do not gain invented edges (1.229ms)
+✔ a T-junction receives a flush join only across the actual footway mouth (1.0031ms)
+✔ expanded source network produces deterministic joins only between existing distinct surfaces (619.9536ms)
+✔ joint render triangles follow shared DMR terrain and never add a raised kerb or wall crossing (1935.1494ms)
+✔ north court plane is a local reconstruction backed by original red ground and preserves raw DMR bytes (101.2689ms)
+✔ all building foundations and outside source terrain stay at their prior elevations (41.5332ms)
+✔ canonical court breaklines are identical in terrain collider, sampler and draped surfaces (2482.3649ms)
+✔ whole-world character crosses the repaired north court and apron without jump, teleport or resting vibration (4039.1576ms)
+✔ source-informed B6 paving joins the mapped west footway to the existing north stairs without a straight grass strip (2973.0207ms)
+✔ optional paved edge margin keeps prior point semantics and clears grass only close to real edges (26.815ms)
+✔ terrain contains georeferenced public F32 DMR5G samples and explicit B6 adaptation (3.9959ms)
+✔ real Rapier collision mesh agrees with rendering and interpolation without closing B6 basement (2004.7233ms)
+✔ draped actual street and parking triangles preserve area and follow terrain inside triangles (7694.1541ms)
+✔ central asphalt, Silicon Hill paint and representative parking are tied to the actual ortho (2.2998ms)
+✔ a real Rapier character crosses the central court and mesh seams, then rests without a height oscillation (1895.8604ms)
+BJS - [09:18:32]: Babylon.js v9.30.0 - Null engine
+✔ texture failure counts are scene-local, unique and detached with the scene (59.3701ms)
+✔ baked passenger navigation identifies current composed paths, terrain patch and actual entrance sources (44.4064ms)
+✔ both baked B6 passenger journeys follow the explicit diagonal paved approach instead of a grass shortcut (6.9721ms)
+North passenger route audit {
+  samples: 18717,
+  propCount: 3284,
+  routes: [
+    {
+      stopId: 'U981Z1P',
+      buildingId: '53929057',
+      name: 'Koleje Strahov blok 4',
+      length: 262.23040930872696,
+      normalAlignment: 0.9999999959465553,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z1P',
+      buildingId: '53929060',
+      name: 'Koleje Strahov blok 2',
+      length: 156.05209904037872,
+      normalAlignment: 0.9999999997683245,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z1P',
+      buildingId: '53929062',
+      name: 'Koleje Strahov blok 9',
+      length: 393.3250632515896,
+      normalAlignment: 0.9999999982579278,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z1P',
+      buildingId: '53929065',
+      name: 'Koleje Strahov blok 8',
+      length: 332.40611264793193,
+      normalAlignment: 0.999999999844062,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z1P',
+      buildingId: '53929066',
+      name: 'Koleje Strahov blok 5',
+      length: 107.72094766676439,
+      normalAlignment: 0.9999999999915401,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z1P',
+      buildingId: '53929067',
+      name: 'Koleje Strahov blok 10',
+      length: 443.7407063003272,
+      normalAlignment: 0.9999999969515665,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z1P',
+      buildingId: '53929068',
+      name: 'Koleje Strahov blok 7',
+      length: 223.19719109352366,
+      normalAlignment: 0.9999999999651459,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z1P',
+      buildingId: '53929069',
+      name: 'Koleje Strahov blok 3',
+      length: 210.09829419144884,
+      normalAlignment: 0.9999999999508076,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z1P',
+      buildingId: '53929071',
+      name: 'Koleje Strahov blok 6',
+      length: 173.1976174529862,
+      normalAlignment: 1,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z2P',
+      buildingId: '53929057',
+      name: 'Koleje Strahov blok 4',
+      length: 239.33147163474015,
+      normalAlignment: 0.9999999959465553,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z2P',
+      buildingId: '53929060',
+      name: 'Koleje Strahov blok 2',
+      length: 133.15316136639186,
+      normalAlignment: 0.9999999997683245,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z2P',
+      buildingId: '53929062',
+      name: 'Koleje Strahov blok 9',
+      length: 370.4261255776027,
+      normalAlignment: 0.9999999982579278,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z2P',
+      buildingId: '53929065',
+      name: 'Koleje Strahov blok 8',
+      length: 309.5071749739451,
+      normalAlignment: 0.999999999844062,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z2P',
+      buildingId: '53929066',
+      name: 'Koleje Strahov blok 5',
+      length: 177.9385380256981,
+      normalAlignment: 0.9999999999915401,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z2P',
+      buildingId: '53929067',
+      name: 'Koleje Strahov blok 10',
+      length: 420.8417686263403,
+      normalAlignment: 0.9999999969515665,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z2P',
+      buildingId: '53929068',
+      name: 'Koleje Strahov blok 7',
+      length: 293.4147814524574,
+      normalAlignment: 0.9999999999651459,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z2P',
+      buildingId: '53929069',
+      name: 'Koleje Strahov blok 3',
+      length: 187.199356517462,
+      normalAlignment: 0.9999999999508076,
+      issues: 0
+    },
+    {
+      stopId: 'U981Z2P',
+      buildingId: '53929071',
+      name: 'Koleje Strahov blok 6',
+      length: 243.41520781191997,
+      normalAlignment: 1,
+      issues: 0
+    }
+  ],
+  issues: []
+}
+North entrance KCC walks [
+  {
+    block: 4,
+    buildingId: '53929057',
+    ticks: 228,
+    distance: 10.834117397487603,
+    maxStep: 0.07698623978650773,
+    minClearance: 0.8200999074451829,
+    maxTreadError: 7.152557368605983e-8,
+    landingY: -0.6397019192729656,
+    finalPosition: DI {
+      x: 75.77422332763672,
+      y: 0.18038883805274963,
+      z: 52.568050384521484
+    }
+  },
+  {
+    block: 2,
+    buildingId: '53929060',
+    ticks: 208,
+    distance: 9.271501319632565,
+    maxStep: 0.07702884022102481,
+    minClearance: 0.8200999024549276,
+    maxTreadError: 7.152557390810443e-8,
+    landingY: 2.131316840542082,
+    finalPosition: DI {
+      x: -28.373647689819336,
+      y: 2.951416254043579,
+      z: 55.1292610168457
+    }
+  },
+  {
+    block: 9,
+    buildingId: '53929062',
+    ticks: 219,
+    distance: 10.026503029435156,
+    maxStep: 0.07709879736219055,
+    minClearance: 0.8200999357150067,
+    maxTreadError: 2.861022947442393e-7,
+    landingY: -3.675854178525647,
+    finalPosition: DI {
+      x: 205.6308135986328,
+      y: -2.8558545112609863,
+      z: 64.57874298095703
+    }
+  },
+  {
+    block: 8,
+    buildingId: '53929065',
+    ticks: 178,
+    distance: 6.877576232558035,
+    maxStep: 0.07704012707457043,
+    minClearance: 0.8204561233205823,
+    maxTreadError: 1.9073486345888568e-7,
+    landingY: -2.5936819519212735,
+    finalPosition: DI {
+      x: 153.6608123779297,
+      y: -1.7735824584960938,
+      z: 66.11448669433594
+    }
+  },
+  {
+    block: 5,
+    buildingId: '53929066',
+    ticks: 188,
+    distance: 7.539700259252577,
+    maxStep: 0.07696172910375187,
+    minClearance: 0.8200999833023843,
+    maxTreadError: 1.9073486345888568e-7,
+    landingY: 3.0133517567664336,
+    finalPosition: DI {
+      x: -56.98897171020508,
+      y: 3.8334505558013916,
+      z: -77.17180633544922
+    }
+  },
+  {
+    block: 10,
+    buildingId: '53929067',
+    ticks: 224,
+    distance: 10.442703138910552,
+    maxStep: 0.07707870712608166,
+    minClearance: 0.8200998430484105,
+    maxTreadError: 2.861022947442393e-7,
+    landingY: -4.831739130251846,
+    finalPosition: DI {
+      x: 257.6593017578125,
+      y: -4.0116472244262695,
+      z: 63.313480377197266
+    }
+  },
+  {
+    block: 7,
+    buildingId: '53929068',
+    ticks: 222,
+    distance: 10.11272466294131,
+    maxStep: 0.0770836072797038,
+    minClearance: 0.8200999275381946,
+    maxTreadError: 4.768371586472142e-8,
+    landingY: 0.4314500096391758,
+    finalPosition: DI {
+      x: 46.94983673095703,
+      y: 1.2513446807861328,
+      z: -79.08118438720703
+    }
+  },
+  {
+    block: 3,
+    buildingId: '53929069',
+    ticks: 228,
+    distance: 10.746202504197987,
+    maxStep: 0.07699720366002132,
+    minClearance: 0.8200999328440446,
+    maxTreadError: 4.768371586472142e-8,
+    landingY: 0.843637177057132,
+    finalPosition: DI {
+      x: 23.801471710205078,
+      y: 1.6637370586395264,
+      z: 53.96778106689453
+    }
+  },
+  {
+    block: 6,
+    buildingId: '53929071',
+    ticks: 145,
+    distance: 4.405807542377386,
+    maxStep: 0.0766754150449933,
+    minClearance: 0.8200998902320862,
+    maxTreadError: 7.152557379708213e-8,
+    landingY: 1.8,
+    finalPosition: DI {
+      x: -4.849997043609619,
+      y: 2.6199984550476074,
+      z: -77.794189453125
+    }
+  }
+]
+✔ passenger paths include every actual north-facing B2–10 destination and avoid source buildings and current fixed props (2355.266ms)
+✔ all nine north-facing passenger approaches climb actual shared stair colliders continuously and match NPC tread heights (5053.1351ms)
+✔ GTFS weekdays, bounded dates and additions/removals respect actual service dates (8.9961ms)
+✔ GTFS clock uses Prague service noon minus 12 h across both DST boundaries and 24+ times (22.6676ms)
+✔ actual PID feed identifies both requested lines, directions and distinct stop positions (63.381ms)
+✔ all baked passenger paths stay outside every OSM building, ending at their own threshold (605.5907ms)
+✔ all bus shape segments avoid building footprints rather than cutting directly between stops (153.085ms)
+✔ passenger door connectors start beside the bus and avoid actual current campus colliders (4132.2627ms)
+✔ fictional passengers are repeatable, vary across arrivals and finish before removal (9.6074ms)
+✔ expired feed never silently repeats a typical timetable (0.9915ms)
+✔ source edge indexing preserves original tolerance, holes and negative row boundaries (5523.0079ms)
+✔ caller-owned polygons still support mutations and hole boundary semantics (0.5842ms)
+✔ indexed grass clearance agrees with exhaustive distances across actual pavement edges (12.7007ms)
+✔ spatial vegetation candidates preserve exhaustive grass, forest and tree decisions (4137.6483ms)
+✔ expanded-campus grass retains the reviewed buffered-placement fingerprint (1874.6552ms)
+✔ each source tree owns clean unique branch geometry, retained detail levels and an editable Blender master (2020.0653ms)
+✔ all photographic material channels preserve official CC0 bytes and alpha silhouettes (427.4544ms)
+✔ reference interpretation stays auditable, roots use native terrain and collision radius matches authored trunk (15.7365ms)
+✔ detail reductions retain every tree, and wind deformation is a PBR shader extension rather than remeshing (0.5775ms)
+BJS - [09:18:54]: Babylon.js v9.30.0 - Null engine
+✔ streamed independent tree details retain every exact authored position, normal, UV and index (4720.2919ms)
+✔ bootstrap includes all independent far crowns with original photographic channels and no hidden high meshes (1225.3336ms)
+✔ independent transform API refreshes frozen tree geometry and world bounds (45.1693ms)
+BJS - [09:19:01]: Babylon.js v9.30.0 - Null engine
+Expanded vegetation bank and active budgets {
+  worldAreaSquareMetres: 573400,
+  possibleGridCells: 2340,
+  registeredTiles: 597,
+  grassClumps: 80576,
+  estimatedMatrixBytes: 5156864,
+  lowActiveTiles: 16,
+  highActiveTiles: 32
+}
+✔ natural grass excludes artificial turf, sand, tartan and unknown pitches (4.1031ms)
+✔ mapped grass clumps avoid actual building footprints and rendered path widths (8950.1637ms)
+✔ tree coordinates preserve OSM nodes and audited orthophoto crown centres without random relocation (15.8302ms)
+✔ wind is exactly still at zero, finite and capped in extreme weather (0.4556ms)
+✔ grass detail has hard distance/tile/density budgets without one mesh per blade (0.2712ms)
+✔ runtime grass tiles share one geometry and obey actual low/high active instance budgets (2325.1698ms)
+✔ saved walking first person does not disable the exterior car orbit path (1.8535ms)
+✔ entry releases existing walking mouse lock while preserving the walking view preference (0.4517ms)
+✔ E prioritises safe vehicle exit over a collectible at the identical position (2.6575ms)
+BJS - [09:18:51]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:51]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:51]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:51]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:51]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:51]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:51]: Babylon.js v9.30.0 - Null engine
+✔ model-derived beam follows translation, 90 degree yaw, pitch and parent transforms in actual world metres (49.699ms)
+✔ day, parking and invalid input disable the bounded beam; steady updates never repeat whole-scene light resync (29.7949ms)
+✔ medium and high use one 256/512 shadow target, low has no pass, and resized maps keep the real culling callback (236.1137ms)
+✔ actual shadow frustum rejects behind/lateral/far/glass/faded/disabled casters while retaining crossing large bounds (41.624ms)
+✔ reactivation, low-to-shadow return, large pose changes and new meshes invalidate stale broad phase immediately (13.1142ms)
+✔ wind depth ownership and disposal are safe, idempotent and do not delete a replacement owner's wrapper (37.3394ms)
+✔ exact 02:00 moonless night frees zero celestial key so hemisphere, two streets and headlight fit four material slots (46.5447ms)
+✔ physics proxy encloses the actual GLB body, roof, bumpers and mirrors (389.6016ms)
+✔ raycast car settles without jitter on cuboid floor (314.4236ms)
+✔ raycast car settles without jitter on heightfield (170.8748ms)
+✔ accelerator, service brake, gated reverse and governor work through chassis forces (144.0401ms)
+✔ steering turns toward requested side without translating or rotating a stationary body (105.7393ms)
+✔ persistent parking, driver ownership, wheel poses and state restore preserve identity (83.3264ms)
+✔ fixed-physics trajectory is identical at 30, 60 and 120 render Hz (318.8297ms)
+✔ CCD chassis stops at a thin wall at top speed without a translational tunnel (300.2091ms)
+✔ turning alongside a wall resolves rotational contacts instead of rotating through it (230.5975ms)
+✔ car traverses a 12cm curb and an inclined ramp without tunnelling or overturning (335.8264ms)
+✔ sustained slalom and alternating turns remain upright with front-wheel steering (334.235ms)
+✔ car completes both loops of a figure-eight and returns close to the crossing (284.7642ms)
+✔ weak opposite pedal always brakes a moving car before reverse, even for analog input (0.7691ms)
+✔ safe exit requires a nearly stopped finite chassis speed in both directions (0.7523ms)
+✔ holding S from cruise stops before reversing and W reverses that process without a pose jump (99.6129ms)
+✔ speed-sensitive steering reduces lateral acceleration and self-centres promptly (68.508ms)
+✔ handbrake applies rear-wheel braking and slows more strongly than coasting (65.9197ms)
+✔ restore/replay isolated car dynamics remains within a centimetre after a two-second replay (61.0435ms)
+BJS - [09:18:55]: Babylon.js v9.30.0 - Null engine
+✔ astronomy and meteorological bearings agree with north/east/south/west of the campus (6.7701ms)
+✔ Prague sun rises east, sets west, and its winter arc is much lower (3.1669ms)
+✔ October 2026 lunar illumination follows independent USNO primary-phase instants (1.8082ms)
+✔ projected moon terminator preserves illuminated area instead of changing a disc's opacity (35.3863ms)
+✔ lunar bright limb faces the sun in the observer's local sky (1.7017ms)
+✔ station local clock handles summer, winter, repeated DST hour and rejects nonexistent time (7.7297ms)
+✔ weather fallback converts current interval sums and distinguishes wind aloft (5.9016ms)
+✔ fresh station cannot silently inherit old cloud cover; both failures mark cache stale (66.7567ms)
+✔ cloud mipmap source has transparent borders and detailed nonuniform opacity (51.4388ms)
+✔ night windows scale the masked emission texture while walls remain nonemissive (99.3754ms)
+BJS - [09:18:55]: Babylon.js v9.30.0 - Null engine
+BJS - [09:18:57]: Babylon.js v9.30.0 - Null engine
+✔ facade, entrance and roof retain one independent source pivot per building with unchanged world vertices (1029.8917ms)
+✔ no material/LOD batch contains multiple building or court source identities (589.5796ms)
+✔ court detail LOD changes independently for distant mapped courts (351.7783ms)
+ℹ tests 346
+ℹ suites 0
+ℹ pass 345
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 99679.4443
+
+✖ failing tests:
+
+test at tests\car-wheel-topology.test.ts:149:1
+✖ source weld preserves every corner UV and avoids all export-time geometry repairs (1.0649ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\performance-snapshot\shadow-reserve-wheel-repair-20261011-k2\docs\vehicles\wheel-weld-audit.json'
+      at readFileSync (node:fs:484:20)
+      at TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\performance-snapshot\shadow-reserve-wheel-repair-20261011-k2\tests\car-wheel-topology.test.ts:151:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\performance-snapshot\\shadow-reserve-wheel-repair-20261011-k2\\docs\\vehicles\\wheel-weld-audit.json'
+  }
+[ELIFECYCLE] Test failed. See above for more details.

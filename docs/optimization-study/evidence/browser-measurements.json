@@ -1,0 +1,235 @@
+{
+  "auditDate": "2026-10-10",
+  "context": "Diagnostic summaries transcribed from the local browser harness output; not raw frame traces or a production capacity certification.",
+  "sourceSnapshot": "source-snapshot.zip",
+  "environment": {
+    "cpu": "Intel Core i7-8750H",
+    "gpu": "Intel UHD Graphics 630",
+    "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "api": "WebGL 2.0",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+    "cssCanvas": [
+      1280,
+      720
+    ],
+    "internalCanvas": [
+      984,
+      553
+    ],
+    "browserViewport": [
+      714,
+      668
+    ],
+    "devicePixelRatio": 1.25,
+    "visible": true,
+    "visibilityChangesDuringRuns": 0
+  },
+  "methodology": {
+    "durationSeconds": 12,
+    "scene": "Stationary spawn, fixed in-game time 2026-10-10T12:00:00Z, default cloud .4, standalone Game without React UI, development Vite build.",
+    "crowd": "1 local physics actor + 99 synthetic static render avatars in a 10-column grid, same base profile; no networking or full crowd physics.",
+    "cpu": "performance.now around Game.frame, including renderer command submission; not GPU time.",
+    "camera": "performance.now around original Scene.pickWithRay; no-ray condition returns null and is an isolation experiment, not a shippable collision fix.",
+    "drawCalls": "Original private counter accumulated incorrectly. SceneInstrumentation added for subsequent inventory and crowd runs; those counts are per frame.",
+    "limitations": [
+      "Short single passes; user applications and thermal state not controlled.",
+      "Canvas larger than visible browser viewport; screenshot only shows a crop, internal backbuffer remains as reported.",
+      "No GPU timer, input-to-photon measurement, full UI, Internet simulation, or 100 connected clients.",
+      "Concurrent compiler runs are preserved separately and excluded from headline performance comparison.",
+      "Independent run differences must not be interpreted as a guaranteed FPS improvement."
+    ]
+  },
+  "runs": [
+    {
+      "capturedAt": "2026-10-10T16:34:21.918Z",
+      "scenario": "1 avatar original camera",
+      "avatarCount": 1,
+      "frameIntervalMs": {
+        "n": 719,
+        "mean": 16.696662,
+        "p50": 16.7,
+        "p95": 16.9,
+        "p99": 18.4,
+        "max": 48.5
+      },
+      "cpuFrameMs": {
+        "n": 720,
+        "mean": 4.117361,
+        "p50": 3.8,
+        "p95": 6.2,
+        "p99": 7.5,
+        "max": 39.4
+      },
+      "cameraPickMs": {
+        "n": 720,
+        "mean": 2.774722,
+        "p50": 2.5,
+        "p95": 4.2,
+        "p99": 4.7,
+        "max": 8.4
+      },
+      "over33ms": 2,
+      "over50ms": 0,
+      "drawCalls": null,
+      "drawCallsNote": "Uninstrumented private counter value 91031 was cumulative, intentionally excluded.",
+      "activeTriangles": 72507
+    },
+    {
+      "capturedAt": "2026-10-10T16:34:57.221Z",
+      "scenario": "1 avatar without camera pick",
+      "avatarCount": 1,
+      "frameIntervalMs": {
+        "n": 719,
+        "mean": 16.702086,
+        "p50": 16.6,
+        "p95": 20.2,
+        "p99": 26.7,
+        "max": 57.5
+      },
+      "cpuFrameMs": {
+        "n": 720,
+        "mean": 1.045,
+        "p50": 1.1,
+        "p95": 1.8,
+        "p99": 2.4,
+        "max": 3.1
+      },
+      "cameraPickMs": null,
+      "over33ms": 1,
+      "over50ms": 1,
+      "drawCalls": null,
+      "drawCallsNote": "Private counter value 181675 was cumulative, intentionally excluded.",
+      "activeTriangles": 72507
+    },
+    {
+      "capturedAt": "2026-10-10T16:36:55.034Z",
+      "scenario": "100 static avatars original camera",
+      "avatarCount": 100,
+      "frameIntervalMs": {
+        "n": 717,
+        "mean": 16.74477,
+        "p50": 16.7,
+        "p95": 19,
+        "p99": 21.5,
+        "max": 24.4
+      },
+      "cpuFrameMs": {
+        "n": 718,
+        "mean": 14.372284,
+        "p50": 14,
+        "p95": 18.6,
+        "p99": 21.1,
+        "max": 24
+      },
+      "cameraPickMs": {
+        "n": 718,
+        "mean": 3.47312,
+        "p50": 3.4,
+        "p95": 4.5,
+        "p99": 4.9,
+        "max": 6.7
+      },
+      "over33ms": 0,
+      "over50ms": 0,
+      "drawCalls": 934,
+      "activeMeshes": 934,
+      "activeTriangles": 131511,
+      "totalMeshes": 1027,
+      "totalTriangles": 157758,
+      "colliders": 1620
+    },
+    {
+      "capturedAt": "2026-10-10T16:37:56.485Z",
+      "scenario": "100 static avatars without camera pick repeated after compiler completion",
+      "avatarCount": 100,
+      "frameIntervalMs": {
+        "n": 721,
+        "mean": 16.65215,
+        "p50": 16.6,
+        "p95": 19.6,
+        "p99": 21.5,
+        "max": 25.8
+      },
+      "cpuFrameMs": {
+        "n": 722,
+        "mean": 8.899169,
+        "p50": 8.4,
+        "p95": 12.5,
+        "p99": 16.1,
+        "max": 20.2
+      },
+      "cameraPickMs": null,
+      "over33ms": 0,
+      "over50ms": 0,
+      "drawCalls": 934,
+      "activeMeshes": 934,
+      "activeTriangles": 131511,
+      "totalMeshes": 1027,
+      "totalTriangles": 157758,
+      "colliders": 1620
+    }
+  ],
+  "instrumentedSingleInventory": {
+    "capturedAt": "2026-10-10T16:36:21.020Z",
+    "drawCallsPerFrame": 43,
+    "activeMeshes": 43,
+    "meshes": 136,
+    "materials": 58,
+    "multiMaterials": 18,
+    "textures": 23,
+    "colliders": 1620,
+    "subMeshes": 136,
+    "totalTriangles": 98754,
+    "activeTriangles": 72507
+  },
+  "excludedTimingRuns": [
+    {
+      "capturedAt": "2026-10-10T16:36:21.020Z",
+      "scenario": "1 avatar original camera with instrumentation",
+      "reason": "Overlapped Vite build; keep only scene inventory, not headline timing.",
+      "frameIntervalMs": {
+        "n": 693,
+        "mean": 17.319625,
+        "p50": 16.6,
+        "p95": 20.6,
+        "p99": 25.9,
+        "max": 455.7
+      },
+      "cpuFrameMs": {
+        "n": 694,
+        "mean": 5.940058,
+        "p50": 5.2,
+        "p95": 10.3,
+        "p99": 17,
+        "max": 33.5
+      },
+      "cameraPickMs": {
+        "mean": 3.984438,
+        "p95": 7.3
+      }
+    },
+    {
+      "capturedAt": "2026-10-10T16:37:20.408Z",
+      "scenario": "100 avatars without camera pick",
+      "reason": "Overlapped TypeScript build; repeated after completion.",
+      "frameIntervalMs": {
+        "n": 646,
+        "mean": 18.577554,
+        "p50": 17.2,
+        "p95": 27.8,
+        "p99": 43,
+        "max": 109.5
+      },
+      "cpuFrameMs": {
+        "n": 647,
+        "mean": 14.520247,
+        "p50": 13.3,
+        "p95": 23.4,
+        "p99": 38.2,
+        "max": 108.9
+      },
+      "over33ms": 14,
+      "over50ms": 3
+    }
+  ]
+}

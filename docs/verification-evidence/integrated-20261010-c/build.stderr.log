@@ -1,0 +1,8 @@
+$ tsc --noEmit && vite build
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0mclient/vegetation.ts is dynamically imported by client/game.ts but also statically imported by client/world-renderer.ts, dynamic import will not move module into another chunk.
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 1100 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

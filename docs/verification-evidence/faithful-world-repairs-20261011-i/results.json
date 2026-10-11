@@ -1,0 +1,33 @@
+{
+  "status": "failed-test-checkpoint",
+  "sourceSnapshotId": "d9baf093defe543c53facbf3c19fe22453e431a5e16e07236229ed6d3e706352",
+  "files": 8049,
+  "tests": {
+    "total": 334,
+    "passed": 330,
+    "failed": 4,
+    "elapsedSeconds": 50.3948143
+  },
+  "build": "not-run-after-test-failure",
+  "integration": "not-run-after-test-failure",
+  "browserFps": "not-measured",
+  "failures": [
+    {
+      "file": "tests/road-calibration.test.ts",
+      "reason": "old total380 ignores attributed B6 connector381"
+    },
+    {
+      "file": "tests/skinned-avatar.test.ts",
+      "reason": "licence evidence only in docs, absent from frozen source/asset package"
+    },
+    {
+      "file": "tests/vegetation-index.test.ts",
+      "reason": "old unbuffered599tile fingerprint vs intentional35cm pavement clearance597tiles"
+    },
+    {
+      "file": "tests/world-asset-identity.test.ts",
+      "reason": "old five-court+roof root count6 ignores new sixthcourt"
+    }
+  ],
+  "reportingNote": "Raw PowerShell stage report has an array in files due reporting-property enumeration; this summary derives the correct scalar directly from the immutable manifest. Neither snapshot source nor raw logs were rewritten."
+}

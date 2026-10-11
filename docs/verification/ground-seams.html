@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" /><title>Kontrola styku trávníku a podkladu</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: #10201a;
+      color: #fff;
+      font: 13px system-ui;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    aside {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      width: 290px;
+      padding: 14px;
+      background: #10241ce8;
+      border-radius: 8px;
+    }
+    h1 {
+      font-size: 17px;
+    }
+    label {
+      display: block;
+      margin: 8px 0;
+    }
+    button,
+    select {
+      padding: 5px;
+    }
+    pre {
+      font-size: 10px;
+      white-space: pre-wrap;
+      max-height: 35vh;
+      overflow: auto;
+    }
+    .scene-labels {
+      display: none;
+    }
+  </style>
+  <canvas tabindex="0" aria-label="Skutečná hra · styky povrchů"></canvas>
+  <div data-label-layer class="scene-labels"></div>
+  <aside>
+    <h1>Styky podkladu · skutečná hra</h1>
+    <p>
+      Diagnostické umístění vedle skutečného půdorysu. Vypnutí vrstvy slouží k
+      určení příčiny, není opravou ani měřením FPS.
+    </p>
+    <label
+      >Blok
+      <select id="block">
+        <option>6</option>
+        <option>5</option>
+        <option>4</option>
+        <option>3</option>
+        <option>8</option>
+        <option>10</option>
+      </select></label
+    >
+    <button id="place" disabled>Připravit pohled</button>
+    <label
+      >Kontrolní bod od západní hrany půdorysu
+      <select id="foot-offset">
+        <option value="-1">−1 m venku</option>
+        <option value="-0.25" selected>−0,25 m venku</option>
+        <option value="-0.05">−0,05 m venku</option>
+        <option value="0">Na hraně</option>
+        <option value="0.05">+0,05 m uvnitř</option>
+        <option value="0.25">+0,25 m uvnitř</option>
+        <option value="1">+1 m uvnitř</option>
+      </select></label
+    >
+    <label><input id="orbit" type="checkbox" /> Jemně pohybovat kamerou</label>
+    <label
+      ><input id="terrain" type="checkbox" checked /> Základní DMR
+      podklad</label
+    >
+    <label
+      ><input id="landcover" type="checkbox" checked /> Mapové plochy trávníku a
+      okolí</label
+    >
+    <label
+      ><input id="grass" type="checkbox" checked /> Samostatná stébla
+      trávy</label
+    >
+    <label
+      ><input id="roads" type="checkbox" checked /> Mapové cesty a
+      silnice</label
+    >
+    <label
+      ><input id="photo" type="checkbox" checked /> Interpretovaný asfalt
+      parkoviště</label
+    >
+    <label
+      ><input id="hide-avatar" type="checkbox" /> Skrýt postavu při pixelové
+      kontrole</label
+    >
+    <label
+      >Odstup od kontrolovaného bodu
+      <select id="probe-distance">
+        <option value="2">2 m</option>
+        <option value="30">30 m</option>
+        <option value="60">60 m</option>
+        <option value="100">100 m</option>
+      </select></label
+    >
+    <label><input id="shadows" type="checkbox" checked /> Skutečné stíny</label>
+    <label
+      >Sklonová část polygon offset podkladu
+      <select id="slope-bias">
+        <option value="original" selected>Původní faktor i units</option>
+        <option value="zero">Faktor 0, původní units</option>
+      </select></label
+    >
+    <label
+      ><input id="normals" type="checkbox" checked /> Normal mapy
+      podkladu</label
+    >
+    <label
+      ><input id="flat" type="checkbox" /> Diagnostické plné barvy bez
+      osvětlení/textur</label
+    >
+    <label
+      ><input id="pixel" type="checkbox" /> Sledovat barvu projektovaného bodu
+      (ne FPS)</label
+    >
+    <label
+      >CPU audit bod
+      <select id="sample">
+        <option value="grass">Tráva / základ (65.37, −121.39)</option>
+        <option value="road">Asfalt / tráva (70.37, −111.39)</option>
+        <option value="woods">Woods / základ (146.37, −89.39)</option>
+        <option value="photo">Parkoviště / tráva (87.37, 32.61)</option>
+      </select></label
+    >
+    <button id="sample-place" disabled>Přejít k auditovanému bodu</button>
+    <p>
+      CPU body dokládají polohy a vrstvy, nejsou potvrzená místa blikání. Pro
+      izolaci zkus stíny vypnout, pak plné barvy a stébla vypnout. Pixel probe
+      zaznamenává skutečný framebuffer; není měřením výkonu ani sám důkazem
+      příčiny.
+    </p>
+    <p>
+      Faktor 0 je pouze diagnostický pokus. Geometrie ani konstantní units se
+      při něm nemění; případné odstranění artefaktu je nutné potvrdit ve stejném
+      pohledu.
+    </p>
+    <label
+      >Detail
+      <select id="quality">
+        <option value="low">Úsporná</option>
+        <option value="medium" selected>Střední</option>
+        <option value="high">Vysoká</option>
+      </select></label
+    >
+    <pre id="report">Načítání…</pre>
+  </aside>
+  <script type="module" src="./ground-seams.ts"></script>
+</html>

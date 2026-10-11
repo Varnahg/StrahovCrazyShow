@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-10",
+  "coordinateSystem": "Metres, +X east, +Z south. Existing OSM footprints retained; B6 interior shell remains schematic.",
+  "runtimeAssets": "Original procedural textures and authored geometry. No Google, Mapy or ČVUT photographs redistributed as textures.",
+  "sources": [
+    {
+      "id": "ctu-exterior",
+      "url": "https://media.cvut.cz/cs/foto/20240620-exteriery-koleji-strahov",
+      "captureDate": "2024-06-20",
+      "author": "Jiří Ryszawy / ČVUT VIC",
+      "reviewedSlides": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "usage": "Visual reference only"
+    },
+    {
+      "id": "b6-pano",
+      "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=gWCshoWQgiJdy1QWcqe1eQ&heading=178.82123&pitch=20&fov=90",
+      "captureDate": "2025-09",
+      "visuallyReviewed": true,
+      "usage": "Linked reference only"
+    },
+    {
+      "id": "b7-pano",
+      "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=2UCXwe4UgzW5bAoI5ZFssA&heading=348.27243&pitch=12&fov=90",
+      "captureDate": "2024-05",
+      "visuallyReviewed": true,
+      "usage": "Linked reference only"
+    },
+    {
+      "id": "b6-plan",
+      "url": "https://wiki.sh.cvut.cz/kolej/bloky/blok_6",
+      "image": "https://wiki.sh.cvut.cz/_media/kolej/bloky/0.jpg",
+      "captureDate": "2023-03-20 metadata",
+      "visuallyReviewed": true,
+      "usage": "Orientation only; no dimension scale"
+    },
+    {
+      "id": "b8-wiki",
+      "url": "https://wiki.sh.cvut.cz/kolej/bloky/blok_8",
+      "checkedAt": "2026-10-10",
+      "evidence": "The source explicitly identifies B8 as the red block opposite the canteen."
+    },
+    {
+      "id": "b12-historical",
+      "url": "https://commons.wikimedia.org/wiki/File:Strahov,_studentsk%C3%A1_kolej_%C4%8D.12.JPG",
+      "captureDate": "2009-10-06",
+      "author": "Ondrej.konicek",
+      "license": "CC-BY-SA-3.0",
+      "visuallyReviewed": true,
+      "usage": "Window typology only, not current damage"
+    },
+    {
+      "id": "rko-east-pano",
+      "url": "https://mapy.com/cs/zakladni?q=Recharging%20bar&source=firm&id=13296995&pid=101883310&newest=1&yaw=4.343&x=14.3938139&y=50.0812633&ds=2&z=17&ovl=8",
+      "captureDate": "2023-06-01",
+      "visuallyReviewed": true,
+      "usage": "Linked reference only; exact mural artwork is not copied",
+      "evidence": "East end has four small high barred openings, small lower barred vents, painted facade and round metal flue. Bar doorway not visible."
+    },
+    {
+      "id": "osm",
+      "url": "https://www.openstreetmap.org/copyright",
+      "checkedAt": "2026-10-10",
+      "license": "ODbL-1.0",
+      "evidence": "Existing map.json original footprint vertices and building-level tags."
+    }
+  ],
+  "dimensions": {
+    "provenance": "Visual proportion interpretation in metres, not on-site measurements. Window pitch does not assert a room count.",
+    "standard": {
+      "bayPitch": 3.18,
+      "storeyHeight": 3,
+      "windowWidth": 2.18,
+      "windowHeight": 1.5,
+      "sillHeight": 0.85,
+      "revealDepth": 0.18,
+      "panes": 4,
+      "frameWidth": 0.045,
+      "pilasterWidth": 0.18,
+      "pilasterProjection": 0.075
+    },
+    "endPair": {
+      "windowWidth": 0.72,
+      "windowHeight": 0.78,
+      "separation": 0.2,
+      "sillHeight": 1.05,
+      "revealDepth": 0.16
+    },
+    "low": {
+      "bayPitch": 2.65,
+      "storeyHeight": 3,
+      "windowWidth": 1.12,
+      "windowHeight": 1.82,
+      "sillHeight": 0.7,
+      "revealDepth": 0.14,
+      "panes": 1,
+      "horizontalTransom": 0.55
+    }
+  },
+  "phenotypes": [
+    {
+      "osmId": "53929057",
+      "block": 4,
+      "type": "standard",
+      "confidence": "confirmed-numbered-photos-and-shared-long-facade-typology",
+      "sourceIds": ["ctu-exterior", "osm"],
+      "features": [
+        "White rough plaster long facades",
+        "Four-pane brown frames",
+        "Continuous projecting vertical pilasters",
+        "Gray board-formed concrete end piers",
+        "Sparse paired small windows on entrance core",
+        "Large blank end panels",
+        "Blue-white projecting block number"
+      ],
+      "limits": "Exact small-opening positions interpreted; no measured facade elevation."
+    },
+    {
+      "osmId": "53929071",
+      "block": 6,
+      "type": "standard",
+      "confidence": "confirmed-numbered-panorama-plus-typology",
+      "sourceIds": ["b6-pano", "b6-plan", "ctu-exterior", "osm"],
+      "features": [
+        "Concrete north end has broad blank pier, recessed strip of stair windows and paired small windows on second pier",
+        "White number 6 on side projection",
+        "North-facing main doorway and canopy on the western reception projection",
+        "Long facade has pale plaster and brown room frames"
+      ],
+      "limits": "B6 shell fitted to legacy schematic interior; not exactly aligned to rotated OSM perimeter."
+    },
+    {
+      "osmId": "53929068",
+      "block": 7,
+      "type": "standard",
+      "confidence": "identified-panorama-and-shared-typology",
+      "sourceIds": ["b7-pano", "ctu-exterior", "osm"],
+      "features": [
+        "Separate club 007 entrance",
+        "Room facade and entrance projection are distinct"
+      ],
+      "limits": "Club entrance does not make the full interior playable; unobserved details remain conservative."
+    },
+    {
+      "osmId": "53929065",
+      "block": 8,
+      "type": "cell",
+      "confidence": "official-red-identity-plus-photo-typology",
+      "sourceIds": ["b8-wiki", "ctu-exterior", "osm"],
+      "features": [
+        "Red entrance-core accent",
+        "Pale long facade",
+        "Cell windows differ from original standard blocks"
+      ],
+      "limits": "Extent of red cladding inferred from exterior slide 10 and official description; exact current panels not surveyed."
+    },
+    {
+      "osmId": "53921168",
+      "block": 12,
+      "type": "low",
+      "confidence": "historical-labelled-photo",
+      "sourceIds": ["b12-historical", "osm"],
+      "features": [
+        "Three levels from OSM",
+        "Narrow tall windows with horizontal transom",
+        "Off-white plaster"
+      ],
+      "limits": "Historical 2009 typology only; damage deliberately not reproduced as current condition."
+    },
+    {
+      "osmId": "53929063",
+      "block": 1,
+      "type": "administration",
+      "confidence": "identity-and-footprint-only",
+      "sourceIds": ["osm"],
+      "features": ["Compound low administration footprint"],
+      "limits": "No identified facade photograph inspected. No dormitory grid or fabricated reception detail added."
+    },
+    {
+      "osmId": "8111356",
+      "block": null,
+      "type": "canteen",
+      "confidence": "confirmed-exterior-photo",
+      "sourceIds": ["ctu-exterior", "osm"],
+      "features": [
+        "Large metal-framed glazed facade",
+        "Gray upper cladding",
+        "Cream square tile entrance volume",
+        "Blue MENZA STRAHOV sign"
+      ],
+      "limits": "Front-facing north selection is an interpretation toward the campus; exact extent and entrance stairs not measured."
+    },
+    {
+      "osmId": "7645350",
+      "block": null,
+      "type": "commercial",
+      "confidence": "identified-east-panorama-plus-footprint",
+      "sourceIds": ["osm", "rko-east-pano"],
+      "features": [
+        "One low shared Potraviny/R-ko shell",
+        "Four small upper barred windows at east end",
+        "Small lower barred vents",
+        "Painted wall, metal roof cap and round metal flue"
+      ],
+      "limits": "Exact R-ko doorway not established. Mural artist and reproduction rights unknown: original exact mural is not copied, only broad own colour blocks suggest painted character. No invented storefront grid."
+    }
+  ],
+  "b6Entry": {
+    "x": -4.85,
+    "z": -77.1,
+    "y": null,
+    "uncertaintyMetres": 2,
+    "provenance": "North short side of the west reception projection: directly inspected September 2025 north-facing Google panorama, B6 plan arrow and OSM north face. ELSA B2 plan corroborates orientation only.",
+    "sourceIds": ["b6-pano", "b6-plan", "osm"],
+    "measured": false,
+    "modelFoundationOffset": 1.8,
+    "modelFoundationConfidence": "low-typology-interpretation-twelve-times-0.15m-not-surveyed",
+    "modelDoor": { "x": -4.85, "z": -77.15, "outwardX": 0, "outwardZ": -1 },
+    "passage": { "z": -77.1, "fromX": -6.05, "toX": -3.65 },
+    "stairCount": "ELSA documents usually 12 covered steps for blocks 2-7; modeled 12 x 0.15m is an unmeasured estimate. Shared B6_LAYOUT owns traversable north stairs and opening."
+  },
+  "landmarkEntrances": [
+    {
+      "id": "b6-reception",
+      "x": -4.85,
+      "z": -77.1,
+      "y": null,
+      "confidence": "photo-plus-map-interpretation",
+      "uncertaintyMetres": 2,
+      "osmPoiNode": null,
+      "sourceIds": ["b6-pano", "b6-plan", "osm"],
+      "evidence": "North short side of the western reception projection, confirmed by the B6 plan arrow and directly inspected September 2025 north panorama. Elevation and metric stair dimensions remain interpreted, not surveyed."
+    },
+    {
+      "id": "seven-club",
+      "x": 68.3,
+      "z": -31.5,
+      "y": null,
+      "confidence": "visually-localised-under-southeast-stairs",
+      "uncertaintyMetres": 4,
+      "osmPoiNode": null,
+      "sourceIds": ["b7-pano", "osm"],
+      "evidence": "Dark 007 doorway below external stairs on east long facade near south end, distinct from west reception projection. Closed decorative portal in this demo."
+    },
+    {
+      "id": "rko",
+      "x": 103.08,
+      "z": -57.81,
+      "y": null,
+      "confidence": "osm-business-poi-not-door",
+      "uncertaintyMetres": null,
+      "osmPoiNode": "5508982945",
+      "sourceIds": ["osm"],
+      "evidence": "POI inside shared Potraviny shell. This is not a verified entrance coordinate."
+    },
+    {
+      "id": "menza",
+      "x": 100.76,
+      "z": 135.1,
+      "y": null,
+      "confidence": "campus-facing-front-interpretation",
+      "uncertaintyMetres": 8,
+      "osmPoiNode": null,
+      "sourceIds": ["ctu-exterior", "osm"],
+      "evidence": "Glazed facade documented photographically. North-facing selection and door point provisional; not surveyed."
+    }
+  ],
+  "simulation": {
+    "windowOccupancy": "Seeded demonstration lights, unrelated to real residents or room activity."
+  },
+  "limits": [
+    "No measured structural elevations or facade survey.",
+    "Unidentified red-wing photograph is not sufficient to relocate a building.",
+    "Standard blocks without individual source coverage use explicitly labelled shared typology.",
+    "All added facade details stay at or inside a footprint except thin non-walkable sills/pilastry; no new porches or stairs requiring unsynchronised colliders."
+  ]
+}

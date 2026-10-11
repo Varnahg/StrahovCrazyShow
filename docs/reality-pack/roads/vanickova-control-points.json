@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "interpretationDate": "2026-10-10",
+  "method": "Manual identification of the inner asphalt/kerb transition in original georeferenced IPR orthophotos. Pixel coordinates refer to the original 640 by 480 image, top-left origin. Road markings and PID geometry were not used as the polygon boundary. Manually marked centreline pixels are initial guides; the generator centres each guide cross-section between the two photo boundaries. Image-edge guide endpoints stay fixed because image crop edges are not physical kerbs. No PID points are used for axis centring.",
+  "classification": "photo-interpreted-not-surveyed",
+  "estimatedBoundaryUncertaintyMetres": 0.3,
+  "patches": [
+    {
+      "id": "ipr-2024-vanickova-south-curve",
+      "image": "docs/photogrammetry/evidence/pid-149-vanickova-south-ortho-2024.jpg",
+      "georeference": "docs/photogrammetry/evidence/pid-149-vanickova-south-ortho-2024.json",
+      "asphaltBoundaryPixels": [[0,220],[100,215],[200,208],[300,203],[400,192],[480,176],[540,153],[590,121],[640,70],[640,182],[590,221],[540,253],[480,282],[400,301],[300,315],[200,324],[100,338],[0,348]],
+      "centrelinePixels": [[0,284],[100,276.5],[200,266],[300,259],[400,246.5],[480,229],[540,203],[590,171],[640,126]],
+      "notes": "The north edge adjoins the stadium apron. The south edge adjoins the bus/turning apron. Boundary excludes both lighter apron surfaces; it includes the two traffic lanes and marked cycle edge lanes. Continuous short curb transitions are interpreted at 0.1 m/pixel, not measured curb heights."
+    },
+    {
+      "id": "ipr-2024-vanickova-east-curve",
+      "image": "docs/photogrammetry/evidence/pid-149-vanickova-north-ortho-2024.jpg",
+      "georeference": "docs/photogrammetry/evidence/pid-149-vanickova-north-ortho-2024.json",
+      "asphaltBoundaryPixels": [[0,308],[80,302],[160,284],[230,246],[290,193],[330,134],[357,69],[371,0],[446,0],[439,76],[412,154],[367,235],[300,307],[230,358],[160,388],[80,407],[0,415]],
+      "centrelinePixels": [[160,336],[230,302],[290,250],[330,199],[365,133],[389,53],[397,0]],
+      "notes": "Bend from the south stadium frontage towards the north-running Vanickova carriageway. Upper/left inner kerb and lower/right outer kerb are visible. The tiny overlapping image strip is unioned and is not drawn twice. Pixels under cars were interpolated between adjacent visible kerb edges, not inferred from the bus route."
+    }
+  ]
+}

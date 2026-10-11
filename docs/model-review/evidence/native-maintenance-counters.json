@@ -1,0 +1,116 @@
+{
+  "date": "2026-10-10T22:50:34.084Z",
+  "scope": "CPU-only actual native terrain/street/tree/car geometry construction; trees use one explicit untextured surrogate material. Excludes real tree materials/textures, architecture, B6, avatars, grass, HUD and GPU",
+  "sourceHashes": {
+    "public/models/vegetation/realistic/strahov-individual-trees.glb": "b33d22608182ba9e73c97ccc816dde5ad2c85b3d0c5473919626b7fdda6a5358",
+    "public/models/strahov-compact.glb": "04b48fff78884b8bb60bf72592434cce396ca17e4d28532074ad4ede04f4a0d1",
+    "client/cinematic.ts": "345e458fa8396ba0ac7e61c88e208d44e905197270ff3207d1adebf8c6d41ba4",
+    "client/surface-pack.ts": "7b380fd54f3e066cb5ebcf056c392ea6de324f242c6c084b23f5a2c24b06913e",
+    "client/labels.ts": "a6ddbc814d8bc8f409328b7bc296a85685e1e480a3127528c75dc9436b076cb3",
+    "client/render-cost.ts": "e72c7a3cb4af2810541d31a12384d9e12a7038ecfe29680328f2b298c153c63f",
+    "shared/vegetation.ts": "a971613162dcea9068cc63f3c5284ca99cacf8a23eafa6dacce5245a467cd0cf",
+    "shared/data/landcover.json": "92425a36cfdf4bac15415c31e947bbd0e09576f5a650f9589284ee55e5402e3b",
+    "scripts/profile-native-maintenance.ts": "4f618026a13e36b492f9f702c7c6424ada36ada89f123a99c3df8fbdf9dce1e8",
+    "client/streets-renderer.ts": "31b1b3ddcdbf28c6011d723841d763d8b40805cdf15362adc7a0682de4dda845",
+    "client/terrain-renderer.ts": "46039f0a9a696fdee6eba07a7180a8e60811697409b75c67323ebfe8933b64ca",
+    "shared/terrain.ts": "c7e54a6859b22e87ae0d8e71cf01f2d23577994e2eddc6c8bc56a9c445e878e8",
+    "shared/streets.ts": "6a6d797c58f2aaff095a1a72554001f9b87bf8c41effbeebf61dd239c8690436",
+    "shared/world.ts": "394fe4d61db507be8881af44a3dc417ed9c3674688cef3ba6cb9b9534a15a936"
+  },
+  "sourceHashesStable": true,
+  "referenceWholeGameDiagnostic": {
+    "path": "docs/model-review/evidence/native-scene-diagnostic.json",
+    "sha256": "51432bf2f780ab17b3dbc25f97fe854a62f4ec4bec7bea5ef993edda6a59c549",
+    "provisional": true,
+    "fps": 17.7,
+    "cpuMs": 63.59999990463257,
+    "gpuMs": 19.441004,
+    "meshes": 3141,
+    "drawCalls": 322,
+    "renderer": {
+      "vendor": "Google Inc. (Intel)",
+      "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+    }
+  },
+  "treeAsset": {
+    "bytes": 183087208,
+    "meshPrimitives": 657,
+    "materials": [
+      "CC0 photographic bark — ambientCG Bark012",
+      "CC0 photographic green leaves — ambientCG LeafSet001",
+      "CC0 photographic needle atlas — ambientCG LeafSet019"
+    ],
+    "textures": 9,
+    "trianglesByLod": [
+      1963056,
+      654724,
+      256428
+    ]
+  },
+  "constructionCpuMs": 7032.0025000000005,
+  "inventory": {
+    "registeredMeshes": 1031,
+    "enabledVisibleGeometryMeshes": 558,
+    "hiddenGeometryMeshes": 472,
+    "enabledRegularInstances": 325,
+    "uniqueGeometries": 686,
+    "uniqueGeometryTriangles": 3127783,
+    "enabledPotentialTriangles": 598024,
+    "registeredMaterials": 26,
+    "enabledDistinctMaterials": 27,
+    "enabledMeshCountsByMaterialClass": {
+      "PBRMaterial": 334,
+      "StandardMaterial": 224
+    },
+    "materialLightAssignmentGroups": 27,
+    "lights": 37,
+    "enabledLights": 1,
+    "enabledTreeMeshesByLod": [
+      2,
+      10,
+      205
+    ]
+  },
+  "tenSimulatedSecondsSurfaceWork": {
+    "meshVisits": 0,
+    "conversionPasses": 19,
+    "materialUpdates": 0
+  },
+  "convertedSurfaceMaterials": 6,
+  "shadow": {
+    "instant": 1791712800000,
+    "sun": {
+      "altitude": 0.5559550399406001,
+      "azimuth": 2.8901579707152325,
+      "daylight": 1,
+      "angularDiameter": 0.009302604913129777,
+      "x": 0.2113246460854488,
+      "y": 0.5277547486330891,
+      "z": 0.8226887742348772
+    },
+    "potentialCandidates": 369,
+    "priorEnabledCandidates": 336,
+    "frustumSubmitted": 257,
+    "priorPotentialDrawTriangles": 82501,
+    "submittedPotentialDrawTriangles": 63726,
+    "stats": {
+      "shadowCasters": 257,
+      "alphaCasters": 0,
+      "glassMaterials": 0,
+      "skyUpdates": 0,
+      "shadowMapSize": 512,
+      "shadowCandidates": 369,
+      "shadowFrustumRejected": 79,
+      "shadowInactiveRejected": 33,
+      "selectionMeshVisits": 1031,
+      "glassVisits": 26
+    }
+  },
+  "limits": [
+    "No GPU FPS claim or whole-game performance claim.",
+    "Texture/material loading excluded from headless geometry construction; source GLB material/texture counts reported separately.",
+    "Reference browser diagnostic predates these changes and was not source-frozen.",
+    "Only exact shadow-frustum non-contributors removed; no mesh simplification or LOD boundary change."
+  ]
+}

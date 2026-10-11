@@ -1,0 +1,15 @@
+# Oprava degenerátů odvozených modelů
+
+11. 10. 2026. Opravy se týkají herních odvozenin. Původní CC0 `city-bus-source.glb` zůstal byte-identický se SHA-256 `42fc939d64b8bcfc5329e13356fc984872c18ecb10535da6354f98ea58d3519c`.
+
+Autobus měl 161 nulových trojúhelníků přímo v uložené lokální geometrii zdroje. Přesný výpočet jeho transformací v double zachovává 161. Při převodu výsledných vrcholů do float32, který používá zapečený runtime model, vzniká celkem 861. Dalších 700 jsou hrany původních velmi tenkých skel, dveří a světel, které se při překladu do souřadnic autobusu zaokrouhlí na stejnou polohu. Rozdíl tedy není způsoben přidanými 700 viditelnými plochami. Podrobné počty uzlů zaznamenává `bus-degenerate-baseline.json`.
+
+`model_geometry_repair.py` odstraňuje pouze nulové indexové trojice z odvozených GLB. Pozice, normály, UV, barvy a vložené obrázky se nepřepisují. Kontroluje přesné bajty atributů a obrázků i SHA všech zachovaných platných trojúhelníků před a po opravě. Nejdetailnější autobus má 17 919 trojúhelníků místo 18 780; vzdálený má 6 392 místo 6 553. Dveře a čtyři kola si zachovávají vlastní pojmenované uzly. Editovatelný `strahov-city-bus.blend` obsahuje čistých 17 919 faces. Původní zdroj zůstává archivní referencí včetně svých 161 přiznaných vad.
+
+Při běžné tvorbě autobusu generátor opraví oba odvozené GLB. Přepínač `--keep-existing-low` zachová již ověřenou platnou LOD geometrii a odstraní z ní pouze vadné indexy, takže se při topologické opravě nemusí znovu spouštět aproximace Decimate. Předání používá tuto možnost. `--skip-preview` vynechá nákladný CPU render a nemění modelovou opravu.
+
+U umyvadla vytvářel generátor 24 různých vrcholů v jediném středu s poloměrem nula. Navazující čtyřúhelníky a Solidify vytvořily 48 nulových trojúhelníků a zbytečné vnitřní švy. Nová geometrie používá jeden středový vrchol a uzavřený trojúhelníkový vějíř; navazující tři prstence zůstávají beze změny. Výsledných 616 trojúhelníků místo 712 obsahuje správně uzavřenou keramickou tloušťku bez vnitřních švů. Kolizní boxy, rozměry ostatních částí a materiálové předlohy se nemění. Stejná oprava je v `sink.blend` i generátoru. Příkaz `--only-sink --skip-preview` umožňuje opravit právě tuto součást bez regenerace ostatních devíti B6 modelů.
+
+Finální public manifesty B6 a dopravy se kopírují byte-identicky do `shared/data/assets`, včetně nových počtů. Oprava neprohlašuje generický CC0 autobus za konkrétní model DPP a nemění dosavadní míru jistoty u schematického vybavení B6.
+
+Výsledek: 25 cílených testů B6, dopravy, opravené geometrie a source manifestů prošlo; `tsc --noEmit` prošel. Znovu byly otevřeny oba skutečné `.blend` soubory a nemají nulové trojúhelníky. Celý audit 153 GLB nemá žádnou strukturální chybu; jediných zbývajících 161 nulových trojúhelníků je v neměnném archivním CC0 zdroji, nikoli v herních odvozeninách. `bus-repair-byte-equivalence.json` navíc potvrzuje, že oba finální herní autobusy jsou byte-identické s původními verzemi po odstranění pouze vadných indexů. Transformace zdroje lze přepočítat příkazem `node scripts/audit-bus-transform-degenerates.mjs`.

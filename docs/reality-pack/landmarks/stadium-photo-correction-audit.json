@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-10T20:27:58.519Z",
+  "scope": "Author-created photo-interpreted source geometry with OSM footprint/height and CUZK DEM. Not photogrammetry, real-world survey or whole-game FPS evidence.",
+  "sourceSha256": {
+    "shared/landmark-reality.ts": "b11f48b31a631e6a7749b5556655d3af2fb793b0ec4e5f20ec5569348afb7844",
+    "client/landmark-reality.ts": "8c2263a6392ec8cf602d9b653d1b2c297c01cb4981e263c43e194b5319b4da3e",
+    "tests/landmark-reality.test.ts": "749bc0d8a4048f93ea36628ae04a4b2b7f4fd720c7344a5f0eef07fcb502ab26",
+    "tests/stadium-photo-reality.test.ts": "0980e5142be8dfba1bf409c505424e115f91bdd18d0d99abf4fe8ec967e2d5dd",
+    "scripts/create-landmark-reality.py": "9423955887f5db58d044127ae889f8553e77b327e0105df7b21dc227b68fc14d",
+    "shared/data/building-catalog.json": "ed435ec06401b5ea8ea604ca75af0a9fd3a2d7e8252ca65f018853c19a3a804b",
+    "shared/data/terrain-grid.json": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+    "docs/reality-pack/landmarks/geometry-source.json": "f076a5a533c53b102c5b4cf472f5f23926617eeb906e32016ffd05b1ae00f881"
+  },
+  "references": [
+    {
+      "filename": "codex-clipboard-3b764a8e-0dab-477d-9ea5-6c341efd6e2f.png",
+      "sha256": "7b0d9f7eb7530f1b7f1962a390453efd10673ea72f347a76bd84fb8fbe60b55d",
+      "inspected": true,
+      "captureDate": "unknown",
+      "use": "visual comparison and authored interpretation only; not extracted as texture/mesh or redistributed"
+    },
+    {
+      "filename": "codex-clipboard-6d5aac8c-c02e-43f0-9795-57617c3635c0.png",
+      "sha256": "8aabe97044e48086fa4cbf76665c5aaa6e6e56ded6b0569d24056cdb123d54e4",
+      "inspected": true,
+      "captureDate": "unknown",
+      "use": "visual comparison and authored interpretation only; not extracted as texture/mesh or redistributed"
+    },
+    {
+      "filename": "codex-clipboard-7e2949f1-8c17-4ae9-97ab-8eabbb2a2ec9.png",
+      "sha256": "d12f5a5a644906d93e04b9ba90453a60983bdb06ed4ca4d592c81a2806a9d996",
+      "inspected": true,
+      "captureDate": "unknown",
+      "use": "visual comparison and authored interpretation only; not extracted as texture/mesh or redistributed"
+    }
+  ],
+  "geometry": {
+    "landmarkNearTriangles": 26741,
+    "landmarkFarTriangles": 13215,
+    "collisionTriangles": 14336,
+    "stadiumNearTriangles": 16620,
+    "stadiumFarTriangles": 9686,
+    "stadiumMeshBatches": 13,
+    "stadiumNearEnabledBatches": 10,
+    "stadiumFarEnabledBatches": 8,
+    "pavilion": {
+      "osmId": "480849465",
+      "baseY": 3.179767465591432,
+      "height": 20,
+      "frontageMetres": 126.17434309637262,
+      "columns": 17,
+      "glazingBays": 50,
+      "stairFlights": 2,
+      "stairStepsPerFlight": 28,
+      "stairCenter": [-138.08, 3.179767465591432, 17.520000000000007],
+      "stairProfiles": [
+        [
+          [0, -0.19421539359888218],
+          [0.5425, 0.087298068501048],
+          [1.085, 0.36881153060097815],
+          [1.6275, 0.6503249927009083],
+          [2.17, 0.9318384548008385],
+          [2.7125, 1.2133519169007687],
+          [3.255, 1.494865379000699],
+          [3.7975, 1.7763788411006292],
+          [4.34, 2.057892303200559],
+          [4.8825, 2.3394057653004894],
+          [5.425, 2.6209192274004196],
+          [5.967499999999999, 2.90243268950035],
+          [6.51, 3.1839461516002796],
+          [7.0525, 3.46545961370021],
+          [7.595, 3.74697307580014],
+          [8.1375, 4.02848653790007],
+          [8.68, 4.3100000000000005],
+          [8.68, 3.74],
+          [8.1375, 3.399959441295232],
+          [7.595, 3.0621680460906133],
+          [7.0525, 2.7287885437943293],
+          [6.51, 2.4018141172443155],
+          [5.967499999999999, 2.0829918058095864],
+          [5.425, 1.7737553676470337],
+          [4.8825, 1.4751701811795204],
+          [4.34, 1.1878923032005593],
+          [3.7975, 0.9121432569796599],
+          [3.255, 0.6477015192473128],
+          [2.7125, 0.3939110332100051],
+          [2.17, 0.14970642044487426],
+          [1.6275, -0.0863460772049724],
+          [1.085, -0.3159934991085488],
+          [0.5425, -0.5412290281037905],
+          [0, -0.7642153935988822]
+        ],
+        [
+          [0, -0.02819166318996298],
+          [0.5425, 0.24294531575940975],
+          [1.085, 0.5140822947087824],
+          [1.6275, 0.7852192736581551],
+          [2.17, 1.0563562526075279],
+          [2.7125, 1.3274932315569008],
+          [3.255, 1.5986302105062735],
+          [3.7975, 1.8697671894556462],
+          [4.34, 2.1409041684050187],
+          [4.8825, 2.4120411473543912],
+          [5.425, 2.683178126303764],
+          [5.967499999999999, 2.954315105253137],
+          [6.51, 3.2254520842025096],
+          [7.0525, 3.496589063151882],
+          [7.595, 3.767726042101255],
+          [8.1375, 4.038863021050628],
+          [8.68, 4.3100000000000005],
+          [8.68, 3.74],
+          [8.1375, 3.4103359244457896],
+          [7.595, 3.0829210123917283],
+          [7.0525, 2.7599179932460016],
+          [6.51, 2.4433200498465455],
+          [5.967499999999999, 2.1348742215623737],
+          [5.425, 1.8360142665503782],
+          [4.8825, 1.5478055632334222],
+          [4.34, 1.2709041684050189],
+          [3.7975, 1.005531605334677],
+          [3.255, 0.7514663507528874],
+          [2.7125, 0.5080523478661372],
+          [2.17, 0.2742242182515636],
+          [1.6275, 0.04854820375227448],
+          [1.085, -0.17072273500074453],
+          [0.5425, -0.3855817808454287],
+          [0, -0.598191663189963]
+        ]
+      ]
+    },
+    "interpretation": {
+      "osmId": "480849465",
+      "footprint": [
+        [-140.18, -48.38],
+        [-141.63, -48.36],
+        [-159.7, -48.16],
+        [-158.83, -13.69],
+        [-158.12, 17.88],
+        [-157.54, 44.02],
+        [-156.49, 77.78],
+        [-137.09, 77.75],
+        [-137.38, 65.93],
+        [-137.81, 45.34],
+        [-138.08, 17.52],
+        [-139.39, -16.53],
+        [-140.18, -48.38]
+      ],
+      "frontage": [
+        [-140.18, -48.38],
+        [-139.39, -16.53],
+        [-138.08, 17.52],
+        [-137.81, 45.34],
+        [-137.38, 65.93],
+        [-137.09, 77.75]
+      ],
+      "height": 20,
+      "concourseY": 4.2,
+      "cantileverSoffitY": 8.4,
+      "principalGlassTopY": 13.6,
+      "upperGlassBottomY": 18.35,
+      "upperGlassTopY": 19.55,
+      "columnInset": 3.4,
+      "columnPitch": 7.8,
+      "glazingPitch": 2.55,
+      "coveredPortalZ": 17.522,
+      "portalClearWidth": 5.8,
+      "stairWidth": 3.8,
+      "stairOutward": 3,
+      "stairStepsPerFlight": 28,
+      "stairRun": 0.31,
+      "stairLandingHalfLength": 1.8,
+      "confidence": "OSM-footprint-and-height; source-DEM-base; photo-interpreted-structural-silhouette-and-detail"
+    }
+  },
+  "tests": {
+    "command": "pnpm exec tsx --test tests/landmark-reality.test.ts tests/stadium-photo-reality.test.ts",
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 6286.8041,
+    "physicalProof": [
+      "35m continuous production KCC undercroft traversal",
+      "both source-model exterior flights continuously climbed without teleport",
+      "source covered service portal sphere sweep remains open"
+    ]
+  },
+  "blender": {
+    "version": "5.2.2 LTS",
+    "manifest": {
+      "schemaVersion": 1,
+      "license": "Original authored meshes/materials CC0-1.0; OSM-derived placement/footprint data ODbL-1.0 with attribution. Reference photographs not redistributed.",
+      "sourceGeometrySha256": "f076a5a533c53b102c5b4cf472f5f23926617eeb906e32016ffd05b1ae00f881",
+      "modules": [
+        {
+          "id": "b1-administration",
+          "triangles": 5225,
+          "bytes": 388900,
+          "sha256": "719bfd14745ad32df03424af40b2a0308b131be3da22d23133a69007a1115104",
+          "worldOrigin": {
+            "x": -87.03,
+            "y": 2.0953938016295437,
+            "z": 77.57,
+            "yaw": 0
+          }
+        },
+        {
+          "id": "great-strahov-stadium",
+          "triangles": 16620,
+          "bytes": 1326232,
+          "sha256": "0e977512d3493246511e88f8660c7be08afddd0846dbde530e7c6609fa7ccf16",
+          "worldOrigin": {
+            "x": -286,
+            "z": 18,
+            "y": 6.163147394061088,
+            "yaw": 0
+          }
+        },
+        {
+          "id": "great-strahov-stadium-far",
+          "triangles": 9686,
+          "bytes": 736852,
+          "sha256": "13751fa28f0398aaaa5cf08a2ea2826121c76ff748ee197634d23f2bc6900eec",
+          "worldOrigin": {
+            "x": -286,
+            "z": 18,
+            "y": 6.163147394061088,
+            "yaw": 0
+          }
+        },
+        {
+          "id": "common-covered-entrance",
+          "triangles": 612,
+          "bytes": 51264,
+          "sha256": "2cc8f48cf411453ee91ee06125d232702320ad5e3591f397c411311282650363",
+          "worldOrigin": {
+            "x": -28.27,
+            "y": 0.33131684054208227,
+            "z": 55.82,
+            "yaw": -2.9946335161312017
+          }
+        }
+      ]
+    },
+    "glassVertexColorsExported": ["stadium stadium-glass"]
+  },
+  "webGL": {
+    "status": "Unavailable in this subagent: Cua inventory browsers=[]; known parent browser id 2 unavailable. Requested root visual inspection.",
+    "preview": "/docs/reality-pack/landmarks/stadium-photo-correction-preview.html?view=south",
+    "gpuMeasurement": false
+  }
+}

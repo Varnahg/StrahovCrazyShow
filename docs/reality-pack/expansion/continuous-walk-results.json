@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-10",
+  "command": "pnpm exec tsx --test tests/campus-expansion.test.ts",
+  "result": "4 passed, 0 failed, 0 skipped",
+  "durationMs": 55624.4875,
+  "environment": "Node.js v24.19.0; Rapier 0.21.0; shared production Simulation; one actual controlled walking actor; fixed simulation timestamp 0",
+  "scope": "CPU physics and mapped pedestrian topology validation. Not a browser screenshot, GPU measurement, real-world accessibility audit or frozen whole-game verification.",
+  "teleportsAllowed": false,
+  "inputDataSha256": {
+    "shared/data/streets.json": "fef5c4489d4cf0ac5b3a914b1c42771ee416e14b42379e0220d47a11e6211897",
+    "shared/data/terrain-grid.json": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03"
+  },
+  "routes": [
+    {
+      "target": "stadium191a",
+      "routeSha256": "7b81710035d1d5dd08b6bbe2c24666412e1dc36d49fa55ff7ac39fdf65196b9e",
+      "routeMetres": 503.1423913163508,
+      "mappedSurfaceSamples": 1043,
+      "startConnectorMetres": 1.5797003000668015,
+      "endConnectorMetres": 0.4179581318744597,
+      "ticks": 6678,
+      "simulatedSeconds": 111.3,
+      "testDurationMs": 19880.3816,
+      "travelledMetres": 502.7443814514207,
+      "maxHorizontalStepMetres": 0.07703191332260438,
+      "minCapsuleCentreAboveTerrainMetres": 0.8198943280158346,
+      "maxCapsuleCentreAboveTerrainMetres": 0.994999997317791,
+      "groundedTicks": 6672,
+      "steepTerrainTicks": 385,
+      "finalPosition": {
+        "x": -241.8406219482422,
+        "y": 3.941310405731201,
+        "z": 254.44451904296875
+      }
+    },
+    {
+      "target": "stadium191b",
+      "routeSha256": "d65e6c2b6b7408fdb8c2aab2441e55fa28cd408a7d4f0bebf5a00c71e5e47c76",
+      "routeMetres": 641.8466362827828,
+      "mappedSurfaceSamples": 1337,
+      "startConnectorMetres": 1.5797003000668015,
+      "endConnectorMetres": 0.18153122417439604,
+      "ticks": 8485,
+      "simulatedSeconds": 141.41666666666666,
+      "testDurationMs": 34454.3027,
+      "travelledMetres": 641.1749011092134,
+      "maxHorizontalStepMetres": 0.07706066160105261,
+      "minCapsuleCentreAboveTerrainMetres": 0.8175527680432424,
+      "maxCapsuleCentreAboveTerrainMetres": 0.994999997317791,
+      "groundedTicks": 8479,
+      "steepTerrainTicks": 478,
+      "finalPosition": {
+        "x": -281.92779541015625,
+        "y": 2.9324052333831787,
+        "z": 273.72857666015625
+      }
+    }
+  ],
+  "followup": "After clipping the graph to the gameplay bounds, 2 graph-only tests passed again and both route lengths, endpoint connectors and route SHA-256 remained identical. Full current-source test suite remains the root integration responsibility."
+}

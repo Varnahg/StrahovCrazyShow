@@ -1,0 +1,37 @@
+{
+  "checkedDate": "2026-10-10",
+  "scope": "Visual inspection of six-building standalone comparison scene. Not production-game FPS validation.",
+  "url": "http://127.0.0.1:5173/docs/reality-pack/architecture/preview.html",
+  "browser": {
+    "cssWidth": 970,
+    "cssHeight": 720,
+    "internalWidth": 970,
+    "internalHeight": 720,
+    "vendor": "Google Inc. (Intel)",
+    "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+  },
+  "consoleErrorsOrWarningsAtFinalCheck": [],
+  "verified": [
+    "Exterior-facing right-handed culling, deep four-pane frames and sills",
+    "North B6 broad blank piers, west paired openings, narrow recessed stair strip and upright white six on western projection",
+    "B6-only transparent room windows show shared room partitions; full-game reflection is an integration responsibility",
+    "Upright non-mirrored B4 sign, distinct concrete and plaster facades",
+    "Warm simulated B4 night lights only within selected glass areas; opaque concrete remains dark",
+    "Potraviny east end small barred upper windows, lower vents and round metal flue",
+    "No shader errors or warnings in the browser console"
+  ],
+  "screenshots": [
+    "qa-b6-north.jpg",
+    "qa-b6-long.jpg",
+    "qa-b4-day.jpg",
+    "qa-b4-night.jpg",
+    "qa-rko-east.jpg"
+  ],
+  "limitations": [
+    "Comparison lighting and flat review ground are not the integrated game terrain or cinematic sky.",
+    "Exact measured elevations, six external stair dimensions and facade survey remain unverified.",
+    "B6 room reflections are added by the parent cinematic integration; the standalone preview currently has no environment reflection map.",
+    "No production multiplayer FPS claim is made from these screenshots or the NullEngine geometry audit."
+  ]
+}

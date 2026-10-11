@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "name": "Strahov — přirozený filmový den",
+  "authoredAt": "2026-10-10",
+  "status": "proposed-settings-not-measured",
+  "colorSpace": "sRGB hex; renderer conversion exactly once",
+  "notes": "Výtvarné hodnoty, nikoliv naměřené barvy. Skutečná reference konkrétní budovy má přednost. Roughness a metallic jsou pouze pro PBR.",
+  "materials": {
+    "renderPlaster": { "color": "#D3D1C7", "roughness": 0.86, "metallic": 0 },
+    "concrete": { "color": "#929893", "roughness": 0.9, "metallic": 0 },
+    "weatheredConcrete": { "color": "#797C75", "roughness": 0.94, "metallic": 0 },
+    "asphalt": { "color": "#666B68", "roughness": 0.96, "metallic": 0 },
+    "paving": { "color": "#ABA99F", "roughness": 0.92, "metallic": 0 },
+    "grass": { "color": "#788268", "roughness": 1, "metallic": 0 },
+    "grassVariation": { "color": "#828B70", "roughness": 1, "metallic": 0 },
+    "foliage": { "color": "#556B4E", "roughness": 0.94, "metallic": 0 },
+    "foliageVariation": { "color": "#667653", "roughness": 0.94, "metallic": 0 },
+    "glass": { "color": "#50656C", "roughness": 0.25, "metallic": 0 },
+    "windowFrameBrown": { "color": "#675750", "roughness": 0.76, "metallic": 0 },
+    "paintedMetal": { "color": "#555F5F", "roughness": 0.58, "metallic": 0 },
+    "wood": { "color": "#8F7560", "roughness": 0.82, "metallic": 0 },
+    "carPaint": { "color": "#647E78", "roughness": 0.32, "metallic": 0.15 },
+    "rubber": { "color": "#292F30", "roughness": 0.95, "metallic": 0 },
+    "carGlass": { "color": "#425963", "roughness": 0.18, "metallic": 0 }
+  },
+  "lighting": {
+    "day": { "skyTop": "#648CB0", "skyHorizon": "#CAD5D6", "key": "#FFF1DC", "ambient": "#A8BCC8", "keyIntensity": 1, "ambientIntensity": 0.62, "fogExp2": 0.0012 },
+    "overcast": { "skyTop": "#87949C", "skyHorizon": "#B7C1C3", "key": "#DBE3E7", "ambient": "#B4BEC4", "keyIntensity": 0.25, "ambientIntensity": 0.78, "fogExp2": 0.0022 },
+    "lowSun": { "skyTop": "#6A87A1", "skyHorizon": "#D6B7A0", "key": "#FFD5A5", "ambient": "#8FABC0" },
+    "twilight": { "skyTop": "#3F5772", "skyHorizon": "#8D97A8", "key": "#B0BDD0", "ambient": "#708198", "keyIntensity": 0.08, "ambientIntensity": 0.36 },
+    "night": { "skyTop": "#142337", "skyHorizon": "#35465B", "key": "#A0B5CF", "ambient": "#62758B", "keyIntensityMax": 0.12, "ambientIntensity": 0.28 },
+    "lamp": "#FFD6A0",
+    "weatherTransitionSecondsMin": 5,
+    "atmosphereUpdateHz": 1,
+    "rainFogExp2Max": 0.0035
+  },
+  "ui": {
+    "ink": "#193C30",
+    "paper": "#F6F6ED",
+    "accent": "#D3ED8B",
+    "muted": "#738175",
+    "labelBackground": "#182C2E",
+    "labelText": "#F5F2E8",
+    "labelFontCssPx": 14,
+    "maxPlaceLabels": 8,
+    "maxPlayerLabels": 16
+  },
+  "qualityBudgets": {
+    "low": { "visibleTrianglesMax": 150000, "drawCallsAllPassesMax": 100, "textureGpuMiBMax": 128, "dynamicLocalLampsMax": 0, "sunShadowMap": 0 },
+    "medium": { "visibleTrianglesMax": 250000, "drawCallsAllPassesMax": 150, "textureGpuMiBMax": 256, "dynamicLocalLampsMax": 2, "sunShadowMap": 1024 },
+    "high": { "visibleTrianglesMax": 450000, "drawCallsAllPassesMax": 220, "textureGpuMiBMax": 384, "dynamicLocalLampsMax": 2, "sunShadowMap": 2048 },
+    "cloudTrianglesMax": 1000,
+    "rainParticlesMax": 300,
+    "lodHysteresisRatio": 0.15
+  },
+  "assetBudgets": {
+    "avatarNearTrianglesMax": 4000,
+    "avatarMidTrianglesMax": 1000,
+    "avatarFarTrianglesMax": 100,
+    "avatarNearMaterialPassesMax": 2,
+    "carNearTrianglesMax": 8000,
+    "carFarTrianglesMax": 1500,
+    "carMaterialPassesMax": 3,
+    "treeNearTrianglesMax": 800,
+    "treeFarTrianglesMax": 200
+  },
+  "defaultEffects": { "cameraBob": false, "cameraShake": false, "motionBlur": false, "filmGrain": false, "chromaticAberration": false, "depthOfField": false, "ssao": false, "ssr": false, "volumetricClouds": false, "bloom": false }
+}

@@ -1,0 +1,230 @@
+{
+  "status": "passed",
+  "protocol": 5,
+  "endpoint": "http://127.0.0.1:2568",
+  "collision": {
+    "triangles": 3949797,
+    "sha256": "88c247467579429c92dbec2886ebdb156cfc73d426bcd3472095947e905c2b0c"
+  },
+  "sourceFileCount": 49,
+  "sourceManifestSha256": "8eee72acab452446bfd38d23c24a04c690c32927d2ae37324f6389d9a8843e3d",
+  "sourceStableDuringFinalRun": true,
+  "changedFilesBetweenFailureAndSuccess": [
+    "scripts/integration.ts"
+  ],
+  "elapsedSeconds": 21.0,
+  "checks": 29,
+  "stages": [
+    {
+      "name": "car entry at canonical parking spawn",
+      "driver": {
+        "x": 110.00035095214844,
+        "y": -2.338885498046875,
+        "z": 16.000030517578125,
+        "yaw": -1.9111931691311663E-05,
+        "speed": 0.004700935266703918,
+        "ack": 24,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 110.00035095214844,
+        "y": -2.338885498046875,
+        "z": 16.000030517578125,
+        "yaw": -1.9111931691311663E-05,
+        "speed": 0.004700935266703918,
+        "ack": 24,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0,
+      "observerSteering": 0
+    },
+    {
+      "name": "W forward motion received by both clients",
+      "driver": {
+        "x": 110.0054931640625,
+        "y": -2.3526751518249513,
+        "z": 18.790363311767578,
+        "yaw": -0.00014806217895442655,
+        "speed": 4.7183687188960795,
+        "ack": 83,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 110.0054931640625,
+        "y": -2.3526751518249513,
+        "z": 18.790363311767578,
+        "yaw": -0.00014806217895442655,
+        "speed": 4.7183687188960795,
+        "ack": 83,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0,
+      "observerSteering": 0
+    },
+    {
+      "name": "Space stopped car",
+      "driver": {
+        "x": 110.01066589355469,
+        "y": -2.378717374801636,
+        "z": 21.317832946777344,
+        "yaw": -0.0005359033854074766,
+        "speed": -0.0008295762519788473,
+        "ack": 152,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 110.01084899902344,
+        "y": -2.3787257194519045,
+        "z": 21.31791877746582,
+        "yaw": -0.000522113722260918,
+        "speed": 0.0011790403793746182,
+        "ack": 154,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0,
+      "observerSteering": 0
+    },
+    {
+      "name": "A low-speed forward turn",
+      "driver": {
+        "x": 110.03038024902344,
+        "y": -2.3801204681396486,
+        "z": 21.39259910583496,
+        "yaw": 0.01164912120493502,
+        "speed": 0.4204264017774796,
+        "ack": 194,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 110.0340576171875,
+        "y": -2.380419445037842,
+        "z": 21.410173416137695,
+        "yaw": 0.014524432490139834,
+        "speed": 0.5435812341102788,
+        "ack": 196,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0.3226992095706046,
+      "observerSteering": 0.3676992095706046
+    },
+    {
+      "name": "D low-speed reverse turn",
+      "driver": {
+        "x": 110.06363677978516,
+        "y": -2.3806108951568605,
+        "z": 21.339651107788086,
+        "yaw": 0.03508304411278419,
+        "speed": -0.6364761015180724,
+        "ack": 278,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 110.06363677978516,
+        "y": -2.3806108951568605,
+        "z": 21.339651107788086,
+        "yaw": 0.03508304411278419,
+        "speed": -0.6364761015180724,
+        "ack": 278,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": -0.3676992095706046,
+      "observerSteering": -0.3676992095706046
+    },
+    {
+      "name": "S reverse",
+      "driver": {
+        "x": 109.96013641357422,
+        "y": -2.3495532989501955,
+        "z": 18.692153930664062,
+        "yaw": 0.045312797775279114,
+        "speed": -3.975148599688257,
+        "ack": 326,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 109.95408630371094,
+        "y": -2.3497340202331545,
+        "z": 18.558561325073242,
+        "yaw": 0.045412753724720506,
+        "speed": -4.0493475633360765,
+        "ack": 328,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0,
+      "observerSteering": 0
+    },
+    {
+      "name": "W recovers from reverse",
+      "driver": {
+        "x": 109.97038269042969,
+        "y": -2.3514477729797365,
+        "z": 18.77405548095703,
+        "yaw": 0.046346578538468776,
+        "speed": 2.862515274293747,
+        "ack": 386,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 109.97038269042969,
+        "y": -2.3514477729797365,
+        "z": 18.77405548095703,
+        "yaw": 0.046346578538468776,
+        "speed": 2.862515274293747,
+        "ack": 386,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0,
+      "observerSteering": 0
+    },
+    {
+      "name": "safe exit and persistent parking",
+      "driver": {
+        "x": 112.7217788696289,
+        "y": -2.332465410232544,
+        "z": 19.69085693359375,
+        "yaw": 0.04607119268847019,
+        "speed": 0,
+        "ack": 458,
+        "vehicle": false,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 112.7217788696289,
+        "y": -2.332465410232544,
+        "z": 19.69085693359375,
+        "yaw": 0.04607119268847019,
+        "speed": 0,
+        "ack": 458,
+        "vehicle": false,
+        "zone": "outside"
+      },
+      "observerSteering": 0
+    }
+  ],
+  "baseline": "Original root integration passed before extending vehicle manoeuvres.",
+  "failedAttempt": {
+    "file": "photo-integration-run-1.json",
+    "stage": "D changes physical heading while reversing",
+    "retained": true
+  },
+  "ownedServerPort": 2568,
+  "ownedServerClosed": true,
+  "mainServerPort": 2567,
+  "mainServerPidBefore": 18444,
+  "mainServerPidAfter": 18444,
+  "browserOrGpuEvidence": false
+}

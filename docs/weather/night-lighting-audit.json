@@ -1,0 +1,252 @@
+{
+  "capturedAt": "2026-10-11T02:13:27.359Z",
+  "location": {
+    "latitude": 50.08065,
+    "longitude": 14.39175
+  },
+  "scope": "deterministic astronomy and lighting-state audit, not GPU/FPS measurement",
+  "units": "altitudes degrees; lighting, exposure and emissions are bounded art units, not calibrated lux or lumens",
+  "simulation": "Room occupancy/emissive windows and local practical lighting are simulated; no real room-use information.",
+  "references": [
+    {
+      "title": "SunCalc 2.1.1: altitude in degrees and azimuth clockwise from north",
+      "url": "https://github.com/mourner/suncalc#sun-position"
+    },
+    {
+      "title": "USNO: new moon 2026-10-10 15:50 UTC",
+      "url": "https://aa.usno.navy.mil/calculated/moon/phases?date=2026-10-01&format=p&nump=6"
+    },
+    {
+      "title": "NOAA: astronomical twilight at -18 degrees",
+      "url": "https://gml.noaa.gov/grad/solcalc/glossary.html"
+    },
+    {
+      "title": "Babylon PBR: direct/environment/emissive contributions",
+      "url": "https://doc.babylonjs.com/features/featuresDeepDive/materials/using/masterPBR/"
+    }
+  ],
+  "sourceSha256": {
+    "shared/weather.ts": "832ecd30f6036bb6560dc5df104c8d216c18f47312b69abfa4fa255d8346bed0",
+    "client/art-lighting.ts": "e87843b244af23b341112eb89246905c3f6cd1c7adc43cb69a9ba01d110a5739",
+    "client/sky-weather.ts": "f665a181809d35ab1d75cfa468146922b2bb4322f2292676b59a80c04f4731d8",
+    "client/cinematic.ts": "7152751723114ad00b8be4ccdb31ed3a541f21e1c59659ad07b4078849f669ee",
+    "client/cinematic-art.ts": "3b2ef1731b29c6a4eee9d3c36a450c7fd27a54c02d255e8d0abc33c2d53b8766",
+    "client/render-shaders.ts": "514c458c549e75950aba67a5abf6f640f68986e78ffd304efce058d0617a955f",
+    "tests/night-lighting.test.ts": "d5d55f419303e7d9156bc96c9e4629b40131b99c472b38e9a2ec691629a7a476",
+    "tests/photo-lamps.test.ts": "30665a6ea5c028492211323e9fa3bb4404d052d75593a98f51c93fc96d1ddf5b",
+    "docs/reality-pack/art-style-preview.ts": "5eb73bd6d13fab272eb6518c12dea68a8549dfcf2382aab9a61bbc228f49afc8",
+    "docs/reality-pack/art-style-preview.html": "3a951e488fb0f38dc3bae43f3255cdd65e115db0807f6df55a1ac7926556f112",
+    "scripts/audit-night-lighting.ts": "65152807d1e5eb92517a0081e2f708392d309404a40ab210bb653c0b9b42723b",
+    "shared/streets.ts": "43b9e162bbb2ce1d01a5a0097870ac514e5a56ef65201e93386ff9901548bef0",
+    "shared/data/photo-lamps.json": "138e8564ff13f84803ce562c69daca1f8c621127871a5805264ba17f1a7de781",
+    "client/streets-renderer.ts": "f8161b8a941c0a38c5c1000a182cfa9d44e8ff6dcc8af81e5f3d187fbf125427",
+    "assets/reference/lighting/central-parking-ortho-2024.jpg": "f1209447c33a3d9d951ba955c7e4d91e89a56e41bba6c084a768266dcd3d5866",
+    "assets/reference/lighting/central-parking-ortho-2024.json": "f585be33875bf97c86afb038bc3e58345d90ff1dd08064d2b205b4557008a771"
+  },
+  "practicalLights": {
+    "mappedOsmCount": 36,
+    "interpretedPhotoCount": 2,
+    "simultaneousLightBudget": {
+      "low": 1,
+      "medium": 2,
+      "high": 2
+    },
+    "falloff": "Babylon Light.FALLOFF_STANDARD; bounded artistic range22m, not measured lumens",
+    "photoPlacements": [
+      {
+        "id": "ipr2024-parking-south-west",
+        "x": 60.8,
+        "z": 33.5,
+        "basePixel": [
+          208,
+          715
+        ],
+        "positionUncertaintyMetres": 0.8,
+        "height": 5,
+        "heightProvenance": "typology-inferred-not-measured; scan pole fragment confounded by nearby 2023 tree crown",
+        "provenance": "reference-interpreted-not-surveyed",
+        "modelStyle": "white-parking-pole",
+        "reference": "White pole and separate narrow lamp-head shadow at the southern end of the red sports court. Manually distinguished from tree shadows and the parked car.",
+        "sourceNodes": [
+          "1127273",
+          "1127281"
+        ]
+      },
+      {
+        "id": "ipr2024-parking-south-central",
+        "x": 131,
+        "z": 32,
+        "basePixel": [
+          910,
+          700
+        ],
+        "positionUncertaintyMetres": 0.6,
+        "height": 5,
+        "heightProvenance": "scan-guided-estimate-not-surveyed; isolated 2023 lamp-head vertices reach 4.768m above DMR",
+        "provenance": "reference-interpreted-not-surveyed",
+        "modelStyle": "white-parking-pole",
+        "reference": "White pole at the southern parking-row edge immediately east of the footpath. Narrow pole and its lamp-head shadow are separate from the adjacent parked vehicles.",
+        "sourceNodes": [
+          "1123623"
+        ]
+      }
+    ],
+    "spawn": {
+      "x": 110,
+      "z": 12
+    },
+    "closestToSpawn": [
+      {
+        "id": "ipr2024-parking-south-central",
+        "x": 131,
+        "z": 32,
+        "range": 22,
+        "horizontalDistance": 29
+      },
+      {
+        "id": "ipr2024-parking-south-west",
+        "x": 60.8,
+        "z": 33.5,
+        "range": 22,
+        "horizontalDistance": 53.6925506937415
+      },
+      {
+        "id": "12012581930",
+        "x": 9.794,
+        "z": 57.018,
+        "range": 22,
+        "horizontalDistance": 109.85382451239465
+      }
+    ]
+  },
+  "samples": [
+    {
+      "utc": "2026-10-11T00:00:00Z",
+      "prague": "11/10/2026, 02:00",
+      "cloud": 0,
+      "sun": {
+        "altitudeDegrees": -43.91622048804389,
+        "daylight": 0
+      },
+      "moon": {
+        "altitudeDegrees": -50.243260701743594,
+        "fraction": 0.0025445134935915825
+      },
+      "lighting": {
+        "sunlight": 0,
+        "moonlight": 0,
+        "ambientIntensity": 0.018,
+        "cloudEmission": 0.004,
+        "surfaceIllumination": 0.07937253933193772,
+        "skyTopDisplayRgb": [
+          0.0196078431372549,
+          0.0392156862745098,
+          0.07058823529411765
+        ],
+        "skyHorizonDisplayRgb": [
+          0.06274509803921569,
+          0.09411764705882353,
+          0.12549019607843137
+        ],
+        "exposure": 1.1800000000000002,
+        "environmentIntensity": 0.04
+      }
+    },
+    {
+      "utc": "2026-10-11T00:00:00Z",
+      "prague": "11/10/2026, 02:00",
+      "cloud": 1,
+      "sun": {
+        "altitudeDegrees": -43.91622048804389,
+        "daylight": 0
+      },
+      "moon": {
+        "altitudeDegrees": -50.243260701743594,
+        "fraction": 0.0025445134935915825
+      },
+      "lighting": {
+        "sunlight": 0,
+        "moonlight": 0,
+        "ambientIntensity": 0.009,
+        "cloudEmission": 0.004,
+        "surfaceIllumination": 0.05612486080160912,
+        "skyTopDisplayRgb": [
+          0.0196078431372549,
+          0.0392156862745098,
+          0.07058823529411765
+        ],
+        "skyHorizonDisplayRgb": [
+          0.06274509803921569,
+          0.09411764705882353,
+          0.12549019607843137
+        ],
+        "exposure": 1.1800000000000002,
+        "environmentIntensity": 0.04
+      }
+    },
+    {
+      "utc": "2026-10-11T10:00:00Z",
+      "prague": "11/10/2026, 12:00",
+      "cloud": 0,
+      "sun": {
+        "altitudeDegrees": 31.853877387623502,
+        "daylight": 1
+      },
+      "moon": {
+        "altitudeDegrees": 22.423303525975992,
+        "fraction": 0.007666586294977351
+      },
+      "lighting": {
+        "sunlight": 1,
+        "moonlight": 0,
+        "ambientIntensity": 0.62,
+        "cloudEmission": 0.84,
+        "surfaceIllumination": 1,
+        "skyTopDisplayRgb": [
+          0.39215686274509803,
+          0.5490196078431373,
+          0.6901960784313725
+        ],
+        "skyHorizonDisplayRgb": [
+          0.792156862745098,
+          0.8352941176470589,
+          0.8392156862745098
+        ],
+        "exposure": 1.08,
+        "environmentIntensity": 0.65
+      }
+    },
+    {
+      "utc": "2026-10-11T10:00:00Z",
+      "prague": "11/10/2026, 12:00",
+      "cloud": 1,
+      "sun": {
+        "altitudeDegrees": 31.853877387623502,
+        "daylight": 1
+      },
+      "moon": {
+        "altitudeDegrees": 22.423303525975992,
+        "fraction": 0.007666586294977351
+      },
+      "lighting": {
+        "sunlight": 0.25,
+        "moonlight": 0,
+        "ambientIntensity": 0.78,
+        "cloudEmission": 0.74,
+        "surfaceIllumination": 0.687749954561976,
+        "skyTopDisplayRgb": [
+          0.5294117647058824,
+          0.5803921568627451,
+          0.611764705882353
+        ],
+        "skyHorizonDisplayRgb": [
+          0.7176470588235294,
+          0.7568627450980392,
+          0.7647058823529411
+        ],
+        "exposure": 1.08,
+        "environmentIntensity": 0.65
+      }
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+# Blok 1, společné vstupy a Velký strahovský stadion
+
+Balík nahrazuje původní třímetrovou hmotu B1 a souvislé stěny stadionu. Zachovává původní půdorysy. `shared/landmark-reality.ts` vytváří jedinou geometrii pro Babylon a Rapier; `client/landmark-reality.ts` ji dávkuje podle materiálů a přepíná detaily podle sdíleného `renderBudget`.
+
+Východní stadionový pavilon nyní opravuje [navazující model podle tří uživatelských fotografií](stadium-photo-correction.md): vykonzolovaný prosklený objem, široký betonový pás, otevřené přízemí, nižší plechový ochoz a fyzicky průchozí betonová ramena. Je to vlastní model podle fotografických předloh, nikoli fotogrammetrie. Zdrojový plný model předchází samostatné vzdálené geometrii.
+
+## Doložené předlohy
+
+- **B1, OSM way 53929063:** původní členitý půdorys je kompletní. Chyba byla v jediném OSM `building:levels=1`, který zploštil celý administrativní objekt. [Oficiální popis ČVUT ELSA](https://www.elsa.cvut.cz/bezbarierove-cvut/pristupnost-objektu/objekt/?o=81) popisuje vstupní úroveň, zvýšenou recepci, polosuterén a další dvě podlaží. Identifikované fotografie [03_BLOK_1.JPG](https://www.elsa.cvut.cz/wp-content/themes/elsa-cvut/images/objekty/12_6_koleje_Strahov/GALERIE/FULL/03_BLOK_1.JPG) a [04_BLOK_1_vstup.JPG](https://www.elsa.cvut.cz/wp-content/themes/elsa-cvut/images/objekty/12_6_koleje_Strahov/GALERIE/FULL/04_BLOK_1_vstup.JPG) byly skutečně prohlédnuty. Dvě vyšší kancelářské okenní pásy nad přízemím, světlé pilířky a prosklené dveře nahrazují chybějící fasádu. **9,6 m je proporční interpretace, nikoli zaměření.** Datum pořízení galerie ELSA není uvedeno.
+- **Typický vchod:** [12_BLOK_2_typicky_hlavni_vstup.JPG](https://www.elsa.cvut.cz/wp-content/themes/elsa-cvut/images/objekty/12_6_koleje_Strahov/GALERIE/FULL/12_BLOK_2_typicky_hlavni_vstup.JPG) dokládá přímé kryté schodiště, ocelovou stříšku, jednu boční žebrovanou výplň a otevřené zábradlí druhé strany. ELSA uvádí u standardních bloků většinou 12 stupňů. Model používá 12 × 0,15 m, šířku 3,45 m a nášlap 0,29 m; tyto rozměry jsou interpretované.
+- **Směr vstupu je důležitý:** [půdorys B2 z ČVUT](https://www.elsa.cvut.cz/wp-content/themes/elsa-cvut/images/objekty/12_6_koleje_Strahov/SCHEMA/FULL/BLOK_2_-_1NP.jpg) má ulici Chaloupeckého na severním konci a Jezdeckou na jižním. Recepce vyčnívá západně, ale dveře jsou na její **severní krátké straně**. Schodiště stoupá od severu k jihu. Vstupy B2–5 a B7–10 mají stejné základní provedení na mapovaném severním zkoseném čele přístavby. Přenos typologie na ostatní bloky je explicitní interpretace, nikoli individuální zaměření všech dveří. B1, B6, B11 a B12 se tímto modulem nepřepisují.
+- **B6, podstatná oprava předaná integrátorovi:** šipka „vrátnice“ na 1. NP [plánu SH B6](https://wiki.sh.cvut.cz/_media/kolej/bloky/0.jpg) vede podél osy bloku do severní strany západní přístavby. [Identifikované severní Google panorama gWCshoWQgiJdy1QWcqe1eQ](https://www.google.com/maps/@?api=1&map_action=pano&pano=gWCshoWQgiJdy1QWcqe1eQ&heading=178.82123&pitch=20&fov=90), září 2025, skutečně ukazuje čelní dveře, schody a boční zelenou výplň z pohledu od severu. To potvrzuje, že původní západní herní dveře byly chybně otočené. Migraci průchozího interiéru, kolizí, značek a NPC provádí kořenový integrátor; tento balík B6 záměrně nevytváří podruhé. Přibližné mapové čelo je mezi (−7,84; −76,61) a (−1,86; −77,60). Přesná výška prahu B6 z těchto podkladů zaměřená není.
+- **Stadion:** [OSM relation 1515034](https://www.openstreetmap.org/relation/1515034), úplné vnější a vnitřní prstence i výšky jednotlivých částí. [Fotografie z 27. 8. 2005](https://commons.wikimedia.org/wiki/File:Praha_Strahovsky_stadion.jpg), che / úprava Miraceti, ukazuje otevřenou plochu, stupňovité tribuny a sloupy pod ochozy. Jde o historický podklad. [Lafarge Cement Journal 1/2013, str. 25–28](https://www.holcim.cz/sites/czech2/files/2022-06/2013_01.pdf) dokumentuje železobetonovou konstrukci, horizontální ochozy a východní prosklené zázemí. Model má 22 interpretovaných stupňů, odhalené pilíře, horní parapet a oddělené výšky OSM 18 / 20 m. Neobsahuje kolejní okenní mřížku. Současné poškození, přesný počet sedadel, západní věže ani jednotlivá sportovní zařízení nejsou kompletně rekonstruované.
+
+`ipr-b6-entry-analysis.jpg` je přiznaný ořez a zvětšení ortofota IPR z 8. 6. 2024, původní snímek a georeference jsou v `docs/streets`. © IPR Praha, CC BY 4.0, upraveno. Stín a paralaxa neumožňují přesně určit práh; snímek se nepoužívá jako důkaz rozměrů schodů. Google ani fotografie ČVUT nejsou redistribuované jako textury či uložené screenshoty.
+
+## Integrace
+
+1. Při tvorbě `BUILDINGS` použít `landmarkBuildingHeight`: B1 dostane 9,6 m, ostatní budovy se nemění. Jeho původní uzavřený obvodový kolizní model používá tutéž výšku.
+2. B1 vyřadit z původního `buildArchitectureReality` přes `LANDMARK_BUILDING_REPLACEMENTS`; odstranit původní `stadium(context)`. Potom vytvořit `buildLandmarkReality({scene, buildings, baseElevation})`. Callback vrací kompletní základovou výšku právě jednou.
+3. Přidat `buildLandmarkPlan(...).collision` jako jeden pevný Rapier trimesh s `FIX_INTERNAL_EDGES`. Obsahuje viditelné stupně, sloupy a ochozy; B1 obvod se neduplikuje.
+4. `entryForFacade(building.id, edge.a, edge.b)` přesně identifikuje příslušné severní čelo. Zde se odfiltrují původní malé otvory pod výškou 4,6 m a ve vzdáleném LOD se použije čistý materiál. Tím se nevykresluje falešné okno za novými dveřmi nebo stříškou.
+5. NPC mohou používat `COMMON_DORM_ENTRANCES` (včetně `edgeA`, `edgeB`, normály a základové výšky) a `commonEntranceHeight(x,z)`. Skutečný hráč stoupá přes společné fyzikální schody. NPC cesty musí končit u severního nástupu; staré odhady západních dveří nejsou přesné.
+
+Hlavní běh volá `controller.update(position, quality)` a při ukončení `dispose()`. Stadion používá skutečnou vzdálenost od vnějšího/vnitřního obvodu, protože jeho obrovský opsaný kruh by jinak spouštěl jemné tribuny už uprostřed kolejí. Hrací plocha je skutečný otvor v půdorysu. Načítání jedné plné střechy přes vnější polygon by tento otvor zničilo.
+
+## Ověření a modely
+
+`pnpm exec tsx --test tests/landmark-reality.test.ts`: **7/7 PASS**, včetně skutečné herní kapsle, která ze zdrojového DEM bez teleportu vystoupá po 12 schodech B2 a zastaví u zavřených dveří. Další testy kontrolují nezměněný členitý B1, orientaci vstupů, otevřený stadion bez trojúhelníků přes hrací plochu, společná konečná data kolizí, LOD u skutečného kampusového spawnu a úplné odstranění meshů. NullEngine test není GPU nebo FPS důkaz.
+
+WebGL komparátor je `/docs/reality-pack/landmarks/preview.html` na lokálním Vite. Uložené `qa-*.jpg` zobrazují dřívější skutečně vykreslený komponentový náhled; nová oprava má vlastní komparátor `stadium-photo-correction-preview.html`. Kompletní hru, multiplayer a výkon ověřuje integrátor; zde se neuvádí žádná FPS hodnota. Aktuální komponent má 34 dávkovaných meshů, celkem 26 741 blízkých / 13 215 vzdálených trojúhelníků a 14 336 kolizních trojúhelníků. Opakované hrubé části osmi vchodů sdílejí materiálové dávky; jemné žebrování a zábradlí má samostatný dosah. Navazujících 6 stadionových testů doplňuje původních 7: společný cílený běh skončil 13/13 PASS včetně průchodu krytým průjezdem a výstupu po obou nových ramenech.
+
+Editable `.blend` a exporty `.glb` jsou v `assets/blender/landmarks` a `public/models/landmarks`. Obsahují stejnou číselnou geometrii jako runtime, nikoli druhý odlišný model. Hra používá přímé dávkování kvůli menšímu počtu draw calls; archivované GLB se přes něj nepřekrývají. Manifest obsahuje SHA-256, počty trojúhelníků a původní pozici a natočení. Detaily a materiály jsou vlastní, půdorysná a polohová data jsou odvozená z OSM / ODbL; fotografie zůstávají jen referencemi.
+
+```powershell
+pnpm exec tsx docs/reality-pack/landmarks/export.ts
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python scripts/create-landmark-reality.py
+```
+
+Dokumentace nezaměňuje historické fotografie a interpretované proporce za aktuální zaměření. Přesné zaměření prahů, obrub a každého fasádního detailu nadále chybí.

@@ -1,0 +1,281 @@
+{
+  "recordedAt": "2026-10-11T05:25:34.372Z",
+  "layout": {
+    "bounds": {
+      "minX": 0,
+      "maxX": 16,
+      "minZ": -90,
+      "maxZ": -20
+    },
+    "lobby": {
+      "minX": -7,
+      "maxX": 0,
+      "minZ": -77.1,
+      "maxZ": -70
+    },
+    "floorHeight": 3,
+    "floorLevels": [
+      -1,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "foundationOffset": 1.8,
+    "entranceRise": 1.8,
+    "entranceRiseConfidence": "12 risers follow ELSA typical blocks 2-7 access; 0.15m riser/1.8m total is an unmeasured model estimate",
+    "roomPitch": 3.1818181818181817,
+    "roomBaysPerSide": 22,
+    "roomCountPerResidentialLevel": 35,
+    "corridor": {
+      "minX": 6,
+      "maxX": 10
+    },
+    "doorWidth": 1.2,
+    "doorHeight": 2.15,
+    "window": {
+      "width": 2.18,
+      "height": 1.5,
+      "sill": 0.85,
+      "lintel": 2.35
+    },
+    "stairs": {
+      "cores": [
+        {
+          "id": "north-reception",
+          "minX": 0.25,
+          "maxX": 5.75,
+          "minZ": -78.6,
+          "maxZ": -71.1,
+          "sourceBayIndices": [
+            16,
+            17,
+            18,
+            19
+          ]
+        },
+        {
+          "id": "south-service",
+          "minX": 0.25,
+          "maxX": 5.75,
+          "minZ": -38.1,
+          "maxZ": -30.6,
+          "sourceBayIndices": [
+            3,
+            4,
+            5
+          ]
+        }
+      ],
+      "type": "two-opposing-flight-cores",
+      "measured": false
+    },
+    "entry": {
+      "x": -4.85,
+      "z": -77.15,
+      "width": 2.4,
+      "outward": {
+        "x": 0,
+        "z": -1
+      },
+      "direction": "north-to-south",
+      "sourceFloor": "1.NP; 0.NP bicycle room is below the reception",
+      "foundationY": 0,
+      "stepCount": 12,
+      "stepsFromZ": -81.4,
+      "stepsToZ": -77.8,
+      "landingMinZ": -77.8,
+      "landingMaxZ": -76.95
+    },
+    "outsideSpawn": {
+      "x": -4.85,
+      "z": -85
+    },
+    "approachRoute": [
+      [
+        -4.85,
+        -82.1
+      ],
+      [
+        -4.85,
+        -77.35
+      ],
+      [
+        -4.85,
+        -73
+      ]
+    ],
+    "serviceRoute": [
+      [
+        -3.5,
+        -73
+      ],
+      [
+        -1,
+        -71.95
+      ],
+      [
+        6.8,
+        -71.94999999999999
+      ],
+      [
+        4.4,
+        -71.94999999999999
+      ],
+      [
+        4.4,
+        -77.44999999999999
+      ],
+      [
+        1.6,
+        -77.44999999999999
+      ],
+      [
+        1.6,
+        -71.94999999999999
+      ],
+      [
+        6.8,
+        -71.94999999999999
+      ]
+    ],
+    "dimensionsMeasured": false,
+    "roomCountStatus": "35 is an illustrative model count, NOT a confirmed B6 inventory. Three previously invented west room bays per level became the second plan-documented stair core.",
+    "stairStatus": "Two west-side dogleg cores and mezzanines follow the SH schematic. Flight direction, 2.4m width, 10+10 risers and metric positions are unmeasured interpretations. B3 photo supplies material typology only.",
+    "sources": [
+      {
+        "id": "b6-plan-2023",
+        "url": "https://wiki.sh.cvut.cz/_media/kolej/bloky/0.jpg",
+        "date": "2023-03-20",
+        "use": "Topology and service/core placement; no dimensions or north arrow."
+      },
+      {
+        "id": "b6-wiki-2026",
+        "url": "https://wiki.sh.cvut.cz/kolej/bloky/blok_6",
+        "date": "2026-09-26",
+        "use": "B6 room functions, not current materials or furniture dimensions."
+      },
+      {
+        "id": "b6-pano-2025-north",
+        "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=gWCshoWQgiJdy1QWcqe1eQ&heading=178.82123&pitch=20",
+        "date": "2025-09",
+        "use": "Direct visual north-facing entrance/covered stairs; positions are photo/map interpretation."
+      },
+      {
+        "id": "elsa-strahov-typical-entry",
+        "url": "https://www.elsa.cvut.cz/bezbarierove-cvut/pristupnost-objektu/objekt/?o=81",
+        "date": "checked-2026-10-10",
+        "use": "Typical blocks 2-7 covered approaches usually have 12 steps; B2 plan confirms orientation only, not B6 measurements."
+      },
+      {
+        "id": "ctu-room-2016",
+        "url": "https://media.cvut.cz/cs/foto/20161116-pokoje-na-kolejich-strahov",
+        "date": "2016-11-16",
+        "use": "Historical Strahov room furniture and vinyl floor typology; block identity not confirmed."
+      },
+      {
+        "id": "ctu-opening-2024",
+        "url": "https://media.cvut.cz/cs/foto/20240620-slavnostni-otevreni-rekonstruovaneho-bloku-4",
+        "date": "2024-06-20",
+        "use": "Older B3 corridor typology and comparison with renovated B4. Not a photo of B6."
+      },
+      {
+        "id": "user-b3-stair-photo-20261011",
+        "url": "user-attachment:codex-clipboard-dd1cf547-77cc-4c58-8591-56719651b750.png",
+        "date": "provided-2026-10-11; capture-date-unknown",
+        "use": "Photo explicitly labelled BLOK 3: continuous painted concrete stair soffit, grey terrazzo treads, slim black vertical balusters, timber handrail and striped dark corridor tiles. Not a verified B6 finish survey."
+      },
+      {
+        "id": "user-typical-entry-photo",
+        "url": "user-attachment:codex-clipboard-8bfb73f0-f31d-4287-9bd4-72ebd0310732.png",
+        "date": "provided-2026-10-11; capture-date-unknown",
+        "use": "Typical covered dorm entrance: flat silver canopy, light side reveals, dark glazed door frames and slim metal handrails. The visible plaque reads 5; the image is not claimed to identify B6. Dimensions unmeasured."
+      }
+    ]
+  },
+  "structuralColliders": 4096,
+  "glassColliders": 307,
+  "residentialRooms": 210,
+  "propPlacements": 2646,
+  "propCollisionBoxes": 3074,
+  "authoredAssets": 10,
+  "totalAssets": 17,
+  "sourceSha256": {
+    "shared/b6-interior.ts": "ebbe42ea88ca9f0593d774e4df69e416629ff13ed5258fb1501a6f652bd98988",
+    "shared/b6-props.ts": "06e822f7f2463bc8266b0254431ce64fbe4a8ef7684f3235e0c57592a5e8c3ce",
+    "client/b6-reality.ts": "9b7bf2298ae9541b520013017f68b486e4440ea7506fac7154ebbd0d01855602",
+    "scripts/create-b6-reality.py": "11d4dd094a1799f707e1146aca770e439c6c17c6686872d08a588dd2b41bbc09",
+    "public/models/b6/manifest.json": "299b5a62b3f7da36a21f90d4a98233871d1608d6c748a41f3ea4c0e97d6fc1ef",
+    "client/architecture-reality.ts": "5bc00d8cead92f09aef57d6d4a985a8d927e71b8a8612978e27dbcaa16d57145",
+    "shared/data/facade-reality.json": "55f8878ccea2e0a175a2c163da84da194157c2ac9287b471940689975f1f9eb7",
+    "tests/b6-reality.test.ts": "61519f9ebb32194fb4d9a6f35dfcfb5d02575be61911bd8981b87026bfb50ccc",
+    "tests/physics.test.ts": "5c24fd03f9587f72c28525672c8bcf873c41ce1d25e2f317f6a5259d26a9957e",
+    "tests/architecture-reality.test.ts": "a45de161a0a9988421809eaccbf28e307e7481232b521dba4a0d78e92b6bb665",
+    "shared/b6-stairs.ts": "1217e48fabdbc128c89906bffad5c8681d3bf509b77f191333a7ce143b7fe48d",
+    "shared/b6-stair-materials.ts": "1f2d7aa8c33893a5ecdaf35739cc73d3e60371b1014d0f7875edf456d89def4c",
+    "scripts/create-b6-stair-textures.ts": "85583f590d03f122fd6cc8d657cdab4b03149d2496b4a87966a5f4fca88e7f8c",
+    "public/models/b6/striped-corridor-authored.png": "48c502ff2fca99940a25a846ea59ef1f47562f03bb0d8ba0a8412978790072a4",
+    "public/models/b6/stair-terrazzo-authored.png": "371ef26cedf89fa7f7249528956ae46b0168b0a47703e8818bd260cca8b9c714",
+    "shared/b6-entry.ts": "464ba1aa21e8dc2ddf3ede80a2aa3672cfe8bc720716c80a3d1e6794cfd9b620",
+    "shared/b6-facade-plan.ts": "53b4406baf9df10650e79c849d1cd56c6454ccb3bbeebda334fea1b4ae700c45",
+    "client/b6-exterior-concrete.ts": "2b5257f5a3df1c4ed05e3a0297dd7df691ba6e0559c89ef6c64c2589da92edc4",
+    "tests/b6-exterior-concrete.test.ts": "b0b2a8f23886ca8a79327a3601f11156493e0c0e230b4632feb547460be7ec60",
+    "shared/data/assets/surfaces-manifest.json": "c3cf978e1db6e20f21946a8cb3e0d5716dbc730f671b09151f27ad373013d474"
+  },
+  "stairSourceMeshParts": 98,
+  "stairTriangles": 2720,
+  "exteriorConcreteRecipe": {
+    "name": "b6:concrete stair treads",
+    "colorSRGB": "#b7b6ad",
+    "roughness": 1,
+    "metallic": 0,
+    "normalStrength": 0.27,
+    "specularIntensity": 0.52,
+    "environmentIntensity": 0.7,
+    "sourceUVMetresPerRepeat": 1.28,
+    "metresPerRepeat": 1.1,
+    "metresPerRepeatV": 0.55,
+    "family": {
+      "kind": "concrete",
+      "id": "Concrete034",
+      "source": "https://ambientcg.com/a/Concrete034",
+      "sourceArchive": "https://ambientcg.com/get?file=Concrete034_1K-JPG.zip",
+      "archiveSha256": "5839d284d94ffb8d2a56df742ec522b13dd311c52dbd42b8fd33f0409ceedb81",
+      "metadataSha256": "89be25c70c59b84b011ffcf31f7bc04cd7ee6777e672ec7f0854422f9359aa2b",
+      "importedAt": "2026-10-10T19:20:25.056107+00:00",
+      "metresPerRepeat": 1.1,
+      "metresPerRepeatV": 0.55,
+      "providerDimensionsCentimetres": {
+        "width": 110,
+        "height": 55,
+        "depth": 0
+      },
+      "scaleProvenance": "ambientCG official approximate asset dimensions (API centimetres / 100)",
+      "technique": "Generic CC0 material family; not a Strahov scan",
+      "channels": {
+        "color": {
+          "url": "/textures/surfaces/Concrete034_1K-JPG_Color.jpg",
+          "byteLength": 269501,
+          "sha256": "8ceb9186d990b31fce785e06fdc6974c160f1d27c43f6160266f164deba713aa"
+        },
+        "normalgl": {
+          "url": "/textures/surfaces/Concrete034_1K-JPG_NormalGL.jpg",
+          "byteLength": 821681,
+          "sha256": "e509eb9dfa978e780fbebfd2acacc2ce158b5b7ced722ddc0759039dd51e18ca"
+        },
+        "roughness": {
+          "url": "/textures/surfaces/Concrete034_1K-JPG_Roughness.jpg",
+          "byteLength": 217708,
+          "sha256": "a4a9e39857a19afd23a778e5abf44fcdf6bd7f93918f1cf6878b41933e553511"
+        }
+      }
+    },
+    "source": "https://ambientcg.com/a/Concrete034",
+    "license": "CC0-1.0",
+    "checkedAt": "2026-10-11",
+    "classification": "generic-CC0-surface-photo-interpreted-tint-not-B6-scan",
+    "measured": false
+  }
+}

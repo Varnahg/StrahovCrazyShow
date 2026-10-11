@@ -1,0 +1,62 @@
+{
+  "createdAt": "2026-10-10T20:02:41.038Z",
+  "scope": "Avatar source + original Blender exports only, not a frozen whole-game snapshot",
+  "sourceHash": "946b1726dc64b6db6bf098e2b7edec5edb798cb98d95ebc61d3a36a532e111fd",
+  "files": [
+    {
+      "path": "client/avatar-renderer.ts",
+      "sha256": "636b8964df5ec95a0661deccf499652edcda7e34d386bcf4328af22c7d49bd09",
+      "bytes": 24009
+    },
+    {
+      "path": "client/avatar-editor.tsx",
+      "sha256": "22d2f376df2a9ee2bdf2a956dac330b823b113509f674d3d09ef842f605d7df2",
+      "bytes": 12313
+    },
+    {
+      "path": "client/character-materials.ts",
+      "sha256": "4998255ba35668826ec2ae1bd466a8e3562eb7c8b4aeb383137075ddfd5f1545",
+      "bytes": 4896
+    },
+    {
+      "path": "client/avatar-presets.ts",
+      "sha256": "0d078d680f0525c804a8d1712a366fe1071a6a9f1357a550ae58648e896b3073",
+      "bytes": 3039
+    },
+    {
+      "path": "client/data/character-geometry.json",
+      "sha256": "c7ebd5b440e7b5188a6cc6223999838ac0cb03af44101a0ae62c9b6849ed75af",
+      "bytes": 593586
+    },
+    {
+      "path": "scripts/create-avatar-reality.py",
+      "sha256": "5b681674be3b88305473f0b07bb7f358975043f044dff17c9783aa2acf5877f1",
+      "bytes": 12165
+    },
+    {
+      "path": "tests/animation.test.ts",
+      "sha256": "7b20df28ab0c73a53b79bc6257e051a2681a55cc7df1a9255a79df6fcfed61fa",
+      "bytes": 18058
+    },
+    {
+      "path": "assets/blender/characters/avatar-reality.blend",
+      "sha256": "ac829935543c4aa62afadf2c1ef030d141cbe1b55ff57890ca23309b7865a17d",
+      "bytes": 275453
+    },
+    {
+      "path": "public/models/characters/avatar-surface-library.glb",
+      "sha256": "771afed83980c56d27b69f21ceb2ad73ad83bc588a33f31fd89341b59460c2a8",
+      "bytes": 257796
+    },
+    {
+      "path": "public/models/characters/geometry-manifest.json",
+      "sha256": "7f200b108a5131ceec36bfb07d28287fa4e7f84e9bedb7d85b33c198191f7549",
+      "bytes": 560
+    }
+  ],
+  "tests": "19/19 targeted animation + avatar LOD tests passed",
+  "browser": "Actual Vite editor and guest world, background subagent IAB, 1280x720; not an FPS benchmark",
+  "editor": "All six presets, front face/body toggle, no console errors",
+  "game": "Guest day preview, W held 1.8s, new avatar rendered and moved, no console errors; instance visibility warnings passed to root",
+  "limitations": "Original semi-realistic stylization; no scanned humans, facial capture, skinned clips or AAA fidelity claim"
+}

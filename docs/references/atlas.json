@@ -1,0 +1,981 @@
+{
+  "schemaVersion": 1,
+  "title": "Referenční atlas pro virtuální Strahov",
+  "language": "cs",
+  "checkedAt": "2026-10-10",
+  "scope": "Blok 6, Blok 7 / Klub 007, R-ko / Recharging Bar a navazující pěší plochy.",
+  "notes": [
+    "captureDate je datum/interval deklarovaný zdrojem, nikoli nezávislé ověření. null znamená nezjištěno.",
+    "checkedAt znamená datum kontroly tohoto záznamu, ne aktuálnost skutečného místa.",
+    "location.role rozlišuje kameru, bod provozovny a obecnou polohu. Bod POI není zaměřený vstup.",
+    "heading null znamená neznámý směr; yaw z Mapy.com je uložen v radiánech.",
+    "confidence hodnotí konkrétní tvrzení a použitelnost zdroje, nikoli geodetickou přesnost.",
+    "Google a Mapy.com byly prohlíženy běžným webovým rozhraním; žádná jejich média ani snímky obrazovky nejsou archivovány.",
+    "Archivován jediný JPEG plánu B6 pod obecnou doloženou licencí wiki; licence neuděluje záruku aktuálnosti."
+  ],
+  "places": [
+    {
+      "id": "blok-6",
+      "name": "Koleje Strahov – blok 6",
+      "osmWay": "53929071"
+    },
+    {
+      "id": "blok-7",
+      "name": "Koleje Strahov – blok 7",
+      "osmWay": "53929068"
+    },
+    {
+      "id": "klub-007",
+      "name": "Klub 007 Strahov",
+      "parentPlaceId": "blok-7",
+      "osmNode": "1268889585"
+    },
+    {
+      "id": "rko",
+      "name": "R-ko / Recharging Bar",
+      "parentPlaceId": "rko-building-shell",
+      "osmNode": "5508982945"
+    },
+    {
+      "id": "rko-building-shell",
+      "name": "Společná budova Potraviny / Recharging Bar",
+      "osmWay": "7645350",
+      "ruianBuilding": "22041559"
+    },
+    {
+      "id": "campus",
+      "name": "Areál kolejí Strahov"
+    },
+    {
+      "id": "campus-paths",
+      "name": "Pěší a spojovací komunikace mezi B6, B7 a R-kem"
+    }
+  ],
+  "references": [
+    {
+      "id": "b6-plan-2023",
+      "placeId": "blok-6",
+      "url": "https://wiki.sh.cvut.cz/_media/kolej/bloky/0.jpg",
+      "source": "Silicon Hill Wiki / Plán bloku 6",
+      "description": "Axonometrie 0.–5. NP a suterénu: dvě řady pokojů kolem chodby, schodišťové části, vrátnice, místnosti nad vrátnicí, venkovní vstupy Čajovny a STOHu. Bez kót a severky. Názvy projektů nejsou dokladem stavu v roce 2026.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "evidence": "Patička Silicon Hill Wiki: obsah pod CC BY-SA 4.0 kromě explicitních výjimek.",
+        "archiveAllowed": true
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0813851,
+        "lon": 14.3917715,
+        "role": "poi",
+        "note": "Bod Google Maps pro budovu, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "high",
+        "basis": "Obrázek vizuálně zkontrolován; metadata i obecná licence ověřeny v detailu média. Výkres není měřický."
+      },
+      "kind": "orientation-plan",
+      "mediaMetadataDate": "2023-03-20T11:06:00",
+      "dateNote": "Datum v detailu média je datum evidované wiki, nikoli prokázané zaměření nebo datum fotografie.",
+      "provenanceUrl": "https://wiki.sh.cvut.cz/_detail/kolej/bloky/0.jpg?id=kolej%3Abloky%3Ablok_6",
+      "localPath": "docs/references/media/blok-6-plan-2023.jpg",
+      "sha256": "afdb05307e6fb770a42f0363708acd4f06983c8b1a6db20bbb169a3bac95dd7c",
+      "creator": "Přispěvatelé Silicon Hill Wiki; konkrétní autor obrázku neuveden v prohlédnutém detailu.",
+      "modifications": "Žádné; archivován původní JPEG 1160 × 1468."
+    },
+    {
+      "id": "b6-wiki-rooms",
+      "placeId": "blok-6",
+      "url": "https://wiki.sh.cvut.cz/kolej/bloky/blok_6",
+      "source": "Silicon Hill Wiki / Blok 6",
+      "description": "Text lokalizuje posilovnu na jih suterénu, pingpong na sever, kolárnu pod vrátnici, studovnu do 1. mezipatra, SHernu do 3. mezipatra a klubovnu mezi 4. a 5. patro. Čajovna a STOH mají vstup zvenku pod schody.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "evidence": "Patička Silicon Hill Wiki: obsah pod CC BY-SA 4.0 kromě explicitních výjimek.",
+        "archiveAllowed": true
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0813851,
+        "lon": 14.3917715,
+        "role": "poi",
+        "note": "Bod Google Maps pro budovu, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "room-locations",
+      "sourceModifiedAt": "2026-09-26T17:17:00"
+    },
+    {
+      "id": "b6-cajovna-east-entrance",
+      "placeId": "blok-6",
+      "url": "https://klubcajovna.cz/",
+      "source": "Klub Čajovna / oficiální web",
+      "description": "Sekce Kudy k nám určuje suterén B6 a vstup z východní strany mezi bloky 6 a 7. Rozlišuje adresu místa Olympijská 1902/5 a korespondenční Vaníčkova 315/7.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0813851,
+        "lon": 14.3917715,
+        "role": "poi",
+        "note": "Bod Google Maps pro budovu, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "high",
+        "basis": "Přímý popis přístupu od provozovatele; bez zaměřené souřadnice dveří."
+      },
+      "kind": "entrance-description"
+    },
+    {
+      "id": "b6-google-exterior-2018",
+      "placeId": "blok-6",
+      "url": "https://www.google.com/maps/place/Koleje+Strahov+-+blok+6/@50.0813851,14.3917715,3a,75y,90t/data=!3m8!1e2!3m6!1sCIHM0ogKEICAgICkkZC9iwE!2e10!3e12!6shttps:%2F%2Flh3.googleusercontent.com%2Fgps-cs-s%2FANWiy9SKKwPFObDo8Lh5VxBaeDshBxCHMadEJCe_Vz4vucq94-n2QVbj5Jk7NgU0iayMUHjSQA0AlLHcqSH5Pb3eTeHANGVJjGqptIVnVbBMwIf3gCtUO_3gmq4KLYFUuizIe-YdyPLAUA%3Dw397-h298-k-no!7i4160!8i3120!4m9!3m8!1s0x470b950396da4f59:0x7bce64559e7b08d6!8m2!3d50.0813851!4d14.3917715!10e5!14m1!1BCgIYEw!16s%2Fg%2F11bwyypm5d",
+      "source": "Google Maps / Roman Vápeník",
+      "description": "Šikmý pohled na dlouhou světlou fasádu s opakovanými tmavými okny, plochou střechou, plným čelem a malými suterénními okny. Terén, venkovní schody, stromy a parkování pomáhají porovnat proporce; snímek není měřický.",
+      "captureDate": "2018-06",
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Google / jednotliví přispěvatelé – pouze odkaz",
+        "url": "https://www.google.com/intl/cs/help/terms_maps/",
+        "evidence": "Prohlížeč uvádí autorská práva Google nebo možné autorské nároky ke snímku; volná licence nezjištěna.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0813851,
+        "lon": 14.3917715,
+        "role": "poi",
+        "note": "Bod Google Maps pro budovu, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "photograph",
+      "captureDatePrecision": "month",
+      "dateNote": "Google uvádí Pořízení obrázku: červen 2018; nezávisle neověřeno.",
+      "imageId": "CIHM0ogKEICAgICkkZC9iwE",
+      "navigation": "Profil Koleje Strahov - blok 6 → Exteriér → fotografie Roman Vápeník / červen 2018.",
+      "locationNote": "Souřadnice v odkazu jsou bod místa, nikoli doložené stanoviště fotografa."
+    },
+    {
+      "id": "b6-google-streetview-2025",
+      "placeId": "blok-6",
+      "url": "https://www.google.com/maps/place/Koleje+Strahov+-+blok+6/@50.081601,14.3917645,327a,75y,178.82h,90t/data=!3m7!1e1!3m5!1sgWCshoWQgiJdy1QWcqe1eQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.clients6.google.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D0%26panoid%3DgWCshoWQgiJdy1QWcqe1eQ%26yaw%3D178.82123!7i16384!8i8192!4m9!3m8!1s0x470b950396da4f59:0x7bce64559e7b08d6!8m2!3d50.0813851!4d14.3917715!10e5!14m1!1BCgIgARICCAI!16s%2Fg%2F11bwyypm5d",
+      "source": "Google Street View",
+      "description": "Severní konec B6 od Olympijské: číslice 6, malé čelní okenní otvory, krytý prosklený vstup s vnějším schodištěm, nízká betonová stěna, chodník a travnatý pás. Před budovou stojí auta a část detailů zakrývají.",
+      "captureDate": "2025-09",
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Google / jednotliví přispěvatelé – pouze odkaz",
+        "url": "https://www.google.com/intl/cs/help/terms_maps/",
+        "evidence": "Prohlížeč uvádí autorská práva Google nebo možné autorské nároky ke snímku; volná licence nezjištěna.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.081601,
+        "lon": 14.3917645,
+        "role": "camera",
+        "note": "Stanoviště panoramatu dle URL, orientační WGS84."
+      },
+      "heading": {
+        "value": 178.82123,
+        "unit": "degree",
+        "reference": "Google URL yaw, přibližně k jihu"
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "panorama",
+      "captureDatePrecision": "month",
+      "dateNote": "Datum zobrazené Google Street View.",
+      "panoramaId": "gWCshoWQgiJdy1QWcqe1eQ",
+      "navigation": "Profil B6 → Street View a 360° → jediný zobrazený náhled."
+    },
+    {
+      "id": "b6-mapy-panorama-2023",
+      "placeId": "blok-6",
+      "url": "https://mapy.com/cs/zakladni?pid=101883263&newest=1&yaw=2.754&fov=1.257&x=14.3918028&y=50.0815907&z=19&ovl=8",
+      "source": "Mapy.com / Seznam.cz, Cyclomedia",
+      "description": "Panorama na Olympijské u severního konce B6. Po otočení je vidět čelo, boční kryt vstupu, sousední bloky, chodník, betonová stěna, zatravnění a parkování. Vhodné pro návaznost budovy na okolní plochy.",
+      "captureDate": "2023-06-01",
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Seznam.cz / Cyclomedia – pouze odkaz",
+        "url": "https://licence.mapy.cz/?doc=mapy_pu&lang=cs",
+        "evidence": "Copyright v prohlížeči panoramatu; volná licence nezjištěna.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.08159153456348,
+        "lon": 14.391802926548941,
+        "role": "camera",
+        "note": "Stanoviště z odkazu Mapy.com."
+      },
+      "heading": {
+        "value": 2.754,
+        "unit": "radian",
+        "reference": "Parametr Mapy.com yaw; uložen v původních jednotkách"
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "panorama",
+      "captureDatePrecision": "day",
+      "dateNote": "Datum panoramatu zobrazené Mapy.com.",
+      "panoramaId": "101883263",
+      "navigation": "Mapa u severu B6 → Panorama → bod na Olympijské; otočení pohledu."
+    },
+    {
+      "id": "b6-projects-2026",
+      "placeId": "blok-6",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty",
+      "source": "Silicon Hill Wiki / Projekty",
+      "description": "Aktuálně načtená stránka řadí Modelland (2011–2026) mezi zaniklé projekty a odkazuje na usnesení 2026-0010. Z toho nelze vyvozovat odstranění místnosti zakreslené ve starším plánu.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "evidence": "Patička Silicon Hill Wiki: obsah pod CC BY-SA 4.0 kromě explicitních výjimek.",
+        "archiveAllowed": true
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0813851,
+        "lon": 14.3917715,
+        "role": "poi",
+        "note": "Bod Google Maps pro budovu, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "project-status",
+      "sourceModifiedAt": "2026-07-18T18:40:00"
+    },
+    {
+      "id": "b6-fotoatelier-status-2026",
+      "placeId": "blok-6",
+      "url": "https://wiki.sh.cvut.cz/klub/projekty/fotoatelier",
+      "source": "Silicon Hill Wiki / Fotoateliér",
+      "description": "Úvod uvádí zrušení projektu od 1. 7. usnesením 2026-0012 a převzetí místnosti Fotokomorou. Historický popis polohy uvádí 2.–3. mezipatro nad vrátnicí B6. Staré instrukce níže nejsou potvrzením pokračujícího projektu.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "evidence": "Patička Silicon Hill Wiki: obsah pod CC BY-SA 4.0 kromě explicitních výjimek.",
+        "archiveAllowed": true
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0813851,
+        "lon": 14.3917715,
+        "role": "poi",
+        "note": "Bod Google Maps pro budovu, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "project-status",
+      "sourceModifiedAt": "2026-07-18T18:42:00"
+    },
+    {
+      "id": "b6-osm-shell",
+      "placeId": "blok-6",
+      "url": "https://www.openstreetmap.org/way/53929071",
+      "source": "OpenStreetMap / existující lokální výřez",
+      "description": "Vnější polygon B6 (RÚIAN 22041443) je exportován se všemi vrcholy do GeoJSON. Obálka přibližně 69,99 × 22,75 m zahrnuje výstupky. Výška 18 m v herních datech vzniká z 6 podlaží × 3 m, není nezávisle změřena.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "ODbL 1.0",
+        "url": "https://www.openstreetmap.org/copyright",
+        "evidence": "© OpenStreetMap contributors; export odvozený z existující .cache/osm.xml.",
+        "archiveAllowed": true
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0813851,
+        "lon": 14.3917715,
+        "role": "poi",
+        "note": "Bod Google Maps pro budovu, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "building-footprint",
+      "localPath": "docs/references/footprints-and-paths.geojson",
+      "osmVersion": 9,
+      "osmTimestamp": "2023-12-10T10:56:39Z"
+    },
+    {
+      "id": "seven-official-location",
+      "placeId": "klub-007",
+      "url": "https://klub007strahov.cz/kontakt/",
+      "source": "Klub 007 Strahov / oficiální web",
+      "description": "Potvrzuje sklepní prostory bloku 7 a adresu Chaloupeckého 1903/6. Klub modelovat jako součást B7; kontaktní sídlo provozovatele na jiné adrese není polohou klubu.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0809467,
+        "lon": 14.392565,
+        "role": "poi",
+        "note": "OSM node/1268889585; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "high",
+        "basis": "Primární zdroj přímo od klubu."
+      },
+      "kind": "place-identity"
+    },
+    {
+      "id": "seven-stage-dimensions",
+      "placeId": "klub-007",
+      "url": "https://klub007strahov.cz/informace/",
+      "source": "Klub 007 Strahov / technické informace",
+      "description": "Oficiální technické informace uvádějí pódium 6 × 4 m. Použitelné jako rozměrová kotva interiéru; stránka neposkytuje kompletní kótovaný půdorys ani výšku sálu.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0809467,
+        "lon": 14.392565,
+        "role": "poi",
+        "note": "OSM node/1268889585; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "high",
+        "basis": "Explicitní rozměr na oficiálním webu; aktuálnost konkrétního měření není doložena."
+      },
+      "kind": "dimension",
+      "measurements": [
+        {
+          "name": "stage",
+          "widthM": 6,
+          "depthM": 4,
+          "method": "Údaj provozovatele, bez data měření."
+        }
+      ]
+    },
+    {
+      "id": "seven-official-photo-001",
+      "placeId": "klub-007",
+      "url": "https://klub007strahov.cz/wp-content/uploads/2020/04/007-gal001.jpg",
+      "source": "Klub 007 Strahov / galerie Informace",
+      "description": "Dřevěný barový pult, lahve a nápojové lednice, nálepky a plakáty. Detail materiálů baru; žádná spolehlivá délková míra.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0809467,
+        "lon": 14.392565,
+        "role": "poi",
+        "note": "OSM node/1268889585; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "photograph",
+      "contextUrl": "https://klub007strahov.cz/informace/",
+      "dateNote": "2020/04 je adresář publikace, neprokazuje datum pořízení fotografie.",
+      "navigation": "Informace → galerie → snímek 007-gal001.jpg; vizuálně otevřen."
+    },
+    {
+      "id": "seven-official-photo-002",
+      "placeId": "klub-007",
+      "url": "https://klub007strahov.cz/wp-content/uploads/2020/04/007-gal002.jpg",
+      "source": "Klub 007 Strahov / galerie Informace",
+      "description": "Čelní pohled na nízké pódium, rám portálu, monitory, závěs, aparaturu a husté nálepky. Proporce doplnit údaji 6 × 4 m z technické stránky.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0809467,
+        "lon": 14.392565,
+        "role": "poi",
+        "note": "OSM node/1268889585; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "photograph",
+      "contextUrl": "https://klub007strahov.cz/informace/",
+      "dateNote": "2020/04 je adresář publikace, neprokazuje datum pořízení fotografie.",
+      "navigation": "Informace → galerie → snímek 007-gal002.jpg; vizuálně otevřen."
+    },
+    {
+      "id": "seven-official-photo-003",
+      "placeId": "klub-007",
+      "url": "https://klub007strahov.cz/wp-content/uploads/2020/04/007-gal003.jpg",
+      "source": "Klub 007 Strahov / galerie Informace",
+      "description": "Sestupné vnitřní schodiště: modrá horní a tmavě červená spodní část stěn, světlý oddělovací pruh, plakáty a malovaný podhled. Ukazuje skutečný charakter přístupu do suterénu.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0809467,
+        "lon": 14.392565,
+        "role": "poi",
+        "note": "OSM node/1268889585; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "photograph",
+      "contextUrl": "https://klub007strahov.cz/informace/",
+      "dateNote": "2020/04 je adresář publikace, neprokazuje datum pořízení fotografie.",
+      "navigation": "Informace → galerie → snímek 007-gal003.jpg; vizuálně otevřen."
+    },
+    {
+      "id": "seven-google-streetview-2024",
+      "placeId": "klub-007",
+      "url": "https://www.google.com/maps/place/Klub+007+Strahov/@50.0806573,14.3928585,326a,75y,348.27h,90t/data=!3m7!1e1!3m5!1s2UCXwe4UgzW5bAoI5ZFssA!2e0!6shttps:%2F%2Fstreetviewpixels-pa.clients6.google.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D0%26panoid%3D2UCXwe4UgzW5bAoI5ZFssA%26yaw%3D348.27243!7i16384!8i8192!4m9!3m8!1s0x470b950236a7783f:0x3ac0cd0f70e1f528!8m2!3d50.0809034!4d14.3927053!10e5!14m1!1BCgIgARICCAI!16s%2Fg%2F1tt1fylf",
+      "source": "Google Street View",
+      "description": "Pohled od jihovýchodu na čelo se značkou 7 a dlouhou fasádu B7. U východní strany jižní části jsou betonové schody, pod nimi tmavý vstup s označením 007. Vedle samostatný nízký přístavek; před budovou parkování, vpravo pěší plocha a tráva.",
+      "captureDate": "2024-05",
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Google / jednotliví přispěvatelé – pouze odkaz",
+        "url": "https://www.google.com/intl/cs/help/terms_maps/",
+        "evidence": "Prohlížeč uvádí autorská práva Google nebo možné autorské nároky ke snímku; volná licence nezjištěna.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0806573,
+        "lon": 14.3928585,
+        "role": "camera",
+        "note": "Stanoviště panoramatu dle URL."
+      },
+      "heading": {
+        "value": 348.27243,
+        "unit": "degree",
+        "reference": "Google URL yaw, přibližně k severu"
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "panorama",
+      "captureDatePrecision": "month",
+      "dateNote": "Datum zobrazené Google Street View.",
+      "panoramaId": "2UCXwe4UgzW5bAoI5ZFssA",
+      "navigation": "Profil Klub 007 Strahov → Street View a 360°."
+    },
+    {
+      "id": "seven-mapy-sportbar-2022",
+      "placeId": "blok-7",
+      "url": "https://mapy.com/cs/letecka?q=Klub%20007%20Strahov&source=firm&id=275251&pid=94772339&newest=1&yaw=0.229&x=14.3925128&y=50.0807524&ds=2&z=17&ovl=8",
+      "source": "Mapy.com / Seznam.cz, Cyclomedia",
+      "description": "Automaticky nabídnuté panorama profilu 007 míří na sousední přístavek SPORT BAR s venkovním sezením a plotem. Tento výchozí záběr nezaměňovat za dveře Klubu 007. Vidět dlažbu, asfalt a napojení na pěší plochy.",
+      "captureDate": "2022-05-21",
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Seznam.cz / Cyclomedia – pouze odkaz",
+        "url": "https://licence.mapy.cz/?doc=mapy_pu&lang=cs",
+        "evidence": "Copyright v prohlížeči panoramatu; volná licence nezjištěna.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.080752406728934,
+        "lon": 14.392512753877174,
+        "role": "camera",
+        "note": "Bod panoramatu jižně od B7."
+      },
+      "heading": {
+        "value": 0.229,
+        "unit": "radian",
+        "reference": "Výchozí Mapy.com yaw"
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "panorama",
+      "captureDatePrecision": "day",
+      "dateNote": "Datum panoramatu 21. 5. 2022; v malé letecké mapě je jiné datum 4. 6. 2023.",
+      "panoramaId": "94772339",
+      "navigation": "Profil Klub 007 Strahov → PANORAMA."
+    },
+    {
+      "id": "seven-osm-shell",
+      "placeId": "blok-7",
+      "url": "https://www.openstreetmap.org/way/53929068",
+      "source": "OpenStreetMap / existující lokální výřez",
+      "description": "Vnější polygon B7; orientovaná obálka přibližně 70,27 × 22,63 m. V GeoJSON je oddělen od bodu provozovny 007; půdorys celého B7 neudává rozsah klubu.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "ODbL 1.0",
+        "url": "https://www.openstreetmap.org/copyright",
+        "evidence": "© OpenStreetMap contributors; export odvozený z existující .cache/osm.xml.",
+        "archiveAllowed": true
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0809467,
+        "lon": 14.392565,
+        "role": "poi",
+        "note": "OSM node/1268889585; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "building-footprint",
+      "localPath": "docs/references/footprints-and-paths.geojson",
+      "osmVersion": 9,
+      "osmTimestamp": "2022-07-12T19:06:52Z"
+    },
+    {
+      "id": "rko-official-alias",
+      "placeId": "rko",
+      "url": "https://www.rechargingbar.cz/event/rko-party-2025-2",
+      "source": "Recharging Bar / oficiální událost Rko Party",
+      "description": "Provozovatel používá pro své místo název Rko v akci ze září 2025. Spolu s profily Google Maps a Mapy.com váže R-ko na Recharging Bar; nejde o stejnojmenný R-klub v Chrudimi.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0811693,
+        "lon": 14.393193,
+        "role": "poi",
+        "note": "OSM node/5508982945; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "high",
+        "basis": "Pojmenování Rko přímo na webu Recharging Bar."
+      },
+      "kind": "place-identity",
+      "eventDate": "2025-09-24"
+    },
+    {
+      "id": "rko-google-location",
+      "placeId": "rko",
+      "url": "https://www.google.com/maps/place/Recharging+Bar/@50.0811714,14.3932077,17z/data=!3m1!4b1!4m6!3m5!1s0x470b95dc47f419f9:0x655d536098df7e9f!8m2!3d50.0811714!4d14.3932077!16s%2Fg%2F11h6qg17l3",
+      "source": "Google Maps / Recharging Bar",
+      "description": "Profil uvádí Olympijská 1913/1 a přímo Umístění: Potraviny Strahov. Potvrzuje společnou budovu; bod profilu není přesnou polohou dveří ani hranicí provozovny.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Google / jednotliví přispěvatelé – pouze odkaz",
+        "url": "https://www.google.com/intl/cs/help/terms_maps/",
+        "evidence": "Prohlížeč uvádí autorská práva Google nebo možné autorské nároky ke snímku; volná licence nezjištěna.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0811714,
+        "lon": 14.3932077,
+        "role": "poi",
+        "note": "Bod profilu Google Maps."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "place-identity",
+      "externalPlaceId": "0x470b95dc47f419f9:0x655d536098df7e9f"
+    },
+    {
+      "id": "rko-mapy-location",
+      "placeId": "rko",
+      "url": "https://mapy.com/cs/zakladni?q=Recharging%20bar&source=firm&id=13296995&ds=2&x=14.3936686&y=50.0812273&z=17",
+      "source": "Mapy.com / Recharging Bar",
+      "description": "Profil uvádí Olympijská 1913/1 a oficiální web rechargingbar.cz. Poloha na východ od B7 souhlasí s bodem OSM. Čísla x/y v této URL jsou střed mapy, nikoli souřadnice dveří.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0811693,
+        "lon": 14.393193,
+        "role": "poi",
+        "note": "OSM node/5508982945; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "place-identity",
+      "externalPlaceId": "firm/13296995"
+    },
+    {
+      "id": "rko-mapy-panorama-2023",
+      "placeId": "rko",
+      "url": "https://mapy.com/cs/zakladni?q=Recharging%20bar&source=firm&id=13296995&pid=101883310&newest=1&yaw=4.343&x=14.3938139&y=50.0812633&ds=2&z=17&ovl=8",
+      "source": "Mapy.com / Seznam.cz, Cyclomedia",
+      "description": "Od východu nízká budova s malovanou fasádou, malými okny pod horní hranou, spodními zamřížovanými otvory, kovovým kouřovodem a parcelboxem. Ukazuje výškové zasazení do svahu; v záběru není doložen vstup samotného baru.",
+      "captureDate": "2023-06-01",
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Seznam.cz / Cyclomedia – pouze odkaz",
+        "url": "https://licence.mapy.cz/?doc=mapy_pu&lang=cs",
+        "evidence": "Copyright v prohlížeči panoramatu; volná licence nezjištěna.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.081263306725816,
+        "lon": 14.39381387483838,
+        "role": "camera",
+        "note": "Bod panoramatu východně od společné budovy."
+      },
+      "heading": {
+        "value": 4.343,
+        "unit": "radian",
+        "reference": "Mapy.com yaw"
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "panorama",
+      "captureDatePrecision": "day",
+      "dateNote": "Datum zobrazené v panoramatu Mapy.com.",
+      "panoramaId": "101883310",
+      "navigation": "Profil Recharging Bar → PANORAMA."
+    },
+    {
+      "id": "rko-mapy-aerial-2023",
+      "placeId": "rko-building-shell",
+      "url": "https://mapy.com/cs/letecka?q=Recharging%20bar&source=firm&id=13296995&ds=2&x=14.3938172&y=50.0812619&z=17",
+      "source": "Mapy.com / letecká mapa",
+      "description": "Letecký pohled ukazuje protáhlou nízkou stavbu východně od B7, její střechu, okolní cesty a sousední školící centrum. Použitelné ke kontrole umístění OSM obrysu; nevymezuje vnitřní pronajaté prostory R-ka.",
+      "captureDate": "2023-06-04",
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0811693,
+        "lon": 14.393193,
+        "role": "poi",
+        "note": "OSM node/5508982945; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "aerial-imagery",
+      "captureDatePrecision": "day",
+      "dateNote": "Datum letecké vrstvy zobrazené Mapy.com; nejde o datum panoramatu."
+    },
+    {
+      "id": "rko-google-bar-photo-2026",
+      "placeId": "rko",
+      "url": "https://www.google.com/maps/place/Recharging+Bar/@50.0811714,14.3932077,3a,75y,90t/data=!3m8!1e2!3m6!1sCIABIhCuGekJFiKwrKHihKRxiUaf!2e10!3e12!6shttps:%2F%2Flh3.googleusercontent.com%2Fgps-cs-s%2FANWiy9QEO8ANufZfFvtjEgzhy55fDn-l-EoFapc1s7XjlrkF3nvE8YLmWbm3h0jmRal3x1iVogh23goYR0uOyDUyHSk8lPaCYyDmnHPxt-7YX2bw0uyi7RvRnr_9Xy6YMv6ULcBZnZg0_dW6Rms%3Dw224-h398-k-no!7i2268!8i4032!4m9!3m8!1s0x470b95dc47f419f9:0x655d536098df7e9f!8m2!3d50.0811714!4d14.3932077!10e5!14m1!1BCgIYIg!16s%2Fg%2F11h6qg17l3",
+      "source": "Google Maps / Recharging Bar (profil vlastníka)",
+      "description": "Detail baru s dřevěnou deskou, tmavým čelem pultu, nápojovými lednicemi, osvětlenou policí lahví a přiznaným betonovým stropem se spárami. Materiálová reference interiéru bez rozměrového měřítka.",
+      "captureDate": "2026-01",
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Google / jednotliví přispěvatelé – pouze odkaz",
+        "url": "https://www.google.com/intl/cs/help/terms_maps/",
+        "evidence": "Prohlížeč uvádí autorská práva Google nebo možné autorské nároky ke snímku; volná licence nezjištěna.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0811693,
+        "lon": 14.393193,
+        "role": "poi",
+        "note": "OSM node/5508982945; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "photograph",
+      "captureDatePrecision": "month",
+      "dateNote": "Google uvádí Pořízení obrázku: leden 2026; nezávisle neověřeno.",
+      "imageId": "CIABIhCuGekJFiKwrKHihKRxiUaf",
+      "navigation": "Profil Recharging Bar → Vzhled a atmosféra → snímek Recharging Bar / leden 2026."
+    },
+    {
+      "id": "rko-osm-shell",
+      "placeId": "rko-building-shell",
+      "url": "https://www.openstreetmap.org/way/7645350",
+      "source": "OpenStreetMap / budova Potraviny",
+      "description": "Přesný seznam vrcholů OSM v GeoJSON, nikoli geodetický půdorys. Vnější orientovaná obálka 48,61 × 16,67 m, plocha polygonu 700,37 m². Jde o celou společnou budovu Potraviny/R-ko, nikoli doloženou plochu provozovny.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "ODbL 1.0",
+        "url": "https://www.openstreetmap.org/copyright",
+        "evidence": "© OpenStreetMap contributors; export odvozený z existující .cache/osm.xml.",
+        "archiveAllowed": true
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0811693,
+        "lon": 14.393193,
+        "role": "poi",
+        "note": "OSM node/5508982945; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "high",
+        "basis": "Identita objektu ověřena mezi OSM RÚIAN ID, RÚIAN č.p. 1913, profily baru a leteckou mapou. Rozsah pronajatých prostor neznámý."
+      },
+      "kind": "building-footprint",
+      "localPath": "docs/references/footprints-and-paths.geojson",
+      "osmVersion": 13,
+      "osmTimestamp": "2026-01-27T15:53:58Z",
+      "measurements": [
+        {
+          "name": "oriented-envelope",
+          "lengthM": 48.61,
+          "widthM": 16.67,
+          "method": "Výpočet z OSM vrcholů, lokální aproximace projekce."
+        },
+        {
+          "name": "outer-polygon-area",
+          "areaM2": 700.37,
+          "method": "Shoelace v lokálních metrech."
+        }
+      ]
+    },
+    {
+      "id": "rko-osm-poi",
+      "placeId": "rko",
+      "url": "https://www.openstreetmap.org/node/5508982945",
+      "source": "OpenStreetMap / Recharging bar",
+      "description": "Bod R-ka: WGS84 50.0811693 N, 14.3931930 E; v lokálních osách hry x=103,08 m a z=-57,81 m. Leží v polygonu společné budovy 7645350. Není označen jako entrance.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "ODbL 1.0",
+        "url": "https://www.openstreetmap.org/copyright",
+        "evidence": "© OpenStreetMap contributors; export odvozený z existující .cache/osm.xml.",
+        "archiveAllowed": true
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": 50.0811693,
+        "lon": 14.393193,
+        "role": "poi",
+        "note": "OSM node/5508982945; bod provozovny, nikoli zaměřený vstup."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "poi",
+      "localPath": "docs/references/footprints-and-paths.geojson",
+      "osmVersion": 8,
+      "osmTimestamp": "2026-07-08T06:06:56Z"
+    },
+    {
+      "id": "rko-ruian-building",
+      "placeId": "rko-building-shell",
+      "url": "https://vdp.cuzk.gov.cz/vdp/ruian/stavebniobjekty/22041559",
+      "source": "ČÚZK / veřejný dálkový přístup RÚIAN",
+      "description": "Stavební objekt 22041559, č.p. 1913, parcela 2458/10, k.ú. Břevnov; objekt občanské vybavenosti, zastavěná plocha 701 m². Podlaží a podlahová plocha v prohlédnutém detailu nevyplněny. Hodnota počet vchodů 0 není důkazem chybějících dveří.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": null,
+        "lon": null,
+        "role": "building",
+        "note": "RÚIAN definiční bod v S-JTSK: Y=744881,91; X=1043427,14; nepřeváděn."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "high",
+        "basis": "Oficiální detail otevřen a přečten v běžném prohlížeči. Zastavěná plocha se týká celé budovy."
+      },
+      "kind": "official-building-record",
+      "sourceValidity": "10.10.2026 17:32 dle stránky ISÚI",
+      "parcelUrl": "https://vdp.cuzk.gov.cz/vdp/ruian/parcely/2380635101"
+    },
+    {
+      "id": "campus-social-map",
+      "placeId": "campus",
+      "url": "https://www.siliconhill.cz/uploads/mapa-hospody.jpg",
+      "source": "Silicon Hill / mapa společenských prostor",
+      "description": "Schéma na mapovém podkladu s červenými kruhy a ikonami: Čajovna/STOH u jižního konce B6, Klub 007 u B7, další bar východně od B7. Není kótované a bod východně od B7 nemá přímo popisek R-ko.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": null,
+        "lon": null,
+        "role": "campus",
+        "note": "Areál kolejí Strahov."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "orientation-map",
+      "contextUrl": "https://www.siliconhill.cz/koleje-strahov",
+      "verification": "Obrázek vizuálně otevřen v běžném prohlížeči. Přesná identifikace R-ka stojí na samostatných zdrojích."
+    },
+    {
+      "id": "campus-amenities-map",
+      "placeId": "campus",
+      "url": "https://www.siliconhill.cz/uploads/mapa3.jpg",
+      "source": "Silicon Hill / mapa vybavenosti",
+      "description": "Schéma sportovišť: obdélníkové plochy jižně od B5–B7, Silicon Gym u B2, školící centrum na severu; západně bazén a squash. Užitečné pro vztahy cest a hřišť; bez kót a doloženého data.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "Nedoložena licence pro redistribuci",
+        "url": null,
+        "evidence": "Veřejně přístupný zdroj; oprávnění k archivaci média nezjištěno.",
+        "archiveAllowed": false
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": null,
+        "lon": null,
+        "role": "campus",
+        "note": "Areál kolejí Strahov."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Zdroj otevřen a obsah zkontrolován; časová nebo rozměrová přesnost má uvedená omezení."
+      },
+      "kind": "orientation-map",
+      "contextUrl": "https://www.siliconhill.cz/koleje-strahov",
+      "verification": "Obrázek vizuálně otevřen v běžném prohlížeči; nepoužito k měření."
+    },
+    {
+      "id": "campus-osm-paths",
+      "placeId": "campus-paths",
+      "url": "https://www.openstreetmap.org/way/25920435",
+      "source": "OpenStreetMap / existující lokální výřez",
+      "description": "GeoJSON obsahuje 39 celých úseků highway zasahujících do výřezu mezi B6, B7 a R-kem, včetně pěších cest, schodů a obslužných komunikací. Každý má vlastní OSM URL a původní tagy. Šířky, výškové profily a současná průchodnost nejsou tímto exportem ověřeny.",
+      "captureDate": null,
+      "checkedAt": "2026-10-10",
+      "license": {
+        "name": "ODbL 1.0",
+        "url": "https://www.openstreetmap.org/copyright",
+        "evidence": "© OpenStreetMap contributors; odvozeno z existujícího OSM výřezu.",
+        "archiveAllowed": true
+      },
+      "location": {
+        "crs": "EPSG:4326",
+        "lat": null,
+        "lon": null,
+        "role": "selection-bounds",
+        "note": "Úseky s alespoň jedním vrcholem v rozsahu lon 14.3913–14.3939, lat 50.08075–50.08165; celé úseky mohou pokračovat mimo výřez."
+      },
+      "heading": null,
+      "confidence": {
+        "level": "medium",
+        "basis": "Geometrie přímo z OSM; povrchy vizuálně doplnit panoramaty b6-mapy-panorama-2023, seven-google-streetview-2024 a seven-mapy-sportbar-2022."
+      },
+      "kind": "path-network",
+      "localPath": "docs/references/footprints-and-paths.geojson"
+    }
+  ]
+}

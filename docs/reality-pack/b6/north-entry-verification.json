@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-10-10",
+  "scope": "Targeted north-entry reconstruction and shared full-world physics; not GPU/FPS evidence.",
+  "sourceHashes": "inventory.json sourceSha256; source workspace, not a final frozen production snapshot",
+  "results": [
+    { "command": "pnpm exec tsx --test tests/b6-reality.test.ts", "passed": 8, "failed": 0, "claims": ["12 shared north risers and analytic surface heights", "continuous outside-to-first-floor route including all props", "north opening and closed west wall", "window holes and glass collision", "12 east gallery room doors remain supported", "asset existence and renderer cleanup"] },
+    { "command": "pnpm exec tsx --test --test-name-pattern \"B6 north reception\" tests/architecture-reality.test.ts", "passed": 1, "failed": 0, "claims": ["shared north facade bounds", "metadata/model alignment", "three unobstructed north rays", "former west aperture rendered solid"] },
+    { "command": "pnpm exec tsx --test --test-name-pattern \"every catalogued B6 room|B6 exterior north\" tests/physics.test.ts", "exitCode": 0, "passed": 2, "failed": 0, "skipped": 0, "durationMs": 20284.2285, "roomDoorsChecked": 228 },
+    { "command": "pnpm exec tsc --noEmit", "exitCode": 0 }
+  ],
+  "integrationFinding": "The expanded 120-building map produces 1108 architecture meshes. The old absolute <650 mesh test fails independently of the north-door geometry. Coordinator notified; no mesh limit weakened by this subtask. Old far triangle budget was normalized with explicit coordinator authorization to BUILDINGS.length*150 (same per-building allowance).",
+  "limits": [
+    "12 steps is ELSA documented typical access, not a measured B6 step inventory.",
+    "1.8m rise and .15m risers remain explicit model estimates.",
+    "B6 footprint is axis-aligned calibration with approximately 2m source-position uncertainty.",
+    "Final pnpm test/build/integration and actual browser passage/GPU measurements belong to coordinator after remaining avatar/UI integration."
+  ]
+}

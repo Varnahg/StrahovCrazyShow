@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Strahov • materiálová studie H</title>
+    <style>
+      body {
+        margin: 0;
+        background: #1b2528;
+        color: #f4eee1;
+        font: 15px system-ui;
+      }
+      canvas {
+        display: block;
+        width: 100vw;
+        height: calc(100vh - 110px);
+      }
+      header {
+        padding: 14px 22px;
+        min-height: 82px;
+      }
+      button {
+        margin: 8px 6px 0 0;
+        padding: 6px 16px;
+      }
+      #stats {
+        font: 12px monospace;
+        margin-left: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      Materiálová studie H · generické CC0 materiály a filmová stylizace, nikoli
+      fotogrammetrie Strahova. Světla místností a lampa jsou simulované.<br /><button
+        id="day"
+      >
+        11.10.2026 · 12:00 Praha</button
+      ><button id="night">11.10.2026 · 02:00 Praha</button
+      ><button id="clear">Jasno · náhled</button
+      ><button id="overcast">Zataženo · náhled</button
+      ><button id="low">Úsporná</button><button id="high">Vysoká</button
+      ><span id="stats">Načítání…</span>
+    </header>
+    <canvas id="view"></canvas>
+    <script type="module" src="./art-style-preview.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "verifiedAt": "2026-10-10",
+  "astronomyLibrary": {
+    "package": "suncalc",
+    "version": "2.1.1",
+    "angleUnit": "degrees",
+    "azimuth": "clockwise from north",
+    "source": "https://github.com/mourner/suncalc"
+  },
+  "station": {
+    "url": "https://weather.sh.cvut.cz/weather/",
+    "encoding": "windows-1250",
+    "timezone": "Europe/Prague",
+    "maxAgeMinutes": 30,
+    "variables": [
+      "temperature",
+      "wind speed",
+      "wind bearing",
+      "precipitation intensity"
+    ]
+  },
+  "model": {
+    "source": "https://open-meteo.com/en/docs",
+    "surfaceWindUnit": "m/s",
+    "cloudUnit": "%",
+    "precipitationUnit": "mm per current.interval",
+    "aloftPressureLevels": ["850hPa", "700hPa", "500hPa"],
+    "maxAgeMinutes": 60
+  },
+  "moonTexture": {
+    "file": "public/textures/sky/moon-lroc-2k.jpg",
+    "sourcePage": "https://svs.gsfc.nasa.gov/4720/",
+    "sourceFile": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_2k.jpg",
+    "credit": "Source texture: NASA's Scientific Visualization Studio, CGI Moon Kit, Ernie Wright (USRA), LROC WAC mosaic data. Game rendering by this project; no NASA endorsement.",
+    "usageGuidelines": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+    "dimensions": [2048, 1024],
+    "sha256": "f7130a1822681fa7512d7dcfd40db8c10b9ba4f06777910348698260ed7a2170",
+    "modified": false
+  },
+  "cloudTexture": {
+    "authoredIn": "client/sky-weather.ts",
+    "kind": "deterministic procedural RGBA sprite",
+    "dimensions": [256, 128],
+    "externalSource": null
+  },
+  "independentMoonPhaseReference": "https://aa.usno.navy.mil/calculated/moon/phases?date=2026-10-01&format=p&nump=6"
+}

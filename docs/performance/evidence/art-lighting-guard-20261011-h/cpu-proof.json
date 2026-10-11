@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-10T23:16:48.823Z",
+  "scope": "Actual Babylon CPU calls with G applyArtLighting and candidate; 2726 registered empty Mesh, 36 real mapped-like PointLight. No GPU, frame-time or FPS claim.",
+  "snapshotId": "18312ddacd1191e512cfb5f0e1018f024e020fdad8d0075130657e4ea43a6684",
+  "sourceHashes": {
+    "original": "e90fd887fa8224bf59b6c1c30dbcd58401588e1926fde234c923009069a4ab6e",
+    "candidate": "3f3417c23a46fd35509b1d0ddb44b2fd3d2f150d6a2a5c52268f052d9b58981a",
+    "proof": "7272ae256022bca2470b7ac42bc2453374abe59248981990df045fb659e6bb1e"
+  },
+  "steady": {
+    "frames": 10,
+    "meshes": 2726,
+    "lamps": 36,
+    "original": {
+      "resyncs": 360,
+      "resyncMeshVisits": 981360
+    },
+    "candidate": {
+      "resyncs": 0,
+      "resyncMeshVisits": 0
+    }
+  },
+  "scenarios": [
+    {
+      "name": "night high two closest",
+      "enabled": 2
+    },
+    {
+      "name": "night high moved to other lamps",
+      "enabled": 2
+    },
+    {
+      "name": "night low disables local lamps",
+      "enabled": 0
+    },
+    {
+      "name": "day medium keeps all lamps disabled",
+      "enabled": 0
+    }
+  ],
+  "checks": [
+    "exact 98136 resync mesh visits per unchanged original frame",
+    "zero candidate resyncs in unchanged frame",
+    "same lamp states/intensities and sky/fog/sun/ambient colors",
+    "unchanged day/night/quality/movement behavior",
+    "own vs effective enable state under disabled parent",
+    "parent reactivation restores original effective state"
+  ],
+  "passed": true
+}

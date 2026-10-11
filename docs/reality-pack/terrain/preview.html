@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>Strahov · DMR a fotokomparátor povrchů</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #18211e;
+      color: #f0f0e6;
+      font: 14px system-ui;
+    }
+    header {
+      height: 138px;
+      padding: 14px 22px;
+      border-bottom: 1px solid #506457;
+      background: #202c25;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+    p {
+      margin: 5px 0;
+      color: #cad6cc;
+    }
+    button {
+      background: #405b48;
+      color: white;
+      border: 1px solid #809886;
+      border-radius: 5px;
+      padding: 7px 12px;
+      cursor: pointer;
+      margin: 3px 6px 0 0;
+    }
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: calc(100vh - 138px);
+    }
+    figure {
+      position: relative;
+      margin: 0;
+      overflow: hidden;
+      border-right: 1px solid #506457;
+    }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      cursor: crosshair;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      display: block;
+    }
+    figcaption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px;
+      background: #17221de8;
+      font-size: 12px;
+    }
+    a {
+      color: #bfdbc8;
+    }
+    .badge {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      background: #17221de8;
+      padding: 9px;
+      border-radius: 7px;
+      max-width: 330px;
+    }
+    #point {
+      font-family: ui-monospace, monospace;
+    }
+    #marker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #ffda75;
+      border: 2px solid #17221d;
+      border-radius: 50%;
+      pointer-events: none;
+      display: none;
+    }
+    @media (max-width: 800px) {
+      .compare {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+      header {
+        height: 160px;
+      }
+      .compare {
+        height: calc(100vh - 160px);
+      }
+    }
+  </style>
+  <header>
+    <h1>Skutečný terén a centrální asfalt Strahova</h1>
+    <p>
+      ČÚZK DMR 5G · terénní rastr 4 m · IPR ortofoto 8. 6. 2024. Klikni do
+      fotografie pro souřadnici a výšku.
+    </p>
+    <p id="audit">Načítání…</p>
+    <button id="top">Celý areál shora</button
+    ><button id="court">Parkoviště a Silicon Hill</button
+    ><button id="oblique">Terén prostorově</button>
+    <span id="point">B6: referenční DMR výška 326.392 m Bpv → herní y=0</span>
+  </header>
+  <div class="compare">
+    <figure id="photo">
+      <img
+        id="ortho"
+        src="../../streets/strahov-ortho-2024.jpg"
+        alt="Georeferencované ortofoto kolejí Strahov, IPR 8.6.2024"
+      /><span id="marker"></span>
+      <figcaption>
+        datový podklad © IPR Praha · CC BY 4.0 ·
+        <a href="ground-photo-interpretation.jpg"
+          >Interpretované čáry a parkovací místa</a
+        >
+      </figcaption>
+    </figure>
+    <figure>
+      <canvas id="world"></canvas>
+      <div class="badge">
+        Průzkumný 3D náhled: skutečný reliéf, mapované povrchy a hmoty budov.
+        Fasády a provoz vozidel ověřuje celá hra.
+      </div>
+      <figcaption>
+        © ČÚZK, upraveno · CC BY 4.0; © OpenStreetMap contributors, ODbL. B6 má
+        výslovnou základovou adaptaci. Čáry a nápis jsou foto-interpretace.
+      </figcaption>
+    </figure>
+  </div>
+  <script type="module">
+    import { Engine } from "@babylonjs/core/Engines/engine";
+    import { Scene } from "@babylonjs/core/scene";
+    import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+    import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+    import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+    import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+    import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+    import { Mesh } from "@babylonjs/core/Meshes/mesh";
+    import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
+    import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+    import earcut from "earcut";
+    import {
+      buildTerrain,
+      buildRealityGround,
+      applyTerrainData,
+      buildingFoundationData,
+    } from "/client/terrain-renderer.ts";
+    import {
+      groundHeight,
+      buildingBaseHeight,
+      drapeTriangles,
+      TERRAIN_REFERENCE_BPV,
+      TERRAIN,
+    } from "/shared/terrain.ts";
+    import { BUILDINGS, GROUND_RECTS } from "/shared/world.ts";
+    import { STREET_SURFACES } from "/shared/streets.ts";
+    const engine = new Engine(document.querySelector("canvas"), true),
+      scene = new Scene(engine);
+    scene.useRightHandedSystem = true;
+    scene.clearColor = new Color4(0.68, 0.74, 0.76, 1);
+    const camera = new ArcRotateCamera(
+      "survey",
+      Math.PI / 2,
+      0.05,
+      460,
+      new Vector3(100, 0, -10),
+      scene,
+    );
+    camera.attachControl(document.querySelector("canvas"), true);
+    camera.minZ = 0.1;
+    camera.wheelPrecision = 12;
+    camera.lowerRadiusLimit = 15;
+    camera.upperRadiusLimit = 900;
+    const ambient = new HemisphericLight(
+      "ambient",
+      new Vector3(0, 1, 0),
+      scene,
+    );
+    ambient.intensity = 0.8;
+    const sun = new DirectionalLight("sun", new Vector3(0.3, -1, 0.4), scene);
+    sun.intensity = 0.7;
+    const mat = (name, color) => {
+      const m = new StandardMaterial(name, scene);
+      m.diffuseColor = Color3.FromHexString(color);
+      m.specularColor.setAll(0.02);
+      return m;
+    };
+    const terrain = buildTerrain({
+      scene,
+      rects: GROUND_RECTS,
+      bounds: { minX: -152, maxX: 352, minZ: -172, maxZ: 136 },
+    });
+    buildRealityGround({ scene });
+    const colors = {
+      asphalt: "#666b68",
+      paving: "#b3b1a7",
+      sett: "#92918b",
+      gravel: "#a29b86",
+    };
+    for (const surface of STREET_SURFACES) {
+      const material = mat(
+        "street:" + surface.material,
+        colors[surface.material],
+      );
+      material.zOffset = -2;
+      for (const [i, polygon] of surface.polygons.entries()) {
+        const points = [...polygon.outer],
+          holes = [];
+        for (const hole of polygon.holes) {
+          holes.push(points.length);
+          points.push(...hole);
+        }
+        const mesh = new Mesh("street" + surface.material + i, scene);
+        applyTerrainData(
+          mesh,
+          drapeTriangles(points, earcut(points.flat(), holes, 2), 0.018),
+        );
+        mesh.material = material;
+      }
+    }
+    for (const building of BUILDINGS) {
+      const points = building.points.slice(0, -1),
+        base = building.name.endsWith("blok 6")
+          ? 0
+          : buildingBaseHeight(points),
+        p = [],
+        ix = [],
+        n = points.length;
+      for (const [x, z] of points) p.push(x, base, z);
+      for (const [x, z] of points) p.push(x, base + building.height, z);
+      for (let i = 0; i < n; i++) {
+        const j = (i + 1) % n;
+        ix.push(i, j, n + j, i, n + j, n + i);
+      }
+      const tri = earcut(points.flat());
+      for (let i = 0; i < tri.length; i += 3)
+        ix.push(n + tri[i], n + tri[i + 1], n + tri[i + 2]);
+      const data = new VertexData();
+      data.positions = p;
+      data.indices = ix;
+      const normals = [];
+      VertexData.ComputeNormals(p, ix, normals);
+      data.normals = normals;
+      const mesh = new Mesh("building:" + building.id, scene);
+      data.applyToMesh(mesh);
+      mesh.material = mat("proxy:" + building.id, "#d0cec3");
+      mesh.material.backFaceCulling = false;
+      const skirt = new Mesh("foundation:" + building.id, scene);
+      applyTerrainData(skirt, buildingFoundationData(points, base));
+      skirt.material = mat("base:" + building.id, "#7f8279");
+      skirt.material.backFaceCulling = false;
+    }
+    document.querySelector("#audit").textContent =
+      `${TERRAIN.grid.columns} × ${TERRAIN.grid.rows} zdrojových vrcholů · ${TERRAIN.statistics.minAbsolute.toFixed(2)}–${TERRAIN.statistics.maxAbsolute.toFixed(2)} m Bpv · geometrie povrchů se dělí po terénních trojúhelnících.`;
+    const top = () => {
+      camera.setTarget(new Vector3(100, 0, -10));
+      camera.alpha = Math.PI / 2;
+      camera.beta = 0.025;
+      camera.radius = 460;
+    };
+    document.querySelector("#top").onclick = top;
+    document.querySelector("#court").onclick = () => {
+      camera.setTarget(new Vector3(130, groundHeight(130, 8), 8));
+      camera.alpha = Math.PI / 2;
+      camera.beta = 0.2;
+      camera.radius = 130;
+    };
+    document.querySelector("#oblique").onclick = () => {
+      camera.setTarget(new Vector3(110, 0, -10));
+      camera.alpha = -2;
+      camera.beta = 0.9;
+      camera.radius = 370;
+    };
+    const georef = await fetch("../../streets/ortho-georeference.json").then(
+      (r) => r.json(),
+    );
+    document.querySelector("#ortho").onclick = (event) => {
+      const image = event.currentTarget,
+        rect = image.getBoundingClientRect(),
+        scale = Math.min(
+          rect.width / image.naturalWidth,
+          rect.height / image.naturalHeight,
+        ),
+        left = (rect.width - image.naturalWidth * scale) / 2,
+        top = (rect.height - image.naturalHeight * scale) / 2,
+        u = (event.clientX - rect.left - left) / scale,
+        v = (event.clientY - rect.top - top) / scale;
+      if (u < 0 || v < 0 || u > image.naturalWidth || v > image.naturalHeight)
+        return;
+      const e = georef.extent,
+        mx = e.xmin + (u / image.naturalWidth) * (e.xmax - e.xmin),
+        my = e.ymax - (v / image.naturalHeight) * (e.ymax - e.ymin),
+        lon = ((mx / 6378137) * 180) / Math.PI,
+        lat =
+          ((2 * Math.atan(Math.exp(my / 6378137)) - Math.PI / 2) * 180) /
+          Math.PI,
+        x = (lon - 14.39175) * 111320 * Math.cos((50.08065 * Math.PI) / 180),
+        z = -(lat - 50.08065) * 111320,
+        h = groundHeight(x, z);
+      document.querySelector("#point").textContent =
+        `x ${x.toFixed(1)} / z ${z.toFixed(1)} · terén ${(h + TERRAIN_REFERENCE_BPV).toFixed(2)} m Bpv · hra y ${h.toFixed(2)}`;
+      camera.setTarget(new Vector3(x, h, z));
+      const marker = document.querySelector("#marker");
+      marker.style.display = "block";
+      marker.style.left = left + u * scale - 6 + "px";
+      marker.style.top = top + v * scale - 6 + "px";
+    };
+    engine.runRenderLoop(() => scene.render());
+    window.addEventListener("resize", () => engine.resize());
+  </script>
+</html>

@@ -1,0 +1,127 @@
+{
+  "checkedAt": "2026-10-10T18:44:17.310Z",
+  "description": "Geometry/assets audit, not a GPU performance measurement. Browser visual checks recorded separately.",
+  "metrics": {
+    "buildings": 40,
+    "windows": 3278,
+    "detailTriangles": 103214,
+    "farTriangles": 4014,
+    "source": "shared/data/facade-reality.json",
+    "measured": false
+  },
+  "enabledGeometry": [
+    {
+      "id": "spawn",
+      "x": 22,
+      "z": -14,
+      "meshCount": 227,
+      "triangleEstimate": 33314
+    },
+    {
+      "id": "B6 reception",
+      "x": -8,
+      "z": -73,
+      "meshCount": 227,
+      "triangleEstimate": 33314
+    },
+    {
+      "id": "central campus",
+      "x": 130,
+      "z": 12,
+      "meshCount": 223,
+      "triangleEstimate": 22546
+    },
+    {
+      "id": "B12",
+      "x": 303,
+      "z": 43,
+      "meshCount": 226,
+      "triangleEstimate": 24864
+    }
+  ],
+  "sourceHash": "ac3f37bb361c342c118dab326447769a18da3eff6a9bd838e3053ebddd7a2cfc",
+  "sources": [
+    {
+      "file": "client/architecture-reality.ts",
+      "sha256": "7b0ef24345ec0784f7ef877c331c2bfaea363784687516857d88d1846f0c7685"
+    },
+    {
+      "file": "shared/data/facade-reality.json",
+      "sha256": "bd9aa863d428a81626d5e861a2def48e887fa888cb7ac4fc70552cccdf40db74"
+    },
+    {
+      "file": "tests/architecture-reality.test.ts",
+      "sha256": "4c0f220dff154e567e50a91faa1457fc22a43f1260b1dfb5fbbcf9e0e725b796"
+    },
+    {
+      "file": "scripts/create-architecture-reality.py",
+      "sha256": "749c10a593e2878b6a25922bc85d1fb8d4eeb8ea10c1801018a6418e83de58bd"
+    },
+    {
+      "file": "shared/data/building-catalog.json",
+      "sha256": "4d9b1b8be5dc9703bd9e637183819c077a48792ce3944481721c93d6890cc092"
+    },
+    {
+      "file": "shared/data/map.json",
+      "sha256": "c140dbf01cd6649c6ae4903a2827831121b4c343d8cec0c1747c04a75ada5dc8"
+    },
+    {
+      "file": "shared/world.ts",
+      "sha256": "d2291c8da940794d6c40231b6b546394815de943105c3fc2a409aa49b12a38a5"
+    },
+    {
+      "file": "public/models/architecture/textures/concrete-color.png",
+      "sha256": "e7444662dd0d946a6958ea616e89e31d34ab12d107e30dcc4e0ba757562d9674"
+    },
+    {
+      "file": "public/models/architecture/textures/concrete-normal.png",
+      "sha256": "cdbdb777e5a90a49cccfde97a443115493bf2182da0ef4dda888f97585fd68ae"
+    },
+    {
+      "file": "public/models/architecture/textures/plaster-color.png",
+      "sha256": "71893f2de513f4ae64c6a946356555c813f07886c5d36cbbe28f418123e6dea6"
+    },
+    {
+      "file": "public/models/architecture/textures/plaster-normal.png",
+      "sha256": "ab61f47d828832d874c0ea2212b995b3daa21d592cbd16c3aed4d65424ba61b0"
+    },
+    {
+      "file": "public/models/architecture/textures/roof-color.png",
+      "sha256": "1de3d7bb6546b7423004abcc0fb627c4d0c6ad03316b21d76a93f9bf4f470ca6"
+    },
+    {
+      "file": "public/models/architecture/textures/roof-normal.png",
+      "sha256": "94247cccd5eedde2ba913a66cd6981ce1d9b1ad3e7ead1520c15ab1584da6e98"
+    },
+    {
+      "file": "public/models/architecture/textures/tile-color.png",
+      "sha256": "8f2c2e951dac3528a2983d16a61877da15ba393491cc29dfbddc0b0de95e7a8a"
+    },
+    {
+      "file": "public/models/architecture/textures/tile-normal.png",
+      "sha256": "8f80052f0a8f7fd96e85861303adfcba80f30b1794ce5b6f50f29844f00af486"
+    },
+    {
+      "file": "public/models/architecture/textures/wood-color.png",
+      "sha256": "d2587f0ce83412c71e2e70e6f1a7e2e5676ee88edf8af0566256f75b979d0e90"
+    },
+    {
+      "file": "public/models/architecture/textures/wood-normal.png",
+      "sha256": "289264f24994203a7cd71ba7cca21d0000d07a85de8d290f5a971cc440f3bf19"
+    }
+  ],
+  "modules": [
+    {
+      "id": "strahov-four-pane-window",
+      "triangleCount": 540,
+      "byteLength": 48852,
+      "sha256": "cf0404d9943e7b3c910c427c01401796044b8db7db92ec3dc20c1353199259e7"
+    },
+    {
+      "id": "strahov-small-concrete-window",
+      "triangleCount": 408,
+      "byteLength": 37592,
+      "sha256": "0a76dc317d8043cb849683290f12c24d39f47bb765c5891e8eb5a9f9cc54368b"
+    }
+  ]
+}

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" /><title>
+    PID 143 / 149 – kontrola modelu a cestujících
+  </title>
+  <style>
+    body {
+      margin: 0;
+      background: #202a32;
+      color: #f2f0e5;
+      font: 15px system-ui;
+    }
+    header {
+      padding: 14px 22px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    button,
+    select {
+      font: inherit;
+      padding: 8px 12px;
+      border: 0;
+      border-radius: 5px;
+      background: #dae2cf;
+      color: #202a32;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: calc(100vh - 145px);
+      touch-action: none;
+    }
+    #status {
+      white-space: pre-wrap;
+      padding: 8px 22px;
+      font: 12px monospace;
+      max-height: 55px;
+      overflow: auto;
+    }
+    small {
+      opacity: 0.7;
+    }
+  </style>
+  <header>
+    <strong>PID 143 / 149 · skutečný plán, demonstrační cestující</strong
+    ><select id="route" aria-label="Linka">
+      <option>143</option>
+      <option>149</option></select
+    ><button id="reset">Příjezd</button
+    ><button id="walk">Cestující po 35 s</button
+    ><button id="drive">V jízdě</button><button id="play">Přehrát</button
+    ><small
+      >Kontrolní scéna používá stejný renderer a veřejná GTFS data jako
+      hra.</small
+    >
+  </header>
+  <canvas id="canvas"></canvas>
+  <pre id="status">Načítám skutečný stažený CC0 model…</pre>
+  <script type="module">
+    import { Engine } from "@babylonjs/core/Engines/engine";
+    import { Scene } from "@babylonjs/core/scene";
+    import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+    import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+    import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+    import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+    import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+    import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+    import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+    import { TransitRenderer } from "/client/transit-renderer.ts";
+    import {
+      TRANSIT_FEED,
+      nextArrivals,
+      serviceDayEpoch,
+      sampleTransit,
+    } from "/shared/transit.ts";
+    import { MAP } from "/shared/world.ts";
+    const canvas = document.querySelector("#canvas"),
+      engine = new Engine(canvas, true),
+      scene = new Scene(engine);
+    scene.useRightHandedSystem = true;
+    scene.clearColor = new Color4(0.55, 0.67, 0.75, 1);
+    const camera = new ArcRotateCamera(
+      "camera",
+      2.4,
+      1.18,
+      23,
+      new Vector3(-123, 1, 52),
+      scene,
+    );
+    camera.attachControl(canvas, true);
+    camera.lowerRadiusLimit = 8;
+    camera.upperRadiusLimit = 180;
+    new HemisphericLight("ambient", new Vector3(0, 1, 0), scene).intensity =
+      0.75;
+    new DirectionalLight("sun", new Vector3(-0.5, -1, 0.4), scene).intensity =
+      1.4;
+    const mat = (name, color) => {
+      const m = new StandardMaterial(name, scene);
+      m.diffuseColor = Color3.FromHexString(color);
+      m.specularColor = Color3.Black();
+      return m;
+    };
+    const ground = MeshBuilder.CreateGround(
+      "ground",
+      { width: 1100, height: 900 },
+      scene,
+    );
+    ground.position.x = 70;
+    ground.material = mat("grass", "#68755a");
+    const road = MeshBuilder.CreateBox(
+      "road",
+      { width: 15, height: 0.045, depth: 850 },
+      scene,
+    );
+    road.position.set(-125, 0.022, 0);
+    road.material = mat("road", "#555b5c");
+    for (const b of MAP.buildings) {
+      const points = b.points.map((p) => new Vector3(p[0], 0.1, p[1]));
+      const line = MeshBuilder.CreateLines(b.name, { points }, scene);
+      line.color = new Color3(0.8, 0.8, 0.7);
+    }
+    for (const path of MAP.paths.filter((p) =>
+      ["footway", "pedestrian", "path"].includes(p.kind),
+    )) {
+      const line = MeshBuilder.CreateLines(
+        path.id,
+        { points: path.points.map((p) => new Vector3(p[0], 0.1, p[1])) },
+        scene,
+      );
+      line.color = new Color3(0.72, 0.7, 0.58);
+    }
+    const renderer = new TransitRenderer(scene);
+    await renderer.ready;
+    let route = "143",
+      base,
+      offset = 4,
+      playing = false,
+      previous = performance.now();
+    function select() {
+      const arrivals = nextArrivals(
+        serviceDayEpoch(TRANSIT_FEED.start),
+        1000,
+      ).filter(
+        (a) => a.route === route && a.direction === 0 && a.passengerCount >= 4,
+      );
+      base = arrivals[0];
+      const b = sampleTransit(base.at).buses.find(
+        (b) => b.sourceTripId === base.sourceTripId,
+      );
+      camera.target.set(b.position.x, 1, b.position.z);
+      offset = 4;
+    }
+    select();
+    document.querySelector("#route").onchange = (e) => {
+      route = e.target.value;
+      select();
+    };
+    document.querySelector("#reset").onclick = () => {
+      offset = 4;
+      playing = false;
+    };
+    document.querySelector("#walk").onclick = () => {
+      offset = 35;
+      playing = false;
+    };
+    document.querySelector("#drive").onclick = () => {
+      offset = 18;
+      playing = true;
+      const bus = sampleTransit(base.at + 18000).buses.find(
+        (b) => b.sourceTripId === base.sourceTripId,
+      );
+      if (bus) camera.target.set(bus.position.x, 1, bus.position.z);
+    };
+    document.querySelector("#play").onclick = () => {
+      playing = !playing;
+    };
+    engine.runRenderLoop(() => {
+      const time = performance.now(),
+        dt = Math.min(0.1, (time - previous) / 1000);
+      previous = time;
+      if (playing) offset += dt;
+      const now = base.at + offset * 1000;
+      renderer.update({ now, player: camera.target, quality: "medium", dt });
+      scene.render();
+      document.querySelector("#status").textContent = JSON.stringify({
+        ready: !renderer.error,
+        error: renderer.error,
+        arrival: base,
+        previewOffset: Math.round(offset * 10) / 10,
+        visible: renderer.counts,
+        triangles: scene.getActiveIndices() / 3,
+        fps: Math.round(engine.getFps()),
+        buses: renderer.lastFrame?.buses.map((b) => ({
+          route: b.route,
+          headsign: b.headsign,
+          doors: b.doorsOpen,
+          position: b.position,
+        })),
+        passengers: renderer.lastFrame?.passengers.length,
+      });
+    });
+    window.addEventListener("resize", () => engine.resize());
+  </script>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="cs"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Strahov · prototyp vlasových pramenů</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#19252b;color:#e6e3d6;font:14px system-ui}header{padding:15px 20px;background:#22333b}h1{margin:0 0 7px;font-size:21px}p{margin:0;color:#bdc8c9}main{display:grid;grid-template-columns:1fr 310px;height:calc(100vh - 86px)}canvas{width:100%;height:100%;touch-action:none;outline:none}aside{padding:17px;overflow:auto}button{margin:3px;padding:8px;color:#f2eeda;background:#364e50;border:1px solid #718a86;border-radius:5px;cursor:pointer}h2{font-size:14px;color:#c3d0ad}pre{font-size:11px;white-space:pre-wrap}label{display:block;margin:15px 0}.note{font-size:12px;line-height:1.5}.columns{position:absolute;left:25px;right:335px;top:100px;display:flex;justify-content:space-around;pointer-events:none;color:#eee7d6}</style>
+<header><h1>Studie vlasů · CC0 prameny a alpha test</h1><p>Pouze lokální prototyp · stejná původní hlava a rodičovský transform · hra není touto studií změněná</p></header>
+<div class="columns"><span>Původní pevná silueta</span><span>Texturovaný CC0 účes</span></div>
+<main><canvas aria-label="Srovnání původních a texturovaných vlasů"></canvas><aside>
+<h2>Původní postava</h2><div id="presets"></div><h2>Prototyp účesu</h2><div id="styles"></div><h2>Pohled a detail</h2><div id="views"></div><div id="lod"></div>
+<label>Otočení skutečného head pivotu <input id="turn" type="range" min="-.65" max=".65" step=".01" value="0"></label>
+<label>Alpha cutoff <input id="cutoff" type="range" min=".1" max=".8" step=".01" value=".42"></label>
+<label><input id="glasses" type="checkbox"> Brýle · zvláštní geometrie s vůlí pro straničky</label>
+<p class="note">Vpravo je původní RGB barva licencované textury. Barvení podle editoru se zatím neintegruje. Bob nemá dodanou normal mapu; short02 používá původní CC0 normal mapu. Žádné míchání průhledných vrstev: použité alpha testy zapisují hloubku.</p><pre id="hair-audit">Načítání…</pre></aside></main>
+<script type="module">
+import '/client/render-shaders.ts';
+import {Engine} from '@babylonjs/core/Engines/engine';
+import {Scene} from '@babylonjs/core/scene';
+import {Vector3} from '@babylonjs/core/Maths/math.vector';
+import {Color3,Color4} from '@babylonjs/core/Maths/math.color';
+import {ArcRotateCamera} from '@babylonjs/core/Cameras/arcRotateCamera';
+import {Camera} from '@babylonjs/core/Cameras/camera';
+import {HemisphericLight} from '@babylonjs/core/Lights/hemisphericLight';
+import {DirectionalLight} from '@babylonjs/core/Lights/directionalLight';
+import {Mesh} from '@babylonjs/core/Meshes/mesh';
+import {VertexData} from '@babylonjs/core/Meshes/mesh.vertexData';
+import {Material} from '@babylonjs/core/Materials/material';
+import {PBRMaterial} from '@babylonjs/core/Materials/PBR/pbrMaterial';
+import {Texture} from '@babylonjs/core/Materials/Textures/texture';
+import {AvatarPrimitivePool,createAvatarRig} from '/client/avatar-renderer.ts';
+import {AVATAR_PRESETS,applyAvatarPreset} from '/client/avatar-presets.ts';
+import {DEFAULT_AVATAR} from '/shared/types.ts';
+import hair from '/.cache/hair-realism-study/hair-prototypes.json';
+import shortTexture from '/.cache/hair-realism-study/sources/hair/short02/short02_diffuse.png?url';
+import shortNormal from '/.cache/hair-realism-study/sources/hair/short02/short02_normal.png?url';
+import bobTexture from '/.cache/hair-realism-study/sources/hair/bob01/bob01_diffuse.png?url';
+import short04Texture from '/.cache/hair-realism-study/sources/hair/short04/short04_diffuse.png?url';
+import longTexture from '/.cache/hair-realism-study/sources/hair/long01/long01_diffuse.png?url';
+const canvas=document.querySelector('canvas'),engine=new Engine(canvas,true,{powerPreference:'high-performance',stencil:false}),scene=new Scene(engine);scene.useRightHandedSystem=true;scene.clearColor=new Color4(.12,.17,.20,1);
+const camera=new ArcRotateCamera('hair study',Math.PI/2,1.47,1.05,new Vector3(0,1.63,0),scene);camera.fov=.64;camera.minZ=.015;camera.attachControl(canvas,true);
+camera.mode=Camera.ORTHOGRAPHIC_CAMERA;
+function framing(){const half=.38*camera.radius/1.05,aspect=engine.getRenderWidth()/engine.getRenderHeight();camera.orthoLeft=-half;camera.orthoRight=half;camera.orthoTop=half/aspect;camera.orthoBottom=-half/aspect}framing();
+const sky=new HemisphericLight('soft sky',new Vector3(0,1,0),scene);sky.intensity=.8;sky.groundColor=new Color3(.24,.25,.26);
+const sun=new DirectionalLight('soft key',new Vector3(-.6,-1,-.8),scene);sun.intensity=1.7;sun.diffuse=new Color3(1,.91,.79);
+const pool=new AvatarPrimitivePool(scene);let rigs=[],mesh,material,preset=0,style='short02',level='near',error=null,glassesOverride;
+function arrange(){const x=Math.sin(camera.alpha),z=-Math.cos(camera.alpha);for(let i=0;i<rigs.length;i++){rigs[i].root.position.x=x*(i===0?-.20:.20);rigs[i].root.position.z=z*(i===0?-.20:.20)}}
+const textures={short02:new Texture(shortTexture,scene,false,true,Texture.TRILINEAR_SAMPLINGMODE),bob01:new Texture(bobTexture,scene,false,true,Texture.TRILINEAR_SAMPLINGMODE),short04:new Texture(short04Texture,scene,false,true,Texture.TRILINEAR_SAMPLINGMODE),long01:new Texture(longTexture,scene,false,true,Texture.TRILINEAR_SAMPLINGMODE)};for(const t of Object.values(textures)){t.hasAlpha=true;t.gammaSpace=true}
+const normal=new Texture(shortNormal,scene,false,true,Texture.TRILINEAR_SAMPLINGMODE);normal.gammaSpace=false;normal.level=.4;
+function build(){
+ for(const rig of rigs)rig.root.dispose();rigs=[];material?.dispose(false,false);
+ const base=applyAvatarPreset(preset,DEFAULT_AVATAR),config={...base,glasses:glassesOverride??base.glasses},faceWidth=.173+Math.max(0,Math.min(1,base.face))*.016;document.querySelector('#glasses').checked=config.glasses;
+ for(let side=0;side<2;side++){
+  const rig=createAvatarRig(scene,config,pool,'hair study '+side,{studentGarments:false});rig.root.position.x=side===0?-.20:.20;rigs.push(rig);
+  for(const m of rig.root.getChildMeshes())if(!m.isDescendantOf(rig.head))m.setEnabled(false);
+  for(const m of rig.head.getChildMeshes())if(m.name.endsWith(' hair')&&side===1)m.setEnabled(false);else if(m.metadata?.avatarBodyLod)m.setEnabled(m.metadata.avatarBodyLod===level);
+  rig.head.rotation.y=Number(document.querySelector('#turn').value);
+ }
+ mesh=new Mesh('cache-only CC0 '+style+' '+level,scene);const g=(config.glasses?hair.styles[style].glasses:hair.styles[style])[level],data=new VertexData();data.positions=g.positions;data.normals=g.normals;data.uvs=g.uvs;data.indices=g.indices;data.applyToMesh(mesh);mesh.parent=rigs[1].head;mesh.scaling.set(faceWidth,.235,.195);mesh.sideOrientation=Material.CounterClockWiseSideOrientation;mesh.isPickable=false;
+ material=new PBRMaterial('alpha-test strand study',scene);material.albedoTexture=textures[style];material.useAlphaFromAlbedoTexture=true;material.transparencyMode=PBRMaterial.PBRMATERIAL_ALPHATEST;material.alphaCutOff=Number(document.querySelector('#cutoff').value);material.backFaceCulling=false;material.twoSidedLighting=true;material.metallic=0;material.roughness=.76;material.indexOfRefraction=1.33;material.forceDepthWrite=true;material.bumpTexture=style==='short02'?normal:null;material.environmentIntensity=.65;mesh.material=material;
+ for(const mat of scene.materials)mat.onError=(_,message)=>error=message;
+ if(style==='long01'){
+  const baseY=rigs[1].head.getAbsolutePosition().y,scaleY=.235*rigs[1].root.scaling.y,ys=g.positions.filter((_,i)=>i%3===1),min=baseY+Math.min(...ys)*scaleY,max=baseY+Math.max(...ys)*scaleY;
+  camera.target.y=(min+max)/2;camera.radius=Math.max(1.05,(max-min+.12)*(engine.getRenderWidth()/engine.getRenderHeight())*1.05/.76);
+ }else{camera.target.y=rigs[1].head.getAbsolutePosition().y+.02;camera.radius=1.05}
+ arrange();pool.pruneUnused();scene.executeWhenReady(()=>scene.render());
+}
+function button(target,label,fn){const b=document.createElement('button');b.textContent=label;b.onclick=fn;document.querySelector(target).append(b)}
+AVATAR_PRESETS.forEach((p,i)=>button('#presets',p.name,()=>{preset=i;glassesOverride=undefined;build()}));
+for(const [id,label,i]of [['short02','Krátký vrstvený',0],['bob01','Asymetrické mikádo',4],['short04','Krátký uhlazený',3],['long01','Dlouhý s pěšinkou',2]])button('#styles',label,()=>{style=id;preset=i;glassesOverride=undefined;build()});
+for(const [label,a,r]of [['Čelně',Math.PI/2,0],['Tři čtvrtiny',1.1,0],['Profil',.3,0],['Zezadu',-Math.PI/2,0],['Detail',Math.PI/2,.73]])button('#views',label,()=>{camera.alpha=a;if(r){camera.radius=r;camera.target.y=rigs[1].head.getAbsolutePosition().y+.02}framing()});
+for(const [label,l]of [['Near','near'],['Medium','medium']])button('#lod',label,()=>{level=l;build()});
+document.querySelector('#turn').oninput=e=>{for(const rig of rigs)rig.head.rotation.y=Number(e.target.value)};document.querySelector('#cutoff').oninput=e=>material.alphaCutOff=Number(e.target.value);
+document.querySelector('#glasses').onchange=e=>{glassesOverride=e.target.checked;build()};
+build();let next=0;engine.runRenderLoop(()=>{arrange();framing();scene.render();if(performance.now()>next){next=performance.now()+250;const matrix=rigs[1].head.computeWorldMatrix(true);document.querySelector('#hair-audit').textContent=JSON.stringify({ready:scene.isReady(),prototypeOnly:true,style,preset:AVATAR_PRESETS[preset].name,lod:level,glassesFit:document.querySelector('#glasses').checked,earClearance:hair.styles[style].exposesEars,vertices:mesh.getTotalVertices(),triangles:mesh.getTotalIndices()/3,alphaCutOff:material.alphaCutOff,alphaTest:material.needAlphaTestingForMesh(mesh),alphaBlend:material.needAlphaBlendingForMesh(mesh),twoSided:!material.backFaceCulling,headParent:mesh.parent.name,headWorldPosition:matrix.getTranslation().asArray(),sourceNormal:style==='short02',gpu:engine.getGlInfo().renderer,shaderError:error},null,2)}});addEventListener('resize',()=>{engine.resize();framing()});
+</script>
+</html>

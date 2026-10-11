@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Strahov · zdrojová okna v noci</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        color: #e9edf7;
+        background: #0c1626;
+        font:
+          14px system-ui,
+          sans-serif;
+      }
+      canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        touch-action: none;
+      }
+      aside {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        width: min(360px, calc(100% - 24px));
+        padding: 14px;
+        background: #142232eb;
+        border: 1px solid #748395;
+        border-radius: 10px;
+        max-height: calc(100% - 24px);
+        overflow: auto;
+      }
+      h1 {
+        font-size: 16px;
+        margin: 0 0 8px;
+      }
+      p {
+        line-height: 1.4;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      button,
+      select {
+        color: #edf1f7;
+        background: #32455c;
+        border: 1px solid #6b839e;
+        padding: 7px;
+        font: inherit;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid #f0bc69;
+      }
+      label {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 12px;
+      }
+      pre {
+        font-size: 10px;
+        white-space: pre-wrap;
+      }
+      #night-errors {
+        color: #ffc0a1;
+      }
+      footer {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        padding: 6px 10px;
+        background: #122232df;
+      }
+      a {
+        color: #b6d5f4;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="night-scan"
+      aria-label="Kontrola nočního osvětlení skutečné fotogrammetrie"
+    ></canvas>
+    <aside>
+      <h1>Okna podle skutečného snímku IPR</h1>
+      <p>
+        Teplá světla a obsazenost jsou simulované. Původní snímky z léta 2023
+        mají stále zachycené denní stíny.
+      </p>
+      <nav aria-label="Kontrolní pohledy">
+        <button data-view="b6east">B6 východ</button>
+        <button data-view="b6west">B6 západ</button>
+        <button data-view="b5">B5</button>
+        <button data-view="b10">B10 na svahu</button>
+        <button data-view="campus">Celý areál</button>
+      </nav>
+      <label
+        >Den / noc
+        <input
+          id="night-daylight"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0"
+      /></label>
+      <label
+        ><input id="night-enabled" type="checkbox" checked />Simulovaná světla
+        oken</label
+      >
+      <p>Myší otáčet, kolečkem přiblížit. Není to měření FPS celé hry.</p>
+      <p id="night-errors" role="status"></p>
+      <pre id="night-diagnostics"></pre>
+    </aside>
+    <footer>
+      datový podklad © IPR Praha · CC BY ·
+      <a
+        href="https://www.arcgis.com/home/item.html?id=92d2d376599c4fd2b6600ed46db7402e"
+        target="_blank"
+        rel="noreferrer"
+        >původní zdroj</a
+      >
+    </footer>
+    <script type="module" src="./night-preview.ts"></script>
+  </body>
+</html>

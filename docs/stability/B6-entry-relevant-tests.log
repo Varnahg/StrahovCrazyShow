@@ -1,0 +1,23 @@
+✔ diagonal movement has the same direction before and after transport at every camera angle (6.2154ms)
+✔ fixed simulation time does not depend on irregular callback count (1.3247ms)
+✔ input queue does not lose batched commands, repeat jumps, reset acknowledgments or speed up simulation (0.5646ms)
+✔ restore and replay reproduce the local movement and jumping state (927.9451ms)
+✔ remote snapshots interpolate time and take the short rotational path (1.053ms)
+✔ walking avatars do not create an inconsistent crowd collision wall (184.4571ms)
+✔ campus ground has no holes at sampled outdoor points including B6 edges (11141.236ms)
+✔ walking and driving cannot tunnel through a solid wall or world boundary (258.3921ms)
+✔ B6 west lobby reaches the first floor by continuous walking without teleporting (211.097ms)
+✔ B6 service hall keeps east bedroom walls and both lobby side plinths solid (192.4744ms)
+✔ B6 basement floor remains supported beneath the service core (39.7471ms)
+✔ all B6 room floors and stair flights support a walking capsule (2016.2745ms)
+✔ rain wraps coherently without flashing eighteen-meter segments (4.4568ms)
+✔ resting contact does not visibly oscillate at former penetration points and terrain seams (2593.9486ms)
+✔ walking across flat terrain seams keeps a stable physical eye height (296.1309ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14704.5325

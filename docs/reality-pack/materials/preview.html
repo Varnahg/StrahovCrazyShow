@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Strahov – porovnání materiálů a atmosféry</title>
+  <style>
+    body {
+      margin: 0;
+      background: #172329;
+      color: #e8e8df;
+      font: 15px system-ui;
+    }
+    header {
+      padding: 14px 22px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    h1 {
+      font-size: 19px;
+      margin: 0;
+      margin-right: auto;
+    }
+    button,
+    select {
+      padding: 9px;
+      background: #33484d;
+      color: white;
+      border: 1px solid #73857e;
+      border-radius: 7px;
+    }
+    button[aria-pressed="true"] {
+      background: #5d6f4c;
+    }
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+    }
+    figure {
+      margin: 0;
+      position: relative;
+    }
+    canvas {
+      width: 100%;
+      height: 65vh;
+      display: block;
+      outline: 0;
+    }
+    figcaption {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: #152126de;
+      border-radius: 6px;
+      padding: 8px 12px;
+    }
+    p {
+      margin: 14px 22px;
+      max-width: 1150px;
+      line-height: 1.5;
+    }
+    #status {
+      color: #c3d4bf;
+    }
+    #diagnostics {
+      white-space: pre-wrap;
+      font: 12px ui-monospace;
+      margin: 14px 22px;
+      color: #b5c7ca;
+    }
+    a {
+      color: #ccdcba;
+    }
+    @media (max-width: 750px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      canvas {
+        height: 44vh;
+      }
+    }
+  </style>
+  <header>
+    <h1>Materiály a světlo na stejné geometrii B6</h1>
+    <button data-time="actual" aria-pressed="true">Skutečný okamžik</button>
+    <button data-time="day" aria-pressed="false">Denní kontrola</button>
+    <button data-time="night" aria-pressed="false">Noční kontrola</button>
+    <label
+      >Kvalita
+      <select id="quality">
+        <option value="low">Nízká</option>
+        <option value="medium" selected>Střední</option>
+        <option value="high">Vysoká</option>
+      </select></label
+    >
+  </header>
+  <header aria-label="Kontrolní pohled">
+    <button data-view="facade" aria-pressed="true">Fasáda</button>
+    <button data-view="surface" aria-pressed="false">Povrchy zblízka</button>
+    <button data-view="grass" aria-pressed="false">Tráva zblízka</button>
+    <button data-view="shadows" aria-pressed="false">
+      Kontakt se zemí a stíny
+    </button>
+  </header>
+  <main>
+    <figure>
+      <canvas id="before"></canvas>
+      <figcaption>Původní Standard materiály</figcaption>
+    </figure>
+    <figure>
+      <canvas id="after"></canvas>
+      <figcaption>CC0 PBR + měkké stíny + odraz aktuální oblohy</figcaption>
+    </figure>
+  </main>
+  <p id="status">Načítám lokální meteorologický zdroj…</p>
+  <p>
+    Diagnostický náhled používá stejný model B6, kameru a počasí na obou
+    stranách. Okolní rovná plocha zde slouží jen k porovnání asfaltu, dlažby a
+    stínů; není mapovým podkladem kampusu. Denní/noční kontrola mění výslovně
+    čas náhledu. Osvětlená okna jsou simulace. Zdrojové fotografie a přesnost
+    modelu: <a href="../architecture/README.md">architektura</a>; textury:
+    <a href="https://docs.ambientcg.com/license/">ambientCG CC0</a>.
+  </p>
+  <pre id="diagnostics"></pre>
+  <script type="module" src="./preview.ts"></script>
+</html>

@@ -1,0 +1,6 @@
+import fs from 'node:fs/promises';
+import crypto from 'node:crypto';
+const data=JSON.parse(await fs.readFile('shared/data/journal.json','utf8'));
+const queue=[...data.sources],results=[];
+async function worker(){while(queue.length){const source=queue.shift();try{const response=await fetch(source.url,{signal:AbortSignal.timeout(12000),headers:{'User-Agent':'StrahovCrazyShow local-demo reference audit'}});const bytes=Buffer.from(await response.arrayBuffer());results.push({id:source.id,url:source.url,finalUrl:response.url,status:response.status,bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex'),contentType:response.headers.get('content-type'),retrievedAt:new Date().toISOString()});}catch(error){results.push({id:source.id,url:source.url,error:String(error),retrievedAt:new Date().toISOString()});}}}
+await Promise.all(Array.from({length:8},worker));results.sort((a,b)=>a.id.localeCompare(b.id));await fs.writeFile('docs/journal/link-audit.json',JSON.stringify({note:'HTTP retrieval audit only. Successful response is not independent confirmation of every assertion; evidence interpretation is in source-audit.json. Original web content is not republished.',results},null,2)+'\n');console.log(JSON.stringify({total:results.length,problems:results.filter(result=>result.status!==200).map(({id,status,error})=>({id,status,error}))}));

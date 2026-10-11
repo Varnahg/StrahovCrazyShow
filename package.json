@@ -1,0 +1,45 @@
+{
+  "name": "strahov-crazy-show",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": ">=11 <12"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n SERVER,CLIENT \"pnpm dev:server\" \"pnpm dev:client\"",
+    "dev:client": "vite --host 127.0.0.1",
+    "dev:server": "tsx watch server/index.ts",
+    "build": "tsc --noEmit && vite build",
+    "test": "tsx --test tests/*.test.ts",
+    "test:integration": "node scripts/test-integration.mjs",
+    "map:fetch": "node scripts/fetch-map.mjs"
+  },
+  "dependencies": {
+    "@babylonjs/core": "9.30.0",
+    "@babylonjs/loaders": "9.30.0",
+    "@colyseus/core": "0.18.9",
+    "@colyseus/schema": "latest",
+    "@colyseus/sdk": "0.18.5",
+    "@colyseus/ws-transport": "latest",
+    "@dimforge/rapier3d-compat": "0.21.0",
+    "earcut": "^3.2.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "suncalc": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/earcut": "^3.0.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "latest",
+    "concurrently": "latest",
+    "prettier": "^3.9.9",
+    "tsx": "latest",
+    "typescript": "~5.9.0",
+    "vite": "latest"
+  }
+}

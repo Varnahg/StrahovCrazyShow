@@ -1,0 +1,8 @@
+{
+  "snapshot": "integrated-20261010-b",
+  "snapshotId": "84760d988d1f08877fc4d6c6f996cd582270513d5d6f401c80d53997f5f01b04",
+  "classification": "test-pipeline-error-not-game-failure",
+  "finding": "The source snapshot omitted tests/. pnpm test exited 0 but actually executed zero tests. This exit code is not evidence that the game test suite passed.",
+  "evidence": ["initial-freeze-source-check.json", "test-missing-sources.stdout.log", "test-missing-sources.result.json"],
+  "action": "Root fixed the freeze script to include tests and created integrated-20261010-c. All actual verification moved to the c snapshot. No runtime game source was changed for this pipeline repair."
+}

@@ -1,0 +1,354 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Scene } from "@babylonjs/core/scene";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
+import { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { VehicleLighting } from "../client/vehicle-lighting";
+import manifest from "../shared/data/assets/vehicles-manifest.json";
+import { applyArtLighting } from "../client/art-lighting";
+import { sunState, moonState } from "../shared/weather";
+
+function fixture(t: import("node:test").TestContext) {
+  const engine = new NullEngine(),
+    scene = new Scene(engine);
+  scene.useRightHandedSystem = true;
+  const camera = new FreeCamera("test observer", new Vector3(0, 3, -8), scene);
+  scene.activeCamera = camera;
+  const root = new TransformNode("physical vehicle root", scene),
+    lighting = new VehicleLighting(scene);
+  t.after(() => {
+    lighting.dispose();
+    scene.dispose();
+    engine.dispose();
+  });
+  return { engine, scene, root, lighting };
+}
+function box(
+  scene: Scene,
+  name: string,
+  x: number,
+  y: number,
+  z: number,
+  size = 1,
+) {
+  const mesh = MeshBuilder.CreateBox(name, { size }, scene);
+  mesh.position.set(x, y, z);
+  mesh.material = new StandardMaterial(name + " opaque material", scene);
+  mesh.metadata = { depthCaster: "opaque" };
+  return mesh;
+}
+function selection(scene: Scene, lighting: VehicleLighting) {
+  scene.incrementRenderId();
+  const generator = lighting.light.getShadowGenerator() as ShadowGenerator;
+  const map = generator.getShadowMap()!;
+  assert.ok(
+    map.getCustomRenderList,
+    "actual current render target must retain draw-time culling after resize",
+  );
+  const candidates = map.renderList!;
+  return map.getCustomRenderList!(0, candidates, candidates.length)!;
+}
+
+test("model-derived beam follows translation, 90 degree yaw, pitch and parent transforms in actual world metres", (t) => {
+  const { scene, root, lighting } = fixture(t);
+  const origin = manifest.lights.frontCentres
+    .reduce((sum, p) => sum.add(Vector3.FromArray(p)), Vector3.Zero())
+    .scale(0.5);
+  origin.z += 0.025;
+  root.position.set(10, 2, 30);
+  root.rotationQuaternion = Quaternion.RotationAxis(Vector3.Up(), Math.PI / 2);
+  lighting.update(root, 1, true, "low");
+  assert.ok(
+    Vector3.Distance(
+      lighting.light.position,
+      new Vector3(10 + origin.z, 2 + origin.y, 30 - origin.x),
+    ) < 1e-5,
+  );
+  const norm = Math.sqrt(1.01);
+  assert.ok(
+    Vector3.Distance(
+      lighting.light.direction,
+      new Vector3(1 / norm, -0.1 / norm, 0),
+    ) < 1e-6,
+  );
+  root.rotationQuaternion = root.rotationQuaternion.multiply(
+    Quaternion.RotationAxis(Vector3.Right(), Math.PI / 6),
+  );
+  lighting.update(root, 1, true, "low");
+  const c = Math.cos(Math.PI / 6),
+    s = Math.sin(Math.PI / 6);
+  assert.ok(
+    Vector3.Distance(
+      lighting.light.position,
+      new Vector3(
+        10 + s * origin.y + c * origin.z,
+        2 + c * origin.y - s * origin.z,
+        30 - origin.x,
+      ),
+    ) < 1e-5,
+  );
+  assert.ok(
+    Vector3.Distance(
+      lighting.light.direction,
+      new Vector3((c - 0.1 * s) / norm, (-0.1 * c - s) / norm, 0),
+    ) < 1e-6,
+  );
+  const parent = new TransformNode("pose parent", scene);
+  parent.position.set(-5, 3, 7);
+  parent.rotationQuaternion = Quaternion.RotationAxis(
+    Vector3.Up(),
+    -Math.PI / 2,
+  );
+  root.parent = parent;
+  root.position.set(1, 2, 4);
+  root.rotationQuaternion = Quaternion.RotationAxis(Vector3.Up(), Math.PI / 2);
+  lighting.update(root, 1, true, "low");
+  assert.ok(
+    Vector3.Distance(
+      lighting.light.position,
+      new Vector3(-9 + origin.x, 5 + origin.y, 8 + origin.z),
+    ) < 1e-5,
+  );
+  assert.ok(
+    Vector3.Distance(
+      lighting.light.direction,
+      new Vector3(0, -0.1 / norm, 1 / norm),
+    ) < 1e-6,
+  );
+  assert.equal(
+    lighting.light.parent,
+    null,
+    "already transformed world pose must not get parent-transformed twice",
+  );
+});
+
+test("day, parking and invalid input disable the bounded beam; steady updates never repeat whole-scene light resync", (t) => {
+  const { scene, root, lighting } = fixture(t),
+    object = box(scene, "resync observer", 0, 0, 10);
+  let resync = 0;
+  const original = object._resyncLightSource;
+  object._resyncLightSource = function (light) {
+    resync++;
+    return original.call(this, light);
+  };
+  for (const value of [0, -0.5, NaN, Infinity]) {
+    lighting.update(root, value, true, "low");
+    assert.equal(lighting.light.isEnabled(), false);
+    assert.equal(lighting.light.intensity, 0);
+  }
+  assert.equal(resync, 0);
+  lighting.update(root, 1, true, "low");
+  assert.ok(
+    resync > 0 && resync <= 2,
+    "Babylon may resync both parent-enabled and explicit enabled state on one transition",
+  );
+  const steady = resync;
+  for (let frame = 0; frame < 30; frame++)
+    lighting.update(root, 1, true, "low");
+  assert.equal(resync, steady);
+  assert.equal(lighting.light.range, 32);
+  assert.equal(lighting.light.intensity, 1.6);
+  lighting.update(root, 1, false, "high");
+  assert.equal(lighting.light.isEnabled(), false);
+  assert.equal(lighting.light.intensity, 0);
+  assert.equal(lighting.light.shadowEnabled, false);
+});
+
+test("medium and high use one 256/512 shadow target, low has no pass, and resized maps keep the real culling callback", (t) => {
+  const { scene, root, lighting } = fixture(t);
+  box(scene, "front occluder", 0, 0.6, 8);
+  lighting.update(root, 1, true, "low");
+  assert.equal(lighting.light.getShadowGenerator(), null);
+  assert.equal(lighting.light.shadowEnabled, false);
+  lighting.update(root, 1, true, "medium");
+  const shadow = lighting.light.getShadowGenerator() as ShadowGenerator;
+  assert.equal(shadow.mapSize, 256);
+  assert.ok(
+    selection(scene, lighting).some((mesh) => mesh.name === "front occluder"),
+  );
+  lighting.update(root, 1, true, "high");
+  assert.equal(lighting.light.getShadowGenerator(), shadow);
+  assert.equal(shadow.mapSize, 512);
+  assert.ok(
+    selection(scene, lighting).some((mesh) => mesh.name === "front occluder"),
+  );
+  lighting.update(root, 1, true, "low");
+  assert.equal(lighting.light.shadowEnabled, false);
+  assert.deepEqual(selection(scene, lighting), []);
+  lighting.update(root, 1, true, "medium");
+  assert.equal(shadow.mapSize, 256);
+  assert.ok(
+    selection(scene, lighting).some((mesh) => mesh.name === "front occluder"),
+  );
+  lighting.update(root, 1, true, "unknown");
+  assert.equal(lighting.light.shadowEnabled, false);
+});
+
+test("actual shadow frustum rejects behind/lateral/far/glass/faded/disabled casters while retaining crossing large bounds", (t) => {
+  const { scene, root, lighting } = fixture(t);
+  box(scene, "inside", 0, 0.6, 8);
+  box(scene, "behind", 0, 0.6, -8);
+  box(scene, "lateral", 12, 0.6, 3);
+  box(scene, "far", 0, 0.6, 50);
+  const glass = box(scene, "glass", 0, 0.6, 6);
+  glass.material!.alpha = 0.34;
+  const faded = box(scene, "faded", 0, 0.6, 7);
+  faded.visibility = 0.4;
+  const inactive = box(scene, "inactive", 0, 0.6, 9);
+  inactive.setEnabled(false);
+  const noCaster = box(scene, "ground marked no caster", 0, 0.6, 5);
+  noCaster.metadata.depthCaster = false;
+  const crossing = MeshBuilder.CreateBox(
+    "crossing far plane",
+    { width: 2, height: 2, depth: 22 },
+    scene,
+  );
+  crossing.position.set(0, 0.6, 40);
+  crossing.material = new StandardMaterial("crossing opaque", scene);
+  crossing.metadata = { depthCaster: "opaque" };
+  lighting.update(root, 1, true, "medium");
+  assert.deepEqual(
+    selection(scene, lighting)
+      .map((mesh) => mesh.name)
+      .sort(),
+    ["crossing far plane", "inside"],
+  );
+  // Candidate pooling must not wait 250 ms when an existing visible LOD is enabled.
+  inactive.setEnabled(true);
+  assert.ok(selection(scene, lighting).includes(inactive));
+  // The same broad phase covers turning; draw-time projection must be current.
+  root.rotationQuaternion = Quaternion.RotationAxis(Vector3.Up(), Math.PI);
+  lighting.update(root, 1, true, "medium");
+  assert.deepEqual(
+    selection(scene, lighting).map((mesh) => mesh.name),
+    ["behind"],
+  );
+});
+
+test("reactivation, low-to-shadow return, large pose changes and new meshes invalidate stale broad phase immediately", (t) => {
+  const { scene, root, lighting } = fixture(t);
+  box(scene, "old location", 0, 0.6, 8);
+  lighting.update(root, 1, true, "high");
+  assert.equal(selection(scene, lighting)[0].name, "old location");
+  const later = box(scene, "newly added", 0, 0.6, 12);
+  lighting.update(root, 1, true, "high");
+  assert.ok(selection(scene, lighting).includes(later));
+  lighting.update(root, 1, false, "high");
+  root.position.x = 100;
+  box(scene, "new location", 100, 0.6, 8);
+  lighting.update(root, 1, true, "high");
+  assert.deepEqual(
+    selection(scene, lighting).map((mesh) => mesh.name),
+    ["new location"],
+  );
+  lighting.update(root, 1, true, "low");
+  root.position.x = 0;
+  lighting.update(root, 1, true, "high");
+  assert.ok(
+    selection(scene, lighting).some((mesh) => mesh.name === "old location"),
+  );
+  root.position.x = 100;
+  lighting.update(root, 1, true, "high");
+  assert.deepEqual(
+    selection(scene, lighting).map((mesh) => mesh.name),
+    ["new location"],
+  );
+});
+
+test("wind depth ownership and disposal are safe, idempotent and do not delete a replacement owner's wrapper", (t) => {
+  const { scene, root, lighting } = fixture(t),
+    leaf = box(scene, "wind alpha leaf", 0, 0.6, 8);
+  const material = new ShaderMaterial(
+    "test wind alpha shader",
+    scene,
+    "unused-in-state-test",
+    { needAlphaTesting: true },
+  );
+  leaf.material = material;
+  leaf.metadata = { depthCaster: "alpha-test", windDeformed: true };
+  lighting.update(root, 1, true, "high");
+  assert.ok(selection(scene, lighting).includes(leaf));
+  const owned = material.shadowDepthWrapper!;
+  assert.ok(owned);
+  let ownedDisposals = 0;
+  const original = owned.dispose.bind(owned);
+  owned.dispose = () => {
+    ownedDisposals++;
+    original();
+  };
+  const replacement = new ShadowDepthWrapper(material, scene);
+  material.shadowDepthWrapper = replacement;
+  lighting.dispose();
+  lighting.dispose();
+  lighting.update(root, 1, true, "high");
+  assert.equal(ownedDisposals, 1);
+  assert.equal(material.shadowDepthWrapper, replacement);
+  assert.equal(lighting.light.isDisposed(), true);
+  assert.ok(!scene.lights.includes(lighting.light));
+  replacement.dispose();
+  material.shadowDepthWrapper = null;
+});
+
+test("exact 02:00 moonless night frees zero celestial key so hemisphere, two streets and headlight fit four material slots", (t) => {
+  const { scene, root, lighting } = fixture(t),
+    instant = Date.parse("2026-10-11T00:00:00Z");
+  const sampleObject = box(scene, "four light slots", 0, 0.5, 8);
+  const pbr = new PBRMaterial("actual four-slot PBR", scene);
+  pbr.maxSimultaneousLights = 4;
+  sampleObject.material = pbr;
+  const sun = new DirectionalLight("celestial", Vector3.Down(), scene),
+    ambient = new HemisphericLight("ambient", Vector3.Up(), scene);
+  const lamps = [0, 6].map((x, i) => {
+    const light = new PointLight("street" + i, new Vector3(x, 4, 8), scene);
+    light.range = 22;
+    light.setEnabled(false);
+    return light;
+  });
+  const sample = applyArtLighting(
+    {
+      scene,
+      sun,
+      ambient,
+      lamps: new StandardMaterial("emissive fixtures", scene),
+      lights: lamps,
+      clouds: [],
+      quality: "high",
+    },
+    {
+      sun: sunState(instant),
+      moon: moonState(instant),
+      instant,
+      player: { x: 0, y: 0, z: 8 },
+      weather: { cloud: 1, rain: 0, wind: 0 },
+      dt: 0.1,
+    },
+  );
+  lighting.update(root, sample.night, true, "low");
+  assert.equal(sun.intensity, 0);
+  assert.equal(sun.isEnabled(), false);
+  assert.equal(sample.moonlight, 0);
+  assert.equal(sample.sunlight, 0);
+  const active = sampleObject.lightSources.filter((light) => light.isEnabled());
+  assert.equal(active.length, 4);
+  assert.ok(
+    active.includes(ambient) &&
+      active.includes(lamps[0]) &&
+      active.includes(lamps[1]) &&
+      active.includes(lighting.light),
+  );
+  assert.ok(
+    sampleObject.lightSources.length <= pbr.maxSimultaneousLights,
+    "no enabled practical light is beyond the material's four-light shader cap",
+  );
+});

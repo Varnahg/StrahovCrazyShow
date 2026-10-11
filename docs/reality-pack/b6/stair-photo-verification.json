@@ -1,0 +1,237 @@
+{
+  "recordedAt": "2026-10-11T02:59:51.9416310Z",
+  "scope": "B6 two-core stair reconstruction; not a whole-game GPU benchmark",
+  "sourceIdentity": {
+    "plan": "B6 SH wiki axonometric; unmeasured",
+    "materialPhoto": "User photo explicitly labelled BLOK 3; capture date unknown"
+  },
+  "illustrativeBedroomsPerResidentialLevel": 35,
+  "illustrativeBedroomsTotal": 210,
+  "modelDoorRoutesChecked": 222,
+  "tests": [
+    {
+      "command": "pnpm exec tsx --test tests/b6-reality.test.ts tests/architecture-reality.test.ts",
+      "passed": 23,
+      "failed": 0,
+      "exitCode": 0,
+      "durationMs": 24234.9469
+    },
+    {
+      "command": "pnpm exec tsx --test --test-name-pattern 'B6 exterior north|every catalogued B6 room|B6 catalogued room floors' tests/physics.test.ts",
+      "passed": 3,
+      "failed": 0,
+      "exitCode": 0,
+      "durationMs": 3778.5476
+    },
+    {
+      "command": "pnpm exec tsc --noEmit",
+      "exitCode": 0
+    }
+  ],
+  "physics": {
+    "engine": "Rapier",
+    "characterController": "Actual shared Actor",
+    "wholeSimulation": true,
+    "trimeshFlags": "FIX_INTERNAL_EDGES",
+    "bothCoresClimbed": true,
+    "twoContinuousFloorsAndDescent": true,
+    "jumps": false,
+    "teleports": false,
+    "tolerancesLoosened": false
+  },
+  "geometry": {
+    "sourceMeshParts": 98,
+    "triangles": 2720,
+    "rendererBatches": 19,
+    "sourceVertexParity": true,
+    "renderIndexWindingConversionOnly": true,
+    "upwardTreadNormals": true,
+    "downwardSoffitNormals": true,
+    "zeroAreaTriangles": 0,
+    "foundationOffsetAppliedOnce": true,
+    "floorFinishesOnlyUpwardFaces": true,
+    "floorCeilingsSmoothUntextured": true,
+    "noDuplicateCeilingGeometry": true,
+    "exteriorEntryIndependentFloorCull": true,
+    "northFacadeAndPhysicalWindowPlanShared": true,
+    "duplicatedOuterShellFacesRemoved": true,
+    "adjoiningBedroomClosingPartitionsChecked": true,
+    "structuralColliderBoxes": 4096,
+    "canonicalArchiveBoxParts": 3976
+  },
+  "browser": {
+    "preview": "/docs/reality-pack/b6/stair-photo-preview.html",
+    "status": "Root visual QA required; subagent browser inventory empty and iab unavailable",
+    "performanceClaim": false
+  },
+  "knownLimitations": [
+    "No measured B6 dimensions or current interior material survey",
+    "B3 photograph provides material typology only",
+    "Floor and room numbering is illustrative",
+    "Actual study/game/club room layouts and vertical floor binding remain unmeasured"
+  ],
+  "finalClosure": {
+    "recordedAtUtc": "2026-10-11T05:27:39.385Z",
+    "tests": {
+      "mainPassed": 36,
+      "mainFailed": 0,
+      "mainDurationMs": 23173.8634,
+      "mainLog": ".cache/b6-navigation-closure-tests.log",
+      "postGetterAndCopyrightPassed": 3,
+      "postGetterAndCopyrightFailed": 0,
+      "postGetterAndCopyrightDurationMs": 3708.5087,
+      "postGetterAndCopyrightLog": ".cache/b6-final-source-material-tests.log",
+      "typecheck": "pnpm exec tsc --noEmit PASS"
+    },
+    "archive": {
+      "models": 121,
+      "totalTriangles": 190863,
+      "b6Triangles": 55290,
+      "b6Parts": 48,
+      "b6CanonicalBoxParts": 3976,
+      "sourcePlanSha256": "27e3843f83fef257fa8d25917a859fd25b9ba8d0731d1320a804c0bd7421ed03",
+      "b6GlbSha256": "03a1c44ecd315e7983d3852665a70d1afc061bce93253647f8ef68323edaca69",
+      "retainedOtherArchives": 120,
+      "reopenedBlend": {
+        "status": "passed",
+        "scope": "selected-building-reopen",
+        "selectedSourceId": "53929071",
+        "models": 1,
+        "triangles": 55290,
+        "maxEditableVertexErrorMetres": 0.0000018920898412488896,
+        "surfaceRecipesChecked": [
+          {
+            "material": "b6:concrete stair treads",
+            "tintLinear": [
+              0.4819522370506978,
+              0.4761772653974402,
+              0.42590528570714575
+            ],
+            "uvScale": [
+              1.1636363636363636,
+              2.327272727272727
+            ],
+            "normalStrength": 0.27,
+            "roughnessFactor": 1,
+            "metallic": 0,
+            "source": "https://ambientcg.com/a/Concrete034"
+          }
+        ],
+        "checks": [
+          "actual .blend reopen",
+          "one source object root per building",
+          "all mesh parts parented to own root",
+          "original vertex/face counts and triangle topology",
+          "source positions within 40 micrometres",
+          "UV layers present",
+          "linked texture files resolve"
+        ],
+        "modelsDetail": [
+          {
+            "id": "osm-way-53929071",
+            "objects": 48,
+            "triangles": 55290,
+            "valid": true
+          }
+        ]
+      }
+    },
+    "exteriorConcrete": {
+      "status": "passed",
+      "file": "public/models/buildings/osm-way-53929071.glb",
+      "glbSha256": "03a1c44ecd315e7983d3852665a70d1afc061bce93253647f8ef68323edaca69",
+      "source": "https://ambientcg.com/a/Concrete034",
+      "license": "CC0-1.0",
+      "classification": "generic-CC0-surface-photo-interpreted-tint-not-B6-scan",
+      "measured": false,
+      "tintSRGB": "#b7b6ad",
+      "tintLinear": [
+        0.4819522370506978,
+        0.4761772653974402,
+        0.42590528570714575,
+        1
+      ],
+      "repeatMetres": [
+        1.1,
+        0.55
+      ],
+      "roughnessFactor": 1,
+      "metallicFactor": 0,
+      "normalStrength": 0.27,
+      "opaque": true,
+      "backfaceCulling": true,
+      "textures": [
+        {
+          "channel": "color",
+          "image": "public/models/buildings/textures/8ceb9186d990b31fce785e06fdc6974c160f1d27c43f6160266f164deba713aa.jpg",
+          "sha256": "8ceb9186d990b31fce785e06fdc6974c160f1d27c43f6160266f164deba713aa",
+          "uvScale": [
+            1.163636326789856,
+            2.327272653579712
+          ],
+          "gltfVerticalUVOffset": -1.327272653579712,
+          "originalBytesPreserved": true,
+          "note": "original CC0 bytes"
+        },
+        {
+          "channel": "normalgl",
+          "image": "public/models/buildings/textures/e509eb9dfa978e780fbebfd2acacc2ce158b5b7ced722ddc0759039dd51e18ca.jpg",
+          "sha256": "e509eb9dfa978e780fbebfd2acacc2ce158b5b7ced722ddc0759039dd51e18ca",
+          "uvScale": [
+            1.163636326789856,
+            2.327272653579712
+          ],
+          "gltfVerticalUVOffset": -1.327272653579712,
+          "originalBytesPreserved": true,
+          "note": "original CC0 bytes"
+        },
+        {
+          "channel": "roughness",
+          "image": "public/models/buildings/textures/bae2afe6b7c711008bbf3b7ce5f48099a37298f5f16f35e7a6385afa871b69d7.png",
+          "sha256": "bae2afe6b7c711008bbf3b7ce5f48099a37298f5f16f35e7a6385afa871b69d7",
+          "uvScale": [
+            1.163636326789856,
+            2.327272653579712
+          ],
+          "gltfVerticalUVOffset": -1.327272653579712,
+          "originalBytesPreserved": false,
+          "note": "Blender packs source grayscale into glTF green channel; original JPEG remains immutable"
+        }
+      ],
+      "geometryMutated": false
+    },
+    "navigation": {
+      "sha256": "81976eb49770366ba8603fb218e20464cc94ccc96a8796359d458f822d3ac8b0",
+      "sourceFiles": [
+        "shared/data/map.json",
+        "shared/world.ts",
+        "shared/data/building-catalog.json",
+        "shared/data/streets.json",
+        "shared/streets.ts",
+        "shared/data/b6-entry-paving.json",
+        "shared/campus-routes.ts",
+        "shared/data/terrain-grid.json",
+        "shared/data/reality-ground.json",
+        "shared/terrain.ts",
+        "shared/terrain-patches.ts",
+        "shared/data/north-court-terrain-patch.json",
+        "shared/data/north-court-style.json",
+        "shared/campus-exterior.ts",
+        "shared/b6-interior.ts",
+        "shared/b6-stairs.ts",
+        "shared/b6-entry.ts",
+        "shared/b6-facade-plan.ts",
+        "shared/landmark-reality.ts",
+        "shared/transit.ts",
+        "shared/terrain-entities.ts",
+        "shared/data/transit.json",
+        "scripts/rebuild-campus-transit-navigation.ts"
+      ],
+      "destinations": 9,
+      "journeys": 18,
+      "b6UsesCanonicalDiagonalPaving": true,
+      "scope": "Current pedestrian graph, destination entrances, terrain and court-height support, and passenger height sampling; not a complete game snapshot or proof of every transient obstruction."
+    },
+    "actualGPUVisualCheck": "Root owns final close-up; no FPS claim from these audits"
+  }
+}

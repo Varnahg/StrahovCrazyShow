@@ -1,0 +1,2766 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/create-building-assets.py",
+  "sourcePlanSha256": "b46fea77d568d9c9d7aaf88999cf4d7d6d11c4c4cf4055eef67ce5833ec131a1",
+  "sourceHashes": {
+    "shared/data/map.json": "cc41d5fc78ffbff275468cdd191e96c74e1c9dc09a74be7bc82a918184c7f64c",
+    "shared/data/facade-reality.json": "55f8878ccea2e0a175a2c163da84da194157c2ac9287b471940689975f1f9eb7",
+    "shared/landmark-reality.ts": "f9473a38d5f14bb8f1972f501945559eacaefdcf74e39e13c3467664094e5145",
+    "shared/campus-exterior.ts": "c781bc8aeb6b4492d62e0cba686511afdf0eb7725b8685ae275c1425b3790847",
+    "client/architecture-reality.ts": "5bc00d8cead92f09aef57d6d4a985a8d927e71b8a8612978e27dbcaa16d57145",
+    "shared/b6-interior.ts": "ebbe42ea88ca9f0593d774e4df69e416629ff13ed5258fb1501a6f652bd98988",
+    "shared/b6-stairs.ts": "1217e48fabdbc128c89906bffad5c8681d3bf509b77f191333a7ce143b7fe48d",
+    "shared/b6-entry.ts": "464ba1aa21e8dc2ddf3ede80a2aa3672cfe8bc720716c80a3d1e6794cfd9b620",
+    "shared/b6-facade-plan.ts": "53b4406baf9df10650e79c849d1cd56c6454ccb3bbeebda334fea1b4ae700c45",
+    "shared/b6-stair-materials.ts": "1f2d7aa8c33893a5ecdaf35739cc73d3e60371b1014d0f7875edf456d89def4c",
+    "client/b6-reality.ts": "9b7bf2298ae9541b520013017f68b486e4440ea7506fac7154ebbd0d01855602",
+    "client/b6-exterior-concrete.ts": "2b5257f5a3df1c4ed05e3a0297dd7df691ba6e0559c89ef6c64c2589da92edc4",
+    "shared/data/assets/surfaces-manifest.json": "c3cf978e1db6e20f21946a8cb3e0d5716dbc730f671b09151f27ad373013d474",
+    "client/terrain-renderer.ts": "01601504b751a58bf79fb66a7b2031c6d2010679466936aaabbf388d68f7e7c4"
+  },
+  "limitations": "Clean source-authored models interpreted from maps/photos. No raw photogrammetry mesh. Heights/details remain documented estimates; B6 interior is schematic. CC0 generic surface channels are linked from installed original assets. Photographs are references only.",
+  "license": "Original authored parts CC0-1.0; OSM-derived footprints ODbL-1.0; linked ambientCG textures CC0-1.0. Source photos are references only.",
+  "textureSharing": "Original exported texture bytes are shared by SHA-256 URI; no image resizing or recompression. Preserve the adjacent textures directory when copying GLBs.",
+  "textures": [
+    {
+      "url": "/models/buildings/textures/e509eb9dfa978e780fbebfd2acacc2ce158b5b7ced722ddc0759039dd51e18ca.jpg",
+      "sha256": "e509eb9dfa978e780fbebfd2acacc2ce158b5b7ced722ddc0759039dd51e18ca",
+      "bytes": 821681,
+      "mimeType": "image/jpeg"
+    },
+    {
+      "url": "/models/buildings/textures/8ceb9186d990b31fce785e06fdc6974c160f1d27c43f6160266f164deba713aa.jpg",
+      "sha256": "8ceb9186d990b31fce785e06fdc6974c160f1d27c43f6160266f164deba713aa",
+      "bytes": 269501,
+      "mimeType": "image/jpeg"
+    },
+    {
+      "url": "/models/buildings/textures/bae2afe6b7c711008bbf3b7ce5f48099a37298f5f16f35e7a6385afa871b69d7.png",
+      "sha256": "bae2afe6b7c711008bbf3b7ce5f48099a37298f5f16f35e7a6385afa871b69d7",
+      "bytes": 389987,
+      "mimeType": "image/png"
+    },
+    {
+      "url": "/models/buildings/textures/ea293c335a0b9243f0a825573b81304b8f99e60b2c067e493d0792adf96dfc72.jpg",
+      "sha256": "ea293c335a0b9243f0a825573b81304b8f99e60b2c067e493d0792adf96dfc72",
+      "bytes": 2091491,
+      "mimeType": "image/jpeg"
+    },
+    {
+      "url": "/models/buildings/textures/d3fe43282859ab7293ad41f2fa3c29f02df077e5bc326cf90a65cc588a4ac5a4.jpg",
+      "sha256": "d3fe43282859ab7293ad41f2fa3c29f02df077e5bc326cf90a65cc588a4ac5a4",
+      "bytes": 828790,
+      "mimeType": "image/jpeg"
+    },
+    {
+      "url": "/models/buildings/textures/99885e2e9216f2bcce82064516c9b186f2630e729e9237813a6672198fc7ed7c.png",
+      "sha256": "99885e2e9216f2bcce82064516c9b186f2630e729e9237813a6672198fc7ed7c",
+      "bytes": 701049,
+      "mimeType": "image/png"
+    },
+    {
+      "url": "/models/buildings/textures/48c502ff2fca99940a25a846ea59ef1f47562f03bb0d8ba0a8412978790072a4.png",
+      "sha256": "48c502ff2fca99940a25a846ea59ef1f47562f03bb0d8ba0a8412978790072a4",
+      "bytes": 185203,
+      "mimeType": "image/png"
+    },
+    {
+      "url": "/models/buildings/textures/79f5c917beee49ac2d7096dd9979553f741e198bb4a2d0122f4fbe565cb2850f.png",
+      "sha256": "79f5c917beee49ac2d7096dd9979553f741e198bb4a2d0122f4fbe565cb2850f",
+      "bytes": 26071,
+      "mimeType": "image/png"
+    },
+    {
+      "url": "/models/buildings/textures/371ef26cedf89fa7f7249528956ae46b0168b0a47703e8818bd260cca8b9c714.png",
+      "sha256": "371ef26cedf89fa7f7249528956ae46b0168b0a47703e8818bd260cca8b9c714",
+      "bytes": 175922,
+      "mimeType": "image/png"
+    }
+  ],
+  "models": [
+    {
+      "id": "osm-way-7645350",
+      "identity": {
+        "key": "building:osm:way:7645350",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "7645350",
+        "sourceUrl": "https://www.openstreetmap.org/way/7645350"
+      },
+      "origin": {
+        "x": 114.705,
+        "y": -3.9207787817716593,
+        "z": -63.111
+      },
+      "parts": 11,
+      "triangles": 515,
+      "blend": "assets/blender/buildings/osm-way-7645350.blend",
+      "url": "/models/buildings/osm-way-7645350.glb",
+      "bytes": 61036,
+      "unsharedBytes": 5163540,
+      "sha256": "03795730df9b85e1b2ea2643ea676c6fa25f01368337ff6adcad8fc47aa2d720"
+    },
+    {
+      "id": "osm-way-7670452",
+      "identity": {
+        "key": "building:osm:way:7670452",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "7670452",
+        "sourceUrl": "https://www.openstreetmap.org/way/7670452"
+      },
+      "origin": {
+        "x": 461.007,
+        "y": -2.393032493591308,
+        "z": -55.17
+      },
+      "parts": 5,
+      "triangles": 42,
+      "blend": "assets/blender/buildings/osm-way-7670452.blend",
+      "url": "/models/buildings/osm-way-7670452.glb",
+      "bytes": 17916,
+      "unsharedBytes": 5120376,
+      "sha256": "0f0c29bbcb5e172da5c43aaf5177ccaee87271f2e03a9e5721c71082675c44ed"
+    },
+    {
+      "id": "osm-way-7670468",
+      "identity": {
+        "key": "building:osm:way:7670468",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "7670468",
+        "sourceUrl": "https://www.openstreetmap.org/way/7670468"
+      },
+      "origin": {
+        "x": 239.45,
+        "y": 0.6512062402814625,
+        "z": -145.232
+      },
+      "parts": 5,
+      "triangles": 299,
+      "blend": "assets/blender/buildings/osm-way-7670468.blend",
+      "url": "/models/buildings/osm-way-7670468.glb",
+      "bytes": 36324,
+      "unsharedBytes": 5138772,
+      "sha256": "4a978679d93ebc9a2fe28cb9582445694727ebfc8ec2628b3bd0625e7c19bc45"
+    },
+    {
+      "id": "osm-way-8111356",
+      "identity": {
+        "key": "building:osm:way:8111356",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "8111356",
+        "sourceUrl": "https://www.openstreetmap.org/way/8111356"
+      },
+      "origin": {
+        "x": 100.762,
+        "y": -4.571390095949171,
+        "z": 167.57
+      },
+      "parts": 10,
+      "triangles": 1675,
+      "blend": "assets/blender/buildings/osm-way-8111356.blend",
+      "url": "/models/buildings/osm-way-8111356.glb",
+      "bytes": 138664,
+      "unsharedBytes": 1619852,
+      "sha256": "4e9b35e7c998a2cb0452ce438cfcb0fa711d333048d500416a1cc6c9c116709a"
+    },
+    {
+      "id": "osm-way-24450068",
+      "identity": {
+        "key": "building:osm:way:24450068",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "24450068",
+        "sourceUrl": "https://www.openstreetmap.org/way/24450068"
+      },
+      "origin": {
+        "x": -81.215,
+        "y": 2.5960449802875516,
+        "z": -186.48
+      },
+      "parts": 5,
+      "triangles": 90,
+      "blend": "assets/blender/buildings/osm-way-24450068.blend",
+      "url": "/models/buildings/osm-way-24450068.glb",
+      "bytes": 21076,
+      "unsharedBytes": 5123532,
+      "sha256": "f79c8967005f0fcbc5ad3a93d628c98abedb39a6948bd85c1eb657b35a6c7888"
+    },
+    {
+      "id": "osm-way-24450069",
+      "identity": {
+        "key": "building:osm:way:24450069",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "24450069",
+        "sourceUrl": "https://www.openstreetmap.org/way/24450069"
+      },
+      "origin": {
+        "x": -73.633,
+        "y": 2.332998749613762,
+        "z": -137.926
+      },
+      "parts": 5,
+      "triangles": 85,
+      "blend": "assets/blender/buildings/osm-way-24450069.blend",
+      "url": "/models/buildings/osm-way-24450069.glb",
+      "bytes": 20732,
+      "unsharedBytes": 5123192,
+      "sha256": "d7336813e3f17e9e8664bf527fb5f38820c841d0f059012e4caf19be6d86e34f"
+    },
+    {
+      "id": "osm-way-24450070",
+      "identity": {
+        "key": "building:osm:way:24450070",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "24450070",
+        "sourceUrl": "https://www.openstreetmap.org/way/24450070"
+      },
+      "origin": {
+        "x": 14.033,
+        "y": 2.994667420387267,
+        "z": -258.073
+      },
+      "parts": 5,
+      "triangles": 74,
+      "blend": "assets/blender/buildings/osm-way-24450070.blend",
+      "url": "/models/buildings/osm-way-24450070.glb",
+      "bytes": 20188,
+      "unsharedBytes": 5122648,
+      "sha256": "a58ba886998b8ef3b7fd1fe0a088c636af464623954919221f07efdacbad43e3"
+    },
+    {
+      "id": "osm-way-24450071",
+      "identity": {
+        "key": "building:osm:way:24450071",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "24450071",
+        "sourceUrl": "https://www.openstreetmap.org/way/24450071"
+      },
+      "origin": {
+        "x": 91.244,
+        "y": 2.418364975452424,
+        "z": -224.45
+      },
+      "parts": 5,
+      "triangles": 407,
+      "blend": "assets/blender/buildings/osm-way-24450071.blend",
+      "url": "/models/buildings/osm-way-24450071.glb",
+      "bytes": 43664,
+      "unsharedBytes": 5146108,
+      "sha256": "e03ea36f8de8f3e9921ad84e22eeb040196d4d6247d5eb50a49bbf313a980bfe"
+    },
+    {
+      "id": "osm-way-25920626",
+      "identity": {
+        "key": "building:osm:way:25920626",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "25920626",
+        "sourceUrl": "https://www.openstreetmap.org/way/25920626"
+      },
+      "origin": {
+        "x": 161.175,
+        "y": -6.441860113143917,
+        "z": 175.94
+      },
+      "parts": 5,
+      "triangles": 58,
+      "blend": "assets/blender/buildings/osm-way-25920626.blend",
+      "url": "/models/buildings/osm-way-25920626.glb",
+      "bytes": 18800,
+      "unsharedBytes": 5121260,
+      "sha256": "691c3c353eaa88649701ad9738ef43d34e1b16497921b292f66d29640a86bd6a"
+    },
+    {
+      "id": "osm-way-27580887",
+      "identity": {
+        "key": "building:osm:way:27580887",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "27580887",
+        "sourceUrl": "https://www.openstreetmap.org/way/27580887"
+      },
+      "origin": {
+        "x": 440.833,
+        "y": -49.491192383766176,
+        "z": 222.341
+      },
+      "parts": 5,
+      "triangles": 171,
+      "blend": "assets/blender/buildings/osm-way-27580887.blend",
+      "url": "/models/buildings/osm-way-27580887.glb",
+      "bytes": 27184,
+      "unsharedBytes": 5129640,
+      "sha256": "25322bd62bc13e36710aa195f5d983b5170ef0fa77bfb891783c72c0acec8487"
+    },
+    {
+      "id": "osm-way-27581155",
+      "identity": {
+        "key": "building:osm:way:27581155",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "27581155",
+        "sourceUrl": "https://www.openstreetmap.org/way/27581155"
+      },
+      "origin": {
+        "x": 310.915,
+        "y": -1.3762837353348725,
+        "z": -271.055
+      },
+      "parts": 5,
+      "triangles": 437,
+      "blend": "assets/blender/buildings/osm-way-27581155.blend",
+      "url": "/models/buildings/osm-way-27581155.glb",
+      "bytes": 46612,
+      "unsharedBytes": 5149060,
+      "sha256": "5f8c2ece32a72a2babc110f110d750b8196ab6f4ad4be211cc69cbd70ed3eed0"
+    },
+    {
+      "id": "osm-way-27581156",
+      "identity": {
+        "key": "building:osm:way:27581156",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "27581156",
+        "sourceUrl": "https://www.openstreetmap.org/way/27581156"
+      },
+      "origin": {
+        "x": 329.208,
+        "y": -1.17713751465082,
+        "z": -262.482
+      },
+      "parts": 5,
+      "triangles": 104,
+      "blend": "assets/blender/buildings/osm-way-27581156.blend",
+      "url": "/models/buildings/osm-way-27581156.glb",
+      "bytes": 22096,
+      "unsharedBytes": 5124552,
+      "sha256": "ee06fb6cb5f1aa22d109fb56b1cd5b1afda74d6ee0b3b50661bac3e565aec243"
+    },
+    {
+      "id": "osm-way-27581157",
+      "identity": {
+        "key": "building:osm:way:27581157",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "27581157",
+        "sourceUrl": "https://www.openstreetmap.org/way/27581157"
+      },
+      "origin": {
+        "x": 332.035,
+        "y": -2.8024999380111724,
+        "z": -283.605
+      },
+      "parts": 5,
+      "triangles": 184,
+      "blend": "assets/blender/buildings/osm-way-27581157.blend",
+      "url": "/models/buildings/osm-way-27581157.glb",
+      "bytes": 27776,
+      "unsharedBytes": 5130232,
+      "sha256": "8542764aca6ec6be3c8bedcbaadf3b41e6782b224ab81a14097322c30eea2ffe"
+    },
+    {
+      "id": "osm-way-49379023",
+      "identity": {
+        "key": "building:osm:way:49379023",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379023",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379023"
+      },
+      "origin": {
+        "x": -568.894,
+        "y": 17.29638063430786,
+        "z": 26.001
+      },
+      "parts": 5,
+      "triangles": 1223,
+      "blend": "assets/blender/buildings/osm-way-49379023.blend",
+      "url": "/models/buildings/osm-way-49379023.glb",
+      "bytes": 104796,
+      "unsharedBytes": 5207244,
+      "sha256": "05392692fec51e2bf73eb7b79e18ef765e204cccd51da7285027c47c3c4b0222"
+    },
+    {
+      "id": "osm-way-49379034",
+      "identity": {
+        "key": "building:osm:way:49379034",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379034",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379034"
+      },
+      "origin": {
+        "x": -90.8,
+        "y": -1.6450724965333898,
+        "z": 244.19
+      },
+      "parts": 5,
+      "triangles": 65,
+      "blend": "assets/blender/buildings/osm-way-49379034.blend",
+      "url": "/models/buildings/osm-way-49379034.glb",
+      "bytes": 19308,
+      "unsharedBytes": 5121764,
+      "sha256": "00358540c91601160e57ee7625388ccbafb16b3d35ae2901663bce3a4851412b"
+    },
+    {
+      "id": "osm-way-49379059",
+      "identity": {
+        "key": "building:osm:way:49379059",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379059",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379059"
+      },
+      "origin": {
+        "x": -444.735,
+        "y": 12.99957360506058,
+        "z": 175.062
+      },
+      "parts": 5,
+      "triangles": 109,
+      "blend": "assets/blender/buildings/osm-way-49379059.blend",
+      "url": "/models/buildings/osm-way-49379059.glb",
+      "bytes": 22452,
+      "unsharedBytes": 5124908,
+      "sha256": "67b1651cab7fc7fdc25a77208fe0605792657d0ee74ebc956d7fb4eb62790ba6"
+    },
+    {
+      "id": "osm-way-49379061",
+      "identity": {
+        "key": "building:osm:way:49379061",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379061",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379061"
+      },
+      "origin": {
+        "x": -481.026,
+        "y": 14.031085102558137,
+        "z": 181.679
+      },
+      "parts": 5,
+      "triangles": 317,
+      "blend": "assets/blender/buildings/osm-way-49379061.blend",
+      "url": "/models/buildings/osm-way-49379061.glb",
+      "bytes": 37220,
+      "unsharedBytes": 5139664,
+      "sha256": "181617fb7121182ed6362e97d4ab017bfda42896d689cded9a992ec5214ee739"
+    },
+    {
+      "id": "osm-way-49379063",
+      "identity": {
+        "key": "building:osm:way:49379063",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379063",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379063"
+      },
+      "origin": {
+        "x": -503.835,
+        "y": 16.284742200374602,
+        "z": 122.672
+      },
+      "parts": 5,
+      "triangles": 103,
+      "blend": "assets/blender/buildings/osm-way-49379063.blend",
+      "url": "/models/buildings/osm-way-49379063.glb",
+      "bytes": 22032,
+      "unsharedBytes": 5124492,
+      "sha256": "3726b93bf647ca58a9055d85fd07555089cfaeff3664bdbd33dda71bf4a5d0d8"
+    },
+    {
+      "id": "osm-way-49379066",
+      "identity": {
+        "key": "building:osm:way:49379066",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379066",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379066"
+      },
+      "origin": {
+        "x": -275.01,
+        "y": -11.936618885993989,
+        "z": 343.626
+      },
+      "parts": 5,
+      "triangles": 303,
+      "blend": "assets/blender/buildings/osm-way-49379066.blend",
+      "url": "/models/buildings/osm-way-49379066.glb",
+      "bytes": 36204,
+      "unsharedBytes": 5138652,
+      "sha256": "c876624af0f65864741f07411917a8eac95457e39f9a5ec6f171d01ed95c83ca"
+    },
+    {
+      "id": "osm-way-49379068",
+      "identity": {
+        "key": "building:osm:way:49379068",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379068",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379068"
+      },
+      "origin": {
+        "x": -253.031,
+        "y": -9.925957369804378,
+        "z": 344.682
+      },
+      "parts": 5,
+      "triangles": 211,
+      "blend": "assets/blender/buildings/osm-way-49379068.blend",
+      "url": "/models/buildings/osm-way-49379068.glb",
+      "bytes": 29684,
+      "unsharedBytes": 5132132,
+      "sha256": "f9bb6854b2c6fd3ccdec0995731fbd619774cb36df507e4a7116811a1b32df6d"
+    },
+    {
+      "id": "osm-way-49379072",
+      "identity": {
+        "key": "building:osm:way:49379072",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379072",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379072"
+      },
+      "origin": {
+        "x": -223.96,
+        "y": -10.679055104255667,
+        "z": 348.195
+      },
+      "parts": 5,
+      "triangles": 54,
+      "blend": "assets/blender/buildings/osm-way-49379072.blend",
+      "url": "/models/buildings/osm-way-49379072.glb",
+      "bytes": 18496,
+      "unsharedBytes": 5120952,
+      "sha256": "77c5c31e5232763076911b99c35206d7ce5ebe597dc18144f81f1760cc6ca309"
+    },
+    {
+      "id": "osm-way-49379074",
+      "identity": {
+        "key": "building:osm:way:49379074",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379074",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379074"
+      },
+      "origin": {
+        "x": -224.66,
+        "y": -14.691239871978796,
+        "z": 355.865
+      },
+      "parts": 5,
+      "triangles": 54,
+      "blend": "assets/blender/buildings/osm-way-49379074.blend",
+      "url": "/models/buildings/osm-way-49379074.glb",
+      "bytes": 18496,
+      "unsharedBytes": 5120956,
+      "sha256": "b917e39cb621689e347809105c1be08214dc852559aa57cda405d0e0474b5443"
+    },
+    {
+      "id": "osm-way-49379076",
+      "identity": {
+        "key": "building:osm:way:49379076",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379076",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379076"
+      },
+      "origin": {
+        "x": -225.365,
+        "y": -15.245069885253907,
+        "z": 363.54
+      },
+      "parts": 5,
+      "triangles": 54,
+      "blend": "assets/blender/buildings/osm-way-49379076.blend",
+      "url": "/models/buildings/osm-way-49379076.glb",
+      "bytes": 18532,
+      "unsharedBytes": 5120988,
+      "sha256": "c323796865ccd29540e5ff16df9c719c647219acc2c710d051dc317eb702deff"
+    },
+    {
+      "id": "osm-way-49379082",
+      "identity": {
+        "key": "building:osm:way:49379082",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379082",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379082"
+      },
+      "origin": {
+        "x": -201.259,
+        "y": -7.053559908866885,
+        "z": 334.19
+      },
+      "parts": 5,
+      "triangles": 84,
+      "blend": "assets/blender/buildings/osm-way-49379082.blend",
+      "url": "/models/buildings/osm-way-49379082.glb",
+      "bytes": 20960,
+      "unsharedBytes": 5123420,
+      "sha256": "31bc0d0df49f79fb2c58b0c999ab3e457ce23182fd26268c58e06ae06e4520ec"
+    },
+    {
+      "id": "osm-way-49379084",
+      "identity": {
+        "key": "building:osm:way:49379084",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379084",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379084"
+      },
+      "origin": {
+        "x": -202.088,
+        "y": -8.577249914407716,
+        "z": 343.951
+      },
+      "parts": 5,
+      "triangles": 61,
+      "blend": "assets/blender/buildings/osm-way-49379084.blend",
+      "url": "/models/buildings/osm-way-49379084.glb",
+      "bytes": 19364,
+      "unsharedBytes": 5121824,
+      "sha256": "070571e66db03347412f64a7f4e2ce84e0e47f099aa872a36fbc8b756da0e883"
+    },
+    {
+      "id": "osm-way-49379085",
+      "identity": {
+        "key": "building:osm:way:49379085",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379085",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379085"
+      },
+      "origin": {
+        "x": -202.844,
+        "y": -13.38409611701966,
+        "z": 353.374
+      },
+      "parts": 5,
+      "triangles": 97,
+      "blend": "assets/blender/buildings/osm-way-49379085.blend",
+      "url": "/models/buildings/osm-way-49379085.glb",
+      "bytes": 21588,
+      "unsharedBytes": 5124044,
+      "sha256": "dbc3030a592edabe1d2a2a1f422348c456100329ea3d893938d4b20e629b2ec5"
+    },
+    {
+      "id": "osm-way-49379089",
+      "identity": {
+        "key": "building:osm:way:49379089",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379089",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379089"
+      },
+      "origin": {
+        "x": -204.384,
+        "y": -17.150919127464288,
+        "z": 362.794
+      },
+      "parts": 5,
+      "triangles": 95,
+      "blend": "assets/blender/buildings/osm-way-49379089.blend",
+      "url": "/models/buildings/osm-way-49379089.glb",
+      "bytes": 21460,
+      "unsharedBytes": 5123916,
+      "sha256": "910fb283b420743e337b91176459df13cd523b408d2498e35f2a1d382e53c68b"
+    },
+    {
+      "id": "osm-way-49379096",
+      "identity": {
+        "key": "building:osm:way:49379096",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379096",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379096"
+      },
+      "origin": {
+        "x": -91.91,
+        "y": -3.283227494657039,
+        "z": 290.763
+      },
+      "parts": 5,
+      "triangles": 131,
+      "blend": "assets/blender/buildings/osm-way-49379096.blend",
+      "url": "/models/buildings/osm-way-49379096.glb",
+      "bytes": 23996,
+      "unsharedBytes": 5126456,
+      "sha256": "1f34c8bcab70ef5a349987c802f2b95a91ad120ae49a405e0317bedebfbb8540"
+    },
+    {
+      "id": "osm-way-49379098",
+      "identity": {
+        "key": "building:osm:way:49379098",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379098",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379098"
+      },
+      "origin": {
+        "x": -153.283,
+        "y": -16.872526884078987,
+        "z": 360.127
+      },
+      "parts": 5,
+      "triangles": 164,
+      "blend": "assets/blender/buildings/osm-way-49379098.blend",
+      "url": "/models/buildings/osm-way-49379098.glb",
+      "bytes": 26344,
+      "unsharedBytes": 5128796,
+      "sha256": "ccb43c94665b0f73c52d6f232ee79c70a1d5b4aba9cd1febea30ba5c5f58f6ff"
+    },
+    {
+      "id": "osm-way-49379102",
+      "identity": {
+        "key": "building:osm:way:49379102",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379102",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379102"
+      },
+      "origin": {
+        "x": -120.895,
+        "y": -19.102109508514403,
+        "z": 367.11
+      },
+      "parts": 5,
+      "triangles": 46,
+      "blend": "assets/blender/buildings/osm-way-49379102.blend",
+      "url": "/models/buildings/osm-way-49379102.glb",
+      "bytes": 17972,
+      "unsharedBytes": 5120428,
+      "sha256": "783d5379ca787f332645ff92077ce89de4bead479e7eaa420aad7b722fe7d0e4"
+    },
+    {
+      "id": "osm-way-49379103",
+      "identity": {
+        "key": "building:osm:way:49379103",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379103",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379103"
+      },
+      "origin": {
+        "x": -121.87,
+        "y": -19.085109310150145,
+        "z": 360.825
+      },
+      "parts": 5,
+      "triangles": 46,
+      "blend": "assets/blender/buildings/osm-way-49379103.blend",
+      "url": "/models/buildings/osm-way-49379103.glb",
+      "bytes": 17972,
+      "unsharedBytes": 5120428,
+      "sha256": "5562712b02386c9316b546ae15573e685a6fb6366b414039663097a2f3ff6c72"
+    },
+    {
+      "id": "osm-way-49379105",
+      "identity": {
+        "key": "building:osm:way:49379105",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379105",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379105"
+      },
+      "origin": {
+        "x": -122.885,
+        "y": -18.314419202804583,
+        "z": 354.37
+      },
+      "parts": 5,
+      "triangles": 46,
+      "blend": "assets/blender/buildings/osm-way-49379105.blend",
+      "url": "/models/buildings/osm-way-49379105.glb",
+      "bytes": 17972,
+      "unsharedBytes": 5120428,
+      "sha256": "bdae47c520908358653eaa23fbb442a16cb5b0bbc04614d86aee856f9128ae41"
+    },
+    {
+      "id": "osm-way-49379108",
+      "identity": {
+        "key": "building:osm:way:49379108",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379108",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379108"
+      },
+      "origin": {
+        "x": -64.496,
+        "y": -25.964932646751404,
+        "z": 372.375
+      },
+      "parts": 5,
+      "triangles": 324,
+      "blend": "assets/blender/buildings/osm-way-49379108.blend",
+      "url": "/models/buildings/osm-way-49379108.glb",
+      "bytes": 38464,
+      "unsharedBytes": 5140912,
+      "sha256": "a14367c689033a8063ba691a347803e9ee8c89f8bde11e3b2018b88d9fd6007d"
+    },
+    {
+      "id": "osm-way-49379124",
+      "identity": {
+        "key": "building:osm:way:49379124",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379124",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379124"
+      },
+      "origin": {
+        "x": 36.891,
+        "y": -34.082545928955085,
+        "z": 358.696
+      },
+      "parts": 5,
+      "triangles": 266,
+      "blend": "assets/blender/buildings/osm-way-49379124.blend",
+      "url": "/models/buildings/osm-way-49379124.glb",
+      "bytes": 34752,
+      "unsharedBytes": 5137204,
+      "sha256": "3353c173a56e6b8289858d1dd4389679c9fa4384aa50a7f9e716b9fe023afa47"
+    },
+    {
+      "id": "osm-way-49379126",
+      "identity": {
+        "key": "building:osm:way:49379126",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379126",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379126"
+      },
+      "origin": {
+        "x": 65.943,
+        "y": -32.421920166015624,
+        "z": 348.286
+      },
+      "parts": 5,
+      "triangles": 119,
+      "blend": "assets/blender/buildings/osm-way-49379126.blend",
+      "url": "/models/buildings/osm-way-49379126.glb",
+      "bytes": 23148,
+      "unsharedBytes": 5125604,
+      "sha256": "b3b918c1e70ba8447befae94dd5e1b4f0cebeaaa65fb7ace488f34f29842889c"
+    },
+    {
+      "id": "osm-way-49379130",
+      "identity": {
+        "key": "building:osm:way:49379130",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49379130",
+        "sourceUrl": "https://www.openstreetmap.org/way/49379130"
+      },
+      "origin": {
+        "x": 71.995,
+        "y": -27.41110479831695,
+        "z": 319.74
+      },
+      "parts": 5,
+      "triangles": 34,
+      "blend": "assets/blender/buildings/osm-way-49379130.blend",
+      "url": "/models/buildings/osm-way-49379130.glb",
+      "bytes": 17132,
+      "unsharedBytes": 5119592,
+      "sha256": "d95a540b72a140587422c7f91b117c60c41196e3930a8df416126fd1094eacbe"
+    },
+    {
+      "id": "osm-way-49380517",
+      "identity": {
+        "key": "building:osm:way:49380517",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49380517",
+        "sourceUrl": "https://www.openstreetmap.org/way/49380517"
+      },
+      "origin": {
+        "x": -508.576,
+        "y": 15.11276966094971,
+        "z": -76.598
+      },
+      "parts": 5,
+      "triangles": 96,
+      "blend": "assets/blender/buildings/osm-way-49380517.blend",
+      "url": "/models/buildings/osm-way-49380517.glb",
+      "bytes": 21524,
+      "unsharedBytes": 5123984,
+      "sha256": "bffe1b63d21eb63bd7297d4ddab23d2d677a1265cccdce03621edc334a67faa9"
+    },
+    {
+      "id": "osm-way-49773504",
+      "identity": {
+        "key": "building:osm:way:49773504",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49773504",
+        "sourceUrl": "https://www.openstreetmap.org/way/49773504"
+      },
+      "origin": {
+        "x": -467.076,
+        "y": -22.138695471286773,
+        "z": 366.458
+      },
+      "parts": 5,
+      "triangles": 133,
+      "blend": "assets/blender/buildings/osm-way-49773504.blend",
+      "url": "/models/buildings/osm-way-49773504.glb",
+      "bytes": 24496,
+      "unsharedBytes": 5126956,
+      "sha256": "54f3937b791598a08f20591537b5b287b7980aaebdc42a21fe63e1ab3fb5ed3a"
+    },
+    {
+      "id": "osm-way-49773514",
+      "identity": {
+        "key": "building:osm:way:49773514",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49773514",
+        "sourceUrl": "https://www.openstreetmap.org/way/49773514"
+      },
+      "origin": {
+        "x": -478.358,
+        "y": -22.600119476318362,
+        "z": 366.49
+      },
+      "parts": 5,
+      "triangles": 126,
+      "blend": "assets/blender/buildings/osm-way-49773514.blend",
+      "url": "/models/buildings/osm-way-49773514.glb",
+      "bytes": 23980,
+      "unsharedBytes": 5126444,
+      "sha256": "e0c606cdef18cafad8b7f16b66e3466a53de2beef476f388f89362cd49c1c06f"
+    },
+    {
+      "id": "osm-way-49773519",
+      "identity": {
+        "key": "building:osm:way:49773519",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49773519",
+        "sourceUrl": "https://www.openstreetmap.org/way/49773519"
+      },
+      "origin": {
+        "x": -444.37,
+        "y": -22.488220596313475,
+        "z": 366.567
+      },
+      "parts": 5,
+      "triangles": 115,
+      "blend": "assets/blender/buildings/osm-way-49773519.blend",
+      "url": "/models/buildings/osm-way-49773519.glb",
+      "bytes": 22872,
+      "unsharedBytes": 5125328,
+      "sha256": "9097e0dc57b6d4eea3dddc56f4f7f7ed2dc713fee382ece40036e2cca68dd601"
+    },
+    {
+      "id": "osm-way-49773521",
+      "identity": {
+        "key": "building:osm:way:49773521",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49773521",
+        "sourceUrl": "https://www.openstreetmap.org/way/49773521"
+      },
+      "origin": {
+        "x": -455.836,
+        "y": -22.340539894104005,
+        "z": 366.448
+      },
+      "parts": 5,
+      "triangles": 133,
+      "blend": "assets/blender/buildings/osm-way-49773521.blend",
+      "url": "/models/buildings/osm-way-49773521.glb",
+      "bytes": 24152,
+      "unsharedBytes": 5126608,
+      "sha256": "a800f3b672f6bf48cb538a65f30664ecd8502404d625506c6938dadc1a29303b"
+    },
+    {
+      "id": "osm-way-49773522",
+      "identity": {
+        "key": "building:osm:way:49773522",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49773522",
+        "sourceUrl": "https://www.openstreetmap.org/way/49773522"
+      },
+      "origin": {
+        "x": -418.646,
+        "y": -21.891159496307374,
+        "z": 368.182
+      },
+      "parts": 5,
+      "triangles": 133,
+      "blend": "assets/blender/buildings/osm-way-49773522.blend",
+      "url": "/models/buildings/osm-way-49773522.glb",
+      "bytes": 24148,
+      "unsharedBytes": 5126604,
+      "sha256": "1727cdcaf72420ec39b39514b29fabb1bfadfffdca1942ab8d28d42df11271a5"
+    },
+    {
+      "id": "osm-way-49773524",
+      "identity": {
+        "key": "building:osm:way:49773524",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49773524",
+        "sourceUrl": "https://www.openstreetmap.org/way/49773524"
+      },
+      "origin": {
+        "x": -429.822,
+        "y": -21.94433421134949,
+        "z": 366.52
+      },
+      "parts": 5,
+      "triangles": 126,
+      "blend": "assets/blender/buildings/osm-way-49773524.blend",
+      "url": "/models/buildings/osm-way-49773524.glb",
+      "bytes": 23640,
+      "unsharedBytes": 5126100,
+      "sha256": "75843ecf9a72d855f57503298793ec1a75ada995d107e4036c44cda8a81daad8"
+    },
+    {
+      "id": "osm-way-49773526",
+      "identity": {
+        "key": "building:osm:way:49773526",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "49773526",
+        "sourceUrl": "https://www.openstreetmap.org/way/49773526"
+      },
+      "origin": {
+        "x": -407.391,
+        "y": -21.846779942512512,
+        "z": 369.943
+      },
+      "parts": 5,
+      "triangles": 115,
+      "blend": "assets/blender/buildings/osm-way-49773526.blend",
+      "url": "/models/buildings/osm-way-49773526.glb",
+      "bytes": 22872,
+      "unsharedBytes": 5125332,
+      "sha256": "a9b4ce0876cd8b48528989cb5a0dbbaf975bb291adc428120d48e737cb36ff00"
+    },
+    {
+      "id": "osm-way-52281079",
+      "identity": {
+        "key": "building:osm:way:52281079",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "52281079",
+        "sourceUrl": "https://www.openstreetmap.org/way/52281079"
+      },
+      "origin": {
+        "x": -152.127,
+        "y": 2.490295022130013,
+        "z": 276.294
+      },
+      "parts": 5,
+      "triangles": 48,
+      "blend": "assets/blender/buildings/osm-way-52281079.blend",
+      "url": "/models/buildings/osm-way-52281079.glb",
+      "bytes": 18116,
+      "unsharedBytes": 5120576,
+      "sha256": "fa1a19df174c589967032630bd2d2661a1bf90080e82af76a8a927bf8de0d313"
+    },
+    {
+      "id": "osm-way-52281080",
+      "identity": {
+        "key": "building:osm:way:52281080",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "52281080",
+        "sourceUrl": "https://www.openstreetmap.org/way/52281080"
+      },
+      "origin": {
+        "x": -160.435,
+        "y": 2.4764225345849993,
+        "z": 267.915
+      },
+      "parts": 5,
+      "triangles": 48,
+      "blend": "assets/blender/buildings/osm-way-52281080.blend",
+      "url": "/models/buildings/osm-way-52281080.glb",
+      "bytes": 18112,
+      "unsharedBytes": 5120572,
+      "sha256": "9a0970ac01360965cd1d17b01588ba65a524ca300ddf43604a2ca942d46fc831"
+    },
+    {
+      "id": "osm-way-53920574",
+      "identity": {
+        "key": "building:osm:way:53920574",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53920574",
+        "sourceUrl": "https://www.openstreetmap.org/way/53920574"
+      },
+      "origin": {
+        "x": 266.722,
+        "y": -14.098610136508944,
+        "z": 175.903
+      },
+      "parts": 5,
+      "triangles": 80,
+      "blend": "assets/blender/buildings/osm-way-53920574.blend",
+      "url": "/models/buildings/osm-way-53920574.glb",
+      "bytes": 20984,
+      "unsharedBytes": 5123448,
+      "sha256": "646e96ade885277c657800022c0d9283d65074233ef1b03102f867272b2a40f9"
+    },
+    {
+      "id": "osm-way-53920575",
+      "identity": {
+        "key": "building:osm:way:53920575",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53920575",
+        "sourceUrl": "https://www.openstreetmap.org/way/53920575"
+      },
+      "origin": {
+        "x": 308.321,
+        "y": -11.841597313880925,
+        "z": 145.733
+      },
+      "parts": 5,
+      "triangles": 122,
+      "blend": "assets/blender/buildings/osm-way-53920575.blend",
+      "url": "/models/buildings/osm-way-53920575.glb",
+      "bytes": 23360,
+      "unsharedBytes": 5125820,
+      "sha256": "17021bc95e21efb70012a91d239daac7f1447ac16b5f5c816c7230abaa0e9b80"
+    },
+    {
+      "id": "osm-way-53921162",
+      "identity": {
+        "key": "building:osm:way:53921162",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921162",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921162"
+      },
+      "origin": {
+        "x": 350.968,
+        "y": -6.344960162639618,
+        "z": -30.912
+      },
+      "parts": 5,
+      "triangles": 72,
+      "blend": "assets/blender/buildings/osm-way-53921162.blend",
+      "url": "/models/buildings/osm-way-53921162.glb",
+      "bytes": 20136,
+      "unsharedBytes": 5122596,
+      "sha256": "e1ae18c4df9390d8f6585f16eeadc00afa26bd754e9c4eaeeb110116b6f03214"
+    },
+    {
+      "id": "osm-way-53921163",
+      "identity": {
+        "key": "building:osm:way:53921163",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921163",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921163"
+      },
+      "origin": {
+        "x": 274.426,
+        "y": -6.353199915885925,
+        "z": -2.341
+      },
+      "parts": 12,
+      "triangles": 8840,
+      "blend": "assets/blender/buildings/osm-way-53921163.blend",
+      "url": "/models/buildings/osm-way-53921163.glb",
+      "bytes": 680816,
+      "unsharedBytes": 5783276,
+      "sha256": "64c2efe115d3afdcbc3a53b46ce4f8d801583a3fe72ee6e3a9fafd872d6f92c8"
+    },
+    {
+      "id": "osm-way-53921164",
+      "identity": {
+        "key": "building:osm:way:53921164",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921164",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921164"
+      },
+      "origin": {
+        "x": 365.399,
+        "y": -6.55362241268158,
+        "z": -46.66
+      },
+      "parts": 5,
+      "triangles": 78,
+      "blend": "assets/blender/buildings/osm-way-53921164.blend",
+      "url": "/models/buildings/osm-way-53921164.glb",
+      "bytes": 20468,
+      "unsharedBytes": 5122932,
+      "sha256": "07d95e65bb2eea26a934b268f7430773eac84e3205cb87eea78d5cb25bd3cdcb"
+    },
+    {
+      "id": "osm-way-53921166",
+      "identity": {
+        "key": "building:osm:way:53921166",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921166",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921166"
+      },
+      "origin": {
+        "x": 324.985,
+        "y": -6.407080099582672,
+        "z": -65.05
+      },
+      "parts": 5,
+      "triangles": 50,
+      "blend": "assets/blender/buildings/osm-way-53921166.blend",
+      "url": "/models/buildings/osm-way-53921166.glb",
+      "bytes": 18252,
+      "unsharedBytes": 5120708,
+      "sha256": "0b67eeff9e31c008af236ee52652f701b740a83a92942034584dbca4fda43d22"
+    },
+    {
+      "id": "osm-way-53921167",
+      "identity": {
+        "key": "building:osm:way:53921167",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921167",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921167"
+      },
+      "origin": {
+        "x": 358.805,
+        "y": -6.953309817314148,
+        "z": 55.58
+      },
+      "parts": 5,
+      "triangles": 78,
+      "blend": "assets/blender/buildings/osm-way-53921167.blend",
+      "url": "/models/buildings/osm-way-53921167.glb",
+      "bytes": 20224,
+      "unsharedBytes": 5122684,
+      "sha256": "e69d498b86f5f2518530d03d1550cf90cef8f5e42282172533f399391e864413"
+    },
+    {
+      "id": "osm-way-53921168",
+      "identity": {
+        "key": "building:osm:way:53921168",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921168",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921168"
+      },
+      "origin": {
+        "x": 302.919,
+        "y": -6.828294970989227,
+        "z": 42.936
+      },
+      "parts": 11,
+      "triangles": 2591,
+      "blend": "assets/blender/buildings/osm-way-53921168.blend",
+      "url": "/models/buildings/osm-way-53921168.glb",
+      "bytes": 210112,
+      "unsharedBytes": 5312572,
+      "sha256": "07e3f423a26154b259309b53a6231de1be947c0c159dcbb683cf1325c2af3466"
+    },
+    {
+      "id": "osm-way-53921169",
+      "identity": {
+        "key": "building:osm:way:53921169",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921169",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921169"
+      },
+      "origin": {
+        "x": 323.085,
+        "y": -6.235712491273879,
+        "z": -40.265
+      },
+      "parts": 5,
+      "triangles": 50,
+      "blend": "assets/blender/buildings/osm-way-53921169.blend",
+      "url": "/models/buildings/osm-way-53921169.glb",
+      "bytes": 18256,
+      "unsharedBytes": 5120716,
+      "sha256": "1ebd9a209df34cfbb318708f1cb5b2048f8c723549d242df89fea7591ac66cd6"
+    },
+    {
+      "id": "osm-way-53921170",
+      "identity": {
+        "key": "building:osm:way:53921170",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921170",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921170"
+      },
+      "origin": {
+        "x": 382.28,
+        "y": -5.721147526502609,
+        "z": 13.42
+      },
+      "parts": 5,
+      "triangles": 69,
+      "blend": "assets/blender/buildings/osm-way-53921170.blend",
+      "url": "/models/buildings/osm-way-53921170.glb",
+      "bytes": 19836,
+      "unsharedBytes": 5122300,
+      "sha256": "ae0c74d9304187ec713e09826c9f51d91a1dea7e13ad27cff39b02661c633ee3"
+    },
+    {
+      "id": "osm-way-53921171",
+      "identity": {
+        "key": "building:osm:way:53921171",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921171",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921171"
+      },
+      "origin": {
+        "x": 382.674,
+        "y": -6.231600008010863,
+        "z": 28.902
+      },
+      "parts": 5,
+      "triangles": 50,
+      "blend": "assets/blender/buildings/osm-way-53921171.blend",
+      "url": "/models/buildings/osm-way-53921171.glb",
+      "bytes": 18320,
+      "unsharedBytes": 5120780,
+      "sha256": "bc8c94d928b7aa85e3caa470d17369a903ad6603cfe0ceb7c52e5722b7e897c8"
+    },
+    {
+      "id": "osm-way-53921692",
+      "identity": {
+        "key": "building:osm:way:53921692",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921692",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921692"
+      },
+      "origin": {
+        "x": 148.904,
+        "y": -4.930610074996948,
+        "z": -132.997
+      },
+      "parts": 5,
+      "triangles": 112,
+      "blend": "assets/blender/buildings/osm-way-53921692.blend",
+      "url": "/models/buildings/osm-way-53921692.glb",
+      "bytes": 22652,
+      "unsharedBytes": 5125112,
+      "sha256": "41888e441ade8dbdcfc2a590aa5b41e5be0af259ac53ffaa3dc4975226238daf"
+    },
+    {
+      "id": "osm-way-53921696",
+      "identity": {
+        "key": "building:osm:way:53921696",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921696",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921696"
+      },
+      "origin": {
+        "x": 98.599,
+        "y": -3.6216175234317785,
+        "z": -141.462
+      },
+      "parts": 5,
+      "triangles": 109,
+      "blend": "assets/blender/buildings/osm-way-53921696.blend",
+      "url": "/models/buildings/osm-way-53921696.glb",
+      "bytes": 22440,
+      "unsharedBytes": 5124896,
+      "sha256": "3b1f1dee03aab008b763a76d94c2947714b64e6e27a70490b948d09a10e1e459"
+    },
+    {
+      "id": "osm-way-53921697",
+      "identity": {
+        "key": "building:osm:way:53921697",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53921697",
+        "sourceUrl": "https://www.openstreetmap.org/way/53921697"
+      },
+      "origin": {
+        "x": -5.978,
+        "y": 3.5382775449752804,
+        "z": -208.732
+      },
+      "parts": 5,
+      "triangles": 332,
+      "blend": "assets/blender/buildings/osm-way-53921697.blend",
+      "url": "/models/buildings/osm-way-53921697.glb",
+      "bytes": 38960,
+      "unsharedBytes": 5141404,
+      "sha256": "07e453b3dbd1bec07acc881cdf76727e91d4ca0c01c7f1ddc668c3a107a9b49b"
+    },
+    {
+      "id": "osm-way-53929057",
+      "identity": {
+        "key": "building:osm:way:53929057",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929057",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929057"
+      },
+      "origin": {
+        "x": 84.633,
+        "y": -3.037701258361343,
+        "z": 75.48
+      },
+      "parts": 18,
+      "triangles": 10393,
+      "blend": "assets/blender/buildings/osm-way-53929057.blend",
+      "url": "/models/buildings/osm-way-53929057.glb",
+      "bytes": 786048,
+      "unsharedBytes": 5888552,
+      "sha256": "7709f2789112f11000c34ebed3853aff9df082da8233f6d9f5ce95798d1f2b73"
+    },
+    {
+      "id": "osm-way-53929060",
+      "identity": {
+        "key": "building:osm:way:53929060",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929060",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929060"
+      },
+      "origin": {
+        "x": -19.53,
+        "y": -0.06288000095635818,
+        "z": 77.926
+      },
+      "parts": 18,
+      "triangles": 10772,
+      "blend": "assets/blender/buildings/osm-way-53929060.blend",
+      "url": "/models/buildings/osm-way-53929060.glb",
+      "bytes": 812736,
+      "unsharedBytes": 5915240,
+      "sha256": "6dc7705598acce653c4d388e0cc6aac295c2f29020efe5fa9c8ffcd8bc3724db"
+    },
+    {
+      "id": "osm-way-53929062",
+      "identity": {
+        "key": "building:osm:way:53929062",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929062",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929062"
+      },
+      "origin": {
+        "x": 214.439,
+        "y": -6.050572498440743,
+        "z": 87.469
+      },
+      "parts": 18,
+      "triangles": 10469,
+      "blend": "assets/blender/buildings/osm-way-53929062.blend",
+      "url": "/models/buildings/osm-way-53929062.glb",
+      "bytes": 794448,
+      "unsharedBytes": 5896952,
+      "sha256": "e08abc2f5195926aeb90710e68f7706b152d554e7176af3feebb6c511d3556d8"
+    },
+    {
+      "id": "osm-way-53929064",
+      "identity": {
+        "key": "building:osm:way:53929064",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929064",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929064"
+      },
+      "origin": {
+        "x": 84.459,
+        "y": -5.35466009736061,
+        "z": 218.683
+      },
+      "parts": 5,
+      "triangles": 70,
+      "blend": "assets/blender/buildings/osm-way-53929064.blend",
+      "url": "/models/buildings/osm-way-53929064.glb",
+      "bytes": 19912,
+      "unsharedBytes": 5122372,
+      "sha256": "cb75f208de2625cd2ba77d0c1e79c57e0c5ec1c44e0a5513f3b4681b4f289911"
+    },
+    {
+      "id": "osm-way-53929065",
+      "identity": {
+        "key": "building:osm:way:53929065",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929065",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929065"
+      },
+      "origin": {
+        "x": 162.606,
+        "y": -5.24327488422394,
+        "z": 88.802
+      },
+      "parts": 19,
+      "triangles": 9530,
+      "blend": "assets/blender/buildings/osm-way-53929065.blend",
+      "url": "/models/buildings/osm-way-53929065.glb",
+      "bytes": 715664,
+      "unsharedBytes": 5818172,
+      "sha256": "1c49d3ce448bcfd621b09175431152224893e3a50e2f5e76deb2764d2da8866b"
+    },
+    {
+      "id": "osm-way-53929066",
+      "identity": {
+        "key": "building:osm:way:53929066",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929066",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929066"
+      },
+      "origin": {
+        "x": -48.052,
+        "y": 0.7810812697559606,
+        "z": -53.951
+      },
+      "parts": 18,
+      "triangles": 10671,
+      "blend": "assets/blender/buildings/osm-way-53929066.blend",
+      "url": "/models/buildings/osm-way-53929066.glb",
+      "bytes": 811076,
+      "unsharedBytes": 5913580,
+      "sha256": "495f11f39b318c958c3c042c9bfa478fb78c83caffe2fbde8b1aa53f28645cfc"
+    },
+    {
+      "id": "osm-way-53929067",
+      "identity": {
+        "key": "building:osm:way:53929067",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929067",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929067"
+      },
+      "origin": {
+        "x": 266.362,
+        "y": -6.903292549848547,
+        "z": 86.186
+      },
+      "parts": 18,
+      "triangles": 10566,
+      "blend": "assets/blender/buildings/osm-way-53929067.blend",
+      "url": "/models/buildings/osm-way-53929067.glb",
+      "bytes": 793920,
+      "unsharedBytes": 5896428,
+      "sha256": "94903dd2c9b71c481514f343f1df10794fda632cbc2a46e7fc610ccbd3d1aa52"
+    },
+    {
+      "id": "osm-way-53929068",
+      "identity": {
+        "key": "building:osm:way:53929068",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929068",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929068"
+      },
+      "origin": {
+        "x": 55.885,
+        "y": -1.4876474714279189,
+        "z": -56.398
+      },
+      "parts": 19,
+      "triangles": 10758,
+      "blend": "assets/blender/buildings/osm-way-53929068.blend",
+      "url": "/models/buildings/osm-way-53929068.glb",
+      "bytes": 807464,
+      "unsharedBytes": 5909976,
+      "sha256": "9f600c71284d6ed4bc41c1d9001e9410cf3566d991e4d69d8c741507084315b7"
+    },
+    {
+      "id": "osm-way-53929069",
+      "identity": {
+        "key": "building:osm:way:53929069",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929069",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929069"
+      },
+      "origin": {
+        "x": 32.702,
+        "y": -1.8576250047981753,
+        "z": 76.83
+      },
+      "parts": 18,
+      "triangles": 10521,
+      "blend": "assets/blender/buildings/osm-way-53929069.blend",
+      "url": "/models/buildings/osm-way-53929069.glb",
+      "bytes": 791680,
+      "unsharedBytes": 5894184,
+      "sha256": "766c8af634a54fced58e108249f4b7fef447434d65e6936e15de767b4e6a11dd"
+    },
+    {
+      "id": "osm-way-53929070",
+      "identity": {
+        "key": "building:osm:way:53929070",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929070",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929070"
+      },
+      "origin": {
+        "x": 109.96,
+        "y": -5.576632587909695,
+        "z": 208.931
+      },
+      "parts": 5,
+      "triangles": 103,
+      "blend": "assets/blender/buildings/osm-way-53929070.blend",
+      "url": "/models/buildings/osm-way-53929070.glb",
+      "bytes": 22012,
+      "unsharedBytes": 5124468,
+      "sha256": "c92d438619737faa229af6328d9c79f6aa7544d0dab0abd6a6bdb77eb2eb343f"
+    },
+    {
+      "id": "osm-way-53929071",
+      "identity": {
+        "key": "building:osm:way:53929071",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929071",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929071"
+      },
+      "origin": {
+        "x": 4.121,
+        "y": 1.8,
+        "z": -55.111
+      },
+      "parts": 48,
+      "triangles": 55290,
+      "blend": "assets/blender/buildings/osm-way-53929071.blend",
+      "url": "/models/buildings/osm-way-53929071.glb",
+      "bytes": 4128656,
+      "unsharedBytes": 9618128,
+      "sha256": "e23e25d12088214cbc35f17836b79559457c81d8d32b14fb4a53ca4765fd9006"
+    },
+    {
+      "id": "osm-way-106220817",
+      "identity": {
+        "key": "building:osm:way:106220817",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "106220817",
+        "sourceUrl": "https://www.openstreetmap.org/way/106220817"
+      },
+      "origin": {
+        "x": -438.825,
+        "y": 14.451752593517304,
+        "z": 21.679
+      },
+      "parts": 5,
+      "triangles": 294,
+      "blend": "assets/blender/buildings/osm-way-106220817.blend",
+      "url": "/models/buildings/osm-way-106220817.glb",
+      "bytes": 35524,
+      "unsharedBytes": 5137968,
+      "sha256": "a209720a90da0151d39c33a1a441ea4bb241bfba41f2b75dd894dff1741e71cd"
+    },
+    {
+      "id": "osm-way-108855005",
+      "identity": {
+        "key": "building:osm:way:108855005",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "108855005",
+        "sourceUrl": "https://www.openstreetmap.org/way/108855005"
+      },
+      "origin": {
+        "x": 327.255,
+        "y": -2.122070013284683,
+        "z": -253.352
+      },
+      "parts": 5,
+      "triangles": 172,
+      "blend": "assets/blender/buildings/osm-way-108855005.blend",
+      "url": "/models/buildings/osm-way-108855005.glb",
+      "bytes": 27356,
+      "unsharedBytes": 5129816,
+      "sha256": "426479d8cb0830079fb547bb3cd7895a9aa48b6c652e3e718d7aadd30824cc65"
+    },
+    {
+      "id": "osm-way-115973658",
+      "identity": {
+        "key": "building:osm:way:115973658",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "115973658",
+        "sourceUrl": "https://www.openstreetmap.org/way/115973658"
+      },
+      "origin": {
+        "x": -28.228,
+        "y": 0.23394499022513693,
+        "z": 160.648
+      },
+      "parts": 5,
+      "triangles": 484,
+      "blend": "assets/blender/buildings/osm-way-115973658.blend",
+      "url": "/models/buildings/osm-way-115973658.glb",
+      "bytes": 50496,
+      "unsharedBytes": 5152944,
+      "sha256": "8c7be30c85302ba7097f51eeaa19134a5a94a108163e654ddf0927431dd7f42b"
+    },
+    {
+      "id": "osm-way-115973679",
+      "identity": {
+        "key": "building:osm:way:115973679",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "115973679",
+        "sourceUrl": "https://www.openstreetmap.org/way/115973679"
+      },
+      "origin": {
+        "x": -419.592,
+        "y": -21.612977371215823,
+        "z": 346.247
+      },
+      "parts": 5,
+      "triangles": 58,
+      "blend": "assets/blender/buildings/osm-way-115973679.blend",
+      "url": "/models/buildings/osm-way-115973679.glb",
+      "bytes": 18872,
+      "unsharedBytes": 5121332,
+      "sha256": "4756e67d2ec8ec6d60a7059f5267f700a485954488e3562334053585cab7947c"
+    },
+    {
+      "id": "osm-way-115973713",
+      "identity": {
+        "key": "building:osm:way:115973713",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "115973713",
+        "sourceUrl": "https://www.openstreetmap.org/way/115973713"
+      },
+      "origin": {
+        "x": 19.385,
+        "y": -2.1916050541400955,
+        "z": 180.336
+      },
+      "parts": 5,
+      "triangles": 152,
+      "blend": "assets/blender/buildings/osm-way-115973713.blend",
+      "url": "/models/buildings/osm-way-115973713.glb",
+      "bytes": 25540,
+      "unsharedBytes": 5127996,
+      "sha256": "304aff2f0d2d9dde9f833c5a1da337e613d6ede8733098734aa3e8bcb9c4e057"
+    },
+    {
+      "id": "osm-way-115973734",
+      "identity": {
+        "key": "building:osm:way:115973734",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "115973734",
+        "sourceUrl": "https://www.openstreetmap.org/way/115973734"
+      },
+      "origin": {
+        "x": -422.701,
+        "y": -21.932234992980963,
+        "z": 345.495
+      },
+      "parts": 5,
+      "triangles": 58,
+      "blend": "assets/blender/buildings/osm-way-115973734.blend",
+      "url": "/models/buildings/osm-way-115973734.glb",
+      "bytes": 18868,
+      "unsharedBytes": 5121324,
+      "sha256": "d0ca65c60e7767cd319c42d17e8a94c5be629e79601d0a820efc08e6633550c3"
+    },
+    {
+      "id": "osm-way-155743944",
+      "identity": {
+        "key": "building:osm:way:155743944",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "155743944",
+        "sourceUrl": "https://www.openstreetmap.org/way/155743944"
+      },
+      "origin": {
+        "x": 192.235,
+        "y": -1.658934991657733,
+        "z": -278.635
+      },
+      "parts": 5,
+      "triangles": 50,
+      "blend": "assets/blender/buildings/osm-way-155743944.blend",
+      "url": "/models/buildings/osm-way-155743944.glb",
+      "bytes": 18280,
+      "unsharedBytes": 5120736,
+      "sha256": "37aa5462f743630ec44f4422ec5abc34097b086a217e9d92bffb14c1370aa5f0"
+    },
+    {
+      "id": "osm-way-159388517",
+      "identity": {
+        "key": "building:osm:way:159388517",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "159388517",
+        "sourceUrl": "https://www.openstreetmap.org/way/159388517"
+      },
+      "origin": {
+        "x": 17.27,
+        "y": 3.309822459816933,
+        "z": -216.309
+      },
+      "parts": 5,
+      "triangles": 54,
+      "blend": "assets/blender/buildings/osm-way-159388517.blend",
+      "url": "/models/buildings/osm-way-159388517.glb",
+      "bytes": 18860,
+      "unsharedBytes": 5121320,
+      "sha256": "120a98e744c421f1b26b87cf811bf94214c1812a7c1fa3bb6934afbabbc633e8"
+    },
+    {
+      "id": "osm-way-159388519",
+      "identity": {
+        "key": "building:osm:way:159388519",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "159388519",
+        "sourceUrl": "https://www.openstreetmap.org/way/159388519"
+      },
+      "origin": {
+        "x": -10.049,
+        "y": 3.5062524890899662,
+        "z": -232.774
+      },
+      "parts": 5,
+      "triangles": 90,
+      "blend": "assets/blender/buildings/osm-way-159388519.blend",
+      "url": "/models/buildings/osm-way-159388519.glb",
+      "bytes": 21416,
+      "unsharedBytes": 5123876,
+      "sha256": "bbe03ea5e53b29100fa5c88907bc4ea1bde7bc20b214ac27f68a5af4eaa3e3a9"
+    },
+    {
+      "id": "osm-way-159477031",
+      "identity": {
+        "key": "building:osm:way:159477031",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "159477031",
+        "sourceUrl": "https://www.openstreetmap.org/way/159477031"
+      },
+      "origin": {
+        "x": 358.048,
+        "y": -0.6685087439417833,
+        "z": -152.825
+      },
+      "parts": 5,
+      "triangles": 263,
+      "blend": "assets/blender/buildings/osm-way-159477031.blend",
+      "url": "/models/buildings/osm-way-159477031.glb",
+      "bytes": 34468,
+      "unsharedBytes": 5136920,
+      "sha256": "518eb70f1852ac6b9b2dacf53d04c9615940d7212836a1bd078c353d26c2c0f4"
+    },
+    {
+      "id": "osm-way-159477035",
+      "identity": {
+        "key": "building:osm:way:159477035",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "159477035",
+        "sourceUrl": "https://www.openstreetmap.org/way/159477035"
+      },
+      "origin": {
+        "x": 437.989,
+        "y": -2.2163099622726445,
+        "z": -69.341
+      },
+      "parts": 5,
+      "triangles": 430,
+      "blend": "assets/blender/buildings/osm-way-159477035.blend",
+      "url": "/models/buildings/osm-way-159477035.glb",
+      "bytes": 46168,
+      "unsharedBytes": 5148616,
+      "sha256": "ef38aa4ff1f94566a4f0bfd09729c956ea08ce5fd4702f4e970b926b81805659"
+    },
+    {
+      "id": "osm-way-166152866",
+      "identity": {
+        "key": "building:osm:way:166152866",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "166152866",
+        "sourceUrl": "https://www.openstreetmap.org/way/166152866"
+      },
+      "origin": {
+        "x": -368.117,
+        "y": 3.8329962006211282,
+        "z": -319.657
+      },
+      "parts": 5,
+      "triangles": 293,
+      "blend": "assets/blender/buildings/osm-way-166152866.blend",
+      "url": "/models/buildings/osm-way-166152866.glb",
+      "bytes": 35796,
+      "unsharedBytes": 5138240,
+      "sha256": "4e6f8d726d17ba595267b6aff3ed0cc4a5aec299e8eba209149e44e856083fac"
+    },
+    {
+      "id": "osm-way-166375020",
+      "identity": {
+        "key": "building:osm:way:166375020",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "166375020",
+        "sourceUrl": "https://www.openstreetmap.org/way/166375020"
+      },
+      "origin": {
+        "x": -285.935,
+        "y": 2.198399913311006,
+        "z": 268.765
+      },
+      "parts": 5,
+      "triangles": 42,
+      "blend": "assets/blender/buildings/osm-way-166375020.blend",
+      "url": "/models/buildings/osm-way-166375020.glb",
+      "bytes": 17716,
+      "unsharedBytes": 5120176,
+      "sha256": "31fbb23ae40110395e15a68f169065434989e371f3541e0bbd6599bc9eadac87"
+    },
+    {
+      "id": "osm-way-166375027",
+      "identity": {
+        "key": "building:osm:way:166375027",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "166375027",
+        "sourceUrl": "https://www.openstreetmap.org/way/166375027"
+      },
+      "origin": {
+        "x": -305.41,
+        "y": -16.01212731361389,
+        "z": 363.357
+      },
+      "parts": 5,
+      "triangles": 124,
+      "blend": "assets/blender/buildings/osm-way-166375027.blend",
+      "url": "/models/buildings/osm-way-166375027.glb",
+      "bytes": 23864,
+      "unsharedBytes": 5126324,
+      "sha256": "1d308e4e2f8cd1691e097966a5ede9e75c660d066bb774380115596720a5e53d"
+    },
+    {
+      "id": "osm-way-166375073",
+      "identity": {
+        "key": "building:osm:way:166375073",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "166375073",
+        "sourceUrl": "https://www.openstreetmap.org/way/166375073"
+      },
+      "origin": {
+        "x": -276.969,
+        "y": -18.136965503692625,
+        "z": 366.834
+      },
+      "parts": 5,
+      "triangles": 50,
+      "blend": "assets/blender/buildings/osm-way-166375073.blend",
+      "url": "/models/buildings/osm-way-166375073.glb",
+      "bytes": 18288,
+      "unsharedBytes": 5120744,
+      "sha256": "755a6bb6066cbc17eab33153fe7a3caf31de1f11509135c68105c7307dd1a590"
+    },
+    {
+      "id": "osm-way-166375092",
+      "identity": {
+        "key": "building:osm:way:166375092",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "166375092",
+        "sourceUrl": "https://www.openstreetmap.org/way/166375092"
+      },
+      "origin": {
+        "x": -255.045,
+        "y": -16.21960509777069,
+        "z": 368.64
+      },
+      "parts": 5,
+      "triangles": 50,
+      "blend": "assets/blender/buildings/osm-way-166375092.blend",
+      "url": "/models/buildings/osm-way-166375092.glb",
+      "bytes": 18272,
+      "unsharedBytes": 5120728,
+      "sha256": "58d5bcf91ec0cd4fc53dbf96bdd38fc20a49fa2b3973038bc8020205f04df178"
+    },
+    {
+      "id": "osm-way-268457490",
+      "identity": {
+        "key": "building:osm:way:268457490",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "268457490",
+        "sourceUrl": "https://www.openstreetmap.org/way/268457490"
+      },
+      "origin": {
+        "x": 383.923,
+        "y": -75.9623410797119,
+        "z": 329.453
+      },
+      "parts": 5,
+      "triangles": 42,
+      "blend": "assets/blender/buildings/osm-way-268457490.blend",
+      "url": "/models/buildings/osm-way-268457490.glb",
+      "bytes": 18024,
+      "unsharedBytes": 5120484,
+      "sha256": "43168e3348948047981a80b8d2c5772c7e39624b12ce42b9794d51d57a8841a2"
+    },
+    {
+      "id": "osm-way-277923411",
+      "identity": {
+        "key": "building:osm:way:277923411",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "277923411",
+        "sourceUrl": "https://www.openstreetmap.org/way/277923411"
+      },
+      "origin": {
+        "x": -0.172,
+        "y": -3.145887610316277,
+        "z": 258.48
+      },
+      "parts": 5,
+      "triangles": 141,
+      "blend": "assets/blender/buildings/osm-way-277923411.blend",
+      "url": "/models/buildings/osm-way-277923411.glb",
+      "bytes": 24736,
+      "unsharedBytes": 5127196,
+      "sha256": "4ba24d937758c492d4e207b42524db292ad56f1cbedb60af74b52446a45b506b"
+    },
+    {
+      "id": "osm-way-293949905",
+      "identity": {
+        "key": "building:osm:way:293949905",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "293949905",
+        "sourceUrl": "https://www.openstreetmap.org/way/293949905"
+      },
+      "origin": {
+        "x": 27.019,
+        "y": -3.6426674854755423,
+        "z": 236.083
+      },
+      "parts": 5,
+      "triangles": 180,
+      "blend": "assets/blender/buildings/osm-way-293949905.blend",
+      "url": "/models/buildings/osm-way-293949905.glb",
+      "bytes": 27956,
+      "unsharedBytes": 5130412,
+      "sha256": "4491a466c59bfab0a2dd121e0a43d70aec6ab9af99e0fc8d0f09d47783c931d5"
+    },
+    {
+      "id": "osm-way-293949906",
+      "identity": {
+        "key": "building:osm:way:293949906",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "293949906",
+        "sourceUrl": "https://www.openstreetmap.org/way/293949906"
+      },
+      "origin": {
+        "x": -21.942,
+        "y": -2.7209212708473203,
+        "z": 265.206
+      },
+      "parts": 5,
+      "triangles": 151,
+      "blend": "assets/blender/buildings/osm-way-293949906.blend",
+      "url": "/models/buildings/osm-way-293949906.glb",
+      "bytes": 25452,
+      "unsharedBytes": 5127908,
+      "sha256": "041b61b39bbd25af1d4f40b4e024a631ddc880763119cb36e58943b10cdfb73f"
+    },
+    {
+      "id": "osm-way-293949907",
+      "identity": {
+        "key": "building:osm:way:293949907",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "293949907",
+        "sourceUrl": "https://www.openstreetmap.org/way/293949907"
+      },
+      "origin": {
+        "x": -55.095,
+        "y": -2.765852512717245,
+        "z": 273.157
+      },
+      "parts": 5,
+      "triangles": 172,
+      "blend": "assets/blender/buildings/osm-way-293949907.blend",
+      "url": "/models/buildings/osm-way-293949907.glb",
+      "bytes": 27512,
+      "unsharedBytes": 5129968,
+      "sha256": "adf35b61f7e4485eb3cee4f1af304799849afb364381efaa948953eeb52f13f2"
+    },
+    {
+      "id": "osm-way-293949908",
+      "identity": {
+        "key": "building:osm:way:293949908",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "293949908",
+        "sourceUrl": "https://www.openstreetmap.org/way/293949908"
+      },
+      "origin": {
+        "x": 56.037,
+        "y": -4.200662544369692,
+        "z": 227.031
+      },
+      "parts": 5,
+      "triangles": 135,
+      "blend": "assets/blender/buildings/osm-way-293949908.blend",
+      "url": "/models/buildings/osm-way-293949908.glb",
+      "bytes": 25264,
+      "unsharedBytes": 5127728,
+      "sha256": "f43699968c7aa54d608272c12da75758eebcaf9712fdb563e16714d98475f60a"
+    },
+    {
+      "id": "osm-way-370462836",
+      "identity": {
+        "key": "building:osm:way:370462836",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "370462836",
+        "sourceUrl": "https://www.openstreetmap.org/way/370462836"
+      },
+      "origin": {
+        "x": -533.097,
+        "y": 5.583000183105469,
+        "z": -330.814
+      },
+      "parts": 5,
+      "triangles": 238,
+      "blend": "assets/blender/buildings/osm-way-370462836.blend",
+      "url": "/models/buildings/osm-way-370462836.glb",
+      "bytes": 31584,
+      "unsharedBytes": 5134032,
+      "sha256": "8825aedde3ba6206592d571854b68f52ddcbd7760f32a2a740a80840d38eddf8"
+    },
+    {
+      "id": "osm-way-379383172",
+      "identity": {
+        "key": "building:osm:way:379383172",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "379383172",
+        "sourceUrl": "https://www.openstreetmap.org/way/379383172"
+      },
+      "origin": {
+        "x": 228.539,
+        "y": 0.7297550150752067,
+        "z": -148.125
+      },
+      "parts": 5,
+      "triangles": 34,
+      "blend": "assets/blender/buildings/osm-way-379383172.blend",
+      "url": "/models/buildings/osm-way-379383172.glb",
+      "bytes": 17172,
+      "unsharedBytes": 5119632,
+      "sha256": "f91c7232ac32271e5038d63aa543af747346a0d4dddfbe02ac96cb557f5aff46"
+    },
+    {
+      "id": "osm-way-379383188",
+      "identity": {
+        "key": "building:osm:way:379383188",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "379383188",
+        "sourceUrl": "https://www.openstreetmap.org/way/379383188"
+      },
+      "origin": {
+        "x": 249.375,
+        "y": 0.4665349939465522,
+        "z": -139.09
+      },
+      "parts": 5,
+      "triangles": 34,
+      "blend": "assets/blender/buildings/osm-way-379383188.blend",
+      "url": "/models/buildings/osm-way-379383188.glb",
+      "bytes": 17168,
+      "unsharedBytes": 5119628,
+      "sha256": "c4fadb85c07a52e28e8ea72d6e05f30ed709be2b9f8ddcd20ca11f5bcee1efed"
+    },
+    {
+      "id": "osm-way-429820561",
+      "identity": {
+        "key": "building:osm:way:429820561",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "429820561",
+        "sourceUrl": "https://www.openstreetmap.org/way/429820561"
+      },
+      "origin": {
+        "x": 237.904,
+        "y": -13.024099955558784,
+        "z": 196.759
+      },
+      "parts": 5,
+      "triangles": 46,
+      "blend": "assets/blender/buildings/osm-way-429820561.blend",
+      "url": "/models/buildings/osm-way-429820561.glb",
+      "bytes": 17996,
+      "unsharedBytes": 5120456,
+      "sha256": "d56a7ed99135ba2e1ecebc019dba80080fd5c40c73df03bf3961255e26914878"
+    },
+    {
+      "id": "osm-way-432351705",
+      "identity": {
+        "key": "building:osm:way:432351705",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "432351705",
+        "sourceUrl": "https://www.openstreetmap.org/way/432351705"
+      },
+      "origin": {
+        "x": -68.037,
+        "y": 0.12757499303668707,
+        "z": 228.673
+      },
+      "parts": 5,
+      "triangles": 115,
+      "blend": "assets/blender/buildings/osm-way-432351705.blend",
+      "url": "/models/buildings/osm-way-432351705.glb",
+      "bytes": 22896,
+      "unsharedBytes": 5125352,
+      "sha256": "ca96841017ff420ea5297e5e85f006b883a5d76cc7bc7de05911f5f0a597de52"
+    },
+    {
+      "id": "osm-way-455556827",
+      "identity": {
+        "key": "building:osm:way:455556827",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "455556827",
+        "sourceUrl": "https://www.openstreetmap.org/way/455556827"
+      },
+      "origin": {
+        "x": -18.525,
+        "y": 3.0072000104188916,
+        "z": -259.105
+      },
+      "parts": 5,
+      "triangles": 50,
+      "blend": "assets/blender/buildings/osm-way-455556827.blend",
+      "url": "/models/buildings/osm-way-455556827.glb",
+      "bytes": 18588,
+      "unsharedBytes": 5121048,
+      "sha256": "98b6d3a44efbf21e8ae39967d9db8e9e83c306815451bbe4f681df39ac7bd085"
+    },
+    {
+      "id": "osm-way-480849468",
+      "identity": {
+        "key": "building:osm:way:480849468",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "480849468",
+        "sourceUrl": "https://www.openstreetmap.org/way/480849468"
+      },
+      "origin": {
+        "x": -386.22,
+        "y": 6.873979938030243,
+        "z": -168.464
+      },
+      "parts": 5,
+      "triangles": 42,
+      "blend": "assets/blender/buildings/osm-way-480849468.blend",
+      "url": "/models/buildings/osm-way-480849468.glb",
+      "bytes": 17732,
+      "unsharedBytes": 5120192,
+      "sha256": "5a8f077b69e3f173620893ce7114c5f670df4579f0e4142dc654bad7b2e54766"
+    },
+    {
+      "id": "osm-way-480849469",
+      "identity": {
+        "key": "building:osm:way:480849469",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "480849469",
+        "sourceUrl": "https://www.openstreetmap.org/way/480849469"
+      },
+      "origin": {
+        "x": -480.943,
+        "y": 11.653850340843201,
+        "z": -109.265
+      },
+      "parts": 5,
+      "triangles": 34,
+      "blend": "assets/blender/buildings/osm-way-480849469.blend",
+      "url": "/models/buildings/osm-way-480849469.glb",
+      "bytes": 17172,
+      "unsharedBytes": 5119632,
+      "sha256": "9d963b8c17d6bd091276523b991f66fd6a2c341e3711fa616929b599e50d0f2d"
+    },
+    {
+      "id": "osm-way-570947098",
+      "identity": {
+        "key": "building:osm:way:570947098",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "570947098",
+        "sourceUrl": "https://www.openstreetmap.org/way/570947098"
+      },
+      "origin": {
+        "x": 255.65,
+        "y": -5.682694921493547,
+        "z": -43.31
+      },
+      "parts": 5,
+      "triangles": 72,
+      "blend": "assets/blender/buildings/osm-way-570947098.blend",
+      "url": "/models/buildings/osm-way-570947098.glb",
+      "bytes": 20100,
+      "unsharedBytes": 5122564,
+      "sha256": "14688f9ac4e57bd180ea017127450c71d1db708a7203fd7bcfef579015b937dd"
+    },
+    {
+      "id": "osm-way-570947099",
+      "identity": {
+        "key": "building:osm:way:570947099",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "570947099",
+        "sourceUrl": "https://www.openstreetmap.org/way/570947099"
+      },
+      "origin": {
+        "x": 289.699,
+        "y": 0.16567999765276853,
+        "z": -116.306
+      },
+      "parts": 5,
+      "triangles": 108,
+      "blend": "assets/blender/buildings/osm-way-570947099.blend",
+      "url": "/models/buildings/osm-way-570947099.glb",
+      "bytes": 22388,
+      "unsharedBytes": 5124848,
+      "sha256": "dbca37e0f84ced4ce1cb2a225133816322615c7860b471f223cc05dfe99d2251"
+    },
+    {
+      "id": "osm-way-570947100",
+      "identity": {
+        "key": "building:osm:way:570947100",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "570947100",
+        "sourceUrl": "https://www.openstreetmap.org/way/570947100"
+      },
+      "origin": {
+        "x": 234.479,
+        "y": 0.5154850146174439,
+        "z": -74.254
+      },
+      "parts": 5,
+      "triangles": 172,
+      "blend": "assets/blender/buildings/osm-way-570947100.blend",
+      "url": "/models/buildings/osm-way-570947100.glb",
+      "bytes": 27000,
+      "unsharedBytes": 5129456,
+      "sha256": "f5ea2f82f7128450449a491c8fb5b2615c9641f6d5981d72accb7970d206678f"
+    },
+    {
+      "id": "osm-way-570947101",
+      "identity": {
+        "key": "building:osm:way:570947101",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "570947101",
+        "sourceUrl": "https://www.openstreetmap.org/way/570947101"
+      },
+      "origin": {
+        "x": 226.975,
+        "y": 0.14166999678127462,
+        "z": -101.305
+      },
+      "parts": 5,
+      "triangles": 78,
+      "blend": "assets/blender/buildings/osm-way-570947101.blend",
+      "url": "/models/buildings/osm-way-570947101.glb",
+      "bytes": 20324,
+      "unsharedBytes": 5122784,
+      "sha256": "2dc06c87f36c382f7a4729650e62e7e532d51b78cb9de6e20382f04463fc1ea6"
+    },
+    {
+      "id": "osm-way-570947102",
+      "identity": {
+        "key": "building:osm:way:570947102",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "570947102",
+        "sourceUrl": "https://www.openstreetmap.org/way/570947102"
+      },
+      "origin": {
+        "x": 191.44,
+        "y": 0.9200124996900607,
+        "z": -95.14
+      },
+      "parts": 5,
+      "triangles": 38,
+      "blend": "assets/blender/buildings/osm-way-570947102.blend",
+      "url": "/models/buildings/osm-way-570947102.glb",
+      "bytes": 17432,
+      "unsharedBytes": 5119892,
+      "sha256": "4eee20b41e5959384785501213c1a990809c2ca60ccdaceded2328c6d2371282"
+    },
+    {
+      "id": "osm-way-570947103",
+      "identity": {
+        "key": "building:osm:way:570947103",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "570947103",
+        "sourceUrl": "https://www.openstreetmap.org/way/570947103"
+      },
+      "origin": {
+        "x": 193.477,
+        "y": 3.8118149787187523,
+        "z": -50.051
+      },
+      "parts": 5,
+      "triangles": 60,
+      "blend": "assets/blender/buildings/osm-way-570947103.blend",
+      "url": "/models/buildings/osm-way-570947103.glb",
+      "bytes": 18988,
+      "unsharedBytes": 5121444,
+      "sha256": "5a932e04eb3d71aeb66a10288da815122ba11404d2d921cecbc24fb9a38810e0"
+    },
+    {
+      "id": "osm-way-570947104",
+      "identity": {
+        "key": "building:osm:way:570947104",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "570947104",
+        "sourceUrl": "https://www.openstreetmap.org/way/570947104"
+      },
+      "origin": {
+        "x": 70.455,
+        "y": 1.9756399750709535,
+        "z": -245.911
+      },
+      "parts": 5,
+      "triangles": 42,
+      "blend": "assets/blender/buildings/osm-way-570947104.blend",
+      "url": "/models/buildings/osm-way-570947104.glb",
+      "bytes": 17960,
+      "unsharedBytes": 5120420,
+      "sha256": "a4a70517eb07a9321395f5fbbe90ff5078ced244b8e6bfc34c89aec17d800795"
+    },
+    {
+      "id": "osm-way-672784912",
+      "identity": {
+        "key": "building:osm:way:672784912",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "672784912",
+        "sourceUrl": "https://www.openstreetmap.org/way/672784912"
+      },
+      "origin": {
+        "x": 359.747,
+        "y": -0.6778075132519046,
+        "z": -138.737
+      },
+      "parts": 5,
+      "triangles": 103,
+      "blend": "assets/blender/buildings/osm-way-672784912.blend",
+      "url": "/models/buildings/osm-way-672784912.glb",
+      "bytes": 22060,
+      "unsharedBytes": 5124520,
+      "sha256": "d30194379377455f5825edaa0e4b37da9870a74dae4a11a3c81d271bb443399b"
+    },
+    {
+      "id": "osm-way-672784913",
+      "identity": {
+        "key": "building:osm:way:672784913",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "672784913",
+        "sourceUrl": "https://www.openstreetmap.org/way/672784913"
+      },
+      "origin": {
+        "x": 299.315,
+        "y": 0.08214999804273046,
+        "z": -135.855
+      },
+      "parts": 5,
+      "triangles": 51,
+      "blend": "assets/blender/buildings/osm-way-672784913.blend",
+      "url": "/models/buildings/osm-way-672784913.glb",
+      "bytes": 18616,
+      "unsharedBytes": 5121076,
+      "sha256": "d927094e34c9b58ab0b7d5d4c3798c503f5b7e5d65b1766c425aa005feeb2d4a"
+    },
+    {
+      "id": "osm-way-672784914",
+      "identity": {
+        "key": "building:osm:way:672784914",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "672784914",
+        "sourceUrl": "https://www.openstreetmap.org/way/672784914"
+      },
+      "origin": {
+        "x": -92.205,
+        "y": 1.9908700042963012,
+        "z": 253.395
+      },
+      "parts": 5,
+      "triangles": 46,
+      "blend": "assets/blender/buildings/osm-way-672784914.blend",
+      "url": "/models/buildings/osm-way-672784914.glb",
+      "bytes": 18004,
+      "unsharedBytes": 5120460,
+      "sha256": "85b83e400556906ed62e0961db4b2291dd87c3342bb75ddab6c638f3756dfe41"
+    },
+    {
+      "id": "osm-way-809949594",
+      "identity": {
+        "key": "building:osm:way:809949594",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "809949594",
+        "sourceUrl": "https://www.openstreetmap.org/way/809949594"
+      },
+      "origin": {
+        "x": 270.97,
+        "y": -58.36973447799681,
+        "z": 317.735
+      },
+      "parts": 5,
+      "triangles": 34,
+      "blend": "assets/blender/buildings/osm-way-809949594.blend",
+      "url": "/models/buildings/osm-way-809949594.glb",
+      "bytes": 17168,
+      "unsharedBytes": 5119628,
+      "sha256": "f2868f7417446d994a5e342f60622648174ce152de664c09a8909c361f444140"
+    },
+    {
+      "id": "osm-way-1132256447",
+      "identity": {
+        "key": "building:osm:way:1132256447",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "1132256447",
+        "sourceUrl": "https://www.openstreetmap.org/way/1132256447"
+      },
+      "origin": {
+        "x": 129.313,
+        "y": -0.4710649994015592,
+        "z": -307.929
+      },
+      "parts": 5,
+      "triangles": 2092,
+      "blend": "assets/blender/buildings/osm-way-1132256447.blend",
+      "url": "/models/buildings/osm-way-1132256447.glb",
+      "bytes": 171416,
+      "unsharedBytes": 5273848,
+      "sha256": "af7f832ff7fd4b386a730d73e2ec0e53c371d39302ff54fc5bdccd6040c80631"
+    },
+    {
+      "id": "osm-way-1132256451",
+      "identity": {
+        "key": "building:osm:way:1132256451",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "1132256451",
+        "sourceUrl": "https://www.openstreetmap.org/way/1132256451"
+      },
+      "origin": {
+        "x": -213.157,
+        "y": 5.823137491941451,
+        "z": 16.742
+      },
+      "parts": 5,
+      "triangles": 218,
+      "blend": "assets/blender/buildings/osm-way-1132256451.blend",
+      "url": "/models/buildings/osm-way-1132256451.glb",
+      "bytes": 30152,
+      "unsharedBytes": 5132596,
+      "sha256": "2a2feb00120b7fa089ab9241a75eb6bccfac0ff1ad43335a4895e0982ee9d045"
+    },
+    {
+      "id": "osm-way-1132256478",
+      "identity": {
+        "key": "building:osm:way:1132256478",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "1132256478",
+        "sourceUrl": "https://www.openstreetmap.org/way/1132256478"
+      },
+      "origin": {
+        "x": 402.827,
+        "y": -4.717643784880643,
+        "z": 13.213
+      },
+      "parts": 5,
+      "triangles": 207,
+      "blend": "assets/blender/buildings/osm-way-1132256478.blend",
+      "url": "/models/buildings/osm-way-1132256478.glb",
+      "bytes": 29760,
+      "unsharedBytes": 5132208,
+      "sha256": "4b3d0408a49dc9c3114bf9ee9fc4e17e336baa14db79379b7a18925d5a1176f2"
+    },
+    {
+      "id": "osm-way-1132256479",
+      "identity": {
+        "key": "building:osm:way:1132256479",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "1132256479",
+        "sourceUrl": "https://www.openstreetmap.org/way/1132256479"
+      },
+      "origin": {
+        "x": 343.468,
+        "y": -2.5538175058364674,
+        "z": -67.86
+      },
+      "parts": 5,
+      "triangles": 160,
+      "blend": "assets/blender/buildings/osm-way-1132256479.blend",
+      "url": "/models/buildings/osm-way-1132256479.glb",
+      "bytes": 26028,
+      "unsharedBytes": 5128476,
+      "sha256": "3045df848663daed6c49e234bf778613c2d1549e6d7f27e9dc886acaffb19762"
+    },
+    {
+      "id": "osm-way-1132256480",
+      "identity": {
+        "key": "building:osm:way:1132256480",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "1132256480",
+        "sourceUrl": "https://www.openstreetmap.org/way/1132256480"
+      },
+      "origin": {
+        "x": 464.343,
+        "y": -8.089110138416302,
+        "z": 44.724
+      },
+      "parts": 5,
+      "triangles": 191,
+      "blend": "assets/blender/buildings/osm-way-1132256480.blend",
+      "url": "/models/buildings/osm-way-1132256480.glb",
+      "bytes": 28220,
+      "unsharedBytes": 5130664,
+      "sha256": "2c029a4d3525fee60115c17db598c4434dc03630f25771d3c40f8b756756ac58"
+    },
+    {
+      "id": "osm-way-1374441208",
+      "identity": {
+        "key": "building:osm:way:1374441208",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "1374441208",
+        "sourceUrl": "https://www.openstreetmap.org/way/1374441208"
+      },
+      "origin": {
+        "x": 55.325,
+        "y": -1.8837399762868852,
+        "z": -19.004
+      },
+      "parts": 5,
+      "triangles": 68,
+      "blend": "assets/blender/buildings/osm-way-1374441208.blend",
+      "url": "/models/buildings/osm-way-1374441208.glb",
+      "bytes": 19580,
+      "unsharedBytes": 5122040,
+      "sha256": "e1a73af5105803d110d598c51daf767e39c564acb48273cdfc7faaf5e0d53a70"
+    },
+    {
+      "id": "osm-way-1558137690",
+      "identity": {
+        "key": "building:osm:way:1558137690",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "1558137690",
+        "sourceUrl": "https://www.openstreetmap.org/way/1558137690"
+      },
+      "origin": {
+        "x": -306.235,
+        "y": 0.3513199965655822,
+        "z": 277.805
+      },
+      "parts": 5,
+      "triangles": 66,
+      "blend": "assets/blender/buildings/osm-way-1558137690.blend",
+      "url": "/models/buildings/osm-way-1558137690.glb",
+      "bytes": 19428,
+      "unsharedBytes": 5121888,
+      "sha256": "0387e9087c796f6043de655a0f696a1ac2cb328800c35edf871e6859490d8564"
+    },
+    {
+      "id": "osm-way-53929063",
+      "identity": {
+        "key": "building:osm:way:53929063",
+        "kind": "building",
+        "sourceType": "way",
+        "sourceId": "53929063",
+        "sourceUrl": "https://www.openstreetmap.org/way/53929063"
+      },
+      "origin": {
+        "x": -87.0299939240806,
+        "y": 2.0953938016295437,
+        "z": 77.57000108997528
+      },
+      "parts": 9,
+      "triangles": 5363,
+      "blend": "assets/blender/buildings/osm-way-53929063.blend",
+      "url": "/models/buildings/osm-way-53929063.glb",
+      "bytes": 407608,
+      "unsharedBytes": 5510080,
+      "sha256": "950029947f8f0baac0fbf742cc16a2f3db0a7fda22f7f91e33943d32a75ea0d0"
+    },
+    {
+      "id": "osm-relation-1515034",
+      "identity": {
+        "key": "building:osm:relation:1515034",
+        "kind": "building",
+        "sourceType": "relation",
+        "sourceId": "1515034",
+        "sourceUrl": "https://www.openstreetmap.org/relation/1515034"
+      },
+      "origin": {
+        "x": -286.64658839962823,
+        "y": 2.4155520719925496,
+        "z": 18.424944332711803
+      },
+      "parts": 10,
+      "triangles": 16620,
+      "blend": "assets/blender/buildings/osm-relation-1515034.blend",
+      "url": "/models/buildings/osm-relation-1515034.glb",
+      "bytes": 1331904,
+      "unsharedBytes": 2813052,
+      "sha256": "81cc90adc6f395b565956d048cf79709e681851e9d9b044c568f582400939b36"
+    }
+  ],
+  "foundationRepair": {
+    "kind": "outward-foundation-winding",
+    "affectedSourceIds": [
+      "25920626",
+      "49379068",
+      "49379089",
+      "53921168",
+      "53929071",
+      "155743944",
+      "268457490",
+      "293949905",
+      "293949906",
+      "293949907",
+      "293949908",
+      "379383172",
+      "379383188",
+      "480849469",
+      "1374441208",
+      "1558137690"
+    ],
+    "evidence": "docs/verification-evidence/ground-flicker-20261011/foundation-archive-sync.json"
+  }
+}

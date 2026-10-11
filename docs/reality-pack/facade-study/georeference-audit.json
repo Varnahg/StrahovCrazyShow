@@ -1,0 +1,186 @@
+{
+  "sourceProvider": "IPR Praha + OpenStreetMap/RUIAN",
+  "originalMapSha256": "cc41d5fc78ffbff275468cdd191e96c74e1c9dc09a74be7bc82a918184c7f64c",
+  "osmXmlSha256": "7ff214452c91162fffc77809bd7c07f9511e694d2a7b48bc316d7b5865cedb62",
+  "origin": {
+    "lat": 50.08065,
+    "lon": 14.39175
+  },
+  "expectedCosLatitude": 0.6417086829273078,
+  "manifestMetresPerMercatorUnit": 0.6417086829273079,
+  "manifestLocalPositionScale": null,
+  "cosLatitudeDifference": 1.1102230246251565e-16,
+  "osmGeographicVertices": [
+    [
+      50.0808487,
+      14.3917477
+    ],
+    [
+      50.0812778,
+      14.391731
+    ],
+    [
+      50.0812831,
+      14.3916421
+    ],
+    [
+      50.0812861,
+      14.3916419
+    ],
+    [
+      50.0812862,
+      14.3916474
+    ],
+    [
+      50.0813354,
+      14.3916458
+    ],
+    [
+      50.0813354,
+      14.3916402
+    ],
+    [
+      50.0813382,
+      14.3916402
+    ],
+    [
+      50.0813471,
+      14.391724
+    ],
+    [
+      50.0814579,
+      14.3917201
+    ],
+    [
+      50.0814591,
+      14.3918127
+    ],
+    [
+      50.0814402,
+      14.3918134
+    ],
+    [
+      50.0814427,
+      14.3919533
+    ],
+    [
+      50.0809953,
+      14.3919739
+    ],
+    [
+      50.0808341,
+      14.3919813
+    ],
+    [
+      50.0808321,
+      14.3918898
+    ],
+    [
+      50.0808515,
+      14.3918891
+    ],
+    [
+      50.0808487,
+      14.3917477
+    ]
+  ],
+  "osmStoredBounds": [
+    [
+      -7.84,
+      -90.07
+    ],
+    [
+      16.52,
+      -20.27
+    ]
+  ],
+  "osmReprojectedMercatorBounds": [
+    [
+      -7.843528283612438,
+      -90.06936007685049
+    ],
+    [
+      16.522842367832354,
+      -20.271317772359065
+    ]
+  ],
+  "maxOSMEquirectangularVsMercatorRoundedPointDifferenceM": 0.0046133939578965055,
+  "osmGeodesicEdgeLengthsM": [
+    47.744026592794924,
+    6.3902510820070955,
+    0.33399879699959667,
+    0.39381849881533004,
+    5.47374513177595,
+    0.40081845584175685,
+    0.31144576702741816,
+    6.0791070234128055,
+    12.327514884723048,
+    6.629146396535616,
+    2.102855917066295,
+    10.017142290640153,
+    49.786421273750314,
+    17.938197698594752,
+    6.552932885565606,
+    2.1584556402229422,
+    10.125559098060936
+  ],
+  "nativeBodyBounds": {
+    "minX": 0,
+    "maxX": 16,
+    "minZ": -90,
+    "maxZ": -20,
+    "lengthM": 70
+  },
+  "sourceRoofNearPlaneBoundsWorld": [
+    [
+      -7.408931031665854,
+      18.554999939199263,
+      -89.39034749076646
+    ],
+    [
+      15.756612818963593,
+      19.610999332984704,
+      -20.94450300817087
+    ]
+  ],
+  "sourceFormulaIndependentMaxErrorM": 1.4210854715202004e-14,
+  "rooftopTopSurfaceCandidates": [
+    {
+      "id": "north",
+      "sourceTriangleCount": 46,
+      "minWorld": [
+        1.473133008757395,
+        19.672999492879683,
+        -81.17969925817874
+      ],
+      "maxWorld": [
+        6.524479841302615,
+        22.215999714132124,
+        -77.14745640708983
+      ],
+      "estimatedRiseOverSourceRoofM": 3.384405056910719,
+      "confidence": "photogrammetry top-surface envelope, not as-built dimensions"
+    },
+    {
+      "id": "south",
+      "sourceTriangleCount": 28,
+      "minWorld": [
+        9.084679851596913,
+        19.610999332984704,
+        -30.366231556730057
+      ],
+      "maxWorld": [
+        14.485925731186185,
+        21.257999084289338,
+        -24.411392862791946
+      ],
+      "estimatedRiseOverSourceRoofM": 2.4514390076279042,
+      "confidence": "photogrammetry top-surface envelope, not as-built dimensions"
+    }
+  ],
+  "notes": [
+    "All source XY uses cos(latitude) once; Bpv height is unscaled.",
+    "OSM/native/IPR all have roughly70m main length; the source wide glazing grouping difference cannot be explained by a1.56x horizontal scale discrepancy.",
+    "Visible glazing groups do not establish room inventory. Lower rows are partly occluded by trees; threshold candidate counts are not adopted as a facade plan."
+  ]
+}

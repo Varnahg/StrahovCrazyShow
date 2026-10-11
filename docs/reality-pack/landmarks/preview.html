@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>Strahov · blok 1, vstupy a tribuny</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: #24312d;
+      color: #f0eee4;
+      font: 14px system-ui;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    aside {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      max-width: 370px;
+      padding: 18px;
+      border: 1px solid #ffffff30;
+      border-radius: 12px;
+      background: #162321e8;
+      box-shadow: 0 10px 40px #0004;
+    }
+    h1 {
+      font-size: 17px;
+      margin: 0 0 10px;
+    }
+    p {
+      line-height: 1.5;
+      margin: 8px 0;
+      color: #ccd5cb;
+    }
+    select {
+      width: 100%;
+      padding: 9px;
+      background: #33483d;
+      color: white;
+      border: 1px solid #8b9a7d;
+      border-radius: 6px;
+    }
+    a {
+      color: #d7c58e;
+    }
+    output {
+      font: 12px ui-monospace;
+      white-space: pre-line;
+      display: block;
+      margin-top: 12px;
+      color: #c5cdbf;
+    }
+  </style>
+  <canvas
+    id="preview"
+    aria-label="Prostorový náhled bloku 1 a strahovského stadionu"
+  ></canvas>
+  <aside>
+    <h1>Blok 1 · vstupy · stadion</h1>
+    <p>
+      Půdorysy OSM, terén ČÚZK DMR 5G. Architektura podle identifikovaných
+      fotografií; rozměry detailů jsou interpretované.
+    </p>
+    <label for="view">Pohled</label
+    ><select id="view">
+      <option value="b1">Blok 1 od Chaloupeckého</option>
+      <option value="entry">Typický vchod do B2</option>
+      <option value="stadium-east">Východní tribuna od kolejí</option>
+      <option value="stadium-south">Jižní tribuna od zastávky 191</option>
+      <option value="stadium-aerial">Celý otevřený stadion</option>
+    </select>
+    <p>
+      <a
+        id="reference"
+        href="https://www.elsa.cvut.cz/bezbarierove-cvut/pristupnost-objektu/objekt/?o=81"
+        target="_blank"
+        >Otevřít identifikovanou předlohu ↗</a
+      >
+    </p>
+    <output id="metrics"></output>
+    <p>
+      Táhnutí: otočit. Kolečko: přiblížit. Tento náhled není měření výkonu hry.
+    </p>
+  </aside>
+  <script type="module" src="./preview.ts"></script>
+</html>

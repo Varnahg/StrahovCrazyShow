@@ -1,0 +1,177 @@
+.emote-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: #061b1640;
+  display: grid;
+  place-items: center;
+}
+.emote-menu {
+  width: min(500px, 94vw);
+  padding: 22px;
+  background: linear-gradient(140deg, #243f35, #102a23);
+  color: #f5eed9;
+  border: 1px solid #b69a62;
+  border-radius: 20px;
+  box-shadow: 0 20px 80px #0008;
+}
+.emote-menu header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.emote-menu header strong,
+.emote-menu header small {
+  display: block;
+}
+.emote-menu header strong {
+  font-size: 24px;
+}
+.emote-menu header small {
+  color: #d5bb83;
+  margin-bottom: 4px;
+}
+.emote-menu header button {
+  background: transparent;
+  border-color: #ad996d88;
+  color: #fff;
+  font-size: 22px;
+  padding: 3px 12px;
+}
+.emote-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+}
+.emote-options button {
+  position: relative;
+  padding: 20px 4px 12px;
+  background: #f7efd90b;
+  color: #f5eed9;
+  border-color: #b69a6277;
+}
+.emote-options button:hover,
+.emote-options button:focus-visible {
+  background: #7b74443d;
+  outline: 2px solid #e7c578;
+  outline-offset: 2px;
+}
+.emote-options kbd {
+  position: absolute;
+  top: 6px;
+  left: 7px;
+  color: #d7bc83;
+}
+.emote-options span {
+  display: block;
+  font-size: 36px;
+  margin: 8px;
+}
+.emote-options strong {
+  font-size: 11px;
+}
+.emote-menu p {
+  font-size: 12px;
+  color: #d7d1b9;
+  margin: 18px 0 0;
+}
+.target-card {
+  position: fixed;
+  left: 24px;
+  top: 170px;
+  z-index: 22;
+  width: 270px;
+  background: linear-gradient(140deg, #193c32ef, #0d251fef);
+  color: #f6efd9;
+  border: 1px solid #c2a264a8;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 7px 24px #001b1745;
+}
+.target-card > header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.target-card .target-portrait {
+  width: 38px;
+  height: 38px;
+  border: 2px solid #c7ad71;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #fff;
+}
+.target-card h3 {
+  font-size: 16px;
+  margin: 0;
+}
+.target-card header small {
+  display: block;
+  color: #cfbf96;
+  font-size: 11px;
+  margin-top: 4px;
+}
+.target-card header button {
+  margin-left: auto;
+  background: transparent;
+  color: #ded3b5;
+  border: 0;
+  padding: 3px 6px;
+}
+.target-card p {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 10px 0;
+  color: #e4dcc6;
+}
+.target-card .target-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.target-card .target-actions button {
+  padding: 6px 9px;
+  font-size: 11px;
+  border-color: #c5ad7466;
+  background: #f0e8c913;
+  color: #f5eacc;
+}
+.target-card .target-actions button:hover {
+  background: #c5ad7433;
+}
+.target-card .target-actions button:focus-visible {
+  outline: 2px solid #eac570;
+  outline-offset: 2px;
+}
+.world-controls-button {
+  pointer-events: auto;
+  background: #14382ce6;
+  color: #eadcb5;
+  border-color: #ad996d88;
+  font-size: 11px;
+  padding: 5px 8px;
+}
+@media (max-width: 700px) {
+  .target-card {
+    left: 10px;
+    top: 140px;
+    width: 230px;
+  }
+  .emote-menu {
+    padding: 15px;
+  }
+  .emote-options {
+    gap: 5px;
+  }
+  .emote-options span {
+    font-size: 29px;
+  }
+}
+.controls.world-keybar {
+  font-size: 10px;
+  gap: 5px;
+  max-width: min(340px, calc(50vw - 270px));
+}

@@ -1,0 +1,24 @@
+{
+  "status": "failed",
+  "sourceSnapshotId": "ceddd77a5b4e5324d30945a4586b6055e0472c922d59c9ab52541db679f40b15",
+  "files": 8060,
+  "tests": {
+    "total": 372,
+    "passed": 370,
+    "failed": 2
+  },
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 1,
+      "elapsedSeconds": 110.3776076,
+      "log": "pipeline-test.log"
+    }
+  ],
+  "failures": [
+    "skinned-avatar.test.ts: planted ankle assertion after heel/toe locomotion change",
+    "transit-navigation-source.test.ts: baked passenger navigation source hash stale after shared streets change"
+  ],
+  "build": "not run after failed tests",
+  "integration": "not run after failed tests"
+}

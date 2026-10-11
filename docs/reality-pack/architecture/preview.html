@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  /><title>Strahov – ověření fasád podle předloh</title
+  ><style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font: 15px system-ui;
+      background: #101c25;
+      color: #e1e6dd;
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      height: 100vh;
+    }
+    aside {
+      padding: 24px;
+      overflow: auto;
+      background: #1b2a32;
+    }
+    h1 {
+      font-size: 23px;
+      font-weight: 600;
+      line-height: 1.2;
+      margin: 0 0 20px;
+    }
+    p {
+      line-height: 1.5;
+      color: #b9c5c7;
+    }
+    button,
+    a {
+      display: block;
+      margin: 8px 0;
+      color: inherit;
+    }
+    button {
+      border: 1px solid #4c6469;
+      background: #273b44;
+      padding: 11px;
+      text-align: left;
+      border-radius: 5px;
+      width: 100%;
+      cursor: pointer;
+    }
+    button[aria-pressed="true"] {
+      border-color: #b6aa83;
+      background: #4b514b;
+    }
+    a {
+      color: #bdd7e5;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      display: block;
+    }
+    main {
+      min-width: 0;
+      position: relative;
+    }
+    #caption {
+      position: absolute;
+      bottom: 20px;
+      left: 24px;
+      right: 24px;
+      padding: 14px 18px;
+      background: #10202bd9;
+      border-left: 3px solid #c1b388;
+      max-width: 750px;
+    }
+    small {
+      color: #a9babd;
+    }
+    #metrics {
+      white-space: pre-wrap;
+      font-size: 11px;
+    }
+  </style>
+  <aside>
+    <h1>Strahov<br />fotografie → model</h1>
+    <p>
+      Skutečné obrysy OSM, vlastní modelovaná okna a materiály. Rozměry
+      fasádních prvků jsou interpretace snímků.
+    </p>
+    <div id="views"></div>
+    <button id="night" aria-pressed="false">
+      Noc · simulovaná rozsvícená okna</button
+    ><a id="reference" target="_blank" rel="noreferrer"
+      >Otevřít primární foto předlohu ↗</a
+    >
+    <p id="evidence"></p>
+    <small
+      >Žádná zdrojová fotografie není herní texturou. Počet rozsvícených oken je
+      simulace, nikoli údaj o obyvatelích.</small
+    >
+    <p id="metrics"></p>
+  </aside>
+  <main>
+    <canvas id="preview"></canvas>
+    <div id="caption"></div>
+  </main>
+  <script type="module" src="./preview.ts"></script>
+</html>

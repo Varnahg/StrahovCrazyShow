@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kontrola průchodu skutečnou herní scénou</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #14201e;
+        color: #f6f3e9;
+        font: 14px system-ui;
+      }
+      canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        outline: none;
+      }
+      .scene-labels {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .scene-label {
+        position: absolute;
+        background: #142e24b8;
+        padding: 4px 8px;
+        border-radius: 5px;
+        white-space: nowrap;
+      }
+      aside {
+        position: absolute;
+        left: 14px;
+        top: 14px;
+        width: 310px;
+        background: #10241ce8;
+        padding: 16px;
+        border-radius: 10px;
+      }
+      h1 {
+        font-size: 17px;
+        margin: 0 0 10px;
+      }
+      p {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      button,
+      select {
+        font: inherit;
+        padding: 6px;
+        margin: 3px 0;
+        max-width: 100%;
+      }
+      output {
+        display: block;
+        white-space: pre-wrap;
+        font: 11px monospace;
+        max-height: 40vh;
+        overflow: auto;
+      }
+      label {
+        display: block;
+      }
+      button:disabled {
+        opacity: 0.45;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="game"
+      aria-label="Skutečná hra · kontrola B6"
+      tabindex="0"
+    ></canvas>
+    <div class="scene-labels" data-label-layer></div>
+    <aside>
+      <h1>Průchod B6 · celá herní scéna</h1>
+      <p>
+        Používá Game, fyziku, renderer a assety hry. Připraví pouze počáteční
+        pozici venku; následné úseky prochází pomocí WASD bez skoku nebo
+        teleportu. Slouží k vizuální kontrole, ne k potvrzení FPS.
+      </p>
+      <label
+        >Kvalita
+        <select id="quality">
+          <option value="low">Úsporná</option>
+          <option value="medium" selected>Střední</option>
+          <option value="high">Vysoká</option>
+        </select></label
+      >
+      <label
+        >Osvětlení
+        <select id="light">
+          <option value="day">11. 10. 2026 · 12:00 Praha</option>
+          <option value="night">11. 10. 2026 · 02:00 Praha</option>
+        </select></label
+      >
+      <button id="start" disabled>Připravit počáteční pozici venku</button
+      ><br /><button id="next" disabled>Projít další úsek</button
+      ><button id="stop" disabled>Zastavit</button
+      ><output id="metrics" role="status">Načítání skutečné hry…</output>
+    </aside>
+    <script type="module" src="./world-walk.ts"></script>
+  </body>
+</html>

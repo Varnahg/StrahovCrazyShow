@@ -1,0 +1,79 @@
+{
+  "scope": "Read-only render audit of .cache/optimization-study-snapshot; source is changing concurrently outside this audit.",
+  "method": "Executed snapshot Game.prototype.buildWorld on Babylon.js 9.30.0 NullEngine. Replaced label() DynamicTexture canvas creation with an identically sized plane and separate StandardMaterial. This counts scene topology, not browser performance, visible geometry, GPU memory, or actual draw calls.",
+  "reproduce": "node --import tsx docs/optimization-study/evidence/render-inventory.mjs",
+  "sourceHashManifest": ".cache/optimization-study-snapshot/source-hashes.json",
+  "geometryInventory": {
+    "buildingsInWorldData": 40,
+    "pathsInMapData": 529,
+    "renderedRoadAndFootwaySegments": 1258,
+    "b6StructuralBoxes": 716,
+    "b6WindowBoxes": 144,
+    "otherWindowBoxes": 2809,
+    "groundBoxes": 6,
+    "labelPlanes": 23
+  },
+  "nullEngineWorldOnly": {
+    "excludes": ["cars", "avatars", "actual label textures"],
+    "includes": "All 24 cloud meshes, even though live weather disables some of them.",
+    "meshes": 109,
+    "subMeshes": 109,
+    "totalTriangles": 97718,
+    "solidMeshes": 57,
+    "materials": 48,
+    "multiMaterials": 18,
+    "lights": 8,
+    "largestMeshes": [
+      {"name": "window_merged", "triangles": 33708, "subMeshes": 1, "aabbExtentHalfSizeMeters": [217.25083458467387, 8.175, 105.93039124206175]},
+      {"name": "path_merged", "triangles": 13368, "subMeshes": 1, "aabbExtentHalfSizeMeters": [268.86826201596864, 0.0175, 200.7422412252945]},
+      {"name": "tree crown_merged", "triangles": 10752, "subMeshes": 1, "aabbExtentHalfSizeMeters": [234.72667803172243, 2.8639491911641777, 145.03713489472824]},
+      {"name": "B6 wall_merged", "triangles": 6708, "subMeshes": 1, "aabbExtentHalfSizeMeters": [11.675, 10.450000357627868, 35.175]}
+    ],
+    "allCloudTriangles": 24576,
+    "lightsAttachedToLargestMeshesInOrder": ["sky", "sun", "lamp at x=20", "lamp at x=65", "lamp at x=110", "lamp at x=155", "lamp at x=200", "lamp at x=245"]
+  },
+  "codeDerivedFacts": {
+    "standardMaterialDefaultMaxSimultaneousLights": 4,
+    "lightSources": "All 8 are enabled and associated with meshes; range does not select nearest lights. Materials bind only the first 4, so only the first 2 of the 6 point lamps contribute.",
+    "mergeMeshes": "Installed Babylon.js 9.30 consolidates contiguous submesh ranges of equal materials. The final multiMultiMaterials=true argument does NOT cause thousands of draw calls in this version.",
+    "drawCallsStatIssue": "client/game.ts:150 reads engine._drawCalls.current without constructing SceneInstrumentation. In installed Babylon.js the constructor of SceneInstrumentation registers onBeforeAnimations to call fetchNewFrame (sceneInstrumentation.js:439). Without instrumentation/reset the counter accumulates across frames. Use new SceneInstrumentation(scene) and its public drawCallsCounter.current after render in the benchmark.",
+    "avatarMeshesPerPlayer": {"base": 9, "withGlassesAndBeard": 12},
+    "hundredAvatarMeshCandidates": {"base": 900, "withGlassesAndBeard": 1200, "caveat": "Potential render submissions if all visible and enabled, before shadow passes; not observed draw calls."},
+    "labelTextureBaseRGBA8BytesTheoretical": 6029312,
+    "labelTextureCaveat": "23 * 512 * 128 * 4, excluding driver allocation overhead; not measured GPU memory.",
+    "qualityLowLinearResolutionFraction": 0.7692307692307692,
+    "qualityLowPixelFractionVersusHigh": 0.5917159763313609,
+    "qualityCaveat": "Low hardware scaling 1.3 versus high 1.0. Quality also changes fog but not clipping distance, geometric detail or lighting. Fog alone does not cull geometry."
+  },
+  "snapshotEvidence": [
+    {"path": "client/game.ts", "line": 19, "finding": "WebGL Engine, antialias on, hardware scaling 1.3, no device-ratio adaptation"},
+    {"path": "client/game.ts", "line": 30, "finding": "Unbounded per-session color-to-material cache"},
+    {"path": "client/game.ts", "line": 33, "finding": "One 512x128 DynamicTexture and StandardMaterial per label, no mipmaps"},
+    {"path": "client/game.ts", "line": 80, "finding": "Six point lamps, range16, all enabled"},
+    {"path": "client/game.ts", "line": 83, "finding": "World-wide batching by material, frozen world matrices"},
+    {"path": "client/game.ts", "line": 88, "finding": "Avatar construction with 9-12 separate meshes"},
+    {"path": "client/game.ts", "line": 107, "finding": "Quality changes only hardware scaling and fog"},
+    {"path": "client/game.ts", "line": 129, "finding": "Fixed simulation at 30Hz"},
+    {"path": "client/game.ts", "line": 132, "finding": "Local render transform copies newest simulation pose without interpolation"},
+    {"path": "client/game.ts", "line": 137, "finding": "Camera ray picks visual solid geometry every rendered frame"},
+    {"path": "client/game.ts", "line": 140, "finding": "Solar calculation and light/color updates every frame"},
+    {"path": "client/game.ts", "line": 144, "finding": "Stored frame samples are clamped at100ms and maintained with Array.shift"},
+    {"path": "client/game.ts", "line": 145, "finding": "HUD labels projected only every200ms"},
+    {"path": "client/ui.tsx", "line": 17, "finding": "Static 529-path SVG map reconstructed on App render"},
+    {"path": "client/ui.tsx", "line": 42, "finding": "5Hz game stats write into top-level App React state"}
+  ],
+  "proposedCrowdBudgetsNotMeasured": {
+    "target": "60FPS on a declared ordinary-laptop reference configuration; support100 connected players and separately test100 visible crowded players",
+    "wholeSceneDrawCallsInitialTarget": 150,
+    "worldDrawCallsInitialTarget": 80,
+    "crowdDrawCallsInitialTarget": 60,
+    "crowdTriangleInitialTarget": 100000,
+    "nearCharacters": {"count": 12, "trianglesEach": 4000, "drawCallsEachMax": 2, "poseHz": 60},
+    "middleCharacters": {"count": 28, "trianglesEach": 1000, "drawCallsEachMax": 1, "poseHz": 20},
+    "lowPriorityCharacters": {"count": 60, "trianglesEach": 100, "drawCallsForGroupMax": 8, "poseHz": 10},
+    "crowdedCase": "Importance-based representation budget with screen-size, interaction and distance priorities, hysteresis, shared palettes and batched low-detail animation; distance LOD alone cannot guarantee this budget for100 players in one courtyard.",
+    "dispersedCase": "Spatial interest management and frustum/room visibility limit rendered characters; server population is not equal to visible player count.",
+    "motionRule": "Render/interpolate root positions every frame even when animation pose evaluation is reduced.",
+    "caveat": "Design budgets for prototyping, not measured capability or promised FPS. Hardware, viewport, thermals, transparency, shadows, browser and network conditions must be specified."
+  }
+}

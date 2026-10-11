@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "assetId": "campus-hatchback",
+  "license": "CC0",
+  "source": "https://www.innerscene.com/tools/library/3d-parts/blue-five-door-compact-hatchback-5b95b2a0",
+  "sourceSha256": "107410e01453abbce452fabbe6d51436fb98a0920672643a893263a8861873d7",
+  "sourceFile": "assets/blender/vehicles/innerscene-hatchback/original-source.glb",
+  "editableMaster": "assets/blender/vehicles/innerscene-hatchback/campus-hatchback-master.blend",
+  "classification": "generic-normalized-game-car-not-a-surveyed-Strahov-vehicle",
+  "units": "metres",
+  "dimensions": {
+    "width": 2.04,
+    "height": 1.56,
+    "length": 3.56
+  },
+  "wheelRadius": 0.34,
+  "wheelCentres": [
+    [
+      -0.85,
+      0.36,
+      1.05
+    ],
+    [
+      0.85,
+      0.36,
+      1.05
+    ],
+    [
+      -0.85,
+      0.36,
+      -1.05
+    ],
+    [
+      0.85,
+      0.36,
+      -1.05
+    ]
+  ],
+  "groundOriginOffset": -0.0112,
+  "paintMaterial": "Campus enamel",
+  "glassMaterial": "Window glass",
+  "lights": {
+    "frontLensMaterial": "Front headlamp lens",
+    "rearLensMaterial": "Rear position lamp lens",
+    "brakeLensMaterial": "Rear brake strip lens",
+    "frontCentres": [
+      [
+        0.6247225653740667,
+        0.8306756065871421,
+        1.7577694577489382
+      ],
+      [
+        -0.6247225653740667,
+        0.8306756065871421,
+        1.7577452644586358
+      ]
+    ],
+    "rearCentres": [
+      [
+        0.6686483881165903,
+        0.7450165526423803,
+        -1.7025285631223872
+      ],
+      [
+        -0.6686483881165903,
+        0.7450165526423803,
+        -1.7025299203012767
+      ]
+    ],
+    "provenance": "centres derived from actual CC0 source lens meshes through the documented normalization; not surveyed lamp photometry",
+    "brightnessProvenance": "simulated artistic emissive intensity, not measured lumens or candela"
+  },
+  "lods": [
+    {
+      "level": "near",
+      "url": "/models/vehicles/campus-hatchback-near.glb",
+      "bytes": 5351716,
+      "sha256": "2805ecfd4dd14ad3ea0511efce8c78d9dd8fc07c9d55dc28bf02e61831afa665",
+      "triangles": 138750,
+      "parts": 26
+    },
+    {
+      "level": "medium",
+      "url": "/models/vehicles/campus-hatchback-medium.glb",
+      "bytes": 2063852,
+      "sha256": "0bef8a689cf02ed048c5db28cfd050154144aab386e1e5b67a583de8ec95b82c",
+      "triangles": 42732,
+      "parts": 26
+    },
+    {
+      "level": "far",
+      "url": "/models/vehicles/campus-hatchback-far.glb",
+      "bytes": 479460,
+      "sha256": "98254bb33689919998a83fd28aae77a6aa31da5826afda368f9f4c4e7f2ead58",
+      "triangles": 9202,
+      "parts": 26
+    }
+  ],
+  "lodDistances": {
+    "low": [
+      10,
+      36
+    ],
+    "medium": [
+      16,
+      55
+    ],
+    "high": [
+      24,
+      75
+    ]
+  },
+  "limitations": [
+    "A small near inner black sidewall triangle folds across piecewise normalization knots; correction remains pending a conforming source/visual study.",
+    "Medium/far wheel shells are closed after weld-before-decimate; frozen J far body retains separate open-material/arch coverage limits and is not claimed watertight.",
+    "Far wheel LOD retains four whole radial-extremum tread blocks and omits other entire tiny tread blocks; near master remains unchanged.",
+    "Small panel gaps can alias at subpixel size; reviewed close-up continuous geometry is retained.",
+    "Generic CC0 design and simulated paint/parking occupancy; not a claim about specific real cars.",
+    "Alpha dielectric glazing approximates the source transmission without a refraction render target."
+  ]
+}

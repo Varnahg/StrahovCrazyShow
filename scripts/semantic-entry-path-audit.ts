@@ -1,0 +1,18 @@
+import {writeFile,mkdir} from "node:fs/promises";
+import {createHash} from "node:crypto";
+import raw from "../shared/data/photogrammetry.json";
+import {STREET_FEATURES,nearestStreet,streetSurfaceAt} from "../shared/streets";
+const out="docs/reality-pack/facade-study",x=-4.85,z=-83;
+const bbox=[raw.mercatorOrigin.x+(x-32)/raw.metresPerMercatorUnit,raw.mercatorOrigin.y-(z+24)/raw.metresPerMercatorUnit,raw.mercatorOrigin.x+(x+32)/raw.metresPerMercatorUnit,raw.mercatorOrigin.y-(z-24)/raw.metresPerMercatorUnit];
+const service="https://gs-pub.praha.eu/imgs/rest/services/ort/letecke_snimkovani/ImageServer/exportImage";
+const url=service+"?"+new URLSearchParams({bbox:bbox.join(","),bboxSR:"3857",imageSR:"3857",size:"640,480",format:"jpg",interpolation:"RSP_NearestNeighbor",f:"json"});
+await mkdir(out,{recursive:true});
+const response=await fetch(url);if(!response.ok)throw Error(String(response.status));
+const metadata=await response.json() as {href:string};
+const image=await fetch(metadata.href);if(!image.ok)throw Error(String(image.status));
+const bytes=new Uint8Array(await image.arrayBuffer());await writeFile(out+"/b6-entry-ortho-2024.jpg",bytes);
+const candidates=STREET_FEATURES.filter(feature=>feature.points.some(([fx,fz])=>Math.hypot(fx-x,fz-z)<25)).map(feature=>({id:feature.id,kind:feature.kind,points:feature.points,width:feature.width,widthProvenance:feature.widthProvenance,material:feature.material,source:feature.source}));
+const samples=Array.from({length:17},(_,i)=>({x,z:-90+i,material:streetSurfaceAt(x,-90+i),nearest:nearestStreet(x,-90+i)}));
+const report={recordedAt:new Date().toISOString(),provider:"IPR Praha",captureDate:"2024-06-08",attribution:"datový podklad © IPR Praha",url,sha256:createHash("sha256").update(bytes).digest("hex"),worldExtent:{minX:x-32,maxX:x+32,minZ:z-24,maxZ:z+24},resolution:[640,480],metresPerPixel:.1,coordinateMeaning:"gameX east,gameZ south; image top=north",entryNative:{x:-4.85,firstRiserZ:-81.4,northDoorZ:-77.15},samples,candidates,scope:"Read-only photographic/path audit; no invented paving polygon added to the game"};
+await writeFile(out+"/b6-entry-path-audit.json",JSON.stringify(report,null,2)+"\n");
+console.log(JSON.stringify({samples:samples.map(s=>({z:s.z,material:s.material,nearest:s.nearest?{id:s.nearest.feature.id,distance:s.nearest.distance,x:s.nearest.x,z:s.nearest.z}:null})),candidates:candidates.map(c=>({id:c.id,kind:c.kind,points:c.points}))}));

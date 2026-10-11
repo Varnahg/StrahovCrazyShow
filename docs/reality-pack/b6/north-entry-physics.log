@@ -1,0 +1,22 @@
+Captured 2026-10-10 from the shared source workspace, not a production GPU run.
+Command: pnpm exec tsx --test --test-name-pattern "every catalogued B6 room|B6 exterior north" tests/physics.test.ts
+Exit code: 0
+
+✔ B6 exterior north twelve-step entry and first-floor route are continuously walkable without teleporting (1914.0805ms)
+✔ every catalogued B6 room has a supported doorway approach and passage into that actual room (17799.131ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20284.2285
+
+Command: pnpm exec tsc --noEmit
+Exit code: 0
+Output: none
+
+The earlier compile attempt found a literal inferred type on the optional
+b6EntranceHeight foundation parameter. It was annotated number, then rerun.
+The runtime helper arithmetic did not change in that repair.

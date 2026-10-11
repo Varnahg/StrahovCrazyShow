@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-10-11",
+  "scope": "Component WebGL preview, not complete-game performance benchmark",
+  "geometrySha256": "b33d22608182ba9e73c97ccc816dde5ad2c85b3d0c5473919626b7fdda6a5358",
+  "sourceTrees": 110,
+  "runtimeTrees": 109,
+  "checks": {
+    "actualPBRShaderCompiled": true,
+    "broadleafAlphaSilhouette": true,
+    "coniferSeparateNeedleAtlasAlphaSilhouette": true,
+    "rootEqualsNativeGround": true,
+    "colorUsesHardwareSRGB": true,
+    "normalMapsLinear": true,
+    "independentCameraOrbitUsed": true,
+    "gpuFpsMeasured": false,
+    "farLodWindScreenshotVerified": false
+  },
+  "evidence": [
+    "realistic-pack-broadleaf-browser.png",
+    "realistic-pack-broadleaf-browser.json",
+    "realistic-pack-conifer-browser.png",
+    "realistic-pack-conifer-browser.json",
+    "realistic-pack-browser-logs.json"
+  ],
+  "notes": [
+    "One warning in accumulated logs predates the corrected preview terrain rectangle; current tree shader had no console errors.",
+    "The final GLB re-export removes orphaned .001 mesh names; the deterministic conifer shape and materials shown in evidence are unchanged.",
+    "A late public-asset HMR reload interrupted the far/wind screenshot; stale files were removed rather than treated as evidence.",
+    "Bare tree was visually reviewed, then its interpreted trunk radius was corrected to 0.38 m. No current bare-tree screenshot is claimed.",
+    "All owned browser QA tabs closed; no own preview server or Blender process remains."
+  ]
+}

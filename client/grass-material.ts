@@ -1,0 +1,111 @@
+import "./render-shaders";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { MaterialPluginBase } from "@babylonjs/core/Materials/materialPluginBase";
+import { ShaderLanguage } from "@babylonjs/core/Materials/shaderLanguage";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import type { Scene } from "@babylonjs/core/scene";
+import type { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
+
+export type GrassWindState = {
+  time: number;
+  windX: number;
+  windZ: number;
+  playerX: number;
+  playerY: number;
+  playerZ: number;
+  range: number;
+};
+
+/** Thin-instanced grass uses the same PBR lights, fog and cast shadows as the
+ * ground. The plugin adds only wind/colour/fade; it emits no independent light.
+ */
+export class GrassWindPlugin extends MaterialPluginBase {
+  constructor(
+    material: PBRMaterial,
+    private state: GrassWindState,
+  ) {
+    super(material, "StrahovPbrGrassWind", 220, {}, true, true);
+    this.doNotSerialize = true;
+  }
+  override isCompatible(language: ShaderLanguage) {
+    return language === ShaderLanguage.GLSL;
+  }
+  override getUniforms() {
+    return {
+      ubo: [
+        { name: "grassWind", size: 3, type: "vec3" },
+        { name: "grassViewer", size: 4, type: "vec4" },
+      ],
+      vertex: "uniform vec3 grassWind; uniform vec4 grassViewer;",
+      fragment: "uniform vec4 grassViewer;",
+    };
+  }
+  override bindForSubMesh(buffer: UniformBuffer) {
+    buffer.updateFloat3(
+      "grassWind",
+      this.state.time,
+      this.state.windX,
+      this.state.windZ,
+    );
+    buffer.updateFloat4(
+      "grassViewer",
+      this.state.playerX,
+      this.state.playerY,
+      this.state.playerZ,
+      this.state.range,
+    );
+  }
+  override getCustomCode(
+    type: string,
+    language = ShaderLanguage.GLSL,
+  ): Record<string, string> | null {
+    if (language !== ShaderLanguage.GLSL) return null;
+    if (type === "vertex")
+      return {
+        CUSTOM_VERTEX_DEFINITIONS: "varying vec3 vCampusGrass;",
+        // Apply displacement in world space AFTER the per-clump yaw/ground tilt;
+        // otherwise every rotated blade would bend in a different wind direction.
+        CUSTOM_VERTEX_UPDATE_WORLDPOS: `
+        float grassGust = sin(grassWind.x * 0.85 + worldPos.x * 0.07 + worldPos.z * 0.11) * 0.55
+          + sin(grassWind.x * 1.9 + worldPos.x * 0.21) * 0.22;
+        worldPos.xz += grassWind.yz * grassGust * positionUpdated.y * positionUpdated.y * 0.004;
+        vPositionW = worldPos.xyz;
+        vCampusGrass = vec3(fract(sin(dot(finalWorld[3].xz,vec2(12.9898,78.233))) * 43758.5453),
+          clamp(positionUpdated.y,0.0,1.0), distance(worldPos.xyz,grassViewer.xyz));
+      `,
+      };
+    if (type === "fragment")
+      return {
+        CUSTOM_FRAGMENT_DEFINITIONS: "varying vec3 vCampusGrass;",
+        CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
+        float grassFade = 1.0 - smoothstep(grassViewer.w * 0.72, grassViewer.w, vCampusGrass.z);
+        if(vCampusGrass.x > grassFade) discard;
+        surfaceAlbedo *= mix(0.68,1.22,vCampusGrass.y) * (0.83 + vCampusGrass.x * 0.25);
+      `,
+      };
+    return null;
+  }
+}
+
+export function createGrassMaterial(scene: Scene, state: GrassWindState) {
+  const material = new PBRMaterial(
+    "grass · physical sky and street lighting",
+    scene,
+  );
+  material.albedoColor = Color3.FromHexString("#5e7043").toLinearSpace();
+  material.metallic = 0;
+  material.roughness = 0.97;
+  material.specularIntensity = 0.12;
+  material.backFaceCulling = false;
+  material.twoSidedLighting = true;
+  material.transparencyMode = PBRMaterial.PBRMATERIAL_OPAQUE;
+  material.emissiveColor.setAll(0);
+  material.metadata = {
+    vegetation: "grass",
+    physicallyBased: true,
+    windDeformed: true,
+    source: "project-authored blade geometry and bounded colour variation",
+  };
+  new GrassWindPlugin(material, state);
+  return material;
+}

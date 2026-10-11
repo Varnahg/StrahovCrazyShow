@@ -1,0 +1,160 @@
+{
+  "recordedAtUtc": "2026-10-11T04:42:53.8517771Z",
+  "scope": "north-B6 court terrain, separate tennis surface and source-informed paved entry",
+  "classification": "interpreted-local-reconstruction-not-survey",
+  "sourceFiles": [
+    {
+      "path": "shared/terrain.ts",
+      "sha256": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f"
+    },
+    {
+      "path": "shared/terrain-patches.ts",
+      "sha256": "71bece3e3bb764b690cc59b77573fa8f60e38afae3f2e9d03cb0213b1b8b0c25"
+    },
+    {
+      "path": "shared/data/north-court-terrain-patch.json",
+      "sha256": "8ab204a289b1eabc45359c56fca050170f1729f7832da15345ed4c2f7b35c292"
+    },
+    {
+      "path": "shared/streets.ts",
+      "sha256": "7e2f86ba7ae9b72ab14bd14a5c2fa48ff42fcaeded152b7c06dfdc05d2bfc520"
+    },
+    {
+      "path": "shared/data/b6-entry-paving.json",
+      "sha256": "6d37d1172e331b5b6a41924656b1b86ace49f83822df5887671d043b72b39bf3"
+    },
+    {
+      "path": "shared/campus-exterior.ts",
+      "sha256": "c781bc8aeb6b4492d62e0cba686511afdf0eb7725b8685ae275c1425b3790847"
+    },
+    {
+      "path": "shared/data/north-court-style.json",
+      "sha256": "584dffa3dfaef557e39451bbd0603465164595e9f508dec673bdb3d84fbe2872"
+    },
+    {
+      "path": "client/terrain-renderer.ts",
+      "sha256": "f8ae93d5777cec077710e0933c0bf94efcd545f9904f92ce1b4b138111768fb1"
+    },
+    {
+      "path": "client/campus-exterior.ts",
+      "sha256": "449ad689cc3279736749184e1a1c00a944a8475029d1b50cb6cfd3c26a18ef4e"
+    },
+    {
+      "path": "tests/terrain-patch.test.ts",
+      "sha256": "328db0b1568459fc92dbe50a8fdd39af287fbe53ec84e4e4666a0dd5ac43cb38"
+    },
+    {
+      "path": "tests/campus-exterior.test.ts",
+      "sha256": "a38a1e6edb5d7b9c3451900fd50eba8228fac452786890f955fe69f1f6be9b49"
+    },
+    {
+      "path": "tests/streets.test.ts",
+      "sha256": "72a742259db95df4c9a97d82e9ffd9110ab6da03a627f4144557fa37c9132511"
+    },
+    {
+      "path": "scripts/semantic-court-ground-study.py",
+      "sha256": "75634b93d31e27a5bfe9cc67ca29065f4fb76bffd16d357f5c187546507aa869"
+    },
+    {
+      "path": "scripts/create-north-court-terrain-patch.py",
+      "sha256": "fb24a8c0af7cfd29fd1fa857eaf8d7db8e85a685f3b1548c25c144fa73e74491"
+    },
+    {
+      "path": "scripts/create-b6-entry-paving.py",
+      "sha256": "11919ffccbcf61f15b2222cdd289b8c7ef13de91595189c32443343166934124"
+    },
+    {
+      "path": "scripts/create-north-court-style.py",
+      "sha256": "1117a673053f557e1054a4fe5a9478a655beebe2df25b8021947a0647c840c03"
+    },
+    {
+      "path": "scripts/export-north-court.ts",
+      "sha256": "d2665bdab06772fa03c49740ae12a2558bb2a69886cd41a9ba3e1a4e20f2310f"
+    },
+    {
+      "path": "scripts/create-north-court-model.py",
+      "sha256": "43efbc971dd4e450cdd530124163d870204a090b70f58a09d3444b9443fbeaf6"
+    },
+    {
+      "path": "scripts/audit-north-court-roof-sync.ts",
+      "sha256": "1cc008f8b034453e70673c2ab4025393fd5aff7c49909ce531672a71665cab61"
+    }
+  ],
+  "tests": {
+    "command": "pnpm exec tsx --test tests/terrain-patch.test.ts tests/terrain.test.ts tests/campus-exterior.test.ts tests/streets.test.ts tests/surface-transitions.test.ts",
+    "passed": 28,
+    "failed": 0,
+    "durationMs": 12213.7112,
+    "typecheck": "pnpm exec tsc --noEmit PASS"
+  },
+  "terrain": {
+    "vertices": 422,
+    "triangles": 796,
+    "sourceCells": 130,
+    "apronMetres": 3,
+    "sourceRedIPRTriangles": 156,
+    "rawTerrainSha256": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+    "allBuildingFoundationChanges": 0,
+    "samplerColliderToleranceMetres": 5E-05,
+    "drapeBarycentreToleranceMetres": 1E-06,
+    "actualWholeSimulationCourtAndEntryWalk": "PASS; no jump or teleport",
+    "restingToleranceMetres": 0.003
+  },
+  "paving": {
+    "areaSquareMetres": 12.471629602144699,
+    "mappedAnchorWay": "25920440",
+    "positionUncertaintyMetres": 2,
+    "oldRawStreetsUnchanged": true,
+    "optionalGrassMarginApi": "isStreetSurface(x,z,margin=0)"
+  },
+  "model": {
+    "sourceId": "293949920",
+    "sourcePlanSha256": "dca3cba41f0716043a7b7f0be6a8631721378e3aa20d284b7b3386b7bb2c724b",
+    "blendSha256": "979d1dfab866ce63be1cc8331234e5b7a556fbc528db8f392a9ded7a6b614e00",
+    "glbSha256": "e08387f8b4cf314a13c616c80706a7ee466c8ab677ca03579424d7ccce9a60ba",
+    "triangles": 1019,
+    "serializedGLBTriangles": 1019,
+    "serializedDegenerateTriangles": 0,
+    "parts": 3,
+    "exactDuplicatedOpaqueTriangles": 0,
+    "reopenedBlendVertexParity": true,
+    "photosEmbedded": false,
+    "sourceOrigin": {
+      "x": 1.8199999999999994,
+      "y": 0,
+      "z": -127.9025
+    },
+    "dimensionsMeasured": false,
+    "attribution": "© OpenStreetMap contributors · ODbL; datový podklad © IPR Praha · CC BY; © ČÚZK, upraveno · CC BY4.0"
+  },
+  "marketRoof": {
+    "recordedAt": "2026-10-11T04:17:28.292Z",
+    "sourceId": "7645350",
+    "archiveSourcePlanSha256": "d925b3c8f333089c20b3aa957813913aac6ad9893c299f0333a2108b407d5781",
+    "sourcePlanBytesUnchanged": true,
+    "matchesFreshRuntimeGeometry": true,
+    "parts": [
+      {
+        "name": "campus-exterior market-roof roof both",
+        "triangles": 11,
+        "maxPositionError": 1.1102230246251565E-16,
+        "maxNormalError": 0,
+        "sameIndices": true
+      },
+      {
+        "name": "campus-exterior market-roof roofSeam both",
+        "triangles": 52,
+        "maxPositionError": 2.220446049250313E-16,
+        "maxNormalError": 0,
+        "sameIndices": true
+      }
+    ],
+    "foundationArchiveRefreshRequired": false
+  },
+  "remainingLimitations": [
+    "Photo/map interpretation; no new topographic or material survey.",
+    "No guessed north-court net/fence/gate dimensions.",
+    "CPU render and Node tests do not measure actual production GPU FPS.",
+    "Root will perform final whole-game browser walk and source/nav hash regeneration."
+  ]
+}

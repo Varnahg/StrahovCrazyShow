@@ -1,0 +1,90 @@
+import assert from "node:assert/strict";
+import { readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Scene } from "@babylonjs/core/scene";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { applyArtLighting as original, type ArtLightingInput, type ArtLightingContext } from "../performance-snapshot/authored-models-20261011-g/client/art-lighting";
+import { applyArtLighting as candidate } from "./art-lighting.candidate";
+
+const hash = (file: string) => createHash("sha256").update(readFileSync(file)).digest("hex");
+const baselinePath = ".cache/performance-snapshot/authored-models-20261011-g/client/art-lighting.ts";
+const manifest = JSON.parse(readFileSync(".cache/performance-snapshot/authored-models-20261011-g/source-manifest.json", "utf8"));
+assert.equal(hash(baselinePath), manifest.files["client/art-lighting.ts"]);
+
+function setup(apply: typeof original) {
+  const engine = new NullEngine(), scene = new Scene(engine);
+  for (let i = 0; i < 2725; i++) new Mesh("count probe " + i, scene);
+  const sun = new DirectionalLight("sun", Vector3.Down(), scene);
+  const ambient = new HemisphericLight("ambient", Vector3.Up(), scene);
+  const unrelated = new PointLight("B6 inactive", Vector3.Zero(), scene);
+  unrelated.setEnabled(false);
+  const lights = Array.from({length: 36}, (_, i) => {
+    const light = new PointLight("mapped lamp " + i, new Vector3(i * 10, 4, 0), scene);
+    light.setEnabled(false);
+    return light;
+  });
+  const context: ArtLightingContext = {scene, sun, ambient, lights, clouds: [], lamps: new StandardMaterial("fixtures", scene), quality: "low"};
+  const input: ArtLightingInput = {dt: 1/60, player: {x: 0, y: 0, z: 0}, sun: {x: .2, y: .7, z: .6, altitude: .5, daylight: 1}, weather: {cloud: .4, rain: 0, wind: 0}, instant: 1791712800000};
+  apply(context, input);
+  assert.equal(scene.meshes.length, 2726);
+  let resyncs = 0, resyncMeshVisits = 0;
+  for (const light of lights) {
+    const baseline = light._resyncMeshes;
+    light._resyncMeshes = function() {
+      resyncs++;
+      resyncMeshVisits += scene.meshes.length;
+      return baseline.call(this);
+    };
+  }
+  return {context, input, lights, run(next = input) { apply(context, next); },
+    counts: () => ({resyncs, resyncMeshVisits}),
+    state: () => ({lamps: lights.map(light => ({enabled: light.isEnabled(false), effectiveEnabled: light.isEnabled(), intensity: light.intensity})), sunDirection: sun.direction.asArray(), sunIntensity: sun.intensity, ambientIntensity: ambient.intensity, clear: scene.clearColor.asArray(), fog: scene.fogColor.asArray(), fogDensity: scene.fogDensity, fixtureEmission: context.lamps.emissiveColor.asArray()}),
+    dispose() { scene.dispose(); engine.dispose(); }};
+}
+const before = setup(original), after = setup(candidate);
+try {
+  for (let i = 0; i < 10; i++) { before.run(); after.run(); }
+  const steady = {frames: 10, meshes: 2726, lamps: 36, original: before.counts(), candidate: after.counts()};
+  assert.equal(steady.original.resyncMeshVisits, 10 * 2726 * 36);
+  assert.equal(steady.candidate.resyncMeshVisits, 0);
+  assert.deepEqual(before.state(), after.state());
+  const scenarios = [
+    {name: "night high two closest", quality: "high", altitude: -.25, x: 0},
+    {name: "night high moved to other lamps", quality: "high", altitude: -.25, x: 160},
+    {name: "night low disables local lamps", quality: "low", altitude: -.25, x: 160},
+    {name: "day medium keeps all lamps disabled", quality: "medium", altitude: .5, x: 80},
+  ];
+  const states = [];
+  for (const scenario of scenarios) {
+    before.context.quality = after.context.quality = scenario.quality;
+    const input = {...before.input, dt: .1, player: {x: scenario.x, y: 0, z: 0}, sun: {...before.input.sun, altitude: scenario.altitude}};
+    for (let i = 0; i < 8; i++) { before.run(input); after.run(input); }
+    assert.deepEqual(before.state(), after.state(), scenario.name);
+    states.push({name: scenario.name, enabled: after.state().lamps.filter(light=>light.enabled).length});
+  }
+  // Under an inactive parent, desired own state and effective state differ.
+  // Guarding isEnabled(false) preserves the original request without rescans.
+  const beforeParent = new TransformNode("disabled parent", before.context.scene);
+  const afterParent = new TransformNode("disabled parent", after.context.scene);
+  beforeParent.setEnabled(false); afterParent.setEnabled(false);
+  before.lights[0].parent = beforeParent; after.lights[0].parent = afterParent;
+  before.context.quality = after.context.quality = "high";
+  const night = {...before.input, dt: .1, sun: {...before.input.sun, altitude: -.25}};
+  for (let i = 0; i < 8; i++) { before.run(night); after.run(night); }
+  assert.deepEqual(before.state(), after.state(), "inactive parent");
+  const parentCount = after.counts();
+  after.run(night);
+  assert.deepEqual(after.counts(), parentCount, "already enabled lamp under disabled parent must not resync");
+  beforeParent.setEnabled(true); afterParent.setEnabled(true);
+  assert.deepEqual(before.state(), after.state(), "parent activation");
+  const out = {date: new Date().toISOString(), scope: "Actual Babylon CPU calls with G applyArtLighting and candidate; 2726 registered empty Mesh, 36 real mapped-like PointLight. No GPU, frame-time or FPS claim.", snapshotId: manifest.snapshotId, sourceHashes: {original: hash(baselinePath), candidate: hash(".cache/patches/art-lighting.candidate.ts"), proof: hash(".cache/patches/art-lighting-proof.ts")}, steady, scenarios: states, checks: ["exact 98136 resync mesh visits per unchanged original frame", "zero candidate resyncs in unchanged frame", "same lamp states/intensities and sky/fog/sun/ambient colors", "unchanged day/night/quality/movement behavior", "own vs effective enable state under disabled parent", "parent reactivation restores original effective state"], passed: true};
+  writeFileSync(".cache/patches/art-lighting-proof.json", JSON.stringify(out,null,2)+"\n");
+  console.log(JSON.stringify(out,null,2));
+} finally { before.dispose(); after.dispose(); }

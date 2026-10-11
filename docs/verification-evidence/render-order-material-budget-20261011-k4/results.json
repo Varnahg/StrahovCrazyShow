@@ -1,0 +1,53 @@
+{
+  "status": "passed",
+  "sourceSnapshotId": "441bbcd3b3f861e01fbcde498cff75ba3f332671eb361078d62143b725b5a687",
+  "files": 8066,
+  "tests": {
+    "total": 352,
+    "passed": 352,
+    "failed": 0
+  },
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 56.1538877,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 34.2528575,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 17.8149398,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "sourceCheck": "source-check.json",
+  "delta": {
+    "baseSourceSnapshotId": "e91aa84ec7d77949b2db706091fa66c603777faa13daa8ed998ff0871b390c9b",
+    "changed": [
+      "client/art-lighting.ts",
+      "client/car-pack.ts"
+    ],
+    "added": [
+      "client/car-material-budget.ts",
+      "client/opaque-sort.ts",
+      "tests/car-material-budget.test.ts",
+      "tests/opaque-sort.test.ts"
+    ],
+    "removed": []
+  },
+  "gpu": {
+    "status": "measured-targets-not-achieved",
+    "summary": "../../performance/evidence/render-order-material-budget-20261011-k4/summary.json",
+    "validSamples": 7,
+    "excludedSamples": 1,
+    "nvidia": "pending"
+  },
+  "nvidia": "No public K4/30-player NVIDIA measurement; user-triggered diagnostics remain local."
+}

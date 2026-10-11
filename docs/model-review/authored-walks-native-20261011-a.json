@@ -1,0 +1,4698 @@
+{
+  "schemaVersion": 1,
+  "kind": "production-native-authored-KCC-walk-audit",
+  "label": "native-20261011-a",
+  "timestamp": "2026-10-10T22:29:37.793Z",
+  "photogrammetryLoaded": false,
+  "legacyStartUsed": false,
+  "spawn": {
+    "x": 110,
+    "z": 12,
+    "y": -2.143999934196472
+  },
+  "constructionSeconds": 1.1187588,
+  "totalSeconds": 86.07524059999999,
+  "sourceStableDuringAudit": true,
+  "sourceHashes": {
+    "shared/b6-interior.ts": "ac73fbfc1d721ebfca0d03483115ef96d372bae99ed84e75bceba56fba90276e",
+    "shared/b6-props.ts": "637bf89cae23fddd0adf4c7f371bc9d57c83ef1e4bfcaf1a21305d218a864809",
+    "shared/campus-exterior.ts": "7246489ef0fe6337c812eb3abe5e25e81c9e45b8b62a179413fadcc15967b455",
+    "shared/campus-routes.ts": "bedc1f583ba3219342bfe2492387734933a28e54a2ce180994d84b89c091b45c",
+    "shared/controls.ts": "744ddfb810a5d5dbd75e4998d1b58d15ec51ddae4c99c36ce5f7322f7861d823",
+    "shared/data/assets/b6-manifest.json": "a9ffd0fd0550a1e8649a2582e3c0b0e259ae662129180fe47f14f0bb74b30d72",
+    "shared/data/assets/environment-manifest.json": "c1e8ce89a4d42fde0fcf1996d475b535e859ad06b3fbba824b1fd7a3b0f62af7",
+    "shared/data/assets/surfaces-manifest.json": "c3cf978e1db6e20f21946a8cb3e0d5716dbc730f671b09151f27ad373013d474",
+    "shared/data/assets/transit-manifest.json": "3ca361a92c68ad989535a5d00cd7c4e9a11b4c37c2b7913f8eca23aba67cb8a5",
+    "shared/data/building-catalog.json": "ed435ec06401b5ea8ea604ca75af0a9fd3a2d7e8252ca65f018853c19a3a804b",
+    "shared/data/campus-coverage.json": "d6882c0d41f717b382ff4fe9a6b5a39e2aa7b0ca15defdcdab886b2314b6bff2",
+    "shared/data/facade-reality.json": "55f8878ccea2e0a175a2c163da84da194157c2ac9287b471940689975f1f9eb7",
+    "shared/data/gameplay-placement.json": "53ed8754ecfff552143abf182d1fa8445563a40e7208ce56fb8ad7a948706e27",
+    "shared/data/journal.json": "c622454965838edc6ec622c15b8bcbf06f16a188ba0cd3cf4f46dc69a599dfd1",
+    "shared/data/landcover.json": "92425a36cfdf4bac15415c31e947bbd0e09576f5a650f9589284ee55e5402e3b",
+    "shared/data/map.json": "cc41d5fc78ffbff275468cdd191e96c74e1c9dc09a74be7bc82a918184c7f64c",
+    "shared/data/photogrammetry-collision.json": "a0abcfb73c8db6b1cbd807a70215656e1ad7554040548cca856bf9b7073d190d",
+    "shared/data/photogrammetry-ground-repairs.json": "c0cf042ca71571784a66a5fc90ca45172cc5e629dbc8058cc6d396cefa388165",
+    "shared/data/photogrammetry.json": "d556d38d5c32d9d039479e492d7937e2c358df90cf94f7aee232f5e1ba330d93",
+    "shared/data/reality-ground.json": "9a144e2556c960677ce1d486477f0730ced54455662c1075ffc081fc90a6d878",
+    "shared/data/road-calibration.json": "b794e4f06f7dfa58e1ec3c34845f6b5b8a8551743231d4ad09da49c70b3e7b76",
+    "shared/data/stadium-stops.json": "d1c2e7734556439cf98a98f719665d993a03705d39518d69c328f562a4c94464",
+    "shared/data/streets.json": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14",
+    "shared/data/surveyed-trees.json": "1e3ad99f1640a14921ed7fc7c797c841fa2ca404e3c7c4cd4a39ffb64463ac75",
+    "shared/data/terrain-grid.json": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+    "shared/data/transit-navigation.json": "4ecb232781bb323f27c3e9db8ccc4ad7cbacfa281b9131b0b6e9305377402aa4",
+    "shared/data/transit.json": "66c4f8f5aebce2f5fb244e0fad54b514a32e41bdbc19415c75c488335d7867ce",
+    "shared/data/tree-reconstruction.json": "250e483ef04a962402ffe55b1eba895409ef06509951bde9f2113b6b6535a493",
+    "shared/environment.ts": "90c6a3722226110255fc1d57edc294696a8077c7cc364dda0b063c223d315f52",
+    "shared/events.ts": "a194685b74238aadd6d90ef3c179cf3e55cc0e2af5698828955b5fb6c8a98115",
+    "shared/journal.ts": "2f3e5992a8be368653b6a32b20fd3a27459507765c8edd72f16bd2c205936d79",
+    "shared/landmark-reality.ts": "f9473a38d5f14bb8f1972f501945559eacaefdcf74e39e13c3467664094e5145",
+    "shared/netcode.ts": "d363a000039e0c757b65108207a500ab15850921428d660ecc0470f98defca64",
+    "shared/photogrammetry-gameplay.ts": "9ce098866da1e59272d08590ca6e45123182a73946506bbcd03b6639cf7a2365",
+    "shared/photogrammetry-ground.ts": "94c3c4d69a2ae5c645033cf9e7e8f729f5a17dd2e052294e9aaa19ea47cbdf64",
+    "shared/photogrammetry-repairs.ts": "16ff0813cb5f0fe0bec05561f5483c07095b0658100c2b92a60a9d3ef55b1e91",
+    "shared/photogrammetry.ts": "1643ca85940021765e5b2ca2ad9b2b55b482b41267c2942521e226dc89b20054",
+    "shared/profile.ts": "c6bf137d2324c4ab360b9ab925037e37042a699fda9200ef6b82f8b7b04c2ddb",
+    "shared/render-quality.ts": "e9506573186c6d6e50af5e0db17458959ae61f808d1ad4158cdc03589ffbeada",
+    "shared/simulation.ts": "de8d00472e258796503176bfe7971d471d4a7c1068ebb53c5f14782e52650eb8",
+    "shared/streets.ts": "6a6d797c58f2aaff095a1a72554001f9b87bf8c41effbeebf61dd239c8690436",
+    "shared/terrain-entities.ts": "8460192bd81483def617d977775dd251817bc7f9bf0aa05ed65de66c95620bf1",
+    "shared/terrain.ts": "c7e54a6859b22e87ae0d8e71cf01f2d23577994e2eddc6c8bc56a9c445e878e8",
+    "shared/transit.ts": "d40d42e41fd70a7a8b0dfd028e2a0644613529d41b71f76313b594b8ffded9b2",
+    "shared/types.ts": "e3fb9f3ddc84bf714f627ddabdda0182a8e8aa2bc6795f983d398ed7f7df8f4d",
+    "shared/vegetation.ts": "a971613162dcea9068cc63f3c5284ca99cacf8a23eafa6dacce5245a467cd0cf",
+    "shared/vehicle.ts": "6b8ab0f1eeb8139a7301736c4fa6b3d7523217193dd2e125933ea4d8529213ce",
+    "shared/weather.ts": "832ecd30f6036bb6560dc5df104c8d216c18f47312b69abfa4fa255d8346bed0",
+    "shared/world-asset-identity.ts": "a6173d4759b8fa490f931b772c2d833926926cc1efd3bb838d85e30533643a20",
+    "shared/world.ts": "394fe4d61db507be8881af44a3dc417ed9c3674688cef3ba6cb9b9534a15a936"
+  },
+  "sourceHashesAfter": {
+    "shared/b6-interior.ts": "ac73fbfc1d721ebfca0d03483115ef96d372bae99ed84e75bceba56fba90276e",
+    "shared/b6-props.ts": "637bf89cae23fddd0adf4c7f371bc9d57c83ef1e4bfcaf1a21305d218a864809",
+    "shared/campus-exterior.ts": "7246489ef0fe6337c812eb3abe5e25e81c9e45b8b62a179413fadcc15967b455",
+    "shared/campus-routes.ts": "bedc1f583ba3219342bfe2492387734933a28e54a2ce180994d84b89c091b45c",
+    "shared/controls.ts": "744ddfb810a5d5dbd75e4998d1b58d15ec51ddae4c99c36ce5f7322f7861d823",
+    "shared/data/assets/b6-manifest.json": "a9ffd0fd0550a1e8649a2582e3c0b0e259ae662129180fe47f14f0bb74b30d72",
+    "shared/data/assets/environment-manifest.json": "c1e8ce89a4d42fde0fcf1996d475b535e859ad06b3fbba824b1fd7a3b0f62af7",
+    "shared/data/assets/surfaces-manifest.json": "c3cf978e1db6e20f21946a8cb3e0d5716dbc730f671b09151f27ad373013d474",
+    "shared/data/assets/transit-manifest.json": "3ca361a92c68ad989535a5d00cd7c4e9a11b4c37c2b7913f8eca23aba67cb8a5",
+    "shared/data/building-catalog.json": "ed435ec06401b5ea8ea604ca75af0a9fd3a2d7e8252ca65f018853c19a3a804b",
+    "shared/data/campus-coverage.json": "d6882c0d41f717b382ff4fe9a6b5a39e2aa7b0ca15defdcdab886b2314b6bff2",
+    "shared/data/facade-reality.json": "55f8878ccea2e0a175a2c163da84da194157c2ac9287b471940689975f1f9eb7",
+    "shared/data/gameplay-placement.json": "53ed8754ecfff552143abf182d1fa8445563a40e7208ce56fb8ad7a948706e27",
+    "shared/data/journal.json": "c622454965838edc6ec622c15b8bcbf06f16a188ba0cd3cf4f46dc69a599dfd1",
+    "shared/data/landcover.json": "92425a36cfdf4bac15415c31e947bbd0e09576f5a650f9589284ee55e5402e3b",
+    "shared/data/map.json": "cc41d5fc78ffbff275468cdd191e96c74e1c9dc09a74be7bc82a918184c7f64c",
+    "shared/data/photogrammetry-collision.json": "a0abcfb73c8db6b1cbd807a70215656e1ad7554040548cca856bf9b7073d190d",
+    "shared/data/photogrammetry-ground-repairs.json": "c0cf042ca71571784a66a5fc90ca45172cc5e629dbc8058cc6d396cefa388165",
+    "shared/data/photogrammetry.json": "d556d38d5c32d9d039479e492d7937e2c358df90cf94f7aee232f5e1ba330d93",
+    "shared/data/reality-ground.json": "9a144e2556c960677ce1d486477f0730ced54455662c1075ffc081fc90a6d878",
+    "shared/data/road-calibration.json": "b794e4f06f7dfa58e1ec3c34845f6b5b8a8551743231d4ad09da49c70b3e7b76",
+    "shared/data/stadium-stops.json": "d1c2e7734556439cf98a98f719665d993a03705d39518d69c328f562a4c94464",
+    "shared/data/streets.json": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14",
+    "shared/data/surveyed-trees.json": "1e3ad99f1640a14921ed7fc7c797c841fa2ca404e3c7c4cd4a39ffb64463ac75",
+    "shared/data/terrain-grid.json": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+    "shared/data/transit-navigation.json": "4ecb232781bb323f27c3e9db8ccc4ad7cbacfa281b9131b0b6e9305377402aa4",
+    "shared/data/transit.json": "66c4f8f5aebce2f5fb244e0fad54b514a32e41bdbc19415c75c488335d7867ce",
+    "shared/data/tree-reconstruction.json": "250e483ef04a962402ffe55b1eba895409ef06509951bde9f2113b6b6535a493",
+    "shared/environment.ts": "90c6a3722226110255fc1d57edc294696a8077c7cc364dda0b063c223d315f52",
+    "shared/events.ts": "a194685b74238aadd6d90ef3c179cf3e55cc0e2af5698828955b5fb6c8a98115",
+    "shared/journal.ts": "2f3e5992a8be368653b6a32b20fd3a27459507765c8edd72f16bd2c205936d79",
+    "shared/landmark-reality.ts": "f9473a38d5f14bb8f1972f501945559eacaefdcf74e39e13c3467664094e5145",
+    "shared/netcode.ts": "d363a000039e0c757b65108207a500ab15850921428d660ecc0470f98defca64",
+    "shared/photogrammetry-gameplay.ts": "9ce098866da1e59272d08590ca6e45123182a73946506bbcd03b6639cf7a2365",
+    "shared/photogrammetry-ground.ts": "94c3c4d69a2ae5c645033cf9e7e8f729f5a17dd2e052294e9aaa19ea47cbdf64",
+    "shared/photogrammetry-repairs.ts": "16ff0813cb5f0fe0bec05561f5483c07095b0658100c2b92a60a9d3ef55b1e91",
+    "shared/photogrammetry.ts": "1643ca85940021765e5b2ca2ad9b2b55b482b41267c2942521e226dc89b20054",
+    "shared/profile.ts": "c6bf137d2324c4ab360b9ab925037e37042a699fda9200ef6b82f8b7b04c2ddb",
+    "shared/render-quality.ts": "e9506573186c6d6e50af5e0db17458959ae61f808d1ad4158cdc03589ffbeada",
+    "shared/simulation.ts": "de8d00472e258796503176bfe7971d471d4a7c1068ebb53c5f14782e52650eb8",
+    "shared/streets.ts": "6a6d797c58f2aaff095a1a72554001f9b87bf8c41effbeebf61dd239c8690436",
+    "shared/terrain-entities.ts": "8460192bd81483def617d977775dd251817bc7f9bf0aa05ed65de66c95620bf1",
+    "shared/terrain.ts": "c7e54a6859b22e87ae0d8e71cf01f2d23577994e2eddc6c8bc56a9c445e878e8",
+    "shared/transit.ts": "d40d42e41fd70a7a8b0dfd028e2a0644613529d41b71f76313b594b8ffded9b2",
+    "shared/types.ts": "e3fb9f3ddc84bf714f627ddabdda0182a8e8aa2bc6795f983d398ed7f7df8f4d",
+    "shared/vegetation.ts": "a971613162dcea9068cc63f3c5284ca99cacf8a23eafa6dacce5245a467cd0cf",
+    "shared/vehicle.ts": "6b8ab0f1eeb8139a7301736c4fa6b3d7523217193dd2e125933ea4d8529213ce",
+    "shared/weather.ts": "832ecd30f6036bb6560dc5df104c8d216c18f47312b69abfa4fa255d8346bed0",
+    "shared/world-asset-identity.ts": "a6173d4759b8fa490f931b772c2d833926926cc1efd3bb838d85e30533643a20",
+    "shared/world.ts": "394fe4d61db507be8881af44a3dc417ed9c3674688cef3ba6cb9b9534a15a936"
+  },
+  "world": {
+    "courtCount": 5,
+    "fenceSegments": 24,
+    "gates": 8,
+    "courtColliderMeshes": 1,
+    "treeTrunks": 109,
+    "parkedCars": 24,
+    "colliders": 8127
+  },
+  "physics": {
+    "fixedDt": 0.016666666666666666,
+    "capsuleRadius": 0.42,
+    "capsuleHalfHeight": 0.38,
+    "teleportAllowed": false,
+    "jumpAllowed": false,
+    "collisionDisableAllowed": false,
+    "trafficSampleInstant": 0,
+    "trafficScope": "Deterministic static-route regression, not live PID traffic proof."
+  },
+  "passed": true,
+  "reports": [
+    {
+      "id": "stadium191a",
+      "passed": true,
+      "start": {
+        "x": 110,
+        "z": 12,
+        "y": -2.143999934196472
+      },
+      "goal": [
+        -241.879,
+        254.4
+      ],
+      "finalPosition": {
+        "x": -241.83761596679688,
+        "y": 3.941340208053589,
+        "z": 254.44615173339844
+      },
+      "ticks": 8208,
+      "seconds": 136.8,
+      "travelled": 610.6464874443595,
+      "maxHorizontalStep": 0.07707394137312537,
+      "maxVerticalStep": 0.039899349212646484,
+      "minSupportGap": 0.8199489355087279,
+      "maxSupportGap": 0.9949996709823608,
+      "groundedSamples": 8202,
+      "groundedFraction": 0.9992690058479532,
+      "teleportAttempts": 0,
+      "provenance": [
+        "Explicit virtual access through mapped private parking155743958 to public foot graph; no public parking access claim.",
+        "Strict public OSM route, max4m endpoint attachment; local detours stay in existing parking/footways."
+      ],
+      "sourceWayIds": [
+        "785663896",
+        "573681966",
+        "25920432",
+        "106402081",
+        "1219495683",
+        "408313961",
+        "1219495685"
+      ],
+      "nominalPoints": [
+        [
+          110,
+          12
+        ],
+        [
+          109.52341319607139,
+          -11.40754211169377
+        ],
+        [
+          93.78,
+          -11.087
+        ],
+        [
+          68.32,
+          -10.676
+        ],
+        [
+          50.276,
+          -10.286
+        ],
+        [
+          45.125,
+          -10.186
+        ],
+        [
+          46.333,
+          36.057
+        ],
+        [
+          19.323,
+          36.814
+        ],
+        [
+          16.009,
+          36.903
+        ],
+        [
+          -16.351,
+          37.804
+        ],
+        [
+          -29.996,
+          38.183
+        ],
+        [
+          -47.419,
+          38.673
+        ],
+        [
+          -67.656,
+          39.24
+        ],
+        [
+          -115.66,
+          39.897
+        ],
+        [
+          -116.075,
+          47.979
+        ],
+        [
+          -114.982,
+          84.915
+        ],
+        [
+          -114.203,
+          120.76
+        ],
+        [
+          -113.56,
+          130.634
+        ],
+        [
+          -113.332,
+          136.757
+        ],
+        [
+          -111.824,
+          176.598
+        ],
+        [
+          -111.381,
+          188.22
+        ],
+        [
+          -111.489,
+          197.348
+        ],
+        [
+          -111.539,
+          201.845
+        ],
+        [
+          -114.51,
+          211.23
+        ],
+        [
+          -123.825,
+          226.803
+        ],
+        [
+          -138.784,
+          237.557
+        ],
+        [
+          -154.421,
+          240.974
+        ],
+        [
+          -185.402,
+          244.436
+        ],
+        [
+          -200.418,
+          245.071
+        ],
+        [
+          -219.448,
+          246.006
+        ],
+        [
+          -241.679,
+          254.767
+        ],
+        [
+          -241.879,
+          254.4
+        ]
+      ],
+      "walkedWaypoints": [
+        [
+          110,
+          12
+        ],
+        [
+          109.52341319607139,
+          -11.40754211169377
+        ],
+        [
+          109.5,
+          -11
+        ],
+        [
+          108.5,
+          -10.5
+        ],
+        [
+          94.5,
+          -10.5
+        ],
+        [
+          93.78,
+          -11.087
+        ],
+        [
+          68.32,
+          -10.676
+        ],
+        [
+          50.276,
+          -10.286
+        ],
+        [
+          45.125,
+          -10.186
+        ],
+        [
+          46.333,
+          36.057
+        ],
+        [
+          19.323,
+          36.814
+        ],
+        [
+          16.009,
+          36.903
+        ],
+        [
+          -16.351,
+          37.804
+        ],
+        [
+          -29.996,
+          38.183
+        ],
+        [
+          -47.419,
+          38.673
+        ],
+        [
+          -67.656,
+          39.24
+        ],
+        [
+          -115.66,
+          39.897
+        ],
+        [
+          -116.075,
+          47.979
+        ],
+        [
+          -114.982,
+          84.915
+        ],
+        [
+          -114.203,
+          120.76
+        ],
+        [
+          -113.56,
+          130.634
+        ],
+        [
+          -113.332,
+          136.757
+        ],
+        [
+          -111.824,
+          176.598
+        ],
+        [
+          -111.381,
+          188.22
+        ],
+        [
+          -111.489,
+          197.348
+        ],
+        [
+          -111.539,
+          201.845
+        ],
+        [
+          -114.51,
+          211.23
+        ],
+        [
+          -123.825,
+          226.803
+        ],
+        [
+          -138.784,
+          237.557
+        ],
+        [
+          -154.421,
+          240.974
+        ],
+        [
+          -185.402,
+          244.436
+        ],
+        [
+          -200.418,
+          245.071
+        ],
+        [
+          -219.448,
+          246.006
+        ],
+        [
+          -241.679,
+          254.767
+        ],
+        [
+          -241.879,
+          254.4
+        ]
+      ],
+      "detours": [
+        {
+          "from": [
+            109.2082748413086,
+            -11.21580696105957
+          ],
+          "rejoin": [
+            93.78,
+            -11.087
+          ],
+          "skippedOriginalWaypoints": [],
+          "points": [
+            [
+              109.2082748413086,
+              -11.21580696105957
+            ],
+            [
+              109.5,
+              -11
+            ],
+            [
+              108.5,
+              -10.5
+            ],
+            [
+              94.5,
+              -10.5
+            ],
+            [
+              93.78,
+              -11.087
+            ]
+          ],
+          "gridMetres": 0.5,
+          "expanded": 42,
+          "checkedNodes": 636,
+          "areas": [
+            "virtual-private-parking155743958"
+          ],
+          "blockingContacts": [
+            {
+              "kind": "native-DMR-ground",
+              "collider": 0,
+              "witness": {
+                "x": 109.19438171386719,
+                "y": -3.2719855308532715,
+                "z": -11.214503288269043
+              },
+              "normal": {
+                "x": 0.031233221292495728,
+                "y": 0.9995031356811523,
+                "z": -0.0042481739073991776
+              },
+              "remaining": {
+                "x": -0.07666396349668503,
+                "y": -0.009999999776482582,
+                "z": 0.0006434288807213306
+              }
+            },
+            {
+              "kind": "parked-car:photo-central-bay-3",
+              "collider": 3.8493E-320,
+              "witness": {
+                "x": 108.76829528808594,
+                "y": -2.0615763664245605,
+                "z": -11.21636962890625
+              },
+              "normal": {
+                "x": 0.9997221231460571,
+                "y": -0.023571083322167397,
+                "z": -2.8206530259922147E-05
+              },
+              "remaining": {
+                "x": -0.07615368813276291,
+                "y": 0.0024821064434945583,
+                "z": 0.0005894300993531942
+              }
+            }
+          ]
+        }
+      ],
+      "trace": [
+        {
+          "tick": 120,
+          "position": {
+            "x": 109.90168762207031,
+            "y": -2.3039586544036865,
+            "z": 6.254073143005371
+          },
+          "support": {
+            "y": -3.1240586280822753,
+            "normal": {
+              "x": 0.02723981812596321,
+              "y": 0.999624490737915,
+              "z": -0.002998834941536188
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 240,
+          "position": {
+            "x": 109.72618865966797,
+            "y": -2.3947982788085938,
+            "z": -2.95442271232605
+          },
+          "support": {
+            "y": -3.214898371696472,
+            "normal": {
+              "x": 0.029235053807497025,
+              "y": 0.999488115310669,
+              "z": -0.01299335714429617
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 360,
+          "position": {
+            "x": 109.20831298828125,
+            "y": -2.4527053833007812,
+            "z": -11.304896354675293
+          },
+          "support": {
+            "y": -3.272805416584015,
+            "normal": {
+              "x": 0.031234469264745712,
+              "y": 0.9995030164718628,
+              "z": -0.00424787774682045
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 480,
+          "position": {
+            "x": 109.25597381591797,
+            "y": -2.4525649547576904,
+            "z": -10.921380996704102
+          },
+          "support": {
+            "y": -3.2726648688316344,
+            "normal": {
+              "x": 0.031234469264745712,
+              "y": 0.9995030164718628,
+              "z": -0.00424787774682045
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 600,
+          "position": {
+            "x": 100.210693359375,
+            "y": -2.2414495944976807,
+            "z": -10.532745361328125
+          },
+          "support": {
+            "y": -3.0615495681762694,
+            "normal": {
+              "x": 0.019742397591471672,
+              "y": 0.9996150732040405,
+              "z": -0.019492510706186295
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 720,
+          "position": {
+            "x": 91.22894287109375,
+            "y": -2.0420398712158203,
+            "z": -11.021890640258789
+          },
+          "support": {
+            "y": -2.8621399641036986,
+            "normal": {
+              "x": 0.0264878086745739,
+              "y": 0.9995404481887817,
+              "z": -0.014743225648999214
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 840,
+          "position": {
+            "x": 82.07649230957031,
+            "y": -1.762046456336975,
+            "z": -10.895527839660645
+          },
+          "support": {
+            "y": -2.5821464896202087,
+            "normal": {
+              "x": 0.03447793424129486,
+              "y": 0.9993603825569153,
+              "z": -0.009493891149759293
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 960,
+          "position": {
+            "x": 72.91949462890625,
+            "y": -1.508764386177063,
+            "z": -10.760610580444336
+          },
+          "support": {
+            "y": -2.3288643598556518,
+            "normal": {
+              "x": 0.02123871259391308,
+              "y": 0.9994683861732483,
+              "z": -0.024736836552619934
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1080,
+          "position": {
+            "x": 63.774932861328125,
+            "y": -1.1955503225326538,
+            "z": -10.61390209197998
+          },
+          "support": {
+            "y": -2.0166114211082458,
+            "normal": {
+              "x": 0.007487414870411158,
+              "y": 0.9983229041099548,
+              "z": -0.0574035719037056
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1200,
+          "position": {
+            "x": 54.61072540283203,
+            "y": -0.9899150729179382,
+            "z": -10.411413192749023
+          },
+          "support": {
+            "y": -1.8100151062011718,
+            "normal": {
+              "x": 0.034970879554748535,
+              "y": 0.9991680383682251,
+              "z": -0.020982526242733
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1320,
+          "position": {
+            "x": 45.4607048034668,
+            "y": -0.7157313227653503,
+            "z": -10.198118209838867
+          },
+          "support": {
+            "y": -1.536106789112091,
+            "normal": {
+              "x": 0.043451886624097824,
+              "y": 0.9988937973976135,
+              "z": -0.017980094999074936
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1440,
+          "position": {
+            "x": 45.43984603881836,
+            "y": -0.4336559474468231,
+            "z": -1.2698702812194824
+          },
+          "support": {
+            "y": -1.253755921125412,
+            "normal": {
+              "x": -0.016746321693062782,
+              "y": 0.9997816681861877,
+              "z": -0.012497259303927422
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1560,
+          "position": {
+            "x": 45.654354095458984,
+            "y": -0.33394941687583923,
+            "z": 7.909997940063477
+          },
+          "support": {
+            "y": -1.154049390554428,
+            "normal": {
+              "x": 0.012498734518885612,
+              "y": 0.9998973608016968,
+              "z": 0.006999280769377947
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1680,
+          "position": {
+            "x": 45.875579833984375,
+            "y": -0.38289323449134827,
+            "z": 17.11158561706543
+          },
+          "support": {
+            "y": -1.202993208169937,
+            "normal": {
+              "x": -0.006997925229370594,
+              "y": 0.9996994733810425,
+              "z": 0.023492932319641113
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1800,
+          "position": {
+            "x": 46.09538650512695,
+            "y": -0.6186103820800781,
+            "z": 26.33207130432129
+          },
+          "support": {
+            "y": -1.4391179919242858,
+            "normal": {
+              "x": 0.02447158470749855,
+              "y": 0.998840868473053,
+              "z": 0.041451867669820786
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1920,
+          "position": {
+            "x": 46.3276481628418,
+            "y": -0.7705602049827576,
+            "z": 35.543418884277344
+          },
+          "support": {
+            "y": -1.5906601786613463,
+            "normal": {
+              "x": 0.03622577711939812,
+              "y": 0.9993311166763306,
+              "z": -0.004996650852262974
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2040,
+          "position": {
+            "x": 37.645389556884766,
+            "y": -0.4816948175430298,
+            "z": 36.20815658569336
+          },
+          "support": {
+            "y": -1.3047603011131286,
+            "normal": {
+              "x": 0.01938518136739731,
+              "y": 0.9941110014915466,
+              "z": -0.10661839693784714
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2160,
+          "position": {
+            "x": 28.490888595581055,
+            "y": -0.23566612601280212,
+            "z": 36.481475830078125
+          },
+          "support": {
+            "y": -1.055766099691391,
+            "normal": {
+              "x": 0.030236078426241875,
+              "y": 0.9995403289794922,
+              "z": -0.00224898150190711
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2280,
+          "position": {
+            "x": 19.34505271911621,
+            "y": 0.05163949355483055,
+            "z": 36.8120002746582
+          },
+          "support": {
+            "y": -0.7684604801237583,
+            "normal": {
+              "x": 0.03273152559995651,
+              "y": 0.99943608045578,
+              "z": -0.007495778147131205
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2400,
+          "position": {
+            "x": 10.204981803894043,
+            "y": 0.3659254014492035,
+            "z": 37.05756378173828
+          },
+          "support": {
+            "y": -0.4541745722293854,
+            "normal": {
+              "x": 0.009746960364282131,
+              "y": 0.9996881484985352,
+              "z": -0.022992821410298347
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2520,
+          "position": {
+            "x": 1.0395479202270508,
+            "y": 0.5420979857444763,
+            "z": 37.30517578125
+          },
+          "support": {
+            "y": -0.27800198793411257,
+            "normal": {
+              "x": -0.002499884692952037,
+              "y": 0.9999518394470215,
+              "z": -0.009499547071754932
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2640,
+          "position": {
+            "x": -8.114008903503418,
+            "y": 0.7882916927337646,
+            "z": 37.57379150390625
+          },
+          "support": {
+            "y": -0.03265603780746462,
+            "normal": {
+              "x": 0.043954040855169296,
+              "y": 0.998955488204956,
+              "z": 0.012486943043768406
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2760,
+          "position": {
+            "x": -17.268674850463867,
+            "y": 1.0368057489395142,
+            "z": 37.82435607910156
+          },
+          "support": {
+            "y": 0.2167057156562806,
+            "normal": {
+              "x": 0.023984350264072418,
+              "y": 0.9993481040000916,
+              "z": -0.026982400566339493
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2880,
+          "position": {
+            "x": -26.4212703704834,
+            "y": 1.2942334413528442,
+            "z": 38.082820892333984
+          },
+          "support": {
+            "y": 0.47413346767425546,
+            "normal": {
+              "x": 0.010499355383217335,
+              "y": 0.9999387264251709,
+              "z": 0.003499785205349326
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3000,
+          "position": {
+            "x": -35.593379974365234,
+            "y": 1.4456177949905396,
+            "z": 38.35271453857422
+          },
+          "support": {
+            "y": 0.625517761707306,
+            "normal": {
+              "x": 0.025487234815955162,
+              "y": 0.9994994401931763,
+              "z": 0.018740611150860786
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3120,
+          "position": {
+            "x": -44.761470794677734,
+            "y": 1.61311936378479,
+            "z": 38.592079162597656
+          },
+          "support": {
+            "y": 0.7926594972610475,
+            "normal": {
+              "x": 0.04144507274031639,
+              "y": 0.9986763596534729,
+              "z": -0.030459638684988022
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3240,
+          "position": {
+            "x": -53.88883590698242,
+            "y": 1.997685194015503,
+            "z": 38.847801208496094
+          },
+          "support": {
+            "y": 1.1769217014312745,
+            "normal": {
+              "x": 0.051430486142635345,
+              "y": 0.9986503720283508,
+              "z": -0.007240226026624441
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3360,
+          "position": {
+            "x": -62.99491882324219,
+            "y": 2.465945243835449,
+            "z": 39.06184768676758
+          },
+          "support": {
+            "y": 1.6441256165504456,
+            "normal": {
+              "x": 0.03288353979587555,
+              "y": 0.9964711666107178,
+              "z": -0.07722653448581696
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3480,
+          "position": {
+            "x": -72.02201843261719,
+            "y": 2.2285101413726807,
+            "z": 39.46497344970703
+          },
+          "support": {
+            "y": 1.4042879104614259,
+            "normal": {
+              "x": 0.1273774802684784,
+              "y": 0.9912645816802979,
+              "z": 0.03419863060116768
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3600,
+          "position": {
+            "x": -81.07820892333984,
+            "y": 2.8135764598846436,
+            "z": 39.5302734375
+          },
+          "support": {
+            "y": 1.9919258117675782,
+            "normal": {
+              "x": -0.012202998623251915,
+              "y": 0.9961626529693604,
+              "z": -0.08666616678237915
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3720,
+          "position": {
+            "x": -90.24773406982422,
+            "y": 2.9893746376037598,
+            "z": 39.5745735168457
+          },
+          "support": {
+            "y": 2.169274663925171,
+            "normal": {
+              "x": 0.021733710542321205,
+              "y": 0.9992522597312927,
+              "z": -0.03197607770562172
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3840,
+          "position": {
+            "x": -99.41954040527344,
+            "y": 3.168854236602783,
+            "z": 39.67025375366211
+          },
+          "support": {
+            "y": 2.3487542033195496,
+            "normal": {
+              "x": 0.01674533821642399,
+              "y": 0.9997194409370422,
+              "z": -0.016745278611779213
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3960,
+          "position": {
+            "x": -108.54109954833984,
+            "y": 3.597114324569702,
+            "z": 39.76150131225586
+          },
+          "support": {
+            "y": 2.776036834716797,
+            "normal": {
+              "x": 0.02419452555477619,
+              "y": 0.997713565826416,
+              "z": -0.06310538947582245
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4080,
+          "position": {
+            "x": -115.70478820800781,
+            "y": 3.761441946029663,
+            "z": 42.024723052978516
+          },
+          "support": {
+            "y": 2.9413419723510743,
+            "normal": {
+              "x": 0.007248442620038986,
+              "y": 0.9997836947441101,
+              "z": -0.019495800137519836
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4200,
+          "position": {
+            "x": -115.98889923095703,
+            "y": 3.8990399837493896,
+            "z": 51.191654205322266
+          },
+          "support": {
+            "y": 3.0789400696754456,
+            "normal": {
+              "x": -0.021243808791041374,
+              "y": 0.9997082352638245,
+              "z": -0.011496645398437977
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4320,
+          "position": {
+            "x": -115.72537231445312,
+            "y": 3.8980648517608643,
+            "z": 60.38702392578125
+          },
+          "support": {
+            "y": 3.0779649376869203,
+            "normal": {
+              "x": -0.0017499527893960476,
+              "y": 0.9999773502349854,
+              "z": 0.006499858573079109
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4440,
+          "position": {
+            "x": -115.43675231933594,
+            "y": 3.8877530097961426,
+            "z": 69.58304595947266
+          },
+          "support": {
+            "y": 3.067653036117554,
+            "normal": {
+              "x": 0.021244043484330177,
+              "y": 0.9997192025184631,
+              "z": -0.010497065261006355
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4560,
+          "position": {
+            "x": -115.15611267089844,
+            "y": 3.861605405807495,
+            "z": 78.78046417236328
+          },
+          "support": {
+            "y": 3.0415054321289063,
+            "normal": {
+              "x": 0.015497447922825813,
+              "y": 0.9998347759246826,
+              "z": 0.009498457424342632
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4680,
+          "position": {
+            "x": -114.91256713867188,
+            "y": 3.914107322692871,
+            "z": 87.96685028076172
+          },
+          "support": {
+            "y": 3.093283152580261,
+            "normal": {
+              "x": -0.017230387777090073,
+              "y": 0.9988629817962646,
+              "z": -0.044449396431446075
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4800,
+          "position": {
+            "x": -114.71781158447266,
+            "y": 3.8798604011535645,
+            "z": 97.16746520996094
+          },
+          "support": {
+            "y": 3.059760367870331,
+            "normal": {
+              "x": -0.004749922081828117,
+              "y": 0.9999808073043823,
+              "z": -0.003999931272119284
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4920,
+          "position": {
+            "x": -114.50733184814453,
+            "y": 3.767204523086548,
+            "z": 106.37529754638672
+          },
+          "support": {
+            "y": 2.947104609012604,
+            "normal": {
+              "x": 0.03622112795710564,
+              "y": 0.999203622341156,
+              "z": 0.01673663966357708
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5040,
+          "position": {
+            "x": -114.2818603515625,
+            "y": 3.801891803741455,
+            "z": 115.56035614013672
+          },
+          "support": {
+            "y": 2.981180465221405,
+            "normal": {
+              "x": 0.006241307128220797,
+              "y": 0.9986053109169006,
+              "z": -0.052426788955926895
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5160,
+          "position": {
+            "x": -113.9453125,
+            "y": 3.632265329360962,
+            "z": 124.76488494873047
+          },
+          "support": {
+            "y": 2.812165415287018,
+            "normal": {
+              "x": -0.009499305859208107,
+              "y": 0.9999303817749023,
+              "z": 0.006999541539698839
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5280,
+          "position": {
+            "x": -113.44041442871094,
+            "y": 3.6158790588378906,
+            "z": 133.95042419433594
+          },
+          "support": {
+            "y": 2.795779025554657,
+            "normal": {
+              "x": -0.012998263351619244,
+              "y": 0.9998655319213867,
+              "z": -0.009998645633459091
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5400,
+          "position": {
+            "x": -113.10105895996094,
+            "y": 3.6239612102508545,
+            "z": 143.14027404785156
+          },
+          "support": {
+            "y": 2.8038612961769105,
+            "normal": {
+              "x": -0.016997428610920906,
+              "y": 0.9998511075973511,
+              "z": 0.002999574411660433
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5520,
+          "position": {
+            "x": -112.75070190429688,
+            "y": 3.6184370517730713,
+            "z": 152.3223114013672
+          },
+          "support": {
+            "y": 2.7983370780944825,
+            "normal": {
+              "x": -0.0032498231157660484,
+              "y": 0.9999446868896484,
+              "z": 0.009999437257647514
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5640,
+          "position": {
+            "x": -112.40889739990234,
+            "y": 3.542391061782837,
+            "z": 161.52496337890625
+          },
+          "support": {
+            "y": 2.722291147708893,
+            "normal": {
+              "x": -0.016497153788805008,
+              "y": 0.9998277425765991,
+              "z": 0.008498575538396835
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5760,
+          "position": {
+            "x": -112.0693588256836,
+            "y": 3.471255302429199,
+            "z": 170.72776794433594
+          },
+          "support": {
+            "y": 2.651155388355255,
+            "normal": {
+              "x": -0.028487304225564003,
+              "y": 0.9995558857917786,
+              "z": 0.008746135048568249
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5880,
+          "position": {
+            "x": -111.70455169677734,
+            "y": 3.3677964210510254,
+            "z": 179.9325408935547
+          },
+          "support": {
+            "y": 2.547696328163147,
+            "normal": {
+              "x": -0.01149711199104786,
+              "y": 0.9997487664222717,
+              "z": 0.019245140254497528
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6000,
+          "position": {
+            "x": -111.39994812011719,
+            "y": 3.3017148971557617,
+            "z": 189.13247680664062
+          },
+          "support": {
+            "y": 2.4812976479530335,
+            "normal": {
+              "x": -0.03296301141381264,
+              "y": 0.9988793730735779,
+              "z": 0.03396187722682953
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6120,
+          "position": {
+            "x": -111.49784088134766,
+            "y": 2.8765268325805664,
+            "z": 198.36492919921875
+          },
+          "support": {
+            "y": 2.056426739692688,
+            "normal": {
+              "x": 0.023479169234633446,
+              "y": 0.9991125464439392,
+              "z": 0.034968964755535126
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6240,
+          "position": {
+            "x": -113.259765625,
+            "y": 2.977173089981079,
+            "z": 207.2808380126953
+          },
+          "support": {
+            "y": 2.1570731163024903,
+            "normal": {
+              "x": 0.022481491789221764,
+              "y": 0.9991783499717712,
+              "z": -0.033722326159477234
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6360,
+          "position": {
+            "x": -117.10472106933594,
+            "y": 3.2187466621398926,
+            "z": 215.52865600585938
+          },
+          "support": {
+            "y": 2.3986465692520142,
+            "normal": {
+              "x": 0.007998240180313587,
+              "y": 0.9997779726982117,
+              "z": -0.019495628774166107
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6480,
+          "position": {
+            "x": -121.8070068359375,
+            "y": 3.3443806171417236,
+            "z": 223.41351318359375
+          },
+          "support": {
+            "y": 2.524280643463135,
+            "normal": {
+              "x": -0.001999981002882123,
+              "y": 0.9999735355377197,
+              "z": -0.006999843753874302
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6600,
+          "position": {
+            "x": -128.11849975585938,
+            "y": 3.378655195236206,
+            "z": 229.8426055908203
+          },
+          "support": {
+            "y": 2.558555281162262,
+            "normal": {
+              "x": -0.0009999729227274656,
+              "y": 0.9999858140945435,
+              "z": -0.005249902606010437
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6720,
+          "position": {
+            "x": -135.56854248046875,
+            "y": 3.424168825149536,
+            "z": 235.2291717529297
+          },
+          "support": {
+            "y": 2.6040688514709474,
+            "normal": {
+              "x": 0.002749864012002945,
+              "y": 0.9999580383300781,
+              "z": -0.00874965451657772
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6840,
+          "position": {
+            "x": -143.89266967773438,
+            "y": 3.4907894134521484,
+            "z": 238.65380859375
+          },
+          "support": {
+            "y": 2.6706894993782044,
+            "normal": {
+              "x": -0.0014999221311882138,
+              "y": 0.9999411106109619,
+              "z": -0.010749362409114838
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6960,
+          "position": {
+            "x": -152.8675079345703,
+            "y": 3.5600881576538086,
+            "z": 240.6298370361328
+          },
+          "support": {
+            "y": 2.73998818397522,
+            "normal": {
+              "x": 0.005249766632914543,
+              "y": 0.9999599456787109,
+              "z": 0.007249660789966583
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7080,
+          "position": {
+            "x": -161.97459411621094,
+            "y": 3.619170665740967,
+            "z": 241.81520080566406
+          },
+          "support": {
+            "y": 2.799070692062378,
+            "normal": {
+              "x": -0.0022498206235468388,
+              "y": 0.9999397993087769,
+              "z": -0.010749348439276218
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7200,
+          "position": {
+            "x": -171.104248046875,
+            "y": 3.7109153270721436,
+            "z": 242.8302001953125
+          },
+          "support": {
+            "y": 2.8908152341842652,
+            "normal": {
+              "x": 0.007999616675078869,
+              "y": 0.9999500513076782,
+              "z": -0.00599968247115612
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7320,
+          "position": {
+            "x": -180.2330780029297,
+            "y": 3.8073182106018066,
+            "z": 243.84889221191406
+          },
+          "support": {
+            "y": 2.9872181177139283,
+            "normal": {
+              "x": 0.015997186303138733,
+              "y": 0.9998220801353455,
+              "z": -0.00999821163713932
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7440,
+          "position": {
+            "x": -189.38113403320312,
+            "y": 3.907954692840576,
+            "z": 244.60044860839844
+          },
+          "support": {
+            "y": 3.087855017185211,
+            "normal": {
+              "x": 0.0049999249167740345,
+              "y": 0.999985933303833,
+              "z": 0.0017499678069725633
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7560,
+          "position": {
+            "x": -198.55694580078125,
+            "y": 4.009562015533447,
+            "z": 244.99795532226562
+          },
+          "support": {
+            "y": 3.189462101459503,
+            "normal": {
+              "x": 0.009748374111950397,
+              "y": 0.9998323917388916,
+              "z": 0.015497410669922829
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7680,
+          "position": {
+            "x": -207.74131774902344,
+            "y": 4.038452625274658,
+            "z": 245.44712829589844
+          },
+          "support": {
+            "y": 3.2183525323867794,
+            "normal": {
+              "x": 0.00699816457927227,
+              "y": 0.9997336268424988,
+              "z": 0.021994154900312424
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7800,
+          "position": {
+            "x": -216.9138641357422,
+            "y": 4.144774436950684,
+            "z": 245.89791870117188
+          },
+          "support": {
+            "y": 3.3246744632720944,
+            "normal": {
+              "x": 0.002249525859951973,
+              "y": 0.9997822642326355,
+              "z": 0.020745467394590378
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7920,
+          "position": {
+            "x": -225.64456176757812,
+            "y": 4.107455730438232,
+            "z": 248.48141479492188
+          },
+          "support": {
+            "y": 3.287355577945709,
+            "normal": {
+              "x": 0.0032492862083017826,
+              "y": 0.9997795224189758,
+              "z": 0.020745471119880676
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 8040,
+          "position": {
+            "x": -234.20941162109375,
+            "y": 4.058623313903809,
+            "z": 251.85484313964844
+          },
+          "support": {
+            "y": 3.238523161411285,
+            "normal": {
+              "x": 0.00399929191917181,
+              "y": 0.9998210072517395,
+              "z": 0.018496718257665634
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 8160,
+          "position": {
+            "x": -241.83761596679688,
+            "y": 3.941340208053589,
+            "z": 254.44615173339844
+          },
+          "support": {
+            "y": 3.1212402939796444,
+            "normal": {
+              "x": -0.02049190364778042,
+              "y": 0.9996048808097839,
+              "z": 0.019242430105805397
+            },
+            "kind": "native-DMR-ground"
+          }
+        }
+      ]
+    },
+    {
+      "id": "stadium191b",
+      "passed": true,
+      "start": {
+        "x": 110,
+        "z": 12,
+        "y": -2.143999934196472
+      },
+      "goal": [
+        -281.968,
+        273.747
+      ],
+      "finalPosition": {
+        "x": -281.9272766113281,
+        "y": 2.932356834411621,
+        "z": 273.7278747558594
+      },
+      "ticks": 10015,
+      "seconds": 166.91666666666666,
+      "travelled": 749.0672398617686,
+      "maxHorizontalStep": 0.07711815541529202,
+      "maxVerticalStep": 0.039899349212646484,
+      "minSupportGap": 0.8154874086380008,
+      "maxSupportGap": 0.9949996709823608,
+      "groundedSamples": 10009,
+      "groundedFraction": 0.999400898652022,
+      "teleportAttempts": 0,
+      "provenance": [
+        "Explicit virtual access through mapped private parking155743958 to public foot graph; no public parking access claim.",
+        "Strict public OSM route, max4m endpoint attachment; local detours stay in existing parking/footways."
+      ],
+      "sourceWayIds": [
+        "785663896",
+        "573681966",
+        "25920432",
+        "106402081",
+        "1219495683",
+        "1219495684",
+        "437247893",
+        "1561361283",
+        "374233872",
+        "408510603",
+        "479784159",
+        "434329306",
+        "320586063",
+        "408313962"
+      ],
+      "nominalPoints": [
+        [
+          110,
+          12
+        ],
+        [
+          109.52341319607139,
+          -11.40754211169377
+        ],
+        [
+          93.78,
+          -11.087
+        ],
+        [
+          68.32,
+          -10.676
+        ],
+        [
+          50.276,
+          -10.286
+        ],
+        [
+          45.125,
+          -10.186
+        ],
+        [
+          46.333,
+          36.057
+        ],
+        [
+          19.323,
+          36.814
+        ],
+        [
+          16.009,
+          36.903
+        ],
+        [
+          -16.351,
+          37.804
+        ],
+        [
+          -29.996,
+          38.183
+        ],
+        [
+          -47.419,
+          38.673
+        ],
+        [
+          -67.656,
+          39.24
+        ],
+        [
+          -115.66,
+          39.897
+        ],
+        [
+          -116.075,
+          47.979
+        ],
+        [
+          -114.982,
+          84.915
+        ],
+        [
+          -114.203,
+          120.76
+        ],
+        [
+          -113.56,
+          130.634
+        ],
+        [
+          -113.332,
+          136.757
+        ],
+        [
+          -111.824,
+          176.598
+        ],
+        [
+          -111.381,
+          188.22
+        ],
+        [
+          -111.489,
+          197.348
+        ],
+        [
+          -111.539,
+          201.845
+        ],
+        [
+          -114.51,
+          211.23
+        ],
+        [
+          -123.825,
+          226.803
+        ],
+        [
+          -138.784,
+          237.557
+        ],
+        [
+          -154.421,
+          240.974
+        ],
+        [
+          -185.402,
+          244.436
+        ],
+        [
+          -185.388,
+          240.629
+        ],
+        [
+          -185.395,
+          237.034
+        ],
+        [
+          -185.402,
+          232.848
+        ],
+        [
+          -185.417,
+          227.327
+        ],
+        [
+          -203.847,
+          228.351
+        ],
+        [
+          -239.522,
+          230.354
+        ],
+        [
+          -306.299,
+          232.492
+        ],
+        [
+          -306.542,
+          238.292
+        ],
+        [
+          -306.935,
+          244.67
+        ],
+        [
+          -291.355,
+          246.229
+        ],
+        [
+          -285.647,
+          250.648
+        ],
+        [
+          -282.618,
+          257.839
+        ],
+        [
+          -282.033,
+          264.129
+        ],
+        [
+          -281.78652840952685,
+          273.7423473446942
+        ],
+        [
+          -281.968,
+          273.747
+        ]
+      ],
+      "walkedWaypoints": [
+        [
+          110,
+          12
+        ],
+        [
+          109.52341319607139,
+          -11.40754211169377
+        ],
+        [
+          109.5,
+          -11
+        ],
+        [
+          108.5,
+          -10.5
+        ],
+        [
+          94.5,
+          -10.5
+        ],
+        [
+          93.78,
+          -11.087
+        ],
+        [
+          68.32,
+          -10.676
+        ],
+        [
+          50.276,
+          -10.286
+        ],
+        [
+          45.125,
+          -10.186
+        ],
+        [
+          46.333,
+          36.057
+        ],
+        [
+          19.323,
+          36.814
+        ],
+        [
+          16.009,
+          36.903
+        ],
+        [
+          -16.351,
+          37.804
+        ],
+        [
+          -29.996,
+          38.183
+        ],
+        [
+          -47.419,
+          38.673
+        ],
+        [
+          -67.656,
+          39.24
+        ],
+        [
+          -115.66,
+          39.897
+        ],
+        [
+          -116.075,
+          47.979
+        ],
+        [
+          -114.982,
+          84.915
+        ],
+        [
+          -114.203,
+          120.76
+        ],
+        [
+          -113.56,
+          130.634
+        ],
+        [
+          -113.332,
+          136.757
+        ],
+        [
+          -111.824,
+          176.598
+        ],
+        [
+          -111.381,
+          188.22
+        ],
+        [
+          -111.489,
+          197.348
+        ],
+        [
+          -111.539,
+          201.845
+        ],
+        [
+          -114.51,
+          211.23
+        ],
+        [
+          -123.825,
+          226.803
+        ],
+        [
+          -138.784,
+          237.557
+        ],
+        [
+          -154.421,
+          240.974
+        ],
+        [
+          -185.402,
+          244.436
+        ],
+        [
+          -185.388,
+          240.629
+        ],
+        [
+          -185.395,
+          237.034
+        ],
+        [
+          -185.402,
+          232.848
+        ],
+        [
+          -185.417,
+          227.327
+        ],
+        [
+          -203.847,
+          228.351
+        ],
+        [
+          -239.522,
+          230.354
+        ],
+        [
+          -306.299,
+          232.492
+        ],
+        [
+          -306.542,
+          238.292
+        ],
+        [
+          -306.935,
+          244.67
+        ],
+        [
+          -291.355,
+          246.229
+        ],
+        [
+          -285.647,
+          250.648
+        ],
+        [
+          -282.618,
+          257.839
+        ],
+        [
+          -282.033,
+          264.129
+        ],
+        [
+          -281.78652840952685,
+          273.7423473446942
+        ],
+        [
+          -281.968,
+          273.747
+        ]
+      ],
+      "detours": [
+        {
+          "from": [
+            109.2082748413086,
+            -11.21580696105957
+          ],
+          "rejoin": [
+            93.78,
+            -11.087
+          ],
+          "skippedOriginalWaypoints": [],
+          "points": [
+            [
+              109.2082748413086,
+              -11.21580696105957
+            ],
+            [
+              109.5,
+              -11
+            ],
+            [
+              108.5,
+              -10.5
+            ],
+            [
+              94.5,
+              -10.5
+            ],
+            [
+              93.78,
+              -11.087
+            ]
+          ],
+          "gridMetres": 0.5,
+          "expanded": 42,
+          "checkedNodes": 636,
+          "areas": [
+            "virtual-private-parking155743958"
+          ],
+          "blockingContacts": [
+            {
+              "kind": "native-DMR-ground",
+              "collider": 0,
+              "witness": {
+                "x": 109.19438171386719,
+                "y": -3.2719855308532715,
+                "z": -11.214503288269043
+              },
+              "normal": {
+                "x": 0.031233221292495728,
+                "y": 0.9995031356811523,
+                "z": -0.0042481739073991776
+              },
+              "remaining": {
+                "x": -0.07666396349668503,
+                "y": -0.009999999776482582,
+                "z": 0.0006434288807213306
+              }
+            },
+            {
+              "kind": "parked-car:photo-central-bay-3",
+              "collider": 3.8493E-320,
+              "witness": {
+                "x": 108.76829528808594,
+                "y": -2.0615763664245605,
+                "z": -11.21636962890625
+              },
+              "normal": {
+                "x": 0.9997221231460571,
+                "y": -0.023571083322167397,
+                "z": -2.8206530259922147E-05
+              },
+              "remaining": {
+                "x": -0.07615368813276291,
+                "y": 0.0024821064434945583,
+                "z": 0.0005894300993531942
+              }
+            }
+          ]
+        }
+      ],
+      "trace": [
+        {
+          "tick": 120,
+          "position": {
+            "x": 109.90168762207031,
+            "y": -2.3039586544036865,
+            "z": 6.254073143005371
+          },
+          "support": {
+            "y": -3.1240586280822753,
+            "normal": {
+              "x": 0.02723981812596321,
+              "y": 0.999624490737915,
+              "z": -0.002998834941536188
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 240,
+          "position": {
+            "x": 109.72618865966797,
+            "y": -2.3947982788085938,
+            "z": -2.95442271232605
+          },
+          "support": {
+            "y": -3.214898371696472,
+            "normal": {
+              "x": 0.029235053807497025,
+              "y": 0.999488115310669,
+              "z": -0.01299335714429617
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 360,
+          "position": {
+            "x": 109.20831298828125,
+            "y": -2.4527053833007812,
+            "z": -11.304896354675293
+          },
+          "support": {
+            "y": -3.272805416584015,
+            "normal": {
+              "x": 0.031234469264745712,
+              "y": 0.9995030164718628,
+              "z": -0.00424787774682045
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 480,
+          "position": {
+            "x": 109.25597381591797,
+            "y": -2.4525649547576904,
+            "z": -10.921380996704102
+          },
+          "support": {
+            "y": -3.2726648688316344,
+            "normal": {
+              "x": 0.031234469264745712,
+              "y": 0.9995030164718628,
+              "z": -0.00424787774682045
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 600,
+          "position": {
+            "x": 100.210693359375,
+            "y": -2.2414495944976807,
+            "z": -10.532745361328125
+          },
+          "support": {
+            "y": -3.0615495681762694,
+            "normal": {
+              "x": 0.019742397591471672,
+              "y": 0.9996150732040405,
+              "z": -0.019492510706186295
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 720,
+          "position": {
+            "x": 91.22894287109375,
+            "y": -2.0420398712158203,
+            "z": -11.021890640258789
+          },
+          "support": {
+            "y": -2.8621399641036986,
+            "normal": {
+              "x": 0.0264878086745739,
+              "y": 0.9995404481887817,
+              "z": -0.014743225648999214
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 840,
+          "position": {
+            "x": 82.07649230957031,
+            "y": -1.762046456336975,
+            "z": -10.895527839660645
+          },
+          "support": {
+            "y": -2.5821464896202087,
+            "normal": {
+              "x": 0.03447793424129486,
+              "y": 0.9993603825569153,
+              "z": -0.009493891149759293
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 960,
+          "position": {
+            "x": 72.91949462890625,
+            "y": -1.508764386177063,
+            "z": -10.760610580444336
+          },
+          "support": {
+            "y": -2.3288643598556518,
+            "normal": {
+              "x": 0.02123871259391308,
+              "y": 0.9994683861732483,
+              "z": -0.024736836552619934
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1080,
+          "position": {
+            "x": 63.774932861328125,
+            "y": -1.1955503225326538,
+            "z": -10.61390209197998
+          },
+          "support": {
+            "y": -2.0166114211082458,
+            "normal": {
+              "x": 0.007487414870411158,
+              "y": 0.9983229041099548,
+              "z": -0.0574035719037056
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1200,
+          "position": {
+            "x": 54.61072540283203,
+            "y": -0.9899150729179382,
+            "z": -10.411413192749023
+          },
+          "support": {
+            "y": -1.8100151062011718,
+            "normal": {
+              "x": 0.034970879554748535,
+              "y": 0.9991680383682251,
+              "z": -0.020982526242733
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1320,
+          "position": {
+            "x": 45.4607048034668,
+            "y": -0.7157313227653503,
+            "z": -10.198118209838867
+          },
+          "support": {
+            "y": -1.536106789112091,
+            "normal": {
+              "x": 0.043451886624097824,
+              "y": 0.9988937973976135,
+              "z": -0.017980094999074936
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1440,
+          "position": {
+            "x": 45.43984603881836,
+            "y": -0.4336559474468231,
+            "z": -1.2698702812194824
+          },
+          "support": {
+            "y": -1.253755921125412,
+            "normal": {
+              "x": -0.016746321693062782,
+              "y": 0.9997816681861877,
+              "z": -0.012497259303927422
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1560,
+          "position": {
+            "x": 45.654354095458984,
+            "y": -0.33394941687583923,
+            "z": 7.909997940063477
+          },
+          "support": {
+            "y": -1.154049390554428,
+            "normal": {
+              "x": 0.012498734518885612,
+              "y": 0.9998973608016968,
+              "z": 0.006999280769377947
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1680,
+          "position": {
+            "x": 45.875579833984375,
+            "y": -0.38289323449134827,
+            "z": 17.11158561706543
+          },
+          "support": {
+            "y": -1.202993208169937,
+            "normal": {
+              "x": -0.006997925229370594,
+              "y": 0.9996994733810425,
+              "z": 0.023492932319641113
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1800,
+          "position": {
+            "x": 46.09538650512695,
+            "y": -0.6186103820800781,
+            "z": 26.33207130432129
+          },
+          "support": {
+            "y": -1.4391179919242858,
+            "normal": {
+              "x": 0.02447158470749855,
+              "y": 0.998840868473053,
+              "z": 0.041451867669820786
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1920,
+          "position": {
+            "x": 46.3276481628418,
+            "y": -0.7705602049827576,
+            "z": 35.543418884277344
+          },
+          "support": {
+            "y": -1.5906601786613463,
+            "normal": {
+              "x": 0.03622577711939812,
+              "y": 0.9993311166763306,
+              "z": -0.004996650852262974
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2040,
+          "position": {
+            "x": 37.645389556884766,
+            "y": -0.4816948175430298,
+            "z": 36.20815658569336
+          },
+          "support": {
+            "y": -1.3047603011131286,
+            "normal": {
+              "x": 0.01938518136739731,
+              "y": 0.9941110014915466,
+              "z": -0.10661839693784714
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2160,
+          "position": {
+            "x": 28.490888595581055,
+            "y": -0.23566612601280212,
+            "z": 36.481475830078125
+          },
+          "support": {
+            "y": -1.055766099691391,
+            "normal": {
+              "x": 0.030236078426241875,
+              "y": 0.9995403289794922,
+              "z": -0.00224898150190711
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2280,
+          "position": {
+            "x": 19.34505271911621,
+            "y": 0.05163949355483055,
+            "z": 36.8120002746582
+          },
+          "support": {
+            "y": -0.7684604801237583,
+            "normal": {
+              "x": 0.03273152559995651,
+              "y": 0.99943608045578,
+              "z": -0.007495778147131205
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2400,
+          "position": {
+            "x": 10.204981803894043,
+            "y": 0.3659254014492035,
+            "z": 37.05756378173828
+          },
+          "support": {
+            "y": -0.4541745722293854,
+            "normal": {
+              "x": 0.009746960364282131,
+              "y": 0.9996881484985352,
+              "z": -0.022992821410298347
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2520,
+          "position": {
+            "x": 1.0395479202270508,
+            "y": 0.5420979857444763,
+            "z": 37.30517578125
+          },
+          "support": {
+            "y": -0.27800198793411257,
+            "normal": {
+              "x": -0.002499884692952037,
+              "y": 0.9999518394470215,
+              "z": -0.009499547071754932
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2640,
+          "position": {
+            "x": -8.114008903503418,
+            "y": 0.7882916927337646,
+            "z": 37.57379150390625
+          },
+          "support": {
+            "y": -0.03265603780746462,
+            "normal": {
+              "x": 0.043954040855169296,
+              "y": 0.998955488204956,
+              "z": 0.012486943043768406
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2760,
+          "position": {
+            "x": -17.268674850463867,
+            "y": 1.0368057489395142,
+            "z": 37.82435607910156
+          },
+          "support": {
+            "y": 0.2167057156562806,
+            "normal": {
+              "x": 0.023984350264072418,
+              "y": 0.9993481040000916,
+              "z": -0.026982400566339493
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2880,
+          "position": {
+            "x": -26.4212703704834,
+            "y": 1.2942334413528442,
+            "z": 38.082820892333984
+          },
+          "support": {
+            "y": 0.47413346767425546,
+            "normal": {
+              "x": 0.010499355383217335,
+              "y": 0.9999387264251709,
+              "z": 0.003499785205349326
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3000,
+          "position": {
+            "x": -35.593379974365234,
+            "y": 1.4456177949905396,
+            "z": 38.35271453857422
+          },
+          "support": {
+            "y": 0.625517761707306,
+            "normal": {
+              "x": 0.025487234815955162,
+              "y": 0.9994994401931763,
+              "z": 0.018740611150860786
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3120,
+          "position": {
+            "x": -44.761470794677734,
+            "y": 1.61311936378479,
+            "z": 38.592079162597656
+          },
+          "support": {
+            "y": 0.7926594972610475,
+            "normal": {
+              "x": 0.04144507274031639,
+              "y": 0.9986763596534729,
+              "z": -0.030459638684988022
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3240,
+          "position": {
+            "x": -53.88883590698242,
+            "y": 1.997685194015503,
+            "z": 38.847801208496094
+          },
+          "support": {
+            "y": 1.1769217014312745,
+            "normal": {
+              "x": 0.051430486142635345,
+              "y": 0.9986503720283508,
+              "z": -0.007240226026624441
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3360,
+          "position": {
+            "x": -62.99491882324219,
+            "y": 2.465945243835449,
+            "z": 39.06184768676758
+          },
+          "support": {
+            "y": 1.6441256165504456,
+            "normal": {
+              "x": 0.03288353979587555,
+              "y": 0.9964711666107178,
+              "z": -0.07722653448581696
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3480,
+          "position": {
+            "x": -72.02201843261719,
+            "y": 2.2285101413726807,
+            "z": 39.46497344970703
+          },
+          "support": {
+            "y": 1.4042879104614259,
+            "normal": {
+              "x": 0.1273774802684784,
+              "y": 0.9912645816802979,
+              "z": 0.03419863060116768
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3600,
+          "position": {
+            "x": -81.07820892333984,
+            "y": 2.8135764598846436,
+            "z": 39.5302734375
+          },
+          "support": {
+            "y": 1.9919258117675782,
+            "normal": {
+              "x": -0.012202998623251915,
+              "y": 0.9961626529693604,
+              "z": -0.08666616678237915
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3720,
+          "position": {
+            "x": -90.24773406982422,
+            "y": 2.9893746376037598,
+            "z": 39.5745735168457
+          },
+          "support": {
+            "y": 2.169274663925171,
+            "normal": {
+              "x": 0.021733710542321205,
+              "y": 0.9992522597312927,
+              "z": -0.03197607770562172
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3840,
+          "position": {
+            "x": -99.41954040527344,
+            "y": 3.168854236602783,
+            "z": 39.67025375366211
+          },
+          "support": {
+            "y": 2.3487542033195496,
+            "normal": {
+              "x": 0.01674533821642399,
+              "y": 0.9997194409370422,
+              "z": -0.016745278611779213
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3960,
+          "position": {
+            "x": -108.54109954833984,
+            "y": 3.597114324569702,
+            "z": 39.76150131225586
+          },
+          "support": {
+            "y": 2.776036834716797,
+            "normal": {
+              "x": 0.02419452555477619,
+              "y": 0.997713565826416,
+              "z": -0.06310538947582245
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4080,
+          "position": {
+            "x": -115.70478820800781,
+            "y": 3.761441946029663,
+            "z": 42.024723052978516
+          },
+          "support": {
+            "y": 2.9413419723510743,
+            "normal": {
+              "x": 0.007248442620038986,
+              "y": 0.9997836947441101,
+              "z": -0.019495800137519836
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4200,
+          "position": {
+            "x": -115.98889923095703,
+            "y": 3.8990399837493896,
+            "z": 51.191654205322266
+          },
+          "support": {
+            "y": 3.0789400696754456,
+            "normal": {
+              "x": -0.021243808791041374,
+              "y": 0.9997082352638245,
+              "z": -0.011496645398437977
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4320,
+          "position": {
+            "x": -115.72537231445312,
+            "y": 3.8980648517608643,
+            "z": 60.38702392578125
+          },
+          "support": {
+            "y": 3.0779649376869203,
+            "normal": {
+              "x": -0.0017499527893960476,
+              "y": 0.9999773502349854,
+              "z": 0.006499858573079109
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4440,
+          "position": {
+            "x": -115.43675231933594,
+            "y": 3.8877530097961426,
+            "z": 69.58304595947266
+          },
+          "support": {
+            "y": 3.067653036117554,
+            "normal": {
+              "x": 0.021244043484330177,
+              "y": 0.9997192025184631,
+              "z": -0.010497065261006355
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4560,
+          "position": {
+            "x": -115.15611267089844,
+            "y": 3.861605405807495,
+            "z": 78.78046417236328
+          },
+          "support": {
+            "y": 3.0415054321289063,
+            "normal": {
+              "x": 0.015497447922825813,
+              "y": 0.9998347759246826,
+              "z": 0.009498457424342632
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4680,
+          "position": {
+            "x": -114.91256713867188,
+            "y": 3.914107322692871,
+            "z": 87.96685028076172
+          },
+          "support": {
+            "y": 3.093283152580261,
+            "normal": {
+              "x": -0.017230387777090073,
+              "y": 0.9988629817962646,
+              "z": -0.044449396431446075
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4800,
+          "position": {
+            "x": -114.71781158447266,
+            "y": 3.8798604011535645,
+            "z": 97.16746520996094
+          },
+          "support": {
+            "y": 3.059760367870331,
+            "normal": {
+              "x": -0.004749922081828117,
+              "y": 0.9999808073043823,
+              "z": -0.003999931272119284
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 4920,
+          "position": {
+            "x": -114.50733184814453,
+            "y": 3.767204523086548,
+            "z": 106.37529754638672
+          },
+          "support": {
+            "y": 2.947104609012604,
+            "normal": {
+              "x": 0.03622112795710564,
+              "y": 0.999203622341156,
+              "z": 0.01673663966357708
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5040,
+          "position": {
+            "x": -114.2818603515625,
+            "y": 3.801891803741455,
+            "z": 115.56035614013672
+          },
+          "support": {
+            "y": 2.981180465221405,
+            "normal": {
+              "x": 0.006241307128220797,
+              "y": 0.9986053109169006,
+              "z": -0.052426788955926895
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5160,
+          "position": {
+            "x": -113.9453125,
+            "y": 3.632265329360962,
+            "z": 124.76488494873047
+          },
+          "support": {
+            "y": 2.812165415287018,
+            "normal": {
+              "x": -0.009499305859208107,
+              "y": 0.9999303817749023,
+              "z": 0.006999541539698839
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5280,
+          "position": {
+            "x": -113.44041442871094,
+            "y": 3.6158790588378906,
+            "z": 133.95042419433594
+          },
+          "support": {
+            "y": 2.795779025554657,
+            "normal": {
+              "x": -0.012998263351619244,
+              "y": 0.9998655319213867,
+              "z": -0.009998645633459091
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5400,
+          "position": {
+            "x": -113.10105895996094,
+            "y": 3.6239612102508545,
+            "z": 143.14027404785156
+          },
+          "support": {
+            "y": 2.8038612961769105,
+            "normal": {
+              "x": -0.016997428610920906,
+              "y": 0.9998511075973511,
+              "z": 0.002999574411660433
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5520,
+          "position": {
+            "x": -112.75070190429688,
+            "y": 3.6184370517730713,
+            "z": 152.3223114013672
+          },
+          "support": {
+            "y": 2.7983370780944825,
+            "normal": {
+              "x": -0.0032498231157660484,
+              "y": 0.9999446868896484,
+              "z": 0.009999437257647514
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5640,
+          "position": {
+            "x": -112.40889739990234,
+            "y": 3.542391061782837,
+            "z": 161.52496337890625
+          },
+          "support": {
+            "y": 2.722291147708893,
+            "normal": {
+              "x": -0.016497153788805008,
+              "y": 0.9998277425765991,
+              "z": 0.008498575538396835
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5760,
+          "position": {
+            "x": -112.0693588256836,
+            "y": 3.471255302429199,
+            "z": 170.72776794433594
+          },
+          "support": {
+            "y": 2.651155388355255,
+            "normal": {
+              "x": -0.028487304225564003,
+              "y": 0.9995558857917786,
+              "z": 0.008746135048568249
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 5880,
+          "position": {
+            "x": -111.70455169677734,
+            "y": 3.3677964210510254,
+            "z": 179.9325408935547
+          },
+          "support": {
+            "y": 2.547696328163147,
+            "normal": {
+              "x": -0.01149711199104786,
+              "y": 0.9997487664222717,
+              "z": 0.019245140254497528
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6000,
+          "position": {
+            "x": -111.39994812011719,
+            "y": 3.3017148971557617,
+            "z": 189.13247680664062
+          },
+          "support": {
+            "y": 2.4812976479530335,
+            "normal": {
+              "x": -0.03296301141381264,
+              "y": 0.9988793730735779,
+              "z": 0.03396187722682953
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6120,
+          "position": {
+            "x": -111.49784088134766,
+            "y": 2.8765268325805664,
+            "z": 198.36492919921875
+          },
+          "support": {
+            "y": 2.056426739692688,
+            "normal": {
+              "x": 0.023479169234633446,
+              "y": 0.9991125464439392,
+              "z": 0.034968964755535126
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6240,
+          "position": {
+            "x": -113.259765625,
+            "y": 2.977173089981079,
+            "z": 207.2808380126953
+          },
+          "support": {
+            "y": 2.1570731163024903,
+            "normal": {
+              "x": 0.022481491789221764,
+              "y": 0.9991783499717712,
+              "z": -0.033722326159477234
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6360,
+          "position": {
+            "x": -117.10472106933594,
+            "y": 3.2187466621398926,
+            "z": 215.52865600585938
+          },
+          "support": {
+            "y": 2.3986465692520142,
+            "normal": {
+              "x": 0.007998240180313587,
+              "y": 0.9997779726982117,
+              "z": -0.019495628774166107
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6480,
+          "position": {
+            "x": -121.8070068359375,
+            "y": 3.3443806171417236,
+            "z": 223.41351318359375
+          },
+          "support": {
+            "y": 2.524280643463135,
+            "normal": {
+              "x": -0.001999981002882123,
+              "y": 0.9999735355377197,
+              "z": -0.006999843753874302
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6600,
+          "position": {
+            "x": -128.11849975585938,
+            "y": 3.378655195236206,
+            "z": 229.8426055908203
+          },
+          "support": {
+            "y": 2.558555281162262,
+            "normal": {
+              "x": -0.0009999729227274656,
+              "y": 0.9999858140945435,
+              "z": -0.005249902606010437
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6720,
+          "position": {
+            "x": -135.56854248046875,
+            "y": 3.424168825149536,
+            "z": 235.2291717529297
+          },
+          "support": {
+            "y": 2.6040688514709474,
+            "normal": {
+              "x": 0.002749864012002945,
+              "y": 0.9999580383300781,
+              "z": -0.00874965451657772
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6840,
+          "position": {
+            "x": -143.89266967773438,
+            "y": 3.4907894134521484,
+            "z": 238.65380859375
+          },
+          "support": {
+            "y": 2.6706894993782044,
+            "normal": {
+              "x": -0.0014999221311882138,
+              "y": 0.9999411106109619,
+              "z": -0.010749362409114838
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 6960,
+          "position": {
+            "x": -152.8675079345703,
+            "y": 3.5600881576538086,
+            "z": 240.6298370361328
+          },
+          "support": {
+            "y": 2.73998818397522,
+            "normal": {
+              "x": 0.005249766632914543,
+              "y": 0.9999599456787109,
+              "z": 0.007249660789966583
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7080,
+          "position": {
+            "x": -161.97459411621094,
+            "y": 3.619170665740967,
+            "z": 241.81520080566406
+          },
+          "support": {
+            "y": 2.799070692062378,
+            "normal": {
+              "x": -0.0022498206235468388,
+              "y": 0.9999397993087769,
+              "z": -0.010749348439276218
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7200,
+          "position": {
+            "x": -171.104248046875,
+            "y": 3.7109153270721436,
+            "z": 242.8302001953125
+          },
+          "support": {
+            "y": 2.8908152341842652,
+            "normal": {
+              "x": 0.007999616675078869,
+              "y": 0.9999500513076782,
+              "z": -0.00599968247115612
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7320,
+          "position": {
+            "x": -180.2330780029297,
+            "y": 3.8073182106018066,
+            "z": 243.84889221191406
+          },
+          "support": {
+            "y": 2.9872181177139283,
+            "normal": {
+              "x": 0.015997186303138733,
+              "y": 0.9998220801353455,
+              "z": -0.00999821163713932
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7440,
+          "position": {
+            "x": -185.3865203857422,
+            "y": 3.8239684104919434,
+            "z": 240.35791015625
+          },
+          "support": {
+            "y": 3.003868317604065,
+            "normal": {
+              "x": 0.007248863112181425,
+              "y": 0.9998416900634766,
+              "z": -0.016247441992163658
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7560,
+          "position": {
+            "x": -185.40505981445312,
+            "y": 3.6436333656311035,
+            "z": 231.1409454345703
+          },
+          "support": {
+            "y": 2.82353333234787,
+            "normal": {
+              "x": 0.006996906362473965,
+              "y": 0.9995624423027039,
+              "z": 0.028737422078847885
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7680,
+          "position": {
+            "x": -190.8478546142578,
+            "y": 3.7849042415618896,
+            "z": 227.71287536621094
+          },
+          "support": {
+            "y": 2.9644222617149354,
+            "normal": {
+              "x": 0.00024969736114144325,
+              "y": 0.9988617897033691,
+              "z": 0.047695647925138474
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7800,
+          "position": {
+            "x": -200.02639770507812,
+            "y": 3.845078229904175,
+            "z": 228.1904296875
+          },
+          "support": {
+            "y": 3.0249781966209413,
+            "normal": {
+              "x": 0.011744569055736065,
+              "y": 0.9995392560958862,
+              "z": 0.027987096458673477
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 7920,
+          "position": {
+            "x": -209.18504333496094,
+            "y": 3.975862979888916,
+            "z": 228.67755126953125
+          },
+          "support": {
+            "y": 3.1553494095802304,
+            "normal": {
+              "x": 0.012236149981617928,
+              "y": 0.9988688826560974,
+              "z": 0.04594797268509865
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 8040,
+          "position": {
+            "x": -218.35665893554688,
+            "y": 4.049255847930908,
+            "z": 229.23805236816406
+          },
+          "support": {
+            "y": 3.2291559338569638,
+            "normal": {
+              "x": 0.0014987187460064888,
+              "y": 0.9991388320922852,
+              "z": 0.04146423563361168
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 8160,
+          "position": {
+            "x": -227.52256774902344,
+            "y": 4.172043323516846,
+            "z": 229.76470947265625
+          },
+          "support": {
+            "y": 3.351416146755218,
+            "normal": {
+              "x": 0.012236290611326694,
+              "y": 0.9988803267478943,
+              "z": 0.04569873586297035
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 8280,
+          "position": {
+            "x": -236.68797302246094,
+            "y": 4.304809093475342,
+            "z": 230.2298583984375
+          },
+          "support": {
+            "y": 3.4847088813781735,
+            "normal": {
+              "x": -0.004249184858053923,
+              "y": 0.999810516834259,
+              "z": 0.01899639330804348
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 8400,
+          "position": {
+            "x": -245.87559509277344,
+            "y": 4.336391925811768,
+            "z": 230.5926971435547
+          },
+          "support": {
+            "y": 3.516292071342468,
+            "normal": {
+              "x": 0.006243869662284851,
+              "y": 0.9990248680114746,
+              "z": 0.04370732605457306
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 8520,
+          "position": {
+            "x": -255.04530334472656,
+            "y": 4.486552715301514,
+            "z": 230.9457550048828
+          },
+          "support": {
+            "y": 3.66645256280899,
+            "normal": {
+              "x": 0.014737983234226704,
+              "y": 0.9991890788078308,
+              "z": 0.03746955469250679
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 8640,
+          "position": {
+            "x": -264.2219543457031,
+            "y": 4.6073102951049805,
+            "z": 231.2557373046875
+          },
+          "support": {
+            "y": 3.787210440635681,
+            "normal": {
+              "x": 0.014247295446693897,
+              "y": 0.9998074173927307,
+              "z": 0.013497434556484222
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 8760,
+          "position": {
+            "x": -273.4013671875,
+            "y": 4.709917068481445,
+            "z": 231.54843139648438
+          },
+          "support": {
+            "y": 3.8898172140121456,
+            "normal": {
+              "x": 0.010995867662131786,
+              "y": 0.9996209144592285,
+              "z": 0.025240445509552956
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 8880,
+          "position": {
+            "x": -282.5750732421875,
+            "y": 4.844980239868164,
+            "z": 231.84727478027344
+          },
+          "support": {
+            "y": 4.024514174461364,
+            "normal": {
+              "x": 0.03369932249188423,
+              "y": 0.9984985589981079,
+              "z": 0.04318508878350258
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 9000,
+          "position": {
+            "x": -291.7384948730469,
+            "y": 5.051037788391113,
+            "z": 232.1311492919922
+          },
+          "support": {
+            "y": 4.230937755107879,
+            "normal": {
+              "x": 0.024727284908294678,
+              "y": 0.9990824460983276,
+              "z": 0.034967850893735886
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 9120,
+          "position": {
+            "x": -300.8819885253906,
+            "y": 5.365780353546143,
+            "z": 232.39169311523438
+          },
+          "support": {
+            "y": 4.545023715496063,
+            "normal": {
+              "x": 0.04219181835651398,
+              "y": 0.9986220598220825,
+              "z": 0.03120693936944008
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 9240,
+          "position": {
+            "x": -306.423828125,
+            "y": 5.450184345245361,
+            "z": 236.33154296875
+          },
+          "support": {
+            "y": 4.630084192752838,
+            "normal": {
+              "x": 0.0299804899841547,
+              "y": 0.9993506073951721,
+              "z": 0.019986992701888084
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 9360,
+          "position": {
+            "x": -306.0168762207031,
+            "y": 4.979308128356934,
+            "z": 244.73892211914062
+          },
+          "support": {
+            "y": 4.141442513465881,
+            "normal": {
+              "x": -0.003603236051276326,
+              "y": 0.9608715176582336,
+              "z": 0.2769712507724762
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 9480,
+          "position": {
+            "x": -296.8824157714844,
+            "y": 4.8394551277160645,
+            "z": 245.75721740722656
+          },
+          "support": {
+            "y": 4.019355034828186,
+            "normal": {
+              "x": -0.020730821415781975,
+              "y": 0.9990735054016113,
+              "z": 0.03771502897143364
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 9600,
+          "position": {
+            "x": -288.4496765136719,
+            "y": 4.27109432220459,
+            "z": 248.5097198486328
+          },
+          "support": {
+            "y": 3.449463105201721,
+            "normal": {
+              "x": -0.007723504211753607,
+              "y": 0.996584415435791,
+              "z": 0.08221819251775742
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 9720,
+          "position": {
+            "x": -283.44000244140625,
+            "y": 3.7534947395324707,
+            "z": 255.92471313476562
+          },
+          "support": {
+            "y": 2.932969069480896,
+            "normal": {
+              "x": -0.0004994241171516478,
+              "y": 0.998801589012146,
+              "z": 0.04894130304455757
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 9840,
+          "position": {
+            "x": -282.0166931152344,
+            "y": 3.3624956607818604,
+            "z": 264.9666748046875
+          },
+          "support": {
+            "y": 2.5423957467079163,
+            "normal": {
+              "x": 0.004746199119836092,
+              "y": 0.9992095232009888,
+              "z": 0.03946877270936966
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 9960,
+          "position": {
+            "x": -281.9272766113281,
+            "y": 2.932339668273926,
+            "z": 273.7278747558594
+          },
+          "support": {
+            "y": 2.1113646984100343,
+            "normal": {
+              "x": -0.011474091559648514,
+              "y": 0.997747004032135,
+              "z": 0.06610070914030075
+            },
+            "kind": "native-DMR-ground"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rko-public-approach",
+      "passed": true,
+      "start": {
+        "x": 110,
+        "z": 12,
+        "y": -2.143999934196472
+      },
+      "goal": [
+        103.08789883595836,
+        -54.92523226749529
+      ],
+      "marker": [
+        103.08,
+        -57.81
+      ],
+      "markerDistance": 2.8852777568893053,
+      "finalPosition": {
+        "x": 103.1427001953125,
+        "y": -2.4566800594329834,
+        "z": -54.9254035949707
+      },
+      "ticks": 1513,
+      "seconds": 25.216666666666665,
+      "travelled": 98.82823948899626,
+      "maxHorizontalStep": 0.07695052190086679,
+      "maxVerticalStep": 0.039899349212646484,
+      "minSupportGap": 0.8200998544692992,
+      "maxSupportGap": 0.9949996709823608,
+      "groundedSamples": 1507,
+      "groundedFraction": 0.9960343688037012,
+      "teleportAttempts": 0,
+      "provenance": [
+        "Explicit virtual access through mapped private parking155743958 to public foot graph; no public parking access claim.",
+        "Closest mapped public footway outside solid Potraviny; marker lies inside, no invented doorway or bar interior."
+      ],
+      "sourceWayIds": [
+        "785663896",
+        "25920435",
+        "25920441",
+        "1111105716"
+      ],
+      "nominalPoints": [
+        [
+          110,
+          12
+        ],
+        [
+          109.52341319607139,
+          -11.40754211169377
+        ],
+        [
+          93.78,
+          -11.087
+        ],
+        [
+          90.651,
+          -25.147
+        ],
+        [
+          111.403,
+          -54.948
+        ],
+        [
+          103.08789883595836,
+          -54.92523226749529
+        ]
+      ],
+      "walkedWaypoints": [
+        [
+          110,
+          12
+        ],
+        [
+          109.52341319607139,
+          -11.40754211169377
+        ],
+        [
+          109.5,
+          -11
+        ],
+        [
+          108.5,
+          -10.5
+        ],
+        [
+          94.5,
+          -10.5
+        ],
+        [
+          93.78,
+          -11.087
+        ],
+        [
+          90.651,
+          -25.147
+        ],
+        [
+          111.403,
+          -54.948
+        ],
+        [
+          103.08789883595836,
+          -54.92523226749529
+        ]
+      ],
+      "detours": [
+        {
+          "from": [
+            109.2082748413086,
+            -11.21580696105957
+          ],
+          "rejoin": [
+            93.78,
+            -11.087
+          ],
+          "skippedOriginalWaypoints": [],
+          "points": [
+            [
+              109.2082748413086,
+              -11.21580696105957
+            ],
+            [
+              109.5,
+              -11
+            ],
+            [
+              108.5,
+              -10.5
+            ],
+            [
+              94.5,
+              -10.5
+            ],
+            [
+              93.78,
+              -11.087
+            ]
+          ],
+          "gridMetres": 0.5,
+          "expanded": 42,
+          "checkedNodes": 636,
+          "areas": [
+            "virtual-private-parking155743958"
+          ],
+          "blockingContacts": [
+            {
+              "kind": "native-DMR-ground",
+              "collider": 0,
+              "witness": {
+                "x": 109.19438171386719,
+                "y": -3.2719855308532715,
+                "z": -11.214503288269043
+              },
+              "normal": {
+                "x": 0.031233221292495728,
+                "y": 0.9995031356811523,
+                "z": -0.0042481739073991776
+              },
+              "remaining": {
+                "x": -0.07666396349668503,
+                "y": -0.009999999776482582,
+                "z": 0.0006434288807213306
+              }
+            },
+            {
+              "kind": "parked-car:photo-central-bay-3",
+              "collider": 3.8493E-320,
+              "witness": {
+                "x": 108.76829528808594,
+                "y": -2.0615763664245605,
+                "z": -11.21636962890625
+              },
+              "normal": {
+                "x": 0.9997221231460571,
+                "y": -0.023571083322167397,
+                "z": -2.8206530259922147E-05
+              },
+              "remaining": {
+                "x": -0.07615368813276291,
+                "y": 0.0024821064434945583,
+                "z": 0.0005894300993531942
+              }
+            }
+          ]
+        }
+      ],
+      "trace": [
+        {
+          "tick": 120,
+          "position": {
+            "x": 109.90168762207031,
+            "y": -2.3039586544036865,
+            "z": 6.254073143005371
+          },
+          "support": {
+            "y": -3.1240586280822753,
+            "normal": {
+              "x": 0.02723981812596321,
+              "y": 0.999624490737915,
+              "z": -0.002998834941536188
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 240,
+          "position": {
+            "x": 109.72618865966797,
+            "y": -2.3947982788085938,
+            "z": -2.95442271232605
+          },
+          "support": {
+            "y": -3.214898371696472,
+            "normal": {
+              "x": 0.029235053807497025,
+              "y": 0.999488115310669,
+              "z": -0.01299335714429617
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 360,
+          "position": {
+            "x": 109.20831298828125,
+            "y": -2.4527053833007812,
+            "z": -11.304896354675293
+          },
+          "support": {
+            "y": -3.272805416584015,
+            "normal": {
+              "x": 0.031234469264745712,
+              "y": 0.9995030164718628,
+              "z": -0.00424787774682045
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 480,
+          "position": {
+            "x": 109.25597381591797,
+            "y": -2.4525649547576904,
+            "z": -10.921380996704102
+          },
+          "support": {
+            "y": -3.2726648688316344,
+            "normal": {
+              "x": 0.031234469264745712,
+              "y": 0.9995030164718628,
+              "z": -0.00424787774682045
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 600,
+          "position": {
+            "x": 100.210693359375,
+            "y": -2.2414495944976807,
+            "z": -10.532745361328125
+          },
+          "support": {
+            "y": -3.0615495681762694,
+            "normal": {
+              "x": 0.019742397591471672,
+              "y": 0.9996150732040405,
+              "z": -0.019492510706186295
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 720,
+          "position": {
+            "x": 93.25981140136719,
+            "y": -2.1087563037872314,
+            "z": -13.598730087280273
+          },
+          "support": {
+            "y": -2.9288563966751098,
+            "normal": {
+              "x": 0.014497973956167698,
+              "y": 0.9998587369918823,
+              "z": -0.008498779498040676
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 840,
+          "position": {
+            "x": 91.24800872802734,
+            "y": -2.0083792209625244,
+            "z": -22.560176849365234
+          },
+          "support": {
+            "y": -2.828479194641113,
+            "normal": {
+              "x": 0.024991754442453384,
+              "y": 0.9996711015701294,
+              "z": 0.0057481094263494015
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 960,
+          "position": {
+            "x": 94.44340515136719,
+            "y": -2.0493979454040527,
+            "z": -30.504165649414062
+          },
+          "support": {
+            "y": -2.8694979190826415,
+            "normal": {
+              "x": 0.01674520969390869,
+              "y": 0.999715268611908,
+              "z": -0.016995178535580635
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1080,
+          "position": {
+            "x": 99.7042465209961,
+            "y": -2.232351541519165,
+            "z": -38.075679779052734
+          },
+          "support": {
+            "y": -3.052451455593109,
+            "normal": {
+              "x": 0.016747616231441498,
+              "y": 0.9998589754104614,
+              "z": 0.0012497927527874708
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1200,
+          "position": {
+            "x": 104.95973205566406,
+            "y": -2.313791513442993,
+            "z": -45.63850784301758
+          },
+          "support": {
+            "y": -3.1338916063308715,
+            "normal": {
+              "x": 0.002749839099124074,
+              "y": 0.999927282333374,
+              "z": -0.011749128811061382
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1320,
+          "position": {
+            "x": 110.20384216308594,
+            "y": -2.4600703716278076,
+            "z": -53.217777252197266
+          },
+          "support": {
+            "y": -3.2801703453063964,
+            "normal": {
+              "x": 0.008499417454004288,
+              "y": 0.9999338388442993,
+              "z": -0.007749462034553289
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1440,
+          "position": {
+            "x": 104.13789367675781,
+            "y": -2.46693754196167,
+            "z": -54.921669006347656
+          },
+          "support": {
+            "y": -3.2870376348495483,
+            "normal": {
+              "x": 0.010998452082276344,
+              "y": 0.9998613595962524,
+              "z": -0.012498254887759686
+            },
+            "kind": "native-DMR-ground"
+          }
+        }
+      ]
+    },
+    {
+      "id": "b6-north-reception",
+      "passed": true,
+      "start": {
+        "x": 110,
+        "z": 12,
+        "y": -2.143999934196472
+      },
+      "goal": [
+        -3.5,
+        -73
+      ],
+      "finalPosition": {
+        "x": -3.547780990600586,
+        "y": 2.6200063228607178,
+        "z": -73.00187683105469
+      },
+      "ticks": 3108,
+      "seconds": 51.8,
+      "travelled": 218.00458862798106,
+      "maxHorizontalStep": 0.07697009061901133,
+      "maxVerticalStep": 0.06688284873962402,
+      "minSupportGap": 0.8195919036865233,
+      "maxSupportGap": 1.0019742488861083,
+      "groundedSamples": 3102,
+      "groundedFraction": 0.9980694980694981,
+      "teleportAttempts": 0,
+      "provenance": [
+        "Explicit virtual access through mapped private parking155743958 to public foot graph; no public parking access claim.",
+        "Mapped graph plus explicit <=10m model-entry connector, shared twelve risers, north doorway and reception; unmeasured reconstruction."
+      ],
+      "sourceWayIds": [
+        "785663896",
+        "1021415596",
+        "1021415594",
+        "25920436",
+        "573676196"
+      ],
+      "nominalPoints": [
+        [
+          110,
+          12
+        ],
+        [
+          109.52341319607139,
+          -11.40754211169377
+        ],
+        [
+          93.78,
+          -11.087
+        ],
+        [
+          68.32,
+          -10.676
+        ],
+        [
+          50.276,
+          -10.286
+        ],
+        [
+          45.433,
+          -22.654
+        ],
+        [
+          32.324,
+          -56.128
+        ],
+        [
+          27.645,
+          -68.072
+        ],
+        [
+          18.059,
+          -86.841
+        ],
+        [
+          17.752,
+          -89.067
+        ],
+        [
+          16.987,
+          -94.744
+        ],
+        [
+          5.486,
+          -94.867
+        ],
+        [
+          -6.81784263768298,
+          -90.29042590299058
+        ],
+        [
+          -4.85,
+          -85
+        ],
+        [
+          -4.85,
+          -82.1
+        ],
+        [
+          -4.85,
+          -77.35
+        ],
+        [
+          -4.85,
+          -73
+        ],
+        [
+          -3.5,
+          -73
+        ]
+      ],
+      "walkedWaypoints": [
+        [
+          110,
+          12
+        ],
+        [
+          109.52341319607139,
+          -11.40754211169377
+        ],
+        [
+          109.5,
+          -11
+        ],
+        [
+          108.5,
+          -10.5
+        ],
+        [
+          94.5,
+          -10.5
+        ],
+        [
+          93.78,
+          -11.087
+        ],
+        [
+          68.32,
+          -10.676
+        ],
+        [
+          50.276,
+          -10.286
+        ],
+        [
+          45.433,
+          -22.654
+        ],
+        [
+          32.324,
+          -56.128
+        ],
+        [
+          27.645,
+          -68.072
+        ],
+        [
+          18.059,
+          -86.841
+        ],
+        [
+          17.752,
+          -89.067
+        ],
+        [
+          16.987,
+          -94.744
+        ],
+        [
+          5.486,
+          -94.867
+        ],
+        [
+          -6.81784263768298,
+          -90.29042590299058
+        ],
+        [
+          -4.85,
+          -85
+        ],
+        [
+          -4.85,
+          -82.1
+        ],
+        [
+          -4.85,
+          -77.35
+        ],
+        [
+          -4.85,
+          -73
+        ],
+        [
+          -3.5,
+          -73
+        ]
+      ],
+      "detours": [
+        {
+          "from": [
+            109.2082748413086,
+            -11.21580696105957
+          ],
+          "rejoin": [
+            93.78,
+            -11.087
+          ],
+          "skippedOriginalWaypoints": [],
+          "points": [
+            [
+              109.2082748413086,
+              -11.21580696105957
+            ],
+            [
+              109.5,
+              -11
+            ],
+            [
+              108.5,
+              -10.5
+            ],
+            [
+              94.5,
+              -10.5
+            ],
+            [
+              93.78,
+              -11.087
+            ]
+          ],
+          "gridMetres": 0.5,
+          "expanded": 42,
+          "checkedNodes": 636,
+          "areas": [
+            "virtual-private-parking155743958"
+          ],
+          "blockingContacts": [
+            {
+              "kind": "native-DMR-ground",
+              "collider": 0,
+              "witness": {
+                "x": 109.19438171386719,
+                "y": -3.2719855308532715,
+                "z": -11.214503288269043
+              },
+              "normal": {
+                "x": 0.031233221292495728,
+                "y": 0.9995031356811523,
+                "z": -0.0042481739073991776
+              },
+              "remaining": {
+                "x": -0.07666396349668503,
+                "y": -0.009999999776482582,
+                "z": 0.0006434288807213306
+              }
+            },
+            {
+              "kind": "parked-car:photo-central-bay-3",
+              "collider": 3.8493E-320,
+              "witness": {
+                "x": 108.76829528808594,
+                "y": -2.0615763664245605,
+                "z": -11.21636962890625
+              },
+              "normal": {
+                "x": 0.9997221231460571,
+                "y": -0.023571083322167397,
+                "z": -2.8206530259922147E-05
+              },
+              "remaining": {
+                "x": -0.07615368813276291,
+                "y": 0.0024821064434945583,
+                "z": 0.0005894300993531942
+              }
+            }
+          ]
+        }
+      ],
+      "trace": [
+        {
+          "tick": 120,
+          "position": {
+            "x": 109.90168762207031,
+            "y": -2.3039586544036865,
+            "z": 6.254073143005371
+          },
+          "support": {
+            "y": -3.1240586280822753,
+            "normal": {
+              "x": 0.02723981812596321,
+              "y": 0.999624490737915,
+              "z": -0.002998834941536188
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 240,
+          "position": {
+            "x": 109.72618865966797,
+            "y": -2.3947982788085938,
+            "z": -2.95442271232605
+          },
+          "support": {
+            "y": -3.214898371696472,
+            "normal": {
+              "x": 0.029235053807497025,
+              "y": 0.999488115310669,
+              "z": -0.01299335714429617
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 360,
+          "position": {
+            "x": 109.20831298828125,
+            "y": -2.4527053833007812,
+            "z": -11.304896354675293
+          },
+          "support": {
+            "y": -3.272805416584015,
+            "normal": {
+              "x": 0.031234469264745712,
+              "y": 0.9995030164718628,
+              "z": -0.00424787774682045
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 480,
+          "position": {
+            "x": 109.25597381591797,
+            "y": -2.4525649547576904,
+            "z": -10.921380996704102
+          },
+          "support": {
+            "y": -3.2726648688316344,
+            "normal": {
+              "x": 0.031234469264745712,
+              "y": 0.9995030164718628,
+              "z": -0.00424787774682045
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 600,
+          "position": {
+            "x": 100.210693359375,
+            "y": -2.2414495944976807,
+            "z": -10.532745361328125
+          },
+          "support": {
+            "y": -3.0615495681762694,
+            "normal": {
+              "x": 0.019742397591471672,
+              "y": 0.9996150732040405,
+              "z": -0.019492510706186295
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 720,
+          "position": {
+            "x": 91.22894287109375,
+            "y": -2.0420398712158203,
+            "z": -11.021890640258789
+          },
+          "support": {
+            "y": -2.8621399641036986,
+            "normal": {
+              "x": 0.0264878086745739,
+              "y": 0.9995404481887817,
+              "z": -0.014743225648999214
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 840,
+          "position": {
+            "x": 82.07649230957031,
+            "y": -1.762046456336975,
+            "z": -10.895527839660645
+          },
+          "support": {
+            "y": -2.5821464896202087,
+            "normal": {
+              "x": 0.03447793424129486,
+              "y": 0.9993603825569153,
+              "z": -0.009493891149759293
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 960,
+          "position": {
+            "x": 72.91949462890625,
+            "y": -1.508764386177063,
+            "z": -10.760610580444336
+          },
+          "support": {
+            "y": -2.3288643598556518,
+            "normal": {
+              "x": 0.02123871259391308,
+              "y": 0.9994683861732483,
+              "z": -0.024736836552619934
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1080,
+          "position": {
+            "x": 63.774932861328125,
+            "y": -1.1955503225326538,
+            "z": -10.61390209197998
+          },
+          "support": {
+            "y": -2.0166114211082458,
+            "normal": {
+              "x": 0.007487414870411158,
+              "y": 0.9983229041099548,
+              "z": -0.0574035719037056
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1200,
+          "position": {
+            "x": 54.61072540283203,
+            "y": -0.9899150729179382,
+            "z": -10.411413192749023
+          },
+          "support": {
+            "y": -1.8100151062011718,
+            "normal": {
+              "x": 0.034970879554748535,
+              "y": 0.9991680383682251,
+              "z": -0.020982526242733
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1320,
+          "position": {
+            "x": 48.41741180419922,
+            "y": -0.8835037350654602,
+            "z": -14.663692474365234
+          },
+          "support": {
+            "y": -1.703603708744049,
+            "normal": {
+              "x": 0.022244123741984367,
+              "y": 0.9997360110282898,
+              "z": -0.005748482421040535
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1440,
+          "position": {
+            "x": 45.19037628173828,
+            "y": -0.8472390174865723,
+            "z": -23.27012062072754
+          },
+          "support": {
+            "y": -1.667338991165161,
+            "normal": {
+              "x": 0.0017499825917184353,
+              "y": 0.9999773502349854,
+              "z": -0.0064998287707567215
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1560,
+          "position": {
+            "x": 41.857513427734375,
+            "y": -0.7037847638130188,
+            "z": -31.821243286132812
+          },
+          "support": {
+            "y": -1.5238847374916076,
+            "normal": {
+              "x": 0.01899459771811962,
+              "y": 0.9997144341468811,
+              "z": 0.014495881274342537
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1680,
+          "position": {
+            "x": 38.53080749511719,
+            "y": -0.5443761348724365,
+            "z": -40.371604919433594
+          },
+          "support": {
+            "y": -1.3644761085510253,
+            "normal": {
+              "x": 0.019492946565151215,
+              "y": 0.9996389150619507,
+              "z": 0.018493320792913437
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1800,
+          "position": {
+            "x": 35.17742919921875,
+            "y": -0.3782685697078705,
+            "z": -48.90946960449219
+          },
+          "support": {
+            "y": -1.1983685433864593,
+            "normal": {
+              "x": 0.01799401268362999,
+              "y": 0.9996670484542847,
+              "z": 0.018493840470910072
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 1920,
+          "position": {
+            "x": 31.807994842529297,
+            "y": -0.2629692852497101,
+            "z": -57.45040512084961
+          },
+          "support": {
+            "y": -1.0830693185329436,
+            "normal": {
+              "x": 0.01074881013482809,
+              "y": 0.9998897314071655,
+              "z": 0.010248871520161629
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2040,
+          "position": {
+            "x": 28.458017349243164,
+            "y": -0.2014974057674408,
+            "z": -66.00763702392578
+          },
+          "support": {
+            "y": -1.0215973794460296,
+            "normal": {
+              "x": 0.002249924000352621,
+              "y": 0.9999592304229736,
+              "z": -0.008749634958803654
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2160,
+          "position": {
+            "x": 24.470335006713867,
+            "y": -0.16626068949699402,
+            "z": -74.28062438964844
+          },
+          "support": {
+            "y": -0.9863606631755829,
+            "normal": {
+              "x": 0.0024999049492180347,
+              "y": 0.9999629259109497,
+              "z": 0.0082496777176857
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2280,
+          "position": {
+            "x": 20.6075439453125,
+            "y": 0.6894642114639282,
+            "z": -82.38926696777344
+          },
+          "support": {
+            "y": -0.14262094497680666,
+            "normal": {
+              "x": 0.22853738069534302,
+              "y": 0.9735351800918579,
+              "z": 0
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2400,
+          "position": {
+            "x": 17.554567337036133,
+            "y": 0.820099949836731,
+            "z": -90.54618835449219
+          },
+          "support": {
+            "y": -2.384185793236071E-08,
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2520,
+          "position": {
+            "x": 12.321698188781738,
+            "y": 0.820099949836731,
+            "z": -94.73773956298828
+          },
+          "support": {
+            "y": -2.384185793236071E-08,
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2640,
+          "position": {
+            "x": 3.631120443344116,
+            "y": 0.820099949836731,
+            "z": -94.148193359375
+          },
+          "support": {
+            "y": -2.384185793236071E-08,
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2760,
+          "position": {
+            "x": -4.856963157653809,
+            "y": 0.820099949836731,
+            "z": -91.01444244384766
+          },
+          "support": {
+            "y": -2.384185793236071E-08,
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 2880,
+          "position": {
+            "x": -4.858133792877197,
+            "y": 0.820099949836731,
+            "z": -83.58894348144531
+          },
+          "support": {
+            "y": -2.384185793236071E-08,
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "native-DMR-ground"
+          }
+        },
+        {
+          "tick": 3000,
+          "position": {
+            "x": -4.850234031677246,
+            "y": 2.6198995113372803,
+            "z": -75.43013763427734
+          },
+          "support": {
+            "y": 1.800000047683716,
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "B6-floor-or-stair"
+          }
+        }
+      ]
+    }
+  ],
+  "auditScriptSha256": "815b42f79f0202db055cf0e4919af6fe50a3ecfd7957313f12dfa49a1fc707eb"
+}

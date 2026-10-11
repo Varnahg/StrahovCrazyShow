@@ -1,0 +1,35 @@
+<!doctype html><html lang="cs"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Strahov – skutečné studentské oděvy</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#182027;color:#efe9db;font:14px system-ui}header{padding:16px 20px;background:#242f35}h1{font-size:20px;margin:0 0 6px}p{margin:0;color:#bfc9c4}main{display:grid;grid-template-columns:1fr 300px;height:calc(100vh - 85px)}canvas{width:100%;height:100%;outline:none;touch-action:none;background:linear-gradient(#53636a,#253532)}aside{padding:16px;overflow:auto}button{background:#374b46;color:#f2eddf;border:1px solid #697869;border-radius:5px;padding:8px;margin:3px;cursor:pointer}button[aria-pressed=true]{background:#a4b97f;color:#19281d}pre{font-size:11px;white-space:pre-wrap}section{margin:0 0 20px}h2{font-size:14px;color:#c6d1b1}</style>
+<header><h1>Strahov · střih a pohyb oděvu</h1><p>Produkční postavy · CC0 MakeHuman oděvy · původní hlava/IK beze změny · stejné oděvy jako v hlavní hře</p></header>
+<main><canvas aria-label="3D náhled anatomického avatara"></canvas><aside><section><h2>Předpřipravená postava</h2><div id="presets"></div></section><section><h2>Pohled</h2><div id="views"></div></section><section><h2>Animace</h2><div id="poses"></div><button id="pause">Pozastavit animaci</button></section><section><h2>Podrobnost</h2><button data-lod="near">Zblízka</button><button data-lod="medium">Střední vzdálenost</button><button data-lod="far">Daleko</button></section><pre id="character-audit">Načítání…</pre></aside></main>
+<script type="module">
+import '/client/render-shaders.ts';
+import {Engine} from '@babylonjs/core/Engines/engine';
+import {Scene} from '@babylonjs/core/scene';
+import {Color3,Color4} from '@babylonjs/core/Maths/math.color';
+import {Vector3} from '@babylonjs/core/Maths/math.vector';
+import {ArcRotateCamera} from '@babylonjs/core/Cameras/arcRotateCamera';
+import {HemisphericLight} from '@babylonjs/core/Lights/hemisphericLight';
+import {DirectionalLight} from '@babylonjs/core/Lights/directionalLight';
+import {AvatarPrimitivePool,createAvatarRig} from '/client/avatar-renderer.ts';
+import {AvatarAnimator} from '/client/animation.ts';
+import {AvatarLodController} from '/client/avatar-lod.ts';
+import {AVATAR_PRESETS,applyAvatarPreset} from '/client/avatar-presets.ts';
+import {DEFAULT_AVATAR} from '/shared/types.ts';
+const canvas=document.querySelector('canvas'),engine=new Engine(canvas,true,{powerPreference:'high-performance',stencil:false}),scene=new Scene(engine);
+scene.useRightHandedSystem=true;scene.clearColor=new Color4(.18,.23,.25,1);
+const camera=new ArcRotateCamera('review',1.05,1.46,3.5,new Vector3(0,.88,0),scene);camera.fov=.54;camera.minZ=.03;camera.attachControl(canvas,true);
+const hemi=new HemisphericLight('sky',new Vector3(0,1,0),scene);hemi.intensity=.9;hemi.groundColor=new Color3(.24,.22,.18);
+const sun=new DirectionalLight('key',new Vector3(-.6,-1,-.8),scene);sun.intensity=1.6;sun.diffuse=new Color3(1,.9,.76);
+const pool=new AvatarPrimitivePool(scene);let rig,animator,lod,preset=0,pose='idle',paused=false,level='near',travel=0,error=null;
+function build(i){rig?.root.dispose();preset=i;const config=applyAvatarPreset(i,DEFAULT_AVATAR);rig=createAvatarRig(scene,config,pool,'avatar review '+i);animator=new AvatarAnimator(rig);lod=new AvatarLodController(scene,pool,rig,config);pool.pruneUnused();for(const mat of scene.materials)mat.onError=(_,message)=>{error=message};}
+const button=(container,label,fn)=>{const b=document.createElement('button');b.textContent=label;b.addEventListener('click',fn);document.querySelector(container).append(b);return b;};
+AVATAR_PRESETS.forEach((p,i)=>button('#presets',p.name,()=>build(i)));
+for(const [label,alpha,beta,radius,target]of [['Čelně',Math.PI/2,1.5,3.5,.88],['Tři čtvrtiny',1.05,1.46,3.5,.88],['Profil',0,1.5,3.5,.88],['Záda',-Math.PI/2,1.5,3.5,.88],['Obličej',Math.PI/2,1.5,1,1.57],['Gesta',1.05,1.46,4.25,1.03]])button('#views',label,()=>{camera.alpha=alpha;camera.beta=beta;camera.radius=radius;camera.target.y=target});
+for(const [label,p]of [['Klid','idle'],['Chůze','walk'],['Běh','run'],['Zamávání','wave']])button('#poses',label,()=>{pose=p;paused=false});
+document.querySelector('#pause').addEventListener('click',()=>paused=!paused);
+for(const b of document.querySelectorAll('[data-lod]'))b.addEventListener('click',()=>level=b.dataset.lod);
+build(0);let last=performance.now(),next=0;
+engine.runRenderLoop(()=>{const now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;if(!paused){travel+=(pose==='walk'?2.1:pose==='run'?4.8:0)*dt;animator.update({position:{x:0,y:0,z:travel},yaw:0,emote:pose==='wave'?'👋':undefined},dt)}lod.update({distance:level==='near'?0:level==='medium'?20:100,quality:'low',position:{x:0,y:0,z:0},yaw:0});scene.render();if(now>next){next=now+200;const active=rig.root.getChildMeshes().filter(m=>m.isEnabled());document.querySelector('#character-audit').textContent=JSON.stringify({ready:scene.isReady(),garments:'MakeHuman CC0 fitting + painted weights',preset:AVATAR_PRESETS[preset].name,pose,paused,lod:lod.level,activeMeshes:active.length,activeTriangles:active.reduce((s,m)=>s+m.getTotalIndices()/3,0),skinDraws:active.filter(m=>m.metadata?.skinnedAnatomy).length,bones:rig.skinnedBody?.skeleton.bones.length,eyeHeight:rig.eyeHeight,bodyHeight:rig.bodyHeight,gpu:engine.getGlInfo().renderer,shaderError:error},null,2)}});
+addEventListener('resize',()=>engine.resize());
+</script>

@@ -1,0 +1,49 @@
+{
+  "checkedAt": "2026-10-10T17:50:21.345Z",
+  "sourceSha256": "42fc939d64b8bcfc5329e13356fc984872c18ecb10535da6354f98ea58d3519c",
+  "full": {
+    "bytes": 880992,
+    "triangles": 18780,
+    "meshes": 23,
+    "wheelGroups": [
+      "WheelFrontLeft",
+      "WheelFrontRight",
+      "WheelRearLeft",
+      "WheelRearRight"
+    ]
+  },
+  "low": {
+    "bytes": 353076,
+    "triangles": 6553,
+    "meshes": 15,
+    "wheelGroups": [
+      "WheelFrontLeft",
+      "WheelFrontRight",
+      "WheelRearLeft",
+      "WheelRearRight"
+    ]
+  },
+  "gtfs": {
+    "start": "20261010",
+    "end": "20261023",
+    "trips": 443,
+    "shapes": 6,
+    "stops": 10,
+    "source": "https://data.pid.cz/PID_GTFS.zip",
+    "license": "CC-BY-4.0"
+  },
+  "navigation": {
+    "destinations": 8,
+    "journeys": 16,
+    "doorConfidence": "provisional-west-entrance-projection"
+  },
+  "browserQA": {
+    "renderer": "Actual Babylon WebGL in IAB; both route displays and departure/NPC continuity checked; console error/warn list empty",
+    "screenshots": [
+      "browser-149-arrival.jpg",
+      "browser-149-departed.jpg"
+    ],
+    "wholeGameFPS": false
+  },
+  "tests": "pnpm exec tsx --test tests/transit.test.ts: 8/8 passed; TypeScript passed on 2026-10-10"
+}

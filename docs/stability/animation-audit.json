@@ -1,0 +1,76 @@
+{
+  "recordedAt": "2026-10-10T17:36:01.718Z",
+  "userTimezone": "Europe/Prague",
+  "runtime": "v24.19.0",
+  "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+  "logicalCpus": 12,
+  "totalMemoryGiB": 31.844104766845703,
+  "renderer": "Babylon.js 9.30.0 NullEngine (no GPU)",
+  "sourceSha256": {
+    "client/animation.ts": "2eb8eb97a45aa8c308f883b20de77557119af89a129976bc2845c91d600a10e6",
+    "client/labels.ts": "c068a91cf180070cc5bb862621e7db929417bc339272e32c6a738eb2f7dfa0f9",
+    "client/avatar-renderer.ts": "e7530f81ec63420e5c2d6cf3e588aeeca64c6d024b479235a730795e8bd5ad83"
+  },
+  "scenarios": [
+    {
+      "avatarCount": 1,
+      "warmupFrames": 180,
+      "measuredFrames": 900,
+      "fixedAnimationDt": 0.016666666666666666,
+      "animatorWithPositionAssignment": {
+        "meanMs": 0.013033111111109672,
+        "p95Ms": 0.03770000000008622,
+        "p99Ms": 0.08750000000009095,
+        "maximumMs": 0.32970000000000255
+      },
+      "nullEngineSceneRenderCpu": {
+        "meanMs": 0.17015600000000125,
+        "p95Ms": 0.38830000000007203,
+        "p99Ms": 0.8554999999998927,
+        "maximumMs": 6.10979999999995
+      },
+      "maximumRootTranslationError": 0,
+      "note": "Synthetic render rigs, no network/physics/HUD/GPU. NullEngine has no GPU work; these are CPU component costs, not game FPS."
+    },
+    {
+      "avatarCount": 30,
+      "warmupFrames": 180,
+      "measuredFrames": 900,
+      "fixedAnimationDt": 0.016666666666666666,
+      "animatorWithPositionAssignment": {
+        "meanMs": 0.19904411111111686,
+        "p95Ms": 0.32689999999956854,
+        "p99Ms": 0.44290000000000873,
+        "maximumMs": 0.6746000000002823
+      },
+      "nullEngineSceneRenderCpu": {
+        "meanMs": 4.060868222222219,
+        "p95Ms": 6.074699999999211,
+        "p99Ms": 7.273699999999735,
+        "maximumMs": 8.791300000000774
+      },
+      "maximumRootTranslationError": 0,
+      "note": "Synthetic render rigs, no network/physics/HUD/GPU. NullEngine has no GPU work; these are CPU component costs, not game FPS."
+    },
+    {
+      "avatarCount": 100,
+      "warmupFrames": 180,
+      "measuredFrames": 900,
+      "fixedAnimationDt": 0.016666666666666666,
+      "animatorWithPositionAssignment": {
+        "meanMs": 0.6463642222222208,
+        "p95Ms": 1.0001000000011118,
+        "p99Ms": 1.2679000000007363,
+        "maximumMs": 2.1057999999993626
+      },
+      "nullEngineSceneRenderCpu": {
+        "meanMs": 12.644881555555552,
+        "p95Ms": 16.541799999999057,
+        "p99Ms": 21.31420000000071,
+        "maximumMs": 29.850399999999354
+      },
+      "maximumRootTranslationError": 0,
+      "note": "Synthetic render rigs, no network/physics/HUD/GPU. NullEngine has no GPU work; these are CPU component costs, not game FPS."
+    }
+  ]
+}

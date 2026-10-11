@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-11",
+  "evidenceTrigger": "root-review/eli-medium-idle-final.png (before correction)",
+  "cause": "Opening radial enlargement was incorrectly applied around the remote cuff centre throughout the lower sleeve; it amplified the source taper into a bell. Fix restricts this added radial scale to the last 45mm while preserving the original sewn forearm.",
+  "unchangedAnatomySha256": "8809116cd9d3f35c471f76429c863a58624126315031addb27642c22159ba8dc",
+  "oldDataFailedRegression": {
+    "preset": "Eli",
+    "lod": "near",
+    "observedForearmRadialRatio": 1.9670557864183744
+  },
+  "correctedData": {
+    "maximumOpeningRadialRatio": 1.0810595489674626,
+    "maximumForearmRadialRatio": 1.2988694485680141,
+    "maximumCuffOpeningCentreDifferenceMetres": 0.025342433774138112,
+    "radialTransitionMetres": 0.045,
+    "openingRatioLimit": 1.55,
+    "forearmRatioLimit": 1.65,
+    "axialOverlapAllowedMetres": [-0.04, 0.012]
+  },
+  "measurement": "Actual Babylon skinning matrices, idle to wave, both LODs, original skin opening and CG forearm reference; radius projected perpendicular to the posed elbow bone axis. Structural geometry proof, not a substitute for live GPU visual QA or an FPS benchmark.",
+  "targetedTests": {"passed": 31, "failed": 0},
+  "finalGpuReview": {
+    "reviewer": "root",
+    "views": ["root-review/eli-medium-idle-cuff-corrected.png", "root-review/eli-near-wave-cuff-corrected.png", "root-review/eli-medium-wave-cuff-corrected.png"],
+    "ready": true,
+    "shaderError": null,
+    "result": "Giant bell forearm distortion removed against same-angle previous PNG; small outward cuff lip remains a qualitative styling limitation. Not an AAA/perfect or FPS claim."
+  }
+}

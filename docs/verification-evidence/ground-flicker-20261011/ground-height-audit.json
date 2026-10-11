@@ -1,0 +1,775 @@
+{
+  "generatedAt": "2026-10-11T10:18:21.483Z",
+  "scope": "Read-only actual F32 vertex inputs and original rendered ground geometry; sampled top two distinct material layers. Analytic projection uses recorded K3 matrices; not GPU depth readback, polygon-offset raster proof, occlusion proof or a demonstrated visual repro.",
+  "sourceHashes": {
+    "shared/terrain.ts": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f",
+    "shared/vegetation.ts": "da310b4c7441e98816f9fe6900145c530f7dcb6c3846fb1ff55511568a510075",
+    "client/terrain-renderer.ts": "54cba70e1227b60ad69a4543977869b0e1ee817bfd919a282ddad0d33166b1fe",
+    "client/streets-renderer.ts": "ab2661bf9a15c876674be46afd0d40ce8d70f078ddd8051d5e6a110887ba315c",
+    "client/vegetation.ts": "d1a1d6e5e7296538208a8d08c924c7a15080623e84ebc590a62bdc8e4463d992"
+  },
+  "sourceStable": true,
+  "region": {
+    "minX": -170,
+    "maxX": 270,
+    "minZ": -220,
+    "maxZ": 170
+  },
+  "gridStepMetres": 1,
+  "meshes": 24,
+  "triangles": 101683,
+  "samples": 70315,
+  "cpuMs": 10361.4715,
+  "pairs": [
+    {
+      "key": "street:asphalt > terrain:soil-grass-base",
+      "samples": 30899,
+      "minGapMetres": 0.01799649068127751,
+      "maxGapMetres": 0.018003076431978293,
+      "recordedVisibleSamples": 6579,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": -33.629999999999995,
+        "z": -219.39,
+        "topY": 4.2030596296108085,
+        "underY": 4.185060024857522,
+        "gapMetres": 0.017999604753286214,
+        "depth24Lsb": 0.17811549883392397,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -2,
+          -2
+        ],
+        "nearestBlock": "",
+        "top": {
+          "owner": "mapped-surfaces:asphalt",
+          "material": "street:asphalt",
+          "triangle": 89530
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 35180
+        }
+      }
+    },
+    {
+      "key": "mapped ground #788268 > terrain:soil-grass-base",
+      "samples": 28572,
+      "minGapMetres": 0.002496104508529662,
+      "maxGapMetres": 0.0025066641505784304,
+      "recordedVisibleSamples": 1738,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 65.37,
+        "z": -121.38999999999999,
+        "topY": -3.0965951570688386,
+        "underY": -3.099095062017441,
+        "gapMetres": 0.002499904948602527,
+        "depth24Lsb": 0.06855862924107115,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "",
+        "top": {
+          "owner": "mapped surface #788268",
+          "material": "mapped ground #788268",
+          "triangle": 3827
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 43618
+        }
+      }
+    },
+    {
+      "key": "street:paving > terrain:soil-grass-base",
+      "samples": 2240,
+      "minGapMetres": 0.017992563358928182,
+      "maxGapMetres": 0.018004762967236854,
+      "recordedVisibleSamples": 521,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 37.370000000000005,
+        "z": -77.38999999999999,
+        "topY": -1.087939971520868,
+        "underY": -1.1059399867057802,
+        "gapMetres": 0.018000015184912233,
+        "depth24Lsb": 1.0454172409077107,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -2,
+          -2
+        ],
+        "nearestBlock": "Koleje Strahov blok 7",
+        "top": {
+          "owner": "mapped-surfaces:paving",
+          "material": "street:paving",
+          "triangle": 11985
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 41300
+        }
+      }
+    },
+    {
+      "key": "street:paving > mapped ground #788268",
+      "samples": 149,
+      "minGapMetres": 0.015499357178463402,
+      "maxGapMetres": 0.015500454204844694,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": -136.63,
+        "z": -35.389999999999986,
+        "topY": 3.096922745356482,
+        "underY": 3.081422953145946,
+        "gapMetres": 0.01549979221053599,
+        "depth24Lsb": 2.9077096543336016,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -2,
+          -2
+        ],
+        "nearestBlock": "Koleje Strahov blok 5",
+        "top": {
+          "owner": "mapped-surfaces:paving",
+          "material": "street:paving",
+          "triangle": 5895
+        },
+        "under": {
+          "owner": "mapped surface #788268",
+          "material": "mapped ground #788268",
+          "triangle": 31463
+        }
+      }
+    },
+    {
+      "key": "street:asphalt > mapped ground #788268",
+      "samples": 687,
+      "minGapMetres": 0.015499406696196871,
+      "maxGapMetres": 0.015500970768460132,
+      "recordedVisibleSamples": 30,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 70.37,
+        "z": -111.38999999999999,
+        "topY": -3.0605024668174274,
+        "underY": -3.0760024359568092,
+        "gapMetres": 0.015499969139381786,
+        "depth24Lsb": 0.49141439660403574,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -2,
+          -2
+        ],
+        "nearestBlock": "",
+        "top": {
+          "owner": "mapped-surfaces:asphalt",
+          "material": "street:asphalt",
+          "triangle": 14686
+        },
+        "under": {
+          "owner": "mapped surface #788268",
+          "material": "mapped ground #788268",
+          "triangle": 3566
+        }
+      }
+    },
+    {
+      "key": "street:gravel > terrain:soil-grass-base",
+      "samples": 364,
+      "minGapMetres": 0.017999760638779394,
+      "maxGapMetres": 0.01800018030699002,
+      "recordedVisibleSamples": 17,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 40.370000000000005,
+        "z": -88.38999999999999,
+        "topY": -1.187962492905147,
+        "underY": -1.2059624883532525,
+        "gapMetres": 0.017999995448105377,
+        "depth24Lsb": 0.8450884278065873,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -2,
+          -2
+        ],
+        "nearestBlock": "Koleje Strahov blok 7",
+        "top": {
+          "owner": "mapped-surfaces:gravel",
+          "material": "street:gravel",
+          "triangle": 580
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 41255
+        }
+      }
+    },
+    {
+      "key": "mapped ground #92928a > terrain:soil-grass-base",
+      "samples": 274,
+      "minGapMetres": 0.0034997449890904475,
+      "maxGapMetres": 0.003500170454899476,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": -52.629999999999995,
+        "z": -20.389999999999986,
+        "topY": 0.7819825197761555,
+        "underY": 0.7784825184941302,
+        "gapMetres": 0.0035000012820253223,
+        "depth24Lsb": 1.1913539010596887,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "Koleje Strahov blok 5",
+        "top": {
+          "owner": "mapped surface #92928a",
+          "material": "mapped ground #92928a",
+          "triangle": 319
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 35955
+        }
+      }
+    },
+    {
+      "key": "campus-exterior:turf > terrain:soil-grass-base",
+      "samples": 910,
+      "minGapMetres": 0.026999876787434873,
+      "maxGapMetres": 0.0270001307225467,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": -43.629999999999995,
+        "z": -7.389999999999986,
+        "topY": 1.2874475027634265,
+        "underY": 1.2604474851489067,
+        "gapMetres": 0.027000017614519756,
+        "depth24Lsb": 20.153000487208267,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "Koleje Strahov blok 5",
+        "top": {
+          "owner": "campus-exterior court-41833989 turf both",
+          "material": "campus-exterior:turf",
+          "triangle": 7
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 36024
+        }
+      }
+    },
+    {
+      "key": "campus-exterior:courtGreen > terrain:soil-grass-base",
+      "samples": 377,
+      "minGapMetres": 0.026999980129608386,
+      "maxGapMetres": 0.02700002777382768,
+      "recordedVisibleSamples": 203,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": -5.6299999999999955,
+        "z": -134.39,
+        "topY": 0.2545938703304307,
+        "underY": 0.2275938644720851,
+        "gapMetres": 0.027000005858345583,
+        "depth24Lsb": 0.6328086839059757,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "",
+        "top": {
+          "owner": "campus-exterior court-293949920 courtGreen both",
+          "material": "campus-exterior:courtGreen",
+          "triangle": 109
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 75949
+        }
+      }
+    },
+    {
+      "key": "campus-exterior:ochre > terrain:soil-grass-base",
+      "samples": 1225,
+      "minGapMetres": 0.026999812687146907,
+      "maxGapMetres": 0.027000205961058232,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": -12.629999999999995,
+        "z": -7.389999999999986,
+        "topY": 0.34784748712388847,
+        "underY": 0.3208475019410252,
+        "gapMetres": 0.026999985182863284,
+        "depth24Lsb": 19.62526508512251,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "Koleje Strahov blok 6",
+        "top": {
+          "owner": "campus-exterior court-41833990 ochre both",
+          "material": "campus-exterior:ochre",
+          "triangle": 123
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 38404
+        }
+      }
+    },
+    {
+      "key": "campus-exterior:courtRed > terrain:soil-grass-base",
+      "samples": 256,
+      "minGapMetres": 0.026999986340449783,
+      "maxGapMetres": 0.027000021801575597,
+      "recordedVisibleSamples": 158,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": -3.6299999999999955,
+        "z": -131.39,
+        "topY": 0.24291395114843695,
+        "underY": 0.21591396480798716,
+        "gapMetres": 0.026999986340449783,
+        "depth24Lsb": 0.6580210178034868,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "",
+        "top": {
+          "owner": "campus-exterior court-293949920 courtRed both",
+          "material": "campus-exterior:courtRed",
+          "triangle": 19
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 76508
+        }
+      }
+    },
+    {
+      "key": "campus-exterior:blue > campus-exterior:ochre",
+      "samples": 569,
+      "minGapMetres": 0.0069999741762876155,
+      "maxGapMetres": 0.0070000428325650565,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": -6.6299999999999955,
+        "z": -0.38999999999998636,
+        "topY": 0.36687499817724173,
+        "underY": 0.35987500390500154,
+        "gapMetres": 0.006999994272240184,
+        "depth24Lsb": 9.097910757859868,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -3,
+          -3
+        ],
+        "nearestBlock": "Koleje Strahov blok 6",
+        "top": {
+          "owner": "campus-exterior court-41833990 blue both",
+          "material": "campus-exterior:blue",
+          "triangle": 57
+        },
+        "under": {
+          "owner": "campus-exterior court-41833990 ochre both",
+          "material": "campus-exterior:ochre",
+          "triangle": 40
+        }
+      }
+    },
+    {
+      "key": "street:gravel > mapped ground #788268",
+      "samples": 104,
+      "minGapMetres": 0.015499604269511469,
+      "maxGapMetres": 0.015500316759559762,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 38.370000000000005,
+        "z": 116.61000000000001,
+        "topY": -2.087522385301822,
+        "underY": -2.1030224472753694,
+        "gapMetres": 0.015500061973547474,
+        "depth24Lsb": 0.9600232341871684,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -2,
+          -2
+        ],
+        "nearestBlock": "Koleje Strahov blok 3",
+        "top": {
+          "owner": "mapped-surfaces:gravel",
+          "material": "street:gravel",
+          "triangle": 3271
+        },
+        "under": {
+          "owner": "mapped surface #788268",
+          "material": "mapped ground #788268",
+          "triangle": 26267
+        }
+      }
+    },
+    {
+      "key": "campus-exterior:red > terrain:soil-grass-base",
+      "samples": 485,
+      "minGapMetres": 0.02699974917242076,
+      "maxGapMetres": 0.027000373512297005,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 49.370000000000005,
+        "z": -3.3899999999999864,
+        "topY": -1.2398299970296969,
+        "underY": -1.2668300002813337,
+        "gapMetres": 0.027000003251636873,
+        "depth24Lsb": 25.434588554488716,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "",
+        "top": {
+          "owner": "campus-exterior court-108568430 red both",
+          "material": "campus-exterior:red",
+          "triangle": 14
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 44090
+        }
+      }
+    },
+    {
+      "key": "campus-exterior:red > street:asphalt",
+      "samples": 5,
+      "minGapMetres": 0.008999546078882092,
+      "maxGapMetres": 0.008999843825333143,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 65.37,
+        "z": 2.6100000000000136,
+        "topY": -1.6965374972423495,
+        "underY": -1.7055370433212316,
+        "gapMetres": 0.008999546078882092,
+        "depth24Lsb": 14.620478912526083,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "",
+        "top": {
+          "owner": "campus-exterior court-108568430 red both",
+          "material": "campus-exterior:red",
+          "triangle": 36
+        },
+        "under": {
+          "owner": "mapped-surfaces:asphalt",
+          "material": "street:asphalt",
+          "triangle": 7771
+        }
+      }
+    },
+    {
+      "key": "photo:central-asphalt > terrain:soil-grass-base",
+      "samples": 60,
+      "minGapMetres": 0.010999815302871419,
+      "maxGapMetres": 0.011000265226380535,
+      "recordedVisibleSamples": 6,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 132.37,
+        "z": -15.389999999999986,
+        "topY": -3.802120078839616,
+        "underY": -3.8131199920177465,
+        "gapMetres": 0.010999913178130427,
+        "depth24Lsb": 4.414325413744111,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -1,
+          0
+        ],
+        "nearestBlock": "Potraviny",
+        "top": {
+          "owner": "central-asphalt-court:1",
+          "material": "photo:central-asphalt",
+          "triangle": 7
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 49044
+        }
+      }
+    },
+    {
+      "key": "photo:central-asphalt > mapped ground #788268",
+      "samples": 21,
+      "minGapMetres": 0.008499812182989341,
+      "maxGapMetres": 0.00850012138043521,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 87.37,
+        "z": 32.610000000000014,
+        "topY": -2.6147025902404404,
+        "underY": -2.623202517611067,
+        "gapMetres": 0.008499927370626548,
+        "depth24Lsb": 39.15821784722983,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -1,
+          0
+        ],
+        "nearestBlock": "Koleje Strahov blok 4",
+        "top": {
+          "owner": "central-asphalt-court:3",
+          "material": "photo:central-asphalt",
+          "triangle": 99
+        },
+        "under": {
+          "owner": "mapped surface #788268",
+          "material": "mapped ground #788268",
+          "triangle": 20434
+        }
+      }
+    },
+    {
+      "key": "campus-exterior:sand > terrain:soil-grass-base",
+      "samples": 345,
+      "minGapMetres": 0.02699981932899087,
+      "maxGapMetres": 0.027000184141396932,
+      "recordedVisibleSamples": 345,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 104.37,
+        "z": -39.389999999999986,
+        "topY": -3.1189924827836983,
+        "underY": -3.1459924441576006,
+        "gapMetres": 0.02699996137390226,
+        "depth24Lsb": 4.056527930667808,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "Potraviny",
+        "top": {
+          "owner": "campus-exterior court-293949918 sand both",
+          "material": "campus-exterior:sand",
+          "triangle": 2
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 46454
+        }
+      }
+    },
+    {
+      "key": "mapped ground #6f7561 > terrain:soil-grass-base",
+      "samples": 1722,
+      "minGapMetres": 0.0014906101849254672,
+      "maxGapMetres": 0.0015063019871588423,
+      "recordedVisibleSamples": 1186,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 146.37,
+        "z": -89.38999999999999,
+        "topY": -4.54695502186457,
+        "underY": -4.548454923629761,
+        "gapMetres": 0.0014999017651904367,
+        "depth24Lsb": 0.06754113331191913,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "Potraviny",
+        "top": {
+          "owner": "mapped surface #6f7561",
+          "material": "mapped ground #6f7561",
+          "triangle": 5553
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 51227
+        }
+      }
+    },
+    {
+      "key": "mapped ground #647f67 > terrain:soil-grass-base",
+      "samples": 960,
+      "minGapMetres": 0.0044993397560597614,
+      "maxGapMetres": 0.004500528102423296,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 211.37,
+        "z": -13.389999999999986,
+        "topY": -5.443557601744214,
+        "underY": -5.448057388067246,
+        "gapMetres": 0.004499786323032495,
+        "depth24Lsb": 1.9446887295133564,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -1,
+          -1
+        ],
+        "nearestBlock": "",
+        "top": {
+          "owner": "mapped surface #647f67",
+          "material": "mapped ground #647f67",
+          "triangle": 692
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 56523
+        }
+      }
+    },
+    {
+      "key": "street:sett > terrain:soil-grass-base",
+      "samples": 52,
+      "minGapMetres": 0.017996432583215594,
+      "maxGapMetres": 0.018001907685837537,
+      "recordedVisibleSamples": 0,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 251.37,
+        "z": 169.61,
+        "topY": -9.384387824909751,
+        "underY": -9.402387468814855,
+        "gapMetres": 0.017999643905103113,
+        "depth24Lsb": 0.4783907024031442,
+        "inRecordedFrustum": false,
+        "sameBias": false,
+        "bias": [
+          -2,
+          -2
+        ],
+        "nearestBlock": "",
+        "top": {
+          "owner": "mapped-surfaces:sett",
+          "material": "street:sett",
+          "triangle": 4314
+        },
+        "under": {
+          "owner": "source-dmr5g-terrain",
+          "material": "terrain:soil-grass-base",
+          "triangle": 59759
+        }
+      }
+    },
+    {
+      "key": "street:gravel > mapped ground #6f7561",
+      "samples": 39,
+      "minGapMetres": 0.01649900176715491,
+      "maxGapMetres": 0.016500825889759874,
+      "recordedVisibleSamples": 39,
+      "sameBias": false,
+      "subLsbVisibleSamples": 0,
+      "example": {
+        "x": 256.37,
+        "z": -219.39,
+        "topY": -0.4590099362277853,
+        "underY": -0.475509957458681,
+        "gapMetres": 0.016500021230895723,
+        "depth24Lsb": 0.16081337696681103,
+        "inRecordedFrustum": true,
+        "sameBias": false,
+        "bias": [
+          -2,
+          -2
+        ],
+        "nearestBlock": "",
+        "top": {
+          "owner": "mapped-surfaces:gravel",
+          "material": "street:gravel",
+          "triangle": 361
+        },
+        "under": {
+          "owner": "mapped surface #6f7561",
+          "material": "mapped ground #6f7561",
+          "triangle": 5419
+        }
+      }
+    }
+  ],
+  "subLsbVisibleCandidateCount": 0,
+  "candidates": []
+}

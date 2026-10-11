@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Strahov • skutečný car master</title
+  ><style>
+    body {
+      margin: 0;
+      background: #121e24;
+      color: #f3ebdb;
+      font: 14px system-ui;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    aside {
+      position: fixed;
+      left: 12px;
+      top: 12px;
+      width: min(360px, calc(100vw - 48px));
+      padding: 14px;
+      background: #17252bef;
+      border: 1px solid #8a937b;
+      border-radius: 10px;
+    }
+    button,
+    select {
+      background: #344b45;
+      border: 1px solid #83917a;
+      color: white;
+      padding: 7px;
+      margin: 3px;
+    }
+    pre {
+      font: 11px monospace;
+      white-space: pre-wrap;
+      max-height: 220px;
+      overflow: auto;
+    }
+    p {
+      line-height: 1.4;
+    }</style
+  ><canvas id="car"></canvas>
+  <aside>
+    <strong>Samostatný skutečný CC0 car master</strong>
+    <p>
+      Innerscene původní model → normalizovaný herní derivát. Není to značka ani
+      fotografie konkrétního strahovského auta. Barvy a obsazenost jsou
+      simulované.
+    </p>
+    <label
+      >Model
+      <select id="model">
+        <option value="near">Near · zachovaná geometrie</option>
+        <option value="medium">Medium · odvozené LOD</option>
+        <option value="far">Far · odvozené LOD</option>
+      </select></label
+    >
+    <div>
+      <button id="front">Předek</button><button id="rear">Záď</button
+      ><button id="side">Bok</button><button id="seams">Spáry zblízka</button
+      ><button id="under">Podvozek</button
+      ><button id="wheels">Kola · zapnout pohyb</button
+      ><button id="colour">Barva laku</button
+      ><button id="day">12:00 Praha</button
+      ><button id="night">02:00 Praha</button>
+    </div>
+    <p>
+      Myší lze otáčet kameru. Fyzický envelope, kola a kontakt se zemí mají
+      skutečné herní metry. Tato studie není FPS benchmark celé hry.
+    </p>
+    <pre id="stats">Načítání skutečného modelu…</pre>
+  </aside>
+  <script type="module" src="./preview.ts"></script>
+</html>

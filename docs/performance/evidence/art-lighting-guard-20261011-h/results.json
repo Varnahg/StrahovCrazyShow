@@ -1,0 +1,45 @@
+{
+  "recordedAt": "2026-10-10T23:19:40.197Z",
+  "baselineSnapshotId": "18312ddacd1191e512cfb5f0e1018f024e020fdad8d0075130657e4ea43a6684",
+  "cpuProofPassed": true,
+  "targetedTests": {
+    "command": "pnpm exec tsx --test tests/art-lighting-maintenance.test.ts tests/weather.test.ts tests/graphics.test.ts",
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "exitCode": 0
+  },
+  "targetedTypescript": {
+    "command": "pnpm exec tsc --noEmit --target ES2022 --module ESNext --moduleResolution Bundler --strict --skipLibCheck --resolveJsonModule --allowImportingTsExtensions --esModuleInterop --types node client/art-lighting.ts tests/art-lighting-maintenance.test.ts",
+    "exitCode": 0
+  },
+  "sourceHashes": {
+    "appliedArtLighting": "3f3417c23a46fd35509b1d0ddb44b2fd3d2f150d6a2a5c52268f052d9b58981a",
+    "regressionTest": "91db4d3f4697b77d6418a30636be33483cfae17bbda9268e8695c9fdc674e4f2",
+    "frozenGArtLighting": "e90fd887fa8224bf59b6c1c30dbcd58401588e1926fde234c923009069a4ab6e"
+  },
+  "appliedMatchesCandidate": true,
+  "frozenGUnchanged": true,
+  "evidence": {
+    "cpu-proof.json": {
+      "bytes": 1528,
+      "sha256": "1fae9f68a950072b05766fcd883478e19dd44727d17abee6b1204c2aa4aabc0e"
+    },
+    "cpu-proof-source.txt": {
+      "bytes": 6573,
+      "sha256": "7272ae256022bca2470b7ac42bc2453374abe59248981990df045fb659e6bb1e"
+    },
+    "candidate.patch": {
+      "bytes": 259,
+      "sha256": "6f40393d7242ef1d4d04b2e53cc17cccd98e49b2590c30f170bdab6bdca8314c"
+    },
+    "targeted-tests.log": {
+      "bytes": 2049,
+      "sha256": "c1d21e0f2bac2162f1e35b551b3cc174da3776ce1ee5a07b0d98d1e11e0a98f6"
+    },
+    "targeted-typescript.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

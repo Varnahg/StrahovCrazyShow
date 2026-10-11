@@ -1,0 +1,65 @@
+BJS - [07:25:29]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+✔ exact moonless 02:00 reserves headlight and B6 slots without raising the four-light material cap (75.004ms)
+✔ lit lunar key reserves one street slot immediately for driving and restores it immediately on exit (18.9201ms)
+✔ real dusk keeps solar key, hemisphere, B6 and car by reducing street capacity to zero (6.4785ms)
+✔ daytime car request consumes no beam slot and low quality retains at most one mapped street lamp (5.4132ms)
+✔ nearest movement retains its half-second cadence while a capacity change immediately refreshes the nearest lamp (8.7283ms)
+BJS - [07:25:29]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:29]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:29]: Babylon.js v9.30.0 - Null engine
+✔ Babylon Light override still scans identical toggles but steady ArtLighting no longer does (76.1899ms)
+✔ lamp guard retains exact two-nearest night states, movement, quality and new-mesh lighting (46.8054ms)
+✔ lamp guard compares requested own state beneath an inactive parent and preserves parent reactivation (27.778ms)
+BJS - [07:25:29]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:29]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:29]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:29]: Babylon.js v9.30.0 - Null engine
+✔ PBR channel scales retain metres, rectangular concrete and authored paving joints (2.4011ms)
+✔ real material conversion preserves tint/joints and never treats grayscale roughness as metal (47.3418ms)
+✔ paved and stone surfaces use matching real channels and return to their dry tint after rain (15.2165ms)
+✔ sky cubemap stores linear colours once and matches each hemisphere (32.8732ms)
+✔ shadow projection is stable for sub-texel motion including the solar zenith (1.073ms)
+✔ shadow metadata rejects ground, transparent glass and arbitrary custom sky shaders (4.564ms)
+✔ B6 Fresnel reflection preserves warm masks/alpha and night never keeps solar shadows (3.271ms)
+BJS - [07:25:29]: Babylon.js v9.30.0 - Null engine
+✔ 02:00 Prague on 11 October is an astronomical, almost new-moon night (7.0244ms)
+✔ night lunar lighting requires a known lit phase above the horizon and clouds attenuate it (1.2485ms)
+✔ twilight is continuous to -18 degrees and daytime overcast still has useful diffuse fill (4.2465ms)
+✔ actual Babylon scene gets dark sky, zero celestial key, retained local lamps and masked room lights (146.4ms)
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+BJS - [07:25:30]: Babylon.js v9.30.0 - Null engine
+✔ model-derived beam follows translation, 90 degree yaw, pitch and parent transforms in actual world metres (22.9846ms)
+✔ day, parking and invalid input disable the bounded beam; steady updates never repeat whole-scene light resync (19.6175ms)
+✔ medium and high use one 256/512 shadow target, low has no pass, and resized maps keep the real culling callback (81.5738ms)
+✔ actual shadow frustum rejects behind/lateral/far/glass/faded/disabled casters while retaining crossing large bounds (14.8993ms)
+✔ reactivation, low-to-shadow return, large pose changes and new meshes invalidate stale broad phase immediately (8.7936ms)
+✔ wind depth ownership and disposal are safe, idempotent and do not delete a replacement owner's wrapper (7.3482ms)
+✔ exact 02:00 moonless night frees zero celestial key so hemisphere, two streets and headlight fit four material slots (15.8066ms)
+BJS - [07:25:29]: Babylon.js v9.30.0 - Null engine
+✔ astronomy and meteorological bearings agree with north/east/south/west of the campus (4.0921ms)
+✔ Prague sun rises east, sets west, and its winter arc is much lower (2.63ms)
+✔ October 2026 lunar illumination follows independent USNO primary-phase instants (1.6255ms)
+✔ projected moon terminator preserves illuminated area instead of changing a disc's opacity (28.8075ms)
+✔ lunar bright limb faces the sun in the observer's local sky (1.3325ms)
+✔ station local clock handles summer, winter, repeated DST hour and rejects nonexistent time (10.1547ms)
+✔ weather fallback converts current interval sums and distinguishes wind aloft (3.9238ms)
+✔ fresh station cannot silently inherit old cloud cover; both failures mark cache stale (61.1517ms)
+✔ cloud mipmap source has transparent borders and detailed nonuniform opacity (34.6138ms)
+✔ night windows scale the masked emission texture while walls remain nonemissive (64.1543ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3524.5691

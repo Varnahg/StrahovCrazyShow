@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-10",
+  "client": "http://127.0.0.1:5180",
+  "server": "http://127.0.0.1:2567",
+  "protocol": 4,
+  "tabs": 2,
+  "testPlayers": [
+    "GUI A",
+    "GUI B"
+  ],
+  "tests": {
+    "sharedPresence": true,
+    "mapKeyboardSelection": true,
+    "leftClickSceneSelection": "GUI B",
+    "pointerLockAfterPick": false,
+    "contactRequest": true,
+    "contactAcceptance": true,
+    "privateMessage": "Test soukromého kontaktu A → B",
+    "privateMessageReceivedBy": "GUI B",
+    "blockingRemovedDmOption": true,
+    "remoteEmote": "👋 GUI A",
+    "journalShortcutJ": true,
+    "emoteShortcutG": true,
+    "journalSearchAndMapLink": true,
+    "typing": {
+      "text": "wasd jmg",
+      "before": "translate(23.80015754699707,-14.041749954223633) rotate(0) scale(0.7812817904374365)",
+      "after": "translate(23.800167083740234,-14.042717933654785) rotate(0) scale(0.7812817904374365)"
+    },
+    "walking": {
+      "before": "translate(23.800207138061523,-14.054657936096191) rotate(0) scale(0.7812817904374365)",
+      "afterD1200ms": "translate(28.7039794921875,-14.106209754943848) rotate(0) scale(0.7812817904374365)",
+      "afterA1200ms": "translate(24.424776077270508,-14.17138671875) rotate(0) scale(0.7812817904374365)"
+    }
+  },
+  "limitations": [
+    "Hidden subagent browser; no GPU performance claim",
+    "RMB drag cannot be synthesized with the documented Cua drag API button parameter; root final manual QA needed",
+    "Long initial scene bootstrap caused a WebSocket disconnect before reconnect; no disconnect after both clients were ready"
+  ],
+  "followupSolo": {
+    "leftDragOrbitVerified": true,
+    "uses": "pointermove with absolute client delta outside lock; mousemove relative only inside lock",
+    "screenshots": [
+      "orbit-before.png",
+      "orbit-after.png",
+      "map-drag-isolated.png"
+    ],
+    "mapBeforeDrag": "22.05,-13.96",
+    "mapAfterDrag": "-17.01,-37.40",
+    "mapDragChangedWorldCamera": false,
+    "mapHotkeyFromSvgFocus": true,
+    "clusterB4AccessiblePlaces": 3
+  },
+  "sourceHashTiming": "Final agent source after removing temporary development pointer console log; this is functional browser QA, not a frozen GPU measurement."
+}

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Strahov · skutečné půdorysy hřišť a Marketu</title
+  ><style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #1c2420;
+      color: #f1f2e7;
+      font: 14px system-ui;
+    }
+    header {
+      padding: 12px 18px;
+      height: 130px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0 0 6px;
+    }
+    p {
+      margin: 5px 0;
+      color: #c5d0c4;
+    }
+    button {
+      padding: 7px 12px;
+      margin: 3px;
+      background: #46624a;
+      color: white;
+      border: 1px solid #91a091;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .panes {
+      display: grid;
+      grid-template-columns: 38% 62%;
+      height: calc(100vh - 130px);
+    }
+    figure {
+      margin: 0;
+      position: relative;
+      overflow: hidden;
+      background: #121b15;
+    }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    figcaption {
+      position: absolute;
+      bottom: 0;
+      background: #15211de0;
+      padding: 8px;
+      width: 100%;
+      font-size: 12px;
+    }
+    #status {
+      font-size: 12px;
+    }
+  </style>
+  <header>
+    <h1>Strahov · hřiště a nízká budova Market / Recharging</h1>
+    <p>
+      IPR Praha 8. 6. 2024 + OSM půdorysy + ČÚZK DMR 5G. Vlastní herní
+      geometrie; nejde o fotogrammetrický mesh.
+    </p>
+    <button id="overview">Pohled z výšky</button
+    ><button id="courts">Z úrovně chodníku</button
+    ><button id="market">Střecha Marketu</button
+    ><button id="lod">Detail / vzdálená verze</button
+    ><span id="status">Načítám…</span>
+  </header>
+  <div class="panes">
+    <figure>
+      <img
+        src="../expansion/strahov-ortho-2024.jpg"
+        alt="Ortofoto IPR Praha 8. června 2024: centrální kurty mezi bloky a Market severovýchodně"
+      />
+      <figcaption>
+        datový podklad © IPR Praha · CC BY 4.0. Zelený kurt, dva žluto-modré,
+        červený tenis; stejný metricky doložený půdorys vpravo.
+      </figcaption>
+    </figure>
+    <figure>
+      <canvas
+        id="scene"
+        aria-label="Interaktivní 3D prohlídka modelovaných hřišť"
+      ></canvas>
+      <figcaption>
+        Myší otočit, kolečkem přiblížit. Branky a výšky oplocení jsou označené
+        herní odhady. Přesné dveře baru z těchto podkladů neurčujeme.
+      </figcaption>
+    </figure>
+  </div>
+  <script type="module" src="./preview.ts"></script>
+</html>

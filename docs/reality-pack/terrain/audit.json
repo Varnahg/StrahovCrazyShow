@@ -1,0 +1,97 @@
+{
+  "checkedAt": "2026-10-10T18:38:49.851Z",
+  "scope": "Geometry/physics audit; NullEngine is NOT a GPU/FPS result",
+  "sourceHashes": {
+    "shared/terrain.ts": "c7e54a6859b22e87ae0d8e71cf01f2d23577994e2eddc6c8bc56a9c445e878e8",
+    "shared/data/terrain-grid.json": "1b35f7237e48c7b509bc894973485b761cda26637386bf86cb266a75488d5b4c",
+    "shared/data/reality-ground.json": "9a144e2556c960677ce1d486477f0730ced54455662c1075ffc081fc90a6d878",
+    "shared/streets.ts": "f10177940e6392936e9a821edb7e01daa260a8ed0bd593a903ae0b0ec603931c",
+    "client/terrain-renderer.ts": "ebf506e0930485c3ab14194bfa24e1e0ebd7eb39e38993607d77e882ccb493f6",
+    "client/streets-renderer.ts": "c567e40d0100ddee26fc3e6e0674b720e7d204d6474c76a86e0d21f9d428aaf9",
+    "client/vegetation.ts": "29fe8bafcbefbda147e054c9305e2bf7313adcefcc96086118fc3f62ff39fa26",
+    "tests/terrain.test.ts": "61906749c68df240b1885b53ae8908fb96d9eb3b35f004a1992e3dfa71b6d578",
+    "tests/streets.test.ts": "4380769f5fa2fc1f805111def186b03111133cc2dd96ecfdf169b049db18c401",
+    "tests/vegetation.test.ts": "70a76dbcb55948853f8db428104666e6506e51c9a957b429bd705e028915cb35"
+  },
+  "sourceData": {
+    "provider": "ČÚZK / Zeměměřický úřad",
+    "referenceBpv": 326.392,
+    "grid": {
+      "minX": -160,
+      "maxX": 360,
+      "minZ": -180,
+      "maxZ": 148,
+      "step": 4,
+      "columns": 131,
+      "rows": 83
+    },
+    "tifSha256": "bccc7a4897f299d01183518910801ddd89838c6ccc80fc01233bd624af0a19cb",
+    "rangeBpv": {
+      "minAbsolute": 310.73,
+      "maxAbsolute": 339.621,
+      "samples": 10873
+    }
+  },
+  "terrain": {
+    "coverage": {
+      "minX": -152,
+      "maxX": 352,
+      "minZ": -172,
+      "maxZ": 136
+    },
+    "tiles": 198,
+    "clippedTiles": 27,
+    "vertices": 15333,
+    "triangles": 20121,
+    "physicsRaycasts": 2983,
+    "basementExclusionProbes": 27,
+    "maxRayHeightErrorMetres": 0.000018333196569741972
+  },
+  "roads": {
+    "meshes": 8,
+    "triangles": 61929,
+    "lamps": 15,
+    "crossings": 2
+  },
+  "landcover": {
+    "meshes": 6,
+    "triangles": 19027
+  },
+  "photoPack": {
+    "captureDate": "2024-06-08",
+    "additionalAsphaltFillArea": 66.367,
+    "paintLines": 73,
+    "representativeParkingSlots": 24,
+    "logoPoints": [
+      [
+        89.043,
+        -4.927
+      ],
+      [
+        122.412,
+        -4.927
+      ],
+      [
+        122.412,
+        3.291
+      ],
+      [
+        89.043,
+        3.291
+      ]
+    ]
+  },
+  "browserVerification": {
+    "url": "http://127.0.0.1:5173/docs/reality-pack/terrain/preview.html",
+    "screenshots": [
+      "browser-parking.jpg",
+      "browser-terrain.jpg"
+    ],
+    "photoClick": {
+      "x": 105.1,
+      "z": 0.1,
+      "heightBpv": 323.34
+    },
+    "note": "Actual Chromium WebGL preview, normal north-up orientation, readable non-inverted authored lettering; test tab closed to release GPU. Full game performance is a separate root audit."
+  }
+}

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="cs"><meta charset="utf-8"><title>Strahov měření scény</title>
+<style>body{margin:0;background:#17242a;color:#edf1df;font:14px monospace}canvas{width:1280px;height:720px;display:block}button{padding:12px;margin:8px}pre{white-space:pre-wrap;max-width:1280px;padding:16px}</style>
+<button id="base">Změřit původní kameru</button><button id="noray">Změřit bez kamerového paprsku</button><button id="crowd">Přidat 99 avatarů</button>
+<canvas id="game"></canvas><pre id="result">Načítání</pre>
+<script type="module">
+import { Game } from '/client/game.ts';
+import { DEFAULT_PROFILE } from '/shared/types.ts';
+import { SceneInstrumentation } from '@babylonjs/core/Instrumentation/sceneInstrumentation';
+const output=document.querySelector('#result');
+const constructed=performance.now();
+const g=new Game(document.querySelector('canvas'),DEFAULT_PROFILE);
+const instrumentation=new SceneInstrumentation(g.scene);
+const buildWorldMs=performance.now()-constructed;
+g.timeOverride=Date.parse('2026-10-10T12:00:00Z');
+let lastStats={};g.onStats=s=>lastStats=s;
+const originalPick=g.scene.pickWithRay.bind(g.scene);
+let noRay=false,pickTimes=[],cpuTimes=[],intervals=[],running=false,lastFrame=0,started=0,visibilityChanges=0;
+document.addEventListener('visibilitychange',()=>{if(running)visibilityChanges++;});
+g.scene.pickWithRay=(...args)=>{if(noRay)return null;const t=performance.now();const r=originalPick(...args);if(running)pickTimes.push(performance.now()-t);return r;};
+const originalFrame=g.frame.bind(g);
+g.frame=()=>{const t=performance.now();originalFrame();if(running){cpuTimes.push(performance.now()-t);if(lastFrame)intervals.push(t-lastFrame);lastFrame=t;if(t-started>=12000)finish();}};
+const summary=a=>{const s=[...a].sort((x,y)=>x-y);return{n:s.length,mean:s.reduce((n,x)=>n+x,0)/s.length,p50:s[Math.floor(s.length*.5)],p95:s[Math.floor(s.length*.95)],p99:s[Math.floor(s.length*.99)],max:s[s.length-1]};};
+function finish(){running=false;const result={capturedAt:new Date().toISOString(),scenario:noRay?'idle-without-camera-pick':'idle-original-camera',notes:'Development snapshot; standalone Game without React HUD. Raw frame intervals are unclamped. CPU timing includes command submission, not GPU execution. Twelve seconds after warmup; no hardware generalization. SceneInstrumentation resets draw counter each frame. Avatars are synthetic static render entities, only one local physical actor.',buildWorldMs,renderer:g.engine.getGlInfo(),userAgent:navigator.userAgent,visibility:document.visibilityState,visibilityChanges,viewport:[innerWidth,innerHeight],canvas:[g.engine.getRenderWidth(),g.engine.getRenderHeight()],devicePixelRatio,avatarCount:g.avatars.size,activeMeshes:g.scene.getActiveMeshes().length,drawCallsPerFrame:instrumentation.drawCallsCounter.current,frameIntervalMs:summary(intervals),cpuFrameMs:summary(cpuTimes),cameraPickMs:summary(pickTimes),over33ms:intervals.filter(x=>x>33.333).length,over50ms:intervals.filter(x=>x>50).length,stats:lastStats,meshes:g.scene.meshes.length,materials:g.scene.materials.length,multiMaterials:g.scene.multiMaterials.length,textures:g.scene.textures.length,colliders:g.sim.world.colliders.len(),subMeshes:g.scene.meshes.reduce((n,m)=>n+(m.subMeshes?.length??0),0),totalTriangles:g.scene.meshes.reduce((n,m)=>n+m.getTotalIndices()/3,0)};output.textContent=JSON.stringify(result,null,2);}
+function measure(disable){if(running)return;noRay=disable;pickTimes=[];cpuTimes=[];intervals=[];lastFrame=0;visibilityChanges=0;started=performance.now();running=true;output.textContent='Probíhá 12sekundové měření';}
+document.querySelector('#base').onclick=()=>measure(false);
+document.querySelector('#noray').onclick=()=>measure(true);
+document.querySelector('#crowd').onclick=()=>{if(running)return;g.updatePlayers([g.localPlayer,...Array.from({length:99},(_,i)=>({...g.localPlayer,id:'audit'+i,nickname:'Audit '+i,x:22+(i%10-5)*1.2,z:-20-Math.floor(i/10)*1.2}))]);output.textContent='Připraveno 100 avatarů. Jde pouze o statické render entity, nikoliv 100 síťových klientů.';};
+await g.start();output.textContent='Připraveno. Před měřením nechte scénu alespoň 5 sekund zahřát.';
+</script></html>

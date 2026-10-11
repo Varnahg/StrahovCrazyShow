@@ -1,0 +1,40 @@
+BJS - [06:08:59]: Babylon.js v9.30.0 - Null engine
+BJS - [06:08:59]: Babylon.js v9.30.0 - Null engine
+Native separate parking DMR support {
+  cars: 24,
+  minimumTyreGapMetres: 0.001870555501686244,
+  maximumTyreGapMetres: 0.015063899745586085
+}
+BJS - [06:08:59]: Babylon.js v9.30.0 - Null engine
+BJS - [06:08:59]: Babylon.js v9.30.0 - Null engine
+BJS - [06:08:59]: Babylon.js v9.30.0 - Null engine
+✔ actual compact GLB creates independent identified vehicle roots instead of a baked campus mesh (131.265ms)
+✔ all source parking transforms match the DMR collider placement and keep wheel bottoms close to ground (61.2619ms)
+✔ driving and suspension animation never mutates any separate parked car (38.1425ms)
+✔ native model materials distinguish reflective dielectric glass from shared paint variants (33.3153ms)
+✔ parking opt-out, driving visibility and loader disposal do not leave baked or orphan geometry (304.6651ms)
+BJS - [06:08:59]: Babylon.js v9.30.0 - Null engine
+✔ retained source is exact CC0 master and all published LOD bytes match the canonical manifest (34.2368ms)
+BJS - [06:09:00]: Babylon.js v9.30.0 - Null engine
+✔ real GLB import fits current wheel physics and keeps four independent round tyres with finite valid geometry (219.4991ms)
+BJS - [06:09:00]: Babylon.js v9.30.0 - Null engine
+✔ scene consumers share one source upload and actual palette materials across independent car entities (133.3831ms)
+Reviewed car parking actual DMR support {
+  minimum: 0.001870555501686244,
+  maximum: 0.015063899745586085,
+  cars: 24,
+  paletteMaterials: 6
+}
+BJS - [06:09:00]: Babylon.js v9.30.0 - Null engine
+✔ production loadCar adapter uses the reviewed shared pack with 24 independent grounded parking cars (128.9467ms)
+BJS - [06:09:00]: Babylon.js v9.30.0 - Null engine
+✔ actual Babylon instance LOD selects retained near, medium and far without extra per-car instances (106.8306ms)
+✔ night emission belongs only to main source lenses and parked, reversing, brake, glass and paint stay dark (45.2617ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3115.8079

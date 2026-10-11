@@ -1,0 +1,9 @@
+Command: pnpm exec tsc --noEmit
+UTC: 2026-10-11T06:57:42.3633559Z
+Exit code: 2
+client/game.ts(155,17): error TS2304: Cannot find name 'Vec3'.
+client/game.ts(1803,11): error TS2353: Object literal may only specify known properties, and 'triangleCountScope' does not exist in type 'Benchmark'.
+client/game.ts(1897,22): error TS2345: Argument of type '{ speed: number; yaw: number; vehicle: boolean; zone: string; hint: string; rendering: Readonly<{ mode: RenderQualityMode; quality: RenderQuality; ... 8 more ...; statistics: AdaptiveFrameStatistics | null; }>; ... 8 more ...; drawCalls: number; }' is not assignable to parameter of type 'GameStats'.
+  Property 'triangleCountScope' is missing in type '{ speed: number; yaw: number; vehicle: boolean; zone: string; hint: string; rendering: Readonly<{ mode: RenderQualityMode; quality: RenderQuality; ... 8 more ...; statistics: AdaptiveFrameStatistics | null; }>; ... 8 more ...; drawCalls: number; }' but required in type 'GameStats'.
+
+Follow-up: root reported a fresh whole-workspace tsc exit 0 after correcting its concurrent Game interface edits. The earlier exit 2 above is retained as the preceding in-flight checkpoint; it is not the final K TypeScript status.

@@ -1,0 +1,58 @@
+<!doctype html><html lang="cs"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Strahov · studie anatomických očí a studentské postavy</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#182128;color:#e3e3dc;font:14px system-ui}header{padding:14px 20px;background:#26323a}h1{margin:0 0 5px;font-size:21px}p{margin:0;color:#bfc9c8}main{display:grid;grid-template-columns:1fr 310px;height:calc(100vh - 82px)}canvas{width:100%;height:100%;touch-action:none}aside{padding:15px;overflow:auto}button{margin:3px;padding:8px;color:#ede9dc;background:#3b4b50;border:1px solid #728481;border-radius:5px;cursor:pointer}h2{font-size:14px}label{display:block;margin:17px 0}pre{font-size:11px;white-space:pre-wrap}.columns{position:absolute;left:15px;right:325px;top:94px;display:flex;justify-content:space-around;pointer-events:none}</style>
+<header><h1>Oči podle skutečné anatomie · oddělená studie</h1><p>Vlevo současná produkce · vpravo CC0 oční povrch fitted do původních důlků · původní hlava, tělo i oděvy beze změny</p></header><div class="columns"><span>Původní oči</span><span>Anatomické oči</span></div>
+<main><canvas></canvas><aside><h2>Postava</h2><div id="presets"></div><h2>Rámování</h2><div id="frames"></div><h2>Pohled</h2><div id="views"></div><h2>Skutečný LOD</h2><div id="lod"></div><h2>Pohyb</h2><div id="poses"></div><label>Otočení hlavy <input id="turn" type="range" min="-.65" max=".65" step=".01" value=".65"></label><label><input id="hair" type="checkbox"> Vpravo texturovaný vlasový prototyp</label><div id="hair-styles"></div><label><input id="pause" type="checkbox"> Pozastavit animaci</label><p>Izolovaná kontrola ve stejném osvětlení, tónování a odrazech jako hra; referenční datum 11. 10. 2026 13:00 UTC, oblačnost 30 %. Nejde o měření FPS celého areálu.</p><pre id="audit">Načítání…</pre></aside></main>
+<script type="module">
+import '/client/render-shaders.ts';
+import {Engine} from '@babylonjs/core/Engines/engine';import {Scene} from '@babylonjs/core/scene';
+import {Vector3} from '@babylonjs/core/Maths/math.vector';import {Color3,Color4} from '@babylonjs/core/Maths/math.color';
+import {ArcRotateCamera} from '@babylonjs/core/Cameras/arcRotateCamera';import {Camera} from '@babylonjs/core/Cameras/camera';
+import {HemisphericLight} from '@babylonjs/core/Lights/hemisphericLight';import {DirectionalLight} from '@babylonjs/core/Lights/directionalLight';
+import {StandardMaterial} from '@babylonjs/core/Materials/standardMaterial';import {MeshBuilder} from '@babylonjs/core/Meshes/meshBuilder';
+import {RawCubeTexture} from '@babylonjs/core/Materials/Textures/rawCubeTexture';import {Texture} from '@babylonjs/core/Materials/Textures/texture';import {Constants} from '@babylonjs/core/Engines/constants';
+import {AvatarPrimitivePool,createAvatarRig} from '/client/avatar-renderer.ts';import {AvatarAnimator} from '/client/animation.ts';import {AvatarLodController} from '/client/avatar-lod.ts';
+import {AVATAR_PRESETS,applyAvatarPreset} from '/client/avatar-presets.ts';import {DEFAULT_AVATAR} from '/shared/types.ts';
+import {installAnatomicalEyes} from '/.cache/student-avatar-study/eye-renderer.ts';import eyeTexture from '/.cache/student-avatar-study/sources/eyes/materials/brown_eye.png?url';
+import {installStudyHair} from '/.cache/student-avatar-study/hair-renderer.ts';import {appearanceCacheCounts} from '/.cache/student-avatar-study/appearance-resources.ts';
+import {installSkinStudy} from '/.cache/student-avatar-study/skin-study.ts';
+import shortTexture from '/.cache/hair-realism-study/sources/hair/short02/short02_diffuse.png?url';import shortNormal from '/.cache/hair-realism-study/sources/hair/short02/short02_normal.png?url';
+import bobTexture from '/.cache/hair-realism-study/sources/hair/bob01/bob01_diffuse.png?url';import closeTexture from '/.cache/hair-realism-study/sources/hair/short04/short04_diffuse.png?url';import longTexture from '/.cache/hair-realism-study/sources/hair/long01/long01_diffuse.png?url';
+import {applyArtLighting,sampleArtLighting} from '/client/art-lighting.ts';import {sunState,moonState} from '/shared/weather.ts';
+import {configureCampusGrade} from '/client/cinematic-art.ts';import {skyReflectionData,applyCampusSkyIntensity} from '/client/cinematic.ts';
+const canvas=document.querySelector('canvas'),engine=new Engine(canvas,true,{powerPreference:'high-performance',stencil:false}),scene=new Scene(engine);scene.useRightHandedSystem=true;scene.clearColor=new Color4(.12,.17,.2,1);
+const camera=new ArcRotateCamera('avatar study',Math.PI/2,1.47,1.1,new Vector3(0,1.63,0),scene);camera.fov=.64;camera.minZ=.015;camera.attachControl(canvas,true);camera.mode=Camera.ORTHOGRAPHIC_CAMERA;
+const ambient=new HemisphericLight('actual game sky',new Vector3(0,1,0),scene),sun=new DirectionalLight('actual game sun',new Vector3(-.6,-1,-.8),scene),lamps=new StandardMaterial('unused practical lamp contract',scene);
+const instant=Date.parse('2026-10-11T13:00:00Z'),sunInput=sunState(instant),moonInput=moonState(instant),weather={cloud:.3,rain:0,wind:2};
+applyArtLighting({scene,sun,ambient,lamps,lights:[],clouds:[],quality:'high'},{sun:sunInput,moon:moonInput,weather,player:{x:0,y:0,z:0},dt:1,instant});
+scene.imageProcessingConfiguration.toneMappingEnabled=true;scene.imageProcessingConfiguration.toneMappingType=1;configureCampusGrade(scene.imageProcessingConfiguration);applyCampusSkyIntensity(scene,sunInput.daylight);
+const palette=sampleArtLighting(sunInput.altitude,.3,0,moonInput.altitude,moonInput.fraction),reflection=skyReflectionData(palette.top,palette.horizon),environment=new RawCubeTexture(scene,reflection.faces,32,Constants.TEXTUREFORMAT_RGBA,Constants.TEXTURETYPE_UNSIGNED_BYTE,true,false,Texture.TRILINEAR_SAMPLINGMODE);environment.gammaSpace=false;environment.sphericalPolynomial=reflection.polynomial;scene.environmentTexture=environment;
+const ground=MeshBuilder.CreateGround('isolated review plane, not Strahov survey',{width:200,height:200},scene),groundMaterial=new StandardMaterial('neutral review ground',scene);groundMaterial.diffuseColor=Color3.FromHexString('#696d67').toLinearSpace();groundMaterial.specularColor.set(.04,.04,.04);ground.material=groundMaterial;
+const hairUrls={short02:{diffuse:shortTexture,normal:shortNormal},bob01:{diffuse:bobTexture},short04:{diffuse:closeTexture},long01:{diffuse:longTexture}},defaultStyles=['short02','short02','long01','short04','bob01','short02'];
+const pool=new AvatarPrimitivePool(scene);let rigs=[],controllers=[],animators=[],preset=0,level='near',frame='head',pose='idle',motion=0,error=null,hairStyle='short02';
+const skinLabel=document.createElement('label'),skinInput=document.createElement('input');skinInput.type='checkbox';skinInput.id='skin-study';skinLabel.append(skinInput,' Jemná autorská skin roughness / původní UV');document.querySelector('#hair-styles').after(skinLabel);skinInput.onchange=build;
+function framing(){const half=frame==='head'?.23:1.30,aspect=engine.getRenderWidth()/engine.getRenderHeight();camera.orthoTop=half;camera.orthoBottom=-half;camera.orthoLeft=-half*aspect;camera.orthoRight=half*aspect}
+function arrange(){const spacing=frame==='head'?.22:.63,x=Math.sin(camera.alpha),z=-Math.cos(camera.alpha);for(let i=0;i<rigs.length;i++)rigs[i].root.position.set(x*(i===0?-spacing:spacing),0,z*(i===0?-spacing:spacing))}
+function build(){for(const rig of rigs)rig.root.dispose();rigs=[];controllers=[];animators=[];motion=0;
+ const config=applyAvatarPreset(preset,DEFAULT_AVATAR);
+ for(let side=0;side<2;side++){const rig=createAvatarRig(scene,config,pool,'eye study '+side);if(side){installAnatomicalEyes(scene,rig,config,eyeTexture);if(document.querySelector('#hair').checked)installStudyHair(scene,rig,config,hairStyle,hairUrls[hairStyle]);if(skinInput.checked)installSkinStudy(scene,rig,config)}rigs.push(rig);controllers.push(new AvatarLodController(scene,pool,rig,config));animators.push(new AvatarAnimator(rig))}
+ for(const material of scene.materials)material.onError=(_,message)=>error=message;
+ arrange();camera.target.y=frame==='head'?rigs[1].eyeHeight+.025:.94;framing();pool.pruneUnused();scene.executeWhenReady(()=>scene.render());
+}
+function button(target,label,fn){const b=document.createElement('button');b.textContent=label;b.onclick=fn;document.querySelector(target).append(b)}
+AVATAR_PRESETS.forEach((p,i)=>button('#presets',p.name,()=>{preset=i;hairStyle=defaultStyles[i];build()}));
+for(const [label,id] of [['Vrstvené krátké','short02'],['Uhlazené krátké','short04'],['Mikádo','bob01'],['Dlouhé','long01']])button('#hair-styles',label,()=>{hairStyle=id;document.querySelector('#hair').checked=true;build()});document.querySelector('#hair').onchange=build;
+for(const [label,id] of [['Detail hlavy','head'],['Celá postava','body']])button('#frames',label,()=>{frame=id;build()});
+for(const [label,angle] of [['Čelně',Math.PI/2],['Tři čtvrtiny',1.1],['Profil',.15],['Zezadu',-Math.PI/2]])button('#views',label,()=>{camera.alpha=angle;arrange()});
+for(const id of ['near','medium'])button('#lod',id,()=>level=id);
+for(const [label,id]of [['Klid','idle'],['Chůze','walk'],['Běh','run'],['Zamávání','wave']])button('#poses',label,()=>{pose=id;for(const a of animators)a.reset()});
+build();let previous=performance.now(),next=0;
+engine.runRenderLoop(()=>{const now=performance.now(),dt=Math.min(.05,(now-previous)/1000);previous=now;const paused=document.querySelector('#pause').checked;
+ if(!paused)motion+=dt*(pose==='walk'?1.6:pose==='run'?4.6:0);
+ arrange();for(let i=0;i<rigs.length;i++){const rig=rigs[i];controllers[i].update({distance:level==='near'?0:20,quality:'low',position:{x:rig.root.position.x,y:0,z:rig.root.position.z},yaw:0});
+  if(!paused)animators[i].update({position:{x:0,y:0,z:motion},yaw:0,grounded:true,groundHeight:()=>0,emote:pose==='wave'?'wave':undefined},dt);
+  rig.head.rotation.y=Number(document.querySelector('#turn').value);
+  if(frame==='head')for(const mesh of rig.root.getChildMeshes())if(!mesh.isDescendantOf(rig.head)&&!mesh.metadata?.avatarHair)mesh.setEnabled(false);
+ }
+ framing();scene.render();if(now>next){next=now+250;const counts=rigs.map(rig=>{const ms=rig.root.getChildMeshes().filter(m=>m.isEnabled()&&m.isVisible);return{meshes:ms.length,triangles:ms.reduce((s,m)=>s+m.getTotalIndices()/3,0),enabledEyes:ms.filter(m=>/ (eye|iris|pupil)$/.test(m.name)||m.metadata?.anatomicalEye).map(m=>m.name)}});document.querySelector('#audit').textContent=JSON.stringify({ready:scene.isReady(),studyOnly:true,preset:AVATAR_PRESETS[preset].name,level,actualLevels:controllers.map(c=>c.level),frame,pose,headTurn:rigs[1].head.rotation.y,hair:document.querySelector('#hair').checked?hairStyle:'original',appearanceCache:appearanceCacheCounts(scene),activeCounts:counts,gpu:engine.getGlInfo().renderer,shaderError:error,lighting:{utc:new Date(instant).toISOString(),sunAltitude:sunInput.altitude,cloud:.3,exposure:scene.imageProcessingConfiguration.exposure}},null,2)}
+});addEventListener('resize',()=>{engine.resize();framing()});
+</script></html>

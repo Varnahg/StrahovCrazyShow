@@ -1,0 +1,6115 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-10",
+  "origin": {
+    "lat": 50.08065,
+    "lon": 14.39175
+  },
+  "coordinates": "Same local metre system as map.json: x east, z south. footprint.yaw is Babylon rotation.y (local x axis follows edge); envelope includes projections and is not a room plan.",
+  "license": "OSM-derived geometry © OpenStreetMap contributors, ODbL-1.0. Photographs are reference links with separate licences.",
+  "inputHashes": {
+    "mapSha256": "cc41d5fc78ffbff275468cdd191e96c74e1c9dc09a74be7bc82a918184c7f64c",
+    "osmSha256": "7ff214452c91162fffc77809bd7c07f9511e694d2a7b48bc316d7b5865cedb62"
+  },
+  "notes": [
+    "Identity, observed features and dimensions have separate confidence. No entry claims measured door positions or on-site height.",
+    "All existing map buildings are catalogued, including landmarks outside playable bounds.",
+    "Generic window grids are permitted only on catalogued dormitories and must distinguish long and short facades.",
+    "Existing reference atlas stores full Google/Mapy links. No provider imagery was copied into runtime assets."
+  ],
+  "sources": [
+    {
+      "id": "osm",
+      "label": "OpenStreetMap contributors",
+      "url": "https://www.openstreetmap.org/copyright",
+      "checkedAt": "2026-10-10",
+      "license": "ODbL-1.0",
+      "evidence": "Exact existing OSM IDs, footprints and tags; not an on-site survey."
+    },
+    {
+      "id": "sh-campus",
+      "label": "Silicon Hill – Koleje Strahov",
+      "url": "https://www.siliconhill.cz/koleje-strahov",
+      "checkedAt": "2026-10-10"
+    },
+    {
+      "id": "sh-b6",
+      "label": "Silicon Hill Wiki – Blok 6",
+      "url": "https://wiki.sh.cvut.cz/kolej/bloky/blok_6",
+      "checkedAt": "2026-10-10"
+    },
+    {
+      "id": "sh-b6-plan",
+      "label": "Plán B6, wiki metadata 20. 3. 2023",
+      "url": "https://wiki.sh.cvut.cz/_media/kolej/bloky/0.jpg",
+      "checkedAt": "2026-10-10",
+      "license": "CC-BY-SA-4.0",
+      "localPath": "docs/references/media/blok-6-plan-2023.jpg"
+    },
+    {
+      "id": "sh-map",
+      "label": "Silicon Hill – orientační mapa areálu",
+      "url": "https://www.siliconhill.cz/uploads/mapa3.jpg",
+      "checkedAt": "2026-10-10"
+    },
+    {
+      "id": "sh-galleries",
+      "label": "Silicon Hill – archiv fotogalerií",
+      "url": "https://www.siliconhill.cz/photogalleries",
+      "checkedAt": "2026-10-10",
+      "coverage": "Discovery source; individual albums still need identification and permission review."
+    },
+    {
+      "id": "ctu-exteriors-2024",
+      "label": "ČVUT – Exteriéry kolejí Strahov",
+      "url": "https://media.cvut.cz/cs/foto/20240620-exteriery-koleji-strahov",
+      "checkedAt": "2026-10-10",
+      "captureDate": "2024-06-20",
+      "author": "Jiří Ryszawy",
+      "photoCount": 12,
+      "usage": "Reference links only. Outside ČVUT, reproduction requires written approval under the published rules."
+    },
+    {
+      "id": "ctu-b4-2024",
+      "label": "ČVUT – Rekonstruovaný blok 4",
+      "url": "https://media.cvut.cz/cs/foto/20240620-rekonstruovany-blok-4-strahovskych-koleji",
+      "checkedAt": "2026-10-10",
+      "captureDate": "2024-06-20",
+      "author": "Jiří Ryszawy",
+      "photoCount": 62,
+      "usage": "Reference links only."
+    },
+    {
+      "id": "ctu-opening-2024",
+      "label": "ČVUT – Otevření bloku 4, návštěva bloku 3",
+      "url": "https://media.cvut.cz/cs/foto/20240620-slavnostni-otevreni-rekonstruovaneho-bloku-4",
+      "checkedAt": "2026-10-10",
+      "captureDate": "2024-06-20",
+      "author": "Jiří Ryszawy",
+      "photoCount": 57,
+      "usage": "Mixed B3/B4 album. Do not assign all photos to B4."
+    },
+    {
+      "id": "ctu-rooms-2016",
+      "label": "ČVUT – Pokoje na kolejích Strahov",
+      "url": "https://media.cvut.cz/cs/foto/20161116-pokoje-na-kolejich-strahov",
+      "checkedAt": "2026-10-10",
+      "captureDate": "2016-11-16",
+      "photoCount": 15,
+      "usage": "Historical interior reference; individual block identification not supplied by album title."
+    },
+    {
+      "id": "ctu-media-rules",
+      "label": "ČVUT – Pravidla používání Mediatéky",
+      "url": "https://media.cvut.cz/cs/pravidla-pouzivani",
+      "checkedAt": "2026-10-10"
+    },
+    {
+      "id": "ctu-menza",
+      "label": "SÚZ ČVUT – Menza Strahov, Jezdecká 1920/1",
+      "url": "https://www.suz.cvut.cz/cz/menzy-stravovani/menza-strahov",
+      "checkedAt": "2026-10-10"
+    },
+    {
+      "id": "ctu-block1",
+      "label": "SÚZ ČVUT – Bufet v přízemí budovy ředitelství, blok 1",
+      "url": "https://www.suz.cvut.cz/cz/menzy-stravovani",
+      "checkedAt": "2026-10-10"
+    },
+    {
+      "id": "commons-campus",
+      "label": "Wikimedia Commons – Koleje Strahov",
+      "url": "https://commons.wikimedia.org/wiki/Category:Koleje_Strahov",
+      "checkedAt": "2026-10-10",
+      "photoCount": 22,
+      "usage": "Each file has its own licence, author and date."
+    },
+    {
+      "id": "commons-b12",
+      "label": "Wikimedia Commons – Strahov, studentská kolej č.12",
+      "url": "https://commons.wikimedia.org/wiki/File:Strahov,_studentsk%C3%A1_kolej_%C4%8D.12.JPG",
+      "checkedAt": "2026-10-10",
+      "captureDate": "2009-10-06",
+      "author": "Ondrej.konicek",
+      "license": "CC-BY-SA-3.0",
+      "usage": "Historical facade detail; not proof of 2026 condition."
+    },
+    {
+      "id": "commons-stadium",
+      "label": "Wikimedia Commons – Praha Strahovsky stadion",
+      "url": "https://commons.wikimedia.org/wiki/File:Praha_Strahovsky_stadion.jpg",
+      "checkedAt": "2026-10-10",
+      "captureDate": "2005-08-27",
+      "author": "che; image enhancement Miraceti",
+      "license": "CC-BY-SA-2.5",
+      "usage": "Historical broad spatial reference."
+    }
+  ],
+  "photoReferences": [
+    {
+      "id": "b4-end-small-windows",
+      "sourceId": "ctu-exteriors-2024",
+      "slide": 1,
+      "imageUrl": "https://media.cvut.cz/sites/media/files/content/photos/4747a232-056d-41a1-8baa-a2255d7d7efb/958a2185-7a8b-46e5-96f5-eddfdc1aa790.jpg",
+      "osmIds": [
+        "53929057"
+      ],
+      "visuallyReviewed": true,
+      "identity": "confirmed-visible-number",
+      "observations": [
+        "Grey panelled end wall",
+        "Small paired openings",
+        "Projecting blue-white number 4 sign"
+      ]
+    },
+    {
+      "id": "b4-entrance-wing",
+      "sourceId": "ctu-exteriors-2024",
+      "slide": 2,
+      "imageUrl": "https://media.cvut.cz/sites/media/files/content/photos/4747a232-056d-41a1-8baa-a2255d7d7efb/f3452ed9-9cab-4197-946b-b0c92ded8913.jpg",
+      "osmIds": [
+        "53929057"
+      ],
+      "visuallyReviewed": true,
+      "identity": "confirmed-visible-number",
+      "observations": [
+        "Offset projecting wing",
+        "Small paired openings in grey panels",
+        "Flat roofline"
+      ]
+    },
+    {
+      "id": "campus-long-facade",
+      "sourceId": "ctu-exteriors-2024",
+      "slide": 3,
+      "imageUrl": "https://media.cvut.cz/sites/media/files/content/photos/4747a232-056d-41a1-8baa-a2255d7d7efb/fe9b7d5b-facc-479d-9e50-1c07806041ce.jpg",
+      "osmIds": [],
+      "visuallyReviewed": true,
+      "identity": "typology-only-block-number-not-visible",
+      "observations": [
+        "Off-white rendered long facade",
+        "Regular wide three-part room windows",
+        "Dark brown frames and recesses"
+      ]
+    },
+    {
+      "id": "b4-end-blank-panel",
+      "sourceId": "ctu-exteriors-2024",
+      "slide": 8,
+      "imageUrl": "https://media.cvut.cz/sites/media/files/content/photos/4747a232-056d-41a1-8baa-a2255d7d7efb/30144e31-7c32-46b1-bd71-1b5f45600249.jpg",
+      "osmIds": [
+        "53929057"
+      ],
+      "visuallyReviewed": true,
+      "identity": "confirmed-visible-number",
+      "observations": [
+        "Large blank grey panel face with white number 4",
+        "Vertical strip of wider horizontal windows beside blank face",
+        "No repetitive room-window grid over blank face"
+      ]
+    },
+    {
+      "id": "menza-front",
+      "sourceId": "ctu-exteriors-2024",
+      "slide": 9,
+      "imageUrl": "https://media.cvut.cz/sites/media/files/content/photos/4747a232-056d-41a1-8baa-a2255d7d7efb/f8f6ea08-e636-468c-a495-36ec03be3688.jpg",
+      "osmIds": [
+        "8111356"
+      ],
+      "visuallyReviewed": true,
+      "identity": "confirmed-sign-and-official-address",
+      "observations": [
+        "Readable Menza Strahov sign",
+        "Large glazed entrance wall",
+        "Cream/yellow small cladding panels",
+        "Entrance stairs with white railing"
+      ]
+    },
+    {
+      "id": "campus-red-wing",
+      "sourceId": "ctu-exteriors-2024",
+      "slide": 10,
+      "imageUrl": "https://media.cvut.cz/sites/media/files/content/photos/4747a232-056d-41a1-8baa-a2255d7d7efb/4bf030d9-1afd-42de-971d-b9a7c177cd92.jpg",
+      "osmIds": [],
+      "visuallyReviewed": true,
+      "identity": "unresolved-no-visible-number",
+      "observations": [
+        "White facade with red vertical wing",
+        "Petřín tower behind trees",
+        "Parking, pedestrian path and lawn"
+      ],
+      "warning": "Do not assign this to a block from colour alone."
+    },
+    {
+      "id": "b4-shared-bathroom-2024",
+      "sourceId": "ctu-b4-2024",
+      "slide": 1,
+      "imageUrl": "https://media.cvut.cz/sites/media/files/content/photos/1a9fbb77-c02d-4a25-97c7-4cdcb7049f52/13802908-16c1-4d11-8c1f-e05a12538c12.jpg",
+      "osmIds": [
+        "53929057"
+      ],
+      "visuallyReviewed": true,
+      "identity": "source-labelled-b4-interior",
+      "observations": [
+        "White walls and floor",
+        "Large grey wall tiles",
+        "Four wall-mounted washbasins",
+        "Shower partition and curtain",
+        "Exposed ventilation duct"
+      ],
+      "warning": "This reconstructed B4 interior does not establish B6 materials or layout."
+    },
+    {
+      "id": "b12-historical-numbered-detail",
+      "sourceId": "commons-b12",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/49/Strahov%2C_studentsk%C3%A1_kolej_%C4%8D.12.JPG",
+      "osmIds": [
+        "53921168"
+      ],
+      "visuallyReviewed": true,
+      "identity": "confirmed-sign-12B",
+      "observations": [
+        "12 B VCHOD sign",
+        "Narrow vertically subdivided windows",
+        "Off-white facade with weathering"
+      ],
+      "warning": "Historical 2009 condition; no inference of current damage."
+    },
+    {
+      "id": "stadium-historical-overview",
+      "sourceId": "commons-stadium",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Praha_Strahovsky_stadion.jpg",
+      "osmIds": [],
+      "landmarkId": "great-strahov-stadium",
+      "visuallyReviewed": true,
+      "identity": "source-labelled-and-distinct-sports-bowl",
+      "observations": [
+        "Open stadium bowl",
+        "Tiered stands",
+        "Concrete support rhythm below elevated stands",
+        "Dormitory slabs are separate foreground structures"
+      ],
+      "warning": "Historical 2005 skyline reference; not proof of 2026 finishes."
+    },
+    {
+      "id": "b6-plan",
+      "sourceId": "sh-b6-plan",
+      "osmIds": [
+        "53929071"
+      ],
+      "imageUrl": "https://wiki.sh.cvut.cz/_media/kolej/bloky/0.jpg",
+      "visuallyReviewed": true,
+      "identity": "source-labelled",
+      "observations": [
+        "Axonometric floors and basement",
+        "Rooms beside corridor",
+        "Stair/entrance projection",
+        "No dimensions or north arrow"
+      ],
+      "existingAtlasId": "b6-plan-2023"
+    },
+    {
+      "id": "b6-north-panorama",
+      "sourceId": "sh-b6",
+      "osmIds": [
+        "53929071"
+      ],
+      "visuallyReviewed": false,
+      "identity": "previous-reference-atlas",
+      "existingAtlasId": "b6-google-streetview-2025",
+      "observations": [
+        "See existing atlas for individually reviewed 2025 panorama, camera coordinates and original provider URL."
+      ]
+    },
+    {
+      "id": "b6-east-access",
+      "sourceId": "sh-b6",
+      "osmIds": [
+        "53929071"
+      ],
+      "visuallyReviewed": false,
+      "identity": "previous-reference-atlas",
+      "existingAtlasId": "b6-cajovna-east-entrance",
+      "observations": [
+        "East-side access between B6 and B7; exact basement doors not surveyed."
+      ]
+    },
+    {
+      "id": "b7-club-entry",
+      "sourceId": "sh-campus",
+      "osmIds": [
+        "53929068"
+      ],
+      "visuallyReviewed": false,
+      "identity": "previous-reference-atlas",
+      "existingAtlasId": "seven-google-streetview-2024",
+      "observations": [
+        "007 entrance in basement of B7; neighbouring Sport bar is a different venue."
+      ]
+    },
+    {
+      "id": "rko-east-wall",
+      "sourceId": "sh-campus",
+      "osmIds": [
+        "7645350"
+      ],
+      "visuallyReviewed": false,
+      "identity": "previous-reference-atlas",
+      "existingAtlasId": "rko-mapy-panorama-2023",
+      "observations": [
+        "Shared low building; exact bar/store division and entrance not surveyed."
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "osmId": "7645350",
+      "name": "Potraviny",
+      "kind": "commercial",
+      "facade": "commercial-low",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "identity-and-photo-features",
+      "sourceIds": [
+        "osm",
+        "sh-campus"
+      ],
+      "photoIds": [
+        "rko-east-wall"
+      ],
+      "characteristics": [
+        "Potraviny and Recharging Bar occupy the same low building shell.",
+        "Not a dormitory; no multi-floor dormitory window grid.",
+        "Bar POI is not a measured door and does not occupy the entire footprint by default."
+      ],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 700.148,
+        "center": {
+          "x": 114.705,
+          "z": -63.111
+        },
+        "width": 48.613,
+        "depth": 16.667,
+        "yaw": -3.1181414562165415,
+        "envelopeArea": 810.241,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "7645353",
+      "name": "Petřínská rozhledna",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 60,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 60,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 542.84,
+        "center": {
+          "x": 238.604,
+          "z": -318.238
+        },
+        "width": 27.574,
+        "depth": 27.682,
+        "yaw": 2.2828195637173034,
+        "envelopeArea": 763.31,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "7670452",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 25.32,
+        "center": {
+          "x": 461.007,
+          "z": -55.17
+        },
+        "width": 4.982,
+        "depth": 5.131,
+        "yaw": -2.1387570707893984,
+        "envelopeArea": 25.564,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "7670468",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "hipped",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1404.323,
+        "center": {
+          "x": 239.45,
+          "z": -145.232
+        },
+        "width": 84.654,
+        "depth": 39.402,
+        "yaw": -0.41384677078604964,
+        "envelopeArea": 3335.519,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "8111356",
+      "name": "Menza Strahov",
+      "kind": "canteen",
+      "facade": "canteen-glazing",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "official-identity-and-photo",
+      "sourceIds": [
+        "osm",
+        "ctu-menza",
+        "ctu-exteriors-2024"
+      ],
+      "photoIds": [
+        "menza-front"
+      ],
+      "characteristics": [
+        "Menza Strahov, Jezdecká 1920/1; separate from block 1 buffet.",
+        "Large entrance glazing, cream/yellow panel cladding and white stair rails observed in 2024."
+      ],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1902.805,
+        "center": {
+          "x": 100.762,
+          "z": 167.57
+        },
+        "width": 35.055,
+        "depth": 64.969,
+        "yaw": -1.5517872099078882,
+        "envelopeArea": 2277.478,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "24450068",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 996.473,
+        "center": {
+          "x": -81.215,
+          "z": -186.48
+        },
+        "width": 36.087,
+        "depth": 27.961,
+        "yaw": 1.8348183700851972,
+        "envelopeArea": 1009.053,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "24450069",
+      "name": "Neidentifikovaný objekt",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 557.014,
+        "center": {
+          "x": -73.633,
+          "z": -137.926
+        },
+        "width": 26.702,
+        "depth": 20.898,
+        "yaw": 0.26825776769894316,
+        "envelopeArea": 558.01,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "24450070",
+      "name": "Neidentifikovaný objekt",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "gabled",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 366.346,
+        "center": {
+          "x": 14.033,
+          "z": -258.073
+        },
+        "width": 33.803,
+        "depth": 10.863,
+        "yaw": -0.4518725512315881,
+        "envelopeArea": 367.216,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "24450071",
+      "name": "Neidentifikovaný objekt",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "hipped",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 663.289,
+        "center": {
+          "x": 91.244,
+          "z": -224.45
+        },
+        "width": 33.068,
+        "depth": 35.961,
+        "yaw": 2.6111839423629224,
+        "envelopeArea": 1189.152,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "25920626",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "flat",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 178.046,
+        "center": {
+          "x": 161.175,
+          "z": 175.94
+        },
+        "width": 17.214,
+        "depth": 10.351,
+        "yaw": 1.5835863270100965,
+        "envelopeArea": 178.175,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "27337056",
+      "name": "svatý archanděl Michael",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "hipped",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 67.869,
+        "center": {
+          "x": 477.864,
+          "z": 245.411
+        },
+        "width": 12.731,
+        "depth": 5.856,
+        "yaw": 0.28307485735441335,
+        "envelopeArea": 74.546,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "27580887",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 555.399,
+        "center": {
+          "x": 440.833,
+          "z": 222.341
+        },
+        "width": 55.914,
+        "depth": 10.967,
+        "yaw": 0.2379084762161359,
+        "envelopeArea": 613.234,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "27581155",
+      "name": "svatý Vavřinec",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 333.78,
+        "center": {
+          "x": 310.915,
+          "z": -271.055
+        },
+        "width": 31.021,
+        "depth": 15.559,
+        "yaw": 2.9863088777776405,
+        "envelopeArea": 482.662,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "27581156",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 6,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 6,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 84.337,
+        "center": {
+          "x": 329.208,
+          "z": -262.482
+        },
+        "width": 21.951,
+        "depth": 7.773,
+        "yaw": 2.985707533005963,
+        "envelopeArea": 170.621,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "27581157",
+      "name": "Kaple Kalvárie",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 37.74,
+        "center": {
+          "x": 332.035,
+          "z": -283.605
+        },
+        "width": 8.648,
+        "depth": 10.112,
+        "yaw": 0.03481180146586946,
+        "envelopeArea": 87.446,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "27581160",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 4.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 45.98,
+        "center": {
+          "x": 162.815,
+          "z": -300.395
+        },
+        "width": 8.571,
+        "depth": 5.482,
+        "yaw": 3.068856873403724,
+        "envelopeArea": 46.99,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379019",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 141.417,
+        "center": {
+          "x": 20.496,
+          "z": 376.458
+        },
+        "width": 12.132,
+        "depth": 13.582,
+        "yaw": 0.2737707044632316,
+        "envelopeArea": 164.778,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379023",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 22,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 22,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 10847.627,
+        "center": {
+          "x": -568.894,
+          "z": 26.001
+        },
+        "width": 148.667,
+        "depth": 232.865,
+        "yaw": -3.1182324177679184,
+        "envelopeArea": 34619.232,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379034",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "quadruple_saltbox",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 172.308,
+        "center": {
+          "x": -90.8,
+          "z": 244.19
+        },
+        "width": 13.113,
+        "depth": 13.153,
+        "yaw": 0.02060776929037297,
+        "envelopeArea": 172.469,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379059",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 6,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 6,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 239.68,
+        "center": {
+          "x": -444.735,
+          "z": 175.062
+        },
+        "width": 6.966,
+        "depth": 34.466,
+        "yaw": 1.5894991817281232,
+        "envelopeArea": 240.074,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379061",
+      "name": "Neidentifikovaný objekt",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 678.048,
+        "center": {
+          "x": -481.026,
+          "z": 181.679
+        },
+        "width": 38.324,
+        "depth": 25.187,
+        "yaw": 0.013251780081964277,
+        "envelopeArea": 965.262,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379063",
+      "name": "Neidentifikovaný objekt",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 175.337,
+        "center": {
+          "x": -503.835,
+          "z": 122.672
+        },
+        "width": 26.726,
+        "depth": 7.45,
+        "yaw": -1.551644638342476,
+        "envelopeArea": 199.105,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379066",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 495.278,
+        "center": {
+          "x": -275.01,
+          "z": 343.626
+        },
+        "width": 12.831,
+        "depth": 39.8,
+        "yaw": 3.0585183247587198,
+        "envelopeArea": 510.681,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379068",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 513.458,
+        "center": {
+          "x": -253.031,
+          "z": 344.682
+        },
+        "width": 12.521,
+        "depth": 41.384,
+        "yaw": 3.0568446747409945,
+        "envelopeArea": 518.159,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379072",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 148.916,
+        "center": {
+          "x": -223.96,
+          "z": 348.195
+        },
+        "width": 19.398,
+        "depth": 7.711,
+        "yaw": -0.08133625727032558,
+        "envelopeArea": 149.584,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379074",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 148.885,
+        "center": {
+          "x": -224.66,
+          "z": 355.865
+        },
+        "width": 19.397,
+        "depth": 7.712,
+        "yaw": 3.0602143299666533,
+        "envelopeArea": 149.598,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379076",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 148.777,
+        "center": {
+          "x": -225.365,
+          "z": 363.54
+        },
+        "width": 19.388,
+        "depth": 7.702,
+        "yaw": -0.08137832362314003,
+        "envelopeArea": 149.318,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379077",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 148.985,
+        "center": {
+          "x": -226.06,
+          "z": 371.215
+        },
+        "width": 19.397,
+        "depth": 7.712,
+        "yaw": 3.0602143299666533,
+        "envelopeArea": 149.598,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379079",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint.",
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.6,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 140.133,
+        "center": {
+          "x": -227.515,
+          "z": 378.325
+        },
+        "width": 20.972,
+        "depth": 6.708,
+        "yaw": 3.0597223213705753,
+        "envelopeArea": 140.668,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379080",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 4.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 56.295,
+        "center": {
+          "x": -245.575,
+          "z": 376.495
+        },
+        "width": 7.53,
+        "depth": 7.489,
+        "yaw": 3.072370098596308,
+        "envelopeArea": 56.391,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379082",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 129.953,
+        "center": {
+          "x": -201.259,
+          "z": 334.19
+        },
+        "width": 13.653,
+        "depth": 10.673,
+        "yaw": -0.097039385981999,
+        "envelopeArea": 145.715,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379084",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 129.092,
+        "center": {
+          "x": -202.088,
+          "z": 343.951
+        },
+        "width": 9.482,
+        "depth": 13.745,
+        "yaw": -1.6514400168243333,
+        "envelopeArea": 130.33,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379085",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 124.728,
+        "center": {
+          "x": -202.844,
+          "z": 353.374
+        },
+        "width": 14.398,
+        "depth": 9.457,
+        "yaw": 3.058653768926435,
+        "envelopeArea": 136.158,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379089",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 144.564,
+        "center": {
+          "x": -204.384,
+          "z": 362.794
+        },
+        "width": 15.973,
+        "depth": 9.607,
+        "yaw": -0.08577355364006627,
+        "envelopeArea": 153.451,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379096",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 177.92,
+        "center": {
+          "x": -91.91,
+          "z": 290.763
+        },
+        "width": 14.464,
+        "depth": 13.204,
+        "yaw": 1.5917722708289204,
+        "envelopeArea": 190.982,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379098",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "flat",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 511.605,
+        "center": {
+          "x": -153.283,
+          "z": 360.127
+        },
+        "width": 16.796,
+        "depth": 35.906,
+        "yaw": -0.04079368286786698,
+        "envelopeArea": 603.057,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379100",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 80.028,
+        "center": {
+          "x": -119.875,
+          "z": 373.675
+        },
+        "width": 11.694,
+        "depth": 6.905,
+        "yaw": -2.9924053271709337,
+        "envelopeArea": 80.742,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379102",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 74.816,
+        "center": {
+          "x": -120.895,
+          "z": 367.11
+        },
+        "width": 11.751,
+        "depth": 6.457,
+        "yaw": -2.9988472171748723,
+        "envelopeArea": 75.88,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379103",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 75.012,
+        "center": {
+          "x": -121.87,
+          "z": 360.825
+        },
+        "width": 11.788,
+        "depth": 6.456,
+        "yaw": 0.1414138461373005,
+        "envelopeArea": 76.1,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379105",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 77.346,
+        "center": {
+          "x": -122.885,
+          "z": 354.37
+        },
+        "width": 11.816,
+        "depth": 6.611,
+        "yaw": -3.000178807452493,
+        "envelopeArea": 78.121,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379108",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 252.039,
+        "center": {
+          "x": -64.496,
+          "z": 372.375
+        },
+        "width": 21.505,
+        "depth": 15.697,
+        "yaw": 1.6951513213416582,
+        "envelopeArea": 337.558,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379110",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 230.633,
+        "center": {
+          "x": -92.065,
+          "z": 381.22
+        },
+        "width": 14.624,
+        "depth": 17.745,
+        "yaw": -1.649440217749938,
+        "envelopeArea": 259.504,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379118",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 207.074,
+        "center": {
+          "x": -36.814,
+          "z": 380.486
+        },
+        "width": 17.701,
+        "depth": 15.609,
+        "yaw": 1.7175595230383591,
+        "envelopeArea": 276.295,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379120",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 132.437,
+        "center": {
+          "x": -2.83,
+          "z": 379.904
+        },
+        "width": 16.237,
+        "depth": 10.108,
+        "yaw": 1.715647979301631,
+        "envelopeArea": 164.115,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379122",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 128.727,
+        "center": {
+          "x": -12.321,
+          "z": 381.26
+        },
+        "width": 16.14,
+        "depth": 9.066,
+        "yaw": -1.4259446742881623,
+        "envelopeArea": 146.329,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379124",
+      "name": "Hotel Vaníček",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 12,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 12,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 466.723,
+        "center": {
+          "x": 36.891,
+          "z": 358.696
+        },
+        "width": 13.46,
+        "depth": 43.158,
+        "yaw": 0.2573237149711384,
+        "envelopeArea": 580.891,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379126",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 189.701,
+        "center": {
+          "x": 65.943,
+          "z": 348.286
+        },
+        "width": 14.763,
+        "depth": 15.078,
+        "yaw": 1.8762616760481932,
+        "envelopeArea": 222.6,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379128",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint.",
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.6,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 44.195,
+        "center": {
+          "x": 63.69,
+          "z": 375.084
+        },
+        "width": 11.543,
+        "depth": 4,
+        "yaw": 0.26970976757551,
+        "envelopeArea": 46.172,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49379130",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 4.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 5.544,
+        "center": {
+          "x": 71.995,
+          "z": 319.74
+        },
+        "width": 2.976,
+        "depth": 1.927,
+        "yaw": -1.3027575017014845,
+        "envelopeArea": 5.734,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49380517",
+      "name": "Neidentifikovaný objekt",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 172.013,
+        "center": {
+          "x": -508.576,
+          "z": -76.598
+        },
+        "width": 26.699,
+        "depth": 7.384,
+        "yaw": -1.5447709667290748,
+        "envelopeArea": 197.151,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49773504",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 136.92,
+        "center": {
+          "x": -467.076,
+          "z": 366.458
+        },
+        "width": 17.293,
+        "depth": 10.149,
+        "yaw": -2.220090274483554,
+        "envelopeArea": 175.504,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49773514",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 137.63,
+        "center": {
+          "x": -478.358,
+          "z": 366.49
+        },
+        "width": 17.259,
+        "depth": 10.204,
+        "yaw": -2.218633712914138,
+        "envelopeArea": 176.112,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49773519",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 143.037,
+        "center": {
+          "x": -444.37,
+          "z": 366.567
+        },
+        "width": 17.274,
+        "depth": 10.489,
+        "yaw": -2.220268088829556,
+        "envelopeArea": 181.185,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49773521",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 138.067,
+        "center": {
+          "x": -455.836,
+          "z": 366.448
+        },
+        "width": 17.416,
+        "depth": 10.192,
+        "yaw": -2.230890429179508,
+        "envelopeArea": 177.496,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49773522",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 137.058,
+        "center": {
+          "x": -418.646,
+          "z": 368.182
+        },
+        "width": 17.235,
+        "depth": 10.245,
+        "yaw": -2.3604936898439073,
+        "envelopeArea": 176.578,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49773524",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 137.331,
+        "center": {
+          "x": -429.822,
+          "z": 366.52
+        },
+        "width": 17.311,
+        "depth": 10.161,
+        "yaw": -2.3689597542189986,
+        "envelopeArea": 175.9,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "49773526",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 144.12,
+        "center": {
+          "x": -407.391,
+          "z": 369.943
+        },
+        "width": 17.336,
+        "depth": 10.565,
+        "yaw": -2.3691453679894106,
+        "envelopeArea": 183.159,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "52281079",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 49,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 49,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 72.076,
+        "center": {
+          "x": -152.127,
+          "z": 276.294
+        },
+        "width": 10.483,
+        "depth": 9.008,
+        "yaw": 0.758414161343598,
+        "envelopeArea": 94.428,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "52281080",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 49,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 49,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 67.934,
+        "center": {
+          "x": -160.435,
+          "z": 267.915
+        },
+        "width": 10.493,
+        "depth": 8.782,
+        "yaw": -2.356194490192343,
+        "envelopeArea": 92.156,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53920574",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 160.577,
+        "center": {
+          "x": 266.722,
+          "z": 175.903
+        },
+        "width": 25.238,
+        "depth": 6.985,
+        "yaw": -2.573529510668047,
+        "envelopeArea": 176.297,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53920575",
+      "name": "Neidentifikovaný objekt",
+      "kind": "shed",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 435.678,
+        "center": {
+          "x": 308.321,
+          "z": 145.733
+        },
+        "width": 47.479,
+        "depth": 12.029,
+        "yaw": 0.5723530854865313,
+        "envelopeArea": 571.122,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921162",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 193.867,
+        "center": {
+          "x": 350.968,
+          "z": -30.912
+        },
+        "width": 15.131,
+        "depth": 12.859,
+        "yaw": -0.3546596167940325,
+        "envelopeArea": 194.58,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921163",
+      "name": "Koleje Strahov blok 11",
+      "kind": "dormitory",
+      "facade": "dormitory-standard",
+      "roof": "flat",
+      "block": 11,
+      "confidence": "osm-identity-typology",
+      "sourceIds": [
+        "osm",
+        "sh-campus"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey.",
+        "Shorter and wider irregular OSM volume; do not force the 70 m standard slab envelope."
+      ],
+      "renderHeight": 18,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 18,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1049.543,
+        "center": {
+          "x": 274.426,
+          "z": -2.341
+        },
+        "width": 25.418,
+        "depth": 62.919,
+        "yaw": 0.013635518501502726,
+        "envelopeArea": 1599.264,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921164",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "gabled",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 410.456,
+        "center": {
+          "x": 365.399,
+          "z": -46.66
+        },
+        "width": 39.343,
+        "depth": 10.438,
+        "yaw": -0.42271485374665985,
+        "envelopeArea": 410.657,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921166",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 59.26,
+        "center": {
+          "x": 324.985,
+          "z": -65.05
+        },
+        "width": 18.542,
+        "depth": 3.216,
+        "yaw": -0.42658267218656243,
+        "envelopeArea": 59.634,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921167",
+      "name": "Neidentifikovaný objekt",
+      "kind": "shed",
+      "facade": "none",
+      "roof": "round",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 410.47,
+        "center": {
+          "x": 358.805,
+          "z": 55.58
+        },
+        "width": 10.425,
+        "depth": 39.398,
+        "yaw": -3.1108921297908423,
+        "envelopeArea": 410.724,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921168",
+      "name": "Koleje Strahov blok 12",
+      "kind": "dormitory",
+      "facade": "dormitory-low",
+      "roof": "flat",
+      "block": 12,
+      "confidence": "osm-identity-typology",
+      "sourceIds": [
+        "osm",
+        "sh-campus",
+        "commons-b12"
+      ],
+      "photoIds": [
+        "b12-historical-numbered-detail"
+      ],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey.",
+        "Lower three-level OSM building; do not repeat six levels of windows.",
+        "2009 facade reference is historical, current condition is not verified."
+      ],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 879.79,
+        "center": {
+          "x": 302.919,
+          "z": 42.936
+        },
+        "width": 45.607,
+        "depth": 34.924,
+        "yaw": 1.5977693843018068,
+        "envelopeArea": 1592.777,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921169",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "gabled",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 91.879,
+        "center": {
+          "x": 323.085,
+          "z": -40.265
+        },
+        "width": 15.095,
+        "depth": 6.092,
+        "yaw": -2.9311939254880293,
+        "envelopeArea": 91.955,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921170",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "gabled",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 177.841,
+        "center": {
+          "x": 382.28,
+          "z": 13.42
+        },
+        "width": 22.171,
+        "depth": 8.043,
+        "yaw": -1.1378833731920606,
+        "envelopeArea": 178.325,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921171",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "gabled",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint.",
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.6,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 91.609,
+        "center": {
+          "x": 382.674,
+          "z": 28.902
+        },
+        "width": 15.097,
+        "depth": 6.105,
+        "yaw": -3.0280826861497983,
+        "envelopeArea": 92.162,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921692",
+      "name": "Neidentifikovaný objekt",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 534.798,
+        "center": {
+          "x": 148.904,
+          "z": -132.997
+        },
+        "width": 25.007,
+        "depth": 21.844,
+        "yaw": -0.3736535979785857,
+        "envelopeArea": 546.266,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921696",
+      "name": "Neidentifikovaný objekt",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 536.591,
+        "center": {
+          "x": 98.599,
+          "z": -141.462
+        },
+        "width": 42.562,
+        "depth": 12.641,
+        "yaw": -0.3814245300547821,
+        "envelopeArea": 538.026,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53921697",
+      "name": "Neidentifikovaný objekt",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "hipped",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1193.895,
+        "center": {
+          "x": -5.978,
+          "z": -208.732
+        },
+        "width": 44.261,
+        "depth": 63.103,
+        "yaw": 1.0212861678592526,
+        "envelopeArea": 2793.015,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929057",
+      "name": "Koleje Strahov blok 4",
+      "kind": "dormitory",
+      "facade": "dormitory-standard",
+      "roof": "flat",
+      "block": 4,
+      "confidence": "identity-and-photo-features",
+      "sourceIds": [
+        "osm",
+        "sh-campus",
+        "ctu-exteriors-2024",
+        "ctu-b4-2024",
+        "ctu-opening-2024"
+      ],
+      "photoIds": [
+        "b4-end-small-windows",
+        "b4-entrance-wing",
+        "b4-end-blank-panel",
+        "b4-shared-bathroom-2024"
+      ],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey.",
+        "B4 grey end panels include a large blank numbered face and a narrow strip of horizontal openings.",
+        "Reconstructed interior shown in 2024 is not a template for all other blocks."
+      ],
+      "renderHeight": 18,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 18,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1158.369,
+        "center": {
+          "x": 84.633,
+          "z": 75.48
+        },
+        "width": 70.272,
+        "depth": 22.664,
+        "yaw": -1.5520181542646658,
+        "envelopeArea": 1592.644,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929060",
+      "name": "Koleje Strahov blok 2",
+      "kind": "dormitory",
+      "facade": "dormitory-standard",
+      "roof": "flat",
+      "block": 2,
+      "confidence": "osm-identity-typology",
+      "sourceIds": [
+        "osm",
+        "sh-campus"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey."
+      ],
+      "renderHeight": 18,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 18,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1130.387,
+        "center": {
+          "x": -19.53,
+          "z": 77.926
+        },
+        "width": 70.072,
+        "depth": 22.622,
+        "yaw": -1.5492513769090837,
+        "envelopeArea": 1585.158,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929062",
+      "name": "Koleje Strahov blok 9",
+      "kind": "dormitory",
+      "facade": "dormitory-standard",
+      "roof": "flat",
+      "block": 9,
+      "confidence": "osm-identity-typology",
+      "sourceIds": [
+        "osm",
+        "sh-campus"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey."
+      ],
+      "renderHeight": 18,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 18,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1153.87,
+        "center": {
+          "x": 214.439,
+          "z": 87.469
+        },
+        "width": 70.247,
+        "depth": 22.591,
+        "yaw": -1.5525731327355152,
+        "envelopeArea": 1586.94,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929063",
+      "name": "Koleje Strahov blok 1",
+      "kind": "administration",
+      "facade": "administration",
+      "roof": "unverified",
+      "block": 1,
+      "confidence": "official-identity",
+      "sourceIds": [
+        "osm",
+        "ctu-block1",
+        "sh-campus"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Block 1 is the administration building with a buffet, not a six-storey accommodation slab.",
+        "Preserve its compound OSM footprint; floors/height in OSM remain unverified."
+      ],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1562.013,
+        "center": {
+          "x": -87.03,
+          "z": 77.57
+        },
+        "width": 68.08,
+        "depth": 52.84,
+        "yaw": -1.5707963267948966,
+        "envelopeArea": 3597.347,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929064",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 357.741,
+        "center": {
+          "x": 84.459,
+          "z": 218.683
+        },
+        "width": 14.368,
+        "depth": 25.66,
+        "yaw": 1.8769197140534752,
+        "envelopeArea": 368.686,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929065",
+      "name": "Koleje Strahov blok 8",
+      "kind": "dormitory",
+      "facade": "dormitory-cell",
+      "roof": "flat",
+      "block": 8,
+      "confidence": "osm-identity-typology",
+      "sourceIds": [
+        "osm",
+        "sh-campus"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey.",
+        "B8 has a cell-based interior arrangement; do not reuse the B6 corridor plan."
+      ],
+      "renderHeight": 18,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 18,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1165.221,
+        "center": {
+          "x": 162.606,
+          "z": 88.802
+        },
+        "width": 22.65,
+        "depth": 70.214,
+        "yaw": -3.1178112111979353,
+        "envelopeArea": 1590.352,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929066",
+      "name": "Koleje Strahov blok 5",
+      "kind": "dormitory",
+      "facade": "dormitory-standard",
+      "roof": "flat",
+      "block": 5,
+      "confidence": "osm-identity-typology",
+      "sourceIds": [
+        "osm",
+        "sh-campus"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey."
+      ],
+      "renderHeight": 18,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 18,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1146.365,
+        "center": {
+          "x": -48.052,
+          "z": -53.951
+        },
+        "width": 69.921,
+        "depth": 22.725,
+        "yaw": -1.5492513769090834,
+        "envelopeArea": 1588.937,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929067",
+      "name": "Koleje Strahov blok 10",
+      "kind": "dormitory",
+      "facade": "dormitory-standard",
+      "roof": "flat",
+      "block": 10,
+      "confidence": "osm-identity-typology",
+      "sourceIds": [
+        "osm",
+        "sh-campus"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey."
+      ],
+      "renderHeight": 18,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 18,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1156.861,
+        "center": {
+          "x": 266.362,
+          "z": 86.186
+        },
+        "width": 70.285,
+        "depth": 22.512,
+        "yaw": -1.557000574585774,
+        "envelopeArea": 1582.292,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929068",
+      "name": "Koleje Strahov blok 7",
+      "kind": "dormitory",
+      "facade": "dormitory-standard",
+      "roof": "flat",
+      "block": 7,
+      "confidence": "identity-and-photo-features",
+      "sourceIds": [
+        "osm",
+        "sh-campus"
+      ],
+      "photoIds": [
+        "b7-club-entry"
+      ],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey.",
+        "Basement venue Klub 007; neighbouring Sport bar must not become the same entrance."
+      ],
+      "renderHeight": 18,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 18,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1149.324,
+        "center": {
+          "x": 55.885,
+          "z": -56.398
+        },
+        "width": 70.258,
+        "depth": 22.634,
+        "yaw": -1.5456512722695317,
+        "envelopeArea": 1590.196,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929069",
+      "name": "Koleje Strahov blok 3",
+      "kind": "dormitory",
+      "facade": "dormitory-standard",
+      "roof": "unverified",
+      "block": 3,
+      "confidence": "osm-identity-typology",
+      "sourceIds": [
+        "osm",
+        "sh-campus"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey."
+      ],
+      "renderHeight": 18,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 18,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1125.846,
+        "center": {
+          "x": 32.702,
+          "z": 76.83
+        },
+        "width": 70.215,
+        "depth": 22.648,
+        "yaw": -1.5462914290339083,
+        "envelopeArea": 1590.194,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929070",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 215.03,
+        "center": {
+          "x": 109.96,
+          "z": 208.931
+        },
+        "width": 17.621,
+        "depth": 16.261,
+        "yaw": 1.859140290860022,
+        "envelopeArea": 286.534,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "53929071",
+      "name": "Koleje Strahov blok 6",
+      "kind": "dormitory",
+      "facade": "dormitory-standard",
+      "roof": "flat",
+      "block": 6,
+      "confidence": "identity-and-photo-features",
+      "sourceIds": [
+        "osm",
+        "sh-campus",
+        "sh-b6",
+        "sh-b6-plan"
+      ],
+      "photoIds": [
+        "b6-plan",
+        "b6-north-panorama",
+        "b6-east-access"
+      ],
+      "characteristics": [
+        "Use the original irregular footprint with entrance projection, not an axis-aligned rectangle.",
+        "Long facade room-window rhythm differs from sparse end-wall openings.",
+        "Flat roof; glazing proportions and exact spacing need a per-facade survey.",
+        "B6 has a western entrance projection and eastern basement venue access; schematic game interior is approximate.",
+        "Community rooms occupy mezzanines; do not equate wiki floor labels with evenly spaced game floors."
+      ],
+      "renderHeight": 18,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 18,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1155.104,
+        "center": {
+          "x": 4.121,
+          "z": -55.111
+        },
+        "width": 69.998,
+        "depth": 22.745,
+        "yaw": -1.541286823221927,
+        "envelopeArea": 1592.077,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "106220817",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 22,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 22,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 2494.096,
+        "center": {
+          "x": -438.825,
+          "z": 21.679
+        },
+        "width": 108.127,
+        "depth": 24.038,
+        "yaw": -1.544396686426481,
+        "envelopeArea": 2599.131,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "108855005",
+      "name": "strážní domek",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 140.083,
+        "center": {
+          "x": 327.255,
+          "z": -253.352
+        },
+        "width": 20.871,
+        "depth": 10.425,
+        "yaw": -0.15358319347738522,
+        "envelopeArea": 217.583,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973658",
+      "name": "Nemocnice Na Strahově",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "flat",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 12,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 12,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1078.254,
+        "center": {
+          "x": -28.228,
+          "z": 160.648
+        },
+        "width": 28.468,
+        "depth": 80.874,
+        "yaw": 1.5984572541183255,
+        "envelopeArea": 2302.305,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973668",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 155.725,
+        "center": {
+          "x": -179.255,
+          "z": 373.588
+        },
+        "width": 13.732,
+        "depth": 14.549,
+        "yaw": -1.6518785361984898,
+        "envelopeArea": 199.788,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973674",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint.",
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.6,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 25.67,
+        "center": {
+          "x": -198.267,
+          "z": 381.102
+        },
+        "width": 3.955,
+        "depth": 6.613,
+        "yaw": -0.10017898671580083,
+        "envelopeArea": 26.157,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973679",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 27.345,
+        "center": {
+          "x": -419.592,
+          "z": 346.247
+        },
+        "width": 8.872,
+        "depth": 3.451,
+        "yaw": -1.8243795716573317,
+        "envelopeArea": 30.622,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973687",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint.",
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.6,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 24.719,
+        "center": {
+          "x": -209.965,
+          "z": 379.97
+        },
+        "width": 6.678,
+        "depth": 3.754,
+        "yaw": -1.6593846798782905,
+        "envelopeArea": 25.07,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973703",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint."
+      ],
+      "renderHeight": 6,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 6,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 26.07,
+        "center": {
+          "x": -206.114,
+          "z": 380.247
+        },
+        "width": 6.577,
+        "depth": 3.975,
+        "yaw": -1.6606302229940622,
+        "envelopeArea": 26.139,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973713",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 4.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 82.568,
+        "center": {
+          "x": 19.385,
+          "z": 180.336
+        },
+        "width": 13.395,
+        "depth": 6.482,
+        "yaw": 1.5864200554153736,
+        "envelopeArea": 86.825,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973721",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint.",
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.6,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 25.903,
+        "center": {
+          "x": -194.35,
+          "z": 381.496
+        },
+        "width": 6.613,
+        "depth": 3.92,
+        "yaw": 1.470826741420854,
+        "envelopeArea": 25.926,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973731",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 107.984,
+        "center": {
+          "x": -204.662,
+          "z": 372.351
+        },
+        "width": 12.972,
+        "depth": 9.484,
+        "yaw": -0.08577355364006627,
+        "envelopeArea": 123.026,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973734",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 24.963,
+        "center": {
+          "x": -422.701,
+          "z": 345.495
+        },
+        "width": 8.877,
+        "depth": 3.23,
+        "yaw": -1.7922756269513376,
+        "envelopeArea": 28.672,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "115973738",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint.",
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.6,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 25.607,
+        "center": {
+          "x": -202.199,
+          "z": 380.589
+        },
+        "width": 6.591,
+        "depth": 3.895,
+        "yaw": -1.6591155876766326,
+        "envelopeArea": 25.673,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "155743944",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "flat",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 87.7,
+        "center": {
+          "x": 192.235,
+          "z": -278.635
+        },
+        "width": 5.972,
+        "depth": 14.703,
+        "yaw": -1.592604949163921,
+        "envelopeArea": 87.804,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "159388517",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "flat",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 134.419,
+        "center": {
+          "x": 17.27,
+          "z": -216.309
+        },
+        "width": 18.815,
+        "depth": 7.237,
+        "yaw": 2.601811198989622,
+        "envelopeArea": 136.169,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "159388519",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "flat",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 136.37,
+        "center": {
+          "x": -10.049,
+          "z": -232.774
+        },
+        "width": 19.465,
+        "depth": 7.243,
+        "yaw": -0.5455295879488099,
+        "envelopeArea": 140.996,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "159477031",
+      "name": "Horní stanice lanovky",
+      "kind": "transport",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 568.828,
+        "center": {
+          "x": 358.048,
+          "z": -152.825
+        },
+        "width": 21.864,
+        "depth": 36.725,
+        "yaw": 1.7733376388252173,
+        "envelopeArea": 802.946,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "159477035",
+      "name": "Štefánikova hvězdárna",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "hipped",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 6,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 6,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 371.784,
+        "center": {
+          "x": 437.989,
+          "z": -69.341
+        },
+        "width": 14.792,
+        "depth": 49.067,
+        "yaw": 0.8913825213870623,
+        "envelopeArea": 725.799,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "166152866",
+      "name": "Neidentifikovaný objekt",
+      "kind": "civic",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 4615.416,
+        "center": {
+          "x": -368.117,
+          "z": -319.657
+        },
+        "width": 125.537,
+        "depth": 48.588,
+        "yaw": 1.5968930111729693,
+        "envelopeArea": 6099.543,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "166375020",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "mansard",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 6,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 6,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 45.091,
+        "center": {
+          "x": -285.935,
+          "z": 268.765
+        },
+        "width": 7.241,
+        "depth": 6.233,
+        "yaw": 1.6039791629613964,
+        "envelopeArea": 45.133,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "166375027",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 182.433,
+        "center": {
+          "x": -305.41,
+          "z": 363.357
+        },
+        "width": 19.511,
+        "depth": 13.084,
+        "yaw": 3.0586885571012212,
+        "envelopeArea": 255.278,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "166375073",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 85.164,
+        "center": {
+          "x": -276.969,
+          "z": 366.834
+        },
+        "width": 12.56,
+        "depth": 6.859,
+        "yaw": 3.052302332317145,
+        "envelopeArea": 86.151,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "166375092",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 84.564,
+        "center": {
+          "x": -255.045,
+          "z": 368.64
+        },
+        "width": 12.535,
+        "depth": 6.752,
+        "yaw": 3.060903534223151,
+        "envelopeArea": 84.631,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "268457490",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 36.415,
+        "center": {
+          "x": 383.923,
+          "z": 329.453
+        },
+        "width": 6.102,
+        "depth": 5.974,
+        "yaw": 2.508579524698947,
+        "envelopeArea": 36.458,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "277923411",
+      "name": "C",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 282.39,
+        "center": {
+          "x": -0.172,
+          "z": 258.48
+        },
+        "width": 21.147,
+        "depth": 14.58,
+        "yaw": -2.8424415245526973,
+        "envelopeArea": 308.317,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "293949905",
+      "name": "D",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 476.239,
+        "center": {
+          "x": 27.019,
+          "z": 236.083
+        },
+        "width": 35.934,
+        "depth": 14.517,
+        "yaw": 0.2975617247378057,
+        "envelopeArea": 521.649,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "293949906",
+      "name": "B",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 210.42,
+        "center": {
+          "x": -21.942,
+          "z": 265.206
+        },
+        "width": 16.73,
+        "depth": 14.421,
+        "yaw": 0.2844035246018818,
+        "envelopeArea": 241.271,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "293949907",
+      "name": "A",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 582.804,
+        "center": {
+          "x": -55.095,
+          "z": 273.157
+        },
+        "width": 43.65,
+        "depth": 18.962,
+        "yaw": 0.29312481303492927,
+        "envelopeArea": 827.703,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "293949908",
+      "name": "E",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 206.789,
+        "center": {
+          "x": 56.037,
+          "z": 227.031
+        },
+        "width": 16.682,
+        "depth": 14.592,
+        "yaw": 0.28301355328793376,
+        "envelopeArea": 243.428,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "370462836",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 3,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 3,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1200.278,
+        "center": {
+          "x": -533.097,
+          "z": -330.814
+        },
+        "width": 19.08,
+        "depth": 81.144,
+        "yaw": 0.0823217838336742,
+        "envelopeArea": 1548.226,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "379383172",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 5.795,
+        "center": {
+          "x": 228.539,
+          "z": -148.125
+        },
+        "width": 2.852,
+        "depth": 2.055,
+        "yaw": -0.4150203533586474,
+        "envelopeArea": 5.861,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "379383188",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 6.178,
+        "center": {
+          "x": 249.375,
+          "z": -139.09
+        },
+        "width": 3.081,
+        "depth": 2.01,
+        "yaw": 2.7273234780735005,
+        "envelopeArea": 6.193,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "429820561",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 70.174,
+        "center": {
+          "x": 237.904,
+          "z": 196.759
+        },
+        "width": 9.879,
+        "depth": 7.14,
+        "yaw": 1.9437840485949576,
+        "envelopeArea": 70.536,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "432351705",
+      "name": "G - vrátnice",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 422.723,
+        "center": {
+          "x": -68.037,
+          "z": 228.673
+        },
+        "width": 33.649,
+        "depth": 13.5,
+        "yaw": 1.5889078116716253,
+        "envelopeArea": 454.266,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "455556827",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "pyramidal",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 55,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 55,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 71.85,
+        "center": {
+          "x": -18.525,
+          "z": -259.105
+        },
+        "width": 8.61,
+        "depth": 8.345,
+        "yaw": 2.6306584279367127,
+        "envelopeArea": 71.857,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "480849468",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 38,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 38,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 40.413,
+        "center": {
+          "x": -386.22,
+          "z": -168.464
+        },
+        "width": 5.87,
+        "depth": 6.89,
+        "yaw": -1.5793140083643187,
+        "envelopeArea": 40.447,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "480849469",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 10,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 10,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1.873,
+        "center": {
+          "x": -480.943,
+          "z": -109.265
+        },
+        "width": 1.291,
+        "depth": 1.461,
+        "yaw": 3.102852355926317,
+        "envelopeArea": 1.886,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "506638099",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 67.813,
+        "center": {
+          "x": 484.641,
+          "z": -35.67
+        },
+        "width": 7.856,
+        "depth": 8.64,
+        "yaw": -0.6399360615081648,
+        "envelopeArea": 67.877,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "508120069",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 20.868,
+        "center": {
+          "x": 335.48,
+          "z": 381.835
+        },
+        "width": 5.672,
+        "depth": 3.686,
+        "yaw": -2.2449864566257944,
+        "envelopeArea": 20.904,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "570947077",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint.",
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.6,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 39.247,
+        "center": {
+          "x": -187.606,
+          "z": 381.893
+        },
+        "width": 6.607,
+        "depth": 6.012,
+        "yaw": 1.4798623919167164,
+        "envelopeArea": 39.726,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "570947098",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 4.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 153.06,
+        "center": {
+          "x": 255.65,
+          "z": -43.31
+        },
+        "width": 16.322,
+        "depth": 13.288,
+        "yaw": -1.5739608731932477,
+        "envelopeArea": 216.895,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "570947099",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 204.665,
+        "center": {
+          "x": 289.699,
+          "z": -116.306
+        },
+        "width": 36.588,
+        "depth": 7.589,
+        "yaw": -2.0115705095099807,
+        "envelopeArea": 277.657,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "570947100",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint.",
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.6,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 342.329,
+        "center": {
+          "x": 234.479,
+          "z": -74.254
+        },
+        "width": 32.254,
+        "depth": 12.448,
+        "yaw": 0.24753620230758902,
+        "envelopeArea": 401.509,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "570947101",
+      "name": "Neidentifikovaný objekt",
+      "kind": "garage",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Low garage/service volume; openings are not established by the footprint.",
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.6,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 251.66,
+        "center": {
+          "x": 226.975,
+          "z": -101.305
+        },
+        "width": 41.973,
+        "depth": 6.016,
+        "yaw": -0.04243633997012318,
+        "envelopeArea": 252.509,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "570947102",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 28.754,
+        "center": {
+          "x": 191.44,
+          "z": -95.14
+        },
+        "width": 7.578,
+        "depth": 3.821,
+        "yaw": 1.9977522990515362,
+        "envelopeArea": 28.956,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "570947103",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 121.314,
+        "center": {
+          "x": 193.477,
+          "z": -50.051
+        },
+        "width": 24.006,
+        "depth": 5.067,
+        "yaw": 2.0336987794507593,
+        "envelopeArea": 121.639,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "570947104",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 4.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 43.717,
+        "center": {
+          "x": 70.455,
+          "z": -245.911
+        },
+        "width": 7.101,
+        "depth": 6.187,
+        "yaw": 1.1392737678712739,
+        "envelopeArea": 43.936,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "672784912",
+      "name": "Neidentifikovaný objekt",
+      "kind": "shed",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 3.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 38.818,
+        "center": {
+          "x": 359.747,
+          "z": -138.737
+        },
+        "width": 7.532,
+        "depth": 6.452,
+        "yaw": 0.19792382181870438,
+        "envelopeArea": 48.594,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "672784913",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 4.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 47.867,
+        "center": {
+          "x": 299.315,
+          "z": -135.855
+        },
+        "width": 7.011,
+        "depth": 6.871,
+        "yaw": -2.0107910587155846,
+        "envelopeArea": 48.173,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "672784914",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 4.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 45.705,
+        "center": {
+          "x": -92.205,
+          "z": 253.395
+        },
+        "width": 5.24,
+        "depth": 8.762,
+        "yaw": 1.5880690809946725,
+        "envelopeArea": 45.914,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "809949594",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 9.14,
+        "center": {
+          "x": 270.97,
+          "z": 317.735
+        },
+        "width": 3.658,
+        "depth": 2.509,
+        "yaw": -1.2698760924344772,
+        "envelopeArea": 9.176,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "1132256447",
+      "name": "Hladová zeď",
+      "kind": "fortification",
+      "facade": "stone-wall",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Historic wall/bastion outline, not accommodation. Never add a dormitory window grid."
+      ],
+      "renderHeight": 10,
+      "heightProvenance": "osm-height",
+      "sourceHeight": 10,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 2141.134,
+        "center": {
+          "x": 129.313,
+          "z": -307.929
+        },
+        "width": 1053.653,
+        "depth": 115.782,
+        "yaw": 2.633514813500363,
+        "envelopeArea": 121994.493,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "1132256451",
+      "name": "Neidentifikovaný objekt",
+      "kind": "administration",
+      "facade": "administration",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 9,
+      "heightProvenance": "osm-levels-times-3m-approximate",
+      "sourceHeight": 9,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 1560.345,
+        "center": {
+          "x": -213.157,
+          "z": 16.742
+        },
+        "width": 18.235,
+        "depth": 107.903,
+        "yaw": 0.02470427541523283,
+        "envelopeArea": 1967.649,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "1132256478",
+      "name": "bašta svatého Karla",
+      "kind": "fortification",
+      "facade": "stone-wall",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Historic wall/bastion outline, not accommodation. Never add a dormitory window grid."
+      ],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 333.255,
+        "center": {
+          "x": 402.827,
+          "z": 13.213
+        },
+        "width": 35.945,
+        "depth": 105.151,
+        "yaw": 0.3286115102048477,
+        "envelopeArea": 3779.687,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "1132256479",
+      "name": "Neidentifikovaný objekt",
+      "kind": "fortification",
+      "facade": "stone-wall",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Historic wall/bastion outline, not accommodation. Never add a dormitory window grid."
+      ],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 330.369,
+        "center": {
+          "x": 343.468,
+          "z": -67.86
+        },
+        "width": 129.268,
+        "depth": 2.67,
+        "yaw": -0.4262753691938,
+        "envelopeArea": 345.088,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "1132256480",
+      "name": "bašta svatého Karla",
+      "kind": "fortification",
+      "facade": "stone-wall",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Historic wall/bastion outline, not accommodation. Never add a dormitory window grid."
+      ],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 311.311,
+        "center": {
+          "x": 464.343,
+          "z": 44.724
+        },
+        "width": 36.721,
+        "depth": 119.401,
+        "yaw": -0.9998099089092785,
+        "envelopeArea": 4384.524,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "1374441208",
+      "name": "Neidentifikovaný objekt",
+      "kind": "unknown",
+      "facade": "none",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [],
+      "renderHeight": 15,
+      "heightProvenance": "legacy-fallback-unverified",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 109.402,
+        "center": {
+          "x": 55.325,
+          "z": -19.004
+        },
+        "width": 12.537,
+        "depth": 8.782,
+        "yaw": -3.1214948574912023,
+        "envelopeArea": 110.098,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    },
+    {
+      "osmId": "1558137690",
+      "name": "Neidentifikovaný objekt",
+      "kind": "service",
+      "facade": "industrial",
+      "roof": "unverified",
+      "block": null,
+      "confidence": "osm-typology-only",
+      "sourceIds": [
+        "osm"
+      ],
+      "photoIds": [],
+      "characteristics": [
+        "Render/collision height is a clearly inferred low-rise fallback, not a measured dimension."
+      ],
+      "renderHeight": 4.5,
+      "heightProvenance": "typology-inferred-approximate",
+      "sourceHeight": 15,
+      "measuredHeight": null,
+      "entranceSurveyed": false,
+      "footprint": {
+        "area": 354.641,
+        "center": {
+          "x": -306.235,
+          "z": 277.805
+        },
+        "width": 23.518,
+        "depth": 15.081,
+        "yaw": -0.10351918142359468,
+        "envelopeArea": 354.665,
+        "precision": "derived-from-osm-not-surveyed"
+      }
+    }
+  ],
+  "landmarks": [
+    {
+      "id": "great-strahov-stadium",
+      "name": "Velký strahovský stadion",
+      "kind": "stadium",
+      "facade": "stadium-concrete",
+      "decorativeOnly": true,
+      "addedToCollisionWorld": false,
+      "source": "https://www.openstreetmap.org/relation/1515034",
+      "identitySource": "https://www.openstreetmap.org/relation/1515375",
+      "sourceIds": [
+        "osm",
+        "commons-stadium"
+      ],
+      "confidence": "osm-multipolygon-complete-and-historical-photo",
+      "height": 10,
+      "heightProvenance": "osm-height",
+      "osmVersion": 9,
+      "osmTimestamp": "2022-06-17T20:38:35Z",
+      "outerRings": [
+        [
+          [
+            -138.29,
+            92.06
+          ],
+          [
+            -138.66,
+            77.77
+          ],
+          [
+            -137.09,
+            77.75
+          ],
+          [
+            -137.38,
+            65.93
+          ],
+          [
+            -137.81,
+            45.34
+          ],
+          [
+            -138.08,
+            17.52
+          ],
+          [
+            -140.18,
+            -48.38
+          ],
+          [
+            -141.63,
+            -48.36
+          ],
+          [
+            -143.91,
+            -141.79
+          ],
+          [
+            -144.23,
+            -145.54
+          ],
+          [
+            -146.01,
+            -155.69
+          ],
+          [
+            -150.52,
+            -164.76
+          ],
+          [
+            -155.24,
+            -170.99
+          ],
+          [
+            -160.21,
+            -175.76
+          ],
+          [
+            -167.44,
+            -180
+          ],
+          [
+            -174.36,
+            -182.83
+          ],
+          [
+            -184.17,
+            -183.38
+          ],
+          [
+            -184.16,
+            -186.71
+          ],
+          [
+            -384.53,
+            -183.18
+          ],
+          [
+            -384.51,
+            -181.17
+          ],
+          [
+            -383.37,
+            -180.84
+          ],
+          [
+            -383.76,
+            -172.36
+          ],
+          [
+            -388.37,
+            -171.68
+          ],
+          [
+            -399.61,
+            -168.79
+          ],
+          [
+            -411.34,
+            -162.08
+          ],
+          [
+            -418.68,
+            -154.12
+          ],
+          [
+            -422.87,
+            -143.02
+          ],
+          [
+            -423.14,
+            -135.16
+          ],
+          [
+            -435.12,
+            -134.65
+          ],
+          [
+            -435.1,
+            -133.91
+          ],
+          [
+            -439.18,
+            -133.82
+          ],
+          [
+            -436.65,
+            -31.01
+          ],
+          [
+            -428.2,
+            -31.25
+          ],
+          [
+            -425.42,
+            74.03
+          ],
+          [
+            -434.05,
+            74.23
+          ],
+          [
+            -433.06,
+            115.72
+          ],
+          [
+            -430.89,
+            115.67
+          ],
+          [
+            -428.9,
+            115.63
+          ],
+          [
+            -427.57,
+            171.28
+          ],
+          [
+            -427.44,
+            178.21
+          ],
+          [
+            -426.92,
+            178.19
+          ],
+          [
+            -426.92,
+            177.9
+          ],
+          [
+            -414.82,
+            177.72
+          ],
+          [
+            -414.04,
+            183.59
+          ],
+          [
+            -411.27,
+            191.62
+          ],
+          [
+            -406.75,
+            199.16
+          ],
+          [
+            -398.19,
+            206.75
+          ],
+          [
+            -393.06,
+            209.58
+          ],
+          [
+            -387.16,
+            211.23
+          ],
+          [
+            -378.49,
+            212.09
+          ],
+          [
+            -378.5,
+            212.71
+          ],
+          [
+            -374.81,
+            212.62
+          ],
+          [
+            -374.79,
+            213.04
+          ],
+          [
+            -374.59,
+            222.46
+          ],
+          [
+            -374.99,
+            222.47
+          ],
+          [
+            -374.89,
+            223.56
+          ],
+          [
+            -239.94,
+            220.54
+          ],
+          [
+            -179.25,
+            218.87
+          ],
+          [
+            -179.22,
+            217.8
+          ],
+          [
+            -174.94,
+            217.81
+          ],
+          [
+            -174.95,
+            217.5
+          ],
+          [
+            -174.7,
+            217.49
+          ],
+          [
+            -174.6,
+            214.93
+          ],
+          [
+            -167.52,
+            214.19
+          ],
+          [
+            -157.39,
+            210.47
+          ],
+          [
+            -150.47,
+            205.44
+          ],
+          [
+            -142.52,
+            196.47
+          ],
+          [
+            -138.11,
+            187.53
+          ],
+          [
+            -136.61,
+            179.92
+          ],
+          [
+            -136.43,
+            170.64
+          ],
+          [
+            -136.5,
+            167.33
+          ],
+          [
+            -137.89,
+            106.24
+          ],
+          [
+            -138.25,
+            94
+          ],
+          [
+            -138.29,
+            92.06
+          ]
+        ]
+      ],
+      "innerRings": [
+        [
+          [
+            -409.78,
+            -135.6
+          ],
+          [
+            -408.91,
+            -140
+          ],
+          [
+            -407.11,
+            -146.07
+          ],
+          [
+            -402.71,
+            -151.53
+          ],
+          [
+            -395.79,
+            -156.55
+          ],
+          [
+            -391.88,
+            -157.64
+          ],
+          [
+            -387.31,
+            -158.3
+          ],
+          [
+            -387.55,
+            -151.35
+          ],
+          [
+            -183.71,
+            -157.3
+          ],
+          [
+            -183.79,
+            -163.18
+          ],
+          [
+            -183.75,
+            -165.69
+          ],
+          [
+            -179.32,
+            -164.55
+          ],
+          [
+            -174.54,
+            -163.21
+          ],
+          [
+            -168.84,
+            -159.02
+          ],
+          [
+            -165.24,
+            -154.62
+          ],
+          [
+            -162.91,
+            -149.88
+          ],
+          [
+            -161.98,
+            -144.76
+          ],
+          [
+            -161.98,
+            -141.18
+          ],
+          [
+            -175.14,
+            -141.72
+          ],
+          [
+            -178.97,
+            -138.26
+          ],
+          [
+            -178.59,
+            -113.13
+          ],
+          [
+            -174.34,
+            -109.68
+          ],
+          [
+            -161.3,
+            -109.72
+          ],
+          [
+            -160.72,
+            -87.85
+          ],
+          [
+            -173.72,
+            -87.73
+          ],
+          [
+            -177.39,
+            -83.53
+          ],
+          [
+            -176.08,
+            -17.22
+          ],
+          [
+            -172.28,
+            -13.44
+          ],
+          [
+            -158.83,
+            -13.69
+          ],
+          [
+            -158.12,
+            17.88
+          ],
+          [
+            -157.54,
+            44.02
+          ],
+          [
+            -170.47,
+            44.26
+          ],
+          [
+            -174.24,
+            48.12
+          ],
+          [
+            -172.99,
+            115.21
+          ],
+          [
+            -168.68,
+            118.82
+          ],
+          [
+            -155.61,
+            118.9
+          ],
+          [
+            -155.12,
+            140.17
+          ],
+          [
+            -167.6,
+            140.31
+          ],
+          [
+            -171.72,
+            144.18
+          ],
+          [
+            -171.45,
+            169.2
+          ],
+          [
+            -166.94,
+            172.4
+          ],
+          [
+            -153.93,
+            172.06
+          ],
+          [
+            -155.89,
+            177.86
+          ],
+          [
+            -157.54,
+            183.13
+          ],
+          [
+            -159.32,
+            188.5
+          ],
+          [
+            -165.61,
+            193.37
+          ],
+          [
+            -168.64,
+            195.71
+          ],
+          [
+            -172.42,
+            196.84
+          ],
+          [
+            -174.73,
+            196.87
+          ],
+          [
+            -174.69,
+            194.69
+          ],
+          [
+            -174.62,
+            188.77
+          ],
+          [
+            -187.27,
+            188.6
+          ],
+          [
+            -368.45,
+            189.77
+          ],
+          [
+            -378.95,
+            192.98
+          ],
+          [
+            -378.79,
+            199.37
+          ],
+          [
+            -388.56,
+            197.48
+          ],
+          [
+            -394.59,
+            193.08
+          ],
+          [
+            -398.46,
+            189.01
+          ],
+          [
+            -400.39,
+            183.69
+          ],
+          [
+            -401.96,
+            177.41
+          ],
+          [
+            -393.4,
+            177.5
+          ],
+          [
+            -383.98,
+            168.73
+          ],
+          [
+            -386.38,
+            76.53
+          ],
+          [
+            -391.68,
+            -125.89
+          ],
+          [
+            -402.56,
+            -135.98
+          ],
+          [
+            -409.78,
+            -135.6
+          ]
+        ]
+      ],
+      "parts": [
+        {
+          "osmId": "456174850",
+          "points": [
+            [
+              -378.61,
+              207.13
+            ],
+            [
+              -371.5,
+              207.18
+            ],
+            [
+              -371.55,
+              213.04
+            ],
+            [
+              -374.79,
+              213.04
+            ],
+            [
+              -374.81,
+              212.62
+            ],
+            [
+              -378.5,
+              212.71
+            ],
+            [
+              -378.49,
+              212.09
+            ],
+            [
+              -378.61,
+              207.13
+            ]
+          ],
+          "height": 38,
+          "heightProvenance": "osm-height",
+          "source": "https://www.openstreetmap.org/way/456174850"
+        },
+        {
+          "osmId": "480849464",
+          "points": [
+            [
+              -374.79,
+              213.04
+            ],
+            [
+              -371.55,
+              213.04
+            ],
+            [
+              -174.67,
+              209.36
+            ],
+            [
+              -174.6,
+              214.93
+            ],
+            [
+              -174.7,
+              217.49
+            ],
+            [
+              -174.95,
+              217.5
+            ],
+            [
+              -174.94,
+              217.81
+            ],
+            [
+              -179.22,
+              217.8
+            ],
+            [
+              -179.25,
+              218.87
+            ],
+            [
+              -374.89,
+              223.56
+            ],
+            [
+              -374.99,
+              222.47
+            ],
+            [
+              -374.59,
+              222.46
+            ],
+            [
+              -374.79,
+              213.04
+            ]
+          ],
+          "height": 18,
+          "heightProvenance": "osm-height",
+          "source": "https://www.openstreetmap.org/way/480849464"
+        },
+        {
+          "osmId": "480849465",
+          "points": [
+            [
+              -140.18,
+              -48.38
+            ],
+            [
+              -141.63,
+              -48.36
+            ],
+            [
+              -159.7,
+              -48.16
+            ],
+            [
+              -158.83,
+              -13.69
+            ],
+            [
+              -158.12,
+              17.88
+            ],
+            [
+              -157.54,
+              44.02
+            ],
+            [
+              -156.49,
+              77.78
+            ],
+            [
+              -137.09,
+              77.75
+            ],
+            [
+              -137.38,
+              65.93
+            ],
+            [
+              -137.81,
+              45.34
+            ],
+            [
+              -138.08,
+              17.52
+            ],
+            [
+              -139.39,
+              -16.53
+            ],
+            [
+              -140.18,
+              -48.38
+            ]
+          ],
+          "height": 20,
+          "heightProvenance": "osm-height",
+          "source": "https://www.openstreetmap.org/way/480849465"
+        },
+        {
+          "osmId": "480849466",
+          "points": [
+            [
+              -383.76,
+              -172.36
+            ],
+            [
+              -184.07,
+              -177.12
+            ],
+            [
+              -184.17,
+              -183.38
+            ],
+            [
+              -184.16,
+              -186.71
+            ],
+            [
+              -384.53,
+              -183.18
+            ],
+            [
+              -384.51,
+              -181.17
+            ],
+            [
+              -383.37,
+              -180.84
+            ],
+            [
+              -383.76,
+              -172.36
+            ]
+          ],
+          "height": 18,
+          "heightProvenance": "osm-height",
+          "source": "https://www.openstreetmap.org/way/480849466"
+        },
+        {
+          "osmId": "1132256450",
+          "points": [
+            [
+              -174.7,
+              217.49
+            ],
+            [
+              -174.95,
+              217.5
+            ],
+            [
+              -174.94,
+              217.81
+            ],
+            [
+              -179.22,
+              217.8
+            ],
+            [
+              -179.25,
+              218.87
+            ],
+            [
+              -374.89,
+              223.56
+            ],
+            [
+              -374.99,
+              222.47
+            ],
+            [
+              -374.59,
+              222.46
+            ],
+            [
+              -374.79,
+              213.04
+            ],
+            [
+              -374.81,
+              212.62
+            ],
+            [
+              -378.5,
+              212.71
+            ],
+            [
+              -378.49,
+              212.09
+            ],
+            [
+              -378.61,
+              207.13
+            ],
+            [
+              -378.79,
+              199.37
+            ],
+            [
+              -174.69,
+              194.69
+            ],
+            [
+              -174.73,
+              196.87
+            ],
+            [
+              -174.67,
+              209.36
+            ],
+            [
+              -174.6,
+              214.93
+            ],
+            [
+              -174.7,
+              217.49
+            ]
+          ],
+          "height": 10,
+          "heightProvenance": "parent-height-approximate",
+          "source": "https://www.openstreetmap.org/way/1132256450"
+        },
+        {
+          "osmId": "1132256452",
+          "points": [
+            [
+              -137.89,
+              106.24
+            ],
+            [
+              -137.12,
+              141.94
+            ],
+            [
+              -136.81,
+              155.14
+            ],
+            [
+              -136.5,
+              167.33
+            ],
+            [
+              -136.43,
+              170.64
+            ],
+            [
+              -154.34,
+              171.44
+            ],
+            [
+              -155.12,
+              140.17
+            ],
+            [
+              -155.61,
+              118.9
+            ],
+            [
+              -156.49,
+              77.78
+            ],
+            [
+              -157.54,
+              44.02
+            ],
+            [
+              -158.12,
+              17.88
+            ],
+            [
+              -158.83,
+              -13.69
+            ],
+            [
+              -159.7,
+              -48.16
+            ],
+            [
+              -160.72,
+              -87.85
+            ],
+            [
+              -161.3,
+              -109.72
+            ],
+            [
+              -161.98,
+              -141.18
+            ],
+            [
+              -143.91,
+              -141.79
+            ],
+            [
+              -143.56,
+              -127.75
+            ],
+            [
+              -143.19,
+              -112.38
+            ],
+            [
+              -142.36,
+              -78.06
+            ],
+            [
+              -142.02,
+              -64.28
+            ],
+            [
+              -141.63,
+              -48.36
+            ],
+            [
+              -140.18,
+              -48.38
+            ],
+            [
+              -139.88,
+              -36.45
+            ],
+            [
+              -139.39,
+              -16.53
+            ],
+            [
+              -138.08,
+              17.52
+            ],
+            [
+              -137.81,
+              45.34
+            ],
+            [
+              -137.38,
+              65.93
+            ],
+            [
+              -137.09,
+              77.75
+            ],
+            [
+              -138.66,
+              77.77
+            ],
+            [
+              -138.29,
+              92.06
+            ],
+            [
+              -138.25,
+              94
+            ],
+            [
+              -137.89,
+              106.24
+            ]
+          ],
+          "height": 10,
+          "heightProvenance": "parent-height-approximate",
+          "source": "https://www.openstreetmap.org/way/1132256452"
+        },
+        {
+          "osmId": "1132256453",
+          "points": [
+            [
+              -409.78,
+              -135.6
+            ],
+            [
+              -401.96,
+              177.41
+            ],
+            [
+              -414.82,
+              177.72
+            ],
+            [
+              -426.92,
+              177.9
+            ],
+            [
+              -426.92,
+              178.19
+            ],
+            [
+              -427.44,
+              178.21
+            ],
+            [
+              -427.57,
+              171.28
+            ],
+            [
+              -428.9,
+              115.63
+            ],
+            [
+              -430.89,
+              115.67
+            ],
+            [
+              -433.06,
+              115.72
+            ],
+            [
+              -434.05,
+              74.23
+            ],
+            [
+              -425.42,
+              74.03
+            ],
+            [
+              -428.2,
+              -31.25
+            ],
+            [
+              -436.65,
+              -31.01
+            ],
+            [
+              -439.18,
+              -133.82
+            ],
+            [
+              -435.1,
+              -133.91
+            ],
+            [
+              -435.12,
+              -134.65
+            ],
+            [
+              -409.78,
+              -135.6
+            ]
+          ],
+          "height": 10,
+          "heightProvenance": "osm-height",
+          "source": "https://www.openstreetmap.org/way/1132256453"
+        },
+        {
+          "osmId": "1132256454",
+          "points": [
+            [
+              -387.31,
+              -158.3
+            ],
+            [
+              -387.3,
+              -165.39
+            ],
+            [
+              -387.3,
+              -166.77
+            ],
+            [
+              -383.71,
+              -166.88
+            ],
+            [
+              -383.75,
+              -171.22
+            ],
+            [
+              -383.76,
+              -172.36
+            ],
+            [
+              -184.07,
+              -177.12
+            ],
+            [
+              -183.75,
+              -165.69
+            ],
+            [
+              -183.79,
+              -163.18
+            ],
+            [
+              -387.31,
+              -158.3
+            ]
+          ],
+          "height": 10,
+          "heightProvenance": "parent-height-approximate",
+          "source": "https://www.openstreetmap.org/way/1132256454"
+        }
+      ],
+      "characteristics": [
+        "Open sports bowl with a real inner void, concrete tribunes and distinct taller stand parts.",
+        "Never fill the inner sports field with a solid building roof.",
+        "No accommodation facade or generic room-window grid.",
+        "Imported geometry was previously absent because fetch-map imports only building ways, not building multipolygon relations.",
+        "Backdrop west of current playable bounds; this does not enlarge the walkable area."
+      ]
+    }
+  ]
+}
