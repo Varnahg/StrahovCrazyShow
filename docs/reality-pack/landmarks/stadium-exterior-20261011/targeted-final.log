@@ -1,0 +1,75 @@
+OSM53921692 roof reproduction {
+  sourceHeight: 3,
+  baseY: -4.930610074996948,
+  roofY: -1.930610074996948,
+  beforeWithoutRoof: {
+    x: 154.17221069335938,
+    y: -5.010554790496826,
+    z: -125.2276611328125
+  },
+  afterWithRoof: {
+    x: 154.17056274414062,
+    y: -1.9418113231658936,
+    z: -125.22510528564453
+  }
+}
+BJS - [21:18:57]: Babylon.js v9.30.0 - Null engine
+✔ B1 and market roof collision streams exactly reuse their visible triangles (544.2035ms)
+✔ actual B1 and market roofs stop the chassis from above and below without filling B1 courtyards or stadium (2559.5188ms)
+✔ OSM53921692 previously missed roof ray and car now collide at the exact rendered roof (1264.6624ms)
+✔ shared roof remains two-sided for the chassis and blocks an oblique upward approach (2105.0961ms)
+✔ roof rays follow the real slanted outline and its small recesses, with no generic caps on replacements (625.4313ms)
+✔ shared polygon keeps rendered triangles/UV order and rejects B6, market and landmark replacements (29.2276ms)
+BJS - [21:18:50]: Babylon.js v9.30.0 - Null engine
+✔ B1 keeps the full original Z footprint and three documented storeys instead of OSM's single-storey default (6.7518ms)
+✔ common reception entrances use the mapped western projections, preserving separate B6 and special blocks (0.8952ms)
+✔ the canopy, door and twelve stair levels share one coherent landing elevation (1.9862ms)
+✔ stadium ray sections retain the mapped open bowl with exterior beyond the field edge (59.6995ms)
+✔ visible landmark solids and Rapier collision triangles come from one finite bounded plan (8.0259ms)
+✔ landmark component switches geometric tiers using the shared quality radius and disposes every mesh (126.9751ms)
+✔ the actual game capsule continuously climbs B2's twelve exterior steps on the DEM and stops at its closed door (2437.0022ms)
+✔ stadium archives match the current shared exterior geometry and keep actual tinted COLOR_0 (253.2963ms)
+✔ closed stadium boundary follows the source outline behind exterior paths and preserves the open field (204.5408ms)
+✔ every closure panel and seam blocks a capsule at walking and jumping heights (76.8671ms)
+✔ actual CCD car cannot drive through the former east portal and a jumping walker cannot bypass it (1485.685ms)
+✔ actual walker can still follow the outside Vanickova pavement past the pavilion (1496.0069ms)
+✔ photo-correct east pavilion preserves the OSM outline and owns its actual DEM base (1.8868ms)
+✔ east curtain wall has unequal horizontal rows, a broad opaque band and narrow clerestory, with separately authored far geometry (0.9941ms)
+BJS - [21:18:54]: Babylon.js v9.30.0 - Null engine
+Photo-correct stadium component geometry {
+  meshCount: 68,
+  nearTriangles: 21300,
+  farTriangles: 13000,
+  collisionTriangles: 11442,
+  commonEntrances: 8,
+  b1Height: 9.6,
+  stadiumRows: 0,
+  stadiumAccess: 'exterior-only',
+  stadiumMeshes: 12,
+  pavilion: {
+    osmId: '480849465',
+    baseY: 3.179767465591432,
+    height: 24,
+    frontageMetres: 126.17434309637262,
+    columns: 17,
+    glazingBays: 50,
+    stairFlights: 2,
+    stairStepsPerFlight: 28,
+    stairCenter: [ -138.08, 3.179767465591432, 17.520000000000007 ],
+    stairProfiles: [ [Array], [Array] ]
+  }
+}
+✔ recessed pavilion piers retain the visible covered portal with an explicit pilot closure behind it (296.5003ms)
+✔ actual production KCC approaches the east covered portal but cannot enter the closed stadium (2019.3388ms)
+✔ both interpreted exterior flights are continuous physical stairs with an open arch below (1520.2842ms)
+✔ stadium silhouette materials stay batched and every LOD uses the original full-detail source (118.4444ms)
+✔ baked passenger navigation identifies current composed paths, terrain patch and actual entrance sources (22.19ms)
+✔ both baked B6 passenger journeys follow the explicit diagonal paved approach instead of a grass shortcut (4.2608ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9469.2981

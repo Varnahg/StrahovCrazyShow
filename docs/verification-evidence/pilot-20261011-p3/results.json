@@ -1,0 +1,76 @@
+{
+  "status": "passed",
+  "failureReasons": [],
+  "scope": "Technical checkpoint P3: finalized tests, production build including TypeScript, isolated integration and subsequent independent live/frozen SHA audit. No GPU/FPS acceptance is implied.",
+  "sourceSnapshotId": "912e65ee7ef04ab302db5c611e146b3e23ee6424d9bddc0102b4867fe24f03da",
+  "files": 8173,
+  "tests": {
+    "total": 469,
+    "passed": 469,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "startedAt": "2026-10-11T19:53:18.4196151Z",
+  "finishedAt": "2026-10-11T19:55:46.7708092Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 84.3436825,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 42.2027005,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 21.7253609,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "missingStages": [],
+  "failedStages": [],
+  "sourceCheck": "source-check.json",
+  "pipeline": "pipeline-results.json",
+  "publishedSha256": {
+    "audit-live-frozen.mjs.txt": "8ba52230b3fa1d0d788aa4d8554fcf03d907464dbe8387612bda5c6317ef59ae",
+    "integration-evidence.json": "9d8f4fcf06081a9d2555485ab3490fab80de0b1d4db0447be4d2c26573554c7c",
+    "integration-respawn-evidence.json": "5e7a71bf842e3ea0a05079f8406f9ff257c9f807fcebd022d52994e205c0e1e2",
+    "local-preview-status.json": "6d9b37c0f47eca63acc7a23699ac17a92841ccfa4b2ecfad51b2f5e0502ddf30",
+    "pipeline-build.log": "0b052a2d47454b3328b30da4bb368911365545f01f54d9351c72a7f00516828e",
+    "pipeline-results.json": "a3276a8000c3adfe36b848e457c012ce94771c12c85882c655a4b17c28319b42",
+    "pipeline-test-integration.log": "e3c898b2698d075a1c82f0380c7a0871d06b99e825e5a1a3822d50a6008ee28a",
+    "pipeline-test.log": "c0f93d15c5485b275f70b4f1235a3c4d9c4cfe4176bd6e588423fd5bb66ea22a",
+    "production-flashlight-first-person.png": "2eca62a592d39ef6f313a947ba7ca8dafed82720867444db8bf79ca368825ca0",
+    "production-flashlight-soft.png": "5af2a4895454f363f4dd8ba3ea780f8dd88302b07c890d92b2bd7c5c3afd201b",
+    "production-map-route.png": "9e954a53150f9c8f9a4acd5f7c992580879392b5bc38739bf50df5a4e36b0a65",
+    "production-ui.json": "2bcdd4104420f70068c54e4b493696f6072b3641c0770d9abedc16064032ae2b",
+    "readme-check.json": "5cdac4a5c5581f96fd88754351c3ec5589151d942045de03d0218952c0cfe66b",
+    "source-check.json": "6b8c8b41a8c1b2e9aa37b4c08f5da7382c028307fc0db352deb6146ec1ef58af",
+    "source-comparison-p2.json": "e93bdb17ced96e2c19177d60bd986a437e5481216482633863b5880c57b83962",
+    "source-manifest.json": "d37d0e80585775527eb3a77e911cad1a838b8c6f6fe30c68db70ad55c7b38620"
+  },
+  "archiveErrors": [],
+  "gpu": {
+    "status": "functional-qa-only",
+    "fpsAcceptance": "pending",
+    "note": "No matched full-production GeForce/FPS result for P3 is archived. Private user diagnostics remain local."
+  },
+  "notes": [
+    "Raw logs retain any warnings and integration diagnostics; status is derived from actual final stage exit codes, final test summary and source audit.",
+    "Reports and prose may change independently; the required static landmark geometry fixture is explicitly included and immutable."
+  ],
+  "visualQa": {
+    "status": "passed-with-documented-limits",
+    "evidence": "production-ui.json",
+    "sourceComparison": "source-comparison-p2.json",
+    "note": "Medium, Intel UHD 630, 1280x720, one actual production session. P2 functional evidence remains valid for unchanged files; P3 directly verifies the two visual corrections. Not FPS acceptance."
+  },
+  "localPreview": "local-preview-status.json"
+}

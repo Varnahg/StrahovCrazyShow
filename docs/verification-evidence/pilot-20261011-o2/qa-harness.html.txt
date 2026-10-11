@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QA střechy 53921692 a návratu na start</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: #17231f; color: #f4f0e6; font: 14px system-ui; }
+      main { display: grid; grid-template-columns: minmax(0, 1fr) 390px; height: 100%; }
+      .viewport { position: relative; min-width: 0; overflow: hidden; }
+      canvas { display: block; width: 100%; height: 100%; outline: none; }
+      aside { overflow: auto; padding: 16px; background: #223029; }
+      h1 { font-size: 19px; margin: 0 0 12px; }
+      p { font-size: 12px; line-height: 1.5; }
+      button { padding: 8px; margin: 3px 0; font: inherit; }
+      button:disabled { opacity: .5; }
+      output { display: block; white-space: pre-wrap; overflow-wrap: anywhere; font: 11px/1.4 monospace; }
+      .scene-labels { position: absolute; inset: 0; pointer-events: none; }
+      .world-label { position: absolute; padding: 3px 7px; background: #12281acc; white-space: nowrap; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="viewport">
+        <canvas id="game" tabindex="0" aria-label="Skutečný Game a Rapier, diagnostický pád auta na střechu"></canvas>
+        <div class="scene-labels" data-label-layer></div>
+      </div>
+      <aside>
+        <h1>Střecha a recovery · QA</h1>
+        <p>Výslovná diagnostická příprava: lokální postava usedne do skutečného auta; auto se umístí 2 m nad sdílenou střechu OSM 53921692 v X 154,1723175 / Z −125,2249374 s rychlostí Y −8 m/s. Potom běží pouze původní Game a pevné fyzikální kroky.</p>
+        <p>Po 90 physics inputs se uloží průběh a výsledek po renderu. Během sondy nemačkej pohybové klávesy. Návrat použije skutečné Game.requestRespawn a vyhodnotí šest dokončených renderů. Samostatná místní QA, bez multiplayeru a bez tvrzení o FPS.</p>
+        <button id="start" disabled>Start / drop · QA příprava</button>
+        <button id="return" disabled>ReturnToStart · skutečný respawn</button>
+        <button id="stop">Stop · uvolnit Game</button>
+        <p>Střední kvalita, denní testovací okamžik 11. 10. 2026 10:00 UTC. Stop i odchod ukončí scénu; nový běh vyžaduje obnovu stránky.</p>
+        <output id="metrics" aria-live="off">Načítání skutečné hry…</output>
+      </aside>
+    </main>
+    <script type="module" src="./roof-recovery.ts"></script>
+  </body>
+</html>

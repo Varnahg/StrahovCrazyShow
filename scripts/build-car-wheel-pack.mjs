@@ -8,6 +8,14 @@ const root = new URL(
   ),
   sha = (b) => createHash("sha256").update(b).digest("hex"),
   reports = [];
+const nearMasterSha256 = sha(
+  await readFile(
+    new URL(
+      "../public/models/vehicles/campus-hatchback-near.glb",
+      import.meta.url,
+    ),
+  ),
+);
 const baselineShas = {
   medium: "09abe7339544c6fa8e6bfa8a612c8a793e9542ba3bb14cf4d95c35e59db305c8",
   far: "b8426d57160e691484e3f87f0ce96b5b515fdc3305732cdd07d3c5c0bf16223a",
@@ -199,8 +207,7 @@ await writeFile(
       bytes: r.outputBytes,
       sha256: r.outputSha256,
       wheelCentresUnchanged: true,
-      nearMasterSha256:
-        "2805ecfd4dd14ad3ea0511efce8c78d9dd8fc07c9d55dc28bf02e61831afa665",
+      nearMasterSha256,
     })),
     null,
     2,

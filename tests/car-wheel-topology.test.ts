@@ -32,7 +32,7 @@ const bodySignature = (model: ReturnType<typeof parseGlb>, mesh: number) =>
     ),
   );
 
-test("source, reviewed near GLB and editable highest master remain byte-for-byte unchanged", () => {
+test("immutable source and accepted repaired near/master retain their reviewed hashes", () => {
   for (const [file, sha] of [
     [
       assets + "original-source.glb",
@@ -40,11 +40,11 @@ test("source, reviewed near GLB and editable highest master remain byte-for-byte
     ],
     [
       assets + "campus-hatchback-master.blend",
-      "3b72d0f6f89d3a6719eda6588422f087ed5fae5a0a454103efe72a62e3317a6e",
+      "903eaf0fcfaa7a4ef1ce15a89435e3e4186db8190907e0099b5be7f52e44e83f",
     ],
     [
       "public/models/vehicles/campus-hatchback-near.glb",
-      "2805ecfd4dd14ad3ea0511efce8c78d9dd8fc07c9d55dc28bf02e61831afa665",
+      "7491240d9c5acc10375a394bc9b56a02f314da749dfb63e397506d90ae33c853",
     ],
   ])
     assert.equal(hash(readFileSync(file)), sha);

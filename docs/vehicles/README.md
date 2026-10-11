@@ -32,7 +32,7 @@ Zdrojové mapy mají skutečnou mikrovariaci, proto zůstávají zachované. Pou
 
 Originál a near master nebyly kvůli LOD zjednodušeny. Exportní a loader testy potvrzují konečné souřadnice/normály a nulové trojúhelníky s plochou pod 1e−12 m² ve všech třech výstupech. Nativní Babylon instance LOD vybírá zdroj podle skutečné kamery; na auto vzniká 26 instancí, nikoli tři úplné kopie. Sdílené low/medium/high prahy jsou **10/36, 16/55, 24/75 m**.
 
-[Wheel oprava K](./wheel-repair.md) řeší rozpojené UV ostrovy před decimací a nevalidní far dvoustranné kolapsy. Všech32 skutečně exportovaných medium/far wheel částí je uzavřených a bez degenerovaných trojúhelníků; J body/PBR/obrázky/uzly zůstaly bitově stejné. Malý vnitřní near normalizační fold a samostatné far body/arch limity jsou doložené a zůstávají otevřené. Uzavřenost kol se nevydává za dokonalost celé karoserie.
+[Wheel oprava K](./wheel-repair.md) řeší rozpojené UV ostrovy před decimací a nevalidní far dvoustranné kolapsy. Všech32 skutečně exportovaných medium/far wheel částí je uzavřených a bez degenerovaných trojúhelníků; J body/PBR/obrázky/uzly zůstaly bitově stejné. Následná [near oprava 11. 10. 2026](../vehicle-pilot-repair-20261011.md) odstranila vnitřní normalizační fold výměnou jedné diagonály: pouze šest indexů, bez změny vertex polí, UV, materiálů, rozměrů nebo kol. Opraven je také editovatelný master a regenerátor. Nová GPU přejímka této opravy zatím neproběhla. Far limity zůstávají otevřené a jsou nově rozlišené podle skutečných source komponent; 22 z 28 starších body-ray missů patří třmenům, nikoli vnějšímu shellu. Uzavřenost kol se nevydává za dokonalost celé karoserie.
 
 ```ts
 import { acquireCarPack, CAR_PACK_MANIFEST } from "../../client/car-pack";
@@ -60,7 +60,7 @@ Středy dvou předních světel jsou odvozené z konkrétních `Flush swept tran
 
 `tests/realistic-car-pack.test.ts` načítá skutečné GLB přes skutečný Babylon loader. V headless části jsou záměrně odložené dekódy obrazů; ověřuje geometrii, materiálové hodnoty, fyzické rozměry, skutečný LOD selection, refcount, paletu, grounding a omezenou emisi, **nikoli GPU nebo FPS**. Původní legacy loader regrese zůstávají zachované.
 
-Konečný cílený běh: **11/11 PASS**, exit 0, [úplný log](./targeted-tests.log). `pnpm exec tsc --noEmit`: **PASS**, exit 0, [log](./typescript.log). Full suite, build a integrační test jsou součástí kořenového předání. Prvotní bílé CPU near rendery v `before-repair` jsou historický důkaz chyby barevného exportu; současný modrý master potvrzuje opravené WebGL review.
+Původní pack ověření: **11/11 PASS**, exit 0, [úplný log](./targeted-tests.log). Původní `pnpm exec tsc --noEmit`: **PASS**, exit 0, [log](./typescript.log). Po integraci lokální near opravy: **19/19 cílených testů PASS** včetně reálného GLB loaderu, LOD, 24 parkovacích pozic a kontrol nezměněných kol; [nový log](./inner-shell-repair-tests.log), [aktuální audit](./inner-shell-repair-audit.json). Cílený TypeScript rovněž PASS. Full suite, build, integrace a nová GPU přejímka patří do kořenového předání. Prvotní bílé CPU near rendery v `before-repair` jsou historický důkaz chyby barevného exportu; dřívější modrý master potvrzuje tehdejší WebGL review, nikoli tuto následnou opravu.
 
 ```powershell
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --threads 2 --python scripts/car-master-pack.py

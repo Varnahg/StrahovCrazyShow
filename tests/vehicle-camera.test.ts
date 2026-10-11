@@ -98,7 +98,9 @@ test("E prioritises safe vehicle exit over a collectible at the identical positi
     const actions: string[] = [],
       notices: string[] = [];
     game.network = true;
-    game.onAction = (action) => actions.push(action);
+    game.onAction = (action) => {
+      actions.push(action);
+    };
     game.onNotice = (notice) => notices.push(notice);
     game.found = new Set();
     Object.defineProperty(game.actor, "speed", {

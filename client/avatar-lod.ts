@@ -89,7 +89,11 @@ function capturePieces(
   const inverseRoot = rig.root.getWorldMatrix().clone().invert();
   const pieces = meshes
     .filter(
-      (mesh) => !PROXY_OMIT.test(mesh.name) && !mesh.metadata?.skinnedAnatomy,
+      (mesh) =>
+        !PROXY_OMIT.test(mesh.name) &&
+        !mesh.metadata?.skinnedAnatomy &&
+        !mesh.metadata?.anatomicalEye &&
+        mesh.metadata?.avatarFarProxy !== false,
     )
     .map((mesh) => {
       mesh.computeWorldMatrix(true);

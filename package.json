@@ -15,6 +15,7 @@
     "build": "tsc --noEmit && vite build",
     "test": "tsx --test tests/*.test.ts",
     "test:integration": "node scripts/test-integration.mjs",
+    "check:readme": "node scripts/check-readme-links.mjs",
     "map:fetch": "node scripts/fetch-map.mjs"
   },
   "dependencies": {

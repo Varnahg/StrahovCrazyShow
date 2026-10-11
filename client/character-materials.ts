@@ -4,15 +4,25 @@ import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Constants } from "@babylonjs/core/Engines/constants";
+import { EYE_PALETTES } from "./avatar-eyes";
+import {
+  configureStudentHairMaterial,
+  createStudentHairTextures,
+  type StudentHairStyle,
+  type StudentHairSurface,
+  type StudentHairTextures,
+} from "./avatar-hair";
 
 export type CharacterSurface =
   | "skin"
   | "hair"
+  | StudentHairSurface
   | "beard"
   | "cloth"
   | "denim"
   | "leather"
   | "eye"
+  | "ocular"
   | "iris"
   | "metal"
   | "rubber";
@@ -72,6 +82,8 @@ function microNormal(scene: Scene, kind: "skin" | "cloth" | "hair") {
 /** One material per role/colour in a scene, three shared normal textures total. */
 export class CharacterMaterials {
   private textures = new Map<"skin" | "cloth" | "hair", RawTexture>();
+  private eyeTextures = new Map<string, Texture>();
+  private hairTextures = new Map<StudentHairStyle, StudentHairTextures>();
   private materials = new Map<string, PBRMaterial>();
   constructor(private scene: Scene) {}
 
@@ -85,17 +97,56 @@ export class CharacterMaterials {
     material.roughness = {
       skin: 0.53,
       hair: 0.54,
+      "strands-short02": 0.76,
+      "strands-short04": 0.76,
       beard: 0.9,
       cloth: 0.88,
       denim: 0.94,
       leather: 0.56,
       eye: 0.14,
+      ocular: 0.3,
       iris: 0.22,
       metal: 0.37,
       rubber: 0.86,
     }[surface];
     material.environmentIntensity = surface === "eye" ? 0.9 : 0.65;
     material.metadata = { characterSurface: surface, paletteColor: color };
+    if (surface === "strands-short02" || surface === "strands-short04") {
+      const style = surface === "strands-short02" ? "short02" : "short04";
+      let maps = this.hairTextures.get(style);
+      if (!maps) {
+        maps = createStudentHairTextures(this.scene, style);
+        this.hairTextures.set(style, maps);
+      }
+      configureStudentHairMaterial(material, style, maps);
+    }
+    if (surface === "ocular") {
+      const atlas =
+        EYE_PALETTES.find((entry) => entry.color === color)?.atlas ?? "brown";
+      let texture = this.eyeTextures.get(atlas);
+      if (!texture) {
+        texture = new Texture(
+          `/models/characters/student-eyes/${atlas}.png`,
+          this.scene,
+          false,
+          true,
+          Texture.TRILINEAR_SAMPLINGMODE,
+        );
+        texture.gammaSpace = true;
+        texture.hasAlpha = false;
+        this.eyeTextures.set(atlas, texture);
+      }
+      material.albedoColor = Color3.White();
+      material.albedoTexture = texture;
+      material.indexOfRefraction = 1.376;
+      material.clearCoat.isEnabled = true;
+      material.clearCoat.intensity = 1;
+      material.clearCoat.roughness = 0.08;
+      material.clearCoat.indexOfRefraction = 1.376;
+      material.transparencyMode = PBRMaterial.PBRMATERIAL_OPAQUE;
+      material.metadata.sourceLicense = "CC0-1.0";
+      material.metadata.eyeAtlas = atlas;
+    }
     if (surface === "beard") {
       // Stubble blends over an opaque head, never cuts a hole in skin.
       material.alpha = 0.42;
@@ -146,7 +197,14 @@ export class CharacterMaterials {
     for (const material of this.materials.values())
       material.dispose(false, false);
     for (const texture of this.textures.values()) texture.dispose();
+    for (const texture of this.eyeTextures.values()) texture.dispose();
+    for (const { albedo, normal } of this.hairTextures.values()) {
+      albedo.dispose();
+      normal?.dispose();
+    }
     this.materials.clear();
     this.textures.clear();
+    this.eyeTextures.clear();
+    this.hairTextures.clear();
   }
 }

@@ -61,7 +61,11 @@ test("LOD changes actual scene traversal candidates and returns every original d
   assert.equal(lod.update(at(2)).level, "near");
   assert.equal(registeredChildren(c.scene, rig.root).length, full.length);
   assert.equal(lod.update(at(20)).level, "medium");
-  assert.ok(lod.counts.registered < full.length * 0.65);
+  // Near eyes now use one instanced surface in place of six primitive layers.
+  // Keep an absolute medium traversal/triangle budget, not a ratio that rewards
+  // the old inflated near count and penalizes removing five near-only parts.
+  assert.ok(lod.counts.registered <= 8 && lod.counts.registered < full.length);
+  assert.ok(lod.counts.mediumTriangles < lod.counts.nearTriangles * 0.5);
   assert.ok(
     !registeredChildren(c.scene, rig.root).some((mesh) =>
       / (eye|glasses rim|thumb)$/.test(mesh.name),
@@ -120,6 +124,77 @@ test("distance hysteresis prevents boundary flutter and quality expands detail d
   assert.equal(lod.update(at(20, "high")).level, "near");
   assert.equal(lod.update(at(Number.NaN)).level, "near");
   rig.root.dispose();
+  c.dispose();
+});
+
+test("glasses remain shared identity geometry in medium and never add a far proxy box", () => {
+  const c = context();
+  for (let preset = 0; preset < 6; preset++) {
+    const config = {
+      ...applyAvatarPreset(preset, DEFAULT_AVATAR),
+      glasses: true,
+    };
+    const rig = createAvatarRig(
+      c.scene,
+      config,
+      c.pool,
+      `glasses identity ${preset}`,
+    );
+    const copy = createAvatarRig(
+      c.scene,
+      config,
+      c.pool,
+      `glasses copy ${preset}`,
+    );
+    const plainConfig = { ...config, glasses: false };
+    const plain = createAvatarRig(
+      c.scene,
+      plainConfig,
+      c.pool,
+      `without glasses ${preset}`,
+    );
+    const lod = new AvatarLodController(c.scene, c.pool, rig, config);
+    const plainLod = new AvatarLodController(
+      c.scene,
+      c.pool,
+      plain,
+      plainConfig,
+    );
+    const frame = rig.head
+      .getChildMeshes()
+      .find((mesh) => mesh.name.endsWith(" glasses frames")) as InstancedMesh;
+    const copyFrame = copy.head
+      .getChildMeshes()
+      .find((mesh) => mesh.name.endsWith(" glasses frames")) as InstancedMesh;
+    assert.equal(frame.getTotalIndices() / 3, 720);
+    assert.equal(frame.sourceMesh, copyFrame.sourceMesh);
+    assert.equal(frame.sourceMesh.geometry, copyFrame.sourceMesh.geometry);
+    assert.equal(lod.counts.medium, plainLod.counts.medium + 1);
+    for (const distance of [0, 20, 100, 20, 0]) {
+      lod.update(at(distance));
+      plainLod.update(at(distance));
+      assert.equal(
+        frame.isEnabled(),
+        distance !== 100,
+        `preset ${preset} at ${distance}m`,
+      );
+      assert.equal(c.scene.meshes.includes(frame), distance !== 100);
+      assert.equal(frame.isDisposed(), false);
+      assert.equal(frame.parent, rig.head);
+      assert.equal(frame.sourceMesh, copyFrame.sourceMesh);
+    }
+    assert.equal(lod.counts.farTriangles, plainLod.counts.farTriangles);
+    assert.ok(lod.counts.farTriangles <= 204);
+    const source = frame.sourceMesh;
+    rig.root.dispose();
+    c.pool.pruneUnused();
+    assert.equal(source.isDisposed(), false);
+    assert.equal(copyFrame.isEnabled(), true);
+    copy.root.dispose();
+    plain.root.dispose();
+    c.pool.pruneUnused();
+    assert.equal(source.isDisposed(), true);
+  }
   c.dispose();
 });
 

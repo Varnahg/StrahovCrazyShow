@@ -1,0 +1,17 @@
+✔ diagonal movement has the same direction before and after transport at every camera angle (7.4354ms)
+✔ fixed simulation time does not depend on irregular callback count (0.55ms)
+✔ input queue does not lose batched commands, repeat jumps, reset acknowledgments or speed up simulation (0.3006ms)
+✔ restore and replay reproduce the local movement and jumping state (1411.8833ms)
+✔ remote snapshots interpolate time and take the short rotational path (0.4728ms)
+✔ walking avatars do not create an inconsistent crowd collision wall (521.0582ms)
+✔ old respawn sequence demonstrably retains queued commands and broadcasts stale presence; forced recovery clears both (757.8903ms)
+✔ server forced recovery produces finite authoritative foot+car state from invalid physics without stale reads (555.3918ms)
+✔ respawn of another player never resets the shared car's different owner (533.7761ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5187.9318

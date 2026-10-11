@@ -91,6 +91,9 @@ export type ExteriorGate = {
 export type CampusExteriorPlan = {
   parts: ExteriorPart[];
   collision: TerrainMeshData;
+  /** Existing roof render triangles; Simulation gives this open surface
+   * two-sided contacts without changing fence/wall collision flags. */
+  twoSidedRoofCollision: TerrainMeshData;
   courts: ExteriorCourt[];
   fences: ExteriorFence[];
   gates: ExteriorGate[];
@@ -599,6 +602,7 @@ export function buildCampusExteriorPlan(): CampusExteriorPlan {
   return {
     parts: [...g.parts.values()].filter((p) => p.indices.length),
     collision: g.collision,
+    twoSidedRoofCollision: roofData,
     courts: CAMPUS_COURTS,
     fences,
     gates,

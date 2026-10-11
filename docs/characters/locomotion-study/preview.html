@@ -70,7 +70,7 @@
     }
   </style>
   <header>
-    <h1>Kontrola lokomoce · vlevo původní, vpravo upravená</h1>
+    <h1>Kontrola lokomoce · vlevo O2, vpravo aktuální oprava</h1>
     <p>
       Stejné produkční modely a oděvy · pohyb měřený podle vzdálenosti · kamera
       myší · žádné změny zdrojových assetů
@@ -84,10 +84,26 @@
       <button id="steady">Přejít do ustáleného kroku</button
       ><button id="pause">Pozastavit</button
       ><button id="step">Jeden snímek</button>
+      <button id="restart">Vrátit sekvenci na začátek</button>
+      <label
+        >Rychlost přehrávání
+        <select id="playback">
+          <option value="1">100 %</option>
+          <option value="0.5">50 %</option>
+          <option value="0.25">25 %</option>
+        </select></label
+      >
       <h2>Pohled</h2>
       <div id="views"></div>
       <h2>Postava</h2>
       <select id="preset"></select>
+      <label
+        >Detail
+        <select id="lod">
+          <option value="near">Near</option>
+          <option value="medium">Medium</option>
+        </select></label
+      >
       <h2>Podklad</h2>
       <select id="terrain">
         <option value="flat">Rovná silnice</option>

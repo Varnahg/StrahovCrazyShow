@@ -1,0 +1,43 @@
+{
+  "capturedAt": "2026-10-11T19:31:23.0641603+02:00",
+  "status": "targeted-tests-passed",
+  "command": "pnpm exec tsx --test --test-concurrency=1 tests/server-respawn.test.ts tests/netcode.test.ts",
+  "exitCode": 0,
+  "tests": {
+    "failed": 0,
+    "passed": 9,
+    "total": 9
+  },
+  "runnerDurationMs": 5187.9318,
+  "sourceSha256CapturedAfterTests": {
+    "server/respawn.ts": "a1829001265be4574d4952a67f8234845ebb4169394cb4b0ad278df153994ac9",
+    "tests/server-respawn.test.ts": "52f2a89c9270cd70861c9a1c33f40ba4e0d1833afd407ff4fb05ba8bf1c659a9",
+    "server/index.ts": "58b95ee9a3fc7724d3e22e1db3f947a4532c49f8c69cc2b3116d310c584bfeda"
+  },
+  "sourceScope": "Server-owned working-tree files only; not a frozen checkpoint or a complete source audit",
+  "protocol": "Existing authoritative channel and resync:true; ack=InputQueue.lastReceived after queue.reset; valid optional state.vehicleState also carried for pedestrian hard reset",
+  "liveServer": "No restart or mutation of live API2570/snapshotN",
+  "incidentScope": "Independent reset regression; not a demonstrated cause of the user roof incident, whose respawn later worked again",
+  "limitations": [
+    "The 9-test summary above is the targeted Rapier/InputQueue unit run; real SDK results are recorded separately in sdkRegression",
+    "Full final frozen test/build/integration is coordinated by root",
+    "No live API2570/snapshotN restart or mutation and no GPU/FPS measurement"
+  ],
+  "sdkRegression": {
+    "status": "passed",
+    "command": "node scripts/test-integration.mjs --respawn-only",
+    "exitCode": 0,
+    "endpoint": "http://127.0.0.1:2568",
+    "completedChecks": 21,
+    "forcedResetReplies": 3,
+    "openAuthenticatedConnectionsAfterCleanup": 0,
+    "wireEvidence": "sdk-final.json",
+    "log": "sdk-final.log",
+    "cleanup": "sdk-cleanup.json",
+    "combinedRunnerStatus": "passed",
+    "combinedRunnerExitCode": 0,
+    "combinedLog": "sdk-combined.log",
+    "existingIntegrationEvidence": "sdk-existing-combined.json",
+    "scope": "Actual HTTP/SDK production-server roundtrip, separate from the 9 unit tests and not a GPU or FPS benchmark"
+  }
+}

@@ -85,6 +85,35 @@ export function projectLocalBenchmark(value: unknown) {
     ]),
   };
   if (gpu.version !== undefined) result.gpu.version = text(gpu.version);
+  if (gpu.context !== undefined) {
+    const context = object(gpu.context);
+    const sampleCount = (value: unknown, maximum: number) => {
+      if (value === null) return null;
+      const count = number(value, 0, maximum);
+      if (!Number.isInteger(count)) throw new Error("sample count");
+      return count;
+    };
+    result.gpu.context = {
+      requestedAntialias: choice(context.requestedAntialias, [
+        true,
+        false,
+        null,
+      ]),
+      actualAntialias: choice(context.actualAntialias, [true, false, null]),
+      defaultFramebuffer: choice(context.defaultFramebuffer, [
+        true,
+        false,
+        null,
+      ]),
+      sampleBuffers: sampleCount(context.sampleBuffers, 1),
+      samples: sampleCount(context.samples, 64),
+    };
+    if (
+      context.defaultFramebuffer !== true &&
+      (context.sampleBuffers !== null || context.samples !== null)
+    )
+      throw new Error("offscreen sample count");
+  }
   if (gpu.webglVersion !== undefined)
     result.gpu.webglVersion = choice(gpu.webglVersion, [1, 2, null]);
   if (gpu.requestedPowerPreference !== undefined)
@@ -143,6 +172,13 @@ export function projectLocalBenchmark(value: unknown) {
   }
   if (raw.frameWork)
     result.frameWork = fields(raw.frameWork, ["cpuMs", "gpuMs"], true);
+  // Exact numeric whitelist; no renderer names, paths or arbitrary stage keys.
+  if (raw.engineCpuBreakdownMs)
+    result.engineCpuBreakdownMs = fields(raw.engineCpuBreakdownMs, [
+      "activeMeshes",
+      "mainDraw",
+      "renderTargets",
+    ]);
   if (raw.frameBreakdownMs)
     result.frameBreakdownMs = fields(raw.frameBreakdownMs, [
       "simulation",

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QA skutečných transformací auta</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #14201e;
+        color: #f4f0e6;
+        font: 14px system-ui;
+      }
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 390px;
+        height: 100%;
+      }
+      .viewport {
+        position: relative;
+        min-width: 0;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        outline: none;
+      }
+      aside {
+        padding: 16px;
+        overflow: auto;
+        background: #1d2b29;
+      }
+      h1 {
+        font-size: 19px;
+        margin: 0 0 12px;
+      }
+      p {
+        font-size: 12px;
+        line-height: 1.55;
+      }
+      label {
+        display: block;
+        margin: 12px 0;
+      }
+      button,
+      select {
+        font: inherit;
+        padding: 8px;
+        margin: 3px 0;
+      }
+      button:disabled {
+        opacity: 0.45;
+      }
+      output {
+        display: block;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font: 11px/1.45 monospace;
+      }
+      .scene-labels {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .world-label {
+        position: absolute;
+        padding: 3px 7px;
+        background: #12281acc;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="viewport">
+        <canvas
+          id="game"
+          aria-label="Skutečná hra a řízená QA jízda"
+          tabindex="0"
+        ></canvas>
+        <div class="scene-labels" data-label-layer></div>
+      </div>
+      <aside>
+        <h1>Transformace auta · QA</h1>
+        <p>
+          Skutečný Game, Rapier, kola a vykreslování. Jediná příprava přesune
+          pěší postavu vedle auta v parkovišti CAR_SPAWN (110, 16). Potom
+          pracují jen herní klávesy a interakce. Pohyb je omezen tickovými
+          rozpočty a 5m pojistkou. Nejde o test FPS ani důkaz konečné obrazové
+          kvality.
+        </p>
+        <label
+          >Kvalita
+          <select id="quality">
+            <option value="low">Nízká</option>
+            <option value="medium" selected>Střední</option>
+            <option value="high">Vysoká</option>
+          </select></label
+        >
+        <label
+          >Testovací UTC světlo
+          <select id="light">
+            <option value="day">Den · 11. 10. 2026 10:00 UTC</option>
+            <option value="night">Noc · 11. 10. 2026 00:00 UTC</option>
+          </select></label
+        >
+        <button id="start" disabled>Start · příprava a sekvence</button>
+        <button id="stop">Stop · uvolnit scénu</button>
+        <button id="reload" disabled>Načíst novou scénu</button>
+        <label
+          ><input id="mirror" type="checkbox" disabled /> Zrcadlit test
+          parkovaného laku</label
+        >
+        <p id="mirror-note">
+          Nedostupné: zatím nebyla doložena aktivní lakovaná část parkovacího
+          auta. Zrcadlení mění pouze vizuální měřítko jednoho právě viditelného
+          parking-bay rootu; kolize se nemění. Jízda probíhá bez zrcadlení.
+          Barvová metadata nejsou důkaz pixelů.
+        </p>
+        <p>
+          W → W+A → W+D → ruční brzda → S zpátečka → brzda → vystoupit → znovu
+          nastoupit. V průběhu nemačkej pohybové klávesy. Stop i odchod uvolní
+          Game; další běh vyžaduje novou scénu.
+        </p>
+        <output id="metrics" aria-live="off">Načítání skutečné hry…</output>
+      </aside>
+    </main>
+    <script type="module" src="./vehicle-transforms.ts"></script>
+  </body>
+</html>

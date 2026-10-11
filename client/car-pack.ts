@@ -10,6 +10,11 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import manifest from "../shared/data/assets/vehicles-manifest.json";
 import { CarShadowProxyPack } from "./car-shadow-proxy";
 import { disableZeroWeightCarClearCoat } from "./car-material-budget";
+import {
+  CAR_PAINT_COLOR_BUFFER,
+  carPaintColor,
+  installCarPaintInstances,
+} from "./car-paint-instances";
 
 export const CAR_PACK_MANIFEST = manifest;
 export type CarLod = "near" | "medium" | "far";
@@ -17,6 +22,9 @@ export type CarPackOptions = {
   assetSources?: Partial<
     Record<CarLod, Parameters<typeof LoadAssetContainerAsync>[0]>
   >;
+  /** Explicit compatibility/dispatch A/B switch. Unsupported backends retain
+   * the original per-colour materials regardless of this option. */
+  paintInstancing?: boolean;
 };
 type Part = { key: string; wheel?: number; source: Mesh };
 export type CarRig = {
@@ -43,6 +51,7 @@ export class CarPack {
   private quality = "";
   private disposed = false;
   private basePaint?: PBRMaterial;
+  private instancePaintColor?: Color3;
   private shadowProxies?: CarShadowProxyPack;
   private constructor(private readonly scene: Scene) {
     this.root = new TransformNode("shared campus hatchback templates", scene);
@@ -149,6 +158,19 @@ export class CarPack {
         pack.templates.get("far")!.values(),
         pack.root,
       );
+      if (
+        options.paintInstancing !== false &&
+        scene.getEngine().getCaps().instancedArrays &&
+        !scene.getEngine().isWebGPU
+      ) {
+        pack.instancePaintColor = installCarPaintInstances(
+          [...pack.templates.values()].flatMap((parts) =>
+            [...parts.values()]
+              .filter((part) => part.source.material?.metadata?.vehiclePaint)
+              .map((part) => part.source),
+          ),
+        );
+      }
       pack.setQuality("medium");
       pack.updateLighting(0);
       return pack;
@@ -158,7 +180,7 @@ export class CarPack {
     }
   }
   private family(colour?: string) {
-    if (!colour) return this.templates;
+    if (!colour || this.instancePaintColor) return this.templates;
     const canonical = Color3.FromHexString(colour).toHexString().toLowerCase();
     let family = this.variants.get(canonical);
     if (family) return family;
@@ -303,6 +325,14 @@ export class CarPack {
         ? dark.get(original.key)!
         : original;
       const mesh = part.source.createInstance(entityId + ":" + part.key);
+      if (
+        this.instancePaintColor &&
+        part.source.material?.metadata?.vehiclePaint
+      )
+        mesh.instancedBuffers[CAR_PAINT_COLOR_BUFFER] = carPaintColor(
+          this.instancePaintColor,
+          colour,
+        );
       mesh.parent = part.wheel === undefined ? root : wheels[part.wheel];
       mesh.isVisible = true;
       mesh.isPickable = false;

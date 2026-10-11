@@ -1,4 +1,4 @@
-import { memo, useEffect, useId, useRef, useState } from "react";
+import { memo, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   BUILDINGS,
   BOUNDS,
@@ -19,8 +19,11 @@ import {
   mapToScreen,
   panMapBy,
   zoomMapAt,
+  screenToMap,
   type MapPoint,
 } from "./minimap-math";
+import type { PlanMapRoute, MapNavigation } from "./map-navigation";
+import { useLocale, localizeText as L, formatNumber } from "./i18n";
 import "./minimap.css";
 
 // Geometry is shared with the actual world and constructed once, not for each
@@ -30,6 +33,7 @@ const BACKGROUND = (
     {LANDCOVER.areas.map((a) => (
       <polygon
         key={"land:" + a.osmId}
+        className={`map-land map-land-${a.kind}`}
         points={a.points.map((p) => p.join(",")).join(" ")}
         fill={
           a.kind === "pitch"
@@ -41,6 +45,7 @@ const BACKGROUND = (
       />
     ))}
     <path
+      className="map-stadium"
       d={[...STADIUM.outerRings, ...STADIUM.innerRings]
         .map((ring) => "M" + ring.map((p) => p.join(",")).join("L") + "Z")
         .join(" ")}
@@ -52,6 +57,7 @@ const BACKGROUND = (
     {STREET_SURFACES.map((surface) => (
       <path
         key={surface.material}
+        className={`map-surface map-surface-${surface.material}`}
         fill={
           surface.material === "asphalt"
             ? "#a5aaa5"
@@ -69,12 +75,16 @@ const BACKGROUND = (
     {REALITY_GROUND.surfaces.map((s) => (
       <polygon
         key={s.id}
+        className="map-reality-surface"
         points={s.points.map((p) => p.join(",")).join(" ")}
         fill="#a5aaa5"
       />
     ))}
     {BUILDINGS.map((b) => (
-      <g key={b.id}>
+      <g
+        key={b.id}
+        className={`map-building ${blockNumber(b.name) === 6 ? "map-building-b6" : ""}`}
+      >
         <polygon
           points={b.points.map((p) => p.join(",")).join(" ")}
           fill={blockNumber(b.name) === 6 ? "#e8cf8d" : "#d4c9aa"}
@@ -123,6 +133,10 @@ export type MapViewProps = {
   selected?: string;
   onPlace?: (id: string) => void;
   onPlayer?: (id: string) => void;
+  waypoint?: MapPoint;
+  onWaypoint?: (point: MapPoint) => void;
+  onClearDestination?: () => void;
+  planRoute?: PlanMapRoute;
   big?: boolean;
 };
 export const MapView = memo(function MapView({
@@ -131,8 +145,13 @@ export const MapView = memo(function MapView({
   selected,
   onPlace,
   onPlayer,
+  waypoint,
+  onWaypoint,
+  onClearDestination,
+  planRoute,
   big = false,
 }: MapViewProps) {
+  const locale = useLocale();
   const svg = useRef<SVGSVGElement>(null),
     titleId = useId(),
     hintId = useId(),
@@ -268,15 +287,16 @@ export const MapView = memo(function MapView({
     else setExpandedIds(places.map((p) => p.id));
   };
   const selectedPlace = PLACES.find((p) => p.id === selected),
-    selectedScreen = selectedPlace
-      ? mapToScreen(selectedPlace, camera, size)
+    destination = waypoint
+      ? { ...waypoint, id: undefined, name: L("Vlastní cíl") }
+      : selectedPlace,
+    selectedScreen = destination
+      ? mapToScreen(destination, camera, size)
       : null,
     indicator = selectedScreen && mapEdgeIndicator(selectedScreen, size),
     distance =
-      self && selectedPlace
-        ? Math.round(
-            Math.hypot(self.x - selectedPlace.x, self.z - selectedPlace.z),
-          )
+      self && destination
+        ? Math.round(Math.hypot(self.x - destination.x, self.z - destination.z))
         : null,
     northAngle = (rotation * 180) / Math.PI,
     nearest =
@@ -290,10 +310,60 @@ export const MapView = memo(function MapView({
     placeLabel =
       PLACES.find((p) => p.id === hover)?.name ||
       (nearest && nearest.distance < 45 ? nearest.name : "Strahov");
+  const [navigation, setNavigation] = useState<MapNavigation>();
+  const [routePending, setRoutePending] = useState(false);
+  const navigationKey = destination
+    ? `${destination.id ?? ""}:${destination.x}:${destination.z}`
+    : "";
+  const previousNavigationKey = useRef("");
+  useEffect(() => {
+    let current = true;
+    if (!self || !destination || !planRoute) {
+      setNavigation(undefined);
+      setRoutePending(false);
+      return;
+    }
+    if (previousNavigationKey.current !== navigationKey)
+      setNavigation(undefined);
+    previousNavigationKey.current = navigationKey;
+    setRoutePending(true);
+    Promise.resolve(planRoute(self, destination)).then(
+      (result) => {
+        if (!current) return;
+        setNavigation(result);
+        setRoutePending(false);
+      },
+      () => {
+        if (!current) return;
+        setNavigation({
+          status: "unavailable",
+          points: [],
+          distance: 0,
+          endpoint: destination,
+          toEntrance: false,
+        });
+        setRoutePending(false);
+      },
+    );
+    return () => {
+      current = false;
+    };
+  }, [
+    self ? Math.round(self.x * 10) : null,
+    self ? Math.round(self.z * 10) : null,
+    destination?.x,
+    destination?.z,
+    destination?.id,
+    planRoute,
+  ]);
+  const routePoints = useMemo(
+    () => navigation?.points.map((p) => `${p.x},${p.z}`).join(" "),
+    [navigation],
+  );
   return (
     <section
       className={"map-widget " + (big ? "map-widget-big" : "map-widget-mini")}
-      aria-label={big ? "Velká interaktivní mapa" : "Interaktivní minimapa"}
+      aria-label={L(big ? "Velká interaktivní mapa" : "Interaktivní minimapa")}
       data-map-ui
       onKeyDown={(e) => {
         if (!["KeyM", "KeyJ", "KeyG", "Escape"].includes(e.code))
@@ -301,21 +371,22 @@ export const MapView = memo(function MapView({
       }}
     >
       <header className="map-widget-heading">
-        <span id={titleId}>{placeLabel}</span>
+        <span id={titleId}>{L(placeLabel)}</span>
         <button
           type="button"
           className="map-north"
-          title={
+          title={L(
             headingUp
               ? "Směr postavy nahoře · přepnout na sever"
-              : "Sever nahoře · přepnout na směr postavy"
-          }
-          aria-label="Otáčet mapu podle směru postavy"
+              : "Sever nahoře · přepnout na směr postavy",
+          )}
+          aria-label={L("Otáčet mapu podle směru postavy")}
           aria-pressed={headingUp}
           disabled={!self}
           onClick={() => setHeadingUp(!headingUp)}
         >
-          <span style={{ transform: `rotate(${northAngle}deg)` }}>↑</span> S
+          <span style={{ transform: `rotate(${northAngle}deg)` }}>↑</span>{" "}
+          {locale === "cs" ? "S" : "N"}
         </button>
       </header>
       <div className="map-viewport">
@@ -324,12 +395,31 @@ export const MapView = memo(function MapView({
           className={big ? "map big-map" : "map"}
           viewBox={`0 0 ${size.width} ${size.height}`}
           role="group"
-          aria-label="Mapa kolejního areálu Strahov podle OpenStreetMap"
+          aria-label={L("Mapa kolejního areálu Strahov podle OpenStreetMap")}
           aria-describedby={hintId}
           tabIndex={0}
           data-follow-player={follow && !!self}
           data-zoom={zoom.toFixed(2)}
           data-map-center={`${camera.x.toFixed(2)},${camera.z.toFixed(2)}`}
+          data-route-status={
+            routePending ? "planning" : (navigation?.status ?? "none")
+          }
+          data-route-points={navigation?.points.length ?? 0}
+          onClick={(e) => {
+            if (
+              !onWaypoint ||
+              performance.now() < suppressedClickUntil.current ||
+              (e.target as Element).closest("[data-map-marker]")
+            )
+              return;
+            onWaypoint(
+              screenToMap(
+                localPointer(e.clientX, e.clientY),
+                cameraRef.current,
+                sizeRef.current,
+              ),
+            );
+          }}
           onKeyDown={(e) => {
             if (
               [
@@ -351,6 +441,14 @@ export const MapView = memo(function MapView({
             if (e.key === "+" || e.key === "=") changeZoom(1.3);
             if (e.key === "-") changeZoom(1 / 1.3);
             if (e.key === "Home") reset();
+            if (
+              (e.key === "Enter" || e.key === " ") &&
+              e.target === e.currentTarget &&
+              onWaypoint
+            ) {
+              e.preventDefault();
+              onWaypoint({ x: camera.x, z: camera.z });
+            }
           }}
           onPointerDown={(e) => {
             if (e.button !== 0 && e.pointerType !== "touch") return;
@@ -421,12 +519,50 @@ export const MapView = memo(function MapView({
             }
           }}
         >
-          <title>Strahov · sever nahoře, metry</title>
-          <rect width={size.width} height={size.height} fill="#b8c3a5" />
+          <title>{L("Strahov · sever nahoře, metry")}</title>
+          <defs>
+            <pattern
+              id={`${titleId}-grid`}
+              width="40"
+              height="40"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M40 0H0V40"
+                fill="none"
+                stroke="#87c7c0"
+                strokeWidth=".5"
+                opacity=".07"
+              />
+            </pattern>
+          </defs>
+          <rect width={size.width} height={size.height} fill="#101e27" />
+          <rect
+            width={size.width}
+            height={size.height}
+            fill={`url(#${titleId}-grid)`}
+          />
           <g
             transform={`translate(${size.width / 2},${size.height / 2}) rotate(${northAngle}) scale(${camera.scale}) translate(${-camera.x},${-camera.z})`}
           >
             <MapBackground />
+            {routePoints && (
+              <g className="map-route" pointerEvents="none">
+                <polyline className="map-route-underlay" points={routePoints} />
+                <polyline className="map-route-line" points={routePoints} />
+              </g>
+            )}
+            {waypoint && (
+              <g
+                data-map-marker
+                transform={`translate(${waypoint.x},${waypoint.z}) rotate(${-northAngle}) scale(${1 / camera.scale})`}
+                className="map-waypoint"
+                pointerEvents="none"
+              >
+                <path d="M0,-10 8,0 0,10 -8,0Z" />
+                <circle r="2" />
+              </g>
+            )}
             {clusters.map((group) => {
               const p =
                   group.places.find((place) => place.id === selected) ||
@@ -434,11 +570,12 @@ export const MapView = memo(function MapView({
                 clustered = group.places.length > 1,
                 active = group.places.some((place) => place.id === selected),
                 name = clustered
-                  ? `${group.places.length} míst: ${group.places.map((place) => place.name).join(", ")}`
-                  : p.name;
+                  ? `${group.places.length} ${L("míst")}: ${group.places.map((place) => L(place.name)).join(", ")}`
+                  : L(p.name);
               return (
                 <g
                   key={group.id}
+                  data-map-marker
                   transform={`translate(${group.x},${group.z}) rotate(${-northAngle}) scale(${1 / camera.scale})`}
                   className={"map-poi " + (active ? "map-poi-selected" : "")}
                   role={onPlace ? "button" : undefined}
@@ -462,8 +599,10 @@ export const MapView = memo(function MapView({
                   }}
                 >
                   <title>
-                    {name}
-                    {!clustered && p.floor ? ` · ${p.floor}. patro` : ""}
+                    {L(name)}
+                    {!clustered && p.floor
+                      ? ` · ${formatNumber(p.floor)} ${L("patro")}`
+                      : ""}
                   </title>
                   <g>
                     <circle r="12" fill="transparent" />
@@ -489,7 +628,7 @@ export const MapView = memo(function MapView({
                         {group.places.length}
                       </text>
                     )}
-                    {(big || zoom >= 4 || active || hover === p.id) && (
+                    {((big && zoom >= 3) || active || hover === p.id) && (
                       <text
                         x={clustered ? 14 : 10}
                         y="4"
@@ -497,9 +636,9 @@ export const MapView = memo(function MapView({
                       >
                         {clustered
                           ? active
-                            ? shortName(p.id, p.name)
-                            : `${group.places.length} míst`
-                          : shortName(p.id, p.name)}
+                            ? L(shortName(p.id, p.name))
+                            : `${group.places.length} ${L("míst")}`
+                          : L(shortName(p.id, p.name))}
                       </text>
                     )}
                   </g>
@@ -509,10 +648,11 @@ export const MapView = memo(function MapView({
             {players.map((p) => (
               <g
                 key={p.id}
+                data-map-marker
                 transform={`translate(${p.x},${p.z}) rotate(${-northAngle}) scale(${1 / camera.scale})`}
                 role={onPlayer ? "button" : undefined}
                 tabIndex={onPlayer ? 0 : undefined}
-                aria-label={`Vybrat hráče ${p.nickname}`}
+                aria-label={`${L("Vybrat hráče")} ${p.nickname}`}
                 className="map-player"
                 onClick={() => {
                   if (performance.now() >= suppressedClickUntil.current)
@@ -528,7 +668,9 @@ export const MapView = memo(function MapView({
               >
                 <circle r="9" fill="transparent" />
                 <circle r="3" fill="#8760ad" stroke="#eee4ff" strokeWidth=".8">
-                  <title>{p.nickname} · virtuálně online</title>
+                  <title>
+                    {p.nickname} · {L("virtuálně online")}
+                  </title>
                 </circle>
               </g>
             ))}
@@ -545,26 +687,27 @@ export const MapView = memo(function MapView({
                   stroke="#244b3c"
                   strokeWidth="1.7"
                 >
-                  <title>Tvoje virtuální poloha</title>
+                  <title>{L("Tvoje virtuální poloha")}</title>
                 </path>
               </g>
             )}
           </g>
-          {indicator?.offscreen && selectedPlace && (
+          {indicator?.offscreen && destination && (
             <g
               transform={`translate(${indicator.x},${indicator.y})`}
               className="map-target-edge"
+              data-map-marker
               role="button"
               tabIndex={0}
-              aria-label={`Cíl mimo výřez: ${selectedPlace.name}`}
+              aria-label={`${L("Cíl mimo výřez")}: ${L(destination.name)}`}
               onClick={() => {
-                setFreeCenter(selectedPlace);
+                setFreeCenter(destination);
                 setFollow(false);
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  setFreeCenter(selectedPlace);
+                  setFreeCenter(destination);
                   setFollow(false);
                 }
               }}
@@ -580,7 +723,9 @@ export const MapView = memo(function MapView({
                 fill="#f7db7e"
                 transform={`rotate(${indicator.angle})`}
               />
-              <title>{selectedPlace.name} · zobrazit cíl</title>
+              <title>
+                {L(destination.name)} · {L("zobrazit cíl")}
+              </title>
             </g>
           )}
           <g
@@ -591,11 +736,11 @@ export const MapView = memo(function MapView({
             <text y="-5">{zoom >= 5 ? "10 m" : "50 m"}</text>
           </g>
         </svg>
-        <div className="map-tools" role="group" aria-label="Ovládání mapy">
+        <div className="map-tools" role="group" aria-label={L("Ovládání mapy")}>
           <button
             type="button"
-            aria-label="Přiblížit mapu"
-            title="Přiblížit (+)"
+            aria-label={L("Přiblížit mapu")}
+            title={L("Přiblížit (+)")}
             disabled={zoom >= maxZoom}
             onClick={() => changeZoom(1.3)}
           >
@@ -603,8 +748,8 @@ export const MapView = memo(function MapView({
           </button>
           <button
             type="button"
-            aria-label="Oddálit mapu"
-            title="Oddálit (−)"
+            aria-label={L("Oddálit mapu")}
+            title={L("Oddálit (−)")}
             disabled={zoom <= 1}
             onClick={() => changeZoom(1 / 1.3)}
           >
@@ -612,8 +757,8 @@ export const MapView = memo(function MapView({
           </button>
           <button
             type="button"
-            aria-label="Sledovat moji postavu"
-            title="Sledovat moji postavu"
+            aria-label={L("Sledovat moji postavu")}
+            title={L("Sledovat moji postavu")}
             aria-pressed={follow}
             disabled={!self}
             onClick={() => {
@@ -628,8 +773,8 @@ export const MapView = memo(function MapView({
           </button>
           <button
             type="button"
-            aria-label="Zobrazit celý areál"
-            title="Celý areál (Home)"
+            aria-label={L("Zobrazit celý areál")}
+            title={L("Celý areál (Home)")}
             onClick={reset}
           >
             ⛶
@@ -637,12 +782,17 @@ export const MapView = memo(function MapView({
         </div>
       </div>
       {expandedPlaces.length > 1 && (
-        <div className="map-cluster-list" aria-label="Místa v této části mapy">
+        <div
+          className="map-cluster-list"
+          aria-label={L("Místa v této části mapy")}
+        >
           <header>
-            <strong>{expandedPlaces.length} míst v okolí</strong>
+            <strong>
+              {expandedPlaces.length} {L("míst v okolí")}
+            </strong>
             <button
               type="button"
-              aria-label="Zavřít seznam míst"
+              aria-label={L("Zavřít seznam míst")}
               onClick={() => setExpandedIds([])}
             >
               ×
@@ -656,23 +806,60 @@ export const MapView = memo(function MapView({
               aria-pressed={selected === place.id}
             >
               <span>⌖</span>
-              {place.name}
+              {L(place.name)}
               <span>↗</span>
             </button>
           ))}
         </div>
       )}
-      {selectedPlace && (
-        <div className="map-destination">
-          <span>◆ {shortName(selectedPlace.id, selectedPlace.name)}</span>
+      {destination && (
+        <div
+          className="map-destination"
+          data-navigation-status={
+            routePending ? "planning" : (navigation?.status ?? "none")
+          }
+        >
+          <span>
+            ◆{" "}
+            {selectedPlace
+              ? L(shortName(selectedPlace.id, selectedPlace.name))
+              : L("Vlastní cíl")}
+          </span>
           <strong>
-            {distance != null ? `${distance} m` : "Vybrané místo"}
+            {routePending
+              ? L("Hledám trasu…")
+              : navigation?.status === "arrived"
+                ? L("Jsi v cíli")
+                : navigation?.status === "unavailable"
+                  ? L("Trasa není dostupná")
+                  : navigation?.status === "route"
+                    ? `${formatNumber(Math.round(navigation.distance))} m`
+                    : distance != null
+                      ? `${distance} m · ${L("směr")}`
+                      : L("Vybrané místo")}
           </strong>
+          {onClearDestination && (
+            <button
+              type="button"
+              className="map-clear-target"
+              onClick={onClearDestination}
+              aria-label={L("Zrušit navigační cíl")}
+              title={L("Zrušit navigační cíl")}
+            >
+              ×
+            </button>
+          )}
         </div>
       )}
-      <p id={hintId} className={big ? "map-help" : "map-help map-sr-only"}>
-        Kolečko nebo +/− přibližuje. Tažením či šipkami posuneš mapu. ⌖ sleduje
-        postavu, ⛶ zobrazí areál. Vzdálenost je vzdušnou čarou.
+      {big && navigation?.toEntrance && (
+        <p className="map-route-note">
+          {L("Trasa vede k venkovnímu přístupu.")}
+        </p>
+      )}
+      <p id={hintId} className="map-help map-sr-only">
+        {L(
+          "Kolečko přibližuje, tažení posouvá. Kliknutím označíš cíl; Enter označí střed mapy.",
+        )}
       </p>
     </section>
   );

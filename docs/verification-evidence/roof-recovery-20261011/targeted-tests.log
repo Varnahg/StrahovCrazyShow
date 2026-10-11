@@ -1,0 +1,74 @@
+BJS - [19:37:03]: Babylon.js v9.30.0 - Null engine
+Reality geometry audit {
+  buildings: 120,
+  windows: 3258,
+  detailTriangles: 109483,
+  farTriangles: 10927,
+  source: 'shared/data/facade-reality.json',
+  measured: false
+} { meshes: 1104 }
+BJS - [19:37:04]: Babylon.js v9.30.0 - Null engine
+✔ photo interpreted window pitch fits every original edge and retains outward normals (26.2934ms)
+✔ B6 north end preserves broad blank piers and sparse core openings (1.0563ms)
+✔ B12 three levels retain narrow transom windows, B1 and shops have no dorm grid (0.5889ms)
+✔ 007 doorway is at southeast club, reception and R-ko POI retain explicit uncertainty (0.33ms)
+✔ architecture batches remain bounded (837.8324ms)
+✔ B6 north reception shell preserves the canonical opening and closes the former west entry (656.1029ms)
+OSM53921692 roof reproduction {
+  sourceHeight: 3,
+  baseY: -4.930610074996948,
+  roofY: -1.930610074996948,
+  beforeWithoutRoof: {
+    x: 154.17221069335938,
+    y: -5.010554790496826,
+    z: -125.2276611328125
+  },
+  afterWithRoof: {
+    x: 154.17056274414062,
+    y: -1.9418113231658936,
+    z: -125.22510528564453
+  }
+}
+BJS - [19:37:10]: Babylon.js v9.30.0 - Null engine
+✔ OSM53921692 previously missed roof ray and car now collide at the exact rendered roof (2268.6813ms)
+✔ shared roof remains two-sided for the chassis and blocks an oblique upward approach (3427.4024ms)
+✔ roof rays follow the real slanted outline and its small recesses, with no generic caps on replacements (999.8282ms)
+✔ shared polygon keeps rendered triangles/UV order and rejects B6, market and landmark replacements (49.5498ms)
+DEM outdoor coverage { checked: 4309, belowOldZero: 1840, slopes: 1187 }
+✔ sampled accessible outdoor ground follows actual DEM heights without holes or fallback teleports (10340.5225ms)
+✔ walking and the actual driven chassis approach but cannot tunnel through a solid wall (981.6195ms)
+✔ terrain-relative outer barriers retain walkers and the car below the old absolute fall threshold (898.8975ms)
+✔ B6 exterior north twelve-step entry and first-floor route are continuously walkable without teleporting (873.4004ms)
+✔ every catalogued B6 room has a supported doorway approach and passage into that actual room (1489.6791ms)
+✔ B6 catalogued room floors, basement and every stair flight remain supported at the raised foundation (1699.7814ms)
+✔ B6 real glass collider prevents a window exit above furniture and roof stops a genuine jump (732.8948ms)
+✔ respawn discards invalid chassis/parking and stale kinematic state without sampling either (2556.8178ms)
+✔ hard foot authority ignores a corrupt local driving pose and never resets another driver (1572.2359ms)
+✔ restore rejects invalid parking/quaternions and Float32 overflow before mutation (3.6468ms)
+✔ existing CCD blocks upward overspeed through a thin solid roof; recovery clears all dynamics (19.3975ms)
+✔ physics proxy encloses the actual GLB body, roof, bumpers and mirrors (167.9011ms)
+✔ raycast car settles without jitter on cuboid floor (131.9253ms)
+✔ raycast car settles without jitter on heightfield (104.287ms)
+✔ accelerator, service brake, gated reverse and governor work through chassis forces (137.182ms)
+✔ steering turns toward requested side without translating or rotating a stationary body (57.261ms)
+✔ persistent parking, driver ownership, wheel poses and state restore preserve identity (30.2012ms)
+✔ fixed-physics trajectory is identical at 30, 60 and 120 render Hz (228.1031ms)
+✔ CCD chassis stops at a thin wall at top speed without a translational tunnel (186.3978ms)
+✔ turning alongside a wall resolves rotational contacts instead of rotating through it (122.0758ms)
+✔ car traverses a 12cm curb and an inclined ramp without tunnelling or overturning (102.7359ms)
+✔ sustained slalom and alternating turns remain upright with front-wheel steering (133.8114ms)
+✔ car completes both loops of a figure-eight and returns close to the crossing (180.1593ms)
+✔ weak opposite pedal always brakes a moving car before reverse, even for analog input (0.5359ms)
+✔ safe exit requires a nearly stopped finite chassis speed in both directions (0.3448ms)
+✔ holding S from cruise stops before reversing and W reverses that process without a pose jump (60.1426ms)
+✔ speed-sensitive steering reduces lateral acceleration and self-centres promptly (52.9718ms)
+✔ handbrake applies rear-wheel braking and slows more strongly than coasting (29.0985ms)
+✔ restore/replay isolated car dynamics remains within a centimetre after a two-second replay (49.5016ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18365.0374

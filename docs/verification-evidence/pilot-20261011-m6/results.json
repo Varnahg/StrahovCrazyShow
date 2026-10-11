@@ -1,0 +1,93 @@
+{
+  "status": "passed",
+  "scope": "Technical checkpoint: tests, production build including TypeScript, isolated integration, and independent live/frozen SHA audit. GPU validation pending.",
+  "sourceSnapshotId": "c21932439374f0bf23e7a8d514aecb88ef9552c2e89d5e3e2890e4b71da8b896",
+  "files": 8144,
+  "tests": {
+    "total": 403,
+    "passed": 403,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "startedAt": "2026-10-11T15:49:31.2160069Z",
+  "finishedAt": "2026-10-11T15:51:49.3605884Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 78.0187807,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 41.867378,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 18.1793895,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "sourceCheck": "source-check.json",
+  "pipeline": "pipeline-results.json",
+  "publishedSha256": {
+    "source-manifest.json": "fff8ad1abc2048a60006fac97427f0e88571e3fb1530163af63ed0c479bf2eee",
+    "pipeline-results.json": "b6d2312cb5e30e306bca3c89b4df2e07fcd3a8976ebc810bd7fcc12c357af62c",
+    "pipeline-test.log": "bb6a46197cee4afecab2b69a84b04c41fb89ca779f3d2813cf39415a607e0cde",
+    "pipeline-build.log": "56968f879a93eea500c945faed2773f3c900297242fe17cb1ced6bd6e2aea2b8",
+    "pipeline-test-integration.log": "aface68e5682d0ca68a92ce1f35a2b51d7e7f7f85bb6bd6349a939543931cdf9",
+    "production-smoke.json": "30c4386c2bd0a9c7871f2d82f0a245832c9f41de6932d387c28c9e2e2c4a45a7",
+    "production-high-day.png": "ddfa7d4b5bc8dae1a32fcb34d692977b466b4bb04f2c66305064f84730fd85b7",
+    "production-medium-current-time.png": "3477b80d480af505e4dd2553c8c916c05b3ce634d6b3d6722ef18cb84038f9a8"
+  },
+  "gpu": {
+    "status": "pending",
+    "note": "M6 has no completed matched full-game GPU/FPS result yet. Prior L2/M measurements, standalone component previews and NullEngine contract controls are separate evidence and do not establish M6 FPS."
+  },
+  "buildNotes": [
+    "Build completed with exit 0; complete log preserves dynamic-import and bundler timing warnings.",
+    "Integration completed with exit 0 and its explicit PASS summary; the retained raw log also contains the room-close diagnostic (4002)."
+  ],
+  "registrationContract": {
+    "evidence": "registration-contract/results.json",
+    "positiveControl": "1/1 passed, exit 0",
+    "negativeM4Control": "0/1 passed, 1 expected failure, exit 1; manager undefined before pipeline construction",
+    "testSourceMatchesFrozenM6": true,
+    "cinematicSourceMatchesFrozenM6": true,
+    "fullSuiteAlsoIncludesStrengthenedTest": true,
+    "limitations": "Node/NullEngine contract checks, not shader execution, asset loading, GPU performance or FPS. Pipeline construction cannot mask the prerequisite manager assertion.",
+    "copiedEvidenceSha256": {
+      "results.json": "00ddb989b3ff3124b92933ffdac740eddbcfc44109137519c3775bf4f624e6c2",
+      "positive.test.ts.txt": "78914aeba9b2f05e8737591f8b04f14fd4e6d4231f3a59203f1014df1f962aaf",
+      "m4-negative.test.ts.txt": "973d6186e269ada4bc71ea7e53cb4dd4a6c8c4ab64ce912d6b5cb9ee40511b79",
+      "positive.log": "89c0b10755547ab76995de7ba6655c1b22c1e4e7e1c53dc59e960dee65fc3643",
+      "m4-negative.log": "ec72d45d5f95d3e8d2d05026ef73a5fe77e499c6c9085734849a614e4bace6d3"
+    }
+  },
+  "lineage": {
+    "registrationFix": {
+      "checkpoint": "M5",
+      "sourceSnapshotId": "3fcfe5e33638bddb0cef28c6fa79728e0bd022170bacf5898e29953a55ea35d0",
+      "fullPipelineStatus": "not-run",
+      "acceptanceStatus": "intermediate-only"
+    },
+    "strengthenedRegression": {
+      "checkpoint": "M6",
+      "sourceSnapshotId": "c21932439374f0bf23e7a8d514aecb88ef9552c2e89d5e3e2890e4b71da8b896",
+      "assertsManagerBeforePipelineConstruction": true
+    },
+    "note": "The registration fix entered M5. M5 was frozen but had no full pipeline and is not a successful acceptance checkpoint. M6 adds the strengthened positive/negative regression and has the complete pipeline recorded here."
+  },
+  "productionSmoke": {
+    "fpsAcceptance": "pending GeForce",
+    "currentConsoleWarningsAndErrors": 0,
+    "scope": "Full production game, HUD, one real multiplayer browser session; visual/loading QA only",
+    "adapter": "Intel UHD 630",
+    "record": "production-smoke.json"
+  }
+}

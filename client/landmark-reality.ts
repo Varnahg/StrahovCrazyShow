@@ -68,7 +68,8 @@ export function buildLandmarkReality(options: {
         sourcePack: "landmark-reality",
         landmarkGlass: kind === "stadium-glass",
         sourceMeasured: false,
-        sourceDetail: "user-photo-interpreted-east-pavilion",
+        sourceDetail:
+          "OSM/IPR/photo exterior; interior closure is a pilot adaptation",
       };
       materials.set(kind, m);
       return m;
@@ -194,6 +195,13 @@ export function buildLandmarkReality(options: {
       landmark: part.group,
       lod: part.lod,
       sourceMeasured: false,
+      ...(part.group === "stadium"
+        ? {
+            modelScope: "exterior-only",
+            interiorPubliclyAccessible: false,
+            closureProvenance: plan.stadium.access.policy.provenance,
+          }
+        : {}),
     };
     attachWorldAssetNode(mesh, assetRoots.get(part.asset.key)!);
     all.push(mesh);
@@ -241,10 +249,15 @@ export function buildLandmarkReality(options: {
       farTriangles: plan.parts
         .filter((p) => p.lod !== "near")
         .reduce((s, p) => s + p.indices.length / 3, 0),
-      collisionTriangles: plan.collision.indices.length / 3,
+      collisionTriangles:
+        (plan.collision.indices.length +
+          plan.twoSidedRoofCollision.indices.length +
+          plan.twoSidedExteriorCollision.indices.length) /
+        3,
       commonEntrances: plan.entrances.length,
       b1Height: plan.b1Roof?.height ?? null,
       stadiumRows: plan.stadium.rows,
+      stadiumAccess: plan.stadium.access.policy.mode,
     },
     update(position: Pick<Vec3, "x" | "z">, quality: RenderQuality = "low") {
       const distance = renderBudget(quality).architectureDetailMetres;

@@ -10,8 +10,8 @@ ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'assets/blender/vehicles/innerscene-hatchback';SOURCE=OUT/'campus-hatchback-master.blend';DOCS=ROOT/'docs/vehicles'
 before_sha=hashlib.sha256(SOURCE.read_bytes()).hexdigest()
 near_sha=hashlib.sha256((ROOT/'public/models/vehicles/campus-hatchback-near.glb').read_bytes()).hexdigest()
-assert before_sha=='3b72d0f6f89d3a6719eda6588422f087ed5fae5a0a454103efe72a62e3317a6e'
-assert near_sha=='2805ecfd4dd14ad3ea0511efce8c78d9dd8fc07c9d55dc28bf02e61831afa665'
+assert before_sha=='903eaf0fcfaa7a4ef1ce15a89435e3e4186db8190907e0099b5be7f52e44e83f'
+assert near_sha=='7491240d9c5acc10375a394bc9b56a02f314da749dfb63e397506d90ae33c853'
 reports=[]
 def topology(mesh):
  bm=bmesh.new();bm.from_mesh(mesh)

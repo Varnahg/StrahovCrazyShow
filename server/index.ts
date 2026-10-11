@@ -9,13 +9,14 @@ import {
 import { Community } from "./community";
 import { sanitizeInput, sanitizeProfile, cleanText } from "../shared/profile";
 import { initPhysics, Simulation } from "../shared/simulation";
-import { SPAWN, zoneAt } from "../shared/world";
+import { SPAWN } from "../shared/world";
 import { groundHeight } from "../shared/terrain";
 import { vehicleExitAllowed } from "../shared/vehicle";
 import { makeDemoEvents, dateKey } from "../shared/events";
 import type { Input, Player, Profile } from "../shared/types";
 import { getWeather } from "./weather";
 import { createLocalBenchmarkHandler } from "./local-benchmarks";
+import { respawnServerPlayer, synchronizePlayer } from "./respawn";
 import {
   FixedStepClock,
   InputQueue,
@@ -187,20 +188,30 @@ class StrahovRoom extends Room {
         this.broadcastPresence();
       }),
     );
-    this.onMessage("respawn", (c) => {
-      const a = this.sim.actors.get(c.auth.id)!;
-      if (a.vehicle) {
-        a.setVehicle(false);
-        this.broadcast("car", {
-          ...this.carPosition,
-          yaw: this.carYaw,
-          parked: true,
-          state: this.sim.car.capture(),
-        });
-      }
-      a.setPosition(SPAWN);
-      this.broadcastPresence();
-    });
+    this.onMessage("respawn", (c) =>
+      this.safe(c, () => {
+        const player = store.players.get(c.auth.id),
+          queue = this.inputQueues.get(c.auth.id);
+        if (!player || !queue) return;
+        const recovery = respawnServerPlayer(
+          this.sim,
+          player,
+          queue,
+          this.simulationClock.tick,
+        );
+        if (!recovery) return;
+        // Send immediately, even if the next motion tick has not occurred.
+        c.send("authoritative", recovery.authority);
+        if (recovery.carRecovered)
+          this.broadcast("car", {
+            ...this.carPosition,
+            yaw: this.carYaw,
+            parked: this.sim.car.parked,
+            state: this.sim.car.capture(),
+          });
+        this.broadcastPresence();
+      }),
+    );
     this.onMessage("find", (c, d) =>
       this.safe(c, () => {
         if (store.find(c.auth.id, Number(d)))
@@ -246,12 +257,7 @@ class StrahovRoom extends Room {
       });
       for (const [id, a] of this.sim.actors) {
         const p = store.players.get(id)!;
-        Object.assign(p, a.position, {
-          yaw: a.yaw,
-          speed: a.speed,
-          vehicle: a.vehicle,
-          zone: zoneAt(a.position),
-        });
+        synchronizePlayer(p, a);
       }
       if (store.tick()) {
         this.broadcast("activity", store.activity);
@@ -421,9 +427,9 @@ class StrahovRoom extends Room {
 }
 const http = createServer();
 const listenHost = "127.0.0.1";
-const localBenchmarks = createLocalBenchmarkHandler({listenHost});
+const localBenchmarks = createLocalBenchmarkHandler({ listenHost });
 const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
-  if (await localBenchmarks(req,res)) return;
+  if (await localBenchmarks(req, res)) return;
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
   res.setHeader("Cache-Control", "no-store");

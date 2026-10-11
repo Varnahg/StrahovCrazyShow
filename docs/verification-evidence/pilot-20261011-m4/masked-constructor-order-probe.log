@@ -1,0 +1,24 @@
+✓ Lockfile passes supply-chain policies (verified 2h ago)
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 919ms using pnpm v11.25.0
+BJS - [17:42:09]: Babylon.js v9.30.0 - Null engine
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected actual frozen M4 addPipeline failure
+    at <anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\repro-m4-pipeline-contract.ts:24:8)
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

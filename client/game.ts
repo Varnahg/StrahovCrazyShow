@@ -8,6 +8,12 @@ import {
 import { buildWorld } from "./world-renderer";
 import { captureModelReview } from "./model-review";
 import { captureRenderCostInventory } from "./render-cost";
+import { EnabledMeshCandidates } from "./active-mesh-candidates";
+import { writeQuaternion, writeVector3 } from "./transform-updates";
+import {
+  BenchmarkRenderProfile,
+  BENCHMARK_RENDER_CPU_SCOPE,
+} from "./benchmark-render-profile";
 import { AvatarAnimator } from "./animation";
 import { AvatarLodController } from "./avatar-lod";
 import { ContactShadows } from "./contact-shadows";
@@ -39,6 +45,10 @@ import { groundHeight, PARKING_SLOTS } from "../shared/terrain";
 import type { B6RealityController } from "./b6-reality";
 import { applyArtLighting } from "./art-lighting";
 import { VehicleLighting } from "./vehicle-lighting";
+import { PlayerFlashlight } from "./flashlight";
+import { localizeText, t } from "./i18n";
+import { MapNavigator, type PlanMapRoute } from "./map-navigation";
+import { createNavigationClearance } from "./navigation-physics";
 import { updateRainSegments } from "./weather-particles";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
@@ -98,7 +108,13 @@ import {
   TRANSIT_NAVIGATION,
   sampleTransit,
 } from "../shared/transit";
-import type { Player, Profile, Input, AvatarConfig, Vec3 } from "../shared/types";
+import type {
+  Player,
+  Profile,
+  Input,
+  AvatarConfig,
+  Vec3,
+} from "../shared/types";
 import {
   canonicalInput,
   FIXED_DT,
@@ -118,6 +134,7 @@ export type GameStats = {
   speed: number;
   yaw: number;
   vehicle: boolean;
+  flashlight: boolean;
   zone: string;
   hint: string;
   rendering: AdaptiveQualitySnapshot;
@@ -179,6 +196,12 @@ export type Benchmark = {
   gpu: GpuDiagnostics;
   frameWork: { cpuMs: number | null; gpuMs: number | null };
   frameBreakdownMs: Record<string, number>;
+  /** Nested Babylon CPU timings, not additive and never GPU timings. */
+  engineCpuBreakdownMs: Record<string, number>;
+  engineCpuBreakdownScope: typeof BENCHMARK_RENDER_CPU_SCOPE;
+  frameIntervalsMs: number[];
+  weatherAtStart: Weather | null;
+  weatherAtEnd: Weather | null;
   presentationRate: PresentationRateMeasurement | null;
 };
 type Avatar = AvatarRig & {
@@ -214,7 +237,7 @@ export class Game {
   localId = "guest";
   onInput?: (input: Input) => void;
   onPredictionReset?: () => void;
-  onAction?: (action: string, data?: unknown) => void;
+  onAction?: (action: string, data?: unknown) => void | boolean;
   onStats?: (stats: GameStats) => void;
   onNotice?: (message: string) => void;
   onBenchmark?: (result: Benchmark) => void;
@@ -249,6 +272,9 @@ export class Game {
     frames: number[];
     minAvatars: number;
     work: Record<string, number>;
+    engineWork: Record<string, number>;
+    profile: BenchmarkRenderProfile;
+    weatherAtStart: Weather | null;
   };
   network = false;
   ready = false;
@@ -306,6 +332,7 @@ export class Game {
   renderErrorCount = 0;
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
+  private enabledMeshCandidates: EnabledMeshCandidates;
   get assetLoadErrorCount() {
     return (
       this.startupAssetErrors +
@@ -326,12 +353,32 @@ export class Game {
   skyWeather: SkyWeatherController;
   environment?: { update(player: { x: number; y: number; z: number }): void };
   carSnapshots: { time: number; state: VehicleState }[] = [];
+  respawnPending = false;
+  private minimumMotionTick = -1;
   previousCarPose?: { position: Vector3; rotation: Quaternion };
   updateCarWheels?: (state: VehicleState) => void;
   disposeCarAssets?: () => void;
   setCarQuality?: (quality: string) => void;
   updateCarLighting?: (night: number) => void;
   vehicleLighting?: VehicleLighting;
+  flashlightOn = false;
+  private flashlight?: PlayerFlashlight;
+  private mapNavigator?: MapNavigator;
+  planMapRoute: PlanMapRoute = (start, target) => {
+    if (!this.ready)
+      return {
+        status: "unavailable",
+        points: [],
+        distance: 0,
+        endpoint: target,
+        toEntrance: false,
+      };
+    this.mapNavigator ??= new MapNavigator(createNavigationClearance(this.sim));
+    return this.mapNavigator.planAsync(start, target);
+  };
+  cancelMapRoute() {
+    this.mapNavigator?.cancel();
+  }
   vegetation?: VegetationController;
   transit?: TransitRenderer;
   trafficPreview?: { instant: number; started: number };
@@ -344,12 +391,12 @@ export class Game {
   }
   previewTransit() {
     if (this.network) {
-      this.onNotice?.("Ukázka dopravy je dostupná v samostatné prohlídce.");
+      this.notice("Ukázka dopravy je dostupná v samostatné prohlídce.");
       return null;
     }
     const arrival = getPreviewArrival(Date.now());
     if (!arrival) {
-      this.onNotice?.("Pro ukázku nemáme platný podklad.");
+      this.notice("Pro ukázku nemáme platný podklad.");
       return null;
     }
     this.trafficPreview = {
@@ -393,9 +440,7 @@ export class Game {
     this.engine.onEffectErrorObservable.add(() => {
       this.canvas.dataset.renderErrorCount = String(++this.renderErrorCount);
       if (this.renderErrorCount === 1)
-        this.onNotice?.(
-          "Část prostředí se nepodařilo vykreslit. Obnov stránku.",
-        );
+        this.notice("Část prostředí se nepodařilo vykreslit. Obnov stránku.");
     });
     this.applyAdaptiveQuality(this.adaptive.state);
     this.gpu = readGpuDiagnostics(this.engine);
@@ -416,6 +461,10 @@ export class Game {
       }
     }
     this.scene = new Scene(this.engine);
+    this.enabledMeshCandidates = new EnabledMeshCandidates(
+      this.scene,
+      this.scene.getActiveMeshCandidates,
+    );
     this.textureDiagnostics = new SceneTextureDiagnostics(
       this.scene,
       (count) => {
@@ -423,7 +472,7 @@ export class Game {
           this.assetLoadErrorCount,
         );
         if (count === 1)
-          this.onNotice?.(
+          this.notice(
             "Část textur prostředí se nepodařilo načíst. Obnov stránku.",
           );
       },
@@ -449,6 +498,11 @@ export class Game {
       this.camera,
       this.engine,
     );
+    // Permanent landmark captions belong to the map. Keep only a handful of
+    // nearby names in the scene; distant players remain represented by avatars.
+    this.labels.placeLimit = 0;
+    this.labels.playerLimit = 6;
+    this.labels.playerRange = 18;
     this.ambient = new HemisphericLight(
       "sky",
       new Vector3(0, 1, 0),
@@ -820,6 +874,18 @@ export class Game {
   }
   setLocalId(id: string) {
     const old = this.localId;
+    if (old === id) return;
+    // A newly issued session belongs to a new network epoch. Resuming the same
+    // identity keeps its frontiers so delayed packets cannot rewind it.
+    this.resetPredictionHistory();
+    this.lastAuthorityTick = this.minimumMotionTick = -1;
+    this.seq = 0;
+    this.respawnPending = false;
+    this.carSnapshots.length = 0;
+    this.previousCarPose = undefined;
+    this.visualOffset.setAll(0);
+    this.snapshots.entities.clear();
+    this.snapshots.offset = undefined;
     this.contactShadows.remove(old);
     this.localId = id;
     const a = this.avatars.get(old);
@@ -830,6 +896,7 @@ export class Game {
     this.localPlayer.id = id;
   }
   syncMotion(packet: MotionPacket) {
+    if (packet.tick < this.minimumMotionTick) return;
     this.snapshots.push(packet);
     if (packet.car) {
       this.carSnapshots.push({ time: packet.time, state: packet.car });
@@ -855,6 +922,11 @@ export class Game {
   }
   reconcile(packet: Authority) {
     if (!this.ready || packet.tick < this.lastAuthorityTick) return;
+    // Respawn is completed by a forced authority, not by replaying a packet
+    // already in flight when the user asked to return to the start.
+    const respawnReply = packet.resync === true && packet.respawn === true;
+    if (this.respawnPending && !respawnReply) return;
+    const explicitRespawn = this.respawnPending && respawnReply;
     this.lastAuthorityTick = packet.tick;
     const expected = this.prediction.states.get(packet.ack);
     const exact =
@@ -885,20 +957,29 @@ export class Game {
       this.seq = Math.max(this.seq, packet.ack);
       return;
     }
-    const old = { ...this.actor.position },
+    const old = packet.resync
+        ? packet.state.position
+        : { ...this.actor.position },
       modeChanged = this.actor.vehicle !== packet.state.vehicle;
     if (packet.resync) {
-      this.prediction.clear();
+      if (explicitRespawn) this.clearPendingMovement();
+      else this.resetPredictionHistory();
       this.seq = packet.ack;
-      this.onPredictionReset?.();
+      this.respawnPending = false;
+      this.minimumMotionTick = packet.tick;
+      this.carSnapshots.length = 0;
+      this.snapshots.remove(this.localId);
     } else this.seq = Math.max(this.seq, packet.ack);
     const replay = this.prediction
       .acknowledge(packet.ack)
       .filter(
         (i) => i.vehicle === undefined || i.vehicle === packet.state.vehicle,
       );
-    this.actor.restore(packet.state);
-    if (modeChanged && packet.state.vehicle) this.alignVehicleCamera();
+    this.actor.restore(packet.state, packet.respawn === true);
+    if (packet.resync && !packet.state.vehicle && packet.state.vehicleState)
+      this.sim.restorePublicCar(packet.state.vehicleState);
+    if (modeChanged && packet.state.vehicle && !packet.resync)
+      this.alignVehicleCamera();
     if (!packet.resync)
       for (const input of replay) {
         this.actor.step(input, FIXED_DT);
@@ -930,6 +1011,67 @@ export class Game {
         carPose.rotation.w,
       ),
     };
+    if (explicitRespawn) this.snapRecoveryPresentation();
+  }
+  private resetPredictionHistory() {
+    this.accumulator = 0;
+    this.prediction.clear();
+    this.onPredictionReset?.();
+  }
+  private clearPendingMovement() {
+    this.clearHeldInput();
+    this.jumpWasDown = false;
+    this.resetPredictionHistory();
+  }
+  private snapRecoveryPresentation() {
+    const position = this.actor.position;
+    this.visualOffset.setAll(0);
+    this.previousPosition.copyFromFloats(position.x, position.y, position.z);
+    this.cameraArm = this.distance;
+    this.yaw = this.actor.yaw;
+    this.vehicleCameraSnap = true;
+    this.avatars.get(this.localId)?.animation.reset();
+    this.canvas.dataset.recoveryStage = "restored";
+  }
+  /** One path for R and the GUI. Ordered transport sees old inputs before the
+   * request; no fresh input is predicted or queued until the forced reply. */
+  requestRespawn() {
+    if (!this.ready || this.respawnPending) return false;
+    this.clearPendingMovement();
+    if (this.network) {
+      this.respawnPending = true;
+      this.canvas.dataset.recoveryStage = "waiting-for-authority";
+      if (!this.onAction || this.onAction("respawn") === false) {
+        this.cancelRespawn();
+        this.notice(
+          "Návrat vyžaduje spojení se serverem. Použij Obnovit spojení.",
+        );
+        return false;
+      }
+      return true;
+    }
+    if (!this.sim.respawnActor(this.actor.id)) return false;
+    this.carSnapshots.length = 0;
+    this.previousCarPose = undefined;
+    this.snapshots.remove(this.localId);
+    this.snapRecoveryPresentation();
+    return true;
+  }
+  cancelRespawn() {
+    this.respawnPending = false;
+    this.keys.clear();
+    this.canvas.dataset.recoveryStage = "disconnected";
+  }
+  toggleFlashlight() {
+    if (!this.ready || this.actor.vehicle || this.respawnPending)
+      return this.flashlightOn;
+    this.flashlight ??= new PlayerFlashlight(this.scene);
+    this.flashlightOn = !this.flashlightOn;
+    this.canvas.dataset.flashlight = String(this.flashlightOn);
+    return this.flashlightOn;
+  }
+  private notice(message: string) {
+    this.onNotice?.(localizeText(message));
   }
   setWeather(weather: Weather) {
     this.weather = weather;
@@ -955,11 +1097,15 @@ export class Game {
       this.applyAdaptiveQuality(this.adaptive.setTargetFps(fps));
   }
   startBenchmark() {
+    this.benchmark?.profile.dispose();
     this.benchmark = {
       start: performance.now(),
       frames: [],
       minAvatars: this.avatars.size,
       work: {},
+      engineWork: {},
+      profile: new BenchmarkRenderProfile(this.scene),
+      weatherAtStart: this.weather ? structuredClone(this.weather) : null,
     };
   }
   interact() {
@@ -968,9 +1114,7 @@ export class Game {
     // Driving takes priority over a collectible beside the road.
     if (this.actor.vehicle) {
       if (!vehicleExitAllowed(this.actor.speed)) {
-        this.onNotice?.(
-          "Nejdřív zastav auto: S brzdí, mezerník je ruční brzda.",
-        );
+        this.notice("Nejdřív zastav auto: S brzdí, mezerník je ruční brzda.");
         return;
       }
       if (this.network) {
@@ -979,7 +1123,7 @@ export class Game {
       }
       const exit = this.sim.exitPosition(this.actor);
       if (!exit) {
-        this.onNotice?.("Vedle auta není bezpečné místo k vystoupení.");
+        this.notice("Vedle auta není bezpečné místo k vystoupení.");
         return;
       }
       this.actor.setVehicle(false);
@@ -995,7 +1139,12 @@ export class Game {
       else {
         this.found.add(String(nearby));
         this.huntMeshes[nearby].setEnabled(false);
-        this.onNotice?.(`Nalezeno ${this.found.size}/${HUNT_POINTS.length}`);
+        this.notice(
+          t("Nalezeno {count}/{total}", {
+            count: this.found.size,
+            total: HUNT_POINTS.length,
+          }),
+        );
         if (this.found.size === HUNT_POINTS.length)
           this.onAction?.("reward", "Průzkumník kopce");
       }
@@ -1018,7 +1167,7 @@ export class Game {
       Math.hypot(p.x - SPAWN.x, p.z - SPAWN.z) < 6
     ) {
       this.soloDelivery = 1;
-      this.onNotice?.(
+      this.notice(
         "Balíček vyzvednutý. Dones jej ke vstupu B6 (značka na mapě).",
       );
     } else if (
@@ -1026,9 +1175,9 @@ export class Game {
       Math.hypot(p.x - B6_LAYOUT.entry.x, p.z - B6_LAYOUT.entry.z) < 5
     ) {
       this.soloDelivery = 2;
-      this.onNotice?.("Doručeno! Odemčená kosmetická odměna.");
+      this.notice("Doručeno! Odemčená kosmetická odměna.");
       this.onAction?.("reward", "Strahovský kurýr");
-    } else this.onNotice?.("Přibliž se k autu, značce nebo místu úkolu.");
+    } else this.notice("Přibliž se k autu, značce nebo místu úkolu.");
   }
   setFound(ids: string[]) {
     this.found = new Set(ids);
@@ -1050,12 +1199,13 @@ export class Game {
       this.sim.setParkedCar({ x: data.x, y: data.y, z: data.z }, data.yaw);
   }
   resize = () => this.engine.resize();
-  blur = () => {
+  private clearHeldInput() {
     this.keys.clear();
     this.orbiting = false;
     this.pointerPress = undefined;
     this.canvas.style.cursor = "";
-  };
+  }
+  blur = () => this.clearHeldInput();
   visibility = () => {
     this.blur();
     if (!document.hidden && this.network) this.onAction?.("resync");
@@ -1107,6 +1257,7 @@ export class Game {
       })
     )
       return;
+    if (this.respawnPending) return;
     if (
       ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
         e.code,
@@ -1127,13 +1278,8 @@ export class Game {
             document.exitPointerLock();
         }
       }
-      if (e.code === "KeyR") {
-        if (this.network) this.onAction?.("respawn");
-        else {
-          this.actor.setVehicle(false);
-          this.actor.setPosition(SPAWN);
-        }
-      }
+      if (e.code === "KeyR") this.requestRespawn();
+      if (e.code === "KeyF") this.toggleFlashlight();
     }
   };
   keyUp = (e: KeyboardEvent) => this.keys.delete(e.code);
@@ -1143,7 +1289,7 @@ export class Game {
     const unavailable = () => {
       if (this.disposed || !this.footFirstPerson) return;
       this.canvas.dataset.pointerMode = "drag-fallback";
-      this.onNotice?.(
+      this.notice(
         "Prohlížeč nepovolil zachycení myši. Rozhlížej se tažením pravého tlačítka.",
       );
     };
@@ -1334,7 +1480,7 @@ export class Game {
         gpuFrameMs: this.lastGpuFrameMs,
       }),
     );
-    this.accumulator += dt;
+    this.accumulator = this.respawnPending ? 0 : this.accumulator + dt;
     if (
       vehicleCameraCanFollow({
         driving: this.actor.vehicle,
@@ -1425,6 +1571,10 @@ export class Game {
       zone: zoneAt(pos),
     });
     const self = this.avatars.get(this.localId);
+    if (this.actor.vehicle && this.flashlightOn) {
+      this.flashlightOn = false;
+      this.canvas.dataset.flashlight = "false";
+    }
     if (self) Object.assign(self.target, this.localPlayer);
     const worldEnded = performance.now();
     const time = worldEnded / 1000;
@@ -1444,7 +1594,7 @@ export class Game {
           id === this.localId
             ? renderPosition.add(new Vector3(0, -0.8, 0))
             : new Vector3(p.x, p.y - 0.8, p.z);
-      a.root.position.copyFrom(target);
+      writeVector3(a.root.position, target.x, target.y, target.z);
       const lod = a.lod.update({
         distance: Vector3.Distance(this.camera.position, target),
         quality: this.quality,
@@ -1462,6 +1612,7 @@ export class Game {
             yaw: p.yaw,
             emote: p.emote,
             vehicle: p.vehicle,
+            flashlight: id === this.localId && this.flashlightOn,
             grounded: id === this.localId ? this.actor.grounded : undefined,
             groundHeight:
               id === this.localId
@@ -1592,14 +1743,19 @@ export class Game {
         carRotation,
       );
     }
-    for (const car of [this.car, this.parkedCar]) {
-      car.position.copyFrom(carPosition);
-      car.rotationQuaternion = carRotation.clone();
-    }
-    if (this.actor.vehicle) {
-      this.car.position.addInPlace(this.visualOffset);
-      this.parkedCar.position.copyFrom(this.car.position);
-    }
+    const visualCarX = this.actor.vehicle
+      ? carPosition.x + this.visualOffset.x
+      : carPosition.x;
+    const visualCarY = this.actor.vehicle
+      ? carPosition.y + this.visualOffset.y
+      : carPosition.y;
+    const visualCarZ = this.actor.vehicle
+      ? carPosition.z + this.visualOffset.z
+      : carPosition.z;
+    writeVector3(this.car.position, visualCarX, visualCarY, visualCarZ);
+    writeVector3(this.parkedCar.position, visualCarX, visualCarY, visualCarZ);
+    writeQuaternion(this.car, carRotation);
+    writeQuaternion(this.parkedCar, carRotation);
     this.updateCarWheels?.(carState);
     this.contactShadows.set(
       "car",
@@ -1684,9 +1840,9 @@ export class Game {
       sun,
       moon,
       headlightRequested: this.car.isEnabled(),
-      extraPracticalLightSlots: Number(
-        this.b6Reality?.interiorLightEnabled ?? false,
-      ),
+      extraPracticalLightSlots:
+        Number(this.b6Reality?.interiorLightEnabled ?? false) +
+        Number(this.flashlightOn && !!self && !this.actor.vehicle),
       weather: this.weather,
       player: pos,
       dt,
@@ -1697,6 +1853,13 @@ export class Game {
       this.car,
       lighting.night,
       this.car.isEnabled(),
+      this.quality,
+    );
+    this.flashlight?.update(
+      self,
+      this.camera,
+      this.flashlightOn && !this.actor.vehicle,
+      this.footFirstPerson,
       this.quality,
     );
     this.vegetation?.update({
@@ -1742,7 +1905,9 @@ export class Game {
       localId: this.localId,
     });
     const environmentEnded = performance.now();
+    this.benchmark?.profile.beginFrame();
     this.scene.render();
+    const engineWork = this.benchmark?.profile.endFrame();
     const renderEnded = performance.now();
     for (const [id, a] of this.avatars) {
       if (id === this.localId) continue;
@@ -1760,8 +1925,10 @@ export class Game {
     this.labels.render(pos, (point) =>
       this.sim.hasLineOfSight(this.camera.position, point, this.actor),
     );
-    this.frames.push(rawFrameMs);
-    if (this.frames.length > 600) this.frames.shift();
+    if (import.meta.env.DEV) {
+      this.frames.push(rawFrameMs);
+      if (this.frames.length > 600) this.frames.shift();
+    }
     if (this.benchmark) {
       const b = this.benchmark;
       const breakdown = {
@@ -1774,11 +1941,17 @@ export class Game {
       };
       for (const [key, milliseconds] of Object.entries(breakdown))
         b.work[key] = (b.work[key] ?? 0) + milliseconds;
+      if (engineWork)
+        for (const [key, milliseconds] of Object.entries(engineWork))
+          b.engineWork[key] = (b.engineWork[key] ?? 0) + milliseconds;
       b.frames.push(rawFrameMs);
       b.minAvatars = Math.min(b.minAvatars, this.avatars.size);
       if (performance.now() - b.start >= 10000) {
         const sorted = b.frames.slice().sort((a, b) => a - b),
           sum = b.frames.reduce((a, b) => a + b, 0);
+        // Release before the callback: it may immediately start another run.
+        this.benchmark = undefined;
+        b.profile.dispose();
         this.onBenchmark?.({
           date: new Date().toISOString(),
           sourceSnapshotId: import.meta.env.VITE_SOURCE_SNAPSHOT_ID || null,
@@ -1859,17 +2032,26 @@ export class Game {
               sum / b.frames.length,
             ]),
           ),
+          engineCpuBreakdownMs: Object.fromEntries(
+            Object.entries(b.engineWork).map(([key, sum]) => [
+              key,
+              sum / b.frames.length,
+            ]),
+          ),
+          engineCpuBreakdownScope: BENCHMARK_RENDER_CPU_SCOPE,
+          frameIntervalsMs: b.frames,
+          weatherAtStart: b.weatherAtStart,
+          weatherAtEnd: this.weather ? structuredClone(this.weather) : null,
           presentationRate: this.presentationRate,
         });
-        this.benchmark = undefined;
       }
     }
     if (performance.now() - this.lastStats > 200) {
       this.lastStats = performance.now();
       let hint = this.actor.vehicle
         ? vehicleExitAllowed(this.actor.speed)
-          ? "E · vystoupit · W/S plyn a brzda · Space ruční brzda"
-          : "S · brzda / zpátečka · Space ruční brzda · po zastavení E vystoupit"
+          ? "E · vystoupit"
+          : "Nejdřív zastav auto."
         : Math.hypot(
               pos.x - this.parkedCar.position.x,
               pos.z - this.parkedCar.position.z,
@@ -1902,8 +2084,9 @@ export class Game {
         speed: this.actor.speed,
         yaw: this.actor.yaw,
         vehicle: this.actor.vehicle,
+        flashlight: this.flashlightOn,
         zone: zoneAt(pos),
-        hint,
+        hint: localizeText(hint),
         rendering: this.adaptive.state,
         gpu: this.gpu,
         cpuFrameMs: this.lastCpuFrameMs ?? null,
@@ -1931,9 +2114,13 @@ export class Game {
     window.removeEventListener("resize", this.resize);
     if (document.pointerLockElement === this.canvas) document.exitPointerLock();
     this.engine.stopRenderLoop();
+    this.enabledMeshCandidates.dispose();
+    this.mapNavigator?.dispose();
     this.sim?.dispose();
     this.labels.dispose();
     this.contactShadows.dispose();
+    this.benchmark?.profile.dispose();
+    this.benchmark = undefined;
     this.instrumentation.dispose();
     this.engineInstrumentation.dispose();
     this.cinematic?.dispose();
@@ -1946,6 +2133,7 @@ export class Game {
     this.vegetation?.dispose();
     this.disposeCarAssets?.();
     this.vehicleLighting?.dispose();
+    this.flashlight?.dispose();
     this.transit?.dispose();
     this.avatarPool.dispose();
     this.scene.dispose();

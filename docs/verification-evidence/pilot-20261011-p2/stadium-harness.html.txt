@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="cs">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>Stadion · kontrola východního pavilonu</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: #647b85;
+      color: #f2f0e8;
+      font: 14px system-ui;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+    aside {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      padding: 16px;
+      max-width: 340px;
+      border: 1px solid #ffffff40;
+      border-radius: 10px;
+      background: #152220e8;
+    }
+    h1 {
+      font-size: 17px;
+      margin: 0 0 10px;
+    }
+    p {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #c7d1cf;
+    }
+    select {
+      width: 100%;
+      padding: 9px;
+      background: #33443f;
+      border: 1px solid #849890;
+      color: white;
+    }
+    output {
+      white-space: pre-line;
+      font: 11px ui-monospace;
+      display: block;
+      margin-top: 12px;
+    }
+  </style>
+  <canvas
+    id="preview"
+    aria-label="Východní stadionový pavilon podle fotografických předloh"
+  ></canvas>
+  <aside>
+    <h1>Stadion · Vaníčkova</h1>
+    <label for="view">Srovnávací pohled</label
+    ><select id="view">
+      <option value="north">Od severu podél fasády</option>
+      <option value="south">Od jihu ke schodišti</option>
+      <option value="portal">Krytý vstup s uzávěrou pilotu</option>
+      <option value="campus">Opačný chodník a koleje</option>
+      <option value="aerial">Otevřený stadion z výšky</option>
+    </select>
+    <p>
+      OSM půdorys, výška pavilonu odvozená z IPR 2023; výškový základ ČÚZK.
+      Vlastní model podle fotografií. Stadion je v pilotu pouze exteriér;
+      uzavření vstupů je herní opatření. Stupně a členění jsou interpretované. Tento
+      komponentový náhled není měření výkonu celé hry.
+    </p>
+    <output id="metrics">Načítání modelu…</output>
+    <p>Tažením otočit, kolečkem přiblížit.</p>
+  </aside>
+  <script type="module" src="./stadium-photo-correction-preview.ts"></script>
+</html>

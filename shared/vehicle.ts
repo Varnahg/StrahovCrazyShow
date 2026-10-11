@@ -63,6 +63,42 @@ export const vehicleExitAllowed = (speed: number) =>
   Number.isFinite(speed) && Math.abs(speed) <= VEHICLE_EXIT_MAX_SPEED;
 const IDENTITY: VehicleRotation = { x: 0, y: 0, z: 0, w: 1 };
 const ZERO: Vec3 = { x: 0, y: 0, z: 0 };
+const finitePhysicsNumber = (value: number) =>
+  Number.isFinite(value) && Number.isFinite(Math.fround(value));
+export const finiteVehiclePosition = (value: Vec3) =>
+  !!value && [value.x, value.y, value.z].every(finitePhysicsNumber);
+const validRotation = (value: VehicleRotation) =>
+  !!value &&
+  [value.x, value.y, value.z, value.w].every(finitePhysicsNumber) &&
+  Math.abs(Math.hypot(value.x, value.y, value.z, value.w) - 1) < 0.001;
+const validPose = (pose: VehiclePose) =>
+  !!pose &&
+  finiteVehiclePosition(pose.position) &&
+  validRotation(pose.rotation);
+export function validVehicleState(state: VehicleState): boolean {
+  return (
+    !!state &&
+    validPose(state) &&
+    validPose(state.parking) &&
+    finiteVehiclePosition(state.linvel) &&
+    finiteVehiclePosition(state.angvel) &&
+    finiteVehiclePosition(state.force) &&
+    finiteVehiclePosition(state.torque) &&
+    finitePhysicsNumber(state.steering) &&
+    Array.isArray(state.wheelSpin) &&
+    state.wheelSpin.length === 4 &&
+    state.wheelSpin.every(finitePhysicsNumber) &&
+    Array.isArray(state.wheelSuspension) &&
+    state.wheelSuspension.length === 4 &&
+    state.wheelSuspension.every(finitePhysicsNumber) &&
+    Array.isArray(state.wheelContact) &&
+    state.wheelContact.length === 4 &&
+    state.wheelContact.every((b) => typeof b === "boolean") &&
+    typeof state.parked === "boolean" &&
+    typeof state.sleeping === "boolean" &&
+    (state.driverId === null || typeof state.driverId === "string")
+  );
+}
 const clamp = (n: number, lo: number, hi: number) =>
   Math.max(lo, Math.min(hi, Number.isFinite(n) ? n : 0));
 const approach = (n: number, target: number, delta: number) =>
@@ -146,9 +182,9 @@ function copyPose(pose: VehiclePose): VehiclePose {
  */
 export class VehicleEntity {
   readonly id: string;
-  readonly body: RAPIER.RigidBody;
-  readonly collider: RAPIER.Collider;
-  readonly controller: RAPIER.DynamicRayCastVehicleController;
+  body!: RAPIER.RigidBody;
+  collider!: RAPIER.Collider;
+  controller!: RAPIER.DynamicRayCastVehicleController;
   driverId: string | null = null;
   parked = false;
   parking: VehiclePose;
@@ -157,6 +193,7 @@ export class VehicleEntity {
   private wheelSpin = [0, 0, 0, 0];
   private suspension = [0.25, 0.25, 0.25, 0.25];
   private wheelContact = [false, false, false, false];
+  private readonly home: VehiclePose;
 
   constructor(
     readonly world: RAPIER.World,
@@ -166,6 +203,16 @@ export class VehicleEntity {
     this.id = options.id ?? "campus-car";
     const yaw = options.yaw ?? 0,
       rotation = { x: 0, y: Math.sin(yaw / 2), z: 0, w: Math.cos(yaw / 2) };
+    if (!validPose({ position, rotation }))
+      throw new TypeError("Invalid vehicle initial pose");
+    this.home = copyPose({ position, rotation });
+    this.parking = copyPose(this.home);
+    this.createPhysics(position, rotation);
+    if (options.parked) this.park();
+  }
+
+  private createPhysics(position: Vec3, rotation: VehicleRotation) {
+    const world = this.world;
     this.body = world.createRigidBody(
       RAPIER.RigidBodyDesc.dynamic()
         .setTranslation(position.x, position.y, position.z)
@@ -227,8 +274,6 @@ export class VehicleEntity {
       this.controller.setWheelFrictionSlip(i, 2.3);
       this.controller.setWheelSideFrictionStiffness(i, 0.8);
     }
-    this.parking = copyPose({ position, rotation });
-    if (options.parked) this.park();
   }
 
   get position(): Vec3 {
@@ -352,14 +397,18 @@ export class VehicleEntity {
   }
 
   /** Explicit recovery/admin operation; caller must first validate a safe empty pose. */
-  reset(position = this.parking.position, yaw?: number) {
-    const state = this.capture();
+  reset(position?: Vec3, yaw?: number) {
+    const parking = validPose(this.parking) ? this.parking : this.home;
+    const target = position ?? parking.position;
     this.restore({
-      ...state,
-      position: { ...position },
+      id: this.id,
+      driverId: this.driverId,
+      parked: this.parked,
+      parking: copyPose(parking),
+      position: { ...target },
       rotation:
         yaw === undefined
-          ? { ...this.parking.rotation }
+          ? { ...parking.rotation }
           : { x: 0, y: Math.sin(yaw / 2), z: 0, w: Math.cos(yaw / 2) },
       linvel: { ...ZERO },
       angvel: { ...ZERO },
@@ -376,6 +425,26 @@ export class VehicleEntity {
         position: this.position,
         rotation: this.rotation,
       });
+  }
+
+  /** Emergency recovery never samples a potentially corrupt body/controller.
+   * Keep the vehicle entity identity, recreate its native dynamics and clear
+   * contact/suspension caches. The caller supplies an independently safe pose. */
+  recover(position = this.home.position, rotation = this.home.rotation) {
+    if (this.disposed) throw new Error("Cannot recover a disposed vehicle");
+    const pose = { position, rotation };
+    if (!validPose(pose)) throw new TypeError("Invalid vehicle recovery pose");
+    this.world.removeVehicleController(this.controller);
+    this.world.removeRigidBody(this.body);
+    this.createPhysics(position, rotation);
+    this.driverId = null;
+    this.parked = false;
+    this.steering = 0;
+    this.wheelSpin.fill(0);
+    this.suspension.fill(0.25);
+    this.wheelContact.fill(false);
+    this.park();
+    this.world.propagateModifiedBodyPositionsToColliders();
   }
 
   capture(): VehicleState {
@@ -407,39 +476,7 @@ export class VehicleEntity {
   restore(state: VehicleState) {
     if (state.id !== this.id)
       throw new Error("Cannot restore another vehicle identity");
-    const numbers = [
-      state.position.x,
-      state.position.y,
-      state.position.z,
-      state.rotation.x,
-      state.rotation.y,
-      state.rotation.z,
-      state.rotation.w,
-      state.linvel.x,
-      state.linvel.y,
-      state.linvel.z,
-      state.angvel.x,
-      state.angvel.y,
-      state.angvel.z,
-      state.steering,
-      ...state.wheelSpin,
-      ...state.wheelSuspension,
-    ];
-    numbers.push(
-      state.force.x,
-      state.force.y,
-      state.force.z,
-      state.torque.x,
-      state.torque.y,
-      state.torque.z,
-    );
-    if (
-      !numbers.every(Number.isFinite) ||
-      state.wheelSpin.length !== 4 ||
-      state.wheelSuspension.length !== 4 ||
-      state.wheelContact.length !== 4 ||
-      !state.wheelContact.every((b) => typeof b === "boolean")
-    )
+    if (!validVehicleState(state))
       throw new TypeError("Invalid vehicle physical state");
     this.driverId = state.driverId;
     this.parked = state.parked;

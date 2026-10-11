@@ -1,4 +1,7 @@
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
+// Own the scene extension used below; glTF may register it later, but a render
+// loop can start before asynchronous model loading has completed.
+import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
 import { ImageProcessingConfiguration } from "@babylonjs/core/Materials/imageProcessingConfiguration";

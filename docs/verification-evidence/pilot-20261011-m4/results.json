@@ -1,0 +1,70 @@
+{
+  "status": "technical-passed-component-qa-failed",
+  "scope": "M4 frozen technical checkpoint: tests, production build including TypeScript, isolated integration, and subsequent independent frozen-only SHA audit. Does not describe subsequent scene-component registration fix; GPU validation pending.",
+  "sourceSnapshotId": "38776c10a70e2148b5b2b525d366cecd35c768e0116857e211a02e32a1150b9c",
+  "files": 8143,
+  "tests": {
+    "total": 402,
+    "passed": 402,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "startedAt": "2026-10-11T15:27:26.6283410Z",
+  "finishedAt": "2026-10-11T15:29:32.6640565Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 70.4164437,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 37.274628,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 18.289956,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "sourceCheck": "source-check.json",
+  "pipeline": "pipeline-results.json",
+  "publishedSha256": {
+    "source-manifest.json": "9bd26be8c5b4c95ca4d7a1b76c0d4f4680ec6ba45dd44d2d924d8371c34a4809",
+    "pipeline-results.json": "b905f29b42fcae78141185d6833f318df437fa28c54602e8a1e5dbcec5e354ec",
+    "pipeline-test.log": "d169ab20040d32b2076dd5b44b60bb01044d298b5dfa1aff84e480aeac72b335",
+    "pipeline-build.log": "26911d5ffc439a338eb05d83b6685eefadcd6d348ff8f50b3a723e75faa0ff1a",
+    "pipeline-test-integration.log": "aface68e5682d0ca68a92ce1f35a2b51d7e7f7f85bb6bd6349a939543931cdf9",
+    "component-contract-repro.json": "8f7d6f265a1c698af641520c8673203c9adc12858131e0652be56984b5f5d119",
+    "component-contract-repro.ts.txt": "0255797f3b6e7f419a2b9b4166b350f038ee205b27f033213cd4a63f8ffd1303",
+    "component-contract-repro.log": "2605691140ff39d65f13ecf0d3487ce2f45164104e8b5257c59089bbe59cd3a1",
+    "masked-constructor-order-probe.log": "08ded4ce5e3cac55dab23a4217b370b14e98fd0ace32f8f3083d91226912d0b2"
+  },
+  "currentLiveMatchesSnapshot": null,
+  "currentLiveNote": "No current live SHA comparison was performed or claimed. Live has subsequent postprocess scene-component registration fix and regression test.",
+  "gpu": {
+    "status": "pending",
+    "note": "M4 FPS validation remains pending. A standalone high-quality component preview failed during pipeline registration; neither that failure nor M5 repaired visual loading is an M4 FPS result."
+  },
+  "buildNotes": [
+    "Build completed with exit 0; raw log retains chunk-size, dynamic-import and plugin-timing warnings.",
+    "Isolated integration completed with exit 0 and explicit PASS summary; raw log retains the room-close diagnostic (4002)."
+  ],
+  "technicalPipelineStatus": "passed",
+  "componentQa": {
+    "status": "failed",
+    "browserFinding": "Standalone high-quality car preview failed with TypeError: Cannot read properties of undefined (reading addPipeline). Observed by coordinating root agent after the M4 technical pipeline.",
+    "isolatedFrozenPublicContract": "component-contract-repro.json",
+    "reproducedWithActualM4Source": true,
+    "errorClass": "Missing postprocess scene-component registration; not a near-shell shader or asset error.",
+    "orderingLimit": "The Node probe reads the manager before constructing another pipeline. Constructing PostProcessRenderPipeline first registers the manager and masks the missing import-time registration.",
+    "correctionCheckpoint": "M5",
+    "correctionScope": "Registration fix, new regression test and successful repeated GPU car loading belong to M5, not M4. GPU component QA is not an FPS benchmark."
+  }
+}

@@ -6,11 +6,13 @@ import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { ScreenLabels } from "../client/labels";
 import type { Vec3 } from "../shared/types";
+import { getLocale, setLocale } from "../client/i18n";
 
 function setup(t: import("node:test").TestContext) {
   const previousDocument = globalThis.document;
   const elements: Array<{ style: Record<string, string> }> = [];
   globalThis.document = {
+    documentElement: { lang: "cs" },
     removeEventListener() {},
     createElement() {
       const element = { dataset: {}, style: {}, textContent: "", remove() {} };
@@ -261,4 +263,39 @@ test("remote/off-floor labels skip camera projections without changing name/LOS 
   assert.equal(context.labels.stats.projections, 1);
   assert.ok(context.labels.stats.losCasts <= 4);
   assert.equal(context.labels.entries.get("person")!.visible, true);
+});
+
+test("compact game labels skip every static projection and keep six nearby names", (t) => {
+  const c = setup(t);
+  c.labels.placeLimit = 0;
+  c.labels.playerLimit = 6;
+  c.labels.playerRange = 18;
+  for (let i = 0; i < 30; i++)
+    c.labels.set("place" + i, "Place", { x: 0, y: 1, z: 60 + i });
+  for (let i = 0; i < 12; i++)
+    c.labels.set("near" + i, "Nickname", { x: i * 0.1, y: 1, z: 10 }, true);
+  c.labels.set("far", "Far nickname", { x: 0, y: 1, z: 30 }, true);
+  c.frames(0, 1000);
+  assert.equal(
+    [...c.labels.entries.values()].filter((l) => l.visible).length,
+    6,
+  );
+  assert.equal(c.labels.stats.projections, 12);
+  assert.equal(c.labels.entries.get("far")!.visible, false);
+  assert.ok(c.labels.stats.losCasts <= 4);
+});
+
+test("language changes update known place captions without translating identical player names", (t) => {
+  const c = setup(t),
+    old = getLocale();
+  setLocale("cs");
+  c.labels.set("static", "Blok 6", { x: 0, y: 1, z: 60 });
+  c.labels.set("player", "Blok 6", { x: 0, y: 1, z: 12 }, true);
+  c.frames(0, 200);
+  setLocale("en");
+  c.frames(250, 500);
+  assert.equal(c.labels.entries.get("static")!.element.textContent, "Block 6");
+  assert.equal(c.labels.entries.get("player")!.element.textContent, "Blok 6");
+  assert.equal(c.labels.entries.get("static")!.text, "Blok 6");
+  setLocale(old);
 });

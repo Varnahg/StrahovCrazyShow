@@ -1,0 +1,32 @@
+{
+  "status": "failed",
+  "sourceSnapshotId": "90a6870fce287b9a407cec13b72c0720adcc02e09c9c92b6fc0cfab58d6ad0fb",
+  "files": 8155,
+  "tests": {
+    "total": 433,
+    "passed": 432,
+    "failed": 1
+  },
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 1,
+      "elapsedSeconds": 79.0100367,
+      "log": "pipeline-test.log"
+    }
+  ],
+  "processExitCode": 1,
+  "processExitEvidence": "Root observed terminal exec session 41944 complete with exit 1; build and integration did not run.",
+  "failure": "transit-navigation-source.test.ts rejects stale campus-exterior source SHA after the roof collision change. Regenerate with the existing navigation generator and verify routes before a new immutable checkpoint.",
+  "notRun": [
+    "pnpm build",
+    "pnpm test:integration",
+    "GPU QA"
+  ],
+  "frozenSha": {
+    "checked": 8155,
+    "errors": [],
+    "status": "passed"
+  },
+  "archivedAt": "2026-10-11T18:09:16.323Z"
+}

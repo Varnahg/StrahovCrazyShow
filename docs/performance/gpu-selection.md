@@ -38,4 +38,16 @@ Na podporovaném monitoru zkontrolovat **Nastavení → Systém → Obrazovka �
 
 ## Ověření implementace
 
+### Navazující diagnostika klienta · 11. 10. 2026
+
+Primární přejímací cíl je po upřesnění uživatele **60 FPS klienta na GeForce GTX 1060**. Serverové Hz, počet relací ani přítomnost nainstalované NVIDIA nejsou důkaz tohoto cíle. Při GeForce měření musí být ostatní řízené 3D scény zavřené; test/build/Blender souběh se eviduje a nesmí se zaměnit za nezatížené měření.
+
+`readGpuContextDiagnostics` jednorázově při vytvoření/obnovení kontextu čte skutečné `getContextAttributes().antialias`, `FRAMEBUFFER_BINDING`, `SAMPLE_BUFFERS` a `SAMPLES`. Nevytváří jiný kontext, nepřepíná framebuffer a neprovádí driver dotazy každý snímek. Počty vzorků uvádí pouze pro výchozí framebuffer; pro offscreen cíl, ztracený kontext nebo nedostupná data ukládá `null`. `MAX_SAMPLES` se nepoužívá jako skutečný počet. [WebGL specifikace](https://registry.khronos.org/webgl/specs/latest/1.0/#WEBGLCONTEXTATTRIBUTES).
+
+Průzkum instalovaného Babylon 9.30 potvrdil, že Game žádá canvas antialias i na low. Medium/high používají HDR postproces s výchozím `samples=1`, bloom a FXAA; dvojité 4× MSAA tedy ze zdrojů nevyplývá. Zda low reálně používá 4× MSAA, musí potvrdit výše uvedené údaje. Samotná diagnostika žádnou kvalitu ani vyhlazování nemění.
+
+Lokální sběr navíc zachová přesný numerický whitelist `engineCpuBreakdownMs.activeMeshes/mainDraw/renderTargets`. Jde o CPU intervaly vnořené do celkové render položky; nesčítají se jako nezávislý úplný frame. Neznámé klíče a textová pole se neukládají. Whitelist kontextu hlídá booleany/null a konečné celočíselné sample counts; offscreen sample counts odmítne. Tyto doplňky prošly ověřením v M6 a navazujícím [produkčním N](../verification-evidence/pilot-20261011-n/results.json); nejsou zpětně připsané původnímu M. Místní měření na portu 4179 nyní očekává zdrojové ID N `4c19b98bc5b73410b776b388a3c55d7d8a4d0b25d60b42137268b522ea29d778`.
+
+Cíleně `pnpm exec tsx --test --test-concurrency=1 tests/gpu-diagnostics.test.ts tests/local-benchmarks.test.ts`: **12/12 PASS**, exit 0, 11. 10. 2026 14:19:21–14:19:23 UTC. Nejde o GPU měření; porovnání FPS s vypnutým canvas AA dosud nebylo provedeno.
+
 `pnpm exec tsx --test tests/gpu-diagnostics.test.ts`: **3/3 testů prošlo**. Pokrývají skutečný Intel renderer navzdory požadavku high-performance, rozpoznání GTX 1060, softwarový renderer, nejednoznačné názvy, skrytá data a nedostupný kontext. Tyto testy nejsou GPU benchmark. Ověření integrované hry a nové FPS výsledky musí uvádět aktuální snapshot, rozlišení a skutečný renderer.

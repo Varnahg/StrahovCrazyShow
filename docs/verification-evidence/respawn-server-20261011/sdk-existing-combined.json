@@ -1,0 +1,256 @@
+{
+  "startedAt": "2026-10-11T17:39:51.312Z",
+  "endpoint": "http://127.0.0.1:2568",
+  "protocol": 5,
+  "spawn": {
+    "x": 110,
+    "z": 12,
+    "y": -2.143999934196472
+  },
+  "carSpawn": {
+    "x": 110,
+    "z": 16,
+    "yaw": 0
+  },
+  "collision": {
+    "mode": "native-dmr-and-independent-authored-assets",
+    "sourcePhotogrammetry": "reference-only"
+  },
+  "completed": true,
+  "lastStage": "ownership rejection",
+  "checks": [
+    "guest session and private HTTP endpoints return403; public health contains no presence",
+    "presence of both clients",
+    "enter car",
+    "drive car",
+    "second client receives actual car motion",
+    "reject car exit while moving",
+    "brake before safe exit",
+    "A turns the real front wheels left",
+    "A changes physical heading while rolling",
+    "stop after A turn",
+    "D turns the real front wheels right",
+    "D changes physical heading while reversing",
+    "S reverse on native campus collisions",
+    "W brakes reverse before driving forward",
+    "final handbrake before safe exit",
+    "exit and park car",
+    "enter moved car",
+    "exit moved car again",
+    "global chat",
+    "contact request",
+    "accepted contact",
+    "both clients have accepted contact",
+    "private chat",
+    "blocked contact removal",
+    "new explicit blocked DM rejection",
+    "server movement",
+    "own event",
+    "ownership rejection",
+    "singleton, event ownership, session resume and public weather verified"
+  ],
+  "stages": [
+    {
+      "name": "car entry at canonical parking spawn",
+      "driver": {
+        "x": 110.00030517578125,
+        "y": -2.3917190551757814,
+        "z": 16.00011444091797,
+        "yaw": -5.646801059944408e-7,
+        "speed": 0.0034620421967132683,
+        "ack": 24,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 110.00030517578125,
+        "y": -2.3917190551757814,
+        "z": 16.00011444091797,
+        "yaw": -5.646801059944408e-7,
+        "speed": 0.0034620421967132683,
+        "ack": 24,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0,
+      "observerSteering": 0
+    },
+    {
+      "name": "W forward motion received by both clients",
+      "driver": {
+        "x": 110.00799560546875,
+        "y": -2.431627702713013,
+        "z": 19.031150817871094,
+        "yaw": 0.00021853934743980332,
+        "speed": 4.631380352423839,
+        "ack": 84,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 110.00799560546875,
+        "y": -2.431627702713013,
+        "z": 19.031150817871094,
+        "yaw": 0.00021853934743980332,
+        "speed": 4.631380352423839,
+        "ack": 84,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0,
+      "observerSteering": 0
+    },
+    {
+      "name": "Space stopped car",
+      "driver": {
+        "x": 110.01393127441406,
+        "y": -2.465182971954346,
+        "z": 21.672588348388672,
+        "yaw": -0.000384645693731188,
+        "speed": 0.003312716871352868,
+        "ack": 154,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 110.01393127441406,
+        "y": -2.465182971954346,
+        "z": 21.672588348388672,
+        "yaw": -0.000384645693731188,
+        "speed": 0.003312716871352868,
+        "ack": 154,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0,
+      "observerSteering": 0
+    },
+    {
+      "name": "A low-speed forward turn",
+      "driver": {
+        "x": 110.02932739257812,
+        "y": -2.4664501667022707,
+        "z": 21.737703323364258,
+        "yaw": 0.009698658972711374,
+        "speed": 0.35928431340855843,
+        "ack": 192,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 110.02932739257812,
+        "y": -2.4664501667022707,
+        "z": 21.737703323364258,
+        "yaw": 0.009698658972711374,
+        "speed": 0.35928431340855843,
+        "ack": 192,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0.3226992095706046,
+      "observerSteering": 0.3226992095706046
+    },
+    {
+      "name": "D low-speed reverse turn",
+      "driver": {
+        "x": 110.06304168701172,
+        "y": -2.465419960021973,
+        "z": 21.609149932861328,
+        "yaw": 0.033074461431552016,
+        "speed": -0.3600326384571107,
+        "ack": 291,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 110.06304168701172,
+        "y": -2.465419960021973,
+        "z": 21.609149932861328,
+        "yaw": 0.033074461431552016,
+        "speed": -0.3600326384571107,
+        "ack": 291,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": -0.3676992095706046,
+      "observerSteering": -0.3676992095706046
+    },
+    {
+      "name": "S reverse",
+      "driver": {
+        "x": 109.9683609008789,
+        "y": -2.429825496673584,
+        "z": 18.97018051147461,
+        "yaw": 0.04079352176596466,
+        "speed": -3.832260582722815,
+        "ack": 340,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 109.9683609008789,
+        "y": -2.429825496673584,
+        "z": 18.97018051147461,
+        "yaw": 0.04079352176596466,
+        "speed": -3.832260582722815,
+        "ack": 340,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0,
+      "observerSteering": 0
+    },
+    {
+      "name": "W recovers from reverse",
+      "driver": {
+        "x": 109.99464416503906,
+        "y": -2.436940383911133,
+        "z": 19.447654724121094,
+        "yaw": 0.04085025764428256,
+        "speed": 3.3301563524165902,
+        "ack": 402,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 109.99464416503906,
+        "y": -2.436940383911133,
+        "z": 19.447654724121094,
+        "yaw": 0.04085025764428256,
+        "speed": 3.3301563524165902,
+        "ack": 402,
+        "vehicle": true,
+        "zone": "outside"
+      },
+      "steering": 0,
+      "observerSteering": 0
+    },
+    {
+      "name": "safe exit and persistent parking",
+      "driver": {
+        "x": 112.75273132324219,
+        "y": -2.4134066104888916,
+        "z": 20.65871238708496,
+        "yaw": 0.040242619054521374,
+        "speed": 0,
+        "ack": 472,
+        "vehicle": false,
+        "zone": "outside"
+      },
+      "observer": {
+        "x": 112.75273132324219,
+        "y": -2.4134066104888916,
+        "z": 20.65871238708496,
+        "yaw": 0.040242619054521374,
+        "speed": 0,
+        "ack": 472,
+        "vehicle": false,
+        "zone": "outside"
+      },
+      "observerSteering": 0
+    }
+  ],
+  "status": "passed",
+  "exitCode": 0,
+  "finishedAt": "2026-10-11T17:40:05.487Z"
+}

@@ -28,11 +28,15 @@ const source = {
     },
     {
       id: "great-strahov-stadium",
+      modelScope: plan.stadium.access.policy.mode,
+      interiorPubliclyAccessible: false,
       origin: { ...STADIUM_PLAN.center, y: plan.stadium.baseY, yaw: 0 },
       parts: plan.parts.filter((p) => p.group === "stadium" && p.lod !== "far"),
     },
     {
       id: "great-strahov-stadium-far",
+      modelScope: plan.stadium.access.policy.mode,
+      interiorPubliclyAccessible: false,
       origin: { ...STADIUM_PLAN.center, y: plan.stadium.baseY, yaw: 0 },
       parts: plan.parts.filter(
         (p) => p.group === "stadium" && p.lod !== "near",
@@ -52,7 +56,11 @@ const source = {
     },
   ],
   metrics: {
-    collisionTriangles: plan.collision.indices.length / 3,
+    collisionTriangles:
+      (plan.collision.indices.length +
+        plan.twoSidedRoofCollision.indices.length +
+        plan.twoSidedExteriorCollision.indices.length) /
+      3,
     nearTriangles: plan.parts
       .filter((p) => p.lod !== "far")
       .reduce((n, p) => n + p.indices.length / 3, 0),

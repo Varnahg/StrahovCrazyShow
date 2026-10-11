@@ -80,7 +80,9 @@ export class GrassWindPlugin extends MaterialPluginBase {
         CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
         float grassFade = 1.0 - smoothstep(grassViewer.w * 0.72, grassViewer.w, vCampusGrass.z);
         if(vCampusGrass.x > grassFade) discard;
-        surfaceAlbedo *= mix(0.68,1.22,vCampusGrass.y) * (0.83 + vCampusGrass.x * 0.25);
+        // Keep short clumps in the ground's muted family. Reduced tip/clump
+        // contrast avoids bright striped tufts without adding a texture sample.
+        surfaceAlbedo *= mix(0.74,1.1,vCampusGrass.y) * (0.88 + vCampusGrass.x * 0.16);
       `,
       };
     return null;
@@ -105,6 +107,8 @@ export function createGrassMaterial(scene: Scene, state: GrassWindState) {
     physicallyBased: true,
     windDeformed: true,
     source: "project-authored blade geometry and bounded colour variation",
+    paletteProvenance:
+      "2026-10-11 artistic contrast reduction; not a campus reflectance measurement",
   };
   new GrassWindPlugin(material, state);
   return material;

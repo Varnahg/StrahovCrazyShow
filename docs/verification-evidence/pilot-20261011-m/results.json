@@ -1,0 +1,53 @@
+{
+  "status": "passed",
+  "scope": "Technical checkpoint: tests, production build including TypeScript, isolated integration, and independent live/frozen SHA audit. GPU validation pending.",
+  "sourceSnapshotId": "c88f33c4baa80a1d6322b0551c555cb76b4912a4e5995f6d91af2ea06a188ea9",
+  "files": 8107,
+  "tests": {
+    "total": 384,
+    "passed": 384,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "startedAt": "2026-10-11T13:57:29.5256036Z",
+  "finishedAt": "2026-10-11T13:59:34.9446476Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 68.4003629,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 38.5877477,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 18.3482345,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "sourceCheck": "source-check.json",
+  "pipeline": "pipeline-results.json",
+  "publishedSha256": {
+    "source-manifest.json": "191c2d03f2684419ed19a7329fec666cdbc97fb116a90cc4a3b4b968d209ef14",
+    "pipeline-results.json": "83e166ec8e1ddae7868ba9c546ae3c3c62dd6a2d3d7f657ade2ecfb1176b5d5e",
+    "pipeline-test.log": "b5019c7de4f51d4e49f16625770ec8721c27df1eb5bd6af2480097ea3bbec983",
+    "pipeline-build.log": "8e3cc23350308f8e76d79642191543146983f013ca21a5a1c625a2d751673160",
+    "pipeline-test-integration.log": "aface68e5682d0ca68a92ce1f35a2b51d7e7f7f85bb6bd6349a939543931cdf9"
+  },
+  "gpu": {
+    "status": "pending",
+    "note": "Candidate M has no completed matched GPU/FPS result yet. L2 baseline is separate evidence, not a GPU result for M."
+  },
+  "buildNotes": [
+    "Build completed with exit 0; complete log preserves dynamic-import and bundler timing warnings.",
+    "Integration completed with exit 0 and its explicit PASS summary; the retained raw log also contains the room-close diagnostic (4002)."
+  ]
+}

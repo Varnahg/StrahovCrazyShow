@@ -12,7 +12,7 @@ test("baked passenger navigation identifies current composed paths, terrain patc
     "shared/data/terrain-grid.json","shared/data/reality-ground.json","shared/terrain.ts","shared/terrain-patches.ts",
     "shared/data/north-court-terrain-patch.json","shared/data/north-court-style.json","shared/campus-exterior.ts",
     "shared/b6-interior.ts","shared/b6-stairs.ts","shared/b6-entry.ts","shared/b6-facade-plan.ts",
-    "shared/landmark-reality.ts","shared/transit.ts","shared/terrain-entities.ts","shared/data/transit.json",
+    "shared/landmark-reality.ts","shared/stadium-exterior.ts","shared/transit.ts","shared/terrain-entities.ts","shared/data/transit.json",
     "scripts/rebuild-campus-transit-navigation.ts",
   ];
   assert.deepEqual(Object.keys(navigation.sourceHashes).sort(),required.sort(),"new derived surfaces must not be covered by stale raw-map hashes alone");

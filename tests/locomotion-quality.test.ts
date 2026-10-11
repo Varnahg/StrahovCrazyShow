@@ -9,6 +9,7 @@ import {
   createAvatarRig,
 } from "../client/avatar-renderer";
 import { AvatarAnimator } from "../client/animation";
+import { AvatarLodController } from "../client/avatar-lod";
 import { DEFAULT_AVATAR } from "../shared/types";
 
 function setup(preset = 0) {
@@ -21,6 +22,8 @@ function setup(preset = 0) {
   return {
     rig,
     animation,
+    scene,
+    pool,
     dispose() {
       rig.root.dispose();
       pool.dispose();
@@ -30,6 +33,89 @@ function setup(preset = 0) {
   };
 }
 const range = (s: number[]) => Math.max(...s) - Math.min(...s);
+
+test("real near/medium ankle transforms remain continuous through starting and stopping at different stride phases", () => {
+  for (const fps of [30, 60, 144])
+    for (const speed of [1.8, 4.6, 7])
+      for (const stopAt of [2.1, 2.35, 2.6]) {
+        const c = setup(speed === 7 ? 2 : 0);
+        const lod = new AvatarLodController(
+          c.scene,
+          c.pool,
+          c.rig,
+          DEFAULT_AVATAR,
+        );
+        let z = 0,
+          maximumVerticalSpeed = 0,
+          maximumSupportError = 0;
+        const previous = [new Vector3(), new Vector3()];
+        for (let frame = 0; frame <= fps * 4; frame++) {
+          const time = frame / fps;
+          const moving =
+            (time >= 0.5 && time < stopAt) ||
+            (time >= stopAt + 0.15 && time < 3.25);
+          if (moving) z += speed / fps;
+          c.rig.root.position.set(0, 0, z);
+          lod.update({
+            distance: time < 1.5 ? 0 : 20,
+            quality: "low",
+            position: c.rig.root.position,
+            yaw: 0,
+          });
+          c.animation.update(
+            {
+              position: c.rig.root.position,
+              yaw: 0,
+              grounded: true,
+              groundHeight: () => 0,
+            },
+            1 / fps,
+          );
+          for (const [side, foot] of [
+            c.rig.leftFoot,
+            c.rig.rightFoot,
+          ].entries()) {
+            foot.computeWorldMatrix(true);
+            const actual = foot.getAbsolutePosition();
+            if (frame)
+              maximumVerticalSpeed = Math.max(
+                maximumVerticalSpeed,
+                Math.abs(actual.y - previous[side].y) * fps,
+              );
+            previous[side].copyFrom(actual);
+            const contact = side
+              ? c.animation.contacts.right
+              : c.animation.contacts.left;
+            if (contact.planted)
+              maximumSupportError = Math.max(
+                maximumSupportError,
+                Math.hypot(
+                  actual.x - contact.target.x,
+                  actual.y - contact.target.y,
+                  actual.z - contact.target.z,
+                ),
+              );
+          }
+          assert.equal(c.rig.root.position.y, 0);
+        }
+        // A continuity bound, not a claim of measured human biomechanics. The
+        // previous 144Hz start/stop jumped at 18.3/15.3m/s; smaller dt must not
+        // amplify a fixed one-frame teleport. Existing stricter steady-state
+        // sole, support and head tests remain unchanged.
+        assert.ok(
+          maximumVerticalSpeed < 5,
+          `${speed}m/s, ${fps}Hz, stop ${stopAt}: ankle discontinuity ${maximumVerticalSpeed}m/s`,
+        );
+        assert.ok(
+          maximumSupportError < 0.003,
+          `stance ankle failed to reach support: ${maximumSupportError}m`,
+        );
+        assert.equal(lod.level, "medium");
+        assert.ok(c.rig.skinnedBody!.medium.every((mesh) => mesh.isEnabled()));
+        assert.equal(c.animation.gait, "idle");
+        c.dispose();
+      }
+});
 
 test("steady locomotion has a small continuous head excursion and lets both hands swing behind the torso at 30/60/144 Hz", () => {
   for (const speed of [1.8, 4.6, 7])

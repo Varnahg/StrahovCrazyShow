@@ -1,3 +1,4 @@
+import { t, localizeText, useLocale } from "./i18n";
 import { useEffect, useRef } from "react";
 import { EMOTES, textEntryTarget } from "./interaction";
 import "./interaction.css";
@@ -11,6 +12,7 @@ export function EmoteMenu({
   onClose: () => void;
   onChoose: (emoji: string) => void;
 }) {
+  useLocale();
   const menu = useRef<HTMLDivElement>(null),
     close = useRef(onClose),
     choose = useRef(onChoose);
@@ -68,17 +70,17 @@ export function EmoteMenu({
         className="emote-menu"
         role="dialog"
         aria-modal="true"
-        aria-label="Rychlá gesta"
+        aria-label={t("Rychlá gesta")}
         ref={menu}
       >
         <header>
           <div>
-            <small>Dej o sobě vědět</small>
-            <strong>Rychlá gesta</strong>
+            <small>{t("Dej o sobě vědět")}</small>
+            <strong>{t("Rychlá gesta")}</strong>
           </div>
           <button
             type="button"
-            aria-label="Zavřít rychlá gesta"
+            aria-label={t("Zavřít rychlá gesta")}
             onClick={onClose}
           >
             ×
@@ -93,13 +95,13 @@ export function EmoteMenu({
             >
               <kbd>{item.key}</kbd>
               <span aria-hidden="true">{item.emoji}</span>
-              <strong>{item.label}</strong>
+              <strong>{localizeText(item.label)}</strong>
             </button>
           ))}
         </div>
         <p>
-          Vyber myší nebo klávesou 1–4. <kbd>G</kbd> / <kbd>Esc</kbd> zavře
-          nabídku.
+          {t("Vyber myší nebo klávesou 1–4.")} <kbd>G</kbd> / <kbd>Esc</kbd>{" "}
+          {t("zavře nabídku.")}
         </p>
       </div>
     </div>

@@ -1,0 +1,162 @@
+{
+  "startedAt": "2026-10-11T19:15:20.322Z",
+  "finishedAt": "2026-10-11T19:15:22.003Z",
+  "scope": "CPU plan/cache comparison on actual Rapier static world; no renderer/GPU/FPS. Input hashes cover named navigation/physics sources, not a complete game snapshot. Chunk budget is cooperative; one native call, JIT or GC can exceed it.",
+  "inputs": {
+    "client/map-navigation.ts": "9142676a040da5d5f785390269ba0cfa2d318ba54ae69a181fd831f25574524a",
+    "client/navigation-physics.ts": "cdd24d1dbe8308b580039a2333821c42d73048b3ba2291e8f8734bd9d7c27499",
+    "tests/map-navigation.test.ts": "c396069fdb77196297368409315cfbe5030828067d4a9e930fb1a67f4a935c14",
+    "shared/simulation.ts": "d4678e39bf9905b254cb07a5cdc67e13738036dc45950ccd073a3b7dd573e73c",
+    "shared/campus-routes.ts": "71ab953c15386d9b5491f5b8189746cf612e24f402f1333427739ad93b63bcd5",
+    "shared/streets.ts": "b216be738513a39bb81c42fddacb78fa4ad0a2a6eb2da0a0879cc97d399d7da9",
+    "shared/terrain.ts": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f",
+    "shared/terrain-patches.ts": "71bece3e3bb764b690cc59b77573fa8f60e38afae3f2e9d03cb0213b1b8b0c25",
+    "shared/landmark-reality.ts": "a96539cb85b272911a47ab24af1aae5540227be01b321ac0dcfc6b81e2b893e9",
+    "shared/stadium-exterior.ts": "5a4ff8cf5077a8b47128504c388614bde31b2eb646967c631918f3231d4cc6a1",
+    "shared/data/streets.json": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14",
+    "shared/data/terrain-grid.json": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+    "shared/data/north-court-terrain-patch.json": "8ab204a289b1eabc45359c56fca050170f1729f7832da15345ed4c2f7b35c292"
+  },
+  "scenarios": [
+    {
+      "id": "sports",
+      "distance": 20,
+      "first": {
+        "wallMs": 9.542999999999893,
+        "budgetMs": 3,
+        "chunks": 2,
+        "totalWorkMs": 6.597500000000082,
+        "maxChunkMs": 5.174800000000005,
+        "maxUnitMs": 5.148100000000113,
+        "searches": 1,
+        "graphSearches": 0,
+        "clearanceChecks": 1,
+        "maximumPhysicsUnitMs": 3.5532999999998083
+      },
+      "cached": {
+        "calls": 600,
+        "wallMs": 5.713700000000017,
+        "clearanceChecks": 0,
+        "searches": 0
+      },
+      "progress": {
+        "samples": 120,
+        "mapCalls": 240,
+        "wallMs": 5.710299999999961,
+        "clearanceChecks": 60,
+        "searches": 0,
+        "prunes": 60
+      },
+      "syncAfterWarmup": {
+        "wallMs": 2.4120000000000346,
+        "clearanceChecks": 1,
+        "graphSearches": 0
+      }
+    },
+    {
+      "id": "rko",
+      "distance": 98.88641292493782,
+      "first": {
+        "wallMs": 62.0643,
+        "budgetMs": 3,
+        "chunks": 15,
+        "totalWorkMs": 49.251399999999194,
+        "maxChunkMs": 5.3396000000000186,
+        "maxUnitMs": 3.7275999999999385,
+        "searches": 1,
+        "graphSearches": 1,
+        "clearanceChecks": 53,
+        "maximumPhysicsUnitMs": 3.6195999999999913
+      },
+      "cached": {
+        "calls": 600,
+        "wallMs": 4.173000000000002,
+        "clearanceChecks": 0,
+        "searches": 0
+      },
+      "progress": {
+        "samples": 120,
+        "mapCalls": 240,
+        "wallMs": 5.732500000000073,
+        "clearanceChecks": 120,
+        "searches": 0,
+        "prunes": 120
+      },
+      "syncAfterWarmup": {
+        "wallMs": 30.06860000000006,
+        "clearanceChecks": 53,
+        "graphSearches": 1
+      }
+    },
+    {
+      "id": "b6",
+      "distance": 292.25648779469435,
+      "first": {
+        "wallMs": 79.95679999999993,
+        "budgetMs": 3,
+        "chunks": 20,
+        "totalWorkMs": 58.099300000000085,
+        "maxChunkMs": 3.1014000000000124,
+        "maxUnitMs": 0.7730000000001382,
+        "searches": 1,
+        "graphSearches": 1,
+        "clearanceChecks": 190,
+        "maximumPhysicsUnitMs": 0.6433999999999287
+      },
+      "cached": {
+        "calls": 600,
+        "wallMs": 1.7653000000000247,
+        "clearanceChecks": 0,
+        "searches": 0
+      },
+      "progress": {
+        "samples": 120,
+        "mapCalls": 240,
+        "wallMs": 3.4760000000001128,
+        "clearanceChecks": 120,
+        "searches": 0,
+        "prunes": 120
+      },
+      "syncAfterWarmup": {
+        "wallMs": 41.94679999999994,
+        "clearanceChecks": 190,
+        "graphSearches": 1
+      }
+    },
+    {
+      "id": "stadium191a",
+      "distance": 536.6143818264081,
+      "first": {
+        "wallMs": 379.06129999999985,
+        "budgetMs": 3,
+        "chunks": 41,
+        "totalWorkMs": 123.08910000000014,
+        "maxChunkMs": 3.0435999999999694,
+        "maxUnitMs": 0.6189999999999145,
+        "searches": 1,
+        "graphSearches": 1,
+        "clearanceChecks": 372,
+        "maximumPhysicsUnitMs": 0.5326000000000022
+      },
+      "cached": {
+        "calls": 600,
+        "wallMs": 1.2941000000000713,
+        "clearanceChecks": 0,
+        "searches": 0
+      },
+      "progress": {
+        "samples": 120,
+        "mapCalls": 240,
+        "wallMs": 5.356999999999971,
+        "clearanceChecks": 120,
+        "searches": 0,
+        "prunes": 120
+      },
+      "syncAfterWarmup": {
+        "wallMs": 85.1555000000003,
+        "clearanceChecks": 372,
+        "graphSearches": 1
+      }
+    }
+  ]
+}

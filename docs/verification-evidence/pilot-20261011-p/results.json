@@ -1,0 +1,32 @@
+{
+  "status": "failed",
+  "sourceSnapshotId": "891aa382f6bcb81070763618135886b6865b5a50d46df42dfab720a2edd8f018",
+  "files": 8172,
+  "tests": {
+    "total": 469,
+    "passed": 468,
+    "failed": 1
+  },
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 1,
+      "elapsedSeconds": 103.1963335,
+      "log": "pipeline-test.log"
+    }
+  ],
+  "processExitCode": 1,
+  "processExitEvidence": "Root observed terminal exec session 61090 complete with exit 1; build and integration did not run.",
+  "failure": "stadium-assets.test.ts requires docs/reality-pack/landmarks/geometry-source.json, which was missing from the frozen fixture set. The exact static fixture is added to the source manifest for P2; the assertion remains unchanged.",
+  "notRun": [
+    "pnpm build",
+    "pnpm test:integration",
+    "GPU QA"
+  ],
+  "frozenSha": {
+    "checked": 8172,
+    "errors": [],
+    "status": "passed"
+  },
+  "archivedAt": "2026-10-11T19:27:39.985Z"
+}
