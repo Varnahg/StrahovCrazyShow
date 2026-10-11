@@ -1,0 +1,40 @@
+{
+  "status": "failed",
+  "sourceSnapshotId": "634de03d43d0d694b0db93b3b470a2a116cddb9faedd1d4faabf18af35b61e5e",
+  "files": 8175,
+  "archiveCapturedAt": "2026-10-11T20:46:41.631Z",
+  "tests": {
+    "reported": 466,
+    "passed": 464,
+    "failed": 2
+  },
+  "pipeline": {
+    "sourceSnapshotId": "634de03d43d0d694b0db93b3b470a2a116cddb9faedd1d4faabf18af35b61e5e",
+    "files": 8175,
+    "startedAt": "2026-10-11T20:42:33.7004799Z",
+    "stages": [
+      {
+        "command": "pnpm test",
+        "exitCode": 1,
+        "elapsedSeconds": 75.3960128,
+        "log": "pipeline-test.log"
+      }
+    ]
+  },
+  "reason": "The new managed worktree initially contained four unmaterialized Git LFS pointers. Two vegetation test modules failed parsing GLB input, so not all individual tests could be registered. This is not a 471-test completed run.",
+  "unmaterializedAssets": [
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "public/models/vegetation/realistic/strahov-individual-trees.glb",
+    "public/models/vegetation/runtime/far.glb"
+  ],
+  "repair": "git lfs checkout materialized all four local LFS objects (564 MB). Tests were not weakened and the failed frozen tree was not modified. A fresh P5 snapshot is required.",
+  "build": "not run",
+  "integration": "not run",
+  "gpuAcceptance": "not run",
+  "publishedSha256": {
+    "source-manifest.json": "36e46798cd52bd0a0c587272a6b0421934bd62c1535eaa36520c1e2b562b8ec4",
+    "pipeline-results.json": "c2c291ca4cc0c458228208f013d515016731c1830c6cbf6cc4a4a2ab9ffc2b7d",
+    "pipeline-test.log": "497f060bf58ca445fd87cec3064dd7375c19786762309ddbfa0ccee300ecc684"
+  }
+}

@@ -70,7 +70,7 @@
     }
   </style>
   <header>
-    <h1>Kontrola lokomoce · vlevo O2, vpravo aktuální oprava</h1>
+    <h1>Kontrola lokomoce · vlevo P3, vpravo aktuální oprava</h1>
     <p>
       Stejné produkční modely a oděvy · pohyb měřený podle vzdálenosti · kamera
       myší · žádné změny zdrojových assetů
@@ -79,6 +79,22 @@
   <main>
     <canvas aria-label="Srovnání přirozenosti chůze a běhu"></canvas>
     <aside>
+      <h2>Skutečný Rapier skok</h2>
+      <div id="jump-actions"></div>
+      <div id="jump-events"></div>
+      <label
+        >Čas klipu <output id="jump-time-value">0.000 s</output
+        ><input
+          id="jump-time"
+          type="range"
+          min="0.0166666667"
+          max="4.5"
+          step="0.0166666667"
+          value="0.0166666667"
+          disabled
+          style="width: 100%"
+      /></label>
+      <small id="jump-status">Zvol skok z klidu nebo běhu.</small>
       <h2>Pohyb</h2>
       <div id="actions"></div>
       <button id="steady">Přejít do ustáleného kroku</button

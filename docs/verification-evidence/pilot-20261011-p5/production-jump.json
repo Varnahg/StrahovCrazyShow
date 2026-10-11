@@ -1,0 +1,50 @@
+{
+  "status": "passed",
+  "capturedAt": "2026-10-11T21:00:10.334Z",
+  "sourceSnapshotId": "4601a8c8f94775e37befda81976b1a8457a171be923dd5b24981847b7c34000e",
+  "url": "http://127.0.0.1:4190/",
+  "scope": "Full frozen production game, ordinary HUD, one authenticated synthetic QA multiplayer session. Functional visual smoke; no FPS sample.",
+  "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "quality": "Medium detail",
+  "lighting": "Daytime preview · demo",
+  "canvas": {
+    "attributes": {
+      "aria-label": "Strahov 3D game",
+      "data-b6-stage": "ready",
+      "data-boot-stage": "ready",
+      "data-car-stage": "ready",
+      "data-engine": "Babylon.js v9.30.0",
+      "data-physics-stage": "ready",
+      "data-render-error-count": "0",
+      "data-scan-stage": "reference-only",
+      "data-world-mode": "authored-separate-assets",
+      "height": "720",
+      "style": "touch-action: none; -webkit-tap-highlight-color: transparent;",
+      "tabindex": "1",
+      "touch-action": "none",
+      "width": "1280"
+    },
+    "css": [
+      1280,
+      720
+    ]
+  },
+  "console": [],
+  "actions": [
+    "Native W held850ms, Space100ms, recovered standing pose.",
+    "Native Space100ms from standing; screenshot captured in same tool call while airborne.",
+    "Native W650ms then Space100ms; screenshot captured while airborne after actual movement.",
+    "Returned to Settings through normal UI; render and physics remain ready."
+  ],
+  "screenshots": [
+    "production-after-jump.png",
+    "production-airborne.png",
+    "production-jump-after-movement.png"
+  ],
+  "result": "No visually inverted legs or collapsed torso in the observed jumps; normal standing recovered. Detailed first-grounded contact and phase-scrubbing are separately evidenced by the exact same animation SHA in the component review.",
+  "limits": [
+    "Intel UHD630, not the target GeForce.",
+    "No multiplayer crowd/daytime FPS acceptance.",
+    "This smoke does not sample every possible landing or sharp ground turn."
+  ]
+}

@@ -1,4 +1,4 @@
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { AvatarRig } from "./avatar-renderer";
 import type { Vec3 } from "../shared/types";
@@ -55,6 +55,7 @@ type FootContact = {
   swingFrom: Vec3;
   swingTo: Vec3;
   landingPelvisMax: number;
+  airFrom: Vec3;
 };
 const footContact = (): FootContact => ({
   planted: false,
@@ -79,13 +80,16 @@ const footContact = (): FootContact => ({
   swingFrom: { x: 0, y: 0, z: 0 },
   swingTo: { x: 0, y: 0, z: 0 },
   landingPelvisMax: Infinity,
+  airFrom: { x: 0, y: 0, z: 0 },
 });
 
 /** Articulated, distance-driven gait. Root/camera/collider never bob or move here. */
 export class AvatarAnimator {
   private initialized = false;
   private previousX = 0;
+  private previousY = 0;
   private previousZ = 0;
+  private wasAirborne = false;
   private wasDriving = false;
   private wasMoving = false;
   private measuredSpeed = 0;
@@ -98,11 +102,14 @@ export class AvatarAnimator {
   private gestureTime = 0;
   private gestureWeight = 0;
   private air = 0;
+  private landingWeight = 0;
   private pelvisWorldY = NaN;
   private kneeQuaternion = Quaternion.Identity();
   private legQuaternion = Quaternion.Identity();
   private inverseLeg = Quaternion.Identity();
   private desiredFoot = Quaternion.Identity();
+  private readonly inverseRoot = Matrix.Identity();
+  private readonly localFoot = Vector3.Zero();
   readonly contacts = { left: footContact(), right: footContact() };
   private readonly feet = [this.contacts.left, this.contacts.right];
 
@@ -126,7 +133,9 @@ export class AvatarAnimator {
   reset() {
     this.initialized = false;
     this.measuredSpeed = this.movement = this.cycle = this.air = 0;
+    this.landingWeight = 0;
     this.wasMoving = false;
+    this.wasAirborne = false;
     this.stoppedTime = Infinity;
     this.travelSpeed = 0;
     this.strideSpeed = 0;
@@ -151,11 +160,47 @@ export class AvatarAnimator {
       joint.rotation.set(0, 0, 0);
       joint.rotationQuaternion?.set(0, 0, 0, 1);
     }
+    this.resetContacts();
+  }
+
+  private resetContacts() {
     for (const contact of this.feet) {
       contact.initialized = contact.planted = false;
       contact.settleTime = Infinity;
       contact.releasePhase = NaN;
       contact.swingPlanned = false;
+    }
+  }
+
+  private captureAirPose() {
+    this.rig.root.computeWorldMatrix(true).invertToRef(this.inverseRoot);
+    for (const [contact, foot] of [
+      [this.contacts.left, this.rig.leftFoot],
+      [this.contacts.right, this.rig.rightFoot],
+    ] as const) {
+      foot.computeWorldMatrix(true);
+      Vector3.TransformCoordinatesToRef(
+        foot.getAbsolutePosition(),
+        this.inverseRoot,
+        this.localFoot,
+      );
+      contact.airFrom.x = this.localFoot.x;
+      contact.airFrom.y = this.localFoot.y;
+      contact.airFrom.z = this.localFoot.z;
+    }
+  }
+
+  private translateUnmeasuredGround(deltaY: number) {
+    // Remote snapshots have no grounded bit or floor query. Their root height
+    // is authoritative presentation data, not a measured lower stair tread.
+    for (const contact of this.feet) {
+      contact.anchor.y += deltaY;
+      contact.target.y += deltaY;
+      contact.support.y += deltaY;
+      contact.settleFrom.y += deltaY;
+      contact.swingFrom.y += deltaY;
+      contact.swingTo.y += deltaY;
+      contact.landingPelvisMax += deltaY;
     }
   }
 
@@ -174,6 +219,7 @@ export class AvatarAnimator {
     let distance = this.initialized
       ? Math.hypot(position.x - this.previousX, position.z - this.previousZ)
       : 0;
+    let verticalTravel = this.initialized ? position.y - this.previousY : 0;
     const driving = !!state.vehicle;
     if (
       state.teleport ||
@@ -183,12 +229,14 @@ export class AvatarAnimator {
     ) {
       this.reset();
       distance = 0;
+      verticalTravel = 0;
     }
     if (!this.initialized) {
       this.rig.root.rotation.y = yaw;
       this.initialized = true;
     }
     this.previousX = position.x;
+    this.previousY = position.y;
     this.previousZ = position.z;
     this.wasDriving = driving;
     const speed = driving ? 0 : Math.min(9, distance / dt);
@@ -203,7 +251,10 @@ export class AvatarAnimator {
       this.strideSpeed = speed;
     }
     const moving = this.stoppedTime < 0.06 && !driving;
-    const starting = moving && !this.wasMoving;
+    const airborne = state.grounded === false && !driving;
+    const takingOff = airborne && !this.wasAirborne;
+    const landed = !airborne && this.wasAirborne;
+    const starting = moving && (!this.wasMoving || landed);
     this.movement = mix(this.movement, moving ? 1 : 0, blend(16, dt));
     const gaitSpeed = moving ? this.travelSpeed : this.measuredSpeed;
     const run = clamp((gaitSpeed - 2.4) / 2.2, 0, 1);
@@ -217,6 +268,13 @@ export class AvatarAnimator {
       run,
     );
     if (starting) this.cycle = duty * 0.5 * TAU;
+    if (landed) {
+      // Contacts and swing predictions belong to the old ground position.
+      // Reacquire the actual landing surface, even if horizontal input stayed
+      // held for the whole jump and therefore never triggered a walking start.
+      this.resetContacts();
+      for (const contact of this.feet) contact.toe = 0;
+    }
     if (!driving && distance > dt * 0.12 && state.grounded !== false)
       this.cycle =
         (this.cycle + (Math.min(distance, dt * 9) / stride) * TAU) % TAU;
@@ -234,8 +292,29 @@ export class AvatarAnimator {
     this.air = mix(
       this.air,
       state.grounded === false && !driving ? 1 : 0,
-      blend(18, dt),
+      blend(airborne ? 18 : 36, dt),
     );
+    if (landed || (!airborne && this.air < 0.01)) this.air = 0;
+    if (takingOff) this.landingWeight = 0;
+    if (airborne && verticalTravel < 0 && state.groundHeight) {
+      const floor = state.groundHeight(position.x, position.z);
+      if (floor !== undefined && Number.isFinite(floor)) {
+        const clearance = (position.y - floor) / this.rig.root.scaling.y;
+        this.landingWeight = smooth(clamp(1 - clearance / 0.55, 0, 1));
+      }
+    }
+    // Ground-step smoothing is world-relative. In flight the same state must
+    // travel with the physical root, otherwise rising roots leave the pelvis
+    // behind and can put the IK ankles above their hip pivots.
+    if (
+      (airborne || this.wasAirborne || !state.groundHeight) &&
+      Number.isFinite(this.pelvisWorldY)
+    )
+      this.pelvisWorldY += verticalTravel;
+    if (!state.groundHeight && verticalTravel !== 0)
+      this.translateUnmeasuredGround(verticalTravel);
+    if (takingOff) this.captureAirPose();
+    this.wasAirborne = airborne;
     this.rig.root.rotation.y +=
       shortestAngle(this.rig.root.rotation.y, yaw) * blend(18, dt);
     this.rig.torso.rotation.x = mix(
@@ -283,9 +362,9 @@ export class AvatarAnimator {
       Math.cos(this.cycle * 2) * mix(0.018, 0.023, run);
     const maximumReachable = this.supportedHipHeight(state);
     const pelvisTarget = mix(
-      m.hipHeight,
-      Math.min(pelvis, maximumReachable),
-      this.movement,
+      mix(m.hipHeight, Math.min(pelvis, maximumReachable), this.movement),
+      m.hipHeight - 0.025,
+      this.air,
     );
     const scaleY = this.rig.root.scaling.y;
     if (!Number.isFinite(this.pelvisWorldY))
@@ -293,6 +372,8 @@ export class AvatarAnimator {
     let targetWorldY = position.y + pelvisTarget * scaleY;
     for (const contact of this.feet) {
       if (
+        !airborne &&
+        !!state.groundHeight &&
         !contact.planted &&
         contact.swingPlanned &&
         contact.swingTo.y < position.y + (m.ankleHeight - 0.04) * scaleY
@@ -304,8 +385,9 @@ export class AvatarAnimator {
         );
       }
     }
-    this.pelvisWorldY = Math.min(
+    this.pelvisWorldY = clamp(
       mix(this.pelvisWorldY, targetWorldY, blend(26, dt)),
+      position.y + (m.hipHeight - 0.3) * scaleY,
       position.y + maximumReachable * scaleY,
     );
     this.rig.hips.position.y = (this.pelvisWorldY - position.y) / scaleY;
@@ -379,6 +461,20 @@ export class AvatarAnimator {
       s = Math.sin(yaw);
     const scale = this.rig.root.scaling;
     const lateral = side * m.legSpacing;
+    if (state.grounded === false && !state.vehicle) {
+      contact.initialized = true;
+      const from = contact.airFrom;
+      contact.target.x = root.x + c * from.x * scale.x + s * from.z * scale.z;
+      contact.target.y = root.y + from.y * scale.y;
+      contact.target.z = root.z - s * from.x * scale.x + c * from.z * scale.z;
+      contact.yaw = yaw;
+      // A flight pose has no world-anchored supporting shoe or planned lower
+      // tread. The take-off origin follows the root, including turns in flight.
+      contact.planted = false;
+      contact.swingPlanned = false;
+      contact.releasePhase = NaN;
+      return;
+    }
     const forwardReach = stride * duty * 0.5;
     const heelPitch = -0.16;
     const toePitch = mix(0.5, 0.62, run);
@@ -650,9 +746,20 @@ export class AvatarAnimator {
     }
     // Airborne leg fold blends independently of the ground-contact state.
     localX = mix(localX, lateral, this.air);
-    localY = mix(localY, m.ankleHeight + (side < 0 ? 0.2 : 0.14), this.air);
-    localZ = mix(localZ, side < 0 ? 0.11 : -0.09, this.air);
-    if (this.air > 0.5) contact.planted = false;
+    // Explicit airborne descent and a real floor query prepare extension
+    // before touchdown. The grounded sample can then establish sole contact
+    // immediately instead of keeping a folded leg hovering after collision.
+    const flightY = mix(
+      m.ankleHeight + (side < 0 ? 0.2 : 0.14),
+      m.ankleHeight - 0.025,
+      this.landingWeight,
+    );
+    const flightZ = mix(side < 0 ? 0.11 : -0.09, 0, this.landingWeight);
+    localY = mix(localY, flightY, this.air);
+    localZ = mix(localZ, flightZ, this.air);
+    // During the brief landing extension the target may already be a ground
+    // point, but the displayed ankle has not reached it yet.
+    if (this.air > 0) contact.planted = false;
     const vx = localX - lateral,
       vy = localY - this.rig.hips.position.y,
       vz = localZ;
