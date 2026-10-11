@@ -85,7 +85,9 @@ const footContact = (): FootContact => ({
 export class AvatarAnimator {
   private initialized = false;
   private previousX = 0;
+  private previousY = 0;
   private previousZ = 0;
+  private wasAirborne = false;
   private wasDriving = false;
   private wasMoving = false;
   private measuredSpeed = 0;
@@ -127,6 +129,7 @@ export class AvatarAnimator {
     this.initialized = false;
     this.measuredSpeed = this.movement = this.cycle = this.air = 0;
     this.wasMoving = false;
+    this.wasAirborne = false;
     this.stoppedTime = Infinity;
     this.travelSpeed = 0;
     this.strideSpeed = 0;
@@ -174,6 +177,7 @@ export class AvatarAnimator {
     let distance = this.initialized
       ? Math.hypot(position.x - this.previousX, position.z - this.previousZ)
       : 0;
+    let verticalTravel = this.initialized ? position.y - this.previousY : 0;
     const driving = !!state.vehicle;
     if (
       state.teleport ||
@@ -183,12 +187,14 @@ export class AvatarAnimator {
     ) {
       this.reset();
       distance = 0;
+      verticalTravel = 0;
     }
     if (!this.initialized) {
       this.rig.root.rotation.y = yaw;
       this.initialized = true;
     }
     this.previousX = position.x;
+    this.previousY = position.y;
     this.previousZ = position.z;
     this.wasDriving = driving;
     const speed = driving ? 0 : Math.min(9, distance / dt);
@@ -203,7 +209,9 @@ export class AvatarAnimator {
       this.strideSpeed = speed;
     }
     const moving = this.stoppedTime < 0.06 && !driving;
-    const starting = moving && !this.wasMoving;
+    const airborne = state.grounded === false && !driving;
+    const landed = !airborne && this.wasAirborne;
+    const starting = moving && (!this.wasMoving || landed);
     this.movement = mix(this.movement, moving ? 1 : 0, blend(16, dt));
     const gaitSpeed = moving ? this.travelSpeed : this.measuredSpeed;
     const run = clamp((gaitSpeed - 2.4) / 2.2, 0, 1);
@@ -217,6 +225,17 @@ export class AvatarAnimator {
       run,
     );
     if (starting) this.cycle = duty * 0.5 * TAU;
+    if (landed) {
+      // Contacts and swing predictions belong to the old ground position.
+      // Reacquire the actual landing surface, even if horizontal input stayed
+      // held for the whole jump and therefore never triggered a walking start.
+      for (const contact of this.feet) {
+        contact.initialized = contact.planted = false;
+        contact.swingPlanned = false;
+        contact.releasePhase = NaN;
+        contact.settleTime = Infinity;
+      }
+    }
     if (!driving && distance > dt * 0.12 && state.grounded !== false)
       this.cycle =
         (this.cycle + (Math.min(distance, dt * 9) / stride) * TAU) % TAU;
@@ -236,6 +255,12 @@ export class AvatarAnimator {
       state.grounded === false && !driving ? 1 : 0,
       blend(18, dt),
     );
+    // Ground-step smoothing is world-relative. In flight the same state must
+    // travel with the physical root, otherwise rising roots leave the pelvis
+    // behind and can put the IK ankles above their hip pivots.
+    if ((airborne || this.wasAirborne) && Number.isFinite(this.pelvisWorldY))
+      this.pelvisWorldY += verticalTravel;
+    this.wasAirborne = airborne;
     this.rig.root.rotation.y +=
       shortestAngle(this.rig.root.rotation.y, yaw) * blend(18, dt);
     this.rig.torso.rotation.x = mix(
@@ -283,9 +308,9 @@ export class AvatarAnimator {
       Math.cos(this.cycle * 2) * mix(0.018, 0.023, run);
     const maximumReachable = this.supportedHipHeight(state);
     const pelvisTarget = mix(
-      m.hipHeight,
-      Math.min(pelvis, maximumReachable),
-      this.movement,
+      mix(m.hipHeight, Math.min(pelvis, maximumReachable), this.movement),
+      m.hipHeight - 0.025,
+      this.air,
     );
     const scaleY = this.rig.root.scaling.y;
     if (!Number.isFinite(this.pelvisWorldY))
@@ -293,6 +318,7 @@ export class AvatarAnimator {
     let targetWorldY = position.y + pelvisTarget * scaleY;
     for (const contact of this.feet) {
       if (
+        !airborne &&
         !contact.planted &&
         contact.swingPlanned &&
         contact.swingTo.y < position.y + (m.ankleHeight - 0.04) * scaleY
@@ -379,6 +405,22 @@ export class AvatarAnimator {
       s = Math.sin(yaw);
     const scale = this.rig.root.scaling;
     const lateral = side * m.legSpacing;
+    if (state.grounded === false && !state.vehicle) {
+      if (!contact.initialized) {
+        contact.initialized = true;
+        contact.target.x = root.x + c * lateral * scale.x;
+        contact.target.y = root.y + m.ankleHeight * scale.y;
+        contact.target.z = root.z - s * lateral * scale.x;
+        contact.yaw = yaw;
+        contact.toe = 0;
+      }
+      // A flight pose has no world-anchored supporting shoe or planned lower
+      // tread. Keep the take-off target only as the short air blend's origin.
+      contact.planted = false;
+      contact.swingPlanned = false;
+      contact.releasePhase = NaN;
+      return;
+    }
     const forwardReach = stride * duty * 0.5;
     const heelPitch = -0.16;
     const toePitch = mix(0.5, 0.62, run);
