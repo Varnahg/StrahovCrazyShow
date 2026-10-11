@@ -1,0 +1,159 @@
+import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
+import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
+import { resolve, join, sep } from 'node:path';
+import assert from 'node:assert/strict';
+
+const root = resolve(import.meta.dirname, '..');
+const frozen = join(root, '.cache/performance-snapshot/pilot-20261011-m6');
+const destination = join(root, 'docs/verification-evidence/pilot-20261011-m6');
+const sourceFile = join(frozen, 'source-manifest.json');
+const manifestBytes = await readFile(sourceFile);
+const manifest = JSON.parse(manifestBytes);
+const expectedId = 'c21932439374f0bf23e7a8d514aecb88ef9552c2e89d5e3e2890e4b71da8b896';
+const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+assert.equal(manifest.snapshotId, expectedId);
+assert.equal(digest(JSON.stringify(manifest.files)), expectedId);
+const files = Object.entries(manifest.files);
+assert.equal(files.length, 8144);
+const completedPipeline = JSON.parse(await readFile(join(frozen,'pipeline-results.json'),'utf8'));
+assert.ok(completedPipeline.finishedAt && Number.isFinite(Date.parse(completedPipeline.finishedAt)), 'Pipeline has not finished');
+assert.deepEqual(completedPipeline.stages.map(stage=>[stage.command,stage.exitCode]), [['pnpm test',0],['pnpm build',0],['pnpm test:integration',0]]);
+const startedAt = new Date().toISOString();
+const start = performance.now();
+const mismatches = [], errors = [];
+const computed = { live: {}, frozen: {} };
+const counts = { live: 0, frozen: 0 };
+const bytesRead = { live: 0, frozen: 0 };
+const tasks = files.flatMap(([file, expected]) => [
+  { tree: 'live', base: root, file, expected },
+  { tree: 'frozen', base: frozen, file, expected },
+]);
+let cursor = 0;
+async function hashFile(path) {
+  const hash = createHash('sha256');
+  let bytes = 0;
+  for await (const chunk of createReadStream(path)) { hash.update(chunk); bytes += chunk.length; }
+  return { sha256: hash.digest('hex'), bytes };
+}
+await Promise.all(Array.from({ length: 8 }, async () => {
+  while (cursor < tasks.length) {
+    const task = tasks[cursor++];
+    const path = resolve(task.base, task.file);
+    assert.ok(path.startsWith(task.base + sep));
+    try {
+      const actual = await hashFile(path);
+      computed[task.tree][task.file] = actual.sha256;
+      counts[task.tree]++;
+      bytesRead[task.tree] += actual.bytes;
+      if (actual.sha256 !== task.expected) mismatches.push({ tree: task.tree, file: task.file, expected: task.expected, actual: actual.sha256 });
+    } catch (error) { errors.push({ tree: task.tree, file: task.file, error: String(error) }); }
+  }
+}));
+const wholeTreeIds = Object.fromEntries(['live', 'frozen'].map(tree => [tree,
+  digest(JSON.stringify(Object.fromEntries(files.map(([file]) => [file, computed[tree][file] ?? null]))))]));
+const check = {
+  startedAt, capturedAt: new Date().toISOString(), elapsedSeconds: (performance.now()-start)/1000,
+  sourceSnapshotId: expectedId, manifestSha256: digest(manifestBytes), files: files.length,
+  liveFilesChecked: counts.live, frozenFilesChecked: counts.frozen,
+  liveAndFrozenFilesChecked: counts.live + counts.frozen, bytesRead, computedSourceSnapshotIds: wholeTreeIds,
+  status: mismatches.length === 0 && errors.length === 0 && counts.live === files.length && counts.frozen === files.length ? 'passed' : 'failed',
+  method: 'Independent SHA-256 streaming reads of every manifest path in both live and frozen trees. Shared historical reference paths are read and hashed separately for each tree; no cached hashes or deduplication. Aggregate IDs reconstructed in original manifest key order.',
+  scope: 'All manifest source, assets, tests and configuration. Does not hash docs, build outputs, dependencies or unlisted paths.',
+  testFilesCheckedPerTree: files.filter(([file]) => file.startsWith('tests/')).length,
+  mismatches, errors,
+};
+await mkdir(destination, { recursive: true });
+const publishedFiles = ['source-manifest.json','pipeline-results.json','pipeline-test.log','pipeline-build.log','pipeline-test-integration.log'];
+const publishedSha256 = {};
+for (const file of publishedFiles) {
+  await copyFile(join(frozen, file), join(destination, file));
+  const [source, copy] = await Promise.all([hashFile(join(frozen,file)),hashFile(join(destination,file))]);
+  assert.equal(copy.sha256, source.sha256);
+  publishedSha256[file] = copy.sha256;
+}
+await writeFile(join(destination,'source-check.json'), JSON.stringify(check,null,2)+'\n');
+const pipeline = JSON.parse(await readFile(join(destination,'pipeline-results.json'),'utf8'));
+assert.equal(pipeline.sourceSnapshotId, expectedId);
+assert.equal(pipeline.files, files.length);
+const testLog = await readFile(join(destination,'pipeline-test.log'),'utf8');
+const testCount = kind => {
+  const match = testLog.match(new RegExp('^.*?\\b'+kind+' (\\d+)\\s*$', 'm'));
+  assert.ok(match, 'Missing test log count: '+kind);
+  return Number(match[1]);
+};
+const tests = { total: testCount('tests'), passed: testCount('pass'), failed: testCount('fail'),
+  cancelled: testCount('cancelled'), skipped: testCount('skipped'), todo: testCount('todo') };
+assert.equal(tests.total, tests.passed);
+const results = {
+  status: check.status === 'passed' && pipeline.stages.every(stage=>stage.exitCode===0) && tests.failed===0 ? 'passed' : 'failed',
+  scope: 'Technical checkpoint: tests, production build including TypeScript, isolated integration, and independent live/frozen SHA audit. GPU validation pending.',
+  sourceSnapshotId: expectedId, files: files.length, tests,
+  startedAt: pipeline.startedAt, finishedAt: pipeline.finishedAt, stages: pipeline.stages,
+  sourceCheck: 'source-check.json', pipeline: 'pipeline-results.json', publishedSha256,
+  gpu: { status: 'pending', note: 'M6 has no completed matched full-game GPU/FPS result yet. Prior L2/M measurements, standalone component previews and NullEngine contract controls are separate evidence and do not establish M6 FPS.' },
+  buildNotes: [
+    'Build completed with exit 0; complete log preserves dynamic-import and bundler timing warnings.',
+    'Integration completed with exit 0 and its explicit PASS summary; the retained raw log also contains the room-close diagnostic (4002).',
+  ],
+};
+assert.ok(pipeline.finishedAt);
+assert.deepEqual(pipeline, completedPipeline, 'Pipeline changed during archival');
+const proofRoot=join(root,'docs/verification-evidence/cinematic-pipeline-contract-20261011');
+const proof=JSON.parse(await readFile(join(proofRoot,'results.json'),'utf8'));
+assert.equal(proof.positive.exitCode,0);
+assert.equal(proof.negative.exitCode,1);
+assert.equal(proof.negative.status,'expected-failure-confirmed');
+assert.equal(proof.files['positive.test.ts.txt'],manifest.files['tests/cinematic-pipeline.test.ts']);
+assert.equal(proof.positive.cinematicSourceSha256,manifest.files['client/cinematic.ts']);
+const proofDestination=join(destination,'registration-contract');
+await mkdir(proofDestination,{recursive:true});
+const proofSha256={};
+for(const file of ['results.json',...Object.keys(proof.files)]){
+  await copyFile(join(proofRoot,file),join(proofDestination,file));
+  const sourceHash=(await hashFile(join(proofRoot,file))).sha256;
+  const copyHash=(await hashFile(join(proofDestination,file))).sha256;
+  assert.equal(copyHash,sourceHash);
+  if(proof.files[file]) assert.equal(copyHash,proof.files[file]);
+  proofSha256[file]=copyHash;
+}
+results.registrationContract={
+  evidence:'registration-contract/results.json', positiveControl:'1/1 passed, exit 0',
+  negativeM4Control:'0/1 passed, 1 expected failure, exit 1; manager undefined before pipeline construction',
+  testSourceMatchesFrozenM6:true, cinematicSourceMatchesFrozenM6:true,
+  fullSuiteAlsoIncludesStrengthenedTest:tests.total===403 && tests.passed===403,
+  limitations:'Node/NullEngine contract checks, not shader execution, asset loading, GPU performance or FPS. Pipeline construction cannot mask the prerequisite manager assertion.',
+  copiedEvidenceSha256:proofSha256,
+};
+const m5Frozen=join(root,'.cache/performance-snapshot/pilot-20261011-m5');
+const m5ManifestBytes=await readFile(join(m5Frozen,'source-manifest.json'));
+const m5Manifest=JSON.parse(m5ManifestBytes);
+assert.equal(m5Manifest.snapshotId,proof.positive.cinematicMatchesM5SourceSnapshotId);
+let m5Pipeline;
+try { m5Pipeline=await readFile(join(m5Frozen,'pipeline-results.json'),'utf8'); } catch(error) { if(error.code!=='ENOENT') throw error; }
+assert.equal(m5Pipeline,undefined,'Recheck M5 lineage: a pipeline record now exists');
+results.lineage={
+  registrationFix:{checkpoint:'M5',sourceSnapshotId:m5Manifest.snapshotId,fullPipelineStatus:'not-run',acceptanceStatus:'intermediate-only'},
+  strengthenedRegression:{checkpoint:'M6',sourceSnapshotId:expectedId,assertsManagerBeforePipelineConstruction:true},
+  note:'The registration fix entered M5. M5 was frozen but had no full pipeline and is not a successful acceptance checkpoint. M6 adds the strengthened positive/negative regression and has the complete pipeline recorded here.',
+};
+await writeFile(join(destination,'results.json'),JSON.stringify(results,null,2)+'\n');
+await copyFile(import.meta.filename,join(destination,'audit-live-frozen.mjs.txt'));
+const m5Destination=join(root,'docs/verification-evidence/pilot-20261011-m5');
+await mkdir(m5Destination,{recursive:true});
+await copyFile(join(m5Frozen,'source-manifest.json'),join(m5Destination,'source-manifest.json'));
+assert.equal(digest(await readFile(join(m5Destination,'source-manifest.json'))),digest(m5ManifestBytes));
+await writeFile(join(m5Destination,'results.json'),JSON.stringify({
+  status:'intermediate-no-full-pipeline',sourceSnapshotId:m5Manifest.snapshotId,files:Object.keys(m5Manifest.files).length,
+  sourceManifestSha256:digest(m5ManifestBytes),fullPipeline:{status:'not-run',testResult:null,buildResult:null,integrationResult:null},
+  changes:'Explicit registration of postprocess scene component in cinematic.ts. Strong pre-construction regression belongs to M6.',
+  acceptance:'Not an accepted technical checkpoint; M5 freeze and separate visual component QA do not substitute for the complete M6 pipeline.',
+  independentSourceAudit:'No separate M5 source-tree SHA audit is claimed by this archival record; source-manifest preserves its original freeze verification.',
+  gpu:{status:'pending',scope:'No complete production-game FPS result for M5. Component preview is separate.'},
+  nextVerifiedCheckpoint:{name:'M6',sourceSnapshotId:expectedId,results:'../pilot-20261011-m6/results.json'},
+},null,2)+'\n');
+console.log(JSON.stringify({sourceCheck:check,results},null,2));
+assert.equal(check.status,'passed');
+assert.equal(wholeTreeIds.live, expectedId);
+assert.equal(wholeTreeIds.frozen, expectedId);
+assert.equal(results.status,'passed');

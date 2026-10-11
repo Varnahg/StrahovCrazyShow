@@ -1,0 +1,611 @@
+{
+  "auditedAt": "2026-10-11T13:58:40.916Z",
+  "status": "valid-with-documented-limitations",
+  "sourceSnapshotId": "c4586de83cef2b7406122c75eed04abf89796765cc338c0b7dabc92a9c7ad658",
+  "validSampleCount": 6,
+  "excludedSampleCount": 4,
+  "intervalSemantics": "Frozen L2 client/game.ts emits date at benchmark completion, rounds durationSeconds to 0.01 s, and stores avatars as the minimum seen every frame. Start UTC is reconstructed with an additional 5 ms rounding allowance.",
+  "referenceConditions": {
+    "sceneView": {
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "lightingInstant": 1791712800000,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 700,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.2424912452697754,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.0002286434173584,
+          -1,
+          0,
+          0,
+          -0.16001829504966736,
+          0
+        ]
+      }
+    },
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "internalResolution": {
+      "width": 1476,
+      "height": 830
+    },
+    "quality": "low",
+    "renderer": {
+      "vendor": "Google Inc. (Intel)",
+      "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+    },
+    "renderBudgets": {
+      "architectureDetailMetres": 55,
+      "avatarNearMetres": 10,
+      "avatarMediumMetres": 36,
+      "grassRangeMetres": 35,
+      "grassTiles": 16,
+      "grassDensity": 0.375,
+      "b6PropRadiusMetres": 13,
+      "shadowMapSize": 512,
+      "postProcesses": false
+    },
+    "ambient": {
+      "buses": 0,
+      "passengers": 0,
+      "cars": 0
+    }
+  },
+  "samples": [
+    {
+      "file": "baseline-1-day-a.json",
+      "sha256": "2892e2fdd79689116590a6ace4051eaf3cc195d77b5f435a2935d0f577ae01e3",
+      "status": "valid",
+      "invalidReasons": [],
+      "expectedPopulation": 1,
+      "minimumPopulationAcrossFrames": 1,
+      "interval": {
+        "estimatedStartUtc": "2026-10-11T13:40:57.733Z",
+        "endUtc": "2026-10-11T13:41:07.743Z",
+        "startEstimateRoundingAllowanceMs": 5,
+        "fullyInsideMeasuredNetworkCohort": null
+      },
+      "checks": {
+        "sourceSnapshotId": true,
+        "cameraAndLighting": true,
+        "cssViewport": true,
+        "internalResolution": true,
+        "quality": true,
+        "gpu": true,
+        "qualityMode": true,
+        "hardwareScaling": true,
+        "renderBudgets": true,
+        "ambientPopulation": true,
+        "snapshotMatchesNetworkAndManifest": true,
+        "minimumPopulationMatches": true,
+        "durationAtLeastTenSeconds": true,
+        "zeroRenderAndAssetErrors": true,
+        "manualLowQuality": true,
+        "networkIntervalContainment": true
+      },
+      "frames": 341,
+      "durationSeconds": 10.01,
+      "averageFps": 34.1,
+      "p95FrameMs": 37.39999985694885,
+      "p99FrameMs": 47.09999990463257,
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "drawCallsLastFrame": 363,
+      "trianglesAllPassesLastFrame": 813592,
+      "frameBreakdownMeanMs": {
+        "simulation": 0.4829911989900024,
+        "world": 0.06832844560796564,
+        "avatarsAndCamera": 0.25073314691918336,
+        "environment": 0.5809384105492198,
+        "render": 14.472434021510686,
+        "labels": 0.12346040748081599
+      },
+      "lastFrameWorkMs": {
+        "cpuMs": 10.399999856948853,
+        "gpuMs": 24.636401
+      },
+      "finalAvatarLod": {
+        "near": 1,
+        "medium": 0,
+        "far": 0
+      },
+      "finalTreeLod": [
+        1,
+        5,
+        103
+      ],
+      "finalLoadedTreeMeshes": 229
+    },
+    {
+      "file": "baseline-1-day-b.json",
+      "sha256": "591c25ea3aa9a6089e265e4592d5b14d8e9f60d88e3ebadecca2a5434e952224",
+      "status": "valid",
+      "invalidReasons": [],
+      "expectedPopulation": 1,
+      "minimumPopulationAcrossFrames": 1,
+      "interval": {
+        "estimatedStartUtc": "2026-10-11T13:41:18.602Z",
+        "endUtc": "2026-10-11T13:41:28.622Z",
+        "startEstimateRoundingAllowanceMs": 5,
+        "fullyInsideMeasuredNetworkCohort": null
+      },
+      "checks": {
+        "sourceSnapshotId": true,
+        "cameraAndLighting": true,
+        "cssViewport": true,
+        "internalResolution": true,
+        "quality": true,
+        "gpu": true,
+        "qualityMode": true,
+        "hardwareScaling": true,
+        "renderBudgets": true,
+        "ambientPopulation": true,
+        "snapshotMatchesNetworkAndManifest": true,
+        "minimumPopulationMatches": true,
+        "durationAtLeastTenSeconds": true,
+        "zeroRenderAndAssetErrors": true,
+        "manualLowQuality": true,
+        "networkIntervalContainment": true
+      },
+      "frames": 347,
+      "durationSeconds": 10.02,
+      "averageFps": 34.6,
+      "p95FrameMs": 34,
+      "p99FrameMs": 41.30000019073486,
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "drawCallsLastFrame": 363,
+      "trianglesAllPassesLastFrame": 813592,
+      "frameBreakdownMeanMs": {
+        "simulation": 0.44985591987368007,
+        "world": 0.056484142023136015,
+        "avatarsAndCamera": 0.1951008619423902,
+        "environment": 0.479827092772602,
+        "render": 11.261959651018083,
+        "labels": 0.07002882105472795
+      },
+      "lastFrameWorkMs": {
+        "cpuMs": 14.599999904632568,
+        "gpuMs": 25.018733
+      },
+      "finalAvatarLod": {
+        "near": 1,
+        "medium": 0,
+        "far": 0
+      },
+      "finalTreeLod": [
+        1,
+        5,
+        103
+      ],
+      "finalLoadedTreeMeshes": 229
+    },
+    {
+      "file": "baseline-1-day-c.json",
+      "sha256": "962ded0a8cecf234eda09b19c3069cd968b04fbc41f67bbebd194a2d5557b36c",
+      "status": "valid",
+      "invalidReasons": [],
+      "expectedPopulation": 1,
+      "minimumPopulationAcrossFrames": 1,
+      "interval": {
+        "estimatedStartUtc": "2026-10-11T13:41:52.904Z",
+        "endUtc": "2026-10-11T13:42:02.934Z",
+        "startEstimateRoundingAllowanceMs": 5,
+        "fullyInsideMeasuredNetworkCohort": null
+      },
+      "checks": {
+        "sourceSnapshotId": true,
+        "cameraAndLighting": true,
+        "cssViewport": true,
+        "internalResolution": true,
+        "quality": true,
+        "gpu": true,
+        "qualityMode": true,
+        "hardwareScaling": true,
+        "renderBudgets": true,
+        "ambientPopulation": true,
+        "snapshotMatchesNetworkAndManifest": true,
+        "minimumPopulationMatches": true,
+        "durationAtLeastTenSeconds": true,
+        "zeroRenderAndAssetErrors": true,
+        "manualLowQuality": true,
+        "networkIntervalContainment": true
+      },
+      "frames": 347,
+      "durationSeconds": 10.03,
+      "averageFps": 34.6,
+      "p95FrameMs": 32.40000009536743,
+      "p99FrameMs": 39.5,
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "drawCallsLastFrame": 363,
+      "trianglesAllPassesLastFrame": 813592,
+      "frameBreakdownMeanMs": {
+        "simulation": 0.4487031784112584,
+        "world": 0.0495677131740779,
+        "avatarsAndCamera": 0.1988472732412025,
+        "environment": 0.49481267132058265,
+        "render": 11.215561959516762,
+        "labels": 0.06599423383773233
+      },
+      "lastFrameWorkMs": {
+        "cpuMs": 11,
+        "gpuMs": 24.773567
+      },
+      "finalAvatarLod": {
+        "near": 1,
+        "medium": 0,
+        "far": 0
+      },
+      "finalTreeLod": [
+        1,
+        5,
+        103
+      ],
+      "finalLoadedTreeMeshes": 229
+    },
+    {
+      "file": "baseline-30-day-a.json",
+      "sha256": "2d314cf4ec6f155e2cd3f94809fa4542d6bc57c3b14c12b46527597151f1b05e",
+      "status": "valid",
+      "invalidReasons": [],
+      "expectedPopulation": 30,
+      "minimumPopulationAcrossFrames": 30,
+      "interval": {
+        "estimatedStartUtc": "2026-10-11T13:44:03.286Z",
+        "endUtc": "2026-10-11T13:44:13.316Z",
+        "startEstimateRoundingAllowanceMs": 5,
+        "fullyInsideMeasuredNetworkCohort": true
+      },
+      "checks": {
+        "sourceSnapshotId": true,
+        "cameraAndLighting": true,
+        "cssViewport": true,
+        "internalResolution": true,
+        "quality": true,
+        "gpu": true,
+        "qualityMode": true,
+        "hardwareScaling": true,
+        "renderBudgets": true,
+        "ambientPopulation": true,
+        "snapshotMatchesNetworkAndManifest": true,
+        "minimumPopulationMatches": true,
+        "durationAtLeastTenSeconds": true,
+        "zeroRenderAndAssetErrors": true,
+        "manualLowQuality": true,
+        "networkIntervalContainment": true
+      },
+      "frames": 304,
+      "durationSeconds": 10.03,
+      "averageFps": 30.3,
+      "p95FrameMs": 41.700000047683716,
+      "p99FrameMs": 54,
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "drawCallsLastFrame": 442,
+      "trianglesAllPassesLastFrame": 1066962,
+      "frameBreakdownMeanMs": {
+        "simulation": 0.5039473701464502,
+        "world": 0.050986840536719875,
+        "avatarsAndCamera": 0.4947368479088733,
+        "environment": 0.5529605189436361,
+        "render": 16.782565789003122,
+        "labels": 0.3302631644826186
+      },
+      "lastFrameWorkMs": {
+        "cpuMs": 16.700000047683716,
+        "gpuMs": 28.833134
+      },
+      "finalAvatarLod": {
+        "near": 3,
+        "medium": 27,
+        "far": 0
+      },
+      "finalTreeLod": [
+        1,
+        5,
+        103
+      ],
+      "finalLoadedTreeMeshes": 229
+    },
+    {
+      "file": "baseline-30-day-b.json",
+      "sha256": "5372468566edfe1be4bdc5418a69a97efa9689d8eddd16746cd1f186167a87fb",
+      "status": "valid",
+      "invalidReasons": [],
+      "expectedPopulation": 30,
+      "minimumPopulationAcrossFrames": 30,
+      "interval": {
+        "estimatedStartUtc": "2026-10-11T13:45:30.069Z",
+        "endUtc": "2026-10-11T13:45:40.069Z",
+        "startEstimateRoundingAllowanceMs": 5,
+        "fullyInsideMeasuredNetworkCohort": true
+      },
+      "checks": {
+        "sourceSnapshotId": true,
+        "cameraAndLighting": true,
+        "cssViewport": true,
+        "internalResolution": true,
+        "quality": true,
+        "gpu": true,
+        "qualityMode": true,
+        "hardwareScaling": true,
+        "renderBudgets": true,
+        "ambientPopulation": true,
+        "snapshotMatchesNetworkAndManifest": true,
+        "minimumPopulationMatches": true,
+        "durationAtLeastTenSeconds": true,
+        "zeroRenderAndAssetErrors": true,
+        "manualLowQuality": true,
+        "networkIntervalContainment": true
+      },
+      "frames": 291,
+      "durationSeconds": 10,
+      "averageFps": 29,
+      "p95FrameMs": 48.200000047683716,
+      "p99FrameMs": 57.799999952316284,
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "drawCallsLastFrame": 434,
+      "trianglesAllPassesLastFrame": 1016574,
+      "frameBreakdownMeanMs": {
+        "simulation": 0.6175257651666596,
+        "world": 0.06151203027705556,
+        "avatarsAndCamera": 0.620274919005194,
+        "environment": 0.7298968985318318,
+        "render": 22.301030933242483,
+        "labels": 0.3532646079243663
+      },
+      "lastFrameWorkMs": {
+        "cpuMs": 20.799999952316284,
+        "gpuMs": 28.439719
+      },
+      "finalAvatarLod": {
+        "near": 1,
+        "medium": 29,
+        "far": 0
+      },
+      "finalTreeLod": [
+        1,
+        5,
+        103
+      ],
+      "finalLoadedTreeMeshes": 229
+    },
+    {
+      "file": "baseline-30-day-c.json",
+      "sha256": "cf68000be964f76950d2597a23621d0824ab022b2350c17691da0e4459fc23c5",
+      "status": "valid",
+      "invalidReasons": [],
+      "expectedPopulation": 30,
+      "minimumPopulationAcrossFrames": 30,
+      "interval": {
+        "estimatedStartUtc": "2026-10-11T13:46:25.992Z",
+        "endUtc": "2026-10-11T13:46:36.012Z",
+        "startEstimateRoundingAllowanceMs": 5,
+        "fullyInsideMeasuredNetworkCohort": true
+      },
+      "checks": {
+        "sourceSnapshotId": true,
+        "cameraAndLighting": true,
+        "cssViewport": true,
+        "internalResolution": true,
+        "quality": true,
+        "gpu": true,
+        "qualityMode": true,
+        "hardwareScaling": true,
+        "renderBudgets": true,
+        "ambientPopulation": true,
+        "snapshotMatchesNetworkAndManifest": true,
+        "minimumPopulationMatches": true,
+        "durationAtLeastTenSeconds": true,
+        "zeroRenderAndAssetErrors": true,
+        "manualLowQuality": true,
+        "networkIntervalContainment": true
+      },
+      "frames": 323,
+      "durationSeconds": 10.02,
+      "averageFps": 32.2,
+      "p95FrameMs": 36.299999952316284,
+      "p99FrameMs": 40.799999952316284,
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0,
+      "drawCallsLastFrame": 428,
+      "trianglesAllPassesLastFrame": 986218,
+      "frameBreakdownMeanMs": {
+        "simulation": 0.5232198083363819,
+        "world": 0.051393194464338085,
+        "avatarsAndCamera": 0.45356037594585596,
+        "environment": 0.5547987543761546,
+        "render": 14.88049535485613,
+        "labels": 0.2674922581427607
+      },
+      "lastFrameWorkMs": {
+        "cpuMs": 15.199999809265137,
+        "gpuMs": 27.360973
+      },
+      "finalAvatarLod": {
+        "near": 1,
+        "medium": 29,
+        "far": 0
+      },
+      "finalTreeLod": [
+        1,
+        5,
+        103
+      ],
+      "finalLoadedTreeMeshes": 229
+    }
+  ],
+  "groups": [
+    {
+      "population": 1,
+      "validIntervals": 3,
+      "files": [
+        "baseline-1-day-a.json",
+        "baseline-1-day-b.json",
+        "baseline-1-day-c.json"
+      ],
+      "medianIntervalAverageFps": 34.6,
+      "medianIntervalP95FrameMs": 34,
+      "medianIntervalP99FrameMs": 41.30000019073486,
+      "scope": "Median of interval summaries, not a pooled frame percentile or a cross-population average."
+    },
+    {
+      "population": 30,
+      "validIntervals": 3,
+      "files": [
+        "baseline-30-day-a.json",
+        "baseline-30-day-b.json",
+        "baseline-30-day-c.json"
+      ],
+      "medianIntervalAverageFps": 30.3,
+      "medianIntervalP95FrameMs": 41.700000047683716,
+      "medianIntervalP99FrameMs": 54,
+      "scope": "Median of interval summaries, not a pooled frame percentile or a cross-population average."
+    }
+  ],
+  "excluded": [
+    {
+      "file": "baseline-discovery.json",
+      "sha256": "44b445bdec6373b4e2e428341508463b2b3083e7f499285fb09de8be68273958",
+      "status": "invalid",
+      "includedInAggregates": false,
+      "reason": "Uncontrolled discovery interval; never part of the formal baseline.",
+      "originalExclusionReason": null,
+      "date": "2026-10-11T13:36:11.207Z",
+      "minimumPopulationAcrossFrames": 1
+    },
+    {
+      "file": "excluded-baseline-concurrent-cpu.json",
+      "sha256": "9353b5532e36e8fb086a03c6d535c11a3350b51793b0e4711d313862365d9dc7",
+      "status": "invalid",
+      "includedInAggregates": false,
+      "reason": "Concurrent targeted tests/CPU microstudy; deliberately excluded.",
+      "originalExclusionReason": "Concurrent targeted test/CPU microstudy during interval",
+      "date": "2026-10-11T13:40:35.796Z",
+      "minimumPopulationAcrossFrames": 1
+    },
+    {
+      "file": "excluded-baseline-30-concurrent-typecheck.json",
+      "sha256": "7af788660ed16d23830a62b3e33c99de840dd5b4f3f6ca8d35a9e9c16ef8d3be",
+      "status": "invalid",
+      "includedInAggregates": false,
+      "reason": "Concurrent avatar core tests/typecheck; deliberately excluded.",
+      "originalExclusionReason": "Concurrent avatar core tests/typecheck were reported; retained as discovery only",
+      "date": "2026-10-11T13:43:10.498Z",
+      "minimumPopulationAcrossFrames": 30
+    },
+    {
+      "file": "excluded-baseline-night-after-cohort.json",
+      "sha256": "956d106cf930dfb7aacfaf7ffd007930f391052330c78d81ce107f2a47ff1227",
+      "status": "invalid",
+      "includedInAggregates": false,
+      "reason": "Night interval extends beyond measured cohort and minimum population fell to one; excluded from 30-avatar evidence.",
+      "originalExclusionReason": null,
+      "date": "2026-10-11T13:47:53.874Z",
+      "minimumPopulationAcrossFrames": 1
+    }
+  ],
+  "network": {
+    "file": "baseline-network.json",
+    "profilesFile": "baseline-network.profiles.json",
+    "measuredStartUtc": "2026-10-11T13:42:48.952Z",
+    "measuredEndUtc": "2026-10-11T13:47:48.953Z",
+    "durationMs": 300001.405,
+    "warmupSeconds": 20,
+    "botCount": 29,
+    "expectedTotalPopulation": 30,
+    "worldCount": 1,
+    "minRowsPerMotion": 30,
+    "maxRowsPerMotion": 30,
+    "movingClients": 29,
+    "serverTickHz": 59.969,
+    "motionHz": 19.953,
+    "errors": [],
+    "resyncsDuringWholeMeasurement": 87,
+    "stopReason": "deadline",
+    "profiles": {
+      "count": 29,
+      "presetCounts": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        4
+      ],
+      "allSixPresetsPresent": true,
+      "issuedIdsExactlyMatchNetworkPositions": true,
+      "importedSourceHashesMatchFrozenManifest": true,
+      "scope": "Successful normal session-issuance payload capture with IDs linked to the network cohort. No independent post-join profile echo was captured."
+    }
+  },
+  "weather": {
+    "fixtureFile": "weather-fixture.json",
+    "fixtureSha256": "aa2030018833952bd83c858ba208ff22c03de20aa7c32432101b88efaad24574",
+    "postRunObservationFile": "baseline-weather-observation.json",
+    "coordinatorObservedStartupFixtureSha256": "aa2030018833952bd83c858ba208ff22c03de20aa7c32432101b88efaad24574",
+    "limitation": "Historical installation is confirmed by coordinator startup output and UI. Post-run HTTP response matches fixture. Baseline JSON lacks weatherAtStart/weatherAtEnd, so exact shader use throughout each interval is not independently embedded."
+  },
+  "limitations": [
+    "Valid formal samples were coordinated without concurrent CPU studies, tests or additional GPU scenes. This is operator evidence; there is no complete OS process-load trace.",
+    "The network cohort contains 87 authority resync flags and no application errors. Raw evidence lacks timestamps for each resync; none can be assigned to or subtracted from the three valid GPU intervals. Network stability is not declared passed.",
+    "Moving avatars occupy different exact positions and LODs at interval end; comparable means identical source, camera, quality, resolution, fixture and population contract, not pixel-identical crowd poses.",
+    "CPU frameBreakdownMs values are interval means; frameWork is the final sample; rendering.statistics is a separate short adaptive window. These scopes are not combined.",
+    "Only Intel UHD 630 at low quality is measured here. No NVIDIA, higher quality, night baseline or 60 FPS success is inferred."
+  ],
+  "fileSha256": {
+    "baseline-network.json": "a7f1d48989a64be83fc27c2b20408c3caa8d651cd430c708f6330fa85fe68697",
+    "baseline-network.profiles.json": "a1982eb5969e028cec8ca65f0abb3c3100abdd6addbe89a60d4acb819e502cce",
+    "baseline-network-harness.ts.txt": "8e98ef8b8c5f3b322d485ca6355e855bf23055862d678a77474a85b98c825a16",
+    "baseline-profile-wrapper.mjs.txt": "4ed130702245dcebfb5934744cc27a425728399e68b5a06b28f115baa5da5d97",
+    "baseline-avatar-presets.ts.txt": "0d078d680f0525c804a8d1712a366fe1071a6a9f1357a550ae58648e896b3073",
+    "baseline-preview.mjs.txt": "374d46dc8bc935912e1b2ca7437ccd6a73988705c24c02f14ea400da14a0db7a",
+    "weather-fixture.json": "aa2030018833952bd83c858ba208ff22c03de20aa7c32432101b88efaad24574",
+    "baseline-weather-observation.json": "4446939527a39a258f34a61715da194fa28294aa0d29b92cca22ef102616f405",
+    "validate-baseline.mjs": "b9e611a3189e5dbb5d7d5fa4b9a426af9177fae3e6b92ac7258212e2be2a2589"
+  }
+}

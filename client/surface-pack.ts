@@ -19,6 +19,24 @@ type SurfaceMetadata = {
   preserveAuthoredPavingJoints?: boolean;
 };
 
+const FAMILIES = new Map(manifest.assets.map((asset) => [asset.kind, asset]));
+const SURFACE_ALIASES: Readonly<Record<string, string>> = {
+  paving_stones: "paving",
+  stone: "sett",
+  cobblestone: "sett",
+  compacted: "gravel",
+};
+
+/** Canonical family drives both the texture and its response to weather. */
+const WET_RESPONSE: Readonly<Record<string, readonly [number, number]>> = {
+  asphalt: [0.12, 0.46],
+  concrete: [0.1, 0.23],
+  paving: [0.1, 0.23],
+  sett: [0.1, 0.23],
+  gravel: [0.18, 0.04],
+  grass: [0.05, 0.02],
+};
+
 /** Mesh UVs are authored in metres / uvMetresPerRepeat, not per object. */
 export function surfaceTexturePlan(metadata?: SurfaceMetadata | null) {
   if (
@@ -28,17 +46,10 @@ export function surfaceTexturePlan(metadata?: SurfaceMetadata | null) {
   )
     return null;
   const rawKind = metadata.surface ?? metadata.surfaceKind;
-  const kind =
-    rawKind === "paving_stones"
-      ? "paving"
-      : ["stone", "cobblestone"].includes(rawKind)
-        ? "sett"
-        : rawKind === "compacted"
-          ? "gravel"
-          : rawKind;
+  const kind = SURFACE_ALIASES[rawKind] ?? rawKind;
   const family =
-    manifest.assets.find((asset) => asset.kind === kind) ??
-    manifest.assets.find((asset) => asset.kind === metadata.surfaceKind);
+    FAMILIES.get(kind) ??
+    FAMILIES.get(SURFACE_ALIASES[metadata.surfaceKind] ?? metadata.surfaceKind);
   if (!family) return null;
   const uv =
     Number.isFinite(metadata.uvMetresPerRepeat) &&
@@ -48,12 +59,12 @@ export function surfaceTexturePlan(metadata?: SurfaceMetadata | null) {
   const metresV = family.metresPerRepeatV ?? family.metresPerRepeat;
   return {
     family,
-    kind,
+    kind: family.kind,
     uScale: uv / family.metresPerRepeat,
     vScale: uv / metresV,
     retainPavingJoints:
       metadata.preserveAuthoredPavingJoints === true &&
-      (kind === "paving" || kind === "sett"),
+      (family.kind === "paving" || family.kind === "sett"),
   };
 }
 
@@ -61,6 +72,7 @@ export function surfaceTexturePlan(metadata?: SurfaceMetadata | null) {
  * appearance evidence remain in the campus reference atlas. */
 export class SurfacePack {
   private converted = new Map<Material, PBRMaterial>();
+  private originals = new Map<PBRMaterial, Material>();
   private textures = new Map<string, Texture>();
   private dryAlbedos = new Map<PBRMaterial, Color3>();
   private pending = new Set<AbstractMesh>();
@@ -140,17 +152,11 @@ export class SurfacePack {
       ...original.metadata,
       physicallyBased: true,
       materialFamily: family.id,
+      materialSurfaceKind: kind,
       textureSource: family.source,
       textureLicense: manifest.license,
       authoredPavingJoints: plan.retainPavingJoints,
-      wettable: [
-        "asphalt",
-        "paving",
-        "sett",
-        "concrete",
-        "gravel",
-        "grass",
-      ].includes(kind),
+      wettable: kind in WET_RESPONSE,
       surfaceScaleProvenance: family.scaleProvenance,
     };
     if (plan.retainPavingJoints && original.diffuseTexture) {
@@ -196,8 +202,9 @@ export class SurfacePack {
     material.zOffset = original.zOffset;
     material.zOffsetUnits = original.zOffsetUnits;
     material.sideOrientation = original.sideOrientation;
-    new CampusSurfaceArtPlugin(material, art);
+    new CampusSurfaceArtPlugin(material, art, plan.retainPavingJoints);
     this.converted.set(original, material);
+    this.originals.set(material, original);
     this.dryAlbedos.set(material, material.albedoColor.clone());
     this.fresh.add(material);
     return material;
@@ -228,34 +235,21 @@ export class SurfacePack {
       Math.min(1, (Number.isFinite(rain) ? rain : 0) / 2),
     );
     const changed = wet !== this.lastWet || quality !== this.lastQuality;
+    if (!changed && this.fresh.size === 0) return;
     const updates = changed ? this.converted.values() : this.fresh.values();
     for (const material of updates) {
       this.stats.materialUpdates++;
       if (material.metadata.wettable) {
-        const kind = material.metadata.surface ?? material.metadata.surfaceKind;
-        const darken =
-          kind === "gravel"
-            ? 0.18
-            : kind === "grass"
-              ? 0.05
-              : kind === "asphalt"
-                ? 0.12
-                : 0.1;
-        const smooth =
-          kind === "asphalt"
-            ? 0.46
-            : kind === "gravel"
-              ? 0.04
-              : kind === "grass"
-                ? 0.02
-                : 0.23;
+        const [darken, smooth] =
+          WET_RESPONSE[material.metadata.materialSurfaceKind];
         material.roughness = 1 - wet * smooth;
         material.albedoColor
           .copyFrom(this.dryAlbedos.get(material)!)
           .scaleInPlace(1 - wet * darken);
       }
       material.disableBumpMap =
-        quality === "low" && material.metadata.surfaceKind === "plaster";
+        quality === "low" &&
+        material.metadata.materialSurfaceKind === "plaster";
     }
     this.fresh.clear();
     this.lastWet = wet;
@@ -271,27 +265,30 @@ export class SurfacePack {
       mesh.onMaterialChangedObservable.remove(observer);
     this.materialObservers.clear();
     this.pending.clear();
-    for (const mesh of this.scene.meshes) {
-      if (mesh.material instanceof MultiMaterial) {
-        mesh.material.subMaterials = mesh.material.subMaterials.map(
-          (material) => this.originalMaterial(material),
-        );
-      } else mesh.material = this.originalMaterial(mesh.material);
-    }
+    for (const mesh of this.scene.meshes)
+      mesh.material = this.originalMaterial(mesh.material);
     for (const [original, material] of this.converted) {
       original.name = material.name;
       material.dispose(false, false);
     }
     for (const texture of this.textures.values()) texture.dispose();
     this.converted.clear();
+    this.originals.clear();
     this.textures.clear();
     this.dryAlbedos.clear();
     this.fresh.clear();
   }
 
   private originalMaterial(material: Material | null): Material | null {
-    for (const [original, converted] of this.converted)
-      if (converted === material) return original;
-    return material;
+    if (material instanceof MultiMaterial) {
+      for (let i = 0; i < material.subMaterials.length; i++)
+        material.subMaterials[i] = this.originalMaterial(
+          material.subMaterials[i],
+        );
+      return material;
+    }
+    return material instanceof PBRMaterial
+      ? (this.originals.get(material) ?? material)
+      : material;
   }
 }

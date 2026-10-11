@@ -15,6 +15,7 @@ const quality = document.querySelector<HTMLSelectElement>("#quality")!;
 const light = document.querySelector<HTMLSelectElement>("#light")!;
 const start = document.querySelector<HTMLButtonElement>("#start")!;
 const next = document.querySelector<HTMLButtonElement>("#next")!;
+const all = document.querySelector<HTMLButtonElement>("#all")!;
 const stop = document.querySelector<HTMLButtonElement>("#stop")!;
 const metrics = document.querySelector<HTMLOutputElement>("#metrics")!;
 const inward: [number, number][] = [
@@ -36,7 +37,11 @@ const route = [
 let index = 0,
   walking = false,
   prepared = false,
-  ticks = 0;
+  ticks = 0,
+  continuous = false,
+  legStarted = 0,
+  lastReport = 0;
+let failure: string | null = null;
 const visits: {
   index: number;
   position: { x: number; y: number; z: number };
@@ -64,6 +69,8 @@ function status() {
     routeIndex: index,
     routeLength: route.length,
     walking,
+    continuous,
+    failure,
     physicsTicks: ticks,
     position: { ...game.actor.position },
     vehicle: game.actor.vehicle,
@@ -87,11 +94,17 @@ function status() {
 function report() {
   metrics.textContent = JSON.stringify(status(), null, 2);
 }
+function syncWalkControls() {
+  next.disabled = all.disabled = !prepared || walking || index >= route.length;
+  stop.disabled = !walking;
+}
 quality.addEventListener("change", () => game.setQuality(quality.value));
 light.addEventListener("change", lighting);
 start.addEventListener("click", () => {
   game.keys.clear();
   walking = false;
+  continuous = false;
+  failure = null;
   prepared = true;
   index = 0;
   ticks = 0;
@@ -109,23 +122,26 @@ start.addEventListener("click", () => {
   game.distance = 6;
   game.firstPerson = false;
   game.setUiModal(false);
-  next.disabled = false;
-  stop.disabled = true;
+  syncWalkControls();
   report();
 });
-next.addEventListener("click", () => {
+function beginWalk(entireRoute: boolean) {
   if (prepared && index < route.length) {
+    continuous = entireRoute;
+    failure = null;
+    legStarted = performance.now();
     walking = true;
-    next.disabled = true;
-    stop.disabled = false;
+    syncWalkControls();
     game.setUiModal(false);
   }
-});
+}
+next.addEventListener("click", () => beginWalk(false));
+all.addEventListener("click", () => beginWalk(true));
 stop.addEventListener("click", () => {
   walking = false;
+  continuous = false;
   game.keys.clear();
-  next.disabled = index >= route.length;
-  stop.disabled = true;
+  syncWalkControls();
   report();
 });
 game.onInput = () => {
@@ -133,6 +149,7 @@ game.onInput = () => {
 };
 game.engine.onBeginFrameObservable.add(() => {
   if (!game.ready) return;
+  const now = performance.now();
   if (prepared && walking) {
     const target = route[index],
       pos = game.actor.position,
@@ -149,14 +166,25 @@ game.engine.onBeginFrameObservable.add(() => {
         visibleEnvelope: state.visibleEnvelope,
       });
       index++;
-      next.disabled = index >= route.length;
-      stop.disabled = true;
+      walking = continuous && index < route.length;
+      if (!walking) continuous = false;
+      legStarted = now;
+      syncWalkControls();
+    } else if (now - legStarted > 20000) {
+      failure = `Úsek ${index + 1} nebyl dokončen do 20 sekund`;
+      walking = continuous = false;
+      game.keys.clear();
+      syncWalkControls();
     } else {
       game.yaw = Math.atan2(dx, dz);
       game.keys.add("KeyW");
     }
   }
-  report();
+  // The harness never claims FPS, but avoids a full scene/DOM scan each frame.
+  if (now - lastReport >= 200) {
+    lastReport = now;
+    report();
+  }
 });
 game.setQuality(quality.value);
 lighting();

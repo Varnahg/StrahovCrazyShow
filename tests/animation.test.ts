@@ -13,6 +13,7 @@ import { Material } from "@babylonjs/core/Materials/material";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { applyAvatarPreset } from "../client/avatar-presets";
+import { irisLandmarks } from "../client/avatar-eyes";
 import characterGeometry from "../client/data/character-geometry.json";
 
 function setup() {
@@ -385,10 +386,13 @@ test("skin, cloth, hair and eyes have shared role-specific linear PBR materials 
       assert.ok(gamma.every((v, j) => Math.abs(v - chosen[j]) < 1e-6));
       assert.equal(material.metallic, 0);
     }
-    const eye = part(i, " eye").material as PBRMaterial;
+    const eye = part(i, " anatomical eyes near").material as PBRMaterial;
     const cloth = part(i, " clothed torso").material as PBRMaterial;
     assert.ok(eye.roughness! < cloth.roughness!);
-    assert.equal(part(i, " iris").metadata.avatarDetail, "micro");
+    assert.equal(
+      part(i, " anatomical eyes medium").metadata.avatarBodyLod,
+      "medium",
+    );
     assert.equal(part(i, " face").metadata.avatarDetail, "silhouette");
   }
   assert.equal(
@@ -461,15 +465,18 @@ test("all six hairstyles leave both pupils visible and expose a stable first-per
     const hair = rig.head
       .getChildMeshes()
       .find((mesh) => mesh.name.endsWith(" hair")) as InstancedMesh;
-    const pupils = rig.head
-      .getChildMeshes()
-      .filter((mesh) => mesh.name.endsWith(" pupil")) as InstancedMesh[];
+    const pupils = irisLandmarks(
+      "near",
+      applyAvatarPreset(preset, DEFAULT_AVATAR),
+    );
     assert.equal(pupils.length, 2);
-    for (const pupil of pupils)
-      assert.ok(
-        frontDepth(hair, pupil.position.x, pupil.position.y) < pupil.position.z,
-        "preset " + preset + " hair must not cover a pupil in front view",
-      );
+    // Alpha-tested card pupils have a dedicated atlas-aware ray regression.
+    for (const { point } of pupils)
+      if (!hair.metadata?.avatarHair)
+        assert.ok(
+          frontDepth(hair, point[0], point[1]) < point[2],
+          "preset " + preset + " hair must not cover a pupil in front view",
+        );
     assert.ok(rig.eyeHeight > 1.53 && rig.eyeHeight < 1.72);
     assert.ok(
       rig.bodyHeight - rig.eyeHeight > 0.08 &&

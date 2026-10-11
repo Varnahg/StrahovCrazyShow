@@ -1,0 +1,103 @@
+import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
+import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
+import { resolve, join, sep } from 'node:path';
+import assert from 'node:assert/strict';
+
+const root = resolve(import.meta.dirname, '..');
+const frozen = join(root, '.cache/performance-snapshot/pilot-20261011-m3');
+const destination = join(root, 'docs/verification-evidence/pilot-20261011-m3');
+const sourceFile = join(frozen, 'source-manifest.json');
+const manifestBytes = await readFile(sourceFile);
+const manifest = JSON.parse(manifestBytes);
+const expectedId = '761f0f3436c7479126ecd2fc3dcc9231b6040d41371d5f9b1d560b855a021d65';
+const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+assert.equal(manifest.snapshotId, expectedId);
+assert.equal(digest(JSON.stringify(manifest.files)), expectedId);
+const files = Object.entries(manifest.files);
+assert.equal(files.length, 8139);
+const startedAt = new Date().toISOString();
+const start = performance.now();
+const mismatches = [], errors = [];
+const computed = { live: {}, frozen: {} };
+const counts = { live: 0, frozen: 0 };
+const bytesRead = { live: 0, frozen: 0 };
+const tasks = files.flatMap(([file, expected]) => [
+  { tree: 'live', base: root, file, expected },
+  { tree: 'frozen', base: frozen, file, expected },
+]);
+let cursor = 0;
+async function hashFile(path) {
+  const hash = createHash('sha256');
+  let bytes = 0;
+  for await (const chunk of createReadStream(path)) { hash.update(chunk); bytes += chunk.length; }
+  return { sha256: hash.digest('hex'), bytes };
+}
+await Promise.all(Array.from({ length: 8 }, async () => {
+  while (cursor < tasks.length) {
+    const task = tasks[cursor++];
+    const path = resolve(task.base, task.file);
+    assert.ok(path.startsWith(task.base + sep));
+    try {
+      const actual = await hashFile(path);
+      computed[task.tree][task.file] = actual.sha256;
+      counts[task.tree]++;
+      bytesRead[task.tree] += actual.bytes;
+      if (actual.sha256 !== task.expected) mismatches.push({ tree: task.tree, file: task.file, expected: task.expected, actual: actual.sha256 });
+    } catch (error) { errors.push({ tree: task.tree, file: task.file, error: String(error) }); }
+  }
+}));
+const wholeTreeIds = Object.fromEntries(['live', 'frozen'].map(tree => [tree,
+  digest(JSON.stringify(Object.fromEntries(files.map(([file]) => [file, computed[tree][file] ?? null]))))]));
+const check = {
+  startedAt, capturedAt: new Date().toISOString(), elapsedSeconds: (performance.now()-start)/1000,
+  sourceSnapshotId: expectedId, manifestSha256: digest(manifestBytes), files: files.length,
+  liveFilesChecked: counts.live, frozenFilesChecked: counts.frozen,
+  liveAndFrozenFilesChecked: counts.live + counts.frozen, bytesRead, computedSourceSnapshotIds: wholeTreeIds,
+  status: mismatches.length === 0 && errors.length === 0 && counts.live === files.length && counts.frozen === files.length ? 'passed' : 'failed',
+  method: 'Independent SHA-256 streaming reads of every manifest path in both live and frozen trees. Shared historical reference paths are read and hashed separately for each tree; no cached hashes or deduplication. Aggregate IDs reconstructed in original manifest key order.',
+  scope: 'All manifest source, assets, tests and configuration. Does not hash docs, build outputs, dependencies or unlisted paths.',
+  testFilesCheckedPerTree: files.filter(([file]) => file.startsWith('tests/')).length,
+  mismatches, errors,
+};
+await mkdir(destination, { recursive: true });
+const publishedFiles = ['source-manifest.json','pipeline-results.json','pipeline-test.log','pipeline-build.log','pipeline-test-integration.log'];
+const publishedSha256 = {};
+for (const file of publishedFiles) {
+  await copyFile(join(frozen, file), join(destination, file));
+  const [source, copy] = await Promise.all([hashFile(join(frozen,file)),hashFile(join(destination,file))]);
+  assert.equal(copy.sha256, source.sha256);
+  publishedSha256[file] = copy.sha256;
+}
+await writeFile(join(destination,'source-check.json'), JSON.stringify(check,null,2)+'\n');
+const pipeline = JSON.parse(await readFile(join(destination,'pipeline-results.json'),'utf8'));
+assert.equal(pipeline.sourceSnapshotId, expectedId);
+assert.equal(pipeline.files, files.length);
+const testLog = await readFile(join(destination,'pipeline-test.log'),'utf8');
+const testCount = kind => {
+  const match = testLog.match(new RegExp('^.*?\\b'+kind+' (\\d+)\\s*$', 'm'));
+  assert.ok(match, 'Missing test log count: '+kind);
+  return Number(match[1]);
+};
+const tests = { total: testCount('tests'), passed: testCount('pass'), failed: testCount('fail'),
+  cancelled: testCount('cancelled'), skipped: testCount('skipped'), todo: testCount('todo') };
+assert.equal(tests.total, tests.passed);
+const results = {
+  status: check.status === 'passed' && pipeline.stages.every(stage=>stage.exitCode===0) && tests.failed===0 ? 'passed' : 'failed',
+  scope: 'Technical checkpoint: tests, production build including TypeScript, isolated integration, and independent live/frozen SHA audit. GPU validation pending.',
+  sourceSnapshotId: expectedId, files: files.length, tests,
+  startedAt: pipeline.startedAt, finishedAt: pipeline.finishedAt, stages: pipeline.stages,
+  sourceCheck: 'source-check.json', pipeline: 'pipeline-results.json', publishedSha256,
+  gpu: { status: 'pending', note: 'M3 has no completed matched GPU/FPS result yet. Earlier L2/M evidence and separate visual hair evidence are not FPS results for M3.' },
+  buildNotes: [
+    'Build completed with exit 0; complete log preserves dynamic-import and bundler timing warnings.',
+    'Integration completed with exit 0 and its explicit PASS summary; the retained raw log also contains the room-close diagnostic (4002).',
+  ],
+};
+await writeFile(join(destination,'results.json'),JSON.stringify(results,null,2)+'\n');
+await copyFile(import.meta.filename,join(destination,'audit-live-frozen.mjs.txt'));
+console.log(JSON.stringify({sourceCheck:check,results},null,2));
+assert.equal(check.status,'passed');
+assert.equal(wholeTreeIds.live, expectedId);
+assert.equal(wholeTreeIds.frozen, expectedId);
+assert.equal(results.status,'passed');

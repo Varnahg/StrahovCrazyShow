@@ -1,0 +1,18 @@
+{
+  "capturedAt": "2026-10-11T15:43:47.932Z",
+  "sourceSnapshotId": "38776c10a70e2148b5b2b525d366cecd35c768e0116857e211a02e32a1150b9c",
+  "runtime": "v24.19.0",
+  "sourceFile": "client/cinematic.ts",
+  "sourceSha256": "a9b15b6036f61fc1e5b4497357202ebb0f88333c02ccc6d8a7b8818617fbbe62",
+  "reproductionStatus": "confirmed",
+  "componentQualityStatus": "failed",
+  "scope": "Isolated Node pre-construction public-contract reproduction with actual frozen M4 cinematic import; no Game or glTF loader imports. NullEngine, no GPU or FPS measurement.",
+  "contract": "scene.postProcessRenderPipelineManager.addPipeline(new PostProcessRenderPipeline(engine, name))",
+  "error": {
+    "name": "TypeError",
+    "message": "Cannot read properties of undefined (reading 'addPipeline')",
+    "stack": "TypeError: Cannot read properties of undefined (reading 'addPipeline')\n    at <anonymous> (C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\repro-m4-pipeline-contract.ts:19:42)\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)"
+  },
+  "classification": "Missing postprocess scene-component registration; not a near-shell shader or asset error.",
+  "orderingLimitation": "Manager availability is tested before constructing any PostProcessRenderPipeline. Constructing one first registers the manager as a side effect and masks this missing import-time registration; that different ordering did not reproduce the error in an initial probe."
+}

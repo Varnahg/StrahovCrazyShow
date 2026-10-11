@@ -1,0 +1,41 @@
+{
+  "capturedAt": "2026-10-11T15:48:48.945Z",
+  "status": "passed-positive-and-negative-controls",
+  "sourceChange": "tests/cinematic-pipeline.test.ts only; no runtime or GPU changes in this correction",
+  "correctedContract": "Read and assert the existing scene.postProcessRenderPipelineManager immediately after cinematic import and Scene construction, before creating any PostProcessRenderPipeline; then test addPipeline on that same manager.",
+  "positive": {
+    "command": "pnpm exec tsx --test tests/cinematic-pipeline.test.ts",
+    "exitCode": 0,
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "cinematicSourceSha256": "f6a994309952e89b0eafdf76fde6d3edf0eb9cc12fbab5e3492e2a8e946b4806",
+    "cinematicMatchesM5SourceSnapshotId": "3fcfe5e33638bddb0cef28c6fa79728e0bd022170bacf5898e29953a55ea35d0",
+    "scope": "The cinematic source matches M5, but the strengthened test is a later source change for the upcoming M6 freeze. This is not a full M5 or M6 pipeline result."
+  },
+  "negative": {
+    "command": "pnpm exec tsx --test .cache/cinematic-pipeline-m4-negative.test.ts",
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "status": "expected-failure-confirmed",
+    "sourceSnapshotId": "38776c10a70e2148b5b2b525d366cecd35c768e0116857e211a02e32a1150b9c",
+    "cinematicSourceSha256": "a9b15b6036f61fc1e5b4497357202ebb0f88333c02ccc6d8a7b8818617fbbe62",
+    "observed": "AssertionError at pre-construction manager check; actual value undefined",
+    "exactlySameTestExceptCinematicImport": true
+  },
+  "reasonForOrdering": "Babylon PostProcessRenderPipeline construction registers the scene manager itself; constructing the pipeline before asserting manager presence masks the missing cinematic registration.",
+  "limitations": [
+    "Each control ran in a separate Node process.",
+    "NullEngine public-contract checks only; no shader, asset, browser, GPU or FPS claim.",
+    "M4 archive remains unchanged."
+  ],
+  "files": {
+    "positive.test.ts.txt": "78914aeba9b2f05e8737591f8b04f14fd4e6d4231f3a59203f1014df1f962aaf",
+    "m4-negative.test.ts.txt": "973d6186e269ada4bc71ea7e53cb4dd4a6c8c4ab64ce912d6b5cb9ee40511b79",
+    "positive.log": "89c0b10755547ab76995de7ba6655c1b22c1e4e7e1c53dc59e960dee65fc3643",
+    "m4-negative.log": "ec72d45d5f95d3e8d2d05026ef73a5fe77e499c6c9085734849a614e4bace6d3"
+  }
+}

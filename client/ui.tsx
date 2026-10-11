@@ -1,4 +1,5 @@
 import { AvatarEditor } from "./avatar-editor";
+import { applyAvatarPreset } from "./avatar-presets";
 import { MapView } from "./minimap";
 import { Journal } from "./journal";
 import { entryForPlace } from "../shared/journal";
@@ -8,6 +9,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { Client, type Room } from "@colyseus/sdk";
 import {
   DEFAULT_PROFILE,
+  DEFAULT_AVATAR,
   INTERESTS,
   type Profile,
   type Player,
@@ -51,13 +53,16 @@ import {
 } from "../shared/netcode";
 
 const readProfile = () => {
+  const fallback = {
+    ...DEFAULT_PROFILE,
+    avatar: applyAvatarPreset(0, DEFAULT_AVATAR),
+  };
   try {
     return sanitizeProfile(
-      JSON.parse(localStorage.getItem("strahov.profile") || "null") ||
-        DEFAULT_PROFILE,
+      JSON.parse(localStorage.getItem("strahov.profile") || "null") || fallback,
     );
   } catch {
-    return DEFAULT_PROFILE;
+    return sanitizeProfile(fallback);
   }
 };
 const readRenderPreferences = (): {

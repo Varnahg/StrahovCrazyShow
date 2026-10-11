@@ -3,7 +3,7 @@
 The immutable original is kept separately. Mapping is explicit and preserves
 round wheel/arch neighbourhoods while fitting the existing game collider.
 """
-import bpy, bmesh, json, math, hashlib, sys, struct
+import bpy, bmesh, json, math, hashlib, sys, struct, runpy, subprocess, shutil
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
@@ -180,7 +180,17 @@ view=len(gltf['bufferViews']);gltf['bufferViews'].append({'buffer':0,'byteOffset
 paint=next(m for m in gltf['materials'] if m['name']=='Campus enamel');texture=gltf['textures'][paint['pbrMetallicRoughness']['baseColorTexture']['index']];gltf['images'][texture['source']]={'bufferView':view,'mimeType':'image/png','name':'CC0 paint neutral microvariation'}
 paint['pbrMetallicRoughness']['baseColorFactor']=next(m['baseColorLinear'] for m in material_audit if m['sourceRole']=='paint');gltf['buffers'][0]['byteLength']=len(binary)
 js=json.dumps(gltf,separators=(',',':')).encode();js+=b' '*((-len(js))%4);binary.extend(b'\0'*((-len(binary))%4));nearfile.write_bytes(struct.pack('<III',0x46546c67,2,28+len(js)+len(binary))+struct.pack('<II',len(js),0x4e4f534a)+js+struct.pack('<II',len(binary),0x004e4942)+binary)
+# Rotate only the reviewed normalized inner-shell diagonal in the editable
+# master. The final GLB retains every original byte except its six indices.
+inner_repair=runpy.run_path(str(ROOT/'scripts/car-inner-shell-repair.py'))['repair_inner_shell'](bpy.data.objects['Body:black'].data)
+repairs.append({'id':'inner-shell-diagonal-20261011','object':'Watertight 14-station body shell','repair':'local coplanar diagonal rotation; zero vertex movement; original UV and normal channels retained',**inner_repair})
+# Keep the packed master portable when generated in an isolated output root.
+neutral.filepath_raw='//paint-neutral-microvariation.png'
+bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'campus-hatchback-master.blend'))
+node=shutil.which('node');assert node,'Node is required for exact index-only GLB repair'
+subprocess.run([node,str(ROOT/'scripts/repair-car-near.mjs'),str(nearfile),str(nearfile),str(DOCS/'near-inner-shell-index-audit.json')],check=True)
 report={'sourceGlbSha256':'107410e01453abbce452fabbe6d51436fb98a0920672643a893263a8861873d7','nearTriangles':sum(len(o.data.loop_triangles) for o in parts),'parts':len(parts),'wheelPartCounts':[sum(o.get('wheel_index')==i for o in parts) for i in range(4)],'repairs':repairs,'normalization':{'sourceLongitudinalKnots':source_x.tolist(),'targetLongitudinalKnots':target_x.tolist(),'sourceHalfWidthKnots':source_y.tolist(),'targetHalfWidthKnots':target_y.tolist(),'sourceHeightKnots':source_z.tolist(),'targetHeightKnots':target_z.tolist(),'wheelRadiusMetres':.34,'wheelCentresGame':[[-.85,.36,1.05],[.85,.36,1.05],[-.85,.36,-1.05],[.85,.36,-1.05]],'reflectionOrNegativeDeterminant':False,'sharedPhysicsChanged':False},'materials':material_audit,'geometry':geometry_audit,'zeroAreaTriangles':sum(r['zeroAreaTriangles'] for r in geometry_audit),'outputs':{}}
+report['editableMasterPortability']={'neutralImageFilepath':neutral.filepath,'neutralImagePacked':bool(neutral.packed_file)}
 for file in [OUT/'original-source.glb',OUT/'original-source.blend',OUT/'campus-hatchback-master.blend',PUBLIC/'campus-hatchback-near.glb']:
     report['outputs'][file.relative_to(ROOT).as_posix()]={'bytes':file.stat().st_size,'sha256':hashlib.sha256(file.read_bytes()).hexdigest()}
 report['lightGeometry']={}

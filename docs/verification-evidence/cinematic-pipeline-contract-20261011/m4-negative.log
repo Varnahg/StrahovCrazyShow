@@ -1,0 +1,28 @@
+BJS - [17:48:07]: Babylon.js v9.30.0 - Null engine
+✖ cinematic pipeline owns its scene registration before any model is loaded (10.3874ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1259.0275
+
+✖ failing tests:
+
+test at .cache\cinematic-pipeline-m4-negative.test.ts:10:1
+✖ cinematic pipeline owns its scene registration before any model is loaded (10.3874ms)
+  AssertionError [ERR_ASSERTION]: cinematic import must register the scene pipeline manager before pipeline construction
+      at TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\cinematic-pipeline-m4-negative.test.ts:17:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

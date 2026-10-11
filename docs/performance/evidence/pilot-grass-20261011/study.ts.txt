@@ -1,0 +1,67 @@
+import { createHash } from 'node:crypto';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { Session } from 'node:inspector/promises';
+import { platform, arch, cpus } from 'node:os';
+import { GrassPatchSelection } from '../client/vegetation-selection';
+import { createGrassPatches } from '../shared/vegetation';
+import { BOUNDS, BUILDINGS, MAP } from '../shared/world';
+
+const dir = 'docs/performance/evidence/pilot-grass-20261011';
+mkdirSync(dir, { recursive: true });
+const patches = createGrassPatches(BOUNDS, BUILDINGS, MAP.paths);
+const route = Array.from({length: 4000}, (_, i) => ({x: Math.sin(i * .027) * 430 - 20, z: Math.sin(i * .043) * 270 + 30}));
+let checksum = 0;
+function baseline(stationary: boolean) {
+  const bank = patches.map(patch => ({patch, enabled: false}));
+  return function oldSelection(i: number) {
+    const {x, z} = stationary ? {x: 110, z: 12} : route[i % route.length];
+    const nearby = bank.map(patch => ({patch, distance: Math.hypot(patch.patch.x - x, patch.patch.z - z)}))
+      .filter(p => p.distance < 35 + 11.4)
+      .sort((a,b) => a.distance * (a.patch.enabled ? .85 : 1) - b.distance * (b.patch.enabled ? .85 : 1)).slice(0,16);
+    const visible = new Set(nearby.map(p => p.patch));
+    let count = 0;
+    for(const patch of bank) {
+      patch.enabled = visible.has(patch);
+      if (patch.enabled) count += Math.max(1, Math.floor(patch.patch.points.length * .375));
+    }
+    checksum += count;
+  };
+}
+function candidate(stationary: boolean) {
+  const selection = new GrassPatchSelection(patches);
+  let count = 0;
+  return function newSelection(i: number) {
+    const {x,z} = stationary ? {x: 110, z: 12} : route[i % route.length];
+    if(selection.update(x,z,35,16)) {
+      count = 0;
+      for(let p = 0; p < patches.length; p++) if(selection.isSelected(p)) count += Math.max(1, Math.floor(patches[p].points.length * .375));
+    }
+    checksum += count;
+  };
+}
+function measure(run: (i:number)=>void) {
+  for(let i=0;i<4000;i++) run(i);
+  const start=performance.now();
+  for(let i=0;i<12000;i++) run(i);
+  return (performance.now()-start)/12000;
+}
+const report: any = {at: new Date().toISOString(), node: process.version, platform:platform(), arch: arch(), cpu: cpus()[0].model, tileCount:patches.length, iterationsPerSample:12000, scope:'Node CPU selection microstudy only; no Babylon render, no FPS/GPU claim', sources: {}, results: {}};
+for(const file of ['client/vegetation.ts','client/vegetation-selection.ts','shared/vegetation.ts','shared/world.ts','.cache/pilot-grass-study.ts']) report.sources[file]=createHash('sha256').update(readFileSync(file)).digest('hex');
+for(const stationary of [false,true]) {
+  const old=baseline(stationary), next=candidate(stationary);
+  const a:number[]=[],b:number[]=[];
+  for(let pair=0;pair<5;pair++) if(pair%2) { b.push(measure(next));a.push(measure(old)); } else {a.push(measure(old));b.push(measure(next));}
+  report.results[stationary?'stationary':'moving']={baselineMillisecondsPerSelection:a,candidateMillisecondsPerSelection:b};
+}
+const session=new Session();session.connect();await session.post('Profiler.enable');
+await session.post('Profiler.setSamplingInterval',{interval:100});
+for(const [label, run] of [['baseline',baseline(false)],['candidate',candidate(false)]] as const) {
+  await session.post('Profiler.start');
+  for(let i=0;i<60000;i++) run(i);
+  const {profile}=await session.post('Profiler.stop');
+  writeFileSync(`${dir}/${label}.cpuprofile`,JSON.stringify(profile));
+  report[label+'ProfileTopSelfSamples']=profile.nodes.filter(n=>n.hitCount).sort((a,b)=>(b.hitCount??0)-(a.hitCount??0)).slice(0,12).map(n=>({name:n.callFrame.functionName,samples:n.hitCount,url:n.callFrame.url}));
+}
+session.disconnect();report.checksum=checksum;
+writeFileSync(`${dir}/study.json`, JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify(report.results,null,2));

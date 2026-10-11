@@ -1,0 +1,29 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Scene } from "@babylonjs/core/scene";
+import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
+import "./performance-snapshot/pilot-20261011-m4/client/cinematic";
+
+// Deliberately no glTF loader or Game imports: high quality must work before a
+// model loader has had any opportunity to register unrelated scene extensions.
+test("cinematic pipeline owns its scene registration before any model is loaded", () => {
+  const engine = new NullEngine();
+  const scene = new Scene(engine);
+  try {
+    // Check before constructing a pipeline: Babylon's pipeline constructor
+    // itself registers the manager and would mask a missing cinematic import.
+    const manager = scene.postProcessRenderPipelineManager;
+    assert.ok(
+      manager,
+      "cinematic import must register the scene pipeline manager before pipeline construction",
+    );
+    // Raw sky textures and shader execution still need browser QA.
+    const pipeline = new PostProcessRenderPipeline(engine, "registration test");
+    assert.doesNotThrow(() => manager.addPipeline(pipeline));
+    assert.ok(manager.supportedPipelines.includes(pipeline));
+  } finally {
+    scene.dispose();
+    engine.dispose();
+  }
+});

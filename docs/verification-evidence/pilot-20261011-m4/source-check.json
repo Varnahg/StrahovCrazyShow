@@ -1,0 +1,33 @@
+{
+  "startedAt": "2026-10-11T15:44:31.532Z",
+  "capturedAt": "2026-10-11T15:44:36.625Z",
+  "elapsedSeconds": 5.0919493000000005,
+  "sourceSnapshotId": "38776c10a70e2148b5b2b525d366cecd35c768e0116857e211a02e32a1150b9c",
+  "manifestSha256": "9bd26be8c5b4c95ca4d7a1b76c0d4f4680ec6ba45dd44d2d924d8371c34a4809",
+  "files": 8143,
+  "auditScope": "frozen-only",
+  "frozenFilesChecked": 8143,
+  "liveFilesChecked": 0,
+  "frozenBytesRead": 1788475491,
+  "computedFrozenSourceSnapshotId": "38776c10a70e2148b5b2b525d366cecd35c768e0116857e211a02e32a1150b9c",
+  "status": "passed",
+  "method": "Independent SHA-256 streaming read of every frozen manifest path, including shared historical IPR reference files. No cached hashes or reference deduplication. Aggregate ID reconstructed in original manifest key order.",
+  "currentLiveComparison": "Not performed. Live workspace contains subsequent postprocess scene-component registration fix and regression test and is not claimed to match M4.",
+  "historicalFreezeVerification": {
+    "capturedAt": "2026-10-11T15:26:09.772Z",
+    "method": "Live hashes before and after source/asset/test copy exactly match frozen hashes. Dependencies share node_modules; package and lock identify versions. Historical reference reuse, when present, is declared separately.",
+    "source": "source-manifest.json",
+    "scope": "The freeze operation reported matching live-before, live-after and copied frozen hashes at its original time. This historical statement is distinct from the present frozen-only audit."
+  },
+  "excludedFromThisAudit": [
+    "Documentation",
+    "build outputs",
+    "dependencies",
+    "unlisted paths",
+    "current live workspace"
+  ],
+  "testFilesChecked": 79,
+  "historicalReferenceFilesChecked": 7038,
+  "mismatches": [],
+  "errors": []
+}

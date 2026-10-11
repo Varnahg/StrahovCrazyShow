@@ -1,0 +1,2076 @@
+{
+  "capturedAt": "2026-10-11T15:20:10.155Z",
+  "status": "integrated CPU-verified near repair; new GPU acceptance pending",
+  "sourceRepairId": "inner-shell-diagonal-20261011",
+  "sourceOriginalUnchanged": true,
+  "sourceAndDerivedFilesPreserved": [
+    {
+      "file": "assets/blender/vehicles/innerscene-hatchback/original-source.glb",
+      "sha256": "107410e01453abbce452fabbe6d51436fb98a0920672643a893263a8861873d7",
+      "afterSha256": "107410e01453abbce452fabbe6d51436fb98a0920672643a893263a8861873d7"
+    },
+    {
+      "file": "assets/blender/vehicles/innerscene-hatchback/original-source.blend",
+      "sha256": "0fef4161683d2a499034b3edafafbaf77a509df96c5e43c0e7fbc0c86b7b8467",
+      "afterSha256": "0fef4161683d2a499034b3edafafbaf77a509df96c5e43c0e7fbc0c86b7b8467"
+    },
+    {
+      "file": "public/models/vehicles/campus-hatchback-medium.glb",
+      "sha256": "0bef8a689cf02ed048c5db28cfd050154144aab386e1e5b67a583de8ec95b82c",
+      "afterSha256": "0bef8a689cf02ed048c5db28cfd050154144aab386e1e5b67a583de8ec95b82c"
+    },
+    {
+      "file": "public/models/vehicles/campus-hatchback-far.glb",
+      "sha256": "98254bb33689919998a83fd28aae77a6aa31da5826afda368f9f4c4e7f2ead58",
+      "afterSha256": "98254bb33689919998a83fd28aae77a6aa31da5826afda368f9f4c4e7f2ead58"
+    },
+    {
+      "file": "assets/blender/vehicles/innerscene-hatchback/campus-hatchback-medium-wheels.glb",
+      "sha256": "c47f6b429b97c7893af9a0ea5b0359836cd8b9bd982ef2ea1ceb011853255260",
+      "afterSha256": "c47f6b429b97c7893af9a0ea5b0359836cd8b9bd982ef2ea1ceb011853255260"
+    },
+    {
+      "file": "assets/blender/vehicles/innerscene-hatchback/campus-hatchback-far-wheels.glb",
+      "sha256": "e8bc4f08949ae708d6975c485c060eed38e128f738b8f799e326da3044890910",
+      "afterSha256": "e8bc4f08949ae708d6975c485c060eed38e128f738b8f799e326da3044890910"
+    },
+    {
+      "file": "assets/blender/vehicles/innerscene-hatchback/lod-baseline-j/medium.glb",
+      "sha256": "09abe7339544c6fa8e6bfa8a612c8a793e9542ba3bb14cf4d95c35e59db305c8",
+      "afterSha256": "09abe7339544c6fa8e6bfa8a612c8a793e9542ba3bb14cf4d95c35e59db305c8"
+    },
+    {
+      "file": "assets/blender/vehicles/innerscene-hatchback/lod-baseline-j/far.glb",
+      "sha256": "b8426d57160e691484e3f87f0ce96b5b515fdc3305732cdd07d3c5c0bf16223a",
+      "afterSha256": "b8426d57160e691484e3f87f0ce96b5b515fdc3305732cdd07d3c5c0bf16223a"
+    }
+  ],
+  "indexRepair": {
+    "capturedAt": "2026-10-11T14:53:20.968Z",
+    "classification": "isolated index-only candidate; master/generator and visual acceptance pending",
+    "inputSha256": "2805ecfd4dd14ad3ea0511efce8c78d9dd8fc07c9d55dc28bf02e61831afa665",
+    "outputSha256": "7491240d9c5acc10375a394bc9b56a02f314da749dfb63e397506d90ae33c853",
+    "bytes": 5351716,
+    "triangleCountUnchanged": true,
+    "changedTriangles": [
+      18116,
+      18117
+    ],
+    "changedIndexCount": 6,
+    "changedByteOffsets": [
+      1403440,
+      1403441,
+      1403442,
+      1403443,
+      1403444,
+      1403446,
+      1403447,
+      1403448,
+      1403450,
+      1403451
+    ],
+    "permittedByteOffsets": [
+      1403440,
+      1403441,
+      1403442,
+      1403443,
+      1403444,
+      1403445,
+      1403446,
+      1403447,
+      1403448,
+      1403449,
+      1403450,
+      1403451
+    ],
+    "patchBoundaryUnchanged": true,
+    "positionsNormalsUvsMaterialsNodesImagesByteIdentical": true,
+    "maximumVertexDisplacementMetres": 0,
+    "replacementFaces": [
+      {
+        "indices": [
+          27830,
+          27921,
+          27927
+        ],
+        "area": 0.0024616058706818933,
+        "normalDot": 0.999999994444444
+      },
+      {
+        "indices": [
+          27830,
+          27927,
+          25955
+        ],
+        "area": 0.15759190824249547,
+        "normalDot": 0.999999994444444
+      }
+    ],
+    "boundary": [
+      [
+        "805306,1020440,-1343287|805306,730235,-976356",
+        1
+      ],
+      [
+        "805306,307302,664768|805306,1020440,-1343287",
+        1
+      ],
+      [
+        "805306,724626,-952299|805306,307302,664768",
+        1
+      ],
+      [
+        "805306,730235,-976356|805306,724626,-952299",
+        1
+      ]
+    ]
+  },
+  "masterRepair": {
+    "id": "inner-shell-diagonal-20261011",
+    "object": "Watertight 14-station body shell",
+    "repair": "local coplanar diagonal rotation; zero vertex movement; original UV and normal channels retained",
+    "polygons": [
+      18116,
+      18117
+    ],
+    "changedLoops": [
+      54348,
+      54349,
+      54350,
+      54351,
+      54352,
+      54353
+    ],
+    "newVertexIndices": [
+      24556,
+      24641,
+      24647,
+      24556,
+      24647,
+      22756
+    ],
+    "sourceCornerLoops": [
+      54349,
+      54350,
+      54353,
+      54349,
+      54353,
+      54348
+    ],
+    "verticesUnchanged": true,
+    "unrelatedCornerIndicesUVsAndPackedNormalsUnchanged": true,
+    "polygonCount": 29083,
+    "triangles": 34939,
+    "customNormalReencodingMaxVectorError": 0.00007802565721874947,
+    "unmodifiedCornersDecodedNormalMaxError": 0,
+    "validationChanged": false
+  },
+  "reopenedMaster": {
+    "master": ".cache\\vehicle-pilot-repair-20261011\\reproduction\\assets\\blender\\vehicles\\innerscene-hatchback\\campus-hatchback-master.blend",
+    "sha256": "2a1da0d7b9e99b8d0946615559b1bfc230382071570c39a62c1e98695c606375",
+    "triangles": 34939,
+    "repairedPoints": [
+      [
+        [
+          0.8053064346313477,
+          1.3432865142822266,
+          1.0204403400421143
+        ],
+        [
+          0.8053064346313477,
+          0.9763556718826294,
+          0.7302349805831909
+        ],
+        [
+          0.8053064346313477,
+          0.9522988200187683,
+          0.7246257066726685
+        ]
+      ],
+      [
+        [
+          0.8053064346313477,
+          1.3432865142822266,
+          1.0204403400421143
+        ],
+        [
+          0.8053064346313477,
+          0.9522988200187683,
+          0.7246257066726685
+        ],
+        [
+          0.8053064346313477,
+          -0.664768397808075,
+          0.3073022663593292
+        ]
+      ]
+    ],
+    "validationChanged": false,
+    "renderPerformed": false
+  },
+  "actualMasterExport": {
+    "classification": "Actual post-save Blender Body:black export compared by indexed triangle corners to canonical index-only GLB",
+    "triangles": 34939,
+    "allPositionsAndUVExact": true,
+    "unchangedTriangleNormalsExact": true,
+    "changedNormalCorners": 0,
+    "maxNormalError": 0,
+    "failures": [],
+    "failureCount": 0
+  },
+  "currentNearSha256": "7491240d9c5acc10375a394bc9b56a02f314da749dfb63e397506d90ae33c853",
+  "currentMasterSha256": "903eaf0fcfaa7a4ef1ce15a89435e3e4186db8190907e0099b5be7f52e44e83f",
+  "manifestsEqual": true,
+  "farGeometryChanged": false,
+  "farCoverageEvidence": {
+    "referenceRays": 2870,
+    "misses": 28,
+    "recesses": 8,
+    "missesWhoseBothNearHitsAreCalipers": 22,
+    "allMisses": [
+      {
+        "y": 0.325,
+        "z": -1.2249999999999999,
+        "near": {
+          "lo": {
+            "x": -0.9209229870129153,
+            "node": "Body:black",
+            "triangle": 1709,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 89,
+              "indices": [
+                326,
+                308,
+                332
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9209230115350546,
+            "node": "Body:black",
+            "triangle": 1487,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 55,
+              "indices": [
+                206,
+                224,
+                212
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.325,
+        "z": -1.2,
+        "near": {
+          "lo": {
+            "x": -0.9235395646170328,
+            "node": "Body:black",
+            "triangle": 1738,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 118,
+              "indices": [
+                121,
+                305,
+                324
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9235395646170328,
+            "node": "Body:black",
+            "triangle": 1538,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 106,
+              "indices": [
+                36,
+                220,
+                205
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.325,
+        "z": -1.1749999999999998,
+        "near": {
+          "lo": {
+            "x": -0.9235395646170328,
+            "node": "Body:black",
+            "triangle": 1739,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 119,
+              "indices": [
+                121,
+                324,
+                136
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9235395646170328,
+            "node": "Body:black",
+            "triangle": 1539,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 107,
+              "indices": [
+                36,
+                205,
+                17
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.325,
+        "z": 0.8750000000000004,
+        "near": {
+          "lo": {
+            "x": -0.9209229601587182,
+            "node": "Body:black",
+            "triangle": 1333,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 89,
+              "indices": [
+                326,
+                308,
+                332
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9209229846811142,
+            "node": "Body:black",
+            "triangle": 1111,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 55,
+              "indices": [
+                206,
+                224,
+                212
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.325,
+        "z": 0.9000000000000004,
+        "near": {
+          "lo": {
+            "x": -0.9235395646170328,
+            "node": "Body:black",
+            "triangle": 1362,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 118,
+              "indices": [
+                121,
+                305,
+                324
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9235395646170328,
+            "node": "Body:black",
+            "triangle": 1162,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 106,
+              "indices": [
+                36,
+                220,
+                205
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.325,
+        "z": 0.9250000000000003,
+        "near": {
+          "lo": {
+            "x": -0.9235395646170328,
+            "node": "Body:black",
+            "triangle": 1363,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 119,
+              "indices": [
+                121,
+                324,
+                136
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9235395646170328,
+            "node": "Body:black",
+            "triangle": 1163,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 107,
+              "indices": [
+                36,
+                205,
+                17
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.35,
+        "z": -1.2249999999999999,
+        "near": {
+          "lo": {
+            "x": -0.9272976807640821,
+            "node": "Body:black",
+            "triangle": 1791,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 171,
+              "indices": [
+                291,
+                365,
+                301
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9272976807640821,
+            "node": "Body:black",
+            "triangle": 1594,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 162,
+              "indices": [
+                209,
+                253,
+                243
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.35,
+        "z": 0.8750000000000004,
+        "near": {
+          "lo": {
+            "x": -0.9272976579959435,
+            "node": "Body:black",
+            "triangle": 1415,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 171,
+              "indices": [
+                291,
+                365,
+                301
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9272976579959435,
+            "node": "Body:black",
+            "triangle": 1218,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 162,
+              "indices": [
+                209,
+                253,
+                243
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.375,
+        "z": -1.2249999999999999,
+        "near": {
+          "lo": {
+            "x": -0.927297680764082,
+            "node": "Body:black",
+            "triangle": 1791,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 171,
+              "indices": [
+                291,
+                365,
+                301
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.927297680764082,
+            "node": "Body:black",
+            "triangle": 1594,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 162,
+              "indices": [
+                209,
+                253,
+                243
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.375,
+        "z": 0.8750000000000004,
+        "near": {
+          "lo": {
+            "x": -0.9272976579959434,
+            "node": "Body:black",
+            "triangle": 1415,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 171,
+              "indices": [
+                291,
+                365,
+                301
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9272976579959434,
+            "node": "Body:black",
+            "triangle": 1218,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 162,
+              "indices": [
+                209,
+                253,
+                243
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.4,
+        "z": -1.2249999999999999,
+        "near": {
+          "lo": {
+            "x": -0.9272976807640823,
+            "node": "Body:black",
+            "triangle": 1791,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 171,
+              "indices": [
+                291,
+                365,
+                301
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9272976807640823,
+            "node": "Body:black",
+            "triangle": 1594,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 162,
+              "indices": [
+                209,
+                253,
+                243
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.4,
+        "z": 0.8750000000000004,
+        "near": {
+          "lo": {
+            "x": -0.9272976579959435,
+            "node": "Body:black",
+            "triangle": 1415,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 171,
+              "indices": [
+                291,
+                365,
+                301
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9272976579959435,
+            "node": "Body:black",
+            "triangle": 1218,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 162,
+              "indices": [
+                209,
+                253,
+                243
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.42500000000000004,
+        "z": -1.2249999999999999,
+        "near": {
+          "lo": {
+            "x": -0.9272976807640823,
+            "node": "Body:black",
+            "triangle": 1791,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 171,
+              "indices": [
+                291,
+                365,
+                301
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9272976807640821,
+            "node": "Body:black",
+            "triangle": 1594,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 162,
+              "indices": [
+                209,
+                253,
+                243
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.42500000000000004,
+        "z": 0.8750000000000004,
+        "near": {
+          "lo": {
+            "x": -0.9272976579959435,
+            "node": "Body:black",
+            "triangle": 1415,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 171,
+              "indices": [
+                291,
+                365,
+                301
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9272976579959437,
+            "node": "Body:black",
+            "triangle": 1218,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 162,
+              "indices": [
+                209,
+                253,
+                243
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.45,
+        "z": -1.2249999999999999,
+        "near": {
+          "lo": {
+            "x": -0.9272976807640823,
+            "node": "Body:black",
+            "triangle": 1791,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 171,
+              "indices": [
+                291,
+                365,
+                301
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9272976807640821,
+            "node": "Body:black",
+            "triangle": 1594,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 162,
+              "indices": [
+                209,
+                253,
+                243
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.45,
+        "z": 0.8750000000000004,
+        "near": {
+          "lo": {
+            "x": -0.9272976579959435,
+            "node": "Body:black",
+            "triangle": 1415,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 171,
+              "indices": [
+                291,
+                365,
+                301
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9272976579959435,
+            "node": "Body:black",
+            "triangle": 1218,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 162,
+              "indices": [
+                209,
+                253,
+                243
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.475,
+        "z": -1.2249999999999999,
+        "near": {
+          "lo": {
+            "x": -0.921464354609509,
+            "node": "Body:black",
+            "triangle": 1718,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 98,
+              "indices": [
+                362,
+                380,
+                368
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9214643555977228,
+            "node": "Body:black",
+            "triangle": 1508,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 76,
+              "indices": [
+                278,
+                260,
+                284
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.475,
+        "z": -1.2,
+        "near": {
+          "lo": {
+            "x": -0.9240809135072835,
+            "node": "Body:black",
+            "triangle": 1768,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 148,
+              "indices": [
+                168,
+                376,
+                361
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9240809021566707,
+            "node": "Body:black",
+            "triangle": 1568,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 136,
+              "indices": [
+                73,
+                257,
+                276
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.475,
+        "z": -1.1749999999999998,
+        "near": {
+          "lo": {
+            "x": -0.9240809303287529,
+            "node": "Body:black",
+            "triangle": 1769,
+            "source": {
+              "node": "Brake caliper.003",
+              "nodeIndex": 49,
+              "mesh": 49,
+              "meshName": "Brake caliper.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 149,
+              "indices": [
+                168,
+                361,
+                185
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9240809021566707,
+            "node": "Body:black",
+            "triangle": 1569,
+            "source": {
+              "node": "Brake caliper.002",
+              "nodeIndex": 48,
+              "mesh": 48,
+              "meshName": "Brake caliper.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 137,
+              "indices": [
+                73,
+                276,
+                88
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.475,
+        "z": 0.8750000000000004,
+        "near": {
+          "lo": {
+            "x": -0.921464327755843,
+            "node": "Body:black",
+            "triangle": 1342,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 98,
+              "indices": [
+                362,
+                380,
+                368
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9214643287438247,
+            "node": "Body:black",
+            "triangle": 1132,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 76,
+              "indices": [
+                278,
+                260,
+                284
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.475,
+        "z": 0.9000000000000004,
+        "near": {
+          "lo": {
+            "x": -0.9240809135072423,
+            "node": "Body:black",
+            "triangle": 1392,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 148,
+              "indices": [
+                168,
+                376,
+                361
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9240809021566707,
+            "node": "Body:black",
+            "triangle": 1192,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 136,
+              "indices": [
+                73,
+                257,
+                276
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.475,
+        "z": 0.9250000000000003,
+        "near": {
+          "lo": {
+            "x": -0.9240809303287338,
+            "node": "Body:black",
+            "triangle": 1393,
+            "source": {
+              "node": "Brake caliper.001",
+              "nodeIndex": 47,
+              "mesh": 47,
+              "meshName": "Brake caliper.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 149,
+              "indices": [
+                168,
+                361,
+                185
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9240809021566707,
+            "node": "Body:black",
+            "triangle": 1193,
+            "source": {
+              "node": "Brake caliper",
+              "nodeIndex": 46,
+              "mesh": 46,
+              "meshName": "Brake caliper",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 137,
+              "indices": [
+                73,
+                276,
+                88
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.5,
+        "z": -1.375,
+        "near": {
+          "lo": {
+            "x": -0.9108693815078269,
+            "node": "Body:black",
+            "triangle": 21673,
+            "source": {
+              "node": "Wheelhouse inner liner.003",
+              "nodeIndex": 309,
+              "mesh": 309,
+              "meshName": "Wheelhouse inner liner.003",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 98,
+              "indices": [
+                81,
+                83,
+                95
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9108694188627974,
+            "node": "Body:black",
+            "triangle": 20896,
+            "source": {
+              "node": "Wheelhouse inner liner.002",
+              "nodeIndex": 308,
+              "mesh": 308,
+              "meshName": "Wheelhouse inner liner.002",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 101,
+              "indices": [
+                83,
+                97,
+                95
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.5,
+        "z": 0.7250000000000001,
+        "near": {
+          "lo": {
+            "x": -0.9108693891423832,
+            "node": "Body:black",
+            "triangle": 20113,
+            "source": {
+              "node": "Wheelhouse inner liner.001",
+              "nodeIndex": 307,
+              "mesh": 307,
+              "meshName": "Wheelhouse inner liner.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 98,
+              "indices": [
+                81,
+                83,
+                95
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.910869380182325,
+            "node": "Body:black",
+            "triangle": 19336,
+            "source": {
+              "node": "Wheelhouse inner liner",
+              "nodeIndex": 306,
+              "mesh": 306,
+              "meshName": "Wheelhouse inner liner",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 101,
+              "indices": [
+                83,
+                96,
+                95
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.5,
+        "z": 1.3750000000000004,
+        "near": {
+          "lo": {
+            "x": -0.9108694188627984,
+            "node": "Body:black",
+            "triangle": 20673,
+            "source": {
+              "node": "Wheelhouse inner liner.001",
+              "nodeIndex": 307,
+              "mesh": 307,
+              "meshName": "Wheelhouse inner liner.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 658,
+              "indices": [
+                513,
+                515,
+                527
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9108693815078279,
+            "node": "Body:black",
+            "triangle": 19896,
+            "source": {
+              "node": "Wheelhouse inner liner",
+              "nodeIndex": 306,
+              "mesh": 306,
+              "meshName": "Wheelhouse inner liner",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 661,
+              "indices": [
+                515,
+                528,
+                527
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.55,
+        "z": 0.7500000000000004,
+        "near": {
+          "lo": {
+            "x": -0.914031861249929,
+            "node": "Body:black",
+            "triangle": 20145,
+            "source": {
+              "node": "Wheelhouse inner liner.001",
+              "nodeIndex": 307,
+              "mesh": 307,
+              "meshName": "Wheelhouse inner liner.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 130,
+              "indices": [
+                105,
+                107,
+                119
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9140318940491667,
+            "node": "Body:black",
+            "triangle": 19368,
+            "source": {
+              "node": "Wheelhouse inner liner",
+              "nodeIndex": 306,
+              "mesh": 306,
+              "meshName": "Wheelhouse inner liner",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 133,
+              "indices": [
+                107,
+                120,
+                119
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.675,
+        "z": 1.225,
+        "near": {
+          "lo": {
+            "x": -0.9726936654629603,
+            "node": "Body:paint",
+            "triangle": 7731,
+            "source": {
+              "node": "Rolled fender lip.001",
+              "nodeIndex": 190,
+              "mesh": 190,
+              "meshName": "Rolled fender lip.001",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 499,
+              "indices": [
+                387,
+                401,
+                399
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9726936726120332,
+            "node": "Body:paint",
+            "triangle": 6953,
+            "source": {
+              "node": "Rolled fender lip",
+              "nodeIndex": 189,
+              "mesh": 189,
+              "meshName": "Rolled fender lip",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 501,
+              "indices": [
+                389,
+                403,
+                401
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      },
+      {
+        "y": 0.7,
+        "z": 0.9500000000000002,
+        "near": {
+          "lo": {
+            "x": -0.912294325392587,
+            "node": "Body:black",
+            "triangle": 20321,
+            "source": {
+              "node": "Wheelhouse inner liner.001",
+              "nodeIndex": 307,
+              "mesh": 307,
+              "meshName": "Wheelhouse inner liner.001",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 306,
+              "indices": [
+                243,
+                245,
+                257
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9122943312799354,
+            "node": "Body:black",
+            "triangle": 19544,
+            "source": {
+              "node": "Wheelhouse inner liner",
+              "nodeIndex": 306,
+              "mesh": 306,
+              "meshName": "Wheelhouse inner liner",
+              "primitive": 0,
+              "material": "black.001",
+              "triangle": 309,
+              "indices": [
+                245,
+                259,
+                257
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": null,
+          "hi": null
+        }
+      }
+    ],
+    "allRecesses": [
+      {
+        "y": 0.45,
+        "z": -1.4,
+        "near": {
+          "lo": {
+            "x": -0.9737130664456857,
+            "node": "Body:paint",
+            "triangle": 8843,
+            "source": {
+              "node": "Rolled fender lip.003",
+              "nodeIndex": 192,
+              "mesh": 192,
+              "meshName": "Rolled fender lip.003",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 51,
+              "indices": [
+                45,
+                59,
+                57
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9737130519982709,
+            "node": "Body:paint",
+            "triangle": 8065,
+            "source": {
+              "node": "Rolled fender lip.002",
+              "nodeIndex": 191,
+              "mesh": 191,
+              "meshName": "Rolled fender lip.002",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 53,
+              "indices": [
+                47,
+                61,
+                59
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": {
+            "x": 0.963459465093164,
+            "node": "Body:paint",
+            "triangle": 701,
+            "source": null
+          },
+          "hi": {
+            "x": 0.9760058936196648,
+            "node": "Body:paint",
+            "triangle": 702,
+            "source": null
+          }
+        }
+      },
+      {
+        "y": 0.45,
+        "z": 0.7000000000000002,
+        "near": {
+          "lo": {
+            "x": -0.973713151606445,
+            "node": "Body:paint",
+            "triangle": 7283,
+            "source": {
+              "node": "Rolled fender lip.001",
+              "nodeIndex": 190,
+              "mesh": 190,
+              "meshName": "Rolled fender lip.001",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 51,
+              "indices": [
+                45,
+                59,
+                57
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.97371314738023,
+            "node": "Body:paint",
+            "triangle": 6505,
+            "source": {
+              "node": "Rolled fender lip",
+              "nodeIndex": 189,
+              "mesh": 189,
+              "meshName": "Rolled fender lip",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 53,
+              "indices": [
+                47,
+                60,
+                59
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": {
+            "x": 0.9615389236739306,
+            "node": "Body:paint",
+            "triangle": 436,
+            "source": null
+          },
+          "hi": {
+            "x": 0.9761454423015379,
+            "node": "Body:paint",
+            "triangle": 437,
+            "source": null
+          }
+        }
+      },
+      {
+        "y": 0.45,
+        "z": 1.4000000000000004,
+        "near": {
+          "lo": {
+            "x": -0.9737130705656378,
+            "node": "Body:paint",
+            "triangle": 7938,
+            "source": {
+              "node": "Rolled fender lip.001",
+              "nodeIndex": 190,
+              "mesh": 190,
+              "meshName": "Rolled fender lip.001",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 706,
+              "indices": [
+                549,
+                551,
+                563
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9737130664456861,
+            "node": "Body:paint",
+            "triangle": 7160,
+            "source": {
+              "node": "Rolled fender lip",
+              "nodeIndex": 189,
+              "mesh": 189,
+              "meshName": "Rolled fender lip",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 708,
+              "indices": [
+                551,
+                552,
+                564
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": {
+            "x": -0.9760731468231656,
+            "node": "Body:paint",
+            "triangle": 676,
+            "source": null
+          },
+          "hi": {
+            "x": -0.9643021805422543,
+            "node": "Body:paint",
+            "triangle": 677,
+            "source": null
+          }
+        }
+      },
+      {
+        "y": 0.675,
+        "z": -1.2249999999999999,
+        "near": {
+          "lo": {
+            "x": -0.972693672612033,
+            "node": "Body:paint",
+            "triangle": 9050,
+            "source": {
+              "node": "Rolled fender lip.003",
+              "nodeIndex": 192,
+              "mesh": 192,
+              "meshName": "Rolled fender lip.003",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 258,
+              "indices": [
+                207,
+                209,
+                221
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9726936654629602,
+            "node": "Body:paint",
+            "triangle": 8272,
+            "source": {
+              "node": "Rolled fender lip.002",
+              "nodeIndex": 191,
+              "mesh": 191,
+              "meshName": "Rolled fender lip.002",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 260,
+              "indices": [
+                209,
+                211,
+                223
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": {
+            "x": -0.9760758382500379,
+            "node": "Body:paint",
+            "triangle": 867,
+            "source": null
+          },
+          "hi": {
+            "x": 0.8947061795592381,
+            "node": "Body:black",
+            "triangle": 1002,
+            "source": null
+          }
+        }
+      },
+      {
+        "y": 0.675,
+        "z": -0.8749999999999999,
+        "near": {
+          "lo": {
+            "x": -0.9726936673813719,
+            "node": "Body:paint",
+            "triangle": 9291,
+            "source": {
+              "node": "Rolled fender lip.003",
+              "nodeIndex": 192,
+              "mesh": 192,
+              "meshName": "Rolled fender lip.003",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 499,
+              "indices": [
+                387,
+                401,
+                399
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9726936819577503,
+            "node": "Body:paint",
+            "triangle": 8513,
+            "source": {
+              "node": "Rolled fender lip.002",
+              "nodeIndex": 191,
+              "mesh": 191,
+              "meshName": "Rolled fender lip.002",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 501,
+              "indices": [
+                389,
+                403,
+                401
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": {
+            "x": -0.9760109718946655,
+            "node": "Body:paint",
+            "triangle": 910,
+            "source": null
+          },
+          "hi": {
+            "x": 0.8837460439119482,
+            "node": "Body:black",
+            "triangle": 1031,
+            "source": null
+          }
+        }
+      },
+      {
+        "y": 0.7,
+        "z": -1.1749999999999998,
+        "near": {
+          "lo": {
+            "x": -0.974682591735983,
+            "node": "Body:paint",
+            "triangle": 9083,
+            "source": {
+              "node": "Rolled fender lip.003",
+              "nodeIndex": 192,
+              "mesh": 192,
+              "meshName": "Rolled fender lip.003",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 291,
+              "indices": [
+                231,
+                245,
+                243
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9746825915813766,
+            "node": "Body:paint",
+            "triangle": 8304,
+            "source": {
+              "node": "Rolled fender lip.002",
+              "nodeIndex": 191,
+              "mesh": 191,
+              "meshName": "Rolled fender lip.002",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 292,
+              "indices": [
+                233,
+                235,
+                247
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": {
+            "x": -0.9661073878817138,
+            "node": "Body:paint",
+            "triangle": 868,
+            "source": null
+          },
+          "hi": {
+            "x": 0.8102763571009204,
+            "node": "Body:black",
+            "triangle": 498,
+            "source": null
+          }
+        }
+      },
+      {
+        "y": 0.7,
+        "z": 1.1750000000000003,
+        "near": {
+          "lo": {
+            "x": -0.9746825915813767,
+            "node": "Body:paint",
+            "triangle": 7699,
+            "source": {
+              "node": "Rolled fender lip.001",
+              "nodeIndex": 190,
+              "mesh": 190,
+              "meshName": "Rolled fender lip.001",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 467,
+              "indices": [
+                363,
+                377,
+                375
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.9746825917359833,
+            "node": "Body:paint",
+            "triangle": 6920,
+            "source": {
+              "node": "Rolled fender lip",
+              "nodeIndex": 189,
+              "mesh": 189,
+              "meshName": "Rolled fender lip",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 468,
+              "indices": [
+                365,
+                367,
+                379
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": {
+            "x": -0.9187824488963654,
+            "node": "Body:black",
+            "triangle": 918,
+            "source": null
+          },
+          "hi": {
+            "x": 0.9760538037619679,
+            "node": "Body:paint",
+            "triangle": 500,
+            "source": null
+          }
+        }
+      },
+      {
+        "y": 0.925,
+        "z": 1.6,
+        "near": {
+          "lo": {
+            "x": -0.8912783136110306,
+            "node": "Body:paint",
+            "triangle": 15638,
+            "source": {
+              "node": "Watertight 14-station body shell",
+              "nodeIndex": 305,
+              "mesh": 305,
+              "meshName": "Watertight 14-station body shell_closed_tessellation",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 1298,
+              "indices": [
+                401,
+                514,
+                38
+              ]
+            }
+          },
+          "hi": {
+            "x": 0.8912313475707816,
+            "node": "Body:paint",
+            "triangle": 16063,
+            "source": {
+              "node": "Watertight 14-station body shell",
+              "nodeIndex": 305,
+              "mesh": 305,
+              "meshName": "Watertight 14-station body shell_closed_tessellation",
+              "primitive": 0,
+              "material": "paint",
+              "triangle": 1723,
+              "indices": [
+                53,
+                577,
+                1951
+              ]
+            }
+          }
+        },
+        "far": {
+          "lo": {
+            "x": 0.8914463269595303,
+            "node": "Body:paint",
+            "triangle": 1248,
+            "source": null
+          },
+          "hi": {
+            "x": 0.8914463269595303,
+            "node": "Body:paint",
+            "triangle": 1248,
+            "source": null
+          }
+        }
+      }
+    ]
+  },
+  "tests": {
+    "command": "pnpm exec tsx --test tests/car-inner-shell-repair.test.ts tests/car-wheel-topology.test.ts tests/realistic-car-pack.test.ts tests/native-car-models.test.ts",
+    "passed": 19,
+    "failed": 0,
+    "typescript": "targeted --noEmit PASS",
+    "fullSuiteBuildIntegration": "owned by root, not run in this subtask"
+  },
+  "gpuVerified": false,
+  "portableMasterMetadataAdjustment": {
+    "beforeSha256": "2a1da0d7b9e99b8d0946615559b1bfc230382071570c39a62c1e98695c606375",
+    "afterSha256": "903eaf0fcfaa7a4ef1ce15a89435e3e4186db8190907e0099b5be7f52e44e83f",
+    "changedMetadataOnly": true,
+    "changedProperty": "CC0 paint neutral microvariation.filepath",
+    "beforePath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\vehicle-pilot-repair-20261011\\reproduction\\assets\\blender\\vehicles\\innerscene-hatchback\\paint-neutral-microvariation.png",
+    "afterPath": "//paint-neutral-microvariation.png",
+    "allMeshPositionsLoopIndicesUVNormalsAndTransformsUnchangedSha256": "618b63a56c38966e3ad49f0c2c4ad6922f1733dec694720d431a9b3a821aa416",
+    "packedPaintSha256Unchanged": "7d24bdbd9ec756d0124fa06edc6e12a32b2075c7044ed59c27b3924fefba8038",
+    "renderPerformed": false
+  },
+  "liveMasterPortability": {
+    "audit": "docs/vehicles/inner-shell-master-portability.json",
+    "sha256": "903eaf0fcfaa7a4ef1ce15a89435e3e4186db8190907e0099b5be7f52e44e83f",
+    "objectCount": 27,
+    "materialCount": 12,
+    "imageCount": 10,
+    "allPackedImageBytesUnchanged": true,
+    "requiredCacheDependencies": [],
+    "missingRequiredImages": []
+  },
+  "finalTargetedTestsAfterMetadataChange": {
+    "passed": 19,
+    "failed": 0
+  }
+}

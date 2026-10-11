@@ -1,0 +1,53 @@
+{
+  "status": "passed",
+  "scope": "Technical checkpoint: tests, production build including TypeScript, isolated integration, and independent live/frozen SHA audit. GPU validation pending.",
+  "sourceSnapshotId": "761f0f3436c7479126ecd2fc3dcc9231b6040d41371d5f9b1d560b855a021d65",
+  "files": 8139,
+  "tests": {
+    "total": 399,
+    "passed": 399,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "startedAt": "2026-10-11T15:01:12.0665054Z",
+  "finishedAt": "2026-10-11T15:03:21.0553557Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 69.2049262,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 41.0310887,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 18.6945179,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "sourceCheck": "source-check.json",
+  "pipeline": "pipeline-results.json",
+  "publishedSha256": {
+    "source-manifest.json": "78a686b6c0d75cdf1d8e924feb15ab52bb2b6d26d64c52073e2c38820dd93537",
+    "pipeline-results.json": "9857b924850204d5900aff9cb4fee5731ac34591ed72cc5f7fabfc5af716377d",
+    "pipeline-test.log": "97e9f8d1869a615e71e18e545db8e8db96406d1b83ca2b049542a075162fb4dd",
+    "pipeline-build.log": "a20775146037d99fde687395fcca7009441822353d1989a1f13585f19b67f8e4",
+    "pipeline-test-integration.log": "aface68e5682d0ca68a92ce1f35a2b51d7e7f7f85bb6bd6349a939543931cdf9"
+  },
+  "gpu": {
+    "status": "pending",
+    "note": "M3 has no completed matched GPU/FPS result yet. Earlier L2/M evidence and separate visual hair evidence are not FPS results for M3."
+  },
+  "buildNotes": [
+    "Build completed with exit 0; complete log preserves dynamic-import and bundler timing warnings.",
+    "Integration completed with exit 0 and its explicit PASS summary; the retained raw log also contains the room-close diagnostic (4002)."
+  ]
+}

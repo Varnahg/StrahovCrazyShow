@@ -62,6 +62,60 @@ function sample() {
   };
 }
 
+test("local CPU and AA diagnostics whitelist numeric stages and real context attributes", () => {
+  const context = {
+    requestedAntialias: true,
+    actualAntialias: true,
+    defaultFramebuffer: true,
+    sampleBuffers: 1,
+    samples: 4,
+    private: "drop",
+  };
+  const raw = {
+    ...sample(),
+    gpu: { ...sample().gpu, context },
+    engineCpuBreakdownMs: {
+      activeMeshes: 2.5,
+      mainDraw: 3.2,
+      renderTargets: 1.1,
+      private: "drop",
+    },
+  };
+  const projected = projectLocalBenchmark(raw);
+  assert.deepEqual(projected.engineCpuBreakdownMs, {
+    activeMeshes: 2.5,
+    mainDraw: 3.2,
+    renderTargets: 1.1,
+  });
+  assert.equal(projected.gpu.context.samples, 4);
+  assert.equal(projected.gpu.context.private, undefined);
+  assert.ok(!JSON.stringify(projected).includes("drop"));
+  assert.throws(() =>
+    projectLocalBenchmark({
+      ...raw,
+      engineCpuBreakdownMs: { activeMeshes: NaN },
+    }),
+  );
+  assert.throws(() =>
+    projectLocalBenchmark({
+      ...raw,
+      gpu: { ...raw.gpu, context: { ...context, samples: -1 } },
+    }),
+  );
+  assert.throws(() =>
+    projectLocalBenchmark({
+      ...raw,
+      gpu: { ...raw.gpu, context: { ...context, samples: 1.5 } },
+    }),
+  );
+  assert.throws(() =>
+    projectLocalBenchmark({
+      ...raw,
+      gpu: { ...raw.gpu, context: { ...context, defaultFramebuffer: false } },
+    }),
+  );
+});
+
 test("virtual camera projection preserves only finite bounded geometry metadata", () => {
   const matrix = Array.from({ length: 16 }, (_, i) => (i % 5 === 0 ? 1 : 0));
   const camera = {

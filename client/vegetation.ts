@@ -17,6 +17,7 @@ import { Vector3, Quaternion, Matrix } from "@babylonjs/core/Maths/math.vector";
 import { BoundingInfo } from "@babylonjs/core/Culling/boundingInfo";
 import { createGrassMaterial, type GrassWindState } from "./grass-material";
 import { chunkStaticMesh } from "./static-submesh-chunks";
+import { GrassPatchSelection } from "./vegetation-selection";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import type { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Meshes/instancedMesh";
@@ -335,6 +336,8 @@ type PatchMesh = { mesh: Mesh; patch: GrassPatch; enabled: boolean };
 export class VegetationController {
   readonly stats: VegetationStats;
   private patches: PatchMesh[] = [];
+  private grassSelection?: GrassPatchSelection;
+  private grassBudget = grassLod("");
   private trees: Mesh[] = [];
   private treeContainer?: AssetContainer;
   private treeGroups: {
@@ -381,6 +384,7 @@ export class VegetationController {
     this.grassMaterial = createGrassMaterial(scene, this.grassWind);
     this.materials.push(this.grassMaterial);
     const patches = createGrassPatches(BOUNDS, BUILDINGS, MAP.paths);
+    this.grassSelection = new GrassPatchSelection(patches);
     const source = grassSource(scene, this.grassMaterial);
     this.grassIndexLevels = source.metadata.grassIndicesByQuality;
     this.sources.push(source);
@@ -724,8 +728,9 @@ export class VegetationController {
     this.treeWind.time = Number.isFinite(input.time) ? input.time : 0;
     this.treeWind.x = this.wind.x;
     this.treeWind.z = this.wind.z;
-    const lod = grassLod(input.quality);
-    if (this.previousQuality !== input.quality) {
+    const qualityChanged = this.previousQuality !== input.quality;
+    if (qualityChanged) {
+      this.grassBudget = grassLod(input.quality);
       const key =
         input.quality === "low"
           ? "low"
@@ -736,15 +741,14 @@ export class VegetationController {
       // conservative bounds retain the complete master, with no extra tile meshes.
       this.sources[0].geometry!.setIndices(this.grassIndexLevels[key]);
     }
-    Object.assign(this.grassWind, {
-      time: this.treeWind.time,
-      windX: this.wind.x,
-      windZ: this.wind.z,
-      playerX: input.player.x,
-      playerY: input.player.y,
-      playerZ: input.player.z,
-      range: lod.range,
-    });
+    const lod = this.grassBudget;
+    this.grassWind.time = this.treeWind.time;
+    this.grassWind.windX = this.wind.x;
+    this.grassWind.windZ = this.wind.z;
+    this.grassWind.playerX = input.player.x;
+    this.grassWind.playerY = input.player.y;
+    this.grassWind.playerZ = input.player.z;
+    this.grassWind.range = lod.range;
     if (
       input.time - this.lastSelection < 0.15 &&
       this.previousQuality === input.quality
@@ -780,26 +784,17 @@ export class VegetationController {
     this.stats.activeTreeTriangles = treeTriangles;
     this.startDetailLoads();
     this.trimDetailCache();
-    const nearby = this.patches
-      .map((patch) => ({
-        patch,
-        distance: Math.hypot(
-          patch.patch.x - input.player.x,
-          patch.patch.z - input.player.z,
-        ),
-      }))
-      .filter((p) => p.distance < lod.range + 11.4)
-      .sort(
-        (a, b) =>
-          a.distance * (a.patch.enabled ? 0.85 : 1) -
-          b.distance * (b.patch.enabled ? 0.85 : 1),
-      )
-      .slice(0, lod.tiles);
-    const visible = new Set(nearby.map((p) => p.patch));
-    this.stats.visibleGrassTiles = nearby.length;
+    const selection = this.grassSelection!;
+    if (
+      !selection.update(input.player.x, input.player.z, lod.range, lod.tiles) &&
+      !qualityChanged
+    )
+      return;
+    this.stats.visibleGrassTiles = selection.selected.length;
     this.stats.visibleGrassClumps = 0;
-    for (const patch of this.patches) {
-      const enabled = visible.has(patch);
+    for (let i = 0; i < this.patches.length; i++) {
+      const patch = this.patches[i];
+      const enabled = selection.isSelected(i);
       if (enabled !== patch.enabled) {
         patch.mesh.setEnabled(enabled);
         patch.enabled = enabled;
@@ -827,6 +822,7 @@ export class VegetationController {
     for (const source of this.sources) source.dispose(false, false);
     for (const material of this.materials) material.dispose(false, true);
     this.patches = [];
+    this.grassSelection = undefined;
     this.trees = [];
     this.treeGroups = [];
     this.sources = [];

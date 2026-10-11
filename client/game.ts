@@ -8,6 +8,11 @@ import {
 import { buildWorld } from "./world-renderer";
 import { captureModelReview } from "./model-review";
 import { captureRenderCostInventory } from "./render-cost";
+import { EnabledMeshCandidates } from "./active-mesh-candidates";
+import {
+  BenchmarkRenderProfile,
+  BENCHMARK_RENDER_CPU_SCOPE,
+} from "./benchmark-render-profile";
 import { AvatarAnimator } from "./animation";
 import { AvatarLodController } from "./avatar-lod";
 import { ContactShadows } from "./contact-shadows";
@@ -98,7 +103,13 @@ import {
   TRANSIT_NAVIGATION,
   sampleTransit,
 } from "../shared/transit";
-import type { Player, Profile, Input, AvatarConfig, Vec3 } from "../shared/types";
+import type {
+  Player,
+  Profile,
+  Input,
+  AvatarConfig,
+  Vec3,
+} from "../shared/types";
 import {
   canonicalInput,
   FIXED_DT,
@@ -179,6 +190,12 @@ export type Benchmark = {
   gpu: GpuDiagnostics;
   frameWork: { cpuMs: number | null; gpuMs: number | null };
   frameBreakdownMs: Record<string, number>;
+  /** Nested Babylon CPU timings, not additive and never GPU timings. */
+  engineCpuBreakdownMs: Record<string, number>;
+  engineCpuBreakdownScope: typeof BENCHMARK_RENDER_CPU_SCOPE;
+  frameIntervalsMs: number[];
+  weatherAtStart: Weather | null;
+  weatherAtEnd: Weather | null;
   presentationRate: PresentationRateMeasurement | null;
 };
 type Avatar = AvatarRig & {
@@ -249,6 +266,9 @@ export class Game {
     frames: number[];
     minAvatars: number;
     work: Record<string, number>;
+    engineWork: Record<string, number>;
+    profile: BenchmarkRenderProfile;
+    weatherAtStart: Weather | null;
   };
   network = false;
   ready = false;
@@ -306,6 +326,7 @@ export class Game {
   renderErrorCount = 0;
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
+  private enabledMeshCandidates: EnabledMeshCandidates;
   get assetLoadErrorCount() {
     return (
       this.startupAssetErrors +
@@ -416,6 +437,10 @@ export class Game {
       }
     }
     this.scene = new Scene(this.engine);
+    this.enabledMeshCandidates = new EnabledMeshCandidates(
+      this.scene,
+      this.scene.getActiveMeshCandidates,
+    );
     this.textureDiagnostics = new SceneTextureDiagnostics(
       this.scene,
       (count) => {
@@ -955,11 +980,15 @@ export class Game {
       this.applyAdaptiveQuality(this.adaptive.setTargetFps(fps));
   }
   startBenchmark() {
+    this.benchmark?.profile.dispose();
     this.benchmark = {
       start: performance.now(),
       frames: [],
       minAvatars: this.avatars.size,
       work: {},
+      engineWork: {},
+      profile: new BenchmarkRenderProfile(this.scene),
+      weatherAtStart: this.weather ? structuredClone(this.weather) : null,
     };
   }
   interact() {
@@ -1742,7 +1771,9 @@ export class Game {
       localId: this.localId,
     });
     const environmentEnded = performance.now();
+    this.benchmark?.profile.beginFrame();
     this.scene.render();
+    const engineWork = this.benchmark?.profile.endFrame();
     const renderEnded = performance.now();
     for (const [id, a] of this.avatars) {
       if (id === this.localId) continue;
@@ -1774,11 +1805,17 @@ export class Game {
       };
       for (const [key, milliseconds] of Object.entries(breakdown))
         b.work[key] = (b.work[key] ?? 0) + milliseconds;
+      if (engineWork)
+        for (const [key, milliseconds] of Object.entries(engineWork))
+          b.engineWork[key] = (b.engineWork[key] ?? 0) + milliseconds;
       b.frames.push(rawFrameMs);
       b.minAvatars = Math.min(b.minAvatars, this.avatars.size);
       if (performance.now() - b.start >= 10000) {
         const sorted = b.frames.slice().sort((a, b) => a - b),
           sum = b.frames.reduce((a, b) => a + b, 0);
+        // Release before the callback: it may immediately start another run.
+        this.benchmark = undefined;
+        b.profile.dispose();
         this.onBenchmark?.({
           date: new Date().toISOString(),
           sourceSnapshotId: import.meta.env.VITE_SOURCE_SNAPSHOT_ID || null,
@@ -1859,9 +1896,18 @@ export class Game {
               sum / b.frames.length,
             ]),
           ),
+          engineCpuBreakdownMs: Object.fromEntries(
+            Object.entries(b.engineWork).map(([key, sum]) => [
+              key,
+              sum / b.frames.length,
+            ]),
+          ),
+          engineCpuBreakdownScope: BENCHMARK_RENDER_CPU_SCOPE,
+          frameIntervalsMs: b.frames,
+          weatherAtStart: b.weatherAtStart,
+          weatherAtEnd: this.weather ? structuredClone(this.weather) : null,
           presentationRate: this.presentationRate,
         });
-        this.benchmark = undefined;
       }
     }
     if (performance.now() - this.lastStats > 200) {
@@ -1931,9 +1977,12 @@ export class Game {
     window.removeEventListener("resize", this.resize);
     if (document.pointerLockElement === this.canvas) document.exitPointerLock();
     this.engine.stopRenderLoop();
+    this.enabledMeshCandidates.dispose();
     this.sim?.dispose();
     this.labels.dispose();
     this.contactShadows.dispose();
+    this.benchmark?.profile.dispose();
+    this.benchmark = undefined;
     this.instrumentation.dispose();
     this.engineInstrumentation.dispose();
     this.cinematic?.dispose();

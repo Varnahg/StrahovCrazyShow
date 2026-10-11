@@ -17,6 +17,11 @@ export type CampusSurfaceArt = Readonly<{
   roughnessVariation: number;
   normalStrength: number;
   specularIntensity: number;
+  /** Linear-space mean of the unchanged source albedo, sampled on an 8px grid.
+   * Detail contrast is an art choice; this mean is not a measured campus colour. */
+  sourceMean: readonly [number, number, number];
+  nearDetail: number;
+  farDetail: number;
 }>;
 
 const ART: Readonly<Record<string, CampusSurfaceArt>> = {
@@ -29,8 +34,11 @@ const ART: Readonly<Record<string, CampusSurfaceArt>> = {
     coarseMetres: 17,
     fineMetres: 4.5,
     roughnessVariation: 0.055,
-    normalStrength: 0.32,
+    normalStrength: 0.26,
     specularIntensity: 0.67,
+    sourceMean: [0.092028, 0.082484, 0.06154],
+    nearDetail: 0.9,
+    farDetail: 0.64,
   },
   concrete: {
     tint: [0.83, 0.84, 0.79],
@@ -41,6 +49,9 @@ const ART: Readonly<Record<string, CampusSurfaceArt>> = {
     roughnessVariation: 0.025,
     normalStrength: 0.27,
     specularIntensity: 0.52,
+    sourceMean: [0.490326, 0.490326, 0.490326],
+    nearDetail: 0.94,
+    farDetail: 0.82,
   },
   plaster: {
     tint: [0.98, 0.965, 0.91],
@@ -51,6 +62,9 @@ const ART: Readonly<Record<string, CampusSurfaceArt>> = {
     roughnessVariation: 0.012,
     normalStrength: 0.18,
     specularIntensity: 0.43,
+    sourceMean: [0.687218, 0.661026, 0.638101],
+    nearDetail: 0.94,
+    farDetail: 0.82,
   },
   grass: {
     tint: [0.94, 0.9, 0.76],
@@ -59,8 +73,11 @@ const ART: Readonly<Record<string, CampusSurfaceArt>> = {
     coarseMetres: 16,
     fineMetres: 3.7,
     roughnessVariation: 0.015,
-    normalStrength: 0.4,
+    normalStrength: 0.28,
     specularIntensity: 0.27,
+    sourceMean: [0.057231, 0.10811, 0.018593],
+    nearDetail: 0.8,
+    farDetail: 0.55,
   },
   paving: {
     tint: [0.96, 0.95, 0.9],
@@ -69,8 +86,11 @@ const ART: Readonly<Record<string, CampusSurfaceArt>> = {
     coarseMetres: 14,
     fineMetres: 3.8,
     roughnessVariation: 0.025,
-    normalStrength: 0.43,
+    normalStrength: 0.35,
     specularIntensity: 0.53,
+    sourceMean: [0.216666, 0.219948, 0.200163],
+    nearDetail: 0.88,
+    farDetail: 0.76,
   },
   sett: {
     tint: [0.94, 0.95, 0.93],
@@ -79,8 +99,11 @@ const ART: Readonly<Record<string, CampusSurfaceArt>> = {
     coarseMetres: 13,
     fineMetres: 3.4,
     roughnessVariation: 0.03,
-    normalStrength: 0.48,
+    normalStrength: 0.4,
     specularIntensity: 0.58,
+    sourceMean: [0.299795, 0.31009, 0.247003],
+    nearDetail: 0.88,
+    farDetail: 0.76,
   },
   gravel: {
     tint: [0.95, 0.93, 0.86],
@@ -89,8 +112,11 @@ const ART: Readonly<Record<string, CampusSurfaceArt>> = {
     coarseMetres: 11,
     fineMetres: 3.5,
     roughnessVariation: 0.025,
-    normalStrength: 0.35,
+    normalStrength: 0.29,
     specularIntensity: 0.35,
+    sourceMean: [0.262178, 0.240306, 0.19394],
+    nearDetail: 0.82,
+    farDetail: 0.64,
   },
 };
 
@@ -146,6 +172,7 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
   constructor(
     material: PBRMaterial,
     readonly art: CampusSurfaceArt,
+    private preserveAuthoredDetail = false,
   ) {
     super(material, "CampusSurfaceArt", 190, {}, true, true);
     this.doNotSerialize = true;
@@ -156,6 +183,9 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
         "bounded artistic surface variation; not surveyed stains or repairs",
       originalTextureChannelsUnmodified: true,
       addedArtDrawCalls: 0,
+      surfaceDetailProvenance:
+        "source-albedo linear mean sampled 2026-10-11; artistic detail compression, not campus colour measurement",
+      surfaceDetailPreserved: preserveAuthoredDetail,
     };
   }
 
@@ -167,10 +197,11 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
     return {
       ubo: [
         { name: "campusArtSettings", size: 4, type: "vec4" },
-        { name: "campusArtRoughness", size: 1, type: "float" },
+        { name: "campusArtDetail", size: 4, type: "vec4" },
+        { name: "campusArtResponse", size: 2, type: "vec2" },
       ],
       fragment:
-        "uniform vec4 campusArtSettings;\nuniform float campusArtRoughness;",
+        "uniform vec4 campusArtSettings;\nuniform vec4 campusArtDetail;\nuniform vec2 campusArtResponse;",
     };
   }
 
@@ -182,7 +213,16 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
       this.art.coarseMetres,
       this.art.fineMetres,
     );
-    buffer.updateFloat("campusArtRoughness", this.art.roughnessVariation);
+    buffer.updateFloat4(
+      "campusArtDetail",
+      ...this.art.sourceMean,
+      this.preserveAuthoredDetail ? 1 : this.art.nearDetail,
+    );
+    buffer.updateFloat2(
+      "campusArtResponse",
+      this.preserveAuthoredDetail ? 1 : this.art.farDetail,
+      this.art.roughnessVariation,
+    );
   }
 
   override getCustomCode(type: string, language = ShaderLanguage.GLSL) {
@@ -192,15 +232,23 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
       CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
         // A small Y contribution avoids horizontal stripes on vertical walls.
         vec2 campusArtPosition=vPositionW.xz+vPositionW.y*vec2(0.37,0.23);
-        campusArtVariation=0.72*campusArtNoise(campusArtPosition/campusArtSettings.z)
-          +0.28*campusArtNoise(campusArtPosition/campusArtSettings.w+vec2(37.2,19.6));
+        // One noise octave (four hashes) replaces the former two/eight hashes.
+        // Mipmaps still select actual texture detail; this only lowers contrast.
+        campusArtVariation=campusArtNoise(campusArtPosition/campusArtSettings.z);
+        vec3 campusEyeOffset=vEyePosition.xyz-vPositionW;
+        float campusDetailFade=smoothstep(campusArtSettings.w*campusArtSettings.w,
+          16.0*campusArtSettings.z*campusArtSettings.z,dot(campusEyeOffset,campusEyeOffset));
+        float campusDetail=mix(campusArtDetail.w,campusArtResponse.x,campusDetailFade);
+        // Retain the current material factor, including rain darkening. Original
+        // authored joints use detail=1 and are never pulled to a different map's mean.
+        surfaceAlbedo=mix(campusArtDetail.rgb*vAlbedoColor.rgb,surfaceAlbedo,campusDetail);
         float campusArtLuma=dot(surfaceAlbedo,vec3(0.2126,0.7152,0.0722));
         surfaceAlbedo=mix(vec3(campusArtLuma),surfaceAlbedo,campusArtSettings.x);
         surfaceAlbedo*=1.0+(campusArtVariation-0.5)*campusArtSettings.y;
       `,
       CUSTOM_FRAGMENT_UPDATE_METALLICROUGHNESS: `
         metallicRoughness.g=clamp(metallicRoughness.g+
-          (campusArtVariation-0.5)*campusArtRoughness,0.045,1.0);
+          (campusArtVariation-0.5)*campusArtResponse.y,0.045,1.0);
       `,
     };
   }

@@ -1,5 +1,55 @@
 # Ověření dema a známá omezení
 
+## Checkpoint M6 · integrovaný pilot a klientské ověření
+
+M6 `c21932439374f0bf23e7a8d514aecb88ef9552c2e89d5e3e2890e4b71da8b896` prošel **403/403 testy, produkčním buildem a izolovanou integrací**, vše exit 0 (11. 10. 2026 15:49:31–15:51:49 UTC; 78,019 / 41,867 / 18,179 s). Nezávislý audit skutečně hashoval **8144 live + 8144 frozen souborů**, včetně 80 testových souborů v každém stromu: **0 neshod a chyb**. [Výsledky a úplné logy](verification-evidence/pilot-20261011-m6/results.json), [SHA audit](verification-evidence/pilot-20261011-m6/source-check.json).
+
+Zahrnuje tlumenější materiály, sdílené oči, texturované krátké účesy Alex/Sam, opravené medium brýle a Samovo ucho, cache render kandidátů a výběru trávy, přesný CPU profil a diagnostiku skutečného WebGL kontextu. Přidaná [oprava vnitřní near plochy auta](vehicle-pilot-repair-20261011.md) mění jedinou diagonálu, nikoli polohy vrcholů, textury nebo fyziku; stejná oprava je v editovatelném masteru. [Aktuální strukturální inventář](model-review/authored-glb-audit.json): 158 GLB, 0 strukturálních chyb; 161 degenerátů patří původnímu autobusu. Vizuální věrnost všech modelů tím není přijata.
+
+M4 měl **402/402 technický PASS, ale následný component QA FAIL** při samostatném spuštění vysokého detailu: chyběla explicitní registrace postprocess scene component. [Původní selhání a reprodukce](verification-evidence/pilot-20261011-m4/results.json) zůstávají zachované. M5 je [mezikrok bez plné pipeline](verification-evidence/pilot-20261011-m5/results.json), který registraci opravuje; M6 přidává silnější regresi ověřující manager ještě před konstrukcí pipeline. Stejný test proti M4 správně selže, proti aktuální implementaci projde. [Pozitivní i negativní kontrola](verification-evidence/cinematic-pipeline-contract-20261011/results.json).
+
+Skutečná **produkční hra s HUD a jednou multiplayerovou relací** se načetla na low, přepnula na high s denním náhledem a zpět na medium se skutečným časem. CSS i interní rozlišení při high/medium bylo **1280×720**, skutečný adaptér **Intel UHD 630**. V aktuálním intervalu nebyla nová console warning/error; jediná zachycená stará chyba patřila dřívějšímu M4 náhledu a je výslovně oddělená. [Protokol a omezení](verification-evidence/pilot-20261011-m6/production-smoke.json), [high / den](verification-evidence/pilot-20261011-m6/production-high-day.png), [medium / skutečný čas](verification-evidence/pilot-20261011-m6/production-medium-current-time.png). Nešlo o FPS přejímku ani opakování všech pěších/jízdních tras; ty mají vlastní dřívější důkazy níže.
+
+**Hlavní cíl zůstává 60 FPS klienta na GeForce GTX 1060. Nové měření na této kartě chybí.** Instalovaná karta, serverové Hz, NullEngine, technický PASS ani okamžité HUD číslo cíl nedokazují. Přínos cache pro FPS se dosud nevyčísluje. Místní produkční odkaz `http://127.0.0.1:4179/` byl po ověření nulového počtu připojených relací aktualizován na M6; lokální sběr vrací přesné ID M6 a výsledky ukládá pouze do ignorované `.cache`. Před uživatelským měřením byly řízené 3D scény zavřené. Ovládání samostatného Edge nebylo nástroji dostupné; vynucení GeForce se netvrdí.
+
+## Checkpoint M3 · texturované krátké vlasy a stabilní identita postav
+
+M3 `761f0f3436c7479126ecd2fc3dcc9231b6040d41371d5f9b1d560b855a021d65` prošel **399/399 testy, produkčním buildem a izolovanou integrací**, vše exit 0 (11. 10. 2026 15:01:12–15:03:21 UTC). Nezávislý audit následně hashoval **8139 live + 8139 frozen souborů**, včetně 78 testových souborů v každém stromu: 0 neshod a chyb. [Výsledky a logy](verification-evidence/pilot-20261011-m3/results.json), [SHA audit](verification-evidence/pilot-20261011-m3/source-check.json).
+
+Alex a Sam používají ve skutečné herní factory sdílené CC0 pramenné účesy se zachovanými původními atlasy, paletou editoru a LOD. Brýle zůstávají viditelné i ve středním detailu a nezvětšují far proxy. Praktický GPU review zkontroloval tmavou/blond variantu, profily, zadní siluety, brýle a medium přechod. Nalezený pramen před tragusem Sama se opravil podle úplných původních face-setů ucha: předchozí výběr vynechal 86 vrcholů. Původní zdroj, hlava a bitmapy zůstaly nezměněné. Paprsky reprodukují 36/64 překrytí před opravou a 0/64 po ní; následné skutečné GPU snímky potvrzují odkryté ucho. [Provenience, přesná oprava a omezení](pilot-hair-20261011.md), [GPU po opravě](verification-evidence/pilot-hair-20261011/sam-ear-fixed-blond-glasses-medium.png), [nový Alex](verification-evidence/pilot-hair-20261011/alex-near-front.png).
+
+Vizuální QA používala Intel UHD 630 a není FPS důkaz. **60 FPS klienta na GeForce GTX 1060 stále čeká na měření; technický PASS ani samostatný avatarový náhled tento cíl nepotvrzují.** Čtyři zbývající účesy, společná základna obličejů, vpečené světlo zdrojových vlasových atlasů a další otevřené modelové vady se tímto krokem neoznačují za dokončené. Následující car oprava má vlastní checkpoint a není součástí M3.
+
+## Checkpoint M2 · méně prázdných kandidátů rendereru
+
+M2 `868d6898dbe813ae2c9170beb3f629c8b890c5ec1766abb40a7ab8bca185f435` prošel **390/390 testy, buildem a izolovanou integrací**, vše exit 0 (11. 10. 2026 14:23:27–14:25:29 UTC). Následný audit skutečně přečetl a hashoval všech **8109 zmrazených souborů**, včetně 74 testových souborů a 7038 IPR podkladů: 0 neshod/chyb. [Výsledky](verification-evidence/pilot-20261011-m2/results.json), [frozen SHA audit](verification-evidence/pilot-20261011-m2/source-check.json). Pozdější živé soubory s novými účesy nejsou vydávané za shodné s M2.
+
+Renderer nyní předává Babylonu cache efektivně povolených meshů. Zachovává původní pořadí, neviditelné zdroje instancí, nativní LOD i okamžité přidávání/odstraňování; žádný vrchol ani rozměr kolizí se touto optimalizací nemění. Cílené regrese ověřily shodný nativní camera/shadow dispatch před a po změně, včetně thin/regular instancí, záporného měřítka, rodičovského enabled a streamovaných meshů. [Implementace a hranice důkazů](performance/active-mesh-candidates-20261011.md).
+
+Skutečná browserová kontrola stejného M2 dokončila **18/18 úseků venek–recepce B6–venek**, 1226 fyzikálních kroků, bez skoku a bez teleportů po jediné výslovné přípravě počátku. Vstup byl viditelný už před schody; všech 18 kontrolních bodů mělo 6/6 vstupních částí a 73/73 částí obalu, 0 chyb shaderů/assetů. [Záznam včetně hashů QA harnessu](verification-evidence/pilot-20261011-m2/b6-walk-medium.json), [vstup před schody](verification-evidence/pilot-20261011-m2/b6-before-steps.png). Celá Game scéna ve standalone režimu, medium, Intel UHD 630; jde o funkční/vizuální QA, nikoli výkonový test produkčního HUD nebo GeForce.
+
+M2 doplňuje i jednorázové skutečné canvas AA/sample údaje a lokální numerický whitelist CPU rozkladu. **GPU/FPS efekt cache není dosud změřený a 60 FPS na GeForce není potvrzených.** Rozpracované texturované krátké vlasy pro Alexe/Sama patří navazujícímu checkpointu; ani technický PASS M2 nepřijímá jejich vizuální nebo výkonovou kvalitu.
+
+## Pilot M · materiály, oči a přesný profil klienta (11. 10. 2026)
+
+Zmrazený checkpoint M `c88f33c4baa80a1d6322b0551c555cb76b4912a4e5995f6d91af2ea06a188ea9` prošel **384/384 testy, produkčním buildem a izolovanou integrací**, vše exit 0. Nezávislý SHA audit skutečně hashoval 8107 živých a 8107 zmrazených souborů, včetně 73 testových souborů v každém stromu: 0 neshod. [Výsledky a logy](verification-evidence/pilot-20261011-m/results.json), [SHA audit](verification-evidence/pilot-20261011-m/source-check.json).
+
+M přidává tlumenější fotografický detail povrchů se zachovanými původními texturami/UV, jednu místo dvou oktáv výtvarného šumu, fitované sdílené oči i ve středním LOD a přesnou akumulaci CPU render průchodů s ověřeným odpojením observerů. [Materiály a provenience](pilot-surfaces-20261011.md), [postavy a GPU snímky](pilot-avatars-20261011.md), [malá CPU úspora výběru trávy](pilot-render-performance-20261011.md). Geometrie světa a kolize nejsou tímto checkpointem měněné.
+
+Veškeré níže uvedené dosavadní GPU výsledky jsou **Intel UHD 630, nikoli GeForce**. Celá produkční hra, HUD, low, CSS 1920×1080, interně 1476×830, skutečné relace a šest různých presetů. Zdrojové ID je v každém JSON; všechny uvedené intervaly mají nulové shaderové/asset chyby.
+
+| M | FPS v jednotlivých 10s intervalech | p95 / p99 ms |
+| --- | --- | --- |
+| 1 hráč, den | 34,7 / 34,6 / 34,8 | 33,0–35,4 / 36,8–39,9 |
+| 30 hráčů, den | 30,9 / 30,0 / 31,7 | 36,3–44,0 / 39,5–53,3 |
+| 30 hráčů, noc, jediný interval | 35,4 | 31,8 / 35,9 |
+
+[Jednotlivé raw záznamy](performance/evidence/pilot-20261011-m/), [ověřený baseline L2](performance/evidence/pilot-20261011-m/baseline-readme.md). Počasí a astronomický náhled byly řízené, ale PID/ambientní simulace dál používala skutečný čas: M jednohráčové intervaly měly 3–6 NPC cestujících, baseline žádné. Proto se z nich **neodvozuje izolované procento zrychlení**. Denní třicetihráčové M intervaly měly 0 ambientních vozů/cestujících. Výběr aktivních meshů zabíral přibližně 5–7 ms CPU; následná konzervativní cache kandidátů je rozpracovaný další checkpoint, není součástí ověřeného M.
+
+Síťová kohorta M měla 29 pohybujících se SDK klientů plus browser, 58 authority resync flagů a 0 aplikačních chyb. Browser byl při přechodu na GeForce zavřen před stop-file ukončením kohorty; její celkové minimum proto je 29, maximum 30. Celou kohortu nelze vydávat za stálou populaci 30 ani za síťovou stabilitu. Samotné uvedené GPU intervaly zaznamenaly minimum 30 avatarů po celou dobu. Vyloučené/discovery soubory baseline zůstávají zachované a nejsou započtené.
+
+**Priorita upřesněná uživatelem: 60 FPS klienta na jeho GeForce GTX 1060.** Intel výsledky jsou doplňková diagnostika, nepředstavují splnění tohoto cíle. Připravené místní měření M v Chrome/Edge čeká na potvrzení skutečného rendereru; instalovaná karta se nevydává za použitou. Nové GeForce měření zatím chybí. Technický PASS M ani nové oči neznamenají hotové všechny účesy, obličeje, terénní styky nebo dokončenou výtvarnou kvalitu pilotu.
+
 ## Publikovaná verze L2
 
 **Checkpoint L2 prošel 372/372 testy, produkčním buildem včetně TypeScript a izolovanou síťovou integrací; všechny příkazy skončily exit 0.** Zdrojové ID: `c4586de83cef2b7406122c75eed04abf89796765cc338c0b7dabc92a9c7ad658`, 8060 souborů. Následný SHA audit zkontroloval 8060 živých + 8060 zmrazených souborů bez neshody. Jde o zdroje klienta, serveru, společné logiky, assetů, skriptů, testů a konfigurace; dokumentace není součástí tohoto zdrojového hashe.

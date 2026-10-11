@@ -1,0 +1,40 @@
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Scene } from "@babylonjs/core/scene";
+import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
+import "./performance-snapshot/pilot-20261011-m4/client/cinematic";
+
+const snapshot = ".cache/performance-snapshot/pilot-20261011-m4";
+const folder = "docs/verification-evidence/pilot-20261011-m4";
+const manifest = JSON.parse(readFileSync(snapshot + "/source-manifest.json", "utf8"));
+const cinematicSha = createHash("sha256").update(readFileSync(snapshot + "/client/cinematic.ts")).digest("hex");
+assert.equal(cinematicSha, manifest.files["client/cinematic.ts"]);
+const engine = new NullEngine(), scene = new Scene(engine);
+let captured: Error | undefined;
+try {
+  // Read the manager first, before a pipeline constructor can register it as
+  // an unrelated side effect. This tests cinematic's import-time contract.
+  scene.postProcessRenderPipelineManager.addPipeline(
+    new PostProcessRenderPipeline(engine, "M4 isolated public contract"),
+  );
+} catch (error) {
+  captured = error instanceof Error ? error : new Error(String(error));
+} finally {
+  scene.dispose(); engine.dispose();
+}
+assert.ok(captured instanceof TypeError && captured.message.includes("addPipeline"), "Expected actual frozen M4 addPipeline failure");
+const result = {
+  capturedAt: new Date().toISOString(), sourceSnapshotId: manifest.snapshotId,
+  runtime: process.version, sourceFile: "client/cinematic.ts", sourceSha256: cinematicSha,
+  reproductionStatus: "confirmed", componentQualityStatus: "failed",
+  scope: "Isolated Node pre-construction public-contract reproduction with actual frozen M4 cinematic import; no Game or glTF loader imports. NullEngine, no GPU or FPS measurement.",
+  contract: "scene.postProcessRenderPipelineManager.addPipeline(new PostProcessRenderPipeline(engine, name))",
+  error: { name: captured.name, message: captured.message, stack: captured.stack },
+  classification: "Missing postprocess scene-component registration; not a near-shell shader or asset error.",
+  orderingLimitation: "Manager availability is tested before constructing any PostProcessRenderPipeline. Constructing one first registers the manager as a side effect and masks this missing import-time registration; that different ordering did not reproduce the error in an initial probe.",
+};
+mkdirSync(folder, {recursive: true});
+writeFileSync(folder + "/component-contract-repro.json", JSON.stringify(result,null,2)+"\n");
+console.log(JSON.stringify(result,null,2));

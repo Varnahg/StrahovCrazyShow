@@ -21,6 +21,14 @@ import { avatarPreset } from "./avatar-presets";
 import geometry from "./data/character-geometry.json";
 import anatomy from "./data/skinned-character-geometry.json";
 import { installStudentGarments } from "./avatar-garments";
+import { avatarFaceWidth, createAvatarEyes, eyeGeometry } from "./avatar-eyes";
+import {
+  createStudentHair,
+  isStudentHairForm,
+  studentHairGeometry,
+  studentHairStyle,
+  type StudentHairForm,
+} from "./avatar-hair";
 import {
   createSkinnedAvatarBody,
   type SkinnedAvatarBody,
@@ -60,7 +68,12 @@ export type AvatarRig = {
 };
 
 export type AvatarForm =
-  keyof typeof geometry.forms | "head-medium" | "glasses";
+  | keyof typeof geometry.forms
+  | "head-medium"
+  | "glasses"
+  | "eyes-near"
+  | "eyes-medium"
+  | StudentHairForm;
 
 export type AvatarMeshFactory = {
   material?(
@@ -88,17 +101,36 @@ export type AvatarMeshFactory = {
 };
 
 /** Closed, shared silhouette meshes: no disconnected ball-shaped limbs. */
+function authoredForm(shape: AvatarForm) {
+  return isStudentHairForm(shape)
+    ? studentHairGeometry(shape)
+    : shape === "eyes-near" || shape === "eyes-medium"
+      ? eyeGeometry[shape === "eyes-near" ? "near" : "medium"]
+      : shape === "head"
+        ? anatomy.head
+        : shape === "head-medium"
+          ? anatomy.headMedium
+          : shape === "glasses" || shape === "beard"
+            ? anatomy.accessories[shape]
+            : shape.startsWith("hair-")
+              ? anatomy.hair[shape.slice(5) as keyof typeof anatomy.hair]
+              : geometry.forms[shape as keyof typeof geometry.forms];
+}
+
+const hairHeights = new Map<keyof typeof anatomy.hair, number>();
+function hairHeight(style: keyof typeof anatomy.hair) {
+  let height = hairHeights.get(style);
+  if (height !== undefined) return height;
+  const positions = anatomy.hair[style].positions;
+  height = -Infinity;
+  for (let i = 1; i < positions.length; i += 3)
+    height = Math.max(height, positions[i] * 0.235);
+  hairHeights.set(style, height);
+  return height;
+}
+
 function formMesh(shape: AvatarForm, name: string, scene: Scene) {
-  const authored =
-    shape === "head"
-      ? anatomy.head
-      : shape === "head-medium"
-        ? anatomy.headMedium
-        : shape === "glasses" || shape === "beard"
-          ? anatomy.accessories[shape]
-          : shape.startsWith("hair-")
-            ? anatomy.hair[shape.slice(5) as keyof typeof anatomy.hair]
-            : geometry.forms[shape as keyof typeof geometry.forms];
+  const authored = authoredForm(shape);
   const mesh = new Mesh(name, scene),
     data = new VertexData();
   data.positions = authored.positions;
@@ -245,13 +277,7 @@ export class AvatarPrimitivePool implements AvatarMeshFactory {
         sharedGeometry.applyToMesh(source);
         if (shape !== "box" && shape !== "sphere") {
           source.sideOrientation = Material.CounterClockWiseSideOrientation;
-          source.useVertexColors =
-            shape === "head" ||
-            shape === "head-medium" ||
-            shape === "beard" ||
-            (!shape.startsWith("hair-") &&
-              shape !== "glasses" &&
-              "colors" in geometry.forms[shape as keyof typeof geometry.forms]);
+          source.useVertexColors = "colors" in authoredForm(shape);
           source.hasVertexAlpha = shape === "beard";
         }
       } else if (source.geometry) this.geometries.set(shape, source.geometry);
@@ -291,13 +317,11 @@ export class AvatarPrimitivePool implements AvatarMeshFactory {
         this.sources.delete(key);
       }
     }
+    const usedMaterials = new Set(
+      [...this.sources.values()].map((source) => source.material),
+    );
     for (const [color, material] of this.materials) {
-      if (
-        ![...this.sources.values()].some(
-          (source) => source.material === material,
-        ) &&
-        !this.materialUsers.has(material)
-      ) {
+      if (!usedMaterials.has(material) && !this.materialUsers.has(material)) {
         this.materials.delete(color);
       }
     }
@@ -335,6 +359,9 @@ export function createAvatarRig(
   root.scaling.y = preset.height * 1.03;
   const build = preset.build;
   const continuousBody = !!factory.material;
+  const anatomicalEyes = continuousBody && !!factory.form;
+  const texturedHair =
+    continuousBody && !!factory.form && studentHairStyle(config.preset);
   const studentGarments = continuousBody && options.studentGarments !== false;
   const measurements = {
     thigh: 0.42,
@@ -465,7 +492,7 @@ export function createAvatarRig(
     );
     oval("neck", config.skin, 0, 0.375, 0, 0.095, 0.14, 0.1, torso);
   }
-  const faceWidth = 0.173 + Math.max(0, Math.min(1, config.face)) * 0.016;
+  const faceWidth = avatarFaceWidth(config);
   const face = piece(
     "head",
     "face",
@@ -499,7 +526,6 @@ export function createAvatarRig(
   for (const side of [-1, 1]) {
     const eyeX = side * 0.034;
     const eyeY = 0.009;
-    const eyeSurface = faceSurfaceZ(eyeX, eyeY, faceWidth);
     if (!continuousBody)
       oval(
         "ear",
@@ -512,43 +538,46 @@ export function createAvatarRig(
         0.027,
         head,
       );
-    oval(
-      "eye",
-      "#c8c4b5",
-      eyeX,
-      eyeY,
-      eyeSurface - 0.001,
-      0.025,
-      0.0105,
-      0.009,
-      head,
-    );
-    oval(
-      "iris",
-      config.preset % 3 === 0
-        ? "#6b4c36"
-        : config.preset % 3 === 1
-          ? "#52604d"
-          : "#526575",
-      eyeX,
-      eyeY,
-      eyeSurface + 0.0036,
-      0.0085,
-      0.0085,
-      0.002,
-      head,
-    );
-    oval(
-      "pupil",
-      "#121817",
-      eyeX,
-      eyeY,
-      eyeSurface + 0.0046,
-      0.0036,
-      0.0042,
-      0.001,
-      head,
-    );
+    if (!anatomicalEyes) {
+      const eyeSurface = faceSurfaceZ(eyeX, eyeY, faceWidth);
+      oval(
+        "eye",
+        "#c8c4b5",
+        eyeX,
+        eyeY,
+        eyeSurface - 0.001,
+        0.025,
+        0.0105,
+        0.009,
+        head,
+      );
+      oval(
+        "iris",
+        config.preset % 3 === 0
+          ? "#6b4c36"
+          : config.preset % 3 === 1
+            ? "#52604d"
+            : "#526575",
+        eyeX,
+        eyeY,
+        eyeSurface + 0.0036,
+        0.0085,
+        0.0085,
+        0.002,
+        head,
+      );
+      oval(
+        "pupil",
+        "#121817",
+        eyeX,
+        eyeY,
+        eyeSurface + 0.0046,
+        0.0036,
+        0.0042,
+        0.001,
+        head,
+      );
+    }
     const eyebrow = piece(
       "limb",
       "eyebrow",
@@ -565,18 +594,19 @@ export function createAvatarRig(
   }
   // Nose, orbital rims, cheeks, chin and lips belong to the continuous head
   // surface, avoiding glued-on cylinders and a floating black mouth stripe.
-  piece(
-    `hair-${preset.hairStyle}`,
-    `${preset.hairStyle} hair`,
-    config.hair,
-    0,
-    0,
-    0,
-    faceWidth,
-    0.235,
-    0.195,
-    head,
-  );
+  if (!texturedHair)
+    piece(
+      `hair-${preset.hairStyle}`,
+      `${preset.hairStyle} hair`,
+      config.hair,
+      0,
+      0,
+      0,
+      faceWidth,
+      0.235,
+      0.195,
+      head,
+    );
 
   // Real clothes have a neckline, hem and tapered limbs, rather than a stack
   // of equally rounded balls. Details stay broad enough to survive distance.
@@ -840,7 +870,10 @@ export function createAvatarRig(
       0.195,
       head,
     );
-    glasses.metadata.avatarDetail = "micro";
+    // Eyewear carries identity at conversational distance. Keep the original
+    // shared frame through medium LOD, then omit it from the solid far proxy.
+    glasses.metadata.avatarDetail = "identity";
+    glasses.metadata.avatarFarProxy = false;
   }
   if (config.beard)
     piece(
@@ -881,12 +914,7 @@ export function createAvatarRig(
       (measurements.hipHeight +
         torso.position.y +
         head.position.y +
-        Math.max(
-          ...anatomy.hair[preset.hairStyle].positions.filter(
-            (_, index) => index % 3 === 1,
-          ),
-        ) *
-          0.235) *
+        hairHeight(preset.hairStyle)) *
       root.scaling.y,
     root,
     hips,
@@ -904,6 +932,8 @@ export function createAvatarRig(
     rightElbow,
     measurements,
   };
+  if (anatomicalEyes) createAvatarEyes(rig, config, factory);
+  if (texturedHair) createStudentHair(rig, config, factory);
   rig.skinnedBody = createSkinnedAvatarBody(scene, rig, config, factory, {
     parts: studentGarments
       ? preset.outfit === "tee"
