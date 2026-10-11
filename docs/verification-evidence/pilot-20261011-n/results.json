@@ -1,0 +1,96 @@
+{
+  "status": "passed",
+  "failureReasons": [],
+  "scope": "Technical checkpoint N: finalized tests, production build including TypeScript, isolated integration and subsequent independent live/frozen SHA audit. No GPU/FPS acceptance is implied.",
+  "sourceSnapshotId": "4c19b98bc5b73410b776b388a3c55d7d8a4d0b25d60b42137268b522ea29d778",
+  "files": 8148,
+  "tests": {
+    "total": 410,
+    "passed": 410,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "startedAt": "2026-10-11T16:28:57.084664Z",
+  "finishedAt": "2026-10-11T16:31:16.904061Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 83.8125508,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 38.3980752,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 17.5454945,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "missingStages": [],
+  "failedStages": [],
+  "sourceCheck": "source-check.json",
+  "pipeline": "pipeline-results.json",
+  "publishedSha256": {
+    "source-manifest.json": "b5503345ae0b956a2f7027fd7a29165af5d092f238a3ce90b5793305d3de7139",
+    "pipeline-results.json": "e4f0e8ba15859555a2397e3aae7fe94fe6e3eea780406452d4b497fb84e6f554",
+    "pipeline-test.log": "60b32a7c4e44855c627013b1b2805b2a57c1012fab4babb9debeee153c9fdcee",
+    "pipeline-build.log": "bb0af28e10291e1de9b2b7cd0126982ce5af3eb9be5578e73d90824ce539c66f",
+    "pipeline-test-integration.log": "aface68e5682d0ca68a92ce1f35a2b51d7e7f7f85bb6bd6349a939543931cdf9",
+    "browser-qa-console-after-stop.json": "7ac6bab0b517de166be9e3fa8a182994b5070d7575c09a83868bf61a00bea1d7",
+    "browser-qa-console.json": "0d00d8a8d661476b7ded38708e51db889cbb080da138c28fb6fe827216dd2736",
+    "initial-harness-error.json": "bdec1638de1bfa6557c0c9a3f547c5d5945e059705bb2778b7f992f88748074d",
+    "paint-high-day.json": "dfa98c8cb7e070ca0c9a73d20ac7744246932ec23e5f59004076ca20f0b49b72",
+    "paint-high-day.png": "419dd5c6a33eb283615a94443dc0cbc090024630f29dc3df555cdb6c83519276",
+    "paint-low-day.json": "29d03583f376bc08976c3ca5cdd0a862eba2e5c49918936576e42c2128044f37",
+    "paint-low-day.png": "0a47cb9e9d3eddaa0ec304679639fe8f933d180b60d738888a2674a7508de424",
+    "paint-medium-mirrored.json": "6547fb60423e1e68d05fa3fef39fad374b368931c8c19bdceaacdb17ae120802",
+    "paint-medium-mirrored.png": "14834dd934b4d2ec4defd9dd9ffbb1a726bc2d0bfd75af3bd4be6c5212064e87",
+    "paint-medium-positive.json": "402e2ec69756d7b2ce9ac84ec273c110bde90d8cd139bae406e14949260d14d6",
+    "paint-medium-positive.png": "93a26ed54e150c2ae06b4cb9a7900edf236b842f59cf11458918984f2197f8ca",
+    "production-medium-day.png": "e145c6c191b31d01783253955b92943d6a5733c4ec3008fd58f5a8b3517fc19e",
+    "production-smoke.json": "935755e575d08ef612ae06220abb2d5006de18e1e896b6a3304a0f27fc67b943",
+    "qa-harness.html.txt": "5fef14b29dccc297a2eb7829df565c1cfb556f65b3a5dcacb4ed02473a65b087",
+    "qa-harness.ts.txt": "bf757ab3fd2f5c3f9566d84f66bc0c98d6496120cfcdc093a3cc436a70599b9c",
+    "vehicle-drive-day.json": "92074acbff85ed1d4c3592745c477bfd67c571a1f612f541b888ea0f5efd256b",
+    "vehicle-drive-day.png": "078e46d4986b4d7393d5bfbdaf6a333f2e9022e8367cc387d3d4f2a55551b82f",
+    "vehicle-drive-night.json": "a12d6dadc5923a99fb535c540369f18b8685ce5ce4f8ad78379ccd902d9c74b9",
+    "vehicle-drive-night.png": "45f0bedaa361051c22f3633aea5f45402bdae25157beeccb7e4ccb5fd2cd8c1d"
+  },
+  "archiveErrors": [],
+  "gpu": {
+    "status": "pending",
+    "note": "No matched full-production GeForce/FPS result for N is archived here. Separate Intel visual/loading and day/night driving evidence is linked under visualQa; it is not an FPS benchmark."
+  },
+  "notes": [
+    "Raw logs retain any warnings and integration diagnostics; status is derived from actual final stage exit codes, final test summary and source audit.",
+    "Documentation can change independently because it is excluded from the source snapshot hash."
+  ],
+  "visualQa": {
+    "consoleRecord": "browser-qa-console-after-stop.json",
+    "status": "functional-observations-completed-not-fps",
+    "harnessTsSha256": "bf757ab3fd2f5c3f9566d84f66bc0c98d6496120cfcdc093a3cc436a70599b9c",
+    "limits": "One local Game driving rig and one separate production multiplayer session; no GeForce/FPS interval or pixel equality assertion.",
+    "drivingRecords": [
+      "vehicle-drive-day.json",
+      "vehicle-drive-night.json"
+    ],
+    "harnessHtmlSha256": "5fef14b29dccc297a2eb7829df565c1cfb556f65b3a5dcacb4ed02473a65b087",
+    "productionRecord": "production-smoke.json",
+    "paintRecords": [
+      "paint-medium-positive.json",
+      "paint-medium-mirrored.json",
+      "paint-high-day.json",
+      "paint-low-day.json"
+    ],
+    "adapter": "Intel UHD 630",
+    "initialHarnessFailure": "initial-harness-error.json"
+  }
+}

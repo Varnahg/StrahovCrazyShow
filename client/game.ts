@@ -9,6 +9,7 @@ import { buildWorld } from "./world-renderer";
 import { captureModelReview } from "./model-review";
 import { captureRenderCostInventory } from "./render-cost";
 import { EnabledMeshCandidates } from "./active-mesh-candidates";
+import { writeQuaternion, writeVector3 } from "./transform-updates";
 import {
   BenchmarkRenderProfile,
   BENCHMARK_RENDER_CPU_SCOPE,
@@ -1473,7 +1474,7 @@ export class Game {
           id === this.localId
             ? renderPosition.add(new Vector3(0, -0.8, 0))
             : new Vector3(p.x, p.y - 0.8, p.z);
-      a.root.position.copyFrom(target);
+      writeVector3(a.root.position, target.x, target.y, target.z);
       const lod = a.lod.update({
         distance: Vector3.Distance(this.camera.position, target),
         quality: this.quality,
@@ -1621,14 +1622,19 @@ export class Game {
         carRotation,
       );
     }
-    for (const car of [this.car, this.parkedCar]) {
-      car.position.copyFrom(carPosition);
-      car.rotationQuaternion = carRotation.clone();
-    }
-    if (this.actor.vehicle) {
-      this.car.position.addInPlace(this.visualOffset);
-      this.parkedCar.position.copyFrom(this.car.position);
-    }
+    const visualCarX = this.actor.vehicle
+      ? carPosition.x + this.visualOffset.x
+      : carPosition.x;
+    const visualCarY = this.actor.vehicle
+      ? carPosition.y + this.visualOffset.y
+      : carPosition.y;
+    const visualCarZ = this.actor.vehicle
+      ? carPosition.z + this.visualOffset.z
+      : carPosition.z;
+    writeVector3(this.car.position, visualCarX, visualCarY, visualCarZ);
+    writeVector3(this.parkedCar.position, visualCarX, visualCarY, visualCarZ);
+    writeQuaternion(this.car, carRotation);
+    writeQuaternion(this.parkedCar, carRotation);
     this.updateCarWheels?.(carState);
     this.contactShadows.set(
       "car",
@@ -1791,8 +1797,10 @@ export class Game {
     this.labels.render(pos, (point) =>
       this.sim.hasLineOfSight(this.camera.position, point, this.actor),
     );
-    this.frames.push(rawFrameMs);
-    if (this.frames.length > 600) this.frames.shift();
+    if (import.meta.env.DEV) {
+      this.frames.push(rawFrameMs);
+      if (this.frames.length > 600) this.frames.shift();
+    }
     if (this.benchmark) {
       const b = this.benchmark;
       const breakdown = {

@@ -1,0 +1,101 @@
+{
+  "capturedAt": "2026-10-11T16:20:09.284Z",
+  "status": "targeted-tests-passed",
+  "node": "v24.19.0",
+  "babylonVersion": "9.30.0",
+  "sourceScope": "Partial hashes of this targeted change and its direct primary API inputs; not a complete production snapshot.",
+  "sourceSha256": {
+    "client/transform-updates.ts": "0b42765e5b1c01fb2701825c4e76f9a582123f9fc236528c4df4e47dcad72a2c",
+    "client/assets.ts": "10df97aa8e7e719f721d1dc9c807d415e742740a3dbf98649f0cd1f67dfc14fb",
+    "client/contact-shadows.ts": "450b3536d7a154b729d9f2042d4be5c5849d08f0173af2db90ea913e33e6f483",
+    "client/game.ts": "a69cd610109f7cff1a8172424f1b96875b4d135103b254e93fc7d782e2e1cce4",
+    "tests/transform-updates.test.ts": "048e02464b19fd8f06a7b81e2589fc6104592900791c79352f0685306be93473",
+    "shared/vehicle.ts": "6b8ab0f1eeb8139a7301736c4fa6b3d7523217193dd2e125933ea4d8529213ce",
+    "shared/terrain-entities.ts": "8460192bd81483def617d977775dd251817bc7f9bf0aa05ed65de66c95620bf1",
+    "package.json": "a1e20e1b92d96273e077778ab784074eec3b4411a99f83ee4f5b5c9080cabef7"
+  },
+  "primaryApiSha256": {
+    "node_modules/@babylonjs/core/Maths/math.vector.pure.js": "82d6bde06e06cc8bc5975c7d29ecd6a4f6f85485f17039c521cb455786b2deb9",
+    "node_modules/@babylonjs/core/Meshes/transformNode.pure.js": "e6daafc1e9aedd109913c8fbfe2a5ffba69db275b2a2557ea37ab6951065446e",
+    "node_modules/@babylonjs/core/node.js": "e4859368dbf13688644adb6a17bb3dc65220133d3a979889a4f8ae8e95bafad7"
+  },
+  "publishedSha256": {
+    "new-tests.log": "7b8a6a7ddb7e286682004572930333d79d70cdb260e456a91c3fd809e517accd",
+    "targeted-regressions.log": "a5b06677aaeb526813032da7f9e6b85ed14ea1f545030e284005815dc44e9a71",
+    "connections-before-new-tests.json": "1659de9f5728e7d8bc40396d17d96d70499416e7dd9b74e50524fda3e209dde6",
+    "connections-before-regressions.json": "c83a6ed09538f8c2efb5ef618b56d975f7a2f06e933ab988107b01f9557a02ba",
+    "connections-after.json": "a5259a4af539c17c3218e9f9535147765a03ed148f8e37d9523f09daf3197336"
+  },
+  "connectionChecks": [
+    {
+      "file": "connections-before-new-tests.json",
+      "at": "2026-10-11T16:15:47.7024783+00:00",
+      "serverPort": 2570,
+      "listeners": 1,
+      "establishedConnections": 0,
+      "scope": "Read-only OS TCP observation, not application presence or a history of user activity"
+    },
+    {
+      "file": "connections-before-regressions.json",
+      "at": "2026-10-11T16:16:40.6619529+00:00",
+      "serverPort": 2570,
+      "establishedConnections": 0
+    },
+    {
+      "file": "connections-after.json",
+      "at": "2026-10-11T16:19:24.2757518+00:00",
+      "serverPort": 2570,
+      "establishedConnections": 0,
+      "scope": "Read-only OS TCP observation after targeted tests"
+    }
+  ],
+  "tests": {
+    "command": "pnpm exec tsx --test --test-concurrency=1 tests/transform-updates.test.ts tests/native-car-models.test.ts tests/realistic-car-pack.test.ts tests/car-shadow-proxy.test.ts tests/vehicle-camera.test.ts",
+    "total": 22,
+    "passed": 22,
+    "failed": 0,
+    "exitCode": 0,
+    "runnerDurationMs": 14451.0469
+  },
+  "initialNewTests": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "exitCode": 0
+  },
+  "recomputeEvidence": {
+    "vehicle": {
+      "scope": "Real Babylon world-matrix observer events, not GPU/FPS or CPU timing",
+      "stationary": {
+        "frames": 240,
+        "originalRecomputes": 2400,
+        "candidateRecomputes": 0
+      },
+      "moving": {
+        "frames": 120,
+        "originalRecomputes": 1200,
+        "candidateRecomputes": 1200
+      }
+    },
+    "contact": {
+      "frames": 240,
+      "originalRecomputes": 240,
+      "candidateRecomputes": 0,
+      "scope": "Native observer count, not FPS"
+    },
+    "method": "Counts from actual Babylon onAfterWorldMatrixUpdateObservable while executing original and candidate writers against matching real Babylon node/mesh hierarchies. Every step checks exact world matrices and bounds.",
+    "fixture": "Two vehicle rigs, each root + four wheel pivots + body mesh + four simple tyre meshes, canonical shared wheel locations, one active driving/parked representation. Separate contact-shadow native instances; actual GLB loading is covered by independent regressions."
+  },
+  "guarantees": [
+    "No epsilon or quantization; Object.is retains signed zero.",
+    "Unchanged rotations reuse the target-owned quaternion; caller scratch values are never aliased.",
+    "Original steering/spin multiplication and parked/contact suspension rules retained.",
+    "DEV Game.frames field and 600-frame behaviour retained; production push/shift omitted; benchmark b.frames unchanged."
+  ],
+  "limits": [
+    "No GPU, FPS or CPU time performance measurement in this evidence.",
+    "Full stable-checkpoint test/build/integration remains the coordinating root agent's next stage.",
+    "Server connection observations show zero established TCP connections at three instants, not an application-level user history.",
+    "M6 production on port 4179 was not modified."
+  ]
+}

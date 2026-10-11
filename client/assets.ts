@@ -16,6 +16,7 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { CAR_SPAWN } from "../shared/world";
 import { acquireCarPack, CAR_PACK_MANIFEST, type CarRig } from "./car-pack";
+import { writeQuaternion } from "./transform-updates";
 export async function loadEnvironment(scene: Scene) {
   const placed: { root: TransformNode; interior: boolean }[] = [];
   await Promise.all(
@@ -103,6 +104,51 @@ const CAR_ASSET_ID = "strahov-compact",
   CAR_ENTITY_ID = "campus-car";
 const AUTHORED_SUSPENSION = 0.32,
   GROUND_ORIGIN_OFFSET = -0.0112;
+
+/** Both imported car paths share the same exact steering/spin/suspension rule.
+ * Scratch rotations belong to this rig pair and cannot survive its disposal.
+ */
+export function createCarWheelUpdater(
+  driving: readonly TransformNode[],
+  parked: readonly TransformNode[],
+  isDisposed: () => boolean,
+): CarModelController["updateWheels"] {
+  const groups = [driving, parked];
+  const rotations = Array.from({ length: 4 }, () => Quaternion.Identity());
+  const lastSteering: (number | undefined)[] = [],
+    lastSpin: (number | undefined)[] = [];
+  const steeringRotation = Quaternion.Identity(),
+    spinRotation = Quaternion.Identity();
+  const up = Vector3.Up(),
+    right = Vector3.Right();
+  return (state) => {
+    if (isDisposed()) return;
+    for (let i = 0; i < 4; i++) {
+      const suspension =
+        state.parked && !state.wheelContact[i]
+          ? AUTHORED_SUSPENSION
+          : (state.wheelSuspension[i] ?? AUTHORED_SUSPENSION);
+      const y = VEHICLE_WHEELS[i].y - suspension;
+      const steering = i < 2 ? state.steering : 0;
+      const spin = state.wheelSpin[i] ?? 0;
+      if (
+        !Object.is(lastSteering[i], steering) ||
+        !Object.is(lastSpin[i], spin)
+      ) {
+        Quaternion.RotationAxisToRef(up, steering, steeringRotation);
+        Quaternion.RotationAxisToRef(right, spin, spinRotation);
+        steeringRotation.multiplyToRef(spinRotation, rotations[i]);
+        lastSteering[i] = steering;
+        lastSpin[i] = spin;
+      }
+      for (const group of groups) {
+        const wheel = group[i];
+        if (!Object.is(wheel.position.y, y)) wheel.position.y = y;
+        writeQuaternion(wheel, rotations[i]);
+      }
+    }
+  };
+}
 
 /** One native GLB, independent per-vehicle transforms, immutable shared parts.
  * No campus geometry or photograph mesh is included in any vehicle root. */
@@ -387,23 +433,7 @@ export async function loadCar(
       dispose,
       setQuality() {},
       updateLighting() {},
-      updateWheels(state) {
-        if (disposed) return;
-        for (let i = 0; i < 4; i++)
-          for (const wheel of [wheels[i], parkedWheels[i]]) {
-            const suspension =
-              state.parked && !state.wheelContact[i]
-                ? AUTHORED_SUSPENSION
-                : (state.wheelSuspension[i] ?? AUTHORED_SUSPENSION);
-            wheel.position.y = VEHICLE_WHEELS[i].y - suspension;
-            wheel.rotationQuaternion = Quaternion.RotationAxis(
-              Vector3.Up(),
-              i < 2 ? state.steering : 0,
-            ).multiply(
-              Quaternion.RotationAxis(Vector3.Right(), state.wheelSpin[i] ?? 0),
-            );
-          }
-      },
+      updateWheels: createCarWheelUpdater(wheels, parkedWheels, () => disposed),
     };
   } catch (error) {
     dispose();
@@ -489,23 +519,11 @@ async function loadReviewedCar(
       dispose,
       setQuality: (quality) => acquired.pack.setQuality(quality),
       updateLighting: (night) => acquired.pack.updateLighting(night),
-      updateWheels(state) {
-        if (disposed) return;
-        for (let i = 0; i < 4; i++)
-          for (const wheel of [driving.wheels[i], parked.wheels[i]]) {
-            const suspension =
-              state.parked && !state.wheelContact[i]
-                ? AUTHORED_SUSPENSION
-                : (state.wheelSuspension[i] ?? AUTHORED_SUSPENSION);
-            wheel.position.y = VEHICLE_WHEELS[i].y - suspension;
-            wheel.rotationQuaternion = Quaternion.RotationAxis(
-              Vector3.Up(),
-              i < 2 ? state.steering : 0,
-            ).multiply(
-              Quaternion.RotationAxis(Vector3.Right(), state.wheelSpin[i] ?? 0),
-            );
-          }
-      },
+      updateWheels: createCarWheelUpdater(
+        driving.wheels,
+        parked.wheels,
+        () => disposed,
+      ),
     };
   } catch (error) {
     dispose();

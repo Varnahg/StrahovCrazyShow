@@ -1,0 +1,12 @@
+{
+  "scope": "QA harness setup failure before Game startup, not a paint shader failure",
+  "missing": "data-label-layer DOM container",
+  "logs": [
+    {
+      "level": "error",
+      "message": "TypeError: Cannot read properties of null (reading 'append')\n    at ScreenLabels.set (http://127.0.0.1:5189/client/labels.ts:31:19)\n    at Game.label (http://127.0.0.1:5189/client/game.ts:556:15)\n    at buildWorld (http://127.0.0.1:5189/client/world-renderer.ts:576:10)\n    at Game.buildWorld (http://127.0.0.1:5189/client/game.ts:593:27)\n    at new Game (http://127.0.0.1:5189/client/game.ts:376:8)\n    at loadScene (http://127.0.0.1:5189/docs/verification/vehicle-transforms.ts:556:18)\n    at http://127.0.0.1:5189/docs/verification/vehicle-transforms.ts:624:6",
+      "timestamp": "2026-10-11T16:32:24.751Z",
+      "url": "http://127.0.0.1:5189/client/labels.ts"
+    }
+  ]
+}

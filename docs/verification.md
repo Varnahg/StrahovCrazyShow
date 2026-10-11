@@ -1,5 +1,32 @@
 # Ověření dema a známá omezení
 
+## Checkpoint N · přesné transformace a společné barevné dávky aut
+
+N `4c19b98bc5b73410b776b388a3c55d7d8a4d0b25d60b42137268b522ea29d778` prošel **410/410 testy, produkčním buildem a izolovanou integrací**, vše exit 0 (11. 10. 2026 16:28:57–16:31:16 UTC; 83,813 / 38,398 / 17,545 s). Nezávislý audit skutečně hashoval **8148 live + 8148 frozen souborů**, včetně 82 testových souborů v každém stromu: **0 neshod a chyb**. [Výsledky a logy](verification-evidence/pilot-20261011-n/results.json), [SHA audit](verification-evidence/pilot-20261011-n/source-check.json).
+
+Klient nyní nepřepisuje identické polohy/rotace, znovu používá quaterniony a počítá orientaci kontaktního stínu jen při změně jeho vstupů. Zachovává přesné hodnoty, velmi malé pohyby i původní pravidla odpružení. Native Babylon testovací sestava odstranila 2400 zbytečných přepočtů stojícího auta za 240 kroků, zatímco pohyblivá sestava zachovala všech 1200 potřebných přepočtů a stejné matice/bounds. [Přesný rozsah této CPU evidence](performance/transform-updates-20261011.md); nejde o měření celé hry ani FPS.
+
+Barevné lakované části sdílejí původní LOD zdroje a používají per-instance lineární barvu. Native dispatch fixture prokázala **6 → 3 paint draws při stejných 215 892 odeslaných indexech**, včetně správných Float32 barev, shaderových atributů a zrcadlené regular větve. Opravené je také Babylon 9.30 rozlišení barev u medium/far native LOD. [Primární API, testy, PBR/texture shoda a omezení](performance/car-paint-instances-20261011.md). Toto není snížení celkových draw calls celé hry o polovinu. Modely, textury, kolize a jejich rozměry se nemění.
+
+**Praktická kontrola skutečného Game a Rapieru:** denní i noční sekvence dokončila přípravu, nastoupení, W/A/D, brzdění, zpátečku, vystoupení a opětovné nastoupení. Po jediné výslovné přípravě pěší postavy nepoužívala teleport ani přímý zápis polohy auta. Kontrolovala již vykreslené world cache a dříve zachycené bounds; žádným force-refresh neopravovala stav před měřením.
+
+| Celá herní scéna, medium, Intel UHD 630, CSS/render 890×720 | Den 10:00 UTC | Noc 00:00 UTC |
+| --- | ---: | ---: |
+| Skutečné fyzikální kroky | 271 | 272 |
+| Projetá délka | 3,958 m | 3,866 m |
+| Kontrolované vykreslené snímky | 208 | 233 |
+| Vzorky world matic / bounds | 6410 / 5376 | 7166 / 6011 |
+| Maximální zjištěná odchylka matic / bounds | 0 / 0 | 0 / 0 |
+| Shaderové / assetové chyby | 0 / 0 | 0 / 0 |
+
+Oba běhy viděly všechna čtyři kola v parked i driving reprezentaci, žádný kontrolovaný snímek neztratil zobrazený rig. Jednokrokové přesahy fází při pevném physics catch-up zůstávají v raw datech, nikoli přepsané na plán. [Denní záznam](verification-evidence/pilot-20261011-n/vehicle-drive-day.json), [noční záznam](verification-evidence/pilot-20261011-n/vehicle-drive-night.json), [denní snímek](verification-evidence/pilot-20261011-n/vehicle-drive-day.png), [noční snímek](verification-evidence/pilot-20261011-n/vehicle-drive-night.png). Jde o funkční QA jednoho lokálního hráče, nikoli produkční multiplayerový FPS interval.
+
+Skutečný GPU review navíc prošel low/medium/high a dočasně zrcadlenou právě aktivní lakovanou část `photo-central-bay-1`. Její lak zůstal vykreslený, 0 shader/asset chyb. Zrcadlení bylo samostatnou vizuální zkouškou a před jízdou obnoveno; kolize se neměnily. [Snímky a stavy](verification-evidence/pilot-20261011-n/), [konzole po ukončení](verification-evidence/pilot-20261011-n/browser-qa-console-after-stop.json). Počáteční QA HTML postrádalo povinný label layer a selhalo před spuštěním Game; [původní chyba](verification-evidence/pilot-20261011-n/initial-harness-error.json) je zachovaná a oprava se týká pouze testovací stránky. Není vydávána za shaderovou vadu N. Finální QA HTML SHA `5fef14b29dccc297a2eb7829df565c1cfb556f65b3a5dcacb4ed02473a65b087`, TS SHA `bf757ab3fd2f5c3f9566d84f66bc0c98d6496120cfcdc093a3cc436a70599b9c`; docs harness je samostatný od runtime source ID.
+
+Také produkční bundle s HUD a jednou skutečnou multiplayerovou relací byl načten: **medium, CSS/render 1280×720, Intel UHD 630**, aktuální čas a označený denní náhled, bez nové chyby konzole. [Protokol](verification-evidence/pilot-20261011-n/production-smoke.json), [produkční snímek](verification-evidence/pilot-20261011-n/production-medium-day.png). Místní odkaz `http://127.0.0.1:4179/` nyní obsluhuje N a lokální sběr očekává přesné ID N; při výměně předchozího M6 nebyla připojená žádná relace. Řízené GPU scény byly po kontrole zavřené.
+
+**60 FPS klienta na GeForce GTX 1060 stále není potvrzených.** N neobsahuje nové srovnatelné FPS měření; úspora native operací není důkaz dosaženého FPS ani optimálnosti celého rendereru. Všechny další modelové a výtvarné limity zůstávají v přejímce. Veřejné nasazení se neprovádí.
+
 ## Checkpoint M6 · integrovaný pilot a klientské ověření
 
 M6 `c21932439374f0bf23e7a8d514aecb88ef9552c2e89d5e3e2890e4b71da8b896` prošel **403/403 testy, produkčním buildem a izolovanou integrací**, vše exit 0 (11. 10. 2026 15:49:31–15:51:49 UTC; 78,019 / 41,867 / 18,179 s). Nezávislý audit skutečně hashoval **8144 live + 8144 frozen souborů**, včetně 80 testových souborů v každém stromu: **0 neshod a chyb**. [Výsledky a úplné logy](verification-evidence/pilot-20261011-m6/results.json), [SHA audit](verification-evidence/pilot-20261011-m6/source-check.json).
