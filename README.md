@@ -35,7 +35,9 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-If pnpm is missing, install it after Node.js with `npm install --global pnpm@11.25.0`. In an existing clone, start with `git lfs pull`. A GitHub ZIP does not replace a complete LFS clone. A new clone normally selects `main`/L2; newer pilot changes require `codex/pilot-visuals-client-performance` if available in your clone.
+If pnpm is missing, install it after Node.js with `npm install --global pnpm@11.25.0`. In an existing clone, start with `git lfs pull`. A GitHub ZIP does not replace a complete LFS clone.
+
+The default `main` branch includes the tested P5 pilot and all preceding merged features. Use `main` for current testing. Photographic grass and the distant car fender repair are still being prepared in a separate worktree; they are not part of P5. The prepared local production preview uses **4179** as linked above; `pnpm dev` starts a separate development instance on **5173**.
 
 Open [http://127.0.0.1:5173/](http://127.0.0.1:5173/). Vite serves the client on **5173**, Colyseus/API on **2567**. The client uses Vite's `/api` and `/realtime` proxies. At this stage the server binds locally. Services can also run in separate terminals:
 
