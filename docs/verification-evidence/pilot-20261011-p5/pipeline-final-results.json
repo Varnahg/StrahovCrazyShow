@@ -1,0 +1,38 @@
+{
+  "sourceSnapshotId": "4601a8c8f94775e37befda81976b1a8457a171be923dd5b24981847b7c34000e",
+  "files": 8175,
+  "startedAt": "2026-10-11T20:48:56.4582061Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 78.686386,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 35.4770354,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "attempt": 2,
+      "startedAt": "2026-10-11T20:54:25.4979491Z",
+      "finishedAt": "2026-10-11T20:54:46.0463198Z",
+      "exitCode": 0,
+      "elapsedSeconds": 20.5479665,
+      "log": "pipeline-test-integration-retry.log",
+      "conditions": "No agent-owned Blender/GPU/export jobs; synthetic isolated SDK sessions; same frozen source and unchanged checks."
+    }
+  ],
+  "finishedAt": "2026-10-11T20:54:46.0463198Z",
+  "initialIntegrationAttempt": {
+    "command": "pnpm test:integration",
+    "exitCode": 1,
+    "elapsedSeconds": 17.8323936,
+    "log": "pipeline-test-integration.log"
+  },
+  "initialResultsFile": "pipeline-results.json",
+  "note": "Test and build passed once. Initial integration timed out on D steering. The same frozen source and unchanged checks passed a separate isolated retry. The initial failure is retained; its root cause has not been established."
+}

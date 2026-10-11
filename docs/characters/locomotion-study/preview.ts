@@ -2,7 +2,9 @@ import "/client/render-shaders.ts";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
@@ -15,12 +17,19 @@ import {
   type AvatarRig,
 } from "/client/avatar-renderer.ts";
 import { AvatarAnimator } from "/client/animation.ts";
-import { AvatarAnimator as BeforeAnimator } from "./animation-o2.ts";
+import { AvatarAnimator as BeforeAnimator } from "./animation-p3.ts";
 import { AvatarLodController } from "/client/avatar-lod.ts";
 import { SceneTextureDiagnostics } from "/client/texture-diagnostics.ts";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { AVATAR_PRESETS, applyAvatarPreset } from "/client/avatar-presets.ts";
 import { DEFAULT_AVATAR } from "/shared/types.ts";
+import { groundHeight } from "/shared/terrain.ts";
+import { FIXED_DT } from "/shared/netcode.ts";
+import {
+  createJumpClip,
+  type JumpClip,
+  type JumpClipFrame,
+} from "../../../tests/helpers/jump-animation-fixture.ts";
 
 const canvas = document.querySelector("canvas")!,
   engine = new Engine(canvas, true, {
@@ -63,6 +72,36 @@ function floor(x: number, z: number) {
 function buildGround() {
   for (const m of groundMeshes) m.dispose();
   groundMeshes = [];
+  if (jumpClip && pose === "jump") {
+    const xs = jumpClip.frames.map((f) => f.position.x),
+      zs = jumpClip.frames.map((f) => f.position.z);
+    const cx = (Math.min(...xs) + Math.max(...xs)) / 2,
+      cz = (Math.min(...zs) + Math.max(...zs)) / 2;
+    const mesh = MeshBuilder.CreateGround(
+      "canonical ground under Rapier clip",
+      {
+        width: Math.max(...xs) - Math.min(...xs) + 6,
+        height: Math.max(...zs) - Math.min(...zs) + 6,
+        subdivisions: 36,
+        updatable: true,
+      },
+      scene,
+    );
+    const positions = Array.from(
+      mesh.getVerticesData(VertexBuffer.PositionKind)!,
+    );
+    for (let i = 0; i < positions.length; i += 3)
+      positions[i + 1] = groundHeight(cx + positions[i], cz + positions[i + 2]);
+    const normals: number[] = [];
+    VertexData.ComputeNormals(positions, mesh.getIndices()!, normals);
+    mesh.updateVerticesData(VertexBuffer.PositionKind, positions);
+    mesh.updateVerticesData(VertexBuffer.NormalKind, normals);
+    mesh.refreshBoundingInfo();
+    mesh.position.set(cx, 0, cz);
+    mesh.material = groundMaterial;
+    groundMeshes.push(mesh);
+    return;
+  }
   if (terrain === "stairs") {
     for (let i = 0; i < 60; i++) {
       const b = MeshBuilder.CreateBox(
@@ -109,6 +148,14 @@ let before: AvatarRig,
   poseTime = 0,
   playback = 1,
   level = "near";
+let jumpClip: JumpClip | undefined,
+  jumpIndex = -1,
+  jumpTime = 0,
+  jumpPlayhead = 0,
+  jumpLoading = false,
+  jumpRequest = 0,
+  jumpError: string | null = null;
+let jumpFrame: JumpClipFrame | undefined;
 const beforeDisplay = new TransformNode("before display offset only", scene),
   afterDisplay = new TransformNode("after display offset only", scene);
 const hist = { before: [] as number[], after: [] as number[] };
@@ -145,6 +192,10 @@ function build() {
   travelX = travelZ = 0;
   time = 0;
   yaw = 0;
+  if (jumpClip && pose === "jump") {
+    jumpIndex = -1;
+    seekJump(jumpTime);
+  }
 }
 function button(container: string, label: string, fn: () => void) {
   const b = document.createElement("button");
@@ -164,7 +215,12 @@ for (const [label, key] of [
   ["Zamávání", "wave"],
 ])
   button("#actions", label, () => {
+    const wasJump = pose === "jump";
     pose = key;
+    if (wasJump) {
+      buildGround();
+      build();
+    }
     paused = false;
     time = 0;
     resetHistory();
@@ -176,7 +232,8 @@ for (const [label, alpha] of [
   ["Tři čtvrtiny", 0.8],
 ] as const)
   button("#views", label, () => {
-    camera.alpha = alpha;
+    // Arc alpha runs from +X toward +Z; rig yaw turns +Z toward +X.
+    camera.alpha = alpha - (pose === "jump" ? (jumpFrame?.yaw ?? 0) : 0);
     camera.beta = 1.4;
     camera.radius = 5.5;
   });
@@ -198,7 +255,12 @@ document.querySelector("#terrain")!.addEventListener("change", (e) => {
 document
   .querySelector("#pause")!
   .addEventListener("click", () => (paused = !paused));
-document.querySelector("#restart")!.addEventListener("click", () => build());
+document.querySelector("#restart")!.addEventListener("click", () => {
+  if (pose === "jump" && jumpClip) {
+    paused = true;
+    seekJump(jumpClip.frames[0].time);
+  } else build();
+});
 document.querySelector("#playback")!.addEventListener("change", (event) => {
   playback = Number((event.target as HTMLSelectElement).value);
 });
@@ -210,6 +272,120 @@ document.querySelector("#step")!.addEventListener("click", () => {
   animate(1 / 60);
   render();
 });
+async function loadJump(mode: "standing" | "run") {
+  const request = ++jumpRequest;
+  jumpLoading = true;
+  jumpError = null;
+  paused = true;
+  document.querySelector("#jump-status")!.textContent =
+    "Připravuji skutečnou Rapier trajektorii…";
+  try {
+    const clip = await createJumpClip({ mode, jumpTick: 94 });
+    if (disposed || request !== jumpRequest) {
+      clip.dispose();
+      return;
+    }
+    jumpClip?.dispose();
+    jumpClip = clip;
+    pose = "jump";
+    jumpTime = clip.frames[Math.max(0, clip.takeoff - 15)].time;
+    (document.querySelector("#before") as HTMLInputElement).checked = false;
+    const slider = document.querySelector("#jump-time") as HTMLInputElement;
+    slider.max = String(clip.frames.at(-1)!.time);
+    slider.disabled = false;
+    buildGround();
+    build();
+    camera.alpha = -(jumpFrame?.yaw ?? 0);
+    camera.beta = 1.4;
+    camera.radius = 4.5;
+  } catch (error) {
+    jumpError = String(error);
+  } finally {
+    if (request === jumpRequest) {
+      jumpLoading = false;
+      updateJumpControls();
+    }
+  }
+}
+function updateJumpControls() {
+  const slider = document.querySelector("#jump-time") as HTMLInputElement;
+  slider.value = String(jumpTime);
+  document.querySelector("#jump-time-value")!.textContent =
+    `${jumpTime.toFixed(3)} s`;
+  document.querySelector("#jump-status")!.textContent =
+    jumpError ??
+    (jumpLoading
+      ? "Připravuji trajektorii…"
+      : jumpFrame
+        ? `Rapier po kroku ${jumpIndex + 1}: ${jumpFrame.grounded ? "na zemi" : "ve vzduchu"}, vy=${jumpFrame.vertical.toFixed(2)} m/s`
+        : "Zvol skok z klidu nebo běhu.");
+}
+function seekJump(time: number, controls = true) {
+  if (!jumpClip) return;
+  const target = Math.max(
+    0,
+    Math.min(jumpClip.frames.length - 1, Math.round(time / FIXED_DT) - 1),
+  );
+  if (target < jumpIndex || jumpIndex < 0) {
+    beforeAnim.reset();
+    afterAnim.reset();
+    jumpIndex = -1;
+  }
+  for (let index = jumpIndex + 1; index <= target; index++) {
+    const frame = jumpClip.frames[index];
+    for (const [rig, animator] of [
+      [before, beforeAnim],
+      [after, afterAnim],
+    ] as const) {
+      rig.root.position.set(
+        frame.position.x,
+        frame.position.y,
+        frame.position.z,
+      );
+      animator.update(
+        {
+          ...frame,
+          groundHeight: (x, z) => jumpClip!.floorHeight(x, z, frame.position.y),
+        },
+        FIXED_DT,
+      );
+    }
+  }
+  jumpIndex = target;
+  jumpFrame = jumpClip.frames[target];
+  jumpTime = jumpFrame.time;
+  jumpPlayhead = time;
+  yaw = jumpFrame.yaw;
+  frames = target + 1;
+  poseTime = jumpTime;
+  camera.target.set(
+    jumpFrame.position.x,
+    jumpFrame.position.y + 0.9,
+    jumpFrame.position.z,
+  );
+  if (controls) updateJumpControls();
+}
+button("#jump-actions", "Skok z klidu", () => {
+  void loadJump("standing");
+});
+button("#jump-actions", "Skok z běhu", () => {
+  void loadJump("run");
+});
+for (const [label, key] of [
+  ["Odraz", "takeoff"],
+  ["Vrchol", "apex"],
+  ["Doskok", "landing"],
+] as const)
+  button("#jump-events", label, () => {
+    if (jumpClip) {
+      paused = true;
+      seekJump(jumpClip.frames[jumpClip[key]].time);
+    }
+  });
+document.querySelector("#jump-time")!.addEventListener("input", (event) => {
+  paused = true;
+  seekJump(Number((event.target as HTMLInputElement).value));
+});
 document.querySelector("#steady")!.addEventListener("click", () => {
   for (let i = 0; i < 240; i++) animate(1 / 60);
   hist.before = [];
@@ -218,17 +394,25 @@ document.querySelector("#steady")!.addEventListener("click", () => {
   paused = false;
 });
 function displayLayout() {
+  const comparison = (document.querySelector("#before") as HTMLInputElement)
+    .checked;
   for (const [node, side] of [
     [beforeDisplay, -1],
     [afterDisplay, 1],
   ] as const)
     node.position.set(
-      side * 0.7 * Math.sin(camera.alpha),
+      comparison ? side * 0.7 * Math.sin(camera.alpha) : 0,
       0,
-      -side * 0.7 * Math.cos(camera.alpha),
+      comparison ? -side * 0.7 * Math.cos(camera.alpha) : 0,
     );
 }
 function animate(dt: number) {
+  if (pose === "jump" && jumpClip) {
+    const nextTime = Math.min(jumpClip.frames.at(-1)!.time, jumpPlayhead + dt);
+    seekJump(nextTime, false);
+    if (nextTime >= jumpClip.frames.at(-1)!.time) paused = true;
+    return;
+  }
   time += dt;
   poseTime += dt;
   const speed =
@@ -313,6 +497,31 @@ function render() {
     });
   scene.render();
 }
+function jumpFk(rig: AvatarRig) {
+  rig.root.computeWorldMatrix(true);
+  const inverse = Matrix.Invert(rig.root.getWorldMatrix());
+  const local = (node: AvatarRig["hips"]) => {
+    node.computeWorldMatrix(true);
+    return Vector3.TransformCoordinates(
+      node.getAbsolutePosition(),
+      inverse,
+    ).asArray();
+  };
+  return {
+    root: rig.root.position.asArray(),
+    pelvis: local(rig.hips),
+    left: {
+      hip: local(rig.left),
+      knee: local(rig.leftKnee),
+      ankle: local(rig.leftFoot),
+    },
+    right: {
+      hip: local(rig.right),
+      knee: local(rig.rightKnee),
+      ankle: local(rig.rightFoot),
+    },
+  };
+}
 engine.runRenderLoop(() => {
   const now = performance.now(),
     dt = Math.min(0.05, (now - last) / 1000);
@@ -322,6 +531,7 @@ engine.runRenderLoop(() => {
   render();
   if (now > next) {
     next = now + 200;
+    if (pose === "jump") updateJumpControls();
     const range = (s: number[]) =>
       s.length ? Math.max(...s) - Math.min(...s) : 0;
     document.querySelector("#metrics")!.textContent = JSON.stringify(
@@ -345,6 +555,20 @@ engine.runRenderLoop(() => {
         },
         afterGait: afterAnim.gait,
         afterSpeed: afterAnim.speed,
+        jump:
+          pose === "jump"
+            ? {
+                time: jumpTime,
+                frame: jumpIndex,
+                grounded: jumpFrame?.grounded,
+                vertical: jumpFrame?.vertical,
+                aligned: true,
+                loading: jumpLoading,
+                error: jumpError,
+                before: jumpFk(before),
+                after: jumpFk(after),
+              }
+            : null,
         travel,
         transientHeadRangeBefore: range(transient.before),
         transientHeadRangeAfter: range(transient.after),
@@ -352,9 +576,9 @@ engine.runRenderLoop(() => {
         steadyHeadRangeBefore: range(hist.before),
         steadyHeadRangeAfter: range(hist.after),
         baseline:
-          "O2 production animation before current transition repair; animation-o2.ts (type imports relocated only)",
+          "P3 before jump repair; animation-p3.ts (type imports relocated only)",
         source:
-          "live production rig + AvatarAnimator; kinematic preview, no multiplayer/physics/HUD/FPS proof",
+          "live production rig + AvatarAnimator; jump uses recorded actual Rapier Actor/KCC with aligned post-step state; no GPU FPS proof",
       },
       null,
       2,
@@ -369,6 +593,8 @@ addEventListener(
   () => {
     if (disposed) return;
     disposed = true;
+    jumpRequest++;
+    jumpClip?.dispose();
     engine.stopRenderLoop();
     removeEventListener("resize", resize);
     camera.detachControl();

@@ -1,6 +1,8 @@
 # Oprava chůze, běhu a opory bot — 11. 10. 2026
 
-Aktuální navazující opravu rozběhu, zastavení a opakovaného stisku pohybu po sestavě O2 popisuje [kontinuita kroků](transition-repair-20261011.md). Výchozí `preview.html` nyní srovnává O2 proti této opravě; následující zpráva a starší snímky zachovávají předchozí historickou fázi.
+Nejnovější navazující opravu skutečného odrazu, letu a doskoku popisuje [jump repair](jump-repair-20261011.md). Preview nyní srovnává P3 a opravu skoku; historické O2 podklady zůstávají zachované.
+
+Předchozí opravu rozběhu, zastavení a opakovaného stisku pohybu po sestavě O2 popisuje [kontinuita kroků](transition-repair-20261011.md). Její O2 baseline a výsledky zůstávají zachované; následující zpráva a starší snímky patří ještě dřívější historické fázi.
 
 Uživatel upozornil na poskakování postav a ruce příliš daleko vpředu. Audit skutečných světových transformací produkčního rigu potvrdil obě závady. Root, kapsle a kamera přitom měly nulovou animovanou vertikální odchylku; výrazný pohyb vznikal uvnitř rigu v pánvi a následně v hlavě.
 

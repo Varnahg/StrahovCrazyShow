@@ -1,0 +1,90 @@
+{
+  "status": "passed-after-integration-retry",
+  "failureReasons": [],
+  "initialIntegrationAttempt": {
+    "command": "pnpm test:integration",
+    "exitCode": 1,
+    "elapsedSeconds": 17.8323936,
+    "log": "pipeline-test-integration.log"
+  },
+  "integrationRetryNote": "Test and build passed once. Initial integration timed out on D steering. The same frozen source and unchanged checks passed a separate isolated retry. The initial failure is retained; its root cause has not been established.",
+  "scope": "Technical checkpoint P5: finalized tests, production build including TypeScript, isolated integration and subsequent independent live/frozen SHA audit. No GPU/FPS acceptance is implied.",
+  "sourceSnapshotId": "4601a8c8f94775e37befda81976b1a8457a171be923dd5b24981847b7c34000e",
+  "files": 8175,
+  "tests": {
+    "total": 471,
+    "passed": 471,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "startedAt": "2026-10-11T20:48:56.4582061Z",
+  "finishedAt": "2026-10-11T20:54:46.0463198Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 78.686386,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 35.4770354,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "attempt": 2,
+      "startedAt": "2026-10-11T20:54:25.4979491Z",
+      "finishedAt": "2026-10-11T20:54:46.0463198Z",
+      "exitCode": 0,
+      "elapsedSeconds": 20.5479665,
+      "log": "pipeline-test-integration-retry.log",
+      "conditions": "No agent-owned Blender/GPU/export jobs; synthetic isolated SDK sessions; same frozen source and unchanged checks."
+    }
+  ],
+  "missingStages": [],
+  "failedStages": [],
+  "sourceCheck": "source-check.json",
+  "pipeline": "pipeline-final-results.json",
+  "publishedSha256": {
+    "audit-live-frozen.mjs.txt": "016c18a7e9432eae47571173a9f04174e1046a8af4e9ebb1474f2d1e27e4b197",
+    "integration-respawn-retry-evidence.json": "ab35818236a636dbb8f70f1e90e071a5dde8ffa658a906b02a38b9143e23afc3",
+    "integration-retry-evidence.json": "e50e82e5016152b29cf0533877c9d80b65d29a0ceb2479a2799420ed3171dcd7",
+    "integration-retry-result.json": "e80a85d0d471ec3a0c6709d27b8eb71daacb627fa8f48172ffb94c37cfd68372",
+    "local-preview-status.json": "e08aa794ddf36bc62117cad8f5f57caa88844a9b947d62844a0bee920ef0ec38",
+    "pipeline-build.log": "532b36788821eb44bb2e90d256cf6d117a5d43a7f6ebeb3f76571cf1f20a5768",
+    "pipeline-final-results.json": "1a64ac5f1e2079f5f7e8e36508ddc56f47488a2372c5f3f98536b79026a6d37f",
+    "pipeline-results.json": "14ef58cfc6b7a9a08482ac8bb2e00ae18d06a338ab76d22ac82332784eceb766",
+    "pipeline-test-integration-retry.log": "e3c898b2698d075a1c82f0380c7a0871d06b99e825e5a1a3822d50a6008ee28a",
+    "pipeline-test-integration.log": "eb9139243dc2500c642741e364a36c1a142cb9798af0bffa58247990e5d9ac8f",
+    "pipeline-test.log": "23214ca16e2e6d5110df3e00f6a423a64db105c933d99592b2d5c2bc82302158",
+    "production-after-jump.png": "c05b3f1a118249c95065d5eceaee7a007e142b18575faab15e5307c5f4feeca2",
+    "production-airborne.png": "06707d32524d8e9f7f579a0f9a22b8c1df5af06bec402dc8c7fc004fe2a0fb5a",
+    "production-jump-after-movement.png": "de2e222bd5a07b29e3ac302513a94b69480c84b8eb0c1af4e5b730321054b14c",
+    "production-jump.json": "4670213da4c22f8378d0679cd23f864f288a70dbb7f7c24f1bdf75bd218374ef",
+    "readme-check.json": "e94e9ee9c073506499be421a9057cb80530834373e29e5246898e17a8da26197",
+    "source-check.json": "360cb5de3154a6a62e9caa97bb2fff30287372907c2c74b4a5ec7a882ab76add",
+    "source-comparison-p3.json": "5c6f80496665fedd43c8fb1600f773f31f37f7ca070d35aa064b20be367cd968",
+    "source-manifest.json": "cfd87197d656e2337fcbb6586d0dad19c9ea8145a4fcafb0ae1f980b56eafe00"
+  },
+  "archiveErrors": [],
+  "gpu": {
+    "status": "functional-qa-only",
+    "fpsAcceptance": "pending",
+    "note": "Intel UHD630 functional checks; no new GeForce or crowd FPS acceptance."
+  },
+  "notes": [
+    "Raw logs retain any warnings and integration diagnostics; status is derived from actual final stage exit codes, final test summary and source audit.",
+    "Reports and prose may change independently; the required static landmark geometry fixture is explicitly included and immutable."
+  ],
+  "visualQa": {
+    "status": "passed-reviewed-scope",
+    "fullProduction": "production-jump.json",
+    "component": "../jump-animation-20261011/final-component-gpu.json",
+    "sourceComparison": "source-comparison-p3.json"
+  },
+  "localPreview": "local-preview-status.json"
+}
