@@ -5,7 +5,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import type { Scene } from "@babylonjs/core/scene";
-import earcut from "earcut";
+import { buildingRoofGeometry } from "../shared/building-roofs";
 import evidence from "../shared/data/facade-reality.json";
 import { BUILDINGS, buildingArchitecture } from "../shared/world";
 import type { Building, Vec3 } from "../shared/types";
@@ -1189,10 +1189,10 @@ export function buildArchitectureReality(context: {
         }
       }
     }
-    if (block !== 6 && building.id !== "7645350") {
-      const p = building.points.slice();
-      if (p[0][0] === p.at(-1)![0] && p[0][1] === p.at(-1)![1]) p.pop();
-      const triangles = earcut(p.flat());
+    const sharedRoof = buildingRoofGeometry(building, baseY);
+    if (sharedRoof) {
+      const p = sharedRoof.points;
+      const triangles = sharedRoof.triangles;
       for (const far of [false, true]) {
         const target = batch(palette.roof, far);
         for (let i = 0; i < triangles.length; i += 3) {
@@ -1201,10 +1201,10 @@ export function buildArchitectureReality(context: {
             c = p[triangles[i + 2]];
           // Degenerate fourth corner maintains the same batched format.
           target.quad(
-            [a[0], baseY + building.height, a[1]],
-            [b[0], baseY + building.height, b[1]],
-            [c[0], baseY + building.height, c[1]],
-            [c[0], baseY + building.height, c[1]],
+            [a[0], sharedRoof.y, a[1]],
+            [b[0], sharedRoof.y, b[1]],
+            [c[0], sharedRoof.y, c[1]],
+            [c[0], sharedRoof.y, c[1]],
             [0, 1, 0],
             [a[0] / 4, a[1] / 4, c[0] / 4, c[1] / 4],
           );

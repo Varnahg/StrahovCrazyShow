@@ -1,0 +1,94 @@
+{
+  "status": "passed",
+  "failureReasons": [],
+  "scope": "Technical checkpoint O2: finalized tests, production build including TypeScript, isolated integration and subsequent independent live/frozen SHA audit. No GPU/FPS acceptance is implied.",
+  "sourceSnapshotId": "54ce6e6d630b68b5c91de1197a07920cb7d0e27cf43e01376d3c02574b220d4c",
+  "files": 8155,
+  "tests": {
+    "total": 433,
+    "passed": 433,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "startedAt": "2026-10-11T18:12:13.9277339Z",
+  "finishedAt": "2026-10-11T18:14:23.6969954Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 71.2795458,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 38.122977,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 20.3193912,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "missingStages": [],
+  "failedStages": [],
+  "sourceCheck": "source-check.json",
+  "pipeline": "pipeline-results.json",
+  "publishedSha256": {
+    "source-manifest.json": "174c8f018e34e2aa76a7a031eee8192efaafb50d4c4d9d7783ada6a9a86c2cfb",
+    "pipeline-results.json": "c9746a6636aafdfc2d1328e2cbbd0fed57b9101649b8d4ed3abfbf55907e40f6",
+    "pipeline-test.log": "1ebd53ac5cfd7e7214e37234a25226e7f60d85f03399291c6214a090b52dc7bd",
+    "pipeline-build.log": "b4cc3c5090be56e301c79220d775f301bff847304d94f81cb686abfdcc01e853",
+    "pipeline-test-integration.log": "e3c898b2698d075a1c82f0380c7a0871d06b99e825e5a1a3822d50a6008ee28a",
+    "audit-live-frozen.mjs.txt": "e85f6e327604f58eb7f919439efe716bdc526cc5a8a399bf38b01e10a7ca885d",
+    "integration-evidence.json": "2194139db69055c18c3196e3e019160641eac8c7d19a5a261817539128272310",
+    "integration-respawn-evidence.json": "259a1c3719aa9cd6b7d080a55bcb9d16f61b4cf01d8f2819b1fd7698bbeff6d1",
+    "local-preview.json": "dde3868d3ee9581ed01ad8996b8f8cbfadaa4e9bbfe3e34b3bfded6d27670bf2",
+    "navigation-comparison.json": "17c73218a3c67cefc70b962b4429ef6e97269ffb662956ca93780d5ab95f5bd1",
+    "navigation-targeted-tests.log": "b0bbe20eda826f89bc0861814dc360c8cd4b48e108f381a203a12b7d48c91573",
+    "production-respawn.png": "a82d168e86e6f97ee4e3f99fa32b250da438f89c1cf07aa8dfe10da61fa57953",
+    "production-smoke.json": "5d2a7d6d476428c364de236d3b5b2d68fc1f4090d67e7212b51fc038af5dab49",
+    "qa-harness.html.txt": "292c5607094ce6eb1f3987e7c8b2bd84853988dfe2fcf3f213b57cf70aa79620",
+    "qa-harness.ts.txt": "32d1a17eb13c62eacfb406f7b16b8b628daeb471197233c14e4ab097a7fd175a",
+    "roof-console-after-stop.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "roof-drop.json": "46745ec197dcdbf6882378e8d02c6b99b807bd84bfec686084d214c3975c091f",
+    "roof-drop.png": "8c6a1cc9e3f973673073a2fdaccb32feb399d6199bbb3614dcd6f98eea5e121b",
+    "roof-recovery.json": "61fd4400d6364e7d5ef59e7a6eb554ca3edf5272f9717ead79fbe43dbaa3a4d9",
+    "roof-recovery.png": "87774f121729145fd67fcf0e1436989654899eb4732fdabc039ab632e0a7e753",
+    "source-check.json": "e10ba241707e6a81be6cfbb5fb98a56a153ef0c255059a84782849ca4abfe558"
+  },
+  "archiveErrors": [],
+  "gpu": {
+    "status": "pending",
+    "note": "No matched full-production GeForce/FPS result for O2 is archived here. Separate GPU visual/component QA may be attached later by the coordinating root; it must not be reported as an FPS benchmark."
+  },
+  "notes": [
+    "Raw logs retain any warnings and integration diagnostics; status is derived from actual final stage exit codes, final test summary and source audit.",
+    "Documentation can change independently because it is excluded from the source snapshot hash."
+  ],
+  "visualQa": {
+    "status": "functional-checks-passed-not-fps",
+    "scope": "Real Game/Rapier drop and local recovery, then separate production HUD and authenticated multiplayer R/settings button.",
+    "adapter": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "drop": "roof-drop.json",
+    "recovery": "roof-recovery.json",
+    "production": "production-smoke.json",
+    "console": "roof-console-after-stop.json",
+    "harnessHtmlSha256": "292c5607094ce6eb1f3987e7c8b2bd84853988dfe2fcf3f213b57cf70aa79620",
+    "harnessTsSha256": "32d1a17eb13c62eacfb406f7b16b8b628daeb471197233c14e4ab097a7fd175a",
+    "limitation": "No production GeForce FPS interval or pixel equality claim. Full diagnostic setup and transient car-origin values remain in raw data."
+  },
+  "integration": {
+    "script": "integration-respawn-evidence.json",
+    "protocol": 6,
+    "checks": 23,
+    "respawnReplies": 3,
+    "errors": 0,
+    "openConnectionsAfterCleanup": 0
+  },
+  "localPreview": "local-preview.json"
+}

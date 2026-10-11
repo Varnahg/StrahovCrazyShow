@@ -1,0 +1,60 @@
+{
+  "sourceSnapshotId": "54ce6e6d630b68b5c91de1197a07920cb7d0e27cf43e01376d3c02574b220d4c",
+  "capturedAt": "2026-10-11T18:18:54.398Z",
+  "scope": "Production bundle with HUD and one real authenticated multiplayer session on isolated API2571/preview4189; functional QA, no FPS benchmark.",
+  "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "actions": [
+    "Enter common world as QA O2",
+    "Close events panel",
+    "Focus canvas; native W for 1300 ms, then native R",
+    "Observed recoveryStage restored",
+    "Select medium and explicit daytime preview",
+    "Click production Settings → Vrátit se na start",
+    "Observed recoveryStage restored and rendered spawn/canonical car"
+  ],
+  "afterKeyboardR": {
+    "css": {
+      "height": 720,
+      "width": 1280
+    },
+    "data": {
+      "b6Stage": "ready",
+      "bootStage": "ready",
+      "carStage": "ready",
+      "engine": "Babylon.js v9.30.0",
+      "physicsStage": "ready",
+      "recoveryStage": "restored",
+      "renderErrorCount": "0",
+      "scanStage": "reference-only",
+      "worldMode": "authored-separate-assets"
+    },
+    "internal": {
+      "height": 600,
+      "width": 1066
+    }
+  },
+  "afterSettingsButton": {
+    "css": {
+      "height": 720,
+      "width": 1280
+    },
+    "data": {
+      "b6Stage": "ready",
+      "bootStage": "ready",
+      "carStage": "ready",
+      "engine": "Babylon.js v9.30.0",
+      "physicsStage": "ready",
+      "recoveryStage": "restored",
+      "renderErrorCount": "0",
+      "scanStage": "reference-only",
+      "worldMode": "authored-separate-assets"
+    },
+    "internal": {
+      "height": 720,
+      "width": 1280
+    }
+  },
+  "console": [],
+  "automationNote": "Initial role=img lookup did not match the canvas and sent no input; DOM confirmed CANVAS aria-label without role, then actual canvas locator and native keys succeeded.",
+  "limitations": "No GPU/FPS acceptance, trajectory measurement or pixel equality claim. Dedicated SDK evidence verifies reset payloads and positions."
+}

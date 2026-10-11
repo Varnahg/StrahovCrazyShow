@@ -1,0 +1,79 @@
+OSM53921692 roof reproduction {
+  sourceHeight: 3,
+  baseY: -4.930610074996948,
+  roofY: -1.930610074996948,
+  beforeWithoutRoof: {
+    x: 154.17221069335938,
+    y: -5.010554790496826,
+    z: -125.2276611328125
+  },
+  afterWithRoof: {
+    x: 154.17056274414062,
+    y: -1.9418113231658936,
+    z: -125.22510528564453
+  }
+}
+BJS - [19:59:35]: Babylon.js v9.30.0 - Null engine
+✔ B1 and market roof collision streams exactly reuse their visible triangles (521.735ms)
+✔ actual B1 and market roofs stop the chassis from above and below without filling B1 courtyards or stadium (1918.3433ms)
+✔ OSM53921692 previously missed roof ray and car now collide at the exact rendered roof (723.4902ms)
+✔ shared roof remains two-sided for the chassis and blocks an oblique upward approach (1499.8907ms)
+✔ roof rays follow the real slanted outline and its small recesses, with no generic caps on replacements (476.913ms)
+✔ shared polygon keeps rendered triangles/UV order and rejects B6, market and landmark replacements (25.2191ms)
+BJS - [19:59:30]: Babylon.js v9.30.0 - Null engine
+✔ court overlays retain all six real OSM footprints and the two photographed blue insets (3.5458ms)
+✔ paint and colored surfaces lie on the exact current DEM triangles rather than bridging slopes (6.1685ms)
+✔ north B6 tennis replacement has source red core, disjoint green runoff and merged white line geometry on its canonical terrain (7.7048ms)
+✔ fences preserve existing pedestrian widths plus capsule clearance and expose eight honest adaptation gates (429.4148ms)
+✔ all exterior triangles are finite, bounded, valid and budgeted separately from the unchanged finest source plan (4.1049ms)
+✔ opaque batched renderer switches detail without decimating or mutating its source geometry (154.3232ms)
+✔ Rapier capsule passes every open gate and is stopped by the identical shared visible fence boundary (590.1117ms)
+BJS - [19:59:30]: Babylon.js v9.30.0 - Null engine
+✔ B1 keeps the full original Z footprint and three documented storeys instead of OSM's single-storey default (8.561ms)
+✔ common reception entrances use the mapped western projections, preserving separate B6 and special blocks (0.8571ms)
+✔ the canopy, door and twelve stair levels share one coherent landing elevation (2.5025ms)
+✔ stadium ray sections retain the mapped open bowl with exterior beyond the field edge (269.8489ms)
+✔ visible landmark solids and Rapier collision triangles come from one finite bounded plan (6.8813ms)
+✔ landmark component switches geometric tiers using the shared quality radius and disposes every mesh (88.5433ms)
+✔ the actual game capsule continuously climbs B2's twelve exterior steps on the DEM and stops at its closed door (1801.7806ms)
+✔ respawn discards invalid chassis/parking and stale kinematic state without sampling either (1335.6862ms)
+✔ hard foot authority ignores a corrupt local driving pose and never resets another driver (1128.0571ms)
+✔ restore rejects invalid parking/quaternions and Float32 overflow before mutation (1.3533ms)
+✔ existing CCD blocks upward overspeed through a thin solid roof; recovery clears all dynamics (9.8545ms)
+✔ photo-correct east pavilion preserves the OSM outline and owns its actual DEM base (1.781ms)
+✔ east curtain wall has unequal horizontal rows, a broad opaque band and narrow clerestory, with separately authored far geometry (1.7423ms)
+BJS - [19:59:33]: Babylon.js v9.30.0 - Null engine
+Photo-correct stadium component geometry {
+  meshCount: 69,
+  nearTriangles: 26741,
+  farTriangles: 13215,
+  collisionTriangles: 14336,
+  commonEntrances: 8,
+  b1Height: 9.6,
+  stadiumRows: 22,
+  stadiumMeshes: 13,
+  pavilion: {
+    osmId: '480849465',
+    baseY: 3.179767465591432,
+    height: 20,
+    frontageMetres: 126.17434309637262,
+    columns: 17,
+    glazingBays: 50,
+    stairFlights: 2,
+    stairStepsPerFlight: 28,
+    stairCenter: [ -138.08, 3.179767465591432, 17.520000000000007 ],
+    stairProfiles: [ [Array], [Array] ]
+  }
+}
+✔ recessed pavilion piers leave a real covered ground-level service portal rather than a hidden solid wall (304.0506ms)
+✔ actual production KCC walks continuously under the east cantilever and central covered service portal (1318.7005ms)
+✔ both interpreted exterior flights are continuous physical stairs with an open arch below (1032.0169ms)
+✔ stadium silhouette materials stay batched and every LOD uses the original full-detail source (89.2654ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7232.1832

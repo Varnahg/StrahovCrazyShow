@@ -1,0 +1,32 @@
+OSM53921692 roof reproduction {
+  sourceHeight: 3,
+  baseY: -4.930610074996948,
+  roofY: -1.930610074996948,
+  beforeWithoutRoof: {
+    x: 154.17221069335938,
+    y: -5.010554790496826,
+    z: -125.2276611328125
+  },
+  afterWithRoof: {
+    x: 154.17056274414062,
+    y: -1.9418113231658936,
+    z: -125.22510528564453
+  }
+}
+BJS - [19:39:05]: Babylon.js v9.30.0 - Null engine
+✔ OSM53921692 previously missed roof ray and car now collide at the exact rendered roof (1034.7746ms)
+✔ shared roof remains two-sided for the chassis and blocks an oblique upward approach (1970.4729ms)
+✔ roof rays follow the real slanted outline and its small recesses, with no generic caps on replacements (486.6023ms)
+✔ shared polygon keeps rendered triangles/UV order and rejects B6, market and landmark replacements (26.9559ms)
+✔ respawn discards invalid chassis/parking and stale kinematic state without sampling either (921.228ms)
+✔ hard foot authority ignores a corrupt local driving pose and never resets another driver (732.9627ms)
+✔ restore rejects invalid parking/quaternions and Float32 overflow before mutation (1.6192ms)
+✔ existing CCD blocks upward overspeed through a thin solid roof; recovery clears all dynamics (10.3578ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5053.7324

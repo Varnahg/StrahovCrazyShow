@@ -25,6 +25,7 @@ import { B6_LAYOUT, B6_STAIR_MESHES } from "./b6-interior";
 import { buildLandmarkPlan } from "./landmark-reality";
 import {
   VehicleEntity,
+  finiteVehiclePosition,
   vehicleExitAllowed,
   rotateVehicleVector,
   type VehicleState,
@@ -36,6 +37,7 @@ import { treeTrunkCollision } from "./vegetation";
 import type { PhotogrammetryCollision } from "./photogrammetry-gameplay";
 import { photogrammetryEntranceRepair } from "./photogrammetry-repairs";
 import { getPhotogrammetryGroundPatchGeometry } from "./photogrammetry-ground";
+import { buildingRoofGeometry } from "./building-roofs";
 export const CHARACTER_RADIUS = 0.42,
   CHARACTER_HALF_HEIGHT = 0.38;
 let initialized: Promise<void> | undefined;
@@ -54,6 +56,7 @@ export class Simulation {
   }
   walkingColliders = new Set<number>();
   groundColliders = new Set<number>();
+  readonly buildingRoofColliders = new Map<string, RAPIER.Collider>();
   constructor(public readonly photogrammetry?: PhotogrammetryCollision) {
     this.world = new RAPIER.World({ x: 0, y: -18, z: 0 });
     this.world.timestep = FIXED_DT;
@@ -97,27 +100,25 @@ export class Simulation {
         ),
       );
       this.groundColliders.add(ground.handle);
-      const landmarks = buildLandmarkPlan({
-        buildings: BUILDINGS,
-        baseElevation: (b) => buildingBaseHeight(b.points),
-      }).collision;
-      if (landmarks.indices.length)
-        this.world.createCollider(
-          RAPIER.ColliderDesc.trimesh(
-            new Float32Array(landmarks.positions),
-            new Uint32Array(landmarks.indices),
-            RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES,
-          ),
-        );
-      const exterior = buildCampusExteriorPlan().collision;
-      if (exterior.indices.length)
-        this.world.createCollider(
-          RAPIER.ColliderDesc.trimesh(
-            new Float32Array(exterior.positions),
-            new Uint32Array(exterior.indices),
-            RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES,
-          ),
-        );
+      for (const plan of [
+        buildLandmarkPlan({
+          buildings: BUILDINGS,
+          baseElevation: (b) => buildingBaseHeight(b.points),
+        }),
+        buildCampusExteriorPlan(),
+      ]) {
+        const solid = plan.collision;
+        if (solid.indices.length)
+          this.world.createCollider(
+            RAPIER.ColliderDesc.trimesh(
+              new Float32Array(solid.positions),
+              new Uint32Array(solid.indices),
+              RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES,
+            ),
+          );
+        if (plan.twoSidedRoofCollision.indices.length)
+          this.createRoofCollider(plan.twoSidedRoofCollision);
+      }
       for (const b of BUILDINGS) {
         if (b.name.endsWith("blok 6")) continue;
         const baseY = buildingBaseHeight(b.points);
@@ -139,6 +140,9 @@ export class Simulation {
             Math.atan2(nx - x, nz - z),
           );
         }
+        const roof = buildingRoofGeometry(b, baseY);
+        if (roof?.indices.length)
+          this.buildingRoofColliders.set(b.id, this.createRoofCollider(roof));
       }
     }
     for (const b of B6_BOXES)
@@ -188,26 +192,11 @@ export class Simulation {
         b.yaw,
       );
     stepRigidWorld(this.world);
-    this.car = new VehicleEntity(
-      this.world,
-      {
-        x: CAR_SPAWN.x,
-        y: this.surfaceHeight(CAR_SPAWN.x, CAR_SPAWN.z) - 0.0112,
-        z: CAR_SPAWN.z,
-      },
-      { parked: true },
-    );
-    this.car.body.setRotation(
-      groundRotation(
-        CAR_SPAWN.x,
-        CAR_SPAWN.z,
-        CAR_SPAWN.yaw,
-        3.56,
-        2.04,
-        (x, z) => this.surfaceHeight(x, z),
-      ),
-      true,
-    );
+    const carSpawn = this.carSpawnPose();
+    this.car = new VehicleEntity(this.world, carSpawn.position, {
+      parked: true,
+    });
+    this.car.body.setRotation(carSpawn.rotation, true);
     this.car.park();
     for (const slot of photogrammetry ? [] : PARKING_SLOTS) {
       const body = this.world.createRigidBody(
@@ -244,6 +233,17 @@ export class Simulation {
       for (const z of [BOUNDS.minZ - 1, BOUNDS.maxZ + 1])
         rail(x, z, Math.min(BOUNDS.maxX + 1, x + 10), z);
     stepRigidWorld(this.world);
+  }
+  private createRoofCollider(data: { positions: number[]; indices: number[] }) {
+    // A roof is a surface, not a closed solid: retain contacts from below
+    // without inventing thickness or duplicate faces.
+    return this.world.createCollider(
+      RAPIER.ColliderDesc.trimesh(
+        new Float32Array(data.positions),
+        new Uint32Array(data.indices),
+        RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES_TWO_SIDED,
+      ),
+    );
   }
   solid(
     x: number,
@@ -410,6 +410,47 @@ export class Simulation {
     this.actors.set(id, actor);
     return actor;
   }
+  /** Explicit user recovery is independent of the broken pose and exit-speed
+   * rule. Never teleport another driver's shared car. */
+  respawnActor(id: string): boolean {
+    const actor = this.actors.get(id);
+    if (!actor) return false;
+    this.recoverOwnedCar(actor);
+    actor.resetOnFoot({
+      ...SPAWN,
+      y: this.photogrammetry
+        ? this.surfaceHeight(SPAWN.x, SPAWN.z) + 1
+        : SPAWN.y,
+    });
+    return true;
+  }
+  private carSpawnPose() {
+    return {
+      position: {
+        x: CAR_SPAWN.x,
+        y: this.surfaceHeight(CAR_SPAWN.x, CAR_SPAWN.z) - 0.0112,
+        z: CAR_SPAWN.z,
+      },
+      rotation: groundRotation(
+        CAR_SPAWN.x,
+        CAR_SPAWN.z,
+        CAR_SPAWN.yaw,
+        3.56,
+        2.04,
+        (x, z) => this.surfaceHeight(x, z),
+      ),
+    };
+  }
+  recoverOwnedCar(actor: Actor) {
+    if (
+      (actor.vehicle || this.car.driverId === actor.id) &&
+      (this.car.driverId === null || this.car.driverId === actor.id)
+    ) {
+      const pose = this.carSpawnPose();
+      this.car.recover(pose.position, pose.rotation);
+      this.carStepped = false;
+    }
+  }
   remove(id: string) {
     const a = this.actors.get(id);
     if (a) {
@@ -498,9 +539,9 @@ export class Simulation {
   }
 }
 export class Actor {
-  body: RAPIER.RigidBody;
-  collider: RAPIER.Collider;
-  controller: RAPIER.KinematicCharacterController;
+  body!: RAPIER.RigidBody;
+  collider!: RAPIER.Collider;
+  controller!: RAPIER.KinematicCharacterController;
   private footYaw = 0;
   private footSpeed = 0;
   get yaw() {
@@ -525,6 +566,10 @@ export class Actor {
     public id: string,
     p: Vec3,
   ) {
+    this.createPhysics(p);
+  }
+  private createPhysics(p: Vec3) {
+    const sim = this.sim;
     this.body = sim.world.createRigidBody(
       RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(
         p.x,
@@ -541,6 +586,23 @@ export class Actor {
     this.controller.enableAutostep(0.22, 0.2, false);
     this.controller.enableSnapToGround(0.25);
     this.controller.setSlideEnabled(true);
+  }
+  /** Replace native kinematic/controller state without reading old translation,
+   * rotation, velocity, next target or the vehicle's potentially invalid pose. */
+  resetOnFoot(position: Vec3, yaw = 0) {
+    if (!finiteVehiclePosition(position) || !Number.isFinite(yaw))
+      throw new TypeError("Invalid actor recovery pose");
+    this.sim.walkingColliders.delete(this.collider.handle);
+    this.sim.world.removeCharacterController(this.controller);
+    this.sim.world.removeRigidBody(this.body);
+    this.vehicle = false;
+    this.footYaw = yaw;
+    this.footSpeed = 0;
+    this.vertical = 0;
+    this.grounded = false;
+    this.createPhysics(position);
+    this.body.setNextKinematicTranslation(position);
+    this.sim.world.propagateModifiedBodyPositionsToColliders();
   }
   get position() {
     if (this.vehicle) {
@@ -587,7 +649,15 @@ export class Actor {
       vehicleState: this.vehicle ? this.sim.car.capture() : undefined,
     };
   }
-  restore(state: ActorState) {
+  restore(state: ActorState, hard = false) {
+    if (hard && !state.vehicle) {
+      this.sim.recoverOwnedCar(this);
+      this.resetOnFoot(state.position, state.yaw);
+      this.footSpeed = Number.isFinite(state.speed) ? state.speed : 0;
+      this.vertical = Number.isFinite(state.vertical) ? state.vertical : 0;
+      this.grounded = state.grounded;
+      return;
+    }
     if (state.vehicle && state.vehicleState) {
       this.sim.car.restore({ ...state.vehicleState, driverId: this.id });
       this.vehicle = true;

@@ -212,14 +212,19 @@ export function commonEntranceHeight(x: number, z: number) {
   return undefined;
 }
 
+const emptyMeshData = (): LandmarkMeshData => ({
+  positions: [],
+  normals: [],
+  indices: [],
+  uvs: [],
+});
+
 class Geometry {
   readonly parts = new Map<string, LandmarkPart>();
-  readonly collision: LandmarkMeshData = {
-    positions: [],
-    normals: [],
-    indices: [],
-    uvs: [],
-  };
+  readonly collision = emptyMeshData();
+  /** Open roof surfaces require contacts from both sides, unlike the closed
+   * wall/box stream. Keep their Rapier flags separate from existing solids. */
+  readonly twoSidedRoofCollision = emptyMeshData();
   readonly boxes: LandmarkBox[] = [];
   part(
     group: string,
@@ -386,7 +391,13 @@ class Geometry {
       d,
     );
   }
-  roof(group: string, points: P2[], y: number, collision = false, up = true) {
+  roof(
+    group: string,
+    points: P2[],
+    y: number,
+    collision: LandmarkMeshData,
+    up = true,
+  ) {
     const p = ring(points),
       idx = earcut(p.flat()),
       target = this.part(group, "roof");
@@ -414,7 +425,7 @@ class Geometry {
       }
     };
     append(target);
-    if (collision) append(this.collision);
+    append(collision);
   }
   rod(group: string, material: LandmarkMaterial, a: P, b: P, radius: number) {
     const axis = b.map((v, i) => v - a[i]),
@@ -579,7 +590,7 @@ function b1(g: Geometry, building: Building, baseY: number) {
     }
   }
   // Earcut preserves the concave Z footprint and its two external courtyards.
-  g.roof(group, building.points, baseY + height);
+  g.roof(group, building.points, baseY + height, g.twoSidedRoofCollision);
   return { group, points: ring(building.points), baseY, height };
 }
 
@@ -1569,9 +1580,10 @@ function stadium(g: Geometry, baseY: number) {
           });
       }
     }
-    g.roof("stadium", p.points as P2[], baseY + h, true);
-    g.roof("stadium", p.points as P2[], baseY + h - 0.45, true, false);
-    if (isEast) g.roof("stadium", p.points as P2[], baseY + 7.5, true, false);
+    g.roof("stadium", p.points as P2[], baseY + h, g.collision);
+    g.roof("stadium", p.points as P2[], baseY + h - 0.45, g.collision, false);
+    if (isEast)
+      g.roof("stadium", p.points as P2[], baseY + 7.5, g.collision, false);
   }
   const east = eastPavilion(g, baseY);
   return { baseY, samples: points.length, rows, east };
@@ -1598,6 +1610,7 @@ export function buildLandmarkPlan(
   return {
     parts: [...geometry.parts.values()],
     collision: geometry.collision,
+    twoSidedRoofCollision: geometry.twoSidedRoofCollision,
     boxes: geometry.boxes,
     entrances: entranceRows,
     b1Roof,

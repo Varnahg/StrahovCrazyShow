@@ -232,7 +232,7 @@ export class Game {
   localId = "guest";
   onInput?: (input: Input) => void;
   onPredictionReset?: () => void;
-  onAction?: (action: string, data?: unknown) => void;
+  onAction?: (action: string, data?: unknown) => void | boolean;
   onStats?: (stats: GameStats) => void;
   onNotice?: (message: string) => void;
   onBenchmark?: (result: Benchmark) => void;
@@ -348,6 +348,8 @@ export class Game {
   skyWeather: SkyWeatherController;
   environment?: { update(player: { x: number; y: number; z: number }): void };
   carSnapshots: { time: number; state: VehicleState }[] = [];
+  respawnPending = false;
+  private minimumMotionTick = -1;
   previousCarPose?: { position: Vector3; rotation: Quaternion };
   updateCarWheels?: (state: VehicleState) => void;
   disposeCarAssets?: () => void;
@@ -846,6 +848,18 @@ export class Game {
   }
   setLocalId(id: string) {
     const old = this.localId;
+    if (old === id) return;
+    // A newly issued session belongs to a new network epoch. Resuming the same
+    // identity keeps its frontiers so delayed packets cannot rewind it.
+    this.resetPredictionHistory();
+    this.lastAuthorityTick = this.minimumMotionTick = -1;
+    this.seq = 0;
+    this.respawnPending = false;
+    this.carSnapshots.length = 0;
+    this.previousCarPose = undefined;
+    this.visualOffset.setAll(0);
+    this.snapshots.entities.clear();
+    this.snapshots.offset = undefined;
     this.contactShadows.remove(old);
     this.localId = id;
     const a = this.avatars.get(old);
@@ -856,6 +870,7 @@ export class Game {
     this.localPlayer.id = id;
   }
   syncMotion(packet: MotionPacket) {
+    if (packet.tick < this.minimumMotionTick) return;
     this.snapshots.push(packet);
     if (packet.car) {
       this.carSnapshots.push({ time: packet.time, state: packet.car });
@@ -881,6 +896,11 @@ export class Game {
   }
   reconcile(packet: Authority) {
     if (!this.ready || packet.tick < this.lastAuthorityTick) return;
+    // Respawn is completed by a forced authority, not by replaying a packet
+    // already in flight when the user asked to return to the start.
+    const respawnReply = packet.resync === true && packet.respawn === true;
+    if (this.respawnPending && !respawnReply) return;
+    const explicitRespawn = this.respawnPending && respawnReply;
     this.lastAuthorityTick = packet.tick;
     const expected = this.prediction.states.get(packet.ack);
     const exact =
@@ -911,20 +931,29 @@ export class Game {
       this.seq = Math.max(this.seq, packet.ack);
       return;
     }
-    const old = { ...this.actor.position },
+    const old = packet.resync
+        ? packet.state.position
+        : { ...this.actor.position },
       modeChanged = this.actor.vehicle !== packet.state.vehicle;
     if (packet.resync) {
-      this.prediction.clear();
+      if (explicitRespawn) this.clearPendingMovement();
+      else this.resetPredictionHistory();
       this.seq = packet.ack;
-      this.onPredictionReset?.();
+      this.respawnPending = false;
+      this.minimumMotionTick = packet.tick;
+      this.carSnapshots.length = 0;
+      this.snapshots.remove(this.localId);
     } else this.seq = Math.max(this.seq, packet.ack);
     const replay = this.prediction
       .acknowledge(packet.ack)
       .filter(
         (i) => i.vehicle === undefined || i.vehicle === packet.state.vehicle,
       );
-    this.actor.restore(packet.state);
-    if (modeChanged && packet.state.vehicle) this.alignVehicleCamera();
+    this.actor.restore(packet.state, packet.respawn === true);
+    if (packet.resync && !packet.state.vehicle && packet.state.vehicleState)
+      this.sim.restorePublicCar(packet.state.vehicleState);
+    if (modeChanged && packet.state.vehicle && !packet.resync)
+      this.alignVehicleCamera();
     if (!packet.resync)
       for (const input of replay) {
         this.actor.step(input, FIXED_DT);
@@ -956,6 +985,56 @@ export class Game {
         carPose.rotation.w,
       ),
     };
+    if (explicitRespawn) this.snapRecoveryPresentation();
+  }
+  private resetPredictionHistory() {
+    this.accumulator = 0;
+    this.prediction.clear();
+    this.onPredictionReset?.();
+  }
+  private clearPendingMovement() {
+    this.clearHeldInput();
+    this.jumpWasDown = false;
+    this.resetPredictionHistory();
+  }
+  private snapRecoveryPresentation() {
+    const position = this.actor.position;
+    this.visualOffset.setAll(0);
+    this.previousPosition.copyFromFloats(position.x, position.y, position.z);
+    this.cameraArm = this.distance;
+    this.yaw = this.actor.yaw;
+    this.vehicleCameraSnap = true;
+    this.avatars.get(this.localId)?.animation.reset();
+    this.canvas.dataset.recoveryStage = "restored";
+  }
+  /** One path for R and the GUI. Ordered transport sees old inputs before the
+   * request; no fresh input is predicted or queued until the forced reply. */
+  requestRespawn() {
+    if (!this.ready || this.respawnPending) return false;
+    this.clearPendingMovement();
+    if (this.network) {
+      this.respawnPending = true;
+      this.canvas.dataset.recoveryStage = "waiting-for-authority";
+      if (!this.onAction || this.onAction("respawn") === false) {
+        this.cancelRespawn();
+        this.onNotice?.(
+          "Návrat vyžaduje spojení se serverem. Použij Obnovit spojení.",
+        );
+        return false;
+      }
+      return true;
+    }
+    if (!this.sim.respawnActor(this.actor.id)) return false;
+    this.carSnapshots.length = 0;
+    this.previousCarPose = undefined;
+    this.snapshots.remove(this.localId);
+    this.snapRecoveryPresentation();
+    return true;
+  }
+  cancelRespawn() {
+    this.respawnPending = false;
+    this.keys.clear();
+    this.canvas.dataset.recoveryStage = "disconnected";
   }
   setWeather(weather: Weather) {
     this.weather = weather;
@@ -1080,12 +1159,13 @@ export class Game {
       this.sim.setParkedCar({ x: data.x, y: data.y, z: data.z }, data.yaw);
   }
   resize = () => this.engine.resize();
-  blur = () => {
+  private clearHeldInput() {
     this.keys.clear();
     this.orbiting = false;
     this.pointerPress = undefined;
     this.canvas.style.cursor = "";
-  };
+  }
+  blur = () => this.clearHeldInput();
   visibility = () => {
     this.blur();
     if (!document.hidden && this.network) this.onAction?.("resync");
@@ -1137,6 +1217,7 @@ export class Game {
       })
     )
       return;
+    if (this.respawnPending) return;
     if (
       ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
         e.code,
@@ -1157,13 +1238,7 @@ export class Game {
             document.exitPointerLock();
         }
       }
-      if (e.code === "KeyR") {
-        if (this.network) this.onAction?.("respawn");
-        else {
-          this.actor.setVehicle(false);
-          this.actor.setPosition(SPAWN);
-        }
-      }
+      if (e.code === "KeyR") this.requestRespawn();
     }
   };
   keyUp = (e: KeyboardEvent) => this.keys.delete(e.code);
@@ -1364,7 +1439,7 @@ export class Game {
         gpuFrameMs: this.lastGpuFrameMs,
       }),
     );
-    this.accumulator += dt;
+    this.accumulator = this.respawnPending ? 0 : this.accumulator + dt;
     if (
       vehicleCameraCanFollow({
         driving: this.actor.vehicle,

@@ -27,7 +27,7 @@ import {
 } from "../shared/events";
 import { sanitizeProfile } from "../shared/profile";
 import { projectLocalBenchmark } from "../shared/local-benchmark";
-import { PLACES, HUNT_POINTS, SPAWN } from "../shared/world";
+import { PLACES, HUNT_POINTS } from "../shared/world";
 import type { Game, GameStats, Benchmark } from "./game";
 import {
   isRenderQualityMode,
@@ -268,6 +268,10 @@ export function App() {
       return;
     }
     const timer = setInterval(() => {
+      if (game.current?.respawnPending) {
+        inputBuffer.current = [];
+        return;
+      }
       if (inputBuffer.current.length && room.current)
         room.current.send("inputs", inputBuffer.current.splice(0, 8));
     }, 1000 / 30);
@@ -377,8 +381,13 @@ export function App() {
         };
         g.onPredictionReset = () => (inputBuffer.current = []);
         g.onAction = (action, data) => {
-          if (action === "reward") reward(String(data));
-          else room.current?.send(action, data);
+          if (action === "reward") {
+            reward(String(data));
+            return true;
+          }
+          if (!room.current || !connectedRef.current) return false;
+          room.current.send(action, data);
+          return true;
         };
         if (weatherRef.current) g.setWeather(weatherRef.current);
         g.setQuality(quality);
@@ -433,12 +442,14 @@ export function App() {
       if (game.current) game.current.canvas.dataset.networkStage = "connected";
     });
     r.onMessage("presence", (data: Player[]) => {
+      if (room.current !== r) return;
       playersRef.current = data;
       playersById.current = new Map(data.map((p) => [p.id, p]));
       setPlayers(data);
       game.current?.updatePlayers(data);
     });
     r.onMessage("motion", (packet: MotionPacket) => {
+      if (room.current !== r) return;
       for (const row of packet.rows) {
         const p = playersById.current.get(row[0]);
         if (p)
@@ -455,6 +466,7 @@ export function App() {
       game.current?.syncMotion(packet);
     });
     r.onMessage("authoritative", (data: Authority) => {
+      if (room.current !== r) return;
       authorityRef.current = data;
       game.current?.reconcile(data);
     });
@@ -467,6 +479,7 @@ export function App() {
     r.onMessage("notice", notice);
     r.onMessage("reward", reward);
     r.onMessage("car", (data: any) => {
+      if (room.current !== r) return;
       carState.current = data;
       game.current?.setCar(data);
     });
@@ -491,6 +504,7 @@ export function App() {
       setWorldSelection(null);
       const currentGame = game.current;
       if (currentGame) {
+        currentGame.cancelRespawn();
         currentGame.canvas.dataset.networkStage = `disconnected:${code}`;
         currentGame.selectTarget(null);
         currentGame.updatePlayers([currentGame.localPlayer]);
@@ -514,6 +528,8 @@ export function App() {
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Server není dostupný.");
+    const identityChanged =
+      (game.current?.localId ?? idRef.current) !== data.id;
     sessionStorage.setItem("strahov.session", data.token);
     idRef.current = data.id;
     setSelfId(data.id);
@@ -524,6 +540,14 @@ export function App() {
       token: data.token,
       protocol: PROTOCOL_VERSION,
     });
+    if (identityChanged) {
+      authorityRef.current = null;
+      carState.current = null;
+      inputBuffer.current = [];
+    }
+    // Reconnect does not rebuild Game. Install the session epoch before bind()
+    // accepts its first motion/authority, including if welcome arrives later.
+    game.current?.setLocalId(data.id);
     bind(r);
   };
   const enter = async (next: "guest" | "multi") => {
@@ -2030,13 +2054,8 @@ export function App() {
               </p>
               <button
                 className="secondary full"
-                onClick={() => {
-                  if (mode === "multi") send("respawn");
-                  else {
-                    game.current?.actor.setVehicle(false);
-                    game.current?.actor.setPosition(SPAWN);
-                  }
-                }}
+                disabled={!ready}
+                onClick={() => game.current?.requestRespawn()}
               >
                 Vrátit se na start
               </button>

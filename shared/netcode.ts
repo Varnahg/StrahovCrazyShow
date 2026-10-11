@@ -2,7 +2,7 @@ import type { Input, Vec3 } from "./types";
 import type { VehicleState } from "./vehicle";
 export type { Input } from "./types";
 
-export const PROTOCOL_VERSION = 5;
+export const PROTOCOL_VERSION = 6;
 export const SIM_HZ = 60;
 export const FIXED_DT = 1 / SIM_HZ;
 export const MAX_CATCHUP_STEPS = 8;
@@ -21,6 +21,8 @@ export type Authority = {
   ack: number;
   state: ActorState;
   resync?: boolean;
+  /** Only the reply to an explicit respawn request, never a generic resync. */
+  respawn?: true;
 };
 export type MotionPacket = {
   time: number;
