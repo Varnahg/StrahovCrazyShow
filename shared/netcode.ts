@@ -2,7 +2,9 @@ import type { Input, Vec3 } from "./types";
 import type { VehicleState } from "./vehicle";
 export type { Input } from "./types";
 
-export const PROTOCOL_VERSION = 6;
+// Closed stadium geometry changes prediction/collision behaviour. Old clients
+// must refresh instead of joining a world whose visible boundaries differ.
+export const PROTOCOL_VERSION = 7;
 export const SIM_HZ = 60;
 export const FIXED_DT = 1 / SIM_HZ;
 export const MAX_CATCHUP_STEPS = 8;

@@ -12,9 +12,13 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import {
   AvatarPrimitivePool,
   createAvatarRig,
+  type AvatarRig,
 } from "/client/avatar-renderer.ts";
 import { AvatarAnimator } from "/client/animation.ts";
-import { AvatarAnimator as BeforeAnimator } from "./animation-before.ts";
+import { AvatarAnimator as BeforeAnimator } from "./animation-o2.ts";
+import { AvatarLodController } from "/client/avatar-lod.ts";
+import { SceneTextureDiagnostics } from "/client/texture-diagnostics.ts";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { AVATAR_PRESETS, applyAvatarPreset } from "/client/avatar-presets.ts";
 import { DEFAULT_AVATAR } from "/shared/types.ts";
 
@@ -25,6 +29,7 @@ const canvas = document.querySelector("canvas")!,
   }),
   scene = new Scene(engine);
 scene.useRightHandedSystem = true;
+const textures = new SceneTextureDiagnostics(scene);
 scene.clearColor = new Color4(0.19, 0.24, 0.27, 1);
 const camera = new ArcRotateCamera(
   "locomotion review",
@@ -46,7 +51,7 @@ sun.diffuse = new Color3(1, 0.92, 0.82);
 const groundMaterial = new StandardMaterial("matte pavement", scene);
 groundMaterial.diffuseColor = new Color3(0.26, 0.29, 0.3);
 groundMaterial.specularColor = Color3.Black();
-let groundMeshes: any[] = [];
+let groundMeshes: Mesh[] = [];
 let terrain = "flat";
 function floor(x: number, z: number) {
   return terrain === "slope"
@@ -85,19 +90,25 @@ function buildGround() {
   }
 }
 const pool = new AvatarPrimitivePool(scene);
-let before: any,
-  after: any,
-  beforeAnim: any,
-  afterAnim: any,
+let before: AvatarRig,
+  after: AvatarRig,
+  beforeAnim: BeforeAnimator,
+  afterAnim: AvatarAnimator,
+  beforeLod: AvatarLodController,
+  afterLod: AvatarLodController,
   preset = 0,
   pose = "idle",
   travel = 0,
+  travelX = 0,
+  travelZ = 0,
   yaw = 0,
   paused = false,
   time = 0,
   shaderError: string | null = null,
   frames = 0,
-  poseTime = 0;
+  poseTime = 0,
+  playback = 1,
+  level = "near";
 const beforeDisplay = new TransformNode("before display offset only", scene),
   afterDisplay = new TransformNode("after display offset only", scene);
 const hist = { before: [] as number[], after: [] as number[] };
@@ -110,6 +121,8 @@ function resetHistory() {
   poseTime = 0;
 }
 function build() {
+  beforeLod?.dispose();
+  afterLod?.dispose();
   before?.root.dispose();
   after?.root.dispose();
   const config = applyAvatarPreset(preset, DEFAULT_AVATAR);
@@ -119,6 +132,8 @@ function build() {
   after.root.parent = afterDisplay;
   beforeAnim = new BeforeAnimator(before);
   afterAnim = new AvatarAnimator(after);
+  beforeLod = new AvatarLodController(scene, pool, before, config);
+  afterLod = new AvatarLodController(scene, pool, after, config);
   pool.pruneUnused();
   for (const m of scene.materials)
     m.onError = (_, e) => {
@@ -127,6 +142,7 @@ function build() {
   resetHistory();
   frames = 0;
   travel = 0;
+  travelX = travelZ = 0;
   time = 0;
   yaw = 0;
 }
@@ -143,6 +159,8 @@ for (const [label, key] of [
   ["Sprint 7 m/s", "sprint"],
   ["Otáčení", "turn"],
   ["Rozběh a zastavení", "stop"],
+  ["Krátké rozběhy", "pulse"],
+  ["Chůze → běh", "shift"],
   ["Zamávání", "wave"],
 ])
   button("#actions", label, () => {
@@ -156,7 +174,7 @@ for (const [label, alpha] of [
   ["Čelně", Math.PI / 2],
   ["Záda", -Math.PI / 2],
   ["Tři čtvrtiny", 0.8],
-])
+] as const)
   button("#views", label, () => {
     camera.alpha = alpha;
     camera.beta = 1.4;
@@ -180,10 +198,17 @@ document.querySelector("#terrain")!.addEventListener("change", (e) => {
 document
   .querySelector("#pause")!
   .addEventListener("click", () => (paused = !paused));
+document.querySelector("#restart")!.addEventListener("click", () => build());
+document.querySelector("#playback")!.addEventListener("change", (event) => {
+  playback = Number((event.target as HTMLSelectElement).value);
+});
+document.querySelector("#lod")!.addEventListener("change", (event) => {
+  level = (event.target as HTMLSelectElement).value;
+});
 document.querySelector("#step")!.addEventListener("click", () => {
   paused = true;
   animate(1 / 60);
-  scene.render();
+  render();
 });
 document.querySelector("#steady")!.addEventListener("click", () => {
   for (let i = 0; i < 240; i++) animate(1 / 60);
@@ -214,24 +239,38 @@ function animate(dt: number) {
         : pose === "sprint"
           ? 7
           : pose === "stop"
-            ? time % 8 < 4
+            ? time % 6 >= 0.75 && time % 6 < 3
               ? 4.6
               : 0
-            : 0;
+            : pose === "pulse"
+              ? (time % 2 >= 0.5 && time % 2 < 0.95) ||
+                (time % 2 >= 1.1 && time % 2 < 1.65)
+                ? 4.6
+                : 0
+              : pose === "shift"
+                ? time % 6 < 2
+                  ? 1.8
+                  : time % 6 < 4
+                    ? 4.6
+                    : 7
+                : 0;
+  yaw = pose === "turn" ? 0.7 * Math.sin(time * 0.8) : 0;
   travel += speed * dt;
+  travelX += Math.sin(yaw) * speed * dt;
+  travelZ += Math.cos(yaw) * speed * dt;
   if (travel > (terrain === "stairs" ? 18 : 800)) {
     travel = 0;
+    travelX = travelZ = 0;
     beforeAnim.reset();
     afterAnim.reset();
     resetHistory();
   }
-  yaw = pose === "turn" ? 0.7 * Math.sin(time * 0.8) : 0;
   displayLayout();
   for (const [rig, anim, key] of [
     [before, beforeAnim, "before"],
     [after, afterAnim, "after"],
   ] as const) {
-    const position = { x: 0, y: floor(0, travel), z: travel };
+    const position = { x: travelX, y: floor(travelX, travelZ), z: travelZ };
     rig.root.position.set(position.x, position.y, position.z);
     anim.update(
       {
@@ -251,20 +290,36 @@ function animate(dt: number) {
   before.root.setEnabled(
     (document.querySelector("#before") as HTMLInputElement).checked,
   );
-  camera.target.set(0, floor(0, travel) + 0.85, travel);
+  camera.target.set(travelX, floor(travelX, travelZ) + 0.85, travelZ);
   frames++;
 }
 buildGround();
 build();
 let last = performance.now(),
   next = 0;
+function render() {
+  before.root.setEnabled(
+    (document.querySelector("#before") as HTMLInputElement).checked,
+  );
+  for (const [rig, lod] of [
+    [before, beforeLod],
+    [after, afterLod],
+  ] as const)
+    lod.update({
+      distance: level === "near" ? 0 : 20,
+      quality: "low",
+      position: rig.root.position,
+      yaw,
+    });
+  scene.render();
+}
 engine.runRenderLoop(() => {
   const now = performance.now(),
     dt = Math.min(0.05, (now - last) / 1000);
   last = now;
-  if (!paused) animate(dt);
+  if (!paused) animate(dt * playback);
   displayLayout();
-  scene.render();
+  render();
   if (now > next) {
     next = now + 200;
     const range = (s: number[]) =>
@@ -275,11 +330,19 @@ engine.runRenderLoop(() => {
         pose,
         terrain,
         preset: AVATAR_PRESETS[preset].name,
+        lod: afterLod.level,
+        playback,
         paused,
         frames,
         poseTime,
         gpu: engine.getGlInfo().renderer,
         shaderError,
+        textureLoadErrors: textures.count,
+        canvasCss: { width: canvas.clientWidth, height: canvas.clientHeight },
+        canvasInternal: {
+          width: engine.getRenderWidth(),
+          height: engine.getRenderHeight(),
+        },
         afterGait: afterAnim.gait,
         afterSpeed: afterAnim.speed,
         travel,
@@ -288,7 +351,8 @@ engine.runRenderLoop(() => {
         steadySamples: hist.after.length,
         steadyHeadRangeBefore: range(hist.before),
         steadyHeadRangeAfter: range(hist.after),
-        baseline: "archived animation before change",
+        baseline:
+          "O2 production animation before current transition repair; animation-o2.ts (type imports relocated only)",
         source:
           "live production rig + AvatarAnimator; kinematic preview, no multiplayer/physics/HUD/FPS proof",
       },
@@ -297,4 +361,28 @@ engine.runRenderLoop(() => {
     );
   }
 });
-addEventListener("resize", () => engine.resize());
+const resize = () => engine.resize();
+addEventListener("resize", resize);
+let disposed = false;
+addEventListener(
+  "pagehide",
+  () => {
+    if (disposed) return;
+    disposed = true;
+    engine.stopRenderLoop();
+    removeEventListener("resize", resize);
+    camera.detachControl();
+    beforeLod.dispose();
+    afterLod.dispose();
+    before.root.dispose();
+    after.root.dispose();
+    textures.dispose();
+    pool.dispose();
+    scene.dispose();
+    engine.dispose();
+  },
+  { once: true },
+);
+addEventListener("pageshow", (event) => {
+  if (event.persisted) location.reload();
+});

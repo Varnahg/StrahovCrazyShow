@@ -45,6 +45,10 @@ import { groundHeight, PARKING_SLOTS } from "../shared/terrain";
 import type { B6RealityController } from "./b6-reality";
 import { applyArtLighting } from "./art-lighting";
 import { VehicleLighting } from "./vehicle-lighting";
+import { PlayerFlashlight } from "./flashlight";
+import { localizeText, t } from "./i18n";
+import { MapNavigator, type PlanMapRoute } from "./map-navigation";
+import { createNavigationClearance } from "./navigation-physics";
 import { updateRainSegments } from "./weather-particles";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
@@ -130,6 +134,7 @@ export type GameStats = {
   speed: number;
   yaw: number;
   vehicle: boolean;
+  flashlight: boolean;
   zone: string;
   hint: string;
   rendering: AdaptiveQualitySnapshot;
@@ -356,6 +361,24 @@ export class Game {
   setCarQuality?: (quality: string) => void;
   updateCarLighting?: (night: number) => void;
   vehicleLighting?: VehicleLighting;
+  flashlightOn = false;
+  private flashlight?: PlayerFlashlight;
+  private mapNavigator?: MapNavigator;
+  planMapRoute: PlanMapRoute = (start, target) => {
+    if (!this.ready)
+      return {
+        status: "unavailable",
+        points: [],
+        distance: 0,
+        endpoint: target,
+        toEntrance: false,
+      };
+    this.mapNavigator ??= new MapNavigator(createNavigationClearance(this.sim));
+    return this.mapNavigator.planAsync(start, target);
+  };
+  cancelMapRoute() {
+    this.mapNavigator?.cancel();
+  }
   vegetation?: VegetationController;
   transit?: TransitRenderer;
   trafficPreview?: { instant: number; started: number };
@@ -368,12 +391,12 @@ export class Game {
   }
   previewTransit() {
     if (this.network) {
-      this.onNotice?.("Ukázka dopravy je dostupná v samostatné prohlídce.");
+      this.notice("Ukázka dopravy je dostupná v samostatné prohlídce.");
       return null;
     }
     const arrival = getPreviewArrival(Date.now());
     if (!arrival) {
-      this.onNotice?.("Pro ukázku nemáme platný podklad.");
+      this.notice("Pro ukázku nemáme platný podklad.");
       return null;
     }
     this.trafficPreview = {
@@ -417,9 +440,7 @@ export class Game {
     this.engine.onEffectErrorObservable.add(() => {
       this.canvas.dataset.renderErrorCount = String(++this.renderErrorCount);
       if (this.renderErrorCount === 1)
-        this.onNotice?.(
-          "Část prostředí se nepodařilo vykreslit. Obnov stránku.",
-        );
+        this.notice("Část prostředí se nepodařilo vykreslit. Obnov stránku.");
     });
     this.applyAdaptiveQuality(this.adaptive.state);
     this.gpu = readGpuDiagnostics(this.engine);
@@ -451,7 +472,7 @@ export class Game {
           this.assetLoadErrorCount,
         );
         if (count === 1)
-          this.onNotice?.(
+          this.notice(
             "Část textur prostředí se nepodařilo načíst. Obnov stránku.",
           );
       },
@@ -477,6 +498,11 @@ export class Game {
       this.camera,
       this.engine,
     );
+    // Permanent landmark captions belong to the map. Keep only a handful of
+    // nearby names in the scene; distant players remain represented by avatars.
+    this.labels.placeLimit = 0;
+    this.labels.playerLimit = 6;
+    this.labels.playerRange = 18;
     this.ambient = new HemisphericLight(
       "sky",
       new Vector3(0, 1, 0),
@@ -1017,7 +1043,7 @@ export class Game {
       this.canvas.dataset.recoveryStage = "waiting-for-authority";
       if (!this.onAction || this.onAction("respawn") === false) {
         this.cancelRespawn();
-        this.onNotice?.(
+        this.notice(
           "Návrat vyžaduje spojení se serverem. Použij Obnovit spojení.",
         );
         return false;
@@ -1035,6 +1061,17 @@ export class Game {
     this.respawnPending = false;
     this.keys.clear();
     this.canvas.dataset.recoveryStage = "disconnected";
+  }
+  toggleFlashlight() {
+    if (!this.ready || this.actor.vehicle || this.respawnPending)
+      return this.flashlightOn;
+    this.flashlight ??= new PlayerFlashlight(this.scene);
+    this.flashlightOn = !this.flashlightOn;
+    this.canvas.dataset.flashlight = String(this.flashlightOn);
+    return this.flashlightOn;
+  }
+  private notice(message: string) {
+    this.onNotice?.(localizeText(message));
   }
   setWeather(weather: Weather) {
     this.weather = weather;
@@ -1077,9 +1114,7 @@ export class Game {
     // Driving takes priority over a collectible beside the road.
     if (this.actor.vehicle) {
       if (!vehicleExitAllowed(this.actor.speed)) {
-        this.onNotice?.(
-          "Nejdřív zastav auto: S brzdí, mezerník je ruční brzda.",
-        );
+        this.notice("Nejdřív zastav auto: S brzdí, mezerník je ruční brzda.");
         return;
       }
       if (this.network) {
@@ -1088,7 +1123,7 @@ export class Game {
       }
       const exit = this.sim.exitPosition(this.actor);
       if (!exit) {
-        this.onNotice?.("Vedle auta není bezpečné místo k vystoupení.");
+        this.notice("Vedle auta není bezpečné místo k vystoupení.");
         return;
       }
       this.actor.setVehicle(false);
@@ -1104,7 +1139,12 @@ export class Game {
       else {
         this.found.add(String(nearby));
         this.huntMeshes[nearby].setEnabled(false);
-        this.onNotice?.(`Nalezeno ${this.found.size}/${HUNT_POINTS.length}`);
+        this.notice(
+          t("Nalezeno {count}/{total}", {
+            count: this.found.size,
+            total: HUNT_POINTS.length,
+          }),
+        );
         if (this.found.size === HUNT_POINTS.length)
           this.onAction?.("reward", "Průzkumník kopce");
       }
@@ -1127,7 +1167,7 @@ export class Game {
       Math.hypot(p.x - SPAWN.x, p.z - SPAWN.z) < 6
     ) {
       this.soloDelivery = 1;
-      this.onNotice?.(
+      this.notice(
         "Balíček vyzvednutý. Dones jej ke vstupu B6 (značka na mapě).",
       );
     } else if (
@@ -1135,9 +1175,9 @@ export class Game {
       Math.hypot(p.x - B6_LAYOUT.entry.x, p.z - B6_LAYOUT.entry.z) < 5
     ) {
       this.soloDelivery = 2;
-      this.onNotice?.("Doručeno! Odemčená kosmetická odměna.");
+      this.notice("Doručeno! Odemčená kosmetická odměna.");
       this.onAction?.("reward", "Strahovský kurýr");
-    } else this.onNotice?.("Přibliž se k autu, značce nebo místu úkolu.");
+    } else this.notice("Přibliž se k autu, značce nebo místu úkolu.");
   }
   setFound(ids: string[]) {
     this.found = new Set(ids);
@@ -1239,6 +1279,7 @@ export class Game {
         }
       }
       if (e.code === "KeyR") this.requestRespawn();
+      if (e.code === "KeyF") this.toggleFlashlight();
     }
   };
   keyUp = (e: KeyboardEvent) => this.keys.delete(e.code);
@@ -1248,7 +1289,7 @@ export class Game {
     const unavailable = () => {
       if (this.disposed || !this.footFirstPerson) return;
       this.canvas.dataset.pointerMode = "drag-fallback";
-      this.onNotice?.(
+      this.notice(
         "Prohlížeč nepovolil zachycení myši. Rozhlížej se tažením pravého tlačítka.",
       );
     };
@@ -1530,6 +1571,10 @@ export class Game {
       zone: zoneAt(pos),
     });
     const self = this.avatars.get(this.localId);
+    if (this.actor.vehicle && this.flashlightOn) {
+      this.flashlightOn = false;
+      this.canvas.dataset.flashlight = "false";
+    }
     if (self) Object.assign(self.target, this.localPlayer);
     const worldEnded = performance.now();
     const time = worldEnded / 1000;
@@ -1567,6 +1612,7 @@ export class Game {
             yaw: p.yaw,
             emote: p.emote,
             vehicle: p.vehicle,
+            flashlight: id === this.localId && this.flashlightOn,
             grounded: id === this.localId ? this.actor.grounded : undefined,
             groundHeight:
               id === this.localId
@@ -1794,9 +1840,9 @@ export class Game {
       sun,
       moon,
       headlightRequested: this.car.isEnabled(),
-      extraPracticalLightSlots: Number(
-        this.b6Reality?.interiorLightEnabled ?? false,
-      ),
+      extraPracticalLightSlots:
+        Number(this.b6Reality?.interiorLightEnabled ?? false) +
+        Number(this.flashlightOn && !!self && !this.actor.vehicle),
       weather: this.weather,
       player: pos,
       dt,
@@ -1807,6 +1853,13 @@ export class Game {
       this.car,
       lighting.night,
       this.car.isEnabled(),
+      this.quality,
+    );
+    this.flashlight?.update(
+      self,
+      this.camera,
+      this.flashlightOn && !this.actor.vehicle,
+      this.footFirstPerson,
       this.quality,
     );
     this.vegetation?.update({
@@ -1997,8 +2050,8 @@ export class Game {
       this.lastStats = performance.now();
       let hint = this.actor.vehicle
         ? vehicleExitAllowed(this.actor.speed)
-          ? "E · vystoupit · W/S plyn a brzda · Space ruční brzda"
-          : "S · brzda / zpátečka · Space ruční brzda · po zastavení E vystoupit"
+          ? "E · vystoupit"
+          : "Nejdřív zastav auto."
         : Math.hypot(
               pos.x - this.parkedCar.position.x,
               pos.z - this.parkedCar.position.z,
@@ -2031,8 +2084,9 @@ export class Game {
         speed: this.actor.speed,
         yaw: this.actor.yaw,
         vehicle: this.actor.vehicle,
+        flashlight: this.flashlightOn,
         zone: zoneAt(pos),
-        hint,
+        hint: localizeText(hint),
         rendering: this.adaptive.state,
         gpu: this.gpu,
         cpuFrameMs: this.lastCpuFrameMs ?? null,
@@ -2061,6 +2115,7 @@ export class Game {
     if (document.pointerLockElement === this.canvas) document.exitPointerLock();
     this.engine.stopRenderLoop();
     this.enabledMeshCandidates.dispose();
+    this.mapNavigator?.dispose();
     this.sim?.dispose();
     this.labels.dispose();
     this.contactShadows.dispose();
@@ -2078,6 +2133,7 @@ export class Game {
     this.vegetation?.dispose();
     this.disposeCarAssets?.();
     this.vehicleLighting?.dispose();
+    this.flashlight?.dispose();
     this.transit?.dispose();
     this.avatarPool.dispose();
     this.scene.dispose();

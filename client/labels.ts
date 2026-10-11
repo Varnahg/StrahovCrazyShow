@@ -3,6 +3,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
 import type { Engine } from "@babylonjs/core/Engines/engine";
 import type { Vec3 } from "../shared/types";
+import { getLocale, localizeText } from "./i18n";
 /** Nearby landmarks belong on the minimap. Separate entry/exit distances keep
  * their distant signs stable while walking along the threshold. */
 export function landmarkLabelInRange(
@@ -37,6 +38,10 @@ type Label = {
 export class ScreenLabels {
   entries = new Map<string, Label>();
   private identity = Matrix.Identity();
+  private locale = getLocale();
+  placeLimit = 8;
+  playerLimit = 16;
+  playerRange = 45;
   readonly stats = { projections: 0, losCasts: 0 };
   constructor(
     public container: HTMLElement,
@@ -52,7 +57,7 @@ export class ScreenLabels {
         ? "world-label player-label"
         : "world-label place-label";
       element.dataset.labelId = id;
-      element.textContent = text;
+      element.textContent = player ? text : localizeText(text);
       // Creating a label between frames must never flash it at the top left.
       element.style.display = "none";
       this.container.append(element);
@@ -79,7 +84,7 @@ export class ScreenLabels {
     }
     if (label.text !== text) {
       label.text = text;
-      label.element.textContent = text;
+      label.element.textContent = player ? text : localizeText(text);
     }
     label.point.set(point.x, point.y, point.z);
   }
@@ -93,6 +98,11 @@ export class ScreenLabels {
     now = performance.now(),
   ) {
     this.stats.projections = this.stats.losCasts = 0;
+    if (this.locale !== getLocale()) {
+      this.locale = getLocale();
+      for (const label of this.entries.values())
+        if (!label.player) label.element.textContent = localizeText(label.text);
+    }
     const width = this.engine.getRenderWidth(),
       height = this.engine.getRenderHeight(),
       viewport = this.camera.viewport.toGlobal(width, height),
@@ -111,13 +121,18 @@ export class ScreenLabels {
 
     const candidates: Label[] = [];
     for (const label of this.entries.values()) {
+      if (!label.player && this.placeLimit === 0) {
+        label.eligible = false;
+        label.inRange = false;
+        continue;
+      }
       const dx = label.point.x - local.x,
         dy = label.point.y - local.y,
         dz = label.point.z - local.z;
       const indoor = label.text.match(/^(\d+) NP$/),
         inside = local.x > -8 && local.x < 17 && local.z > -91 && local.z < -19;
       label.distanceSquared = dx * dx + dz * dz + (label.player ? dy * dy : 0);
-      const range = 45 * (label.inRange ? 1.1 : 1);
+      const range = this.playerRange * (label.inRange ? 1.1 : 1);
       label.inRange = label.player
         ? label.distanceSquared < range * range
         : landmarkLabelInRange(label.distanceSquared, label.inRange, !!indoor);
@@ -187,7 +202,12 @@ export class ScreenLabels {
     let playerCount = 0,
       placeCount = 0;
     for (const label of candidates) {
-      if (label.player ? playerCount >= 16 : placeCount >= 8) continue;
+      if (
+        label.player
+          ? playerCount >= this.playerLimit
+          : placeCount >= this.placeLimit
+      )
+        continue;
       if (label.occluded) continue;
       if (!label.player) {
         const rectangle = {

@@ -1,3 +1,16 @@
+import { HudIcon } from "./hud-icons";
+import { useDialogFocus } from "./use-dialog-focus";
+import {
+  t,
+  localizeText,
+  localizeNotice,
+  useLocale,
+  setLocale,
+  formatDate,
+  formatNumber,
+  plural,
+} from "./i18n";
+import { demoEventText } from "./i18n-content-helpers";
 import { AvatarEditor } from "./avatar-editor";
 import { applyAvatarPreset } from "./avatar-presets";
 import { MapView } from "./minimap";
@@ -55,6 +68,7 @@ import {
 const readProfile = () => {
   const fallback = {
     ...DEFAULT_PROFILE,
+    nickname: t("Návštěvník"),
     avatar: applyAvatarPreset(0, DEFAULT_AVATAR),
   };
   try {
@@ -83,11 +97,11 @@ const readRenderPreferences = (): {
 };
 const qualityLabel = { low: "Úsporná", medium: "Střední", high: "Vysoká" };
 const time = (t: number) =>
-  new Intl.DateTimeFormat("cs-CZ", {
+  formatDate(t, {
     timeZone: "Europe/Prague",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(t);
+  });
 const STATUS = {
   planned: "Plánováno",
   live: "Právě probíhá",
@@ -105,6 +119,9 @@ const initialActivity: ActivityState = {
   },
 };
 export function App() {
+  useLocale();
+  const mapDialog = useRef<HTMLElement>(null),
+    mapClose = useRef<HTMLButtonElement>(null);
   const [journalOpen, setJournalOpen] = useState(false),
     [journalEntryId, setJournalEntryId] = useState<string | undefined>();
   const [emotesOpen, setEmotesOpen] = useState(false),
@@ -156,10 +173,10 @@ export function App() {
         body: JSON.stringify(payload),
       });
       if (!response.ok) throw new Error("save");
-      setBenchmarkSaveNotice("Výsledek uložen pouze na tomto počítači.");
+      setBenchmarkSaveNotice(t("Výsledek uložen pouze na tomto počítači."));
     } catch {
       setBenchmarkSaveNotice(
-        "Místní uložení se nezdařilo; výsledek zůstává zde v prohlížeči.",
+        t("Místní uložení se nezdařilo; výsledek zůstává zde v prohlížeči."),
       );
     }
   };
@@ -182,12 +199,15 @@ export function App() {
     [busy, setBusy] = useState(false),
     [ready, setReady] = useState(false),
     [error, setError] = useState("");
-  const [panel, setPanel] = useState("events"),
+  const [panel, setPanel] = useState(""),
     [events, setEvents] = useState<EventItem[]>(() => makeDemoEvents()),
     [period, setPeriod] = useState("today"),
     [interest, setInterest] = useState(""),
     [selected, setSelected] = useState<string | null>(null),
     [mapDestination, setMapDestination] = useState<string | null>(null),
+    [mapWaypoint, setMapWaypoint] = useState<
+      { x: number; z: number } | undefined
+    >(),
     [players, setPlayers] = useState<Player[]>([]),
     [selfId, setSelfId] = useState("guest");
   const [social, setSocial] = useState<SocialState>({
@@ -243,6 +263,12 @@ export function App() {
     weatherRef = useRef(weather),
     chatEnd = useRef<HTMLDivElement>(null),
     carState = useRef<any>(null);
+  useDialogFocus(
+    panel === "map" && !journalOpen && !emotesOpen && !showForm,
+    mapDialog,
+    () => setPanel(""),
+    mapClose,
+  );
   const notice = (message: string) => setToast(message);
   const reward = (name: string) => {
     setRewards((previous) => {
@@ -250,7 +276,7 @@ export function App() {
       localStorage.setItem("strahov.rewards", JSON.stringify(next));
       return next;
     });
-    notice("Odměna: " + name);
+    notice(t("Odměna: {name}", { name: localizeText(name) }));
   };
   useEffect(() => {
     profileRef.current = profile;
@@ -318,9 +344,7 @@ export function App() {
     };
   }, []);
   useEffect(() => {
-    game.current?.setUiModal(
-      journalOpen || emotesOpen || showForm || panel === "map",
-    );
+    game.current?.setUiModal(journalOpen || emotesOpen || showForm || !!panel);
   }, [journalOpen, emotesOpen, showForm, panel, ready]);
   useEffect(() => {
     chatEnd.current?.scrollIntoView({ block: "nearest" });
@@ -415,7 +439,9 @@ export function App() {
             setWeather: (w: Weather) => g.setWeather(w),
           };
       } catch (e) {
-        setError("3D scénu se nepodařilo spustit: " + String(e));
+        setError(
+          t("3D scénu se nepodařilo spustit: {error}", { error: String(e) }),
+        );
       }
     })();
     return () => {
@@ -510,10 +536,10 @@ export function App() {
         currentGame.updatePlayers([currentGame.localPlayer]);
       }
       setConnected(false);
-      notice("Spojení přerušeno. Použij Obnovit spojení.");
+      notice(t("Spojení přerušeno. Použij Obnovit spojení."));
     });
     r.onError((_code: number, text?: string) =>
-      notice(text || "Chyba spojení."),
+      notice(text || t("Chyba spojení.")),
     );
   };
   const connect = async () => {
@@ -527,7 +553,7 @@ export function App() {
       }),
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Server není dostupný.");
+    if (!response.ok) throw new Error(data.error || t("Server není dostupný."));
     const identityChanged =
       (game.current?.localId ?? idRef.current) !== data.id;
     sessionStorage.setItem("strahov.session", data.token);
@@ -566,8 +592,9 @@ export function App() {
       modeRef.current = next;
     } catch (e) {
       setError(
-        "Multiplayer se nepřipojil. Zkontroluj spuštění serveru. " +
-          (e instanceof Error ? e.message : String(e)),
+        t("Multiplayer se nepřipojil. Zkontroluj spuštění serveru. {error}", {
+          error: localizeNotice(e instanceof Error ? e.message : String(e)),
+        }),
       );
     } finally {
       setBusy(false);
@@ -588,7 +615,7 @@ export function App() {
   };
   const send = (action: string, data?: unknown) => {
     if (mode !== "multi" || !connected) {
-      notice("Tato funkce je dostupná v připojeném multiplayeru.");
+      notice(t("Tato funkce je dostupná v připojeném multiplayeru."));
       return;
     }
     room.current?.send(action, data);
@@ -639,12 +666,24 @@ export function App() {
     game.current?.blur();
     if (document.pointerLockElement) document.exitPointerLock();
     setMapDestination(id);
+    setMapWaypoint(undefined);
     if (openMap) setPanel("map");
+  };
+  const clearMapDestination = () => {
+    game.current?.cancelMapRoute();
+    setMapWaypoint(undefined);
+    setMapDestination(null);
+    setSelected(null);
+  };
+  const chooseMapWaypoint = (point: { x: number; z: number }) => {
+    setMapWaypoint(point);
+    setMapDestination(null);
+    setSelected(null);
   };
   const weatherLabel =
     weather?.temperature != null
-      ? `${weather.temperature.toFixed(1)} °C`
-      : "Počasí…";
+      ? `${formatNumber(weather.temperature, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} °C`
+      : t("Počasí…");
   const updateAvatar = (key: string, value: any) =>
     setProfile((p) => ({ ...p, avatar: { ...p.avatar, [key]: value } }));
   const avatarEditor = (
@@ -661,56 +700,59 @@ export function App() {
           <a className="brand" href="#">
             s<span>•</span>trahov
           </a>
-          <span className="demo-badge">HRATELNÉ DEMO · 0.1</span>
+          <span className="demo-badge">{t("HRATELNÉ DEMO · 0.1")}</span>
+          <LanguagePicker />
           <a
             href="https://wiki.sh.cvut.cz/kolej/bloky/blok_6"
             target="_blank"
             rel="noreferrer"
           >
-            Poznej kopec ↗
+            {t("Poznej kopec ↗")}
           </a>
         </div>
         <section className="welcome-grid">
           <div className="welcome-copy">
-            <div className="eyebrow">PRAHA · 50.08065° N, 14.39175° E</div>
+            <div className="eyebrow">
+              {t("PRAHA · 50.08065° N, 14.39175° E")}
+            </div>
             <h1>
-              Na kopci.
+              {t("Na kopci.")}
               <br />
-              Ve svém živlu.
+              {t("Ve svém živlu.")}
             </h1>
             <p>
-              Tvůj Strahov v prohlížeči. Potkej ostatní, najdi svou partu a
-              objev, co se děje mezi bloky.
+              {t(
+                "Tvůj Strahov v prohlížeči. Potkej ostatní, najdi svou partu a objev, co se děje mezi bloky.",
+              )}
             </p>
             <div className="welcome-facts">
-              <span>↗ Celý areál</span>
-              <span>◉ Společný svět</span>
-              <span>☁ Skutečné počasí</span>
+              <span>{t("↗ Celý areál")}</span>
+              <span>{t("◉ Společný svět")}</span>
+              <span>{t("☁ Skutečné počasí")}</span>
             </div>
             <div className="welcome-map">
               <MapView big />
               <div className="map-caption">
-                <span>STRAHOV / KOLEJNÍ AREÁL</span>
+                <span>{t("STRAHOV / KOLEJNÍ AREÁL")}</span>
                 <span>© OpenStreetMap contributors</span>
               </div>
             </div>
             <p className="small muted">
-              Samostatně modelovaný Strahov podle map a fotografických předloh.
-              Referenční 3D podklad © IPR Praha, 2023, CC BY. Hratelný interiér
-              B6 je rekonstrukce podle plánů a fotografií. Všechny uvedené akce
-              jsou fiktivní.
+              {t(
+                "Samostatně modelovaný Strahov podle map a fotografických předloh. Referenční 3D podklad © IPR Praha, 2023, CC BY. Hratelný interiér B6 je rekonstrukce podle plánů a fotografií. Všechny uvedené akce jsou fiktivní.",
+              )}
             </p>
           </div>
           <aside className="join-card">
-            <div className="eyebrow">ZAČNI U SEBE</div>
-            <h2>Kdo dnes přijde?</h2>
+            <div className="eyebrow">{t("ZAČNI U SEBE")}</div>
+            <h2>{t("Kdo dnes přijde?")}</h2>
             {avatarEditor}
             <button
               className="primary full"
               disabled={busy}
               onClick={() => enter("multi")}
             >
-              {busy ? "Připojuji…" : "Vstoupit do společného světa"}{" "}
+              {busy ? t("Připojuji…") : t("Vstoupit do společného světa")}{" "}
               <span>↗</span>
             </button>
             <button
@@ -718,22 +760,23 @@ export function App() {
               disabled={busy}
               onClick={() => enter("guest")}
             >
-              Prohlédnout si Strahov sám
+              {t("Prohlédnout si Strahov sám")}
             </button>
             {error && (
               <p role="alert" className="error">
-                {error}
+                {localizeNotice(error)}
               </p>
             )}
             <p className="small muted">
-              Přezdívka není účet ani ověřená identita. Demo neověřuje bydliště.
-              Vzhled se uloží jen v tomto prohlížeči.
+              {t(
+                "Přezdívka není účet ani ověřená identita. Demo neověřuje bydliště. Vzhled se uloží jen v tomto prohlížeči.",
+              )}
             </p>
           </aside>
         </section>
         <footer>
           <span>STRAHOV CRAZY SHOW</span>
-          <span>Pro lidi, kteří žijí na kopci.</span>
+          <span>{t("Pro lidi, kteří žijí na kopci.")}</span>
         </footer>
       </main>
     );
@@ -742,7 +785,7 @@ export function App() {
       <canvas
         ref={canvas}
         tabIndex={0}
-        aria-label="3D hra Strahov"
+        aria-label={t("3D hra Strahov")}
         style={{ touchAction: "none" }}
       />
       {!ready && (
@@ -750,13 +793,18 @@ export function App() {
           <div className="brand">
             s<span>•</span>trahov
           </div>
-          <p>Připravuji celý kopec…</p>
-          {error && <p className="error">{error}</p>}
+          <p>{t("Připravuji celý kopec…")}</p>
+          {error && <p className="error">{localizeNotice(error)}</p>}
         </div>
       )}
       <header className="game-top">
-        <button className="brand" onClick={leave}>
-          s<span>•</span>trahov
+        <button
+          className="brand game-brand"
+          onClick={leave}
+          aria-label={t("Opustit demo")}
+          title={t("Opustit demo")}
+        >
+          s<span>•</span>
         </button>
         <div className="world-status">
           <i
@@ -765,10 +813,12 @@ export function App() {
             }
           />
           {mode === "guest"
-            ? "Samostatná prohlídka"
+            ? t("Samostatná prohlídka")
             : connected
-              ? `${players.length} na kopci · společný svět`
-              : "Odpojeno"}
+              ? t("{count} na kopci · společný svět", {
+                  count: formatNumber(players.length),
+                })
+              : t("Odpojeno")}
           <span className="demo-badge">DEMO</span>
           {lighting !== "real" && (
             <button
@@ -778,7 +828,8 @@ export function App() {
                 if (game.current) game.current.timeOverride = null;
               }}
             >
-              {lighting === "day" ? "Denní" : "Noční"} náhled · vypnout
+              {lighting === "day" ? t("Denní") : t("Noční")}{" "}
+              {t("náhled · vypnout")}
             </button>
           )}
           {trafficPreview && (
@@ -789,60 +840,60 @@ export function App() {
                 setTrafficPreview(null);
               }}
             >
-              Ukázka busu {trafficPreview.route} · {time(trafficPreview.at)} ·
-              ukončit
+              {t("Ukázka busu")} {trafficPreview.route} ·{" "}
+              {time(trafficPreview.at)} {t("· ukončit")}
             </button>
           )}
         </div>
         <div className="top-right">
           <span
             className="weather"
-            title={`${weather?.source || ""} · ${weather?.cloudSource || ""}`}
+            title={`${localizeText(weather?.source)} · ${localizeText(weather?.cloudSource)}`}
           >
             ☁ {weatherLabel}{" "}
             <small>
               {!weather
-                ? "načítám"
+                ? t("načítám")
                 : weather.stale
-                  ? "starší / nedostupná data"
+                  ? t("starší / nedostupná data")
                   : weather.status === "fallback"
-                    ? "záložní model"
-                    : "živá data"}
+                    ? t("záložní model")
+                    : t("živá data")}
             </small>
           </span>
           <span className="clock">
             {time(previewInstant(lighting) ?? now)}{" "}
             <small>
-              {lighting === "real" ? "Praha" : "náhled světla · Praha"}
+              {lighting === "real" ? t("Praha") : t("náhled světla · Praha")}
             </small>
           </span>
           <button
             className="profile-button"
+            aria-label={t("Tvoje postava")}
+            title={t("Tvoje postava")}
             onClick={() => togglePanel("avatar")}
           >
             {profile.nickname.slice(0, 1).toUpperCase()}
           </button>
         </div>
       </header>
-      <div className="demo-strip">
-        Ukázkové akce jsou fiktivní. Přítomnost ve hře neznamená skutečnou
-        návštěvu místa.
-      </div>
       <div className="scene-labels" data-label-layer aria-hidden="true" />
       <div className="location-pill">
         <span>↗</span>
         <div>
           <strong>
             {stats?.zone.startsWith("b6")
-              ? "Blok 6 · " + stats.zone.split(":")[1] + ". úroveň"
-              : "Mezi bloky"}
+              ? t("Blok 6 · {level}. úroveň", {
+                  level: stats.zone.split(":")[1],
+                })
+              : t("Mezi bloky")}
           </strong>
           <small>
             {stats?.vehicle
-              ? (stats.speed < -0.2 ? "Zpátečka · " : "Za volantem · ") +
+              ? (stats.speed < -0.2 ? t("Zpátečka · ") : t("Za volantem · ")) +
                 Math.round(Math.abs(stats.speed) * 3.6) +
                 " km/h"
-              : "Všechno je kousek pěšky"}
+              : t("Všechno je kousek pěšky")}
           </small>
         </div>
       </div>
@@ -857,28 +908,30 @@ export function App() {
             }
           }}
         >
-          Obnovit spojení
+          {t("Obnovit spojení")}
         </button>
       )}
       <nav className="dock">
         {[
-          ["events", "◷", "Akce"],
-          ["map", "⌖", "Mapa"],
-          ["journal", "▤", "Deník"],
-          ["people", "◎", "Lidé"],
-          ["chat", "☏", "Chat"],
-          ["activities", "✧", "Aktivity"],
-          ["settings", "⚙", "Nastavení"],
-        ].map(([id, icon, label]) => (
+          ["events", t("Akce")],
+          ["map", t("Mapa")],
+          ["journal", t("Deník")],
+          ["people", t("Lidé")],
+          ["chat", t("Chat")],
+          ["activities", t("Aktivity")],
+          ["settings", t("Nastavení")],
+        ].map(([id, label]) => (
           <button
             key={id}
             className={
               panel === id || (id === "journal" && journalOpen) ? "active" : ""
             }
             onClick={() => togglePanel(id)}
+            title={label}
+            aria-label={localizeText(label)}
+            aria-pressed={panel === id || (id === "journal" && journalOpen)}
           >
-            <span>{icon}</span>
-            {label}
+            <HudIcon name={id} />
             {id === "people" && social.requests.length > 0 && (
               <b>{social.requests.length}</b>
             )}
@@ -892,20 +945,35 @@ export function App() {
             mode === "multi" ? players.filter((p) => p.id !== selfId) : []
           }
           selected={selectedPlace}
+          waypoint={mapWaypoint}
+          planRoute={ready ? game.current?.planMapRoute : undefined}
+          onClearDestination={clearMapDestination}
           onPlace={(id) => chooseMapPlace(id, true)}
           onPlayer={(id) => game.current?.selectTarget({ kind: "player", id })}
         />
-        <span>
-          Mapa © OpenStreetMap · ODbL. Prostorová předloha © IPR Praha · CC BY ·
-          2023
+        <span
+          className="minimap-attribution"
+          title={t(
+            "Mapa © OpenStreetMap · ODbL. Prostorová předloha © IPR Praha · CC BY · 2023",
+          )}
+        >
+          © OSM / IPR
         </span>
       </div>
       <div
         className="controls world-keybar"
-        title="Levé kliknutí vybere cíl. Tažení levým nebo pravým tlačítkem otáčí kameru, kolečko přibližuje. Esc zavře nabídku nebo uvolní myš."
+        title={t(
+          "Levé kliknutí vybere cíl. Tažení levým nebo pravým tlačítkem otáčí kameru, kolečko přibližuje. Esc zavře nabídku nebo uvolní myš.",
+        )}
       >
-        <kbd>W A S D</kbd> pohyb <kbd>E</kbd> interakce <kbd>V</kbd> pohled{" "}
-        <kbd>M</kbd> mapa <kbd>J</kbd> deník{" "}
+        <button
+          className="world-controls-button"
+          title={t("Ovládání")}
+          aria-label={t("Ovládání")}
+          onClick={() => togglePanel("help")}
+        >
+          <kbd>?</kbd>
+        </button>
         <button
           className="world-controls-button"
           onClick={() => {
@@ -913,20 +981,33 @@ export function App() {
             setJournalOpen(false);
             setEmotesOpen((open) => !open);
           }}
-          aria-label="Rychlá gesta (G)"
+          aria-label={t("Rychlá gesta (G)")}
         >
-          <kbd>G</kbd> gesta
+          <kbd>G</kbd>
         </button>{" "}
         <span className="fps">{stats?.fps || "—"} FPS</span>
       </div>
-      {stats?.hint && <div className="interaction">{stats.hint}</div>}
+      <button
+        className="hud-flashlight"
+        disabled={!ready || !!stats?.vehicle}
+        aria-pressed={!!stats?.flashlight}
+        aria-label={t("Svítilna (F)")}
+        title={t("Svítilna (F)")}
+        onClick={() => game.current?.toggleFlashlight()}
+      >
+        <HudIcon name="flashlight" />
+        <kbd>F</kbd>
+      </button>
+      {stats?.hint && (
+        <div className="interaction">{localizeNotice(stats.hint)}</div>
+      )}
       {toast && (
         <div className="toast" role="status">
-          {toast}
+          {localizeNotice(toast)}
         </div>
       )}
       {(targetPlayer || targetPlace || worldSelection?.kind === "hunt") && (
-        <section className="target-card" aria-label="Vybraný cíl">
+        <section className="target-card" aria-label={t("Vybraný cíl")}>
           <header>
             <span
               className="target-portrait"
@@ -938,19 +1019,19 @@ export function App() {
             <div>
               <h3>
                 {targetPlayer?.nickname ||
-                  targetPlace?.name ||
-                  "Hledací značka"}
+                  localizeText(targetPlace?.name) ||
+                  t("Hledací značka")}
               </h3>
               <small>
                 {targetPlayer
-                  ? "Virtuálně online"
+                  ? t("Virtuálně online")
                   : targetPlace
-                    ? "Místo na Strahově"
-                    : "Společná výzva"}
+                    ? t("Místo na Strahově")
+                    : t("Společná výzva")}
               </small>
             </div>
             <button
-              aria-label="Zrušit výběr cíle"
+              aria-label={t("Zrušit výběr cíle")}
               onClick={() => game.current?.selectTarget(null)}
             >
               ×
@@ -959,10 +1040,11 @@ export function App() {
           {targetPlayer && (
             <>
               <p>
-                {targetPlayer.social ? "Rád se seznámím" : "Na kopci"}
-                {targetPlayer.firstTime ? " · Jdu poprvé" : ""}
+                {targetPlayer.social ? t("Rád se seznámím") : t("Na kopci")}
+                {targetPlayer.firstTime ? t(" · Jdu poprvé") : ""}
                 <br />
-                {targetPlayer.interests.join(" · ") || "Zájmy nesdíleny"}
+                {targetPlayer.interests.map(localizeText).join(" · ") ||
+                  t("Zájmy nesdíleny")}
               </p>
               <div className="target-actions">
                 {social.contacts.includes(targetPlayer.id) ? (
@@ -972,7 +1054,7 @@ export function App() {
                       setPanel("chat");
                     }}
                   >
-                    Soukromá zpráva
+                    {t("Soukromá zpráva")}
                   </button>
                 ) : (
                   <button
@@ -981,7 +1063,7 @@ export function App() {
                     }
                     onClick={() => send("contact", { to: targetPlayer.id })}
                   >
-                    Požádat o kontakt
+                    {t("Požádat o kontakt")}
                   </button>
                 )}
                 {social.requests.includes(targetPlayer.id) && (
@@ -990,7 +1072,7 @@ export function App() {
                       send("contact", { to: targetPlayer.id, accept: true })
                     }
                   >
-                    Přijmout kontakt
+                    {t("Přijmout kontakt")}
                   </button>
                 )}
                 <button
@@ -1003,8 +1085,8 @@ export function App() {
                   }
                 >
                   {muted.includes(targetPlayer.id)
-                    ? "Zrušit ztlumení"
-                    : "Ztlumit"}
+                    ? t("Zrušit ztlumení")
+                    : t("Ztlumit")}
                 </button>
                 <button
                   onClick={() =>
@@ -1015,18 +1097,18 @@ export function App() {
                   }
                 >
                   {social.blocked.includes(targetPlayer.id)
-                    ? "Odblokovat"
-                    : "Blokovat"}
+                    ? t("Odblokovat")
+                    : t("Blokovat")}
                 </button>
               </div>
             </>
           )}
           {targetPlace && (
             <>
-              <p>{targetPlace.description}</p>
+              <p>{localizeText(targetPlace.description)}</p>
               <div className="target-actions">
                 <button onClick={() => chooseMapPlace(targetPlace.id, true)}>
-                  Ukázat na mapě
+                  {t("Ukázat na mapě")}
                 </button>
                 {entryForPlace(targetPlace.id) && (
                   <button
@@ -1034,7 +1116,7 @@ export function App() {
                       openJournal(entryForPlace(targetPlace.id)?.id)
                     }
                   >
-                    Přečíst v deníku
+                    {t("Přečíst v deníku")}
                   </button>
                 )}
               </div>
@@ -1042,1029 +1124,1124 @@ export function App() {
           )}
           {worldSelection?.kind === "hunt" && (
             <p>
-              Přibliž se ke značce a stiskni <kbd>E</kbd>. Výběr sám úkol
-              nesplní.
+              {t("Přibliž se ke značce a stiskni")} <kbd>E</kbd>
+              {t(". Výběr sám úkol nesplní.")}
             </p>
           )}
         </section>
       )}
       {panel && (
-        <aside
-          className={"side-panel " + (panel === "map" ? "wide-panel" : "")}
+        <div
+          className={panel === "map" ? "map-overlay" : "panel-container"}
+          onPointerDown={(e) => {
+            if (panel === "map" && e.target === e.currentTarget) setPanel("");
+          }}
         >
-          <div className="panel-heading">
-            <div>
-              <div className="eyebrow">TVŮJ KOPEC</div>
-              <h2>
-                {
+          <aside
+            ref={mapDialog}
+            tabIndex={-1}
+            className={panel === "map" ? "map-panel" : "side-panel"}
+            role={panel === "map" ? "dialog" : undefined}
+            aria-modal={panel === "map" ? true : undefined}
+            aria-label={panel === "map" ? t("Mapa") : undefined}
+          >
+            <div className="panel-heading">
+              <div>
+                <div className="eyebrow">{t("TVŮJ KOPEC")}</div>
+                <h2>
                   {
-                    events: "Co se děje",
-                    map: "Najdi svoje místo",
-                    people: "Lidé na kopci",
-                    chat: "Dej se do řeči",
-                    activities: "Zkus něco společně",
-                    avatar: "Tvoje postava",
-                    settings: "Po tvém",
-                  }[panel]
-                }
-              </h2>
+                    {
+                      events: t("Co se děje"),
+                      map: t("Najdi svoje místo"),
+                      people: t("Lidé na kopci"),
+                      chat: t("Dej se do řeči"),
+                      activities: t("Zkus něco společně"),
+                      avatar: t("Tvoje postava"),
+                      settings: t("Po tvém"),
+                      help: t("Nápověda"),
+                    }[panel]
+                  }
+                </h2>
+              </div>
+              <button
+                className="close"
+                ref={mapClose}
+                aria-label={t("Zavřít panel")}
+                onClick={() => setPanel("")}
+              >
+                ×
+              </button>
             </div>
-            <button
-              className="close"
-              aria-label="Zavřít panel"
-              onClick={() => setPanel("")}
-            >
-              ×
-            </button>
-          </div>
-          {panel === "events" && (
-            <>
-              <div className="segmented">
-                {[
-                  ["now", "Teď"],
-                  ["today", "Dnes"],
-                  ["week", "Tento týden"],
-                ].map(([key, label]) => (
-                  <button
-                    className={period === key ? "selected" : ""}
-                    onClick={() => {
-                      setPeriod(key);
-                      setSelected(null);
-                    }}
-                    key={key}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <div className="chips">
-                <button
-                  className={!interest ? "chosen" : ""}
-                  onClick={() => setInterest("")}
-                >
-                  Všechno
-                </button>
-                {INTERESTS.map((tag) => (
-                  <button
-                    key={tag}
-                    className={interest === tag ? "chosen" : ""}
-                    onClick={() => setInterest(tag)}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-              {event ? (
-                <div className="event-detail">
-                  <button
-                    className="text-button"
-                    onClick={() => setSelected(null)}
-                  >
-                    ← Všechny akce
-                  </button>
-                  <span className={"status " + eventStatus(event, now)}>
-                    {STATUS[eventStatus(event, now)]}
-                  </span>
-                  <h2>{event.title}</h2>
-                  <p>{event.description}</p>
-                  <div className="event-meta">
-                    ⌖ {PLACES.find((p) => p.id === event.placeId)?.name}
-                    <br />◷ {time(event.startsAt)}–{time(event.endsAt)} · Praha
-                  </div>
-                  <p className="fiction">FIKTIVNÍ DEMONSTRAČNÍ UDÁLOST</p>
-                  {mode === "multi" ? (
-                    <>
-                      <label className="check">
-                        <input
-                          type="checkbox"
-                          checked={attendance(event.id)?.company || false}
-                          onChange={(e) =>
-                            send("attend", {
-                              eventId: event.id,
-                              enabled: true,
-                              company: e.target.checked,
-                            })
-                          }
-                        />{" "}
-                        Hledám společnost
-                      </label>
-                      <button
-                        className="primary full"
-                        disabled={
-                          !attendance(event.id) &&
-                          ["ended", "cancelled"].includes(
-                            eventStatus(event, now),
-                          )
-                        }
-                        onClick={() =>
-                          send("attend", {
-                            eventId: event.id,
-                            enabled: !attendance(event.id),
-                            company: attendance(event.id)?.company || false,
-                          })
-                        }
-                      >
-                        {attendance(event.id)
-                          ? "Zrušit virtuální účast"
-                          : "Přidat se virtuálně"}
-                      </button>
-                      {attendance(event.id) && (
-                        <button
-                          className="secondary full"
-                          onClick={() => {
-                            setChannel("event:" + event.id);
-                            setPanel("chat");
-                          }}
-                        >
-                          Otevřít chat události
-                        </button>
-                      )}
-                      <p className="small muted">
-                        Virtuálně přidáno:{" "}
-                        {
-                          social.attendance.filter(
-                            (a) => a.eventId === event.id,
-                          ).length
-                        }
-                      </p>
-                      {event.owner === selfId && (
-                        <div className="inline">
-                          <button
-                            onClick={() => {
-                              setEditing(event);
-                              setShowForm(true);
-                            }}
-                          >
-                            Upravit
-                          </button>
-                          <button
-                            onClick={() =>
-                              send("cancelEvent", { id: event.id })
-                            }
-                          >
-                            Zrušit setkání
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <p className="muted">
-                      V samostatné prohlídce vidíš pouze ukázkové akce.
-                      Společnost najdeš po vstupu do multiplayeru.
-                    </p>
-                  )}
-                  <button
-                    className="text-button"
-                    onClick={() => setPanel("map")}
-                  >
-                    Ukázat místo na mapě ↗
-                  </button>
-                </div>
-              ) : (
-                <div className="event-list">
-                  {filtered.length === 0 && (
-                    <p className="empty">
-                      V tomto výběru teď nic není. Zkus jiný čas nebo zájem.
-                    </p>
-                  )}
-                  {filtered.map((e, i) => (
+            {panel === "events" && (
+              <>
+                <div className="segmented">
+                  {[
+                    ["now", t("Teď")],
+                    ["today", t("Dnes")],
+                    ["week", t("Tento týden")],
+                  ].map(([key, label]) => (
                     <button
-                      className="event-card"
-                      key={e.id}
-                      onClick={() => setSelected(e.id)}
+                      className={period === key ? "selected" : ""}
+                      onClick={() => {
+                        setPeriod(key);
+                        setSelected(null);
+                      }}
+                      key={key}
                     >
-                      <div className={"event-art art-" + (i % 3)}>
-                        <span>
-                          {e.tags.includes("Hudba")
-                            ? "♫"
-                            : e.tags.includes("Čaj")
-                              ? "♧"
-                              : "✧"}
-                        </span>
-                        <small>FIKTIVNÍ AKCE</small>
-                      </div>
-                      <div className="event-content">
-                        <span className={"status " + eventStatus(e, now)}>
-                          {STATUS[eventStatus(e, now)]}
-                        </span>
-                        <h3>{e.title}</h3>
-                        <p>
-                          {PLACES.find((p) => p.id === e.placeId)?.name}{" "}
-                          <span>·</span> {time(e.startsAt)}
-                        </p>
-                        <div className="event-tags">
-                          {e.tags.map((t) => (
-                            <span key={t}>{t}</span>
-                          ))}
-                          {attendance(e.id) && <span>✓ Jdu virtuálně</span>}
-                        </div>
-                      </div>
-                      <span className="card-arrow">↗</span>
+                      {label}
                     </button>
                   ))}
                 </div>
-              )}
-              {mode === "multi" && (
-                <button
-                  className="secondary full"
-                  onClick={() => {
-                    setEditing(null);
-                    setShowForm(true);
-                  }}
-                >
-                  ＋ Založit vlastní demo setkání
-                </button>
-              )}
-            </>
-          )}
-          {panel === "map" && (
-            <>
-              <p className="muted">
-                Vyber místo a uvidíš jeho akce. Fialové body označují virtuálně
-                připojené hráče; nejsou údajem o skutečné návštěvě.
-              </p>
-              <MapView
-                big
-                self={stats || undefined}
-                players={
-                  mode === "multi" ? players.filter((p) => p.id !== selfId) : []
-                }
-                selected={selectedPlace}
-                onPlace={(id) => chooseMapPlace(id)}
-                onPlayer={(id) =>
-                  game.current?.selectTarget({ kind: "player", id })
-                }
-              />
-              {destination && (
-                <section
-                  className="place-map-detail"
-                  aria-label="Vybrané místo"
-                >
-                  <h3>{destination.name}</h3>
-                  <p>{destination.description}</p>
-                  {entryForPlace(destination.id) && (
+                <div className="chips">
+                  <button
+                    className={!interest ? "chosen" : ""}
+                    onClick={() => setInterest("")}
+                  >
+                    {t("Všechno")}
+                  </button>
+                  {INTERESTS.map((tag) => (
                     <button
-                      onClick={() =>
-                        openJournal(entryForPlace(destination.id)?.id)
-                      }
+                      key={localizeText(tag)}
+                      className={interest === tag ? "chosen" : ""}
+                      onClick={() => setInterest(tag)}
                     >
-                      ▤ Přečíst v deníku
+                      {localizeText(tag)}
                     </button>
-                  )}
-                  {stats && (
-                    <p>
-                      ◆{" "}
-                      {Math.round(
-                        Math.hypot(
-                          stats.x - destination.x,
-                          stats.z - destination.z,
-                        ),
-                      )}{" "}
-                      m vzdušnou čarou
-                      {destination.floor != null
-                        ? destination.floor < 0
-                          ? " · suterén"
-                          : ` · ${destination.floor}. patro / mezipatro`
-                        : ""}
-                    </p>
-                  )}
-                  {destination.source && (
-                    <a
-                      href={destination.source}
-                      target="_blank"
-                      rel="noreferrer"
+                  ))}
+                </div>
+                {event ? (
+                  <div className="event-detail">
+                    <button
+                      className="text-button"
+                      onClick={() => setSelected(null)}
                     >
-                      Podklad místa ↗
-                    </a>
-                  )}
-                  <div className="place-events">
-                    {events
-                      .filter(
+                      {t("← Všechny akce")}
+                    </button>
+                    <span className={"status " + eventStatus(event, now)}>
+                      {localizeText(STATUS[eventStatus(event, now)])}
+                    </span>
+                    <h2>{demoEventText(event, "title")}</h2>
+                    <p>{demoEventText(event, "description")}</p>
+                    <div className="event-meta">
+                      ⌖{" "}
+                      {localizeText(
+                        PLACES.find((p) => p.id === event.placeId)?.name,
+                      )}
+                      <br />◷ {time(event.startsAt)}–{time(event.endsAt)}{" "}
+                      {t("· Praha")}
+                    </div>
+                    <p className="fiction">
+                      {t("FIKTIVNÍ DEMONSTRAČNÍ UDÁLOST")}
+                    </p>
+                    {mode === "multi" ? (
+                      <>
+                        <label className="check">
+                          <input
+                            type="checkbox"
+                            checked={attendance(event.id)?.company || false}
+                            onChange={(e) =>
+                              send("attend", {
+                                eventId: event.id,
+                                enabled: true,
+                                company: e.target.checked,
+                              })
+                            }
+                          />{" "}
+                          {t("Hledám společnost")}
+                        </label>
+                        <button
+                          className="primary full"
+                          disabled={
+                            !attendance(event.id) &&
+                            ["ended", "cancelled"].includes(
+                              eventStatus(event, now),
+                            )
+                          }
+                          onClick={() =>
+                            send("attend", {
+                              eventId: event.id,
+                              enabled: !attendance(event.id),
+                              company: attendance(event.id)?.company || false,
+                            })
+                          }
+                        >
+                          {attendance(event.id)
+                            ? t("Zrušit virtuální účast")
+                            : t("Přidat se virtuálně")}
+                        </button>
+                        {attendance(event.id) && (
+                          <button
+                            className="secondary full"
+                            onClick={() => {
+                              setChannel("event:" + event.id);
+                              setPanel("chat");
+                            }}
+                          >
+                            {t("Otevřít chat události")}
+                          </button>
+                        )}
+                        <p className="small muted">
+                          {t("Virtuálně přidáno:")}{" "}
+                          {
+                            social.attendance.filter(
+                              (a) => a.eventId === event.id,
+                            ).length
+                          }
+                        </p>
+                        {event.owner === selfId && (
+                          <div className="inline">
+                            <button
+                              onClick={() => {
+                                setEditing(event);
+                                setShowForm(true);
+                              }}
+                            >
+                              {t("Upravit")}
+                            </button>
+                            <button
+                              onClick={() =>
+                                send("cancelEvent", { id: event.id })
+                              }
+                            >
+                              {t("Zrušit setkání")}
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p className="muted">
+                        {t(
+                          "V samostatné prohlídce vidíš pouze ukázkové akce. Společnost najdeš po vstupu do multiplayeru.",
+                        )}
+                      </p>
+                    )}
+                    <button
+                      className="text-button"
+                      onClick={() => chooseMapPlace(event.placeId, true)}
+                    >
+                      {t("Ukázat místo na mapě ↗")}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="event-list">
+                    {filtered.length === 0 && (
+                      <p className="empty">
+                        {t(
+                          "V tomto výběru teď nic není. Zkus jiný čas nebo zájem.",
+                        )}
+                      </p>
+                    )}
+                    {filtered.map((e, i) => (
+                      <button
+                        className="event-card"
+                        key={e.id}
+                        onClick={() => setSelected(e.id)}
+                      >
+                        <div className={"event-art art-" + (i % 3)}>
+                          <span>
+                            {e.tags.includes("Hudba")
+                              ? "♫"
+                              : e.tags.includes("Čaj")
+                                ? "♧"
+                                : "✧"}
+                          </span>
+                          <small>{t("FIKTIVNÍ AKCE")}</small>
+                        </div>
+                        <div className="event-content">
+                          <span className={"status " + eventStatus(e, now)}>
+                            {localizeText(STATUS[eventStatus(e, now)])}
+                          </span>
+                          <h3>{demoEventText(e, "title")}</h3>
+                          <p>
+                            {localizeText(
+                              PLACES.find((p) => p.id === e.placeId)?.name,
+                            )}{" "}
+                            <span>·</span> {time(e.startsAt)}
+                          </p>
+                          <div className="event-tags">
+                            {e.tags.map((tag) => (
+                              <span key={tag}>{localizeText(tag)}</span>
+                            ))}
+                            {attendance(e.id) && (
+                              <span>{t("✓ Jdu virtuálně")}</span>
+                            )}
+                          </div>
+                        </div>
+                        <span className="card-arrow">↗</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {mode === "multi" && (
+                  <button
+                    className="secondary full"
+                    onClick={() => {
+                      setEditing(null);
+                      setShowForm(true);
+                    }}
+                  >
+                    {t("＋ Založit vlastní demo setkání")}
+                  </button>
+                )}
+              </>
+            )}
+            {panel === "map" && (
+              <div className="map-content">
+                <div className="map-canvas-area">
+                  <MapView
+                    big
+                    onWaypoint={chooseMapWaypoint}
+                    self={stats || undefined}
+                    players={
+                      mode === "multi"
+                        ? players.filter((p) => p.id !== selfId)
+                        : []
+                    }
+                    selected={selectedPlace}
+                    waypoint={mapWaypoint}
+                    planRoute={ready ? game.current?.planMapRoute : undefined}
+                    onClearDestination={clearMapDestination}
+                    onPlace={(id) => chooseMapPlace(id)}
+                    onPlayer={(id) =>
+                      game.current?.selectTarget({ kind: "player", id })
+                    }
+                  />
+                </div>
+                {destination && (
+                  <section
+                    className="place-map-detail"
+                    aria-label={t("Vybrané místo")}
+                  >
+                    <h3>{localizeText(destination.name)}</h3>
+                    <p>{localizeText(destination.description)}</p>
+                    {entryForPlace(destination.id) && (
+                      <button
+                        onClick={() =>
+                          openJournal(entryForPlace(destination.id)?.id)
+                        }
+                      >
+                        {t("▤ Přečíst v deníku")}
+                      </button>
+                    )}
+                    {destination.floor != null && (
+                      <p>
+                        {destination.floor < 0
+                          ? t("Suterén")
+                          : t("{floor}. patro / mezipatro", {
+                              floor: destination.floor,
+                            })}
+                      </p>
+                    )}
+                    {destination.source && (
+                      <a
+                        href={destination.source}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {t("Podklad místa ↗")}
+                      </a>
+                    )}
+                    <div className="place-events">
+                      {events
+                        .filter(
+                          (e) =>
+                            e.placeId === destination.id &&
+                            !e.cancelled &&
+                            e.endsAt > now,
+                        )
+                        .sort((a, b) => a.startsAt - b.startsAt)
+                        .slice(0, 4)
+                        .map((e) => (
+                          <button
+                            key={e.id}
+                            onClick={() => {
+                              setSelected(e.id);
+                              chooseMapPlace(e.placeId);
+                              setPanel("events");
+                            }}
+                          >
+                            <span>
+                              {demoEventText(e, "title")}{" "}
+                              <small
+                                className="demo-badge"
+                                title={t("FIKTIVNÍ AKCE")}
+                              >
+                                DEMO
+                              </small>
+                            </span>
+                            <span>
+                              {dateKey(e.startsAt) === dateKey(now)
+                                ? t("Dnes")
+                                : formatDate(e.startsAt, {
+                                    dateStyle: "medium",
+                                  })}{" "}
+                              · {time(e.startsAt)} ↗
+                            </span>
+                          </button>
+                        ))}
+                      {!events.some(
                         (e) =>
                           e.placeId === destination.id &&
                           !e.cancelled &&
                           e.endsAt > now,
-                      )
-                      .sort((a, b) => a.startsAt - b.startsAt)
-                      .slice(0, 4)
-                      .map((e) => (
-                        <button
-                          key={e.id}
-                          onClick={() => {
-                            setSelected(e.id);
-                            setMapDestination(e.placeId);
-                            setPanel("events");
-                          }}
-                        >
-                          <span>{e.title}</span>
-                          <span>
-                            {dateKey(e.startsAt) === dateKey(now)
-                              ? "Dnes"
-                              : dateKey(e.startsAt)}{" "}
-                            · {time(e.startsAt)} ↗
-                          </span>
-                        </button>
-                      ))}
-                    {!events.some(
-                      (e) =>
-                        e.placeId === destination.id &&
-                        !e.cancelled &&
-                        e.endsAt > now,
-                    ) && (
-                      <p className="muted">
-                        V tomto místě není naplánovaná další ukázková akce.
-                      </p>
-                    )}
-                  </div>
-                  <button
-                    className="clear-destination"
-                    onClick={() => {
-                      setMapDestination(null);
-                      setSelected(null);
-                    }}
-                  >
-                    Zrušit navigační cíl
-                  </button>
-                </section>
-              )}
-              <div className="places-list">
-                {PLACES.map((place) => (
-                  <div key={place.id}>
-                    <button
-                      className="place-select"
-                      onClick={() => chooseMapPlace(place.id)}
-                    >
-                      {place.name} ↗
-                    </button>
-                    <p>{place.description}</p>
-                    {place.source && (
-                      <a href={place.source} target="_blank" rel="noreferrer">
-                        Podklad / wiki ↗
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <p className="small muted">
-                © OpenStreetMap contributors · ODbL. Parkoviště: datový podklad
-                © IPR Praha, CC BY 4.0. Interiéry jsou orientační model.
-              </p>
-            </>
-          )}
-          {panel === "avatar" && (
-            <>
-              {avatarEditor}
-              <h3>Co tě baví?</h3>
-              <div className="chips">
-                {INTERESTS.map((tag) => (
-                  <button
-                    key={tag}
-                    className={profile.interests.includes(tag) ? "chosen" : ""}
-                    onClick={() =>
-                      setProfile((p) => ({
-                        ...p,
-                        interests: p.interests.includes(tag)
-                          ? p.interests.filter((t) => t !== tag)
-                          : [...p.interests, tag],
-                      }))
-                    }
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-              <label className="check">
-                <input
-                  type="checkbox"
-                  checked={profile.social}
-                  onChange={(e) =>
-                    setProfile({ ...profile, social: e.target.checked })
-                  }
-                />{" "}
-                Rád se seznámím
-              </label>
-              <label className="check">
-                <input
-                  type="checkbox"
-                  checked={profile.firstTime}
-                  onChange={(e) =>
-                    setProfile({ ...profile, firstTime: e.target.checked })
-                  }
-                />{" "}
-                Jdu poprvé
-              </label>
-              <h3>Tvoje odměny</h3>
-              {rewards.length ? (
-                rewards.map((r) => (
-                  <button
-                    className="reward"
-                    key={r}
-                    onClick={() =>
-                      updateAvatar("badge", profile.avatar.badge === r ? "" : r)
-                    }
-                  >
-                    ✧ {r} ·{" "}
-                    {profile.avatar.badge === r
-                      ? "Odznak nasazený"
-                      : "Nasadit odznak"}
-                  </button>
-                ))
-              ) : (
-                <p className="muted">Odměny získáš za průzkum a kvíz.</p>
-              )}
-            </>
-          )}
-          {panel === "people" && (
-            <>
-              {mode === "guest" ? (
-                <p className="empty">
-                  Jsi v samostatném světě. Žádní hráči ani jejich data se sem
-                  neposílají.
-                </p>
-              ) : (
-                <>
-                  <p className="muted">
-                    Všichni jsou v jednom společném světě. Přezdívky nejsou
-                    ověřené identity.
-                  </p>
-                  {social.requests.map((id) => (
-                    <div className="request" key={id}>
-                      <strong>
-                        {players.find((p) => p.id === id)?.nickname ||
-                          "Účastník"}
-                      </strong>{" "}
-                      žádá o soukromý kontakt.
-                      <div className="inline">
-                        <button
-                          onClick={() =>
-                            send("contact", { to: id, accept: true })
-                          }
-                        >
-                          Přijmout
-                        </button>
-                        <button onClick={() => send("decline", { to: id })}>
-                          Odmítnout
-                        </button>
-                      </div>
+                      ) && (
+                        <p className="muted">
+                          {t(
+                            "V tomto místě není naplánovaná další ukázková akce.",
+                          )}
+                        </p>
+                      )}
                     </div>
-                  ))}
-                  {players
-                    .filter((p) => p.id !== selfId)
-                    .map((p) => (
-                      <div className="person" key={p.id}>
-                        <div
-                          className="person-icon"
-                          style={{ background: p.avatar.shirt }}
-                        >
-                          {p.nickname.slice(0, 1)}
-                        </div>
-                        <div>
-                          <strong>{p.nickname}</strong>
-                          <p>
-                            {p.social ? "Rád se seznámím" : "Na kopci"}
-                            {p.firstTime ? " · Jdu poprvé" : ""}
-                          </p>
-                          <small>{p.interests.join(" · ")}</small>
-                          <div className="person-actions">
-                            {social.contacts.includes(p.id) ? (
-                              <button
-                                onClick={() => {
-                                  setChannel("dm:" + p.id);
-                                  setPanel("chat");
-                                }}
-                              >
-                                Zpráva
-                              </button>
-                            ) : (
-                              <button
-                                disabled={social.blocked.includes(p.id)}
-                                onClick={() => send("contact", { to: p.id })}
-                              >
-                                Požádat o kontakt
-                              </button>
-                            )}
-                            <button
-                              onClick={() =>
-                                setMuted((m) =>
-                                  m.includes(p.id)
-                                    ? m.filter((id) => id !== p.id)
-                                    : [...m, p.id],
-                                )
-                              }
-                            >
-                              {muted.includes(p.id)
-                                ? "Zrušit ztlumení"
-                                : "Ztlumit"}
-                            </button>
-                            <button
-                              onClick={() =>
-                                send("block", {
-                                  to: p.id,
-                                  enabled: !social.blocked.includes(p.id),
-                                })
-                              }
-                            >
-                              {social.blocked.includes(p.id)
-                                ? "Odblokovat"
-                                : "Blokovat"}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  {players.length < 2 && (
-                    <p className="empty">
-                      Zatím jsi tu sám. Otevři demo ve druhém prohlížeči a
-                      potkáte se.
-                    </p>
-                  )}
-                </>
-              )}
-            </>
-          )}
-          {panel === "chat" && (
-            <>
-              {mode === "guest" ? (
-                <p className="empty">
-                  Samostatná prohlídka není připojená k žádnému multiplayerovému
-                  chatu.
-                </p>
-              ) : (
-                <>
-                  <select
-                    aria-label="Chatový kanál"
-                    value={channel}
-                    onChange={(e) => setChannel(e.target.value)}
-                  >
-                    <option value="global">Celý Strahov</option>
-                    <option value="local">V okolí · do 40 m</option>
-                    {events
-                      .filter((e) => attendance(e.id))
-                      .map((e) => (
-                        <option key={e.id} value={"event:" + e.id}>
-                          Akce: {e.title}
-                        </option>
-                      ))}
-                    {social.contacts.map((id) => (
-                      <option key={id} value={"dm:" + id}>
-                        Soukromě:{" "}
-                        {players.find((p) => p.id === id)?.nickname ||
-                          "Odpojený kontakt"}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="small muted">
-                    Místní chat sdílí pouze stejné patro / venkovní prostor.
-                    Soukromé zprávy vyžadují přijatý kontakt.
-                  </p>
-                  <div className="chat-log">
-                    {messages
-                      .filter((m) => {
-                        if (
-                          muted.includes(m.sender) ||
-                          social.blocked.includes(m.sender)
-                        )
-                          return false;
-                        if (channel.startsWith("dm:"))
-                          return (
-                            (m.sender === channel.slice(3) &&
-                              m.channel === "dm:" + selfId) ||
-                            (m.sender === selfId && m.channel === channel)
-                          );
-                        return m.channel === channel;
-                      })
-                      .map((m) => (
-                        <div
-                          key={m.id}
-                          className={
-                            m.sender === selfId
-                              ? "chat-message own"
-                              : "chat-message"
-                          }
-                        >
-                          <strong>{m.nickname}</strong>
-                          <small>{time(m.at)}</small>
-                          <p>{m.text}</p>
-                        </div>
-                      ))}
-                    <div ref={chatEnd} />
-                  </div>
-                  <form
-                    className="chat-form"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      if (message.trim()) {
-                        send("chat", { channel, text: message });
-                        setMessage("");
-                      }
-                    }}
-                  >
-                    <input
-                      aria-label="Zpráva"
-                      placeholder="Napiš něco…"
-                      maxLength={500}
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                    />
-                    <button className="primary" disabled={!connected}>
-                      ↗
+                    <button
+                      className="clear-destination"
+                      onClick={clearMapDestination}
+                    >
+                      {t("Zrušit navigační cíl")}
                     </button>
-                  </form>
-                </>
-              )}
-            </>
-          )}
-          {panel === "activities" && (
-            <>
-              <div className="activity-card">
-                <div className="activity-symbol">⌖</div>
-                <h3>Pět zastávek na kopci</h3>
-                <p>
-                  Prozkoumej areál a najdi pět limetkových značek. U každé
-                  stiskni E. V multiplayeru postup sdílíte.
-                </p>
-                <div className="progress">
-                  <i
-                    style={{
-                      width:
-                        ((mode === "multi"
-                          ? activity.hunt.length
-                          : game.current?.found.size || 0) /
-                          HUNT_POINTS.length) *
-                          100 +
-                        "%",
-                    }}
-                  />
-                </div>
-                <strong>
-                  {mode === "multi"
-                    ? activity.hunt.length
-                    : game.current?.found.size || 0}{" "}
-                  / {HUNT_POINTS.length} nalezeno
-                </strong>
-              </div>
-              <div className="activity-card">
-                <div className="activity-symbol">?</div>
-                <h3>Strahovský týmový kvíz</h3>
-                {mode === "multi" ? (
-                  <>
-                    {activity.quiz.running ? (
-                      <>
-                        <button
-                          className="secondary full"
-                          onClick={() => {
-                            setAnswerSent(-1);
-                            send("quizStart", team);
-                          }}
-                        >
-                          Přidat se do týmu{" "}
-                          {team === "lime" ? "Limeta" : "Fialová"}
-                        </button>
-                        <p>{QUIZ[activity.quiz.question]?.question}</p>
-                        <span className="status live">
-                          Zbývá{" "}
-                          {Math.max(
-                            0,
-                            Math.ceil((activity.quiz.deadline - now) / 1000),
-                          )}{" "}
-                          s
-                        </span>
-                        <div className="answers">
-                          {QUIZ[activity.quiz.question]?.answers.map((a, i) => (
-                            <button
-                              disabled={answerSent === activity.quiz.question}
-                              onClick={() => {
-                                send("quizAnswer", i);
-                                setAnswerSent(activity.quiz.question);
-                              }}
-                              key={a}
-                            >
-                              {a}
-                            </button>
-                          ))}
-                        </div>
-                        <p>
-                          Limeta {activity.quiz.teamScores.lime || 0} :{" "}
-                          {activity.quiz.teamScores.purple || 0} Fialová
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p>
-                          Tři otázky, dvě party a společný kopec. Vyber tým a
-                          zahaj kvíz.
-                        </p>
-                        <select
-                          value={team}
-                          onChange={(e) => setTeam(e.target.value)}
-                        >
-                          <option value="lime">Tým Limeta</option>
-                          <option value="purple">Tým Fialová</option>
-                        </select>
-                        <button
-                          className="primary full"
-                          onClick={() => {
-                            setAnswerSent(-1);
-                            send("quizStart", team);
-                          }}
-                        >
-                          Spustit / připojit se ke kvízu
-                        </button>
-                        {Object.keys(activity.quiz.scores).length > 0 && (
-                          <p>
-                            Poslední skóre: {activity.quiz.teamScores.lime || 0}{" "}
-                            : {activity.quiz.teamScores.purple || 0}
-                          </p>
-                        )}
-                      </>
+                  </section>
+                )}
+                {!destination && (
+                  <aside className="place-map-detail">
+                    <h3>{t("Najdi svoje místo")}</h3>
+                    <p>
+                      {t(
+                        "Vyber místo nebo klikni do mapy a nastav vlastní cíl.",
+                      )}
+                    </p>
+                    <p className="small muted">
+                      {t(
+                        "Fialové body jsou hráči ve hře. Trasa je orientační.",
+                      )}
+                    </p>
+                    {mapWaypoint && (
+                      <button onClick={clearMapDestination}>
+                        {t("Zrušit navigační cíl")}
+                      </button>
                     )}
-                  </>
+                  </aside>
+                )}
+                <small className="map-attribution">
+                  {t(
+                    "© OpenStreetMap contributors · ODbL. Parkoviště: datový podklad © IPR Praha, CC BY 4.0. Interiéry jsou orientační model.",
+                  )}
+                </small>
+              </div>
+            )}
+            {panel === "avatar" && (
+              <>
+                {avatarEditor}
+                <h3>{t("Co tě baví?")}</h3>
+                <div className="chips">
+                  {INTERESTS.map((tag) => (
+                    <button
+                      key={localizeText(tag)}
+                      className={
+                        profile.interests.includes(tag) ? "chosen" : ""
+                      }
+                      onClick={() =>
+                        setProfile((p) => ({
+                          ...p,
+                          interests: p.interests.includes(tag)
+                            ? p.interests.filter((t) => t !== tag)
+                            : [...p.interests, tag],
+                        }))
+                      }
+                    >
+                      {localizeText(tag)}
+                    </button>
+                  ))}
+                </div>
+                <label className="check">
+                  <input
+                    type="checkbox"
+                    checked={profile.social}
+                    onChange={(e) =>
+                      setProfile({ ...profile, social: e.target.checked })
+                    }
+                  />{" "}
+                  {t("Rád se seznámím")}
+                </label>
+                <label className="check">
+                  <input
+                    type="checkbox"
+                    checked={profile.firstTime}
+                    onChange={(e) =>
+                      setProfile({ ...profile, firstTime: e.target.checked })
+                    }
+                  />{" "}
+                  {t("Jdu poprvé")}
+                </label>
+                <h3>{t("Tvoje odměny")}</h3>
+                {rewards.length ? (
+                  rewards.map((r) => (
+                    <button
+                      className="reward"
+                      key={r}
+                      onClick={() =>
+                        updateAvatar(
+                          "badge",
+                          profile.avatar.badge === r ? "" : r,
+                        )
+                      }
+                    >
+                      ✧ {localizeText(r)} ·{" "}
+                      {profile.avatar.badge === r
+                        ? t("Odznak nasazený")
+                        : t("Nasadit odznak")}
+                    </button>
+                  ))
                 ) : (
-                  <p>
-                    Týmový kvíz patří do multiplayeru. Sólo můžeš objevovat
-                    značky a doručit balíček ke vstupu B6.
+                  <p className="muted">
+                    {t("Odměny získáš za průzkum a kvíz.")}
                   </p>
                 )}
-              </div>
-              <h3>Dej o sobě vědět</h3>
-              <div className="emotes">
-                {EMOTES.map(({ emoji: emote, label }) => (
-                  <button
-                    key={emote}
-                    aria-label={label}
-                    onClick={() => playEmote(emote)}
-                  >
-                    {emote}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-          {panel === "settings" && (
-            <>
-              <label>
-                Kvalita vykreslování
-                <select
-                  value={quality}
-                  onChange={(e) => {
-                    if (!isRenderQualityMode(e.target.value)) return;
-                    setQuality(e.target.value);
-                    game.current?.setQuality(e.target.value);
-                  }}
-                >
-                  <option value="auto">Automaticky · podle výkonu</option>
-                  <option value="low">Úsporná · běžný notebook</option>
-                  <option value="medium">Střední detail</option>
-                  <option value="high">Vyšší detail a rozlišení</option>
-                </select>
-              </label>
-              <label>
-                Cíl snímkové frekvence
-                <select
-                  value={targetFps}
-                  disabled={quality !== "auto"}
-                  onChange={(e) => {
-                    const fps = Number(e.target.value);
-                    if (!isRenderTargetFps(fps)) return;
-                    setTargetFps(fps);
-                    game.current?.setTargetFps(fps);
-                  }}
-                >
-                  <option value={60}>60 FPS</option>
-                  <option value={120}>120 FPS</option>
-                  <option value={144}>144 FPS</option>
-                </select>
-              </label>
-              <p className="small muted">
-                Cíl řídí automatickou kvalitu. Snímkování není omezené na 60
-                FPS; vyšší frekvence potřebuje odpovídající monitor a prohlížeč.
-              </p>
-              {stats?.rendering && (
-                <p className="small muted" data-rendering-status>
-                  Aktuálně {qualityLabel[stats.rendering.quality]} · render{" "}
-                  {Math.round(stats.rendering.renderScale * 100)} %.
-                  {stats.rendering.presentationHz
-                    ? ` Zjištěný rytmus prohlížeče přibližně ${Math.round(stats.rendering.presentationHz)} Hz.`
-                    : ""}
-                </p>
-              )}
-              {stats?.gpu && (
-                <details>
-                  <summary>Použitá grafická karta a detail okolí</summary>
-                  <p>{stats.gpu.classificationLabel}</p>
-                  <p
-                    className="small"
-                    data-gpu-renderer
-                    style={{ overflowWrap: "anywhere" }}
-                  >
-                    {stats.gpu.renderer}
+              </>
+            )}
+            {panel === "people" && (
+              <>
+                {mode === "guest" ? (
+                  <p className="empty">
+                    {t(
+                      "Jsi v samostatném světě. Žádní hráči ani jejich data se sem neposílají.",
+                    )}
                   </p>
-                  {stats.gpu.warnings.map((w) => (
-                    <p className="small muted" key={w}>
-                      {w}
+                ) : (
+                  <>
+                    <p className="muted">
+                      {t(
+                        "Všichni jsou v jednom společném světě. Přezdívky nejsou ověřené identity.",
+                      )}
                     </p>
-                  ))}
-                  <p className="small muted">
-                    Blízké okolí má vyšší detail, vzdálené budovy a postavy
-                    úspornější model. Všichni připojení zůstávají ve společném
-                    světě.
+                    {social.requests.map((id) => (
+                      <div className="request" key={id}>
+                        <strong>
+                          {players.find((p) => p.id === id)?.nickname ||
+                            t("Účastník")}
+                        </strong>{" "}
+                        {t("žádá o soukromý kontakt.")}
+                        <div className="inline">
+                          <button
+                            onClick={() =>
+                              send("contact", { to: id, accept: true })
+                            }
+                          >
+                            {t("Přijmout")}
+                          </button>
+                          <button onClick={() => send("decline", { to: id })}>
+                            {t("Odmítnout")}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {players
+                      .filter((p) => p.id !== selfId)
+                      .map((p) => (
+                        <div className="person" key={p.id}>
+                          <div
+                            className="person-icon"
+                            style={{ background: p.avatar.shirt }}
+                          >
+                            {p.nickname.slice(0, 1)}
+                          </div>
+                          <div>
+                            <strong>{p.nickname}</strong>
+                            <p>
+                              {p.social ? t("Rád se seznámím") : t("Na kopci")}
+                              {p.firstTime ? t(" · Jdu poprvé") : ""}
+                            </p>
+                            <small>
+                              {p.interests.map(localizeText).join(" · ")}
+                            </small>
+                            <div className="person-actions">
+                              {social.contacts.includes(p.id) ? (
+                                <button
+                                  onClick={() => {
+                                    setChannel("dm:" + p.id);
+                                    setPanel("chat");
+                                  }}
+                                >
+                                  {t("Zpráva")}
+                                </button>
+                              ) : (
+                                <button
+                                  disabled={social.blocked.includes(p.id)}
+                                  onClick={() => send("contact", { to: p.id })}
+                                >
+                                  {t("Požádat o kontakt")}
+                                </button>
+                              )}
+                              <button
+                                onClick={() =>
+                                  setMuted((m) =>
+                                    m.includes(p.id)
+                                      ? m.filter((id) => id !== p.id)
+                                      : [...m, p.id],
+                                  )
+                                }
+                              >
+                                {muted.includes(p.id)
+                                  ? t("Zrušit ztlumení")
+                                  : t("Ztlumit")}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  send("block", {
+                                    to: p.id,
+                                    enabled: !social.blocked.includes(p.id),
+                                  })
+                                }
+                              >
+                                {social.blocked.includes(p.id)
+                                  ? t("Odblokovat")
+                                  : t("Blokovat")}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    {players.length < 2 && (
+                      <p className="empty">
+                        {t(
+                          "Zatím jsi tu sám. Otevři demo ve druhém prohlížeči a potkáte se.",
+                        )}
+                      </p>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+            {panel === "chat" && (
+              <>
+                {mode === "guest" ? (
+                  <p className="empty">
+                    {t(
+                      "Samostatná prohlídka není připojená k žádnému multiplayerovému chatu.",
+                    )}
                   </p>
-                  <p className="small">
-                    <a
-                      href={GPU_SETTINGS_HELP_URL}
-                      target="_blank"
-                      rel="noreferrer"
+                ) : (
+                  <>
+                    <select
+                      aria-label={t("Chatový kanál")}
+                      value={channel}
+                      onChange={(e) => setChannel(e.target.value)}
                     >
-                      Výkonnější GPU ve Windows ↗
-                    </a>{" "}
-                    ·{" "}
-                    <a
-                      href={DISPLAY_REFRESH_HELP_URL}
-                      target="_blank"
-                      rel="noreferrer"
+                      <option value="global">{t("Celý Strahov")}</option>
+                      <option value="local">{t("V okolí · do 40 m")}</option>
+                      {events
+                        .filter((e) => attendance(e.id))
+                        .map((e) => (
+                          <option key={e.id} value={"event:" + e.id}>
+                            {t("Akce:")} {demoEventText(e, "title")}
+                          </option>
+                        ))}
+                      {social.contacts.map((id) => (
+                        <option key={id} value={"dm:" + id}>
+                          {t("Soukromě:")}{" "}
+                          {players.find((p) => p.id === id)?.nickname ||
+                            t("Odpojený kontakt")}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="small muted">
+                      {t(
+                        "Místní chat sdílí pouze stejné patro / venkovní prostor. Soukromé zprávy vyžadují přijatý kontakt.",
+                      )}
+                    </p>
+                    <div className="chat-log">
+                      {messages
+                        .filter((m) => {
+                          if (
+                            muted.includes(m.sender) ||
+                            social.blocked.includes(m.sender)
+                          )
+                            return false;
+                          if (channel.startsWith("dm:"))
+                            return (
+                              (m.sender === channel.slice(3) &&
+                                m.channel === "dm:" + selfId) ||
+                              (m.sender === selfId && m.channel === channel)
+                            );
+                          return m.channel === channel;
+                        })
+                        .map((m) => (
+                          <div
+                            key={m.id}
+                            className={
+                              m.sender === selfId
+                                ? "chat-message own"
+                                : "chat-message"
+                            }
+                          >
+                            <strong>{m.nickname}</strong>
+                            <small>{time(m.at)}</small>
+                            <p>{m.text}</p>
+                          </div>
+                        ))}
+                      <div ref={chatEnd} />
+                    </div>
+                    <form
+                      className="chat-form"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (message.trim()) {
+                          send("chat", { channel, text: message });
+                          setMessage("");
+                        }
+                      }}
                     >
-                      Frekvence monitoru ↗
-                    </a>
+                      <input
+                        aria-label={t("Zpráva")}
+                        placeholder={t("Napiš něco…")}
+                        maxLength={500}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                      />
+                      <button
+                        className="primary"
+                        disabled={!connected}
+                        aria-label={t("Odeslat zprávu")}
+                      >
+                        ↗
+                      </button>
+                    </form>
+                  </>
+                )}
+              </>
+            )}
+            {panel === "activities" && (
+              <>
+                <div className="activity-card">
+                  <div className="activity-symbol">⌖</div>
+                  <h3>{t("Pět zastávek na kopci")}</h3>
+                  <p>
+                    {t(
+                      "Prozkoumej areál a najdi pět limetkových značek. U každé stiskni E. V multiplayeru postup sdílíte.",
+                    )}
                   </p>
-                </details>
-              )}
-              <BenchmarkControls
-                game={game.current}
-                result={benchmark}
-                localCollector={localCollector}
-                saveNotice={benchmarkSaveNotice}
-                onUserStart={() => {
-                  userBenchmark.current = true;
-                  setBenchmarkSaveNotice("");
-                }}
-              />
-              <label>
-                Náhled osvětlení
-                <select
-                  value={lighting}
-                  onChange={(e) => {
-                    setLighting(e.target.value);
-                    if (game.current)
-                      game.current.timeOverride = previewInstant(
-                        e.target.value,
-                      );
-                  }}
-                >
-                  <option value="real">Skutečný čas na Strahově</option>
-                  <option value="day">Denní náhled · demo</option>
-                  <option value="night">Noční náhled · demo</option>
-                </select>
-              </label>
-              {lighting !== "real" && (
-                <p className="fiction">
-                  NÁHLED OSVĚTLENÍ · skutečný čas je dočasně nahrazený.
-                </p>
-              )}
-              <div className="stat-grid">
-                <div>
-                  <strong>{stats?.fps || "—"}</strong>
-                  <span>FPS</span>
-                </div>
-                <div>
+                  <div className="progress">
+                    <i
+                      style={{
+                        width:
+                          ((mode === "multi"
+                            ? activity.hunt.length
+                            : game.current?.found.size || 0) /
+                            HUNT_POINTS.length) *
+                            100 +
+                          "%",
+                      }}
+                    />
+                  </div>
                   <strong>
-                    {stats?.triangles.toLocaleString("cs-CZ") || "—"}
+                    {mode === "multi"
+                      ? activity.hunt.length
+                      : game.current?.found.size || 0}{" "}
+                    / {HUNT_POINTS.length} {t("nalezeno")}
                   </strong>
-                  <span>trojúhelníků včetně stínů</span>
                 </div>
-              </div>
-              <h3>Počasí na Strahově</h3>
-              <p>{weather?.source || "Zdroj se načítá"}</p>
-              <p>
-                {weatherLabel} · vítr {weather?.wind.toFixed(1) || "—"} m/s ·
-                déšť {weather?.rain || 0} mm/h
-              </p>
-              <p className="small muted">
-                {weather?.observedAt
-                  ? "Čas dat: " +
-                    new Intl.DateTimeFormat("cs-CZ", {
-                      timeZone: "Europe/Prague",
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    }).format(weather.observedAt)
-                  : "Žádné platné měření."}
-                <br />
-                {weather?.cloudSource}
-                <br />
-                Denní a noční světlo odpovídá skutečné poloze Slunce nad
-                Strahovem.
-              </p>
-              <p className="small muted">
-                Vítr přichází z {Math.round(weather?.windDirection ?? 0)}°;
-                mraky používají modelové proudění ve výšce.{" "}
-                {weather?.cloudWindSource}
-              </p>
-              <a
-                href="https://weather.sh.cvut.cz/weather/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Meteostanice Silicon Hill ↗
-              </a>
-              <p className="small muted">
-                Doplňková oblačnost / záložní počasí:{" "}
+                <div className="activity-card">
+                  <div className="activity-symbol">?</div>
+                  <h3>{t("Strahovský týmový kvíz")}</h3>
+                  {mode === "multi" ? (
+                    <>
+                      {activity.quiz.running ? (
+                        <>
+                          <button
+                            className="secondary full"
+                            onClick={() => {
+                              setAnswerSent(-1);
+                              send("quizStart", team);
+                            }}
+                          >
+                            {t("Přidat se do týmu")}{" "}
+                            {team === "lime" ? t("Limeta") : t("Fialová")}
+                          </button>
+                          <p>
+                            {localizeText(
+                              QUIZ[activity.quiz.question]?.question,
+                            )}
+                          </p>
+                          <span className="status live">
+                            {t("Zbývá")}{" "}
+                            {Math.max(
+                              0,
+                              Math.ceil((activity.quiz.deadline - now) / 1000),
+                            )}{" "}
+                            s
+                          </span>
+                          <div className="answers">
+                            {QUIZ[activity.quiz.question]?.answers.map(
+                              (a, i) => (
+                                <button
+                                  disabled={
+                                    answerSent === activity.quiz.question
+                                  }
+                                  onClick={() => {
+                                    send("quizAnswer", i);
+                                    setAnswerSent(activity.quiz.question);
+                                  }}
+                                  key={localizeText(a)}
+                                >
+                                  {localizeText(a)}
+                                </button>
+                              ),
+                            )}
+                          </div>
+                          <p>
+                            {t("Limeta")} {activity.quiz.teamScores.lime || 0} :{" "}
+                            {activity.quiz.teamScores.purple || 0}{" "}
+                            {t("Fialová")}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p>
+                            {t(
+                              "Tři otázky, dvě party a společný kopec. Vyber tým a zahaj kvíz.",
+                            )}
+                          </p>
+                          <select
+                            value={team}
+                            onChange={(e) => setTeam(e.target.value)}
+                          >
+                            <option value="lime">{t("Tým Limeta")}</option>
+                            <option value="purple">{t("Tým Fialová")}</option>
+                          </select>
+                          <button
+                            className="primary full"
+                            onClick={() => {
+                              setAnswerSent(-1);
+                              send("quizStart", team);
+                            }}
+                          >
+                            {t("Spustit / připojit se ke kvízu")}
+                          </button>
+                          {Object.keys(activity.quiz.scores).length > 0 && (
+                            <p>
+                              {t("Poslední skóre:")}{" "}
+                              {activity.quiz.teamScores.lime || 0} :{" "}
+                              {activity.quiz.teamScores.purple || 0}
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <p>
+                      {t(
+                        "Týmový kvíz patří do multiplayeru. Sólo můžeš objevovat značky a doručit balíček ke vstupu B6.",
+                      )}
+                    </p>
+                  )}
+                </div>
+                <h3>{t("Dej o sobě vědět")}</h3>
+                <div className="emotes">
+                  {EMOTES.map(({ emoji: emote, label }) => (
+                    <button
+                      key={emote}
+                      aria-label={localizeText(label)}
+                      onClick={() => playEmote(emote)}
+                    >
+                      {emote}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {panel === "settings" && (
+              <>
+                <LanguagePicker />
+                <label>
+                  {t("Kvalita vykreslování")}
+                  <select
+                    value={quality}
+                    onChange={(e) => {
+                      if (!isRenderQualityMode(e.target.value)) return;
+                      setQuality(e.target.value);
+                      game.current?.setQuality(e.target.value);
+                    }}
+                  >
+                    <option value="auto">
+                      {t("Automaticky · podle výkonu")}
+                    </option>
+                    <option value="low">{t("Úsporná · běžný notebook")}</option>
+                    <option value="medium">{t("Střední detail")}</option>
+                    <option value="high">
+                      {t("Vyšší detail a rozlišení")}
+                    </option>
+                  </select>
+                </label>
+                <label>
+                  {t("Cíl snímkové frekvence")}
+                  <select
+                    value={targetFps}
+                    disabled={quality !== "auto"}
+                    onChange={(e) => {
+                      const fps = Number(e.target.value);
+                      if (!isRenderTargetFps(fps)) return;
+                      setTargetFps(fps);
+                      game.current?.setTargetFps(fps);
+                    }}
+                  >
+                    <option value={60}>60 FPS</option>
+                    <option value={120}>120 FPS</option>
+                    <option value={144}>144 FPS</option>
+                  </select>
+                </label>
+                <p className="small muted">
+                  {t(
+                    "Cíl řídí automatickou kvalitu. Snímkování není omezené na 60 FPS; vyšší frekvence potřebuje odpovídající monitor a prohlížeč.",
+                  )}
+                </p>
+                {stats?.rendering && (
+                  <p className="small muted" data-rendering-status>
+                    {t("Aktuálně")}{" "}
+                    {localizeText(qualityLabel[stats.rendering.quality])}{" "}
+                    {t("· render")}{" "}
+                    {Math.round(stats.rendering.renderScale * 100)} %.
+                    {stats.rendering.presentationHz
+                      ? t(" Zjištěný rytmus prohlížeče přibližně {hz} Hz.", {
+                          hz: formatNumber(
+                            Math.round(stats.rendering.presentationHz),
+                          ),
+                        })
+                      : ""}
+                  </p>
+                )}
+                {stats?.gpu && (
+                  <details>
+                    <summary>
+                      {t("Použitá grafická karta a detail okolí")}
+                    </summary>
+                    <p>{localizeText(stats.gpu.classificationLabel)}</p>
+                    <p
+                      className="small"
+                      data-gpu-renderer
+                      style={{ overflowWrap: "anywhere" }}
+                    >
+                      {localizeText(stats.gpu.renderer)}
+                    </p>
+                    {stats.gpu.warnings.map((w) => (
+                      <p className="small muted" key={localizeText(w)}>
+                        {localizeText(w)}
+                      </p>
+                    ))}
+                    <p className="small muted">
+                      {t(
+                        "Blízké okolí má vyšší detail, vzdálené budovy a postavy úspornější model. Všichni připojení zůstávají ve společném světě.",
+                      )}
+                    </p>
+                    <p className="small">
+                      <a
+                        href={GPU_SETTINGS_HELP_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {t("Výkonnější GPU ve Windows ↗")}
+                      </a>{" "}
+                      ·{" "}
+                      <a
+                        href={DISPLAY_REFRESH_HELP_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {t("Frekvence monitoru ↗")}
+                      </a>
+                    </p>
+                  </details>
+                )}
+                <BenchmarkControls
+                  game={game.current}
+                  result={benchmark}
+                  localCollector={localCollector}
+                  saveNotice={benchmarkSaveNotice}
+                  onUserStart={() => {
+                    userBenchmark.current = true;
+                    setBenchmarkSaveNotice("");
+                  }}
+                />
+                <label>
+                  {t("Náhled osvětlení")}
+                  <select
+                    value={lighting}
+                    onChange={(e) => {
+                      setLighting(e.target.value);
+                      if (game.current)
+                        game.current.timeOverride = previewInstant(
+                          e.target.value,
+                        );
+                    }}
+                  >
+                    <option value="real">
+                      {t("Skutečný čas na Strahově")}
+                    </option>
+                    <option value="day">{t("Denní náhled · demo")}</option>
+                    <option value="night">{t("Noční náhled · demo")}</option>
+                  </select>
+                </label>
+                {lighting !== "real" && (
+                  <p className="fiction">
+                    {t("NÁHLED OSVĚTLENÍ · skutečný čas je dočasně nahrazený.")}
+                  </p>
+                )}
+                <div className="stat-grid">
+                  <div>
+                    <strong>{stats?.fps || "—"}</strong>
+                    <span>FPS</span>
+                  </div>
+                  <div>
+                    <strong>
+                      {stats ? formatNumber(stats.triangles) : "—"}
+                    </strong>
+                    <span>{t("trojúhelníků včetně stínů")}</span>
+                  </div>
+                </div>
+                <h3>{t("Počasí na Strahově")}</h3>
+                <p>{localizeText(weather?.source || t("Zdroj se načítá"))}</p>
+                <p>
+                  {weatherLabel} {t("· vítr")}{" "}
+                  {weather
+                    ? formatNumber(weather.wind, { maximumFractionDigits: 1 })
+                    : "—"}{" "}
+                  {t("m/s · déšť")} {formatNumber(weather?.rain || 0)} mm/h
+                </p>
+                <p className="small muted">
+                  {weather?.observedAt
+                    ? t("Čas dat: ") +
+                      formatDate(weather.observedAt, {
+                        timeZone: "Europe/Prague",
+                        dateStyle: "short",
+                        timeStyle: "short",
+                      })
+                    : t("Žádné platné měření.")}
+                  <br />
+                  {localizeText(weather?.cloudSource)}
+                  <br />
+                  {t(
+                    "Denní a noční světlo odpovídá skutečné poloze Slunce nad Strahovem.",
+                  )}
+                </p>
+                <p className="small muted">
+                  {t("Vítr přichází z")}{" "}
+                  {Math.round(weather?.windDirection ?? 0)}
+                  {t("°; mraky používají modelové proudění ve výšce.")}{" "}
+                  {localizeText(weather?.cloudWindSource)}
+                </p>
                 <a
-                  href="https://open-meteo.com/"
+                  href="https://weather.sh.cvut.cz/weather/"
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Open-Meteo
+                  {t("Meteostanice Silicon Hill ↗")}
                 </a>
-                , CC BY 4.0.
-              </p>
-              <h3>Autobusy u kolejí</h3>
-              <p className="small muted">
-                {transitStatus(now).label}. Počet cestujících a okolní provoz
-                jsou simulované.
-              </p>
-              {nextArrivals(now, 4).map((arrival) => (
-                <p
-                  className="small"
-                  key={arrival.at + arrival.sourceTripId + arrival.stopId}
-                >
-                  <strong>{arrival.route}</strong> · {time(arrival.at)} ·{" "}
-                  {arrival.headsign}
+                <p className="small muted">
+                  {t("Doplňková oblačnost / záložní počasí:")}{" "}
+                  <a
+                    href="https://open-meteo.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open-Meteo
+                  </a>
+                  , CC BY 4.0.
                 </p>
-              ))}
-              <a
-                href="https://pid.cz/o-systemu/opendata/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Jízdní řád PID · zdroj dat ↗
-              </a>
-              {mode === "guest" && (
-                <button
-                  className="primary"
-                  onClick={() => {
-                    const arrival = game.current?.previewTransit();
-                    if (arrival) {
-                      setTrafficPreview(arrival);
-                      setPanel("");
-                    }
-                  }}
-                >
-                  Ukázka příjezdu a cestujících
-                </button>
-              )}
-              {trafficPreview && (
-                <>
-                  <p className="fiction">
-                    UKÁZKA DOPRAVY · {time(trafficPreview.at)}, linka{" "}
-                    {trafficPreview.route}. Herní NPC představují fiktivní
-                    cestující.
+                <h3>{t("Autobusy u kolejí")}</h3>
+                <p className="small muted">
+                  {localizeText(transitStatus(now).label)}
+                  {t(". Počet cestujících a okolní provoz jsou simulované.")}
+                </p>
+                {nextArrivals(now, 4).map((arrival) => (
+                  <p
+                    className="small"
+                    key={arrival.at + arrival.sourceTripId + arrival.stopId}
+                  >
+                    <strong>{arrival.route}</strong> · {time(arrival.at)} ·{" "}
+                    {arrival.headsign}
                   </p>
+                ))}
+                <a
+                  href="https://pid.cz/o-systemu/opendata/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t("Jízdní řád PID · zdroj dat ↗")}
+                </a>
+                {mode === "guest" && (
                   <button
+                    className="primary"
                     onClick={() => {
-                      if (game.current) game.current.trafficPreview = undefined;
-                      setTrafficPreview(null);
+                      const arrival = game.current?.previewTransit();
+                      if (arrival) {
+                        setTrafficPreview(arrival);
+                        setPanel("");
+                      }
                     }}
                   >
-                    Vrátit dopravu na skutečný čas
+                    {t("Ukázka příjezdu a cestujících")}
                   </button>
-                </>
-              )}
-              <h3>Ovládání</h3>
-              <p className="small muted">
-                W / S vpřed a vzad · A / D chůze doleva a doprava podle kamery,
-                v autě zatáčení · tažení levým nebo pravým tlačítkem otáčí
-                kameru · krátké levé kliknutí vybere postavu nebo značku ·
-                kolečko přiblíží pohled · Shift běh · mezerník skok / ruční
-                brzda · E interakce · V pohled · R návrat · M mapa · J deník · G
-                gesta (1–4) · Esc zavře nabídku nebo zruší výběr. V první osobě
-                klikni do hry pro rozhlížení, Esc uvolní kurzor.
-              </p>
-              <p className="small muted">
-                V autě W přidává plyn, S nejdřív brzdí a po zastavení couvá. A/D
-                zatáčí volantem nezávisle na pohledu myši. Mezerník brzdí zadní
-                kola. E vystoupí až po zastavení na bezpečném místě. Tažením
-                myši se rozhlédneš; při stání zůstane pohled natočený, za jízdy
-                se po chvíli vrátí. V přepíná tři vzdálenosti vnější kamery
-                auta.
-              </p>
-              <p className="small muted">
-                Mapový podklad © OpenStreetMap contributors, ODbL. Polohy korun
-                podle ortofota: datový podklad © IPR Praha, 2024, CC BY 4.0.
-                Měsíc: NASA SVS / LROC / Arizona State University. Model
-                autobusu: Innerscene, CC0.
-              </p>
-              <button
-                className="secondary full"
-                disabled={!ready}
-                onClick={() => game.current?.requestRespawn()}
-              >
-                Vrátit se na start
-              </button>
-              <button className="text-button" onClick={leave}>
-                Opustit demo
-              </button>
-            </>
-          )}
-        </aside>
+                )}
+                {trafficPreview && (
+                  <>
+                    <p className="fiction">
+                      {t("UKÁZKA DOPRAVY ·")} {time(trafficPreview.at)}
+                      {t(", linka")} {trafficPreview.route}
+                      {t(". Herní NPC představují fiktivní cestující.")}
+                    </p>
+                    <button
+                      onClick={() => {
+                        if (game.current)
+                          game.current.trafficPreview = undefined;
+                        setTrafficPreview(null);
+                      }}
+                    >
+                      {t("Vrátit dopravu na skutečný čas")}
+                    </button>
+                  </>
+                )}
+                <button
+                  className="secondary full"
+                  disabled={!ready}
+                  onClick={() => game.current?.requestRespawn()}
+                >
+                  {t("Vrátit se na start")}
+                </button>
+                <button className="text-button" onClick={leave}>
+                  {t("Opustit demo")}
+                </button>
+              </>
+            )}
+            {panel === "help" && (
+              <>
+                <p className="fiction">
+                  {t(
+                    "Ukázkové akce jsou fiktivní. Přítomnost ve hře neznamená skutečnou návštěvu místa.",
+                  )}
+                </p>{" "}
+                <h3>{t("Ovládání")}</h3>
+                <p className="small muted">
+                  {t(
+                    "W / S vpřed a vzad · A / D chůze doleva a doprava podle kamery, v autě zatáčení · tažení levým nebo pravým tlačítkem otáčí kameru · krátké levé kliknutí vybere postavu nebo značku · kolečko přiblíží pohled · Shift běh · mezerník skok / ruční brzda · E interakce · V pohled · R návrat · M mapa · J deník · G gesta (1–4) · Esc zavře nabídku nebo zruší výběr. V první osobě klikni do hry pro rozhlížení, Esc uvolní kurzor.",
+                  )}
+                </p>
+                <p className="small muted">
+                  {t(
+                    "V autě W přidává plyn, S nejdřív brzdí a po zastavení couvá. A/D zatáčí volantem nezávisle na pohledu myši. Mezerník brzdí zadní kola. E vystoupí až po zastavení na bezpečném místě. Tažením myši se rozhlédneš; při stání zůstane pohled natočený, za jízdy se po chvíli vrátí. V přepíná tři vzdálenosti vnější kamery auta.",
+                  )}
+                </p>
+                <p className="small muted">
+                  {t(
+                    "Mapový podklad © OpenStreetMap contributors, ODbL. Polohy korun podle ortofota: datový podklad © IPR Praha, 2024, CC BY 4.0. Měsíc: NASA SVS / LROC / Arizona State University. Model autobusu: Innerscene, CC0.",
+                  )}
+                </p>
+                <p>{t("F zapne nebo vypne svítilnu při chůzi.")}</p>
+                <p>
+                  {t(
+                    "Přezdívka není účet ani ověřená identita. Demo neověřuje bydliště. Vzhled se uloží jen v tomto prohlížeči.",
+                  )}
+                </p>
+              </>
+            )}
+          </aside>
+        </div>
       )}
       {showForm && (
         <EventForm
@@ -2093,6 +2270,27 @@ export function App() {
     </main>
   );
 }
+function LanguagePicker() {
+  const locale = useLocale();
+  return (
+    <label className="language-picker">
+      {t("Jazyk")}
+      <select
+        value={locale}
+        onChange={(event) =>
+          setLocale(event.target.value === "cs" ? "cs" : "en")
+        }
+      >
+        <option value="cs" lang="cs">
+          Čeština
+        </option>
+        <option value="en" lang="en">
+          English
+        </option>
+      </select>
+    </label>
+  );
+}
 function BenchmarkControls({
   game,
   result,
@@ -2106,6 +2304,7 @@ function BenchmarkControls({
   saveNotice: string;
   onUserStart: () => void;
 }) {
+  useLocale();
   const [running, setRunning] = useState(false);
   const resultJSON = useMemo(
     () => (result ? JSON.stringify(result, null, 2) : ""),
@@ -2124,38 +2323,55 @@ function BenchmarkControls({
           setRunning(true);
         }}
       >
-        {active ? "Měřím 10 sekund…" : "Změřit FPS po dobu 10 sekund"}
+        {active ? t("Měřím 10 sekund…") : t("Změřit FPS po dobu 10 sekund")}
       </button>
-      <p className="small muted">Během měření se automatická kvalita nemění.</p>
+      <p className="small muted">
+        {t("Během měření se automatická kvalita nemění.")}
+      </p>
       {localCollector && (
         <p className="small muted">
-          Výsledek se uloží pouze na tomto počítači.
+          {t("Výsledek se uloží pouze na tomto počítači.")}
         </p>
       )}
       {saveNotice && (
         <p className="small muted" role="status">
-          {saveNotice}
+          {localizeNotice(saveNotice)}
         </p>
       )}
       {result && (
         <>
           {(result.renderErrorCount > 0 || result.assetLoadErrorCount > 0) && (
             <p role="alert">
-              Měření je neplatné: prostředí obsahuje chybu vykreslování nebo
-              načtení modelů. Obnov stránku před dalším měřením.
+              {t(
+                "Měření je neplatné: prostředí obsahuje chybu vykreslování nebo načtení modelů. Obnov stránku před dalším měřením.",
+              )}
             </p>
           )}
           <p>
-            <strong>{result.averageFps} FPS</strong> · {result.avatars} avatarů
-            · p95 {result.p95FrameMs.toFixed(1)} ms
+            <strong>{formatNumber(result.averageFps)} FPS</strong> ·{" "}
+            {t(
+              plural(result.avatars, {
+                one: "{count} avatar",
+                few: "{count} avataři",
+                other: "{count} avatarů",
+              }),
+              { count: formatNumber(result.avatars) },
+            )}{" "}
+            · p95{" "}
+            {formatNumber(result.p95FrameMs, {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+            })}{" "}
+            ms
           </p>
           <p className="small muted">
-            Rozlišení {result.viewport.width} × {result.viewport.height}; render{" "}
-            {result.renderResolution.width} × {result.renderResolution.height}.
-            Tento výsledek platí jen pro uvedený adaptér a scénu.
+            {t("Rozlišení")} {result.viewport.width} × {result.viewport.height}
+            {t("; render")} {result.renderResolution.width} ×{" "}
+            {result.renderResolution.height}
+            {t(". Tento výsledek platí jen pro uvedený adaptér a scénu.")}
           </p>
           <details>
-            <summary>Podrobnosti měření</summary>
+            <summary>{t("Podrobnosti měření")}</summary>
             <pre id="benchmark-result">{resultJSON}</pre>
           </details>
         </>
@@ -2172,6 +2388,10 @@ function EventForm({
   onClose: () => void;
   onSave: (data: any) => void;
 }) {
+  useLocale();
+  const dialog = useRef<HTMLFormElement>(null);
+  useDialogFocus(true, dialog, onClose);
+  const [formError, setFormError] = useState("");
   const [title, setTitle] = useState(event?.title || ""),
     [description, setDescription] = useState(event?.description || ""),
     [placeId, setPlaceId] = useState(event?.placeId || "club6"),
@@ -2186,9 +2406,31 @@ function EventForm({
   return (
     <div className="modal-backdrop">
       <form
+        noValidate
+        ref={dialog}
+        role="dialog"
+        aria-modal="true"
+        aria-label={event ? t("Upravit setkání") : t("Potkáme se na kopci?")}
         className="modal"
         onSubmit={(e) => {
           e.preventDefault();
+          if (!title.trim()) {
+            setFormError("Zadej název setkání.");
+            return;
+          }
+          if (
+            !Number.isFinite(minutes) ||
+            !Number.isFinite(duration) ||
+            minutes < 0 ||
+            minutes > 10080 ||
+            duration < 5 ||
+            duration > 1440
+          ) {
+            setFormError(
+              "Zadej platný začátek (0–10080 minut) a délku (5–1440 minut).",
+            );
+            return;
+          }
           onSave({
             id: event?.id,
             title,
@@ -2200,14 +2442,23 @@ function EventForm({
         }}
       >
         <div className="panel-heading">
-          <h2>{event ? "Upravit setkání" : "Potkáme se na kopci?"}</h2>
-          <button type="button" onClick={onClose}>
+          <h2>{event ? t("Upravit setkání") : t("Potkáme se na kopci?")}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t("Zavřít panel")}
+          >
             ×
           </button>
         </div>
-        <p className="fiction">FIKTIVNÍ DEMONSTRAČNÍ SETKÁNÍ</p>
+        <p className="fiction">{t("FIKTIVNÍ DEMONSTRAČNÍ SETKÁNÍ")}</p>
+        {formError && (
+          <p role="alert" className="error">
+            {localizeText(formError)}
+          </p>
+        )}
         <label>
-          Název
+          {t("Název")}
           <input
             required
             maxLength={80}
@@ -2216,7 +2467,7 @@ function EventForm({
           />
         </label>
         <label>
-          Popis
+          {t("Popis")}
           <textarea
             maxLength={600}
             value={description}
@@ -2224,18 +2475,18 @@ function EventForm({
           />
         </label>
         <label>
-          Místo
+          {t("Místo")}
           <select value={placeId} onChange={(e) => setPlaceId(e.target.value)}>
             {PLACES.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name}
+                {localizeText(p.name)}
               </option>
             ))}
           </select>
         </label>
         <div className="inline">
           <label>
-            Za kolik minut
+            {t("Za kolik minut")}
             <input
               type="number"
               min="0"
@@ -2245,7 +2496,7 @@ function EventForm({
             />
           </label>
           <label>
-            Délka (minuty)
+            {t("Délka (minuty)")}
             <input
               type="number"
               min="5"
@@ -2256,11 +2507,12 @@ function EventForm({
           </label>
         </div>
         <button className="primary full">
-          {event ? "Uložit změny" : "Založit setkání"}
+          {event ? t("Uložit změny") : t("Založit setkání")}
         </button>
         <p className="small muted">
-          Setkání vlastní tvoje dočasná relace. Po restartu serveru demonstrační
-          setkání zaniknou.
+          {t(
+            "Setkání vlastní tvoje dočasná relace. Po restartu serveru demonstrační setkání zaniknou.",
+          )}
         </p>
       </form>
     </div>

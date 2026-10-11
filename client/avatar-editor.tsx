@@ -1,3 +1,4 @@
+import { t, localizeText, useLocale, formatNumber } from "./i18n";
 import { useEffect, useId, useRef, useState } from "react";
 import type { AvatarConfig, Profile } from "../shared/types";
 import type { AvatarPreviewController } from "./avatar-renderer";
@@ -93,7 +94,11 @@ function Palette({
             type="button"
             className="ae-swatch"
             style={{ backgroundColor: color }}
-            aria-label={`${title}, odstín ${index + 1}: ${color}`}
+            aria-label={t("{title}, odstín {index}: {color}", {
+              title,
+              index: formatNumber(index + 1),
+              color,
+            })}
             aria-pressed={value.toLowerCase() === color}
             onClick={() => onChange(color)}
             title={`${title} ${color}`}
@@ -104,10 +109,13 @@ function Palette({
         <label
           htmlFor={id}
           className="ae-custom-color"
-          title="Zvolit vlastní barvu"
+          title={t("Zvolit vlastní barvu")}
         >
           <span aria-hidden="true">+</span>
-          <span className="ae-sr-only">{title}: vlastní barva</span>
+          <span className="ae-sr-only">
+            {title}
+            {t(": vlastní barva")}
+          </span>
           <input
             id={id}
             type="color"
@@ -125,6 +133,7 @@ export function AvatarEditor({
   onChange,
   compact = false,
 }: AvatarEditorProps) {
+  useLocale();
   const [section, setSection] = useState<"appearance" | "clothes">(
     "appearance",
   );
@@ -177,27 +186,29 @@ export function AvatarEditor({
   return (
     <section
       className={`avatar-editor${compact ? " ae-compact" : ""}`}
-      aria-label="Vytvoření vlastní postavy"
+      aria-label={t("Vytvoření vlastní postavy")}
     >
       <label htmlFor={nicknameId} className="ae-nickname">
-        Jak ti budeme říkat?
+        {t("Jak ti budeme říkat?")}
         <input
           id={nicknameId}
           value={profile.nickname}
           maxLength={24}
           autoComplete="off"
-          placeholder="Tvoje přezdívka"
+          placeholder={t("Tvoje přezdívka")}
           onChange={(event) =>
             onChange({ ...profile, nickname: event.target.value })
           }
         />
       </label>
       <div className="ae-preview">
-        <span className="ae-preview-label">TVOJE POSTAVA</span>
+        <span className="ae-preview-label">{t("TVOJE POSTAVA")}</span>
         <div className="ae-preview-floor" aria-hidden="true" />
         <canvas
           ref={canvas}
-          aria-label="3D náhled postavy. Pro otočení táhni myší nebo použij šipky pod náhledem."
+          aria-label={t(
+            "3D náhled postavy. Pro otočení táhni myší nebo použij šipky pod náhledem.",
+          )}
           className={previewStatus === "ready" ? "ae-ready" : ""}
           onPointerDown={(event) => {
             if (previewStatus !== "ready") return;
@@ -230,16 +241,16 @@ export function AvatarEditor({
             <Silhouette {...config} hairStyle={preset.hairStyle} />
             <span>
               {previewStatus === "loading"
-                ? "Připravuji 3D náhled…"
-                : "3D náhled není dostupný. Vzhled můžeš dál upravit."}
+                ? t("Připravuji 3D náhled…")
+                : t("3D náhled není dostupný. Vzhled můžeš dál upravit.")}
             </span>
           </div>
         )}
-        <div className="ae-view-controls" aria-label="Otočení náhledu">
+        <div className="ae-view-controls" aria-label={t("Otočení náhledu")}>
           <button
             type="button"
             onClick={() => preview.current?.rotate(0.4)}
-            aria-label="Otočit postavu doleva"
+            aria-label={t("Otočit postavu doleva")}
             disabled={previewStatus !== "ready"}
           >
             ↶
@@ -249,12 +260,12 @@ export function AvatarEditor({
             onClick={() => preview.current?.resetView()}
             disabled={previewStatus !== "ready"}
           >
-            Zepředu
+            {t("Zepředu")}
           </button>
           <button
             type="button"
             onClick={() => preview.current?.rotate(-0.4)}
-            aria-label="Otočit postavu doprava"
+            aria-label={t("Otočit postavu doprava")}
             disabled={previewStatus !== "ready"}
           >
             ↷
@@ -269,18 +280,18 @@ export function AvatarEditor({
               preview.current?.focus(next);
             }}
           >
-            {detail === "face" ? "Celá postava" : "Detail tváře"}
+            {detail === "face" ? t("Celá postava") : t("Detail tváře")}
           </button>
         </div>
       </div>
       <div className="ae-group-heading">
-        <span>Začni s předlohou</span>
-        <span>6 podob · tvoje úpravy</span>
+        <span>{t("Začni s předlohou")}</span>
+        <span>{t("6 podob · tvoje úpravy")}</span>
       </div>
       <div
         className="ae-presets"
         role="group"
-        aria-label="Výchozí předloha postavy"
+        aria-label={t("Výchozí předloha postavy")}
       >
         {AVATAR_PRESETS.map((item, index) => (
           <button
@@ -288,7 +299,10 @@ export function AvatarEditor({
             key={item.name}
             className="ae-preset"
             aria-pressed={config.preset === index}
-            title={`${item.name}: ${item.detail}. Nastaví také výchozí barvy a doplňky.`}
+            title={t(
+              "{name}: {detail}. Nastaví také výchozí barvy a doplňky.",
+              { name: item.name, detail: localizeText(item.detail) },
+            )}
             onClick={() =>
               onChange({ ...profile, avatar: applyAvatarPreset(index, config) })
             }
@@ -299,41 +313,41 @@ export function AvatarEditor({
         ))}
       </div>
       <p className="ae-preset-caption">
-        <strong>{preset.name}</strong> · {preset.detail}. Výběr předlohy obnoví
-        její vzhled.
+        <strong>{preset.name}</strong> · {localizeText(preset.detail)}
+        {t(". Výběr předlohy obnoví její vzhled.")}
       </p>
-      <div className="ae-sections" role="group" aria-label="Části editoru">
+      <div className="ae-sections" role="group" aria-label={t("Části editoru")}>
         <button
           type="button"
           aria-pressed={section === "appearance"}
           onClick={() => setSection("appearance")}
         >
-          Obličej a vlasy
+          {t("Obličej a vlasy")}
         </button>
         <button
           type="button"
           aria-pressed={section === "clothes"}
           onClick={() => setSection("clothes")}
         >
-          Oblečení
+          {t("Oblečení")}
         </button>
       </div>
       {section === "appearance" ? (
         <div className="ae-details">
           <Palette
-            title="Odstín pokožky"
+            title={t("Odstín pokožky")}
             value={config.skin}
             colors={SKIN_TONES}
             onChange={(color) => update("skin", color)}
           />
           <Palette
-            title="Barva vlasů a vousů"
+            title={t("Barva vlasů a vousů")}
             value={config.hair}
             colors={HAIR_TONES}
             onChange={(color) => update("hair", color)}
           />
           <label className="ae-face" htmlFor={faceId}>
-            Tvar obličeje
+            {t("Tvar obličeje")}
             <input
               id={faceId}
               type="range"
@@ -341,12 +355,14 @@ export function AvatarEditor({
               max={1}
               step={0.05}
               value={config.face}
-              aria-valuetext={`${Math.round(config.face * 100)} % šířky obličeje`}
+              aria-valuetext={t("{width} % šířky obličeje", {
+                width: formatNumber(Math.round(config.face * 100)),
+              })}
               onChange={(event) => update("face", Number(event.target.value))}
             />
             <span className="ae-range-ends">
-              <span>Užší</span>
-              <span>Širší</span>
+              <span>{t("Užší")}</span>
+              <span>{t("Širší")}</span>
             </span>
           </label>
           <div className="ae-accessories">
@@ -356,7 +372,7 @@ export function AvatarEditor({
                 checked={config.glasses}
                 onChange={(event) => update("glasses", event.target.checked)}
               />
-              Brýle
+              {t("Brýle")}
             </label>
             <label>
               <input
@@ -364,33 +380,36 @@ export function AvatarEditor({
                 checked={config.beard}
                 onChange={(event) => update("beard", event.target.checked)}
               />
-              Vousy
+              {t("Vousy")}
             </label>
           </div>
         </div>
       ) : (
         <div className="ae-details">
           <Palette
-            title="Horní díl"
+            title={t("Horní díl")}
             value={config.shirt}
             colors={CLOTHING_TONES}
             onChange={(color) => update("shirt", color)}
           />
           <Palette
-            title="Kalhoty"
+            title={t("Kalhoty")}
             value={config.trousers}
             colors={TROUSER_TONES}
             onChange={(color) => update("trousers", color)}
           />
           <p className="ae-help">
-            Střih oblečení se mění s předlohou. Barvy si nastav podle sebe;
-            můžeš je změnit i později ve hře.
+            {t(
+              "Střih oblečení se mění s předlohou. Barvy si nastav podle sebe; můžeš je změnit i později ve hře.",
+            )}
           </p>
-          {config.badge && <p className="ae-earned">✧ {config.badge}</p>}
+          {config.badge && (
+            <p className="ae-earned">✧ {localizeText(config.badge)}</p>
+          )}
         </div>
       )}
       <p className="ae-storage-note">
-        Vzhled a přezdívka zůstávají v tomto prohlížeči.
+        {t("Vzhled a přezdívka zůstávají v tomto prohlížeči.")}
       </p>
     </section>
   );

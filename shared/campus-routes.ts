@@ -53,7 +53,7 @@ const distance = (a: StreetPoint, b: StreetPoint) =>
   Math.hypot(b[0] - a[0], b[1] - a[1]);
 
 /** A small binary heap keeps a route search off the per-frame rendering path. */
-class Queue {
+export class CampusRouteQueue {
   values: { id: string; distance: number }[] = [];
   push(value: { id: string; distance: number }) {
     const entries = this.values;
@@ -200,7 +200,7 @@ export function createCampusWalkRouter(
       } else {
         const distances = new Map<string, number>(),
           previous = new Map<string, { from: string; featureId: string }>(),
-          queue = new Queue();
+          queue = new CampusRouteQueue();
         for (const id of [first.a, first.b]) {
           const length = distance(first.point, nodes.get(id)!.point);
           distances.set(id, length);

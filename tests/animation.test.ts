@@ -15,6 +15,7 @@ import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { applyAvatarPreset } from "../client/avatar-presets";
 import { irisLandmarks } from "../client/avatar-eyes";
 import characterGeometry from "../client/data/character-geometry.json";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 function setup() {
   const engine = new NullEngine();
@@ -45,6 +46,47 @@ function travel(fps: number, speed: number, seconds = 4) {
   }
   return { ...context, position };
 }
+
+test("flashlight carries the right forearm forward without changing leg IK and releases it in a vehicle", () => {
+  const ordinary = setup(),
+    carrying = setup();
+  for (let frame = 0; frame < 180; frame++) {
+    const position = { x: 0, y: 0, z: (frame * 4.6) / 60 };
+    for (const c of [ordinary, carrying])
+      c.rig.root.position.copyFromFloats(position.x, position.y, position.z);
+    ordinary.animation.update({ position, yaw: 0 }, 1 / 60);
+    carrying.animation.update({ position, yaw: 0, flashlight: true }, 1 / 60);
+    assert.equal(carrying.animation.phase, ordinary.animation.phase);
+    assert.equal(
+      carrying.rig.leftKnee.rotation.x,
+      ordinary.rig.leftKnee.rotation.x,
+    );
+    assert.equal(
+      carrying.rig.rightKnee.rotation.x,
+      ordinary.rig.rightKnee.rotation.x,
+    );
+  }
+  carrying.rig.rightElbow.computeWorldMatrix(true);
+  const direction = Vector3.TransformNormal(
+    new Vector3(0, -1, 0),
+    carrying.rig.rightElbow.getWorldMatrix(),
+  ).normalize();
+  assert.ok(direction.z > 0.98, `grip axis must face forward: ${direction}`);
+  assert.ok(Math.abs(carrying.rig.rightArm.rotation.x + 0.42) < 1e-6);
+  for (let frame = 0; frame < 120; frame++)
+    carrying.animation.update(
+      {
+        position: carrying.rig.root.position,
+        yaw: 0,
+        flashlight: true,
+        vehicle: true,
+      },
+      1 / 60,
+    );
+  assert.ok(Math.abs(carrying.rig.rightArm.rotation.x) < 1e-6);
+  ordinary.dispose();
+  carrying.dispose();
+});
 
 test("real rig walks, runs and sprints from measured travel at 30/60/144 FPS", () => {
   for (const [speed, gait] of [
@@ -90,6 +132,22 @@ test("stopping against an obstacle settles both limbs without root bob or time-d
     context.animation.update({ position: context.position, yaw: 0 }, 1 / 60);
   assert.ok(Math.abs(context.rig.left.rotation.x - settled) < 1e-8);
   context.dispose();
+});
+
+test("a one-frame interpolation gap preserves the distance-driven gait instead of restarting a step", () => {
+  const c = travel(60, 4.6, 2.2);
+  const before = c.animation.phase;
+  c.animation.update({ position: c.position, yaw: 0 }, 1 / 60);
+  assert.equal(c.animation.phase, before);
+  c.position.z += 4.6 / 60;
+  c.rig.root.position.z = c.position.z;
+  c.animation.update({ position: c.position, yaw: 0 }, 1 / 60);
+  const delta = Math.atan2(
+    Math.sin(c.animation.phase - before),
+    Math.cos(c.animation.phase - before),
+  );
+  assert.ok(delta > 0 && delta < 0.3);
+  c.dispose();
 });
 
 test("body rotation takes the shortest path across the minus-pi/plus-pi seam", () => {

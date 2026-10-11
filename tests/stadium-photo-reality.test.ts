@@ -5,6 +5,7 @@ import {
   buildLandmarkPlan,
   STADIUM_EAST_PAVILION,
   STADIUM_PLAN,
+  isClosedStadiumInterior,
 } from "../shared/landmark-reality";
 import { groundHeight, buildingBaseHeight } from "../shared/terrain";
 import {
@@ -24,7 +25,9 @@ const plan = buildLandmarkPlan(),
 test("photo-correct east pavilion preserves the OSM outline and owns its actual DEM base", () => {
   const actual = STADIUM_PLAN.parts.find((p) => p.osmId === "480849465")!;
   assert.deepEqual(source.footprint, actual.points);
-  assert.equal(source.height, 20);
+  assert.equal(source.osmHeight, 20);
+  assert.equal(source.height, 24);
+  assert.match(source.heightProvenance, /IPR2023/);
   assert(
     Math.abs(
       pavilion.baseY - buildingBaseHeight(actual.points as [number, number][]),
@@ -76,7 +79,7 @@ test("east curtain wall has unequal horizontal rows, a broad opaque band and nar
   );
 });
 
-test("recessed pavilion piers leave a real covered ground-level service portal rather than a hidden solid wall", async () => {
+test("recessed pavilion piers retain the visible covered portal with an explicit pilot closure behind it", async () => {
   await initPhysics();
   const world = new RAPIER.World({ x: 0, y: 0, z: 0 }),
     data = plan.collision;
@@ -85,6 +88,13 @@ test("recessed pavilion piers leave a real covered ground-level service portal r
       new Float32Array(data.positions),
       new Uint32Array(data.indices),
       RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES,
+    ),
+  );
+  world.createCollider(
+    RAPIER.ColliderDesc.trimesh(
+      new Float32Array(plan.twoSidedExteriorCollision.positions),
+      new Uint32Array(plan.twoSidedExteriorCollision.indices),
+      RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES_TWO_SIDED,
     ),
   );
   world.step();
@@ -109,10 +119,13 @@ test("recessed pavilion piers leave a real covered ground-level service portal r
       length,
       true,
     );
-    assert.equal(
+    assert.ok(
       hit,
-      null,
-      "the source OSM covered service way must remain physically open",
+      "the existing source portal is physically closed for the exterior-only pilot",
+    );
+    assert.ok(
+      hit.time_of_impact > 10,
+      "closure must stand behind the photographed outer piers, not across the street",
     );
     const piers = plan.boxes.filter(
       (b) =>
@@ -134,7 +147,7 @@ test("recessed pavilion piers leave a real covered ground-level service portal r
   }
 });
 
-test("actual production KCC walks continuously under the east cantilever and central covered service portal", async () => {
+test("actual production KCC approaches the east covered portal but cannot enter the closed stadium", async () => {
   await initPhysics();
   const sim = new Simulation(),
     start = {
@@ -173,10 +186,11 @@ test("actual production KCC walks continuously under the east cantilever and cen
       );
     }
     assert(
-      actor.position.x < -164.8,
-      `covered passage blocked at ${JSON.stringify(actor.position)}`,
+      actor.position.x > -145 && actor.position.x < -140,
+      `unexpected closure position ${JSON.stringify(actor.position)}`,
     );
-    assert(moved > 34);
+    assert(moved > 10 && moved < 16);
+    assert.equal(isClosedStadiumInterior(actor.position), false);
   } finally {
     sim.dispose();
   }

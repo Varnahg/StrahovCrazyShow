@@ -35,6 +35,7 @@ const files = [
   "shared/b6-entry.ts",
   "shared/b6-facade-plan.ts",
   "shared/landmark-reality.ts",
+  "shared/stadium-exterior.ts",
   "shared/transit.ts",
   "shared/terrain-entities.ts",
   "shared/data/transit.json",

@@ -11,6 +11,8 @@ export type AvatarAnimationState = {
   grounded?: boolean;
   vehicle?: boolean;
   teleport?: boolean;
+  /** Right-hand carry pose; the light/mesh lifecycle is owned by Game. */
+  flashlight?: boolean;
   /** Optional terrain/step query. Without it use the current foot-level plane. */
   groundHeight?: (x: number, z: number) => number | undefined;
 };
@@ -24,6 +26,10 @@ const clamp = (value: number, low: number, high: number) =>
 const smooth = (value: number) => value * value * (3 - 2 * value);
 const shortestAngle = (from: number, to: number) =>
   Math.atan2(Math.sin(to - from), Math.cos(to - from));
+const rollHeight = (ankleHeight: number, pitch: number, pivotZ: number) =>
+  ankleHeight * (Math.cos(pitch) - 1) + pivotZ * Math.sin(pitch);
+const rollForward = (ankleHeight: number, pitch: number, pivotZ: number) =>
+  pivotZ * (1 - Math.cos(pitch)) + ankleHeight * Math.sin(pitch);
 
 type FootContact = {
   planted: boolean;
@@ -35,11 +41,17 @@ type FootContact = {
   anchorYaw: number;
   settleFrom: Vec3;
   settleTime: number;
+  settleToe: number;
+  settleYaw: number;
+  settleDelay: number;
+  settlePlanted: boolean;
   toe: number;
   yaw: number;
   phase: number;
   releasePhase: number;
   swingPlanned: boolean;
+  swingToeFrom: number;
+  swingLift: number;
   swingFrom: Vec3;
   swingTo: Vec3;
   landingPelvisMax: number;
@@ -53,11 +65,17 @@ const footContact = (): FootContact => ({
   anchorYaw: 0,
   settleFrom: { x: 0, y: 0, z: 0 },
   settleTime: Infinity,
+  settleToe: 0,
+  settleYaw: 0,
+  settleDelay: 0,
+  settlePlanted: true,
   toe: 0,
   yaw: 0,
   phase: 0,
   releasePhase: NaN,
   swingPlanned: false,
+  swingToeFrom: 0,
+  swingLift: 0,
   swingFrom: { x: 0, y: 0, z: 0 },
   swingTo: { x: 0, y: 0, z: 0 },
   landingPelvisMax: Infinity,
@@ -72,6 +90,9 @@ export class AvatarAnimator {
   private wasMoving = false;
   private measuredSpeed = 0;
   private movement = 0;
+  private stoppedTime = Infinity;
+  private travelSpeed = 0;
+  private strideSpeed = 0;
   private cycle = 0;
   private gesture = "";
   private gestureTime = 0;
@@ -83,6 +104,7 @@ export class AvatarAnimator {
   private inverseLeg = Quaternion.Identity();
   private desiredFoot = Quaternion.Identity();
   readonly contacts = { left: footContact(), right: footContact() };
+  private readonly feet = [this.contacts.left, this.contacts.right];
 
   constructor(private readonly rig: AvatarRig) {
     for (const joint of [rig.left, rig.right, rig.leftFoot, rig.rightFoot])
@@ -105,6 +127,9 @@ export class AvatarAnimator {
     this.initialized = false;
     this.measuredSpeed = this.movement = this.cycle = this.air = 0;
     this.wasMoving = false;
+    this.stoppedTime = Infinity;
+    this.travelSpeed = 0;
+    this.strideSpeed = 0;
     this.pelvisWorldY = NaN;
     this.gesture = "";
     this.gestureTime = this.gestureWeight = 0;
@@ -126,7 +151,7 @@ export class AvatarAnimator {
       joint.rotation.set(0, 0, 0);
       joint.rotationQuaternion?.set(0, 0, 0, 1);
     }
-    for (const contact of Object.values(this.contacts)) {
+    for (const contact of this.feet) {
       contact.initialized = contact.planted = false;
       contact.settleTime = Infinity;
       contact.releasePhase = NaN;
@@ -169,22 +194,40 @@ export class AvatarAnimator {
     const speed = driving ? 0 : Math.min(9, distance / dt);
     this.measuredSpeed = mix(this.measuredSpeed, speed, blend(13, dt));
     if (this.measuredSpeed < 0.001) this.measuredSpeed = 0;
-    const moving = this.measuredSpeed > 0.12 && !driving;
+    // A small interpolation gap is not a new step. Keep the last stride shape
+    // while distance is zero; changing its duty/length with a frozen phase used
+    // to teleport a swinging foot into stance when the player released W.
+    this.stoppedTime = speed > 0.12 ? 0 : this.stoppedTime + dt;
+    if (speed > 0.12) {
+      this.travelSpeed = this.measuredSpeed;
+      this.strideSpeed = speed;
+    }
+    const moving = this.stoppedTime < 0.06 && !driving;
+    const starting = moving && !this.wasMoving;
     this.movement = mix(this.movement, moving ? 1 : 0, blend(16, dt));
-    const run = clamp((this.measuredSpeed - 2.4) / 2.2, 0, 1);
-    const sprint = clamp((this.measuredSpeed - 5.8) / 1.2, 0, 1);
+    const gaitSpeed = moving ? this.travelSpeed : this.measuredSpeed;
+    const run = clamp((gaitSpeed - 2.4) / 2.2, 0, 1);
+    const sprint = clamp((gaitSpeed - 5.8) / 1.2, 0, 1);
     const duty = mix(mix(0.54, 0.25, run), 0.21, sprint);
     // A complete left-to-left cycle, not one step. At 4.6 m/s the old 2.06 m
     // cycle produced 4.47 steps/s and looked like a hurried cartoon jog.
-    const stride = mix(0.9 + speed * 0.25, 1.6 + speed * 0.3, run);
-    if (moving && !this.wasMoving) this.cycle = duty * 0.5 * TAU;
+    const stride = mix(
+      0.9 + this.strideSpeed * 0.25,
+      1.6 + this.strideSpeed * 0.3,
+      run,
+    );
+    if (starting) this.cycle = duty * 0.5 * TAU;
     if (!driving && distance > dt * 0.12 && state.grounded !== false)
       this.cycle =
         (this.cycle + (Math.min(distance, dt * 9) / stride) * TAU) % TAU;
     if (!moving && this.wasMoving) {
-      for (const contact of Object.values(this.contacts)) {
+      for (const contact of this.feet) {
         Object.assign(contact.settleFrom, contact.target);
         contact.settleTime = 0;
+        contact.settleToe = contact.toe;
+        contact.settleYaw = contact.yaw;
+        contact.settlePlanted = contact.planted;
+        contact.settleDelay = contact.planted ? 0.1 : 0;
       }
     }
     this.wasMoving = moving;
@@ -215,6 +258,7 @@ export class AvatarAnimator {
       -1,
       state,
       moving,
+      starting,
       run,
       dt,
     );
@@ -226,6 +270,7 @@ export class AvatarAnimator {
       1,
       state,
       moving,
+      starting,
       run,
       dt,
     );
@@ -246,7 +291,7 @@ export class AvatarAnimator {
     if (!Number.isFinite(this.pelvisWorldY))
       this.pelvisWorldY = position.y + pelvisTarget * scaleY;
     let targetWorldY = position.y + pelvisTarget * scaleY;
-    for (const contact of Object.values(this.contacts)) {
+    for (const contact of this.feet) {
       if (
         !contact.planted &&
         contact.swingPlanned &&
@@ -261,7 +306,7 @@ export class AvatarAnimator {
     }
     this.pelvisWorldY = Math.min(
       mix(this.pelvisWorldY, targetWorldY, blend(26, dt)),
-      position.y + mix(m.hipHeight, maximumReachable, this.movement) * scaleY,
+      position.y + maximumReachable * scaleY,
     );
     this.rig.hips.position.y = (this.pelvisWorldY - position.y) / scaleY;
     this.solveFoot(
@@ -323,6 +368,7 @@ export class AvatarAnimator {
     side: number,
     state: AvatarAnimationState,
     moving: boolean,
+    starting: boolean,
     run: number,
     dt: number,
   ) {
@@ -334,18 +380,8 @@ export class AvatarAnimator {
     const scale = this.rig.root.scaling;
     const lateral = side * m.legSpacing;
     const forwardReach = stride * duty * 0.5;
-    const rearReach = forwardReach - stride * duty;
     const heelPitch = -0.16;
     const toePitch = mix(0.5, 0.62, run);
-    const rollOffset = (pitch: number, pivotZ: number) => ({
-      y:
-        -m.ankleHeight +
-        m.ankleHeight * Math.cos(pitch) +
-        pivotZ * Math.sin(pitch),
-      // The sole is below the ankle: its local Y is -ankleHeight. Rx therefore
-      // contributes -ankleHeight*sin(pitch) to Z, as in clearSole/FK below.
-      z: pivotZ - (-m.ankleHeight * Math.sin(pitch) + pivotZ * Math.cos(pitch)),
-    });
     const groundAt = (x: number, z: number) =>
       state.groundHeight?.(x, z) ?? root.y;
     const shoeGround = (x: number, z: number, angle: number) =>
@@ -371,7 +407,6 @@ export class AvatarAnimator {
       contact.releasePhase = phase;
       contact.swingPlanned = false;
     }
-    const stance = phase < duty && !Number.isFinite(contact.releasePhase);
     if (!contact.initialized) {
       contact.initialized = true;
       contact.anchor.x = root.x + c * lateral * scale.x;
@@ -384,6 +419,13 @@ export class AvatarAnimator {
       Object.assign(contact.support, contact.anchor);
       Object.assign(contact.target, contact.anchor);
     }
+    if (starting && (phase >= duty || !contact.planted)) {
+      // Begin the first swing at the real standing/settling foot, not halfway
+      // through a synthetic cycle whose toe-off happened before movement.
+      contact.releasePhase = phase;
+      contact.swingPlanned = false;
+    }
+    const stance = phase < duty && !Number.isFinite(contact.releasePhase);
     if (moving && this.air < 0.5) {
       if (stance) {
         if (!contact.planted) {
@@ -406,62 +448,63 @@ export class AvatarAnimator {
           stanceProgress < 0.22
             ? heelPitch * (1 - smooth(stanceProgress / 0.22))
             : toePitch * smooth(clamp((stanceProgress - 0.62) / 0.38, 0, 1));
-        const offset = rollOffset(toe, toe < 0 ? -0.085 : 0.191);
+        // A restarted step can still be balanced on its toe. Preserve that
+        // real support roll while the new gait phase catches up.
+        toe = mix(contact.toe, toe * this.movement, blend(24, dt));
+        const pivotZ = toe < 0 ? -0.085 : 0.191;
+        const forward = rollForward(m.ankleHeight, toe, pivotZ);
         contact.target.x =
-          contact.support.x + Math.sin(contact.anchorYaw) * offset.z * scale.z;
+          contact.support.x + Math.sin(contact.anchorYaw) * forward * scale.z;
         contact.target.z =
-          contact.support.z + Math.cos(contact.anchorYaw) * offset.z * scale.z;
-        contact.target.y = contact.support.y + offset.y * scale.y;
+          contact.support.z + Math.cos(contact.anchorYaw) * forward * scale.z;
+        contact.target.y =
+          contact.support.y + rollHeight(m.ankleHeight, toe, pivotZ) * scale.y;
         Object.assign(contact.anchor, contact.target);
         footYaw = contact.anchorYaw;
       } else {
-        const wasPlanted = contact.planted;
         contact.planted = false;
-        const takeOff = Number.isFinite(contact.releasePhase)
-          ? contact.releasePhase
-          : duty;
-        const progress = clamp((phase - takeOff) / (1 - takeOff), 0, 1);
-        const toeOff = rollOffset(toePitch, 0.191);
-        const heelStrike = rollOffset(heelPitch, -0.085);
+        const heelForward = rollForward(m.ankleHeight, heelPitch, -0.085);
+        const heelHeight = rollHeight(m.ankleHeight, heelPitch, -0.085);
         if (!contact.swingPlanned) {
           contact.swingPlanned = true;
-          if (Number.isFinite(contact.releasePhase) && wasPlanted)
-            Object.assign(contact.swingFrom, contact.target);
-          else {
-            contact.swingFrom.x =
-              root.x +
-              c * lateral * scale.x +
-              s * (rearReach + toeOff.z - stride * (phase - duty)) * scale.z;
-            contact.swingFrom.z =
-              root.z -
-              s * lateral * scale.x +
-              c * (rearReach + toeOff.z - stride * (phase - duty)) * scale.z;
-            contact.swingFrom.y =
-              shoeGround(contact.swingFrom.x, contact.swingFrom.z, yaw) +
-              (m.ankleHeight + toeOff.y) * scale.y;
-          }
-          const landing = forwardReach + heelStrike.z + stride * (1 - phase);
+          // Retain the rendered ankle and roll at toe-off. Reconstructing a
+          // theoretical rear endpoint jumps whenever speed/duty changes, and
+          // on the first step it assumes a stance that never actually existed.
+          contact.releasePhase = phase;
+          contact.swingToeFrom = contact.toe;
+          contact.swingLift = mix(0.09, 0.32, run);
+          Object.assign(contact.swingFrom, contact.target);
+          const landing = forwardReach + heelForward + stride * (1 - phase);
           contact.swingTo.x =
             root.x + c * lateral * scale.x + s * landing * scale.z;
           contact.swingTo.z =
             root.z - s * lateral * scale.x + c * landing * scale.z;
           contact.swingTo.y =
-            shoeGround(contact.swingTo.x, contact.swingTo.z, yaw) +
-            (m.ankleHeight + heelStrike.y) * scale.y;
+            shoeGround(
+              contact.swingTo.x - s * heelForward * scale.z,
+              contact.swingTo.z - c * heelForward * scale.z,
+              yaw,
+            ) +
+            (m.ankleHeight + heelHeight) * scale.y;
           const legLength = m.thigh + m.shin - 0.0005;
           contact.landingPelvisMax =
             contact.swingTo.y +
             (Math.sqrt(
               Math.max(
                 0,
-                legLength * legLength - (forwardReach + heelStrike.z) ** 2,
+                legLength * legLength - (forwardReach + heelForward) ** 2,
               ),
             ) -
               0.006) *
               scale.y;
         }
+        const progress = clamp(
+          (phase - contact.releasePhase) / (1 - contact.releasePhase),
+          0,
+          1,
+        );
         toe =
-          mix(toePitch, heelPitch, smooth(progress)) -
+          mix(contact.swingToeFrom, heelPitch, smooth(progress)) -
           Math.sin(Math.PI * progress) * 0.35;
         contact.target.x = mix(
           contact.swingFrom.x,
@@ -480,7 +523,7 @@ export class AvatarAnimator {
           groundAt(contact.target.x, contact.target.z) +
             m.ankleHeight * scale.y,
           mix(contact.swingFrom.y, contact.swingTo.y, smooth(progress)) +
-            lift * mix(0.09, 0.32, run) * scale.y,
+            lift * contact.swingLift * scale.y,
         );
       }
     } else if (this.air < 0.5) {
@@ -489,24 +532,25 @@ export class AvatarAnimator {
       const destinationX = root.x + c * lateral * scale.x;
       const destinationZ = root.z - s * lateral * scale.x;
       const progress = Number.isFinite(contact.settleTime)
-        ? clamp((contact.settleTime - (side > 0 ? 0.1 : 0)) / 0.22, 0, 1)
+        ? clamp((contact.settleTime - contact.settleDelay) / 0.22, 0, 1)
         : 1;
       contact.settleTime += dt;
-      contact.target.x = mix(
-        contact.settleFrom.x,
-        destinationX,
-        smooth(progress),
-      );
-      contact.target.z = mix(
-        contact.settleFrom.z,
-        destinationZ,
-        smooth(progress),
-      );
+      const eased = smooth(progress);
+      contact.target.x = mix(contact.settleFrom.x, destinationX, eased);
+      contact.target.z = mix(contact.settleFrom.z, destinationZ, eased);
       const floor = shoeGround(contact.target.x, contact.target.z, yaw);
-      contact.target.y =
-        floor +
-        (m.ankleHeight + Math.sin(Math.PI * progress) * 0.055) * scale.y;
-      contact.planted = progress === 0 || progress === 1;
+      const destinationY = floor + m.ankleHeight * scale.y;
+      const lift = contact.settlePlanted ? 0.055 : 0;
+      contact.target.y = Math.max(
+        destinationY,
+        mix(contact.settleFrom.y, destinationY, eased) +
+          Math.sin(Math.PI * progress) * lift * scale.y,
+      );
+      toe = mix(contact.settleToe, 0, eased);
+      footYaw =
+        contact.settleYaw + shortestAngle(contact.settleYaw, yaw) * eased;
+      contact.planted =
+        (progress === 0 && contact.settlePlanted) || progress === 1;
       if (progress === 1) {
         Object.assign(contact.anchor, contact.target);
         Object.assign(contact.support, contact.target);
@@ -735,6 +779,13 @@ export class AvatarAnimator {
     rightElbow = mix(rightElbow, elbowRight, this.gestureWeight);
     leftSpread = mix(leftSpread, spreadLeft, this.gestureWeight);
     rightSpread = mix(rightSpread, spreadRight, this.gestureWeight);
+    if (state.flashlight && !driving) {
+      // The grip is rightElbow local (0,-0.275,0.02), light axis -Y.
+      // Keep that forearm forward without changing locomotion or the left arm.
+      rightArm = -0.42;
+      rightElbow = -1.15;
+      rightSpread = 0.04;
+    }
     const factor = blend(24, dt);
     this.rig.arm.rotation.x = mix(this.rig.arm.rotation.x, leftArm, factor);
     this.rig.rightArm.rotation.x = mix(

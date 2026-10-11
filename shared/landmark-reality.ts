@@ -4,6 +4,13 @@ import { buildingBaseHeight, groundHeight } from "./terrain";
 import type { Building, Vec3 } from "./types";
 import earcut from "earcut";
 import {
+  stadiumClosurePanels,
+  stadiumClosureBoundary,
+  pointInsideStadiumBoundary,
+  ringBoundaryDistance,
+  STADIUM_ACCESS_POLICY,
+} from "./stadium-exterior";
+import {
   osmAssetIdentity,
   type WorldAssetIdentity,
 } from "./world-asset-identity";
@@ -33,8 +40,12 @@ export const LANDMARK_SOURCE = {
     "https://www.holcim.cz/sites/czech2/files/2022-06/2013_01.pdf",
   stadiumEastCorrection:
     "Three user-supplied Google Street View reference screenshots inspected 2026-10-10: Vanickova east pavilion from both directions and the opposite campus pavement. Capture date unavailable; references are not textures or photogrammetric geometry.",
+  stadiumExteriorCheckedAt: "2026-10-11",
+  stadiumHeightReference:
+    "IPR Praha summer 2023 original level16 mesh: dominant east roof band Y27.1m (1142m² sampled horizontal surface), versus prior model Y23.18m. Authored height rounded to24m above the existing DEM base; not a new survey. datovy podklad © IPR Praha.",
+  stadiumAccess: STADIUM_ACCESS_POLICY.provenance,
   limits:
-    "B1 three storeys are photo/document evidence, 9.6 m is interpreted. Entrance proportions and stair heights are interpreted from the named B2 photograph and ELSA description. Stadium plan/heights retain OSM; tier count, pier pitch and material ageing are interpreted, not surveyed. B6 remains owned by its playable interior module.",
+    "B1 three storeys are photo/document evidence, 9.6 m is interpreted. Entrance proportions and stair heights are interpreted from the named B2 photograph and ELSA description. Stadium outline/other heights retain OSM; east roof height is refined from IPR2023 mesh. Exterior pier rhythm and materials are interpreted, not surveyed. The stadium interior is closed for the pilot. B6 remains owned by its playable interior module.",
 } as const;
 
 export function landmarkBuildingHeight(
@@ -225,6 +236,7 @@ class Geometry {
   /** Open roof surfaces require contacts from both sides, unlike the closed
    * wall/box stream. Keep their Rapier flags separate from existing solids. */
   readonly twoSidedRoofCollision = emptyMeshData();
+  readonly twoSidedExteriorCollision = emptyMeshData();
   readonly boxes: LandmarkBox[] = [];
   part(
     group: string,
@@ -259,7 +271,7 @@ class Geometry {
     d: P,
     normal: P,
     lod: LandmarkPart["lod"] = "both",
-    collide = false,
+    collide: boolean | LandmarkMeshData = false,
     uv = [0, 0, 1, 1],
   ) {
     const add = (data: LandmarkMeshData) => {
@@ -296,7 +308,7 @@ class Geometry {
       }
     };
     add(this.part(group, material, lod));
-    if (collide) add(this.collision);
+    if (collide) add(collide === true ? this.collision : collide);
   }
   box(box: LandmarkBox, lod: LandmarkPart["lod"] = "both") {
     this.boxes.push(box);
@@ -727,28 +739,7 @@ function entrances(g: Geometry, rows: MappedEntrance[]) {
 
 /** First positive ray intersection, valid for the mapped stadium's star-shaped
  * bowl. Vertex angles are included so original perimeter corners are retained. */
-export function ringRayDistance(
-  points: P2[],
-  cx: number,
-  cz: number,
-  angle: number,
-) {
-  const dx = Math.cos(angle),
-    dz = Math.sin(angle);
-  let result = Infinity;
-  for (const e of landmarkEdges(points)) {
-    const ex = e.b[0] - e.a[0],
-      ez = e.b[1] - e.a[1],
-      den = dx * ez - dz * ex;
-    if (Math.abs(den) < 1e-9) continue;
-    const ax = e.a[0] - cx,
-      az = e.a[1] - cz;
-    const t = (ax * ez - az * ex) / den,
-      u = (ax * dz - az * dx) / den;
-    if (t > 0 && u >= -1e-7 && u <= 1 + 1e-7) result = Math.min(result, t);
-  }
-  return result;
-}
+export const ringRayDistance = ringBoundaryDistance;
 
 const stadiumSource = catalogRaw.landmarks.find(
   (l) => l.id === "great-strahov-stadium",
@@ -758,11 +749,21 @@ export const STADIUM_PLAN = {
   inner: stadiumSource.innerRings[0] as P2[],
   center: { x: -286, z: 18 },
   parts: stadiumSource.parts,
-  rows: 22,
+  rows: 0,
+  interiorMode: "closed-exterior-silhouette" as const,
   upperHeight: 10,
   lowerHeight: 1.1,
   pierPitch: 7.8,
 };
+
+export const STADIUM_INTERIOR_CLOSED = true;
+export const STADIUM_CLOSED_BOUNDARY = stadiumClosureBoundary(
+  STADIUM_PLAN.outer,
+  STADIUM_PLAN.inner,
+  STADIUM_PLAN.center,
+);
+export const isClosedStadiumInterior = (position: Pick<Vec3, "x" | "z">) =>
+  pointInsideStadiumBoundary(position, STADIUM_CLOSED_BOUNDARY);
 
 const eastPavilionSource = STADIUM_PLAN.parts.find(
   (p) => p.osmId === "480849465",
@@ -782,12 +783,18 @@ export const STADIUM_EAST_PAVILION = {
     [-137.38, 65.93],
     [-137.09, 77.75],
   ] as P2[],
-  height: eastPavilionSource.height,
+  osmHeight: eastPavilionSource.height,
+  height: 24,
+  heightProvenance:
+    "IPR2023 mesh roof-band profile rounded to0.1m; OSM20m retained separately" as const,
   concourseY: 4.2,
   cantileverSoffitY: 8.4,
-  principalGlassTopY: 13.6,
-  upperGlassBottomY: 18.35,
-  upperGlassTopY: 19.55,
+  // Keep the photograph's narrow clerestory directly below the corrected
+  // roof. The strong IPR horizontal band at worldY17.6 anchors the main band;
+  // exact glazing subdivisions remain photo interpretation, not a survey.
+  principalGlassTopY: 14.4,
+  upperGlassBottomY: 22.35,
+  upperGlassTopY: 23.55,
   columnInset: 3.4,
   columnPitch: 7.8,
   glazingPitch: 2.55,
@@ -799,25 +806,15 @@ export const STADIUM_EAST_PAVILION = {
   stairRun: 0.31,
   stairLandingHalfLength: 1.8,
   confidence:
-    "OSM-footprint-and-height; source-DEM-base; photo-interpreted-structural-silhouette-and-detail" as const,
+    "OSM-footprint; IPR2023-roof-height; source-DEM-base; photo-interpreted-structural-silhouette-and-detail" as const,
 };
 
 export function distanceToStadium(position: Pick<Vec3, "x" | "z">) {
-  const inside = (points: P2[]) => {
-    let value = false;
-    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
-      const a = points[i],
-        b = points[j];
-      if (
-        a[1] > position.z !== b[1] > position.z &&
-        position.x <
-          ((b[0] - a[0]) * (position.z - a[1])) / (b[1] - a[1]) + a[0]
-      )
-        value = !value;
-    }
-    return value;
-  };
-  if (inside(STADIUM_PLAN.outer) && !inside(STADIUM_PLAN.inner)) return 0;
+  if (
+    pointInsideStadiumBoundary(position, STADIUM_PLAN.outer) &&
+    !pointInsideStadiumBoundary(position, STADIUM_PLAN.inner)
+  )
+    return 0;
   let minimum = Infinity;
   for (const points of [STADIUM_PLAN.outer, STADIUM_PLAN.inner])
     for (let i = 0; i < points.length - 1; i++) {
@@ -890,6 +887,27 @@ function eastPavilion(g: Geometry, stadiumBaseY: number) {
     lod: LandmarkPart["lod"] = "both",
   ) => {
     const v = at(s, y, out);
+    if (!collide && kind === "stadium-frame") {
+      // Keep the exact exposed front of small applied mullions/seams. Their
+      // hidden back and edge faces added cost at every LOD without changing
+      // the photographed structural silhouette or any collision.
+      const point = (u: number, yy: number): P => [
+        v.p[0] + v.tx * u + (v.nx * d) / 2,
+        v.p[1] + yy,
+        v.p[2] + v.tz * u + (v.nz * d) / 2,
+      ];
+      g.quad(
+        group,
+        kind,
+        point(-w / 2, -h / 2),
+        point(w / 2, -h / 2),
+        point(w / 2, h / 2),
+        point(-w / 2, h / 2),
+        [v.nx, 0, v.nz],
+        lod,
+      );
+      return;
+    }
     g.box(
       {
         group,
@@ -1350,106 +1368,45 @@ function eastPavilion(g: Geometry, stadiumBaseY: number) {
 }
 
 function stadium(g: Geometry, baseY: number) {
-  const { outer, inner, center, rows, upperHeight, lowerHeight } = STADIUM_PLAN;
+  const { outer, inner, upperHeight, lowerHeight } = STADIUM_PLAN;
   const outside = ring(outer),
     inside = ring(inner),
     points = [...outside, ...inside],
     triangles = earcut(points.flat(), [outside.length]);
-  type Section = { x: number; z: number; t: number };
-  const vertices = points.map(([x, z], i) => ({
-    x,
-    z,
-    t: i < outside.length ? 1 : 0,
-  }));
-  const clip = (poly: Section[], value: number, above: boolean) => {
-    const result: Section[] = [];
-    for (let i = 0; i < poly.length; i++) {
-      const a = poly[i],
-        b = poly[(i + 1) % poly.length],
-        ain = above ? a.t >= value - 1e-8 : a.t <= value + 1e-8,
-        bin = above ? b.t >= value - 1e-8 : b.t <= value + 1e-8;
-      if (ain) result.push(a);
-      if (ain !== bin) {
-        const f = (value - a.t) / (b.t - a.t);
-        result.push({
-          x: a.x + (b.x - a.x) * f,
-          z: a.z + (b.z - a.z) * f,
-          t: value,
-        });
-      }
-    }
-    return result.filter(
-      (p, i) =>
-        i === 0 ||
-        Math.hypot(p.x - result[i - 1].x, p.z - result[i - 1].z) > 1e-7,
-    );
-  };
-  const pos = (v: Section, y: number): P => [v.x, baseY + y, v.z];
-  for (let j = 0; j < triangles.length; j += 3) {
-    const triangle = triangles.slice(j, j + 3).map((i) => vertices[i]);
-    const far = triangle.map((v) =>
-      pos(v, lowerHeight + (upperHeight - lowerHeight) * v.t),
-    );
+  // Exterior-only pilot: preserve the exact mapped annulus and its notches,
+  // but use one continuous seating silhouette instead of a walkable interior.
+  // This replaces both the former 22-row near mesh and a second far mesh.
+  for (let i = 0; i < triangles.length; i += 3) {
+    const p = triangles
+      .slice(i, i + 3)
+      .map(
+        (index) =>
+          [
+            points[index][0],
+            baseY + (index < outside.length ? upperHeight : lowerHeight),
+            points[index][1],
+          ] as P,
+      );
+    const u = p[1].map((v, j) => v - p[0][j]),
+      v = p[2].map((v, j) => v - p[0][j]);
+    const n: P = [
+      u[1] * v[2] - u[2] * v[1],
+      u[2] * v[0] - u[0] * v[2],
+      u[0] * v[1] - u[1] * v[0],
+    ];
+    const length = Math.hypot(...n),
+      sign = n[1] < 0 ? -1 : 1;
     g.quad(
       "stadium",
-      "concrete",
-      far[0],
-      far[1],
-      far[2],
-      far[2],
-      [0, 1, 0],
-      "far",
+      "seat",
+      p[0],
+      p[1],
+      p[2],
+      p[2],
+      n.map((v) => (sign * v) / length) as P,
+      "both",
+      false,
     );
-    for (let i = 0; i < rows; i++) {
-      const lo = i / rows,
-        hi = (i + 1) / rows,
-        h = lowerHeight + (upperHeight - lowerHeight) * hi,
-        prev = lowerHeight + (upperHeight - lowerHeight) * lo;
-      const poly = clip(clip(triangle, lo, true), hi, false);
-      if (poly.length < 3) continue;
-      // Clip each exact annulus triangle into step bands. Radial sampling
-      // cannot preserve the bowl's re-entrant west-side notches; using the
-      // original hole polygon prevents a spurious roof over those field bays.
-      for (let k = 1; k < poly.length - 1; k++)
-        g.quad(
-          "stadium",
-          "seat",
-          pos(poly[0], h),
-          pos(poly[k], h),
-          pos(poly[k + 1], h),
-          pos(poly[k + 1], h),
-          [0, 1, 0],
-          "near",
-          true,
-          [poly[0].x / 3, poly[0].z / 3, poly[k + 1].x / 3, poly[k + 1].z / 3],
-        );
-      const cuts = poly.filter((v) => Math.abs(v.t - lo) < 1e-7);
-      if (cuts.length >= 2) {
-        const a = cuts[0],
-          b = cuts.find((v) => Math.hypot(v.x - a.x, v.z - a.z) > 1e-6);
-        if (b) {
-          const len = Math.hypot(b.x - a.x, b.z - a.z),
-            midX = (a.x + b.x) / 2,
-            midZ = (a.z + b.z) / 2,
-            n: P = [(b.z - a.z) / len, 0, -(b.x - a.x) / len];
-          if (n[0] * (midX - center.x) + n[2] * (midZ - center.z) > 0) {
-            n[0] *= -1;
-            n[2] *= -1;
-          }
-          g.quad(
-            "stadium",
-            "concrete",
-            pos(a, i === 0 ? 0 : prev),
-            pos(b, i === 0 ? 0 : prev),
-            pos(b, h),
-            pos(a, h),
-            n,
-            "near",
-            true,
-          );
-        }
-      }
-    }
   }
   for (const e of landmarkEdges(outer)) {
     if (e.length < 0.5) continue;
@@ -1462,9 +1419,7 @@ function stadium(g: Geometry, baseY: number) {
       middleZ < STADIUM_EAST_PAVILION.frontage.at(-1)![1]
     )
       continue;
-    const yaw = Math.atan2(-e.tz, e.tx),
-      cx = (e.a[0] + e.b[0]) / 2,
-      cz = (e.a[1] + e.b[1]) / 2;
+    const yaw = Math.atan2(-e.tz, e.tx);
     const box = (
       material: LandmarkMaterial,
       u: number,
@@ -1503,18 +1458,15 @@ function stadium(g: Geometry, baseY: number) {
         top = upperHeight - 2.2;
       box("concrete", u, (foot + top) / 2, -0.23, 0.48, top - foot, 0.65);
     }
-    // Shadowed open bays, not a full-height concrete wall. Actual pier gaps
-    // remain physical gaps; only visible piers/slabs are collidable.
-    void cx;
-    void cz;
+    // Keep the photographed front pier rhythm. Pilot closure panels stand
+    // behind these bays; no facade windows or doorways are invented.
   }
   // Explicit OSM part IDs retain the differing main stand heights. East is
   // horizontal glazing over concrete decks; north/south are open colonnades.
   for (const p of STADIUM_PLAN.parts.filter((p) =>
     ["480849464", "480849466"].includes(p.osmId),
   )) {
-    const isEast = p.osmId === "480849465",
-      edges = landmarkEdges(p.points as P2[]),
+    const edges = landmarkEdges(p.points as P2[]),
       h = p.height;
     for (const e of edges) {
       const point = (u: number, y: number, out = 0): P => [
@@ -1542,27 +1494,8 @@ function stadium(g: Geometry, baseY: number) {
           solid,
           [0, 0, e.length / 3, hh / 3],
         );
-      face("concrete", h - (isEast ? 1.55 : 1.05), isEast ? 1.55 : 1.05);
-      if (isEast) {
-        for (const y of [8.6, 12.25, 15.9]) {
-          face("glass", y, 2.55, 0.018);
-          face("concrete", y - 1.1, 1.1, 0.13);
-          const n = Math.ceil(e.length / 2.65);
-          for (let i = 0; i <= n; i++) {
-            const u = (e.length * i) / n;
-            g.quad(
-              "stadium",
-              "metal",
-              point(u - 0.022, y, 0.045),
-              point(u + 0.022, y, 0.045),
-              point(u + 0.022, y + 2.55, 0.045),
-              point(u - 0.022, y + 2.55, 0.045),
-              [e.nx, 0, e.nz],
-              "near",
-            );
-          }
-        }
-      } else {
+      face("concrete", h - 1.05, 1.05);
+      {
         const n = Math.ceil(e.length / 7.8),
           yaw = Math.atan2(-e.tz, e.tx);
         for (let i = 0; i <= n; i++)
@@ -1582,11 +1515,83 @@ function stadium(g: Geometry, baseY: number) {
     }
     g.roof("stadium", p.points as P2[], baseY + h, g.collision);
     g.roof("stadium", p.points as P2[], baseY + h - 0.45, g.collision, false);
-    if (isEast)
-      g.roof("stadium", p.points as P2[], baseY + 7.5, g.collision, false);
   }
   const east = eastPavilion(g, baseY);
-  return { baseY, samples: points.length, rows, east };
+  const offset = baseY - buildingBaseHeight(outer);
+  const tower = STADIUM_PLAN.parts.find((p) => p.osmId === "456174850")!;
+  const towerBase = buildingBaseHeight(tower.points as P2[]) + offset;
+  // The mapped southern marathon tower is a major photographed silhouette,
+  // previously omitted. No speculative windows, stairs or interior are added.
+  for (const e of landmarkEdges(tower.points as P2[]))
+    g.quad(
+      "stadium",
+      "brick",
+      [e.a[0], towerBase, e.a[1]],
+      [e.b[0], towerBase, e.b[1]],
+      [e.b[0], towerBase + tower.height, e.b[1]],
+      [e.a[0], towerBase + tower.height, e.a[1]],
+      [e.nx, 0, e.nz],
+      "both",
+      true,
+    );
+  g.roof(
+    "stadium",
+    tower.points as P2[],
+    towerBase + tower.height,
+    g.collision,
+  );
+  const access = stadiumClosurePanels(
+    outer,
+    inner,
+    STADIUM_PLAN.center,
+    offset,
+    east.baseY + STADIUM_EAST_PAVILION.cantileverSoffitY - 0.05,
+  );
+  const closurePart = g.part("stadium", "stadium-soffit"),
+    closureIndexStart = closurePart.indices.length;
+  for (const panel of access.panels) {
+    const tx = Math.cos(panel.yaw),
+      tz = -Math.sin(panel.yaw),
+      sign =
+        (panel.x - STADIUM_PLAN.center.x) * tz -
+          (panel.z - STADIUM_PLAN.center.z) * tx >=
+        0
+          ? 1
+          : -1;
+    const point = (u: number, y: number): P => [
+      panel.x + tx * u,
+      y,
+      panel.z + tz * u,
+    ];
+    g.quad(
+      "stadium",
+      "stadium-soffit",
+      point(-panel.w / 2, panel.bottom),
+      point(panel.w / 2, panel.bottom),
+      point(panel.w / 2, panel.top),
+      point(-panel.w / 2, panel.top),
+      [tz * sign, 0, -tx * sign],
+      "both",
+      g.twoSidedExteriorCollision,
+    );
+  }
+  return {
+    baseY,
+    samples: points.length,
+    rows: 0,
+    east,
+    access: {
+      ...access,
+      renderIndexStart: closureIndexStart,
+      renderIndexCount: closurePart.indices.length - closureIndexStart,
+    },
+    tower: {
+      osmId: tower.osmId,
+      baseY: towerBase,
+      height: tower.height,
+      source: tower.source,
+    },
+  };
 }
 
 export function buildLandmarkPlan(
@@ -1611,6 +1616,7 @@ export function buildLandmarkPlan(
     parts: [...geometry.parts.values()],
     collision: geometry.collision,
     twoSidedRoofCollision: geometry.twoSidedRoofCollision,
+    twoSidedExteriorCollision: geometry.twoSidedExteriorCollision,
     boxes: geometry.boxes,
     entrances: entranceRows,
     b1Roof,

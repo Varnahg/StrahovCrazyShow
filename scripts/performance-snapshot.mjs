@@ -12,7 +12,7 @@ import {
   realpath,
 } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { resolve, join, sep } from "node:path";
+import { resolve, join, sep, dirname } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const name =
@@ -30,6 +30,9 @@ const entries = [
   "assets",
   "scripts",
   "tests",
+  // Static serialized source used by the stadium archive regression. Evolving
+  // verification reports and the remaining documentation stay outside runtime.
+  "docs/reality-pack/landmarks/geometry-source.json",
   "index.html",
   "package.json",
   "pnpm-lock.yaml",
@@ -125,15 +128,16 @@ if (reuseName) {
   };
 }
 await Promise.all(
-  entries.map((entry) =>
-    cp(join(root, entry), join(target, entry), {
+  entries.map(async (entry) => {
+    await mkdir(dirname(join(target, entry)), { recursive: true });
+    return cp(join(root, entry), join(target, entry), {
       recursive: true,
       filter: (source) =>
         !generatedArtifact(source) &&
         (!referenceReuse ||
           source !== join(root, "public/models/photogrammetry")),
-    }),
-  ),
+    });
+  }),
 );
 if (referenceReuse)
   await symlink(

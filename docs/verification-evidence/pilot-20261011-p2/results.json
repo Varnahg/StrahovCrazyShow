@@ -1,0 +1,101 @@
+{
+  "status": "passed",
+  "failureReasons": [],
+  "scope": "Technical checkpoint P2: finalized tests, production build including TypeScript, isolated integration and subsequent independent live/frozen SHA audit. No GPU/FPS acceptance is implied.",
+  "sourceSnapshotId": "2ed46d650365578ae1444220d3ae47bc546158190ff203fde2ce3e23a747a0cd",
+  "files": 8173,
+  "tests": {
+    "total": 469,
+    "passed": 469,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "startedAt": "2026-10-11T19:29:25.2363121Z",
+  "finishedAt": "2026-10-11T19:31:48.7139401Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 77.3702425,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 44.7459616,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 21.2950244,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "missingStages": [],
+  "failedStages": [],
+  "sourceCheck": "source-check.json",
+  "pipeline": "pipeline-results.json",
+  "publishedSha256": {
+    "source-manifest.json": "a2b0666d6025d97fd1cb1f4738be6c732f291406c210ad54df5ee0d578daac8e",
+    "pipeline-results.json": "e18d8d11b714f250c01ee006604b46e0133680c74e5fa5ff90c3dc4984300fa7",
+    "pipeline-test.log": "7ecac46363e13c9b4ddaeb5ec1739c1646b31ff2a29509d1d3dcf0dad9e937d8",
+    "pipeline-build.log": "2613458b91b806950fdf7dade55499696293723dfa7ab2158d92cd81b4e97010",
+    "pipeline-test-integration.log": "e3c898b2698d075a1c82f0380c7a0871d06b99e825e5a1a3822d50a6008ee28a",
+    "audit-live-frozen.mjs.txt": "5cd2e1f2273a4f547814d47d1ef32007f665c5221e82ecb4fbc295289087d080",
+    "integration-evidence.json": "5ea31ee0ac09fe9bdd951ddd7254b674c3b0125f87b9e607502f486a10a05362",
+    "integration-respawn-evidence.json": "543c8ef6fe3bbe55c40dbdadb145830767c544ff617ef844c3ccc7bf5867dfc9",
+    "locomotion-baseline-o2.ts.txt": "6d78ce2c25ad9ce2d5d1b69a8ce136c3df77d2b2bba539fc761a33d8b0e652cb",
+    "locomotion-eli-medium.png": "e791fe0f0c3a3fcef6897d9db893b87733e73d8fc016bd8dbe7323684bf3ab83",
+    "locomotion-harness.html.txt": "a871442a23432a348c91e357a905c4cca80c078d82177f433ae11006cf70ad3c",
+    "locomotion-harness.ts.txt": "adc9459130dbc9849ebdf6afd0b3abef569ef249041b9c4e3b44bffdbf7e6f87",
+    "locomotion-pulse.png": "559c2fcefd995c66068df6377b888692ff1d969d3876d507904373ff9c0b76d6",
+    "locomotion-visual.json": "9e5cd1b1e643b34fc13bac1055cd33beaaf9288dc6c20c68e97e3b0e1214eedb",
+    "production-flashlight-first-person.png": "df9c1e63645bcce8e99d75a5154f80dc2dd7e71f65a263a6fe8345191f25ddea",
+    "production-flashlight-third-person.png": "3aae4a0779705c9470146343da53108832d571b9171c3b41bca886cd14932583",
+    "production-hud-day.png": "9e38f99ee42ab2ed48783b18eacb04124aff9f745e7cd6e900a01d35178d2f0d",
+    "production-journal-en.png": "90c370c9baaedfcf01f47dbd674e5d21b0e19066bb13f64287c720acf227bc86",
+    "production-map-route.png": "ac063f59b87ae75fe1efd2a276db6987a10bc261c7e0b2a5562ed3f281ca0cba",
+    "production-ui.json": "f4cb35eb1e49a6426ddd2d4b49647cced401295aa3d7068c64e0ed5a564d874e",
+    "source-check.json": "5313e3a14e89737fcc9751542e77067d10ae0693eeff90161996f9f40ec7a3d6",
+    "stadium-aerial.png": "ed8680ca590e04003f4914fc35e9e6d0c3691f817edbb01c6048cd73e6d8e348",
+    "stadium-closure.png": "193553f29c1a87c3622ea8a692570ca8ae63472658093b7a8801d3214e35baec",
+    "stadium-harness.html.txt": "404062ec4adec19d6b431378e86fe3809ff106b5201a541a9bc4199986770eef",
+    "stadium-harness.ts.txt": "08d3a095048279a23d73b3ba788e88cd67bca08d185e38bc05f6c4070fe1eb8c",
+    "stadium-south.png": "8bba90c17ea68912a59f518048870c1faad4f4e6f469eb50cb822282bb2c5c9c",
+    "stadium-visual.json": "e1abc7c3dd6527b212462356c608b5564e479bd05ff29633cc09a80526207483"
+  },
+  "archiveErrors": [],
+  "gpu": {
+    "status": "pending",
+    "note": "No matched full-production GeForce/FPS result for P2 is archived here. Separate GPU visual/component QA may be attached later by the coordinating root; it must not be reported as an FPS benchmark."
+  },
+  "notes": [
+    "Raw logs retain any warnings and integration diagnostics; status is derived from actual final stage exit codes, final test summary and source audit.",
+    "Documentation can change independently because it is excluded from the source snapshot hash.",
+    "Technical tests/build/integration passed. P2 visual review found the two explicitly listed corrections; a later checkpoint verifies them."
+  ],
+  "visualQa": {
+    "status": "two-visual-corrections-required",
+    "production": "production-ui.json",
+    "stadium": "stadium-visual.json",
+    "locomotion": "locomotion-visual.json",
+    "scope": "Actual production HUD/multiplayer plus separate actual renderer/rig views. Not an FPS benchmark.",
+    "requiredCorrections": [
+      "DEMO badge contrast",
+      "player torch angular falloff"
+    ],
+    "passed": [
+      "CZ/EN in current game and unchanged nickname",
+      "Map destination and persistent minimap route",
+      "Actual WASD walk to custom destination",
+      "Modal F guard, Escape and Tab trapping",
+      "English journal search/article",
+      "Torch on/off, third-person and first-person rendering",
+      "Stadium source-comparison views and visible closure",
+      "Locomotion pulse and Eli medium running; no shader/texture errors"
+    ]
+  }
+}

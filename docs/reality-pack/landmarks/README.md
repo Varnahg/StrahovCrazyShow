@@ -1,5 +1,7 @@
 # Blok 1, společné vstupy a Velký strahovský stadion
 
+**Aktuální pilot 11. 10. 2026:** stadion je podle zadání uživatele [exteriérem s fyzicky uzavřeným vnitřkem](stadium-exterior-20261011.md). Jeho výška a silueta byly upřesněny z IPR/OSM, obnovená je jižní věž a otevřené hřiště zůstává bez střešního capu. Historické výsledky průchozího pavilonu níže popisují předchozí model; nejde o současný přístupový režim.
+
 Balík nahrazuje původní třímetrovou hmotu B1 a souvislé stěny stadionu. Zachovává původní půdorysy. `shared/landmark-reality.ts` vytváří jedinou geometrii pro Babylon a Rapier; `client/landmark-reality.ts` ji dávkuje podle materiálů a přepíná detaily podle sdíleného `renderBudget`.
 
 Východní stadionový pavilon nyní opravuje [navazující model podle tří uživatelských fotografií](stadium-photo-correction.md): vykonzolovaný prosklený objem, široký betonový pás, otevřené přízemí, nižší plechový ochoz a fyzicky průchozí betonová ramena. Je to vlastní model podle fotografických předloh, nikoli fotogrammetrie. Zdrojový plný model předchází samostatné vzdálené geometrii.

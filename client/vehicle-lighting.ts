@@ -14,8 +14,13 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import manifest from "../shared/data/assets/vehicles-manifest.json";
 import { installStaticSubmeshShadowCull } from "./static-submesh-shadows";
 
-/** A bounded combined low beam for the one shared drivable vehicle. Lens glow
- * remains per model. These artistic units are not measured vehicle photometry.
+type BeamQuality = "low" | "medium" | "high";
+const shadowMapSize = (quality: BeamQuality) =>
+  quality === "high" ? 512 : quality === "medium" ? 256 : 128;
+
+/** Bounded spotlight and shared shadow lifecycle for the car or local torch.
+ * These artistic units are not measured photometry. Only one is used by the
+ * local player at a time; parked cars and remote avatars do not add spotlights.
  */
 export class VehicleLighting {
   readonly light: SpotLight;
@@ -31,33 +36,41 @@ export class VehicleLighting {
   private wrappers = new Map<ShaderMaterial, ShadowDepthWrapper>();
   private disposed = false;
   private customRenderList: RenderTargetTexture["getCustomRenderList"] = null;
-  constructor(private scene: Scene) {
+  constructor(
+    private scene: Scene,
+    private readonly kind: "vehicle" | "player" = "vehicle",
+  ) {
     for (const point of manifest.lights.frontCentres)
       this.origin.addInPlace(Vector3.FromArray(point));
     this.origin.scaleInPlace(1 / manifest.lights.frontCentres.length);
     this.origin.z += 0.025;
     this.light = new SpotLight(
-      "shared car · simulated low beam",
+      kind === "vehicle"
+        ? "shared car · simulated low beam"
+        : "local player · flashlight",
       Vector3.Zero(),
       Vector3.Forward(),
-      0.8,
-      2,
+      kind === "vehicle" ? 0.8 : 0.72,
+      // Standard attenuation has a hard outer cutoff. A narrow smooth core
+      // fades the torch to <2% before that edge; preserve the car's low beam.
+      kind === "vehicle" ? 2 : 64,
       scene,
     );
     this.light.diffuse = Color3.FromHexString("#fff2d4");
     this.light.falloffType = Light.FALLOFF_STANDARD;
-    this.light.range = 32;
+    this.light.range = kind === "vehicle" ? 32 : 24;
     this.light.renderPriority = 10;
     this.light.intensity = 0;
     this.light.setEnabled(false);
     this.light.shadowEnabled = false;
     this.light.shadowMinZ = 0.1;
-    this.light.shadowMaxZ = 32;
+    this.light.shadowMaxZ = this.light.range;
     this.light.metadata = {
-      simulatedVehicleLight: true,
-      assetId: manifest.assetId,
+      simulatedVehicleLight: kind === "vehicle",
+      assetId: kind === "vehicle" ? manifest.assetId : undefined,
       intensityUnits: "artist units, not measured luminous flux",
-      combinedHeadlamps: true,
+      combinedHeadlamps: kind === "vehicle",
+      localFlashlight: kind === "player",
     };
   }
   update(
@@ -66,31 +79,56 @@ export class VehicleLighting {
     driving: boolean,
     quality = "medium",
   ) {
+    if (!this.disposed && driving && night > 0.1) {
+      const world = root.computeWorldMatrix(true);
+      Vector3.TransformCoordinatesToRef(
+        this.origin,
+        world,
+        this.light.position,
+      );
+      Vector3.TransformNormalToRef(this.direction, world, this.light.direction);
+      this.light.direction.normalize();
+    }
+    this.updateBeam(night, driving, quality);
+  }
+  /** Already computed socket/camera pose: no temporary transform node or matrix. */
+  updateFromPose(
+    position: Vector3,
+    direction: Vector3,
+    enabled: boolean,
+    quality = "medium",
+  ) {
+    if (!this.disposed && enabled) {
+      this.light.position.copyFrom(position);
+      this.light.direction.copyFrom(direction).normalize();
+    }
+    this.updateBeam(1, enabled, quality);
+  }
+  private updateBeam(night: number, driving: boolean, quality: string) {
     if (this.disposed) return;
     const strength = Number.isFinite(night)
       ? Math.max(0, Math.min(1, night))
       : 0;
-    const resolvedQuality =
+    const resolvedQuality: BeamQuality =
       quality === "high" ? "high" : quality === "medium" ? "medium" : "low";
     const active = driving && strength > 0.1;
     if (this.light.isEnabled(false) !== active) this.light.setEnabled(active);
     this.light.intensity = active ? strength * 1.6 : 0;
-    this.light.shadowEnabled = active && resolvedQuality !== "low";
+    // The close-range torch retains a small occlusion map on low. Disabled
+    // lights/maps are omitted by Babylon's shadow render-target collector.
+    this.light.shadowEnabled =
+      active && (this.kind === "player" || resolvedQuality !== "low");
     if (!active) {
       this.lastSelection = -Infinity;
       return;
     }
-    const world = root.computeWorldMatrix(true);
-    Vector3.TransformCoordinatesToRef(this.origin, world, this.light.position);
-    Vector3.TransformNormalToRef(this.direction, world, this.light.direction);
-    this.light.direction.normalize();
     if (!this.light.shadowEnabled) {
       this.lastSelection = -Infinity;
       return;
     }
     if (!this.shadow) {
       this.shadow = new ShadowGenerator(
-        resolvedQuality === "high" ? 512 : 256,
+        shadowMapSize(resolvedQuality),
         this.light,
       );
       installStaticSubmeshShadowCull(
@@ -155,7 +193,7 @@ export class VehicleLighting {
     }
     const now = performance.now();
     if (resolvedQuality !== this.shadowQuality) {
-      this.shadow.mapSize = resolvedQuality === "high" ? 512 : 256;
+      this.shadow.mapSize = shadowMapSize(resolvedQuality);
       this.shadowQuality = resolvedQuality;
       this.lastSelection = -Infinity;
     }
@@ -186,7 +224,7 @@ export class VehicleLighting {
         return (
           Vector3.Distance(sphere.centerWorld, this.light.position) -
             sphere.radiusWorld <
-          36
+          this.light.range + 4
         );
       });
     }

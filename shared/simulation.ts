@@ -117,7 +117,12 @@ export class Simulation {
             ),
           );
         if (plan.twoSidedRoofCollision.indices.length)
-          this.createRoofCollider(plan.twoSidedRoofCollision);
+          this.createTwoSidedSurfaceCollider(plan.twoSidedRoofCollision);
+        if (
+          "twoSidedExteriorCollision" in plan &&
+          plan.twoSidedExteriorCollision.indices.length
+        )
+          this.createTwoSidedSurfaceCollider(plan.twoSidedExteriorCollision);
       }
       for (const b of BUILDINGS) {
         if (b.name.endsWith("blok 6")) continue;
@@ -142,7 +147,10 @@ export class Simulation {
         }
         const roof = buildingRoofGeometry(b, baseY);
         if (roof?.indices.length)
-          this.buildingRoofColliders.set(b.id, this.createRoofCollider(roof));
+          this.buildingRoofColliders.set(
+            b.id,
+            this.createTwoSidedSurfaceCollider(roof),
+          );
       }
     }
     for (const b of B6_BOXES)
@@ -234,9 +242,12 @@ export class Simulation {
         rail(x, z, Math.min(BOUNDS.maxX + 1, x + 10), z);
     stepRigidWorld(this.world);
   }
-  private createRoofCollider(data: { positions: number[]; indices: number[] }) {
-    // A roof is a surface, not a closed solid: retain contacts from below
-    // without inventing thickness or duplicate faces.
+  private createTwoSidedSurfaceCollider(data: {
+    positions: number[];
+    indices: number[];
+  }) {
+    // Roofs and visible closure panels are surfaces, not closed solids:
+    // retain contacts from both sides without inventing duplicate faces.
     return this.world.createCollider(
       RAPIER.ColliderDesc.trimesh(
         new Float32Array(data.positions),

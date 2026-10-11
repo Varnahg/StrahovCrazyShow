@@ -102,7 +102,8 @@ test("stadium ray sections retain the mapped open bowl with exterior beyond the 
     assert.ok(Number.isFinite(inner) && Number.isFinite(outer));
     assert.ok(outer > inner + 8);
   }
-  assert.equal(plan.stadium.rows, 22);
+  assert.equal(plan.stadium.rows, 0);
+  assert.equal(STADIUM_PLAN.interiorMode, "closed-exterior-silhouette");
   assert.ok(
     plan.parts.some(
       (p) => p.group === "stadium" && p.material === "stadium-glass",
