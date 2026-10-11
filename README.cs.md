@@ -41,7 +41,7 @@ pnpm dev
 
 Pokud `pnpm` ještě nemáš, nainstaluj jej po instalaci Node.js pomocí `npm install --global pnpm@11.25.0`. Pokud už pracuješ v tomto naklonovaném projektu, začni příkazem `git lfs pull`. GitHub ZIP není náhradou úplného klonu s LFS modely.
 
-Nový klon standardně otevře `main`/L2. Popsané novější pilotní změny vyžadují checkout pracovní větve `codex/pilot-visuals-client-performance`, pokud ji máš ve svém klonu dostupnou; samotné klonování výchozí větve je nezahrnuje.
+Výchozí větev `main` obsahuje ověřený pilot P5 i všechny předchozí sloučené funkce. Pro aktuální testování používej `main`. Fotografická tráva a oprava vzdáleného lemu auta se připravují v oddělené pracovní kopii a nejsou součástí P5. Připravený místní produkční náhled používá **4179** podle odkazu výše; `pnpm dev` spouští samostatnou vývojovou instanci na **5173**.
 
 Otevři [http://127.0.0.1:5173/](http://127.0.0.1:5173/). Vite obsluhuje klienta na **5173**, Colyseus/API server běží na **2567**. Klient používá Vite proxy `/api` a `/realtime`; server je v této etapě vázaný na místní počítač.
 
