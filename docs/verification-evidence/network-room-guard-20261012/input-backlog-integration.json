@@ -1,0 +1,39 @@
+{
+  "completed": true,
+  "protocol": 8,
+  "endpoint": "http://127.0.0.1:2568",
+  "firstRecoveryAck": 16,
+  "firstRecoveryMs": 2.8461000000000354,
+  "firstBurstDisplacementX": 0,
+  "steadyLagCommandsP95": 3,
+  "steadySamples": 50,
+  "unaffectedPeerResyncs": 0,
+  "backlogRecoveries": [
+    {
+      "time": 1791788745428,
+      "tick": 1190,
+      "ack": 16,
+      "reason": "input-backlog"
+    },
+    {
+      "time": 1791788748189,
+      "tick": 1356,
+      "ack": 183,
+      "reason": "input-backlog"
+    },
+    {
+      "time": 1791788749200,
+      "tick": 1417,
+      "ack": 259,
+      "reason": "input-backlog"
+    }
+  ],
+  "checks": [
+    "received frontier acknowledged explicitly",
+    "no accelerated movement",
+    "continued 60Hz returns to normal lag",
+    "other player unaffected",
+    "invalid input preserves strict sequence",
+    "recovery rate bounded"
+  ]
+}

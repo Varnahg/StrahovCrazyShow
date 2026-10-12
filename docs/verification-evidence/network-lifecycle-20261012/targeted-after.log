@@ -1,0 +1,31 @@
+✔ keyframes and moving deltas reconstruct every player within presentation quantization bounds (29.3518ms)
+✔ stationary deltas still advance every player and retain optional grounded and exact acknowledgments (0.4579ms)
+✔ fresh targeted join keyframe cannot poison global baseline when transforms revert before broadcast (0.3259ms)
+✔ explicit removals and complete roster keyframes cannot leave ghosts; handles are not reused (0.3443ms)
+✔ a gap waits for periodic full state, ignores replay, and a new session must reset (0.359ms)
+✔ malformed packets fail atomically without corrupting the previous dictionary or vehicle state (0.6682ms)
+✔ input, wire, and decoded objects have independent ownership; unchanged car remains lossless (0.5887ms)
+✔ invalid application rows are rejected before changing encoder sequence or baseline (0.6238ms)
+✔ actual Colyseus binary frames reduce a mixed 100-player replay including periodic keyframes (70.1555ms)
+✔ every current room UI subscription still applies its message (4.0113ms)
+✔ leave invalidates before the handshake and all retained callbacks remain inert in menu/guest (1.4099ms)
+✔ replaced room cannot alter the current session, emit notices/rewards, or request motion recovery (1.6251ms)
+✔ current onLeave disconnects once and ignores subsequent retained messages and errors (1.1166ms)
+✔ a current multiplayer entry commits identity and token only after its join succeeds (7.0848ms)
+✔ leave then guest cancels a pending session fetch without reading its body or joining (1.0739ms)
+✔ direct guest entry cancels an in-flight session body before identity or join mutation (2.17ms)
+✔ a join resolving after leave and guest entry closes its room without rebinding or effects (2.0622ms)
+✔ the newest overlapping connection wins and a late older join cannot replace it (1.8193ms)
+✔ an accepted replacement invalidates old callbacks before closing the previous live room (1.7636ms)
+✔ enter cannot restore multiplayer when leave/guest runs between connect and enter continuations (1.8647ms)
+✔ a rejected close remains harmless after explicit leave or a cancelled join (1.8745ms)
+✔ cancelled fetch/json/join rejections cannot display an entry error or reconnect notice (5.2179ms)
+✔ current connection failures still reach entry and reconnect feedback (1.4693ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1266.4759

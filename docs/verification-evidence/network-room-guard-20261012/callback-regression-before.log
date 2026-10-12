@@ -1,0 +1,115 @@
+✓ Lockfile passes supply-chain policies (verified 18h ago)
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 1.2s using pnpm v11.25.0
+✔ every current room UI subscription still applies its message (8.5905ms)
+✖ leave invalidates before the handshake and all retained callbacks remain inert in menu/guest (5.2441ms)
+✖ replaced room cannot alter the current session, emit notices/rewards, or request motion recovery (3.1879ms)
+✖ current onLeave disconnects once and ignores subsequent retained messages and errors (2.5352ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2047.8026
+
+✖ failing tests:
+
+test at .cache\room-callbacks-before.test.ts:217:1
+✖ leave invalidates before the handshake and all retained callbacks remain inert in menu/guest (5.2441ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + FakeRoom {
+  +   duringLeave: [Function (anonymous)],
+  +   errorListeners: [
+  +     [Function (anonymous)]
+  +   ],
+  +   leaveListeners: [
+  +     [Function (anonymous)]
+  +   ],
+  +   messages: Map(12) {
+  +     'activity' => [Function (anonymous)],
+  +     'authoritative' => [Function (anonymous)],
+  +     'car' => [Function (anonymous)],
+  +     'chat' => [Function (anonymous)],
+  +     'emote' => [Function (anonymous)],
+  +     'events' => [Function (anonymous)],
+  +     'motion' => [Function (anonymous)],
+  +     'notice' => [Function: notice],
+  +     'presence' => [Function (anonymous)],
+  +     'reward' => [Function: reward],
+  +     'social' => [Function (anonymous)],
+  +     'welcome' => [Function (anonymous)]
+  +   },
+  +   resolveLeave: undefined,
+  +   sent: []
+  + }
+  - null
+  
+      at FakeRoom.room.duringLeave (C:\Users\rezac\.codex\worktrees\network-state-hud\StrahovCrazyShow\.cache\room-callbacks-before.test.ts:223:12)
+      at FakeRoom.leave (C:\Users\rezac\.codex\worktrees\network-state-hud\StrahovCrazyShow\.cache\room-callbacks-before.test.ts:68:10)
+      at Object.leave (evalmachine.<anonymous>:112:19)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\network-state-hud\StrahovCrazyShow\.cache\room-callbacks-before.test.ts:235:6)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [FakeRoom],
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at .cache\room-callbacks-before.test.ts:256:1
+✖ replaced room cannot alter the current session, emit notices/rewards, or request motion recovery (3.1879ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '{"state":{"messages":[{"id":"message","text":"multiplayer chat"},{"id":"message","text":"multiplayer chat"}],"connected":true,"selfId":"new-self","game.setLocalId":["new-self"],"players":[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}],"events":[{"id":"private-event"}],"activity":{"hunt":["found-marker"]},"game.updatePlayers":[[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]],"game.syncMotion":[{"time":1000,"tick":1,"rows":[["self",5,2,3,0.1,1,0,0,"outside",true]]}],"game.reconcile":[{"ack":1,"x":5,"y":2,"z":3}],"social":{"contacts":["friend"],"requests":[],"blocked":[],"attendance":[]},"game.setFound":[["found-marker"]],"notice":"socket error","reward":"multiplayer reward","game.setCar":[{"id":"campus-car"}],"game.setEmote":["self","wave"]},"effects":["setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers","setPlayers","game.updatePlayers","game.syncMotion","game.reconcile","setEvents","setSocial","setActivity","game.setFound","notice","reward","game.setCar","setMessages","game.setEmote","setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers","setEvents","setSocial","setActivity","game.setFound","notice","reward","setMessages","game.setEmote","notice"],"refs":{"connectedRef":{"current":true},"inputBuffer":{"current":["pending input"]},"authorityRef":{"current":{"ack":1,"x":5,"y":2,"z":3}},"playersRef":{"current":[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]},"playersById":{"current":{}},"carState":{"current":{"id":"campus-car"}},"idRef":{"current":"new-self"},"modeRef":{"current":"multi"}},"players":[["new-self",{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]],"canvas":{"dataset":{"networkStage":"connected"}}}'
+  - '{"state":{"messages":[{"id":"message","text":"multiplayer chat"}],"connected":true,"selfId":"new-self","game.setLocalId":["new-self"],"players":[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}],"events":[],"activity":{"hunt":[]},"game.updatePlayers":[[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]],"game.syncMotion":[{"time":1000,"tick":1,"rows":[["self",5,2,3,0.1,1,0,0,"outside",true]]}],"game.reconcile":[{"ack":1,"x":5,"y":2,"z":3}],"social":{"contacts":["friend"],"requests":[],"blocked":[],"attendance":[]},"game.setFound":[["found-marker"]],"notice":"multiplayer notice","reward":"multiplayer reward","game.setCar":[{"id":"campus-car"}],"game.setEmote":["self","wave"]},"effects":["setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers","setPlayers","game.updatePlayers","game.syncMotion","game.reconcile","setEvents","setSocial","setActivity","game.setFound","notice","reward","game.setCar","setMessages","game.setEmote","setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers"],"refs":{"connectedRef":{"current":true},"inputBuffer":{"current":["pending input"]},"authorityRef":{"current":{"ack":1,"x":5,"y":2,"z":3}},"playersRef":{"current":[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]},"playersById":{"current":{}},"carState":{"current":{"id":"campus-car"}},"idRef":{"current":"new-self"},"modeRef":{"current":"multi"}},"players":[["new-self",{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]],"canvas":{"dataset":{"networkStage":"connected"}}}'
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\network-state-hud\StrahovCrazyShow\.cache\room-callbacks-before.test.ts:269:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '{"state":{"messages":[{"id":"message","text":"multiplayer chat"},{"id":"message","text":"multiplayer chat"}],"connected":true,"selfId":"new-self","game.setLocalId":["new-self"],"players":[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}],"events":[{"id":"private-event"}],"activity":{"hunt":["found-marker"]},"game.updatePlayers":[[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]],"game.syncMotion":[{"time":1000,"tick":1,"rows":[["self",5,2,3,0.1,1,0,0,"outside",true]]}],"game.reconcile":[{"ack":1,"x":5,"y":2,"z":3}],"social":{"contacts":["friend"],"requests":[],"blocked":[],"attendance":[]},"game.setFound":[["found-marker"]],"notice":"socket error","reward":"multiplayer reward","game.setCar":[{"id":"campus-car"}],"game.setEmote":["self","wave"]},"effects":["setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers","setPlayers","game.updatePlayers","game.syncMotion","game.reconcile","setEvents","setSocial","setActivity","game.setFound","notice","reward","game.setCar","setMessages","game.setEmote","setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers","setEvents","setSocial","setActivity","game.setFound","notice","reward","setMessages","game.setEmote","notice"],"refs":{"connectedRef":{"current":true},"inputBuffer":{"current":["pending input"]},"authorityRef":{"current":{"ack":1,"x":5,"y":2,"z":3}},"playersRef":{"current":[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]},"playersById":{"current":{}},"carState":{"current":{"id":"campus-car"}},"idRef":{"current":"new-self"},"modeRef":{"current":"multi"}},"players":[["new-self",{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]],"canvas":{"dataset":{"networkStage":"connected"}}}',
+    expected: '{"state":{"messages":[{"id":"message","text":"multiplayer chat"}],"connected":true,"selfId":"new-self","game.setLocalId":["new-self"],"players":[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}],"events":[],"activity":{"hunt":[]},"game.updatePlayers":[[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]],"game.syncMotion":[{"time":1000,"tick":1,"rows":[["self",5,2,3,0.1,1,0,0,"outside",true]]}],"game.reconcile":[{"ack":1,"x":5,"y":2,"z":3}],"social":{"contacts":["friend"],"requests":[],"blocked":[],"attendance":[]},"game.setFound":[["found-marker"]],"notice":"multiplayer notice","reward":"multiplayer reward","game.setCar":[{"id":"campus-car"}],"game.setEmote":["self","wave"]},"effects":["setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers","setPlayers","game.updatePlayers","game.syncMotion","game.reconcile","setEvents","setSocial","setActivity","game.setFound","notice","reward","game.setCar","setMessages","game.setEmote","setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers"],"refs":{"connectedRef":{"current":true},"inputBuffer":{"current":["pending input"]},"authorityRef":{"current":{"ack":1,"x":5,"y":2,"z":3}},"playersRef":{"current":[{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]},"playersById":{"current":{}},"carState":{"current":{"id":"campus-car"}},"idRef":{"current":"new-self"},"modeRef":{"current":"multi"}},"players":[["new-self",{"id":"new-self","x":1,"y":2,"z":3,"emote":""}]],"canvas":{"dataset":{"networkStage":"connected"}}}',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at .cache\room-callbacks-before.test.ts:282:1
+✖ current onLeave disconnects once and ignores subsequent retained messages and errors (2.5352ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '{"state":{"messages":[{"id":"message","text":"multiplayer chat"},{"id":"message","text":"multiplayer chat"}],"connected":false,"selfId":"self","game.setLocalId":["self"],"players":[],"events":[{"id":"private-event"}],"activity":{"hunt":["found-marker"]},"game.updatePlayers":[[{"id":"self"}]],"game.syncMotion":[{"time":1000,"tick":1,"rows":[["self",5,2,3,0.1,1,0,0,"outside",true]]}],"game.reconcile":[{"ack":1,"x":5,"y":2,"z":3}],"social":{"contacts":["friend"],"requests":[],"blocked":[],"attendance":[]},"game.setFound":[["found-marker"]],"notice":"socket error","reward":"multiplayer reward","game.setCar":[{"id":"campus-car"}],"game.setEmote":["self","wave"],"worldSelection":null,"game.cancelRespawn":[],"game.selectTarget":[null]},"effects":["setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers","setPlayers","game.updatePlayers","game.syncMotion","game.reconcile","setEvents","setSocial","setActivity","game.setFound","notice","reward","game.setCar","setMessages","game.setEmote","setPlayers","setWorldSelection","game.cancelRespawn","game.selectTarget","game.updatePlayers","setConnected","notice","setEvents","setSocial","setActivity","game.setFound","notice","reward","setMessages","game.setEmote","notice"],"refs":{"connectedRef":{"current":false},"inputBuffer":{"current":[]},"authorityRef":{"current":null},"playersRef":{"current":[]},"playersById":{"current":{}},"carState":{"current":{"id":"campus-car"}},"idRef":{"current":"self"},"modeRef":{"current":"multi"}},"players":[],"canvas":{"dataset":{"networkStage":"disconnected:1000"}}}'
+  - '{"state":{"messages":[{"id":"message","text":"multiplayer chat"}],"connected":false,"selfId":"self","game.setLocalId":["self"],"players":[],"events":[{"id":"private-event"}],"activity":{"hunt":["found-marker"]},"game.updatePlayers":[[{"id":"self"}]],"game.syncMotion":[{"time":1000,"tick":1,"rows":[["self",5,2,3,0.1,1,0,0,"outside",true]]}],"game.reconcile":[{"ack":1,"x":5,"y":2,"z":3}],"social":{"contacts":["friend"],"requests":[],"blocked":[],"attendance":[]},"game.setFound":[["found-marker"]],"notice":"Spojení přerušeno. Použij Obnovit spojení.","reward":"multiplayer reward","game.setCar":[{"id":"campus-car"}],"game.setEmote":["self","wave"],"worldSelection":null,"game.cancelRespawn":[],"game.selectTarget":[null]},"effects":["setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers","setPlayers","game.updatePlayers","game.syncMotion","game.reconcile","setEvents","setSocial","setActivity","game.setFound","notice","reward","game.setCar","setMessages","game.setEmote","setPlayers","setWorldSelection","game.cancelRespawn","game.selectTarget","game.updatePlayers","setConnected","notice"],"refs":{"connectedRef":{"current":false},"inputBuffer":{"current":[]},"authorityRef":{"current":null},"playersRef":{"current":[]},"playersById":{"current":{}},"carState":{"current":{"id":"campus-car"}},"idRef":{"current":"self"},"modeRef":{"current":"multi"}},"players":[],"canvas":{"dataset":{"networkStage":"disconnected:1000"}}}'
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\network-state-hud\StrahovCrazyShow\.cache\room-callbacks-before.test.ts:299:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '{"state":{"messages":[{"id":"message","text":"multiplayer chat"},{"id":"message","text":"multiplayer chat"}],"connected":false,"selfId":"self","game.setLocalId":["self"],"players":[],"events":[{"id":"private-event"}],"activity":{"hunt":["found-marker"]},"game.updatePlayers":[[{"id":"self"}]],"game.syncMotion":[{"time":1000,"tick":1,"rows":[["self",5,2,3,0.1,1,0,0,"outside",true]]}],"game.reconcile":[{"ack":1,"x":5,"y":2,"z":3}],"social":{"contacts":["friend"],"requests":[],"blocked":[],"attendance":[]},"game.setFound":[["found-marker"]],"notice":"socket error","reward":"multiplayer reward","game.setCar":[{"id":"campus-car"}],"game.setEmote":["self","wave"],"worldSelection":null,"game.cancelRespawn":[],"game.selectTarget":[null]},"effects":["setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers","setPlayers","game.updatePlayers","game.syncMotion","game.reconcile","setEvents","setSocial","setActivity","game.setFound","notice","reward","game.setCar","setMessages","game.setEmote","setPlayers","setWorldSelection","game.cancelRespawn","game.selectTarget","game.updatePlayers","setConnected","notice","setEvents","setSocial","setActivity","game.setFound","notice","reward","setMessages","game.setEmote","notice"],"refs":{"connectedRef":{"current":false},"inputBuffer":{"current":[]},"authorityRef":{"current":null},"playersRef":{"current":[]},"playersById":{"current":{}},"carState":{"current":{"id":"campus-car"}},"idRef":{"current":"self"},"modeRef":{"current":"multi"}},"players":[],"canvas":{"dataset":{"networkStage":"disconnected:1000"}}}',
+    expected: '{"state":{"messages":[{"id":"message","text":"multiplayer chat"}],"connected":false,"selfId":"self","game.setLocalId":["self"],"players":[],"events":[{"id":"private-event"}],"activity":{"hunt":["found-marker"]},"game.updatePlayers":[[{"id":"self"}]],"game.syncMotion":[{"time":1000,"tick":1,"rows":[["self",5,2,3,0.1,1,0,0,"outside",true]]}],"game.reconcile":[{"ack":1,"x":5,"y":2,"z":3}],"social":{"contacts":["friend"],"requests":[],"blocked":[],"attendance":[]},"game.setFound":[["found-marker"]],"notice":"Spojení přerušeno. Použij Obnovit spojení.","reward":"multiplayer reward","game.setCar":[{"id":"campus-car"}],"game.setEmote":["self","wave"],"worldSelection":null,"game.cancelRespawn":[],"game.selectTarget":[null]},"effects":["setConnected","setSelfId","game.setLocalId","setPlayers","setEvents","setActivity","game.updatePlayers","setPlayers","game.updatePlayers","game.syncMotion","game.reconcile","setEvents","setSocial","setActivity","game.setFound","notice","reward","game.setCar","setMessages","game.setEmote","setPlayers","setWorldSelection","game.cancelRespawn","game.selectTarget","game.updatePlayers","setConnected","notice"],"refs":{"connectedRef":{"current":false},"inputBuffer":{"current":[]},"authorityRef":{"current":null},"playersRef":{"current":[]},"playersById":{"current":{}},"carState":{"current":{"id":"campus-car"}},"idRef":{"current":"self"},"modeRef":{"current":"multi"}},"players":[],"canvas":{"dataset":{"networkStage":"disconnected:1000"}}}',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

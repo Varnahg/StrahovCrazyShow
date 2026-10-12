@@ -10,6 +10,8 @@ There is no IS sign-in, residency verification, password or real student profile
 
 ## Current version
 
+The latest follow-up on this branch is **B5 / network-lifecycle**, source `609ab94390971f928f9e8a4becaac717601e57b6f96aecb4bb591493dd195520`: late messages and cancelled connection attempts can no longer restore multiplayer state in guest mode. All 530 tests, the production build and full isolated integration passed; [B5 verification](docs/verification.md) distinguishes this fix from the B3 performance measurements below.
+
 The repository contains development demo 0.1.0 and the current social MMO pilot. [Historical L2 acceptance](docs/releases/demo-2026-10-11.md) records the earlier release; the latest checkpoint is described below.
 
 This branch, `codex/network-state-hud`, contains checkpoint **B3 / network-responsive**, source `f908aacdec194939b7715d66bafae972530efa88e66378b1ba0b7656b3d8607f`. **516/516 tests, the production build and full isolated integration passed**; see [B3 results](docs/verification-evidence/network-responsive-20261012/results.json). It adds delta motion updates while preserving one shared world and updates for every player, corrects prediction replay, cleans up expired session state and stalled input backlogs, and improves HUD readability. **Protocol 8 replaces protocol 7 in this branch; deploy the matching server and client together.** B3 reduced transfer with 100 sessions by 75.11%; CPU and GPU speedups were not demonstrated. The [performance evidence](docs/performance/network-state-20261012.md) includes the five-minute cohort and remaining limitations.

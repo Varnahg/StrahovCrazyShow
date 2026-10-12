@@ -1,0 +1,37 @@
+{
+  "sourceSnapshotId": "609ab94390971f928f9e8a4becaac717601e57b6f96aecb4bb591493dd195520",
+  "regressionMethod": "Tests execute actual App bind/leave/connect/enter/reconnect extracted via TypeScript AST with controllable fetch/json/join promises and a retained-listener transport. React setters and Game calls are observed stubs; no browser/WebGL or actual network scheduling is claimed.",
+  "oldCallbacks": {
+    "baselineSnapshotId": "f908aacdec194939b7715d66bafae972530efa88e66378b1ba0b7656b3d8607f",
+    "passed": 1,
+    "failed": 3,
+    "log": "../network-room-guard-20261012/callback-regression-before.log"
+  },
+  "oldPendingJoin": {
+    "baselineSnapshotId": "74e703c6af98f1b50b69fbc74d7cbdb15d369265857456caa06bfab182a4e652",
+    "passed": 0,
+    "failed": 1,
+    "observed": "A join completed after leave/guest, rebound multiplayer, set connected=true and changed Game identity",
+    "log": "async-regression-before.log"
+  },
+  "currentTargeted": {
+    "passed": 23,
+    "failed": 0,
+    "lifecycleCases": 14,
+    "codecCases": 9,
+    "log": "targeted-after.log",
+    "typecheckExit": 0
+  },
+  "sdkPrimarySource": {
+    "package": "@colyseus/sdk",
+    "version": "0.18.5",
+    "file": "node_modules/@colyseus/sdk/src/Room.ts",
+    "leaveLines": "201-215",
+    "listenerCleanupLines": "147-149, 531-543"
+  },
+  "limits": [
+    "Controlled callback/fetch/join scheduling, not a real browser timing or React lifecycle test.",
+    "No new GPU or load test; prior measurements remain attributed to B3."
+  ],
+  "implementationCommit": "4b7ec12b081970cf6ef678a61e34a44d0207932a"
+}

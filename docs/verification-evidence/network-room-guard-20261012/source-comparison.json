@@ -1,0 +1,24 @@
+{
+  "baselineSnapshotId": "f908aacdec194939b7715d66bafae972530efa88e66378b1ba0b7656b3d8607f",
+  "candidateSnapshotId": "74e703c6af98f1b50b69fbc74d7cbdb15d369265857456caa06bfab182a4e652",
+  "baselineFiles": 8193,
+  "candidateFiles": 8195,
+  "changedOrAdded": [
+    {
+      "path": "client/room-callbacks.ts",
+      "before": null,
+      "after": "86857ee0db007280538cbb2cfcb9c23d29645500eb098714f5a20a95260c351c"
+    },
+    {
+      "path": "client/ui.tsx",
+      "before": "a8c8c96753983c2cf5722d82b4c34bbbb0a0cfc96f26aad0ba2b6d896f25dc5a",
+      "after": "97acfd3eeb9e4c6ed187eca42b576c9930da767b44cec63050af671bb456ab5a"
+    },
+    {
+      "path": "tests/room-callbacks.test.ts",
+      "before": null,
+      "after": "7be8b0a24f403d45a25d8bb39dbb55e0aa99f428ca93daa90a0e9409b9c36d80"
+    }
+  ],
+  "note": "Intermediate callback guard. Subsequent review found unfinished async connection attempts also require invalidation; not the final lifecycle acceptance."
+}

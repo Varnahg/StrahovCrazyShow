@@ -1,0 +1,30 @@
+✖ a join resolving after leave and guest entry closes its room without rebinding or effects (10.1045ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1623.6475
+
+✖ failing tests:
+
+test at .cache\room-callbacks-attempts-before.test.ts:468:1
+✖ a join resolving after leave and guest entry closes its room without rebinding or effects (10.1045ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '{"state":{"messages":[],"busy":false,"error":"","selfId":"guest","mode":"multi","ready":false,"connected":true,"social":{"attendance":[],"contacts":[],"requests":[],"blocked":[]},"journalOpen":false,"emotesOpen":false,"worldSelection":null,"events":[{"id":"guest-demo"}],"players":[],"activity":{"hunt":[]},"game.setLocalId":["joined-self"]},"effects":["setBusy","setError","sessionStorage.setItem","setSelfId","setMode","setReady","setConnected","setMessages","setSocial","setJournalOpen","setEmotesOpen","setWorldSelection","setBusy","setError","setSelfId","setEvents","setPlayers","setActivity","setMode","setBusy","game.setLocalId","setConnected","setMode","setBusy"],"refs":{"connectionAttempt":{"current":0},"connectedRef":{"current":true},"inputBuffer":{"current":[]},"authorityRef":{"current":null},"playersRef":{"current":[]},"playersById":{"current":{}},"carState":{"current":null},"idRef":{"current":"guest"},"modeRef":{"current":"multi"},"profileRef":{"current":{}}},"players":[],"canvas":{"dataset":{}},"stored":[["strahov.session","token-joined-self"]]}'
+  - '{"state":{"messages":[],"busy":false,"error":"","selfId":"guest","mode":"guest","ready":false,"connected":false,"social":{"attendance":[],"contacts":[],"requests":[],"blocked":[]},"journalOpen":false,"emotesOpen":false,"worldSelection":null,"events":[{"id":"guest-demo"}],"players":[],"activity":{"hunt":[]}},"effects":["setBusy","setError","sessionStorage.setItem","setSelfId","setMode","setReady","setConnected","setMessages","setSocial","setJournalOpen","setEmotesOpen","setWorldSelection","setBusy","setError","setSelfId","setEvents","setPlayers","setActivity","setMode","setBusy"],"refs":{"connectionAttempt":{"current":0},"connectedRef":{"current":false},"inputBuffer":{"current":[]},"authorityRef":{"current":null},"playersRef":{"current":[]},"playersById":{"current":{}},"carState":{"current":null},"idRef":{"current":"guest"},"modeRef":{"current":"guest"},"profileRef":{"current":{}}},"players":[],"canvas":{"dataset":{}},"stored":[["strahov.session","token-joined-self"]]}'
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\network-state-hud\StrahovCrazyShow\.cache\room-callbacks-attempts-before.test.ts:478:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '{"state":{"messages":[],"busy":false,"error":"","selfId":"guest","mode":"multi","ready":false,"connected":true,"social":{"attendance":[],"contacts":[],"requests":[],"blocked":[]},"journalOpen":false,"emotesOpen":false,"worldSelection":null,"events":[{"id":"guest-demo"}],"players":[],"activity":{"hunt":[]},"game.setLocalId":["joined-self"]},"effects":["setBusy","setError","sessionStorage.setItem","setSelfId","setMode","setReady","setConnected","setMessages","setSocial","setJournalOpen","setEmotesOpen","setWorldSelection","setBusy","setError","setSelfId","setEvents","setPlayers","setActivity","setMode","setBusy","game.setLocalId","setConnected","setMode","setBusy"],"refs":{"connectionAttempt":{"current":0},"connectedRef":{"current":true},"inputBuffer":{"current":[]},"authorityRef":{"current":null},"playersRef":{"current":[]},"playersById":{"current":{}},"carState":{"current":null},"idRef":{"current":"guest"},"modeRef":{"current":"multi"},"profileRef":{"current":{}}},"players":[],"canvas":{"dataset":{}},"stored":[["strahov.session","token-joined-self"]]}',
+    expected: '{"state":{"messages":[],"busy":false,"error":"","selfId":"guest","mode":"guest","ready":false,"connected":false,"social":{"attendance":[],"contacts":[],"requests":[],"blocked":[]},"journalOpen":false,"emotesOpen":false,"worldSelection":null,"events":[{"id":"guest-demo"}],"players":[],"activity":{"hunt":[]}},"effects":["setBusy","setError","sessionStorage.setItem","setSelfId","setMode","setReady","setConnected","setMessages","setSocial","setJournalOpen","setEmotesOpen","setWorldSelection","setBusy","setError","setSelfId","setEvents","setPlayers","setActivity","setMode","setBusy"],"refs":{"connectionAttempt":{"current":0},"connectedRef":{"current":false},"inputBuffer":{"current":[]},"authorityRef":{"current":null},"playersRef":{"current":[]},"playersById":{"current":{}},"carState":{"current":null},"idRef":{"current":"guest"},"modeRef":{"current":"guest"},"profileRef":{"current":{}}},"players":[],"canvas":{"dataset":{}},"stored":[["strahov.session","token-joined-self"]]}',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -10,6 +10,8 @@ Demo neobsahuje přihlášení přes IS, ověření bydliště ani skutečné st
 
 ## Současná verze
 
+Nejnovější dodatek v této větvi je **B5 / network-lifecycle**, zdroj `609ab94390971f928f9e8a4becaac717601e57b6f96aecb4bb591493dd195520`: pozdní zprávy ani zrušené připojování už nesmějí obnovit multiplayerový stav v hostovi. Prošlo 530/530 testů, produkční build i plná izolovaná integrace; [aktuální ověření B5](docs/verification.md) odlišuje tuto opravu od níže uvedených výkonových měření B3.
+
 Repozitář obsahuje vývojové demo 0.1.0 a aktuální seznamovací MMO pilot. [Historická přejímka L2](docs/releases/demo-2026-10-11.md) popisuje dřívější vydání; nejnovější checkpoint je uvedený níže.
 
 Tato větev `codex/network-state-hud` obsahuje checkpoint **B3 / network-responsive**, zdroj `f908aacdec194939b7715d66bafae972530efa88e66378b1ba0b7656b3d8607f`. Prošel **516/516 testy, produkčním buildem a celou izolovanou integrací**; viz [výsledky B3](docs/verification-evidence/network-responsive-20261012/results.json). Přidává rozdílový přenos pohybu při zachování jednoho společného světa a aktualizací všech hráčů, opravuje přepočet predikce, uklízí stav vypršelých relací a nahromaděné vstupy po výpadku a zlepšuje čitelnost HUD. **Protokol 8 v této větvi nahrazuje protokol 7; odpovídající server a klient se nasazují společně.** B3 snížil přenos při 100 relacích o 75,11 %; zrychlení CPU ani GPU se neprokázalo. Výsledky včetně pětiminutové kohorty a známých omezení obsahuje [výkonová evidence](docs/performance/network-state-20261012.md).
