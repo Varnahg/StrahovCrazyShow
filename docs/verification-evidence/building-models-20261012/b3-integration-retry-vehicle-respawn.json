@@ -1,0 +1,390 @@
+{
+  "startedAt": "2026-10-12T15:28:56.681Z",
+  "endpoint": "http://127.0.0.1:2568",
+  "protocol": 10,
+  "sourceSnapshotId": "e94b95757c44c2d58c63a3df2bb7ecc8581725271fc9ff29124919a7988928a6",
+  "harnessSha256": "f62c18c1318b1a02c12dc02adaff16db1715d344804e69dbdbd0b51dec833f8d",
+  "completed": true,
+  "lastStage": "both SDK peers receive current respawn presence, without stale vehicle or coordinates",
+  "checks": [
+    "respawn driver initial authority",
+    "respawn observer initial authority",
+    "ordinary resync receives its own authoritative reply",
+    "ordinary resync receives its own authoritative reply",
+    "walk within car entry range",
+    "walking queue consumed before entering",
+    "actual vehicle entry",
+    "respawn replies with forced authority at received input frontier",
+    "both SDK peers receive current respawn presence, without stale vehicle or coordinates",
+    "two authority samples after duplicate input",
+    "fresh ack+1 input moves the recovered pedestrian",
+    "observer receives movement after recovery",
+    "walk within car entry range",
+    "walking queue consumed before entering",
+    "actual vehicle entry",
+    "drive shared car away from its canonical recovery pose",
+    "brake before testing another player's respawn",
+    "driver input queue consumed",
+    "respawn replies with forced authority at received input frontier",
+    "both SDK peers receive current respawn presence, without stale vehicle or coordinates",
+    "another player's respawn retains the different driver and displaced shared car",
+    "respawn replies with forced authority at received input frontier",
+    "both SDK peers receive current respawn presence, without stale vehicle or coordinates"
+  ],
+  "resets": [
+    {
+      "id": "0f189c4b-63be-4d8c-bb03-7101c5a74a1e",
+      "ackBefore": 0,
+      "frontier": 32,
+      "queuedBurst": 32,
+      "forced": {
+        "time": 1791818936961,
+        "tick": 66,
+        "ack": 32,
+        "state": {
+          "position": {
+            "x": 110,
+            "y": -2.1440000534057617,
+            "z": 12
+          },
+          "yaw": 0,
+          "speed": 0,
+          "vertical": 0,
+          "grounded": false,
+          "vehicle": false,
+          "vehicleState": {
+            "id": "campus-car",
+            "driverId": null,
+            "parked": true,
+            "parking": {
+              "position": {
+                "x": 110,
+                "y": -3.19320011138916,
+                "z": 16
+              },
+              "rotation": {
+                "x": 0.006686203181743622,
+                "y": 0.00010695189121179283,
+                "z": -0.015993505716323853,
+                "w": 0.9998497366905212
+              }
+            },
+            "position": {
+              "x": 110,
+              "y": -3.19320011138916,
+              "z": 16
+            },
+            "rotation": {
+              "x": 0.006686203181743622,
+              "y": 0.00010695189121179283,
+              "z": -0.015993505716323853,
+              "w": 0.9998497366905212
+            },
+            "linvel": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "angvel": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "steering": 0,
+            "wheelSpin": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "wheelSuspension": [
+              0.25,
+              0.25,
+              0.25,
+              0.25
+            ],
+            "wheelContact": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "force": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "torque": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "sleeping": false
+          }
+        },
+        "resync": true,
+        "respawn": true
+      },
+      "localPresence": {
+        "id": "0f189c4b-63be-4d8c-bb03-7101c5a74a1e",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 32,
+        "zone": "outside"
+      },
+      "observerPresence": {
+        "id": "0f189c4b-63be-4d8c-bb03-7101c5a74a1e",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 32,
+        "zone": "outside"
+      }
+    },
+    {
+      "id": "82ebcf0c-87ef-46ee-8a54-609b477a11f8",
+      "ackBefore": 0,
+      "frontier": 32,
+      "queuedBurst": 32,
+      "forced": {
+        "time": 1791818938696,
+        "tick": 172,
+        "ack": 32,
+        "state": {
+          "position": {
+            "x": 110,
+            "y": -2.1440000534057617,
+            "z": 12
+          },
+          "yaw": 0,
+          "speed": 0,
+          "vertical": 0,
+          "grounded": false,
+          "vehicle": false,
+          "vehicleState": {
+            "id": "campus-car",
+            "driverId": "0f189c4b-63be-4d8c-bb03-7101c5a74a1e",
+            "parked": false,
+            "parking": {
+              "position": {
+                "x": 110,
+                "y": -3.19320011138916,
+                "z": 16
+              },
+              "rotation": {
+                "x": 0.006686203181743622,
+                "y": 0.00010695189121179283,
+                "z": -0.015993505716323853,
+                "w": 0.9998497366905212
+              }
+            },
+            "position": {
+              "x": 110.00788879394531,
+              "y": -3.2237062454223633,
+              "z": 18.302759170532227
+            },
+            "rotation": {
+              "x": 0.012539616785943508,
+              "y": -0.0001528686552774161,
+              "z": -0.014531166292726994,
+              "w": 0.999815821647644
+            },
+            "linvel": {
+              "x": 0.004825855139642954,
+              "y": -0.07162909209728241,
+              "z": 0.0046976590529084206
+            },
+            "angvel": {
+              "x": -0.011642332188785076,
+              "y": 0.00028812664095312357,
+              "z": 0.00021806177392136306
+            },
+            "steering": 0,
+            "wheelSpin": [
+              0.49417175099325533,
+              0.49417175099325533,
+              0.49417175099325533,
+              0.49417175099325533
+            ],
+            "wheelSuspension": [
+              0.31674322485923767,
+              0.3115150034427643,
+              0.34141579270362854,
+              0.3457145392894745
+            ],
+            "wheelContact": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "force": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "torque": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "sleeping": false
+          }
+        },
+        "resync": true,
+        "respawn": true
+      },
+      "localPresence": {
+        "id": "82ebcf0c-87ef-46ee-8a54-609b477a11f8",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 32,
+        "zone": "outside"
+      },
+      "observerPresence": {
+        "id": "82ebcf0c-87ef-46ee-8a54-609b477a11f8",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 32,
+        "zone": "outside"
+      }
+    },
+    {
+      "id": "0f189c4b-63be-4d8c-bb03-7101c5a74a1e",
+      "ackBefore": 99,
+      "frontier": 99,
+      "queuedBurst": 0,
+      "forced": {
+        "time": 1791818938727,
+        "tick": 173,
+        "ack": 99,
+        "state": {
+          "position": {
+            "x": 110,
+            "y": -2.1440000534057617,
+            "z": 12
+          },
+          "yaw": 0,
+          "speed": 0,
+          "vertical": 0,
+          "grounded": false,
+          "vehicle": false,
+          "vehicleState": {
+            "id": "campus-car",
+            "driverId": null,
+            "parked": true,
+            "parking": {
+              "position": {
+                "x": 110,
+                "y": -3.19320011138916,
+                "z": 16
+              },
+              "rotation": {
+                "x": 0.006686203181743622,
+                "y": 0.00010695189121179283,
+                "z": -0.015993505716323853,
+                "w": 0.9998497366905212
+              }
+            },
+            "position": {
+              "x": 110,
+              "y": -3.19320011138916,
+              "z": 16
+            },
+            "rotation": {
+              "x": 0.006686203181743622,
+              "y": 0.00010695189121179283,
+              "z": -0.015993505716323853,
+              "w": 0.9998497366905212
+            },
+            "linvel": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "angvel": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "steering": 0,
+            "wheelSpin": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "wheelSuspension": [
+              0.25,
+              0.25,
+              0.25,
+              0.25
+            ],
+            "wheelContact": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "force": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "torque": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "sleeping": false
+          }
+        },
+        "resync": true,
+        "respawn": true
+      },
+      "localPresence": {
+        "id": "0f189c4b-63be-4d8c-bb03-7101c5a74a1e",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 99,
+        "zone": "outside"
+      },
+      "observerPresence": {
+        "id": "0f189c4b-63be-4d8c-bb03-7101c5a74a1e",
+        "x": 110,
+        "y": -2.1440000534057617,
+        "z": 12,
+        "yaw": 0,
+        "speed": 0,
+        "vehicle": false,
+        "ack": 99,
+        "zone": "outside"
+      }
+    }
+  ],
+  "errors": [],
+  "openAuthenticatedConnectionsAfterCleanup": 0,
+  "scope": "Real HTTP session issuance and authenticated SDK messages on an isolated production server; no privileged position mutation, no GPU/FPS benchmark, no access to live API2570.",
+  "exitCode": 0,
+  "status": "passed",
+  "finishedAt": "2026-10-12T15:28:58.766Z"
+}

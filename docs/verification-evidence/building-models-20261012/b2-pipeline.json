@@ -1,0 +1,50 @@
+{
+  "sourceSnapshotId": "edfac4a2a1b0ed14fe8835b47df5b957ef8efe4a538e4c775710ecda7d44d19e",
+  "files": 8355,
+  "startedAt": "2026-10-12T14:54:41.885Z",
+  "results": [
+    {
+      "command": "pnpm test",
+      "code": 0,
+      "pid": 44348,
+      "elapsedMs": 114896,
+      "completedAt": "2026-10-12T14:56:36.784Z",
+      "summary": [
+        "BJS - [16:55:06]: Skeleton \"person 0 continuous anatomy\": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.",
+        "✔ different or already modified near assets fail closed instead of applying hardcoded indices blindly (648.5781ms)",
+        "✔ quality keeps the same map budgets/PCF and bounded night bloom without another exposure pass (1104.2954ms)",
+        "✔ finite metrics, cohort 1/30, ten-second duration, JSON content type and 3/min limit are enforced (390.5728ms)",
+        "✔ malformed packets fail atomically without corrupting the previous dictionary or vehicle state (2.3739ms)",
+        "✔ unknown outdoor identities fail before allocating any scene resources (5.502ms)",
+        "✔ browser HTTP Content-Encoding already decoded PCM is accepted without a second gzip pass (3.9519ms)",
+        "✔ actual CCD car cannot drive through the former east portal and a jumping walker cannot bypass it (3094.7937ms)",
+        "ℹ tests 677",
+        "ℹ pass 677",
+        "ℹ fail 0",
+        "ℹ duration_ms 112686.4655"
+      ]
+    },
+    {
+      "command": "pnpm build",
+      "code": 0,
+      "pid": 47456,
+      "elapsedMs": 44745,
+      "completedAt": "2026-10-12T14:57:21.531Z",
+      "summary": [
+        "✓ built in 17.76s"
+      ]
+    },
+    {
+      "command": "pnpm test:integration",
+      "code": 0,
+      "pid": 40460,
+      "elapsedMs": 28410,
+      "completedAt": "2026-10-12T14:57:49.942Z",
+      "summary": [
+        "PASS: real SDK queued vehicle respawn, immediate forced authority and current presence, duplicate rejection, fresh ack+1 movement, protected foreign driver, canonical isolated-world cleanup.",
+        "PASS: singleton world, guest boundary, two clients, walking, physical car W/A/D/brake/reverse/exit/re-entry on native DMR and authored assets, global/DM chat, consent, explicit blocking rejection, event ownership, session resume and weather endpoint.",
+        "PASS: 12 authenticated peers in one world; every peer sees every identity, above the old eight-player boundary; movement reaches every observer; position error <=0.51mm, exact ack and authoritative grounded bit; targeted keyframe restores an empty decoder without resetting locomotion or losing remote players; repeated ineffective quiz/decline commands do not fan out state to the world; contact changes update the two participants without broadcasting to ten unrelated peers; disconnect removes the player everywhere; resuming the same identity reconstructs the full shared world; guest cannot join or read authored meeting/presence from public HTTP"
+      ]
+    }
+  ]
+}

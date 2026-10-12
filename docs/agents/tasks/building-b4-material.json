@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "building-b4-material",
+  "title": "Sladit šedé panely B4 s fyzikálním osvětlením a Blender materiálem",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/b4-panel-material.ts",
+    "client/architecture-reality.ts",
+    "tests/b4-panel-material.test.ts",
+    "tests/b4-facade-rendering.test.ts",
+    "docs/reality-pack/b4-material-20261012/",
+    "docs/agents/handoffs/building-b4-material.md",
+    "tests/architecture-reality.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze B4 greyPanel převést na netexturovaný rough PBR ze společného barevného plánu. Přesná sRGB konverze, roughness0.84 a metallic0 odpovídají existujícímu skutečnému Blender panelovému kitu. Environment intensity0.7 odpovídá sousedním povrchům.",
+    "Near/far sdílí materiál. Žádné změny geometrie, normál, otvorů, batching topologie, okolních119budov, globálního světla, postav ani vegetace. Nevymýšlet betonovou texturu nebo potvrzené složení panelu.",
+    "Doplň skutečné regresní kontroly přesné lineární barvy, absence textur/emise, shody s native-kit GLB a zachovaných geometrií/otvorů. Refaktoruj pouze potřebné typy Batch/map z StandardMaterial na Material a jasnou továrnu se zdrojem.",
+    "Handoff uvádí konkrétní soubory, hashe, provedené CPU testy a pending produkční GPU porovnání. Původní B1 snímek a GPU záznam zůstávají zachované."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/b4-panel-material.test.ts tests/b4-facade-rendering.test.ts",
+    "TypeScript bez emit a cílený diff-check; žádný nový Blender, build nebo GPU pod tímto code-only claimem.",
+    "Root potom aktualizuje odpovídající B4 kombinovaný archiv a ověří další zmrazený produkční checkpoint."
+  ],
+  "notes": [
+    "Root předává konkrétní implementaci agentu building_pipeline v codex/building-models. Původní B1 je už main/origin142ce23, implementacefbe6ed3, source16b469a...; neopravovat publikovaný immutable snapshot.",
+    "Nález je vidět v docs/verification-evidence/building-models-20261012/b4-north-day-material-review.jpg. Shaderová diagnóza potvrdila StandardMaterial bez IBL oproti okolním PBR; skutečné čelní normály jsou správné. Causal GPU porovnání ještě pending.",
+    "Blender panelový kit už obsahuje přesné lineární albedo[0.3662526,0.3864294,0.3712377] a roughness0.84. Samotný kit ani source plán v tomto tasku neměnit."
+  ]
+}

@@ -5,6 +5,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Ray } from "@babylonjs/core/Culling/ray";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { BUILDINGS } from "../shared/world";
 import { B4_FACADE_PLAN, b4FacadePlan } from "../shared/b4-facade-plan";
 import panels from "../shared/data/b4-panel-kit.json";
@@ -36,10 +37,22 @@ test("B4 source faces replace the wall geometry and retain the same openings in 
         mesh.material?.name === "reality B4 grey facade panels",
     )!;
     assert.ok(grey);
+    assert.ok(grey.material instanceof PBRMaterial);
     assert.equal(
-      (grey.material as StandardMaterial).diffuseTexture,
+      grey.material.albedoTexture,
       null,
       "no board-formed texture invented for the grey panel cladding",
+    );
+    const farGrey = scene.meshes.find(
+      (mesh) =>
+        mesh.name.includes(" far ") &&
+        mesh.material?.name === grey.material!.name,
+    )!;
+    assert.ok(farGrey);
+    assert.equal(
+      farGrey.material,
+      grey.material,
+      "near and far share one weather-lit panel material",
     );
     const frameMaterial = scene.materials.find(
       (material) => material.name === "reality B4 dark window frames",

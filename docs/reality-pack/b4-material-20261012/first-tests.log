@@ -1,0 +1,80 @@
+BJS - [16:34:50]: Babylon.js v9.30.0 - Null engine
+BJS - [16:34:50]: Babylon.js v9.30.0 - Null engine
+Reality geometry audit {
+  buildings: 120,
+  windows: 3242,
+  detailTriangles: 1326031,
+  farTriangles: 11661,
+  source: 'shared/data/facade-reality.json',
+  windowModelSource: 'shared/data/building-window-kit.json',
+  marketModelSource: 'shared/data/market-detail-kit.json',
+  b4PanelModelSource: 'shared/data/b4-panel-kit.json',
+  authoredDetail: 'near',
+  measured: false
+} { meshes: 1109 }
+BJS - [16:34:51]: Babylon.js v9.30.0 - Null engine
+✖ headless architecture retains authored texture recipes without requesting their images (29.1548ms)
+✔ photo interpreted window pitch fits every original edge and retains outward normals (9.5411ms)
+✔ B6 north end preserves broad blank piers and sparse core openings (0.4793ms)
+✔ B12 three levels retain narrow transom windows, B1 and shops have no dorm grid (0.3142ms)
+✔ 007 doorway is at southeast club, reception and R-ko POI retain explicit uncertainty (0.2204ms)
+✔ architecture batches remain bounded (883.6291ms)
+✔ B6 north reception shell preserves the canonical opening and closes the former west entry (535.2564ms)
+BJS - [16:34:50]: Babylon.js v9.30.0 - Null engine
+✔ B4 source faces replace the wall geometry and retain the same openings in both LODs (243.1815ms)
+BJS - [16:34:50]: Babylon.js v9.30.0 - Null engine
+BJS - [16:34:50]: Babylon.js v9.30.0 - Null engine
+✖ B4 material uses the source shade as linear, rough nonmetallic albedo with no invented surface maps (52.0519ms)
+✔ runtime B4 albedo and roughness match both existing Blender-native GLB materials (31.0539ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 8
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4435.3764
+
+✖ failing tests:
+
+test at tests\architecture-reality.test.ts:23:1
+✖ headless architecture retains authored texture recipes without requesting their images (29.1548ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'data:EnvironmentBRDFTexture0'
+  - 'EnvironmentBRDFTexture'
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\visual-quality-jump\StrahovCrazyShow\tests\architecture-reality.test.ts:87:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'data:EnvironmentBRDFTexture0',
+    expected: 'EnvironmentBRDFTexture',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\b4-panel-material.test.ts:31:1
+✖ B4 material uses the source shade as linear, rough nonmetallic albedo with no invented surface maps (52.0519ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(Math.abs(value - expected[i]) < 1e-12)
+  
+      at <anonymous> (C:\Users\rezac\.codex\worktrees\visual-quality-jump\StrahovCrazyShow\tests\b4-panel-material.test.ts:48:37)
+      at Array.forEach (<anonymous>)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\visual-quality-jump\StrahovCrazyShow\tests\b4-panel-material.test.ts:48:8)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

@@ -1,6 +1,7 @@
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -24,6 +25,7 @@ import {
 } from "./world-asset-identity";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { FACADE_DEPTH, metricFacadeFrame } from "./architecture-depth";
+import { createB4PanelMaterial } from "./b4-panel-material";
 import {
   appendBuildingDetailGeometry,
   createBuildingWindowModelCache,
@@ -281,7 +283,7 @@ class Batch {
   colors?: number[];
   constructor(
     readonly name: string,
-    readonly material: StandardMaterial,
+    readonly material: Material,
   ) {}
   surface(a: Point, b: Point, c: Point, d: Point, outward: Point) {
     const { normal, uv } = metricFacadeFrame(a, b, c, outward);
@@ -405,10 +407,7 @@ function createMaterials(scene: Scene) {
     red = solid("B8 red entrance core", "#8f3c38"),
     metal = solid("entrance galvanized frame", "#6c7a76"),
     cream = solid("menza tile", "#cfbf89", "tile", 0.13);
-  const greyPanel = solid(
-    "B4 grey facade panels",
-    B4_FACADE_PLAN.material.neutralShadeHex,
-  );
+  const greyPanel = createB4PanelMaterial(scene);
   const b4Frame = solid(
     "B4 dark window frames",
     B4_FACADE_PLAN.material.frameNeutralShadeHex,
@@ -773,9 +772,9 @@ export function buildArchitectureReality(context: {
       { ...center, y: baseY },
     );
     assetRoots.push(assetRoot);
-    const buckets = new Map<StandardMaterial, Batch>(),
-      distant = new Map<StandardMaterial, Batch>();
-    const batch = (material: StandardMaterial, far = false) => {
+    const buckets = new Map<Material, Batch>(),
+      distant = new Map<Material, Batch>();
+    const batch = (material: Material, far = false) => {
       const map = far ? distant : buckets;
       let b = map.get(material);
       if (!b) {

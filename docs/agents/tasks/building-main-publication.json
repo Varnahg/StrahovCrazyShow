@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "building-main-publication",
   "title": "Nasadit uživatelem vyžádaný ověřený modelový commit do hlavního preview",
-  "status": "done",
+  "status": "ready",
   "dependsOn": [],
   "writePaths": [
     "docs/verification.md",
@@ -17,20 +17,21 @@
     "workspace-build"
   ],
   "acceptance": [
-    "Publikuj již hotový commit fbe6ed3 a frozen source16b469a2685a08dce9b886bdd4828033d5c10c62b8bc338b14d61b32c7d14b65, 675/675+build+integration PASS. User explicitně nařídil main integraci před pokračováním vizuální/crowd QA.",
+    "Publish final reviewed building update after full B3 tests/build/isolated integration and runtime-input parity with GPU-tested B2. Preserve old B1 dist, foreign WIP and source-security commits on main.",
     "Ověř hlavní runtime zdroje proti frozen manifestu včetně testů. Uchovej předchozí dist bez rekurzivního mazání; copy frozen dist a ověř skutečně servírované HTML/JS/CSS/Moon soubory.",
     "Porty a živé procesy vlastní oddělený building-main-preview task; zastavení předaných weather procesů musí potvrdit exact identity. Žádná nová GPU, rebuild nebo změna herního runtime pro samotnou publikaci.",
     "Do reportu zaznamenej skutečný commit/source/HTTP výsledky i pending herní snímky a30relací. Cizí vegetation audit zůstane nedotčený; neclaimuj celý checkout čistý."
   ],
   "verification": [
-    "SHA všech8353 main+frozen source souborů a skutečného distribuovaného buildu.",
-    "HTTP health/source snapshot a HTML/JS/CSS data proti testovanému dist, evidence v building-models-20261012/publication.json.",
+    "SHA of every main and frozen B3 source file including all tests; compare actual served distribution and source identity.",
+    "HTTP health/source/HTML/JS/CSS assets checked against B3 tested dist; preserve B1 publication evidence and write b3-publication.json.",
     "git status a origin/main po normálním push; žádný force."
   ],
   "notes": [
     "Koordinátor a doložený vlastník modelů buildings-01a12b28-root. Main již bezpečně fast-forward na fbe6ed3, osm metadata blobů bylo předem porovnáno.",
     "Hlavní4179/2570 byly výslovně předány weather-live-preview handoffem; release jejich claim až po skutečném kontrolovaném zastavení. Publikační task nedrží porty.",
     "QA4193/2587 a vlastní tab40 jsou zavřené, building-production-verification byl uvolněn s partial handoffem. Po publikaci jej obnovit, neznačit jako hotové.",
-    "Primární cwd C:/Users/rezac/Documents/GitHub/StrahovCrazyShow; frozen build je ve worktree codex/building-models/.cache/performance-snapshot/building-models-20261012-b1. Prověř resolved source/destination před Move-Item."
+    "Primární cwd C:/Users/rezac/Documents/GitHub/StrahovCrazyShow; frozen build je ve worktree codex/building-models/.cache/performance-snapshot/building-models-20261012-b1. Prověř resolved source/destination před Move-Item.",
+    "B1 already running under building-main-preview. Same owner stops its exact API900/preview34300 only when B3 ready. Collector may retain B1-named directory; each report contains its actual source hash."
   ]
 }

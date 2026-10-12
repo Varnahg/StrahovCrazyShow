@@ -1,0 +1,84 @@
+{
+  "recordedAt": "2026-10-12T14:40:13.198Z",
+  "status": "CPU passed; combined archive and production GPU comparison pending",
+  "owner": "buildings-01a12b28-pipeline",
+  "baseHead": "142ce23",
+  "sourceHashes": {
+    "client/b4-panel-material.ts": "c8171233109b5096d232fbdd484c56faba2a620b6b7442fe8edd7251738d865a",
+    "client/architecture-reality.ts": "9e1c55065a1bfb32afffbd1e884e6c1126b962f5bfe951e7ba65cc516c4005e6",
+    "tests/b4-panel-material.test.ts": "a151c13ac9ec76a7fff7bb7b8daed85bd04768cc96c6e6d579d0d42840363c33",
+    "tests/b4-facade-rendering.test.ts": "bfa0e2b85ebaa318f33512db1845ff832982b07c5462e541d42dea44953cbaa3",
+    "tests/architecture-reality.test.ts": "52809d9aad0c91a2e9fab521ef98dfdb51fcf95a86f18a20792cd98c34601b05",
+    "shared/data/b4-facade-plan.json": "fa9343fdb925c5f670dab75e8c86bf99fa4eb9100c7df7246156a77171c21172",
+    "shared/data/b4-panel-kit.json": "6513ff48c1628eaace4705cd69e6e1f5f946a39ef9d08aa1b83bb6e5f4a790a6",
+    "assets/blender/b4-panel-kit/highest-geometry.json": "f0d9209d47056d5bd5138c896fc52fd243b9c097fb2c6694ebe1efe19cf78019",
+    "public/models/architecture/b4-facade/b4-facade-panels-near.glb": "3472c5d4a53fc40c8a2089f47d1c54d337699d0fe5cd8bad487b93268d37e09d",
+    "public/models/architecture/b4-facade/b4-facade-panels-highest.glb": "90e81b7caa043e915973e09f5e960388514e8301d2969cfbb4cb834ccdaf291f",
+    "assets/blender/b4-panel-kit/b4-facade-panels.blend": "92a540a1795e5fbdebf70b29c60a2b95f045c047fb766de4ba098a7bea8aa1d7"
+  },
+  "material": {
+    "sourceShade": "#a3a7a4",
+    "exactSRGB": true,
+    "metallic": 0,
+    "roughness": 0.84,
+    "environmentIntensity": 0.7,
+    "authoredTextureSlots": [],
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "sharedEngineLookup": "data:EnvironmentBRDFTexture…"
+  },
+  "verification": {
+    "testsPassed": 10,
+    "testsFailed": 0,
+    "testLog": "final-tests.log",
+    "firstRun": {
+      "passed": 8,
+      "failed": 2,
+      "log": "first-tests.log",
+      "reason": "Test LUT alias expectation and overstrict arithmetic tolerance corrected; implementation unchanged"
+    },
+    "typecheckExitCode": 0,
+    "typecheckLog": "types.log",
+    "diffCheckExitCode": 0,
+    "geometry": {
+      "recordedAt": "2026-10-12T14:37:07.597Z",
+      "unchangedBuildings": 120,
+      "changedBuildings": [],
+      "allNearFarBuffersIdentical": true,
+      "method": "Per-building mesh/material names and every position/normal/UV/color/index value hashed; material class/lighting response intentionally not part of geometry hash.",
+      "before": {
+        "buildings": 120,
+        "windows": 3242,
+        "detailTriangles": 1326031,
+        "farTriangles": 11661,
+        "source": "shared/data/facade-reality.json",
+        "windowModelSource": "shared/data/building-window-kit.json",
+        "marketModelSource": "shared/data/market-detail-kit.json",
+        "b4PanelModelSource": "shared/data/b4-panel-kit.json",
+        "authoredDetail": "near",
+        "measured": false
+      },
+      "after": {
+        "buildings": 120,
+        "windows": 3242,
+        "detailTriangles": 1326031,
+        "farTriangles": 11661,
+        "source": "shared/data/facade-reality.json",
+        "windowModelSource": "shared/data/building-window-kit.json",
+        "marketModelSource": "shared/data/market-detail-kit.json",
+        "b4PanelModelSource": "shared/data/b4-panel-kit.json",
+        "authoredDetail": "near",
+        "measured": false
+      }
+    }
+  },
+  "activeProcesses": [],
+  "pending": [
+    "Root combined B4 archive export and material audit",
+    "Frozen production checkpoint",
+    "Same-camera/light/weather screenshot and GPU comparison"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "sourceSnapshotId": "e94b95757c44c2d58c63a3df2bb7ecc8581725271fc9ff29124919a7988928a6",
+  "files": 8357,
+  "startedAt": "2026-10-12T15:24:39.055Z",
+  "results": [
+    {
+      "command": "pnpm test",
+      "code": 0,
+      "pid": 15264,
+      "elapsedMs": 114412,
+      "completedAt": "2026-10-12T15:26:33.470Z",
+      "summary": [
+        "BJS - [17:24:59]: Skeleton \"person 0 continuous anatomy\": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.",
+        "✔ different or already modified near assets fail closed instead of applying hardcoded indices blindly (626.3664ms)",
+        "✔ quality keeps the same map budgets/PCF and bounded night bloom without another exposure pass (188.9983ms)",
+        "✔ finite metrics, cohort 1/30, ten-second duration, JSON content type and 3/min limit are enforced (467.5338ms)",
+        "✔ malformed packets fail atomically without corrupting the previous dictionary or vehicle state (1.8738ms)",
+        "✔ unknown outdoor identities fail before allocating any scene resources (2.9193ms)",
+        "✔ browser HTTP Content-Encoding already decoded PCM is accepted without a second gzip pass (4.0454ms)",
+        "✔ actual CCD car cannot drive through the former east portal and a jumping walker cannot bypass it (3123.128ms)",
+        "ℹ tests 684",
+        "ℹ pass 684",
+        "ℹ fail 0",
+        "ℹ duration_ms 112486.1231"
+      ]
+    },
+    {
+      "command": "pnpm build",
+      "code": 0,
+      "pid": 12780,
+      "elapsedMs": 46182,
+      "completedAt": "2026-10-12T15:27:19.654Z",
+      "summary": [
+        "✓ built in 14.99s"
+      ]
+    },
+    {
+      "command": "pnpm test:integration",
+      "code": 1,
+      "pid": 9300,
+      "elapsedMs": 17679,
+      "completedAt": "2026-10-12T15:27:37.335Z",
+      "summary": [
+        "PASS: real SDK queued vehicle respawn, immediate forced authority and current presence, duplicate rejection, fresh ack+1 movement, protected foreign driver, canonical isolated-world cleanup."
+      ]
+    }
+  ]
+}

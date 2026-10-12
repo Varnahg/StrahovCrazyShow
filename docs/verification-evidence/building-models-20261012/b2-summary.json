@@ -1,0 +1,297 @@
+{
+  "sourceSnapshotId": "edfac4a2a1b0ed14fe8835b47df5b957ef8efe4a538e4c775710ecda7d44d19e",
+  "pipeline": {
+    "sourceSnapshotId": "edfac4a2a1b0ed14fe8835b47df5b957ef8efe4a538e4c775710ecda7d44d19e",
+    "files": 8355,
+    "startedAt": "2026-10-12T14:54:41.885Z",
+    "results": [
+      {
+        "command": "pnpm test",
+        "code": 0,
+        "pid": 44348,
+        "elapsedMs": 114896,
+        "completedAt": "2026-10-12T14:56:36.784Z",
+        "summary": [
+          "BJS - [16:55:06]: Skeleton \"person 0 continuous anatomy\": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.",
+          "✔ different or already modified near assets fail closed instead of applying hardcoded indices blindly (648.5781ms)",
+          "✔ quality keeps the same map budgets/PCF and bounded night bloom without another exposure pass (1104.2954ms)",
+          "✔ finite metrics, cohort 1/30, ten-second duration, JSON content type and 3/min limit are enforced (390.5728ms)",
+          "✔ malformed packets fail atomically without corrupting the previous dictionary or vehicle state (2.3739ms)",
+          "✔ unknown outdoor identities fail before allocating any scene resources (5.502ms)",
+          "✔ browser HTTP Content-Encoding already decoded PCM is accepted without a second gzip pass (3.9519ms)",
+          "✔ actual CCD car cannot drive through the former east portal and a jumping walker cannot bypass it (3094.7937ms)",
+          "ℹ tests 677",
+          "ℹ pass 677",
+          "ℹ fail 0",
+          "ℹ duration_ms 112686.4655"
+        ]
+      },
+      {
+        "command": "pnpm build",
+        "code": 0,
+        "pid": 47456,
+        "elapsedMs": 44745,
+        "completedAt": "2026-10-12T14:57:21.531Z",
+        "summary": [
+          "✓ built in 17.76s"
+        ]
+      },
+      {
+        "command": "pnpm test:integration",
+        "code": 0,
+        "pid": 40460,
+        "elapsedMs": 28410,
+        "completedAt": "2026-10-12T14:57:49.942Z",
+        "summary": [
+          "PASS: real SDK queued vehicle respawn, immediate forced authority and current presence, duplicate rejection, fresh ack+1 movement, protected foreign driver, canonical isolated-world cleanup.",
+          "PASS: singleton world, guest boundary, two clients, walking, physical car W/A/D/brake/reverse/exit/re-entry on native DMR and authored assets, global/DM chat, consent, explicit blocking rejection, event ownership, session resume and weather endpoint.",
+          "PASS: 12 authenticated peers in one world; every peer sees every identity, above the old eight-player boundary; movement reaches every observer; position error <=0.51mm, exact ack and authoritative grounded bit; targeted keyframe restores an empty decoder without resetting locomotion or losing remote players; repeated ineffective quiz/decline commands do not fan out state to the world; contact changes update the two participants without broadcasting to ten unrelated peers; disconnect removes the player everywhere; resuming the same identity reconstructs the full shared world; guest cannot join or read authored meeting/presence from public HTTP"
+        ]
+      }
+    ]
+  },
+  "samples": [
+    {
+      "file": "b2-b4-north-day-full.json",
+      "date": "2026-10-12T15:08:12.015Z",
+      "sourceSnapshotId": "edfac4a2a1b0ed14fe8835b47df5b957ef8efe4a538e4c775710ecda7d44d19e",
+      "avatars": 1,
+      "fps": 33.2,
+      "p95FrameMs": 38.19999980926514,
+      "p99FrameMs": 46.90000009536743,
+      "durationSeconds": 10.03,
+      "frames": 333,
+      "gpu": {
+        "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (Intel)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "integrated",
+        "classificationLabel": "Integrovaná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Hra nyní používá integrovanou grafiku. Pokud máš i samostatnou kartu, nastav pro tento prohlížeč nebo aplikaci ve Windows vysoký výkon a aplikaci znovu spusť."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        }
+      },
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderResolution": {
+        "width": 1280,
+        "height": 720
+      },
+      "quality": "medium",
+      "sceneView": {
+        "position": {
+          "x": 82.45465087890625,
+          "y": -1.5441564321517944,
+          "z": 13.609017372131348
+        },
+        "yaw": 0,
+        "pitch": -0.55,
+        "lightingInstant": 1791799200000,
+        "camera": {
+          "position": {
+            "x": 82.45465087890625,
+            "y": -1.1441563367843628,
+            "z": 5.609012603759766
+          },
+          "fov": 0.85,
+          "minZ": 0.08,
+          "maxZ": 1100,
+          "viewMatrix": [
+            -1,
+            0,
+            0,
+            0,
+            0,
+            0.999687671661377,
+            -0.024992169812321663,
+            0,
+            0,
+            -0.024992169812321663,
+            -0.999687671661377,
+            0,
+            82.45465087890625,
+            1.283980369567871,
+            5.578665733337402,
+            1
+          ],
+          "projectionMatrix": [
+            1.2428655624389648,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000145435333252,
+            -1,
+            0,
+            0,
+            -0.1600116342306137,
+            0
+          ]
+        }
+      },
+      "frameWork": {
+        "cpuMs": 17.300000190734863,
+        "gpuMs": 26.520893
+      },
+      "frameBreakdownMs": {
+        "simulation": 0.4654654497140879,
+        "world": 0.09489489532447792,
+        "avatarsAndCamera": 0.21621622480787672,
+        "environment": 0.7738738675733229,
+        "render": 18.90390391535945,
+        "labels": 0.059459453588491445
+      },
+      "triangles": 2481423,
+      "drawCalls": 620,
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0
+    },
+    {
+      "file": "b2-thirty-day-medium-full.json",
+      "date": "2026-10-12T15:10:57.493Z",
+      "sourceSnapshotId": "edfac4a2a1b0ed14fe8835b47df5b957ef8efe4a538e4c775710ecda7d44d19e",
+      "avatars": 30,
+      "fps": 28.3,
+      "p95FrameMs": 43.5,
+      "p99FrameMs": 48.700000047683716,
+      "durationSeconds": 10.03,
+      "frames": 284,
+      "gpu": {
+        "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (Intel)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "integrated",
+        "classificationLabel": "Integrovaná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Hra nyní používá integrovanou grafiku. Pokud máš i samostatnou kartu, nastav pro tento prohlížeč nebo aplikaci ve Windows vysoký výkon a aplikaci znovu spusť."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        }
+      },
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderResolution": {
+        "width": 1280,
+        "height": 720
+      },
+      "quality": "medium",
+      "sceneView": {
+        "position": {
+          "x": 110,
+          "y": -2.323899984359741,
+          "z": 12.00003433227539
+        },
+        "yaw": 0,
+        "pitch": 0.1899999999999999,
+        "lightingInstant": 1791799200000,
+        "camera": {
+          "position": {
+            "x": 110,
+            "y": 1.036099910736084,
+            "z": 4.000034332275391
+          },
+          "fov": 0.85,
+          "minZ": 0.08,
+          "maxZ": 1100,
+          "viewMatrix": [
+            -1,
+            0,
+            0,
+            0,
+            0,
+            0.9453227519989014,
+            0.32613635063171387,
+            0,
+            0,
+            0.32613635063171387,
+            -0.9453227519989014,
+            0,
+            110,
+            -2.2840054035186768,
+            3.443413496017456,
+            1
+          ],
+          "projectionMatrix": [
+            1.2428655624389648,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000145435333252,
+            -1,
+            0,
+            0,
+            -0.1600116342306137,
+            0
+          ]
+        }
+      },
+      "frameWork": {
+        "cpuMs": 33.299999952316284,
+        "gpuMs": 29.440298
+      },
+      "frameBreakdownMs": {
+        "simulation": 0.789084511743465,
+        "world": 0.1316901487363896,
+        "avatarsAndCamera": 0.8052816894692434,
+        "environment": 1.442605624736195,
+        "render": 24.562323948027384,
+        "labels": 0.19119718293069113
+      },
+      "triangles": 3267609,
+      "drawCalls": 662,
+      "renderErrorCount": 0,
+      "assetLoadErrorCount": 0
+    }
+  ],
+  "network": {
+    "durationMs": 120010.731,
+    "minRowsPerMotion": 30,
+    "maxRowsPerMotion": 30,
+    "worldIds": [
+      "a5rHSHQcv"
+    ],
+    "distinctPresets": 6,
+    "errors": [],
+    "resyncs": 0
+  },
+  "limits": "Intel UHD630, medium 1280x720, full production game and HUD; not GeForce or a 60 FPS result. Camera differs from B1, therefore no speedup/regression A/B claim.",
+  "visual": "B4 PBR panels now respond to daylight; photographed north/west faces, window detail, market, B6 entry and stadium exterior. No image generation or screenshot retouching.",
+  "practical": [
+    "Actual A/D walking in camera-relative directions and orbit/first-person camera used across the route. Browser denied pointer lock; documented drag fallback worked.",
+    "Car entered, W+A turned left, W+D turned right, handbrake stopped, E exited safely. This is not exhaustive vehicle roof/collision certification.",
+    "B6 external stairs climbed into reception and descended to (-4.6385,-89.5129). An initial retreat stopped at the entry edge; recentring passed without jumping or respawn.",
+    "Brief HUD drop to 7-8 FPS while approaching B6 interior, recovering to 26 FPS; not a timed benchmark and not claimed resolved.",
+    "Stadium east wall stopped the walker at x=-143.1999; continued forward input left x=-143.2059 with slight tangential sliding. Whole perimeter not walked."
+  ]
+}

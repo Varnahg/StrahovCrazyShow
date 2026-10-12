@@ -35,3 +35,13 @@ Převod os/normál/zaokrouhlení je společný helper, source JSON se zapisuje p
 Procesy root: B1 source session75157; B1 Blender session56846/PID31044; B3 source+Blender session20348/PID6884; GLB audit session56847; native audit session60013; všechny skončily exit0 kromě výslovně zachovaného B1 audit failure. Diagnostické native sessions43266/37658/97127 skončily exit0 bez přepsání modelů. Žádný Blender, vlastní server či GPU scéna po předání nezůstává. Weather preview4179/API2570 zůstává pod svým předaným vlastníkem.
 
 Přesné logy B1/B2/B3 a aktuální audity jsou v `docs/reality-pack/separate-assets/`; úplný manifest tohoto předání je `building-archive-validation-manifest.json` (obsahuje také testy, vylučuje `.blend1/.blend2` zálohy). Po uložení manifestu se heavy-validation/claim uvolní. Následuje stabilní snapshot, plné testy/build/izolovaná integrace a skutečné herní JPEG záběry + GPU měření. Žádné tvrzení o GeForce nebo 60 FPS z těchto CPU výsledků.
+
+## M2 — B4 material correction after actual B1 gameplay
+
+The B1 north-facade screenshot exposed the StandardMaterial/PBR lighting mismatch. The separately tested B4 factory now decodes the shared sRGB shade exactly, uses roughness0.84, metallic0 and scene environment0.7, with no invented texture or emission. Geometry-buffer hashes of all120 buildings are unchanged. Factory `client/b4-panel-material.ts` was added to the explicit archive source-hash list.
+
+All121 source models and Blender/GLB archives were refreshed and rechecked in the `*-20261012-m2.log` run, exit0 with actual success markers. GLB audit and all121 native reopens PASS again;2,905,224 triangles and206,118,812 GLB bytes unchanged. Source plan is379,878,381 bytes. Native source-normal precision, maximum native shading angle and B6 invariants remain identical to B1. Prior B1 audits were copied to immutable `building-export-audit-20261012-b1.json` and `blender-reopen-audit-20261012-b1.json` before the new report was written.
+
+The actual combined B4 GLB was additionally compared with the actual unchanged highest panel-kit GLB: linear factor `[0.3662526011,0.3864294291,0.3712376952,1]`, roughness0.83999997, metallic0, no maps/emission, opaque/backface culled PASS. Evidence: `b4-combined-material-20261012-m2.json`, runnable `audit-b4-combined-material.mjs`.
+
+Pipeline session84166 and all Blender children completed; no own process remains. No new GPU or full game pipeline was run in this archive phase. Root will freeze B2 with all tests and compare the actual game appearance before publishing another implementation change. The old main B1 remains available.

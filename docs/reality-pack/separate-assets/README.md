@@ -4,6 +4,8 @@ Aktualizováno 12. 10. 2026. Hlavní svět používá čisté autorské modely a
 
 ## Aktuální modelářský checkpoint 12. 10. 2026
 
+**Následná materiálová oprava M2:** skutečný herní snímek B1 odhalil odlišnou světelnou reakci šedých panelů B4. Jejich nový netexturovaný PBR materiál odpovídá původnímu Blender kitu přesnou lineární barvou a roughness0,84. Geometrie všech120 budov je beze změny. Všech121 kombinovaných archivů bylo znovu vytvořeno a prošlo GLB i native kontrolou; [přímá shoda materiálů](b4-combined-material-20261012-m2.json). Source plan M2 má379878381B. Následující B1 údaje zachycují původní checkpoint; jeho audity jsou zachované také s příponou `-20261012-b1.json`. Produkční GPU porovnání opraveného materiálu ještě navazuje.
+
 Všech 121 samostatných `.blend` a GLB bylo znovu vytvořeno z nejvyšší skutečně autorské geometrie: **2 905 224 trojúhelníků**. Zahrnuje nové Blender profily oken, správnou identifikovanou skladbu tří fasád B4 a doložený kouřovod Potravin/R-ka. Okna mají oddělené rámy, zapuštěné křídlo, těsnění, ostění a profilovaný parapet. B4 má 12/5/18 otvorů, tmavé neutrální rámy a panelové spáry; složení šedého obkladu není prokázané. Konstrukční milimetrové rozměry jsou výslovně modelářské odhady, ne zaměření.
 
 Aktuální přenosné geometrie mají dohromady **206 118 812 B**, 15 sdílených obrazů **6 020 118 B**. Source plan má **379 878 281 B** a je vedený přes Git LFS. Herní near/far varianty pocházejí ze stejných autorských kitů; nejvyšší archivní detail se v běžné hře nepřidává jako další překrývající se model.

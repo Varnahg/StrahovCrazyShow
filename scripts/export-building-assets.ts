@@ -319,6 +319,7 @@ const sourceFiles = [
   "client/architecture-reality.ts",
   "client/architecture-depth.ts",
   "client/building-window-model.ts",
+  "client/b4-panel-material.ts",
   "shared/b4-facade-plan.ts",
   "shared/data/b4-facade-plan.json",
   "shared/data/building-window-kit.json",

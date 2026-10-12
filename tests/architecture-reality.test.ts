@@ -6,6 +6,8 @@ import { Ray } from "@babylonjs/core/Culling/ray";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import type { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { surfaceTexturePlan } from "../client/surface-pack";
 import {
   architectureEdges,
@@ -18,7 +20,7 @@ import {
 import { BUILDINGS } from "../shared/world";
 import { B6_LAYOUT } from "../shared/b6-interior";
 
-test("headless architecture retains the browser texture recipe without changing fallback colours or loading images", () => {
+test("headless architecture retains authored texture recipes without requesting their images", () => {
   const engine = new NullEngine(),
     scene = new Scene(engine);
   const architecture = buildArchitectureReality({ scene, buildings: [] });
@@ -65,10 +67,29 @@ test("headless architecture retains the browser texture recipe without changing 
           ?.authoredArchitectureTexture,
         undefined,
       );
-    assert.equal(
-      scene.textures.length,
-      0,
-      "NullEngine does not request authored PNGs",
+    const panel = scene.materials.find(
+      (material) => material.name === "reality B4 grey facade panels",
+    );
+    assert.ok(panel instanceof PBRMaterial);
+    for (const texture of [
+      panel.albedoTexture,
+      panel.bumpTexture,
+      panel.emissiveTexture,
+      panel.metallicTexture,
+    ])
+      assert.equal(
+        texture,
+        null,
+        "no authored panel maps are created in headless mode",
+      );
+    const lut = panel.environmentBRDFTexture;
+    assert.ok(lut);
+    assert.match(lut.name, /^data:EnvironmentBRDFTexture\d+$/);
+    assert.equal((lut as Texture).url, lut.name);
+    assert.deepEqual(
+      scene.textures,
+      [lut],
+      "only the embedded shared BRDF LUT is allowed; no network/authored PNGs",
     );
   } finally {
     architecture.dispose();
