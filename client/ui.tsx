@@ -5,6 +5,13 @@ import {
 } from "./benchmark-presentation";
 import { WorldDock } from "./world-dock";
 import { HudWeather } from "./hud-status";
+import {
+  LIGHTING_PREVIEWS,
+  isLightingPreviewMode,
+  selectLightingPreview,
+  type LightingPreviewMode,
+  type LightingPreviewSelection,
+} from "./lighting-preview";
 import { currentRoomCallbacks } from "./room-callbacks";
 import "./hud.css";
 import { useDialogFocus } from "./use-dialog-focus";
@@ -61,6 +68,7 @@ import {
   DISPLAY_REFRESH_HELP_URL,
 } from "./gpu-diagnostics";
 import type { Weather } from "../shared/weather";
+import { ageClientWeather } from "./weather-freshness";
 import { MotionDecoder } from "../shared/motion-codec";
 import {
   nextArrivals,
@@ -188,7 +196,13 @@ export function App() {
       );
     }
   };
-  const [lighting, setLighting] = useState("real");
+  const [lightingPreview, setLightingPreview] =
+    useState<LightingPreviewSelection>({
+      mode: "real",
+      instant: null,
+    });
+  const lightingPreviewRef = useRef(lightingPreview);
+  const { mode: lighting, instant: previewInstant } = lightingPreview;
   const [trafficPreview, setTrafficPreview] = useState<TransitArrival | null>(
     null,
   );
@@ -196,12 +210,6 @@ export function App() {
     authorityRef = useRef<Authority | null>(null),
     playersById = useRef(new Map<string, Player>()),
     connectedRef = useRef(false);
-  const previewInstant = (mode: string) =>
-    mode === "real"
-      ? null
-      : Date.parse(
-          dateKey(Date.now()) + (mode === "day" ? "T10:00:00Z" : "T22:00:00Z"),
-        );
   const [profile, setProfile] = useState<Profile>(readProfile),
     [mode, setMode] = useState<"menu" | "guest" | "multi">("menu"),
     [busy, setBusy] = useState(false),
@@ -279,6 +287,12 @@ export function App() {
     mapClose,
   );
   const notice = (message: string) => setToast(message);
+  const changeLightingPreview = (mode: LightingPreviewMode) => {
+    const selection = selectLightingPreview(mode);
+    lightingPreviewRef.current = selection;
+    setLightingPreview(selection);
+    if (game.current) game.current.timeOverride = selection.instant;
+  };
   const reward = (name: string) => {
     setRewards((previous) => {
       const next = [...new Set([...previous, name])];
@@ -359,22 +373,42 @@ export function App() {
     chatEnd.current?.scrollIntoView({ block: "nearest" });
   }, [messages, channel]);
   useEffect(() => {
+    let cancelled = false;
+    let active: AbortController | undefined;
+    const publish = (weather: Weather) => {
+      if (cancelled) return;
+      setWeather(weather);
+      weatherRef.current = weather;
+      game.current?.setWeather(weather);
+    };
     const load = async () => {
+      if (active || cancelled) return;
+      if (weatherRef.current)
+        publish(ageClientWeather(weatherRef.current, Date.now()));
+      const request = new AbortController();
+      active = request;
+      const timeout = setTimeout(() => request.abort(), 20000);
       try {
-        const response = await fetch("/api/weather");
-        if (response.ok) {
-          const w = await response.json();
-          setWeather(w);
-          weatherRef.current = w;
-          game.current?.setWeather(w);
-        }
+        const response = await fetch("/api/weather", {
+          signal: request.signal,
+        });
+        if (!response.ok) throw new Error("Weather refresh failed");
+        publish(ageClientWeather(await response.json(), Date.now()));
       } catch {
-        /* solo remains playable */
+        if (weatherRef.current)
+          publish(ageClientWeather(weatherRef.current, Date.now(), true));
+      } finally {
+        clearTimeout(timeout);
+        active = undefined;
       }
     };
     load();
     const interval = setInterval(load, 60000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      active?.abort();
+    };
   }, []);
   useEffect(() => {
     if (mode === "menu" || !canvas.current) return;
@@ -387,7 +421,7 @@ export function App() {
         const g = new Game(canvas.current, profileRef.current);
         game.current = g;
         g.network = mode === "multi";
-        g.timeOverride = previewInstant(lighting);
+        g.timeOverride = lightingPreviewRef.current.instant;
         g.setLocalId(idRef.current);
         g.onStats = setStats;
         g.onBenchmark = (value) => {
@@ -887,18 +921,10 @@ export function App() {
           {lighting !== "real" && (
             <button
               className="demo-badge"
-              aria-label={
-                lighting === "day"
-                  ? t("Vypnout denní náhled osvětlení")
-                  : t("Vypnout noční náhled osvětlení")
-              }
-              onClick={() => {
-                setLighting("real");
-                if (game.current) game.current.timeOverride = null;
-              }}
+              aria-label={t("Vypnout náhled osvětlení")}
+              onClick={() => changeLightingPreview("real")}
             >
-              {lighting === "day" ? t("Denní náhled") : t("Noční náhled")}{" "}
-              <span aria-hidden="true">×</span>
+              {t(LIGHTING_PREVIEWS[lighting])} <span aria-hidden="true">×</span>
             </button>
           )}
           {trafficPreview && (
@@ -917,9 +943,18 @@ export function App() {
         <div className="top-right">
           <HudWeather weather={weather} label={weatherLabel} />
           <span className="clock">
-            {time(previewInstant(lighting) ?? now)}{" "}
+            {time(previewInstant ?? now)}{" "}
             <small>
-              {lighting === "real" ? t("Praha") : t("náhled světla · Praha")}
+              {previewInstant === null
+                ? t("Praha")
+                : formatDate(previewInstant, {
+                    timeZone: "Europe/Prague",
+                    day: "numeric",
+                    month: "numeric",
+                    year: "numeric",
+                  }) +
+                  " · " +
+                  t("náhled světla · Praha")}
             </small>
           </span>
           <button
@@ -2096,23 +2131,30 @@ export function App() {
                   <select
                     value={lighting}
                     onChange={(e) => {
-                      setLighting(e.target.value);
-                      if (game.current)
-                        game.current.timeOverride = previewInstant(
-                          e.target.value,
-                        );
+                      if (isLightingPreviewMode(e.target.value))
+                        changeLightingPreview(e.target.value);
                     }}
                   >
-                    <option value="real">
-                      {t("Skutečný čas na Strahově")}
-                    </option>
-                    <option value="day">{t("Denní náhled · demo")}</option>
-                    <option value="night">{t("Noční náhled · demo")}</option>
+                    {Object.entries(LIGHTING_PREVIEWS).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {t(label)}
+                      </option>
+                    ))}
                   </select>
                 </label>
                 {lighting !== "real" && (
                   <p className="fiction">
-                    {t("NÁHLED OSVĚTLENÍ · skutečný čas je dočasně nahrazený.")}
+                    {t("NÁHLED OSVĚTLENÍ · skutečný čas je dočasně nahrazený.")}{" "}
+                    {previewInstant !== null && (
+                      <time dateTime={new Date(previewInstant).toISOString()}>
+                        {formatDate(previewInstant, {
+                          timeZone: "Europe/Prague",
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })}{" "}
+                        · {t("Praha")}
+                      </time>
+                    )}
                   </p>
                 )}
                 <div className="stat-grid">
@@ -2158,6 +2200,25 @@ export function App() {
                   {t("°; mraky používají modelové proudění ve výšce.")}{" "}
                   {localizeText(weather?.cloudWindSource)}
                 </p>
+                {weather?.visibility !== undefined && (
+                  <p className="small muted">
+                    {t("Modelová dohlednost")}:{" "}
+                    {formatNumber(weather.visibility / 1000, {
+                      maximumFractionDigits: 1,
+                    })}{" "}
+                    km
+                    {weather.fieldSources?.visibility?.stale &&
+                      " · " + t("model · starší data")}
+                  </p>
+                )}
+                {(weather?.snowfall ?? 0) > 0 && (
+                  <p className="small muted">
+                    {t("Modelové sněžení")}: {formatNumber(weather!.snowfall!)}{" "}
+                    cm/h
+                    {weather?.fieldSources?.snowfall?.stale &&
+                      " · " + t("model · starší data")}
+                  </p>
+                )}
                 <a
                   href="https://weather.sh.cvut.cz/weather/"
                   target="_blank"
@@ -2175,6 +2236,33 @@ export function App() {
                     Open-Meteo
                   </a>
                   , CC BY 4.0.
+                </p>
+                <p className="small muted">
+                  {t("Hvězdy a Měsíc")}:{" "}
+                  <a
+                    href="https://github.com/astronexus/HYG-Database"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    HYG v4.1 · David Nash / Astronomy Nexus
+                  </a>{" "}
+                  (
+                  <a
+                    href="https://creativecommons.org/licenses/by-sa/4.0/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    CC BY-SA 4.0
+                  </a>
+                  ; {t("výběr a zobrazení upravené")}).{" "}
+                  <a
+                    href="https://svs.gsfc.nasa.gov/4720/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    NASA SVS · LROC
+                  </a>
+                  .
                 </p>
                 <h3>{t("Autobusy u kolejí")}</h3>
                 <p className="small muted">

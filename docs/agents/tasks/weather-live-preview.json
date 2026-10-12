@@ -1,0 +1,29 @@
+{
+  "id": "weather-live-preview",
+  "title": "Hlavní lokální preview počasí A na4179 aAPI2570",
+  "writePaths": [
+    ".cache/main-testing-handoff.json",
+    ".cache/local-user-benchmarks/atmosphere-20261012/",
+    "docs/agents/handoffs/weather-live-preview.md"
+  ],
+  "resources": [
+    "port:4179",
+    "port:2570"
+  ],
+  "acceptance": [
+    "Run verified source snapshot identitycc97bef12245d7861505791ea4ad5d56e3d667c55f81cf8e10f2a0e1927edae5/protocol10; actual live weather, no benchmark fixture.",
+    "Keep live services under this dedicated reservation, without retaining GPU/heavy/workspace-build resources."
+  ],
+  "notes": [
+    "Received explicit original-process handoff from buildingsthread01a12b28; replace only matching PID/creation-time/command confirmed at action time.",
+    "This is an intentional persistent user-facing local preview, not an abandoned test. The original owner and next building integrator may stop/release it only after an explicit documented handoff."
+  ],
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [
+    "weather-integration-20261012"
+  ],
+  "verification": [
+    "HTTP health and asset byte checks; no additional GPU/performance claims."
+  ]
+}

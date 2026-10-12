@@ -2,9 +2,9 @@ import type { Input, Vec3 } from "./types";
 import type { VehicleState } from "./vehicle";
 export type { Input } from "./types";
 
-// The canonical market roof collision changed in v9. Reject older predictors
-// even though the compact motion dictionary/delta wire format is unchanged.
-export const PROTOCOL_VERSION = 9;
+// Mapped outdoor furniture/barriers add static collisions in v10. Reject older
+// predictors even though the compact motion dictionary/delta wire format is unchanged.
+export const PROTOCOL_VERSION = 10;
 export const SIM_HZ = 60;
 export const FIXED_DT = 1 / SIM_HZ;
 export const MAX_CATCHUP_STEPS = 8;

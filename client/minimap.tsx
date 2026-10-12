@@ -1,4 +1,4 @@
-import { memo, useEffect, useId, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   BUILDINGS,
   BOUNDS,
@@ -25,6 +25,7 @@ import {
 import type { PlanMapRoute, MapNavigation } from "./map-navigation";
 import { useLocale, localizeText as L, formatNumber } from "./i18n";
 import "./minimap.css";
+import { MapArtifactLayer, MAP_ARTIFACTS } from "./map-artifacts";
 
 // Geometry is shared with the actual world and constructed once, not for each
 // telemetry update. No extra map tiles, requests, or multiplayer connection.
@@ -111,7 +112,7 @@ const MapBackground = memo(() => BACKGROUND);
 const mapBounds = {
   minX: BOUNDS.minX - 8,
   maxX: BOUNDS.maxX + 8,
-  minZ: BOUNDS.minZ - 8,
+  minZ: Math.min(BOUNDS.minZ, ...MAP_ARTIFACTS.map((a) => a.z)) - 12,
   maxZ: BOUNDS.maxZ + 8,
 };
 const center = {
@@ -181,6 +182,14 @@ export const MapView = memo(function MapView({
     [headingUp, setHeadingUp] = useState(false),
     [hover, setHover] = useState<string | null>(null),
     [expandedIds, setExpandedIds] = useState<string[]>([]);
+  const [showArtifacts, setShowArtifacts] = useState(false);
+  const [artifactId, setArtifactId] = useState<string>();
+  const selectArtifact = useCallback((a: (typeof MAP_ARTIFACTS)[number]) => {
+    if (performance.now() >= suppressedClickUntil.current) setArtifactId(a.id);
+  }, []);
+  const selectedArtifact = showArtifacts
+    ? MAP_ARTIFACTS.find((a) => a.id === artifactId)
+    : undefined;
   const fit = fitMapScale(mapBounds, size),
     maxZoom = 12,
     rotation = headingUp && self ? -mapHeading(self.yaw) : 0,
@@ -546,6 +555,14 @@ export const MapView = memo(function MapView({
             transform={`translate(${size.width / 2},${size.height / 2}) rotate(${northAngle}) scale(${camera.scale}) translate(${-camera.x},${-camera.z})`}
           >
             <MapBackground />
+            {showArtifacts && (
+              <MapArtifactLayer
+                scale={camera.scale}
+                angle={northAngle}
+                selected={artifactId}
+                onSelect={selectArtifact}
+              />
+            )}
             {routePoints && (
               <g className="map-route" pointerEvents="none">
                 <polyline className="map-route-underlay" points={routePoints} />
@@ -781,6 +798,43 @@ export const MapView = memo(function MapView({
           </button>
         </div>
       </div>
+      {big && (
+        <div className="map-artifact-tools">
+          <button
+            type="button"
+            aria-pressed={showArtifacts}
+            onClick={() => setShowArtifacts(!showArtifacts)}
+          >
+            {locale === "cs"
+              ? "Mobiliář a dominanty"
+              : "Street furniture & landmarks"}
+            {showArtifacts ? ` · ${MAP_ARTIFACTS.length}` : ""}
+          </button>
+          {selectedArtifact && (
+            <div className="map-artifact-detail">
+              <strong>{selectedArtifact.name}</strong>
+              <span>
+                {selectedArtifact.kind === "tower"
+                  ? locale === "cs"
+                    ? "Dominanta za hranicí pěší mapy"
+                    : "Landmark beyond the walkable map"
+                  : locale === "cs"
+                    ? "Mapová poloha · rozměry modelu orientační"
+                    : "Mapped position · approximate model dimensions"}
+              </span>
+              <a
+                href={selectedArtifact.source}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {locale === "cs"
+                  ? "Zdroj polohy a identifikace ↗"
+                  : "Position & identification source ↗"}
+              </a>
+            </div>
+          )}
+        </div>
+      )}
       {expandedPlaces.length > 1 && (
         <div
           className="map-cluster-list"

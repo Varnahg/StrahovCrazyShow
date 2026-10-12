@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "weather-final-refactor",
+  "title": "Dokončit vlastní počasí před uvolněním společné GPU přejímky",
+  "status": "done",
+  "dependsOn": [
+    "atmosphere-cloud-refinement"
+  ],
+  "writePaths": [
+    "shared/weather.ts",
+    "server/weather.ts",
+    "client/weather-freshness.ts",
+    "client/art-lighting.ts",
+    "client/sky-weather.ts",
+    "client/ui.tsx",
+    "client/i18n-messages.ts",
+    "tests/graphics.test.ts",
+    "tests/weather-freshness.test.ts",
+    "docs/weather/README.md",
+    "docs/weather/atmosphere-lighting.md",
+    "docs/weather/sources.json",
+    "docs/agents/handoffs/weather-final-refactor.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Consolidate weather freshness logic and finish bounded lighting/visibility/attribution refinements in original weather-owned WIP. Preserve all other tasks.",
+    "Update old numerical art bounds without removing physical horizon/continuity assertions."
+  ],
+  "verification": [
+    "Focused CPU tests only; no full suite/build/GPU until outdoor releases heavy-validation."
+  ],
+  "notes": [
+    "Owner weather-01a12fcb-root is the original author of these weather files, and recipient of explicitly completed weather/shadows subagent handoffs. --adopt-dirty is authorized for these known own changes.",
+    "Main game/world-renderer and docs/verification remain with outdoor task until its handoff.",
+    "Original owner completed and accepted own integration refactor; see handoff, 30/30 + 30/30 focused CPU PASS. No heavy/GPU."
+  ]
+}

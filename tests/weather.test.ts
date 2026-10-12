@@ -14,7 +14,7 @@ import {
   parseModelWeather,
   selectWeather,
 } from "../server/weather";
-import { cloudPixels, moonDiscLightVector } from "../client/sky-weather";
+import { moonDiscLightVector } from "../client/sky-weather";
 import { sampleArtLighting } from "../client/art-lighting";
 import { applyArtLighting } from "../client/art-lighting";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
@@ -43,10 +43,10 @@ const modelData = () => ({
     cloud_cover_high: 45,
     wind_speed_850hPa: 12,
     wind_direction_850hPa: 225,
-    wind_speed_700hPa: 18,
-    wind_direction_700hPa: 250,
-    wind_speed_500hPa: 25,
-    wind_direction_500hPa: 265,
+    wind_speed_500hPa: 18,
+    wind_direction_500hPa: 250,
+    wind_speed_300hPa: 25,
+    wind_direction_300hPa: 265,
     snowfall: 0.1,
   },
 });
@@ -225,16 +225,6 @@ test("fresh station cannot silently inherit old cloud cover; both failures mark 
   assert.equal(stale.cloudStale, true);
   assert.equal(stale.observedAt, now);
   assert.equal(calls, 4);
-});
-
-test("cloud mipmap source has transparent borders and detailed nonuniform opacity", () => {
-  const pixels = cloudPixels(128, 64),
-    alphas = [];
-  for (let i = 3; i < pixels.length; i += 4) alphas.push(pixels[i]);
-  assert.equal(pixels[3], 0);
-  assert.equal(pixels[pixels.length - 1], 0);
-  assert.ok(new Set(alphas).size > 100);
-  assert.ok(Math.max(...alphas) > 200);
 });
 
 test("night windows scale the masked emission texture while walls remain nonemissive", () => {

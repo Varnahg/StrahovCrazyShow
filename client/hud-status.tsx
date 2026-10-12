@@ -10,11 +10,14 @@ export const HudWeather = memo(function HudWeather({
   label: string;
 }) {
   useLocale();
+  const station =
+    weather?.sourceKind === "station" ||
+    (!weather?.sourceKind && weather?.status === "live");
   const provenance = !weather
     ? t("načítám")
     : weather.status === "unavailable"
       ? t("data nedostupná")
-      : weather.status === "fallback"
+      : !station
         ? weather.stale
           ? t("model · starší data")
           : t("model počasí")
@@ -26,7 +29,7 @@ export const HudWeather = memo(function HudWeather({
       className="weather"
       title={
         weather
-          ? `${localizeText(weather.source)} · ${localizeText(weather.cloudSource)}`
+          ? `${localizeText(weather.source)} · ${localizeText(weather.cloudSource)}${weather.cloudStale && weather.cloudObservedAt != null ? " · " + t("model · starší data") : ""}`
           : undefined
       }
     >

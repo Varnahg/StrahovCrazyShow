@@ -41,6 +41,7 @@ import {
   type PresentationRateMeasurement,
 } from "./presentation-rate";
 import { CinematicAtmosphere } from "./cinematic";
+import { clampOrbitPitch, nextCameraPitch } from "./camera-look";
 import { SurfacePack } from "./surface-pack";
 import { B6_LAYOUT } from "../shared/b6-interior";
 import { groundHeight, PARKING_SLOTS } from "../shared/terrain";
@@ -184,6 +185,7 @@ export type Benchmark = {
     landmarks: unknown;
     referenceOnly: true;
     campusExterior: unknown;
+    outdoorArtifacts: unknown;
     b6: unknown;
     parkedCars: number;
   };
@@ -312,8 +314,6 @@ export class Game {
   lamps: StandardMaterial;
   rain?: LinesMesh;
   rainLines: Vector3[][] = [];
-  sunOrb!: Mesh;
-  moonOrb!: Mesh;
   car: TransformNode;
   parkedCar: TransformNode;
   found = new Set<string>();
@@ -486,7 +486,7 @@ export class Game {
     this.instrumentation = new SceneInstrumentation(this.scene);
     this.avatarPool = new AvatarPrimitivePool(this.scene);
     this.scene.clearColor = new Color4(0.58, 0.72, 0.73, 1);
-    this.scene.fogMode = Scene.FOGMODE_EXP2;
+    this.scene.fogMode = Scene.FOGMODE_EXP;
     this.scene.fogDensity = 0.0018;
     this.camera = new UniversalCamera(
       "follow",
@@ -494,7 +494,8 @@ export class Game {
       this.scene,
     );
     this.camera.minZ = 0.08;
-    this.camera.maxZ = 700;
+    // The Petřín skyline is nearly 1 km from the southwest playable corner.
+    this.camera.maxZ = 1100;
     this.camera.fov = 0.85;
     this.labels = new ScreenLabels(
       canvas.parentElement!.querySelector("[data-label-layer]")!,
@@ -531,20 +532,7 @@ export class Game {
       groundHeight(CAR_SPAWN.x, CAR_SPAWN.z),
       CAR_SPAWN.z,
     );
-    this.sunOrb = this.sphere("sun disc", 0, 200, 0, 10, "#fff0bb");
-    (this.sunOrb.material as StandardMaterial).emissiveColor =
-      Color3.FromHexString("#fff0bb");
-    this.sunOrb.isPickable = false;
-    this.moonOrb = this.sphere("moon", 0, 200, 0, 5, "#b4c7d9");
-    (this.moonOrb.material as StandardMaterial).emissiveColor =
-      Color3.FromHexString("#b4c7d9");
-    this.moonOrb.isPickable = false;
-    this.skyWeather = new SkyWeatherController(
-      this.scene,
-      this.sunOrb,
-      this.moonOrb,
-      this.clouds,
-    );
+    this.skyWeather = new SkyWeatherController(this.scene);
     for (let i = 0; i < 160; i++) {
       const x = ((i * 13.17) % 36) - 18,
         z = ((i * 7.31) % 36) - 18,
@@ -1083,7 +1071,6 @@ export class Game {
   }
   setWeather(weather: Weather) {
     this.weather = weather;
-    this.scene.fogDensity = weather.rain > 0.1 ? 0.006 : 0.0018;
   }
   applyAdaptiveQuality(next: AdaptiveQualitySnapshot) {
     if (next.revision === this.appliedQualityRevision) return;
@@ -1451,7 +1438,7 @@ export class Game {
     ) {
       this.lastCameraInput = performance.now();
       this.yaw -= deltaX * 0.003;
-      this.pitch = Math.max(-0.55, Math.min(1.1, this.pitch + deltaY * 0.002));
+      this.pitch = nextCameraPitch(this.pitch, deltaY, this.footFirstPerson);
     }
   };
   wheel = (e: WheelEvent) => {
@@ -1538,6 +1525,9 @@ export class Game {
     eyeHeight: number,
     dt: number,
   ) {
+    // A first-person sky look stores a steep slope. Restore the original orbit
+    // range before V/vehicle transitions can reuse it as a camera-height offset.
+    if (!this.footFirstPerson) this.pitch = clampOrbitPitch(this.pitch);
     const target = new Vector3(
       renderPosition.x,
       renderPosition.y + (this.actor.vehicle ? 0.7 : 0.6),
@@ -1696,6 +1686,11 @@ export class Game {
       this.quality as "low" | "medium" | "high",
     );
     this.worldControllers?.campusExterior?.update(
+      pos.x,
+      pos.z,
+      this.quality as "low" | "medium" | "high",
+    );
+    this.worldControllers?.outdoorArtifacts?.update(
       pos.x,
       pos.z,
       this.quality as "low" | "medium" | "high",
@@ -1910,6 +1905,7 @@ export class Game {
     const lighting = applyArtLighting(this, {
       sun,
       moon,
+      atmosphere: this.skyWeather.atmosphere,
       headlightRequested: this.car.isEnabled(),
       extraPracticalLightSlots:
         Number(this.b6Reality?.interiorLightEnabled ?? false) +
@@ -1954,11 +1950,13 @@ export class Game {
     this.rain?.setEnabled(raining);
     if (raining && this.rain) {
       this.rain.position.set(pos.x, pos.y, pos.z);
+      this.rain.alpha = 0.12 + lighting.surfaceIllumination * 0.32;
       updateRainSegments(
         this.rainLines,
         dt,
-        this.weather?.temperature ?? 10,
+        this.weather ?? { rain: 0 },
         wind,
+        time,
       );
       MeshBuilder.CreateLineSystem("rain", {
         lines: this.rainLines,
@@ -1971,6 +1969,8 @@ export class Game {
       player: pos,
       quality: this.quality,
       cloud: this.weather?.cloud ?? 0.4,
+      rain: this.weather?.rain ?? 0,
+      keySource: lighting.keySource,
       daylight: sun.daylight,
       avatars: this.avatars.values(),
       localId: this.localId,
@@ -2036,6 +2036,8 @@ export class Game {
             referenceOnly: true as const,
             campusExterior:
               this.worldControllers?.campusExterior?.stats ?? null,
+            outdoorArtifacts:
+              this.worldControllers?.outdoorArtifacts?.stats ?? null,
             landmarks: this.worldControllers?.landmarks?.metrics ?? null,
             b6: this.b6Reality?.stats ?? null,
             parkedCars: PARKING_SLOTS.length,
@@ -2204,6 +2206,7 @@ export class Game {
     this.worldControllers?.architecture?.dispose();
     this.worldControllers?.landmarks?.dispose();
     this.worldControllers?.campusExterior?.dispose();
+    this.worldControllers?.outdoorArtifacts?.dispose();
     this.skyWeather.dispose();
     this.vegetation?.dispose();
     this.disposeCarAssets?.();

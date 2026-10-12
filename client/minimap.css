@@ -360,6 +360,65 @@
   white-space: nowrap !important;
   border: 0 !important;
 }
+.map-artifact {
+  cursor: pointer;
+}
+.map-artifact circle {
+  fill: #233b42;
+  stroke: #c9d1ad;
+  stroke-width: 1;
+}
+.map-artifact path {
+  fill: none;
+  stroke: #edebd2;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.map-artifact.selected circle,
+.map-artifact:focus circle {
+  fill: #735330;
+  stroke: #ffe3a0;
+  stroke-width: 2;
+}
+.map-artifact-boundary {
+  fill: none;
+  stroke: #526b72;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.map-artifact-tools {
+  padding: 6px 10px;
+  background: #112430;
+  font-size: 11px;
+}
+.map-artifact-tools > button {
+  padding: 5px 8px;
+  border: 1px solid #536b70;
+  border-radius: 4px;
+  color: #e4e8da;
+  background: #203b45;
+  cursor: pointer;
+}
+.map-artifact-tools > button[aria-pressed="true"] {
+  border-color: #e3c78d;
+}
+.map-artifact-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 12px;
+  padding-top: 7px;
+}
+.map-artifact-detail strong {
+  width: 100%;
+  color: #ede0b7;
+}
+.map-artifact-detail span {
+  color: #b6c8c6;
+}
+.map-artifact-detail a {
+  color: #d5cfb2;
+}
 @media (max-width: 620px) {
   .map-widget-mini svg.map {
     height: 125px;

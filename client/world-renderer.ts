@@ -42,6 +42,8 @@ import { TERRAIN_COVERAGE } from "../shared/world";
 import { buildPhotogrammetryEntranceRepair } from "./photogrammetry-repairs";
 import { buildPhotogrammetryGroundRepairs } from "./photogrammetry-ground";
 import { createCampusExterior } from "./campus-exterior";
+import { createOutdoorArtifacts } from "./outdoor-artifacts";
+import { buildOutdoorWorldPlan } from "../shared/outdoor-world";
 import { buildCampusExteriorPlan } from "../shared/campus-exterior";
 import {
   getWorldAssetRoot,
@@ -663,58 +665,6 @@ function stadium(context: WorldBuildContext) {
   }
 }
 
-function clouds(context: WorldBuildContext) {
-  const tex = texture(context.scene, "authored soft cloud", 256, 128, (ctx) => {
-    // A single shared mipmapped alpha texture replaces 96 intersecting spheres.
-    // Two altitude bands provide depth, no volumetric raymarching or particles.
-    const blobs = [
-      [52, 72, 43],
-      [88, 57, 47],
-      [128, 57, 52],
-      [171, 66, 47],
-      [208, 77, 35],
-    ];
-    for (const [x, y, r] of blobs) {
-      const gradient = ctx.createRadialGradient(x, y, r * 0.12, x, y, r);
-      gradient.addColorStop(0, "rgba(244,245,238,.75)");
-      gradient.addColorStop(0.6, "rgba(237,240,235,.44)");
-      gradient.addColorStop(1, "rgba(229,235,233,0)");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(x - r, y - r, r * 2, r * 2);
-    }
-  });
-  tex.hasAlpha = true;
-  const material = new StandardMaterial("art:clouds", context.scene);
-  material.diffuseTexture = tex;
-  material.useAlphaFromDiffuseTexture = true;
-  material.disableLighting = true;
-  material.emissiveColor.set(0.85, 0.88, 0.88);
-  material.backFaceCulling = false;
-  material.disableDepthWrite = true;
-  for (let i = 0; i < 24; i++) {
-    const site = (i * 7) % 24;
-    const cloud = MeshBuilder.CreatePlane(
-      "soft cloud",
-      {
-        width: 78 + (i % 4) * 14,
-        height: 40 + (i % 3) * 8,
-      },
-      context.scene,
-    );
-    cloud.rotation.x = Math.PI / 2;
-    cloud.rotation.y = ((i * 7) % 11) * 0.19;
-    cloud.position.set(
-      -220 + (site % 6) * 125,
-      88 + (i % 2) * 23,
-      -190 + Math.floor(site / 6) * 125,
-    );
-    cloud.material = material;
-    cloud.isPickable = false;
-    cloud.applyFog = false;
-    context.clouds.push(cloud);
-  }
-}
-
 export function buildWorld(
   context: WorldBuildContext,
   options: { photogrammetry?: boolean } = {},
@@ -852,6 +802,9 @@ export function buildWorld(
   const campusExterior = exteriorPlan
     ? createCampusExterior(context.scene, exteriorPlan)
     : undefined;
+  const outdoorArtifacts = options.photogrammetry
+    ? undefined
+    : createOutdoorArtifacts(context.scene, buildOutdoorWorldPlan());
   for (const p of PLACES)
     if (p.worldLabel !== false && p.id !== "club6" && p.id !== "b6")
       context.label(p.name, p.x, groundHeight(p.x, p.z) + 3.4, p.z, 5.5);
@@ -883,6 +836,12 @@ export function buildWorld(
     )
       material.specularColor.set(0.025, 0.025, 0.025);
   }
-  clouds(context);
-  return { architecture, b6Fallback, b6Root, landmarks, campusExterior };
+  return {
+    architecture,
+    b6Fallback,
+    b6Root,
+    landmarks,
+    campusExterior,
+    outdoorArtifacts,
+  };
 }

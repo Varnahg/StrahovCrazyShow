@@ -1,12 +1,17 @@
 import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import type { Scene } from "@babylonjs/core/scene";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+import {
+  createAtmosphereSky,
+  ATMOSPHERE_CLOUD_GLSL,
+  ATMOSPHERE_CLOUD_UNIFORMS,
+  ATMOSPHERE_CLOUD_SAMPLERS,
+  type AtmosphereSky,
+} from "./atmosphere-sky";
 import {
   moonState,
   sunState,
@@ -34,10 +39,6 @@ export interface SkyWeatherState {
 
 const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
-const smooth = (a: number, b: number, v: number) => {
-  const t = clamp((v - a) / (b - a));
-  return t * t * (3 - 2 * t);
-};
 
 /** Lighting a projected sphere gives the actual illuminated-area fraction. */
 export function moonDiscLightVector(fraction: number, brightLimbAngle: number) {
@@ -54,13 +55,23 @@ Effect.ShadersStore.strahovCelestialVertexShader = `
 precision highp float;
 attribute vec3 position;
 uniform mat4 worldViewProjection;
+uniform mat4 world;
+uniform vec3 skyObserver;
+uniform float farDepth;
+varying vec3 vSkyRay;
 varying vec2 vDisc;
 void main(void) {
   vDisc=position.xy;
+  vSkyRay=(world*vec4(position,1.0)).xyz-skyObserver;
   gl_Position=worldViewProjection*vec4(position,1.0);
+  // Celestial geometry sets angular size only: every piece of scenery, even
+  // beyond the 420m placement sphere, must be able to occlude a distant body.
+  gl_Position.z=farDepth*gl_Position.w;
 }`;
 Effect.ShadersStore.strahovSunFragmentShader = `
 precision highp float;
+varying vec3 vSkyRay;
+${ATMOSPHERE_CLOUD_GLSL}
 varying vec2 vDisc;
 uniform float altitude;
 uniform float angularRadius;
@@ -74,10 +85,12 @@ void main(void) {
   float halo=exp(-radius*radius*.16)*.12;
   float warm=1.0-smoothstep(0.0,.28,altitude);
   vec3 color=mix(vec3(1.0,.97,.86),vec3(1.0,.67,.32),warm*.75);
-  gl_FragColor=vec4(color,max(disc,halo)*strength);
+  gl_FragColor=vec4(color,max(disc,halo)*strength*(1.0-atmosphereCloudOpacity(normalize(vSkyRay))));
 }`;
 Effect.ShadersStore.strahovMoonFragmentShader = `
 precision highp float;
+varying vec3 vSkyRay;
+${ATMOSPHERE_CLOUD_GLSL}
 varying vec2 vDisc;
 uniform sampler2D moonMap;
 uniform vec3 lightDirection;
@@ -100,69 +113,16 @@ void main(void) {
   vec3 albedo=texture2D(moonMap,uv).rgb;
   float cosine=dot(normal,lightDirection);
   float lit=pow(max(cosine,0.0),.32)*smoothstep(-.006,.006,cosine);
-  float earthshine=.028*(1.0-daylight);
+  float earthshine=.035*(1.0-daylight)*(1.0-(lightDirection.z+1.0)*.5);
   vec3 color=albedo*(lit*1.7+earthshine);
   // Atmospheric foreground keeps the unlit side from becoming a black daytime disc.
   color=mix(color,skyColor+color*.3,daylight*.78);
   float edge=1.0-smoothstep(.992,1.0,sqrt(r2));
-  gl_FragColor=vec4(color,edge*strength);
+  // In daylight the unlit lunar surface is hidden by foreground sky radiance.
+  // Reveal the exact backdrop instead of painting a dark circular sky-colour guess.
+  float visibleSurface=mix(1.0,smoothstep(-.006,.04,cosine),daylight);
+  gl_FragColor=vec4(color,edge*visibleSurface*strength*(1.0-atmosphereCloudOpacity(normalize(vSkyRay))));
 }`;
-
-function hash(x: number, y: number) {
-  const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
-  return n - Math.floor(n);
-}
-function noise(x: number, y: number) {
-  const ix = Math.floor(x),
-    iy = Math.floor(y),
-    fx = x - ix,
-    fy = y - iy,
-    ux = fx * fx * (3 - 2 * fx),
-    uy = fy * fy * (3 - 2 * fy);
-  return mix(
-    mix(hash(ix, iy), hash(ix + 1, iy), ux),
-    mix(hash(ix, iy + 1), hash(ix + 1, iy + 1), ux),
-    uy,
-  );
-}
-/** Shared, authored RGBA cloud sprite: generated once, mipmapped; no runtime raymarch. */
-export function cloudPixels(width = 256, height = 128) {
-  const pixels = new Uint8Array(width * height * 4);
-  for (let y = 0; y < height; y++)
-    for (let x = 0; x < width; x++) {
-      const u = x / (width - 1),
-        v = y / (height - 1),
-        nx = u * 8,
-        ny = v * 4,
-        detail =
-          noise(nx, ny) * 0.55 +
-          noise(nx * 2.07 + 17, ny * 2.07) * 0.28 +
-          noise(nx * 4.11, ny * 4.11 + 31) * 0.17;
-      // Rounded individual lobes with irregular wisps, rather than uniform grey blobs.
-      let silhouette = 0;
-      for (let l = 0; l < 5; l++) {
-        const cx = 0.17 + l * 0.165,
-          cy = 0.54 + Math.sin(l * 2.1) * 0.09,
-          q =
-            ((u - cx) / (0.19 + hash(l, 4) * 0.03)) ** 2 +
-            ((v - cy) / (0.32 + hash(l, 9) * 0.1)) ** 2;
-        silhouette = Math.max(silhouette, Math.exp(-q * 1.65));
-      }
-      const edge =
-          smooth(0, 0.08, u) *
-          smooth(0, 0.08, 1 - u) *
-          smooth(0, 0.08, v) *
-          smooth(0, 0.08, 1 - v),
-        alpha = smooth(0.17, 0.57, silhouette + detail * 0.31 - 0.16) * edge,
-        shade = clamp(0.76 + v * 0.16 + detail * 0.12),
-        i = (y * width + x) * 4;
-      pixels[i] = Math.round(242 * shade);
-      pixels[i + 1] = Math.round(245 * shade);
-      pixels[i + 2] = Math.round(246 * shade);
-      pixels[i + 3] = Math.round(alpha * 225);
-    }
-  return pixels;
-}
 
 export class SkyWeatherController {
   private readonly sunDisc: Mesh;
@@ -170,7 +130,9 @@ export class SkyWeatherController {
   private readonly sunMaterial: ShaderMaterial;
   private readonly moonMaterial: ShaderMaterial;
   private readonly moonMap: Texture;
-  private readonly cloudTexture: RawTexture | null;
+  readonly atmosphere: AtmosphereSky;
+  private readonly observer = new Vector3();
+  private readonly unbindClouds: (() => void)[] = [];
   private readonly direction = new Vector3();
   private readonly right = new Vector3();
   private readonly up = new Vector3();
@@ -179,11 +141,6 @@ export class SkyWeatherController {
   private readonly worldUp = Vector3.Up();
   private lastInstant = -Infinity;
   private initialized = false;
-  private readonly layerWind = [
-    { x: 0, z: 0 },
-    { x: 0, z: 0 },
-    { x: 0, z: 0 },
-  ];
   private readonly state: SkyWeatherState = {
     sun: sunState(),
     moon: moonState(),
@@ -193,14 +150,8 @@ export class SkyWeatherController {
     instant: Date.now(),
   };
 
-  constructor(
-    private readonly scene: Scene,
-    sunOrb: Mesh,
-    moonOrb: Mesh,
-    private readonly clouds: Mesh[],
-  ) {
-    sunOrb.setEnabled(false);
-    moonOrb.setEnabled(false);
+  constructor(private readonly scene: Scene) {
+    this.atmosphere = createAtmosphereSky(scene, "medium");
     this.sunMaterial = new ShaderMaterial(
       "sky:solar-disc",
       scene,
@@ -209,12 +160,17 @@ export class SkyWeatherController {
         attributes: ["position"],
         uniforms: [
           "worldViewProjection",
+          "world",
+          "skyObserver",
+          "farDepth",
+          ...ATMOSPHERE_CLOUD_UNIFORMS,
           "altitude",
           "angularRadius",
           "upY",
           "strength",
         ],
         needAlphaBlending: true,
+        samplers: [...ATMOSPHERE_CLOUD_SAMPLERS],
       },
     );
     this.moonMaterial = new ShaderMaterial(
@@ -225,6 +181,10 @@ export class SkyWeatherController {
         attributes: ["position"],
         uniforms: [
           "worldViewProjection",
+          "world",
+          "skyObserver",
+          "farDepth",
+          ...ATMOSPHERE_CLOUD_UNIFORMS,
           "lightDirection",
           "skyColor",
           "daylight",
@@ -234,13 +194,18 @@ export class SkyWeatherController {
           "textureAngle",
           "strength",
         ],
-        samplers: ["moonMap"],
+        samplers: ["moonMap", ...ATMOSPHERE_CLOUD_SAMPLERS],
         needAlphaBlending: true,
       },
     );
     for (const material of [this.sunMaterial, this.moonMaterial]) {
       material.backFaceCulling = false;
       material.disableDepthWrite = true;
+      material.setFloat(
+        "farDepth",
+        scene.getEngine().useReverseDepthBuffer ? 0.000001 : 0.999999,
+      );
+      this.unbindClouds.push(this.atmosphere.bindClouds(material));
     }
     this.moonMap = new Texture(
       "/textures/sky/moon-lroc-2k.jpg",
@@ -253,30 +218,6 @@ export class SkyWeatherController {
     this.moonMaterial.setTexture("moonMap", this.moonMap);
     this.sunDisc = this.createDisc("astronomical sun", this.sunMaterial);
     this.moonDisc = this.createDisc("astronomical moon", this.moonMaterial);
-    const material = scene.getMaterialByName("art:clouds");
-    if (material instanceof StandardMaterial) {
-      const oldTexture = material.diffuseTexture;
-      this.cloudTexture = RawTexture.CreateRGBATexture(
-        cloudPixels(),
-        256,
-        128,
-        scene,
-        true,
-        false,
-        Texture.TRILINEAR_SAMPLINGMODE,
-      );
-      this.cloudTexture.name = "authored detailed cloud sprite";
-      this.cloudTexture.hasAlpha = true;
-      material.diffuseTexture = this.cloudTexture;
-      oldTexture?.dispose();
-    } else this.cloudTexture = null;
-    for (let i = 0; i < clouds.length; i++) {
-      const layer = i % 3;
-      // Compressed visual layers fit a browser campus; their altitudes are not measured cloud bases.
-      clouds[i].position.y = 125 + layer * 40 + (Math.floor(i / 3) % 3) * 7;
-      clouds[i].scaling.scaleInPlace(1 + layer * 0.28);
-      clouds[i].metadata = { ...clouds[i].metadata, skyLayer: layer };
-    }
   }
 
   private createDisc(name: string, material: ShaderMaterial) {
@@ -347,8 +288,8 @@ export class SkyWeatherController {
     this.scene.activeCamera?.getWorldMatrix();
     const observer = this.scene.activeCamera?.globalPosition ?? input.player;
     const sunUp = this.placeDisc(this.sunDisc, sun, observer, 6),
-      moonUp = this.placeDisc(this.moonDisc, moon, observer),
-      transparency = 1 - smooth(0.55, 1, this.state.cloud) * 0.9;
+      moonUp = this.placeDisc(this.moonDisc, moon, observer);
+    this.observer.set(observer.x, observer.y, observer.z);
     this.sunDisc.setEnabled(sun.altitude > -sun.angularDiameter / 2);
     this.moonDisc.setEnabled(
       moon.altitude > -moon.angularDiameter / 2 && moon.fraction > 0.002,
@@ -357,7 +298,8 @@ export class SkyWeatherController {
       .setFloat("altitude", sun.altitude)
       .setFloat("angularRadius", sun.angularDiameter / 2)
       .setFloat("upY", sunUp)
-      .setFloat("strength", transparency);
+      .setFloat("strength", 1)
+      .setVector3("skyObserver", this.observer);
     const moonLight = moonDiscLightVector(moon.fraction, moon.brightLimbAngle);
     this.light.set(moonLight.x, moonLight.y, moonLight.z);
     this.moonMaterial
@@ -368,34 +310,8 @@ export class SkyWeatherController {
       .setFloat("angularRadius", moon.angularDiameter / 2)
       .setFloat("upY", moonUp)
       .setFloat("textureAngle", -moon.parallacticAngle)
-      .setFloat("strength", transparency);
-    const layers = [
-      input.weather?.cloudWinds?.low,
-      input.weather?.cloudWinds?.mid,
-      input.weather?.cloudWinds?.high,
-    ];
-    for (let i = 0; i < 3; i++) {
-      const target = layers[i]
-        ? windVector(layers[i]!.speed, layers[i]!.direction)
-        : targetWind;
-      this.layerWind[i].x = mix(this.layerWind[i].x, target.x, t);
-      this.layerWind[i].z = mix(this.layerWind[i].z, target.z, t);
-    }
-    for (let i = 0; i < this.clouds.length; i++) {
-      const cloudMesh = this.clouds[i],
-        wind = this.layerWind[i % 3];
-      cloudMesh.position.x += wind.x * dt;
-      cloudMesh.position.z += wind.z * dt;
-      // Wrapping is outside the local campus view; no jumping directly overhead.
-      if (cloudMesh.position.x > input.player.x + 620)
-        cloudMesh.position.x -= 1240;
-      if (cloudMesh.position.x < input.player.x - 620)
-        cloudMesh.position.x += 1240;
-      if (cloudMesh.position.z > input.player.z + 620)
-        cloudMesh.position.z -= 1240;
-      if (cloudMesh.position.z < input.player.z - 620)
-        cloudMesh.position.z += 1240;
-    }
+      .setFloat("strength", 1)
+      .setVector3("skyObserver", this.observer);
     return this.state;
   }
 
@@ -405,6 +321,7 @@ export class SkyWeatherController {
     this.sunMaterial.dispose();
     this.moonMaterial.dispose();
     this.moonMap.dispose();
-    this.cloudTexture?.dispose();
+    for (const unbind of this.unbindClouds) unbind();
+    this.atmosphere.dispose();
   }
 }

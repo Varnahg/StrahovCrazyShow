@@ -1,5 +1,9 @@
 /** Czech source strings are stable typed keys; English never changes content identifiers. */
 export const messages = {
+  "Modelová dohlednost": "Modelled visibility",
+  "Modelové sněžení": "Modelled snowfall",
+  "Hvězdy a Měsíc": "Stars and Moon",
+  "výběr a zobrazení upravené": "selection and rendering modified",
   "Denní náhled": "Day preview",
   "Noční náhled": "Night preview",
   "Vypnout denní náhled osvětlení": "Turn off day lighting preview",
@@ -350,6 +354,10 @@ export const messages = {
   "Skutečný čas na Strahově": "Real time in Strahov",
   "Denní náhled · demo": "Daytime preview · demo",
   "Noční náhled · demo": "Night-time preview · demo",
+  "Zlatá hodina · demo": "Golden hour · demo",
+  "Modrá hodina · demo": "Blue hour · demo",
+  "Úplňková noc · demo": "Full-moon night · demo",
+  "Vypnout náhled osvětlení": "Turn off lighting preview",
   "NÁHLED OSVĚTLENÍ · skutečný čas je dočasně nahrazený.":
     "LIGHTING PREVIEW · real time is temporarily overridden.",
   "trojúhelníků včetně stínů": "triangles including shadows",

@@ -50,8 +50,8 @@ test("rain wraps coherently without flashing eighteen-meter segments", () => {
     ],
   ];
   for (let i = 0; i < 1000; i++) {
-    updateRainSegments(lines, 1 / 60, 12);
-    assert.ok(Math.abs(lines[0][0].y - lines[0][1].y - 0.7) < 1e-8);
+    updateRainSegments(lines, 1 / 60, { rain: 3, precipitationType: "rain" });
+    assert.ok(Math.abs(lines[0][0].y - lines[0][1].y - 0.32) < 1e-8);
   }
 });
 test("resting walkable DEM contact stays within three millimetres at former trouble points and grid seams", () => {

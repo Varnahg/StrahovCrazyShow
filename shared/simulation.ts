@@ -33,6 +33,7 @@ import {
 import { sampleTransit, transitObstacles } from "./transit";
 import { STREET_COLLISIONS } from "./streets";
 import { buildCampusExteriorPlan } from "./campus-exterior";
+import { buildOutdoorWorldPlan } from "./outdoor-world";
 import { treeTrunkCollision } from "./vegetation";
 import type { PhotogrammetryCollision } from "./photogrammetry-gameplay";
 import { photogrammetryEntranceRepair } from "./photogrammetry-repairs";
@@ -187,6 +188,8 @@ export class Simulation {
         );
       }
       for (const b of STREET_COLLISIONS)
+        this.solid(b.x, b.y, b.z, b.w, b.h, b.d, b.yaw);
+      for (const b of buildOutdoorWorldPlan().colliders)
         this.solid(b.x, b.y, b.z, b.w, b.h, b.d, b.yaw);
     }
     for (const b of B6_PROP_COLLISIONS)

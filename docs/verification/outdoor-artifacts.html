@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mobiliář · kontrola skutečné hry</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #14201e;
+        color: #eee;
+        font: 13px system-ui;
+      }
+      canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        outline: none;
+      }
+      aside {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        width: 310px;
+        padding: 12px;
+        background: #10241eea;
+        border-radius: 8px;
+      }
+      h1 {
+        font-size: 17px;
+        margin: 0 0 8px;
+      }
+      p {
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      select,
+      button {
+        font: inherit;
+        padding: 5px;
+        margin: 2px;
+        max-width: 100%;
+      }
+      output {
+        display: block;
+        white-space: pre-wrap;
+        max-height: 34vh;
+        overflow: auto;
+        font: 10px monospace;
+      }
+      .scene-labels {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .scene-label {
+        position: absolute;
+        padding: 3px;
+        background: #142e24b8;
+      }
+      #map {
+        position: absolute;
+        right: 12px;
+        top: 12px;
+        width: 520px;
+        max-width: 40vw;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="game"
+      tabindex="0"
+      aria-label="Skutečná hra s mobiliářem"
+    ></canvas>
+    <div class="scene-labels" data-label-layer></div>
+    <aside>
+      <h1>Mobiliář a dominanty</h1>
+      <p>
+        Skutečný Game, terén, kolize a všechny assety. Přesun připraví začátek
+        kontroly; následný pohyb používá herní vstupy. Tato kontrola není
+        měřením výkonu.
+      </p>
+      <label
+        >Objekt
+        <select id="artifact"></select></label
+      ><br />
+      <label
+        >Kvalita
+        <select id="quality">
+          <option value="low">Úsporná</option>
+          <option value="medium" selected>Střední</option>
+          <option value="high">Vysoká</option>
+        </select></label
+      ><br />
+      <button id="view" disabled>Prohlédnout objekt</button
+      ><button id="orbit">Druhý pohled</button
+      ><button id="walk">Jít vpřed 2 s</button
+      ><button id="left">A vlevo 1 s</button
+      ><button id="right">D vpravo 1 s</button
+      ><button id="stop">Zastavit</button><button id="map-toggle">Mapa</button>
+      <output id="metrics" role="status">Načítání…</output>
+    </aside>
+    <div id="map" hidden></div>
+    <script type="module" src="./outdoor-artifacts.tsx"></script>
+  </body>
+</html>

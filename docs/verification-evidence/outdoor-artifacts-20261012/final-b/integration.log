@@ -1,0 +1,45 @@
+$ node scripts/test-integration.mjs
+PASS: real SDK queued vehicle respawn, immediate forced authority and current presence, duplicate rejection, fresh ack+1 movement, protected foreign driver, canonical isolated-world cleanup.
+Room connection was closed unexpectedly (4002): 
+PASS: singleton world, guest boundary, two clients, walking, physical car W/A/D/brake/reverse/exit/re-entry on native DMR and authored assets, global/DM chat, consent, explicit blocking rejection, event ownership, session resume and weather endpoint.
+Room connection was closed unexpectedly (4002): 
+PASS: 12 authenticated peers in one world; every peer sees every identity, above the old eight-player boundary; movement reaches every observer; position error <=0.51mm, exact ack and authoritative grounded bit; targeted keyframe restores an empty decoder without resetting locomotion or losing remote players; repeated ineffective quiz/decline commands do not fan out state to the world; contact changes update the two participants without broadcasting to ten unrelated peers; disconnect removes the player everywhere; resuming the same identity reconstructs the full shared world; guest cannot join or read authored meeting/presence from public HTTP
+{
+  "completed": true,
+  "protocol": 10,
+  "endpoint": "http://127.0.0.1:2568",
+  "firstRecoveryAck": 16,
+  "firstRecoveryMs": 5.237599999999929,
+  "firstBurstDisplacementX": 0,
+  "steadyLagCommandsP95": 4,
+  "steadySamples": 49,
+  "unaffectedPeerResyncs": 0,
+  "backlogRecoveries": [
+    {
+      "time": 1791805812688,
+      "tick": 1319,
+      "ack": 16,
+      "reason": "input-backlog"
+    },
+    {
+      "time": 1791805815424,
+      "tick": 1482,
+      "ack": 183,
+      "reason": "input-backlog"
+    },
+    {
+      "time": 1791805816451,
+      "tick": 1545,
+      "ack": 259,
+      "reason": "input-backlog"
+    }
+  ],
+  "checks": [
+    "received frontier acknowledged explicitly",
+    "no accelerated movement",
+    "continued 60Hz returns to normal lag",
+    "other player unaffected",
+    "invalid input preserves strict sequence",
+    "recovery rate bounded"
+  ]
+}

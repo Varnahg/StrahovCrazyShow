@@ -1,9 +1,10 @@
 {
   "schemaVersion": 1,
-  "status": "blocked",
+  "status": "done",
   "dependsOn": [
     "atmosphere-cloud-refinement",
-    "outdoor-artifacts-verification"
+    "outdoor-artifacts-verification",
+    "weather-final-refactor"
   ],
   "writePaths": [
     "client/art-lighting.ts",
@@ -46,7 +47,10 @@
     "docs/agents/handoffs/weather-integration-20261012.md",
     ".cache/atmosphere-vite.config.mjs",
     ".cache/performance-snapshot/atmosphere-20261012-a/",
-    "dist/"
+    "dist/",
+    "client/atmosphere-sky.ts",
+    "tests/atmosphere-sky.test.ts",
+    "docs/weather/atmosphere-sources.md"
   ],
   "resources": [
     "heavy-validation",
@@ -58,24 +62,26 @@
     "port:2586"
   ],
   "acceptance": [
-    "Před ready dolož předání společných game/ui/world-renderer a stability souborů od původního outdoor vlastníka; docs/verification.md také upravuje vegetační audit a musí mít jediného aktuálního zapisovatele.",
-    "Po dokončení refinement koordinátor přidá jeho tři soubory do tohoto writePaths. Zastav preview-5191 a uvolni jeho rezervaci před integračním claim.",
-    "Integruj pouze původní weather změny; zachovej outdoor diff, společné rozměry, izolaci hosta i označení modelovaných/simulovaných dat.",
-    "Dokonči refaktoring cache, alokací a lifecycle a ověř skutečnou produkční denní/noční oblohu, Měsíc, hvězdy, směr větru, stíny a kameru.",
-    "Výsledky patří ke konkrétnímu snapshotu včetně testů. Výkonová tvrzení vyžadují skutečné produkční relace, HUD, GPU, rozlišení, srovnatelné FPS a p95/p99."
+    "PĹ™ed ready doloĹľ pĹ™edĂˇnĂ­ spoleÄŤnĂ˝ch game/ui/world-renderer a stability souborĹŻ od pĹŻvodnĂ­ho outdoor vlastnĂ­ka; docs/verification.md takĂ© upravuje vegetaÄŤnĂ­ audit a musĂ­ mĂ­t jedinĂ©ho aktuĂˇlnĂ­ho zapisovatele.",
+    "Po dokonÄŤenĂ­ refinement koordinĂˇtor pĹ™idĂˇ jeho tĹ™i soubory do tohoto writePaths. Zastav preview-5191 a uvolni jeho rezervaci pĹ™ed integraÄŤnĂ­m claim.",
+    "Integruj pouze pĹŻvodnĂ­ weather zmÄ›ny; zachovej outdoor diff, spoleÄŤnĂ© rozmÄ›ry, izolaci hosta i oznaÄŤenĂ­ modelovanĂ˝ch/simulovanĂ˝ch dat.",
+    "DokonÄŤi refaktoring cache, alokacĂ­ a lifecycle a ovÄ›Ĺ™ skuteÄŤnou produkÄŤnĂ­ dennĂ­/noÄŤnĂ­ oblohu, MÄ›sĂ­c, hvÄ›zdy, smÄ›r vÄ›tru, stĂ­ny a kameru.",
+    "VĂ˝sledky patĹ™Ă­ ke konkrĂ©tnĂ­mu snapshotu vÄŤetnÄ› testĹŻ. VĂ˝konovĂˇ tvrzenĂ­ vyĹľadujĂ­ skuteÄŤnĂ© produkÄŤnĂ­ relace, HUD, GPU, rozliĹˇenĂ­, srovnatelnĂ© FPS a p95/p99."
   ],
   "verification": [
-    "Cílené weather/atmosphere/camera/lighting testy podle změn.",
-    "Nad stabilním snapshotem postupně pnpm test, pnpm build a pnpm test:integration.",
-    "Produkční vizuální přejímka a případná srovnatelná GPU měření až po uvolnění jiných scén/Blenderu.",
-    "Původní logy, manifest a meze do vlastní evidence; po předání souboru přidej do docs/verification.md také odkaz na docs/verification-evidence/agents/coordination-20261012/README.md."
+    "CĂ­lenĂ© weather/atmosphere/camera/lighting testy podle zmÄ›n.",
+    "Nad stabilnĂ­m snapshotem postupnÄ› pnpm test, pnpm build a pnpm test:integration.",
+    "ProdukÄŤnĂ­ vizuĂˇlnĂ­ pĹ™ejĂ­mka a pĹ™Ă­padnĂˇ srovnatelnĂˇ GPU mÄ›Ĺ™enĂ­ aĹľ po uvolnÄ›nĂ­ jinĂ˝ch scĂ©n/Blenderu.",
+    "PĹŻvodnĂ­ logy, manifest a meze do vlastnĂ­ evidence; po pĹ™edĂˇnĂ­ souboru pĹ™idej do docs/verification.md takĂ© odkaz na docs/verification-evidence/agents/coordination-20261012/README.md."
   ],
   "notes": [
-    "Samostatný nyní autorizovaný weather checkpoint; nezávisí na budoucích sprint/grass auditech ani na integration-checkpoint.",
-    "Původní weather vlastník a zamýšlený owner weather-01a12fcb-root, chat 01a12fcb-4233-70c0-bc2d-95fc261f870c. Předán přesný scope v technické zprávě 12.10.2026; společné soubory ještě čekají na předání.",
-    "Vlastní dirty změny lze po doloženém předání převzít --adopt-dirty; žádný cizí diff se tím nepřepisuje.",
-    "Porty4179/2570 zůstávají mimo tento task. Nový snapshot suffix nebo jiný výstup vyžaduje změnu rozsahu rezervace."
+    "SamostatnĂ˝ nynĂ­ autorizovanĂ˝ weather checkpoint; nezĂˇvisĂ­ na budoucĂ­ch sprint/grass auditech ani na integration-checkpoint.",
+    "PĹŻvodnĂ­ weather vlastnĂ­k a zamĂ˝ĹˇlenĂ˝ owner weather-01a12fcb-root, chat 01a12fcb-4233-70c0-bc2d-95fc261f870c. PĹ™edĂˇn pĹ™esnĂ˝ scope v technickĂ© zprĂˇvÄ› 12.10.2026; spoleÄŤnĂ© soubory jeĹˇtÄ› ÄŤekajĂ­ na pĹ™edĂˇnĂ­.",
+    "VlastnĂ­ dirty zmÄ›ny lze po doloĹľenĂ©m pĹ™edĂˇnĂ­ pĹ™evzĂ­t --adopt-dirty; ĹľĂˇdnĂ˝ cizĂ­ diff se tĂ­m nepĹ™episuje.",
+    "Porty4179/2570 zĹŻstĂˇvajĂ­ mimo tento task. NovĂ˝ snapshot suffix nebo jinĂ˝ vĂ˝stup vyĹľaduje zmÄ›nu rozsahu rezervace.",
+    "Sky refinement and weather final refactor accepted; original outdoor owner explicitly handed off game/world-renderer/docsverification and released all own GPU/heavy/processes. Vegetation final audit also complete.",
+    "Completed handoff/source-check648tests/buildPASS, unchanged integration retryPASS, eight actualGPU samples and29SDKcohort; all owned helper processes stopped and heavy/GPU released."
   ],
   "id": "weather-integration-20261012",
-  "title": "Integrovat a prakticky ověřit autorizované počasí po předání společných souborů"
+  "title": "Integrovat a prakticky ovÄ›Ĺ™it autorizovanĂ© poÄŤasĂ­ po pĹ™edĂˇnĂ­ spoleÄŤnĂ˝ch souborĹŻ"
 }

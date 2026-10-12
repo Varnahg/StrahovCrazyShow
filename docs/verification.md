@@ -1,5 +1,32 @@
 # Ověření dema a známá omezení
 
+## Atmosféra A · 12. října 2026
+
+**648/648 testů a produkční build PASS. Celá izolovaná integrace PASS při opakování stejného nezměněného snapshotu**; první pokus vypršel při testu A řízení auta a je zachovaný v evidenci. Snapshot `cc97bef12245d7861505791ea4ad5d56e3d667c55f81cf8e10f2a0e1927edae5` obsahuje8313 souborů včetně testů, protokol10 a předaný outdoorB. [Úplný protokol, logy, profily a omezení](verification-evidence/atmosphere-20261012/README.md).
+
+Obloha má souvislé vrstvené mraky se společným zakrytím hvězd/Slunce/Měsíce,925 skutečných hvězd HYG s UTC siderickou rotací a precesí, směrový soumrak, LROC měsíční texturu, nelineární fázový/vzdálenostní jas a měsíční stíny. Modelová dohlednost řídí plynulou EXP mlhu; sníh se určuje podle typu srážek. Stanice/model/stará data jsou odlišené i při výpadku browserového obnovení. Náhledy zlaté/modré hodiny a úplňkové noci jsou označené a zobrazují datum. První osoba dovoluje pohled do85°; orbit/auto zachovávají bezpečné limity.
+
+Produkční Intel UHD630, CSS1280×720,30 skutečných relací/6 avatarových předloh: **medium den28,0–32,1FPS, p95 36,6–51,9ms; úplněk30,5–32,2FPS, p95 38,3–48,9ms**, po3×10s. Interně1280×720. Low jediný10s vzorek: **42,7FPS, p95 30,4ms, p99 35,5ms**, interně984×553. Všech8 vzorků včetně jednoho hráče má0 render/asset chyb. **Medium výkonový cíl ani60FPS nesplněny**; nejde o A/B důkaz zrychlení. Síť držela30 motion řádků po364s, ale měla29 cílených backlog resynchronizací. [Raw shrnutí](verification-evidence/atmosphere-20261012/gpu-summary.json).
+
+[Podklady a hranice realismu](weather/README.md), [produkční snímek](verification-evidence/atmosphere-20261012/production-golden.jpg). **Ověřený build je nasazený na [4179](http://127.0.0.1:4179/) s API2570, protokol10. Obnov otevřenou hru Ctrl+F5.** [HTTP kontrola277 souborů](verification-evidence/atmosphere-20261012/publication.json) našla0 odchylek proti frozen buildu; skutečné počasí je zapnuté, řízený fixture odstraněn. PůvodníD2build i místní měření zůstaly zachované. Nové Blender budovy z druhé worktree nejsou součástí tohoto checkpointu. [Pravidla a důkazy zavedené koordinace](verification-evidence/agents/coordination-20261012/README.md) zůstávají samostatným předaným výstupem.
+
+
+## Mobiliář a dominanty · 12. října 2026
+
+Do sdíleného světa je integrovaných **202 identifikovaných objektů**: lavičky, dva piknikové stoly, koše/kontejnery/sběrná místa, tabule, stojan, sloupky, brány a oplocení, růžový punkový traktor a Petřínská rozhledna. [Soupis a provenience](reality-pack/outdoor-artifacts/inventory.md), [podklady dominant](reality-pack/outdoor-artifacts/landmarks.md). Nová vrstva velké mapy **Mobiliář a dominanty** zobrazuje značky a odkazy na zdroje. Polohy a kolize používají společný plán; předpokládané rozměry a stav bran jsou přiznané interpretace. Dalších 15 kandidátů čeká na ověření podoby; nejde o úplné zaměření areálu.
+
+Finální snapshot B **`66296696199597061021f234678f122ca46756137e8d442b2a66c3b1fdfd1d0a`**, 8313 souborů včetně testů. **646/648 testů PASS**, dvě známá selhání rozpracovaného počasí v `graphics.test.ts`; build a izolovaná integrace **PASS**. **Protokol 10** odděluje staré klienty s jinými statickými kolizemi. [Přesné výsledky, logy a omezení](verification-evidence/outdoor-artifacts-20261012/README.md), [následná kontrola všech frozen hashů a 18 dotčených live souborů](verification-evidence/outdoor-artifacts-20261012/final-b/source-check.json). Předchozí A se dvěma weather selháními zůstal zachovaný.
+
+Skutečný Game v IAB na Intel UHD 630, medium, CSS/interně 1280×720: traktor ze dvou stran, Petřín, stůl, kontejner, tabule a mapa, **0 render/asset chyb**. Kontakt se stolem funguje, A/D mají správnou projekci, vstup B6 tam a zpět **18/18 úseků**. [Vizuální důkazy](verification-evidence/outdoor-artifacts-20261012/README.md#skutečná-herní-scéna). Diagnostický náhled není produkční multiplayerový FPS benchmark; nové výkonové tvrzení nevzniklo. Hlavní preview 4179/2570 se tímto taskem nepřepublikovalo.
+
+Samostatně proběhlo [ověření lokálního koordinátoru agentů](verification-evidence/agents/coordination-20261012/README.md), **15/15 CLI testů**. Jde o důkaz souborových a procesních rezervací, nikoli herní přejímku.
+
+## Audit stromů trávy a povrchů 12. října 2026
+
+[Analýza současného generování a možností mimo Babylon](vegetation/realism-audit-20261012/README.md) doporučuje nejprve upravit stavbu korun, listové atlasy a sladění země s prostorovou trávou. Přináší [reprodukovatelný statický audit stromů](vegetation/realism-audit-20261012/tree-audit.json) a [povrchů](vegetation/realism-audit-20261012/ground-audit.json), včetně původu, rozměrů, velikostí a otisků vstupů. Tyto počty ani odhady paměti nejsou GPU benchmark.
+
+Existující cílené testy `tree-appearance`, `vegetation-runtime` a `vegetation-realistic-pack` prošly **13/13**. Praktická samostatná prohlídka běžící hry na 4179 potvrdila vzhled nádvoří a travnatého okraje; nevytváří nové FPS tvrzení. Prohlédnuté archivované D2 snímky a jejich původní měření zůstávají historickou evidencí D2. Herní zdroje ani assety se tímto auditem nemění; plná sada, build a integrace nebyly pro dokumentační změnu znovu spuštěné. Rozpracované změny světla/počasí v pracovním stromu nejsou předmětem tohoto ověření. Nový stromový model, nová textura ani jejich výkon zatím nejsou tímto návrhem implementované nebo přijaté.
+
 ## Aktuální checkpoint D2 · objem fasád a korun · 12. října 2026
 
 **573/573 testů, produkční build a plná izolovaná integrace PASS**, vše exit 0. Snapshot `40f1847ec2d227c7d6eca6ea2bb5d2d5eb1b199a9ea392efe6a8225b71139633` obsahuje 8285 souborů včetně testů. Následný nezávislý audit přečetl všech **8285 live + 8285 frozen souborů bez odchylek**. [Výsledky](verification-evidence/campus-depth-20261012-d2/results.json), [SHA audit](verification-evidence/campus-depth-20261012-d2/source-check.json), [manifest](verification-evidence/campus-depth-20261012-d2/source-manifest.json).

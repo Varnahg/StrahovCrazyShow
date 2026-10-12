@@ -1,6 +1,34 @@
 import { getPosition, getMoonPosition, getMoonIllumination } from "suncalc";
 export const STRAHOV_LOCATION = { latitude: 50.08065, longitude: 14.39175 };
 const RAD = Math.PI / 180;
+export type PrecipitationType =
+  "none" | "rain" | "snow" | "mixed" | "freezing-rain" | "hail" | "unknown";
+export type WeatherFieldSource = {
+  kind: "station" | "model";
+  source: string;
+  /** UTC measurement time, or model validity time; not the model run time. */
+  observedAt: number;
+  stale: boolean;
+};
+export type WeatherSupplement =
+  | "humidity"
+  | "windGust"
+  | "visibility"
+  | "snowfall"
+  | "liquidPrecipitation"
+  | "precipitationType";
+export function isWeatherStale(
+  observedAt: number | null | undefined,
+  kind: "station" | "model",
+  now: number,
+) {
+  return (
+    observedAt == null ||
+    !Number.isFinite(observedAt) ||
+    now - observedAt > (kind === "station" ? 30 : 60) * 60000 ||
+    observedAt > now + 5 * 60000
+  );
+}
 export type Weather = {
   temperature: number | null;
   wind: number;
@@ -13,6 +41,8 @@ export type Weather = {
   cloudSource: string;
   stale: boolean;
   status: "live" | "fallback" | "unavailable";
+  /** The owner of temperature/wind/rain; model supplements retain their own sources. */
+  sourceKind?: "station" | "model";
   /** Modelled data has its own timestamp: it is not a station observation. */
   cloudObservedAt?: number | null;
   cloudStale?: boolean;
@@ -29,7 +59,64 @@ export type Weather = {
   visibility?: number;
   /** Model snowfall intensity, cm/h. A station rain gauge is not a snow sensor. */
   snowfall?: number;
+  /** Model rain + showers, mm/h; does not override the station's rain gauge. */
+  liquidPrecipitation?: number;
+  /** Model phase estimate, never inferred only from ground-level temperature. */
+  precipitationType?: PrecipitationType;
+  fieldSources?: Partial<Record<WeatherSupplement, WeatherFieldSource>>;
 };
+/** The browser must age retained data even when it can no longer reach the server.
+ * A failed refresh retains values and their origins, but cannot certify freshness.
+ * Use wall-clock UTC, never the scene's time-preview override. */
+export function ageWeatherSnapshot(
+  weather: Weather,
+  now: number,
+  refreshFailed = false,
+): Weather {
+  const sourceKind =
+    weather.sourceKind ??
+    (weather.status === "live"
+      ? "station"
+      : weather.status === "fallback"
+        ? "model"
+        : undefined);
+  const stale =
+    refreshFailed ||
+    weather.stale ||
+    isWeatherStale(weather.observedAt, sourceKind ?? "model", now);
+  const cloudStale =
+    refreshFailed ||
+    weather.cloudStale === true ||
+    isWeatherStale(weather.cloudObservedAt, "model", now);
+  let fieldSources = weather.fieldSources;
+  for (const field of Object.keys(fieldSources ?? {}) as WeatherSupplement[]) {
+    const source = fieldSources?.[field];
+    if (
+      source &&
+      !source.stale &&
+      (refreshFailed || isWeatherStale(source.observedAt, source.kind, now))
+    ) {
+      if (fieldSources === weather.fieldSources)
+        fieldSources = { ...fieldSources };
+      fieldSources![field] = { ...source, stale: true };
+    }
+  }
+  const status = stale
+    ? weather.observedAt == null
+      ? "unavailable"
+      : "fallback"
+    : weather.status;
+  if (
+    stale === weather.stale &&
+    cloudStale === weather.cloudStale &&
+    status === weather.status &&
+    sourceKind === weather.sourceKind &&
+    fieldSources === weather.fieldSources
+  )
+    return weather;
+  return { ...weather, sourceKind, stale, cloudStale, status, fieldSources };
+}
+
 /** Our map is x=east, z=south; astronomical azimuth is clockwise from north. */
 export function horizontalDirection(
   azimuthDegrees: number,
@@ -96,25 +183,25 @@ export function moonState(time = Date.now()) {
   };
 }
 /** Disambiguate the repeated autumn hour by proximity to the observation fetch. */
+const stationClockFormat = new Intl.DateTimeFormat("sv-SE", {
+  timeZone: "Europe/Prague",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hourCycle: "h23",
+});
 export function pragueStationInstant(
   stamp: string,
   now: number,
 ): number | null {
   const nominal = Date.parse(stamp.replace(" ", "T") + "Z");
   if (!Number.isFinite(nominal)) return null;
-  const format = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Prague",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23",
-  });
   const candidates = [1, 2]
     .map((offset) => nominal - offset * 3600000)
-    .filter((instant) => format.format(instant) === stamp);
+    .filter((instant) => stationClockFormat.format(instant) === stamp);
   candidates.sort((a, b) => Math.abs(a - now) - Math.abs(b - now));
   return candidates[0] ?? null;
 }
@@ -184,6 +271,12 @@ export function parseStation(html: string, now = Date.now()): Weather {
   )?.[1];
   if (wind > 0 && !direction)
     throw new Error("Stanice neobsahuje čitelný směr větru.");
+  const stale = isWeatherStale(observedAt, "station", now),
+    rawHumidity = read("Relativní vlhkost:"),
+    humidity =
+      rawHumidity !== null && rawHumidity >= 0 && rawHumidity <= 100
+        ? rawHumidity
+        : undefined;
   return {
     temperature,
     wind,
@@ -192,11 +285,25 @@ export function parseStation(html: string, now = Date.now()): Weather {
     cloud,
     observedAt,
     fetchedAt: now,
-    source: "Meteostanice Silicon Hill",
+    source:
+      "Meteostanice Silicon Hill" +
+      (stale ? " · poslední zastaralé měření" : ""),
+    sourceKind: "station",
     cloudSource: "Orientační ikona předpovědi stanice",
-    stale: now - observedAt > 30 * 60000 || observedAt > now + 5 * 60000,
-    status: "live",
-    humidity: read("Relativní vlhkost:") ?? undefined,
+    stale,
+    status: stale ? "fallback" : "live",
+    humidity,
+    fieldSources:
+      humidity === undefined
+        ? {}
+        : {
+            humidity: {
+              kind: "station",
+              source: "Meteostanice Silicon Hill",
+              observedAt,
+              stale,
+            },
+          },
     cloudObservedAt: null,
     cloudStale: true,
     cloudWindSource: "Povrchový vítr stanice · přibližný drift mraků",

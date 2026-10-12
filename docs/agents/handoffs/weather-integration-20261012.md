@@ -1,0 +1,11 @@
+# Weather integration handoff · 2026-10-12
+
+Owner weather-01a12fcb-root, original user task01a12fcb-4233-70c0-bc2d-95fc261f870c. Main checkout, coordination HEADde5647a. Own weather work and named sky/shadows/weather subagents were accepted; the original outdoor owner explicitly handed off shared game/world-renderer/docsverification after B. No building-worktree files were edited.
+
+Completed snapshotcc97bef12245d7861505791ea4ad5d56e3d667c55f81cf8e10f2a0e1927edae5,8313files including tests,protocol10. All648tests and buildPASS. Integration first timed out on A car steering, unchanged full retryPASS; original failure retained. Eight real production GPU intervals, with actual 30sessions and six presets, plus full-world weather visual scenes, are recorded in docs/verification-evidence/atmosphere-20261012/README.md. Medium misses strict30FPS/p95 and60FPS targets; low42.7FPS is one sample only.29networkbacklog resyncs in364s are disclosed.
+
+Root refined CDF clouds after actual GPU inspection to reduce glowing rings; nine cloud tests pass. Refactoring consolidates client/server staleness, caches light palette10Hz/astronomy1Hz, retains two sky textures, removes obsolete cloud planes/orbs, and preserves resource disposal. Sources and artistic limitations remain docs/weather/*.md. Modified files are exactly weather-integration taskwritePaths; outdoor parts of shared entrypoints are preserved. New metadata taskchanges were kept separate from runtime snapshots.
+
+All owned test helper processes have ended: Vite5191exec79956, frozen API2586exec71379, frozen preview4191exec81541, cohortexec1516(stop-file,0remainingSDKconnections), integration wrapper2568. Browserdev/productiontabs closed. Original main4179PID28888 and2570PID32140 remain live at this handoff and were explicitly offered for publication by their original owner; they are not stopped under this integration scope. Publication gets a separate reservation.
+
+The streamed live/frozen SHA audit is source-check.json. No further runtime source edits are planned. Release of heavy/GPU permits the buildings owner to resume after explicit DONE. Main publication and optional combined commit are follow-up operations under their own declared scope; current work is already integrated in main working files.

@@ -1,0 +1,45 @@
+{
+  "sourceSnapshotId": "cc97bef12245d7861505791ea4ad5d56e3d667c55f81cf8e10f2a0e1927edae5",
+  "files": 8313,
+  "startedAt": "2026-10-12T12:04:05.774Z",
+  "results": [
+    {
+      "command": "pnpm test",
+      "code": 0,
+      "elapsedMs": 107808,
+      "completedAt": "2026-10-12T12:05:53.585Z",
+      "summary": [
+        "BJS - [14:04:24]: Skeleton \"person 0 continuous anatomy\": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.",
+        "✔ different or already modified near assets fail closed instead of applying hardcoded indices blindly (557.4123ms)",
+        "✔ quality keeps the same map budgets/PCF and bounded night bloom without another exposure pass (135.3236ms)",
+        "✔ finite metrics, cohort 1/30, ten-second duration, JSON content type and 3/min limit are enforced (374.9829ms)",
+        "✔ malformed packets fail atomically without corrupting the previous dictionary or vehicle state (1.6137ms)",
+        "✔ unknown outdoor identities fail before allocating any scene resources (2.2677ms)",
+        "✔ browser HTTP Content-Encoding already decoded PCM is accepted without a second gzip pass (4.1246ms)",
+        "✔ actual CCD car cannot drive through the former east portal and a jumping walker cannot bypass it (3144.9938ms)",
+        "ℹ tests 648",
+        "ℹ pass 648",
+        "ℹ fail 0",
+        "ℹ duration_ms 104311.7955"
+      ]
+    },
+    {
+      "command": "pnpm build",
+      "code": 0,
+      "elapsedMs": 36838,
+      "completedAt": "2026-10-12T12:06:30.425Z",
+      "summary": [
+        "✓ built in 13.12s"
+      ]
+    },
+    {
+      "command": "pnpm test:integration",
+      "code": 1,
+      "elapsedMs": 14651,
+      "completedAt": "2026-10-12T12:06:45.077Z",
+      "summary": [
+        "PASS: real SDK queued vehicle respawn, immediate forced authority and current presence, duplicate rejection, fresh ack+1 movement, protected foreign driver, canonical isolated-world cleanup."
+      ]
+    }
+  ]
+}

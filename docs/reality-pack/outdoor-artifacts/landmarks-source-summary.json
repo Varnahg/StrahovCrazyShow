@@ -1,0 +1,104 @@
+{
+  "checkedAt": "2026-10-12",
+  "references": {
+    "checkedAt": "2026-10-12",
+    "tractor": {
+      "source": "https://umenipromesto.eu/katalog/detail/1798/62?v=list",
+      "photo": "https://umenipromesto.eu/data/katalog/1798/img-0311-6927.jpg",
+      "photoAuthor": "Ondřej Surový",
+      "photoDate": "2022-07",
+      "osmSource": "https://www.openstreetmap.org/node/13482792171",
+      "sourceTimestamp": "2026-07-07T06:06:41Z",
+      "lat": 50.081671,
+      "lon": 14.390167,
+      "catalogLat": 50.081729,
+      "catalogLon": 14.390208,
+      "dimensionMethod": "photo interpretation; approximately 3.9 m tall, not a survey",
+      "yawMethod": "photo interpretation toward the B5 frontage; approximate, not a measured azimuth"
+    },
+    "tower": {
+      "source": "https://prague.eu/cs/objevujte/petrinska-rozhledna/",
+      "photo": "https://pct-wp-prod.storage.googleapis.com/2024/03/14160723/DSC_6996-c.jpg",
+      "lat": 50.083543041143,
+      "lon": 14.395043251282,
+      "sourcePosition": "Prague City Tourism route destination embedded in the official page",
+      "structureHeight": 58.7,
+      "baseDiagonal": 21.65,
+      "firstPlatform": 20,
+      "topPlatform": 51,
+      "baseAltitude": 324,
+      "heightMethod": "2021 remeasurement of highest original structural point, reported by operator",
+      "altitudeMethod": "operator's rounded altitude; interpreted in the project's Bpv datum, ±2 m allowance, not a local survey",
+      "radioMast": "Modern antenna above the historical structural peak omitted: verified height unavailable."
+    }
+  },
+  "sourceFiles": [
+    {
+      "file": "landmarks-ghmp-source.html",
+      "url": "https://umenipromesto.eu/katalog/detail/1798/62?v=list",
+      "sha256": "3c711fdb583c5fb5cd6897a3a6107b9dac188b217ce9b9369cb4ef6cc67b2916",
+      "bytes": 26059
+    },
+    {
+      "file": "landmarks-pct-source.html",
+      "url": "https://prague.eu/cs/objevujte/petrinska-rozhledna/",
+      "sha256": "988cac551c3ed857cad872734b8851232364209ed0b21bff21242581eea444c6",
+      "bytes": 231725
+    },
+    {
+      "file": "landmarks-tractor-ghmp-202207.jpg",
+      "url": "https://umenipromesto.eu/data/katalog/1798/img-0311-6927.jpg",
+      "sha256": "f1afe3830a4ccaa835f8f3adb57ff4c377cef4da571fe755268415c5554fb06a",
+      "bytes": 404047
+    },
+    {
+      "file": "landmarks-tower-pct.jpg",
+      "url": "https://pct-wp-prod.storage.googleapis.com/2024/03/14160723/DSC_6996-c.jpg",
+      "sha256": "c49c0f7b8f03488c988bc77a7a710ce628799839fccc14f89f399e2cdaf3841f",
+      "bytes": 487765
+    },
+    {
+      "file": "landmarks-tractor-osm.json",
+      "url": "https://api.openstreetmap.org/api/0.6/node/13482792171.json",
+      "sha256": "c7180d5d09e3e6d656871370065fc358390ad40fd89006b4a5a2907962048a09",
+      "bytes": 612
+    },
+    {
+      "file": "landmarks-tower-osm.json",
+      "url": "https://api.openstreetmap.org/api/0.6/way/7645353/full.json",
+      "sha256": "81dbc19a4d230f4c5918cd3c9ec36ff550b91d0a95e3a57c59069b90fda6e879",
+      "bytes": 11502
+    }
+  ],
+  "codeSha256": "4ce904c8c1bcc0a0e904423d8ca640affae19be14c2936b4d7b8d8e343e6d47d",
+  "testSha256": "f3b35cbcda85d35880f6a189df864490f97400c6cc3ca36a6b75a3642ec09ff7",
+  "stats": {
+    "artifactCount": 2,
+    "triangleCount": 14552,
+    "colliderCount": 4,
+    "byKind": {
+      "tractor": 1,
+      "tower": 1
+    }
+  },
+  "artifacts": [
+    {
+      "id": "punk-tractor",
+      "x": -113.08,
+      "z": -113.66,
+      "triangles": 4184
+    },
+    {
+      "id": "petrin-tower",
+      "x": 235.25,
+      "z": -322.05,
+      "triangles": 10368
+    }
+  ],
+  "verification": {
+    "command": "pnpm exec tsx --test tests/outdoor-landmarks.test.ts",
+    "passed": 6,
+    "total": 6,
+    "kind": "CPU geometry, not GPU performance"
+  }
+}

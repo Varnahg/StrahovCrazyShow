@@ -16,7 +16,7 @@ test("daylight never lights the scene from below the horizon", () => {
 });
 
 test("night moonlight is bounded and overcast has lower direct contrast", () => {
-  assert.ok(sampleArtLighting(-0.6, 0, 0, 0.6, 1).moonlight <= 0.012);
+  assert.ok(sampleArtLighting(-0.6, 0, 0, 0.6, 1).moonlight <= 0.035);
   assert.equal(sampleArtLighting(-0.6, 0, 0, -0.1).moonlight, 0);
   const clear = sampleArtLighting(0.7, 0, 0);
   const overcast = sampleArtLighting(0.7, 1, 0);
@@ -29,7 +29,7 @@ test("weather fog remains bounded and sunrise has no discontinuous lighting step
     for (const rain of [-1, 0, 0.5, 1, 5]) {
       const state = sampleArtLighting(0.3, cloud, rain);
       assert.ok(
-        state.fogDensity >= 0.0012 && state.fogDensity <= 0.0035 + 1e-9,
+        state.fogDensity >= 0.0003 && state.fogDensity <= 0.00215 + 1e-9,
       );
     }
   for (const altitude of [

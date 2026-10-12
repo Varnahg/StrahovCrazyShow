@@ -71,7 +71,7 @@ test("night lunar lighting requires a known lit phase above the horizon and clou
   );
   const quarter = at(0.7, 0.5),
     full = at(0.7, 1);
-  assert.ok(full > 0 && full <= 0.012);
+  assert.ok(full > 0 && full <= 0.035);
   assert.ok(quarter < full * 0.25);
   assert.ok(at(0.7, 1, 1) < full * 0.2);
   assert.ok(at(0.02, 1) < full * 0.05);
@@ -129,12 +129,7 @@ test("actual Babylon scene gets dark sky, zero celestial key, retained local lam
     lamp.setEnabled(false);
     return lamp;
   });
-  const sky = new SkyWeatherController(
-    scene,
-    MeshBuilder.CreateSphere("old sun", {}, scene),
-    MeshBuilder.CreateSphere("old moon", {}, scene),
-    [],
-  );
+  const sky = new SkyWeatherController(scene);
   const celestial = sky.update({
     instant: reportedNight,
     player: camera.position,

@@ -1,0 +1,16 @@
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { resolve, join } from 'node:path';
+const root=resolve(import.meta.dirname,'../../..');
+const frozen=join(root,'.cache/performance-snapshot/atmosphere-20261012-a/dist');
+const files=['index.html','textures/sky/moon-lroc-2k.jpg',...(await readdir(join(frozen,'assets'))).filter(x=>/\.(js|css)$/.test(x)).map(x=>'assets/'+x)];
+const hash=x=>createHash('sha256').update(x).digest('hex');
+const mismatches=[];let cursor=0;
+await Promise.all(Array.from({length:4},async()=>{while(cursor<files.length){const file=files[cursor++];const expected=hash(await readFile(join(frozen,file)));const installed=hash(await readFile(join(root,'dist',file)));const response=await fetch('http://127.0.0.1:4179/'+file);const served=hash(Buffer.from(await response.arrayBuffer()));if(!response.ok||expected!==installed||expected!==served)mismatches.push({file,expected,installed,served,status:response.status});}}));
+const health=await(await fetch('http://127.0.0.1:4179/api/health')).json();
+const diagnostics=await(await fetch('http://127.0.0.1:4179/api/diagnostics/status',{headers:{Origin:'http://127.0.0.1:4179'}})).json();
+const weather=await(await fetch('http://127.0.0.1:4179/api/weather')).json();
+const result={checkedAt:new Date().toISOString(),sourceSnapshotId:'cc97bef12245d7861505791ea4ad5d56e3d667c55f81cf8e10f2a0e1927edae5',preview:'http://127.0.0.1:4179/',apiPort:2570,protocol:10,filesCompared:files.length,mismatches,health,diagnostics,weather,fixtureRemoved:!String(weather.source).includes('Řízené'),oldBuildPreserved:'.cache/previous-main-dist-before-atmosphere-a'};
+await writeFile(join(import.meta.dirname,'publication.json'),JSON.stringify(result,null,2)+'\n');
+console.log(JSON.stringify({filesCompared:files.length,mismatches,health,diagnostics,weatherSource:weather.source,fixtureRemoved:result.fixtureRemoved}));
+if(mismatches.length||!health.ok||!result.fixtureRemoved)process.exitCode=1;

@@ -1,0 +1,32 @@
+{
+  "id": "weather-publication-20261012",
+  "title": "Publikovat ověřený společný build atmosféry a mobiliáře lokálně",
+  "writePaths": [
+    "dist/",
+    ".cache/previous-main-dist-before-atmosphere-a/",
+    ".cache/atmosphere-deploy-incoming/",
+    "docs/verification-evidence/atmosphere-20261012/",
+    "docs/verification.md",
+    "docs/agents/handoffs/weather-publication-20261012.md"
+  ],
+  "resources": [
+    "workspace-build"
+  ],
+  "acceptance": [
+    "Copy only verified frozen dist; preserve previousD2 build and source evidence.",
+    "Publish client and serverprotocol10 together, check served bundle byte hashes. No new compilation or GPUbenchmark."
+  ],
+  "notes": [
+    "Original owner buildings01a12b28 explicitly handed off originalD2previewPID28888 andAPI32140 after freshly verifying creation times. Runtime processes are reserved by weather-live-preview, separate from this finite copy/report task.",
+    "Original weather/outdoor source ownership and completed handoffs permit a local combined commit of exactly those source/test/evidencepaths. Do not stage unrelated vegetation analysis or buildingworktree changes.",
+    "Completed served-byte checks277/277, actual weather restored, previous build/diagnostics preserved. Persistent services remain under weather-live-preview; publication slot released."
+  ],
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [
+    "weather-integration-20261012"
+  ],
+  "verification": [
+    "HTTP health and asset byte checks; no additional GPU/performance claims."
+  ]
+}

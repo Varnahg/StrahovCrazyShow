@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-10",
+  "verifiedAt": "2026-10-12",
   "astronomyLibrary": {
     "package": "suncalc",
     "version": "2.1.1",
@@ -24,7 +24,11 @@
     "surfaceWindUnit": "m/s",
     "cloudUnit": "%",
     "precipitationUnit": "mm per current.interval",
-    "aloftPressureLevels": ["850hPa", "700hPa", "500hPa"],
+    "aloftPressureLevels": [
+      "850hPa",
+      "500hPa",
+      "300hPa"
+    ],
     "maxAgeMinutes": 60
   },
   "moonTexture": {
@@ -33,15 +37,34 @@
     "sourceFile": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_2k.jpg",
     "credit": "Source texture: NASA's Scientific Visualization Studio, CGI Moon Kit, Ernie Wright (USRA), LROC WAC mosaic data. Game rendering by this project; no NASA endorsement.",
     "usageGuidelines": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
-    "dimensions": [2048, 1024],
+    "dimensions": [
+      2048,
+      1024
+    ],
     "sha256": "f7130a1822681fa7512d7dcfd40db8c10b9ba4f06777910348698260ed7a2170",
     "modified": false
   },
   "cloudTexture": {
-    "authoredIn": "client/sky-weather.ts",
-    "kind": "deterministic procedural RGBA sprite",
-    "dimensions": [256, 128],
+    "authoredIn": "client/atmosphere-sky.ts",
+    "kind": "deterministic cellular/FBM RGBA noise with empirical coverage CDF; procedural artistic cloud outlines",
+    "dimensions": [
+      256,
+      256
+    ],
     "externalSource": null
   },
-  "independentMoonPhaseReference": "https://aa.usno.navy.mil/calculated/moon/phases?date=2026-10-01&format=p&nump=6"
+  "independentMoonPhaseReference": "https://aa.usno.navy.mil/calculated/moon/phases?date=2026-10-01&format=p&nump=6",
+  "starCatalog": {
+    "file": "client/data/bright-stars.json",
+    "source": "https://github.com/astronexus/HYG-Database",
+    "version": "4.1",
+    "count": 925,
+    "license": "CC BY-SA 4.0",
+    "provenance": "docs/weather/atmosphere-sources.md"
+  },
+  "lunarPhotometry": {
+    "source": "https://articles.adsabs.harvard.edu/pdf/1991PASP..103.1033K",
+    "equation": 20,
+    "note": "normalized phase brightness plus inverse-square distance; final 0.035 scene scale is artistic, not lux"
+  }
 }

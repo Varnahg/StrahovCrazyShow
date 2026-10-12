@@ -37,6 +37,48 @@ import { installStaticSubmeshShadowCull } from "./static-submesh-shadows";
 const clamp = (value: number) =>
   Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
 const SHADOW_SPAN = 72;
+const smooth = (from: number, to: number, value: number) => {
+  const t = clamp((value - from) / (to - from));
+  return t * t * (3 - 2 * t);
+};
+
+export type CelestialShadowSource = "sun" | "moon" | "none";
+
+/** Direct-light occlusion, not ambient darkness or a measured optical model.
+ * The selected light already carries phase, distance and atmospheric extinction.
+ * In particular, weak crescents must not inherit a daytime shadow silhouette. */
+export function campusShadowResponse(
+  source: CelestialShadowSource,
+  directionY: number,
+  intensity: number,
+  cloud: number,
+  rain = 0,
+) {
+  const lunar = source === "moon";
+  const elevation = smooth(0.006, 0.065, -directionY);
+  const direct = smooth(lunar ? 0.001 : 0.008, lunar ? 0.012 : 0.16, intensity);
+  const weather = (1 - smooth(0.2, 1, cloud)) * (1 - clamp(rain / 8) * 0.35);
+  const strength =
+    source === "none"
+      ? 0
+      : (lunar ? 0.82 : 0.88) * elevation * direct * weather;
+  return {
+    enabled: strength > 0.008,
+    strength,
+    // Babylon calls light leakage "darkness": 0 occludes, 1 is fully lit.
+    darkness: 1 - strength,
+  };
+}
+
+/** A small nocturnal halo keeps warm practical lights legible without raising
+ * scene exposure. Bloom remains absent at low quality and never lights surfaces. */
+export function campusBloomResponse(daylight: number, rain = 0) {
+  const night = 1 - clamp(daylight);
+  return {
+    threshold: 0.96 - night * 0.08,
+    weight: 0.1 + night * 0.02 + clamp(rain / 8) * night * 0.01,
+  };
+}
 
 /** The cube already contains the current sky radiance. This multiplier must
  * not impose a daytime HDR fill when the sun and moon are below the horizon. */
@@ -105,25 +147,56 @@ export function snappedShadowFocus(
   lightDirection: Vec3,
   mapSize: number,
 ) {
-  const focus = new Vector3(player.x, player.y + 3, player.z);
-  const direction = new Vector3(
+  return writeSnappedShadowFocus(player, lightDirection, mapSize, {
+    focus: Vector3.Zero(),
+    direction: Vector3.Zero(),
+    texel: 0,
+  });
+}
+
+type ShadowFocus = { focus: Vector3; direction: Vector3; texel: number };
+
+/** The render loop owns one result; snapping does not allocate vectors/frame. */
+function writeSnappedShadowFocus(
+  player: Vec3,
+  lightDirection: Vec3,
+  mapSize: number,
+  result: ShadowFocus,
+) {
+  const { focus, direction } = result;
+  focus.set(player.x, player.y + 3, player.z);
+  direction.copyFromFloats(
     lightDirection.x,
     lightDirection.y,
     lightDirection.z,
   );
-  if (direction.lengthSquared() < 1e-12) direction.set(0, -1, 0);
+  const length = direction.lengthSquared();
+  if (!Number.isFinite(length) || length < 1e-12) direction.set(0, -1, 0);
   direction.normalize();
   // The celestial zenith needs a non-parallel reference axis.
-  const reference =
-    Math.abs(direction.y) > 0.98 ? Vector3.Forward() : Vector3.Up();
-  const right = Vector3.Cross(reference, direction).normalize();
-  const up = Vector3.Cross(direction, right).normalize();
+  const zenith = Math.abs(direction.y) > 0.98;
+  let rx = zenith ? -direction.y : direction.z,
+    ry = zenith ? direction.x : 0,
+    rz = zenith ? 0 : -direction.x;
+  const inverseRightLength = 1 / Math.hypot(rx, ry, rz);
+  rx *= inverseRightLength;
+  ry *= inverseRightLength;
+  rz *= inverseRightLength;
+  const ux = direction.y * rz - direction.z * ry,
+    uy = direction.z * rx - direction.x * rz,
+    uz = direction.x * ry - direction.y * rx;
   const texel = SHADOW_SPAN / Math.max(1, mapSize);
-  const rx = Vector3.Dot(focus, right),
-    uy = Vector3.Dot(focus, up);
-  focus.addInPlace(right.scale(Math.round(rx / texel) * texel - rx));
-  focus.addInPlace(up.scale(Math.round(uy / texel) * texel - uy));
-  return { focus, direction, texel };
+  const rightOffset = focus.x * rx + focus.y * ry + focus.z * rz,
+    upOffset = focus.x * ux + focus.y * uy + focus.z * uz;
+  const snapRight = Math.round(rightOffset / texel) * texel - rightOffset,
+    snapUp = Math.round(upOffset / texel) * texel - upOffset;
+  focus.set(
+    focus.x + rx * snapRight + ux * snapUp,
+    focus.y + ry * snapRight + uy * snapUp,
+    focus.z + rz * snapRight + uz * snapUp,
+  );
+  result.texel = texel;
+  return result;
 }
 
 /** Explicit producer metadata takes precedence over the safe opaque fallback. */
@@ -235,6 +308,11 @@ type AtmosphereInput = {
   quality: string;
   cloud: number;
   daylight: number;
+  /** Same celestial source selected by art-lighting for this directional light.
+   * Omission preserves the legacy solar-only scene fixtures. */
+  keySource?: CelestialShadowSource;
+  /** Precipitation in mm/h, as reported by the shared weather state. */
+  rain?: number;
   avatars?: Iterable<{
     root: TransformNode;
     target: { id: string; vehicle: boolean };
@@ -262,6 +340,12 @@ export class CinematicAtmosphere {
   private shadowPlanes = Frustum.GetPlanes(Matrix.Identity());
   private visibleCasters: AbstractMesh[] = [];
   private shadowsEnabled = false;
+  private shadowSource: CelestialShadowSource = "none";
+  private shadowFocus: ShadowFocus = {
+    focus: Vector3.Zero(),
+    direction: Vector3.Zero(),
+    texel: 0,
+  };
   private disposed = false;
   readonly stats = {
     shadowCasters: 0,
@@ -274,6 +358,11 @@ export class CinematicAtmosphere {
     shadowInactiveRejected: 0,
     selectionMeshVisits: 0,
     glassVisits: 0,
+    shadowSource: "none" as CelestialShadowSource,
+    shadowStrength: 0,
+    shadowDarkness: 1,
+    bloomThreshold: 0,
+    bloomWeight: 0,
   };
 
   constructor(
@@ -328,6 +417,7 @@ export class CinematicAtmosphere {
     this.removedMaterial = scene.onMaterialRemovedObservable.add((material) => {
       this.pendingGlass.delete(material);
       this.glass.delete(material as StandardMaterial);
+      this.releaseShadowWrapper(material);
     });
     for (const material of scene.materials) this.pendingGlass.add(material);
     this.bindShadowMap();
@@ -471,6 +561,16 @@ export class CinematicAtmosphere {
     this.stats.glassMaterials = this.glass.size;
   }
 
+  private releaseShadowWrapper(material: Material) {
+    if (!(material instanceof ShaderMaterial)) return;
+    const wrapper = this.wrappers.get(material);
+    if (!wrapper) return;
+    if (material.shadowDepthWrapper === wrapper)
+      material.shadowDepthWrapper = null;
+    wrapper.dispose();
+    this.wrappers.delete(material);
+  }
+
   private selectCasters(input: AtmosphereInput) {
     const map = this.shadow.getShadowMap();
     if (!map) return;
@@ -528,27 +628,50 @@ export class CinematicAtmosphere {
     if (qualityChanged) this.configure(input.quality);
     const daylight = clamp(input.daylight);
     applyCampusSkyIntensity(this.scene, daylight);
-    this.shadow.setDarkness(0.26 + clamp(input.cloud) * 0.4);
-    // art-lighting may reuse this light for the moon. Moon illumination stays
-    // available; the daytime solar map is disabled rather than left stale.
-    const shadows = solarShadowsEnabled(
-      daylight,
+    const source =
+      input.keySource ??
+      (solarShadowsEnabled(daylight, this.sun.direction.y, this.sun.intensity)
+        ? "sun"
+        : "none");
+    const response = campusShadowResponse(
+      source,
       this.sun.direction.y,
       this.sun.intensity,
+      input.cloud,
+      input.rain,
     );
-    const shadowsStarted = shadows && !this.shadowsEnabled;
+    this.shadow.setDarkness(response.darkness);
+    const shadows = response.enabled && this.sun.isEnabled();
+    const shadowsStarted =
+      shadows && (!this.shadowsEnabled || this.shadowSource !== source);
     this.shadowsEnabled = shadows;
+    this.shadowSource = shadows ? source : "none";
+    this.stats.shadowSource = this.shadowSource;
+    this.stats.shadowStrength = shadows ? response.strength : 0;
+    this.stats.shadowDarkness = response.darkness;
     this.sun.shadowEnabled = shadows;
     if (shadows) {
-      const { focus, direction } = snappedShadowFocus(
+      const { focus, direction } = writeSnappedShadowFocus(
         input.player,
         this.sun.direction,
         this.shadow.mapSize,
+        this.shadowFocus,
       );
-      this.sun.position.copyFrom(focus.subtract(direction.scale(80)));
+      this.sun.position.set(
+        focus.x - direction.x * 80,
+        focus.y - direction.y * 80,
+        focus.z - direction.z * 80,
+      );
     } else {
       this.stats.shadowCasters = this.stats.alphaCasters = 0;
     }
+    if (this.pipeline) {
+      const bloom = campusBloomResponse(daylight, input.rain);
+      this.pipeline.bloomThreshold = bloom.threshold;
+      this.pipeline.bloomWeight = bloom.weight;
+      this.stats.bloomThreshold = bloom.threshold;
+      this.stats.bloomWeight = bloom.weight;
+    } else this.stats.bloomThreshold = this.stats.bloomWeight = 0;
     this.timer += dt;
     if (this.timer > 0.4 || qualityChanged || shadowsStarted) {
       this.timer = 0;
@@ -589,12 +712,8 @@ export class CinematicAtmosphere {
     this.pendingGlass.clear();
     this.pipeline?.dispose();
     this.shadow.dispose();
-    for (const [material, wrapper] of this.wrappers) {
-      if (material.shadowDepthWrapper === wrapper)
-        material.shadowDepthWrapper = null;
-      wrapper.dispose();
-    }
-    this.wrappers.clear();
+    for (const material of this.wrappers.keys())
+      this.releaseShadowWrapper(material);
     for (const material of this.glass)
       if (material.reflectionTexture === this.environment) {
         material.reflectionTexture = null;
