@@ -383,6 +383,7 @@ export const messages = {
   ". Tento výsledek platí jen pro uvedený adaptér a scénu.":
     ". This result applies only to the stated adapter and scene.",
   "Podrobnosti měření": "Measurement details",
+  "Stáhnout úplný záznam": "Download full record",
   "Upravit setkání": "Edit meetup",
   "Potkáme se na kopci?": "Meet on the hill?",
   "FIKTIVNÍ DEMONSTRAČNÍ SETKÁNÍ": "FICTIONAL DEMO MEETUP",

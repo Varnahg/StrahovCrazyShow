@@ -1,4 +1,5 @@
 import { HudIcon } from "./hud-icons";
+import { benchmarkPresentation } from "./benchmark-presentation";
 import { useDialogFocus } from "./use-dialog-focus";
 import {
   t,
@@ -2306,10 +2307,33 @@ function BenchmarkControls({
 }) {
   useLocale();
   const [running, setRunning] = useState(false);
+  const downloads = useRef(new Map<string, number>());
   const resultJSON = useMemo(
-    () => (result ? JSON.stringify(result, null, 2) : ""),
+    () => (result ? JSON.stringify(benchmarkPresentation(result), null, 2) : ""),
     [result],
   );
+  useEffect(() => () => {
+    for (const [url, timer] of downloads.current) {
+      window.clearTimeout(timer);
+      URL.revokeObjectURL(url);
+    }
+    downloads.current.clear();
+  }, []);
+  const downloadFullRecord = () => {
+    if (!result) return;
+    const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `strahov-benchmark-${result.date.replace(/[^0-9TZ.-]/g, "-")}.json`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    const timer = window.setTimeout(() => {
+      URL.revokeObjectURL(url);
+      downloads.current.delete(url);
+    }, 1000);
+    downloads.current.set(url, timer);
+  };
   const active = running || !!game?.benchmark;
   useEffect(() => setRunning(false), [result]);
   return (
@@ -2372,6 +2396,9 @@ function BenchmarkControls({
           </p>
           <details>
             <summary>{t("Podrobnosti měření")}</summary>
+            <button className="secondary" onClick={downloadFullRecord}>
+              {t("Stáhnout úplný záznam")}
+            </button>
             <pre id="benchmark-result">{resultJSON}</pre>
           </details>
         </>
