@@ -1,16 +1,14 @@
 import { PhotographicGrass, type PhotoGrassStats } from "./photographic-grass";
+import { applyTreeCrownShading, configureTreeMaterial } from "./tree-appearance";
+import { TreeWindPlugin, type TreeWindState } from "./tree-wind";
+export { TreeWindPlugin } from "./tree-wind";
 import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
-import { MaterialPluginBase } from "@babylonjs/core/Materials/materialPluginBase";
 import { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
-import { ShaderLanguage } from "@babylonjs/core/Materials/shaderLanguage";
-import type { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
-import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import type { SubMesh } from "@babylonjs/core/Meshes/subMesh";
 import type { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
@@ -237,51 +235,6 @@ export function decodeTreeRuntimeChunk(buffer: ArrayBuffer) {
       indices: read(p.indices) as Uint16Array | Uint32Array,
     })),
   };
-}
-
-type TreeWindState = { time: number; x: number; z: number };
-/** PBR retains real sun, roughness/normal maps and alpha-tested leaf shadows. */
-export class TreeWindPlugin extends MaterialPluginBase {
-  constructor(
-    material: PBRMaterial,
-    private state: TreeWindState,
-  ) {
-    super(material, "StrahovCleanTreeWind", 220, {}, true, true);
-    this.doNotSerialize = true;
-  }
-  override isCompatible(language: ShaderLanguage) {
-    return language === ShaderLanguage.GLSL;
-  }
-  override getUniforms() {
-    return {
-      ubo: [{ name: "cleanTreeWind", size: 3, type: "vec3" }],
-      vertex: "uniform vec3 cleanTreeWind;",
-    };
-  }
-  override bindForSubMesh(
-    buffer: UniformBuffer,
-    _scene: Scene,
-    _engine: AbstractEngine,
-    _subMesh: SubMesh,
-  ) {
-    buffer.updateFloat3(
-      "cleanTreeWind",
-      this.state.time,
-      this.state.x,
-      this.state.z,
-    );
-  }
-  override getCustomCode(type: string, language = ShaderLanguage.GLSL) {
-    if (type !== "vertex" || language !== ShaderLanguage.GLSL) return null;
-    return {
-      CUSTOM_VERTEX_UPDATE_POSITION: `
-      float treeGust = sin(cleanTreeWind.x * 0.85 + world[3].x * 0.07 + world[3].z * 0.11) * 0.55
-        + sin(cleanTreeWind.x * 1.9 + world[3].x * 0.21) * 0.22;
-      float treeWeight = smoothstep(1.5, 10.0, positionUpdated.y);
-      positionUpdated.xz += cleanTreeWind.yz * treeGust * treeWeight * 0.008;
-    `,
-    };
-  }
 }
 
 function grassSource(scene: Scene, material: PBRMaterial) {
@@ -514,31 +467,12 @@ export class VegetationController {
       );
       for (const material of container.materials) {
         if (!(material instanceof PBRMaterial)) continue;
-        material.metallic = 0;
-        if (material.albedoTexture) material.albedoTexture.gammaSpace = true;
-        if (material.bumpTexture) material.bumpTexture.gammaSpace = false;
-        if (material.metallicTexture)
-          material.metallicTexture.gammaSpace = false;
-        if (/leaves|needle/.test(material.name)) {
-          material.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHATEST;
-          material.alphaCutOff = 0.5;
-          material.backFaceCulling = false;
-          material.twoSidedLighting = true;
-        }
-        if (/leaves|needle/.test(material.name)) {
+        if (configureTreeMaterial(material)) {
           new TreeWindPlugin(material, this.treeWind);
           const wrapper = new ShadowDepthWrapper(material, this.scene);
           material.shadowDepthWrapper = wrapper;
           this.treeShadows.push(wrapper);
         }
-        material.metadata = {
-          ...material.metadata,
-          cleanReferenceTree: true,
-          source: "ambientCG CC0 LeafSet001/LeafSet019/Bark012",
-          depthCaster: /leaves|needle/.test(material.name)
-            ? "alpha-test"
-            : "opaque",
-        };
       }
       this.sharedTreeMaterials = this.treeRuntime.materialNames.map((name) => {
         const material = container.materials.find(
@@ -578,6 +512,7 @@ export class VegetationController {
           depthCaster: match[3] === "leaves" ? "alpha-test" : "opaque",
           windDeformed: match[3] === "leaves",
         };
+        applyTreeCrownShading(mesh, placement.reconstruction);
         mesh.setEnabled(lod === 2);
         mesh.computeWorldMatrix(true);
         mesh.freezeWorldMatrix();
@@ -683,6 +618,7 @@ export class VegetationController {
               windDeformed: primitive.name.endsWith("__leaves"),
               streamedTreeDetail: true,
             };
+            applyTreeCrownShading(mesh, placement.reconstruction);
             mesh.setEnabled(false);
             mesh.computeWorldMatrix(true);
             mesh.freezeWorldMatrix();

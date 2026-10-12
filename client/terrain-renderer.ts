@@ -288,7 +288,13 @@ export function buildingFoundationData(
       const nx = orientation * (b[1] - a[1]) / length,
         nz = -orientation * (b[0] - a[0]) / length;
       for (let vertex = 0; vertex < 4; vertex++) normals.push(nx, 0, nz);
-      uvs.push(from, 0, to, 0, from, 1, to, 1);
+      // Matches the foundation material's uvMetresPerRepeat:4. Edge fractions
+      // previously stretched one repeat over an entire building, while v=0..1
+      // squeezed it differently at every sampled terrain height.
+      uvs.push(
+        from * length / 4, y1 / 4, to * length / 4, y2 / 4,
+        from * length / 4, baseY / 4, to * length / 4, baseY / 4,
+      );
       if (orientation > 0)
         indices.push(start, start + 1, start + 2, start + 1, start + 3, start + 2);
       else

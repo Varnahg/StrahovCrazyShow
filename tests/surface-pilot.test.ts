@@ -162,3 +162,110 @@ test("disposal restores nested shared materials and leaves borrowed authored tex
   assert.equal(scene.textures.length, textureCount - 2);
   pack.dispose();
 });
+
+test("plaster keeps existing channels and shared cache through quality changes and release", (t) => {
+  const scene = fixture(t);
+  scene.useRightHandedSystem = true;
+  const sources = ["first plaster", "second plaster"].map((name) => {
+    const source = new StandardMaterial(name, scene);
+    source.metadata = { surfaceKind: "plaster", uvMetresPerRepeat: 3 };
+    return source;
+  });
+  const meshes = sources.map((source, i) => {
+    const mesh = MeshBuilder.CreateBox(`wall:${i}`, {}, scene);
+    mesh.material = source;
+    return mesh;
+  });
+  // PBR initializes Babylon's shared environment BRDF lookup independently of
+  // SurfacePack. Include that baseline and an already authored PBR material.
+  const authored = new PBRMaterial("authored model", scene);
+  const authoredMesh = MeshBuilder.CreateBox("authored model", {}, scene);
+  authoredMesh.material = authored;
+  const priorTextures = scene.textures.length;
+  const pack = new SurfacePack(scene);
+  pack.update(1, "medium", 0);
+  assert.equal(authoredMesh.material, authored);
+  const materials = meshes.map((mesh) => mesh.material as PBRMaterial);
+  assert.equal(scene.textures.length - priorTextures, 3);
+  const [first, second] = materials;
+  for (const field of [
+    "albedoTexture",
+    "bumpTexture",
+    "metallicTexture",
+  ] as const) {
+    assert.equal(first[field], second[field]);
+    assert.equal(first[field]!.getTextureMatrix().m[0], 3);
+  }
+  assert.equal(first.albedoTexture!.gammaSpace, true);
+  assert.equal(first.bumpTexture!.gammaSpace, false);
+  assert.equal(first.metallicTexture!.gammaSpace, false);
+  assert.equal(first.bumpTexture!.level, 0.32);
+  assert.equal(first.invertNormalMapX, false);
+  assert.equal(first.invertNormalMapY, true);
+  assert.equal(first.metadata.normalMapConvention, "OpenGL");
+  const dry = first.albedoColor.clone();
+  pack.update(0.1, "low", 2);
+  assert.equal(first.disableBumpMap, true);
+  assert.equal(first.roughness, 1);
+  assert.ok(first.albedoColor.equals(dry)); // Wall plaster is not wettable road.
+  pack.update(0.1, "high", 0);
+  assert.equal(first.disableBumpMap, false);
+  const visits = pack.stats.meshVisits;
+  const updates = pack.stats.materialUpdates;
+  for (let i = 0; i < 120; ++i) pack.update(1 / 60, "high", 0);
+  assert.equal(pack.stats.meshVisits, visits);
+  assert.equal(pack.stats.materialUpdates, updates);
+  assert.equal(scene.textures.length - priorTextures, 3);
+  pack.dispose();
+  assert.equal(scene.textures.length, priorTextures);
+  meshes.forEach((mesh, i) => assert.equal(mesh.material, sources[i]));
+  assert.ok(materials.every((material) => !scene.materials.includes(material)));
+  pack.dispose();
+});
+
+test("quiet plaster reuses a noise-free shader while retaining normal/roughness source detail", (t) => {
+  const scene = fixture(t);
+  const art = campusSurfaceArt("plaster")!;
+  const plugin = new CampusSurfaceArtPlugin(
+    new PBRMaterial("wall", scene),
+    art,
+  );
+  const second = new CampusSurfaceArtPlugin(
+    new PBRMaterial("other wall", scene),
+    art,
+  );
+  const code = plugin.getCustomCode("fragment")!;
+  assert.equal(code, second.getCustomCode("fragment"));
+  assert.equal(Object.isFrozen(code), true);
+  assert.doesNotMatch(
+    Object.values(code).join("\n"),
+    /campusArtNoise|campusArtHash|metallicRoughness|texture2D|textureLod|sampler/,
+  );
+  const uniforms = new Map<string, number[]>();
+  plugin.bindForSubMesh({
+    updateFloat4: (name: string, ...values: number[]) =>
+      uniforms.set(name, values),
+    updateFloat2: (name: string, ...values: number[]) =>
+      uniforms.set(name, values),
+  } as unknown as UniformBuffer);
+  assert.equal(uniforms.get("campusArtDetail")![3], 0.68);
+  assert.equal(uniforms.get("campusArtResponse")![0], 0.52);
+  // Source deviation is compressed around its own mean; it is not blurred,
+  // inverted, recoloured toward a foreign mean or used as a normal-map level.
+  for (const detail of [0.68, 0.52]) {
+    for (const sample of [0.2, 0.6, 0.9]) {
+      const mean = art.sourceMean[0];
+      const compressed = mean + (sample - mean) * detail;
+      assert.equal(Math.sign(compressed - mean), Math.sign(sample - mean));
+      assert.ok(Math.abs(compressed - mean) < Math.abs(sample - mean));
+    }
+  }
+  const asphalt = new CampusSurfaceArtPlugin(
+    new PBRMaterial("road", scene),
+    campusSurfaceArt("asphalt")!,
+  );
+  assert.match(
+    Object.values(asphalt.getCustomCode("fragment")!).join("\n"),
+    /campusArtNoise/,
+  );
+});

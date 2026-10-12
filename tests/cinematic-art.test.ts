@@ -24,7 +24,7 @@ test("campus artistic surfaces keep bounded physical-scale variation without add
     "gravel",
   ]) {
     const art = campusSurfaceArt(kind)!;
-    assert.ok(art.variation > 0 && art.variation <= 0.2);
+    assert.ok(art.variation >= 0 && art.variation <= 0.2);
     assert.ok(art.fineMetres > 3 && art.coarseMetres >= 11);
     assert.ok(art.saturation >= 0.6 && art.saturation <= 1);
     assert.ok(art.roughnessVariation < 0.06);

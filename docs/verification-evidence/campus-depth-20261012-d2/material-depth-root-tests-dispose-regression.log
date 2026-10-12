@@ -1,0 +1,55 @@
+BJS - [12:17:29]: Babylon.js v9.30.0 - Null engine
+BJS - [12:17:29]: Babylon.js v9.30.0 - Null engine
+BJS - [12:17:29]: Babylon.js v9.30.0 - Null engine
+BJS - [12:17:29]: Babylon.js v9.30.0 - Null engine
+✔ PBR channel scales retain metres, rectangular concrete and authored paving joints (1.0493ms)
+✔ real material conversion preserves tint/joints and never treats grayscale roughness as metal (23.8712ms)
+✔ paved and stone surfaces use matching real channels and return to their dry tint after rain (7.725ms)
+✔ sky cubemap stores linear colours once and matches each hemisphere (20.53ms)
+✔ shadow projection is stable for sub-texel motion including the solar zenith (0.6307ms)
+✔ shadow metadata rejects ground, transparent glass and arbitrary custom sky shaders (3.209ms)
+✔ B6 Fresnel reflection preserves warm masks/alpha and night never keeps solar shadows (2.2045ms)
+BJS - [12:17:29]: Babylon.js v9.30.0 - Null engine
+BJS - [12:17:29]: Babylon.js v9.30.0 - Null engine
+BJS - [12:17:29]: Babylon.js v9.30.0 - Null engine
+BJS - [12:17:29]: Babylon.js v9.30.0 - Null engine
+✔ surface maintenance visits changed meshes only and still catches async/material reassignment (111.8251ms)
+✔ shadow draw callback uses actual light frustum, keeps crossing boxes and switches disabled LOD immediately (110.5434ms)
+✔ conservative shadow AABB culling agrees with real Babylon frusta and protects wind margin (8.6452ms)
+BJS - [12:17:29]: Babylon.js v9.30.0 - Null engine
+✖ glass maintenance catches late B6 material once and removes its scene observers (14.8219ms)
+✔ structural render inventory separates shared geometry, disabled LOD and light assignments (5.1281ms)
+✔ every current room UI subscription still applies its message (5.4582ms)
+✔ leave invalidates before the handshake and all retained callbacks remain inert in menu/guest (1.9421ms)
+✔ replaced room cannot alter the current session, emit notices/rewards, or request motion recovery (1.608ms)
+✔ current onLeave disconnects once and ignores subsequent retained messages and errors (1.8866ms)
+✔ a current multiplayer entry commits identity and token only after its join succeeds (9.4719ms)
+✔ leave then guest cancels a pending session fetch without reading its body or joining (1.7673ms)
+✔ direct guest entry cancels an in-flight session body before identity or join mutation (2.6741ms)
+✔ a join resolving after leave and guest entry closes its room without rebinding or effects (2.2293ms)
+✔ the newest overlapping connection wins and a late older join cannot replace it (2.371ms)
+✔ an accepted replacement invalidates old callbacks before closing the previous live room (2.5972ms)
+✔ enter cannot restore multiplayer when leave/guest runs between connect and enter continuations (2.2763ms)
+✔ a rejected close remains harmless after explicit leave or a cancelled join (1.6995ms)
+✔ cancelled fetch/json/join rejections cannot display an entry error or reconnect notice (5.102ms)
+✔ current connection failures still reach entry and reconnect feedback (1.8253ms)
+BJS - [12:17:29]: Babylon.js v9.30.0 - Null engine
+✔ real exterior window palette reflects one shared sky without opening opaque buildings (17.5431ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 26
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1823.7838
+
+✖ failing tests:
+
+test at tests\render-maintenance.test.ts:220:1
+✖ glass maintenance catches late B6 material once and removes its scene observers (14.8219ms)
+  TypeError: Cannot set properties of undefined (setting 'isEnabled')
+      at CinematicAtmosphere.dispose (C:\Users\rezac\.codex\worktrees\visual-quality-jump\StrahovCrazyShow\client\cinematic.ts:599:43)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\visual-quality-jump\StrahovCrazyShow\tests\render-maintenance.test.ts:246:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

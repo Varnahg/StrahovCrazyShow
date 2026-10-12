@@ -1,0 +1,87 @@
+BJS - [12:16:49]: Babylon.js v9.30.0 - Null engine
+BJS - [12:16:49]: Babylon.js v9.30.0 - Null engine
+BJS - [12:16:49]: Babylon.js v9.30.0 - Null engine
+BJS - [12:16:49]: Babylon.js v9.30.0 - Null engine
+✔ PBR channel scales retain metres, rectangular concrete and authored paving joints (1.0597ms)
+✔ real material conversion preserves tint/joints and never treats grayscale roughness as metal (30.4363ms)
+✔ paved and stone surfaces use matching real channels and return to their dry tint after rain (7.4914ms)
+✔ sky cubemap stores linear colours once and matches each hemisphere (20.0251ms)
+✔ shadow projection is stable for sub-texel motion including the solar zenith (0.7739ms)
+✔ shadow metadata rejects ground, transparent glass and arbitrary custom sky shaders (3.9777ms)
+✔ B6 Fresnel reflection preserves warm masks/alpha and night never keeps solar shadows (3.3907ms)
+BJS - [12:16:49]: Babylon.js v9.30.0 - Null engine
+BJS - [12:16:49]: Babylon.js v9.30.0 - Null engine
+BJS - [12:16:49]: Babylon.js v9.30.0 - Null engine
+BJS - [12:16:49]: Babylon.js v9.30.0 - Null engine
+✔ surface maintenance visits changed meshes only and still catches async/material reassignment (84.1007ms)
+✔ shadow draw callback uses actual light frustum, keeps crossing boxes and switches disabled LOD immediately (113.6836ms)
+✔ conservative shadow AABB culling agrees with real Babylon frusta and protects wind margin (7.653ms)
+BJS - [12:16:49]: Babylon.js v9.30.0 - Null engine
+✖ glass maintenance catches late B6 material once and removes its scene observers (10.7456ms)
+✔ structural render inventory separates shared geometry, disabled LOD and light assignments (3.445ms)
+✔ every current room UI subscription still applies its message (5.8907ms)
+✔ leave invalidates before the handshake and all retained callbacks remain inert in menu/guest (1.9981ms)
+✔ replaced room cannot alter the current session, emit notices/rewards, or request motion recovery (1.5713ms)
+✔ current onLeave disconnects once and ignores subsequent retained messages and errors (1.5227ms)
+✔ a current multiplayer entry commits identity and token only after its join succeeds (9.1318ms)
+✔ leave then guest cancels a pending session fetch without reading its body or joining (2.2492ms)
+✔ direct guest entry cancels an in-flight session body before identity or join mutation (4.7363ms)
+✔ a join resolving after leave and guest entry closes its room without rebinding or effects (4.0221ms)
+✔ the newest overlapping connection wins and a late older join cannot replace it (4.0155ms)
+✔ an accepted replacement invalidates old callbacks before closing the previous live room (3.4549ms)
+✔ enter cannot restore multiplayer when leave/guest runs between connect and enter continuations (2.226ms)
+✔ a rejected close remains harmless after explicit leave or a cancelled join (1.8374ms)
+✔ cancelled fetch/json/join rejections cannot display an entry error or reconnect notice (7.5569ms)
+✔ current connection failures still reach entry and reconnect feedback (2.9589ms)
+BJS - [12:16:49]: Babylon.js v9.30.0 - Null engine
+✖ real exterior window palette reflects one shared sky without opening opaque buildings (19.7259ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 25
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2055.218
+
+✖ failing tests:
+
+test at tests\render-maintenance.test.ts:220:1
+✖ glass maintenance catches late B6 material once and removes its scene observers (10.7456ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - false
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\visual-quality-jump\StrahovCrazyShow\tests\render-maintenance.test.ts:240:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\window-sky-reflection.test.ts:10:1
+✖ real exterior window palette reflects one shared sky without opening opaque buildings (19.7259ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - false
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\visual-quality-jump\StrahovCrazyShow\tests\window-sky-reflection.test.ts:24:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -6,6 +6,7 @@ import { setImmediate } from "node:timers/promises";
 import ts from "typescript";
 import { currentRoomCallbacks } from "../client/room-callbacks";
 import { MotionDecoder, MotionEncoder } from "../shared/motion-codec";
+import { PROTOCOL_VERSION } from "../shared/netcode";
 
 // Execute the actual UI subscriptions, without booting React/WebGL. This catches
 // a missing guard on any handler, not only the helper's isolated behavior.
@@ -177,7 +178,7 @@ function fixture() {
     game: { current: game },
     currentRoomCallbacks,
     MotionDecoder,
-    PROTOCOL_VERSION: 8,
+    PROTOCOL_VERSION,
     testImportMeta: { env: {} },
     location: { origin: "http://test.invalid" },
     localizeNotice: (text: string) => text,
