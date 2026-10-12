@@ -1,0 +1,36 @@
+import {readFile,writeFile,readdir,mkdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {createReadStream} from 'node:fs';
+import {resolve,join} from 'node:path';
+import {execFileSync} from 'node:child_process';
+const main=resolve(import.meta.dirname,'..');
+const frozen='C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow/.cache/performance-snapshot/unified-main-20261012-u1';
+const manifest=JSON.parse(await readFile(join(frozen,'source-manifest.json'),'utf8'));
+const sha=b=>createHash('sha256').update(b).digest('hex');
+async function fileSha(path){const digest=createHash('sha256');for await(const chunk of createReadStream(path))digest.update(chunk);return digest.digest('hex');}
+const files=Object.entries(manifest.files),mismatches=[],computed={},errors=[];
+let cursor=0;
+await Promise.all(Array.from({length:6},async()=>{while(cursor<files.length){const [file,expected]=files[cursor++];try{const actual=await fileSha(join(main,file));computed[file]=actual;if(actual!==expected)mismatches.push({file,actual,expected});}catch(error){errors.push({file,error:String(error)});}}}));
+const mainSourceId=sha(JSON.stringify(Object.fromEntries(files.map(([file])=>[file,computed[file]??null]))));
+const buildFiles=['index.html'];
+async function walk(path){for(const e of await readdir(join(frozen,'dist',path),{withFileTypes:true})){const p=path+'/'+e.name;if(e.isDirectory())await walk(p);else buildFiles.push(p);}}
+await walk('assets');
+buildFiles.push('models/vegetation/grass/geometry.json','models/vegetation/grass/material.json','models/vehicles/campus-hatchback-far.glb','textures/vegetation/grass/lawn-leaf-v2-albedo.png','textures/vegetation/grass/lawn-leaf-v2-normal.png');
+const bundle=[];cursor=0;
+await Promise.all(Array.from({length:4},async()=>{
+ while(cursor<buildFiles.length){
+  const file=buildFiles[cursor++];
+  const expected=sha(await readFile(join(frozen,'dist',file))),actual=sha(await readFile(join(main,'dist',file)));
+  const response=await fetch('http://127.0.0.1:4179/'+file);
+  const http=sha(Buffer.from(await response.arrayBuffer()));
+  bundle.push({file,sha256:expected,mainMatches:actual===expected,httpMatches:response.ok&&http===expected});
+ }
+}));
+const collector=await(await fetch('http://127.0.0.1:4179/api/diagnostics/status',{headers:{Origin:'http://127.0.0.1:4179'}})).json();
+const health=await(await fetch('http://127.0.0.1:4179/api/health')).json();
+const publicationCommit=execFileSync('git',['rev-parse','HEAD'],{cwd:main,encoding:'utf8'}).trim();
+const report={capturedAt:new Date().toISOString(),sourceSnapshotId:manifest.snapshotId,publicationCommit,branch:'main',preview:'http://127.0.0.1:4179/',apiPort:2570,mainSourceId,filesChecked:files.length,mismatches,errors,bundle:bundle.sort((a,b)=>a.file.localeCompare(b.file)),health,collector,scope:'Source equality on the main checkout and byte comparison of generated bundle plus selected changed public assets served by the matching main client/server. Runtime unchanged since the frozen U1 pipeline; publication documents are outside the source hash.'};
+report.status=mainSourceId===manifest.snapshotId&&!mismatches.length&&!errors.length&&bundle.every(x=>x.mainMatches&&x.httpMatches)&&health.ok&&collector.sourceSnapshotId===manifest.snapshotId?'passed':'failed';
+const dest=join(main,'docs/verification-evidence/unified-main-20261012-u1');await mkdir(dest,{recursive:true});await writeFile(join(dest,'local-preview-status.json'),JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({status:report.status,commit:publicationCommit,files:files.length,bundleFiles:bundle.length,source:mainSourceId,mismatches:report.mismatches,errors:report.errors,collector}));
+if(report.status!=='passed')process.exitCode=1;
