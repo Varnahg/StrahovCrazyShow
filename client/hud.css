@@ -1,0 +1,287 @@
+/* Scoped above legacy HUD selectors; opaque surfaces keep contrast independent
+   of the current sky, camera or lighting preview. No blur or filter effects. */
+.game-shell .world-status {
+  min-width: 0;
+  flex-wrap: wrap;
+  font-size: 12px;
+  line-height: 1.4;
+  background: #111d28;
+  color: #d9e1dd;
+}
+.game-shell .world-status > i {
+  flex: none;
+  width: 7px;
+  height: 7px;
+}
+.game-shell .world-status .demo-badge {
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1.3;
+  color: #e3c990;
+  background: #263a41;
+}
+.game-shell .top-right {
+  gap: 12px;
+  min-width: 0;
+}
+.game-shell .top-right .profile-button {
+  flex: none;
+}
+.game-shell .top-right :is(.weather, .clock) {
+  background: #111d28;
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: #e1e7df;
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-shadow: none;
+}
+.game-shell .top-right :is(.weather, .clock) small {
+  display: block;
+  font-size: 12px;
+  color: #b9c6c8;
+}
+.game-shell .dock.world-dock {
+  gap: 4px;
+  padding: 6px;
+  background: #111d28;
+}
+.game-shell .world-dock button {
+  width: 74px;
+  min-width: 74px;
+  height: 58px;
+  padding: 5px 3px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  color: #d9e1dd;
+}
+.game-shell .world-dock button .dock-label {
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.game-shell .world-dock button .dock-label kbd {
+  display: none;
+}
+.game-shell .world-dock button.active,
+.game-shell .world-dock button:hover {
+  color: #e7c985;
+}
+.game-shell .world-dock b {
+  font-size: 12px;
+  background: #674c81;
+}
+.game-shell .dock-keyboard-help {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 48px);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(480px, calc(100vw - 24px));
+  margin: 0;
+  padding: 9px 12px;
+  border: 1px solid #b49f7070;
+  border-radius: 4px;
+  background: #111d28;
+  color: #d9e1dd;
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0;
+  pointer-events: none;
+}
+.game-shell .world-dock:has(button:focus-visible) .dock-keyboard-help {
+  opacity: 1;
+}
+.game-shell .controls.world-keybar {
+  display: flex;
+  max-width: none;
+  gap: 5px;
+  padding: 5px;
+  border: 1px solid #b49f704a;
+  border-radius: 4px;
+  background: #111d28;
+  font-size: 12px;
+}
+.game-shell .world-keybar button {
+  min-width: 40px;
+  height: 40px;
+  position: relative;
+  font-size: 12px;
+}
+.game-shell .world-keybar .fps {
+  min-width: 60px;
+  margin-left: 0;
+  color: #b9c6c8;
+  font-size: 12px;
+  text-align: center;
+}
+.game-shell .hud-flashlight {
+  right: 210px;
+  bottom: 23px;
+  height: 52px;
+  min-width: 62px;
+}
+.game-shell .hud-flashlight kbd {
+  font-size: 12px;
+}
+.game-shell .world-control-label {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 12px);
+  padding: 7px 10px;
+  border: 1px solid #b49f7070;
+  border-radius: 4px;
+  background: #111d28;
+  color: #d9e1dd;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+.game-shell
+  .world-keybar
+  button:is(:hover, :focus-visible)
+  .world-control-label {
+  opacity: 1;
+}
+.game-shell .interaction {
+  font-size: 12px;
+  background: #152833;
+}
+.game-shell .minimap > .minimap-attribution {
+  font-size: 12px;
+  color: #b9c6c8;
+}
+.game-shell .stat-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+}
+.game-shell .stat-grid > div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #798b8c48;
+  border-radius: 4px;
+  background: #20333f;
+}
+.game-shell .stat-grid strong {
+  color: #e1e7df;
+  font-size: 24px;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.game-shell .stat-grid span {
+  color: #b9c6c8;
+  font-size: 12px;
+  line-height: 1.4;
+}
+@media (max-width: 1100px) {
+  .game-shell .world-dock button {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+  .game-shell .world-dock button .dock-label {
+    position: absolute;
+    bottom: calc(100% + 14px);
+    padding: 7px 10px;
+    border: 1px solid #b49f7070;
+    border-radius: 4px;
+    background: #111d28;
+    color: #d9e1dd;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .game-shell .world-dock button:first-of-type .dock-label {
+    left: 0;
+  }
+  .game-shell .world-dock button:last-of-type .dock-label {
+    right: 0;
+  }
+  .game-shell .world-dock button .dock-label kbd {
+    display: inline;
+    margin-left: 7px;
+    font-size: 12px;
+  }
+  .game-shell .world-dock button:is(:hover, :focus-visible) .dock-label {
+    opacity: 1;
+  }
+  .game-shell :is(.controls.world-keybar, .hud-flashlight) {
+    bottom: 90px;
+  }
+}
+@media (max-width: 620px) {
+  /* Let the panel start below the actual header, including wrapped previews. */
+  .game-shell {
+    display: grid;
+    grid-template-rows: max-content minmax(0, 1fr);
+    gap: 8px;
+    padding: 12px 12px 76px;
+  }
+  .game-shell .game-top {
+    position: relative;
+    inset: auto;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 34px;
+    gap: 8px;
+    align-items: start;
+  }
+  .game-shell .world-status {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 6px 8px;
+    gap: 5px;
+  }
+  .game-shell .top-right {
+    display: contents;
+  }
+  .game-shell .top-right .profile-button {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .game-shell .top-right .clock {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: start;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 4px 6px;
+    white-space: normal;
+  }
+  .game-shell .panel-container {
+    position: relative;
+    grid-row: 2;
+    min-height: 0;
+  }
+  .game-shell .panel-container > .side-panel {
+    inset: 0;
+    width: auto;
+  }
+  .game-shell .world-keybar .fps {
+    display: none;
+  }
+  .game-shell .hud-flashlight {
+    right: 126px;
+  }
+}
+@media (max-width: 380px) {
+  .game-shell .dock.world-dock {
+    gap: 2px;
+  }
+  .game-shell .world-dock button {
+    width: 40px;
+    min-width: 40px;
+  }
+  .game-shell .minimap {
+    width: 110px;
+  }
+}

@@ -2,12 +2,14 @@ import type { Input, Vec3 } from "./types";
 import type { VehicleState } from "./vehicle";
 export type { Input } from "./types";
 
-// Closed stadium geometry changes prediction/collision behaviour. Old clients
-// must refresh instead of joining a world whose visible boundaries differ.
-export const PROTOCOL_VERSION = 7;
+// Compact motion dictionaries/deltas require a matching client and server.
+export const PROTOCOL_VERSION = 8;
 export const SIM_HZ = 60;
 export const FIXED_DT = 1 / SIM_HZ;
 export const MAX_CATCHUP_STEPS = 8;
+// More than 133ms of queued commands cannot drain while both peers run at 60Hz.
+export const INPUT_BACKLOG_MAX_COMMANDS = 8;
+export const INPUT_BACKLOG_RECOVERY_INTERVAL_MS = 1000;
 export type ActorState = {
   position: Vec3;
   yaw: number;
@@ -23,6 +25,8 @@ export type Authority = {
   ack: number;
   state: ActorState;
   resync?: boolean;
+  /** The received command frontier was explicitly discarded to restore responsiveness. */
+  resyncReason?: "input-backlog";
   /** Only the reply to an explicit respawn request, never a generic resync. */
   respawn?: true;
 };
@@ -88,6 +92,7 @@ export class InputQueue {
   ack = 0;
   lastReceived = 0;
   lastAt = 0;
+  private lastBacklogRecoveryAt = -Infinity;
   last: Input = { x: 0, z: 0, yaw: 0, jump: false, seq: 0 };
   push(input: Input, now: number) {
     if (
@@ -117,6 +122,19 @@ export class InputQueue {
       seq: this.ack,
     };
   }
+  /** Never accelerate the actor to drain a queue. The caller must send a forced
+   * authority after this reset so the client knows which commands were discarded. */
+  recoverBacklog(now: number): boolean {
+    if (
+      !Number.isFinite(now) ||
+      this.pending.length <= INPUT_BACKLOG_MAX_COMMANDS ||
+      now - this.lastBacklogRecoveryAt < INPUT_BACKLOG_RECOVERY_INTERVAL_MS
+    )
+      return false;
+    this.reset();
+    this.lastBacklogRecoveryAt = now;
+    return true;
+  }
   reset() {
     this.pending = [];
     this.ack = this.lastReceived;
@@ -135,10 +153,18 @@ export class PredictionHistory {
       if (old) this.states.delete(old.seq);
     }
   }
-  acknowledge(ack: number) {
-    this.inputs = this.inputs.filter((i) => i.seq > ack);
-    for (const seq of this.states.keys())
-      if (seq <= ack) this.states.delete(seq);
+  acknowledge(ack: number, vehicle?: boolean) {
+    this.inputs = this.inputs.filter((input) => {
+      if (
+        input.seq > ack &&
+        (vehicle === undefined ||
+          input.vehicle === undefined ||
+          input.vehicle === vehicle)
+      )
+        return true;
+      this.states.delete(input.seq);
+      return false;
+    });
     return this.inputs;
   }
   clear() {
@@ -156,6 +182,7 @@ type RemotePose = {
   speed: number;
   vehicle: boolean;
   zone: string;
+  grounded?: boolean;
 };
 export function angleLerp(a: number, b: number, t: number) {
   const delta = Math.atan2(Math.sin(b - a), Math.cos(b - a));
@@ -170,7 +197,18 @@ export class SnapshotBuffer {
       this.offset === undefined
         ? difference
         : this.offset * 0.98 + difference * 0.02;
-    for (const [id, x, y, z, yaw, speed, _ack, vehicle, zone] of packet.rows) {
+    for (const [
+      id,
+      x,
+      y,
+      z,
+      yaw,
+      speed,
+      _ack,
+      vehicle,
+      zone,
+      grounded,
+    ] of packet.rows) {
       const list = this.entities.get(id) || [];
       if (list.length && list[list.length - 1].time >= packet.time) continue;
       list.push({
@@ -182,6 +220,7 @@ export class SnapshotBuffer {
         speed,
         vehicle: !!vehicle,
         zone,
+        grounded: typeof grounded === "boolean" ? grounded : undefined,
       });
       if (list.length > 30) list.shift();
       this.entities.set(id, list);

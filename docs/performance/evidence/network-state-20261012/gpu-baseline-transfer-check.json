@@ -1,0 +1,234 @@
+{
+  "verifiedAtUtc": "2026-10-11T22:45:36.294Z",
+  "purpose": "Independent verification of three already captured production GPU baseline data transfers; no new measurement or reconstruction of frames.",
+  "transferMethod": "Parent saved original browser-returned data objects through ordinary file tools. This verifier independently parsed the saved objects and checked the original envelope FNV values supplied by the parent.",
+  "fnvAlgorithm": "32-bit FNV-1a over UTF-16 code units of JavaScript JSON.stringify(data), in property insertion order: h=0x811c9dc5; h=Math.imul(h ^ charCodeAt(i),0x01000193)>>>0. FNV detects transfer changes; SHA-256 below identifies exact stored file bytes.",
+  "percentileAlgorithm": "Sort frameIntervalsMs ascending; select sorted[Math.floor(n * 0.95)] and sorted[Math.floor(n * 0.99)] without rounding or interpolation.",
+  "averageFpsAlgorithm": "Number(((1000 * n) / sum(frameIntervalsMs)).toFixed(1))",
+  "algorithmEvidence": {
+    "snapshotGamePath": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\.cache\\performance-snapshot\\network-baseline\\client\\game.ts",
+    "snapshotGameSha256": "666af02c59132f32bb09bfa03f39a485e8fb386cdbd3cbd9d425e810614362e6",
+    "snapshotLines": {
+      "averageFps": 1962,
+      "p95": 1963,
+      "p99": 1964
+    },
+    "currentGamePath": "client/game.ts",
+    "expressions": [
+      "sorted[Math.floor(sorted.length * 0.95)]",
+      "sorted[Math.floor(sorted.length * 0.99)]",
+      "Number(((1000 * b.frames.length) / sum).toFixed(1))"
+    ]
+  },
+  "intervalMethod": "date is the completion timestamp produced by the game. Start is estimated from the recorded duration (rounded to hundredths of a second). Conservative start also includes a 5 ms duration-rounding allowance and uses the larger of that duration or summed raw frame intervals. All resulting intervals are fully inside the network capture with ample margins; exact unrounded wall-clock start was not exported.",
+  "sourceSnapshotId": "4601a8c8f94775e37befda81976b1a8457a171be923dd5b24981847b7c34000e",
+  "configuration": {
+    "avatars": 30,
+    "css": {
+      "width": 1920,
+      "height": 1080
+    },
+    "internal": {
+      "width": 1476,
+      "height": 830
+    },
+    "quality": "low",
+    "hardwareScaling": 1.3,
+    "renderer": {
+      "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "vendor": "Google Inc. (Intel)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+    },
+    "captureScope": "DOM benchmark result from full production game; settings panel and HUD visible; per-mesh inventory omitted from transfer; not an FPS value read from HUD"
+  },
+  "network": {
+    "file": "gpu-baseline-network.json",
+    "sha256": "cb599b26d9f2848665c1d0b54de7b19b47dfe4b52002ea48f140e7cf0b5516fa",
+    "startedAtUtc": "2026-10-11T22:34:30.106Z",
+    "endedAtUtc": "2026-10-11T22:38:38.664Z",
+    "expectedPopulation": 30,
+    "minRowsPerMotion": 30,
+    "maxRowsPerMotion": 30,
+    "resyncsDuringMeasurement": 0,
+    "errors": [],
+    "checks": {
+      "oneSharedWorld": true,
+      "twentyNineHarnessClientsPlusBrowser": true,
+      "populationMinMaxThirty": true,
+      "zeroResyncs": true,
+      "zeroErrors": true,
+      "expectedSource": true,
+      "snapshotAndCurrentGameAlgorithmsVerified": true
+    }
+  },
+  "samples": [
+    {
+      "file": "gpu-baseline-a.json",
+      "bytes": 11273,
+      "sha256": "2b15c0034f11ed019d7528b70a8c1be009ed8c69eb134b6ac91e453710a2646a",
+      "originalEnvelopeFnv1a32": "0da4c846",
+      "recomputedFnv1a32": "0da4c846",
+      "frames": 285,
+      "frameIntervalsCount": 285,
+      "sumFrameIntervalsMs": 10027,
+      "recordedAndRecomputed": {
+        "averageFps": {
+          "recorded": 28.4,
+          "recomputed": 28.4
+        },
+        "p95FrameMs": {
+          "recorded": 45.5,
+          "recomputed": 45.5
+        },
+        "p99FrameMs": {
+          "recorded": 55.29999995231629,
+          "recomputed": 55.29999995231629
+        }
+      },
+      "interval": {
+        "endUtc": "2026-10-11T22:35:59.267Z",
+        "durationSeconds": 10.01,
+        "estimatedStartUtc": "2026-10-11T22:35:49.257Z",
+        "conservativeStartUtc": "2026-10-11T22:35:49.240Z",
+        "marginAfterNetworkStartMs": 79134,
+        "marginBeforeNetworkEndMs": 159397
+      },
+      "checks": {
+        "fnvMatchesOriginalEnvelope": true,
+        "frameCountMatchesRecordedAndExpected": true,
+        "allFrameIntervalsFinitePositive": true,
+        "p95ExactlyMatches": true,
+        "p99ExactlyMatches": true,
+        "averageFpsExactlyMatches": true,
+        "sourceMatchesBaselineAndNetwork": true,
+        "atLeastTenSeconds": true,
+        "completeIntervalWithinNetworkRecording": true,
+        "thirtyAvatars": true,
+        "lodPopulationThirty": true,
+        "css1920x1080": true,
+        "internal1476x830": true,
+        "intelUhd630Webgl2": true,
+        "lowQualityFixedScaling": true,
+        "sceneViewUnchangedAcrossSamples": true,
+        "renderBudgetsUnchangedAcrossSamples": true,
+        "controlledWeatherUnchanged": true,
+        "zeroRenderErrors": true,
+        "zeroAssetLoadErrors": true
+      }
+    },
+    {
+      "file": "gpu-baseline-b.json",
+      "bytes": 11795,
+      "sha256": "d9d16cb6d9eb680947b7d9275c1087ff18fd29f92321def4973a1474746b4815",
+      "originalEnvelopeFnv1a32": "b8329316",
+      "recomputedFnv1a32": "b8329316",
+      "frames": 302,
+      "frameIntervalsCount": 302,
+      "sumFrameIntervalsMs": 10036,
+      "recordedAndRecomputed": {
+        "averageFps": {
+          "recorded": 30.1,
+          "recomputed": 30.1
+        },
+        "p95FrameMs": {
+          "recorded": 40.60000014305115,
+          "recomputed": 40.60000014305115
+        },
+        "p99FrameMs": {
+          "recorded": 52.79999995231629,
+          "recomputed": 52.79999995231629
+        }
+      },
+      "interval": {
+        "endUtc": "2026-10-11T22:36:34.054Z",
+        "durationSeconds": 10.03,
+        "estimatedStartUtc": "2026-10-11T22:36:24.024Z",
+        "conservativeStartUtc": "2026-10-11T22:36:24.018Z",
+        "marginAfterNetworkStartMs": 113912,
+        "marginBeforeNetworkEndMs": 124610
+      },
+      "checks": {
+        "fnvMatchesOriginalEnvelope": true,
+        "frameCountMatchesRecordedAndExpected": true,
+        "allFrameIntervalsFinitePositive": true,
+        "p95ExactlyMatches": true,
+        "p99ExactlyMatches": true,
+        "averageFpsExactlyMatches": true,
+        "sourceMatchesBaselineAndNetwork": true,
+        "atLeastTenSeconds": true,
+        "completeIntervalWithinNetworkRecording": true,
+        "thirtyAvatars": true,
+        "lodPopulationThirty": true,
+        "css1920x1080": true,
+        "internal1476x830": true,
+        "intelUhd630Webgl2": true,
+        "lowQualityFixedScaling": true,
+        "sceneViewUnchangedAcrossSamples": true,
+        "renderBudgetsUnchangedAcrossSamples": true,
+        "controlledWeatherUnchanged": true,
+        "zeroRenderErrors": true,
+        "zeroAssetLoadErrors": true
+      }
+    },
+    {
+      "file": "gpu-baseline-c.json",
+      "bytes": 11814,
+      "sha256": "540e4620e8a17545412d453d7192a09cee92d8c4d8673266af10e55607dc1cb9",
+      "originalEnvelopeFnv1a32": "4da4aa33",
+      "recomputedFnv1a32": "4da4aa33",
+      "frames": 307,
+      "frameIntervalsCount": 307,
+      "sumFrameIntervalsMs": 10035.399999856949,
+      "recordedAndRecomputed": {
+        "averageFps": {
+          "recorded": 30.6,
+          "recomputed": 30.6
+        },
+        "p95FrameMs": {
+          "recorded": 38.70000004768371,
+          "recomputed": 38.70000004768371
+        },
+        "p99FrameMs": {
+          "recorded": 48.70000004768371,
+          "recomputed": 48.70000004768371
+        }
+      },
+      "interval": {
+        "endUtc": "2026-10-11T22:37:14.960Z",
+        "durationSeconds": 10.02,
+        "estimatedStartUtc": "2026-10-11T22:37:04.940Z",
+        "conservativeStartUtc": "2026-10-11T22:37:04.924Z",
+        "marginAfterNetworkStartMs": 154818.60009765625,
+        "marginBeforeNetworkEndMs": 83704
+      },
+      "checks": {
+        "fnvMatchesOriginalEnvelope": true,
+        "frameCountMatchesRecordedAndExpected": true,
+        "allFrameIntervalsFinitePositive": true,
+        "p95ExactlyMatches": true,
+        "p99ExactlyMatches": true,
+        "averageFpsExactlyMatches": true,
+        "sourceMatchesBaselineAndNetwork": true,
+        "atLeastTenSeconds": true,
+        "completeIntervalWithinNetworkRecording": true,
+        "thirtyAvatars": true,
+        "lodPopulationThirty": true,
+        "css1920x1080": true,
+        "internal1476x830": true,
+        "intelUhd630Webgl2": true,
+        "lowQualityFixedScaling": true,
+        "sceneViewUnchangedAcrossSamples": true,
+        "renderBudgetsUnchangedAcrossSamples": true,
+        "controlledWeatherUnchanged": true,
+        "zeroRenderErrors": true,
+        "zeroAssetLoadErrors": true
+      }
+    }
+  ],
+  "limitations": [
+    "The transferred data intentionally omit the per-mesh modelReview inventory, as declared in each captureScope. This report verifies those captured objects and does not claim to verify a complete benchmark JSON download.",
+    "Averages and frame-time percentiles are from real browser frames in the production game. This transfer check does not independently measure the GPU, extrapolate server capacity, or establish causal performance gains."
+  ],
+  "discrepancies": [],
+  "passed": true
+}

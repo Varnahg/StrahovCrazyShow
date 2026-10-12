@@ -953,7 +953,7 @@ export class Game {
             expected.vehicleState.linvel.z - packet.state.vehicleState.linvel.z,
           ) < 0.015));
     if (exact && !packet.resync) {
-      this.prediction.acknowledge(packet.ack);
+      this.prediction.acknowledge(packet.ack, packet.state.vehicle);
       this.seq = Math.max(this.seq, packet.ack);
       return;
     }
@@ -970,21 +970,25 @@ export class Game {
       this.carSnapshots.length = 0;
       this.snapshots.remove(this.localId);
     } else this.seq = Math.max(this.seq, packet.ack);
-    const replay = this.prediction
-      .acknowledge(packet.ack)
-      .filter(
-        (i) => i.vehicle === undefined || i.vehicle === packet.state.vehicle,
-      );
+    const replay = this.prediction.acknowledge(
+      packet.ack,
+      packet.state.vehicle,
+    );
     this.actor.restore(packet.state, packet.respawn === true);
     if (packet.resync && !packet.state.vehicle && packet.state.vehicleState)
       this.sim.restorePublicCar(packet.state.vehicleState);
     if (modeChanged && packet.state.vehicle && !packet.resync)
       this.alignVehicleCamera();
-    if (!packet.resync)
+    if (!packet.resync) {
       for (const input of replay) {
         this.actor.step(input, FIXED_DT);
-        this.sim.tick();
+        // Anchor replay to the authority's server time, independent of local
+        // clock skew and mode-filtered sequence gaps. Dynamic contacts still
+        // do not have a full world rollback.
+        this.sim.tick(packet.time + (input.seq - packet.ack) * FIXED_DT * 1000);
+        this.prediction.states.set(input.seq, this.actor.capture());
       }
+    }
     const corrected = this.actor.position,
       error = Math.hypot(
         old.x - corrected.x,

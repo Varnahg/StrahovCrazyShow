@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import { DEFAULT_PROFILE } from '../shared/types';
 import { canonicalInput, PROTOCOL_VERSION } from '../shared/netcode';
+import { MotionDecoder } from '../shared/motion-codec';
 
 const endpoint = process.argv[2] || 'http://127.0.0.1:2570';
 const count = Number(process.argv[3] || 30);
@@ -20,7 +21,7 @@ if (!Number.isInteger(expectedPopulation) || expectedPopulation < count || expec
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const quant = (a: number[], p: number) => a.length ? [...a].sort((x, y) => x - y)[Math.floor((a.length - 1) * p)] : null;
 const rounded = (n: number | null) => n === null ? null : Math.round(n * 1000) / 1000;
-type Bot = { id: string; room: Room; seq: number; ack: number; lastRows: number; sent: Map<number, number>; position: {x: number;y: number;z: number}; startPosition?: {x: number;y: number;z: number}; pathLength: number; bytesDown: number; bytesUp: number; motionBytes: number[]; motionTimes: number[]; motionTicks: number[]; motionServerTimes: number[]; inputTimes: number[]; ackAges: number[]; ackLag: number[]; resyncs: number; maxBuffered: number; minPlayers: number; maxPlayers: number; errors: string[]; };
+type Bot = { id: string; room: Room; seq: number; ack: number; lastRows: number; sent: Map<number, number>; position: {x: number;y: number;z: number}; startPosition?: {x: number;y: number;z: number}; pathLength: number; bytesDown: number; bytesUp: number; motionBytes: number[]; motionTimes: number[]; motionTicks: number[]; motionServerTimes: number[]; inputTimes: number[]; ackAges: number[]; ackTimes: number[]; ackLag: number[]; resyncs: number; resyncEvents: {time: number; serverTime: number; reason: string; seq: number; ack: number}[]; maxBuffered: number; minPlayers: number; maxPlayers: number; errors: string[]; };
 const sdk = new Client(endpoint), bots: Bot[] = [];
 let recording = false, stopped = false, pulse: ReturnType<typeof setTimeout> | undefined;
 const source = JSON.parse(await readFile(resolve('source-manifest.json'), 'utf8'));
@@ -38,14 +39,17 @@ try {
     const session = await response.json() as any;
     worldIds.add(session.worldId);
     const room = await sdk.joinById(session.worldId, { token: session.token, protocol: PROTOCOL_VERSION });
-    const bot: Bot = { id: session.id, room, seq: 0, ack: 0, lastRows: 0, sent: new Map(), position: {x: 22, y: 1, z: -14}, pathLength: 0, bytesDown: 0, bytesUp: 0, motionBytes: [], motionTimes: [], motionTicks: [], motionServerTimes: [], inputTimes: [], ackAges: [], ackLag: [], resyncs: 0, maxBuffered: 0, minPlayers: Infinity, maxPlayers: 0, errors: [] };
+    const bot: Bot = { id: session.id, room, seq: 0, ack: 0, lastRows: 0, sent: new Map(), position: {x: 22, y: 1, z: -14}, pathLength: 0, bytesDown: 0, bytesUp: 0, motionBytes: [], motionTimes: [], motionTicks: [], motionServerTimes: [], inputTimes: [], ackAges: [], ackTimes: [], ackLag: [], resyncs: 0, resyncEvents: [], maxBuffered: 0, minPlayers: Infinity, maxPlayers: 0, errors: [] };
     bots.push(bot);
     room.onMessage('*', () => {});
     room.onError((code, message) => bot.errors.push(String(code) + ': ' + message));
     const conn = (room as any).connection, originalMessage = conn.events.onmessage, originalSend = conn.send.bind(conn);
     conn.events.onmessage = (event: any) => { rawLength = event.data.byteLength; if (recording) bot.bytesDown += rawLength; originalMessage(event); };
     conn.send = (data: any) => { if (recording) bot.bytesUp += data.byteLength; originalSend(data); };
-    room.onMessage('motion', (packet: any) => {
+    const motion = new MotionDecoder();
+    room.onMessage('motion', (wire: unknown) => {
+      const packet = motion.decode(wire);
+      if (!packet) { bot.errors.push('Motion baseline/sequence rejected'); return; }
       bot.lastRows = packet.rows.length;
       if (!recording) return;
       bot.motionBytes.push(rawLength); bot.motionTimes.push(performance.now()); bot.motionTicks.push(packet.tick); bot.motionServerTimes.push(packet.time);
@@ -55,9 +59,9 @@ try {
       const next = authority.state.position;
       if (recording) {
         bot.pathLength += Math.hypot(next.x - bot.position.x, next.z - bot.position.z);
-        if (authority.ack > bot.ack && bot.sent.has(authority.ack)) bot.ackAges.push(performance.now() - bot.sent.get(authority.ack)!);
+        if (authority.ack > bot.ack && bot.sent.has(authority.ack)) { const observedAt = performance.now(); bot.ackAges.push(observedAt - bot.sent.get(authority.ack)!); bot.ackTimes.push(observedAt); }
         bot.ackLag.push(bot.seq - authority.ack);
-        if (authority.resync) bot.resyncs++;
+        if (authority.resync) { bot.resyncs++; bot.resyncEvents.push({time: Date.now(), serverTime: authority.time, reason: authority.resyncReason || "unspecified", seq: bot.seq, ack: authority.ack}); }
       }
       bot.ack = authority.ack; bot.position = next;
     });
@@ -144,11 +148,11 @@ try {
     monitorDownKBps: rounded(monitor.bytesDown / (elapsed / 1000) / 1000), monitorUpKBps: rounded(monitor.bytesUp / (elapsed / 1000) / 1000),
     aggregateDownKBps: rounded(bots.reduce((sum, bot) => sum + bot.bytesDown, 0) / (elapsed / 1000) / 1000), aggregateUpKBps: rounded(bots.reduce((sum, bot) => sum + bot.bytesUp, 0) / (elapsed / 1000) / 1000),
     ackAgeMedianMs: rounded(quant(bots.flatMap(bot => bot.ackAges), .5)), ackAgeP95Ms: rounded(quant(bots.flatMap(bot => bot.ackAges), .95)), ackAgeP99Ms: rounded(quant(bots.flatMap(bot => bot.ackAges), .99)), ackLagCommandsP95: quant(bots.flatMap(bot => bot.ackLag), .95),
-    resyncsDuringMeasurement: bots.reduce((sum, bot) => sum + bot.resyncs, 0), maxBufferedBytes: Math.max(...bots.map(bot => bot.maxBuffered)),
+    resyncsDuringMeasurement: bots.reduce((sum, bot) => sum + bot.resyncs, 0), resyncReasons: bots.flatMap(bot => bot.resyncEvents).reduce((counts, event) => { counts[event.reason] = (counts[event.reason] || 0) + 1; return counts; }, {} as Record<string, number>), resyncEvents: bots.flatMap(bot => bot.resyncEvents.map(event => ({id: bot.id, ...event}))), maxBufferedBytes: Math.max(...bots.map(bot => bot.maxBuffered)),
     movingClients: bots.filter(bot => bot.pathLength > 1).length, pathMetresMedian: rounded(quant(bots.map(bot => bot.pathLength), .5)),
     spatialExtent: {minX: Math.min(...positions.map(p => p.x)), maxX: Math.max(...positions.map(p => p.x)), minZ: Math.min(...positions.map(p => p.z)), maxZ: Math.max(...positions.map(p => p.z))},
     positions, errors: bots.flatMap(bot => bot.errors.map(error => ({id: bot.id, error}))),
-    rawMonitor: {motionTimes: monitor.motionTimes, motionTicks: monitor.motionTicks, motionServerTimes: monitor.motionServerTimes, motionBytes: monitor.motionBytes, inputTimes: monitor.inputTimes, ackAges: monitor.ackAges, ackLag: monitor.ackLag},
+    rawMonitor: {motionTimes: monitor.motionTimes, motionTicks: monitor.motionTicks, motionServerTimes: monitor.motionServerTimes, motionBytes: monitor.motionBytes, inputTimes: monitor.inputTimes, ackAges: monitor.ackAges, ackTimes: monitor.ackTimes, ackLag: monitor.ackLag, resyncEvents: monitor.resyncEvents},
   };
   if (output) await writeFile(output, JSON.stringify(report, null, 2) + '\n');
   const {positions: _positions, rawMonitor: _raw, ...summary} = report;

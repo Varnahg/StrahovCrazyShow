@@ -1,0 +1,224 @@
+{
+  "verifiedAtUtc": "2026-10-11T23:40:30.127Z",
+  "purpose": "Independent read-only validation of saved production B2 GPU exports and their network cohort. B2 is an intermediate checkpoint, not final acceptance; no new measurement was run.",
+  "sourceSnapshotId": "3a27efd9e1ae36a8f3ebce99b3ccffa21e138a88bdc6d9c329a17a591b21875e",
+  "sourceFiles": [
+    {
+      "file": "client/game.ts",
+      "sha256": "6beaa88a1bb6f6e35335e26152f5956860a81987075977ef2332c7b980515e19",
+      "manifestSha256": "6beaa88a1bb6f6e35335e26152f5956860a81987075977ef2332c7b980515e19",
+      "matchesManifest": true
+    },
+    {
+      "file": "scripts/performance-network.ts",
+      "sha256": "67215055539a3ba0465832a97620a45e92625d8edef19fbd128ea747fdf7ccf5",
+      "manifestSha256": "67215055539a3ba0465832a97620a45e92625d8edef19fbd128ea747fdf7ccf5",
+      "matchesManifest": true
+    },
+    {
+      "file": "scripts/performance-diverse.mjs",
+      "sha256": "4ed130702245dcebfb5934744cc27a425728399e68b5a06b28f115baa5da5d97",
+      "manifestSha256": "4ed130702245dcebfb5934744cc27a425728399e68b5a06b28f115baa5da5d97",
+      "matchesManifest": true
+    }
+  ],
+  "algorithmEvidence": {
+    "file": "client/game.ts",
+    "averageFpsLine": 1966,
+    "p95Line": 1967,
+    "p99Line": 1968,
+    "averageFps": "Number(((1000 * frameIntervalsMs.length) / sum(frameIntervalsMs)).toFixed(1))",
+    "percentiles": "Sort ascending and select floor(length * percentile), without interpolation."
+  },
+  "intervalMethod": "date is the completion timestamp. Conservative start uses the larger of recorded duration plus 5 ms rounding allowance and sum of raw intervals. Exact unrounded wall-clock start was not exported.",
+  "baselineConfigurationReference": {
+    "file": "gpu-baseline-a.json",
+    "sha256": "2b15c0034f11ed019d7528b70a8c1be009ed8c69eb134b6ac91e453710a2646a",
+    "numericComparisonTolerance": 1e-12
+  },
+  "network": {
+    "file": "gpu-final-network.json",
+    "sha256": "df745e3d2f27bac163332a441729b1e66b829fb77597420294f27df21c3c04ac",
+    "startedAtUtc": "2026-10-11T23:05:42.292Z",
+    "endedAtUtc": "2026-10-11T23:14:19.025Z",
+    "durationMs": 516732.764,
+    "tickHzServerClock": 60,
+    "motionHz": 19.981,
+    "aggregateDownKBps": 529.337,
+    "aggregateDownScope": "29 SDK clients; browser transport is not included in this byte aggregate.",
+    "ackAgeMedianMs": 212.421,
+    "ackAgeP95Ms": 241.415,
+    "ackAgeP99Ms": 245.735,
+    "ackLagCommandsP95": 14,
+    "resyncsDuringMeasurement": 0,
+    "checks": {
+      "source": true,
+      "oneSharedWorld": true,
+      "twentyNineSDKPlusBrowser": true,
+      "populationMinMaxThirty": true,
+      "zeroErrors": true,
+      "zeroResyncs": true,
+      "snapshotSource": true,
+      "sourceFiles": true,
+      "harnessSha256": true,
+      "harnessImports": true,
+      "monitorMotionArraysAligned": true
+    }
+  },
+  "samples": [
+    {
+      "file": "gpu-final-a.json",
+      "sha256": "19f51c2e7f5056aaa1a49dcc7794947740af2e1e7c5c805e010f7b6a509120f7",
+      "date": "2026-10-11T23:07:52.931Z",
+      "durationSeconds": 10.01,
+      "rawFrameIntervalSumMs": 10022.099999904633,
+      "conservativeStartUtc": "2026-10-11T23:07:42.908Z",
+      "marginAfterNetworkStartMs": 120616.89990234375,
+      "marginBeforeNetworkEndMs": 386094,
+      "recalculated": {
+        "frames": 289,
+        "averageFps": 28.8,
+        "p95FrameMs": 45,
+        "p99FrameMs": 52.40000009536743
+      },
+      "avatarLod": {
+        "near": 1,
+        "medium": 29,
+        "far": 0
+      },
+      "triangles": 1070381,
+      "drawCalls": 449,
+      "inventoryRows": 3546,
+      "checks": {
+        "expectedSource": true,
+        "frameCount": true,
+        "finitePositiveFrames": true,
+        "averageFps": true,
+        "p95": true,
+        "p99": true,
+        "networkContainsConservativeInterval": true,
+        "allThirtyAvatars": true,
+        "zeroRenderErrors": true,
+        "zeroAssetErrors": true,
+        "expectedViewport": true,
+        "expectedInternalResolution": true,
+        "manualLow": true,
+        "hardwareScaling": true,
+        "sameRendererAsBaseline": true,
+        "sameCameraAndLightingAsBaseline": true,
+        "sameWeatherThroughout": true,
+        "sameWeatherAsBaseline": true,
+        "sameRenderBudgetsAsBaseline": true,
+        "noAmbient": true,
+        "fullInventory": true
+      },
+      "passed": true
+    },
+    {
+      "file": "gpu-final-b.json",
+      "sha256": "1802e749068edfdae5a4bc90e309389826c3dce595c661aaeab1d3134a1fc855",
+      "date": "2026-10-11T23:09:06.883Z",
+      "durationSeconds": 10.01,
+      "rawFrameIntervalSumMs": 10010.200000047684,
+      "conservativeStartUtc": "2026-10-11T23:08:56.868Z",
+      "marginAfterNetworkStartMs": 194576,
+      "marginBeforeNetworkEndMs": 312142,
+      "recalculated": {
+        "frames": 292,
+        "averageFps": 29.2,
+        "p95FrameMs": 44.5,
+        "p99FrameMs": 52.30000019073486
+      },
+      "avatarLod": {
+        "near": 3,
+        "medium": 27,
+        "far": 0
+      },
+      "triangles": 939393,
+      "drawCalls": 414,
+      "inventoryRows": 3554,
+      "checks": {
+        "expectedSource": true,
+        "frameCount": true,
+        "finitePositiveFrames": true,
+        "averageFps": true,
+        "p95": true,
+        "p99": true,
+        "networkContainsConservativeInterval": true,
+        "allThirtyAvatars": true,
+        "zeroRenderErrors": true,
+        "zeroAssetErrors": true,
+        "expectedViewport": true,
+        "expectedInternalResolution": true,
+        "manualLow": true,
+        "hardwareScaling": true,
+        "sameRendererAsBaseline": true,
+        "sameCameraAndLightingAsBaseline": true,
+        "sameWeatherThroughout": true,
+        "sameWeatherAsBaseline": true,
+        "sameRenderBudgetsAsBaseline": true,
+        "noAmbient": true,
+        "fullInventory": true
+      },
+      "passed": true
+    },
+    {
+      "file": "gpu-final-c.json",
+      "sha256": "d3f842699012f453300a7d65461602bde99857cefc18cbf41cc04eded5eceb9b",
+      "date": "2026-10-11T23:10:11.773Z",
+      "durationSeconds": 10,
+      "rawFrameIntervalSumMs": 10025.399999856949,
+      "conservativeStartUtc": "2026-10-11T23:10:01.747Z",
+      "marginAfterNetworkStartMs": 259455.60009765625,
+      "marginBeforeNetworkEndMs": 247252,
+      "recalculated": {
+        "frames": 318,
+        "averageFps": 31.7,
+        "p95FrameMs": 38.90000009536743,
+        "p99FrameMs": 42.700000047683716
+      },
+      "avatarLod": {
+        "near": 1,
+        "medium": 29,
+        "far": 0
+      },
+      "triangles": 933128,
+      "drawCalls": 411,
+      "inventoryRows": 3546,
+      "checks": {
+        "expectedSource": true,
+        "frameCount": true,
+        "finitePositiveFrames": true,
+        "averageFps": true,
+        "p95": true,
+        "p99": true,
+        "networkContainsConservativeInterval": true,
+        "allThirtyAvatars": true,
+        "zeroRenderErrors": true,
+        "zeroAssetErrors": true,
+        "expectedViewport": true,
+        "expectedInternalResolution": true,
+        "manualLow": true,
+        "hardwareScaling": true,
+        "sameRendererAsBaseline": true,
+        "sameCameraAndLightingAsBaseline": true,
+        "sameWeatherThroughout": true,
+        "sameWeatherAsBaseline": true,
+        "sameRenderBudgetsAsBaseline": true,
+        "noAmbient": true,
+        "fullInventory": true
+      },
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Validation passed means saved evidence is internally consistent; it does not accept B2 responsiveness. The long cohort exposed persistent input backlog and motivated the subsequent B3 fix.",
+    "The GPU ranges overlap baseline and avatar movement changes LOD and rendered triangles; these three sequential samples do not establish a causal FPS speedup.",
+    "ACK age is send-to-authority-observation, not RTT or input-to-photon. Aggregate ACK metrics cover all 29 SDK clients and cannot be independently reconstructed from the single exported monitor.",
+    "B2 has no ACK event timestamps. rawMonitor.ackAges has 10324 entries while motionTimes and ackLag each have 10325. Never align ackAges to motionTimes by array index; no per-GPU-window ACK-age statistic is asserted here.",
+    "No public Internet test, discrete GPU result, or 60 FPS acceptance is established."
+  ],
+  "acceptanceStatus": "intermediate-response-latency-failure-investigated-in-B3",
+  "discrepancies": [],
+  "passed": true
+}

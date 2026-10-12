@@ -1,12 +1,13 @@
 import type { Scene } from "@babylonjs/core/scene";
 
-/** On-demand asset inventory, captured with a real rendered benchmark. This
- * never runs per frame and does not expose account or multiplayer profiles. */
+/** On-demand inventory of cached render state after a real rendered benchmark.
+ * Do not force world-matrix updates here: diagnostics must not repair or change
+ * the state they observe. Hidden meshes can retain their last evaluated bounds.
+ * Never runs per frame and does not expose account or multiplayer profiles. */
 export function captureModelReview(scene: Scene) {
   return scene.meshes
     .filter((mesh) => !mesh.isDisposed() && mesh.getTotalVertices())
     .map((mesh) => {
-      mesh.computeWorldMatrix(true);
       const box = mesh.getBoundingInfo().boundingBox;
       const material = mesh.material as any;
       let root = mesh.parent;

@@ -15,6 +15,7 @@ export function synchronizePlayer(
     yaw: actor.yaw,
     speed: actor.speed,
     vehicle: actor.vehicle,
+    grounded: actor.grounded,
     zone: zoneAt(position),
     ack,
   });

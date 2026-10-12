@@ -1,7 +1,14 @@
 import { spawn } from "node:child_process";
-const respawnOnly = process.argv[2] === "--respawn-only";
-if (process.argv.length > 2 && (!respawnOnly || process.argv.length !== 3))
-  throw new Error("Usage: node scripts/test-integration.mjs [--respawn-only]");
+const subsets = {
+  "--respawn-only": ["scripts/integration-respawn.ts"],
+  "--network-only": ["scripts/integration-network.ts"],
+  "--input-backlog-only": ["scripts/integration-input-backlog.ts"],
+};
+const subset = process.argv[2];
+if (process.argv.length > 3 || (subset && !Object.hasOwn(subsets, subset)))
+  throw new Error(
+    "Usage: node scripts/test-integration.mjs [--respawn-only|--network-only|--input-backlog-only]",
+  );
 const endpoint = "http://127.0.0.1:2568";
 const server = spawn(process.execPath, ["--import", "tsx", "server/index.ts"], {
   env: { ...process.env, PORT: "2568" },
@@ -44,9 +51,14 @@ try {
     await new Promise((r) => setTimeout(r, 100));
   }
   if (!ready) throw new Error("Isolated test server did not start:\n" + output);
-  for (const script of respawnOnly
-    ? ["scripts/integration-respawn.ts"]
-    : ["scripts/integration-respawn.ts", "scripts/integration.ts"]) {
+  for (const script of subset
+    ? subsets[subset]
+    : [
+        "scripts/integration-respawn.ts",
+        "scripts/integration.ts",
+        "scripts/integration-network.ts",
+        "scripts/integration-input-backlog.ts",
+      ]) {
     const test = spawn(process.execPath, ["--import", "tsx", script], {
       env: { ...process.env, STRAHOV_TEST_URL: endpoint },
       stdio: "inherit",

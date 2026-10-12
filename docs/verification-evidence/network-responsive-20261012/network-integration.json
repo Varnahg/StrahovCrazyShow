@@ -1,0 +1,15 @@
+{
+  "completed": true,
+  "protocol": 8,
+  "endpoint": "http://127.0.0.1:2568",
+  "checks": [
+    "12 authenticated peers in one world; every peer sees every identity, above the old eight-player boundary",
+    "movement reaches every observer; position error <=0.51mm, exact ack and authoritative grounded bit",
+    "targeted keyframe restores an empty decoder without resetting locomotion or losing remote players",
+    "repeated ineffective quiz/decline commands do not fan out state to the world",
+    "contact changes update the two participants without broadcasting to ten unrelated peers",
+    "disconnect removes the player everywhere; resuming the same identity reconstructs the full shared world",
+    "guest cannot join or read authored meeting/presence from public HTTP"
+  ],
+  "peers": 12
+}

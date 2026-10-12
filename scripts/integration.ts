@@ -3,6 +3,7 @@ import { writeFileSync } from "node:fs";
 import { Client, type Room } from "@colyseus/sdk";
 import { DEFAULT_PROFILE } from "../shared/types";
 import { PROTOCOL_VERSION } from "../shared/netcode";
+import { MotionDecoder } from "../shared/motion-codec";
 import { SPAWN, CAR_SPAWN } from "../shared/world";
 const endpoint = process.env.STRAHOV_TEST_URL || "http://127.0.0.1:2567";
 const evidence = {
@@ -116,7 +117,12 @@ try {
     ["events", "events"],
   ])
     a.onMessage(type, (d: any) => (stateA[k] = d));
-  a.onMessage("motion", (d: any) => (stateA.motion = d.rows));
+  const motionA = new MotionDecoder();
+  a.onMessage("motion", (wire: unknown) => {
+    const packet = motionA.decode(wire);
+    assert.ok(packet, "every ordered motion packet must decode");
+    stateA.motion = packet.rows;
+  });
   a.onMessage("authoritative", (packet: any) => {
     stateA.authority = packet;
   });
@@ -142,7 +148,10 @@ try {
   };
   b.onMessage("welcome", () => {});
   b.onMessage("presence", (p: any) => (stateB.players = p));
-  b.onMessage("motion", (packet: any) => {
+  const motionB = new MotionDecoder();
+  b.onMessage("motion", (wire: unknown) => {
+    const packet = motionB.decode(wire);
+    assert.ok(packet, "observer receives a complete reconstructed world");
     stateB.motion = packet.rows;
     stateB.carState = packet.car;
   });

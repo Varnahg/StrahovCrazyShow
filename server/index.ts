@@ -7,22 +7,33 @@ import {
   type ServerResponse,
 } from "node:http";
 import { Community } from "./community";
+import {
+  consumeRate,
+  expireSessions,
+  pruneRateWindows,
+  SESSION_RECONNECT_TTL_MS,
+  SESSION_ISSUE_WINDOW_MS,
+  MAX_SESSION_ISSUE_ADDRESSES,
+} from "./session-lifecycle";
 import { sanitizeInput, sanitizeProfile, cleanText } from "../shared/profile";
 import { initPhysics, Simulation } from "../shared/simulation";
 import { SPAWN } from "../shared/world";
 import { groundHeight } from "../shared/terrain";
 import { vehicleExitAllowed } from "../shared/vehicle";
 import { makeDemoEvents, dateKey } from "../shared/events";
-import type { Input, Player, Profile } from "../shared/types";
+import type { Player, Profile } from "../shared/types";
 import { getWeather } from "./weather";
 import { createLocalBenchmarkHandler } from "./local-benchmarks";
 import { respawnServerPlayer, synchronizePlayer } from "./respawn";
+import { MotionEncoder } from "../shared/motion-codec";
 import {
   FixedStepClock,
   InputQueue,
   PROTOCOL_VERSION,
   SIM_HZ,
   type ActorState,
+  type Authority,
+  type MotionPacket,
 } from "../shared/netcode";
 const sessions = new Map<
   string,
@@ -35,6 +46,9 @@ const store = new Community();
 await initPhysics();
 class StrahovRoom extends Room {
   autoDispose = false;
+  // Inputs arrive in 30 packets/s; this cap also bounds otherwise unknown messages.
+  maxMessagesPerSecond = 150;
+  motionEncoder = new MotionEncoder();
   sim = new Simulation();
   inputQueues = new Map<string, InputQueue>();
   connections = new Map<string, Client>();
@@ -64,6 +78,7 @@ class StrahovRoom extends Room {
       if (!store.rate(c.auth.id, "input-packet", 90, 1000)) return;
       const queue = this.inputQueues.get(c.auth.id);
       if (!queue) return;
+      const receivedAt = performance.now();
       for (const raw of raws.slice(0, 8)) {
         const input = sanitizeInput(raw);
         if (!input) continue;
@@ -75,8 +90,13 @@ class StrahovRoom extends Room {
           this.sendAuthority(c, true);
           break;
         }
-        queue.push(input, performance.now());
+        queue.push(input, receivedAt);
       }
+      // A delayed burst followed by normal 60Hz input otherwise keeps its FIFO
+      // delay forever. Acknowledge the complete accepted packet before resetting
+      // only this player; this does not advance the actor or the shared world.
+      if (queue.recoverBacklog(receivedAt))
+        this.sendAuthority(c, true, "input-backlog");
     };
     this.onMessage("input", (c, raw) => receiveInputs(c, [raw]));
     this.onMessage("inputs", (c, raw) => {
@@ -88,10 +108,19 @@ class StrahovRoom extends Room {
         this.sendAuthority(c, true);
       }
     });
+    this.onMessage("motionResync", (c) => {
+      if (store.rate(c.auth.id, "motion-resync", 2, 1000))
+        this.sendMotionKeyframe(c);
+    });
     this.onMessage("profile", (c, p) =>
       this.safe(c, () => {
         if (!store.rate(c.auth.id, "profile", 5, 1000)) return;
         const profile = sanitizeProfile(p);
+        if (
+          JSON.stringify(sessions.get(c.auth.token)!.profile) ===
+          JSON.stringify(profile)
+        )
+          return;
         Object.assign(store.players.get(c.auth.id)!, profile);
         sessions.get(c.auth.token)!.profile = profile;
         this.broadcastPresence();
@@ -110,41 +139,47 @@ class StrahovRoom extends Room {
     );
     this.onMessage("contact", (c, d) =>
       this.safe(c, () => {
-        store.contact(c.auth.id, cleanText(d?.to, 80), d?.accept === true);
-        this.syncSocial();
+        const to = cleanText(d?.to, 80);
+        if (store.contact(c.auth.id, to, d?.accept === true))
+          this.syncSocial([c.auth.id, to]);
       }),
     );
-    this.onMessage("decline", (c, d) => {
-      store.requests.get(c.auth.id)?.delete(cleanText(d?.to, 80));
-      this.syncSocial();
-    });
+    this.onMessage("decline", (c, d) =>
+      this.safe(c, () => {
+        if (store.decline(c.auth.id, cleanText(d?.to, 80)))
+          this.syncSocial([c.auth.id]);
+      }),
+    );
     this.onMessage("block", (c, d) =>
       this.safe(c, () => {
-        store.block(c.auth.id, cleanText(d?.to, 80), d?.enabled !== false);
-        this.syncSocial();
+        const to = cleanText(d?.to, 80);
+        if (store.block(c.auth.id, to, d?.enabled !== false))
+          this.syncSocial([c.auth.id, to]);
       }),
     );
     this.onMessage("attend", (c, d) =>
       this.safe(c, () => {
-        store.attend(
-          c.auth.id,
-          cleanText(d?.eventId, 80),
-          d?.enabled === true,
-          d?.company === true,
-        );
-        this.syncSocial();
+        if (
+          store.attend(
+            c.auth.id,
+            cleanText(d?.eventId, 80),
+            d?.enabled === true,
+            d?.company === true,
+          )
+        )
+          this.syncSocial();
       }),
     );
     this.onMessage("saveEvent", (c, d) =>
       this.safe(c, () => {
-        store.saveEvent(c.auth.id, d);
-        this.broadcast("events", store.events);
+        if (store.saveEventChange(c.auth.id, d).changed)
+          this.broadcast("events", store.events);
       }),
     );
     this.onMessage("cancelEvent", (c, d) =>
       this.safe(c, () => {
-        store.cancelEvent(c.auth.id, cleanText(d?.id, 80));
-        this.broadcast("events", store.events);
+        if (store.cancelEvent(c.auth.id, cleanText(d?.id, 80)))
+          this.broadcast("events", store.events);
       }),
     );
     this.onMessage("emote", (c, d) => {
@@ -214,20 +249,25 @@ class StrahovRoom extends Room {
     );
     this.onMessage("find", (c, d) =>
       this.safe(c, () => {
-        if (store.find(c.auth.id, Number(d)))
+        const result = store.findChange(c.auth.id, Number(d));
+        if (result.completed)
           for (const client of this.clients)
             client.send("reward", "Průzkumník kopce");
-        this.broadcast("activity", store.activity);
+        if (result.changed) this.broadcast("activity", store.activity);
       }),
     );
-    this.onMessage("quizStart", (c, d) => {
-      store.startQuiz(c.auth.id, d);
-      this.broadcast("activity", store.activity);
-    });
-    this.onMessage("quizAnswer", (c, d) => {
-      store.answer(c.auth.id, Number(d));
-      this.broadcast("activity", store.activity);
-    });
+    this.onMessage("quizStart", (c, d) =>
+      this.safe(c, () => {
+        if (store.startQuiz(c.auth.id, d))
+          this.broadcast("activity", store.activity);
+      }),
+    );
+    this.onMessage("quizAnswer", (c, d) =>
+      this.safe(c, () => {
+        if (store.answer(c.auth.id, Number(d)))
+          this.broadcast("activity", store.activity);
+      }),
+    );
     this.setSimulationInterval(() => {
       const now = performance.now(),
         elapsed = (now - this.lastSimulationTime) / 1000;
@@ -269,22 +309,11 @@ class StrahovRoom extends Room {
       this.motionAccumulator += elapsed;
       if (this.motionAccumulator >= 1 / 20) {
         this.motionAccumulator %= 1 / 20;
-        this.broadcast("motion", {
-          time: Date.now(),
-          tick: this.simulationClock.tick,
-          car: this.sim.car.capture(),
-          rows: [...store.players.values()].map((p) => [
-            p.id,
-            p.x,
-            p.y,
-            p.z,
-            p.yaw,
-            p.speed,
-            p.ack,
-            p.vehicle ? 1 : 0,
-            p.zone,
-          ]),
-        });
+        if (this.clients.length)
+          this.broadcast(
+            "motion",
+            this.motionEncoder.encode(this.captureMotion()),
+          );
         for (const c of this.clients) this.sendAuthority(c, result.dropped > 0);
       }
     }, 1000 / SIM_HZ);
@@ -299,10 +328,14 @@ class StrahovRoom extends Room {
           ),
         ];
         this.broadcast("events", store.events);
+        if (store.pruneAttendance()) this.syncSocial();
       }
-      for (const [token, s] of sessions)
-        if (!this.connections.has(s.id) && s.expires < Date.now())
-          sessions.delete(token);
+      const changes = store.forgetIdentities(
+        expireSessions(sessions, this.connections),
+      );
+      if (changes.social) this.syncSocial();
+      if (changes.activity) this.broadcast("activity", store.activity);
+      pruneRateWindows(issueRates, SESSION_ISSUE_WINDOW_MS);
     }, 30000);
   }
   onAuth(_c: Client, options: any) {
@@ -340,6 +373,7 @@ class StrahovRoom extends Room {
       ack: 0,
       zone: "outside",
     };
+    synchronizePlayer(p, actor);
     store.players.set(p.id, p);
     client.send("welcome", {
       id: p.id,
@@ -356,6 +390,7 @@ class StrahovRoom extends Room {
     this.broadcastPresence();
     this.syncSocial();
     this.sendAuthority(client, true);
+    this.sendMotionKeyframe(client);
   }
   onLeave(client: Client) {
     const id = client.auth.id,
@@ -383,11 +418,12 @@ class StrahovRoom extends Room {
       });
     }
     this.connections.delete(id);
+    this.emoteExpiry.delete(id);
     this.sim.remove(id);
     store.players.delete(id);
     this.inputQueues.delete(id);
     const s = sessions.get(client.auth.token);
-    if (s) s.expires = Date.now() + 30 * 60000;
+    if (s) s.expires = Date.now() + SESSION_RECONNECT_TTL_MS;
     this.broadcastPresence();
     this.syncSocial();
   }
@@ -405,24 +441,52 @@ class StrahovRoom extends Room {
       );
     }
   }
-  sendAuthority(c: Client, resync = false) {
+  sendAuthority(
+    c: Client,
+    resync = false,
+    resyncReason?: Authority["resyncReason"],
+  ) {
     const actor = this.sim.actors.get(c.auth.id),
       queue = this.inputQueues.get(c.auth.id);
-    if (actor && queue)
-      c.send("authoritative", {
-        time: Date.now(),
-        tick: this.simulationClock.tick,
-        ack: queue.ack,
-        state: actor.capture(),
-        resync,
-      });
+    if (!actor || !queue) return;
+    const authority: Authority = {
+      time: Date.now(),
+      tick: this.simulationClock.tick,
+      ack: queue.ack,
+      state: actor.capture(),
+      resync,
+    };
+    if (resyncReason) authority.resyncReason = resyncReason;
+    c.send("authoritative", authority);
+  }
+  captureMotion(): MotionPacket {
+    return {
+      time: Date.now(),
+      tick: this.simulationClock.tick,
+      car: this.sim.car.capture(),
+      rows: [...store.players.values()].map((p) => [
+        p.id,
+        p.x,
+        p.y,
+        p.z,
+        p.yaw,
+        p.speed,
+        p.ack,
+        p.vehicle ? 1 : 0,
+        p.zone,
+        p.grounded,
+      ]),
+    };
+  }
+  sendMotionKeyframe(c: Client) {
+    c.send("motion", this.motionEncoder.keyframe(this.captureMotion()));
   }
   broadcastPresence() {
     this.broadcast("presence", [...store.players.values()]);
   }
-  syncSocial() {
-    for (const c of this.clients)
-      c.send("social", store.privateState(c.auth.id));
+  syncSocial(ids: Iterable<string> = this.connections.keys()) {
+    for (const id of ids)
+      this.connections.get(id)?.send("social", store.privateState(id));
   }
 }
 const http = createServer();
@@ -452,11 +516,17 @@ const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
   }
   if (req.url === "/api/session" && req.method === "POST") {
     try {
-      const addr = req.socket.remoteAddress || "local",
-        list = (issueRates.get(addr) || []).filter(
-          (t) => Date.now() - t < 60000,
-        );
-      if (list.length >= 150) {
+      const addr = req.socket.remoteAddress || "local";
+      if (
+        !consumeRate(
+          issueRates,
+          addr,
+          150,
+          SESSION_ISSUE_WINDOW_MS,
+          Date.now(),
+          MAX_SESSION_ISSUE_ADDRESSES,
+        )
+      ) {
         res.writeHead(429).end(
           JSON.stringify({
             error: "Příliš mnoho vstupů. Zkus to za minutu.",
@@ -464,8 +534,6 @@ const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
         );
         return;
       }
-      list.push(Date.now());
-      issueRates.set(addr, list);
       let body = "";
       for await (const chunk of req) {
         body += chunk;
@@ -493,7 +561,7 @@ const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
       sessions.set(token, {
         id,
         profile: sanitizeProfile(raw.profile),
-        expires: Date.now() + 30 * 60000,
+        expires: Date.now() + SESSION_RECONNECT_TTL_MS,
       });
       res.end(JSON.stringify({ token, id, worldId }));
       return;

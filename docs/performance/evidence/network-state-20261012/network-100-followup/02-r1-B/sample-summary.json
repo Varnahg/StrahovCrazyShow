@@ -1,0 +1,141 @@
+{
+  "ordinal": 2,
+  "repetition": 1,
+  "label": "B",
+  "sourceSnapshotId": "1cdf4c6c3cded658d61117905c3d7b1be662e54ea9081fc002d2c3f86d7abb42",
+  "sampleDir": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\docs\\performance\\evidence\\network-state-20261012\\network-100-followup\\02-r1-B",
+  "rawPath": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\docs\\performance\\evidence\\network-state-20261012\\network-100-followup\\02-r1-B\\network.json",
+  "profilesPath": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\docs\\performance\\evidence\\network-state-20261012\\network-100-followup\\02-r1-B\\network.json.profiles.json",
+  "telemetryPath": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\docs\\performance\\evidence\\network-state-20261012\\network-100-followup\\02-r1-B\\server-telemetry.jsonl",
+  "startedAt": "2026-10-11T22:29:45.367Z",
+  "status": "completed",
+  "errors": [],
+  "qualityIssues": [],
+  "server": {
+    "role": "server",
+    "pid": 48168,
+    "command": [
+      "C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "--import",
+      "file:///C:/Users/rezac/.codex/worktrees/network-state-hud/StrahovCrazyShow/.cache/performance-snapshot/network-candidate/scripts/performance-server-preload.mjs",
+      "--import",
+      "tsx",
+      "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\.cache\\performance-snapshot\\network-candidate\\server\\index.ts"
+    ],
+    "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\.cache\\performance-snapshot\\network-candidate",
+    "stdout": {
+      "path": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\docs\\performance\\evidence\\network-state-20261012\\network-100-followup\\02-r1-B\\server.stdout.log",
+      "bytesSeen": 63,
+      "bytesCaptured": 63,
+      "truncated": false,
+      "error": null
+    },
+    "stderr": {
+      "path": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\docs\\performance\\evidence\\network-state-20261012\\network-100-followup\\02-r1-B\\server.stderr.log",
+      "bytesSeen": 0,
+      "bytesCaptured": 0,
+      "truncated": false,
+      "error": null
+    },
+    "ready": true,
+    "stopped": true,
+    "spawnError": null,
+    "exit": {
+      "code": null,
+      "signal": "SIGTERM",
+      "at": "2026-10-11T22:30:59.576Z"
+    },
+    "killedByRunner": true
+  },
+  "harness": {
+    "role": "harness",
+    "pid": 22684,
+    "command": [
+      "C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "--import",
+      "tsx",
+      "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\.cache\\performance-snapshot\\network-candidate\\scripts\\performance-diverse.mjs",
+      "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\.cache\\performance-snapshot\\network-candidate",
+      "http://127.0.0.1:2580",
+      "100",
+      "60",
+      "crowded",
+      "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\docs\\performance\\evidence\\network-state-20261012\\network-100-followup\\02-r1-B\\network.json",
+      "5",
+      "100"
+    ],
+    "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\.cache\\performance-snapshot\\network-candidate",
+    "stdout": {
+      "path": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\docs\\performance\\evidence\\network-state-20261012\\network-100-followup\\02-r1-B\\harness.stdout.log",
+      "bytesSeen": 6807,
+      "bytesCaptured": 6807,
+      "truncated": false,
+      "error": null
+    },
+    "stderr": {
+      "path": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\docs\\performance\\evidence\\network-state-20261012\\network-100-followup\\02-r1-B\\harness.stderr.log",
+      "bytesSeen": 0,
+      "bytesCaptured": 0,
+      "truncated": false,
+      "error": null
+    },
+    "ready": false,
+    "stopped": true,
+    "spawnError": null,
+    "exit": {
+      "code": 0,
+      "signal": null,
+      "at": "2026-10-11T22:30:59.537Z"
+    },
+    "killedByRunner": false
+  },
+  "endedAt": "2026-10-11T22:30:59.577Z",
+  "network": {
+    "durationMs": 60008.715,
+    "aggregateDownKBps": 5092.462,
+    "aggregateUpKBps": 326.933,
+    "monitorDownKBps": 50.924,
+    "monitorUpKBps": 3.25,
+    "monitorMotionBytesMedian": 2236,
+    "monitorMotionBytesP95": 2305,
+    "tickHzObserved": 60.013,
+    "tickHzServerClock": 60.008,
+    "motionHz": 20.014,
+    "motionGapP95Ms": 70.22,
+    "motionGapP99Ms": 79.317,
+    "ackAgeP95Ms": 70.665,
+    "ackAgeP99Ms": 77.458,
+    "ackLagCommandsP95": 4,
+    "minRowsPerMotion": 100,
+    "maxRowsPerMotion": 100,
+    "movingClients": 100,
+    "resyncsDuringMeasurement": 0,
+    "maxBufferedBytes": 109,
+    "monitorMotionPackets": 1201,
+    "monitorInputPackets": 1800,
+    "applicationErrorCount": 0,
+    "applicationErrors": [],
+    "stopReason": "deadline"
+  },
+  "telemetry": {
+    "path": "C:\\Users\\rezac\\.codex\\worktrees\\network-state-hud\\StrahovCrazyShow\\docs\\performance\\evidence\\network-state-20261012\\network-100-followup\\02-r1-B\\server-telemetry.jsonl",
+    "recordingStartedAt": 1791757797947,
+    "recordingEndedAt": 1791757857956,
+    "inclusionRule": "Only complete telemetry windows: windowEnd - elapsedMs >= recordingStartedAt AND windowEnd <= recordingEndedAt; no startup/warmup/shutdown partial windows.",
+    "eventLoopNote": "P95/P99 below are medians or maxima of per-window telemetry histogram percentiles. They are not pooled event-loop percentiles, frame times, GPU or input-to-photon measurements.",
+    "includedIntervals": 58,
+    "includedElapsedMs": 58506.24909999999,
+    "cpuMs": 29437,
+    "timeWeightedSingleCoreCpuPercent": 50.31428343609197,
+    "rssPeakBytes": 420478976,
+    "heapPeakBytes": 217023536,
+    "eventLoopP95WindowMedianMs": 33.570814999999996,
+    "eventLoopP99WindowMedianMs": 36.159487,
+    "eventLoopP95WindowMaxMs": 37.781503,
+    "eventLoopP99WindowMaxMs": 42.565631,
+    "eventLoopMaxMs": 51.085311,
+    "malformed": []
+  },
+  "eligibleForComparison": true,
+  "functionalPass": true
+}

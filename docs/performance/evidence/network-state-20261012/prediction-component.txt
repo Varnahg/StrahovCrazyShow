@@ -1,0 +1,125 @@
+{
+  "scope": "Node CPU component comparison; not a server-load, browser-FPS or GPU measurement",
+  "baseline": "Only replacement of existing prediction captures is suppressed; actual reconciliation and Rapier are shared",
+  "limitation": "One correction followed by six acknowledgments; no new input generation or moving-contact rollback",
+  "createdAt": "2026-10-11T22:31:39.757Z",
+  "node": "v24.19.0",
+  "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+  "sourceSha256": {
+    "client/game.ts": "6beaa88a1bb6f6e35335e26152f5956860a81987075977ef2332c7b980515e19",
+    "shared/netcode.ts": "758e32776687e774791983fa48da0f0733ebc45cf7e5932099bf86cac9d2c5c0",
+    "shared/simulation.ts": "d4678e39bf9905b254cb07a5cdc67e13738036dc45950ccd073a3b7dd573e73c",
+    "tests/helpers/prediction-replay-fixture.ts": "d18adc18f34900ed1e01191c66bfc9721535609c54dea77e8d29e851bc9478b2",
+    "scripts/profile-prediction-replay.ts": "f7c76908e2b6d2f0d71110e5cd4f896b2722cd75e47366587b191bddf8824bc7"
+  },
+  "results": [
+    {
+      "mode": "stale-history-baseline",
+      "milliseconds": 17.32930000000033,
+      "fullWorldReplaySteps": 45,
+      "authorities": 6,
+      "finalState": {
+        "position": {
+          "x": 180.96868896484375,
+          "y": -3.793095827102661,
+          "z": 20.277076721191406
+        },
+        "yaw": 1.2924966677897853,
+        "speed": 3.3575555936682195,
+        "vertical": 0,
+        "grounded": true,
+        "vehicle": false
+      }
+    },
+    {
+      "mode": "corrected-history",
+      "milliseconds": 3.543399999999565,
+      "fullWorldReplaySteps": 15,
+      "authorities": 6,
+      "finalState": {
+        "position": {
+          "x": 180.96868896484375,
+          "y": -3.793095827102661,
+          "z": 20.277076721191406
+        },
+        "yaw": 1.2924966677897853,
+        "speed": 3.3575555936682195,
+        "vertical": 0,
+        "grounded": true,
+        "vehicle": false
+      }
+    },
+    {
+      "mode": "corrected-history",
+      "milliseconds": 2.64429999999993,
+      "fullWorldReplaySteps": 15,
+      "authorities": 6,
+      "finalState": {
+        "position": {
+          "x": 180.96868896484375,
+          "y": -3.793095827102661,
+          "z": 20.277076721191406
+        },
+        "yaw": 1.2924966677897853,
+        "speed": 3.3575555936682195,
+        "vertical": 0,
+        "grounded": true,
+        "vehicle": false
+      }
+    },
+    {
+      "mode": "stale-history-baseline",
+      "milliseconds": 7.233000000000175,
+      "fullWorldReplaySteps": 45,
+      "authorities": 6,
+      "finalState": {
+        "position": {
+          "x": 180.96868896484375,
+          "y": -3.793095827102661,
+          "z": 20.277076721191406
+        },
+        "yaw": 1.2924966677897853,
+        "speed": 3.3575555936682195,
+        "vertical": 0,
+        "grounded": true,
+        "vehicle": false
+      }
+    },
+    {
+      "mode": "stale-history-baseline",
+      "milliseconds": 6.332200000000739,
+      "fullWorldReplaySteps": 45,
+      "authorities": 6,
+      "finalState": {
+        "position": {
+          "x": 180.96868896484375,
+          "y": -3.793095827102661,
+          "z": 20.277076721191406
+        },
+        "yaw": 1.2924966677897853,
+        "speed": 3.3575555936682195,
+        "vertical": 0,
+        "grounded": true,
+        "vehicle": false
+      }
+    },
+    {
+      "mode": "corrected-history",
+      "milliseconds": 2.360200000000077,
+      "fullWorldReplaySteps": 15,
+      "authorities": 6,
+      "finalState": {
+        "position": {
+          "x": 180.96868896484375,
+          "y": -3.793095827102661,
+          "z": 20.277076721191406
+        },
+        "yaw": 1.2924966677897853,
+        "speed": 3.3575555936682195,
+        "vertical": 0,
+        "grounded": true,
+        "vehicle": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "capturedAt": "2026-10-11T22:31:32.520Z",
+  "node": "v24.19.0",
+  "method": "Same source MotionPacket replay encoded by installed Colyseus binary message serializer, complete population at 20 Hz, 40-message keyframe interval, exact parked car; no WebSocket/TCP/TLS overhead. Byte counts are measured in-memory, aggregate MB/s extrapolated. CPU means are unisolated diagnostics, not production throughput, GPU or client FPS evidence. All players retained; no distance filtering.",
+  "sourceHashes": {
+    "shared/motion-codec.ts": "90cfb10e95586a6df1686cb97631ef874e9d5d1bdfab2e75e8be4ecb3da8e1ec",
+    "shared/netcode.ts": "758e32776687e774791983fa48da0f0733ebc45cf7e5932099bf86cac9d2c5c0",
+    "shared/vehicle.ts": "9cdb914602a99e23f68ab607f9be5226ecdb1f1850c83e2177ccfea458562703",
+    "scripts/profile-motion-codec.ts": "7dd4ed7d3c35414d8f02b59a0a799f6fa5ca24f49cb31c84d8037c8027901c48"
+  },
+  "samples": [
+    {
+      "population": 100,
+      "movingFraction": 0,
+      "frames": 120,
+      "keyframes": 3,
+      "reconstructedPlayerSamples": 12000,
+      "fullBytes": 1105131,
+      "compactBytes": 83625,
+      "reductionPercent": 92.433,
+      "fullAggregateMBps": 18.419,
+      "compactAggregateMBps": 1.394,
+      "fullEncodeMeanMs": 0.0883,
+      "compactEncodeMeanMs": 0.1243,
+      "compactDecodeMeanMs": 0.1227
+    },
+    {
+      "population": 100,
+      "movingFraction": 0.5,
+      "frames": 120,
+      "keyframes": 3,
+      "reconstructedPlayerSamples": 12000,
+      "fullBytes": 1152331,
+      "compactBytes": 147725,
+      "reductionPercent": 87.18,
+      "fullAggregateMBps": 19.206,
+      "compactAggregateMBps": 2.462,
+      "fullEncodeMeanMs": 0.0561,
+      "compactEncodeMeanMs": 0.0926,
+      "compactDecodeMeanMs": 0.0665
+    },
+    {
+      "population": 100,
+      "movingFraction": 1,
+      "frames": 120,
+      "keyframes": 3,
+      "reconstructedPlayerSamples": 12000,
+      "fullBytes": 1199531,
+      "compactBytes": 211825,
+      "reductionPercent": 82.341,
+      "fullAggregateMBps": 19.992,
+      "compactAggregateMBps": 3.53,
+      "fullEncodeMeanMs": 0.0627,
+      "compactEncodeMeanMs": 0.1054,
+      "compactDecodeMeanMs": 0.0698
+    },
+    {
+      "population": 1000,
+      "movingFraction": 0,
+      "frames": 120,
+      "keyframes": 3,
+      "reconstructedPlayerSamples": 120000,
+      "fullBytes": 10601031,
+      "compactBytes": 977085,
+      "reductionPercent": 90.783,
+      "fullAggregateMBps": 1766.839,
+      "compactAggregateMBps": 162.847,
+      "fullEncodeMeanMs": 0.4088,
+      "compactEncodeMeanMs": 0.6458,
+      "compactDecodeMeanMs": 0.4264
+    },
+    {
+      "population": 1000,
+      "movingFraction": 0.5,
+      "frames": 120,
+      "keyframes": 3,
+      "reconstructedPlayerSamples": 120000,
+      "fullBytes": 11073031,
+      "compactBytes": 1618085,
+      "reductionPercent": 85.387,
+      "fullAggregateMBps": 1845.505,
+      "compactAggregateMBps": 269.681,
+      "fullEncodeMeanMs": 0.3714,
+      "compactEncodeMeanMs": 0.6321,
+      "compactDecodeMeanMs": 0.3784
+    },
+    {
+      "population": 1000,
+      "movingFraction": 1,
+      "frames": 120,
+      "keyframes": 3,
+      "reconstructedPlayerSamples": 120000,
+      "fullBytes": 11545031,
+      "compactBytes": 2259085,
+      "reductionPercent": 80.432,
+      "fullAggregateMBps": 1924.172,
+      "compactAggregateMBps": 376.514,
+      "fullEncodeMeanMs": 0.4056,
+      "compactEncodeMeanMs": 0.7802,
+      "compactDecodeMeanMs": 0.433
+    }
+  ]
+}

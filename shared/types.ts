@@ -35,6 +35,8 @@ export type Player = Vec3 &
     speed: number;
     ack: number;
     zone: string;
+    /** Authoritative contact state; older local/demo records may omit it. */
+    grounded?: boolean;
   };
 export type Place = {
   id: string;
@@ -44,7 +46,7 @@ export type Place = {
   floor?: number;
   description: string;
   source?: string;
-  worldLabel?:boolean;
+  worldLabel?: boolean;
 };
 export type EventItem = {
   id: string;

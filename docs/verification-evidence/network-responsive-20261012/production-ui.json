@@ -1,0 +1,90 @@
+{
+  "status": "passed",
+  "sourceSnapshotId": "f908aacdec194939b7715d66bafae972530efa88e66378b1ba0b7656b3d8607f",
+  "dateUTC": "2026-10-11",
+  "localDate": "2026-10-12 Europe/Prague",
+  "method": "Actual production bundle in Codex IAB through documented browser controls; visible DOM, screenshots and keyboard interaction. No hidden game state was invoked.",
+  "endpoint": "http://127.0.0.1:4180/",
+  "isolatedApi": "http://127.0.0.1:2580",
+  "desktop": {
+    "viewport": [1920, 1080],
+    "renderResolution": [1476, 830],
+    "renderer": "Intel UHD Graphics 630 / ANGLE Direct3D11",
+    "quality": "low, manual",
+    "connectedPlayers": 30,
+    "weather": "Explicitly labelled recorded model fixture during measurement",
+    "lightingInstant": 1791799200000,
+    "fullBenchmarkDownloads": [
+      "../../performance/evidence/network-state-20261012/gpu-responsive-a.json",
+      "../../performance/evidence/network-state-20261012/gpu-responsive-b.json",
+      "../../performance/evidence/network-state-20261012/gpu-responsive-c.json"
+    ],
+    "detailsOpenDownloadClose": "passed for all three exports without the former oversized inventory DOM"
+  },
+  "responsive": [
+    {
+      "viewport": [320, 640],
+      "locale": "cs",
+      "lighting": "daytime preview",
+      "documentScrollWidth": 320,
+      "headerBottom": 107.20000457763672,
+      "panelTop": 115.20000457763672,
+      "panelBottom": 564.0000228881836,
+      "dockTop": 567.4000244140625,
+      "dockRight": 312.8000063896179,
+      "overlapOrHorizontalOverflow": false
+    },
+    {
+      "viewport": [390, 844],
+      "locale": "en",
+      "lighting": "night-time preview",
+      "documentScrollWidth": 390,
+      "headerBottom": 107.20000457763672,
+      "panelTop": 115.20000457763672,
+      "panelBottom": 767.9999923706055,
+      "dockTop": 771.4000244140625,
+      "overlapOrHorizontalOverflow": false
+    }
+  ],
+  "keyboard": {
+    "tabFromMapFocusesJournal": true,
+    "journalFocusOutline": "solid",
+    "keyboardHintOpacity": 1,
+    "enterOpensJournal": true,
+    "escapeClosesJournalAndRestoresJournalButtonFocus": true
+  },
+  "guestBoundary": {
+    "companion": "One authenticated synthetic SDK player on the same isolated server",
+    "multiplayerBeforeGuest": "2 na kopci · společný svět",
+    "guestStatus": "Samostatná prohlídka",
+    "guestPeoplePanel": "Jsi v samostatném světě. Žádní hráči ani jejich data se sem neposílají.",
+    "companionNameVisibleToGuest": false,
+    "multiplayerAfterReturn": "2 na kopci · společný svět",
+    "companionVisibleAfterReturn": true,
+    "reloadBehavior": "Reload shows the entrance screen; explicit re-entry returns to two players, with the companion visible and no duplicate player in the displayed count.",
+    "httpAndTwelveObserverEvidence": "network-integration.json"
+  },
+  "finalRejoinedCanvas": {
+    "bootStage": "ready",
+    "physicsStage": "ready",
+    "carStage": "ready",
+    "b6Stage": "ready",
+    "renderErrorCount": 0,
+    "consoleWarningsAndErrors": []
+  },
+  "cleanup": {
+    "allSyntheticPeersDisconnected": true,
+    "browserViewportOverrideReset": true,
+    "localeRestoredToCzech": true,
+    "lightingPreviewDisabled": true,
+    "measurementTelemetryStopped": true,
+    "stableMainPorts4179And2570Untouched": true
+  },
+  "limits": [
+    "Screenshots were inspected and emitted in the chat; this JSON does not claim locally archived screenshot files.",
+    "Viewport emulation is not a physical phone or a touch-control usability test.",
+    "Normal reload and re-entry were checked; no synthetic browser WebSocket outage or forced Game.reconcile input-backlog reset was injected.",
+    "Forced backlog behavior uses the separate SDK integration and measured network cohort; public Internet conditions remain untested.",
+    "The HUD improvement is not a complete accessibility audit of every existing panel."
+  ]
+}

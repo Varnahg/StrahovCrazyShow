@@ -1,4 +1,11 @@
 import { HudIcon } from "./hud-icons";
+import {
+  benchmarkPresentation,
+  createBenchmarkDownloads,
+} from "./benchmark-presentation";
+import { WorldDock } from "./world-dock";
+import { HudWeather } from "./hud-status";
+import "./hud.css";
 import { useDialogFocus } from "./use-dialog-focus";
 import {
   t,
@@ -18,7 +25,7 @@ import { Journal } from "./journal";
 import { entryForPlace } from "../shared/journal";
 import { EmoteMenu } from "./emote-menu";
 import { EMOTES, type WorldSelection } from "./interaction";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Client, type Room } from "@colyseus/sdk";
 import {
   DEFAULT_PROFILE,
@@ -53,6 +60,7 @@ import {
   DISPLAY_REFRESH_HELP_URL,
 } from "./gpu-diagnostics";
 import type { Weather } from "../shared/weather";
+import { MotionDecoder } from "../shared/motion-codec";
 import {
   nextArrivals,
   transitStatus,
@@ -61,7 +69,6 @@ import {
 import {
   PROTOCOL_VERSION,
   type Input,
-  type MotionPacket,
   type Authority,
 } from "../shared/netcode";
 
@@ -452,7 +459,11 @@ export function App() {
     };
   }, [mode]);
   const bind = (r: Room) => {
+    // Each connection owns its dictionary and baseline; reconnect never reuses it.
+    const motionDecoder = new MotionDecoder();
+    let lastMotionRecovery = -Infinity;
     room.current = r;
+    connectedRef.current = true;
     setConnected(true);
     r.onMessage("welcome", (data: any) => {
       if (room.current !== r) return;
@@ -474,8 +485,17 @@ export function App() {
       setPlayers(data);
       game.current?.updatePlayers(data);
     });
-    r.onMessage("motion", (packet: MotionPacket) => {
+    r.onMessage("motion", (wire: unknown) => {
       if (room.current !== r) return;
+      const packet = motionDecoder.decode(wire);
+      if (!packet) {
+        const now = performance.now();
+        if (motionDecoder.needsKeyframe && now - lastMotionRecovery >= 1000) {
+          lastMotionRecovery = now;
+          r.send("motionResync");
+        }
+        return;
+      }
       for (const row of packet.rows) {
         const p = playersById.current.get(row[0]);
         if (p)
@@ -487,6 +507,7 @@ export function App() {
             speed: row[5],
             vehicle: !!row[7],
             zone: row[8],
+            grounded: row[9],
           });
       }
       game.current?.syncMotion(packet);
@@ -521,6 +542,7 @@ export function App() {
       // A late close from a replaced socket must not clear a new connection.
       if (room.current !== r) return;
       room.current = null;
+      motionDecoder.reset();
       connectedRef.current = false;
       inputBuffer.current = [];
       authorityRef.current = null;
@@ -620,7 +642,7 @@ export function App() {
     }
     room.current?.send(action, data);
   };
-  const togglePanel = (value: string) => {
+  const togglePanel = useCallback((value: string) => {
     game.current?.blur();
     if (document.pointerLockElement) document.exitPointerLock();
     setEmotesOpen(false);
@@ -630,7 +652,7 @@ export function App() {
     }
     setJournalOpen(false);
     setPanel((p) => (p === value ? "" : value));
-  };
+  }, []);
   const openJournal = (id?: string) => {
     game.current?.blur();
     if (document.pointerLockElement) document.exitPointerLock();
@@ -808,28 +830,36 @@ export function App() {
         </button>
         <div className="world-status">
           <i
+            aria-hidden="true"
             className={
               mode === "guest" ? "amber" : connected ? "green" : "amber"
             }
           />
-          {mode === "guest"
-            ? t("Samostatná prohlídka")
-            : connected
-              ? t("{count} na kopci · společný svět", {
-                  count: formatNumber(players.length),
-                })
-              : t("Odpojeno")}
+          <span role="status">
+            {mode === "guest"
+              ? t("Samostatná prohlídka")
+              : connected
+                ? t("{count} na kopci · společný svět", {
+                    count: formatNumber(players.length),
+                  })
+                : t("Odpojeno · obnov spojení")}
+          </span>
           <span className="demo-badge">DEMO</span>
           {lighting !== "real" && (
             <button
               className="demo-badge"
+              aria-label={
+                lighting === "day"
+                  ? t("Vypnout denní náhled osvětlení")
+                  : t("Vypnout noční náhled osvětlení")
+              }
               onClick={() => {
                 setLighting("real");
                 if (game.current) game.current.timeOverride = null;
               }}
             >
-              {lighting === "day" ? t("Denní") : t("Noční")}{" "}
-              {t("náhled · vypnout")}
+              {lighting === "day" ? t("Denní náhled") : t("Noční náhled")}{" "}
+              <span aria-hidden="true">×</span>
             </button>
           )}
           {trafficPreview && (
@@ -846,21 +876,7 @@ export function App() {
           )}
         </div>
         <div className="top-right">
-          <span
-            className="weather"
-            title={`${localizeText(weather?.source)} · ${localizeText(weather?.cloudSource)}`}
-          >
-            ☁ {weatherLabel}{" "}
-            <small>
-              {!weather
-                ? t("načítám")
-                : weather.stale
-                  ? t("starší / nedostupná data")
-                  : weather.status === "fallback"
-                    ? t("záložní model")
-                    : t("živá data")}
-            </small>
-          </span>
+          <HudWeather weather={weather} label={weatherLabel} />
           <span className="clock">
             {time(previewInstant(lighting) ?? now)}{" "}
             <small>
@@ -911,33 +927,12 @@ export function App() {
           {t("Obnovit spojení")}
         </button>
       )}
-      <nav className="dock">
-        {[
-          ["events", t("Akce")],
-          ["map", t("Mapa")],
-          ["journal", t("Deník")],
-          ["people", t("Lidé")],
-          ["chat", t("Chat")],
-          ["activities", t("Aktivity")],
-          ["settings", t("Nastavení")],
-        ].map(([id, label]) => (
-          <button
-            key={id}
-            className={
-              panel === id || (id === "journal" && journalOpen) ? "active" : ""
-            }
-            onClick={() => togglePanel(id)}
-            title={label}
-            aria-label={localizeText(label)}
-            aria-pressed={panel === id || (id === "journal" && journalOpen)}
-          >
-            <HudIcon name={id} />
-            {id === "people" && social.requests.length > 0 && (
-              <b>{social.requests.length}</b>
-            )}
-          </button>
-        ))}
-      </nav>
+      <WorldDock
+        panel={panel}
+        journalOpen={journalOpen}
+        requestCount={social.requests.length}
+        onToggle={togglePanel}
+      />
       <div className="minimap">
         <MapView
           self={stats || undefined}
@@ -973,6 +968,9 @@ export function App() {
           onClick={() => togglePanel("help")}
         >
           <kbd>?</kbd>
+          <span className="world-control-label" aria-hidden="true">
+            {t("Ovládání")}
+          </span>
         </button>
         <button
           className="world-controls-button"
@@ -982,8 +980,12 @@ export function App() {
             setEmotesOpen((open) => !open);
           }}
           aria-label={t("Rychlá gesta (G)")}
+          aria-expanded={emotesOpen}
         >
           <kbd>G</kbd>
+          <span className="world-control-label" aria-hidden="true">
+            {t("Rychlá gesta (G)")}
+          </span>
         </button>{" "}
         <span className="fps">{stats?.fps || "—"} FPS</span>
       </div>
@@ -2306,12 +2308,28 @@ function BenchmarkControls({
 }) {
   useLocale();
   const [running, setRunning] = useState(false);
+  const [downloadError, setDownloadError] = useState(false);
+  const downloads = useMemo(() => createBenchmarkDownloads(), []);
   const resultJSON = useMemo(
-    () => (result ? JSON.stringify(result, null, 2) : ""),
+    () =>
+      result ? JSON.stringify(benchmarkPresentation(result), null, 2) : "",
     [result],
   );
+  useEffect(() => () => downloads.dispose(), [downloads]);
+  const downloadFullRecord = () => {
+    if (!result) return;
+    try {
+      downloads.download(result);
+      setDownloadError(false);
+    } catch {
+      setDownloadError(true);
+    }
+  };
   const active = running || !!game?.benchmark;
-  useEffect(() => setRunning(false), [result]);
+  useEffect(() => {
+    setRunning(false);
+    setDownloadError(false);
+  }, [result]);
   return (
     <div className="benchmark">
       <button
@@ -2372,6 +2390,14 @@ function BenchmarkControls({
           </p>
           <details>
             <summary>{t("Podrobnosti měření")}</summary>
+            <button className="secondary" onClick={downloadFullRecord}>
+              {t("Stáhnout úplný záznam")}
+            </button>
+            {downloadError && (
+              <p role="alert">
+                {t("Záznam se nepodařilo stáhnout. Zkus to znovu.")}
+              </p>
+            )}
             <pre id="benchmark-result">{resultJSON}</pre>
           </details>
         </>

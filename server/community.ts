@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { eventStatus, makeDemoEvents, QUIZ } from "../shared/events";
 import { cleanText } from "../shared/profile";
 import { HUNT_POINTS, PLACES } from "../shared/world";
+import { consumeRate } from "./session-lifecycle";
 import type {
   ActivityState,
   Attendance,
@@ -30,53 +31,132 @@ export class Community {
   };
   answered = new Set<string>();
   teams = new Map<string, string>();
-  set(map: Map<string, Set<string>>, id: string) {
+  private set(map: Map<string, Set<string>>, id: string) {
     if (!map.has(id)) map.set(id, new Set());
     return map.get(id)!;
   }
   privateState(id: string): SocialState {
     return {
       attendance: this.attendance.filter((a) => this.players.has(a.playerId)),
-      contacts: [...this.set(this.contacts, id)],
-      requests: [...this.set(this.requests, id)],
-      blocked: [...this.set(this.blocks, id)],
+      contacts: [...(this.contacts.get(id) || [])],
+      requests: [...(this.requests.get(id) || [])],
+      blocked: [...(this.blocks.get(id) || [])],
     };
   }
   blocked(a: string, b: string) {
     return this.blocks.get(a)?.has(b) || this.blocks.get(b)?.has(a);
   }
   rate(id: string, kind = "chat", limit = 5, window = 10000) {
-    const key = id + ":" + kind,
-      now = Date.now(),
-      list = (this.rates.get(key) || []).filter((t) => now - t < window);
-    if (list.length >= limit) return false;
-    list.push(now);
-    this.rates.set(key, list);
+    return consumeRate(this.rates, id + ":" + kind, limit, window);
+  }
+  private requirePlayer(id: string) {
+    if (!this.players.has(id)) throw new Error("Hráč není připojený.");
+  }
+  private action(id: string) {
+    this.requirePlayer(id);
+    if (!this.rate(id, "action", 12, 10000))
+      throw new Error("Počkej před další akcí.");
+  }
+  private removeEdge(map: Map<string, Set<string>>, from: string, to: string) {
+    const edges = map.get(from);
+    if (!edges?.delete(to)) return false;
+    if (!edges.size) map.delete(from);
     return true;
   }
+  /** Called only after the reconnect window expires, never on disconnect. */
+  forgetIdentities(expired: Iterable<string>) {
+    const ids = new Set([...expired].filter((id) => !this.players.has(id)));
+    let social = false,
+      activity = false;
+    if (!ids.size) return { social, activity };
+    for (const map of [this.contacts, this.requests, this.blocks]) {
+      for (const [owner, edges] of map) {
+        if (ids.has(owner)) {
+          social = map.delete(owner) || social;
+          continue;
+        }
+        for (const target of edges)
+          if (ids.has(target)) {
+            edges.delete(target);
+            social = true;
+          }
+        if (!edges.size) map.delete(owner);
+      }
+    }
+    const attendance = this.attendance.filter((a) => !ids.has(a.playerId));
+    social = attendance.length !== this.attendance.length || social;
+    this.attendance = attendance;
+    for (const key of this.rates.keys())
+      if (ids.has(key.slice(0, key.lastIndexOf(":")))) this.rates.delete(key);
+    for (const id of ids) {
+      this.teams.delete(id);
+      this.answered.delete(id);
+      if (Object.hasOwn(this.activity.quiz.scores, id)) {
+        delete this.activity.quiz.scores[id];
+        activity = true;
+      }
+    }
+    // Team points describe completed answers, so disconnect/expiry never takes
+    // points away. Authored events retain their owner marker until normal event
+    // expiry: clearing it would expose their text through the public demo API.
+    return { social, activity };
+  }
+  pruneAttendance() {
+    const events = new Set(this.events.map((event) => event.id));
+    const attendance = this.attendance.filter((a) => events.has(a.eventId));
+    const changed = attendance.length !== this.attendance.length;
+    this.attendance = attendance;
+    return changed;
+  }
   contact(from: string, to: string, accept = false) {
+    this.requirePlayer(from);
     if (from === to || !this.players.has(to) || this.blocked(from, to))
       throw new Error("Kontakt není dostupný.");
+    if (this.contacts.get(from)?.has(to)) return false;
     if (accept) {
-      if (!this.set(this.requests, from).delete(to))
+      if (!this.requests.get(from)?.has(to))
         throw new Error("Žádost už není platná.");
-      this.set(this.requests, to).delete(from);
+      this.action(from);
+      this.removeEdge(this.requests, from, to);
+      this.removeEdge(this.requests, to, from);
       this.set(this.contacts, from).add(to);
       this.set(this.contacts, to).add(from);
     } else {
+      if (this.requests.get(to)?.has(from)) return false;
       if (!this.rate(from, "request", 4, 30000))
         throw new Error("Počkej před další žádostí.");
       this.set(this.requests, to).add(from);
     }
+    return true;
+  }
+  decline(from: string, to: string) {
+    if (!this.requests.get(from)?.has(to)) return false;
+    this.action(from);
+    return this.removeEdge(this.requests, from, to);
   }
   block(from: string, to: string, enabled: boolean) {
+    this.requirePlayer(from);
+    if (from === to) throw new Error("Kontakt není dostupný.");
     if (enabled) {
+      if (this.blocks.get(from)?.has(to)) return false;
+      if (
+        !this.players.has(to) &&
+        !this.contacts.get(from)?.has(to) &&
+        !this.requests.get(from)?.has(to)
+      )
+        throw new Error("Kontakt není dostupný.");
+      this.action(from);
       this.set(this.blocks, from).add(to);
-      this.set(this.contacts, from).delete(to);
-      this.set(this.contacts, to).delete(from);
-      this.set(this.requests, from).delete(to);
-      this.set(this.requests, to).delete(from);
-    } else this.set(this.blocks, from).delete(to);
+      this.removeEdge(this.contacts, from, to);
+      this.removeEdge(this.contacts, to, from);
+      this.removeEdge(this.requests, from, to);
+      this.removeEdge(this.requests, to, from);
+    } else {
+      if (!this.blocks.get(from)?.has(to)) return false;
+      this.action(from);
+      this.removeEdge(this.blocks, from, to);
+    }
+    return true;
   }
   chat(
     id: string,
@@ -128,17 +208,29 @@ export class Community {
     };
   }
   attend(id: string, eventId: string, enabled: boolean, company: boolean) {
+    this.requirePlayer(id);
     const e = this.events.find((e) => e.id === eventId);
     if (!e || (enabled && ["ended", "cancelled"].includes(eventStatus(e))))
       throw new Error("K této akci se už nelze přidat.");
-    this.attendance = this.attendance.filter(
-      (a) => !(a.playerId === id && a.eventId === eventId),
+    const index = this.attendance.findIndex(
+      (a) => a.playerId === id && a.eventId === eventId,
     );
-    if (enabled) this.attendance.push({ playerId: id, eventId, company });
+    if (
+      (!enabled && index === -1) ||
+      (enabled && index !== -1 && this.attendance[index].company === company)
+    )
+      return false;
+    this.action(id);
+    if (!enabled) this.attendance.splice(index, 1);
+    else if (index !== -1) this.attendance[index].company = company;
+    else this.attendance.push({ playerId: id, eventId, company });
+    return true;
   }
   saveEvent(id: string, raw: any) {
-    if (!this.rate(id, "events", 8, 60000))
-      throw new Error("Počkej před další změnou setkání.");
+    return this.saveEventChange(id, raw).event;
+  }
+  saveEventChange(id: string, raw: any) {
+    this.requirePlayer(id);
     const existing = this.events.find((e) => e.id === raw?.id);
     if (existing && existing.owner !== id)
       throw new Error("Upravovat můžeš jen vlastní setkání.");
@@ -165,6 +257,18 @@ export class Community {
       throw new Error(
         "Zkontroluj název, místo a čas (nejvýše týden dopředu, délka do 24 hodin).",
       );
+    if (
+      existing &&
+      existing.title === title &&
+      existing.description === description &&
+      existing.placeId === placeId &&
+      existing.startsAt === startsAt &&
+      existing.endsAt === endsAt &&
+      !existing.cancelled
+    )
+      return { event: existing, changed: false };
+    if (!this.rate(id, "events", 8, 60000))
+      throw new Error("Počkej před další změnou setkání.");
     const e: EventItem = {
       id: existing?.id || randomUUID(),
       title,
@@ -179,15 +283,21 @@ export class Community {
     };
     if (existing) Object.assign(existing, e);
     else this.events.push(e);
-    return e;
+    return { event: existing || e, changed: true };
   }
   cancelEvent(id: string, eventId: string) {
     const e = this.events.find((e) => e.id === eventId);
     if (!e || e.owner !== id)
       throw new Error("Upravovat můžeš jen vlastní setkání.");
+    if (e.cancelled) return false;
+    this.action(id);
     e.cancelled = true;
+    return true;
   }
   find(id: string, index: number) {
+    return this.findChange(id, index).completed;
+  }
+  findChange(id: string, index: number) {
     const p = this.players.get(id),
       point = HUNT_POINTS[index];
     if (
@@ -197,12 +307,22 @@ export class Community {
       Math.hypot(p.x - point.x, p.z - point.z) > 4
     )
       throw new Error("Přibliž se ke značce.");
-    if (!this.activity.hunt.includes(String(index)))
-      this.activity.hunt.push(String(index));
-    return this.activity.hunt.length === HUNT_POINTS.length;
+    if (this.activity.hunt.includes(String(index)))
+      return { changed: false, completed: false };
+    this.action(id);
+    this.activity.hunt.push(String(index));
+    return {
+      changed: true,
+      completed: this.activity.hunt.length === HUNT_POINTS.length,
+    };
   }
   startQuiz(id: string, team: string) {
-    this.teams.set(id, team === "lime" ? "lime" : "purple");
+    this.requirePlayer(id);
+    const selected = team === "lime" ? "lime" : "purple";
+    if (this.activity.quiz.running && this.teams.get(id) === selected)
+      return false;
+    this.action(id);
+    this.teams.set(id, selected);
     if (!this.activity.quiz.running) {
       this.activity.quiz = {
         question: 0,
@@ -212,7 +332,10 @@ export class Community {
         teamScores: { lime: 0, purple: 0 },
       };
       this.answered.clear();
+      return true;
     }
+    // Membership is private bookkeeping, absent from the activity payload.
+    return false;
   }
   answer(id: string, index: number) {
     const q = this.activity.quiz;
@@ -220,15 +343,21 @@ export class Community {
       !q.running ||
       Date.now() >= q.deadline ||
       this.answered.has(id) ||
-      !this.teams.has(id)
+      !this.players.has(id) ||
+      !this.teams.has(id) ||
+      !Number.isInteger(index) ||
+      index < 0 ||
+      index >= QUIZ[q.question].answers.length
     )
-      return;
+      return false;
     this.answered.add(id);
     if (QUIZ[q.question].correct === index) {
       q.scores[id] = (q.scores[id] || 0) + 1;
       const team = this.teams.get(id)!;
       q.teamScores[team] = (q.teamScores[team] || 0) + 1;
+      return true;
     }
+    return false;
   }
   tick() {
     const q = this.activity.quiz;

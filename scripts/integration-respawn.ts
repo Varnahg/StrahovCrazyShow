@@ -12,6 +12,7 @@ import {
 import { DEFAULT_PROFILE, type Player } from "../shared/types";
 import { SPAWN, CAR_SPAWN } from "../shared/world";
 import { validVehicleState } from "../shared/vehicle";
+import { MotionDecoder } from "../shared/motion-codec";
 
 const endpoint = process.env.STRAHOV_TEST_URL || "http://127.0.0.1:2568";
 assert.equal(
@@ -113,7 +114,10 @@ async function join(nickname: string) {
     probe.authority = packet;
     probe.events.push({ type: "authoritative", value: packet });
   });
-  room.onMessage("motion", (packet: MotionPacket) => {
+  const motion = new MotionDecoder();
+  room.onMessage("motion", (wire: unknown) => {
+    const packet = motion.decode(wire);
+    assert.ok(packet, "respawn observer retains the motion baseline");
     probe.motion = packet;
   });
   room.onMessage("presence", (players: Player[]) =>

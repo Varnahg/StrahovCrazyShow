@@ -1,0 +1,359 @@
+{
+  "verifiedAtUtc": "2026-10-11T23:55:38.923Z",
+  "purpose": "Independent read-only validation of saved B3 production GPU exports and 300s network cohort; no new measurement.",
+  "sourceSnapshotId": "f908aacdec194939b7715d66bafae972530efa88e66378b1ba0b7656b3d8607f",
+  "sourceFiles": [
+    {
+      "file": "client/game.ts",
+      "sha256": "6beaa88a1bb6f6e35335e26152f5956860a81987075977ef2332c7b980515e19",
+      "manifestSha256": "6beaa88a1bb6f6e35335e26152f5956860a81987075977ef2332c7b980515e19",
+      "matchesManifest": true
+    },
+    {
+      "file": "scripts/performance-network.ts",
+      "sha256": "4e242105cd18d3da0363a536e6ae00906770f31dc8d709e65a0b17716a6ce60a",
+      "manifestSha256": "4e242105cd18d3da0363a536e6ae00906770f31dc8d709e65a0b17716a6ce60a",
+      "matchesManifest": true
+    },
+    {
+      "file": "scripts/performance-diverse.mjs",
+      "sha256": "4ed130702245dcebfb5934744cc27a425728399e68b5a06b28f115baa5da5d97",
+      "manifestSha256": "4ed130702245dcebfb5934744cc27a425728399e68b5a06b28f115baa5da5d97",
+      "matchesManifest": true
+    }
+  ],
+  "algorithmEvidence": {
+    "file": "client/game.ts",
+    "averageFpsLine": 1966,
+    "p95Line": 1967,
+    "p99Line": 1968,
+    "averageFps": "Number(((1000 * frameIntervalsMs.length) / sum(frameIntervalsMs)).toFixed(1))",
+    "percentiles": "Sort ascending and select floor(length * percentile), without interpolation.",
+    "ackPairing": "Frozen performance-network.ts appends ackAges and ackTimes together only when an ACK advances and its send time exists. ackLag is appended for every authoritative message."
+  },
+  "intervalMethod": "date is completion timestamp. Conservative GPU start uses the larger of recorded duration plus 5ms rounding allowance and sum of raw intervals. Exact unrounded wall-clock start was not exported.",
+  "baselineConfigurationReference": {
+    "file": "gpu-baseline-a.json",
+    "sha256": "2b15c0034f11ed019d7528b70a8c1be009ed8c69eb134b6ac91e453710a2646a",
+    "numericComparisonTolerance": 1e-12
+  },
+  "network": {
+    "file": "gpu-responsive-network.json",
+    "sha256": "059cc1b0cde437f9007e3668a02ec8c8f66d6b9e79f324940f604f4901dc8166",
+    "startedAtUtc": "2026-10-11T23:47:38.195Z",
+    "endedAtUtc": "2026-10-11T23:52:38.210Z",
+    "durationMs": 300013.819,
+    "tickHzServerClock": 60.001,
+    "motionHz": 19.989,
+    "aggregateDownKBps": 529.553,
+    "aggregateDownScope": "29 SDK clients; browser transport is not included in this byte aggregate.",
+    "ackAgeMedianMs": 49.872,
+    "ackAgeP95Ms": 90.49,
+    "ackAgeP99Ms": 113.493,
+    "ackLagCommandsP95": 5,
+    "resyncsDuringMeasurement": 31,
+    "resyncReasons": {
+      "input-backlog": 31
+    },
+    "firstRecoveryObservedUtc": "2026-10-11T23:48:01.007Z",
+    "lastRecoveryObservedUtc": "2026-10-11T23:48:03.537Z",
+    "uniqueRecoveredSDKClients": 29,
+    "repeatRecoveryIntervalsMs": [
+      2391,
+      2390
+    ],
+    "secondsFromLastRecoveryToEnd": 274.673,
+    "checks": {
+      "source": true,
+      "oneSharedWorld": true,
+      "twentyNineSDKPlusBrowser": true,
+      "populationMinMaxThirty": true,
+      "zeroErrors": true,
+      "allRequestedSeconds": true,
+      "resyncCountExplicit": true,
+      "allResyncsInputBacklog": true,
+      "allTwentyNineSDKRecovered": true,
+      "recoveryCooldownRespected": true,
+      "snapshotSource": true,
+      "sourceFiles": true,
+      "harnessSha256": true,
+      "harnessImports": true,
+      "monitorMotionArraysAligned": true,
+      "ackAgesAndTimesPaired": true,
+      "ackTimesStrictlyIncreasing": true,
+      "lagHasOneAdditionalAuthority": true,
+      "monitorNoLagFourteen": true
+    }
+  },
+  "monitorAnalysis": {
+    "scope": "Only the exported first SDK monitor, not the cohort aggregate or browser.",
+    "ackAgesCount": 5997,
+    "ackTimesCount": 5997,
+    "ackLagCount": 5998,
+    "overallAckAgeMs": {
+      "samples": 5997,
+      "min": 8.742599999997765,
+      "median": 50.18869999999879,
+      "p95": 85.01780000000144,
+      "p99": 101.7097000000067,
+      "max": 243.40130000000136
+    },
+    "overallAckLagCommands": {
+      "samples": 5998,
+      "min": 0,
+      "median": 3,
+      "p95": 5,
+      "p99": 6,
+      "max": 10
+    },
+    "clockConversion": {
+      "method": "Approximate receive wall time = monotonic ackTime + maximum(motionServerTime - motionReceiveMonotonicTime) from same-host loopback. Shortest apparent receive delay anchors epoch offset. Exact performance.timeOrigin was not exported, so these are estimated boundaries, not exact cross-clock synchronization.",
+      "estimatedOffsetMs": 1791762450504.1426,
+      "observedOffsetsMs": {
+        "samples": 5997,
+        "min": 1791762450363.8662,
+        "median": 1791762450501.8699,
+        "p95": 1791762450503.3647,
+        "p99": 1791762450503.691,
+        "max": 1791762450504.1426
+      },
+      "guardAroundRecoveriesMs": 1000
+    },
+    "lagMethod": "Never zip ackLag to ackTimes or motionTimes. With one extra lag-only authoritative event, paired age index i corresponds to lag index i or i+1. For a suffix starting at age index i, take lag.slice(i+1); it conservatively excludes at most one boundary value and includes no earlier paired lag. No per-GPU-window lag is asserted.",
+    "windows": [
+      {
+        "name": "before-first-recovery-minus-1s",
+        "approximateStartUtc": "2026-10-11T23:47:38.195Z",
+        "approximateEndUtc": "2026-10-11T23:48:00.007Z",
+        "firstAgeIndex": 0,
+        "lastAgeIndex": 434,
+        "ackAgeMs": {
+          "samples": 435,
+          "min": 21.716199999998935,
+          "median": 46.62750000000051,
+          "p95": 67.95939999999973,
+          "p99": 71.91789999999855,
+          "max": 76.48849999999948
+        }
+      },
+      {
+        "name": "recovery-with-1s-margins",
+        "approximateStartUtc": "2026-10-11T23:48:00.007Z",
+        "approximateEndUtc": "2026-10-11T23:48:04.537Z",
+        "firstAgeIndex": 435,
+        "lastAgeIndex": 525,
+        "ackAgeMs": {
+          "samples": 91,
+          "min": 8.742599999997765,
+          "median": 74.27549999999974,
+          "p95": 167.13490000000093,
+          "p99": 243.40130000000136,
+          "max": 243.40130000000136
+        }
+      },
+      {
+        "name": "after-last-recovery-plus-1s",
+        "approximateStartUtc": "2026-10-11T23:48:04.537Z",
+        "approximateEndUtc": "2026-10-11T23:52:38.210Z",
+        "firstAgeIndex": 526,
+        "lastAgeIndex": 5996,
+        "ackAgeMs": {
+          "samples": 5471,
+          "min": 23.49859999999171,
+          "median": 50.18869999999879,
+          "p95": 85.03700000001118,
+          "p99": 101.32150000002002,
+          "max": 167.30509999999776
+        },
+        "conservativeLagSuffix": {
+          "samples": 5471,
+          "min": 2,
+          "median": 3,
+          "p95": 5,
+          "p99": 6,
+          "max": 9
+        }
+      },
+      {
+        "name": "last-60s",
+        "approximateStartUtc": "2026-10-11T23:51:38.210Z",
+        "approximateEndUtc": "2026-10-11T23:52:38.210Z",
+        "firstAgeIndex": 4798,
+        "lastAgeIndex": 5996,
+        "ackAgeMs": {
+          "samples": 1199,
+          "min": 26.787000000011176,
+          "median": 70.74210000003222,
+          "p95": 99.97080000001006,
+          "p99": 106.04850000003353,
+          "max": 167.30509999999776
+        },
+        "conservativeLagSuffix": {
+          "samples": 1199,
+          "min": 2,
+          "median": 5,
+          "p95": 6,
+          "p99": 6,
+          "max": 9
+        }
+      }
+    ]
+  },
+  "samples": [
+    {
+      "file": "gpu-responsive-a.json",
+      "sha256": "bb599b40cda2efd927ec00c8dc2d50f7a4beb73b495482f8592560e147e9fef7",
+      "date": "2026-10-11T23:47:54.410Z",
+      "durationSeconds": 10.04,
+      "rawFrameIntervalSumMs": 10037.5,
+      "conservativeStartUtc": "2026-10-11T23:47:44.365Z",
+      "marginAfterNetworkStartMs": 6170,
+      "marginBeforeNetworkEndMs": 283800,
+      "recalculated": {
+        "frames": 290,
+        "averageFps": 28.9,
+        "p95FrameMs": 44.39999985694885,
+        "p99FrameMs": 57.90000009536743
+      },
+      "avatarLod": {
+        "near": 5,
+        "medium": 25,
+        "far": 0
+      },
+      "triangles": 1061059,
+      "drawCalls": 439,
+      "inventoryRows": 3562,
+      "checks": {
+        "expectedSource": true,
+        "frameCount": true,
+        "finitePositiveFrames": true,
+        "averageFps": true,
+        "p95": true,
+        "p99": true,
+        "networkContainsConservativeInterval": true,
+        "allThirtyAvatars": true,
+        "zeroRenderErrors": true,
+        "zeroAssetErrors": true,
+        "expectedViewport": true,
+        "expectedInternalResolution": true,
+        "manualLow": true,
+        "hardwareScaling": true,
+        "sameRendererAsBaseline": true,
+        "sameCameraAndLightingAsBaseline": true,
+        "sameWeatherThroughout": true,
+        "sameWeatherAsBaseline": true,
+        "sameRenderBudgetsAsBaseline": true,
+        "noAmbient": true,
+        "fullInventory": true
+      },
+      "passed": true
+    },
+    {
+      "file": "gpu-responsive-b.json",
+      "sha256": "1bcbbe1b45166df48d280a87894754bac3e4dcfc937838e337db139a97a91841",
+      "date": "2026-10-11T23:49:50.396Z",
+      "durationSeconds": 10.01,
+      "rawFrameIntervalSumMs": 10028.399999856949,
+      "conservativeStartUtc": "2026-10-11T23:49:40.367Z",
+      "marginAfterNetworkStartMs": 122172.60009765625,
+      "marginBeforeNetworkEndMs": 167814,
+      "recalculated": {
+        "frames": 296,
+        "averageFps": 29.5,
+        "p95FrameMs": 44.39999985694885,
+        "p99FrameMs": 52.200000047683716
+      },
+      "avatarLod": {
+        "near": 5,
+        "medium": 25,
+        "far": 0
+      },
+      "triangles": 973995,
+      "drawCalls": 422,
+      "inventoryRows": 3562,
+      "checks": {
+        "expectedSource": true,
+        "frameCount": true,
+        "finitePositiveFrames": true,
+        "averageFps": true,
+        "p95": true,
+        "p99": true,
+        "networkContainsConservativeInterval": true,
+        "allThirtyAvatars": true,
+        "zeroRenderErrors": true,
+        "zeroAssetErrors": true,
+        "expectedViewport": true,
+        "expectedInternalResolution": true,
+        "manualLow": true,
+        "hardwareScaling": true,
+        "sameRendererAsBaseline": true,
+        "sameCameraAndLightingAsBaseline": true,
+        "sameWeatherThroughout": true,
+        "sameWeatherAsBaseline": true,
+        "sameRenderBudgetsAsBaseline": true,
+        "noAmbient": true,
+        "fullInventory": true
+      },
+      "passed": true
+    },
+    {
+      "file": "gpu-responsive-c.json",
+      "sha256": "5297590176903c096500d1978be69cc9a8c227d34e6740269f5273c56da15fc9",
+      "date": "2026-10-11T23:52:07.395Z",
+      "durationSeconds": 10.01,
+      "rawFrameIntervalSumMs": 10016.5,
+      "conservativeStartUtc": "2026-10-11T23:51:57.378Z",
+      "marginAfterNetworkStartMs": 259183.5,
+      "marginBeforeNetworkEndMs": 30815,
+      "recalculated": {
+        "frames": 310,
+        "averageFps": 30.9,
+        "p95FrameMs": 42.10000014305115,
+        "p99FrameMs": 49.299999952316284
+      },
+      "avatarLod": {
+        "near": 1,
+        "medium": 29,
+        "far": 0
+      },
+      "triangles": 906423,
+      "drawCalls": 405,
+      "inventoryRows": 3546,
+      "checks": {
+        "expectedSource": true,
+        "frameCount": true,
+        "finitePositiveFrames": true,
+        "averageFps": true,
+        "p95": true,
+        "p99": true,
+        "networkContainsConservativeInterval": true,
+        "allThirtyAvatars": true,
+        "zeroRenderErrors": true,
+        "zeroAssetErrors": true,
+        "expectedViewport": true,
+        "expectedInternalResolution": true,
+        "manualLow": true,
+        "hardwareScaling": true,
+        "sameRendererAsBaseline": true,
+        "sameCameraAndLightingAsBaseline": true,
+        "sameWeatherThroughout": true,
+        "sameWeatherAsBaseline": true,
+        "sameRenderBudgetsAsBaseline": true,
+        "noAmbient": true,
+        "fullInventory": true
+      },
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "31 input-backlog recoveries are actual corrections, not zero resyncs. They can cause visible local position correction when predicted inputs are discarded.",
+    "The SDK driver keeps sending 60Hz commands and consumes authorities; it does not execute browser Game.reconcile or its sequence reset. This cohort demonstrates server queue recovery, not direct forced browser prediction reset coverage.",
+    "No persistent 14-command lag appears in the exported monitor; it reaches max10 overall and max9 after recovery, with p95 5. This is an observed finite run, not a guarantee that future input latency is bounded or constant.",
+    "All-client ACK aggregates cannot be independently recomputed from the single exported monitor. Before/after monitor windows use an approximate epoch mapping and 1s guard; no motion/ACK array index alignment is assumed.",
+    "FPS ranges overlap baseline and moving avatars change LOD/triangles. These sequential samples do not establish causal FPS improvement, discrete GPU performance or 60 FPS.",
+    "This is Windows loopback with server, SDK clients and full browser game on one host; public Internet latency/loss and higher capacity remain untested."
+  ],
+  "acceptanceStatus": "scoped-production-evidence-validated-with-explicit-recovery-and-performance-limitations",
+  "discrepancies": [],
+  "passed": true
+}

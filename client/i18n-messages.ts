@@ -1,5 +1,24 @@
 /** Czech source strings are stable typed keys; English never changes content identifiers. */
 export const messages = {
+  "Denní náhled": "Day preview",
+  "Noční náhled": "Night preview",
+  "Vypnout denní náhled osvětlení": "Turn off day lighting preview",
+  "Vypnout noční náhled osvětlení": "Turn off night lighting preview",
+  "Stáhnout úplný záznam": "Download full record",
+  "Záznam se nepodařilo stáhnout. Zkus to znovu.":
+    "The record could not be downloaded. Try again.",
+  "Hráč není připojený.": "The player is not connected.",
+  "Počkej před další akcí.": "Wait before the next action.",
+  "Herní nabídka": "Game menu",
+  "Lidé · žádosti o kontakt: {count}": "People · contact requests: {count}",
+  "Tab: nabídka · Enter: otevřít · Esc: zavřít. Kliknutím do hry pokračuješ.":
+    "Tab: menu · Enter: open · Esc: close. Click the game to continue.",
+  "Odpojeno · obnov spojení": "Disconnected · reconnect",
+  "data nedostupná": "data unavailable",
+  "model · starší data": "model · stale data",
+  "model počasí": "weather model",
+  "stanice · starší data": "station · stale data",
+  "stanice · čerstvá data": "station · fresh data",
   "Hledám trasu…": "Finding route…",
   "Strahov • společně na kopci": "Strahov • together on the hill",
   Suterén: "Basement",
