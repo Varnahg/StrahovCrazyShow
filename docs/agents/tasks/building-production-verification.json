@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "building-production-verification",
+  "title": "Integrovat modely budov do stabilního produkčního checkpointu a ukázat skutečné herní záběry",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/verification.md",
+    "docs/verification-evidence/building-models-20261012/",
+    "docs/building-modeling-20261012/README.md",
+    "docs/reality-pack/architecture/README.md",
+    "docs/reality-pack/separate-assets/README.md",
+    "docs/agents/handoffs/building-production-verification.md",
+    ".cache/performance-snapshot/building-models-20261012-b1/",
+    "dist/",
+    "scripts/performance-snapshot.mjs"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4193",
+    "port:2587"
+  ],
+  "acceptance": [
+    "Přijmi až stabilně předané weather/outdoor změny; zachovej cizí WIP. Integrační kód a společné entrypointy mimo tento rozsah případně řeš předem disjunktním taskem.",
+    "Ověř celý neměnný produkční snapshot včetně testů a skutečnou hru: budovy/B4/market, vstupy a B6 schody, kamera, skutečná A/D projekce/jízda a uzavřený stadion. Screenshoty JPEG jsou ze hry, samostatné Blender studie jasně odliš.",
+    "Výkon dolož celou produkční hrou, GPU, CSS/interním rozlišením, hashem, HUD, počtem skutečných relací a různými avatary; FPS+p95/p99 a omezení. Neslibuj GeForce60 z Intel či NullEngine výsledků.",
+    "Do docs/verification.md napiš skutečné výsledky včetně selhání. Předej reviewovatelný commit a aktualizovanou verzi pro testing; staré procesy převezmi pouze po doloženém předání a klient/server měň společně."
+  ],
+  "verification": [
+    "pnpm test; pnpm build; izolovaný pnpm test:integration nad stabilním checkpointem.",
+    "Produkční GPU přejímka, archiv skutečných JPEG herních záběrů a srovnatelné měření s explicitními limity.",
+    "Kontrola diffu, zdrojových hashe, LFS a úplnosti testového snapshotu."
+  ],
+  "notes": [
+    "Budovy nyní vlastní codex/building-models worktree. Před integrací do primary ověř konkrétní HEAD a stavy procesů; žádný plošný git add/reset/stash nad cizím WIP.",
+    "4179/2570 byly dne 12.10.2026 výslovně předány počasí; toto plánované uvedení portů neznamená převzetí jejich nynějších procesů. Vyžaduje nové koordinované předání.",
+    "Produkční QA používá pouze vlastní4193/2587. Publikace na4179/2570 bude zvláštní úzký task po hotové QA a koordinovaném zastavení weather-live-preview; zachová dostupný hlavní preview během modelování.",
+    "Ready:7dac0a4weather/outdoorpřevzato, B4+runtime+121GLB+121native PASS. Archive manifestc4c913f9c20a5443aab25e583f04c4d0a5476212bf703c9b9007562a3c73fc15 zahrnuje297souborůvčetnětestů. Nutný vlastní claim heavy/gpu/build/ports před procesy.",
+    "Snapshot doplní tři konkrétní statické Blender audit JSON fixtures, které vyžadují novékitregrese; evolvingdocsaniweatherGPUlogynekopírovat."
+  ]
+}

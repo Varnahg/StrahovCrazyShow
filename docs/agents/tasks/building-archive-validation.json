@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "building-archive-validation",
+  "title": "Vygenerovat a znovu otevřít aktuální samostatné Blender modely budov",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".gitattributes",
+    "scripts/export-building-assets.ts",
+    "scripts/create-building-assets.py",
+    "scripts/audit-building-assets.ts",
+    "scripts/audit-building-blender.py",
+    "scripts/building-archive-transfer.ts",
+    "assets/blender/buildings/",
+    "public/models/buildings/",
+    "docs/reality-pack/separate-assets/",
+    "tests/building-archive-transfer.test.ts",
+    "docs/agents/handoffs/building-archive-validation.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Archiv každé zdrojové budovy obsahuje nejvyšší skutečně vytvořený detail oken, B4 a marketu; původní mapové souřadnice, zdroje a samostatné identity zůstávají zachované. Nevytváří se druhá vrstva budov ve hře.",
+    "Ověř skutečné uložené .blend a GLB proti společným zdrojům: topologii, polohy, custom normals, UV, vertex tints a použité autorské textury. Zachovej původní negativní výsledky i opravy.",
+    "Zkontroluj cache, alokace, determinismus a cleanup. Předej manifest všech kódových změn, testů a výstupů; nemíchej CPU geometrické ověření s GPU nebo 60 FPS."
+  ],
+  "verification": [
+    "pnpm exec tsx scripts/export-building-assets.ts",
+    "Blender 5.2 --background --threads 2 --python scripts/create-building-assets.py",
+    "pnpm exec tsx scripts/audit-building-assets.ts; Blender 5.2 --background --threads 2 --python scripts/audit-building-blender.py",
+    "Cílené archive-transfer testy, potřebné opravy a git diff --check. Celý build a praktická hra patří následnému stabilnímu checkpointu."
+  ],
+  "notes": [
+    "Potvrzený původní vlastník a příjemce WIP je buildings-01a12b28-root ve worktree codex/building-models. Před claim uvolní building-archive-export a převezme vlastní code-ready handoff.",
+    "LFS změna jen assets/blender/buildings/source-plan.json, pokud soubor překročí 100 MiB. Ostatní atributy neměnit.",
+    "Blender v tomto tasku používá pouze CPU. Žádné GPU scény, cizí procesy nebo primární main build.",
+    "Ready po actual B4 exportu9/9+native reopen, runtime17/17+7/7 a TypeScript PASS a weather PUBDONE7dac0a4; worktree fast-forward7dac0a4. Před Blenderem stále nutný claim heavy-validation."
+  ]
+}

@@ -1,730 +1,777 @@
 {
   "status": "passed",
+  "scope": "all-building-reopen",
+  "selectedSourceId": null,
   "models": 121,
-  "triangles": 174481,
-  "maxEditableVertexErrorMetres": 1.518608013384437e-05,
+  "triangles": 2905224,
+  "maxEditableVertexErrorMetres": 1.5136718729991117e-05,
+  "maxEditableNormalComponentError": 0.0037714076671514496,
+  "normalCornersChecked": 8715672,
+  "maxExactSourceNormalComponentError": 2.9802196599426622e-08,
+  "maxNativeShadingNormalAngleDegrees": 0.21814151277434332,
+  "nativeShadingNormalAngleLimitDegrees": 0.25,
+  "worstNativeShadingNormal": {
+    "model": "osm-way-53929065",
+    "part": "reality 53929065 near reality pale aluminum sill",
+    "vertex": 13482,
+    "loop": 25506,
+    "source": [
+      -0.4496100385859848,
+      0.11441300981903935,
+      -0.8858670760260016
+    ],
+    "native": [
+      -0.4496573773631967,
+      0.11818441664047437,
+      -0.8853477772300569
+    ]
+  },
+  "maxEditableColorComponentError": 2.972030643810797e-08,
+  "colorCornersChecked": 7554954,
+  "maxEditableUvComponentError": 7.32421875682121e-06,
+  "surfaceRecipesChecked": [
+    {
+      "material": "b6:concrete stair treads",
+      "tintLinear": [
+        0.4819522370506978,
+        0.4761772653974402,
+        0.42590528570714575
+      ],
+      "uvScale": [
+        1.1636363636363636,
+        2.327272727272727
+      ],
+      "normalStrength": 0.27,
+      "roughnessFactor": 1,
+      "metallic": 0,
+      "source": "https://ambientcg.com/a/Concrete034"
+    }
+  ],
   "checks": [
     "actual .blend reopen",
     "one source object root per building",
     "all mesh parts parented to own root",
     "original vertex/face counts and triangle topology",
     "source positions within 40 micrometres",
-    "UV layers present",
-    "linked texture files resolve"
+    "source UV coordinates retained",
+    "linked texture files resolve",
+    "full-precision source normal attribute retained",
+    "native shading normal angular difference separately bounded",
+    "vertex tint data and shader links retained"
   ],
   "modelsDetail": [
     {
       "id": "osm-way-7645350",
       "objects": 11,
-      "triangles": 515,
+      "triangles": 12021,
       "valid": true
     },
     {
       "id": "osm-way-7670452",
       "objects": 5,
-      "triangles": 42,
+      "triangles": 50,
       "valid": true
     },
     {
       "id": "osm-way-7670468",
       "objects": 5,
-      "triangles": 299,
+      "triangles": 345,
       "valid": true
     },
     {
       "id": "osm-way-8111356",
       "objects": 10,
-      "triangles": 1675,
+      "triangles": 24289,
       "valid": true
     },
     {
       "id": "osm-way-24450068",
       "objects": 5,
-      "triangles": 90,
+      "triangles": 98,
       "valid": true
     },
     {
       "id": "osm-way-24450069",
       "objects": 5,
-      "triangles": 85,
+      "triangles": 95,
       "valid": true
     },
     {
       "id": "osm-way-24450070",
       "objects": 5,
-      "triangles": 74,
+      "triangles": 82,
       "valid": true
     },
     {
       "id": "osm-way-24450071",
       "objects": 5,
-      "triangles": 407,
+      "triangles": 489,
       "valid": true
     },
     {
       "id": "osm-way-25920626",
       "objects": 5,
-      "triangles": 58,
+      "triangles": 66,
       "valid": true
     },
     {
       "id": "osm-way-27580887",
       "objects": 5,
-      "triangles": 171,
+      "triangles": 197,
       "valid": true
     },
     {
       "id": "osm-way-27581155",
       "objects": 5,
-      "triangles": 437,
+      "triangles": 531,
       "valid": true
     },
     {
       "id": "osm-way-27581156",
       "objects": 5,
-      "triangles": 104,
+      "triangles": 124,
       "valid": true
     },
     {
       "id": "osm-way-27581157",
       "objects": 5,
-      "triangles": 184,
+      "triangles": 224,
       "valid": true
     },
     {
       "id": "osm-way-49379023",
       "objects": 5,
-      "triangles": 1223,
+      "triangles": 1413,
       "valid": true
     },
     {
       "id": "osm-way-49379034",
       "objects": 5,
-      "triangles": 65,
+      "triangles": 75,
       "valid": true
     },
     {
       "id": "osm-way-49379059",
       "objects": 5,
-      "triangles": 109,
+      "triangles": 127,
       "valid": true
     },
     {
       "id": "osm-way-49379061",
       "objects": 5,
-      "triangles": 317,
+      "triangles": 379,
       "valid": true
     },
     {
       "id": "osm-way-49379063",
       "objects": 5,
-      "triangles": 103,
+      "triangles": 121,
       "valid": true
     },
     {
       "id": "osm-way-49379066",
       "objects": 5,
-      "triangles": 303,
+      "triangles": 361,
       "valid": true
     },
     {
       "id": "osm-way-49379068",
       "objects": 5,
-      "triangles": 211,
+      "triangles": 249,
       "valid": true
     },
     {
       "id": "osm-way-49379072",
       "objects": 5,
-      "triangles": 54,
+      "triangles": 62,
       "valid": true
     },
     {
       "id": "osm-way-49379074",
       "objects": 5,
-      "triangles": 54,
+      "triangles": 62,
       "valid": true
     },
     {
       "id": "osm-way-49379076",
       "objects": 5,
-      "triangles": 54,
+      "triangles": 62,
       "valid": true
     },
     {
       "id": "osm-way-49379082",
       "objects": 5,
-      "triangles": 84,
+      "triangles": 100,
       "valid": true
     },
     {
       "id": "osm-way-49379084",
       "objects": 5,
-      "triangles": 61,
+      "triangles": 71,
       "valid": true
     },
     {
       "id": "osm-way-49379085",
       "objects": 5,
-      "triangles": 97,
+      "triangles": 115,
       "valid": true
     },
     {
       "id": "osm-way-49379089",
       "objects": 5,
-      "triangles": 95,
+      "triangles": 113,
       "valid": true
     },
     {
       "id": "osm-way-49379096",
       "objects": 5,
-      "triangles": 131,
+      "triangles": 157,
       "valid": true
     },
     {
       "id": "osm-way-49379098",
       "objects": 5,
-      "triangles": 164,
+      "triangles": 192,
       "valid": true
     },
     {
       "id": "osm-way-49379102",
       "objects": 5,
-      "triangles": 46,
+      "triangles": 54,
       "valid": true
     },
     {
       "id": "osm-way-49379103",
       "objects": 5,
-      "triangles": 46,
+      "triangles": 54,
       "valid": true
     },
     {
       "id": "osm-way-49379105",
       "objects": 5,
-      "triangles": 46,
+      "triangles": 54,
       "valid": true
     },
     {
       "id": "osm-way-49379108",
       "objects": 5,
-      "triangles": 324,
+      "triangles": 392,
       "valid": true
     },
     {
       "id": "osm-way-49379124",
       "objects": 5,
-      "triangles": 266,
+      "triangles": 318,
       "valid": true
     },
     {
       "id": "osm-way-49379126",
       "objects": 5,
-      "triangles": 119,
+      "triangles": 141,
       "valid": true
     },
     {
       "id": "osm-way-49379130",
       "objects": 5,
-      "triangles": 34,
+      "triangles": 42,
       "valid": true
     },
     {
       "id": "osm-way-49380517",
       "objects": 5,
-      "triangles": 96,
+      "triangles": 112,
       "valid": true
     },
     {
       "id": "osm-way-49773504",
       "objects": 5,
-      "triangles": 133,
+      "triangles": 159,
       "valid": true
     },
     {
       "id": "osm-way-49773514",
       "objects": 5,
-      "triangles": 126,
+      "triangles": 150,
       "valid": true
     },
     {
       "id": "osm-way-49773519",
       "objects": 5,
-      "triangles": 115,
+      "triangles": 137,
       "valid": true
     },
     {
       "id": "osm-way-49773521",
       "objects": 5,
-      "triangles": 133,
+      "triangles": 159,
       "valid": true
     },
     {
       "id": "osm-way-49773522",
       "objects": 5,
-      "triangles": 133,
+      "triangles": 159,
       "valid": true
     },
     {
       "id": "osm-way-49773524",
       "objects": 5,
-      "triangles": 126,
+      "triangles": 150,
       "valid": true
     },
     {
       "id": "osm-way-49773526",
       "objects": 5,
-      "triangles": 115,
+      "triangles": 137,
       "valid": true
     },
     {
       "id": "osm-way-52281079",
       "objects": 5,
-      "triangles": 48,
+      "triangles": 56,
       "valid": true
     },
     {
       "id": "osm-way-52281080",
       "objects": 5,
-      "triangles": 48,
+      "triangles": 56,
       "valid": true
     },
     {
       "id": "osm-way-53920574",
       "objects": 5,
-      "triangles": 80,
+      "triangles": 92,
       "valid": true
     },
     {
       "id": "osm-way-53920575",
       "objects": 5,
-      "triangles": 122,
+      "triangles": 138,
       "valid": true
     },
     {
       "id": "osm-way-53921162",
       "objects": 5,
-      "triangles": 72,
+      "triangles": 84,
       "valid": true
     },
     {
       "id": "osm-way-53921163",
       "objects": 12,
-      "triangles": 8840,
+      "triangles": 244700,
       "valid": true
     },
     {
       "id": "osm-way-53921164",
       "objects": 5,
-      "triangles": 78,
+      "triangles": 86,
       "valid": true
     },
     {
       "id": "osm-way-53921166",
       "objects": 5,
-      "triangles": 50,
+      "triangles": 58,
       "valid": true
     },
     {
       "id": "osm-way-53921167",
       "objects": 5,
-      "triangles": 78,
+      "triangles": 86,
       "valid": true
     },
     {
       "id": "osm-way-53921168",
       "objects": 11,
-      "triangles": 2591,
+      "triangles": 58223,
       "valid": true
     },
     {
       "id": "osm-way-53921169",
       "objects": 5,
-      "triangles": 50,
+      "triangles": 58,
       "valid": true
     },
     {
       "id": "osm-way-53921170",
       "objects": 5,
-      "triangles": 69,
+      "triangles": 79,
       "valid": true
     },
     {
       "id": "osm-way-53921171",
       "objects": 5,
-      "triangles": 50,
+      "triangles": 58,
       "valid": true
     },
     {
       "id": "osm-way-53921692",
       "objects": 5,
-      "triangles": 112,
+      "triangles": 128,
       "valid": true
     },
     {
       "id": "osm-way-53921696",
       "objects": 5,
-      "triangles": 109,
+      "triangles": 123,
       "valid": true
     },
     {
       "id": "osm-way-53921697",
       "objects": 5,
-      "triangles": 332,
+      "triangles": 388,
       "valid": true
     },
     {
       "id": "osm-way-53929057",
-      "objects": 18,
-      "triangles": 10393,
+      "objects": 19,
+      "triangles": 322923,
       "valid": true
     },
     {
       "id": "osm-way-53929060",
       "objects": 18,
-      "triangles": 10772,
+      "triangles": 277844,
       "valid": true
     },
     {
       "id": "osm-way-53929062",
       "objects": 18,
-      "triangles": 10469,
+      "triangles": 273571,
       "valid": true
     },
     {
       "id": "osm-way-53929064",
       "objects": 5,
-      "triangles": 70,
+      "triangles": 78,
       "valid": true
     },
     {
       "id": "osm-way-53929065",
       "objects": 19,
-      "triangles": 9530,
+      "triangles": 213382,
       "valid": true
     },
     {
       "id": "osm-way-53929066",
       "objects": 18,
-      "triangles": 10671,
+      "triangles": 279793,
       "valid": true
     },
     {
       "id": "osm-way-53929067",
       "objects": 18,
-      "triangles": 10566,
+      "triangles": 281738,
       "valid": true
     },
     {
       "id": "osm-way-53929068",
       "objects": 19,
-      "triangles": 10758,
+      "triangles": 287946,
       "valid": true
     },
     {
       "id": "osm-way-53929069",
       "objects": 18,
-      "triangles": 10521,
+      "triangles": 273635,
       "valid": true
     },
     {
       "id": "osm-way-53929070",
       "objects": 5,
-      "triangles": 103,
+      "triangles": 121,
       "valid": true
     },
     {
       "id": "osm-way-53929071",
-      "objects": 20,
-      "triangles": 38908,
+      "objects": 48,
+      "triangles": 319682,
       "valid": true
     },
     {
       "id": "osm-way-106220817",
       "objects": 5,
-      "triangles": 294,
+      "triangles": 334,
       "valid": true
     },
     {
       "id": "osm-way-108855005",
       "objects": 5,
-      "triangles": 172,
+      "triangles": 208,
       "valid": true
     },
     {
       "id": "osm-way-115973658",
       "objects": 5,
-      "triangles": 484,
+      "triangles": 572,
       "valid": true
     },
     {
       "id": "osm-way-115973679",
       "objects": 5,
-      "triangles": 58,
+      "triangles": 70,
       "valid": true
     },
     {
       "id": "osm-way-115973713",
       "objects": 5,
-      "triangles": 152,
+      "triangles": 184,
       "valid": true
     },
     {
       "id": "osm-way-115973734",
       "objects": 5,
-      "triangles": 58,
+      "triangles": 70,
       "valid": true
     },
     {
       "id": "osm-way-155743944",
       "objects": 5,
-      "triangles": 50,
+      "triangles": 58,
       "valid": true
     },
     {
       "id": "osm-way-159388517",
       "objects": 5,
-      "triangles": 54,
+      "triangles": 62,
       "valid": true
     },
     {
       "id": "osm-way-159388519",
       "objects": 5,
-      "triangles": 90,
+      "triangles": 106,
       "valid": true
     },
     {
       "id": "osm-way-159477031",
       "objects": 5,
-      "triangles": 263,
+      "triangles": 313,
       "valid": true
     },
     {
       "id": "osm-way-159477035",
       "objects": 5,
-      "triangles": 430,
+      "triangles": 518,
       "valid": true
     },
     {
       "id": "osm-way-166152866",
       "objects": 5,
-      "triangles": 293,
+      "triangles": 323,
       "valid": true
     },
     {
       "id": "osm-way-166375020",
       "objects": 5,
-      "triangles": 42,
+      "triangles": 50,
       "valid": true
     },
     {
       "id": "osm-way-166375027",
       "objects": 5,
-      "triangles": 124,
+      "triangles": 148,
       "valid": true
     },
     {
       "id": "osm-way-166375073",
       "objects": 5,
-      "triangles": 50,
+      "triangles": 58,
       "valid": true
     },
     {
       "id": "osm-way-166375092",
       "objects": 5,
-      "triangles": 50,
+      "triangles": 58,
       "valid": true
     },
     {
       "id": "osm-way-268457490",
       "objects": 5,
-      "triangles": 42,
+      "triangles": 50,
       "valid": true
     },
     {
       "id": "osm-way-277923411",
       "objects": 5,
-      "triangles": 141,
+      "triangles": 167,
       "valid": true
     },
     {
       "id": "osm-way-293949905",
       "objects": 5,
-      "triangles": 180,
+      "triangles": 212,
       "valid": true
     },
     {
       "id": "osm-way-293949906",
       "objects": 5,
-      "triangles": 151,
+      "triangles": 181,
       "valid": true
     },
     {
       "id": "osm-way-293949907",
       "objects": 5,
-      "triangles": 172,
+      "triangles": 200,
       "valid": true
     },
     {
       "id": "osm-way-293949908",
       "objects": 5,
-      "triangles": 135,
+      "triangles": 161,
       "valid": true
     },
     {
       "id": "osm-way-370462836",
       "objects": 5,
-      "triangles": 238,
+      "triangles": 274,
       "valid": true
     },
     {
       "id": "osm-way-379383172",
       "objects": 5,
-      "triangles": 34,
+      "triangles": 42,
       "valid": true
     },
     {
       "id": "osm-way-379383188",
       "objects": 5,
-      "triangles": 34,
+      "triangles": 42,
       "valid": true
     },
     {
       "id": "osm-way-429820561",
       "objects": 5,
-      "triangles": 46,
+      "triangles": 54,
       "valid": true
     },
     {
       "id": "osm-way-432351705",
       "objects": 5,
-      "triangles": 115,
+      "triangles": 133,
       "valid": true
     },
     {
       "id": "osm-way-455556827",
       "objects": 5,
-      "triangles": 50,
+      "triangles": 58,
       "valid": true
     },
     {
       "id": "osm-way-480849468",
       "objects": 5,
-      "triangles": 42,
+      "triangles": 50,
       "valid": true
     },
     {
       "id": "osm-way-480849469",
       "objects": 5,
-      "triangles": 34,
+      "triangles": 42,
       "valid": true
     },
     {
       "id": "osm-way-570947098",
       "objects": 5,
-      "triangles": 72,
+      "triangles": 84,
       "valid": true
     },
     {
       "id": "osm-way-570947099",
       "objects": 5,
-      "triangles": 108,
+      "triangles": 124,
       "valid": true
     },
     {
       "id": "osm-way-570947100",
       "objects": 5,
-      "triangles": 172,
+      "triangles": 204,
       "valid": true
     },
     {
       "id": "osm-way-570947101",
       "objects": 5,
-      "triangles": 78,
+      "triangles": 86,
       "valid": true
     },
     {
       "id": "osm-way-570947102",
       "objects": 5,
-      "triangles": 38,
+      "triangles": 46,
       "valid": true
     },
     {
       "id": "osm-way-570947103",
       "objects": 5,
-      "triangles": 60,
+      "triangles": 68,
       "valid": true
     },
     {
       "id": "osm-way-570947104",
       "objects": 5,
-      "triangles": 42,
+      "triangles": 50,
       "valid": true
     },
     {
       "id": "osm-way-672784912",
       "objects": 5,
-      "triangles": 103,
+      "triangles": 125,
       "valid": true
     },
     {
       "id": "osm-way-672784913",
       "objects": 5,
-      "triangles": 51,
+      "triangles": 61,
       "valid": true
     },
     {
       "id": "osm-way-672784914",
       "objects": 5,
-      "triangles": 46,
+      "triangles": 54,
       "valid": true
     },
     {
       "id": "osm-way-809949594",
       "objects": 5,
-      "triangles": 34,
+      "triangles": 42,
       "valid": true
     },
     {
       "id": "osm-way-1132256447",
       "objects": 5,
-      "triangles": 2092,
+      "triangles": 2328,
       "valid": true
     },
     {
       "id": "osm-way-1132256451",
       "objects": 5,
-      "triangles": 218,
+      "triangles": 242,
       "valid": true
     },
     {
       "id": "osm-way-1132256478",
       "objects": 5,
-      "triangles": 207,
+      "triangles": 229,
       "valid": true
     },
     {
       "id": "osm-way-1132256479",
       "objects": 5,
-      "triangles": 160,
+      "triangles": 168,
       "valid": true
     },
     {
       "id": "osm-way-1132256480",
       "objects": 5,
-      "triangles": 191,
+      "triangles": 205,
       "valid": true
     },
     {
       "id": "osm-way-1374441208",
       "objects": 5,
-      "triangles": 68,
+      "triangles": 80,
       "valid": true
     },
     {
       "id": "osm-way-1558137690",
       "objects": 5,
-      "triangles": 66,
+      "triangles": 74,
       "valid": true
     },
     {
@@ -736,7 +783,7 @@
     {
       "id": "osm-relation-1515034",
       "objects": 10,
-      "triangles": 16620,
+      "triangles": 11179,
       "valid": true
     }
   ]

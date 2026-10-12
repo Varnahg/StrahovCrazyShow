@@ -7,6 +7,9 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import type { Scene } from "@babylonjs/core/scene";
 import { buildingRoofGeometry } from "../shared/building-roofs";
 import evidence from "../shared/data/facade-reality.json";
+import marketDetails from "../shared/data/market-detail-kit.json";
+import b4Panels from "../shared/data/b4-panel-kit.json";
+import { B4_FACADE_PLAN, b4FacadePlan } from "../shared/b4-facade-plan";
 import { BUILDINGS, buildingArchitecture } from "../shared/world";
 import type { Building, Vec3 } from "../shared/types";
 import { renderBudget } from "../shared/render-quality";
@@ -21,6 +24,13 @@ import {
 } from "./world-asset-identity";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { FACADE_DEPTH, metricFacadeFrame } from "./architecture-depth";
+import {
+  appendBuildingDetailGeometry,
+  createBuildingWindowModelCache,
+  BUILDING_WINDOW_KIT,
+  type WindowModelKit,
+  type WindowModelGeometry,
+} from "./building-window-model";
 
 /** Window dimensions are photo interpretations, not a claim about room counts. */
 export const FACADE_DIMENSIONS = evidence.dimensions;
@@ -95,6 +105,8 @@ export function planFacadeOpenings(
   type: string,
   block?: number | null,
 ): WindowOpening[] {
+  const b4 = block === 4 ? b4FacadePlan(edge, height) : undefined;
+  if (b4) return b4.openings;
   const low = type === "low",
     cell = type === "cell",
     module = low ? FACADE_DIMENSIONS.low : FACADE_DIMENSIONS.standard;
@@ -266,6 +278,7 @@ class Batch {
   normals: number[] = [];
   uvs: number[] = [];
   indices: number[] = [];
+  colors?: number[];
   constructor(
     readonly name: string,
     readonly material: StandardMaterial,
@@ -284,6 +297,7 @@ class Batch {
   ) {
     const offset = this.positions.length / 3;
     this.positions.push(...a, ...b, ...c, ...d);
+    if (this.colors) for (let i = 0; i < 16; i++) this.colors.push(1);
     for (let i = 0; i < 4; i++) this.normals.push(...normal);
     this.uvs.push(uv[0], uv[1], uv[2], uv[1], uv[2], uv[3], uv[0], uv[3]);
     const ab = b.map((x, i) => x - a[i]),
@@ -314,6 +328,7 @@ class Batch {
     vd.normals = this.normals;
     vd.uvs = this.uvs;
     vd.indices = this.indices;
+    if (this.colors) vd.colors = this.colors;
     vd.applyToMesh(mesh);
     // This builder explicitly emits counterclockwise triangles with outward
     // normals. Babylon's default RH mesh orientation is clockwise; leaving it
@@ -360,17 +375,23 @@ function createMaterials(scene: Scene) {
     m.specularColor.setAll(0.025);
     if (texture === "concrete" || texture === "plaster")
       m.metadata = { surfaceKind: texture, uvMetresPerRepeat: 3 };
+    // Headless archive extraction reads this same authored recipe without
+    // creating browser textures. A later surface-pack override takes priority.
+    if (texture)
+      m.metadata = {
+        ...m.metadata,
+        authoredArchitectureTexture: `/models/architecture/textures/${texture}-color.png`,
+        authoredArchitectureNormal: `/models/architecture/textures/${texture}-normal.png`,
+        authoredArchitectureNormalStrength: bump,
+      };
     if (texture && typeof document !== "undefined") {
       m.diffuseTexture = new Texture(
-        `/models/architecture/textures/${texture}-color.png`,
+        m.metadata.authoredArchitectureTexture,
         scene,
       );
       m.diffuseColor.setAll(1);
-      const normal = new Texture(
-        `/models/architecture/textures/${texture}-normal.png`,
-        scene,
-      );
-      normal.level = bump;
+      const normal = new Texture(m.metadata.authoredArchitectureNormal, scene);
+      normal.level = m.metadata.authoredArchitectureNormalStrength;
       m.bumpTexture = normal;
     }
     return m;
@@ -384,6 +405,14 @@ function createMaterials(scene: Scene) {
     red = solid("B8 red entrance core", "#8f3c38"),
     metal = solid("entrance galvanized frame", "#6c7a76"),
     cream = solid("menza tile", "#cfbf89", "tile", 0.13);
+  const greyPanel = solid(
+    "B4 grey facade panels",
+    B4_FACADE_PLAN.material.neutralShadeHex,
+  );
+  const b4Frame = solid(
+    "B4 dark window frames",
+    B4_FACADE_PLAN.material.frameNeutralShadeHex,
+  );
   const glass: StandardMaterial[] = [];
   for (let style = 0; style < 3; style++)
     for (let lit = 0; lit < 2; lit++) {
@@ -661,6 +690,8 @@ function createMaterials(scene: Scene) {
     red,
     metal,
     cream,
+    greyPanel,
+    b4Frame,
     painted,
     glass,
     b6Glass,
@@ -681,9 +712,38 @@ export function buildArchitectureReality(context: {
    * entrance rise when used. The renderer never adds a second hidden offset. */
   baseElevation?: (x: number, z: number, building: Building) => number;
   buildings?: Building[];
+  /** Archive exporters inject the highest Blender kit. It is deliberately not
+   * imported by the browser bundle; normal gameplay uses the near kit. */
+  authoredDetail?: "near" | "highest";
+  authoredWindowKit?: WindowModelKit;
+  authoredMarketKit?: {
+    parts: { materialRole: string; geometry: WindowModelGeometry }[];
+  };
+  authoredB4PanelKit?: {
+    faces: Record<
+      string,
+      { parts: { materialRole: string; geometry: WindowModelGeometry }[] }
+    >;
+  };
 }) {
+  if (
+    context.authoredDetail === "highest" &&
+    context.authoredWindowKit?.level !== "highest"
+  )
+    throw new Error(
+      "Highest architecture export requires the highest Blender window kit",
+    );
+  if (context.authoredDetail === "highest" && !context.authoredMarketKit)
+    throw new Error(
+      "Highest architecture export requires the highest Blender market kit",
+    );
+  if (context.authoredDetail === "highest" && !context.authoredB4PanelKit)
+    throw new Error(
+      "Highest architecture export requires the highest Blender B4 panel kit",
+    );
   const { scene } = context,
     palette = createMaterials(scene),
+    windowModels = createBuildingWindowModelCache(context.authoredWindowKit),
     assetRoots: TransformNode[] = [],
     lods: {
       near: Mesh[];
@@ -756,59 +816,26 @@ export function buildArchitectureReality(context: {
         normalized ? [1, 0, 0, 1] : [u / 3, v / 3, (u + w) / 3, (v + h) / 3],
       );
     };
-    // Same four-sided section for the bevel, deep reveal and frame return.
-    // Its outer contour always remains inside the existing rough opening.
-    const openingRing = (
-      target: Batch,
-      e: RealityEdge,
-      w: WindowOpening,
-      front: number,
-      back: number,
-      frontInset: number,
-      backInset: number,
-    ) => {
-      const corners = (depth: number, inset: number): Point[] => [
-        point(e, w.u + inset, w.v + inset, depth),
-        point(e, w.u + w.w - inset, w.v + inset, depth),
-        point(e, w.u + w.w - inset, w.v + w.h - inset, depth),
-        point(e, w.u + inset, w.v + w.h - inset, depth),
-      ];
-      const outer = corners(front, frontInset),
-        inner = corners(back, backInset);
-      const normals: Point[] = [
-        [0, 1, 0],
-        [-e.tx, 0, -e.tz],
-        [0, -1, 0],
-        [e.tx, 0, e.tz],
-      ];
-      for (let side = 0; side < 4; side++) {
-        const next = (side + 1) % 4;
-        target.surface(
-          outer[side],
-          outer[next],
-          inner[next],
-          inner[side],
-          normals[side],
-        );
-      }
-    };
     for (let edgeIndex = 0; edgeIndex < edges.length; edgeIndex++) {
       const e = edges[edgeIndex],
         height = building.height;
+      const photoFacade = block === 4 ? b4FacadePlan(e, height) : undefined;
       const concrete = !e.long && ["standard", "cell"].includes(type),
-        material = concrete
-          ? type === "cell" && e.length < 9
-            ? palette.red
-            : palette.concrete
-          : type === "commercial" && e.nx > 0.8
-            ? palette.painted
-            : type === "canteen"
-              ? palette.cream
-              : palette.plaster;
+        material = photoFacade
+          ? palette.greyPanel
+          : concrete
+            ? type === "cell" && e.length < 9
+              ? palette.red
+              : palette.concrete
+            : type === "commercial" && e.nx > 0.8
+              ? palette.painted
+              : type === "canteen"
+                ? palette.cream
+                : palette.plaster;
       let opening = planFacadeOpenings(e, height, type, block);
       const typicalEntry = entryForFacade(building.id, e.a, e.b);
       const typicalEntranceFront = !!typicalEntry;
-      if (typicalEntry)
+      if (typicalEntry && !photoFacade)
         opening = opening.filter(
           (w) =>
             w.v >=
@@ -822,7 +849,7 @@ export function buildArchitectureReality(context: {
       if (lobbyFront) opening = opening.filter((w) => w.v > 3);
       const bottom = lobbyFront ? 3 : 0;
       const coreBand =
-        concrete && e.length >= 9 && e.length <= 19
+        !photoFacade && concrete && e.length >= 9 && e.length <= 19
           ? { from: e.length * 0.49 - 1.2, to: e.length * 0.49 + 1.2 }
           : undefined;
       const wallRect = (u: number, v: number, w: number, h: number) => {
@@ -848,30 +875,58 @@ export function buildArchitectureReality(context: {
           );
         }
       };
-      // Split planes around each hole; there is no opaque backing wall at the glass.
-      const ys = [
-        ...new Set(
-          [bottom, height, ...opening.flatMap((w) => [w.v, w.v + w.h])].filter(
-            (y) => y >= bottom && y <= height,
+      if (photoFacade) {
+        const kit = context.authoredB4PanelKit ?? b4Panels;
+        const face = kit.faces[photoFacade.id as keyof typeof kit.faces];
+        if (!face)
+          throw new Error("Missing Blender B4 panel face: " + photoFacade.id);
+        const { a, b } = photoFacade.anchor;
+        const placement = {
+          x: a[0],
+          y: baseY,
+          z: a[1],
+          tx: (b[0] - a[0]) / photoFacade.width,
+          tz: (b[1] - a[1]) / photoFacade.width,
+          nx: e.nx,
+          nz: e.nz,
+        };
+        for (const part of face.parts)
+          appendBuildingDetailGeometry(
+            batch(material),
+            part.geometry,
+            placement,
+            undefined,
+            FACADE_DEPTH.metresPerRepeat,
+          );
+      } else {
+        // Split planes around each hole; there is no opaque backing wall at the glass.
+        const ys = [
+          ...new Set(
+            [
+              bottom,
+              height,
+              ...opening.flatMap((w) => [w.v, w.v + w.h]),
+            ].filter((y) => y >= bottom && y <= height),
           ),
-        ),
-      ].sort((a, b) => a - b);
-      for (let row = 0; row < ys.length - 1; row++) {
-        const y0 = ys[row],
-          y1 = ys[row + 1],
-          mid = (y0 + y1) / 2;
-        const rowWindows = opening
-          .filter((w) => mid > w.v && mid < w.v + w.h)
-          .sort((a, b) => a.u - b.u);
-        let cursor = 0;
-        for (const w of rowWindows) {
-          wallRect(cursor, y0, w.u - cursor, y1 - y0);
-          cursor = w.u + w.w;
+        ].sort((a, b) => a - b);
+        for (let row = 0; row < ys.length - 1; row++) {
+          const y0 = ys[row],
+            y1 = ys[row + 1],
+            mid = (y0 + y1) / 2;
+          const rowWindows = opening
+            .filter((w) => mid > w.v && mid < w.v + w.h)
+            .sort((a, b) => a.u - b.u);
+          let cursor = 0;
+          for (const w of rowWindows) {
+            wallRect(cursor, y0, w.u - cursor, y1 - y0);
+            cursor = w.u + w.w;
+          }
+          wallRect(cursor, y0, e.length - cursor, y1 - y0);
         }
-        wallRect(cursor, y0, e.length - cursor, y1 - y0);
       }
       if (!lobbyFront) {
         const farMaterial =
+          !photoFacade &&
           !typicalEntranceFront &&
           opening.length &&
           ["standard", "cell", "low"].includes(type)
@@ -914,52 +969,37 @@ export function buildArchitectureReality(context: {
         const w = opening[index],
           frontDepth = coreBand && w.style === "stair" ? -0.23 : 0,
           depth = (w.style === "room" ? 0.18 : 0.2) - frontDepth,
-          frameWidth = w.style === "room" ? 0.045 : 0.04,
-          f = batch(
-            type === "commercial" || type === "canteen"
+          frameWidth = BUILDING_WINDOW_KIT.construction.outerFrameWidth,
+          frameMaterial = photoFacade
+            ? palette.b4Frame
+            : type === "commercial" || type === "canteen"
               ? palette.metal
-              : palette.frame,
+              : palette.frame;
+        const localDepth = w.style === "room" ? 0.18 : 0.2;
+        const placement = {
+          x: e.a[0] + e.tx * w.u + e.nx * frontDepth,
+          y: baseY + w.v,
+          z: e.a[1] + e.tz * w.u + e.nz * frontDepth,
+          tx: e.tx,
+          tz: e.tz,
+          nx: e.nx,
+          nz: e.nz,
+        };
+        for (const part of windowModels.get({ ...w, depth: localDepth }))
+          appendBuildingDetailGeometry(
+            batch(
+              part.role === "reveal"
+                ? material
+                : part.role === "sill"
+                  ? palette.sill
+                  : frameMaterial,
+            ),
+            part,
+            placement,
+            part.role === "gasket" ? [0.22, 0.24, 0.22] : undefined,
+            FACADE_DEPTH.metresPerRepeat,
           );
-        const bevel = FACADE_DEPTH.revealBevel;
-        openingRing(
-          batch(material),
-          e,
-          w,
-          frontDepth,
-          frontDepth - bevel,
-          0,
-          bevel,
-        );
-        openingRing(
-          batch(material),
-          e,
-          w,
-          frontDepth - bevel,
-          -depth,
-          bevel,
-          bevel,
-        );
-        const frameFront = -depth + FACADE_DEPTH.frameFront;
         const glassBack = -depth + FACADE_DEPTH.glassBack;
-        // The frame face used to end at its edge with empty space before the
-        // recessed glass. These returns make that existing 17mm section solid.
-        openingRing(f, e, w, frameFront, glassBack, frameWidth, frameWidth);
-        rect(f, e, w.u, w.v, w.w, frameWidth, frameFront);
-        rect(f, e, w.u, w.v + w.h - frameWidth, w.w, frameWidth, frameFront);
-        rect(f, e, w.u, w.v, frameWidth, w.h, frameFront);
-        rect(f, e, w.u + w.w - frameWidth, w.v, frameWidth, w.h, frameFront);
-        for (let pane = 1; pane < w.panes; pane++)
-          rect(
-            f,
-            e,
-            w.u + (w.w * pane) / w.panes - 0.018,
-            w.v,
-            0.036,
-            w.h,
-            -depth + 0.021,
-          );
-        if (w.transom)
-          rect(f, e, w.u, w.v + w.transom, w.w, 0.045, -depth + 0.021);
         const seed =
             (Number(building.id.slice(-4)) * 17 + edgeIndex * 71 + index * 43) %
             101,
@@ -979,6 +1019,31 @@ export function buildArchitectureReality(context: {
           glassBack,
           true,
         );
+        if (photoFacade) {
+          // The distant silhouette keeps this exact asymmetric source plan.
+          // Flat patches share the building's material batches; no generic grid.
+          rect(batch(frameMaterial, true), e, w.u, w.v, w.w, w.h, 0.006);
+          rect(
+            batch(palette.glass[Math.min(2, style) * 2 + lit], true),
+            e,
+            w.u + frameWidth,
+            w.v + frameWidth,
+            w.w - frameWidth * 2,
+            w.h - frameWidth * 2,
+            0.008,
+            true,
+          );
+          for (let pane = 1; pane < w.panes; pane++)
+            rect(
+              batch(frameMaterial, true),
+              e,
+              w.u + (w.w * pane) / w.panes - 0.018,
+              w.v,
+              0.036,
+              w.h,
+              0.009,
+            );
+        }
         if (type === "commercial" || type === "canteen")
           rect(
             batch(palette.glass[Math.min(2, style) * 2], true),
@@ -1011,40 +1076,44 @@ export function buildArchitectureReality(context: {
             0.012,
           );
         }
-        // Sloped sill has real depth and a front edge, visible against grazing light.
-        const s = batch(palette.sill),
-          a = point(e, w.u - 0.045, w.v - 0.025, 0.08),
-          b = point(e, w.u + w.w + 0.045, w.v - 0.025, 0.08),
-          c = point(e, w.u + w.w + 0.045, w.v + 0.015, -depth),
-          d = point(e, w.u - 0.045, w.v + 0.015, -depth);
-        s.surface(a, b, c, d, [0, 1, 0]);
-        rect(s, e, w.u - 0.045, w.v - 0.07, w.w + 0.09, 0.045, 0.08);
         windows++;
       }
-      if (type === "commercial" && e.nx > 0.8 && e.length > 12) {
-        // Flue stays inside the existing solid footprint, with no new external
-        // obstacle or collision disagreement. Twelve-sided round silhouette.
-        const u = e.length * 0.18,
-          r = 0.17,
-          top = 5.4;
-        for (const far of [false, true])
-          for (let i = 0; i < 12; i++) {
-            const a = (i * Math.PI) / 6,
-              b = ((i + 1) * Math.PI) / 6;
-            const ax = e.a[0] + e.tx * u - e.nx * 0.3 + Math.cos(a) * r,
-              az = e.a[1] + e.tz * u - e.nz * 0.3 + Math.sin(a) * r,
-              bx = e.a[0] + e.tx * u - e.nx * 0.3 + Math.cos(b) * r,
-              bz = e.a[1] + e.tz * u - e.nz * 0.3 + Math.sin(b) * r;
-            batch(palette.metal, far).quad(
-              [ax, baseY, az],
-              [bx, baseY, bz],
-              [bx, baseY + top, bz],
-              [ax, baseY + top, az],
-              [Math.cos((a + b) / 2), 0, Math.sin((a + b) / 2)],
+      if (
+        building.id === marketDetails.placement.buildingId &&
+        e.nx > 0.8 &&
+        e.length > 12
+      ) {
+        // Source-identified metalwork replaces the old cylinder in both LODs.
+        // Its entire silhouette remains inside the same collision footprint.
+        const u = e.length * marketDetails.placement.alongFraction;
+        const placement = {
+          x: e.a[0] + e.tx * u + e.nx * marketDetails.placement.outwardOffset,
+          y: baseY,
+          z: e.a[1] + e.tz * u + e.nz * marketDetails.placement.outwardOffset,
+          tx: e.tx,
+          tz: e.tz,
+          nx: e.nx,
+          nz: e.nz,
+        };
+        for (const far of [false, true]) {
+          const kit = far
+            ? marketDetails.kits.flue.far
+            : (context.authoredMarketKit ?? marketDetails.kits.flue.near);
+          for (const part of kit.parts)
+            appendBuildingDetailGeometry(
+              batch(palette.metal, far),
+              part.geometry,
+              placement,
+              part.materialRole === "darkMetal" ? [0.4, 0.39, 0.38] : undefined,
             );
-          }
+        }
       }
-      if (e.long && opening.some((w) => w.style === "room") && type !== "low") {
+      if (
+        !photoFacade &&
+        e.long &&
+        opening.some((w) => w.style === "room") &&
+        type !== "low"
+      ) {
         const pitch =
           e.length /
           Math.max(
@@ -1133,6 +1202,7 @@ export function buildArchitectureReality(context: {
       if (
         block &&
         block !== 6 &&
+        !photoFacade?.suppressGenericSign &&
         !e.long &&
         e.length >= 9 &&
         e.length <= 19 &&
@@ -1321,6 +1391,7 @@ export function buildArchitectureReality(context: {
       ),
     });
   }
+  windowModels.clear();
   return {
     assetRoots,
     metrics: {
@@ -1329,6 +1400,10 @@ export function buildArchitectureReality(context: {
       detailTriangles,
       farTriangles,
       source: "shared/data/facade-reality.json",
+      windowModelSource: "shared/data/building-window-kit.json",
+      marketModelSource: "shared/data/market-detail-kit.json",
+      b4PanelModelSource: "shared/data/b4-panel-kit.json",
+      authoredDetail: context.authoredDetail ?? "near",
       measured: false,
     },
     /** Call each frame (internally inexpensive); hysteresis prevents facade popping. */

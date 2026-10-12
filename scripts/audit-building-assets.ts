@@ -6,6 +6,7 @@ import { B6_LAYOUT, B6_ROOM_AREAS } from "../shared/b6-interior";
 import { B6_STAIR_MESHES } from "../shared/b6-stairs";
 import { B6_BOXES } from "../shared/world";
 import { createB6BoxFaceParts } from "../client/b6-reality";
+import { verifyBuildingArchiveAttributes } from "./building-archive-transfer";
 const folder = path.resolve("public/models/buildings");
 const manifest = JSON.parse(
   readFileSync(path.join(folder, "manifest.json"), "utf8"),
@@ -14,6 +15,15 @@ const source = JSON.parse(
   readFileSync("assets/blender/buildings/source-plan.json", "utf8"),
 );
 const sha = (data: Buffer) => createHash("sha256").update(data).digest("hex");
+const textureHashes = new Map<string, string>();
+const authoredTextureHash = (url: string) => {
+  let hash = textureHashes.get(url);
+  if (!hash) {
+    hash = sha(readFileSync(path.resolve("public", url.slice(1))));
+    textureHashes.set(url, hash);
+  }
+  return hash;
+};
 assert.equal(
   sha(readFileSync("assets/blender/buildings/source-plan.json")),
   manifest.sourcePlanSha256,
@@ -145,7 +155,18 @@ let triangles = 0,
   maxBoundsError = 0,
   zeroAreaTriangles = 0;
 const rows = [];
+const attributes = {
+  vertices: 0,
+  coloredVertices: 0,
+  maxNormalError: 0,
+  maxColorError: 0,
+  maxUvError: 0,
+};
 for (const model of manifest.models) {
+  const expected = source.models.find(
+    (m: any) => m.identity.key === model.identity.key,
+  );
+  assert.ok(expected, `${model.id}: missing canonical source model`);
   const bytes = readFileSync(path.resolve("public", model.url.slice(1)));
   assert.equal(bytes.length, model.bytes);
   assert.equal(sha(bytes), model.sha256);
@@ -205,7 +226,13 @@ for (const model of manifest.models) {
                 ? binary.readUInt16LE(at)
                 : binary.readUInt8(at);
         assert.ok(Number.isFinite(n), model.id);
-        row.push(n);
+        assert.ok(
+          !a.normalized || a.componentType === 5121 || a.componentType === 5123,
+          "Unsupported normalized accessor",
+        );
+        row.push(
+          a.normalized ? n / (a.componentType === 5121 ? 255 : 65535) : n,
+        );
       }
       result.push(row);
     }
@@ -220,12 +247,127 @@ for (const model of manifest.models) {
     Infinity,
     -Infinity,
   ];
-  for (const mesh of json.meshes)
+  const matchedSourceParts = new Set<string>();
+  for (let meshIndex = 0; meshIndex < json.meshes.length; meshIndex++) {
+    const mesh = json.meshes[meshIndex];
+    const sourcePartName = json.nodes.find(
+      (node: any) => node.mesh === meshIndex,
+    )?.extras?.sourcePartName;
+    const sourcePart = expected.parts.find(
+      (part: any) => part.name === sourcePartName,
+    );
+    if (source.schemaVersion >= 2) {
+      assert.ok(
+        sourcePart,
+        `${model.id}: missing full source part identity for ${mesh.name}`,
+      );
+      assert.ok(
+        !matchedSourceParts.has(sourcePartName),
+        `${model.id}: duplicate source part ${sourcePartName}`,
+      );
+      matchedSourceParts.add(sourcePartName);
+      assert.equal(
+        mesh.primitives.reduce(
+          (sum: number, primitive: any) =>
+            sum + json.accessors[primitive.indices].count,
+          0,
+        ),
+        sourcePart.indices.length,
+        `${model.id}: changed source part triangle count`,
+      );
+    }
     for (const primitive of mesh.primitives) {
       const positions = accessor(primitive.attributes.POSITION),
         indices = accessor(primitive.indices).flat();
       assert.equal(indices.length % 3, 0);
       assert.ok(indices.every((i) => i >= 0 && i < positions.length));
+      if (source.schemaVersion >= 2) {
+        assert.ok(
+          primitive.attributes.NORMAL !== undefined,
+          `${model.id}: lost authored normals`,
+        );
+        const normalAccessor = json.accessors[primitive.attributes.NORMAL];
+        assert.equal(normalAccessor.type, "VEC3");
+        assert.equal(normalAccessor.componentType, 5126);
+        assert.ok(!normalAccessor.normalized);
+        assert.equal(normalAccessor.count, positions.length);
+        assert.equal(
+          primitive.attributes.TANGENT,
+          undefined,
+          `${model.id}: tangents must not retain quantized shading normals`,
+        );
+        assert.equal(
+          primitive.attributes._SOURCE_NORMAL,
+          undefined,
+          `${model.id}: helper attribute must become canonical NORMAL`,
+        );
+        const checked = verifyBuildingArchiveAttributes(sourcePart, {
+          positions,
+          normals: accessor(primitive.attributes.NORMAL),
+          uvs:
+            primitive.attributes.TEXCOORD_0 === undefined
+              ? undefined
+              : accessor(primitive.attributes.TEXCOORD_0),
+          colors:
+            primitive.attributes.COLOR_0 === undefined
+              ? undefined
+              : accessor(primitive.attributes.COLOR_0),
+        });
+        attributes.vertices += checked.vertices;
+        attributes.coloredVertices += checked.coloredVertices;
+        attributes.maxNormalError = Math.max(
+          attributes.maxNormalError,
+          checked.maxNormalError,
+        );
+        attributes.maxColorError = Math.max(
+          attributes.maxColorError,
+          checked.maxColorError,
+        );
+        attributes.maxUvError = Math.max(
+          attributes.maxUvError,
+          checked.maxUvError,
+        );
+        const material = json.materials[primitive.material],
+          canonical = sourcePart.material;
+        for (const [sourceUrl, textureInfo, channel] of [
+          [
+            canonical.authoredTexture,
+            material.pbrMetallicRoughness?.baseColorTexture,
+            "colour",
+          ],
+          [canonical.authoredNormalTexture, material.normalTexture, "normal"],
+        ] as const) {
+          if (!sourceUrl) continue;
+          assert.ok(
+            textureInfo,
+            `${model.id}: lost authored ${channel} texture on ${sourcePart.name}`,
+          );
+          const uri = json.images[json.textures[textureInfo.index].source].uri;
+          assert.equal(
+            path.parse(uri).name,
+            authoredTextureHash(sourceUrl),
+            `${model.id}: changed authored ${channel} texture bytes`,
+          );
+        }
+        if (canonical.authoredNormalTexture)
+          assert.ok(
+            Math.abs(
+              (material.normalTexture.scale ?? 1) -
+                canonical.authoredNormalStrength,
+            ) < 1e-6,
+            `${model.id}: changed authored normal strength`,
+          );
+        if (sourcePart.colors.length) {
+          assert.deepEqual(
+            material.pbrMetallicRoughness.baseColorFactor,
+            [
+              ...canonical.color,
+              canonical.portableEntryGlass ? canonical.alpha : 1,
+            ],
+            `${model.id}: changed vertex-coloured material factor`,
+          );
+        }
+      }
       for (const p of positions)
         for (let axis = 0; axis < 3; axis++) {
           bounds[axis * 2] = Math.min(bounds[axis * 2], p[axis]);
@@ -245,9 +387,13 @@ for (const model of manifest.models) {
       vertices += positions.length;
       count += indices.length / 3;
     }
-  const expected = source.models.find(
-    (m: any) => m.identity.key === model.identity.key,
-  );
+  }
+  if (source.schemaVersion >= 2)
+    assert.equal(
+      matchedSourceParts.size,
+      expected.parts.length,
+      `${model.id}: missing source part`,
+    );
   const original = [
     Infinity,
     -Infinity,
@@ -296,6 +442,7 @@ const report = {
   vertices,
   triangles,
   zeroAreaTriangles,
+  attributes: source.schemaVersion >= 2 ? attributes : undefined,
   maxBoundsErrorMetres: maxBoundsError,
   b6StairMeshParts: sourceStairParts.length,
   b6StairSourceMaxErrorMetres: maxStairSourceError,
@@ -316,6 +463,12 @@ const report = {
     "all world bounds within 40 micrometres",
     "byte-identical texture sharing and GLB SHA/length",
     "current source hashes",
+    ...(source.schemaVersion >= 2
+      ? [
+          "source normals, UV seams and vertex tints retained through Blender/glTF",
+          "full source part identities and canonical vertex-coloured material factors",
+        ]
+      : []),
     "B6 floor/model-room contract from current shared data",
     "every stair source triangle retained with foundation offset once",
     "every canonical box face retained once; no reconstructed coplanar outer shell",

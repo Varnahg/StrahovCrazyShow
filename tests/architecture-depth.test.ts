@@ -84,8 +84,11 @@ test("real near geometry has outward nonzero normals, valid tangent frames and c
         const ab = b.subtract(a),
           ac = c.subtract(a),
           actual = Vector3.Cross(ab, ac).normalize();
+        // Blender's shallow divider bevel has deliberately smoothed split
+        // normals; the flat wall/reveal/sill faces retain geometric normals.
+        const authoredFrame = mesh.material!.name.includes("brown timber");
         assert.ok(
-          Vector3.Dot(actual, n) > 0.999,
+          Vector3.Dot(actual, n) > (authoredFrame ? 0.94 : 0.999),
           `${mesh.name} wrong geometric normal`,
         );
         const du1 = uv[bi * 2] - uv[ai * 2],
@@ -108,9 +111,14 @@ test("real near geometry has outward nonzero normals, valid tangent frames and c
           .scale(1 / determinant)
           .normalize();
         assert.ok(
-          Math.abs(Vector3.Dot(n, tangent)) < 0.002 &&
-            Math.abs(Vector3.Dot(n, bitangent)) < 0.002,
+          Math.abs(Vector3.Dot(actual, tangent)) < 0.002 &&
+            Math.abs(Vector3.Dot(actual, bitangent)) < 0.002,
         );
+        const shadingTangent = tangent
+          .subtract(n.scale(Vector3.Dot(n, tangent)))
+          .normalize();
+        assert.ok(Math.abs(Vector3.Dot(n, shadingTangent)) < 1e-5);
+        assert.ok(Vector3.Cross(n, shadingTangent).lengthSquared() > 0.99);
         if (Math.abs(n.y) > 0.1 && Math.abs(n.y) < 0.95) diagonalNormals++;
         checkedTriangles++;
       }
@@ -147,7 +155,9 @@ test("real near geometry has outward nonzero normals, valid tangent frames and c
     const p = hit.pickedPoint!;
     const hitDepth = (p.x - edge.a[0]) * edge.nx + (p.z - edge.a[1]) * edge.nz;
     assert.ok(
-      hitDepth < front - 0.003 && hitDepth > -depth + FACADE_DEPTH.glassBack,
+      // The modeled inner bevel now precedes the vertical return; both must
+      // remain inside the physical frame section in front of the glass.
+      hitDepth < front + 0.003 && hitDepth > -depth + FACADE_DEPTH.glassBack,
       `return depth ${hitDepth}`,
     );
     assert.deepEqual(

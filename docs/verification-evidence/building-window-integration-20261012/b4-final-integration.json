@@ -1,0 +1,94 @@
+{
+  "recordedAt": "2026-10-12T12:37:41.506Z",
+  "status": "current CPU integration passed; root archive/full checkpoint/GPU remain pending",
+  "hashes": {
+    "client/architecture-reality.ts": "cff6d34d82c51319ce6bb7d4f2817f0f9860ca9fb2e4b6fef631455a0338989c",
+    "client/building-window-model.ts": "3d7290ffdd33ea704d094fac735856c2ec56600f78d03655dd3268735901bff2",
+    "tests/building-window-model.test.ts": "f2d37b9c51ba2b2e9aeb0807c8c46c3136bfc0c93a56eeeb8bfa8ea212320712",
+    "tests/b4-facade-rendering.test.ts": "000160a21236a604a7108cce10b22d4d738b8eb8fb69bdf756968a9de57965ab",
+    "tests/architecture-reality.test.ts": "77714a40f3dbf9fbb2260af530c1ed5ba010ee2d8b5147142fadc8355147d18f",
+    "tests/architecture-depth.test.ts": "1d26ff516dadd2de5e1a9b85631dbec030edb7cea77a679cbedfa900f7ed0af6",
+    "shared/b4-facade-plan.ts": "6dd8cea292c5fa82984150513bcbaa823c601ddaeac8bd8865a378ca7dd8f80c",
+    "shared/data/b4-facade-plan.json": "fa9343fdb925c5f670dab75e8c86bf99fa4eb9100c7df7246156a77171c21172",
+    "shared/data/b4-panel-kit.json": "6513ff48c1628eaace4705cd69e6e1f5f946a39ef9d08aa1b83bb6e5f4a790a6",
+    "shared/data/building-window-kit.json": "b5f2e1a719b7bc4cb9b3cf11d838dd06d66bcae6b9b7a767f6a72271f195d6d3",
+    "shared/data/market-detail-kit.json": "a1a26b7d18188c1c4e6a4509e7a099edea66a77987a2b8b503ab5638cd051950",
+    "shared/data/facade-reality.json": "1a43b7d3db5f8ec0b9da67b02434b322e6fb4bfbe78a8de105b9c1a701c33ad6",
+    "assets/blender/b4-panel-kit/highest-geometry.json": "f0d9209d47056d5bd5138c896fc52fd243b9c097fb2c6694ebe1efe19cf78019",
+    "assets/blender/building-window-kit/highest-geometry.json": "ac1ada9c3957976496c29dc43a9f958bf8056c50ebd4e1b4fc802262c89f2f3e",
+    "assets/blender/market-detail-kit/highest-geometry.json": "e360bf68a90dbb2df4727798e12dc39a24a55268bde54d105a86486bc3d9ee4c"
+  },
+  "tests": [
+    {
+      "command": "node node_modules/tsx/dist/cli.mjs --test tests/building-window-model.test.ts tests/b4-facade-rendering.test.ts tests/architecture-reality.test.ts tests/architecture-depth.test.ts",
+      "passed": 17,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "b4-integration-first-tests.log"
+    },
+    {
+      "command": "node node_modules/tsx/dist/cli.mjs --test --test-name-pattern 'north door|window openings|exterior B6 entry|covered B6 portal|source-supported north small|independent source pivot|no material/LOD batch' tests/b6-reality.test.ts tests/world-asset-identity.test.ts",
+      "passed": 7,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "b4-b6-entry-identity-tests.log"
+    }
+  ],
+  "typecheck": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "exitCode": 0,
+    "log": "b4-integration-types.log"
+  },
+  "comparison": {
+    "recordedAt": "2026-10-12T12:36:54.652Z",
+    "comparedBuildings": 120,
+    "unchangedBuildings": 119,
+    "changedBuildings": [
+      "53929057"
+    ],
+    "b4": {
+      "before": {
+        "nearTriangles": 129687,
+        "farTriangles": 133,
+        "meshes": 19
+      },
+      "after": {
+        "nearTriangles": 140995,
+        "farTriangles": 291,
+        "meshes": 24
+      }
+    },
+    "campus": {
+      "before": {
+        "buildings": 120,
+        "windows": 3258,
+        "detailTriangles": 1314723,
+        "farTriangles": 11503,
+        "source": "shared/data/facade-reality.json",
+        "windowModelSource": "shared/data/building-window-kit.json",
+        "marketModelSource": "shared/data/market-detail-kit.json",
+        "authoredDetail": "near",
+        "measured": false
+      },
+      "after": {
+        "buildings": 120,
+        "windows": 3242,
+        "detailTriangles": 1326031,
+        "farTriangles": 11661,
+        "source": "shared/data/facade-reality.json",
+        "windowModelSource": "shared/data/building-window-kit.json",
+        "marketModelSource": "shared/data/market-detail-kit.json",
+        "b4PanelModelSource": "shared/data/b4-panel-kit.json",
+        "authoredDetail": "near",
+        "measured": false
+      }
+    },
+    "comparison": "Per-building material names, mesh names and all position/normal/UV/color/index values hashed; only B4 changed. Not a GPU or draw-call measurement."
+  },
+  "activeProcesses": [],
+  "limits": [
+    "No GPU, FPS or new gameplay screenshot evidence",
+    "Root must regenerate full highest building archives",
+    "Full production test/build/integration checkpoint remains separate"
+  ]
+}

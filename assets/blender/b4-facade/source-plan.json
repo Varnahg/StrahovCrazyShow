@@ -1,0 +1,637 @@
+{
+  "schemaVersion": 1,
+  "buildingId": "53929057",
+  "block": 4,
+  "checkedAt": "2026-10-12",
+  "coordinateSystem": "metres; +X east, +Z south; local u follows each canonical anchor.a to anchor.b; v is height above existing building base",
+  "height": 18,
+  "anchorToleranceMetres": 0.005,
+  "measured": false,
+  "material": {
+    "id": "greyPanel",
+    "description": "gray panel cladding, composition unknown",
+    "neutralShadeHex": "#a3a7a4",
+    "shadeStatus": "neutral artist setting informed by reference; not measured albedo",
+    "frameNeutralShadeHex": "#4c4b44",
+    "frameShadeStatus": "Identified ČVUT photos 1 and 2 show dark gray-brown small-window profiles and pale separate sills. High confidence in dark-frame/pale-sill distinction; medium confidence in brown hue under reveal shadows. Exact colour is an artist estimate, substrate is unconfirmed, and no timber grain is inferred from the unrelated standard-room-window photograph.",
+    "fineStriations": "visible in ČVUT photographs; material composition is not established"
+  },
+  "dimensions": {
+    "smallWidth": 0.72,
+    "smallHeight": 0.78,
+    "smallSill": 1.05,
+    "pairGap": 0.2,
+    "stairWidth": 2.4,
+    "stairHeight": 0.66,
+    "stairSill": 0.87,
+    "storeyHeight": 3,
+    "status": "existing module dimensions and photo proportion interpretation; not surveyed"
+  },
+  "sources": [
+    {
+      "id": "google-b4-north-202405",
+      "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=Vf0vxZZEYzkbdybWxPSX4w&heading=176.9096&pitch=24.7346&fov=75",
+      "captureDate": "2024-05",
+      "visuallyReviewedAt": "2026-10-12",
+      "camera": {
+        "lat": 50.0804675,
+        "lon": 14.3929854,
+        "headingDegrees": 176.9096
+      },
+      "use": "north composition, six small pairs, five stair bands and blank eastern panel",
+      "measured": false
+    },
+    {
+      "id": "google-b4-northwest-202309",
+      "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=CIHM0ogKEICAgIDZ6Z2S-QE&heading=157.33&pitch=32.12&fov=75",
+      "captureDate": "2023-09",
+      "uploadDate": "2023-10",
+      "visuallyReviewedAt": "2026-10-12",
+      "camera": {
+        "lat": 50.0803105,
+        "lon": 14.3927925,
+        "headingDegrees": 157.33
+      },
+      "use": "northwest corner correlation, three columns of small west-return windows, separate blank reception wall",
+      "measured": false
+    },
+    {
+      "id": "ctu-b4-20240620",
+      "url": "https://media.cvut.cz/cs/foto/20240620-exteriery-koleji-strahov",
+      "captureDate": "2024-06-20",
+      "creator": "Jiří Ryszawy / ČVUT VIC",
+      "reviewedSlides": [
+        1,
+        2,
+        8
+      ],
+      "use": "frame/reveal typology, grey panel seams and striations; no reference pixels redistributed",
+      "measured": false
+    },
+    {
+      "id": "osm-b4",
+      "url": "https://www.openstreetmap.org/way/53929057",
+      "use": "existing footprint endpoints and mapped six levels / 18 metre game height; OSM is not a facade survey",
+      "license": "ODbL-1.0",
+      "measured": false
+    }
+  ],
+  "faces": [
+    {
+      "id": "north-tower",
+      "description": "North-facing western core; six rows of paired small windows.",
+      "anchor": {
+        "a": [
+          78.64,
+          40.45
+        ],
+        "b": [
+          85.16,
+          40.33
+        ]
+      },
+      "edgeAnchor": [
+        [
+          78.64,
+          40.45
+        ],
+        [
+          85.16,
+          40.33
+        ]
+      ],
+      "width": 6.521104200977005,
+      "height": 18,
+      "material": "greyPanel",
+      "suppressGenericSign": true,
+      "sourceIds": [
+        "google-b4-north-202405",
+        "ctu-b4-20240620",
+        "osm-b4"
+      ],
+      "openings": [
+        {
+          "u": 2.4405521004885027,
+          "v": 1.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 3.3605521004885026,
+          "v": 1.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 2.4405521004885027,
+          "v": 4.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 3.3605521004885026,
+          "v": 4.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 2.4405521004885027,
+          "v": 7.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 3.3605521004885026,
+          "v": 7.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 2.4405521004885027,
+          "v": 10.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 3.3605521004885026,
+          "v": 10.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 2.4405521004885027,
+          "v": 13.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 3.3605521004885026,
+          "v": 13.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 2.4405521004885027,
+          "v": 16.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 3.3605521004885026,
+          "v": 16.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        }
+      ],
+      "layoutEvidence": {
+        "count": 12,
+        "rows": 6,
+        "columns": 2,
+        "countStatus": "visually interpreted source arrangement",
+        "metricStatus": "unmeasured centres and dimensions interpreted in metres",
+        "centres": "pair centred on actual edge; 0.2m clear separation"
+      },
+      "joints": {
+        "verticalU": [
+          1.5,
+          3,
+          4.5,
+          6
+        ],
+        "horizontalY": [
+          1.5,
+          3,
+          4.5,
+          6,
+          7.5,
+          9,
+          10.5,
+          12,
+          13.5,
+          15,
+          16.5
+        ],
+        "floorBreakY": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ],
+        "source": [
+          "ctu-b4-20240620",
+          "google-b4-north-202405"
+        ],
+        "status": "regular seams visibly documented; 1.5m rhythm and exact coordinates are conservative unmeasured modelling interpretation, not a prefabricated panel survey",
+        "nominalPitchMetres": 1.5
+      }
+    },
+    {
+      "id": "north-recess",
+      "description": "North-facing recessed edge: five stair bands at its west end; the eastern part remains blank.",
+      "anchor": {
+        "a": [
+          85.21,
+          42.47
+        ],
+        "b": [
+          95.34,
+          42.23
+        ]
+      },
+      "edgeAnchor": [
+        [
+          85.21,
+          42.47
+        ],
+        [
+          95.34,
+          42.23
+        ]
+      ],
+      "width": 10.13284264162827,
+      "height": 18,
+      "material": "greyPanel",
+      "suppressGenericSign": true,
+      "sourceIds": [
+        "google-b4-north-202405",
+        "ctu-b4-20240620",
+        "osm-b4"
+      ],
+      "openings": [
+        {
+          "u": 0.12,
+          "v": 3.87,
+          "w": 2.4,
+          "h": 0.66,
+          "panes": 3,
+          "style": "stair"
+        },
+        {
+          "u": 0.12,
+          "v": 6.87,
+          "w": 2.4,
+          "h": 0.66,
+          "panes": 3,
+          "style": "stair"
+        },
+        {
+          "u": 0.12,
+          "v": 9.87,
+          "w": 2.4,
+          "h": 0.66,
+          "panes": 3,
+          "style": "stair"
+        },
+        {
+          "u": 0.12,
+          "v": 12.87,
+          "w": 2.4,
+          "h": 0.66,
+          "panes": 3,
+          "style": "stair"
+        },
+        {
+          "u": 0.12,
+          "v": 15.87,
+          "w": 2.4,
+          "h": 0.66,
+          "panes": 3,
+          "style": "stair"
+        }
+      ],
+      "layoutEvidence": {
+        "count": 5,
+        "rows": 5,
+        "columns": 1,
+        "countStatus": "visually interpreted source arrangement",
+        "metricStatus": "unmeasured centres and dimensions interpreted in metres",
+        "centres": "west edge +0.12m; eastern remainder blank"
+      },
+      "joints": {
+        "verticalU": [
+          1.5,
+          3,
+          4.5,
+          6,
+          7.5,
+          9
+        ],
+        "horizontalY": [
+          1.5,
+          3,
+          4.5,
+          6,
+          7.5,
+          9,
+          10.5,
+          12,
+          13.5,
+          15,
+          16.5
+        ],
+        "floorBreakY": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ],
+        "source": [
+          "ctu-b4-20240620",
+          "google-b4-north-202405"
+        ],
+        "status": "regular seams visibly documented; 1.5m rhythm and exact coordinates are conservative unmeasured modelling interpretation, not a prefabricated panel survey",
+        "nominalPitchMetres": 1.5
+      },
+      "blankEasternPartOfNorthFace": {
+        "fromU": 2.52,
+        "toU": 10.13284264162827
+      },
+      "groundEntry": {
+        "observed": true,
+        "sourceId": "google-b4-north-202405",
+        "region": "below west stair-window strip",
+        "metricPlacement": null,
+        "renderedOpening": false,
+        "collisionChange": false
+      }
+    },
+    {
+      "id": "west-return",
+      "description": "West-facing return of north core; six rows with three small windows, not the standard four-pane dorm grid.",
+      "anchor": {
+        "a": [
+          78.87,
+          52.8
+        ],
+        "b": [
+          78.64,
+          40.45
+        ]
+      },
+      "edgeAnchor": [
+        [
+          78.87,
+          52.8
+        ],
+        [
+          78.64,
+          40.45
+        ]
+      ],
+      "width": 12.35214151473338,
+      "height": 18,
+      "material": "greyPanel",
+      "suppressGenericSign": true,
+      "sourceIds": [
+        "google-b4-northwest-202309",
+        "ctu-b4-20240620",
+        "osm-b4"
+      ],
+      "openings": [
+        {
+          "u": 2.1104283029466764,
+          "v": 1.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 5.81607075736669,
+          "v": 1.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 9.521713211786706,
+          "v": 1.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 2.1104283029466764,
+          "v": 4.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 5.81607075736669,
+          "v": 4.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 9.521713211786706,
+          "v": 4.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 2.1104283029466764,
+          "v": 7.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 5.81607075736669,
+          "v": 7.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 9.521713211786706,
+          "v": 7.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 2.1104283029466764,
+          "v": 10.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 5.81607075736669,
+          "v": 10.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 9.521713211786706,
+          "v": 10.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 2.1104283029466764,
+          "v": 13.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 5.81607075736669,
+          "v": 13.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 9.521713211786706,
+          "v": 13.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 2.1104283029466764,
+          "v": 16.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 5.81607075736669,
+          "v": 16.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        },
+        {
+          "u": 9.521713211786706,
+          "v": 16.05,
+          "w": 0.72,
+          "h": 0.78,
+          "panes": 1,
+          "style": "small"
+        }
+      ],
+      "layoutEvidence": {
+        "count": 18,
+        "rows": 6,
+        "columns": 3,
+        "countStatus": "visually interpreted source arrangement",
+        "metricStatus": "unmeasured centres and dimensions interpreted in metres",
+        "centres": "0.2, 0.5 and 0.8 of actual edge width"
+      },
+      "joints": {
+        "verticalU": [
+          1.5,
+          3,
+          4.5,
+          6,
+          7.5,
+          9,
+          10.5,
+          12
+        ],
+        "horizontalY": [
+          1.5,
+          3,
+          4.5,
+          6,
+          7.5,
+          9,
+          10.5,
+          12,
+          13.5,
+          15,
+          16.5
+        ],
+        "floorBreakY": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ],
+        "source": [
+          "ctu-b4-20240620",
+          "google-b4-north-202405"
+        ],
+        "status": "regular seams visibly documented; 1.5m rhythm and exact coordinates are conservative unmeasured modelling interpretation, not a prefabricated panel survey",
+        "nominalPitchMetres": 1.5
+      }
+    }
+  ],
+  "unplacedFacts": [
+    {
+      "id": "b4-projecting-number",
+      "sourceIds": [
+        "google-b4-north-202405",
+        "google-b4-northwest-202309"
+      ],
+      "description": "Projecting blue-white number 4 at the northwest corner of the north core; not a flat plaque across the stair windows.",
+      "metricPlacement": null
+    },
+    {
+      "id": "b4-white-square-covers",
+      "sourceIds": [
+        "ctu-b4-20240620"
+      ],
+      "captureDate": "2024-06-20",
+      "description": "At least three upper pale square covers visible on the west-return photograph; September2023 panorama corroborates facade identity but predates their documented appearance.",
+      "metricPlacement": null
+    }
+  ],
+  "limits": [
+    "Only these three matched faces override B4 defaults; other buildings and long B4 facades retain their current plans.",
+    "Photographic row/column interpretation does not assert a room inventory.",
+    "No new door opening or collision passage is created.",
+    "The OSM perimeter includes the north-core setback; panel geometry must not add a second setback.",
+    "Window centres, sill heights, panel seam positions and colour are explicit modelling estimates."
+  ]
+}

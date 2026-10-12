@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "building-b4-export",
+  "title": "Vygenerovat a ověřit Blender model identifikovaných fasád bloku 4",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/create-b4-facade-panels.py",
+    "assets/blender/b4-panel-kit/",
+    "public/models/architecture/b4-facade/",
+    "shared/data/b4-panel-kit.json",
+    "tests/b4-facade-panels.test.ts",
+    "docs/reality-pack/b4-facade-panels-20261012/",
+    "docs/agents/handoffs/building-b4-export.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Z autoritativního shared/data/b4-facade-plan.json vytvoř skutečné editovatelné Blender plochy pro tři identifikované fasády B4: 12/5/18 otvorů, původní OSM hrany, bez druhé stěny či přidaného ústupu.",
+    "Ulož highest a near geometrii, GLB a master .blend; proveď skutečné native reopen a geometrické/UV/normálové porovnání. Všechny konstrukční odhady a fotografie s datem zachovej v provenienci.",
+    "Oprav nalezené chyby, refaktoruj opakované převody a lifecycle. Neoslabuj assertions kvůli chybě generátoru. Handoff uvede soubory, hashe, skutečné důkazy a limity; neprohlašuje herní GPU kvalitu nebo FPS."
+  ],
+  "verification": [
+    "Blender 5.2 CPU --background --threads 2 --python scripts/create-b4-facade-panels.py; skutečný save/reopen a GLB export.",
+    "pnpm exec tsx --test tests/b4-facade-panels.test.ts tests/building-window-kit.test.ts",
+    "Cílená kontrola zdrojových otvorů, topologie, jednotkových normál, škály a maximálních rozměrů; GPU běh patří navazujícímu integračnímu checkpointu."
+  ],
+  "notes": [
+    "Kód předal původní agent v docs/agents/handoffs/building-window-authoring.md. Převzetí WIP je autorizované kořenovým koordinátorem buildings-01a12b28-root.",
+    "Pouze worktree C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow. Do primary/main nezapisovat.",
+    "Nezměň plan referenčního agenta ani runtime integrátora; kontrakty koordinuj. Nevytvářej vymyšlené dveře, větrací otvory či vnitřní průchody.",
+    "Weather explicitně potvrdil DONE a uvolnil heavy-validation/gpu 12.10.2026 přibližně12:27UTC. Agent smí po vlastním claimu spustit CPU Blender. Do main neintegrovat před PUBDONE."
+  ]
+}

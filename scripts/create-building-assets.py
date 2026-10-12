@@ -3,7 +3,7 @@ Run: pnpm exec tsx scripts/export-building-assets.ts
 Then: blender --background --python scripts/create-building-assets.py
 Source photo pixels and raw scanned incidental objects are not included.
 """
-import bpy, json, hashlib, pathlib, struct, sys
+import bpy, json, hashlib, pathlib, struct, sys, math
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'assets/blender/buildings/source-plan.json'
@@ -18,6 +18,12 @@ selected = [model for model in data['models'] if not only_id or model['identity'
 assert selected, 'No source building matches --only ' + str(only_id)
 report = []
 shared_textures = {t['sha256']: t for t in previous['textures']} if previous else {}
+SOURCE_COLOR_ATTRIBUTE = 'Runtime source tint'
+SOURCE_NORMAL_ATTRIBUTE = '_SOURCE_NORMAL'
+vertex_colored_materials = {
+    part['material']['name']
+    for model in selected for part in model['parts'] if part.get('colors')
+}
 retained = []
 if previous:
     selected_keys = {model['identity']['key'] for model in selected}
@@ -39,19 +45,50 @@ def share_original_texture_bytes(glb, source_model):
     json_length, json_type = struct.unpack_from('<II', blob, 12)
     assert json_type == 0x4e4f534a
     spec = json.loads(blob[20:20+json_length])
+    # Blender's native custom normals use angular short2 encoding. Preserve the
+    # original float normals through an explicit POINT attribute, then make it
+    # the portable NORMAL accessor. Generic attributes are not axis-swizzled,
+    # so this one deliberately stores canonical glTF XYZ, not Blender XYZ.
+    assert not spec.get('skins') and not spec.get('animations')
+    for node in spec.get('nodes', []):
+        assert not any(key in node for key in ['translation','rotation','scale','matrix','extensions']), 'Source normal transfer requires static identity-transform nodes'
+    used_accessors = set()
+    for mesh in spec.get('meshes', []):
+        for primitive in mesh['primitives']:
+            assert not primitive.get('targets')
+            assert not primitive.get('extensions'), 'Source normal transfer does not accept compressed/extended geometry'
+            attributes = primitive['attributes']
+            assert SOURCE_NORMAL_ATTRIBUTE in attributes, (source_model['identity']['key'], mesh['name'])
+            attributes['NORMAL'] = attributes.pop(SOURCE_NORMAL_ATTRIBUTE)
+            used_accessors.update(attributes.values())
+            if 'indices' in primitive: used_accessors.add(primitive['indices'])
+    accessor_order = sorted(used_accessors)
+    accessor_remap = {old: new for new, old in enumerate(accessor_order)}
+    spec['accessors'] = [spec['accessors'][old] for old in accessor_order]
+    for mesh in spec.get('meshes', []):
+        for primitive in mesh['primitives']:
+            primitive['attributes'] = {name: accessor_remap[index] for name, index in primitive['attributes'].items()}
+            if 'indices' in primitive: primitive['indices'] = accessor_remap[primitive['indices']]
+    geometry_views = set()
+    for accessor in spec['accessors']:
+        if 'bufferView' in accessor: geometry_views.add(accessor['bufferView'])
+        if 'sparse' in accessor:
+            geometry_views.update(accessor['sparse'][kind]['bufferView'] for kind in ['indices','values'])
     # Blender 5.2 keeps the original image but may omit a Multiply-node tint
     # from glTF. Restore the canonical linear PBR factors only for explicitly
     # opted-in B6 surfaces, without touching texture or geometry buffers.
-    portable={p['material']['name']:p['material']for p in source_model['parts']if(p['material'].get('surface')or{}).get('preserveLinearTint')}
+    portable={p['material']['name']:p['material']for p in source_model['parts']if(p['material'].get('surface')or{}).get('preserveLinearTint') or p['material']['name'] in vertex_colored_materials}
     for mat in spec.get('materials',[]):
         canonical=portable.get(mat.get('name'))
         if not canonical:continue
         pbr=mat.setdefault('pbrMetallicRoughness',{})
-        pbr['baseColorFactor']=[*canonical['color'],canonical['alpha']]
+        portable_alpha = canonical['alpha'] if canonical.get('portableEntryGlass') else 1
+        pbr['baseColorFactor']=[*canonical['color'],portable_alpha]
         pbr['roughnessFactor']=canonical['roughness']
         pbr['metallicFactor']=canonical['metallic']
-        mat['doubleSided']=False
-        if mat.get('normalTexture'):mat['normalTexture']['scale']=canonical['surface']['normalStrength']
+        if (canonical.get('surface') or {}).get('preserveLinearTint'):
+            mat['doubleSided']=False
+            if mat.get('normalTexture'):mat['normalTexture']['scale']=canonical['surface']['normalStrength']
     binary_offset = 20 + json_length
     binary_length, binary_type = struct.unpack_from('<II', blob, binary_offset)
     assert binary_type == 0x004e4942
@@ -79,7 +116,7 @@ def share_original_texture_bytes(glb, source_model):
     clean_views = []
     remap = {}
     for index, view in enumerate(views):
-        if index in image_views:
+        if index in image_views or index not in geometry_views:
             continue
         while len(clean_binary) % 4:
             clean_binary.append(0)
@@ -124,6 +161,7 @@ def material(part):
     # transparency/night shader behavior is intentionally not claimed identical.
     m['runtimeAlpha'] = spec['alpha']
     m['runtimeMaterialNote'] = spec['note']
+    m.use_backface_culling = not spec.get('doubleSided', True)
     if spec.get('portableEntryGlass'):
         bsdf.inputs['Alpha'].default_value = spec['alpha']
         m.surface_render_method = 'DITHERED'
@@ -137,7 +175,17 @@ def material(part):
         tint.inputs[1].default_value=(*spec['color'],1)
         m.node_tree.links.new(texture.outputs['Color'],tint.inputs[2])
         m.node_tree.links.new(tint.outputs['Color'],bsdf.inputs['Base Color'])
-        m['textureProvenance'] = 'Original project-authored PNG interpreted from B3 typology; B6 finishes are not measured'
+        m['textureProvenance'] = spec.get('authoredTextureProvenance', 'Original project-authored PNG interpreted from B3 typology; B6 finishes are not measured')
+    if spec.get('authoredNormalTexture'):
+        texture = m.node_tree.nodes.new('ShaderNodeTexImage')
+        source = ROOT / 'public' / spec['authoredNormalTexture'].lstrip('/')
+        texture.image = bpy.data.images.load(str(source), check_existing=True)
+        texture.image.colorspace_settings.name = 'Non-Color'
+        texture.image.filepath = bpy.path.relpath(str(source), start=str(BLEND))
+        normal = m.node_tree.nodes.new('ShaderNodeNormalMap')
+        normal.inputs['Strength'].default_value = spec['authoredNormalStrength']
+        m.node_tree.links.new(texture.outputs['Color'], normal.inputs['Color'])
+        m.node_tree.links.new(normal.outputs['Normal'], bsdf.inputs['Normal'])
     surface = spec.get('surface')
     if surface:
         m['textureProvenance'] = surface['source']
@@ -173,11 +221,34 @@ def material(part):
                     normal.inputs['Strength'].default_value=surface['normalStrength']
                 m.node_tree.links.new(texture.outputs['Color'], normal.inputs['Color'])
                 m.node_tree.links.new(normal.outputs['Normal'], bsdf.inputs['Normal'])
+    if key in vertex_colored_materials:
+        # Runtime batches use vertex tints for dark gaskets/metal without adding
+        # a draw per window. The attribute alone is not a Blender shader link.
+        vertex = m.node_tree.nodes.new('ShaderNodeVertexColor')
+        vertex.layer_name = SOURCE_COLOR_ATTRIBUTE
+        vertex.name = 'Runtime vertex tint'
+        tint = m.node_tree.nodes.new('ShaderNodeMixRGB')
+        tint.name = 'Multiply runtime vertex tint'
+        tint.blend_type = 'MULTIPLY'
+        tint.inputs[0].default_value = 1
+        base = bsdf.inputs['Base Color']
+        if base.is_linked:
+            m.node_tree.links.new(base.links[0].from_socket, tint.inputs[1])
+        else:
+            tint.inputs[1].default_value = base.default_value
+        m.node_tree.links.new(vertex.outputs['Color'], tint.inputs[2])
+        m.node_tree.links.new(tint.outputs['Color'], base)
+        m['runtimeVertexColorAttribute'] = SOURCE_COLOR_ATTRIBUTE
     return m
 
 for model in selected:
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete(use_global=False)
+    # Meshes are unique to each building, whereas materials/images are shared.
+    # Do not retain every earlier high-detail building as orphan mesh buffers.
+    for old_mesh in tuple(bpy.data.meshes):
+        if old_mesh.users == 0:
+            bpy.data.meshes.remove(old_mesh)
     identity = model['identity']
     model_id = f"osm-{identity['sourceType']}-{identity['sourceId']}"
     root = bpy.data.objects.new(model_id, None)
@@ -194,11 +265,29 @@ for model in selected:
         mesh.from_pydata([(p[i], -p[i+2], p[i+1]) for i in range(0, len(p), 3)], [],
                          [indices[i:i+3] for i in range(0, len(indices), 3)])
         mesh.update()
+        if part.get('normals'):
+            assert len(part['normals']) == len(p), part['name']
+            normal = part['normals']
+            mesh.polygons.foreach_set('use_smooth', [True] * len(mesh.polygons))
+            mesh.normals_split_custom_set_from_vertices([
+                (normal[i], -normal[i+2], normal[i+1])
+                for i in range(0, len(normal), 3)
+            ])
+            exact = mesh.attributes.new(SOURCE_NORMAL_ATTRIBUTE, 'FLOAT_VECTOR', 'POINT')
+            exact_values = []
+            for i in range(0, len(normal), 3):
+                length = math.sqrt(sum(normal[i+j]**2 for j in range(3)))
+                assert length > 0
+                exact_values.extend(normal[i+j]/length for j in range(3))
+            exact.data.foreach_set('vector', exact_values)
         obj = bpy.data.objects.new(part['name'], mesh)
         bpy.context.collection.objects.link(obj)
         obj.parent = root
         obj['assetKey'] = identity['key']
         obj['sourcePack'] = part['sourcePack']
+        obj['sourcePartName'] = part['name']
+        obj['sourceNormalAttribute'] = SOURCE_NORMAL_ATTRIBUTE
+        obj['sourceNormalBasis'] = 'canonical x east, y up, z south; precise float source retained independently of Blender short2 shading normals'
         if part.get('sourceMetadata'):
             obj['sourceDetail'] = json.dumps(part['sourceMetadata'])
         obj['sourceUrl'] = identity['sourceUrl']
@@ -207,10 +296,10 @@ for model in selected:
             uv = mesh.uv_layers.new(name='Runtime source UV')
             for loop in mesh.loops:
                 uv.data[loop.index].uv = part['uvs'][loop.vertex_index*2:loop.vertex_index*2+2]
-        if part['colors']:
-            color = mesh.color_attributes.new(name='Authored pane variation', type='FLOAT_COLOR', domain='CORNER')
+        if part['colors'] or part['material']['name'] in vertex_colored_materials:
+            color = mesh.color_attributes.new(name=SOURCE_COLOR_ATTRIBUTE, type='FLOAT_COLOR', domain='CORNER')
             for loop in mesh.loops:
-                color.data[loop.index].color = part['colors'][loop.vertex_index*4:loop.vertex_index*4+4]
+                color.data[loop.index].color = part['colors'][loop.vertex_index*4:loop.vertex_index*4+4] if part['colors'] else (1, 1, 1, 1)
     scene = bpy.context.scene
     scene.unit_settings.system = 'METRIC'
     scene['sourceOrigin'] = json.dumps(model['origin'])
@@ -220,9 +309,11 @@ for model in selected:
     scene['runtimeUsage'] = 'Runtime generates these same parts from shared plans; archive must not be overlaid as a second building.'
     blend = BLEND / (model_id + '.blend')
     glb = OUT / (model_id + '.glb')
-    bpy.ops.wm.save_as_mainfile(filepath=str(blend))
+    bpy.ops.wm.save_as_mainfile(filepath=str(blend), compress=True)
     bpy.ops.export_scene.gltf(filepath=str(glb), export_format='GLB', export_yup=True,
-                             export_cameras=False, export_lights=False, export_extras=True)
+                             export_cameras=False, export_lights=False, export_extras=True,
+                             export_vertex_color='NAME', export_vertex_color_name=SOURCE_COLOR_ATTRIBUTE,
+                             export_all_vertex_colors=False, export_attributes=True)
     unshared_bytes = share_original_texture_bytes(glb,model)
     report.append({'id': model_id, 'identity': {k: identity[k] for k in ['key', 'kind', 'sourceType', 'sourceId', 'sourceUrl']},
                    'origin': model['origin'], 'parts': len(model['parts']), 'triangles': model['triangles'],

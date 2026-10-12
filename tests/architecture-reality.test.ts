@@ -4,6 +4,9 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { Ray } from "@babylonjs/core/Culling/ray";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import type { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { surfaceTexturePlan } from "../client/surface-pack";
 import {
   architectureEdges,
   planFacadeOpenings,
@@ -14,6 +17,65 @@ import {
 } from "../client/architecture-reality";
 import { BUILDINGS } from "../shared/world";
 import { B6_LAYOUT } from "../shared/b6-interior";
+
+test("headless architecture retains the browser texture recipe without changing fallback colours or loading images", () => {
+  const engine = new NullEngine(),
+    scene = new Scene(engine);
+  const architecture = buildArchitectureReality({ scene, buildings: [] });
+  try {
+    for (const [name, kind, strength, fallback] of [
+      ["brown timber frames", "wood", 0.1, "#5e4737"],
+      ["flat weathered roof", "roof", 0.1, "#737974"],
+      ["menza tile", "tile", 0.13, "#cfbf89"],
+      ["aged pale plaster", "plaster", 0.12, "#d9d7c9"],
+      ["board concrete", "concrete", 0.23, "#92958b"],
+    ] as const) {
+      const material = scene.materials.find(
+        (m) => m.name === `reality ${name}`,
+      ) as StandardMaterial;
+      assert.ok(material);
+      assert.equal(
+        material.metadata.authoredArchitectureTexture,
+        `/models/architecture/textures/${kind}-color.png`,
+      );
+      assert.equal(
+        material.metadata.authoredArchitectureNormal,
+        `/models/architecture/textures/${kind}-normal.png`,
+      );
+      assert.equal(
+        material.metadata.authoredArchitectureNormalStrength,
+        strength,
+      );
+      assert.deepEqual(
+        material.diffuseColor.asArray(),
+        Color3.FromHexString(fallback).asArray(),
+      );
+      assert.equal(material.diffuseTexture, null);
+      assert.equal(material.bumpTexture, null);
+      if (kind === "plaster" || kind === "concrete")
+        assert.ok(
+          surfaceTexturePlan(material.metadata),
+          "physical surface recipe remains available to override the authored fallback",
+        );
+      else assert.equal(surfaceTexturePlan(material.metadata), null);
+    }
+    for (const name of ["B4 grey facade panels", "B4 dark window frames"])
+      assert.equal(
+        scene.materials.find((m) => m.name === `reality ${name}`)!.metadata
+          ?.authoredArchitectureTexture,
+        undefined,
+      );
+    assert.equal(
+      scene.textures.length,
+      0,
+      "NullEngine does not request authored PNGs",
+    );
+  } finally {
+    architecture.dispose();
+    scene.dispose();
+    engine.dispose();
+  }
+});
 
 test("photo interpreted window pitch fits every original edge and retains outward normals", () => {
   for (const building of BUILDINGS) {
@@ -100,7 +162,10 @@ test("architecture batches remain bounded", () => {
       .every((m) => m.alpha === 1),
   );
   assert.ok(reality.metrics.windows > 1500);
-  assert.ok(reality.metrics.detailTriangles < 180000);
+  // Modeled Blender profiles replace flat strips. The existing per-building
+  // distance LOD still bounds visible geometry; this is a topology ceiling,
+  // not a claim that the full scene meets the GPU/FPS target.
+  assert.ok(reality.metrics.detailTriangles < 1400000);
   assert.ok(
     reality.metrics.farTriangles < BUILDINGS.length * 150,
     JSON.stringify(reality.metrics),

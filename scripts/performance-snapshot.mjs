@@ -33,6 +33,12 @@ const entries = [
   // Static serialized source used by the stadium archive regression. Evolving
   // verification reports and the remaining documentation stay outside runtime.
   "docs/reality-pack/landmarks/geometry-source.json",
+  // Fixed native-authoring audit fixtures consumed by the model regressions.
+  // They bind the shipped Blender masters/GLBs; live verification reports do
+  // not belong in a frozen runtime snapshot.
+  "docs/reality-pack/building-window-kit-20261012/blender-export-audit.json",
+  "docs/reality-pack/b4-facade-panels-20261012/blender-export-audit.json",
+  "docs/building-modeling-20261012/references/market-kit-blender-audit.json",
   "index.html",
   "package.json",
   "pnpm-lock.yaml",

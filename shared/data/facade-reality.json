@@ -5,6 +5,16 @@
   "runtimeAssets": "Original procedural textures and authored geometry. No Google, Mapy or ČVUT photographs redistributed as textures.",
   "sources": [
     {
+      "id": "b4-localized-facade-plan",
+      "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=Vf0vxZZEYzkbdybWxPSX4w&heading=176.9096&pitch=24.7346&fov=75",
+      "captureDate": "2024-05",
+      "visuallyReviewed": true,
+      "checkedAt": "2026-10-12",
+      "catalog": "shared/data/b4-facade-plan.json",
+      "evidence": "North panorama plus the September 2023 northwest contributor panorama and June 2024 ČVUT photographs identify three B4 faces. Catalogue preserves each source date, observations and metric-interpretation limits.",
+      "usage": "Visual reference only; source pixels are not redistributed"
+    },
+    {
       "id": "ctu-exterior",
       "url": "https://media.cvut.cz/cs/foto/20240620-exteriery-koleji-strahov",
       "captureDate": "2024-06-20",
@@ -102,18 +112,18 @@
       "osmId": "53929057",
       "block": 4,
       "type": "standard",
-      "confidence": "confirmed-numbered-photos-and-shared-long-facade-typology",
-      "sourceIds": ["ctu-exterior", "osm"],
+      "confidence": "confirmed-numbered-photos-geolocated-north-and-northwest-panoramas-and-shared-long-facade-typology",
+      "sourceIds": ["ctu-exterior", "osm", "b4-localized-facade-plan"],
       "features": [
         "White rough plaster long facades",
         "Four-pane brown frames",
         "Continuous projecting vertical pilasters",
-        "Gray board-formed concrete end piers",
+        "Gray panel cladding with regular seams and fine vertical striations; composition unknown",
         "Sparse paired small windows on entrance core",
         "Large blank end panels",
         "Blue-white projecting block number"
       ],
-      "limits": "Exact small-opening positions interpreted; no measured facade elevation."
+      "limits": "shared/data/b4-facade-plan.json identifies exactly three OSM faces: six north small-window pairs, five west-side stair bands with the rest of that north face blank, and three columns of west-return small windows. Metric centres, dimensions, panel seam rhythm and neutral colour are interpretation; no measured facade elevation. Other facades retain explicit shared typology."
     },
     {
       "osmId": "53929071",

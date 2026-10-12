@@ -1,0 +1,71 @@
+{
+  "checkedAtUtc": "2026-10-12T11:30:19.704Z",
+  "scope": "Window model authoring only; game integration and whole-game GPU acceptance belong to root",
+  "files": [
+    {
+      "path": "scripts/create-building-window-kit.py",
+      "bytes": 23548,
+      "sha256": "dcdfe0029b8ded5637b2b206258df619bb017b31ed71a520833716d86cfc4464"
+    },
+    {
+      "path": "assets/blender/building-window-kit/building-window-kit.blend",
+      "bytes": 127106,
+      "sha256": "032a887100bbcd83e52da7111aab8a47e2a48a477142b153e502aa0158a5725c"
+    },
+    {
+      "path": "assets/blender/building-window-kit/highest-geometry.json",
+      "bytes": 65908,
+      "sha256": "ac1ada9c3957976496c29dc43a9f958bf8056c50ebd4e1b4fc802262c89f2f3e"
+    },
+    {
+      "path": "public/models/building-window-kit/window-kit-profiles-highest.glb",
+      "bytes": 34764,
+      "sha256": "3325ec331fe5fa3df755c44ad78986d32393f2913df1706735799336a57d49cf"
+    },
+    {
+      "path": "public/models/building-window-kit/window-kit-profiles-near.glb",
+      "bytes": 21096,
+      "sha256": "b28fea74d74c0bafb7d471b432aab9ae148c972cbad584b9e312ab0d8f83070f"
+    },
+    {
+      "path": "shared/data/building-window-kit.json",
+      "bytes": 28215,
+      "sha256": "b5f2e1a719b7bc4cb9b3cf11d838dd06d66bcae6b9b7a767f6a72271f195d6d3"
+    },
+    {
+      "path": "tests/building-window-kit.test.ts",
+      "bytes": 9799,
+      "sha256": "2385b8a30cd4a6ba33112d1432352466368da907c9d0d39b4b497a74187950bf"
+    }
+  ],
+  "validation": {
+    "blender": "5.2.2 LTS actual native master reopen passed",
+    "gpuRender": false,
+    "cpuRender": {
+      "width": 1280,
+      "height": 960,
+      "samples": 32,
+      "threads": 2,
+      "file": "docs/reality-pack/building-window-kit-20261012/blender-cpu-profile-inspection.png"
+    },
+    "targetedTests": {
+      "command": "node node_modules/tsx/dist/cli.mjs --test tests/building-window-kit.test.ts",
+      "passed": 4,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "scopedTypeScript": {
+      "exitCode": 0
+    },
+    "distance": {
+      "maxMetres": 0.000660425669072919,
+      "limitMetres": 0.0007,
+      "pass": true
+    }
+  },
+  "budgets": {
+    "nearFourPaneTriangles": 484,
+    "highestFourPaneTriangles": 1028,
+    "firstStudyFourPaneTriangles": 4720
+  }
+}

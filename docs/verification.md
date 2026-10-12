@@ -1,5 +1,15 @@
 # Ověření dema a známá omezení
 
+## Blender budovy B1 · 12. října 2026
+
+**675/675 testů, produkční build a celá izolovaná síťová integrace PASS**, bez opakování. Společný snapshot `16b469a2685a08dce9b886bdd4828033d5c10c62b8bc338b14d61b32c7d14b65` obsahuje **8353 souborů včetně všech testů a jejich Blender audit fixtures**; navazuje na dokončenou atmosféru/outdoor `7dac0a4`, protokol 10. [Protokol a stav přejímky](verification-evidence/building-models-20261012/README.md).
+
+Skutečné Blender profily oken, fotograficky identifikované tři fasády B4 (12/5/18 otvorů) a detail kouřovodu Potravin/R-ka jsou integrované do hry. Její near geometrie má 1 326 031 trojúhelníků pro kontrolní sadu 120 budov; běžná hra vybírá blízký/vzdálený detail. **121 nejvyšších samostatných `.blend`/GLB archivů, 2 905 224 trojúhelníků, prošlo skutečným GLB auditem a opětovným otevřením všech Blender souborů.** Původní rozměry a provenience zůstaly zachované; detaily jsou interpretace fotografií, nikoli zaměření. [Modely a přesné limity](reality-pack/separate-assets/README.md), [B4 podklady](building-modeling-20261012/references/b4-facade-plan.md).
+
+Počáteční skutečná produkční kontrola s HUD: **Intel UHD 630, jeden avatar, medium, CSS i interně 1280×720, 31,8 FPS, p95 37,9 ms, p99 42,7 ms**, 10,01 s, 0 render/asset chyb. [Úplný záznam](verification-evidence/building-models-20261012/one-day-medium-full.json). Použité řízené počasí a denní náhled jsou označené jako demo. **Není to davový test, A/B důkaz optimalizace ani splnění 60 FPS na GeForce.**
+
+Uživatel výslovně požádal o commit a sjednocení `main` před dokončením další přejímky. **Detailní herní fotografie B4/oken/marketu, celá fyzická trasa a nový test 30 relací tedy pokračují po tomto checkpointu; nejsou označené jako hotové.** Stadion zůstává uzavřený exteriér, interiérový rozsah se nerozšiřuje.
+
 ## Atmosféra A · 12. října 2026
 
 **648/648 testů a produkční build PASS. Celá izolovaná integrace PASS při opakování stejného nezměněného snapshotu**; první pokus vypršel při testu A řízení auta a je zachovaný v evidenci. Snapshot `cc97bef12245d7861505791ea4ad5d56e3d667c55f81cf8e10f2a0e1927edae5` obsahuje8313 souborů včetně testů, protokol10 a předaný outdoorB. [Úplný protokol, logy, profily a omezení](verification-evidence/atmosphere-20261012/README.md).

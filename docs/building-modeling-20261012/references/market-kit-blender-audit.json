@@ -1,0 +1,123 @@
+{
+  "status": "passed",
+  "blenderVersion": "5.2.2 LTS",
+  "cpuThreads": 2,
+  "gpuRender": false,
+  "source": {
+    "id": "mapy-east-market-20230601",
+    "url": "https://mapy.com/cs/zakladni?q=Recharging%20bar&source=firm&id=13296995&pid=101883310&newest=1&yaw=4.343&x=14.3938139&y=50.0812633&ds=2&z=17&ovl=8",
+    "captureDate": "2023-06-01",
+    "visuallyReviewedAt": "2026-10-12",
+    "osmWay": "7645350",
+    "photoArchived": false,
+    "usage": "Reference only; no source pixels or mural artwork copied",
+    "visible": [
+      "round metal shaft",
+      "joint collars",
+      "raised rain cap",
+      "low protective barred enclosure"
+    ],
+    "interpretation": "All metric dimensions, collar count/spacing, exact bracket shape and grille subdivision are unmeasured authored proportions."
+  },
+  "highest": {
+    "blend": "assets/blender/market-detail-kit/market-flue-highest.blend",
+    "sha256": "00a1bb72f2008dad2ad3853e80ebd171de750c8b521915c3fd0a2a3f525b8f97",
+    "objects": 29,
+    "triangles": 8336,
+    "audit": {
+      "bounds": {
+        "min": [
+          -0.271,
+          0.0,
+          -0.275
+        ],
+        "max": [
+          0.271,
+          5.4000006,
+          0.271
+        ]
+      },
+      "degenerateTriangles": 0,
+      "normalOpposedTriangles": 0
+    }
+  },
+  "reopenedHighestObjects": 29,
+  "reopenedHighestTriangles": 8336,
+  "reopenedHighestBounds": {
+    "min": [
+      -0.271,
+      0.0,
+      -0.275
+    ],
+    "max": [
+      0.271,
+      5.4000006,
+      0.271
+    ]
+  },
+  "retainedEditableModifiers": true,
+  "highestGeometrySha256": "e360bf68a90dbb2df4727798e12dc39a24a55268bde54d105a86486bc3d9ee4c",
+  "variants": {
+    "near": {
+      "triangles": 1984,
+      "materialCount": 2,
+      "audit": {
+        "bounds": {
+          "min": [
+            -0.271,
+            0.0,
+            -0.275
+          ],
+          "max": [
+            0.271,
+            5.4000006,
+            0.271
+          ]
+        },
+        "degenerateTriangles": 0,
+        "normalOpposedTriangles": 0
+      },
+      "glb": {
+        "url": "/models/architecture/market-detail-kit/market-flue-near.glb",
+        "sha256": "1f28e9c22ab2c9ab7ef1f51ec748f3aedd1f8c8ae95953cb62223deec0bbfa27",
+        "bytes": 123812
+      }
+    },
+    "far": {
+      "triangles": 600,
+      "materialCount": 2,
+      "audit": {
+        "bounds": {
+          "min": [
+            -0.271,
+            0.0,
+            -0.275
+          ],
+          "max": [
+            0.271,
+            5.4000006,
+            0.271
+          ]
+        },
+        "degenerateTriangles": 0,
+        "normalOpposedTriangles": 0
+      },
+      "glb": {
+        "url": "/models/architecture/market-detail-kit/market-flue-far.glb",
+        "sha256": "89674cd51dd340ddfd9805257ddb739d8716e0e170c5e2ce0bc3ff4f6ee6b9ff",
+        "bytes": 52352
+      }
+    }
+  },
+  "dataSha256": "a1a26b7d18188c1c4e6a4509e7a099edea66a77987a2b8b503ab5638cd051950",
+  "checks": [
+    "highest source saved before LOD authorship",
+    "actual native .blend reopened",
+    "evaluated triangle counts and bounds match after reopen",
+    "split normals and triangle winding",
+    "no degenerate triangles",
+    "entire envelope remains inside original facade footprint",
+    "near and far share exact origin and highest point",
+    "no image textures or external media dependencies"
+  ]
+}

@@ -1,0 +1,38 @@
+✔ B4 panel geometry is bound to the exact three-face source plan (1.6344ms)
+✔ both Blender LODs leave every authoritative opening clear instead of overlaying opaque walls (1664.5376ms)
+✔ B4 surfaces retain valid real depth, exact projected coverage and geometric normals (128.0533ms)
+✔ B4 Blender master was actually reopened and all delivered geometry matches its audit (42.3695ms)
+✖ B4 portable GLBs contain the same authored near/highest wall triangles as the runtime contract (92.3955ms)
+✔ Blender kit retains valid evaluated faces, metric UVs and finite unit normals (2.8257ms)
+✔ actual exported corner weights preserve millimetre profiles across real opening sizes (3.1858ms)
+✔ portable GLB contains the same Blender triangles as runtime JSON, not replacement shapes (10.6608ms)
+✔ highest editable master and all delivered evaluated exports match reopened audit (3.5438ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2400.7817
+
+✖ failing tests:
+
+test at tests\b4-facade-panels.test.ts:305:1
+✖ B4 portable GLBs contain the same authored near/highest wall triangles as the runtime contract (92.3955ms)
+  AssertionError [ERR_ASSERTION]: near north-tower unmatched exported normal/UV at vertex 4197
+      at assertPortableAttributes (C:\Users\rezac\.codex\worktrees\visual-quality-jump\StrahovCrazyShow\tests\b4-facade-panels.test.ts:293:12)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\visual-quality-jump\StrahovCrazyShow\tests\b4-facade-panels.test.ts:331:7)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
