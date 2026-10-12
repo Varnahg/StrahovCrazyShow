@@ -18,3 +18,10 @@
 Coordinator buildings-01a12b28-root accepted the narrow code-only handoffs for building-reference-models, building-window-authoring and building-archive-export in codex/building-models. Their status done does not mean that B4 or full building archives have been generated or passed GPU QA. Pipeline integration still awaits the B4 artifact and final targeted checks.
 
 Added blocked follow-up tasks building-b4-export, building-archive-validation and building-production-verification, with explicit resource and file scopes. These are blocked until weather/outdoor DONE and their documented input conditions. No Blender/build/GPU process started during catalog work. Catalog validation passed. Existing weather/outdoor metadata and primary runtime WIP were preserved. Archive code evidence including tests is identified by manifest SHA 91e015952ee864564e21a8f7c7d2c2eedd69a921261cdaaf81a9510ef6734337. Transfer tasks and canonical source plans remain in their original owners' handoffs. The maintenance reservation is released after this update.
+
+
+## Security source remediation — 2026-10-12
+
+Coordinator security-20261012-root reserved the catalog in a clean isolated worktree based on fbe6ed3. Added disjoint secret-source-remediation and source-secret-guard tasks for the user-requested alerts. Existing untracked building tasks in main were not adopted or edited. Administrative reservation remains held until task outcomes are integrated.
+
+Both security tasks accepted after source review, 7/7 Node and tsx regressions, zero candidates in 2,030 text files, validated provenance hashes, and remote verification of main/closed alerts. Task statuses set to done. No own long-lived processes; administrative reservation released after publication. Shared verification evidence remains in the two handoffs because building-production-verification owns docs/verification.md.
