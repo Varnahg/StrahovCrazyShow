@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "weather-wip-handoff",
+  "title": "Převzít potvrzený handoff počasí a dokončit jeho samostatné moduly",
+  "status": "blocked",
+  "dependsOn": [],
+  "writePaths": [
+    "client/art-lighting.ts",
+    "client/atmosphere-light.ts",
+    "client/atmosphere-sky.ts",
+    "client/cinematic.ts",
+    "client/data/bright-stars.json",
+    "client/lighting-preview.ts",
+    "client/sky-weather.ts",
+    "client/weather-particles.ts",
+    "server/weather.ts",
+    "shared/astronomy.ts",
+    "shared/weather.ts",
+    "tests/atmosphere-light.test.ts",
+    "tests/atmosphere-sky.test.ts",
+    "tests/cinematic-atmosphere.test.ts",
+    "tests/lighting-preview.test.ts",
+    "tests/night-lighting.test.ts",
+    "tests/weather-provider.test.ts",
+    "tests/weather.test.ts",
+    "docs/weather/README.md",
+    "docs/weather/sources.json",
+    "docs/weather/atmosphere-sources.md",
+    "docs/weather/provider-sources.md",
+    "docs/weather/shadow-sources.md",
+    "docs/agents/handoffs/weather-wip-handoff.md",
+    "docs/verification-evidence/agents/weather-wip-handoff/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Blokuje neznámý vlastník existujících dirty/untracked změn. Nejprve identifikuj práci a jejího vlastníka, získej skutečné předání se seznamem změn a stabilním hashem; stáří rezervace, absence zprávy ani tento task nedovolují převzetí.",
+    "Teprve po potvrzeném předání ověř diff, očekávané chování a primární zdroje s datem; dokonči zbývající chyby v přidělených modulech a jejich testech. Pokud předání neexistuje, úkol zůstává blocked.",
+    "Stanice, model, zastaralá a nedostupná data mají odlišný význam; meteorologický vítr je ODKUD a astronomie používá skutečný UTC čas a souřadnice Strahova. Výtvarné intenzity ani modelovaná oblačnost se nevydávají za místní měření.",
+    "Prověř časové jednotky, srážkové fáze, fallback a chyby provideru, noční světlo, stínové zdroje i disposal shaderů/textur/observerů; po funkčním updatu refaktoruj opakovanou logiku jen v přidělených modulech.",
+    "Handoff zahrne zdroje, celé změny včetně nových testů a přesné návrhy integrace do game/ui/world-renderer. Tyto společné entrypointy nepřebírá a GPU přejímku nepředstírá."
+  ],
+  "verification": [
+    "Po předání: pnpm exec tsx --test tests/weather.test.ts tests/weather-provider.test.ts tests/atmosphere-light.test.ts tests/atmosphere-sky.test.ts tests/cinematic-atmosphere.test.ts tests/lighting-preview.test.ts tests/night-lighting.test.ts",
+    "Zkontroluj datum/provenienci provider-sources.md, atmosphere-sources.md a shadow-sources.md vůči skutečně použitým algoritmům; statická regrese nenahrazuje den/noc ve hře.",
+    "git diff --check; praktické denní/noční světlo, vítr, srážky, vstupy a finální pipeline předat integration-checkpoint."
+  ],
+  "notes": [
+    "Historický plánovací task nahrazen konkrétním potvrzeným vlastníkem v weather-integration-20261012. Tento task ponechat blocked a nespouštět duplicitní práci.",
+    "Seznam cest zachycuje pozorovaný WIP 12. 10. 2026, není tvrzením o jeho autorovi ani dokončenosti. Před ready jej znovu porovnej s aktuální prací.",
+    "client/game.ts, client/ui.tsx, client/i18n-messages.ts a client/world-renderer.ts jsou společné vstupy pro integrátora. Změny minimapy a venkovních objektů nepatří tomuto úkolu.",
+    "Případné nové podklady nebo chybějící dokumenty musí být výslovně přidané do scope a rezervace. Historické výsledky se nepřepisují novými tvrzeními."
+  ]
+}

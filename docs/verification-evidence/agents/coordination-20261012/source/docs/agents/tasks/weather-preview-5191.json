@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/atmosphere-vite.config.mjs",
+    "docs/agents/handoffs/weather-preview-5191.md"
+  ],
+  "resources": ["port:5191"],
+  "acceptance": [
+    "Zapiš existující vlastní proces: skutečný PID, příkaz, cwd a start; drž rezervaci po celou dobu běhu.",
+    "Před přechodem do integrační rezervace server ukonči a uvolni tento task, poté jej případně znovu spusť pod novým vlastníkem zdroje."
+  ],
+  "verification": [
+    "Read-only kontrola procesu a naslouchajícího portu 5191; žádná další GPU scéna."
+  ],
+  "notes": [
+    "Existující Vite5191 předal jeho původní vlastník weather chat 01a12fcb-4233-70c0-bc2d-95fc261f870c; zamýšlený owner weather-01a12fcb-root.",
+    "Tento task nedává rezervaci GPU. Atmosférický 3D tab vlastník před registrací zavřel; případné nové renderování potřebuje rezervaci gpu i heavy-validation."
+  ],
+  "id": "weather-preview-5191",
+  "title": "Evidovat již běžící vývojový server počasí na 5191"
+}

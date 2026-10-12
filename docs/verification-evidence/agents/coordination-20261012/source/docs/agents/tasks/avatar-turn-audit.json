@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "avatar-turn-audit",
+  "title": "Zmapovat zbývající švih nohy při sprintovém obratu o 180°",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/avatar-turn-audit.md",
+    "docs/verification-evidence/agents/avatar-turn-audit/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Porovnej současný client/animation.ts a tests/helpers/ground-turn-fixture.ts s docs/characters/locomotion-study/ground-turn-20261012.md a medium-plant-compensation-20261012.md; zaznamenej datum a hashe čtených vstupů.",
+    "Odděl doloženou opravu podpírající nohy od otevřeného přesměrování nepodpírajícího švihu. Prověř, že regrese odlišuje skutečný čas mezi pózami od času vykresleného snímku.",
+    "Předání určí konkrétní reprodukční klip, mezery současných testů a nejmenší změnu pouze v animátoru; neoznačí statický audit nebo NullEngine za vizuální či GPU přejímku.",
+    "Do vlastního handoffu zapiš, zda navazující avatar-sprint-fix odpovídá nalezené příčině a zda jeho writePaths stačí. Runtime, existující testy a cizí WIP se v auditu neupravují."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/ground-turn-animation.test.ts tests/medium-plant-compensation.test.ts",
+    "Porovnej git status před/po a ověř, že vznikly pouze vlastní handoff a evidence; u vstupů změněných během auditu výsledek výslovně omez.",
+    "GPU/produkční kontrolu sprintu pouze navrhni do handoffu; tento audit nespouští další browserovou scénu, build ani plnou pipeline."
+  ],
+  "notes": [
+    "Zdroj zadání: README.md a docs/verification.md, D2 z 12. 10. 2026 označují prudký sprintový švih za otevřený limit.",
+    "Status ready znamená připravené zadání, nikoli rezervaci, spuštění nebo potvrzený výsledek.",
+    "client/game.ts a shared/simulation.ts mají při přípravě katalogu cizí změny neznámého vlastníka; audit je smí číst, nesmí je převzít."
+  ]
+}

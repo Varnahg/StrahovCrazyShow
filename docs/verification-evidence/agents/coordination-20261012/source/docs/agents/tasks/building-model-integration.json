@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "building-model-integration",
+  "title": "Připravit napojení samostatných okenních modelů na architekturu ve větvi budov",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/architecture-reality.ts",
+    "client/building-window-model.ts",
+    "tests/building-window-model.test.ts",
+    "tests/b4-facade-rendering.test.ts",
+    "tests/architecture-reality.test.ts",
+    "tests/architecture-depth.test.ts",
+    "docs/reality-pack/building-window-integration-20261012.md",
+    "docs/verification-evidence/building-window-integration-20261012/",
+    "docs/agents/handoffs/building-model-integration.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Integruj v přidělených modulech potvrzený datový kontrakt oken a architektury. Zachovej původní podklady, identitu budov, metry, orientaci a společné rozměry s fyzikou; nevytvářej druhou překrývající se slupku.",
+    "Doplň relevantní CPU regrese hloubky, resize a uvolňování prostředků. Po funkční změně sjednoť opakované skládání geometrií, zkontroluj cache, alokace a životnost sdílených materiálů.",
+    "Handoff uvede přesné hashe použitých dat od building-window-authoring/building-reference-models, diff, testy a otevřené vizuální otázky. Když se souběžně mění vstupní data, opakuj cílené kontroly po jejich předání; nepřepisuj jejich vlastníky."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/building-window-model.test.ts tests/b4-facade-rendering.test.ts tests/architecture-reality.test.ts tests/architecture-depth.test.ts",
+    "git diff --check; čti skutečnou geometrii a životní cyklus Babylon prostředků. NullEngine slouží pouze CPU kontraktům, nikoli vizuálnímu nebo výkonovému PASS.",
+    "Produkční GPU, full suite, build a integrace následují až po outdoor/weather freeze pod samostatnou rezervací zdrojů. Tento task nespouští preview ani nemění main."
+  ],
+  "notes": [
+    "Potvrzený původní vlastník WIP a jeho podagentů: chat01a12b28-f5be-74b0-868c-6c1b0d667685; předání koordinátorovi 12. 10. 2026. Živý vlastník práce se rezervuje pod svým skutečným ID bez domnělého PID.",
+    "Pouze C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow, codex/building-models. --adopt-dirty pouze potvrzenému původnímu autorovi pro jeho vlastní přidělené změny v této worktree.",
+    "Ready je omezené na disjunktní kód a lehké CPU testy; konečné přijetí závisí na stabilních datech obou autorských tasků a následné vlastní QA. Sdílené entrypointy game/world-renderer/simulation nejsou součástí rozsahu."
+  ]
+}

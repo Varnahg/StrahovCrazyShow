@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "building-reference-models",
+  "title": "Dokončit podklady a kód detailů marketu a plánu fasády B4",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/building-modeling-20261012/references/",
+    "scripts/create-market-detail-kit.py",
+    "assets/blender/market-detail-kit/",
+    "public/models/architecture/market-detail-kit/",
+    "shared/data/market-detail-kit.json",
+    "tests/market-detail-kit.test.ts",
+    "shared/b4-facade-plan.ts",
+    "shared/data/b4-facade-plan.json",
+    "shared/data/facade-reality.json",
+    "assets/blender/b4-facade/",
+    "scripts/export-b4-facade-plan.ts",
+    "tests/b4-facade-plan.test.ts",
+    "docs/agents/handoffs/building-reference-models.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Dolož identitu budovy, datum a provenienci každé použité fotografie/mapy. Rozliš zaměření, interpretaci fotografie a herní odhad; původní zdroje a licenční údaje zachovej.",
+    "Dokonči kód generátoru detailů marketu a společný plán B4 bez náhodných otvorů či detailů. Zachovej metry, orientaci a společnou geometrii pro navazující runtime a export.",
+    "Po funkční úpravě sjednoť opakované plánování a výpočty, prověř cache/životní cyklus; předej soubory, hashe, relevantní testy a neověřené exporty v handoffu."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/market-detail-kit.test.ts tests/b4-facade-plan.test.ts",
+    "git diff --check; porovnej doložené podklady se současným datovým plánem a zaznamenej odhady bez regenerace modelů.",
+    "Nový Blender export, plná pipeline a praktická GPU kontrola vyžadují navazující resources rezervaci po outdoor/weather freeze; lehký CPU test není důkazem nového exportu."
+  ],
+  "notes": [
+    "shared/data/facade-reality.json má jediného zapisujícího vlastníka v rámci tohoto tasku; povolené jsou pouze doložené B4 údaje. Ostatní bloky se nemění a další agent nesmí souběžně zapisovat jinou část stejného souboru.",
+    "Potvrzený původní vlastník WIP a podagentů je chat01a12b28-f5be-74b0-868c-6c1b0d667685, předání 12. 10. 2026; skutečného zapisujícího agenta a rezervaci eviduj v CLI, PID nevymýšlej.",
+    "Pouze worktree C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow, větev codex/building-models. --adopt-dirty je omezené na potvrzeného původního autora jeho vlastních změn v této worktree.",
+    "Tato fáze dovoluje kód, podklady a lehké cílené CPU testy. Assetové cesty jsou rezervovaný rozsah existující práce, nikoli povolení spustit Blender/export. Main se mění až po outdoor/weather freeze a vlastní QA."
+  ]
+}

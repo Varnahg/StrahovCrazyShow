@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "host-network-audit",
+  "title": "Zmapovat hranici hosta a kontrakt jediného společného světa",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/host-network-audit.md",
+    "docs/verification-evidence/agents/host-network-audit/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přečti server/index.ts, server/session-lifecycle.ts, client/room-callbacks.ts, relevantní části client/ui.tsx, shared/netcode.ts a shared/motion-codec.ts. Sepiš mapu HTTP/SDK/UI hranic bez změny těchto souborů.",
+    "Přiřaď ke každé hranici existující důkaz: host nemá přítomnost/chat ani veřejným HTTP, pozdní callback nebo join jej nevrátí do multiplayeru, klienti jsou v jediném světě a verze protokolu klienta/serveru souhlasí.",
+    "Porovnej komponentové regrese s scripts/integration.ts, scripts/integration-network.ts a scripts/test-integration.mjs; popiš rozdíl mezi simulovanými settery a skutečným browserovým lifecycle.",
+    "Handoff navrhne cílené chybějící scénáře a soubory případné opravy. Absence reprodukce není důkaz bezchybného internetového provozu, neomezené kapacity nebo nové GPU přejímky."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/room-callbacks.test.ts tests/motion-codec.test.ts tests/community-lifecycle.test.ts",
+    "Read-only kontrola scripts/integration.ts: guest POST vrací 403, /api/health nemá online/worldId a soukromé endpointy vrací 403; ověř odpovídající obsluhu v server/index.ts.",
+    "Skutečné SDK/HTTP a browserové scénáře předej integration-checkpoint. Tento audit nespouští server, zátěž, port 2568 ani produkční GPU."
+  ],
+  "notes": [
+    "Zdroj zadání: AGENTS.md, README.md a B5/D2 sekce docs/verification.md; historické PASS není automatickým potvrzením nových změn.",
+    "client/ui.tsx a client/game.ts jsou při přípravě katalogu dirty s neznámým vlastníkem. Číst lze, editaci audit neopravňuje.",
+    "Pokud se čtené soubory během auditu změní, uveď oba hashe a vyžádej opakování příslušného scénáře na stabilním checkpointu."
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "grass-cold-fix",
+  "title": "Rozložit studenou přípravu trávy do omezených pracovních dávek",
+  "status": "blocked",
+  "dependsOn": ["grass-cold-audit"],
+  "writePaths": [
+    "client/photographic-grass.ts",
+    "client/photo-grass-placement.ts",
+    "tests/photo-grass.test.ts",
+    "docs/agents/handoffs/grass-cold-fix.md",
+    "docs/verification-evidence/agents/grass-cold-fix/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Blokuje dokončený grass-cold-audit s reprodukcí a plánem měření; před rezervací ověř, že úzké runtime soubory zůstávají čisté a nejsou přidělené jinému procesu.",
+    "Podle auditované synchronní cesty navrhni a implementuj omezené množství studené práce na update se zřetelným dokončením. Neodkládej skrytě stejnou neomezenou práci do první následující interakce. Jde o výkonový kandidát do integračního měření, nikoli o prokázanou optimalizaci.",
+    "Zachovej deterministické kořeny, metry, zdrojové mapy/asset, terénní a silniční výluky, omezenou cache a původní stropy trojúhelníků. Ověř přesun kamery, medium→high→low a uvolnění scény během rozpracované přípravy.",
+    "Doplň smysluplné regrese výsledného umístění a životního cyklu; nespoléhej pouze na křehký limit času CI. Po funkční změně sjednoť opakované části výběru a odstraň zbytečné alokace nebo cache bez vlastníka.",
+    "Handoff obsahuje reprodukovatelný driver, hashe baseline/kandidáta a očekávané metriky cold/warm. Definitivní porovnatelné profilování a herní přejímku provede integration-checkpoint; do té doby je výkonový přínos nepotvrzený."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/photo-grass.test.ts",
+    "Regrese ověří konečný deterministický výsledek po vyčerpání dávek, zrušení zastaralé práce při změně kvality a úklid front/cache při dispose.",
+    "git diff --check; integration-checkpoint musí před přijetím porovnat skutečné cold/warm CPU profily a celé produkční snímky se stejným okolím, kamerou a nastavením."
+  ],
+  "notes": [
+    "Příčina a nejmenší přístup mohou být auditem upraveny. Pokud je nutná změna batch/resources/budget nebo sdílené vegetace, nejprve rozšiř task a rezervaci; tyto moduly nejsou automaticky přidělené.",
+    "CPU implementace může být paralelní s avatar-sprint-fix. Úkol nespouští GPU, Blender, build ani zátěž bez samostatné koordinované rezervace.",
+    "Historických 265/181 ms a nižší draw count nejsou novými výsledky ani důkazem dosažených 60 FPS."
+  ]
+}

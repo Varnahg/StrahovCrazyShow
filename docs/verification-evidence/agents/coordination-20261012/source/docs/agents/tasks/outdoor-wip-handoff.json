@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "outdoor-wip-handoff",
+  "title": "Převzít potvrzený handoff venkovních objektů a jejich společné geometrie",
+  "status": "blocked",
+  "dependsOn": [],
+  "writePaths": [
+    "client/outdoor-artifacts.ts",
+    "client/map-artifacts.tsx",
+    "shared/data/outdoor-artifacts.json",
+    "shared/outdoor-artifacts.ts",
+    "shared/outdoor-landmarks.ts",
+    "shared/outdoor-world.ts",
+    "scripts/fetch-outdoor-artifacts.mjs",
+    "tests/outdoor-artifacts.test.ts",
+    "tests/outdoor-artifacts-renderer.test.ts",
+    "tests/outdoor-landmarks.test.ts",
+    "tests/outdoor-world.test.ts",
+    "docs/reality-pack/outdoor-artifacts/",
+    "docs/verification/outdoor-artifacts.html",
+    "docs/verification/outdoor-artifacts.tsx",
+    "docs/agents/handoffs/outdoor-wip-handoff.md",
+    "docs/verification-evidence/agents/outdoor-wip-handoff/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Blokuje neznámý vlastník existujících dirty/untracked souborů a nedokončená dohoda o sdílených entrypointech. Nejprve zachyť vlastníka, skutečné předání, zdrojové hashe a přesný rozsah; bez toho nepřebírej ani nepřepisuj WIP.",
+    "Po předání zkontroluj primární OSM/fotografické zdroje, datum a provenienci každého druhu objektu. Odděl mapový bod, interpretaci snímku a herní rozměrový odhad; nepřidávej náhodné překážky nebo vegetaci do komunikací.",
+    "Dokonči sdílený plán poloh/rozměrů pro renderer a fyziku v přidělených modulech; svět zůstává v metrech, +X východ a +Z jih. Každá odchylka mezi vizuálním a kolizním záměrem má explicitní test a zdůvodnění.",
+    "Po změnách sjednoť skládání plánů a jejich cache, odstraň zbytečné alokace, prověř vlastnictví Babylon/Rapier prostředků a uvolnění scény; nepřesouvej GPU materiály do globální datové cache.",
+    "Předej testy, podklady a přesný diff očekávaný ve shared/simulation.ts, client/world-renderer.ts a minimapě integrátorovi. Samostatný náhled nebo geometrický inventář neznamená dokončený průchod celou hrou."
+  ],
+  "verification": [
+    "Po předání: pnpm exec tsx --test tests/outdoor-artifacts.test.ts tests/outdoor-artifacts-renderer.test.ts tests/outdoor-landmarks.test.ts tests/outdoor-world.test.ts",
+    "Ověř rozměry a rotace skutečných Rapier colliderů proti společnému plánu; test outdoor-world čte rozpracovanou shared/simulation.ts, proto zaznamenej její hash a výsledek nepřenášej na jiný checkpoint.",
+    "git diff --check; průchod cestami, vstupy, schody, styky povrchů, kamerou a projekci mapových popisků předat integration-checkpoint."
+  ],
+  "notes": [
+    "Historický plánovací task nahrazen konkrétním potvrzeným vlastníkem v outdoor-artifacts-verification. Tento task ponechat blocked a nespouštět duplicitní práci.",
+    "Seznam byl odvozen z git status a čtení zdrojů 12. 10. 2026; není důkazem vlastníka nebo schváleného vzhledu.",
+    "shared/simulation.ts, client/world-renderer.ts, client/minimap.tsx a client/minimap.css se při tomto úkolu nemění. Jejich spojení s ostatním WIP patří jedinému integrátorovi.",
+    "Nespouštěj fetch skript jen kvůli auditu: přegenerování zdrojových dat je samostatná změna, musí zachovat původní podklady a mít ověřitelný rozdíl."
+  ]
+}

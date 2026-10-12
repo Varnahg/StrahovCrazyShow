@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "grass-cold-audit",
+  "title": "Zmapovat synchronní studenou přípravu fotografické trávy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/grass-cold-audit.md",
+    "docs/verification-evidence/agents/grass-cold-audit/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přečti současné client/photographic-grass.ts, client/photo-grass-placement.ts a související budget/batch/resources moduly; spoj jednotlivé synchronní kroky s doloženou CPU studií v docs/vegetation/grass-realism-study/README.md.",
+    "Rozliš studený medium výběr, přechod na high, zahřátý výběr, cache missy, upload a GPU vykreslení. Hodnoty přibližně 265/181 ms cituj jako historické měření, nikoli jako nový profil aktuálního WIP.",
+    "Prověř testové pokrytí determinismu, terénních a silničních výluk, bounded cache, viditelnosti, změn kvality a dispose. Do handoffu navrhni omezený frontový nebo inkrementální postup a způsob srovnatelného měření.",
+    "Runtime ani existující testy se nemění; nový závěr má vlastní evidence soubory s hashi vstupů a odlišením známých faktů od hypotéz."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/photo-grass.test.ts",
+    "Zkontroluj v kódu limit 256 dlaždic a vazbu geometrie na shared klasifikaci, současné limity trojúhelníků a vlastnictví prostředků; nezaměň počet drawů za FPS.",
+    "Připrav reprodukční plán pro cold/warm medium/high a profiler; měření výkonu, GPU, build a zátěž patří navazujícímu koordinovanému checkpointu."
+  ],
+  "notes": [
+    "Zdroj zadání: docs/verification.md, README.md a závěrečná část docs/vegetation/grass-realism-study/README.md.",
+    "Cache experimenty zmíněné v historické dokumentaci se nesmějí automaticky převzít z .cache nebo cizího worktree.",
+    "Ready audit má pouze vlastní zápisové cesty a může běžet souběžně s ostatními lehkými audity."
+  ]
+}

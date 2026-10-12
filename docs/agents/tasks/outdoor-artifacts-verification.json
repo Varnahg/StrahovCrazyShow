@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "id": "outdoor-artifacts-verification",
+  "title": "Dokončit již běžící ověření stabilního mobiliáře původního vlastníka",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/outdoor-artifacts.ts",
+    "shared/outdoor-landmarks.ts",
+    "shared/outdoor-world.ts",
+    "shared/data/outdoor-artifacts.json",
+    "shared/simulation.ts",
+    "client/outdoor-artifacts.ts",
+    "client/map-artifacts.tsx",
+    "client/minimap.tsx",
+    "client/minimap.css",
+    "client/game.ts",
+    "client/world-renderer.ts",
+    "scripts/fetch-outdoor-artifacts.mjs",
+    "tests/outdoor-artifacts.test.ts",
+    "tests/outdoor-artifacts-renderer.test.ts",
+    "tests/outdoor-landmarks.test.ts",
+    "tests/outdoor-world.test.ts",
+    "tests/map-artifacts.test.ts",
+    "docs/reality-pack/outdoor-artifacts/",
+    "docs/verification/outdoor-artifacts.html",
+    "docs/verification/outdoor-artifacts.tsx",
+    "docs/verification-evidence/outdoor-artifacts-20261012/",
+    "docs/verification.md",
+    "docs/agents/handoffs/outdoor-artifacts-verification.md",
+    ".cache/performance-snapshot/outdoor-artifacts-20261012-a/",
+    "shared/netcode.ts",
+    "tests/netcode.test.ts",
+    ".cache/performance-snapshot/outdoor-artifacts-20261012-b/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "port:2568",
+    "port:2567",
+    "port:5173",
+    "port:5175"
+  ],
+  "acceptance": [
+    "Původní vlastník outdoor-01a12fcf zaznamená již stabilní implementaci, její snapshot a již spuštěné ověření; --adopt-dirty smí pouze na doložené vlastní/předané změny.",
+    "Počasí potvrdilo čekání na dokončení tohoto checkpointu; po začátku rezervace neprováděj další úpravy společných runtime souborů bez nové dohody.",
+    "Dokonči plnou pipeline a krátkou praktickou GPU přejímku bez konkurenčního Blenderu či jiné 3D scény; celkové výkonové tvrzení vyžaduje odpovídající měření.",
+    "Zachovej evidence vegetačního auditu v docs/verification.md; přidej pouze vlastní výsledky a odkaz na ověření koordinátoru.",
+    "Před release předej soubory a výsledky weather vlastníkovi, ukonči vlastní pomocné procesy a uvolni heavy/GPU slot. Cizí výchozí dev servery neukončuj."
+  ],
+  "verification": [
+    "pnpm test, pnpm build a pnpm test:integration ve vlastním zmrazeném checkpointu; uchovat manifest včetně tests a původní logy.",
+    "Skutečný průchod objekty a společnou kolizí, mapové popisky ze stejné kamery, žádný portový kill cizího procesu.",
+    "docs/verification-evidence/agents/coordination-20261012/README.md obsahuje samostatné výsledky CLI; doplň odkaz do docs/verification.md po převzetí souboru."
+  ],
+  "notes": [
+    "Původní autorství a stabilní runtime potvrzeny technickou zprávou z relace01a12fcf-0296-73c2-8d5e-a54d30c193f2 dne12.10.2026. User autorizace koordinace ověřena v původní weather relaci.",
+    "pnpm test snapshotu začal před načtením nového AGENTS; bootstrap registruje probíhající autorizovanou práci, neznamená dodatečné převzetí cizích procesů.",
+    "Vlastník vegetačního auditu již předal final answer a relace byla notLoaded při read-only kontrole; jeho existující sekce se zachovává.",
+    "Porty2567/5173 zahrnují koordinaci přístupu k existujícímu dev preview, nikoli oprávnění restartovat/ukončit jeho cizí proces. Build je pouze v přesně rezervovaném snapshotu; hlavní dist není writePath.",
+    "Nahrazuje plánovací outdoor-wip-handoff; nevyžaduje sprint/grass tasky.",
+    "Konečný stav ověřen podle aktivního registru: původní owner řádně provedl release/reclaim rozšíření o shared/netcode.ts, tests/netcode.test.ts a snapshot-b. Protokol10 a Bfreeze již vytvořil; původní A zachovává. Scope do dokončení B neměnit."
+  ]
+}

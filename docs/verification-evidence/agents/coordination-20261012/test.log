@@ -1,0 +1,28 @@
+✓ Lockfile passes supply-chain policies (verified 22h ago)
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 7.6s using pnpm v11.25.0
+✔ validates planned overlaps and reports clean, unreserved tasks (9287.9602ms)
+✔ claim records source and owner, gates heartbeat/release, and preserves edits (10553.5334ms)
+✔ independent simultaneous CLI processes have exactly one conflicting winner (3330.2254ms)
+✔ path claims compare case-insensitive ancestors but allow neighboring filenames (4949.3623ms)
+✔ exclusive resources serialize disjoint file scopes and resource-only tasks (7172.9243ms)
+✔ port resource aliases and out-of-range ports cannot bypass exclusivity (9125.1799ms)
+✔ dirty staged, unstaged and untracked paths require explicit adoption (4874.4081ms)
+✔ a staged rename blocks both the source and destination scopes (3679.0953ms)
+✔ status and dependencies gate claims, with cycles and unknown ids rejected (8239.1778ms)
+✔ unsafe paths and malformed task structure fail validation (19828.5805ms)
+✔ stale heartbeat remains reserved until the actual owner releases (6841.9326ms)
+✔ corrupt registry and abandoned mutex fail closed without deleting evidence (6518.3462ms)
+✔ linked Git worktrees use one registry and retain original claim scope (11889.7946ms)
+✔ an owner can release even if catalog edits are invalid, without claiming completion (3082.4524ms)
+✔ argument mistakes cannot mutate the registry (1691.4553ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 112360.5761

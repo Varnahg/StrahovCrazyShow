@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "task-id",
+  "title": "Nahraď konkrétním výsledkem úkolu",
+  "status": "blocked",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/task-id.md",
+    "docs/verification-evidence/agents/task-id/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Doplň pozorovatelné očekávané chování, relevantní zdroje a konkrétní kritéria přijetí.",
+    "Doplň přesné implementační soubory a jejich regresní testy do writePaths; adresář musí mít koncové /, globy nejsou povolené.",
+    "Po funkční změně proveď cílený refaktoring, kontrolu cache, alokací a uvolňování prostředků; zachovej podklady a ověřené chování.",
+    "Předej vlastní handoff se seznamem souborů, zdrojovým hashem, výsledky skutečně provedených kontrol a zbývajícími limity."
+  ],
+  "verification": [
+    "Doplň skutečný cílený příkaz a praktickou kontrolu; odděl plán od provedeného výsledku.",
+    "Plnou sadu, build a izolovanou integraci plánuj nad stabilním checkpointem s potřebnými rezervacemi; snapshot zahrnuje testy."
+  ],
+  "notes": [
+    "Toto je šablona, nikoli připravený nebo spuštěný úkol. Zkopíruj ji do docs/agents/tasks/<id>.json a nahraď task-id všude, včetně handoffu a evidence.",
+    "Před ready ověř git status, aktivní rezervace, závislosti a vlastníka existujících změn; dirty soubory neznámého původu nejsou volné.",
+    "Resources deklaruj podle skutečné práce: heavy-validation pro GPU, Blender, profilování/zátěž a plnou pipeline; gpu pro GPU; workspace-build pro zápis dist; port:2568 pro izolovanou integraci; integration pro společné integrační entrypointy.",
+    "Rezervace je koordinační dohoda. Neprokazuje oprávnění k cizím změnám a neukončuje cizí procesy."
+  ]
+}

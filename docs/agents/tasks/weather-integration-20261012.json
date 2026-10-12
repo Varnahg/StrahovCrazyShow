@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "dependsOn": [
+    "atmosphere-cloud-refinement",
+    "outdoor-artifacts-verification"
+  ],
+  "writePaths": [
+    "client/art-lighting.ts",
+    "client/atmosphere-light.ts",
+    "client/cinematic.ts",
+    "client/sky-weather.ts",
+    "client/weather-particles.ts",
+    "client/camera-look.ts",
+    "client/lighting-preview.ts",
+    "client/weather-freshness.ts",
+    "client/data/bright-stars.json",
+    "client/game.ts",
+    "client/ui.tsx",
+    "client/hud-status.tsx",
+    "client/i18n-messages.ts",
+    "client/world-renderer.ts",
+    "server/weather.ts",
+    "shared/weather.ts",
+    "shared/astronomy.ts",
+    "tests/weather.test.ts",
+    "tests/weather-provider.test.ts",
+    "tests/weather-freshness.test.ts",
+    "tests/atmosphere-light.test.ts",
+    "tests/cinematic-atmosphere.test.ts",
+    "tests/lighting-preview.test.ts",
+    "tests/camera-look.test.ts",
+    "tests/night-lighting.test.ts",
+    "tests/stability.test.ts",
+    "tests/graphics.test.ts",
+    "docs/weather/README.md",
+    "docs/weather/sources.json",
+    "docs/weather/provider-sources.md",
+    "docs/weather/shadow-sources.md",
+    "docs/weather/atmosphere-lighting.md",
+    "docs/weather/atmosphere-preview.html",
+    "docs/weather/atmosphere-preview.ts",
+    "docs/weather/atmosphere-evidence/",
+    "docs/verification.md",
+    "docs/verification-evidence/atmosphere-20261012/",
+    "docs/agents/handoffs/weather-integration-20261012.md",
+    ".cache/atmosphere-vite.config.mjs",
+    ".cache/performance-snapshot/atmosphere-20261012-a/",
+    "dist/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:5191",
+    "port:4191",
+    "port:2586"
+  ],
+  "acceptance": [
+    "Před ready dolož předání společných game/ui/world-renderer a stability souborů od původního outdoor vlastníka; docs/verification.md také upravuje vegetační audit a musí mít jediného aktuálního zapisovatele.",
+    "Po dokončení refinement koordinátor přidá jeho tři soubory do tohoto writePaths. Zastav preview-5191 a uvolni jeho rezervaci před integračním claim.",
+    "Integruj pouze původní weather změny; zachovej outdoor diff, společné rozměry, izolaci hosta i označení modelovaných/simulovaných dat.",
+    "Dokonči refaktoring cache, alokací a lifecycle a ověř skutečnou produkční denní/noční oblohu, Měsíc, hvězdy, směr větru, stíny a kameru.",
+    "Výsledky patří ke konkrétnímu snapshotu včetně testů. Výkonová tvrzení vyžadují skutečné produkční relace, HUD, GPU, rozlišení, srovnatelné FPS a p95/p99."
+  ],
+  "verification": [
+    "Cílené weather/atmosphere/camera/lighting testy podle změn.",
+    "Nad stabilním snapshotem postupně pnpm test, pnpm build a pnpm test:integration.",
+    "Produkční vizuální přejímka a případná srovnatelná GPU měření až po uvolnění jiných scén/Blenderu.",
+    "Původní logy, manifest a meze do vlastní evidence; po předání souboru přidej do docs/verification.md také odkaz na docs/verification-evidence/agents/coordination-20261012/README.md."
+  ],
+  "notes": [
+    "Samostatný nyní autorizovaný weather checkpoint; nezávisí na budoucích sprint/grass auditech ani na integration-checkpoint.",
+    "Původní weather vlastník a zamýšlený owner weather-01a12fcb-root, chat 01a12fcb-4233-70c0-bc2d-95fc261f870c. Předán přesný scope v technické zprávě 12.10.2026; společné soubory ještě čekají na předání.",
+    "Vlastní dirty změny lze po doloženém předání převzít --adopt-dirty; žádný cizí diff se tím nepřepisuje.",
+    "Porty4179/2570 zůstávají mimo tento task. Nový snapshot suffix nebo jiný výstup vyžaduje změnu rozsahu rezervace."
+  ],
+  "id": "weather-integration-20261012",
+  "title": "Integrovat a prakticky ověřit autorizované počasí po předání společných souborů"
+}

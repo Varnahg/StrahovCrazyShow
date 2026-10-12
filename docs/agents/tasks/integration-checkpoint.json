@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "id": "integration-checkpoint",
+  "title": "Integrovat předané změny a ověřit jeden stabilní produkční checkpoint",
+  "status": "blocked",
+  "dependsOn": [
+    "avatar-sprint-fix",
+    "grass-cold-fix",
+    "host-network-audit",
+    "weather-integration-20261012",
+    "outdoor-artifacts-verification"
+  ],
+  "writePaths": [
+    "client/game.ts",
+    "client/ui.tsx",
+    "client/i18n-messages.ts",
+    "client/world-renderer.ts",
+    "client/minimap.tsx",
+    "client/minimap.css",
+    "shared/simulation.ts",
+    "tests/stability.test.ts",
+    "tests/agent-integration.test.ts",
+    "docs/verification.md",
+    "docs/acceptance.md",
+    "docs/agents/handoffs/integration-checkpoint.md",
+    "docs/verification-evidence/agents/integration-checkpoint/",
+    "dist/"
+  ],
+  "resources": [
+    "integration",
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Blokují dokončené závislosti a skutečné předání existujícího dirty WIP ve společných entrypointech. Rezervace tohoto úkolu sama nepřevádí vlastnictví. Před prací ověř celé handoffy, stav ostatních procesů a zdrojové hashe.",
+    "Integruj úzké změny přes existující společné vstupy; dodrž sdílené renderovací/kolizní rozměry, jeden multiplayerový svět, izolaci hosta a simulované údaje. Pokud zjištěná oprava potřebuje soubor mimo scope, nejprve změň zadání a rezervaci.",
+    "Proveď cílený refaktoring integračních změn, sjednoť opakované napojení a zkontroluj cache, alokace i disposal. Doplň smysluplné regresní scénáře do tests/agent-integration.test.ts bez oslabování existujících kontrol.",
+    "Ověř skutečnou projekci A/D a jízdu při různém natočení kamery, vstupy/schody/styky povrchů a mapové popisky ze stejné kamery. Ověř near/medium sprint a noční/denní počasí v celé hře, ne pouze v komponentovém náhledu.",
+    "Před přijetím optimalizace pořiď srovnatelné skutečné profily baseline/kandidáta trávy, cold/warm medium/high a produkční běhy. Uveď source hash včetně testů, GPU, CSS i interní rozlišení, skutečné relace, HUD, různé avatary, počasí, FPS a p95/p99; GeForce 60 FPS zůstává nepotvrzené, pokud příslušný důkaz není k dispozici.",
+    "Aktualizuj docs/verification.md a docs/acceptance.md podle skutečných výsledků stabilního checkpointu; zachovej neúspěšné pokusy, historické snapshoty a otevřené limity. Nynější P5 hlavička acceptance nesmí být převzata jako aktuální, README/verification při přípravě katalogu popisují D2."
+  ],
+  "verification": [
+    "pnpm test",
+    "pnpm build",
+    "pnpm test:integration",
+    "pnpm check:readme",
+    "Snapshot a nezávislé porovnání zdrojových hashů musí zahrnout tests/; všechny příkazy zaznamenej s časem, exit kódem a původním logem do vlastní evidence.",
+    "GPU/CPU profilování a pipeline prováděj postupně pod heavy-validation. Port 2568 musí být volný; scripts/test-integration.mjs spouští a ukončuje vlastní server. Neukončuj cizí server ani nenahrazuj obsluhovaný dist bez potvrzeného předání procesu.",
+    "Po kontrole ukonči vlastní testovací klienty/scény/servery a uvolni rezervace; pokud adapter, snapshot nebo běžící zátěž neodpovídá plánu, označ vzorek jako neplatný místo domnělého PASS."
+  ],
+  "notes": [
+    "Po převzetí docs/verification.md do něj doplň odkaz na docs/verification-evidence/agents/coordination-20261012/README.md. Koordinační úprava tento soubor nezapisovala, protože jej současně upravoval aktivní audit vegetace; nezahazuj jeho výsledky.",
+    "Jde o budoucí integrační zadání, nikoli tvrzení, že současný dirty strom prošel D2 testy nebo že již byly zahájeny herní změny.",
+    "Dokončené implementační handoffy mají technický rozsah; tento task je povinným místem společné pipeline, srovnatelného měření a praktické herní přejímky.",
+    "Historicky používané preview 4179/API 2570 může patřit jinému procesu. Další preview/SDK porty je nutné před spuštěním doplnit do resources a ověřit jejich aktuálního vlastníka.",
+    "Pokud se má integrovat menší checkpoint, koordinátor musí výslovně změnit jeho závislosti a rozsah podle konkrétních handoffů; stav done se nepoužívá k obejití chybějícího předání."
+  ]
+}

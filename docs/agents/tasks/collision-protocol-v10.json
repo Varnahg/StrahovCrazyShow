@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "collision-protocol-v10",
+  "title": "Odmítnout staré klienty po přidání statických outdoor kolizí",
+  "status": "blocked",
+  "dependsOn": ["outdoor-artifacts-verification"],
+  "writePaths": [
+    "shared/netcode.ts",
+    "tests/netcode.test.ts",
+    "docs/agents/handoffs/collision-protocol-v10.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Původní outdoor a weather vlastníci požadují změnu protokolu9→10 kvůli novým shared statickým kolizím. Před změnou ověř aktuální kód/negotiaci; neměň formát motion paketu bez potřeby.",
+    "Původní outdoor snapshot-a zůstává zachovaný. Navazující weather checkpoint musí zahrnout nové společné zdroje i testy, klient a server se publikují společně.",
+    "Cílený regresní test a předání doloží důvod změny; staré klienty ověří reálné SDK v navazující těžké integraci."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/netcode.test.ts",
+    "Skutečná akceptace nové verze a odmítnutí staré v rámci weather-integration-20261012."
+  ],
+  "notes": [
+    "SUPERSEDED: oprávněný outdoor owner již převzal tyto soubory rozšířeným claimem a provedl v10 ve snapshotu B. Tento blokovaný návrh nespouštět; dokončení/pipeline sleduje outdoor-artifacts-verification.",
+    "Výslovná dohoda původních vlastníků v technických zprávách dne12.10.2026; tento task neprovádí koordinátor pravidel.",
+    "Po předání outdoor jej může převzít weather owner jako samostatný úzký task. Do main nasazení nových kolizí musí být hotový.",
+    "Žádný vlastní server/GPU/fullsuite v tomto scope, příslušné resources drží následná integrace."
+  ]
+}

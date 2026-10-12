@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/atmosphere-sky.ts",
+    "tests/atmosphere-sky.test.ts",
+    "docs/weather/atmosphere-sources.md",
+    "docs/agents/handoffs/atmosphere-cloud-refinement.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Dokonči již autorizovanou rozpracovanou oblohu, zachovej astronomii a provenienci.",
+    "Proveď cílený refaktoring a předej integrovatelný výsledek s hashi, testy a omezením vizuálního důkazu."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/atmosphere-sky.test.ts",
+    "Skutečnou GPU přejímku provede následný weather-integration-20261012 s rezervovanými zdroji."
+  ],
+  "notes": [
+    "Původní vlastník weather chat 01a12fcb-4233-70c0-bc2d-95fc261f870c doložil 2026-10-12 vlastnictví těchto tří WIP souborů; oprávněný owner weather-01a12fcb-atmosphere smí --adopt-dirty.",
+    "Uživatel v původní relaci výslovně schválil technickou koordinaci; původní lidské ano, koordinuj ověřeno read_thread.",
+    "Koordinátor nemění tyto herní soubory. Žádná závislost na budoucích sprint/grass taskách."
+  ],
+  "id": "atmosphere-cloud-refinement",
+  "title": "Dokončit rozpracovanou oblačnost původního vlastníka počasí"
+}

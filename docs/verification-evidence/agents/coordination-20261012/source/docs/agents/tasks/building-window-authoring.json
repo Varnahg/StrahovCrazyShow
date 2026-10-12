@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "building-window-authoring",
+  "title": "Dokončit kód autorských oken a panelů B4 v předané větvi budov",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/create-building-window-kit.py",
+    "assets/blender/building-window-kit/",
+    "public/models/building-window-kit/",
+    "shared/data/building-window-kit.json",
+    "tests/building-window-kit.test.ts",
+    "docs/reality-pack/building-window-kit-20261012/",
+    "scripts/create-b4-facade-panels.py",
+    "assets/blender/b4-panel-kit/",
+    "public/models/architecture/b4-facade/",
+    "shared/data/b4-panel-kit.json",
+    "tests/b4-facade-panels.test.ts",
+    "docs/reality-pack/b4-facade-panels-20261012/",
+    "docs/agents/handoffs/building-window-authoring.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Dokonči pouze autorský kód, dokumentaci a lehké CPU regrese oken/B4 podle identifikovaných fotografií s datem; rozměrový odhad jasně odliš od zaměření. Zachovej původní fotografie a mastery.",
+    "Runtime data, editovatelné modely a exportní kontrakt popisují tutéž geometrii v metrech. Po funkční úpravě sjednoť opakovanou logiku generátoru, zkontroluj alokace a vlastnictví dat, zachovej samostatné testy.",
+    "Handoff obsahuje změněné soubory a jejich hashe, skutečné cílené výsledky a oddělený seznam dosud nevygenerovaných či neověřených assetů. Tento task nepřijímá nový Blender export ani GPU vzhled."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/building-window-kit.test.ts tests/b4-facade-panels.test.ts",
+    "git diff --check; ověř provenienci a kontrakt současných dat bez spouštění generátorů. Chybějící export označ jako čekající ověření, test neoslabuj.",
+    "Blender, regenerace/export assetů, full suite, build, integrace a GPU až v navazujícím tasku s potřebnými resources po outdoor/weather freeze."
+  ],
+  "notes": [
+    "Potvrzený původní vlastník WIP a jeho podagentů: chat01a12b28-f5be-74b0-868c-6c1b0d667685; předání koordinátorovi 12. 10. 2026. Nejde o automaticky přiřazený PID nebo rezervaci.",
+    "Pracuj pouze v C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow, větev codex/building-models. --adopt-dirty smí použít jen potvrzený původní autor pro vlastní přidělený WIP v této worktree.",
+    "Ready opravňuje k přiděleným editacím kódu a lehkým CPU testům. Cesty assetů zachycují vlastnictví již existující práce; neopravňují spustit export bez heavy-validation. Do main nenasazovat před outdoor/weather freeze a vlastní následnou QA."
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "checkedAtUtc": "2026-10-12T11:48:07.899Z",
+  "sourceId": "4b9d35416894f7fc58e64c633beae5b39031f476ab046efa5a1adc46140e9034",
+  "scope": "Coordination tooling, rules and final catalogue only; actual test source included. No gameplay snapshot. Catalogue finalized after CLI test with identical CLI/test bytes.",
+  "sourceFiles": 28,
+  "taskDefinitions": 18,
+  "cliTests": {
+    "command": "pnpm exec tsx --test docs/verification-evidence/agents/coordination-20261012/source/tests/agent-tasks.test.ts",
+    "startedAtUtc": "2026-10-12T11:37:05.5463232Z",
+    "finishedAtUtc": "2026-10-12T11:39:10.6991356Z",
+    "exitCode": 0,
+    "tests": 15,
+    "pass": 15,
+    "fail": 0,
+    "skipped": 0,
+    "durationMs": 112360.5761,
+    "bytesIdenticalToFinalSource": true
+  },
+  "validation": "Valid: 18 task definitions, 2 active reservations. Planned task scopes may overlap; claims serialize them.",
+  "gameplayPipeline": "Not run for coordination tooling; unrelated runtime changes have their own owners and checkpoints.",
+  "sourceAndSnapshotMismatches": [],
+  "localLinks": {
+    "checked": 62,
+    "missing": 0
+  },
+  "formatExit": 0,
+  "diffCheckExit": 0
+}

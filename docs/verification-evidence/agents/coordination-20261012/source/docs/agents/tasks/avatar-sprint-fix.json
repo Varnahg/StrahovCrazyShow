@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "avatar-sprint-fix",
+  "title": "Opravit přesměrování sprintového švihu při zachování pevné opory",
+  "status": "blocked",
+  "dependsOn": ["avatar-turn-audit"],
+  "writePaths": [
+    "client/animation.ts",
+    "tests/ground-turn-animation.test.ts",
+    "tests/helpers/ground-turn-fixture.ts",
+    "docs/agents/handoffs/avatar-sprint-fix.md",
+    "docs/verification-evidence/agents/avatar-sprint-fix/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Blokuje dokončený audit a ověření, že jeho zjištění stále platí pro aktuální hash; před rezervací ověř čistotu uvedených souborů a cizí rozpracovanost.",
+    "Přidej reprodukci skutečného 180° run:true KCC klipu pro near a medium a uprav pouze přesměrovaný grounded švih podle potvrzené příčiny. Zachovej fyzikální root, délky segmentů, dosahový solver, pevnou podporu, rovné schody a skoky.",
+    "Regrese měří skutečnou polohu kotníku a správný uplynulý čas mezi pózami; odstranění vady nesmí spočívat ve zvýšení původních tolerancí, skrytí nohy nebo změně pohybu hráče.",
+    "Po funkční opravě sjednoť opakovanou logiku plánování pouze v dotčeném animátoru, zkontroluj reset/dispose a zbytečné alokace; nedoplňuj nový globální stav.",
+    "Předej zdrojové hashe před/po, testy, reprodukční postup a zbylé vizuální limity. Vizuální přijetí ve skutečné hře provádí integration-checkpoint; technický handoff netvrdí hotovou GPU přejímku."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/ground-turn-animation.test.ts tests/medium-plant-compensation.test.ts tests/animation.test.ts tests/locomotion-quality.test.ts tests/jump-animation.test.ts tests/remote-jump-animation.test.ts",
+    "Porovnej stejné KCC klipy před/po včetně 60/144Hz aktualizace kořene a skutečného medium časování; zapiš podporu i švih, nevydávej NullEngine za GPU důkaz.",
+    "git diff --check; úplná pipeline a praktická produkční kontrola náleží závislému integration-checkpoint po stabilizaci všech handoffů."
+  ],
+  "notes": [
+    "Samostatný scope je zvolen podle konkrétního návrhu v docs/characters/locomotion-study/medium-plant-compensation-20261012.md. Nejprve ověř jeho platnost, nejde o předem schválenou příčinu.",
+    "Needituj client/game.ts, avatarové modely, server nebo shared/simulation.ts. Potřeba dalšího souboru znamená aktualizaci rozsahu a rezervace před jeho úpravou.",
+    "Tento plán sám nespouští implementaci. Po auditu mohou CPU implementace avatar-sprint-fix a grass-cold-fix pracovat paralelně; GPU a profilování se sjednotí v integračním úkolu."
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "dev-coordination-maintenance",
+  "title": "Údržba pravidel, katalogu a lokálního koordinátoru agentů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "AGENTS.md",
+    "docs/agents/README.md",
+    "docs/agents/architecture.md",
+    "docs/agents/current-work.md",
+    "docs/agents/bootstrap-status.json",
+    "docs/agents/handoff-template.md",
+    "docs/agents/task-template.json",
+    "docs/agents/tasks/",
+    "docs/agents/handoffs/dev-coordination-maintenance.md",
+    "scripts/agent-tasks.mjs",
+    "tests/agent-tasks.test.ts",
+    "docs/verification-evidence/agents/coordination-20261012/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pravidla odpovídají skutečnému kódu, tasky mají konkrétní rozsah včetně testů a předání.",
+    "Nezávislé CLI procesy nemohou současně získat překrývající se cesty ani procesní zdroj.",
+    "Stará rezervace nebo chybějící PID neopravňuje k automatickému převzetí; dirty změny zůstanou chráněné.",
+    "Dokumentace rozlišuje kooperativní rezervace, fyzické procesy, tasky a skutečně přijaté výsledky."
+  ],
+  "verification": [
+    "node scripts/agent-tasks.mjs validate",
+    "node scripts/agent-tasks.mjs status",
+    "pnpm exec tsx --test tests/agent-tasks.test.ts",
+    "Zkontrolovat místní odkazy v upravené dokumentaci a skutečnou shodu CLI příkladů.",
+    "Herní build, integrace a GPU nejsou pro čistou změnu tohoto nástroje důkazem; při rozšíření do runtime založit samostatný task se zdroji."
+  ],
+  "notes": [
+    "Pouze konkrétně přidělená údržba; existence ready tasku není zadání automaticky měnit pravidla.",
+    "Úprava katalogu nemění již uložené rezervace. Před změnou rozsahu zastavit zápisy a zajistit uvolnění/nový claim.",
+    "Koordinátor nesmí převzít původní weather/outdoor/UI WIP bez doloženého vlastníka a předání.",
+    "Tento task rezervuje katalog, proto ho drží pouze jeden koordinátor; ostatní agenti zapisují jen svá předání.",
+    "Jde o opakovatelný administrativní slot: po provedené údržbě předej konkrétní výsledek a uvolni rezervaci, status ready ponech pro příští přidělenou údržbu. Produktové tasky se po převzetí označují done.",
+    "docs/verification.md při zavádění koordinace mění jiná aktivní relace. Důkazy této úpravy jsou samostatné; publikaci odkazu přebírá integration-checkpoint až po získání vlastnictví, bez přepisování cizí evidence.",
+    "Pro pozdější údržbu vytvořit nový unikátní adresář evidence a rezervaci příslušně upravit; historickou evidenci nepřepisovat."
+  ]
+}
