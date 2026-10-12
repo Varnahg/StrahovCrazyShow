@@ -28,3 +28,11 @@ Toto jsou kontroly CPU geometrie, nikoli GPU důkaz. Praktický průchod, výsle
 ## Uložené reference
 
 `landmarks-ghmp-source.html`, `landmarks-pct-source.html`: odpovědi primárních stránek při kontrole 2026-10-12. `landmarks-tractor-ghmp-202207.jpg`: GHMP / Ondřej Surový, 07/2022. `landmarks-tower-pct.jpg`: fotografie poskytnutá provozovatelem, datum expozice neznámé. Obrázky zůstávají pod autorskými právy uvedených poskytovatelů; nejsou vydávány za naše fotografie či otevřenou texturovou knihovnu. `landmarks-tractor-osm.json`, `landmarks-tower-osm.json`: odpovědi OSM API. `landmarks-source-summary.json`: adresy, data kontroly, modelové údaje a SHA-256 uložených podkladů i testovaného zdrojového souboru.
+
+## Sanitizace archivovaných stránek · 2026-10-12
+
+Oba HTML podklady jsou sanitizované kopie: jediný Google Maps API klíč vložený provozovatelem každé stránky byl nahrazen značkou `REDACTED_GOOGLE_API_KEY`. Ostatní bajty HTML, odborné údaje, autorství a adresy podkladů jsou zachované. Archiv není určen ke spuštění jako webová aplikace. `landmarks-source-summary.json` uvádí SHA-256 a velikost sanitizovaných souborů; původní otisky a velikosti jsou zachovány v `sanitization` pro doložení původu.
+
+Při nezávislé kontrole veřejných stránek dne 2026-10-12 v 14:00:51–52 UTC oba zdroje vrátily HTTP 200 a obsahovaly shodný klíč jako jejich archiv. Porovnání proběhlo pouze v paměti bez použití klíčů vůči Google API. Jde o klíče třetích stran, nikoli přihlašovací údaje hry. Jejich platnost, omezení a revokace nejsou ověřené; spravovat je může vlastník příslušného Google projektu. Oprava aktuálního obsahu nepřepisuje historický commit `7dac0a4985bff5503019107ae88c9380d53e025f`.
+
+Před přidáním nebo obnovením archivovaných zdrojů spusťte `node scripts/check-source-secrets.mjs`; stejná kontrola běží v GitHub Actions. Zjištěné klíče je nutné odstranit před commitem a aktualizovat odpovídající otisky podkladů.
