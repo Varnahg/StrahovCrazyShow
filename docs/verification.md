@@ -14,6 +14,8 @@ První D1 průchod skončil 572/573: nový příznak oken změnil starý význam
 
 Následující historické sekce U1/B5/B3/P5 popisují tehdejší větve, porty a výsledky. Nejsou pokynem spouštět další konkurenční náhledy.
 
+**D2 je nasazené na hlavním checkoutu `main`, klient 4179 a server 2570.** [Kontrola publikace](verification-evidence/campus-depth-20261012-d2/local-preview-status.json) potvrdila shodu všech 8285 souborů hlavního checkoutu se snapshotem a 281 vygenerovaných/vybraných assetů mezi frozen buildem, hlavním `dist` a HTTP odpovědí. Místní sběr měření je označen stejným D2 hashem. Pomocný náhled 5190/2572 je vypnutý. Po přechodu z U1 obnov stránku pomocí Ctrl+F5; v8 klient je záměrně odmítnutý, aby nepoužíval starou fyziku střechy.
+
 ## Checkpoint U1 · sjednocený main pro testování · 12. října 2026
 
 U1 spojuje síťový B5 a dokončené vizuální změny v jednom klientu a serveru s **protokolem 8**. Zdrojový snapshot `1b3c9e14dfbb954c7e9325122d03fc7cafdac97a7f1b406c902ceb9b39313193` obsahuje **8277 souborů včetně testů**. **559/559 testů, produkční build a celá izolovaná integrace prošly na první pokus**, vše exit 0. Následný nezávislý SHA audit přečetl všech **8277 live + 8277 frozen souborů bez odchylek**. [Výsledky a logy](verification-evidence/unified-main-20261012-u1/results.json), [audit](verification-evidence/unified-main-20261012-u1/source-check.json), [manifest](verification-evidence/unified-main-20261012-u1/source-manifest.json). Běžící relace protokolu 7 je při přechodu potřeba obnovit.
