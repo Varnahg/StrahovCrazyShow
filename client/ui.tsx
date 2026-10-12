@@ -5,6 +5,7 @@ import {
 } from "./benchmark-presentation";
 import { WorldDock } from "./world-dock";
 import { HudWeather } from "./hud-status";
+import { currentRoomCallbacks } from "./room-callbacks";
 import "./hud.css";
 import { useDialogFocus } from "./use-dialog-focus";
 import {
@@ -263,6 +264,7 @@ export function App() {
   const canvas = useRef<HTMLCanvasElement>(null),
     game = useRef<Game | null>(null),
     room = useRef<Room | null>(null),
+    connectionAttempt = useRef(0),
     playersRef = useRef<Player[]>([]),
     profileRef = useRef(profile),
     idRef = useRef("guest"),
@@ -465,8 +467,8 @@ export function App() {
     room.current = r;
     connectedRef.current = true;
     setConnected(true);
-    r.onMessage("welcome", (data: any) => {
-      if (room.current !== r) return;
+    const callbacks = currentRoomCallbacks(r, () => room.current === r);
+    callbacks.onMessage("welcome", (data: any) => {
       idRef.current = data.id;
       setSelfId(data.id);
       game.current?.setLocalId(data.id);
@@ -478,15 +480,13 @@ export function App() {
       game.current?.updatePlayers(data.players);
       if (game.current) game.current.canvas.dataset.networkStage = "connected";
     });
-    r.onMessage("presence", (data: Player[]) => {
-      if (room.current !== r) return;
+    callbacks.onMessage("presence", (data: Player[]) => {
       playersRef.current = data;
       playersById.current = new Map(data.map((p) => [p.id, p]));
       setPlayers(data);
       game.current?.updatePlayers(data);
     });
-    r.onMessage("motion", (wire: unknown) => {
-      if (room.current !== r) return;
+    callbacks.onMessage("motion", (wire: unknown) => {
       const packet = motionDecoder.decode(wire);
       if (!packet) {
         const now = performance.now();
@@ -512,35 +512,34 @@ export function App() {
       }
       game.current?.syncMotion(packet);
     });
-    r.onMessage("authoritative", (data: Authority) => {
-      if (room.current !== r) return;
+    callbacks.onMessage("authoritative", (data: Authority) => {
       authorityRef.current = data;
       game.current?.reconcile(data);
     });
-    r.onMessage("events", setEvents);
-    r.onMessage("social", setSocial);
-    r.onMessage("activity", (a: ActivityState) => {
+    callbacks.onMessage("events", setEvents);
+    callbacks.onMessage("social", setSocial);
+    callbacks.onMessage("activity", (a: ActivityState) => {
       setActivity(a);
       game.current?.setFound(a.hunt);
     });
-    r.onMessage("notice", notice);
-    r.onMessage("reward", reward);
-    r.onMessage("car", (data: any) => {
-      if (room.current !== r) return;
+    callbacks.onMessage("notice", notice);
+    callbacks.onMessage("reward", reward);
+    callbacks.onMessage("car", (data: any) => {
       carState.current = data;
       game.current?.setCar(data);
     });
-    r.onMessage("chat", (m: ChatMessage) =>
+    callbacks.onMessage("chat", (m: ChatMessage) =>
       setMessages((previous) => [...previous, m].slice(-200)),
     );
-    r.onMessage("emote", ({ id, emote }: { id: string; emote: string }) => {
-      const player = playersById.current.get(id);
-      if (player) player.emote = emote;
-      game.current?.setEmote(id, emote);
-    });
-    r.onLeave((code) => {
-      // A late close from a replaced socket must not clear a new connection.
-      if (room.current !== r) return;
+    callbacks.onMessage(
+      "emote",
+      ({ id, emote }: { id: string; emote: string }) => {
+        const player = playersById.current.get(id);
+        if (player) player.emote = emote;
+        game.current?.setEmote(id, emote);
+      },
+    );
+    callbacks.onLeave((code) => {
       room.current = null;
       motionDecoder.reset();
       connectedRef.current = false;
@@ -560,50 +559,82 @@ export function App() {
       setConnected(false);
       notice(t("Spojení přerušeno. Použij Obnovit spojení."));
     });
-    r.onError((_code: number, text?: string) =>
+    callbacks.onError((_code: number, text?: string) =>
       notice(text || t("Chyba spojení.")),
     );
   };
-  const connect = async () => {
-    const response = await fetch("/api/session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        mode: "multiplayer",
-        profile: profileRef.current,
-        resumeToken: sessionStorage.getItem("strahov.session"),
-      }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || t("Server není dostupný."));
-    const identityChanged =
-      (game.current?.localId ?? idRef.current) !== data.id;
-    sessionStorage.setItem("strahov.session", data.token);
-    idRef.current = data.id;
-    setSelfId(data.id);
-    const client = new Client(
-      import.meta.env.VITE_MULTIPLAYER_URL || `${location.origin}/realtime`,
-    );
-    const r = await client.joinById(data.worldId, {
-      token: data.token,
-      protocol: PROTOCOL_VERSION,
-    });
-    if (identityChanged) {
-      authorityRef.current = null;
-      carState.current = null;
-      inputBuffer.current = [];
+  const connect = async (attempt = ++connectionAttempt.current) => {
+    let joinedRoom: Room | null = null;
+    try {
+      const response = await fetch("/api/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "multiplayer",
+          profile: profileRef.current,
+          resumeToken: sessionStorage.getItem("strahov.session"),
+        }),
+      });
+      if (attempt !== connectionAttempt.current) return false;
+      const data = await response.json();
+      if (attempt !== connectionAttempt.current) return false;
+      if (!response.ok)
+        throw new Error(data.error || t("Server není dostupný."));
+      const client = new Client(
+        import.meta.env.VITE_MULTIPLAYER_URL || `${location.origin}/realtime`,
+      );
+      joinedRoom = await client.joinById(data.worldId, {
+        token: data.token,
+        protocol: PROTOCOL_VERSION,
+      });
+      if (attempt !== connectionAttempt.current) return false;
+      const identityChanged =
+        (game.current?.localId ?? idRef.current) !== data.id;
+      sessionStorage.setItem("strahov.session", data.token);
+      idRef.current = data.id;
+      setSelfId(data.id);
+      if (identityChanged) {
+        authorityRef.current = null;
+        carState.current = null;
+        inputBuffer.current = [];
+      }
+      // Install identity before accepting the new connection's messages.
+      game.current?.setLocalId(data.id);
+      const previousRoom = room.current;
+      bind(joinedRoom);
+      if (previousRoom && previousRoom !== joinedRoom)
+        void previousRoom.leave(false).catch(() => {});
+      return true;
+    } catch (error) {
+      if (attempt !== connectionAttempt.current) return false;
+      throw error;
+    } finally {
+      // A cancelled join still owns a live socket, but never UI listeners.
+      if (joinedRoom && room.current !== joinedRoom)
+        void joinedRoom.leave(false).catch(() => {});
     }
-    // Reconnect does not rebuild Game. Install the session epoch before bind()
-    // accepts its first motion/authority, including if welcome arrives later.
-    game.current?.setLocalId(data.id);
-    bind(r);
+  };
+  const reconnect = async () => {
+    const attempt = ++connectionAttempt.current;
+    try {
+      await connect(attempt);
+    } catch (error) {
+      if (attempt === connectionAttempt.current) notice(String(error));
+    }
   };
   const enter = async (next: "guest" | "multi") => {
+    if (next === "guest") leave();
+    const attempt =
+      next === "multi"
+        ? ++connectionAttempt.current
+        : connectionAttempt.current;
     setBusy(true);
     setError("");
     try {
-      if (next === "multi") await connect();
-      else {
+      if (next === "multi") {
+        if (!(await connect(attempt)) || attempt !== connectionAttempt.current)
+          return;
+      } else {
         idRef.current = "guest";
         setSelfId("guest");
         setEvents(makeDemoEvents());
@@ -613,20 +644,28 @@ export function App() {
       setMode(next);
       modeRef.current = next;
     } catch (e) {
+      if (attempt !== connectionAttempt.current) return;
       setError(
         t("Multiplayer se nepřipojil. Zkontroluj spuštění serveru. {error}", {
           error: localizeNotice(e instanceof Error ? e.message : String(e)),
         }),
       );
     } finally {
-      setBusy(false);
+      if (attempt === connectionAttempt.current) setBusy(false);
     }
   };
   const leave = () => {
-    room.current?.leave();
+    connectionAttempt.current++;
+    const previousRoom = room.current;
+    // SDK leave waits for the server handshake while keeping its listeners.
+    // Invalidate first, including callbacks fired synchronously by leave().
     room.current = null;
+    connectedRef.current = false;
+    inputBuffer.current = [];
+    void previousRoom?.leave().catch(() => {});
     modeRef.current = "menu";
     setMode("menu");
+    setBusy(false);
     setReady(false);
     setConnected(false);
     setMessages([]);
@@ -914,16 +953,7 @@ export function App() {
         </div>
       </div>
       {mode === "multi" && !connected && (
-        <button
-          className="reconnect primary"
-          onClick={async () => {
-            try {
-              await connect();
-            } catch (e) {
-              notice(String(e));
-            }
-          }}
-        >
+        <button className="reconnect primary" onClick={reconnect}>
           {t("Obnovit spojení")}
         </button>
       )}
