@@ -10,6 +10,8 @@ Počáteční skutečná produkční kontrola s HUD: **Intel UHD 630, jeden avat
 
 Uživatel výslovně požádal o commit a sjednocení `main` před dokončením další přejímky. **Detailní herní fotografie B4/oken/marketu, celá fyzická trasa a nový test 30 relací tedy pokračují po tomto checkpointu; nejsou označené jako hotové.** Stadion zůstává uzavřený exteriér, interiérový rozsah se nerozšiřuje.
 
+Implementační commit **`fbe6ed3` je v `main` i na GitHubu**. Testovaný build je nasazený na **[4179](http://127.0.0.1:4179/)** s API2570; obnov hru Ctrl+F5. [Publikační kontrola](verification-evidence/building-models-20261012/publication.json) porovnala8353 main+frozen vstupů a277 skutečně servírovaných souborů bez odchylek. Skutečné počasí i lokální kolektor jsou zapnuté; předchozí distribuce a měření zůstaly zachované.
+
 ## Atmosféra A · 12. října 2026
 
 **648/648 testů a produkční build PASS. Celá izolovaná integrace PASS při opakování stejného nezměněného snapshotu**; první pokus vypršel při testu A řízení auta a je zachovaný v evidenci. Snapshot `cc97bef12245d7861505791ea4ad5d56e3d667c55f81cf8e10f2a0e1927edae5` obsahuje8313 souborů včetně testů, protokol10 a předaný outdoorB. [Úplný protokol, logy, profily a omezení](verification-evidence/atmosphere-20261012/README.md).

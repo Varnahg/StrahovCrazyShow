@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "building-main-preview",
+  "title": "Udržovat uživatelské hlavní preview modelového checkpointu na4179/2570",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/main-testing-handoff.json",
+    "docs/agents/handoffs/building-main-preview.md",
+    ".cache/local-user-benchmarks/building-models-20261012-b1/"
+  ],
+  "resources": [
+    "port:4179",
+    "port:2570"
+  ],
+  "acceptance": [
+    "Po doloženém zastavení předaných weather procesů a uvolnění weather-live-preview rezervuj oba porty. Spusť klient/server ze stejného ověřeného checkpointu.",
+    "Preview používá skutečné počasí, nikoli řízený GPU fixture. Lokální collector má sourceID novéverze a oddělený adresář; předchozí měření zůstanou zachovaná.",
+    "Ponech explicitní živý handoff včetně příkazu,cwd,creation identity a portů. Rezervaci neuvolňuj za běhu služeb; další vlastník nejprve ověří a ukončí předanou dvojici."
+  ],
+  "verification": [
+    "Ověřit sourceSnapshotId a protocol10 v API, skutečné naslouchání obouportů a publikovanou distribuci ve finite publication tasku.",
+    "V .cache/main-testing-handoff.json uvést commit,source,testy,stav přejímky a procesní metadata."
+  ],
+  "notes": [
+    "Persistent runtime task, nevlastní GPU/heavy/build zdroje. Owner buildings-01a12b28-live, koordinátor současného user building goal.",
+    "Původní weather API36664/preview26852 jsou doložené v docs/agents/handoffs/weather-live-preview.md. Samotná tato čísla nejsou pokynem k ukončení; musí se shodovat command+creationtime.",
+    "User výslovně žádá commit/main nyní a pokračování poté. Tento task nemá tvrdit dokončenou detailní vizuální/crowd přejímku."
+  ]
+}

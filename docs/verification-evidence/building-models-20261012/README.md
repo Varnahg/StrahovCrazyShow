@@ -4,6 +4,8 @@ Source snapshot **16b469a2685a08dce9b886bdd4828033d5c10c62b8bc338b14d61b32c7d14b
 
 [Pipeline](pipeline.json): **675/675 tests PASS**, TypeScript + production build PASS, complete isolated integration PASS on its first run. [Source manifest](source-manifest.json), [freeze log](snapshot.log), [test log](test.log), [build log](build.log), [integration log](test-integration.log). The freeze compared every live byte before/after copying with the frozen tree; only unchanged historical IPR references share a documented junction to D2.
 
+Implementation commit **fbe6ed3 is integrated in main and pushed to GitHub**. The tested distribution is live at **http://127.0.0.1:4179/** with API2570. [Publication verification](publication.json) compared all8353 main and frozen inputs plus277 served HTML/JS/CSS/Moon files with zero mismatches. Actual station/model weather is enabled. The old atmosphere distribution and older local benchmark data were preserved.
+
 The new model geometry, materials and canonical placement passed [121 GLB audits and 121 native Blender reopens](../../reality-pack/separate-assets/README.md). B4 has 35 source-identified openings across three selected faces; window profiles and the market flue come from actual editable Blender kits. Game near/far geometry and highest-detail archives are separate declared levels. No additional building overlay is loaded.
 
 ## First production sample
@@ -17,6 +19,8 @@ The new model geometry, materials and canonical placement passed [121 GLB audits
 - 2,649,599 triangles across all render passes, 448 draw calls; recorded frame work about 19.6 ms CPU and 25.54 ms GPU. These are a scene profile, not proof of an optimization.
 
 [Unedited initial game screenshot](spawn-day-medium.jpg). The complete record was downloaded with the visible “Stáhnout úplný záznam” control and copied from the resulting local file. Automatic collector output did not appear during this initial sample; no missing collector result is presented as a successful save.
+
+Read-only diagnosis established the reason: the existing collector explicitly accepts port4179, so the isolated QA origin4193 disables it. This was a QA setup limitation, not a polygon-limit failure or missing benchmark. The main4179 publication reports the collector enabled for the exact B1 source. Future isolated samples continue through the supported full-download UI; no security-origin contract was changed.
 
 ## Deliberately unfinished at this commit
 
