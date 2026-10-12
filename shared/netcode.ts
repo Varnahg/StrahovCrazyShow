@@ -2,8 +2,9 @@ import type { Input, Vec3 } from "./types";
 import type { VehicleState } from "./vehicle";
 export type { Input } from "./types";
 
-// Compact motion dictionaries/deltas require a matching client and server.
-export const PROTOCOL_VERSION = 8;
+// The canonical market roof collision changed in v9. Reject older predictors
+// even though the compact motion dictionary/delta wire format is unchanged.
+export const PROTOCOL_VERSION = 9;
 export const SIM_HZ = 60;
 export const FIXED_DT = 1 / SIM_HZ;
 export const MAX_CATCHUP_STEPS = 8;

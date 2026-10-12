@@ -1,6 +1,18 @@
 # Ověření dema a známá omezení
 
-Aktuální sjednocený testovací checkpoint je **U1**. Následující historické sekce B5/B3/P5 popisují tehdejší větve, porty a výsledky; nejsou pokynem spouštět další konkurenční náhledy. Hlavní testovací adresa je [http://127.0.0.1:4179/](http://127.0.0.1:4179/), odpovídající API používá 2570. `pnpm dev` nad `main` spouští samostatný vývojový klient na 5173 a API na 2567.
+## Aktuální checkpoint D2 · objem fasád a korun · 12. října 2026
+
+**573/573 testů, produkční build a plná izolovaná integrace PASS**, vše exit 0. Snapshot `40f1847ec2d227c7d6eca6ea2bb5d2d5eb1b199a9ea392efe6a8225b71139633` obsahuje 8285 souborů včetně testů. Následný nezávislý audit přečetl všech **8285 live + 8285 frozen souborů bez odchylek**. [Výsledky](verification-evidence/campus-depth-20261012-d2/results.json), [SHA audit](verification-evidence/campus-depth-20261012-d2/source-check.json), [manifest](verification-evidence/campus-depth-20261012-d2/source-manifest.json).
+
+Oprava 34cm mezery pod střechou R-ka, metrické UV soklů, skutečné boky rámů/ostění a uzavření pilastrů/střešních hran, jemnější omítka, objemové normály korun se správnou odezvou větru a odraz oblohy v neprůhledných fasádních oknech. [Rozsah, podklady a omezení](reality-pack/depth-pass-20261012.md). Změna společné střešní kolize vyžaduje **protokol 9**, klient a server se nasazují společně. [Skutečný SDK test](verification-evidence/campus-depth-20261012-d2/protocol-check.json) ověřil odmítnutí v8 a úspěšné připojení/odchod v9; formát pohybových zpráv se nemění.
+
+[Produkční záznam a čtyři neupravené snímky](verification-evidence/campus-depth-20261012-d2/production-smoke.json): celá hra s HUD, jedna skutečná syntetická multiplayerová relace, Intel UHD 630, medium, CSS i interní rozlišení 1280 × 720; **54,9 FPS, p95 20,2 ms, p99 23,4 ms**, chyby vykreslení, načítání i konzole: 0. Jde o funkční vzorek u stromů, **nikoli srovnání zrychlení, davový test nebo potvrzení 60 FPS na GeForce**. U1 měl jinou kameru, místo a čas. [Starší a DEV srovnávací snímky](verification-evidence/campus-depth-20261012-d2/gameplay/review.json) jsou oddělené od frozen produkčního důkazu.
+
+První D1 průchod skončil 572/573: nový příznak oken změnil starý význam `realityGlass` v testu B6. Oprava používá samostatný explicitní příznak neprůhledných oken a zachovává původní B6 test. [D1 selhání a zdroje](verification-evidence/campus-depth-20261012-d2/earlier-d1/pipeline-results.json) jsou zachované. Samostatná regrese zachytila a opravila také uvolnění oken bez opacity Fresnel; její záznam je v evidenci.
+
+**Otevřené limity:** plná fotografická věrnost a vzhled inspirovaný Hogwarts Legacy nejsou dokončené, stejně jako všechny povolené interiéry. Kůra některých stromů zůstává světlá, terén, provozovny a kurt místy jednoduché. Studená příprava trávy (~265/181 ms v dřívější CPU studii) a prudký sprintový švih zůstávají otevřené. Předchozí čísla z HUD nejsou GPU přejímka. Hlavní testovací adresa zůstává [http://127.0.0.1:4179/](http://127.0.0.1:4179/) s API 2570; `pnpm dev` používá samostatně 5173/2567.
+
+Následující historické sekce U1/B5/B3/P5 popisují tehdejší větve, porty a výsledky. Nejsou pokynem spouštět další konkurenční náhledy.
 
 ## Checkpoint U1 · sjednocený main pro testování · 12. října 2026
 

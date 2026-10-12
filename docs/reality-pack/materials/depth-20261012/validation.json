@@ -1,0 +1,54 @@
+{
+  "files": [
+    {
+      "path": "client/cinematic-art.ts",
+      "sha256": "0801bb81c54bdeff221ce5a1e735927e7a98fcf4d5deb1e8e5274e59297a7328"
+    },
+    {
+      "path": "client/surface-pack.ts",
+      "sha256": "50d77ce3ea9af58281fb196ae3386c99a6e84909d3b6ce5a80307223c1bac90c"
+    },
+    {
+      "path": "tests/cinematic-art.test.ts",
+      "sha256": "a4e1bba50023c3dad544ef8da565e56fe292a69a4a75bdbff36361350f8fd809"
+    },
+    {
+      "path": "tests/surface-pilot.test.ts",
+      "sha256": "2a07cec982a8ae1a912006f893c2e2df5cb05144a312db22aad108e5b69c8514"
+    },
+    {
+      "path": "tests/surface-normal.test.ts",
+      "sha256": "62e85e47aedc4775e8e53acacf8c51c312b5684c00083a8a52410db68d0fefaa"
+    },
+    {
+      "path": "shared/data/assets/surfaces-manifest.json",
+      "sha256": "c3cf978e1db6e20f21946a8cb3e0d5716dbc730f671b09151f27ad373013d474"
+    },
+    {
+      "path": "docs/reality-pack/materials/depth-20261012/audit-channels.py",
+      "sha256": "fd82b75cfc7762531244de68bd6716d96e7a9fd0454587cf08abcc8050be8833"
+    },
+    {
+      "path": "docs/reality-pack/materials/depth-20261012/channel-audit.json",
+      "sha256": "a4d75868c2993cbc29e335570685a92d9e7f98774cf83d92ef4ca71d5b491ca3"
+    },
+    {
+      "path": "docs/reality-pack/materials/depth-20261012/u1-block7.jpg",
+      "sha256": "acb3eaa116a51745ab4d900c3b79d6cf21eb182a85cf8645dc10eef83969dd35"
+    }
+  ],
+  "baseCommit": "76ae037",
+  "gpuReview": "pending root whole-game review",
+  "recordedAt": "2026-10-12T10:08:17.0139290Z",
+  "tests": {
+    "runnerSeconds": 2.4420907,
+    "command": "pnpm exec tsx --test tests/surface-pilot.test.ts tests/cinematic.test.ts tests/cinematic-art.test.ts tests/render-maintenance.test.ts tests/surface-normal.test.ts",
+    "failed": 0,
+    "passed": 20
+  },
+  "scope": "plaster material candidate; CPU/source validation only, no GPU/FPS claim",
+  "pixelFilesVerified": 21,
+  "pixelFilesChanged": 0,
+  "addedSurfaceTextureMaps": 0,
+  "scopedTypescriptExitCode": 0
+}

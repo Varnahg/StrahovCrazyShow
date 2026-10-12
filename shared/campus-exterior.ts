@@ -569,7 +569,11 @@ export function buildCampusExteriorPlan(): CampusExteriorPlan {
   }
   const shop = map.buildings.find((b) => b.id === "7645350")!,
     points = ring(shop.points),
-    y = buildingBaseHeight(points) + shop.height + 0.025;
+    // The facade and wall colliders sample the original closed OSM ring. Its
+    // duplicate endpoint affects the median on sloping ground: sampling the
+    // triangulation's open ring raised this roof 31.5 cm above the walls.
+    // Only triangulation drops the endpoint; all components share one base.
+    y = buildingBaseHeight(shop.points as GroundPoint[]) + shop.height;
   const roofData = empty();
   for (const [x, z] of points) {
     roofData.positions.push(x, y, z);
@@ -594,8 +598,8 @@ export function buildCampusExteriorPlan(): CampusExteriorPlan {
     g.beam(
       "market-roof",
       "roofSeam",
-      [a[0], y + 0.065, a[1]],
-      [b[0], y + 0.065, b[1]],
+      [a[0], y + 0.055, a[1]],
+      [b[0], y + 0.055, b[1]],
       0.11,
     );
   }

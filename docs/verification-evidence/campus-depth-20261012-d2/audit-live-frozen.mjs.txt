@@ -1,0 +1,103 @@
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
+import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
+import { resolve, join, sep } from 'node:path';
+
+const root=resolve(import.meta.dirname,'..');
+const frozen=join(root,'.cache/performance-snapshot/campus-depth-20261012-d2');
+const destination=join(root,'docs/verification-evidence/campus-depth-20261012-d2');
+const expectedId=process.argv[2]; assert.match(expectedId,/^[a-f0-9]{64}$/);
+const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+const pipelineBytes=await readFile(join(frozen,'pipeline-results.json'));
+const pipeline=JSON.parse(pipelineBytes);
+assert.ok(pipeline.finishedAt && Number.isFinite(Date.parse(pipeline.finishedAt)), 'Do not archive a running pipeline');
+assert.equal(pipeline.sourceSnapshotId,expectedId);
+const manifestBytes=await readFile(join(frozen,'source-manifest.json'));
+const manifest=JSON.parse(manifestBytes);
+assert.equal(manifest.snapshotId,expectedId);
+assert.equal(digest(JSON.stringify(manifest.files)),expectedId);
+const files=Object.entries(manifest.files);
+assert.ok(files.length>8148);
+assert.equal(pipeline.files,files.length);
+const startedAt=new Date().toISOString(),start=performance.now();
+const mismatches=[],errors=[];
+const counts={live:0,frozen:0},bytesRead={live:0,frozen:0},computed={live:{},frozen:{}};
+const tasks=files.flatMap(([file,expected])=>[
+  {tree:'live',base:root,file,expected},{tree:'frozen',base:frozen,file,expected},
+]);
+async function hashFile(path){
+  const hash=createHash('sha256');let bytes=0;
+  for await(const chunk of createReadStream(path)){hash.update(chunk);bytes+=chunk.length;}
+  return {sha256:hash.digest('hex'),bytes};
+}
+let cursor=0;
+await Promise.all(Array.from({length:8},async()=>{
+  while(cursor<tasks.length){
+    const {tree,base,file,expected}=tasks[cursor++];
+    const path=resolve(base,file);assert.ok(path.startsWith(base+sep));
+    try{
+      const actual=await hashFile(path);
+      counts[tree]++;bytesRead[tree]+=actual.bytes;computed[tree][file]=actual.sha256;
+      if(actual.sha256!==expected)mismatches.push({tree,file,expected,actual:actual.sha256});
+    }catch(error){errors.push({tree,file,error:String(error)});}
+  }
+}));
+const computedSourceSnapshotIds=Object.fromEntries(['live','frozen'].map(tree=>[
+  tree,digest(JSON.stringify(Object.fromEntries(files.map(([file])=>[file,computed[tree][file]??null])))),
+]));
+const sourceCheck={
+  startedAt,capturedAt:new Date().toISOString(),elapsedSeconds:(performance.now()-start)/1000,
+  sourceSnapshotId:expectedId,manifestSha256:digest(manifestBytes),files:files.length,
+  liveFilesChecked:counts.live,frozenFilesChecked:counts.frozen,liveAndFrozenFilesChecked:counts.live+counts.frozen,
+  bytesRead,computedSourceSnapshotIds,
+  status:mismatches.length===0 && errors.length===0 && counts.live===files.length && counts.frozen===files.length && Object.values(computedSourceSnapshotIds).every(id=>id===expectedId)?'passed':'failed',
+  method:'Independent SHA-256 streaming reads of every manifest path in both live and frozen trees. Shared historical references are read separately for each tree; no cached hashes or deduplication. Aggregate IDs reconstructed in manifest key order.',
+  scope:'All manifest source, assets, tests and configuration. Only the required static geometry JSON under docs is included. All other documentation, build output, dependencies and unlisted paths are outside this hash.',
+  testFilesCheckedPerTree:files.filter(([file])=>file.startsWith('tests/')).length,
+  historicalReferenceFilesCheckedPerTree:files.filter(([file])=>file.startsWith('public/models/photogrammetry/')).length,
+  mismatches,errors,
+};
+assert.equal(digest(await readFile(join(frozen,'pipeline-results.json'))),digest(pipelineBytes),'Pipeline changed during archive');
+await mkdir(destination,{recursive:true});
+const archiveErrors=[],publishedSha256={};
+const copiedNames=new Set(['source-manifest.json','pipeline-results.json',...pipeline.stages.map(s=>s.log)]);
+for(const file of copiedNames){
+  try{
+    const source=join(frozen,file),target=join(destination,file);
+    await copyFile(source,target);
+    const [a,b]=await Promise.all([hashFile(source),hashFile(target)]);
+    assert.equal(a.sha256,b.sha256);publishedSha256[file]=b.sha256;
+  }catch(error){archiveErrors.push({file,error:String(error)});}
+}
+await writeFile(join(destination,'source-check.json'),JSON.stringify(sourceCheck,null,2)+'\n');
+const stagesByCommand=new Map(pipeline.stages.map(s=>[s.command,s]));
+const requiredCommands=['pnpm test','pnpm build','pnpm test:integration'];
+const missingStages=requiredCommands.filter(command=>!stagesByCommand.has(command));
+const failedStages=pipeline.stages.filter(stage=>stage.exitCode!==0);
+let testLog='';try{testLog=await readFile(join(destination,stagesByCommand.get('pnpm test')?.log??'pipeline-test.log'),'utf8');}catch{}
+const testCount=kind=>{const match=testLog.match(new RegExp('^.*?\\b'+kind+' (\\d+)\\s*$','m'));return match?Number(match[1]):null;};
+const tests={total:testCount('tests'),passed:testCount('pass'),failed:testCount('fail'),cancelled:testCount('cancelled'),skipped:testCount('skipped'),todo:testCount('todo')};
+const failureReasons=[];
+if(missingStages.length)failureReasons.push('Required pipeline stages were not run or not recorded');
+if(failedStages.length)failureReasons.push('One or more recorded stages exited unsuccessfully');
+if(tests.total===null || tests.passed!==tests.total || tests.failed!==0 || tests.cancelled!==0)failureReasons.push('Final test summary is incomplete or not wholly passing');
+if(sourceCheck.status!=='passed')failureReasons.push('Independent source SHA audit failed');
+if(archiveErrors.length)failureReasons.push('Evidence copying failed');
+const results={
+  status:failureReasons.length?'failed':'passed',failureReasons,
+  scope:'Technical checkpoint D2: finalized tests, production build including TypeScript, isolated integration and subsequent independent live/frozen SHA audit. No GPU/FPS acceptance is implied.',
+  sourceSnapshotId:expectedId,files:files.length,tests,startedAt:pipeline.startedAt,finishedAt:pipeline.finishedAt,
+  stages:pipeline.stages,missingStages,failedStages,sourceCheck:'source-check.json',pipeline:'pipeline-results.json',publishedSha256,archiveErrors,
+  gpu:{status:'pending',note:'No matched full-production GeForce/FPS result for D2 is archived here. Separate GPU visual/component QA may be attached later by the coordinating root; it must not be reported as an FPS benchmark.'},
+  notes:['Raw logs retain any warnings and integration diagnostics; status is derived from actual final stage exit codes, final test summary and source audit.','Reports and prose may change independently; the required static landmark geometry fixture is explicitly included and immutable.'],
+};
+await writeFile(join(destination,'results.json'),JSON.stringify(results,null,2)+'\n');
+await copyFile(import.meta.filename,join(destination,'audit-live-frozen.mjs.txt'));
+console.log(JSON.stringify({sourceCheck,results},null,2));
+if(results.status!=='passed')process.exitCode=1;
+
+
+
+
+

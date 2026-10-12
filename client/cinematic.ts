@@ -194,12 +194,19 @@ export function solarShadowsEnabled(
   return clamp(daylight) > 0.08 && directionY < -0.015 && intensity > 0.04;
 }
 
+function isCampusWindow(material: StandardMaterial) {
+  return (
+    (material.metadata?.realityGlass === true &&
+      material.metadata.block === 6) ||
+    material.metadata?.exteriorOnlyGlass === true
+  );
+}
+
 export function applyWindowSkyReflection(
   material: StandardMaterial,
   environment: BaseTexture,
 ) {
-  if (material.metadata?.realityGlass !== true || material.metadata.block !== 6)
-    return false;
+  if (!isCampusWindow(material)) return false;
   material.reflectionTexture = environment;
   material.reflectionFresnelParameters = new FresnelParameters({
     leftColor: new Color3(0.68, 0.7, 0.72),
@@ -207,12 +214,15 @@ export function applyWindowSkyReflection(
     power: 5,
     bias: 0,
   });
-  material.opacityFresnelParameters = new FresnelParameters({
-    leftColor: new Color3(0.45, 0.45, 0.45),
-    rightColor: Color3.Black(),
-    power: 5,
-    bias: 0,
-  });
+  // Exterior-only windows keep their opaque authored room mask. Reflection
+  // adds no transparent pass or view into buildings without an interior.
+  if (material.metadata.block === 6)
+    material.opacityFresnelParameters = new FresnelParameters({
+      leftColor: new Color3(0.45, 0.45, 0.45),
+      rightColor: Color3.Black(),
+      power: 5,
+      bias: 0,
+    });
   material.roughness = material.metadata.windowStyle === "clear" ? 0.04 : 0.1;
   if (material.metadata.nightWindows && material.emissiveTexture)
     material.useEmissiveAsIllumination = true;
@@ -446,8 +456,7 @@ export class CinematicAtmosphere {
       this.stats.glassVisits++;
       if (
         !(material instanceof StandardMaterial) ||
-        material.metadata?.realityGlass !== true ||
-        material.metadata.block !== 6 ||
+        !isCampusWindow(material) ||
         this.glass.has(material)
       )
         continue;
@@ -590,7 +599,8 @@ export class CinematicAtmosphere {
       if (material.reflectionTexture === this.environment) {
         material.reflectionTexture = null;
         material.reflectionFresnelParameters.isEnabled = false;
-        material.opacityFresnelParameters.isEnabled = false;
+        if (material.opacityFresnelParameters)
+          material.opacityFresnelParameters.isEnabled = false;
       }
     this.glass.clear();
     this.sun.shadowEnabled = false;

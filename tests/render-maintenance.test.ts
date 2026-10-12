@@ -224,6 +224,8 @@ test("glass maintenance catches late B6 material once and removes its scene obse
   const glass = new StandardMaterial("late B6 glazing", scene);
   glass.metadata = { realityGlass: true, block: 6 };
   glass.alpha = 0.32;
+  const exterior = new StandardMaterial("late opaque facade glazing", scene);
+  exterior.metadata = { exteriorOnlyGlass: true };
   await turn();
   const input = {
     dt: 0.1,
@@ -234,6 +236,8 @@ test("glass maintenance catches late B6 material once and removes its scene obse
   };
   atmosphere.update(input);
   assert.equal(glass.reflectionTexture, scene.environmentTexture);
+  assert.equal(exterior.reflectionTexture, scene.environmentTexture);
+  assert.ok(!exterior.needAlphaBlending());
   const count = atmosphere.stats.glassVisits;
   for (let i = 0; i < 20; i++) atmosphere.update(input);
   assert.equal(atmosphere.stats.glassVisits, count);
@@ -243,6 +247,7 @@ test("glass maintenance catches late B6 material once and removes its scene obse
   await turn();
   assert.equal(scene.onNewMaterialAddedObservable.observers.length, added - 1);
   assert.equal(glass.reflectionTexture, null);
+  assert.equal(exterior.reflectionTexture, null);
 });
 
 test("structural render inventory separates shared geometry, disabled LOD and light assignments", (t) => {

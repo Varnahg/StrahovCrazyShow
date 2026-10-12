@@ -1,0 +1,47 @@
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+Reality geometry audit {
+  buildings: 120,
+  windows: 3258,
+  detailTriangles: 166237,
+  farTriangles: 10927,
+  source: 'shared/data/facade-reality.json',
+  measured: false
+} { meshes: 1104 }
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+✔ photo interpreted window pitch fits every original edge and retains outward normals (10.7644ms)
+✔ B6 north end preserves broad blank piers and sparse core openings (0.404ms)
+✔ B12 three levels retain narrow transom windows, B1 and shops have no dorm grid (0.4162ms)
+✔ 007 doorway is at southeast club, reception and R-ko POI retain explicit uncertainty (0.323ms)
+✔ architecture batches remain bounded (533.5289ms)
+✔ B6 north reception shell preserves the canonical opening and closes the former west entry (297.6637ms)
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+✔ PBR channel scales retain metres, rectangular concrete and authored paving joints (2.1273ms)
+✔ real material conversion preserves tint/joints and never treats grayscale roughness as metal (30.2313ms)
+✔ paved and stone surfaces use matching real channels and return to their dry tint after rain (10.2186ms)
+✔ sky cubemap stores linear colours once and matches each hemisphere (26.8007ms)
+✔ shadow projection is stable for sub-texel motion including the solar zenith (0.5101ms)
+✔ shadow metadata rejects ground, transparent glass and arbitrary custom sky shaders (4.7037ms)
+✔ B6 Fresnel reflection preserves warm masks/alpha and night never keeps solar shadows (3.0295ms)
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+✔ surface maintenance visits changed meshes only and still catches async/material reassignment (121.3321ms)
+✔ shadow draw callback uses actual light frustum, keeps crossing boxes and switches disabled LOD immediately (159.6ms)
+✔ conservative shadow AABB culling agrees with real Babylon frusta and protects wind margin (14.0725ms)
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+✔ glass maintenance catches late B6 material once and removes its scene observers (20.3969ms)
+✔ structural render inventory separates shared geometry, disabled LOD and light assignments (3.6926ms)
+BJS - [12:29:50]: Babylon.js v9.30.0 - Null engine
+✔ real exterior window palette reflects one shared sky without opening opaque buildings (29.1841ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2543.2144

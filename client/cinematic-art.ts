@@ -56,15 +56,17 @@ const ART: Readonly<Record<string, CampusSurfaceArt>> = {
   plaster: {
     tint: [0.98, 0.965, 0.91],
     saturation: 0.9,
-    variation: 0.035,
+    // The generic source already contains broad colour mottling. Keep it quiet
+    // while allowing its existing fine relief to respond to the campus light.
+    variation: 0,
     coarseMetres: 15,
     fineMetres: 4.8,
-    roughnessVariation: 0.012,
-    normalStrength: 0.18,
+    roughnessVariation: 0,
+    normalStrength: 0.32,
     specularIntensity: 0.43,
     sourceMean: [0.687218, 0.661026, 0.638101],
-    nearDetail: 0.94,
-    farDetail: 0.82,
+    nearDetail: 0.68,
+    farDetail: 0.52,
   },
   grass: {
     tint: [0.94, 0.9, 0.76],
@@ -165,6 +167,39 @@ float campusArtNoise(vec2 p) {
 }
 `;
 
+const DETAIL_CODE = `
+  vec3 campusEyeOffset=vEyePosition.xyz-vPositionW;
+  float campusDetailFade=smoothstep(campusArtSettings.w*campusArtSettings.w,
+    16.0*campusArtSettings.z*campusArtSettings.z,dot(campusEyeOffset,campusEyeOffset));
+  float campusDetail=mix(campusArtDetail.w,campusArtResponse.x,campusDetailFade);
+  // Retain the material factor, including rain darkening. Authored joints use
+  // detail=1 and are never pulled to a different source map's mean.
+  surfaceAlbedo=mix(campusArtDetail.rgb*vAlbedoColor.rgb,surfaceAlbedo,campusDetail);
+  float campusArtLuma=dot(surfaceAlbedo,vec3(0.2126,0.7152,0.0722));
+  surfaceAlbedo=mix(vec3(campusArtLuma),surfaceAlbedo,campusArtSettings.x);
+`;
+
+// Immutable shader recipes are shared by material instances. Surfaces without
+// artistic variation do not execute unused noise/hash or roughness arithmetic.
+const DETAIL_ONLY_CODE = Object.freeze({
+  CUSTOM_FRAGMENT_BEFORE_LIGHTS: DETAIL_CODE,
+});
+const VARIED_SURFACE_CODE = Object.freeze({
+  CUSTOM_FRAGMENT_DEFINITIONS: DEFINITIONS,
+  CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
+    // A small Y contribution avoids horizontal stripes on vertical walls.
+    vec2 campusArtPosition=vPositionW.xz+vPositionW.y*vec2(0.37,0.23);
+    // One noise octave (four hashes); mipmaps still select texture detail.
+    campusArtVariation=campusArtNoise(campusArtPosition/campusArtSettings.z);
+    ${DETAIL_CODE}
+    surfaceAlbedo*=1.0+(campusArtVariation-0.5)*campusArtSettings.y;
+  `,
+  CUSTOM_FRAGMENT_UPDATE_METALLICROUGHNESS: `
+    metallicRoughness.g=clamp(metallicRoughness.g+
+      (campusArtVariation-0.5)*campusArtResponse.y,0.045,1.0);
+  `,
+});
+
 /** No new texture samples, lights, meshes, displacement, animation or draw calls.
  * World coordinates keep joins stable across independently modelled objects.
  * Macro changes are visibly artistic, not an invented georeferenced patch map. */
@@ -180,12 +215,15 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
       ...material.metadata,
       campusArtDirection: true,
       macroVariationProvenance:
-        "bounded artistic surface variation; not surveyed stains or repairs",
+        art.variation || art.roughnessVariation
+          ? "bounded artistic surface variation; not surveyed stains or repairs"
+          : "no added macro albedo or roughness variation; unchanged source maps",
       originalTextureChannelsUnmodified: true,
       addedArtDrawCalls: 0,
       surfaceDetailProvenance:
         "source-albedo linear mean sampled 2026-10-11; artistic detail compression, not campus colour measurement",
       surfaceDetailPreserved: preserveAuthoredDetail,
+      surfaceNormalStrength: art.normalStrength,
     };
   }
 
@@ -215,7 +253,9 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
     );
     buffer.updateFloat4(
       "campusArtDetail",
-      ...this.art.sourceMean,
+      this.art.sourceMean[0],
+      this.art.sourceMean[1],
+      this.art.sourceMean[2],
       this.preserveAuthoredDetail ? 1 : this.art.nearDetail,
     );
     buffer.updateFloat2(
@@ -227,29 +267,11 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
 
   override getCustomCode(type: string, language = ShaderLanguage.GLSL) {
     if (type !== "fragment" || language !== ShaderLanguage.GLSL) return null;
-    return {
-      CUSTOM_FRAGMENT_DEFINITIONS: DEFINITIONS,
-      CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
-        // A small Y contribution avoids horizontal stripes on vertical walls.
-        vec2 campusArtPosition=vPositionW.xz+vPositionW.y*vec2(0.37,0.23);
-        // One noise octave (four hashes) replaces the former two/eight hashes.
-        // Mipmaps still select actual texture detail; this only lowers contrast.
-        campusArtVariation=campusArtNoise(campusArtPosition/campusArtSettings.z);
-        vec3 campusEyeOffset=vEyePosition.xyz-vPositionW;
-        float campusDetailFade=smoothstep(campusArtSettings.w*campusArtSettings.w,
-          16.0*campusArtSettings.z*campusArtSettings.z,dot(campusEyeOffset,campusEyeOffset));
-        float campusDetail=mix(campusArtDetail.w,campusArtResponse.x,campusDetailFade);
-        // Retain the current material factor, including rain darkening. Original
-        // authored joints use detail=1 and are never pulled to a different map's mean.
-        surfaceAlbedo=mix(campusArtDetail.rgb*vAlbedoColor.rgb,surfaceAlbedo,campusDetail);
-        float campusArtLuma=dot(surfaceAlbedo,vec3(0.2126,0.7152,0.0722));
-        surfaceAlbedo=mix(vec3(campusArtLuma),surfaceAlbedo,campusArtSettings.x);
-        surfaceAlbedo*=1.0+(campusArtVariation-0.5)*campusArtSettings.y;
-      `,
-      CUSTOM_FRAGMENT_UPDATE_METALLICROUGHNESS: `
-        metallicRoughness.g=clamp(metallicRoughness.g+
-          (campusArtVariation-0.5)*campusArtResponse.y,0.045,1.0);
-      `,
-    };
+    // Babylon discovers injection points from the base constructor before the
+    // derived art field is initialized. Register the complete hook set then;
+    // actual shader injection uses the fully initialized material recipe.
+    return this.art?.variation === 0 && this.art.roughnessVariation === 0
+      ? DETAIL_ONLY_CODE
+      : VARIED_SURFACE_CODE;
   }
 }

@@ -134,6 +134,42 @@ test("actual B3/B4/B5/B6/B8/B10 skirts retain terrain boundary and outward RH fr
   assert.deepEqual(found, blocks);
 });
 
+test("foundation UVs retain four-metre scale and shared height phase on long sloping edges", () => {
+  for (const building of BUILDINGS.filter((b) =>
+    ["53929068", "7645350"].includes(b.id),
+  )) {
+    const data = buildingFoundationData(
+      building.points,
+      buildingBaseHeight(building.points),
+    );
+    let maxHorizontalSpan = 0;
+    for (let i = 0; i < data.positions.length / 3; i += 4) {
+      const p = Array.from({ length: 4 }, (_, offset) =>
+        Vector3.FromArray(data.positions, (i + offset) * 3),
+      );
+      const uv = Array.from({ length: 4 }, (_, offset) =>
+        data.uvs.slice((i + offset) * 2, (i + offset) * 2 + 2),
+      );
+      const width = Math.hypot(p[1].x - p[0].x, p[1].z - p[0].z);
+      assert.ok(
+        Math.abs((uv[1][0] - uv[0][0]) * 4 - width) < 1e-8,
+        "horizontal scale is independent of building length",
+      );
+      for (let corner = 0; corner < 4; corner++)
+        assert.ok(
+          Math.abs(uv[corner][1] * 4 - p[corner].y) < 1e-8,
+          "vertical phase follows world height, not the changing skirt height",
+        );
+      assert.ok(Math.abs((uv[2][1] - uv[0][1]) * 4 - (p[2].y - p[0].y)) < 1e-8);
+      maxHorizontalSpan = Math.max(maxHorizontalSpan, uv[1][0]);
+    }
+    assert.ok(
+      maxHorizontalSpan > 10,
+      "a facade longer than forty metres contains multiple metric repeats",
+    );
+  }
+});
+
 test("all archived foundation GLBs retain outward normals and standard glTF CCW faces", () => {
   const manifest = JSON.parse(
     readFileSync("public/models/buildings/manifest.json", "utf8"),

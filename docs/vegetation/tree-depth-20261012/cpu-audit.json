@@ -1,0 +1,159 @@
+{
+  "timestampUTC": "2026-10-12T10:14:22.822Z",
+  "node": "v24.19.0",
+  "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+  "method": "Node CPU transformation only; no GPU, no disk read in timed region, first call + 9 warmed runs. Concurrent OS activity uncontrolled. Not a frame-time/FPS benchmark or upload-cost measurement.",
+  "treePlacements": 109,
+  "retainedFarFoliageMeshes": 108,
+  "allFarVertices": 179358,
+  "allFarNormalBufferBytes": 2152296,
+  "allFar": {
+    "coldMs": 23.615299999999934,
+    "medianMs": 19.157799999999952,
+    "maxMs": 21.573300000000017,
+    "samplesMs": [
+      21.467799999999897,
+      21.573300000000017,
+      17.845599999999877,
+      21.401400000000194,
+      20.78340000000003,
+      18.96010000000001,
+      18.034800000000132,
+      19.157799999999952,
+      18.326700000000073
+    ]
+  },
+  "details": [
+    {
+      "id": "ipr-crown-026",
+      "lod": 0,
+      "vertices": 17298,
+      "normalBufferBytes": 207576,
+      "timing": {
+        "coldMs": 1.8225000000002183,
+        "medianMs": 1.3704000000002452,
+        "maxMs": 1.408100000000104,
+        "samplesMs": [
+          1.3735000000001492,
+          1.3701000000000931,
+          1.3687999999997373,
+          1.3670000000001892,
+          1.3757000000000517,
+          1.408100000000104,
+          1.3824000000004162,
+          1.3577000000000226,
+          1.3704000000002452
+        ]
+      }
+    },
+    {
+      "id": "ipr-crown-026",
+      "lod": 1,
+      "vertices": 4326,
+      "normalBufferBytes": 51912,
+      "timing": {
+        "coldMs": 0.3652999999999338,
+        "medianMs": 0.3625999999999294,
+        "maxMs": 0.5073999999999614,
+        "samplesMs": [
+          0.36740000000008877,
+          0.3625999999999294,
+          0.42419999999992797,
+          0.5073999999999614,
+          0.36209999999982756,
+          0.36760000000003856,
+          0.35510000000022046,
+          0.3609000000001288,
+          0.3587999999999738
+        ]
+      }
+    },
+    {
+      "id": "ipr-b6-south-conifer",
+      "lod": 0,
+      "vertices": 10200,
+      "normalBufferBytes": 122400,
+      "timing": {
+        "coldMs": 1.0849000000002889,
+        "medianMs": 1.0808999999999287,
+        "maxMs": 1.772899999999936,
+        "samplesMs": [
+          1.6015000000002146,
+          1.772899999999936,
+          1.0767000000000735,
+          1.0903000000002976,
+          1.1066999999998188,
+          1.0808999999999287,
+          1.0289999999999964,
+          1.0747000000001208,
+          1.0581999999999425
+        ]
+      }
+    },
+    {
+      "id": "ipr-b6-south-conifer",
+      "lod": 1,
+      "vertices": 3900,
+      "normalBufferBytes": 46800,
+      "timing": {
+        "coldMs": 0.43249999999989086,
+        "medianMs": 0.41679999999996653,
+        "maxMs": 0.42339999999967404,
+        "samplesMs": [
+          0.4169999999999163,
+          0.4177999999997155,
+          0.4203000000002248,
+          0.41679999999996653,
+          0.42339999999967404,
+          0.4165000000002692,
+          0.41569999999956053,
+          0.4147000000002663,
+          0.41640000000006694
+        ]
+      }
+    }
+  ],
+  "sources": [
+    {
+      "path": "public/models/vegetation/realistic/strahov-individual-trees.glb",
+      "sha256": "b33d22608182ba9e73c97ccc816dde5ad2c85b3d0c5473919626b7fdda6a5358"
+    },
+    {
+      "path": "assets/blender/vegetation/strahov-individual-trees.blend",
+      "sha256": "205a6b53a769fc543c7ae3c0466c1602793daa9e599e49e331a05f24fd3008ec"
+    },
+    {
+      "path": "public/models/vegetation/runtime/far.glb",
+      "sha256": "a378eb7951da498e433d5b4ca2bf3e93b2fb0f8ec740e23c81f746879b94b729"
+    },
+    {
+      "path": "shared/data/tree-reconstruction.json",
+      "sha256": "5956d701a781deaca2d6346c9feae7a4678cf9d94dcef97dbbca4ecdd5dfe367"
+    },
+    {
+      "path": "shared/vegetation.ts",
+      "sha256": "da310b4c7441e98816f9fe6900145c530f7dcb6c3846fb1ff55511568a510075"
+    },
+    {
+      "path": "public/models/vegetation/realistic/LeafSet001_2K-PNG_Color.png",
+      "sha256": "e82912697d97a93f781b8f5402e0635085b4a92cfca0edfcd0827b890461e2d2"
+    },
+    {
+      "path": "public/models/vegetation/realistic/Bark012_2K-JPG_Color.jpg",
+      "sha256": "8ab624e92663bd5e7f1636decc4da761ee314ac27ea528a962930f03d96dd08b"
+    },
+    {
+      "path": "client/tree-appearance.ts",
+      "sha256": "cdbb418181563e62c542fafdc7829b3160cf0072d5d29395cc1d618d5c44392a"
+    },
+    {
+      "path": "client/tree-wind.ts",
+      "sha256": "05a53b380c5d03deed3da3f6efd5ebb67ed646f6097a0b9aec0a50be3549160e"
+    },
+    {
+      "path": "client/vegetation.ts",
+      "sha256": "56548718a707845a10559fec9c7f1415f05a5b81c1cf627994cdf02765b9fd2f"
+    }
+  ],
+  "checksum": -8.926539873937145
+}

@@ -12,7 +12,7 @@ import type { Building, Vec3 } from "../shared/types";
 import { renderBudget } from "../shared/render-quality";
 import { entryForFacade } from "../shared/landmark-reality";
 import { B6_LAYOUT } from "../shared/b6-interior";
-import {B6_FACADE_PLAN,b6LongWindow} from "../shared/b6-facade-plan";
+import { B6_FACADE_PLAN, b6LongWindow } from "../shared/b6-facade-plan";
 import { osmAssetIdentity } from "../shared/world-asset-identity";
 import {
   getWorldAssetRoot,
@@ -20,6 +20,7 @@ import {
   disposeEmptyWorldAssetRoots,
 } from "./world-asset-identity";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { FACADE_DEPTH, metricFacadeFrame } from "./architecture-depth";
 
 /** Window dimensions are photo interpretations, not a claim about room counts. */
 export const FACADE_DIMENSIONS = evidence.dimensions;
@@ -101,9 +102,23 @@ export function planFacadeOpenings(
     result: WindowOpening[] = [];
   if (block === 6 && edge.nz < -0.8 && edge.length < 9) return [];
   if (["administration", "unknown", "service"].includes(type)) return result;
-  if(block===6&&edge.nx<-.8&&edge.a[0]<-6.5&&edge.length>6&&edge.length<9){
-    const band=B6_FACADE_PLAN.receptionWestBand;
-    for(let row=0;row<floors;row++)result.push({u:(edge.length-band.width)/2,v:row*3+band.sill,w:band.width,h:band.height,panes:band.panes,style:band.style});
+  if (
+    block === 6 &&
+    edge.nx < -0.8 &&
+    edge.a[0] < -6.5 &&
+    edge.length > 6 &&
+    edge.length < 9
+  ) {
+    const band = B6_FACADE_PLAN.receptionWestBand;
+    for (let row = 0; row < floors; row++)
+      result.push({
+        u: (edge.length - band.width) / 2,
+        v: row * 3 + band.sill,
+        w: band.width,
+        h: band.height,
+        panes: band.panes,
+        style: band.style,
+      });
     return result;
   }
   if (type === "commercial") {
@@ -164,7 +179,11 @@ export function planFacadeOpenings(
           )
             continue;
           if (z < minZ || z > maxZ) continue;
-          const spec=b6LongWindow(edge.nx<-.8?0:16,z,B6_LAYOUT.window);
+          const spec = b6LongWindow(
+            edge.nx < -0.8 ? 0 : 16,
+            z,
+            B6_LAYOUT.window,
+          );
           const a = Math.max(minZ, z - spec.width / 2),
             b = Math.min(maxZ, z + spec.width / 2);
           if (b - a < 0.3) continue;
@@ -251,6 +270,10 @@ class Batch {
     readonly name: string,
     readonly material: StandardMaterial,
   ) {}
+  surface(a: Point, b: Point, c: Point, d: Point, outward: Point) {
+    const { normal, uv } = metricFacadeFrame(a, b, c, outward);
+    this.quad(a, b, c, d, normal, uv);
+  }
   quad(
     a: Point,
     b: Point,
@@ -418,6 +441,11 @@ function createMaterials(scene: Scene) {
         if (m.emissiveTexture) m.emissiveTexture.level = 0;
         m.metadata = { nightWindows: true, simulatedOccupancy: true };
       }
+      m.metadata = {
+        ...m.metadata,
+        exteriorOnlyGlass: true,
+        windowStyle: style === 0 ? "clear" : style === 1 ? "blinds" : "curtain",
+      };
       glass.push(m);
     }
   const far = (type: string) => {
@@ -532,6 +560,7 @@ function createMaterials(scene: Scene) {
     material.metadata = {
       ...source.metadata,
       realityGlass: true,
+      exteriorOnlyGlass: false,
       block: 6,
       windowStyle: index < 2 ? "clear" : index < 4 ? "blinds" : "curtain",
     };
@@ -727,6 +756,42 @@ export function buildArchitectureReality(context: {
         normalized ? [1, 0, 0, 1] : [u / 3, v / 3, (u + w) / 3, (v + h) / 3],
       );
     };
+    // Same four-sided section for the bevel, deep reveal and frame return.
+    // Its outer contour always remains inside the existing rough opening.
+    const openingRing = (
+      target: Batch,
+      e: RealityEdge,
+      w: WindowOpening,
+      front: number,
+      back: number,
+      frontInset: number,
+      backInset: number,
+    ) => {
+      const corners = (depth: number, inset: number): Point[] => [
+        point(e, w.u + inset, w.v + inset, depth),
+        point(e, w.u + w.w - inset, w.v + inset, depth),
+        point(e, w.u + w.w - inset, w.v + w.h - inset, depth),
+        point(e, w.u + inset, w.v + w.h - inset, depth),
+      ];
+      const outer = corners(front, frontInset),
+        inner = corners(back, backInset);
+      const normals: Point[] = [
+        [0, 1, 0],
+        [-e.tx, 0, -e.tz],
+        [0, -1, 0],
+        [e.tx, 0, e.tz],
+      ];
+      for (let side = 0; side < 4; side++) {
+        const next = (side + 1) % 4;
+        target.surface(
+          outer[side],
+          outer[next],
+          inner[next],
+          inner[side],
+          normals[side],
+        );
+      }
+    };
     for (let edgeIndex = 0; edgeIndex < edges.length; edgeIndex++) {
       const e = edges[edgeIndex],
         height = building.height;
@@ -855,53 +920,34 @@ export function buildArchitectureReality(context: {
               ? palette.metal
               : palette.frame,
           );
-        const corners = [
-          point(e, w.u, w.v, frontDepth),
-          point(e, w.u + w.w, w.v, frontDepth),
-          point(e, w.u + w.w, w.v + w.h, frontDepth),
-          point(e, w.u, w.v + w.h, frontDepth),
-        ];
-        const backs = [
-          point(e, w.u, w.v, -depth),
-          point(e, w.u + w.w, w.v, -depth),
-          point(e, w.u + w.w, w.v + w.h, -depth),
-          point(e, w.u, w.v + w.h, -depth),
-        ];
-        const normals: Point[] = [
-          [0, 1, 0],
-          [-e.tx, 0, -e.tz],
-          [0, -1, 0],
-          [e.tx, 0, e.tz],
-        ];
-        for (let side = 0; side < 4; side++)
-          batch(material).quad(
-            corners[side],
-            corners[(side + 1) % 4],
-            backs[(side + 1) % 4],
-            backs[side],
-            normals[side],
-            [0, 0, w.w / 3, depth / 3],
-          );
-        rect(f, e, w.u, w.v, w.w, frameWidth, -depth + 0.015);
-        rect(
-          f,
+        const bevel = FACADE_DEPTH.revealBevel;
+        openingRing(
+          batch(material),
           e,
-          w.u,
-          w.v + w.h - frameWidth,
-          w.w,
-          frameWidth,
-          -depth + 0.015,
+          w,
+          frontDepth,
+          frontDepth - bevel,
+          0,
+          bevel,
         );
-        rect(f, e, w.u, w.v, frameWidth, w.h, -depth + 0.015);
-        rect(
-          f,
+        openingRing(
+          batch(material),
           e,
-          w.u + w.w - frameWidth,
-          w.v,
-          frameWidth,
-          w.h,
-          -depth + 0.015,
+          w,
+          frontDepth - bevel,
+          -depth,
+          bevel,
+          bevel,
         );
+        const frameFront = -depth + FACADE_DEPTH.frameFront;
+        const glassBack = -depth + FACADE_DEPTH.glassBack;
+        // The frame face used to end at its edge with empty space before the
+        // recessed glass. These returns make that existing 17mm section solid.
+        openingRing(f, e, w, frameFront, glassBack, frameWidth, frameWidth);
+        rect(f, e, w.u, w.v, w.w, frameWidth, frameFront);
+        rect(f, e, w.u, w.v + w.h - frameWidth, w.w, frameWidth, frameFront);
+        rect(f, e, w.u, w.v, frameWidth, w.h, frameFront);
+        rect(f, e, w.u + w.w - frameWidth, w.v, frameWidth, w.h, frameFront);
         for (let pane = 1; pane < w.panes; pane++)
           rect(
             f,
@@ -930,7 +976,7 @@ export function buildArchitectureReality(context: {
           w.v + frameWidth,
           w.w - frameWidth * 2,
           w.h - frameWidth * 2,
-          -depth - 0.002,
+          glassBack,
           true,
         );
         if (type === "commercial" || type === "canteen")
@@ -971,7 +1017,7 @@ export function buildArchitectureReality(context: {
           b = point(e, w.u + w.w + 0.045, w.v - 0.025, 0.08),
           c = point(e, w.u + w.w + 0.045, w.v + 0.015, -depth),
           d = point(e, w.u - 0.045, w.v + 0.015, -depth);
-        s.quad(a, b, c, d, [0, 1, 0]);
+        s.surface(a, b, c, d, [0, 1, 0]);
         rect(s, e, w.u - 0.045, w.v - 0.07, w.w + 0.09, 0.045, 0.08);
         windows++;
       }
@@ -1019,17 +1065,38 @@ export function buildArchitectureReality(context: {
           const width = Math.min(0.18, e.length - x);
           if (width < 0.01) continue;
           rect(batch(palette.plaster), e, x, 0, width, height, 0.075);
-          batch(palette.base).quad(
+          const plaster = batch(palette.plaster);
+          plaster.surface(
             point(e, x + width, 0),
             point(e, x + width, 0, 0.075),
             point(e, x + width, height, 0.075),
             point(e, x + width, height),
             [e.tx, 0, e.tz],
-            [0, 0, 0.075, height / 3],
+          );
+          plaster.surface(
+            point(e, x, 0, 0.075),
+            point(e, x, 0),
+            point(e, x, height),
+            point(e, x, height, 0.075),
+            [-e.tx, 0, -e.tz],
+          );
+          plaster.surface(
+            point(e, x, height),
+            point(e, x + width, height),
+            point(e, x + width, height, 0.075),
+            point(e, x, height, 0.075),
+            [0, 1, 0],
           );
         }
       }
       // Foot/base and roof cap follow each original edge; no random balconies.
+      batch(palette.sill).surface(
+        point(e, 0, height),
+        point(e, e.length, height),
+        point(e, e.length, height, 0.03),
+        point(e, 0, height, 0.03),
+        [0, 1, 0],
+      );
       for (const far of [false, true]) {
         if (lobbyFront) {
           const from = (B6_ENTRY_REFERENCE.passage.fromX - e.a[0]) / e.tx;
