@@ -1,0 +1,94 @@
+import "../../client/render-shaders";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Scene } from "@babylonjs/core/scene";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
+import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import type { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
+import { SurfacePack } from "../../client/surface-pack";
+import { drapeTriangles, groundHeight } from "../../shared/terrain";
+
+const canvas = document.querySelector<HTMLCanvasElement>("canvas")!;
+const engine = new Engine(canvas, true, { powerPreference: "high-performance" });
+const scene = new Scene(engine);
+scene.useRightHandedSystem = true;
+scene.clearColor = new Color4(0.16, 0.19, 0.2, 1);
+scene.imageProcessingConfiguration.toneMappingEnabled = false;
+scene.imageProcessingConfiguration.exposure = 1;
+const y = groundHeight(110, 12);
+const camera = new UniversalCamera("fixed surface review", new Vector3(111.7, y + 1.5, 9.8), scene);
+camera.setTarget(new Vector3(110.3, y, 12));
+camera.minZ = 0.05;
+const light = new DirectionalLight("controlled directional", new Vector3(0, -0.6, 1), scene);
+light.intensity = 2;
+const fill = new HemisphericLight("controlled ambient", Vector3.Up(), scene);
+fill.intensity = 0.12;
+fill.groundColor = new Color3(0.12, 0.12, 0.12);
+const data = drapeTriangles([[108,10],[112,10],[112,14],[108,14]],[0,1,2,0,2,3],0.011);
+const meshes = new Map<string, Mesh>();
+for (const family of ["asphalt", "paving", "grass"]) {
+  const material = new StandardMaterial(family, scene);
+  material.metadata = { surfaceKind: family, uvMetresPerRepeat: 4 };
+  const mesh = new Mesh(family, scene), vertex = new VertexData();
+  Object.assign(vertex, data); vertex.applyToMesh(mesh); mesh.material = material;
+  mesh.setEnabled(family === "asphalt"); mesh.freezeWorldMatrix(); meshes.set(family, mesh);
+}
+const pack = new SurfacePack(scene); pack.update(1, "medium", 0);
+let selected = "asphalt", mode = "corrected", lightName = "north", stopped = false;
+const errors: string[] = [];
+for (const mesh of meshes.values()) {
+  const material = mesh.material as PBRMaterial;
+  material.onError = (_effect, error) => errors.push(error);
+}
+function apply() {
+  for (const [family, mesh] of meshes) {
+    mesh.setEnabled(family === selected);
+    const material = mesh.material as PBRMaterial;
+    material.invertNormalMapX = false;
+    material.invertNormalMapY = mode !== "legacy";
+    material.disableBumpMap = mode === "disabled";
+  }
+}
+document.querySelector<HTMLSelectElement>("#family")!.onchange = event => {
+  selected = (event.target as HTMLSelectElement).value; apply();
+};
+for (const name of ["corrected", "legacy", "disabled"])
+  document.getElementById(name)!.onclick = () => { mode = name; apply(); };
+const directions: Record<string, Vector3> = {
+  north: new Vector3(0, -0.6, 1), south: new Vector3(0, -0.6, -1),
+  east: new Vector3(-1, -0.6, 0), west: new Vector3(1, -0.6, 0),
+};
+for (const button of document.querySelectorAll<HTMLButtonElement>("[data-light]"))
+  button.onclick = () => { lightName = button.dataset.light!; light.direction.copyFrom(directions[lightName]); };
+apply();
+const interval = window.setInterval(() => {
+  if (stopped) return;
+  const mesh = meshes.get(selected)!, material = mesh.material as PBRMaterial;
+  const textures = [material.albedoTexture, material.bumpTexture, material.metallicTexture];
+  document.getElementById("stats")!.textContent = JSON.stringify({
+    scope: "Component shader/visual review; no FPS acceptance", selected, mode, lightName,
+    ready: textures.every(texture => texture?.isReady()), errors,
+    source: material.metadata.textureSource, normalMapConvention: material.metadata.normalMapConvention,
+    normalSigns: [material.invertNormalMapX, material.invertNormalMapY], normalStrength: material.bumpTexture?.level,
+    uvMetresPerRepeat: material.metadata.uvMetresPerRepeat,
+    scale: [(material.bumpTexture as Texture)?.uScale, (material.bumpTexture as Texture)?.vScale],
+    camera: camera.position.asArray(), target: camera.getTarget().asArray(), rightHanded: scene.useRightHandedSystem,
+    meshSideOrientation: mesh.sideOrientation, materialSideOrientation: material.sideOrientation,
+    triangles: mesh.getTotalIndices() / 3,
+    css: [canvas.clientWidth, canvas.clientHeight], internal: [engine.getRenderWidth(), engine.getRenderHeight()], renderer: engine.getGlInfo(),
+  }, null, 2);
+}, 500);
+engine.runRenderLoop(() => scene.render());
+const resize = () => engine.resize(); window.addEventListener("resize", resize);
+function dispose() {
+  if (stopped) return; stopped = true; clearInterval(interval); window.removeEventListener("resize", resize);
+  engine.stopRenderLoop(); pack.dispose(); scene.dispose(); engine.dispose();
+}
+window.addEventListener("pagehide", dispose, { once: true });
+if (import.meta.hot) import.meta.hot.dispose(dispose);

@@ -1,0 +1,42 @@
+{
+  "timestampUtc": "2026-10-12T07:01:54.2546089Z",
+  "status": "runtime-stability-frozen-awaiting-GPU-review-density-not-accepted",
+  "sourceHashes": {
+    "client/photographic-grass.ts": "9f4aa76a5401d6bfea9688409af0eeb43f49892bf02a3c5949aeb5d1f1df48d3",
+    "client/photo-grass-transition.ts": "6f019c148b39a4697891a33112888edf317f7292a316b896bbde2efc27621e47",
+    "client/photo-grass-wind.ts": "a2be44573b9a5c89a76bad43a0372c6c9dc207c6405645bc19d0d092de3ec6a9",
+    "client/photo-grass-resources.ts": "80e66f05cd173ddedc5cebd55c36fd7293154af365c96c0e234f40844e1bc304",
+    "client/photo-grass-budget.ts": "c92a55cb88e51f2c458860e3fe1c4877540031c6aa78c2c1197aa3ec373ee1c8",
+    "client/photo-grass-placement.ts": "35f26592169809ad03f242948c6ae715c1e54d0a53221940106f7e2891320a21",
+    "client/photo-grass-source-material.ts": "694bfe9c309e9565f549d59c4ae6d68bd7de70afd2ab2ab7af20e0a9b5840ef4",
+    "tests/photo-grass.test.ts": "3675379b531084ba4cf6c0d187ed9f6df62fa90988a24f75b7af0709eb03b66b",
+    "docs/verification-evidence/photographic-grass-20261011/runtime-culling-coverage.ts": "7e4876d0b3bdb8c63028068476220b360088c1d3445be30019e1ffdbe997a582"
+  },
+  "tests": {
+    "total": 15,
+    "command": "pnpm exec tsx --test tests/photo-grass.test.ts",
+    "exitCode": 0,
+    "passed": 15,
+    "log": "runtime-stability-tests-20261012.log"
+  },
+  "typescript": {
+    "command": "pnpm exec tsc --noEmit -p .cache/grass-realism-study/tsconfig.runtime.json",
+    "include": [
+      "../../client/photographic-grass.ts",
+      "../../client/photo-grass-*.ts",
+      "../../tests/photo-grass.test.ts"
+    ],
+    "exitCode": 0,
+    "log": "runtime-stability-typescript-20261012.log",
+    "extends": "../../tsconfig.json"
+  },
+  "limits": [
+    "No GPU/FPS acceptance from CPU tests.",
+    "Root whole-game image still shows sparse coverage and a sharp spatial tile edge; density not accepted.",
+    "At medium the 12 single-tile draws cover at most twelve square metres before source exclusions.",
+    "Hard caps remain 60000/140000/280000 submitted triangles and 8/12/16 draws.",
+    "Quality reductions enforce smaller limits immediately; ordinary tile/LOD replacements fade locally without a second draw.",
+    "Original photography, source masters and exported geometry are unchanged by this repair."
+  ],
+  "activeProcessesOwned": 0
+}

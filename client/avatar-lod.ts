@@ -462,6 +462,15 @@ export class AvatarLodController {
     if (this.level === "near") return elapsedSeconds;
     this.animationElapsed += elapsedSeconds;
     if (this.animationElapsed + 1e-10 < 1 / 30) return 0;
+    return this.flushAnimationDelta();
+  }
+
+  /** Consume only time already accumulated for a visible medium pose. An
+   * unreachable held support may need that pose before the regular 30Hz tick;
+   * flushing twice cannot advance animation twice or invent extra elapsed time. */
+  flushAnimationDelta() {
+    if (this.disposed || !this.state.visible || this.level !== "medium")
+      return 0;
     const delta = this.animationElapsed;
     this.animationElapsed = 0;
     return delta;

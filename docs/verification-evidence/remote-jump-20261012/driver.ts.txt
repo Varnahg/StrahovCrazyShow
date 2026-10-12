@@ -1,0 +1,182 @@
+/** Root-coordinated visual QA only. One real peer, no synthetic snapshots,
+ * privileged positioning, performance measurement, or interaction with the car.
+ * Prepared from scripts/performance-network.ts and integration-input-backlog.ts.
+ * Deliberately not auto-started by a test or imported by the production bundle. */
+import { Client, type Room } from "@colyseus/sdk";
+import { DEFAULT_PROFILE, type Vec3 } from "../../shared/types";
+import { canonicalInput, PROTOCOL_VERSION, type Authority } from "../../shared/netcode";
+import { MotionDecoder } from "../../shared/motion-codec";
+import { applyAvatarPreset } from "../../client/avatar-presets";
+import { SPAWN } from "../../shared/world";
+
+const endpoint = "http://127.0.0.1:2572";
+const preset = process.argv[2] ?? "eli";
+const seconds = Number(process.argv[3] ?? 180);
+type Mode = "both" | "standing" | "running";
+let mode = (process.argv[4] ?? "both") as Mode;
+if (PROTOCOL_VERSION !== 8 || !["eli", "sam"].includes(preset) ||
+    !Number.isFinite(seconds) || seconds < 10 || seconds > 600 ||
+    !["both", "standing", "running"].includes(mode))
+  throw new Error("Usage: driver.ts [eli|sam] [10..600 seconds] [both|standing|running]; protocol 8 only");
+const nickname = `QA Skok ${preset === "eli" ? "Eli" : "Sam"}`;
+const decoder = new MotionDecoder();
+let room: Room | undefined, authority: Authority | undefined, spawn: Vec3 | undefined;
+let seq = 0, routeTick = 0, yaw = 0, paused = false, stopped = false, socketLeft = false;
+let pulse: ReturnType<typeof setTimeout> | undefined, deadline: ReturnType<typeof setTimeout> | undefined;
+let nextAt = 0, lastReport = -Infinity, lastResync = -Infinity, stopReason = "completed", id = "", phase = "joining";
+let end!: () => void;
+const completed = new Promise<void>(resolve => { end = resolve; });
+const report = (event: string, data: object = {}) => console.log(JSON.stringify({
+  at: new Date().toISOString(), event, nickname, id, phase, mode, paused,
+  position: authority?.state.position, grounded: authority?.state.grounded,
+  speed: authority?.state.speed, ack: authority?.ack, seq, ...data,
+}));
+function stop(reason: string) {
+  if (stopped) return;
+  stopped = true; stopReason = reason;
+  clearTimeout(pulse); clearTimeout(deadline);
+  report("stopping", { reason });
+  end();
+}
+const interrupt = () => stop("SIGINT");
+const terminate = () => stop("SIGTERM");
+const controls = (chunk: string) => {
+  for (const line of chunk.trim().split(/\s+/)) {
+    if (line === "q") stop("operator q");
+    else if (line === "p") { paused = !paused; report("pause"); }
+    else if (["s", "r", "b"].includes(line)) {
+      mode = line === "s" ? "standing" : line === "r" ? "running" : "both";
+      routeTick = 0; report("mode");
+    } else if (line) report("help", { controls: "s standing; r running; b both; p pause/resume; q leave (then Enter)" });
+  }
+};
+process.on("SIGINT", interrupt);
+process.on("SIGTERM", terminate);
+process.stdin.setEncoding("utf8");
+process.stdin.on("data", controls);
+
+function command() {
+  let direction = 0, jump = false;
+  phase = paused ? "paused" : "settle";
+  if (!paused) {
+    const tick = routeTick++;
+    if (mode === "standing") {
+      const t = tick % 180;
+      jump = t === 60;
+      phase = jump ? "standing takeoff input" : "standing / landing / settle";
+    } else if (mode === "running") {
+      const t = tick % 360;
+      direction = t >= 60 && t < 120 ? 1 : t >= 210 && t < 270 ? -1 : 0;
+      jump = t === 72 || t === 222;
+    } else {
+      const t = tick % 600;
+      direction = t >= 240 && t < 300 ? 1 : t >= 420 && t < 480 ? -1 : 0;
+      jump = t === 60 || t === 252 || t === 432;
+      if (t < 240) phase = "standing / landing / settle";
+    }
+  }
+  // Real input feedback keeps the route in the same short strip even after a
+  // mode change or a server correction. Never assign any server/client pose.
+  let x = 0;
+  if (direction && spawn && authority) {
+    const targetX = spawn.x + (direction > 0 ? 4 : 0);
+    const remaining = targetX - authority.state.position.x;
+    if (Math.abs(remaining) > 0.25) x = Math.sign(remaining);
+    phase = direction > 0 ? "running east (spawn+4m)" : "running west (spawn)";
+  }
+  if (x) yaw = x > 0 ? Math.PI / 2 : -Math.PI / 2;
+  if (jump) report("jump input", { kind: direction ? "running" : "standing", routeTick: routeTick - 1 });
+  return canonicalInput({ x, z: 0, yaw, jump, run: false, vehicle: false, seq: ++seq })!;
+}
+
+function move() {
+  if (stopped || !room) return;
+  const now = performance.now();
+  if (now - nextAt > 200) {
+    // Do not dump a paused process's accumulated commands into the server.
+    report("scheduler gap", { milliseconds: now - nextAt });
+    nextAt = now;
+  }
+  try {
+    room.send("inputs", [command(), command()]); // two canonical 60Hz commands / 30Hz packet
+  } catch (error) {
+    report("input send error", { error: String(error) });
+    stop("input send error");
+    return;
+  }
+  nextAt += 1000 / 30;
+  pulse = setTimeout(move, Math.max(0, nextAt - performance.now()));
+}
+
+try {
+  const response = await fetch(endpoint + "/api/session", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    signal: AbortSignal.timeout(10000),
+    body: JSON.stringify({ mode: "multiplayer", profile: {
+      ...DEFAULT_PROFILE, nickname, social: false,
+      avatar: applyAvatarPreset(preset === "eli" ? 2 : 3, DEFAULT_PROFILE.avatar),
+    } }),
+  });
+  if (!response.ok) throw new Error(`Session HTTP ${response.status}: ${await response.text()}`);
+  const session = await response.json() as { token: string; id: string; worldId: string };
+  id = session.id;
+  room = await new Client(endpoint).joinById(session.worldId, { token: session.token, protocol: PROTOCOL_VERSION });
+  room.onMessage("*", () => {});
+  room.onMessage("motion", (wire: unknown) => {
+    const packet = decoder.decode(wire);
+    if (!packet && decoder.needsKeyframe && performance.now() - lastResync >= 1000 && !stopped) {
+      lastResync = performance.now(); room?.send("motionResync");
+    }
+  });
+  room.onMessage("authoritative", (packet: Authority) => {
+    authority = packet;
+    seq = packet.resync ? packet.ack : Math.max(seq, packet.ack);
+    if (!spawn) {
+      spawn = { ...packet.state.position }; yaw = packet.state.yaw;
+      report("actual spawn", { spawn, targetStrip: { fromX: spawn.x, toX: spawn.x + 4, z: spawn.z }, worldId: session.worldId, protocol: PROTOCOL_VERSION });
+      if (Math.hypot(spawn.x - SPAWN.x, spawn.z - SPAWN.z) > 15)
+        stop("spawn outside intended nearby QA area");
+    }
+    if (packet.state.vehicle || !Object.values(packet.state.position).every(Number.isFinite))
+      stop("unexpected vehicle/nonfinite state");
+    if (spawn && (Math.abs(packet.state.position.x - spawn.x) > 7 || Math.abs(packet.state.position.z - spawn.z) > 1.5))
+      stop("left bounded QA strip");
+    if (packet.resync) report("authority resync", { reason: packet.resyncReason ?? "initial/generic" });
+    if (performance.now() - lastReport >= 1000) { lastReport = performance.now(); report("route"); }
+  });
+  room.onMessage("notice", (notice: unknown) => report("server notice", { notice }));
+  room.onError((code, message) => { report("socket error", { code, message }); stop("socket error"); });
+  room.onLeave(code => { socketLeft = true; stop(`socket left ${code}`); });
+  const waitUntil = performance.now() + 5000;
+  while (!authority && !stopped) {
+    if (performance.now() >= waitUntil) throw new Error("No initial authority in 5 seconds");
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
+  if (!stopped) {
+    report("ready", { seconds, controls: "s standing; r running; b both; p pause/resume; q leave (then Enter)", note: "one real QA peer; not an FPS benchmark" });
+    nextAt = performance.now() + 1000 / 30;
+    pulse = setTimeout(move, 1000 / 30);
+    deadline = setTimeout(() => stop("duration elapsed"), seconds * 1000);
+  }
+  await completed;
+} catch (error) {
+  process.exitCode = 1;
+  report("error", { error: String(error) });
+  stop("error");
+} finally {
+  stopped = true;
+  clearTimeout(pulse); clearTimeout(deadline);
+  process.stdin.removeListener("data", controls); process.stdin.pause();
+  process.removeListener("SIGINT", interrupt); process.removeListener("SIGTERM", terminate);
+  decoder.reset();
+  if (room) {
+    let closeTimer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([
+        room.leave(),
+        new Promise<void>(resolve => { closeTimer = setTimeout(() => { void room!.leave(false); resolve(); }, 2000); }),
+      ]);
+    } finally { clearTimeout(closeTimer); }
+  }
+  report(socketLeft ? "disconnected" : "socket close requested", { reason: stopReason, socketLeft });
+}

@@ -90,9 +90,9 @@
     {
       "level": "far",
       "url": "/models/vehicles/campus-hatchback-far.glb",
-      "bytes": 479460,
-      "sha256": "98254bb33689919998a83fd28aae77a6aa31da5826afda368f9f4c4e7f2ead58",
-      "triangles": 9202,
+      "bytes": 485760,
+      "sha256": "1ccf7c893b6ecddc0be58ca61fd8edd2b5a746eddcc5a1adcf42a3575f6d8bdc",
+      "triangles": 9277,
       "parts": 26
     }
   ],
@@ -125,9 +125,32 @@
     "evidence": "docs/vehicles/inner-shell-repair-audit.json",
     "visualAcceptance": "pending whole-game GPU check for this repaired asset"
   },
+  "farGeometryRepair": {
+    "id": "source-fender-lip-20261011",
+    "sourceObject": "Rolled fender lip.003",
+    "runtimePart": "Body:paint",
+    "replacedTriangleRange": [
+      830,
+      958
+    ],
+    "beforeTriangles": 129,
+    "afterTriangles": 204,
+    "sourceRingsRetained": 13,
+    "sourceProfilePoints": 8,
+    "originalEndCapsRetained": true,
+    "addedDraws": 0,
+    "otherPartsMaterialsImagesAndTransformsUnchanged": true,
+    "editableFarMaster": "assets/blender/vehicles/innerscene-hatchback/campus-hatchback-far.blend",
+    "editableFarMasterSha256": "386e3a8cec5470fcc8a93a74ba38b869f7647887fa7fd49b9d6099105f35daa1",
+    "editableMasterAndGeneratorVerified": true,
+    "evidence": "docs/vehicles/far-fender-repair-audit.json",
+    "visualAcceptance": "root GPU review passed for this fender at far/near/medium and animated wheels; FPS not measured",
+    "visualEvidence": "docs/verification-evidence/vehicle-far-repair-20261011/component-gpu-review.json"
+  },
   "limitations": [
     "Near inner-shell fold is repaired by rotating one coplanar diagonal; CPU source/export checks passed, new whole-game visual acceptance is pending.",
-    "Frozen J far body coverage remains limited: the coarse body-ray grid has 22 caliper misses, 5 wheelhouse-liner misses, 1 fender-lip miss, and 8 recesses (7 lip, 1 shell). These are not 28 proven exterior holes.",
+    "One far fender lip is restored from original source rings with closed geometry and unchanged source UV/normal samples; the other body parts retain the archived J approximation.",
+    "The historical pre-repair coarse grid reported 22 caliper misses, 5 liner misses, 1 lip miss and 8 recesses. These are separate open audit cases, not 28 proven exterior holes or a current post-repair count.",
     "Medium/far wheel shells are unchanged from K and closed after weld-before-decimate; far tyres retain four whole radial-extremum tread blocks and omit other entire tiny blocks.",
     "Small panel gaps can alias at subpixel size; reviewed close-up continuous geometry is retained.",
     "Generic CC0 design and simulated paint/parking occupancy; not a claim about specific real cars.",

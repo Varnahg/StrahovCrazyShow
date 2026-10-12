@@ -1,0 +1,659 @@
+{
+  "inputSha256": "98254bb33689919998a83fd28aae77a6aa31da5826afda368f9f4c4e7f2ead58",
+  "outputSha256": "1ccf7c893b6ecddc0be58ca61fd8edd2b5a746eddcc5a1adcf42a3575f6d8bdc",
+  "gridSubdivisions": 16,
+  "samples": 612,
+  "directions": [
+    [
+      1,
+      0,
+      0
+    ],
+    [
+      0.9578262852211513,
+      0.2873478855663454,
+      0
+    ],
+    [
+      0.9578262852211513,
+      -0.2873478855663454,
+      0
+    ],
+    [
+      0.9578262852211513,
+      0,
+      0.2873478855663454
+    ],
+    [
+      0.9578262852211513,
+      0,
+      -0.2873478855663454
+    ],
+    [
+      0.9205746178983235,
+      0.27617238536949706,
+      0.27617238536949706
+    ],
+    [
+      0.9205746178983235,
+      -0.27617238536949706,
+      -0.27617238536949706
+    ]
+  ],
+  "rangeMetres": 0.3,
+  "method": "First hit against complete indexed scene with ancestor TRS; rays originate 0.15m from sampled patch. Grid includes each old/new face, all edges, seven exterior directions and their interior reverses. Not GPU silhouette proof.",
+  "scopes": [
+    {
+      "geometry": "full Body:paint",
+      "candidateTriangles": [
+        93,
+        122
+      ],
+      "backfaceCulling": true,
+      "side": "exterior -X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4281,
+      "lostHits": 3,
+      "gainedHits": 0,
+      "changedFirstHit": 4280,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.13366901047597202,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.375,
+              0.0625,
+              0.5625
+            ],
+            "center": [
+              -0.9772015735507011,
+              0.5361149534583092,
+              -1.363117977976799
+            ]
+          },
+          "dir": [
+            0.9578262852211513,
+            0,
+            0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.1499400062828138
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": {
+            "node": "107 reused Sculpted_tyre.003",
+            "triangle": 3809,
+            "distance": 0.24530100796260892
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.4375,
+              0,
+              0.5625
+            ],
+            "center": [
+              -0.9772700443863869,
+              0.5261025652289391,
+              -1.367251992225647
+            ]
+          },
+          "dir": [
+            0.9578262852211513,
+            0,
+            0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.14999999999999988
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": {
+            "node": "Siped tread blocks.003",
+            "triangle": 207,
+            "distance": 0.2222539901732413
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 1,
+            "barycentric": [
+              0,
+              0.4375,
+              0.5625
+            ],
+            "center": [
+              -0.9772700443863869,
+              0.5261025652289391,
+              -1.367251992225647
+            ]
+          },
+          "dir": [
+            0.9578262852211513,
+            0,
+            0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.14999999999999988
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": {
+            "node": "Siped tread blocks.003",
+            "triangle": 207,
+            "distance": 0.2222539901732413
+          }
+        }
+      ],
+      "sourceBackedLostHits": 0
+    },
+    {
+      "geometry": "full Body:paint",
+      "candidateTriangles": [
+        93,
+        122
+      ],
+      "backfaceCulling": true,
+      "side": "interior +X",
+      "rays": 4284,
+      "beforeHits": 4209,
+      "afterHits": 4275,
+      "lostHits": 9,
+      "gainedHits": 75,
+      "changedFirstHit": 4200,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.023374485710174503,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.375,
+              0.0625,
+              0.5625
+            ],
+            "center": [
+              -0.9772015735507011,
+              0.5361149534583092,
+              -1.363117977976799
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0,
+            -0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 845,
+            "distance": 0.14735529884003523
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": null
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.4375,
+              0,
+              0.5625
+            ],
+            "center": [
+              -0.9772700443863869,
+              0.5261025652289391,
+              -1.367251992225647
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0,
+            -0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 845,
+            "distance": 0.14800087748123103
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": {
+            "node": "Siped tread blocks.003",
+            "triangle": 209,
+            "distance": 0.05577218422805966
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              1,
+              0,
+              0
+            ],
+            "center": [
+              -0.9771887063980103,
+              0.36093568801879883,
+              -1.4428902864456177
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0.2873478855663454,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.15000000000000022
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": null
+        }
+      ],
+      "sourceBackedLostHits": 0
+    },
+    {
+      "geometry": "full Body:paint",
+      "candidateTriangles": [
+        93,
+        122
+      ],
+      "backfaceCulling": false,
+      "side": "exterior -X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4281,
+      "lostHits": 3,
+      "gainedHits": 0,
+      "changedFirstHit": 4280,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.13366901047597202,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.375,
+              0.0625,
+              0.5625
+            ],
+            "center": [
+              -0.9772015735507011,
+              0.5361149534583092,
+              -1.363117977976799
+            ]
+          },
+          "dir": [
+            0.9578262852211513,
+            0,
+            0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.1499400062828138
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": {
+            "node": "107 reused Sculpted_tyre.003",
+            "triangle": 3809,
+            "distance": 0.24530100796260892
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.4375,
+              0,
+              0.5625
+            ],
+            "center": [
+              -0.9772700443863869,
+              0.5261025652289391,
+              -1.367251992225647
+            ]
+          },
+          "dir": [
+            0.9578262852211513,
+            0,
+            0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.14999999999999938
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": {
+            "node": "Siped tread blocks.003",
+            "triangle": 207,
+            "distance": 0.2222539901732413
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 1,
+            "barycentric": [
+              0,
+              0.4375,
+              0.5625
+            ],
+            "center": [
+              -0.9772700443863869,
+              0.5261025652289391,
+              -1.367251992225647
+            ]
+          },
+          "dir": [
+            0.9578262852211513,
+            0,
+            0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.14999999999999938
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": {
+            "node": "Siped tread blocks.003",
+            "triangle": 207,
+            "distance": 0.2222539901732413
+          }
+        }
+      ],
+      "sourceBackedLostHits": 0
+    },
+    {
+      "geometry": "full Body:paint",
+      "candidateTriangles": [
+        93,
+        122
+      ],
+      "backfaceCulling": false,
+      "side": "interior +X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4281,
+      "lostHits": 3,
+      "gainedHits": 0,
+      "changedFirstHit": 2457,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.023551675826268853,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.375,
+              0.0625,
+              0.5625
+            ],
+            "center": [
+              -0.9772015735507011,
+              0.5361149534583092,
+              -1.363117977976799
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0,
+            -0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 845,
+            "distance": 0.14735529884003523
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": {
+            "node": "107 reused Sculpted_tyre.003",
+            "triangle": 3809,
+            "distance": 0.05469899203739114
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.4375,
+              0,
+              0.5625
+            ],
+            "center": [
+              -0.9772700443863869,
+              0.5261025652289391,
+              -1.367251992225647
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0,
+            -0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 845,
+            "distance": 0.14800087748123103
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": {
+            "node": "Siped tread blocks.003",
+            "triangle": 209,
+            "distance": 0.05577218422805966
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 1,
+            "barycentric": [
+              0,
+              0.4375,
+              0.5625
+            ],
+            "center": [
+              -0.9772700443863869,
+              0.5261025652289391,
+              -1.367251992225647
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0,
+            -0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 845,
+            "distance": 0.14800087748123103
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": {
+            "node": "Siped tread blocks.003",
+            "triangle": 209,
+            "distance": 0.05577218422805966
+          }
+        }
+      ],
+      "sourceBackedLostHits": 0
+    },
+    {
+      "geometry": "all 26 parts",
+      "candidateTriangles": [
+        309,
+        338
+      ],
+      "backfaceCulling": true,
+      "side": "exterior -X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4284,
+      "lostHits": 0,
+      "gainedHits": 0,
+      "changedFirstHit": 4283,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.13366901047597202,
+      "lossExamples": [],
+      "sourceBackedLostHits": 0
+    },
+    {
+      "geometry": "all 26 parts",
+      "candidateTriangles": [
+        309,
+        338
+      ],
+      "backfaceCulling": true,
+      "side": "interior +X",
+      "rays": 4284,
+      "beforeHits": 4263,
+      "afterHits": 4277,
+      "lostHits": 7,
+      "gainedHits": 21,
+      "changedFirstHit": 709,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.02114881611331515,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.375,
+              0.0625,
+              0.5625
+            ],
+            "center": [
+              -0.9772015735507011,
+              0.5361149534583092,
+              -1.363117977976799
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0,
+            -0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 845,
+            "distance": 0.14735529884003523
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": null
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              1,
+              0,
+              0
+            ],
+            "center": [
+              -0.9771887063980103,
+              0.36093568801879883,
+              -1.4428902864456177
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0.2873478855663454,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.15000000000000022
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": null
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              1,
+              0,
+              0
+            ],
+            "center": [
+              -0.9771887063980103,
+              0.36093568801879883,
+              -1.4428902864456177
+            ]
+          },
+          "dir": [
+            -0.9205746178983235,
+            0.27617238536949706,
+            0.27617238536949706
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.14999999999999983
+          },
+          "originalSourceFirstHit": null,
+          "originalSourceAllFirstHit": null
+        }
+      ],
+      "sourceBackedLostHits": 0
+    },
+    {
+      "geometry": "all 26 parts",
+      "candidateTriangles": [
+        309,
+        338
+      ],
+      "backfaceCulling": false,
+      "side": "exterior -X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4284,
+      "lostHits": 0,
+      "gainedHits": 0,
+      "changedFirstHit": 4283,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.13366901047597202,
+      "lossExamples": [],
+      "sourceBackedLostHits": 0
+    },
+    {
+      "geometry": "all 26 parts",
+      "candidateTriangles": [
+        309,
+        338
+      ],
+      "backfaceCulling": false,
+      "side": "interior +X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4284,
+      "lostHits": 0,
+      "gainedHits": 0,
+      "changedFirstHit": 320,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.023226053636433652,
+      "lossExamples": [],
+      "sourceBackedLostHits": 0
+    }
+  ],
+  "originalSourceSha256": "107410e01453abbce452fabbe6d51436fb98a0920672643a893263a8861873d7",
+  "exteriorNoNewHoles": false,
+  "sourceSupportedExteriorCoverage": true
+}

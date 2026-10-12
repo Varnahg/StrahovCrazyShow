@@ -1,0 +1,180 @@
+{
+  "capturedAt": "2026-10-11T21:12:28.083Z",
+  "source": {
+    "url": "https://www.innerscene.com/tools/library/3d-parts/blue-five-door-compact-hatchback-5b95b2a0",
+    "sha256": "107410e01453abbce452fabbe6d51436fb98a0920672643a893263a8861873d7",
+    "node": "Rolled fender lip.003",
+    "license": "CC0; retained repository source, not a surveyed Strahov vehicle"
+  },
+  "farBeforeSha256": "98254bb33689919998a83fd28aae77a6aa31da5826afda368f9f4c4e7f2ead58",
+  "farAfterSha256": "1ccf7c893b6ecddc0be58ca61fd8edd2b5a746eddcc5a1adcf42a3575f6d8bdc",
+  "farMasterSha256": "386e3a8cec5470fcc8a93a74ba38b869f7647887fa7fd49b9d6099105f35daa1",
+  "scope": {
+    "part": "Body:paint",
+    "removedTriangles": [
+      830,
+      958
+    ],
+    "removedCount": 129,
+    "sourceCornerVertices": 184,
+    "sourceGeometricVertices": 104,
+    "addedCount": 204,
+    "netTriangleIncrease": 75,
+    "totalFarTriangles": 9277,
+    "parts": 26,
+    "additionalDraws": 0,
+    "geometryClosed": true,
+    "sourceEndCapsRetained": true
+  },
+  "checks": {
+    "sourceTriangleCorrespondence": "All780 source faces found in accepted near; subset ring corner values retained exactly",
+    "outsideComponent": "No shared vertex or geometric position with retained far components; 106 other raw buffer views unchanged",
+    "topology": {
+      "vertices": 104,
+      "edges": 306,
+      "triangles": 204,
+      "euler": 2,
+      "defects": 0
+    },
+    "rays": {
+      "count": 34272,
+      "sourceBackedLostHits": 0,
+      "method": "First hit against complete indexed scene with ancestor TRS; rays originate 0.15m from sampled patch. Grid includes each old/new face, all edges, seven exterior directions and their interior reverses. Not GPU silhouette proof."
+    },
+    "sampledSurfaceDistance": {
+      "method": "All triangle vertices, edge midpoints and centroids to nearest two-sided triangle; sampled surface distance, not certified continuous Hausdorff bound.",
+      "sourceToBaseline": {
+        "samples": 5460,
+        "maximumMetres": 0.01113712717980739,
+        "p95Metres": 0.0053979770785208886,
+        "maximumPoint": [
+          -0.9656190276145935,
+          0.3944460352261861,
+          -1.4432625373204548
+        ]
+      },
+      "baselineToSource": {
+        "samples": 903,
+        "maximumMetres": 0.010681313955794941,
+        "p95Metres": 0.005307819927130498,
+        "maximumPoint": [
+          -0.96244215965271,
+          0.6277520060539246,
+          -0.7828662991523743
+        ]
+      },
+      "sourceToCandidate": {
+        "samples": 5460,
+        "maximumMetres": 0.0033951139322514643,
+        "p95Metres": 0.0027383417552668474,
+        "maximumPoint": [
+          -0.9702722430229187,
+          0.6748396158218384,
+          -0.8084149956703186
+        ]
+      },
+      "candidateToSource": {
+        "samples": 1428,
+        "maximumMetres": 0.003110400358259693,
+        "p95Metres": 0.0028822476283840407,
+        "maximumPoint": [
+          -0.9632924199104309,
+          0.5091499090194702,
+          -0.688953310251236
+        ]
+      },
+      "sourceBounds": [
+        [
+          -0.9775205254554749,
+          -0.9505303502082825
+        ],
+        [
+          0.3593665361404419,
+          0.7568466663360596
+        ],
+        [
+          -1.4468363523483276,
+          -0.653163731098175
+        ]
+      ],
+      "candidateBounds": [
+        [
+          -0.9775205254554749,
+          -0.9505303502082825
+        ],
+        [
+          0.3593665361404419,
+          0.7568466663360596
+        ],
+        [
+          -1.4468363523483276,
+          -0.653163731098175
+        ]
+      ],
+      "drawsAdded": 0,
+      "trianglesAdded": 75
+    },
+    "master": {
+      "materials": 12,
+      "objects": 27,
+      "images": 10,
+      "allImagesPacked": true,
+      "libraries": [],
+      "retainedCornerCount": 5058,
+      "decodedNormalMaximumError": 0,
+      "reopenedAndRegeneratedPaintTrianglesExact": true
+    },
+    "targetedTests": {
+      "command": "pnpm exec tsx --test tests/car-far-fender-repair.test.ts tests/car-wheel-topology.test.ts tests/car-inner-shell-repair.test.ts tests/realistic-car-pack.test.ts",
+      "passed": 18,
+      "failed": 0,
+      "durationMs": 6684.2571
+    },
+    "typescript": {
+      "command": "pnpm exec tsc --noEmit",
+      "exitCode": 0
+    },
+    "finalPayloadGuardTests": {
+      "command": "pnpm exec tsx --test tests/car-far-fender-repair.test.ts",
+      "log": "docs/vehicles/far-fender-evidence/final-targeted-tests.log",
+      "failed": 0,
+      "passed": 4
+    },
+    "previewTypeScript": {
+      "exitCode": 0,
+      "log": "docs/vehicles/far-fender-evidence/preview-typescript.log"
+    }
+  },
+  "rejectedCandidate": {
+    "sha256": "c96516dbc2f6f2d928019dfaf17715a76a43ea93d86e6c5af23d468b07c51938",
+    "reason": "Two-face diagonal preserved directed boundary but exposed actual source lip surfaces; exact ray witness is now a regression test"
+  },
+  "review": {
+    "url": "http://127.0.0.1:5190/docs/vehicles/preview.html?model=far&view=fender",
+    "rightHanded": true,
+    "carRootTranslation": [
+      0,
+      -0.0112,
+      0
+    ],
+    "cameraPosition": [
+      -1.8,
+      0.6688,
+      -1.7
+    ],
+    "cameraTarget": [
+      -0.977,
+      0.5388,
+      -1.18
+    ],
+    "gpuAcceptance": "root GPU component review PASS for outer/detail and near/medium references with wheel motion; see linked evidence",
+    "fpsMeasured": false,
+    "evidence": "docs/verification-evidence/vehicle-far-repair-20261011/component-gpu-review.json"
+  },
+  "limitations": [
+    "Sampled surface distances are not continuous Hausdorff bounds; reduced source arcs use source endpoint chords.",
+    "Historical coarse far-body caliper/liner/lip/recess probes remain distinct open cases; no claim that all far body issues are fixed.",
+    "The current unmodified generator already differs from the historical far master in Body:black; integrated master is a direct repair of the historical far master, preserving that unrelated mesh.",
+    "CPU/NullEngine results are not a GPU performance measurement."
+  ]
+}

@@ -1,0 +1,28 @@
+BJS - [09:42:14]: Babylon.js v9.30.0 - Null engine
+✖ original NormalGL relief keeps its physical light direction on real DMR UVs and Babylon winding (26.4111ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1202.1959
+
+✖ failing tests:
+
+test at tests\surface-normal.test.ts:87:1
+✖ original NormalGL relief keeps its physical light direction on real DMR UVs and Babylon winding (26.4111ms)
+  AssertionError [ERR_ASSERTION]: NormalGL south-facing slope must face increasing terrain Z, not north
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\visual-quality-jump\StrahovCrazyShow\tests\surface-normal.test.ts:138:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

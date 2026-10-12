@@ -8,6 +8,7 @@ import {
 import { buildWorld } from "./world-renderer";
 import { captureModelReview } from "./model-review";
 import { captureRenderCostInventory } from "./render-cost";
+import { snapshotBenchmarkDiagnostics } from "./benchmark-snapshot";
 import { EnabledMeshCandidates } from "./active-mesh-candidates";
 import { writeQuaternion, writeVector3 } from "./transform-updates";
 import {
@@ -16,6 +17,7 @@ import {
 } from "./benchmark-render-profile";
 import { AvatarAnimator } from "./animation";
 import { AvatarLodController } from "./avatar-lod";
+import { LocalAvatarPresentation } from "./local-avatar-presentation";
 import { ContactShadows } from "./contact-shadows";
 import { SceneInstrumentation } from "@babylonjs/core/Instrumentation/sceneInstrumentation";
 import { EngineInstrumentation } from "@babylonjs/core/Instrumentation/engineInstrumentation";
@@ -209,6 +211,7 @@ type Avatar = AvatarRig & {
   target: Player;
   animation: AvatarAnimator;
   lod: AvatarLodController;
+  floorQuery?: (x: number, z: number) => number | undefined;
 };
 
 export class Game {
@@ -232,6 +235,7 @@ export class Game {
   surfacePack?: SurfacePack;
   b6Reality?: B6RealityController;
   cameraArm = 8;
+  private readonly localAvatarPresentation = new LocalAvatarPresentation();
   sim!: Simulation;
   actor!: Actor;
   localId = "guest";
@@ -1456,6 +1460,143 @@ export class Game {
     this.lastCameraInput = performance.now();
     this.distance = Math.max(3, Math.min(15, this.distance + e.deltaY * 0.006));
   };
+  private updateAvatarPresentation(
+    id: string,
+    avatar: Avatar,
+    target: Vector3,
+    dt: number,
+    visible: boolean,
+    resetAnimation = false,
+  ) {
+    const local = id === this.localId;
+    const p = avatar.target;
+    // Remote position and contact come from the same SnapshotBuffer sample.
+    // Unknown legacy contact stays unknown; height motion is not a jump flag.
+    const grounded = local ? this.actor.grounded : p.grounded;
+    const distance = Vector3.Distance(this.camera.position, target);
+    writeVector3(avatar.root.position, target.x, target.y, target.z);
+    const lod = avatar.lod.update({
+      distance,
+      quality: this.quality,
+      position: target,
+      yaw: p.yaw,
+      visible,
+      forceNear: local,
+    });
+    if (lod.resetAnimation || resetAnimation) avatar.animation.reset();
+    let animationDt = avatar.lod.animationDelta(dt);
+    if (
+      animationDt === 0 &&
+      dt > 0 &&
+      lod.visible &&
+      lod.level === "medium" &&
+      grounded === true &&
+      !p.vehicle &&
+      avatar.animation.compensatePlantedFeet(avatar.root.position) ===
+        "unreachable"
+    ) {
+      // A cached stance can end between cadence ticks. Use only elapsed time
+      // already accrued, so the ordinary gait can release it without stretching.
+      animationDt = avatar.lod.flushAnimationDelta();
+    }
+    if (animationDt > 0) {
+      const floorQuery =
+        local || grounded !== undefined
+          ? (avatar.floorQuery ??= (x, z) =>
+              this.sim.floorHeight(x, z, avatar.root.position.y, this.actor))
+          : undefined;
+      avatar.animation.update(
+        {
+          position: avatar.root.position,
+          yaw: p.yaw,
+          emote: p.emote,
+          vehicle: p.vehicle,
+          flashlight: local && this.flashlightOn,
+          grounded,
+          // Remote flight asks only for the real root floor on descent. Exact
+          // foot queries run once on touchdown, not on every crowd gait frame.
+          groundHeight: local || grounded === false ? floorQuery : undefined,
+          touchdownGroundHeight:
+            !local && grounded === true ? floorQuery : undefined,
+        },
+        animationDt,
+      );
+    }
+    this.contactShadows.set(
+      id,
+      target,
+      0.95,
+      0.65,
+      p.yaw,
+      !p.vehicle && lod.visible && distance < 45 && grounded === true,
+    );
+  }
+
+  /** Unchanged collision solve; local visibility consumes its final pose. */
+  private updateCameraFollow(
+    renderPosition: Vector3,
+    eyeHeight: number,
+    dt: number,
+  ) {
+    const target = new Vector3(
+      renderPosition.x,
+      renderPosition.y + (this.actor.vehicle ? 0.7 : 0.6),
+      renderPosition.z,
+    );
+    let desired =
+      this.firstPerson && !this.actor.vehicle
+        ? new Vector3(
+            renderPosition.x,
+            renderPosition.y - 0.8 + eyeHeight,
+            renderPosition.z,
+          )
+        : target.add(
+            new Vector3(
+              -Math.sin(this.yaw) * this.distance,
+              2 + this.pitch * 4,
+              -Math.cos(this.yaw) * this.distance,
+            ),
+          );
+    if (!this.firstPerson || this.actor.vehicle) {
+      const delta = desired.subtract(target).normalize(),
+        length = this.sim.cameraDistance(target, desired, this.actor);
+      this.cameraArm =
+        length < this.cameraArm
+          ? length
+          : this.cameraArm +
+            (length - this.cameraArm) * (1 - Math.exp(-dt * 5));
+      desired = target.add(delta.scale(this.cameraArm));
+    }
+    if (this.firstPerson && !this.actor.vehicle)
+      this.camera.position.copyFrom(desired);
+    else {
+      if (this.vehicleCameraSnap) {
+        this.camera.position.copyFrom(desired);
+        this.vehicleCameraSnap = false;
+      } else
+        this.camera.position = Vector3.Lerp(
+          this.camera.position,
+          desired,
+          1 - Math.exp(-dt * 12),
+        );
+      const safe = this.sim.cameraDistance(
+          target,
+          this.camera.position,
+          this.actor,
+        ),
+        delta = this.camera.position.subtract(target);
+      if (safe < delta.length() - 0.005)
+        this.camera.position = target.add(delta.normalize().scale(safe));
+    }
+    this.camera.setTarget(
+      this.firstPerson && !this.actor.vehicle
+        ? this.camera.position.add(
+            new Vector3(Math.sin(this.yaw), -this.pitch, Math.cos(this.yaw)),
+          )
+        : target,
+    );
+  }
+
   frame() {
     if (!this.ready || this.disposed) return;
     const frameStarted = performance.now();
@@ -1588,54 +1729,19 @@ export class Game {
       new Vector3(pos.x, pos.y, pos.z),
       Math.min(1, this.accumulator / FIXED_DT),
     ).add(this.visualOffset);
+    const localFeet = renderPosition.add(new Vector3(0, -0.8, 0));
     for (const [id, a] of this.avatars) {
-      if (id !== this.localId) {
-        const pose = this.snapshots.sample(id);
-        if (pose) Object.assign(a.target, pose);
-      }
-      const p = a.target,
-        target =
-          id === this.localId
-            ? renderPosition.add(new Vector3(0, -0.8, 0))
-            : new Vector3(p.x, p.y - 0.8, p.z);
-      writeVector3(a.root.position, target.x, target.y, target.z);
-      const lod = a.lod.update({
-        distance: Vector3.Distance(this.camera.position, target),
-        quality: this.quality,
-        position: target,
-        yaw: p.yaw,
-        visible: !p.vehicle && !(id === this.localId && this.firstPerson),
-        forceNear: id === this.localId,
-      });
-      if (lod.resetAnimation) a.animation.reset();
-      const animationDt = a.lod.animationDelta(dt);
-      if (animationDt > 0)
-        a.animation.update(
-          {
-            position: a.root.position,
-            yaw: p.yaw,
-            emote: p.emote,
-            vehicle: p.vehicle,
-            flashlight: id === this.localId && this.flashlightOn,
-            grounded: id === this.localId ? this.actor.grounded : undefined,
-            groundHeight:
-              id === this.localId
-                ? (x, z) =>
-                    this.sim.floorHeight(x, z, a.root.position.y, this.actor)
-                : undefined,
-          },
-          animationDt,
-        );
-      this.contactShadows.set(
+      // Decide local visibility only after the camera's final collision solve.
+      if (id === this.localId) continue;
+      const pose = this.snapshots.sample(id);
+      if (pose) Object.assign(a.target, pose);
+      const p = a.target;
+      this.updateAvatarPresentation(
         id,
-        target,
-        0.95,
-        0.65,
-        p.yaw,
-        !p.vehicle &&
-          lod.visible &&
-          Vector3.Distance(this.camera.position, target) < 45 &&
-          (id !== this.localId || this.actor.grounded),
+        a,
+        new Vector3(p.x, p.y - 0.8, p.z),
+        dt,
+        !p.vehicle,
       );
     }
     const selectedAvatar =
@@ -1662,12 +1768,11 @@ export class Game {
       this.selectionMarker.setEnabled(
         !!selectedAvatar && !selectedAvatar.target.vehicle,
       );
-      if (selectedAvatar)
-        this.selectionMarker.position.set(
-          selectedAvatar.root.position.x,
-          selectedAvatar.root.position.y + 0.025,
-          selectedAvatar.root.position.z,
-        );
+      if (selectedAvatar) {
+        const feet =
+          selectedAvatar === self ? localFeet : selectedAvatar.root.position;
+        this.selectionMarker.position.set(feet.x, feet.y + 0.025, feet.z);
+      }
     }
     const driving = [...this.avatars.values()].find((a) => a.target.vehicle);
     this.car.setEnabled(this.actor.vehicle || !!driving);
@@ -1769,63 +1874,25 @@ export class Game {
       this.actor.vehicle ? this.actor.yaw : (driving?.target.yaw ?? 0),
       true,
     );
-    const target = new Vector3(
-      renderPosition.x,
-      renderPosition.y + (this.actor.vehicle ? 0.7 : 0.6),
-      renderPosition.z,
-    );
-    let desired =
-      this.firstPerson && !this.actor.vehicle
-        ? new Vector3(
-            renderPosition.x,
-            renderPosition.y - 0.8 + (self?.eyeHeight ?? 1.63),
-            renderPosition.z,
-          )
-        : target.add(
-            new Vector3(
-              -Math.sin(this.yaw) * this.distance,
-              2 + this.pitch * 4,
-              -Math.cos(this.yaw) * this.distance,
-            ),
-          );
-    if (!this.firstPerson || this.actor.vehicle) {
-      const delta = desired.subtract(target).normalize(),
-        length = this.sim.cameraDistance(target, desired, this.actor);
-      this.cameraArm =
-        length < this.cameraArm
-          ? length
-          : this.cameraArm +
-            (length - this.cameraArm) * (1 - Math.exp(-dt * 5));
-      desired = target.add(delta.scale(this.cameraArm));
-    }
-    if (this.firstPerson && !this.actor.vehicle)
-      this.camera.position.copyFrom(desired);
-    else {
-      if (this.vehicleCameraSnap) {
-        this.camera.position.copyFrom(desired);
-        this.vehicleCameraSnap = false;
-      } else
-        this.camera.position = Vector3.Lerp(
-          this.camera.position,
-          desired,
-          1 - Math.exp(-dt * 12),
-        );
-      const safe = this.sim.cameraDistance(
-          target,
-          this.camera.position,
-          this.actor,
-        ),
-        delta = this.camera.position.subtract(target);
-      if (safe < delta.length() - 0.005)
-        this.camera.position = target.add(delta.normalize().scale(safe));
-    }
-    this.camera.setTarget(
-      this.firstPerson && !this.actor.vehicle
-        ? this.camera.position.add(
-            new Vector3(Math.sin(this.yaw), -this.pitch, Math.cos(this.yaw)),
-          )
-        : target,
-    );
+    this.updateCameraFollow(renderPosition, self?.eyeHeight ?? 1.63, dt);
+    const localView = this.localAvatarPresentation.update({
+      camera: this.camera.position,
+      feet: localFeet,
+      bodyHeight: self?.bodyHeight ?? 1.8,
+      bodyWidthScale: self ? self.measurements.legSpacing / 0.105 : 1,
+      nearPlane: this.camera.minZ,
+      firstPerson: this.firstPerson,
+      vehicle: this.actor.vehicle,
+    });
+    if (self)
+      this.updateAvatarPresentation(
+        this.localId,
+        self,
+        localFeet,
+        dt,
+        localView.visible,
+        localView.resetAnimation,
+      );
     this.huntMeshes.forEach((m, i) => {
       m.rotation.y += dt;
       m.position.y =
@@ -1863,7 +1930,7 @@ export class Game {
       self,
       this.camera,
       this.flashlightOn && !this.actor.vehicle,
-      this.footFirstPerson,
+      localView.cameraLight,
       this.quality,
     );
     this.vegetation?.update({
@@ -1956,12 +2023,37 @@ export class Game {
         // Release before the callback: it may immediately start another run.
         this.benchmark = undefined;
         b.profile.dispose();
+        const durationSeconds = Number(
+          ((performance.now() - b.start) / 1000).toFixed(2),
+        );
+        // Controllers keep updating (or dispose after HMR) while the result is
+        // retained by the UI. Snapshot only their small diagnostic records.
+        const diagnostics = snapshotBenchmarkDiagnostics({
+          renderer: this.engine.getGlInfo(),
+          ambient: this.transit?.counts ?? { buses: 0, passengers: 0, cars: 0 },
+          realityPack: {
+            architecture: this.worldControllers?.architecture?.metrics ?? null,
+            referenceOnly: true as const,
+            campusExterior:
+              this.worldControllers?.campusExterior?.stats ?? null,
+            landmarks: this.worldControllers?.landmarks?.metrics ?? null,
+            b6: this.b6Reality?.stats ?? null,
+            parkedCars: PARKING_SLOTS.length,
+          },
+          renderCost: {
+            shadows: this.cinematic?.stats ?? null,
+            surfaces: this.surfacePack?.stats ?? null,
+            vegetation: this.vegetation?.stats ?? null,
+          },
+          rendering: this.adaptive.state,
+          gpu: this.gpu,
+          presentationRate: this.presentationRate,
+        });
         this.onBenchmark?.({
+          ...diagnostics,
           date: new Date().toISOString(),
           sourceSnapshotId: import.meta.env.VITE_SOURCE_SNAPSHOT_ID || null,
-          durationSeconds: Number(
-            ((performance.now() - b.start) / 1000).toFixed(2),
-          ),
+          durationSeconds,
           frames: b.frames.length,
           averageFps: Number(((1000 * b.frames.length) / sum).toFixed(1)),
           p95FrameMs: sorted[Math.floor(sorted.length * 0.95)],
@@ -1975,11 +2067,9 @@ export class Game {
             height: this.engine.getRenderHeight(),
           },
           quality: this.quality,
-          renderer: this.engine.getGlInfo(),
           triangles: Math.round(this.scene.getActiveIndices() / 3),
           triangleCountScope: "all-render-passes",
           drawCalls: this.instrumentation.drawCallsCounter.current,
-          ambient: this.transit?.counts ?? { buses: 0, passengers: 0, cars: 0 },
           avatarLod: [...this.avatars.values()].reduce(
             (out, a) => (out[a.lod.level]++, out),
             { near: 0, medium: 0, far: 0 },
@@ -2003,29 +2093,11 @@ export class Game {
               projectionMatrix: Array.from(this.camera.getProjectionMatrix().m),
             },
           },
-          realityPack: {
-            architecture: this.worldControllers?.architecture?.metrics ?? null,
-            referenceOnly: true,
-            campusExterior:
-              this.worldControllers?.campusExterior?.stats ?? null,
-            landmarks: this.worldControllers?.landmarks?.metrics ?? null,
-            b6: this.b6Reality
-              ? {
-                  ...this.b6Reality.stats,
-                  errors: [...this.b6Reality.stats.errors],
-                }
-              : null,
-            parkedCars: PARKING_SLOTS.length,
-          },
           modelReview: captureModelReview(this.scene),
           renderCost: {
+            ...diagnostics.renderCost,
             inventory: captureRenderCostInventory(this.scene),
-            shadows: this.cinematic?.stats ?? null,
-            surfaces: this.surfacePack?.stats ?? null,
-            vegetation: this.vegetation?.stats ?? null,
           },
-          rendering: this.adaptive.state,
-          gpu: this.gpu,
           frameWork: {
             cpuMs: this.lastCpuFrameMs ?? null,
             gpuMs: this.lastGpuFrameMs ?? null,
@@ -2046,7 +2118,6 @@ export class Game {
           frameIntervalsMs: b.frames,
           weatherAtStart: b.weatherAtStart,
           weatherAtEnd: this.weather ? structuredClone(this.weather) : null,
-          presentationRate: this.presentationRate,
         });
       }
     }

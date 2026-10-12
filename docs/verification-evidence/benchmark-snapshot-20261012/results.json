@@ -1,0 +1,43 @@
+{
+  "capturedAtUtc": "2026-10-12T07:10:36.4317975Z",
+  "status": "passed-targeted-scope",
+  "scope": "CPU ownership/lifecycle regression and scoped TypeScript; no GPU benchmark or full production acceptance",
+  "negativeControl": {
+    "implementation": "snapshot helper returned its input, preserving the previous live-reference semantics",
+    "tests": 1,
+    "passed": 0,
+    "failed": 1,
+    "expectedFailure": "later updates must not rewrite the completed export",
+    "log": "negative-alias-control.log"
+  },
+  "targeted": {
+    "command": "pnpm exec tsx --test tests/benchmark-snapshot.test.ts tests/benchmark-presentation.test.ts",
+    "tests": 10,
+    "passed": 10,
+    "failed": 0,
+    "exitCode": 0,
+    "log": "targeted-tests.log"
+  },
+  "typecheck": {
+    "command": "pnpm exec tsc --project .cache/benchmark-snapshot/tsconfig.json --noEmit",
+    "exitCode": 0,
+    "log": "typecheck.log",
+    "config": "tsconfig.json.txt"
+  },
+  "diffCheckExitCode": 0,
+  "sources": {
+    "client/benchmark-snapshot.ts": "34388f1a537306d3d48456aa3852ddf59c327a1ca4452234e669457f7c8ebfce",
+    "tests/benchmark-snapshot.test.ts": "067816e2576b769e15fd3c2d9ff2b8dbcf6521052ce0cf4932089172181df19e"
+  },
+  "artifactSha256": {
+    "negative-alias-control.log": "5ce61067564be0adf1eba06edee11cad55fee118e3f89ecf1895023c9a6fe34b",
+    "targeted-tests.log": "cfdeccbfc489aa5c11853dd84c22fe52e8cc89a2e747b8128171d09411e90811",
+    "typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tsconfig.json.txt": "541f4ec9ceac7a857ed410f49bf82775d07fb9945a93a5eef6900d8bf83f971c"
+  },
+  "fullGameSourceSnapshotId": null,
+  "pending": [
+    "UI/GPU delayed export verification",
+    "stable checkpoint full tests/build/integration"
+  ]
+}

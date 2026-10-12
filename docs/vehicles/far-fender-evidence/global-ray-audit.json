@@ -1,0 +1,813 @@
+{
+  "inputSha256": "98254bb33689919998a83fd28aae77a6aa31da5826afda368f9f4c4e7f2ead58",
+  "outputSha256": "c96516dbc2f6f2d928019dfaf17715a76a43ea93d86e6c5af23d468b07c51938",
+  "gridSubdivisions": 16,
+  "samples": 612,
+  "directions": [
+    [
+      1,
+      0,
+      0
+    ],
+    [
+      0.9578262852211513,
+      0.2873478855663454,
+      0
+    ],
+    [
+      0.9578262852211513,
+      -0.2873478855663454,
+      0
+    ],
+    [
+      0.9578262852211513,
+      0,
+      0.2873478855663454
+    ],
+    [
+      0.9578262852211513,
+      0,
+      -0.2873478855663454
+    ],
+    [
+      0.9205746178983235,
+      0.27617238536949706,
+      0.27617238536949706
+    ],
+    [
+      0.9205746178983235,
+      -0.27617238536949706,
+      -0.27617238536949706
+    ]
+  ],
+  "rangeMetres": 0.3,
+  "method": "First hit against complete indexed scene with ancestor TRS; rays originate 0.15m from sampled patch. Grid includes each old/new face, all edges, seven exterior directions and their interior reverses. Not GPU silhouette proof.",
+  "scopes": [
+    {
+      "geometry": "full Body:paint",
+      "candidateTriangles": [
+        93,
+        93
+      ],
+      "backfaceCulling": true,
+      "side": "exterior -X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4252,
+      "lostHits": 32,
+      "gainedHits": 0,
+      "changedFirstHit": 3769,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.06098336100846194,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.3125,
+              0.5625,
+              0.125
+            ],
+            "center": [
+              -0.9765905439853668,
+              0.48775093257427216,
+              -1.3888756483793259
+            ]
+          },
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.14947754877537486
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 83,
+            "distance": 0.1519933455427278
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.3125,
+              0.5625,
+              0.125
+            ],
+            "center": [
+              -0.9765905439853668,
+              0.48775093257427216,
+              -1.3888756483793259
+            ]
+          },
+          "dir": [
+            0.9578262852211513,
+            -0.2873478855663454,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.14945700301938877
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 83,
+            "distance": 0.15233402862801215
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.3125,
+              0.5625,
+              0.125
+            ],
+            "center": [
+              -0.9765905439853668,
+              0.48775093257427216,
+              -1.3888756483793259
+            ]
+          },
+          "dir": [
+            0.9578262852211513,
+            0,
+            0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.14946005654532485
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 83,
+            "distance": 0.15292250770350754
+          }
+        }
+      ]
+    },
+    {
+      "geometry": "full Body:paint",
+      "candidateTriangles": [
+        93,
+        93
+      ],
+      "backfaceCulling": true,
+      "side": "interior +X",
+      "rays": 4284,
+      "beforeHits": 4209,
+      "afterHits": 4135,
+      "lostHits": 74,
+      "gainedHits": 0,
+      "changedFirstHit": 0,
+      "maximumAbsoluteFirstHitDeltaMetres": 0,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0,
+              0,
+              1
+            ],
+            "center": [
+              -0.9773333072662354,
+              0.654565691947937,
+              -1.3084222078323364
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            -0.2873478855663454,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.14999999999999944
+          },
+          "originalSourceFirstHit": {
+            "node": "Wheelhouse inner liner.003",
+            "triangle": 216,
+            "distance": 0.047971665913878705
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0,
+              0,
+              1
+            ],
+            "center": [
+              -0.9773333072662354,
+              0.654565691947937,
+              -1.3084222078323364
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0,
+            0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.14999999999999983
+          },
+          "originalSourceFirstHit": {
+            "node": "Wheelhouse inner liner.003",
+            "triangle": 200,
+            "distance": 0.04690904248618689
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.0625,
+              0.4375,
+              0.5
+            ],
+            "center": [
+              -0.9767817109823227,
+              0.5778374075889587,
+              -1.3467181473970413
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0,
+            -0.2873478855663454
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.1499999999999996
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 148,
+            "distance": 0.12947271261179225
+          }
+        }
+      ]
+    },
+    {
+      "geometry": "full Body:paint",
+      "candidateTriangles": [
+        93,
+        93
+      ],
+      "backfaceCulling": false,
+      "side": "exterior -X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4281,
+      "lostHits": 3,
+      "gainedHits": 0,
+      "changedFirstHit": 3798,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.02391015004107558,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.4375,
+              0.375,
+              0.1875
+            ],
+            "center": [
+              -0.9768049940466881,
+              0.47606564313173294,
+              -1.3928734362125397
+            ]
+          },
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.14965169918358318
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 67,
+            "distance": 0.15257133161724412
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.5625,
+              0.1875,
+              0.25
+            ],
+            "center": [
+              -0.9770194441080093,
+              0.4643803536891937,
+              -1.3968712240457535
+            ]
+          },
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.14982584959179154
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 67,
+            "distance": 0.1523412102079448
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.625,
+              0.125,
+              0.25
+            ],
+            "center": [
+              -0.9770879149436951,
+              0.4543679654598236,
+              -1.4010052382946014
+            ]
+          },
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.149883899727861
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 66,
+            "distance": 0.1513334956639227
+          }
+        }
+      ]
+    },
+    {
+      "geometry": "full Body:paint",
+      "candidateTriangles": [
+        93,
+        93
+      ],
+      "backfaceCulling": false,
+      "side": "interior +X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4281,
+      "lostHits": 3,
+      "gainedHits": 0,
+      "changedFirstHit": 18,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.000904994967685091,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.4375,
+              0.375,
+              0.1875
+            ],
+            "center": [
+              -0.9768049940466881,
+              0.47606564313173294,
+              -1.3928734362125397
+            ]
+          },
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.15000000000000005
+          },
+          "originalSourceFirstHit": {
+            "node": "Wheelhouse inner liner.003",
+            "triangle": 69,
+            "distance": 0.05823896789822562
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.5625,
+              0.1875,
+              0.25
+            ],
+            "center": [
+              -0.9770194441080093,
+              0.4643803536891937,
+              -1.3968712240457535
+            ]
+          },
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.15000000000000005
+          },
+          "originalSourceFirstHit": {
+            "node": "Wheelhouse inner liner.003",
+            "triangle": 68,
+            "distance": 0.056956518681616906
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.625,
+              0.125,
+              0.25
+            ],
+            "center": [
+              -0.9770879149436951,
+              0.4543679654598236,
+              -1.4010052382946014
+            ]
+          },
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.15000000000000005
+          },
+          "originalSourceFirstHit": {
+            "node": "Wheelhouse inner liner.003",
+            "triangle": 68,
+            "distance": 0.054302681961191285
+          }
+        }
+      ]
+    },
+    {
+      "geometry": "all 26 parts",
+      "candidateTriangles": [
+        309,
+        309
+      ],
+      "backfaceCulling": true,
+      "side": "exterior -X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4274,
+      "lostHits": 10,
+      "gainedHits": 0,
+      "changedFirstHit": 3791,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.13652067472294827,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.3125,
+              0.5625,
+              0.125
+            ],
+            "center": [
+              -0.9765905439853668,
+              0.48775093257427216,
+              -1.3888756483793259
+            ]
+          },
+          "dir": [
+            0.9578262852211513,
+            -0.2873478855663454,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.14945700301938877
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 83,
+            "distance": 0.15233402862801215
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.3125,
+              0.5625,
+              0.125
+            ],
+            "center": [
+              -0.9765905439853668,
+              0.48775093257427216,
+              -1.3888756483793259
+            ]
+          },
+          "dir": [
+            0.9205746178983235,
+            0.27617238536949706,
+            0.27617238536949706
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.14943567854029913
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 83,
+            "distance": 0.1526391678484328
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.4375,
+              0.375,
+              0.1875
+            ],
+            "center": [
+              -0.9768049940466881,
+              0.47606564313173294,
+              -1.3928734362125397
+            ]
+          },
+          "dir": [
+            0.9578262852211513,
+            -0.2873478855663454,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.1496380020129258
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 67,
+            "distance": 0.15294777383579108
+          }
+        }
+      ]
+    },
+    {
+      "geometry": "all 26 parts",
+      "candidateTriangles": [
+        309,
+        309
+      ],
+      "backfaceCulling": true,
+      "side": "interior +X",
+      "rays": 4284,
+      "beforeHits": 4263,
+      "afterHits": 4243,
+      "lostHits": 20,
+      "gainedHits": 0,
+      "changedFirstHit": 0,
+      "maximumAbsoluteFirstHitDeltaMetres": 0,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.125,
+              0.875,
+              0
+            ],
+            "center": [
+              -0.97623011469841,
+              0.5011091232299805,
+              -1.3850140869617462
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0.2873478855663454,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.15000000000000022
+          },
+          "originalSourceFirstHit": {
+            "node": "Wheelhouse inner liner.003",
+            "triangle": 84,
+            "distance": 0.07151206826169944
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.1875,
+              0.8125,
+              0
+            ],
+            "center": [
+              -0.9762985855340958,
+              0.49109673500061035,
+              -1.3891481012105942
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0.2873478855663454,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.15000000000000022
+          },
+          "originalSourceFirstHit": {
+            "node": "Wheelhouse inner liner.003",
+            "triangle": 69,
+            "distance": 0.06986497082641613
+          }
+        },
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.25,
+              0.75,
+              0
+            ],
+            "center": [
+              -0.9763670563697815,
+              0.48108434677124023,
+              -1.3932821154594421
+            ]
+          },
+          "dir": [
+            -0.9578262852211513,
+            0.2873478855663454,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.15000000000000022
+          },
+          "originalSourceFirstHit": {
+            "node": "Wheelhouse inner liner.003",
+            "triangle": 68,
+            "distance": 0.06758362937711157
+          }
+        }
+      ]
+    },
+    {
+      "geometry": "all 26 parts",
+      "candidateTriangles": [
+        309,
+        309
+      ],
+      "backfaceCulling": false,
+      "side": "exterior -X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4283,
+      "lostHits": 1,
+      "gainedHits": 0,
+      "changedFirstHit": 3800,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.04722486511773097,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.5625,
+              0.1875,
+              0.25
+            ],
+            "center": [
+              -0.9770194441080093,
+              0.4643803536891937,
+              -1.3968712240457535
+            ]
+          },
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 848,
+            "distance": 0.14982584959179154
+          },
+          "originalSourceFirstHit": {
+            "node": "Rolled fender lip.003",
+            "triangle": 67,
+            "distance": 0.1523412102079448
+          }
+        }
+      ]
+    },
+    {
+      "geometry": "all 26 parts",
+      "candidateTriangles": [
+        309,
+        309
+      ],
+      "backfaceCulling": false,
+      "side": "interior +X",
+      "rays": 4284,
+      "beforeHits": 4284,
+      "afterHits": 4283,
+      "lostHits": 1,
+      "gainedHits": 0,
+      "changedFirstHit": 12,
+      "maximumAbsoluteFirstHitDeltaMetres": 0.000904994967685091,
+      "lossExamples": [
+        {
+          "sample": {
+            "scope": "old",
+            "face": 0,
+            "barycentric": [
+              0.5625,
+              0.1875,
+              0.25
+            ],
+            "center": [
+              -0.9770194441080093,
+              0.4643803536891937,
+              -1.3968712240457535
+            ]
+          },
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "before": {
+            "node": "Body:paint",
+            "triangle": 847,
+            "distance": 0.15000000000000005
+          },
+          "originalSourceFirstHit": {
+            "node": "Wheelhouse inner liner.003",
+            "triangle": 68,
+            "distance": 0.056956518681616906
+          }
+        }
+      ]
+    }
+  ],
+  "originalSourceSha256": "107410e01453abbce452fabbe6d51436fb98a0920672643a893263a8861873d7",
+  "exteriorNoNewHoles": false
+}

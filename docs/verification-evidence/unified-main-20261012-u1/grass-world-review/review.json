@@ -1,0 +1,84 @@
+{
+  "capturedAt": "2026-10-12T09:11:36.973Z",
+  "scope": "Whole-game DEV appearance and resource counters only; not frozen production performance acceptance.",
+  "url": "http://127.0.0.1:5190/",
+  "sourceSnapshotId": null,
+  "runtimeHashes": {
+    "client/photographic-grass.ts": "bad76a906959d87c1f32a05b764466ffb158c14da6976824821e21e408dd5f6a",
+    "client/photo-grass-batch.ts": "5c7d13bd394925eeab4922b8ac79939f920475779de68fb6c10621aa43d6949e",
+    "client/photo-grass-budget.ts": "119026716ffe311b9b0d2980aa255d739cd55a04ddf6b81b0f8c139d0ca0854e",
+    "client/photo-grass-placement.ts": "9f91ea57ae32f85aeaa58964d8ecd178e0ac071714c4afad56c2e9baf19ea0d0",
+    "client/photo-grass-resources.ts": "14ebd248bc3a2bde786c9b52b80d82dfed604b387c6b87a3706f533cd3d5ac0f",
+    "client/photo-grass-wind.ts": "9a4efbf60a1688bf8f29a2d3a5bebdcf183ba1be3d40d34ed7b0477832b38c57",
+    "client/photo-grass-transition.ts": "6f019c148b39a4697891a33112888edf317f7292a316b896bbde2efc27621e47",
+    "client/vegetation.ts": "e86c8704b6d18afc541ba3a6d629c3dd6df89522793f2e3df32ab2c3a72d4f96",
+    "public/models/vegetation/grass/geometry.json": "6834b188faa69a3ae3366e97a5de8c99dc6b7132d75d2eb15fbfabcb5545fa12",
+    "tests/photo-grass.test.ts": "5884e5765bb64d3c120ff3e0a992a53b28e3d4ce42f7db9e3e6b184e5aec8b0f"
+  },
+  "renderer": {
+    "vendor": "Google Inc. (Intel)",
+    "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+  },
+  "cssResolution": [
+    1280,
+    720
+  ],
+  "internalResolution": [
+    1280,
+    720
+  ],
+  "session": "Synthetic QA Tráva multiplayer participant; one session",
+  "observations": [
+    "Short photographic leaf grass remains continuous during first-person sideways walking.",
+    "Third-person, medium/high settings, night preview and F flashlight inspected.",
+    "No old square tile border observed on the inspected route.",
+    "Grass outside flashlight cone remains dark."
+  ],
+  "mediumDayGrass": {
+    "representation": "photographic-short-lawn",
+    "draws": 2,
+    "triangles": 116284,
+    "instances": 3203,
+    "submittedLeaves": 58142,
+    "activeTiles": 40,
+    "cachedTiles": 247,
+    "textureResolution": 1024,
+    "textureHeight": 512,
+    "triangleLimit": 140000,
+    "drawLimit": 12,
+    "allocatedInstanceBytes": 819200,
+    "transitionRoots": 0,
+    "ready": true
+  },
+  "consoleErrors": [],
+  "renderErrors": 0,
+  "assetErrors": 0,
+  "limitations": [
+    "DEV observation is not a production FPS claim.",
+    "Cold placement CPU spikes remain unresolved: approximately265ms first medium update and181ms high transition.",
+    "The separate active record remained the original medium/day snapshot after changing settings."
+  ],
+  "images": [
+    {
+      "file": "medium-first-person-before-move.jpg",
+      "sha256": "d0fe45a37c103f17dadbb2afd0cbd5f9aead3a36a1ddc15983abe08cccbeb5b4"
+    },
+    {
+      "file": "medium-first-person-after-move.jpg",
+      "sha256": "d7b34686b26879e920e0160394a4777e74770086cb7e4eb3130b5d98ae1f5600"
+    },
+    {
+      "file": "high-first-person.jpg",
+      "sha256": "99950f4808314006c42a22408801b9a6e9d0b5b7e4588326fc0420eff3d0e0b0"
+    },
+    {
+      "file": "night-flashlight-off.jpg",
+      "sha256": "fd18e3268748637736459789415f0886606997e5d63e44f40c0c7964ec994e4d"
+    },
+    {
+      "file": "night-flashlight-on.jpg",
+      "sha256": "a56e5b189da8c2edf0f4e13b057ec20009dd9cbbb23cd05665faab4ff7060b84"
+    }
+  ]
+}

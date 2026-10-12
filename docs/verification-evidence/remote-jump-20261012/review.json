@@ -1,0 +1,233 @@
+{
+  "archivedAtUtc": "2026-10-12T07:26:36.4495772Z",
+  "status": "reviewed-selected-functional-scope",
+  "scope": "Existing root GPU captures of one browser player plus one real SDK peer, HUD enabled. No new execution performed for this archive.",
+  "sourceSnapshotId": null,
+  "sourceHashes": {
+    "client/game.ts": "77c79081ab1cdb368c1aca022963060a34ca20779b014c0fc70ba141ce12cd66",
+    "client/animation.ts": "19346ab0af5e6550c154844f87313df6b99c46f51e636cb2e6b7e2e5e7211570",
+    "shared/netcode.ts": "d1cb306091462adac6181bd8ba08865eec86f103bf794ba38dd249bc73c3465e",
+    "tests/remote-jump-animation.test.ts": "3848ac10d82f38691c0814fb0990134732ea3bf1c7dd3821b7f33a19c3863541",
+    "tests/helpers/remote-jump-fixture.ts": "15d76417c9f3960c24e1fdbd2ee36254ad33c2e516b5e3ae0954b78a7783edbe"
+  },
+  "sourceHashScope": "Five original remote-jump freeze hashes rechecked at archival time and matching the documented reviewed Game77c79081 source. Not a hash of the complete development scene or a frozen production benchmark.",
+  "provenance": {
+    "images": "Original bytes copied from cache; capturedAtUtc taken from the corresponding original capture index.",
+    "observations": "Images independently inspected during archival; input/position, console, resolution and cleanup metadata below were reported by the root operator.",
+    "driverLogs": "No raw SDK stdout file was present in the supplied cache. Reported runtime/cleanup values are explicitly operator observations, not a reconstructed raw transcript.",
+    "lod": "Near/distant name the viewing setups. The cache folder named medium-frames does not prove an actual medium LOD counter."
+  },
+  "setup": {
+    "url": "http://127.0.0.1:5190/",
+    "api": "http://127.0.0.1:2572",
+    "protocol": 8,
+    "adapter": "Intel UHD 630",
+    "sessions": {
+      "browser": 1,
+      "sdk": 1
+    },
+    "nickname": "QA Skok Eli",
+    "sessionId": "24861f0f-84ea-4d8f-bc6a-8df1820305e5",
+    "driverArguments": [
+      "eli",
+      "180",
+      "both"
+    ],
+    "laterStdinModes": [
+      "s",
+      "r"
+    ],
+    "positioning": "Normal canonical input through the actual server physics; no privileged teleport or fabricated motion snapshots.",
+    "approximateInitialAuthority": [
+      111.800003,
+      -2.1935,
+      12
+    ],
+    "approximateSettledAuthorityY": -2.3734,
+    "runFlag": false,
+    "runFlagMeaning": "The driver mode named running sends movement with run:false; these GPU captures do not prove Shift sprint jumping."
+  },
+  "views": [
+    {
+      "name": "near",
+      "quality": "medium",
+      "css": [
+        1280,
+        720
+      ],
+      "internal": [
+        1280,
+        720
+      ],
+      "localPlayerXZ": [
+        110,
+        12
+      ],
+      "remoteLateralDistanceMetresApprox": [
+        1.7,
+        5.8
+      ],
+      "cameraSetbackMetresApprox": 7,
+      "actualAvatarLod": null
+    },
+    {
+      "name": "distant",
+      "quality": "low",
+      "css": [
+        1280,
+        720
+      ],
+      "internal": [
+        984,
+        553
+      ],
+      "nativeRoute": "D1600ms, S3000ms, A1600ms",
+      "localPlayerXZ": [
+        110.64998,
+        26.21823
+      ],
+      "cameraToRemoteMetresApprox": 20,
+      "actualAvatarLod": null
+    }
+  ],
+  "reportedFinalBrowser": {
+    "boot": "ready",
+    "renderErrorCount": 0,
+    "consoleWarnings": 0,
+    "consoleErrors": 0
+  },
+  "reportedCleanup": {
+    "finishedAtUtc": "2026-10-12T07:21:47.594Z",
+    "exitCode": 0,
+    "socketLeft": true,
+    "browserParticipantsAfterLeave": 1
+  },
+  "images": [
+    {
+      "file": "near-04-airborne.jpg",
+      "sha256": "49f4819dfc1f100e410b2a2e3177ead5f85d0a7128015bcb45ef2abeaa675706",
+      "bytes": 69534,
+      "capturedAtUtc": "2026-10-12T07:20:06.861Z",
+      "originalPath": "C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow/.cache/remote-jump-qa/near-frames/04.jpg",
+      "sourceSeries": "near",
+      "sourceIndex": 4,
+      "phase": "airborne",
+      "phaseProvenance": "Root visual review and comparative screenshot interpretation; no per-frame authoritative grounded sample or runtime LOD counter was captured.",
+      "observation": "Eli is above the asphalt with bent knees; no visible inverted leg silhouette."
+    },
+    {
+      "file": "near-06-descent.jpg",
+      "sha256": "935ebb3c0af32f1d878762909cd9e16f89abbb9617f4bc259032925555df0809",
+      "bytes": 69641,
+      "capturedAtUtc": "2026-10-12T07:20:07.173Z",
+      "originalPath": "C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow/.cache/remote-jump-qa/near-frames/06.jpg",
+      "sourceSeries": "near",
+      "sourceIndex": 6,
+      "phase": "descent",
+      "phaseProvenance": "Root visual review and comparative screenshot interpretation; no per-frame authoritative grounded sample or runtime LOD counter was captured.",
+      "observation": "Eli is lower than frame04, knees remain bent."
+    },
+    {
+      "file": "near-08-ground.jpg",
+      "sha256": "088bae6c1334af0307dc4f9bbd9bf80ab52398b6db207209b94c139b5db672d5",
+      "bytes": 69580,
+      "capturedAtUtc": "2026-10-12T07:20:07.445Z",
+      "originalPath": "C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow/.cache/remote-jump-qa/near-frames/08.jpg",
+      "sourceSeries": "near",
+      "sourceIndex": 8,
+      "phase": "ground",
+      "phaseProvenance": "Root visual review and comparative screenshot interpretation; no per-frame authoritative grounded sample or runtime LOD counter was captured.",
+      "observation": "Eli returns to standing height with both shoes near the asphalt; no conspicuous persistent hover in this image."
+    },
+    {
+      "file": "distant-00-airborne.jpg",
+      "sha256": "de2f9ec83ec2927d1a3dbd177cae93d03049451999587047642960261606906f",
+      "bytes": 65796,
+      "capturedAtUtc": "2026-10-12T07:21:26.15Z",
+      "originalPath": "C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow/.cache/remote-jump-qa/medium-frames/00.jpg",
+      "sourceSeries": "medium",
+      "sourceIndex": 0,
+      "phase": "airborne",
+      "phaseProvenance": "Root visual review and comparative screenshot interpretation; no per-frame authoritative grounded sample or runtime LOD counter was captured.",
+      "observation": "Raised remote silhouette, partly obscured by a parked car; fine leg/contact assessment is limited."
+    },
+    {
+      "file": "distant-04-ground.jpg",
+      "sha256": "a14d413be847ed3c0483f1fc30a8d692426b6b91f3618a688dcdf1d3fb61489b",
+      "bytes": 65710,
+      "capturedAtUtc": "2026-10-12T07:21:27.067Z",
+      "originalPath": "C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow/.cache/remote-jump-qa/medium-frames/04.jpg",
+      "sourceSeries": "medium",
+      "sourceIndex": 4,
+      "phase": "ground",
+      "phaseProvenance": "Root visual review and comparative screenshot interpretation; no per-frame authoritative grounded sample or runtime LOD counter was captured.",
+      "observation": "Remote character is lower and near ground level; small screen size limits precise foot assessment."
+    },
+    {
+      "file": "distant-20-moving-airborne.jpg",
+      "sha256": "1647d1efdbc9f2d67b7effc58e1dda0bd720c4a81a61319d0b0054faaa1d6606",
+      "bytes": 65897,
+      "capturedAtUtc": "2026-10-12T07:21:29.184Z",
+      "originalPath": "C:/Users/rezac/.codex/worktrees/visual-quality-jump/StrahovCrazyShow/.cache/remote-jump-qa/medium-frames/20.jpg",
+      "sourceSeries": "medium",
+      "sourceIndex": 20,
+      "phase": "moving airborne",
+      "phaseProvenance": "Root visual review and comparative screenshot interpretation; no per-frame authoritative grounded sample or runtime LOD counter was captured.",
+      "observation": "Remote silhouette is raised with visibly bent legs during the moving sequence."
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "driver.ts.txt",
+      "originalPath": ".cache/remote-jump-qa/driver.ts",
+      "sha256": "0cd42daf5f8c803d00180a8d486755b23eeaa55da66008320e8366590745df10",
+      "bytes": 8720
+    },
+    {
+      "file": "near-capture-index.json",
+      "originalPath": ".cache/remote-jump-qa/near-frames/captures.json",
+      "sha256": "cdb776c35e6d43673920544154377690ccfd853fa651293af71b8a4cf22d2a6f",
+      "bytes": 5880
+    },
+    {
+      "file": "distant-capture-index.json",
+      "originalPath": ".cache/remote-jump-qa/medium-frames/captures.json",
+      "sha256": "cbb6558a302e2514471b191ef5418ab86d522ae0d45d09b1eb7bb4287cffe5f3",
+      "bytes": 7804
+    },
+    {
+      "file": "cpu-targeted-tests.log",
+      "originalPath": ".cache/remote-jump-20261012/targeted-tests.log",
+      "sha256": "d5d990a99c09de77eda89179cccce9b847e65099b439983b3d7e8d220f36cf97",
+      "bytes": 11792
+    },
+    {
+      "file": "cpu-query-cache-tests.log",
+      "originalPath": ".cache/remote-jump-20261012/query-cache-tests.log",
+      "sha256": "5c44cf6f2b66f31f5d55a32312fe3d502952b5431fc34bea15f4d8dfd5a98159",
+      "bytes": 2193
+    },
+    {
+      "file": "cpu-typecheck.log",
+      "originalPath": ".cache/remote-jump-20261012/typecheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "cpu-tsconfig.json.txt",
+      "originalPath": ".cache/remote-jump-20261012/tsconfig.json",
+      "sha256": "d2e5f31075dde2f23f9630fbd80de7f8394d8a9495b38ea3c9700791567ab543",
+      "bytes": 221
+    }
+  ],
+  "limits": [
+    "Functional visuals only; screenshot bursts affect the instantaneous HUD FPS, which is not used as a benchmark.",
+    "This is a development scene without a whole-production source snapshot; GeForce acceptance and a stable production checkpoint remain pending.",
+    "Actual avatar LOD was not independently read; quality/distance are setup observations only.",
+    "No per-frame network-contact or contact-shadow telemetry was saved. Precise foot-clearance and first-contact timing remain CPU-test evidence.",
+    "The distant character is small and sometimes car-occluded. The selected still frames cannot establish uninterrupted gait quality.",
+    "Only Eli was exercised in this GPU run. Sam and true run:true sprint scenarios remain separate CPU evidence.",
+    "The complete original capture indexes include additional cache frames; only the six selected image files are archived here.",
+    "Driver/config .txt files retain their original relative paths and are provenance copies, not relocated runnable scripts."
+  ]
+}

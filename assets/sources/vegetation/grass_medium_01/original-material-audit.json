@@ -1,0 +1,1134 @@
+{
+  "originalSha256": "62ac1b9f9d8196c6dfc295387fe2d8a9716d811e69e4b873b7b3632121bebcb7",
+  "originalUnchanged": true,
+  "materials": [
+    {
+      "name": "grass_medium_01",
+      "nodes": [
+        {
+          "name": "Frame",
+          "type": "FRAME",
+          "image": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.001",
+          "type": "FRAME",
+          "image": null,
+          "inputs": {}
+        },
+        {
+          "name": "Mapping",
+          "type": "MAPPING",
+          "image": null,
+          "inputs": {
+            "Vector": {
+              "linked": true,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Location": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Rotation": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Scale": {
+              "linked": false,
+              "default": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "Texture Coordinate",
+          "type": "TEX_COORD",
+          "image": null,
+          "inputs": {}
+        },
+        {
+          "name": "Material Output",
+          "type": "OUTPUT_MATERIAL",
+          "image": null,
+          "inputs": {
+            "Surface": {
+              "linked": true,
+              "default": null
+            },
+            "Volume": {
+              "linked": false,
+              "default": null
+            },
+            "Displacement": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Thickness": {
+              "linked": false,
+              "default": 0.0
+            }
+          }
+        },
+        {
+          "name": "Image Texture.002",
+          "type": "TEX_IMAGE",
+          "image": "//textures\\grass_medium_01_nor_gl_8k.exr",
+          "inputs": {
+            "Vector": {
+              "linked": true,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "Image Texture.003",
+          "type": "TEX_IMAGE",
+          "image": "//textures\\grass_medium_01_alpha_8k.png",
+          "inputs": {
+            "Vector": {
+              "linked": true,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "Image Texture.001",
+          "type": "TEX_IMAGE",
+          "image": "//textures\\grass_medium_01_rough_8k.exr",
+          "inputs": {
+            "Vector": {
+              "linked": true,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reroute",
+          "type": "REROUTE",
+          "image": null,
+          "inputs": {
+            "Input": {
+              "linked": true,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "Image Texture",
+          "type": "TEX_IMAGE",
+          "image": "//textures\\grass_medium_01_diff_8k.jpg",
+          "inputs": {
+            "Vector": {
+              "linked": true,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "Image Texture.004",
+          "type": "TEX_IMAGE",
+          "image": "//textures\\grass_medium_01_dry_diff_8k.png",
+          "inputs": {
+            "Vector": {
+              "linked": true,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "grass_medium_01",
+          "type": "GROUP",
+          "image": null,
+          "inputs": {
+            "Diffuse": {
+              "linked": true,
+              "default": [
+                0.5,
+                0.5,
+                0.5,
+                1.0
+              ]
+            },
+            "Diffuse Dead": {
+              "linked": true,
+              "default": [
+                0.5,
+                0.5,
+                0.5,
+                1.0
+              ]
+            },
+            "Rough": {
+              "linked": true,
+              "default": [
+                0.5,
+                0.5,
+                0.5,
+                1.0
+              ]
+            },
+            "Normal": {
+              "linked": true,
+              "default": [
+                0.5,
+                0.5,
+                1.0,
+                1.0
+              ]
+            },
+            "Alpha": {
+              "linked": true,
+              "default": 1.0
+            },
+            "Specular": {
+              "linked": false,
+              "default": 0.5
+            },
+            "Dead Amount": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Wetness": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Translucency": {
+              "linked": false,
+              "default": 0.4000000059604645
+            },
+            "Hue": {
+              "linked": false,
+              "default": 0.49999991059303284
+            },
+            "Saturation": {
+              "linked": false,
+              "default": 0.9999998807907104
+            },
+            "Value": {
+              "linked": false,
+              "default": 1.0
+            }
+          }
+        }
+      ],
+      "links": [
+        {
+          "from": "Image Texture.002",
+          "output": "Color",
+          "to": "grass_medium_01",
+          "input": "Normal"
+        },
+        {
+          "from": "Reroute",
+          "output": "Output",
+          "to": "Image Texture",
+          "input": "Vector"
+        },
+        {
+          "from": "Reroute",
+          "output": "Output",
+          "to": "Image Texture.001",
+          "input": "Vector"
+        },
+        {
+          "from": "Reroute",
+          "output": "Output",
+          "to": "Image Texture.002",
+          "input": "Vector"
+        },
+        {
+          "from": "Mapping",
+          "output": "Vector",
+          "to": "Reroute",
+          "input": "Input"
+        },
+        {
+          "from": "Texture Coordinate",
+          "output": "UV",
+          "to": "Mapping",
+          "input": "Vector"
+        },
+        {
+          "from": "Reroute",
+          "output": "Output",
+          "to": "Image Texture.003",
+          "input": "Vector"
+        },
+        {
+          "from": "Image Texture.003",
+          "output": "Color",
+          "to": "grass_medium_01",
+          "input": "Alpha"
+        },
+        {
+          "from": "Image Texture",
+          "output": "Color",
+          "to": "grass_medium_01",
+          "input": "Diffuse"
+        },
+        {
+          "from": "Image Texture.001",
+          "output": "Color",
+          "to": "grass_medium_01",
+          "input": "Rough"
+        },
+        {
+          "from": "grass_medium_01",
+          "output": "Shader",
+          "to": "Material Output",
+          "input": "Surface"
+        },
+        {
+          "from": "Reroute",
+          "output": "Output",
+          "to": "Image Texture.004",
+          "input": "Vector"
+        },
+        {
+          "from": "Image Texture.004",
+          "output": "Color",
+          "to": "grass_medium_01",
+          "input": "Diffuse Dead"
+        }
+      ]
+    },
+    {
+      "name": "grass_medium_01_sphere",
+      "nodes": [
+        {
+          "name": "Principled BSDF",
+          "type": "BSDF_PRINCIPLED",
+          "image": null,
+          "inputs": {
+            "Base Color": {
+              "linked": false,
+              "default": [
+                0.024779867380857468,
+                0.04323456808924675,
+                0.009161568246781826,
+                1.0
+              ]
+            },
+            "Metallic": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Roughness": {
+              "linked": false,
+              "default": 1.0
+            },
+            "IOR": {
+              "linked": false,
+              "default": 1.4500000476837158
+            },
+            "Alpha": {
+              "linked": false,
+              "default": 1.0
+            },
+            "Thin Wall": {
+              "linked": false,
+              "default": false
+            },
+            "Normal": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Weight": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Diffuse Roughness": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Subsurface Weight": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Subsurface Radius": {
+              "linked": false,
+              "default": [
+                1.0,
+                0.20000000298023224,
+                0.10000000149011612
+              ]
+            },
+            "Subsurface Scale": {
+              "linked": false,
+              "default": 0.05000000074505806
+            },
+            "Subsurface IOR": {
+              "linked": false,
+              "default": 1.399999976158142
+            },
+            "Subsurface Anisotropy": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Specular IOR Level": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Specular Tint": {
+              "linked": false,
+              "default": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "Anisotropic": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Anisotropic Rotation": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Tangent": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Transmission Weight": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Coat Weight": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Coat Roughness": {
+              "linked": false,
+              "default": 0.029999999329447746
+            },
+            "Coat IOR": {
+              "linked": false,
+              "default": 1.5
+            },
+            "Coat Tint": {
+              "linked": false,
+              "default": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "Coat Normal": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Sheen Weight": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Sheen Roughness": {
+              "linked": false,
+              "default": 0.5
+            },
+            "Sheen Tint": {
+              "linked": false,
+              "default": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "Emission Color": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            },
+            "Emission Strength": {
+              "linked": false,
+              "default": 1.0
+            },
+            "Thin Film Thickness": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Thin Film IOR": {
+              "linked": false,
+              "default": 1.3300000429153442
+            }
+          }
+        },
+        {
+          "name": "Material Output",
+          "type": "OUTPUT_MATERIAL",
+          "image": null,
+          "inputs": {
+            "Surface": {
+              "linked": true,
+              "default": null
+            },
+            "Volume": {
+              "linked": false,
+              "default": null
+            },
+            "Displacement": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Thickness": {
+              "linked": false,
+              "default": 0.0
+            }
+          }
+        }
+      ],
+      "links": [
+        {
+          "from": "Principled BSDF",
+          "output": "BSDF",
+          "to": "Material Output",
+          "input": "Surface"
+        }
+      ]
+    }
+  ],
+  "shaderGroups": [
+    {
+      "name": "grass_medium_01",
+      "nodes": [
+        {
+          "name": "Translucent BSDF",
+          "type": "BSDF_TRANSLUCENT",
+          "operation": null,
+          "inputs": {
+            "Color": {
+              "linked": true,
+              "default": [
+                0.800000011920929,
+                0.800000011920929,
+                0.800000011920929,
+                1.0
+              ]
+            },
+            "Normal": {
+              "linked": true,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Weight": {
+              "linked": false,
+              "default": 0.0
+            }
+          }
+        },
+        {
+          "name": "Math",
+          "type": "MATH",
+          "operation": "MULTIPLY",
+          "inputs": {
+            "Value": {
+              "linked": false,
+              "default": 0.5
+            }
+          }
+        },
+        {
+          "name": "Normal Map",
+          "type": "NORMAL_MAP",
+          "operation": null,
+          "inputs": {
+            "Strength": {
+              "linked": false,
+              "default": 1.0
+            },
+            "Color": {
+              "linked": true,
+              "default": [
+                0.5,
+                0.5,
+                1.0,
+                1.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "Math.001",
+          "type": "MATH",
+          "operation": "ADD",
+          "inputs": {
+            "Value": {
+              "linked": false,
+              "default": 0.5
+            }
+          }
+        },
+        {
+          "name": "Hue Saturation Value",
+          "type": "HUE_SAT",
+          "operation": null,
+          "inputs": {
+            "Hue": {
+              "linked": true,
+              "default": 0.5
+            },
+            "Saturation": {
+              "linked": true,
+              "default": 1.0
+            },
+            "Value": {
+              "linked": true,
+              "default": 1.0
+            },
+            "Factor": {
+              "linked": false,
+              "default": 1.0
+            },
+            "Color": {
+              "linked": true,
+              "default": [
+                0.800000011920929,
+                0.800000011920929,
+                0.800000011920929,
+                1.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "Group Input",
+          "type": "GROUP_INPUT",
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Mix Shader",
+          "type": "MIX_SHADER",
+          "operation": null,
+          "inputs": {
+            "Factor": {
+              "linked": true,
+              "default": 0.5
+            },
+            "Shader": {
+              "linked": true,
+              "default": null
+            }
+          }
+        },
+        {
+          "name": "Group Output",
+          "type": "GROUP_OUTPUT",
+          "operation": null,
+          "inputs": {
+            "Shader": {
+              "linked": true,
+              "default": null
+            },
+            "": {
+              "linked": false,
+              "default": null
+            }
+          }
+        },
+        {
+          "name": "Mix.001",
+          "type": "MIX",
+          "operation": null,
+          "inputs": {
+            "Factor": {
+              "linked": false,
+              "default": [
+                0.5,
+                0.5,
+                0.5
+              ]
+            },
+            "A": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "B": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "rough amount",
+          "type": "MIX",
+          "operation": null,
+          "inputs": {
+            "Factor": {
+              "linked": false,
+              "default": [
+                0.5,
+                0.5,
+                0.5
+              ]
+            },
+            "A": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "B": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mix",
+          "type": "MIX",
+          "operation": null,
+          "inputs": {
+            "Factor": {
+              "linked": false,
+              "default": [
+                0.5,
+                0.5,
+                0.5
+              ]
+            },
+            "A": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "B": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "name": "Principled BSDF",
+          "type": "BSDF_PRINCIPLED",
+          "operation": null,
+          "inputs": {
+            "Base Color": {
+              "linked": true,
+              "default": [
+                0.800000011920929,
+                0.800000011920929,
+                0.800000011920929,
+                1.0
+              ]
+            },
+            "Metallic": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Roughness": {
+              "linked": true,
+              "default": 0.5
+            },
+            "IOR": {
+              "linked": false,
+              "default": 1.4500000476837158
+            },
+            "Alpha": {
+              "linked": true,
+              "default": 1.0
+            },
+            "Thin Wall": {
+              "linked": false,
+              "default": false
+            },
+            "Normal": {
+              "linked": true,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Weight": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Diffuse Roughness": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Subsurface Weight": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Subsurface Radius": {
+              "linked": false,
+              "default": [
+                1.0,
+                0.20000000298023224,
+                0.10000000149011612
+              ]
+            },
+            "Subsurface Scale": {
+              "linked": false,
+              "default": 0.05000000074505806
+            },
+            "Subsurface IOR": {
+              "linked": false,
+              "default": 1.399999976158142
+            },
+            "Subsurface Anisotropy": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Specular IOR Level": {
+              "linked": true,
+              "default": 0.5
+            },
+            "Specular Tint": {
+              "linked": false,
+              "default": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "Anisotropic": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Anisotropic Rotation": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Tangent": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Transmission Weight": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Coat Weight": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Coat Roughness": {
+              "linked": false,
+              "default": 0.029999999329447746
+            },
+            "Coat IOR": {
+              "linked": false,
+              "default": 1.5
+            },
+            "Coat Tint": {
+              "linked": false,
+              "default": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "Coat Normal": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Sheen Weight": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Sheen Roughness": {
+              "linked": false,
+              "default": 0.5
+            },
+            "Sheen Tint": {
+              "linked": false,
+              "default": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "Emission Color": {
+              "linked": false,
+              "default": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            },
+            "Emission Strength": {
+              "linked": false,
+              "default": 1.0
+            },
+            "Thin Film Thickness": {
+              "linked": false,
+              "default": 0.0
+            },
+            "Thin Film IOR": {
+              "linked": false,
+              "default": 1.3300000429153442
+            }
+          }
+        }
+      ],
+      "links": [
+        {
+          "from": "Group Input",
+          "output": "Normal",
+          "to": "Normal Map",
+          "input": "Color"
+        },
+        {
+          "from": "Group Input",
+          "output": "Alpha",
+          "to": "Principled BSDF",
+          "input": "Alpha"
+        },
+        {
+          "from": "Group Input",
+          "output": "Diffuse",
+          "to": "Mix",
+          "input": "A"
+        },
+        {
+          "from": "Group Input",
+          "output": "Rough",
+          "to": "Mix.001",
+          "input": "A"
+        },
+        {
+          "from": "Mix Shader",
+          "output": "Shader",
+          "to": "Group Output",
+          "input": "Shader"
+        },
+        {
+          "from": "rough amount",
+          "output": "Result",
+          "to": "Principled BSDF",
+          "input": "Roughness"
+        },
+        {
+          "from": "Normal Map",
+          "output": "Normal",
+          "to": "Principled BSDF",
+          "input": "Normal"
+        },
+        {
+          "from": "Principled BSDF",
+          "output": "BSDF",
+          "to": "Mix Shader",
+          "input": "Shader"
+        },
+        {
+          "from": "Translucent BSDF",
+          "output": "BSDF",
+          "to": "Mix Shader",
+          "input": "Shader"
+        },
+        {
+          "from": "Normal Map",
+          "output": "Normal",
+          "to": "Translucent BSDF",
+          "input": "Normal"
+        },
+        {
+          "from": "Hue Saturation Value",
+          "output": "Color",
+          "to": "Translucent BSDF",
+          "input": "Color"
+        },
+        {
+          "from": "Math",
+          "output": "Value",
+          "to": "Mix Shader",
+          "input": "Factor"
+        },
+        {
+          "from": "Math.001",
+          "output": "Value",
+          "to": "Mix.001",
+          "input": "B"
+        },
+        {
+          "from": "Group Input",
+          "output": "Dead Amount",
+          "to": "Mix.001",
+          "input": "Factor"
+        },
+        {
+          "from": "Group Input",
+          "output": "Dead Amount",
+          "to": "Mix",
+          "input": "Factor"
+        },
+        {
+          "from": "Group Input",
+          "output": "Rough",
+          "to": "Math.001",
+          "input": "Value"
+        },
+        {
+          "from": "Group Input",
+          "output": "Alpha",
+          "to": "Math",
+          "input": "Value"
+        },
+        {
+          "from": "Group Input",
+          "output": "Translucency",
+          "to": "Math",
+          "input": "Value"
+        },
+        {
+          "from": "Mix.001",
+          "output": "Result",
+          "to": "rough amount",
+          "input": "A"
+        },
+        {
+          "from": "Group Input",
+          "output": "Wetness",
+          "to": "rough amount",
+          "input": "Factor"
+        },
+        {
+          "from": "Mix",
+          "output": "Result",
+          "to": "Hue Saturation Value",
+          "input": "Color"
+        },
+        {
+          "from": "Hue Saturation Value",
+          "output": "Color",
+          "to": "Principled BSDF",
+          "input": "Base Color"
+        },
+        {
+          "from": "Group Input",
+          "output": "Hue",
+          "to": "Hue Saturation Value",
+          "input": "Hue"
+        },
+        {
+          "from": "Group Input",
+          "output": "Saturation",
+          "to": "Hue Saturation Value",
+          "input": "Saturation"
+        },
+        {
+          "from": "Group Input",
+          "output": "Value",
+          "to": "Hue Saturation Value",
+          "input": "Value"
+        },
+        {
+          "from": "Group Input",
+          "output": "Diffuse Dead",
+          "to": "Mix",
+          "input": "B"
+        },
+        {
+          "from": "Group Input",
+          "output": "Specular",
+          "to": "Principled BSDF",
+          "input": "Specular IOR Level"
+        }
+      ]
+    }
+  ]
+}

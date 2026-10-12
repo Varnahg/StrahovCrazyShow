@@ -1,0 +1,68 @@
+{
+  "testedAt": "2026-10-12T07:22:41.352Z",
+  "scope": "Whole-game development functional test, not frozen production FPS acceptance",
+  "status": "passed",
+  "downloadBytes": 2133242,
+  "firstSha256": "ee2e670c60b8369d9f3eb2f9056377e38cfba4b4dace425f6414e4dedbe4fa9d",
+  "secondSha256": "ee2e670c60b8369d9f3eb2f9056377e38cfba4b4dace425f6414e4dedbe4fa9d",
+  "sameBytes": true,
+  "actions": [
+    "Completed native Settings benchmark at medium",
+    "Expanded compact details",
+    "Downloaded full JSON",
+    "Changed live quality to high",
+    "Verified DOM summary unchanged",
+    "Downloaded full JSON again: byte-identical",
+    "Restored medium"
+  ],
+  "sourceSnapshotId": null,
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "renderResolution": {
+    "width": 1280,
+    "height": 720
+  },
+  "gpu": {
+    "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "vendor": "Google Inc. (Intel)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "webglVersion": 2,
+    "classification": "integrated",
+    "classificationLabel": "Integrovaná grafika",
+    "requestedPowerPreference": "high-performance",
+    "warnings": [
+      "Hra nyní používá integrovanou grafiku. Pokud máš i samostatnou kartu, nastav pro tento prohlížeč nebo aplikaci ve Windows vysoký výkon a aplikaci znovu spusť."
+    ],
+    "context": {
+      "requestedAntialias": true,
+      "actualAntialias": true,
+      "defaultFramebuffer": true,
+      "sampleBuffers": 1,
+      "samples": 4
+    }
+  },
+  "renderErrorCount": 0,
+  "assetLoadErrorCount": 0,
+  "inventoryCount": 2795,
+  "frameCount": 371,
+  "grass": {
+    "representation": "photographic-short-lawn",
+    "draws": 0,
+    "triangles": 0,
+    "instances": 0,
+    "submittedLeaves": 0,
+    "cachedTiles": 0,
+    "textureResolution": 1024,
+    "triangleLimit": 140000,
+    "drawLimit": 12,
+    "ready": true
+  },
+  "limits": [
+    "At this spawn no grass tiles were submitted; active tile teardown is covered by the separate real-controller CPU regression.",
+    "Development HMR may have occurred before the first capture; no source-stable FPS claim.",
+    "This browser test changed quality, not a forced scene disposal."
+  ],
+  "screenshot": "quality-changed-record-retained.png"
+}

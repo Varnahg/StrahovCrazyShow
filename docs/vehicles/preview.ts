@@ -17,6 +17,7 @@ import { CinematicAtmosphere } from "../../client/cinematic";
 import { applyArtLighting } from "../../client/art-lighting";
 import { sunState, moonState } from "../../shared/weather";
 import { VEHICLE_WHEELS } from "../../shared/vehicle";
+import manifest from "../../shared/data/assets/vehicles-manifest.json";
 
 const canvas = document.querySelector<HTMLCanvasElement>("canvas")!;
 const engine = new Engine(canvas, true, {
@@ -66,17 +67,59 @@ let container: AssetContainer | undefined,
   diagnostic = 0;
 const carRoot = new TransformNode("one independent car entity", scene);
 carRoot.position.y = -0.0112;
-let model = "near",
-  sourceTriangles = 0;
+const query = new URLSearchParams(location.search);
+let model = ["near", "medium", "far"].includes(query.get("model") ?? "")
+    ? query.get("model")!
+    : "near",
+  loadedModel = "",
+  sourceTriangles = 0,
+  loadGeneration = 0;
+const presets: Record<string, { position: number[]; target: number[] }> = {
+  front: { position: [4, 2.5, 5], target: [0, 0.7, 0] },
+  rear: { position: [-4, 2.2, -5], target: [0, 0.7, 0] },
+  side: { position: [5, 1.8, 0], target: [0, 0.7, 0] },
+  seams: { position: [2, 1.7, 2.5], target: [0, 0.7, 0] },
+  under: { position: [3, -1.5, 4], target: [0, 0.7, 0] },
+  // Game-local source points plus the same -0.0112 m root translation as load().
+  fender: { position: [-1.8, 0.6688, -1.7], target: [-0.977, 0.5388, -1.18] },
+  "fender-close": {
+    position: [-1.65, 0.4988, -1.39],
+    target: [-0.977, 0.4988, -1.39],
+  },
+  "fender-inside": {
+    position: [-0.35, 0.4988, -1.39],
+    target: [-0.977, 0.4988, -1.39],
+  },
+};
+function rememberQuery(key: string, value: string) {
+  const url = new URL(location.href);
+  url.searchParams.set(key, value);
+  history.replaceState(null, "", url);
+}
+function view(name: string) {
+  const preset = presets[name];
+  if (!preset) return;
+  camera.setTarget(Vector3.FromArray(preset.target));
+  camera.setPosition(Vector3.FromArray(preset.position));
+  rememberQuery("view", name);
+}
 async function load() {
+  const generation = ++loadGeneration,
+    requestedModel = model;
+  const loaded = await LoadAssetContainerAsync(
+    "/models/vehicles/campus-hatchback-" + requestedModel + ".glb",
+    scene,
+  );
+  if (generation !== loadGeneration) {
+    loaded.dispose();
+    return;
+  }
   container?.dispose();
   wheels.forEach((w) => w.dispose(false, false));
   wheels = [];
   errors.length = 0;
-  container = await LoadAssetContainerAsync(
-    "/models/vehicles/campus-hatchback-" + model + ".glb",
-    scene,
-  );
+  container = loaded;
+  loadedModel = requestedModel;
   container.addAllToScene();
   sourceTriangles = container.meshes.reduce(
     (sum, m) => sum + m.getTotalIndices() / 3,
@@ -98,20 +141,15 @@ async function load() {
     if (material instanceof PBRMaterial && material.name === "Campus enamel")
       paint = material;
 }
+document.querySelector<HTMLSelectElement>("#model")!.value = model;
 document.querySelector<HTMLSelectElement>("#model")!.onchange = () => {
   model = document.querySelector<HTMLSelectElement>("#model")!.value;
+  rememberQuery("model", model);
   void load().catch((e) => errors.push(String(e)));
 };
-for (const [id, p] of Object.entries({
-  front: [4, 2.5, 5],
-  rear: [-4, 2.2, -5],
-  side: [5, 1.8, 0],
-  seams: [2, 1.7, 2.5],
-  under: [3, -1.5, 4],
-}))
-  document
-    .querySelector("#" + id)!
-    .addEventListener("click", () => camera.setPosition(Vector3.FromArray(p)));
+for (const id of Object.keys(presets))
+  document.querySelector("#" + id)!.addEventListener("click", () => view(id));
+view(query.get("view") ?? "");
 document.querySelector("#wheels")!.addEventListener("click", () => {
   moving = !moving;
 });
@@ -180,14 +218,29 @@ engine.runRenderLoop(() => {
     document.querySelector("#stats")!.textContent = JSON.stringify(
       {
         model,
+        loadedModel,
+        asset: manifest.lods.find((lod) => lod.level === loadedModel),
         triangles: sourceTriangles,
+        rightHanded: scene.useRightHandedSystem,
+        carRoot: {
+          position: carRoot.position.asArray(),
+          scaling: carRoot.scaling.asArray(),
+        },
+        camera: {
+          position: camera.position.asArray(),
+          target: camera.target.asArray(),
+          minZ: camera.minZ,
+        },
         meshParts: meshes.length,
         wheelPivots: wheels.map((w) => ({
           position: w.position.asArray(),
           rotation: w.rotationQuaternion?.asArray(),
         })),
         moving,
-        ready: meshes.length > 0 && meshes.every((m) => m.isReady(true)),
+        ready:
+          loadedModel === model &&
+          meshes.length > 0 &&
+          meshes.every((m) => m.isReady(true)),
         errors,
         renderer: engine.getGlInfo().renderer,
         measuredGameFps: false,
@@ -202,6 +255,7 @@ addEventListener("resize", () => engine.resize());
 addEventListener(
   "pagehide",
   () => {
+    loadGeneration++;
     cinematic.dispose();
     container?.dispose();
     scene.dispose();

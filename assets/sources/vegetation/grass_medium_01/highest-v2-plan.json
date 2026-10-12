@@ -1,0 +1,115 @@
+{
+  "status": "proposal-only-awaiting-managed-worktree-path",
+  "primaryMain": "b28dbd4",
+  "primaryRepositoryEditsAllowed": false,
+  "sourcePixelsModified": false,
+  "geometryMeasuredAtStrahov": false,
+  "reference": "Root GPU review of authored-lawn detail/contact/both: continuous short green cover, but leaves read as wide angular glossy ribbons. The source photograph supports a short continuous lawn, not measured dimensions or species.",
+  "preservedAB": {
+    "profile": "authored",
+    "geometrySha256": "5328570820560d684930d14f2c1e119f008ac83b8962504c8380548225b3354c",
+    "blendSha256": "ed96d049c0c433cc6994b91c3d50f86e3bb49360d3b27e24532d060d4270bc32",
+    "originalPolyHavenBlendSha256": "62ac1b9f9d8196c6dfc295387fe2d8a9716d811e69e4b873b7b3632121bebcb7",
+    "currentTuftTriangles": [768, 896, 1024],
+    "currentWidthMillimetres": [4.5, 9],
+    "currentEveryTuftMaximumHeightMillimetres": 52.5625,
+    "scatterSeed": 5351094,
+    "scatterCount": 3500,
+    "studyAreaSquareMetres": 4
+  },
+  "commonGeometry": {
+    "units": "metres; no inherited production template scale",
+    "rootEmbeddingMillimetres": 2,
+    "longitudinalSegments": 16,
+    "crossSectionVertices": 5,
+    "crossSection": "smooth shallow quadratic fold, transported along a curved centreline; shared smooth normals, no two rigid panels",
+    "tipFamilies": "narrow intact tip and slightly oblique cut tip; cut tips remain narrow, never the previous half-width square paddle",
+    "tipWidthFractionIntact": [0.04, 0.12],
+    "tipWidthFractionCut": [0.2, 0.42],
+    "rootPositions": "small irregular basal cluster with deterministic per-leaf variation, not identical golden-angle fans",
+    "uv": "existing three original photographed green tracks; barycentric/row interpolation only, original RGB/alpha/normal/roughness pixels unchanged",
+    "normalPolicy": "finite normalized smooth vertex normals, winding and tangent-space audit against actual renderer convention"
+  },
+  "variants": [
+    {
+      "id": "mown-a",
+      "purpose": "recently cut central lawn",
+      "blades": 12,
+      "lengthMillimetres": [30, 43],
+      "widthMillimetres": [2.5, 4.0],
+      "leanMillimetres": [6, 14],
+      "lateralCurveMillimetres": [1, 3],
+      "foldHeightMillimetres": [0.08, 0.18],
+      "twistDegrees": [-7, 7],
+      "cutTipFraction": 0.75,
+      "highestTriangles": 1536
+    },
+    {
+      "id": "mixed-b",
+      "purpose": "mixed leaf heights within the same maintained lawn",
+      "blades": 14,
+      "lengthMillimetres": [34, 53],
+      "widthMillimetres": [2.8, 4.6],
+      "leanMillimetres": [10, 21],
+      "lateralCurveMillimetres": [2, 4],
+      "foldHeightMillimetres": [0.1, 0.25],
+      "twistDegrees": [-10, 10],
+      "cutTipFraction": 0.5,
+      "highestTriangles": 1792
+    },
+    {
+      "id": "edge-c",
+      "purpose": "occasional older leaves, not a separate invented vegetation zone",
+      "blades": 16,
+      "lengthMillimetres": [42, 60],
+      "widthMillimetres": [3.2, 5.5],
+      "leanMillimetres": [14, 28],
+      "lateralCurveMillimetres": [3, 6],
+      "foldHeightMillimetres": [0.12, 0.3],
+      "twistDegrees": [-12, 12],
+      "cutTipFraction": 0.35,
+      "highestTriangles": 2048
+    }
+  ],
+  "materialControlledForAB": {
+    "sameOriginal8kPhotographicMaps": true,
+    "albedoFactor": [1, 1, 1],
+    "emission": [0, 0, 0],
+    "normalStrength": 1,
+    "metallic": 0,
+    "roughness": "original ARM green; no newly invented global gloss suppression",
+    "AOFromRed": false,
+    "alphaMode": "ALPHATEST",
+    "alphaCutoff": 0.45,
+    "translucency": 0.4000000059604645,
+    "transmittedColour": "same original diffuse atlas; no double IBL albedo tint",
+    "metallicF0Factor": 0.8433987298331317,
+    "specularIntensity": 1
+  },
+  "auditRequirements": [
+    "Before/after SHA256 of original source master, all photographed channels and retained authored-v1 files",
+    "Deterministic buffers and per-leaf manifest; no repeated maximum-height lock across all variants",
+    "Actual per-leaf length, width, cut/taper counts, vertex groups and material links; declared ranges must match exported geometry",
+    "Finite vertices and normalized normals; nonzero triangle areas; positive face/vertex normal agreement; no UV outside original selected photographed leaf bands",
+    "Root min Y -0.002m, no exaggerated width at tips, no generated pixels or broad material recolouring",
+    "Actual Babylon RH projection of bed anchors, including camera rotation and CSS/internal resolution changes; labels cannot be hardcoded left/right",
+    "A/B camera/light/wind/scatter seed identical, then review each variant alone and a mixed patch at normal standing camera height, near contact, 6m and night",
+    "Original highest remains editable and immutable after separate distance LOD derivation; compare centreline/silhouette displacement and UV error",
+    "Runtime deployment must use world-metre geometry, existing source-backed grass exclusions and terrain sampler, not old point.size 0.09..0.19 template scaling",
+    "Full-game path/road edge/terrain/seam and alpha-shadow checks plus bounded draw/instance/texture budgets; no FPS claim from the component scene"
+  ],
+  "plannedSeparateLOD": [
+    {"name":"highest-master", "segments":16, "crossVertices":5, "trianglesPerBlade":128},
+    {"name":"near-derived", "segments":8, "crossVertices":3, "trianglesPerBlade":32},
+    {"name":"medium-derived", "segments":4, "crossVertices":2, "trianglesPerBlade":8},
+    {"name":"far-derived", "segments":2, "crossVertices":2, "trianglesPerBlade":4}
+  ],
+  "limitations": [
+    "All dimensions and mowing proportions are explicit artistic interpretation; no botanical or survey claim",
+    "5 cross-section vertices double the highest A/B triangle count to 5376 per three masters, roughly 6.28M potential triangles for the old 3500-instance study; this is not a production budget",
+    "Narrower leaves may expose more ground at the identical seed/density; measure and review this instead of silently increasing density",
+    "Four decoded 8k maps are not suitable as an assumed full-world runtime budget; source master remains 8k, runtime may use official lower-resolution originals and their GPU mips after visual review",
+    "Existing production placement proposes roughly one clump per square metre; directly replacing its normalized clump with this 3–6cm tuft would remain sparse. Near-surface coverage and bounded tile sampling need explicit integration work",
+    "No Blender, GPU, runtime edits or generator execution before worktree paths and coordinated permission are supplied"
+  ]
+}

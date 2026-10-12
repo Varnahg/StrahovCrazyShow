@@ -1,0 +1,152 @@
+{
+  "archivedAtUtc": "2026-10-12T06:52:41.156614Z",
+  "scope": "Archived root-operated native-input functional GPU review in the full development game with HUD. No new browser run, test execution or FPS measurement during archival.",
+  "evidenceProvenance": "Original screenshots and CPU artifact bytes copied unchanged from the ignored cache. Action timings, player positions and flashlight flag were reported by the root reviewer during this task; no separate raw DOM/action log was saved in these cache folders.",
+  "url": "http://127.0.0.1:5190/",
+  "sourceSnapshotId": null,
+  "sourceHashes": {
+    "client/game.ts": "c05c507c6bd3fa6eae393643fd394f3e05bc0bb46a8af18dc9962c1659cdf89e",
+    "client/local-avatar-presentation.ts": "24aac859c3e268661afe8dfa03cac53b4c173380c0e9536a25cdaed9b1907673",
+    "tests/local-avatar-presentation.test.ts": "7fb2ffdc01df96b255127b816f74c2fe4e8414f9f241ebce07931efa938ef198"
+  },
+  "sourceHashScope": "Hashes of the camera implementation/test files associated with the original functional review. All three still matched at the start of archival. During archival, root integrated the newer network baseline; the original GPU source hashes are preserved and are not substituted with later source hashes.",
+  "gpu": {
+    "adapter": "Intel UHD 630",
+    "adapterProvenance": "Reported by root reviewer for the controlled IAB scene",
+    "screenshotPixels": [
+      1280,
+      720
+    ],
+    "cssResolution": null,
+    "internalRenderResolution": null,
+    "consoleLog": null,
+    "renderErrorSample": null,
+    "assetErrorSample": null,
+    "fpsInterval": null
+  },
+  "steps": [
+    {
+      "phase": "before",
+      "input": "Fresh spawn, native S for approximately 4.5 seconds",
+      "screenshot": "torso-near-parked-car.png",
+      "observation": "Own torso and neck cover most of the world view."
+    },
+    {
+      "phase": "after-obstruction",
+      "input": "Fresh spawn, native S for approximately 4.5 seconds",
+      "playerXZ": [
+        110.0703735,
+        13.7860689
+      ],
+      "screenshot": "hidden-at-parked-car.png",
+      "observation": "Own body is hidden; the world and HUD remain visible."
+    },
+    {
+      "phase": "flashlight",
+      "input": "Native F on, then F off while obstructed",
+      "reportedDomFlag": "data-flashlight=true after enabling",
+      "screenshot": null,
+      "observation": "Root reported the enabled DOM flag and subsequent toggle off. No separate beam screenshot or raw DOM dump was archived."
+    },
+    {
+      "phase": "after-step-away",
+      "input": "Native W for approximately 1.4 seconds",
+      "playerXZ": [
+        110.0947876,
+        7.888464
+      ],
+      "screenshot": "restored-after-step-away.png",
+      "observation": "Own body returns in third-person view after leaving the obstruction."
+    }
+  ],
+  "limitations": [
+    "Functional visual evidence only; instantaneous HUD FPS is not a benchmark.",
+    "No new GeForce, production-snapshot or crowd performance acceptance.",
+    "No archived console/errors or measured CSS/internal render resolution for this specific camera sequence; null values are unknown, not zero.",
+    "No dedicated V or vehicle-mode GPU sequence is claimed here.",
+    "The archived CPU reproduction retains its original relative paths; the .txt copies are provenance artifacts, not relocated executable scripts. The empty typecheck log does not by itself record an exit code.",
+    "Original .png filenames contain JPEG-encoded 1280x720 screenshots. Their original filenames and bytes are preserved; dimensions were verified from JPEG SOF headers after correcting an initial PNG-header assumption during archival validation."
+  ],
+  "artifacts": [
+    {
+      "path": "torso-near-parked-car.png",
+      "originalPath": ".cache/camera-obstruction-qa/torso-near-parked-car.png",
+      "bytes": 40950,
+      "sha256": "26ef53fe449968b87d5827ba215e79503eec886015f81dbc5179da77d3b48b53",
+      "originalLastWriteTimeUtc": "2026-10-11T21:21:17.5020303Z",
+      "timestampMeaning": "Filesystem modification time only; not an instrumented capture timestamp",
+      "encodedMimeType": "image/jpeg",
+      "dimensions": [
+        1280,
+        720
+      ]
+    },
+    {
+      "path": "hidden-at-parked-car.png",
+      "originalPath": ".cache/camera-obstruction-qa/hidden-at-parked-car.png",
+      "bytes": 65338,
+      "sha256": "52b244b916943136c02085da859d902eb6f2d187f3de96f5e68df533e5e1c91f",
+      "originalLastWriteTimeUtc": "2026-10-11T21:47:49.5999642Z",
+      "timestampMeaning": "Filesystem modification time only; not an instrumented capture timestamp",
+      "encodedMimeType": "image/jpeg",
+      "dimensions": [
+        1280,
+        720
+      ]
+    },
+    {
+      "path": "restored-after-step-away.png",
+      "originalPath": ".cache/camera-obstruction-qa/restored-after-step-away.png",
+      "bytes": 66592,
+      "sha256": "4e1081c24cd8ea50be9ad4a45468bc58e0c48a2b1159572886b2f9578aaf962d",
+      "originalLastWriteTimeUtc": "2026-10-11T21:49:30.4456444Z",
+      "timestampMeaning": "Filesystem modification time only; not an instrumented capture timestamp",
+      "encodedMimeType": "image/jpeg",
+      "dimensions": [
+        1280,
+        720
+      ]
+    },
+    {
+      "path": "cpu-before.json",
+      "originalPath": ".cache/camera-obstruction-independent/before.json",
+      "bytes": 462,
+      "sha256": "47410736e35431c8cb8d2eec0d21fc41007fe5ad4bb8f63f2d6559729b9853d1",
+      "originalLastWriteTimeUtc": "2026-10-11T21:26:19.1761201Z",
+      "timestampMeaning": "Filesystem modification time only; not an instrumented capture timestamp"
+    },
+    {
+      "path": "reproduce.ts.txt",
+      "originalPath": ".cache/camera-obstruction-independent/reproduce.ts",
+      "bytes": 1633,
+      "sha256": "63119820d39917a041f377ce3b7ce5dd0ec8ef8de9046775fd729d820c4ec869",
+      "originalLastWriteTimeUtc": "2026-10-11T21:26:16.6482461Z",
+      "timestampMeaning": "Filesystem modification time only; not an instrumented capture timestamp"
+    },
+    {
+      "path": "tsconfig.json.txt",
+      "originalPath": ".cache/camera-obstruction-independent/tsconfig.json",
+      "bytes": 160,
+      "sha256": "500189b02088f86cdd34d7bd9e8a6ed75c1f75182b424bc9b1fcb479594d6854",
+      "originalLastWriteTimeUtc": "2026-10-11T21:37:23.4162226Z",
+      "timestampMeaning": "Filesystem modification time only; not an instrumented capture timestamp"
+    },
+    {
+      "path": "typecheck.log",
+      "originalPath": ".cache/camera-obstruction-independent/typecheck.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalLastWriteTimeUtc": "2026-10-11T21:37:25.4319481Z",
+      "timestampMeaning": "Filesystem modification time only; not an instrumented capture timestamp"
+    }
+  ],
+  "laterIntegration": {
+    "checkedAtUtc": "2026-10-12T06:56:38.4448559Z",
+    "reportedBy": "Root integration coordination",
+    "networkCommit": "a242ff9",
+    "gameSha256": "0bdaa2bfd1ab1784ba17c5f171cf5a429a6bee60db33dab4521c161cf36fb977",
+    "cameraHunks": "Root reports camera hunks unchanged, with additional separate reconcile fixes",
+    "practicalGpuReverification": "pending",
+    "note": "This is a later source state, not the source of the archived GPU screenshots."
+  }
+}

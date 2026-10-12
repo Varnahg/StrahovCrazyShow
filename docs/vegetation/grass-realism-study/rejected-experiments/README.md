@@ -1,0 +1,10 @@
+# Preserved rejected grass prototypes — 12 October 2026
+
+These archives preserve the rejected experiments, source/derived channel hashes, alpha-union audits, controlled bake scripts, standalone preview source and root GPU screenshots. The generated JavaScript bundle is omitted; it is reproduced by the included build script against the pinned repository dependencies.
+
+- `grass-cluster-study-rejected-20261012.zip`: four projection planes of an entire 42-leaf cluster. Rejected for regular dark islands, flattened crossed silhouettes and lost parallax in close/mid views. Highest geometry looked substantially more spatial; disabling normals did not repair the shape. Night had no fake emission.
+- `grass-leaf-study-rejected-20261012.zip`: first individual-leaf planes. Rejected because the transverse PCA followed centreline bending instead of the physical leaf width and projected some leaves almost edge-on. Base-level alpha diagnostics already found substantial silhouette loss before minification. The corrected accepted component is separate in `../leaf-planes-v2`.
+
+For historical reproduction, extract each archive into its original `.cache/grass-cluster-study` or `.cache/grass-leaf-study` directory under the worktree. Source images and highest masters remain in `assets/sources/vegetation/grass_medium_01`. Where an older script refers to the previous `public/models/vegetation/grass/geometry.json`, its exact bytes are now preserved as `assets/sources/vegetation/grass_medium_01/derived/grass-uv-aware-render-pack.json` (SHA256 `67cd457ebd61ded79c15ff5b4e90c6ccd1508aa81eccb279f569261a3cfd1442`). This source-path relocation does not alter the historical model. Static preview servers likewise read the archived source pack rather than the newly integrated runtime pack.
+
+Neither archive is a whole-game or FPS acceptance result, and neither rejected representation was substituted for near runtime grass. Original photographs and editable highest geometry were not altered to conceal their defects.

@@ -1,3 +1,4 @@
+import { PhotographicGrass, type PhotoGrassStats } from "./photographic-grass";
 import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -174,6 +175,7 @@ export type VegetationStats = {
   pendingTreeLoads?: number;
   bootstrapBytes?: number;
   loadError?: string;
+  photographicGrass?: PhotoGrassStats;
 };
 
 type TreeChunkAccessor = {
@@ -337,6 +339,7 @@ export class VegetationController {
   readonly stats: VegetationStats;
   private patches: PatchMesh[] = [];
   private grassSelection?: GrassPatchSelection;
+  private photographicGrass?: PhotographicGrass;
   private grassBudget = grassLod("");
   private trees: Mesh[] = [];
   private treeContainer?: AssetContainer;
@@ -380,10 +383,10 @@ export class VegetationController {
   private previousQuality = "";
   private disposed = false;
 
-  constructor(private scene: Scene) {
+  constructor(private scene: Scene, options: { skipLegacyGrass?: boolean } = {}) {
     this.grassMaterial = createGrassMaterial(scene, this.grassWind);
     this.materials.push(this.grassMaterial);
-    const patches = createGrassPatches(BOUNDS, BUILDINGS, MAP.paths);
+    const patches = options.skipLegacyGrass ? [] : createGrassPatches(BOUNDS, BUILDINGS, MAP.paths);
     this.grassSelection = new GrassPatchSelection(patches);
     const source = grassSource(scene, this.grassMaterial);
     this.grassIndexLevels = source.metadata.grassIndicesByQuality;
@@ -453,6 +456,17 @@ export class VegetationController {
       visibleGrassTiles: 0,
       visibleGrassClumps: 0,
     };
+  }
+
+  async loadPhotographicGrass() {
+    const grass = await PhotographicGrass.load(this.scene);
+    if (this.disposed || this.scene.isDisposed) { grass.dispose(); return; }
+    this.photographicGrass = grass;
+    this.stats.photographicGrass = grass.stats;
+    for (const {mesh} of this.patches) mesh.dispose(false,false);
+    for (const source of this.sources) source.dispose(false,false);
+    for (const material of this.materials) material.dispose(false,true);
+    this.patches=[]; this.sources=[]; this.materials=[]; this.grassSelection=undefined;
   }
 
   async loadTrees() {
@@ -739,9 +753,15 @@ export class VegetationController {
             : "medium";
       // One shared index buffer selects 4/8/16 authored blades. Vertex data and
       // conservative bounds retain the complete master, with no extra tile meshes.
-      this.sources[0].geometry!.setIndices(this.grassIndexLevels[key]);
+      if (!this.photographicGrass) this.sources[0]?.geometry!.setIndices(this.grassIndexLevels[key]);
     }
     const lod = this.grassBudget;
+    if (this.photographicGrass) {
+      this.photographicGrass.update({time: input.time, quality: input.quality, wind: {x:this.wind.x,z:this.wind.z}, focus: input.player});
+      const photo=this.photographicGrass.stats;
+      this.stats.grassTiles=photo.cachedTiles;this.stats.grassClumps=photo.instances;
+      this.stats.visibleGrassTiles=photo.activeTiles;this.stats.visibleGrassClumps=photo.instances;
+    }
     this.grassWind.time = this.treeWind.time;
     this.grassWind.windX = this.wind.x;
     this.grassWind.windZ = this.wind.z;
@@ -784,6 +804,7 @@ export class VegetationController {
     this.stats.activeTreeTriangles = treeTriangles;
     this.startDetailLoads();
     this.trimDetailCache();
+    if (this.photographicGrass) return;
     const selection = this.grassSelection!;
     if (
       !selection.update(input.player.x, input.player.z, lod.range, lod.tiles) &&
@@ -812,6 +833,7 @@ export class VegetationController {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.photographicGrass?.dispose();
     for (const abort of this.loadControllers) abort.abort();
     for (const { mesh } of this.patches) mesh.dispose(false, false);
     for (const wrapper of this.treeShadows) wrapper.dispose();
@@ -831,7 +853,9 @@ export class VegetationController {
 
 /** One original tree pack, individual crowns with shared photographic materials. */
 export async function loadVegetation(scene: Scene) {
-  const controller = new VegetationController(scene);
-  await controller.loadTrees();
-  return controller;
+  const controller = new VegetationController(scene, {skipLegacyGrass:true});
+  try {
+    await Promise.all([controller.loadTrees(), controller.loadPhotographicGrass()]);
+    return controller;
+  } catch(error) { controller.dispose(); throw error; }
 }

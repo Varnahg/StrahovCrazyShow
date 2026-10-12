@@ -158,6 +158,7 @@ export class SurfacePack {
       authoredPavingJoints: plan.retainPavingJoints,
       wettable: kind in WET_RESPONSE,
       surfaceScaleProvenance: family.scaleProvenance,
+      normalMapConvention: "OpenGL",
     };
     if (plan.retainPavingJoints && original.diffuseTexture) {
       material.albedoTexture = original.diffuseTexture;
@@ -180,6 +181,11 @@ export class SurfacePack {
       vScale,
     );
     material.bumpTexture.level = art.normalStrength;
+    // Original NormalGL bytes use upward-image green; the draped terrain UVs
+    // increase toward +Z. Match Babylon's tangent-space convention without
+    // flipping the image (which would misalign colour/roughness features).
+    material.invertNormalMapX = !this.scene.useRightHandedSystem;
+    material.invertNormalMapY = this.scene.useRightHandedSystem;
     material.metallicTexture = this.texture(
       family.channels.roughness.url,
       false,

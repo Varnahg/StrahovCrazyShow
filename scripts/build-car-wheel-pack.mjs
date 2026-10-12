@@ -1,7 +1,8 @@
-/** Replace only repaired wheels; retain exact archived J body/PBR/image bytes. */
+/** Retain archived J body/PBR/images except the source-restored far fender lip. */
 import { readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { parseGlb as parse } from "./car-glb-reader.mjs";
+import { createFarLipRecipe, repairFarBytes } from "./repair-car-far.mjs";
 const root = new URL(
     "../assets/blender/vehicles/innerscene-hatchback/",
     import.meta.url,
@@ -170,7 +171,27 @@ for (const level of ["medium", "far"]) {
   head.writeUInt32LE(0x4e4f534a, 16);
   binHead.writeUInt32LE(bin.length);
   binHead.writeUInt32LE(0x004e4942, 4);
-  const result = Buffer.concat([head, jb, binHead, bin]);
+  const assembled = Buffer.concat([head, jb, binHead, bin]);
+  const farRecipe =
+    level === "far"
+      ? createFarLipRecipe(
+          await readFile(
+            new URL(
+              "../public/models/vehicles/campus-hatchback-near.glb",
+              import.meta.url,
+            ),
+          ),
+          await readFile(new URL("original-source.glb", root)),
+        )
+      : null;
+  const farFold = farRecipe ? repairFarBytes(assembled, farRecipe) : null;
+  const result = farFold?.bytes ?? assembled;
+  if (farFold) {
+    const paint = parts.find((p) => p.node === "Body:paint");
+    paint.triangles +=
+      farFold.audit.addedTriangles - farFold.audit.removedTriangles.length;
+    paint.sourceFenderRestored = true;
+  }
   await writeFile(
     new URL(
       "../public/models/vehicles/campus-hatchback-" + level + ".glb",
@@ -185,11 +206,13 @@ for (const level of ["medium", "far"]) {
     outputSha256: sha(result),
     inputBytes: original.length,
     outputBytes: result.length,
-    triangles: parts.reduce((s, p) => s + p.triangles, 0),
+    triangles:
+      farFold?.audit.triangles ?? parts.reduce((s, p) => s + p.triangles, 0),
     parts,
     nodesUnchanged: true,
     materialsUnchanged: true,
     imagesUnchanged: true,
+    farFenderRepair: farFold?.audit ?? null,
   });
 }
 await writeFile(

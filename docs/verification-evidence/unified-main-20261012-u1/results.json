@@ -1,0 +1,57 @@
+{
+  "status": "passed",
+  "failureReasons": [],
+  "scope": "Technical checkpoint U1: finalized tests, production build including TypeScript, isolated integration and subsequent independent live/frozen SHA audit. No GPU/FPS acceptance is implied.",
+  "sourceSnapshotId": "1b3c9e14dfbb954c7e9325122d03fc7cafdac97a7f1b406c902ceb9b39313193",
+  "files": 8277,
+  "tests": {
+    "total": 559,
+    "passed": 559,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "startedAt": "2026-10-12T09:25:55.2725406Z",
+  "finishedAt": "2026-10-12T09:28:44.6900062Z",
+  "stages": [
+    {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "elapsedSeconds": 105.9517046,
+      "log": "pipeline-test.log"
+    },
+    {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "elapsedSeconds": 34.8001738,
+      "log": "pipeline-build.log"
+    },
+    {
+      "command": "pnpm test:integration",
+      "exitCode": 0,
+      "elapsedSeconds": 28.617838,
+      "log": "pipeline-test-integration.log"
+    }
+  ],
+  "missingStages": [],
+  "failedStages": [],
+  "sourceCheck": "source-check.json",
+  "pipeline": "pipeline-results.json",
+  "publishedSha256": {
+    "source-manifest.json": "af7542315c382a3c88c30c5564bb5c545455c4119a8d3e7dd8ef92ac3be1affc",
+    "pipeline-results.json": "a55d1d866b7c61ecdd988493c697dbc3986ef4ef26e0d1def1de2c6d88d7d22d",
+    "pipeline-test.log": "f4eb39713106f459d414271d7bf2fbc224328da848ad7e5af41de7e3d9fdb65c",
+    "pipeline-build.log": "8ed0320309f97bd354852fe86c3fa55cdb5810aa29e91f3fecb7b0c1b7e8a132",
+    "pipeline-test-integration.log": "00d0abd9255ad1e184d5c2a82905ab84c6ed9025c8d529c2293a2f7997a2df05"
+  },
+  "archiveErrors": [],
+  "gpu": {
+    "status": "pending",
+    "note": "No matched full-production GeForce/FPS result for U1 is archived here. Separate GPU visual/component QA may be attached later by the coordinating root; it must not be reported as an FPS benchmark."
+  },
+  "notes": [
+    "Raw logs retain any warnings and integration diagnostics; status is derived from actual final stage exit codes, final test summary and source audit.",
+    "Reports and prose may change independently; the required static landmark geometry fixture is explicitly included and immutable."
+  ]
+}

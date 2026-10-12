@@ -15,8 +15,11 @@ export type AvatarAnimationState = {
   flashlight?: boolean;
   /** Optional terrain/step query. Without it use the current foot-level plane. */
   groundHeight?: (x: number, z: number) => number | undefined;
+  /** Measured floor used only on air→ground, without continuous remote foot IK. */
+  touchdownGroundHeight?: (x: number, z: number) => number | undefined;
 };
 export type AvatarGait = "idle" | "walk" | "run" | "sprint";
+export type PlantCompensation = "skipped" | "compensated" | "unreachable";
 
 const TAU = Math.PI * 2;
 const blend = (rate: number, dt: number) => -Math.expm1(-rate * dt);
@@ -50,6 +53,8 @@ type FootContact = {
   phase: number;
   releasePhase: number;
   swingPlanned: boolean;
+  swingYaw: number;
+  swingTurning: boolean;
   swingToeFrom: number;
   swingLift: number;
   swingFrom: Vec3;
@@ -75,6 +80,8 @@ const footContact = (): FootContact => ({
   phase: 0,
   releasePhase: NaN,
   swingPlanned: false,
+  swingYaw: 0,
+  swingTurning: false,
   swingToeFrom: 0,
   swingLift: 0,
   swingFrom: { x: 0, y: 0, z: 0 },
@@ -110,10 +117,17 @@ export class AvatarAnimator {
   private desiredFoot = Quaternion.Identity();
   private readonly inverseRoot = Matrix.Identity();
   private readonly localFoot = Vector3.Zero();
+  private readonly compensationState: AvatarAnimationState;
   readonly contacts = { left: footContact(), right: footContact() };
   private readonly feet = [this.contacts.left, this.contacts.right];
 
   constructor(private readonly rig: AvatarRig) {
+    // One state per animator; compensation deliberately has no terrain query.
+    this.compensationState = {
+      position: rig.root.position,
+      yaw: 0,
+      grounded: true,
+    };
     for (const joint of [rig.left, rig.right, rig.leftFoot, rig.rightFoot])
       joint.rotationQuaternion = Quaternion.Identity();
   }
@@ -128,6 +142,74 @@ export class AvatarAnimator {
     if (this.measuredSpeed < 2.8) return "walk";
     if (this.measuredSpeed < 5.8) return "run";
     return "sprint";
+  }
+
+  /** Reproject only held supports after the rendered root moves between medium
+   * pose ticks. Does not advance gait, plan a step, sample terrain or allocate.
+   * Caller must restrict this to visible grounded articulated medium avatars. */
+  compensatePlantedFeet(position: Vec3): PlantCompensation {
+    if (
+      !this.initialized ||
+      this.wasAirborne ||
+      this.wasDriving ||
+      this.air > 0 ||
+      this.rig.root.isDisposed() ||
+      !this.rig.root.isEnabled() ||
+      !Number.isFinite(position.x) ||
+      !Number.isFinite(position.y) ||
+      !Number.isFinite(position.z) ||
+      Math.hypot(
+        position.x - this.previousX,
+        position.y - this.previousY,
+        position.z - this.previousZ,
+      ) > 2.5 ||
+      (!this.contacts.left.planted && !this.contacts.right.planted)
+    )
+      return "skipped";
+    const state = this.compensationState;
+    state.position = position;
+    state.yaw = this.rig.root.rotation.y;
+    const height = Math.min(
+      this.rig.hips.position.y,
+      this.supportedHipHeight(state),
+    );
+    const m = this.rig.measurements,
+      scale = this.rig.root.scaling;
+    const c = Math.cos(state.yaw),
+      s = Math.sin(state.yaw);
+    const maximum = m.thigh + m.shin - 0.0001;
+    for (let side = 0; side < 2; side++) {
+      const contact = this.feet[side];
+      if (!contact.planted) continue;
+      const dx = contact.target.x - position.x,
+        dz = contact.target.z - position.z;
+      const x = (c * dx - s * dz) / scale.x - (side ? 1 : -1) * m.legSpacing;
+      const y = (contact.target.y - position.y) / scale.y - height;
+      const z = (s * dx + c * dz) / scale.z;
+      // A discontinuous root cannot retain an unreachable old-world support.
+      // Leave that pose to the next complete update/reset rather than stretch.
+      if (x * x + y * y + z * z > maximum * maximum) return "unreachable";
+    }
+    this.rig.hips.position.y = height;
+    if (this.contacts.left.planted)
+      this.solveFoot(
+        this.contacts.left,
+        this.rig.left,
+        this.rig.leftKnee,
+        this.rig.leftFoot,
+        -1,
+        state,
+      );
+    if (this.contacts.right.planted)
+      this.solveFoot(
+        this.contacts.right,
+        this.rig.right,
+        this.rig.rightKnee,
+        this.rig.rightFoot,
+        1,
+        state,
+      );
+    return "compensated";
   }
 
   reset() {
@@ -169,6 +251,7 @@ export class AvatarAnimator {
       contact.settleTime = Infinity;
       contact.releasePhase = NaN;
       contact.swingPlanned = false;
+      contact.swingTurning = false;
     }
   }
 
@@ -191,8 +274,8 @@ export class AvatarAnimator {
   }
 
   private translateUnmeasuredGround(deltaY: number) {
-    // Remote snapshots have no grounded bit or floor query. Their root height
-    // is authoritative presentation data, not a measured lower stair tread.
+    // A snapshot without a floor query has authoritative root-height data,
+    // not a measured lower stair tread. This includes legacy remote records.
     for (const contact of this.feet) {
       contact.anchor.y += deltaY;
       contact.target.y += deltaY;
@@ -254,6 +337,8 @@ export class AvatarAnimator {
     const airborne = state.grounded === false && !driving;
     const takingOff = airborne && !this.wasAirborne;
     const landed = !airborne && this.wasAirborne;
+    if (landed && !state.groundHeight && state.touchdownGroundHeight)
+      state = { ...state, groundHeight: state.touchdownGroundHeight };
     const starting = moving && (!this.wasMoving || landed);
     this.movement = mix(this.movement, moving ? 1 : 0, blend(16, dt));
     const gaitSpeed = moving ? this.travelSpeed : this.measuredSpeed;
@@ -525,17 +610,35 @@ export class AvatarAnimator {
     if (moving && this.air < 0.5) {
       if (stance) {
         if (!contact.planted) {
-          // The render frame can land slightly after phase zero. Account for
-          // that travelled distance instead of snapping forward by one frame.
-          const landing = forwardReach - stride * phase;
-          contact.support.x =
-            root.x + c * lateral * scale.x + s * landing * scale.z;
-          contact.support.z =
-            root.z - s * lateral * scale.x + c * landing * scale.z;
-          contact.support.y =
-            shoeGround(contact.support.x, contact.support.z, yaw) +
-            m.ankleHeight * scale.y;
-          contact.anchorYaw = yaw;
+          if (contact.swingTurning) {
+            // Plant where the rendered swing actually arrived. Reconstructing a
+            // theoretical landing from the current heading teleports the ankle
+            // after a turn, because its swing began at another yaw.
+            // Undo the previous roll once, then retain that flat support for the
+            // whole stance; do not smooth a planted shoe across the ground.
+            const pivotZ = contact.toe < 0 ? -0.085 : 0.191;
+            const forward = rollForward(m.ankleHeight, contact.toe, pivotZ);
+            contact.support.x =
+              contact.target.x - Math.sin(contact.yaw) * forward * scale.z;
+            contact.support.z =
+              contact.target.z - Math.cos(contact.yaw) * forward * scale.z;
+            contact.support.y =
+              shoeGround(contact.support.x, contact.support.z, contact.yaw) +
+              m.ankleHeight * scale.y;
+            contact.anchorYaw = contact.yaw;
+          } else {
+            // Preserve the established straight stride and stair landing.
+            const landing = forwardReach - stride * phase;
+            contact.support.x =
+              root.x + c * lateral * scale.x + s * landing * scale.z;
+            contact.support.z =
+              root.z - s * lateral * scale.x + c * landing * scale.z;
+            contact.support.y =
+              shoeGround(contact.support.x, contact.support.z, yaw) +
+              m.ankleHeight * scale.y;
+            contact.anchorYaw = yaw;
+          }
+          contact.swingTurning = false;
         }
         contact.planted = true;
         contact.swingPlanned = false;
@@ -561,8 +664,12 @@ export class AvatarAnimator {
         contact.planted = false;
         const heelForward = rollForward(m.ankleHeight, heelPitch, -0.085);
         const heelHeight = rollHeight(m.ankleHeight, heelPitch, -0.085);
+        const newSwing = !contact.swingPlanned;
+        const headingChanged = !newSwing && contact.swingYaw !== yaw;
+        const retargetSurface = newSwing || headingChanged;
         if (!contact.swingPlanned) {
           contact.swingPlanned = true;
+          contact.swingTurning = false;
           // Retain the rendered ankle and roll at toe-off. Reconstructing a
           // theoretical rear endpoint jumps whenever speed/duty changes, and
           // on the first step it assumes a stance that never actually existed.
@@ -570,18 +677,28 @@ export class AvatarAnimator {
           contact.swingToeFrom = contact.toe;
           contact.swingLift = mix(0.09, 0.32, run);
           Object.assign(contact.swingFrom, contact.target);
+        }
+        if (headingChanged) contact.swingTurning = true;
+        // Follow the current stride and smooth heading in the horizontal
+        // plane. Reuse the vertical forecast along a straight step; only a
+        // redirected swing needs another surface plan. Actual shoe clearance
+        // and the eventual supporting point still query their real surface.
+        if (newSwing || contact.swingTurning) {
           const landing = forwardReach + heelForward + stride * (1 - phase);
           contact.swingTo.x =
             root.x + c * lateral * scale.x + s * landing * scale.z;
           contact.swingTo.z =
             root.z - s * lateral * scale.x + c * landing * scale.z;
-          contact.swingTo.y =
-            shoeGround(
-              contact.swingTo.x - s * heelForward * scale.z,
-              contact.swingTo.z - c * heelForward * scale.z,
-              yaw,
-            ) +
-            (m.ankleHeight + heelHeight) * scale.y;
+          if (retargetSurface) {
+            contact.swingYaw = yaw;
+            contact.swingTo.y =
+              shoeGround(
+                contact.swingTo.x - s * heelForward * scale.z,
+                contact.swingTo.z - c * heelForward * scale.z,
+                yaw,
+              ) +
+              (m.ankleHeight + heelHeight) * scale.y;
+          }
           const legLength = m.thigh + m.shin - 0.0005;
           contact.landingPelvisMax =
             contact.swingTo.y +
@@ -659,7 +776,7 @@ export class AvatarAnimator {
   }
 
   private clearSole(contact: FootContact, state: AvatarAnimationState) {
-    if (state.groundHeight && this.air < 0.5) {
+    if (state.grounded !== false && state.groundHeight && this.air < 0.5) {
       // Check the shoe, not only its ankle. A 15 cm riser can sit immediately
       // in front of a perfectly valid ankle query; the former solver allowed
       // the visible toe/sole to pass through it. Conservative sole corners

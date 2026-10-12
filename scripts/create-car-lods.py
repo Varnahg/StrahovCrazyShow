@@ -1,7 +1,7 @@
 """Repair wheel LOD topology, preserving reviewed near/master and frozen J body.
 No render, no cap, no normals flip. UV remains per loop through source weld.
 """
-import bpy,bmesh,json,hashlib,math,subprocess,shutil
+import bpy,bmesh,json,hashlib,math,subprocess,shutil,runpy
 from pathlib import Path
 from mathutils import Vector
 from mathutils.kdtree import KDTree
@@ -13,6 +13,8 @@ near_sha=hashlib.sha256((ROOT/'public/models/vehicles/campus-hatchback-near.glb'
 assert before_sha=='903eaf0fcfaa7a4ef1ce15a89435e3e4186db8190907e0099b5be7f52e44e83f'
 assert near_sha=='7491240d9c5acc10375a394bc9b56a02f314da749dfb63e397506d90ae33c853'
 reports=[]
+far_repair=runpy.run_path(str(ROOT/'scripts/car-far-fold-repair.py'))
+far_recipe=far_repair['load_source_recipe'](ROOT)
 def topology(mesh):
  bm=bmesh.new();bm.from_mesh(mesh)
  result={'vertices':len(bm.verts),'edges':len(bm.edges),'faces':len(bm.faces),'boundaryEdges':sum(e.is_boundary for e in bm.edges),'looseEdges':sum(len(e.link_faces)==0 for e in bm.edges),'nonManifoldEdges':sum(len(e.link_faces)>2 for e in bm.edges),'inconsistentOrientationEdges':sum(e.is_manifold and not e.is_contiguous for e in bm.edges)}
@@ -57,16 +59,20 @@ def component_far(obj,role,ratio):
 for level in ['medium','far']:
  bpy.ops.wm.open_mainfile(filepath=str(SOURCE));bpy.context.preferences.filepaths.save_version=0
  bpy.context.scene.render.threads_mode='FIXED';bpy.context.scene.render.threads=2
- # Editable derived body uses unchanged J ratios. The final GLB retains exact
- # J body attributes, PBR materials and images from the archived baseline.
+ # Editable body retains J ratios except one source-restored far fender lip.
+ # The final GLB retains all other archived J body/PBR/image bytes.
+ far_fold_audit=None
  for body in [o for o in bpy.context.scene.objects if o.type=='MESH' and o.get('wheel_index') is None]:
   role=body.data.materials[0].get('source_role','')
   ratios={'paint':.6,'black':.22,'interior':.35,'glass':.4,'chrome':.35,'clearlens':.25,'redlens':.4,'white':.4,'steel':.16,'rubber':.3} if level=='medium' else {'paint':.085,'black':.05,'interior':.12,'glass':.12,'chrome':.085,'clearlens':.12,'redlens':.2,'white':.2,'steel':.06,'rubber':.065}
   role='clearlens' if role=='frontlamp' else 'redlens' if role=='brakelamp' else role
+  source_lip=far_repair['capture_source_lip'](body.data,far_recipe) if level=='far' and role=='paint' else None
   decimate(body,ratios.get(role,.3 if level=='medium' else .1));body.data.calc_loop_triangles();body['derived_lod']=level;body['near_master_retained']=True
+  if source_lip is not None:far_fold_audit=far_repair['repair_far_fold'](body,source_lip)
+ if level=='far' and far_fold_audit is None:raise RuntimeError('Far source lip was not reproduced')
  objects=[o for o in bpy.context.scene.objects if o.type=='MESH' and o.get('wheel_index') is not None]
  assert len(objects)==16
- level_report={'level':level,'parts':[]};processed=[]
+ level_report={'level':level,'parts':[],'farFenderRepair':far_fold_audit};processed=[]
  for obj in sorted(objects,key=lambda o:o.name):
   mesh=obj.data;mesh.calc_loop_triangles();before=topology(mesh)
   uv_before=uv_values(mesh);normals_before=[tuple(n.vector) for n in mesh.corner_normals]
@@ -104,7 +110,7 @@ for level in ['medium','far']:
  reports.append(level_report)
 assert hashlib.sha256(SOURCE.read_bytes()).hexdigest()==before_sha
 assert hashlib.sha256((ROOT/'public/models/vehicles/campus-hatchback-near.glb').read_bytes()).hexdigest()==near_sha
-result={'capturedAt':__import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat(),'blenderVersion':bpy.app.version_string,'threads':2,'sourceMasterSha256':before_sha,'nearMasterSha256':near_sha,'sourceUnchanged':True,'method':'weld source position duplicates within 1um before wheel-only DECIMATE; preserve original per-loop UV/custom normal through weld; whole cardinal tread blocks retained, prevent two-face collapse; no caps/winding flip; frozen J body unchanged','levels':reports}
+result={'capturedAt':__import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat(),'blenderVersion':bpy.app.version_string,'threads':2,'sourceMasterSha256':before_sha,'nearMasterSha256':near_sha,'sourceUnchanged':True,'method':'weld source position duplicates within 1um before wheel-only DECIMATE; preserve original per-loop UV/custom normal through weld; whole cardinal tread blocks retained, prevent two-face collapse; no caps/winding flip; frozen J body retained except one closed source fender lip; no wheel/PBR/image change','levels':reports}
 audit_text=json.dumps(result,indent=2)+'\n'
 (OUT/'wheel-weld-audit.json').write_text(audit_text)
 (DOCS/'wheel-weld-audit.json').write_text(audit_text)

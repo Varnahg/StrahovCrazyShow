@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="cs"><meta charset="utf-8"><title>NormalGL přenos · komponentová kontrola</title>
+<style>body{margin:0;background:#1a2227;color:#eee;font:14px system-ui}aside{position:absolute;z-index:1;margin:12px;padding:14px;background:#17252be8;border:1px solid #7b918a;border-radius:8px;max-width:390px}label,button{margin:4px}button,select{padding:5px;background:#344b4c;color:white;border:1px solid #8ba397}pre{font-size:11px;max-height:240px;overflow:auto}canvas{width:100vw;height:100vh;display:block}p{margin:8px 0}</style>
+<aside><b>NormalGL na skutečném DMR trojúhelníku</b><p>Komponentový náhled: stejné mapy, UV, kamera a PBR shader. Ruční světlo, nikoli skutečné počasí ani FPS benchmark.</p>
+<label>Povrch <select id="family"><option value="asphalt">Asfalt</option><option value="paving">Dlažba</option><option value="grass">Procedurální travní podklad</option></select></label>
+<p><button id="corrected">Opravený přenos</button><button id="legacy">Původní přenos</button><button id="disabled">Bez normálové mapy</button></p>
+<p>Světlo: <button data-light="north">Sever</button><button data-light="south">Jih</button><button data-light="east">Východ</button><button data-light="west">Západ</button></p>
+<p>Kamera se mezi variantami nemění. Nejprve vyčkej ready=true; po kontrole zavři scénu.</p><pre id="stats">Načítání…</pre></aside><canvas id="scene" aria-label="Komponentové porovnání normálových map"></canvas><script type="module" src="./preview.ts"></script></html>

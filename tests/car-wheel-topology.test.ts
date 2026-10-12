@@ -50,7 +50,7 @@ test("immutable source and accepted repaired near/master retain their reviewed h
     assert.equal(hash(readFileSync(file)), sha);
 });
 
-test("medium/far retain every frozen J body attribute, PBR material, node/pivot and embedded image", () => {
+test("medium/far retain frozen J parts outside the separately verified source lip repair, plus all PBR/pivots/images", () => {
   for (const level of ["medium", "far"]) {
     const before = parseGlb(
         readFileSync(assets + "lod-baseline-j/" + level + ".glb"),
@@ -72,7 +72,10 @@ test("medium/far retain every frozen J body attribute, PBR material, node/pivot 
       });
     assert.deepEqual(images(after), images(before));
     for (const node of after.json.nodes)
-      if (node.name.startsWith("Body:"))
+      if (
+        node.name.startsWith("Body:") &&
+        !(level === "far" && node.name === "Body:paint")
+      )
         assert.deepEqual(
           bodySignature(after, node.mesh),
           bodySignature(before, node.mesh),

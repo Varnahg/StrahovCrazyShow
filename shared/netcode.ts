@@ -243,6 +243,18 @@ export class SnapshotBuffer {
         : Math.max(0, Math.min(1, (renderTime - a.time) / (b.time - a.time)));
     return {
       ...a,
+      // This is contact presentation, not another physics simulation. A known
+      // airborne endpoint makes the interior of the interpolated segment air;
+      // otherwise a rising/descending root would still claim floor contact.
+      // Exact endpoints retain their own state, including unknown old records.
+      grounded:
+        t === 0
+          ? a.grounded
+          : t === 1
+            ? b.grounded
+            : a.grounded === undefined || b.grounded === undefined
+              ? undefined
+              : a.grounded && b.grounded,
       x: a.x + (b.x - a.x) * t,
       y: a.y + (b.y - a.y) * t,
       z: a.z + (b.z - a.z) * t,
