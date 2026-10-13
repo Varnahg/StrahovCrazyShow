@@ -1,4 +1,5 @@
 import test from "node:test";
+import type { PointLight } from "@babylonjs/core/Lights/pointLight";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import RAPIER from "@dimforge/rapier3d-compat";
@@ -21,6 +22,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { B6RealityController, createB6StairMeshes, createB6BoxFaceParts } from "../client/b6-reality";
 import { b6AuthoredStairPixels } from "../shared/b6-stair-materials";
 import {groundHeight} from "../shared/terrain";
@@ -408,6 +410,86 @@ test("opaque B6 construction detaches beyond facade LOD, restores conservatively
   assert.equal(scene.materials.length, 0);
   scene.dispose();
   engine.dispose();
+});
+
+test("walking around B6 only resynchronizes scene lighting when crossing its interior boundary", (t) => {
+  const engine = new NullEngine(),
+    scene = new Scene(engine),
+    controller = new B6RealityController(scene),
+    unrelatedMesh = new Mesh("outside lighting probe", scene);
+  const light = scene.lights.find(
+    (candidate) => candidate.name === "b6 nearest corridor fixture fill",
+  )! as PointLight;
+  // This observes Babylon's real per-mesh resync, retaining its implementation.
+  // An unchanged Light.setEnabled call would still visit this unrelated mesh.
+  const resync = t.mock.method(unrelatedMesh, "_resyncLightSource");
+  const enable = t.mock.method(light, "setEnabled");
+  const outsideX = B6_LAYOUT.bounds.maxX + 4;
+  const walk = (x: number) => {
+    for (let step = 0; step < 10; step++)
+      controller.update({
+        player: {
+          x,
+          y: B6_LAYOUT.foundationOffset + 0.82,
+          z: -55 + step * 0.4,
+        },
+        quality: "low",
+      });
+  };
+  try {
+    walk(outsideX);
+    assert.equal(controller.interiorLightEnabled, false);
+    assert.equal(unrelatedMesh.lightSources.includes(light), false);
+    assert.equal(
+      resync.mock.callCount(),
+      0,
+      "outdoor movement does not scan scene lighting",
+    );
+
+    controller.update({
+      player: { x: 8, y: B6_LAYOUT.foundationOffset + 0.82, z: -55 },
+      quality: "low",
+    });
+    assert.equal(controller.interiorLightEnabled, true);
+    assert.equal(unrelatedMesh.lightSources.includes(light), true);
+    assert.equal(light.intensity, 0.65);
+    assert.equal(enable.mock.callCount(), 1);
+    // A real transition can invoke multiple native scans (own + parent state).
+    const entryScans = resync.mock.callCount();
+    assert.ok(entryScans > 0, "entry synchronizes real scene light membership");
+    walk(8);
+    assert.equal(resync.mock.callCount(), entryScans);
+    assert.equal(enable.mock.callCount(), 1);
+
+    controller.update({
+      player: { x: 8, y: B6_LAYOUT.foundationOffset + 3.82, z: -50 },
+      quality: "high",
+      floor: 1,
+    });
+    assert.equal(light.intensity, 0.9);
+    assert.equal(light.position.y, B6_LAYOUT.foundationOffset + 3 + 2.35);
+    assert.equal(
+      resync.mock.callCount(),
+      entryScans,
+      "floor, intensity and position update without a membership scan",
+    );
+
+    controller.update({
+      player: { x: outsideX, y: B6_LAYOUT.foundationOffset + 0.82, z: -55 },
+      quality: "low",
+    });
+    const exitScans = resync.mock.callCount();
+    assert.ok(exitScans > entryScans, "exit removes real scene light membership");
+    walk(outsideX);
+    assert.equal(controller.interiorLightEnabled, false);
+    assert.equal(unrelatedMesh.lightSources.includes(light), false);
+    assert.equal(resync.mock.callCount(), exitScans);
+    assert.equal(enable.mock.callCount(), 2);
+  } finally {
+    controller.dispose();
+    scene.dispose();
+    engine.dispose();
+  }
 });
 
 test("exterior B6 entry stays visible from the north approach at every quality before and after actual GLB loading and root attachment",async()=>{

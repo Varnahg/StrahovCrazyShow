@@ -634,7 +634,9 @@ export class B6RealityController {
           Matrix.Invert(this.buildingRoot.computeWorldMatrix(true)),
         ),
       );
-    this.light.setEnabled(inside);
+    // Babylon rescans every scene mesh even for an unchanged Light.setEnabled.
+    // Walking updates this fixture's position, not its light membership.
+    if (this.light.isEnabled(false) !== inside) this.light.setEnabled(inside);
     this.light.intensity = input.quality === "low" ? 0.65 : 0.9;
   }
   dispose() {

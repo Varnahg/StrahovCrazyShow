@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "fps-nav-provenance",
+  "title": "Obnovit odvozené navigační otisky po refaktoringu dopravy",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/data/map.json",
+    "shared/world.ts",
+    "shared/data/building-catalog.json",
+    "shared/data/streets.json",
+    "shared/streets.ts",
+    "shared/data/b6-entry-paving.json",
+    "shared/campus-routes.ts",
+    "shared/data/terrain-grid.json",
+    "shared/data/reality-ground.json",
+    "shared/terrain.ts",
+    "shared/terrain-patches.ts",
+    "shared/data/north-court-terrain-patch.json",
+    "shared/data/north-court-style.json",
+    "shared/campus-exterior.ts",
+    "shared/b6-interior.ts",
+    "shared/b6-stairs.ts",
+    "shared/b6-entry.ts",
+    "shared/b6-facade-plan.ts",
+    "shared/landmark-reality.ts",
+    "shared/stadium-exterior.ts",
+    "shared/transit.ts",
+    "shared/terrain-entities.ts",
+    "shared/data/transit.json",
+    "scripts/rebuild-campus-transit-navigation.ts",
+    "shared/data/transit-navigation.json"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Spustit původní generátor a ověřit přesnou shodu tras a metadat kromě aktualizovaného otisku shared/transit.ts."
+  ],
+  "verification": [
+    "pnpm exec tsx scripts/rebuild-campus-transit-navigation.ts",
+    "Cílený transit-navigation-source test"
+  ],
+  "notes": [
+    "Změněný shared/transit.ts převzat od fps-transit-cost; root drží heavy-validation a vlastní evidenci. Vstupy jsou rezervované pro generování, neobjednané úpravy jejich obsahu nejsou součástí tasku."
+  ]
+}

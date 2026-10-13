@@ -12,11 +12,62 @@ import {
   shiftServiceDate,
   sampleTrip,
   sampleTransit,
+  sampleTransitVehicles,
+  sampleAmbientTraffic,
+  transitObstacles,
   passengerCount,
   sampleWalkingPath,
   passengerWalkingRoute,
   transitStatus,
 } from "../shared/transit";
+
+test("physics vehicle sampling preserves timetable motion and obstacle poses across arrival, midnight, expiry and rewind", () => {
+  const day = serviceDayEpoch(TRANSIT_FEED.start);
+  const arrival = TRANSIT_FEED.trips.find((trip) =>
+    serviceRuns(TRANSIT_FEED, trip.service, TRANSIT_FEED.start),
+  )!.stops[0][1];
+  const times = [
+    day - 1000,
+    day,
+    ...[-1, 0, 0.001, 7, 14, 14.001, 35, 120, 599, 601].map(
+      (offset) => day + (arrival + offset) * 1000,
+    ),
+    day + 86399999,
+    day + 86400000,
+    serviceDayEpoch(shiftServiceDate(TRANSIT_FEED.end, 1)),
+    day + arrival * 1000,
+  ];
+  for (const now of times) {
+    const complete = sampleTransit(now),
+      vehicles = sampleTransitVehicles(now);
+    assert.deepEqual(vehicles, {
+      buses: complete.buses,
+      traffic: complete.traffic,
+    });
+    assert.deepEqual(transitObstacles(vehicles), transitObstacles(complete));
+    assert.equal("passengers" in vehicles, false);
+    assert.equal("status" in vehicles, false);
+  }
+});
+
+test("ambient traffic retains the exact speed derived from each source centre line", () => {
+  const start = serviceDayEpoch(TRANSIT_FEED.start);
+  let checked = 0;
+  for (let offset = 0; offset < 270; offset += 13) {
+    for (const car of sampleAmbientTraffic(start + offset * 1000)) {
+      const direction = Number(car.id.split(":")[1]);
+      const shape = TRANSIT_FEED.shapes[direction === 0 ? "L143V1" : "L143V2"];
+      const expected = shape.slice(1).reduce(
+        (sum, point, index) =>
+          sum + Math.hypot(point[0] - shape[index][0], point[1] - shape[index][1]),
+        0,
+      ) / 75;
+      assert.equal(car.speed, expected);
+      checked++;
+    }
+  }
+  assert.ok(checked > 10);
+});
 
 test("GTFS weekdays, bounded dates and additions/removals respect actual service dates", () => {
   const f = {

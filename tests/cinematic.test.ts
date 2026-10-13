@@ -10,7 +10,14 @@ import { MultiMaterial } from "@babylonjs/core/Materials/multiMaterial";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import {
+  InternalTexture,
+  InternalTextureSource,
+} from "@babylonjs/core/Materials/Textures/internalTexture";
+import {
+  CinematicAtmosphere,
   applyWindowSkyReflection,
   solarShadowsEnabled,
   skyReflectionData,
@@ -257,4 +264,51 @@ test("B6 Fresnel reflection preserves warm masks/alpha and night never keeps sol
   assert.equal(other.reflectionTexture, null);
   scene.dispose();
   engine.dispose();
+});
+
+// NullEngine has no raw cube upload; only that GPU resource is stubbed. Camera
+// attachment and pipeline lifecycle below are the actual Babylon implementation.
+class ReflectionTestEngine extends NullEngine {
+  override createRawCubeTexture(...args: Parameters<NullEngine["createRawCubeTexture"]>) {
+    const texture = new InternalTexture(this, InternalTextureSource.CubeRaw);
+    texture.isCube = texture.isReady = true;
+    texture.width = texture.height = texture.baseWidth = texture.baseHeight = args[1];
+    return texture;
+  }
+}
+
+test("cinematic quality creates one complete postprocess chain per activation and keeps it for medium/high", (t) => {
+  const engine = new ReflectionTestEngine(), scene = new Scene(engine);
+  const camera = new FreeCamera("pipeline observer", new Vector3(0, 3, -5), scene);
+  scene.activeCamera = camera;
+  const sun = new DirectionalLight("sun", Vector3.Down(), scene);
+  const atmosphere = new CinematicAtmosphere(scene, camera, sun);
+  t.after(() => { atmosphere.dispose(); scene.dispose(); engine.dispose(); });
+  const manager = scene.postProcessRenderPipelineManager;
+  const attach = manager.attachCamerasToRenderPipeline.bind(manager);
+  let attachments = 0;
+  manager.attachCamerasToRenderPipeline = (...args) => {
+    attachments++;
+    return attach(...args);
+  };
+  const update = (quality: string) => atmosphere.update({
+    dt: 0, player: { x: 0, y: 0, z: 0 }, quality, cloud: 0, daylight: 1,
+  });
+  update("medium");
+  assert.equal(attachments, 1, "configuration must attach only the final chain");
+  const postProcesses = camera._postProcesses.filter(Boolean);
+  assert.ok(postProcesses.length > 0);
+  assert.equal(scene.imageProcessingConfiguration.applyByPostProcess, false);
+  assert.equal(scene.imageProcessingConfiguration.isEnabled, false);
+  update("high");
+  assert.equal(attachments, 1);
+  assert.deepEqual(camera._postProcesses.filter(Boolean), postProcesses);
+  assert.equal(atmosphere.stats.shadowMapSize, 2048);
+  update("low");
+  assert.equal(camera._postProcesses.filter(Boolean).length, 0);
+  assert.equal(atmosphere.stats.bloomWeight, 0);
+  update("medium");
+  assert.equal(attachments, 2);
+  assert.equal(camera._postProcesses.filter(Boolean).length, postProcesses.length);
+  assert.equal(atmosphere.stats.shadowMapSize, 1024);
 });

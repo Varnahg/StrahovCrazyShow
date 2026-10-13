@@ -114,14 +114,17 @@ export class VehicleLighting {
     const active = driving && strength > 0.1;
     if (this.light.isEnabled(false) !== active) this.light.setEnabled(active);
     this.light.intensity = active ? strength * 1.6 : 0;
-    // The close-range torch retains a small occlusion map on low. Disabled
-    // lights/maps are omitted by Babylon's shadow render-target collector.
-    this.light.shadowEnabled =
-      active && (this.kind === "player" || resolvedQuality !== "low");
     if (!active) {
+      // Babylon excludes disabled lights from both material light slots and
+      // shadow collection. Retain the configured shadow mode while off: also
+      // changing shadowEnabled needlessly dirties every affected mesh on the
+      // next activation, although the same shader/map can be used again.
       this.lastSelection = -Infinity;
       return;
     }
+    // The close-range torch retains a small occlusion map even on low.
+    this.light.shadowEnabled =
+      this.kind === "player" || resolvedQuality !== "low";
     if (!this.light.shadowEnabled) {
       this.lastSelection = -Infinity;
       return;
@@ -209,8 +212,9 @@ export class VehicleLighting {
       this.lastSelection = now;
       this.lastPosition.copyFrom(this.light.position);
       this.lastMeshCount = this.scene.meshes.length;
-      const map = this.shadow.getShadowMap()!;
-      map.renderList = this.scene.meshes.filter((mesh) => {
+      const candidates = shadowMap.renderList ?? (shadowMap.renderList = []);
+      let count = 0;
+      for (const mesh of this.scene.meshes) {
         if (
           mesh.isDisposed() ||
           !mesh.getTotalVertices() ||
@@ -218,15 +222,28 @@ export class VehicleLighting {
           mesh.metadata?.shadowCaster === false ||
           mesh.infiniteDistance
         )
-          return false;
+          continue;
         mesh.computeWorldMatrix(!mesh.isSynchronized());
         const sphere = mesh.getBoundingInfo().boundingSphere;
-        return (
-          Vector3.Distance(sphere.centerWorld, this.light.position) -
-            sphere.radiusWorld <
-          this.light.range + 4
-        );
-      });
+        const reach = this.light.range + 4 + sphere.radiusWorld;
+        if (
+          !(
+            Vector3.DistanceSquared(sphere.centerWorld, this.light.position) <
+            reach * reach
+          )
+        )
+          continue;
+        // Babylon observes renderList mutators to dirty shadow defines when
+        // the list becomes empty/nonempty. Preserve that notification once,
+        // while reusing the same array for ordinary broad-phase refreshes.
+        if (candidates.length === 0) candidates.push(mesh);
+        else candidates[count] = mesh;
+        count++;
+      }
+      if (count === 0 && candidates.length > 0) {
+        candidates.length = 1;
+        candidates.pop();
+      } else candidates.length = count;
     }
   }
   dispose() {

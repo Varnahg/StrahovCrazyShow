@@ -1,0 +1,48 @@
+BJS - [15:30:18]: Babylon.js v9.30.0 - Null engine
+✔ completed benchmark survives real grass update, quality change and disposal without freezing live statistics (583.689566ms)
+✔ incremental score ordering matches full sorting and every quality's triangle budget (43.069248ms)
+BJS - [15:30:18]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:19]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:19]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:20]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:22]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:22]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:25]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:28]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:32]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:34]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:38]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:38]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:38]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:39]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:40]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:40]: Babylon.js v9.30.0 - Null engine
+✔ cold work and instance arrivals are bounded per update and converge to the original root set (475.189986ms)
+✔ quality changes and teleports replace pending work, and disposal releases both selection pools (480.690702ms)
+✔ small continuous camera movements do not starve preparation (620.526784ms)
+✔ camera motion at walking/sprinting speeds and sustained rotation completes cold preparations (2208.709531ms)
+✔ partial tile generation preserves exact placement and cannot publish a cancelled tile (22.249117ms)
+✔ sharp turns cancel the old snapshot while committed grass survives preparation (388.531884ms)
+✔ straight walking, sprinting and sustained turns retain grass in the CURRENT near frustum (9738.926022ms)
+✔ high third-person views fit the bounded cache and stop generating once stationary (5694.174349ms)
+✔ accepted leaf derivatives match source hashes and far retains complete photographed leaves (7.160843ms)
+✔ root budget counts all three LODs without limiting coverage to draw-count tiles (25.107851ms)
+✔ five atlas maps, two materials and LOD geometry are shared while controller wind ownership stays separate (7.622691ms)
+✔ source exclusions, world-metre placement and bounded cache survive eviction (30.64168ms)
+✔ batch append uploads the new count, compaction keeps native matrix snapshots and world bounds accurate (4.05281ms)
+✔ production renderer batches many world tiles, retains meshes/roots and stays under caps through movement and high→low (1480.309603ms)
+✔ stationary frames finish fades without uploading every instance each frame; a camera turn preserves common root identities (348.622728ms)
+✔ shared pending atlas readiness/failure cannot be bypassed by a cache hit (10.833138ms)
+BJS - [15:30:40]: Babylon.js v9.30.0 - Null engine
+BJS - [15:30:40]: Babylon.js v9.30.0 - Null engine
+✔ repeated resource cycles and disposal during pending loading release maps and observers (50.832738ms)
+✔ fixed capsule range protects third-person foreground/player grass and root IDs do not collide (9.474305ms)
+✔ shared PBR hard bind uses each owner's current world-space fade and wind (3.757705ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23040.015114

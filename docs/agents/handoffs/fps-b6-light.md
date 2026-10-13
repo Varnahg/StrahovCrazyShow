@@ -1,0 +1,17 @@
+# Předání: fps-b6-light
+
+- Vlastník: `fps-ui-20261013`; příjemce: koordinátor `fps-root-20261013`.
+- Pracovní kopie: `/workspace/StrahovCrazyShow`, větev `main`; výchozí commit `a381cf637b607b364e85b1e44a8e57566b3c9a0d`.
+- Výsledek: dokončena lokální oprava opakovaného průchodu celé scény při běžné chůzi. B6 mění zapnutí chodbového světla pouze při skutečné změně požadovaného stavu. Poloha, patro, intenzita, přechod dovnitř/ven a viditelnost geometrie zachovávají původní chování.
+- Změněné soubory: `client/b6-reality.ts`, `tests/b6-reality.test.ts`, toto předání.
+- Cizí změny: výchozí checkout byl čistý; koordinátor delegoval souběžné disjunktní opravy. Nebyly převzaty ani upraveny cizí změny.
+- Podklady: skutečný Babylon.js 9.30.0, `node_modules/@babylonjs/core/Lights/light.js`, ověřeno 13. 10. 2026. `Light.setEnabled` volá `_resyncMeshes` i pro stejnou hodnotu, `_resyncMeshes` prochází všechny registrované meshe. Skutečná změna navíc prochází synchronizací zděděného enabled stavu. Členství světla v meshích má vlastní kontrolu změny, proto odstranění redundantních průchodů není důkazem odstranění kompilace shaderů.
+- Refaktoring: místo dalšího duplicitního cache stavu se čte `light.isEnabled(false)`, stejně jako u existujících pouličních světel. Oprava nealokuje ani nezavádí nový životní cyklus prostředků.
+- Regrese: test sleduje skutečné volání Babylon `_resyncLightSource` na nezávislém meshi se zachováním původní implementace. Před opravou deset venkovních kroků způsobilo deset zbytečných průchodů a test selhal `10 !== 0`. Po opravě nezměněná chůze neprovádí žádný další průchod; vstup/výstup zachovává skutečné `mesh.lightSources` i zapnutí světla. Změna patra a kvality nadále aktualizuje polohu a intenzitu bez změny členství světla.
+- Ověření: `pnpm exec tsx --test tests/b6-reality.test.ts`, 13. 10. 2026 přibližně 16:43 Europe/Prague, exit 0, **18/18**, 18,84 s. Soubor zahrnuje reálné načtení GLB, kolize vstupu/schodů a zachování neprůhledné obálky. `git diff --check -- client/b6-reality.ts tests/b6-reality.test.ts`: exit 0.
+- Mezivýsledek: první běh celého souboru skončil 17/18 kvůli příliš přísnému očekávání jediného nativního průchodu při skutečné změně světla (`2 !== 1`). Po kontrole implementace Babylon byl test opraven: vyžaduje právě jednu veřejnou změnu stavu na hranici a žádné dodatečné mesh průchody během chůze. Produkční oprava se nezměnila.
+- SHA-256 po cíleném ověření: `client/b6-reality.ts` = `b483b6304949d5dff2ca5b60ad07547fc9023e00aca38414ffc4731b57a8de09`; `tests/b6-reality.test.ts` = `504e32d5000f93b7480af0db41953e4aa47f9f2e94e349c693b5af7205d9a1cd`. Jde o otisky předaných souborů včetně testu, nikoli identitu celého souběžně upravovaného checkpointu.
+- Procesy/zdroje: pouze ukončené lehké CPU testy, žádný server, port, GPU ani dlouhožijící proces.
+- Meze: NullEngine ověřuje počet skutečných synchronizací a funkční chování; není měřením GPU FPS nebo důkazem odstranění všech záseků při vstupu. B6 assety už jsou načtené před herním `ready`; změna neřeší první GPU shader variantu při vstupu. Produkční kontrolu, celý checkpoint a commit přebírá koordinátor.
+- Rezervace: po tomto předání se uvolňuje příkazem `node scripts/agent-tasks.mjs release --task fps-b6-light --owner fps-ui-20261013`; sdílený diff je předán koordinátorovi, nikoli volný k nezávislému přepisování.
+- Integrátor: má zkontrolovat diff, převzít soubory a zaznamenat finální stav a produkční důkazy v `docs/verification.md`.

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "fps-transit-cost",
+  "title": "Odstranit nepotřebnou práci simulace dopravy a skrytých kontaktních stínů",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/transit.ts",
+    "shared/simulation.ts",
+    "client/transit-renderer.ts",
+    "client/contact-shadows.ts",
+    "tests/transit.test.ts",
+    "tests/contact-shadows.test.ts",
+    "scripts/profile-transit-cost.ts",
+    "docs/agents/handoffs/fps-transit-cost.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Fyzika používá stejné pozice autobusů a dopravy bez výpočtu cestujících.",
+    "Skryté kontaktní stíny nepotřebují instance a terénní výpočty; zobrazení obnoví správnou polohu."
+  ],
+  "verification": [
+    "Cílené regresní testy a společný srovnatelný CPU profil pod koordinátorem."
+  ],
+  "notes": [
+    "Root koordinuje heavy-validation; nepouštět samostatný browser nebo full test/build."
+  ]
+}

@@ -30,7 +30,7 @@ import {
   rotateVehicleVector,
   type VehicleState,
 } from "./vehicle";
-import { sampleTransit, transitObstacles } from "./transit";
+import { sampleTransitVehicles, transitObstacles } from "./transit";
 import { STREET_COLLISIONS } from "./streets";
 import { buildCampusExteriorPlan } from "./campus-exterior";
 import { buildOutdoorWorldPlan } from "./outdoor-world";
@@ -477,7 +477,7 @@ export class Simulation {
   }
   tick(now = Date.now()) {
     if (now - this.trafficAt >= 33 || now < this.trafficAt) {
-      const frame = sampleTransit(now);
+      const frame = sampleTransitVehicles(now);
       this.trafficCache = transitObstacles(frame);
       this.trafficAt = now;
       this.trafficVelocities = new Map(

@@ -1,0 +1,23 @@
+{
+  "profiledSnapshot": "8656a67c8da2b849541661fdf4b8eaed3197026d2062b161db242ccff60eda00",
+  "finalSnapshot": "c48c0e1898b37075401f56005e3863b25b62b27867baa55643aa4b45fad1dc09",
+  "changedPaths": [
+    "scripts/profile-transit-cost.ts",
+    "shared/data/transit-navigation.json",
+    "tests/b6-reality.test.ts",
+    "tests/benchmark-snapshot.test.ts",
+    "tests/photo-grass.test.ts"
+  ],
+  "gameRuntimeCodeUnchanged": true,
+  "navigationContent": "Only shared/transit.ts source hash changed; full generated payload equality separately verified",
+  "semanticTestChanges": [
+    "tests/benchmark-snapshot.test.ts",
+    "tests/photo-grass.test.ts"
+  ],
+  "semanticTestChangeReason": "Fixed work scheduling; assertions and explicit +3ms deadline tests preserved; subsequent full suite703/703 PASS",
+  "typeOnlyChanges": [
+    "scripts/profile-transit-cost.ts",
+    "tests/b6-reality.test.ts"
+  ],
+  "typeOnlyProof": "type-only-equivalence.json"
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "fps-flashlight-cost",
+  "title": "Omezit redundantní práci při přepínání svítilny",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/vehicle-lighting.ts",
+    "tests/vehicle-lighting.test.ts",
+    "tests/flashlight.test.ts",
+    "docs/agents/handoffs/fps-flashlight-cost.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Vypnuté světlo nemá žádný světelný slot ani stínový průchod.",
+    "Přepínání neprovádí navíc globální změnu shadowEnabled; kvalita mapy a přesná geometrie paprsku zůstávají zachované.",
+    "Broad-phase cache nevynechá nového/přesunutého/dříve skrytého castera."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/vehicle-lighting.test.ts tests/flashlight.test.ts",
+    "Regrese reálných Babylon dirty calls a nativního shadow collectoru"
+  ],
+  "notes": [
+    "Nevynechat potřebné změny stínů, neudržovat nulové světlo zapnuté.",
+    "Studená kompilace shaderů zůstává samostatná sledovaná hranice; prewarm bez profilu se neimplementuje."
+  ]
+}

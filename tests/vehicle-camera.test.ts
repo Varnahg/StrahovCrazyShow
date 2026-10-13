@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { Game } from "../client/game";
 import { HUNT_POINTS } from "../shared/world";
 import { vehicleCameraCanFollow } from "../shared/controls";
+import { getLocale, setLocale } from "../client/i18n";
 
 function withInputFixture(
   run: (
@@ -93,7 +94,10 @@ test("entry releases existing walking mouse lock while preserving the walking vi
     assert.equal(documentStub.pointerLockElement, null);
     assert.equal(game.yaw, 0.4);
   }));
-test("E prioritises safe vehicle exit over a collectible at the identical position", () =>
+test("E prioritises safe vehicle exit over a collectible at the identical position", (t) => {
+  const previousLocale = getLocale();
+  setLocale("cs");
+  t.after(() => setLocale(previousLocale));
   withInputFixture((game) => {
     const actions: string[] = [],
       notices: string[] = [];
@@ -117,4 +121,5 @@ test("E prioritises safe vehicle exit over a collectible at the identical positi
     game.interact();
     assert.deepEqual(actions, []);
     assert.match(notices.at(-1)!, /zastav/);
-  }));
+  });
+});

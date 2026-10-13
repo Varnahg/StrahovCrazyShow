@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "fps-type-validation",
+  "title": "Opravit pouze typové deklarace kontrolních nástrojů",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/profile-transit-cost.ts",
+    "tests/b6-reality.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "TypeScript build projde a JavaScript po odstranění typů je přesně stejný jako v checkpointu703/703."
+  ],
+  "verification": [
+    "Shoda transpilačního výstupu",
+    "pnpm build"
+  ],
+  "notes": [
+    "Root přebírá dvě cesty z předaných fps-transit-cost a fps-b6-light. Změny pouze v typech, žádná změna runtime/test assertions."
+  ]
+}

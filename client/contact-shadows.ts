@@ -73,6 +73,12 @@ export class ContactShadows {
     visible = true,
   ) {
     let entry = this.instances.get(id);
+    // Distant/hidden avatars need neither a mesh nor terrain slope queries.
+    // Retain the last visible pose so showing it again recomputes any movement.
+    if (!visible) {
+      entry?.mesh.setEnabled(false);
+      return;
+    }
     if (!entry) {
       const instance = this.source.createInstance("contact " + id);
       instance.isVisible = true;

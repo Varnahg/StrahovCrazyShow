@@ -19,10 +19,6 @@ import type { Plane } from "@babylonjs/core/Maths/math.plane";
 import type { Observer } from "@babylonjs/core/Misc/observable";
 import type { Material } from "@babylonjs/core/Materials/material";
 import type { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/renderTargetTexture";
-import {
-  SphericalHarmonics,
-  SphericalPolynomial,
-} from "@babylonjs/core/Maths/sphericalPolynomial";
 import type { Scene } from "@babylonjs/core/scene";
 import type { BaseTexture } from "@babylonjs/core/Materials/Textures/baseTexture";
 import type { Camera } from "@babylonjs/core/Cameras/camera";
@@ -33,6 +29,8 @@ import type { Vec3 } from "../shared/types";
 import { renderBudget } from "../shared/render-quality";
 import { configureCampusGrade, campusExposure } from "./cinematic-art";
 import { installStaticSubmeshShadowCull } from "./static-submesh-shadows";
+import { SkyReflectionSampler } from "./sky-reflection";
+export { skyReflectionData } from "./sky-reflection";
 
 const clamp = (value: number) =>
   Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
@@ -91,54 +89,6 @@ export function campusEnvironmentIntensity(daylight: number) {
 export function applyCampusSkyIntensity(scene: Scene, daylight: number) {
   scene.imageProcessingConfiguration.exposure = campusExposure(clamp(daylight));
   scene.environmentIntensity = campusEnvironmentIntensity(daylight);
-}
-
-/** CPU integration of the authored sky avoids a GPU readback or a foreign HDR
- * landscape. Inputs are display-space palette colours; stored data are linear. */
-export function skyReflectionData(
-  topDisplay: Color3,
-  horizonDisplay: Color3,
-  size = 32,
-) {
-  const top = topDisplay.toLinearSpace(),
-    horizon = horizonDisplay.toLinearSpace();
-  const directions = [
-    (u: number, v: number) => new Vector3(1, v, -u),
-    (u: number, v: number) => new Vector3(-1, v, u),
-    (u: number, v: number) => new Vector3(u, 1, -v),
-    (u: number, v: number) => new Vector3(u, -1, v),
-    (u: number, v: number) => new Vector3(u, v, 1),
-    (u: number, v: number) => new Vector3(-u, v, -1),
-  ];
-  const harmonics = new SphericalHarmonics();
-  const color = Color3.Black();
-  const faces = directions.map((direction) => {
-    const data = new Uint8Array(size * size * 4);
-    for (let y = 0; y < size; y++)
-      for (let x = 0; x < size; x++) {
-        const u = ((x + 0.5) * 2) / size - 1,
-          v = 1 - ((y + 0.5) * 2) / size;
-        const d = direction(u, v).normalize();
-        const elevation = d.y,
-          t = Math.max(0, elevation);
-        Color3.LerpToRef(horizon, top, t, color);
-        if (elevation < 0) color.scaleInPlace(0.24);
-        const i = (y * size + x) * 4;
-        data[i] = Math.round(clamp(color.r) * 255);
-        data[i + 1] = Math.round(clamp(color.g) * 255);
-        data[i + 2] = Math.round(clamp(color.b) * 255);
-        data[i + 3] = 255;
-        harmonics.addLight(
-          d,
-          color,
-          4 / (size * size * (1 + u * u + v * v) ** 1.5),
-        );
-      }
-    return data;
-  });
-  harmonics.convertIncidentRadianceToIrradiance();
-  harmonics.convertIrradianceToLambertianRadiance();
-  return { faces, polynomial: SphericalPolynomial.FromHarmonics(harmonics) };
 }
 
 /** Snap the light's two transverse axes, without snapping the player or camera. */
@@ -326,6 +276,7 @@ export class CinematicAtmosphere {
   private pipeline?: DefaultRenderingPipeline;
   private shadow: ShadowGenerator;
   private environment: RawCubeTexture;
+  private readonly reflection = new SkyReflectionSampler();
   private quality = "";
   private timer = 1;
   private environmentTimer = 10;
@@ -499,14 +450,13 @@ export class CinematicAtmosphere {
   }
 
   private reflectionData() {
-    const top = new Color3(
+    this.lastSky.set(
       this.scene.clearColor.r,
       this.scene.clearColor.g,
       this.scene.clearColor.b,
     );
-    this.lastSky.copyFrom(top);
     this.lastHorizon.copyFrom(this.scene.fogColor);
-    return skyReflectionData(top, this.scene.fogColor);
+    return this.reflection.update(this.lastSky, this.lastHorizon);
   }
 
   private configure(quality: string) {
@@ -529,14 +479,26 @@ export class CinematicAtmosphere {
         true,
         this.scene,
         [this.camera],
+        false,
       );
       this.pipeline.imageProcessingEnabled = false;
+      // A recreated Babylon 9.30 pipeline initially assumes image processing
+      // is enabled, even if the previous one already disabled scene config.
+      // In that case the setter has no notification; synchronize its public
+      // configuration observable before preparing the chain (no extra build).
+      const imageProcessing = this.scene.imageProcessingConfiguration;
+      if (this.pipeline.imageProcessingEnabled !== imageProcessing.isEnabled)
+        imageProcessing.onUpdateParameters.notifyObservers(imageProcessing);
       this.pipeline.fxaaEnabled = true;
       this.pipeline.bloomEnabled = true;
       this.pipeline.bloomScale = 0.5;
       this.pipeline.bloomKernel = 32;
       this.pipeline.bloomThreshold = 0.96;
       this.pipeline.bloomWeight = 0.1;
+      // Compile/attach the final chain once, rather than rebuilding for each
+      // option above. Retain automatic updates after this initial transaction.
+      this.pipeline.prepare();
+      this.pipeline.automaticBuild = true;
     }
     this.scene.imageProcessingConfiguration.applyByPostProcess = false;
   }

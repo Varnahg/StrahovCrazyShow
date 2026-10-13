@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "fps-b6-light",
+  "title": "Odstranit opakovanou synchronizaci světla při pohybu v B6",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/b6-reality.ts",
+    "tests/b6-reality.test.ts",
+    "docs/agents/handoffs/fps-b6-light.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Stejný stav světla neprovádí znovu celoscénovou synchronizaci.",
+    "Přechod interiér/exteriér zachová osvětlení, geometrii a kolize."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/b6-reality.test.ts",
+    "Regrese počítá skutečné Babylon light resync při chůzi a přechodu hranice"
+  ],
+  "notes": [
+    "Podagent získá vlastní claim; heavy a browser testy koordinuje root."
+  ]
+}

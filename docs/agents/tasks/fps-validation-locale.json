@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "fps-validation-locale",
+  "title": "Učinit regresi bezpečného výstupu z auta nezávislou na výchozím jazyce",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/vehicle-camera.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Regrese bezpečnosti výstupu běží s výslovným jazykem a obnoví původní stav.",
+    "Žádné oslabení asercí ani změna runtime."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/vehicle-camera.test.ts"
+  ],
+  "notes": [
+    "Jediné známé selhání čistého baseline: test očekává českou hlášku při výchozí angličtině."
+  ]
+}

@@ -19,14 +19,17 @@ import manifest from "../shared/data/assets/vehicles-manifest.json";
 import { applyArtLighting } from "../client/art-lighting";
 import { sunState, moonState } from "../shared/weather";
 
-function fixture(t: import("node:test").TestContext) {
+function fixture(
+  t: import("node:test").TestContext,
+  kind: "vehicle" | "player" = "vehicle",
+) {
   const engine = new NullEngine(),
     scene = new Scene(engine);
   scene.useRightHandedSystem = true;
   const camera = new FreeCamera("test observer", new Vector3(0, 3, -8), scene);
   scene.activeCamera = camera;
   const root = new TransformNode("physical vehicle root", scene),
-    lighting = new VehicleLighting(scene);
+    lighting = new VehicleLighting(scene, kind);
   t.after(() => {
     lighting.dispose();
     scene.dispose();
@@ -193,6 +196,103 @@ test("medium and high use one 256/512 shadow target, low has no pass, and resize
   );
   lighting.update(root, 1, true, "unknown");
   assert.equal(lighting.light.shadowEnabled, false);
+});
+
+test("off/on reuses configured shadows without a second global light-dirty pass or an off light slot", (t) => {
+  const { scene, root, lighting } = fixture(t, "player");
+  const receiver = box(scene, "torch receiver", 0, 0.6, 8);
+  new HemisphericLight("ambient", Vector3.Up(), scene);
+  new DirectionalLight("key", Vector3.Down(), scene);
+  new PointLight("street", new Vector3(1, 4, 8), scene);
+  receiver.receiveShadows = true;
+  lighting.update(root, 1, true, "low");
+  const shadow = lighting.light.getShadowGenerator() as ShadowGenerator;
+  const map = shadow.getShadowMap()!;
+  const candidates = map.renderList;
+  let shadowModeDirties = 0,
+    receiverDirties = 0;
+  const markLight = lighting.light._markMeshesAsLightDirty.bind(lighting.light);
+  lighting.light._markMeshesAsLightDirty = () => {
+    shadowModeDirties++;
+    markLight();
+  };
+  const markReceiver = receiver._markSubMeshesAsLightDirty.bind(receiver);
+  receiver._markSubMeshesAsLightDirty = (disposed) => {
+    receiverDirties++;
+    markReceiver(disposed);
+  };
+  for (let toggle = 0; toggle < 6; toggle++) {
+    lighting.update(root, 1, false, "high");
+    assert.equal(lighting.light.isEnabled(), false);
+    assert.equal(lighting.light.intensity, 0);
+    assert.equal(receiver.lightSources.length, 3);
+    assert.ok(!receiver.lightSources.includes(lighting.light));
+    assert.equal(lighting.light.shadowEnabled, true);
+    assert.equal(shadow.mapSize, 128, "off quality cannot resize an unused map");
+    lighting.update(root, 1, true, "low");
+    assert.equal(receiver.lightSources.length, 4);
+    assert.ok(receiver.lightSources.includes(lighting.light));
+    assert.equal(shadow.getShadowMap(), map);
+    assert.equal(map.renderList, candidates);
+  }
+  assert.equal(shadowModeDirties, 0);
+  assert.equal(
+    receiverDirties,
+    12,
+    "only the necessary light membership transitions dirty shaders",
+  );
+});
+
+test("shadow candidates reuse storage while empty transitions and moved/reenabled casters remain current", (t) => {
+  const { scene, root, lighting } = fixture(t, "player");
+  const moving = box(scene, "moving caster", 0, 0.6, 8);
+  const hidden = box(scene, "hidden caster", 0, 0.6, 9);
+  hidden.setEnabled(false);
+  lighting.update(root, 1, true, "low");
+  const shadow = lighting.light.getShadowGenerator() as ShadowGenerator;
+  const candidates = shadow.getShadowMap()!.renderList!;
+  assert.ok(selection(scene, lighting).includes(moving));
+  assert.ok(!selection(scene, lighting).includes(hidden));
+  let dirties = 0;
+  const markReceiver = moving._markSubMeshesAsLightDirty.bind(moving);
+  moving._markSubMeshesAsLightDirty = (disposed) => {
+    dirties++;
+    markReceiver(disposed);
+  };
+  // A refresh with casters at the next location leaves shadow defines alone.
+  root.position.z += 3;
+  lighting.update(root, 1, true, "low");
+  assert.equal(shadow.getShadowMap()!.renderList, candidates);
+  assert.equal(dirties, 0);
+  root.position.x = 100;
+  lighting.update(root, 1, true, "low");
+  assert.equal(candidates.length, 0);
+  assert.equal(
+    dirties,
+    1,
+    "empty shadow map must invalidate its receiver defines",
+  );
+  root.position.x = 0;
+  lighting.update(root, 1, true, "low");
+  assert.ok(candidates.length > 0);
+  assert.equal(
+    dirties,
+    2,
+    "restored shadow map must invalidate its receiver defines",
+  );
+  assert.equal(shadow.getShadowMap()!.renderList, candidates);
+  lighting.update(root, 1, false, "low");
+  moving.position.x = 100;
+  hidden.setEnabled(true);
+  lighting.update(root, 1, true, "low");
+  assert.deepEqual(selection(scene, lighting).map((mesh) => mesh.name), [
+    "hidden caster",
+  ]);
+  lighting.update(root, 1, true, "high");
+  assert.notEqual(shadow.getShadowMap()!.renderList, candidates);
+  assert.deepEqual(selection(scene, lighting).map((mesh) => mesh.name), [
+    "hidden caster",
+  ]);
 });
 
 test("actual shadow frustum rejects behind/lateral/far/glass/faded/disabled casters while retaining crossing large bounds", (t) => {

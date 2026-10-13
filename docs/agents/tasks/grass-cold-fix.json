@@ -2,14 +2,19 @@
   "schemaVersion": 1,
   "id": "grass-cold-fix",
   "title": "Rozložit studenou přípravu trávy do omezených pracovních dávek",
-  "status": "blocked",
-  "dependsOn": ["grass-cold-audit"],
+  "status": "done",
+  "dependsOn": [
+    "grass-cold-audit"
+  ],
   "writePaths": [
     "client/photographic-grass.ts",
     "client/photo-grass-placement.ts",
     "tests/photo-grass.test.ts",
     "docs/agents/handoffs/grass-cold-fix.md",
-    "docs/verification-evidence/agents/grass-cold-fix/"
+    "docs/verification-evidence/agents/grass-cold-fix/",
+    "client/photo-grass-selection.ts",
+    "tests/photo-grass-selection.test.ts",
+    "tests/benchmark-snapshot.test.ts"
   ],
   "resources": [],
   "acceptance": [

@@ -14,7 +14,10 @@ import { captureModelReview } from "../client/model-review";
 import { captureRenderCostInventory } from "../client/render-cost";
 import { groundHeight } from "../shared/terrain";
 
-test("completed benchmark survives real grass update, quality change and disposal without freezing live statistics", () => {
+test("completed benchmark survives real grass update, quality change and disposal without freezing live statistics", (t) => {
+  // Snapshot/lifecycle semantics need a fixed work quantum, independent of
+  // concurrent test load; this fixture does not benchmark elapsed CPU time.
+  t.mock.method(performance, "now", () => 0);
   const engine = new NullEngine({
       renderWidth: 1280,
       renderHeight: 720,
@@ -52,7 +55,14 @@ test("completed benchmark survives real grass update, quality change and disposa
     grass = new PhotographicGrass(scene, pack, recipe, resources),
     adaptive = new AdaptiveQualityController({ mode: "medium" });
   try {
-    grass.update({ time: 1, quality: "medium", wind: { x: 0, z: 0 } });
+    for (let frame = 0; frame < 1000; frame++) {
+      grass.update({
+        time: 1 + frame / 60,
+        quality: "medium",
+        wind: { x: 0, z: 0 },
+      });
+      if (!grass.stats.preparing) break;
+    }
     assert.ok(grass.stats.ready && grass.stats.draws > 0);
     const originalStats = grass.stats;
     const live = {

@@ -11,7 +11,6 @@ import {
   type PhotoGrassTile,
 } from "./photo-grass-placement";
 import {
-  allocateGrassBudget,
   projectedLeafLevel,
   grassRootId,
   grassRootSeed,
@@ -35,6 +34,11 @@ import {
 import { PhotoGrassBatch, type GrassRootState } from "./photo-grass-batch";
 import type { SourceGrassRecipe } from "./photo-grass-source-material";
 import { grassVisibility, setGrassVisibility } from "./photo-grass-transition";
+import {
+  GRASS_CACHE_TILES,
+  GRASS_PREPARATION,
+  GrassSelectionHeap,
+} from "./photo-grass-selection";
 
 type RootCandidate = {
   id: number;
@@ -43,11 +47,11 @@ type RootCandidate = {
   x: number;
   y: number;
   z: number;
-  distance: number;
   score: number;
   seed: number;
   level: CandidateLevel;
 };
+type TileRequest = { x: number; y: number; z: number };
 export type PhotoGrassStats = {
   representation: "photographic-short-lawn";
   draws: number;
@@ -63,6 +67,8 @@ export type PhotoGrassStats = {
   allocatedInstanceBytes: number;
   transitionRoots: number;
   ready: boolean;
+  preparing: boolean;
+  pendingTiles: number;
 };
 const qualityKey = (quality: string): CandidateQuality =>
   quality === "high" ? "high" : quality === "low" ? "low" : "medium";
@@ -90,19 +96,38 @@ export class PhotographicGrass {
     allocatedInstanceBytes: 0,
     transitionRoots: 0,
     ready: false,
+    preparing: false,
+    pendingTiles: 0,
   };
-  // Three broad LOD batches have a larger working set than the former twelve
-  // one-metre draws. A still-bounded cache avoids regenerating the same high
-  // quality tiles on every small camera movement.
-  private placement = createPhotoGrassPlacement(256);
+  // The current high third-person view must fit before historical tiles evict;
+  // otherwise cached-only selection would endlessly regenerate a static view.
+  private placement = createPhotoGrassPlacement(GRASS_CACHE_TILES);
   private batches = new Map<CandidateLevel, PhotoGrassBatch>();
   private roots = new Map<number, GrassRootState>();
   private transitions = new Set<GrassRootState>();
   private freeRoots: GrassRootState[] = [];
   private records: RootCandidate[] = [];
-  private candidates: RootCandidate[] = [];
+  private workRecords: RootCandidate[] = [];
+  private candidates = new GrassSelectionHeap<RootCandidate>();
   private selected: RootCandidate[] = [];
+  private nextSelected: RootCandidate[] = [];
   private wanted = new Map<number, RootCandidate>();
+  private nextWanted = new Map<number, RootCandidate>();
+  private preparation?: Generator<number, void>;
+  private preparationEye = Vector3.Zero();
+  private preparationFocus = Vector3.Zero();
+  private preparationView = Matrix.Identity();
+  private tileRequests = new Map<string, TileRequest>();
+  private tilePreparation?: {
+    request: TileRequest;
+    work: Generator<void, PhotoGrassTile | undefined>;
+  };
+  private tileRevision = 0;
+  private selectionRevision = -1;
+  private preferredLevels = new Map<number, CandidateLevel>();
+  private preferredRoots = new Set<number>();
+  private lastFov = 0;
+  private vacancyCursor = 0;
   private activeTiles = new Set<string>();
   private pruneRoots: GrassRootState[] = [];
   private planes = Array.from({ length: 6 }, () => new Plane(0, 0, 0, 0));
@@ -176,7 +201,9 @@ export class PhotographicGrass {
     this.selected.length = 0;
     this.wanted.clear();
     this.records.length = 0;
-    this.candidates.length = 0;
+    this.cancelPreparation();
+    this.cancelTilePreparation();
+    this.workRecords.length = 0;
     this.submittedTriangles = 0;
     this.statsDirty = true;
     this.previousQuality = "";
@@ -255,6 +282,7 @@ export class PhotographicGrass {
         this.batches.get(root.level)!.updateFade(root);
       }
       this.lastUpdate = -Infinity;
+      this.cancelPreparation();
     }
     this.lastTime = time;
     this.wind.time = time;
@@ -285,64 +313,239 @@ export class PhotographicGrass {
       }
       this.pruneRoots.length = 0;
     }
-    if (qualityChanged || time - this.lastUpdate >= 0.15) {
-      this.lastUpdate = time;
+    if (this.preparation || qualityChanged || time - this.lastUpdate >= 0.15) {
       camera
         .getViewMatrix()
         .multiplyToRef(camera.getProjectionMatrix(), this.transform);
       const height = this.scene.getEngine().getRenderHeight();
       if (
+        this.preparation &&
+        this.preparationIsStale(qualityChanged, height, camera.fov, eye, focus)
+      )
+        this.cancelPreparation();
+      const viewChanged =
         qualityChanged ||
         !this.lastTransform.equals(this.transform) ||
         this.lastHeight !== height ||
+        this.lastFov !== camera.fov ||
         this.lastFocusX !== focus.x ||
-        this.lastFocusZ !== focus.z
+        this.lastFocusZ !== focus.z;
+      if (!this.preparation) this.lastUpdate = time;
+      if (
+        !this.preparation &&
+        (viewChanged || this.selectionRevision !== this.tileRevision)
       ) {
-        this.lastTransform.copyFrom(this.transform);
-        this.lastHeight = height;
-        this.lastFocusX = focus.x;
-        this.lastFocusZ = focus.z;
-        Frustum.GetPlanesToRef(this.transform, this.planes);
-        this.selectRoots(quality, height, camera.fov, eye, focus);
-        for (const root of this.roots.values()) {
-          const desired = this.wanted.get(root.id),
-            target = desired?.level === root.level ? 1 : 0;
-          this.point.set(root.x, root.y + 0.025, root.z);
-          if (
-            !desired &&
-            this.planes.some((plane) => plane.dotCoordinate(this.point) < -0.16)
-          ) {
-            this.removeRoot(root);
-            continue;
-          }
-          if (root.fade.to !== target) {
-            setGrassVisibility(root.fade, target, time);
-            this.batches.get(root.level)!.updateFade(root);
-            this.transitions.add(root);
-            this.statsDirty = true;
+        if (viewChanged) {
+          this.tileRequests.clear();
+          this.preferredLevels.clear();
+          this.preferredRoots.clear();
+          for (const root of this.roots.values()) {
+            this.preferredLevels.set(root.id, root.level);
+            if (root.fade.to === 1) this.preferredRoots.add(root.id);
           }
         }
-        this.advanceTransitions(time);
+        this.selectionRevision = this.tileRevision;
+        this.lastTransform.copyFrom(this.transform);
+        this.lastHeight = height;
+        this.lastFov = camera.fov;
+        this.lastFocusX = focus.x;
+        this.lastFocusZ = focus.z;
+        this.preparationEye.copyFrom(eye);
+        this.preparationFocus.set(focus.x, 0, focus.z);
+        this.preparationView.copyFrom(camera.getViewMatrix());
+        Frustum.GetPlanesToRef(this.transform, this.planes);
+        this.preparation = this.selectRoots(
+          quality,
+          height,
+          camera.fov,
+          this.preparationEye,
+          this.preparationFocus,
+        );
       }
       this.previousQuality = quality;
     }
+    this.advancePreparation(time);
+    this.advanceTilePreparation(eye, focus, limits.range);
     this.fillVacancies(time, limits.triangles);
     for (const batch of this.batches.values()) batch.flush();
     this.updateStats();
+    this.stats.cachedTiles = this.placement.cacheSize;
+    this.stats.pendingTiles =
+      this.tileRequests.size + (this.tilePreparation ? 1 : 0);
+    this.stats.preparing =
+      !!this.preparation ||
+      this.stats.pendingTiles > 0 ||
+      this.allocationDirty ||
+      this.selectionRevision !== this.tileRevision;
   }
-  private selectRoots(
+  private preparationIsStale(
+    qualityChanged: boolean,
+    height: number,
+    fov: number,
+    eye: Vector3,
+    focus: { x: number; z: number },
+  ) {
+    // Selection only scans cached roots; cold work has an independent queue.
+    // Discarding an obsolete view therefore keeps all completed terrain work.
+    const view = this.scene.activeCamera!.getViewMatrix().m,
+      previous = this.preparationView.m;
+    return (
+      qualityChanged ||
+      height !== this.lastHeight ||
+      fov !== this.lastFov ||
+      Vector3.DistanceSquared(eye, this.preparationEye) > 9 ||
+      (focus.x - this.preparationFocus.x) ** 2 +
+        (focus.z - this.preparationFocus.z) ** 2 >
+        9 ||
+      view[2] * previous[2] + view[6] * previous[6] + view[10] * previous[10] <
+        0.866
+    );
+  }
+  private advancePreparation(time: number) {
+    if (!this.preparation) return;
+    const deadline = performance.now() + GRASS_PREPARATION.milliseconds;
+    for (let step = 0; step < GRASS_PREPARATION.steps; step++) {
+      const result = this.preparation.next();
+      if (result.done) {
+        this.preparation = undefined;
+        this.commitSelection(time);
+        return;
+      }
+      if (performance.now() >= deadline) break;
+    }
+    this.stats.cachedTiles = this.placement.cacheSize;
+  }
+  private cancelTilePreparation() {
+    this.tilePreparation?.work.return(undefined);
+    this.tilePreparation = undefined;
+    this.tileRequests.clear();
+    this.preferredLevels.clear();
+    this.preferredRoots.clear();
+  }
+  private advanceTilePreparation(
+    eye: Vector3,
+    focus: { x: number; z: number },
+    range: number,
+  ) {
+    const facing = this.planes[0].normal,
+      length = Math.hypot(facing.x, facing.z) || 1,
+      hasFocus = (focus.x - eye.x) ** 2 + (focus.z - eye.z) ** 2 > 1,
+      targetX = hasFocus ? focus.x : eye.x + (facing.x / length) * 4,
+      targetZ = hasFocus ? focus.z : eye.z + (facing.z / length) * 4;
+    const distance = (request: TileRequest) =>
+      grassFocusDistance(
+        request.x + 0.5,
+        request.z + 0.5,
+        eye.x,
+        eye.z,
+        focus.x,
+        focus.z,
+      );
+    if (
+      this.tilePreparation &&
+      distance(this.tilePreparation.request) > range + 0.8
+    ) {
+      this.tilePreparation.work.return(undefined);
+      this.tilePreparation = undefined;
+    }
+    const deadline = performance.now() + GRASS_PREPARATION.milliseconds;
+    let completed = 0;
+    for (let step = 0; step < GRASS_PREPARATION.steps; step++) {
+      if (!this.tilePreparation) {
+        let nearestId = "",
+          nearest: TileRequest | undefined,
+          nearestDistance = Infinity;
+        for (const [id, request] of this.tileRequests) {
+          const d = distance(request);
+          if (
+            d > range + 0.8 ||
+            this.placement.cachedTile(request.x, request.z)
+          ) {
+            this.tileRequests.delete(id);
+          } else {
+            // First-person footprints directly below the eye are often outside
+            // the image. Prepare visible foreground slightly ahead of motion;
+            // third person prioritizes the supplied player's ground position.
+            this.point.set(request.x + 0.5, request.y, request.z + 0.5);
+            const fringe = this.planes.some(
+                (plane) => plane.dotCoordinate(this.point) < 0,
+              ),
+              priority =
+                Math.hypot(
+                  request.x + 0.5 - targetX,
+                  request.z + 0.5 - targetZ,
+                ) + (fringe ? range * 2 : 0);
+            if (priority < nearestDistance) {
+              nearestId = id;
+              nearest = request;
+              nearestDistance = priority;
+            }
+          }
+        }
+        if (!nearest) return;
+        this.tileRequests.delete(nearestId);
+        this.tilePreparation = {
+          request: nearest,
+          work: this.placement.prepareTile(nearest.x, nearest.z),
+        };
+      }
+      const result = this.tilePreparation.work.next();
+      if (result.done) {
+        this.tilePreparation = undefined;
+        this.tileRevision++;
+        if (++completed >= GRASS_PREPARATION.coldTiles) return;
+      }
+      if (performance.now() >= deadline) return;
+    }
+  }
+  private cancelPreparation() {
+    this.preparation?.return();
+    this.preparation = undefined;
+    this.candidates.clear();
+    this.nextWanted.clear();
+    this.nextSelected.length = 0;
+    for (const record of this.workRecords) record.tile = null;
+    this.lastTransform.reset();
+  }
+  private commitSelection(time: number) {
+    [this.records, this.workRecords] = [this.workRecords, this.records];
+    [this.selected, this.nextSelected] = [this.nextSelected, this.selected];
+    [this.wanted, this.nextWanted] = [this.nextWanted, this.wanted];
+    for (const record of this.workRecords) record.tile = null;
+    this.nextSelected.length = 0;
+    this.nextWanted.clear();
+    this.allocationDirty = true;
+    this.vacancyCursor = 0;
+    this.statsDirty = true;
+    for (const root of this.roots.values()) {
+      const desired = this.wanted.get(root.id),
+        target = desired?.level === root.level ? 1 : 0;
+      this.point.set(root.x, root.y + 0.025, root.z);
+      if (
+        !desired &&
+        this.planes.some((plane) => plane.dotCoordinate(this.point) < -0.16)
+      ) {
+        this.removeRoot(root);
+        continue;
+      }
+      if (root.fade.to !== target) {
+        setGrassVisibility(root.fade, target, time);
+        this.batches.get(root.level)!.updateFade(root);
+        this.transitions.add(root);
+      }
+    }
+    this.advanceTransitions(time);
+  }
+  private *selectRoots(
     quality: CandidateQuality,
     height: number,
     fov: number,
     eye: Vector3,
     focus: { x: number; z: number },
   ) {
-    this.statsDirty = true;
-    this.allocationDirty = true;
-    for (const previous of this.selected) previous.tile = null;
-    this.wanted.clear();
-    this.selected.length = 0;
-    this.candidates.length = 0;
+    this.nextWanted.clear();
+    this.nextSelected.length = 0;
+    this.candidates.clear();
     const range = CANDIDATE_GRASS_LIMITS[quality].range;
     const minX = Math.floor(Math.min(eye.x, focus.x) - range),
       maxX = Math.floor(Math.max(eye.x, focus.x) + range),
@@ -355,14 +558,25 @@ export class PhotographicGrass {
           !this.placement.mayContainGrass(x, z) ||
           grassFocusDistance(x + 0.5, z + 0.5, eye.x, eye.z, focus.x, focus.z) >
             range + 0.8
-        )
+        ) {
+          yield 0;
           continue;
+        }
         this.point.set(x + 0.5, groundHeight(x + 0.5, z + 0.5) + 0.04, z + 0.5);
         if (
           this.planes.some((plane) => plane.dotCoordinate(this.point) < -0.95)
-        )
+        ) {
+          yield 0;
           continue;
-        const tile = this.placement.tile(x, z);
+        }
+        const tile = this.placement.cachedTile(x, z);
+        if (!tile) {
+          const pending = this.tilePreparation?.request;
+          if (pending?.x !== x || pending.z !== z)
+            this.tileRequests.set(x + ":" + z, { x, y: this.point.y, z });
+          yield 0;
+          continue;
+        }
         for (let index = 0; index < tile.count; index++) {
           const offset = index * 16,
             px = tile.x + tile.matrices[offset + 12],
@@ -378,16 +592,16 @@ export class PhotographicGrass {
           )
             continue;
           const id = grassRootId(x, z, index),
-            existing = this.roots.get(id),
+            previousLevel = this.preferredLevels.get(id),
             distance = Math.hypot(px - eye.x, py - eye.y, pz - eye.z),
-            level = projectedLeafLevel(distance, height, fov, existing?.level);
+            level = projectedLeafLevel(distance, height, fov, previousLevel);
           if (!level) continue;
           const seed = grassRootSeed(id),
             score =
               distance *
               (0.72 + 0.56 * grassRootSeed(id + 0x6d2b79f5)) *
-              (existing?.fade.to === 1 ? 0.93 : 1);
-          let candidate = this.records[used];
+              (this.preferredRoots.has(id) ? 0.93 : 1);
+          let candidate = this.workRecords[used];
           if (!candidate) {
             candidate = {
               id,
@@ -396,12 +610,11 @@ export class PhotographicGrass {
               x: px,
               y: py,
               z: pz,
-              distance,
               level,
               seed,
               score,
             };
-            this.records.push(candidate);
+            this.workRecords.push(candidate);
           } else {
             candidate.id = id;
             candidate.tile = tile;
@@ -409,7 +622,6 @@ export class PhotographicGrass {
             candidate.x = px;
             candidate.y = py;
             candidate.z = pz;
-            candidate.distance = distance;
             candidate.level = level;
             candidate.seed = seed;
             candidate.score = score;
@@ -417,21 +629,40 @@ export class PhotographicGrass {
           this.candidates.push(candidate);
           used++;
         }
+        yield 0;
       }
-    this.candidates.sort((a, b) => a.score - b.score || a.id - b.id);
-    allocateGrassBudget(this.candidates, quality, this.selected);
-    for (const selected of this.selected)
-      this.wanted.set(selected.id, selected);
-    for (const candidate of this.candidates)
-      if (!this.wanted.has(candidate.id)) candidate.tile = null;
-    // Unused pool entries must not retain old terrain buffers after long walks.
-    for (let i = used; i < this.records.length; i++)
-      this.records[i].tile = null;
+    let remaining = CANDIDATE_GRASS_LIMITS[quality].triangles,
+      ranked = 0;
+    while (this.candidates.length && remaining >= CANDIDATE_LOD_TRIANGLES.far) {
+      const candidate = this.candidates.pop()!,
+        cost = CANDIDATE_LOD_TRIANGLES[candidate.level];
+      if (cost <= remaining) {
+        remaining -= cost;
+        this.nextSelected.push(candidate);
+        this.nextWanted.set(candidate.id, candidate);
+      } else candidate.tile = null;
+      if (++ranked % GRASS_PREPARATION.rankedRootsPerStep === 0) yield 0;
+    }
+    // No remaining candidate can fit below the cheapest LOD's cost. Stop
+    // ranking; release discarded tile references in the same bounded steps.
+    this.candidates.clear();
+    for (let i = 0; i < this.workRecords.length; i++) {
+      const candidate = this.workRecords[i];
+      if (i >= used || !this.nextWanted.has(candidate.id))
+        candidate.tile = null;
+      if ((i + 1) % GRASS_PREPARATION.rankedRootsPerStep === 0) yield 0;
+    }
   }
   private fillVacancies(time: number, limit: number) {
     if (!this.allocationDirty) return;
-    this.allocationDirty = false;
-    for (const candidate of this.selected) {
+    let additions = 0,
+      checked = 0;
+    while (
+      this.vacancyCursor < this.selected.length &&
+      additions < GRASS_PREPARATION.additions &&
+      checked++ < GRASS_PREPARATION.allocationChecks
+    ) {
+      const candidate = this.selected[this.vacancyCursor++];
       if (this.roots.has(candidate.id) || !candidate.tile) continue;
       const cost = CANDIDATE_LOD_TRIANGLES[candidate.level];
       if (this.submittedTriangles + cost > limit) continue;
@@ -469,7 +700,9 @@ export class PhotographicGrass {
       this.transitions.add(root);
       this.submittedTriangles += cost;
       this.statsDirty = true;
+      additions++;
     }
+    this.allocationDirty = this.vacancyCursor < this.selected.length;
   }
   private advanceTransitions(time: number) {
     for (const root of this.transitions) {
@@ -483,6 +716,7 @@ export class PhotographicGrass {
   }
   private removeRoot(root: GrassRootState) {
     this.allocationDirty = true;
+    this.vacancyCursor = 0;
     this.transitions.delete(root);
     this.roots.delete(root.id);
     this.batches.get(root.level)!.remove(root);
@@ -525,11 +759,13 @@ export class PhotographicGrass {
     this.resources?.release();
     this.resources = undefined;
     this.placement.dispose();
+    this.cancelPreparation();
+    this.cancelTilePreparation();
     this.roots.clear();
     this.transitions.clear();
     this.freeRoots.length = 0;
     this.records.length = 0;
-    this.candidates.length = 0;
+    this.workRecords.length = 0;
     this.selected.length = 0;
     this.wanted.clear();
     this.activeTiles.clear();
@@ -537,5 +773,7 @@ export class PhotographicGrass {
     this.statsDirty = true;
     this.updateStats();
     this.stats.ready = false;
+    this.stats.preparing = false;
+    this.stats.pendingTiles = 0;
   }
 }

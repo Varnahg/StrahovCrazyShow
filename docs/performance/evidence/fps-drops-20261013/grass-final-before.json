@@ -1,0 +1,5874 @@
+{
+  "kind": "CPU grass update only; NullEngine excludes GPU/FPS",
+  "sourceRoot": "/workspace/StrahovCrazyShow/.cache/performance-snapshot/fps-before-20261013",
+  "driverHash": "ad9b8676ceb089fff393b6ab69eb8d35367232f463e48d5e030395938f289494",
+  "gitHead": "a381cf637b607b364e85b1e44a8e57566b3c9a0d",
+  "sourceHashes": {
+    "client/photographic-grass.ts": "bad76a906959d87c1f32a05b764466ffb158c14da6976824821e21e408dd5f6a",
+    "client/photo-grass-placement.ts": "9f91ea57ae32f85aeaa58964d8ecd178e0ac071714c4afad56c2e9baf19ea0d0",
+    "client/photo-grass-budget.ts": "119026716ffe311b9b0d2980aa255d739cd55a04ddf6b81b0f8c139d0ca0854e",
+    "client/photo-grass-batch.ts": "5c7d13bd394925eeab4922b8ac79939f920475779de68fb6c10621aa43d6949e",
+    "client/photo-grass-resources.ts": "14ebd248bc3a2bde786c9b52b80d82dfed604b387c6b87a3706f533cd3d5ac0f",
+    "shared/vegetation.ts": "da310b4c7441e98816f9fe6900145c530f7dcb6c3846fb1ff55511568a510075",
+    "shared/terrain.ts": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f",
+    "tests/photo-grass.test.ts": "5884e5765bb64d3c120ff3e0a992a53b28e3d4ce42f7db9e3e6b184e5aec8b0f"
+  },
+  "renderWidth": 1280,
+  "renderHeight": 720,
+  "cameraFov": 0.8,
+  "stages": [
+    {
+      "name": "cold-medium",
+      "quality": "medium",
+      "frames": 180,
+      "totalMs": 389.5036599999992,
+      "firstMs": 384.29224,
+      "maxMs": 384.29224,
+      "p95Ms": 0.16599399999995512,
+      "p99Ms": 0.949493000000075,
+      "rootHash": "481a3b9b1ad136fa18ab9d25e908daa85d0e51652a709ad77ba26014210f15c0",
+      "finalStats": {
+        "representation": "photographic-short-lawn",
+        "draws": 2,
+        "triangles": 139988,
+        "instances": 1916,
+        "submittedLeaves": 69994,
+        "activeTiles": 37,
+        "cachedTiles": 81,
+        "textureResolution": 1024,
+        "textureHeight": 512,
+        "triangleLimit": 140000,
+        "drawLimit": 12,
+        "allocatedInstanceBytes": 204800,
+        "transitionRoots": 0,
+        "ready": true
+      },
+      "samples": [
+        {
+          "frame": 0,
+          "ms": 384.29224,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 1,
+          "ms": 0.8765779999998813,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 2,
+          "ms": 0.18754899999998997,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 3,
+          "ms": 0.1372350000001461,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 4,
+          "ms": 0.2792010000000573,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 5,
+          "ms": 0.10220500000013999,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 6,
+          "ms": 0.16599399999995512,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 7,
+          "ms": 0.22593299999994088,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 8,
+          "ms": 0.8572859999999309,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 9,
+          "ms": 0.949493000000075,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 10,
+          "ms": 0.2362119999997958,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 11,
+          "ms": 0.008205000000089058,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 12,
+          "ms": 0.003995000000031723,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 13,
+          "ms": 0.009656999999833715,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 14,
+          "ms": 0.007389999999986685,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 15,
+          "ms": 0.0038369999999758875,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 16,
+          "ms": 0.0036410000000159926,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 17,
+          "ms": 0.0035439999999198335,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 18,
+          "ms": 0.0035080000000107248,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 19,
+          "ms": 0.003516999999874315,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 20,
+          "ms": 0.027195000000119762,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 21,
+          "ms": 0.00381399999992027,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 22,
+          "ms": 0.0035190000000966393,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 23,
+          "ms": 0.003496000000041022,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 24,
+          "ms": 0.003551000000015847,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 25,
+          "ms": 0.003555000000005748,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 26,
+          "ms": 0.0035359999999400316,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 27,
+          "ms": 0.0035030000001370354,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 28,
+          "ms": 0.0036029999998845597,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 29,
+          "ms": 0.011865000000170767,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 30,
+          "ms": 0.0034860000000662694,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 31,
+          "ms": 0.0033530000000610016,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 32,
+          "ms": 0.0033990000001722365,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 33,
+          "ms": 0.003482999999960157,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 34,
+          "ms": 0.0033759999998892454,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 35,
+          "ms": 0.003421000000116692,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 36,
+          "ms": 0.0033559999999397405,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 37,
+          "ms": 0.005580000000009022,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 38,
+          "ms": 0.0034070000001520384,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 39,
+          "ms": 0.033948999999893203,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 40,
+          "ms": 0.004142000000001644,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 41,
+          "ms": 0.003528999999844018,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 42,
+          "ms": 0.0034319999999752326,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 43,
+          "ms": 0.0034620000001268636,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 44,
+          "ms": 0.003557999999884487,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 45,
+          "ms": 0.0035530000000107975,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 46,
+          "ms": 0.007047000000056869,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 47,
+          "ms": 0.003809999999930369,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 48,
+          "ms": 0.02786500000001979,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 49,
+          "ms": 0.004505000000108339,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 50,
+          "ms": 0.003522000000202752,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 51,
+          "ms": 0.003449999999929787,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 52,
+          "ms": 0.003443000000061147,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 53,
+          "ms": 0.003369999999904394,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 54,
+          "ms": 0.0033490000000711007,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 55,
+          "ms": 0.003364000000146916,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 56,
+          "ms": 0.003425999999990381,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 57,
+          "ms": 0.0041430000001128064,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 58,
+          "ms": 0.0386919999998554,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 59,
+          "ms": 0.007552000000032422,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 60,
+          "ms": 0.005971999999928812,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 61,
+          "ms": 0.006401999999980035,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 62,
+          "ms": 0.007209999999986394,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 63,
+          "ms": 0.006744999999909851,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 64,
+          "ms": 0.004181000000016866,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 65,
+          "ms": 0.003735000000006039,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 66,
+          "ms": 0.0034940000000460714,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 67,
+          "ms": 0.0034229999998842686,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 68,
+          "ms": 0.024541999999883046,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 69,
+          "ms": 0.003647000000000844,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 70,
+          "ms": 0.00342200000000048,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 71,
+          "ms": 0.0034309999998640706,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 72,
+          "ms": 0.0034650000000056025,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 73,
+          "ms": 0.005562000000054468,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 74,
+          "ms": 0.0049630000000888685,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 75,
+          "ms": 0.003520999999864216,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 76,
+          "ms": 0.0033200000000306318,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 77,
+          "ms": 0.0033220000000255823,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 78,
+          "ms": 0.007252999999991516,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 79,
+          "ms": 0.005341999999927793,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 80,
+          "ms": 0.010352000000011685,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 81,
+          "ms": 0.00345500000003085,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 82,
+          "ms": 0.0034679999998843414,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 83,
+          "ms": 0.003404000000045926,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 84,
+          "ms": 0.005705000000034488,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 85,
+          "ms": 0.003408000000035827,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 86,
+          "ms": 0.003639000000021042,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 87,
+          "ms": 0.012856000000056156,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 88,
+          "ms": 0.003388000000086322,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 89,
+          "ms": 0.0034399999999550346,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 90,
+          "ms": 0.013376999999991313,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 91,
+          "ms": 0.010262999999895328,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 92,
+          "ms": 0.010581999999885738,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 93,
+          "ms": 0.004561999999850741,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 94,
+          "ms": 0.004478999999946609,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 95,
+          "ms": 0.00405799999998635,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 96,
+          "ms": 0.0030719999999746506,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 97,
+          "ms": 0.0496699999998782,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 98,
+          "ms": 0.004692999999861058,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 99,
+          "ms": 0.0049449999999069405,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 100,
+          "ms": 0.003032000000075641,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 101,
+          "ms": 0.0030130000000099244,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 102,
+          "ms": 0.0029669999998986896,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 103,
+          "ms": 0.00302800000008574,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 104,
+          "ms": 0.0035110000001168373,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 105,
+          "ms": 0.0018350000000282307,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 106,
+          "ms": 0.001952999999957683,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 107,
+          "ms": 0.009052000000110638,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 108,
+          "ms": 0.0074789999998756684,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 109,
+          "ms": 0.0018009999998866988,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 110,
+          "ms": 0.0035849999999300053,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 111,
+          "ms": 0.001776999999947293,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 112,
+          "ms": 0.0017320000001745939,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 113,
+          "ms": 0.002437999999983731,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 114,
+          "ms": 0.001711000000113927,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 115,
+          "ms": 0.0023479999999835854,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 116,
+          "ms": 0.009288000000196917,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 117,
+          "ms": 0.0019350000000031287,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 118,
+          "ms": 0.001679999999851134,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 119,
+          "ms": 0.0017370000000482833,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 120,
+          "ms": 0.0019039999999677093,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 121,
+          "ms": 0.0016480000001592998,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 122,
+          "ms": 0.0016439999999420252,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 123,
+          "ms": 0.0017410000000381842,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 124,
+          "ms": 0.0016540000001441513,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 125,
+          "ms": 0.23423200000001998,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 126,
+          "ms": 0.015928000000030806,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 127,
+          "ms": 0.00373899999999594,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 128,
+          "ms": 0.003191000000015265,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 129,
+          "ms": 0.003201999999873806,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 130,
+          "ms": 0.0030380000000604923,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 131,
+          "ms": 0.0028529999999591382,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 132,
+          "ms": 0.0031339999998181156,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 133,
+          "ms": 0.00278600000001461,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 134,
+          "ms": 0.0029090000000451255,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 135,
+          "ms": 0.002909999999928914,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 136,
+          "ms": 0.009798000000046159,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 137,
+          "ms": 0.002944000000070446,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 138,
+          "ms": 0.0029369999999744323,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 139,
+          "ms": 0.0028949999998530984,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 140,
+          "ms": 0.0028670000001511653,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 141,
+          "ms": 0.0028619999998227286,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 142,
+          "ms": 0.002736000000140848,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 143,
+          "ms": 0.007881999999881373,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 144,
+          "ms": 0.0020429999999578285,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 145,
+          "ms": 0.0073039999999764404,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 146,
+          "ms": 0.009829999999965366,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 147,
+          "ms": 0.0019640000000435975,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 148,
+          "ms": 0.0016210000001137814,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 149,
+          "ms": 0.0017219999999724678,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 150,
+          "ms": 0.0018149999998513522,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 151,
+          "ms": 0.0016709999999875436,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 152,
+          "ms": 0.03259800000000723,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 153,
+          "ms": 0.0019299999999020656,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 154,
+          "ms": 0.0015859999998610874,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 155,
+          "ms": 0.006250000000136424,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 156,
+          "ms": 0.0016450000000531873,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 157,
+          "ms": 0.001759999999876527,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 158,
+          "ms": 0.0017149999998764542,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 159,
+          "ms": 0.0017179999999825668,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 160,
+          "ms": 0.0017230000000836299,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 161,
+          "ms": 0.0016760000000886066,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 162,
+          "ms": 0.0016839999998410349,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 163,
+          "ms": 0.0015920000000733125,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 164,
+          "ms": 0.0015699999999014835,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 165,
+          "ms": 0.004666999999926702,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 166,
+          "ms": 0.0016610000000127911,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 167,
+          "ms": 0.0016259999999874708,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 168,
+          "ms": 0.001598000000058164,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 169,
+          "ms": 0.03127700000004552,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 170,
+          "ms": 0.0035060000000157743,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 171,
+          "ms": 0.05584399999997913,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 172,
+          "ms": 0.004361999999900945,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 173,
+          "ms": 0.0016539999999167776,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 174,
+          "ms": 0.0015690000000176951,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 175,
+          "ms": 0.007695000000012442,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 176,
+          "ms": 0.00393900000017311,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 177,
+          "ms": 0.001672999999982494,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 178,
+          "ms": 0.0015559999999368301,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 179,
+          "ms": 0.0016310000000885339,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        }
+      ]
+    },
+    {
+      "name": "warm-movement",
+      "quality": "medium",
+      "frames": 120,
+      "totalMs": 196.3137149999975,
+      "firstMs": 0.009229000000004817,
+      "maxMs": 27.962370999999848,
+      "p95Ms": 10.202752999999802,
+      "p99Ms": 26.9772660000001,
+      "rootHash": "c1d5163c1e42f5542a341158f68972f8df3a7276035935f5b1a2a2803ce2d2ee",
+      "finalStats": {
+        "representation": "photographic-short-lawn",
+        "draws": 2,
+        "triangles": 140000,
+        "instances": 1708,
+        "submittedLeaves": 70000,
+        "activeTiles": 24,
+        "cachedTiles": 103,
+        "textureResolution": 1024,
+        "textureHeight": 512,
+        "triangleLimit": 140000,
+        "drawLimit": 12,
+        "allocatedInstanceBytes": 204800,
+        "transitionRoots": 103,
+        "ready": true
+      },
+      "samples": [
+        {
+          "frame": 0,
+          "ms": 0.009229000000004817,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 1,
+          "ms": 0.06144599999993261,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 2,
+          "ms": 0.016365999999834457,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 3,
+          "ms": 0.011932000000115295,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 4,
+          "ms": 0.010801000000128624,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 5,
+          "ms": 17.332540999999992,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 6,
+          "ms": 0.11124299999983123,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 7,
+          "ms": 0.05538299999989249,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 8,
+          "ms": 0.10159599999997226,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 9,
+          "ms": 0.1563490000000911,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 10,
+          "ms": 0.043677000000116095,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 11,
+          "ms": 0.03569499999980508,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 12,
+          "ms": 0.07684400000016467,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 13,
+          "ms": 0.038536999999905674,
+          "instances": 1916,
+          "triangles": 139988,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 14,
+          "ms": 1.228452999999945,
+          "instances": 1868,
+          "triangles": 139986,
+          "cachedTiles": 81
+        },
+        {
+          "frame": 15,
+          "ms": 21.18844899999999,
+          "instances": 1868,
+          "triangles": 139986,
+          "cachedTiles": 84
+        },
+        {
+          "frame": 16,
+          "ms": 0.33464299999991454,
+          "instances": 1868,
+          "triangles": 139986,
+          "cachedTiles": 84
+        },
+        {
+          "frame": 17,
+          "ms": 0.0342569999997977,
+          "instances": 1868,
+          "triangles": 139986,
+          "cachedTiles": 84
+        },
+        {
+          "frame": 18,
+          "ms": 0.0213330000001406,
+          "instances": 1868,
+          "triangles": 139986,
+          "cachedTiles": 84
+        },
+        {
+          "frame": 19,
+          "ms": 0.147715000000062,
+          "instances": 1868,
+          "triangles": 139986,
+          "cachedTiles": 84
+        },
+        {
+          "frame": 20,
+          "ms": 0.024012999999968088,
+          "instances": 1868,
+          "triangles": 139986,
+          "cachedTiles": 84
+        },
+        {
+          "frame": 21,
+          "ms": 0.01809000000002925,
+          "instances": 1868,
+          "triangles": 139986,
+          "cachedTiles": 84
+        },
+        {
+          "frame": 22,
+          "ms": 0.017753000000084285,
+          "instances": 1868,
+          "triangles": 139986,
+          "cachedTiles": 84
+        },
+        {
+          "frame": 23,
+          "ms": 0.18515999999999622,
+          "instances": 1868,
+          "triangles": 139986,
+          "cachedTiles": 84
+        },
+        {
+          "frame": 24,
+          "ms": 17.4615960000001,
+          "instances": 1803,
+          "triangles": 139982,
+          "cachedTiles": 87
+        },
+        {
+          "frame": 25,
+          "ms": 0.08741199999985838,
+          "instances": 1803,
+          "triangles": 139982,
+          "cachedTiles": 87
+        },
+        {
+          "frame": 26,
+          "ms": 0.01689999999985048,
+          "instances": 1803,
+          "triangles": 139982,
+          "cachedTiles": 87
+        },
+        {
+          "frame": 27,
+          "ms": 0.01301499999999578,
+          "instances": 1803,
+          "triangles": 139982,
+          "cachedTiles": 87
+        },
+        {
+          "frame": 28,
+          "ms": 0.011686999999938052,
+          "instances": 1803,
+          "triangles": 139982,
+          "cachedTiles": 87
+        },
+        {
+          "frame": 29,
+          "ms": 0.011774999999943248,
+          "instances": 1803,
+          "triangles": 139982,
+          "cachedTiles": 87
+        },
+        {
+          "frame": 30,
+          "ms": 0.011709000000109882,
+          "instances": 1803,
+          "triangles": 139982,
+          "cachedTiles": 87
+        },
+        {
+          "frame": 31,
+          "ms": 0.01166800000009971,
+          "instances": 1803,
+          "triangles": 139982,
+          "cachedTiles": 87
+        },
+        {
+          "frame": 32,
+          "ms": 0.011597999999821695,
+          "instances": 1803,
+          "triangles": 139982,
+          "cachedTiles": 87
+        },
+        {
+          "frame": 33,
+          "ms": 1.5696490000000267,
+          "instances": 1770,
+          "triangles": 140000,
+          "cachedTiles": 87
+        },
+        {
+          "frame": 34,
+          "ms": 9.037301999999954,
+          "instances": 1772,
+          "triangles": 139982,
+          "cachedTiles": 88
+        },
+        {
+          "frame": 35,
+          "ms": 0.0646719999999732,
+          "instances": 1772,
+          "triangles": 139982,
+          "cachedTiles": 88
+        },
+        {
+          "frame": 36,
+          "ms": 0.01383599999985563,
+          "instances": 1772,
+          "triangles": 139982,
+          "cachedTiles": 88
+        },
+        {
+          "frame": 37,
+          "ms": 0.012712999999848762,
+          "instances": 1772,
+          "triangles": 139982,
+          "cachedTiles": 88
+        },
+        {
+          "frame": 38,
+          "ms": 0.04878499999995256,
+          "instances": 1772,
+          "triangles": 139982,
+          "cachedTiles": 88
+        },
+        {
+          "frame": 39,
+          "ms": 0.013451999999915643,
+          "instances": 1772,
+          "triangles": 139982,
+          "cachedTiles": 88
+        },
+        {
+          "frame": 40,
+          "ms": 0.018741999999974723,
+          "instances": 1772,
+          "triangles": 139982,
+          "cachedTiles": 88
+        },
+        {
+          "frame": 41,
+          "ms": 0.29549999999994725,
+          "instances": 1772,
+          "triangles": 139982,
+          "cachedTiles": 88
+        },
+        {
+          "frame": 42,
+          "ms": 0.34239499999989675,
+          "instances": 1772,
+          "triangles": 139982,
+          "cachedTiles": 88
+        },
+        {
+          "frame": 43,
+          "ms": 27.962370999999848,
+          "instances": 1750,
+          "triangles": 139932,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 44,
+          "ms": 0.17975000000001273,
+          "instances": 1750,
+          "triangles": 139932,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 45,
+          "ms": 0.014798000000155298,
+          "instances": 1750,
+          "triangles": 139932,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 46,
+          "ms": 0.010710999999901105,
+          "instances": 1750,
+          "triangles": 139932,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 47,
+          "ms": 0.009710999999924752,
+          "instances": 1750,
+          "triangles": 139932,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 48,
+          "ms": 0.009565999999949781,
+          "instances": 1750,
+          "triangles": 139932,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 49,
+          "ms": 0.009944000000132291,
+          "instances": 1750,
+          "triangles": 139932,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 50,
+          "ms": 0.010105000000066866,
+          "instances": 1750,
+          "triangles": 139932,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 51,
+          "ms": 0.009826999999859254,
+          "instances": 1750,
+          "triangles": 139932,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 52,
+          "ms": 10.20258100000001,
+          "instances": 1744,
+          "triangles": 139986,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 53,
+          "ms": 0.04555800000002819,
+          "instances": 1744,
+          "triangles": 139986,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 54,
+          "ms": 0.018491000000040003,
+          "instances": 1744,
+          "triangles": 139986,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 55,
+          "ms": 0.01650000000017826,
+          "instances": 1744,
+          "triangles": 139986,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 56,
+          "ms": 0.015949999999975262,
+          "instances": 1744,
+          "triangles": 139986,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 57,
+          "ms": 0.049353000000110114,
+          "instances": 1744,
+          "triangles": 139986,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 58,
+          "ms": 0.019277000000101907,
+          "instances": 1744,
+          "triangles": 139986,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 59,
+          "ms": 0.017828999999892403,
+          "instances": 1744,
+          "triangles": 139986,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 60,
+          "ms": 0.0194610000000921,
+          "instances": 1744,
+          "triangles": 139986,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 61,
+          "ms": 0.772521000000097,
+          "instances": 1733,
+          "triangles": 139992,
+          "cachedTiles": 90
+        },
+        {
+          "frame": 62,
+          "ms": 26.9772660000001,
+          "instances": 1737,
+          "triangles": 139956,
+          "cachedTiles": 93
+        },
+        {
+          "frame": 63,
+          "ms": 0.23720699999989847,
+          "instances": 1737,
+          "triangles": 139956,
+          "cachedTiles": 93
+        },
+        {
+          "frame": 64,
+          "ms": 0.01943400000004658,
+          "instances": 1737,
+          "triangles": 139956,
+          "cachedTiles": 93
+        },
+        {
+          "frame": 65,
+          "ms": 0.01591099999996004,
+          "instances": 1737,
+          "triangles": 139956,
+          "cachedTiles": 93
+        },
+        {
+          "frame": 66,
+          "ms": 0.01604300000008152,
+          "instances": 1737,
+          "triangles": 139956,
+          "cachedTiles": 93
+        },
+        {
+          "frame": 67,
+          "ms": 0.015536000000111017,
+          "instances": 1737,
+          "triangles": 139956,
+          "cachedTiles": 93
+        },
+        {
+          "frame": 68,
+          "ms": 0.014858999999887601,
+          "instances": 1737,
+          "triangles": 139956,
+          "cachedTiles": 93
+        },
+        {
+          "frame": 69,
+          "ms": 0.014677000000119733,
+          "instances": 1737,
+          "triangles": 139956,
+          "cachedTiles": 93
+        },
+        {
+          "frame": 70,
+          "ms": 0.1015709999999217,
+          "instances": 1737,
+          "triangles": 139956,
+          "cachedTiles": 93
+        },
+        {
+          "frame": 71,
+          "ms": 10.099790999999868,
+          "instances": 1732,
+          "triangles": 139970,
+          "cachedTiles": 94
+        },
+        {
+          "frame": 72,
+          "ms": 0.03499099999999089,
+          "instances": 1732,
+          "triangles": 139970,
+          "cachedTiles": 94
+        },
+        {
+          "frame": 73,
+          "ms": 0.010635000000092987,
+          "instances": 1732,
+          "triangles": 139970,
+          "cachedTiles": 94
+        },
+        {
+          "frame": 74,
+          "ms": 0.011811999999963518,
+          "instances": 1732,
+          "triangles": 139970,
+          "cachedTiles": 94
+        },
+        {
+          "frame": 75,
+          "ms": 0.011385000000018408,
+          "instances": 1732,
+          "triangles": 139970,
+          "cachedTiles": 94
+        },
+        {
+          "frame": 76,
+          "ms": 0.009857999999894673,
+          "instances": 1732,
+          "triangles": 139970,
+          "cachedTiles": 94
+        },
+        {
+          "frame": 77,
+          "ms": 0.037655999999969936,
+          "instances": 1732,
+          "triangles": 139970,
+          "cachedTiles": 94
+        },
+        {
+          "frame": 78,
+          "ms": 0.01096400000005815,
+          "instances": 1732,
+          "triangles": 139970,
+          "cachedTiles": 94
+        },
+        {
+          "frame": 79,
+          "ms": 0.010413000000198736,
+          "instances": 1732,
+          "triangles": 139970,
+          "cachedTiles": 94
+        },
+        {
+          "frame": 80,
+          "ms": 0.4397149999999783,
+          "instances": 1724,
+          "triangles": 139980,
+          "cachedTiles": 94
+        },
+        {
+          "frame": 81,
+          "ms": 10.202752999999802,
+          "instances": 1727,
+          "triangles": 139984,
+          "cachedTiles": 97
+        },
+        {
+          "frame": 82,
+          "ms": 0.04606200000011995,
+          "instances": 1727,
+          "triangles": 139984,
+          "cachedTiles": 97
+        },
+        {
+          "frame": 83,
+          "ms": 0.01664400000004207,
+          "instances": 1727,
+          "triangles": 139984,
+          "cachedTiles": 97
+        },
+        {
+          "frame": 84,
+          "ms": 0.014271000000007916,
+          "instances": 1727,
+          "triangles": 139984,
+          "cachedTiles": 97
+        },
+        {
+          "frame": 85,
+          "ms": 0.015392000000019834,
+          "instances": 1727,
+          "triangles": 139984,
+          "cachedTiles": 97
+        },
+        {
+          "frame": 86,
+          "ms": 0.014965000000074724,
+          "instances": 1727,
+          "triangles": 139984,
+          "cachedTiles": 97
+        },
+        {
+          "frame": 87,
+          "ms": 0.01484800000002906,
+          "instances": 1727,
+          "triangles": 139984,
+          "cachedTiles": 97
+        },
+        {
+          "frame": 88,
+          "ms": 0.014785999999958221,
+          "instances": 1727,
+          "triangles": 139984,
+          "cachedTiles": 97
+        },
+        {
+          "frame": 89,
+          "ms": 0.1115380000001096,
+          "instances": 1727,
+          "triangles": 139984,
+          "cachedTiles": 97
+        },
+        {
+          "frame": 90,
+          "ms": 7.462166000000025,
+          "instances": 1722,
+          "triangles": 139998,
+          "cachedTiles": 98
+        },
+        {
+          "frame": 91,
+          "ms": 0.03505599999994047,
+          "instances": 1722,
+          "triangles": 139998,
+          "cachedTiles": 98
+        },
+        {
+          "frame": 92,
+          "ms": 0.011115000000017972,
+          "instances": 1722,
+          "triangles": 139998,
+          "cachedTiles": 98
+        },
+        {
+          "frame": 93,
+          "ms": 0.010074000000031447,
+          "instances": 1722,
+          "triangles": 139998,
+          "cachedTiles": 98
+        },
+        {
+          "frame": 94,
+          "ms": 0.00871699999993325,
+          "instances": 1722,
+          "triangles": 139998,
+          "cachedTiles": 98
+        },
+        {
+          "frame": 95,
+          "ms": 0.009095999999999549,
+          "instances": 1722,
+          "triangles": 139998,
+          "cachedTiles": 98
+        },
+        {
+          "frame": 96,
+          "ms": 0.008898000000044703,
+          "instances": 1722,
+          "triangles": 139998,
+          "cachedTiles": 98
+        },
+        {
+          "frame": 97,
+          "ms": 0.00861399999985224,
+          "instances": 1722,
+          "triangles": 139998,
+          "cachedTiles": 98
+        },
+        {
+          "frame": 98,
+          "ms": 0.06028900000001158,
+          "instances": 1722,
+          "triangles": 139998,
+          "cachedTiles": 98
+        },
+        {
+          "frame": 99,
+          "ms": 8.277995999999803,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 99
+        },
+        {
+          "frame": 100,
+          "ms": 0.035345999999663036,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 99
+        },
+        {
+          "frame": 101,
+          "ms": 0.009512999999969907,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 99
+        },
+        {
+          "frame": 102,
+          "ms": 0.007784999999785214,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 99
+        },
+        {
+          "frame": 103,
+          "ms": 0.010229999999864958,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 99
+        },
+        {
+          "frame": 104,
+          "ms": 0.007223999999951047,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 99
+        },
+        {
+          "frame": 105,
+          "ms": 0.007371000000148342,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 99
+        },
+        {
+          "frame": 106,
+          "ms": 0.007936000000427157,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 99
+        },
+        {
+          "frame": 107,
+          "ms": 0.0076990000002297165,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 99
+        },
+        {
+          "frame": 108,
+          "ms": 0.6045329999997193,
+          "instances": 1713,
+          "triangles": 139986,
+          "cachedTiles": 99
+        },
+        {
+          "frame": 109,
+          "ms": 16.910973999999896,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 102
+        },
+        {
+          "frame": 110,
+          "ms": 0.10094200000003184,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 102
+        },
+        {
+          "frame": 111,
+          "ms": 0.011572999999771127,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 102
+        },
+        {
+          "frame": 112,
+          "ms": 0.007840999999643827,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 102
+        },
+        {
+          "frame": 113,
+          "ms": 0.007960999999795604,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 102
+        },
+        {
+          "frame": 114,
+          "ms": 0.007607000000007247,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 102
+        },
+        {
+          "frame": 115,
+          "ms": 0.007564000000002125,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 102
+        },
+        {
+          "frame": 116,
+          "ms": 0.007599999999911233,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 102
+        },
+        {
+          "frame": 117,
+          "ms": 0.06601499999987936,
+          "instances": 1716,
+          "triangles": 139990,
+          "cachedTiles": 102
+        },
+        {
+          "frame": 118,
+          "ms": 4.3206709999999475,
+          "instances": 1708,
+          "triangles": 140000,
+          "cachedTiles": 103
+        },
+        {
+          "frame": 119,
+          "ms": 0.02411099999972066,
+          "instances": 1708,
+          "triangles": 140000,
+          "cachedTiles": 103
+        }
+      ]
+    },
+    {
+      "name": "quality-high",
+      "quality": "high",
+      "frames": 180,
+      "totalMs": 261.34746000000223,
+      "firstMs": 253.57424500000025,
+      "maxMs": 253.57424500000025,
+      "p95Ms": 0.1390070000002197,
+      "p99Ms": 2.7927199999999175,
+      "rootHash": "6bc9505573e8e799c2f5482322136c2d7b01cab4b489d005f0cd64f72a4375e4",
+      "finalStats": {
+        "representation": "photographic-short-lawn",
+        "draws": 2,
+        "triangles": 279982,
+        "instances": 6735,
+        "submittedLeaves": 139991,
+        "activeTiles": 97,
+        "cachedTiles": 148,
+        "textureResolution": 1024,
+        "textureHeight": 512,
+        "triangleLimit": 280000,
+        "drawLimit": 16,
+        "allocatedInstanceBytes": 922000,
+        "transitionRoots": 0,
+        "ready": true
+      },
+      "samples": [
+        {
+          "frame": 0,
+          "ms": 253.57424500000025,
+          "instances": 6735,
+          "triangles": 279486,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 1,
+          "ms": 0.2726700000002893,
+          "instances": 6735,
+          "triangles": 279486,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 2,
+          "ms": 0.1390070000002197,
+          "instances": 6735,
+          "triangles": 279486,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 3,
+          "ms": 0.11942100000032951,
+          "instances": 6735,
+          "triangles": 279486,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 4,
+          "ms": 0.3855009999997492,
+          "instances": 6735,
+          "triangles": 279486,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 5,
+          "ms": 0.1354390000001331,
+          "instances": 6735,
+          "triangles": 279486,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 6,
+          "ms": 0.21283199999970748,
+          "instances": 6735,
+          "triangles": 279486,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 7,
+          "ms": 2.078403999999864,
+          "instances": 6735,
+          "triangles": 279920,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 8,
+          "ms": 0.11701500000026499,
+          "instances": 6735,
+          "triangles": 279920,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 9,
+          "ms": 2.7927199999999175,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 10,
+          "ms": 0.007906999999704567,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 11,
+          "ms": 0.0020110000000386208,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 12,
+          "ms": 0.0020049999998263957,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 13,
+          "ms": 0.0017350000002807064,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 14,
+          "ms": 0.00161500000012893,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 15,
+          "ms": 0.001702000000022963,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 16,
+          "ms": 0.41855000000032305,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 17,
+          "ms": 0.006751999999778491,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 18,
+          "ms": 0.29541900000003807,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 19,
+          "ms": 0.3709670000002916,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 20,
+          "ms": 0.0035819999998238927,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 21,
+          "ms": 0.0019440000000940927,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 22,
+          "ms": 0.0014909999999872525,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 23,
+          "ms": 0.0014670000000478467,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 24,
+          "ms": 0.0017710000001898152,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 25,
+          "ms": 0.0014550000000781438,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 26,
+          "ms": 0.001807000000098924,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 27,
+          "ms": 0.0020150000000285218,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 28,
+          "ms": 0.005455999999867345,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 29,
+          "ms": 0.0015319999997700506,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 30,
+          "ms": 0.0014690000002701709,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 31,
+          "ms": 0.0020939999999427528,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 32,
+          "ms": 0.0018279999999322172,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 33,
+          "ms": 0.0014710000000377477,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 34,
+          "ms": 0.0015720000001238077,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 35,
+          "ms": 0.0015279999997801497,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 36,
+          "ms": 0.00243399999999383,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 37,
+          "ms": 0.0019409999999879801,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 38,
+          "ms": 0.006329000000278029,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 39,
+          "ms": 0.0018129999998564017,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 40,
+          "ms": 0.0015130000001590815,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 41,
+          "ms": 0.0013939999998910935,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 42,
+          "ms": 0.001698000000033062,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 43,
+          "ms": 0.0014529999998558196,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 44,
+          "ms": 0.0015080000002853922,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 45,
+          "ms": 0.001461000000290369,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 46,
+          "ms": 0.0014769999997952254,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 47,
+          "ms": 0.0014769999997952254,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 48,
+          "ms": 0.004303000000163593,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 49,
+          "ms": 0.0027409999997871637,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 50,
+          "ms": 0.010802000000239786,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 51,
+          "ms": 0.001491999999871041,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 52,
+          "ms": 0.0015750000002299203,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 53,
+          "ms": 0.0016550000000279397,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 54,
+          "ms": 0.0014339999997901032,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 55,
+          "ms": 0.0015699999999014835,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 56,
+          "ms": 0.0014449999998760177,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 57,
+          "ms": 0.005362999999761087,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 58,
+          "ms": 0.0026790000001710723,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 59,
+          "ms": 0.003127999999833264,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 60,
+          "ms": 0.0018109999996340775,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 61,
+          "ms": 0.0016270000000986329,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 62,
+          "ms": 0.0014529999998558196,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 63,
+          "ms": 0.001475999999911437,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 64,
+          "ms": 0.0015940000002956367,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 65,
+          "ms": 0.0015760000001137087,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 66,
+          "ms": 0.0016219999997701962,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 67,
+          "ms": 0.006556000000273343,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 68,
+          "ms": 0.0016169999998965068,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 69,
+          "ms": 0.0014479999999821302,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 70,
+          "ms": 0.0014519999999720312,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 71,
+          "ms": 0.0014200000000528235,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 72,
+          "ms": 0.001475999999911437,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 73,
+          "ms": 0.0016340000001946464,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 74,
+          "ms": 0.0014730000002600718,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 75,
+          "ms": 0.0014750000000276486,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 76,
+          "ms": 0.004716000000371423,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 77,
+          "ms": 0.0015609999995831458,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 78,
+          "ms": 0.0014100000003054447,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 79,
+          "ms": 0.0014710000000377477,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 80,
+          "ms": 0.0015610000000378932,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 81,
+          "ms": 0.0016380000001845474,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 82,
+          "ms": 0.0014179999998304993,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 83,
+          "ms": 0.001528000000234897,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 84,
+          "ms": 0.0014340000002448505,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 85,
+          "ms": 0.004492000000027474,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 86,
+          "ms": 0.0015300000000024738,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 87,
+          "ms": 0.001599000000169326,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 88,
+          "ms": 0.0015339999999923748,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 89,
+          "ms": 0.0015530000000580912,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 90,
+          "ms": 0.0016270000000986329,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 91,
+          "ms": 0.0014890000002196757,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 92,
+          "ms": 0.0017459999999118736,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 93,
+          "ms": 0.0016700000001037552,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 94,
+          "ms": 0.0014339999997901032,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 95,
+          "ms": 0.004410999999890919,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 96,
+          "ms": 0.0015790000002198212,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 97,
+          "ms": 0.0014329999999063148,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 98,
+          "ms": 0.0015960000000632135,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 99,
+          "ms": 0.0017360000001644948,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 100,
+          "ms": 0.0019219999999222637,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 101,
+          "ms": 0.0014549999996233964,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 102,
+          "ms": 0.0014580000001842564,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 103,
+          "ms": 0.0015840000000935106,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 104,
+          "ms": 0.004708999999820662,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 105,
+          "ms": 0.0016959999998107378,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 106,
+          "ms": 0.0018230000000585278,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 107,
+          "ms": 0.0018580000000838481,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 108,
+          "ms": 0.0017490000000179862,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 109,
+          "ms": 0.0017179999999825668,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 110,
+          "ms": 0.0014590000000680448,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 111,
+          "ms": 0.001389000000017404,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 112,
+          "ms": 0.0019139999999424617,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 113,
+          "ms": 0.004999999999654392,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 114,
+          "ms": 0.0016970000001492735,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 115,
+          "ms": 0.0014400000000023283,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 116,
+          "ms": 0.0015459999999620777,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 117,
+          "ms": 0.0014769999997952254,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 118,
+          "ms": 0.001659999999901629,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 119,
+          "ms": 0.0017660000003161258,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 120,
+          "ms": 0.0014649999998255225,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 121,
+          "ms": 0.0018509999999878346,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 122,
+          "ms": 0.0016730000002098677,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 123,
+          "ms": 0.004554000000098313,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 124,
+          "ms": 0.0018029999996542756,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 125,
+          "ms": 0.0015130000001590815,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 126,
+          "ms": 0.0014400000000023283,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 127,
+          "ms": 0.0013750000002801244,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 128,
+          "ms": 0.0013960000001134176,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 129,
+          "ms": 0.0015089999997144332,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 130,
+          "ms": 0.0014690000002701709,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 131,
+          "ms": 0.0014989999999670545,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 132,
+          "ms": 0.0014160000000629225,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 133,
+          "ms": 0.004242999999860331,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 134,
+          "ms": 0.04431299999987459,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 135,
+          "ms": 0.002268000000185566,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 136,
+          "ms": 0.0014580000001842564,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 137,
+          "ms": 0.0013840000001437147,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 138,
+          "ms": 0.0014989999999670545,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 139,
+          "ms": 0.0013089999997646373,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 140,
+          "ms": 0.0014210000003913592,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 141,
+          "ms": 0.001348000000234606,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 142,
+          "ms": 0.005478999999922962,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 143,
+          "ms": 0.0013699999999516876,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 144,
+          "ms": 0.0012950000000273576,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 145,
+          "ms": 0.0013269999999465654,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 146,
+          "ms": 0.0012980000001334702,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 147,
+          "ms": 0.0013670000003003224,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 148,
+          "ms": 0.001366999999845575,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 149,
+          "ms": 0.0012860000001637673,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 150,
+          "ms": 0.0013139999996383267,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 151,
+          "ms": 0.0012440000000424334,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 152,
+          "ms": 0.004609999999956926,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 153,
+          "ms": 0.001374999999825377,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 154,
+          "ms": 0.0013250000001789886,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 155,
+          "ms": 0.001356999999643449,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 156,
+          "ms": 0.001334000000042579,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 157,
+          "ms": 0.009047000000009575,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 158,
+          "ms": 0.0027810000001409207,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 159,
+          "ms": 0.002058000000033644,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 160,
+          "ms": 0.002080000000205473,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 161,
+          "ms": 0.01940100000001621,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 162,
+          "ms": 0.0016140000002451416,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 163,
+          "ms": 0.0014649999998255225,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 164,
+          "ms": 0.0016669999999976426,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 165,
+          "ms": 0.0013570000000981963,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 166,
+          "ms": 0.001216999999996915,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 167,
+          "ms": 0.001216999999996915,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 168,
+          "ms": 0.0012480000000323344,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 169,
+          "ms": 0.0012449999999262218,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 170,
+          "ms": 0.0012669999996433035,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 171,
+          "ms": 0.003936999999950785,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 172,
+          "ms": 0.0013369999996939441,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 173,
+          "ms": 0.001295999999911146,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 174,
+          "ms": 0.0012750000000778527,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 175,
+          "ms": 0.0012609999998858257,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 176,
+          "ms": 0.0011970000000474101,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 177,
+          "ms": 0.00300199999992401,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 178,
+          "ms": 0.028152999999747408,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 179,
+          "ms": 0.0025040000000444707,
+          "instances": 6735,
+          "triangles": 279982,
+          "cachedTiles": 148
+        }
+      ]
+    },
+    {
+      "name": "quality-low",
+      "quality": "low",
+      "frames": 120,
+      "totalMs": 16.215385000001334,
+      "firstMs": 15.360659999999825,
+      "maxMs": 15.360659999999825,
+      "p95Ms": 0.015049999999973807,
+      "p99Ms": 0.3205120000002353,
+      "rootHash": "3102bc5eb58838acd7fa82101212af8bd7426abadb396c53e0581a53467748c6",
+      "finalStats": {
+        "representation": "photographic-short-lawn",
+        "draws": 2,
+        "triangles": 59998,
+        "instances": 715,
+        "submittedLeaves": 29999,
+        "activeTiles": 16,
+        "cachedTiles": 148,
+        "textureResolution": 1024,
+        "textureHeight": 512,
+        "triangleLimit": 60000,
+        "drawLimit": 8,
+        "allocatedInstanceBytes": 922000,
+        "transitionRoots": 0,
+        "ready": true
+      },
+      "samples": [
+        {
+          "frame": 0,
+          "ms": 15.360659999999825,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 1,
+          "ms": 0.013233000000127504,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 2,
+          "ms": 0.007730000000265136,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 3,
+          "ms": 0.0047969999995984836,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 4,
+          "ms": 0.07708999999977095,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 5,
+          "ms": 0.004141999999774271,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 6,
+          "ms": 0.0029240000003483146,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 7,
+          "ms": 0.00285200000007535,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 8,
+          "ms": 0.0027580000000853033,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 9,
+          "ms": 0.3205120000002353,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 10,
+          "ms": 0.009582000000136759,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 11,
+          "ms": 0.00282599999991362,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 12,
+          "ms": 0.0027199999999538704,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 13,
+          "ms": 0.0026920000000245636,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 14,
+          "ms": 0.0027489999997669656,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 15,
+          "ms": 0.00283499999977721,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 16,
+          "ms": 0.00287800000023708,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 17,
+          "ms": 0.002743000000009488,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 18,
+          "ms": 0.04147599999987506,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 19,
+          "ms": 0.0015679999996791594,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 20,
+          "ms": 0.0012670000000980508,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 21,
+          "ms": 0.0012150000002293382,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 22,
+          "ms": 0.0014519999999720312,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 23,
+          "ms": 0.001306000000113272,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 24,
+          "ms": 0.0012329999999565189,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 25,
+          "ms": 0.0012450000003809691,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 26,
+          "ms": 0.0012760000004163885,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 27,
+          "ms": 0.0012360000000626314,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 28,
+          "ms": 0.004338000000188913,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 29,
+          "ms": 0.008319000000028609,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 30,
+          "ms": 0.015049999999973807,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 31,
+          "ms": 0.0024200000002565503,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 32,
+          "ms": 0.0022450000001299486,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 33,
+          "ms": 0.0022349999999278225,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 34,
+          "ms": 0.002159000000119704,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 35,
+          "ms": 0.0021039999996901315,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 36,
+          "ms": 0.002234000000044034,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 37,
+          "ms": 0.012318000000050233,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 38,
+          "ms": 0.002519000000120286,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 39,
+          "ms": 0.002058000000033644,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 40,
+          "ms": 0.001952999999957683,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 41,
+          "ms": 0.002387999999882595,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 42,
+          "ms": 0.0023099999998521525,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 43,
+          "ms": 0.0021560000000135915,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 44,
+          "ms": 0.0020730000001094595,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 45,
+          "ms": 0.0020309999999881256,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 46,
+          "ms": 0.007989000000179658,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 47,
+          "ms": 0.0020269999999982247,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 48,
+          "ms": 0.0019459999998616695,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 49,
+          "ms": 0.002059999999801221,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 50,
+          "ms": 0.0021320000000741857,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 51,
+          "ms": 0.0020829999998568383,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 52,
+          "ms": 0.0020230000000083237,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 53,
+          "ms": 0.0020870000003014866,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 54,
+          "ms": 0.002094999999826541,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 55,
+          "ms": 0.01727500000015425,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 56,
+          "ms": 0.009675000000243017,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 57,
+          "ms": 0.004004999999779102,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 58,
+          "ms": 0.019651000000067143,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 59,
+          "ms": 0.002340999999887572,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 60,
+          "ms": 0.002191000000038912,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 61,
+          "ms": 0.0023199999995995313,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 62,
+          "ms": 0.0022389999999177235,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 63,
+          "ms": 0.0025489999998171697,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 64,
+          "ms": 0.0022049999997761915,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 65,
+          "ms": 0.008815000000140572,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 66,
+          "ms": 0.0026490000000194414,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 67,
+          "ms": 0.002177000000301632,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 68,
+          "ms": 0.002242000000023836,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 69,
+          "ms": 0.0021350000001802982,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 70,
+          "ms": 0.0023519999999734864,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 71,
+          "ms": 0.0024429999998574203,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 72,
+          "ms": 0.0024040000002969464,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 73,
+          "ms": 0.0021270000002004963,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 74,
+          "ms": 0.001995000000079017,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 75,
+          "ms": 0.007765999999719497,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 76,
+          "ms": 0.00206800000023577,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 77,
+          "ms": 0.001959000000169908,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 78,
+          "ms": 0.002098999999816442,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 79,
+          "ms": 0.0022690000000693544,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 80,
+          "ms": 0.0022910000002411834,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 81,
+          "ms": 0.002215999999862106,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 82,
+          "ms": 0.002272000000175467,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 83,
+          "ms": 0.0020869999998467392,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 84,
+          "ms": 0.007345999999870401,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 85,
+          "ms": 0.0025070000001505832,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 86,
+          "ms": 0.002051999999821419,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 87,
+          "ms": 0.0021299999998518615,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 88,
+          "ms": 0.0025729999997565756,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 89,
+          "ms": 0.002250000000003638,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 90,
+          "ms": 0.0022830000002613815,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 91,
+          "ms": 0.0021280000000842847,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 92,
+          "ms": 0.002148999999917578,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 93,
+          "ms": 0.008252000000084081,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 94,
+          "ms": 0.002652000000125554,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 95,
+          "ms": 0.0033149999999295687,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 96,
+          "ms": 0.002265999999963242,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 97,
+          "ms": 0.002222000000074331,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 98,
+          "ms": 0.0022670000003017776,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 99,
+          "ms": 0.002203999999892403,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 100,
+          "ms": 0.0021860000001652224,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 101,
+          "ms": 0.002401000000190834,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 102,
+          "ms": 0.0021929999998064886,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 103,
+          "ms": 0.009297000000060507,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 104,
+          "ms": 0.0024170000001504377,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 105,
+          "ms": 0.002195000000028813,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 106,
+          "ms": 0.0033149999999295687,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 107,
+          "ms": 0.002238000000033935,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 108,
+          "ms": 0.0022530000001097505,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 109,
+          "ms": 0.0021539999997912673,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 110,
+          "ms": 0.0021579999997811683,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 111,
+          "ms": 0.0022770000000491564,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 112,
+          "ms": 0.009164999999939027,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 113,
+          "ms": 0.00972200000023804,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 114,
+          "ms": 0.0025559999999131833,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 115,
+          "ms": 0.007960999999795604,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 116,
+          "ms": 0.0024589999998170242,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 117,
+          "ms": 0.0020869999998467392,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 118,
+          "ms": 0.00224400000024616,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        },
+        {
+          "frame": 119,
+          "ms": 0.002344999999877473,
+          "instances": 715,
+          "triangles": 59998,
+          "cachedTiles": 148
+        }
+      ]
+    },
+    {
+      "name": "teleport-medium",
+      "quality": "medium",
+      "frames": 180,
+      "totalMs": 596.9200339999961,
+      "firstMs": 594.5069529999996,
+      "maxMs": 594.5069529999996,
+      "p95Ms": 0.025076999999782856,
+      "p99Ms": 1.1397440000000643,
+      "rootHash": "1d1675c9fbe48056bcc99ff237de7952de3c423a5cecd061dec9f9e03625e752",
+      "finalStats": {
+        "representation": "photographic-short-lawn",
+        "draws": 2,
+        "triangles": 139984,
+        "instances": 2347,
+        "submittedLeaves": 69992,
+        "activeTiles": 43,
+        "cachedTiles": 229,
+        "textureResolution": 1024,
+        "textureHeight": 512,
+        "triangleLimit": 140000,
+        "drawLimit": 12,
+        "allocatedInstanceBytes": 922000,
+        "transitionRoots": 0,
+        "ready": true
+      },
+      "samples": [
+        {
+          "frame": 0,
+          "ms": 594.5069529999996,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 1,
+          "ms": 0.1867349999997714,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 2,
+          "ms": 0.03947100000004866,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 3,
+          "ms": 0.02544300000045041,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 4,
+          "ms": 0.024913999999625958,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 5,
+          "ms": 0.025153000000045722,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 6,
+          "ms": 0.024882000000161497,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 7,
+          "ms": 0.0248900000001413,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 8,
+          "ms": 0.025076999999782856,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 9,
+          "ms": 1.1397440000000643,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 10,
+          "ms": 0.00389599999971324,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 11,
+          "ms": 0.001283999999941443,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 12,
+          "ms": 0.0011709999998856802,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 13,
+          "ms": 0.0011890000000676082,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 14,
+          "ms": 0.0011399999998502608,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 15,
+          "ms": 0.0012709999996332044,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 16,
+          "ms": 0.0011930000000575092,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 17,
+          "ms": 0.0011289999997643463,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 18,
+          "ms": 0.006216999999651307,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 19,
+          "ms": 0.00128599999970902,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 20,
+          "ms": 0.0012409999999363208,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 21,
+          "ms": 0.0012019999999210995,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 22,
+          "ms": 0.0011639999997896666,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 23,
+          "ms": 0.0011589999999159772,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 24,
+          "ms": 0.0011709999998856802,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 25,
+          "ms": 0.0012160000001131266,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 26,
+          "ms": 0.0011639999997896666,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 27,
+          "ms": 0.0012639999999919382,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 28,
+          "ms": 0.0041839999998956046,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 29,
+          "ms": 0.0012179999998807034,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 30,
+          "ms": 0.0011519999998199637,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 31,
+          "ms": 0.0012069999997947889,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 32,
+          "ms": 0.0011960000001636217,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 33,
+          "ms": 0.0011930000000575092,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 34,
+          "ms": 0.0012200000001030276,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 35,
+          "ms": 0.0012010000000373111,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 36,
+          "ms": 0.0011240000003454043,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 37,
+          "ms": 0.004034999999930733,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 38,
+          "ms": 0.0012200000001030276,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 39,
+          "ms": 0.0012940000001435692,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 40,
+          "ms": 0.0011509999999361753,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 41,
+          "ms": 0.0012059999999110005,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 42,
+          "ms": 0.0011570000001484004,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 43,
+          "ms": 0.0011670000003505265,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 44,
+          "ms": 0.010364999999637803,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 45,
+          "ms": 0.001435000000128639,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 46,
+          "ms": 0.00519700000040757,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 47,
+          "ms": 0.0012219999998706044,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 48,
+          "ms": 0.00358200000027864,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 49,
+          "ms": 0.0018199999999524152,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 50,
+          "ms": 0.002134999999725551,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 51,
+          "ms": 0.0025279999999838765,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 52,
+          "ms": 0.001389000000017404,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 53,
+          "ms": 0.0011890000000676082,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 54,
+          "ms": 0.0012930000002597808,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 55,
+          "ms": 0.001239000000168744,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 56,
+          "ms": 0.006160999999792693,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 57,
+          "ms": 0.0012809999998353305,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 58,
+          "ms": 0.001198999999814987,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 59,
+          "ms": 0.0012229999997543928,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 60,
+          "ms": 0.0012939999996888218,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 61,
+          "ms": 0.0012719999999717402,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 62,
+          "ms": 0.0012850000002799788,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 63,
+          "ms": 0.0012080000001333246,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 64,
+          "ms": 0.0014059999998607964,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 65,
+          "ms": 0.003834999999980937,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 66,
+          "ms": 0.001378999999815278,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 67,
+          "ms": 0.0011690000001181033,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 68,
+          "ms": 0.0011749999998755811,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 69,
+          "ms": 0.0012069999997947889,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 70,
+          "ms": 0.0012139999998908024,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 71,
+          "ms": 0.0014080000000831205,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 72,
+          "ms": 0.0011779999999816937,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 73,
+          "ms": 0.0011639999997896666,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 74,
+          "ms": 0.0011669999998957792,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 75,
+          "ms": 0.004273000000011962,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 76,
+          "ms": 0.0012749999996231054,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 77,
+          "ms": 0.0011790000003202294,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 78,
+          "ms": 0.0014000000001033186,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 79,
+          "ms": 0.0012339999998403073,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 80,
+          "ms": 0.0012870000000475557,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 81,
+          "ms": 0.0012790000000677537,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 82,
+          "ms": 0.0038700000000062573,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 83,
+          "ms": 0.002066000000013446,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 84,
+          "ms": 0.4905180000000655,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 85,
+          "ms": 0.0028710000001410663,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 86,
+          "ms": 0.0012689999998656276,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 87,
+          "ms": 0.0011930000000575092,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 88,
+          "ms": 0.0011730000001080043,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 89,
+          "ms": 0.0013229999999566644,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 90,
+          "ms": 0.0011290000002190936,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 91,
+          "ms": 0.0011349999999765714,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 92,
+          "ms": 0.0011540000000422879,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 93,
+          "ms": 0.005258000000139873,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 94,
+          "ms": 0.0012719999999717402,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 95,
+          "ms": 0.001783000000159518,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 96,
+          "ms": 0.0021190000002206943,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 97,
+          "ms": 0.06628599999976359,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 98,
+          "ms": 0.04218800000035117,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 99,
+          "ms": 0.001261999999769614,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 100,
+          "ms": 0.001150000000052387,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 101,
+          "ms": 0.0016219999997701962,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 102,
+          "ms": 0.0011150000000270666,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 103,
+          "ms": 0.005630000000110158,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 104,
+          "ms": 0.0012820000001738663,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 105,
+          "ms": 0.0013059999996585248,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 106,
+          "ms": 0.001115999999910855,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 107,
+          "ms": 0.0010969999998451385,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 108,
+          "ms": 0.001475999999911437,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 109,
+          "ms": 0.0010919999999714491,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 110,
+          "ms": 0.0011939999999412976,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 111,
+          "ms": 0.0010919999999714491,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 112,
+          "ms": 0.003991999999925611,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 113,
+          "ms": 0.001216999999996915,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 114,
+          "ms": 0.0010910000000876607,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 115,
+          "ms": 0.007412999999814929,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 116,
+          "ms": 0.0012850000002799788,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 117,
+          "ms": 0.0012890000002698798,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 118,
+          "ms": 0.0011330000002089946,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 119,
+          "ms": 0.0011069999995925173,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 120,
+          "ms": 0.0013699999999516876,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 121,
+          "ms": 0.0048040000001492444,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 122,
+          "ms": 0.001239999999597785,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 123,
+          "ms": 0.0010860000002139714,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 124,
+          "ms": 0.0012980000001334702,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 125,
+          "ms": 0.001081999999769323,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 126,
+          "ms": 0.0011050000002796878,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 127,
+          "ms": 0.0012179999998807034,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 128,
+          "ms": 0.0011129999998047424,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 129,
+          "ms": 0.0011330000002089946,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 130,
+          "ms": 0.001152000000274711,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 131,
+          "ms": 0.0037879999999859137,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 132,
+          "ms": 0.0011939999999412976,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 133,
+          "ms": 0.0011170000002493907,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 134,
+          "ms": 0.0017149999998764542,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 135,
+          "ms": 0.0011130000002594898,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 136,
+          "ms": 0.001168000000234315,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 137,
+          "ms": 0.001138000000082684,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 138,
+          "ms": 0.0011970000000474101,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 139,
+          "ms": 0.001291999999921245,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 140,
+          "ms": 0.0035559999996621627,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 141,
+          "ms": 0.001172999999653257,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 142,
+          "ms": 0.0011099999996986298,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 143,
+          "ms": 0.001194999999825086,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 144,
+          "ms": 0.0011479999998300627,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 145,
+          "ms": 0.0013149999999768625,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 146,
+          "ms": 0.0011439999998401618,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 147,
+          "ms": 0.0011339999996380357,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 148,
+          "ms": 0.0012200000001030276,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 149,
+          "ms": 0.0011090000002695888,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 150,
+          "ms": 0.0037779999997837876,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 151,
+          "ms": 0.0012609999998858257,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 152,
+          "ms": 0.0011519999998199637,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 153,
+          "ms": 0.0012600000000020373,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 154,
+          "ms": 0.0013209999997343402,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 155,
+          "ms": 0.001261999999769614,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 156,
+          "ms": 0.0011870000003000314,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 157,
+          "ms": 0.0011250000002291927,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 158,
+          "ms": 0.0011819999999715947,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 159,
+          "ms": 0.0037349999997786654,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 160,
+          "ms": 0.0012379999998302083,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 161,
+          "ms": 0.001150000000052387,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 162,
+          "ms": 0.001220999999986816,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 163,
+          "ms": 0.0012580000002344605,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 164,
+          "ms": 0.0014620000001741573,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 165,
+          "ms": 0.0013429999999061693,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 166,
+          "ms": 0.0037809999998899,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 167,
+          "ms": 0.0021660000002157176,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 168,
+          "ms": 0.007575000000088039,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 169,
+          "ms": 0.001600999999936903,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 170,
+          "ms": 0.0014219999998204003,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 171,
+          "ms": 0.001318000000082975,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 172,
+          "ms": 0.0013559999997596606,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 173,
+          "ms": 0.0013089999997646373,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 174,
+          "ms": 0.0013450000001284934,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 175,
+          "ms": 0.0012409999999363208,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 176,
+          "ms": 0.0013050000002294837,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 177,
+          "ms": 0.0012380000002849556,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 178,
+          "ms": 0.004014999999981228,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        },
+        {
+          "frame": 179,
+          "ms": 0.0013420000000223808,
+          "instances": 2347,
+          "triangles": 139984,
+          "cachedTiles": 229
+        }
+      ]
+    },
+    {
+      "name": "settle-cold-medium",
+      "quality": "medium",
+      "frames": 31,
+      "simulatedSeconds": 0.5166666666666667,
+      "firstVisibleFrame": 0,
+      "settled": true,
+      "totalMs": 309.51877199999853,
+      "maxMs": 308.1415969999998,
+      "p95Ms": 0.5301390000004176,
+      "p99Ms": 308.1415969999998,
+      "rootHash": "481a3b9b1ad136fa18ab9d25e908daa85d0e51652a709ad77ba26014210f15c0",
+      "finalStats": {
+        "representation": "photographic-short-lawn",
+        "draws": 2,
+        "triangles": 139988,
+        "instances": 1916,
+        "submittedLeaves": 69994,
+        "activeTiles": 37,
+        "cachedTiles": 81,
+        "textureResolution": 1024,
+        "textureHeight": 512,
+        "triangleLimit": 140000,
+        "drawLimit": 12,
+        "allocatedInstanceBytes": 204800,
+        "transitionRoots": 0,
+        "ready": true
+      },
+      "samples": [
+        308.1415969999998,
+        0.5301390000004176,
+        0.06357200000002194,
+        0.03450399999974252,
+        0.03416299999980765,
+        0.1537309999998797,
+        0.044967999999698804,
+        0.03507799999988492,
+        0.03238400000009278,
+        0.3231590000000324,
+        0.07368499999984124,
+        0.0035570000000006985,
+        0.0020690000001195585,
+        0.001821999999719992,
+        0.001851999999871623,
+        0.0032559999999648426,
+        0.0018029999996542756,
+        0.0015349999998761632,
+        0.001574999999775173,
+        0.003404000000045926,
+        0.007727000000159023,
+        0.0022280000002865563,
+        0.0019139999999424617,
+        0.0018840000002455781,
+        0.0016189999996640836,
+        0.0019019999999727588,
+        0.001728000000184693,
+        0.0016730000002098677,
+        0.001607999999578169,
+        0.006879000000026281,
+        0.0017569999999977881
+      ]
+    },
+    {
+      "name": "settle-cold-teleport",
+      "quality": "medium",
+      "frames": 31,
+      "simulatedSeconds": 0.5166666666666667,
+      "firstVisibleFrame": 0,
+      "settled": true,
+      "totalMs": 1039.6455000000042,
+      "maxMs": 1038.514545,
+      "p95Ms": 0.43277300000045216,
+      "p99Ms": 1038.514545,
+      "rootHash": "1d1675c9fbe48056bcc99ff237de7952de3c423a5cecd061dec9f9e03625e752",
+      "finalStats": {
+        "representation": "photographic-short-lawn",
+        "draws": 2,
+        "triangles": 139984,
+        "instances": 2347,
+        "submittedLeaves": 69992,
+        "activeTiles": 43,
+        "cachedTiles": 81,
+        "textureResolution": 1024,
+        "textureHeight": 512,
+        "triangleLimit": 140000,
+        "drawLimit": 12,
+        "allocatedInstanceBytes": 245760,
+        "transitionRoots": 0,
+        "ready": true
+      },
+      "samples": [
+        1038.514545,
+        0.11126599999988684,
+        0.026719000000412052,
+        0.0184850000005099,
+        0.3283350000001519,
+        0.030205000000023574,
+        0.018466999999873224,
+        0.01822100000026694,
+        0.01816099999996368,
+        0.43277300000045216,
+        0.11029700000017328,
+        0.0019430000002103043,
+        0.0007020000002739835,
+        0.0005190000001675799,
+        0.0005120000005263137,
+        0.00047400000039488077,
+        0.0004800000006071059,
+        0.0006649999995715916,
+        0.0005550000005314359,
+        0.0005240000000412692,
+        0.004009999999652791,
+        0.0005580000006375485,
+        0.0004989999997633277,
+        0.00048999999944499,
+        0.0006270000003496534,
+        0.00047400000039488077,
+        0.00047199999971780926,
+        0.0004600000002028537,
+        0.00046599999950558413,
+        0.003072000000429398,
+        0.0005240000000412692
+      ]
+    },
+    {
+      "name": "settle-cold-high",
+      "quality": "high",
+      "frames": 31,
+      "simulatedSeconds": 0.5166666666666667,
+      "firstVisibleFrame": 0,
+      "settled": true,
+      "totalMs": 445.49723599999743,
+      "maxMs": 443.068319,
+      "p95Ms": 1.5168089999997392,
+      "p99Ms": 443.068319,
+      "rootHash": "b2e2be1c87c0f5aa0287f98407a8621c025b86350ab42a7f78e166a15fc946f5",
+      "finalStats": {
+        "representation": "photographic-short-lawn",
+        "draws": 2,
+        "triangles": 279996,
+        "instances": 8249,
+        "submittedLeaves": 139998,
+        "activeTiles": 102,
+        "cachedTiles": 129,
+        "textureResolution": 1024,
+        "textureHeight": 512,
+        "triangleLimit": 280000,
+        "drawLimit": 16,
+        "allocatedInstanceBytes": 819200,
+        "transitionRoots": 0,
+        "ready": true
+      },
+      "samples": [
+        443.068319,
+        0.1308390000003783,
+        0.09686800000054063,
+        0.2187979999998788,
+        0.11583599999994476,
+        0.07618599999932485,
+        0.07501200000024255,
+        0.07503700000052049,
+        0.07486399999925197,
+        1.5168089999997392,
+        0.0322360000000117,
+        0.0009579999996276456,
+        0.0005350000001271837,
+        0.0005029999992984813,
+        0.0004929999995511025,
+        0.0004890000000159489,
+        0.0005800000008093775,
+        0.0004800000006071059,
+        0.00048100000003614696,
+        0.0004929999995511025,
+        0.0033309999998891726,
+        0.0006149999999252032,
+        0.0005369999998947605,
+        0.0007539999996879487,
+        0.0005129999999553547,
+        0.00047899999935907545,
+        0.000481999999465188,
+        0.0004749999998239218,
+        0.0005749999991166987,
+        0.0029130000002624,
+        0.0007460000006176415
+      ]
+    },
+    {
+      "name": "settle-cold-low",
+      "quality": "low",
+      "frames": 31,
+      "simulatedSeconds": 0.5166666666666667,
+      "firstVisibleFrame": 0,
+      "settled": true,
+      "totalMs": 75.33480099999997,
+      "maxMs": 75.07246299999952,
+      "p95Ms": 0.12506699999994453,
+      "p99Ms": 75.07246299999952,
+      "rootHash": "2ecb6f213d0895501516732ede3aff3b0c78c6c7ddf46778b8d1cf9282683e1e",
+      "finalStats": {
+        "representation": "photographic-short-lawn",
+        "draws": 2,
+        "triangles": 59998,
+        "instances": 715,
+        "submittedLeaves": 29999,
+        "activeTiles": 17,
+        "cachedTiles": 44,
+        "textureResolution": 1024,
+        "textureHeight": 512,
+        "triangleLimit": 60000,
+        "drawLimit": 8,
+        "allocatedInstanceBytes": 87040,
+        "transitionRoots": 0,
+        "ready": true
+      },
+      "samples": [
+        75.07246299999952,
+        0.022903000000042084,
+        0.0063589999999749125,
+        0.0061700000005657785,
+        0.005950000000666478,
+        0.006191000000399072,
+        0.03890899999987596,
+        0.00646000000051572,
+        0.006155000000035216,
+        0.12506699999994453,
+        0.021560999999564956,
+        0.0007040000000415603,
+        0.0008159999997587875,
+        0.0004980000003342866,
+        0.00047500000073341653,
+        0.00046300000030896626,
+        0.0005109999992782832,
+        0.0006160000002637389,
+        0.0004959999996572151,
+        0.00048799999967741314,
+        0.0033260000000154832,
+        0.0005920000003243331,
+        0.000525999999808846,
+        0.0004939999998896383,
+        0.0006370000000970322,
+        0.00048299999980372377,
+        0.0004980000003342866,
+        0.0004840000001422595,
+        0.00047899999935907545,
+        0.003464999999778229,
+        0.0005619999992632074
+      ]
+    }
+  ]
+}

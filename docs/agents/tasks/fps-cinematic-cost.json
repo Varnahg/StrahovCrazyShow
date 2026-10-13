@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "fps-cinematic-cost",
+  "title": "Omezit opakovanou přípravu odrazů oblohy a postprocess řetězce",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/cinematic.ts",
+    "client/sky-reflection.ts",
+    "tests/sky-reflection.test.ts",
+    "tests/cinematic.test.ts",
+    "docs/agents/handoffs/fps-cinematic-cost.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zachovat bajty cubemapy a SH koeficienty v numerické toleranci.",
+    "Sestavit konečné postprocess nastavení jednou a zachovat render quality kontrakty."
+  ],
+  "verification": [
+    "Cílené regresní testy a společný srovnatelný CPU profil pod koordinátorem."
+  ],
+  "notes": [
+    "Root koordinuje heavy-validation; nepouštět samostatný browser nebo full test/build."
+  ]
+}

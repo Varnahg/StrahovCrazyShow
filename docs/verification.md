@@ -1,5 +1,15 @@
 # Ověření dema a známá omezení
 
+## Propady FPS · 13. října 2026
+
+**703/703 testů PASS, finální produkční build včetně TypeScript a celá izolovaná síťová integrace PASS.** Po celé sadě se opravily pouze dvě typové deklarace; jejich transpilační výstup je přesně stejný. Záznam všech checkpointů, obou předchozích neúspěšných testů a první typové chyby je v [auditu a evidenci](performance/fps-drops-20261013.md). Finální snapshot `c48c0e1898b37075401f56005e3863b25b62b27867baa55643aa4b45fad1dc09` obsahuje **8363 vstupních souborů včetně testů**.
+
+Pohyb a otáčení nyní připravují trávu postupně; světlo B6 zbytečně nesynchronizuje celou scénu při každém kroku. Svítilna vynechává redundantní invalidaci stínů a používá stejné pole casterů. Obloha opakuje výrazně levnější předpočítanou projekci, fyzika netvoří cestující a skryté kontaktní stíny neprovádějí zbytečnou práci. Herní geometrie, kolizní polohy, hustotní rozpočty a fyzikální tick se tím nemění.
+
+Dílčí grass replay snížil největší špičky studeného medium **384→51 ms** a přesunu **595→60 ms**. Kandidát však v těchto oknech ještě doplňuje trávu, má vyšší součet časů aktualizací a větší cache (15 MiB samotných matic uvnitř cache). Jiný studený scénář obsahuje i **176,59ms výkyv**, který se při diagnostickém opakování neobjevil. Nejde o garanci 16,7ms snímku. Všechny čtyři zcela ustálené výhledy mají přesně původní ID/pozice/LOD kořenů. [Čísla, tradeoffy a přehled dalších metod](performance/fps-drops-20261013.md).
+
+Skutečná produkční hra s HUD a jedním hostem prošla opakovaným F a smoke kontrolou vstupů pohybu/kamery: **0 render chyb a výjimek stránky**, svět/fyzika/B6/auto `ready`. [Snímek hry](performance/evidence/fps-drops-20261013/flashlight-after.png), [po vstupech](performance/evidence/fps-drops-20261013/flashlight-after-movement.png). Cloud používá **SwiftShader bez fyzické GPU**, CSS 960×720, interně 738×553; počasí bylo nedostupné a čas skutečný. Není to cílový GPU FPS benchmark, kontrolované A/B ani kompletní fyzický průchod B6. První shaderové varianty a uploady zůstávají další prioritou měření. Testovací server a browser jsou po kontrole ukončené; tento checkpoint nenahrazuje historické uživatelské preview popsané níže.
+
 ## Blender budovy B1 · 12. října 2026
 
 **675/675 testů, produkční build a celá izolovaná síťová integrace PASS**, bez opakování. Společný snapshot `16b469a2685a08dce9b886bdd4828033d5c10c62b8bc338b14d61b32c7d14b65` obsahuje **8353 souborů včetně všech testů a jejich Blender audit fixtures**; navazuje na dokončenou atmosféru/outdoor `7dac0a4`, protokol 10. [Protokol a stav přejímky](verification-evidence/building-models-20261012/README.md).

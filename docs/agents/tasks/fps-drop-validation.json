@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "fps-drop-validation",
+  "title": "Ověřit a integrovat optimalizace propadů FPS",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/performance/fps-drops-20261013.md",
+    "docs/performance/evidence/fps-drops-20261013/",
+    "docs/agents/handoffs/fps-drop-validation.md",
+    "docs/verification.md",
+    ".cache/fps-drops/",
+    ".cache/performance-snapshot/",
+    "dist/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4175",
+    "port:2570",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Zaznamenat baseline, srovnat CPU práci a ověřit skutečné vykreslení.",
+    "Sekvenčně ověřit testy, build a izolovanou integraci; přesně uvést limity softwarového GPU.",
+    "Integrovat autorizované změny do main bez přepsání cizí práce."
+  ],
+  "verification": [
+    "Cílené CPU profily před/po",
+    "pnpm test",
+    "pnpm build",
+    "pnpm test:integration",
+    "Produkční prohlížeč s HUD a skutečným WebGL"
+  ],
+  "notes": [
+    "Uživatelské zadání 13.10.2026: prověřit a optimalizovat FPS dropy, commit a main.",
+    "Koordinátor vlastní společné měření; podagenti pouze cílené lehké testy do domluveného okna."
+  ]
+}

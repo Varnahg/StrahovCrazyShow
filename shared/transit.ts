@@ -441,14 +441,16 @@ function avatarFor(seed: number): AvatarConfig {
     face: Math.floor(r() * 2),
   };
 }
-export function sampleTransit(now: number): TransitFrame {
-  const buses: TransitBus[] = [],
-    passengers: TransitPassenger[] = [];
+/** Vehicle motion and passengers share the same timetable clock. Physics only
+ * needs the non-pedestrian obstacles, so it must not build the visual crowd. */
+function sampleScheduledTransit(now: number, passengers?: TransitPassenger[]) {
+  const buses: TransitBus[] = [];
   for (const day of daysFor(now)) {
     const seconds = (now - day.epoch) / 1000;
     for (const trip of day.trips) {
       const bus = sampleTrip(trip, seconds);
       if (bus) buses.push({ ...bus, id: `${day.date}:${trip.id}` });
+      if (!passengers) continue;
       for (const stop of trip.stops) {
         const paths = journeysByStop.get(stop[0]);
         if (!paths?.length || stop[4] === 1) continue;
@@ -482,20 +484,45 @@ export function sampleTransit(now: number): TransitFrame {
       }
     }
   }
+  return buses;
+}
+export type TransitVehicleFrame = Pick<TransitFrame, "buses" | "traffic">;
+
+/** Exact collision vehicles without passenger routes, avatars or UI status. */
+export function sampleTransitVehicles(now: number): TransitVehicleFrame {
   return {
-    buses,
+    buses: sampleScheduledTransit(now),
+    traffic: sampleAmbientTraffic(now),
+  };
+}
+export function sampleTransit(now: number): TransitFrame {
+  const passengers: TransitPassenger[] = [];
+  return {
+    buses: sampleScheduledTransit(now, passengers),
     passengers,
     traffic: sampleAmbientTraffic(now),
     status: transitStatus(now),
   };
 }
+// These centre lines come from the immutable bundled feed. Cache their metric
+// lengths once, rather than slicing/reducing every physics and visual sample.
+const ambientRoutes = ["L143V1", "L143V2"].map((key) => {
+  const shape = TRANSIT_FEED.shapes[key];
+  let length = 0;
+  if (shape)
+    for (let i = 1; i < shape.length; i++)
+      length += Math.hypot(
+        shape[i][0] - shape[i - 1][0],
+        shape[i][1] - shape[i - 1][1],
+      );
+  return { shape, length };
+});
 /** Fictional background traffic on the actual road centre lines, independent of GTFS service validity. */
 export function sampleAmbientTraffic(now: number): TransitCar[] {
   const output: TransitCar[] = [],
     t = now / 1000;
-  const shapes = [TRANSIT_FEED.shapes.L143V1, TRANSIT_FEED.shapes.L143V2];
-  for (let direction = 0; direction < shapes.length; direction++) {
-    const shape = shapes[direction];
+  for (let direction = 0; direction < ambientRoutes.length; direction++) {
+    const { shape, length } = ambientRoutes[direction];
     if (!shape) continue;
     const duration = 75,
       period = 135,
@@ -507,20 +534,13 @@ export function sampleAmbientTraffic(now: number): TransitCar[] {
     output.push({
       id: `traffic:${direction}:${slot}`,
       ...alongShape(shape, distance),
-      speed:
-        shape
-          .slice(1)
-          .reduce(
-            (sum, p, i) =>
-              sum + Math.hypot(p[0] - shape[i][0], p[1] - shape[i][1]),
-            0,
-          ) / duration,
+      speed: length / duration,
     });
   }
   return output;
 }
 /** Shared kinematic obstacle contract for the root simulation; NPCs remain social, nonblocking walkers. */
-export function transitObstacles(frame: TransitFrame) {
+export function transitObstacles(frame: TransitVehicleFrame) {
   const obstacle = (
     vehicle: TransitCar | TransitBus,
     dimensions: { x: number; y: number; z: number },

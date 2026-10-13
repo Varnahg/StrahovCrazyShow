@@ -220,7 +220,10 @@ test("steady torch updates reuse the prop/light and do not repeat enabled or lig
     torch.update(rig, camera, false, false, "high");
   assert.equal(bodyEnables, 1);
   assert.equal(lightEnables, 1);
-  assert.equal(torch.beam.light.shadowEnabled, false);
+  assert.equal(torch.beam.light.shadowEnabled, true);
+  assert.ok(
+    scene.meshes.every((mesh) => !mesh.lightSources.includes(torch.beam.light)),
+  );
 });
 
 test("profile replacement and missing/disposed rigs do not recreate orphan props or lose controller-owned materials", (t) => {
@@ -330,6 +333,8 @@ test("128/256/512 torch shadows share one generator and real scene scheduling em
   assert.equal(passes, 0);
   assert.equal(draws, 0);
   assert.equal(torch.beam.light.intensity, 0);
+  assert.equal(torch.beam.light.shadowEnabled, true);
+  assert.ok(!caster.lightSources.includes(torch.beam.light));
   torch.update(rig, camera, true, true, "low");
   scene.render();
   assert.ok(
