@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "fix-babylon-image-processing-ownership-20261014",
+  "title": "KEY-17: pinovaná oprava vlastnictví Babylon ImageProcessingPostProcess",
+  "status": "ready",
+  "dependsOn": ["research-visual-lighting-20261014"],
+  "writePaths": [
+    "package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "patches/@babylonjs__core@9.30.0.patch",
+    "tests/babylon-image-processing-ownership.test.ts",
+    "docs/performance/research-20261014/image-processing-ownership.md",
+    "docs/agents/handoffs/fix-babylon-image-processing-ownership-20261014.md",
+    ".cache/image-processing-ownership/",
+    "node_modules/"
+  ],
+  "resources": ["heavy-validation"],
+  "acceptance": [
+    "Před zápisem dokončit výzkum constructor/dispose a aktuálního pnpm patch workflow. Vlastní interně vytvořený Thin wrapper přesně jednou uvolnit; dodané/půjčené/sdílené wrappery ponechat volajícímu.",
+    "Žádný klientský protected/private cast, prototype patch, oslabení observer testu ani změna jiné dependency. Předaný IMAGE-01 runtime kandidát se v tomto tasku neupravuje.",
+    "Nezávislá WT instalace a reprodukovatelný verzovaný patch s frozen lockfile. Main node_modules a vyřešené původní B6 snapshot dependencies zůstanou byte-identické.",
+    "Cílený refaktoring, red/green regrese skutečného Babylonu, přesný samostatný commit delta a handoff. Žádná nepodložená tvrzení o obrazu/FPS nebo hotové KEY-14."
+  ],
+  "verification": [
+    "Skutečný ImageProcessingPostProcess: numeric/object/explicit-undefined options, owned/borrowed/shared wrapper, config replacement, double a multi-camera dispose; bounded config observers a effect lifecycle.",
+    "Ověřit obnovu patchované instalace z lockfile v izolovaném prostoru. Úzké typy a relevantní stávající postprocess testy. Celou sadu/build/integraci přidělit samostatnému stabilnímu checkpointu, nikoli spouštět bez všech zdrojů.",
+    "Žádný server, browser, GPU ani build v tomto tasku. Žádné odstraňování nebo přesměrování existujících junctionů."
+  ],
+  "notes": [
+    "Provádět v nové managed worktree založené koordinátorem z přesného lokálního commitu f63039b4067d57c8bdbe560ead5719cfc05cbb0d; konkrétní vrácenou cestu zaznamenat před claimem. Dosavadní playtest-repairs-wave4 ani main instalaci neměnit. Tento JSON je zadání, ne aktivní rezervace; claim před jakýmkoli zápisem.",
+    "Důkaz a předání: WT docs/agents/handoffs/fix-material-image-processing-20261014.md a visual-lighting.md sekce 7. Volba a zamítnuté alternativy v main decision-register; Linear KEY-17 blokuje KEY-4/14/11.",
+    "Původní WT node_modules odkazuje do main/node_modules a B6 baseline/candidate závisejí na témže odkazu. Jejich změna byla odmítnuta: checkScopeFilesystem nepřipouští rezervaci existujícího junctionu. Použít novou worktree bez node_modules, rezervovat ji a instalovat vlastní zamčené závislosti. Původní WT, oba B6 linky a standalone zůstanou nedotčené.",
+    "Před instalací ověřit pnpm11.25.0 patch syntax a patch filename. Při jiném nutném výstupu požádat koordinátora o změnu rezervace, nerozšiřovat scope. Sdílený package store nepovažovat za prostor k ruční editaci.",
+    "Uživatel odložil pouze svou GUI přejímku a požádal o přípravu na později. Není povolené označit runtime kandidáty za přijaté ani je přimíchat do již uloženého B6 A/B."
+  ]
+}

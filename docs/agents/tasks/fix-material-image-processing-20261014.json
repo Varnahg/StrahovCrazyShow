@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "fix-material-image-processing-20261014",
+  "title": "KEY-14/4: obnovit účinný materiálový image-processing bez dalšího fullscreen průchodu",
+  "status": "blocked",
+  "dependsOn": [
+    "research-visual-lighting-20261014",
+    "fix-babylon-image-processing-ownership-20261014"
+  ],
+  "writePaths": [
+    "client/cinematic.ts",
+    "tests/cinematic-image-processing.test.ts",
+    "docs/performance/research-20261014/visual-lighting.md",
+    "docs/agents/handoffs/fix-material-image-processing-20261014.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Implementovat po zdokumentovaném rozhodnutí pouze veřejný non-HDR DefaultPipeline/material-side kontrakt, bez změn palet, exposure čísel, intenzit světel, textur nebo shaderů.",
+    "Skutečné isEnabled/applyByPostProcess a Standard/PBR prepareDefines musí odpovídat zamýšlenému ACES/grade při low-first, medium-first i přechodech kvalit; žádný fullscreen ImageProcessing pass a žádný lifecycle leak.",
+    "Původní kód musí novou skutečnou regresi reprodukčně nesplnit. Přijatý fix musí mít samostatný delta patch vůči wave3, aby neobsahoval starší reuse WIP při commitu.",
+    "Cílený refaktoring a relevantní testy společně. Praktická GPU/obrazová přejímka a main integrace zůstávají odložené uživatelem."
+  ],
+  "verification": [
+    "Nový samostatný test používá skutečný CinematicAtmosphere/Scene/Standard/PBR/DefaultPipeline, ne pouze scalar config hodnoty. Krytí expozice za low, quality návrat, vlastněných/explicitních material config a disposal.",
+    "Původní tests/cinematic-atmosphere.test.ts a cinematic-art.test.ts spustit beze změn; pokud je změna nutná kvůli skutečnému kontraktu, nejprve požádat koordinátora o přesný scope, ne oslabovat assertions.",
+    "Jen lehké cílené CPU testy a úzké typy. Žádný browser/GPU/fullsuite/build/server. Root koordinuje stabilní checkpoint."
+  ],
+  "notes": [
+    "Pouze C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow, branchcodex/playtest-repairs-wave4. Main a zmrazené B6 snapshoty zůstanou beze změn.",
+    "client/cinematic.ts již obsahuje doložený starší wave3 reuse WIP. Koordinátor root jej explicitně předává z bootstrapu (handoff repair-wave4-bootstrap) pro úzkou nadstavbu, zachovat celý původní diff. Adopt-dirty je doložený převod.",
+    "Výzkum visual-lighting.md ze main je vlastní práce příjemce/již předaný dokument; smí se byte-exact zkopírovat do přidělené WT cesty a doplnit o implementační výsledek.",
+    "Zatím necommitovat; root ověří samostatný delta commit bez staršího reuse WIP a připraví jednotlivou integraci až po praktické přejímce.",
+    "14.10 předán nepřijatý kandidát: původní kontrakt 1/7 PASS, kandidát 5/7 PASS; dva disposal testy prokazují živý ThinIP observer po dispose. Původní testy 8/8 a úzký TS PASS. Přesný diff/hash/provenience ve WT handoffu fix-material-image-processing-20261014.md. Agent uvolnil rezervaci, žádné helpery neběží. Blokuje KEY-17, nikoli chybějící souhlas uživatele."
+  ]
+}
