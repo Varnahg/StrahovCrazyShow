@@ -1,0 +1,112 @@
+{
+  "atUTC": "2026-10-14T20:35:04.175Z",
+  "archive": {
+    "path": "C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/playtest-repairs-validation/snapshots/wave3/.cache/game-diagnostics/07c227f8-d2f8-4011-a6f8-5d27ad0627a4.jsonl",
+    "sha256": "0ebf9512e10df06d94121358a57133885b7d0371b10d3b0b3027dbbce4b46dbb"
+  },
+  "assertions": "PASS",
+  "results": {
+    "status": "observed-intervals",
+    "scope": "Observed counter increments between comparable retained server-clock snapshots; not a full-session total. Each segment's first value is a baseline, not observed work. The sum is a lower bound only assuming counter continuity inside those segments. No server-instance ID is recorded: an unobserved restart may be undetectable. Unsampled start/end, gaps and callback peaks remain unknown. Room clock counters are separate from player queue counters and recovery events.",
+    "samples": 479,
+    "comparableIntervals": 475,
+    "observed": {
+      "callbacks": 21395,
+      "droppedMs": 283.3333333333344
+    },
+    "sampledCurrentMaxMs": {
+      "elapsed": 32.06140000000596,
+      "cpu": 15.38980000000447
+    },
+    "reportedLifetimeMaxMs": {
+      "elapsed": 1108.652699999977,
+      "cpu": 1108.5656999999192
+    },
+    "diagnostics": {
+      "ambiguousLog": false,
+      "ambiguousSequences": 0,
+      "duplicateContexts": 17,
+      "conflictingContexts": 0,
+      "missingSamples": 0,
+      "invalidSamples": 0,
+      "unavailableTimingValues": 0,
+      "staleContexts": 0,
+      "counterResets": 0,
+      "clockConflicts": 0,
+      "sequenceGaps": 0,
+      "recordingGaps": 0,
+      "lifecycleBoundaries": 6,
+      "numericOverflows": 0
+    },
+    "segments": [
+      {
+        "fromSeq": 259,
+        "toSeq": 1796,
+        "fromContextAtMs": 74830.30000019073,
+        "toContextAtMs": 564182.8000001907,
+        "baseline": {
+          "callbacks": 86629,
+          "droppedTotalMs": 3966.6666666666665
+        },
+        "last": {
+          "callbacks": 108024,
+          "droppedTotalMs": 4250.000000000001
+        },
+        "intervals": 475,
+        "callbacksDelta": 21395,
+        "droppedMsDelta": 283.3333333333344
+      }
+    ],
+    "omittedSegments": 0
+  },
+  "files": [
+    {
+      "path": "scripts/diagnostics-report.mjs",
+      "sha256": "3c402e4cfd1913733520ea18aa6f3c76b9c180c8bd88684706945757ed2390e4"
+    },
+    {
+      "path": "tests/diagnostics-report.test.ts",
+      "sha256": "e1e8c131407b3c4c2412b96a9032c28518d9e6c373dc0ee5c48f94c9a8b4f8d6"
+    },
+    {
+      "path": "docs/performance/research-20261014/server-clock-report.md",
+      "sha256": "34b736838d57d928f92b8e84d66fd377736a6ccc1b1dcdf689af8e4c3e4128ab"
+    },
+    {
+      "path": "docs/agents/handoffs/report-server-clock-deltas-20261014.md",
+      "sha256": "f118bc482afb22b72fa75c3ab5f1bc503c2273d2f618cb432b25adfadd279098"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/red.log",
+      "sha256": "c40d4692752a567353e819dbdd9839bb717200e79c96f89241b444b86a4755ff"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/green-1.log",
+      "sha256": "fd18051944468d5c350546cbab4e7b16f069515139ebcb1a86b68c557e063280"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/green-2.log",
+      "sha256": "f7636efebe3b2415488fb33a6c561e8702be34d5343e8cf772d055c26d8618e9"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/green-3.log",
+      "sha256": "1cb51bdb652f79be8a0fb0c40483fc97ac85f034d888712e88af156da81da4f1"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/green-4.log",
+      "sha256": "3a3d99cc8fbce7609b1ee7d6faa82824bd454ea61103c63532420dbf554d6071"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/green-final.log",
+      "sha256": "a633e0fc0817db01212eafdf08913dd95c0f22bb06983a05ef13e61db104a4d6"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/archive-report-final.json",
+      "sha256": "e86dab225b58ca205900d60cc819b9ee465d0e288038ebcfa02b9998df673d75"
+    },
+    {
+      "path": ".cache/server-clock-report-feature/archive-report-final.txt",
+      "sha256": "6737fc7e36fc09b5860e7214889a6a21b9951c7b504f6f0668472b5bd5841fc2"
+    }
+  ]
+}

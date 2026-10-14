@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "report-server-clock-deltas-20261014",
+  "title": "KEY-18 / KEY-2: oddělit pozorované přírůstky serverového času od lifetime hodnot",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/diagnostics-report.mjs",
+    "tests/diagnostics-report.test.ts",
+    "docs/performance/research-20261014/server-clock-report.md",
+    "docs/agents/handoffs/report-server-clock-deltas-20261014.md",
+    ".cache/server-clock-report-feature/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před implementací zapsat zjištěnou chybějící funkci, varianty a přesný význam výstupu. Jde o již popsanou neherní část KEY-2, sledovanou samostatně jako KEY-18.",
+    "Číst pouze whitelist server.clock scalar hodnot z frame-window contextu. První vzorek je baseline; součet porovnatelných přírůstků callbacks a droppedTotalMs je oddělený od vzorkovaných callback maxima a hlášených lifetime maxima.",
+    "Deduplikace batch/seq/contextů, determinismus při přeházených částech, konfliktní snapshoty, mezery/lifecycle a pokles čítačů nesmějí vytvořit falešný přírůstek. Jediný vzorek nebo chybějící data nemají přírůstek0, ale unavailable.",
+    "Read-only původní logy, žádné síťové dotazy či Game/server/emitter změny, žádné queue agregace s jiným lifecycle. Pevný whitelist, finite/safeInteger, overflow kontrola a bounded podrobnosti.",
+    "Red/green fixtures, zachované původní report/CLI testy a praktický plain Node report nad existujícím07c logem s ověřeným SHA. Handoff musí uvést výpočty a skutečné meze pozorovaných intervalů."
+  ],
+  "verification": [
+    "Pouze vlastní idle WT key17-ownership-integration s obsahem main af4d6ef; původní B6/KEY7/KEY17 evidence a LFS jsou read-only. Instalace již připravená.",
+    "Lehké cílené CLI/diagnostics testy a read-only archivní analýza; žádný browser, hra, GPU, server, build nebo plná sada bez root rezervace.",
+    "Zdrojový archiv main/.cache/playtest-repairs-validation/snapshots/wave3/.cache/game-diagnostics/07c227f8-d2f8-4011-a6f8-5d27ad0627a4.jsonl zůstane beze změny. Očekáváme callbacks+21395, dropped+283.3333ms, sampledCPUmax15.3898ms vs lifetime1108.5657ms."
+  ],
+  "notes": [
+    "Current committed Game server context zatím neemitoval; tato offline čtečka zpracuje existující archivní nebo další kompatibilní záznamy. Absenci dat musí přiznat; širší KEY-2 není touto změnou Done.",
+    "Koordinátor předává pouze tento rozsah. Main script/test jsou čisté; ostatní WIP se nepřebírá. Root dokončí review, plnou kontrolu podle rozsahu, commit/push a Linear.",
+    "Root accepted snapshot54f3532699e234a935b9cc7e8d85bc99d6aafc939903f631c262ebb5670e4d08:29 focused/892 full tests, build and plain Node JSON/text archive proof PASS. KEY-18 complete without game testing; parent KEY-2 remains open."
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "startedAt": "2026-10-14T20:35:07.764Z",
+  "completedAt": "2026-10-14T20:35:08.209Z",
+  "jsonExitCode": 0,
+  "textExitCode": 0,
+  "sourceSha256": "0ebf9512e10df06d94121358a57133885b7d0371b10d3b0b3027dbbce4b46dbb",
+  "sourceUnchanged": true,
+  "rawFrameServerRecords": 496,
+  "scriptSha256": "3c402e4cfd1913733520ea18aa6f3c76b9c180c8bd88684706945757ed2390e4",
+  "testSha256": "e1e8c131407b3c4c2412b96a9032c28518d9e6c373dc0ee5c48f94c9a8b4f8d6",
+  "serverClock": {
+    "status": "observed-intervals",
+    "scope": "Observed counter increments between comparable retained server-clock snapshots; not a full-session total. Each segment's first value is a baseline, not observed work. The sum is a lower bound only assuming counter continuity inside those segments. No server-instance ID is recorded: an unobserved restart may be undetectable. Unsampled start/end, gaps and callback peaks remain unknown. Room clock counters are separate from player queue counters and recovery events.",
+    "samples": 479,
+    "comparableIntervals": 475,
+    "observed": {
+      "callbacks": 21395,
+      "droppedMs": 283.3333333333344
+    },
+    "sampledCurrentMaxMs": {
+      "elapsed": 32.06140000000596,
+      "cpu": 15.38980000000447
+    },
+    "reportedLifetimeMaxMs": {
+      "elapsed": 1108.652699999977,
+      "cpu": 1108.5656999999192
+    },
+    "diagnostics": {
+      "ambiguousLog": false,
+      "ambiguousSequences": 0,
+      "duplicateContexts": 17,
+      "conflictingContexts": 0,
+      "missingSamples": 0,
+      "invalidSamples": 0,
+      "unavailableTimingValues": 0,
+      "staleContexts": 0,
+      "counterResets": 0,
+      "clockConflicts": 0,
+      "sequenceGaps": 0,
+      "recordingGaps": 0,
+      "lifecycleBoundaries": 6,
+      "numericOverflows": 0
+    },
+    "segments": [
+      {
+        "fromSeq": 259,
+        "toSeq": 1796,
+        "fromContextAtMs": 74830.30000019073,
+        "toContextAtMs": 564182.8000001907,
+        "baseline": {
+          "callbacks": 86629,
+          "droppedTotalMs": 3966.6666666666665
+        },
+        "last": {
+          "callbacks": 108024,
+          "droppedTotalMs": 4250.000000000001
+        },
+        "intervals": 475,
+        "callbacksDelta": 21395,
+        "droppedMsDelta": 283.3333333333344
+      }
+    ],
+    "omittedSegments": 0
+  },
+  "textClockLines": [
+    "Server clock: observed-intervals; observed increments 21395 callbacks / 283.33 ms dropped across 475 comparable intervals; 479 retained samples.",
+    "Server clock sampled callback maxima elapsed/CPU: 32.06 / 15.39 ms; reported lifetime maxima elapsed/CPU: 1108.65 / 1108.57 ms (may include work before the first observation).",
+    "Server clock scope: Observed counter increments between comparable retained server-clock snapshots; not a full-session total. Each segment's first value is a baseline, not observed work. The sum is a lower bound only assuming counter continuity inside those segments. No server-instance ID is recorded: an unobserved restart may be undetectable. Unsampled start/end, gaps and callback peaks remain unknown. Room clock counters are separate from player queue counters and recovery events.",
+    "Server clock coverage: {\"ambiguousLog\":false,\"ambiguousSequences\":0,\"duplicateContexts\":17,\"conflictingContexts\":0,\"missingSamples\":0,\"invalidSamples\":0,\"unavailableTimingValues\":0,\"staleContexts\":0,\"counterResets\":0,\"clockConflicts\":0,\"sequenceGaps\":0,\"recordingGaps\":0,\"lifecycleBoundaries\":6,\"numericOverflows\":0}; 0 segment details omitted."
+  ]
+}
