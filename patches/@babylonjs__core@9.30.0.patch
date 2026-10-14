@@ -1,0 +1,57 @@
+diff --git a/PostProcesses/imageProcessingPostProcess.js b/PostProcesses/imageProcessingPostProcess.js
+index c514ea1a28f4d9381e5b745a8c8398a76d494760..1aef6cc0de3973ee9594ccf0c0538808901c82f3 100644
+--- a/PostProcesses/imageProcessingPostProcess.js
++++ b/PostProcesses/imageProcessingPostProcess.js
+@@ -338,11 +338,15 @@ let ImageProcessingPostProcess = (() => {
+                     ...options,
+                     blockCompilation: true,
+                 };
++                const suppliedEffectWrapper = localOptions.effectWrapper;
++                const ownedEffectWrapper = suppliedEffectWrapper == null ? new ThinImageProcessingPostProcess(name, engine, localOptions) : null;
+                 super(name, ThinImageProcessingPostProcess.FragmentUrl, {
+-                    effectWrapper: typeof options === "number" || !options.effectWrapper ? new ThinImageProcessingPostProcess(name, engine, localOptions) : undefined,
+                     ...localOptions,
++                    // Keep the resolved wrapper after the spread, including explicit undefined options.
++                    effectWrapper: suppliedEffectWrapper ?? ownedEffectWrapper,
+                 });
+                 __runInitializers(this, _instanceExtraInitializers);
++                this._ownedImageProcessingWrapper = ownedEffectWrapper;
+                 // Applied here (not just inside ThinImageProcessingPostProcess's own constructor) so that `temperature`/
+                 // `tint` are honored even when a caller supplies their own pre-built `effectWrapper`, in which case the
+                 // thin wrapper above is never constructed and its own application of these options never runs.
+@@ -365,9 +369,15 @@ let ImageProcessingPostProcess = (() => {
+                 this._effectWrapper._updateParameters();
+             }
+             dispose(camera) {
+-                super.dispose(camera);
+-                if (this._imageProcessingConfiguration) {
+-                    this.imageProcessingConfiguration.applyByPostProcess = false;
++                const ownedEffectWrapper = this._ownedImageProcessingWrapper;
++                this._ownedImageProcessingWrapper = null;
++                try {
++                    // Only this constructor's wrapper owns its configuration cleanup.
++                    ownedEffectWrapper?.dispose();
++                }
++                finally {
++                    // Every camera still needs base teardown, also on repeated/reentrant calls.
++                    super.dispose(camera);
+                 }
+             }
+         },
+diff --git a/PostProcesses/postProcess.pure.js b/PostProcesses/postProcess.pure.js
+index c1a7836d3fa0752b5af76534049d23f63080d88a..52afa346cb94cd6d1309ac5c2742d089d83ce9d3 100644
+--- a/PostProcesses/postProcess.pure.js
++++ b/PostProcesses/postProcess.pure.js
+@@ -822,7 +822,11 @@ let PostProcess = (() => {
+                 this.onApplyObservable.clear();
+                 this.onBeforeRenderObservable.clear();
+                 this.onSizeChangedObservable.clear();
+-                this.onEffectCreatedObservable.clear();
++                // This observable aliases the wrapper's event source. A supplied wrapper
++                // and its subscribers belong to the caller, possibly shared by other passes.
++                if (!this._useExistingThinPostProcess) {
++                    this.onEffectCreatedObservable.clear();
++                }
+             }
+             /**
+              * Serializes the post process to a JSON object

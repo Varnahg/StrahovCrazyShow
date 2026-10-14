@@ -385,3 +385,12 @@ Final B3 source `e94b95757c44c2d58c63a3df2bb7ecc8581725271fc9ff29124919a7988928a
 B3 full validation completed:684/684 tests and build PASS; first integration had a right-wheel-steering timeout. The unchanged complete isolated retry PASS is retained separately alongside the original failure and actual vehicle evidence. Root cause of the first timeout is not established; no timing threshold or physics was changed to make it pass. [Both attempts](verification-evidence/building-models-20261012/b3-integration-retry.json).
 
 Published locally: main7f65653, B3 source e94b95757c44c2d58c63a3df2bb7ecc8581725271fc9ff29124919a7988928a6 on4179/API2570. All8357 source files and277 served build files match,0 differences; health/collector PASS and live station weather restored. [Publication evidence](verification-evidence/building-models-20261012/b3-publication.json). Foreign untracked vegetation-audit files were preserved; no whole-checkout-clean claim.
+
+
+## KEY-17: Babylon ownership fix, 14 October 2026
+
+Current-main checkpoint `fe5fc15ff3c4e745f30cab4cdc21a2725b8f19732e2c9431a576d853b3b76993` contains 8393 tracked non-document inputs, including all156 test files and tracked assets. The existing candidate6df08fb was applied to main2c7aec9 with only four package/test changes: the pinned Babylon9.30.0 patch, lockfile, workspace configuration and ten lifecycle regressions. Independent review found no blocking ownership/security issue; no dependency version, shader, network, guest-isolation or gameplay API changed.
+
+Fresh offline frozen install PASS;26/26 focused tests,851/851 full tests, TypeScript/production build and the complete isolated multiplayer integration PASS. Two preparation failures are retained:843/846 with runtime GLB pointers, then850/851 with an authoring Blender pointer. All12 tracked LFS objects were subsequently restored and verified locally; no implementation/test change was made. All8393 corrected-checkpoint input hashes stayed identical. Original main dependency module/config hashes and resolved paths stayed unchanged. [Decision, security/impact review, exact manifest and full logs](performance/evidence/key17-main-20261014/README.md).
+
+This fixes owned-wrapper cleanup and preserves borrowed-wrapper subscribers; it does not establish GPU performance or visual acceptance. KEY-4/14 and movement/B6/texture issues remain open. Existing previews and their shared installed packages are unchanged; the committed lock/patch applies on a frozen install.
