@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "reproduce-network-latency-recovery-20261014",
+  "title": "KEY-7: reprodukovat přetrvávající posun hodin po vysokém RTT a nové epoše",
+  "status": "done",
+  "dependsOn": [
+    "research-netcode-camera-20261014"
+  ],
+  "writePaths": [
+    ".cache/network-latency-reproduction/",
+    "docs/performance/research-20261014/network-latency-recovery.md",
+    "docs/agents/handoffs/reproduce-network-latency-recovery-20261014.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před testovacím kódem zapsat hypotézu, reálné události, původ a limity dat i alternativy příčiny; raw RTT není automaticky wirelatency a longtask coverage neprokazuje nepřítomnost všech localdelay.",
+    "Reprodukovat přes skutečný frozen NetworkTimeline a podle potřeby skutečnou TimelineInputQueue posloupnost vysokéRTT→client-requestepoch→nízkéRTT/pravidelnáauthority. Ukázat zda odhadclock a produkovanésekvence zůstávají mimo serverovéokno, ne jen ruční výpočet hypotézy.",
+    "Zachovat původní log07c227f8 a všechny failed/positive runs. Přidat pozitivní kontrolu stabilní nízkéRTT a dokázat který vstup konkrétně mění výsledek. Nerozšířit limityani nezměnit productruntime.",
+    "Porovnat možnéopravnéstrategie, dopadna monotónnost/replay/lead/sender/epoch/uživatelskýpohyb a doporučit rozhodujícíregrese. Předat přesné zdroje, testcode, výstup a omezení. Implementace runtime až v novém claimu po tomto rozhodnutí."
+  ],
+  "verification": [
+    "Pouze levné deterministické CPUreprodukce a cílenétypy, žádný fullsuite/build/server/GPU/Blender ani instalace. Předtesty prověřit4186/2581 a novéJSONL; při aktivním hraní další zátěž odložit.",
+    "Importovat skutečné neměnné frozen wave3 moduly, nebo ověřit byteidentitu používaných hlavních zdrojů. Nevytvořit kopii algoritmu jako jediný důkaz chyby.",
+    "Nezaměnit tento problém za novouphaseopravu: ta zatím mění pouze prezentačnífázi a výsledeknejde vydávat za její regresi. Nesmí se změnit nebo přepsat žádný původní snapshot/log."
+  ],
+  "notes": [
+    "Pouze hlavní checkout C:/Users/rezac/Documents/GitHub/StrahovCrazyShow, zápisvýhradněnovécache/research/handoff. Networkruntime tam je frozenwave3; publicationagent současně píšeoddělenouWT a jeho scope se nesmí přebírat.",
+    "Zdrojový log C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/playtest-repairs-validation/snapshots/wave3/.cache/game-diagnostics/07c227f8-d2f8-4011-a6f8-5d27ad0627a4.jsonl, SHA0ebf9512e10df06d94121358a57133885b7d0371b10d3b0b3027dbbce4b46dbb. Snapshot0f20b5a7… a source-manifest jsou autorita.",
+    "Read-only audit reportingagenta našelRTT533.6ms seq1455→epoch33resync1456→freshRTT34ms, přetrvávajícíclockSeqAtAnchor−ack~11.6ticku a následných9aheadodmítnutí, předtím0. Jde o silnou časovouvazbu, nikoli zatímdůkaz každého odmítnutí.",
+    "Předchozí výzkum repair-live-network-audit a research-netcode-camera zachovat; původní6vysokýchRTTintervalů mělo2contexty bezezměnyproduced/serveraccepted, idle+63–68, authority/senderresetrostly. Ověřit vlastní výpočty a časovýgrain.",
+    "Root14.10 převzal skutečný frozen blackbox:3positivePASS/1expectedRED153ahead po freshlow, narrowTSexit0, původnílog/source/hash bezezměny. Opraven pouze terminologickýtext rejected.epoch=6; finalmanifest1360ac6611096dfe291bbe79b2fd13b938f834eb476d4b979647b2cdf58f7a37. ProductfixB následuje samostatně, problémA/RTTpolicy zůstává otevřený."
+  ]
+}

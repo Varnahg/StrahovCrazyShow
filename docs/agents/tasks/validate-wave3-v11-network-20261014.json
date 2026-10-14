@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-wave3-v11-network-20261014",
+  "title": "Ověřit oddělený V11 feature v celé hře před samostatnou integrací",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/wave3-v11-validation/",
+    "docs/performance/evidence/wave3-v11-network-20261014/",
+    "docs/agents/handoffs/validate-wave3-v11-network-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Začít až po skutečném ukončení zápisů a cíleném předání publication V11 agenta. Převzít32source paths se skutečným assemblymanifestem; všechny ostatní source/test/config soubory porovnat s HEAD5f9b011, žádné skryté závislosti ve WIP.",
+    "Vytvořit nový neměnný snapshot se všemi testy, potřebnými fixtures a identifikovanými původními assety. Původní diagnostics baseline, wave3 i právě hraný B6 zůstávají nezměněné.",
+    "Sekvenčně pnpm test, pnpm build, plný izolovaný pnpm test:integration. Zachovat každý fail bez přepsání a řešit příčinu v samostatném povoleném scope; žádné oslabení assertion nebo předstíraný PASS.",
+    "Po ověření zachování všech source hashů, ukončení vlastních procesů a volný2568. Připravit evidence pro jeden atomický V11 commit a následný samostatný phasefix."
+  ],
+  "verification": [
+    "Před každým heavykrokem kontrolovat skutečné klienty4186/2581 a nové herní logy; při hře dál nezatěžovat. Žádný GPU/browser/Blender ani zásah do existujícího preview.",
+    "Použít stabilní publication node_modules pouze přes read-only junction snapshotu; původní core9.30.0 bezpatchů a schema5.0.36. Žádné nové instalace ani node_modules mutace.",
+    "Actual SDK integrace musí zachovat všechny manévrové, guest/privacy, respawn, síťové/backlog kontroly. Výsledek technické sady nenahrazuje skutečnou GPU/viditelné třesení a neslibuje všechnyRTT.",
+    "Staging/commit dělá root po kontrole přesného diffu, nikoli automatický helper. ProcesníPID/rezervace zůstávají pouzecache."
+  ],
+  "notes": [
+    "Pouze C:/Users/rezac/.codex/worktrees/wave3-feature-publication/StrahovCrazyShow. Assembly source připravuje publish-wave3-v11-network-20261014; tento task jeho zdroje nemění.",
+    "Původní baseline feature5f9b011 je integrován main4bd7c4b; nový V11 checkpoint nepřebírá Gamephase, světla/startup/editor ani engine/IMAGE. Ty mají vlastní následnéfeature.",
+    "Asset reference f2705e4… a frozen wave3manifest0f20… jsou dosavadní neměnné vstupy; před kopírováním ověřit vůči očekávanému manifestu a Git assetshodu.",
+    "Koncové zhodnocení musí uvést reálné counts,hashy,testy,limity a další krok. Celý cíl není dokončen tímto izolovaným checkpointem.",
+    "Root přijal snapshot03b597a6…:819/819 testů, build a plná integrace PASS,491 posthashů shodných, všechny helpery ukončené a2568 volný."
+  ]
+}
