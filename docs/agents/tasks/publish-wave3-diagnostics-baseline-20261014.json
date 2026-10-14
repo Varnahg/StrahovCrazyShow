@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "publish-wave3-diagnostics-baseline-20261014",
+  "title": "Oddělit automatickou diagnostiku do samostatně ověřitelného baseline commitu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/session-diagnostics.ts",
+    "client/session-diagnostics.ts",
+    "server/session-diagnostics.ts",
+    "client/render-incident-profile.ts",
+    "client/benchmark-render-profile.ts",
+    "client/main.tsx",
+    "server/index.ts",
+    "vite.config.ts",
+    "scripts/performance-preview.mjs",
+    "scripts/diagnostics-report.mjs",
+    "tests/session-diagnostics.test.ts",
+    "tests/session-diagnostics-server.test.ts",
+    "tests/render-incident-profile.test.ts",
+    "tests/diagnostics-report.test.ts",
+    "node_modules/",
+    ".cache/wave3-diagnostics-publication/",
+    "docs/performance/research-20261014/wave3-diagnostics-publication.md",
+    "docs/agents/handoffs/publish-wave3-diagnostics-baseline-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Sestavit v čisté izolované WT pouze diagnostický základ podle skutečného import/hunk auditu; zdrojem je neměnný wave3. Žádný V11, Game/UI, startup/render/light/glTF/editor WIP.",
+    "Převzít přesné nové moduly a jejich testy; server/index.ts pouze collector import, handler za listenHost a HTTP route před benchmark. Nekopírovat celý frozen server.",
+    "Zachovat kompatibilní původní API: BenchmarkRenderProfile přidává jen třetí volitelný callback a jeho vyvolání; nové RenderIncidentProfile jej skutečně používá. Client main pouze start/dispose recorderu, proxy pouze changeOrigin:false.",
+    "Před kódem zapsat closure/rozhodnutí a vybraný delta. Cílené testy, čisté typy a handoff; root zajišťuje finální checkpoint/staging/commit. Neoznačovat baseline infrastrukturu za celé Game FPS/context napojení."
+  ],
+  "verification": [
+    "Nejdřív pnpm install --frozen-lockfile bez resolverových upgradů ve vlastní skutečné node_modules složce. Vlastní cache může obsahovat logy/checkpoint, žádné sdílené instalace se nemění.",
+    "Cílené čtyři nové testy a beze změny tests/benchmark-render-profile.test.ts; typová kontrola čisté sestavené WT podle skutečného tsconfig. Zachovat původní selhání.",
+    "Před náročným krokem ověřit skutečnou absenci klienta4186/2581 a nového herního JSONL; při hře další zatížení odložit. Žádný plný build/suite/integrace/GPU/preview v tomto tasku."
+  ],
+  "notes": [
+    "Pouze C:/Users/rezac/.codex/worktrees/wave3-feature-publication/StrahovCrazyShow, větev codex/wave3-feature-publication, základ e215bf4fe5e7c148d806207f82ae6b849895fdd6. Při založení čistá a bez node_modules; aktuální koordinační podklady kopíruje root.",
+    "Autorita kopie: main .cache/playtest-repairs-validation/snapshots/wave3, snapshot0f20b5a7c7ba9ce5ab9aa16bba3b0a6886823152a322be2724fd2cdad41d6248 a jeho manifest. Root výslovně předává dokončené automatic-diagnostics a render-incident předání; 14 vybraných main souborů bylo read-only ověřeno jako byte-identických wave3.",
+    "Client render-cost a mesh-draw do tohoto základu nepatří; dependency closure je session-diagnostics -> type RenderIncidentSnapshot -> RenderIncidentProfile -> BenchmarkRenderProfile. Celý Game.diagnosticContext vyžaduje jiné vrstvy a nesmí být převzat.",
+    "Hrané snapshoty, main pracovní soubory, jiné WT a foreign vegetation audit jsou read-only. Žádné staging/commity agenta, žádný reset/restore/clean/stash nebo broad git add. Případnou chybějící dependency nejprve doložit koordinátorovi, nerozšiřovat scope sám."
+  ]
+}

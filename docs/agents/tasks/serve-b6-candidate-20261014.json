@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "serve-b6-candidate-20261014",
+  "title": "Ponechat uživateli neměnný B6 testovací build na4186",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/b6-transform-validation/live-preview/",
+    ".cache/b6-transform-validation/candidate/.cache/",
+    "docs/agents/handoffs/serve-b6-candidate-20261014.md"
+  ],
+  "resources": [
+    "port:4186",
+    "port:2581"
+  ],
+  "acceptance": [
+    "Servírovat pouze existující neměnný candidate cbc158068138e3454a6959a0d7a945465ea2974e6c246e86ed231abf92a4b5dc; žádná změna source/dist/assets/dependencies.",
+    "Zachovat automatický recorder a přiřadit logy ke skutečné relaci. Žádné tvrzení o GPU přejímce z HTTP health.",
+    "Po explicitním koordinovaném zastavení předchozího vlastního runtime spustit služby pod novým živým ownerem, evidovat PID/startUTC/command pouze v cache; nezastavovat proces podle portu."
+  ],
+  "verification": [
+    "Před převodem aktuální absence klientských TCP spojení a herních JSONL; při připojené relaci převod odložit.",
+    "Parser odvozených start/stop helperů, skutečná HTTP readiness a byte shoda buildu, CIM identita vlastních procesů.",
+    "Tato rezervace chrání pouze běh preview/API a diagnostiku. GPU měření, build, suite či instalace vyžadují vlastní heavy/GPU rezervace a ověření skutečné aktivity hráče před spuštěním."
+  ],
+  "notes": [
+    "Pouze wave4 WT C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow; owner repairs-01a13624-b6-preview.",
+    "Koordinátor při přípravě držel nadřazený validate-b6 scope. Odvozené helpery zachovávají jeho ověřený lifecycle; mění jen metadata úkolu/resources/output/source. Převod není atomická změna živého vlastníka: původní runtime musí být zastaven a ověřen před release/novým claimem.",
+    "Uživatel vyžádal přímé URL bez Computer Use. Servery mají zůstat dostupné; jejich dostupnost sama není probíhající GPU úloha. Při aktivním hraní nespouštět rušivé validace a označit případné nesrovnatelné intervaly.",
+    "Původní task validate-b6-transform-20261014 zůstává pro řízenou A/B přejímku; před ní se služby převedou stejným stop/verify/release/claim postupem."
+  ]
+}

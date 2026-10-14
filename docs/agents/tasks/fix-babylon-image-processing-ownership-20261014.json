@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fix-babylon-image-processing-ownership-20261014",
   "title": "KEY-17: pinovaná oprava vlastnictví Babylon ImageProcessingPostProcess",
-  "status": "ready",
+  "status": "done",
   "dependsOn": ["research-visual-lighting-20261014"],
   "writePaths": [
     "package.json",
@@ -28,10 +28,11 @@
     "Žádný server, browser, GPU ani build v tomto tasku. Žádné odstraňování nebo přesměrování existujících junctionů."
   ],
   "notes": [
-    "Provádět v nové managed worktree založené koordinátorem z přesného lokálního commitu f63039b4067d57c8bdbe560ead5719cfc05cbb0d; konkrétní vrácenou cestu zaznamenat před claimem. Dosavadní playtest-repairs-wave4 ani main instalaci neměnit. Tento JSON je zadání, ne aktivní rezervace; claim před jakýmkoli zápisem.",
+    "Přidělena nová managed worktree C:/Users/rezac/.codex/worktrees/image-processing-ownership/StrahovCrazyShow, větev codex/image-processing-ownership, přesný základ f63039b4067d57c8bdbe560ead5719cfc05cbb0d. Při založení čistá a bez node_modules; aktuální AGENTS a katalog zkopíroval koordinátor. Dosavadní playtest-repairs-wave4 ani main instalaci neměnit. Tento JSON je zadání, ne aktivní rezervace; claim před jakýmkoli zápisem.",
     "Důkaz a předání: WT docs/agents/handoffs/fix-material-image-processing-20261014.md a visual-lighting.md sekce 7. Volba a zamítnuté alternativy v main decision-register; Linear KEY-17 blokuje KEY-4/14/11.",
     "Původní WT node_modules odkazuje do main/node_modules a B6 baseline/candidate závisejí na témže odkazu. Jejich změna byla odmítnuta: checkScopeFilesystem nepřipouští rezervaci existujícího junctionu. Použít novou worktree bez node_modules, rezervovat ji a instalovat vlastní zamčené závislosti. Původní WT, oba B6 linky a standalone zůstanou nedotčené.",
     "Před instalací ověřit pnpm11.25.0 patch syntax a patch filename. Při jiném nutném výstupu požádat koordinátora o změnu rezervace, nerozšiřovat scope. Sdílený package store nepovažovat za prostor k ruční editaci.",
-    "Uživatel odložil pouze svou GUI přejímku a požádal o přípravu na později. Není povolené označit runtime kandidáty za přijaté ani je přimíchat do již uloženého B6 A/B."
+    "Uživatel odložil pouze svou GUI přejímku a požádal o přípravu na později. Není povolené označit runtime kandidáty za přijaté ani je přimíchat do již uloženého B6 A/B.",
+    "14.10 dokončeno jako samostatný ověřený kandidát: red1/10 (i stejný finální test), green10/10, původní16/16, narrowTS0, čistá frozen reprodukce10/10 a main dependency audit17238/0změn. Root následně ověřil celou hru888/888+build+integraci nad snapshot8eea6163… a vytvořil lokální commit6df08fb6b4003bc958a72fd58592ee24fa74dc41. Done platí pro předaný package kandidát; runtime main/GPU přejímka a KEY-14 zůstávají otevřené."
   ]
 }

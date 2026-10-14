@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-b6-transform-20261014",
+  "title": "Ověřit samostatný B6 transform fix nad izolovaným wave3 základem",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/b6-transform-validation/",
+    "dist/",
+    "docs/performance/evidence/b6-transform-20261014/",
+    "docs/agents/handoffs/validate-b6-transform-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4186",
+    "port:2581",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Stabilní kandidát pouze sB6fixem, snapshotvčetnětestů, přesnýdiff protireferenčníwave3; pozdějšíglTF/nebojináopravamimoA/B.",
+    "Plnátest/build/integrace dle rozsahu plus skutečnýprodukčníB6průchod a vizuál při shodnémGPU/rozlišení/počasí/UTC; pokudGPUtoolnenídostupný, jasněponechatpřejímkuneuzavřenou.",
+    "Žádnýzásah dohraného/developerskéhostromu, žádnésouběžnéGPU/Blender/serverpodobnýchportů. Výsledky, známélimity a vlastníprocesyvhand offu."
+  ],
+  "verification": [
+    "Root koordinuje pipeline; používatNode child orchestration se skutečnými exit codes, nepovažovat stderr zaPSterminatingerror.",
+    "PředGPUověřit dostupnébrowserynativníscény. Baseline i kandidát na vyhrazených4186/2581, serverlifecycleověřitPID+UTCstart; neukončovatprocessypodleportu."
+  ],
+  "notes": [
+    "Pouze managed worktree C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow. Root čte staréimmutable snapshoty zmain jako referenci.",
+    "Původnírepair-production-validation po ověření zaniklých vlastních procesů uvolněn; cizí stale rezervace nebyly změněny.",
+    "KlientskéCUA getState14.10 vrací žádné připojenébrowsery; pokus vytvořit iab hlásilunavailable. PraktickouGPUčinnost nelze tvrdit bez funkčního browsertoolu; případnápurposebuilt appbrowser alternativa se ověří až s připraveným serverem.",
+    "14.10 uživatel výslovně odložil GPU přejímku. Kandidát f63039b4067d57c8bdbe560ead5719cfc05cbb0d,878testů/build/integracePASS,QA připravená; runtimeintegrace main čeká na praktické ověření. Helpery ukončené a rezervace uvolněné.",
+    "14.10 kolem16:06 Praha uživatel vyžádal nový pokus o testování. Unified browser APIs stále vrací prázdný inventář a iab/Edge unavailable. Nativní @oai/sky našlo Edge okno, ale get_window_state zastavila automatická kontrola kvůli nemožnosti určit aktuální URL; Computer Use pro tah ukončeno. Žádná hra/server/GPU nebyly spuštěné.",
+    "14.10 následný přímý pokyn uživatele: zadat testovací URL bez Computer Use. Koordinátor předal http://127.0.0.1:4186/ přímo open_in_codex (queued), ověřil všech510 source/config/test hashů kandidáta cbc158… a obnoví služby až po bezpečném uvolnění heavy-validation package agentem. Tento stav ready dovoluje obnovení vlastní rezervace; neznamená hotovou GPU přejímku ani funkční browser control."
+  ]
+}

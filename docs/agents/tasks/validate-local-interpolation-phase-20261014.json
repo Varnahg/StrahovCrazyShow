@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-local-interpolation-phase-20261014",
+  "title": "KEY-12/7: ověřit izolovaný phase fix v úplném produkčním checkpointu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/local-interpolation-validation/",
+    "docs/performance/evidence/local-interpolation-phase-20261014/",
+    "docs/agents/handoffs/validate-local-interpolation-phase-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Převzít přesné4source/test soubory předaného phase fixu; snapshot proti B6 candidate mění pouze Game, NetworkTimeline, nový Game test a Timeline test. Žádný engine/IMAGE nebo novýglTF fastpath.",
+    "Snapshot zahrnuje testy a všechny produkční vstupy; ověřit před/kopie/po hashes a připnout původní dependency instalaci. Nesmí přepsat hraný4186build.",
+    "Pnptest/build/test:integration nad stabilnímkandidátem, původníred a cílené52PASS zachovat. Výkon/GPU ani vyřešení všechkorekcí se netvrdí.",
+    "Přesnýdelta/evidence a handoff pro následné samostatnécommitování po oddělení staršího V11featureWIP."
+  ],
+  "verification": [
+    "Před každým náročným krokem ověřit skutečnou aktivitu4186/2581 a novéherníJSONL; při hraní dalšízatěžování nezačínat.",
+    "Port2568 předintegracívolný, po testu vlastníprocessyukončené. Žádný browser/GPU/install.",
+    "Pokudcelávalidaceodhalífixture/APIregresi, zachovatpůvodnívýstup a předatpřesnouopravu k novémuscope, neoslabovattesty."
+  ],
+  "notes": [
+    "Pouze wave4 WT C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow, rootkoordinátor. ZdrojbaselineCBC v neměnném .cache/b6-transform-validation/candidate.",
+    "PředanésourceSHA: Gameb40a8a97a9100a0c872fda1771fcb9d9fd7fbaa8bc6e3d3278bdaa3208d07954; Timelinec5007cac09055ed02eb3362f79da0d920725a61adb3e1bd1a2d17508590d2fa1; Gametest9365d519affe5310ec6685d7bc5fd28de922804a54222a70e2e8ce3abea976f9; Timelinetested7cf65ae3049add3508f7f5d34ad9b9c8c4074cdab55d223cc885b264d1ee0f.",
+    "Samostatné preview běží pod serve-b6-candidate taskem, jeho služby neukončovat. Tento task po sobě nenechá dlouhožijící helpery.",
+    "14.10 přijato: snapshot2aaa3f428bcba9527ab86c61d10cc3b85b40a9a434161683adc7e5fb0bc55e70,8408 vstupů/511source,892/892test+build+celá integracePASS,511posthashů beze změny,2568volný. Vlastníprocesy ukončené a rezervace uvolněná; důkazy ve stejnojmenném handoffu/evidence. GPU ani commit/main tím nejsou prokázané."
+  ]
+}

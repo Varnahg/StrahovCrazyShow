@@ -10,8 +10,10 @@
   "writePaths": [
     "client/cinematic.ts",
     "tests/cinematic-image-processing.test.ts",
+    "tests/cinematic.test.ts",
     "docs/performance/research-20261014/visual-lighting.md",
-    "docs/agents/handoffs/fix-material-image-processing-20261014.md"
+    "docs/agents/handoffs/fix-material-image-processing-20261014.md",
+    ".cache/material-image-processing/"
   ],
   "resources": [],
   "acceptance": [
@@ -26,10 +28,13 @@
     "Jen lehké cílené CPU testy a úzké typy. Žádný browser/GPU/fullsuite/build/server. Root koordinuje stabilní checkpoint."
   ],
   "notes": [
-    "Pouze C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow, branchcodex/playtest-repairs-wave4. Main a zmrazené B6 snapshoty zůstanou beze změn.",
-    "client/cinematic.ts již obsahuje doložený starší wave3 reuse WIP. Koordinátor root jej explicitně předává z bootstrapu (handoff repair-wave4-bootstrap) pro úzkou nadstavbu, zachovat celý původní diff. Adopt-dirty je doložený převod.",
-    "Výzkum visual-lighting.md ze main je vlastní práce příjemce/již předaný dokument; smí se byte-exact zkopírovat do přidělené WT cesty a doplnit o implementační výsledek.",
+    "Navazující implementace pouze v C:/Users/rezac/.codex/worktrees/image-processing-ownership/StrahovCrazyShow, branchcodex/image-processing-ownership, HEAD6df08fb6b4003bc958a72fd58592ee24fa74dc41 s ověřeným package patchem. Původní nepřijatý wave4 kandidát, main a zmrazené B6 snapshoty zůstanou beze změn.",
+    "Původní wave4 client/cinematic.ts obsahuje starší reuse WIP a nepřijatý IMAGE-01 delta; neměnit jej. V nové ownership WT je čistá HEAD cinematic bez reuse WIP. Příjemce aplikuje pouze přesný malý IMAGE delta ze svého předání; nový test byl navržen nezávisle na reuse. Žádný celý copy původního cinematic do nové WT. Root při pozdějším production freeze aplikuje tentýž delta na frozen wave3 cinematic, aby nezrušil starší reuse chování.",
+    "Výzkum visual-lighting.md a nový cinematic-image-processing test z wave4 jsou vlastní předaná práce příjemce; smí se zkopírovat do přesně přidělené nové WT cesty a doplnit. Předchozí handoff zůstane v původní WT zachovaný, nová WT má vlastní navazující handoff.",
     "Zatím necommitovat; root ověří samostatný delta commit bez staršího reuse WIP a připraví jednotlivou integraci až po praktické přejímce.",
-    "14.10 předán nepřijatý kandidát: původní kontrakt 1/7 PASS, kandidát 5/7 PASS; dva disposal testy prokazují živý ThinIP observer po dispose. Původní testy 8/8 a úzký TS PASS. Přesný diff/hash/provenience ve WT handoffu fix-material-image-processing-20261014.md. Agent uvolnil rezervaci, žádné helpery neběží. Blokuje KEY-17, nikoli chybějící souhlas uživatele."
+    "Předchozí14.10 red1/7 a nepřijatý5/7 jsou zachované v původní wave4 handoffu. Package prerequisite je nyní dokončený kandidát6df08fb; pokračování musí prokázat všech7 scénářů v nové WT, stejné actual material defines, camera passes a bounded observers/effects. Žádný nový odhad barev nebo změna art čísel.",
+    "Před cílenými CPU testy kontrolovat skutečné TCP4186/2581 a herní JSONL ve wave4 candidate; při aktivitě odložit zatížení. Žádná instalace/build/fullsuite/GPU/server v tomto tasku. Samostatný nový delta/commit ověří root; zdroje nové WT neslouží jako náhrada plného původního wave3 produkčního základu.",
+    "Po potvrzeném release rozšířen scope pouze o tests/cinematic.test.ts: root přečetl test kolem302. Jediný isEnabled=false assertion kodifikuje právě opravovanou chybu a smí se změnit na true se stručným zdůvodněním; applyByPostProcess=false a všechny attach/identity/quality assertions zůstávají. Žádné jiné změny tohoto existujícího testu.",
+    "14.10 dokončen ověřený kandidát: stejné nové testy1/7→7/7, finální23/23 a narrowTS0. Root produkčně zachoval wave3 reuse a ověřil snapshotd032be65…895/895+build+integracePASS,513posthashů bez změny. Samostatný lokální commit557eb880b6caff433f2d8e87211b20165baa4c12. Blocked znamená otevřenou GPU/obrazovou a main integrační přejímku, nikoli chybějící kód; rozsah nesmí přebírat nový autor jako volný."
   ]
 }
