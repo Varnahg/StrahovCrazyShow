@@ -80,6 +80,111 @@ test("first trusted RTT can calibrate an unmeasured bootstrap clock once", () =>
   assert.equal(timeline.snapshot().clockCalibrated, true);
 });
 
+test("unsupported bootstrap timing keeps calibration pending through repeated authorities until a supported sample", () => {
+  for (const supportedRtt of [0, 34, 200]) {
+    const timeline = new NetworkTimeline();
+    timeline.setRtt(533.6);
+    for (const ack of [0, 3, 6]) {
+      timeline.acceptAuthority(authority(ack), ack * (1000 / 60), mode);
+      const clock = timeline.snapshot();
+      assert.equal(clock.clockSeqAtAnchor, ack);
+      assert.equal(clock.clockCalibrated, false);
+      assert.equal(clock.rttMs, 533.6);
+      assert.equal(clock.deliveryBudgetExceeded, true);
+      assert.deepEqual(
+        timeline.advance(ack * (1000 / 60), command, () => {
+          throw Error("unsupported timing must still wait");
+        }),
+        { status: "waiting", reason: "latency-budget" },
+      );
+    }
+    timeline.setRtt(supportedRtt);
+    timeline.acceptAuthority(authority(9), 150, mode);
+    const offset = supportedRtt / 2 / (1000 / 60);
+    assert.ok(
+      Math.abs(timeline.snapshot().clockSeqAtAnchor - (9 + offset)) < 1e-10,
+    );
+    assert.equal(timeline.snapshot().clockCalibrated, true);
+    timeline.setRtt(200);
+    timeline.acceptAuthority(authority(12), 200, mode);
+    assert.ok(
+      Math.abs(timeline.snapshot().clockSeqAtAnchor - (12 + offset)) < 1e-10,
+      "already calibrated clock does not ratchet for another supported RTT",
+    );
+  }
+});
+
+test("new epoch cannot inherit an over-budget clock offset or consume pending calibration with stale or invalid authority", () => {
+  const timeline = new NetworkTimeline();
+  timeline.setRtt(34);
+  timeline.acceptAuthority(authority(100, 1, 0), 0, mode);
+  assert.equal(timeline.snapshot().clockCalibrated, true);
+  timeline.setRtt(533.6);
+  for (const ack of [0, 3, 6]) {
+    timeline.acceptAuthority(
+      authority(ack, 2, 103),
+      50 + ack * (1000 / 60),
+      mode,
+    );
+    assert.equal(timeline.snapshot().clockSeqAtAnchor, ack);
+    assert.equal(timeline.snapshot().clockCalibrated, false);
+  }
+  for (const invalid of [NaN, Infinity, -1]) {
+    const before = timeline.snapshot();
+    assert.equal(timeline.setRtt(invalid), false);
+    assert.deepEqual(timeline.snapshot(), before);
+  }
+  timeline.setRtt(34);
+  const pending = timeline.snapshot();
+  assert.deepEqual(timeline.acceptAuthority(authority(6, 2, 103), 180, mode), {
+    accepted: false,
+    reason: "stale",
+  });
+  assert.deepEqual(
+    timeline.acceptAuthority({ ...authority(9, 2, 103), tick: -1 }, 200, mode),
+    { accepted: false, reason: "invalid" },
+  );
+  assert.deepEqual(timeline.snapshot(), pending);
+  assert.equal(timeline.snapshot().clockCalibrated, false);
+  timeline.acceptAuthority(authority(9, 2, 103), 200, mode);
+  assert.ok(Math.abs(timeline.snapshot().clockSeqAtAnchor - 10.02) < 1e-10);
+  assert.equal(timeline.snapshot().clockCalibrated, true);
+});
+
+test("a first over-budget sample after unmeasured bootstrap does not finish calibration", () => {
+  const timeline = new NetworkTimeline();
+  timeline.acceptAuthority(authority(100, 1, 0), 0, mode);
+  timeline.setRtt(500);
+  timeline.acceptAuthority(authority(103, 1, 0), 50, mode);
+  assert.equal(timeline.snapshot().clockSeqAtAnchor, 103);
+  assert.equal(timeline.snapshot().clockCalibrated, false);
+  timeline.setRtt(200);
+  timeline.acceptAuthority(authority(106, 1, 0), 100, mode);
+  assert.equal(timeline.snapshot().clockSeqAtAnchor, 112);
+  assert.equal(timeline.snapshot().clockCalibrated, true);
+});
+
+test("epoch discontinuity and a fresh connection keep independent calibration state", () => {
+  const prior = new NetworkTimeline();
+  prior.setRtt(200);
+  prior.acceptAuthority(authority(1000, 1, 0), 0, mode);
+  prior.acceptAuthority(authority(0, 2, 1001), 2000, mode);
+  assert.equal(
+    prior.snapshot().clockSeqAtAnchor,
+    6,
+    "clock-drop or respawn epoch uses its own authority basis, not old elapsed time",
+  );
+  assert.equal(prior.snapshot().clockCalibrated, true);
+  const fresh = new NetworkTimeline();
+  fresh.acceptAuthority(authority(0, 1, 0), 3000, mode);
+  assert.equal(fresh.snapshot().clockSeqAtAnchor, 0);
+  assert.equal(fresh.snapshot().clockCalibrated, false);
+  fresh.setRtt(200);
+  fresh.acceptAuthority(authority(3, 1, 0), 3050, mode);
+  assert.equal(fresh.snapshot().clockSeqAtAnchor, 9);
+  assert.equal(fresh.snapshot().clockCalibrated, true);
+});
+
 test("initial lead predicts all six time steps instead of relabeling one step", () => {
   const timeline = new NetworkTimeline(),
     steps: PredictedTimelineStep[] = [];

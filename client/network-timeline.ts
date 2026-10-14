@@ -109,20 +109,24 @@ export class NetworkTimeline {
       epochChanged ||
       authority.ack > this.predictedSeq ||
       this.predictedSeq - authority.ack > MAX_TIMELINE_REPLAY_TICKS;
+    // A sample that already exceeds our delivery budget cannot establish a
+    // clock offset. Keep calibration pending until an eligible sample arrives.
+    const canCalibrate = this.hasTimingSample && !this.deliveryBudgetExceeded;
     if (epochChanged) {
-      this.clockSeq = authority.ack + this.rttMs / 2 / STEP_MS;
+      this.clockSeq =
+        authority.ack + (canCalibrate ? this.rttMs / 2 / STEP_MS : 0);
       this.clockAt = receivedAt;
-      this.clockNeedsCalibration = !this.hasTimingSample;
+      this.clockNeedsCalibration = !canCalibrate;
     } else {
       const at = Math.max(this.clockAt, receivedAt);
       const calibrationMs =
-        this.clockNeedsCalibration && this.hasTimingSample ? this.rttMs / 2 : 0;
+        this.clockNeedsCalibration && canCalibrate ? this.rttMs / 2 : 0;
       this.clockSeq = Math.max(
         this.estimateServerSeq(at),
         authority.ack + (at - receivedAt + calibrationMs) / STEP_MS,
       );
       this.clockAt = at;
-      if (this.hasTimingSample) this.clockNeedsCalibration = false;
+      if (canCalibrate) this.clockNeedsCalibration = false;
     }
     this.anchor = { ...authority };
     this.mode = { ...mode };
