@@ -1082,6 +1082,8 @@ for (const outcome of [
     let starts = 0;
     Object.assign(game, {
       ready: false,
+      // Game constructs its Scene before start; UI may inspect its inventory.
+      scene: { meshes: [], materials: [] },
       setQuality() {},
       setTargetFps() {},
       start: async () => {
