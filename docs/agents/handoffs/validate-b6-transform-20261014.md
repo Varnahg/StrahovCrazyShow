@@ -1,0 +1,11 @@
+# Předání validačního checkpointu B6-01
+
+Vlastník `repairs-01a13624-b6-validation`, managed worktree `C:/Users/rezac/.codex/worktrees/playtest-repairs-wave4/StrahovCrazyShow`. Kandidát `cbc158068138e3454a6959a0d7a945465ea2974e6c246e86ed231abf92a4b5dc`; základ wave3 `0f20b5a7c7ba9ce5ab9aa16bba3b0a6886823152a322be2724fd2cdad41d6248`. Snapshot obsahuje8407vstupů/510source-config-tests; přesný rozdíl jen B6modul a nový lifecycle test. Žádný glTFfastpath nebo dalšíruntimefix nebyl přimíchán.
+
+Skutečná pipeline14.10.12:36:33–12:40:58UTC:878/878 testůPASS, buildPASS, celá SDKintegracePASS, všechnyexit0. Žádná tolerance manévrů se nezměnila. Původní průběhy ani logs se nepřepisovaly. Samostatný Git archive91ee88fclient/shared + B6fix/test prošel4/4 a potvrzuje nezávislost tohoto commitu na ostatnímbootstrapWIP. Přesná evidence a omezení jsou v `docs/performance/evidence/b6-transform-20261014/README.md`, `checkpoint.json`, `pipeline.jsonl`; plnélogs v `.cache/b6-transform-validation/`.
+
+Dočasný produkčníserver: API PID28740/startUTC2026-10-14T12:42:39.3135761Z, preview PID24024/startUTC2026-10-14T12:42:39.3257718Z, port2581/4186. cwd `.cache/b6-transform-validation/candidate`; příkazy a vlastníci v runtime-candidate-20261014.json. Health přespreview200, stderrbezvýstupu. CUA nemělo žádný připojenýbrowser a pokusy oIAB/Edge bylyunavailable; appbrowseropenbylqueued. Žádná GPUscéna proto neběžela a GPUvýkon se netvrdí.
+
+Uživatel požádal „teď nemůžu, připrav to na později“. Předaný QApostup má baseline i candidate, zachovanébuildy, explicitněoznačenéuloženépočasí, unikátnírunmetadata a stopověřeníPID/UTCstart/command. První stopskript narazil na PowerShellautomatickydekódovaný DateTime; před Stop-Process selhal, nikoho nezastavil. Opravené typed/invariantculture čtení pak ověřiloidentitu a ukončilo oba vlastníPID. NáslednýCIMvýpis obouPID prázdný;4186/2581/2568volné. Žádné validačníhelpery nezůstaly.
+
+Root ukládá samostatný kandidátní commit. Integrace do main a uzavření KEY-16 čekají na praktickou grafickou přejímku; dokumentační výzkum už je na lokální main v commitu 10fa69b057b90696f1eaadc0b520caceb0dfbf44. Cizí WIP, původní preview a stale rezervace se neměnily. Po commitu a předání se tato validační rezervace uvolní; při další přejímce znovu rezervovat porty, GPU a heavy-validation a ověřit aktuální dostupnost prostředí.

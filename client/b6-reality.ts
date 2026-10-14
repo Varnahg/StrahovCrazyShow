@@ -236,6 +236,8 @@ export class B6RealityController {
   get interiorLightEnabled(){return this.light.isEnabled()&&this.light.intensity>0;}
   private disposed = false;
   private buildingRoot?: TransformNode;
+  private readonly lightWorldPosition = Vector3.Zero();
+  private readonly inverseBuildingWorld = Matrix.Identity();
   attachToBuilding(root: TransformNode) {
     this.buildingRoot = root;
     for (const entry of this.managed) attachWorldAssetNode(entry.mesh, root);
@@ -622,18 +624,23 @@ export class B6RealityController {
       }
       if (visible) this.stats.activeMeshes++;
     }
-    this.light.position.set(
+    this.lightWorldPosition.set(
       8,
       floor * 3 + foundation + 2.35,
       Math.max(-86, Math.min(-24, p.z)),
     );
-    if (this.buildingRoot)
-      this.light.position.copyFrom(
-        Vector3.TransformCoordinates(
-          this.light.position,
-          Matrix.Invert(this.buildingRoot.computeWorldMatrix(true)),
-        ),
+    if (this.buildingRoot) {
+      // Forcing an unchanged shared pivot invalidates every sibling before the
+      // torch's caster scan. A real edit still needs force in the same render ID.
+      this.buildingRoot
+        .computeWorldMatrix(!this.buildingRoot.isSynchronized())
+        .invertToRef(this.inverseBuildingWorld);
+      Vector3.TransformCoordinatesToRef(
+        this.lightWorldPosition,
+        this.inverseBuildingWorld,
+        this.light.position,
       );
+    } else this.light.position.copyFrom(this.lightWorldPosition);
     // Babylon rescans every scene mesh even for an unchanged Light.setEnabled.
     // Walking updates this fixture's position, not its light membership.
     if (this.light.isEnabled(false) !== inside) this.light.setEnabled(inside);
