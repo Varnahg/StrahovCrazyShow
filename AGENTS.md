@@ -2,6 +2,14 @@
 
 Před implementací ověř očekávané chování, existující kód a vhodné primární podklady. Uživatel výslovně požaduje průzkum před změnami a praktické ověření výsledku.
 
+## Výslovný postup uživatele od 14. 10. 2026
+
+- Před každou opravou či funkcí nejdřív proveď důkladný výzkum celého dotčeného řetězce: příčiny, závislosti a vzájemné dopady. Projdi relevantní primární zdroje a reprodukční důkazy; odliš doložený mechanismus, hypotézu a chybějící měření.
+- Před implementací porovnej všechny rozumné varianty řešení včetně jejich nákladů, rizik, dopadů na výkon, vzhled, chování, cache a lifecycle. Zaznamenej volbu a proč je pro konkrétní problém nejlepší. Výzkum není jen potvrzení první navržené opravy.
+- Teprve po tomto průzkumu a rozhodnutí implementuj, proveď cílený refaktoring a relevantní ověření. Opravy/funkce commituj samostatně a průběžně integruj do main po jednotlivých ověřených celcích. Nepřibaluj cizí WIP a nevyužívej jednu velkou dávku nesouvisejících změn.
+- Linear aktualizuj průběžně po průzkumu, rozhodnutí, implementaci, ověření a integraci. Uváděj současný stav, důkazy, otevřené otázky, skutečné výsledky testů a související commity; neoznačuj celek Done podle dílčího testu.
+- Hranou testovací verzi drž neměnnou a před další prací ověř skutečnou URL a identitu klienta. Vývojová HMR karta není izolovaný uživatelský test. Oddělená pracovní kopie musí zachovat koordinační rezervace a vlastnictví vstupů/výstupů.
+
 ## Než začneš měnit soubory
 
 1. Přečti [mapu stacku a vlastnictví](docs/agents/architecture.md), [pravidla koordinace](docs/agents/README.md) a [evidenci převzatého WIP](docs/agents/current-work.md). Načti relevantní podklady a testy své oblasti; nečti hromadně archivní evidenci.

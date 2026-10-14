@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "research-visual-lighting-20261014",
+  "title": "KEY-3/13/14/15: výzkum materiálů, barev a světel",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/performance/research-20261014/visual-lighting.md",
+    "docs/agents/handoffs/research-visual-lighting-20261014.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před opravou doložit systémový řetězec a vzájemné dopady; odlišit fakta/hypotézy/chybějící měření.",
+    "Porovnat všechny rozumné varianty včetně příčin, kompromisů, regresních rizik, dopadů na vzhled/výkon/cache/lifecycle a způsobu ověření; uvést doporučení a zamítnuté varianty.",
+    "Výstup je výzkum a rozhodovací podklad, nikoli povolení implementovat runtime; navazující přesný scope přidělí koordinátor."
+  ],
+  "verification": [
+    "Primární installed source, relevantní oficiální dokumentace a archivované nezměněné uživatelské logy; citovat konkrétní cesty/řádky a zdrojovou identitu.",
+    "Bez runtime editací, buildů, GPU, serverů či zátěžových profilů. Levné nové reprodukční experimenty nejprve navrhnout koordinátorovi; nepsat mimo writePaths."
+  ],
+  "notes": [
+    "Výslovná uživatelská pravidla14.10 jsou doplněna v AGENTS.md; agent je musí přečíst.",
+    "Root připravuje izolovanou managed worktree; tento výzkum zatím píše pouze do přidělených docs v hlavním checkoutu, runtime zůstává beze změn.",
+    "Linear projekt Strahov Crazy Show; latest production log07c227f8…/snapshot0f20b5a7… je zdroj důkazů. Každý pozdější fix samostatný commit/integrace main.",
+    "14.10 root převzal dokončený výzkum, varianty, primární důkazy a předání; neznamená runtime opravu nebo uzavření Linear issue."
+  ]
+}

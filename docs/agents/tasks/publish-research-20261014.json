@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "publish-research-20261014",
+  "title": "Samostatně commitovat předaný výzkum a postup práce14.10 bez runtime změn",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/performance/research-20261014/b6-render.md",
+    "docs/performance/research-20261014/netcode-camera.md",
+    "docs/performance/research-20261014/visual-lighting.md",
+    "docs/agents/handoffs/research-b6-render-20261014.md",
+    "docs/agents/handoffs/research-netcode-camera-20261014.md",
+    "docs/agents/handoffs/research-visual-lighting-20261014.md",
+    "docs/agents/handoffs/publish-research-20261014.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Převzít pouze doložené research dokumenty/handoffy původních autorů, preserve evidence/hypotheses.",
+    "Samostatný dokumentační commit spolu srootem vlastněným AGENTS/decision-register a jejich úzkými task definitions; žádnýruntime ani cizíWIP."
+  ],
+  "verification": [
+    "Zkontrolovat přesný staged diff, strukturu/odkazy/taskvalidate; testy hry pro docs commit nejsou potřeba."
+  ],
+  "notes": [
+    "Root je výslovný příjemce všech tří předání; adopt-dirty je doložený převod, ne bypass.",
+    "Globální admin vlastník držíAGENTS/taskcatalog, research-integration vlastníkdecision-register; stejnýroot sestaví jeden soudržný doc commit."
+  ]
+}
