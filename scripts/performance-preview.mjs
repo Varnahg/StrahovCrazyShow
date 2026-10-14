@@ -32,7 +32,7 @@ await preview({
     });
   } }] : [],
   preview: { host: '127.0.0.1', port, strictPort: true, proxy: {
-    '/api': `http://127.0.0.1:${apiPort}`,
+    '/api': { target: `http://127.0.0.1:${apiPort}`, changeOrigin: false },
     '/realtime': { target: `http://127.0.0.1:${apiPort}`, ws: true, rewrite: path => path.replace(/^\/realtime/, '') },
   } },
 });

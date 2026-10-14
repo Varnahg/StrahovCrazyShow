@@ -24,6 +24,7 @@ import { makeDemoEvents, dateKey } from "../shared/events";
 import type { Player, Profile } from "../shared/types";
 import { getWeather } from "./weather";
 import { createLocalBenchmarkHandler } from "./local-benchmarks";
+import { createSessionDiagnosticsHandler } from "./session-diagnostics";
 import { respawnServerPlayer, synchronizePlayer } from "./respawn";
 import { MotionEncoder } from "../shared/motion-codec";
 import {
@@ -491,8 +492,10 @@ class StrahovRoom extends Room {
 }
 const http = createServer();
 const listenHost = "127.0.0.1";
+const sessionDiagnostics = createSessionDiagnosticsHandler({ listenHost });
 const localBenchmarks = createLocalBenchmarkHandler({ listenHost });
 const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
+  if (await sessionDiagnostics(req, res)) return;
   if (await localBenchmarks(req, res)) return;
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");

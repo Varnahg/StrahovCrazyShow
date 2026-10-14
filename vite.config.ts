@@ -21,7 +21,8 @@ export default defineConfig({
       ],
     },
     proxy: {
-      "/api": "http://127.0.0.1:2567",
+      // Keep the browser's local origin visible to the diagnostic collector.
+      "/api": { target: "http://127.0.0.1:2567", changeOrigin: false },
       "/realtime": {
         target: "http://127.0.0.1:2567",
         ws: true,
