@@ -476,19 +476,14 @@ export class CinematicAtmosphere {
     } else if (!this.pipeline) {
       this.pipeline = new DefaultRenderingPipeline(
         "cinematic campus",
-        true,
+        false,
         this.scene,
         [this.camera],
         false,
       );
-      this.pipeline.imageProcessingEnabled = false;
-      // A recreated Babylon 9.30 pipeline initially assumes image processing
-      // is enabled, even if the previous one already disabled scene config.
-      // In that case the setter has no notification; synchronize its public
-      // configuration observable before preparing the chain (no extra build).
-      const imageProcessing = this.scene.imageProcessingConfiguration;
-      if (this.pipeline.imageProcessingEnabled !== imageProcessing.isEnabled)
-        imageProcessing.onUpdateParameters.notifyObservers(imageProcessing);
+      // Non-HDR keeps image processing in Standard/PBR materials and does not
+      // attach a fullscreen color pass over the display-space sky. Do not set
+      // imageProcessingEnabled=false: that also disables the scene's material grade.
       this.pipeline.fxaaEnabled = true;
       this.pipeline.bloomEnabled = true;
       this.pipeline.bloomScale = 0.5;

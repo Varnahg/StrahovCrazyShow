@@ -299,7 +299,8 @@ test("cinematic quality creates one complete postprocess chain per activation an
   const postProcesses = camera._postProcesses.filter(Boolean);
   assert.ok(postProcesses.length > 0);
   assert.equal(scene.imageProcessingConfiguration.applyByPostProcess, false);
-  assert.equal(scene.imageProcessingConfiguration.isEnabled, false);
+  // Non-HDR leaves the configured grade active in Standard/PBR materials.
+  assert.equal(scene.imageProcessingConfiguration.isEnabled, true);
   update("high");
   assert.equal(attachments, 1);
   assert.deepEqual(camera._postProcesses.filter(Boolean), postProcesses);
