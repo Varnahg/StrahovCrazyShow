@@ -42,6 +42,10 @@ export class BenchmarkRenderProfile {
   constructor(
     private readonly scene: Scene,
     private readonly now: () => number = () => performance.now(),
+    private readonly onRenderTargetInterval?: (
+      renderer: ObjectRenderer,
+      durationMs: number,
+    ) => void,
   ) {
     this.sceneIntervals.push(
       this.interval(
@@ -78,6 +82,7 @@ export class BenchmarkRenderProfile {
     before: Observable<T>,
     after: Observable<T>,
     metric: keyof BenchmarkRenderCpuMs,
+    onComplete?: (durationMs: number) => void,
   ): Interval {
     const starts: number[] = [];
     const detachBefore = this.observe(before, () => {
@@ -86,8 +91,11 @@ export class BenchmarkRenderProfile {
     const detachAfter = this.observe(after, () => {
       if (!this.frameOpen || this.disposed) return;
       const started = starts.pop();
-      if (started !== undefined)
-        this.totals[metric] += Math.max(0, this.now() - started);
+      if (started !== undefined) {
+        const duration = Math.max(0, this.now() - started);
+        this.totals[metric] += duration;
+        onComplete?.(duration);
+      }
     });
     return {
       starts,
@@ -107,6 +115,7 @@ export class BenchmarkRenderProfile {
         renderer.onInitRenderingObservable,
         renderer.onFinishRenderingObservable,
         "renderTargets",
+        (duration) => this.onRenderTargetInterval?.(renderer, duration),
       ),
     );
   }
