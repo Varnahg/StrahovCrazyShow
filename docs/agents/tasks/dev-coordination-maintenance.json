@@ -18,7 +18,9 @@
     "tests/agent-tasks.test.ts",
     "docs/verification-evidence/agents/coordination-20261012/",
     "docs/agents/handoffs/integrate-wave3-v11-network-20261014.md",
-    "docs/agents/handoffs/commit-wave3-v11-network-20261014.md"
+    "docs/agents/handoffs/commit-wave3-v11-network-20261014.md",
+    "docs/agents/handoffs/commit-network-epoch-calibration-20261014.md",
+    "docs/agents/handoffs/integrate-network-epoch-calibration-20261014.md"
   ],
   "resources": [],
   "acceptance": [
@@ -42,6 +44,7 @@
     "Jde o opakovatelný administrativní slot: po provedené údržbě předej konkrétní výsledek a uvolni rezervaci, status ready ponech pro příští přidělenou údržbu. Produktové tasky se po převzetí označují done.",
     "docs/verification.md při zavádění koordinace mění jiná aktivní relace. Důkazy této úpravy jsou samostatné; publikaci odkazu přebírá integration-checkpoint až po získání vlastnictví, bez přepisování cizí evidence.",
     "Pro pozdější údržbu vytvořit nový unikátní adresář evidence a rezervaci příslušně upravit; historickou evidenci nepřepisovat.",
-    "14.10 root výslovně předává své dokončené commit/main V11 handoffy do koordinační metadata publikace. Původní runtime scopes jsou uvolněné; přijímají se pouze dva přesně uvedené vlastní dokumenty, nikoli source/fixtures. Před zápisem do nich obnovit rezervaci s novým seznamem."
+    "14.10 root výslovně předává své dokončené commit/main V11 handoffy do koordinační metadata publikace. Původní runtime scopes jsou uvolněné; přijímají se pouze dva přesně uvedené vlastní dokumenty, nikoli source/fixtures. Před zápisem do nich obnovit rezervaci s novým seznamem.",
+    "14.10 další přesné vlastní root handoffy clock commit/integrace předané po release runtime scopes do metadata publikace. Před zápisem obnovit admin rezervaci; žádné síťové source cesty se nepřebírají."
   ]
 }

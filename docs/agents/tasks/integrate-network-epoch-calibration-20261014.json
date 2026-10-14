@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "resources": [],
+  "verification": [
+    "Čerstvý registr/HEAD, prázdný index, přesný whitelist a SHA každého staged blobu; žádné široké Git operace nebo zahrnutí jiného WIP.",
+    "Převzít jen dokončený validovaný checkpoint včetně testů. Po commitu ověřit runtime/test/config/assets obsah a zachování ostatních pracovních souborů."
+  ],
+  "id": "integrate-network-epoch-calibration-20261014",
+  "title": "Začlenit samostatný clock-calibration fix do main",
+  "writePaths": [
+    "client/network-timeline.ts",
+    "tests/network-timeline.test.ts",
+    "tests/network-latency-recovery.test.ts",
+    "docs/performance/research-20261014/network-epoch-calibration.md",
+    "docs/agents/handoffs/fix-network-epoch-calibration-20261014.md",
+    "docs/performance/research-20261014/network-latency-recovery.md",
+    "docs/agents/handoffs/reproduce-network-latency-recovery-20261014.md",
+    "docs/performance/evidence/network-epoch-calibration-20261014/",
+    "docs/agents/handoffs/validate-network-epoch-calibration-20261014.md",
+    ".cache/network-epoch-main-integration/",
+    "docs/agents/handoffs/integrate-network-epoch-calibration-20261014.md"
+  ],
+  "acceptance": [
+    "Před claimem určit přesný ověřený feature SHA. Main předchůdce má runtime/test strom shodný s publicationc677d47; před zápisem znovu ověřit tuto shodu v Git i konkrétní dva pracovní source předchůdce.",
+    "Přenést pouze3 source/test soubory a přesné feature dokumenty. Nový testový soubor nesmí přepsat neznámou kolizi; dva stávající source musí odpovídat původním commitovým blobům. Ostatní WIP včetně Game/UI a vegetace zachovat.",
+    "Před fyzickou editací client/network-timeline.ts ověřit nepřítomnost skutečných dev klientů5173/2567 a nového uživatelského testu. Při jejich aktivitě runtime edit odložit a pokračovat bezpečnými čteními/dokumentací; nevyvolat další HMR v hrané relaci. Produkční4186 je nezávislý immutable build a nemění se.",
+    "Pokud již existují historické research/handoff dokumenty z reprodukce, vyžadovat byte shodu s feature, nekopírovat přes neznámé změny. Výslovně převzaté stejné dokumenty stageovat společně s fixem.",
+    "Po commitu prokázat přesnou shodu runtime/test/config/assets s ověřeným feature a audit ostatních původních dirty/untracked souborů. Fyzické změny povolené jen dvěma stávajícím cílovým source souborům; nový regression test a nové dokumenty mají samostatnou provenance."
+  ],
+  "notes": [
+    "Pouze hlavní checkout; nynější HEAD9c76d3f3f0486d103357a318202ee73a70d8fdf9 je metadata nad58c8003, runtime/test obsah shodný s publicationc677d47. Přesný další feature commit doplní root po plné validaci.",
+    "Tato oprava nezmění již vytvořený snapshot/asset reference/node_modules a není důkazem odstranění všech freeze, phase jitter nebo GPU problémů. Main runtime změna je malá kompatibilní oprava bez změny API/protokolu.",
+    "Root přebírá historické dva vlastní/reporterovy research/handoff dokumenty podle dokončeného reprodukčního předání; jejich existující dirty main původ je doložený, není to převzetí cizího WIP.",
+    "Přijat přesný publication commit4f41b37fb145e5a00414bf256fd431744b6ba462 nadc677d47. Full b773dc71…827/827+build+integracePASS,492 source Git blobů i SHA shodných,65 publication working souborů zachováno. Předchozí source/validation/commit claimy uvolněné; main základ9c76d3f3f0486d103357a318202ee73a70d8fdf9.",
+    "Dokončeno main98ce8fcbef76632d649c94e4dca5aeb81d0b1e84, přesný feature4f41b37,827/827+build+integracePASS;117 původních dirty souborů beze změny. Vlastní procesy skončily, handoff uložen a claim uvolněný."
+  ]
+}

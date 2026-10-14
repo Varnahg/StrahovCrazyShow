@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fix-network-epoch-calibration-20261014",
   "title": "KEY-7: zabránit přetrvávající clock kotvě z RTT mimo podporovaný delivery budget",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [
     "publish-wave3-v11-network-20261014",
     "reproduce-network-latency-recovery-20261014"
@@ -23,7 +23,7 @@
     "Over-budget RTT nepoužít jako kvalifikovaný halfRTT offset novéepochy. Zachovat pendingkalibraci přes opakovanéoverbudgetauthority, aby první způsobilýsample+authority mohl skutečnějednoukalibrovat. Platné stable200ms musí zachovat původníonewaykalibraci.",
     "Bezezměny rawRTT/logging, deliveryBudgetExceeded, wire protocol, input/future/replay/rate limits, Game/camera/presentation, probe či server. Nezvyšovat limityani neclampovatspike pro dosaženígreen.",
     "Přenést skutečný frozen counterexample na aktuálníproductimports. Původnícache red/test neměnit; novátestregrese má očekávat0ahead a pokračujícíacceptedpo freshlow. Poslednícausalresetkontrola musí teď očekávat0ahead jižpředresetem, protože odstraněná chyba nemůže zůstat pozitivníassertion.",
-    "Pokrýt repeatedoverbudgetauthorities, prvníbootstrap/highfirst, stabilníRTT0/34/200+jitter, stale/invalidsample, novéepoch/respawn/clockdrop/reconnect bezopakovaného/resendseq; skutečnéserverqueue a existujícísender/physics kontroly zachovat.",
+    "Pokrýt repeatedoverbudgetauthorities, prvníbootstrap/highfirst, stabilníRTT0/34/200+jitter, stale/invalid authority a neplatné RTT, novéepoch/respawn/clockdrop/reconnect bezopakovaného/resendseq; skutečnéserverqueue a existujícísender/physics kontroly zachovat.",
     "Implementace, relevantníregrese, targetedrefaktor společnévaliditypodmínky a lifecycle/cachereview jako jeden výsledek. Žádnýunboundedstav ani duplicitníRTTpolicy. Předat přesnýdelta/hashy/testy/limity pro rootfullcheckpoint a samostatnýcommit."
   ],
   "verification": [
@@ -38,6 +38,8 @@
     "Globálníserver-tick continuity přeskaždouepochu zatímnezvolená: vyžadujeexplicitnídůvodserverovédiscontinuity/roomidentity; samaTimelineAuthority jejnemápovinný. Tento malýpatch nesmí skrytěpřebratširšíwire/lifecyclescope.",
     "Novýphasefix vwave4 je samostatnýpředanýdelta, nikoličásttohototasku. Pokudrootmezitímphasepublikuje, předclaimemexplicitněověřitnovýbase; nikdynekopírovatcelýstarýTimeline přesnovějšípráci.",
     "READY po skutečné V11 integraci. Přesný čistý runtime základ publication c677d47fd5722475ea1700b44fb3aea6ea581955 =8fd53e9+2řádková test fixture kompatibilita. Runtime V11 je ověřen819/819+build+integrace, follow-up24/24; main ekvivalent58c8003. Všechny předchozí source claims uvolněné. Nový Game phase není zahrnut.",
-    "Tentýž autor reprodukce smí převzít přesné dva vlastní research/handoff dokumenty zmain do publication WT (nové relativníwritePaths výše). Původnímain kopie a red cache zůstanou read-only; do nového runtime testu přenést public imports a nové správné assertions, původnícache neupravovat."
+    "Tentýž autor reprodukce smí převzít přesné dva vlastní research/handoff dokumenty zmain do publication WT (nové relativníwritePaths výše). Původnímain kopie a red cache zůstanou read-only; do nového runtime testu přenést public imports a nové správné assertions, původnícache neupravovat.",
+    "Potvrzená hranice před implementací: setRtt nemá timestamp; numericky validní, ale časově staré RTT nelze v tomto API rozpoznat. Tento malý B fix neprohlašuje podporu freshness. Stale/invalid authority a invalid RTT se ověřují, existující Probe nonce/room lifecycle zůstává zachovaný; časová freshness patří širší A policy.",
+    "Přijat přesný publication commit4f41b37fb145e5a00414bf256fd431744b6ba462 nadc677d47. Full b773dc71…827/827+build+integracePASS,492 source Git blobů i SHA shodných,65 publication working souborů zachováno. Předchozí source/validation/commit claimy uvolněné; main základ9c76d3f3f0486d103357a318202ee73a70d8fdf9."
   ]
 }
