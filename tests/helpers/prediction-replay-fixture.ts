@@ -1,5 +1,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Game } from "../../client/game";
+import { NetworkTimeline } from "../../client/network-timeline";
 import {
   FIXED_DT,
   PredictionHistory,
@@ -20,6 +21,7 @@ export const REPLAY_INPUTS = 18;
 export function createReplayFixture(
   movement: "walking" | "stationary" | "vehicle" = "walking",
   staleHistory = false,
+  wrongModeSeqs: number[] = [],
 ) {
   const sim = new Simulation(),
     actor = sim.add("local", {
@@ -42,19 +44,34 @@ export function createReplayFixture(
     actor.step({ ...input, x: 0, z: 0 });
     sim.tick(REPLAY_AT + tick * FIXED_DT * 1000);
   }
-  for (let seq = 1; seq <= REPLAY_INPUTS; seq++) {
-    const command = { ...input, seq };
-    actor.step(command);
-    sim.tick(REPLAY_AT + seq * FIXED_DT * 1000);
-    const state = actor.capture();
-    authorities.set(seq, state);
-    // Represent captures from before a server correction. The tested replay
-    // must replace them with its actual resulting physics states.
-    prediction.push(command, {
-      ...structuredClone(state),
-      position: { ...state.position, x: state.position.x - 0.1 },
-    });
-  }
+  const networkTimeline = new NetworkTimeline();
+  networkTimeline.acceptAuthority(
+    { inputEpoch: 1, inputTickBase: 0, tick: 0, ack: 0, time: REPLAY_AT },
+    0,
+    { vehicle: actor.vehicle, yaw: actor.yaw },
+  );
+  for (const now of [0, 100, 200])
+    networkTimeline.advance(
+      now,
+      (seq) => ({
+        ...input,
+        seq,
+        vehicle: wrongModeSeqs.includes(seq) ? !input.vehicle : input.vehicle,
+      }),
+      ({ input: command, time }) => {
+        const seq = command.seq;
+        actor.step(command);
+        sim.tick(time);
+        const state = actor.capture();
+        authorities.set(seq, state);
+        // Represent captures from before a server correction. The tested replay
+        // must replace them with its actual resulting physics states.
+        prediction.push(command, {
+          ...structuredClone(state),
+          position: { ...state.position, x: state.position.x - 0.1 },
+        });
+      },
+    );
   if (staleHistory) {
     const set = prediction.states.set.bind(prediction.states);
     prediction.states.set = (seq, state) =>
@@ -67,10 +84,19 @@ export function createReplayFixture(
     ready: true,
     network: true,
     localId: "local",
+    diagnosticNetwork: {
+      motionPackets: 0,
+      authorityPackets: 0,
+      corrections: 0,
+      resyncs: 0,
+      lastCorrectionMetres: 0,
+      lastMotionAtMs: 0,
+    },
     lastAuthorityTick: -1,
     minimumMotionTick: -1,
     respawnPending: false,
     prediction,
+    networkTimeline,
     snapshots: new SnapshotBuffer(),
     seq: REPLAY_INPUTS,
     accumulator: 0,
@@ -89,6 +115,9 @@ export function createReplayFixture(
     return {
       tick: ack,
       ack,
+      inputEpoch: 1,
+      inputTickBase: 0,
+      receivedSeq: REPLAY_INPUTS,
       time: REPLAY_AT + ack * FIXED_DT * 1000,
       state: structuredClone(state),
     };

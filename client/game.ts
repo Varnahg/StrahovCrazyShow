@@ -1,4 +1,7 @@
 import "./render-shaders";
+import { sessionDiagnostics } from "./session-diagnostics";
+import { NetworkTimeline } from "./network-timeline";
+import type { TimelineInput } from "../shared/input-timeline";
 import { SceneTextureDiagnostics } from "./texture-diagnostics";
 import {
   AvatarPrimitivePool,
@@ -127,6 +130,50 @@ import {
   type Authority,
 } from "../shared/netcode";
 
+const vectorNear = (a: Vec3, b: Vec3, tolerance: number) =>
+  Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) < tolerance;
+const quaternionNear = (
+  a: VehicleState["rotation"],
+  b: VehicleState["rotation"],
+) =>
+  Math.min(
+    Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w),
+    Math.hypot(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w),
+  ) < 0.0001;
+const arrayNear = (a: number[], b: number[], tolerance: number) =>
+  a.length === b.length &&
+  a.every((value, index) => Math.abs(value - b[index]) < tolerance);
+
+/** Equal translation alone is not equal vehicle dynamics: steering, forces and
+ * roll/rotation can diverge before position does. Driver identity is local in
+ * the prediction world and intentionally compared only as occupied/vacant. */
+function vehiclePredictionMatches(
+  a: VehicleState | undefined,
+  b: VehicleState | undefined,
+) {
+  return (
+    !!a &&
+    !!b &&
+    a.id === b.id &&
+    !!a.driverId === !!b.driverId &&
+    a.parked === b.parked &&
+    a.sleeping === b.sleeping &&
+    vectorNear(a.position, b.position, 0.003) &&
+    quaternionNear(a.rotation, b.rotation) &&
+    vectorNear(a.linvel, b.linvel, 0.015) &&
+    vectorNear(a.angvel, b.angvel, 0.001) &&
+    vectorNear(a.force, b.force, 0.001) &&
+    vectorNear(a.torque, b.torque, 0.001) &&
+    vectorNear(a.parking.position, b.parking.position, 0.003) &&
+    quaternionNear(a.parking.rotation, b.parking.rotation) &&
+    Math.abs(a.steering - b.steering) < 0.0001 &&
+    arrayNear(a.wheelSpin, b.wheelSpin, 0.001) &&
+    arrayNear(a.wheelSuspension, b.wheelSuspension, 0.0001) &&
+    a.wheelContact.length === b.wheelContact.length &&
+    a.wheelContact.every((value, i) => value === b.wheelContact[i])
+  );
+}
+
 export type GameStats = {
   fps: number;
   triangles: number;
@@ -241,8 +288,8 @@ export class Game {
   sim!: Simulation;
   actor!: Actor;
   localId = "guest";
-  onInput?: (input: Input) => void;
-  onPredictionReset?: () => void;
+  onInput?: (input: TimelineInput) => void;
+  onPredictionReset?: (priority?: boolean) => void;
   onAction?: (action: string, data?: unknown) => void | boolean;
   onStats?: (stats: GameStats) => void;
   onNotice?: (message: string) => void;
@@ -303,6 +350,20 @@ export class Game {
   pitch = 0.28;
   distance = 8;
   seq = 0;
+  onInputFrame?: () => void;
+  onBeforeInputFrame?: () => void;
+  onNetworkDiagnostics?: () => unknown;
+  networkTimeline = new NetworkTimeline();
+  private lastTimelineRecoveryAt = -Infinity;
+  private lastAuthorityNetwork: Authority["network"] | null = null;
+  private readonly diagnosticNetwork = {
+    motionPackets: 0,
+    authorityPackets: 0,
+    corrections: 0,
+    resyncs: 0,
+    lastCorrectionMetres: null as number | null,
+    lastMotionAtMs: 0,
+  };
   accumulator = 0;
   lastStats = 0;
   profile: Profile;
@@ -870,6 +931,7 @@ export class Game {
     // A newly issued session belongs to a new network epoch. Resuming the same
     // identity keeps its frontiers so delayed packets cannot rewind it.
     this.resetPredictionHistory();
+    this.networkTimeline = new NetworkTimeline();
     this.lastAuthorityTick = this.minimumMotionTick = -1;
     this.seq = 0;
     this.respawnPending = false;
@@ -889,6 +951,8 @@ export class Game {
   }
   syncMotion(packet: MotionPacket) {
     if (packet.tick < this.minimumMotionTick) return;
+    this.diagnosticNetwork.motionPackets++;
+    this.diagnosticNetwork.lastMotionAtMs = performance.now();
     this.snapshots.push(packet);
     if (packet.car) {
       this.carSnapshots.push({ time: packet.time, state: packet.car });
@@ -912,18 +976,31 @@ export class Game {
         });
     }
   }
-  reconcile(packet: Authority) {
-    if (!this.ready || packet.tick < this.lastAuthorityTick) return;
+  reconcile(packet: Authority, receivedAt = performance.now()): boolean {
+    if (!this.ready || packet.tick < this.lastAuthorityTick) return false;
     // Respawn is completed by a forced authority, not by replaying a packet
     // already in flight when the user asked to return to the start.
     const respawnReply = packet.resync === true && packet.respawn === true;
-    if (this.respawnPending && !respawnReply) return;
+    if (this.respawnPending && !respawnReply) return false;
     const explicitRespawn = this.respawnPending && respawnReply;
+    const acceptance = this.networkTimeline.acceptAuthority(
+      packet,
+      receivedAt,
+      {
+        vehicle: packet.state.vehicle,
+        yaw: packet.state.yaw,
+      },
+    );
+    if (!acceptance.accepted) return false;
+    this.lastAuthorityNetwork = packet.network ?? null;
+    this.diagnosticNetwork.authorityPackets++;
     this.lastAuthorityTick = packet.tick;
     const expected = this.prediction.states.get(packet.ack);
     const exact =
       expected &&
       expected.vehicle === packet.state.vehicle &&
+      expected.grounded === packet.state.grounded &&
+      Math.abs(expected.speed - packet.state.speed) < 0.01 &&
       Math.hypot(
         expected.position.x - packet.state.position.x,
         expected.position.y - packet.state.position.y,
@@ -937,47 +1014,62 @@ export class Game {
         ),
       ) < 0.003 &&
       (!packet.state.vehicle ||
-        (!!expected.vehicleState &&
-          !!packet.state.vehicleState &&
-          Math.hypot(
-            expected.vehicleState.linvel.x - packet.state.vehicleState.linvel.x,
-            expected.vehicleState.linvel.y - packet.state.vehicleState.linvel.y,
-            expected.vehicleState.linvel.z - packet.state.vehicleState.linvel.z,
-          ) < 0.015));
-    if (exact && !packet.resync) {
-      this.prediction.acknowledge(packet.ack, packet.state.vehicle);
+        vehiclePredictionMatches(
+          expected.vehicleState,
+          packet.state.vehicleState,
+        ));
+    if (
+      exact &&
+      !packet.resync &&
+      !acceptance.rebase &&
+      acceptance.replay.every((step) => step.source === "input")
+    ) {
+      this.prediction.acknowledge(packet.ack);
       this.seq = Math.max(this.seq, packet.ack);
-      return;
+      return true;
     }
     const old = packet.resync
         ? packet.state.position
         : { ...this.actor.position },
       modeChanged = this.actor.vehicle !== packet.state.vehicle;
-    if (packet.resync) {
+    // Recovery can arrive with an invalid old physics pose. Keep presentation's
+    // hard reset independent of optional diagnostics; authority against itself
+    // is not a measured zero displacement.
+    let beforeCorrection: Vec3 | null = packet.resync ? null : old;
+    if (packet.resync && !packet.respawn) {
+      try {
+        const position = this.actor.position;
+        if ([position.x, position.y, position.z].every(Number.isFinite))
+          beforeCorrection = { x: position.x, y: position.y, z: position.z };
+      } catch {
+        // Forced recovery can legitimately replace an unreadable old body.
+      }
+    }
+    const pendingInputs = this.prediction.inputs.length;
+    const localSequence = this.seq;
+    if (packet.resync || acceptance.rebase) {
       if (explicitRespawn) this.clearPendingMovement();
-      else this.resetPredictionHistory();
+      else this.resetPredictionHistory(true);
       this.seq = packet.ack;
       this.respawnPending = false;
       this.minimumMotionTick = packet.tick;
       this.carSnapshots.length = 0;
       this.snapshots.remove(this.localId);
     } else this.seq = Math.max(this.seq, packet.ack);
-    const replay = this.prediction.acknowledge(
-      packet.ack,
-      packet.state.vehicle,
-    );
+    this.prediction.acknowledge(packet.ack);
+    const replay = acceptance.replay;
     this.actor.restore(packet.state, packet.respawn === true);
     if (packet.resync && !packet.state.vehicle && packet.state.vehicleState)
       this.sim.restorePublicCar(packet.state.vehicleState);
     if (modeChanged && packet.state.vehicle && !packet.resync)
       this.alignVehicleCamera();
     if (!packet.resync) {
-      for (const input of replay) {
+      for (const { input, time } of replay) {
         this.actor.step(input, FIXED_DT);
         // Anchor replay to the authority's server time, independent of local
         // clock skew and mode-filtered sequence gaps. Dynamic contacts still
         // do not have a full world rollback.
-        this.sim.tick(packet.time + (input.seq - packet.ack) * FIXED_DT * 1000);
+        this.sim.tick(time);
         this.prediction.states.set(input.seq, this.actor.capture());
       }
     }
@@ -987,6 +1079,33 @@ export class Game {
         old.y - corrected.y,
         old.z - corrected.z,
       );
+    this.diagnosticNetwork.corrections++;
+    const measuredCorrection = beforeCorrection
+      ? Math.hypot(
+          beforeCorrection.x - corrected.x,
+          beforeCorrection.y - corrected.y,
+          beforeCorrection.z - corrected.z,
+        )
+      : null;
+    this.diagnosticNetwork.lastCorrectionMetres = measuredCorrection;
+    if (packet.resync) this.diagnosticNetwork.resyncs++;
+    if (packet.resync || error >= 0.35)
+      sessionDiagnostics.event("network-correction", {
+        resync: !!packet.resync,
+        respawn: !!packet.respawn,
+        correctionMetres: measuredCorrection,
+        correctionAvailable: measuredCorrection !== null,
+        modeChanged,
+        resyncReason: packet.resyncReason ?? null,
+        authorityAck: packet.ack,
+        authorityTime: packet.time,
+        localSequence,
+        pendingInputs,
+        replayInputs: replay.length,
+        authorityTick: packet.tick,
+        inputEpoch: packet.inputEpoch,
+        timelineRebase: acceptance.rebase,
+      });
     this.visualOffset.set(
       !modeChanged && !packet.resync && error < 0.35 ? old.x - corrected.x : 0,
       !modeChanged && !packet.resync && error < 0.35 ? old.y - corrected.y : 0,
@@ -1008,16 +1127,17 @@ export class Game {
       ),
     };
     if (explicitRespawn) this.snapRecoveryPresentation();
+    return true;
   }
-  private resetPredictionHistory() {
+  private resetPredictionHistory(priority = false) {
     this.accumulator = 0;
     this.prediction.clear();
-    this.onPredictionReset?.();
+    this.onPredictionReset?.(priority);
   }
   private clearPendingMovement() {
     this.clearHeldInput();
     this.jumpWasDown = false;
-    this.resetPredictionHistory();
+    this.resetPredictionHistory(true);
   }
   private snapRecoveryPresentation() {
     const position = this.actor.position;
@@ -1032,6 +1152,7 @@ export class Game {
   /** One path for R and the GUI. Ordered transport sees old inputs before the
    * request; no fresh input is predicted or queued until the forced reply. */
   requestRespawn() {
+    sessionDiagnostics.event("action", { action: "respawn" });
     if (!this.ready || this.respawnPending) return false;
     this.clearPendingMovement();
     if (this.network) {
@@ -1106,6 +1227,11 @@ export class Game {
   interact() {
     if (!this.ready) return;
     const p = this.actor.position;
+    sessionDiagnostics.event("action", {
+      action: "interact",
+      vehicle: this.actor.vehicle,
+      position: { x: p.x, y: p.y, z: p.z },
+    });
     // Driving takes priority over a collectible beside the road.
     if (this.actor.vehicle) {
       if (!vehicleExitAllowed(this.actor.speed)) {
@@ -1587,9 +1713,93 @@ export class Game {
     );
   }
 
+  advanceSimulation(dt: number, now: number) {
+    if (this.respawnPending) {
+      this.accumulator = 0;
+      return;
+    }
+    this.accumulator += dt;
+    const forward =
+        (this.keys.has("KeyW") || this.keys.has("ArrowUp") ? 1 : 0) -
+        (this.keys.has("KeyS") || this.keys.has("ArrowDown") ? 1 : 0),
+      side =
+        (this.keys.has("KeyD") || this.keys.has("ArrowRight") ? 1 : 0) -
+        (this.keys.has("KeyA") || this.keys.has("ArrowLeft") ? 1 : 0);
+    const makeInput = (seq: number): Input => {
+      const jumpDown = this.keys.has("Space");
+      const input = canonicalInput({
+        ...movementFromKeys(forward, side, this.yaw, this.actor.vehicle),
+        yaw: this.yaw,
+        jump: this.actor.vehicle ? jumpDown : jumpDown && !this.jumpWasDown,
+        seq,
+        run: this.keys.has("ShiftLeft") || this.keys.has("ShiftRight"),
+        vehicle: this.actor.vehicle,
+      })!;
+      this.jumpWasDown = jumpDown;
+      return input;
+    };
+    const applyStep = (input: Input, time: number) => {
+      this.previousPosition.copyFromFloats(
+        this.actor.position.x,
+        this.actor.position.y,
+        this.actor.position.z,
+      );
+      const carPose = this.sim.car.getVisualPose();
+      this.previousCarPose = {
+        position: new Vector3(
+          carPose.position.x,
+          carPose.position.y,
+          carPose.position.z,
+        ),
+        rotation: new Quaternion(
+          carPose.rotation.x,
+          carPose.rotation.y,
+          carPose.rotation.z,
+          carPose.rotation.w,
+        ),
+      };
+      this.actor.step(input, FIXED_DT);
+      this.sim.tick(time);
+      this.seq = input.seq;
+    };
+    if (this.network) {
+      const result = this.networkTimeline.advance(now, makeInput, (step) => {
+        applyStep(step.input, step.time);
+        this.prediction.push(step.input, this.actor.capture());
+        // Neutral elapsed prefix is predicted for temporal alignment only.
+        // Sending it would create late packets and consume the sender budget.
+        if (step.source === "input") this.onInput?.(step.input);
+      });
+      if (result.status === "advanced") {
+        if (result.steps) this.accumulator %= FIXED_DT;
+      } else {
+        this.accumulator = 0;
+        if (
+          result.reason !== "no-authority" &&
+          now - this.lastTimelineRecoveryAt >= 1000
+        ) {
+          this.lastTimelineRecoveryAt = now;
+          const recoveryRequested = result.reason !== "latency-budget";
+          sessionDiagnostics.event("network-timeline-wait", {
+            reason: result.reason,
+            recoveryRequested,
+          });
+          if (recoveryRequested) this.onAction?.("resync");
+        }
+      }
+    } else {
+      while (this.accumulator >= FIXED_DT) {
+        applyStep(makeInput(this.seq + 1), this.trafficInstant());
+        this.accumulator -= FIXED_DT;
+      }
+    }
+    this.onInputFrame?.();
+  }
+
   frame() {
     if (!this.ready || this.disposed) return;
     const frameStarted = performance.now();
+    this.onBeforeInputFrame?.();
     const rawFrameMs = this.engine.getDeltaTime(),
       dt = Math.min(0.1, rawFrameMs / 1000);
     const gpuCounter = this.engineInstrumentation.captureGPUFrameTime
@@ -1615,7 +1825,6 @@ export class Game {
         gpuFrameMs: this.lastGpuFrameMs,
       }),
     );
-    this.accumulator = this.respawnPending ? 0 : this.accumulator + dt;
     if (
       vehicleCameraCanFollow({
         driving: this.actor.vehicle,
@@ -1627,53 +1836,7 @@ export class Game {
       })
     )
       this.yaw = vehicleChaseYaw(this.yaw, this.actor.yaw, dt);
-    const forward =
-        (this.keys.has("KeyW") || this.keys.has("ArrowUp") ? 1 : 0) -
-        (this.keys.has("KeyS") || this.keys.has("ArrowDown") ? 1 : 0),
-      side =
-        (this.keys.has("KeyD") || this.keys.has("ArrowRight") ? 1 : 0) -
-        (this.keys.has("KeyA") || this.keys.has("ArrowLeft") ? 1 : 0);
-    if (rawFrameMs > 250) {
-      this.accumulator = 0;
-      this.blur();
-      if (this.network) this.onAction?.("resync");
-    }
-    while (this.accumulator >= FIXED_DT) {
-      const jumpDown = this.keys.has("Space");
-      const input = canonicalInput({
-        ...movementFromKeys(forward, side, this.yaw, this.actor.vehicle),
-        yaw: this.yaw,
-        jump: this.actor.vehicle ? jumpDown : jumpDown && !this.jumpWasDown,
-        seq: ++this.seq,
-        run: this.keys.has("ShiftLeft") || this.keys.has("ShiftRight"),
-        vehicle: this.actor.vehicle,
-      })!;
-      this.jumpWasDown = jumpDown;
-      this.previousPosition.copyFromFloats(
-        this.actor.position.x,
-        this.actor.position.y,
-        this.actor.position.z,
-      );
-      const carPose = this.sim.car.getVisualPose();
-      this.previousCarPose = {
-        position: new Vector3(
-          carPose.position.x,
-          carPose.position.y,
-          carPose.position.z,
-        ),
-        rotation: new Quaternion(
-          carPose.rotation.x,
-          carPose.rotation.y,
-          carPose.rotation.z,
-          carPose.rotation.w,
-        ),
-      };
-      this.actor.step(input, FIXED_DT);
-      this.sim.tick(this.trafficInstant());
-      if (this.network) this.prediction.push(input, this.actor.capture());
-      this.onInput?.(input);
-      this.accumulator -= FIXED_DT;
-    }
+    this.advanceSimulation(dt, frameStarted);
     const simulationEnded = performance.now();
     const pos = this.actor.position;
     this.worldControllers?.architecture?.update(

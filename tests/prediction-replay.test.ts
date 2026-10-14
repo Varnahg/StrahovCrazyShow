@@ -88,34 +88,38 @@ test("vehicle replay records complete car state and matching authority preserves
   }
 });
 
-test("both authority paths discard obsolete modes and retain sequence time gaps", () => {
-  const f = createReplayFixture();
+test("future mode mismatches simulate neutral time without compressing the timeline", () => {
+  const f = createReplayFixture("walking", false, [6, 8]);
   try {
     f.prediction.states.set(3, f.authorities.get(3)!);
-    f.prediction.inputs.find((input) => input.seq === 6)!.vehicle = true;
     f.game.reconcile(f.authority(3));
     assert.equal(
       f.times.length,
-      0,
-      "matching authority stays on the fast path",
+      15,
+      "matching frontier still replays changed future mode inputs",
     );
-    assert.equal(f.prediction.states.has(6), false);
-    assert.equal(
-      f.prediction.inputs.some((input) => input.seq === 6),
-      false,
-    );
-
-    f.prediction.inputs.find((input) => input.seq === 8)!.vehicle = true;
-    const packet = f.authority(4);
-    f.game.reconcile(packet);
-    assert.equal(f.prediction.states.has(8), false);
     assert.deepEqual(
       f.times,
-      f.prediction.inputs.map(
-        (input) => packet.time + (input.seq - packet.ack) * FIXED_DT * 1000,
+      Array.from(
+        { length: 15 },
+        (_, i) => REPLAY_AT + (i + 4) * FIXED_DT * 1000,
       ),
     );
-    assert.equal(f.times.length, 12);
+    for (const seq of [6, 8]) {
+      assert.equal(
+        f.prediction.inputs.find((input) => input.seq === seq)!.vehicle,
+        true,
+        "original wire input survives a temporary mode filter",
+      );
+      assert.equal(
+        f.prediction.states.get(seq)!.vehicle,
+        false,
+        "capture records the neutral time step in the authoritative mode",
+      );
+    }
+    assert.deepEqual(f.prediction.states.get(REPLAY_INPUTS), f.actor.capture());
+    f.game.reconcile(f.authority(REPLAY_INPUTS));
+    assert.equal(f.prediction.states.size, 0);
   } finally {
     f.sim.dispose();
   }
@@ -167,7 +171,7 @@ test("acknowledgment prunes obsolete vehicle inputs and captures together", () =
 test("forced authority clears replay history without stepping the world", () => {
   const f = createReplayFixture();
   try {
-    f.game.reconcile({ ...f.authority(3), resync: true });
+    f.game.reconcile({ ...f.authority(3), inputEpoch: 2, resync: true });
     assert.equal(f.times.length, 0);
     assert.equal(f.prediction.inputs.length, 0);
     assert.equal(f.prediction.states.size, 0);
@@ -190,4 +194,41 @@ test("remote snapshots preserve optional grounded state without inventing old da
   }
   buffer.remove("remote");
   assert.equal(buffer.sample("remote"), undefined);
+});
+
+test("matching position cannot hide authoritative grounding or vehicle dynamics changes", () => {
+  for (const change of [
+    "grounded",
+    "steering",
+    "rotation",
+    "angvel",
+    "force",
+  ] as const) {
+    const f = createReplayFixture(
+      change === "grounded" ? "stationary" : "vehicle",
+    );
+    try {
+      const state = structuredClone(f.authorities.get(3)!);
+      f.prediction.states.set(3, structuredClone(state));
+      if (change === "grounded") state.grounded = !state.grounded;
+      else if (change === "steering") state.vehicleState!.steering += 0.2;
+      else if (change === "rotation")
+        state.vehicleState!.rotation = {
+          x: Math.sin(0.1),
+          y: 0,
+          z: 0,
+          w: Math.cos(0.1),
+        };
+      else state.vehicleState![change].x += 0.2;
+      f.game.reconcile(f.authority(3, state));
+      assert.equal(
+        f.times.length,
+        15,
+        change +
+          " must restore before future replay even when actor position/yaw/linvel match",
+      );
+    } finally {
+      f.sim.dispose();
+    }
+  }
 });

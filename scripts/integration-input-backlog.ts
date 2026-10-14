@@ -3,12 +3,13 @@ import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import { Client, type Room } from "@colyseus/sdk";
 import { DEFAULT_PROFILE } from "../shared/types";
+import { PROTOCOL_VERSION, SIM_HZ } from "../shared/netcode";
 import {
-  INPUT_BACKLOG_RECOVERY_INTERVAL_MS,
-  PROTOCOL_VERSION,
-  canonicalInput,
-  type Authority,
-} from "../shared/netcode";
+  DEFAULT_INPUT_LEAD_TICKS,
+  MAX_FUTURE_INPUT_TICKS,
+  type TimelineQueueDiagnostics,
+} from "../shared/input-timeline";
+import { ScriptTimelineClient, type ScriptAuthority } from "./timeline-client";
 
 const endpoint = process.env.STRAHOV_TEST_URL || "http://127.0.0.1:2568";
 assert.equal(
@@ -28,9 +29,9 @@ async function until(predicate: () => boolean, label: string) {
 }
 type Probe = {
   room: Room;
-  authority?: Authority;
-  seq: number;
-  recoveries: { at: number; authority: Authority }[];
+  inputs: ScriptTimelineClient;
+  authority?: ScriptAuthority;
+  recoveries: { at: number; authority: ScriptAuthority }[];
   lags: number[];
   record: boolean;
 };
@@ -51,183 +52,204 @@ async function join(nickname: string) {
   });
   const probe: Probe = {
     room,
-    seq: 0,
+    inputs: new ScriptTimelineClient({
+      send: (batch) => room.send("inputs", batch),
+    }),
     recoveries: [],
     lags: [],
     record: false,
   };
   probes.push(probe);
   room.onMessage("*", () => {});
-  room.onMessage("authoritative", (authority: Authority) => {
+  room.onMessage("authoritative", (authority: ScriptAuthority) => {
+    if (probe.record && !authority.resync)
+      probe.lags.push(probe.inputs.frontier.seq - authority.ack);
     probe.authority = authority;
+    probe.inputs.acceptAuthority(authority);
     if (authority.resync)
       probe.recoveries.push({ at: performance.now(), authority });
-    if (probe.record && !authority.resync)
-      probe.lags.push(probe.seq - authority.ack);
   });
   await until(() => !!probe.authority, "initial authority");
   return probe;
 }
-function send(probe: Probe, count: number) {
-  for (let batch = 0; batch < count; batch += 8)
-    probe.room.send(
-      "inputs",
-      Array.from({ length: Math.min(8, count - batch) }, () =>
-        canonicalInput({
-          x: 1,
-          z: 0,
-          yaw: Math.PI / 2,
-          jump: false,
-          vehicle: false,
-          seq: ++probe.seq,
-        })!,
-      ),
-    );
+function queue(probe: Probe): TimelineQueueDiagnostics {
+  const diagnostic = probe.authority!.network!.queue;
+  assert.ok(
+    "resolution" in diagnostic && diagnostic.resolution === "scheduled-tick",
+  );
+  return diagnostic;
 }
-async function rhythm(probe: Probe, milliseconds: number) {
-  const start = performance.now();
-  for (
-    let batch = 1;
-    batch <= Math.floor(milliseconds / (1000 / 30));
-    batch++
-  ) {
-    await sleep(Math.max(0, start + batch * (1000 / 30) - performance.now()));
-    send(probe, 2);
-  }
-}
+const controls = { x: 1, z: 0, yaw: Math.PI / 2, jump: false, vehicle: false };
+const command = (probe: Probe, seq: number) => ({
+  ...controls,
+  seq,
+  inputEpoch: probe.authority!.inputEpoch,
+});
 const quantile = (values: number[], fraction: number) =>
   [...values].sort((a, b) => a - b)[Math.floor((values.length - 1) * fraction)];
 
 try {
   const delayed = await join("backlog-delayed"),
     peer = await join("backlog-peer");
-  const peerResyncs = peer.recoveries.length;
+  const peerResyncs = peer.recoveries.length,
+    initialResyncs = delayed.recoveries.length;
   const before = delayed.authority!,
     started = performance.now();
-  // Model a paused sender delivering accumulated commands. The server itself is
-  // not paused; all sixteen commands use its ordinary public input handler.
-  send(delayed, 16);
-  await until(
-    () =>
-      delayed.recoveries.some(
-        ({ authority }) => authority.resyncReason === "input-backlog",
+  const burstEnd = before.ack + MAX_FUTURE_INPUT_TICKS;
+  // The full supported window arrives together, but each input belongs to one
+  // future tick. Some earliest deadlines may have elapsed while in transport.
+  for (let offset = 1; offset <= MAX_FUTURE_INPUT_TICKS; offset += 8)
+    delayed.room.send(
+      "inputs",
+      Array.from({ length: 8 }, (_, i) =>
+        command(delayed, before.ack + offset + i),
       ),
-    "explicit backlog authority",
+    );
+  await until(
+    () => queue(delayed).receivedSeq === burstEnd,
+    "scheduled burst received",
   );
-  const first = delayed.recoveries.find(
-    ({ authority }) => authority.resyncReason === "input-backlog",
-  )!;
+  const first = delayed.authority!,
+    firstAt = performance.now();
+  const displacement = first.state.position.x - before.state.position.x;
+  assert.ok(
+    displacement <= ((first.tick - before.tick) * 4.6) / SIM_HZ + 0.005,
+    "burst cannot move farther than ordinary pedestrian speed over resolved world ticks",
+  );
+  assert.ok(
+    firstAt - started < 1000,
+    "burst reports receipt without a seconds-long FIFO drain",
+  );
+  assert.equal(first.respawn, undefined);
+  assert.equal(first.state.vehicle, before.state.vehicle);
+  assert.equal(first.inputEpoch, before.inputEpoch);
+  await until(
+    () => delayed.authority!.ack >= burstEnd,
+    "burst resolves by scheduled time",
+  );
   assert.equal(
-    first.authority.ack,
-    16,
-    "reset acknowledges the entire accepted burst",
+    delayed.recoveries.length,
+    initialResyncs,
+    "scheduled burst needs no recovery",
   );
-  assert.ok(
-    first.at - started < 1000,
-    "recovery is immediate, not a seconds-long FIFO drain",
-  );
-  assert.ok(
-    Math.abs(first.authority.state.position.x - before.state.position.x) < 0.16,
-    "burst cannot accelerate movement",
-  );
-  assert.equal(first.authority.respawn, undefined);
-  assert.equal(first.authority.state.vehicle, before.state.vehicle);
 
   delayed.record = true;
-  await rhythm(delayed, 2500);
+  await delayed.inputs.holdFor(controls, 2500);
   delayed.record = false;
+  await delayed.inputs.settle();
   assert.ok(delayed.lags.length >= 30);
-  const recoveredLagP95 = quantile(delayed.lags, 0.95);
+  const leadP95 = quantile(delayed.lags, 0.95);
   assert.ok(
-    recoveredLagP95 <= 5,
-    `normal cadence remains responsive: p95 lag ${recoveredLagP95}`,
+    leadP95 <= DEFAULT_INPUT_LEAD_TICKS,
+    `normal cadence remains within intentional lead: p95 ${leadP95}`,
   );
   assert.equal(
     peer.recoveries.length,
     peerResyncs,
-    "an unaffected peer must not resync",
-  );
-  await until(
-    () => delayed.authority!.ack === delayed.seq,
-    "settled frontier before malformed input",
-  );
-  const frontier = delayed.seq;
-  const recoveriesBeforeInvalid = delayed.recoveries.length;
-  delayed.room.send("inputs", [
-    { x: NaN, z: 0, yaw: 0, jump: false, seq: frontier + 1 },
-  ]);
-  await sleep(75);
-  assert.equal(
-    delayed.authority!.ack,
-    frontier,
-    "invalid numbers never advance the frontier",
-  );
-  assert.equal(
-    delayed.recoveries.length,
-    recoveriesBeforeInvalid,
-    "malformed input cannot trigger recovery spam",
-  );
-  send(delayed, 1);
-  await until(
-    () => delayed.authority!.ack === delayed.seq,
-    "valid next sequence after invalid input",
+    "unaffected peer must not resync",
   );
 
-  const recoveriesBeforeRate = delayed.recoveries.filter(
-    ({ authority }) => authority.resyncReason === "input-backlog",
-  ).length;
-  for (let burst = 0; burst < 3; burst++) {
-    send(delayed, 16);
-    await sleep(80);
-  }
-  const duringRate = delayed.recoveries.filter(
-    ({ authority }) => authority.resyncReason === "input-backlog",
-  );
-  assert.equal(
-    duringRate.length,
-    recoveriesBeforeRate + 1,
-    "repeated bursts produce at most one reset in the cooldown",
-  );
-  await rhythm(delayed, INPUT_BACKLOG_RECOVERY_INTERVAL_MS + 500);
-  const backlogRecoveries = delayed.recoveries.filter(
-    ({ authority }) => authority.resyncReason === "input-backlog",
-  );
-  for (let i = 1; i < backlogRecoveries.length; i++)
-    assert.ok(
-      backlogRecoveries[i].authority.time -
-        backlogRecoveries[i - 1].authority.time >=
-        INPUT_BACKLOG_RECOVERY_INTERVAL_MS - 2,
-    );
+  const invalidBefore = queue(delayed),
+    epochBefore = delayed.authority!.inputEpoch;
+  delayed.room.send("inputs", [
+    { ...command(delayed, delayed.authority!.ack + 8), x: NaN },
+  ]);
   await until(
-    () => delayed.authority!.ack === delayed.seq,
-    "queue drains after the bounded second recovery",
+    () => queue(delayed).rejected.invalid > invalidBefore.rejected.invalid,
+    "invalid input rejected",
   );
+  assert.equal(queue(delayed).accepted, invalidBefore.accepted);
+  assert.equal(queue(delayed).receivedSeq, invalidBefore.receivedSeq);
+  assert.ok(
+    delayed.authority!.ack > invalidBefore.ack,
+    "invalid input cannot stop world time",
+  );
+
+  const rejectedBefore = queue(delayed).rejected;
+  delayed.room.send("inputs", [
+    command(delayed, Math.max(0, delayed.authority!.ack - 1)),
+    {
+      ...command(delayed, delayed.authority!.ack + 8),
+      inputEpoch: epochBefore - 1,
+    },
+    command(delayed, delayed.authority!.ack + MAX_FUTURE_INPUT_TICKS + 1000),
+  ]);
+  await until(() => {
+    const rejected = queue(delayed).rejected;
+    return (
+      rejected.late > rejectedBefore.late &&
+      rejected.epoch > rejectedBefore.epoch &&
+      rejected.ahead > rejectedBefore.ahead
+    );
+  }, "late, old-epoch and excessive-future commands rejected independently");
+  assert.equal(delayed.authority!.inputEpoch, epochBefore);
+  assert.equal(
+    delayed.recoveries.length,
+    initialResyncs,
+    "bad packets cannot cause recovery spam",
+  );
+
+  const duplicateBefore = queue(delayed),
+    duplicateSeq = delayed.authority!.ack + 12;
+  const duplicate = command(delayed, duplicateSeq);
+  delayed.room.send("inputs", [duplicate, duplicate]);
+  await until(
+    () =>
+      queue(delayed).rejected.duplicate > duplicateBefore.rejected.duplicate,
+    "duplicate future input rejected",
+  );
+  assert.equal(queue(delayed).accepted, duplicateBefore.accepted + 1);
+  await until(
+    () => delayed.authority!.ack >= duplicateSeq,
+    "single accepted duplicate slot resolves once",
+  );
+
+  const beforeRecovery = delayed.authority!,
+    recoveryCount = delayed.recoveries.length;
+  delayed.room.send("resync");
+  await until(
+    () => delayed.recoveries.length > recoveryCount,
+    "explicit client recovery response",
+  );
+  const recovery = delayed.recoveries[recoveryCount].authority;
+  assert.equal(recovery.resyncReason, "client-request");
+  assert.ok(recovery.inputEpoch > beforeRecovery.inputEpoch);
+  assert.equal(recovery.ack, 0);
+  assert.equal(recovery.inputTickBase, recovery.tick);
+  assert.equal(recovery.receivedSeq, 0);
+  const resumedX = recovery.state.position.x;
+  await delayed.inputs.holdUntil(
+    controls,
+    () => delayed.authority!.state.position.x > resumedX + 1,
+    "fresh epoch responds to continuous movement",
+  );
+  await delayed.inputs.settle();
   assert.equal(peer.recoveries.length, peerResyncs);
 
   const report = {
     completed: true,
     protocol: PROTOCOL_VERSION,
     endpoint,
-    firstRecoveryAck: first.authority.ack,
-    firstRecoveryMs: first.at - started,
-    firstBurstDisplacementX:
-      first.authority.state.position.x - before.state.position.x,
-    steadyLagCommandsP95: recoveredLagP95,
+    burstReceivedSeq: first.receivedSeq,
+    burstResolvedAck: burstEnd,
+    firstBurstReplyMs: firstAt - started,
+    firstBurstDisplacementX: displacement,
+    steadyIntentionalLeadTicksP95: leadP95,
     steadySamples: delayed.lags.length,
     unaffectedPeerResyncs: peer.recoveries.length - peerResyncs,
-    backlogRecoveries: backlogRecoveries.map(({ authority }) => ({
-      time: authority.time,
-      tick: authority.tick,
-      ack: authority.ack,
-      reason: authority.resyncReason,
-    })),
+    rejectionCounters: queue(delayed).rejected,
+    recovery: {
+      inputEpoch: recovery.inputEpoch,
+      inputTickBase: recovery.inputTickBase,
+      tick: recovery.tick,
+      ack: recovery.ack,
+    },
     checks: [
-      "received frontier acknowledged explicitly",
-      "no accelerated movement",
-      "continued 60Hz returns to normal lag",
+      "future window resolves on world time without acceleration",
+      "continuous held input stays within bounded lead",
+      "invalid/late/old-epoch/ahead/duplicate input rejected without resync storm",
+      "explicit recovery creates fresh epoch and remains responsive",
       "other player unaffected",
-      "invalid input preserves strict sequence",
-      "recovery rate bounded",
     ],
   };
   if (process.env.STRAHOV_INPUT_BACKLOG_EVIDENCE)
@@ -237,5 +259,6 @@ try {
     );
   console.log(JSON.stringify(report, null, 2));
 } finally {
+  probes.forEach((probe) => probe.inputs.dispose());
   await Promise.allSettled(probes.map((probe) => probe.room.leave()));
 }

@@ -5,6 +5,7 @@ import { DEFAULT_PROFILE } from "../shared/types";
 import { PROTOCOL_VERSION } from "../shared/netcode";
 import { MotionDecoder } from "../shared/motion-codec";
 import { SPAWN, CAR_SPAWN } from "../shared/world";
+import { ScriptTimelineClient, type ScriptAuthority } from "./timeline-client";
 const endpoint = process.env.STRAHOV_TEST_URL || "http://127.0.0.1:2567";
 const evidence = {
   startedAt: new Date().toISOString(),
@@ -20,6 +21,11 @@ const evidence = {
   lastStage: "HTTP guest boundary",
   checks: [] as string[],
   stages: [] as any[],
+  failure: null as {
+    message: string;
+    lastStage: string;
+    state: unknown;
+  } | null,
 };
 process.on("exit", (code) => {
   if (process.env.STRAHOV_INTEGRATION_EVIDENCE)
@@ -96,6 +102,8 @@ await assert.rejects(
   "no token must be rejected",
 );
 const rooms: Room[] = [];
+let inputs: ScriptTimelineClient | undefined;
+let captureState: () => unknown = () => ({ producer: inputs?.snapshot() });
 try {
   const a = await sdk.joinById(sessionA.worldId, {
     token: sessionA.token,
@@ -123,8 +131,12 @@ try {
     assert.ok(packet, "every ordered motion packet must decode");
     stateA.motion = packet.rows;
   });
-  a.onMessage("authoritative", (packet: any) => {
+  inputs = new ScriptTimelineClient({
+    send: (batch) => a.send("inputs", batch),
+  });
+  a.onMessage("authoritative", (packet: ScriptAuthority) => {
     stateA.authority = packet;
+    inputs!.acceptAuthority(packet);
   });
   a.onMessage("welcome", (d: any) =>
     Object.assign(stateA, { players: d.players, events: d.events }),
@@ -162,6 +174,15 @@ try {
   b.onMessage("events", () => {});
   b.onMessage("activity", () => {});
   b.onMessage("car", () => {});
+  captureState = () => ({
+    authority: stateA.authority,
+    motion: stateA.motion,
+    observerMotion: stateB.motion,
+    notices: [...stateA.notices],
+    observerNotices: [...stateB.notices],
+    car: stateA.car,
+    producer: inputs?.snapshot(),
+  });
   await until(() => stateA.players.length === 2, "presence of both clients");
   const self = () => stateA.motion.find((row: any) => row[0] === sessionA.id);
   const record = (name: string) => {
@@ -184,24 +205,52 @@ try {
       observer: pose(stateB.motion.find((row: any) => row[0] === sessionA.id)),
       steering: stateA.authority?.state.vehicleState?.steering,
       observerSteering: stateB.carState?.steering,
+      authority: stateA.authority && {
+        tick: stateA.authority.tick,
+        time: stateA.authority.time,
+        inputEpoch: stateA.authority.inputEpoch,
+        inputTickBase: stateA.authority.inputTickBase,
+        ack: stateA.authority.ack,
+        receivedSeq: stateA.authority.receivedSeq,
+      },
+      producer: inputs?.snapshot(),
+      notices: [...stateA.notices],
     });
   };
-  let seq = 0;
-  const sendInput = (x: number, z: number, handbrake = false) =>
-    a.send(
-      "inputs",
-      Array.from({ length: 2 }, () => ({
-        x,
-        z,
-        yaw: 0,
-        jump: handbrake,
-        seq: ++seq,
-      })),
-    );
-  for (let i = 0; i < 12; i++) {
-    sendInput(0, 1);
-    await sleep(34);
-  }
+  await until(() => !!inputs!.authority, "initial input timeline authority");
+  const controls = (x: number, z: number, handbrake = false) => ({
+    x,
+    z,
+    yaw: 0,
+    jump: handbrake,
+    vehicle: inputs!.authority!.state.vehicle,
+  });
+  const drive = (x: number, z: number, packets: number, handbrake = false) =>
+    inputs!.holdFor(() => controls(x, z, handbrake), packets * 34);
+  const driveUntil = async (
+    x: number,
+    z: number,
+    check: () => boolean,
+    label: string,
+    handbrake = false,
+    timeoutMs = 3000,
+  ) => {
+    evidence.lastStage = label;
+    try {
+      await inputs!.holdUntil(
+        () => controls(x, z, handbrake),
+        check,
+        label,
+        timeoutMs,
+      );
+      evidence.checks.push(label);
+    } catch (error) {
+      record("failed manoeuvre: " + label);
+      throw error;
+    }
+  };
+  await drive(0, 1, 12);
+  await inputs.settle();
   a.send("vehicle");
   await until(
     () => stateA.motion.find((r: any) => r[0] === sessionA.id)?.[7] === 1,
@@ -213,11 +262,9 @@ try {
     "car entry must be the actual canonical car, not an old fixture",
   );
   const startZ = stateA.motion.find((r: any) => r[0] === sessionA.id)[3];
-  for (let i = 0; i < 30; i++) {
-    sendInput(0, 1);
-    await sleep(34);
-  }
-  await until(
+  await driveUntil(
+    0,
+    1,
     () => stateA.motion.find((r: any) => r[0] === sessionA.id)[3] > startZ + 2,
     "drive car",
   );
@@ -240,50 +287,21 @@ try {
     "reject car exit while moving",
   );
   assert.equal(stateA.motion.find((r: any) => r[0] === sessionA.id)?.[7], 1);
-  for (let i = 0; i < 35; i++) {
-    sendInput(0, 0, true);
-    await sleep(34);
-  }
-  await until(
+  await driveUntil(
+    0,
+    0,
     () =>
       Math.abs(
         stateA.motion.find((r: any) => r[0] === sessionA.id)?.[5] ?? Infinity,
       ) <= 1,
     "brake before safe exit",
+    true,
   );
   record("Space stopped car");
-  const drive = async (
-    x: number,
-    z: number,
-    packets: number,
-    handbrake = false,
-  ) => {
-    for (let i = 0; i < packets; i++) {
-      sendInput(x, z, handbrake);
-      await sleep(34);
-    }
-  };
-  const driveUntil = async (
-    x: number,
-    z: number,
-    check: () => boolean,
-    label: string,
-  ) => {
-    evidence.lastStage = label;
-    for (let i = 0; i < 60; i++) {
-      if (check()) {
-        evidence.checks.push(label);
-        return;
-      }
-      sendInput(x, z);
-      await sleep(34);
-    }
-    record("failed manoeuvre: " + label);
-    throw new Error("Timeout while holding actual driving input: " + label);
-  };
   // Short low-speed manoeuvres stay inside the measured clear parking area.
-  await drive(1, 0, 12);
-  await until(
+  await driveUntil(
+    1,
+    0,
     () => stateA.authority?.state.vehicleState?.steering > 0.25,
     "A turns the real front wheels left",
   );
@@ -299,12 +317,20 @@ try {
         ),
       ) > 0.01,
     "A changes physical heading while rolling",
+    false,
+    60 * 34,
   );
   record("A low-speed forward turn");
-  await drive(0, 0, 20, true);
-  await until(() => Math.abs(self()[5]) <= 1, "stop after A turn");
-  await drive(-1, 0, 12);
-  await until(
+  await driveUntil(
+    0,
+    0,
+    () => Math.abs(self()[5]) <= 1,
+    "stop after A turn",
+    true,
+  );
+  await driveUntil(
+    -1,
+    0,
     () => stateA.authority?.state.vehicleState?.steering < -0.25,
     "D turns the real front wheels right",
   );
@@ -321,23 +347,34 @@ try {
         ),
       ) > 0.01,
     "D changes physical heading while reversing",
+    false,
+    60 * 34,
   );
   record("D low-speed reverse turn");
   const beforeReverseZ = self()[3];
-  await drive(0, -1, 25);
-  await until(
+  await driveUntil(
+    0,
+    -1,
     () => self()[5] < -1 && self()[3] < beforeReverseZ - 0.5,
     "S reverse on native campus collisions",
   );
   record("S reverse");
-  await drive(0, 1, 30);
-  await until(() => self()[5] > 0.5, "W brakes reverse before driving forward");
+  await driveUntil(
+    0,
+    1,
+    () => self()[5] > 0.5,
+    "W brakes reverse before driving forward",
+  );
   record("W recovers from reverse");
-  await drive(0, 0, 35, true);
-  await until(
+  await driveUntil(
+    0,
+    0,
     () => Math.abs(self()[5]) <= 1,
     "final handbrake before safe exit",
+    true,
   );
+  await inputs.settle();
+  record("resolved final handbrake before exit request");
   a.send("vehicle");
   await until(
     () =>
@@ -397,11 +434,9 @@ try {
   );
   assert.ok(!stateB.messages.some((m: any) => m.text === "Zablokovaná"));
   const before = stateA.motion.find((r: any) => r[0] === sessionA.id)?.[1];
-  for (let i = 0; i < 20; i++) {
-    sendInput(1, 0);
-    await sleep(34);
-  }
-  await until(
+  await driveUntil(
+    1,
+    0,
     () =>
       stateA.motion.find((r: any) => r[0] === sessionA.id)?.[1] > before + 1,
     "server movement",
@@ -441,6 +476,17 @@ try {
   console.log(
     "PASS: singleton world, guest boundary, two clients, walking, physical car W/A/D/brake/reverse/exit/re-entry on native DMR and authored assets, global/DM chat, consent, explicit blocking rejection, event ownership, session resume and weather endpoint.",
   );
+} catch (error) {
+  evidence.failure = {
+    message: error instanceof Error ? error.message : String(error),
+    lastStage: evidence.lastStage,
+    state: captureState(),
+  };
+  console.error(
+    "Integration failure state: " + JSON.stringify(evidence.failure),
+  );
+  throw error;
 } finally {
+  inputs?.dispose();
   for (const r of rooms) await r.leave();
 }

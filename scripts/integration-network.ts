@@ -5,11 +5,11 @@ import { Client, type Room } from "@colyseus/sdk";
 import { DEFAULT_PROFILE, type Player } from "../shared/types";
 import {
   PROTOCOL_VERSION,
-  canonicalInput,
   type Authority,
   type MotionPacket,
 } from "../shared/netcode";
 import { MotionDecoder } from "../shared/motion-codec";
+import { ScriptTimelineClient, type ScriptAuthority } from "./timeline-client";
 
 const endpoint = process.env.STRAHOV_TEST_URL || "http://127.0.0.1:2568";
 assert.equal(
@@ -34,6 +34,9 @@ type Probe = {
   authority?: Authority;
   presence: Player[];
   decoder: MotionDecoder;
+  inputs: ScriptTimelineClient;
+  motions: Map<number, MotionPacket>;
+  authorities: Map<number, ScriptAuthority>;
   rejected: number;
   socialMessages: number;
   activityMessages: number;
@@ -64,6 +67,11 @@ async function join(session: Session) {
     session,
     room,
     decoder: new MotionDecoder(),
+    inputs: new ScriptTimelineClient({
+      send: (batch) => room.send("inputs", batch),
+    }),
+    motions: new Map(),
+    authorities: new Map(),
     rejected: 0,
     presence: [],
     socialMessages: 0,
@@ -83,13 +91,20 @@ async function join(session: Session) {
   room.onMessage("presence", (players: Player[]) => (probe.presence = players));
   room.onMessage("motion", (wire: unknown) => {
     const motion = probe.decoder.decode(wire);
-    if (motion) probe.motion = motion;
-    else probe.rejected++;
+    if (motion) {
+      probe.motion = motion;
+      probe.motions.set(motion.tick, motion);
+      if (probe.motions.size > 120)
+        probe.motions.delete(probe.motions.keys().next().value!);
+    } else probe.rejected++;
   });
-  room.onMessage(
-    "authoritative",
-    (authority: Authority) => (probe.authority = authority),
-  );
+  room.onMessage("authoritative", (authority: ScriptAuthority) => {
+    probe.inputs.acceptAuthority(authority);
+    probe.authority = authority;
+    probe.authorities.set(authority.tick, authority);
+    if (probe.authorities.size > 120)
+      probe.authorities.delete(probe.authorities.keys().next().value!);
+  });
   room.onMessage("social", () => probe.socialMessages++);
   room.onMessage("activity", () => probe.activityMessages++);
   room.onMessage("events", (events: Probe["events"]) => {
@@ -137,41 +152,39 @@ try {
   );
 
   await until(() => !!first.authority, "initial exact authority");
-  let seq = first.authority!.ack;
   const startX = first.authority!.state.position.x;
-  for (let i = 0; i < 24; i++) {
-    first.room.send(
-      "inputs",
-      Array.from({ length: 2 }, () =>
-        canonicalInput({
-          x: 1,
-          z: 0,
-          yaw: Math.PI / 2,
-          jump: false,
-          vehicle: false,
-          seq: ++seq,
-        }),
-      ),
-    );
-    await sleep(34);
-  }
-  await until(
-    () => first.authority!.ack >= seq,
-    "all valid commands acknowledged",
+  const frontier = await first.inputs.holdFor(
+    {
+      x: 1,
+      z: 0,
+      yaw: Math.PI / 2,
+      jump: false,
+      vehicle: false,
+    },
+    24 * 34,
   );
+  await first.inputs.settle(frontier);
   assert.ok(first.authority!.state.position.x > startX + 1);
+  let matchingAuthority: ScriptAuthority | undefined;
   await until(
-    () =>
-      probes.every((probe) => {
-        const row = probe.motion?.rows.find(
-          (row) => row[0] === firstSession.id,
-        );
-        return (
-          row &&
-          row[6] === seq &&
-          Math.abs(row[1] - first.authority!.state.position.x) <= 0.00051
-        );
-      }),
+    () => {
+      matchingAuthority = [...first.authorities.values()].find(
+        (authority) =>
+          authority.inputEpoch === frontier.inputEpoch &&
+          authority.ack >= frontier.seq &&
+          probes.every((probe) => {
+            const row = probe.motions
+              .get(authority.tick)
+              ?.rows.find((row) => row[0] === firstSession.id);
+            return (
+              row &&
+              row[6] === authority.ack &&
+              Math.abs(row[1] - authority.state.position.x) <= 0.00051
+            );
+          }),
+      );
+      return !!matchingAuthority;
+    },
     "all observers reconstruct millimetre-bounded motion and exact acknowledgements",
   );
   assert.ok(
@@ -289,6 +302,12 @@ try {
     endpoint,
     checks,
     peers: 12,
+    matchingMotion: {
+      tick: matchingAuthority!.tick,
+      time: matchingAuthority!.time,
+      inputEpoch: matchingAuthority!.inputEpoch,
+      ack: matchingAuthority!.ack,
+    },
   };
   if (process.env.STRAHOV_NETWORK_EVIDENCE)
     writeFileSync(
@@ -297,5 +316,6 @@ try {
     );
   console.log("PASS: " + checks.join("; "));
 } finally {
+  probes.forEach((probe) => probe.inputs.dispose());
   await Promise.allSettled(connected().map((probe) => probe.room.leave()));
 }
