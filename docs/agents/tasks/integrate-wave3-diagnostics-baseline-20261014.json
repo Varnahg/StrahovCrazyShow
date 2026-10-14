@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "integrate-wave3-diagnostics-baseline-20261014",
+  "title": "Začlenit ověřený diagnostický feature do main bez přepsání navazujícího WIP",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/session-diagnostics.ts",
+    "client/session-diagnostics.ts",
+    "server/session-diagnostics.ts",
+    "client/render-incident-profile.ts",
+    "client/benchmark-render-profile.ts",
+    "client/main.tsx",
+    "server/index.ts",
+    "vite.config.ts",
+    "scripts/performance-preview.mjs",
+    "scripts/diagnostics-report.mjs",
+    "tests/session-diagnostics.test.ts",
+    "tests/session-diagnostics-server.test.ts",
+    "tests/render-incident-profile.test.ts",
+    "tests/diagnostics-report.test.ts",
+    "docs/performance/research-20261014/wave3-diagnostics-publication.md",
+    "docs/agents/handoffs/publish-wave3-diagnostics-baseline-20261014.md",
+    "docs/agents/handoffs/validate-wave3-diagnostics-baseline-20261014.md",
+    "docs/performance/evidence/wave3-diagnostics-baseline-20261014/",
+    "docs/agents/handoffs/integrate-wave3-diagnostics-baseline-20261014.md",
+    ".cache/diagnostics-main-integration/"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Převzít přesný commit5f9b011f2f65ffeaab1c16754f37a4ff8c5771d8 a ověření750/750+build+integrace nad snapshot9877f891…. Do main zahrnout pouze jeho20 přesných souborů.",
+    "Zachovat bajty všech původních dirty/untracked souborů včetně cizí vegetace.13source souborů již odpovídá feature; server/index obsahuje další V11 WIP a nesmí být fyzicky přepsaný.",
+    "Pro server stageovat pouze ověřený commit blob přes explicitní index operaci; předem prázdný index a přesný whitelist. Kopírovat pouze nové předané dokumenty, nikoli celý server nebo working tree.",
+    "Po commitu dokázat shodu celého runtime/test/config/assets Git stromu s ověřeným feature commitem a zachování všech původních pracovních bajtů. Žádné tvrzení o plném Game/context/V11 nebo opraveném cíli."
+  ],
+  "verification": [
+    "Čerstvé git status/worktrees/registry, předem porovnat14 hlavních source souborů s původním frozen wave3 a předáním. Nesoulad znamená nově prověřit původ, ne přepsat WIP.",
+    "Před/po hash všech původních dirty a untracked souborů. Stage přesné cesty, porovnat staged blob hashes s předaným commitem; žádný git add . reset restore clean stash.",
+    "Runtime obsah po integraci shodný s již úplně validovaným izolovaným feature; neopakovat build do živého hlavního stromu. Služby4186 a dependencies se nemění."
+  ],
+  "notes": [
+    "Pouze main C:/Users/rezac/Documents/GitHub/StrahovCrazyShow, aktuální HEADcfcbc55361e45044940bef182c779eea5a2d4b76. Runtime před tímto commitem je proti e215bf4 nezměněný; pozdější hlavní commity byly jen metadata.",
+    "Root je původní integrátor automatických diagnostics (handoff automatic-diagnostics-integration/repair-game-integration) a příjemce recorder/storage/render-incident předání. Těchto14 vlastních předaných cest smí adopt-dirty až po aktuální shodě s frozen wave3.",
+    "Publication WT a branch commit jsou read-only zdroj. Podle pravidel není možný obyčejný cherry-pick přes dirty server; explicitní ověřený index blob zachová skutečný soubor i jeho navazující vlastní V11 změny.",
+    "Konkrétní PID ani rezervace se necommitují. Cache obsahuje audit; nový integrační handoff shrne skutečný výsledek.",
+    "Přijato rootem14.10.2026: feature5f9b011, snapshot9877f891…750/750+build+integrace PASS; přesná integrace main4bd7c4b se zachováním156 původních working souborů. Viz integrate-wave3-diagnostics-baseline-20261014.md."
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "validate-wave3-diagnostics-baseline-20261014",
+  "title": "Ověřit samostatný diagnostický základ v čistém úplném checkpointu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/wave3-diagnostics-validation/",
+    "docs/performance/evidence/wave3-diagnostics-baseline-20261014/",
+    "docs/agents/handoffs/validate-wave3-diagnostics-baseline-20261014.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Převzít přesný14-souborový diagnostický celek z čisté publication WT, bez Game/UI/V11 a bez nových runtime fixů. Ostatní kód odpovídá základnímu Git commitu.",
+    "Snapshot zahrnuje source, testy, konfiguraci a identifikovanou neměnnou asset referenci; ověřit SHA a nepoužívat LFS pointery místo modelů.",
+    "Pnptest/build/test:integration nad tímto samostatným celkem. Při neúspěchu rozlišit novou chybu od prokázaného výchozího limitu; žádné skryté přijetí cizího WIP.",
+    "Připravit přesný commitový podklad a evidence pro samostatné začlenění do main bez přepsání jeho existujícího rozpracovaného stromu."
+  ],
+  "verification": [
+    "Před náročnými kroky kontrolovat klienty4186/2581 a nové herní logy. Preview zůstává neměnné; při hře další zatěžování odložit.",
+    "Původní vlastní instalace publication WT je frozen a stabilní; žádný nový resolver či změna main dependencies.",
+    "Po pipeline ověřit source parity a ukončení vlastní integrace2568. Žádný browser/GPU/Blender."
+  ],
+  "notes": [
+    "Pouze C:/Users/rezac/.codex/worktrees/wave3-feature-publication/StrahovCrazyShow. Převzetí podle publish-wave3-diagnostics-baseline handoffu a assembly-output manifestu297916679ef32df4b9ad87fcc5c14006fa6050e6a023b252bd525ae32162a811.",
+    "Asset reference je dříve ověřený neměnný baseline f2705e4…; Git základ e215bf4 se v public/assets od91ee88f neliší. Source/test vstupy se berou z tohoto čistého pracovního celku, nikoli z celého wave3.",
+    "Tento první feature poskytuje recorder/collector/čtečku a entrypoint glue. Game context a V11 publikace jsou následné samostatné celky; přejímka nesmí tvrdit víc.",
+    "Přijato rootem14.10.2026: feature5f9b011, snapshot9877f891…750/750+build+integrace PASS; přesná integrace main4bd7c4b se zachováním156 původních working souborů. Viz integrate-wave3-diagnostics-baseline-20261014.md."
+  ]
+}
