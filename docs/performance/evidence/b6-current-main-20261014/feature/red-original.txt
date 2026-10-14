@@ -1,0 +1,41 @@
+BJS - [21:58:27]: Babylon.js v9.30.0 - Null engine
+BJS - [21:58:27]: Babylon.js v9.30.0 - Null engine
+✖ walking in B6 does not invalidate its static pivot or amplify the actual torch caster traversal (339.8791ms)
+BJS - [21:58:27]: Babylon.js v9.30.0 - Null engine
+✔ same-render B6 pivot translation, rotation and scale preserve world geometry and the fill's world position (237.044ms)
+BJS - [21:58:28]: Babylon.js v9.30.0 - Null engine
+✔ actual B6 detach/reattach at every quality retains mesh, light and source identities (233.8816ms)
+✔ same-render controller reparent, repeated attach and disposal preserve foreign ownership (224.692ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3104.4731
+
+✖ failing tests:
+
+test at tests\b6-render-lifecycle.test.ts:1:2518
+✖ walking in B6 does not invalidate its static pivot or amplify the actual torch caster traversal (339.8791ms)
+  AssertionError [ERR_ASSERTION]: a stationary editable pivot must not force sibling/parent recomputation during walking
+  + actual - expected
+  
+    {
+  +   childUpdates: 402,
+  +   rootUpdates: 405
+  -   childUpdates: 0,
+  -   rootUpdates: 0
+    }
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\key17-ownership-integration\StrahovCrazyShow\tests\b6-render-lifecycle.test.ts:127:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { rootUpdates: 405, childUpdates: 402 },
+    expected: { rootUpdates: 0, childUpdates: 0 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
