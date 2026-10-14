@@ -1,0 +1,79 @@
+import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { writeFileSync } from 'node:fs';
+import { Client, type Room } from '@colyseus/sdk';
+import { NetworkProbe } from '../../client/network-probe';
+import { ScriptTimelineClient, type ScriptAuthority } from '../../scripts/timeline-client';
+import { PROTOCOL_VERSION } from '../../shared/netcode';
+import { DEFAULT_PROFILE } from '../../shared/types';
+import type { NetworkProbeReply } from '../../shared/network-diagnostics';
+
+const endpoint='http://127.0.0.1:2568';
+const evidence='docs/performance/evidence/key7-transient-latency-20261014';
+const server=spawn(process.execPath,['--import','tsx','server/index.ts'],{env:{...process.env,PORT:'2568'},windowsHide:true,stdio:['ignore','pipe','pipe']});
+let output='',stopped=false;
+server.stdout.on('data',b=>output+=b);server.stderr.on('data',b=>output+=b);
+const closed=new Promise<void>((resolve,reject)=>{server.once('error',reject);server.once('exit',()=>{stopped=true;resolve();});});
+const sleep=(ms:number)=>new Promise<void>(r=>setTimeout(r,ms));
+let room:Room|undefined,inputs:ScriptTimelineClient|undefined,probe:NetworkProbe|undefined;
+const timers=new Set<ReturnType<typeof setTimeout>>();
+try {
+ const deadline=performance.now()+12000;
+ while(!output.includes('Strahov multiplayer: '+endpoint)){
+  if(stopped||performance.now()>deadline)throw Error('Owned server did not become ready: '+output);
+  await sleep(50);
+ }
+ const response=await fetch(endpoint+'/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'multiplayer',profile:{...DEFAULT_PROFILE,nickname:'key7-live-probe'}})});
+ assert.equal(response.status,200);
+ const session=await response.json() as {token:string;worldId:string};
+ room=await new Client(endpoint).joinById(session.worldId,{token:session.token,protocol:PROTOCOL_VERSION});
+ let sentInputs=0,latest:ScriptAuthority|undefined;
+ inputs=new ScriptTimelineClient({send:batch=>{sentInputs+=batch.length;room!.send('inputs',batch);}});
+ room.onMessage('*',()=>{});
+ room.onMessage('authoritative',(authority:ScriptAuthority)=>{latest=authority;inputs!.acceptAuthority(authority);});
+ const samples:object[]=[],rawSamples:number[]=[]; let callbackError:unknown;
+ let replies=0,highAt:number|null=null,recoveredAt:number|null=null,acceptedAtHigh=0,acceptedAtRecovery=0,sentAtHigh=0,sentAtRecovery=0;
+ const accept=(reply:NetworkProbeReply)=>{
+  const m=probe!.receive(reply);assert.ok(m);if(m.acceptedForPrediction&&m.predictionRoundTripMs!==null)inputs!.setRtt(m.predictionRoundTripMs);
+  rawSamples.push(m.rawRoundTripMs);
+  samples.push({raw:m.rawRoundTripMs,measuredAt:m.measuredAt,coverage:m.longTaskCoverage,timeline:inputs!.snapshot().timeline});
+  if(samples.length===2){highAt=m.measuredAt;acceptedAtHigh=latest?.network?.queue.accepted??0;sentAtHigh=sentInputs;}
+  if(samples.length===3){recoveredAt=m.measuredAt;acceptedAtRecovery=latest?.network?.queue.accepted??0;sentAtRecovery=sentInputs;}
+ };
+ probe=new NetworkProbe({now:()=>performance.now(),send:request=>room!.send('networkProbe',request),longTasks:()=>null});
+ room.onMessage('networkProbe',(reply:NetworkProbeReply)=>{
+  replies++;
+  const safeAccept=()=>{try{accept(reply);}catch(error){callbackError=error;}};
+  if(replies===2){const timer=setTimeout(()=>{timers.delete(timer);safeAccept();},534);timers.add(timer);}
+  else safeAccept();
+ });
+ const readyUntil=performance.now()+7000;
+ while(!latest){if(performance.now()>readyUntil)throw Error('Missing actual authority');await sleep(10);}
+ const start=performance.now();let nextPoll=start,latencyWaits=0,steps=0,graceTravel=0;
+ let previousPosition={...latest.state.position};
+ while(performance.now()-start<6500){
+  if(callbackError)throw callbackError;
+  const now=performance.now();
+  if(now>=nextPoll){probe.poll({enabled:true,ready:true});nextPoll+=1000;}
+  const position=latest!.state.position;
+  if(highAt!==null&&recoveredAt===null)graceTravel+=Math.hypot(position.x-previousPosition.x,position.z-previousPosition.z);
+  previousPosition={...position};
+  const direction=Math.floor((now-start)/750)%2===0?1:-1;
+  const result=inputs.step({x:direction,z:0,yaw:direction*Math.PI/2,jump:false,vehicle:false});
+  if(highAt!==null&&recoveredAt===null&&result.status==='waiting'&&result.reason==='latency-budget')latencyWaits++;
+  steps++;await sleep(10);
+ }
+ if(callbackError)throw callbackError;
+ assert.ok(rawSamples[0]<233&&rawSamples[1]>=500&&rawSamples[2]<233,'Observed low/high/low preconditions');
+ assert.ok(highAt!==null&&recoveredAt!==null,'All three actual probes must complete');
+ assert.equal(latencyWaits,0,'Isolated callback delay must not stop supported command production');
+ assert.ok(sentAtRecovery-sentAtHigh>=40,'Real sender continues during held probe reply');
+ assert.ok(acceptedAtRecovery-acceptedAtHigh>=35,'Authoritative queue accepts ongoing movement during held probe reply');
+ assert.ok(graceTravel>0.5,'Real authoritative actor continues moving during uncertain probe interval');
+ const report={completed:true,scenario:'Actual authenticated Colyseus connection, real authority/physics/input sender. Only the second probe application callback is artificially held534ms; this does not assert a wire delay or explain the original user callback delay.',pollCadenceMs:1000,missingLongTaskObserver:true,samples,steps,latencyWaits,authoritativeTravelDuringGraceM:graceTravel,graceIntervalMs:recoveredAt!-highAt!,sentDuringGrace:sentAtRecovery-sentAtHigh,serverAcceptedDuringGrace:acceptedAtRecovery-acceptedAtHigh,finalQueue:latest?.network?.queue,finalPosition:latest?.state.position};
+ writeFileSync(evidence+'/live-probe.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
+} finally {
+ for(const timer of timers)clearTimeout(timer);probe?.dispose();inputs?.dispose();
+ if(room)await room.leave().catch(()=>{});
+ if(!stopped)server.kill();await closed;
+}

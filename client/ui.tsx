@@ -411,6 +411,7 @@ export function App() {
       clearInterval(timer);
       clearInterval(probeTimer);
       networkProbeRef.current?.reset();
+      game.current?.networkTimeline.resetRttSelection();
     };
   }, [connected]);
   useEffect(() => {
@@ -603,6 +604,7 @@ export function App() {
     authorityBufferRef.current?.reset();
     bootstrapAuthorityRef.current = null;
     networkProbeRef.current?.reset();
+    game.current?.networkTimeline.resetRttSelection();
     connectedRef.current = true;
     setConnected(true);
     const callbacks = currentRoomCallbacks(r, () => room.current === r);
@@ -613,7 +615,10 @@ export function App() {
         measurement.acceptedForPrediction &&
         measurement.predictionRoundTripMs !== null
       )
-        game.current?.networkTimeline.setRtt(measurement.predictionRoundTripMs);
+        game.current?.networkTimeline.setRtt(
+          measurement.predictionRoundTripMs,
+          measurement.measuredAt,
+        );
       sessionDiagnostics.event("network-round-trip", {
         ...measurement,
         roundTripMs: measurement.rawRoundTripMs,
@@ -710,6 +715,7 @@ export function App() {
       bootstrapAuthorityRef.current = null;
       authorityBufferRef.current?.reset();
       networkProbeRef.current?.reset();
+      game.current?.networkTimeline.resetRttSelection();
       playersRef.current = [];
       playersById.current.clear();
       setPlayers([]);
@@ -764,6 +770,7 @@ export function App() {
         bootstrapAuthorityRef.current = null;
         authorityBufferRef.current?.reset();
         networkProbeRef.current?.reset();
+        game.current?.networkTimeline.resetRttSelection();
         carState.current = null;
         inputBuffer.current?.reset("identity-changed");
       }
@@ -837,6 +844,7 @@ export function App() {
     bootstrapAuthorityRef.current = null;
     authorityBufferRef.current?.reset();
     networkProbeRef.current?.reset();
+    game.current?.networkTimeline.resetRttSelection();
     void previousRoom?.leave().catch(() => {});
     modeRef.current = "menu";
     setMode("menu");

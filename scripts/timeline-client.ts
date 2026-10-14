@@ -65,7 +65,7 @@ export class ScriptTimelineClient {
   }
 
   setRtt(milliseconds: number) {
-    return this.timeline.setRtt(milliseconds);
+    return this.timeline.setRtt(milliseconds, this.now());
   }
 
   step(controls: ControlsSource) {

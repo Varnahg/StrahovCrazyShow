@@ -15,6 +15,7 @@ import {
   type ReceivedAuthority,
 } from "../client/authority-buffer";
 import { NetworkProbe } from "../client/network-probe";
+import { NetworkTimeline } from "../client/network-timeline";
 
 // Execute the actual UI subscriptions, without booting React/WebGL. This catches
 // a missing guard on any handler, not only the helper's isolated behavior.
@@ -311,7 +312,13 @@ function fixture() {
     network: true,
     canvas: { dataset: {} },
     localPlayer: { id: "self" },
-    networkTimeline: { setRtt: (value: number) => (state.rttMs = value) },
+    networkTimeline: {
+      setRtt: (value: number, measuredAt?: number) => {
+        state.rttMs = value;
+        state.rttMeasuredAt = measuredAt;
+      },
+      resetRttSelection: () => { state.rttSelectionResets = (state.rttSelectionResets ?? 0) + 1; },
+    },
   };
   for (const method of [
     "setLocalId",
@@ -988,12 +995,14 @@ test("the actual probe callback logs main-thread contamination without feeding i
   now = 2000;
   room.message("networkProbe", payloads().networkProbe);
   assert.equal(ui.state.rttMs, 30);
+  assert.equal(ui.state.rttMeasuredAt, 2000);
   now = 4000;
   ui.networkProbeRef.current.poll({ enabled: true, ready: true });
   tasks.push({ startTime: 4010, duration: 990 });
   now = 5000;
   room.message("networkProbe", { ...payloads().networkProbe, nonce: 2 });
   assert.equal(ui.state.rttMs, 30);
+  assert.equal(ui.state.rttMeasuredAt, 2000, "contamination cannot refresh planner confidence");
   const event = ui.diagnostics
     .filter((e) => e.kind === "network-round-trip")
     .at(-1)!.data as any;
@@ -1001,6 +1010,39 @@ test("the actual probe callback logs main-thread contamination without feeding i
   assert.equal(event.blockedOverlapMs, 990);
   assert.equal(event.acceptedForPrediction, false);
 });
+
+for (const transition of ["rebind", "close", "leave"] as const) {
+  test(`actual UI ${transition} discards same-identity timing confidence without replacing the timeline`, () => {
+    const ui = fixture(), room = new FakeRoom(), timeline = new NetworkTimeline();
+    ui.game.networkTimeline = timeline;
+    ui.bind(room);
+    ui.beginProbe();
+    room.message("networkProbe", payloads().networkProbe);
+    assert.equal(timeline.snapshot().rttMeasuredAtMs, 2000);
+    timeline.acceptAuthority({ inputEpoch: 1, inputTickBase: 0, tick: 0, ack: 0, time: 0 }, 2000, { vehicle: false, yaw: 0 });
+    ui.setClock(3050);
+    ui.networkProbeRef.current.poll({ enabled: true, ready: true });
+    ui.setClock(3550);
+    room.message("networkProbe", { ...payloads().networkProbe, nonce: 2 });
+    assert.equal(timeline.snapshot().rttMs, 30);
+    assert.equal(timeline.snapshot().pendingRttMs, 500);
+    const before = timeline.snapshot();
+    if (transition === "rebind") ui.bind(new FakeRoom());
+    else if (transition === "close") room.close();
+    else ui.leave();
+    assert.equal(ui.game.networkTimeline, timeline);
+    assert.equal(timeline.snapshot().inputEpoch, before.inputEpoch);
+    assert.equal(timeline.snapshot().clockSeqAtAnchor, before.clockSeqAtAnchor);
+    assert.equal(timeline.snapshot().rttMs, 500);
+    assert.equal(timeline.snapshot().pendingRttMs, null);
+    assert.equal(timeline.snapshot().supportedRttMeasuredAtMs, null);
+    const after = timeline.snapshot();
+    room.message("networkProbe", { ...payloads().networkProbe, nonce: 2 });
+    assert.deepEqual(timeline.snapshot(), after, "obsolete room callback cannot restore confidence");
+    assert.equal(timeline.setRtt(500, 3600), true);
+    assert.equal(timeline.snapshot().pendingRttMs, null, "new connection starts conservatively");
+  });
+}
 
 test("actual UI hook assignments drain authority before Game simulation and flush its generated input afterward", (t) => {
   const f = fixture();
