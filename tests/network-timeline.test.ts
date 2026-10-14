@@ -365,3 +365,59 @@ test("valid but unsupported latency is explicit instead of silently dropping all
     { status: "waiting", reason: "latency-budget" },
   );
 });
+
+test("presentation phase uses the same clock for completed and zero-step frames", () => {
+  const timeline = new NetworkTimeline();
+  timeline.setRtt(26);
+  timeline.acceptAuthority(authority(0), 0, mode);
+  const cases = [
+    { now: 0, seq: 6, steps: 6, alpha: 0.78 },
+    { now: 5, seq: 7, steps: 1, alpha: 0.08 },
+    { now: 8, seq: 7, steps: 0, alpha: 0.26 },
+    { now: 20, seq: 7, steps: 0, alpha: 0.98 },
+    { now: (2 - 0.78) * 1000 / 60, seq: 8, steps: 1, alpha: 0 },
+    { now: 21, seq: 8, steps: 0, alpha: 0.04 },
+  ];
+  for (const expected of cases) {
+    const result = timeline.advance(expected.now, command, () => {});
+    assert.equal(result.status, "advanced");
+    assert.equal(result.steps, expected.steps);
+    assert.equal(result.presentation.currentSeq, expected.seq);
+    assert.equal(result.presentation.inputEpoch, 1);
+    assert.ok(Math.abs(result.presentation.alpha - expected.alpha) < 1e-8);
+    assert.ok(result.presentation.alpha >= 0 && result.presentation.alpha <= 1);
+  }
+});
+
+test("bounded catch-up presentation names the completed tick rather than the future target", () => {
+  const timeline = new NetworkTimeline();
+  timeline.setRtt(200);
+  timeline.acceptAuthority(authority(0), 0, mode);
+  const applied: number[] = [];
+  const first = timeline.advance(0, command, (step) => applied.push(step.input.seq));
+  assert.equal(first.status, "advanced");
+  assert.equal(first.steps, MAX_TIMELINE_FRAME_TICKS);
+  assert.equal(first.presentation.currentSeq, applied.at(-1));
+  assert.ok(first.targetSeq > first.presentation.currentSeq);
+  assert.equal(first.presentation.alpha, 1, "never extrapolate past the latest completed pose");
+  const second = timeline.advance(0, command, () => {});
+  assert.equal(second.status, "advanced");
+  assert.equal(second.presentation.currentSeq, first.targetSeq);
+  assert.equal(second.remaining, 0);
+  assert.ok(second.presentation.alpha >= 0 && second.presentation.alpha < 1e-8);
+});
+
+test("a recovered epoch labels its own phase and waiting does not publish a replacement phase", () => {
+  const timeline = new NetworkTimeline();
+  timeline.setRtt(26);
+  timeline.acceptAuthority(authority(0), 0, mode);
+  const first = timeline.advance(0, command, () => {});
+  assert.equal(first.status, "advanced");
+  timeline.acceptAuthority(authority(0, 2, 200), 10, mode);
+  const recovered = timeline.advance(10, command, () => {});
+  assert.equal(recovered.status, "advanced");
+  assert.equal(recovered.presentation.currentSeq, first.presentation.currentSeq);
+  assert.equal(recovered.presentation.inputEpoch, 2);
+  const waiting = timeline.advance(1000, command, () => assert.fail("waiting cannot step"));
+  assert.deepEqual(waiting, { status: "waiting", reason: "stale-authority" });
+});

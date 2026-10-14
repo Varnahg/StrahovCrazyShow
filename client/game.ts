@@ -1,6 +1,6 @@
 import "./render-shaders";
 import { sessionDiagnostics } from "./session-diagnostics";
-import { NetworkTimeline } from "./network-timeline";
+import { NetworkTimeline, type TimelinePresentation } from "./network-timeline";
 import type { TimelineInput } from "../shared/input-timeline";
 import { SceneTextureDiagnostics } from "./texture-diagnostics";
 import {
@@ -354,6 +354,9 @@ export class Game {
   onBeforeInputFrame?: () => void;
   onNetworkDiagnostics?: () => unknown;
   networkTimeline = new NetworkTimeline();
+  private networkPresentation?: TimelinePresentation & {
+    timeline: NetworkTimeline;
+  };
   private lastTimelineRecoveryAt = -Infinity;
   private lastAuthorityNetwork: Authority["network"] | null = null;
   private readonly diagnosticNetwork = {
@@ -932,6 +935,7 @@ export class Game {
     // identity keeps its frontiers so delayed packets cannot rewind it.
     this.resetPredictionHistory();
     this.networkTimeline = new NetworkTimeline();
+    this.networkPresentation = undefined;
     this.lastAuthorityTick = this.minimumMotionTick = -1;
     this.seq = 0;
     this.respawnPending = false;
@@ -1126,6 +1130,9 @@ export class Game {
         carPose.rotation.w,
       ),
     };
+    // Reconciliation has replaced both endpoints. Do not bind a new segment to
+    // the old phase; the current-pose fallback is exact for this collapsed pair.
+    this.networkPresentation = undefined;
     if (explicitRespawn) this.snapRecoveryPresentation();
     return true;
   }
@@ -1771,6 +1778,7 @@ export class Game {
         if (step.source === "input") this.onInput?.(step.input);
       });
       if (result.status === "advanced") {
+        this.updateNetworkPresentation(result.presentation);
         if (result.steps) this.accumulator %= FIXED_DT;
       } else {
         this.accumulator = 0;
@@ -1794,6 +1802,61 @@ export class Game {
       }
     }
     this.onInputFrame?.();
+  }
+
+  private updateNetworkPresentation(presentation: TimelinePresentation) {
+    const previous = this.networkPresentation;
+    if (!previous) {
+      this.networkPresentation = {
+        ...presentation,
+        timeline: this.networkTimeline,
+      };
+      return;
+    }
+    const samePair =
+      previous.timeline === this.networkTimeline &&
+      previous.inputEpoch === presentation.inputEpoch &&
+      previous.currentSeq === presentation.currentSeq;
+    previous.alpha = samePair
+      ? Math.max(previous.alpha, presentation.alpha)
+      : presentation.alpha;
+    previous.timeline = this.networkTimeline;
+    previous.inputEpoch = presentation.inputEpoch;
+    previous.currentSeq = presentation.currentSeq;
+  }
+
+  private get interpolationAlpha() {
+    if (!this.network) return Math.min(1, this.accumulator / FIXED_DT);
+    return this.networkPresentation?.timeline === this.networkTimeline
+      ? this.networkPresentation.alpha
+      : 1;
+  }
+
+  /** Shared by the rendered frame and its timing regression. Keep the caller's
+   * captured position and the existing interpolation/offset order unchanged. */
+  interpolateLocalPosition(position: Vec3): Vector3 {
+    return Vector3.Lerp(
+      this.previousPosition,
+      new Vector3(position.x, position.y, position.z),
+      this.interpolationAlpha,
+    ).add(this.visualOffset);
+  }
+
+  /** The driven-car branch calls this only with an available previous pose. */
+  interpolateDrivenCarPose(position: Vector3, rotation: Quaternion): void {
+    const alpha = this.interpolationAlpha;
+    Vector3.LerpToRef(
+      this.previousCarPose!.position,
+      position,
+      alpha,
+      position,
+    );
+    Quaternion.SlerpToRef(
+      this.previousCarPose!.rotation,
+      rotation,
+      alpha,
+      rotation,
+    );
   }
 
   frame() {
@@ -1882,11 +1945,7 @@ export class Game {
     const worldEnded = performance.now();
     const time = worldEnded / 1000;
     this.visualOffset.scaleInPlace(Math.exp(-dt * 18));
-    const renderPosition = Vector3.Lerp(
-      this.previousPosition,
-      new Vector3(pos.x, pos.y, pos.z),
-      Math.min(1, this.accumulator / FIXED_DT),
-    ).add(this.visualOffset);
+    const renderPosition = this.interpolateLocalPosition(pos);
     const localFeet = renderPosition.add(new Vector3(0, -0.8, 0));
     for (const [id, a] of this.avatars) {
       // Decide local visibility only after the camera's final collision solve.
@@ -1948,18 +2007,7 @@ export class Game {
         carState.rotation.w,
       );
     if (this.actor.vehicle && this.previousCarPose) {
-      Vector3.LerpToRef(
-        this.previousCarPose.position,
-        carPosition,
-        Math.min(1, this.accumulator / FIXED_DT),
-        carPosition,
-      );
-      Quaternion.SlerpToRef(
-        this.previousCarPose.rotation,
-        carRotation,
-        Math.min(1, this.accumulator / FIXED_DT),
-        carRotation,
-      );
+      this.interpolateDrivenCarPose(carPosition, carRotation);
     } else if (this.network && this.carSnapshots.length) {
       const sampleAt = Date.now() + (this.snapshots.offset ?? 0) - 100,
         list = this.carSnapshots;
