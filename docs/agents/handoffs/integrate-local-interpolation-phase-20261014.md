@@ -1,0 +1,8 @@
+# Předání: integrate-local-interpolation-phase-20261014
+
+- Root repairs-01a13624-phase-integration. Publication commit3a9f16e6633eeca4af2e47399ccb6e68546f971c, main **75046d0b29e96dce31ad673c81b3703dd1131ea9**,17 přesných source/test/evidence souborů. Git runtime/test/config/assets stromy shodné, index prázdný.
+- Pět source/test cest z phase assemblyf2bf323c…;84 cílenýchPASS/scopedTS0. Společný skutečný produkční source1cddfe82… má922/922+build+integracePASS;8phase členů/40frame statements AST-shodných a183 ostatních fullGame členů zachovaných. Tento full důkaz se nevydává za totožný manifest menšího publication Git stromu.
+- V main původní GameSHAeb34279e… ověřen před přenosem fullphase výsledkub40a8a97…; jiné WIP členy zachované. Do indexu pouze přesný publicationGame blob47cedaa4…. Ostatní4 source/test cesty mají přesné manifestové hashy.114 ostatních původních dirty/untracked souborů byte-identických, nová kalibrace hodin i původní testy zachované.
+- Před runtime editací0dev klientů5173/2567. Hraný immutable4187/API2582 a staré4186/API2581 beze změny. Žádná nová heavy/GPU práce nebo instalace. Audity .cache/local-phase-integration/ v obou WT, vlastní krátké procesy ukončené.
+- GPU/viditelné třesení a celý KEY-12 zůstávají k herní přejímce. Nové4187 má zatím jen3 syntetické agent-collector-smoke záznamy, žádné potvrzené nové hraní.
+- Uživatel po tomto commitu a sjednocení mainu výslovně požádal zastavit cíl. Další implementace/publikace se nezahajuje. Integrační rezervace se uvolní; oba preview portoví vlastníci zůstávají pro běžící testovací služby. Goal se přepne na paused, nikoli complete.

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "integrate-local-interpolation-phase-20261014",
+  "title": "Samostatně commitovat a začlenit ověřený phase fix do main",
+  "status": "done",
+  "dependsOn": [
+    "fix-network-epoch-calibration-20261014"
+  ],
+  "writePaths": [
+    "client/game.ts",
+    "client/network-timeline.ts",
+    "tests/game-interpolation.test.ts",
+    "tests/network-timeline.test.ts",
+    "tests/room-callbacks.test.ts",
+    "docs/performance/research-20261014/local-interpolation-publication.md",
+    "docs/agents/handoffs/publish-local-interpolation-phase-20261014.md",
+    "docs/performance/research-20261014/local-interpolation-phase.md",
+    "docs/performance/research-20261014/game-interpolation-reproduction.md",
+    "docs/agents/handoffs/fix-local-interpolation-phase-20261014.md",
+    "docs/agents/handoffs/reproduce-game-interpolation-20261014.md",
+    "docs/performance/evidence/combined-playtest-20261014/",
+    "docs/agents/handoffs/assemble-combined-playtest-20261014.md",
+    "docs/agents/handoffs/validate-combined-playtest-20261014.md",
+    "docs/agents/handoffs/integrate-local-interpolation-phase-20261014.md",
+    ".cache/local-phase-integration/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Převzít přesnou phase assembly f2bf323c…:5 source/test cest,84 targetedPASS/scopedTS0; žádný nový runtime patch mimo předaný delta.",
+    "Plný společný produkční checkpoint1cddfe82…922/922+build+integracePASS a515hashů je již hotový a běží na4187. Doložit rozdíl jeho plného Game od commitového menšího Game;8 phase členů a40frame statements mají ověřenou AST shodu,183 dalších fullGame členů zachováno. Netvrdit, že celý menší Git strom má jinak stejný full manifest.",
+    "Samostatný publication commit obsahuje5 source/test cest, původní phase podklady a přesnou společnou validační evidenci. Stageovat whitelist, ověřit každého blob/mode; index předem/po prázdný.",
+    "Main Game obsahuje další vlastní wave3WIP. Po čerstvém ověření původního GameSHAeb34279e… aplikovat pouze ověřený full phase výsledek b40a8a97… zimmutable1c candidate, jehož ostatní členy AST audit zachoval. Do indexu dát pouze ověřený menší publication Game blob, ne celý WIP. Ostatní4 source/test soubory mají přesné predecessor hashe nebo novou nekolidující cestu.",
+    "Před main klientskými editacemi ověřit neaktivitu dev5173/2567. Produkční4187/4186, jejich assets/node_modules a běžící procesy zůstanou nedotčené. Hash audit všech ostatních dirty/untracked souborů včetně cizí vegetace.",
+    "Po main commitu přesná Git runtime/test/config/assets shoda s publication commitem, working Game b40a… a ostatní4 source soubory shodné s běžícím1c checkpointem. Celý goal/KEY-12 bez GPU přejímky neuzavírat."
+  ],
+  "verification": [
+    "Žádné další fullsuite/build nebo GPU jen kvůli evidenci. Použít již získané84targeted+types a922fullcombined důkazy s přesnou identitou a AST parity.",
+    "Před/po audity a konkrétní source/dokumentové whitelisty, žádný git add ., reset, restore, stash, clean nebo přepis neznámého WIP."
+  ],
+  "notes": [
+    "Root sekvenčně pracuje v publication WT naHEAD4f41b37fb145e5a00414bf256fd431744b6ba462 a main naHEAD3e3dedc (přesnýSHA ověřit). Tento společný owner je jediný writer pěti source cest; předchozí phase agent ukončil zápisy a uvolnilclaim.",
+    "Root je původní Game integrátor a explicitní příjemce phase handoffu. Adopt-dirty vpublication pouze pro předané5 source a6phase dokumentů; main Game WIP původem immutable wave3, nesmí se zahodit.",
+    "Kopírované combined evidence/assembly/validation handoffy jsou hotové, jejich vlastníci skončili. Aktivní serve-combined handoff do tohoto scope nepatří a nepřebírá se. Runtime PID se necommitují.",
+    "Dokončeno samostatným publication3a9f16e a main75046d0, zachované WIP a clock fix;84targeted/types+922combined evidence. Uživatel poté výslovně zastavil cíl. Vizuální/GPU přejímka a jiné nálezy nejsou označenéDone."
+  ]
+}
