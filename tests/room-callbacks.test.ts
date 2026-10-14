@@ -151,6 +151,29 @@ function gameMethod(name: string) {
   assert.ok(method?.body, `Game must define ${name}`);
   return method;
 }
+const gamePrinter = ts.createPrinter();
+function executableGameMethod(name: string) {
+  const method = gameMethod(name);
+  // Object-literal harnesses have no TypeScript access modifiers. Preserve the
+  // actual parameters/body; only remove private syntax from the source AST.
+  return gamePrinter.printNode(
+    ts.EmitHint.Unspecified,
+    ts.factory.updateMethodDeclaration(
+      method,
+      method.modifiers?.filter(
+        (modifier) => modifier.kind !== ts.SyntaxKind.PrivateKeyword,
+      ),
+      method.asteriskToken,
+      method.name,
+      method.questionToken,
+      method.typeParameters,
+      method.parameters,
+      method.type,
+      method.body,
+    ),
+    gameSource,
+  );
+}
 const frame = gameMethod("frame");
 const simulationIndex = frame.body!.statements.findIndex(
   (statement) =>
@@ -163,7 +186,8 @@ assert.ok(simulationIndex >= 0);
 // Retain the actual contiguous frame prefix and whole simulation method. Only
 // the unrelated render tail is omitted; callback ordering is not reconstructed.
 const gameMethodsScript = compileScript(`({
-  ${gameMethod("advanceSimulation").getText(gameSource)},
+  ${executableGameMethod("updateNetworkPresentation")},
+  ${executableGameMethod("advanceSimulation")},
   frame() { ${frame
     .body!.statements.slice(0, simulationIndex + 1)
     .map((node) => node.getText(gameSource))
@@ -1041,7 +1065,13 @@ test("actual UI hook assignments drain authority before Game simulation and flus
           source: "input",
           time: 1000,
         });
-        return { status: "advanced", steps: 1 };
+        return {
+          status: "advanced",
+          steps: 1,
+          targetSeq: 2,
+          remaining: 0,
+          presentation: { inputEpoch: 1, currentSeq: 2, alpha: 0 },
+        };
       },
     },
   });

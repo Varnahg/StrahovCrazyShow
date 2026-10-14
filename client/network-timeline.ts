@@ -22,6 +22,12 @@ const MAX_LEAD_TICKS = MAX_FUTURE_INPUT_TICKS - 4;
 // extra server ticks. Lead alone cannot repair an indefinitely stalled renderer.
 const DELIVERY_MARGIN_TICKS = 5;
 export type PredictedTimelineStep = TimelineStep & { time: number };
+export type TimelinePresentation = {
+  inputEpoch: number;
+  currentSeq: number;
+  /** Interpolation from currentSeq - 1 to the actually completed currentSeq. */
+  alpha: number;
+};
 export type AuthorityAcceptance =
   | { accepted: false; reason: "invalid" | "stale" }
   | {
@@ -39,7 +45,13 @@ export type TimelineAdvance =
         | "prediction-budget"
         | "latency-budget";
     }
-  | { status: "advanced"; steps: number; targetSeq: number; remaining: number };
+  | {
+      status: "advanced";
+      steps: number;
+      targetSeq: number;
+      remaining: number;
+      presentation: TimelinePresentation;
+    };
 
 /** Bounded command-time planner. The integration owns actor restore/capture and
  * applies each returned replay step exactly once after restoring authority.state. */
@@ -164,7 +176,8 @@ export class NetworkTimeline {
     if (!Number.isFinite(now) || ageMs < 0 || ageMs > MAX_AUTHORITY_AGE_MS)
       return { status: "waiting", reason: "stale-authority" };
     const estimatedServerSeq = this.estimateServerSeq(now);
-    const targetSeq = Math.floor(estimatedServerSeq + 1e-8) + this.leadTicks;
+    const leadTicks = this.leadTicks;
+    const targetSeq = Math.floor(estimatedServerSeq + 1e-8) + leadTicks;
     if (targetSeq - this.anchor.ack > MAX_TIMELINE_REPLAY_TICKS)
       return { status: "waiting", reason: "prediction-budget" };
     let steps = 0;
@@ -199,6 +212,16 @@ export class NetworkTimeline {
       steps,
       targetSeq,
       remaining: Math.max(0, targetSeq - this.predictedSeq),
+      presentation: {
+        inputEpoch: this.anchor.inputEpoch,
+        currentSeq: this.predictedSeq,
+        // Use this advance's clock, not render delta or a later wall-time read.
+        // Catch-up can stop before targetSeq; never extrapolate past its pose.
+        alpha: Math.max(
+          0,
+          Math.min(1, estimatedServerSeq + leadTicks - this.predictedSeq),
+        ),
+      },
     };
   }
 
