@@ -4,7 +4,6 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { Client, type Room } from "@colyseus/sdk";
 import {
-  canonicalInput,
   PROTOCOL_VERSION,
   type Authority,
   type MotionPacket,
@@ -13,6 +12,11 @@ import { DEFAULT_PROFILE, type Player } from "../shared/types";
 import { SPAWN, CAR_SPAWN } from "../shared/world";
 import { validVehicleState } from "../shared/vehicle";
 import { MotionDecoder } from "../shared/motion-codec";
+import {
+  ScriptTimelineClient,
+  type ScriptAuthority,
+  type ScriptControls,
+} from "./timeline-client";
 
 const endpoint = process.env.STRAHOV_TEST_URL || "http://127.0.0.1:2568";
 assert.equal(
@@ -74,8 +78,8 @@ type Event = { type: string; value: any };
 type Probe = {
   id: string;
   room: Room;
-  seq: number;
-  authority?: Authority;
+  inputs: ScriptTimelineClient;
+  authority?: ScriptAuthority;
   motion?: MotionPacket;
   events: Event[];
   notices: string[];
@@ -104,14 +108,17 @@ async function join(nickname: string) {
   const probe: Probe = {
     id: session.id,
     room,
-    seq: 0,
+    inputs: new ScriptTimelineClient({
+      send: (batch) => room.send("inputs", batch),
+    }),
     events: [],
     notices: [],
   };
   probes.push(probe);
   room.onMessage("*", () => {});
-  room.onMessage("authoritative", (packet: Authority) => {
+  room.onMessage("authoritative", (packet: ScriptAuthority) => {
     probe.authority = packet;
+    probe.inputs.acceptAuthority(packet);
     probe.events.push({ type: "authoritative", value: packet });
   });
   const motion = new MotionDecoder();
@@ -136,11 +143,11 @@ async function join(nickname: string) {
     undefined,
     "welcome reset is not a respawn acknowledgement",
   );
-  probe.seq = probe.authority!.ack;
   return probe;
 }
 async function ordinaryResync(probe: Probe) {
-  const firstEvent = probe.events.length;
+  const firstEvent = probe.events.length,
+    previousEpoch = probe.authority!.inputEpoch;
   probe.room.send("resync");
   let reply: Authority | undefined;
   await until(() => {
@@ -157,38 +164,21 @@ async function ordinaryResync(probe: Probe) {
     undefined,
     "ordinary resync must not acknowledge a pending respawn",
   );
-}
-function inputs(
-  probe: Probe,
-  count: number,
-  x: number,
-  z: number,
-  vehicle: boolean,
-  jump = false,
-) {
-  for (let sent = 0; sent < count; sent += 8) {
-    const batch = Array.from({ length: Math.min(8, count - sent) }, () =>
-      canonicalInput({ x, z, yaw: 0, jump, vehicle, seq: ++probe.seq })!,
-    );
-    probe.room.send("inputs", batch);
-  }
+  assert.ok(
+    reply!.inputEpoch > previousEpoch,
+    "ordinary recovery changes the input epoch",
+  );
+  assert.equal(reply!.ack, 0);
 }
 async function moveUntil(
   probe: Probe,
-  action: () => void,
+  controls: ScriptControls | (() => ScriptControls),
   check: () => boolean,
   label: string,
 ) {
   evidence.lastStage = label;
-  for (let i = 0; i < 120; i++) {
-    if (check()) {
-      evidence.checks.push(label);
-      return;
-    }
-    action();
-    await sleep(34);
-  }
-  throw new Error("Timed out using actual movement inputs: " + label);
+  await probe.inputs.holdUntil(controls, check, label, 120 * 34);
+  evidence.checks.push(label);
 }
 async function enterCar(probe: Probe) {
   await moveUntil(
@@ -198,7 +188,13 @@ async function enterCar(probe: Probe) {
       const dx = CAR_SPAWN.x - p.x,
         dz = CAR_SPAWN.z - p.z,
         length = Math.max(1, Math.hypot(dx, dz));
-      inputs(probe, 2, dx / length, dz / length, false);
+      return {
+        x: dx / length,
+        z: dz / length,
+        yaw: 0,
+        jump: false,
+        vehicle: false,
+      };
     },
     () =>
       Math.hypot(
@@ -207,10 +203,8 @@ async function enterCar(probe: Probe) {
       ) < 4.2,
     "walk within car entry range",
   );
-  await until(
-    () => probe.authority!.ack >= probe.seq,
-    "walking queue consumed before entering",
-  );
+  await probe.inputs.settle();
+  evidence.checks.push("walking timeline resolved before entering");
   probe.room.send("vehicle");
   await until(
     () =>
@@ -240,9 +234,22 @@ async function respawn(
 ) {
   const firstEvent = probe.events.length,
     firstObserver = observer.events.length;
-  const ackBefore = probe.authority!.ack;
-  inputs(probe, count, 1, 1, vehicle);
-  const frontier = probe.seq;
+  const ackBefore = probe.authority!.ack,
+    epochBefore = probe.authority!.inputEpoch;
+  const discardedBefore = probe.authority!.network!.queue.discarded;
+  for (let sent = 0; sent < count; sent += 8)
+    probe.room.send(
+      "inputs",
+      Array.from({ length: Math.min(8, count - sent) }, (_, index) => ({
+        x: 1,
+        z: 1,
+        yaw: 0,
+        jump: false,
+        vehicle,
+        seq: ackBefore + sent + index + 1,
+        inputEpoch: epochBefore,
+      })),
+    );
   probe.room.send("respawn");
   let forced: Authority | undefined;
   await until(() => {
@@ -253,10 +260,13 @@ async function respawn(
           event.type === "authoritative" &&
           event.value.resync === true &&
           event.value.respawn === true &&
-          event.value.ack === frontier,
+          event.value.inputEpoch > epochBefore &&
+          event.value.ack === 0,
       )?.value;
     return !!forced;
-  }, "respawn replies with forced authority at received input frontier");
+  }, "respawn replies with forced authority in a fresh input epoch at ack zero");
+  assert.equal(forced!.inputTickBase, forced!.tick);
+  assert.equal(forced!.receivedSeq, 0);
   assert.equal(forced!.state.vehicle, false);
   assert.equal(forced!.respawn, true);
   assert.ok(
@@ -272,8 +282,7 @@ async function respawn(
       .filter((event) => event.type === "presence")
       .flatMap((event) => event.value as Player[])
       .find(
-        (p) =>
-          p.id === probe.id && !p.vehicle && p.ack === frontier && atSpawn(p),
+        (p) => p.id === probe.id && !p.vehicle && p.ack === 0 && atSpawn(p),
       );
   await until(() => {
     current = findPresence(probe.events.slice(firstEvent));
@@ -290,29 +299,31 @@ async function respawn(
     (event, index) =>
       index >= firstEvent &&
       event.type === "presence" &&
-      (event.value as Player[]).some(
-        (p) => p.id === probe.id && p.ack === frontier,
-      ),
+      (event.value as Player[]).some((p) => p.id === probe.id && p.ack === 0),
   );
   assert.ok(
     authorityIndex >= firstEvent && presenceIndex > authorityIndex,
     "forced authority must precede matching presence",
   );
-  if (count > 0)
+  if (count > 0) {
+    const queue = forced!.network!.queue;
+    assert.ok("resolution" in queue && queue.resolution === "scheduled-tick");
+    assert.equal(queue.depth, 0, "respawn discards queued old-epoch input");
     assert.ok(
-      frontier > ackBefore,
-      "queued input burst is included in the acknowledged frontier",
+      queue.discarded > discardedBefore,
+      "this request actually left accepted future commands pending",
     );
+  }
   evidence.resets.push({
     id: probe.id,
     ackBefore,
-    frontier,
+    epochBefore,
+    burstLastSeq: ackBefore + count,
     queuedBurst: count,
     forced,
     localPresence: playerRecord(current!),
     observerPresence: playerRecord(seenByObserver!),
   });
-  probe.seq = forced!.ack;
   return forced!;
 }
 
@@ -332,11 +343,28 @@ try {
   assert.equal(recovered.state.vehicleState!.parked, true);
   assert.equal(recovered.state.vehicleState!.position.x, CAR_SPAWN.x);
   assert.equal(recovered.state.vehicleState!.position.z, CAR_SPAWN.z);
-  // A duplicate already acknowledged vehicle input cannot regain control.
+  // Neither a resolved new-epoch slot nor an old-epoch vehicle input can regain control.
   const duplicateAck = recovered.ack,
     beforeDuplicate = a.events.length;
   a.room.send("inputs", [
-    { x: 1, z: 1, yaw: 0, jump: true, vehicle: true, seq: duplicateAck },
+    {
+      x: 1,
+      z: 1,
+      yaw: 0,
+      jump: true,
+      vehicle: true,
+      seq: duplicateAck,
+      inputEpoch: recovered.inputEpoch,
+    },
+    {
+      x: 1,
+      z: 1,
+      yaw: 0,
+      jump: true,
+      vehicle: true,
+      seq: 12,
+      inputEpoch: recovered.inputEpoch - 1,
+    },
   ]);
   await until(
     () =>
@@ -344,7 +372,11 @@ try {
         .length >= 2,
     "two authority samples after duplicate input",
   );
-  assert.equal(a.authority!.ack, duplicateAck);
+  assert.ok(
+    a.authority!.ack > duplicateAck,
+    "world time continues without replaying rejected inputs",
+  );
+  assert.equal(a.authority!.inputEpoch, recovered.inputEpoch);
   assert.equal(a.authority!.state.vehicle, false);
   assert.ok(
     Math.hypot(
@@ -352,19 +384,20 @@ try {
       a.authority!.state.position.z - SPAWN.z,
     ) < 1e-4,
   );
-  inputs(a, 1, 1, 0, false);
-  await until(
-    () =>
-      a.authority!.ack === duplicateAck + 1 &&
-      a.authority!.state.position.x > SPAWN.x + 0.01,
-    "fresh ack+1 input moves the recovered pedestrian",
+  await moveUntil(
+    a,
+    { x: 1, z: 0, yaw: 0, jump: false, vehicle: false },
+    () => a.authority!.state.position.x > SPAWN.x + 0.01,
+    "fresh scheduled input moves the recovered pedestrian",
   );
+  const resumedFrontier = a.inputs.frontier;
+  await a.inputs.settle(resumedFrontier);
   await until(
     () =>
       b.motion?.rows.some(
         (row) =>
           row[0] === a.id &&
-          row[6] === duplicateAck + 1 &&
+          row[6] >= resumedFrontier.seq &&
           row[1] > SPAWN.x + 0.01,
       ) ?? false,
     "observer receives movement after recovery",
@@ -372,7 +405,7 @@ try {
   await enterCar(a);
   await moveUntil(
     a,
-    () => inputs(a, 2, 0, 1, true),
+    { x: 0, z: 1, yaw: 0, jump: false, vehicle: true },
     () => {
       const p = a.authority!.state.position;
       return Math.hypot(p.x - CAR_SPAWN.x, p.z - CAR_SPAWN.z) > 1.1;
@@ -381,11 +414,11 @@ try {
   );
   await moveUntil(
     a,
-    () => inputs(a, 2, 0, 0, true, true),
+    { x: 0, z: 0, yaw: 0, jump: true, vehicle: true },
     () => Math.abs(a.authority!.state.speed) < 0.2,
     "brake before testing another player's respawn",
   );
-  await until(() => a.authority!.ack >= a.seq, "driver input queue consumed");
+  await a.inputs.settle();
   const foreignBefore = a.authority!.state.vehicleState!;
   const otherReset = await respawn(b, a, 32, false);
   const foreignAfter = otherReset.state.vehicleState!;
@@ -415,6 +448,7 @@ try {
   evidence.errors.push(error instanceof Error ? error.message : String(error));
   throw error;
 } finally {
+  probes.forEach((probe) => probe.inputs.dispose());
   for (const probe of probes)
     if (probe.room.connection.isOpen) await probe.room.leave();
   evidence.openAuthenticatedConnectionsAfterCleanup = probes.filter(
@@ -434,5 +468,5 @@ assert.deepEqual(
 );
 evidence.completed = true;
 console.log(
-  "PASS: real SDK queued vehicle respawn, immediate forced authority and current presence, duplicate rejection, fresh ack+1 movement, protected foreign driver, canonical isolated-world cleanup.",
+  "PASS: real SDK queued vehicle respawn, fresh epoch forced authority and current presence, duplicate/old-epoch rejection, fresh scheduled movement, protected foreign driver, canonical isolated-world cleanup.",
 );

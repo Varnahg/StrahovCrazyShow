@@ -1,12 +1,20 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { Script } from "node:vm";
+import { Script, createContext } from "node:vm";
 import { setImmediate } from "node:timers/promises";
 import ts from "typescript";
 import { currentRoomCallbacks } from "../client/room-callbacks";
 import { MotionDecoder, MotionEncoder } from "../shared/motion-codec";
-import { PROTOCOL_VERSION } from "../shared/netcode";
+import { PROTOCOL_VERSION, FIXED_DT, canonicalInput } from "../shared/netcode";
+import { movementFromKeys } from "../shared/controls";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { FrameInputBuffer } from "../client/network-input-buffer";
+import {
+  AuthorityBuffer,
+  type ReceivedAuthority,
+} from "../client/authority-buffer";
+import { NetworkProbe } from "../client/network-probe";
 
 // Execute the actual UI subscriptions, without booting React/WebGL. This catches
 // a missing guard on any handler, not only the helper's isolated behavior.
@@ -24,7 +32,16 @@ const app = ui.statements.find(
 const declarations = app.body!.statements.flatMap((node) =>
   ts.isVariableStatement(node) ? [...node.declarationList.declarations] : [],
 );
-const callbackNames = ["bind", "connect", "reconnect", "enter", "leave"];
+const callbackNames = [
+  "applyReceivedAuthority",
+  "drainAuthorities",
+  "syncNetworkStage",
+  "bind",
+  "connect",
+  "reconnect",
+  "enter",
+  "leave",
+];
 const callbackSource = callbackNames.map((name) => {
   const declaration = declarations.find(
     (node) => ts.isIdentifier(node.name) && node.name.text === name,
@@ -32,10 +49,49 @@ const callbackSource = callbackNames.map((name) => {
   assert.ok(declaration?.initializer, `App must define ${name}`);
   return `const ${name} = ${declaration.initializer.getText(ui)};`;
 });
-const callbacksScript = new Script(
-  ts.transpileModule(
-    [...callbackSource, `({ ${callbackNames.join(",")} });`].join("\n"),
-    {
+const startupEffects = app.body!.statements.filter(
+  (node): node is ts.ExpressionStatement =>
+    ts.isExpressionStatement(node) &&
+    ts.isCallExpression(node.expression) &&
+    node.expression.expression.getText(ui) === "useEffect" &&
+    Boolean(
+      node.expression.arguments[0]?.getText(ui).includes("await g.start()"),
+    ),
+);
+assert.equal(startupEffects.length, 1, "one actual Game lifecycle effect");
+const startupEffect = (startupEffects[0].expression as ts.CallExpression)
+  .arguments[0];
+const hookNames = ["onInput", "onInputFrame", "onBeforeInputFrame"];
+const hookAssignments: ts.ExpressionStatement[] = [];
+function findHookAssignments(node: ts.Node) {
+  if (
+    ts.isExpressionStatement(node) &&
+    ts.isBinaryExpression(node.expression) &&
+    node.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+    ts.isPropertyAccessExpression(node.expression.left) &&
+    node.expression.left.expression.getText(ui) === "g" &&
+    hookNames.includes(node.expression.left.name.text)
+  )
+    hookAssignments.push(node);
+  ts.forEachChild(node, findHookAssignments);
+}
+findHookAssignments(startupEffect);
+assert.deepEqual(
+  hookAssignments
+    .map(
+      (node) =>
+        (
+          (node.expression as ts.BinaryExpression)
+            .left as ts.PropertyAccessExpression
+        ).name.text,
+    )
+    .sort(),
+  [...hookNames].sort(),
+  "each tested hook must be assigned exactly once by the real lifecycle",
+);
+function compileScript(source: string) {
+  return new Script(
+    ts.transpileModule(source, {
       compilerOptions: {
         target: ts.ScriptTarget.ES2022,
         module: ts.ModuleKind.CommonJS,
@@ -43,18 +99,76 @@ const callbacksScript = new Script(
       transformers: {
         before: [
           (context) => (source) => {
-            const visit: ts.Visitor = (node) =>
-              ts.isMetaProperty(node) &&
-              node.keywordToken === ts.SyntaxKind.ImportKeyword
+            const visit: ts.Visitor = (node) => {
+              if (
+                ts.isCallExpression(node) &&
+                node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+                node.arguments[0] &&
+                ts.isStringLiteral(node.arguments[0]) &&
+                node.arguments[0].text === "./game"
+              )
+                return ts.factory.createCallExpression(
+                  ts.factory.createIdentifier("testLoadGame"),
+                  undefined,
+                  [],
+                );
+              return ts.isMetaProperty(node) &&
+                node.keywordToken === ts.SyntaxKind.ImportKeyword
                 ? ts.factory.createIdentifier("testImportMeta")
                 : ts.visitEachChild(node, visit, context);
+            };
             return ts.visitNode(source, visit) as ts.SourceFile;
           },
         ],
       },
-    },
-  ).outputText,
+    }).outputText,
+  );
+}
+const callbacksScript = compileScript(
+  [
+    ...callbackSource,
+    `const installFrameHooks = (g) => { ${hookAssignments.map((node) => node.getText(ui)).join("\n")} };`,
+    `({ ${callbackNames.join(",")}, installFrameHooks });`,
+  ].join("\n"),
 );
+const startupScript = compileScript(`(${startupEffect.getText(ui)})()`);
+
+const gameSource = ts.createSourceFile(
+  "game.ts",
+  readFileSync(new URL("../client/game.ts", import.meta.url), "utf8"),
+  ts.ScriptTarget.Latest,
+  true,
+);
+const gameClass = gameSource.statements.find(
+  (node): node is ts.ClassDeclaration =>
+    ts.isClassDeclaration(node) && node.name?.text === "Game",
+)!;
+function gameMethod(name: string) {
+  const method = gameClass.members.find(
+    (node): node is ts.MethodDeclaration =>
+      ts.isMethodDeclaration(node) && node.name.getText(gameSource) === name,
+  );
+  assert.ok(method?.body, `Game must define ${name}`);
+  return method;
+}
+const frame = gameMethod("frame");
+const simulationIndex = frame.body!.statements.findIndex(
+  (statement) =>
+    ts.isExpressionStatement(statement) &&
+    ts.isCallExpression(statement.expression) &&
+    statement.expression.expression.getText(gameSource) ===
+      "this.advanceSimulation",
+);
+assert.ok(simulationIndex >= 0);
+// Retain the actual contiguous frame prefix and whole simulation method. Only
+// the unrelated render tail is omitted; callback ordering is not reconstructed.
+const gameMethodsScript = compileScript(`({
+  ${gameMethod("advanceSimulation").getText(gameSource)},
+  frame() { ${frame
+    .body!.statements.slice(0, simulationIndex + 1)
+    .map((node) => node.getText(gameSource))
+    .join("\n")} }
+})`);
 
 function deferred<T>() {
   let resolve!: (value: T) => void, reject!: (error: unknown) => void;
@@ -128,14 +242,30 @@ class FakeRoom {
 }
 
 function fixture() {
+  let clockNow = 2000;
   const effects: string[] = [];
+  const diagnostics: { kind: string; data: unknown }[] = [];
   const state: Record<string, any> = { messages: [] };
   const refs = {
     room: { current: null as FakeRoom | null },
     connectionAttempt: { current: 0 },
     connectedRef: { current: false },
-    inputBuffer: { current: ["pending input"] as unknown[] },
-    authorityRef: { current: null },
+    networkProbeRef: {
+      current: new NetworkProbe({
+        now: () => clockNow,
+        send: () => {},
+        longTasks: () => null,
+      }),
+    },
+    inputBuffer: {
+      current: new FrameInputBuffer({
+        now: () => 2000,
+        canSend: () => true,
+        send: () => {},
+      }),
+    },
+    authorityBufferRef: { current: new AuthorityBuffer() },
+    bootstrapAuthorityRef: { current: null as ReceivedAuthority | null },
     playersRef: { current: [] },
     playersById: { current: new Map<string, any>() },
     carState: { current: null },
@@ -153,8 +283,11 @@ function fixture() {
     ["strahov.session", "prior-session-token"],
   ]);
   const game: Record<string, any> = {
+    ready: true,
+    network: true,
     canvas: { dataset: {} },
     localPlayer: { id: "self" },
+    networkTimeline: { setRtt: (value: number) => (state.rttMs = value) },
   };
   for (const method of [
     "setLocalId",
@@ -171,12 +304,17 @@ function fixture() {
       if (method === "setLocalId") game.localId = args[0];
       effects.push(`game.${method}`);
       state[`game.${method}`] = args;
+      return true;
     };
   const environment: Record<string, any> = {
     exports: {},
     ...refs,
     game: { current: game },
     currentRoomCallbacks,
+    sessionDiagnostics: {
+      event: (kind: string, data: unknown = {}) =>
+        diagnostics.push({ kind, data: structuredClone(data) }),
+    },
     MotionDecoder,
     PROTOCOL_VERSION,
     testImportMeta: { env: {} },
@@ -203,7 +341,7 @@ function fixture() {
         return result.promise;
       }
     },
-    performance: { now: () => 2000 },
+    performance: { now: () => clockNow },
     t: (text: string) => text,
     notice: (message: string) => {
       effects.push("notice");
@@ -236,8 +374,15 @@ function fixture() {
       state[key] = typeof value === "function" ? value(state[key]) : value;
     };
   }
-  const callbacks = callbacksScript.runInNewContext(environment) as {
+  const context = createContext(environment);
+  const callbacks = callbacksScript.runInContext(context) as {
+    installFrameHooks: (game: Record<string, any>) => void;
+    syncNetworkStage: (game: {
+      network: boolean;
+      canvas: { dataset: Record<string, string> };
+    }) => void;
     bind: (room: FakeRoom) => void;
+    drainAuthorities: () => void;
     leave: () => void;
     connect: () => Promise<boolean>;
     reconnect: () => Promise<void>;
@@ -246,8 +391,20 @@ function fixture() {
   return {
     ...callbacks,
     ...refs,
+    game,
+    context,
+    environment,
+    setClock: (now: number) => {
+      clockNow = now;
+    },
+    beginProbe: () => {
+      clockNow = 1970;
+      refs.networkProbeRef.current.poll({ enabled: true, ready: true });
+      clockNow = 2000;
+    },
     state,
     effects,
+    diagnostics,
     fetches,
     joins,
     storage,
@@ -255,6 +412,7 @@ function fixture() {
       JSON.stringify({
         state,
         effects,
+        diagnostics,
         refs: { ...refs, room: undefined },
         players: [...refs.playersById.current],
         canvas: game.canvas,
@@ -273,7 +431,15 @@ function payloads(id = "self") {
       tick: 1,
       rows: [[id, 5, 2, 3, 0.1, 1, 0, 0, "outside", true]],
     }),
-    authoritative: { ack: 1, x: 5, y: 2, z: 3 },
+    authoritative: {
+      ack: 1,
+      tick: 1,
+      inputEpoch: 1,
+      inputTickBase: 0,
+      receivedSeq: 1,
+      time: 1000,
+      state: { position: { x: 5, y: 2, z: 3 } },
+    },
     events: [{ id: "private-event" }],
     social: { contacts: ["friend"], requests: [], blocked: [], attendance: [] },
     activity: { hunt: ["found-marker"] },
@@ -282,6 +448,7 @@ function payloads(id = "self") {
     car: { id: "campus-car" },
     chat: { id: "message", text: "multiplayer chat" },
     emote: { id, emote: "wave" },
+    networkProbe: { nonce: 1, serverTick: 120, serverTimeMs: 1000 },
   };
 }
 
@@ -301,10 +468,20 @@ test("every current room UI subscription still applies its message", () => {
   const ui = fixture(),
     room = new FakeRoom();
   ui.bind(room);
+  ui.beginProbe();
   for (const [type, data] of Object.entries(payloads())) {
     ui.effects.length = 0;
     room.message(type, data);
-    assert.ok(ui.effects.length > 0, `${type} must reach the current UI/Game`);
+    if (type === "networkProbe")
+      assert.equal(
+        ui.networkProbeRef.current.snapshot().predictionRoundTripMs,
+        30,
+      );
+    else
+      assert.ok(
+        ui.effects.length > 0,
+        `${type} must reach the current UI/Game`,
+      );
   }
   assert.equal(ui.playersById.current.get("self").x, 5);
   assert.equal(ui.playersById.current.get("self").emote, "wave");
@@ -312,6 +489,56 @@ test("every current room UI subscription still applies its message", () => {
   assert.equal(ui.state.notice, "socket error");
   room.message("motion", { v: 1, s: 3, t: 1100, n: 3, p: 1, r: [] });
   assert.deepEqual(room.sent, [["motionResync", undefined]]);
+  assert.deepEqual(
+    ui.diagnostics,
+    [
+      { kind: "network-connected", data: {} },
+      {
+        kind: "network-round-trip",
+        data: {
+          nonce: 1,
+          roundTripMs: 30,
+          rawRoundTripMs: 30,
+          measuredAt: 2000,
+          contaminated: false,
+          blockedOverlapMs: 0,
+          overlappingLongTasks: 0,
+          longTaskCoverage: "unavailable",
+          acceptedForPrediction: true,
+          predictionRoundTripMs: 30,
+          serverTick: 120,
+          serverTimeMs: 1000,
+          scope:
+            "raw includes scheduling; only uncontaminated samples feed prediction",
+        },
+      },
+      { kind: "network-error", data: { code: 4000, message: "socket error" } },
+      { kind: "network-keyframe-request", data: {} },
+    ],
+    "diagnostics contain technical events without message or presence payloads",
+  );
+});
+
+test("a game installed after welcome inherits the live connection and a guest stays offline", () => {
+  const ui = fixture(),
+    room = new FakeRoom();
+  ui.bind(room);
+  room.message("welcome", payloads().welcome);
+  const laterGame = {
+    network: true,
+    canvas: { dataset: {} as Record<string, string> },
+  };
+  ui.syncNetworkStage(laterGame);
+  assert.equal(laterGame.canvas.dataset.networkStage, "connected");
+  const guest = {
+    network: false,
+    canvas: { dataset: {} as Record<string, string> },
+  };
+  ui.syncNetworkStage(guest);
+  assert.equal(guest.canvas.dataset.networkStage, "offline");
+  ui.connectedRef.current = false;
+  ui.syncNetworkStage(laterGame);
+  assert.equal(laterGame.canvas.dataset.networkStage, "connecting");
 });
 
 test("leave invalidates before the handshake and all retained callbacks remain inert in menu/guest", () => {
@@ -336,7 +563,7 @@ test("leave invalidates before the handshake and all retained callbacks remain i
   assert.equal(ui.state.mode, "menu");
   assert.equal(ui.state.messages.length, 0);
   assert.equal(ui.state.social.contacts.length, 0);
-  assert.equal(room.messages.size, 12, "transport still retains its listeners");
+  assert.equal(room.messages.size, 13, "transport still retains its listeners");
   for (const mode of ["menu", "guest"]) {
     ui.modeRef.current = mode;
     const before = ui.snapshot();
@@ -387,10 +614,11 @@ test("current onLeave disconnects once and ignores subsequent retained messages 
   room.close();
   assert.equal(ui.room.current, null);
   assert.equal(ui.connectedRef.current, false);
-  assert.equal(ui.inputBuffer.current.length, 0);
+  assert.equal(ui.inputBuffer.current.snapshot().queued, 0);
   assert.equal(ui.playersRef.current.length, 0);
   assert.equal(ui.playersById.current.size, 0);
-  assert.equal(ui.authorityRef.current, null);
+  assert.equal(ui.bootstrapAuthorityRef.current, null);
+  assert.equal(ui.authorityBufferRef.current.snapshot().pending, false);
   assert.ok(ui.effects.includes("game.cancelRespawn"));
   const before = ui.snapshot();
   dispatchMessages(room);
@@ -429,7 +657,7 @@ test("a current multiplayer entry commits identity and token only after its join
   assert.equal(ui.storage.get("strahov.session"), "token-joined-self");
   assert.equal(ui.state.mode, "multi");
   assert.equal(ui.state.busy, false);
-  assert.equal(room.messages.size, 12);
+  assert.equal(room.messages.size, 13);
 });
 
 test("leave then guest cancels a pending session fetch without reading its body or joining", async () => {
@@ -613,3 +841,291 @@ test("current connection failures still reach entry and reconnect feedback", asy
   await connecting;
   assert.equal(reconnect.state.notice, "Error: current reconnect failure");
 });
+
+test("authority callback rejects stale epoch before acknowledging queued inputs and retains arrival time", () => {
+  const ui = fixture(),
+    room = new FakeRoom();
+  ui.bind(room);
+  const data = {
+    ...payloads().authoritative,
+    inputEpoch: 2,
+    inputTickBase: 40,
+    tick: 50,
+    ack: 10,
+  };
+  room.message("authoritative", data);
+  assert.equal(ui.state["game.reconcile"][1], 2000);
+  assert.equal(ui.inputBuffer.current.snapshot().lastAck, 10);
+  const before = JSON.stringify(ui.state["game.reconcile"]);
+  room.message("authoritative", { ...data, inputEpoch: 1, tick: 60, ack: 20 });
+  room.message("authoritative", { ...data, inputTickBase: 41 });
+  room.message("authoritative", data);
+  assert.equal(
+    JSON.stringify(ui.state["game.reconcile"]),
+    before,
+    "old epoch, invalid frontier and duplicate authority are inert before transport acknowledgement",
+  );
+  assert.equal(ui.inputBuffer.current.snapshot().lastAck, 10);
+  assert.equal(ui.authorityBufferRef.current.snapshot().rejected, 3);
+});
+
+test("ordinary authority backlog is applied once per frame using original arrival time, while barriers stay immediate", () => {
+  const ui = fixture(),
+    room = new FakeRoom();
+  ui.bind(room);
+  const first = {
+    ...payloads().authoritative,
+    tick: 100,
+    inputTickBase: 100,
+    ack: 0,
+  };
+  room.message("authoritative", first);
+  for (let ack = 1; ack <= 80; ack++) {
+    ui.setClock(2000 + ack * 50);
+    room.message("authoritative", { ...first, tick: 100 + ack, ack });
+  }
+  assert.equal(
+    ui.effects.filter((effect) => effect === "game.reconcile").length,
+    1,
+  );
+  ui.setClock(6500);
+  ui.drainAuthorities();
+  assert.equal(
+    ui.effects.filter((effect) => effect === "game.reconcile").length,
+    2,
+  );
+  assert.equal(ui.state["game.reconcile"][0].ack, 80);
+  assert.equal(
+    ui.state["game.reconcile"][1],
+    6000,
+    "frame execution cannot refresh a packet's arrival timestamp",
+  );
+  assert.equal(ui.inputBuffer.current.snapshot().lastAck, 80);
+  assert.equal(ui.authorityBufferRef.current.snapshot().superseded, 79);
+  room.message("authoritative", { ...first, tick: 181, ack: 81 });
+  room.message("authoritative", {
+    ...first,
+    inputEpoch: 2,
+    inputTickBase: 181,
+    tick: 181,
+    ack: 0,
+    resync: true,
+    respawn: true,
+  });
+  assert.equal(ui.state["game.reconcile"][0].respawn, true);
+  const applied = ui.effects.filter(
+    (effect) => effect === "game.reconcile",
+  ).length;
+  ui.drainAuthorities();
+  assert.equal(
+    ui.effects.filter((effect) => effect === "game.reconcile").length,
+    applied,
+    "superseded ordinary state cannot follow a forced barrier",
+  );
+});
+
+test("bootstrap authority is retained until physics is ready and multiplayer state never drains into a guest", () => {
+  const ui = fixture(),
+    room = new FakeRoom();
+  ui.bind(room);
+  ui.game.ready = false;
+  const first = { ...payloads().authoritative, resync: true };
+  room.message("authoritative", first);
+  room.message("authoritative", { ...first, resync: false, tick: 2, ack: 2 });
+  ui.drainAuthorities();
+  assert.equal(ui.effects.filter((e) => e === "game.reconcile").length, 0);
+  assert.ok(ui.bootstrapAuthorityRef.current);
+  ui.game.ready = true;
+  ui.drainAuthorities();
+  assert.equal(ui.effects.filter((e) => e === "game.reconcile").length, 2);
+  room.message("authoritative", { ...first, resync: false, tick: 3, ack: 3 });
+  ui.leave();
+  ui.modeRef.current = "guest";
+  ui.game.network = false;
+  const before = JSON.stringify(ui.state["game.reconcile"]);
+  ui.drainAuthorities();
+  assert.equal(JSON.stringify(ui.state["game.reconcile"]), before);
+  assert.equal(ui.bootstrapAuthorityRef.current, null);
+  assert.equal(ui.authorityBufferRef.current.snapshot().pending, false);
+});
+
+test("the actual probe callback logs main-thread contamination without feeding it into prediction", () => {
+  const ui = fixture(),
+    room = new FakeRoom();
+  ui.bind(room);
+  let now = 1970;
+  const tasks: { startTime: number; duration: number }[] = [];
+  ui.networkProbeRef.current = new NetworkProbe({
+    now: () => now,
+    send: () => {},
+    longTasks: () => ({ takeRecords: () => tasks.splice(0), disconnect() {} }),
+  });
+  ui.networkProbeRef.current.poll({ enabled: true, ready: true });
+  now = 2000;
+  room.message("networkProbe", payloads().networkProbe);
+  assert.equal(ui.state.rttMs, 30);
+  now = 4000;
+  ui.networkProbeRef.current.poll({ enabled: true, ready: true });
+  tasks.push({ startTime: 4010, duration: 990 });
+  now = 5000;
+  room.message("networkProbe", { ...payloads().networkProbe, nonce: 2 });
+  assert.equal(ui.state.rttMs, 30);
+  const event = ui.diagnostics
+    .filter((e) => e.kind === "network-round-trip")
+    .at(-1)!.data as any;
+  assert.equal(event.roundTripMs, 1000);
+  assert.equal(event.blockedOverlapMs, 990);
+  assert.equal(event.acceptedForPrediction, false);
+});
+
+test("actual UI hook assignments drain authority before Game simulation and flush its generated input afterward", (t) => {
+  const f = fixture();
+  const room = new FakeRoom();
+  f.bind(room);
+  const authority = payloads().authoritative;
+  room.message("authoritative", {
+    ...authority,
+    ack: 0,
+    tick: 0,
+    receivedSeq: 0,
+  });
+  room.message("authoritative", { ...authority, time: 1000 + FIXED_DT * 1000 });
+  assert.equal(f.authorityBufferRef.current.snapshot().pending, true);
+  Object.assign(f.environment, {
+    Vector3,
+    Quaternion,
+    FIXED_DT,
+    canonicalInput,
+    movementFromKeys,
+    document: { hidden: false },
+    vehicleCameraCanFollow: () => false,
+  });
+  Object.assign(f.game, gameMethodsScript.runInContext(f.context), {
+    ready: true,
+    disposed: false,
+    respawnPending: false,
+    accumulator: 0,
+    keys: new Set(["KeyW"]),
+    yaw: 0,
+    seq: 1,
+    previousPosition: Vector3.Zero(),
+    engine: { getDeltaTime: () => FIXED_DT * 1000 },
+    engineInstrumentation: { captureGPUFrameTime: false },
+    adaptive: { update: () => ({}) },
+    applyAdaptiveQuality() {},
+    actor: {
+      position: { x: 0, y: 0, z: 0 },
+      vehicle: false,
+      speed: 0,
+      step: () => f.effects.push("actor.step"),
+      capture: () => ({}),
+    },
+    sim: {
+      car: {
+        getVisualPose: () => ({
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0, w: 1 },
+        }),
+      },
+      tick: () => f.effects.push("sim.tick"),
+    },
+    prediction: { push() {} },
+    networkTimeline: {
+      advance(
+        _now: number,
+        make: (seq: number) => object,
+        apply: (step: object) => void,
+      ) {
+        apply({
+          input: { ...make(2), inputEpoch: 1 },
+          source: "input",
+          time: 1000,
+        });
+        return { status: "advanced", steps: 1 };
+      },
+    },
+  });
+  f.installFrameHooks(f.game);
+  const sender = f.inputBuffer.current;
+  const flush = sender.flush.bind(sender);
+  t.mock.method(
+    sender,
+    "flush",
+    (source: Parameters<FrameInputBuffer["flush"]>[0]) => {
+      f.effects.push(`sender.flush:${source}`);
+      return flush(source);
+    },
+  );
+  f.effects.length = 0;
+  f.game.frame();
+  assert.deepEqual(f.effects, [
+    "game.reconcile",
+    "actor.step",
+    "sim.tick",
+    "sender.flush:frame",
+  ]);
+  assert.equal(f.state["game.reconcile"][0].ack, 1);
+  assert.equal(sender.snapshot().sentInputs, 1);
+  assert.equal(sender.snapshot().queued, 0);
+});
+
+for (const outcome of [
+  "success",
+  "failure",
+  "cancel-success",
+  "cancel-failure",
+] as const) {
+  test(`actual Game lifecycle emits game-ready only after successful uncancelled start: ${outcome}`, async () => {
+    const f = fixture();
+    const starting = deferred<void>();
+    const game = f.game;
+    let starts = 0;
+    Object.assign(game, {
+      ready: false,
+      setQuality() {},
+      setTargetFps() {},
+      start: async () => {
+        starts++;
+        await starting.promise;
+        game.ready = true;
+      },
+      dispose: () => {
+        game.disposed = true;
+      },
+    });
+    Object.assign(f.environment, {
+      testLoadGame: async () => ({
+        Game: class {
+          constructor() {
+            return game;
+          }
+        },
+      }),
+      mode: "multi",
+      canvas: { current: game.canvas },
+      lightingPreviewRef: { current: { instant: null } },
+      weatherRef: { current: null },
+      userBenchmark: { current: false },
+      quality: "medium",
+      targetFps: 60,
+      activity: { hunt: [] },
+      setStats() {},
+    });
+    const cleanup = startupScript.runInContext(f.context) as () => void;
+    const readyEvents = () =>
+      f.diagnostics.filter((event) => event.kind === "game-ready");
+    await setImmediate();
+    assert.equal(starts, 1, "actual lifecycle must reach the pending start");
+    assert.equal(readyEvents().length, 0);
+    assert.notEqual(f.state.ready, true);
+    if (outcome.startsWith("cancel-")) cleanup();
+    if (outcome.endsWith("failure")) starting.reject(new Error("start failed"));
+    else starting.resolve();
+    await setImmediate();
+    const successful = outcome === "success";
+    assert.equal(readyEvents().length, successful ? 1 : 0);
+    assert.equal(f.state.ready === true, successful);
+    if (!outcome.startsWith("cancel-")) cleanup();
+    assert.equal(game.disposed, true);
+  });
+}

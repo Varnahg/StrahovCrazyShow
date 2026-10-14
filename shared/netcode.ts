@@ -1,10 +1,15 @@
 import type { Input, Vec3 } from "./types";
 import type { VehicleState } from "./vehicle";
+import type {
+  AuthorityNetworkDiagnostics,
+  InputQueueDiagnostics,
+  ResyncReason,
+} from "./network-diagnostics";
 export type { Input } from "./types";
 
-// Mapped outdoor furniture/barriers add static collisions in v10. Reject older
-// predictors even though the compact motion dictionary/delta wire format is unchanged.
-export const PROTOCOL_VERSION = 10;
+// V11 input seq identifies a scheduled simulation tick inside a server epoch.
+// V10 command-count acknowledgements cannot predict this timeline safely.
+export const PROTOCOL_VERSION = 11;
 export const SIM_HZ = 60;
 export const FIXED_DT = 1 / SIM_HZ;
 export const MAX_CATCHUP_STEPS = 8;
@@ -21,13 +26,18 @@ export type ActorState = {
   vehicleState?: VehicleState;
 };
 export type Authority = {
+  /** UTC instant used by the represented simulation tick. */
   time: number;
   tick: number;
   ack: number;
+  inputEpoch: number;
+  inputTickBase: number;
+  receivedSeq: number;
   state: ActorState;
   resync?: boolean;
-  /** The received command frontier was explicitly discarded to restore responsiveness. */
-  resyncReason?: "input-backlog";
+  /** Own-session diagnostics are optional; the epoch/time frontier is required. */
+  resyncReason?: ResyncReason;
+  network?: AuthorityNetworkDiagnostics;
   /** Only the reply to an explicit respawn request, never a generic resync. */
   respawn?: true;
 };
@@ -62,58 +72,106 @@ export function canonicalInput(raw: any): Input | null {
   };
 }
 
+export type FixedStepPlan = { steps: number; dropped: number };
+
+function planFixedSteps(accumulator: number) {
+  let steps = 0;
+  while (accumulator + 1e-10 >= FIXED_DT && steps < MAX_CATCHUP_STEPS) {
+    accumulator -= FIXED_DT;
+    steps++;
+  }
+  const dropped =
+    accumulator >= FIXED_DT ? accumulator - (accumulator % FIXED_DT) : 0;
+  return {
+    steps,
+    dropped,
+    remainder: dropped ? accumulator % FIXED_DT : accumulator,
+  };
+}
+
 /** Wall time drives fixed simulation ticks, independent of callback frequency. */
 export class FixedStepClock {
   accumulator = 0;
   tick = 0;
   droppedSeconds = 0;
-  advance(elapsed: number, step: (dt: number, tick: number) => void) {
+  advance(
+    elapsed: number,
+    step: (dt: number, tick: number) => void,
+    beforeSteps?: (plan: Readonly<FixedStepPlan>) => void,
+  ) {
     if (!Number.isFinite(elapsed) || elapsed < 0)
       return { steps: 0, dropped: 0 };
     this.accumulator += elapsed;
-    let steps = 0;
-    while (this.accumulator + 1e-10 >= FIXED_DT && steps < MAX_CATCHUP_STEPS) {
+    const plan = planFixedSteps(this.accumulator);
+    beforeSteps?.({ steps: plan.steps, dropped: plan.dropped });
+    for (let index = 0; index < plan.steps; index++) {
       this.accumulator -= FIXED_DT;
       step(FIXED_DT, ++this.tick);
-      steps++;
     }
-    let dropped = 0;
-    if (this.accumulator >= FIXED_DT) {
-      dropped = this.accumulator - (this.accumulator % FIXED_DT);
-      this.accumulator %= FIXED_DT;
-      this.droppedSeconds += dropped;
-    }
-    return { steps, dropped };
+    this.accumulator = plan.remainder;
+    this.droppedSeconds += plan.dropped;
+    return { steps: plan.steps, dropped: plan.dropped };
   }
 }
 
-/** Reliable ordered transport still needs a bounded, deduplicated per-tick queue. */
+/** Legacy V10 command FIFO, retained for regression comparisons only.
+ * The V11 server uses TimelineInputQueue and never executes late commands. */
 export class InputQueue {
   pending: Input[] = [];
   ack = 0;
   lastReceived = 0;
   lastAt = 0;
   private lastBacklogRecoveryAt = -Infinity;
+  private queuedAt = new Map<number, number>();
+  private maxDepth = 0;
+  private accepted = 0;
+  private rejectedDuplicate = 0;
+  private rejectedGap = 0;
+  private rejectedCapacity = 0;
+  private consumed = 0;
+  private idleTicks = 0;
+  private idleTicksSinceAck = 0;
+  private lastAppliedTick: number | null = null;
+  private resets = 0;
+  private discarded = 0;
   last: Input = { x: 0, z: 0, yaw: 0, jump: false, seq: 0 };
   push(input: Input, now: number) {
-    if (
-      input.seq <= this.lastReceived ||
-      input.seq !== this.lastReceived + 1 ||
-      this.pending.length >= 64
-    )
+    if (input.seq <= this.lastReceived) {
+      this.rejectedDuplicate++;
       return false;
+    }
+    if (input.seq !== this.lastReceived + 1) {
+      this.rejectedGap++;
+      return false;
+    }
+    if (this.pending.length >= 64) {
+      this.rejectedCapacity++;
+      return false;
+    }
     this.pending.push(input);
+    this.queuedAt.set(input.seq, now);
+    this.accepted++;
+    this.maxDepth = Math.max(this.maxDepth, this.pending.length);
     this.lastReceived = input.seq;
     this.lastAt = now;
     return true;
   }
-  consume(now: number) {
+  consume(now: number, tick?: number) {
     const input = this.pending.shift();
     if (input) {
+      this.queuedAt.delete(input.seq);
+      this.consumed++;
+      this.idleTicksSinceAck = 0;
+      this.lastAppliedTick =
+        typeof tick === "number" && Number.isSafeInteger(tick) && tick >= 0
+          ? tick
+          : null;
       this.ack = input.seq;
       this.last = input;
       return input;
     }
+    this.idleTicks++;
+    this.idleTicksSinceAck++;
     // A missing command must not add unacknowledged horizontal motion.
     return {
       ...this.last,
@@ -137,9 +195,39 @@ export class InputQueue {
     return true;
   }
   reset() {
+    this.resets++;
+    this.discarded += this.pending.length;
     this.pending = [];
+    this.queuedAt.clear();
+    this.idleTicksSinceAck = 0;
     this.ack = this.lastReceived;
     this.last = { x: 0, z: 0, yaw: 0, jump: false, seq: this.ack };
+  }
+  diagnostics(now: number): InputQueueDiagnostics {
+    const age = (at: number | undefined) =>
+      at !== undefined && Number.isFinite(at) && Number.isFinite(now)
+        ? Math.max(0, now - at)
+        : null;
+    return {
+      depth: this.pending.length,
+      maxDepth: this.maxDepth,
+      ack: this.ack,
+      receivedSeq: this.lastReceived,
+      lastInputAgeMs: this.accepted ? age(this.lastAt) : null,
+      oldestQueuedAgeMs: age(
+        this.pending[0] ? this.queuedAt.get(this.pending[0].seq) : undefined,
+      ),
+      lastAppliedTick: this.lastAppliedTick,
+      accepted: this.accepted,
+      rejectedDuplicate: this.rejectedDuplicate,
+      rejectedGap: this.rejectedGap,
+      rejectedCapacity: this.rejectedCapacity,
+      consumed: this.consumed,
+      idleTicks: this.idleTicks,
+      idleTicksSinceAck: this.idleTicksSinceAck,
+      resets: this.resets,
+      discarded: this.discarded,
+    };
   }
 }
 

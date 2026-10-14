@@ -15,7 +15,7 @@ import {
   SESSION_ISSUE_WINDOW_MS,
   MAX_SESSION_ISSUE_ADDRESSES,
 } from "./session-lifecycle";
-import { sanitizeInput, sanitizeProfile, cleanText } from "../shared/profile";
+import { sanitizeProfile, cleanText } from "../shared/profile";
 import { initPhysics, Simulation } from "../shared/simulation";
 import { SPAWN } from "../shared/world";
 import { groundHeight } from "../shared/terrain";
@@ -28,8 +28,15 @@ import { createSessionDiagnosticsHandler } from "./session-diagnostics";
 import { respawnServerPlayer, synchronizePlayer } from "./respawn";
 import { MotionEncoder } from "../shared/motion-codec";
 import {
-  FixedStepClock,
-  InputQueue,
+  TimelineInputQueue,
+  TimelineSimulationClock,
+} from "../shared/input-timeline";
+import {
+  NetworkClockTiming,
+  networkProbeNonce,
+  networkProbeReply,
+} from "../shared/network-diagnostics";
+import {
   PROTOCOL_VERSION,
   SIM_HZ,
   type ActorState,
@@ -51,9 +58,11 @@ class StrahovRoom extends Room {
   maxMessagesPerSecond = 150;
   motionEncoder = new MotionEncoder();
   sim = new Simulation();
-  inputQueues = new Map<string, InputQueue>();
+  inputQueues = new Map<string, TimelineInputQueue>();
   connections = new Map<string, Client>();
-  simulationClock = new FixedStepClock();
+  simulationClock = new TimelineSimulationClock(Date.now());
+  nextInputEpoch = 0;
+  networkClockTiming = new NetworkClockTiming();
   lastSimulationTime = performance.now();
   motionAccumulator = 0;
   day = dateKey(Date.now());
@@ -80,24 +89,9 @@ class StrahovRoom extends Room {
       const queue = this.inputQueues.get(c.auth.id);
       if (!queue) return;
       const receivedAt = performance.now();
-      for (const raw of raws.slice(0, 8)) {
-        const input = sanitizeInput(raw);
-        if (!input) continue;
-        if (
-          input.seq > queue.lastReceived + 1 &&
-          store.rate(c.auth.id, "resync", 2, 1000)
-        ) {
-          queue.reset();
-          this.sendAuthority(c, true);
-          break;
-        }
-        queue.push(input, receivedAt);
-      }
-      // A delayed burst followed by normal 60Hz input otherwise keeps its FIFO
-      // delay forever. Acknowledge the complete accepted packet before resetting
-      // only this player; this does not advance the actor or the shared world.
-      if (queue.recoverBacklog(receivedAt))
-        this.sendAuthority(c, true, "input-backlog");
+      // V11 rejects expired/malformed/foreign-epoch commands. A hole is a
+      // neutral future tick, never a reason to replay old time or reset a peer.
+      for (const raw of raws.slice(0, 8)) queue.push(raw, receivedAt);
     };
     this.onMessage("input", (c, raw) => receiveInputs(c, [raw]));
     this.onMessage("inputs", (c, raw) => {
@@ -105,9 +99,27 @@ class StrahovRoom extends Room {
     });
     this.onMessage("resync", (c) => {
       if (store.rate(c.auth.id, "resync", 2, 1000)) {
-        this.inputQueues.get(c.auth.id)?.reset();
-        this.sendAuthority(c, true);
+        const queue = this.inputQueues.get(c.auth.id);
+        if (!queue) return;
+        this.resetInputEpoch(c.auth.id, queue);
+        this.sendAuthority(c, true, "client-request");
       }
+    });
+    this.onMessage("networkProbe", (c, raw: unknown) => {
+      const nonce = networkProbeNonce(raw);
+      if (
+        nonce === null ||
+        this.connections.get(c.auth.id) !== c ||
+        !this.inputQueues.has(c.auth.id) ||
+        !store.rate(c.auth.id, "network-probe", 1, 1000)
+      )
+        return;
+      const reply = networkProbeReply(
+        nonce,
+        this.simulationClock.tick,
+        Date.now(),
+      );
+      if (reply) c.send("networkProbe", reply);
     });
     this.onMessage("motionResync", (c) => {
       if (store.rate(c.auth.id, "motion-resync", 2, 1000))
@@ -229,13 +241,14 @@ class StrahovRoom extends Room {
         const player = store.players.get(c.auth.id),
           queue = this.inputQueues.get(c.auth.id);
         if (!player || !queue) return;
-        const recovery = respawnServerPlayer(
-          this.sim,
-          player,
-          queue,
-          this.simulationClock.tick,
-        );
+        const recovery = respawnServerPlayer(this.sim, player, queue, {
+          inputEpoch: ++this.nextInputEpoch,
+          tick: this.simulationClock.tick,
+          time: this.simulationClock.time,
+        });
         if (!recovery) return;
+        recovery.authority.resyncReason = "respawn";
+        recovery.authority.network = this.captureNetworkDiagnostics(queue);
         // Send immediately, even if the next motion tick has not occurred.
         c.send("authoritative", recovery.authority);
         if (recovery.carRecovered)
@@ -282,20 +295,26 @@ class StrahovRoom extends Room {
             this.broadcast("emote", { id, emote: "" });
           }
         }
-      const result = this.simulationClock.advance(elapsed, (dt) => {
-        for (const [id, a] of this.sim.actors) {
-          const queue = this.inputQueues.get(id)!,
-            input = queue.consume(now);
-          a.step(
-            input.vehicle !== undefined && input.vehicle !== a.vehicle
-              ? { ...input, x: 0, z: 0, jump: false }
-              : input,
-            dt,
-          );
-          store.players.get(id)!.ack = queue.ack;
-        }
-        this.sim.tick();
-      });
+      const result = this.simulationClock.advance(
+        elapsed,
+        (dt, tick, time) => {
+          for (const [id, a] of this.sim.actors) {
+            const queue = this.inputQueues.get(id)!,
+              input = queue.consume(tick, {
+                vehicle: a.vehicle,
+                yaw: a.yaw,
+              }).input;
+            a.step(input, dt);
+            store.players.get(id)!.ack = queue.ack;
+          }
+          this.sim.tick(time);
+        },
+        (plan) => {
+          if (plan.dropped > 0)
+            for (const queue of this.inputQueues.values())
+              queue.discardPending();
+        },
+      );
       for (const [id, a] of this.sim.actors) {
         const p = store.players.get(id)!;
         synchronizePlayer(p, a);
@@ -306,7 +325,15 @@ class StrahovRoom extends Room {
           for (const c of this.clients) c.send("reward", "Kvízový nadšenec");
       }
       if (result.dropped > 0)
-        for (const queue of this.inputQueues.values()) queue.reset();
+        for (const [id, queue] of this.inputQueues)
+          this.resetInputEpoch(id, queue);
+      this.networkClockTiming.record({
+        elapsedMs: elapsed * 1000,
+        cpuMs: performance.now() - now,
+        steps: result.steps,
+        droppedMs: result.dropped * 1000,
+        accumulatorMs: Math.max(0, this.simulationClock.accumulator * 1000),
+      });
       this.motionAccumulator += elapsed;
       if (this.motionAccumulator >= 1 / 20) {
         this.motionAccumulator %= 1 / 20;
@@ -315,7 +342,12 @@ class StrahovRoom extends Room {
             "motion",
             this.motionEncoder.encode(this.captureMotion()),
           );
-        for (const c of this.clients) this.sendAuthority(c, result.dropped > 0);
+        for (const c of this.clients)
+          this.sendAuthority(
+            c,
+            result.dropped > 0,
+            result.dropped > 0 ? "server-clock-drop" : undefined,
+          );
       }
     }, 1000 / SIM_HZ);
     this.clock.setInterval(() => {
@@ -362,7 +394,10 @@ class StrahovRoom extends Room {
     });
     const saved = sessions.get(s.token)?.savedState;
     if (saved) actor.restore(saved);
-    this.inputQueues.set(s.id, new InputQueue());
+    this.inputQueues.set(
+      s.id,
+      new TimelineInputQueue(++this.nextInputEpoch, this.simulationClock.tick),
+    );
     const p: Player = {
       ...s.profile,
       ...actor.position,
@@ -390,7 +425,7 @@ class StrahovRoom extends Room {
     });
     this.broadcastPresence();
     this.syncSocial();
-    this.sendAuthority(client, true);
+    this.sendAuthority(client, true, "join");
     this.sendMotionKeyframe(client);
   }
   onLeave(client: Client) {
@@ -451,18 +486,29 @@ class StrahovRoom extends Room {
       queue = this.inputQueues.get(c.auth.id);
     if (!actor || !queue) return;
     const authority: Authority = {
-      time: Date.now(),
-      tick: this.simulationClock.tick,
-      ack: queue.ack,
+      ...queue.frontier(),
+      time: this.simulationClock.time,
       state: actor.capture(),
       resync,
+      network: this.captureNetworkDiagnostics(queue),
     };
     if (resyncReason) authority.resyncReason = resyncReason;
     c.send("authoritative", authority);
   }
+  private resetInputEpoch(id: string, queue: TimelineInputQueue) {
+    queue.reset(++this.nextInputEpoch, this.simulationClock.tick);
+    const player = store.players.get(id);
+    if (player) player.ack = 0;
+  }
+  private captureNetworkDiagnostics(queue: TimelineInputQueue) {
+    return {
+      queue: queue.diagnostics(performance.now()),
+      clock: this.networkClockTiming.snapshot(),
+    };
+  }
   captureMotion(): MotionPacket {
     return {
-      time: Date.now(),
+      time: this.simulationClock.time,
       tick: this.simulationClock.tick,
       car: this.sim.car.capture(),
       rows: [...store.players.values()].map((p) => [

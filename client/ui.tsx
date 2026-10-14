@@ -1,4 +1,10 @@
 import { HudIcon } from "./hud-icons";
+import { sessionDiagnostics } from "./session-diagnostics";
+import { FrameInputBuffer } from "./network-input-buffer";
+import { AuthorityBuffer, type ReceivedAuthority } from "./authority-buffer";
+import { NetworkProbe } from "./network-probe";
+import type { NetworkProbeReply } from "../shared/network-diagnostics";
+
 import {
   benchmarkPresentation,
   createBenchmarkDownloads,
@@ -206,10 +212,12 @@ export function App() {
   const [trafficPreview, setTrafficPreview] = useState<TransitArrival | null>(
     null,
   );
-  const inputBuffer = useRef<Input[]>([]),
-    authorityRef = useRef<Authority | null>(null),
+  const inputBuffer = useRef<FrameInputBuffer | null>(null),
+    authorityBufferRef = useRef<AuthorityBuffer | null>(null),
+    bootstrapAuthorityRef = useRef<ReceivedAuthority | null>(null),
     playersById = useRef(new Map<string, Player>()),
     connectedRef = useRef(false);
+  const networkProbeRef = useRef<NetworkProbe | null>(null);
   const [profile, setProfile] = useState<Profile>(readProfile),
     [mode, setMode] = useState<"menu" | "guest" | "multi">("menu"),
     [busy, setBusy] = useState(false),
@@ -280,6 +288,38 @@ export function App() {
     weatherRef = useRef(weather),
     chatEnd = useRef<HTMLDivElement>(null),
     carState = useRef<any>(null);
+  if (!inputBuffer.current)
+    inputBuffer.current = new FrameInputBuffer({
+      now: () => performance.now(),
+      canSend: () =>
+        !!room.current &&
+        connectedRef.current &&
+        modeRef.current === "multi" &&
+        !game.current?.respawnPending,
+      send: (inputs) => room.current!.send("inputs", inputs),
+      onOverflow: (snapshot) => {
+        sessionDiagnostics.event("network-input-overflow", {
+          ...snapshot,
+          droppedInputs: snapshot.queued,
+        });
+        try {
+          room.current?.send("resync");
+        } catch (error) {
+          sessionDiagnostics.event("network-send-error", {
+            message: String(error),
+          });
+        }
+      },
+      onSendError: (error) =>
+        sessionDiagnostics.event("network-send-error", {
+          message: String(error),
+        }),
+    });
+  authorityBufferRef.current ??= new AuthorityBuffer();
+  networkProbeRef.current ??= new NetworkProbe({
+    now: () => performance.now(),
+    send: (request) => room.current!.send("networkProbe", request),
+  });
   useDialogFocus(
     panel === "map" && !journalOpen && !emotesOpen && !showForm,
     mapDialog,
@@ -287,6 +327,42 @@ export function App() {
     mapClose,
   );
   const notice = (message: string) => setToast(message);
+  const applyReceivedAuthority = ({
+    packet,
+    receivedAt,
+  }: ReceivedAuthority) => {
+    if (
+      modeRef.current !== "multi" ||
+      !connectedRef.current ||
+      !game.current?.network ||
+      !game.current.ready
+    )
+      return false;
+    if (!game.current.reconcile(packet, receivedAt)) return false;
+    inputBuffer.current?.acknowledge(packet.ack);
+    return true;
+  };
+  const drainAuthorities = () => {
+    if (
+      modeRef.current !== "multi" ||
+      !connectedRef.current ||
+      !game.current?.network ||
+      !game.current.ready
+    )
+      return;
+    const bootstrap = bootstrapAuthorityRef.current;
+    bootstrapAuthorityRef.current = null;
+    if (bootstrap) applyReceivedAuthority(bootstrap);
+    const latest = authorityBufferRef.current?.takeLatest();
+    if (latest) applyReceivedAuthority(latest);
+  };
+  const syncNetworkStage = (currentGame: Game) => {
+    currentGame.canvas.dataset.networkStage = currentGame.network
+      ? connectedRef.current
+        ? "connected"
+        : "connecting"
+      : "offline";
+  };
   const changeLightingPreview = (mode: LightingPreviewMode) => {
     const selection = selectLightingPreview(mode);
     lightingPreviewRef.current = selection;
@@ -313,18 +389,29 @@ export function App() {
   useEffect(() => {
     connectedRef.current = connected;
     if (!connected) {
-      inputBuffer.current = [];
+      inputBuffer.current?.reset("disconnected");
       return;
     }
     const timer = setInterval(() => {
-      if (game.current?.respawnPending) {
-        inputBuffer.current = [];
-        return;
-      }
-      if (inputBuffer.current.length && room.current)
-        room.current.send("inputs", inputBuffer.current.splice(0, 8));
+      if (game.current?.respawnPending) return;
+      inputBuffer.current?.flush("timer");
     }, 1000 / 30);
-    return () => clearInterval(timer);
+    const probeTimer = setInterval(() => {
+      const result = networkProbeRef.current?.poll({
+        enabled:
+          !!room.current && connectedRef.current && modeRef.current === "multi",
+        ready: !!game.current?.ready,
+      });
+      if (result?.kind === "timeout")
+        sessionDiagnostics.event("network-probe-timeout", result);
+      else if (result?.kind === "send-error")
+        sessionDiagnostics.event("network-send-error", result);
+    }, 1000);
+    return () => {
+      clearInterval(timer);
+      clearInterval(probeTimer);
+      networkProbeRef.current?.reset();
+    };
   }, [connected]);
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000);
@@ -412,6 +499,7 @@ export function App() {
   }, []);
   useEffect(() => {
     if (mode === "menu" || !canvas.current) return;
+    sessionDiagnostics.event("mode-change", { mode });
     let cancelled = false;
     modeRef.current = mode;
     (async () => {
@@ -421,6 +509,7 @@ export function App() {
         const g = new Game(canvas.current, profileRef.current);
         game.current = g;
         g.network = mode === "multi";
+        syncNetworkStage(g);
         g.timeOverride = lightingPreviewRef.current.instant;
         g.setLocalId(idRef.current);
         g.onStats = setStats;
@@ -439,14 +528,22 @@ export function App() {
             modeRef.current === "multi" &&
             connectedRef.current
           ) {
-            inputBuffer.current.push(input);
-            if (inputBuffer.current.length > 64) {
-              inputBuffer.current = [];
-              room.current.send("resync");
-            }
+            inputBuffer.current?.enqueue(input);
           }
         };
-        g.onPredictionReset = () => (inputBuffer.current = []);
+        g.onInputFrame = () => {
+          inputBuffer.current?.flush("frame");
+        };
+        g.onBeforeInputFrame = drainAuthorities;
+        g.onNetworkDiagnostics = () => ({
+          sender: inputBuffer.current?.snapshot() ?? null,
+          probe: networkProbeRef.current?.snapshot() ?? null,
+          authorities: authorityBufferRef.current?.snapshot() ?? null,
+          roundTripScope:
+            "same-client monotonic request/reply time including browser and server scheduling; not wire-only latency",
+        });
+        g.onPredictionReset = (priority) =>
+          inputBuffer.current?.reset("prediction-reset", { priority });
         g.onAction = (action, data) => {
           if (action === "reward") {
             reward(String(data));
@@ -461,11 +558,14 @@ export function App() {
         g.setTargetFps(targetFps);
         await g.start();
         if (cancelled) return;
+        sessionDiagnostics.event("game-ready", { mode });
         if (mode === "multi") {
           g.updatePlayers(playersRef.current);
           if (carState.current) g.setCar(carState.current);
           g.setFound(activity.hunt);
-          if (authorityRef.current) g.reconcile(authorityRef.current);
+          drainAuthorities();
+          const rtt = networkProbeRef.current?.snapshot().predictionRoundTripMs;
+          if (rtt !== null && rtt !== undefined) g.networkTimeline.setRtt(rtt);
         }
         setReady(true);
         // Read-only debug/benchmark entry points, local development only.
@@ -495,13 +595,32 @@ export function App() {
     };
   }, [mode]);
   const bind = (r: Room) => {
+    sessionDiagnostics.event("network-connected", {});
     // Each connection owns its dictionary and baseline; reconnect never reuses it.
     const motionDecoder = new MotionDecoder();
     let lastMotionRecovery = -Infinity;
     room.current = r;
+    authorityBufferRef.current?.reset();
+    bootstrapAuthorityRef.current = null;
+    networkProbeRef.current?.reset();
     connectedRef.current = true;
     setConnected(true);
     const callbacks = currentRoomCallbacks(r, () => room.current === r);
+    callbacks.onMessage("networkProbe", (data: NetworkProbeReply) => {
+      const measurement = networkProbeRef.current?.receive(data);
+      if (!measurement) return;
+      if (
+        measurement.acceptedForPrediction &&
+        measurement.predictionRoundTripMs !== null
+      )
+        game.current?.networkTimeline.setRtt(measurement.predictionRoundTripMs);
+      sessionDiagnostics.event("network-round-trip", {
+        ...measurement,
+        roundTripMs: measurement.rawRoundTripMs,
+        scope:
+          "raw includes scheduling; only uncontaminated samples feed prediction",
+      });
+    });
     callbacks.onMessage("welcome", (data: any) => {
       idRef.current = data.id;
       setSelfId(data.id);
@@ -512,7 +631,7 @@ export function App() {
       setEvents(data.events);
       setActivity(data.activity);
       game.current?.updatePlayers(data.players);
-      if (game.current) game.current.canvas.dataset.networkStage = "connected";
+      if (game.current) syncNetworkStage(game.current);
     });
     callbacks.onMessage("presence", (data: Player[]) => {
       playersRef.current = data;
@@ -526,6 +645,7 @@ export function App() {
         const now = performance.now();
         if (motionDecoder.needsKeyframe && now - lastMotionRecovery >= 1000) {
           lastMotionRecovery = now;
+          sessionDiagnostics.event("network-keyframe-request", {});
           r.send("motionResync");
         }
         return;
@@ -547,8 +667,16 @@ export function App() {
       game.current?.syncMotion(packet);
     });
     callbacks.onMessage("authoritative", (data: Authority) => {
-      authorityRef.current = data;
-      game.current?.reconcile(data);
+      const result = authorityBufferRef.current?.offer(data, performance.now());
+      if (result?.kind !== "barrier") return;
+      if (
+        modeRef.current === "multi" &&
+        game.current?.network &&
+        game.current.ready
+      ) {
+        bootstrapAuthorityRef.current = null;
+        applyReceivedAuthority(result.authority);
+      } else bootstrapAuthorityRef.current = result.authority;
     });
     callbacks.onMessage("events", setEvents);
     callbacks.onMessage("social", setSocial);
@@ -574,11 +702,14 @@ export function App() {
       },
     );
     callbacks.onLeave((code) => {
+      sessionDiagnostics.event("network-disconnected", { code });
       room.current = null;
       motionDecoder.reset();
       connectedRef.current = false;
-      inputBuffer.current = [];
-      authorityRef.current = null;
+      inputBuffer.current?.reset("room-left");
+      bootstrapAuthorityRef.current = null;
+      authorityBufferRef.current?.reset();
+      networkProbeRef.current?.reset();
       playersRef.current = [];
       playersById.current.clear();
       setPlayers([]);
@@ -593,11 +724,13 @@ export function App() {
       setConnected(false);
       notice(t("Spojení přerušeno. Použij Obnovit spojení."));
     });
-    callbacks.onError((_code: number, text?: string) =>
-      notice(text || t("Chyba spojení.")),
-    );
+    callbacks.onError((code: number, text?: string) => {
+      sessionDiagnostics.event("network-error", { code, message: text });
+      notice(text || t("Chyba spojení."));
+    });
   };
   const connect = async (attempt = ++connectionAttempt.current) => {
+    sessionDiagnostics.event("network-connecting", { attempt });
     let joinedRoom: Room | null = null;
     try {
       const response = await fetch("/api/session", {
@@ -628,9 +761,11 @@ export function App() {
       idRef.current = data.id;
       setSelfId(data.id);
       if (identityChanged) {
-        authorityRef.current = null;
+        bootstrapAuthorityRef.current = null;
+        authorityBufferRef.current?.reset();
+        networkProbeRef.current?.reset();
         carState.current = null;
-        inputBuffer.current = [];
+        inputBuffer.current?.reset("identity-changed");
       }
       // Install identity before accepting the new connection's messages.
       game.current?.setLocalId(data.id);
@@ -641,6 +776,9 @@ export function App() {
       return true;
     } catch (error) {
       if (attempt !== connectionAttempt.current) return false;
+      sessionDiagnostics.event("network-connect-error", {
+        message: String(error),
+      });
       throw error;
     } finally {
       // A cancelled join still owns a live socket, but never UI listeners.
@@ -695,7 +833,10 @@ export function App() {
     // Invalidate first, including callbacks fired synchronously by leave().
     room.current = null;
     connectedRef.current = false;
-    inputBuffer.current = [];
+    inputBuffer.current?.reset("leave");
+    bootstrapAuthorityRef.current = null;
+    authorityBufferRef.current?.reset();
+    networkProbeRef.current?.reset();
     void previousRoom?.leave().catch(() => {});
     modeRef.current = "menu";
     setMode("menu");
