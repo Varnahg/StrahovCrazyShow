@@ -1,0 +1,3 @@
+$ tsc --noEmit && vite build
+tests/client-recovery.test.ts(146,9): error TS2741: Property 'receivedSeq' is missing in type '{ inputEpoch: number; inputTickBase: number; tick: number; ack: number; time: number; resync: true; state: ActorState; network: { clock: { callbacks: number; elapsedMeanMs: number; cpuMeanMs: number; ... 7 more ...; accumulatorMs: number; }; queue: { ...; }; }; }' but required in type 'Authority'.
+[ELIFECYCLE] Command failed with exit code 2.

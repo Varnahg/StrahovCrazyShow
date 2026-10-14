@@ -421,3 +421,12 @@ After synchronizing main/Linear at af4d6ef, completed the existing KEY-2 require
 29/29 focused tests and independent parser/security review PASS. Plain Node JSON/text reports on the retained07c log agree with an independent oracle:21395 observed callbacks,283.333333ms dropped increment, sampledCPUmax15.3898ms versus lifetime1108.5657ms.496 raw records reduce to479 unique contexts/475 comparable intervals. Raw source SHA unchanged; no original log was rewritten.
 
 Snapshot`54f3532699e234a935b9cc7e8d85bc99d6aafc939903f631c262ebb5670e4d08`: **892/892 full tests and build PASS**,8395 source/test/asset hashes unchanged. [Research, exact delta, archive oracle and full validation](performance/evidence/server-clock-report-20261014/README.md). No game/browser/GPU/server test is required for this offline CLI change. Without server-instance identity hidden resets can remain undetectable; output is observed intervals, not complete-session runtime. Missing emitter data is unavailable, never a fabricated zero. KEY-18 can close; broader KEY-2 remains separate.
+
+
+## KEY-19 — automatický frame sběr a oddělení relací (14.10.2026)
+
+Game na publikovaném main f4f6116 neměl callsite recordFrame. Nový producer používá šest existujících časových fází, raw interval a pouze čerstvé asynchronní GPU výsledky. Vlastní síťové údaje mají whitelist; guest nevolá transport a lifecycle odděluje recorder cache i při event limitu. Diagnostický reset nemění predikci ani simulaci.
+
+Snapshot **4dcb3f6fc34a560b455c0ee5c4f02a014105142d4bcce392f2628bca0e012ca0**:916 testů, build a izolovaná SDK/HTTP integrace2568 PASS. Skutečný Game.frame→recorder→collector→JSONL→report ověřen automaticky;45 recovery/UI testů ověřilo i adaptaci zachovaného pracovního WIP. První typová chyba fixture a její oprava jsou v evidenci, finální pipeline běžela znovu. Žádný nový browser/GPU či FPS důkaz; běžící preview i původní main dependencies zachované.
+
+[Kompletní důkazy a limity](performance/evidence/automatic-frames-20261014/README.md). KEY-19 dokončuje sběr, širší KEY-2 a grafická přejímka zůstávají otevřené.

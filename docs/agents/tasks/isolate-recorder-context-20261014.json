@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "isolate-recorder-context-20261014",
+  "title": "KEY-2: oddělit recorder kontexty na hranici herní relace",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/session-diagnostics.ts",
+    "tests/session-diagnostics.test.ts",
+    "docs/agents/handoffs/isolate-recorder-context-20261014.md",
+    ".cache/recorder-context-feature/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Public resetFrameContext(): finish old window, clear sampledContext/contextAt/previousFrame before new frames. Callable by Game diagnostic reset/dispose.",
+    "Known lifecycle event boundaries trigger reset before event-rate limit, without dropping historical windows. Error in new context factory cannot resurrect previous session.",
+    "Actual serialized batch tests for multiplayer→guest under250ms, limited events, failures, repeated reset, no disabled recording emissions. Document async GPU meaning."
+  ],
+  "verification": [
+    "Idle root-owned key17-ownership-integration WT over main f4f6116. No install, browser, GPU or live-preview changes. Light targeted CPU tests only unless heavy-validation reserved.",
+    "Research before edits; handoff includes exact source/test hashes and actual results."
+  ],
+  "notes": [
+    "Existing KEY-2 scope, newly tracked bounded child. Root transfers its current-main overlay content in the named owned WT only; adopt-dirty permitted for those inherited published files. Foreign main WIP is not transferred.",
+    "All task catalog writes are owned by repairs-01a13624-admin. No commit/push by subagent; root integrates exact validated delta.",
+    "Root accepted final snapshot4dcb3f6fc34a560b455c0ee5c4f02a014105142d4bcce392f2628bca0e012ca0:916 tests/build/integration2568 PASS,45 WIP callback/recovery regressions. Evidence preserves initial fixture typing failure and successful rerun. KEY-19 complete, graphics/whole KEY-2 still open."
+  ]
+}

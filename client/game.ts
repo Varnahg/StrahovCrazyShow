@@ -1,5 +1,11 @@
 import "./render-shaders";
 import { sessionDiagnostics } from "./session-diagnostics";
+import {
+  snapshotAcceptedAuthorityDiagnostics,
+  snapshotTransportDiagnostics,
+  snapshotTimelineDiagnostics,
+  type AcceptedAuthorityDiagnostics,
+} from "./game-diagnostics";
 import { NetworkTimeline, type TimelinePresentation } from "./network-timeline";
 import type { TimelineInput } from "../shared/input-timeline";
 import { SceneTextureDiagnostics } from "./texture-diagnostics";
@@ -358,7 +364,8 @@ export class Game {
     timeline: NetworkTimeline;
   };
   private lastTimelineRecoveryAt = -Infinity;
-  private lastAuthorityNetwork: Authority["network"] | null = null;
+  private lastAuthorityNetwork: AcceptedAuthorityDiagnostics | null = null;
+  private lastAuthorityAtMs: number | null = null;
   private readonly diagnosticNetwork = {
     motionPackets: 0,
     authorityPackets: 0,
@@ -931,6 +938,9 @@ export class Game {
   setLocalId(id: string) {
     const old = this.localId;
     if (old === id) return;
+    if (this.network)
+      sessionDiagnostics.event("network-left", { reason: "identity-change" });
+    this.resetDiagnosticContext();
     // A newly issued session belongs to a new network epoch. Resuming the same
     // identity keeps its frontiers so delayed packets cannot rewind it.
     this.resetPredictionHistory();
@@ -981,14 +991,23 @@ export class Game {
     }
   }
   reconcile(packet: Authority, receivedAt = performance.now()): boolean {
-    if (!this.ready || packet.tick < this.lastAuthorityTick) return false;
+    if (this.disposed || !this.ready || packet.tick < this.lastAuthorityTick) return false;
     // Respawn is completed by a forced authority, not by replaying a packet
     // already in flight when the user asked to return to the start.
     const respawnReply = packet.resync === true && packet.respawn === true;
     if (this.respawnPending && !respawnReply) return false;
     const explicitRespawn = this.respawnPending && respawnReply;
     const acceptance = this.networkTimeline.acceptAuthority(
-      packet,
+      // The timeline retains its anchor; do not retain/spread optional packet
+      // telemetry or physics state while validating the command frontier.
+      {
+        inputEpoch: packet.inputEpoch,
+        inputTickBase: packet.inputTickBase,
+        tick: packet.tick,
+        ack: packet.ack,
+        receivedSeq: packet.receivedSeq,
+        time: packet.time,
+      },
       receivedAt,
       {
         vehicle: packet.state.vehicle,
@@ -996,7 +1015,8 @@ export class Game {
       },
     );
     if (!acceptance.accepted) return false;
-    this.lastAuthorityNetwork = packet.network ?? null;
+    this.lastAuthorityNetwork = snapshotAcceptedAuthorityDiagnostics(packet);
+    this.lastAuthorityAtMs = receivedAt;
     this.diagnosticNetwork.authorityPackets++;
     this.lastAuthorityTick = packet.tick;
     const expected = this.prediction.states.get(packet.ack);
@@ -1859,6 +1879,69 @@ export class Game {
     );
   }
 
+  /** Diagnostic lifetime is a connection, independently of prediction identity. */
+  resetDiagnosticContext(): void {
+    this.lastAuthorityNetwork = null;
+    this.lastAuthorityAtMs = null;
+    Object.assign(this.diagnosticNetwork, {
+      motionPackets: 0,
+      authorityPackets: 0,
+      corrections: 0,
+      resyncs: 0,
+      lastCorrectionMetres: null,
+      lastMotionAtMs: 0,
+    });
+    sessionDiagnostics.resetFrameContext();
+  }
+
+  private diagnosticNetworkContext() {
+    if (!this.network || this.disposed) return null;
+    const now = performance.now();
+    return {
+      motionPackets: this.diagnosticNetwork.motionPackets,
+      authorityPackets: this.diagnosticNetwork.authorityPackets,
+      corrections: this.diagnosticNetwork.corrections,
+      resyncs: this.diagnosticNetwork.resyncs,
+      lastCorrectionMetres: this.diagnosticNetwork.lastCorrectionMetres,
+      lastMotionAgeMs: this.diagnosticNetwork.lastMotionAtMs
+        ? Math.max(0, now - this.diagnosticNetwork.lastMotionAtMs) : null,
+      authorityAgeMs: this.lastAuthorityAtMs === null
+        ? null : Math.max(0, now - this.lastAuthorityAtMs),
+      authorityTick: this.lastAuthorityTick,
+      pendingInputs: this.prediction.inputs.length,
+      visualCorrectionMetres: this.visualOffset.length(),
+      timeline: snapshotTimelineDiagnostics(this.networkTimeline.snapshot()),
+      transport: snapshotTransportDiagnostics(this.onNetworkDiagnostics),
+      server: this.lastAuthorityNetwork,
+    };
+  }
+
+  /** Fixed-size, sampled context; no scene, player or material inventories. */
+  private diagnosticContext = () => {
+    if (this.disposed) return { mode: "disposed", network: null };
+    const position = this.actor.position;
+    const stage = this.canvas.dataset.networkStage;
+    const rendering = this.adaptive.state;
+    return {
+      mode: this.network ? "multiplayer" : "guest",
+      connection: !this.network ? "offline" : stage === "connected"
+        ? "connected" : stage?.startsWith("disconnected") ? "disconnected" : "connecting",
+      position: { x: position.x, y: position.y, z: position.z },
+      zone: zoneAt(position),
+      speed: this.actor.speed,
+      vehicle: this.actor.vehicle,
+      rendering: {
+        mode: rendering.mode,
+        quality: rendering.quality,
+        targetFps: rendering.targetFps,
+        hardwareScaling: rendering.hardwareScaling,
+      },
+      viewport: { width: this.canvas.clientWidth, height: this.canvas.clientHeight },
+      renderResolution: { width: this.engine.getRenderWidth(), height: this.engine.getRenderHeight() },
+      network: this.diagnosticNetworkContext(),
+    };
+  };
+
   frame() {
     if (!this.ready || this.disposed) return;
     const frameStarted = performance.now();
@@ -1868,7 +1951,8 @@ export class Game {
     const gpuCounter = this.engineInstrumentation.captureGPUFrameTime
       ? this.engineInstrumentation.gpuFrameTimeCounter
       : undefined;
-    if (gpuCounter && gpuCounter.count !== this.lastGpuCounterCount) {
+    const freshGpuSample = !!gpuCounter && gpuCounter.count !== this.lastGpuCounterCount;
+    if (freshGpuSample) {
       this.lastGpuCounterCount = gpuCounter.count;
       this.lastGpuCounterAt = frameStarted;
       this.lastGpuFrameMs =
@@ -2211,18 +2295,32 @@ export class Game {
       this.frames.push(rawFrameMs);
       if (this.frames.length > 600) this.frames.shift();
     }
-    if (this.benchmark) {
-      const b = this.benchmark;
+    if (this.benchmark || sessionDiagnostics.isRecording) {
+      // Callback work through labels; excludes recorder and later HUD/benchmark
+      // bookkeeping. Keep one endpoint so the six phases sum to this CPU scope.
+      const frameCpuEnded = performance.now();
       const breakdown = {
         simulation: simulationEnded - frameStarted,
         world: worldEnded - simulationEnded,
         avatarsAndCamera: avatarsEnded - worldEnded,
         environment: environmentEnded - avatarsEnded,
         render: renderEnded - environmentEnded,
-        labels: performance.now() - renderEnded,
+        labels: frameCpuEnded - renderEnded,
       };
-      for (const [key, milliseconds] of Object.entries(breakdown))
-        b.work[key] = (b.work[key] ?? 0) + milliseconds;
+      if (sessionDiagnostics.isRecording)
+        sessionDiagnostics.recordFrame({
+          frameMs: rawFrameMs,
+          frameStartedAtMs: frameStarted,
+          cpuMs: frameCpuEnded - frameStarted,
+          gpuMs: freshGpuSample ? (this.lastGpuFrameMs ?? null) : null,
+          phases: breakdown,
+        }, this.diagnosticContext);
+      if (this.benchmark)
+        for (const [key, milliseconds] of Object.entries(breakdown))
+          this.benchmark.work[key] = (this.benchmark.work[key] ?? 0) + milliseconds;
+    }
+    if (this.benchmark) {
+      const b = this.benchmark;
       if (engineWork)
         for (const [key, milliseconds] of Object.entries(engineWork))
           b.engineWork[key] = (b.engineWork[key] ?? 0) + milliseconds;
@@ -2384,7 +2482,10 @@ export class Game {
     this.lastCpuFrameMs = performance.now() - frameStarted;
   }
   dispose() {
+    if (this.disposed) return;
     this.disposed = true;
+    sessionDiagnostics.event("game-dispose", {});
+    this.resetDiagnosticContext();
     window.removeEventListener("keydown", this.keyDown);
     window.removeEventListener("keyup", this.keyUp);
     window.removeEventListener("blur", this.blur);

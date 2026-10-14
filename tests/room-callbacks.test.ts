@@ -62,7 +62,7 @@ const startupEffects = app.body!.statements.filter(
 assert.equal(startupEffects.length, 1, "one actual Game lifecycle effect");
 const startupEffect = (startupEffects[0].expression as ts.CallExpression)
   .arguments[0];
-const hookNames = ["onInput", "onInputFrame", "onBeforeInputFrame"];
+const hookNames = ["onInput", "onInputFrame", "onBeforeInputFrame", "onNetworkDiagnostics"];
 const hookAssignments: ts.ExpressionStatement[] = [];
 function findHookAssignments(node: ts.Node) {
   if (
@@ -133,6 +133,12 @@ const callbacksScript = compileScript(
   ].join("\n"),
 );
 const startupScript = compileScript(`(${startupEffect.getText(ui)})()`);
+const timingEffect = app.body!.statements.find(
+  (node): node is ts.ExpressionStatement => ts.isExpressionStatement(node) &&
+    ts.isCallExpression(node.expression) && node.expression.expression.getText(ui) === "useEffect" &&
+    Boolean(node.expression.arguments[0]?.getText(ui).includes("const probeTimer")),
+)!;
+const timingScript = compileScript(`(${(timingEffect.expression as ts.CallExpression).arguments[0].getText(ui)})()`);
 
 const gameSource = ts.createSourceFile(
   "game.ts",
@@ -322,6 +328,7 @@ function fixture() {
   };
   for (const method of [
     "setLocalId",
+    "resetDiagnosticContext",
     "updatePlayers",
     "syncMotion",
     "reconcile",
@@ -1027,9 +1034,11 @@ for (const transition of ["rebind", "close", "leave"] as const) {
     assert.equal(timeline.snapshot().rttMs, 30);
     assert.equal(timeline.snapshot().pendingRttMs, 500);
     const before = timeline.snapshot();
+    const diagnosticResets = ui.effects.filter((effect) => effect === "game.resetDiagnosticContext").length;
     if (transition === "rebind") ui.bind(new FakeRoom());
     else if (transition === "close") room.close();
     else ui.leave();
+    assert.equal(ui.effects.filter((effect) => effect === "game.resetDiagnosticContext").length, diagnosticResets + 1);
     assert.equal(ui.game.networkTimeline, timeline);
     assert.equal(timeline.snapshot().inputEpoch, before.inputEpoch);
     assert.equal(timeline.snapshot().clockSeqAtAnchor, before.clockSeqAtAnchor);
@@ -1038,11 +1047,43 @@ for (const transition of ["rebind", "close", "leave"] as const) {
     assert.equal(timeline.snapshot().supportedRttMeasuredAtMs, null);
     const after = timeline.snapshot();
     room.message("networkProbe", { ...payloads().networkProbe, nonce: 2 });
+    assert.equal(ui.effects.filter((effect) => effect === "game.resetDiagnosticContext").length, diagnosticResets + 1, "stale room cannot mutate diagnostic lifecycle");
     assert.deepEqual(timeline.snapshot(), after, "obsolete room callback cannot restore confidence");
     assert.equal(timeline.setRtt(500, 3600), true);
     assert.equal(timeline.snapshot().pendingRttMs, null, "new connection starts conservatively");
   });
 }
+
+test("actual UI transport diagnostics require the current connected multiplayer room", () => {
+  const ui = fixture();
+  ui.installFrameHooks(ui.game);
+  assert.equal(ui.game.onNetworkDiagnostics(), null);
+  const room = new FakeRoom();
+  ui.bind(room);
+  assert.ok(ui.game.onNetworkDiagnostics().sender);
+  ui.modeRef.current = "guest";
+  assert.equal(ui.game.onNetworkDiagnostics(), null);
+  ui.modeRef.current = "multi";
+  ui.connectedRef.current = false;
+  assert.equal(ui.game.onNetworkDiagnostics(), null);
+  ui.connectedRef.current = true;
+  ui.leave();
+  assert.equal(ui.game.onNetworkDiagnostics(), null);
+  assert.equal(ui.diagnostics.at(-1)?.kind, "network-left");
+});
+
+test("actual UI connection timer cleanup resets diagnostic context without replacing prediction", () => {
+  const ui = fixture();
+  const timeline = ui.game.networkTimeline;
+  let nextTimer = 0;
+  const cleared: number[] = [];
+  Object.assign(ui.environment, { connected: true, setInterval: () => ++nextTimer, clearInterval: (id: number) => cleared.push(id) });
+  const cleanup = timingScript.runInContext(ui.context) as () => void;
+  cleanup();
+  assert.deepEqual(cleared, [1, 2]);
+  assert.equal(ui.game.networkTimeline, timeline);
+  assert.equal(ui.effects.filter((effect) => effect === "game.resetDiagnosticContext").length, 1);
+});
 
 test("actual UI hook assignments drain authority before Game simulation and flush its generated input afterward", (t) => {
   const f = fixture();

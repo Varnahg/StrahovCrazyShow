@@ -412,6 +412,7 @@ export function App() {
       clearInterval(probeTimer);
       networkProbeRef.current?.reset();
       game.current?.networkTimeline.resetRttSelection();
+      game.current?.resetDiagnosticContext();
     };
   }, [connected]);
   useEffect(() => {
@@ -536,13 +537,14 @@ export function App() {
           inputBuffer.current?.flush("frame");
         };
         g.onBeforeInputFrame = drainAuthorities;
-        g.onNetworkDiagnostics = () => ({
+        g.onNetworkDiagnostics = () =>
+          room.current && connectedRef.current && modeRef.current === "multi" ? ({
           sender: inputBuffer.current?.snapshot() ?? null,
           probe: networkProbeRef.current?.snapshot() ?? null,
           authorities: authorityBufferRef.current?.snapshot() ?? null,
           roundTripScope:
             "same-client monotonic request/reply time including browser and server scheduling; not wire-only latency",
-        });
+        }) : null;
         g.onPredictionReset = (priority) =>
           inputBuffer.current?.reset("prediction-reset", { priority });
         g.onAction = (action, data) => {
@@ -605,6 +607,7 @@ export function App() {
     bootstrapAuthorityRef.current = null;
     networkProbeRef.current?.reset();
     game.current?.networkTimeline.resetRttSelection();
+    game.current?.resetDiagnosticContext();
     connectedRef.current = true;
     setConnected(true);
     const callbacks = currentRoomCallbacks(r, () => room.current === r);
@@ -716,6 +719,7 @@ export function App() {
       authorityBufferRef.current?.reset();
       networkProbeRef.current?.reset();
       game.current?.networkTimeline.resetRttSelection();
+      game.current?.resetDiagnosticContext();
       playersRef.current = [];
       playersById.current.clear();
       setPlayers([]);
@@ -771,6 +775,7 @@ export function App() {
         authorityBufferRef.current?.reset();
         networkProbeRef.current?.reset();
         game.current?.networkTimeline.resetRttSelection();
+        game.current?.resetDiagnosticContext();
         carState.current = null;
         inputBuffer.current?.reset("identity-changed");
       }
@@ -834,6 +839,7 @@ export function App() {
     }
   };
   const leave = () => {
+    sessionDiagnostics.event("network-left", {});
     connectionAttempt.current++;
     const previousRoom = room.current;
     // SDK leave waits for the server handshake while keeping its listeners.
@@ -845,6 +851,7 @@ export function App() {
     authorityBufferRef.current?.reset();
     networkProbeRef.current?.reset();
     game.current?.networkTimeline.resetRttSelection();
+    game.current?.resetDiagnosticContext();
     void previousRoom?.leave().catch(() => {});
     modeRef.current = "menu";
     setMode("menu");

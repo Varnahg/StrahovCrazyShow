@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
+// @ts-expect-error JavaScript CLI module has no separate declaration file.
+import { summarizeDiagnosticFiles } from "../scripts/diagnostics-report.mjs";
 import {
   SessionDiagnostics,
   type DiagnosticsEnvironment,
@@ -81,6 +84,289 @@ async function settle() {
   await new Promise<void>((resolve) => setImmediate(resolve));
 }
 
+const frameContextBoundaries = [
+  "session-end",
+  "game-start",
+  "game-dispose",
+  "game-disposed",
+  "game-end",
+  "mode-change",
+  "network-connecting",
+  "network-connected",
+  "network-disconnected",
+  "network-left",
+];
+
+test("lifecycle boundaries separate serialized multiplayer and guest frames inside the context cache interval", async () => {
+  for (const boundary of frameContextBoundaries) {
+    const f = fixture();
+    f.recorder.start();
+    await settle();
+    f.recorder.recordFrame(
+      { frameMs: 16, cpuMs: 7, gpuMs: null, phases: { render: 5 } },
+      () => ({
+        mode: "multiplayer",
+        network: { server: { clock: { callbacks: 17 } } },
+      }),
+    );
+    f.time(150);
+    f.recorder.event(boundary);
+    f.time(180);
+    let snapshots = 0;
+    f.recorder.recordFrame(
+      { frameMs: 80, cpuMs: 4, gpuMs: null, phases: { render: 3 } },
+      () => {
+        snapshots++;
+        return { mode: "guest", network: null };
+      },
+    );
+    f.recorder.event("game-dispose");
+    await f.recorder.flush();
+    assert.equal(snapshots, 1, boundary);
+    const records = f.records();
+    const windows = records.filter((record) => record.kind === "frame-window");
+    assert.equal(windows.length, 2, boundary);
+    assert.deepEqual(
+      windows.map((record) => record.data.frameMs),
+      [[16], [80]],
+      boundary,
+    );
+    assert.equal(
+      (windows[0].data.context as any).mode,
+      "multiplayer",
+      boundary,
+    );
+    assert.deepEqual(
+      windows[1].data.context,
+      { mode: "guest", network: null },
+      boundary,
+    );
+    const boundaryIndex = records.findIndex(
+      (record) => record.kind === boundary,
+    );
+    assert.ok(records.indexOf(windows[0]) < boundaryIndex, boundary);
+    const hitch = records.find((record) => record.kind === "frame-hitch")!;
+    assert.equal(hitch.data.previousFrame, null, boundary);
+    assert.deepEqual(hitch.data.previousContext, {}, boundary);
+    assert.equal(hitch.data.previousContextAgeMs, null, boundary);
+    assert.deepEqual(
+      hitch.data.context,
+      { mode: "guest", network: null },
+      boundary,
+    );
+    for (const body of f.bodies)
+      assert.ok(validateDiagnosticsBatch(JSON.parse(body)), boundary);
+    f.recorder.dispose();
+    await settle();
+  }
+});
+
+test("a rate-limited lifecycle boundary still invalidates context and separates serialized evidence", async () => {
+  const f = fixture();
+  f.recorder.start();
+  await settle();
+  f.time(2000);
+  f.recorder.recordFrame(
+    { frameMs: 16, cpuMs: 3, gpuMs: null, phases: {} },
+    () => ({
+      mode: "multiplayer",
+      network: { server: { clock: { callbacks: 100 } } },
+    }),
+  );
+  for (let index = 0; index < 100; index++)
+    f.recorder.event("storm", { index });
+  f.time(2050);
+  f.recorder.event("network-disconnected");
+  f.time(2080);
+  f.recorder.recordFrame(
+    { frameMs: 16, cpuMs: 3, gpuMs: null, phases: {} },
+    () => ({ mode: "guest", network: null }),
+  );
+  f.recorder.resetFrameContext();
+  await f.recorder.flush();
+  const records = f.records();
+  const windows = records.filter((record) => record.kind === "frame-window");
+  assert.equal(windows.length, 2);
+  assert.deepEqual(windows[1].data.context, { mode: "guest", network: null });
+  assert.equal(
+    records.some((record) => record.kind === "network-disconnected"),
+    false,
+  );
+  assert.ok(
+    windows[1].seq > windows[0].seq + 1,
+    "omitted boundary leaves a sequence barrier before new frames",
+  );
+  assert.equal(f.recorder.status().droppedByReason.eventRate, 1);
+  for (const body of f.bodies)
+    assert.ok(validateDiagnosticsBatch(JSON.parse(body)));
+  f.recorder.dispose();
+  await settle();
+});
+
+test("the offline report cannot bridge room counters when their lifecycle marker hits the event cap", async () => {
+  const f = fixture();
+  f.recorder.start();
+  await settle();
+  const frame = { frameMs: 16, cpuMs: 3, gpuMs: null, phases: {} };
+  const context = (callbacks: number) => ({
+    mode: "multiplayer",
+    network: { server: { clock: { callbacks, droppedTotalMs: 0 } } },
+  });
+  f.time(2000);
+  f.recorder.recordFrame(frame, () => context(100));
+  for (let index = 0; index < 100; index++)
+    f.recorder.event("storm", { index });
+  f.time(2050);
+  f.recorder.event("network-connected");
+  f.time(2080);
+  f.recorder.recordFrame(frame, () => context(900));
+  f.recorder.resetFrameContext();
+  await f.recorder.flush();
+  const directory = new URL(
+    "../.cache/recorder-context-feature/",
+    import.meta.url,
+  );
+  const path = new URL(`room-counters-${process.pid}.jsonl`, directory);
+  await mkdir(directory, { recursive: true });
+  try {
+    await writeFile(
+      path,
+      f.bodies
+        .map((body) =>
+          JSON.stringify({
+            ...JSON.parse(body),
+            type: "batch",
+            digest: body,
+            receivedAtUTC: "2026-10-14T21:00:00.000Z",
+            source: { contentSha256: "a".repeat(64) },
+          }),
+        )
+        .join("\n") + "\n",
+    );
+    const result = await summarizeDiagnosticFiles([path]);
+    assert.equal(result.serverClock.samples, 2);
+    assert.equal(result.serverClock.comparableIntervals, 0);
+    assert.equal(result.serverClock.observed.callbacks, null);
+    assert.equal(result.serverClock.diagnostics.sequenceGaps, 1);
+    assert.equal(result.serverClock.segments.length, 2);
+  } finally {
+    await unlink(path);
+    f.recorder.dispose();
+    await settle();
+  }
+});
+
+test("explicit repeated context reset preserves the historical window only once and clears preceding work", async () => {
+  const f = fixture();
+  f.recorder.start();
+  await settle();
+  f.recorder.recordFrame(
+    { frameMs: 16, cpuMs: 7, gpuMs: 2, phases: { render: 5 } },
+    () => ({ mode: "multiplayer", network: { authorityTick: 123 } }),
+  );
+  f.time(140);
+  f.recorder.resetFrameContext();
+  f.recorder.resetFrameContext();
+  f.time(180);
+  f.recorder.recordFrame(
+    { frameMs: 80, cpuMs: 2, gpuMs: null, phases: {} },
+    () => ({ mode: "guest", network: null }),
+  );
+  f.recorder.resetFrameContext();
+  f.recorder.resetFrameContext();
+  await f.recorder.flush();
+  const windows = f
+    .records()
+    .filter((record) => record.kind === "frame-window");
+  assert.equal(windows.length, 2);
+  assert.deepEqual(
+    windows.map((record) => record.data.frameMs),
+    [[16], [80]],
+  );
+  const hitch = f.records().find((record) => record.kind === "frame-hitch")!;
+  assert.equal(hitch.data.previousFrame, null);
+  assert.deepEqual(hitch.data.previousContext, {});
+  assert.deepEqual(hitch.data.context, { mode: "guest", network: null });
+  f.recorder.dispose();
+  await settle();
+});
+
+test("a failing context factory cannot preserve stale data across reset or a later sample", async () => {
+  const f = fixture();
+  f.recorder.start();
+  await settle();
+  const frame = { frameMs: 50, cpuMs: 3, gpuMs: null, phases: {} };
+  f.recorder.recordFrame(frame, () => ({
+    mode: "multiplayer",
+    network: { authorityTick: 123 },
+  }));
+  f.time(150);
+  f.recorder.event("mode-change", { mode: "guest" });
+  f.time(180);
+  const brokenContext = () => {
+    throw new Error("Context unavailable");
+  };
+  f.recorder.recordFrame(frame, brokenContext);
+  f.recorder.resetFrameContext();
+  f.time(200);
+  f.recorder.recordFrame(frame, () => ({ mode: "guest", network: null }));
+  f.time(500);
+  f.recorder.recordFrame(frame, brokenContext);
+  await f.recorder.flush();
+  const hitches = f.records().filter((record) => record.kind === "frame-hitch");
+  assert.deepEqual(hitches[1].data.previousContext, {});
+  assert.equal(hitches[1].data.previousFrame, null);
+  assert.deepEqual(hitches[1].data.context, {});
+  assert.deepEqual(hitches.at(-1)!.data.context, {});
+  assert.equal(
+    f.records().filter((record) => record.kind === "context-error").length,
+    2,
+  );
+  f.recorder.dispose();
+  await settle();
+});
+
+test("context resets preserve global rate budgets and disabled recorders emit nothing", async () => {
+  const f = fixture();
+  f.recorder.start();
+  await settle();
+  f.time(2000);
+  for (let index = 0; index < 12; index++) {
+    f.recorder.resetFrameContext();
+    f.recorder.recordFrame(
+      { frameMs: 50, cpuMs: 3, gpuMs: null, phases: {} },
+      () => ({ mode: "guest", network: null }),
+    );
+  }
+  f.recorder.resetFrameContext();
+  await f.recorder.flush();
+  assert.equal(
+    f.records().filter((record) => record.kind === "frame-hitch").length,
+    4,
+  );
+  assert.equal(
+    f.records().filter((record) => record.kind === "frame-window").length,
+    12,
+  );
+  f.recorder.dispose();
+  await settle();
+
+  const disabled = fixture("example.com");
+  disabled.recorder.resetFrameContext();
+  disabled.recorder.start();
+  disabled.recorder.event("mode-change");
+  disabled.recorder.resetFrameContext();
+  disabled.recorder.recordFrame(
+    { frameMs: 50, cpuMs: 3, gpuMs: null, phases: {} },
+    () => {
+      throw new Error("Disabled recorder must not sample");
+    },
+  );
+  await disabled.recorder.flush();
+  assert.equal(disabled.posts.length, 0);
+  assert.equal(disabled.recorder.status().pending, 0);
+});
+
 test("automatic local startup proves persisted receipt and source identity without a manual action", async () => {
   const f = fixture();
   f.recorder.start();
@@ -98,6 +384,10 @@ test("automatic local startup proves persisted receipt and source identity witho
   assert.equal(
     f.records().filter((record) => record.kind === "source-identity").length,
     1,
+  );
+  assert.match(
+    String(f.records().find((record) => record.kind === "session-start")!.data.gpuTiming),
+    /newly available asynchronous query; may describe an earlier frame/,
   );
   f.recorder.dispose();
   await settle();

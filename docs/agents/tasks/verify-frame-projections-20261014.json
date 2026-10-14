@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "verify-frame-projections-20261014",
+  "title": "KEY-19: nezávislé adversariální testy bezpečné diagnostické projekce",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/game-diagnostics-projection.test.ts",
+    "docs/agents/handoffs/verify-frame-projections-20261014.md",
+    ".cache/frame-projection-tests/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Implementovat přesné adversariální testy skutečného client/game-diagnostics.ts: fixed whitelist, getters/proxies, plain/null proto, fractions/unsafe counters, unknown private fields, retained mutation, optional data cannot break authority, callback failure.",
+    "Implementátor produkčního helperu je network_context_audit; tento agent nesmí měnit jeho source. Reviewer hlásí chyby autorovi a ověří opravu testy.",
+    "Žádné browser/GPU/server/fulltest/build/install. Pouze lehké cílené CPU testy; handoff a release."
+  ],
+  "verification": [
+    "Stejný idle owned WT key17-ownership-integration s current main f4f6116 overlay. Task je součást právě objednaného KEY-19, nikoli nová feature."
+  ],
+  "notes": [
+    "Nový soubor má disjunktní vlastnictví; root vlastní katalog a finální integraci. Přenos existujícího WIP zde není potřebný.",
+    "Root accepted final snapshot4dcb3f6fc34a560b455c0ee5c4f02a014105142d4bcce392f2628bca0e012ca0:916 tests/build/integration2568 PASS,45 WIP callback/recovery regressions. Evidence preserves initial fixture typing failure and successful rerun. KEY-19 complete, graphics/whole KEY-2 still open."
+  ]
+}
