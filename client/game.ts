@@ -11,6 +11,8 @@ import type { TimelineInput } from "../shared/input-timeline";
 import { SceneTextureDiagnostics } from "./texture-diagnostics";
 import { StableLightState } from "./stable-light-state";
 import { GltfLightBudget } from "./gltf-light-budget";
+import { prepareLightVariants } from "./light-preparation";
+import { selectLightingPreview } from "./lighting-preview";
 import {
   AvatarPrimitivePool,
   createAvatarRig,
@@ -410,6 +412,7 @@ export class Game {
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
   private readonly stableLights: StableLightState;
+  private cancelLightPreparation?: () => void;
   private readonly gltfLightBudget: GltfLightBudget;
   private enabledMeshCandidates: EnabledMeshCandidates;
   get assetLoadErrorCount() {
@@ -683,6 +686,7 @@ export class Game {
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
     const preloadRender = () => {
       if (!this.disposed) {
+        this.gltfLightBudget.prepareFrame();
         this.stableLights.update();
         this.scene.render();
       }
@@ -769,10 +773,15 @@ export class Game {
     this.surfacePack.update(1, this.quality, this.weather?.rain ?? 0);
     this.cinematic = new CinematicAtmosphere(this.scene, this.camera, this.sun);
     this.vehicleLighting = new VehicleLighting(this.scene);
+    this.updatePlayers([this.localPlayer]);
+    this.engine.stopRenderLoop(preloadRender);
+    this.canvas.dataset.bootStage = "light-preparation";
+    const preparation = await this.prepareLighting(preloadRender);
+    sessionDiagnostics.event("lighting-preparation", preparation);
+    if (this.disposed) return;
+    this.canvas.dataset.lightPreparation = preparation.status;
     this.ready = true;
     this.canvas.dataset.bootStage = "ready";
-    this.engine.stopRenderLoop(preloadRender);
-    this.updatePlayers([this.localPlayer]);
     this.engine.runRenderLoop(() => this.frame());
   }
   mat(hex: string) {
@@ -1952,6 +1961,252 @@ export class Game {
     };
   };
 
+  /** Shared render-only world state; never advances physics or network clocks. */
+  private updateWorldPresentation(pos: Vec3) {
+    this.worldControllers?.architecture?.update(
+      pos,
+      this.quality as "low" | "medium" | "high",
+    );
+    this.b6Reality?.update({ player: pos, quality: this.quality });
+    this.worldControllers?.landmarks?.update(
+      pos,
+      this.quality as "low" | "medium" | "high",
+    );
+    this.worldControllers?.campusExterior?.update(
+      pos.x,
+      pos.z,
+      this.quality as "low" | "medium" | "high",
+    );
+    this.worldControllers?.outdoorArtifacts?.update(
+      pos.x,
+      pos.z,
+      this.quality as "low" | "medium" | "high",
+    );
+    this.environment?.update(pos);
+  }
+  private updateRenderEnvironment(
+    pos: Vec3,
+    self: Avatar | undefined,
+    cameraLight: boolean,
+    dt: number,
+    time: number,
+    instant = this.timeOverride ?? Date.now(),
+    flashlightOn = this.flashlightOn,
+  ) {
+    const { sun, moon, wind } = this.skyWeather.update({
+      instant,
+      weather: this.weather,
+      player: pos,
+      dt,
+      quality: this.quality,
+    });
+    const lighting = applyArtLighting(this, {
+      sun,
+      moon,
+      atmosphere: this.skyWeather.atmosphere,
+      headlightRequested: this.car.isEnabled(),
+      extraPracticalLightSlots:
+        Number(this.b6Reality?.interiorLightEnabled ?? false) +
+        Number(flashlightOn && !!self && !this.actor.vehicle),
+      weather: this.weather,
+      player: pos,
+      dt,
+      instant,
+    });
+    this.updateCarLighting?.(lighting.night);
+    this.vehicleLighting?.update(
+      this.car,
+      lighting.night,
+      this.car.isEnabled(),
+      this.quality,
+    );
+    this.flashlight?.update(
+      self,
+      this.camera,
+      flashlightOn && !this.actor.vehicle,
+      cameraLight,
+      this.quality,
+    );
+    this.vegetation?.update({
+      dt,
+      time,
+      wind: { ...wind, speed: Math.hypot(wind.x, wind.z) },
+      daylight: sun.daylight,
+      player: pos,
+      quality: this.quality,
+    });
+    this.transit?.update({
+      now: this.trafficInstant(),
+      player: pos,
+      quality: this.quality as "low" | "medium" | "high",
+      dt,
+    });
+    const raining =
+      ((this.weather?.rain ?? 0) > 0.05 ||
+        (this.weather?.snowfall ?? 0) > 0.005) &&
+      zoneAt(pos) === "outside";
+    this.rain?.setEnabled(raining);
+    if (raining && this.rain) {
+      this.rain.position.set(pos.x, pos.y, pos.z);
+      this.rain.alpha = 0.12 + lighting.surfaceIllumination * 0.32;
+      updateRainSegments(
+        this.rainLines,
+        dt,
+        this.weather ?? { rain: 0 },
+        wind,
+        time,
+      );
+      MeshBuilder.CreateLineSystem("rain", {
+        lines: this.rainLines,
+        instance: this.rain,
+      });
+    }
+    this.surfacePack?.update(dt, this.quality, this.weather?.rain ?? 0);
+    this.cinematic?.update({
+      dt,
+      player: pos,
+      quality: this.quality,
+      cloud: this.weather?.cloud ?? 0.4,
+      rain: this.weather?.rain ?? 0,
+      keySource: lighting.keySource,
+      daylight: sun.daylight,
+      avatars: this.avatars.values(),
+      localId: this.localId,
+    });
+    return lighting;
+  }
+  private prepareLighting(render: () => void) {
+    // The same controller/materials survive into gameplay; no proxy shaders.
+    this.flashlight ??= new PlayerFlashlight(this.scene);
+    const night = selectLightingPreview("night").instant!;
+    const apply = (
+      instant: number,
+      flashlightOn: boolean,
+      streetCount?: number,
+    ) => {
+      const pos = this.actor.position;
+      this.updateWorldPresentation(pos);
+      const self = this.avatars.get(this.localId);
+      const position = new Vector3(pos.x, pos.y, pos.z);
+      const feet = position.add(new Vector3(0, -0.8, 0));
+      // Settle the same collision-aware follow camera behind the loading cover.
+      // This is presentation only; no simulation or animation time advances.
+      this.updateCameraFollow(position, self?.eyeHeight ?? 1.63, 1);
+      const view = this.localAvatarPresentation.update({
+        camera: this.camera.position,
+        feet,
+        bodyHeight: self?.bodyHeight ?? 1.8,
+        bodyWidthScale: self ? self.measurements.legSpacing / 0.105 : 1,
+        nearPlane: this.camera.minZ,
+        firstPerson: this.firstPerson,
+        vehicle: this.actor.vehicle,
+      });
+      if (self)
+        this.updateAvatarPresentation(
+          this.localId,
+          self,
+          feet,
+          0,
+          view.visible,
+          view.resetAnimation,
+        );
+      const lighting = this.updateRenderEnvironment(
+        pos,
+        self,
+        view.cameraLight,
+        0,
+        performance.now() / 1000,
+        instant,
+        flashlightOn,
+      );
+      if (streetCount !== undefined) {
+        // A first walk can leave the last lamp's range and change POINT defines.
+        // Prepare each allowed count using existing mapped lamps, only while
+        // loading. The normal update below restores selection and intensities.
+        const nonStreet = this.scene.lights.filter(
+          (light) =>
+            light.isEnabled() && !this.lights.includes(light as PointLight),
+        ).length;
+        const count = Math.min(
+          streetCount,
+          this.quality === "low" ? 1 : 2,
+          Math.max(0, 4 - nonStreet),
+        );
+        const distance = (light: PointLight) =>
+          (light.position.x - pos.x) ** 2 + (light.position.z - pos.z) ** 2;
+        const nearest = [...this.lights]
+          .sort((a, b) => distance(a) - distance(b))
+          .slice(0, count);
+        for (const light of this.lights) {
+          const enabled = nearest.includes(light);
+          if (light.isEnabled(false) !== enabled) light.setEnabled(enabled);
+          light.intensity = enabled ? lighting.night * 0.7 : 0;
+        }
+      }
+    };
+    const restore = () => {
+      if (!this.disposed)
+        apply(this.timeOverride ?? Date.now(), this.flashlightOn);
+    };
+    return prepareLightVariants({
+      apply: (stage) =>
+        stage === "restore"
+          ? restore()
+          : apply(
+              stage.startsWith("night")
+                ? night
+                : (this.timeOverride ?? Date.now()),
+              stage.endsWith("-on"),
+              stage.startsWith("night-")
+                ? Number(stage.split("-")[1])
+                : undefined,
+            ),
+      restore,
+      // The first progress draw establishes the actual active list, including
+      // the real torch prop, instancing and currently selected avatar meshes.
+      meshes: () => {
+        const active = this.scene.getActiveMeshes();
+        return active.data.slice(0, active.length);
+      },
+      beforeChecks: () => this.scene.incrementRenderId(),
+      check: (mesh) => {
+        const previousPass = this.engine.currentRenderPassId;
+        this.engine.currentRenderPassId = this.camera.renderPassId;
+        try {
+          return mesh.isReady(true);
+        } finally {
+          this.engine.currentRenderPassId = previousPass;
+        }
+      },
+      effectsReady: () => this.engine.areAllEffectsReady(),
+      render,
+      run: (callback) => this.engine.runRenderLoop(callback),
+      stop: (callback) => this.engine.stopRenderLoop(callback),
+      onDispose: (callback) => {
+        this.cancelLightPreparation = callback;
+        const observer = this.scene.onDisposeObservable.add(callback);
+        return () => {
+          this.scene.onDisposeObservable.remove(observer);
+          if (this.cancelLightPreparation === callback)
+            this.cancelLightPreparation = undefined;
+        };
+      },
+      isDisposed: () => this.disposed || this.scene.isDisposed,
+      revision: () => [
+        this.quality,
+        this.timeOverride,
+        this.profile,
+        this.weather,
+        this.scene.meshes.length,
+        this.scene.materials.length,
+      ],
+      now: () => performance.now(),
+      setTimer: (callback, milliseconds) =>
+        window.setTimeout(callback, milliseconds),
+      clearTimer: (timer) => window.clearTimeout(timer as number),
+    });
+  }
+
   frame() {
     if (!this.ready || this.disposed) return;
     const frameStarted = performance.now();
@@ -1996,25 +2251,7 @@ export class Game {
     this.advanceSimulation(dt, frameStarted);
     const simulationEnded = performance.now();
     const pos = this.actor.position;
-    this.worldControllers?.architecture?.update(
-      pos,
-      this.quality as "low" | "medium" | "high",
-    );
-    this.b6Reality?.update({ player: pos, quality: this.quality });
-    this.worldControllers?.landmarks?.update(
-      pos,
-      this.quality as "low" | "medium" | "high",
-    );
-    this.worldControllers?.campusExterior?.update(
-      pos.x,
-      pos.z,
-      this.quality as "low" | "medium" | "high",
-    );
-    this.worldControllers?.outdoorArtifacts?.update(
-      pos.x,
-      pos.z,
-      this.quality as "low" | "medium" | "high",
-    );
+    this.updateWorldPresentation(pos);
     if (
       !this.network &&
       this.localEmoteUntil &&
@@ -2023,7 +2260,6 @@ export class Game {
       this.localPlayer.emote = "";
       this.localEmoteUntil = 0;
     }
-    this.environment?.update(pos);
     Object.assign(this.localPlayer, pos, {
       yaw: this.actor.yaw,
       speed: this.actor.speed,
@@ -2199,90 +2435,11 @@ export class Game {
         (m.metadata?.groundY ?? 0) + 1.3 + Math.sin(time * 2 + i) * 0.12;
     });
     const avatarsEnded = performance.now();
-    const instant = this.timeOverride ?? Date.now();
-    const { sun, moon, wind } = this.skyWeather.update({
-      instant,
-      weather: this.weather,
-      player: pos,
-      dt,
-      quality: this.quality,
-    });
-    const lighting = applyArtLighting(this, {
-      sun,
-      moon,
-      atmosphere: this.skyWeather.atmosphere,
-      headlightRequested: this.car.isEnabled(),
-      extraPracticalLightSlots:
-        Number(this.b6Reality?.interiorLightEnabled ?? false) +
-        Number(this.flashlightOn && !!self && !this.actor.vehicle),
-      weather: this.weather,
-      player: pos,
-      dt,
-      instant,
-    });
-    this.updateCarLighting?.(lighting.night);
-    this.vehicleLighting?.update(
-      this.car,
-      lighting.night,
-      this.car.isEnabled(),
-      this.quality,
-    );
-    this.flashlight?.update(
-      self,
-      this.camera,
-      this.flashlightOn && !this.actor.vehicle,
-      localView.cameraLight,
-      this.quality,
-    );
-    this.vegetation?.update({
-      dt,
-      time,
-      wind: { ...wind, speed: Math.hypot(wind.x, wind.z) },
-      daylight: sun.daylight,
-      player: pos,
-      quality: this.quality,
-    });
-    this.transit?.update({
-      now: this.trafficInstant(),
-      player: pos,
-      quality: this.quality as "low" | "medium" | "high",
-      dt,
-    });
-    const raining =
-      ((this.weather?.rain ?? 0) > 0.05 ||
-        (this.weather?.snowfall ?? 0) > 0.005) &&
-      zoneAt(pos) === "outside";
-    this.rain?.setEnabled(raining);
-    if (raining && this.rain) {
-      this.rain.position.set(pos.x, pos.y, pos.z);
-      this.rain.alpha = 0.12 + lighting.surfaceIllumination * 0.32;
-      updateRainSegments(
-        this.rainLines,
-        dt,
-        this.weather ?? { rain: 0 },
-        wind,
-        time,
-      );
-      MeshBuilder.CreateLineSystem("rain", {
-        lines: this.rainLines,
-        instance: this.rain,
-      });
-    }
-    this.surfacePack?.update(dt, this.quality, this.weather?.rain ?? 0);
-    this.cinematic?.update({
-      dt,
-      player: pos,
-      quality: this.quality,
-      cloud: this.weather?.cloud ?? 0.4,
-      rain: this.weather?.rain ?? 0,
-      keySource: lighting.keySource,
-      daylight: sun.daylight,
-      avatars: this.avatars.values(),
-      localId: this.localId,
-    });
+    this.updateRenderEnvironment(pos, self, localView.cameraLight, dt, time);
     const environmentEnded = performance.now();
     this.benchmark?.profile.beginFrame();
     // All beam, street, interior and celestial shadow states are final here.
+    this.gltfLightBudget.prepareFrame();
     this.stableLights.update();
     this.scene.render();
     const engineWork = this.benchmark?.profile.endFrame();
@@ -2496,6 +2653,7 @@ export class Game {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.cancelLightPreparation?.();
     sessionDiagnostics.event("game-dispose", {});
     this.resetDiagnosticContext();
     window.removeEventListener("keydown", this.keyDown);

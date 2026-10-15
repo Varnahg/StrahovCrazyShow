@@ -159,7 +159,12 @@ test("both production render callsites canonicalize actual light slots before dr
     assert.ok(ts.isBlock(statement.parent));
     const siblings = [...statement.parent.statements];
     const before = siblings[siblings.indexOf(statement) - 1];
+    const budget = siblings[siblings.indexOf(statement) - 2];
     assert.equal(before?.getText(source), "this.stableLights.update();");
+    assert.equal(
+      budget?.getText(source),
+      "this.gltfLightBudget.prepareFrame();",
+    );
     // Toggle the first canonical light off/on: Babylon appends it to the end.
     const first = mesh.lightSources[0];
     first.setEnabled(false);
@@ -178,9 +183,9 @@ test("both production render callsites canonicalize actual light slots before dr
         contributors,
       );
     };
-    compile(`${before.getText(source)}\n${statement.getText(source)}`).call(
-      game,
-    );
+    compile(
+      `${budget.getText(source)}\n${before.getText(source)}\n${statement.getText(source)}`,
+    ).call(game);
     assert.equal(draws, 1);
   }
   assert.equal(ambient.intensity, 1);
@@ -192,19 +197,25 @@ test("both production render callsites canonicalize actual light slots before dr
   const stabilize = frameCalls.find(
     (call) => call.expression.getText(source) === "this.stableLights.update",
   )!;
+  const environment = frameCalls.find(
+    (call) =>
+      call.expression.getText(source) === "this.updateRenderEnvironment",
+  );
+  assert.ok(environment && environment.end < stabilize.pos);
+  const environmentCalls = findNodes(
+    member("updateRenderEnvironment"),
+    (node): node is ts.CallExpression => ts.isCallExpression(node),
+  );
   for (const update of [
     "applyArtLighting",
     "this.vehicleLighting?.update",
     "this.flashlight?.update",
     "this.cinematic?.update",
   ]) {
-    const call = frameCalls.find(
+    const call = environmentCalls.find(
       (node) => node.expression.getText(source) === update,
     );
-    assert.ok(
-      call && call.end < stabilize.pos,
-      `${update} must finish before canonicalization`,
-    );
+    assert.ok(call, `${update} must finish before canonicalization`);
   }
 });
 

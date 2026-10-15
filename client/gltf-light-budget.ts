@@ -414,6 +414,11 @@ export class GltfLightBudget {
   update() {
     this.refresh(true);
   }
+  /** Repair automatic caps before callers canonicalize mesh light slots.
+   * The beforeRender observer remains a fallback for other render owners. */
+  prepareFrame() {
+    this.refresh(false);
+  }
   private defer(material: BudgetMaterial, pending: boolean) {
     if (pending && !this.disposed && this.materials.has(material))
       this.deferredMaterials.add(material);

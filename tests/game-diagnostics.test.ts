@@ -44,6 +44,8 @@ const members = declaration.members.filter(
     node.name &&
     [
       "frame",
+      "updateWorldPresentation",
+      "updateRenderEnvironment",
       "diagnosticContext",
       "diagnosticNetworkContext",
       "resetDiagnosticContext",
@@ -174,7 +176,7 @@ function fixture(hostname = "localhost") {
     quality: "medium",
     applyAdaptiveQuality() {},
     stableLights: { update() {}, dispose() {} },
-    gltfLightBudget: { dispose() {} },
+    gltfLightBudget: { prepareFrame() {}, dispose() {} },
     advanceSimulation() {},
     visualOffset: Vector3.Zero(),
     interpolateLocalPosition: () => new Vector3(0, 1, 2),

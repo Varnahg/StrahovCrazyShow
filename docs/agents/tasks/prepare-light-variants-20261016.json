@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "prepare-light-variants-20261016",
+  "title": "KEY-3: omezená příprava skutečných světelných variant před hraním",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/light-preparation-feature/",
+    "docs/performance/research-20261016/light-preparation.md",
+    "docs/agents/handoffs/prepare-light-variants-20261016.md",
+    "client/game.ts",
+    "tests/game-diagnostics.test.ts",
+    "tests/game-light-lifecycle.test.ts",
+    "client/light-preparation.ts",
+    "tests/light-preparation.test.ts",
+    "tests/game-light-preparation.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zapsat výzkum a volbu před implementací: V1warm93ms vs1913, firstFstill1114.4ms, precedingrender1068.8/environment30.9 aClick20.2. Jde o cold rendering, nikoli hlavně konstrukci světla.",
+    "Zvolený omezený warmup skutečné scény před ready, nikoli frame/temporaryready/proxy arbitrárního meshe. Current + normalnight OFF/ON, restorecurrentrequestedsettings, actualscene/shadowrenders a readycheck s bounded batches/deadline/dispose cancellation.",
+    "Žádné input/simulation/authority/adaptive kroky předready; žádná změna veřejných quality/timeOverride/flashlightOn. Explicitně změřit a uvést přesunutý startupcost a incomplete/cancel/timeout.",
+    "Nezahrnovat všechny možné kvality/avatary/B6states bez dalších důkazů. PrvníF a warmcykly/B6/movement rozhodnou o přijetí."
+  ],
+  "verification": [
+    "Nyní pouze vlastní cache draft a research; V1 full pipeline běží, nesmí se změnit žádný runtime nebo tests/*.test.ts soubor.",
+    "Po root signálu dojde k explicitnímu rozšíření/reclaim skutečných source/test cest. Potom implementace/refaktoring+red/green lifecycle/cancellation/readiness/restore/actualGamewiring; no fullbuild/GPU by agent."
+  ],
+  "notes": [
+    "Agent dostává konkrétní další krok autorizovaného KEY3 po novém GPUdůkazu, ne nový neobjednanýúkol.",
+    "Initial draft-only scope je úmyslný, aby souběžná V1pipeline měla neměnnévstupy. ČteníGame/Babylon povolené, zápisy mimo vlastníscope ne.",
+    "Root now explicitly transfers current-main9d98ffc Game and twofixtures after V1publication; caller must release draftclaim and reclaimexpanded withadopt-dirty documented. Remainingdraftrestriction lifted afterrootGO.",
+    "Final bounded feature accepted as technical checkpoint3593bd1d:959tests/build/integrationPASS, GPUfirstF157.8ms; remainingbroaderhitches are explicitly open inLinearKEY3/5. Seeprofilehandoff; resourcesreleasedafterpublication."
+  ]
+}

@@ -21,6 +21,7 @@ import {
   unregisterGLTFExtension,
 } from "@babylonjs/loaders/glTF/2.0/glTFLoaderExtensionRegistry";
 import { GltfLightBudget } from "../client/gltf-light-budget";
+import { StableLightState } from "../client/stable-light-state";
 import "@babylonjs/loaders/glTF";
 import "../client/render-shaders";
 
@@ -58,6 +59,32 @@ function fixture(t: TestContext, enabled = 5) {
 }
 const beforeRender = (scene: Scene) =>
   scene.onBeforeRenderObservable.notifyObservers(scene);
+
+test("prepareFrame raises the automatic cap before stable ordering on four-to-five light transitions", (t) => {
+  const { scene, material, mesh } = fixture(t, 4);
+  const budget = new GltfLightBudget(scene);
+  const stable = new StableLightState(scene);
+  t.after(() => { stable.dispose(); budget.dispose(); });
+  // Same classes isolate the ordering contract: a newly enabled high-priority
+  // fifth source must be included before the stabilizer records the revision.
+  const fifth = scene.lights[4];
+  fifth.renderPriority = 10;
+  budget.prepareFrame();
+  stable.update();
+  assert.equal(material.maxSimultaneousLights, 4);
+  fifth.setEnabled(true);
+  budget.prepareFrame();
+  stable.update();
+  assert.equal(material.maxSimultaneousLights, 5);
+  assert.equal(mesh.lightSources[0], fifth);
+  assert.equal(mesh.lightSources.length, 5);
+  const visits = budget.stats.visits;
+  beforeRender(scene);
+  budget.prepareFrame();
+  stable.update();
+  assert.equal(budget.stats.visits, visits, "idle fallback must not sweep materials again");
+  assert.equal(mesh.lightSources[0], fifth);
+});
 async function loadEmpty(scene: Scene) {
   const container = await LoadAssetContainerAsync(emptyGltf, scene, {
     pluginExtension: ".gltf",

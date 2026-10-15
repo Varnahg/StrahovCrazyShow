@@ -446,3 +446,12 @@ B6 sampled-context40.28FPS a opakované blokace i při téměř stejné poloze. 
 ## KEY-3 světelné varianty — 16.10.2026, první celek
 
 Snapshot2983a71a…:942 testů,build a izolovanáintegrace PASS. ActualGTX1060/2040×986/medium/multiplayer1+HUD A/B: opakovanéFcykly max1913→93ms,p9534.9→21.5ms; prvníF2389.7→1114.4ms, stáleotevřený. StableLightState a rozpoznanáglTFcapoprava zachovávajípřispěvatele/ownercaps,včetněmožných5aktivníchsvětel. Žádnéintenzity/geometrie/net změny. Jedna neplatnáviewport-transition sérieuchovanáavyloučená. [Důkazy a meze](performance/evidence/night-flashlight-20261015/README.md). CelýKEY-3 neuzavřen; pokračuje oddělená příprava coldvariant předhraním s měřenýmstartupcost.
+
+
+## KEY-3: příprava nočních kombinací před hraním — 16.10.2026
+
+Snapshot3593bd1d46b70aa6591e527e7caf47c7eb617d5dd34ae53967c063ad25f24a56: **959 testů, strictTS/build a izolovaná integrace PASS**. Příprava skutečné scény předready má konečnou9stavovou matici současné/nočníOFF–ON a0/1/2 pouliční lampy, actualeffect readiness, cancellation/30sdeadline a obnovu aktuálních nastavení. Žádná změna herního světelného dosahu, intenzity, simulace či oprávnění. Doplněno budget→stable pořadí pro4→5 aktivníchzdrojů.
+
+GTX1060,2040×986,medium,celáhra/HUD: prvníF2389,7→157,8ms. Doložený první pohyb přes poslední lampu851,9→54,4ms veV4, ale finálníV5 opakování má širší propady až374,9ms a warmF269,8ms; nezamlčeno. Tři reálné relace s různými avatary19,7FPS/max207,8ms a0render/asseterrors. Nová příprava v posledním běhu16,386s, celý mode→ready44,391s; delší načítání je výslovný tradeoff. V4narazila na20sdeadline při restore; V5complete. Změnaquality může stále zadrhnout, všechny B6/LOD/novéavatar/car kombinace nejsou ověřené. KEY-3 a související výkonová přejímka zůstávají otevřené.
+
+[Reprodukovatelné výsledky, neúspěšné iterace a omezení](performance/evidence/night-flashlight-20261015/preparation.md). Frozen4188 neměnný; vlastníGPU/preview/SDK procesy ukončené předceloutestovací sadou. Širší původní WIPGame zachovaný samostatně; výkonové důkazy platí pro čistý commitovaný snapshot, nikoli automaticky pro pracovní overlay.
