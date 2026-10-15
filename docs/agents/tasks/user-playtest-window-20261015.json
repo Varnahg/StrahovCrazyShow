@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "user-playtest-window-20261015",
+  "title": "Vyhradit GPU a výkonové okno pro uživatelský test main4188",
+  "status": "ready",
+  "dependsOn": [
+    "prepare-main-playtest-20261015"
+  ],
+  "writePaths": [
+    "docs/agents/handoffs/user-playtest-window-20261015.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu"
+  ],
+  "acceptance": [
+    "Během uživatelem objednaného hraní nespouštět konkurenční GPU/build/fulltest/integration. Neměřit jiné scény.",
+    "Po zprávě uživatele o dokončení ověřit logy/source a uvolnit měřicí okno. Živé preview zůstává samostatně pod serve claimem."
+  ],
+  "verification": [
+    "Žádný automatický GPU benchmark není tímto startem tvrzen; uživatel provede plán den/noc/B6/světla/pohyb/auto/lifecycle."
+  ],
+  "notes": [
+    "Vlastník playtest-main-20261015-window; nejde o nový automatický široký cíl. Přidělené ruční testování je součást aktuálního požadavku."
+  ]
+}

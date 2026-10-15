@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "prepare-main-playtest-20261015",
+  "title": "Připravit neměnný uživatelský test aktuálního main e1b03fe",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/main-playtest-20261015/",
+    "docs/agents/handoffs/prepare-main-playtest-20261015.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Před zápisem ověřit varianty a zvolit přesný již ověřený main snapshot4dcb3f6f s916 testy/build/integrací; žádné runtime změny ani HMR.",
+    "Zkopírovat všechny manifestované vstupy včetně testů a hotový produkční dist do vlastního immutable snapshotu; ověřit SHA vstupů, build snapshot marker a skutečné current-main source blobs.",
+    "Připravit nový explicitně rezervovaný start4188/API2583 podle již ověřeného hidden launcheru; neukončovat staré neidentifikované procesy ani nepřebírat stale claims."
+  ],
+  "verification": [
+    "Žádný nový herní/GPU benchmark nebo zbytečné opakování celých testů pro nezměněný ověřený obsah. Kontrola všech vstupů, distribuovaných bytes a automatického collector statusu/zápisu.",
+    "Po dokončení přípravy release před převzetím živého serve scope; živé služby drží vlastní rezervaci."
+  ],
+  "notes": [
+    "Uživatel výslovně žádá spustit hru pro vlastní test15.10. Nové AGENTS načtené. Neobnovuje se starý široký cíl.",
+    "Varianty: HMR nad dirty main zamítnut kvůli restartům/WIP; starší4187 je jiná skladba bezKEY19; rebuild beze změny nepřidá důkaz. Zvolen copy+hash verifikace již validovaného latest-main checkpointu. Runtime fixes nejsou součást tohoto startu.",
+    "Accepted15.10: all8398 source inputs/160 tests,496 main blobs and7809 dist files match; dependency patch hashes match. No new build/runtime edit."
+  ]
+}
