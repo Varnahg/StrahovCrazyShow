@@ -10,6 +10,7 @@ import { NetworkTimeline, type TimelinePresentation } from "./network-timeline";
 import type { TimelineInput } from "../shared/input-timeline";
 import { SceneTextureDiagnostics } from "./texture-diagnostics";
 import { StableLightState } from "./stable-light-state";
+import { GltfLightBudget } from "./gltf-light-budget";
 import {
   AvatarPrimitivePool,
   createAvatarRig,
@@ -409,6 +410,7 @@ export class Game {
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
   private readonly stableLights: StableLightState;
+  private readonly gltfLightBudget: GltfLightBudget;
   private enabledMeshCandidates: EnabledMeshCandidates;
   get assetLoadErrorCount() {
     return (
@@ -538,6 +540,8 @@ export class Game {
       }
     }
     this.scene = new Scene(this.engine);
+    // Capture material budgets before any world/asset loader can inflate them.
+    this.gltfLightBudget = new GltfLightBudget(this.scene);
     this.stableLights = new StableLightState(this.scene);
     this.enabledMeshCandidates = new EnabledMeshCandidates(
       this.scene,
@@ -2512,6 +2516,7 @@ export class Game {
     if (document.pointerLockElement === this.canvas) document.exitPointerLock();
     this.engine.stopRenderLoop();
     this.stableLights.dispose();
+    this.gltfLightBudget.dispose();
     this.enabledMeshCandidates.dispose();
     this.mapNavigator?.dispose();
     this.sim?.dispose();

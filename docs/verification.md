@@ -441,3 +441,8 @@ Uživatel potvrzuje výrazné zlepšení a žádné červené záblesky v této 
 B6 sampled-context40.28FPS a opakované blokace i při téměř stejné poloze. Samostatný5.640s LongTask při odchodu do menu je mimoframe statistics. Jediná resource chyba favicon404, nikoli pád hry. Lighting/flashlight/camera a vybranýGPU model nejsou zaznamenané; vnitřní render/teardown příčina zůstává neprokázaná. Žádný runtime fix ani nový benchmark nebyl spuštěn.
 
 [Reprodukovatelné výpočty, kompletní nálezy a limity](performance/evidence/playtest-20261015/README.md). Měřicí GPU/heavy okno po hotovo uvolněné; frozenpreview zůstává neměnné a běží.
+
+
+## KEY-3 světelné varianty — 16.10.2026, první celek
+
+Snapshot2983a71a…:942 testů,build a izolovanáintegrace PASS. ActualGTX1060/2040×986/medium/multiplayer1+HUD A/B: opakovanéFcykly max1913→93ms,p9534.9→21.5ms; prvníF2389.7→1114.4ms, stáleotevřený. StableLightState a rozpoznanáglTFcapoprava zachovávajípřispěvatele/ownercaps,včetněmožných5aktivníchsvětel. Žádnéintenzity/geometrie/net změny. Jedna neplatnáviewport-transition sérieuchovanáavyloučená. [Důkazy a meze](performance/evidence/night-flashlight-20261015/README.md). CelýKEY-3 neuzavřen; pokračuje oddělená příprava coldvariant předhraním s měřenýmstartupcost.
