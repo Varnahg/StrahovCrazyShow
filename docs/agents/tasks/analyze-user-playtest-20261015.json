@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "analyze-user-playtest-20261015",
+  "title": "Vyhodnotit dokončený uživatelský test main4188 a aktualizovat Linear",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/playtest-analysis-20261015/",
+    "docs/performance/evidence/playtest-20261015/",
+    "docs/agents/handoffs/analyze-user-playtest-20261015.md",
+    "docs/verification.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejprve neměnně archivovat skutečnou herní relaci5c950ac1… a oddělit menu-only9d4ae317 a synthetic smoke. Ověřit source identitu, pořadí/batches/mezery/visibility a game-dispose. Původní logy nepřepisovat.",
+    "Nezávisle analyzovat výkon a síť; odlišit raw interval vs current CPU, sampled vs lifetime server counters, explicitní respawn a automatické korekce, pozadí a aktivní hraní.",
+    "Doložené výsledky a omezení uložit do evidence/verification a aktualizovat relevantní Linear issues/projekt; nepovažovat tuto analýzu za automatickou implementaci oprav ani pixelový důkaz."
+  ],
+  "verification": [
+    "Pouze lehká offline analýza neměnného archivu, žádný build/integrace/browser/GPU ani nový herní zásah.",
+    "Statistické výsledky křížově zkontrolovat přímým výpočtem ze skutečných frame-window polí a nezávislým čtením síťové časové osy."
+  ],
+  "notes": [
+    "Uživatel15.10 napsal hotovo; jde o objednané vyhodnocení právě předaného testu. Runtime e1b03fe, build4dcb3f6f, repo main3b35904.",
+    "Root explicitně přebírá pouze své předchozí verification WIP pro append-only evidence. Bez převzetí cizích runtime souborů.",
+    "Raw JSONL zůstávají v lokálním archivu s hash manifestem; do Gitu se ukládají agregáty/důkazy bez celé soukromé relace.",
+    "15.10 actual5c950ac1 gameplay archived and analyzed, no seq gaps; userconfirmed no redflashes but remaining night/flashlight stalls and corrections. Userwindow released; frozen4188 stays running. Evidence docs/performance/evidence/playtest-20261015/."
+  ]
+}

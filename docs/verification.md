@@ -430,3 +430,14 @@ Game na publikovaném main f4f6116 neměl callsite recordFrame. Nový producer p
 Snapshot **4dcb3f6fc34a560b455c0ee5c4f02a014105142d4bcce392f2628bca0e012ca0**:916 testů, build a izolovaná SDK/HTTP integrace2568 PASS. Skutečný Game.frame→recorder→collector→JSONL→report ověřen automaticky;45 recovery/UI testů ověřilo i adaptaci zachovaného pracovního WIP. První typová chyba fixture a její oprava jsou v evidenci, finální pipeline běžela znovu. Žádný nový browser/GPU či FPS důkaz; běžící preview i původní main dependencies zachované.
 
 [Kompletní důkazy a limity](performance/evidence/automatic-frames-20261014/README.md). KEY-19 dokončuje sběr, širší KEY-2 a grafická přejímka zůstávají otevřené.
+
+
+## Uživatelský test main4188 — 15.10.2026
+
+Runtime e1b03fe, snapshot4dcb3f6f. Relace5c950ac1… archivována sSHA6c540c3700bbd1c26a9cf0455275916a085fbbc3c4fbaa403c129c8f8954b0c4;4126 záznamů/420 dávek bezseqmezer, jeden source, game-ready a opuštění/dispose. Menu-only a synthetic smoke vyloučené.
+
+Uživatel potvrzuje výrazné zlepšení a žádné červené záblesky v této relaci; přetrvávají hlavně noční/svítilnové dropy a posuny polohy při FPS pádu.41 114 foreground snímků:51.24FPS,p95 34.3ms,p99 77.5ms,max3509ms;22 intervalů≥1s. Jejich preceding callbacky vysvětlují99.05% času, dominantně scene.render.115 korekcí≥0.35m mimo respawn/změnu režimu,max21.087m.0latency-budget waitů/overflow/probe timeoutů;83stale-authority a7prediction-budget upozornění nejsou počty epizod.
+
+B6 sampled-context40.28FPS a opakované blokace i při téměř stejné poloze. Samostatný5.640s LongTask při odchodu do menu je mimoframe statistics. Jediná resource chyba favicon404, nikoli pád hry. Lighting/flashlight/camera a vybranýGPU model nejsou zaznamenané; vnitřní render/teardown příčina zůstává neprokázaná. Žádný runtime fix ani nový benchmark nebyl spuštěn.
+
+[Reprodukovatelné výpočty, kompletní nálezy a limity](performance/evidence/playtest-20261015/README.md). Měřicí GPU/heavy okno po hotovo uvolněné; frozenpreview zůstává neměnné a běží.
