@@ -173,6 +173,7 @@ function fixture(hostname = "localhost") {
     },
     quality: "medium",
     applyAdaptiveQuality() {},
+    stableLights: { update() {}, dispose() {} },
     advanceSimulation() {},
     visualOffset: Vector3.Zero(),
     interpolateLocalPosition: () => new Vector3(0, 1, 2),

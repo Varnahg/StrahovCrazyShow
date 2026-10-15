@@ -9,6 +9,7 @@ import {
 import { NetworkTimeline, type TimelinePresentation } from "./network-timeline";
 import type { TimelineInput } from "../shared/input-timeline";
 import { SceneTextureDiagnostics } from "./texture-diagnostics";
+import { StableLightState } from "./stable-light-state";
 import {
   AvatarPrimitivePool,
   createAvatarRig,
@@ -407,6 +408,7 @@ export class Game {
   renderErrorCount = 0;
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
+  private readonly stableLights: StableLightState;
   private enabledMeshCandidates: EnabledMeshCandidates;
   get assetLoadErrorCount() {
     return (
@@ -536,6 +538,7 @@ export class Game {
       }
     }
     this.scene = new Scene(this.engine);
+    this.stableLights = new StableLightState(this.scene);
     this.enabledMeshCandidates = new EnabledMeshCandidates(
       this.scene,
       this.scene.getActiveMeshCandidates,
@@ -675,7 +678,10 @@ export class Game {
     // Streamed materials must be rendered while glTF assets finish their
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
     const preloadRender = () => {
-      if (!this.disposed) this.scene.render();
+      if (!this.disposed) {
+        this.stableLights.update();
+        this.scene.render();
+      }
     };
     this.engine.runRenderLoop(preloadRender);
     try {
@@ -2272,6 +2278,8 @@ export class Game {
     });
     const environmentEnded = performance.now();
     this.benchmark?.profile.beginFrame();
+    // All beam, street, interior and celestial shadow states are final here.
+    this.stableLights.update();
     this.scene.render();
     const engineWork = this.benchmark?.profile.endFrame();
     const renderEnded = performance.now();
@@ -2503,6 +2511,7 @@ export class Game {
     window.removeEventListener("resize", this.resize);
     if (document.pointerLockElement === this.canvas) document.exitPointerLock();
     this.engine.stopRenderLoop();
+    this.stableLights.dispose();
     this.enabledMeshCandidates.dispose();
     this.mapNavigator?.dispose();
     this.sim?.dispose();
