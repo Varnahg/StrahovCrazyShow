@@ -268,6 +268,7 @@ test("actual Game disposal detaches controllers before scene teardown and is ide
     Object.assign(game, {
       disposed: false,
       startupAbort: new AbortController(),
+      frameLifecycleProfile: undefined,
       renderHealth: { dispose: () => order.push("health") },
       benchmark: undefined,
       canvas: noop,

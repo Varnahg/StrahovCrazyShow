@@ -1,6 +1,7 @@
 import "./render-shaders";
 import { sessionDiagnostics } from "./session-diagnostics";
 import { createEnvironmentProfile } from "./environment-profile";
+import { WebGpuFrameLifecycleProfile } from "./webgpu-frame-lifecycle-profile";
 import {
   snapshotAcceptedAuthorityDiagnostics,
   snapshotTransportDiagnostics,
@@ -438,6 +439,7 @@ export class Game {
   private readonly startupAssets = new Set<{ dispose(): void }>();
   private readonly compilationProfile: WebGpuCompilationProfile;
   private readonly environmentProfile: ReturnType<typeof createEnvironmentProfile>;
+  private readonly frameLifecycleProfile?: WebGpuFrameLifecycleProfile;
   private profiledLightingInstant = 0;
   private profiledDaylight = 0;
   private profiledPreviousExposure = 1;
@@ -585,11 +587,17 @@ export class Game {
         ...sample, rendererId: this.renderHealth.rendererId,
       }),
     });
-    if (this.environmentProfile)
+    if (this.environmentProfile) {
       sessionDiagnostics.event("environment-profiling", {
         rendererId: this.renderHealth.rendererId,
         scope: this.environmentProfile.scope,
       });
+      this.frameLifecycleProfile = new WebGpuFrameLifecycleProfile(this.engine, {
+        onSlowCall: (sample) => sessionDiagnostics.event("engine-frame-work", {
+          ...sample, rendererId: this.renderHealth.rendererId,
+        }),
+      });
+    }
     this.applyAdaptiveQuality(this.adaptive.state);
     this.gpu = readGpuDiagnostics(this.engine);
     this.engine.onContextRestoredObservable.add(() => {
@@ -910,10 +918,20 @@ export class Game {
     this.updatePlayers([this.localPlayer]);
     this.engine.stopRenderLoop(preloadRender);
     this.canvas.dataset.bootStage = "light-preparation";
+    if (this.frameLifecycleProfile)
+      sessionDiagnostics.event("engine-frame-profile", {
+        stage: "preparation-start", rendererId: this.renderHealth.rendererId,
+        timing: this.frameLifecycleProfile.snapshot(),
+      });
     const preparation = await this.renderHealth.guard(this.prepareLighting(preloadRender));
     this.assertStartupActive();
     sessionDiagnostics.event("lighting-preparation", preparation);
     sessionDiagnostics.event("webgpu-preparation-profile", this.compilationProfile.snapshot());
+    if (this.frameLifecycleProfile)
+      sessionDiagnostics.event("engine-frame-profile", {
+        stage: "preparation-end", rendererId: this.renderHealth.rendererId,
+        timing: this.frameLifecycleProfile.snapshot(),
+      });
     this.canvas.dataset.lightPreparation = preparation.status;
     if (preparation.status !== "complete") {
       this.renderHealth.report("pipeline", `Příprava světel: ${preparation.status}`);
@@ -2913,6 +2931,15 @@ export class Game {
     this.transit?.dispose();
     this.avatarPool.dispose();
     this.scene.dispose();
-    this.engine.dispose();
+    try { this.engine.dispose(); }
+    finally {
+      if (this.frameLifecycleProfile) {
+        this.frameLifecycleProfile.dispose();
+        sessionDiagnostics.event("engine-frame-profile", {
+          stage: "engine-disposed", rendererId: this.renderHealth.rendererId,
+          timing: this.frameLifecycleProfile.snapshot(),
+        });
+      }
+    }
   }
 }
