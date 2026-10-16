@@ -921,7 +921,7 @@ export class Game {
     if (this.frameLifecycleProfile)
       sessionDiagnostics.event("engine-frame-profile", {
         stage: "preparation-start", rendererId: this.renderHealth.rendererId,
-        profile: this.frameLifecycleProfile.snapshot(),
+        timing: this.frameLifecycleProfile.snapshot(),
       });
     const preparation = await this.renderHealth.guard(this.prepareLighting(preloadRender));
     this.assertStartupActive();
@@ -930,7 +930,7 @@ export class Game {
     if (this.frameLifecycleProfile)
       sessionDiagnostics.event("engine-frame-profile", {
         stage: "preparation-end", rendererId: this.renderHealth.rendererId,
-        profile: this.frameLifecycleProfile.snapshot(),
+        timing: this.frameLifecycleProfile.snapshot(),
       });
     this.canvas.dataset.lightPreparation = preparation.status;
     if (preparation.status !== "complete") {
@@ -2937,7 +2937,7 @@ export class Game {
         this.frameLifecycleProfile.dispose();
         sessionDiagnostics.event("engine-frame-profile", {
           stage: "engine-disposed", rendererId: this.renderHealth.rendererId,
-          profile: this.frameLifecycleProfile.snapshot(),
+          timing: this.frameLifecycleProfile.snapshot(),
         });
       }
     }

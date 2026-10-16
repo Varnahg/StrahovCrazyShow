@@ -8,6 +8,8 @@ import { Readable } from "node:stream";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import ts from "typescript";
 import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Observable } from "@babylonjs/core/Misc/observable";
+import { WebGpuFrameLifecycleProfile } from "../client/webgpu-frame-lifecycle-profile";
 import {
   SessionDiagnostics,
   type DiagnosticsEnvironment,
@@ -384,6 +386,38 @@ test("actual frame context isolates guest and dispose invalidates once without f
   );
   assert.equal(f.game.diagnosticNetworkContext(), null);
   assert.equal(f.game.lastAuthorityNetwork, null);
+});
+
+test("actual Game lifecycle timing survives the real diagnostic privacy filter", async (t) => {
+  const f = fixture();
+  t.after(() => f.recorder.dispose());
+  let clock = 0;
+  const disposed = new Observable<unknown>();
+  Object.assign(f.game.engine, {
+    isWebGPU: true,
+    onDisposeObservable: disposed,
+    getHostWindow: () => null,
+    beginFrame() { clock += 2; },
+    endFrame() { clock += 4; },
+    dispose() { disposed.notifyObservers(null); },
+  });
+  f.game.renderHealth.rendererId = 73;
+  f.game.frameLifecycleProfile = new WebGpuFrameLifecycleProfile(f.game.engine, { now: () => clock });
+  f.recorder.start();
+  await f.recorder.flush();
+  f.game.engine.beginFrame();
+  f.game.engine.endFrame();
+  f.game.dispose();
+  await f.recorder.flush();
+  const event = f.records().find((record) => record.kind === "engine-frame-profile");
+  assert.ok(event);
+  assert.equal(event.data.stage, "engine-disposed");
+  assert.equal(event.data.rendererId, 73);
+  const timing = event.data.timing as { phases: Record<string, { calls: number; cpuTotalMs: number; asyncCompletion: string }> } | undefined;
+  assert.ok(timing, "technical timing must not be silently removed as a private user profile");
+  assert.equal(timing.phases.beginFrame.calls, 1);
+  assert.equal(timing.phases.endFrame.cpuTotalMs, 4);
+  assert.equal(timing.phases.endFrame.asyncCompletion, "unobserved");
 });
 
 test("real Game frames survive recorder, validator, local collector and report with bounded own telemetry", async (t) => {
