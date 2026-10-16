@@ -3,6 +3,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { ShaderLanguage } from "@babylonjs/core/Materials/shaderLanguage";
 import type { Scene } from "@babylonjs/core/scene";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import {
@@ -155,11 +156,15 @@ export class SkyWeatherController {
 
   constructor(private readonly scene: Scene) {
     this.atmosphere = createAtmosphereSky(scene, "medium");
+    const shaderLanguage = scene.getEngine().isWebGPU
+      ? ShaderLanguage.WGSL
+      : ShaderLanguage.GLSL;
     this.sunMaterial = new ShaderMaterial(
       "sky:solar-disc",
       scene,
       { vertex: "strahovCelestial", fragment: "strahovSun" },
       {
+        shaderLanguage,
         attributes: ["position"],
         uniforms: [
           "worldViewProjection",
@@ -181,6 +186,7 @@ export class SkyWeatherController {
       scene,
       { vertex: "strahovCelestial", fragment: "strahovMoon" },
       {
+        shaderLanguage,
         attributes: ["position"],
         uniforms: [
           "worldViewProjection",

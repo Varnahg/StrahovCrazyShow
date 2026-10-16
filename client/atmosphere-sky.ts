@@ -2,6 +2,8 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { ShaderLanguage } from "@babylonjs/core/Materials/shaderLanguage";
+import { registerAtmosphereWgsl } from "./atmosphere-wgsl";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector2, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
@@ -54,6 +56,7 @@ const CLOUD_RAY_SCALES = [
   3510 / CLOUD_SCALES[1],
   8512 / CLOUD_SCALES[2],
 ] as const;
+registerAtmosphereWgsl(CLOUD_EDGE, CLOUD_RAY_SCALES);
 
 /** Calibrated atlas ranks make this the requested covered fraction of a layer. */
 export function atmosphereCloudDensity(rank: number, coverage: number) {
@@ -463,6 +466,9 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
     scene,
     "strahovAtmosphere",
     {
+      shaderLanguage: scene.getEngine().isWebGPU
+        ? ShaderLanguage.WGSL
+        : ShaderLanguage.GLSL,
       attributes: ["position"],
       uniforms: [
         "worldViewProjection",
@@ -619,7 +625,7 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
   return {
     material,
     update,
-    /** Register once after adding shared cloud GLSL/uniforms/sampler to a shader. */
+    /** Register once after adding shared cloud source/uniforms/sampler to a shader. */
     bindClouds(target: ShaderMaterial) {
       if (!disposed) {
         cloudMaterials.add(target);
