@@ -267,6 +267,8 @@ test("actual Game disposal detaches controllers before scene teardown and is ide
   const context = new Proxy(
     Object.assign(game, {
       disposed: false,
+      startupAbort: new AbortController(),
+      renderHealth: { dispose: () => order.push("health") },
       benchmark: undefined,
       canvas: noop,
       resetDiagnosticContext: noop,
@@ -289,7 +291,8 @@ test("actual Game disposal detaches controllers before scene teardown and is ide
   );
   dispose.call(context);
   dispose.call(context);
-  assert.deepEqual(order, ["stop", "stable", "budget", "scene"]);
+  assert.equal(context.startupAbort.signal.aborted, true);
+  assert.deepEqual(order, ["health", "stop", "stable", "budget", "scene"]);
   assert.equal(
     ambient.onEffectiveEnabledStateChangedObservable.observers.filter(
       (observer) => !observer._willBeUnregistered,

@@ -1,5 +1,7 @@
 import { HudIcon } from "./hud-icons";
 import { sessionDiagnostics } from "./session-diagnostics";
+import { getRendererInfo } from "./gpu-diagnostics";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { FrameInputBuffer } from "./network-input-buffer";
 import { AuthorityBuffer, type ReceivedAuthority } from "./authority-buffer";
 import { NetworkProbe } from "./network-probe";
@@ -501,15 +503,41 @@ export function App() {
   }, []);
   useEffect(() => {
     if (mode === "menu" || !canvas.current) return;
+    const startupCanvas = canvas.current;
     sessionDiagnostics.event("mode-change", { mode });
     let cancelled = false;
+    const startupAbort = new AbortController();
     modeRef.current = mode;
     (async () => {
+      let pendingEngine: AbstractEngine | undefined;
       try {
-        const { Game } = await import("./game");
-        if (cancelled || !canvas.current) return;
-        const g = new Game(canvas.current, profileRef.current);
+        const [{ Game }, { createGameEngine }] = await Promise.all([
+          import("./game"),
+          import("./render-engine"),
+        ]);
+        if (cancelled || canvas.current !== startupCanvas) return;
+        const engineStarted = performance.now();
+        pendingEngine = await createGameEngine(startupCanvas, {
+          signal: startupAbort.signal,
+        });
+        if (cancelled || canvas.current !== startupCanvas) {
+          pendingEngine.dispose();
+          return;
+        }
+        sessionDiagnostics.event("renderer-ready", {
+          durationMs: performance.now() - engineStarted,
+          ...getRendererInfo(pendingEngine),
+          backend: pendingEngine.isWebGPU ? "webgpu" : "webgl2",
+        });
+        const g = new Game(startupCanvas, profileRef.current, pendingEngine);
+        pendingEngine = undefined;
         game.current = g;
+        g.onRendererFailure = (message) => {
+          if (cancelled || game.current !== g) return;
+          userBenchmark.current = false;
+          setReady(false);
+          setError(message);
+        };
         g.network = mode === "multi";
         syncNetworkStage(g);
         g.timeOverride = lightingPreviewRef.current.instant;
@@ -560,7 +588,10 @@ export function App() {
         g.setQuality(quality);
         g.setTargetFps(targetFps);
         await g.start();
-        if (cancelled) return;
+        if (cancelled || game.current !== g || canvas.current !== startupCanvas) return;
+        const health = g.renderHealth.snapshot();
+        if (!g.ready || !health.valid)
+          throw new Error(health.firstErrors[0]?.message ?? "Renderer nedokončil přípravu.");
         sessionDiagnostics.event("game-ready", { mode });
         if (mode === "multi") {
           g.updatePlayers(playersRef.current);
@@ -578,13 +609,21 @@ export function App() {
             getStats: () => ({
               fps: g.engine.getFps(),
               frameTimes: [...g.frames],
-              renderer: g.engine.getGlInfo(),
+              renderer: getRendererInfo(g.engine),
               players: g.avatars.size,
             }),
             setTime: (t: number | null) => (g.timeOverride = t),
             setWeather: (w: Weather) => g.setWeather(w),
           };
       } catch (e) {
+        pendingEngine?.dispose();
+        if (cancelled) return;
+        sessionDiagnostics.event("startup-error", {
+          message: String(e),
+          stack: e instanceof Error ? e.stack?.slice(0, 2000) : undefined,
+        });
+        game.current?.dispose();
+        game.current = null;
         setError(
           t("3D scénu se nepodařilo spustit: {error}", { error: String(e) }),
         );
@@ -592,6 +631,7 @@ export function App() {
     })();
     return () => {
       cancelled = true;
+      startupAbort.abort();
       userBenchmark.current = false;
       game.current?.dispose();
       game.current = null;
@@ -2610,9 +2650,10 @@ function BenchmarkControls({
         className="secondary full"
         disabled={!game?.ready || active}
         onClick={() => {
-          onUserStart();
-          game?.startBenchmark();
-          setRunning(true);
+          if (game?.startBenchmark()) {
+            onUserStart();
+            setRunning(true);
+          }
         }}
       >
         {active ? t("Měřím 10 sekund…") : t("Změřit FPS po dobu 10 sekund")}
@@ -2632,7 +2673,7 @@ function BenchmarkControls({
       )}
       {result && (
         <>
-          {(result.renderErrorCount > 0 || result.assetLoadErrorCount > 0) && (
+          {(result.renderErrorCount > 0 || result.assetLoadErrorCount > 0 || result.renderHealth?.valid === false) && (
             <p role="alert">
               {t(
                 "Měření je neplatné: prostředí obsahuje chybu vykreslování nebo načtení modelů. Obnov stránku před dalším měřením.",

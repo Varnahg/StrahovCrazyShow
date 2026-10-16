@@ -1,7 +1,7 @@
 import { Vector3, Matrix } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
 import type { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
-import type { Engine } from "@babylonjs/core/Engines/engine";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Vec3 } from "../shared/types";
 import { getLocale, localizeText } from "./i18n";
 /** Nearby landmarks belong on the minimap. Separate entry/exit distances keep
@@ -47,7 +47,7 @@ export class ScreenLabels {
     public container: HTMLElement,
     public scene: Scene,
     public camera: UniversalCamera,
-    public engine: Engine,
+    public engine: Pick<AbstractEngine, "getRenderWidth" | "getRenderHeight">,
   ) {}
   set(id: string, text: string, point: Vec3, player = false) {
     let label = this.entries.get(id);
