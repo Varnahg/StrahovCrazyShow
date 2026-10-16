@@ -88,3 +88,59 @@ diff --git a/Materials/shadowDepthWrapper.js b/Materials/shadowDepthWrapper.js
              if (hasLocationForFragment) {
                  fragmentCode = fragmentCode.replace(/#define SHADOWDEPTH_FRAGMENT/g, fragmentBlockCode);
              }
+diff --git a/Materials/imageProcessingConfiguration.pure.js b/Materials/imageProcessingConfiguration.pure.js
+index 13847e9..a87ae64 100644
+--- a/Materials/imageProcessingConfiguration.pure.js
++++ b/Materials/imageProcessingConfiguration.pure.js
+@@ -263,8 +263,10 @@ let ImageProcessingConfiguration = (() => {
+                 if (this._exposure === value) {
+                     return;
+                 }
++                // Exposure is a uniform while its enabled shader variant stays unchanged.
++                const valueOnly = (this._exposure !== 1.0) === (value !== 1.0);
+                 this._exposure = value;
+-                this._updateParameters();
++                this._updateParameters(valueOnly);
+             }
+             /**
+              * Gets whether the tone mapping effect is enabled.
+@@ -538,8 +540,19 @@ let ImageProcessingConfiguration = (() => {
+             /**
+              * Method called each time the image processing information changes requires to recompile the effect.
+              */
+-            _updateParameters() {
+-                this.onUpdateParameters.notifyObservers(this);
++            _updateParameters(exposureValueOnly = false) {
++                // Tag this dispatch, not the configuration: a direct nested notification
++                // must remain a full update. Observables reuse EventState during nesting.
++                const state = this.onUpdateParameters._eventState;
++                const previousUserInfo = state.userInfo;
++                const marker = exposureValueOnly ? (this._exposureValueUpdate ??= {}) : undefined;
++                try {
++                    this.onUpdateParameters.notifyObservers(this, -1, undefined, undefined, marker);
++                }
++                finally {
++                    // Preserve the enclosing dispatch also when an observer throws.
++                    state.userInfo = previousUserInfo;
++                }
+             }
+             /**
+              * Gets the current class name.
+diff --git a/Materials/imageProcessing.js b/Materials/imageProcessing.js
+index 49ba489..d89076d 100644
+--- a/Materials/imageProcessing.js
++++ b/Materials/imageProcessing.js
+@@ -63,7 +63,12 @@ export function ImageProcessingMixin(base) {
+             }
+             // Attaches observer
+             if (this._imageProcessingConfiguration) {
+-                this._imageProcessingObserver = this._imageProcessingConfiguration.onUpdateParameters.add(() => {
++                this._imageProcessingObserver = this._imageProcessingConfiguration.onUpdateParameters.add((_configuration, state) => {
++                    // Keep all notifications (notably bloom exposure), but do not scan
++                    // every scene submesh for a value-only exposure uniform change.
++                    if (state.userInfo && state.userInfo === this._imageProcessingConfiguration._exposureValueUpdate) {
++                        return;
++                    }
+                     // Ensure the effect will be rebuilt.
+                     if (this._markAllSubMeshesAsImageProcessingDirty) {
+                         this._markAllSubMeshesAsImageProcessingDirty();
