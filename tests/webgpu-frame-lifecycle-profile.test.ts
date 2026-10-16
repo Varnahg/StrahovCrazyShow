@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { spawnSync } from "node:child_process";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
@@ -433,30 +434,71 @@ test("method descriptors and receiver/argument identity survive; later foreign o
   assert.equal(f.engine.endFrame, foreign);
 });
 
-test("original Promise and throw identity remain intact; diagnostic rejection branches are handled", async () => {
+test("Promise and thenable returns are not inspected or given handlers; rejection stays caller-owned", async () => {
   const f = fixture();
   const pending = deferred<object>();
-  f.engine.beginFrame = () => {
+  let thenReads = 0;
+  Object.defineProperty(pending.promise, "then", {
+    configurable: true,
+    get() {
+      thenReads++;
+      return Promise.prototype.then;
+    },
+  });
+  let result: unknown = pending.promise;
+  f.engine.beginFrame = function () {
+    assert.equal(this, f.engine);
     f.tick(2);
-    return pending.promise;
+    return result;
   };
   const profile = new WebGpuFrameLifecycleProfile(f.engine, { now: f.now });
   try {
     assert.equal(f.engine.beginFrame(), pending.promise);
-    assert.equal(profile.snapshot().phases.beginFrame?.pending, 1);
+    assert.equal(
+      thenReads,
+      0,
+      "even reading then is an observable side effect",
+    );
+    assert.equal(profile.snapshot().phases.beginFrame?.returned, 1);
+    assert.equal(
+      profile.snapshot().phases.beginFrame?.asyncCompletion,
+      "unobserved",
+    );
     f.tick(40);
     const failure = new Error("original async failure");
+    const caller = pending.promise.catch((error) => {
+      assert.equal(error, failure);
+    });
     pending.reject(failure);
-    await assert.rejects(pending.promise, (e) => e === failure);
+    await caller;
     await settle();
     const metric = profile.snapshot().phases.beginFrame!;
     assert.equal(metric.cpuTotalMs, 2);
-    assert.equal(metric.asyncTotalMs, 42);
-    assert.equal(metric.failures, 1);
-    assert.equal(metric.pending, 0);
+    assert.equal(metric.returned, 1);
+    assert.equal(
+      metric.thrown,
+      0,
+      "async rejection is not a synchronous throw",
+    );
+    assert.equal(Object.hasOwn(metric, "pending"), false);
+    let inspected = false;
+    result = {
+      get then() {
+        inspected = true;
+        throw new Error("must not inspect return");
+      },
+    };
+    assert.equal(f.engine.beginFrame(), result);
+    assert.equal(inspected, false);
+    assert.equal(profile.snapshot().phases.beginFrame?.returned, 2);
   } finally {
+    pending.resolve({});
     profile.dispose();
   }
+});
+
+test("a synchronous throw retains identity and has a separate thrown counter", () => {
+  const f = fixture();
   const error = new Error("original synchronous failure");
   f.engine.beginFrame = () => {
     throw error;
@@ -467,11 +509,76 @@ test("original Promise and throw identity remain intact; diagnostic rejection br
       () => f.engine.beginFrame(),
       (e) => e === error,
     );
-    assert.equal(next.snapshot().phases.beginFrame?.failures, 1);
+    assert.equal(next.snapshot().phases.beginFrame?.thrown, 1);
+    assert.equal(next.snapshot().phases.beginFrame?.returned, 0);
   } finally {
     next.dispose();
   }
 });
+
+for (const lifecycle of ["active", "dispose", "generation"])
+  test(`unhandled Promise rejection remains observable for ${lifecycle} owner`, () => {
+    // Isolated child: Node's test runner must not itself handle or fail this
+    // deliberately unhandled application Promise. No shell interpolation.
+    const moduleUrl = new URL(
+      "../client/webgpu-frame-lifecycle-profile.ts",
+      import.meta.url,
+    ).href;
+    const script = `
+      import { WebGpuFrameLifecycleProfile } from ${JSON.stringify(moduleUrl)};
+      function observable() {
+        const handlers = new Set();
+        return { add(callback) { handlers.add(callback); return { remove() { handlers.delete(callback); } }; },
+          fire() { for (const callback of handlers) callback(); } };
+      }
+      let reject;
+      const promise = new Promise((_yes, no) => { reject = no; });
+      const failure = new Error('original late failure');
+      let observed = 0;
+      process.on('unhandledRejection', (error, original) => {
+        if (error === failure && original === promise) observed++;
+      });
+      const engine = { isWebGPU: true, _device: { queue: {} },
+        onDisposeObservable: observable(), onContextRestoredObservable: observable(),
+        beginFrame() { return promise; } };
+      const profile = new WebGpuFrameLifecycleProfile(engine, { now: () => 0 });
+      if (engine.beginFrame() !== promise) throw new Error('Promise identity changed');
+      const lifecycle = ${JSON.stringify(lifecycle)};
+      if (lifecycle === 'dispose') profile.dispose();
+      if (lifecycle === 'generation') {
+        engine._device = { queue: {} }; engine.onContextRestoredObservable.fire();
+      }
+      reject(failure);
+      setImmediate(() => setImmediate(() => {
+        console.log(JSON.stringify({ lifecycle, observed, phase: profile.snapshot().phases.beginFrame }));
+        profile.dispose();
+        process.exitCode = observed === 1 ? 0 : 3;
+      }));
+    `;
+    const child = spawnSync(
+      process.execPath,
+      [
+        "--import",
+        import.meta.resolve("tsx"),
+        "--input-type=module",
+        "--eval",
+        script,
+      ],
+      {
+        encoding: "utf8",
+        timeout: 10000,
+        maxBuffer: 64 * 1024,
+      },
+    );
+    assert.equal(
+      child.status,
+      0,
+      `${lifecycle}: ${child.stdout}\n${child.stderr}\n${child.error ?? ""}`,
+    );
+    const outcome = JSON.parse(child.stdout.trim());
+    assert.equal(outcome.observed, 1);
+    assert.equal(outcome.phase.asyncCompletion, "unobserved");
+  });
 
 test("throwing clocks/slow observers and reentrant reporting cannot change engine operations", () => {
   const f = fixture();
@@ -509,7 +616,7 @@ test("throwing clocks/slow observers and reentrant reporting cannot change engin
   }
 });
 
-test("context generation restores old methods and ignores old completion callbacks", async () => {
+test("context generation restores old methods without observing old Promise completion", async () => {
   const f = fixture();
   const oldDevice = f.engine._device;
   const originalCreate = oldDevice.createCommandEncoder;
@@ -530,7 +637,7 @@ test("context generation restores old methods and ignores old completion callbac
     pending.resolve({});
     await settle();
     assert.equal(profile.snapshot().phases.beginFrame?.calls, 0);
-    assert.equal(profile.snapshot().phases.beginFrame?.completed, 0);
+    assert.equal(profile.snapshot().phases.beginFrame?.returned, 0);
     assert.equal(profile.snapshot().rawRaf.callbacks, 0);
     f.engine._device.createCommandEncoder().finish();
     assert.equal(profile.snapshot().phases.encoderFinish?.calls, 1);

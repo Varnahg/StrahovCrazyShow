@@ -56,7 +56,7 @@ export type FrameLifecyclePhase = (typeof FRAME_LIFECYCLE_PHASES)[number];
 const scope = Object.freeze({
   cpu: "Inclusive synchronous CPU wall calls, including nested work; never sum parent and child phases. Not GPU execution time.",
   async:
-    "Only promises returned by hooked calls are observed. Their completion latency is separate, may overlap and is not CPU or GPU time. Background timestamp mapAsync completion is not measured here.",
+    "Async completion is unobserved. Return values are never inspected for then or given settlement handlers; original Promise rejection handling stays with the caller. Returned/thrown count only synchronous call outcomes.",
   cadence:
     "Concurrent raw host RAF, engine _processFrame and render-loop callback intervals are distinct; none is a gameplay FPS benchmark.",
   recent:
@@ -64,15 +64,12 @@ const scope = Object.freeze({
 });
 type Metric = {
   calls: number;
-  completed: number;
-  failures: number;
-  pending: number;
+  returned: number;
+  thrown: number;
   timingSamples: number;
   cpuTotalMs: number;
   cpuMaxMs: number;
-  asyncSamples: number;
-  asyncTotalMs: number;
-  asyncMaxMs: number;
+  asyncCompletion: "unobserved";
 };
 type Hook = {
   phase?: FrameLifecyclePhase;
@@ -98,15 +95,12 @@ const field = (target: object, name: string): unknown =>
   (target as Record<string, unknown>)[name];
 const metric = (): Metric => ({
   calls: 0,
-  completed: 0,
-  failures: 0,
-  pending: 0,
+  returned: 0,
+  thrown: 0,
   timingSamples: 0,
   cpuTotalMs: 0,
   cpuMaxMs: 0,
-  asyncSamples: 0,
-  asyncTotalMs: 0,
-  asyncMaxMs: 0,
+  asyncCompletion: "unobserved",
 });
 const metrics = () =>
   Object.fromEntries(
@@ -423,10 +417,10 @@ export class WebGpuFrameLifecycleProfile {
         throw error;
       } finally {
         if (measured) {
-          if (failed) {
-            measured.completed++;
-            measured.failures++;
-          }
+          // A returned Promise is only a synchronous return here. Inspecting or
+          // observing it would change rejection ownership after this owner dies.
+          if (failed) measured.thrown++;
+          else measured.returned++;
           const elapsed = owner.clock() - started;
           if (Number.isFinite(elapsed) && elapsed >= 0) {
             measured.timingSamples++;
@@ -446,8 +440,6 @@ export class WebGpuFrameLifecycleProfile {
         if (operations.after) owner.safe(() => operations.after!(result, args));
         if (operations.terminal && resource) owner.releaseResource(resource);
       }
-      if (measured && owner.valid(generation))
-        owner.observeResult(result, measured, generation, started);
       return result;
     };
     try {
@@ -470,44 +462,6 @@ export class WebGpuFrameLifecycleProfile {
     }
   }
 
-  private observeResult(
-    result: unknown,
-    metric: Metric,
-    generation: number,
-    started: number,
-  ) {
-    let asynchronous = false;
-    this.safe(() => {
-      asynchronous =
-        isObject(result) && typeof field(result, "then") === "function";
-    });
-    if (!asynchronous) {
-      metric.completed++;
-      return;
-    }
-    metric.pending++;
-    const finish = (failed: boolean) => {
-      if (!this.valid(generation)) return;
-      metric.pending--;
-      metric.completed++;
-      if (failed) metric.failures++;
-      const elapsed = this.clock() - started;
-      if (Number.isFinite(elapsed) && elapsed >= 0) {
-        metric.asyncSamples++;
-        metric.asyncTotalMs += elapsed;
-        metric.asyncMaxMs = Math.max(metric.asyncMaxMs, elapsed);
-      }
-    };
-    // This is a handled diagnostic branch; the caller keeps its original return.
-    void Promise.resolve(result)
-      .then(
-        () => finish(false),
-        () => finish(true),
-      )
-      .catch(() => {
-        this.observerErrors++;
-      });
-  }
   private slow(
     phase: FrameLifecyclePhase,
     label: string,
