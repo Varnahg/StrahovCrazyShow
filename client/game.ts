@@ -46,6 +46,7 @@ import {
 } from "../shared/render-quality";
 import {
   readGpuDiagnostics,
+  readWebGpuMainPassTiming,
   type GpuDiagnostics,
 } from "./gpu-diagnostics";
 import {
@@ -68,6 +69,7 @@ import { updateRainSegments } from "./weather-particles";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { getRendererInfo } from "./gpu-diagnostics";
 import { RenderHealth, type RenderHealthSnapshot } from "./render-health";
+import { WebGpuCompilationProfile } from "./webgpu-compilation-profile";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3, Matrix, Quaternion } from "@babylonjs/core/Maths/math.vector";
@@ -218,6 +220,10 @@ export type Benchmark = {
     end: RenderHealthSnapshot;
     valid: boolean;
   };
+  compilation?: {
+    start: ReturnType<WebGpuCompilationProfile["snapshot"]>;
+    end: ReturnType<WebGpuCompilationProfile["snapshot"]>;
+  };
   avatars: number;
   viewport: { width: number; height: number };
   renderResolution: { width: number; height: number };
@@ -261,7 +267,12 @@ export type Benchmark = {
   };
   rendering: AdaptiveQualitySnapshot;
   gpu: GpuDiagnostics;
-  frameWork: { cpuMs: number | null; gpuMs: number | null };
+  frameWork: {
+    cpuMs: number | null;
+    gpuMs: number | null;
+    webgpuMainPassMs?: number | null;
+    webgpuMainPassScope?: "main-render-pass-only";
+  };
   frameBreakdownMs: Record<string, number>;
   /** Nested Babylon CPU timings, not additive and never GPU timings. */
   engineCpuBreakdownMs: Record<string, number>;
@@ -293,6 +304,7 @@ export class Game {
   lastCpuFrameMs: number | undefined;
   lastGpuFrameMs: number | undefined;
   lastGpuCounterCount = 0;
+  private lastMainPassCounterCount = 0;
   lastGpuCounterAt = -Infinity;
   presentationRate: PresentationRateMeasurement | null = null;
   worldControllers?: ReturnType<typeof buildWorld>;
@@ -345,6 +357,7 @@ export class Game {
     profile: BenchmarkRenderProfile;
     weatherAtStart: Weather | null;
     healthAtStart: RenderHealthSnapshot;
+    compilationAtStart: ReturnType<WebGpuCompilationProfile["snapshot"]>;
   };
   network = false;
   ready = false;
@@ -417,6 +430,7 @@ export class Game {
   disposed = false;
   renderErrorCount = 0;
   readonly renderHealth: RenderHealth;
+  private readonly compilationProfile: WebGpuCompilationProfile;
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
   private readonly stableLights: StableLightState;
@@ -540,11 +554,21 @@ export class Game {
       if (this.renderErrorCount === 1)
         this.notice("Část prostředí se nepodařilo vykreslit. Obnov stránku.");
     });
+    this.compilationProfile = new WebGpuCompilationProfile(this.engine, {
+      onError: (channel, error, label) => this.renderHealth.report(
+        channel, `${label}: ${error instanceof Error ? error.message : String(error)}`,
+      ),
+      track: (promise, channel, label) => this.renderHealth.track(promise, channel, label),
+      onSlowCall: (sample) => sessionDiagnostics.event("webgpu-work", {
+        ...sample, rendererId: this.renderHealth.rendererId, purpose: "game",
+      }),
+    });
     this.applyAdaptiveQuality(this.adaptive.state);
     this.gpu = readGpuDiagnostics(this.engine);
     this.engine.onContextRestoredObservable.add(() => {
       this.gpu = readGpuDiagnostics(this.engine);
       this.lastGpuCounterCount = 0;
+      this.lastMainPassCounterCount = 0;
       this.lastGpuCounterAt = -Infinity;
     });
     this.engineInstrumentation = new EngineInstrumentation(this.engine);
@@ -796,6 +820,7 @@ export class Game {
     this.canvas.dataset.bootStage = "light-preparation";
     const preparation = await this.prepareLighting(preloadRender);
     sessionDiagnostics.event("lighting-preparation", preparation);
+    sessionDiagnostics.event("webgpu-preparation-profile", this.compilationProfile.snapshot());
     if (this.disposed) return;
     this.canvas.dataset.lightPreparation = preparation.status;
     if (preparation.status !== "complete")
@@ -1285,7 +1310,23 @@ export class Game {
       this.applyAdaptiveQuality(this.adaptive.setTargetFps(fps));
   }
   startBenchmark() {
+    if (!this.ready) return;
     this.benchmark?.profile.dispose();
+    sessionDiagnostics.event("benchmark-start", {
+      rendererId: this.renderHealth.rendererId,
+      position: { x: this.actor.position.x, y: this.actor.position.y, z: this.actor.position.z },
+      yaw: this.yaw,
+      pitch: this.pitch,
+      camera: {
+        position: { x: this.camera.globalPosition.x, y: this.camera.globalPosition.y, z: this.camera.globalPosition.z },
+        fov: this.camera.fov,
+        minZ: this.camera.minZ,
+        maxZ: this.camera.maxZ,
+      },
+      quality: this.quality,
+      viewport: { width: innerWidth, height: innerHeight },
+      renderResolution: { width: this.engine.getRenderWidth(), height: this.engine.getRenderHeight() },
+    });
     this.benchmark = {
       start: performance.now(),
       frames: [],
@@ -1295,6 +1336,7 @@ export class Game {
       profile: new BenchmarkRenderProfile(this.scene),
       weatherAtStart: this.weather ? structuredClone(this.weather) : null,
       healthAtStart: this.renderHealth.snapshot(),
+      compilationAtStart: this.compilationProfile.snapshot(),
     };
   }
   interact() {
@@ -2243,6 +2285,8 @@ export class Game {
     const gpuCounter = this.engineInstrumentation.captureGPUFrameTime
       ? this.engineInstrumentation.gpuFrameTimeCounter
       : undefined;
+    const mainPassTiming = readWebGpuMainPassTiming(this.engine, this.lastMainPassCounterCount);
+    this.lastMainPassCounterCount = mainPassTiming.count;
     const freshGpuSample = !!gpuCounter && gpuCounter.count !== this.lastGpuCounterCount;
     if (freshGpuSample) {
       this.lastGpuCounterCount = gpuCounter.count;
@@ -2575,6 +2619,7 @@ export class Game {
               b.healthAtStart.generation === healthAtEnd.generation &&
               this.assetLoadErrorCount === 0,
           },
+          compilation: { start: b.compilationAtStart, end: this.compilationProfile.snapshot() },
           avatars: b.minAvatars,
           viewport: { width: innerWidth, height: innerHeight },
           renderResolution: {
@@ -2616,6 +2661,8 @@ export class Game {
           frameWork: {
             cpuMs: this.lastCpuFrameMs ?? null,
             gpuMs: this.lastGpuFrameMs ?? null,
+            webgpuMainPassMs: mainPassTiming.ms,
+            webgpuMainPassScope: mainPassTiming.scope,
           },
           frameBreakdownMs: Object.fromEntries(
             Object.entries(b.work).map(([key, sum]) => [
