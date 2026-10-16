@@ -4,6 +4,8 @@ import {
   classifyGpu,
   readGpuDiagnostics,
   readGpuContextDiagnostics,
+  getRendererInfo,
+  readWebGpuMainPassTiming,
 } from "../client/gpu-diagnostics";
 
 test("GPU diagnostics identify actual Intel and GTX renderers, not the high-performance request", () => {
@@ -30,6 +32,106 @@ test("GPU diagnostics identify actual Intel and GTX renderers, not the high-perf
   });
   assert.equal(nvidia.classification, "dedicated");
   assert.equal(nvidia.warnings.length, 0);
+});
+
+test("WebGPU diagnostics use public adapter info and never open a GL context", () => {
+  const engine = {
+    isWebGPU: true,
+    compatibilityMode: false,
+    enableGPUTimingMeasurements: true,
+    getInfo: () => ({
+      vendor: "nvidia",
+      renderer: "pascal",
+      version: "NVIDIA GeForce GTX 1060",
+    }),
+    getGlInfo() {
+      throw new Error("WebGPU must not request GL info");
+    },
+    getCreationOptions: () => ({
+      antialias: true,
+      powerPreference: "high-performance",
+    }),
+    getRenderingCanvas() {
+      throw new Error("WebGPU must not request a GL context");
+    },
+  };
+  const info = readGpuDiagnostics(engine);
+  assert.equal(info.backend, "webgpu");
+  assert.equal(info.classification, "dedicated");
+  assert.equal(info.renderer, "pascal");
+  assert.equal(info.version, "NVIDIA GeForce GTX 1060");
+  assert.equal(info.webglVersion, null);
+  assert.equal(info.compatibilityMode, false);
+  assert.equal(info.gpuTimingScope, "main-render-pass-only");
+  assert.deepEqual(info.context, {
+    requestedAntialias: true,
+    actualAntialias: null,
+    defaultFramebuffer: null,
+    sampleBuffers: null,
+    samples: null,
+  });
+});
+
+test("renderer info prefers the common API, retains masked data and tolerates lost context", () => {
+  assert.deepEqual(
+    getRendererInfo({
+      getInfo: () => ({
+        renderer: "  measured renderer ",
+        vendor: "vendor",
+        version: "v1",
+      }),
+      getGlInfo() {
+        throw new Error("common API must take precedence");
+      },
+    }),
+    { renderer: "measured renderer", vendor: "vendor", version: "v1" },
+  );
+  const missing = getRendererInfo({
+    isWebGPU: true,
+    getGlInfo() {
+      throw new Error("forbidden");
+    },
+  });
+  assert.match(missing.renderer, /Nezveřejněno/);
+  assert.deepEqual(
+    getRendererInfo({
+      getInfo() {
+        throw new Error("lost");
+      },
+    }),
+    missing,
+  );
+  assert.equal(
+    readGpuDiagnostics({
+      isWebGPU: true,
+      getInfo: () => ({ renderer: "pascal", vendor: "nvidia" }),
+    }).classification,
+    "unknown",
+  );
+});
+
+test("WebGPU pass time rejects missing, stale and zero legacy-style samples", () => {
+  const engine = {
+    isWebGPU: true,
+    enableGPUTimingMeasurements: true,
+    gpuTimeInFrameForMainPass: { counter: { count: 0, current: 0 } },
+  };
+  assert.equal(readWebGpuMainPassTiming(engine).ms, null);
+  engine.gpuTimeInFrameForMainPass.counter = { count: 1, current: 14_500_000 };
+  assert.deepEqual(readWebGpuMainPassTiming(engine), {
+    scope: "main-render-pass-only",
+    count: 1,
+    fresh: true,
+    ms: 14.5,
+  });
+  assert.equal(readWebGpuMainPassTiming(engine, 1).ms, null);
+  for (const current of [0, -1, NaN, Infinity]) {
+    engine.gpuTimeInFrameForMainPass.counter.current = current;
+    assert.equal(readWebGpuMainPassTiming(engine).ms, null);
+  }
+  engine.enableGPUTimingMeasurements = false;
+  assert.equal(readWebGpuMainPassTiming(engine).ms, null);
+  assert.equal(readWebGpuMainPassTiming({ isWebGPU: false }).ms, null);
 });
 
 test("software renderer takes precedence and ambiguous GPU names remain unknown", () => {

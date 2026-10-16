@@ -27,15 +27,78 @@ export type GpuDiagnostics = {
   requestedPowerPreference: GpuPowerPreference;
   warnings: string[];
   context: GpuContextDiagnostics;
+  /** Optional for archived diagnostics created before backend comparison. */
+  backend?: "webgl1" | "webgl2" | "webgpu" | "unknown";
+  compatibilityMode?: boolean | null;
+  gpuTimingScope?: "whole-frame" | "main-render-pass-only" | "unavailable";
 };
 
 /** Kept structural so tests can exercise unavailable or privacy-masked browser information. */
 export type GpuDiagnosticEngine = {
-  getGlInfo(): { renderer?: string; vendor?: string; version?: string };
+  getInfo?(): { renderer?: string; vendor?: string; version?: string };
+  getGlInfo?(): { renderer?: string; vendor?: string; version?: string };
   getCreationOptions?(): unknown;
   readonly webGLVersion?: number;
+  readonly isWebGPU?: boolean;
+  readonly compatibilityMode?: boolean;
+  readonly enableGPUTimingMeasurements?: boolean;
+  readonly gpuTimeInFrameForMainPass?: {
+    counter: { count: number; current: number };
+  };
+  getCaps?(): { timerQuery?: unknown };
   getRenderingCanvas?(): HTMLCanvasElement | null;
 };
+
+/** getInfo is shared by the pinned WebGL and WebGPU engines. Legacy getGlInfo
+ * remains accepted for older fixtures; WebGPU must never query a GL context. */
+export function getRendererInfo(engine: GpuDiagnosticEngine) {
+  const result = {
+    renderer: "Nezveřejněno prohlížečem",
+    vendor: "Nezveřejněno prohlížečem",
+    version: "Neznámá",
+  };
+  try {
+    const info = engine.getInfo
+      ? engine.getInfo()
+      : !engine.isWebGPU
+        ? engine.getGlInfo?.()
+        : undefined;
+    for (const key of ["renderer", "vendor", "version"] as const) {
+      const value = info?.[key];
+      if (typeof value === "string" && value.trim()) result[key] = value.trim();
+    }
+  } catch {
+    // A lost context or privacy restriction must not prevent playing.
+  }
+  return result;
+}
+
+/** Nanoseconds from pass timestamps, never the legacy whole-frame WebGPU
+ * counter. Missing/zero/stale samples stay null and are not a zero-cost frame. */
+export function readWebGpuMainPassTiming(
+  engine: GpuDiagnosticEngine,
+  afterCount = 0,
+) {
+  const counter =
+    engine.isWebGPU && engine.enableGPUTimingMeasurements
+      ? engine.gpuTimeInFrameForMainPass?.counter
+      : undefined;
+  const count =
+    counter && Number.isInteger(counter.count) && counter.count > 0
+      ? counter.count
+      : 0;
+  const fresh = count > afterCount;
+  const value = counter?.current;
+  return {
+    scope: "main-render-pass-only" as const,
+    count,
+    fresh,
+    ms:
+      fresh && typeof value === "number" && Number.isFinite(value) && value > 0
+        ? value / 1e6
+        : null,
+  };
+}
 
 /** Read once outside timed rendering. Never bind a framebuffer or recreate the
  * context to obtain diagnostics; an offscreen binding stays unreported. */
@@ -54,6 +117,7 @@ export function readGpuContextDiagnostics(
       { antialias?: unknown } | undefined;
     if (typeof options?.antialias === "boolean")
       result.requestedAntialias = options.antialias;
+    if (engine.isWebGPU) return result;
     if (engine.webGLVersion !== 1 && engine.webGLVersion !== 2) return result;
     const canvas = engine.getRenderingCanvas?.();
     const gl = canvas?.getContext(
@@ -118,24 +182,18 @@ function powerPreference(options: unknown): GpuPowerPreference {
 export function readGpuDiagnostics(
   engine: GpuDiagnosticEngine,
 ): GpuDiagnostics {
-  let renderer = "Nezveřejněno prohlížečem",
-    vendor = "Nezveřejněno prohlížečem",
-    version = "Neznámá";
+  const { renderer, vendor, version } = getRendererInfo(engine);
   let requestedPowerPreference: GpuPowerPreference = "unknown";
-  try {
-    const info = engine.getGlInfo();
-    renderer = info.renderer?.trim() || renderer;
-    vendor = info.vendor?.trim() || vendor;
-    version = info.version?.trim() || version;
-  } catch {
-    // A lost context or privacy restriction must not prevent launching the game.
-  }
   try {
     requestedPowerPreference = powerPreference(engine.getCreationOptions?.());
   } catch {
     // Engine diagnostics are optional; absence is not evidence of a default adapter.
   }
-  const classification = classifyGpu(renderer);
+  // WebGPU getInfo puts the adapter description in version and its architecture
+  // in renderer. Preserve both raw values, classify only explicit known names.
+  const classification = classifyGpu(
+    engine.isWebGPU ? `${renderer} ${vendor} ${version}` : renderer,
+  );
   const warnings: string[] = [];
   if (classification === "integrated")
     warnings.push(
@@ -157,13 +215,32 @@ export function readGpuDiagnostics(
     renderer,
     vendor,
     version,
-    webglVersion: Number.isFinite(engine.webGLVersion)
-      ? engine.webGLVersion!
-      : null,
+    webglVersion:
+      !engine.isWebGPU && Number.isFinite(engine.webGLVersion)
+        ? engine.webGLVersion!
+        : null,
     classification,
     classificationLabel: CLASSIFICATION_LABELS[classification],
     requestedPowerPreference,
     warnings,
     context: readGpuContextDiagnostics(engine),
+    backend: engine.isWebGPU
+      ? "webgpu"
+      : engine.webGLVersion === 2
+        ? "webgl2"
+        : engine.webGLVersion === 1
+          ? "webgl1"
+          : "unknown",
+    compatibilityMode:
+      engine.isWebGPU && typeof engine.compatibilityMode === "boolean"
+        ? engine.compatibilityMode
+        : null,
+    gpuTimingScope: engine.isWebGPU
+      ? engine.enableGPUTimingMeasurements
+        ? "main-render-pass-only"
+        : "unavailable"
+      : engine.getCaps?.().timerQuery
+        ? "whole-frame"
+        : "unavailable",
   };
 }
