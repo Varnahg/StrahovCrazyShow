@@ -785,6 +785,11 @@ export class Game {
     this.canvas.dataset.bootStage = "presentation";
     this.presentationRate = await this.renderHealth.guard(measurePresentationRate());
     this.assertStartupActive();
+    sessionDiagnostics.event("presentation-rate", {
+      ...this.presentationRate,
+      rendererId: this.renderHealth.rendererId,
+      scope: "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit",
+    });
     this.applyAdaptiveQuality(
       this.adaptive.setPresentationHz(
         this.presentationRate.reliable
