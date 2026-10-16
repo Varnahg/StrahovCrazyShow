@@ -1,5 +1,6 @@
 import "./render-shaders";
 import { sessionDiagnostics } from "./session-diagnostics";
+import { createEnvironmentProfile } from "./environment-profile";
 import {
   snapshotAcceptedAuthorityDiagnostics,
   snapshotTransportDiagnostics,
@@ -436,6 +437,19 @@ export class Game {
   private rendererFailed = false;
   private readonly startupAssets = new Set<{ dispose(): void }>();
   private readonly compilationProfile: WebGpuCompilationProfile;
+  private readonly environmentProfile: ReturnType<typeof createEnvironmentProfile>;
+  private profiledLightingInstant = 0;
+  private profiledDaylight = 0;
+  private profiledPreviousExposure = 1;
+  private readonly environmentProfileMetadata = () => ({
+    quality: this.quality,
+    lightingInstant: this.profiledLightingInstant,
+    daylight: this.profiledDaylight,
+    previousExposure: this.profiledPreviousExposure,
+    exposure: this.scene.imageProcessingConfiguration.exposure,
+    meshCount: this.scene.meshes.length,
+    materialCount: this.scene.materials.length,
+  });
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
   private readonly stableLights: StableLightState;
@@ -566,6 +580,16 @@ export class Game {
         ...sample, rendererId: this.renderHealth.rendererId, purpose: "game",
       }),
     });
+    this.environmentProfile = createEnvironmentProfile(window.location, {
+      onSlowFrame: (sample) => sessionDiagnostics.event("environment-work", {
+        ...sample, rendererId: this.renderHealth.rendererId,
+      }),
+    });
+    if (this.environmentProfile)
+      sessionDiagnostics.event("environment-profiling", {
+        rendererId: this.renderHealth.rendererId,
+        scope: this.environmentProfile.scope,
+      });
     this.applyAdaptiveQuality(this.adaptive.state);
     this.gpu = readGpuDiagnostics(this.engine);
     this.engine.onContextRestoredObservable.add(() => {
@@ -2140,6 +2164,9 @@ export class Game {
     instant = this.timeOverride ?? Date.now(),
     flashlightOn = this.flashlightOn,
   ) {
+    if (this.environmentProfile)
+      this.profiledPreviousExposure = this.scene.imageProcessingConfiguration.exposure;
+    this.environmentProfile?.begin();
     const { sun, moon, wind } = this.skyWeather.update({
       instant,
       weather: this.weather,
@@ -2147,6 +2174,7 @@ export class Game {
       dt,
       quality: this.quality,
     });
+    this.environmentProfile?.mark("skyWeather");
     const lighting = applyArtLighting(this, {
       sun,
       moon,
@@ -2160,13 +2188,16 @@ export class Game {
       dt,
       instant,
     });
+    this.environmentProfile?.mark("artLighting");
     this.updateCarLighting?.(lighting.night);
+    this.environmentProfile?.mark("carLighting");
     this.vehicleLighting?.update(
       this.car,
       lighting.night,
       this.car.isEnabled(),
       this.quality,
     );
+    this.environmentProfile?.mark("vehicleLighting");
     this.flashlight?.update(
       self,
       this.camera,
@@ -2174,6 +2205,7 @@ export class Game {
       cameraLight,
       this.quality,
     );
+    this.environmentProfile?.mark("flashlight");
     this.vegetation?.update({
       dt,
       time,
@@ -2182,12 +2214,14 @@ export class Game {
       player: pos,
       quality: this.quality,
     });
+    this.environmentProfile?.mark("vegetation");
     this.transit?.update({
       now: this.trafficInstant(),
       player: pos,
       quality: this.quality as "low" | "medium" | "high",
       dt,
     });
+    this.environmentProfile?.mark("transit");
     const raining =
       ((this.weather?.rain ?? 0) > 0.05 ||
         (this.weather?.snowfall ?? 0) > 0.005) &&
@@ -2208,7 +2242,9 @@ export class Game {
         instance: this.rain,
       });
     }
+    this.environmentProfile?.mark("precipitation");
     this.surfacePack?.update(dt, this.quality, this.weather?.rain ?? 0);
+    this.environmentProfile?.mark("surfaces");
     this.cinematic?.update({
       dt,
       player: pos,
@@ -2220,6 +2256,12 @@ export class Game {
       avatars: this.avatars.values(),
       localId: this.localId,
     });
+    this.environmentProfile?.mark("cinematic");
+    if (this.environmentProfile) {
+      this.profiledLightingInstant = instant;
+      this.profiledDaylight = sun.daylight;
+      this.environmentProfile.end(this.environmentProfileMetadata);
+    }
     return lighting;
   }
   private prepareLighting(render: () => void) {

@@ -14,6 +14,7 @@ import {
 } from "../client/session-diagnostics";
 import { NetworkTimeline } from "../client/network-timeline";
 import { readWebGpuMainPassTiming } from "../client/gpu-diagnostics";
+import { createEnvironmentProfile, type EnvironmentProfileSnapshot } from "../client/environment-profile";
 import { writeQuaternion, writeVector3 } from "../client/transform-updates";
 import {
   snapshotTransportDiagnostics,
@@ -47,6 +48,7 @@ const members = declaration.members.filter(
       "frame",
       "updateWorldPresentation",
       "updateRenderEnvironment",
+      "environmentProfileMetadata",
       "diagnosticContext",
       "diagnosticNetworkContext",
       "resetDiagnosticContext",
@@ -268,6 +270,39 @@ function fixture(hostname = "localhost") {
     records: () => posts.flatMap((batch) => batch.records),
   };
 }
+
+test("actual environment update attributes synchronous work and reports metadata outside its interval", (t) => {
+  const f = fixture();
+  t.after(() => f.recorder.dispose());
+  let clock = 0;
+  const reports: EnvironmentProfileSnapshot[] = [];
+  Object.assign(f.game.scene, {
+    imageProcessingConfiguration: { exposure: 0.75 },
+    meshes: [{}, {}], materials: [{}],
+  });
+  const skyUpdate = f.game.skyWeather.update;
+  f.game.skyWeather.update = () => { clock += 2; return skyUpdate(); };
+  f.game.surfacePack = { update: () => { clock += 3; } };
+  f.game.cinematic = { update: () => {
+    clock += 40;
+    f.game.scene.imageProcessingConfiguration.exposure = 0.8;
+  } };
+  f.game.environmentProfile = createEnvironmentProfile(
+    { hostname: "localhost", search: "?profileEnvironment=1" },
+    { now: () => clock, onSlowFrame: (report) => { reports.push(report); clock += 100; } },
+  );
+  f.game.updateRenderEnvironment({ x: 0, y: 1, z: 2 }, undefined, false, 0.016, 12, 1234);
+  assert.equal(reports.length, 1);
+  assert.equal(reports[0].totalMs, 45);
+  assert.equal(reports[0].phasesMs.skyWeather, 2);
+  assert.equal(reports[0].phasesMs.surfaces, 3);
+  assert.equal(reports[0].phasesMs.cinematic, 40);
+  assert.equal(Object.values(reports[0].phasesMs).reduce((sum, value) => sum + value, 0), 45);
+  assert.deepEqual({ ...reports[0].metadata }, {
+    quality: "medium", lightingInstant: 1234, daylight: 1,
+    previousExposure: 0.75, exposure: 0.8, meshCount: 2, materialCount: 1,
+  });
+});
 
 test("actual production Game.frame automatically records intervals, six phases and only fresh GPU samples", async (t) => {
   const f = fixture();
