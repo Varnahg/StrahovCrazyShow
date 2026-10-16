@@ -1,5 +1,9 @@
 # WebGPU migration root handoff (ongoing)
 
+## Resumed goal and authorized follow-up
+
+2026-10-16: user explicitly resumed the full migration goal. Native-v3 remains a protected live user playtest. After the full current objective has actually passed its completion audit, the user explicitly requests activating/continuing the goal in `codex://threads/01a13624-c16c-7c11-aa35-070e349e0266`. This is authorization to send that task the continuation instruction at that time; do not trigger it before this migration is complete. Keep this as an outstanding final handoff action, not a substitute for finishing the migration.
+
 ## User playtest handoff — migration paused
 
 2026-10-16 user requested stopping further development and starting the quickest playable build. Frozen `native-v3`, commit `f969bd18d374814bcebad5628e57f9475e25b0b3`, source snapshot `4979284c89088eb2e4cf36d5f96202d9c580f6f0818e6a700b956d53cb1906b9` (8438 inputs), is running at http://127.0.0.1:4192/?renderBackend=webgpu with API2587. Edge tab2070822668 is a user deliverable, viewport override reset. Actual scene/avatar/cars/world rendered; renderer-ready reports WebGPU, nvidia/pascal; B6/car/physics ready and game-ready observed. This is a working migration checkpoint, not complete acceptance.
