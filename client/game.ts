@@ -69,6 +69,7 @@ import { updateRainSegments } from "./weather-particles";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { getRendererInfo } from "./gpu-diagnostics";
 import { RenderHealth, type RenderHealthSnapshot } from "./render-health";
+import { waitForRenderStartup } from "./render-startup";
 import { WebGpuCompilationProfile } from "./webgpu-compilation-profile";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
@@ -320,6 +321,7 @@ export class Game {
   onPredictionReset?: (priority?: boolean) => void;
   onAction?: (action: string, data?: unknown) => void | boolean;
   onStats?: (stats: GameStats) => void;
+  onRendererFailure?: (message: string) => void;
   onNotice?: (message: string) => void;
   onBenchmark?: (result: Benchmark) => void;
   onSelection?: (selection: WorldSelection | null) => void;
@@ -430,6 +432,9 @@ export class Game {
   disposed = false;
   renderErrorCount = 0;
   readonly renderHealth: RenderHealth;
+  private readonly startupAbort = new AbortController();
+  private rendererFailed = false;
+  private readonly startupAssets = new Set<{ dispose(): void }>();
   private readonly compilationProfile: WebGpuCompilationProfile;
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
@@ -546,9 +551,7 @@ export class Game {
           count: health.errorCount,
         });
       if (fault.channel === "device") {
-        this.engine.stopRenderLoop();
-        this.blur();
-        this.notice("Grafické zařízení se odpojilo. Opusť demo a spusť scénu znovu.");
+        this.handleRendererFailure("Grafické zařízení se odpojilo. Opusť demo a spusť scénu znovu.");
         return;
       }
       if (this.renderErrorCount === 1)
@@ -701,10 +704,63 @@ export class Game {
     canvas.addEventListener("wheel", this.wheel, { passive: false });
     window.addEventListener("resize", this.resize);
   }
+  private handleRendererFailure(message: string) {
+    if (this.disposed || this.rendererFailed) return;
+    this.rendererFailed = true;
+    this.ready = false;
+    this.startupAbort.abort();
+    this.disposeStartupAssets();
+    this.cancelLightPreparation?.();
+    this.engine.stopRenderLoop();
+    this.benchmark?.profile.dispose();
+    this.benchmark = undefined;
+    this.blur();
+    this.notice(message);
+    this.onRendererFailure?.(message);
+  }
+  private assertStartupActive() {
+    const health = this.renderHealth.snapshot();
+    if (this.rendererFailed || health.errorCount || health.phase === "restart-required")
+      throw new Error(health.firstErrors[0]?.message ?? "Renderer vyžaduje nové spuštění.");
+    if (this.disposed || this.startupAbort.signal.aborted || health.phase === "disposed") {
+      const error = new Error("Spuštění 3D scény bylo zrušeno.");
+      error.name = "AbortError";
+      throw error;
+    }
+  }
+  private disposeStartupAsset(asset: { dispose(): void }) {
+    try { asset.dispose(); }
+    catch (error) {
+      sessionDiagnostics.event("late-startup-cleanup-error", {
+        rendererId: this.renderHealth.rendererId, message: String(error),
+      });
+    }
+  }
+  private disposeStartupAssets() {
+    const abandoned = [...this.startupAssets];
+    this.startupAssets.clear();
+    for (const asset of abandoned) this.disposeStartupAsset(asset);
+  }
+  private trackStartupAsset<T extends { dispose(): void }>(operation: Promise<T>): Promise<T> {
+    return operation.then((asset) => {
+      try {
+        this.assertStartupActive();
+        this.startupAssets.add(asset);
+      } catch { this.disposeStartupAsset(asset); }
+      return asset;
+    });
+  }
+  private isMeshReadyForCamera(mesh: { isReady(check: boolean): boolean }) {
+    const previousPass = this.engine.currentRenderPassId;
+    this.engine.currentRenderPassId = this.camera.renderPassId;
+    try { return mesh.isReady(true); }
+    finally { this.engine.currentRenderPassId = previousPass; }
+  }
   async start() {
+    this.assertStartupActive();
     this.canvas.dataset.bootStage = "presentation";
-    this.presentationRate = await measurePresentationRate();
-    if (this.disposed) return;
+    this.presentationRate = await this.renderHealth.guard(measurePresentationRate());
+    this.assertStartupActive();
     this.applyAdaptiveQuality(
       this.adaptive.setPresentationHz(
         this.presentationRate.reliable
@@ -713,8 +769,8 @@ export class Game {
       ),
     );
     this.canvas.dataset.bootStage = "physics-library";
-    await initPhysics();
-    if (this.disposed) return;
+    await this.renderHealth.guard(initPhysics());
+    this.assertStartupActive();
     // Survey/photogrammetry is an offline spatial reference. Gameplay uses
     // separately authored assets on the same DMR terrain as its colliders.
     this.canvas.dataset.worldMode = "authored-separate-assets";
@@ -740,44 +796,45 @@ export class Game {
         { loadVegetation },
         { TransitRenderer },
         { loadB6Reality },
-      ] = await Promise.all([
+      ] = await this.renderHealth.guard(Promise.all([
         import("./assets"),
         import("./vegetation"),
         import("./transit-renderer"),
         import("./b6-reality"),
-      ]);
-      if (this.disposed) return;
+      ]));
+      this.assertStartupActive();
       this.transit = new TransitRenderer(this.scene, (x, z) =>
         this.sim.surfaceHeight(x, z),
       );
-      const [interior, vegetation, car] = await Promise.allSettled([
-        loadB6Reality(this.scene, {
+      const [interior, vegetation, car] = await this.renderHealth.guard(Promise.allSettled([
+        this.trackStartupAsset(loadB6Reality(this.scene, {
           foundationY: B6_LAYOUT.foundationOffset,
         }).then(
           (value) => {
-            this.canvas.dataset.b6Stage = "ready";
+            if (!this.disposed && !this.rendererFailed) this.canvas.dataset.b6Stage = "ready";
             return value;
           },
           (error) => {
-            this.canvas.dataset.b6Stage = String(error);
+            if (!this.disposed && !this.rendererFailed) this.canvas.dataset.b6Stage = String(error);
             throw error;
           },
-        ),
-        loadVegetation(this.scene),
-        loadCar(this.scene).then(
+        )),
+        this.trackStartupAsset(loadVegetation(this.scene)),
+        this.trackStartupAsset(loadCar(this.scene).then(
           (value) => {
-            this.canvas.dataset.carStage = "ready";
+            if (!this.disposed && !this.rendererFailed) this.canvas.dataset.carStage = "ready";
             return value;
           },
           (error) => {
-            this.canvas.dataset.carStage = String(error);
+            if (!this.disposed && !this.rendererFailed) this.canvas.dataset.carStage = String(error);
             throw error;
           },
-        ),
-      ]);
-      if (this.disposed) return;
+        )),
+      ]));
+      this.assertStartupActive();
       if (interior.status === "fulfilled") {
         this.b6Reality = interior.value;
+        this.startupAssets.delete(interior.value);
         if (this.worldControllers)
           this.b6Reality.attachToBuilding(this.worldControllers.b6Root);
         this.worldControllers?.b6Fallback.dispose();
@@ -785,7 +842,10 @@ export class Game {
         this.startupAssetErrors++;
         console.error("B6 interior models", interior.reason);
       }
-      if (vegetation.status === "fulfilled") this.vegetation = vegetation.value;
+      if (vegetation.status === "fulfilled") {
+        this.vegetation = vegetation.value;
+        this.startupAssets.delete(vegetation.value);
+      }
       else {
         this.startupAssetErrors++;
         console.error("Vegetation models", vegetation.reason);
@@ -797,6 +857,7 @@ export class Game {
         this.parkedCar = car.value.parked;
         this.updateCarWheels = car.value.updateWheels;
         this.disposeCarAssets = car.value.dispose;
+        this.startupAssets.delete(car.value);
         this.setCarQuality = car.value.setQuality;
         this.setCarQuality(this.quality);
         this.updateCarLighting = car.value.updateLighting;
@@ -806,11 +867,13 @@ export class Game {
       }
       this.car.setEnabled(false);
     } catch (error) {
+      this.disposeStartupAssets();
       if (this.disposed) return;
+      if (this.rendererFailed || this.renderHealth.snapshot().errorCount) throw error;
       this.startupAssetErrors++;
       console.warn("Používám geometrickou zálohu auta.", error);
     }
-    if (this.disposed) return;
+    this.assertStartupActive();
     this.surfacePack = new SurfacePack(this.scene);
     this.surfacePack.update(1, this.quality, this.weather?.rain ?? 0);
     this.cinematic = new CinematicAtmosphere(this.scene, this.camera, this.sun);
@@ -818,19 +881,30 @@ export class Game {
     this.updatePlayers([this.localPlayer]);
     this.engine.stopRenderLoop(preloadRender);
     this.canvas.dataset.bootStage = "light-preparation";
-    const preparation = await this.prepareLighting(preloadRender);
+    const preparation = await this.renderHealth.guard(this.prepareLighting(preloadRender));
+    this.assertStartupActive();
     sessionDiagnostics.event("lighting-preparation", preparation);
     sessionDiagnostics.event("webgpu-preparation-profile", this.compilationProfile.snapshot());
-    if (this.disposed) return;
     this.canvas.dataset.lightPreparation = preparation.status;
-    if (preparation.status !== "complete")
+    if (preparation.status !== "complete") {
       this.renderHealth.report("pipeline", `Příprava světel: ${preparation.status}`);
-    const readyObserver = this.engine.onEndFrameObservable.add(() => {
-      if (this.renderHealth.markReady()) {
-        this.canvas.dataset.renderHealth = "ready";
-        readyObserver.remove(true);
-      }
+      throw new Error(`Přípravu 3D scény se nepodařilo dokončit (${preparation.status}).`);
+    }
+    this.canvas.dataset.bootStage = "submitted-frame";
+    await waitForRenderStartup({
+      engine: this.engine,
+      health: this.renderHealth,
+      render: preloadRender,
+      isReady: () => {
+        const meshes = this.scene.getActiveMeshes();
+        for (let index = 0; index < meshes.length; index++)
+          if (!this.isMeshReadyForCamera(meshes.data[index])) return false;
+        return this.engine.areAllEffectsReady();
+      },
+      signal: this.startupAbort.signal,
     });
+    this.assertStartupActive();
+    this.canvas.dataset.renderHealth = "ready";
     this.ready = true;
     this.canvas.dataset.bootStage = "ready";
     this.engine.runRenderLoop(() => this.frame());
@@ -1310,7 +1384,9 @@ export class Game {
       this.applyAdaptiveQuality(this.adaptive.setTargetFps(fps));
   }
   startBenchmark() {
-    if (!this.ready) return;
+    if (!this.ready || this.disposed || this.rendererFailed) return false;
+    // Keep failed-render raw samples available for diagnosis. Their start/end
+    // health and error counts invalidate performance claims in UI and reports.
     this.benchmark?.profile.dispose();
     sessionDiagnostics.event("benchmark-start", {
       rendererId: this.renderHealth.rendererId,
@@ -1339,6 +1415,7 @@ export class Game {
       healthAtStart: this.renderHealth.snapshot(),
       compilationAtStart: this.compilationProfile.snapshot(),
     };
+    return true;
   }
   interact() {
     if (!this.ready) return;
@@ -2239,16 +2316,13 @@ export class Game {
         return active.data.slice(0, active.length);
       },
       beforeChecks: () => this.scene.incrementRenderId(),
-      check: (mesh) => {
-        const previousPass = this.engine.currentRenderPassId;
-        this.engine.currentRenderPassId = this.camera.renderPassId;
-        try {
-          return mesh.isReady(true);
-        } finally {
-          this.engine.currentRenderPassId = previousPass;
-        }
+      check: (mesh) => this.isMeshReadyForCamera(mesh),
+      effectsReady: () => {
+        const health = this.renderHealth.snapshot();
+        if (health.errorCount || health.phase === "restart-required")
+          throw new Error("Příprava rendereru byla přerušena chybou zařízení nebo shaderu.");
+        return health.pendingOperations === 0 && this.engine.areAllEffectsReady();
       },
-      effectsReady: () => this.engine.areAllEffectsReady(),
       render,
       run: (callback) => this.engine.runRenderLoop(callback),
       stop: (callback) => this.engine.stopRenderLoop(callback),
@@ -2270,6 +2344,12 @@ export class Game {
         this.scene.meshes.length,
         this.scene.materials.length,
       ],
+      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials"],
+      isVisible: () => !document.hidden,
+      onVisibilityChange: (callback) => {
+        document.addEventListener("visibilitychange", callback);
+        return () => document.removeEventListener("visibilitychange", callback);
+      },
       now: () => performance.now(),
       setTimer: (callback, milliseconds) =>
         window.setTimeout(callback, milliseconds),
@@ -2736,6 +2816,10 @@ export class Game {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.ready = false;
+    this.startupAbort.abort();
+    this.renderHealth.dispose();
+    this.disposeStartupAssets();
     this.cancelLightPreparation?.();
     sessionDiagnostics.event("game-dispose", {});
     this.resetDiagnosticContext();

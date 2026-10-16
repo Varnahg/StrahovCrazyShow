@@ -57,6 +57,7 @@ function fixture(t: TestContext) {
     checks = 0,
     detached = 0;
   class Device extends EventTarget {
+    readonly lost = new Promise<{ reason: string; message: string }>(() => {});
     pushErrorScope() {
       calls.push("push");
     }

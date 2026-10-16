@@ -1212,6 +1212,7 @@ for (const outcome of [
     };
     Object.assign(game, {
       ready: false,
+      renderHealth: { snapshot: () => ({ valid: game.ready, firstErrors: [] }) },
       // Game constructs its Scene before start; UI may inspect its inventory.
       scene: { meshes: [], materials: [] },
       setQuality() {},

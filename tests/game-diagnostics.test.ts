@@ -51,6 +51,8 @@ const members = declaration.members.filter(
       "diagnosticNetworkContext",
       "resetDiagnosticContext",
       "dispose",
+      "disposeStartupAssets",
+      "disposeStartupAsset",
     ].includes(node.name.getText(source)),
 );
 assert.ok(members.some((node) => node.name?.getText(source) === "frame"));
@@ -150,6 +152,9 @@ function fixture(hostname = "localhost") {
   const game = Object.assign(new FrameGame(), {
     ready: true,
     disposed: false,
+    startupAbort: new AbortController(),
+    startupAssets: new Set(),
+    renderHealth: { dispose() {} },
     network: false,
     localId: "private-local-id",
     localPlayer: {},

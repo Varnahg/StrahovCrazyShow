@@ -60,7 +60,7 @@ const make = new Script(
 ).runInThisContext();
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
-function fixture(options: { constructionError?: boolean; startError?: boolean } = {}) {
+function fixture(options: { constructionError?: boolean; startError?: boolean; loseAfterStart?: boolean } = {}) {
   let resolveEngine!: (engine: any) => void;
   let rejectEngine!: (reason: Error) => void;
   const promise = new Promise((resolve, reject) => {
@@ -82,6 +82,9 @@ function fixture(options: { constructionError?: boolean; startError?: boolean } 
   const canvas = { current: {} };
   const initialCanvas = canvas.current;
   class Game {
+    onRendererFailure?: (message: string) => void;
+    ready = false;
+    renderHealth = { snapshot: () => ({ valid: this.ready, firstErrors: [] }) };
     constructor(_canvas: unknown, _profile: unknown, prepared: unknown) {
       assert.equal(_canvas, initialCanvas);
       assert.equal(prepared, engine);
@@ -93,6 +96,11 @@ function fixture(options: { constructionError?: boolean; startError?: boolean } 
     setTargetFps() {}
     async start() {
       if (options.startError) throw new Error("start failed");
+      this.ready = true;
+      if (options.loseAfterStart) queueMicrotask(() => {
+        this.ready = false;
+        this.onRendererFailure?.("Device lost after start settlement");
+      });
     }
     dispose() {
       gameDisposals++;
@@ -214,6 +222,29 @@ test("start failure releases the engine through its Game owner exactly once", as
   assert.equal(f.state.current, null);
   assert.equal(f.errors.length, 1);
   assert.equal(f.stats().ready, false);
+  f.cleanup();
+  assert.equal(f.engine.disposed, 1);
+});
+
+test("a live renderer failure clears UI ready and a retired callback cannot alter a replacement", async () => {
+  const f = fixture();
+  await tick(); f.resolveEngine(f.engine); await tick();
+  const callback = f.state.current!.onRendererFailure!;
+  callback("Device lost; restart required");
+  assert.equal(f.stats().ready, false);
+  assert.equal(f.errors.at(-1), "Device lost; restart required");
+  f.cleanup();
+  const count = f.errors.length;
+  callback("retired renderer");
+  assert.equal(f.errors.length, count);
+});
+
+test("loss between Game start settlement and UI continuation cannot announce game-ready", async () => {
+  const f = fixture({ loseAfterStart: true });
+  await tick(); f.resolveEngine(f.engine); await tick();
+  assert.equal(f.stats().ready, false);
+  assert.equal(f.events.includes("game-ready"), false);
+  assert.equal(f.stats().gameDisposals, 1);
   f.cleanup();
   assert.equal(f.engine.disposed, 1);
 });

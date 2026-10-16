@@ -200,6 +200,9 @@ const runtime: RenderEngineRuntime<AbstractEngine> = {
       stencil: true,
       adaptToDeviceRatio: false,
       powerPreference: PREFERRED_GPU_POWER,
+      // RenderHealth owns device.lost and requires a new prepared renderer.
+      // Babylon's automatic restore could allocate a device after UI teardown.
+      doNotHandleContextLost: true,
       // Babylon intersects this list with adapter support before requestDevice.
       deviceDescriptor: { requiredFeatures: ["timestamp-query"] },
     });

@@ -532,6 +532,12 @@ export function App() {
         const g = new Game(startupCanvas, profileRef.current, pendingEngine);
         pendingEngine = undefined;
         game.current = g;
+        g.onRendererFailure = (message) => {
+          if (cancelled || game.current !== g) return;
+          userBenchmark.current = false;
+          setReady(false);
+          setError(message);
+        };
         g.network = mode === "multi";
         syncNetworkStage(g);
         g.timeOverride = lightingPreviewRef.current.instant;
@@ -582,7 +588,10 @@ export function App() {
         g.setQuality(quality);
         g.setTargetFps(targetFps);
         await g.start();
-        if (cancelled) return;
+        if (cancelled || game.current !== g || canvas.current !== startupCanvas) return;
+        const health = g.renderHealth.snapshot();
+        if (!g.ready || !health.valid)
+          throw new Error(health.firstErrors[0]?.message ?? "Renderer nedokončil přípravu.");
         sessionDiagnostics.event("game-ready", { mode });
         if (mode === "multi") {
           g.updatePlayers(playersRef.current);
@@ -2641,9 +2650,10 @@ function BenchmarkControls({
         className="secondary full"
         disabled={!game?.ready || active}
         onClick={() => {
-          onUserStart();
-          game?.startBenchmark();
-          setRunning(true);
+          if (game?.startBenchmark()) {
+            onUserStart();
+            setRunning(true);
+          }
         }}
       >
         {active ? t("Měřím 10 sekund…") : t("Změřit FPS po dobu 10 sekund")}
@@ -2663,7 +2673,7 @@ function BenchmarkControls({
       )}
       {result && (
         <>
-          {(result.renderErrorCount > 0 || result.assetLoadErrorCount > 0) && (
+          {(result.renderErrorCount > 0 || result.assetLoadErrorCount > 0 || result.renderHealth?.valid === false) && (
             <p role="alert">
               {t(
                 "Měření je neplatné: prostředí obsahuje chybu vykreslování nebo načtení modelů. Obnov stránku před dalším měřením.",

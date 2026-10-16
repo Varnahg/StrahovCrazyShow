@@ -35,14 +35,14 @@ const declaration = source.statements.find(
 )!;
 const members = declaration.members.filter(
   (node) =>
-    node.name && ["prepareLighting"].includes(node.name.getText(source)),
+    node.name && ["prepareLighting", "isMeshReadyForCamera"].includes(node.name.getText(source)),
 );
 const compiled = ts.transpileModule(
   `class PreparationGame { ${members.map((node) => node.getText(source)).join("\n")} };`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(`(function(environment) {
-  const { PlayerFlashlight, Vector3, prepareLightVariants, selectLightingPreview, performance, window } = environment;
+  const { PlayerFlashlight, Vector3, prepareLightVariants, selectLightingPreview, performance, window, document } = environment;
   ${compiled}
   return PreparationGame;
 })`).runInThisContext();
@@ -90,6 +90,7 @@ function fixture(t: import("node:test").TestContext) {
     prepareLightVariants,
     selectLightingPreview,
     performance: { now: () => now },
+    document: { hidden: false, addEventListener() {}, removeEventListener() {} },
     window: {
       setTimeout(callback: () => void) {
         timer = callback;
@@ -120,6 +121,7 @@ function fixture(t: import("node:test").TestContext) {
     scene,
     camera,
     engine,
+    renderHealth: { snapshot: () => ({ errorCount: 0, pendingOperations: 0, phase: "preparing" }) },
     stableLights,
     lights: streets,
     ready: false,
@@ -393,7 +395,7 @@ test("production startup awaits preparation before ready and records its outcome
   const start = declaration.members
     .find((node) => node.name?.getText(source) === "start")!
     .getText(source);
-  const prepare = start.indexOf("await this.prepareLighting(preloadRender)");
+  const prepare = start.search(/await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(preloadRender\)/);
   assert.ok(prepare > start.indexOf("this.updatePlayers([this.localPlayer])"));
   assert.ok(
     prepare > start.indexOf("this.engine.stopRenderLoop(preloadRender)"),
