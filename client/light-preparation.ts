@@ -4,9 +4,18 @@ export type LightPreparationStage =
   | "current-on"
   | `night-${0 | 1 | 2}-${"off" | "on"}`
   | "restore";
+type PreparationTiming = { calls: number; totalMs: number; maxMs: number };
+const timing = (): PreparationTiming => ({ calls: 0, totalMs: 0, maxMs: 0 });
+const stageCpu = () => ({
+  apply: timing(),
+  checkBatch: timing(),
+  render: timing(),
+});
 export type LightPreparationResult = {
   status: "complete" | "timeout" | "disposed" | "failed";
   elapsedMs: number;
+  activeElapsedMs: number;
+  pausedMs: number;
   failureStep:
     | "apply"
     | "meshes"
@@ -20,6 +29,14 @@ export type LightPreparationResult = {
   stages: {
     stage: LightPreparationStage;
     elapsedMs: number;
+    activeElapsedMs: number;
+    pausedMs: number;
+    tickCount: number;
+    /** Wall gaps preceding stage callbacks, including any explicit hidden pause. */
+    rafGap: { count: number; totalMs: number; maxMs: number };
+    /** Inclusive call wall durations; these are not hardware GPU timings. */
+    cpu: ReturnType<typeof stageCpu>;
+    restartReasons: Record<string, number>;
     checks: number;
     renders: number;
     restarts: number;
@@ -47,6 +64,10 @@ export type LightPreparationOptions = {
   isDisposed(): boolean;
   /** Settings/asset identity changes restart only the current bounded stage. */
   revision(): readonly unknown[];
+  revisionKeys?: readonly string[];
+  /** Without visibility integration, preparation retains its visible deadline. */
+  isVisible?(): boolean;
+  onVisibilityChange?(callback: () => void): () => void;
   now(): number;
   setTimer(callback: () => void, milliseconds: number): unknown;
   clearTimer(timer: unknown): void;
@@ -67,7 +88,7 @@ const stages: readonly LightPreparationStage[] = [
   "restore",
 ];
 
-/** A single engine loop with an independent deadline also when RAF is paused.
+/** A single engine loop with a visible-time deadline even when RAF is stalled.
  * Mesh readiness alone can report the old hot-swapped effect, so the engine's
  * newly created effects must be ready before and after acceptance draws.
  * Separate progress draws start work that depends on rendering first.
@@ -79,7 +100,6 @@ export function prepareLightVariants(
 ): Promise<LightPreparationResult> {
   const started = options.now();
   const timeout = Math.max(1, options.timeoutMs ?? 30_000);
-  const deadline = started + timeout;
   const batchSize = Math.max(1, Math.floor(options.batchSize ?? 128));
   const batchMs = Math.max(0.1, options.batchMs ?? 4);
   return new Promise((resolve) => {
@@ -91,6 +111,17 @@ export function prepareLightVariants(
       renders = 0,
       restarts = 0,
       readyRenders = 0;
+    let visible = true,
+      visibilityAt = started,
+      activeBefore = 0,
+      pausedBefore = 0,
+      stageActiveStarted = 0,
+      stagePausedStarted = 0,
+      lastTickAt = started,
+      tickCount = 0;
+    let rafGap = { count: 0, totalMs: 0, maxMs: 0 };
+    let cpu = stageCpu();
+    let restartReasons: Record<string, number> = Object.create(null);
     let needsApply = true;
     let queue: readonly ReadyMesh[] = [],
       retry: ReadyMesh[] = [],
@@ -100,24 +131,63 @@ export function prepareLightVariants(
       "lifecycle";
     let failureStep: LightPreparationResult["failureStep"] = null;
     let timer: unknown,
-      detach = () => {};
+      timerArmed = false,
+      timerEpoch = 0,
+      detach = () => {},
+      detachVisibility = () => {};
+    const activeElapsed = (at = options.now()) =>
+      activeBefore + (visible ? Math.max(0, at - visibilityAt) : 0);
+    const clock = (at = options.now()) => {
+      const delta = Math.max(0, at - visibilityAt);
+      return {
+        activeElapsedMs: activeBefore + (visible ? delta : 0),
+        pausedMs: pausedBefore + (visible ? 0 : delta),
+      };
+    };
+    const measure = <T>(sample: PreparationTiming, callback: () => T): T => {
+      sample.calls++;
+      const before = options.now();
+      try {
+        return callback();
+      } finally {
+        const elapsed = Math.max(0, options.now() - before);
+        sample.totalMs += elapsed;
+        sample.maxMs = Math.max(sample.maxMs, elapsed);
+      }
+    };
+    const clearWatchdog = () => {
+      timerEpoch++;
+      if (timerArmed) options.clearTimer(timer);
+      timerArmed = false;
+      timer = undefined;
+    };
     const saveStage = () => {
-      if (index >= 0 && index < stages.length)
+      if (index >= 0 && index < stages.length) {
+        const at = options.now();
+        const elapsed = clock(at);
         results.push({
           stage: stages[index],
-          elapsedMs: options.now() - stageStarted,
+          elapsedMs: at - stageStarted,
+          activeElapsedMs: elapsed.activeElapsedMs - stageActiveStarted,
+          pausedMs: elapsed.pausedMs - stagePausedStarted,
+          tickCount,
+          rafGap,
+          cpu,
+          restartReasons: { ...restartReasons },
           checks,
           renders,
           restarts,
         });
+      }
     };
     const finish = (status: LightPreparationResult["status"]) => {
       if (done) return;
       done = true;
       for (const cleanup of [
         () => options.stop(tick),
-        () => options.clearTimer(timer),
+        clearWatchdog,
         () => detach(),
+        () => detachVisibility(),
       ]) {
         try {
           cleanup();
@@ -135,15 +205,112 @@ export function prepareLightVariants(
           failureStep = "restore";
         }
       }
+      const at = options.now();
+      const elapsed = clock(at);
       resolve({
-        status,
-        elapsedMs: options.now() - started,
+        status:
+          status === "complete" && elapsed.activeElapsedMs >= timeout
+            ? "timeout"
+            : status,
+        elapsedMs: at - started,
+        ...elapsed,
         failureStep,
         stages: results,
       });
       queue = [];
       retry = [];
       revision = [];
+    };
+    const armWatchdog = () => {
+      clearWatchdog();
+      if (done || !visible) return;
+      const epoch = timerEpoch;
+      timerArmed = true;
+      const handle = options.setTimer(
+        () => {
+          if (done || epoch !== timerEpoch) return;
+          try {
+            if (options.isDisposed()) return finish("disposed");
+            if (activeElapsed() >= timeout) return finish("timeout");
+            syncVisibility();
+            if (!done && visible) armWatchdog();
+          } catch {
+            failureStep = "lifecycle";
+            finish("failed");
+          }
+        },
+        Math.max(0, timeout - activeElapsed()),
+      );
+      // A lifecycle source can synchronously finish while attaching a timer.
+      if (done || !timerArmed || epoch !== timerEpoch)
+        options.clearTimer(handle);
+      else timer = handle;
+    };
+    const syncVisibility = () => {
+      if (done) return;
+      const next = options.isVisible?.() ?? true;
+      if (next === visible) return;
+      const at = options.now();
+      const elapsed = clock(at);
+      // Do not erase a visible synchronous overrun merely because the page
+      // became hidden before JavaScript could deliver its visibility event.
+      if (elapsed.activeElapsedMs >= timeout) return finish("timeout");
+      activeBefore = elapsed.activeElapsedMs;
+      pausedBefore = elapsed.pausedMs;
+      visibilityAt = at;
+      visible = next;
+      if (visible) armWatchdog();
+      else clearWatchdog();
+    };
+    const canWork = () => {
+      if (done) return false;
+      if (options.isDisposed()) {
+        finish("disposed");
+        return false;
+      }
+      if (activeElapsed() >= timeout) {
+        finish("timeout");
+        return false;
+      }
+      syncVisibility();
+      return !done && visible;
+    };
+    const visibilityChanged = () => {
+      if (done) return;
+      try {
+        if (options.isDisposed()) return finish("disposed");
+        syncVisibility();
+      } catch {
+        failureStep = "lifecycle";
+        finish("failed");
+      }
+    };
+    const noteRestart = (next: readonly unknown[]) => {
+      if (
+        next.length === revision.length &&
+        next.every((value, at) => value === revision[at])
+      )
+        return false;
+      const reasons = new Set<string>();
+      if (next.length !== revision.length) reasons.add("revision-length");
+      for (let at = 0; at < Math.max(next.length, revision.length); at++)
+        if (next[at] !== revision[at])
+          reasons.add(options.revisionKeys?.[at] ?? `revision-${at}`);
+      if (!reasons.size) return false;
+      restarts++;
+      for (const reason of reasons)
+        restartReasons[reason] = (restartReasons[reason] ?? 0) + 1;
+      return true;
+    };
+    const startStage = () => {
+      stageStarted = options.now();
+      const elapsed = clock(stageStarted);
+      stageActiveStarted = elapsed.activeElapsedMs;
+      stagePausedStarted = elapsed.pausedMs;
+      checks = renders = restarts = readyRenders = tickCount = 0;
+      rafGap = { count: 0, totalMs: 0, maxMs: 0 };
+      cpu = stageCpu();
+      restartReasons = Object.create(null);
     };
     const collect = () => {
       operation = "meshes";
@@ -152,70 +319,85 @@ export function prepareLightVariants(
       cursor = 0;
     };
     const draw = () => {
+      if (!canWork()) return false;
       operation = "render";
-      options.render();
+      measure(cpu.render, () => options.render());
       renders++;
-      if (options.isDisposed()) {
-        finish("disposed");
-        return false;
-      }
-      if (options.now() >= deadline) {
-        finish("timeout");
-        return false;
-      }
-      return true;
+      return canWork();
     };
     const apply = () => {
       operation = "apply";
-      options.apply(stages[index]);
+      measure(cpu.apply, () => options.apply(stages[index]));
+      if (!canWork()) {
+        if (!done) needsApply = true;
+        return;
+      }
       revision = [...options.revision()];
       readyRenders = 0;
       // A real progress draw starts lazy shader/postprocess/shadow work that
       // cannot become ready without rendering. It is not proof of readiness.
-      if (!draw()) return;
+      if (!draw()) {
+        if (!done) needsApply = true;
+        return;
+      }
       collect();
     };
     function tick() {
       if (done) return;
-      if (options.isDisposed()) return finish("disposed");
-      if (options.now() >= deadline) return finish("timeout");
+      const at = options.now();
+      const gap = Math.max(0, at - lastTickAt);
+      lastTickAt = at;
       try {
+        const working = canWork();
+        if (done) return;
         if (index < 0) {
+          if (!working) return;
           index = 0;
-          stageStarted = options.now();
+          startStage();
         }
+        tickCount++;
+        rafGap.count++;
+        rafGap.totalMs += gap;
+        rafGap.maxMs = Math.max(rafGap.maxMs, gap);
+        if (!working) return;
         if (needsApply) {
           needsApply = false;
           apply();
           return;
         }
         const nextRevision = options.revision();
-        if (
-          nextRevision.length !== revision.length ||
-          nextRevision.some((value, at) => value !== revision[at])
-        ) {
-          restarts++;
+        if (noteRestart(nextRevision)) {
           apply();
           return;
         }
-        const batchStarted = options.now();
-        options.beforeChecks();
-        let batch = 0;
-        while (
-          cursor < queue.length &&
-          batch < batchSize &&
-          options.now() - batchStarted < batchMs
-        ) {
-          const mesh = queue[cursor++];
-          batch++;
-          if (mesh.isDisposed() || !mesh.isEnabled() || !mesh.isVisible)
-            continue;
-          checks++;
-          operation = "check";
-          if (!options.check(mesh)) retry.push(mesh);
-          if (options.isDisposed()) return finish("disposed");
-          if (options.now() >= deadline) return finish("timeout");
-        }
+        operation = "check";
+        measure(cpu.checkBatch, () => {
+          const batchStarted = options.now();
+          options.beforeChecks();
+          let batch = 0;
+          while (
+            cursor < queue.length &&
+            batch < batchSize &&
+            options.now() - batchStarted < batchMs
+          ) {
+            // End the measured batch before timeout/restore cleanup. An actual
+            // visibility event still updates the clock through its observer.
+            if (
+              done ||
+              options.isDisposed() ||
+              activeElapsed() >= timeout ||
+              !(options.isVisible?.() ?? true)
+            )
+              break;
+            const mesh = queue[cursor++];
+            batch++;
+            if (mesh.isDisposed() || !mesh.isEnabled() || !mesh.isVisible)
+              continue;
+            checks++;
+            if (!options.check(mesh)) retry.push(mesh);
+          }
+        });
+        if (!canWork()) return;
         if (cursor < queue.length) return;
         if (retry.length) {
           queue = retry;
@@ -233,11 +415,7 @@ export function prepareLightVariants(
         }
         if (!draw()) return;
         const afterDraw = options.revision();
-        if (
-          afterDraw.length !== revision.length ||
-          afterDraw.some((value, at) => value !== revision[at])
-        ) {
-          restarts++;
+        if (noteRestart(afterDraw)) {
           needsApply = true;
           return;
         }
@@ -252,8 +430,7 @@ export function prepareLightVariants(
         saveStage();
         index++;
         if (index === stages.length) return finish("complete");
-        stageStarted = options.now();
-        checks = renders = restarts = 0;
+        startStage();
         needsApply = true;
       } catch {
         failureStep = operation;
@@ -267,10 +444,14 @@ export function prepareLightVariants(
         detach();
         return;
       }
-      timer = options.setTimer(
-        () => finish(options.isDisposed() ? "disposed" : "timeout"),
-        timeout,
-      );
+      detachVisibility =
+        options.onVisibilityChange?.(visibilityChanged) ?? (() => {});
+      if (done) {
+        detachVisibility();
+        return;
+      }
+      syncVisibility();
+      if (!done) armWatchdog();
       if (!done) options.run(tick);
     } catch {
       failureStep = "lifecycle";
