@@ -7,6 +7,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { ShaderLanguage } from "@babylonjs/core/Materials/shaderLanguage";
 import manifest from "../shared/data/assets/vehicles-manifest.json";
 import { CarShadowProxyPack } from "./car-shadow-proxy";
 import { disableZeroWeightCarClearCoat } from "./car-material-budget";
@@ -22,7 +23,7 @@ export type CarPackOptions = {
   assetSources?: Partial<
     Record<CarLod, Parameters<typeof LoadAssetContainerAsync>[0]>
   >;
-  /** Explicit compatibility/dispatch A/B switch. Unsupported backends retain
+  /** Explicit compatibility/dispatch A/B switch. Unsupported shader languages retain
    * the original per-colour materials regardless of this option. */
   paintInstancing?: boolean;
 };
@@ -158,18 +159,23 @@ export class CarPack {
         pack.templates.get("far")!.values(),
         pack.root,
       );
+      const paintSources = [...pack.templates.values()].flatMap((parts) =>
+        [...parts.values()]
+          .filter((part) => part.source.material?.metadata?.vehiclePaint)
+          .map((part) => part.source),
+      );
       if (
         options.paintInstancing !== false &&
         scene.getEngine().getCaps().instancedArrays &&
-        !scene.getEngine().isWebGPU
+        // The fallback plugin injects GLSL. The explicit WebGPU experiment
+        // creates GLSL PBR materials before loading; ordinary WGSL keeps the
+        // per-colour fallback. Inspect each material's captured language, not
+        // a global ForceGLSL flag that may change after construction.
+        paintSources.every(
+          (source) => source.material?.shaderLanguage === ShaderLanguage.GLSL,
+        )
       ) {
-        pack.instancePaintColor = installCarPaintInstances(
-          [...pack.templates.values()].flatMap((parts) =>
-            [...parts.values()]
-              .filter((part) => part.source.material?.metadata?.vehiclePaint)
-              .map((part) => part.source),
-          ),
-        );
+        pack.instancePaintColor = installCarPaintInstances(paintSources);
       }
       pack.setQuality("medium");
       pack.updateLighting(0);
