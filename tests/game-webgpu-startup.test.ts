@@ -109,6 +109,7 @@ function fixture(
     simulations = 0,
     failures = 0;
   const events: { kind: string; data: unknown }[] = [];
+  const shaderStages: string[] = [];
   let gateReadiness: (() => boolean) | undefined;
   const disposable = () => ({ dispose: () => disposedAssets++ });
   const carAsset = {
@@ -207,7 +208,10 @@ function fixture(
     blur() {},
     notice() {},
     onRendererFailure: () => failures++,
-    compilationProfile: { snapshot: () => ({}) },
+    compilationProfile: {
+      snapshot: () => ({}),
+      setStage: (stage: string) => shaderStages.push(stage),
+    },
     prepareLighting: async () => ({
       status: options.preparation ?? "complete",
       elapsedMs: 1,
@@ -222,6 +226,7 @@ function fixture(
     gate,
     loops,
     events,
+    shaderStages,
     gateReadiness: () => gateReadiness!(),
     completeAssets: () => {
       interior.resolve(interiorAsset);
@@ -241,11 +246,13 @@ test("actual Game start cannot become playable until the submitted-frame gate su
   assert.equal(f.stats().gateCalls, 1);
   assert.equal(f.game.ready, false);
   assert.equal(f.game.canvas.dataset.bootStage, "submitted-frame");
+  assert.equal(f.shaderStages.at(-1), "submitted-frame");
   assert.equal(f.loops.size, 0, "preload loop is stopped before the gate");
   f.gate.resolve();
   await start;
   assert.equal(f.game.ready, true);
   assert.equal(f.health.snapshot().valid, true);
+  assert.equal(f.shaderStages.at(-1), "ready");
   assert.equal(f.loops.size, 1);
 });
 

@@ -574,7 +574,13 @@ export class Game {
       if (this.renderErrorCount === 1)
         this.notice("Část prostředí se nepodařilo vykreslit. Obnov stránku.");
     });
+    this.environmentProfile = createEnvironmentProfile(window.location, {
+      onSlowFrame: (sample) => sessionDiagnostics.event("environment-work", {
+        ...sample, rendererId: this.renderHealth.rendererId,
+      }),
+    });
     this.compilationProfile = new WebGpuCompilationProfile(this.engine, {
+      captureShaderInventory: this.environmentProfile !== undefined,
       onError: (channel, error, label) => this.renderHealth.report(
         channel, `${label}: ${error instanceof Error ? error.message : String(error)}`,
       ),
@@ -584,11 +590,7 @@ export class Game {
         ...sample, rendererId: this.renderHealth.rendererId, purpose: "game",
       }),
     });
-    this.environmentProfile = createEnvironmentProfile(window.location, {
-      onSlowFrame: (sample) => sessionDiagnostics.event("environment-work", {
-        ...sample, rendererId: this.renderHealth.rendererId,
-      }),
-    });
+    this.compilationProfile.setStage("construction");
     if (this.environmentProfile) {
       sessionDiagnostics.event("environment-profiling", {
         rendererId: this.renderHealth.rendererId,
@@ -818,6 +820,7 @@ export class Game {
     this.sim = new Simulation();
     this.canvas.dataset.physicsStage = "ready";
     this.canvas.dataset.bootStage = "avatar-and-props";
+    this.compilationProfile.setStage("assets");
     this.actor = this.sim.add("local");
     // Streamed materials must be rendered while glTF assets finish their
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
@@ -940,6 +943,7 @@ export class Game {
       throw new Error(`Přípravu 3D scény se nepodařilo dokončit (${preparation.status}).`);
     }
     this.canvas.dataset.bootStage = "submitted-frame";
+    this.compilationProfile.setStage("submitted-frame");
     await waitForRenderStartup({
       engine: this.engine,
       health: this.renderHealth,
@@ -954,6 +958,7 @@ export class Game {
     });
     this.assertStartupActive();
     this.canvas.dataset.renderHealth = "ready";
+    this.compilationProfile.setStage("ready");
     this.ready = true;
     this.canvas.dataset.bootStage = "ready";
     this.engine.runRenderLoop(() => this.frame());
@@ -2359,22 +2364,21 @@ export class Game {
       }
     };
     const restore = () => {
-      if (!this.disposed)
+      if (!this.disposed) {
+        this.compilationProfile.setStage("restore");
         apply(this.timeOverride ?? Date.now(), this.flashlightOn);
+      }
     };
     return prepareLightVariants({
-      apply: (stage) =>
-        stage === "restore"
-          ? restore()
-          : apply(
-              stage.startsWith("night")
-                ? night
-                : (this.timeOverride ?? Date.now()),
-              stage.endsWith("-on"),
-              stage.startsWith("night-")
-                ? Number(stage.split("-")[1])
-                : undefined,
-            ),
+      apply: (stage) => {
+        if (stage === "restore") return restore();
+        this.compilationProfile.setStage(stage);
+        apply(
+          stage.startsWith("night") ? night : (this.timeOverride ?? Date.now()),
+          stage.endsWith("-on"),
+          stage.startsWith("night-") ? Number(stage.split("-")[1]) : undefined,
+        );
+      },
       restore,
       // The first progress draw establishes the actual active list, including
       // the real torch prop, instancing and currently selected avatar meshes.
