@@ -8,8 +8,8 @@
   "resources": [],
   "acceptance": [
     "Před implementací porovnat identity/expectedEffect kontrolu a startup-only allowShaderHotSwapping=false; doložit pinned PBR/Standard a extraInitializationsAsync řetězec.",
-    "Malý samostatný vlastník přepne pouze skutečné účastnící se materialy do strict readiness, včetně pozdě přidaných, a vrátí přesné původní hodnoty. Žádné globální prototypy či změna shaderů, vzhledu, freeze politiky nebo běžné render cache.",
-    "Dohodnout API s rootem před implementací; root vlastní Gamewiring. Explicitní životní cyklus při normal completion, timeout, scene disposal a late materials; neobnovovat přes cizí náhradu a nepsat do již zaniklých materiálů.",
+    "Po porovnání zvolen read-only guard skutečných Effectů v cache daného enginu: createEffect je synchronně eviduje před extraInitializer await. Žádné mutace allowShaderHotSwapping, globálních prototypů, shaderů, vzhledu, freeze politiky ani render cache.",
+    "Odsouhlasen export arePreparationEffectsReady(engine); WebGL deleguje původní method, WebGPU kontroluje dostupnost cache, vlastnictví/liveness a skutečné Effect.isReady. Root používá v stage i final gate. Malformed/unavailable cache nikdy neznamená ready; žádná persistent držení prostředků.",
     "Regrese musí reprodukovat skutečný pinned Standard/PBR pending-new-effect hot swap nebo delayed initializer, nikoli pouze testovat nastavení booleanu. Nová varianta nesmí být označena ready přes předchozí efekt."
   ],
   "verification": [
@@ -18,6 +18,7 @@
   ],
   "notes": [
     "UserauthorizedKEY-22/31. Typed diagnostic-overlap je samostatný agent; bez tohoto strict guardu není nové stage readiness prokázané, protože Babylon hot swap vrací old ready effect a hook nezachytí předcházející extraInitializationsAsync.",
-    "Přidělen stack_options; WT webgpu-comparison, root koordinuje vstupy/výstupy a finální GPU ověření."
+    "Přidělen stack_options; WT webgpu-comparison, root koordinuje vstupy/výstupy a finální GPU ověření.",
+    "Rozhodnutí po úplném průzkumu: readonly cache varianta má menší lifecycle riziko než dočasné změny všech materiálů; scope souborů a resources se nemění. Root schválil API před implementací."
   ]
 }
