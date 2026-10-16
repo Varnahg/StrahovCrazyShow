@@ -2,7 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import type { Effect } from "@babylonjs/core/Materials/effect";
-import { RenderHealth, type RenderFault } from "../client/render-health";
+import {
+  RenderHealth,
+  type RenderFault,
+  type RenderOperationKind,
+} from "../client/render-health";
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -12,6 +16,130 @@ function deferred<T>() {
     reject = no;
   });
   return { promise, resolve, reject };
+}
+
+function pendingCounts(health: RenderHealth) {
+  const state = health.snapshot();
+  return [
+    state.pendingOperations,
+    state.pendingPreparationOperations,
+    state.pendingShaderValidationOperations,
+  ];
+}
+
+test("mixed operation kinds retain a total ready barrier and default shader work is preparation", async () => {
+  const engine = new NullEngine(),
+    health = new RenderHealth(engine, "game");
+  const preparation = deferred<object>(),
+    validation = deferred<void>(),
+    secondValidation = deferred<void>();
+  try {
+    const original = { prepared: true };
+    // A label or the shared shader channel must never classify the operation.
+    const preparing = health.track(
+      preparation.promise, "shader", "shader-validation",
+    );
+    const validating = health.track(
+      validation.promise, "shader", "same shader", "shader-validation",
+    );
+    const validatingSecond = health.track(
+      secondValidation.promise, "shader", "second shader", "shader-validation",
+    );
+    assert.deepEqual(pendingCounts(health), [3, 1, 2]);
+    assert.equal(health.markReady(), false);
+    preparation.resolve(original);
+    assert.equal(await preparing, original);
+    assert.deepEqual(pendingCounts(health), [2, 0, 2]);
+    assert.equal(
+      health.markReady(), false, "diagnostics still block final acceptance",
+    );
+    const snapshot = health.snapshot();
+    snapshot.pendingShaderValidationOperations = 100;
+    assert.deepEqual(pendingCounts(health), [2, 0, 2]);
+    validation.resolve();
+    await validating;
+    assert.deepEqual(pendingCounts(health), [1, 0, 1]);
+    assert.equal(health.markReady(), false);
+    secondValidation.resolve();
+    await validatingSecond;
+    assert.deepEqual(pendingCounts(health), [0, 0, 0]);
+    assert.equal(health.markReady(), true);
+  } finally {
+    engine.dispose();
+  }
+});
+
+const operationKinds: readonly RenderOperationKind[] = [
+  "preparation", "shader-validation",
+];
+for (const kind of operationKinds) {
+  test(`${kind} rejection keeps its identity and only settles its own pending kind`, async () => {
+    const engine = new NullEngine(),
+      health = new RenderHealth(engine, "game");
+    const failing = deferred<void>(),
+      other = deferred<void>();
+    try {
+      const otherKind = kind === "preparation" ? "shader-validation" : "preparation";
+      const tracked = health.track(failing.promise, "shader", "failing", kind);
+      const remaining = health.track(
+        other.promise, "shader", "remaining", otherKind,
+      );
+      const failure = new Error("owned failure");
+      const rejected = assert.rejects(tracked, (error) => error === failure);
+      failing.reject(failure);
+      await rejected;
+      assert.deepEqual(
+        pendingCounts(health), kind === "preparation" ? [1, 0, 1] : [1, 1, 0],
+      );
+      assert.equal(health.snapshot().counts.shader, 1);
+      assert.equal(health.markReady(), false);
+      other.resolve();
+      await remaining;
+      assert.deepEqual(pendingCounts(health), [0, 0, 0]);
+      assert.equal(health.markReady(), false, "settlement never clears a fault");
+    } finally {
+      engine.dispose();
+    }
+  });
+}
+
+for (const lifecycle of ["dispose", "loss", "restore"] as const) {
+  test(`${lifecycle} clears both kinds and late settlements cannot alter the retired counters`, async () => {
+    const engine = new NullEngine(),
+      health = new RenderHealth(engine, "game");
+    const preparation = deferred<number>(),
+      validation = deferred<void>();
+    try {
+      const preparing = health.track(
+        preparation.promise, "pipeline", "old pipeline",
+      );
+      const validating = health.track(
+        validation.promise, "shader", "old diagnostics", "shader-validation",
+      );
+      assert.deepEqual(pendingCounts(health), [2, 1, 1]);
+      if (lifecycle === "dispose") health.dispose();
+      else if (lifecycle === "loss")
+        engine.onContextLostObservable.notifyObservers(engine);
+      else engine.onContextRestoredObservable.notifyObservers(engine);
+      assert.deepEqual(pendingCounts(health), [0, 0, 0]);
+      const retired = health.snapshot();
+      assert.equal(retired.generation, lifecycle === "restore" ? 2 : 1);
+      const failure = new Error("late diagnostics");
+      const rejected = assert.rejects(validating, (error) => error === failure);
+      preparation.resolve(42);
+      validation.reject(failure);
+      assert.equal(await preparing, 42);
+      await rejected;
+      // Tracking after retirement also must not create permanently pending work.
+      await health.track(
+        Promise.resolve(), "shader", "retired call", "shader-validation",
+      );
+      assert.deepEqual(health.snapshot(), retired);
+      assert.equal(health.markReady(), false);
+    } finally {
+      engine.dispose();
+    }
+  });
 }
 
 test("two real engine owners attribute effect errors and resource failures independently", () => {

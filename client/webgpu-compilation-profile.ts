@@ -1,3 +1,5 @@
+import type { RenderOperationKind } from "./render-health";
+
 type ProfileObserver = { remove(defer?: boolean): void };
 type ProfileObservable = { add(callback: () => void): ProfileObserver };
 type FaultChannel = "shader" | "pipeline" | "render";
@@ -21,11 +23,13 @@ export type CompilationProfileOptions = {
     generation: number;
   }) => void;
   onError?: (channel: FaultChannel, error: unknown, label: string) => void;
-  /** Returns an observed branch, not a replacement for the caller's promise. */
+  /** Returns an observed branch, not a replacement for the caller's promise.
+   * Forward kind unchanged: only compilation-info diagnostics may overlap stages. */
   track?: <T>(
     promise: Promise<T>,
     channel: "shader" | "pipeline",
     label: string,
+    kind: RenderOperationKind,
   ) => Promise<T>;
 };
 
@@ -247,6 +251,7 @@ export class WebGpuCompilationProfile {
           operation,
           this.channel(phase) as "shader" | "pipeline",
           label,
+          phase === "shaderValidation" ? "shader-validation" : "preparation",
         );
         void tracked.catch(() => {});
         externalTracking = true;

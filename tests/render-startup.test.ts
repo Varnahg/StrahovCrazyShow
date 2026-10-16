@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { RenderHealth } from "../client/render-health";
+import { WebGpuCompilationProfile } from "../client/webgpu-compilation-profile";
 import {
   waitForRenderStartup,
   type RenderStartupHost,
@@ -138,6 +139,98 @@ function fixture(native = true) {
     dispose: () => engine.dispose(),
   };
 }
+
+function shaderDiagnostics(f: ReturnType<typeof fixture>) {
+  const info = deferred<{ messages: { type: string; message: string }[] }>();
+  const device = Object.assign(f.device, {
+    createShaderModule: () => ({ getCompilationInfo: () => info.promise }),
+  });
+  const profile = new WebGpuCompilationProfile(f.engine, {
+    track: (operation, channel, label, kind) =>
+      f.health.track(operation, channel, label, kind),
+    onError: (channel, error) => f.health.report(channel, error),
+  });
+  return { info, profile, create: () => device.createShaderModule() };
+}
+
+test("final submission waits for diagnostic-only shader work created by that same frame", async () => {
+  const f = fixture(),
+    { info, profile, create } = shaderDiagnostics(f);
+  try {
+    const ready = waitForRenderStartup({
+      ...f,
+      isReady: () => true,
+      render() {
+        f.render();
+        if (f.counts().renders === 1) create();
+      },
+    }, f.host);
+    await f.frame();
+    const state = f.health.snapshot();
+    assert.equal(state.pendingPreparationOperations, 0);
+    assert.equal(state.pendingShaderValidationOperations, 1);
+    assert.equal(state.pendingOperations, 1);
+    assert.equal(state.phase, "preparing");
+    assert.equal(
+      f.counts().submissions, 1,
+      "queue completion does not replace shader diagnostics",
+    );
+    info.resolve({ messages: [{ type: "warning", message: "unused binding" }] });
+    await flush();
+    await f.frame();
+    await ready;
+    assert.equal(f.health.snapshot().valid, true);
+    assert.equal(f.health.snapshot().pendingShaderValidationOperations, 0);
+    f.idle();
+  } finally {
+    profile.dispose();
+    f.dispose();
+  }
+});
+
+test("late fulfilled compilation errors reject final acceptance after a successful submission", async () => {
+  const f = fixture(),
+    { info, profile, create } = shaderDiagnostics(f);
+  try {
+    create();
+    const ready = waitForRenderStartup({ ...f, isReady: () => true }, f.host);
+    const rejected = assert.rejects(ready, /invalid late variant/);
+    await f.frame();
+    assert.equal(f.counts().submissions, 1);
+    info.resolve({ messages: [{ type: "error", message: "invalid late variant" }] });
+    await rejected;
+    assert.equal(f.health.snapshot().counts.shader, 1);
+    assert.equal(f.health.snapshot().pendingOperations, 0);
+    assert.equal(f.health.snapshot().valid, false);
+    f.idle();
+  } finally {
+    profile.dispose();
+    f.dispose();
+  }
+});
+
+test("diagnostic-only pending work cannot extend the final visible deadline", async () => {
+  const f = fixture(),
+    { info, profile, create } = shaderDiagnostics(f);
+  try {
+    create();
+    const ready = waitForRenderStartup({ ...f, isReady: () => true }, f.host);
+    const rejected = assert.rejects(ready, { name: "RenderStartupTimeoutError" });
+    await f.frame();
+    f.advance(30_000);
+    await rejected;
+    assert.equal(f.health.snapshot().pendingPreparationOperations, 0);
+    assert.equal(f.health.snapshot().pendingShaderValidationOperations, 1);
+    info.resolve({ messages: [] });
+    await flush();
+    assert.equal(f.health.snapshot().valid, false);
+    assert.equal(f.health.snapshot().pendingOperations, 0);
+    f.idle();
+  } finally {
+    profile.dispose();
+    f.dispose();
+  }
+});
 
 test("startup needs an actual ready submitted frame, then removes all idle work", async () => {
   const f = fixture(),
