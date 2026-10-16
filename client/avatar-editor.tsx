@@ -1,7 +1,10 @@
 import { t, localizeText, useLocale, formatNumber } from "./i18n";
 import { useEffect, useId, useRef, useState } from "react";
 import type { AvatarConfig, Profile } from "../shared/types";
-import type { AvatarPreviewController } from "./avatar-renderer";
+import type {
+  AvatarPreviewController,
+  AvatarPreviewState,
+} from "./avatar-preview";
 import {
   AVATAR_PRESETS,
   SKIN_TONES,
@@ -138,11 +141,12 @@ export function AvatarEditor({
     "appearance",
   );
   const [detail, setDetail] = useState<"body" | "face">("body");
-  const [previewStatus, setPreviewStatus] = useState<
-    "loading" | "ready" | "unavailable"
-  >("loading");
+  const [previewStatus, setPreviewStatus] =
+    useState<AvatarPreviewState>("loading");
+  const [previewError, setPreviewError] = useState("");
   const canvas = useRef<HTMLCanvasElement>(null);
   const preview = useRef<AvatarPreviewController | null>(null);
+  const previewGeneration = useRef(0);
   const currentAvatar = useRef(profile.avatar);
   const pointer = useRef<{ id: number; x: number } | null>(null);
   const faceId = useId();
@@ -152,25 +156,61 @@ export function AvatarEditor({
   currentAvatar.current = config;
 
   useEffect(() => {
-    let cancelled = false;
+    const target = canvas.current;
+    if (!target) return;
+    const abort = new AbortController();
+    const generation = ++previewGeneration.current;
+    let owned: AvatarPreviewController | undefined;
+    const current = () =>
+      !abort.signal.aborted &&
+      previewGeneration.current === generation &&
+      canvas.current === target;
+    const message = (error: unknown) =>
+      error == null
+        ? ""
+        : (error instanceof Error ? error.message : String(error))
+            .split("\n", 1)[0]
+            .slice(0, 240);
     setPreviewStatus("loading");
+    setPreviewError("");
     // The initial form itself does not eagerly import Babylon or initialize physics.
-    import("./avatar-renderer")
+    import("./avatar-preview")
       .then(({ createAvatarPreview }) => {
-        if (cancelled || !canvas.current) return;
-        preview.current = createAvatarPreview(
-          canvas.current,
-          currentAvatar.current,
-        );
-        setPreviewStatus("ready");
+        if (!current()) return;
+        return createAvatarPreview(target, currentAvatar.current, {
+          signal: abort.signal,
+          getCurrentConfig: () => currentAvatar.current,
+          onState(state, error) {
+            if (!current()) return;
+            setPreviewStatus(state);
+            setPreviewError(message(error));
+          },
+        });
       })
-      .catch(() => {
-        if (!cancelled) setPreviewStatus("unavailable");
+      .then((controller) => {
+        if (!controller) return;
+        if (!current()) {
+          controller.dispose();
+          return;
+        }
+        owned = controller;
+        preview.current = controller;
+        controller.update(currentAvatar.current);
+      })
+      .catch((error: unknown) => {
+        if (!current()) return;
+        setPreviewStatus(
+          error instanceof Error &&
+            error.name === "AvatarPreviewUnsupportedError"
+            ? "unsupported"
+            : "failed",
+        );
+        setPreviewError(message(error));
       });
     return () => {
-      cancelled = true;
-      preview.current?.dispose();
-      preview.current = null;
+      abort.abort();
+      owned?.dispose();
+      if (preview.current === owned) preview.current = null;
     };
   }, []);
 
@@ -210,6 +250,7 @@ export function AvatarEditor({
             "3D náhled postavy. Pro otočení táhni myší nebo použij šipky pod náhledem.",
           )}
           className={previewStatus === "ready" ? "ae-ready" : ""}
+          data-preview-state={previewStatus}
           onPointerDown={(event) => {
             if (previewStatus !== "ready") return;
             pointer.current = { id: event.pointerId, x: event.clientX };
@@ -244,6 +285,13 @@ export function AvatarEditor({
                 ? t("Připravuji 3D náhled…")
                 : t("3D náhled není dostupný. Vzhled můžeš dál upravit.")}
             </span>
+            {previewError && (
+              <span>
+                {t("3D scénu se nepodařilo spustit: {error}", {
+                  error: previewError,
+                })}
+              </span>
+            )}
           </div>
         )}
         <div className="ae-view-controls" aria-label={t("Otočení náhledu")}>
