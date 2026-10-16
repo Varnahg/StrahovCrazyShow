@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { WebGpuCompilationProfile } from "../client/webgpu-compilation-profile";
+import type { RenderOperationKind } from "../client/render-health";
 
 function deferred<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
@@ -100,6 +101,42 @@ function fixture() {
   };
   return { engine, device, Device, tick, now: () => time };
 }
+
+test("only compilation-info diagnostics receive the validation kind, regardless of channel and label", async () => {
+  const f = fixture();
+  const tracked: {
+    channel: string; label: string; kind: RenderOperationKind;
+  }[] = [];
+  const info = deferred<{ messages: unknown[] }>();
+  f.device.module.getCompilationInfo = () => info.promise;
+  const profile = new WebGpuCompilationProfile(f.engine, {
+    track: (operation, channel, label, kind) => {
+      tracked.push({ channel, label, kind });
+      return operation;
+    },
+  });
+  try {
+    f.device.createShaderModule({ label: "same label" });
+    const pipeline = f.device.createRenderPipelineAsync({
+      label: "shader-validation",
+    });
+    await f.engine._preparePipelineContextAsync({ _name: "same label" });
+    await f.engine.prepareGlslangAndTintAsync();
+    assert.deepEqual(tracked, [
+      { channel: "shader", label: "same label", kind: "shader-validation" },
+      { channel: "pipeline", label: "shader-validation", kind: "preparation" },
+      { channel: "shader", label: "same label", kind: "preparation" },
+      { channel: "shader", label: "compilerLoad", kind: "preparation" },
+    ]);
+    f.device.pending.resolve({});
+    info.resolve({ messages: [] });
+    await pipeline;
+    await settle();
+    assert.equal(profile.snapshot().observerErrors, 0);
+  } finally {
+    profile.dispose();
+  }
+});
 
 test("profile preserves returns and receivers, separates CPU phases and marks shared cache scope", async () => {
   const f = fixture();

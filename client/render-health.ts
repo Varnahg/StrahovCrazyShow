@@ -11,6 +11,9 @@ export type RenderFaultChannel =
   | "render";
 export type RenderHealthPhase =
   "preparing" | "ready" | "invalid" | "restart-required" | "disposed";
+/** Only shader diagnostic messages may overlap preparation stages. Neither kind
+ * can remain pending when the renderer is finally accepted as ready. */
+export type RenderOperationKind = "preparation" | "shader-validation";
 export type RenderFault = {
   channel: RenderFaultChannel;
   message: string;
@@ -24,6 +27,8 @@ export type RenderHealthSnapshot = {
   valid: boolean;
   errorCount: number;
   pendingOperations: number;
+  pendingPreparationOperations: number;
+  pendingShaderValidationOperations: number;
   counts: Record<RenderFaultChannel, number>;
   firstErrors: RenderFault[];
 };
@@ -40,7 +45,10 @@ export class RenderHealth {
   readonly rendererId = nextRendererId++;
   private generation = 1;
   private phase: RenderHealthPhase = "preparing";
-  private pendingOperations = 0;
+  private readonly pendingByKind: Record<RenderOperationKind, number> = {
+    preparation: 0,
+    "shader-validation": 0,
+  };
   private errorCount = 0;
   private counts: Record<RenderFaultChannel, number> = {
     effect: 0,
@@ -74,7 +82,7 @@ export class RenderHealth {
     const restored = engine.onContextRestoredObservable.add(() => {
       if (this.phase === "disposed") return;
       this.generation++;
-      this.pendingOperations = 0;
+      this.resetPendingOperations();
       this.phase = "restart-required";
       this.rejectGuards(
         new Error("Grafické zařízení se změnilo. Spusť 3D scénu znovu."),
@@ -98,6 +106,17 @@ export class RenderHealth {
 
   report(channel: RenderFaultChannel, error: unknown) {
     this.recordFault(channel, error);
+  }
+
+  private get pendingOperations() {
+    return (
+      this.pendingByKind.preparation + this.pendingByKind["shader-validation"]
+    );
+  }
+
+  private resetPendingOperations() {
+    this.pendingByKind.preparation = 0;
+    this.pendingByKind["shader-validation"] = 0;
   }
 
   private recordFault(
@@ -131,7 +150,7 @@ export class RenderHealth {
       return;
     this.deviceLostGeneration = this.generation;
     this.phase = "restart-required";
-    this.pendingOperations = 0;
+    this.resetPendingOperations();
     this.recordFault("device", new Error(message));
   }
 
@@ -166,26 +185,29 @@ export class RenderHealth {
 
   /** The caller still awaits/catches this result. Rejection identity is kept;
    * async pipeline failures need this path because they need not emit a device
-   * uncapturederror. A completion from an old device cannot taint a new one. */
+   * uncapturederror. A completion from an old device cannot taint a new one.
+   * Operation kind is explicit: a shared error channel or label cannot classify
+   * diagnostic-only work. Default preparation preserves existing callers. */
   track<T>(
     operation: Promise<T>,
     channel: "pipeline" | "shader",
     label: string,
+    kind: RenderOperationKind = "preparation",
   ): Promise<T> {
     const generation = this.generation;
     const active = () =>
       this.phase !== "disposed" &&
       this.phase !== "restart-required" &&
       this.generation === generation;
-    if (active()) this.pendingOperations++;
+    if (active()) this.pendingByKind[kind]++;
     return operation.then(
       (value) => {
-        if (active()) this.pendingOperations--;
+        if (active()) this.pendingByKind[kind]--;
         return value;
       },
       (error: unknown) => {
         if (active()) {
-          this.pendingOperations--;
+          this.pendingByKind[kind]--;
           try {
             this.recordFault(channel, error, label);
           } finally {
@@ -218,6 +240,8 @@ export class RenderHealth {
         this.pendingOperations === 0,
       errorCount: this.errorCount,
       pendingOperations: this.pendingOperations,
+      pendingPreparationOperations: this.pendingByKind.preparation,
+      pendingShaderValidationOperations: this.pendingByKind["shader-validation"],
       counts: { ...this.counts },
       firstErrors: this.firstErrors.map((fault) => ({ ...fault })),
     };
@@ -230,7 +254,7 @@ export class RenderHealth {
   dispose() {
     if (this.phase !== "disposed") {
       this.phase = "disposed";
-      this.pendingOperations = 0;
+      this.resetPendingOperations();
       const error = new Error("Renderer disposed");
       error.name = "AbortError";
       this.rejectGuards(error);
