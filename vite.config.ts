@@ -30,5 +30,20 @@ export default defineConfig({
       },
     },
   },
-  build: { chunkSizeWarningLimit: 1100 },
+  build: {
+    chunkSizeWarningLimit: 1100,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [{
+            name: "babylon",
+            test: /node_modules[\\/]@babylonjs[\\/]/,
+            priority: 20,
+            entriesAware: false,
+            includeDependenciesRecursively: true,
+          }],
+        },
+      },
+    },
+  },
 });
