@@ -800,8 +800,11 @@ export class Game {
     this.canvas.dataset.lightPreparation = preparation.status;
     if (preparation.status !== "complete")
       this.renderHealth.report("pipeline", `Příprava světel: ${preparation.status}`);
-    this.engine.onEndFrameObservable.addOnce(() => {
-      if (this.renderHealth.markReady()) this.canvas.dataset.renderHealth = "ready";
+    const readyObserver = this.engine.onEndFrameObservable.add(() => {
+      if (this.renderHealth.markReady()) {
+        this.canvas.dataset.renderHealth = "ready";
+        readyObserver.remove(true);
+      }
     });
     this.ready = true;
     this.canvas.dataset.bootStage = "ready";
