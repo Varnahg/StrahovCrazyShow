@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-ab-20261016",
+  "title": "Produkční A/B WebGL2 versus WebGPU FPS a záseky",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/game.ts",
+    "client/ui.tsx",
+    "client/labels.ts",
+    "tests/game-render-engine.test.ts",
+    "scripts/webgpu-companions.ts",
+    "scripts/webgpu-report.mjs",
+    "scripts/webgpu-preview.mjs",
+    "tests/webgpu-report.test.ts",
+    "docs/performance/research-20261016/webgpu-comparison.md",
+    "docs/performance/evidence/webgpu-comparison-20261016/",
+    "docs/agents/handoffs/webgpu-ab-20261016.md",
+    "docs/verification.md",
+    ".cache/webgpu-comparison/",
+    "dist/",
+    "public/tools/webgpu-9.30/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4191",
+    "port:2586",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Stejný produkční zdroj a assets, quality, viewport, UTC/weather a reálné relace/HUD.",
+    "Raw důkazy a nejméně3 páry pokud backend projde funkčním smoke; nezamlčet neúspěšné běhy.",
+    "Ověřit obraz/řízení, GPU identitu, FPS p95 p99 maxima hitches a startup; závěr dle výsledků.",
+    "Frozen4188 a cizí WIP beze změny; vlastní procesy před release ukončit."
+  ],
+  "verification": [
+    "Cílené testy, pnpm test, pnpm build a izolovaný pnpm test:integration dle runtime scope.",
+    "Skutečná GPU série WebGL2/WebGPU CM; NCM samostatně pokud funkční.",
+    "Hashované vstupy včetně testů a frozen4188 kontrola před/po."
+  ],
+  "notes": [
+    "Uživatel výslovně zadal srovnání a zachování hranéverze. Žádná default migrace před důkazy.",
+    "Recovery starých diary integration/validation claims jen po interrupted thread + absent processes + preserved WIP evidence; žádné převzetí jejich změn.",
+    "Main commit960cb6f bez dirtyoverlay; GLSL runtime translation, carparity, timingnullscope výslovně vyhodnotit."
+  ]
+}

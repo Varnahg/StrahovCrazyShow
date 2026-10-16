@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-engine-20261016",
+  "title": "Izolované WebGL2/WebGPU factory a pravdivá diagnostika backendu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/render-engine.ts",
+    "client/gpu-diagnostics.ts",
+    "tests/render-engine.test.ts",
+    "tests/gpu-diagnostics.test.ts",
+    "docs/agents/handoffs/webgpu-engine-20261016.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Explicitní lokální volba WebGL2/WebGPU CM/NCM, žádný tichý fallback.",
+    "Async init cancellation/error dispose, stejný GLSL a AA; skutečná identita backendu, null není GPU0."
+  ],
+  "verification": [
+    "Cílené CPU testy; root provede skutečný produkční smoke/GPU."
+  ],
+  "notes": [
+    "Nový task pro uživatelské A/B. Pracovat jen v nové webgpu-comparison WT na960cb6f; root vlastní integraci."
+  ]
+}
