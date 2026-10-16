@@ -1,8 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { WebGpuCompilationProfile } from "../client/webgpu-compilation-profile";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine.pure";
+import {
+  WebGpuCompilationProfile,
+  type CompilationProfileOptions,
+} from "../client/webgpu-compilation-profile";
 import type { RenderOperationKind } from "../client/render-health";
+import {
+  sanitizeDiagnosticsData,
+  validateDiagnosticsBatch,
+  diagnosticsByteLength,
+  MAX_DIAGNOSTICS_RECORD_BYTES,
+} from "../shared/session-diagnostics";
 
 function deferred<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
@@ -101,6 +111,270 @@ function fixture() {
   };
   return { engine, device, Device, tick, now: () => time };
 }
+
+const pinnedWGSL = (WebGPUEngine.prototype as unknown as {
+  _getWGSLShader(source: string, type: string, defines?: string): string;
+})._getWGSLShader;
+
+function inventoryFixture(options: CompilationProfileOptions = {}) {
+  const f = fixture();
+  const engine = Object.assign(f.engine, { _getWGSLShader: pinnedWGSL });
+  const profile = new WebGpuCompilationProfile(engine, {
+    captureShaderInventory: true, now: f.now, ...options,
+  });
+  const emit = (body: string, defines = "", role: "vertex" | "fragment" = "vertex") => {
+    const code = engine._getWGSLShader(body, role, defines);
+    const result = f.device.createShaderModule({ code, label: role });
+    assert.equal(result, f.device.module);
+    return code;
+  };
+  return { ...f, engine, profile, emit };
+}
+
+test("inventory uses actual pinned WGSL construction and exact raw/body equality across stages", async () => {
+  const f = inventoryFixture();
+  try {
+    f.profile.setStage("current-off");
+    const vertex = "@vertex fn vertexMain() {}", fragment = "@fragment fn fragmentMain() {}";
+    const raw = f.emit(vertex, "#define LIGHT0\n#define POINTLIGHT0");
+    assert.equal(raw, "//#define LIGHT0\n//#define POINTLIGHT0\n" + vertex);
+    f.emit(vertex, "#define LIGHT0\n#define POINTLIGHT0");
+    f.emit(fragment, "#define LIGHT0", "fragment");
+    f.profile.setStage("current-on");
+    f.emit(vertex, "#define LIGHT0\n#define SPOTLIGHT0");
+    f.emit(fragment, "#define LIGHT0\n#define LIGHT1", "fragment");
+    await settle();
+    const inv = f.profile.snapshot().shaderInventory!;
+    assert.equal(inv.calls, 5);
+    assert.equal(inv.rawKnown, 5);
+    assert.equal(inv.rawRepeated, 1);
+    assert.equal(inv.bodyKnown, 5);
+    assert.equal(inv.bodyRepeated, 3);
+    assert.equal(inv.bodyUnknown, 0);
+    assert.equal(inv.rawDuplicateGroups, 1);
+    assert.equal(inv.bodyDuplicateGroups, 2);
+    const v = inv.bodyDuplicates.find((entry) => entry.vertex === 3)!;
+    assert.equal(v.variants, 2);
+    assert.deepEqual(v.stages, [0, 2, 1]);
+    assert.equal(inv.bodyDuplicates.find((entry) => entry.fragment === 2)!.variants, 2);
+    assert.equal(f.profile.snapshot().metrics.shaderValidation.calls, 5);
+    assert.equal(f.profile.snapshot().observerErrors, 0);
+  } finally { f.profile.dispose(); }
+});
+
+test("known FNV collisions never count unequal raw or body text as duplicates", async () => {
+  const f = inventoryFixture();
+  try {
+    f.emit("costarring");
+    f.emit("liquid");
+    let inv = f.profile.snapshot().shaderInventory!;
+    assert.equal(inv.rawRepeated, 0);
+    assert.equal(inv.bodyRepeated, 0);
+    assert.ok(inv.rawHashConflicts > 0);
+    assert.ok(inv.bodyHashConflicts > 0);
+    f.emit("costarring");
+    f.emit("liquid");
+    await settle();
+    inv = f.profile.snapshot().shaderInventory!;
+    assert.equal(inv.rawDuplicateGroups, 2);
+    assert.equal(inv.bodyDuplicateGroups, 2);
+    assert.deepEqual(inv.rawDuplicates.map((entry) => entry.fingerprint), ["5e4daa9d", "5e4daa9d"]);
+    assert.notEqual(inv.rawDuplicates[0].id, inv.rawDuplicates[1].id);
+    assert.equal(inv.rawRepeated, 2);
+  } finally { f.profile.dispose(); }
+});
+
+test("body identity preserves original comments and rejects unobserved or ambiguous prefix guesses", async () => {
+  const f = inventoryFixture();
+  try {
+    const body = "//#define USER_COMMENT\n@vertex fn main() {}";
+    f.emit(body, "#define FIRST");
+    f.emit(body, "#define SECOND");
+    f.emit("@vertex fn main() {}", "#define SECOND");
+    const raw = f.emit("fn another() {}", "#define FIRST");
+    f.emit(raw); // Same raw text, now observed with a different decomposition.
+    f.device.createShaderModule({ code: "//#define UNSEEN\nfn unseen() {}" });
+    await settle();
+    const inv = f.profile.snapshot().shaderInventory!;
+    assert.equal(inv.bodyRepeated, 1, "only identical original bodies are duplicates");
+    assert.equal(inv.bodyUnknown, 2, "ambiguous and unobserved prefixes stay unknown");
+    assert.equal(inv.ambiguousBodies, 1);
+    assert.equal(inv.rawRepeated, 1);
+    assert.equal(inv.bodyDuplicates[0].chars, body.length);
+  } finally { f.profile.dispose(); }
+});
+
+test("inventory never reads shader accessors twice and an observation error cannot suppress validation", async () => {
+  const f = fixture();
+  let codeReads = 0;
+  const original = f.device.createShaderModule;
+  f.device.createShaderModule = function (descriptor) {
+    void (descriptor as { code: unknown }).code; // The original API owns this read.
+    return original.call(this, descriptor);
+  };
+  const errors: unknown[] = [];
+  f.device.module.getCompilationInfo = () => Promise.resolve({
+    messages: [{ type: "error", message: "still validated" }],
+  });
+  const profile = new WebGpuCompilationProfile(f.engine, {
+    captureShaderInventory: true,
+    onError: (_channel, error) => errors.push(error),
+  });
+  try {
+    const descriptor = { get code() { codeReads++; return "accessor body"; } };
+    assert.equal(f.device.createShaderModule(descriptor), f.device.module);
+    assert.equal(codeReads, 1);
+    f.device.createShaderModule(new Proxy({ code: "proxy body" }, {
+      getOwnPropertyDescriptor(_target, name) {
+        if (name === "code") throw new Error("observer descriptor trap");
+        return undefined;
+      },
+    }));
+    await settle();
+    assert.equal(profile.snapshot().shaderInventory!.descriptorUnknown, 2);
+    assert.equal(profile.snapshot().observerErrors, 1);
+    assert.equal(profile.snapshot().metrics.shaderValidation.calls, 2);
+    assert.equal(errors.length, 2);
+  } finally { profile.dispose(); }
+});
+
+test("disabled inventory does no descriptor or stage text work and installs no WGSL hook", async () => {
+  const f = fixture();
+  const engine = Object.assign(f.engine, { _getWGSLShader: pinnedWGSL });
+  let reads = 0;
+  const profile = new WebGpuCompilationProfile(engine);
+  try {
+    profile.setStage({ toString() { throw new Error("must not stringify"); } } as unknown as string);
+    f.device.createShaderModule({ get code() { reads++; return "unread"; } });
+    await settle();
+    assert.equal(reads, 0);
+    assert.equal(engine._getWGSLShader, pinnedWGSL);
+    assert.equal(profile.snapshot().shaderInventory, null);
+    assert.equal(profile.snapshot().hooks["engine._getWGSLShader"], undefined);
+    assert.equal(profile.snapshot().observerErrors, 0);
+  } finally { profile.dispose(); }
+});
+
+test("entry, text, stage and exported row limits remain explicit without losing known repeats", async () => {
+  const f = inventoryFixture({ shaderInventoryLimits: {
+    maxEntries: 2, maxCodeUnits: 5, maxStages: 3, maxRows: 1,
+  } });
+  try {
+    f.profile.setStage("assets");
+    f.emit("aa"); f.emit("aa");
+    f.profile.setStage("current-off");
+    f.emit("bbb"); f.emit("bbb");
+    f.profile.setStage("current-on");
+    f.emit("c"); f.emit("too large");
+    f.emit("aa");
+    await settle();
+    const inv = f.profile.snapshot().shaderInventory!;
+    assert.equal(inv.calls, 7);
+    assert.equal(inv.limited, 2);
+    assert.equal(inv.evidenceTruncated, true);
+    assert.equal(inv.rawRepeated, 3);
+    assert.equal(inv.retainedEntries, 2);
+    assert.equal(inv.retainedCodeUnits, 5);
+    assert.equal(inv.stages.length, 3);
+    assert.equal(inv.stageOverflow, 2);
+    assert.equal(inv.rawDuplicateGroups, 2);
+    assert.equal(inv.bodyDuplicateGroups, 2);
+    assert.equal(inv.rawDuplicates.length, 1);
+    assert.equal(inv.bodyDuplicates.length, 1);
+    assert.equal(inv.exportTruncated, true);
+    assert.equal(inv.stages[2].name, "overflow");
+  } finally { f.profile.dispose(); }
+});
+
+test("unrecognized WGSL method output remains raw-only and input/return/throw semantics stay intact", async () => {
+  const f = fixture();
+  const failure = new Error("original failure");
+  const engine = Object.assign(f.engine, {
+    _getWGSLShader(source: string, type: string, defines: string) {
+      assert.equal(this, engine);
+      if (source === "throw") throw failure;
+      assert.deepEqual([source, type, defines], ["body", "vertex", "#define ONE"]);
+      return "custom transformed body";
+    },
+  });
+  const profile = new WebGpuCompilationProfile(engine, { captureShaderInventory: true });
+  try {
+    const raw = engine._getWGSLShader("body", "vertex", "#define ONE");
+    assert.equal(raw, "custom transformed body");
+    f.device.createShaderModule({ code: raw, label: "vertex" });
+    assert.throws(() => engine._getWGSLShader("throw", "vertex", ""), (error) => error === failure);
+    await settle();
+    assert.equal(profile.snapshot().shaderInventory!.unrecognizedPrefix, 1);
+    assert.equal(profile.snapshot().shaderInventory!.bodyUnknown, 1);
+  } finally { profile.dispose(); }
+});
+
+test("restoration drops old evidence and disposal releases text while retaining bounded numeric results", async () => {
+  const f = inventoryFixture();
+  const wrapper = f.engine._getWGSLShader;
+  f.profile.setStage("current-on");
+  f.emit("first"); f.emit("first");
+  const next = new f.Device();
+  f.engine._device = next;
+  f.engine.onContextRestoredObservable.notifyObservers();
+  assert.equal(f.profile.snapshot().generation, 2);
+  assert.equal(f.profile.snapshot().shaderInventory!.calls, 0);
+  assert.equal(f.profile.snapshot().shaderInventory!.retainedCodeUnits, 0);
+  const code = f.engine._getWGSLShader("second", "fragment", "");
+  next.createShaderModule({ code }); next.createShaderModule({ code });
+  await settle();
+  let snapshot = f.profile.snapshot().shaderInventory!;
+  assert.equal(snapshot.bodyDuplicates[0].fragment, 2);
+  snapshot.bodyDuplicates[0].stages[0] = 999;
+  assert.equal(f.profile.snapshot().shaderInventory!.bodyDuplicates[0].stages[0], 2);
+  f.profile.dispose();
+  snapshot = f.profile.snapshot().shaderInventory!;
+  assert.equal(snapshot.retainedCodeUnits, 0);
+  assert.equal(snapshot.retainedEntries, 0);
+  assert.equal(snapshot.released, true);
+  assert.equal(snapshot.bodyDuplicateGroups, 1);
+  assert.equal(f.engine._getWGSLShader, pinnedWGSL);
+  wrapper.call(f.engine, "late", "vertex", "");
+  f.profile.setStage("late");
+  assert.deepEqual(f.profile.snapshot().shaderInventory, snapshot);
+});
+
+test("bounded inventory survives the real client and server privacy filters without any shader text", async () => {
+  const f = inventoryFixture({ shaderInventoryLimits: {
+    maxEntries: Number.MAX_SAFE_INTEGER, maxCodeUnits: Infinity,
+    maxStages: 999, maxRows: 999,
+  } });
+  try {
+    for (let index = 0; index < 40; index++) {
+      f.profile.setStage(`phase-${index % 20}`);
+      const body = `PRIVATE_SHADER_TEXT_${index}`;
+      f.emit(body, "#define ONE");
+      f.emit(body, "#define ONE");
+      f.emit(body, "#define TWO");
+    }
+    await settle();
+    const timing = f.profile.snapshot();
+    assert.equal(timing.shaderInventory!.limits.maxEntries, 1024);
+    assert.equal(timing.shaderInventory!.limits.maxCodeUnits, 32 * 1024 * 1024);
+    assert.equal(timing.shaderInventory!.limits.maxStages, 16);
+    assert.equal(timing.shaderInventory!.limits.maxRows, 16);
+    const data = { stage: "preparation-end", timing };
+    assert.doesNotMatch(JSON.stringify(data), /PRIVATE_SHADER_TEXT|#define/);
+    const sanitized = sanitizeDiagnosticsData(data);
+    assert.deepEqual(sanitized.timing, timing);
+    const record = { seq: 0, atMs: 10, kind: "webgpu-inventory", data: sanitized };
+    assert.ok(diagnosticsByteLength(record) < MAX_DIAGNOSTICS_RECORD_BYTES);
+    const wire = validateDiagnosticsBatch({
+      schemaVersion: 1, sessionId: "11111111-1111-4111-8111-111111111111",
+      batchId: 0, records: [record],
+    });
+    assert.ok(wire);
+    assert.deepEqual(wire.records[0].data, sanitized);
+    assert.equal(timing.shaderInventory!.rawDuplicates.length, 16);
+    assert.equal(timing.shaderInventory!.bodyDuplicates.length, 16);
+    assert.equal(timing.shaderInventory!.exportTruncated, true);
+  } finally { f.profile.dispose(); }
+});
 
 test("only compilation-info diagnostics receive the validation kind, regardless of channel and label", async () => {
   const f = fixture();
