@@ -41,3 +41,22 @@ Příkazy ze stagingu: `node --import tsx --test --test-concurrency=1 tests/on-d
 Source/staged shoda všech šesti runtime/test cest, source SHA pro shared factory/health/texture boundary a log hashe jsou v `checks.json`. Stejné factory/health/validation/type soubory byly při závěrečném porovnání stále aktuální. Původní neúspěšné fixture kontroly zůstaly zachované. Historické snapshoty/dependencies jsou nedotčené.
 
 Root převezme sedm verzovaných own cest a samostatně ověří stabilní pipeline, skutečný obraz šesti presetů, rychlé změny/rotaci/detail, opakovaný lifecycle a výkon editoru samostatně i nad Game. Žádný GPU, build ani fullsuite zde neproběhl; KEY-29 ani migrace se podle tohoto CPU předání neoznačují Done. Po samostatném commitu se claim uvolňuje; přesný commit a potvrzení release dostane root zprávou.
+
+## Navazující oprava visible-deadline race
+
+Read-only audit po obnovení cíle reprodukoval skutečný createAvatarPreview + OnDemandRender + RenderHealth pomocí fake hodin/DOM/render IO: při plánovaném 30s timeoutu synchronní render posunul viditelný čas na 31s. Promise microtask následně označil náhled ready/valid a zrušil timer dřív, než mohl jeho opožděný callback běžet. Tedy nezávislý setTimeout sám nevynucuje deadline před přijetím. GPU ani hraný native-v3 se výzkumu neúčastnily.
+
+Před implementací zvolena společná funkce zbývajícího viditelného času a explicitní kontrola před prací a před přijetím po GPU checkpointu. Nezávislý timer zůstává pro nikdy nekončící asynchronní čekání. Nižší timeout neřeší pořadí task/microtask; umělé čekání na další timer přidává latenci a pouze přesouvá závod. Bezpodmínečný wall-clock deadline by porušil existující hidden pause. Nový engine/factory/health API není potřeba. Game startup/context-loss připomínky byly předány rootovi; nejsou součástí této rezervace ani změny.
+
+Nový claim `webgpu-mig-01a14497-preview` získán před zápisem, výchozí HEAD při převzetí `2464b6e`. Změna bude omezena na avatar-preview, jeho regresní test a tento append-only handoff. Nové výsledky budou uvedeny níže; původní evidence zůstává zachovaná.
+
+Oprava dokončena: zbývající visible budget počítá jedno místo používané pauzou i acceptance kontrolou. Timer a explicitní kontrola používají stejné hlášení, stejný limit a existující idempotentní failure/cleanup cestu. Kontrola před prací brání dalšímu renderu po již vyčerpaném budgetu; kontrola po GPU checkpointu brání pozdnímu ready. Není přidán timer, loop, globální stav ani nová přidělovaná kolekce. Device-loss continuation již předchozí regrese správně zastavovala; do tohoto mechanismu se nesahalo.
+
+Skutečné ověření 16. 10. 2026, direct Node CLI v původním vlastním CPU stagingu:
+
+- `deadline-red.log`: původní runtime a tři nové skutečné controller regrese **0 PASS / 3 FAIL**, exit 1. Clock překročí limit před RAF, uvnitř synchronního renderu nebo během čekání na submission; žádný opožděný timer callback se úmyslně nevolá. Původní controller ve všech případech nesprávně resolve ready.
+- `deadline-green.log`: finální controller/scheduler/RenderHealth série **28/28 PASS**, exit 0. Zahrnuje všechny tři red scénáře a pozitivní hidden kontrolu s dalším 60s skrytého času, který se do limitu nezapočítá. EndFrame, cleanup, context-loss a generace zůstávají ověřené.
+- `deadline-types.log`: scoped strict TypeScript **0 diagnostik**, exit 0. `git diff --check` PASS.
+- `deadline-checks.json`: přesné source/staged a log hashe. Runtime SHA-256 `a20befc527e998129d492b3977b8788f33537ddcce087f1d9d2987fb10556543`; test SHA-256 `93383410f5f14f9a5137a9b625a226b599d74ad0b0105b3875fa581ae3bd7219`.
+
+Žádný GPU/server/build/fullsuite, změna dependencies nebo zásah do hraného native-v3/4192. Vlastní krátké kontroly skončily. Po samostatném commitu těchto tří souborů se rezervace znovu uvolňuje; root dostane SHA/release a řeší odděleně Game/UI/factory i následnou stabilní přejímku.

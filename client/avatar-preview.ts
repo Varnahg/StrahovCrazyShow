@@ -281,10 +281,12 @@ export async function createAvatarPreview(
   let budgetStart: number | undefined;
   let budgetRemaining = 30_000;
   let budgetEpoch = 0;
+  const remainingVisibleBudget = () =>
+    budgetRemaining -
+    (budgetStart === undefined ? 0 : Math.max(0, runtime.now() - budgetStart));
   const pauseBudget = () => {
     budgetEpoch++;
-    if (budgetStart !== undefined)
-      budgetRemaining -= Math.max(0, runtime.now() - budgetStart);
+    budgetRemaining = remainingVisibleBudget();
     budgetStart = undefined;
     if (budgetTimer !== undefined) runtime.clearTimer(budgetTimer);
     budgetTimer = undefined;
@@ -327,6 +329,13 @@ export async function createAvatarPreview(
     // An effect notification may arrive inside render: finish endFrame first.
     queueMicrotask(() => dispose(failure));
   };
+  const reportDeadline = () =>
+    health?.report("pipeline", "Příprava 3D náhledu překročila časový limit.");
+  const withinBudget = () => {
+    if (state !== "loading" || remainingVisibleBudget() > 0) return true;
+    reportDeadline();
+    return false;
+  };
   const resumeBudget = () => {
     if (
       disposed ||
@@ -345,10 +354,7 @@ export async function createAvatarPreview(
           state === "loading" &&
           runtime.visible()
         )
-          health?.report(
-            "pipeline",
-            "Příprava 3D náhledu překročila časový limit.",
-          );
+          reportDeadline();
       },
       Math.max(0, budgetRemaining),
     );
@@ -447,6 +453,7 @@ export async function createAvatarPreview(
       },
       async frame() {
         if (disposed || failure) return false;
+        if (!withinBudget()) return false;
         const finishValidation = scope();
         let beforeReady = false;
         let begun = false;
@@ -524,6 +531,9 @@ export async function createAvatarPreview(
         await Promise.all([validation, submission, ...compilation]);
         if (renderFailure) throw renderFailure;
         if (disposed || failure) return false;
+        // A blocking render or a resolved GPU promise can reach this microtask
+        // before the overdue timer task. Do not accept after the visible budget.
+        if (!withinBudget()) return false;
         if (
           !runtime.visible() ||
           signature !== JSON.stringify(currentConfig()) ||

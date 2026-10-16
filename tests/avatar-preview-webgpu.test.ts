@@ -428,6 +428,7 @@ test("hidden preparation pauses budget and RAF, then resumes with current DPR", 
   const staleTimer = f.timers.values().next().value!;
   f.advance(5000);
   f.visible(false);
+  f.advance(60_000);
   assert.equal(f.queued.size, 0);
   assert.equal(f.timers.size, 0);
   staleTimer();
@@ -513,6 +514,39 @@ test("visible preparation has a bounded deadline and cleans a never-ready scene"
   assert.equal(f.queued.size, 0);
   assert.equal(f.timers.size, 0);
 });
+
+for (const stage of ["before-frame", "render", "submission"] as const)
+  test(`visible deadline is checked without dispatching the late timer after ${stage}`, async (t) => {
+    const f = fixture(t);
+    const result = f.start();
+    await settle();
+    const pending = deferred<void>();
+    if (stage === "before-frame") f.advance(30_001);
+    if (stage === "render")
+      f.surface.render = () => {
+        f.calls.push("render");
+        f.advance(30_001);
+      };
+    if (stage === "submission") f.submission(pending);
+    await f.frame();
+    if (stage === "submission") {
+      f.advance(30_001);
+      pending.resolve();
+      await settle();
+    }
+    // Browser microtasks run before the overdue timer task. Do not invoke it:
+    // acceptance itself must inspect elapsed visible time.
+    await assert.rejects(result, /časový limit/);
+    await settle();
+    assert.equal(f.states.includes("ready"), false);
+    assert.equal(f.stats().disposals, 1);
+    assert.equal(
+      f.calls.filter((call) => call === "end").length,
+      stage === "before-frame" ? 0 : 1,
+    );
+    assert.equal(f.queued.size, 0);
+    assert.equal(f.timers.size, 0);
+  });
 
 test("a throwing latest-profile getter still releases its initialized engine", async (t) => {
   const f = fixture(t);
