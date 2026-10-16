@@ -1,0 +1,13 @@
+# Předání: webgpu-ui-fixtures-20261016
+
+- Vlastník: `webgpu-01a14497-uifixture`; příjemce: `webgpu-01a14497-root`.
+- Pracovní kopie: `C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow`, větev `codex/webgpu-comparison`; výchozí commit `19d3408`.
+- Rozsah: pouze `tests/room-callbacks.test.ts` a tento soubor. Game/UI/factory ani cizí WIP nejsou upravené. Claim získán před prvním zápisem.
+- Podklady: skutečný nový UI effect a původní AST/VM fixture, pinované TypeScript transpile chování; rootův zachovaný `.cache/webgpu-comparison/logs/full-test-v1.log` má 972 testů, 965 PASS a 7 FAIL. Čtyři startup scénáře končí na chybějícím VM `AbortController`; další tři chyby jsou oddělené LFS fixtures v rootově rozsahu.
+- Rozhodnutí před implementací: doplnit pouze nové IO hranice fixture. Ponechat skutečný UI effect, odložený `Game.start`, všechny čtyři success/failure/cancel scénáře i všechny původní assertions. Kopírování runtime lifecycle, vynechání testů, rozvolnění očekávání ani načtení skutečného GPU enginu není potřebné.
+- Implementace/refaktoring: jeden AST import přepis rozpoznává `./game` i `./render-engine`; startup prostředí přidává skutečný `AbortController`, fake async factory a renderer identity. Fake Game má idempotentní dispose jako produkt. Nové assertions ověřují přesné předání enginu do Game, nezrušený init signal, vlastnictví během startu, abort při cleanup a právě jedno uvolnění enginu ve všech čtyřech scénářích.
+- Freeze: `tests/room-callbacks.test.ts` SHA-256 `11e6f88a2c29ad24c6594c180ee9dc04125c3f748dbed4be75fd113d173b2d58`. Root byl požádán o kopii tohoto zmrazeného souboru do svého validovaného snapshotu; autor testový soubor po oznámení dále nemění.
+- Ověření autora: `git diff --check -- tests/room-callbacks.test.ts` PASS, exit 0. Root následně spustil cílené `room-callbacks`, `tree-appearance`, `vegetation-realistic` a `vegetation-runtime` testy: **42/42 PASS**, exit 0, log `.cache/webgpu-comparison/logs/recovered-targeted.log`, jeho koncové výsledky autor znovu přečetl. Nový rootův zdrojový/assetový/testový snapshot je `e0de700bbcb2f603fac295ed718c9f872b8e5c993be64bd8195212b1ca49c90b`. Původní neúspěšný plný log zůstává zachovaný; nová plná pipeline je samostatná navazující práce rootu.
+- Procesy: žádný vlastní dlouhožijící proces, server, build, GPU ani změna závislostí/assetů.
+- Omezení: tato změna je testovací kompatibilita nové async IO hranice; není měřením FPS, shaderové kompatibility ani dokončením celého WebGPU A/B. Stav tasku, finální plnou pipeline a integraci vlastní root.
+- Rezervace: po tomto předání a samostatném commitu dvou vlastních souborů se uvolňuje; přesný commit a úspěšný release dostává root v závěrečné zprávě. Release není označení celého experimentu Done.

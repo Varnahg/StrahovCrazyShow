@@ -105,14 +105,21 @@ function compileScript(source: string) {
                 ts.isCallExpression(node) &&
                 node.expression.kind === ts.SyntaxKind.ImportKeyword &&
                 node.arguments[0] &&
-                ts.isStringLiteral(node.arguments[0]) &&
-                node.arguments[0].text === "./game"
-              )
-                return ts.factory.createCallExpression(
-                  ts.factory.createIdentifier("testLoadGame"),
-                  undefined,
-                  [],
-                );
+                ts.isStringLiteral(node.arguments[0])
+              ) {
+                const loader =
+                  node.arguments[0].text === "./game"
+                    ? "testLoadGame"
+                    : node.arguments[0].text === "./render-engine"
+                      ? "testLoadRenderEngine"
+                      : undefined;
+                if (loader)
+                  return ts.factory.createCallExpression(
+                    ts.factory.createIdentifier(loader),
+                    undefined,
+                    [],
+                  );
+              }
               return ts.isMetaProperty(node) &&
                 node.keywordToken === ts.SyntaxKind.ImportKeyword
                 ? ts.factory.createIdentifier("testImportMeta")
@@ -1193,6 +1200,14 @@ for (const outcome of [
     const starting = deferred<void>();
     const game = f.game;
     let starts = 0;
+    let engineDisposals = 0;
+    let initializationSignal: AbortSignal | undefined;
+    const engine = {
+      isWebGPU: false,
+      dispose() {
+        engineDisposals++;
+      },
+    };
     Object.assign(game, {
       ready: false,
       // Game constructs its Scene before start; UI may inspect its inventory.
@@ -1205,17 +1220,37 @@ for (const outcome of [
         game.ready = true;
       },
       dispose: () => {
+        if (game.disposed) return;
         game.disposed = true;
+        engine.dispose();
       },
     });
     Object.assign(f.environment, {
+      AbortController,
       testLoadGame: async () => ({
         Game: class {
-          constructor() {
+          constructor(canvas: unknown, _profile: unknown, prepared: unknown) {
+            assert.equal(canvas, game.canvas);
+            assert.equal(prepared, engine);
             return game;
           }
         },
       }),
+      testLoadRenderEngine: async () => ({
+        createGameEngine: async (
+          canvas: unknown,
+          { signal }: { signal: AbortSignal },
+        ) => {
+          assert.equal(canvas, game.canvas);
+          assert.equal(signal.aborted, false);
+          initializationSignal = signal;
+          return engine;
+        },
+      }),
+      getRendererInfo: (candidate: unknown) => {
+        assert.equal(candidate, engine);
+        return { renderer: "fixture", vendor: "fixture", version: "fixture" };
+      },
       mode: "multi",
       canvas: { current: game.canvas },
       lightingPreviewRef: { current: { instant: null } },
@@ -1231,6 +1266,8 @@ for (const outcome of [
       f.diagnostics.filter((event) => event.kind === "game-ready");
     await setImmediate();
     assert.equal(starts, 1, "actual lifecycle must reach the pending start");
+    assert.ok(initializationSignal);
+    assert.equal(engineDisposals, 0, "Game owns the initialized engine while starting");
     assert.equal(readyEvents().length, 0);
     assert.notEqual(f.state.ready, true);
     if (outcome.startsWith("cancel-")) cleanup();
@@ -1242,5 +1279,7 @@ for (const outcome of [
     assert.equal(f.state.ready === true, successful);
     if (!outcome.startsWith("cancel-")) cleanup();
     assert.equal(game.disposed, true);
+    assert.equal(initializationSignal.aborted, true);
+    assert.equal(engineDisposals, 1, "startup failure or cleanup releases the engine once");
   });
 }
