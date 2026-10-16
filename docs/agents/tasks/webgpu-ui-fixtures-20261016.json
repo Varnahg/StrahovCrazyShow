@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-ui-fixtures-20261016",
+  "title": "Aktualizovat skutečné UI startup fixtures pro async backend",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/room-callbacks.test.ts",
+    "docs/agents/handoffs/webgpu-ui-fixtures-20261016.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Skutečný UI effect zůstává testovaný pro success/failure/cancel; doplněné IOhranice asyncengine, nikoli kopírovanálogika."
+  ],
+  "verification": [
+    "Cílené room-callbacks testy a rootfullpipeline."
+  ],
+  "notes": [
+    "Root autorizuje pouzefixtures; runtimegame/ui držíroot."
+  ]
+}
