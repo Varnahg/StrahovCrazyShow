@@ -1,23 +1,19 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine.pure.js";
 import { _CommonDispose } from "@babylonjs/core/Engines/engine.common.js";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
 import { PREFERRED_GPU_POWER } from "./gpu-diagnostics";
 
 export type RenderBackend = "webgl2" | "webgpu" | "webgpu-fast";
 
-/** These immutable local assets are supplied by the experiment's own snapshot. */
-export const WEBGPU_COMPILERS = Object.freeze({
-  glslang: Object.freeze({
-    jsPath: "/tools/webgpu-9.30/glslang.js",
-    wasmPath: "/tools/webgpu-9.30/glslang.wasm",
-  }),
-  twgsl: Object.freeze({
-    jsPath: "/tools/webgpu-9.30/twgsl.js",
-    wasmPath: "/tools/webgpu-9.30/twgsl.wasm",
-  }),
-});
+/** The migration renders native WGSL. Reject an overlooked GLSL material
+ * before Babylon can download or synchronously run a translation toolchain. */
+export function requireNativeWebGpuShaders(engine: {
+  prepareGlslangAndTintAsync(): Promise<void>;
+}) {
+  engine.prepareGlslangAndTintAsync = async () => {
+    throw new Error("WebGPU vyžaduje nativní WGSL materiál; překlad GLSL není povolen.");
+  };
+}
 
 export function selectRenderBackend(location: {
   hostname: string;
@@ -199,26 +195,23 @@ const runtime: RenderEngineRuntime<AbstractEngine> = {
     const { WebGPUEngine } =
       await import("@babylonjs/core/Engines/webgpuEngine");
     checkAbort(signal);
-    // These page-wide flags must remain in force for later glTF/LOD materials.
-    // The experiment always uses one requested backend for the whole page.
-    StandardMaterial.ForceGLSL = true;
-    PBRBaseMaterial.ForceGLSL = true;
     const engine = new WebGPUEngine(canvas, {
       antialias: true,
       stencil: true,
       adaptToDeviceRatio: false,
       powerPreference: PREFERRED_GPU_POWER,
+      // RenderHealth owns device.lost and requires a new prepared renderer.
+      // Babylon's automatic restore could allocate a device after UI teardown.
+      doNotHandleContextLost: true,
       // Babylon intersects this list with adapter support before requestDevice.
       deviceDescriptor: { requiredFeatures: ["timestamp-query"] },
     });
+    requireNativeWebGpuShaders(engine);
     let initialized = false;
     return {
       engine,
       async initialize() {
-        await engine.initAsync(
-          WEBGPU_COMPILERS.glslang,
-          WEBGPU_COMPILERS.twgsl,
-        );
+        await engine.initAsync();
         initialized = true;
         // The legacy whole-frame counter can report 0 when writeTimestamp is
         // unavailable. Only the explicitly scoped per-pass path is enabled.

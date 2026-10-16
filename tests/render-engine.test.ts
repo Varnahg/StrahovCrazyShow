@@ -5,6 +5,7 @@ import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import {
   disposeFailedWebGpuInitialization,
   initializeRenderEngine,
+  requireNativeWebGpuShaders,
   selectRenderBackend,
   type RenderEngineRuntime,
 } from "../client/render-engine";
@@ -14,6 +15,17 @@ const canvas = {
   height: 720,
   removeEventListener() {},
 } as unknown as HTMLCanvasElement;
+
+test("native shader policy prevents the real engine from attempting a compiler download", async () => {
+  const engine = new WebGPUEngine(canvas);
+  try {
+    requireNativeWebGpuShaders(engine);
+    await assert.rejects(engine.prepareGlslangAndTintAsync(), /nativní WGSL/);
+    assert.equal((engine as unknown as { _workingGlslangAndTintPromise: unknown })._workingGlslangAndTintPromise, null);
+  } finally {
+    disposeFailedWebGpuInitialization(engine, canvas);
+  }
+});
 
 function deferred<T = void>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
