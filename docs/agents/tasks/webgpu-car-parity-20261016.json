@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-car-parity-20261016",
+  "title": "Shodná car paint instance cesta pro renderer A/B",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/car-pack.ts",
+    "tests/car-webgpu-parity.test.ts",
+    "docs/agents/handoffs/webgpu-car-parity-20261016.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Po source výzkumu povolit existující GLSL plugin na WebGPU pouze v explicitním experimentu.",
+    "Stejné barvy/geometrie/LOD; default chování nezměnit."
+  ],
+  "verification": [
+    "Cílené CPU regrese, root navazující obrazová kontrola."
+  ],
+  "notes": [
+    "Disjunktní task; nezměnit obecné API/asset bez dohody; při nepodpoře uvést blocker.",
+    "16.10 root převzal konkrétní ověřený celek v izolované větvi. Runtime snapshot a1eb953f…,985/985tests/build/integration PASS. Porovnání dokončeno s negativním výsledkem migrace;3WebGPUthree běhy neplatné, KEY-5 zůstává otevřený. Viz docs/performance/evidence/webgpu-comparison-20261016/README.md. Nejde o nasazení WebGPU do main."
+  ]
+}

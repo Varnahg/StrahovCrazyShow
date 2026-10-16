@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-frame-lifecycle-profile-20261016",
+  "title": "KEY-31: rozlišit raw RAF od celé enginové práce před/po Game callbacku",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/webgpu-frame-lifecycle-profile.ts", "tests/webgpu-frame-lifecycle-profile.test.ts", "docs/agents/handoffs/webgpu-frame-lifecycle-profile-20261016.md", ".cache/webgpu-migration-checks/frame-lifecycle/"],
+  "resources": [],
+  "acceptance": ["Samostatný explicitně vytvořený diagnostic owner; root jej zapojí pouze loopback opt-in. Žádné globální prototype mutace ani změna render policy/readiness.", "Měřit synchronní engine begin/end/flush a relevantní vlastní encoder finish/pass end/create/query/getCurrentTexture/destroy podle pinovaného řetězce; report jasně odlišuje nested/inclusive CPU a async completion latency.", "Současná raw RAF kadence a skutečná engine maxFPS/background/host-window/skip state metadata; chybějící hook není nula. Zachovat návraty, výjimky, Promise identity a this. Bez silného držení všech transient GPU resources."],
+  "verification": ["Lehké CPU fake-host/per-instance regressions, zdokumentované varianty/scope a refaktor; cleanup restores jen vlastní wrappery, ruší vlastní raw RAF a nepřebírá cizí owner. Strict TS.", "Žádný GPU/UI/build/fullsuite/install. Root provede společné zapojení do Game a skutečnou produkční diagnostiku."],
+  "notes": ["Native-v7: idle85samples59.9Hz, poté29engine callbacks/30s. Dosavadní rafGap znamená engine callback gap, ne raw RAF; beginFrame/endFrame jsou mimo callback. Není důkazem samotného backgroundu.", "Přidělen render_diagnosis po detailním read-only průzkumu pinned Babylon9.30. Navrhnout API před integrací rootovi; source slot Game vlastní root. Použít readonly dependencies-v5."]
+}

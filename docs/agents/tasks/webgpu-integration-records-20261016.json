@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-integration-records-20261016",
+  "title": "Převzít nezávislé historické záznamy native engine integrace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["docs/agents/handoffs/webgpu-engine-20261016.md", "scripts/webgpu-companions.ts"],
+  "resources": [],
+  "acceptance": ["Přesný vlastní předaný handoff z ověřeného commitu; žádný foreign WIP."],
+  "verification": ["Parent blob/index/status preflight a fyzické hash/diff zachování primary WIP po integraci."],
+  "notes": ["Root již vlastní common engine/diagnostics/runtime tests přes původní claim; tento úzký scope doplňuje pouze disjunktní handoff soubor. Heavy-validation drží root."]
+}

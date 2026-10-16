@@ -1,0 +1,74 @@
+BJS - [21:55:46]: Babylon.js v9.30.0 - Null engine
+BJS - [21:55:46]: Babylon.js v9.30.0 - Null engine
+BJS - [21:55:46]: Babylon.js v9.30.0 - Null engine
+BJS - [21:55:46]: Babylon.js v9.30.0 - Null engine
+BJS - [21:55:46]: Babylon.js v9.30.0 - Null engine
+BJS - [21:55:46]: Babylon.js v9.30.0 - Null engine
+BJS - [21:55:46]: Babylon.js v9.30.0 - Null engine
+BJS - [21:55:46]: Babylon.js v9.30.0 - Null engine
+BJS - [21:55:46]: Babylon.js v9.30.0 - Null engine
+BJS - [21:55:46]: Babylon.js v9.30.0 - Null engine
+✔ actual Game prepares current/night OFF/ON with one real torch and restores current requested state (72.8826ms)
+✔ night preparation respects low quality and the actual celestial key slot (8.9314ms)
+✖ actual Game overlaps shader diagnostics while retaining preparation barriers (7.8343ms)
+✖ actual Game does not accept native hot-swap readiness while a new effect is pending (3.551ms)
+✔ late validation failure still stops actual Game variant preparation (2.0846ms)
+✔ settings/avatar changes during wait are preserved and current local rig is reacquired (3.3579ms)
+✔ actual Game cancellation settles pending new effects without restoring disposed objects (2.0047ms)
+✔ actual Game timeout reports incomplete work and restores OFF while allowing startup caller to decide (2.6653ms)
+✔ production startup awaits preparation before ready and records its outcome; dispose aborts first (0.524ms)
+✔ actual readiness error restores camera pass and leaves the requested OFF state intact (2.9274ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 8
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2858.5894
+
+✖ failing tests:
+
+test at tests\game-light-preparation.test.ts:5:6134
+✖ actual Game overlaps shader diagnostics while retaining preparation barriers (7.8343ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + [Function: tick]
+  - undefined
+  
+      at Object.finish (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\readiness-wiring\tests\game-light-preparation.test.ts:262:14)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\readiness-wiring\tests\game-light-preparation.test.ts:370:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    expected: undefined,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\game-light-preparation.test.ts:5:6850
+✖ actual Game does not accept native hot-swap readiness while a new effect is pending (3.551ms)
+  AssertionError [ERR_ASSERTION]: native stub and ready old effect cannot advance the stage
+  
+  4 !== 1
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\readiness-wiring\tests\game-light-preparation.test.ts:389:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

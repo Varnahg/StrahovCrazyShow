@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-shader-inventory-20261016",
+  "title": "KEY-31/32: doložit skutečné duplicity WGSL a jejich přípravné etapy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/webgpu-compilation-profile.ts", "tests/webgpu-compilation-profile.test.ts", "docs/agents/handoffs/webgpu-shader-inventory-20261016.md", ".cache/webgpu-migration-checks/shader-inventory/"],
+  "resources": [],
+  "acceptance": [
+    "Před implementací zapsat primární důkaz: pinned _getWGSLShader přidává defines jako diagnostický komentářový prefix k již zpracovanému WGSL; Dawn cache porovnává raw WGSL. To je možnost duplicity, nikoli dosud změřený hit-rate.",
+    "Pouze explicitně zapnutý omezený inventář: raw kód versus skutečné tělo před známým prefixem, stage/vertex/fragment identita, délka a počty opakování. Žádná normalizace, shader transformace, cache náhrada nebo vypnutí validace.",
+    "Dohodnout malé API s rootem před implementací; root vlastní opt-in Game wiring a označení etap. Normální vypnutý stav nezpracovává texty shaderů ani nealokuje inventář.",
+    "Pevné kapacity paměti/počtu záznamů a explicitní truncation/unknown/collision scope; žádné plné zdrojové shadery v frame logu. Přesnost duplicit musí být doložená, ne pouze přejmenovaná odhadovaná fingerprint shoda.",
+    "Zachovat původní receiver, argumenty, návraty, výjimky a Promise/rejection semantiku. Per-engine/device generation ownership a disposal; neponechat silné reference na GPU zdroje. Snapshot musí přežít skutečný diagnostický sanitizer."
+  ],
+  "verification": [
+    "Cílené CPU testy skutečného pinned prefixu, rozdílných defines/stejného těla, skutečně odlišných těl, obou stages, limitů, vypnutého režimu a lifecycle. Strict TypeScript a cílený refaktor.",
+    "Bez GPU, full suite, build, instalace a procesů. Root provede označený diagnostický build a reálný sběr; výkonové akceptační běhy mají inventář vypnutý. Commit/handoff/release po vlastních testech."
+  ],
+  "notes": [
+    "Userauthorized KEY-22/31/32. C4 pilot: WebGL2 53.3FPS/start32.396s, WebGPU CM53.5FPS/start45.718s, NCM54.2FPS/start45.930s; pouze piloty, nikoli třipárová přejímka. WebGPU firstF již bez nových modulů, ale delší startup vyžaduje další důkaz.",
+    "Přidělen render_diagnosis. Pouze migrační WT a readonly dependencies-v5; žádné změny frozen C4/v12/uživatelské4192. Root vlastní ostatní integrační body."
+  ]
+}

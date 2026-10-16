@@ -1,0 +1,50 @@
+{
+  "atUTC": "2026-10-16T19:40:48.103Z",
+  "evidence": "Native-v10 pnpm test (1173) then isolated integration returned exit0; unchanged v10 production build with TypeScript already returned exit0 before serving and was not rebuilt. Combined-v3 sequential pnpm test (1233), pnpm build, pnpm test:integration returned exit0. GPU acceptance remains separate.",
+  "native": {
+    "sourceCommit": "ad2b39c67a5b1db3930c1ab1579a96207d0b2458",
+    "snapshotId": "79d55c7b29685b41f5d02afc6afe8be6d0f0dfe15adbf88fa3fad56480b5fbe7",
+    "tests": 1173,
+    "complete": true,
+    "logs": {
+      "tests": {
+        "path": ".cache/webgpu-migration/native-v10-test.log",
+        "sha256": "5e5a57050003b7c00c14e8e179481e1240ef7ec6f1088a41733ed76fe4fe3961",
+        "exitCode": 0
+      },
+      "build": {
+        "path": ".cache/webgpu-migration/native-v10-build.log",
+        "sha256": "8654c2b7dee0f7e3b65e9d089faff0d9685dcb45e6c4a684276ff0c1830cf0a1",
+        "exitCode": 0
+      },
+      "integration": {
+        "path": ".cache/webgpu-migration/native-v10-integration.log",
+        "sha256": "4a08c856a582e290725170a903444c97e387e57928726c4b2e72d5772b99a44d",
+        "exitCode": 0
+      }
+    }
+  },
+  "combined": {
+    "sourceCommit": "ad2b39c67a5b1db3930c1ab1579a96207d0b2458",
+    "snapshotId": "31d0f02303b9cd3ff0721a830f130ee4647df615ffc9a2a47726a4b04c2adbe9",
+    "tests": 1233,
+    "complete": true,
+    "logs": {
+      "tests": {
+        "path": ".cache/webgpu-migration/combined-v3-test.log",
+        "sha256": "b0ed21ade0b38d1ac7e28191ce73bdaac738d5af89967e363a623dde15449d39",
+        "exitCode": 0
+      },
+      "build": {
+        "path": ".cache/webgpu-migration/combined-v3-build.log",
+        "sha256": "0d8433101972eeedff7dbd7a9d157ff8acbe01fb6ad1baea6706fc626959a5b4",
+        "exitCode": 0
+      },
+      "integration": {
+        "path": ".cache/webgpu-migration/combined-v3-integration.log",
+        "sha256": "26351e44e553d452ffbc2cdc6aec6dcb131dc92376b65feb2bf43a5bce81d3fc",
+        "exitCode": 0
+      }
+    }
+  }
+}

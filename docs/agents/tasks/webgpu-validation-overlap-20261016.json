@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-validation-overlap-20261016",
+  "title": "KEY-31: oddělit asynchronní diagnostiku shaderů od přípravy jednotlivých variant",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": ["client/render-health.ts", "client/webgpu-compilation-profile.ts", "tests/render-health.test.ts", "tests/webgpu-compilation-profile.test.ts", "tests/render-startup.test.ts", "docs/agents/handoffs/webgpu-validation-overlap-20261016.md", ".cache/webgpu-migration-checks/validation-overlap/"],
+  "resources": [],
+  "acceptance": [
+    "Před implementací doložit pinned Babylon readiness a WebGPU compilation-info pořadí; srovnat raw odstranění všech bariér, typed shader-validation overlap, dedup stage/cache, async pipeline a timeout změny.",
+    "RenderHealth.track má explicitní typ operace, výchozí preparation; jen přesně phase shaderValidation/getCompilationInfo je shader-validation. Žádná klasifikace podle label substring nebo obecného shader channel.",
+    "Snapshot rozlišuje pendingPreparationOperations a pendingShaderValidationOperations; původní pendingOperations a markReady nadále zahrnují vše. Synchronous failures, rejection identity, generation reset, disposal/device loss a resource lifecycle zůstávají bezpečné.",
+    "Per-stage Game wiring vlastní root. Final waitForRenderStartup nadále musí čekat VŠECHNY pending operace, validaci scope a dokončení skutečné fronty; žádný kratší readiness důkaz, prodloužený timeout ani vypnuté chybové kontroly."
+  ],
+  "verification": [
+    "Cílené skutečné health/profile/startup regrese pro mixed pending druhy, late failures, disposal/generation reset a final gate. Strict TS proti readonly dependencies-v5; refaktor společně s implementací.",
+    "Bez GPU, full suite, build, instalací či síťových služeb; root provede stabilní checkpoint a aktivní Edge srovnání. Přesné soubory/commity/hashes/výsledky do vlastního handoffu, poté release."
+  ],
+  "notes": [
+    "Uživatelem autorizovaná úplná WebGPU migrace KEY-22/31. V11 active A/B/A stále timeout u night2; 576-580module diagnostics, max5.3-5.6s latency. Pinned areAllEffectsReady pouze returntrue, proto nesmí zmizet preparation pending barrier.",
+    "Přidělen render_diagnosis. Game a jeho fixtures drží root; žádné zápisy do primary WIP/frozen snapshotů. Jen pracovní kopie webgpu-comparison, přímý Node CLI, vlastní výstupy."
+  ]
+}

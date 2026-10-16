@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-profile-preview-20261016",
+  "title": "Izolovaný profiling preview bez změny hraného native-v3",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [],
+  "resources": ["port:4193", "port:2588"],
+  "acceptance": ["Samostatný API/world/log a preview; native-v3 4192/2587 beze změny."],
+  "verification": ["Ověřit PID/start/cmd, actual URL/build identity, fixture a nulový souběh aktivních GPU scén před výkonovým měřením."],
+  "notes": ["Root explicitně vlastní všechny výstupy .cache/webgpu-migration i heavy-validation/gpu pod webgpu-migrate-root-20261016. Tento resource-only task rozšiřuje oddělené porty bez uvolnění původního běžícího userplaytestu. Nový origin není důvod měnit jeho snapshot nebo dependencies."]
+}

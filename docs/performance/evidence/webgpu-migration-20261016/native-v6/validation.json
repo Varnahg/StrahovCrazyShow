@@ -1,0 +1,273 @@
+{
+  "atUTC": "2026-10-16T17:29:21.769Z",
+  "sourceCommit": "8de8299a7db91c6e072898a7cecbcaf0de3ffa3c",
+  "sourceSnapshotId": "9a3481d692bc6421edab4948207007de22ddc7a9eec2f58885e50263f7c0025f",
+  "cpuValidation": {
+    "tests": 1142,
+    "pass": 1142,
+    "build": "pass",
+    "integration": "pass"
+  },
+  "sessionId": "36b29b47-d154-40ae-a728-7d8ef13511c8",
+  "scope": "immutable prefix of ongoing session; startup diagnostics only, no valid gameplay/FPS interval",
+  "maxSeq": 264,
+  "attempts": [
+    {
+      "seq": 104,
+      "atMs": 59524.7,
+      "status": "timeout",
+      "activeElapsedMs": 30009.40000000596,
+      "elapsedMs": 30009.40000000596,
+      "stages": [
+        {
+          "stage": "current-off",
+          "elapsedMs": 30007.09999999404,
+          "activeElapsedMs": 30007.09999999404,
+          "pausedMs": 0,
+          "tickCount": 29,
+          "rafGap": {
+            "count": 29,
+            "totalMs": 29612.09999999404,
+            "maxMs": 2185.199999988079
+          },
+          "cpu": {
+            "apply": {
+              "calls": 7,
+              "totalMs": 414.50000001490116,
+              "maxMs": 398.30000001192093
+            },
+            "checkBatch": {
+              "calls": 22,
+              "totalMs": 346.2999999821186,
+              "maxMs": 72.20000000298023
+            },
+            "render": {
+              "calls": 8,
+              "totalMs": 1281.6000000089407,
+              "maxMs": 916.7999999970198
+            }
+          },
+          "restartReasons": {
+            "meshes": 6
+          },
+          "checks": 1062,
+          "renders": 8,
+          "restarts": 6
+        }
+      ],
+      "accountedCpuMs": 2042.4000000059605
+    },
+    {
+      "seq": 231,
+      "atMs": 320320.5,
+      "status": "timeout",
+      "activeElapsedMs": 30626.5,
+      "elapsedMs": 30626.5,
+      "stages": [
+        {
+          "stage": "current-off",
+          "elapsedMs": 28637.70000000298,
+          "activeElapsedMs": 28637.70000000298,
+          "pausedMs": 0,
+          "tickCount": 28,
+          "rafGap": {
+            "count": 28,
+            "totalMs": 28606.70000000298,
+            "maxMs": 2195.9000000059605
+          },
+          "cpu": {
+            "apply": {
+              "calls": 8,
+              "totalMs": 705.4999999701977,
+              "maxMs": 688.5999999940395
+            },
+            "checkBatch": {
+              "calls": 20,
+              "totalMs": 140.2000000178814,
+              "maxMs": 24.700000002980232
+            },
+            "render": {
+              "calls": 10,
+              "totalMs": 1181.0000000149012,
+              "maxMs": 794.2999999970198
+            }
+          },
+          "restartReasons": {
+            "meshes": 6,
+            "weather": 1
+          },
+          "checks": 1135,
+          "renders": 10,
+          "restarts": 7
+        },
+        {
+          "stage": "current-on",
+          "elapsedMs": 1980.2000000029802,
+          "activeElapsedMs": 1980.2000000029802,
+          "pausedMs": 0,
+          "tickCount": 1,
+          "rafGap": {
+            "count": 1,
+            "totalMs": 1015.7999999970198,
+            "maxMs": 1015.7999999970198
+          },
+          "cpu": {
+            "apply": {
+              "calls": 1,
+              "totalMs": 29.600000008940697,
+              "maxMs": 29.600000008940697
+            },
+            "checkBatch": {
+              "calls": 0,
+              "totalMs": 0,
+              "maxMs": 0
+            },
+            "render": {
+              "calls": 1,
+              "totalMs": 966.2000000029802,
+              "maxMs": 966.2000000029802
+            }
+          },
+          "restartReasons": {},
+          "checks": 0,
+          "renders": 1,
+          "restarts": 0
+        }
+      ],
+      "accountedCpuMs": 3022.500000014901
+    }
+  ],
+  "environmentSamples": [
+    {
+      "seq": 64,
+      "atMs": 29914.4,
+      "kind": "environment-work",
+      "data": {
+        "scope": {
+          "clock": "performance.now monotonic milliseconds within this owner",
+          "phases": "consecutive CPU wall intervals from begin to each ordered mark; includes synchronous nested calls, listeners, GC and scheduling delays",
+          "total": "begin through the cinematic mark; excludes end, metadata collection and reporting, asynchronous completion, rendering and GPU execution",
+          "relationship": "phases partition this environment interval; inclusive in the enclosing environment/frame CPU timing, never add to that enclosing timing",
+          "sampling": "only complete valid intervals meeting the threshold and cadence; not a distribution, whole-frame time or FPS measurement"
+        },
+        "startedAtMs": 29521.90000000596,
+        "endedAtMs": 29914.20000000298,
+        "totalMs": 392.29999999701977,
+        "phasesMs": {
+          "skyWeather": 0.5,
+          "artLighting": 5.299999997019768,
+          "carLighting": 0,
+          "vehicleLighting": 0.20000000298023224,
+          "flashlight": 0.09999999403953552,
+          "vegetation": 3.2000000029802322,
+          "transit": 4,
+          "precipitation": 0,
+          "surfaces": 0,
+          "cinematic": 379
+        },
+        "metadata": {
+          "quality": "medium",
+          "lightingInstant": 1792171424333,
+          "daylight": 0,
+          "previousExposure": 1.1800000000000002,
+          "exposure": 1.1800000000000002,
+          "meshCount": 3250,
+          "materialCount": 222
+        },
+        "rendererId": 2
+      }
+    },
+    {
+      "seq": 194,
+      "atMs": 290382.9,
+      "kind": "environment-work",
+      "data": {
+        "scope": {
+          "clock": "performance.now monotonic milliseconds within this owner",
+          "phases": "consecutive CPU wall intervals from begin to each ordered mark; includes synchronous nested calls, listeners, GC and scheduling delays",
+          "total": "begin through the cinematic mark; excludes end, metadata collection and reporting, asynchronous completion, rendering and GPU execution",
+          "relationship": "phases partition this environment interval; inclusive in the enclosing environment/frame CPU timing, never add to that enclosing timing",
+          "sampling": "only complete valid intervals meeting the threshold and cadence; not a distribution, whole-frame time or FPS measurement"
+        },
+        "startedAtMs": 289698.10000000894,
+        "endedAtMs": 290382.700000003,
+        "totalMs": 684.5999999940395,
+        "phasesMs": {
+          "skyWeather": 0.19999998807907104,
+          "artLighting": 4.300000011920929,
+          "carLighting": 0,
+          "vehicleLighting": 0,
+          "flashlight": 0,
+          "vegetation": 2,
+          "transit": 245.29999999701977,
+          "precipitation": 0,
+          "surfaces": 0,
+          "cinematic": 432.79999999701977
+        },
+        "metadata": {
+          "quality": "medium",
+          "lightingInstant": 1792171684512,
+          "daylight": 0,
+          "previousExposure": 1.1800000000000002,
+          "exposure": 1.1800000000000002,
+          "meshCount": 3303,
+          "materialCount": 242
+        },
+        "rendererId": 4
+      }
+    },
+    {
+      "seq": 230,
+      "atMs": 319345.7,
+      "kind": "environment-work",
+      "data": {
+        "scope": {
+          "clock": "performance.now monotonic milliseconds within this owner",
+          "phases": "consecutive CPU wall intervals from begin to each ordered mark; includes synchronous nested calls, listeners, GC and scheduling delays",
+          "total": "begin through the cinematic mark; excludes end, metadata collection and reporting, asynchronous completion, rendering and GPU execution",
+          "relationship": "phases partition this environment interval; inclusive in the enclosing environment/frame CPU timing, never add to that enclosing timing",
+          "sampling": "only complete valid intervals meeting the threshold and cadence; not a distribution, whole-frame time or FPS measurement"
+        },
+        "startedAtMs": 319316.700000003,
+        "endedAtMs": 319345.700000003,
+        "totalMs": 29,
+        "phasesMs": {
+          "skyWeather": 0,
+          "artLighting": 0.20000000298023224,
+          "carLighting": 0,
+          "vehicleLighting": 0,
+          "flashlight": 26.200000002980232,
+          "vegetation": 0.7999999970197678,
+          "transit": 1.7999999970197678,
+          "precipitation": 0,
+          "surfaces": 0,
+          "cinematic": 0
+        },
+        "metadata": {
+          "quality": "medium",
+          "lightingInstant": 1792171714134,
+          "daylight": 0,
+          "previousExposure": 1.1800000000000002,
+          "exposure": 1.1800000000000002,
+          "meshCount": 3329,
+          "materialCount": 242
+        },
+        "rendererId": 4
+      }
+    }
+  ],
+  "limitations": [
+    "Actual native foreground/occlusion state unconfirmed despite page visible/focused.",
+    "First attempt2040x986 override; second1528x698 natural viewport. Different resolution is diagnostic only.",
+    "No complete startup, no gameplay acceptance or FPS claim.",
+    "Cinematic initialization is one-off in these attempts; exposure unchanged.",
+    "Protected user native-v3 on4192 remains unchanged."
+  ],
+  "artifacts": {
+    "tests.log": "9696ac6165dec93307ef1bd129a61cff66512c25f49e70bfa2e6c1b1453d0863",
+    "build.log": "36b657f3e091ba824689d111fb669b41b9a14b99cfe4f6effae4639964913b0c",
+    "integration.log": "fa3aa57f7ea78d3d7ace758cb39ae4ad7d280638164d478477051d7c467618de",
+    "source-manifest.json": "4f512105a6ebf2e39840e6d8a96e1c7b23a0e2bb41ac878ea6f76a8c105dae9a",
+    "startup-session-prefix.jsonl": "f1d2e440ee0cb8fe8557073e7f9ef50d55772d481f9f75484f83f53e015b87de"
+  }
+}

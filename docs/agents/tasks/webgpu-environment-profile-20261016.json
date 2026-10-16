@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-environment-profile-20261016",
+  "title": "Změřit skutečné environment podfáze bez změny vykreslování",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/environment-profile.ts", "tests/environment-profile.test.ts", "docs/agents/handoffs/webgpu-environment-profile-20261016.md", ".cache/webgpu-migration-checks/environment/"],
+  "resources": [],
+  "acceptance": ["Čistý per-owner opt-in profiler pro named environment podfáze, bounded pomalé události a žádné frame alokace bez reportu.", "Výslovný CPU/inclusive scope; žádné FPS/GPU tvrzení, změna app chování ani náhodná cache optimalizace."],
+  "verification": ["Deterministické smysluplné testy fáze/čas/nový frame/throttle/snapshot/invalidclock a scoped TypeScript; root vlastní Game zapojení."],
+  "notes": ["KEY32/36, přidělen stack_options po předání reporteru, owner webgpu-mig-01a14497-environment. Direct Node CLI, žádný install/build/GPU a žádné živé snapshot/dependencies edits."]
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-ab-20261016",
+  "title": "Produkční A/B WebGL2 versus WebGPU FPS a záseky",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/game.ts",
+    "client/ui.tsx",
+    "client/labels.ts",
+    "tests/game-render-engine.test.ts",
+    "scripts/webgpu-companions.ts",
+    "scripts/webgpu-report.mjs",
+    "scripts/webgpu-preview.mjs",
+    "tests/webgpu-report.test.ts",
+    "docs/performance/research-20261016/webgpu-comparison.md",
+    "docs/performance/evidence/webgpu-comparison-20261016/",
+    "docs/agents/handoffs/webgpu-ab-20261016.md",
+    "docs/verification.md",
+    ".cache/webgpu-comparison/",
+    "dist/",
+    "public/tools/webgpu-9.30/",
+    "assets/blender/buildings/source-plan.json",
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_alpha_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_arm_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_diff_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_dry_diff_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.exr",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_rough_8k.exr",
+    "public/models/vegetation/realistic/strahov-individual-trees.glb",
+    "public/models/vegetation/runtime/far.glb"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4191",
+    "port:2586",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Stejný produkční zdroj a assets, quality, viewport, UTC/weather a reálné relace/HUD.",
+    "Raw důkazy a nejméně3 páry pokud backend projde funkčním smoke; nezamlčet neúspěšné běhy.",
+    "Ověřit obraz/řízení, GPU identitu, FPS p95 p99 maxima hitches a startup; závěr dle výsledků.",
+    "Frozen4188 a cizí WIP beze změny; vlastní procesy před release ukončit."
+  ],
+  "verification": [
+    "Cílené testy, pnpm test, pnpm build a izolovaný pnpm test:integration dle runtime scope.",
+    "Skutečná GPU série WebGL2/WebGPU CM; NCM samostatně pokud funkční.",
+    "Hashované vstupy včetně testů a frozen4188 kontrola před/po."
+  ],
+  "notes": [
+    "Uživatel výslovně zadal srovnání a zachování hranéverze. Žádná default migrace před důkazy.",
+    "Recovery starých diary integration/validation claims jen po interrupted thread + absent processes + preserved WIP evidence; žádné převzetí jejich změn.",
+    "Main commit960cb6f bez dirtyoverlay; GLSL runtime translation, carparity, timingnullscope výslovně vyhodnotit.",
+    "16.10 vlastní root WIP převzat po obnově rezervace stejným autorem. Rozšíření pouze hydratace12 přesněverzovaných LFSvstupů vnovéWT; žádná regenerace, frozen4188zachovaný. První fulltest965/972 odhalil7selhání:4UIfixture chybějícíAbortController a3LFSodkazy místo binárníchvstupů. Původnílog uchován.",
+    "16.10 root převzal konkrétní ověřený celek v izolované větvi. Runtime snapshot a1eb953f…,985/985tests/build/integration PASS. Porovnání dokončeno s negativním výsledkem migrace;3WebGPUthree běhy neplatné, KEY-5 zůstává otevřený. Viz docs/performance/evidence/webgpu-comparison-20261016/README.md. Nejde o nasazení WebGPU do main.",
+    "Výsledky a offline reporter integrovány do main jako9d1133816cb45d60c7639846882b225f8d15680f; pouze20novýchreportovýchsouborů, žádná runtime migrace. Primary cizístatus+binarydiff zůstaly shodné. RootGPU/preview/API/SDK procesy ukončené, claims se uvolňují."
+  ]
+}

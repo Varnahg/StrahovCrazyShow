@@ -1,0 +1,79 @@
+# WebGPU migration — KEY-22
+
+Owner: `webgpu-migration-01a14497-root`, 2026-10-16. User authorized the complete migration, separate issues, implementation and integration. [Parent issue](https://linear.app/gigeconomy/issue/KEY-22/premigrovat-celou-produkcni-hru-a-editor-na-plynule-webgpu) is the current delivery record; this document fixes the engineering contract. An individual CPU test is not graphical acceptance.
+
+## Evidence and decision
+
+The production A/B report in [webgpu-comparison-20261016](evidence/webgpu-comparison-20261016/README.md) measured source snapshot `a1eb953f7dc9805ee01798e1f11da854215896aadc484d1d3b3d3a89aaad065d`. One-avatar idle FPS was approximately 60 on both backends. First flashlight activation blocked for about 4.9–5.2 seconds on WebGPU. Its lighting preparation timed out, and every three-avatar WebGPU run was invalid because of shader errors. These are observed failures of that prototype, not proof that native WebGPU cannot run this game smoothly.
+
+Pinned Babylon core/loaders are 9.30.0. Their installed sources and existing project patch are authoritative for implementation. Official [non compatibility mode guidance](https://doc.babylonjs.com/setup/support/webGPU/webGPUOptimization/webGPUNonCompatibilityMode/) explains why bundle reuse must be measured: rebuilding bundles can cost more than it saves. [Other WebGPU guidance](https://doc.babylonjs.com/setup/support/webGPU/webGPUOptimization/webGPUMiscellaneous/) identifies DrawWrapper ownership and postprocess binding as specific review points. No unmeasured fast-mode switch is an accepted optimization.
+
+Considered alternatives:
+
+| Alternative | Benefit | Cost/risk | Decision |
+| --- | --- | --- | --- |
+| Keep GLSL translation on WebGPU | Smallest immediate port; preserves current recipes | Runtime compiler dependency and synchronous translation remain; shadow include language can mismatch | Retain only as an intermediate reference, not final architecture |
+| Native WGSL in the existing Babylon renderer | Reuses scene, physics, multiplayer and assets; removes conversion path | Every custom shader, shadow and editor path needs real compilation/parity checks | Selected |
+| Rewrite renderer/engine or game in Rust | Potential worker/WASM CPU kernels where profiling warrants them | Large unrelated migration; does not fix shader/pipeline work by itself | Out of scope without CPU profile evidence |
+| Python rendering/runtime | Useful offline tooling | Does not replace the browser GPU API or improve this production render path | Out of scope |
+| Immediately enable NCM/snapshot rendering | Potential submission reuse | Dynamic scene, uniforms, textures, avatars and pass cache invalidation need measurement | Evaluate NCM after native correctness; do not freeze dynamic rendering |
+
+## Work packages and order
+
+| Issue | Deliverable | Acceptance dependency |
+| --- | --- | --- |
+| KEY-23 | One asynchronous renderer factory and explicit engine ownership | Foundation |
+| KEY-24 | Shadow include closure and native wrapper correctness | GPU shadow repro |
+| KEY-25 | Tree, photographic grass and grass wind WGSL | Foundation + shadow parity |
+| KEY-26 | Campus surface art and photographic facade WGSL | Foundation + calibrated appearance |
+| KEY-27 | Hair and car paint WGSL, instances and all LOD | Foundation + shadow parity |
+| KEY-28 | Sky, Sun and Moon WGSL | Foundation + derivative-safe texture sampling |
+| KEY-29 | Asynchronous avatar preview/editor, cancellation and frame lifecycle | Shared factory |
+| KEY-30 | Error channels, device generations and truthful timing | Shared factory |
+| KEY-31 | Profile and prepare actual pipeline variants without blocking gameplay | All native materials + health |
+| KEY-32 | Profile submission/cache ownership and optimize measured churn | Native scene + editor + health |
+| KEY-33 | Complete functional and visual matrix | Native modules + lifecycle + preparation |
+| KEY-34 | Repeated production acceptance, default flip and integration | Functional, performance and startup acceptance |
+
+Research and disjoint modules may proceed in parallel. Integration follows the dependencies above. Every package records its mechanisms, alternatives, chosen change, targeted refactoring, tests and remaining GPU checks. It receives its own commit and handoff. Linear is updated at research, decision, implementation, verification and integration; no issue is Done merely because its CPU subset passed.
+
+## Renderer and language contract
+
+- Game and avatar preview receive an initialized engine from the same asynchronous factory. A Game constructor must never quietly create another WebGL engine. The caller owns an engine until successful transfer; the scene owner disposes it afterward.
+- Initialization has an AbortSignal. Cancellation returns promptly while any in-flight adapter/device operation performs late cleanup. A changed or detached canvas must not receive an engine created for an older canvas.
+- Preview readiness means a successful prepared frame. Each manual preview frame brackets scene rendering with beginFrame/endFrame and submits work. Idle preview scheduling does not create a second continuous GPU load.
+- Final production default is actual WebGPU, independent of a query string. Unsupported adapter/device has an explicit usable error state. No silent WebGL fallback. A clearly identified reference backend may remain available for controlled local A/B.
+- Native materials select WGSL at construction. Do not flip page-wide language flags on a live engine: Babylon's effect keys do not safely isolate every such transition. Final runtime must neither request nor invoke glslang/Tint.
+- Preserve GLSL recipes during parity work. Preserve geometry, UVs, texture filtering/mips, calibrated colors, wind coefficients, alpha/discard, depth conventions and instance attributes. No missing effect is hidden by reducing quality or disabling shadows.
+- Native support includes built-in PBR/Standard shaders, seven custom plugin classes, custom sky and car ShaderMaterials, all shadow paths and postprocessing. `ShadowDepthWrapper` requires explicit investigation; include availability alone does not prove correct WGSL declarations.
+- Failure channels include effect compilation, shader-module information, validation errors, rejected asynchronous pipeline promises, device loss, failed assets and unexpected shader HTTP responses. Each invalidates the affected measurement generation. A fulfilled readiness Promise alone is insufficient proof of completed pipelines.
+
+## Pipeline and cache work
+
+Record separate CPU conversion, shader-module, synchronous pipeline and asynchronous pipeline timings. Derive variants from the actual scene draw state, including instance layouts, shadow passes, attachment formats, texture state and postprocessing. Babylon's geometry-only convenience prewarm must not be assumed to match those keys. Startup readiness must include all required light states without timeout and preserve scene state after preparation.
+
+Inspect pipeline/bind-group/render-bundle reuse and rebuilds during idle, movement, LOD, flashlight, weather, quality, avatar changes and editor lifecycle. Keep cache ownership per engine/device generation; release obsolete entries and observers. Only add an optimization when the profile locates the cost. Validate both cold interaction and warm steady state; preloading cannot merely move an unbounded freeze into startup.
+
+## Production acceptance
+
+Use a built full production scene, real multiplayer sessions, HUD and varied avatars. Record commit and manifest hashes including tests/assets, Babylon version/patch hash, browser, actual adapter, driver, thermal/clock state, CSS/internal resolution, requested and effective quality, frame intervals, FPS, p95/p99, stalls and startup stages. Keep failures and raw data. A NullEngine or HUD number is not GPU evidence.
+
+Functional matrix covers all six avatar presets and clothing/hair/glasses/beards, peer arrival/departure and LOD, guest isolation and a single shared multiplayer world, B6 entrances/stairs/floor transitions, car entry/driving/exit, camera rotations with A-left/D-right projection, day/night/weather, first and warm flashlight, lamp boundaries, every quality level, resize/hidden-tab/resume, editor open/edit/close and rejoin/recovery. Historical photogrammetry stays historical; this migration does not reinsert it into the live world.
+
+Initial target on the measured GTX 1060 at medium 2040×986 with full HUD and one/at least three real sessions: near 60 FPS, p95 ≤20 ms, p99 ≤33.3 ms, no migration interaction hitch ≥100 ms and no seconds-long freeze. This is a target, not a current claim. If the measured scene budget cannot meet it, document the dominant cost and decision; do not silently lower quality or weaken acceptance. Comparable startup should not regress and preparation must complete without timeout.
+
+Use at least three interleaved repetitions with controlled cache state and thermal/clock evidence. Close other 3D views and account for editor sessions. Separate idle/first interaction/warm movement; verify the same position, camera and route. Do not compare GPU-error runs as if they rendered the same content. GPU timestamp scope is explicit; a main-pass sample is not whole-frame GPU time, and unavailable data stays null.
+
+Full `pnpm test`, `pnpm build`, isolated `pnpm test:integration` and actual Edge GPU checks apply to the stable candidate. Broaden/repeat after relevant repairs. Default flip and integration require the accepted candidate, not just the factory change.
+
+## Isolation and integration
+
+- Active development: attached `webgpu-comparison/StrahovCrazyShow` worktree, branch `codex/webgpu-migration`; original comparison branch stays intact.
+- Root owns new staging `.cache/webgpu-migration/`, ports 4192/2587, integration 2568, `heavy-validation`, `gpu` and `workspace-build`. Agents reserve exact disjoint task paths and CPU outputs. Heartbeats renew within 15 minutes.
+- Played frozen4188/source snapshot `4dcb3f6fc34a560b455c0ee5c4f02a014105142d4bcce392f2628bca0e012ca0` stays byte-identical. Actual client URL/build identity is checked before browser work. No HMR as an isolated test.
+- Historical A/B snapshot and evidence stay immutable. Its public/assets junctions are shared read-only inputs; any future asset change needs a separate scope and detached snapshot first.
+- Primary checkout contains foreign WIP. Before integrating a unit, inspect its exact commit, tests and destination overlap; integrate only owned changes without adopting unrelated dirty paths. Shared Game/UI points require explicit coordination. Freeze candidate and preserve handoff evidence before any delivery.
+
+## Current checkpoint
+
+2026-10-16: issues KEY-22 through KEY-34 created; goal active. Commit `2899f08` closes the shadow include registration path. Actual Babylon wrapper/include processing changes from 1/3 to 3/3 passing tests, with the five-HTML-response negative control retained. GPU reproduction and native wrapper declarations remain open. Vegetation and surface WGSL implementations are in progress. Production default is not yet flipped.

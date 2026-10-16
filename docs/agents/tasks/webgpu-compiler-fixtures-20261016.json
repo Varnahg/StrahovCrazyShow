@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-compiler-fixtures-20261016",
+  "title": "Přenést přesné pinované offline compiler fixtures nutné pro již integrované testy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["public/tools/webgpu-9.30/", "docs/agents/handoffs/webgpu-compiler-fixtures-20261016.md"],
+  "resources": [],
+  "acceptance": ["Pět přesných committed blobů ze57460fe/dacb5dd, oficiální Babylon9.30 CDN provenience a rawSHA. Žádná změna dependency/renderer policy; runtime GLSL guard zůstává.", "Přenést pouze do primary, kde fixtures chybí; stávající WT public junctions hraných native-v3 a historických snapshotů zůstávají nedotčené."],
+  "verification": ["tests/atmosphere-webgpu.test.ts používá tyto přesné offline JS/WASM soubory; zahrnuté v native1150 i combined1210 full PASS checkpointu. Po integraci ověřit úplnou shodu source/assets/config clean main s pinovaným native základem a fyzické bloby."],
+  "notes": ["Root koordinátor drží heavy-validation. Public fixtures jsou původní vlastní předané srovnávací podklady, nikoli nová runtime konverzní cesta. Původní4188 má fyzický public; AB/native-v3 public junctiony cílí do WT, ne primary."]
+}

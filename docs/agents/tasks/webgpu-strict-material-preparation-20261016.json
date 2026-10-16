@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-strict-material-preparation-20261016",
+  "title": "KEY-31: během prewarm nepřijímat starý hot-swapped shader jako novou variantu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": ["client/strict-material-preparation.ts", "tests/strict-material-preparation.test.ts", "docs/agents/handoffs/webgpu-strict-material-preparation-20261016.md", ".cache/webgpu-migration-checks/strict-material/"],
+  "resources": [],
+  "acceptance": [
+    "Před implementací porovnat identity/expectedEffect kontrolu a startup-only allowShaderHotSwapping=false; doložit pinned PBR/Standard a extraInitializationsAsync řetězec.",
+    "Po porovnání zvolen read-only guard skutečných Effectů v cache daného enginu: createEffect je synchronně eviduje před extraInitializer await. Žádné mutace allowShaderHotSwapping, globálních prototypů, shaderů, vzhledu, freeze politiky ani render cache.",
+    "Odsouhlasen export arePreparationEffectsReady(engine); WebGL deleguje původní method, WebGPU kontroluje dostupnost cache, vlastnictví/liveness a skutečné Effect.isReady. Root používá v stage i final gate. Malformed/unavailable cache nikdy neznamená ready; žádná persistent držení prostředků.",
+    "Regrese musí reprodukovat skutečný pinned Standard/PBR pending-new-effect hot swap nebo delayed initializer, nikoli pouze testovat nastavení booleanu. Nová varianta nesmí být označena ready přes předchozí efekt."
+  ],
+  "verification": [
+    "Cílené lehké CPU testy s NullEngine/controlled effects; strict TypeScript proti readonly dependencies-v5; implementace/refaktor/handoff společně.",
+    "Žádný GPU, build, full suite, instalace ani síťový proces. Výstupy pouze vlastní cache; zdroje Game a jiné snapshots nepsat. Commit/release po předání."
+  ],
+  "notes": [
+    "UserauthorizedKEY-22/31. Typed diagnostic-overlap je samostatný agent; bez tohoto strict guardu není nové stage readiness prokázané, protože Babylon hot swap vrací old ready effect a hook nezachytí předcházející extraInitializationsAsync.",
+    "Přidělen stack_options; WT webgpu-comparison, root koordinuje vstupy/výstupy a finální GPU ověření.",
+    "Rozhodnutí po úplném průzkumu: readonly cache varianta má menší lifecycle riziko než dočasné změny všech materiálů; scope souborů a resources se nemění. Root schválil API před implementací."
+  ]
+}

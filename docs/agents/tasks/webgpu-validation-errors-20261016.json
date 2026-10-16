@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-validation-errors-20261016",
+  "title": "Zachytit GPU validační chyby do pravdivého benchmarku",
+  "writePaths": [
+    "client/webgpu-validation.ts",
+    "tests/webgpu-validation.test.ts",
+    "docs/agents/handoffs/webgpu-validation-errors-20261016.md"
+  ],
+  "acceptance": [
+    "Listeneruncapturederror poinit,předScene,cleanup/restored-device rebind, žádnépreventDefault.",
+    "Callback boundedmessage proGame renderErrorCount; WebGLno-op; žádnýfalšovanýEffect."
+  ],
+  "verification": [
+    "CPUactualEventTarget/Observable lifecycle testy; rootGPUcounterpři skutečnémrenderu."
+  ],
+  "notes": [
+    "PinnedBabylon9.30 pouzeLogger.Warn; onEffectErrorObservable a getError tuto chybu nezachytí. RootintegrujecallbackdoGame.",
+    "16.10 root převzal konkrétní ověřený celek v izolované větvi. Runtime snapshot a1eb953f…,985/985tests/build/integration PASS. Porovnání dokončeno s negativním výsledkem migrace;3WebGPUthree běhy neplatné, KEY-5 zůstává otevřený. Viz docs/performance/evidence/webgpu-comparison-20261016/README.md. Nejde o nasazení WebGPU do main."
+  ],
+  "status": "done",
+  "dependsOn": [],
+  "resources": []
+}

@@ -1,0 +1,50 @@
+{
+  "atUTC": "2026-10-16T20:25:04.038Z",
+  "evidence": "Both complete sequential pnpm test/build/integration invocations returned exit0; native1195 and combined1255. Combined build explicitly set VITE_SOURCE_SNAPSHOT_ID from its manifest; native12 diagnostic build omitted this tag and its raw pilot remains unverified for formal performance. Actual native startup and firstF succeeded with valid health; overall performance acceptance still outstanding.",
+  "native": {
+    "sourceCommit": "dc293902fd47072fc784fa4e7c9f04e816e2ec00",
+    "snapshotId": "cbbca97e164ae6a7f0c756bd8d4b97e81e3bed8b984f308e05cc20f56d63b55c",
+    "tests": 1195,
+    "complete": true,
+    "logs": {
+      "tests": {
+        "path": ".cache/webgpu-migration/native-v12-test.log",
+        "sha256": "a40fbf15323ebe06c56f9564b8403d3651ecb4b0c0aaca6205ac4af2ed93ad19",
+        "exitCode": 0
+      },
+      "build": {
+        "path": ".cache/webgpu-migration/native-v12-build.log",
+        "sha256": "6c65edab63ba913a2b38840c28bd3f8d593aa50d1c14379e9b834f3ee35b68b7",
+        "exitCode": 0
+      },
+      "integration": {
+        "path": ".cache/webgpu-migration/native-v12-integration.log",
+        "sha256": "11db135a3a09f5af187510a9d68b3890580641edcf005af0259242f6daa94021",
+        "exitCode": 0
+      }
+    }
+  },
+  "combined": {
+    "sourceCommit": "dc293902fd47072fc784fa4e7c9f04e816e2ec00",
+    "snapshotId": "1383fc9296d70d256ead4c6df0ac87892cdcd522426272bc8e7288613266f277",
+    "tests": 1255,
+    "complete": true,
+    "logs": {
+      "tests": {
+        "path": ".cache/webgpu-migration/combined-v4-test.log",
+        "sha256": "9d1d79d81cb23c576c1e21132cf867a7726b3330148b601031ecf152febb0db6",
+        "exitCode": 0
+      },
+      "build": {
+        "path": ".cache/webgpu-migration/combined-v4-build.log",
+        "sha256": "04636776ea1f5ee4b77e443192e003378aa23e6d31fbcc8c7dd3dae8f57bf5f2",
+        "exitCode": 0
+      },
+      "integration": {
+        "path": ".cache/webgpu-migration/combined-v4-integration.log",
+        "sha256": "a6f02918f1e4fc713e92c24087454ee8c563115f4754d6af54a0671ba4d054ac",
+        "exitCode": 0
+      }
+    }
+  }
+}

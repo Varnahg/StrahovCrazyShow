@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-ui-fixtures-20261016",
+  "title": "Aktualizovat skutečné UI startup fixtures pro async backend",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/room-callbacks.test.ts",
+    "docs/agents/handoffs/webgpu-ui-fixtures-20261016.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Skutečný UI effect zůstává testovaný pro success/failure/cancel; doplněné IOhranice asyncengine, nikoli kopírovanálogika."
+  ],
+  "verification": [
+    "Cílené room-callbacks testy a rootfullpipeline."
+  ],
+  "notes": [
+    "Root autorizuje pouzefixtures; runtimegame/ui držíroot.",
+    "16.10 root převzal konkrétní ověřený celek v izolované větvi. Runtime snapshot a1eb953f…,985/985tests/build/integration PASS. Porovnání dokončeno s negativním výsledkem migrace;3WebGPUthree běhy neplatné, KEY-5 zůstává otevřený. Viz docs/performance/evidence/webgpu-comparison-20261016/README.md. Nejde o nasazení WebGPU do main."
+  ]
+}

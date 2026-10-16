@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-migrate-bundle-20261016",
+  "title": "Odstranit doložený cross-chunk Material/PushMaterial start cycle",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["vite.config.ts", "docs/agents/handoffs/webgpu-migrate-bundle-20261016.md"],
+  "resources": [],
+  "acceptance": ["KEY-23: Material se inicializuje před PushMaterial a produkční menu/Game import funguje; shodné native/reference CPU import pořadí a skutečný Edge start."],
+  "verification": ["Root rezervuje heavy-validation/build/GPU/staging; scoped config typecheck, skutečný production build a startup smoke."],
+  "notes": ["User nyní prioritizuje co nejrychlejší build/start pro hraní. Předchozí GPU starty de1ca89d a8f0694a7 selhaly na stejném cross-chunk cyklu před renderer-ready. Původní hraný snapshot beze změny."]
+}

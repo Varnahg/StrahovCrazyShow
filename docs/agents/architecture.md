@@ -21,14 +21,14 @@ Repozitář je jedna privátní ESM aplikace, nikoli několik nezávisle sestavo
 
 Na tomto stroji bylo read-only příkazy ověřeno `node --version` → `v24.19.0`, `pnpm --version` → `11.25.0`, `git lfs version` → `3.7.1`. Verze instalovaných JS balíčků se zde neporovnávaly s lockfilem. `latest` není stabilní verze: změna závislostí vyžaduje společnou práci s manifestem, lockfilem a oběma stranami protokolu.
 
-- Běžný vývoj potřebuje Node 24, pnpm 11 a pro praktickou kontrolu prohlížeč se skutečným GPU kontextem. [client/game.ts](../../client/game.ts) vytváří Babylon `Engine`, pravotočivou scénu a lokální simulaci; NullEngine test tuto kontrolu nenahrazuje.
+- Běžný vývoj potřebuje Node 24, pnpm 11 a pro praktickou kontrolu prohlížeč se skutečným GPU kontextem. [client/render-engine.ts](../../client/render-engine.ts) je společná asynchronní továrna enginu pro hru i avatar preview; [client/game.ts](../../client/game.ts) přebírá již inicializovanou instanci a vlastní pravotočivou scénu i lokální simulaci. NullEngine test skutečné vykreslení nenahrazuje.
 - Rekonstrukce modelů navíc používá Blender a jeho Python `bpy`. Reprodukční dokumentace uvádí Blender 5.2; jeho aktuální instalace ani dostupnost Python knihoven zde nebyla ověřena. `pnpm build` Blender nespouští.
 - Velké modely a původní textury používají [Git LFS](../../.gitattributes). Test vyžadující skutečné GLB/textury nemůže běžet nad LFS pointery. `.gitattributes` zachovává bajty (`* -text`): nepřevádět plošně konce řádků zdrojů a evidence.
 - Není stanovený a ověřený minimální GPU/RAM/diskový profil. Existující výkonová evidence není zárukou 60 FPS současného stromu; podrobnosti níže.
 
 ## Jak aplikace skutečně drží pohromadě
 
-`index.html` → [client/main.tsx](../../client/main.tsx) → `client/ui.tsx` → `client/game.ts`. UI spravuje React stav a Colyseus relaci; Game spravuje Babylon scénu, kameru, fyziku, animace a životní cyklus zdrojů. `client/world-renderer.ts` integruje jednotlivé části světa.
+`index.html` → [client/main.tsx](../../client/main.tsx) → `client/ui.tsx` → `client/render-engine.ts` → `client/game.ts`. UI spravuje React stav, Colyseus relaci a převod vlastnictví enginu; Game spravuje Babylon scénu, kameru, fyziku, animace a životní cyklus zdrojů. `client/world-renderer.ts` integruje jednotlivé části světa. `client/render-health.ts` zachovává chyby a nedokončené operace dané generace; `client/render-startup.ts` pustí hru až po připravené scéně a potvrzení skutečně odevzdaného snímku. `client/strict-material-preparation.ts` kontroluje i nové WebGPU Effecty čekající za starým hot-swapped materiálem.
 
 [server/index.ts](../../server/index.ts) spouští HTTP/WebSocket server a právě jednu `StrahovRoom`; stav komunity a relací drží v paměti. Sdílená [shared/simulation.ts](../../shared/simulation.ts) obsluhuje autoritativní fyziku na serveru i klientskou predikci. [shared/netcode.ts](../../shared/netcode.ts) deklaruje protokol **9**, fyziku **60 Hz**, limit catch-up i fronty vstupů. Server odesílá pohybové zprávy **20 Hz**. Změna kolizí může vyžadovat společnou aktualizaci protokolu, i když se struktura paketů nezmění.
 

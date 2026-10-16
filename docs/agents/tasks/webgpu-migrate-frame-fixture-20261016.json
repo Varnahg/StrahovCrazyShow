@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-migrate-frame-fixture-20261016",
+  "title": "Ověřit skutečný Game startup a renderové integrační fixtures",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/game-diagnostics.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-startup.test.ts",
+    "tests/game-webgpu-startup.test.ts",
+    "tests/game-light-lifecycle.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "KEY-30: VM fixture vykonává skutečnou Game frame metodu i importovaný WebGPU timing helper bez změny původních assertion.",
+    "Device loss, cancellation a neúspěšná příprava nesmí oznámit Game ready; skutečné startup tělo je vykonané proti řízeným IO závislostem."
+  ],
+  "verification": [
+    "Cílené Game diagnostics a room-callbacks + následný úplný checkpoint. Root vlastní ostatní integrační testy/output/handoff."
+  ],
+  "notes": [
+    "Přidělen rootovi po nativním checkpointu de1ca89d: 1033/1038 PASS, pět VM testů postrádá nový import. Původní log zůstává zachovaný.",
+    "Native-v5: 1141/1142 PASS; lifecycle VM fixture postrádá skutečný startupAbort. Doplnit explicitní ownership dependencies bez oslabení assertions. Vlastní Game startup fixture přejmenovat na game-webgpu-startup před integrací, protože primary má cizí untracked game-startup.test.ts; žádné převzetí této cizí fixture."
+  ]
+}

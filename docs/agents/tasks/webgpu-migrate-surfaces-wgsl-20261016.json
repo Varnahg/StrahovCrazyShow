@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-migrate-surfaces-wgsl-20261016",
+  "title": "Portovat povrchové MaterialPlugin cesty na WGSL",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/cinematic-art.ts",
+    "client/photogrammetry-lighting.ts",
+    "tests/wgsl-surface-materials.test.ts",
+    "docs/agents/handoffs/webgpu-migrate-surfaces-wgsl-20261016.md",
+    ".cache/webgpu-migration-checks/surfaces/",
+    "tests/cinematic-art.test.ts",
+    "tests/photogrammetry-lighting.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Podmínky přijetí jsou podrobně v Linear KEY-26, parent KEY-22.",
+    "Pouze přidělený rozsah; průzkum/varianty před implementací, společně cílený refaktoring a relevantní testy.",
+    "CPU výsledek není GPU přejímka; předání obsahuje skutečné důkazy, cache/lifecycle a otevřené otázky."
+  ],
+  "verification": [
+    "Cílené CPU regrese během implementace; root provede stabilní kompletní pipeline a skutečný GPU scénář podle issue.",
+    "Přesný seznam zdrojů/testů, source SHA a vlastní handoff; žádný cizí WIP ani proces."
+  ],
+  "notes": [
+    "Uživatel výslovně autorizoval úplnou migraci 16.10.2026; Linear KEY-26, epik KEY-22.",
+    "Použít připojenou pracovní kopii C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow ve větvi codex/webgpu-migration.",
+    "Historický a1eb953f benchmark a frozen4188 neměnit. public/assets zůstávají sdílené read-only v historickém snapshotu; případné změny potřebují vlastní rezervaci a oddělení předem.",
+    "Nové závislosti/staged validace patří do .cache/webgpu-migration pod rootem; node_modules původního4188 je cizí rezervace.",
+    "Po dokončení pouze vlastních přesných souborů commit, předání a release. Root potvrzuje přijetí a integraci.",
+    "Vlastní cílené CPU checks mohou použít tento oddělený output: kopie potřebných vstupů + readonly junction na .cache/webgpu-comparison/frozen/node_modules, nikdy install/edit přes junction. Žádný build/GPU/fullsuite."
+  ]
+}

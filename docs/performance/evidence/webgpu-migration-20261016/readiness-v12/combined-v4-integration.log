@@ -1,0 +1,38 @@
+$ node scripts/test-integration.mjs
+PASS: real SDK queued vehicle respawn, fresh epoch forced authority and current presence, duplicate/old-epoch rejection, fresh scheduled movement, protected foreign driver, canonical isolated-world cleanup.
+Room connection was closed unexpectedly (4002): 
+PASS: singleton world, guest boundary, two clients, walking, physical car W/A/D/brake/reverse/exit/re-entry on native DMR and authored assets, global/DM chat, consent, explicit blocking rejection, event ownership, session resume and weather endpoint.
+Room connection was closed unexpectedly (4002): 
+PASS: 12 authenticated peers in one world; every peer sees every identity, above the old eight-player boundary; movement reaches every observer; position error <=0.51mm, exact ack and authoritative grounded bit; targeted keyframe restores an empty decoder without resetting locomotion or losing remote players; repeated ineffective quiz/decline commands do not fan out state to the world; contact changes update the two participants without broadcasting to ten unrelated peers; disconnect removes the player everywhere; resuming the same identity reconstructs the full shared world; guest cannot join or read authored meeting/presence from public HTTP
+{
+  "completed": true,
+  "protocol": 11,
+  "endpoint": "http://127.0.0.1:2568",
+  "burstReceivedSeq": 18,
+  "burstResolvedAck": 18,
+  "firstBurstReplyMs": 40.9864,
+  "firstBurstDisplacementX": 0.23000335693359375,
+  "steadyIntentionalLeadTicksP95": 6,
+  "steadySamples": 50,
+  "unaffectedPeerResyncs": 0,
+  "rejectionCounters": {
+    "invalid": 1,
+    "epoch": 1,
+    "late": 2,
+    "ahead": 1,
+    "duplicate": 1
+  },
+  "recovery": {
+    "inputEpoch": 26,
+    "inputTickBase": 965,
+    "tick": 965,
+    "ack": 0
+  },
+  "checks": [
+    "future window resolves on world time without acceleration",
+    "continuous held input stays within bounded lead",
+    "invalid/late/old-epoch/ahead/duplicate input rejected without resync storm",
+    "explicit recovery creates fresh epoch and remains responsive",
+    "other player unaffected"
+  ]
+}

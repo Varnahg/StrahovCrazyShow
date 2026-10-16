@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-scheduler-generation-20261016",
+  "title": "Zabránit opožděnému RAF měnit novou generaci preview scheduleru",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/on-demand-render.ts", "tests/on-demand-render.test.ts", "docs/agents/handoffs/webgpu-scheduler-generation-20261016.md"],
+  "resources": [],
+  "acceptance": ["Minimální vlastní native fix generation guard při hide/dispose; dequeued callback nesmí renderovat ani přepsat handle nové fronty. Zachovat timing/pending/idle/submitted a callback identity kontrakty."],
+  "verification": ["Skutečná red reprodukce na čistém native8de8299 visibility false→true, cílený refaktoring a adversariální green scheduler/lifecycle testy. Bez GPU/build/fullsuite."],
+  "notes": ["Mechanismus odhalen při combined preview auditu a potvrzen i bez foreign setActive; vlastní čistá oprava nesmí zahrnout foreign WIP.", "Použít již vlastněný combined-preview cache output pro testy. Samostatný přesný runtime/test/handoff commit; pak uvolnit tento scope."]
+}

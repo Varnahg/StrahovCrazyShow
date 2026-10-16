@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-combined-game-20261016",
+  "title": "Připravit izolovaný sémantický merge WebGPU s cizím Game/UI WIP",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [".cache/webgpu-migration-checks/combined-game/", "docs/agents/handoffs/webgpu-combined-game-20261016.md"],
+  "resources": [],
+  "acceptance": ["Pouze kopie v přidělené cache; primary i migrační runtime soubory zůstávají read-only.", "Zachovat veškeré cizí phased-world/startup a UI/diagnostické opravy; přidat migrační prepared engine/health/gate/profile lifecycle. Výsledný kombinovaný WIP se nesmí vydávat za čistý vlastní commit."],
+  "verification": ["Uložit hash všech vstupů a oddělený own native delta / kombinovaný diff; cílené lehké CPU regrese v izolované kopii s readonly dependencies-v5. Bez GPU/build/fullsuite/install.", "Ověřit cancellation/late ownership world job a Simulation, skutečné start/startContent a UI lifecycle; refaktoring pouze dotčeného kombinovaného řetězce."],
+  "notes": ["Root koordinátor autorizuje přípravu reviewovatelného merge před integrací, nikoli převzetí cizího WIP do commitu. Primary124foreign paths chráněny; final zápis/integraci provede root.", "Preview candidate připravuje jiný agent samostatně; v Game/UI zachovat foreign persistent editor active API."]
+}

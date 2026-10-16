@@ -1,0 +1,280 @@
+{
+  "atUTC": "2026-10-16T18:20:44.502Z",
+  "files": {
+    "native-v7-tests.log": "6092ccfc6630704d8d43ade000099d3211b1144e3e56692221a566ad8c30b39c",
+    "native-v7-build.log": "4d0ce9d52c216a3caa0808faf18393ce5727db56e1a745fe954a5d0907d366bf",
+    "native-v7-integration.log": "fe8da919d2a1ce35122d3917c2f4d5a834159b97fab3bf2a94f6ad628ab25081",
+    "combined-v1-tests.log": "682eccd5318a726b3d6da0756467d7c5f6ded7eae74202c91ab793dbff81ee2f",
+    "combined-v1-build.log": "5999e58d6da99139def0ba005027f826c3400545401f6b317467bafee29ce4a7",
+    "combined-v1-integration.log": "a7c7e89ebaf89a9d743e10de5d97aec2fd8791536b897b509097cf3dd72f5a54",
+    "native-source-manifest.json": "e7c5c41642f3c2246b5167b90528fc93203a0409ff6a742932ae9e07b9f070c2",
+    "combined-source-manifest.json": "34821d0769d27c16192a8fa56bb7d9bd4be0548d2b142c85d9b8708c481061ce",
+    "combined-source-composition.json": "98a225435cdf44da0d4cbd38bdd3d1127fdc1ea9d78a96e6f8278bffb412846c",
+    "validated-checkpoints.json": "b51e4ec3658b84cd2477be411cf2f6130f0f418daeda0b5178fb3ef3880ea036",
+    "index-publication-probe.json": "121b1c2d5734a7c0febb7a5574a4b84c5ae220af5074596ffd37da7077173790",
+    "preview-main-integration.json": "d20efc04f61cd1bb8cd73cf7bb2d7d975a70b00fb708ea54b253206b163f24a5",
+    "game-main-integration.json": "98ee79a645699e7fba90fc1c7113bfe24a8ddff54c82a0ce8fe9b62a65a4e29a",
+    "fresnel-main-integration.json": "d8d8e812e23308a6a7b4cbce2dc2e02a8545134276a0a87a10a694b2c950cb14",
+    "companions-main-integration.json": "dc548474faddf0987b517f692f0546d9ba7b0d8d22e4bad61be889b3b765c0ad",
+    "fixtures-main-integration.json": "891dd844402c4210f90de789fc4fe979b17a6d4bf37479ab76969cf9b902a941",
+    "a2ed041f-c13b-4065-b707-9da693bde8ee-prefix.jsonl": "893f730354fc727246617322e585e6c4a507b81871c025511dd202ef51dd91f3",
+    "6edf1304-b66d-4136-aeb0-af46b17b58fc-prefix.jsonl": "896ac17b901979ba1d1db0a485bfcffab14e0c7fe1a642587f28869f163f6361"
+  },
+  "sessions": [
+    {
+      "id": "a2ed041f-c13b-4065-b707-9da693bde8ee",
+      "path": "a2ed041f-c13b-4065-b707-9da693bde8ee-prefix.jsonl",
+      "maxSeq": 148,
+      "startup": [
+        {
+          "seq": 19,
+          "atMs": 5627.1,
+          "kind": "renderer-ready",
+          "data": {
+            "durationMs": 40.80000001192093,
+            "renderer": "pascal",
+            "vendor": "nvidia",
+            "version": "unknown version",
+            "backend": "webgpu"
+          }
+        },
+        {
+          "seq": 27,
+          "atMs": 11009.3,
+          "kind": "presentation-rate",
+          "data": {
+            "observedBrowserHz": 59.9,
+            "reliable": true,
+            "samples": 85,
+            "p10FrameMs": 16.5,
+            "medianFrameMs": 16.69999999999891,
+            "p95FrameMs": 16.80000000000109,
+            "reason": "ok",
+            "rendererId": 2,
+            "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+          }
+        },
+        {
+          "seq": 110,
+          "atMs": 49490.4,
+          "kind": "lighting-preparation",
+          "data": {
+            "status": "timeout",
+            "elapsedMs": 30014.09999999404,
+            "activeElapsedMs": 30014.09999999404,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stages": [
+              {
+                "stage": "current-off",
+                "elapsedMs": 26995.90000000596,
+                "activeElapsedMs": 26995.90000000596,
+                "pausedMs": 0,
+                "tickCount": 27,
+                "rafGap": {
+                  "count": 27,
+                  "totalMs": 26968.59999999404,
+                  "maxMs": 1573.1000000238419
+                },
+                "cpu": {
+                  "apply": {
+                    "calls": 7,
+                    "totalMs": 255.80000001192093,
+                    "maxMs": 239
+                  },
+                  "checkBatch": {
+                    "calls": 20,
+                    "totalMs": 167.00000002980232,
+                    "maxMs": 32.400000005960464
+                  },
+                  "render": {
+                    "calls": 9,
+                    "totalMs": 1078.599999934435,
+                    "maxMs": 687.7999999821186
+                  }
+                },
+                "restartReasons": {
+                  "meshes": 6
+                },
+                "checks": 1126,
+                "renders": 9,
+                "restarts": 6
+              },
+              {
+                "stage": "current-on",
+                "elapsedMs": 3010.2000000178814,
+                "activeElapsedMs": 3010.2000000178814,
+                "pausedMs": 0,
+                "tickCount": 2,
+                "rafGap": {
+                  "count": 2,
+                  "totalMs": 2031.4000000059605,
+                  "maxMs": 1015.7999999821186
+                },
+                "cpu": {
+                  "apply": {
+                    "calls": 1,
+                    "totalMs": 32.900000005960464,
+                    "maxMs": 32.900000005960464
+                  },
+                  "checkBatch": {
+                    "calls": 1,
+                    "totalMs": 6.399999976158142,
+                    "maxMs": 6.399999976158142
+                  },
+                  "render": {
+                    "calls": 1,
+                    "totalMs": 862,
+                    "maxMs": 862
+                  }
+                },
+                "restartReasons": {},
+                "checks": 1,
+                "renders": 1,
+                "restarts": 0
+              }
+            ]
+          }
+        },
+        {
+          "seq": 113,
+          "atMs": 49491.5,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at $l.start (http://127.0.0.1:4193/assets/game-DpgIKydj.js:578:22723)\n    at async http://127.0.0.1:4193/assets/index-C2KsoZ3g.js:16:4491306"
+          }
+        }
+      ]
+    },
+    {
+      "id": "6edf1304-b66d-4136-aeb0-af46b17b58fc",
+      "path": "6edf1304-b66d-4136-aeb0-af46b17b58fc-prefix.jsonl",
+      "maxSeq": 178,
+      "startup": [
+        {
+          "seq": 22,
+          "atMs": 7760.9,
+          "kind": "renderer-ready",
+          "data": {
+            "durationMs": 57.69999998807907,
+            "renderer": "pascal",
+            "vendor": "nvidia",
+            "version": "unknown version",
+            "backend": "webgpu"
+          }
+        },
+        {
+          "seq": 31,
+          "atMs": 13127,
+          "kind": "presentation-rate",
+          "data": {
+            "observedBrowserHz": 60.2,
+            "reliable": true,
+            "samples": 85,
+            "p10FrameMs": 16.5,
+            "medianFrameMs": 16.600000000000364,
+            "p95FrameMs": 16.80000000000109,
+            "reason": "ok",
+            "rendererId": 2,
+            "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+          }
+        },
+        {
+          "seq": 115,
+          "atMs": 50595.4,
+          "kind": "lighting-preparation",
+          "data": {
+            "status": "timeout",
+            "elapsedMs": 30707.59999999404,
+            "activeElapsedMs": 30707.59999999404,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stages": [
+              {
+                "stage": "current-off",
+                "elapsedMs": 28531.29999998212,
+                "activeElapsedMs": 28531.29999998212,
+                "pausedMs": 0,
+                "tickCount": 29,
+                "rafGap": {
+                  "count": 29,
+                  "totalMs": 28508.399999976158,
+                  "maxMs": 1092
+                },
+                "cpu": {
+                  "apply": {
+                    "calls": 7,
+                    "totalMs": 363.09999999403954,
+                    "maxMs": 235.69999998807907
+                  },
+                  "checkBatch": {
+                    "calls": 22,
+                    "totalMs": 181.30000001192093,
+                    "maxMs": 29.5
+                  },
+                  "render": {
+                    "calls": 9,
+                    "totalMs": 1385.300000011921,
+                    "maxMs": 674.2999999821186
+                  }
+                },
+                "restartReasons": {
+                  "meshes": 6
+                },
+                "checks": 1126,
+                "renders": 9,
+                "restarts": 6
+              },
+              {
+                "stage": "current-on",
+                "elapsedMs": 2166.2000000178814,
+                "activeElapsedMs": 2166.2000000178814,
+                "pausedMs": 0,
+                "tickCount": 1,
+                "rafGap": {
+                  "count": 1,
+                  "totalMs": 1015.7000000178814,
+                  "maxMs": 1015.7000000178814
+                },
+                "cpu": {
+                  "apply": {
+                    "calls": 1,
+                    "totalMs": 243.69999998807907,
+                    "maxMs": 243.69999998807907
+                  },
+                  "checkBatch": {
+                    "calls": 0,
+                    "totalMs": 0,
+                    "maxMs": 0
+                  },
+                  "render": {
+                    "calls": 1,
+                    "totalMs": 930.5,
+                    "maxMs": 930.5
+                  }
+                },
+                "restartReasons": {},
+                "checks": 0,
+                "renders": 1,
+                "restarts": 0
+              }
+            ]
+          }
+        },
+        {
+          "seq": 118,
+          "atMs": 50596.6,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at $l.start (http://127.0.0.1:4193/assets/game-DpgIKydj.js:578:22723)\n    at async http://127.0.0.1:4193/assets/index-C2KsoZ3g.js:16:4491306"
+          }
+        }
+      ]
+    }
+  ],
+  "mainHead": "b758c0ab490363eb86a058d0ac7590ea8eb69078",
+  "validGpuAcceptance": false,
+  "interpretation": "Idle browser RAF is59.9/60.2Hz before Game loop; preparation records engine callback gaps, not concurrent raw RAF. begin/end frame are outside previous callback CPU scope. Both CM/NCM startup attempts fail; no gameplay FPS claim. Native/combined test/build/integration PASS and exact native/working integration receipts are separate evidence."
+}
