@@ -503,6 +503,7 @@ export function App() {
   }, []);
   useEffect(() => {
     if (mode === "menu" || !canvas.current) return;
+    const startupCanvas = canvas.current;
     sessionDiagnostics.event("mode-change", { mode });
     let cancelled = false;
     const startupAbort = new AbortController();
@@ -514,12 +515,12 @@ export function App() {
           import("./game"),
           import("./render-engine"),
         ]);
-        if (cancelled || !canvas.current) return;
+        if (cancelled || canvas.current !== startupCanvas) return;
         const engineStarted = performance.now();
-        pendingEngine = await createGameEngine(canvas.current, {
+        pendingEngine = await createGameEngine(startupCanvas, {
           signal: startupAbort.signal,
         });
-        if (cancelled || !canvas.current) {
+        if (cancelled || canvas.current !== startupCanvas) {
           pendingEngine.dispose();
           return;
         }
@@ -528,7 +529,7 @@ export function App() {
           ...getRendererInfo(pendingEngine),
           backend: pendingEngine.isWebGPU ? "webgpu" : "webgl2",
         });
-        const g = new Game(canvas.current, profileRef.current, pendingEngine);
+        const g = new Game(startupCanvas, profileRef.current, pendingEngine);
         pendingEngine = undefined;
         game.current = g;
         g.network = mode === "multi";

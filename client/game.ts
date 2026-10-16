@@ -45,7 +45,6 @@ import {
   isRenderTargetFps,
 } from "../shared/render-quality";
 import {
-  PREFERRED_GPU_POWER,
   readGpuDiagnostics,
   type GpuDiagnostics,
 } from "./gpu-diagnostics";
@@ -66,7 +65,6 @@ import { localizeText, t } from "./i18n";
 import { MapNavigator, type PlanMapRoute } from "./map-navigation";
 import { createNavigationClearance } from "./navigation-physics";
 import { updateRainSegments } from "./weather-particles";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { getRendererInfo } from "./gpu-diagnostics";
 import { watchWebGpuValidation } from "./webgpu-validation";
@@ -509,21 +507,10 @@ export class Game {
   constructor(
     public canvas: HTMLCanvasElement,
     profile: Profile,
-    preparedEngine?: AbstractEngine,
+    preparedEngine: AbstractEngine,
   ) {
     this.profile = profile;
-    this.engine =
-      preparedEngine ??
-      new Engine(
-        canvas,
-        true,
-        {
-          stencil: true,
-          preserveDrawingBuffer: false,
-          powerPreference: PREFERRED_GPU_POWER,
-        },
-        false,
-      );
+    this.engine = preparedEngine;
     this.canvas.dataset.renderErrorCount = "0";
     watchWebGpuValidation(this.engine, (message) => {
       if (this.disposed) return;

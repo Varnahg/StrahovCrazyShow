@@ -60,7 +60,7 @@ const make = new Script(
 ).runInThisContext();
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
-function fixture() {
+function fixture(options: { constructionError?: boolean; startError?: boolean } = {}) {
   let resolveEngine!: (engine: any) => void;
   let rejectEngine!: (reason: Error) => void;
   const promise = new Promise((resolve, reject) => {
@@ -79,15 +79,21 @@ function fixture() {
     ready = false;
   const errors: string[] = [];
   const events: string[] = [];
+  const canvas = { current: {} };
+  const initialCanvas = canvas.current;
   class Game {
     constructor(_canvas: unknown, _profile: unknown, prepared: unknown) {
+      assert.equal(_canvas, initialCanvas);
       assert.equal(prepared, engine);
+      if (options.constructionError) throw new Error("construction failed");
       gameCount++;
     }
     setLocalId() {}
     setQuality() {}
     setTargetFps() {}
-    async start() {}
+    async start() {
+      if (options.startError) throw new Error("start failed");
+    }
     dispose() {
       gameDisposals++;
       engine.dispose();
@@ -97,7 +103,7 @@ function fixture() {
   const state = { current: null as Game | null };
   const cleanup = make({
     mode: "guest",
-    canvas: { current: {} },
+    canvas,
     profileRef: { current: {} },
     game: state,
     modeRef: { current: "menu" },
@@ -128,6 +134,7 @@ function fixture() {
   }) as () => void;
   return {
     engine,
+    canvas,
     resolveEngine,
     rejectEngine,
     cleanup,
@@ -169,4 +176,44 @@ test("backend initialization failure is reported without constructing a fallback
   assert.equal(f.errors.length, 1);
   assert.ok(f.events.includes("startup-error"));
   f.cleanup();
+});
+
+test("replaced canvas never receives an engine prepared for the old canvas", async () => {
+  const f = fixture();
+  await tick();
+  f.canvas.current = {};
+  f.resolveEngine(f.engine);
+  await tick();
+  assert.equal(f.stats().gameCount, 0);
+  assert.equal(f.engine.disposed, 1);
+  assert.deepEqual(f.errors, []);
+  f.cleanup();
+  assert.equal(f.engine.disposed, 1);
+});
+
+test("construction failure releases the engine still owned by startup exactly once", async () => {
+  const f = fixture({ constructionError: true });
+  await tick();
+  f.resolveEngine(f.engine);
+  await tick();
+  assert.equal(f.engine.disposed, 1);
+  assert.equal(f.stats().gameDisposals, 0);
+  assert.equal(f.errors.length, 1);
+  assert.equal(f.stats().ready, false);
+  f.cleanup();
+  assert.equal(f.engine.disposed, 1);
+});
+
+test("start failure releases the engine through its Game owner exactly once", async () => {
+  const f = fixture({ startError: true });
+  await tick();
+  f.resolveEngine(f.engine);
+  await tick();
+  assert.equal(f.engine.disposed, 1);
+  assert.equal(f.stats().gameDisposals, 1);
+  assert.equal(f.state.current, null);
+  assert.equal(f.errors.length, 1);
+  assert.equal(f.stats().ready, false);
+  f.cleanup();
+  assert.equal(f.engine.disposed, 1);
 });
