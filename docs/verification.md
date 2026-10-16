@@ -1,5 +1,11 @@
 # Ověření dema a známá omezení
 
+## WebGPU · frame lifecycle a aktivní Edge · 16. října 2026 19:43 UTC
+
+Native-v10/ad2b39c, snapshot79d55c7b29685b41f5d02afc6afe8be6d0f0dfe15adbf88fa3fad56480b5fbe7: **1173/1173 testů, build/TypeScript a izolovaná integrace PASS**. Combined-v3, snapshot31d0f02303b9cd3ff0721a830f130ee4647df615ffc9a2a47726a4b04c2adbe9: **1233/1233, build/TypeScript a integrace PASS**. Do main samostatně integroványcd2e60b (opt-in celkový frame lifecycle a doručení timing payloadu) a8eb183d (kliknutelný odchod z načítání/chyby). Čistý runtime strom main odpovídá native-v10;544fyzických souborů source/test odpovídá combined-v3 se zachováním cizího WIP. Index čistý, primary dependencies a hraná4192 beze změny.
+
+Neaktivní agentní karta Edge hlásila uvnitř stránky visible/focused; teprve management API odhalilo activefalse. Nová vlastní karta v samostatném okně byla ověřena active/selectedtrue, frozenfalse a windowfocusedtrue. V ní kontrola opaque/transparent/opaque překryvu přinesla243/134/243raw i engine callbacků během30s; CPU processFrame7502,9/5615,4/8176,7ms. Všechny tři běhy timeoutují u nočních variant a nedosáhly game-ready. Průhledný překryv scénu odkryl, ale přípravu nevyřešil. Jde o diagnostiku startu, **nikoli FPS přejímku**: canvas1514×644/643, dynamické asset/material timing a nedostatečný idle preflight. Výchozí renderer stále WebGL2; úplná funkční a výkonová přejímka před veřejným přepnutím chybí. [Raw logy, přesná metodika a integrační důkazy](performance/evidence/webgpu-migration-20261016/frame-lifecycle-v10/README.md).
+
 ## WebGPU migrace · 16. října 2026 · probíhá
 
 [Workflow a přejímka](performance/webgpu-migration.md), Linear KEY-22 až KEY-35. První jednotky mají cílené CPU důkazy: shadow includes 3/3, vegetace 37/37, povrchy 12/12, obloha 22/22, společný async engine/UI lifecycle 44/44 a render health 11/11. Scopované typové kontroly prošly. To není úplná GPU validace ani důkaz zlepšení FPS. Nativní shadow wrapper, shader/pipeline profil, editor a stabilní full pipeline následují; WebGPU dosud není produkční default.

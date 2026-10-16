@@ -1,0 +1,444 @@
+{
+  "scope": "Startup diagnosis only. None completed; not an FPS acceptance benchmark. Parent/nested CPU times are inclusive and must not be summed. Browser-active evidence from CUA management is external to DOM telemetry. Natural canvas A1 1514x644, B/A2 1514x643; source/runtime same; dynamic material/asset timing not locked.",
+  "comparisons": [
+    {
+      "checkpoint": "native-v10",
+      "id": "5f5ddf8d-4402-4ce7-bd92-1443b67ef641",
+      "condition": "opaque; tab activation not established",
+      "wallMs": 30036.700000000004,
+      "rawCallbacks": 30,
+      "engineCallbacks": 30,
+      "engineCpuMs": 2404.100000023842,
+      "endCpuMs": 3.599999964237213,
+      "queueToProcessMs": 27044.19999998808,
+      "status": "timeout",
+      "stages": [
+        {
+          "stage": "current-off",
+          "elapsedMs": 25412,
+          "ticks": 26,
+          "renders": 9,
+          "restarts": 6
+        },
+        {
+          "stage": "current-on",
+          "elapsedMs": 4602.199999988079,
+          "ticks": 4,
+          "renders": 1,
+          "restarts": 0
+        }
+      ],
+      "idle": {
+        "observedBrowserHz": 59.9,
+        "reliable": true,
+        "samples": 85,
+        "p10FrameMs": 16.5,
+        "medianFrameMs": 16.69999999999891,
+        "p95FrameMs": 16.80000000000109,
+        "reason": "ok",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "browserStates": [
+        {
+          "atMs": 705.7,
+          "reason": "start",
+          "visibility": "visible",
+          "focused": true
+        },
+        {
+          "atMs": 708.5,
+          "reason": "pageshow",
+          "visibility": "visible",
+          "focused": true
+        }
+      ],
+      "gameReady": false
+    },
+    {
+      "checkpoint": "native-v11",
+      "id": "0a438b39-d33c-4914-b757-0f5c97eee3e1",
+      "condition": "transparent; inactive agent tab",
+      "wallMs": 30024.2,
+      "rawCallbacks": 62,
+      "engineCallbacks": 62,
+      "engineCpuMs": 4878.199999898672,
+      "endCpuMs": 6.800000011920929,
+      "queueToProcessMs": 24961.10000011325,
+      "status": "timeout",
+      "stages": [
+        {
+          "stage": "current-off",
+          "elapsedMs": 11039.300000011921,
+          "ticks": 29,
+          "renders": 9,
+          "restarts": 6
+        },
+        {
+          "stage": "current-on",
+          "elapsedMs": 11712.300000011921,
+          "ticks": 27,
+          "renders": 9,
+          "restarts": 0
+        },
+        {
+          "stage": "night-0-off",
+          "elapsedMs": 7249.399999976158,
+          "ticks": 6,
+          "renders": 1,
+          "restarts": 0
+        }
+      ],
+      "idle": {
+        "observedBrowserHz": null,
+        "reliable": false,
+        "samples": 0,
+        "p10FrameMs": null,
+        "medianFrameMs": null,
+        "p95FrameMs": null,
+        "reason": "hidden",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "browserStates": [
+        {
+          "atMs": 525.4,
+          "reason": "start",
+          "visibility": "visible",
+          "focused": true
+        },
+        {
+          "atMs": 529.3,
+          "reason": "pageshow",
+          "visibility": "visible",
+          "focused": true
+        },
+        {
+          "atMs": 16480.8,
+          "reason": "visibility",
+          "visibility": "hidden",
+          "focused": true
+        },
+        {
+          "atMs": 16546.3,
+          "reason": "visibility",
+          "visibility": "visible",
+          "focused": true
+        },
+        {
+          "atMs": 340039.3,
+          "reason": "visibility",
+          "visibility": "hidden",
+          "focused": true
+        },
+        {
+          "atMs": 642533.3,
+          "reason": "visibility",
+          "visibility": "visible",
+          "focused": true
+        },
+        {
+          "atMs": 642633.5,
+          "reason": "visibility",
+          "visibility": "hidden",
+          "focused": true
+        },
+        {
+          "atMs": 691216.2,
+          "reason": "blur",
+          "visibility": "hidden",
+          "focused": false
+        }
+      ],
+      "gameReady": false
+    },
+    {
+      "checkpoint": "native-v11",
+      "id": "b50a667a-c13c-41fd-a70e-d814d4f6265a",
+      "condition": "A1 opaque; Edge active selected unfrozen; focused own window",
+      "wallMs": 30033.1,
+      "rawCallbacks": 243,
+      "engineCallbacks": 243,
+      "engineCpuMs": 7502.900000363588,
+      "endCpuMs": 26.400000005960464,
+      "queueToProcessMs": 22123.69999963045,
+      "status": "timeout",
+      "stages": [
+        {
+          "stage": "current-off",
+          "elapsedMs": 5348.199999988079,
+          "ticks": 50,
+          "renders": 33,
+          "restarts": 3
+        },
+        {
+          "stage": "current-on",
+          "elapsedMs": 5769.300000011921,
+          "ticks": 43,
+          "renders": 26,
+          "restarts": 2
+        },
+        {
+          "stage": "night-0-off",
+          "elapsedMs": 4287,
+          "ticks": 36,
+          "renders": 19,
+          "restarts": 1
+        },
+        {
+          "stage": "night-0-on",
+          "elapsedMs": 6419.0999999940395,
+          "ticks": 46,
+          "renders": 21,
+          "restarts": 1
+        },
+        {
+          "stage": "night-1-off",
+          "elapsedMs": 606,
+          "ticks": 14,
+          "renders": 3,
+          "restarts": 0
+        },
+        {
+          "stage": "night-1-on",
+          "elapsedMs": 524.2000000178814,
+          "ticks": 15,
+          "renders": 3,
+          "restarts": 0
+        },
+        {
+          "stage": "night-2-off",
+          "elapsedMs": 5920.199999988079,
+          "ticks": 36,
+          "renders": 21,
+          "restarts": 0
+        },
+        {
+          "stage": "night-2-on",
+          "elapsedMs": 1139.800000011921,
+          "ticks": 3,
+          "renders": 1,
+          "restarts": 0
+        }
+      ],
+      "idle": {
+        "observedBrowserHz": null,
+        "reliable": false,
+        "samples": 1,
+        "p10FrameMs": 3413.699999999997,
+        "medianFrameMs": 3413.699999999997,
+        "p95FrameMs": 3413.699999999997,
+        "reason": "insufficient-samples",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "browserStates": [
+        {
+          "atMs": 488.2,
+          "reason": "start",
+          "visibility": "visible",
+          "focused": true
+        },
+        {
+          "atMs": 491.3,
+          "reason": "pageshow",
+          "visibility": "visible",
+          "focused": true
+        }
+      ],
+      "gameReady": false
+    },
+    {
+      "checkpoint": "native-v11",
+      "id": "a6340587-bc3f-42a5-880e-50433a5a24c6",
+      "condition": "B transparent; same active Edge tab/window",
+      "wallMs": 30054.300000000003,
+      "rawCallbacks": 134,
+      "engineCallbacks": 134,
+      "engineCpuMs": 5615.399999707937,
+      "endCpuMs": 14.899999797344208,
+      "queueToProcessMs": 24424.700000315905,
+      "status": "timeout",
+      "stages": [
+        {
+          "stage": "current-off",
+          "elapsedMs": 5373.699999988079,
+          "ticks": 24,
+          "renders": 6,
+          "restarts": 3
+        },
+        {
+          "stage": "current-on",
+          "elapsedMs": 5963.5,
+          "ticks": 22,
+          "renders": 6,
+          "restarts": 3
+        },
+        {
+          "stage": "night-0-off",
+          "elapsedMs": 4244.899999976158,
+          "ticks": 19,
+          "renders": 3,
+          "restarts": 0
+        },
+        {
+          "stage": "night-0-on",
+          "elapsedMs": 6286.0999999940395,
+          "ticks": 20,
+          "renders": 3,
+          "restarts": 0
+        },
+        {
+          "stage": "night-1-off",
+          "elapsedMs": 707.0999999940395,
+          "ticks": 15,
+          "renders": 3,
+          "restarts": 0
+        },
+        {
+          "stage": "night-1-on",
+          "elapsedMs": 641,
+          "ticks": 14,
+          "renders": 3,
+          "restarts": 0
+        },
+        {
+          "stage": "night-2-off",
+          "elapsedMs": 6165.5,
+          "ticks": 19,
+          "renders": 3,
+          "restarts": 0
+        },
+        {
+          "stage": "night-2-on",
+          "elapsedMs": 653,
+          "ticks": 1,
+          "renders": 1,
+          "restarts": 0
+        }
+      ],
+      "idle": {
+        "observedBrowserHz": null,
+        "reliable": false,
+        "samples": 1,
+        "p10FrameMs": 3363.833999999999,
+        "medianFrameMs": 3363.833999999999,
+        "p95FrameMs": 3363.833999999999,
+        "reason": "insufficient-samples",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "browserStates": [
+        {
+          "atMs": 424,
+          "reason": "start",
+          "visibility": "visible",
+          "focused": true
+        },
+        {
+          "atMs": 425.3,
+          "reason": "pageshow",
+          "visibility": "visible",
+          "focused": true
+        }
+      ],
+      "gameReady": false
+    },
+    {
+      "checkpoint": "native-v11",
+      "id": "4a12fea3-2d1f-47fc-97f7-f6d28e0b2a8b",
+      "condition": "A2 opaque; same active Edge tab/window",
+      "wallMs": 30040.4,
+      "rawCallbacks": 243,
+      "engineCallbacks": 243,
+      "engineCpuMs": 8176.699999809265,
+      "endCpuMs": 26.0999998152256,
+      "queueToProcessMs": 21398.900000035763,
+      "status": "timeout",
+      "stages": [
+        {
+          "stage": "current-off",
+          "elapsedMs": 5158.800000011921,
+          "ticks": 46,
+          "renders": 28,
+          "restarts": 6
+        },
+        {
+          "stage": "current-on",
+          "elapsedMs": 6023.5999999940395,
+          "ticks": 40,
+          "renders": 23,
+          "restarts": 0
+        },
+        {
+          "stage": "night-0-off",
+          "elapsedMs": 4093.9000000059605,
+          "ticks": 36,
+          "renders": 20,
+          "restarts": 0
+        },
+        {
+          "stage": "night-0-on",
+          "elapsedMs": 6245.299999982119,
+          "ticks": 38,
+          "renders": 22,
+          "restarts": 0
+        },
+        {
+          "stage": "night-1-off",
+          "elapsedMs": 365,
+          "ticks": 14,
+          "renders": 3,
+          "restarts": 0
+        },
+        {
+          "stage": "night-1-on",
+          "elapsedMs": 302.40000000596046,
+          "ticks": 15,
+          "renders": 3,
+          "restarts": 0
+        },
+        {
+          "stage": "night-2-off",
+          "elapsedMs": 6027,
+          "ticks": 37,
+          "renders": 21,
+          "restarts": 0
+        },
+        {
+          "stage": "night-2-on",
+          "elapsedMs": 1793.1000000238419,
+          "ticks": 17,
+          "renders": 4,
+          "restarts": 0
+        }
+      ],
+      "idle": {
+        "observedBrowserHz": null,
+        "reliable": false,
+        "samples": 1,
+        "p10FrameMs": 3863.199999999999,
+        "medianFrameMs": 3863.199999999999,
+        "p95FrameMs": 3863.199999999999,
+        "reason": "insufficient-samples",
+        "rendererId": 2,
+        "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+      },
+      "browserStates": [
+        {
+          "atMs": 378.3,
+          "reason": "start",
+          "visibility": "visible",
+          "focused": true
+        },
+        {
+          "atMs": 379.8,
+          "reason": "pageshow",
+          "visibility": "visible",
+          "focused": true
+        }
+      ],
+      "gameReady": false
+    }
+  ]
+}
