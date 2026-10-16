@@ -1,5 +1,17 @@
 # WebGPU migration root handoff (ongoing)
 
+## User playtest handoff — migration paused
+
+2026-10-16 user requested stopping further development and starting the quickest playable build. Frozen `native-v3`, commit `f969bd18d374814bcebad5628e57f9475e25b0b3`, source snapshot `4979284c89088eb2e4cf36d5f96202d9c580f6f0818e6a700b956d53cb1906b9` (8438 inputs), is running at http://127.0.0.1:4192/?renderBackend=webgpu with API2587. Edge tab2070822668 is a user deliverable, viewport override reset. Actual scene/avatar/cars/world rendered; renderer-ready reports WebGPU, nvidia/pascal; B6/car/physics ready and game-ready observed. This is a working migration checkpoint, not complete acceptance.
+
+Full native-v1 suite: 1033/1038 PASS, five VM fixtures omitted the new actual timing helper. Fix276357a passes all33 affected tests without weakening assertions. Native-v3 production `pnpm build` including project TypeScript PASS. Its ordered index→Game import probe PASS, all13JS chunks have no static cycles; original startup inheritance error is fixed. Complete suite/integration/repeated performance and full visual matrix are still outstanding for this final checkpoint.
+
+Session `ce67cc8d-189e-43a8-a69e-8397df14805e`: renderer initialization29.6ms; lighting preparation timed out after30265.9ms and is correctly recorded as a pipeline health failure. Game-ready followed; HUD shows about1FPS in the automation-controlled window, so this run is not a valid performance result. No shader compiler/validation error was observed at handoff. User focus/foreground and actual play must be checked before drawing any FPS conclusion.
+
+Services remain under the active root reservation; exact owned PID/start/path records are in `.cache/webgpu-migration/runs/native-v3/runtime.json`. Do not stop by port. Do not rebuild or mutate `native-v3`, its served dist, or its shared `.cache/webgpu-migration/dependencies` while the user plays. Future development needs a new checkpoint/dependency directory. Native-v1/v2 services were stopped by verified process identity. Original frozen4188 remains untouched.
+
+Other implementation is stopped. Preview commitd3c0fa7 is included. Unverified acceptance reporter WIP remains owned by `webgpu-mig-01a14497-acceptance`: script, test and its handoff; excluded from this committed snapshot. Pipeline agent released its reservation, no helper processes remain. Root keeps GPU/heavy-validation/ports reserved to protect this user playtest; migration goal is paused at the user's request.
+
 - Owner: `webgpu-migration-01a14497-root`; coordinator of user-authorized KEY-22 goal. Worktree `C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow`, branch `codex/webgpu-migration`, starting commit `b1b25d1`. This is an ongoing record, not final acceptance.
 - Foundation changes: `client/game.ts` now requires the initialized engine supplied by the factory, removing its independent WebGL constructor. `client/ui.tsx` captures the original startup canvas and disposes a late engine if the canvas was replaced. `tests/game-render-engine.test.ts` exercises replacement, construction failure and asynchronous start failure in the actual compiled UI effect.
 - Workflow/decisions: `docs/performance/webgpu-migration.md`, Linear KEY-22 and children KEY-23 through KEY-35. Existing Babylon 9.30 dependency and patch retained. No native/default switch yet; custom modules and real GPU acceptance are required first.
