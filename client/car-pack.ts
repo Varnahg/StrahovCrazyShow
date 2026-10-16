@@ -167,13 +167,14 @@ export class CarPack {
       if (
         options.paintInstancing !== false &&
         scene.getEngine().getCaps().instancedArrays &&
-        // The fallback plugin injects GLSL. The explicit WebGPU experiment
-        // creates GLSL PBR materials before loading; ordinary WGSL keeps the
-        // per-colour fallback. Inspect each material's captured language, not
-        // a global ForceGLSL flag that may change after construction.
-        paintSources.every(
-          (source) => source.material?.shaderLanguage === ShaderLanguage.GLSL,
-        )
+        // Both plugin recipes use Babylon's same native instance stream.
+        // Inspect the material's captured language, never a mutable ForceGLSL.
+        paintSources.every((source) => {
+          const language = source.material?.shaderLanguage;
+          return (
+            language === ShaderLanguage.GLSL || language === ShaderLanguage.WGSL
+          );
+        })
       ) {
         pack.instancePaintColor = installCarPaintInstances(paintSources);
       }
