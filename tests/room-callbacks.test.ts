@@ -16,6 +16,7 @@ import {
 } from "../client/authority-buffer";
 import { NetworkProbe } from "../client/network-probe";
 import { NetworkTimeline } from "../client/network-timeline";
+import { readWebGpuMainPassTiming } from "../client/gpu-diagnostics";
 
 // Execute the actual UI subscriptions, without booting React/WebGL. This catches
 // a missing guard on any handler, not only the helper's isolated behavior.
@@ -1113,6 +1114,7 @@ test("actual UI hook assignments drain authority before Game simulation and flus
     movementFromKeys,
     document: { hidden: false },
     vehicleCameraCanFollow: () => false,
+    readWebGpuMainPassTiming,
   });
   Object.assign(f.game, gameMethodsScript.runInContext(f.context), {
     ready: true,

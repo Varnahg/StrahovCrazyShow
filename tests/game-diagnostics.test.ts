@@ -13,6 +13,7 @@ import {
   type DiagnosticsEnvironment,
 } from "../client/session-diagnostics";
 import { NetworkTimeline } from "../client/network-timeline";
+import { readWebGpuMainPassTiming } from "../client/gpu-diagnostics";
 import { writeQuaternion, writeVector3 } from "../client/transform-updates";
 import {
   snapshotTransportDiagnostics,
@@ -77,7 +78,7 @@ const compiled = ts.transpileModule(
 // Same-realm object literals exercise the real sanitizer's plain-object policy.
 const script = new Script(`(function(environment) {
   const { exports, Vector3, Quaternion, writeQuaternion, writeVector3, performance, document, window,
-    testImportMeta, sessionDiagnostics, vehicleCameraCanFollow, zoneAt, applyArtLighting, snapshotTransportDiagnostics, snapshotTimelineDiagnostics } = environment;
+    testImportMeta, sessionDiagnostics, vehicleCameraCanFollow, zoneAt, applyArtLighting, snapshotTransportDiagnostics, snapshotTimelineDiagnostics, readWebGpuMainPassTiming } = environment;
   ${compiled}
   return FrameGame;
 })`);
@@ -128,6 +129,7 @@ function fixture(hostname = "localhost") {
     writeVector3,
     snapshotTransportDiagnostics,
     snapshotTimelineDiagnostics,
+    readWebGpuMainPassTiming,
     performance: { now: () => clock++ },
     document: { hidden: false, removeEventListener() {} },
     window: { devicePixelRatio: 1, removeEventListener() {} },

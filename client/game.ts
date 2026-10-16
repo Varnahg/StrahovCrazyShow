@@ -1314,6 +1314,7 @@ export class Game {
     this.benchmark?.profile.dispose();
     sessionDiagnostics.event("benchmark-start", {
       rendererId: this.renderHealth.rendererId,
+      avatars: this.avatars.size,
       position: { x: this.actor.position.x, y: this.actor.position.y, z: this.actor.position.z },
       yaw: this.yaw,
       pitch: this.pitch,
