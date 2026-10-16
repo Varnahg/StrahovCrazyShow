@@ -69,6 +69,7 @@ import { updateRainSegments } from "./weather-particles";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { getRendererInfo } from "./gpu-diagnostics";
+import { watchWebGpuValidation } from "./webgpu-validation";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3, Matrix, Quaternion } from "@babylonjs/core/Maths/math.vector";
@@ -524,6 +525,17 @@ export class Game {
         false,
       );
     this.canvas.dataset.renderErrorCount = "0";
+    watchWebGpuValidation(this.engine, (message) => {
+      if (this.disposed) return;
+      this.canvas.dataset.renderErrorCount = String(++this.renderErrorCount);
+      if (this.renderErrorCount <= 5)
+        sessionDiagnostics.event("webgpu-validation-error", {
+          count: this.renderErrorCount,
+          message,
+        });
+      if (this.renderErrorCount === 1)
+        this.notice("Část prostředí se nepodařilo vykreslit. Obnov stránku.");
+    });
     this.engine.onEffectErrorObservable.add(() => {
       this.canvas.dataset.renderErrorCount = String(++this.renderErrorCount);
       if (this.renderErrorCount === 1)
