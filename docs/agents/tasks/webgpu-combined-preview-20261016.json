@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-combined-preview-20261016",
+  "title": "Připravit izolovaný merge async WebGPU preview s cizím persistent preview WIP",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [".cache/webgpu-migration-checks/combined-preview/", "docs/agents/handoffs/webgpu-combined-preview-20261016.md"],
+  "resources": [],
+  "acceptance": ["Pouze vlastní izolované kopie; primary i migrační runtime soubory read-only.", "Zachovat AvatarPreviewModel create-next-before-dispose-old, no-op stejných profilů, viditelné readiness meshe, active API a persistent editor; spojit s native async factory/health/submitted gate a cleanup generation."],
+  "verification": ["Vstupní SHA, konkrétní diff/candidate soubory a lehké cílené CPU regrese; žádný install/GPU/build/fullsuite.", "Předat zachování cache/lifecycle/profilů, active/hidden pause a unmount/late engine disposal, včetně refaktoringu dotčeného řetězce."],
+  "notes": ["Použít vlastní staging s readonly dependencies-v5; žádný pnpm exec.", "Připravit candidate avatar-renderer.ts, avatar-editor.tsx, avatar-preview.ts a související testy. Game/UI řeší root a jiný agent. Kombinované foreign změny se nesmí commitovat jako čistá migrace."]
+}
