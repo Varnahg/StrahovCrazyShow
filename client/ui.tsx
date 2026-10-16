@@ -1,5 +1,7 @@
 import { HudIcon } from "./hud-icons";
 import { sessionDiagnostics } from "./session-diagnostics";
+import { getRendererInfo } from "./gpu-diagnostics";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { FrameInputBuffer } from "./network-input-buffer";
 import { AuthorityBuffer, type ReceivedAuthority } from "./authority-buffer";
 import { NetworkProbe } from "./network-probe";
@@ -503,12 +505,31 @@ export function App() {
     if (mode === "menu" || !canvas.current) return;
     sessionDiagnostics.event("mode-change", { mode });
     let cancelled = false;
+    const startupAbort = new AbortController();
     modeRef.current = mode;
     (async () => {
+      let pendingEngine: AbstractEngine | undefined;
       try {
-        const { Game } = await import("./game");
+        const [{ Game }, { createGameEngine }] = await Promise.all([
+          import("./game"),
+          import("./render-engine"),
+        ]);
         if (cancelled || !canvas.current) return;
-        const g = new Game(canvas.current, profileRef.current);
+        const engineStarted = performance.now();
+        pendingEngine = await createGameEngine(canvas.current, {
+          signal: startupAbort.signal,
+        });
+        if (cancelled || !canvas.current) {
+          pendingEngine.dispose();
+          return;
+        }
+        sessionDiagnostics.event("renderer-ready", {
+          durationMs: performance.now() - engineStarted,
+          ...getRendererInfo(pendingEngine),
+          backend: pendingEngine.isWebGPU ? "webgpu" : "webgl2",
+        });
+        const g = new Game(canvas.current, profileRef.current, pendingEngine);
+        pendingEngine = undefined;
         game.current = g;
         g.network = mode === "multi";
         syncNetworkStage(g);
@@ -578,13 +599,18 @@ export function App() {
             getStats: () => ({
               fps: g.engine.getFps(),
               frameTimes: [...g.frames],
-              renderer: g.engine.getGlInfo(),
+              renderer: getRendererInfo(g.engine),
               players: g.avatars.size,
             }),
             setTime: (t: number | null) => (g.timeOverride = t),
             setWeather: (w: Weather) => g.setWeather(w),
           };
       } catch (e) {
+        pendingEngine?.dispose();
+        if (cancelled) return;
+        sessionDiagnostics.event("startup-error", { message: String(e) });
+        game.current?.dispose();
+        game.current = null;
         setError(
           t("3D scénu se nepodařilo spustit: {error}", { error: String(e) }),
         );
@@ -592,6 +618,7 @@ export function App() {
     })();
     return () => {
       cancelled = true;
+      startupAbort.abort();
       userBenchmark.current = false;
       game.current?.dispose();
       game.current = null;

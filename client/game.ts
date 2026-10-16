@@ -67,6 +67,8 @@ import { MapNavigator, type PlanMapRoute } from "./map-navigation";
 import { createNavigationClearance } from "./navigation-physics";
 import { updateRainSegments } from "./weather-particles";
 import { Engine } from "@babylonjs/core/Engines/engine";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { getRendererInfo } from "./gpu-diagnostics";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3, Matrix, Quaternion } from "@babylonjs/core/Maths/math.vector";
@@ -274,7 +276,7 @@ type Avatar = AvatarRig & {
 };
 
 export class Game {
-  engine: Engine;
+  engine: AbstractEngine;
   scene: Scene;
   camera: UniversalCamera;
   labels: ScreenLabels;
@@ -506,18 +508,21 @@ export class Game {
   constructor(
     public canvas: HTMLCanvasElement,
     profile: Profile,
+    preparedEngine?: AbstractEngine,
   ) {
     this.profile = profile;
-    this.engine = new Engine(
-      canvas,
-      true,
-      {
-        stencil: true,
-        preserveDrawingBuffer: false,
-        powerPreference: PREFERRED_GPU_POWER,
-      },
-      false,
-    );
+    this.engine =
+      preparedEngine ??
+      new Engine(
+        canvas,
+        true,
+        {
+          stencil: true,
+          preserveDrawingBuffer: false,
+          powerPreference: PREFERRED_GPU_POWER,
+        },
+        false,
+      );
     this.canvas.dataset.renderErrorCount = "0";
     this.engine.onEffectErrorObservable.add(() => {
       this.canvas.dataset.renderErrorCount = String(++this.renderErrorCount);
@@ -533,6 +538,7 @@ export class Game {
     });
     this.engineInstrumentation = new EngineInstrumentation(this.engine);
     if (
+      !this.engine.isWebGPU &&
       this.engine.getCaps().timerQuery &&
       typeof this.engine.getGPUFrameTimeCounter === "function"
     ) {
@@ -2507,7 +2513,7 @@ export class Game {
         // Controllers keep updating (or dispose after HMR) while the result is
         // retained by the UI. Snapshot only their small diagnostic records.
         const diagnostics = snapshotBenchmarkDiagnostics({
-          renderer: this.engine.getGlInfo(),
+          renderer: getRendererInfo(this.engine),
           ambient: this.transit?.counts ?? { buses: 0, passengers: 0, cars: 0 },
           realityPack: {
             architecture: this.worldControllers?.architecture?.metrics ?? null,
