@@ -92,6 +92,30 @@ test("hidden state cancels the queued RAF and retains the pending change", async
   f.renderer.dispose();
 });
 
+test("a dequeued RAF from an earlier visible generation cannot submit or clear the current handle", async () => {
+  let frames = 0;
+  const f = fixture(() => { frames++; return false; });
+  f.renderer.request();
+  const stale = f.queued.values().next().value!;
+  f.visible(false);
+  f.visible(true);
+  const current = f.queued.values().next().value!;
+  stale();
+  await settle();
+  assert.equal(frames, 0, "cancelled generation cannot render after visibility resumes");
+  assert.equal(f.queued.size, 1);
+  assert.equal(f.queued.values().next().value, current);
+  f.renderer.request();
+  assert.equal(f.queued.size, 1, "stale callback cannot clear the current handle");
+  await f.fire();
+  assert.equal(frames, 1);
+  f.renderer.dispose();
+  current();
+  stale();
+  await settle();
+  assert.equal(frames, 1, "disposal also rejects callbacks already dequeued");
+});
+
 test("dispose suppresses a late checkpoint and preparation repeat", async () => {
   let resolve!: (value: boolean) => void;
   const pending = new Promise<boolean>((done) => {

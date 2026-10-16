@@ -14,6 +14,7 @@ export class OnDemandRender {
   private dirty = false;
   private inFlight = false;
   private disposed = false;
+  private generation = 0;
 
   constructor(private readonly host: OnDemandRenderHost) {}
 
@@ -25,9 +26,14 @@ export class OnDemandRender {
 
   visibilityChanged() {
     if (!this.host.visible()) {
-      if (this.handle !== undefined) this.host.cancelFrame(this.handle);
-      this.handle = undefined;
+      this.cancelScheduledFrame();
     } else this.request();
+  }
+
+  private cancelScheduledFrame() {
+    this.generation++;
+    if (this.handle !== undefined) this.host.cancelFrame(this.handle);
+    this.handle = undefined;
   }
 
   private schedule() {
@@ -39,7 +45,11 @@ export class OnDemandRender {
       !this.host.visible()
     )
       return;
+    const generation = this.generation;
     this.handle = this.host.requestFrame(() => {
+      // Cancellation can race a callback already dequeued by the browser.
+      // It must not clear the handle or submit work for a reopened owner.
+      if (this.disposed || generation !== this.generation) return;
       this.handle = undefined;
       void this.run();
     });
@@ -67,7 +77,6 @@ export class OnDemandRender {
     if (this.disposed) return;
     this.disposed = true;
     this.dirty = false;
-    if (this.handle !== undefined) this.host.cancelFrame(this.handle);
-    this.handle = undefined;
+    this.cancelScheduledFrame();
   }
 }
