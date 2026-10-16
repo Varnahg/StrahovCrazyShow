@@ -609,7 +609,10 @@ export function App() {
       } catch (e) {
         pendingEngine?.dispose();
         if (cancelled) return;
-        sessionDiagnostics.event("startup-error", { message: String(e) });
+        sessionDiagnostics.event("startup-error", {
+          message: String(e),
+          stack: e instanceof Error ? e.stack?.slice(0, 2000) : undefined,
+        });
         game.current?.dispose();
         game.current = null;
         setError(
