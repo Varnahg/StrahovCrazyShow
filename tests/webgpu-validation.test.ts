@@ -165,3 +165,62 @@ test("missing initialized device is visible and a restored device becomes monito
     cleanup();
   }
 });
+
+function pendingLoss() {
+  let resolve!: (value: { reason: string; message: string }) => void;
+  const promise = new Promise<{ reason: string; message: string }>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+
+test("explicit loss monitoring follows only the current live device and detaches on cleanup", async () => {
+  const engine = fixture(),
+    first = pendingLoss(),
+    second = pendingLoss();
+  engine._device = Object.assign(new EventTarget(), { lost: first.promise });
+  const losses: string[] = [];
+  const cleanup = watchWebGpuValidation(
+    engine,
+    () => {},
+    (message) => losses.push(message),
+  );
+  engine._device = Object.assign(new EventTarget(), { lost: second.promise });
+  engine.onContextRestoredObservable.notifyObservers();
+  first.resolve({ reason: "destroyed", message: "retired device" });
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(losses.length, 0);
+  second.resolve({ reason: "unknown", message: "current device removed" });
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(losses.length, 1);
+  assert.match(losses[0], /current device removed/);
+  cleanup();
+  const later = fixture(),
+    pending = pendingLoss();
+  later._device = Object.assign(new EventTarget(), { lost: pending.promise });
+  const stop = watchWebGpuValidation(
+    later,
+    () => {},
+    (message) => losses.push(message),
+  );
+  stop();
+  pending.resolve({ reason: "destroyed", message: "disposed owner" });
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(losses.length, 1);
+});
+
+test("requesting explicit device-loss monitoring exposes a missing lost Promise", () => {
+  const engine = fixture(),
+    losses: string[] = [];
+  const cleanup = watchWebGpuValidation(
+    engine,
+    () => {},
+    (message) => losses.push(message),
+  );
+  assert.equal(losses.length, 1);
+  assert.match(losses[0], /lost.*unavailable/);
+  cleanup();
+});

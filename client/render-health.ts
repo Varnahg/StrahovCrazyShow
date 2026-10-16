@@ -53,6 +53,9 @@ export class RenderHealth {
   };
   private firstErrors: RenderFault[] = [];
   private cleanups: (() => void)[] = [];
+  private guards = new Set<(reason: unknown) => void>();
+  private terminalReason: unknown;
+  private deviceLostGeneration: number | undefined;
 
   constructor(
     engine: AbstractEngine,
@@ -65,19 +68,17 @@ export class RenderHealth {
     const effect = engine.onEffectErrorObservable.add(({ errors }) =>
       this.report("effect", errors),
     );
-    const lost = engine.onContextLostObservable.add(() => {
-      if (this.phase === "disposed") return;
-      this.phase = "restart-required";
-      this.report(
-        "device",
-        "Grafické zařízení se odpojilo. Spusť 3D scénu znovu.",
-      );
-    });
+    const lost = engine.onContextLostObservable.add(() =>
+      this.deviceLost("Grafické zařízení se odpojilo. Spusť 3D scénu znovu."),
+    );
     const restored = engine.onContextRestoredObservable.add(() => {
       if (this.phase === "disposed") return;
       this.generation++;
       this.pendingOperations = 0;
       this.phase = "restart-required";
+      this.rejectGuards(
+        new Error("Grafické zařízení se změnilo. Spusť 3D scénu znovu."),
+      );
     });
     const disposed = engine.onDisposeObservable.add(() => this.dispose());
     this.cleanups.push(
@@ -85,8 +86,10 @@ export class RenderHealth {
       () => lost.remove(true),
       () => restored.remove(true),
       () => disposed.remove(true),
-      watchWebGpuValidation(engine, (message) =>
-        this.report("validation", message),
+      watchWebGpuValidation(
+        engine,
+        (message) => this.report("validation", message),
+        (message) => this.deviceLost(message),
       ),
     );
     // An observable can replay disposal synchronously while attaching.
@@ -94,16 +97,71 @@ export class RenderHealth {
   }
 
   report(channel: RenderFaultChannel, error: unknown) {
+    this.recordFault(channel, error);
+  }
+
+  private recordFault(
+    channel: RenderFaultChannel,
+    error: unknown,
+    label?: string,
+  ) {
     if (this.phase === "disposed") return;
-    const message = (
-      error instanceof Error ? error.message : String(error)
-    ).slice(0, MAX_MESSAGE);
+    const detail = error instanceof Error ? error.message : String(error);
+    const message = (label ? `${label}: ${detail}` : detail).slice(
+      0,
+      MAX_MESSAGE,
+    );
     const fault = { channel, message, generation: this.generation };
     this.errorCount++;
     this.counts[channel]++;
     if (this.phase !== "restart-required") this.phase = "invalid";
     if (this.firstErrors.length < MAX_ERRORS) this.firstErrors.push(fault);
+    // Preserve the operation's original rejection, even when its report reaches
+    // a guard before the tracked promise's rejection microtask does.
+    if (this.errorCount === 1) this.terminalReason = error;
+    this.rejectGuards(this.terminalReason);
     this.onFault?.({ ...fault }, this.snapshot());
+  }
+
+  private deviceLost(message: string) {
+    if (
+      this.phase === "disposed" ||
+      this.deviceLostGeneration === this.generation
+    )
+      return;
+    this.deviceLostGeneration = this.generation;
+    this.phase = "restart-required";
+    this.pendingOperations = 0;
+    this.recordFault("device", new Error(message));
+  }
+
+  private rejectGuards(reason: unknown) {
+    this.terminalReason = reason;
+    for (const reject of this.guards) reject(reason);
+    this.guards.clear();
+  }
+
+  /** Stops awaiting promptly when this renderer becomes unusable. This does
+   * not cancel the operation: its caller still owns abort and late cleanup. */
+  guard<T>(operation: Promise<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      const generation = this.generation;
+      const fail = (reason: unknown) => {
+        this.guards.delete(fail);
+        reject(reason);
+      };
+      const usable = () =>
+        this.generation === generation &&
+        (this.phase === "preparing" || this.phase === "ready");
+      this.guards.add(fail);
+      // Always consume the owned operation, including after a prior fault.
+      operation.then((value) => {
+        this.guards.delete(fail);
+        if (usable()) resolve(value);
+        else reject(this.terminalReason);
+      }, fail);
+      if (!usable()) fail(this.terminalReason);
+    });
   }
 
   /** The caller still awaits/catches this result. Rejection identity is kept;
@@ -116,7 +174,9 @@ export class RenderHealth {
   ): Promise<T> {
     const generation = this.generation;
     const active = () =>
-      this.phase !== "disposed" && this.generation === generation;
+      this.phase !== "disposed" &&
+      this.phase !== "restart-required" &&
+      this.generation === generation;
     if (active()) this.pendingOperations++;
     return operation.then(
       (value) => {
@@ -126,9 +186,12 @@ export class RenderHealth {
       (error: unknown) => {
         if (active()) {
           this.pendingOperations--;
-          const message =
-            error instanceof Error ? error.message : String(error);
-          this.report(channel, `${label}: ${message}`);
+          try {
+            this.recordFault(channel, error, label);
+          } finally {
+            // A diagnostic callback must not replace the operation's error.
+            throw error;
+          }
         }
         throw error;
       },
@@ -168,6 +231,9 @@ export class RenderHealth {
     if (this.phase !== "disposed") {
       this.phase = "disposed";
       this.pendingOperations = 0;
+      const error = new Error("Renderer disposed");
+      error.name = "AbortError";
+      this.rejectGuards(error);
     }
     this.detach();
   }

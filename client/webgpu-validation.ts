@@ -10,7 +10,12 @@ export type WebGpuValidationEngine = {
   readonly _device?: Pick<
     EventTarget,
     "addEventListener" | "removeEventListener"
-  >;
+  > & {
+    readonly lost?: PromiseLike<{
+      readonly message: string;
+      readonly reason: string;
+    }>;
+  };
   readonly onDisposeObservable: LifecycleObservable;
   readonly onContextRestoredObservable: LifecycleObservable;
 };
@@ -24,6 +29,7 @@ const MAX_MESSAGE_LENGTH = 2000;
 export function watchWebGpuValidation(
   engine: WebGpuValidationEngine,
   callback: (message: string) => void,
+  onDeviceLost?: (message: string) => void,
 ): () => void {
   if (!engine.isWebGPU) return () => {};
 
@@ -52,6 +58,29 @@ export function watchWebGpuValidation(
     device = next;
     if (device) {
       device.addEventListener("uncapturederror", onError);
+      if (onDeviceLost) {
+        const current = device;
+        const deliverLoss = (message: string) => {
+          if (active && device === current && engine._device === current)
+            onDeviceLost(message.slice(0, MAX_MESSAGE_LENGTH));
+        };
+        if (current.lost && typeof current.lost.then === "function") {
+          void Promise.resolve(current.lost).then(
+            (info) =>
+              deliverLoss(
+                `WebGPU device lost (${info.reason}): ${info.message}`,
+              ),
+            (error: unknown) =>
+              deliverLoss(
+                `WebGPU device lost monitoring failed: ${String(error)}`,
+              ),
+          );
+        } else {
+          deliverLoss(
+            "WebGPU device lost monitoring unavailable: no device.lost Promise",
+          );
+        }
+      }
     } else {
       // A zero-error benchmark must not silently mean no monitor was attached.
       callback(
