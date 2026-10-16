@@ -225,31 +225,87 @@ function isCampusWindow(material: StandardMaterial) {
   );
 }
 
-export function applyWindowSkyReflection(
+type WindowSkyReflectionOwnership = {
+  reflection?: FresnelParameters;
+  opacity?: FresnelParameters;
+};
+
+function configureWindowSkyReflection(
   material: StandardMaterial,
   environment: BaseTexture,
-) {
-  if (!isCampusWindow(material)) return false;
+): WindowSkyReflectionOwnership | undefined {
+  if (!isCampusWindow(material)) return;
   material.reflectionTexture = environment;
-  material.reflectionFresnelParameters = new FresnelParameters({
+  const reflection = new FresnelParameters({
     leftColor: new Color3(0.68, 0.7, 0.72),
     rightColor: new Color3(0.04, 0.04, 0.04),
     power: 5,
     bias: 0,
   });
+  material.reflectionFresnelParameters = reflection;
   // Exterior-only windows keep their opaque authored room mask. Reflection
   // adds no transparent pass or view into buildings without an interior.
-  if (material.metadata.block === 6)
-    material.opacityFresnelParameters = new FresnelParameters({
+  let opacity: FresnelParameters | undefined;
+  if (material.metadata.block === 6) {
+    opacity = new FresnelParameters({
       leftColor: new Color3(0.45, 0.45, 0.45),
       rightColor: Color3.Black(),
       power: 5,
       bias: 0,
     });
+    material.opacityFresnelParameters = opacity;
+  }
   material.roughness = material.metadata.windowStyle === "clear" ? 0.04 : 0.1;
   if (material.metadata.nightWindows && material.emissiveTexture)
     material.useEmissiveAsIllumination = true;
-  return true;
+  // Babylon's equality setter can retain an equivalent pre-existing object.
+  // Only the exact newly accepted reference belongs to this configuration.
+  return {
+    reflection:
+      material.reflectionFresnelParameters === reflection
+        ? reflection
+        : undefined,
+    opacity:
+      material.opacityFresnelParameters === opacity ? opacity : undefined,
+  };
+}
+
+export function applyWindowSkyReflection(
+  material: StandardMaterial,
+  environment: BaseTexture,
+) {
+  return configureWindowSkyReflection(material, environment) !== undefined;
+}
+
+function releaseWindowSkyReflection(
+  material: StandardMaterial,
+  environment: BaseTexture,
+  ownership: WindowSkyReflectionOwnership,
+) {
+  // A replacement texture transfers the reflection setup to its external owner.
+  if (material.reflectionTexture !== environment) return;
+  material.reflectionTexture = null;
+  let detached = false;
+  if (
+    ownership.reflection &&
+    material.reflectionFresnelParameters === ownership.reflection
+  ) {
+    // The 9.30 accessor is typed nonnullable, but its runtime supports null.
+    // Mutating isEnabled (even through a disabled constructor) dirties every
+    // material in every engine and changes any external user of the object.
+    material.reflectionFresnelParameters = null!;
+    detached = true;
+  }
+  if (
+    ownership.opacity &&
+    material.opacityFresnelParameters === ownership.opacity
+  ) {
+    material.opacityFresnelParameters = null!;
+    detached = true;
+  }
+  // StandardMaterial 9.30 leaves old Fresnel defines after the last null detach.
+  // Reset this material's wrappers once, also for frozen live-scene materials.
+  if (detached) material.resetDrawCache();
 }
 
 type AtmosphereInput = {
@@ -283,7 +339,10 @@ export class CinematicAtmosphere {
   private lastSky = new Color3(-1, -1, -1);
   private lastHorizon = new Color3(-1, -1, -1);
   private wrappers = new Map<ShaderMaterial, ShadowDepthWrapper>();
-  private glass = new Set<StandardMaterial>();
+  private readonly glass = new Map<
+    StandardMaterial,
+    WindowSkyReflectionOwnership
+  >();
   private pendingGlass = new Set<Material>();
   private addedMaterial: Observer<Material>;
   private removedMaterial: Observer<Material>;
@@ -506,18 +565,17 @@ export class CinematicAtmosphere {
   private configureGlass() {
     for (const material of this.pendingGlass) {
       this.stats.glassVisits++;
-      if (
-        !(material instanceof StandardMaterial) ||
-        !isCampusWindow(material) ||
-        this.glass.has(material)
-      )
+      if (!(material instanceof StandardMaterial) || this.glass.has(material))
         continue;
       // Sky reflection is strongest at grazing angles. Opacity Fresnel adds only
       // at the edges, keeping the outward view through clear B6 panes usable.
-      applyWindowSkyReflection(material, this.environment);
+      const ownership = configureWindowSkyReflection(
+        material,
+        this.environment,
+      );
       // Keep alpha, diffuse blinds/curtains and the independently controlled warm
       // emissive occupancy mask exactly as the architecture producer authored.
-      this.glass.add(material);
+      if (ownership) this.glass.set(material, ownership);
     }
     this.pendingGlass.clear();
     this.stats.glassMaterials = this.glass.size;
@@ -676,13 +734,8 @@ export class CinematicAtmosphere {
     this.shadow.dispose();
     for (const material of this.wrappers.keys())
       this.releaseShadowWrapper(material);
-    for (const material of this.glass)
-      if (material.reflectionTexture === this.environment) {
-        material.reflectionTexture = null;
-        material.reflectionFresnelParameters.isEnabled = false;
-        if (material.opacityFresnelParameters)
-          material.opacityFresnelParameters.isEnabled = false;
-      }
+    for (const [material, ownership] of this.glass)
+      releaseWindowSkyReflection(material, this.environment, ownership);
     this.glass.clear();
     this.sun.shadowEnabled = false;
     if (this.scene.environmentTexture === this.environment)
