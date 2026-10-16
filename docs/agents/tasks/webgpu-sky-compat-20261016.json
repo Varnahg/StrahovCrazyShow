@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-sky-compat-20261016",
+  "title": "Zachovat mipmapové vzorkování oblohy v uniform control flow",
+  "writePaths": [
+    "client/atmosphere-sky.ts",
+    "client/sky-weather.ts",
+    "tests/atmosphere-webgpu.test.ts",
+    "docs/agents/handoffs/webgpu-sky-compat-20261016.md"
+  ],
+  "acceptance": [
+    "Hoist implicit texture samples před pixelové return/discard/branches; zachovat původní UV,textury,mipy,filtry,koeficienty.",
+    "Stejná změna pro oba backendy; žádný disableUniformityAnalysis ani LOD0 náhrada."
+  ],
+  "verification": [
+    "Cílené skutečné shader/atmosphere regrese, root následný skutečnýWebGPUrender."
+  ],
+  "notes": [
+    "Příčina doložena actualEdge smoke e0de700…; textureSample derivativeUniformity error. OběRawTexture iMoonmapmajímipy; vybránhoist oproti širšímugradientAPI."
+  ],
+  "status": "ready",
+  "dependsOn": [],
+  "resources": []
+}

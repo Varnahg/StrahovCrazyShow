@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-validation-errors-20261016",
+  "title": "Zachytit GPU validační chyby do pravdivého benchmarku",
+  "writePaths": [
+    "client/webgpu-validation.ts",
+    "tests/webgpu-validation.test.ts",
+    "docs/agents/handoffs/webgpu-validation-errors-20261016.md"
+  ],
+  "acceptance": [
+    "Listeneruncapturederror poinit,předScene,cleanup/restored-device rebind, žádnépreventDefault.",
+    "Callback boundedmessage proGame renderErrorCount; WebGLno-op; žádnýfalšovanýEffect."
+  ],
+  "verification": [
+    "CPUactualEventTarget/Observable lifecycle testy; rootGPUcounterpři skutečnémrenderu."
+  ],
+  "notes": [
+    "PinnedBabylon9.30 pouzeLogger.Warn; onEffectErrorObservable a getError tuto chybu nezachytí. RootintegrujecallbackdoGame."
+  ],
+  "status": "ready",
+  "dependsOn": [],
+  "resources": []
+}
