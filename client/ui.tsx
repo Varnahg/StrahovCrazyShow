@@ -1086,6 +1086,14 @@ export function App() {
           </div>
           <p>{t("Připravuji celý kopec…")}</p>
           {error && <p className="error">{localizeNotice(error)}</p>}
+          <button
+            type="button"
+            className="secondary"
+            style={{ marginTop: 16 }}
+            onClick={leave}
+          >
+            {t("Opustit demo")}
+          </button>
         </div>
       )}
       <header className="game-top">
