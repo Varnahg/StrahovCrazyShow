@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-car-parity-20261016",
   "title": "Shodná car paint instance cesta pro renderer A/B",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "client/car-pack.ts",
@@ -18,6 +18,7 @@
     "Cílené CPU regrese, root navazující obrazová kontrola."
   ],
   "notes": [
-    "Disjunktní task; nezměnit obecné API/asset bez dohody; při nepodpoře uvést blocker."
+    "Disjunktní task; nezměnit obecné API/asset bez dohody; při nepodpoře uvést blocker.",
+    "16.10 root převzal konkrétní ověřený celek v izolované větvi. Runtime snapshot a1eb953f…,985/985tests/build/integration PASS. Porovnání dokončeno s negativním výsledkem migrace;3WebGPUthree běhy neplatné, KEY-5 zůstává otevřený. Viz docs/performance/evidence/webgpu-comparison-20261016/README.md. Nejde o nasazení WebGPU do main."
   ]
 }

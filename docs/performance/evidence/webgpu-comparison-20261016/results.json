@@ -1,0 +1,5817 @@
+{
+  "snapshotId": "a1eb953f7dc9805ee01798e1f11da854215896aadc484d1d3b3d3a89aaad065d",
+  "method": "FPS=count/sum(raw intervals)*1000; nearest-rank per-run percentiles; median and full min/max across repetitions, no pooling of percentiles.",
+  "order": [
+    "a1",
+    "b1",
+    "b2",
+    "a2",
+    "a3",
+    "b3",
+    "c1"
+  ],
+  "limits": [
+    "Three repetitions per main backend; WebGPU-fast is one exploratory repetition with one avatar only.",
+    "Same full production content, medium, HUD, 2040x986 CSS/internal, fixed QA weather and UTC1792188000000. Shared sky compatibility change applies to both APIs; this is not the unchanged historical4188 build.",
+    "Browser/driver caches were not cleared. First F means first user activation in a new Game, after normal startup preparation.",
+    "WebGL preparation completed; every measured WebGPU preparation hit its existing30s watchdog. This compares current end-to-end behavior, not equally completed warmup.",
+    "OFF is near the display presentation ceiling around60Hz. Small FPS differences cannot establish unrestricted throughput.",
+    "GPU checkpoints reached82-83C; observed graphics clocks varied1088-1379MHz. Thermal/clock conditions were not fixed; small differences cannot be attributed solely to the backend.",
+    "Movement uses the same real3sW/3sS inputs but achieved trajectories differ under stalls/corrections. Ambient transit follows real time; camera/astronomy fixture does not freeze it.",
+    "WebGL identifies GTX1060/ANGLE D3D11; WebGPU exposes nvidia/pascal only. Host inventory contains one NVIDIA adapter, GTX1060. WebGPU precise device name and actual framebuffer sample query were unavailable.",
+    "Whole-frame WebGL GPU timing is not comparable to WebGPU main-pass timing; missing values remain null.",
+    "First WebGPU F has one directly proven4.9-5.2s render/LongTask block and another long presentation interval not explained by the measured callback. The second gap's cause is not isolated.",
+    "No current NCM bundle rebuild/reuse distribution was collected, no nativeWGSL rewrite or alternative cache architecture was tested.",
+    "Initial shader-validation failure and background1FPS smoke were excluded before the measured series; all raw failures remain preserved."
+  ],
+  "groups": [
+    {
+      "backend": "webgl2",
+      "scenario": "off",
+      "n": 3,
+      "pilot": false,
+      "fps": {
+        "median": 60.052558478855396,
+        "min": 59.71878245580671,
+        "max": 60.057359274861156
+      },
+      "p95": {
+        "median": 16.900000005960464,
+        "min": 16.80000001192093,
+        "max": 17
+      },
+      "p99": {
+        "median": 19.200000002980232,
+        "min": 17.099999994039536,
+        "max": 22.200000002980232
+      },
+      "maximum": {
+        "median": 22.099999994039536,
+        "min": 20,
+        "max": 35.6000000089407
+      }
+    },
+    {
+      "backend": "webgl2",
+      "scenario": "first-on",
+      "n": 3,
+      "pilot": false,
+      "fps": {
+        "median": 59.55414330963384,
+        "min": 59.359042260893055,
+        "max": 59.72474681895472
+      },
+      "p95": {
+        "median": 19.299999997019768,
+        "min": 18.400000005960464,
+        "max": 20.399999991059303
+      },
+      "p99": {
+        "median": 23.299999997019768,
+        "min": 21.700000002980232,
+        "max": 23.400000005960464
+      },
+      "maximum": {
+        "median": 66.5,
+        "min": 63.400000005960464,
+        "max": 76
+      }
+    },
+    {
+      "backend": "webgl2",
+      "scenario": "warm",
+      "n": 3,
+      "pilot": false,
+      "fps": {
+        "median": 59.152677857713826,
+        "min": 57.89000898293243,
+        "max": 59.15563327504372
+      },
+      "p95": {
+        "median": 19.899999991059303,
+        "min": 18.899999991059303,
+        "max": 21
+      },
+      "p99": {
+        "median": 26,
+        "min": 22.30000001192093,
+        "max": 45.5
+      },
+      "maximum": {
+        "median": 74.70000000298023,
+        "min": 58.6000000089407,
+        "max": 76.70000000298023
+      }
+    },
+    {
+      "backend": "webgl2",
+      "scenario": "move",
+      "n": 3,
+      "pilot": false,
+      "fps": {
+        "median": 59.39212755356253,
+        "min": 48.76099120703437,
+        "max": 59.62546816479401
+      },
+      "p95": {
+        "median": 20.5,
+        "min": 19.100000008940697,
+        "max": 55.5
+      },
+      "p99": {
+        "median": 24.799999997019768,
+        "min": 21.700000002980232,
+        "max": 91.09999999403954
+      },
+      "maximum": {
+        "median": 60.6000000089407,
+        "min": 53.1000000089407,
+        "max": 101.70000000298023
+      }
+    },
+    {
+      "backend": "webgl2",
+      "scenario": "three",
+      "n": 3,
+      "pilot": false,
+      "fps": {
+        "median": 59.1532689175199,
+        "min": 57.7336063526944,
+        "max": 59.49825797880305
+      },
+      "p95": {
+        "median": 23.100000008940697,
+        "min": 21.799999997019768,
+        "max": 24
+      },
+      "p99": {
+        "median": 26.5,
+        "min": 24.600000008940697,
+        "max": 27.799999997019768
+      },
+      "maximum": {
+        "median": 31.5,
+        "min": 28.599999994039536,
+        "max": 42.099999994039536
+      }
+    },
+    {
+      "backend": "webgpu",
+      "scenario": "off",
+      "n": 3,
+      "pilot": false,
+      "fps": {
+        "median": 59.954434629627876,
+        "min": 59.0663321907217,
+        "max": 60.06456190843822
+      },
+      "p95": {
+        "median": 16.900000005960464,
+        "min": 16.900000005960464,
+        "max": 19.200000002980232
+      },
+      "p99": {
+        "median": 20.400000005960464,
+        "min": 18.799999997019768,
+        "max": 25.399999991059303
+      },
+      "maximum": {
+        "median": 25,
+        "min": 23.599999994039536,
+        "max": 55.1000000089407
+      }
+    },
+    {
+      "backend": "webgpu",
+      "scenario": "first-on",
+      "n": 3,
+      "pilot": false,
+      "fps": {
+        "median": 7.876350562455393,
+        "min": 7.741052783182665,
+        "max": 8.489875579409611
+      },
+      "p95": {
+        "median": 22.900000005960464,
+        "min": 21.600000008940697,
+        "max": 23.799999997019768
+      },
+      "p99": {
+        "median": 4975.79999999702,
+        "min": 4898.29999999702,
+        "max": 5238.20000000298
+      },
+      "maximum": {
+        "median": 4975.79999999702,
+        "min": 4898.29999999702,
+        "max": 5238.20000000298
+      }
+    },
+    {
+      "backend": "webgpu",
+      "scenario": "warm",
+      "n": 3,
+      "pilot": false,
+      "fps": {
+        "median": 58.30496291047331,
+        "min": 56.69262995812234,
+        "max": 58.89987022062494
+      },
+      "p95": {
+        "median": 23,
+        "min": 21.599999994039536,
+        "max": 24.100000008940697
+      },
+      "p99": {
+        "median": 28.599999994039536,
+        "min": 26.900000005960464,
+        "max": 31.200000002980232
+      },
+      "maximum": {
+        "median": 66.80000001192093,
+        "min": 64,
+        "max": 105.30000001192093
+      }
+    },
+    {
+      "backend": "webgpu",
+      "scenario": "move",
+      "n": 3,
+      "pilot": false,
+      "fps": {
+        "median": 53.436410671269336,
+        "min": 44.838145231819446,
+        "max": 56.462170345851455
+      },
+      "p95": {
+        "median": 26.200000002980232,
+        "min": 24.400000005960464,
+        "max": 68.29999999701977
+      },
+      "p99": {
+        "median": 36.70000000298023,
+        "min": 27.799999997019768,
+        "max": 107.5
+      },
+      "maximum": {
+        "median": 121.3999999910593,
+        "min": 67.5,
+        "max": 169
+      }
+    },
+    {
+      "backend": "webgpu-fast",
+      "scenario": "off",
+      "n": 1,
+      "pilot": true,
+      "fps": {
+        "median": 60.05615900394502,
+        "min": 60.05615900394502,
+        "max": 60.05615900394502
+      },
+      "p95": {
+        "median": 16.899999991059303,
+        "min": 16.899999991059303,
+        "max": 16.899999991059303
+      },
+      "p99": {
+        "median": 17.099999994039536,
+        "min": 17.099999994039536,
+        "max": 17.099999994039536
+      },
+      "maximum": {
+        "median": 20.599999994039536,
+        "min": 20.599999994039536,
+        "max": 20.599999994039536
+      }
+    },
+    {
+      "backend": "webgpu-fast",
+      "scenario": "first-on",
+      "n": 1,
+      "pilot": true,
+      "fps": {
+        "median": 7.492398700148165,
+        "min": 7.492398700148165,
+        "max": 7.492398700148165
+      },
+      "p95": {
+        "median": 18.900000005960464,
+        "min": 18.900000005960464,
+        "max": 18.900000005960464
+      },
+      "p99": {
+        "median": 5105.20000000298,
+        "min": 5105.20000000298,
+        "max": 5105.20000000298
+      },
+      "maximum": {
+        "median": 5105.20000000298,
+        "min": 5105.20000000298,
+        "max": 5105.20000000298
+      }
+    },
+    {
+      "backend": "webgpu-fast",
+      "scenario": "warm",
+      "n": 1,
+      "pilot": true,
+      "fps": {
+        "median": 57.16741457367597,
+        "min": 57.16741457367597,
+        "max": 57.16741457367597
+      },
+      "p95": {
+        "median": 24.200000002980232,
+        "min": 24.200000002980232,
+        "max": 24.200000002980232
+      },
+      "p99": {
+        "median": 31.799999997019768,
+        "min": 31.799999997019768,
+        "max": 31.799999997019768
+      },
+      "maximum": {
+        "median": 79,
+        "min": 79,
+        "max": 79
+      }
+    },
+    {
+      "backend": "webgpu-fast",
+      "scenario": "move",
+      "n": 1,
+      "pilot": true,
+      "fps": {
+        "median": 51.87637969094923,
+        "min": 51.87637969094923,
+        "max": 51.87637969094923
+      },
+      "p95": {
+        "median": 29.5,
+        "min": 29.5,
+        "max": 29.5
+      },
+      "p99": {
+        "median": 73.6000000089407,
+        "min": 73.6000000089407,
+        "max": 73.6000000089407
+      },
+      "maximum": {
+        "median": 98.20000000298023,
+        "min": 98.20000000298023,
+        "max": 98.20000000298023
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "label": "b1-webgpu-three",
+      "reason": {
+        "sessionId": "8b5cfa14-ed8e-43d9-ab05-f69fe6a649d8",
+        "errorUTC": "2026-10-16T13:39:16.420Z",
+        "reason": "Unhandled GLSL compilation failed before measurement, after peer cohort and explicit respawn. Zero renderErrorCount does not establish visual parity."
+      }
+    },
+    {
+      "label": "b2-webgpu-three",
+      "reason": {
+        "sessionId": "4442ad4b-13ea-4159-a010-57b9482cc71b",
+        "errorUTC": "2026-10-16T13:43:54.653Z",
+        "reason": "Unhandled GLSL compilation failed before measurement, after peer cohort and explicit respawn. Zero renderErrorCount does not establish visual parity."
+      }
+    },
+    {
+      "label": "b3-webgpu-three",
+      "reason": {
+        "sessionId": "7f01abb0-78da-41b3-bafc-f9aacfb92b78",
+        "errorUTC": "2026-10-16T13:56:33.444Z",
+        "reason": "Unhandled GLSL compilation failed before measurement, after peer cohort and explicit respawn. Zero renderErrorCount does not establish visual parity."
+      }
+    }
+  ],
+  "runs": [
+    {
+      "label": "a1-webgl2-first-on",
+      "repeat": "a1",
+      "backend": "webgl2",
+      "scenario": "first-on",
+      "date": "2026-10-16T13:29:58.187Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "5961600eb5667d99f9dfb317f1361be4fe8c5446c6da416a170b5ccde152a966",
+      "rawFile": "a1-webgl2-first-on.json",
+      "frames": 594,
+      "fps": 59.359042260893055,
+      "p95": 18.400000005960464,
+      "p99": 23.400000005960464,
+      "maximum": 76,
+      "hitches": {
+        "50": 1,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2014.800000011921,
+          "samples": 121,
+          "averageFps": 60.05558864367882,
+          "medianFrameMs": 16.69999998807907,
+          "p95FrameMs": 16.80000001192093,
+          "p99FrameMs": 16.900000005960464,
+          "slowFrameFraction": 0,
+          "averageCpuFrameMs": 9.754545453781924,
+          "averageGpuFrameMs": 5.786630082644627
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 1,
+        "passengers": 0,
+        "cars": 0
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.28451178456195675,
+        "world": 0.07323232308180645,
+        "avatarsAndCamera": 0.1698653201763879,
+        "environment": 0.6259259259459948,
+        "render": 10.819696969330712,
+        "labels": 0.018350168385288933
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.006902356867236,
+        "mainDraw": 5.955218855053287,
+        "renderTargets": 0.6966329967283239
+      }
+    },
+    {
+      "label": "a1-webgl2-move",
+      "repeat": "a1",
+      "backend": "webgl2",
+      "scenario": "move",
+      "date": "2026-10-16T13:32:03.031Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "99b7ba3825f52b8edc976c78a0f97af1c5ceb8dc7438cc1e5c8d611a50e4b844",
+      "rawFile": "a1-webgl2-move.json",
+      "frames": 597,
+      "fps": 59.62546816479401,
+      "p95": 19.100000008940697,
+      "p99": 21.700000002980232,
+      "maximum": 53.1000000089407,
+      "hitches": {
+        "50": 2,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2015.2000000029802,
+          "samples": 121,
+          "averageFps": 60.046647809219344,
+          "medianFrameMs": 16.69999998807907,
+          "p95FrameMs": 18.5,
+          "p99FrameMs": 19.400000005960464,
+          "slowFrameFraction": 0.008264462809917356,
+          "averageCpuFrameMs": 11.870247933490218,
+          "averageGpuFrameMs": 6.155922776859503
+        }
+      },
+      "position": {
+        "x": 110.1000747680664,
+        "y": -2.3265559673309326,
+        "z": 11.983316421508789
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110.1000747680664,
+          "y": 1.3934438228607178,
+          "z": 19.983312606811523
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          1.2908628591433847e-15,
+          -3.30990342589882e-15,
+          0,
+          0,
+          0.9316545128822327,
+          0.3633454144001007,
+          0,
+          3.5527153728663954e-15,
+          -0.3633454144001007,
+          0.9316545128822327,
+          0,
+          -110.1000747680664,
+          5.962636470794678,
+          -19.123844146728516,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 4,
+        "cars": 0
+      },
+      "draws": 427,
+      "triangles": 1267665,
+      "frameBreakdownMs": {
+        "simulation": 0.3077051922853668,
+        "world": 0.09564489128701452,
+        "avatarsAndCamera": 0.21993299824508591,
+        "environment": 0.8398659968845409,
+        "render": 10.787102177140103,
+        "labels": 0.019095477571639183
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 3.9887772196501343,
+        "mainDraw": 5.844388609305898,
+        "renderTargets": 0.7810720265710374
+      }
+    },
+    {
+      "label": "a1-webgl2-off",
+      "repeat": "a1",
+      "backend": "webgl2",
+      "scenario": "off",
+      "date": "2026-10-16T13:27:24.903Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "31e1478af0e5e549ef063b22c60c29615d6376a46c77c5fd7a8e3000d9ab86db",
+      "rawFile": "a1-webgl2-off.json",
+      "frames": 598,
+      "fps": 59.71878245580671,
+      "p95": 17,
+      "p99": 22.200000002980232,
+      "maximum": 35.6000000089407,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2015.2000000029802,
+          "samples": 121,
+          "averageFps": 60.04366812218195,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 16.900000005960464,
+          "p99FrameMs": 20.5,
+          "slowFrameFraction": 0.008264462809917356,
+          "averageCpuFrameMs": 10.346280992646848,
+          "averageGpuFrameMs": 6.106248462809916
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 6,
+        "cars": 0
+      },
+      "draws": 396,
+      "triangles": 1122230,
+      "frameBreakdownMs": {
+        "simulation": 0.3727424751257019,
+        "world": 0.1347826083866649,
+        "avatarsAndCamera": 0.23344481626780933,
+        "environment": 0.4864548491096018,
+        "render": 9.471070234193451,
+        "labels": 0.019397993350906115
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 3.9026755851547055,
+        "mainDraw": 5.381772575196016,
+        "renderTargets": 0
+      }
+    },
+    {
+      "label": "a1-webgl2-three",
+      "repeat": "a1",
+      "backend": "webgl2",
+      "scenario": "three",
+      "date": "2026-10-16T13:33:50.853Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "dca19e2d2aee774f6813400a092b80dab9c8d82e95338a72bd714da315464ee6",
+      "rawFile": "a1-webgl2-three.json",
+      "frames": 578,
+      "fps": 57.7336063526944,
+      "p95": 24,
+      "p99": 27.799999997019768,
+      "maximum": 42.099999994039536,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 3,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2011.2999999970198,
+          "samples": 118,
+          "averageFps": 58.668522846007484,
+          "medianFrameMs": 16.099999994039536,
+          "p95FrameMs": 23.399999991059303,
+          "p99FrameMs": 24.899999991059303,
+          "slowFrameFraction": 0.0847457627118644,
+          "averageCpuFrameMs": 16.118644067417765,
+          "averageGpuFrameMs": 6.894792677966103
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 0,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.3961000442504883,
+          "z": 4.000034332275391
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          0.36334526538848877,
+          -0.9316545724868774,
+          0,
+          110,
+          -2.7540764808654785,
+          3.219383955001831,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 2,
+        "cars": 1
+      },
+      "draws": 563,
+      "triangles": 1357012,
+      "frameBreakdownMs": {
+        "simulation": 0.28840830452920657,
+        "world": 0.07837370231386699,
+        "avatarsAndCamera": 0.19878892757797736,
+        "environment": 0.7719723183958176,
+        "render": 14.788408304245621,
+        "labels": 0.04567474023693573
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.593425605665235,
+        "mainDraw": 9.051211072550926,
+        "renderTargets": 0.9712802768784823
+      }
+    },
+    {
+      "label": "a1-webgl2-warm",
+      "repeat": "a1",
+      "backend": "webgl2",
+      "scenario": "warm",
+      "date": "2026-10-16T13:30:55.054Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "88539246e340a195c13be56ce6e07a1b93c8fd6523a54e02b6e5d81bc28c7d73",
+      "rawFile": "a1-webgl2-warm.json",
+      "frames": 580,
+      "fps": 57.89000898293243,
+      "p95": 21,
+      "p99": 45.5,
+      "maximum": 74.70000000298023,
+      "hitches": {
+        "50": 5,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2014.7999999970198,
+          "samples": 118,
+          "averageFps": 58.56660710749183,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 20,
+          "p99FrameMs": 21.69999998807907,
+          "slowFrameFraction": 0.025423728813559324,
+          "averageCpuFrameMs": 12.79999999979795,
+          "averageGpuFrameMs": 6.1754790508474535
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 1,
+        "passengers": 3,
+        "cars": 2
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.31862068959865075,
+        "world": 0.08706896577415796,
+        "avatarsAndCamera": 0.19051724145638532,
+        "environment": 0.7779310342052888,
+        "render": 11.346551723932398,
+        "labels": 0.020689655069647164
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.2706896551981055,
+        "mainDraw": 6.383793103181083,
+        "renderTargets": 0.5099999998664034
+      }
+    },
+    {
+      "label": "a2-webgl2-first-on",
+      "repeat": "a2",
+      "backend": "webgl2",
+      "scenario": "first-on",
+      "date": "2026-10-16T13:47:09.191Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "d251b2b758ba32230ede4f9d309f0a5f3ad1be5c450c2cf8c8264896efb9a6f3",
+      "rawFile": "a2-webgl2-first-on.json",
+      "frames": 598,
+      "fps": 59.72474681895472,
+      "p95": 19.299999997019768,
+      "p99": 21.700000002980232,
+      "maximum": 66.5,
+      "hitches": {
+        "50": 1,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2012.5,
+          "samples": 121,
+          "averageFps": 60.1212362120433,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 16.799999997019768,
+          "p99FrameMs": 17.100000008940697,
+          "slowFrameFraction": 0,
+          "averageCpuFrameMs": 10.826446281607486,
+          "averageGpuFrameMs": 6.1182074710743795
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 2,
+        "cars": 1
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.33160535116558487,
+        "world": 0.0936454849747511,
+        "avatarsAndCamera": 0.19648829421470795,
+        "environment": 0.6849498332144823,
+        "render": 11.084782608600962,
+        "labels": 0.01956521752087966
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.211872909753817,
+        "mainDraw": 5.970401337937169,
+        "renderTargets": 0.7028428095339931
+      }
+    },
+    {
+      "label": "a2-webgl2-move",
+      "repeat": "a2",
+      "backend": "webgl2",
+      "scenario": "move",
+      "date": "2026-10-16T13:47:36.078Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "1d4029b042a3bc93114af33864d0d301199d524e58f1fbcc04ab60db236c65d0",
+      "rawFile": "a2-webgl2-move.json",
+      "frames": 596,
+      "fps": 59.39212755356253,
+      "p95": 20.5,
+      "p99": 24.799999997019768,
+      "maximum": 60.6000000089407,
+      "hitches": {
+        "50": 2,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2012.5,
+          "samples": 121,
+          "averageFps": 60.1212362120433,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 16.799999997019768,
+          "p99FrameMs": 17.100000008940697,
+          "slowFrameFraction": 0,
+          "averageCpuFrameMs": 10.826446281607486,
+          "averageGpuFrameMs": 6.1182074710743795
+        }
+      },
+      "position": {
+        "x": 110.09978485107422,
+        "y": -2.3270790576934814,
+        "z": 12.060009956359863
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110.09978485107422,
+          "y": 1.3929213285446167,
+          "z": 20.06000518798828
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          1.2908628591433847e-15,
+          -3.30990342589882e-15,
+          0,
+          0,
+          0.9316545128822327,
+          0.3633454144001007,
+          0,
+          3.5527153728663954e-15,
+          -0.3633454144001007,
+          0.9316545128822327,
+          0,
+          -110.09978485107422,
+          5.990989685058594,
+          -19.195106506347656,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 4,
+        "cars": 0
+      },
+      "draws": 428,
+      "triangles": 1261525,
+      "frameBreakdownMs": {
+        "simulation": 0.323825503230695,
+        "world": 0.11124161103327802,
+        "avatarsAndCamera": 0.2293624159373693,
+        "environment": 0.8743288590504019,
+        "render": 11.327348993328593,
+        "labels": 0.022315436011592815
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.232046979560748,
+        "mainDraw": 6.07063758418264,
+        "renderTargets": 0.8359060403734646
+      }
+    },
+    {
+      "label": "a2-webgl2-off",
+      "repeat": "a2",
+      "backend": "webgl2",
+      "scenario": "off",
+      "date": "2026-10-16T13:46:49.201Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "e3f3d1f50664756f2d9f669bac003985c550e5062cc67ba31080f2e88a73de6e",
+      "rawFile": "a2-webgl2-off.json",
+      "frames": 601,
+      "fps": 60.057359274861156,
+      "p95": 16.80000001192093,
+      "p99": 17.099999994039536,
+      "maximum": 20,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2014.7000000029802,
+          "samples": 121,
+          "averageFps": 60.05856951398273,
+          "medianFrameMs": 16.69999998807907,
+          "p95FrameMs": 16.899999991059303,
+          "p99FrameMs": 17.600000008940697,
+          "slowFrameFraction": 0.008264462809917356,
+          "averageCpuFrameMs": 10.585123967163819,
+          "averageGpuFrameMs": 6.201033785123969
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 2,
+        "cars": 1
+      },
+      "draws": 396,
+      "triangles": 1122230,
+      "frameBreakdownMs": {
+        "simulation": 0.37487520780817246,
+        "world": 0.16222961737887434,
+        "avatarsAndCamera": 0.2392678867511067,
+        "environment": 0.49983361055966025,
+        "render": 9.195174708813676,
+        "labels": 0.01896838613238787
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 3.8269550750487658,
+        "mainDraw": 5.187520798401111,
+        "renderTargets": 0
+      }
+    },
+    {
+      "label": "a2-webgl2-three",
+      "repeat": "a2",
+      "backend": "webgl2",
+      "scenario": "three",
+      "date": "2026-10-16T13:48:54.873Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "04e0f00890d4bfa908a2ad755bb8ee015b093bb84bc007b0152c9a2d3fde4142",
+      "rawFile": "a2-webgl2-three.json",
+      "frames": 592,
+      "fps": 59.1532689175199,
+      "p95": 23.100000008940697,
+      "p99": 26.5,
+      "maximum": 28.599999994039536,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 3,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2000.0999999940395,
+          "samples": 115,
+          "averageFps": 57.49712514391416,
+          "medianFrameMs": 16.400000005960464,
+          "p95FrameMs": 26.100000008940697,
+          "p99FrameMs": 29.399999991059303,
+          "slowFrameFraction": 0.11304347826086956,
+          "averageCpuFrameMs": 15.9539130433746,
+          "averageGpuFrameMs": 7.3499525565217345
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 0,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.3961000442504883,
+          "z": 4.000034332275391
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          0.36334526538848877,
+          -0.9316545724868774,
+          0,
+          110,
+          -2.7540764808654785,
+          3.219383955001831,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 6,
+        "cars": 2
+      },
+      "draws": 563,
+      "triangles": 1357012,
+      "frameBreakdownMs": {
+        "simulation": 0.3077702707535512,
+        "world": 0.08429054034924185,
+        "avatarsAndCamera": 0.19983108115155954,
+        "environment": 0.7662162160802934,
+        "render": 14.29459459455432,
+        "labels": 0.04138513523581866
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.525844594488877,
+        "mainDraw": 8.681249999994966,
+        "renderTargets": 0.9283783785193354
+      }
+    },
+    {
+      "label": "a2-webgl2-warm",
+      "repeat": "a2",
+      "backend": "webgl2",
+      "scenario": "warm",
+      "date": "2026-10-16T13:47:22.740Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "85e7256d5e238f4342b0762871a643c7eb0a20779d6f86bd19850e3377bf2c08",
+      "rawFile": "a2-webgl2-warm.json",
+      "frames": 592,
+      "fps": 59.152677857713826,
+      "p95": 18.899999991059303,
+      "p99": 22.30000001192093,
+      "maximum": 76.70000000298023,
+      "hitches": {
+        "50": 3,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2012.5,
+          "samples": 121,
+          "averageFps": 60.1212362120433,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 16.799999997019768,
+          "p99FrameMs": 17.100000008940697,
+          "slowFrameFraction": 0,
+          "averageCpuFrameMs": 10.826446281607486,
+          "averageGpuFrameMs": 6.1182074710743795
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 3,
+        "cars": 0
+      },
+      "draws": 429,
+      "triangles": 1271477,
+      "frameBreakdownMs": {
+        "simulation": 0.314020270204826,
+        "world": 0.10489864856306766,
+        "avatarsAndCamera": 0.19611486505616355,
+        "environment": 0.7449324324324325,
+        "render": 10.98327702681559,
+        "labels": 0.019932432603594417
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.205067567376269,
+        "mainDraw": 6.072128378333071,
+        "renderTargets": 0.5189189190498075
+      }
+    },
+    {
+      "label": "a3-webgl2-first-on",
+      "repeat": "a3",
+      "backend": "webgl2",
+      "scenario": "first-on",
+      "date": "2026-10-16T13:51:12.357Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "171827923dcc895dfb7ed0d0b04ff93810232ad31e7114f045c1d19e4aa2b558",
+      "rawFile": "a3-webgl2-first-on.json",
+      "frames": 596,
+      "fps": 59.55414330963384,
+      "p95": 20.399999991059303,
+      "p99": 23.299999997019768,
+      "maximum": 63.400000005960464,
+      "hitches": {
+        "50": 1,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2014.7999999970198,
+          "samples": 120,
+          "averageFps": 59.55926146524593,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 18.80000001192093,
+          "p99FrameMs": 21.299999997019768,
+          "slowFrameFraction": 0.016666666666666666,
+          "averageCpuFrameMs": 12.199999999379118,
+          "averageGpuFrameMs": 6.358570666666664
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 1,
+        "cars": 2
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.3144295300613314,
+        "world": 0.09681208004187418,
+        "avatarsAndCamera": 0.18506711443898663,
+        "environment": 0.7743288589853968,
+        "render": 11.700838926104492,
+        "labels": 0.017281879139626585
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.4159395974754485,
+        "mainDraw": 6.38942952991632,
+        "renderTargets": 0.6979865770061944
+      }
+    },
+    {
+      "label": "a3-webgl2-move",
+      "repeat": "a3",
+      "backend": "webgl2",
+      "scenario": "move",
+      "date": "2026-10-16T13:51:39.365Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "4a2f22853239443c24170db969ec5769cba3325fe93ee2229724217f69ec3082",
+      "rawFile": "a3-webgl2-move.json",
+      "frames": 488,
+      "fps": 48.76099120703437,
+      "p95": 55.5,
+      "p99": 91.09999999403954,
+      "maximum": 101.70000000298023,
+      "hitches": {
+        "50": 38,
+        "100": 1,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2014.7999999970198,
+          "samples": 120,
+          "averageFps": 59.55926146524593,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 18.80000001192093,
+          "p99FrameMs": 21.299999997019768,
+          "slowFrameFraction": 0.016666666666666666,
+          "averageCpuFrameMs": 12.199999999379118,
+          "averageGpuFrameMs": 6.358570666666664
+        }
+      },
+      "position": {
+        "x": 110.09770202636719,
+        "y": -2.3220818042755127,
+        "z": 11.21654224395752
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110.09770202636719,
+          "y": 1.3979179859161377,
+          "z": 19.216537475585938
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          1.2908628591433847e-15,
+          -3.30990342589882e-15,
+          0,
+          0,
+          0.9316545128822327,
+          0.3633454144001007,
+          0,
+          3.5527153728663954e-15,
+          -0.3633454144001007,
+          0.9316545128822327,
+          0,
+          -110.09770202636719,
+          5.679863929748535,
+          -18.411100387573242,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 1,
+        "passengers": 1,
+        "cars": 1
+      },
+      "draws": 430,
+      "triangles": 1309223,
+      "frameBreakdownMs": {
+        "simulation": 0.5383196721983249,
+        "world": 0.122745901407277,
+        "avatarsAndCamera": 0.28893442665700053,
+        "environment": 1.4307377047103937,
+        "render": 14.637295081845073,
+        "labels": 0.026639344384435746
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 5.262090163366472,
+        "mainDraw": 8.118032787147849,
+        "renderTargets": 1.0258196725158906
+      }
+    },
+    {
+      "label": "a3-webgl2-off",
+      "repeat": "a3",
+      "backend": "webgl2",
+      "scenario": "off",
+      "date": "2026-10-16T13:50:47.210Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "b30cb2ed768f75c1596806c81d6f9b9a1757b73f61a39d06e3ee25472552937c",
+      "rawFile": "a3-webgl2-off.json",
+      "frames": 601,
+      "fps": 60.052558478855396,
+      "p95": 16.900000005960464,
+      "p99": 19.200000002980232,
+      "maximum": 22.099999994039536,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2014.7999999970198,
+          "samples": 121,
+          "averageFps": 60.05558864412298,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 16.899999991059303,
+          "p99FrameMs": 23.900000005960464,
+          "slowFrameFraction": 0.024793388429752067,
+          "averageCpuFrameMs": 11.190909091968182,
+          "averageGpuFrameMs": 6.377842247933884
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 3,
+        "cars": 1
+      },
+      "draws": 396,
+      "triangles": 1122230,
+      "frameBreakdownMs": {
+        "simulation": 0.41214642258432266,
+        "world": 0.16622296154201527,
+        "avatarsAndCamera": 0.2613976707623128,
+        "environment": 0.5069883527255892,
+        "render": 10.03410981682295,
+        "labels": 0.020465890153275552
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.089184692616074,
+        "mainDraw": 5.7539101495669405,
+        "renderTargets": 0
+      }
+    },
+    {
+      "label": "a3-webgl2-three",
+      "repeat": "a3",
+      "backend": "webgl2",
+      "scenario": "three",
+      "date": "2026-10-16T13:52:41.079Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "42e39d547e006b5c4e3fc206e158bad9661e29dacec6182565848f2958b53d15",
+      "rawFile": "a3-webgl2-three.json",
+      "frames": 596,
+      "fps": 59.49825797880305,
+      "p95": 21.799999997019768,
+      "p99": 24.600000008940697,
+      "maximum": 31.5,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 3,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2015.0999999940395,
+          "samples": 117,
+          "averageFps": 58.061634658501355,
+          "medianFrameMs": 16.299999997019768,
+          "p95FrameMs": 25.400000005960464,
+          "p99FrameMs": 27.899999991059303,
+          "slowFrameFraction": 0.08547008547008547,
+          "averageCpuFrameMs": 15.910256409874329,
+          "averageGpuFrameMs": 6.924680205128206
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 0,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.3961000442504883,
+          "z": 4.000034332275391
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          0.36334526538848877,
+          -0.9316545724868774,
+          0,
+          110,
+          -2.7540764808654785,
+          3.219383955001831,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 2,
+        "passengers": 4,
+        "cars": 0
+      },
+      "draws": 563,
+      "triangles": 1357012,
+      "frameBreakdownMs": {
+        "simulation": 0.3006711409445977,
+        "world": 0.08439597337437957,
+        "avatarsAndCamera": 0.21208053692275244,
+        "environment": 0.7615771811180467,
+        "render": 13.33221476522568,
+        "labels": 0.04328859082404399
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.503020134173184,
+        "mainDraw": 7.790100670800913,
+        "renderTargets": 0.8738255037257335
+      }
+    },
+    {
+      "label": "a3-webgl2-warm",
+      "repeat": "a3",
+      "backend": "webgl2",
+      "scenario": "warm",
+      "date": "2026-10-16T13:51:26.027Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "2503ef976928347ff23ce2a864ddcc67ffad9812d312d04c504f052036177ee8",
+      "rawFile": "a3-webgl2-warm.json",
+      "frames": 592,
+      "fps": 59.15563327504372,
+      "p95": 19.899999991059303,
+      "p99": 26,
+      "maximum": 58.6000000089407,
+      "hitches": {
+        "50": 3,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      },
+      "gpu": {
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "vendor": "Google Inc. (NVIDIA)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "webglVersion": 2,
+        "classification": "dedicated",
+        "classificationLabel": "Samostatná grafika",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": true,
+          "defaultFramebuffer": true,
+          "sampleBuffers": 1,
+          "samples": 4
+        },
+        "backend": "webgl2",
+        "compatibilityMode": null,
+        "gpuTimingScope": "whole-frame"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2014.7999999970198,
+          "samples": 120,
+          "averageFps": 59.55926146524593,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 18.80000001192093,
+          "p99FrameMs": 21.299999997019768,
+          "slowFrameFraction": 0.016666666666666666,
+          "averageCpuFrameMs": 12.199999999379118,
+          "averageGpuFrameMs": 6.358570666666664
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000145435333252,
+          -1,
+          0,
+          0,
+          -0.1600116342306137,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 1,
+        "cars": 1
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.35709459425227064,
+        "world": 0.10270270267249765,
+        "avatarsAndCamera": 0.20861486499071927,
+        "environment": 0.658952702969514,
+        "render": 11.320777027112609,
+        "labels": 0.020439189103608195
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.253040540611019,
+        "mainDraw": 6.345777026604156,
+        "renderTargets": 0.5207770271226764
+      }
+    },
+    {
+      "label": "b1-webgpu-first-on",
+      "repeat": "b1",
+      "backend": "webgpu",
+      "scenario": "first-on",
+      "date": "2026-10-16T13:37:31.735Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "f711c77f518abf1a82fda4f1bc832ce9f2f2e2cc5a2b6962b2c44b3043917720",
+      "rawFile": "b1-webgpu-first-on.json",
+      "frames": 87,
+      "fps": 8.489875579409611,
+      "p95": 22.900000005960464,
+      "p99": 4975.79999999702,
+      "maximum": 4975.79999999702,
+      "hitches": {
+        "50": 2,
+        "100": 2,
+        "250": 2,
+        "1000": 2
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2020.1000000089407,
+          "samples": 118,
+          "averageFps": 58.412949853709094,
+          "medianFrameMs": 16.69999998807907,
+          "p95FrameMs": 22,
+          "p99FrameMs": 27.5,
+          "slowFrameFraction": 0.059322033898305086,
+          "averageCpuFrameMs": 12.956779661193742,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 2,
+        "passengers": 5,
+        "cars": 1
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.4919540236393611,
+        "world": 0.13448275779855662,
+        "avatarsAndCamera": 0.21839080476897887,
+        "environment": 0.7540229886085138,
+        "render": 69.87816092012257,
+        "labels": 0.031034482792876232
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.696551725097086,
+        "mainDraw": 64.47356321825379,
+        "renderTargets": 0.06781609202253408
+      }
+    },
+    {
+      "label": "b1-webgpu-move",
+      "repeat": "b1",
+      "backend": "webgpu",
+      "scenario": "move",
+      "date": "2026-10-16T13:38:26.062Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "fccfe3862b3f179b10dfdb53de7de5c1fd94d8ab14c932330c82b1519efa3a06",
+      "rawFile": "b1-webgpu-move.json",
+      "frames": 451,
+      "fps": 44.838145231819446,
+      "p95": 68.29999999701977,
+      "p99": 107.5,
+      "maximum": 169,
+      "hitches": {
+        "50": 32,
+        "100": 8,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2009.9000000059605,
+          "samples": 118,
+          "averageFps": 58.70938852661827,
+          "medianFrameMs": 15.800000011920929,
+          "p95FrameMs": 23.700000002980232,
+          "p99FrameMs": 26.600000008940697,
+          "slowFrameFraction": 0.09322033898305085,
+          "averageCpuFrameMs": 15.772881356462584,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110.09850311279297,
+        "y": -2.3320534229278564,
+        "z": 12.750995635986328
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110.09850311279297,
+          "y": 1.3879461288452148,
+          "z": 20.75098991394043
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          1.2908628591433847e-15,
+          -3.30990342589882e-15,
+          0,
+          0,
+          0.9316545128822327,
+          0.3633454144001007,
+          0,
+          3.5527153728663954e-15,
+          -0.3633454144001007,
+          0.9316545128822327,
+          0,
+          -110.09850311279297,
+          6.24669075012207,
+          -19.83705711364746,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 1,
+        "passengers": 3,
+        "cars": 0
+      },
+      "draws": 432,
+      "triangles": 1209494,
+      "frameBreakdownMs": {
+        "simulation": 0.5886917959427886,
+        "world": 0.150776053016836,
+        "avatarsAndCamera": 0.25875831542416844,
+        "environment": 1.7221729491740267,
+        "render": 16.99113081977135,
+        "labels": 0.02305986727288451
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 5.339689578522336,
+        "mainDraw": 9.583148558725275,
+        "renderTargets": 1.4676274946351802
+      }
+    },
+    {
+      "label": "b1-webgpu-off",
+      "repeat": "b1",
+      "backend": "webgpu",
+      "scenario": "off",
+      "date": "2026-10-16T13:36:50.110Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "e3b7cb6034878dea2ae017f13c7ec366a03a1ebdc9c74277951b4ee88a24b58d",
+      "rawFile": "b1-webgpu-off.json",
+      "frames": 591,
+      "fps": 59.0663321907217,
+      "p95": 19.200000002980232,
+      "p99": 25.399999991059303,
+      "maximum": 55.1000000089407,
+      "hitches": {
+        "50": 1,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2018,
+          "samples": 121,
+          "averageFps": 59.9603567888999,
+          "medianFrameMs": 16.69999998807907,
+          "p95FrameMs": 17.399999991059303,
+          "p99FrameMs": 22,
+          "slowFrameFraction": 0.01652892561983471,
+          "averageCpuFrameMs": 12.256198347353738,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 1,
+        "passengers": 4,
+        "cars": 0
+      },
+      "draws": 396,
+      "triangles": 1122230,
+      "frameBreakdownMs": {
+        "simulation": 0.35194585468563333,
+        "world": 0.1341793569413135,
+        "avatarsAndCamera": 0.22656514385932594,
+        "environment": 0.551776649710894,
+        "render": 11.161421319630545,
+        "labels": 0.02385786806064612
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.0649746187447295,
+        "mainDraw": 6.56091370560897,
+        "renderTargets": 0
+      }
+    },
+    {
+      "label": "b1-webgpu-three",
+      "repeat": "b1",
+      "backend": "webgpu",
+      "scenario": "three",
+      "date": "2026-10-16T13:39:43.840Z",
+      "valid": false,
+      "rejection": {
+        "sessionId": "8b5cfa14-ed8e-43d9-ab05-f69fe6a649d8",
+        "errorUTC": "2026-10-16T13:39:16.420Z",
+        "reason": "Unhandled GLSL compilation failed before measurement, after peer cohort and explicit respawn. Zero renderErrorCount does not establish visual parity."
+      },
+      "sha256": "febe4ca4e086af4d22ca062c5a89253865fd801a4ac7d2820d437b96e19e7f01",
+      "rawFile": "b1-webgpu-three.json",
+      "frames": 519,
+      "fps": 51.82433646878646,
+      "p95": 26.30000001192093,
+      "p99": 29.5,
+      "maximum": 32.599999994039536,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 3,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2012,
+          "samples": 104,
+          "averageFps": 51.68986083499006,
+          "medianFrameMs": 18.200000002980232,
+          "p95FrameMs": 26.899999991059303,
+          "p99FrameMs": 32.80000001192093,
+          "slowFrameFraction": 0.15384615384615385,
+          "averageCpuFrameMs": 17.898076923277515,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 0,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.3961000442504883,
+          "z": 4.000034332275391
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          0.36334526538848877,
+          -0.9316545724868774,
+          0,
+          110,
+          -2.7540764808654785,
+          3.219383955001831,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 5,
+        "cars": 1
+      },
+      "draws": 562,
+      "triangles": 1343808,
+      "frameBreakdownMs": {
+        "simulation": 0.30886319876865614,
+        "world": 0.08323699408183897,
+        "avatarsAndCamera": 0.19171483656804225,
+        "environment": 0.8362235063417799,
+        "render": 16.731213872717525,
+        "labels": 0.04046242780308733
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.797302505012192,
+        "mainDraw": 10.249903661207886,
+        "renderTargets": 1.2096339107880474
+      }
+    },
+    {
+      "label": "b1-webgpu-warm",
+      "repeat": "b1",
+      "backend": "webgpu",
+      "scenario": "warm",
+      "date": "2026-10-16T13:38:12.311Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "bf611f10e25d2e6641c5b2e805ced745739106a381fdf4c424589960790991eb",
+      "rawFile": "b1-webgpu-warm.json",
+      "frames": 590,
+      "fps": 58.89987022062494,
+      "p95": 21.599999994039536,
+      "p99": 26.900000005960464,
+      "maximum": 64,
+      "hitches": {
+        "50": 3,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2009.9000000059605,
+          "samples": 118,
+          "averageFps": 58.70938852661827,
+          "medianFrameMs": 15.800000011920929,
+          "p95FrameMs": 23.700000002980232,
+          "p99FrameMs": 26.600000008940697,
+          "slowFrameFraction": 0.09322033898305085,
+          "averageCpuFrameMs": 15.772881356462584,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 1,
+        "passengers": 3,
+        "cars": 1
+      },
+      "draws": 432,
+      "triangles": 1276731,
+      "frameBreakdownMs": {
+        "simulation": 0.35271186421988376,
+        "world": 0.11593220329890817,
+        "avatarsAndCamera": 0.20135593232461962,
+        "environment": 0.6791525424789574,
+        "render": 12.982203390007301,
+        "labels": 0.017796610220003936
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.398305084821532,
+        "mainDraw": 7.36779661024526,
+        "renderTargets": 0.7181355932506465
+      }
+    },
+    {
+      "label": "b2-webgpu-first-on",
+      "repeat": "b2",
+      "backend": "webgpu",
+      "scenario": "first-on",
+      "date": "2026-10-16T13:42:56.481Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "0366fa429fce4c3923e979a02269479ea42aed06195c1b33b9a7a98d29b1796b",
+      "rawFile": "b2-webgpu-first-on.json",
+      "frames": 86,
+      "fps": 7.741052783182665,
+      "p95": 21.600000008940697,
+      "p99": 4898.29999999702,
+      "maximum": 4898.29999999702,
+      "hitches": {
+        "50": 2,
+        "100": 2,
+        "250": 2,
+        "1000": 2
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2006.199999988079,
+          "samples": 119,
+          "averageFps": 59.31612002826593,
+          "medianFrameMs": 16.69999998807907,
+          "p95FrameMs": 19.30000001192093,
+          "p99FrameMs": 22.30000001192093,
+          "slowFrameFraction": 0.03361344537815126,
+          "averageCpuFrameMs": 13.581512604816622,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 3,
+        "cars": 0
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.4290697671646296,
+        "world": 0.14069767556218213,
+        "avatarsAndCamera": 0.23023255845141966,
+        "environment": 0.7209302315185236,
+        "render": 69.45465116272139,
+        "labels": 0.025581395210221756
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.6313953481094785,
+        "mainDraw": 64.15465116258278,
+        "renderTargets": 0.06744186043046242
+      }
+    },
+    {
+      "label": "b2-webgpu-move",
+      "repeat": "b2",
+      "backend": "webgpu",
+      "scenario": "move",
+      "date": "2026-10-16T13:43:32.870Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "3b731e96a2692d5ba8035982defb3aa675e9b88d6ff9070f7edc7eb685f01f64",
+      "rawFile": "b2-webgpu-move.json",
+      "frames": 565,
+      "fps": 56.462170345851455,
+      "p95": 24.400000005960464,
+      "p99": 27.799999997019768,
+      "maximum": 67.5,
+      "hitches": {
+        "50": 2,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2001.8999999910593,
+          "samples": 115,
+          "averageFps": 57.44542684475429,
+          "medianFrameMs": 16.700000002980232,
+          "p95FrameMs": 22.5,
+          "p99FrameMs": 28.899999991059303,
+          "slowFrameFraction": 0.08695652173913043,
+          "averageCpuFrameMs": 15.783478261336036,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110.1000747680664,
+        "y": -2.3265559673309326,
+        "z": 11.98331356048584
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110.1000747680664,
+          "y": 1.393444538116455,
+          "z": 19.983308792114258
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          6.454314295716924e-16,
+          -1.65495171294941e-15,
+          0,
+          0,
+          0.9316545128822327,
+          0.3633454144001007,
+          0,
+          1.7763576864331977e-15,
+          -0.3633454144001007,
+          0.9316545128822327,
+          0,
+          -110.1000747680664,
+          5.962635040283203,
+          -19.123842239379883,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 2,
+        "cars": 0
+      },
+      "draws": 427,
+      "triangles": 1267665,
+      "frameBreakdownMs": {
+        "simulation": 0.3364601770860959,
+        "world": 0.1063716813262585,
+        "avatarsAndCamera": 0.23964601781515948,
+        "environment": 0.8844247791619427,
+        "render": 14.655929203054546,
+        "labels": 0.021238938000349872
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.486017699183616,
+        "mainDraw": 8.435398229587394,
+        "renderTargets": 1.2306194693377588
+      }
+    },
+    {
+      "label": "b2-webgpu-off",
+      "repeat": "b2",
+      "backend": "webgpu",
+      "scenario": "off",
+      "date": "2026-10-16T13:42:28.048Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "d34a941df98f677fd82d8acc79b0103886a0a476ef74d9dacb7b0721c54853a6",
+      "rawFile": "b2-webgpu-off.json",
+      "frames": 600,
+      "fps": 59.954434629627876,
+      "p95": 16.900000005960464,
+      "p99": 20.400000005960464,
+      "maximum": 25,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2014.800000011921,
+          "samples": 121,
+          "averageFps": 60.05558864367882,
+          "medianFrameMs": 16.69999998807907,
+          "p95FrameMs": 16.900000005960464,
+          "p99FrameMs": 17,
+          "slowFrameFraction": 0,
+          "averageCpuFrameMs": 12.344628099567634,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 3,
+        "cars": 1
+      },
+      "draws": 396,
+      "triangles": 1122230,
+      "frameBreakdownMs": {
+        "simulation": 0.3824999997019768,
+        "world": 0.14283333351214728,
+        "avatarsAndCamera": 0.24550000006953876,
+        "environment": 0.4681666664034128,
+        "render": 11.588333333681026,
+        "labels": 0.016833333348234496
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.222000000278155,
+        "mainDraw": 6.832499999826153,
+        "renderTargets": 0
+      }
+    },
+    {
+      "label": "b2-webgpu-three",
+      "repeat": "b2",
+      "backend": "webgpu",
+      "scenario": "three",
+      "date": "2026-10-16T13:44:22.018Z",
+      "valid": false,
+      "rejection": {
+        "sessionId": "4442ad4b-13ea-4159-a010-57b9482cc71b",
+        "errorUTC": "2026-10-16T13:43:54.653Z",
+        "reason": "Unhandled GLSL compilation failed before measurement, after peer cohort and explicit respawn. Zero renderErrorCount does not establish visual parity."
+      },
+      "sha256": "09c8587e746728db577588c66f40268aac23db28793b28f9ea880119a4886bab",
+      "rawFile": "b2-webgpu-three.json",
+      "frames": 500,
+      "fps": 49.97151623573074,
+      "p95": 27.700000002980232,
+      "p99": 30.5,
+      "maximum": 41.599999994039536,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 3,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2001.3999999910593,
+          "samples": 100,
+          "averageFps": 49.9650244830852,
+          "medianFrameMs": 19.200000002980232,
+          "p95FrameMs": 28,
+          "p99FrameMs": 34.400000005960464,
+          "slowFrameFraction": 0.2,
+          "averageCpuFrameMs": 18.51,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 0,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.3961000442504883,
+          "z": 4.000034332275391
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          0.36334526538848877,
+          -0.9316545724868774,
+          0,
+          110,
+          -2.7540764808654785,
+          3.219383955001831,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 1,
+        "passengers": 1,
+        "cars": 1
+      },
+      "draws": 562,
+      "triangles": 1343808,
+      "frameBreakdownMs": {
+        "simulation": 0.33220000010728834,
+        "world": 0.07159999987483025,
+        "avatarsAndCamera": 0.19640000000596047,
+        "environment": 0.8514000000953674,
+        "render": 17.36959999975562,
+        "labels": 0.040600000113248824
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.945599999815226,
+        "mainDraw": 10.711999999940396,
+        "renderTargets": 1.2340000005662441
+      }
+    },
+    {
+      "label": "b2-webgpu-warm",
+      "repeat": "b2",
+      "backend": "webgpu",
+      "scenario": "warm",
+      "date": "2026-10-16T13:43:19.480Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "2a52f3ae2001340bb32a74f7c09e0086c2a1e0c9565689a54421cebd9149d04a",
+      "rawFile": "b2-webgpu-warm.json",
+      "frames": 584,
+      "fps": 58.30496291047331,
+      "p95": 23,
+      "p99": 28.599999994039536,
+      "maximum": 66.80000001192093,
+      "hitches": {
+        "50": 4,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2001.8999999910593,
+          "samples": 115,
+          "averageFps": 57.44542684475429,
+          "medianFrameMs": 16.700000002980232,
+          "p95FrameMs": 22.5,
+          "p99FrameMs": 28.899999991059303,
+          "slowFrameFraction": 0.08695652173913043,
+          "averageCpuFrameMs": 15.783478261336036,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 2,
+        "cars": 0
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.32345890406876393,
+        "world": 0.08304794512893239,
+        "avatarsAndCamera": 0.18356164386623527,
+        "environment": 0.6852739724037173,
+        "render": 13.860102740052628,
+        "labels": 0.02157534263415696
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.523801369362906,
+        "mainDraw": 8.060787671437001,
+        "renderTargets": 0.7712328765949567
+      }
+    },
+    {
+      "label": "b3-webgpu-first-on",
+      "repeat": "b3",
+      "backend": "webgpu",
+      "scenario": "first-on",
+      "date": "2026-10-16T13:55:28.492Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "80c13a7e74a3660e62f42b97e6c6aa378875064a318e64fe8b455204ea5c3d55",
+      "rawFile": "b3-webgpu-first-on.json",
+      "frames": 85,
+      "fps": 7.876350562455393,
+      "p95": 23.799999997019768,
+      "p99": 5238.20000000298,
+      "maximum": 5238.20000000298,
+      "hitches": {
+        "50": 2,
+        "100": 2,
+        "250": 2,
+        "1000": 2
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2003.5,
+          "samples": 120,
+          "averageFps": 59.89518342899925,
+          "medianFrameMs": 16.69999998807907,
+          "p95FrameMs": 17,
+          "p99FrameMs": 18.600000008940697,
+          "slowFrameFraction": 0.008333333333333333,
+          "averageCpuFrameMs": 12.739166666691501,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 4,
+        "cars": 1
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.35647058890146366,
+        "world": 0.08823529446826262,
+        "avatarsAndCamera": 0.21176470570704517,
+        "environment": 0.6941176461822847,
+        "render": 74.90705882433583,
+        "labels": 0.022352940720670362
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.625882353326854,
+        "mainDraw": 69.59999999894815,
+        "renderTargets": 0.06235294114140903
+      }
+    },
+    {
+      "label": "b3-webgpu-move",
+      "repeat": "b3",
+      "backend": "webgpu",
+      "scenario": "move",
+      "date": "2026-10-16T13:56:05.023Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "dec6281ad6cf4c82803f002b481cf1d4d102ddc431f66eaf39ce4c6ed7e2cc4d",
+      "rawFile": "b3-webgpu-move.json",
+      "frames": 535,
+      "fps": 53.436410671269336,
+      "p95": 26.200000002980232,
+      "p99": 36.70000000298023,
+      "maximum": 121.3999999910593,
+      "hitches": {
+        "50": 3,
+        "100": 2,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2017.4000000059605,
+          "samples": 114,
+          "averageFps": 56.50557620817844,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 24.900000005960464,
+          "p99FrameMs": 26.799999997019768,
+          "slowFrameFraction": 0.13157894736842105,
+          "averageCpuFrameMs": 16.44824561319853,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110.09996032714844,
+        "y": -2.327078104019165,
+        "z": 12.059228897094727
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110.09996032714844,
+          "y": 1.392921805381775,
+          "z": 20.059223175048828
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          6.454314295716924e-16,
+          -1.65495171294941e-15,
+          0,
+          0,
+          0.9316545128822327,
+          0.3633454144001007,
+          0,
+          1.7763576864331977e-15,
+          -0.3633454144001007,
+          0.9316545128822327,
+          0,
+          -110.09996032714844,
+          5.9907050132751465,
+          -19.194377899169922,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 7,
+        "cars": 1
+      },
+      "draws": 429,
+      "triangles": 1261717,
+      "frameBreakdownMs": {
+        "simulation": 0.3454205610763247,
+        "world": 0.0971962610973376,
+        "avatarsAndCamera": 0.22317757013245162,
+        "environment": 1.171962617128809,
+        "render": 15.318504672852631,
+        "labels": 0.018691588785046728
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.740000000122552,
+        "mainDraw": 8.775700935052933,
+        "renderTargets": 1.259999999905301
+      }
+    },
+    {
+      "label": "b3-webgpu-off",
+      "repeat": "b3",
+      "backend": "webgpu",
+      "scenario": "off",
+      "date": "2026-10-16T13:55:07.401Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "eaf40d60512ae8c4c2f6548adacfe7f8068917790e22b976cac31d0f3337fedc",
+      "rawFile": "b3-webgpu-off.json",
+      "frames": 601,
+      "fps": 60.06456190843822,
+      "p95": 16.900000005960464,
+      "p99": 18.799999997019768,
+      "maximum": 23.599999994039536,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2015,
+          "samples": 121,
+          "averageFps": 60.049627791563275,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 17.099999994039536,
+          "p99FrameMs": 20,
+          "slowFrameFraction": 0.008264462809917356,
+          "averageCpuFrameMs": 12.52314049571999,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 6,
+        "cars": 1
+      },
+      "draws": 396,
+      "triangles": 1122230,
+      "frameBreakdownMs": {
+        "simulation": 0.359733777191992,
+        "world": 0.1475873543646887,
+        "avatarsAndCamera": 0.24376039923526682,
+        "environment": 0.5347753742123998,
+        "render": 11.351913477810172,
+        "labels": 0.018469217935338393
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 3.993344426303854,
+        "mainDraw": 6.820965058543718,
+        "renderTargets": 0
+      }
+    },
+    {
+      "label": "b3-webgpu-three",
+      "repeat": "b3",
+      "backend": "webgpu",
+      "scenario": "three",
+      "date": "2026-10-16T13:57:00.871Z",
+      "valid": false,
+      "rejection": {
+        "sessionId": "7f01abb0-78da-41b3-bafc-f9aacfb92b78",
+        "errorUTC": "2026-10-16T13:56:33.444Z",
+        "reason": "Unhandled GLSL compilation failed before measurement, after peer cohort and explicit respawn. Zero renderErrorCount does not establish visual parity."
+      },
+      "sha256": "217555ecd36d2b53bd94cfb57a6725af75d5bc7ae36c626afeaaaab1c07459f8",
+      "rawFile": "b3-webgpu-three.json",
+      "frames": 479,
+      "fps": 47.80725392735244,
+      "p95": 28.200000002980232,
+      "p99": 35.70000000298023,
+      "maximum": 39.19999998807907,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 3,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2005.5999999940395,
+          "samples": 94,
+          "averageFps": 46.868767451276106,
+          "medianFrameMs": 19.299999997019768,
+          "p95FrameMs": 30.200000002980232,
+          "p99FrameMs": 61.099999994039536,
+          "slowFrameFraction": 0.3191489361702128,
+          "averageCpuFrameMs": 19.751063828455642,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 0,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.3961000442504883,
+          "z": 4.000034332275391
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          0.36334526538848877,
+          -0.9316545724868774,
+          0,
+          110,
+          -2.7540764808654785,
+          3.219383955001831,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 5,
+        "cars": 0
+      },
+      "draws": 570,
+      "triangles": 1355775,
+      "frameBreakdownMs": {
+        "simulation": 0.29665970777420014,
+        "world": 0.07703549058676264,
+        "avatarsAndCamera": 0.20501043845069183,
+        "environment": 0.91586638884405,
+        "render": 18.143841335133867,
+        "labels": 0.04050104388488857
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.951356993712065,
+        "mainDraw": 11.385177453276011,
+        "renderTargets": 1.3058455115133636
+      }
+    },
+    {
+      "label": "b3-webgpu-warm",
+      "repeat": "b3",
+      "backend": "webgpu",
+      "scenario": "warm",
+      "date": "2026-10-16T13:55:51.495Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "4de484222ce732240685babcf67f71133e44b2c2e5ac4252a40d005eeae8c426",
+      "rawFile": "b3-webgpu-warm.json",
+      "frames": 567,
+      "fps": 56.69262995812234,
+      "p95": 24.100000008940697,
+      "p99": 31.200000002980232,
+      "maximum": 105.30000001192093,
+      "hitches": {
+        "50": 4,
+        "100": 1,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2017.4000000059605,
+          "samples": 114,
+          "averageFps": 56.50557620817844,
+          "medianFrameMs": 16.600000008940697,
+          "p95FrameMs": 24.900000005960464,
+          "p99FrameMs": 26.799999997019768,
+          "slowFrameFraction": 0.13157894736842105,
+          "averageCpuFrameMs": 16.44824561319853,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 7,
+        "cars": 1
+      },
+      "draws": 431,
+      "triangles": 1271861,
+      "frameBreakdownMs": {
+        "simulation": 0.37548500888141584,
+        "world": 0.09312169303759486,
+        "avatarsAndCamera": 0.19753086422381158,
+        "environment": 0.8100529096271626,
+        "render": 14.359259259606164,
+        "labels": 0.019400352865089603
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.578130511747676,
+        "mainDraw": 8.473544973466131,
+        "renderTargets": 0.7804232803444383
+      }
+    },
+    {
+      "label": "c1-webgpu-fast-first-on",
+      "repeat": "c1",
+      "backend": "webgpu-fast",
+      "scenario": "first-on",
+      "date": "2026-10-16T14:02:57.941Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "6259741214383a460789d6b6c15567bcdd3411109c34ee91f23e2606e701e83d",
+      "rawFile": "c1-webgpu-fast-first-on.json",
+      "frames": 86,
+      "fps": 7.492398700148165,
+      "p95": 18.900000005960464,
+      "p99": 5105.20000000298,
+      "maximum": 5105.20000000298,
+      "hitches": {
+        "50": 2,
+        "100": 2,
+        "250": 2,
+        "1000": 2
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": false,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2014.7999999970198,
+          "samples": 121,
+          "averageFps": 60.05558864412298,
+          "medianFrameMs": 16.69999998807907,
+          "p95FrameMs": 16.900000005960464,
+          "p99FrameMs": 19.100000008940697,
+          "slowFrameFraction": 0,
+          "averageCpuFrameMs": 10.958677686443014,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 5,
+        "cars": 1
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.4337209308909815,
+        "world": 0.16162790565989738,
+        "avatarsAndCamera": 0.2534883730979853,
+        "environment": 1.0441860459571661,
+        "render": 68.20813953495303,
+        "labels": 0.030232558416765788
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.594186045749243,
+        "mainDraw": 62.879069767719095,
+        "renderTargets": 0.08604651135067608
+      }
+    },
+    {
+      "label": "c1-webgpu-fast-move",
+      "repeat": "c1",
+      "backend": "webgpu-fast",
+      "scenario": "move",
+      "date": "2026-10-16T14:03:36.717Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "2d664ad6fb99cf956e7be12835e110ef4af5619720c475ed7462ebfe0b3181dd",
+      "rawFile": "c1-webgpu-fast-move.json",
+      "frames": 517,
+      "fps": 51.87637969094923,
+      "p95": 29.5,
+      "p99": 73.6000000089407,
+      "maximum": 98.20000000298023,
+      "hitches": {
+        "50": 21,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": false,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2016.5,
+          "samples": 103,
+          "averageFps": 51.078601537317134,
+          "medianFrameMs": 16.799999997019768,
+          "p95FrameMs": 30.299999997019768,
+          "p99FrameMs": 47.099999994039536,
+          "slowFrameFraction": 0.2621359223300971,
+          "averageCpuFrameMs": 16.690291262367396,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110.10040283203125,
+        "y": -2.3270957469940186,
+        "z": 12.059980392456055
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110.10040283203125,
+          "y": 1.3929038047790527,
+          "z": 20.05997657775879
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545128822327,
+          0.3633453845977783,
+          0,
+          0,
+          -0.3633453845977783,
+          0.9316545128822327,
+          0,
+          -110.10040283203125,
+          5.990994453430176,
+          -19.195072174072266,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 5,
+        "cars": 0
+      },
+      "draws": 426,
+      "triangles": 1261141,
+      "frameBreakdownMs": {
+        "simulation": 0.4725338489797175,
+        "world": 0.1663442940615132,
+        "avatarsAndCamera": 0.3036750484423665,
+        "environment": 1.1835589936323738,
+        "render": 14.172340425895076,
+        "labels": 0.025338491169119712
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.976982591807035,
+        "mainDraw": 7.353191489580752,
+        "renderTargets": 1.242553191039733
+      }
+    },
+    {
+      "label": "c1-webgpu-fast-off",
+      "repeat": "c1",
+      "backend": "webgpu-fast",
+      "scenario": "off",
+      "date": "2026-10-16T13:59:13.567Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "ed7cd4209849a38eec6a084192d6d942a8b155e4eaf25d0f854ad10ab40a7784",
+      "rawFile": "c1-webgpu-fast-off.json",
+      "frames": 601,
+      "fps": 60.05615900394502,
+      "p95": 16.899999991059303,
+      "p99": 17.099999994039536,
+      "maximum": 20.599999994039536,
+      "hitches": {
+        "50": 0,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": false,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2014.9000000059605,
+          "samples": 121,
+          "averageFps": 60.049627791563275,
+          "medianFrameMs": 16.69999998807907,
+          "p95FrameMs": 16.80000001192093,
+          "p99FrameMs": 16.900000005960464,
+          "slowFrameFraction": 0,
+          "averageCpuFrameMs": 10.934710742890342,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 1,
+        "passengers": 0,
+        "cars": 0
+      },
+      "draws": 396,
+      "triangles": 1122230,
+      "frameBreakdownMs": {
+        "simulation": 0.36073211318938786,
+        "world": 0.16705490854536237,
+        "avatarsAndCamera": 0.2620632277054715,
+        "environment": 0.4402662234972797,
+        "render": 9.564392678253663,
+        "labels": 0.019301164641158157
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.007820299580173,
+        "mainDraw": 5.015973378041025,
+        "renderTargets": 0
+      }
+    },
+    {
+      "label": "c1-webgpu-fast-warm",
+      "repeat": "c1",
+      "backend": "webgpu-fast",
+      "scenario": "warm",
+      "date": "2026-10-16T14:03:23.168Z",
+      "valid": true,
+      "rejection": null,
+      "sha256": "636b3492602177e1daffed9ab500035682b4b12d9d49b865acf9ca09032d4048",
+      "rawFile": "c1-webgpu-fast-warm.json",
+      "frames": 572,
+      "fps": 57.16741457367597,
+      "p95": 24.200000002980232,
+      "p99": 31.799999997019768,
+      "maximum": 79,
+      "hitches": {
+        "50": 4,
+        "100": 0,
+        "250": 0,
+        "1000": 0
+      },
+      "avatars": 1,
+      "errors": {
+        "render": 0,
+        "asset": 0
+      },
+      "renderer": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version"
+      },
+      "gpu": {
+        "renderer": "pascal",
+        "vendor": "nvidia",
+        "version": "unknown version",
+        "webglVersion": null,
+        "classification": "unknown",
+        "classificationLabel": "Typ grafiky nelze určit",
+        "requestedPowerPreference": "high-performance",
+        "warnings": [
+          "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+        ],
+        "context": {
+          "requestedAntialias": true,
+          "actualAntialias": null,
+          "defaultFramebuffer": null,
+          "sampleBuffers": null,
+          "samples": null
+        },
+        "backend": "webgpu",
+        "compatibilityMode": false,
+        "gpuTimingScope": "main-render-pass-only"
+      },
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "effectiveTargetFps": 60,
+        "presentationHz": null,
+        "hardwareScaling": 1,
+        "renderScale": 1,
+        "budgets": {
+          "architectureDetailMetres": 76,
+          "avatarNearMetres": 15,
+          "avatarMediumMetres": 60,
+          "grassRangeMetres": 45,
+          "grassTiles": 24,
+          "grassDensity": 0.65,
+          "b6PropRadiusMetres": 18,
+          "shadowMapSize": 1024,
+          "postProcesses": true
+        },
+        "reason": "suspended",
+        "revision": 1,
+        "statistics": {
+          "durationMs": 2016.5,
+          "samples": 103,
+          "averageFps": 51.078601537317134,
+          "medianFrameMs": 16.799999997019768,
+          "p95FrameMs": 30.299999997019768,
+          "p99FrameMs": 47.099999994039536,
+          "slowFrameFraction": 0.2621359223300971,
+          "averageCpuFrameMs": 16.690291262367396,
+          "averageGpuFrameMs": null
+        }
+      },
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      },
+      "ambient": {
+        "buses": 0,
+        "passengers": 5,
+        "cars": 0
+      },
+      "draws": 428,
+      "triangles": 1271285,
+      "frameBreakdownMs": {
+        "simulation": 0.3924825178211802,
+        "world": 0.1309440557200175,
+        "avatarsAndCamera": 0.223426573733975,
+        "environment": 0.764860139651732,
+        "render": 13.176573426625529,
+        "labels": 0.022902098021932417
+      },
+      "engineCpuBreakdownMs": {
+        "activeMeshes": 4.907692307410957,
+        "mainDraw": 6.9410839161308076,
+        "renderTargets": 0.7374125869905616
+      }
+    }
+  ]
+}

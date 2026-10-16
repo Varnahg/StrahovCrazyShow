@@ -1,0 +1,13 @@
+{
+  "snapshotId": "e0de700bbcb2f603fac295ed718c9f872b8e5c993be64bd8195212b1ca49c90b",
+  "url": "http://127.0.0.1:4191/?renderBackend=webgpu",
+  "browser": "Edge via directly connected extension",
+  "viewport": {"width": 2040, "height": 986},
+  "scenario": "first real multiplayer WebGPU compatibility smoke; no FPS result accepted",
+  "firstErrorUTC": "2026-10-16T13:03:26.948Z",
+  "firstError": "[Frame 11] WebGPU uncaptured error (1): GPUValidationError. Error while parsing WGSL: :375:31 error: 'textureSample' must only be called from uniform control flow. let x_604 : vec4<f32> = textureSample(atmosphereNoiseTexture, atmosphereNoiseSampler, (x_599 + (x_600 * 0.01200000010430812836f))); :356:5 note: control flow depends on possibly non-uniform value: if (x_568). :324:27 note: return value of 'atmosphereCloudField_vf3_' may be non-uniform. While calling Device BabylonWebGPUDevice0.CreateShaderModule(fragment).",
+  "followingErrors": "Invalid ShaderModule, Invalid RenderPipeline rgba16float_depth24plus-stencil8_samples1_textureState0, Invalid CommandBuffer during PostProcessRTT-highlights render pass.",
+  "observedImage": "Loading overlay remained visible; no valid scene presentation was accepted.",
+  "cleanup": "Own Edge tab navigated to about:blank before source/build work. Own API2586/preview4191 stopped after PID/path/exact UTC ticks verification. Initial stop helper rejected its own process due to ConvertFrom-Json DateTime conversion, without stopping any process; corrected comparison retained exact timestamp precision.",
+  "notClaimed": ["FPS improvement", "GPU frame time", "visual parity", "successful WebGPU migration"]
+}

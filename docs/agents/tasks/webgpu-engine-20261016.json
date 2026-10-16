@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-engine-20261016",
   "title": "Izolované WebGL2/WebGPU factory a pravdivá diagnostika backendu",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "client/render-engine.ts",
@@ -20,6 +20,7 @@
     "Cílené CPU testy; root provede skutečný produkční smoke/GPU."
   ],
   "notes": [
-    "Nový task pro uživatelské A/B. Pracovat jen v nové webgpu-comparison WT na960cb6f; root vlastní integraci."
+    "Nový task pro uživatelské A/B. Pracovat jen v nové webgpu-comparison WT na960cb6f; root vlastní integraci.",
+    "16.10 root převzal konkrétní ověřený celek v izolované větvi. Runtime snapshot a1eb953f…,985/985tests/build/integration PASS. Porovnání dokončeno s negativním výsledkem migrace;3WebGPUthree běhy neplatné, KEY-5 zůstává otevřený. Viz docs/performance/evidence/webgpu-comparison-20261016/README.md. Nejde o nasazení WebGPU do main."
   ]
 }
