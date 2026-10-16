@@ -1,0 +1,22 @@
+{
+  "snapshotId": "a1eb953f7dc9805ee01798e1f11da854215896aadc484d1d3b3d3a89aaad065d",
+  "rejected": {
+    "b1-webgpu-three": {"sessionId":"8b5cfa14-ed8e-43d9-ab05-f69fe6a649d8","errorUTC":"2026-10-16T13:39:16.420Z","reason":"Unhandled GLSL compilation failed before measurement, after peer cohort and explicit respawn. Zero renderErrorCount does not establish visual parity."},
+    "b2-webgpu-three": {"sessionId":"4442ad4b-13ea-4159-a010-57b9482cc71b","errorUTC":"2026-10-16T13:43:54.653Z","reason":"Unhandled GLSL compilation failed before measurement, after peer cohort and explicit respawn. Zero renderErrorCount does not establish visual parity."},
+    "b3-webgpu-three": {"sessionId":"7f01abb0-78da-41b3-bafc-f9aacfb92b78","errorUTC":"2026-10-16T13:56:33.444Z","reason":"Unhandled GLSL compilation failed before measurement, after peer cohort and explicit respawn. Zero renderErrorCount does not establish visual parity."}
+  },
+  "limits": [
+    "Three repetitions per main backend; WebGPU-fast is one exploratory repetition with one avatar only.",
+    "Same full production content, medium, HUD, 2040x986 CSS/internal, fixed QA weather and UTC1792188000000. Shared sky compatibility change applies to both APIs; this is not the unchanged historical4188 build.",
+    "Browser/driver caches were not cleared. First F means first user activation in a new Game, after normal startup preparation.",
+    "WebGL preparation completed; every measured WebGPU preparation hit its existing30s watchdog. This compares current end-to-end behavior, not equally completed warmup.",
+    "OFF is near the display presentation ceiling around60Hz. Small FPS differences cannot establish unrestricted throughput.",
+    "GPU checkpoints reached82-83C; observed graphics clocks varied1088-1379MHz. Thermal/clock conditions were not fixed; small differences cannot be attributed solely to the backend.",
+    "Movement uses the same real3sW/3sS inputs but achieved trajectories differ under stalls/corrections. Ambient transit follows real time; camera/astronomy fixture does not freeze it.",
+    "WebGL identifies GTX1060/ANGLE D3D11; WebGPU exposes nvidia/pascal only. Host inventory contains one NVIDIA adapter, GTX1060. WebGPU precise device name and actual framebuffer sample query were unavailable.",
+    "Whole-frame WebGL GPU timing is not comparable to WebGPU main-pass timing; missing values remain null.",
+    "First WebGPU F has one directly proven4.9-5.2s render/LongTask block and another long presentation interval not explained by the measured callback. The second gap's cause is not isolated.",
+    "No current NCM bundle rebuild/reuse distribution was collected, no nativeWGSL rewrite or alternative cache architecture was tested.",
+    "Initial shader-validation failure and background1FPS smoke were excluded before the measured series; all raw failures remain preserved."
+  ]
+}
