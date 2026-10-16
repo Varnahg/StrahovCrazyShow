@@ -106,24 +106,8 @@ export function createStudentHair(
     rig.root.scaling.y;
 }
 
-/** Single atlas sample, original alpha, no texture rewrite or per-frame state.
- * Neutralise only the source's baked hue before applying the chosen hair colour.
- * Relative light/dark strand contrast is an explicit artistic interpretation. */
-export class StudentHairTintPlugin extends MaterialPluginBase {
-  constructor(material: PBRMaterial) {
-    super(material, "StrahovStudentHairTint", 230, {}, true, true);
-    this.doNotSerialize = true;
-  }
-  override isCompatible(language: ShaderLanguage) {
-    return language === ShaderLanguage.GLSL;
-  }
-  override getCustomCode(
-    type: string,
-    language = ShaderLanguage.GLSL,
-  ): Record<string, string> | null {
-    if (type !== "fragment" || language !== ShaderLanguage.GLSL) return null;
-    return {
-      CUSTOM_FRAGMENT_UPDATE_ALBEDO: `
+const HAIR_TINT_GLSL = Object.freeze({
+  CUSTOM_FRAGMENT_UPDATE_ALBEDO: `
         #ifdef ALBEDO
         vec3 studentHairSource = albedoTexture.rgb;
         #ifdef GAMMAALBEDO
@@ -133,7 +117,40 @@ export class StudentHairTintPlugin extends MaterialPluginBase {
         surfaceAlbedo = min(vec3(1.0), vAlbedoColor.rgb * studentHairShade);
         #endif
       `,
-    };
+});
+
+// UPDATE_ALBEDO is inside albedoOpacityBlock, not main. Its source sample and
+// colour/level parameters are local; no new texture sample or uniform is needed.
+const HAIR_TINT_WGSL = Object.freeze({
+  CUSTOM_FRAGMENT_UPDATE_ALBEDO: `
+        #ifdef ALBEDO
+        var studentHairSource = albedoTexture.rgb;
+        #ifdef GAMMAALBEDO
+        studentHairSource = toLinearSpaceVec3(studentHairSource);
+        #endif
+        let studentHairShade = clamp(dot(studentHairSource, vec3f(0.2126, 0.7152, 0.0722)) * albedoInfos.y, 0.45, 1.55);
+        surfaceAlbedo = min(vec3f(1.0), vAlbedoColor.rgb * studentHairShade);
+        #endif
+      `,
+});
+
+/** Single atlas sample, original alpha, no texture rewrite or per-frame state.
+ * Neutralise only the source's baked hue before applying the chosen hair colour.
+ * Relative light/dark strand contrast is an explicit artistic interpretation. */
+export class StudentHairTintPlugin extends MaterialPluginBase {
+  constructor(material: PBRMaterial) {
+    super(material, "StrahovStudentHairTint", 230, {}, true, true);
+    this.doNotSerialize = true;
+  }
+  override isCompatible(language: ShaderLanguage) {
+    return language === ShaderLanguage.GLSL || language === ShaderLanguage.WGSL;
+  }
+  override getCustomCode(
+    type: string,
+    language = ShaderLanguage.GLSL,
+  ): Record<string, string> | null {
+    if (type !== "fragment" || !this.isCompatible(language)) return null;
+    return language === ShaderLanguage.WGSL ? HAIR_TINT_WGSL : HAIR_TINT_GLSL;
   }
 }
 

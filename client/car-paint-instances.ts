@@ -13,6 +13,21 @@ import type { MaterialDefines } from "@babylonjs/core/Materials/materialDefines"
 
 export const CAR_PAINT_COLOR_BUFFER = "instanceColor";
 
+const PAINT_FALLBACK_GLSL = Object.freeze({
+  CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
+        #ifndef INSTANCES
+        surfaceAlbedo *= carPaintFallback;
+        #endif
+      `,
+});
+const PAINT_FALLBACK_WGSL = Object.freeze({
+  CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
+        #ifndef INSTANCES
+        surfaceAlbedo *= uniforms.carPaintFallback;
+        #endif
+      `,
+});
+
 /** Babylon's built-in instanceColor is only consumed with INSTANCES. Mirrored
  * instances use a regular draw instead; hardBind supplies their original tint
  * on every bind, including consecutive draws sharing the same material. */
@@ -25,13 +40,16 @@ export class CarPaintFallbackPlugin extends MaterialPluginBase {
   }
 
   override isCompatible(language: ShaderLanguage) {
-    return language === ShaderLanguage.GLSL;
+    return language === ShaderLanguage.GLSL || language === ShaderLanguage.WGSL;
   }
 
-  override getUniforms() {
+  override getUniforms(language = ShaderLanguage.GLSL) {
     return {
       ubo: [{ name: "carPaintFallback", size: 3, type: "vec3" }],
-      fragment: "uniform vec3 carPaintFallback;",
+      fragment:
+        language === ShaderLanguage.GLSL
+          ? "uniform vec3 carPaintFallback;"
+          : undefined,
     };
   }
 
@@ -69,14 +87,10 @@ export class CarPaintFallbackPlugin extends MaterialPluginBase {
   }
 
   override getCustomCode(type: string, language = ShaderLanguage.GLSL) {
-    if (type !== "fragment" || language !== ShaderLanguage.GLSL) return null;
-    return {
-      CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
-        #ifndef INSTANCES
-        surfaceAlbedo *= carPaintFallback;
-        #endif
-      `,
-    };
+    if (type !== "fragment" || !this.isCompatible(language)) return null;
+    return language === ShaderLanguage.WGSL
+      ? PAINT_FALLBACK_WGSL
+      : PAINT_FALLBACK_GLSL;
   }
 }
 

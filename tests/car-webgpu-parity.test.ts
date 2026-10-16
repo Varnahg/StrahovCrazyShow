@@ -28,7 +28,7 @@ function readAssetSources() {
 }
 
 /** Exercises Babylon's material language and per-pass instance-buffer paths.
- * This does not create a GPU device or prove converted shaders render. */
+ * This does not create a GPU device or prove native/converted shaders render. */
 class BackendContractEngine extends NullEngine {
   constructor(webGPU: boolean, instancing: boolean) {
     super();
@@ -194,20 +194,34 @@ test("explicit WebGPU GLSL keeps native paint colors, source geometry, PBR param
   assert.deepEqual(candidate, baseline);
 });
 
-test("ordinary WebGPU WGSL preserves the per-color fallback even when paint instancing is requested", async () => {
+test("native WebGPU WGSL preserves WebGL paint colors, geometry, PBR and LOD without per-color fallback", async () => {
+  const baseline = await inspectPack({ webGPU: false });
   const pack = await inspectPack({ webGPU: true, paintInstancing: true });
-  assert.equal(pack.enabled, false);
+  assert.equal(pack.enabled, true);
+  assert.ok(baseline.lods.every((lod) => lod.language === ShaderLanguage.GLSL));
   assert.ok(pack.lods.every((lod) => lod.language === ShaderLanguage.WGSL));
+  const content = (value: typeof pack) => ({
+    ...value,
+    lods: value.lods.map(({ language: _language, ...lod }) => lod),
+  });
+  assert.deepEqual(content(pack), content(baseline));
 });
 
-test("explicit opt-out and missing instanced arrays retain the fallback on WebGPU GLSL", async () => {
-  for (const options of [{ paintInstancing: false }, { instancing: false }]) {
-    const pack = await inspectPack({
-      webGPU: true,
-      forceGLSL: true,
-      ...options,
-    });
-    assert.equal(pack.enabled, false);
-    assert.ok(pack.lods.every((lod) => lod.language === ShaderLanguage.GLSL));
-  }
+test("explicit opt-out and missing instanced arrays retain the fallback on both WebGPU shader languages", async () => {
+  for (const forceGLSL of [false, true])
+    for (const options of [{ paintInstancing: false }, { instancing: false }]) {
+      const pack = await inspectPack({
+        webGPU: true,
+        forceGLSL,
+        ...options,
+      });
+      assert.equal(pack.enabled, false);
+      assert.ok(
+        pack.lods.every(
+          (lod) =>
+            lod.language ===
+            (forceGLSL ? ShaderLanguage.GLSL : ShaderLanguage.WGSL),
+        ),
+      );
+    }
 });
