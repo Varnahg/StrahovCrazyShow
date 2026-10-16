@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-migrate-shadow-wrapper-20261016",
+  "title": "Opravit native WGSL deklarace pinovaného ShadowDepthWrapper",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/webgpu-shadow-depth-wrapper.test.ts",
+    "docs/agents/handoffs/webgpu-migrate-shadow-wrapper-20261016.md",
+    ".cache/webgpu-migration-checks/vendor/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Linear KEY-35: native WGSL normal remap a fragment declarations; původní GLSL a image-processing patch zachované.",
+    "Skutečný wrapper + processor red/green pro directional normal bias, soft alpha, packed point no-normalbias, explicit remaps, cache a lifecycle.",
+    "CPU není GPU přejímka. Historické dependencies a snapshoty nedotčené."
+  ],
+  "verification": [
+    "Vlastní přímé node/tsx cílené testy bez pnpm exec bootstrapu, scoped TypeScript, přesná patch a lock kontrola.",
+    "Samostatný commit, SHA evidence a handoff; root následně čistá instalace/build/GPU."
+  ],
+  "notes": [
+    "Přidělen simulation_network, owner webgpu-mig-01a14497-vendor; před zápisem claim.",
+    "Průzkum a in-memory repro již předané. Žádný upgrade package.json ani pnpm-workspace.yaml.",
+    "Vlastní vendor kopie pod .cache/webgpu-migration-checks/vendor, nikoli edit přes junction/hardlink historického core.",
+    "Instalace/pnpm exec v podadresáři může objevit nadřazený workspace: nepoužívat. Přímý node CLI, izolovaná fyzická vendor kopie a patch; čistou pnpm instalaci koordinuje root."
+  ]
+}
