@@ -14,6 +14,7 @@ import { SceneTextureDiagnostics } from "./texture-diagnostics";
 import { StableLightState } from "./stable-light-state";
 import { GltfLightBudget } from "./gltf-light-budget";
 import { prepareLightVariants } from "./light-preparation";
+import { arePreparationEffectsReady } from "./strict-material-preparation";
 import { selectLightingPreview } from "./lighting-preview";
 import {
   AvatarPrimitivePool,
@@ -577,7 +578,8 @@ export class Game {
       onError: (channel, error, label) => this.renderHealth.report(
         channel, `${label}: ${error instanceof Error ? error.message : String(error)}`,
       ),
-      track: (promise, channel, label) => this.renderHealth.track(promise, channel, label),
+      track: (promise, channel, label, kind) =>
+        this.renderHealth.track(promise, channel, label, kind),
       onSlowCall: (sample) => sessionDiagnostics.event("webgpu-work", {
         ...sample, rendererId: this.renderHealth.rendererId, purpose: "game",
       }),
@@ -946,7 +948,7 @@ export class Game {
         const meshes = this.scene.getActiveMeshes();
         for (let index = 0; index < meshes.length; index++)
           if (!this.isMeshReadyForCamera(meshes.data[index])) return false;
-        return this.engine.areAllEffectsReady();
+        return arePreparationEffectsReady(this.engine);
       },
       signal: this.startupAbort.signal,
     });
@@ -2386,7 +2388,13 @@ export class Game {
         const health = this.renderHealth.snapshot();
         if (health.errorCount || health.phase === "restart-required")
           throw new Error("Příprava rendereru byla přerušena chybou zařízení nebo shaderu.");
-        return health.pendingOperations === 0 && this.engine.areAllEffectsReady();
+        // Shader diagnostics remain owned until the final submitted-frame gate.
+        // Real preparation and newly requested effects must settle before this
+        // variant advances, even if a material can still draw its old effect.
+        return (
+          health.pendingPreparationOperations === 0 &&
+          arePreparationEffectsReady(this.engine)
+        );
       },
       render,
       run: (callback) => this.engine.runRenderLoop(callback),

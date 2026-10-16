@@ -17,6 +17,7 @@ import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { PlayerFlashlight } from "../client/flashlight";
 import { StableLightState } from "../client/stable-light-state";
 import { prepareLightVariants } from "../client/light-preparation";
+import { arePreparationEffectsReady } from "../client/strict-material-preparation";
 import { selectLightingPreview } from "../client/lighting-preview";
 
 const source = ts.createSourceFile(
@@ -42,7 +43,7 @@ const compiled = ts.transpileModule(
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(`(function(environment) {
-  const { PlayerFlashlight, Vector3, prepareLightVariants, selectLightingPreview, performance, window, document } = environment;
+  const { PlayerFlashlight, Vector3, prepareLightVariants, arePreparationEffectsReady, selectLightingPreview, performance, window, document } = environment;
   ${compiled}
   return PreparationGame;
 })`).runInThisContext();
@@ -88,6 +89,7 @@ function fixture(t: import("node:test").TestContext) {
     PlayerFlashlight,
     Vector3,
     prepareLightVariants,
+    arePreparationEffectsReady,
     selectLightingPreview,
     performance: { now: () => now },
     document: { hidden: false, addEventListener() {}, removeEventListener() {} },
@@ -102,6 +104,8 @@ function fixture(t: import("node:test").TestContext) {
     },
   });
   const engine = {
+    isWebGPU: false,
+    isDisposed: false,
     currentRenderPassId: 901,
     areAllEffectsReady: () => effectsReady,
     runRenderLoop(callback: () => void) {
@@ -117,11 +121,18 @@ function fixture(t: import("node:test").TestContext) {
     bodyHeight: 1.8,
     measurements: { legSpacing: 0.105 },
   };
+  const health = {
+    errorCount: 0,
+    pendingOperations: 0,
+    pendingPreparationOperations: 0,
+    pendingShaderValidationOperations: 0,
+    phase: "preparing",
+  };
   const game = Object.assign(new Game(), {
     scene,
     camera,
     engine,
-    renderHealth: { snapshot: () => ({ errorCount: 0, pendingOperations: 0, phase: "preparing" }) },
+    renderHealth: { snapshot: () => health },
     stableLights,
     lights: streets,
     ready: false,
@@ -232,6 +243,7 @@ function fixture(t: import("node:test").TestContext) {
     streets,
     lightStates,
     engine,
+    health,
     start: () => {
       assert.equal(
         typeof game.prepareLighting,
@@ -343,6 +355,57 @@ test("night preparation respects low quality and the actual celestial key slot",
       .filter((state) => state.beam)
       .every((state) => state.streets <= 1),
   );
+});
+
+test("actual Game overlaps shader diagnostics while retaining preparation barriers", async (t) => {
+  const f = fixture(t);
+  Object.assign(f.health, {
+    pendingOperations: 3,
+    pendingPreparationOperations: 1,
+    pendingShaderValidationOperations: 2,
+  });
+  const pending = f.start();
+  for (let index = 0; index < 12; index++) f.tick();
+  assert.equal(f.states.length, 1, "real preparation still blocks the first variant");
+  f.health.pendingPreparationOperations = 0;
+  f.health.pendingOperations = 2;
+  f.finish();
+  assert.equal((await pending).status, "complete");
+  assert.equal(f.health.pendingOperations, 2, "diagnostics remain owned by the final startup gate");
+  assert.equal(f.game.ready, false, "preparing variants never announces playable state");
+  assert.equal(f.hasTimer, false);
+});
+
+test("actual Game does not accept native hot-swap readiness while a new effect is pending", async (t) => {
+  const f = fixture(t);
+  let newEffectReady = false;
+  Object.assign(f.engine, {
+    isWebGPU: true,
+    _compiledEffects: {
+      previous: { isReady: () => true, getEngine: () => f.engine, isDisposed: false },
+      next: { isReady: () => newEffectReady, getEngine: () => f.engine, isDisposed: false },
+    },
+  });
+  const pending = f.start();
+  for (let index = 0; index < 12; index++) f.tick();
+  assert.equal(f.states.length, 1, "native stub and ready old effect cannot advance the stage");
+  newEffectReady = true;
+  f.finish();
+  assert.equal((await pending).status, "complete");
+  assert.equal(f.game.ready, false);
+});
+
+test("late validation failure still stops actual Game variant preparation", async (t) => {
+  const f = fixture(t);
+  Object.assign(f.health, { pendingOperations: 1, pendingShaderValidationOperations: 1 });
+  const pending = f.start();
+  f.tick();
+  Object.assign(f.health, { errorCount: 1, phase: "invalid" });
+  f.finish();
+  assert.equal((await pending).status, "failed");
+  assert.equal(f.game.ready, false);
+  assert.equal(f.hasTimer, false);
+  assert.equal(f.game.flashlight.beam.light.isEnabled(), false);
 });
 
 test("settings/avatar changes during wait are preserved and current local rig is reacquired", async (t) => {

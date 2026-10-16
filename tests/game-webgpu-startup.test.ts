@@ -5,6 +5,7 @@ import { Script } from "node:vm";
 import ts from "typescript";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { RenderHealth } from "../client/render-health";
+import { arePreparationEffectsReady } from "../client/strict-material-preparation";
 
 const source = ts.createSourceFile(
   "game.ts",
@@ -59,7 +60,7 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(`(function(env) {
-  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, SurfacePack, CinematicAtmosphere, VehicleLighting, sessionDiagnostics, waitForRenderStartup } = env;
+  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, SurfacePack, CinematicAtmosphere, VehicleLighting, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady } = env;
   ${compiled}
   return StartupGame;
 })`).runInThisContext();
@@ -108,6 +109,7 @@ function fixture(
     simulations = 0,
     failures = 0;
   const events: { kind: string; data: unknown }[] = [];
+  let gateReadiness: (() => boolean) | undefined;
   const disposable = () => ({ dispose: () => disposedAssets++ });
   const carAsset = {
     ...disposable(),
@@ -130,6 +132,7 @@ function fixture(
     if (fault.channel === "device") game.handleRendererFailure(fault.message);
   });
   const StartupGame = make({
+    arePreparationEffectsReady,
     exports: {},
     measurePresentationRate: async () => ({
       reliable: true,
@@ -165,8 +168,10 @@ function fixture(
     waitForRenderStartup: async (input: {
       health: RenderHealth;
       signal: AbortSignal;
+      isReady(): boolean;
     }) => {
       gateCalls++;
+      gateReadiness = input.isReady;
       assert.equal(input.health, health);
       assert.equal(input.signal, game.startupAbort.signal);
       await health.guard(gate.promise);
@@ -217,6 +222,7 @@ function fixture(
     gate,
     loops,
     events,
+    gateReadiness: () => gateReadiness!(),
     completeAssets: () => {
       interior.resolve(interiorAsset);
       vegetation.resolve(vegetationAsset);
@@ -250,6 +256,32 @@ test("actual Game rejects an incomplete light preparation instead of announcing 
   assert.equal(f.game.ready, false);
   assert.equal(f.health.snapshot().valid, false);
   assert.equal(f.loops.size, 0);
+});
+
+test("actual Game final gate checks pending native effects after the variants were restored", async (t) => {
+  const f = fixture(t);
+  let effectReady = false;
+  Object.assign(f.engine, {
+    _isWebGPU: true,
+    _compiledEffects: {
+      late: { isReady: () => effectReady, getEngine: () => f.engine, isDisposed: false },
+    },
+  });
+  t.mock.method(f.engine, "areAllEffectsReady", () => true);
+  try {
+    const start = f.game.start();
+    await settle();
+    assert.equal(f.stats().gateCalls, 1);
+    assert.equal(f.gateReadiness(), false, "the WebGPU always-true stub is not final readiness");
+    assert.equal(f.game.ready, false);
+    effectReady = true;
+    assert.equal(f.gateReadiness(), true);
+    f.gate.resolve();
+    await start;
+    assert.equal(f.game.ready, true);
+  } finally {
+    Object.assign(f.engine, { _compiledEffects: {}, _isWebGPU: false });
+  }
 });
 
 test("device loss during physics loading promptly rejects and cannot restart the Game loop", async (t) => {
