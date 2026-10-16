@@ -16,6 +16,27 @@ export type GrassWindState = {
   range: number;
 };
 
+const WGSL_VERTEX = Object.freeze({
+  CUSTOM_VERTEX_DEFINITIONS: "varying vCampusGrass: vec3f;",
+  CUSTOM_VERTEX_UPDATE_WORLDPOS: `
+    let grassGust = sin(uniforms.grassWind.x * 0.85 + worldPos.x * 0.07 + worldPos.z * 0.11) * 0.55
+      + sin(uniforms.grassWind.x * 1.9 + worldPos.x * 0.21) * 0.22;
+    let grassDisplacement = uniforms.grassWind.yz * grassGust * positionUpdated.y * positionUpdated.y * 0.004;
+    worldPos = vec4f(worldPos.x+grassDisplacement.x,worldPos.y,worldPos.z+grassDisplacement.y,worldPos.w);
+    vertexOutputs.vPositionW = worldPos.xyz;
+    vertexOutputs.vCampusGrass = vec3f(fract(sin(dot(finalWorld[3].xz,vec2f(12.9898,78.233))) * 43758.5453),
+      clamp(positionUpdated.y,0.0,1.0), distance(worldPos.xyz,uniforms.grassViewer.xyz));
+  `,
+});
+const WGSL_FRAGMENT = Object.freeze({
+  CUSTOM_FRAGMENT_DEFINITIONS: "varying vCampusGrass: vec3f;",
+  CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
+    let grassFade = 1.0 - smoothstep(uniforms.grassViewer.w * 0.72, uniforms.grassViewer.w, fragmentInputs.vCampusGrass.z);
+    if (fragmentInputs.vCampusGrass.x > grassFade) { discard; }
+    surfaceAlbedo *= mix(0.74,1.1,fragmentInputs.vCampusGrass.y) * (0.88 + fragmentInputs.vCampusGrass.x * 0.16);
+  `,
+});
+
 /** Thin-instanced grass uses the same PBR lights, fog and cast shadows as the
  * ground. The plugin adds only wind/colour/fade; it emits no independent light.
  */
@@ -28,16 +49,22 @@ export class GrassWindPlugin extends MaterialPluginBase {
     this.doNotSerialize = true;
   }
   override isCompatible(language: ShaderLanguage) {
-    return language === ShaderLanguage.GLSL;
+    return language === ShaderLanguage.GLSL || language === ShaderLanguage.WGSL;
   }
-  override getUniforms() {
+  override getUniforms(language = ShaderLanguage.GLSL) {
     return {
       ubo: [
         { name: "grassWind", size: 3, type: "vec3" },
         { name: "grassViewer", size: 4, type: "vec4" },
       ],
-      vertex: "uniform vec3 grassWind; uniform vec4 grassViewer;",
-      fragment: "uniform vec4 grassViewer;",
+      vertex:
+        language === ShaderLanguage.GLSL
+          ? "uniform vec3 grassWind; uniform vec4 grassViewer;"
+          : undefined,
+      fragment:
+        language === ShaderLanguage.GLSL
+          ? "uniform vec4 grassViewer;"
+          : undefined,
     };
   }
   override bindForSubMesh(buffer: UniformBuffer) {
@@ -59,6 +86,12 @@ export class GrassWindPlugin extends MaterialPluginBase {
     type: string,
     language = ShaderLanguage.GLSL,
   ): Record<string, string> | null {
+    if (language === ShaderLanguage.WGSL)
+      return type === "vertex"
+        ? WGSL_VERTEX
+        : type === "fragment"
+          ? WGSL_FRAGMENT
+          : null;
     if (language !== ShaderLanguage.GLSL) return null;
     if (type === "vertex")
       return {

@@ -32,6 +32,40 @@ export const createPhotoGrassWindState = (): PhotoGrassWindState => ({
   fadeEnd: 9,
 });
 
+const WGSL_VERTEX = Object.freeze({
+  CUSTOM_VERTEX_DEFINITIONS: `varying vPhotoGrassVisibility: vec2f;
+    #ifdef THIN_INSTANCES
+    attribute photoGrassFade: vec4f;
+    #endif`,
+  CUSTOM_VERTEX_UPDATE_WORLDPOS: `
+    let leafHeight = clamp((positionUpdated.y+0.002)/0.060,0.0,1.0);
+    let leafGust = sin(uniforms.photoGrassWind.x*.85+worldPos.x*1.7+worldPos.z*1.1)*.55+sin(uniforms.photoGrassWind.x*1.9+worldPos.z*2.1)*.22;
+    let leafDisplacement = uniforms.photoGrassWind.yz*leafGust*leafHeight*leafHeight*.001;
+    worldPos = vec4f(worldPos.x+leafDisplacement.x,worldPos.y,worldPos.z+leafDisplacement.y,worldPos.w);
+    vertexOutputs.vPositionW = worldPos.xyz;
+    let rootXZ = finalWorld[3].xz;
+    let focusDelta = uniforms.photoGrassFocus.xy-uniforms.photoGrassView.xy;
+    let focusLength = dot(focusDelta,focusDelta);
+    var focusT = 0.0;
+    if (focusLength>0.00000001) {
+      focusT = clamp(dot(rootXZ-uniforms.photoGrassView.xy,focusDelta)/focusLength,0.0,1.0);
+    }
+    let rangeDistance = length(rootXZ-uniforms.photoGrassView.xy-focusDelta*focusT);
+    let rangeVisibility = 1.0-smoothstep(uniforms.photoGrassView.z,uniforms.photoGrassView.w,rangeDistance);
+    #ifdef THIN_INSTANCES
+    let temporal = smoothstep(0.0,uniforms.photoGrassFocus.z,uniforms.photoGrassWind.x-vertexInputs.photoGrassFade.z);
+    vertexOutputs.vPhotoGrassVisibility = vec2f(vertexInputs.photoGrassFade.w,mix(vertexInputs.photoGrassFade.x,vertexInputs.photoGrassFade.y,temporal)*rangeVisibility);
+    #else
+    vertexOutputs.vPhotoGrassVisibility = vec2f(0.0,rangeVisibility);
+    #endif
+  `,
+});
+const WGSL_FRAGMENT = Object.freeze({
+  CUSTOM_FRAGMENT_DEFINITIONS: "varying vPhotoGrassVisibility: vec2f;",
+  CUSTOM_FRAGMENT_BEFORE_LIGHTS:
+    "if (fragmentInputs.vPhotoGrassVisibility.y<=0.0 || fragmentInputs.vPhotoGrassVisibility.x>fragmentInputs.vPhotoGrassVisibility.y) { discard; }",
+});
+
 /** Source pixels remain unchanged. Per-root timing and fixed world-space range
  * are evaluated in the shader, without uploading every fade on every frame. */
 export class PhotoGrassWind extends MaterialPluginBase {
@@ -45,7 +79,7 @@ export class PhotoGrassWind extends MaterialPluginBase {
     this._enable(true);
   }
   override isCompatible(language: ShaderLanguage) {
-    return language === ShaderLanguage.GLSL;
+    return language === ShaderLanguage.GLSL || language === ShaderLanguage.WGSL;
   }
   override getAttributes(
     attributes: string[],
@@ -54,7 +88,7 @@ export class PhotoGrassWind extends MaterialPluginBase {
   ) {
     if (mesh.hasThinInstances) attributes.push("photoGrassFade");
   }
-  override getUniforms() {
+  override getUniforms(language = ShaderLanguage.GLSL) {
     return {
       ubo: [
         { name: "photoGrassWind", size: 3, type: "vec3" },
@@ -62,7 +96,9 @@ export class PhotoGrassWind extends MaterialPluginBase {
         { name: "photoGrassFocus", size: 3, type: "vec3" },
       ],
       vertex:
-        "uniform vec3 photoGrassWind; uniform vec4 photoGrassView; uniform vec3 photoGrassFocus;",
+        language === ShaderLanguage.GLSL
+          ? "uniform vec3 photoGrassWind; uniform vec4 photoGrassView; uniform vec3 photoGrassFocus;"
+          : undefined,
     };
   }
   override hardBindForSubMesh(
@@ -93,6 +129,12 @@ export class PhotoGrassWind extends MaterialPluginBase {
     type: string,
     language = ShaderLanguage.GLSL,
   ): Record<string, string> | null {
+    if (language === ShaderLanguage.WGSL)
+      return type === "vertex"
+        ? WGSL_VERTEX
+        : type === "fragment"
+          ? WGSL_FRAGMENT
+          : null;
     if (language !== ShaderLanguage.GLSL) return null;
     if (type === "vertex")
       return {

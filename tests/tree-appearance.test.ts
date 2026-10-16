@@ -246,7 +246,13 @@ test("wind refreshes frozen-material uniforms and keeps the inverse-transpose no
     const code = plugin.getCustomCode("vertex")!.CUSTOM_VERTEX_UPDATE_POSITION;
     assert.match(code, /normalUpdated\.y-dot\(treeShear,normalUpdated\.xz\)/);
     assert.match(code, /tangentUpdated\.x\+treeShear\.x\*tangentUpdated\.y/);
-    assert.equal(plugin.getCustomCode("vertex", ShaderLanguage.WGSL), null);
+    const native = plugin.getCustomCode(
+      "vertex",
+      ShaderLanguage.WGSL,
+    )!.CUSTOM_VERTEX_UPDATE_POSITION;
+    assert.match(native, /normalUpdated\.y-dot\(treeShear,normalUpdated\.xz\)/);
+    assert.match(native, /tangentUpdated\.x\+treeShear\.x\*tangentUpdated\.y/);
+    assert.match(native, /tangentUpdated\.w\)/);
     // An arbitrary perpendicular normal/tangent stays perpendicular under the
     // vertical shear used by the shader, including the derivative at both ends.
     for (const y of [0, 1.5, 3, 7, 9.99, 10, 14]) {
