@@ -55,3 +55,36 @@ index c1a7836d3fa0752b5af76534049d23f63080d88a..52afa346cb94cd6d1309ac5c2742d089
              }
              /**
               * Serializes the post process to a JSON object
+diff --git a/Materials/shadowDepthWrapper.js b/Materials/shadowDepthWrapper.js
+--- a/Materials/shadowDepthWrapper.js
++++ b/Materials/shadowDepthWrapper.js
+@@ -175,8 +175,13 @@ export class ShadowDepthWrapper {
+         }
+         if (!this.doNotInjectCode) {
+             // Declare the shadow map includes
+-            const vertexNormalBiasCode = this._options && this._options.remappedVariables
+-                ? `#include<shadowMapVertexNormalBias>(${this._options.remappedVariables.join(",")})`
++            // Native material varyings are qualified; explicit normal remaps still win.
++            const normalBiasRemapping = origEffect.shaderLanguage === 1 /* ShaderLanguage.WGSL */ &&
++                !this._options?.remappedVariables?.some((name, index) => index % 2 === 0 && name === "vNormalW")
++                ? [...(this._options?.remappedVariables ?? []), "vNormalW", "vertexOutputs.vNormalW"]
++                : this._options?.remappedVariables;
++            const vertexNormalBiasCode = normalBiasRemapping
++                ? `#include<shadowMapVertexNormalBias>(${normalBiasRemapping.join(",")})`
+                 : `#include<shadowMapVertexNormalBias>`, vertexMetricCode = this._options && this._options.remappedVariables
+                 ? `#include<shadowMapVertexMetric>(${this._options.remappedVariables.join(",")})`
+                 : `#include<shadowMapVertexMetric>`, fragmentSoftTransparentShadow = this._options && this._options.remappedVariables
+@@ -207,7 +212,12 @@ export class ShadowDepthWrapper {
+             else {
+                 fragmentCode = fragmentCode.replace(/#define SHADOWDEPTH_SOFTTRANSPARENTSHADOW|#define CUSTOM_FRAGMENT_BEFORE_FOG/g, fragmentSoftTransparentShadow);
+             }
+-            fragmentCode = fragmentCode.replace(/void\s+?main/g, Effect.IncludesShadersStore["shadowMapFragmentExtraDeclaration"] + "\nvoid main");
++            if (origEffect.shaderLanguage === 1 /* ShaderLanguage.WGSL */) {
++                fragmentCode = fragmentCode.replace(/@fragment/g, "#include<shadowMapFragmentExtraDeclaration>\n@fragment");
++            }
++            else {
++                fragmentCode = fragmentCode.replace(/void\s+?main/g, Effect.IncludesShadersStore["shadowMapFragmentExtraDeclaration"] + "\nvoid main");
++            }
+             if (hasLocationForFragment) {
+                 fragmentCode = fragmentCode.replace(/#define SHADOWDEPTH_FRAGMENT/g, fragmentBlockCode);
+             }
