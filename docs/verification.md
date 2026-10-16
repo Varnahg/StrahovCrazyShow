@@ -1,5 +1,11 @@
 # Ověření dema a známá omezení
 
+## WebGPU · úspěšný start a první srovnatelné piloty · 16. října 2026
+
+Native-v12/dc29390 (cbbca97e…) prošel **1195/1195, build/TypeScript a integrací**; combined-v4 (1383fc92…) prošel **1255/1255, build/TypeScript a integrací**. Typed pending tracking, strict readiness požadovaných Effectů a Game wiring jsou odděleně integrovány do main jakoa7ac024,6f5a747,c33127d. Čisté runtime stromy odpovídají nativnímu checkpointu;546fyzických source/test souborů odpovídá combined-v4 a zachovává cizí WIP. Nový read-only guard nemění shader/material state; finální ALL-pending/scope/queue gate zůstává povinný.
+
+Aktivní Edge, stejný tagged source, medium100%,1514×643, jeden skutečný multiplayer avatar, pevná noc/počasí: first-F pilot WebGL2 **53,3FPS/p9525,6/p9928,9/max75,4ms/start32,396s**; WebGPU CM **53,5/26,5/31,2/82,6/start45,718s**; NCM **54,2/26,4/40,3/88,4/start45,930s**. Všechny complete/ready, health valid a0chyb; WebGPU běhemF nevytvořilo nové shader moduly. Jde o jednorázové piloty bez detailního profileru, nikoli opakovanou výkonovou přejímku. FPS přínos není prokázaný, startup WebGPU je delší. Dřívější native-v12 profilovaný export má sourceSnapshotId null a zůstává výslovně diagnostický. [Přesné originály, omezení a integrační důkazy](performance/evidence/webgpu-migration-20261016/readiness-v12/README.md). Výchozí/public backend zatím není přepnutý.
+
 ## WebGPU · frame lifecycle a aktivní Edge · 16. října 2026 19:43 UTC
 
 Native-v10/ad2b39c, snapshot79d55c7b29685b41f5d02afc6afe8be6d0f0dfe15adbf88fa3fad56480b5fbe7: **1173/1173 testů, build/TypeScript a izolovaná integrace PASS**. Combined-v3, snapshot31d0f02303b9cd3ff0721a830f130ee4647df615ffc9a2a47726a4b04c2adbe9: **1233/1233, build/TypeScript a integrace PASS**. Do main samostatně integroványcd2e60b (opt-in celkový frame lifecycle a doručení timing payloadu) a8eb183d (kliknutelný odchod z načítání/chyby). Čistý runtime strom main odpovídá native-v10;544fyzických souborů source/test odpovídá combined-v3 se zachováním cizího WIP. Index čistý, primary dependencies a hraná4192 beze změny.

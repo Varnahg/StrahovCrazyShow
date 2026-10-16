@@ -1,0 +1,113 @@
+{
+  "atUTC": "2026-10-16T20:48:30.677Z",
+  "startup": [
+    {
+      "checkpoint": "native-v12",
+      "sessionId": "6b94df8f-3aaa-4c12-a3a6-8beb66239320",
+      "modeToReadyMs": 54876.2,
+      "preparationMs": 29313.69999998808,
+      "preparationToReadyTailMs": 13102.599999999991,
+      "status": "complete",
+      "renderFaults": 0
+    },
+    {
+      "checkpoint": "combined-v4",
+      "sessionId": "51c51d45-4103-43c8-81f2-0629773b865f",
+      "modeToReadyMs": 45718.399999999994,
+      "preparationMs": 17398.19999998808,
+      "preparationToReadyTailMs": 8919.599999999999,
+      "status": "complete",
+      "renderFaults": 0
+    },
+    {
+      "checkpoint": "combined-v4",
+      "sessionId": "cb2e262d-b40f-43fc-bb38-26dd6f8279e7",
+      "modeToReadyMs": 45929.9,
+      "preparationMs": 15174.5,
+      "preparationToReadyTailMs": 12130.5,
+      "status": "complete",
+      "renderFaults": 0
+    },
+    {
+      "checkpoint": "combined-v4",
+      "sessionId": "74eafe0e-7458-49f5-9d84-f3fcd9eb3c97",
+      "modeToReadyMs": 32396.100000000006,
+      "preparationMs": 12323.899999976158,
+      "preparationToReadyTailMs": 18.10000000000582,
+      "status": "complete",
+      "renderFaults": 0
+    }
+  ],
+  "pilots": [
+    {
+      "file": "combined-v4-first-f-pilot.json",
+      "sessionId": "51c51d45-4103-43c8-81f2-0629773b865f",
+      "backend": "webgpu",
+      "compatibilityMode": true,
+      "averageFps": 53.5,
+      "p95FrameMs": 26.5,
+      "p99FrameMs": 31.19999998807907,
+      "maxFrameMs": 82.59999999403954,
+      "frames": 536,
+      "viewport": {
+        "width": 1514,
+        "height": 643
+      },
+      "renderResolution": {
+        "width": 1514,
+        "height": 643
+      },
+      "healthValid": true,
+      "newShaderModules": 0,
+      "lightingInstant": 1792188000000,
+      "quality": "medium"
+    },
+    {
+      "file": "combined-v4-fast-first-f-pilot.json",
+      "sessionId": "cb2e262d-b40f-43fc-bb38-26dd6f8279e7",
+      "backend": "webgpu",
+      "compatibilityMode": false,
+      "averageFps": 54.2,
+      "p95FrameMs": 26.400000005960464,
+      "p99FrameMs": 40.30000001192093,
+      "maxFrameMs": 88.40000000596046,
+      "frames": 543,
+      "viewport": {
+        "width": 1514,
+        "height": 643
+      },
+      "renderResolution": {
+        "width": 1514,
+        "height": 643
+      },
+      "healthValid": true,
+      "newShaderModules": 0,
+      "lightingInstant": 1792188000000,
+      "quality": "medium"
+    },
+    {
+      "file": "combined-v4-webgl2-first-f-pilot.json",
+      "sessionId": "74eafe0e-7458-49f5-9d84-f3fcd9eb3c97",
+      "backend": "webgl2",
+      "compatibilityMode": null,
+      "averageFps": 53.3,
+      "p95FrameMs": 25.599999994039536,
+      "p99FrameMs": 28.900000005960464,
+      "maxFrameMs": 75.40000000596046,
+      "frames": 534,
+      "viewport": {
+        "width": 1514,
+        "height": 643
+      },
+      "renderResolution": {
+        "width": 1514,
+        "height": 643
+      },
+      "healthValid": true,
+      "newShaderModules": 0,
+      "lightingInstant": 1792188000000,
+      "quality": "medium"
+    }
+  ],
+  "scope": "Single first-F pilots, not counterbalanced repeated acceptance. Natural1514x643, medium100%, fixed night; active Edge155/NVIDIA GTX1060. Native12 earlier pilot had detailed profiling and missing raw source ID, so is diagnostic only. C4 carries exact source tag and has no detailed profile flag. All original raw records are preserved; CPU tests and valid render health are not proof of a performance win."
+}
