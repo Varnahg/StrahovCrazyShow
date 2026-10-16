@@ -187,6 +187,47 @@ export function photogrammetryWindowShader(
   `;
 }
 
+/** Native WGSL counterpart. The original atlas sample stays in main scope;
+ * geometric derivatives are prepared before any PBR discard, separately. */
+function photogrammetryWindowShaderWgsl(facades: PhotogrammetryWindowFacade[]) {
+  const blocks = facades
+    .map(
+      (f) => `{
+    let photoDelta = fragmentInputs.vPositionW.xz - vec2f(${f.origin.map(gl).join(",")});
+    let photoS = dot(photoDelta, vec2f(${f.tangent.map(gl).join(",")}));
+    let photoD = dot(photoDelta, vec2f(${f.normal.map(gl).join(",")}));
+    if (photoS > 0.35 && photoS < ${gl(f.length - 0.35)} && abs(photoD) < ${gl(f.planeTolerance)} &&
+        abs(photoNormal.y) < 0.45 && abs(dot(photoNormal.xz,vec2f(${f.normal.map(gl).join(",")}))) > 0.8) {
+      let photoRow = floor((${gl(f.topWindowY)}-fragmentInputs.vPositionW.y)/${gl(f.rowPitch)}+0.5);
+      let photoDY = abs(fragmentInputs.vPositionW.y-(${gl(f.topWindowY)}-photoRow*${gl(f.rowPitch)}));
+      var photoMask = (1.0-smoothstep(${gl(f.windowHalfHeight - 0.08)},${gl(f.windowHalfHeight)},photoDY));
+      photoMask *= (1.0-smoothstep(${gl(f.sourceDarkThreshold - 0.04)},${gl(f.sourceDarkThreshold)},photoHi));
+      photoMask *= (1.0-smoothstep(${gl(f.sourceChromaThreshold - 0.04)},${gl(f.sourceChromaThreshold)},photoHi-photoLo));
+      if (photoRow >= 0.0 && photoRow < ${gl(f.rowCount)} && photoSource.g <= max(photoSource.r,photoSource.b)*1.07+0.01) {
+        let photoBay = floor(photoS/${gl(f.occupancyBayMetres)});
+        // Same source-independent fictional occupancy; never player data.
+        let photoOccupancy = fract(sin(photoBay*12.9898+photoRow*78.233+${gl(f.block * 41.719)})*43758.5453);
+        let photoLit = 1.0-smoothstep(uniforms.photoNightSettings.y-0.015,uniforms.photoNightSettings.y+0.015,photoOccupancy);
+        photoEmission = max(photoEmission, photoMask*photoLit);
+      }
+    }
+  }`,
+    )
+    .join("\n");
+  return `
+  #ifdef ALBEDO
+  if (uniforms.photoNightSettings.x > 0.001) {
+    let photoSource = albedoTexture.rgb;
+    let photoHi=max(photoSource.r,max(photoSource.g,photoSource.b));
+    let photoLo=min(photoSource.r,min(photoSource.g,photoSource.b));
+    var photoEmission=0.0;
+    ${blocks}
+    finalEmissive += vec3f(1.0,0.61,0.28)*photoEmission*uniforms.photoNightSettings.x*0.9;
+  }
+  #endif
+  `;
+}
+
 export class PhotogrammetryNightPlugin extends MaterialPluginBase {
   constructor(
     material: PBRMaterial,
@@ -215,12 +256,15 @@ export class PhotogrammetryNightPlugin extends MaterialPluginBase {
     };
   }
   override isCompatible(language: ShaderLanguage) {
-    return language === ShaderLanguage.GLSL;
+    return language === ShaderLanguage.GLSL || language === ShaderLanguage.WGSL;
   }
-  override getUniforms() {
+  override getUniforms(language = ShaderLanguage.GLSL) {
     return {
       ubo: [{ name: "photoNightSettings", size: 2, type: "vec2" }],
-      fragment: "uniform vec2 photoNightSettings;",
+      fragment:
+        language === ShaderLanguage.GLSL
+          ? "uniform vec2 photoNightSettings;"
+          : undefined,
     };
   }
   override bindForSubMesh(
@@ -235,16 +279,28 @@ export class PhotogrammetryNightPlugin extends MaterialPluginBase {
       this.state.activity,
     );
   }
-  override getCustomCode(type: string, language = ShaderLanguage.GLSL) {
-    if (type !== "fragment" || language !== ShaderLanguage.GLSL) return null;
+  override getCustomCode(
+    type: string,
+    language = ShaderLanguage.GLSL,
+  ): Record<string, string> | null {
+    if (type !== "fragment" || !this.isCompatible(language)) return null;
+    // The base constructor collects hook names before facades is initialized.
+    const facades = this.facades ?? [];
+    if (language === ShaderLanguage.WGSL)
+      return {
+        CUSTOM_FRAGMENT_MAIN_BEGIN: `
+        #ifdef ALBEDO
+        let photoNormal=normalize(cross(dpdx(fragmentInputs.vPositionW),dpdy(fragmentInputs.vPositionW)));
+        #endif
+      `,
+        CUSTOM_FRAGMENT_BEFORE_FINALCOLORCOMPOSITION:
+          photogrammetryWindowShaderWgsl(facades),
+      };
     return {
       CUSTOM_FRAGMENT_EXTENSION:
         "#extension GL_OES_standard_derivatives : enable",
-      CUSTOM_FRAGMENT_BEFORE_FINALCOLORCOMPOSITION: photogrammetryWindowShader(
-        // Babylon collects injection POINT NAMES inside the base constructor,
-        // before subclass parameter properties have been initialized.
-        this.facades ?? [],
-      ),
+      CUSTOM_FRAGMENT_BEFORE_FINALCOLORCOMPOSITION:
+        photogrammetryWindowShader(facades),
     };
   }
 }

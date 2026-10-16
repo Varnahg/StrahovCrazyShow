@@ -201,7 +201,12 @@ test("material integration preserves source texture/UV color handling and adds n
     /finalEmissive \+=/,
   );
   assert.equal(plugin.getCustomCode("vertex"), null);
-  assert.equal(plugin.getCustomCode("fragment", ShaderLanguage.WGSL), null);
+  assert.equal(plugin.isCompatible(ShaderLanguage.WGSL), true);
+  assert.match(
+    plugin.getCustomCode("fragment", ShaderLanguage.WGSL)!
+      .CUSTOM_FRAGMENT_BEFORE_FINALCOLORCOMPOSITION,
+    /photoSource = albedoTexture\.rgb/,
+  );
   assert.equal(lighting.stats().activeMaterials, 1);
   material.dispose();
   assert.equal(lighting.stats().activeMaterials, 0);

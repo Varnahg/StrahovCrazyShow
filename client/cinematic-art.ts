@@ -200,6 +200,53 @@ const VARIED_SURFACE_CODE = Object.freeze({
   `,
 });
 
+// PBR's albedo hook is in main, while its roughness hook is inside
+// reflectivityBlock. Private storage is per shader invocation, preserving the
+// GLSL recipe's shared scalar without evaluating the four hashes twice.
+const WGSL_DEFINITIONS = `
+var<private> campusArtVariation: f32 = 0.5;
+fn campusArtHash(p: vec2f) -> f32 {
+  var q = fract(vec3f(p.x,p.y,p.x+p.y)*vec3f(0.1031,0.11369,0.13787));
+  q += vec3f(dot(q,q.yzx+vec3f(19.19)));
+  return fract((q.x+q.y)*q.z);
+}
+fn campusArtNoise(p: vec2f) -> f32 {
+  let cell=floor(p);
+  var f=fract(p);
+  f=f*f*(vec2f(3.0)-2.0*f);
+  return mix(mix(campusArtHash(cell),campusArtHash(cell+vec2f(1.0,0.0)),f.x),
+    mix(campusArtHash(cell+vec2f(0.0,1.0)),campusArtHash(cell+vec2f(1.0,1.0)),f.x),f.y);
+}
+`;
+
+const WGSL_DETAIL_CODE = `
+  let campusEyeOffset=scene.vEyePosition.xyz-fragmentInputs.vPositionW;
+  let campusDetailFade=smoothstep(uniforms.campusArtSettings.w*uniforms.campusArtSettings.w,
+    16.0*uniforms.campusArtSettings.z*uniforms.campusArtSettings.z,dot(campusEyeOffset,campusEyeOffset));
+  let campusDetail=mix(uniforms.campusArtDetail.w,uniforms.campusArtResponse.x,campusDetailFade);
+  // Preserve the material factor, including rain darkening, just as in GLSL.
+  surfaceAlbedo=mix(uniforms.campusArtDetail.rgb*uniforms.vAlbedoColor.rgb,surfaceAlbedo,campusDetail);
+  let campusArtLuma=dot(surfaceAlbedo,vec3f(0.2126,0.7152,0.0722));
+  surfaceAlbedo=mix(vec3f(campusArtLuma),surfaceAlbedo,uniforms.campusArtSettings.x);
+`;
+
+const WGSL_DETAIL_ONLY_CODE = Object.freeze({
+  CUSTOM_FRAGMENT_BEFORE_LIGHTS: WGSL_DETAIL_CODE,
+});
+const WGSL_VARIED_SURFACE_CODE = Object.freeze({
+  CUSTOM_FRAGMENT_DEFINITIONS: WGSL_DEFINITIONS,
+  CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
+    let campusArtPosition=fragmentInputs.vPositionW.xz+fragmentInputs.vPositionW.y*vec2f(0.37,0.23);
+    campusArtVariation=campusArtNoise(campusArtPosition/uniforms.campusArtSettings.z);
+    ${WGSL_DETAIL_CODE}
+    surfaceAlbedo*=1.0+(campusArtVariation-0.5)*uniforms.campusArtSettings.y;
+  `,
+  CUSTOM_FRAGMENT_UPDATE_METALLICROUGHNESS: `
+    metallicRoughness.g=clamp(metallicRoughness.g+
+      (campusArtVariation-0.5)*uniforms.campusArtResponse.y,0.045,1.0);
+  `,
+});
+
 /** No new texture samples, lights, meshes, displacement, animation or draw calls.
  * World coordinates keep joins stable across independently modelled objects.
  * Macro changes are visibly artistic, not an invented georeferenced patch map. */
@@ -228,10 +275,10 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
   }
 
   override isCompatible(language: ShaderLanguage) {
-    return language === ShaderLanguage.GLSL;
+    return language === ShaderLanguage.GLSL || language === ShaderLanguage.WGSL;
   }
 
-  override getUniforms() {
+  override getUniforms(language = ShaderLanguage.GLSL) {
     return {
       ubo: [
         { name: "campusArtSettings", size: 4, type: "vec4" },
@@ -239,7 +286,9 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
         { name: "campusArtResponse", size: 2, type: "vec2" },
       ],
       fragment:
-        "uniform vec4 campusArtSettings;\nuniform vec4 campusArtDetail;\nuniform vec2 campusArtResponse;",
+        language === ShaderLanguage.GLSL
+          ? "uniform vec4 campusArtSettings;\nuniform vec4 campusArtDetail;\nuniform vec2 campusArtResponse;"
+          : undefined,
     };
   }
 
@@ -265,13 +314,22 @@ export class CampusSurfaceArtPlugin extends MaterialPluginBase {
     );
   }
 
-  override getCustomCode(type: string, language = ShaderLanguage.GLSL) {
-    if (type !== "fragment" || language !== ShaderLanguage.GLSL) return null;
+  override getCustomCode(
+    type: string,
+    language = ShaderLanguage.GLSL,
+  ): Record<string, string> | null {
+    if (type !== "fragment" || !this.isCompatible(language)) return null;
     // Babylon discovers injection points from the base constructor before the
     // derived art field is initialized. Register the complete hook set then;
     // actual shader injection uses the fully initialized material recipe.
-    return this.art?.variation === 0 && this.art.roughnessVariation === 0
-      ? DETAIL_ONLY_CODE
-      : VARIED_SURFACE_CODE;
+    const detailOnly =
+      this.art?.variation === 0 && this.art.roughnessVariation === 0;
+    return language === ShaderLanguage.WGSL
+      ? detailOnly
+        ? WGSL_DETAIL_ONLY_CODE
+        : WGSL_VARIED_SURFACE_CODE
+      : detailOnly
+        ? DETAIL_ONLY_CODE
+        : VARIED_SURFACE_CODE;
   }
 }
