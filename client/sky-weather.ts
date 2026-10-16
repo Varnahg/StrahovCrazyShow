@@ -80,12 +80,13 @@ uniform float strength;
 void main(void) {
   vec2 p=vDisc*6.0;
   float radius=length(p);
+  float cloudOpacity=atmosphereCloudOpacity(normalize(vSkyRay));
   if (sin(altitude)+upY*angularRadius*p.y<0.0) discard;
   float disc=1.0-smoothstep(.99,1.01,radius);
   float halo=exp(-radius*radius*.16)*.12;
   float warm=1.0-smoothstep(0.0,.28,altitude);
   vec3 color=mix(vec3(1.0,.97,.86),vec3(1.0,.67,.32),warm*.75);
-  gl_FragColor=vec4(color,max(disc,halo)*strength*(1.0-atmosphereCloudOpacity(normalize(vSkyRay))));
+  gl_FragColor=vec4(color,max(disc,halo)*strength*(1.0-cloudOpacity));
 }`;
 Effect.ShadersStore.strahovMoonFragmentShader = `
 precision highp float;
@@ -103,7 +104,6 @@ uniform float textureAngle;
 uniform float strength;
 void main(void) {
   float r2=dot(vDisc,vDisc);
-  if (r2>1.0 || sin(altitude)+upY*angularRadius*vDisc.y<0.0) discard;
   vec3 normal=vec3(vDisc,sqrt(max(0.0,1.0-r2)));
   float cs=cos(textureAngle),sn=sin(textureAngle);
   vec3 textureNormal=vec3(normal.x*cs-normal.y*sn,normal.x*sn+normal.y*cs,normal.z);
@@ -111,6 +111,9 @@ void main(void) {
   vec2 uv=vec2(.5+atan(textureNormal.x,textureNormal.z)/6.28318530718,
                .5-asin(clamp(textureNormal.y,-1.0,1.0))/3.14159265359);
   vec3 albedo=texture2D(moonMap,uv).rgb;
+  float cloudOpacity=atmosphereCloudOpacity(normalize(vSkyRay));
+  // All mipmapped reads precede the pixel-dependent limb/horizon discard.
+  if (r2>1.0 || sin(altitude)+upY*angularRadius*vDisc.y<0.0) discard;
   float cosine=dot(normal,lightDirection);
   float lit=pow(max(cosine,0.0),.32)*smoothstep(-.006,.006,cosine);
   float earthshine=.035*(1.0-daylight)*(1.0-(lightDirection.z+1.0)*.5);
@@ -121,7 +124,7 @@ void main(void) {
   // In daylight the unlit lunar surface is hidden by foreground sky radiance.
   // Reveal the exact backdrop instead of painting a dark circular sky-colour guess.
   float visibleSurface=mix(1.0,smoothstep(-.006,.04,cosine),daylight);
-  gl_FragColor=vec4(color,edge*visibleSurface*strength*(1.0-atmosphereCloudOpacity(normalize(vSkyRay))));
+  gl_FragColor=vec4(color,edge*visibleSurface*strength*(1.0-cloudOpacity));
 }`;
 
 export class SkyWeatherController {

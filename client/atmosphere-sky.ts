@@ -118,7 +118,9 @@ vec2 atmosphereLowUV(vec3 direction) {
   return direction.xz / max(direction.y, .085) * ${CLOUD_RAY_SCALES[0]} + atmosphereLowOffset;
 }
 vec4 atmosphereCloudField(vec3 direction) {
-  if (direction.y < -.025 || dot(atmosphereCoverage, vec3(1.0)) < .001) return vec4(0.0);
+  // Coverage is uniform. Pixel-dependent horizon rejection follows sampling so
+  // implicit mip derivatives remain defined across the whole fragment quad.
+  if (dot(atmosphereCoverage, vec3(1.0)) < .001) return vec4(0.0);
   vec2 ray = direction.xz / max(direction.y, .085);
   vec4 lowNoise = texture2D(atmosphereNoise, atmosphereLowUV(direction));
   float low = atmosphereDensity(lowNoise.r, atmosphereCoverage.x);
@@ -134,6 +136,7 @@ vec4 atmosphereCloudField(vec3 direction) {
     vec4 highNoise = texture2D(atmosphereNoise, cirrusRay + vec2(.16, .63));
     high = atmosphereDensity(highNoise.b, atmosphereCoverage.z) * .65;
   }
+  if (direction.y < -.025) return vec4(0.0);
   return vec4(vec3(low, mid, high) * smoothstep(-.025, .015, direction.y), lowNoise.r);
 }
 vec3 atmosphereCloudLayers(vec3 direction) {
@@ -197,13 +200,21 @@ void main(void) {
   // Urban light dome is an artistic, explicitly unmeasured Prague skyglow.
   color += vec3(.024,.017,.014) * horizon * (1.0-day) * (1.0-twilight*.6);
   color += vec3(.11,.15,.21) * moon * (pow(towardMoon,18.0)*.21 + pow(towardMoon,160.0)*.15);
-  if (stars > .001 && d.y > 0.0) {
+  if (stars > .001) {
     vec3 equatorial = worldToCatalog*d;
     vec2 uv = vec2(atan(equatorial.y,equatorial.x)/6.28318530718+.5,
       asin(clamp(equatorial.z,-1.0,1.0))/3.14159265359+.5);
     vec3 starlight = texture2D(atmosphereStars,uv).rgb;
     float extinction = smoothstep(.025,.34,d.y);
-    color += starlight * stars * extinction * (1.0-.55*moon*pow(towardMoon,5.0));
+    if (d.y > 0.0) color += starlight * stars * extinction * (1.0-.55*moon*pow(towardMoon,5.0));
+  }
+  // Keep the uniform quality gate, but sample before cloud opacity/layer tests.
+  // Fixed LOD0 would remove the authored trilinear minification at the horizon.
+  float lightSide = 0.0;
+  if (atmosphereCloudDetail > .5) {
+    vec3 keyDirection = day > .01 ? sunDirection : moonDirection;
+    vec2 key = keyDirection.xz / max(.12,length(keyDirection.xz));
+    lightSide = texture2D(atmosphereNoise,atmosphereLowUV(d)+key*.012).r;
   }
   vec4 cloudField = atmosphereCloudField(d);
   vec3 layers = cloudField.xyz;
@@ -214,9 +225,6 @@ void main(void) {
     float bulk = thickness*.72+layers.y*.28;
     float relief = .5;
     if (atmosphereCloudDetail > .5 && layers.x > .001) {
-      vec3 keyDirection = day > .01 ? sunDirection : moonDirection;
-      vec2 key = keyDirection.xz / max(.12,length(keyDirection.xz));
-      float lightSide = texture2D(atmosphereNoise,atmosphereLowUV(d)+key*.012).r;
       relief = clamp(.5+(cloudField.w-lightSide)*1.7,0.0,1.0);
     }
     vec3 cloudNight = mix(vec3(.020,.027,.043),vec3(.055,.070,.095),moon*.7);
