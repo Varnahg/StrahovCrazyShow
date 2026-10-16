@@ -46,7 +46,8 @@ test("campus artistic surfaces keep bounded physical-scale variation without add
     assert.equal(material.metadata.addedArtDrawCalls, 0);
     assert.equal(material.metadata.originalTextureChannelsUnmodified, true);
     assert.equal(plugin.isCompatible(ShaderLanguage.GLSL), true);
-    assert.equal(plugin.getCustomCode("fragment", ShaderLanguage.WGSL), null);
+    assert.equal(plugin.isCompatible(ShaderLanguage.WGSL), true);
+    assert.ok(plugin.getCustomCode("fragment", ShaderLanguage.WGSL));
     const shader = Object.values(plugin.getCustomCode("fragment")!).join("\n");
     assert.match(shader, /vPositionW/);
     assert.doesNotMatch(shader, /texture2D|textureLod|gl_Position|discard/);
