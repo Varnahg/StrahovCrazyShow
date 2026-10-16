@@ -67,7 +67,7 @@ import { createNavigationClearance } from "./navigation-physics";
 import { updateRainSegments } from "./weather-particles";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { getRendererInfo } from "./gpu-diagnostics";
-import { watchWebGpuValidation } from "./webgpu-validation";
+import { RenderHealth, type RenderHealthSnapshot } from "./render-health";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3, Matrix, Quaternion } from "@babylonjs/core/Maths/math.vector";
@@ -213,6 +213,11 @@ export type Benchmark = {
   p99FrameMs: number;
   renderErrorCount: number;
   assetLoadErrorCount: number;
+  renderHealth?: {
+    start: RenderHealthSnapshot;
+    end: RenderHealthSnapshot;
+    valid: boolean;
+  };
   avatars: number;
   viewport: { width: number; height: number };
   renderResolution: { width: number; height: number };
@@ -339,6 +344,7 @@ export class Game {
     engineWork: Record<string, number>;
     profile: BenchmarkRenderProfile;
     weatherAtStart: Weather | null;
+    healthAtStart: RenderHealthSnapshot;
   };
   network = false;
   ready = false;
@@ -410,6 +416,7 @@ export class Game {
   lights: PointLight[] = [];
   disposed = false;
   renderErrorCount = 0;
+  readonly renderHealth: RenderHealth;
   private startupAssetErrors = 0;
   private textureDiagnostics?: SceneTextureDiagnostics;
   private readonly stableLights: StableLightState;
@@ -512,19 +519,24 @@ export class Game {
     this.profile = profile;
     this.engine = preparedEngine;
     this.canvas.dataset.renderErrorCount = "0";
-    watchWebGpuValidation(this.engine, (message) => {
+    this.renderHealth = new RenderHealth(this.engine, "game", (fault, health) => {
       if (this.disposed) return;
-      this.canvas.dataset.renderErrorCount = String(++this.renderErrorCount);
+      this.renderErrorCount = health.errorCount;
+      this.canvas.dataset.renderErrorCount = String(this.renderErrorCount);
+      this.canvas.dataset.renderHealth = health.phase;
       if (this.renderErrorCount <= 5)
-        sessionDiagnostics.event("webgpu-validation-error", {
-          count: this.renderErrorCount,
-          message,
+        sessionDiagnostics.event("render-fault", {
+          ...fault,
+          rendererId: health.rendererId,
+          purpose: health.purpose,
+          count: health.errorCount,
         });
-      if (this.renderErrorCount === 1)
-        this.notice("Část prostředí se nepodařilo vykreslit. Obnov stránku.");
-    });
-    this.engine.onEffectErrorObservable.add(() => {
-      this.canvas.dataset.renderErrorCount = String(++this.renderErrorCount);
+      if (fault.channel === "device") {
+        this.engine.stopRenderLoop();
+        this.blur();
+        this.notice("Grafické zařízení se odpojilo. Opusť demo a spusť scénu znovu.");
+        return;
+      }
       if (this.renderErrorCount === 1)
         this.notice("Část prostředí se nepodařilo vykreslit. Obnov stránku.");
     });
@@ -558,6 +570,7 @@ export class Game {
     this.textureDiagnostics = new SceneTextureDiagnostics(
       this.scene,
       (count) => {
+        this.renderHealth.report("texture", `Nepodařilo se načíst texturu scény (${count}).`);
         this.canvas.dataset.assetLoadErrorCount = String(
           this.assetLoadErrorCount,
         );
@@ -785,6 +798,11 @@ export class Game {
     sessionDiagnostics.event("lighting-preparation", preparation);
     if (this.disposed) return;
     this.canvas.dataset.lightPreparation = preparation.status;
+    if (preparation.status !== "complete")
+      this.renderHealth.report("pipeline", `Příprava světel: ${preparation.status}`);
+    this.engine.onEndFrameObservable.addOnce(() => {
+      if (this.renderHealth.markReady()) this.canvas.dataset.renderHealth = "ready";
+    });
     this.ready = true;
     this.canvas.dataset.bootStage = "ready";
     this.engine.runRenderLoop(() => this.frame());
@@ -1273,6 +1291,7 @@ export class Game {
       engineWork: {},
       profile: new BenchmarkRenderProfile(this.scene),
       weatherAtStart: this.weather ? structuredClone(this.weather) : null,
+      healthAtStart: this.renderHealth.snapshot(),
     };
   }
   interact() {
@@ -2534,6 +2553,7 @@ export class Game {
           gpu: this.gpu,
           presentationRate: this.presentationRate,
         });
+        const healthAtEnd = this.renderHealth.snapshot();
         this.onBenchmark?.({
           ...diagnostics,
           date: new Date().toISOString(),
@@ -2545,6 +2565,13 @@ export class Game {
           p99FrameMs: sorted[Math.floor(sorted.length * 0.99)],
           renderErrorCount: this.renderErrorCount,
           assetLoadErrorCount: this.assetLoadErrorCount,
+          renderHealth: {
+            start: b.healthAtStart,
+            end: healthAtEnd,
+            valid: b.healthAtStart.valid && healthAtEnd.valid &&
+              b.healthAtStart.generation === healthAtEnd.generation &&
+              this.assetLoadErrorCount === 0,
+          },
           avatars: b.minAvatars,
           viewport: { width: innerWidth, height: innerHeight },
           renderResolution: {

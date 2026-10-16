@@ -1,5 +1,13 @@
 # Ověření dema a známá omezení
 
+## WebGPU migrace · 16. října 2026 · probíhá
+
+[Workflow a přejímka](performance/webgpu-migration.md), Linear KEY-22 až KEY-35. První jednotky mají cílené CPU důkazy: shadow includes 3/3, vegetace 37/37, povrchy 12/12, obloha 22/22, společný async engine/UI lifecycle 44/44 a render health 11/11. Scopované typové kontroly prošly. To není úplná GPU validace ani důkaz zlepšení FPS. Nativní shadow wrapper, shader/pipeline profil, editor a stabilní full pipeline následují; WebGPU dosud není produkční default.
+
+Game explicitně přebírá připravený engine a zachovává identitu canvasu přes async start. Per-engine health rozlišuje Game/preview, device generace, effect/validation/async chyby a zneplatnění benchmarku. Device restore sám neobnovuje připravenost aplikace; ztráta používá restart scény. GPU kompilace a obrazová přejímka zůstávají otevřené. [Průběžné předání](agents/handoffs/webgpu-migrate-root-20261016.md).
+
+V prvním částečném stagingu širší TypeScript check selhal na chybějících server/scripts/assets a rozpracovaném surface return type; opravený scoped check není vydávaný za full build. Jeden nested `pnpm exec` neočekávaně vytvořil vlastní kořenový node_modules v pracovní kopii; byl ihned ukončen, další ověřování používá přímé Node CLI. Hraný frozen4188 ani historický A/B snapshot nejsou migrovány.
+
 ## Propady FPS · 13. října 2026
 
 **703/703 testů PASS, finální produkční build včetně TypeScript a celá izolovaná síťová integrace PASS.** Po celé sadě se opravily pouze dvě typové deklarace; jejich transpilační výstup je přesně stejný. Záznam všech checkpointů, obou předchozích neúspěšných testů a první typové chyby je v [auditu a evidenci](performance/fps-drops-20261013.md). Finální snapshot `c48c0e1898b37075401f56005e3863b25b62b27867baa55643aa4b45fad1dc09` obsahuje **8363 vstupních souborů včetně testů**.
