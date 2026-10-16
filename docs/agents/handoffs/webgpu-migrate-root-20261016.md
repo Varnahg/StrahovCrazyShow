@@ -14,6 +14,10 @@ Actual Game/UI regression group: **72/72 PASS**, strict scoped TypeScript **PASS
 
 Clean vegetation and surface units were integrated separately into main as0c0a17e andcdd439c, with all124 foreign working files plus git status/diff byte-identical. Other shared Game/UI integration remains pending. An isolated profiling copy native-v4 uses the exact native-v3 source hash and read-only served dist on4193/API2588; live4192/API2587 and its dependencies remain untouched. Both observed automated Edge runs still have approximately1Hz cadence; a foreground confirmation is pending. No valid new FPS claim is made.
 
+### Whole-checkpoint fixture compatibility
+
+Native-v5 source6d961ab0 ran the full suite:1141/1142 passed in147.1s. The sole failure was the actual Game disposal VM fixture missing the newly required startupAbort dependency. The fixture now supplies a real AbortController and explicit renderHealth disposal and asserts both cancellation and health-before-scene order; original teardown/idempotence assertions remain. The10 targeted lifecycle/startup regressions pass. The migration-owned startup fixture was renamed to tests/game-webgpu-startup.test.ts to avoid the primary checkout's unrelated untracked tests/game-startup.test.ts. No foreign fixture was adopted. Native-v5 remains frozen, including its failure log; the corrected complete checkpoint follows separately.
+
 ## User playtest handoff — migration paused
 
 2026-10-16 user requested stopping further development and starting the quickest playable build. Frozen `native-v3`, commit `f969bd18d374814bcebad5628e57f9475e25b0b3`, source snapshot `4979284c89088eb2e4cf36d5f96202d9c580f6f0818e6a700b956d53cb1906b9` (8438 inputs), is running at http://127.0.0.1:4192/?renderBackend=webgpu with API2587. Edge tab2070822668 is a user deliverable, viewport override reset. Actual scene/avatar/cars/world rendered; renderer-ready reports WebGPU, nvidia/pascal; B6/car/physics ready and game-ready observed. This is a working migration checkpoint, not complete acceptance.
