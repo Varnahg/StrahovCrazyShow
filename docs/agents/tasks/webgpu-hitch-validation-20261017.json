@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-hitch-validation-20261017",
+  "title": "KEY-31: izolovaně reprodukovat a ověřit dlouhé WebGPU snímkové mezery",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-hitch-validation-20261017/",
+    "docs/agents/handoffs/webgpu-hitch-validation-20261017.md"
+  ],
+  "resources": [
+    "port:4194",
+    "port:2589"
+  ],
+  "acceptance": [
+    "Zachovat C5 uživatelský snapshot a služby4193/2588 i starší4192/4188 beze změny zdrojů/dist/assets/dependencies.",
+    "Oddělená kopie produkční scény s přesnou proveniencí. Nejprve využít stávající lokální frame/environment profiler; žádná nová diagnostická runtime vrstva bez doložené chybějící hranice.",
+    "Rozlišit Game CPU, celý engine frame, raw RAF, GPU completion a browser scheduling; nezaměňovat8smezeru s8sJSblokací.",
+    "Měřit spuštění→ready a srovnatelný first/warm F, quality/light/B6 přechod; profilerové výsledky nejsou finálníFPS přejímka."
+  ],
+  "verification": [
+    "Manifest zdrojů/testů a readonly dependency/asset provenance, SHA baseline a kandidáta, explicitní vlastnictví všech procesů/portů.",
+    "GPU a heavy-validation provádí pouze root při současně držených původních rezervacích; předGPU ověřit skutečné živé scény.",
+    "Po změně použít relevantní cílené testy a stabilní fullpipeline; přesný případ a omezení předat."
+  ],
+  "notes": [
+    "Uživatel17.10 výslovně zadal zaměřit migraci přesBMAD na osmivteřinové záseky, průběžněcommitovat/Linear.",
+    "Root koordinátor; runtime kód je mimo tuto validační rezervaci a před implementací dostane přesný task. BMAD spec bude v rezervovaném parentadresáři webgpu-migration-20261017.",
+    "C5 seq849:8001.2ms mezera při běžících klientských síťových callbackech; konkrétní příčina ještě není určena."
+  ]
+}

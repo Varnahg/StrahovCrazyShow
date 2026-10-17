@@ -1,0 +1,400 @@
+{
+  "seq": 14435,
+  "atMs": 707140.2,
+  "kind": "engine-frame-profile",
+  "data": {
+    "stage": "engine-disposed",
+    "rendererId": 2,
+    "timing": {
+      "active": false,
+      "generation": 1,
+      "scope": {
+        "cpu": "Inclusive synchronous CPU wall calls, including nested work; never sum parent and child phases. Not GPU execution time.",
+        "async": "Async completion is unobserved. Return values are never inspected for then or given settlement handlers; original Promise rejection handling stays with the caller. Returned/thrown count only synchronous call outcomes.",
+        "cadence": "Concurrent raw host RAF, engine _processFrame and render-loop callback intervals are distinct; none is a gameplay FPS benchmark.",
+        "recent": "Cadence quantiles describe only the latest 128 valid intervals; count/total/max cover this engine generation or raw-probe epoch. Compare deltas only within matching owners/epochs."
+      },
+      "phases": {
+        "processFrame": {
+          "calls": 21684,
+          "returned": 21684,
+          "thrown": 0,
+          "timingSamples": 21684,
+          "cpuTotalMs": 426933.49999678135,
+          "cpuMaxMs": 5944,
+          "asyncCompletion": "unobserved"
+        },
+        "beginFrame": {
+          "calls": 21688,
+          "returned": 21688,
+          "thrown": 0,
+          "timingSamples": 21688,
+          "cpuTotalMs": 89.79999965429306,
+          "cpuMaxMs": 0.30000001192092896,
+          "asyncCompletion": "unobserved"
+        },
+        "renderFrame": {
+          "calls": 21684,
+          "returned": 21684,
+          "thrown": 0,
+          "timingSamples": 21684,
+          "cpuTotalMs": 425528.7000002861,
+          "cpuMaxMs": 5943.700000017881,
+          "asyncCompletion": "unobserved"
+        },
+        "endFrame": {
+          "calls": 21688,
+          "returned": 21688,
+          "thrown": 0,
+          "timingSamples": 21688,
+          "cpuTotalMs": 947.9999969601631,
+          "cpuMaxMs": 1.699999988079071,
+          "asyncCompletion": "unobserved"
+        },
+        "queueFrame": {
+          "calls": 21686,
+          "returned": 21686,
+          "thrown": 0,
+          "timingSamples": 21686,
+          "cpuTotalMs": 123.00000005960464,
+          "cpuMaxMs": 0.19999998807907104,
+          "asyncCompletion": "unobserved"
+        },
+        "flush": {
+          "calls": 21691,
+          "returned": 21691,
+          "thrown": 0,
+          "timingSamples": 21691,
+          "cpuTotalMs": 744.7999976277351,
+          "cpuMaxMs": 1.699999988079071,
+          "asyncCompletion": "unobserved"
+        },
+        "endCurrentPass": {
+          "calls": 365915,
+          "returned": 365915,
+          "thrown": 0,
+          "timingSamples": 365915,
+          "cpuTotalMs": 6902.599995046854,
+          "cpuMaxMs": 82.5,
+          "asyncCompletion": "unobserved"
+        },
+        "timestampStart": {
+          "calls": 21691,
+          "returned": 21691,
+          "thrown": 0,
+          "timingSamples": 21691,
+          "cpuTotalMs": 10.300000041723251,
+          "cpuMaxMs": 0.10000002384185791,
+          "asyncCompletion": "unobserved"
+        },
+        "timestampEnd": {
+          "calls": 21688,
+          "returned": 21688,
+          "thrown": 0,
+          "timingSamples": 21688,
+          "cpuTotalMs": 16.599999874830246,
+          "cpuMaxMs": 0.10000002384185791,
+          "asyncCompletion": "unobserved"
+        },
+        "timestampPassEnd": {
+          "calls": 157765,
+          "returned": 157765,
+          "thrown": 0,
+          "timingSamples": 157765,
+          "cpuTotalMs": 6011.299996137619,
+          "cpuMaxMs": 82.5,
+          "asyncCompletion": "unobserved"
+        },
+        "destroyTextures": {
+          "calls": 21689,
+          "returned": 21689,
+          "thrown": 0,
+          "timingSamples": 21689,
+          "cpuTotalMs": 22.799999982118607,
+          "cpuMaxMs": 0.9000000059604645,
+          "asyncCompletion": "unobserved"
+        },
+        "destroyBuffers": {
+          "calls": 21689,
+          "returned": 21689,
+          "thrown": 0,
+          "timingSamples": 21689,
+          "cpuTotalMs": 23.99999976158142,
+          "cpuMaxMs": 4.300000011920929,
+          "asyncCompletion": "unobserved"
+        },
+        "createEncoder": {
+          "calls": 201166,
+          "returned": 201166,
+          "thrown": 0,
+          "timingSamples": 201166,
+          "cpuTotalMs": 680.5999989211559,
+          "cpuMaxMs": 2.0999999940395355,
+          "asyncCompletion": "unobserved"
+        },
+        "encoderFinish": {
+          "calls": 201166,
+          "returned": 201166,
+          "thrown": 0,
+          "timingSamples": 201166,
+          "cpuTotalMs": 314.69999971985817,
+          "cpuMaxMs": 0.20000001788139343,
+          "asyncCompletion": "unobserved"
+        },
+        "beginRenderPass": {
+          "calls": 159200,
+          "returned": 159200,
+          "thrown": 0,
+          "timingSamples": 159200,
+          "cpuTotalMs": 1905.7000018656254,
+          "cpuMaxMs": 4,
+          "asyncCompletion": "unobserved"
+        },
+        "passEnd": {
+          "calls": 159200,
+          "returned": 159200,
+          "thrown": 0,
+          "timingSamples": 159200,
+          "cpuTotalMs": 124.3000001013279,
+          "cpuMaxMs": 0.20000001788139343,
+          "asyncCompletion": "unobserved"
+        },
+        "currentTexture": {
+          "calls": 43089,
+          "returned": 43089,
+          "thrown": 0,
+          "timingSamples": 43089,
+          "cpuTotalMs": 726.8000007867813,
+          "cpuMaxMs": 4.199999988079071,
+          "asyncCompletion": "unobserved"
+        },
+        "writeBuffer": {
+          "calls": 2910943,
+          "returned": 2910943,
+          "thrown": 0,
+          "timingSamples": 2910943,
+          "cpuTotalMs": 7687.999999433756,
+          "cpuMaxMs": 987.5,
+          "asyncCompletion": "unobserved"
+        },
+        "writeTexture": {
+          "calls": 21568,
+          "returned": 21568,
+          "thrown": 0,
+          "timingSamples": 21568,
+          "cpuTotalMs": 536.9999988377094,
+          "cpuMaxMs": 0.30000001192092896,
+          "asyncCompletion": "unobserved"
+        },
+        "copyExternalImage": {
+          "calls": 140,
+          "returned": 140,
+          "thrown": 0,
+          "timingSamples": 140,
+          "cpuTotalMs": 100.00000005960464,
+          "cpuMaxMs": 11.899999976158142,
+          "asyncCompletion": "unobserved"
+        }
+      },
+      "hooks": {
+        "encoder.finish": {
+          "availability": "installed",
+          "observedObjects": 201168,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "encoder.beginRenderPass": {
+          "availability": "installed",
+          "observedObjects": 201168,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "pass.end": {
+          "availability": "installed",
+          "observedObjects": 159200,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "lifecycle.dispose": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "lifecycle.restore": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "engine._processFrame": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "engine.beginFrame": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "engine._renderFrame": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "engine.endFrame": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "engine._queueNewFrameForRenderLoop": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "engine.flushFramebuffer": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "engine._endCurrentRenderPass": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "engine._isOverFrameTime": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "engine._initializeLimits": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "context.getCurrentTexture": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "device.createCommandEncoder": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "queue.writeBuffer": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "queue.writeTexture": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        },
+        "queue.copyExternalImageToTexture": {
+          "availability": "installed",
+          "observedObjects": 1,
+          "missedObjects": 0,
+          "reason": null
+        }
+      },
+      "runtime": {
+        "frameId": 21685,
+        "maxFPS": null,
+        "maxFPSDefined": false,
+        "activeRenderLoops": 0,
+        "customRequester": false,
+        "contextLost": false,
+        "skipFrameRender": false,
+        "windowIsBackground": false,
+        "renderEvenInBackground": true,
+        "hostWindowAvailable": true,
+        "hostWindowIsGlobal": true,
+        "rawProbeUsesCurrentHost": false,
+        "enableGPUTimingMeasurements": true,
+        "timerQueryCapability": true,
+        "timestampQueryFeature": true
+      },
+      "observerErrors": 0,
+      "invalidClocks": 0,
+      "resources": {
+        "tracked": 0,
+        "peak": 3,
+        "limit": 512,
+        "missed": 0
+      },
+      "rawRaf": {
+        "availability": "stopped",
+        "epoch": 2,
+        "source": "engine-host",
+        "deliveryClock": "same-window-or-explicit-injection",
+        "callbacks": 22424,
+        "intervals": {
+          "count": 22423,
+          "totalMs": 527754.6780000001,
+          "maxMs": 5944.899999999994,
+          "recentSamples": 128,
+          "recentP50Ms": 33.29999999993015,
+          "recentP95Ms": 49.89999999990687
+        },
+        "deliveryDelay": {
+          "count": 22424,
+          "totalMs": 116073.15627001025,
+          "maxMs": 1120.6000000000058,
+          "recentSamples": 128,
+          "recentP50Ms": 9.5,
+          "recentP95Ms": 17.200000017881393
+        }
+      },
+      "engineCadence": {
+        "processIntervals": {
+          "count": 21683,
+          "totalMs": 520874.2999999821,
+          "maxMs": 8958.799999982119,
+          "recentSamples": 128,
+          "recentP50Ms": 27.80000001192093,
+          "recentP95Ms": 37.19999998807907
+        },
+        "renderCallbackIntervals": {
+          "count": 21683,
+          "totalMs": 520874.1999999881,
+          "maxMs": 8958.799999982119,
+          "recentSamples": 128,
+          "recentP50Ms": 27.80000001192093,
+          "recentP95Ms": 37.19999998807907
+        },
+        "timestampIntervals": {
+          "count": 21683,
+          "totalMs": 521993.4,
+          "maxMs": 8958.900000000023,
+          "recentSamples": 128,
+          "recentP50Ms": 33.29999999993015,
+          "recentP95Ms": 49.89999999990687
+        },
+        "queueToProcess": {
+          "count": 21684,
+          "totalMs": 84566.50000339746,
+          "maxMs": 3719.0999999940395,
+          "recentSamples": 128,
+          "recentP50Ms": 1,
+          "recentP95Ms": 3.9000000059604645
+        },
+        "skippedByMaxFPS": 0
+      }
+    }
+  }
+}

@@ -1,5 +1,31 @@
 # Předání: webgpu-migrate-pipeline-20261016 (KEY-31)
 
+## Navazující reprodukce globálního light churn, 17. 10. 2026
+
+Vlastník této výslovně omezené reprodukce je `webgpu-hitch-light-probe-20261017` (`shader_inventory`), příjemce root. Před zápisem získán claim; zápisy pouze do nového `.cache/webgpu-migration-checks/pipeline/light-churn-20261017/` a tohoto předání. Žádný produkční runtime/test, frozen snapshot, asset ani dependency se nezměnil; žádný další BMAD/skill/spawn. Primární AGENTS/policy byly načtené v navazujícím výzkumu.
+
+`node probe.mjs` používá skutečné pinned Babylon 9.30 NullEngine/Scene/Light/PBRMaterial/StandardMaterial/mesh readiness metody. Deterministická fixture má 18 materiálových uživatelů: 8 dalekých PBR, 8 dalekých Standard, 2 blízké. Veškeré AABB dalekých meshů leží mimo obě zkoušené vzdálenosti. Po `setEnabled(true)` pro point range12 i spot range24 byly u **16/16 dalekých** uživatelů dirty light defines, změněné LIGHT/type/falloff defines a jiná vázaná Effect identity. Disable znečistil všech 18. Jde o počet postižených materiálových uživatelů, nikoli 16 unikátních shader programů či GPU kompilací. Immediate i finální readiness na NullEngine byly true; to není GPU readiness důkaz.
+
+Kontroly alternativ ve stejné izolované fixture:
+
+- Enabled light s intensity0: žádná nová dirtiness ani změna defines/Effectu, ale členství a slot zůstaly.
+- Pouze dvě konzervativně zasažené AABB v includedOnlyMeshes: **farDirty0 / farEffectChanges0**, oba blízké materiály aktualizované. Toto není produkční membership oprava; globální budget lamp fixture nereprodukuje.
+- Box široký100m s centrem50m daleko má AABB minimální vzdálenost0. Source regular-instance je99m daleko, ale jeho instance má minimum2m. Skutečné thin-instance aggregate bounds po refresh mají také minimum2m přes protisměrné source/instance transformace. Center-only nebo source-only vyřazení tedy není konzervativní.
+
+Finální úspěšný interval fixture/cleanup: **18:28:22.300–18:28:22.651 UTC**,349ms wall, processCPU265ms user+109ms system po module imports; command1.50s včetně importů. Předchozí pokus18:27:20UTC měl chybějící side-effect import InstancedMesh (command9.8s); další18:27:49.809–18:27:50.141UTC prokázal defaultně unsupported thin-instance capability v NullEngine. Finální thin-instance příklad tuto capability zapnul výhradně pro CPU bookkeeping, nikoli jako předstírání GPU podpory. Root obdržel přesná UTC okna kvůli souběžnému QA profilu. Všechny procesy skončily a scény/enginy jsou disposed.
+
+`node shader-audit.mjs` prošel pro oba pinned GLSL/WGSL zdroje i skutečné per-light defines fixture. Ordinary Standard point/spot má lineární cutoff; explicitní PBR `LIGHT_FALLOFF_STANDARD` z obou projektových controllerů má stejný cutoff a přednost před material-level physical/GLTF fallback. PBR physical fallback sám o sobě konečný cutoff nemá. LIGHTMAPEXCLUDED/SHADOWONLY/custom lighting, neznámé nebo frozen materiály a deformované/instanced bounds nelze bez dalšího důkazu zahrnout. Nulový přímý příspěvek vyřazované lampy také nestačí: její odebrání z oříznutého light listu může do limitu povýšit jinou viditelnou lampu. C5 navíc rezervuje **globální** streetCapacity pro B6/F, takže samotný lokální filtr nezruší samostatné globální změny pouličních lamp.
+
+Podrobné srovnání konzervativních AABB/sphere memberships, stabilních enabled slotů s nulovou intenzitou a descriptor-exact async prewarm včetně výkonu/obrazu/cache/lifecycle je v `light-churn-20261017/analysis.md`. Sphere je levnější a více nadmnožinová, AABB těsnější; obě potřebují aktuální světové bounds všech členů batch a deformací. Zero-intensity slots mohou vytlačit jiné lampy ze čtyř slotů a ponechat shadow práci. Existující async prewarm musí odpovídat skutečným override/instance buffers, textureState a target/depth/MSAA/render stavům; neodstraňuje samo globální CPU define přestavbu. Žádná varianta tímto probe není vybraná jako produkční oprava ani příčina 8s pauzy.
+
+Evidence:
+- `probe-final.log`, `report.json`: exit0, všechny assertions prošly; report SHA `87725dfa35c5340c14a5696c927039e4f58892f6754f49cca9e90f2a2b3ed532`.
+- `shader-audit.log/json`: exit0, oba jazyky a skutečné flags prošly; vzorce jsou zdrojově ověřené, nikoli vykonané na GPU.
+- `analysis.md` SHA `6c22250049fa32de63f7cfdaa3961d3cf2de87a6b5300896378021c300615411`.
+- `manifest.json` SHA **`b1069ac5e4d293e2c6ddc027f83c2e952e29f3b9931a04ac067f3447a6810791`**: report/probe/log/audit hashy, pinned shader/method source hashy a šest C5 controller/helper zdrojů ověřených proti frozen source manifestu.
+
+Výslovné předání rootu: tento handoff a nový hashovaný probe adresář. Žádný runtime commit/staging, full suite, build, instalace, server ani GPU. Po předání agent uvolní claim a slot; root rozhodne o případném dalším úzkém návrhu a produkčním měření.
+
 Vlastník `webgpu-mig-01a14497-pipeline`, příjemce root, WT `C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow`, větev codex/webgpu-migration. Claim získán před zápisem. Tento díl je měření pro první native GPU profil; nezavádí dosud žádnou výkonovou optimalizaci ani vendor patch.
 
 ## Průzkum a rozhodnutí před implementací

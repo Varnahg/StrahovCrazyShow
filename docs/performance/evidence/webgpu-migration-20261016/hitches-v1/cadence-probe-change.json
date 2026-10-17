@@ -1,0 +1,10 @@
+{
+  "atUTC": "2026-10-17T18:45:22.800Z",
+  "base": "c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5",
+  "snapshot": "080bf024949f07332b1f18e42a6f80c01a72fe9f1423bfe622c075409b5d30d9",
+  "paths": [
+    "client/game.ts",
+    "tests/game-diagnostics.test.ts"
+  ],
+  "code": "    // Isolated research probe: reuse the existing opt-in profiler at the exact\n    // incident boundary; ordinary frames and non-profiled games do no work here.\n    if (this.frameLifecycleProfile && this.engine.isWebGPU &&\n        Number.isFinite(rawFrameMs) && rawFrameMs >= 250) {\n      try {\n        sessionDiagnostics.event(\"engine-frame-profile\", {\n          stage: \"frame-gap\", rendererId: this.renderHealth.rendererId,\n          frameMs: rawFrameMs, currentCpuStartMs: frameStarted,\n          intervalStartMs: Math.max(0, frameStarted - rawFrameMs),\n          intervalEndMs: frameStarted, visibility: document.visibilityState,\n          timing: this.frameLifecycleProfile.snapshot(),\n          scope: \"Engine delta ends at current Game entry. Current process/render calls are still in progress; compare only matching renderer/generation/raw epoch.\",\n        });\n      } catch { /* Diagnostic failures must not interrupt rendering. */ }\n    }\n"
+}
