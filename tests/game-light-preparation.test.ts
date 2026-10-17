@@ -246,13 +246,13 @@ function fixture(t: import("node:test").TestContext) {
     lightStates,
     engine,
     health,
-    start: () => {
+    start: (pipelines?: { isReady(): boolean }) => {
       assert.equal(
         typeof game.prepareLighting,
         "function",
         "actual Game must prepare its initial light variants before ready",
       );
-      return game.prepareLighting(render);
+      return game.prepareLighting(render, pipelines);
     },
     tick() {
       now += 16;
@@ -283,6 +283,21 @@ function fixture(t: import("node:test").TestContext) {
     },
   };
 }
+
+test("actual Game light stages wait for pipeline and complete-frame readiness", async (t) => {
+  const f = fixture(t);
+  let ready = false;
+  const preparation = f.start({ isReady: () => ready });
+  for (let i = 0; i < 12; i++) f.tick();
+  assert.equal(f.states.length, 1, "pending native pipeline must keep the current light stage");
+  assert.equal(f.game.ready, false);
+  ready = true;
+  f.finish();
+  const result = await preparation;
+  assert.equal(result.status, "complete");
+  assert.equal(result.stages.length, 9);
+  assert.ok(result.stages.every((stage: { renders: number }) => stage.renders >= 3));
+});
 
 test("actual Game shader inventory follows the real loopback diagnostic opt-in", () => {
   const constructor = declaration.members.find(ts.isConstructorDeclaration)!;
@@ -525,7 +540,7 @@ test("production startup awaits preparation before ready and records its outcome
   const start = declaration.members
     .find((node) => node.name?.getText(source) === "start")!
     .getText(source);
-  const prepare = start.search(/await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(preloadRender\)/);
+  const prepare = start.search(/await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(preloadRender, pipelinePreparation\)/);
   assert.ok(prepare > start.indexOf("this.updatePlayers([this.localPlayer])"));
   assert.ok(
     prepare > start.indexOf("this.engine.stopRenderLoop(preloadRender)"),

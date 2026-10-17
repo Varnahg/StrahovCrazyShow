@@ -66,7 +66,7 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(`(function(env) {
-  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, SurfacePack, CinematicAtmosphere, VehicleLighting, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady } = env;
+  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady } = env;
   ${compiled}
   return StartupGame;
 })`).runInThisContext();
@@ -131,6 +131,9 @@ function fixture(
   const events: { kind: string; data: unknown }[] = [];
   const shaderStages: string[] = [];
   let gateReadiness: (() => boolean) | undefined;
+  let gateRender: (() => void) | undefined;
+  let pipelineReady = true, pipelineFrameComplete = true, targetRetries = 0;
+  const pipelineScopes: { disposed: number; renders: number }[] = [];
   const disposable = () => ({ dispose: () => disposedAssets++ });
   const carAsset = {
     ...disposable(),
@@ -180,6 +183,27 @@ function fixture(
     },
     CinematicAtmosphere: class {},
     VehicleLighting: class {},
+    // GPU/cache IO is covered by the helper's pinned-engine tests. This fixture
+    // executes actual Game ownership and both readiness integration points.
+    WebGpuPipelinePreparation: class {
+      readonly state = { disposed: 0, renders: 0 };
+      constructor(_engine: unknown, private options: {
+        signal: AbortSignal; retryIncompleteFrame(): void;
+      }) {
+        assert.equal(_engine, engine);
+        assert.equal(options.signal, game.startupAbort.signal);
+        pipelineScopes.push(this.state);
+      }
+      render(callback: () => void) {
+        assert.equal(this.state.disposed, 0);
+        this.state.renders++;
+        callback();
+        if (!pipelineFrameComplete) this.options.retryIncompleteFrame();
+        return pipelineFrameComplete;
+      }
+      isReady() { return pipelineReady && pipelineFrameComplete; }
+      dispose() { this.state.disposed++; }
+    },
     sessionDiagnostics: {
       event: (kind: string, data: unknown) => events.push({ kind, data }),
     },
@@ -187,9 +211,11 @@ function fixture(
       health: RenderHealth;
       signal: AbortSignal;
       isReady(): boolean;
+      render(): void;
     }) => {
       gateCalls++;
       gateReadiness = input.isReady;
+      gateRender = input.render;
       assert.equal(input.health, health);
       assert.equal(input.signal, game.startupAbort.signal);
       await health.guard(gate.promise);
@@ -212,7 +238,10 @@ function fixture(
     applyAdaptiveQuality() {},
     gltfLightBudget: { prepareFrame() {} },
     stableLights: { update() {} },
-    scene: { render() {}, getActiveMeshes: () => ({ length: 0, data: [] }) },
+    scene: {
+      render() {}, getActiveMeshes: () => ({ length: 0, data: [] }),
+      objectRenderers: [{ resetRefreshCounter() { targetRetries++; } }],
+    },
     car: { dispose() {} },
     parkedCar: { dispose() {} },
     camera: {},
@@ -228,11 +257,12 @@ function fixture(
       snapshot: () => ({}),
       setStage: (stage: string) => shaderStages.push(stage),
     },
-    prepareLighting: async () => ({
-      status: options.preparation ?? "complete",
-      elapsedMs: 1,
-      stages: [],
-    }),
+    prepareLighting: async (render: () => void, pipelines: { isReady(): boolean }) => {
+      assert.equal(pipelineScopes.length, 1);
+      assert.equal(pipelines.isReady(), pipelineReady && pipelineFrameComplete);
+      render();
+      return { status: options.preparation ?? "complete", elapsedMs: 1, stages: [] };
+    },
   });
   initializeHealth({
     RenderHealth,
@@ -249,6 +279,12 @@ function fixture(
     events,
     shaderStages,
     gateReadiness: () => gateReadiness!(),
+    renderGate: () => gateRender!(),
+    pipelineScopes,
+    pipelineState(ready: boolean, complete = true) {
+      pipelineReady = ready; pipelineFrameComplete = complete;
+    },
+    targetRetries: () => targetRetries,
     completeAssets: () => {
       interior.resolve(interiorAsset);
       vegetation.resolve(vegetationAsset);
@@ -275,6 +311,7 @@ test("actual Game start cannot become playable until the submitted-frame gate su
   assert.equal(f.health.snapshot().valid, true);
   assert.equal(f.shaderStages.at(-1), "ready");
   assert.equal(f.loops.size, 1);
+  assert.equal(f.pipelineScopes[0].disposed, 1, "scope ends before interactive frames");
 });
 
 test("actual Game rejects an incomplete light preparation instead of announcing ready", async (t) => {
@@ -284,6 +321,39 @@ test("actual Game rejects an incomplete light preparation instead of announcing 
   assert.equal(f.game.ready, false);
   assert.equal(f.health.snapshot().valid, false);
   assert.equal(f.loops.size, 0);
+  assert.equal(f.pipelineScopes[0].disposed, 1, "failed preparation restores owned hooks");
+});
+
+test("actual Game retains async scope through final gate, rejects incomplete draws and retries object targets", async (t) => {
+  const f = fixture(t), start = f.game.start();
+  await settle();
+  assert.equal(f.pipelineScopes[0].disposed, 0);
+  f.pipelineState(false);
+  assert.equal(f.gateReadiness(), false, "pending pipeline is not a ready scene");
+  f.pipelineState(true, false);
+  f.renderGate();
+  assert.equal(f.targetRetries(), 1, "including shared or once-only ObjectRenderers");
+  assert.equal(f.gateReadiness(), false, "settled Promise does not accept an incomplete draw");
+  f.pipelineState(true, true);
+  f.renderGate();
+  assert.equal(f.gateReadiness(), true);
+  assert.equal(f.pipelineScopes[0].renders, 3);
+  f.gate.resolve();
+  await start;
+  assert.equal(f.pipelineScopes[0].disposed, 1);
+});
+
+test("actual Game final-gate fault releases async scope and never starts gameplay", async (t) => {
+  const f = fixture(t), start = f.game.start();
+  await settle();
+  f.health.report("pipeline", new Error("async native pipeline rejected"));
+  await assert.rejects(start);
+  assert.equal(f.pipelineScopes[0].disposed, 1);
+  assert.equal(f.game.ready, false);
+  assert.equal(f.loops.size, 0);
+  f.gate.resolve();
+  await settle();
+  assert.equal(f.pipelineScopes[0].disposed, 1);
 });
 
 test("actual Game final gate checks pending native effects after the variants were restored", async (t) => {
