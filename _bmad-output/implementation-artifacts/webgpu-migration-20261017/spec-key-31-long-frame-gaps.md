@@ -2,7 +2,7 @@
 title: 'KEY-31: odstranit dlouhé čekání po změně světel a materiálů'
 type: 'bugfix'
 created: '2026-10-17'
-status: 'ready-for-dev'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '86e0b6460514231b97d3159b640e85a7f2337c1f'
@@ -55,9 +55,10 @@ context:
 - [x] Skutečný PBR/TreeWind/Fresh wrapper CPU proof: OFF render ruší připravené ON depth varianty, jejich další zdroj/defines jsou shodné, tokeny nové. GLSL/NullEngine není GPU přejímka.
 - [x] V Edge použít existující UI benchmark přes první F a uložit compilation.start/end. Všech80nových WGSL modulů známých, žádné raw/body ani nové odvozené duplicity, limity nedosaženy, health pending/errors0. [Úplná evidence](../../../docs/performance/evidence/webgpu-migration-20261016/hitches-v4/README.md).
 - [x] Zvolit další úzký zásah: exact async pipeline preparation pouze během stávajícího startupu, pod coverem a bez rozšíření variant. Hitches-v4 neposkytuje důvod pro identickou WGSL cache; stable torch mění fixed-cap výběr a vyžaduje širší redesign.
-- [ ] `webgpu-migrate-pipeline-20261016`: nový `client/webgpu-pipeline-preparation.ts` a stejnojmenný test. Vlastněné instance miss/callsite brány použijí native descriptor a token, bounded async pending/result; skutečnou pipeline zapíše původní synchronní cache cesta až při dalším aktuálním požadavku. Žádné pozdní async cache zápisy. Privátní pending signál neopustí vlastní draw/clear hranici; skutečné chyby zůstanou chybami.
-- [ ] Root `client/game.ts`: scope před prepareLighting až přes finální startup gate, helper frame completeness + pending/unconsumed vstupují do existující readiness. Incomplete RTT se musí znovu skutečně vykreslit. Zachovat dvě kompletní acceptance draws, timeouty, aktuální varianty, abort/dispose a ownership hooků. WebGL/fast nemění chování; žádná async scope během hraní.
-- [ ] Prototyp ověřit skutečnou pinned cache/draw/clear cestou, instancing/texture/MRT/MSAA descriptor parity, pending dedup/limity, rejection/abort/dispose/stalecontext, RTT retry a integrací readiness. Pak jediný QA startup pilot; teprve s doloženým přínosem širší stabilní pipeline.
+- [x] `webgpu-migrate-pipeline-20261016`: nový `client/webgpu-pipeline-preparation.ts` a stejnojmenný test. Vlastněné instance miss/callsite brány používají native descriptor a token, bounded async pending/result; skutečnou pipeline zapíše původní synchronní cache cesta až při dalším aktuálním požadavku. Žádné pozdní async cache zápisy. Privátní pending signál neopouští vlastní draw/clear hranici; skutečné chyby zůstávají chybami.
+- [x] Root `client/game.ts`: scope před prepareLighting až přes finální startup gate, helper frame completeness + pending/unconsumed vstupují do existující readiness. Incomplete RTT se znovu vykreslí; neaktivní ready orphan lze uvolnit po skutečném retry. Zachovány dvě kompletní acceptance draws, timeouty, aktuální varianty, abort/dispose a ownership hooků. WebGL/fast mají inertní cestu; během hraní async scope není.
+- [x] Pinned proof29/29 a scopedTS0, native1296/1296 a kombinovaná produkce1352/1352, oba pnpm build/integration PASS. Tři QA startup páry, produkční pár bez detailní diagnostiky, prvníF a skutečný cancel/reentry mají [úplnou evidenci](../../../docs/performance/evidence/webgpu-migration-20261016/hitches-v5/README.md). Runtime8d20cecc72066b498e735b8b2524fd23baa19eff → main232cffb1fd67b47766fedd2b27c933ddf786e617.
+- [ ] Další CPU proof: skutečná prezentace spawn→denní B6 OFF/ON→restore, ordered light/define/instance/pass identity a main/depth reuse. B6 props jsou mimo spawn odpojené ze scene.meshes; rozšířit běžný mesh sweep nestačí. Konkrétní chybějící světelný layout zatím není prokázaný. Teprve potom případný dvouetapový QA kandidát, bez nové cache a bez změny fyziky/sítě.
 - [ ] U přijatého kandidáta dokončit refaktor, regrese, stabilní native i kombinovaný test/build/integraci, GPU obraz a srovnatelné cold/warm/startup měření; samostatný commit/main/Linear.
 
 **AC:** Given stejný přechod F/čas/quality/B6, when se použije kandidát, then musí zkrátit celou prodlevu při stejném světle/obrazu a bez nepřiznaného přesunu do startupu. Given výkonové tvrzení, then musí mít odpovídající produkční důkaz se zdrojem, GPU, rozlišením, p95/p99 a zdravým lifecycle. Neprovedené přejímky zůstávají neověřené.
@@ -85,6 +86,10 @@ Full pnpm test/build/izolovaná integration se pro zamítnutý receiver pokus ne
 17.10: první implementační varianta po GPU pilotu zamítnuta a vrácena. Další rozhodnutí se opírá o skutečný lifecycle proof a chybějící runtime inventář; status draft znamená technický průzkum, ne čekání na souhlas.
 
 17.10 21:10UTC: doplněn skutečný inventář prvního F. Deduplikační hypotéza pro tento burst nepotvrzena. Výzkum další změny porovnává stabilní fyzickou skladbu světel a přesnou async přípravu; nelze pouze zadržet obraz do kompilace a nazvat to odstraněním záseku.
+
+17.10 21:43UTC: async helper a Game wiring jsou implementované, cílené leaf28/28 a Game39/39 prošly; společný QA checkpoint cedb795597282e26f8aa4388e538676645a323d0728741c2e1b224731da67256 právě prochází targeted/fullTS/build. Přípravné review native i C5 wiring bez nálezů. GPU přínos ani kompletní matrix zatím nejsou ověřené; formální závěrečné BMAD review ještě nezačalo. Frontmatter in-progress zde doplněn po zahájení implementace, nejde o novou baseline.
+
+18.10: startup celek integrován. Review callback retention opraveno RED→GREEN; QA plná sada1364/1368 odhalila4 chybějící C5 VM bindings, finální produkční sada1352/1352 je opravena bez oslabení assertions. Tři diagnostické páry pozorovaly41,9–43,0s versus27,6–28,8s; jeden produkční pár45,8/28,3s, ale jiný běh stejného kandidáta41,1s kvůli variabilitě před přípravou. Nejde o statistickou FPS přejímku. RuntimeF stále1172,2msCPU+6197,4msgap/+80modulů/+59sync; frozen intent a migrační cíl zůstávají otevřené.
 
 ## Review Triage Log
 
