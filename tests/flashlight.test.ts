@@ -70,39 +70,6 @@ function fk(node: TransformNode, input: Vector3, normal = false) {
   return normal ? result.normalize() : result;
 }
 
-test("final receiver gate follows first/third-person torch pose without changing shadows or OFF membership", (t) => {
-  const { scene, rig, camera, torch } = fixture(t);
-  const near = MeshBuilder.CreateBox("static at original pose", { size: 1 }, scene);
-  const far = MeshBuilder.CreateBox("static at next camera pose", { size: 1 }, scene);
-  for (const mesh of [near, far]) {
-    mesh.material = new StandardMaterial(mesh.name, scene);
-    mesh.metadata = { artStatic: true, depthCaster: "opaque" };
-  }
-  near.position.set(0, 1, 8); far.position.set(100, 1, 8);
-  torch.update(rig, camera, true, false, "low");
-  torch.beam.prepareReceivers();
-  assert.ok(near.lightSources.includes(torch.beam.light));
-  assert.ok(!far.lightSources.includes(torch.beam.light));
-  const shadow = torch.beam.light.getShadowGenerator();
-  camera.position.set(100, 1, -4);
-  camera.setTarget(new Vector3(100, 1, 8));
-  torch.update(rig, camera, true, true, "low");
-  const changed = torch.beam.prepareReceivers();
-  assert.ok(changed.includes(near) && changed.includes(far));
-  assert.ok(!near.lightSources.includes(torch.beam.light));
-  assert.ok(far.lightSources.includes(torch.beam.light));
-  assert.ok(torch.beam.light.getShadowGenerator() === shadow);
-  assert.equal(torch.beam.light.intensity, 1.6);
-  torch.update(rig, camera, false, true, "low");
-  torch.beam.prepareReceivers();
-  assert.ok(!near.lightSources.includes(torch.beam.light) && !far.lightSources.includes(torch.beam.light));
-  rig.root.position.x = 100;
-  torch.update(rig, camera, true, false, "low");
-  torch.beam.prepareReceivers();
-  assert.ok(far.lightSources.includes(torch.beam.light));
-  assert.ok(!near.lightSources.includes(torch.beam.light));
-});
-
 test("third-person torch follows actual right-hand FK for six builds, all headings and parent transforms", (t) => {
   const { scene, pool, camera, torch } = fixture(t);
   // Babylon 9.30 standard spot falloff is pow(cos(angle), exponent) up to

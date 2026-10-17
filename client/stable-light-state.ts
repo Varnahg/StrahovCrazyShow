@@ -86,18 +86,6 @@ export class StableLightState {
     });
   }
 
-  /** Queue membership changes that do not change a light's shader signature.
-   * Consume before update/render; the existing Set deduplicates receivers. */
-  markMeshesDirty(meshes: Iterable<AbstractMesh>): void {
-    if (this.disposed || this.scene.isDisposed) return;
-    for (const mesh of meshes) {
-      // An iterable may release its owner while advancing to the next item.
-      if (this.disposed || this.scene.isDisposed) return;
-      if (!mesh.isDisposed() && mesh.getScene() === this.scene)
-        this.pendingMeshes.add(mesh);
-    }
-  }
-
   private signature(light: Light) {
     const type = light.getTypeID();
     if (

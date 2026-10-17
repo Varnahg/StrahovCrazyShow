@@ -839,7 +839,8 @@ export class Game {
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
     const preloadRender = () => {
       if (!this.disposed) {
-        this.prepareSceneLightState();
+        this.gltfLightBudget.prepareFrame();
+        this.stableLights.update();
         this.scene.render();
       }
     };
@@ -2313,13 +2314,6 @@ export class Game {
     }
     return lighting;
   }
-  private prepareSceneLightState() {
-    this.gltfLightBudget.prepareFrame();
-    const changedReceivers = this.flashlight?.beam.prepareReceivers();
-    if (changedReceivers?.length)
-      this.stableLights.markMeshesDirty(changedReceivers);
-    this.stableLights.update();
-  }
   private prepareLighting(render: () => void) {
     const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
     // The same controller/materials survive into gameplay; no proxy shaders.
@@ -2695,7 +2689,8 @@ export class Game {
     const environmentEnded = performance.now();
     this.benchmark?.profile.beginFrame();
     // All beam, street, interior and celestial shadow states are final here.
-    this.prepareSceneLightState();
+    this.gltfLightBudget.prepareFrame();
+    this.stableLights.update();
     this.scene.render();
     const engineWork = this.benchmark?.profile.endFrame();
     const renderEnded = performance.now();

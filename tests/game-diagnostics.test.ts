@@ -48,7 +48,6 @@ const members = declaration.members.filter(
     node.name &&
     [
       "frame",
-      "prepareSceneLightState",
       "updateWorldPresentation",
       "updateRenderEnvironment",
       "environmentProfileMetadata",
