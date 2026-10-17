@@ -11,6 +11,7 @@ context:
   - '{project-root}/AGENTS.md'
   - '{project-root}/docs/agents/bmad-policy.md'
   - '{project-root}/docs/agents/tasks/webgpu-hitch-validation-20261017.json'
+  - '{project-root}/docs/agents/tasks/webgpu-b6-variant-proof-20261018.json'
 ---
 
 <frozen-after-approval reason="Uživatel17.10 výslovně zadal řešit osmivteřinové záseky, chránit hraný build a průběžně integrovat">
@@ -58,7 +59,7 @@ context:
 - [x] `webgpu-migrate-pipeline-20261016`: nový `client/webgpu-pipeline-preparation.ts` a stejnojmenný test. Vlastněné instance miss/callsite brány používají native descriptor a token, bounded async pending/result; skutečnou pipeline zapíše původní synchronní cache cesta až při dalším aktuálním požadavku. Žádné pozdní async cache zápisy. Privátní pending signál neopouští vlastní draw/clear hranici; skutečné chyby zůstávají chybami.
 - [x] Root `client/game.ts`: scope před prepareLighting až přes finální startup gate, helper frame completeness + pending/unconsumed vstupují do existující readiness. Incomplete RTT se znovu vykreslí; neaktivní ready orphan lze uvolnit po skutečném retry. Zachovány dvě kompletní acceptance draws, timeouty, aktuální varianty, abort/dispose a ownership hooků. WebGL/fast mají inertní cestu; během hraní async scope není.
 - [x] Pinned proof29/29 a scopedTS0, native1296/1296 a kombinovaná produkce1352/1352, oba pnpm build/integration PASS. Tři QA startup páry, produkční pár bez detailní diagnostiky, prvníF a skutečný cancel/reentry mají [úplnou evidenci](../../../docs/performance/evidence/webgpu-migration-20261016/hitches-v5/README.md). Runtime8d20cecc72066b498e735b8b2524fd23baa19eff → main232cffb1fd67b47766fedd2b27c933ddf786e617.
-- [ ] Další CPU proof: skutečná prezentace spawn→denní B6 OFF/ON→restore, ordered light/define/instance/pass identity a main/depth reuse. B6 props jsou mimo spawn odpojené ze scene.meshes; rozšířit běžný mesh sweep nestačí. Konkrétní chybějící světelný layout zatím není prokázaný. Teprve potom případný dvouetapový QA kandidát, bez nové cache a bez změny fyziky/sítě.
+- [ ] Task `webgpu-b6-variant-proof-20261018`: cache-only CPU proof v `.cache/webgpu-migration-checks/b6-variant-proof-20261018/` a vlastní handoff. Skutečná prezentace spawn→denní B6 OFF/ON→restore, ordered light/define/instance/pass identity a main/depth reuse. B6 props jsou mimo spawn odpojené ze scene.meshes; rozšířit běžný mesh sweep nestačí. Konkrétní chybějící světelný layout zatím není prokázaný. Teprve potom případný dvouetapový QA kandidát, bez nové cache a bez změny fyziky/sítě.
 - [ ] U přijatého kandidáta dokončit refaktor, regrese, stabilní native i kombinovaný test/build/integraci, GPU obraz a srovnatelné cold/warm/startup měření; samostatný commit/main/Linear.
 
 **AC:** Given stejný přechod F/čas/quality/B6, when se použije kandidát, then musí zkrátit celou prodlevu při stejném světle/obrazu a bez nepřiznaného přesunu do startupu. Given výkonové tvrzení, then musí mít odpovídající produkční důkaz se zdrojem, GPU, rozlišením, p95/p99 a zdravým lifecycle. Neprovedené přejímky zůstávají neověřené.
@@ -90,6 +91,8 @@ Full pnpm test/build/izolovaná integration se pro zamítnutý receiver pokus ne
 17.10 21:43UTC: async helper a Game wiring jsou implementované, cílené leaf28/28 a Game39/39 prošly; společný QA checkpoint cedb795597282e26f8aa4388e538676645a323d0728741c2e1b224731da67256 právě prochází targeted/fullTS/build. Přípravné review native i C5 wiring bez nálezů. GPU přínos ani kompletní matrix zatím nejsou ověřené; formální závěrečné BMAD review ještě nezačalo. Frontmatter in-progress zde doplněn po zahájení implementace, nejde o novou baseline.
 
 18.10: startup celek integrován. Review callback retention opraveno RED→GREEN; QA plná sada1364/1368 odhalila4 chybějící C5 VM bindings, finální produkční sada1352/1352 je opravena bez oslabení assertions. Tři diagnostické páry pozorovaly41,9–43,0s versus27,6–28,8s; jeden produkční pár45,8/28,3s, ale jiný běh stejného kandidáta41,1s kvůli variabilitě před přípravou. Nejde o statistickou FPS přejímku. RuntimeF stále1172,2msCPU+6197,4msgap/+80modulů/+59sync; frozen intent a migrační cíl zůstávají otevřené.
+
+18.10 změna celkového cíle uživatelem: po dokončení migrace pokračovat na souvisejících performance/FPS-drop issues v Linear, celý proces projektovým BMAD. Starší cílové zakončení předáním do jiného chatu je nahrazené. Tato KEY-31 specifikace zůstává jedním aktuálním celkem; širší následný backlog není automaticky označen hotový ani rozpracovaný.
 
 ## Review Triage Log
 
