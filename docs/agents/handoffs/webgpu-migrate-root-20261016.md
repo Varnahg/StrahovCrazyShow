@@ -4,6 +4,8 @@
 
 Uživatel aktualizoval cílovou sekvenci: dokončit schválenou migraci na výchozí nativní WebGPU pro hru i editor včetně produkční přejímky, potom pokračovat na souvisejících projektových issues performance/FPS drops v Linear. Hotovo až po jejich vyřešení. V celém procesu používat projektový BMAD. Starší zakončení předáním do jiného chatu je nahrazené; není aktuální závěrečný úkol.
 
+Doplnění18.10: pokud optimalizace delší dobu nepůjde vyřešit, uživatel dovoluje riskantnější řešení pouze po průzkumu, který doloží, že je nejlepší a nepoškodí jiné funkce. Jde o možnost porovnat širší variantu, nikoli zrušení výzkumu, vlastnictví, readiness, testů nebo přejímky. Aktuální B6 proof zůstává omezený na důkaz před další implementací.
+
 Startup-only async celek native8d20cecc72066b498e735b8b2524fd23baa19eff → main232cffb1fd67b47766fedd2b27c933ddf786e617. Evidence6eef0b3 → main6c96968, BMAD9208c1f. Native1296/1296 a kombinovaná produkce1352/1352, oba buildy/integration PASS. [Hitches-v5](../../performance/evidence/webgpu-migration-20261016/hitches-v5/README.md) obsahuje všechny běhy,41s outlier, skutečné limity a původní gameplayF6197,4msgap, který není opravený. Default a finální přejímka zůstávají otevřené.
 
 Další autorizovaný úkol je webgpu-b6-variant-proof-20261018: lehký CPU důkaz actual B6 presentation/layout/instance/pass a main/depth reuse, nikoli produkční implementace ani nová cache. Jeho cache a handoff vlastní samostatný leaf podle registru. Root vede existující BMAD spec-key-31-long-frame-gaps; nenastavuje celý cíl jako complete.

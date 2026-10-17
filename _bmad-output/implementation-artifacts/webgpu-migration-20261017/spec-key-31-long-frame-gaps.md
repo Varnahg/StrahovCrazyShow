@@ -94,6 +94,8 @@ Full pnpm test/build/izolovaná integration se pro zamítnutý receiver pokus ne
 
 18.10 změna celkového cíle uživatelem: po dokončení migrace pokračovat na souvisejících performance/FPS-drop issues v Linear, celý proces projektovým BMAD. Starší cílové zakončení předáním do jiného chatu je nahrazené. Tato KEY-31 specifikace zůstává jedním aktuálním celkem; širší následný backlog není automaticky označen hotový ani rozpracovaný.
 
+18.10 doplnění uživatele: při dlouho neřešitelné optimalizaci lze zvolit riskantnější řešení, pokud předchozí průzkum doloží jeho výhodnost proti rozumným variantám a zachování ostatních funkcí. Nejde o povolení přeskočit důkazy nebo přejímku; současný task je stále pouze CPU proof.
+
 ## Review Triage Log
 
 Čtecí native a C5 overlay audity bez nálezů. CPU/obrazová korektnost sama nestačila k přijetí výkonu. Formální závěrečné BMAD review přijatého runtime celku zatím neproběhlo.
