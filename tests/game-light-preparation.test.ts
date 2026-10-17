@@ -308,19 +308,25 @@ test("actual Game shader inventory follows the real loopback diagnostic opt-in",
     ["https://example.com/?profileEnvironment=1", false],
     ["http://127.0.0.1:4193/?profileEnvironment=1", true],
   ] as const) {
-    let captured: boolean | undefined;
+    let captured: { shader: boolean; unusedDefines: boolean } | undefined;
     const run = initialize({
       createEnvironmentProfile,
       WebGpuCompilationProfile: class {
-        constructor(_engine: unknown, options: { captureShaderInventory: boolean }) {
-          captured = options.captureShaderInventory;
+        constructor(_engine: unknown, options: {
+          captureShaderInventory: boolean;
+          captureUnusedDefineInventory: boolean;
+        }) {
+          captured = {
+            shader: options.captureShaderInventory,
+            unusedDefines: options.captureUnusedDefineInventory,
+          };
         }
       },
       sessionDiagnostics: { event() {} },
       window: { location: new URL(url) },
     });
     run.call({ engine: {}, renderHealth: { rendererId: 1 } });
-    assert.equal(captured, expected, url);
+    assert.deepEqual(captured, { shader: expected, unusedDefines: expected }, url);
   }
 });
 

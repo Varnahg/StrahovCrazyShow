@@ -581,6 +581,7 @@ export class Game {
     });
     this.compilationProfile = new WebGpuCompilationProfile(this.engine, {
       captureShaderInventory: this.environmentProfile !== undefined,
+      captureUnusedDefineInventory: this.environmentProfile !== undefined,
       onError: (channel, error, label) => this.renderHealth.report(
         channel, `${label}: ${error instanceof Error ? error.message : String(error)}`,
       ),
