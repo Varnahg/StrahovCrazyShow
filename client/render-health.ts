@@ -36,6 +36,7 @@ export type RenderHealthSnapshot = {
 let nextRendererId = 1;
 const MAX_ERRORS = 5;
 const MAX_MESSAGE = 2000;
+const owners = new WeakMap<AbstractEngine, RenderHealth>();
 
 /** One owner per engine, installed before scene creation. This observes engine
  * errors and explicitly owned async operations, never unrelated page promises.
@@ -73,21 +74,21 @@ export class RenderHealth {
       health: RenderHealthSnapshot,
     ) => void,
   ) {
+    if (owners.has(engine))
+      throw new Error("This engine already has a render health owner.");
+    owners.set(engine, this);
+    this.cleanups.push(() => {
+      if (owners.get(engine) === this) owners.delete(engine);
+    });
     const effect = engine.onEffectErrorObservable.add(({ errors }) =>
       this.report("effect", errors),
     );
     const lost = engine.onContextLostObservable.add(() =>
       this.deviceLost("Grafické zařízení se odpojilo. Spusť 3D scénu znovu."),
     );
-    const restored = engine.onContextRestoredObservable.add(() => {
-      if (this.phase === "disposed") return;
-      this.generation++;
-      this.resetPendingOperations();
-      this.phase = "restart-required";
-      this.rejectGuards(
-        new Error("Grafické zařízení se změnilo. Spusť 3D scénu znovu."),
-      );
-    });
+    const restored = engine.onContextRestoredObservable.add(() =>
+      this.deviceLost("Grafické zařízení se změnilo. Spusť 3D scénu znovu.", true),
+    );
     const disposed = engine.onDisposeObservable.add(() => this.dispose());
     this.cleanups.push(
       () => effect.remove(true),
@@ -102,6 +103,74 @@ export class RenderHealth {
     );
     // An observable can replay disposal synchronously while attaching.
     if (this.phase === "disposed") this.detach();
+    else this.observeFrame(engine);
+  }
+
+  /** Pinned AbstractEngine calls begin/render/end inside this synchronous
+   * boundary. A throw aborts its normal queueing; never repair/flush the frame.
+   * Manual preview draw failures are caught by their owning scheduler; the
+   * endFrame veto also prevents its finalizer from submitting after a fault. */
+  private observeFrame(engine: AbstractEngine) {
+    this.observeFrameMethod(engine, "_processFrame");
+    this.observeFrameMethod(engine, "endFrame");
+  }
+
+  private observeFrameMethod(engine: AbstractEngine, method: "_processFrame" | "endFrame") {
+    if (this.phase === "disposed") return;
+    try {
+      const own = Object.getOwnPropertyDescriptor(engine, method);
+      let descriptor = own;
+      let prototype = Object.getPrototypeOf(engine);
+      while (!descriptor && prototype) {
+        descriptor = Object.getOwnPropertyDescriptor(prototype, method);
+        prototype = Object.getPrototypeOf(prototype);
+      }
+      // Do not invoke an accessor merely to discover an observable method.
+      const original: unknown = descriptor && "value" in descriptor ? descriptor.value : undefined;
+      if (typeof original !== "function") throw new Error("Missing frame method");
+      const owner = this;
+      const wrapper = function (this: unknown) {
+        if (this !== engine || owner.phase === "disposed")
+          return Reflect.apply(original, this, arguments);
+        // stopRenderLoop cannot recall a callback already selected by the
+        // host. A fault reported synchronously inside a callback must also
+        // veto Babylon's following endFrame, even if that callback returns.
+        if (owner.phase === "invalid" || owner.phase === "restart-required") return;
+        if (method === "endFrame") return Reflect.apply(original, this, arguments);
+        const generation = owner.generation, beforeErrors = owner.errorCount;
+        try {
+          // Do not inspect returns, including Promise/thenable values. No
+          // snapshot, token object or argument-array copy in this hot path.
+          return Reflect.apply(original, this, arguments);
+        } catch (error) {
+          try {
+            owner.frameFailed(generation, beforeErrors, error);
+          } finally {
+            // A failing reporter must never replace the original exception.
+            throw error;
+          }
+        }
+      };
+      Object.defineProperty(engine, method, own
+        ? { ...own, value: wrapper }
+        : { value: wrapper, configurable: true, writable: true, enumerable: false });
+      this.cleanups.push(() => {
+        if (Object.getOwnPropertyDescriptor(engine, method)?.value !== wrapper) return;
+        if (own) Object.defineProperty(engine, method, own);
+        else Reflect.deleteProperty(engine, method);
+      });
+    } catch {
+      this.report("render", new Error(`Engine frame failure monitoring is unavailable (${method}).`));
+    }
+  }
+
+  private frameFailed(generation: number, beforeErrors: number, error: unknown) {
+    // A nested pipeline/submit hook may already have reported it. Re-read
+    // mutable lifecycle state after the original call, which can dispose or
+    // restore the renderer synchronously while unwinding the same frame.
+    if (this.phase !== "disposed" && this.generation === generation &&
+        this.errorCount === beforeErrors)
+      this.recordFault("render", error);
   }
 
   report(channel: RenderFaultChannel, error: unknown) {
@@ -142,16 +211,18 @@ export class RenderHealth {
     this.onFault?.({ ...fault }, this.snapshot());
   }
 
-  private deviceLost(message: string) {
-    if (
-      this.phase === "disposed" ||
-      this.deviceLostGeneration === this.generation
-    )
-      return;
+  private deviceLost(message: string, restored = false) {
+    if (this.phase === "disposed") return;
+    if (restored) this.generation++;
+    if (this.deviceLostGeneration === this.generation) return;
     this.deviceLostGeneration = this.generation;
     this.phase = "restart-required";
     this.resetPendingOperations();
-    this.recordFault("device", new Error(message));
+    const error = new Error(message);
+    // Restoration starts a new epoch and must notify its owner even if no
+    // preceding loss event was delivered. Preserve its own guard reason.
+    if (restored) this.terminalReason = error;
+    this.recordFault("device", error);
   }
 
   private rejectGuards(reason: unknown) {
