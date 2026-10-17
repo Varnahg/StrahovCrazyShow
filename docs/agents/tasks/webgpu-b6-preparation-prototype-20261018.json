@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-b6-preparation-prototype-20261018",
+  "title": "KEY-31: izolovaný QA experiment denní B6 přípravy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/b6-preparation-prototype-20261018/",
+    "docs/agents/handoffs/webgpu-b6-preparation-prototype-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Cache-only reviewed overlay nad frozen async-production-v3; žádný zápis do native runtime nebo hraných snapshotů.",
+    "Dvě skutečné day B6 OFF/ON etapy, source-derived landing view potvrzený CPU proofem; skutečné controllers a camera pass bez pohybu actoru/avatara nebo změny physics/network.",
+    "Původní timeout a úplná readiness zůstávají; dočasná camera pose se obnoví a aktuální požadavky se znovu aplikují. Spatial caster výběr se při vstupu/restore obnoví přes úzký optional cinematic vstup, bez falešného dt.",
+    "Zachovat původní C5 funkce a diagnostics; žádná cache, nové diagnostické hooks, změna light budgetu nebo shaderu. Root měří skutečný přínos a startup na GPU před produkčním přijetím."
+  ],
+  "verification": [
+    "Lehké cílené testy skutečných upravených metod: camera restore, aktuální požadavky, abort/dispose/timeout, actor/animation tripwires, B6 revision a spatial refresh.",
+    "Předat přesný diff, zdrojové a výstupní SHA, změněné soubory, testy a limity. Root teprve sestaví samostatný snapshot a spustí heavy/fullTS/build/GPU."
+  ],
+  "notes": [
+    "Autorizovaný root QA experiment po proofu webgpu-b6-variant-proof-20261018. Přímá delegace nevyvolává další BMAD workflow.",
+    "Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow. Readonly base .cache/webgpu-hitch-validation-20261017/async-production-v3 snapshot ec2802daf9426f63814054627adf5a18f04cd54eb2da20e800eb1a89feb6c563.",
+    "Vlastní prefix obsahuje overlay client/game.ts, client/light-preparation.ts, client/cinematic.ts a odpovídající tests, assembly script a evidence. Needitovat originály ani root QA prefix.",
+    "B6 proof doložil missing DIR pro dva noční starty, 8 skutečných regular-instance částí a main reuse, ale wrapped leaf depth churn přetrvává. Source-derived landing(-4.85,-76.95) eye3.43 směrem approachRoute.last vykreslí těchto8; plná geometrie/avatar zůstává GPU otázkou.",
+    "Nepoužívat CameraFollow/LocalAvatarPresentation/updateAvatarPresentation na syntetickou B6 pozici. Při restore použít latest požadavky. Na disposed/failed scéne neobnovovat rendering. Standardní runtime a WebGL beze změny mimo explicitní QA startup etapy.",
+    "Read-only dependencies-v5, TSX_DISABLE_CACHE=1 přímý node/tsx; žádný install nebo full world/GLB/GPU. Předání a release po ukončení vlastních procesů, bez commitu."
+  ]
+}
