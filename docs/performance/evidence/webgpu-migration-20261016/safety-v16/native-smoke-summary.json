@@ -1,0 +1,126 @@
+{
+  "atUTC": "2026-10-17T17:23:26.232Z",
+  "kind": "native-correctness-smoke-not-performance-acceptance",
+  "sourceCommit": "8363c7603028a5a11b2f3d54f7a702c34ccfb608",
+  "snapshotId": "f1d6c2bdd58f6c73fbaeec1f0b6326a4bda9e4c04449bc112cdd05ad609f4397",
+  "sessionId": "bbda451c-21a8-454d-a9cc-d8ae13bd3f31",
+  "url": "http://127.0.0.1:4193/?renderBackend=webgpu",
+  "viewport": {
+    "width": 1512,
+    "height": 642
+  },
+  "foreground": {
+    "active": true,
+    "frozen": false,
+    "windowId": 2070822965,
+    "tabId": 2070822964
+  },
+  "entry": {
+    "seq": 19,
+    "atMs": 5005.5,
+    "kind": "mode-change",
+    "data": {
+      "mode": "multi"
+    }
+  },
+  "ready": {
+    "seq": 154,
+    "atMs": 44543.1,
+    "kind": "game-ready",
+    "data": {
+      "mode": "multi"
+    }
+  },
+  "startupMs": 39537.6,
+  "renderer": {
+    "seq": 20,
+    "atMs": 5177.3,
+    "kind": "renderer-ready",
+    "data": {
+      "durationMs": 24,
+      "renderer": "pascal",
+      "vendor": "nvidia",
+      "version": "unknown version",
+      "backend": "webgpu"
+    }
+  },
+  "faults": [],
+  "recordCount": 499,
+  "recordRange": [
+    0,
+    498
+  ],
+  "frameWindowCount": 170,
+  "lastFrame": 222861.20000001788,
+  "qualityChanges": [
+    {
+      "seq": 157,
+      "atMs": 44593,
+      "rendering": {
+        "mode": "low",
+        "quality": "low",
+        "targetFps": 60,
+        "hardwareScaling": 1.3
+      }
+    },
+    {
+      "seq": 213,
+      "atMs": 76999.7,
+      "rendering": {
+        "mode": "medium",
+        "quality": "medium",
+        "targetFps": 60,
+        "hardwareScaling": 1
+      }
+    },
+    {
+      "seq": 319,
+      "atMs": 131033.3,
+      "rendering": {
+        "mode": "high",
+        "quality": "high",
+        "targetFps": 60,
+        "hardwareScaling": 1
+      }
+    },
+    {
+      "seq": 342,
+      "atMs": 143039,
+      "rendering": {
+        "mode": "low",
+        "quality": "low",
+        "targetFps": 60,
+        "hardwareScaling": 1.3
+      }
+    }
+  ],
+  "positions": [
+    {
+      "x": 110,
+      "y": -2.323899984359741,
+      "z": 12.00003433227539
+    },
+    {
+      "x": 115.26653289794922,
+      "y": -2.4334192276000977,
+      "z": 6.537304878234863
+    }
+  ],
+  "observedUIActions": [
+    "Entry multi/Alex at persisted low quality",
+    "Set medium; night; close panel; F on",
+    "Set high then low",
+    "Night to golden hour to real time",
+    "Explicit canvas focus and W2000ms; V camera change",
+    "Exit via Opustit demo; navigate own tab blank"
+  ],
+  "limits": [
+    "No B6 traversal or exact user failure position; this is only short focused light-quality smoke",
+    "Initial W before explicit canvas focus did not move; movement verified only for final W",
+    "Visible screenshot proves final image only, not visual parity",
+    "No matched backend pair or final FPS claim; agent light CPU checks overlapped part of startup",
+    "Shader compilation hitches remain; first frame-hitch includes pre-ready interval"
+  ],
+  "sha256": "739e7cc5563d947c2b7f38e0fa81f0df936dc763d288b51299fccecbbad08f46",
+  "bytes": 1008983
+}

@@ -1,5 +1,11 @@
 # WebGPU migration root handoff (ongoing)
 
+## Novější checkpoint17.10.2026: main a2acbed / C5
+
+Runtime integrován v pěti samostatných commitech po native1260/1260 a combined1320/1320, obou fullbuild/strictTS/integraci. C5 obsahuje30 zachovaných foreignoverlayů a physicalmain549souborů se shoduje; indexclean. [Úplná nová evidence](../../performance/evidence/webgpu-migration-20261016/safety-v16/README.md) nahrazuje níže uvedené rozpracované stavy jako aktuální checkpoint, historické záznamy se nemažou.
+
+Current4193/API2588 = frozen combined-v5, snapshotc4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5, runtime recordruns/combined-v5/runtime.json. Native14/16 vlastní služby identitycheckedstopped. Edge tab2070822964/browser3/window2070822965 je v menu, Alex; GPUhra ukončena. C5session4ecc6280-d257-4858-ada1-3ab856ce4691:1559prefixrecords,0faults, B6:0 přes skutečnývstup a zpět,10persistentpreviewcyclesrenderer3 +Sam/detail a návratAlex. FullGPU/FPSdefaultacceptance není hotová; KEY31záseky přetrvávají. Navazující autorizovaný chat01a13624-c16c-7c11-aa35-070e349e0266 se aktivuje teprvepo úplnémcíli.
+
 ## Aktuální pokračování 17.10.2026 — KEY-39 má prioritu
 
 Uživatel výslovně dokončil ruční test a povolil další ověřování. C4 byl v Edge ověřen v menu, vlastní karta2070822960 zavřena a vlastní služby zastaveny přes přesný runtime record. Immutable archiv `.cache/webgpu-migration/user-test-20261017-completed/` má16440300B JSONL, SHA `CB15DB6A0EE7905EDE9DEBDD7435556C165799BCC0D3931246122D97403E46C2`,5297souvislýchrecords. User frame evidence14:30:16.268→14:34:03.556UTC, pak už neprobíhalo vykreslování až do dispose15:57:52.322. Seq2412/2450 prokazují sunUBO80B proti shadow96B; seq2496 TypeError missingresource.buffer zastavil frame loop při stale UI ready:true. Pozdější focus není prokázaná příčina starého swapchain submitu. KEY-39 je nový urgent child KEY-22; není FPS acceptance.

@@ -1,0 +1,55 @@
+{
+  "atUTC": "2026-10-17T17:30:00.876Z",
+  "evidence": "Complete sequential pipeline sessions1933 and88801 finished exit0. Native1260 and combined1320 test pass, zero fails/skips; strict TypeScript and Vite build; isolated integration. Both builds explicitly set VITE_SOURCE_SNAPSHOT_ID. Runtime GPU full acceptance remains open.",
+  "native": {
+    "sourceCommit": "8363c7603028a5a11b2f3d54f7a702c34ccfb608",
+    "snapshotId": "f1d6c2bdd58f6c73fbaeec1f0b6326a4bda9e4c04449bc112cdd05ad609f4397",
+    "tests": 1260,
+    "complete": true,
+    "logs": {
+      "test": {
+        "path": ".cache/webgpu-migration/native-v16-test.log",
+        "sha256": "279d26502d0f147ded4a1f226baf1428bfce5176b1fefbcb73069135dc83297a",
+        "exitCode": 0
+      },
+      "build": {
+        "path": ".cache/webgpu-migration/native-v16-build.log",
+        "sha256": "6ed588119e4bd44b875bf2f5cd96646bcf02c196d5c246ff0bd89e6a88a7b63c",
+        "exitCode": 0
+      },
+      "integration": {
+        "path": ".cache/webgpu-migration/native-v16-integration.log",
+        "sha256": "1baaa77f2e503e39262658d688713ad2da186c8853e5bbad93640d9d6b5db9aa",
+        "exitCode": 0
+      }
+    }
+  },
+  "combined": {
+    "sourceCommit": "8363c7603028a5a11b2f3d54f7a702c34ccfb608",
+    "snapshotId": "c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5",
+    "tests": 1320,
+    "complete": true,
+    "logs": {
+      "test": {
+        "path": ".cache/webgpu-migration/combined-v5-test.log",
+        "sha256": "3da8cc9177713708f6f1cb2174d876579a05b63f1713d502f1b9932e079000f0",
+        "exitCode": 0
+      },
+      "build": {
+        "path": ".cache/webgpu-migration/combined-v5-build.log",
+        "sha256": "75cccc4b0548b2f14d76e314a2da9a94a8d2c0c9b4bed3084b74afe2df44e95d",
+        "exitCode": 0
+      },
+      "integration": {
+        "path": ".cache/webgpu-migration/combined-v5-integration.log",
+        "sha256": "92897226896487ab6293dfd50d1540c644dcbf8acc7e14ef6706a86777ff850b",
+        "exitCode": 0
+      }
+    }
+  },
+  "reviews": {
+    "semanticMerge": "resume_plan_review findings[]; root read exact own delta and conflict resolutions",
+    "integrationHelperSha256": "ba2ea5e37247e0b3fd1b5549fdbf8eb746940fcbe50b564ec2af16e9314ce31b",
+    "integrationBaselineSha256": "9bdb13b31510536845a12a83236a5b469def5b27434dd7a68c9d81581f7b8d9c"
+  }
+}

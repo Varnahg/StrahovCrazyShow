@@ -1,5 +1,32 @@
 # Předání: webgpu-combined-preview-20261016
 
+## C5 navazující spojení 17. 10. 2026
+
+Vlastník této navazující izolované práce je `webgpu-mig-01a14497-c5-preview` (`shader_inventory`), příjemce root. Claim při čistém WT HEAD `8363c76`. Primární AGENTS/BMAD policy načtené; žádný nový workflow, renderer ani podagent. Rozsah zápisu pouze nový `.cache/webgpu-migration-checks/combined-preview/c5/` a toto předání. Native/combined runtime a frozen vstupy zůstaly read-only.
+
+Výsledek k přenosu po rootově review je pouze `c5/avatar-preview.ts` (nikoli celá testová candidate kopie), SHA-256 **`acba8c80433f6de42f9e3bc56cbe0fbfc2a53a53e2148690648a18e58ba8d86f`**. `c5/resolution.json`, SHA-256 `fd11f09315d3bf2fce37fea01f9d9f3b9440ddd076243ddaeffb189028e99d27`, používá composer klíče `path/previous/nativeBefore/nativeAfter/conflictSha256/result`:
+
+| Role | Snapshot | Avatar preview SHA-256 |
+| --- | --- | --- |
+| Base native-v12 | `cbbca97e164ae6a7f0c756bd8d4b97e81e3bed8b984f308e05cc20f56d63b55c` | `a20befc527e998129d492b3977b8788f33537ddcce087f1d9d2987fb10556543` |
+| Foreign combined-v4 | `1383fc9296d70d256ead4c6df0ac87892cdcd522426272bc8e7288613266f277` | `caceaa5d9961eb048363b8d6c15c50b0552b2f3174489d315021a726dfc0d8a2` |
+| Own native-v16 | `f1d6c2bdd58f6c73fbaeec1f0b6326a4bda9e4c04449bc112cdd05ad609f4397` | `bb27c9a87a395ffdc58d36c73c5799453eb81230b50808974eb6cf0a2a2bd816` |
+
+Vstupy byly ověřeny proti svým source manifestům před zápisem a stejné SHA znovu při freeze. Rootův conflict `combined-v5-client_avatar-preview.ts.conflict` má SHA `a67f02ae3251e3af8061de1e132a5d27aadb980a4374f9a3e20ed276c6b5166d`; jeho kopie a přesné tři vstupy jsou v `c5/inputs/`.
+
+Vyřešeny jen tři konfliktní bloky: foreign `visible` gating se spojil s native `reportRenderFailure`; foreign timing proměnné s native boolean/capture první chyby; native kontroly `canRenderFrame` se vložily kolem skutečné readiness/render práce při zachování původních intervalů a `frames++`. Žádný zbytek automatického merge se nepřepisoval. Boolean `active` patří persistent viditelnosti, predicate `canRenderFrame` patří životnímu cyklu; názvy se nestíní. Model create-next-before-dispose-old, hodnotové no-op, zobrazené readiness meshe, `setActive`, pause/reopen, disposal a veškeré create/update/active/frame/ready-frame/resume-frame timing telemetry jsou zachované.
+
+Izolovaný `c5/candidate/` vychází z native-v16 klienta/shared, s přesnými foreign podpůrnými preview model/editor/cache soubory a třemi foreign testy. `tests/avatar-preview-webgpu.test.ts` se proti native-v12 sloučil čistě bez konfliktu, SHA `68ddf733e0ad8122ce2e0fc020a76cf4e8905b36be4cff6cf5a2868b0c42f9d9`; root jej může porovnat se svým automatickým C5 merge. Candidate není důvod přepisovat jiné runtime soubory.
+
+Ověření před rootovým native-v16 GPU smoke:
+
+- `TSX_DISABLE_CACHE=1 node --import tsx --test tests/render-startup.test.ts tests/avatar-preview-webgpu.test.ts tests/avatar-preview-surface.test.ts tests/avatar-preview.test.ts tests/avatar-preview-cache.test.ts tests/on-demand-render.test.ts`: **68/68 PASS**, exit 0, `c5/tests.log`.
+- Scoped `node typecheck.mjs`: **3002 souborů, 0 diagnostics**, exit 0, `c5/types.log`.
+- Vlastní statický review diffu proti C4: pouze vlastní native-v12→v16 failure delta, vložená kolem zachované foreign telemetry. Diffy vůči všem třem vstupům jsou v `c5/against-*.diff`; `git diff --no-index --check` bez whitespace diagnostics (status 1 pouze kvůli implikovanému `--exit-code`).
+- Manifest `c5/manifest.json`, SHA-256 **`f779f65af1c0c868e8325d9e41be88ab6e5a6f41f03f9b0689977193e114dab8`**, obsahuje 224 přesných staging inputs, provenance podpůrných foreign souborů, diff/test/TS hashy a readonly dependencies-v5 cestu.
+
+Žádný build, full suite, GPU, instalace nebo server; vlastní procesy skončily. Po oznámení rootova GPU smoke se žádné nové testy ani TS nespouštěly. Výsledek je izolovaný candidate a vlastní review, nikoli nezávislé přijetí či publikace. Root nyní provede review a teprve potom přenos do C5 i úplnou combined pipeline. Agent po tomto výslovném předání uvolní claim a slot; runtime nic necommitoval.
+
 - Vlastník `webgpu-mig-01a14497-combined-preview` (`/root/stack_options`); příjemce `/root`, společnou Game/UI kontrolu provádí `/root/simulation_network`.
 - Worktree `C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow`, větev `codex/webgpu-migration`; claim při HEAD `9ceeeb9753b859c034c6185b9626c8a82542b0e0`. Native vstup je přesný commit `8de8299a7db91c6e072898a7cecbcaf0de3ffa3c`, nikoli pohyblivý WT.
 - Výsledek: izolovaný kombinovaný kandidát, **ne integrovaný/commitovaný foreign runtime**. Do tohoto commitu patří pouze toto předání. Primary ani migrační avatar runtime se nezměnil.
