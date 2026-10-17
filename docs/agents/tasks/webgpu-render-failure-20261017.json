@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-render-failure-20261017",
+  "title": "KEY-39: zachytit terminální selhání celého enginového snímku",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/render-health.ts",
+    "tests/render-health.test.ts",
+    "docs/agents/handoffs/webgpu-render-failure-20261017.md",
+    ".cache/webgpu-migration-checks/render-failure/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Doložit skutečný _processFrame beginFrame/callback/endFrame řetězec a proč synchronní TypeError přeskočí endFrame i plánování dalšího RAF. Porovnat instanční hook s Game-only catch a globálním error listenerem; poslední dvě varianty nepokrývají ownership/engine submission.",
+    "Vždy aktivní instančně vlastněný catch ve RenderHealth zaznamená render fault a zachová přesně původní return/throw/receiver/argumenty; žádné then getter/Promise handlers, žádný opravný flush/endFrame.",
+    "Zachovat generace, vlastní cleanup, pozdější hook vlastníky a souběžný opt-in frame profiler. Deduplicovat vnořeně hlášený render fault bez per-frame snapshotu; omezit alokace.",
+    "Terminální obnova contextu musí doručit failure callback v pravdivé generaci. Game/UI failure/resize/quality/input integraci vlastní root; do těchto souborů nepsat.",
+    "Implementace, cílený refaktoring, reálné pinned CPU regrese a scoped TS společně. Žádný GPU/build/full suite/server/instalace/změna frozen snapshotů."
+  ],
+  "verification": [
+    "RED/green: exception z beginFrame,callback,endFrame,submit; původní error identity i při pádu reporteru; jeden fault, žádná změna thenable semantics; dispose/pozdější vlastník/generation/2engines/profiler layering.",
+    "Scoped TS, diff check, input/log hashy a přesné předání. Root dodá skutečné Game/UI fixture a produkční Edge ověření."
+  ],
+  "notes": [
+    "KEY-39 child KEY-22; user sessionc063cf2e seq2496 a následný stale ready jsou doložené v immutable root archivu. BMADspec v primárním _bmad-output/implementation-artifacts/spec-key-39-shadow-freshness-20261017.md.",
+    "WT C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, readonlydependencies-v5. Nový AGENTS/policy číst z primární kopie; podagent nespouští rekurzivní BMAD.",
+    "Přidělen shader_inventory; root vlastní společné Game/UI vstupy a konečnou integraci."
+  ]
+}

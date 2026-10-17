@@ -53,9 +53,9 @@ Runtime pracovní kopie: `C:/Users/rezac/.codex/worktrees/webgpu-comparison/Stra
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Profiler a jeho test: dokončit a refaktorovat omezený lexer/provenance/region comparison; vlastní task `webgpu-shader-inventory-20261016` a owner `webgpu-mig-01a14497-unused-20261017`.
-- [ ] Game a integrační fixture: zapojit oba flags shodným gate; rootovy rezervace `webgpu-migrate-root-20261016` a `webgpu-migrate-frame-fixture-20261016`.
-- [ ] Nezávislé review přesného vlastního diffu; opravy jen ve vlastněných souborech, poté cílené testy a scoped TS.
+- [x] Profiler a jeho test: dokončit a refaktorovat omezený lexer/provenance/region comparison; vlastní task `webgpu-shader-inventory-20261016` a owner `webgpu-mig-01a14497-unused-20261017`.
+- [x] Game a integrační fixture: zapojit oba flags shodným gate; rootovy rezervace `webgpu-migrate-root-20261016` a `webgpu-migrate-frame-fixture-20261016`.
+- [x] Nezávislé review přesného vlastního diffu; opravy jen ve vlastněných souborech, poté cílené testy a scoped TS.
 - [ ] Root po uživatelském testu vytvoří nový označený immutable checkpoint a jeden skutečný Edge sběr. Vyhodnotí počty, unknown/limity a režii; bez přínosu experiment uzavře bez cache.
 - [ ] Samostatné commity a integrace pouze po relevantním ověření; aktualizovat KEY-31/32 a předání. Celá migrace zůstává otevřená do své funkční/výkonové přejímky.
 
@@ -73,6 +73,8 @@ Převzetí17.10: existující změny nejsou zahájeny znovu. Před BMAD byly27te
 Checkpoint specifikace: nejsou otevřené otázky záměru ani nevratná změna. Pokračování je již výslovně autorizované zprávou „PLEASE IMPLEMENT THIS PLAN“ a následným požadavkem použít BMAD. Projektová policy vyžaduje využít existující souhlas; nepřidává se opakované schvalování. Zvolen dispatch kvůli netriviálnímu provenance/lexer/lifecycle rozsahu a již disjunktně přidělené implementaci.
 
 BMAD krok03 převzal již existující implementaci; `baseline_commit` je skutečný HEAD implementační pracovní kopie, `workflow_project_commit` identifikuje oddělený primární checkout s instalací BMAD. Review diff smí obsahovat pouze profiler, jeho test/handoff a rootovo Game zapojení s fixture. Dokončení testové matice a skutečný GPU sběr zatím chybí, proto se krok03 ani celá migrace nepovažují za hotové.
+
+Po výslovném dokončení uživatelského testu17.10 proběhlo33/33 cílených testů a scopedTS2957/0 bez další změny source/test freeze, proto původní statické review platí. Root přijal CPU celek a vytvořil samostatné commity `cad8b4f45f0d88c2613ccf3828ae468b27b407f1` (inventář) a `5cdb14e25afbdf83a9f5fa0707b31fed5caea184` (Game gate). Native-v14 snapshot `ecb77e181ed33b8777755cdd426636e0d7a9eb98334df9301d33e353bafadb09` obsahuje8451inputů a prošel1216/1216/fullbuild/TypeScript/izolovanouintegrací. GPU sběr a integrace do main ještě nejsou přijaté. Ruční C4 test odhalil nezávislou existující chybu světelných UBO a zastaveného renderu (KEY-39); tento inventář v C4 neběžel.
 
 ## Spec Change Log
 

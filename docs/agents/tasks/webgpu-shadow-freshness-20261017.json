@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-shadow-freshness-20261017",
+  "title": "KEY-39: reprodukovat a opravit zastaralý shadow efekt při změně světel",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/webgpu-shadow-readiness.ts",
+    "tests/webgpu-shadow-freshness.test.ts",
+    "docs/agents/handoffs/webgpu-shadow-freshness-20261017.md",
+    ".cache/webgpu-migration-checks/shadow-freshness/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před implementací doložit pinned ShadowDepthWrapper/ShadowGenerator/BindLights řetězec a malé reprodukce80B proti96B i chybějícího bufferu. Rozlišit reprodukovaný mechanismus od nepotvrzené atribuce konkrétnímu meshi uživatelského testu.",
+    "Porovnat lokální freshness guard, standalone režim a úzký upstream patch včetně pending/hot-swap/frozen materiálu/render-pass/2generátorů/disposal a nákladů. API navrhnout rootu před zapojením; žádné plošné vypínání cache, stínů nebo validace.",
+    "Po rozhodnutí dodat nejmenší lokální helper, cílený refaktoring a smysluplné pinned regrese společně. Shader layout při depth draw musí odpovídat aktuálně vázaným světelným slotům.",
+    "Vegetation/Game a závislostní patch/lockfile nejsou v tomto scope; nezbytnou změnu vrátit koordinátorovi. Zvláštní zotavení frame loopu vlastní root.",
+    "Žádné změny frozen snapshots, zdrojů/assets/dependencies4193/4192/4188, GPU, serveru, instalace, buildu či full suite. Lehký CPU reproduktor/test po ukončení rootovy právě běžící full pipeline."
+  ],
+  "verification": [
+    "Pinned CPU RED/green pro změnu typu80/96B a počtu světel, shadow-only mesh, pending replacement/hot swap, render pass/generátory, frozen/dispose; konkrétní výsledky a omezení do handoffu.",
+    "Scoped TypeScript a diff check; vlastní zdrojové/test/log hashy. Root následně sestaví nový complete snapshot a provede GPU reprodukci skutečné posloupnosti."
+  ],
+  "notes": [
+    "Uživatel autorizoval úplnou migraci a pokračování přes projektový BMAD. Nový urgent child KEY-39 https://linear.app/gigeconomy/issue/KEY-39/webgpu-opravit-nesoulad-svetelnych-ubo-ve-stinech-svitilny-a-zastaveni, parentKEY22.",
+    "Impl WT C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow. Aktuální AGENTS/BMADpolicy jsou v primárním checkoutu; podagent je načte, ale nespouští další BMAD workflow.",
+    "Důkaz: immutable .cache/webgpu-migration/user-test-20261017-completed/session-prefix.jsonl, SHA CB15DB6A0EE7905EDE9DEBDD7435556C165799BCC0D3931246122D97403E46C2; seq2412/2450/2496. Přesné runtime inputs combined-v4 a readonlydependencies-v5.",
+    "Oficiální upstream9.30 tarball .cache/webgpu-migration/babylon-upstream-930/ má SHA512 shodný lockfilem. UniformBuffer a DrawWrapper byte-identické instalaci; jejich owner-keyed mechanismus není lokální kontaminace.",
+    "Root vede konkrétní BMAD specifikaci v primárním _bmad-output/implementation-artifacts/spec-key-39-shadow-freshness-20261017.md; výzkum/reprodukce jsou plánovací vstup před konečnou volbou implementace."
+  ]
+}
