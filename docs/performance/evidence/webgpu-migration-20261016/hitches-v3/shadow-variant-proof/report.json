@@ -1,0 +1,2775 @@
+{
+  "startedAt": "2026-10-17T20:37:08.737Z",
+  "endedAt": "2026-10-17T20:37:08.882Z",
+  "wallMs": 142.66110000000003,
+  "cpu": {
+    "user": 203000,
+    "system": 31000
+  },
+  "results": [
+    {
+      "kind": "pbr-leaf",
+      "wrapperClass": "FreshWebGpuShadowDepthWrapper",
+      "mainPass": 1,
+      "states": [
+        {
+          "label": "initial-off",
+          "renderCalls": 1,
+          "activeMeshes": 1,
+          "torchEnabled": false,
+          "streetBEnabled": true,
+          "lightTypes": [
+            "PointLight",
+            "PointLight",
+            "DirectionalLight",
+            "HemisphericLight"
+          ],
+          "trackedBase": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 3,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "mainBase": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 3,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 2,
+              "token": "ac82f737-d483-4180-b07c-e3a4da177f01",
+              "effect": {
+                "id": 1,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+                "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define POINTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 3,
+              "token": "05610816-df71-4968-9c10-7dcbaeae8a4d",
+              "effect": {
+                "id": 2,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+                "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define POINTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 1,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            },
+            {
+              "id": 2,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            }
+          ]
+        },
+        {
+          "label": "on-preparation",
+          "renderCalls": 1,
+          "activeMeshes": 1,
+          "torchEnabled": true,
+          "streetBEnabled": false,
+          "lightTypes": [
+            "SpotLight",
+            "PointLight",
+            "DirectionalLight",
+            "HemisphericLight"
+          ],
+          "trackedBase": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 3,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "mainBase": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 3,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 2,
+              "token": "3ed46cfa-12b8-45f0-8f4d-2993cc92fd4c",
+              "effect": {
+                "id": 4,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+                "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define SPOTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 3,
+              "token": "fa398121-24ac-4d0a-b39c-4258c7aafcee",
+              "effect": {
+                "id": 5,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+                "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define SPOTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            },
+            {
+              "id": 5,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            }
+          ]
+        },
+        {
+          "label": "return-off-before-render",
+          "renderCalls": 1,
+          "activeMeshes": 1,
+          "torchEnabled": false,
+          "streetBEnabled": true,
+          "lightTypes": [
+            "PointLight",
+            "PointLight",
+            "DirectionalLight",
+            "HemisphericLight"
+          ],
+          "trackedBase": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 3,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "mainBase": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 3,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 2,
+              "token": "3ed46cfa-12b8-45f0-8f4d-2993cc92fd4c",
+              "effect": {
+                "id": 4,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+                "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define SPOTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 3,
+              "token": "fa398121-24ac-4d0a-b39c-4258c7aafcee",
+              "effect": {
+                "id": 5,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+                "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define SPOTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            },
+            {
+              "id": 5,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            }
+          ]
+        },
+        {
+          "label": "off-render",
+          "renderCalls": 2,
+          "activeMeshes": 1,
+          "torchEnabled": false,
+          "streetBEnabled": true,
+          "lightTypes": [
+            "PointLight",
+            "PointLight",
+            "DirectionalLight",
+            "HemisphericLight"
+          ],
+          "trackedBase": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 5,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "mainBase": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 5,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 2,
+              "token": "c07aa7e4-e201-4451-b41b-e333a64b7162",
+              "effect": {
+                "id": 6,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "262d308750fd52344b7e30dabbfda0218bbe2900f2704ebb4755ad316efc4d83",
+                "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define POINTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 3,
+              "token": null,
+              "effect": null
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 5,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 6,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "262d308750fd52344b7e30dabbfda0218bbe2900f2704ebb4755ad316efc4d83",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            }
+          ]
+        },
+        {
+          "label": "off-settled-render",
+          "renderCalls": 3,
+          "activeMeshes": 1,
+          "torchEnabled": false,
+          "streetBEnabled": true,
+          "lightTypes": [
+            "PointLight",
+            "PointLight",
+            "DirectionalLight",
+            "HemisphericLight"
+          ],
+          "trackedBase": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 6,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "mainBase": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 6,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 2,
+              "token": "c07aa7e4-e201-4451-b41b-e333a64b7162",
+              "effect": {
+                "id": 6,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "262d308750fd52344b7e30dabbfda0218bbe2900f2704ebb4755ad316efc4d83",
+                "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define POINTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 3,
+              "token": "41f3fb26-cbee-41a7-b8b3-cbda139b48cf",
+              "effect": {
+                "id": 7,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "18e10fb9a4a869b3b08115bd9deb7e8293dd3f63938a34f403a2dfa032b9c153",
+                "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define POINTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 5,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 6,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "262d308750fd52344b7e30dabbfda0218bbe2900f2704ebb4755ad316efc4d83",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            },
+            {
+              "id": 7,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "18e10fb9a4a869b3b08115bd9deb7e8293dd3f63938a34f403a2dfa032b9c153",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            }
+          ]
+        },
+        {
+          "label": "on-again",
+          "renderCalls": 3,
+          "activeMeshes": 1,
+          "torchEnabled": true,
+          "streetBEnabled": false,
+          "lightTypes": [
+            "SpotLight",
+            "PointLight",
+            "DirectionalLight",
+            "HemisphericLight"
+          ],
+          "trackedBase": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 6,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "mainBase": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 6,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 2,
+              "token": "161feac3-a89f-4b84-8dd1-6d0b326b1c90",
+              "effect": {
+                "id": 8,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "5cb41639a5bb4376da3758fc7ec324476127555890fd255de18755c8e85ddcab",
+                "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define SPOTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 3,
+              "token": "761bd8af-e0d8-4aaa-b4cf-281fc7fa431d",
+              "effect": {
+                "id": 9,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "29e31ae721a1915bb8419f2c633427cd31a8ec32139c34eff83a207ba454d049",
+                "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+                "lightDefines": [
+                  "#define LIGHT0",
+                  "#define SPOTLIGHT0",
+                  "#define LIGHT1",
+                  "#define POINTLIGHT1",
+                  "#define LIGHT2",
+                  "#define DIRLIGHT2",
+                  "#define LIGHT3",
+                  "#define HEMILIGHT3"
+                ],
+                "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 5,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 6,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "262d308750fd52344b7e30dabbfda0218bbe2900f2704ebb4755ad316efc4d83",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 7,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "18e10fb9a4a869b3b08115bd9deb7e8293dd3f63938a34f403a2dfa032b9c153",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 8,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "5cb41639a5bb4376da3758fc7ec324476127555890fd255de18755c8e85ddcab",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            },
+            {
+              "id": 9,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "29e31ae721a1915bb8419f2c633427cd31a8ec32139c34eff83a207ba454d049",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "stage": "initial-off",
+          "pass": 1,
+          "base": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "previousDepths": []
+        },
+        {
+          "stage": "initial-off",
+          "pass": 2,
+          "base": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 2,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": []
+        },
+        {
+          "stage": "initial-off",
+          "pass": 3,
+          "base": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 3,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": [
+            {
+              "id": 1,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            }
+          ]
+        },
+        {
+          "stage": "on-preparation",
+          "pass": 1,
+          "base": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "stage": "on-preparation",
+          "pass": 2,
+          "base": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 2,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "stage": "on-preparation",
+          "pass": 3,
+          "base": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 3,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            }
+          ]
+        },
+        {
+          "stage": "off-render",
+          "pass": 2,
+          "base": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 4,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 5,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "stage": "off-render",
+          "pass": 1,
+          "base": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 5,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 5,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "stage": "off-settled-render",
+          "pass": 3,
+          "base": {
+            "id": 0,
+            "disposed": false,
+            "refCount": 6,
+            "keySha256": "5dc82af5dd47b235820e46288430561a43580bbfd09c3af61a90963628ab9d58",
+            "definesSha256": "e28756ee5ea3504297972845017fc34a6b0aa83a68d245f9ae17a6df7c993fb6",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define POINTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 5,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 6,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "262d308750fd52344b7e30dabbfda0218bbe2900f2704ebb4755ad316efc4d83",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            }
+          ]
+        },
+        {
+          "stage": "on-again",
+          "pass": 1,
+          "base": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 4,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 5,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 6,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "262d308750fd52344b7e30dabbfda0218bbe2900f2704ebb4755ad316efc4d83",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 7,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "18e10fb9a4a869b3b08115bd9deb7e8293dd3f63938a34f403a2dfa032b9c153",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "stage": "on-again",
+          "pass": 2,
+          "base": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 5,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 5,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 6,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "262d308750fd52344b7e30dabbfda0218bbe2900f2704ebb4755ad316efc4d83",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 7,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "18e10fb9a4a869b3b08115bd9deb7e8293dd3f63938a34f403a2dfa032b9c153",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "stage": "on-again",
+          "pass": 3,
+          "base": {
+            "id": 3,
+            "disposed": false,
+            "refCount": 6,
+            "keySha256": "9b7aedccdc41a6ecc0d57a37b92393dabc9d527996c6970f4aa9558fcdf9f1e0",
+            "definesSha256": "8c122b8f32bcf8057c8fedfe4a789cf6c0944b45da82a55d2be536ce2f54e870",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "cd329f739f2d5f95ef4bd5b391fe1ef0b2b111fe08499dfc8f96f96ae692d5c4"
+          },
+          "previousDepths": [
+            {
+              "id": 1,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "fb0da7e1647ec232e434372269f5e1ff7897adc6624c8910cf47753e0be41c0e",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 2,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "f2a333e060e16f50469814737b5e0446587e699704e4bd7870d3d3dd9609e7f6",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 4,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 5,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+              "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 6,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "262d308750fd52344b7e30dabbfda0218bbe2900f2704ebb4755ad316efc4d83",
+              "definesSha256": "69b37b0710d7d7d63d74063a538ce0683a0e0d19a1eec43ba9a776fcfee61206",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 7,
+              "disposed": true,
+              "refCount": 0,
+              "keySha256": "18e10fb9a4a869b3b08115bd9deb7e8293dd3f63938a34f403a2dfa032b9c153",
+              "definesSha256": "91f667cdcc3c8b9c651722547cc01934b1e34a624643903423373ad14354b54e",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define POINTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": 8,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "5cb41639a5bb4376da3758fc7ec324476127555890fd255de18755c8e85ddcab",
+              "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+              "lightDefines": [
+                "#define LIGHT0",
+                "#define SPOTLIGHT0",
+                "#define LIGHT1",
+                "#define POINTLIGHT1",
+                "#define LIGHT2",
+                "#define DIRLIGHT2",
+                "#define LIGHT3",
+                "#define HEMILIGHT3"
+              ],
+              "vertexSha256": "0416376a0b63e2e27f6876a031067eb338a65f0d1182e2beb9d869f6ac866675"
+            }
+          ]
+        }
+      ],
+      "draws": [
+        {
+          "stage": "initial-off",
+          "pass": 1,
+          "effectId": 0
+        },
+        {
+          "stage": "off-render",
+          "pass": 1,
+          "effectId": 0
+        },
+        {
+          "stage": "off-settled-render",
+          "pass": 1,
+          "effectId": 0
+        }
+      ],
+      "comparison": {
+        "mainBaseSameOnReturn": true,
+        "preparedDepthsImmediatelyAfterOffRender": [
+          {
+            "id": 4,
+            "disposed": true,
+            "refCount": 0,
+            "keySha256": "2f6444421a6acfd7ea77818ac8f8f4a060f12a792be22b063848a694ff1a93c8",
+            "definesSha256": "5c49f39632e6938941e93f0060432036c7079cea549449ca0be4687a8ff47ed5",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "id": 5,
+            "disposed": true,
+            "refCount": 0,
+            "keySha256": "c2397f90a750b425dfc9f6a81851b7fc25489fcac5e004a6dcfd625067887e8b",
+            "definesSha256": "fc01bbd5cb8885ad4a3787ea1cd5cd96332f8d3516bcdd0aa5d158a6424385ad",
+            "lightDefines": [
+              "#define LIGHT0",
+              "#define SPOTLIGHT0",
+              "#define LIGHT1",
+              "#define POINTLIGHT1",
+              "#define LIGHT2",
+              "#define DIRLIGHT2",
+              "#define LIGHT3",
+              "#define HEMILIGHT3"
+            ],
+            "vertexSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ],
+        "offRenderDepthIdentities": [
+          6,
+          null
+        ],
+        "onDepthIdsBefore": [
+          4,
+          5
+        ],
+        "onDepthIdsAfter": [
+          8,
+          9
+        ],
+        "onTokensBefore": [
+          "3ed46cfa-12b8-45f0-8f4d-2993cc92fd4c",
+          "fa398121-24ac-4d0a-b39c-4258c7aafcee"
+        ],
+        "onTokensAfter": [
+          "161feac3-a89f-4b84-8dd1-6d0b326b1c90",
+          "761bd8af-e0d8-4aaa-b4cf-281fc7fa431d"
+        ]
+      },
+      "limitations": "Actual NullEngine GLSL Effects/materials/wrappers/Scene.render and shadow generators. Representative mesh, NullEngine ready dummy texture; no real world asset, WGSL compiler, GPU, pipeline descriptors or timing proof."
+    },
+    {
+      "kind": "shader-control",
+      "wrapperClass": "ShadowDepthWrapper",
+      "mainPass": 4,
+      "states": [
+        {
+          "label": "initial-off",
+          "renderCalls": 1,
+          "activeMeshes": 1,
+          "torchEnabled": false,
+          "streetBEnabled": true,
+          "lightTypes": [
+            "HemisphericLight",
+            "DirectionalLight",
+            "PointLight",
+            "PointLight"
+          ],
+          "trackedBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "mainBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 5,
+              "token": "0b883208-93ca-439e-960e-1409d12f03eb",
+              "effect": {
+                "id": 11,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+                "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 6,
+              "token": "7f520a08-8529-49b8-916f-a06637524b54",
+              "effect": {
+                "id": 12,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+                "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 11,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+              "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            },
+            {
+              "id": 12,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+              "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            }
+          ]
+        },
+        {
+          "label": "on-preparation",
+          "renderCalls": 1,
+          "activeMeshes": 1,
+          "torchEnabled": true,
+          "streetBEnabled": false,
+          "lightTypes": [
+            "HemisphericLight",
+            "DirectionalLight",
+            "PointLight",
+            "SpotLight"
+          ],
+          "trackedBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "mainBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 5,
+              "token": "0b883208-93ca-439e-960e-1409d12f03eb",
+              "effect": {
+                "id": 11,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+                "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 6,
+              "token": "7f520a08-8529-49b8-916f-a06637524b54",
+              "effect": {
+                "id": 12,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+                "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 11,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+              "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            },
+            {
+              "id": 12,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+              "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            }
+          ]
+        },
+        {
+          "label": "return-off-before-render",
+          "renderCalls": 1,
+          "activeMeshes": 1,
+          "torchEnabled": false,
+          "streetBEnabled": true,
+          "lightTypes": [
+            "HemisphericLight",
+            "DirectionalLight",
+            "PointLight",
+            "PointLight"
+          ],
+          "trackedBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "mainBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 5,
+              "token": "0b883208-93ca-439e-960e-1409d12f03eb",
+              "effect": {
+                "id": 11,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+                "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 6,
+              "token": "7f520a08-8529-49b8-916f-a06637524b54",
+              "effect": {
+                "id": 12,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+                "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 11,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+              "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            },
+            {
+              "id": 12,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+              "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            }
+          ]
+        },
+        {
+          "label": "off-render",
+          "renderCalls": 2,
+          "activeMeshes": 1,
+          "torchEnabled": false,
+          "streetBEnabled": true,
+          "lightTypes": [
+            "HemisphericLight",
+            "DirectionalLight",
+            "PointLight",
+            "PointLight"
+          ],
+          "trackedBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "mainBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 5,
+              "token": "0b883208-93ca-439e-960e-1409d12f03eb",
+              "effect": {
+                "id": 11,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+                "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 6,
+              "token": "7f520a08-8529-49b8-916f-a06637524b54",
+              "effect": {
+                "id": 12,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+                "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 11,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+              "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            },
+            {
+              "id": 12,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+              "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            }
+          ]
+        },
+        {
+          "label": "off-settled-render",
+          "renderCalls": 3,
+          "activeMeshes": 1,
+          "torchEnabled": false,
+          "streetBEnabled": true,
+          "lightTypes": [
+            "HemisphericLight",
+            "DirectionalLight",
+            "PointLight",
+            "PointLight"
+          ],
+          "trackedBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "mainBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 5,
+              "token": "0b883208-93ca-439e-960e-1409d12f03eb",
+              "effect": {
+                "id": 11,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+                "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 6,
+              "token": "7f520a08-8529-49b8-916f-a06637524b54",
+              "effect": {
+                "id": 12,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+                "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 11,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+              "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            },
+            {
+              "id": 12,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+              "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            }
+          ]
+        },
+        {
+          "label": "on-again",
+          "renderCalls": 3,
+          "activeMeshes": 1,
+          "torchEnabled": true,
+          "streetBEnabled": false,
+          "lightTypes": [
+            "HemisphericLight",
+            "DirectionalLight",
+            "PointLight",
+            "SpotLight"
+          ],
+          "trackedBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "mainBase": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "depths": [
+            {
+              "generator": "sun",
+              "pass": 5,
+              "token": "0b883208-93ca-439e-960e-1409d12f03eb",
+              "effect": {
+                "id": 11,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+                "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            },
+            {
+              "generator": "torch",
+              "pass": 6,
+              "token": "7f520a08-8529-49b8-916f-a06637524b54",
+              "effect": {
+                "id": 12,
+                "disposed": false,
+                "refCount": 1,
+                "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+                "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+                "lightDefines": [],
+                "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+              }
+            }
+          ],
+          "savedDepths": [
+            {
+              "id": 11,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+              "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            },
+            {
+              "id": 12,
+              "disposed": false,
+              "refCount": 1,
+              "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+              "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+              "lightDefines": [],
+              "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "stage": "initial-off",
+          "pass": 4,
+          "base": {
+            "id": 10,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "a8a190fe7b7d9f0f59067ba49a12f1af88f206cd9252ce575b96c257f18b3929",
+            "definesSha256": "045b56dc52c78f9e836d8510f37caed39b9ca058259c6cec5e0e5e5c5b18d5b4",
+            "lightDefines": [],
+            "vertexSha256": "05705bbe0274504a4316c4a2e0ab1066ac7783e2c9fe0362bcb58e5fb7ae6be3"
+          },
+          "previousDepths": []
+        }
+      ],
+      "draws": [
+        {
+          "stage": "initial-off",
+          "pass": 4,
+          "effectId": 10
+        },
+        {
+          "stage": "off-render",
+          "pass": 4,
+          "effectId": 10
+        },
+        {
+          "stage": "off-settled-render",
+          "pass": 4,
+          "effectId": 10
+        }
+      ],
+      "comparison": {
+        "mainBaseSameOnReturn": true,
+        "preparedDepthsImmediatelyAfterOffRender": [
+          {
+            "id": 11,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "2088af2d77959cb13a9e2ab694ba20cd57689a9465f07dc96e738976ef43fea2",
+            "definesSha256": "59298ae64fa83f8fc3b9badbb21aa3bcd790600299a41f40ac9fb6258b46c85a",
+            "lightDefines": [],
+            "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+          },
+          {
+            "id": 12,
+            "disposed": false,
+            "refCount": 1,
+            "keySha256": "4f5fb88dc750caef1acae541519c7abd6200125653331d1cac2a61c3e23515db",
+            "definesSha256": "a420d7dfae319ce792dfb3175a0a3c2aff0d5fad72b69d9a6d911b2efa351c90",
+            "lightDefines": [],
+            "vertexSha256": "20939da28d415391a82e95c25a10e34a91070b0c2bf57d07358e77befeb7ab82"
+          }
+        ],
+        "offRenderDepthIdentities": [
+          11,
+          12
+        ],
+        "onDepthIdsBefore": [
+          11,
+          12
+        ],
+        "onDepthIdsAfter": [
+          11,
+          12
+        ],
+        "onTokensBefore": [
+          "0b883208-93ca-439e-960e-1409d12f03eb",
+          "7f520a08-8529-49b8-916f-a06637524b54"
+        ],
+        "onTokensAfter": [
+          "0b883208-93ca-439e-960e-1409d12f03eb",
+          "7f520a08-8529-49b8-916f-a06637524b54"
+        ]
+      },
+      "limitations": "Actual NullEngine GLSL Effects/materials/wrappers/Scene.render and shadow generators. Representative mesh, NullEngine ready dummy texture; no real world asset, WGSL compiler, GPU, pipeline descriptors or timing proof."
+    }
+  ],
+  "passed": true
+}

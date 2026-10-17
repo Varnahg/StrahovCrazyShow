@@ -1,0 +1,85 @@
+{
+  "kind": "unaccepted-runtime-receiver-candidate-on-isolated-qa",
+  "baseSnapshot": "3cf48f74ff65aac859d5fa8869abd8da775cee66f85d2df5ff5ac4428d54507b",
+  "baseNativeRevision": "d82eb6342541c7216d395b9d8fe5c89c4b02beeb",
+  "overlays": [
+    {
+      "path": "client/game.ts",
+      "before": "9ab50699f16d66c13a77d8536c1d6ab261a19651221cf440f18fc2d9d18cc4d5",
+      "nativeWorkingSha256": "70f4cb5a045079bf4375c5c4ae2dfe88d58f2b5cd9ec37ce4c690412adbf8c2e",
+      "after": "e2efe004e62a46a732ae695d8d9d6cec592c0b3989dc23f72b35a423de2e328b",
+      "method": "reviewed two-site adapter retaining C5 renderer-failure, preload-visual, optional-controller and phase-profiling behavior"
+    },
+    {
+      "path": "client/light-receivers.ts",
+      "before": null,
+      "nativeWorkingSha256": "9deb3c8045839552226ec44f8924bf9d795dcfef2def9b5953cee7c52104190e",
+      "after": "9deb3c8045839552226ec44f8924bf9d795dcfef2def9b5953cee7c52104190e",
+      "method": "new source"
+    },
+    {
+      "path": "client/vehicle-lighting.ts",
+      "before": "7903f0be0f4b98affc599d7c9cb323581fa482b640b969d9ffc90eb433461891",
+      "nativeWorkingSha256": "5baf48259145e9f1e96884ea8aff0caf2410af57c83aa28160bd8944552c491e",
+      "after": "5baf48259145e9f1e96884ea8aff0caf2410af57c83aa28160bd8944552c491e",
+      "method": "common base after CRLF normalization"
+    },
+    {
+      "path": "client/stable-light-state.ts",
+      "before": "4adfb37dae15ca6a0b9e1b65634266b6791ffc1d8c1aca01858a9557c7f7b8bc",
+      "nativeWorkingSha256": "f385db0207a3662bdbf2a2e07939248d4b555a1dfa5735f6dabb67964daa8207",
+      "after": "f385db0207a3662bdbf2a2e07939248d4b555a1dfa5735f6dabb67964daa8207",
+      "method": "common base after CRLF normalization"
+    },
+    {
+      "path": "tests/game-diagnostics.test.ts",
+      "before": "97913f64ebfaea4c2a6cfb3b44e1172974226017e28c758c5f63dd542794eea6",
+      "nativeWorkingSha256": "a98172c580af9a7836fc568fe1c909517f2a6d91f642cb3f31ca017add2d5268",
+      "after": "9ece3c4e054e1344216f3162c459dd751a1779b0264c5f018756ff151dad59b1",
+      "method": "preserve QA fixture and add actual pre-draw method; normalize CRLF"
+    },
+    {
+      "path": "tests/game-light-lifecycle.test.ts",
+      "before": "671fecfc30e674a9a9a7b398a551d34de3b5c3429f01cd174ed279b5aa39138a",
+      "nativeWorkingSha256": "69c52e3b008e24d821c56d89cf765b990124e0d50d0fe79ab32408ba5d6f2186",
+      "after": "808fa146f997dae79d583982767fb4bd6e3b22dd302d0c9c848097d904aa405d",
+      "method": "reviewed lifecycle fixture adaptation: shared-gate AST lookup works through C5 diagnostic try/finally; preserve all other merged cases; QA disposal fixture explicitly has no pending fence token"
+    },
+    {
+      "path": "tests/game-webgpu-startup.test.ts",
+      "before": "e462f1277a8e9f79bc8176a442684a5aaefccd2990f6cd9d1f7f1db95cfb32f0",
+      "nativeWorkingSha256": "add92359100fb6aab731182d8935be6e8b5c02a0cb1630afde7478c67cc2ef66",
+      "after": "6fa3b4be40bf73e1b68de762e1951862d3def1f235b1aeb2faedd8d1cc7abeb7",
+      "method": "preserve QA fixture and add actual pre-draw method; normalize CRLF"
+    },
+    {
+      "path": "tests/light-receivers.test.ts",
+      "before": null,
+      "nativeWorkingSha256": "b2bfc2efdc52f5f63d219478c19a1702dc03ef09bdab1323600950f0dcbff663",
+      "after": "b2bfc2efdc52f5f63d219478c19a1702dc03ef09bdab1323600950f0dcbff663",
+      "method": "new source"
+    },
+    {
+      "path": "tests/stable-light-state.test.ts",
+      "before": "da9fdb75827d310ff408f05dc0c0bc3a84556ee2b88c9630269def3576ab181b",
+      "nativeWorkingSha256": "ba4dff23c80317fd67c499ff558a103ec8ae5e9e3b3f8bec99cc4c91990ddedb",
+      "after": "ba4dff23c80317fd67c499ff558a103ec8ae5e9e3b3f8bec99cc4c91990ddedb",
+      "method": "common base after CRLF normalization"
+    },
+    {
+      "path": "tests/vehicle-lighting.test.ts",
+      "before": "853f89942bb96e872526208c87e23b8a325ae71dfcc79a9e2c40007806f1f0b0",
+      "nativeWorkingSha256": "c5077dde5d53ec212e1502a2b5538dc4b970a8eb2d68d6beb6258ff79b4568cc",
+      "after": "c5077dde5d53ec212e1502a2b5538dc4b970a8eb2d68d6beb6258ff79b4568cc",
+      "method": "common base after CRLF normalization"
+    },
+    {
+      "path": "tests/flashlight.test.ts",
+      "before": "ee6010035fe3d5589af9188b83960a48062fa1b18c698a38e5c8c7bea870a1e2",
+      "nativeWorkingSha256": "28531c98981dfd13645644dd2785921510d38bc804bc27feb492bfb253256997",
+      "after": "28531c98981dfd13645644dd2785921510d38bc804bc27feb492bfb253256997",
+      "method": "common base after CRLF normalization"
+    }
+  ],
+  "scope": "Same C5 scene and corrected fence/timestamp-OFF QA as baseline. Only explicitly owned receiver/order/Game/test deltas are added; no played files changed. Shared assets/docs retain prior immutable hashes."
+}

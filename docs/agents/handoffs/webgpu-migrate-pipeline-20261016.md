@@ -133,3 +133,35 @@ Sonda nadále měří content-timeline completion latency, ne GPU execution time
 ### Převzetí QA výsledku koordinátorem
 
 Root `webgpu-hitch-record-20261017` po release přebírá přesný handoff e45dd12d48d6c61ee8d4a529c1cce143fee479d44c6bc2323cb527bf70633547. Obě QA kopie zůstávají frozen a nejsou přeneseny do produkční Game. Nový root snapshot3cf48f74…54507b prošel fullTS/Vite build a skutečnou GPU relací8716d28a…e073. [Úplný důkaz a omezení](../../performance/evidence/webgpu-migration-20261016/hitches-v2/README.md): prvníF na prahuB6/outside,1586msGameCPU,8568msRAFmezera,8725,2mscompletion latency, síťovécallbacky/HTTPběží uvnitř. Původní d06c906,5ms číslo je délka burst intervalu, nikoli přesný samostatný GameCPU údaj. Žádná příčina konkrétního ovladače ani přijatá výkonová oprava se z toho netvrdí. Produkčníreceiverkandidát a navazujícíordering task jsou oddělené.
+
+## CPU proof: zánik připravené F shadow varianty při návratu OFF
+
+Vlastník `webgpu-shadow-variant-proof-20261017`, příjemce root. Výchozí WT HEAD `d82eb6342541c7216d395b9d8fe5c89c4b02beeb`; primární AGENTS/policy načtené, status/worktrees/živý registr ověřené a claim získán před zápisem. Scope výhradně nová `.cache/webgpu-migration-checks/pipeline/shadow-variant-proof-20261017/` a tento handoff. Ostatní dirty receiver/Game/test soubory zůstaly pod svými vlastníky a nebyly editované ani použité jako vstup. Vstup je frozen C5 snapshot `c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5` a readonly pinned dependencies-v5/Babylon9.30 s již existujícími projektovými patchi. Žádný další BMAD/spawn. Probe se spustil až po rootově explicitním ukončení GPU okna.
+
+Reprodukce importuje byte-identické C5 `TreeWindPlugin`, `configureTreeMaterial`, `createWebGpuShadowDepthWrapper`, `StableLightState` a shader registrace. Skutečný PBR leaf na malém reprezentativním meshi, skutečná Scene/NullEngine, dvě ShadowGenerator instance, alpha-test a wind vertex obsah jsou ověřené. Factory vybere skutečný FreshWebGpuShadowDepthWrapper; potom se používá běžná NullEngine GLSL Effect cesta, nikoli předstíraná WGSL kompilace. Žádný lifecycle algoritmus není kopírovaný, žádné readiness/dispose/createEffect metody nahrazené. Pozorování používá skutečná onEffectCreated/onAfterRender a pouze čte wrapper mapy.
+
+Při ON se skutečný SPOT range24/priority10 vymění za jednu ze dvou pouličních point lamp; hemi/directional a material cap zůstávají. ON příprava volá skutečné material a ShadowGenerator readiness v jejich skutečných render-pass ID; žádný ON Scene.render. Při návratu OFF nejprve světla přepne, poté vykoná skutečný OFF Scene.render, který onAfterRender potvrdí na camera pass1.
+
+| Krok | PBR main Effect | Sun depth | Torch depth |
+|---|---:|---:|---:|
+| Initial OFF | 0 | 1 | 2 |
+| Připravené ON | 3 | 4 | 5 |
+| OFF před renderem | 3 | 4 živý | 5 živý |
+| Skutečný OFF render | 0 | 6 | původní položka odstraněná |
+| Další ON příprava | 3 | 8 | 9 |
+
+Připravené ON depth4/5 jsou **isDisposed=true již bezprostředně po OFF renderu**, před další přípravou nebo cleanup. Nové ON8/9 mají shodné SHA vertex source i defines, ale jiné RandomGUID tokeny a effect cache keys. Main ON3 je znovu použitý. To dokazuje konkrétní ztrátu shadow identity pro budoucí prewarm. Kontrolní skutečný ShaderMaterial s uniformním wind a native ShadowDepthWrapper drží main10/depth11,12 i tokeny beze změny; nejde o tvrzení, že tento ilustrativní legacy shader dnes C5 generuje. Aktivní listí C5 používá PBR+TreeWind, takže tuto překážku nelze zamítnout argumentem o světelně nezávislém ShaderMaterial.
+
+Finální `node --import tsx probe.ts`: obě větve a lifecycle assertions **PASS**, exit0, fixture+cleanup **20:37:08.737–20:37:08.882 UTC**,142,661ms wall,203ms user+31ms system CPU; celý příkaz1,958s včetně importů. Log `probe-verified.log`, výsledek `report.json`. Zachované předchozí pokusy: NullEngine RawTexture bez ready (nahrazeno standardní ready dummy Texture cestou, žádná falešná material readiness); první záznam připravoval engine pass0, dodatečná kontrola actual main draw to odhalila a finální probe používá skutečné camera.renderPassId. Starší report není finální důkaz.
+
+Manifest **eb8aba0a35a8ce1ff793df3266ec9f19e64a3daaacddc8ea9ac5962db7f3c0be**, probe **614cfee5341bf36e5981f624c92bd0f05ecc82b94f9b5c0af943848d67e04a92**, report **ad9c4abd4dca2745f3b344f7e68d3f67b9fc0504cc95099245e3898ef7fee1f7**, analysis **7579e1c44c805448f7de5f747d58a89441029b3b36e181583313f6e60d82fae9**. Manifest ověřuje shodu pěti převzatých C5 zdrojů a hashované dependency/lifecycle podklady.
+
+`analysis.md` porovnává vlastnictví podle výsledku. Samotné async pipeline prewarm neudrží smazaný wrapper token. Pouhé přidržení refcountu nestačí zachovat map entry/výběr. Nejmenší věrohodný další kandidát jsou omezené ON/OFF varianty vlastněné wrapperem per submesh/baseEffect/generator/shadow defines s úplným cleanup a Fresh layout guardem. Oddělený clone/preparation context vyžaduje přenos přesných effect/token identit a zachování doNotSerialize wind pluginu; prostý clone cache hit nezaručí. Zastavení OFF renderu nesplňuje požadované pokračující vykreslování. Žádná z těchto variant není v tomto úkolu implementovaná ani automaticky přijatá.
+
+Limity: NullEngine neprovádí WGSL/GPU kompilaci ani skutečné GPU draw/submit. Mesh/dummy textura jsou reprezentativní fixture, ne importované tree GLB; používá no-instance a jednoduché shadow filtry, ne obrazovou PCF přejímku. Disposal callback platí nezávisle na filtrech, ale konkrétní GPU varianty/filtering se zde netestovaly. Důkaz neříká četnost postižených stromů při skutečném prvním F, velikost výkonové úspory ani příčinu dlouhé mezery. Přesný async descriptor/cache proof zatím nebyl součástí zadání. Fullsuite/build/GPU/server/install/pnpm ani produkční commit nebyly provedené; scény a enginy jsou disposed, všechny vlastní procesy skončily. Root převzal freeze, po předání následuje release.
+
+### Převzetí a další hranice důkazu
+
+Root `webgpu-hitch-evidence-20261017-root` po release přebírá handoff24653dd526d313ed6eb21bb8d47edc224185dd65ac2514c660ed6781e763b71a a neměnné podklady. [Proof je verzovaný společně s nepřijatým receiver pokusem](../../performance/evidence/webgpu-migration-20261016/hitches-v3/README.md), včetně pěti skutečných C5 zdrojů, probe, reportu, manifestu a logu.
+
+Kontrola existujících GPU archivů našla pouze startup shader inventory, nikoli before/after prvního F. Raw/body duplicit je v zachyceném startupu0; odvozené unused-defines shody nejsou identické skutečně předané WGSL. Další sběr proto využije již existující UI benchmark, který ukládá compilation.start/end, namísto další nové diagnostické vrstvy. CPU lifecycle proof se nesmí vydávat za GPU příčinnou atribuci a neautorizuje automaticky obecnou cache. Žádný nový runtime z tohoto proofu nebyl integrován.

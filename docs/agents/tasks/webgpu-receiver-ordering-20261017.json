@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-receiver-ordering-20261017",
   "title": "KEY-31: explicitně obnovit stabilní pořadí změněných přijímačů svítilny",
-  "status": "ready",
+  "status": "blocked",
   "dependsOn": [],
   "writePaths": [
     "client/stable-light-state.ts",
@@ -25,6 +25,7 @@
   "notes": [
     "Koordinátor root schválil toto API po průzkumu webgpu-torch-receivers-20261017. Původní update sleduje enabled/signatury/topology, nikoli samotný lokální range re-admit.",
     "Root vlastní Game wiring po gltfLightBudget.prepareFrame a před stableLights.update na preload/game paths; tento agent do Game nepíše. Produkční zmrazené4193/4188 se nemění.",
-    "BMAD spec v primary _bmad-output/implementation-artifacts/webgpu-migration-20261017/spec-key-31-long-frame-gaps.md. Přímé implementační delegování bez dalšího workflow/rendereru/podagentů. Commit/integraci provede root."
+    "BMAD spec v primary _bmad-output/implementation-artifacts/webgpu-migration-20261017/spec-key-31-long-frame-gaps.md. Přímé implementační delegování bez dalšího workflow/rendereru/podagentů. Commit/integraci provede root.",
+    "Samotné API/testy prošly13/13 a TS2954/0, ale navazující receiver kandidát nebyl přijat po GPU pilotu. Helper byl spolu s ním vrácen experimentem18701037dd3d8faae9b7bd1807ecfbf23e18aec4/revertemdb9018b8114770e0c71cd2e9b4000303d210b55e. Není integrovaný do main; další práci nezačínat bez nového technicky podloženého zadání koordinátora. Parent migrační cíl zůstává aktivní."
   ]
 }

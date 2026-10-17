@@ -1,0 +1,108 @@
+{
+  "createdAt": "2026-10-17T19:48:25.753Z",
+  "task": "webgpu-receiver-ordering-20261017",
+  "owner": "webgpu-receiver-ordering-20261017-dev",
+  "baseCommit": "3258d49afeb9b2ebeac4982efe66dc78466369b3",
+  "sources": [
+    {
+      "path": "client/stable-light-state.ts",
+      "sha256": "f385db0207a3662bdbf2a2e07939248d4b555a1dfa5735f6dabb67964daa8207"
+    },
+    {
+      "path": "tests/stable-light-state.test.ts",
+      "sha256": "ba4dff23c80317fd67c499ff558a103ec8ae5e9e3b3f8bec99cc4c91990ddedb"
+    }
+  ],
+  "handoff": {
+    "path": "docs/agents/handoffs/webgpu-receiver-ordering-20261017.md",
+    "sha256": "cde843a087bcbf651ff607b2c05a8bf89d14f382f96078d68632eb76aef82ecf"
+  },
+  "spec": {
+    "path": "C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/_bmad-output/implementation-artifacts/webgpu-migration-20261017/spec-key-31-long-frame-gaps.md",
+    "sha256": "6a9e933ba40de08cbf2830bc7b83648cb2dcde6e2023673b7a97d0df9a213de7"
+  },
+  "dependencies": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration\\dependencies-v5\\node_modules",
+  "pinned": [
+    {
+      "path": "@babylonjs/core/package.json",
+      "sha256": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+    },
+    {
+      "path": "@babylonjs/core/Meshes/abstractMesh.pure.js",
+      "sha256": "b092740a1bb15d6d5f457a68854569eb596c95b5c85047eae5e805acdcf8029d"
+    }
+  ],
+  "files": [
+    {
+      "path": "baseline-initial.log",
+      "sha256": "e3741d52e30fae3ddd72657d9ae3429bff8dabc8cf1c0f37c326c53e21974387"
+    },
+    {
+      "path": "freeze.mjs",
+      "sha256": "6ef00376db4f0a63a8dd9351411b57dd09e9177e0333ebc93a8996b601ce6f24"
+    },
+    {
+      "path": "green.log",
+      "sha256": "f3a19d7b5b30f6b04aa5dabdd9e133d2fd7c8cbe877cd70decc346603b59d1ed"
+    },
+    {
+      "path": "owned.diff",
+      "sha256": "f9f0074c13d7bba9ea846860564e964f41a8806c7bc95202b85ddbb7145c95d9"
+    },
+    {
+      "path": "package.json",
+      "sha256": "e1d35f209df3333959931c04ed25681db3ca4d63e919fad0ca93340b4b7b333f"
+    },
+    {
+      "path": "red.log",
+      "sha256": "7356b249ee2c13bdb5a54779d23eefb8f54d4ba448051fb54eb56e6bfc4a04d4"
+    },
+    {
+      "path": "tests-final.log",
+      "sha256": "29b92dc6fb0584d59bf62bb3c7a230e53c69d7c77085d0551e1de514f86abc0c"
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c"
+    },
+    {
+      "path": "typecheck.mjs",
+      "sha256": "86c9b19397ba4299b7a376d4a3e9199d4f10cbd731f01babe6d237ca11efb15f"
+    },
+    {
+      "path": "types-final.log",
+      "sha256": "28613ab32cc58c449ee6de9746a2ac1ebb1cd27b1d457b8f336bf76ccc246db4"
+    },
+    {
+      "path": "validate.mjs",
+      "sha256": "0b1fa110ebf6a45293df8ecb1060525ce5191e681a0c01ea649c13289d78074a"
+    },
+    {
+      "path": "validation.json",
+      "sha256": "37e5d09b1e209f4603a324cd03cc427a494d5b7094b70aa936af5ecc2acfbeb7"
+    }
+  ],
+  "validation": [
+    {
+      "name": "tests",
+      "command": "node --import tsx --test tests/stable-light-state.test.ts",
+      "startedAt": "2026-10-17T19:46:52.629Z",
+      "endedAt": "2026-10-17T19:46:54.321Z",
+      "wallMs": 1689.5825,
+      "exitCode": 0,
+      "signal": null,
+      "log": "tests-final.log"
+    },
+    {
+      "name": "types",
+      "command": "node typecheck.mjs",
+      "startedAt": "2026-10-17T19:46:54.324Z",
+      "endedAt": "2026-10-17T19:47:00.294Z",
+      "wallMs": 5970.4913,
+      "exitCode": 0,
+      "signal": null,
+      "log": "types-final.log"
+    }
+  ],
+  "limitations": "Targeted CPU ordering/defines/lifecycle only; no full suite/build/GPU/commit. Game wiring remains with root."
+}

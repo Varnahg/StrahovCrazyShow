@@ -1,0 +1,19 @@
+{
+  "atUTC": "2026-10-17T20:37:32.066Z",
+  "files": {
+    "client/game.ts": "70f4cb5a045079bf4375c5c4ae2dfe88d58f2b5cd9ec37ce4c690412adbf8c2e",
+    "client/stable-light-state.ts": "f385db0207a3662bdbf2a2e07939248d4b555a1dfa5735f6dabb67964daa8207",
+    "client/vehicle-lighting.ts": "5baf48259145e9f1e96884ea8aff0caf2410af57c83aa28160bd8944552c491e",
+    "client/light-receivers.ts": "9deb3c8045839552226ec44f8924bf9d795dcfef2def9b5953cee7c52104190e",
+    "tests/game-diagnostics.test.ts": "a98172c580af9a7836fc568fe1c909517f2a6d91f642cb3f31ca017add2d5268",
+    "tests/game-light-lifecycle.test.ts": "69c52e3b008e24d821c56d89cf765b990124e0d50d0fe79ab32408ba5d6f2186",
+    "tests/game-webgpu-startup.test.ts": "add92359100fb6aab731182d8935be6e8b5c02a0cb1630afde7478c67cc2ef66",
+    "tests/light-receivers.test.ts": "b2bfc2efdc52f5f63d219478c19a1702dc03ef09bdab1323600950f0dcbff663",
+    "tests/vehicle-lighting.test.ts": "c5077dde5d53ec212e1502a2b5538dc4b970a8eb2d68d6beb6258ff79b4568cc",
+    "tests/flashlight.test.ts": "28531c98981dfd13645644dd2785921510d38bc804bc27feb492bfb253256997",
+    "tests/stable-light-state.test.ts": "ba4dff23c80317fd67c499ff558a103ec8ae5e9e3b3f8bec99cc4c91990ddedb"
+  },
+  "command": "node --import tsx --test tests/game-diagnostics.test.ts tests/game-light-lifecycle.test.ts tests/game-webgpu-startup.test.ts tests/light-receivers.test.ts tests/vehicle-lighting.test.ts tests/flashlight.test.ts tests/stable-light-state.test.ts",
+  "exitCode": 0,
+  "scope": "Targeted native receiver/wiring checkpoint only. Not full suite, GPU acceptance or an accepted production optimization."
+}
