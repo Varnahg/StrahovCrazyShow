@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "resources": [],
+  "notes": [
+    "KEY-38: https://linear.app/gigeconomy/issue/KEY-38/zapojit-stabilni-bmad-do-projektoveho-workflow-codexu",
+    "Pouze schvalene BMAD zapojeni. Cizi WIP neni prevzato. Spolecny registr a puvodni schema zustavaji autoritativni.",
+    "Koordinátor přijal přesné vlastní výstupy a provedené kontroly 17.10.2026; publikaci do main řeší bmad-integrate-20261017."
+  ],
+  "id": "bmad-policy-20261017",
+  "title": "Propojit BMAD s rezervacemi a overit lokalni lifecycle",
+  "writePaths": [
+    "docs/agents/bmad-policy.md",
+    "docs/agents/handoffs/bmad-policy-20261017.md",
+    ".cache/bmad-integration/",
+    "_bmad/render/",
+    "_bmad-output/planning-artifacts/"
+  ],
+  "acceptance": [
+    "Pred rendererem i artefakty je rezervace; podagenti nemaji rekurzivni BMAD ani pravo stagingu ciziho WIP.",
+    "Vyzkum, varianty, refaktoring, skutecne testy a integrace zustavaji povinne."
+  ],
+  "verification": [
+    "Rozlisit skutecny pilot od konfiguracnich kontrol.",
+    "Overit reinstall a prenositelnost v izolovanem fixture, vcetne konfliktu a ciziho WIP."
+  ]
+}

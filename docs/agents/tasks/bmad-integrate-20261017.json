@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "bmad-integrate-20261017",
+  "title": "Přijmout ověřené BMAD zapojení a integrovat pouze jeho změny",
+  "status": "ready",
+  "dependsOn": [
+    "bmad-install-20261017",
+    "bmad-overrides-20261017",
+    "bmad-policy-20261017",
+    "bmad-pilot-20261017"
+  ],
+  "writePaths": [
+    ".agents/skills/",
+    "_bmad/",
+    "_bmad-output/",
+    ".gitignore",
+    "docs/agents/bmad.md",
+    "docs/agents/bmad-policy.md",
+    "docs/agents/handoffs/bmad-install-20261017.md",
+    "docs/agents/handoffs/bmad-overrides-20261017.md",
+    "docs/agents/handoffs/bmad-policy-20261017.md",
+    "docs/agents/handoffs/bmad-pilot-20261017.md",
+    "docs/agents/handoffs/bmad-integrate-20261017.md",
+    ".cache/bmad-integration/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze doložený BMAD diff přijatý od jeho autorů; cizí dirty cesty, runtime, package/lock a živé preview zachovány.",
+    "Před přijetím projde skutečný renderer, resolver, reinstall/přenositelnost, dokumentační pilot, nezávislé review a místní odkazy.",
+    "Samostatný commit funkčního celku v main; Linear a evidence uvádějí skutečný stav a omezení."
+  ],
+  "verification": [
+    "SHA-256 všech původních dirty cest před/po integraci; přesný commit path manifest a staged diff.",
+    "node scripts/agent-tasks.mjs validate; kontrola ignorovaných osobních/cache souborů.",
+    "Ověření projektové dostupnosti skills oddělit od pouhé existence souborů."
+  ],
+  "notes": [
+    "KEY-38: https://linear.app/gigeconomy/issue/KEY-38/zapojit-stabilni-bmad-do-projektoveho-workflow-codexu",
+    "Převzetí výhradně z handoffů bmad-install, bmad-policy, bmad-overrides a bmad-pilot. --adopt-dirty se týká pouze těchto doložených vlastních výstupů.",
+    "AGENTS.md, docs/agents/README.md, katalog a samostatná evidence zůstávají v paralelní administrativní rezervaci stejného koordinátora.",
+    "Pouze Git publikace dokumentace a nástrojů; žádný herní build, integrační test, GPU, server nebo zátěž. docs/verification.md zůstává cizímu vlastníkovi."
+  ]
+}

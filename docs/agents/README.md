@@ -4,6 +4,8 @@ Tato pravidla rozdělují zápis do souborů, náročné procesy a předání v�
 
 ## Co je zdrojem pravdy
 
+Pro nové funkce a významné opravy je zapojen projektový BMAD 6.12.4: [návod](bmad.md) a [závazné propojení s rezervacemi](bmad-policy.md). BMAD specifikace a role rozšiřují tento postup; zdroje pravdy v následující tabulce se nemění. Renderer i jeho ignorované výstupy vyžadují rezervaci před vyvoláním dovednosti.
+
 | Informace                                       | Kde ji zjistit                                                  |
 | ----------------------------------------------- | --------------------------------------------------------------- |
 | Co platí vždy                                   | `AGENTS.md` a relevantní lokální instrukce                      |

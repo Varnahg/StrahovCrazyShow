@@ -29,6 +29,14 @@ Na sdíleném checkoutu nepoužívej `git add .`, hromadný commit, `reset`, `re
 
 Aktivní rezervace jsou lokální ve společném Git adresáři; nesdílejí se mezi nezávislými klony/stroji a samy neblokují editor. V takovém případě urči jednoho koordinátora a jedno místo přidělování, nebo použij společnou externí službu. Úkoly a předání jsou verzované, provozní PID/rezervace se necommitují. Existujícím relacím je nutné nové instrukce výslovně načíst; nelze předpokládat, že změnu souboru samy zaznamenaly.
 
+## BMAD v tomto projektu
+
+- U nových funkcí a významných oprav používej automaticky projektový BMAD podle rozsahu změny. Než vyvoláš jakoukoli BMAD dovednost nebo její renderer, přečti [projektové propojení BMAD](docs/agents/bmad-policy.md); praktické příklady jsou v [návodu](docs/agents/bmad.md). Drobné mechanické úpravy nepotřebují celý workflow.
+- Před prvním zápisem rendereru musíš držet rezervaci jeho výstupů i následných artefaktů. BMAD role, specifikace, sprint ani stav „hotovo“ nepřebíjejí zdejší zadání, task JSON, živé rezervace, cizí WIP nebo přijetí integrátorem. Nezačínej neobjednanou práci.
+- Podagent s konkrétním implementačním/review zadáním od koordinátora další BMAD workflow rekurzivně nespouští. Načte zdejší pravidla a policy; před zápisem získá vlastní disjunktní rezervaci, provede zadanou implementaci, refaktoring a ověření a předá důkazy. Čistě čtecí review rezervaci nepotřebuje.
+- Review, staging a commit se týkají pouze doložených vlastních změn tasku. Nikdy nepoužij upstream pokyn ke stagingu celého dirty stromu. Počet review nálezů nemá minimum; čistý výsledek je platný. Autorizovaná běžná práce nevyžaduje nové potvrzení jen kvůli BMAD kroku.
+- Instalovaná verze a týmové overrides jsou verzované; aktualizace BMAD je samostatná rezervovaná údržba. Běžící starší relace musí tuto sekci výslovně znovu načíst, než BMAD použije.
+
 ## Pravidla hry a ověřování
 
 - Svět používá metry, +X východ, +Z jih a pravotočivou kameru Babylon. A musí být vlevo a D vpravo na obrazovce při každém natočení kamery. Ověř skutečnou projekci a jízdu, nikoli pouze znaménka v kódu.

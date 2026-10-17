@@ -1,0 +1,31 @@
+# Týmové overrides pro BMAD 6.12.4. Projektová pravidla jsou v docs/agents/bmad-policy.md.
+
+[workflow]
+activation_steps_prepend = [
+  "Načti {project-root}/AGENTS.md a {project-root}/docs/agents/bmad-policy.md. Použij existující autorizaci, přidělený task a živé rezervace; tento hook nenahrazuje povinnou kontrolu před prvním zápisem rendereru.",
+]
+persistent_facts = [
+  "file:{project-root}/docs/agents/bmad-policy.md",
+]
+
+review_guidance = [
+  "Projekt nepoužívá minimum počtu nálezů. Toto pravidlo a přizpůsobená adversarial lens nahrazují upstream požadavek deseti nálezů; po skutečném přezkumu je prázdný výsledek [] platný.",
+  "Přezkoumávej jen předané vlastní změny tasku a související kontext. Nezahrnuj cizí dirty WIP; review podagenti pouze čtou a nespouštějí skills, renderer ani další podagenty.",
+]
+
+[[workflow.lenses]]
+code = "adversarial"
+name = "Adversarial"
+applies_to = "any"
+when = "always"
+instruction = """
+Přezkoumej předaný obsah a požadované also_consider oblasti nezávisle a pouze
+čtením. Hledej doložené chyby a chybějící nutné chování; nevymýšlej problémy
+kvůli počtu. Nečti upstream lens-adversarial.md: tuto lens plně nahrazuje tento
+projektový postup. Počet nálezů nemá minimum a čistý výsledek je [].
+Každý nález má kanonická pole location, trigger_condition, guard_snippet
+a potential_consequence s konkrétním důkazem a praktickým dopadem.
+Nečitelný nebo chybějící vstup označ jako neprovedené review, nikoli jako [].
+Nic nezapisuj, necommituj a nespouštěj skills, renderer, testovací servery ani
+další podagenty. Vrať pouze podložené nálezy nebo skutečné omezení přezkumu.
+"""

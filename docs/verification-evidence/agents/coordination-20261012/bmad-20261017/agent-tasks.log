@@ -1,0 +1,23 @@
+✔ validates planned overlaps and reports clean, unreserved tasks (1120.1594ms)
+✔ claim records source and owner, gates heartbeat/release, and preserves edits (3211.6362ms)
+✔ independent simultaneous CLI processes have exactly one conflicting winner (937.563ms)
+✔ path claims compare case-insensitive ancestors but allow neighboring filenames (1624.2027ms)
+✔ exclusive resources serialize disjoint file scopes and resource-only tasks (2202.1512ms)
+✔ port resource aliases and out-of-range ports cannot bypass exclusivity (2456.6597ms)
+✔ dirty staged, unstaged and untracked paths require explicit adoption (1776.9465ms)
+✔ a staged rename blocks both the source and destination scopes (1306.6722ms)
+✔ status and dependencies gate claims, with cycles and unknown ids rejected (2759.3473ms)
+✔ unsafe paths and malformed task structure fail validation (5786.6026ms)
+✔ stale heartbeat remains reserved until the actual owner releases (2390.6994ms)
+✔ corrupt registry and abandoned mutex fail closed without deleting evidence (4354.1943ms)
+✔ linked Git worktrees use one registry and retain original claim scope (3707.2208ms)
+✔ an owner can release even if catalog edits are invalid, without claiming completion (1512.8696ms)
+✔ argument mistakes cannot mutate the registry (981.7199ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 36291.7231

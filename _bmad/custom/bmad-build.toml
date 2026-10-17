@@ -1,0 +1,72 @@
+# Týmové overrides pro BMAD 6.12.4. Projektová pravidla jsou v docs/agents/bmad-policy.md.
+
+[workflow]
+activation_steps_prepend = [
+  "Načti {project-root}/AGENTS.md a {project-root}/docs/agents/bmad-policy.md. Použij existující autorizaci, přidělený task a živé rezervace; tento hook nenahrazuje povinnou kontrolu před prvním zápisem rendereru.",
+]
+persistent_facts = [
+  "file:{project-root}/docs/agents/bmad-policy.md",
+]
+
+implementation_handoff = """
+Jako koordinátor nejdřív přečti {spec_file} a projektovou policy. Specifikace popisuje
+zadaný výsledek; nepřebíjí uživatelské zadání, AGENTS.md, task JSON ani živé rezervace.
+Pro dítě vyber autorizovaný disjunktní task. Předej jeho přesné ID, unikátní owner,
+absolutní pracovní kopii, writePaths, potřebné resources, testy a cestu předání.
+Pokud předáváš vlastní rozpracované soubory, nejdřív dolož převod a uvolni jejich
+rezervaci. Nikdy nerezervuj stejné cesty zároveň za rodiče a dítě. Není-li disjunktní
+task připravený, implementuj přímo pouze v rozsahu vlastní platné rezervace.
+
+Spouštíš-li implementačního podagenta, dej mu tento kontext a instrukce:
+- Načti {spec_file}, všechny soubory z jeho context, kořenový AGENTS.md a
+  docs/agents/bmad-policy.md z předané absolutní pracovní kopie.
+- Jsi podagent s konkrétním implementačním zadáním. Nespouštěj rekurzivně žádný
+  BMAD workflow, renderer ani další podagenty. Nezačínej další katalogový task.
+- Před prvním zápisem ověř git status, git worktree list a živý registr a získej
+  vlastní claim přiděleného tasku pod předaným owner. Při kolizi nezapisuj a vrať
+  důkaz koordinátorovi. --adopt-dirty použij pouze pro doložené předání, ne k obejití kolize.
+- Pracuj pouze v přidělených writePaths; neměň specifikaci nebo společné soubory,
+  pokud nejsou tvoje. Nutnou změnu rozsahu vrať koordinátorovi.
+- Proveď zadanou implementaci, cílený refaktoring i relevantní ověření. Zachovej
+  podklady, cache a lifecycle; těžké kontroly spusť jen s přidělenými resources.
+- Nevyžaduj nové potvrzení již autorizované běžné práce. Skutečně chybějící
+  rozhodnutí nebo konflikt pravidel pojmenuj a předej koordinátorovi.
+- Diff, staging a případný explicitně přidělený commit omez na doložené vlastní
+  změny tasku. Nikdy nepřebírej celý dirty strom ani cizí staged/untracked WIP.
+- Sepiš přidělené předání s přesnými soubory, skutečnými výsledky kontrol, hashy
+  a omezeními. Ukonči vlastní pomocné procesy a uvolni claim. Stav tasku, Linear
+  a přijetí integrace řídí koordinátor; samotné dokončení specifikace není Done.
+
+Není-li k dispozici nástroj pro podagenty, proveď stejné kroky přímo pod svou
+platnou rezervací. Nepředstírej delegaci, výsledky kontrol ani přijetí integrátorem.
+"""
+
+[[workflow.review_layers]]
+id = "blind-hunter"
+name = "Blind Hunter"
+instruction = """
+Spusť nezávislého podagenta pouze pro čtení. Předej absolutní cestu pracovní kopie,
+AGENTS.md a docs/agents/bmad-policy.md, přesný seznam vlastních změn tasku a tento úkol:
+Přečti unified diff v {diff_file}; jde o celý předmět review. Hledej doložené chyby,
+regrese a chybějící chování, ne domnělé nedostatky k naplnění kvóty. Každý nález
+musí uvést místo, konkrétní spouštěcí podmínku, důkaz a praktický dopad. Počet nálezů
+nemá minimum. Pokud nejsou podložené nálezy, vrať prázdný seznam [].
+Prázdný nebo nečitelný vstup označ jako neprovedené review, ne jako čistý výsledek.
+Nic nezapisuj ani necommituj, nespouštěj skills, renderer, testovací servery ani
+další podagenty. Vrať pouze nálezy nebo výslovné omezení přezkumu.
+"""
+
+[[workflow.oneshot_review_layers]]
+id = "blind-hunter"
+name = "Blind Hunter"
+instruction = """
+Spusť nezávislého podagenta pouze pro čtení. Předej absolutní pracovní kopii,
+AGENTS.md a docs/agents/bmad-policy.md a přesný seznam/diff vlastních změn tohoto
+tasku. Nepředávej všechny změněné soubory společného checkoutu.
+Podagent zkontroluje pouze předané změny a potřebné okolí kódu. Každý nález uvede
+místo, spouštěcí podmínku, důkaz a praktický dopad. Počet nálezů nemá minimum;
+čistý výsledek po provedeném přezkumu je platný a vrací se jako [].
+Chybějící nebo nečitelný vstup je omezení přezkumu, ne čistý výsledek.
+Podagent nic nezapisuje, necommituje a nespouští skills, renderer, testovací servery
+ani další podagenty. Vrátí pouze nálezy nebo výslovné omezení přezkumu.
+"""

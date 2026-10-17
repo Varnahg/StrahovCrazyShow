@@ -1,0 +1,30 @@
+{
+  "reviewedAt": "2026-10-17T15:20:11.582Z",
+  "scope": "Five pilot files only; no foreign WIP",
+  "layers": [
+    {
+      "name": "blind-hunter",
+      "findings": [
+        {
+          "location": "docs/agents/bmad.md:66",
+          "verdict": "low",
+          "route": "patch",
+          "evidence": "Installed bmad-spec and bmad-help do not invoke render_skill.py; guide generalized build activation to every skill.",
+          "action": "Fixed by original author; sentence names build/build-auto, other skills follow own activation; 26 links and manifest refreshed."
+        }
+      ]
+    },
+    {
+      "name": "edge-case-hunter",
+      "findings": [],
+      "scope": "Read-only source/parser/config/manifest trace; four hashes checked, no command execution."
+    },
+    {
+      "name": "verification-gap",
+      "findings": [],
+      "scope": "Static documentation excluded from executable verification-gap analysis; no independent test execution."
+    }
+  ],
+  "limits": "Reviews are distinct from actually run installer/resolver/renderer and coordination checks.",
+  "closedAt": "2026-10-17T15:21:36.253Z"
+}

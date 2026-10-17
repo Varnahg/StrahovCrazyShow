@@ -1,0 +1,24 @@
+# Týmové overrides pro BMAD 6.12.4. Projektová pravidla jsou v docs/agents/bmad-policy.md.
+
+[workflow]
+activation_steps_prepend = [
+  "Načti {project-root}/AGENTS.md a {project-root}/docs/agents/bmad-policy.md. Použij existující autorizaci, přidělený task a živé rezervace; tento hook nenahrazuje povinnou kontrolu před prvním zápisem rendereru.",
+]
+persistent_facts = [
+  "file:{project-root}/docs/agents/bmad-policy.md",
+]
+
+[[workflow.review_layers]]
+id = "blind-hunter"
+name = "Blind Hunter"
+instruction = """
+Spusť nezávislého podagenta pouze pro čtení. Předej absolutní cestu pracovní kopie,
+AGENTS.md a docs/agents/bmad-policy.md, přesný seznam vlastních změn tasku a tento úkol:
+Přečti unified diff v {diff_file}; jde o celý předmět review. Hledej doložené chyby,
+regrese a chybějící chování, ne domnělé nedostatky k naplnění kvóty. Každý nález
+musí uvést místo, konkrétní spouštěcí podmínku, důkaz a praktický dopad. Počet nálezů
+nemá minimum. Pokud nejsou podložené nálezy, vrať prázdný seznam [].
+Prázdný nebo nečitelný vstup označ jako neprovedené review, ne jako čistý výsledek.
+Nic nezapisuj ani necommituj, nespouštěj skills, renderer, testovací servery ani
+další podagenty. Vrať pouze nálezy nebo výslovné omezení přezkumu.
+"""

@@ -1,0 +1,9 @@
+# Týmové overrides pro BMAD 6.12.4. Projektová pravidla jsou v docs/agents/bmad-policy.md.
+
+[agent]
+activation_steps_prepend = [
+  "Načti {project-root}/AGENTS.md a {project-root}/docs/agents/bmad-policy.md. Použij existující autorizaci, přidělený task a živé rezervace; tento hook nenahrazuje povinnou kontrolu před prvním zápisem rendereru.",
+]
+persistent_facts = [
+  "file:{project-root}/docs/agents/bmad-policy.md",
+]

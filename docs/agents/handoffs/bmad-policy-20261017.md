@@ -1,0 +1,13 @@
+# Předání: bmad-policy-20261017
+
+- Vlastník: `bmad-01a14a49-policy`; koordinátor: `bmad-01a14a49-root`.
+- Pracovní kopie: `codex/bmad-integration`, základ `b10194bb4bc8a433d87f1ce73241277914710cfa`.
+- Stav: propojení, verifikace a pilot dokončeny; předává se integračnímu tasku. Integrace do main zatím není deklarována.
+- Dodatek k instalačnímu předání: instalátor vytvořil také týmový stub `_bmad/custom/config.toml`, nejen `.gitignore`. Oba vlastní nově instalované soubory výslovně předávám `bmad-01a14a49-overrides` v tasku `bmad-overrides-20261017`. Ignorovaný osobní `config.user.toml` zůstává zachovaný. Nejde o převzetí cizího WIP.
+- Rozsah: `docs/agents/bmad-policy.md`, tento handoff, `_bmad-output/planning-artifacts/bmad-pilot-20261017.md`; vlastní lokální `.cache/bmad-integration/` a `_bmad/render/` nejsou verzované. Administrativní změny AGENTS/README/katalogu a oddělenou evidenci drží současně stejný koordinátor v tasku `dev-coordination-maintenance`.
+- Výsledek: automatický postup přiměřený rozsahu, rezervace před rendererem, selektivní kontext, přesné předání podagentům a staging, doložené review bez kvóty a integrátor jako příjemce. Pravidla se soustřeďují v jedné policy; žádná změna herních cache, alokací ani lifecycle.
+- Ověření: [výsledky KEY-38](../../verification-evidence/agents/coordination-20261012/bmad-20261017/README.md). Oficiální render build snapshotu `ce20385889019000b383`, delegovaný pilot pod vlastním claimem, tři nezávislé review vrstvy; jedna drobná nepřesnost návodu opravena původním autorem. Kontrola 66 místních odkazů bez chyb; 15/15 koordinačních testů PASS; source guard PASS. Reinstall v jiné cestě s mezerou zachoval 251 chráněných souborů, oba build rendery mají přenositelné cesty a stabilní reuse. 219 vendor hashů beze změny.
+- Rozlišení důkazů: test koordinátoru ověřuje rezervace a ochranu dirty souborů, pilot skutečně získal vlastní claim. Není to OS ochrana ani GPU/herní přejímka. Kořenová chyba globálního pnpm store zůstává neprokázaná; úspěšný jednorázový instalační režim je doložen.
+- Procesy: všechna vlastní CLI skončila, nebyl spuštěn server ani 3D scéna. Read-only browserové pozorování nezměnilo otevřený test.
+- Převod: po uvolnění claimu výslovně předávám všechny vlastní výše uvedené soubory a lokální výstupy tasku `bmad-integrate-20261017`, vlastník `bmad-01a14a49-integrator`. Cizí kopírované koordinační vstupy jsou pouze podklady a nesmějí být součástí commitu.
+- Rezervace: uvolní se po tomto předání; skutečný stav je v registru. Integrační task zaznamená commit, zachování 132 původních dirty cest a přijetí do main.

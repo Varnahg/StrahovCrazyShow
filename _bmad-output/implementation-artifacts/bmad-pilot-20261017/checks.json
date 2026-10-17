@@ -1,0 +1,210 @@
+{
+  "checkedAt": "2026-10-17T15:16:35.286Z",
+  "task": "bmad-pilot-20261017",
+  "scope": "Pilot documentation links and installed command contracts only; no gameplay or reinstall execution",
+  "status": "passed",
+  "baselineCommit": "b10194bb4bc8a433d87f1ce73241277914710cfa",
+  "observedVersions": {
+    "node": "v24.19.0",
+    "pnpm": "11.25.0",
+    "uv": "0.12.3",
+    "bmad": "6.12.4"
+  },
+  "catalogValidation": {
+    "command": "node scripts/agent-tasks.mjs validate",
+    "exitCode": 0,
+    "stdout": "Valid: 163 task definitions, 15 active reservations. Planned task scopes may overlap; claims serialize them."
+  },
+  "links": [
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "bmad-policy.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "../../AGENTS.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "README.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "../../.agents/skills/",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "../../.agents/skills/bmad-build/SKILL.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "task-template.json",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "../../_bmad/scripts/resolve_config.py",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "handoffs/bmad-install-20261017.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "handoffs/bmad-install-20261017.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "handoffs/bmad-overrides-20261017.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "../verification-evidence/agents/coordination-20261012/bmad-20261017/portability-reinstall.json",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "../../_bmad-output/planning-artifacts/bmad-pilot-20261017.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "../../_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/bmad.md",
+      "target": "../verification-evidence/agents/coordination-20261012/bmad-20261017/README.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/handoffs/bmad-pilot-20261017.md",
+      "target": "../bmad.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/handoffs/bmad-pilot-20261017.md",
+      "target": "../../../_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/handoffs/bmad-pilot-20261017.md",
+      "target": "../../../_bmad-output/implementation-artifacts/bmad-pilot-20261017/checks.json",
+      "status": "passed"
+    },
+    {
+      "file": "docs/agents/handoffs/bmad-pilot-20261017.md",
+      "target": "../../../_bmad-output/implementation-artifacts/bmad-pilot-20261017/source-manifest.json",
+      "status": "passed"
+    },
+    {
+      "file": "_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md",
+      "target": "../../planning-artifacts/bmad-pilot-20261017.md",
+      "status": "passed"
+    },
+    {
+      "file": "_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md",
+      "target": "../../../docs/agents/bmad.md",
+      "status": "passed"
+    },
+    {
+      "file": "_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md",
+      "target": "checks.json",
+      "status": "passed"
+    },
+    {
+      "file": "_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md",
+      "target": "source-manifest.json",
+      "status": "passed"
+    },
+    {
+      "file": "_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md",
+      "target": "../../../docs/agents/handoffs/bmad-install-20261017.md",
+      "status": "passed"
+    },
+    {
+      "file": "_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md",
+      "target": "../../../docs/agents/handoffs/bmad-overrides-20261017.md",
+      "status": "passed"
+    },
+    {
+      "file": "_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md",
+      "target": "../../../docs/verification-evidence/agents/coordination-20261012/bmad-20261017/portability-reinstall.json",
+      "status": "passed"
+    },
+    {
+      "file": "_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md",
+      "target": "../../../docs/agents/handoffs/bmad-pilot-20261017.md",
+      "status": "passed"
+    }
+  ],
+  "skillNames": {
+    "installedCount": 29,
+    "documented": [
+      "bmad-architecture",
+      "bmad-build",
+      "bmad-build-auto",
+      "bmad-create-epics-and-stories",
+      "bmad-help",
+      "bmad-prd",
+      "bmad-spec"
+    ],
+    "status": "passed"
+  },
+  "commandChecks": [
+    {
+      "check": "Pinned pnpm install line equals successful installer handoff",
+      "status": "passed",
+      "execution": "installer owner, not rerun by pilot"
+    },
+    {
+      "check": "Resolver --project-root / --key supported by actual parser",
+      "status": "passed",
+      "execution": "static verification"
+    },
+    {
+      "check": "bmad-spec output path and slug pattern equal installed defaults",
+      "status": "passed",
+      "execution": "static verification"
+    },
+    {
+      "check": "Durable documentation uses repository-relative file references",
+      "status": "passed"
+    }
+  ],
+  "notRun": [
+    "recursive BMAD workflow",
+    "renderer",
+    "install/reinstall",
+    "full game tests",
+    "build",
+    "game integration",
+    "GPU"
+  ],
+  "next": [
+    "independent review of task diff",
+    "coordinator acceptance and integration"
+  ],
+  "reviewFix": {
+    "checkedAt": "2026-10-17T15:20:37.002Z",
+    "status": "passed",
+    "scope": "Renderer statement only, updated documentation links and output hashes",
+    "inspectedSkills": [
+      "bmad-build",
+      "bmad-build-auto",
+      "bmad-spec",
+      "bmad-help"
+    ],
+    "localLinks": 26,
+    "widerTestsRerun": false
+  }
+}
