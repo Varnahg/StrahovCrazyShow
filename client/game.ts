@@ -14,6 +14,7 @@ import { SceneTextureDiagnostics } from "./texture-diagnostics";
 import { StableLightState } from "./stable-light-state";
 import { GltfLightBudget } from "./gltf-light-budget";
 import { prepareLightVariants } from "./light-preparation";
+import { WebGpuPipelinePreparation } from "./webgpu-pipeline-preparation";
 import { arePreparationEffectsReady } from "./strict-material-preparation";
 import { selectLightingPreview } from "./lighting-preview";
 import {
@@ -837,13 +838,17 @@ export class Game {
     this.actor = this.sim.add("local");
     // Streamed materials must be rendered while glTF assets finish their
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
-    const preloadRender = () => {
+    let pipelinePreparation: WebGpuPipelinePreparation | undefined;
+    const renderPreloadScene = () => {
       if (!this.disposed) {
         this.gltfLightBudget.prepareFrame();
         this.stableLights.update();
         this.scene.render();
       }
     };
+    const preloadRender = () => pipelinePreparation
+      ? pipelinePreparation.render(renderPreloadScene)
+      : renderPreloadScene();
     this.engine.runRenderLoop(preloadRender);
     try {
       const [
@@ -935,41 +940,59 @@ export class Game {
     this.vehicleLighting = new VehicleLighting(this.scene);
     this.updatePlayers([this.localPlayer]);
     this.engine.stopRenderLoop(preloadRender);
-    this.canvas.dataset.bootStage = "light-preparation";
-    if (this.frameLifecycleProfile)
-      sessionDiagnostics.event("engine-frame-profile", {
-        stage: "preparation-start", rendererId: this.renderHealth.rendererId,
-        timing: this.frameLifecycleProfile.snapshot(),
-      });
-    const preparation = await this.renderHealth.guard(this.prepareLighting(preloadRender));
-    this.assertStartupActive();
-    sessionDiagnostics.event("lighting-preparation", preparation);
-    sessionDiagnostics.event("webgpu-preparation-profile", this.compilationProfile.snapshot());
-    if (this.frameLifecycleProfile)
-      sessionDiagnostics.event("engine-frame-profile", {
-        stage: "preparation-end", rendererId: this.renderHealth.rendererId,
-        timing: this.frameLifecycleProfile.snapshot(),
-      });
-    this.canvas.dataset.lightPreparation = preparation.status;
-    if (preparation.status !== "complete") {
-      this.renderHealth.report("pipeline", `Příprava světel: ${preparation.status}`);
-      throw new Error(`Přípravu 3D scény se nepodařilo dokončit (${preparation.status}).`);
-    }
-    this.canvas.dataset.bootStage = "submitted-frame";
-    this.compilationProfile.setStage("submitted-frame");
-    await waitForRenderStartup({
-      engine: this.engine,
-      health: this.renderHealth,
-      render: preloadRender,
-      isReady: () => {
-        const meshes = this.scene.getActiveMeshes();
-        for (let index = 0; index < meshes.length; index++)
-          if (!this.isMeshReadyForCamera(meshes.data[index])) return false;
-        return arePreparationEffectsReady(this.engine);
-      },
+    // Only hidden startup draws may wait for a pipeline without drawing it.
+    // Keep the scope through restore and the final submitted-frame gate.
+    pipelinePreparation = new WebGpuPipelinePreparation(this.engine, {
       signal: this.startupAbort.signal,
+      retryIncompleteFrame: () => {
+        // A skipped once-only/periodic target must receive a real retry. This
+        // registry also covers shared/standalone ObjectRenderer owners; normal
+        // postprocess scratch targets are redrawn on every scene pass already.
+        for (const renderer of this.scene.objectRenderers)
+          renderer.resetRefreshCounter();
+      },
     });
-    this.assertStartupActive();
+    try {
+      this.canvas.dataset.bootStage = "light-preparation";
+      if (this.frameLifecycleProfile)
+        sessionDiagnostics.event("engine-frame-profile", {
+          stage: "preparation-start", rendererId: this.renderHealth.rendererId,
+          timing: this.frameLifecycleProfile.snapshot(),
+        });
+      const preparation = await this.renderHealth.guard(this.prepareLighting(preloadRender, pipelinePreparation));
+      this.assertStartupActive();
+      sessionDiagnostics.event("lighting-preparation", preparation);
+      sessionDiagnostics.event("webgpu-preparation-profile", this.compilationProfile.snapshot());
+      if (this.frameLifecycleProfile)
+        sessionDiagnostics.event("engine-frame-profile", {
+          stage: "preparation-end", rendererId: this.renderHealth.rendererId,
+          timing: this.frameLifecycleProfile.snapshot(),
+        });
+      this.canvas.dataset.lightPreparation = preparation.status;
+      if (preparation.status !== "complete") {
+        this.renderHealth.report("pipeline", `Příprava světel: ${preparation.status}`);
+        throw new Error(`Přípravu 3D scény se nepodařilo dokončit (${preparation.status}).`);
+      }
+      this.canvas.dataset.bootStage = "submitted-frame";
+      this.compilationProfile.setStage("submitted-frame");
+      await waitForRenderStartup({
+        engine: this.engine,
+        health: this.renderHealth,
+        render: preloadRender,
+        isReady: () => {
+          if (!pipelinePreparation!.isReady()) return false;
+          const meshes = this.scene.getActiveMeshes();
+          for (let index = 0; index < meshes.length; index++)
+            if (!this.isMeshReadyForCamera(meshes.data[index])) return false;
+          return arePreparationEffectsReady(this.engine);
+        },
+        signal: this.startupAbort.signal,
+      });
+      this.assertStartupActive();
+    } finally {
+      pipelinePreparation.dispose();
+      pipelinePreparation = undefined;
+    }
     this.canvas.dataset.renderHealth = "ready";
     this.compilationProfile.setStage("ready");
     this.ready = true;
@@ -2314,7 +2337,7 @@ export class Game {
     }
     return lighting;
   }
-  private prepareLighting(render: () => void) {
+  private prepareLighting(render: () => void, pipelines?: Pick<WebGpuPipelinePreparation, "isReady">) {
     const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
     // The same controller/materials survive into gameplay; no proxy shaders.
     this.flashlight ??= new PlayerFlashlight(this.scene);
@@ -2417,6 +2440,7 @@ export class Game {
         // Real preparation and newly requested effects must settle before this
         // variant advances, even if a material can still draw its old effect.
         return (
+          (pipelines?.isReady() ?? true) &&
           health.pendingPreparationOperations === 0 &&
           arePreparationEffectsReady(this.engine)
         );

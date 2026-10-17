@@ -228,11 +228,19 @@ test("actual preload callback does no controller work or render after cancellati
       node.name.getText(source) === "preloadRender",
   )[0];
   assert.ok(preload?.initializer);
+  const drawScene = findNodes(
+    member("start"),
+    (node): node is ts.VariableDeclaration =>
+      ts.isVariableDeclaration(node) && node.name.getText(source) === "renderPreloadScene",
+  )[0];
+  assert.ok(drawScene?.initializer);
   let draws = 0;
   game.scene.render = () => {
     draws++;
   };
-  const render = compile(`return ${preload.initializer.getText(source)};`).call(
+  const render = compile(`let pipelinePreparation;
+    const renderPreloadScene = ${drawScene.initializer.getText(source)};
+    return ${preload.initializer.getText(source)};`).call(
     game,
   );
   render();
