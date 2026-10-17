@@ -8,7 +8,8 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
-import { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
+import type { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
+import { createWebGpuShadowDepthWrapper } from "./webgpu-shadow-readiness";
 import type { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
@@ -469,7 +470,7 @@ export class VegetationController {
         if (!(material instanceof PBRMaterial)) continue;
         if (configureTreeMaterial(material)) {
           new TreeWindPlugin(material, this.treeWind);
-          const wrapper = new ShadowDepthWrapper(material, this.scene);
+          const wrapper = createWebGpuShadowDepthWrapper(material, this.scene);
           material.shadowDepthWrapper = wrapper;
           this.treeShadows.push(wrapper);
         }
