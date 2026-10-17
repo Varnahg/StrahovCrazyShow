@@ -97,13 +97,18 @@ export function waitForRenderStartup(
     finished = true;
     const state = health.snapshot();
     // Cancellation is an ownership change, not a broken shader or submission.
-    if (
-      !(error instanceof Error && error.name === "AbortError") &&
-      state.errorCount === 0 &&
-      (state.phase === "preparing" || state.phase === "ready")
-    )
-      health.report("render", error);
-    reject(error);
+    try {
+      if (
+        !(error instanceof Error && error.name === "AbortError") &&
+        state.errorCount === 0 &&
+        (state.phase === "preparing" || state.phase === "ready")
+      )
+        health.report("render", error);
+    } catch {
+      // Diagnostic observers cannot replace the frame's original failure.
+    } finally {
+      reject(error);
+    }
   };
   const armTimer = () => {
     clearTimer();
@@ -160,11 +165,14 @@ export function waitForRenderStartup(
       }
       engine.beginFrame();
       begun = true;
+      ensureActive();
       options.render();
     } catch (error) {
       capture(error);
     } finally {
-      if (begun) {
+      const phase = health.snapshot().phase;
+      if (begun && !hasError && !finished && !signal?.aborted &&
+          (phase === "preparing" || phase === "ready")) {
         try {
           engine.endFrame();
         } catch (error) {
@@ -189,7 +197,12 @@ export function waitForRenderStartup(
       }
     });
     void checked.catch(() => {});
-    if (hasError) throw frameError;
+    if (hasError) {
+      // The scope is now closed and consumed. Settle the first synchronous
+      // failure before an already fulfilled validation result gets a microtask.
+      fail(frameError);
+      throw frameError;
+    }
     ensureActive();
     await health.guard(Promise.resolve());
     ensureActive();
