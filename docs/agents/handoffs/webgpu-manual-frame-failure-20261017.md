@@ -1,5 +1,9 @@
 # Předání: webgpu-manual-frame-failure-20261017
 
+## Integrační refaktoring rootu
+
+Při přípravě combined overlay root ověřil konkrétní kolizi: cizí persistent C4 preview má vnější `let active` a controller `setActive` uvnitř stejného try bloku, kam vlastní nový `const active` zaváděl stínění a při sloučení by způsobil assignment-to-const. Vlastní predikát byl proto přejmenován na `canRenderFrame` beze změny podmínky či chování. Cizí kód/flag se nemění. Předchozí source snapshot native-v15/a12f076d zůstává zachovaný jako mezikrok před tímto refaktoringem; nebyl vydáván za plně validovaný build. Následuje samostatný cílený test a nový finální checkpoint.
+
 ## Aktuální výsledek po opravě review P2: přednost první chyby
 
 Root vrátil původní vlastní WIP autorovi; stejný owner znovu získal task s doloženým `--adopt-dirty`. Reviewer `functional_record` doložil, že již fulfilled výsledek `popErrorScope()` mohl svým `checked.then` nahlásit sekundární validation dříve než scheduler zpracoval původní render throw. Tím změnil důvod odmítnutí vnějšího health guardu.

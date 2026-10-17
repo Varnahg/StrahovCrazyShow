@@ -453,7 +453,7 @@ export async function createAvatarPreview(
     };
     let width = 0,
       height = 0;
-    const active = () => !disposed && !failure && !signal?.aborted && !engine.isDisposed;
+    const canRenderFrame = () => !disposed && !failure && !signal?.aborted && !engine.isDisposed;
     scheduler = new OnDemandRender({
       requestFrame: runtime.requestFrame,
       cancelFrame: runtime.cancelFrame,
@@ -491,19 +491,19 @@ export async function createAvatarPreview(
             width = nextWidth;
             height = nextHeight;
           }
-          if (!active()) throw abortError();
+          if (!canRenderFrame()) throw abortError();
           beforeReady = ownedSurface.ready();
-          if (!active()) throw abortError();
+          if (!canRenderFrame()) throw abortError();
           engine.beginFrame();
           begun = true;
-          if (!active()) throw abortError();
+          if (!canRenderFrame()) throw abortError();
           ownedSurface.render();
-          if (!active()) throw abortError();
+          if (!canRenderFrame()) throw abortError();
         } catch (error) {
           capture(error);
         } finally {
           try {
-            if (begun && !hasRenderFailure && active()) engine.endFrame();
+            if (begun && !hasRenderFailure && canRenderFrame()) engine.endFrame();
           } catch (error) {
             capture(error);
           }
@@ -520,7 +520,7 @@ export async function createAvatarPreview(
           reportRenderFailure(renderFailure);
           throw renderFailure;
         }
-        if (!active()) return false;
+        if (!canRenderFrame()) return false;
         const compilation: Promise<void>[] = [];
         const modules = engine.isWebGPU ? ownedSurface.shaderModules() : [];
         if (engine.isWebGPU)
