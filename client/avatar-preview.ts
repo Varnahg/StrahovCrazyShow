@@ -301,7 +301,7 @@ export async function createAvatarPreview(
       ...cleanups.splice(0),
       () => health?.dispose(),
       () => surface?.dispose(),
-      () => engine.dispose(),
+      () => { if (!engine.isDisposed) engine.dispose(); },
     ]) {
       try {
         cleanup();
@@ -324,10 +324,19 @@ export async function createAvatarPreview(
     failure = error instanceof Error ? error : new Error(String(error));
     state = "failed";
     scheduler?.dispose();
-    options.onState?.("failed", failure);
-    rejectReady(failure);
-    // An effect notification may arrive inside render: finish endFrame first.
-    queueMicrotask(() => dispose(failure));
+    try { options.onState?.("failed", failure); }
+    catch { /* Presentation must not replace the original rejection. */ }
+    rejectReady(error);
+    // Unwind the owned error scope before disposing, without submitting a
+    // failed frame. Falsy thrown values remain the original rejection reason.
+    queueMicrotask(() => dispose(error));
+  };
+  const reportRenderFailure = (error: unknown) => {
+    if (disposed || failure) return;
+    // Preserve the source reason before onFault formats a UI-facing Error.
+    fail(error);
+    try { health?.report("render", error); }
+    catch { /* The owned ready rejection already preserves the first error. */ }
   };
   const reportDeadline = () =>
     health?.report("pipeline", "Příprava 3D náhledu překročila časový limit.");
@@ -444,20 +453,26 @@ export async function createAvatarPreview(
     };
     let width = 0,
       height = 0;
+    const canRenderFrame = () => !disposed && !failure && !signal?.aborted && !engine.isDisposed;
     scheduler = new OnDemandRender({
       requestFrame: runtime.requestFrame,
       cancelFrame: runtime.cancelFrame,
       visible: runtime.visible,
-      onError: (error) => {
-        if (!disposed && !failure) health!.report("render", error);
-      },
+      onError: reportRenderFailure,
       async frame() {
         if (disposed || failure) return false;
         if (!withinBudget()) return false;
         const finishValidation = scope();
         let beforeReady = false;
         let begun = false;
+        let hasRenderFailure = false;
         let renderFailure: unknown;
+        const capture = (error: unknown) => {
+          if (!hasRenderFailure) {
+            hasRenderFailure = true;
+            renderFailure = error;
+          }
+        };
         try {
           const latest = currentConfig();
           const latestSignature = JSON.stringify(latest);
@@ -476,25 +491,36 @@ export async function createAvatarPreview(
             width = nextWidth;
             height = nextHeight;
           }
+          if (!canRenderFrame()) throw abortError();
           beforeReady = ownedSurface.ready();
+          if (!canRenderFrame()) throw abortError();
           engine.beginFrame();
           begun = true;
+          if (!canRenderFrame()) throw abortError();
           ownedSurface.render();
+          if (!canRenderFrame()) throw abortError();
         } catch (error) {
-          renderFailure = error;
+          capture(error);
         } finally {
           try {
-            if (begun) engine.endFrame();
+            if (begun && !hasRenderFailure && canRenderFrame()) engine.endFrame();
           } catch (error) {
-            renderFailure ??= error;
+            capture(error);
           }
         }
-        const validation = health!.track(
-          finishValidation(),
-          "pipeline",
-          "preview submitted frame",
-        );
+        let validation: Promise<void>;
+        try {
+          validation = health!.track(finishValidation(), "pipeline", "preview submitted frame");
+        } catch (error) {
+          capture(error);
+          validation = Promise.resolve();
+        }
         void validation.catch(() => {});
+        if (hasRenderFailure) {
+          reportRenderFailure(renderFailure);
+          throw renderFailure;
+        }
+        if (!canRenderFrame()) return false;
         const compilation: Promise<void>[] = [];
         const modules = engine.isWebGPU ? ownedSurface.shaderModules() : [];
         if (engine.isWebGPU)
@@ -529,7 +555,6 @@ export async function createAvatarPreview(
             )
           : Promise.resolve();
         await Promise.all([validation, submission, ...compilation]);
-        if (renderFailure) throw renderFailure;
         if (disposed || failure) return false;
         // A blocking render or a resolved GPU promise can reach this microtask
         // before the overdue timer task. Do not accept after the visible budget.

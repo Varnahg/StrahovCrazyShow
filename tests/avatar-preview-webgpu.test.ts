@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { Script, createContext } from "node:vm";
 import ts from "typescript";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine.pure";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { DEFAULT_AVATAR } from "../shared/types";
 import {
@@ -12,6 +13,29 @@ import {
   type AvatarPreviewState,
   type AvatarPreviewController,
 } from "../client/avatar-preview";
+
+function pinnedEndFrame(onFlush: () => void, onSubmit: () => void) {
+  const noop = () => {}, encoder = () => ({ finish: () => ({}) });
+  const state = {
+    _endCurrentRenderPass: noop, _debugPopBeforeEndOfEncoder: noop,
+    _debugPushAfterStartOfEncoder: noop, _snapshotRendering: { endFrame: noop },
+    _timestampQuery: { endFrame: noop, startFrame: noop },
+    _uploadEncoder: encoder(), _renderEncoder: encoder(), _commandBuffers: [],
+    _device: { queue: { submit: onSubmit }, createCommandEncoder: encoder },
+    _uploadEncoderDescriptor: {}, _renderEncoderDescriptor: {},
+    _debugMarkersEncoderGroups: [], _debugMarkersPassGroups: [],
+    _textureHelper: { destroyDeferredTextures: noop, setCommandEncoder: noop },
+    _bufferManager: { destroyDeferredBuffers: noop }, _bundleList: { reset: noop },
+    countersLastFrame: {}, _counters: {}, _frameId: 0, frameId: 0,
+    _cacheRenderPipeline: { endFrame: noop }, _cacheBindGroups: { endFrame: noop },
+    onEndFrameObservable: { notifyObservers: noop },
+    flushFramebuffer(fromEnd?: boolean) {
+      onFlush();
+      return WebGPUEngine.prototype.flushFramebuffer.call(this as unknown as WebGPUEngine, fromEnd);
+    },
+  };
+  return () => WebGPUEngine.prototype.endFrame.call(state as unknown as WebGPUEngine);
+}
 
 function deferred<T>() {
   let resolve!: (value: T) => void, reject!: (error: unknown) => void;
@@ -81,8 +105,10 @@ function fixture(t: TestContext) {
   engine.beginFrame = () => {
     calls.push("begin");
   };
+  const submitFrame = pinnedEndFrame(() => calls.push("flush"), () => calls.push("gpu-submit"));
   engine.endFrame = () => {
     calls.push("end");
+    submitFrame();
   };
   const nativeDispose = engine.dispose.bind(engine);
   engine.dispose = () => {
@@ -259,6 +285,8 @@ test("preview ready follows begin/render/end, submitted work and shader compilat
     ["begin", "render", "end", "submit-check"],
   );
   assert.equal(ready, false);
+  assert.equal(f.calls.filter((call) => call === "flush").length, 1);
+  assert.equal(f.calls.filter((call) => call === "gpu-submit").length, 1);
   submitted.resolve();
   await settle();
   assert.equal(
@@ -403,7 +431,7 @@ test("native scope and module errors reject preparation without marking ready", 
   }
 });
 
-test("render failure still ends the frame and never leaves a live preview", async (t) => {
+test("render failure skips pinned end/flush/submit and never leaves a live preview", async (t) => {
   const f = fixture(t),
     result = f.start();
   await settle();
@@ -415,9 +443,72 @@ test("render failure still ends the frame and never leaves a live preview", asyn
   await assert.rejects(result, /draw failed/);
   await settle();
   assert.deepEqual(
-    f.calls.filter((x) => ["begin", "render", "end"].includes(x)),
-    ["begin", "render", "end"],
+    f.calls.filter((x) => ["begin", "render", "end", "flush", "gpu-submit"].includes(x)),
+    ["begin", "render"],
   );
+  assert.equal(f.stats().disposals, 1);
+});
+
+test("preview rejects truthy and falsy render failures before never-settling GPU work and consumes late scope rejection", async (t) => {
+  for (const failure of [undefined, null, 0, false, new Error("source render")]) {
+    const f = fixture(t), scope = deferred<{ message: string } | null>();
+    let settled = false, reason: unknown;
+    const result = f.start();
+    void result.catch((error) => { settled = true; reason = error; });
+    await settle();
+    const beforePops = f.calls.filter((call) => call === "pop").length;
+    f.validation(scope);
+    f.submission(deferred<void>());
+    f.compilation(deferred<{ messages: { type: string; message: string }[] }>());
+    f.surface.render = () => { f.calls.push("render"); throw failure; };
+    await f.frame();
+    assert.equal(settled, true, "render error must not await GPU completion");
+    assert.equal(reason, failure);
+    assert.equal(f.calls.filter((call) => call === "pop").length, beforePops + 1);
+    assert.equal(f.calls.includes("gpu-submit"), false);
+    assert.equal(f.calls.includes("submit-check"), false);
+    assert.equal(f.stats().checks, 0);
+    scope.reject(new Error("late scope rejection"));
+    await settle();
+    assert.equal(f.stats().disposals, 1);
+  }
+});
+
+test("preview preserves source error before throwing scope cleanup and state observers", async (t) => {
+  const f = fixture(t), original = new Error("original draw");
+  const result = createAvatarPreview(f.canvas, A, {
+    signal: f.abort.signal,
+    onState(state) { if (state === "failed") throw new Error("observer failed"); },
+  }, f.runtime);
+  let settled = false, reason: unknown;
+  void result.catch((error) => { settled = true; reason = error; });
+  await settle();
+  const pop = f.device.popErrorScope.bind(f.device);
+  f.device.popErrorScope = () => { pop(); throw new Error("scope failed"); };
+  f.surface.render = () => { throw original; };
+  f.surface.dispose = () => { throw new Error("surface cleanup failed"); };
+  await f.frame();
+  assert.equal(settled, true);
+  assert.equal(reason, original);
+  assert.equal(f.calls.includes("gpu-submit"), false);
+  assert.equal(f.stats().disposals, 1);
+});
+
+for (const retirement of ["abort", "engine-dispose"] as const)
+test(`preview ${retirement} inside render closes its scope without submitting the disposed owner`, async (t) => {
+  const f = fixture(t), result = f.start();
+  const rejected = assert.rejects(result, { name: "AbortError" });
+  await settle();
+  const beforePops = f.calls.filter((call) => call === "pop").length;
+  f.surface.render = () => {
+    if (retirement === "abort") f.abort.abort();
+    else f.engine.dispose();
+  };
+  await f.frame(); await rejected;
+  assert.equal(f.calls.includes("end"), false);
+  assert.equal(f.calls.includes("gpu-submit"), false);
+  assert.equal(f.calls.includes("submit-check"), false);
+  assert.equal(f.calls.filter((call) => call === "pop").length, beforePops + 1);
   assert.equal(f.stats().disposals, 1);
 });
 

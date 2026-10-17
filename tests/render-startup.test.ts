@@ -1,12 +1,36 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine.pure";
 import { RenderHealth } from "../client/render-health";
 import { WebGpuCompilationProfile } from "../client/webgpu-compilation-profile";
 import {
   waitForRenderStartup,
   type RenderStartupHost,
 } from "../client/render-startup";
+
+function pinnedEndFrame(onFlush: () => void, onSubmit: () => void) {
+  const noop = () => {}, encoder = () => ({ finish: () => ({}) });
+  const state = {
+    _endCurrentRenderPass: noop, _debugPopBeforeEndOfEncoder: noop,
+    _debugPushAfterStartOfEncoder: noop, _snapshotRendering: { endFrame: noop },
+    _timestampQuery: { endFrame: noop, startFrame: noop },
+    _uploadEncoder: encoder(), _renderEncoder: encoder(), _commandBuffers: [],
+    _device: { queue: { submit: onSubmit }, createCommandEncoder: encoder },
+    _uploadEncoderDescriptor: {}, _renderEncoderDescriptor: {},
+    _debugMarkersEncoderGroups: [], _debugMarkersPassGroups: [],
+    _textureHelper: { destroyDeferredTextures: noop, setCommandEncoder: noop },
+    _bufferManager: { destroyDeferredBuffers: noop }, _bundleList: { reset: noop },
+    countersLastFrame: {}, _counters: {}, _frameId: 0, frameId: 0,
+    _cacheRenderPipeline: { endFrame: noop }, _cacheBindGroups: { endFrame: noop },
+    onEndFrameObservable: { notifyObservers: noop },
+    flushFramebuffer(fromEnd?: boolean) {
+      onFlush();
+      return WebGPUEngine.prototype.flushFramebuffer.call(this as unknown as WebGPUEngine, fromEnd);
+    },
+  };
+  return () => WebGPUEngine.prototype.endFrame.call(state as unknown as WebGPUEngine);
+}
 
 function deferred<T>() {
   let resolve!: (value: T) => void, reject!: (reason: unknown) => void;
@@ -20,10 +44,11 @@ async function flush() {
   for (let i = 0; i < 30; i++) await Promise.resolve();
 }
 
-function fixture(native = true) {
+function fixture(native = true, onFault?: () => void) {
   const engine = new NullEngine();
   const lost = deferred<{ reason: string; message: string }>();
   let submissions = 0,
+    flushes = 0, gpuSubmits = 0,
     pushes = 0,
     pops = 0,
     begins = 0,
@@ -55,10 +80,12 @@ function fixture(native = true) {
   engine.beginFrame = () => {
     begins++;
   };
+  const submitFrame = pinnedEndFrame(() => flushes++, () => gpuSubmits++);
   engine.endFrame = () => {
     ends++;
+    submitFrame();
   };
-  const health = new RenderHealth(engine, "game");
+  const health = new RenderHealth(engine, "game", onFault);
   let now = 0,
     visible = true,
     nextId = 1;
@@ -104,6 +131,7 @@ function fixture(native = true) {
       renders++;
     },
     counts: () => ({ submissions, pushes, pops, begins, ends, renders }),
+    gpuCounts: () => ({ flushes, gpuSubmits }),
     setQueue(value: Promise<void>) {
       queue = value;
     },
@@ -249,6 +277,7 @@ test("startup needs an actual ready submitted frame, then removes all idle work"
       ends: 1,
       renders: 1,
     });
+    assert.deepEqual(f.gpuCounts(), { flushes: 1, gpuSubmits: 1 });
     pending.resolve();
     await ready;
     assert.equal(f.health.snapshot().valid, true);
@@ -446,7 +475,7 @@ test("abort before startup schedules no frame and is not a render fault", async 
   }
 });
 
-test("abort during render closes the frame and scope but never submits or marks ready", async () => {
+test("abort during render closes only the scope and never flushes or submits", async () => {
   const f = fixture(),
     controller = new AbortController();
   try {
@@ -465,7 +494,8 @@ test("abort during render closes the frame and scope but never submits or marks 
     const rejected = assert.rejects(ready, { name: "AbortError" });
     await f.frame();
     await rejected;
-    assert.equal(f.counts().ends, 1);
+    assert.equal(f.counts().ends, 0);
+    assert.deepEqual(f.gpuCounts(), { flushes: 0, gpuSubmits: 0 });
     assert.equal(f.counts().pops, 1);
     assert.equal(f.counts().submissions, 0);
     assert.equal(f.health.snapshot().errorCount, 0);
@@ -590,7 +620,7 @@ test("GPU scope validation fails the owner once even when queue submission succe
   }
 });
 
-test("render exceptions close the frame and scope and consume its late rejection", async () => {
+test("render exceptions skip pinned end/flush/submit and consume the closed scope's late rejection", async () => {
   const f = fixture(),
     pending = deferred<{ message: string } | null>(),
     failure = new Error("render failed");
@@ -609,7 +639,8 @@ test("render exceptions close the frame and scope and consume its late rejection
     const rejected = assert.rejects(ready, (error) => error === failure);
     await f.frame();
     await rejected;
-    assert.equal(f.counts().ends, 1);
+    assert.equal(f.counts().ends, 0);
+    assert.deepEqual(f.gpuCounts(), { flushes: 0, gpuSubmits: 0 });
     assert.equal(f.counts().pops, 1);
     assert.equal(f.counts().submissions, 0);
     pending.reject(new Error("late scope failure"));
@@ -618,6 +649,60 @@ test("render exceptions close the frame and scope and consume its late rejection
     f.idle();
   } finally {
     f.dispose();
+  }
+});
+
+test("manual startup retains falsy source throws before scope or reporter failures", async () => {
+  for (const failure of [undefined, null, 0, false, new Error("original")]) {
+    const f = fixture(true, () => { throw new Error("reporter failure"); });
+    const pop = f.device.popErrorScope;
+    f.device.popErrorScope = () => { pop(); throw new Error("scope cleanup failure"); };
+    let settled = false, reason: unknown;
+    const ready = waitForRenderStartup({ ...f, isReady: () => true,
+      render() { throw failure; } }, f.host);
+    void ready.catch((error) => { settled = true; reason = error; });
+    try {
+      await f.frame();
+      assert.equal(settled, true);
+      assert.equal(reason, failure);
+      assert.equal(f.counts().pops, 1);
+      assert.equal(f.counts().ends, 0);
+      assert.deepEqual(f.gpuCounts(), { flushes: 0, gpuSubmits: 0 });
+      f.idle();
+    } finally { f.dispose(); }
+  }
+});
+
+test("manual startup disposal inside render cannot flush the disposed owner", async () => {
+  const f = fixture();
+  const ready = waitForRenderStartup({ ...f, isReady: () => true,
+    render() { f.engine.dispose(); } }, f.host);
+  const rejected = assert.rejects(ready, { name: "AbortError" });
+  await f.frame(); await rejected;
+  assert.equal(f.counts().pops, 1);
+  assert.equal(f.counts().ends, 0);
+  assert.deepEqual(f.gpuCounts(), { flushes: 0, gpuSubmits: 0 });
+  f.idle();
+});
+
+test("synchronous startup source error wins over an already fulfilled scope validation error", async () => {
+  for (const failure of [new Error("first render failure"), undefined, null, 0, false]) {
+    const f = fixture();
+    f.setValidation(Promise.resolve({ message: "secondary validation failure" }));
+    let settled = false, reason: unknown;
+    const ready = waitForRenderStartup({ ...f, isReady: () => true,
+      render() { throw failure; } }, f.host);
+    void ready.catch((error) => { settled = true; reason = error; });
+    try {
+      await f.frame();
+      assert.equal(settled, true);
+      assert.equal(reason, failure);
+      assert.equal(f.counts().pops, 1);
+      assert.deepEqual(f.gpuCounts(), { flushes: 0, gpuSubmits: 0 });
+      assert.equal(f.health.snapshot().counts.render, 1);
+      assert.equal(f.health.snapshot().counts.validation, 0);
+      f.idle();
+    } finally { f.dispose(); }
   }
 });
 
