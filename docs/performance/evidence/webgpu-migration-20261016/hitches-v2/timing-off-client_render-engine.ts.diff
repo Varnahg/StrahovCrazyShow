@@ -1,0 +1,13 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\cadence\\client\\render-engine.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\timing-off\\client\\render-engine.ts"
+index ad1e161..687ce31 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\cadence\\client\\render-engine.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\timing-off\\client\\render-engine.ts"
+@@ -215,7 +215,7 @@ const runtime: RenderEngineRuntime<AbstractEngine> = {
+         initialized = true;
+         // The legacy whole-frame counter can report 0 when writeTimestamp is
+         // unavailable. Only the explicitly scoped per-pass path is enabled.
+-        engine.enableGPUTimingMeasurements = !!engine.getCaps().timerQuery;
++        engine.enableGPUTimingMeasurements = false; // QA-only controlled timestamp-readback experiment.
+       },
+       dispose() {
+         if (initialized) engine.dispose();

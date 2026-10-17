@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-torch-receivers-20261017",
+  "title": "KEY-31: omezit zbytečné varianty svítilny u prokazatelně vzdálených statických přijímačů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/light-receivers.ts",
+    "client/vehicle-lighting.ts",
+    "tests/light-receivers.test.ts",
+    "tests/vehicle-lighting.test.ts",
+    "tests/flashlight.test.ts",
+    "docs/agents/handoffs/webgpu-torch-receivers-20261017.md",
+    ".cache/webgpu-torch-receivers-20261017/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Výzkum a varianty jsou v BMAD spec-key-31-long-frame-gaps a navazující evidenci. Cíl je omezit prokázaný globální material/effect churn při F, nikoli prohlásit GPU driver příčinu nebo vyřešení všech dlouhých mezer.",
+    "Zachovat stávající intenzity, ON/OFF, shadow cast selection, street budget a všechny modely. První scope pouze lokální hráčská svítilna, nikoli auto/pouliční/B6 světla.",
+    "Vyloučit pouze známý Standard/PBR statický nedeformovaný receiver, jehož celý konzervativní world bound je mimo konečný STANDARD dosah24m. Frozen/unknown materials, regular/thin instances, skeleton/morph/wind, nejasné bounds či light cap zůstávají původní.",
+    "Vyloučení nulového světla nikdy nepovýší dosud oříznuté jiné světlo; při nejistotě fallback. Zachovat cizí masks/inclusions/exclusions. Neinstalovat monkeypatch rendereru, novou shader cache ani per-frame log.",
+    "Membership aktualizovat před skutečným draw i po pohybu/topology změně, bez nezdůvodněné250ms prodlevy. Refaktor a bounded ownership/disposal jsou součástí změny."
+  ],
+  "verification": [
+    "Cílené skutečné Babylon CPU regrese hranice dosahu, velkého bounds, cap/truncation, source-instance/thin sdílení, frozen/unknown/deformed fallback, topology/pose změn a zachování exclusions/disposal.",
+    "Regrese s reálným Standard/PBR readiness musí prokázat, že vzdálená oprávněná světelná změna nevytvoří nový Effect, zatímco blízký receiver zůstane správně připojen.",
+    "Direct Node cílené testy a scoped TypeScript v nové cache s read-only dependencies-v5; žádný pnpm install, build/full suite/GPU agentem. Root drží GPU/heavy a provede stabilní full pipeline a samostatný srovnatelný QA test před přijetím."
+  ],
+  "notes": [
+    "Výslovné uživatelské zadání17.10: BMAD, osmivteřinové záseky, průběžné commity/Linear, zachovat4193. Produkční přínos zůstává neověřený do root GPU testu.",
+    "VehicleLighting je byte-identical v native WT a frozen C5 (SHA7903f0be0f4b98affc599d7c9cb323581fa482b640b969d9ffc90eb433461891). Main cizí WIP není součástí tasku.",
+    "Před implementací agent ověří všechny varianty a bezpečné místo update v celém Game řetězci. Přímé delegování nevyvolává další BMAD renderer. Integraci a commit přebírá root."
+  ]
+}

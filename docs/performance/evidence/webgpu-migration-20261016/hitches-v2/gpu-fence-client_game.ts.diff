@@ -1,0 +1,118 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\timing-off\\client\\game.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence\\client\\game.ts"
+index fb236d9..1da3dd8 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\timing-off\\client\\game.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence\\client\\game.ts"
+@@ -445,6 +445,9 @@ export class Game {
+   private readonly environmentProfile: ReturnType<typeof createEnvironmentProfile>;
+   private readonly environmentPhaseEnds = { sky: 0, lighting: 0, vegetation: 0, transit: 0, particles: 0, surfaces: 0 };
+   private readonly frameLifecycleProfile?: WebGpuFrameLifecycleProfile;
++  // QA-only completion probe. No GPU timestamps, draws, resolves or engine hooks.
++  private pendingGpuCompletionFence?: { cancel(): void };
++  private gpuCompletionProbeId = 0;
+   private profiledLightingInstant = 0;
+   private profiledDaylight = 0;
+   private profiledPreviousExposure = 1;
+@@ -2725,6 +2728,89 @@ export class Game {
+     });
+   }
+ 
++  private captureGpuCompletionFence(frameStarted: number, cpuFrameMs: number, frameMs: number) {
++    if (!this.frameLifecycleProfile || !this.engine.isWebGPU ||
++        this.pendingGpuCompletionFence || !Number.isFinite(cpuFrameMs) || cpuFrameMs < 250 ||
++        this.disposed || !this.ready || this.rendererFailed) return;
++    try {
++      const engine = this.engine;
++      const profile = this.frameLifecycleProfile;
++      const gpuEngine = engine as AbstractEngine & {
++        _device?: { queue: { onSubmittedWorkDone(): Promise<void> } };
++      };
++      const device = gpuEngine._device;
++      if (!device || typeof device.queue.onSubmittedWorkDone !== "function") return;
++      const health = this.renderHealth.snapshot();
++      const timing = profile.snapshot();
++      if (!health.valid || !timing.active) return;
++      const identity = {
++        probeId: ++this.gpuCompletionProbeId,
++        rendererId: health.rendererId, generation: health.generation,
++        engineGeneration: timing.generation, rawRafEpoch: timing.rawRaf.epoch,
++        cpuFrameStartMs: frameStarted, cpuFrameEndMs: frameStarted + cpuFrameMs,
++        cpuFrameMs, frameMs,
++      };
++      let observer: ReturnType<typeof engine.onEndFrameObservable.addOnce> = null;
++      let cancelled = false;
++      const pending = { cancel: () => {
++        cancelled = true;
++        if (observer) {
++          try { engine.onEndFrameObservable.remove(observer); } catch { /* diagnostic cleanup */ }
++          observer = null;
++        }
++        if (this.pendingGpuCompletionFence === pending) this.pendingGpuCompletionFence = undefined;
++      } };
++      const current = () => {
++        try {
++          if (cancelled || this.pendingGpuCompletionFence !== pending || this.disposed ||
++              !this.ready || this.rendererFailed || this.engine !== engine ||
++              this.frameLifecycleProfile !== profile ||
++              gpuEngine._device !== device) return false;
++          const latest = this.renderHealth.snapshot();
++          const latestTiming = profile.snapshot();
++          return latest.valid && latest.rendererId === identity.rendererId &&
++            latest.generation === identity.generation && latestTiming.active &&
++            latestTiming.generation === identity.engineGeneration;
++        } catch { return false; }
++      };
++      const emit = (data: Record<string, unknown>) => {
++        try {
++          sessionDiagnostics.event("engine-frame-profile", {
++            stage: "gpu-completion-fence", ...identity, ...data,
++            scope: "QA-only content-timeline queue completion latency after endFrame submit; includes prior queued work and callback scheduling, not GPU execution time.",
++          });
++        } catch { /* A diagnostic sink must never interrupt a frame or Promise handler. */ }
++      };
++      this.pendingGpuCompletionFence = pending;
++      try {
++        observer = engine.onEndFrameObservable.addOnce(() => {
++          observer = null;
++          if (!current()) { pending.cancel(); return; }
++          // Pinned WebGPUEngine.endFrame flushes/submits before AbstractEngine's
++          // onEndFrameObservable. Never flush or wait for work from this observer.
++          let queuedAtMs: number;
++          const settle = (status: "completed" | "failed", failureKind?: "sync-throw" | "rejection") => {
++            try {
++              if (!current()) return;
++              const settledAtMs = performance.now();
++              emit({ status, queuedAtMs, completionLatencyMs: settledAtMs - queuedAtMs,
++                ...(status === "completed" ? { completedAtMs: settledAtMs } : { failedAtMs: settledAtMs, failureKind }) });
++            } catch { /* Clock/snapshot failures remain diagnostic-only. */ }
++            finally { pending.cancel(); }
++          };
++          try {
++            queuedAtMs = performance.now();
++            // queued means the start of the fence request, including sync throws.
++            emit({ status: "queued", queuedAtMs });
++            Promise.resolve(device.queue.onSubmittedWorkDone()).then(
++              () => settle("completed"), () => settle("failed", "rejection"),
++            );
++          } catch { settle("failed", "sync-throw"); }
++        });
++        if (!observer) pending.cancel();
++      } catch { pending.cancel(); }
++    } catch { /* Missing/private API or snapshot failure must not affect rendering. */ }
++  }
+   frame() {
+     if (!this.ready || this.disposed) return;
+     const frameStarted = performance.now();
+@@ -3228,11 +3314,13 @@ export class Game {
+       });
+     }
+     this.lastCpuFrameMs = performance.now() - frameStarted;
++    this.captureGpuCompletionFence(frameStarted, this.lastCpuFrameMs, rawFrameMs);
+   }
+   dispose() {
+     if (this.disposed) return;
+     this.disposed = true;
+     this.ready = false;
++    this.pendingGpuCompletionFence?.cancel();
+     this.startupAbort.abort();
+     this.renderHealth.dispose();
+     this.disposeStartupAssets();

@@ -1,0 +1,201 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence\\tests\\game-diagnostics.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence-pending\\tests\\game-diagnostics.test.ts"
+index 51a8dc8..9e79734 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence\\tests\\game-diagnostics.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence-pending\\tests\\game-diagnostics.test.ts"
+@@ -10,6 +10,9 @@ import ts from "typescript";
+ import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
+ import { Observable } from "@babylonjs/core/Misc/observable";
+ import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
++import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
++import { RenderHealth } from "../client/render-health";
++import { WebGpuCompilationProfile } from "../client/webgpu-compilation-profile";
+ import { WebGpuFrameLifecycleProfile } from "../client/webgpu-frame-lifecycle-profile";
+ import {
+   SessionDiagnostics,
+@@ -717,7 +720,7 @@ function fenceFixture() {
+   Object.assign(f.game.engine, { isWebGPU: true, _device: device, onEndFrameObservable: endFrame });
+   f.game.renderHealth = {
+     rendererId: 73, dispose() {},
+-    snapshot: () => ({ rendererId: 73, generation: healthGeneration, valid: true, phase: "ready" }),
++    snapshot: () => ({ rendererId: 73, generation: healthGeneration, valid: true, phase: "ready", errorCount: 0 }),
+   };
+   f.game.frameLifecycleProfile = {
+     snapshot: () => ({ active: true, generation: profileGeneration, rawRaf: { epoch: 2 } }),
+@@ -828,8 +831,8 @@ test("GPU completion fence rejects foreign generations, devices, renderer identi
+     if (mutation === "health") f.nextHealth();
+     if (mutation === "profile") f.nextProfile();
+     if (mutation === "device") f.game.engine._device = { queue: f.queue };
+-    if (mutation === "renderer") f.game.renderHealth.snapshot = () => ({ rendererId: 74, generation: 3, valid: true });
+-    if (mutation === "invalid") f.game.renderHealth.snapshot = () => ({ rendererId: 73, generation: 3, valid: false });
++    if (mutation === "renderer") f.game.renderHealth.snapshot = () => ({ rendererId: 74, generation: 3, valid: true, phase: "ready", errorCount: 0 });
++    if (mutation === "invalid") f.game.renderHealth.snapshot = () => ({ rendererId: 73, generation: 3, valid: false, phase: "invalid", errorCount: 1 });
+     f.endFrame.notifyObservers(f.game.engine); f.resolve(); await Promise.resolve(); await f.recorder.flush();
+     assert.equal(f.calls(), phase === "observer" ? 0 : 1, `${phase}/${mutation}`);
+     assert.equal(f.game.pendingGpuCompletionFence, undefined, `${phase}/${mutation}`);
+@@ -903,3 +906,166 @@ test("GPU completion fence survives later snapshot failures and unavailable obse
+     assert.equal(f.game.pendingGpuCompletionFence, undefined);
+   }
+ });
++
++function realHealthFenceFixture(onFault?: () => void) {
++  const f = fenceFixture();
++  const engine = new NullEngine({ renderWidth: 800, renderHeight: 600, textureSize: 32, deterministicLockstep: false, lockstepMaxSteps: 1 });
++  // No GPU: exercise the actual pinned engine lifecycle and actual RenderHealth.
++  // The only GPU substitute is the already-controlled device/queue surface.
++  const events = new EventTarget();
++  Object.assign(f.device, {
++    addEventListener: events.addEventListener.bind(events),
++    removeEventListener: events.removeEventListener.bind(events),
++    lost: new Promise(() => {}),
++  });
++  Object.defineProperty(engine, "isWebGPU", { value: true });
++  Object.assign(engine, { _device: f.device, onEndFrameObservable: f.endFrame });
++  f.game.engine = engine;
++  const health = new RenderHealth(engine, "game", onFault);
++  f.game.renderHealth = health;
++  assert.equal(health.markReady(), true);
++  return { ...f, engine, health };
++}
++
++test("GPU completion fence observes a real ready renderer while tracked shader validation remains pending", async (t) => {
++  const f = realHealthFenceFixture();
++  t.after(() => { f.health.dispose(); f.engine.dispose(); f.recorder.dispose(); });
++  let finishValidation!: () => void;
++  const tracked = f.health.track(new Promise<void>(yes => { finishValidation = yes; }), "shader", "pending shader diagnostics", "shader-validation");
++  const pending = f.health.snapshot();
++  assert.equal(pending.phase, "ready");
++  assert.equal(pending.errorCount, 0);
++  assert.equal(pending.pendingShaderValidationOperations, 1);
++  assert.equal(pending.valid, false);
++  f.recorder.start(); await f.recorder.flush();
++  // Real engine endFrame/RenderHealth hooks allow this ready frame even though
++  // diagnostic readiness is temporarily incomplete. No RAF is scheduled here.
++  f.game.frame();
++  assert.equal(f.calls(), 0);
++  assert.equal(f.endFrame.observers.length, 1);
++  f.engine.endFrame();
++  assert.equal(f.calls(), 1);
++  assert.equal(f.health.snapshot().pendingShaderValidationOperations, 1);
++  f.resolve(); await Promise.resolve(); await f.recorder.flush();
++  assert.deepEqual(f.fenceRecords().map(r => r.data.status), ["queued", "completed"]);
++  assert.equal(f.fenceRecords()[0].data.rendererId, f.health.rendererId);
++  assert.equal(f.fenceRecords()[0].data.generation, pending.generation);
++  assert.equal(f.health.snapshot().valid, false, "the diagnostic must not mark readiness complete");
++  finishValidation(); await tracked;
++  assert.equal(f.health.snapshot().valid, true);
++});
++
++test("GPU completion fence tolerates shader validation becoming pending after arm and before settlement", async (t) => {
++  for (const boundary of ["observer", "promise"]) {
++    const f = realHealthFenceFixture();
++    t.after(() => { f.health.dispose(); f.engine.dispose(); f.recorder.dispose(); });
++    f.recorder.start(); await f.recorder.flush(); f.game.frame();
++    if (boundary === "promise") f.engine.endFrame();
++    let finishValidation!: () => void;
++    const tracked = f.health.track(new Promise<void>(yes => { finishValidation = yes; }), "shader", "later shader diagnostics", "shader-validation");
++    assert.equal(f.health.snapshot().valid, false);
++    if (boundary === "observer") f.engine.endFrame();
++    f.resolve(); await Promise.resolve(); await f.recorder.flush();
++    assert.equal(f.calls(), 1, boundary);
++    assert.deepEqual(f.fenceRecords().map(r => r.data.status), ["queued", "completed"], boundary);
++    finishValidation(); await tracked;
++  }
++});
++
++test("GPU completion fence ignores real shader failure and consumes the original rejection despite a fault callback throw", async (t) => {
++  for (const boundary of ["observer", "promise"]) {
++    const callbackError = Error("secondary reporter error");
++    const original = Error("original shader validation failure");
++    const f = realHealthFenceFixture(() => { throw callbackError; });
++    t.after(() => { f.health.dispose(); f.engine.dispose(); f.recorder.dispose(); });
++    f.recorder.start(); await f.recorder.flush(); f.game.frame();
++    if (boundary === "promise") f.engine.endFrame();
++    let rejectValidation!: (error: unknown) => void;
++    const tracked = f.health.track(new Promise<void>((_, no) => { rejectValidation = no; }), "shader", "failing diagnostics", "shader-validation");
++    const consumed = tracked.then(() => assert.fail("expected validation failure"), error => assert.equal(error, original));
++    rejectValidation(original); await consumed;
++    assert.equal(f.health.snapshot().phase, "invalid");
++    assert.equal(f.health.snapshot().errorCount, 1);
++    // The real health hook vetoes endFrame after the fault; no repair submit.
++    f.engine.endFrame();
++    f.resolve(); await Promise.resolve(); await f.recorder.flush();
++    assert.equal(f.calls(), boundary === "observer" ? 0 : 1);
++    assert.deepEqual(f.fenceRecords().map(r => r.data.status), boundary === "observer" ? [] : ["queued"]);
++    if (boundary === "observer") f.game.dispose();
++    assert.equal(f.game.pendingGpuCompletionFence, undefined);
++  }
++});
++
++test("GPU completion fence sees actual CompilationProfile shader tracking inside the real Game.frame callback", async (t) => {
++  for (const mode of ["fulfilled", "deferred", "rejection"]) {
++    const f = realHealthFenceFixture(mode === "rejection" ? () => { throw Error("reporter failure"); } : undefined);
++    let finishInfo!: (value: { messages: unknown[] }) => void;
++    let rejectInfo!: (error: unknown) => void;
++    const deferred = new Promise<{ messages: unknown[] }>((yes, no) => { finishInfo = yes; rejectInfo = no; });
++    const info = mode === "fulfilled" ? Promise.resolve({ messages: [] }) : deferred;
++    const module = { getCompilationInfo: () => info };
++    const device = Object.assign(f.device, { createShaderModule: () => module });
++    const compilation = new WebGpuCompilationProfile(f.engine, {
++      track: (promise, channel, label, kind) => f.health.track(promise, channel, label, kind),
++    });
++    t.after(() => { compilation.dispose(); f.health.dispose(); f.engine.dispose(); f.recorder.dispose(); });
++    const render = f.game.scene.render;
++    f.game.scene.render = () => {
++      device.createShaderModule();
++      assert.equal(f.health.snapshot().pendingShaderValidationOperations, 1);
++      render();
++    };
++    f.recorder.start(); await f.recorder.flush();
++    // Executes Babylon's real beginFrame -> render callbacks -> endFrame with
++    // real RenderHealth wrappers. No runRenderLoop/RAF/GPU is started.
++    (f.engine as any)._activeRenderLoops.push(() => f.game.frame());
++    (f.engine as any)._processFrame(100);
++    assert.equal(f.renders(), 1);
++    assert.equal(f.calls(), 1, mode);
++    assert.equal(f.health.snapshot().phase, "ready");
++    assert.equal(f.health.snapshot().valid, false, "even fulfilled info remains pending until a microtask");
++    if (mode === "rejection") {
++      rejectInfo(Error("shader rejection"));
++      // Both original observation and tracked rejection are consumed by the
++      // actual CompilationProfile, including a throwing onFault callback.
++      await Promise.resolve(); await Promise.resolve(); await Promise.resolve();
++      assert.equal(f.health.snapshot().phase, "invalid");
++      assert.equal(f.health.snapshot().errorCount, 1);
++    }
++    f.resolve(); await Promise.resolve(); await f.recorder.flush();
++    assert.deepEqual(f.fenceRecords().map(r => r.data.status), mode === "rejection" ? ["queued"] : ["queued", "completed"], mode);
++    if (mode === "deferred") {
++      assert.equal(f.health.snapshot().pendingShaderValidationOperations, 1);
++      finishInfo({ messages: [] });
++      await Promise.resolve(); await Promise.resolve(); await Promise.resolve();
++      assert.equal(f.health.snapshot().valid, true);
++    }
++    assert.equal(f.game.pendingGpuCompletionFence, undefined);
++  }
++});
++
++test("GPU completion fence requires ready phase and zero faults independently of aggregate validity", async (t) => {
++  for (const boundary of ["arm", "observer", "promise"]) {
++    for (const state of [
++      { phase: "preparing", errorCount: 0 },
++      { phase: "invalid", errorCount: 0 },
++      { phase: "restart-required", errorCount: 0 },
++      { phase: "disposed", errorCount: 0 },
++      { phase: "ready", errorCount: 1 },
++    ]) {
++      const f = fenceFixture(); t.after(() => f.recorder.dispose());
++      f.recorder.start(); await f.recorder.flush();
++      if (boundary !== "arm") f.game.frame();
++      if (boundary === "promise") f.endFrame.notifyObservers(f.game.engine);
++      // Deliberately inconsistent aggregate valid proves the diagnostic uses
++      // the explicit phase/fault contract at each boundary.
++      f.game.renderHealth.snapshot = () => ({ rendererId: 73, generation: 3, valid: true, ...state });
++      if (boundary === "arm") f.game.frame();
++      f.endFrame.notifyObservers(f.game.engine);
++      f.resolve(); await Promise.resolve(); await f.recorder.flush();
++      assert.equal(f.calls(), boundary === "promise" ? 1 : 0, `${boundary}/${state.phase}/${state.errorCount}`);
++      assert.deepEqual(f.fenceRecords().map(r => r.data.status), boundary === "promise" ? ["queued"] : []);
++      assert.equal(f.game.pendingGpuCompletionFence, undefined);
++    }
++  }
++});

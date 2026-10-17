@@ -1,0 +1,28 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence\\client\\game.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence-pending\\client\\game.ts"
+index 1da3dd8..522b2cc 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence\\client\\game.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence-pending\\client\\game.ts"
+@@ -2740,9 +2740,13 @@ export class Game {
+       };
+       const device = gpuEngine._device;
+       if (!device || typeof device.queue.onSubmittedWorkDone !== "function") return;
++      // Pending shader diagnostics make aggregate readiness false while the
++      // engine legitimately keeps rendering. Measure that work without changing
++      // production readiness or admitting a preparing/faulted renderer.
++      const canObserve = (state: RenderHealthSnapshot) => state.phase === "ready" && state.errorCount === 0;
+       const health = this.renderHealth.snapshot();
+       const timing = profile.snapshot();
+-      if (!health.valid || !timing.active) return;
++      if (!canObserve(health) || !timing.active) return;
+       const identity = {
+         probeId: ++this.gpuCompletionProbeId,
+         rendererId: health.rendererId, generation: health.generation,
+@@ -2768,7 +2772,7 @@ export class Game {
+               gpuEngine._device !== device) return false;
+           const latest = this.renderHealth.snapshot();
+           const latestTiming = profile.snapshot();
+-          return latest.valid && latest.rendererId === identity.rendererId &&
++          return canObserve(latest) && latest.rendererId === identity.rendererId &&
+             latest.generation === identity.generation && latestTiming.active &&
+             latestTiming.generation === identity.engineGeneration;
+         } catch { return false; }

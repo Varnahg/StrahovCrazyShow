@@ -1,0 +1,55 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\baseline\\tests\\game-diagnostics.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\cadence\\tests\\game-diagnostics.test.ts"
+index b62a717..217d357 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\baseline\\tests\\game-diagnostics.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\cadence\\tests\\game-diagnostics.test.ts"
+@@ -653,3 +653,50 @@ test("disabled recorder performs no context work and not-ready/disposed Game pro
+   assert.equal(f.renders(), 1);
+   assert.equal(f.posts.length, 0);
+ });
++
++
++test("cadence research probe is opt-in, finite, WebGPU-only and starts at250ms", async (t) => {
++  for (const row of [
++    { ms:630, profile:false, gpu:true, calls:0 },
++    { ms:630, profile:true, gpu:false, calls:0 },
++    { ms:249.9, profile:true, gpu:true, calls:0 },
++    { ms:NaN, profile:true, gpu:true, calls:0 },
++    { ms:Infinity, profile:true, gpu:true, calls:0 },
++    { ms:250, profile:true, gpu:true, calls:1 },
++  ]) {
++    const f=fixture(); t.after(()=>f.recorder.dispose());
++    let calls=0;
++    f.game.engine.isWebGPU=row.gpu;
++    f.game.engine.getDeltaTime=()=>row.ms;
++    if(row.profile)f.game.frameLifecycleProfile={ snapshot:()=>{calls++;return {generation:1};} };
++    f.recorder.start(); await f.recorder.flush(); f.game.frame(); await f.recorder.flush();
++    assert.equal(calls,row.calls);
++    assert.equal(f.records().filter(r=>r.kind==="engine-frame-profile").length,row.calls);
++    assert.equal(f.renders(),1);
++  }
++});
++
++test("cadence research probe preserves two actual frame boundaries through the collector", async(t)=>{
++  const f=fixture(); t.after(()=>f.recorder.dispose()); let callbacks=100;
++  f.game.engine.isWebGPU=true; f.game.renderHealth.rendererId=7;
++  f.game.frameLifecycleProfile={snapshot:()=>({generation:1,rawRaf:{epoch:1,callbacks}})};
++  f.recorder.start(); await f.recorder.flush();
++  f.time(2000); f.game.engine.getDeltaTime=()=>630; f.game.frame();
++  callbacks=101; f.time(6000); f.game.engine.getDeltaTime=()=>3095; f.game.frame();
++  await f.recorder.flush();
++  const samples=f.records().filter(r=>r.kind==="engine-frame-profile");
++  assert.equal(samples.length,2); assert.equal(f.renders(),2);
++  assert.deepEqual(samples.map(r=>[r.data.intervalStartMs,r.data.intervalEndMs,r.data.frameMs]),[[1370,2000,630],[2905,6000,3095]]);
++  assert.deepEqual(samples.map(r=>(r.data.timing as any).rawRaf.callbacks),[100,101]);
++  for(const batch of f.posts)assert.ok(validateDiagnosticsBatch(batch));
++  for(const r of samples)assert.ok(Buffer.byteLength(JSON.stringify(r),'utf8')<32*1024);
++});
++
++test("cadence research diagnostics cannot interrupt the actual render", async(t)=>{
++  for(const failure of ["snapshot","sink"]){
++    const f=fixture();t.after(()=>f.recorder.dispose());f.game.engine.isWebGPU=true;f.game.engine.getDeltaTime=()=>630;
++    f.game.frameLifecycleProfile={snapshot:()=>{if(failure==="snapshot")throw Error("observer");return {};}};
++    if(failure==="sink"){const event=f.recorder.event.bind(f.recorder);f.recorder.event=((kind:any,data:any)=>{if(kind==="engine-frame-profile")throw Error("sink");return event(kind,data);}) as typeof f.recorder.event;}
++    f.recorder.start();await f.recorder.flush();assert.doesNotThrow(()=>f.game.frame());assert.equal(f.renders(),1);
++  }
++});
