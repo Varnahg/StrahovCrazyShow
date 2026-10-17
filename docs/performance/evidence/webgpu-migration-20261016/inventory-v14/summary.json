@@ -1,0 +1,817 @@
+{
+  "snapshotId": "ecb77e181ed33b8777755cdd426636e0d7a9eb98334df9301d33e353bafadb09",
+  "sourceCommit": "5cdb14e25afbdf83a9f5fa0707b31fed5caea184",
+  "sessionId": "20d694ca-5862-4b83-ba49-13f717ba6c5c",
+  "modeToReadyMs": 46023.5,
+  "lightingMs": 23769.59999999404,
+  "tailAfterLightingMs": 10329.600000000006,
+  "inventory": {
+    "enabled": true,
+    "scope": "Per-device successful module calls; exact text equality confirms duplicates. Body identity only from observed pinned WGSL prefix construction. Unknown/limited calls are not evidence of uniqueness.",
+    "overheadScope": "Text capture/setStage CPU only; nested inside engine timings. Hook entry/cleanup and snapshot/serialization excluded. Text limit counts retained UTF-16 code units (raw plus pending provenance), not total JavaScript heap. Diagnostic overhead, not a performance improvement.",
+    "limits": {
+      "maxEntries": 1024,
+      "maxCodeUnits": 33554432,
+      "maxStages": 16,
+      "maxRows": 16
+    },
+    "calls": 516,
+    "rawKnown": 516,
+    "rawRepeated": 0,
+    "bodyKnown": 516,
+    "bodyRepeated": 0,
+    "descriptorUnknown": 0,
+    "bodyUnknown": 0,
+    "limited": 0,
+    "rawHashConflicts": 0,
+    "bodyHashConflicts": 0,
+    "unrecognizedPrefix": 0,
+    "stageOverflow": 0,
+    "ambiguousBodies": 0,
+    "evidenceTruncated": false,
+    "retainedEntries": 516,
+    "retainedCodeUnits": 16281397,
+    "released": false,
+    "cpuTotalMs": 1154.6999996006489,
+    "cpuMaxMs": 7.800000011920929,
+    "stages": [
+      {
+        "name": "unassigned",
+        "calls": 0,
+        "rawKnown": 0,
+        "rawRepeated": 0,
+        "bodyKnown": 0,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "construction",
+        "calls": 4,
+        "rawKnown": 4,
+        "rawRepeated": 0,
+        "bodyKnown": 4,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "assets",
+        "calls": 30,
+        "rawKnown": 30,
+        "rawRepeated": 0,
+        "bodyKnown": 30,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "current-off",
+        "calls": 86,
+        "rawKnown": 86,
+        "rawRepeated": 0,
+        "bodyKnown": 86,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "current-on",
+        "calls": 96,
+        "rawKnown": 96,
+        "rawRepeated": 0,
+        "bodyKnown": 96,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-0-off",
+        "calls": 66,
+        "rawKnown": 66,
+        "rawRepeated": 0,
+        "bodyKnown": 66,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-0-on",
+        "calls": 74,
+        "rawKnown": 74,
+        "rawRepeated": 0,
+        "bodyKnown": 74,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-1-off",
+        "calls": 66,
+        "rawKnown": 66,
+        "rawRepeated": 0,
+        "bodyKnown": 66,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-1-on",
+        "calls": 90,
+        "rawKnown": 90,
+        "rawRepeated": 0,
+        "bodyKnown": 90,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-2-off",
+        "calls": 0,
+        "rawKnown": 0,
+        "rawRepeated": 0,
+        "bodyKnown": 0,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-2-on",
+        "calls": 0,
+        "rawKnown": 0,
+        "rawRepeated": 0,
+        "bodyKnown": 0,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "restore",
+        "calls": 4,
+        "rawKnown": 4,
+        "rawRepeated": 0,
+        "bodyKnown": 4,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      }
+    ],
+    "rawDuplicateGroups": 0,
+    "bodyDuplicateGroups": 0,
+    "exportTruncated": false,
+    "rawDuplicates": [],
+    "bodyDuplicates": [],
+    "unusedDefines": {
+      "scope": "Observed owned convert/post/finalize provenance; exact derived equality omits only unreferenced generated uppercase non-reserved bool/small decimal-int declarations. Newlines and all other text remain. Candidate only, not semantic equivalence or a runtime/cache change. Counts per analyzed module call; names per distinct analyzed raw text.",
+      "analyzed": 516,
+      "unknown": 0,
+      "repeated": 48,
+      "removedDeclarations": 42624,
+      "retainedDeclarations": 11133,
+      "unsafeDeclarations": 11133,
+      "provenanceUnknown": 0,
+      "provenanceLimited": 0,
+      "analysisUnknown": 0,
+      "hashConflicts": 0,
+      "pendingEntries": 0,
+      "ambiguous": 0,
+      "evidenceTruncated": false,
+      "pendingCodeUnits": 0,
+      "duplicateGroups": 48,
+      "exportTruncated": true,
+      "names": [
+        {
+          "name": "IS_NDC_HALF_ZRANGE",
+          "omitted": 516,
+          "retained": 0
+        },
+        {
+          "name": "MATERIALPLUGIN_7",
+          "omitted": 400,
+          "retained": 0
+        },
+        {
+          "name": "BRDF_V_HEIGHT_CORRELATED",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "MS_BRDF_ENERGY_CONSERVATION",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "SPHERICAL_HARMONICS",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "SPECULAR_GLOSSINESS_ENERGY_CONSERVATION",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "MIX_IBL_RADIANCE_WITH_IRRADIANCE",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "LEGACY_SPECULAR_ENERGY_CONSERVATION",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "BASE_DIFFUSE_MODEL",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "DIELECTRIC_SPECULAR_MODEL",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "CONDUCTOR_SPECULAR_MODEL",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "CLEARCOAT_TEXTUREDIRECTUV",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "CLEARCOAT_TEXTURE_ROUGHNESSDIRECTUV",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "CLEARCOAT_BUMPDIRECTUV",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "CLEARCOAT_TINT_TEXTUREDIRECTUV",
+          "omitted": 350,
+          "retained": 0
+        },
+        {
+          "name": "IRIDESCENCE_TEXTUREDIRECTUV",
+          "omitted": 350,
+          "retained": 0
+        }
+      ],
+      "duplicates": [
+        {
+          "id": 37,
+          "fingerprint": "2addb0ff",
+          "chars": 13169,
+          "calls": 2,
+          "vertex": 2,
+          "fragment": 0,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 38,
+          "fingerprint": "72f5926a",
+          "chars": 50794,
+          "calls": 2,
+          "vertex": 0,
+          "fragment": 2,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 39,
+          "fingerprint": "ecf7fe33",
+          "chars": 12947,
+          "calls": 2,
+          "vertex": 2,
+          "fragment": 0,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 40,
+          "fingerprint": "1f187af7",
+          "chars": 44031,
+          "calls": 2,
+          "vertex": 0,
+          "fragment": 2,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 41,
+          "fingerprint": "cf6b16f3",
+          "chars": 12949,
+          "calls": 2,
+          "vertex": 2,
+          "fragment": 0,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 42,
+          "fingerprint": "8a2c77a3",
+          "chars": 50624,
+          "calls": 2,
+          "vertex": 0,
+          "fragment": 2,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 49,
+          "fingerprint": "312392bf",
+          "chars": 10152,
+          "calls": 2,
+          "vertex": 2,
+          "fragment": 0,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 50,
+          "fingerprint": "bd8ccf47",
+          "chars": 18366,
+          "calls": 2,
+          "vertex": 0,
+          "fragment": 2,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 53,
+          "fingerprint": "30260954",
+          "chars": 13592,
+          "calls": 2,
+          "vertex": 2,
+          "fragment": 0,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 54,
+          "fingerprint": "6bf86fd7",
+          "chars": 42767,
+          "calls": 2,
+          "vertex": 0,
+          "fragment": 2,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 55,
+          "fingerprint": "2f19f101",
+          "chars": 10286,
+          "calls": 2,
+          "vertex": 2,
+          "fragment": 0,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 56,
+          "fingerprint": "c26cf5b6",
+          "chars": 18778,
+          "calls": 2,
+          "vertex": 0,
+          "fragment": 2,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 69,
+          "fingerprint": "f18f8c29",
+          "chars": 10288,
+          "calls": 2,
+          "vertex": 2,
+          "fragment": 0,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 70,
+          "fingerprint": "2f57217f",
+          "chars": 20245,
+          "calls": 2,
+          "vertex": 0,
+          "fragment": 2,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 85,
+          "fingerprint": "d04463c2",
+          "chars": 13951,
+          "calls": 2,
+          "vertex": 2,
+          "fragment": 0,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        },
+        {
+          "id": 86,
+          "fingerprint": "2225ad6f",
+          "chars": 50388,
+          "calls": 2,
+          "vertex": 0,
+          "fragment": 2,
+          "unknown": 0,
+          "stages": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "variants": 2
+        }
+      ]
+    }
+  },
+  "context": {
+    "mode": "multiplayer",
+    "connection": "connected",
+    "position": {
+      "x": 110,
+      "y": -2.323899984359741,
+      "z": 12.00003433227539
+    },
+    "zone": "outside",
+    "speed": 0.00016568564406353877,
+    "vehicle": false,
+    "rendering": {
+      "mode": "low",
+      "quality": "low",
+      "targetFps": 60,
+      "hardwareScaling": 1.3
+    },
+    "viewport": {
+      "width": 1512,
+      "height": 643
+    },
+    "renderResolution": {
+      "width": 1163,
+      "height": 494
+    },
+    "network": {
+      "motionPackets": 917,
+      "authorityPackets": 3,
+      "corrections": 3,
+      "resyncs": 1,
+      "lastCorrectionMetres": 0,
+      "lastMotionAgeMs": 54.29999998211861,
+      "authorityAgeMs": 52.39999997615814,
+      "authorityTick": 5179,
+      "pendingInputs": 6,
+      "visualCorrectionMetres": 0,
+      "timeline": {
+        "inputEpoch": 1,
+        "ack": 2765,
+        "predictedSeq": 2771,
+        "retainedInputs": 6,
+        "rttMs": 0,
+        "rawRttMs": null,
+        "rttMeasuredAtMs": null,
+        "supportedRttMeasuredAtMs": null,
+        "pendingRttMs": null,
+        "pendingRttMeasuredAtMs": null,
+        "pendingRttExpiresAtMs": null,
+        "leadTicks": 6,
+        "clockSeqAtAnchor": 2765,
+        "clockAnchorAtMs": 76808.30000001192,
+        "deliveryBudgetExceeded": false,
+        "clockCalibrated": false
+      },
+      "transport": {
+        "sender": {
+          "queued": 0,
+          "inFlight": 6,
+          "maxQueued": 6,
+          "oldestQueuedAgeMs": null,
+          "oldestUnackedAgeMs": 40.599999994039536,
+          "lastSendAgeMs": 38.80000001192093,
+          "lastTimerAgeMs": 76.7000000178814,
+          "lastFrameAgeMs": 38.80000001192093,
+          "lastTimerIntervalMs": 26.5,
+          "maxTimerIntervalMs": 3777.399999976158,
+          "lastSentSeq": 2771,
+          "lastAck": 2765,
+          "produced": 6,
+          "sentInputs": 6,
+          "sentPackets": 1,
+          "resets": 5,
+          "discardedInputs": 0,
+          "expiredQueuedInputs": 0,
+          "overflows": 0,
+          "sendErrors": 0
+        },
+        "probe": {
+          "pendingMs": null,
+          "predictionRoundTripMs": null,
+          "rawRoundTripMs": null,
+          "measuredAt": null,
+          "retainedLongTasks": 5,
+          "timeouts": 0,
+          "contaminatedSamples": 0,
+          "acceptedSamples": 0
+        },
+        "authorities": {
+          "received": 923,
+          "superseded": 920,
+          "barriers": 1,
+          "ordinaryApplied": 2,
+          "rejected": 0
+        }
+      },
+      "server": {
+        "clock": {
+          "elapsedMs": 30.829799999992247,
+          "cpuMs": 0.380700000008801,
+          "steps": 2,
+          "droppedMs": 0,
+          "accumulatorMs": 2.6654333333300526,
+          "callbacks": 3313,
+          "elapsedMeanMs": 26.054733504376692,
+          "cpuMeanMs": 0.38569837005735774,
+          "elapsedMaxMs": 47.24250000000029,
+          "cpuMaxMs": 12.575200000000223,
+          "droppedTotalMs": 0
+        },
+        "queue": {
+          "inputEpoch": 1,
+          "inputTickBase": 2414,
+          "tick": 5179,
+          "ack": 2765,
+          "receivedSeq": 0,
+          "depth": 0,
+          "maxDepth": 0,
+          "accepted": 0,
+          "consumed": 0,
+          "idleTicks": 2765,
+          "idleTicksSinceInput": 2765,
+          "lastAppliedTick": null,
+          "modeMismatchTicks": 0,
+          "resets": 0,
+          "discarded": 0,
+          "lastInputAgeMs": null,
+          "oldestQueuedAgeMs": null,
+          "resolution": "scheduled-tick",
+          "rejected": {
+            "invalid": 0,
+            "epoch": 0,
+            "late": 0,
+            "ahead": 0,
+            "duplicate": 0
+          }
+        }
+      }
+    }
+  },
+  "errors": [],
+  "validation": {
+    "tests": 1216,
+    "passed": 1216,
+    "buildTypeScript": "PASS",
+    "integration": "PASS"
+  },
+  "limitations": [
+    "One diagnostic capture, not FPS/startup acceptance.",
+    "Inherited manual low quality and real time; conditions differ from v13.",
+    "Initially inactive Edge tab moved to an active focused separate window during startup; no comparable startup-speed claim.",
+    "48 additional derived-equal calls out of516 recognized module calls; candidate comparisons, not semantic equivalence, cache hits or measured savings.",
+    "Bounded names and duplicate-detail export truncated, but aggregate evidence has no unknown or capacity truncation."
+  ]
+}
