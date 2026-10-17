@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-bmad-continuation-20261017",
+  "title": "Vést existující WebGPU migraci projektovým BMAD s přesnými důkazy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "_bmad/render/bmad-build/",
+    "_bmad-output/specs/spec-webgpu-migration-20261017/",
+    "_bmad-output/planning-artifacts/webgpu-migration-20261017.md",
+    "_bmad-output/implementation-artifacts/webgpu-migration-20261017/",
+    "_bmad-output/implementation-artifacts/spec-key-31-wgsl-unused-defines-20261017.md",
+    ".cache/webgpu-bmad-20261017/",
+    "docs/agents/handoffs/webgpu-bmad-continuation-20261017.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Použít oficiální bmad-build renderer nad primárním checkoutem955d134 s úspěšně rozlišenými týmovými overrides; rezervace výstupů musí existovat před renderem.",
+    "Pokračovat v existujících KEY-22 až KEY-37 a doložených implementačních rezervacích; nevytvářet druhý backlog, neoznačit částečný CPU výsledek za GPU přijetí.",
+    "Specifikace a review se týkají pouze vlastních změn WebGPU úkolu. Žádný cizí WIP, žádné runtime zápisy pod touto metadatovou rezervací.",
+    "Zachovat uživatelský ruční test combined-v4 na4193: žádný restart, build, testová zátěž ani další GPU scéna do dokončení testu uživatelem.",
+    "Zaznamenat průzkum, varianty, volbu, implementaci/refaktoring, přesný rozsah review, skutečně provedené testy a otevřené ověření; integraci schvaluje koordinátor podle důkazů."
+  ],
+  "verification": [
+    "node scripts/agent-tasks.mjs validate; skutečný resolver a jediný oficiální render bmad-build; kontrola cest a týmové policy ve vytištěném workflow.",
+    "Dokladové odkazy, SHA vlastního review diffu a návaznost na konkrétní implementační tasky; lehké kontroly bez GPU a bez celých testů během ruční přejímky.",
+    "Herní testy/build/integrace/GPU běží později pouze pod příslušnými runtime rezervacemi; tento task je nenahrazuje."
+  ],
+  "notes": [
+    "Uživatel17.10 výslovně požádal pokračovat přes projektový BMAD. Koordinátor webgpu-migration-01a14497-root; hlavní issue https://linear.app/gigeconomy/issue/KEY-22/premigrovat-celou-produkcni-hru-a-editor-na-plynule-webgpu.",
+    "BMAD je verzovaný v primárním C:/Users/rezac/Documents/GitHub/StrahovCrazyShow; renderer a artefakty se vytvoří právě tam. Žádná reinstalace ani změna upstream skills.",
+    "Runtime implementace zůstává C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, v existujících disjunktních tasks webgpu-migrate-root-20261016, webgpu-migrate-frame-fixture-20261016 a webgpu-shader-inventory-20261016. Scope tohoto metadatového tasku jejich soubory nepřebírá.",
+    "Preferovaný navazující spec adresář _bmad-output/specs/spec-webgpu-migration-20261017/ a evidence _bmad-output/implementation-artifacts/webgpu-migration-20261017/. Další cesta vyžaduje před zápisem změnu rezervace.",
+    "Původní hrané4188/4192 a aktuální uživatelský4193 jsou neměnné. Následný cíl v chatu01a13624-c16c-7c11-aa35-070e349e0266 aktivovat až po úplném přijetí migrace."
+  ]
+}
