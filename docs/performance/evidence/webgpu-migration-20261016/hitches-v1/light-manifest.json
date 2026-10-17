@@ -1,0 +1,92 @@
+{
+  "atUTC": "2026-10-17T18:33:35.467Z",
+  "task": "webgpu-migrate-pipeline-20261016",
+  "owner": "webgpu-hitch-light-probe-20261017",
+  "readonlyDependencies": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration\\dependencies-v5\\node_modules",
+  "projectSources": [
+    {
+      "path": "client/b6-reality.ts",
+      "sha256": "942cc969ebf9b4249086353c08090630720758fc3c63cbca648e72fb7b0bb422",
+      "sourceSnapshot": "c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5"
+    },
+    {
+      "path": "client/vehicle-lighting.ts",
+      "sha256": "7903f0be0f4b98affc599d7c9cb323581fa482b640b969d9ffc90eb433461891",
+      "sourceSnapshot": "c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5"
+    },
+    {
+      "path": "client/art-lighting.ts",
+      "sha256": "39aa6772e6d398b8ef54ed8eea31fe25aa3859148d5ea9b7ccc5c3d7a09b9707",
+      "sourceSnapshot": "c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5"
+    },
+    {
+      "path": "client/gltf-light-budget.ts",
+      "sha256": "a6599ea1a18aa29e3661072083c4f77e396d21d1c85f5430d67f70c70f87fd90",
+      "sourceSnapshot": "c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5"
+    },
+    {
+      "path": "client/stable-light-state.ts",
+      "sha256": "4adfb37dae15ca6a0b9e1b65634266b6791ffc1d8c1aca01858a9557c7f7b8bc",
+      "sourceSnapshot": "c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5"
+    },
+    {
+      "path": "client/webgpu-shadow-readiness.ts",
+      "sha256": "d1ed280ecc3c6530c1bef75ea49de34c65034dd41e9f3f0814333b9e7729ae9d",
+      "sourceSnapshot": "c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "probe.mjs",
+      "sha256": "2f329138f3f38974c5620aff6c8bcf7358423df27af0bdb063644a9ca3fb6c7b"
+    },
+    {
+      "path": "report.json",
+      "sha256": "87725dfa35c5340c14a5696c927039e4f58892f6754f49cca9e90f2a2b3ed532"
+    },
+    {
+      "path": "probe.log",
+      "sha256": "004a92e734985d5d97b9ad1f2d978711cf8eb1586e03206f0c27c7fca063ac8b"
+    },
+    {
+      "path": "probe-v2.log",
+      "sha256": "fb92bb7acac3b7db534cd9e05344ef412d567644bf8169f4e435a8ff48c0c626"
+    },
+    {
+      "path": "probe-final.log",
+      "sha256": "543af33d37ff786490466a9007b706168a5c66fc69a9e1be3862802ba06bd8a0"
+    },
+    {
+      "path": "shader-audit.mjs",
+      "sha256": "5859b74bc050b89d7ad69eb3f67e53884447ab984a5341e0de6d056cbf8532eb"
+    },
+    {
+      "path": "shader-audit.json",
+      "sha256": "6b7036de99ae812578b194abf08dc4de42f6ed3f69e39b499618dcff52757de0"
+    },
+    {
+      "path": "shader-audit.log",
+      "sha256": "4d5d34afd726569031907d903b9464db164b8c48da97e0cd81de7054c1b0097a"
+    },
+    {
+      "path": "analysis.md",
+      "sha256": "6c22250049fa32de63f7cfdaa3961d3cf2de87a6b5300896378021c300615411"
+    }
+  ],
+  "checks": [
+    {
+      "command": "node probe.mjs",
+      "exitCode": 0,
+      "log": "probe-final.log",
+      "startedAtUTC": "2026-10-17T18:28:22.300Z",
+      "completedAtUTC": "2026-10-17T18:28:22.644Z"
+    },
+    {
+      "command": "node shader-audit.mjs",
+      "exitCode": 0,
+      "log": "shader-audit.log",
+      "scope": "both pinned GLSL/WGSL source assertions and actual per-light define flags; no shader execution"
+    }
+  ],
+  "limitations": "Synthetic18-material fixture, not a count of production affected materials or GPU latency. Thin-instance capability enabled solely for actual CPU bounds bookkeeping on NullEngine. Bounds examples establish center-only unsafety, not a complete production culling proof. Runtime source/asset/dependencies unchanged."
+}

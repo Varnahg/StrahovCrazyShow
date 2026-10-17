@@ -1,0 +1,126 @@
+{
+  "atUTC": "2026-10-17T18:31:41.359Z",
+  "checks": [
+    {
+      "language": "Shaders",
+      "ordinaryStandardPointSpotFiniteRangeClamped": true,
+      "explicitPbrStandardOverridesMaterialFallback": true,
+      "pbrPhysicalFallbackHasNoFiniteCutoff": true,
+      "gltfFiniteRangeClamped": true,
+      "specialLightmapShadowOnlyCustomBranchesRequireSeparateProof": true
+    },
+    {
+      "language": "ShadersWGSL",
+      "ordinaryStandardPointSpotFiniteRangeClamped": true,
+      "explicitPbrStandardOverridesMaterialFallback": true,
+      "pbrPhysicalFallbackHasNoFiniteCutoff": true,
+      "gltfFiniteRangeClamped": true,
+      "specialLightmapShadowOnlyCustomBranchesRequireSeparateProof": true
+    }
+  ],
+  "sources": [
+    {
+      "path": "Shaders/ShadersInclude/lightsFragmentFunctions.js",
+      "sha256": "9527ffb9d12dc0bd22e8fef79407e13ef7327ee3988891ae06892f05e5247c8b"
+    },
+    {
+      "path": "Shaders/ShadersInclude/pbrDirectLightingFalloffFunctions.js",
+      "sha256": "9f6e8bfa172767d7746ebac02bcde6b8b4b8b6912cf23cdfd93a6c047b29966f"
+    },
+    {
+      "path": "Shaders/ShadersInclude/lightFragment.js",
+      "sha256": "f8e44f7cc1810a955ee6a2b485b11a8b1dcb100258f00ca48954878d8e399950"
+    },
+    {
+      "path": "Shaders/ShadersInclude/pbrDirectLightingFunctions.js",
+      "sha256": "503acc1c28eafd71cba6ebc03fc5f108856a805ccefb956409a137e6a2f90c00"
+    },
+    {
+      "path": "ShadersWGSL/ShadersInclude/lightsFragmentFunctions.js",
+      "sha256": "ae810495845fb2eb8bfd25aba2beda9c406f8fb0721f5c9d7b37d7a0fec3c0b5"
+    },
+    {
+      "path": "ShadersWGSL/ShadersInclude/pbrDirectLightingFalloffFunctions.js",
+      "sha256": "4ab1f8bb1952cea01bdb8a3d78f974ec348398b9974e907a65e122bd87d84910"
+    },
+    {
+      "path": "ShadersWGSL/ShadersInclude/lightFragment.js",
+      "sha256": "10d35116dbdf1d6615b29cd7a21b3283efae9d07027446332606b547b4fdf37f"
+    },
+    {
+      "path": "ShadersWGSL/ShadersInclude/pbrDirectLightingFunctions.js",
+      "sha256": "97b49469f2e0c419c61233a41b899a1104b3fe945b87191a929427e9b25f183a"
+    },
+    {
+      "path": "Materials/materialHelper.functions.js",
+      "sha256": "b7ae2d99bd444fbd807995aeefa8e35986dd58bdeab770a678312c030c7712fd"
+    }
+  ],
+  "summary": [
+    {
+      "light": "B6-like point range12",
+      "far": 16,
+      "byMaterial": [
+        {
+          "kind": "PBR",
+          "rows": 8,
+          "dirty": 8,
+          "definesChanged": 8,
+          "effectsChanged": 8,
+          "immediateReady": 8,
+          "settledReady": 8
+        },
+        {
+          "kind": "Standard",
+          "rows": 8,
+          "dirty": 8,
+          "definesChanged": 8,
+          "effectsChanged": 8,
+          "immediateReady": 8,
+          "settledReady": 8
+        }
+      ]
+    },
+    {
+      "light": "torch-like spot range24",
+      "far": 16,
+      "byMaterial": [
+        {
+          "kind": "PBR",
+          "rows": 8,
+          "dirty": 8,
+          "definesChanged": 8,
+          "effectsChanged": 8,
+          "immediateReady": 8,
+          "settledReady": 8
+        },
+        {
+          "kind": "Standard",
+          "rows": 8,
+          "dirty": 8,
+          "definesChanged": 8,
+          "effectsChanged": 8,
+          "immediateReady": 8,
+          "settledReady": 8
+        }
+      ]
+    }
+  ],
+  "numericalExamples": [
+    {
+      "range": 12,
+      "distance": 24,
+      "standard": 0,
+      "gltfAttenuation": 0,
+      "physical": 0.001736111111111111
+    },
+    {
+      "range": 24,
+      "distance": 48,
+      "standard": 0,
+      "gltfAttenuation": 0,
+      "physical": 0.00043402777777777775
+    }
+  ],
+  "scope": "Source/define inspection and CPU evaluation of explicit formulas; not shader execution or image equivalence. Production special/custom/frozen/truncated and deformed/instanced bounds remain conditional."
+}
