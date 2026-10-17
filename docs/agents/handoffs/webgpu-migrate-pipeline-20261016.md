@@ -1,5 +1,61 @@
 # Předání: webgpu-migrate-pipeline-20261016 (KEY-31)
 
+## Review oprava callback retention, v2, 17. 10. 2026
+
+Reviewer `functional_record` doložil řetězec pending `createRenderPipelineAsync` Promise → helper → `retryIncompleteFrame` → Game/Scene i po dispose. Root po ukončení v1 GPU pilotu výslovně povolil pouze tento fix. Původní vlastník `webgpu-async-preparation-01a14497-leaf` ověřil beze změny v1 SHA runtime `3c2b738c…efa0c6`, test `dbcee5b6…0241d9`, handoff `a84487be…23c2f8` a získal stejný task claim pomocí `--adopt-dirty`; CLI převzalo právě 3 doložené vlastní soubory. Cizí Game/test změny nebyly převzaté.
+
+Minimální oprava činí `retry` mutable a vymaže jej na začátku `dispose`, ještě před idempotentním guardem. Promise lifecycle, cache, readiness, stage proof a callback během aktivního startupu zůstávají stejné. Regrese deterministicky kontroluje uvolnění callback reference při stále pending GPU Promise, nikoli nedeterministické GC/WeakRef. Pokrývá ruční dispose, AbortSignal i engine disposal, následné resolve/reject a nepřítomnost nového callbacku/cache zápisu.
+
+Nové výstupy jsou výhradně v `.cache/webgpu-migration-checks/pipeline/async-startup-20261017/review-v2/`; předchozí v1 candidate/manifest/logy a root frozen GPU snapshot zůstaly beze změny.
+
+- `retry-retention-red.log`: před runtime opravou **0/1 PASS**, očekávané selhání `manual must release the captured scene owner`, původní retry byl stále Function.
+- `retry-retention-green.log`: **29/29 PASS**, exit0; všech 28 původních kontrol zachováno.
+- `retry-retention-types.log`: scoped TypeScript nad stejnými dvěma roots a jejich skutečnou readonly dependency closure, **2959 souborů / 0 diagnostik**, exit0.
+
+Rootův předaný v1 pilot `cedb7955` zaznamenal startup 30,7317 s / light preparation 13,8979 s bez chyb. Jsou to rootova měření původní zmrazené kopie, nikoli test v2 ani přijatý výkonový přínos. Matched kontrola a přejímka jsou stále otevřené. Leaf neprováděl GPU, full suite, build, server ani commit. Nový `review-v2/freeze-manifest.json` obsahuje přesné vstupní/výstupní SHA a logy; po předání rootovi a ukončení vlastních CPU procesů se claim opět uvolňuje.
+
+## Startup-only přesné async pipeline, 17. 10. 2026
+
+Vlastník `webgpu-async-preparation-01a14497-leaf`, příjemce root; claim base `2f702f8f64617610616fcb02c1e65b64f1daab79`. Před zápisem načteny aktuální primary AGENTS/policy, koordinace, zadání a toto existující předání; živá rezervace byla získaná úspěšně. Root vede BMAD/Linear a vlastní Game napojení. Leaf mění pouze nové `client/webgpu-pipeline-preparation.ts`, `tests/webgpu-pipeline-preparation.test.ts`, tuto novou sekci předání a `.cache/webgpu-migration-checks/pipeline/async-startup-20261017/`. Historická evidence níže zachována; profiler/light-preparation/hraný snapshot/deps zůstaly beze změny.
+
+### Důkazy, varianty a rozhodnutí
+
+Rootův skutečný první-F benchmark měl80nových WGSL modulů/40programů,59sync pipeline a6,18s gap/6,265s completion fence, ale žádné raw/body/unused-derived duplicity. To nedokládá přínos další shader cache ani čisté normalizace. Receiver kandidát byl odmítnut kvůli4,5ms ustáleného CPU/frame a vrácen. Stable torch není malá image-preserving změna: F mění také street membership; fixed caps a místní pěší hráč se vzdáleným řidičem vyžadují širší světelný kontrakt.
+
+Zvolený **ověřovací kandidát je pouze startup pod existujícím loading coverem**. Zachovává stávající stage a aktuální viditelné/aktivní objekty; nepřidává B6 scénář ani všechny budoucí avatary. Nemá být vydáván za vyřešení runtimeF ani automatické zrychlení startupu. Convenience `createRenderPipelineAsync(mesh,...)` používá geometry buffers bez overrides a textureState0. Pinned skutečný `_draw` naopak dokončí applyStates, instance/vertex pulling/UBO a texture state před `cache.getRenderPipeline` (`webgpuEngine.pure.js:2874–2931`). Native `_createRenderPipeline` na miss dostává již přesný topology/sampleCount a používá skutečný `_buildRenderPipelineDescriptor` (`webgpuCacheRenderPipeline.js:849–990`). Tento builder a všechny shader/layout zdroje zůstávají původní.
+
+Alternativa přímého `preWarmPipeline` byla odmítnuta kvůli bezpodmínečnému pozdnímu zápisu zachyceného tokenu; native tree je statický. Helper proto v Promise completion **nikdy nezapisuje do cache**. Vlastní pouze bounded pending/ready výsledky. Skutečný ready pipeline vrátí teprve při dalším současném synchronním miss stejného tokenu/cache/Effect/context/stages/device; původní `getRenderPipeline` provede běžný insert i counters. Žádná surrogatepipeline, Promise místo pipeline, nový shader/module cache nebo úprava GPUDevice prototypu.
+
+### API a root napojení
+
+`new WebGpuPipelinePreparation(engine, { signal?, retryIncompleteFrame?, maxEntries? })`; `render(callback): boolean`; `isReady(): boolean`; `dispose()`.
+
+Root instaluje helper po assets před `prepareLighting`, ponechá jej přes závěrečný startup gate a v `finally` jej dispose. Každé přípravné skutečné render volání obalí `render`; readiness navíc vyžaduje `isReady`. Existující dvě kompletní ready draws a RenderHealth acceptance se neruší. `retryIncompleteFrame` musí resetovat refresh counters živých `scene.objectRenderers` (veřejný registry pokrývá RTT i standalone/shared ObjectRenderer); leaf tyto scény nevlastní. Helper jej volá po neúplném skrytém frame a před retry frame s nově ready výsledky. Callback musí provést synchronní skutečný render za stále zakrytým UI.
+
+WebGL, noncompatibility a snapshot režim jsou při vytvoření inertní. Aktivní CM helper vlastní pouze instance `_draw`, `clearQuad.clear` a `_createRenderPipeline` obou konkrétních caches. Private pending signal se zachytí pouze uvnitř vlastního draw/clear těla před bindGroups/setPipeline/draw; celý scene render pokračuje. Výjimky z cizího draw/clear/builderu nejsou pending signál a propagují se. Clear bez skutečného render passu a disabled cache používají původní synchronní cestu; stale disabled token se nepoužije.
+
+Device async API dál obaluje dosavadní CompilationProfile/RenderHealth. Helper nepřidává druhý track/report stejné Promise; rejection spotřebuje, zapamatuje původní chybu a vydá ji z `render/isReady`, aby startup selhal. Strukturální ztráta device/cache/hook ownership nebo chybějící shader stages selže ihned, ne až přes watchdog. V této samostatné leaf změně nevzniká per-frame log ani nová diagnostická vrstva.
+
+### Readiness, bounded stav a úklid
+
+- Maximum64vlastních entries zahrnuje pending, ready i vyřazené dosud nedokončené práce. Při naplnění se další draw přeskočí bez neomezené descriptor queue; znovu jej objeví skutečný další frame. Token buckets jsou oddělené i podle cache, protože Babylon tree je statický.
+- Každé dokončení invaliduje serial proof posledního kompletního frame. Ready-but-unconsumed není samo readiness. Po forced retry se nevyžádané ready výsledky mohou zahodit bez native insertu. To je možné i při jiných misses, aby neaktivní výsledky nezaplnily bound navždy; takový neúplný frame stále nesmí být přijat. Přijetí vyžaduje complete frame stejného serialu a žádné pending/neudané vlastní výsledky. Bez retry callbacku se nevyžádané ready výsledky konzervativně nepřijímají.
+- Změněný/disposed Effect, context nebo shader stages se vyřadí a vyžaduje se další kompletní frame. Pinned non-float vertex reprocessing při sestavení descriptoru nesmí odeslat starý-stage descriptor do async API.
+- Device/cache/pozdější hook replacement ukončí helper a zachová cizí vlastnictví. Abort/engineDispose odeberou observer/listener, obnoví jen vlastní descriptors a vymažou references. Late Promise nic neinstaluje, nevytváří unhandled rejection a nedotkne se nového vlastníka.
+- Cleanup pokračuje i při cizím hardeningu descriptoru. Neobnovitelný vlastní wrapper je již inactive/pass-through; ostatní hooks, refs a owners se uklidí. Bez předchozí primární chyby se cleanup failure zveřejní jako AggregateError přes `render/isReady`; primární device/render chyba se nepřepíše.
+
+### Cílené ověření a omezení
+
+Izolovaná kopie obsahuje2vlastní roots a skutečné profiler/health dependency closure; node_modules junction míří na readonly dependencies-v5, žádná instalace. Testy vykonávají skutečný pinned `WebGPUCacheRenderPipelineTree`, `_draw`, `WebGPUClearQuad.clear`, `ObjectRenderer.shouldRender` a `VertexBuffer` s fake GPU device/descriptory. Nejde o GPU/pixel důkaz.
+
+- `targeted-final.log`: **28/28 PASS**, exit0,947ms runner. Pending dedup, completion bez insertu/counterů, následný real-pipeline insert/hit, clear cesta, MSAA/MRT/stencil/depth texture state a native/instance overrides proti původnímu descriptor builderu, bounded work, onceRTT retry, live inactive orphan i saturace orphanem, Effect/context/stage/dispose, abort/late owner, cizí throw, disabledcache, hardening cleanup, non-float reprocessing, inert modes a1původní async profiling track/rejection branch.
+- `types-final-v2.log`: **2959transitivních souborů,0diagnostik**,2kořenové soubory, direct Node TypeScript.
+- První18testová iterace měla2fixture chyby (chybějící Effect.getEngine pro skutečný non-float check a neplatný předpoklad o druhém clear bindgroup error po první chybě). Rozšířený profiling test potřeboval skutečné Observable vstupy a správnou rejection větev track. Opravené testy i původní logy zůstaly zachované. Jedna pozdější scopedTS kontrola měla chybějící zkopírovaný `webgpu-validation` dependency closure; finální kopie je kompletní a zelená.
+
+Žádný GPU, full-suite, build, server, commit ani integrace nebyly tímto leafem spuštěny. Root musí ověřit společné Game napojení, kompletní checkpoint a samostatný startup benchmark; runtimeF coverage zůstává otevřená. Async může přesunout čekání z main threadu do pending času, ale není prokázáno, že sníží celkový čas ani všechny driver/queue mezery. Interní texture-manager pipeline cesty mimo tyto dvě cache nejsou zachycené. Během čekání mohou stávající progress frames opakovat CPU traversal; po dispose není záměrná gameplay režie.
+
+Freeze runtime SHA256 `3c2b738caf8367ab80785c9095ff2c49cdd6b5d95023ce4447c289b331efa0c6`, test `dbcee5b66b9ba8f1b3f6046f6d0da707fa5233a39d41f7b58f0ab0ac960241d9`. Finální manifest v `async-startup-20261017/freeze-manifest.json` doplňuje logy, handoff a readonly input hashes. Root přebírá review/commit/integraci; claim bude uvolněn až po předání a kontrole ukončených vlastních procesů.
+
 ## Navazující reprodukce globálního light churn, 17. 10. 2026
 
 Vlastník této výslovně omezené reprodukce je `webgpu-hitch-light-probe-20261017` (`shader_inventory`), příjemce root. Před zápisem získán claim; zápisy pouze do nového `.cache/webgpu-migration-checks/pipeline/light-churn-20261017/` a tohoto předání. Žádný produkční runtime/test, frozen snapshot, asset ani dependency se nezměnil; žádný další BMAD/skill/spawn. Primární AGENTS/policy byly načtené v navazujícím výzkumu.
@@ -165,3 +221,10 @@ Limity: NullEngine neprovádí WGSL/GPU kompilaci ani skutečné GPU draw/submit
 Root `webgpu-hitch-evidence-20261017-root` po release přebírá handoff24653dd526d313ed6eb21bb8d47edc224185dd65ac2514c660ed6781e763b71a a neměnné podklady. [Proof je verzovaný společně s nepřijatým receiver pokusem](../../performance/evidence/webgpu-migration-20261016/hitches-v3/README.md), včetně pěti skutečných C5 zdrojů, probe, reportu, manifestu a logu.
 
 Kontrola existujících GPU archivů našla pouze startup shader inventory, nikoli before/after prvního F. Raw/body duplicit je v zachyceném startupu0; odvozené unused-defines shody nejsou identické skutečně předané WGSL. Další sběr proto využije již existující UI benchmark, který ukládá compilation.start/end, namísto další nové diagnostické vrstvy. CPU lifecycle proof se nesmí vydávat za GPU příčinnou atribuci a neautorizuje automaticky obecnou cache. Žádný nový runtime z tohoto proofu nebyl integrován.
+
+
+## Převzetí a integrace startup celku rootem — 18. 10. 2026
+
+Root webgpu-migration-01a14497-async-integration převzal tři doložené leaf soubory po release přes adopt-dirty. Finální runtime6c7e6e23…d709b/testa0facf43…9416d zůstaly zmrazené; native8d20cecc72066b498e735b8b2524fd23baa19eff → main232cffb1fd67b47766fedd2b27c933ddf786e617. [Hitches-v5](../../performance/evidence/webgpu-migration-20261016/hitches-v5/README.md) uchovává29/29, TS0,1296/1296native a1352/1352production fullpipeline i GPU důkazy. QA1364/1368 failure se nepřepisuje; finální C5 VM environment byl opraven bez přibalení jeho cizího untracked souboru do commitu.
+
+Root stále vede KEY-31: startup celek je přijatý, ale původní prvníF6,2s není opravený. Další průzkum je coverage odpojených B6 instancí a skutečných light/define/pass identit. Bez nové cache, zachovat actor/physics/network a úplnou readiness. Hrané služby zůstávají oddělené; živé rezervace a procesní data patří do registru/cache, ne do tohoto verzovaného předání.

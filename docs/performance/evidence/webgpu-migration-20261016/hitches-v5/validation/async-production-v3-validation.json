@@ -1,0 +1,34 @@
+{
+  "snapshotId": "ec2802daf9426f63814054627adf5a18f04cd54eb2da20e800eb1a89feb6c563",
+  "results": [
+    {
+      "phase": "test",
+      "startedAt": "2026-10-17T22:26:25.603Z",
+      "finishedAt": "2026-10-17T22:30:19.283Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\async-production-v3-test.log",
+      "sha256": "57c55bbf2ebbb8386d8203eb393566745a0f1c5bf7caef5fd8bb77c99f4a0a90"
+    },
+    {
+      "phase": "build",
+      "startedAt": "2026-10-17T22:30:19.307Z",
+      "finishedAt": "2026-10-17T22:31:05.898Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\async-production-v3-build.log",
+      "sha256": "ce27a8721ad5217df2c68e1b2b7cde2796a96916be8f0e9d6b145ed899325182"
+    },
+    {
+      "phase": "integration",
+      "startedAt": "2026-10-17T22:31:05.921Z",
+      "finishedAt": "2026-10-17T22:31:29.347Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test:integration",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\async-production-v3-integration.log",
+      "sha256": "e9e5bfbe2b2d67b1c8ffef2a7160253c5dedc626c3275fe47aed09f36260a56a"
+    }
+  ],
+  "sharedMetadataUnchanged": true,
+  "scope": "Combined production C5 + owned async startup change + C5 VM dependency adaptation. No QA timing/fence interventions."
+}

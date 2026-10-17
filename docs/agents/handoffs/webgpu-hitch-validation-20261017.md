@@ -11,3 +11,10 @@ Session8716d28a-7a9b-4bac-bb9f-71dd189ee073: prvníF na prahuB6, zónaoutside,1,
 Root přijímá childfence předání pouze jako QA nástroj. Receiver kandidát byl po63 nativních/79 kombinovaných cílených testech, fullTS/build a GPU pilotu **nepřijat**: v téměř shodné b6:0 poloze zůstává6,18s proti6,34s kontroly a přibývá trvalý ON gate≈4,58ms/snímek. Experiment18701037dd3d8faae9b7bd1807ecfbf23e18aec4 je přesně vrácen db9018b8114770e0c71cd2e9b4000303d210b55e. [Třetí evidence](../../performance/evidence/webgpu-migration-20261016/hitches-v3/README.md) uchovává oba logy, zdrojový patch a skutečný CPU shadow proof. Plná sada/integrace tohoto zamítnutého kandidáta neběžely. Hraná4193/C5 se nepřepisuje.
 
 Další sběr využije existující UI benchmark s compilation.start/end. Startup inventář nemá údaje o prvním F; zatím nelze z čísel programů odvozovat jeho depth-token podíl nebo identické WGSL/pipeline. Žádná nová cache ani runtime normalizace není tímto předáním přijata.
+
+
+## Pokračování 18. 10.: startup async a produkční kontrola
+
+Předchozí runtime stav výše je historický. GPU měření startupv1/v2, tři QA páry, prvníF a cancel/reentry jsou ukončené, raw zmrazené v [hitches-v5](../../performance/evidence/webgpu-migration-20261016/hitches-v5/README.md). Aktuální4194/API2589 běží z `.cache/webgpu-hitch-validation-20261017/async-production-v3`, snapshotec2802daf9426f63814054627adf5a18f04cd54eb2da20e800eb1a89feb6c563, run async-production-candidate1; QA karta je po měření about:blank. Runtime record zůstává pouze v ignorované cache; root drží porty a odpovědnost.4193/C5 c4e22…e6f5 zůstala beze změny.
+
+Tři QA páry i produkční pár podporují startup změnu, nikoli finální FPS přejímku nebo vyřešené F. Native1296 a produkční1352 fulltest/build/integration PASS, main232cffb. PrvníF6197,4msgap/+80modulů/+59sync dál otevřené; příští kandidát smí vzniknout až po skutečném B6 presentation/layout proofu.

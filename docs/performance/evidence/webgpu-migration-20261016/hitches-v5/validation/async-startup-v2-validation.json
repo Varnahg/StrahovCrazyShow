@@ -1,0 +1,34 @@
+{
+  "snapshotId": "998afe359cce67c57bba04ec581f1b02939e1aa23345600f6f862f2876747ecb",
+  "results": [
+    {
+      "name": "targeted",
+      "startedAt": "2026-10-17T21:50:48.856Z",
+      "finishedAt": "2026-10-17T21:50:52.412Z",
+      "exitCode": 0,
+      "command": "node --import tsx --test tests/webgpu-pipeline-preparation.test.ts tests/game-webgpu-startup.test.ts tests/game-light-preparation.test.ts tests/game-light-lifecycle.test.ts tests/game-render-engine.test.ts tests/render-startup.test.ts tests/light-preparation.test.ts tests/webgpu-compilation-profile.test.ts",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\async-startup-v2-targeted.log",
+      "sha256": "a679a2a8684fa29abca5cdaf1942f6078fed3700f2cab5b61fb9a320089c4c47"
+    },
+    {
+      "name": "types",
+      "startedAt": "2026-10-17T21:50:52.423Z",
+      "finishedAt": "2026-10-17T21:51:15.728Z",
+      "exitCode": 0,
+      "command": "node node_modules/typescript/bin/tsc --noEmit",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\async-startup-v2-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build",
+      "startedAt": "2026-10-17T21:51:15.728Z",
+      "finishedAt": "2026-10-17T21:51:29.931Z",
+      "exitCode": 0,
+      "command": "node node_modules/vite/bin/vite.js build --configLoader native",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\async-startup-v2-build.log",
+      "sha256": "7aa50ad9aceb2c397cae30c91b81f27cc347566a8969a6981ac51aeacf25c40c"
+    }
+  ],
+  "sharedMetadataUnchanged": true,
+  "scope": "Targeted tests/fullTS/production build for isolated GPU pilot; full test suite/integration/final acceptance remain open."
+}
