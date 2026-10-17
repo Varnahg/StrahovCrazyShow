@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-b6-variant-proof-20261018",
   "title": "KEY-31: doložit chybějící B6 presentation a shader varianty před další opravou",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     ".cache/webgpu-migration-checks/b6-variant-proof-20261018/",
@@ -27,6 +27,7 @@
     "B6 props jsou mimo spawn vypnuté a odebrané ze scene.meshes. Typově ekvivalentní B6/street POINT samy nedokazují nový layout. Night anchor se zachytí z Prague dateKey jednou při startu; porovnat hranice17./18.10.",
     "Předchozí shadow proof hitches-v3 ukazuje zánik budoucího PBR ON depth při OFF renderu. Neopravňuje automaticky variantovou cache; nejprve určit podíl missing main/instance a depth reuse.",
     "Aktuální spec v primary _bmad-output/implementation-artifacts/webgpu-migration-20261017/spec-key-31-long-frame-gaps.md. Tato fáze je důkaz před návrhem dvou denních B6 etap, nikoli jejich povolená implementace.",
-    "Používat přímý node/tsx se zakázanou transpile cache a readonly dependencies-v5. Žádný install/pnpm bootstrap, žádné změny node_modules, cizích souborů či procesů. Po předání ukončit vlastní pomocné procesy a release."
+    "Používat přímý node/tsx se zakázanou transpile cache a readonly dependencies-v5. Žádný install/pnpm bootstrap, žádné změny node_modules, cizích souborů či procesů. Po předání ukončit vlastní pomocné procesy a release.",
+    "18.10 root přijal omezený proof po nezávislém čtecím review bez blokujících nálezů. Dva noční starty missing DIR,8 skutečných instancí,main reuse5 Effects,wrapped depth disposal. Evidence hitches-v6; GPU/performance přejímka zůstává otevřená. Navazující QA má samostatný task webgpu-b6-preparation-prototype-20261018."
   ]
 }
