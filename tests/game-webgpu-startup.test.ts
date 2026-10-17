@@ -26,6 +26,7 @@ const methods = gameClass.members.filter(
     node.name &&
     [
       "start",
+      "prepareSceneLightState",
       "handleRendererFailure",
       "isMeshReadyForCamera",
       "assertStartupActive",

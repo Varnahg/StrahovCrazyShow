@@ -13,10 +13,12 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import manifest from "../shared/data/assets/vehicles-manifest.json";
 import { installStaticSubmeshShadowCull } from "./static-submesh-shadows";
+import { TorchReceiverLight } from "./light-receivers";
 
 type BeamQuality = "low" | "medium" | "high";
 const shadowMapSize = (quality: BeamQuality) =>
   quality === "high" ? 512 : quality === "medium" ? 256 : 128;
+const noReceiverChanges: readonly AbstractMesh[] = [];
 
 /** Bounded spotlight and shared shadow lifecycle for the car or local torch.
  * These artistic units are not measured photometry. Only one is used by the
@@ -44,7 +46,8 @@ export class VehicleLighting {
       this.origin.addInPlace(Vector3.FromArray(point));
     this.origin.scaleInPlace(1 / manifest.lights.frontCentres.length);
     this.origin.z += 0.025;
-    this.light = new SpotLight(
+    const BeamLight = kind === "player" ? TorchReceiverLight : SpotLight;
+    this.light = new BeamLight(
       kind === "vehicle"
         ? "shared car · simulated low beam"
         : "local player · flashlight",
@@ -104,6 +107,15 @@ export class VehicleLighting {
     }
     this.updateBeam(1, enabled, quality);
   }
+  /** Call after final light budget changes and before stable slot ordering.
+   * The returned buffer is reused; the caller consumes it synchronously. */
+  prepareReceivers(): readonly AbstractMesh[] {
+    if (this.disposed || !(this.light instanceof TorchReceiverLight)) return noReceiverChanges;
+    // OFF lights cannot belong to a material or render a shadow pass. Their
+    // next activation refreshes before enable, avoiding a steady OFF scan.
+    if (this.light.isEnabled(false)) this.light.refreshReceivers();
+    return this.light.takeChangedReceivers();
+  }
   private updateBeam(night: number, driving: boolean, quality: string) {
     if (this.disposed) return;
     const strength = Number.isFinite(night)
@@ -112,6 +124,10 @@ export class VehicleLighting {
     const resolvedQuality: BeamQuality =
       quality === "high" ? "high" : quality === "medium" ? "medium" : "low";
     const active = driving && strength > 0.1;
+    // Resolve range exclusions before setEnabled's global membership resync.
+    // Keep the changed receivers pending until the owner's final prepare call.
+    if (active && !this.light.isEnabled(false) && this.light instanceof TorchReceiverLight)
+      this.light.refreshReceivers();
     if (this.light.isEnabled(false) !== active) this.light.setEnabled(active);
     this.light.intensity = active ? strength * 1.6 : 0;
     if (!active) {

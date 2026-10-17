@@ -9,6 +9,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import {
   StandardMaterial,
   StandardMaterialDefines,
@@ -75,8 +76,14 @@ function fixture(t: import("node:test").TestContext) {
     scene: Scene;
     stableLights: StableLightState;
     gltfLightBudget: GltfLightBudget;
+    prepareSceneLightState(): void;
+    flashlight?: { beam: { prepareReceivers(): readonly AbstractMesh[] } };
     disposed: boolean;
   };
+  game.prepareSceneLightState = compile(
+    (member("prepareSceneLightState") as ts.MethodDeclaration).body!.statements
+      .map((statement) => statement.getText(source)).join("\n"),
+  );
   t.after(() => {
     game.stableLights?.dispose();
     game.gltfLightBudget?.dispose();
@@ -156,15 +163,18 @@ test("both production render callsites canonicalize actual light slots before dr
   for (const call of calls) {
     const statement = call.parent;
     assert.ok(ts.isExpressionStatement(statement));
-    assert.ok(ts.isBlock(statement.parent));
-    const siblings = [...statement.parent.statements];
-    const before = siblings[siblings.indexOf(statement) - 1];
-    const budget = siblings[siblings.indexOf(statement) - 2];
-    assert.equal(before?.getText(source), "this.stableLights.update();");
-    assert.equal(
-      budget?.getText(source),
-      "this.gltfLightBudget.prepareFrame();",
-    );
+    // The combined scene wraps draw in diagnostic try/finally. Locate the
+    // actual shared gate in the enclosing method rather than copying a second
+    // controller sequence or requiring both statements in the same block.
+    let owner: ts.Node = call;
+    while (!ts.isMethodDeclaration(owner)) owner = owner.parent;
+    const before = findNodes(
+      owner,
+      (node): node is ts.CallExpression =>
+        ts.isCallExpression(node) && node.end < call.pos &&
+        node.expression.getText(source) === "this.prepareSceneLightState",
+    ).at(-1);
+    assert.ok(before, "every production draw must follow the shared light gate");
     // Toggle the first canonical light off/on: Babylon appends it to the end.
     const first = mesh.lightSources[0];
     first.setEnabled(false);
@@ -184,7 +194,7 @@ test("both production render callsites canonicalize actual light slots before dr
       );
     };
     compile(
-      `${budget.getText(source)}\n${before.getText(source)}\n${statement.getText(source)}`,
+      `${before.getText(source)};\n${statement.getText(source)}`,
     ).call(game);
     assert.equal(draws, 1);
   }
@@ -195,7 +205,7 @@ test("both production render callsites canonicalize actual light slots before dr
     ts.isCallExpression(node),
   );
   const stabilize = frameCalls.find(
-    (call) => call.expression.getText(source) === "this.stableLights.update",
+    (call) => call.expression.getText(source) === "this.prepareSceneLightState",
   )!;
   const environment = frameCalls.find(
     (call) =>
@@ -217,6 +227,51 @@ test("both production render callsites canonicalize actual light slots before dr
     );
     assert.ok(call, `${update} must finish before canonicalization`);
   }
+});
+
+test("actual pre-draw helper refreshes changed receivers after budgets and before ordering", (t) => {
+  const game = fixture(t);
+  const ambient = new HemisphericLight("ambient", Vector3.Up(), game.scene);
+  const beam = new PointLight("beam membership fixture", Vector3.Zero(), game.scene);
+  beam.renderPriority = 10;
+  const mesh = MeshBuilder.CreateBox("receiver", {}, game.scene);
+  mesh.material = new StandardMaterial("receiver", game.scene);
+  game.stableLights.update();
+  assert.deepEqual(mesh.lightSources, [beam, ambient]);
+
+  beam.excludedMeshes.push(mesh);
+  game.stableLights.update();
+  assert.deepEqual(mesh.lightSources, [ambient]);
+  const phases: string[] = [];
+  const budget = game.gltfLightBudget.prepareFrame.bind(game.gltfLightBudget);
+  game.gltfLightBudget.prepareFrame = () => {
+    phases.push("budget");
+    budget();
+  };
+  game.flashlight = { beam: { prepareReceivers() {
+    assert.deepEqual(phases, ["budget"]);
+    phases.push("receivers");
+    beam.excludedMeshes.splice(0, 1);
+    assert.deepEqual(mesh.lightSources, [ambient, beam], "real Babylon re-admit appends");
+    return [mesh];
+  } } };
+  const mark = game.stableLights.markMeshesDirty.bind(game.stableLights);
+  game.stableLights.markMeshesDirty = (meshes) => {
+    assert.deepEqual(phases, ["budget", "receivers"]);
+    phases.push("dirty");
+    mark(meshes);
+  };
+  const update = game.stableLights.update.bind(game.stableLights);
+  game.stableLights.update = () => {
+    assert.deepEqual(phases, ["budget", "receivers", "dirty"]);
+    phases.push("order");
+    update();
+  };
+  game.prepareSceneLightState();
+  assert.deepEqual(phases, ["budget", "receivers", "dirty", "order"]);
+  assert.deepEqual(mesh.lightSources, [beam, ambient]);
+  assert.equal(beam.isEnabled(), true);
+  assert.equal(beam.intensity, 1);
 });
 
 test("actual preload callback does no controller work or render after cancellation", (t) => {

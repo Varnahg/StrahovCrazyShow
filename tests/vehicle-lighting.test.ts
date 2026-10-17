@@ -15,6 +15,7 @@ import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { VehicleLighting } from "../client/vehicle-lighting";
+import { TorchReceiverLight } from "../client/light-receivers";
 import manifest from "../shared/data/assets/vehicles-manifest.json";
 import { applyArtLighting } from "../client/art-lighting";
 import { sunState, moonState } from "../shared/weather";
@@ -62,6 +63,56 @@ function selection(scene: Scene, lighting: VehicleLighting) {
   const candidates = map.renderList!;
   return map.getCustomRenderList!(0, candidates, candidates.length)!;
 }
+
+test("only the player owns range policy and pre-ON receiver changes survive until the final gate", (t) => {
+  const { scene, root, lighting } = fixture(t, "player");
+  const near = box(scene, "known near", 0, 0.6, 8);
+  const far = box(scene, "known far", 100, 0.6, 8);
+  near.metadata.artStatic = far.metadata.artStatic = true;
+  new HemisphericLight("ambient", Vector3.Up(), scene);
+  assert.ok(lighting.light instanceof TorchReceiverLight);
+  lighting.update(root, 1, true, "low");
+  assert.ok(near.lightSources.includes(lighting.light));
+  assert.ok(!far.lightSources.includes(lighting.light));
+  const shadow = lighting.light.getShadowGenerator() as ShadowGenerator;
+  const candidates = shadow.getShadowMap()!.renderList;
+  const changes = lighting.prepareReceivers();
+  assert.ok(changes.includes(far), "pre-ON refresh does not consume the final dirty list");
+  assert.ok(lighting.prepareReceivers() === changes, "output buffer is reused");
+  assert.equal(changes.length, 0);
+  assert.equal(lighting.light.intensity, 1.6);
+  assert.equal(lighting.light.range, 24);
+  assert.equal(shadow.mapSize, 128);
+  assert.ok(selection(scene, lighting).includes(near));
+  // A cap decision after pose update must be applied by the final render gate.
+  (far.material as StandardMaterial).maxSimultaneousLights = 1;
+  assert.ok(lighting.prepareReceivers().includes(far));
+  assert.ok(far.lightSources.includes(lighting.light));
+  (far.material as StandardMaterial).maxSimultaneousLights = 4;
+  assert.ok(lighting.prepareReceivers().includes(far));
+  assert.ok(!far.lightSources.includes(lighting.light));
+  assert.ok(shadow.getShadowMap()!.renderList === candidates, "receiver policy never replaces caster list");
+  lighting.update(root, 1, false, "high");
+  assert.equal(lighting.light.intensity, 0);
+  assert.equal(lighting.light.isEnabled(), false);
+  assert.equal(lighting.light.shadowEnabled, true);
+  // Changes while OFF are resolved on the next activation, before enable.
+  root.position.x = 100;
+  lighting.prepareReceivers();
+  lighting.update(root, 1, true, "low");
+  assert.ok(far.lightSources.includes(lighting.light));
+  assert.ok(lighting.prepareReceivers().includes(far));
+  assert.ok(!near.lightSources.includes(lighting.light));
+  const car = new VehicleLighting(scene, "vehicle");
+  try {
+    assert.ok(!(car.light instanceof TorchReceiverLight));
+    car.update(root, 1, true, "low");
+    assert.ok(far.lightSources.includes(car.light), "car retains the original global membership");
+    assert.equal(car.prepareReceivers().length, 0);
+  } finally { car.dispose(); }
+  lighting.dispose();
+  assert.equal(lighting.prepareReceivers().length, 0);
+});
 
 test("model-derived beam follows translation, 90 degree yaw, pitch and parent transforms in actual world metres", (t) => {
   const { scene, root, lighting } = fixture(t);

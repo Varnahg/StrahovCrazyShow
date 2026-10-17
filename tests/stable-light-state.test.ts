@@ -215,3 +215,185 @@ test("removing lights and disposing the controller unregisters its effective-sta
   assert.equal(activeObservers(sun), 0);
   streetA.dispose();
 });
+
+async function settleMeshNotifications(stable: StableLightState) {
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  stable.update();
+}
+
+for (const pbr of [false, true]) {
+  test(`${pbr ? "PBR" : "Standard"} explicit receiver dirtiness restores canonical slots after distance-only readmission`, async (t) => {
+    const { scene, beam, stable } = fixture(t);
+    const mesh = receiver(scene, pbr);
+    receiver(scene, pbr); // This unchanged receiver must not be revisited.
+    beam.range = 24;
+    beam.setEnabled(true);
+    const originalCanAffect = beam.canAffectMesh.bind(beam);
+    // Model only the consumer's distance membership decision. Babylon's actual
+    // resync, light sources, material defines and canonical ordering stay real.
+    beam.canAffectMesh = (candidate) =>
+      originalCanAffect(candidate) &&
+      Vector3.DistanceSquared(beam.position, candidate.position) <=
+        beam.range ** 2;
+    stable.update();
+    await settleMeshNotifications(stable);
+    const canonical = ids(mesh.lightSources);
+    const defines = lightDefines(scene, mesh, pbr);
+    const before = { ...stable.stats };
+
+    mesh.position.x = 100;
+    mesh._resyncLightSource(beam);
+    assert.equal(mesh.lightSources.includes(beam), false);
+    mesh.position.x = 0;
+    mesh._resyncLightSource(beam);
+    assert.equal(
+      mesh.lightSources.at(-1),
+      beam,
+      "pinned Babylon appends the readmitted light",
+    );
+    assert.notDeepEqual(ids(mesh.lightSources), canonical);
+    assert.notEqual(lightDefines(scene, mesh, pbr), defines);
+    stable.update();
+    assert.deepEqual(
+      stable.stats,
+      before,
+      "distance alone does not change the light signature",
+    );
+    assert.notDeepEqual(ids(mesh.lightSources), canonical);
+
+    stable.markMeshesDirty([mesh]);
+    stable.update();
+    assert.deepEqual(ids(mesh.lightSources), canonical);
+    assert.equal(lightDefines(scene, mesh, pbr), defines);
+    assert.equal(stable.stats.visits, before.visits + 1);
+    assert.equal(stable.stats.sorts, before.sorts + 1);
+    assert.equal(stable.stats.revisions, before.revisions);
+  });
+}
+
+test("explicit receiver dirtiness deduplicates iterable entries and visits only the marked meshes", async (t) => {
+  const { scene, stable } = fixture(t);
+  const meshes = Array.from({ length: 8 }, () => receiver(scene));
+  stable.update();
+  await settleMeshNotifications(stable);
+  const before = { ...stable.stats };
+  stable.markMeshesDirty([]);
+  stable.update();
+  assert.deepEqual(stable.stats, before);
+  stable.markMeshesDirty(
+    (function* () {
+      yield meshes[1];
+      yield meshes[1];
+      yield meshes[5];
+    })(),
+  );
+  stable.markMeshesDirty(new Set([meshes[5]]));
+  stable.update();
+  assert.equal(stable.stats.visits, before.visits + 2);
+  assert.equal(stable.stats.sorts, before.sorts);
+  assert.equal(stable.stats.revisions, before.revisions);
+  const after = { ...stable.stats };
+  stable.update();
+  assert.deepEqual(
+    stable.stats,
+    after,
+    "the existing pending collection drains once",
+  );
+});
+
+test("explicit receiver dirtiness ignores foreign and disposed meshes and releases removed pending references", async (t) => {
+  const { engine, scene, stable } = fixture(t);
+  const foreignScene = new Scene(engine);
+  const foreign = receiver(foreignScene);
+  const own = receiver(scene);
+  const disposed = receiver(scene);
+  disposed.dispose();
+  stable.update();
+  await settleMeshNotifications(stable);
+  const before = { ...stable.stats };
+  stable.markMeshesDirty([foreign, disposed]);
+  // This is a retention contract, not just an update/no-op assertion.
+  const pending = Reflect.get(stable, "pendingMeshes") as Set<Mesh>;
+  assert.equal(pending.size, 0);
+  stable.update();
+  assert.deepEqual(stable.stats, before);
+  stable.markMeshesDirty([own]);
+  assert.equal(pending.size, 1);
+  own.dispose();
+  assert.equal(
+    pending.size,
+    0,
+    "the existing mesh removal observer clears queued ownership",
+  );
+  foreignScene.dispose();
+});
+
+test("explicit receiver dirtiness does not consume input after controller or scene disposal", (t) => {
+  for (const disposeScene of [false, true]) {
+    const { scene, stable } = fixture(t);
+    const mesh = receiver(scene);
+    stable.update();
+    stable.markMeshesDirty([mesh]);
+    if (disposeScene) scene.dispose();
+    else stable.dispose();
+    const neverIterate: Iterable<Mesh> = {
+      [Symbol.iterator]() {
+        throw new Error("disposed owner must not retain/iterate new input");
+      },
+    };
+    assert.doesNotThrow(() => stable.markMeshesDirty(neverIterate));
+    assert.equal((Reflect.get(stable, "pendingMeshes") as Set<Mesh>).size, 0);
+  }
+});
+
+test("explicit receiver dirtiness cannot retain a mesh if the iterable disposes its owner", (t) => {
+  const { scene, stable } = fixture(t);
+  const first = receiver(scene),
+    second = receiver(scene);
+  stable.markMeshesDirty(
+    (function* () {
+      yield first;
+      stable.dispose();
+      yield second;
+    })(),
+  );
+  assert.equal((Reflect.get(stable, "pendingMeshes") as Set<Mesh>).size, 0);
+});
+
+test("explicit receiver dirtiness preserves cap, frozen, null-slot and custom-material fallbacks", async (t) => {
+  const { scene, ambient, stable } = fixture(t);
+  const capped = receiver(scene);
+  (capped.material as StandardMaterial).maxSimultaneousLights = 2;
+  const frozen = receiver(scene, true);
+  frozen.material!.freeze();
+  const custom = receiver(scene);
+  custom.material = new ShaderMaterial("custom receiver", scene, "unused");
+  const multi = receiver(scene);
+  multi.material = new MultiMaterial("unknown subslot", scene);
+  (multi.material as MultiMaterial).subMaterials = [
+    new StandardMaterial("known subslot", scene),
+    null,
+  ];
+  const meshes = [capped, frozen, custom, multi];
+  stable.update();
+  await settleMeshNotifications(stable);
+  // Rotate one actual membership without touching enabled/signature/topology.
+  for (const mesh of meshes) {
+    ambient.excludedMeshes.push(mesh);
+    mesh._resyncLightSource(ambient);
+    ambient.excludedMeshes.splice(ambient.excludedMeshes.indexOf(mesh), 1);
+    mesh._resyncLightSource(ambient);
+  }
+  const orders = meshes.map((mesh) => ids(mesh.lightSources));
+  const before = { ...stable.stats };
+  stable.markMeshesDirty(meshes);
+  stable.update();
+  assert.deepEqual(
+    meshes.map((mesh) => ids(mesh.lightSources)),
+    orders,
+  );
+  assert.equal(stable.stats.visits, before.visits + meshes.length);
+  assert.equal(stable.stats.skipped, before.skipped + meshes.length);
+  assert.equal(stable.stats.sorts, before.sorts);
+  assert.equal(stable.stats.revisions, before.revisions);
+});
