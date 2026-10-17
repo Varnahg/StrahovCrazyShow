@@ -246,6 +246,39 @@ test("unsafe initializers retain transitive references and narrow literal/name c
   }
 });
 
+for (const { name, changed, value, matches } of [
+  { name: "referenced declaration", changed: "USED", value: "2", matches: false },
+  { name: "unsafe initializer", changed: "UNSAFE", value: "2 / 0", matches: false },
+  { name: "transitive dependency", changed: "LEAF", value: "2", matches: false },
+  { name: "unused-only control", changed: "UNUSED", value: "1", matches: true },
+]) {
+  test(`retained define values: ${name} preserves derived identity`, async () => {
+    const f = unusedFixture();
+    try {
+      const body = "fn main() { let kept = USED + CHAIN; }";
+      const defines = {
+        USED: "1", UNSAFE: "1 / 0", CHAIN: "1 + MIDDLE",
+        MIDDLE: "1 + LEAF", LEAF: "1", UNUSED: "0",
+      };
+      // Identical vertex/fragment bodies repeat each variant. Only the
+      // unused-only change may merge those two variant groups into one.
+      f.emit(body, body, defines);
+      f.emit(body, body, { ...defines, [changed]: value });
+      await settle();
+      const inventory = f.profile.snapshot().shaderInventory!.unusedDefines!;
+      assert.equal(inventory.analyzed, 4);
+      assert.equal(inventory.unknown, 0);
+      assert.equal(inventory.duplicateGroups, matches ? 1 : 2);
+      assert.equal(inventory.repeated, matches ? 3 : 2);
+      assert.deepEqual(
+        inventory.duplicates.map(({ calls, variants }) => ({ calls, variants })),
+        matches ? [{ calls: 4, variants: 2 }] :
+          [{ calls: 2, variants: 1 }, { calls: 2, variants: 1 }],
+      );
+    } finally { f.profile.dispose(); }
+  });
+}
+
 test("unknown provenance and non top-level or unsupported bodies never become derived matches", async () => {
   const bodies = ["/* unterminated", "fn main() {", "fn main() { let λ = 1; }", "#unknown directive\nfn main() {}"];
   for (const body of bodies) {
