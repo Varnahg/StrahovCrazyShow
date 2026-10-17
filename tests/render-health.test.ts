@@ -1,12 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine.pure";
 import type { Effect } from "@babylonjs/core/Materials/effect";
 import {
   RenderHealth,
   type RenderFault,
   type RenderOperationKind,
 } from "../client/render-health";
+import { WebGpuFrameLifecycleProfile } from "../client/webgpu-frame-lifecycle-profile";
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -26,6 +28,310 @@ function pendingCounts(health: RenderHealth) {
     state.pendingShaderValidationOperations,
   ];
 }
+
+type FrameMethod = (this: unknown, ...args: unknown[]) => unknown;
+type FrameInternals = {
+  _processFrame: FrameMethod;
+  endFrame: FrameMethod;
+  _activeRenderLoops: (() => void)[];
+  _queueNewFrameForRenderLoop(): void;
+};
+function frameFixture(failing?: "begin" | "callback" | "end" | "submit") {
+  const engine = new NullEngine();
+  const internal = engine as unknown as FrameInternals;
+  const failure = new TypeError(`original ${failing} failure`);
+  const calls: string[] = [];
+  const step = (phase: typeof failing) => {
+    calls.push(phase!);
+    if (phase === failing) throw failure;
+  };
+  engine.beginFrame = () => step("begin");
+  engine.endFrame = () => { step("end"); step("submit"); };
+  internal._activeRenderLoops = [() => step("callback")];
+  internal._queueNewFrameForRenderLoop = () => { calls.push("queue"); };
+  const run = () => (AbstractEngine.prototype as unknown as {
+    _renderLoop(timestamp: number): void;
+  })._renderLoop.call(engine, 100);
+  return { engine, internal, calls, failure, run };
+}
+function profiledHealth(f: ReturnType<typeof frameFixture>, healthFirst: boolean,
+  onFault?: () => void) {
+  // Profiling reads only structural fields; no GPU is created by this fixture.
+  Object.defineProperty(f.engine, "isWebGPU", { value: true, configurable: true });
+  const lost = deferred<{ message: string; reason: string }>();
+  Object.assign(f.engine, { _device: Object.assign(new EventTarget(), { lost: lost.promise }) });
+  let health = healthFirst ? new RenderHealth(f.engine, "game", onFault) : undefined;
+  const profiler = new WebGpuFrameLifecycleProfile(f.engine, { rawFrame: { request: () => 1, cancel() {} } });
+  health ??= new RenderHealth(f.engine, "game", onFault);
+  return { health, profiler };
+}
+
+test("a previously selected RAF and manual endFrame issue no GPU work after terminal health", () => {
+  for (const terminal of ["invalid", "restart-required"] as const) {
+    const f = frameFixture();
+    const health = new RenderHealth(f.engine, "game", () => f.engine.stopRenderLoop());
+    try {
+      health.markReady();
+      if (terminal === "invalid") health.report("validation", "terminal validation");
+      else f.engine.onContextRestoredObservable.notifyObservers(f.engine);
+      assert.equal(f.internal._activeRenderLoops.length, 0);
+      assert.equal(health.snapshot().phase, terminal);
+      f.run(); // pinned _processFrame otherwise still calls begin/end with no callbacks
+      f.engine.endFrame(); // a manual finalizer must not submit the abandoned encoder
+      assert.deepEqual(f.calls, []);
+      assert.equal(health.snapshot().errorCount, 1);
+    } finally { f.engine.dispose(); }
+  }
+});
+
+test("a synchronous terminal report during the callback prevents the following endFrame submit", () => {
+  for (const terminal of ["invalid", "restart-required"] as const) {
+    const f = frameFixture();
+    const health = new RenderHealth(f.engine, "game", () => f.engine.stopRenderLoop());
+    f.internal._activeRenderLoops = [() => {
+      f.calls.push("reported");
+      if (terminal === "invalid") health.report("validation", "inline fault without throw");
+      else f.engine.onContextRestoredObservable.notifyObservers(f.engine);
+    }];
+    try {
+      health.markReady();
+      assert.equal(f.run(), undefined);
+      assert.deepEqual(f.calls, ["begin", "reported"]);
+      assert.equal(health.snapshot().errorCount, 1, "no invented exception or second fault");
+      assert.equal(health.snapshot().phase, terminal);
+    } finally { f.engine.dispose(); }
+  }
+});
+
+for (const stage of ["begin", "callback", "end", "submit"] as const) {
+  test(`actual pinned frame ${stage} throw invalidates health without repairing or scheduling the frame`, async () => {
+    const f = frameFixture(stage), faults: RenderFault[] = [];
+    const health = new RenderHealth(f.engine, "game", (fault) => faults.push(fault));
+    const pending = deferred<void>();
+    const guarded = health.guard(pending.promise).then(() => undefined, (error: unknown) => error);
+    try {
+      assert.ok(health.markReady());
+      assert.throws(f.run, (error) => error === f.failure);
+      assert.equal(health.snapshot().counts.render, 1);
+      assert.equal(health.snapshot().valid, false);
+      assert.equal(faults.length, 1);
+      assert.equal(f.calls.filter((call) => call === "end").length, stage === "begin" || stage === "callback" ? 0 : 1);
+      assert.equal(f.calls.includes("queue"), false);
+      assert.equal(await guarded, f.failure);
+    } finally { f.engine.dispose(); }
+  });
+}
+
+test("nested reports are deduplicated and a throwing reporter cannot replace the original frame exception", () => {
+  for (const nested of [false, true]) {
+    const f = frameFixture(), failure = new Error("original frame source");
+    const health = new RenderHealth(f.engine, "game", () => { throw new Error("reporter failure"); });
+    f.internal._activeRenderLoops = [() => {
+      if (nested) {
+        try { health.report("render", failure); } catch { /* profiler already preserves source throw */ }
+      }
+      throw failure;
+    }];
+    try {
+      assert.throws(f.run, (error) => error === failure);
+      assert.equal(health.snapshot().errorCount, 1);
+      assert.equal(health.snapshot().counts.render, 1);
+    } finally { f.engine.dispose(); }
+  }
+});
+
+test("successful and borrowed frame calls preserve receiver arguments return and do not allocate health snapshots", () => {
+  const engine = new NullEngine(), internal = engine as unknown as FrameInternals;
+  const calls: { receiver: unknown; args: unknown[] }[] = [];
+  const returned = { original: true };
+  internal._processFrame = function (...args) { calls.push({ receiver: this, args }); return returned; };
+  const health = new RenderHealth(engine, "game");
+  const snapshot = health.snapshot.bind(health);
+  let snapshots = 0;
+  health.snapshot = () => { snapshots++; return snapshot(); };
+  const argument = {}, other = {};
+  try {
+    assert.equal(internal._processFrame.call(engine, 17, argument), returned);
+    assert.equal(internal._processFrame.call(other, argument), returned);
+    assert.deepEqual(calls, [{ receiver: engine, args: [17, argument] }, { receiver: other, args: [argument] }]);
+    assert.equal(snapshots, 0);
+  } finally { engine.dispose(); }
+});
+
+test("frame returns never inspect then or attach promise settlement handlers", async () => {
+  const engine = new NullEngine(), internal = engine as unknown as FrameInternals;
+  let reads = 0;
+  const thenable = { get then() { reads++; throw new Error("then read"); } };
+  const rejected = deferred<unknown>();
+  const originalThen = rejected.promise.then;
+  Object.defineProperty(rejected.promise, "then", { configurable: true, get() { reads++; return originalThen; } });
+  let returned: unknown = thenable;
+  internal._processFrame = () => returned;
+  const health = new RenderHealth(engine, "game");
+  try {
+    assert.equal(internal._processFrame(), thenable);
+    returned = rejected.promise;
+    assert.equal(internal._processFrame(), rejected.promise);
+    assert.equal(reads, 0);
+    Reflect.deleteProperty(rejected.promise, "then");
+    const failure = new Error("caller-owned async rejection");
+    const checked = assert.rejects(rejected.promise, (error) => error === failure);
+    rejected.reject(failure);
+    await checked;
+    assert.equal(health.snapshot().errorCount, 0);
+  } finally { engine.dispose(); }
+});
+
+test("healthy endFrame preserves receiver arguments returns throws and thenables; disposed wrappers stay transparent", () => {
+  const engine = new NullEngine(), internal = engine as unknown as FrameInternals;
+  const failure = new Error("end source"), argument = {}, other = {};
+  const calls: { receiver: unknown; args: unknown[] }[] = [];
+  let reads = 0, fail = false;
+  const returned = { get then() { reads++; throw new Error("must not inspect"); } };
+  internal.endFrame = function (...args) {
+    calls.push({ receiver: this, args });
+    if (fail) throw failure;
+    return returned;
+  };
+  const original = Object.getOwnPropertyDescriptor(engine, "endFrame");
+  const health = new RenderHealth(engine, "game"), retained = internal.endFrame;
+  try {
+    assert.equal(internal.endFrame.call(engine, argument), returned);
+    assert.equal(internal.endFrame.call(other, 17), returned);
+    assert.deepEqual(calls, [{ receiver: engine, args: [argument] }, { receiver: other, args: [17] }]);
+    assert.equal(reads, 0);
+    fail = true;
+    assert.throws(() => internal.endFrame(), (error) => error === failure);
+    assert.equal(health.snapshot().errorCount, 0, "manual draw owner still catches its healthy-path failure");
+    health.report("validation", "terminal");
+    assert.equal(internal.endFrame(), undefined);
+    health.dispose();
+    assert.deepEqual(Object.getOwnPropertyDescriptor(engine, "endFrame"), original);
+    assert.throws(() => retained.call(engine), (error) => error === failure);
+  } finally { engine.dispose(); }
+});
+
+test("restoration emits a terminal device fault in its new generation even without preceding loss", () => {
+  const engine = new NullEngine();
+  const delivered: { fault: RenderFault; phase: string; generation: number }[] = [];
+  const health = new RenderHealth(engine, "game", (fault, state) => delivered.push({ fault, phase: state.phase, generation: state.generation }));
+  try {
+    health.markReady();
+    engine.onContextRestoredObservable.notifyObservers(engine);
+    assert.deepEqual(delivered.map(({ fault, phase, generation }) => [fault.channel, fault.generation, phase, generation]), [["device", 2, "restart-required", 2]]);
+    assert.equal(health.markReady(), false);
+    engine.onContextLostObservable.notifyObservers(engine);
+    assert.equal(delivered.length, 1, "same-generation loss after restore is already terminal");
+  } finally { engine.dispose(); }
+});
+
+test("disposed or generation-retired frames do not report into a new renderer", () => {
+  for (const retirement of ["dispose", "restore"] as const) {
+    const f = frameFixture(), failure = new Error("retired frame");
+    const health = new RenderHealth(f.engine, "game");
+    f.internal._activeRenderLoops = [() => {
+      if (retirement === "dispose") health.dispose();
+      else f.engine.onContextRestoredObservable.notifyObservers(f.engine);
+      throw failure;
+    }];
+    try {
+      assert.throws(f.run, (error) => error === failure);
+      assert.equal(health.snapshot().counts.render, 0);
+      assert.equal(health.snapshot().counts.device, retirement === "restore" ? 1 : 0);
+    } finally { f.engine.dispose(); }
+  }
+});
+
+test("frame ownership is per engine and restores inherited/own descriptors without replacing later owners", () => {
+  const f = frameFixture("callback"), other = frameFixture();
+  const original = f.internal._processFrame;
+  const ownOriginal = Object.getOwnPropertyDescriptor(f.engine, "_processFrame");
+  const health = new RenderHealth(f.engine, "game"), preview = new RenderHealth(other.engine, "preview");
+  const retained = f.internal._processFrame;
+  try {
+    assert.throws(f.run, (error) => error === f.failure);
+    assert.equal(preview.snapshot().errorCount, 0);
+    health.dispose();
+    assert.equal(f.internal._processFrame, original);
+    assert.deepEqual(Object.getOwnPropertyDescriptor(f.engine, "_processFrame"), ownOriginal);
+    assert.throws(() => retained.call(f.engine, 100), (error) => error === f.failure);
+    assert.equal(health.snapshot().counts.render, 1);
+    const replacement = new RenderHealth(f.engine, "game");
+    const laterOwner = () => "later";
+    f.internal._processFrame = laterOwner;
+    replacement.dispose();
+    assert.equal(f.internal._processFrame, laterOwner);
+  } finally { f.engine.dispose(); other.engine.dispose(); }
+});
+
+test("missing immutable or accessor frame hooks fail closed without evaluating getters", () => {
+  for (const method of ["_processFrame", "endFrame"] as const)
+  for (const mode of ["missing", "immutable", "accessor"] as const) {
+    const engine = new NullEngine(); let reads = 0;
+    Object.defineProperty(engine, method, mode === "accessor" ? {
+      configurable: true, get() { reads++; return () => {}; },
+    } : { configurable: false, writable: false, value: mode === "missing" ? undefined : () => {} });
+    const faults: RenderFault[] = [];
+    const health = new RenderHealth(engine, "game", (fault) => faults.push(fault));
+    try {
+      assert.equal(reads, 0);
+      assert.equal(health.snapshot().counts.render, 1);
+      assert.equal(health.markReady(), false);
+      assert.match(faults[0].message, /frame.*monitor/i);
+    } finally { engine.dispose(); }
+  }
+});
+
+test("own frame descriptors and the sole owner survive attach/dispose without duplicate callbacks", () => {
+  const engine = new NullEngine();
+  const original = { value: () => 19, configurable: true, enumerable: true, writable: false };
+  Object.defineProperty(engine, "_processFrame", original);
+  const health = new RenderHealth(engine, "game");
+  try {
+    assert.throws(() => new RenderHealth(engine, "preview"), /owner/);
+    assert.equal((engine as unknown as FrameInternals)._processFrame(), 19);
+    health.dispose();
+    assert.deepEqual(Object.getOwnPropertyDescriptor(engine, "_processFrame"), original);
+    const next = new RenderHealth(engine, "preview");
+    next.dispose();
+  } finally { engine.dispose(); }
+});
+
+test("always-on health catch composes with the actual optional frame profiler in either attachment order", () => {
+  for (const healthFirst of [true, false]) {
+    const f = frameFixture("callback");
+    const { health, profiler } = profiledHealth(f, healthFirst);
+    try {
+      assert.throws(f.run, (error) => error === f.failure);
+      assert.equal(health.snapshot().counts.render, 1);
+      assert.equal(profiler.snapshot().phases.processFrame!.thrown, 1);
+      const before = [...f.calls];
+      f.engine.endFrame();
+      assert.deepEqual(f.calls, before, "terminal manual submit is vetoed through either wrapper order");
+      health.dispose(); profiler.dispose();
+    } finally { profiler?.dispose(); health?.dispose(); f.engine.dispose(); }
+  }
+});
+
+test("inline terminal reports veto endFrame through the actual profiler in either order and preserve later owners", () => {
+  for (const healthFirst of [true, false]) {
+    const f = frameFixture();
+    const { health, profiler } = profiledHealth(f, healthFirst, () => f.engine.stopRenderLoop());
+    f.internal._activeRenderLoops = [() => {
+      f.calls.push("reported");
+      health.report("validation", "inline terminal");
+    }];
+    try {
+      f.run();
+      assert.deepEqual(f.calls, ["begin", "reported"]);
+      assert.equal(health.snapshot().errorCount, 1);
+      const laterOwner = () => {};
+      f.engine.endFrame = laterOwner;
+      health.dispose(); profiler.dispose();
+      assert.equal(f.engine.endFrame, laterOwner);
+    } finally { profiler.dispose(); health.dispose(); f.engine.dispose(); }
+  }
+});
 
 test("mixed operation kinds retain a total ready barrier and default shader work is preparation", async () => {
   const engine = new NullEngine(),
@@ -210,7 +516,7 @@ test("loss and restoration invalidate the renderer and old asynchronous work can
     await assert.rejects(tracked, /retired error/);
     assert.equal(health.snapshot().pendingOperations, 0);
     assert.equal(health.snapshot().counts.shader, 0);
-    assert.equal(health.snapshot().counts.device, 1);
+    assert.equal(health.snapshot().counts.device, 2, "loss and restored generation each notify their terminal state");
     assert.equal(
       health.markReady(),
       false,
