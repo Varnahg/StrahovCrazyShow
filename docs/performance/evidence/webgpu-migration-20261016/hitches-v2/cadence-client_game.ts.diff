@@ -1,0 +1,26 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\baseline\\client\\game.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\cadence\\client\\game.ts"
+index 5e7d2d7..fb236d9 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\baseline\\client\\game.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\cadence\\client\\game.ts"
+@@ -2731,6 +2731,21 @@ export class Game {
+     this.onBeforeInputFrame?.();
+     const rawFrameMs = this.engine.getDeltaTime(),
+       dt = Math.min(0.1, rawFrameMs / 1000);
++    // Isolated research probe: reuse the existing opt-in profiler at the exact
++    // incident boundary; ordinary frames and non-profiled games do no work here.
++    if (this.frameLifecycleProfile && this.engine.isWebGPU &&
++        Number.isFinite(rawFrameMs) && rawFrameMs >= 250) {
++      try {
++        sessionDiagnostics.event("engine-frame-profile", {
++          stage: "frame-gap", rendererId: this.renderHealth.rendererId,
++          frameMs: rawFrameMs, currentCpuStartMs: frameStarted,
++          intervalStartMs: Math.max(0, frameStarted - rawFrameMs),
++          intervalEndMs: frameStarted, visibility: document.visibilityState,
++          timing: this.frameLifecycleProfile.snapshot(),
++          scope: "Engine delta ends at current Game entry. Current process/render calls are still in progress; compare only matching renderer/generation/raw epoch.",
++        });
++      } catch { /* Diagnostic failures must not interrupt rendering. */ }
++    }
+     const gpuCounter = this.engineInstrumentation.captureGPUFrameTime
+       ? this.engineInstrumentation.gpuFrameTimeCounter
+       : undefined;

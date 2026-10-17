@@ -1,0 +1,28 @@
+{
+  "atUTC": "2026-10-17T19:36:18.695Z",
+  "snapshotId": "3cf48f74ff65aac859d5fa8869abd8da775cee66f85d2df5ff5ac4428d54507b",
+  "checkedCodeFiles": 560,
+  "manifestFiles": 8466,
+  "results": [
+    {
+      "name": "types",
+      "startedAt": "2026-10-17T19:35:31.957Z",
+      "finishedAt": "2026-10-17T19:36:01.299Z",
+      "exitCode": 0,
+      "command": "node ./node_modules/typescript/bin/tsc --noEmit",
+      "log": "gpu-fence-pending-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build",
+      "startedAt": "2026-10-17T19:36:01.300Z",
+      "finishedAt": "2026-10-17T19:36:18.480Z",
+      "exitCode": 0,
+      "command": "node ./node_modules/vite/bin/vite.js build --configLoader native",
+      "log": "gpu-fence-pending-build.log",
+      "sha256": "d4e8f089b428c3ff45574e2e42860e83833de7be12e3a10e00487f6ae4910c03"
+    }
+  ],
+  "sharedMetadataUnchanged": true,
+  "scope": "Corrected QA probe only; targeted actual RenderHealth tests in child manifest. No full suite/integration/FPS acceptance."
+}

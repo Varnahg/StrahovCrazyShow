@@ -1,0 +1,21 @@
+{
+  "atUTC": "2026-10-17T19:26:13.006Z",
+  "snapshotId": "b8b257b1d87da8a4ca7035335b08cde4ce69b3cbdf73eccec95510a8ba04f79c",
+  "manifestFiles": 8466,
+  "targetedTests": 17,
+  "targetedPassed": 17,
+  "fullTypeScriptExitCode": 0,
+  "viteNativeBuildExitCode": 0,
+  "sharedDependencyMetadataUnchanged": true,
+  "logs": [
+    {
+      "path": "gpu-fence-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "gpu-fence-build.log",
+      "sha256": "e7bb2b40dc44b5d65ac1901cf917aa50e49d2f6545fa70cd969b193bb1b4e478"
+    }
+  ],
+  "scope": "QA-only fence probe. First successful TS/Vite pass exposed manifest ordering error for source-composition.json in post-build audit. Corrected that provenance hash and rebuilt Vite with new identity; no code change and no repeated TypeScript required. No full suite/integration/FPS acceptance."
+}

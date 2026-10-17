@@ -1,0 +1,232 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\timing-off\\tests\\game-diagnostics.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence\\tests\\game-diagnostics.test.ts"
+index 217d357..51a8dc8 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\timing-off\\tests\\game-diagnostics.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\gpu-fence\\tests\\game-diagnostics.test.ts"
+@@ -9,6 +9,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
+ import ts from "typescript";
+ import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
+ import { Observable } from "@babylonjs/core/Misc/observable";
++import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
+ import { WebGpuFrameLifecycleProfile } from "../client/webgpu-frame-lifecycle-profile";
+ import {
+   SessionDiagnostics,
+@@ -51,6 +52,9 @@ const members = declaration.members.filter(
+     node.name &&
+     [
+       "frame",
++      "captureGpuCompletionFence",
++      "pendingGpuCompletionFence",
++      "gpuCompletionProbeId",
+       "updateWorldPresentation",
+       "updateRenderEnvironment",
+       "environmentProfileMetadata",
+@@ -279,6 +283,7 @@ function fixture(hostname = "localhost") {
+     time: (now: number) => {
+       clock = now;
+     },
++    advance: (ms: number) => { clock += ms; },
+     renders: () => renders,
+     contexts: () => contexts,
+     records: () => posts.flatMap((batch) => batch.records),
+@@ -700,3 +705,201 @@ test("cadence research diagnostics cannot interrupt the actual render", async(t)
+     f.recorder.start();await f.recorder.flush();assert.doesNotThrow(()=>f.game.frame());assert.equal(f.renders(),1);
+   }
+ });
++
++function fenceFixture() {
++  const f = fixture();
++  const endFrame = new Observable<any>();
++  let calls = 0, healthGeneration = 3, profileGeneration = 5;
++  let resolve!: () => void, reject!: (reason?: unknown) => void;
++  const completion = new Promise<void>((yes, no) => { resolve = yes; reject = no; });
++  const queue = { onSubmittedWorkDone() { assert.equal(this, queue); calls++; return completion; } };
++  const device = { queue };
++  Object.assign(f.game.engine, { isWebGPU: true, _device: device, onEndFrameObservable: endFrame });
++  f.game.renderHealth = {
++    rendererId: 73, dispose() {},
++    snapshot: () => ({ rendererId: 73, generation: healthGeneration, valid: true, phase: "ready" }),
++  };
++  f.game.frameLifecycleProfile = {
++    snapshot: () => ({ active: true, generation: profileGeneration, rawRaf: { epoch: 2 } }),
++    dispose() {},
++  };
++  const render = f.game.scene.render;
++  f.game.scene.render = () => { render(); f.advance(300); };
++  return { ...f, endFrame, queue, device, resolve, reject, calls: () => calls,
++    nextHealth: () => healthGeneration++, nextProfile: () => profileGeneration++,
++    fenceRecords: () => f.records().filter(r => r.kind === "engine-frame-profile" && r.data.stage === "gpu-completion-fence"),
++  };
++}
++
++test("GPU completion fence waits for endFrame and permits only one outstanding fence across CPU bursts", async (t) => {
++  const f = fenceFixture(); t.after(() => f.recorder.dispose());
++  f.recorder.start(); await f.recorder.flush();
++  f.game.frame(); f.game.frame();
++  assert.equal(f.calls(), 0);
++  assert.equal(f.endFrame.observers.length, 1);
++  assert.equal(f.renders(), 2);
++  f.endFrame.notifyObservers(f.game.engine);
++  assert.equal(f.calls(), 1);
++  f.game.frame(); f.endFrame.notifyObservers(f.game.engine);
++  assert.equal(f.calls(), 1);
++  await f.recorder.flush();
++  const queued = f.fenceRecords()[0].data;
++  assert.equal(queued.status, "queued");
++  assert.equal(queued.rendererId, 73);
++  assert.equal(queued.generation, 3);
++  assert.equal(queued.engineGeneration, 5);
++  assert.equal(queued.rawRafEpoch, 2);
++  assert.equal(queued.probeId, 1);
++  assert.ok(Number(queued.cpuFrameMs) >= 300);
++  assert.equal(Number(queued.cpuFrameEndMs) - Number(queued.cpuFrameStartMs), queued.cpuFrameMs);
++  f.advance(1200); f.resolve(); await Promise.resolve(); await f.recorder.flush();
++  const completed = f.fenceRecords()[1].data;
++  assert.equal(completed.status, "completed");
++  assert.equal(completed.probeId, queued.probeId);
++  assert.equal(completed.queuedAtMs, queued.queuedAtMs);
++  assert.equal(completed.completionLatencyMs, Number(completed.completedAtMs) - Number(queued.queuedAtMs));
++  assert.ok(Number(completed.completionLatencyMs) >= 1200);
++  f.game.frame(); f.endFrame.notifyObservers(f.game.engine); await Promise.resolve(); await f.recorder.flush();
++  assert.equal(f.calls(), 2);
++  assert.equal(f.fenceRecords()[2].data.probeId, 2);
++  for (const batch of f.posts) assert.ok(validateDiagnosticsBatch(batch));
++});
++
++test("GPU completion fence consumes rejection and synchronous queue throw without interrupting render", async (t) => {
++  for (const mode of ["rejection", "sync-throw"]) {
++    const f = fenceFixture(); t.after(() => f.recorder.dispose());
++    if (mode === "sync-throw") f.queue.onSubmittedWorkDone = () => { throw new Error("private device detail"); };
++    f.recorder.start(); await f.recorder.flush(); f.game.frame();
++    assert.doesNotThrow(() => f.endFrame.notifyObservers(f.game.engine));
++    if (mode === "rejection") f.reject(new Error("private device detail"));
++    await Promise.resolve(); await f.recorder.flush();
++    assert.deepEqual(f.fenceRecords().map(r => r.data.status), ["queued", "failed"]);
++    const failed = f.fenceRecords()[1].data;
++    assert.equal(failed.failureKind, mode);
++    assert.equal(failed.completionLatencyMs, Number(failed.failedAtMs) - Number(failed.queuedAtMs));
++    assert.equal(JSON.stringify(f.fenceRecords()).includes("private device detail"), false);
++    assert.equal(f.game.pendingGpuCompletionFence, undefined);
++    assert.doesNotThrow(() => f.game.frame()); assert.equal(f.renders(), 2);
++  }
++});
++
++test("GPU completion fence diagnostic snapshot and sink failures are nonfatal", async (t) => {
++  for (const mode of ["snapshot", "health-snapshot", "sink"]) {
++    const f = fenceFixture(); t.after(() => f.recorder.dispose());
++    if (mode === "snapshot") f.game.frameLifecycleProfile.snapshot = () => { throw Error("snapshot"); };
++    if (mode === "health-snapshot") f.game.renderHealth.snapshot = () => { throw Error("snapshot"); };
++    if (mode === "sink") {
++      const event = f.recorder.event.bind(f.recorder);
++      f.recorder.event = ((kind: any, data: any) => {
++        if (data.stage === "gpu-completion-fence") throw Error("sink");
++        return event(kind, data);
++      }) as typeof f.recorder.event;
++    }
++    f.recorder.start(); await f.recorder.flush();
++    assert.doesNotThrow(() => f.game.frame());
++    assert.doesNotThrow(() => f.endFrame.notifyObservers(f.game.engine));
++    f.resolve(); await Promise.resolve();
++    assert.equal(f.game.pendingGpuCompletionFence, undefined);
++    assert.equal(f.calls(), mode === "sink" ? 1 : 0);
++    assert.equal(f.renders(), 1);
++  }
++});
++
++test("GPU completion fence disposal removes the observer and ignores both late Promise outcomes", async (t) => {
++  for (const mode of ["observer", "resolve", "reject"]) {
++    const f = fenceFixture(); t.after(() => f.recorder.dispose());
++    f.recorder.start(); await f.recorder.flush(); f.game.frame();
++    if (mode !== "observer") f.endFrame.notifyObservers(f.game.engine);
++    f.game.dispose();
++    assert.equal(f.game.pendingGpuCompletionFence, undefined);
++    f.endFrame.notifyObservers(f.game.engine);
++    assert.equal(f.calls(), mode === "observer" ? 0 : 1);
++    if (mode === "reject") f.reject(Error("late")); else f.resolve();
++    await Promise.resolve(); await f.recorder.flush();
++    assert.deepEqual(f.fenceRecords().map(r => r.data.status), mode === "observer" ? [] : ["queued"]);
++  }
++});
++
++test("GPU completion fence rejects foreign generations, devices, renderer identity and unhealthy state", async (t) => {
++  for (const phase of ["observer", "promise"]) for (const mutation of ["health", "profile", "device", "renderer", "invalid"]) {
++    const f = fenceFixture(); t.after(() => f.recorder.dispose());
++    f.recorder.start(); await f.recorder.flush(); f.game.frame();
++    if (phase === "promise") f.endFrame.notifyObservers(f.game.engine);
++    if (mutation === "health") f.nextHealth();
++    if (mutation === "profile") f.nextProfile();
++    if (mutation === "device") f.game.engine._device = { queue: f.queue };
++    if (mutation === "renderer") f.game.renderHealth.snapshot = () => ({ rendererId: 74, generation: 3, valid: true });
++    if (mutation === "invalid") f.game.renderHealth.snapshot = () => ({ rendererId: 73, generation: 3, valid: false });
++    f.endFrame.notifyObservers(f.game.engine); f.resolve(); await Promise.resolve(); await f.recorder.flush();
++    assert.equal(f.calls(), phase === "observer" ? 0 : 1, `${phase}/${mutation}`);
++    assert.equal(f.game.pendingGpuCompletionFence, undefined, `${phase}/${mutation}`);
++    assert.deepEqual(f.fenceRecords().map(r => r.data.status), phase === "observer" ? [] : ["queued"], `${phase}/${mutation}`);
++  }
++});
++
++test("GPU completion fence is opt-in, WebGPU-only, finite and starts at CPU250ms", async (t) => {
++  for (const row of [
++    { cpu: 250, profile: false, gpu: true, count: 0 },
++    { cpu: 250, profile: true, gpu: false, count: 0 },
++    { cpu: 249.9, profile: true, gpu: true, count: 0 },
++    { cpu: NaN, profile: true, gpu: true, count: 0 },
++    { cpu: Infinity, profile: true, gpu: true, count: 0 },
++    { cpu: 250, profile: true, gpu: true, count: 1 },
++  ]) {
++    const f = fenceFixture(); t.after(() => f.recorder.dispose());
++    f.game.engine.isWebGPU = row.gpu;
++    if (!row.profile) f.game.frameLifecycleProfile = undefined;
++    // Invoke the extracted production boundary with an exact CPU duration;
++    // the other tests use complete actual frames to arm it.
++    f.game.captureGpuCompletionFence(100, row.cpu, 16);
++    f.endFrame.notifyObservers(f.game.engine);
++    assert.equal(f.calls(), row.count);
++    f.resolve(); await Promise.resolve();
++  }
++});
++
++test("GPU completion fence follows submit in the pinned real WebGPU endFrame and flushFramebuffer methods", async (t) => {
++  const f = fenceFixture(); t.after(() => f.recorder.dispose());
++  const order: string[] = [];
++  const encoder = () => ({ finish: () => ({}) });
++  Object.assign(f.device, { createCommandEncoder: encoder });
++  Object.assign(f.queue, { submit: () => order.push("submit") });
++  const fence = f.queue.onSubmittedWorkDone;
++  f.queue.onSubmittedWorkDone = function() { order.push("fence"); return fence.call(this); };
++  Object.assign(f.game.engine, {
++    _endCurrentRenderPass() {}, _debugPopBeforeEndOfEncoder() {},
++    _snapshotRendering: { endFrame() {} },
++    _timestampQuery: { startFrame() {}, endFrame() {} },
++    _textureHelper: { destroyDeferredTextures() {}, setCommandEncoder() {} },
++    _bufferManager: { destroyDeferredBuffers() {} },
++    _cacheRenderPipeline: { endFrame() {} }, _cacheBindGroups: { endFrame() {} },
++    _bundleList: { reset() {} },
++    _counters: { numEnableEffects: 0, numEnableDrawWrapper: 0, numBundleCreationNonCompatMode: 0, numBundleReuseNonCompatMode: 0 },
++    countersLastFrame: {}, _commandBuffers: [],
++    _uploadEncoder: encoder(), _renderEncoder: encoder(),
++    _uploadEncoderDescriptor: {}, _renderEncoderDescriptor: {},
++    _debugMarkersEncoderGroups: [], _debugMarkersPassGroups: [],
++    _internalFrameCounter: 0, _frameId: 0,
++    flushFramebuffer: WebGPUEngine.prototype.flushFramebuffer,
++  });
++  f.game.frame(); assert.deepEqual(order, []);
++  WebGPUEngine.prototype.endFrame.call(f.game.engine);
++  assert.deepEqual(order, ["submit", "fence"]);
++  assert.equal(f.game.engine._frameId, 1);
++  f.resolve(); await Promise.resolve();
++  assert.equal(f.game.pendingGpuCompletionFence, undefined);
++});
++
++test("GPU completion fence survives later snapshot failures and unavailable observer API", async (t) => {
++  for (const phase of ["observer", "promise", "unavailable"]) {
++    const f = fenceFixture(); t.after(() => f.recorder.dispose());
++    if (phase === "unavailable") f.game.engine.onEndFrameObservable = undefined;
++    assert.doesNotThrow(() => f.game.frame());
++    if (phase === "promise") f.endFrame.notifyObservers(f.game.engine);
++    f.game.frameLifecycleProfile.snapshot = () => { throw Error("later snapshot"); };
++    assert.doesNotThrow(() => f.endFrame.notifyObservers(f.game.engine));
++    f.resolve(); await Promise.resolve();
++    assert.equal(f.calls(), phase === "promise" ? 1 : 0);
++    assert.equal(f.game.pendingGpuCompletionFence, undefined);
++  }
++});

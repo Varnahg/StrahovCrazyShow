@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-receiver-ordering-20261017",
+  "title": "KEY-31: explicitně obnovit stabilní pořadí změněných přijímačů svítilny",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/stable-light-state.ts",
+    "tests/stable-light-state.test.ts",
+    "docs/agents/handoffs/webgpu-receiver-ordering-20261017.md",
+    ".cache/webgpu-receiver-ordering-20261017/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Navazující interní API markMeshesDirty(meshes: Iterable<AbstractMesh>): void umožní finálnímu Game pre-draw bodu zařadit skutečně změněné přijímače do stávající pendingMeshes kolekce.",
+    "Žádný nový scan/cache ani změna původního řazení, cap/frozen/custom fallback. Znovuzařazený torch je po update kanonicky seřazen stejně jako ostatní změny membership.",
+    "Dispose, cizí scéna a disposed meshes nesmí vytvářet retained references. Duplikáty jsou deduplikované stávajícím Set; žádné per-frame alokace při prázdném vstupu.",
+    "Cílený refaktor, skutečné Babylon testy a scopedTS; handoff neprohlašuje GPU přejímku."
+  ],
+  "verification": [
+    "Prokázat skutečný append po _resyncLightSource bez změny světelné signatury, explicitní dirty vstup a shodný kanonický výsledek po update.",
+    "Ověřit pouze dotčené meshes, prázdný/duplicitní vstup, cizí scene/dispose, cap/frozen fallback.",
+    "Přímé Node cílené testy+scopedTS s readonly dependencies-v5 v nové cache; žádný pnpm install/build/fullsuite/GPU/port."
+  ],
+  "notes": [
+    "Koordinátor root schválil toto API po průzkumu webgpu-torch-receivers-20261017. Původní update sleduje enabled/signatury/topology, nikoli samotný lokální range re-admit.",
+    "Root vlastní Game wiring po gltfLightBudget.prepareFrame a před stableLights.update na preload/game paths; tento agent do Game nepíše. Produkční zmrazené4193/4188 se nemění.",
+    "BMAD spec v primary _bmad-output/implementation-artifacts/webgpu-migration-20261017/spec-key-31-long-frame-gaps.md. Přímé implementační delegování bez dalšího workflow/rendereru/podagentů. Commit/integraci provede root."
+  ]
+}
