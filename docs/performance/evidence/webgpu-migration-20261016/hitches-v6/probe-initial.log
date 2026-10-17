@@ -1,0 +1,26 @@
+BJS - [01:10:48]: Babylon.js v9.30.0 - Null engine
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   "noticeboard: Cannot read properties of undefined (reading 'dimensions')"
++ ]
+- []
+
+    at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-variant-proof-20261018\probe.ts:120:10)
+    at async <anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-variant-proof-20261018\probe.ts:253:84) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [
+    "noticeboard: Cannot read properties of undefined (reading 'dimensions')"
+  ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

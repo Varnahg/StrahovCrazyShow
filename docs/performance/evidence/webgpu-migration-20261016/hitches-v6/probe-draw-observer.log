@@ -1,0 +1,33 @@
+BJS - [01:15:54]: Babylon.js v9.30.0 - Null engine
+Probe render failed at current-off TypeError: Cannot read properties of undefined (reading 'renderSelf')
+    at Observer.callback (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-variant-proof-20261018\probe.ts:160:19)
+    at Observable.notifyObservers (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\dependencies-v5\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_05343e646861b28f48a1d6ae565f6f3e\dev\core\src\Misc\observable.pure.ts:439:49)
+    at Mesh.render (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\dependencies-v5\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_05343e646861b28f48a1d6ae565f6f3e\dev\core\src\Meshes\mesh.pure.ts:2898:65)
+    at SubMesh.render (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\dependencies-v5\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_05343e646861b28f48a1d6ae565f6f3e\dev\core\src\Meshes\subMesh.pure.ts:436:29)
+    at RenderingGroup._RenderSorted (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\dependencies-v5\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_05343e646861b28f48a1d6ae565f6f3e\dev\core\src\Rendering\renderingGroup.ts:294:21)
+    at RenderingGroup._renderOpaqueSorted (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\dependencies-v5\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_05343e646861b28f48a1d6ae565f6f3e\dev\core\src\Rendering\renderingGroup.ts:222:24)
+    at RenderingGroup.render (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\dependencies-v5\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_05343e646861b28f48a1d6ae565f6f3e\dev\core\src\Rendering\renderingGroup.ts:157:18)
+    at RenderingManager.render (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\dependencies-v5\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_05343e646861b28f48a1d6ae565f6f3e\dev\core\src\Rendering\renderingManager.ts:258:28)
+    at Scene._renderForCamera (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\dependencies-v5\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_05343e646861b28f48a1d6ae565f6f3e\dev\core\src\scene.pure.ts:5240:32)
+    at Scene._processSubCameras (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration\dependencies-v5\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_05343e646861b28f48a1d6ae565f6f3e\dev\core\src\scene.pure.ts:5271:18)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 'failed'
+- 'complete'
+
+    at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-variant-proof-20261018\probe.ts:216:31)
+    at async <anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-variant-proof-20261018\probe.ts:270:84) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'failed',
+  expected: 'complete',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0
