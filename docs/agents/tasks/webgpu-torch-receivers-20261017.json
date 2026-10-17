@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-torch-receivers-20261017",
   "title": "KEY-31: omezit zbytečné varianty svítilny u prokazatelně vzdálených statických přijímačů",
-  "status": "ready",
+  "status": "blocked",
   "dependsOn": [],
   "writePaths": [
     "client/light-receivers.ts",
@@ -29,6 +29,7 @@
   "notes": [
     "Výslovné uživatelské zadání17.10: BMAD, osmivteřinové záseky, průběžné commity/Linear, zachovat4193. Produkční přínos zůstává neověřený do root GPU testu.",
     "VehicleLighting je byte-identical v native WT a frozen C5 (SHA7903f0be0f4b98affc599d7c9cb323581fa482b640b969d9ffc90eb433461891). Main cizí WIP není součástí tasku.",
-    "Před implementací agent ověří všechny varianty a bezpečné místo update v celém Game řetězci. Přímé delegování nevyvolává další BMAD renderer. Integraci a commit přebírá root."
+    "Před implementací agent ověří všechny varianty a bezpečné místo update v celém Game řetězci. Přímé delegování nevyvolává další BMAD renderer. Integraci a commit přebírá root.",
+    "17.10 pilot nepřijat: cold gap6179.5ms proti původní téměř shodné kontrole6344.2ms, ale steady ON příprava světel4.576ms proti0.018ms. Nejde o statistickou A/B přejímku. Experiment18701037dd3d8faae9b7bd1807ecfbf23e18aec4 vrácen db9018b8114770e0c71cd2e9b4000303d210b55e, runtime není v main. Viz hitches-v3 evidence. Task je blokovaný na novém doloženě užitečném návrhu; parent migrační cíl pokračuje jinou cestou, nejde o požadavek na schválení uživatelem."
   ]
 }

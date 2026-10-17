@@ -1,0 +1,2620 @@
+{
+  "name": "original-control",
+  "sessionId": "d177c0c5-6a11-4a56-8b08-f2526ee16cb6",
+  "rawSha256": "edfff625251633367cbe4f8dd17ba2ae512fd261ba3df7b71d1b898be90ba34c",
+  "rawBytes": 11825615,
+  "records": 15163,
+  "source": {
+    "kind": "working-tree",
+    "gitHead": null,
+    "contentSha256": "4d5e32539bbc5cc10f9bdabab69240750afab63100d5528547a6b11d81831be0",
+    "dirty": null,
+    "buildSnapshotId": "3cf48f74ff65aac859d5fa8869abd8da775cee66f85d2df5ff5ac4428d54507b",
+    "capturedAtUTC": "2026-10-17T20:21:50.218Z",
+    "scope": "client/server/shared/scripts/tests source and project configuration; excludes binary assets, dependencies and local logs; non-atomic working-tree observation",
+    "files": 499
+  },
+  "entry": {
+    "seq": 20,
+    "atMs": 1654.4,
+    "kind": "network-connecting",
+    "data": {
+      "attempt": 1
+    }
+  },
+  "ready": {
+    "seq": 348,
+    "atMs": 47018.6,
+    "kind": "game-ready",
+    "data": {
+      "mode": "multi"
+    }
+  },
+  "actions": {
+    "first": {
+      "seq": 2483,
+      "atMs": 467110.1,
+      "kind": "action",
+      "data": {
+        "action": "flashlight",
+        "enabled": true
+      }
+    },
+    "off": {
+      "seq": 12227,
+      "atMs": 621884.7,
+      "kind": "action",
+      "data": {
+        "action": "flashlight",
+        "enabled": false
+      }
+    },
+    "on": {
+      "seq": 13320,
+      "atMs": 645491,
+      "kind": "action",
+      "data": {
+        "action": "flashlight",
+        "enabled": true
+      }
+    }
+  },
+  "fences": [
+    {
+      "seq": 1005,
+      "atMs": 260322.3,
+      "kind": "engine-frame-profile",
+      "data": {
+        "stage": "gpu-completion-fence",
+        "probeId": 1,
+        "rendererId": 2,
+        "generation": 1,
+        "engineGeneration": 1,
+        "rawRafEpoch": 1,
+        "cpuFrameStartMs": 259471.30000001192,
+        "cpuFrameEndMs": 260321.30000001192,
+        "cpuFrameMs": 850,
+        "frameMs": 40,
+        "status": "queued",
+        "queuedAtMs": 260322.19999998808,
+        "scope": "QA-only content-timeline queue completion latency after endFrame submit; includes prior queued work and callback scheduling, not GPU execution time."
+      }
+    },
+    {
+      "seq": 1028,
+      "atMs": 264028.9,
+      "kind": "engine-frame-profile",
+      "data": {
+        "stage": "gpu-completion-fence",
+        "probeId": 1,
+        "rendererId": 2,
+        "generation": 1,
+        "engineGeneration": 1,
+        "rawRafEpoch": 1,
+        "cpuFrameStartMs": 259471.30000001192,
+        "cpuFrameEndMs": 260321.30000001192,
+        "cpuFrameMs": 850,
+        "frameMs": 40,
+        "status": "completed",
+        "queuedAtMs": 260322.19999998808,
+        "completionLatencyMs": 3706.600000023842,
+        "completedAtMs": 264028.8000000119,
+        "scope": "QA-only content-timeline queue completion latency after endFrame submit; includes prior queued work and callback scheduling, not GPU execution time."
+      }
+    },
+    {
+      "seq": 1735,
+      "atMs": 443363.8,
+      "kind": "engine-frame-profile",
+      "data": {
+        "stage": "gpu-completion-fence",
+        "probeId": 2,
+        "rendererId": 2,
+        "generation": 1,
+        "engineGeneration": 1,
+        "rawRafEpoch": 1,
+        "cpuFrameStartMs": 442298.09999999404,
+        "cpuFrameEndMs": 443361.90000000596,
+        "cpuFrameMs": 1063.800000011921,
+        "frameMs": 28.599999994039536,
+        "status": "queued",
+        "queuedAtMs": 443363.8000000119,
+        "scope": "QA-only content-timeline queue completion latency after endFrame submit; includes prior queued work and callback scheduling, not GPU execution time."
+      }
+    },
+    {
+      "seq": 1757,
+      "atMs": 448332.2,
+      "kind": "engine-frame-profile",
+      "data": {
+        "stage": "gpu-completion-fence",
+        "probeId": 2,
+        "rendererId": 2,
+        "generation": 1,
+        "engineGeneration": 1,
+        "rawRafEpoch": 1,
+        "cpuFrameStartMs": 442298.09999999404,
+        "cpuFrameEndMs": 443361.90000000596,
+        "cpuFrameMs": 1063.800000011921,
+        "frameMs": 28.599999994039536,
+        "status": "completed",
+        "queuedAtMs": 443363.8000000119,
+        "completionLatencyMs": 4968.299999982119,
+        "completedAtMs": 448332.09999999404,
+        "scope": "QA-only content-timeline queue completion latency after endFrame submit; includes prior queued work and callback scheduling, not GPU execution time."
+      }
+    },
+    {
+      "seq": 2486,
+      "atMs": 468340.5,
+      "kind": "engine-frame-profile",
+      "data": {
+        "stage": "gpu-completion-fence",
+        "probeId": 3,
+        "rendererId": 2,
+        "generation": 1,
+        "engineGeneration": 1,
+        "rawRafEpoch": 1,
+        "cpuFrameStartMs": 467110.3000000119,
+        "cpuFrameEndMs": 468340,
+        "cpuFrameMs": 1229.699999988079,
+        "frameMs": 31.30000001192093,
+        "status": "queued",
+        "queuedAtMs": 468340.5,
+        "scope": "QA-only content-timeline queue completion latency after endFrame submit; includes prior queued work and callback scheduling, not GPU execution time."
+      }
+    },
+    {
+      "seq": 2512,
+      "atMs": 474784.3,
+      "kind": "engine-frame-profile",
+      "data": {
+        "stage": "gpu-completion-fence",
+        "probeId": 3,
+        "rendererId": 2,
+        "generation": 1,
+        "engineGeneration": 1,
+        "rawRafEpoch": 1,
+        "cpuFrameStartMs": 467110.3000000119,
+        "cpuFrameEndMs": 468340,
+        "cpuFrameMs": 1229.699999988079,
+        "frameMs": 31.30000001192093,
+        "status": "completed",
+        "queuedAtMs": 468340.5,
+        "completionLatencyMs": 6443.699999988079,
+        "completedAtMs": 474784.1999999881,
+        "scope": "QA-only content-timeline queue completion latency after endFrame submit; includes prior queued work and callback scheduling, not GPU execution time."
+      }
+    }
+  ],
+  "cold": {
+    "profiles": [
+      {
+        "seq": 2488,
+        "atMs": 468341.6,
+        "frameMs": 1231,
+        "intervalStartMs": 467110.40000000596,
+        "intervalEndMs": 468341.40000000596,
+        "rendererId": 2,
+        "generation": 1,
+        "epoch": 1
+      },
+      {
+        "seq": 2502,
+        "atMs": 474685.7,
+        "frameMs": 6344.199999988079,
+        "intervalStartMs": 468341.3000000119,
+        "intervalEndMs": 474685.5,
+        "rendererId": 2,
+        "generation": 1,
+        "epoch": 1
+      }
+    ],
+    "delta": {
+      "rawCallbacks": 1,
+      "processCalls": 1,
+      "completedProcessCpuMs": 64.59999999403954,
+      "queueWaitMs": 6279.4000000059605
+    }
+  },
+  "windows": {
+    "before": {
+      "requestedRangeMs": [
+        451110.1,
+        466110.1
+      ],
+      "windowCount": 15,
+      "frames": 550,
+      "seq": [
+        1928,
+        2439
+      ],
+      "lightGateMeanMs": 0.01672727272727273,
+      "cpu": {
+        "mean": 25.504181818181817,
+        "p50": 24.6,
+        "p95": 29.9,
+        "p99": 41.6
+      },
+      "frame": {
+        "mean": 26.738545454545452,
+        "p50": 25.9,
+        "p95": 31.5,
+        "p99": 45.1
+      },
+      "ambient": {
+        "buses": {
+          "min": 0,
+          "max": 0
+        },
+        "cars": {
+          "min": 1,
+          "max": 2
+        },
+        "passengers": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "meshes": {
+        "source": {
+          "min": 3813,
+          "max": 3844
+        },
+        "active": {
+          "min": 1008,
+          "max": 1034
+        }
+      },
+      "context": {
+        "mode": "multiplayer",
+        "connection": "connected",
+        "position": {
+          "x": -4.829116344451904,
+          "y": 2.6200942993164062,
+          "z": -76.9476318359375
+        },
+        "zone": "b6:0",
+        "speed": 0.0000036288832077170467,
+        "vehicle": false,
+        "flashlight": false,
+        "appearance": {
+          "preset": 0,
+          "skin": "#d7a77f",
+          "hair": "#352823",
+          "shirt": "#657b67",
+          "trousers": "#273b40",
+          "glasses": false,
+          "beard": false,
+          "face": 0.45,
+          "badge": ""
+        },
+        "camera": {
+          "x": -4.827765464782715,
+          "y": 4.109000205993652,
+          "z": -79.22696685791016,
+          "yaw": 6.282592653589791,
+          "pitch": 0.28,
+          "distance": 8,
+          "fov": 0.85,
+          "firstPerson": false
+        },
+        "rendering": {
+          "mode": "medium",
+          "quality": "medium",
+          "targetFps": 60,
+          "effectiveTargetFps": 59.9,
+          "presentationHz": 59.9,
+          "hardwareScaling": 1,
+          "renderScale": 1,
+          "budgets": {
+            "architectureDetailMetres": 76,
+            "avatarNearMetres": 15,
+            "avatarMediumMetres": 60,
+            "grassRangeMetres": 45,
+            "grassTiles": 24,
+            "grassDensity": 0.65,
+            "b6PropRadiusMetres": 18,
+            "shadowMapSize": 1024,
+            "postProcesses": true
+          },
+          "reason": "manual",
+          "revision": 2,
+          "statistics": {
+            "durationMs": 2010.300000011921,
+            "samples": 47,
+            "averageFps": 23.37959508517201,
+            "medianFrameMs": 28,
+            "p95FrameMs": 150.40000000596046,
+            "p99FrameMs": 357.7999999821186,
+            "slowFrameFraction": 1,
+            "averageCpuFrameMs": 29.348936169705492,
+            "averageGpuFrameMs": null
+          }
+        },
+        "viewport": {
+          "width": 1512,
+          "height": 642
+        },
+        "renderResolution": {
+          "width": 1512,
+          "height": 642
+        },
+        "devicePixelRatio": 1,
+        "gpu": {
+          "renderer": "pascal",
+          "vendor": "nvidia",
+          "version": "unknown version",
+          "webglVersion": null,
+          "classification": "unknown",
+          "classificationLabel": "Typ grafiky nelze určit",
+          "requestedPowerPreference": "high-performance",
+          "warnings": [
+            "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+          ],
+          "context": {
+            "requestedAntialias": true,
+            "actualAntialias": null,
+            "defaultFramebuffer": null,
+            "sampleBuffers": null,
+            "samples": null
+          },
+          "backend": "webgpu",
+          "compatibilityMode": true,
+          "gpuTimingScope": "unavailable"
+        },
+        "lightOrdering": {
+          "revisions": 11,
+          "visits": 430359,
+          "sorts": 26411,
+          "skipped": 1007
+        },
+        "renderWork": {
+          "shaderProgramStarts": 375,
+          "shaderPrograms": 375,
+          "shaderIntervalsDropped": 0,
+          "materialEffectEvents": 17652,
+          "materialEffectChanges": 7811,
+          "materialDetailsOmitted": 1794,
+          "renderTargetIntervals": 0,
+          "renderTargetDetailsOmitted": 0,
+          "shaderCreationMs": 2103.0000000298023,
+          "trackedMaterials": 223
+        },
+        "gpuSampleAgeMs": null,
+        "avatars": 1,
+        "avatarLod": {
+          "near": 1,
+          "medium": 0,
+          "far": 0
+        },
+        "drawCalls": 827,
+        "activeMeshInventory": {
+          "candidates": 2544,
+          "meshes": 1008,
+          "potentialSubmeshes": 1308,
+          "frozenWorldMatrices": 137,
+          "regularInstances": 365,
+          "materialClasses": {
+            "PBRMaterial": 769,
+            "StandardMaterial": 231,
+            "MultiMaterial": 3,
+            "ShaderMaterial": 1,
+            "none": 4
+          },
+          "scope": "sampled active-mesh list; potential submeshes are not actual draw calls"
+        },
+        "triangles": 900152,
+        "vegetation": {
+          "treeInstances": 109,
+          "mappedTrees": 47,
+          "inferredTrees": 0,
+          "photoInterpretedTrees": 62,
+          "grassTiles": 7,
+          "grassClumps": 0,
+          "visibleGrassTiles": 0,
+          "visibleGrassClumps": 0,
+          "photographicGrass": {
+            "representation": "photographic-short-lawn",
+            "draws": 0,
+            "triangles": 0,
+            "instances": 0,
+            "submittedLeaves": 0,
+            "activeTiles": 0,
+            "cachedTiles": 7,
+            "textureResolution": 1024,
+            "textureHeight": 512,
+            "triangleLimit": 140000,
+            "drawLimit": 12,
+            "allocatedInstanceBytes": 0,
+            "transitionRoots": 0,
+            "ready": true,
+            "preparing": false,
+            "pendingTiles": 0
+          },
+          "uniqueTreeModels": 109,
+          "treeDetailCounts": [
+            1,
+            16,
+            92
+          ],
+          "loadedTreeMeshes": 279,
+          "bootstrapBytes": 76500488,
+          "activeTreeTriangles": 321591,
+          "pendingTreeLoads": 0
+        },
+        "ambient": {
+          "buses": 0,
+          "passengers": 0,
+          "cars": 1
+        },
+        "weather": {
+          "temperature": 10.8,
+          "wind": 0.9,
+          "windDirection": 45,
+          "rain": 0,
+          "cloud": 0.96,
+          "observedAt": 1792101550000,
+          "fetchedAt": 1792101607591,
+          "source": "Řízené testovací počasí · uložený záznam",
+          "sourceKind": "station",
+          "cloudSource": "Řízený meteorologický model · benchmark",
+          "stale": true,
+          "status": "fallback",
+          "humidity": 87,
+          "fieldSources": {
+            "windGust": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "humidity": {
+              "kind": "station",
+              "source": "Meteostanice Silicon Hill",
+              "observedAt": 1792101550000,
+              "stale": true
+            },
+            "visibility": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "snowfall": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "liquidPrecipitation": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "precipitationType": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            }
+          },
+          "cloudObservedAt": 1792101600000,
+          "cloudStale": true,
+          "cloudWindSource": "Řízené modelové proudění · benchmark",
+          "cloudLayers": {
+            "low": 0,
+            "mid": 0.41,
+            "high": 0.9
+          },
+          "cloudWinds": {
+            "low": {
+              "speed": 3.7,
+              "direction": 308
+            },
+            "mid": {
+              "speed": 22.45,
+              "direction": 6
+            },
+            "high": {
+              "speed": 21.12,
+              "direction": 348
+            }
+          },
+          "windGust": 2.1,
+          "visibility": 24100,
+          "snowfall": 0,
+          "liquidPrecipitation": 0,
+          "precipitationType": "none"
+        },
+        "lightingInstant": 1792231200000,
+        "lightingPreview": true,
+        "uiModal": false,
+        "benchmarkActive": false,
+        "renderErrors": 0,
+        "meshCandidates": {
+          "staticFrustumEnabled": false,
+          "queries": 23366,
+          "rebuilds": 348,
+          "renderEvaluations": 22967,
+          "attestationErrors": 0,
+          "sourceCandidates": 3813,
+          "enabledCandidates": 2544,
+          "outputCandidates": 2544,
+          "staticTests": 0,
+          "staticRejected": 0,
+          "unsafeStatic": 0,
+          "bypassReason": "disabled",
+          "lastRenderSource": 3813,
+          "lastRenderEnabled": 2544,
+          "lastRenderOutput": 2544,
+          "lastRenderTests": 0,
+          "lastRenderRejected": 0,
+          "lastRenderUnsafe": 0,
+          "lastRenderBypassReason": "disabled"
+        },
+        "lightBudgets": {
+          "trackedMaterials": 281,
+          "activeLoaders": 0,
+          "loaderStarts": 23,
+          "loaderReady": 23,
+          "loaderFailures": 0,
+          "enabledLights": 3,
+          "registeredLights": 43,
+          "visits": 68836,
+          "fullSweeps": 265,
+          "deferredPasses": 0,
+          "skippedFrames": 45738,
+          "deferredMaterials": 0,
+          "writes": 4537,
+          "inflationRepairs": 4537,
+          "ownerChanges": 0,
+          "explicitDeclarations": 0,
+          "skippedFrozenVisits": 0,
+          "invalidBudgetVisits": 0,
+          "writeErrors": 0,
+          "unwrappedEntryPoints": 0,
+          "descriptorRestoreFailures": 0,
+          "lastInflatedBudget": 42,
+          "lastRestoredBudget": 4
+        },
+        "assetErrors": 0,
+        "network": {
+          "motionPackets": 8956,
+          "authorityPackets": 7792,
+          "corrections": 15,
+          "resyncs": 3,
+          "lastCorrectionMetres": 0,
+          "lastMotionAgeMs": 25.399999976158142,
+          "authorityAgeMs": 25.299999982118607,
+          "authorityTick": 27285,
+          "pendingInputs": 9,
+          "visualCorrectionMetres": 0,
+          "timeline": {
+            "inputEpoch": 3,
+            "ack": 414,
+            "predictedSeq": 423,
+            "retainedInputs": 9,
+            "rttMs": 30.099999994039536,
+            "rawRttMs": 30.099999994039536,
+            "rttMeasuredAtMs": 448837.6999999881,
+            "supportedRttMeasuredAtMs": 448837.6999999881,
+            "pendingRttMs": null,
+            "pendingRttMeasuredAtMs": null,
+            "pendingRttExpiresAtMs": null,
+            "leadTicks": 6,
+            "clockSeqAtAnchor": 417.1499999999999,
+            "clockAnchorAtMs": 450295.90000000596,
+            "deliveryBudgetExceeded": false,
+            "clockCalibrated": true
+          },
+          "transport": {
+            "sender": {
+              "queued": 4,
+              "inFlight": 5,
+              "maxQueued": 7,
+              "oldestQueuedAgeMs": 51.099999994039536,
+              "oldestUnackedAgeMs": 139.59999999403954,
+              "lastSendAgeMs": 51.5,
+              "lastTimerAgeMs": 51.5,
+              "lastFrameAgeMs": 24.5,
+              "lastTimerIntervalMs": 34.69999998807907,
+              "maxTimerIntervalMs": 2585.4000000059605,
+              "lastSentSeq": 419,
+              "lastAck": 414,
+              "produced": 23470,
+              "sentInputs": 23466,
+              "sentPackets": 9468,
+              "resets": 17,
+              "discardedInputs": 0,
+              "expiredQueuedInputs": 0,
+              "overflows": 0,
+              "sendErrors": 0
+            },
+            "probe": {
+              "pendingMs": null,
+              "predictionRoundTripMs": 30.099999994039536,
+              "rawRoundTripMs": 30.099999994039536,
+              "measuredAt": 448837.6999999881,
+              "retainedLongTasks": 4,
+              "timeouts": 0,
+              "contaminatedSamples": 0,
+              "acceptedSamples": 202
+            },
+            "authorities": {
+              "received": 8975,
+              "superseded": 1183,
+              "barriers": 3,
+              "ordinaryApplied": 7789,
+              "rejected": 0
+            }
+          },
+          "server": {
+            "clock": {
+              "elapsedMs": 29.929599999974016,
+              "cpuMs": 0.44650000002002344,
+              "steps": 2,
+              "droppedMs": 0,
+              "accumulatorMs": 10.791299999999428,
+              "callbacks": 19449,
+              "elapsedMeanMs": 23.38221971823744,
+              "cpuMeanMs": 0.4056695768420893,
+              "elapsedMaxMs": 44.366799999999785,
+              "cpuMaxMs": 7.1500999999998385,
+              "droppedTotalMs": 0
+            },
+            "queue": {
+              "inputEpoch": 3,
+              "inputTickBase": 26871,
+              "tick": 27285,
+              "ack": 414,
+              "receivedSeq": 416,
+              "depth": 2,
+              "maxDepth": 10,
+              "accepted": 23456,
+              "consumed": 23454,
+              "idleTicks": 3460,
+              "idleTicksSinceInput": 0,
+              "lastAppliedTick": 27285,
+              "modeMismatchTicks": 0,
+              "resets": 2,
+              "discarded": 0,
+              "lastInputAgeMs": 44.34560000000056,
+              "oldestQueuedAgeMs": 44.34560000000056,
+              "resolution": "scheduled-tick",
+              "rejected": {
+                "invalid": 0,
+                "epoch": 2,
+                "late": 5,
+                "ahead": 0,
+                "duplicate": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "earlyOn": {
+      "requestedRangeMs": [
+        484784.3,
+        504784.3
+      ],
+      "windowCount": 19,
+      "frames": 603,
+      "seq": [
+        3288,
+        4438
+      ],
+      "lightGateMeanMs": 0.015091210613598673,
+      "cpu": {
+        "mean": 29.725870646766165,
+        "p50": 29.2,
+        "p95": 37.7,
+        "p99": 40.6
+      },
+      "frame": {
+        "mean": 31.025538971807638,
+        "p50": 30.4,
+        "p95": 39.3,
+        "p99": 42.8
+      },
+      "ambient": {
+        "buses": {
+          "min": 0,
+          "max": 0
+        },
+        "cars": {
+          "min": 1,
+          "max": 1
+        },
+        "passengers": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "meshes": {
+        "source": {
+          "min": 3813,
+          "max": 3813
+        },
+        "active": {
+          "min": 984,
+          "max": 984
+        }
+      },
+      "context": {
+        "mode": "multiplayer",
+        "connection": "connected",
+        "position": {
+          "x": -4.829116344451904,
+          "y": 2.6199944019317627,
+          "z": -76.9476318359375
+        },
+        "zone": "b6:0",
+        "speed": 0.000022119805294096295,
+        "vehicle": false,
+        "flashlight": true,
+        "appearance": {
+          "preset": 0,
+          "skin": "#d7a77f",
+          "hair": "#352823",
+          "shirt": "#657b67",
+          "trousers": "#273b40",
+          "glasses": false,
+          "beard": false,
+          "face": 0.45,
+          "badge": ""
+        },
+        "camera": {
+          "x": -4.827765464782715,
+          "y": 4.108973026275635,
+          "z": -79.22689056396484,
+          "yaw": 6.282592653589791,
+          "pitch": 0.28,
+          "distance": 8,
+          "fov": 0.85,
+          "firstPerson": false
+        },
+        "rendering": {
+          "mode": "medium",
+          "quality": "medium",
+          "targetFps": 60,
+          "effectiveTargetFps": 59.9,
+          "presentationHz": 59.9,
+          "hardwareScaling": 1,
+          "renderScale": 1,
+          "budgets": {
+            "architectureDetailMetres": 76,
+            "avatarNearMetres": 15,
+            "avatarMediumMetres": 60,
+            "grassRangeMetres": 45,
+            "grassTiles": 24,
+            "grassDensity": 0.65,
+            "b6PropRadiusMetres": 18,
+            "shadowMapSize": 1024,
+            "postProcesses": true
+          },
+          "reason": "manual",
+          "revision": 2,
+          "statistics": {
+            "durationMs": 2009.4000000059605,
+            "samples": 67,
+            "averageFps": 33.34328655310105,
+            "medianFrameMs": 29.400000005960464,
+            "p95FrameMs": 36.29999998211861,
+            "p99FrameMs": 48.400000005960464,
+            "slowFrameFraction": 1,
+            "averageCpuFrameMs": 28.79253731200944,
+            "averageGpuFrameMs": null
+          }
+        },
+        "viewport": {
+          "width": 1512,
+          "height": 642
+        },
+        "renderResolution": {
+          "width": 1512,
+          "height": 642
+        },
+        "devicePixelRatio": 1,
+        "gpu": {
+          "renderer": "pascal",
+          "vendor": "nvidia",
+          "version": "unknown version",
+          "webglVersion": null,
+          "classification": "unknown",
+          "classificationLabel": "Typ grafiky nelze určit",
+          "requestedPowerPreference": "high-performance",
+          "warnings": [
+            "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+          ],
+          "context": {
+            "requestedAntialias": true,
+            "actualAntialias": null,
+            "defaultFramebuffer": null,
+            "sampleBuffers": null,
+            "samples": null
+          },
+          "backend": "webgpu",
+          "compatibilityMode": true,
+          "gpuTimingScope": "unavailable"
+        },
+        "lightOrdering": {
+          "revisions": 12,
+          "visits": 441860,
+          "sorts": 28886,
+          "skipped": 1031
+        },
+        "renderWork": {
+          "shaderProgramStarts": 415,
+          "shaderPrograms": 415,
+          "shaderIntervalsDropped": 0,
+          "materialEffectEvents": 18449,
+          "materialEffectChanges": 8606,
+          "materialDetailsOmitted": 2567,
+          "renderTargetIntervals": 330,
+          "renderTargetDetailsOmitted": 0,
+          "shaderCreationMs": 2361.2000000178814,
+          "trackedMaterials": 223
+        },
+        "gpuSampleAgeMs": null,
+        "avatars": 1,
+        "avatarLod": {
+          "near": 1,
+          "medium": 0,
+          "far": 0
+        },
+        "drawCalls": 906,
+        "activeMeshInventory": {
+          "candidates": 2546,
+          "meshes": 984,
+          "potentialSubmeshes": 1284,
+          "frozenWorldMatrices": 137,
+          "regularInstances": 339,
+          "materialClasses": {
+            "PBRMaterial": 743,
+            "StandardMaterial": 233,
+            "MultiMaterial": 3,
+            "ShaderMaterial": 1,
+            "none": 4
+          },
+          "scope": "sampled active-mesh list; potential submeshes are not actual draw calls"
+        },
+        "triangles": 1104153,
+        "vegetation": {
+          "treeInstances": 109,
+          "mappedTrees": 47,
+          "inferredTrees": 0,
+          "photoInterpretedTrees": 62,
+          "grassTiles": 7,
+          "grassClumps": 0,
+          "visibleGrassTiles": 0,
+          "visibleGrassClumps": 0,
+          "photographicGrass": {
+            "representation": "photographic-short-lawn",
+            "draws": 0,
+            "triangles": 0,
+            "instances": 0,
+            "submittedLeaves": 0,
+            "activeTiles": 0,
+            "cachedTiles": 7,
+            "textureResolution": 1024,
+            "textureHeight": 512,
+            "triangleLimit": 140000,
+            "drawLimit": 12,
+            "allocatedInstanceBytes": 0,
+            "transitionRoots": 0,
+            "ready": true,
+            "preparing": false,
+            "pendingTiles": 0
+          },
+          "uniqueTreeModels": 109,
+          "treeDetailCounts": [
+            1,
+            16,
+            92
+          ],
+          "loadedTreeMeshes": 279,
+          "bootstrapBytes": 76500488,
+          "activeTreeTriangles": 321591,
+          "pendingTreeLoads": 0
+        },
+        "ambient": {
+          "buses": 0,
+          "passengers": 0,
+          "cars": 1
+        },
+        "weather": {
+          "temperature": 10.8,
+          "wind": 0.9,
+          "windDirection": 45,
+          "rain": 0,
+          "cloud": 0.96,
+          "observedAt": 1792101550000,
+          "fetchedAt": 1792101607591,
+          "source": "Řízené testovací počasí · uložený záznam",
+          "sourceKind": "station",
+          "cloudSource": "Řízený meteorologický model · benchmark",
+          "stale": true,
+          "status": "fallback",
+          "humidity": 87,
+          "fieldSources": {
+            "windGust": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "humidity": {
+              "kind": "station",
+              "source": "Meteostanice Silicon Hill",
+              "observedAt": 1792101550000,
+              "stale": true
+            },
+            "visibility": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "snowfall": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "liquidPrecipitation": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "precipitationType": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            }
+          },
+          "cloudObservedAt": 1792101600000,
+          "cloudStale": true,
+          "cloudWindSource": "Řízené modelové proudění · benchmark",
+          "cloudLayers": {
+            "low": 0,
+            "mid": 0.41,
+            "high": 0.9
+          },
+          "cloudWinds": {
+            "low": {
+              "speed": 3.7,
+              "direction": 308
+            },
+            "mid": {
+              "speed": 22.45,
+              "direction": 6
+            },
+            "high": {
+              "speed": 21.12,
+              "direction": 348
+            }
+          },
+          "windGust": 2.1,
+          "visibility": 24100,
+          "snowfall": 0,
+          "liquidPrecipitation": 0,
+          "precipitationType": "none"
+        },
+        "lightingInstant": 1792231200000,
+        "lightingPreview": true,
+        "uiModal": false,
+        "benchmarkActive": false,
+        "renderErrors": 0,
+        "meshCandidates": {
+          "staticFrustumEnabled": false,
+          "queries": 24350,
+          "rebuilds": 352,
+          "renderEvaluations": 23922,
+          "attestationErrors": 0,
+          "sourceCandidates": 3813,
+          "enabledCandidates": 2546,
+          "outputCandidates": 2546,
+          "staticTests": 0,
+          "staticRejected": 0,
+          "unsafeStatic": 0,
+          "bypassReason": "disabled",
+          "lastRenderSource": 3813,
+          "lastRenderEnabled": 2546,
+          "lastRenderOutput": 2546,
+          "lastRenderTests": 0,
+          "lastRenderRejected": 0,
+          "lastRenderUnsafe": 0,
+          "lastRenderBypassReason": "disabled"
+        },
+        "lightBudgets": {
+          "trackedMaterials": 281,
+          "activeLoaders": 0,
+          "loaderStarts": 23,
+          "loaderReady": 23,
+          "loaderFailures": 0,
+          "enabledLights": 4,
+          "registeredLights": 43,
+          "visits": 69117,
+          "fullSweeps": 266,
+          "deferredPasses": 0,
+          "skippedFrames": 47647,
+          "deferredMaterials": 0,
+          "writes": 4537,
+          "inflationRepairs": 4537,
+          "ownerChanges": 0,
+          "explicitDeclarations": 0,
+          "skippedFrozenVisits": 0,
+          "invalidBudgetVisits": 0,
+          "writeErrors": 0,
+          "unwrappedEntryPoints": 0,
+          "descriptorRestoreFailures": 0,
+          "lastInflatedBudget": 42,
+          "lastRestoredBudget": 4
+        },
+        "assetErrors": 0,
+        "network": {
+          "motionPackets": 9651,
+          "authorityPackets": 8333,
+          "corrections": 17,
+          "resyncs": 4,
+          "lastCorrectionMetres": 0.00006699562072753906,
+          "lastMotionAgeMs": 70.80000001192093,
+          "authorityAgeMs": 40.400000005960464,
+          "authorityTick": 29371,
+          "pendingInputs": 10,
+          "visualCorrectionMetres": 1.0441829299769396e-86,
+          "timeline": {
+            "inputEpoch": 4,
+            "ack": 1002,
+            "predictedSeq": 1012,
+            "retainedInputs": 10,
+            "rttMs": 80.09999999403954,
+            "rawRttMs": 80.09999999403954,
+            "rttMeasuredAtMs": 483940.90000000596,
+            "supportedRttMeasuredAtMs": 483940.90000000596,
+            "pendingRttMs": null,
+            "pendingRttMeasuredAtMs": null,
+            "pendingRttExpiresAtMs": null,
+            "leadTicks": 8,
+            "clockSeqAtAnchor": 1004.431999999284,
+            "clockAnchorAtMs": 485050.09999999404,
+            "deliveryBudgetExceeded": false,
+            "clockCalibrated": true
+          },
+          "transport": {
+            "sender": {
+              "queued": 2,
+              "inFlight": 8,
+              "maxQueued": 7,
+              "oldestQueuedAgeMs": 39.69999998807907,
+              "oldestUnackedAgeMs": 189.69999998807907,
+              "lastSendAgeMs": 40.30000001192093,
+              "lastTimerAgeMs": 40.30000001192093,
+              "lastFrameAgeMs": 39.599999994039536,
+              "lastTimerIntervalMs": 30.399999976158142,
+              "maxTimerIntervalMs": 2585.4000000059605,
+              "lastSentSeq": 1010,
+              "lastAck": 1002,
+              "produced": 25109,
+              "sentInputs": 25107,
+              "sentPackets": 9990,
+              "resets": 19,
+              "discardedInputs": 0,
+              "expiredQueuedInputs": 0,
+              "overflows": 0,
+              "sendErrors": 0
+            },
+            "probe": {
+              "pendingMs": null,
+              "predictionRoundTripMs": 80.09999999403954,
+              "rawRoundTripMs": 80.09999999403954,
+              "measuredAt": 483940.90000000596,
+              "retainedLongTasks": 4,
+              "timeouts": 0,
+              "contaminatedSamples": 0,
+              "acceptedSamples": 220
+            },
+            "authorities": {
+              "received": 9671,
+              "superseded": 1338,
+              "barriers": 4,
+              "ordinaryApplied": 8329,
+              "rejected": 0
+            }
+          },
+          "server": {
+            "clock": {
+              "elapsedMs": 22.26579999999376,
+              "cpuMs": 0.35110000002896413,
+              "steps": 2,
+              "droppedMs": 0,
+              "accumulatorMs": 3.459133333330429,
+              "callbacks": 20952,
+              "elapsedMeanMs": 23.36388534746086,
+              "cpuMeanMs": 0.4032226135930082,
+              "elapsedMaxMs": 44.366799999999785,
+              "cpuMaxMs": 7.1500999999998385,
+              "droppedTotalMs": 0
+            },
+            "queue": {
+              "inputEpoch": 4,
+              "inputTickBase": 28369,
+              "tick": 29371,
+              "ack": 1002,
+              "receivedSeq": 1006,
+              "depth": 4,
+              "maxDepth": 10,
+              "accepted": 25094,
+              "consumed": 25090,
+              "idleTicks": 3910,
+              "idleTicksSinceInput": 0,
+              "lastAppliedTick": 29371,
+              "modeMismatchTicks": 0,
+              "resets": 3,
+              "discarded": 0,
+              "lastInputAgeMs": 22.787199999962468,
+              "oldestQueuedAgeMs": 83.77149999997346,
+              "resolution": "scheduled-tick",
+              "rejected": {
+                "invalid": 0,
+                "epoch": 4,
+                "late": 5,
+                "ahead": 0,
+                "duplicate": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "lateOn": {
+      "requestedRangeMs": [
+        600884.7,
+        620884.7
+      ],
+      "windowCount": 19,
+      "frames": 599,
+      "seq": [
+        10964,
+        12131
+      ],
+      "lightGateMeanMs": 0.014524207011686142,
+      "cpu": {
+        "mean": 29.766777963272137,
+        "p50": 28.8,
+        "p95": 38.4,
+        "p99": 45.7
+      },
+      "frame": {
+        "mean": 31.147579298831417,
+        "p50": 30,
+        "p95": 39.8,
+        "p99": 46.9
+      },
+      "ambient": {
+        "buses": {
+          "min": 0,
+          "max": 0
+        },
+        "cars": {
+          "min": 1,
+          "max": 1
+        },
+        "passengers": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "meshes": {
+        "source": {
+          "min": 3813,
+          "max": 3813
+        },
+        "active": {
+          "min": 984,
+          "max": 1010
+        }
+      },
+      "context": {
+        "mode": "multiplayer",
+        "connection": "connected",
+        "position": {
+          "x": -4.829116344451904,
+          "y": 2.6200942993164062,
+          "z": -76.9476318359375
+        },
+        "zone": "b6:0",
+        "speed": 0.0000036288832077170467,
+        "vehicle": false,
+        "flashlight": true,
+        "appearance": {
+          "preset": 0,
+          "skin": "#d7a77f",
+          "hair": "#352823",
+          "shirt": "#657b67",
+          "trousers": "#273b40",
+          "glasses": false,
+          "beard": false,
+          "face": 0.45,
+          "badge": ""
+        },
+        "camera": {
+          "x": -4.827765464782715,
+          "y": 4.108963489532471,
+          "z": -79.2268295288086,
+          "yaw": 6.282592653589791,
+          "pitch": 0.28,
+          "distance": 8,
+          "fov": 0.85,
+          "firstPerson": false
+        },
+        "rendering": {
+          "mode": "medium",
+          "quality": "medium",
+          "targetFps": 60,
+          "effectiveTargetFps": 59.9,
+          "presentationHz": 59.9,
+          "hardwareScaling": 1,
+          "renderScale": 1,
+          "budgets": {
+            "architectureDetailMetres": 76,
+            "avatarNearMetres": 15,
+            "avatarMediumMetres": 60,
+            "grassRangeMetres": 45,
+            "grassTiles": 24,
+            "grassDensity": 0.65,
+            "b6PropRadiusMetres": 18,
+            "shadowMapSize": 1024,
+            "postProcesses": true
+          },
+          "reason": "manual",
+          "revision": 2,
+          "statistics": {
+            "durationMs": 2002.5,
+            "samples": 65,
+            "averageFps": 32.45942571785268,
+            "medianFrameMs": 30.30000001192093,
+            "p95FrameMs": 37.60000002384186,
+            "p99FrameMs": 39.10000002384186,
+            "slowFrameFraction": 1,
+            "averageCpuFrameMs": 29.506153847621036,
+            "averageGpuFrameMs": null
+          }
+        },
+        "viewport": {
+          "width": 1512,
+          "height": 642
+        },
+        "renderResolution": {
+          "width": 1512,
+          "height": 642
+        },
+        "devicePixelRatio": 1,
+        "gpu": {
+          "renderer": "pascal",
+          "vendor": "nvidia",
+          "version": "unknown version",
+          "webglVersion": null,
+          "classification": "unknown",
+          "classificationLabel": "Typ grafiky nelze určit",
+          "requestedPowerPreference": "high-performance",
+          "warnings": [
+            "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+          ],
+          "context": {
+            "requestedAntialias": true,
+            "actualAntialias": null,
+            "defaultFramebuffer": null,
+            "sampleBuffers": null,
+            "samples": null
+          },
+          "backend": "webgpu",
+          "compatibilityMode": true,
+          "gpuTimingScope": "unavailable"
+        },
+        "lightOrdering": {
+          "revisions": 12,
+          "visits": 457174,
+          "sorts": 28886,
+          "skipped": 1063
+        },
+        "renderWork": {
+          "shaderProgramStarts": 415,
+          "shaderPrograms": 415,
+          "shaderIntervalsDropped": 0,
+          "materialEffectEvents": 18449,
+          "materialEffectChanges": 8606,
+          "materialDetailsOmitted": 2567,
+          "renderTargetIntervals": 4077,
+          "renderTargetDetailsOmitted": 0,
+          "shaderCreationMs": 2361.2000000178814,
+          "trackedMaterials": 223
+        },
+        "gpuSampleAgeMs": null,
+        "avatars": 1,
+        "avatarLod": {
+          "near": 1,
+          "medium": 0,
+          "far": 0
+        },
+        "drawCalls": 908,
+        "activeMeshInventory": {
+          "candidates": 2546,
+          "meshes": 1010,
+          "potentialSubmeshes": 1310,
+          "frozenWorldMatrices": 137,
+          "regularInstances": 365,
+          "materialClasses": {
+            "PBRMaterial": 769,
+            "StandardMaterial": 233,
+            "MultiMaterial": 3,
+            "ShaderMaterial": 1,
+            "none": 4
+          },
+          "scope": "sampled active-mesh list; potential submeshes are not actual draw calls"
+        },
+        "triangles": 1113430,
+        "vegetation": {
+          "treeInstances": 109,
+          "mappedTrees": 47,
+          "inferredTrees": 0,
+          "photoInterpretedTrees": 62,
+          "grassTiles": 7,
+          "grassClumps": 0,
+          "visibleGrassTiles": 0,
+          "visibleGrassClumps": 0,
+          "photographicGrass": {
+            "representation": "photographic-short-lawn",
+            "draws": 0,
+            "triangles": 0,
+            "instances": 0,
+            "submittedLeaves": 0,
+            "activeTiles": 0,
+            "cachedTiles": 7,
+            "textureResolution": 1024,
+            "textureHeight": 512,
+            "triangleLimit": 140000,
+            "drawLimit": 12,
+            "allocatedInstanceBytes": 0,
+            "transitionRoots": 0,
+            "ready": true,
+            "preparing": false,
+            "pendingTiles": 0
+          },
+          "uniqueTreeModels": 109,
+          "treeDetailCounts": [
+            1,
+            16,
+            92
+          ],
+          "loadedTreeMeshes": 279,
+          "bootstrapBytes": 76500488,
+          "activeTreeTriangles": 321591,
+          "pendingTreeLoads": 0
+        },
+        "ambient": {
+          "buses": 0,
+          "passengers": 0,
+          "cars": 1
+        },
+        "weather": {
+          "temperature": 10.8,
+          "wind": 0.9,
+          "windDirection": 45,
+          "rain": 0,
+          "cloud": 0.96,
+          "observedAt": 1792101550000,
+          "fetchedAt": 1792101607591,
+          "source": "Řízené testovací počasí · uložený záznam",
+          "sourceKind": "station",
+          "cloudSource": "Řízený meteorologický model · benchmark",
+          "stale": true,
+          "status": "fallback",
+          "humidity": 87,
+          "fieldSources": {
+            "windGust": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "humidity": {
+              "kind": "station",
+              "source": "Meteostanice Silicon Hill",
+              "observedAt": 1792101550000,
+              "stale": true
+            },
+            "visibility": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "snowfall": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "liquidPrecipitation": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "precipitationType": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            }
+          },
+          "cloudObservedAt": 1792101600000,
+          "cloudStale": true,
+          "cloudWindSource": "Řízené modelové proudění · benchmark",
+          "cloudLayers": {
+            "low": 0,
+            "mid": 0.41,
+            "high": 0.9
+          },
+          "cloudWinds": {
+            "low": {
+              "speed": 3.7,
+              "direction": 308
+            },
+            "mid": {
+              "speed": 22.45,
+              "direction": 6
+            },
+            "high": {
+              "speed": 21.12,
+              "direction": 348
+            }
+          },
+          "windGust": 2.1,
+          "visibility": 24100,
+          "snowfall": 0,
+          "liquidPrecipitation": 0,
+          "precipitationType": "none"
+        },
+        "lightingInstant": 1792231200000,
+        "lightingPreview": true,
+        "uiModal": false,
+        "benchmarkActive": false,
+        "renderErrors": 0,
+        "meshCandidates": {
+          "staticFrustumEnabled": false,
+          "queries": 28215,
+          "rebuilds": 358,
+          "renderEvaluations": 27669,
+          "attestationErrors": 0,
+          "sourceCandidates": 3813,
+          "enabledCandidates": 2546,
+          "outputCandidates": 2546,
+          "staticTests": 0,
+          "staticRejected": 0,
+          "unsafeStatic": 0,
+          "bypassReason": "disabled",
+          "lastRenderSource": 3813,
+          "lastRenderEnabled": 2546,
+          "lastRenderOutput": 2546,
+          "lastRenderTests": 0,
+          "lastRenderRejected": 0,
+          "lastRenderUnsafe": 0,
+          "lastRenderBypassReason": "disabled"
+        },
+        "lightBudgets": {
+          "trackedMaterials": 281,
+          "activeLoaders": 0,
+          "loaderStarts": 23,
+          "loaderReady": 23,
+          "loaderFailures": 0,
+          "enabledLights": 4,
+          "registeredLights": 43,
+          "visits": 69117,
+          "fullSweeps": 266,
+          "deferredPasses": 0,
+          "skippedFrames": 55141,
+          "deferredMaterials": 0,
+          "writes": 4537,
+          "inflationRepairs": 4537,
+          "ownerChanges": 0,
+          "explicitDeclarations": 0,
+          "skippedFrozenVisits": 0,
+          "invalidBudgetVisits": 0,
+          "writeErrors": 0,
+          "unwrappedEntryPoints": 0,
+          "descriptorRestoreFailures": 0,
+          "lastInflatedBudget": 42,
+          "lastRestoredBudget": 4
+        },
+        "assetErrors": 0,
+        "network": {
+          "motionPackets": 11977,
+          "authorityPackets": 10637,
+          "corrections": 17,
+          "resyncs": 4,
+          "lastCorrectionMetres": 0.00006699562072753906,
+          "lastMotionAgeMs": 30.30000001192093,
+          "authorityAgeMs": 60.30000001192093,
+          "authorityTick": 36345,
+          "pendingInputs": 12,
+          "visualCorrectionMetres": 0,
+          "timeline": {
+            "inputEpoch": 4,
+            "ack": 7976,
+            "predictedSeq": 7988,
+            "retainedInputs": 12,
+            "rttMs": 57.400000005960464,
+            "rawRttMs": 57.400000005960464,
+            "rttMeasuredAtMs": 599871.8000000119,
+            "supportedRttMeasuredAtMs": 599871.8000000119,
+            "pendingRttMs": null,
+            "pendingRttMeasuredAtMs": null,
+            "pendingRttExpiresAtMs": null,
+            "leadTicks": 7,
+            "clockSeqAtAnchor": 7980.031999999293,
+            "clockAnchorAtMs": 601310.099999994,
+            "deliveryBudgetExceeded": false,
+            "clockCalibrated": true
+          },
+          "transport": {
+            "sender": {
+              "queued": 3,
+              "inFlight": 9,
+              "maxQueued": 8,
+              "oldestQueuedAgeMs": 59.900000005960464,
+              "oldestUnackedAgeMs": 226,
+              "lastSendAgeMs": 60.30000001192093,
+              "lastTimerAgeMs": 30.200000017881393,
+              "lastFrameAgeMs": 29.900000005960464,
+              "lastTimerIntervalMs": 30.099999994039536,
+              "maxTimerIntervalMs": 2585.4000000059605,
+              "lastSentSeq": 7985,
+              "lastAck": 7976,
+              "produced": 32085,
+              "sentInputs": 32082,
+              "sentPackets": 12163,
+              "resets": 19,
+              "discardedInputs": 0,
+              "expiredQueuedInputs": 0,
+              "overflows": 0,
+              "sendErrors": 0
+            },
+            "probe": {
+              "pendingMs": null,
+              "predictionRoundTripMs": 57.400000005960464,
+              "rawRoundTripMs": 57.400000005960464,
+              "measuredAt": 599871.8000000119,
+              "retainedLongTasks": 0,
+              "timeouts": 0,
+              "contaminatedSamples": 0,
+              "acceptedSamples": 278
+            },
+            "authorities": {
+              "received": 11996,
+              "superseded": 1359,
+              "barriers": 4,
+              "ordinaryApplied": 10633,
+              "rejected": 0
+            }
+          },
+          "server": {
+            "clock": {
+              "elapsedMs": 24.284600000013597,
+              "cpuMs": 0.3001999999396503,
+              "steps": 1,
+              "droppedMs": 0,
+              "accumulatorMs": 11.879100000038827,
+              "callbacks": 26009,
+              "elapsedMeanMs": 23.290471725172058,
+              "cpuMeanMs": 0.3919464992885606,
+              "elapsedMaxMs": 44.366799999999785,
+              "cpuMaxMs": 7.1500999999998385,
+              "droppedTotalMs": 0
+            },
+            "queue": {
+              "inputEpoch": 4,
+              "inputTickBase": 28369,
+              "tick": 36345,
+              "ack": 7976,
+              "receivedSeq": 7983,
+              "depth": 7,
+              "maxDepth": 10,
+              "accepted": 32066,
+              "consumed": 32059,
+              "idleTicks": 3915,
+              "idleTicksSinceInput": 0,
+              "lastAppliedTick": 36345,
+              "modeMismatchTicks": 0,
+              "resets": 3,
+              "discarded": 0,
+              "lastInputAgeMs": 0.4433000000426546,
+              "oldestQueuedAgeMs": 108.45689999999013,
+              "resolution": "scheduled-tick",
+              "rejected": {
+                "invalid": 0,
+                "epoch": 4,
+                "late": 10,
+                "ahead": 0,
+                "duplicate": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "warmOff": {
+      "requestedRangeMs": [
+        629491,
+        644491
+      ],
+      "windowCount": 14,
+      "frames": 431,
+      "seq": [
+        12572,
+        13258
+      ],
+      "lightGateMeanMs": 0.016009280742459397,
+      "cpu": {
+        "mean": 30.123433874709974,
+        "p50": 28.2,
+        "p95": 43.4,
+        "p99": 54.1
+      },
+      "frame": {
+        "mean": 31.6740139211137,
+        "p50": 29.9,
+        "p95": 45.3,
+        "p99": 57.7
+      },
+      "ambient": {
+        "buses": {
+          "min": 0,
+          "max": 0
+        },
+        "cars": {
+          "min": 1,
+          "max": 1
+        },
+        "passengers": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "meshes": {
+        "source": {
+          "min": 3813,
+          "max": 3813
+        },
+        "active": {
+          "min": 982,
+          "max": 982
+        }
+      },
+      "context": {
+        "mode": "multiplayer",
+        "connection": "connected",
+        "position": {
+          "x": -4.829116344451904,
+          "y": 2.6199944019317627,
+          "z": -76.9476318359375
+        },
+        "zone": "b6:0",
+        "speed": 0.000022119805294096295,
+        "vehicle": false,
+        "flashlight": false,
+        "appearance": {
+          "preset": 0,
+          "skin": "#d7a77f",
+          "hair": "#352823",
+          "shirt": "#657b67",
+          "trousers": "#273b40",
+          "glasses": false,
+          "beard": false,
+          "face": 0.45,
+          "badge": ""
+        },
+        "camera": {
+          "x": -4.827765464782715,
+          "y": 4.108945846557617,
+          "z": -79.226806640625,
+          "yaw": 6.282592653589791,
+          "pitch": 0.28,
+          "distance": 8,
+          "fov": 0.85,
+          "firstPerson": false
+        },
+        "rendering": {
+          "mode": "medium",
+          "quality": "medium",
+          "targetFps": 60,
+          "effectiveTargetFps": 59.9,
+          "presentationHz": 59.9,
+          "hardwareScaling": 1,
+          "renderScale": 1,
+          "budgets": {
+            "architectureDetailMetres": 76,
+            "avatarNearMetres": 15,
+            "avatarMediumMetres": 60,
+            "grassRangeMetres": 45,
+            "grassTiles": 24,
+            "grassDensity": 0.65,
+            "b6PropRadiusMetres": 18,
+            "shadowMapSize": 1024,
+            "postProcesses": true
+          },
+          "reason": "manual",
+          "revision": 2,
+          "statistics": {
+            "durationMs": 2000.0999999940395,
+            "samples": 77,
+            "averageFps": 38.5,
+            "medianFrameMs": 25.599999994039536,
+            "p95FrameMs": 29.900000005960464,
+            "p99FrameMs": 33.5,
+            "slowFrameFraction": 1,
+            "averageCpuFrameMs": 24.83766233804938,
+            "averageGpuFrameMs": null
+          }
+        },
+        "viewport": {
+          "width": 1512,
+          "height": 642
+        },
+        "renderResolution": {
+          "width": 1512,
+          "height": 642
+        },
+        "devicePixelRatio": 1,
+        "gpu": {
+          "renderer": "pascal",
+          "vendor": "nvidia",
+          "version": "unknown version",
+          "webglVersion": null,
+          "classification": "unknown",
+          "classificationLabel": "Typ grafiky nelze určit",
+          "requestedPowerPreference": "high-performance",
+          "warnings": [
+            "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+          ],
+          "context": {
+            "requestedAntialias": true,
+            "actualAntialias": null,
+            "defaultFramebuffer": null,
+            "sampleBuffers": null,
+            "samples": null
+          },
+          "backend": "webgpu",
+          "compatibilityMode": true,
+          "gpuTimingScope": "unavailable"
+        },
+        "lightOrdering": {
+          "revisions": 13,
+          "visits": 460987,
+          "sorts": 28886,
+          "skipped": 1071
+        },
+        "renderWork": {
+          "shaderProgramStarts": 415,
+          "shaderPrograms": 415,
+          "shaderIntervalsDropped": 0,
+          "materialEffectEvents": 19242,
+          "materialEffectChanges": 9397,
+          "materialDetailsOmitted": 3336,
+          "renderTargetIntervals": 4735,
+          "renderTargetDetailsOmitted": 0,
+          "shaderCreationMs": 2361.2000000178814,
+          "trackedMaterials": 223
+        },
+        "gpuSampleAgeMs": null,
+        "avatars": 1,
+        "avatarLod": {
+          "near": 1,
+          "medium": 0,
+          "far": 0
+        },
+        "drawCalls": 825,
+        "activeMeshInventory": {
+          "candidates": 2544,
+          "meshes": 982,
+          "potentialSubmeshes": 1282,
+          "frozenWorldMatrices": 137,
+          "regularInstances": 339,
+          "materialClasses": {
+            "PBRMaterial": 743,
+            "StandardMaterial": 231,
+            "MultiMaterial": 3,
+            "ShaderMaterial": 1,
+            "none": 4
+          },
+          "scope": "sampled active-mesh list; potential submeshes are not actual draw calls"
+        },
+        "triangles": 890875,
+        "vegetation": {
+          "treeInstances": 109,
+          "mappedTrees": 47,
+          "inferredTrees": 0,
+          "photoInterpretedTrees": 62,
+          "grassTiles": 7,
+          "grassClumps": 0,
+          "visibleGrassTiles": 0,
+          "visibleGrassClumps": 0,
+          "photographicGrass": {
+            "representation": "photographic-short-lawn",
+            "draws": 0,
+            "triangles": 0,
+            "instances": 0,
+            "submittedLeaves": 0,
+            "activeTiles": 0,
+            "cachedTiles": 7,
+            "textureResolution": 1024,
+            "textureHeight": 512,
+            "triangleLimit": 140000,
+            "drawLimit": 12,
+            "allocatedInstanceBytes": 0,
+            "transitionRoots": 0,
+            "ready": true,
+            "preparing": false,
+            "pendingTiles": 0
+          },
+          "uniqueTreeModels": 109,
+          "treeDetailCounts": [
+            1,
+            16,
+            92
+          ],
+          "loadedTreeMeshes": 279,
+          "bootstrapBytes": 76500488,
+          "activeTreeTriangles": 321591,
+          "pendingTreeLoads": 0
+        },
+        "ambient": {
+          "buses": 0,
+          "passengers": 0,
+          "cars": 1
+        },
+        "weather": {
+          "temperature": 10.8,
+          "wind": 0.9,
+          "windDirection": 45,
+          "rain": 0,
+          "cloud": 0.96,
+          "observedAt": 1792101550000,
+          "fetchedAt": 1792101607591,
+          "source": "Řízené testovací počasí · uložený záznam",
+          "sourceKind": "station",
+          "cloudSource": "Řízený meteorologický model · benchmark",
+          "stale": true,
+          "status": "fallback",
+          "humidity": 87,
+          "fieldSources": {
+            "windGust": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "humidity": {
+              "kind": "station",
+              "source": "Meteostanice Silicon Hill",
+              "observedAt": 1792101550000,
+              "stale": true
+            },
+            "visibility": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "snowfall": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "liquidPrecipitation": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "precipitationType": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            }
+          },
+          "cloudObservedAt": 1792101600000,
+          "cloudStale": true,
+          "cloudWindSource": "Řízené modelové proudění · benchmark",
+          "cloudLayers": {
+            "low": 0,
+            "mid": 0.41,
+            "high": 0.9
+          },
+          "cloudWinds": {
+            "low": {
+              "speed": 3.7,
+              "direction": 308
+            },
+            "mid": {
+              "speed": 22.45,
+              "direction": 6
+            },
+            "high": {
+              "speed": 21.12,
+              "direction": 348
+            }
+          },
+          "windGust": 2.1,
+          "visibility": 24100,
+          "snowfall": 0,
+          "liquidPrecipitation": 0,
+          "precipitationType": "none"
+        },
+        "lightingInstant": 1792231200000,
+        "lightingPreview": true,
+        "uiModal": false,
+        "benchmarkActive": false,
+        "renderErrors": 0,
+        "meshCandidates": {
+          "staticFrustumEnabled": false,
+          "queries": 29203,
+          "rebuilds": 359,
+          "renderEvaluations": 28628,
+          "attestationErrors": 0,
+          "sourceCandidates": 3813,
+          "enabledCandidates": 2544,
+          "outputCandidates": 2544,
+          "staticTests": 0,
+          "staticRejected": 0,
+          "unsafeStatic": 0,
+          "bypassReason": "disabled",
+          "lastRenderSource": 3813,
+          "lastRenderEnabled": 2544,
+          "lastRenderOutput": 2544,
+          "lastRenderTests": 0,
+          "lastRenderRejected": 0,
+          "lastRenderUnsafe": 0,
+          "lastRenderBypassReason": "disabled"
+        },
+        "lightBudgets": {
+          "trackedMaterials": 281,
+          "activeLoaders": 0,
+          "loaderStarts": 23,
+          "loaderReady": 23,
+          "loaderFailures": 0,
+          "enabledLights": 3,
+          "registeredLights": 43,
+          "visits": 69398,
+          "fullSweeps": 267,
+          "deferredPasses": 0,
+          "skippedFrames": 57058,
+          "deferredMaterials": 0,
+          "writes": 4537,
+          "inflationRepairs": 4537,
+          "ownerChanges": 0,
+          "explicitDeclarations": 0,
+          "skippedFrozenVisits": 0,
+          "invalidBudgetVisits": 0,
+          "writeErrors": 0,
+          "unwrappedEntryPoints": 0,
+          "descriptorRestoreFailures": 0,
+          "lastInflatedBudget": 42,
+          "lastRestoredBudget": 4
+        },
+        "assetErrors": 0,
+        "network": {
+          "motionPackets": 12549,
+          "authorityPackets": 11204,
+          "corrections": 17,
+          "resyncs": 4,
+          "lastCorrectionMetres": 0.00006699562072753906,
+          "lastMotionAgeMs": 23.600000023841858,
+          "authorityAgeMs": 23.5,
+          "authorityTick": 38064,
+          "pendingInputs": 10,
+          "visualCorrectionMetres": 0,
+          "timeline": {
+            "inputEpoch": 4,
+            "ack": 9695,
+            "predictedSeq": 9705,
+            "retainedInputs": 10,
+            "rttMs": 52.60000002384186,
+            "rawRttMs": 52.60000002384186,
+            "rttMeasuredAtMs": 629864.8000000119,
+            "supportedRttMeasuredAtMs": 629864.8000000119,
+            "pendingRttMs": null,
+            "pendingRttMeasuredAtMs": null,
+            "pendingRttExpiresAtMs": null,
+            "leadTicks": 7,
+            "clockSeqAtAnchor": 9698.234000000351,
+            "clockAnchorAtMs": 629946.8000000119,
+            "deliveryBudgetExceeded": false,
+            "clockCalibrated": true
+          },
+          "transport": {
+            "sender": {
+              "queued": 0,
+              "inFlight": 10,
+              "maxQueued": 8,
+              "oldestQueuedAgeMs": null,
+              "oldestUnackedAgeMs": 157.7000000178814,
+              "lastSendAgeMs": 22.80000001192093,
+              "lastTimerAgeMs": 51.70000001788139,
+              "lastFrameAgeMs": 22.80000001192093,
+              "lastTimerIntervalMs": 25.900000005960464,
+              "maxTimerIntervalMs": 2585.4000000059605,
+              "lastSentSeq": 9705,
+              "lastAck": 9695,
+              "produced": 33798,
+              "sentInputs": 33798,
+              "sentPackets": 12695,
+              "resets": 19,
+              "discardedInputs": 0,
+              "expiredQueuedInputs": 0,
+              "overflows": 0,
+              "sendErrors": 0
+            },
+            "probe": {
+              "pendingMs": null,
+              "predictionRoundTripMs": 52.60000002384186,
+              "rawRoundTripMs": 52.60000002384186,
+              "measuredAt": 629864.8000000119,
+              "retainedLongTasks": 1,
+              "timeouts": 0,
+              "contaminatedSamples": 0,
+              "acceptedSamples": 293
+            },
+            "authorities": {
+              "received": 12569,
+              "superseded": 1365,
+              "barriers": 4,
+              "ordinaryApplied": 11200,
+              "rejected": 0
+            }
+          },
+          "server": {
+            "clock": {
+              "elapsedMs": 21.94840000011027,
+              "cpuMs": 0.34399999992456287,
+              "steps": 2,
+              "droppedMs": 0,
+              "accumulatorMs": 2.1149000000632094,
+              "callbacks": 27241,
+              "elapsedMeanMs": 23.288503171689733,
+              "cpuMeanMs": 0.39033610366712707,
+              "elapsedMaxMs": 44.366799999999785,
+              "cpuMaxMs": 7.1500999999998385,
+              "droppedTotalMs": 0
+            },
+            "queue": {
+              "inputEpoch": 4,
+              "inputTickBase": 28369,
+              "tick": 38064,
+              "ack": 9695,
+              "receivedSeq": 9700,
+              "depth": 5,
+              "maxDepth": 10,
+              "accepted": 33779,
+              "consumed": 33774,
+              "idleTicks": 3919,
+              "idleTicksSinceInput": 0,
+              "lastAppliedTick": 38064,
+              "modeMismatchTicks": 0,
+              "resets": 3,
+              "discarded": 0,
+              "lastInputAgeMs": 0.4636000000173226,
+              "oldestQueuedAgeMs": 52.8705000000773,
+              "resolution": "scheduled-tick",
+              "rejected": {
+                "invalid": 0,
+                "epoch": 4,
+                "late": 10,
+                "ahead": 0,
+                "duplicate": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "warmOn": {
+      "requestedRangeMs": [
+        647491,
+        657491
+      ],
+      "windowCount": 9,
+      "frames": 282,
+      "seq": [
+        13532,
+        14042
+      ],
+      "lightGateMeanMs": 0.022340425531914895,
+      "cpu": {
+        "mean": 29.990780141843985,
+        "p50": 29.2,
+        "p95": 38.9,
+        "p99": 43.5
+      },
+      "frame": {
+        "mean": 31.36773049645387,
+        "p50": 30.6,
+        "p95": 39.8,
+        "p99": 46.1
+      },
+      "ambient": {
+        "buses": {
+          "min": 0,
+          "max": 0
+        },
+        "cars": {
+          "min": 0,
+          "max": 1
+        },
+        "passengers": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "meshes": {
+        "source": {
+          "min": 3782,
+          "max": 3813
+        },
+        "active": {
+          "min": 984,
+          "max": 984
+        }
+      },
+      "context": {
+        "mode": "multiplayer",
+        "connection": "connected",
+        "position": {
+          "x": -4.829116344451904,
+          "y": 2.6200942993164062,
+          "z": -76.9476318359375
+        },
+        "zone": "b6:0",
+        "speed": 0.0000036288832077170467,
+        "vehicle": false,
+        "flashlight": true,
+        "appearance": {
+          "preset": 0,
+          "skin": "#d7a77f",
+          "hair": "#352823",
+          "shirt": "#657b67",
+          "trousers": "#273b40",
+          "glasses": false,
+          "beard": false,
+          "face": 0.45,
+          "badge": ""
+        },
+        "camera": {
+          "x": -4.827765464782715,
+          "y": 4.10899543762207,
+          "z": -79.22694396972656,
+          "yaw": 6.282592653589791,
+          "pitch": 0.28,
+          "distance": 8,
+          "fov": 0.85,
+          "firstPerson": false
+        },
+        "rendering": {
+          "mode": "medium",
+          "quality": "medium",
+          "targetFps": 60,
+          "effectiveTargetFps": 59.9,
+          "presentationHz": 59.9,
+          "hardwareScaling": 1,
+          "renderScale": 1,
+          "budgets": {
+            "architectureDetailMetres": 76,
+            "avatarNearMetres": 15,
+            "avatarMediumMetres": 60,
+            "grassRangeMetres": 45,
+            "grassTiles": 24,
+            "grassDensity": 0.65,
+            "b6PropRadiusMetres": 18,
+            "shadowMapSize": 1024,
+            "postProcesses": true
+          },
+          "reason": "manual",
+          "revision": 2,
+          "statistics": {
+            "durationMs": 2029.300000011921,
+            "samples": 60,
+            "averageFps": 29.56684571016978,
+            "medianFrameMs": 31.099999994039536,
+            "p95FrameMs": 44,
+            "p99FrameMs": 164.09999999403954,
+            "slowFrameFraction": 1,
+            "averageCpuFrameMs": 32.26666666915019,
+            "averageGpuFrameMs": null
+          }
+        },
+        "viewport": {
+          "width": 1512,
+          "height": 642
+        },
+        "renderResolution": {
+          "width": 1512,
+          "height": 642
+        },
+        "devicePixelRatio": 1,
+        "gpu": {
+          "renderer": "pascal",
+          "vendor": "nvidia",
+          "version": "unknown version",
+          "webglVersion": null,
+          "classification": "unknown",
+          "classificationLabel": "Typ grafiky nelze určit",
+          "requestedPowerPreference": "high-performance",
+          "warnings": [
+            "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+          ],
+          "context": {
+            "requestedAntialias": true,
+            "actualAntialias": null,
+            "defaultFramebuffer": null,
+            "sampleBuffers": null,
+            "samples": null
+          },
+          "backend": "webgpu",
+          "compatibilityMode": true,
+          "gpuTimingScope": "unavailable"
+        },
+        "lightOrdering": {
+          "revisions": 14,
+          "visits": 464800,
+          "sorts": 31361,
+          "skipped": 1079
+        },
+        "renderWork": {
+          "shaderProgramStarts": 415,
+          "shaderPrograms": 415,
+          "shaderIntervalsDropped": 0,
+          "materialEffectEvents": 20037,
+          "materialEffectChanges": 10188,
+          "materialDetailsOmitted": 4107,
+          "renderTargetIntervals": 4799,
+          "renderTargetDetailsOmitted": 0,
+          "shaderCreationMs": 2361.2000000178814,
+          "trackedMaterials": 223
+        },
+        "gpuSampleAgeMs": null,
+        "avatars": 1,
+        "avatarLod": {
+          "near": 1,
+          "medium": 0,
+          "far": 0
+        },
+        "drawCalls": 906,
+        "activeMeshInventory": {
+          "candidates": 2546,
+          "meshes": 984,
+          "potentialSubmeshes": 1284,
+          "frozenWorldMatrices": 137,
+          "regularInstances": 339,
+          "materialClasses": {
+            "PBRMaterial": 743,
+            "StandardMaterial": 233,
+            "MultiMaterial": 3,
+            "ShaderMaterial": 1,
+            "none": 4
+          },
+          "scope": "sampled active-mesh list; potential submeshes are not actual draw calls"
+        },
+        "triangles": 1104153,
+        "vegetation": {
+          "treeInstances": 109,
+          "mappedTrees": 47,
+          "inferredTrees": 0,
+          "photoInterpretedTrees": 62,
+          "grassTiles": 7,
+          "grassClumps": 0,
+          "visibleGrassTiles": 0,
+          "visibleGrassClumps": 0,
+          "photographicGrass": {
+            "representation": "photographic-short-lawn",
+            "draws": 0,
+            "triangles": 0,
+            "instances": 0,
+            "submittedLeaves": 0,
+            "activeTiles": 0,
+            "cachedTiles": 7,
+            "textureResolution": 1024,
+            "textureHeight": 512,
+            "triangleLimit": 140000,
+            "drawLimit": 12,
+            "allocatedInstanceBytes": 0,
+            "transitionRoots": 0,
+            "ready": true,
+            "preparing": false,
+            "pendingTiles": 0
+          },
+          "uniqueTreeModels": 109,
+          "treeDetailCounts": [
+            1,
+            16,
+            92
+          ],
+          "loadedTreeMeshes": 279,
+          "bootstrapBytes": 76500488,
+          "activeTreeTriangles": 321591,
+          "pendingTreeLoads": 0
+        },
+        "ambient": {
+          "buses": 0,
+          "passengers": 0,
+          "cars": 1
+        },
+        "weather": {
+          "temperature": 10.8,
+          "wind": 0.9,
+          "windDirection": 45,
+          "rain": 0,
+          "cloud": 0.96,
+          "observedAt": 1792101550000,
+          "fetchedAt": 1792101607591,
+          "source": "Řízené testovací počasí · uložený záznam",
+          "sourceKind": "station",
+          "cloudSource": "Řízený meteorologický model · benchmark",
+          "stale": true,
+          "status": "fallback",
+          "humidity": 87,
+          "fieldSources": {
+            "windGust": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "humidity": {
+              "kind": "station",
+              "source": "Meteostanice Silicon Hill",
+              "observedAt": 1792101550000,
+              "stale": true
+            },
+            "visibility": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "snowfall": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "liquidPrecipitation": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            },
+            "precipitationType": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792101600000,
+              "stale": true
+            }
+          },
+          "cloudObservedAt": 1792101600000,
+          "cloudStale": true,
+          "cloudWindSource": "Řízené modelové proudění · benchmark",
+          "cloudLayers": {
+            "low": 0,
+            "mid": 0.41,
+            "high": 0.9
+          },
+          "cloudWinds": {
+            "low": {
+              "speed": 3.7,
+              "direction": 308
+            },
+            "mid": {
+              "speed": 22.45,
+              "direction": 6
+            },
+            "high": {
+              "speed": 21.12,
+              "direction": 348
+            }
+          },
+          "windGust": 2.1,
+          "visibility": 24100,
+          "snowfall": 0,
+          "liquidPrecipitation": 0,
+          "precipitationType": "none"
+        },
+        "lightingInstant": 1792231200000,
+        "lightingPreview": true,
+        "uiModal": false,
+        "benchmarkActive": false,
+        "renderErrors": 0,
+        "meshCandidates": {
+          "staticFrustumEnabled": false,
+          "queries": 29785,
+          "rebuilds": 360,
+          "renderEvaluations": 29190,
+          "attestationErrors": 0,
+          "sourceCandidates": 3813,
+          "enabledCandidates": 2546,
+          "outputCandidates": 2546,
+          "staticTests": 0,
+          "staticRejected": 0,
+          "unsafeStatic": 0,
+          "bypassReason": "disabled",
+          "lastRenderSource": 3813,
+          "lastRenderEnabled": 2546,
+          "lastRenderOutput": 2546,
+          "lastRenderTests": 0,
+          "lastRenderRejected": 0,
+          "lastRenderUnsafe": 0,
+          "lastRenderBypassReason": "disabled"
+        },
+        "lightBudgets": {
+          "trackedMaterials": 281,
+          "activeLoaders": 0,
+          "loaderStarts": 23,
+          "loaderReady": 23,
+          "loaderFailures": 0,
+          "enabledLights": 4,
+          "registeredLights": 43,
+          "visits": 69679,
+          "fullSweeps": 268,
+          "deferredPasses": 0,
+          "skippedFrames": 58181,
+          "deferredMaterials": 0,
+          "writes": 4537,
+          "inflationRepairs": 4537,
+          "ownerChanges": 0,
+          "explicitDeclarations": 0,
+          "skippedFrozenVisits": 0,
+          "invalidBudgetVisits": 0,
+          "writeErrors": 0,
+          "unwrappedEntryPoints": 0,
+          "descriptorRestoreFailures": 0,
+          "lastInflatedBudget": 42,
+          "lastRestoredBudget": 4
+        },
+        "assetErrors": 0,
+        "network": {
+          "motionPackets": 12904,
+          "authorityPackets": 11549,
+          "corrections": 19,
+          "resyncs": 5,
+          "lastCorrectionMetres": 0.0000040531158447265625,
+          "lastMotionAgeMs": 28.099999994039536,
+          "authorityAgeMs": 28,
+          "authorityTick": 39129,
+          "pendingInputs": 8,
+          "visualCorrectionMetres": 2.0459501945588922e-21,
+          "timeline": {
+            "inputEpoch": 5,
+            "ack": 119,
+            "predictedSeq": 127,
+            "retainedInputs": 8,
+            "rttMs": 80.5,
+            "rawRttMs": 80.5,
+            "rttMeasuredAtMs": 645916.5,
+            "supportedRttMeasuredAtMs": 645916.5,
+            "pendingRttMs": null,
+            "pendingRttMeasuredAtMs": null,
+            "pendingRttExpiresAtMs": null,
+            "leadTicks": 8,
+            "clockSeqAtAnchor": 119.65800000071525,
+            "clockAnchorAtMs": 647684.5,
+            "deliveryBudgetExceeded": false,
+            "clockCalibrated": true
+          },
+          "transport": {
+            "sender": {
+              "queued": 2,
+              "inFlight": 6,
+              "maxQueued": 8,
+              "oldestQueuedAgeMs": 27.400000005960464,
+              "oldestUnackedAgeMs": 146,
+              "lastSendAgeMs": 27.80000001192093,
+              "lastTimerAgeMs": 27.80000001192093,
+              "lastFrameAgeMs": 27.30000001192093,
+              "lastTimerIntervalMs": 37.29999998211861,
+              "maxTimerIntervalMs": 2585.4000000059605,
+              "lastSentSeq": 125,
+              "lastAck": 119,
+              "produced": 34862,
+              "sentInputs": 34860,
+              "sentPackets": 13041,
+              "resets": 21,
+              "discardedInputs": 0,
+              "expiredQueuedInputs": 0,
+              "overflows": 0,
+              "sendErrors": 0
+            },
+            "probe": {
+              "pendingMs": null,
+              "predictionRoundTripMs": 80.5,
+              "rawRoundTripMs": 80.5,
+              "measuredAt": 645916.5,
+              "retainedLongTasks": 6,
+              "timeouts": 0,
+              "contaminatedSamples": 0,
+              "acceptedSamples": 301
+            },
+            "authorities": {
+              "received": 12925,
+              "superseded": 1376,
+              "barriers": 5,
+              "ordinaryApplied": 11544,
+              "rejected": 0
+            }
+          },
+          "server": {
+            "clock": {
+              "elapsedMs": 15.515099999960512,
+              "cpuMs": 0.32579999999143183,
+              "steps": 1,
+              "droppedMs": 0,
+              "accumulatorMs": 0.3162000000204723,
+              "callbacks": 28008,
+              "elapsedMeanMs": 23.284430027135105,
+              "cpuMeanMs": 0.39060638389017244,
+              "elapsedMaxMs": 44.366799999999785,
+              "cpuMaxMs": 7.1500999999998385,
+              "droppedTotalMs": 0
+            },
+            "queue": {
+              "inputEpoch": 5,
+              "inputTickBase": 39010,
+              "tick": 39129,
+              "ack": 119,
+              "receivedSeq": 120,
+              "depth": 1,
+              "maxDepth": 10,
+              "accepted": 34833,
+              "consumed": 34828,
+              "idleTicks": 3930,
+              "idleTicksSinceInput": 0,
+              "lastAppliedTick": 39129,
+              "modeMismatchTicks": 0,
+              "resets": 4,
+              "discarded": 4,
+              "lastInputAgeMs": 48.77989999996498,
+              "oldestQueuedAgeMs": 48.77989999996498,
+              "resolution": "scheduled-tick",
+              "rejected": {
+                "invalid": 0,
+                "epoch": 9,
+                "late": 13,
+                "ahead": 0,
+                "duplicate": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "dispose": [
+    {
+      "seq": 15158,
+      "atMs": 673795.4,
+      "kind": "game-dispose",
+      "data": {
+        "renderErrors": 0,
+        "assetErrors": 0
+      }
+    }
+  ],
+  "faults": [],
+  "scope": "One exploratory near-matched pair, not statistically accepted A/B. Quantiles use individual recorded frame/CPU samples, nearest rank; light gate is weighted total/count and is nested in render CPU."
+}

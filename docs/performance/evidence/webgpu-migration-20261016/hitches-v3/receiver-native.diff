@@ -1,0 +1,1028 @@
+diff --git a/client/game.ts b/client/game.ts
+index 6139b8f..b7dfd2a 100644
+--- a/client/game.ts
++++ b/client/game.ts
+@@ -839,8 +839,7 @@ export class Game {
+     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
+     const preloadRender = () => {
+       if (!this.disposed) {
+-        this.gltfLightBudget.prepareFrame();
+-        this.stableLights.update();
++        this.prepareSceneLightState();
+         this.scene.render();
+       }
+     };
+@@ -2314,6 +2313,13 @@ export class Game {
+     }
+     return lighting;
+   }
++  private prepareSceneLightState() {
++    this.gltfLightBudget.prepareFrame();
++    const changedReceivers = this.flashlight?.beam.prepareReceivers();
++    if (changedReceivers?.length)
++      this.stableLights.markMeshesDirty(changedReceivers);
++    this.stableLights.update();
++  }
+   private prepareLighting(render: () => void) {
+     const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
+     // The same controller/materials survive into gameplay; no proxy shaders.
+@@ -2689,8 +2695,7 @@ export class Game {
+     const environmentEnded = performance.now();
+     this.benchmark?.profile.beginFrame();
+     // All beam, street, interior and celestial shadow states are final here.
+-    this.gltfLightBudget.prepareFrame();
+-    this.stableLights.update();
++    this.prepareSceneLightState();
+     this.scene.render();
+     const engineWork = this.benchmark?.profile.endFrame();
+     const renderEnded = performance.now();
+diff --git a/client/light-receivers.ts b/client/light-receivers.ts
+new file mode 100644
+index 0000000..745379c
+--- /dev/null
++++ b/client/light-receivers.ts
+@@ -0,0 +1,166 @@
++import { SpotLight } from "@babylonjs/core/Lights/spotLight";
++import { Light } from "@babylonjs/core/Lights/light";
++import { Mesh } from "@babylonjs/core/Meshes/mesh";
++import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
++import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
++import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
++import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
++import { GetSupportedSimultaneousLights } from "@babylonjs/core/Materials/materialHelper.functions";
++import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
++import type { Material } from "@babylonjs/core/Materials/material";
++import type { Observer } from "@babylonjs/core/Misc/observable";
++import type { Node } from "@babylonjs/core/node";
++import { CampusSurfaceArtPlugin } from "./cinematic-art";
++
++const RANGE_MARGIN_METRES = 0.05;
++type LitMaterial = StandardMaterial | PBRMaterial;
++
++/** These pinned built-in plugins, and our fragment-only surface art, do not
++ * move geometry or replace the stock per-light contribution calculation. */
++function knownMaterial(material: Material | null): material is LitMaterial {
++  if (!material || material.isFrozen ||
++      (material.constructor !== StandardMaterial && material.constructor !== PBRMaterial)) return false;
++  // Pinned declarations say this hook is required, while stock runtime has
++  // undefined. Do not let that declaration narrow the normal material to never.
++  const resolver: unknown = (material as { customShaderNameResolve?: unknown }).customShaderNameResolve;
++  if (resolver != null) return false;
++  const lit = material as LitMaterial;
++  if (lit.disableLighting || (lit instanceof PBRMaterial && lit.debugMode !== 0)) return false;
++  for (const plugin of lit.pluginManager?._plugins ?? []) {
++    if (plugin === lit.detailMap || ("decalMap" in lit && plugin === lit.decalMap) ||
++        plugin.constructor === CampusSurfaceArtPlugin) continue;
++    if (lit instanceof PBRMaterial && (plugin === lit.clearCoat || plugin === lit.iridescence ||
++        plugin === lit.anisotropy || plugin === lit.brdf || plugin === lit.sheen || plugin === lit.subSurface)) continue;
++    return false;
++  }
++  return true;
++}
++
++/** Local player-only light. The inherited SpotLight class name, light type,
++ * shader, masks and caller-owned inclusion/exclusion arrays are unchanged.
++ * Scene serialization/cloning does not carry this runtime-only policy. */
++export class TorchReceiverLight extends SpotLight {
++  // Light's super constructor may call canAffectMesh before field initialization.
++  private rangeExcluded = new Set<AbstractMesh>();
++  private pendingChanges = new Set<AbstractMesh>();
++  private changedBuffer: AbstractMesh[] = [];
++  private animatedTargets = new Set<unknown>();
++  private receiversDisposed = false;
++  private readonly removedObserver: Observer<AbstractMesh>;
++
++  constructor(...args: ConstructorParameters<typeof SpotLight>) {
++    super(...args);
++    this.removedObserver = this.getScene().onMeshRemovedObservable.add((mesh) => {
++      // A mesh can be detached without disposal and later reattached elsewhere.
++      if (this.rangeExcluded.delete(mesh) && !mesh.isDisposed() && !this.receiversDisposed)
++        mesh._resyncLightSource(this);
++      this.pendingChanges.delete(mesh);
++      const index = this.changedBuffer.indexOf(mesh);
++      if (index >= 0) this.changedBuffer.splice(index, 1);
++    });
++  }
++
++  override canAffectMesh(mesh: AbstractMesh): boolean {
++    return super.canAffectMesh(mesh) && !this.rangeExcluded?.has(mesh);
++  }
++
++  /** Refresh synchronously before ON and again after all pose/light/cap changes,
++   * before the caller canonicalizes light slots and renders. No stale interval. */
++  refreshReceivers(): void {
++    if (this.receiversDisposed) return;
++    const scene = this.getScene();
++    this.animatedTargets.clear();
++    try {
++      for (const animation of scene.animatables) {
++        this.animatedTargets.add(animation.target);
++        for (const runtime of animation.getAnimations()) {
++          const target: unknown = runtime.target;
++          if (Array.isArray(target)) for (const item of target) this.animatedTargets.add(item);
++          else this.animatedTargets.add(target);
++        }
++      }
++      const supported = !scene.isDisposed && scene.lightsEnabled && this.parent === null &&
++        this.falloffType === Light.FALLOFF_STANDARD && this.range === 24 &&
++        this.lightmapMode === Light.LIGHTMAP_DEFAULT &&
++        this.metadata?.localFlashlight === true && !this.projectionTexture && !this.iesProfileTexture &&
++        this.canAffectMesh === TorchReceiverLight.prototype.canAffectMesh &&
++        Number.isFinite(this.position.x) && Number.isFinite(this.position.y) && Number.isFinite(this.position.z);
++      for (const mesh of scene.meshes) {
++        const excluded = supported && this.canExclude(mesh);
++        if (excluded === this.rangeExcluded.has(mesh)) continue;
++        if (excluded) this.rangeExcluded.add(mesh);
++        else this.rangeExcluded.delete(mesh);
++        // Pinned resync is a no-op if membership has not changed; it dirties only
++        // this mesh when it actually adds/removes the one local torch.
++        mesh._resyncLightSource(this);
++        this.pendingChanges.add(mesh);
++      }
++    } finally {
++      // Targets are needed only during this pass. In particular, an OFF period
++      // must not retain disposed rigs through a previous animation snapshot.
++      this.animatedTargets.clear();
++    }
++  }
++
++  private canExclude(mesh: AbstractMesh): boolean {
++    if (!(mesh instanceof Mesh) || mesh.getClassName() !== "Mesh" || mesh.isDisposed() ||
++        mesh.isAnInstance || mesh.hasInstances || mesh.hasThinInstances || mesh.skeleton ||
++        mesh.morphTargetManager || mesh.bakedVertexAnimationManager || mesh.infiniteDistance ||
++        mesh.billboardMode !== 0 || mesh.doNotSyncBoundingInfo || mesh.metadata?.windDeformed ||
++        !(mesh.metadata?.artStatic === true || mesh.metadata?.sourcePack === "architecture-reality") ||
++        !super.canAffectMesh(mesh) || !knownMaterial(mesh.material)) return false;
++    const positions = mesh.getVertexBuffer(VertexBuffer.PositionKind);
++    if (!positions || positions.isUpdatable()) return false;
++    // Scene animation runs inside render(), after the owner's final gate.
++    // A tagged mesh or ancestor with animation therefore is not a static proof.
++    for (let node: Node | null = mesh; node; node = node.parent) {
++      if (node.animations.length || this.animatedTargets.has(node)) return false;
++      if (node instanceof TransformNode && (this.animatedTargets.has(node.position) ||
++          this.animatedTargets.has(node.rotation) || this.animatedTargets.has(node.rotationQuaternion) ||
++          this.animatedTargets.has(node.scaling))) return false;
++    }
++    const cap = mesh.material.maxSimultaneousLights;
++    const supported = GetSupportedSimultaneousLights(this.getScene(), cap);
++    if (!Number.isSafeInteger(cap) || cap < 1 || !Number.isSafeInteger(supported) || supported < 1) return false;
++    // Count the unfiltered counterfactual list, including this torch even if
++    // it is currently OFF or already excluded by us. Never promote a light
++    // which the original material/device cap would have dropped.
++    let count = 1;
++    for (const light of mesh.lightSources) if (light !== this) count++;
++    if (count > supported) return false;
++    mesh.computeWorldMatrix(!mesh.isSynchronized());
++    const bounds = mesh.getBoundingInfo();
++    if (bounds.isLocked) return false;
++    const min = bounds.boundingBox.minimumWorld, max = bounds.boundingBox.maximumWorld;
++    if (!Number.isFinite(min.x) || !Number.isFinite(min.y) || !Number.isFinite(min.z) ||
++        !Number.isFinite(max.x) || !Number.isFinite(max.y) || !Number.isFinite(max.z) ||
++        min.x > max.x || min.y > max.y || min.z > max.z) return false;
++    const x = Math.max(min.x - this.position.x, 0, this.position.x - max.x);
++    const y = Math.max(min.y - this.position.y, 0, this.position.y - max.y);
++    const z = Math.max(min.z - this.position.z, 0, this.position.z - max.z);
++    const distanceSquared = x * x + y * y + z * z;
++    const reach = this.range + RANGE_MARGIN_METRES;
++    return Number.isFinite(distanceSquared) && distanceSquared > reach * reach;
++  }
++
++  /** Reused output, valid until the next call. Consume synchronously; internal
++   * pre-ON refreshes accumulate here instead of losing changes before sorting. */
++  takeChangedReceivers(): readonly AbstractMesh[] {
++    this.changedBuffer.length = 0;
++    for (const mesh of this.pendingChanges) this.changedBuffer.push(mesh);
++    this.pendingChanges.clear();
++    return this.changedBuffer;
++  }
++
++  override dispose(): void {
++    if (this.receiversDisposed) return;
++    this.receiversDisposed = true;
++    this.getScene().onMeshRemovedObservable.remove(this.removedObserver);
++    this.rangeExcluded.clear();
++    this.animatedTargets.clear();
++    this.pendingChanges.clear();
++    this.changedBuffer.length = 0;
++    // Light.dispose removes this light from every mesh; no temporary readmission.
++    super.dispose();
++  }
++}
+diff --git a/client/stable-light-state.ts b/client/stable-light-state.ts
+index b8d4a3c..dda1f00 100644
+--- a/client/stable-light-state.ts
++++ b/client/stable-light-state.ts
+@@ -86,6 +86,18 @@ export class StableLightState {
+     });
+   }
+ 
++  /** Queue membership changes that do not change a light's shader signature.
++   * Consume before update/render; the existing Set deduplicates receivers. */
++  markMeshesDirty(meshes: Iterable<AbstractMesh>): void {
++    if (this.disposed || this.scene.isDisposed) return;
++    for (const mesh of meshes) {
++      // An iterable may release its owner while advancing to the next item.
++      if (this.disposed || this.scene.isDisposed) return;
++      if (!mesh.isDisposed() && mesh.getScene() === this.scene)
++        this.pendingMeshes.add(mesh);
++    }
++  }
++
+   private signature(light: Light) {
+     const type = light.getTypeID();
+     if (
+diff --git a/client/vehicle-lighting.ts b/client/vehicle-lighting.ts
+index 753cbbc..c3d4998 100644
+--- a/client/vehicle-lighting.ts
++++ b/client/vehicle-lighting.ts
+@@ -13,10 +13,12 @@ import type { Scene } from "@babylonjs/core/scene";
+ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+ import manifest from "../shared/data/assets/vehicles-manifest.json";
+ import { installStaticSubmeshShadowCull } from "./static-submesh-shadows";
++import { TorchReceiverLight } from "./light-receivers";
+ 
+ type BeamQuality = "low" | "medium" | "high";
+ const shadowMapSize = (quality: BeamQuality) =>
+   quality === "high" ? 512 : quality === "medium" ? 256 : 128;
++const noReceiverChanges: readonly AbstractMesh[] = [];
+ 
+ /** Bounded spotlight and shared shadow lifecycle for the car or local torch.
+  * These artistic units are not measured photometry. Only one is used by the
+@@ -44,7 +46,8 @@ export class VehicleLighting {
+       this.origin.addInPlace(Vector3.FromArray(point));
+     this.origin.scaleInPlace(1 / manifest.lights.frontCentres.length);
+     this.origin.z += 0.025;
+-    this.light = new SpotLight(
++    const BeamLight = kind === "player" ? TorchReceiverLight : SpotLight;
++    this.light = new BeamLight(
+       kind === "vehicle"
+         ? "shared car · simulated low beam"
+         : "local player · flashlight",
+@@ -104,6 +107,15 @@ export class VehicleLighting {
+     }
+     this.updateBeam(1, enabled, quality);
+   }
++  /** Call after final light budget changes and before stable slot ordering.
++   * The returned buffer is reused; the caller consumes it synchronously. */
++  prepareReceivers(): readonly AbstractMesh[] {
++    if (this.disposed || !(this.light instanceof TorchReceiverLight)) return noReceiverChanges;
++    // OFF lights cannot belong to a material or render a shadow pass. Their
++    // next activation refreshes before enable, avoiding a steady OFF scan.
++    if (this.light.isEnabled(false)) this.light.refreshReceivers();
++    return this.light.takeChangedReceivers();
++  }
+   private updateBeam(night: number, driving: boolean, quality: string) {
+     if (this.disposed) return;
+     const strength = Number.isFinite(night)
+@@ -112,6 +124,10 @@ export class VehicleLighting {
+     const resolvedQuality: BeamQuality =
+       quality === "high" ? "high" : quality === "medium" ? "medium" : "low";
+     const active = driving && strength > 0.1;
++    // Resolve range exclusions before setEnabled's global membership resync.
++    // Keep the changed receivers pending until the owner's final prepare call.
++    if (active && !this.light.isEnabled(false) && this.light instanceof TorchReceiverLight)
++      this.light.refreshReceivers();
+     if (this.light.isEnabled(false) !== active) this.light.setEnabled(active);
+     this.light.intensity = active ? strength * 1.6 : 0;
+     if (!active) {
+diff --git a/tests/flashlight.test.ts b/tests/flashlight.test.ts
+index 471659b..1f0dd4f 100644
+--- a/tests/flashlight.test.ts
++++ b/tests/flashlight.test.ts
+@@ -70,6 +70,39 @@ function fk(node: TransformNode, input: Vector3, normal = false) {
+   return normal ? result.normalize() : result;
+ }
+ 
++test("final receiver gate follows first/third-person torch pose without changing shadows or OFF membership", (t) => {
++  const { scene, rig, camera, torch } = fixture(t);
++  const near = MeshBuilder.CreateBox("static at original pose", { size: 1 }, scene);
++  const far = MeshBuilder.CreateBox("static at next camera pose", { size: 1 }, scene);
++  for (const mesh of [near, far]) {
++    mesh.material = new StandardMaterial(mesh.name, scene);
++    mesh.metadata = { artStatic: true, depthCaster: "opaque" };
++  }
++  near.position.set(0, 1, 8); far.position.set(100, 1, 8);
++  torch.update(rig, camera, true, false, "low");
++  torch.beam.prepareReceivers();
++  assert.ok(near.lightSources.includes(torch.beam.light));
++  assert.ok(!far.lightSources.includes(torch.beam.light));
++  const shadow = torch.beam.light.getShadowGenerator();
++  camera.position.set(100, 1, -4);
++  camera.setTarget(new Vector3(100, 1, 8));
++  torch.update(rig, camera, true, true, "low");
++  const changed = torch.beam.prepareReceivers();
++  assert.ok(changed.includes(near) && changed.includes(far));
++  assert.ok(!near.lightSources.includes(torch.beam.light));
++  assert.ok(far.lightSources.includes(torch.beam.light));
++  assert.ok(torch.beam.light.getShadowGenerator() === shadow);
++  assert.equal(torch.beam.light.intensity, 1.6);
++  torch.update(rig, camera, false, true, "low");
++  torch.beam.prepareReceivers();
++  assert.ok(!near.lightSources.includes(torch.beam.light) && !far.lightSources.includes(torch.beam.light));
++  rig.root.position.x = 100;
++  torch.update(rig, camera, true, false, "low");
++  torch.beam.prepareReceivers();
++  assert.ok(far.lightSources.includes(torch.beam.light));
++  assert.ok(!near.lightSources.includes(torch.beam.light));
++});
++
+ test("third-person torch follows actual right-hand FK for six builds, all headings and parent transforms", (t) => {
+   const { scene, pool, camera, torch } = fixture(t);
+   // Babylon 9.30 standard spot falloff is pow(cos(angle), exponent) up to
+diff --git a/tests/game-diagnostics.test.ts b/tests/game-diagnostics.test.ts
+index bc57df8..d22b851 100644
+--- a/tests/game-diagnostics.test.ts
++++ b/tests/game-diagnostics.test.ts
+@@ -48,6 +48,7 @@ const members = declaration.members.filter(
+     node.name &&
+     [
+       "frame",
++      "prepareSceneLightState",
+       "updateWorldPresentation",
+       "updateRenderEnvironment",
+       "environmentProfileMetadata",
+diff --git a/tests/game-light-lifecycle.test.ts b/tests/game-light-lifecycle.test.ts
+index 49b18f2..03ce3ae 100644
+--- a/tests/game-light-lifecycle.test.ts
++++ b/tests/game-light-lifecycle.test.ts
+@@ -9,6 +9,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+ import { PointLight } from "@babylonjs/core/Lights/pointLight";
++import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+ import {
+   StandardMaterial,
+   StandardMaterialDefines,
+@@ -75,8 +76,14 @@ function fixture(t: import("node:test").TestContext) {
+     scene: Scene;
+     stableLights: StableLightState;
+     gltfLightBudget: GltfLightBudget;
++    prepareSceneLightState(): void;
++    flashlight?: { beam: { prepareReceivers(): readonly AbstractMesh[] } };
+     disposed: boolean;
+   };
++  game.prepareSceneLightState = compile(
++    (member("prepareSceneLightState") as ts.MethodDeclaration).body!.statements
++      .map((statement) => statement.getText(source)).join("\n"),
++  );
+   t.after(() => {
+     game.stableLights?.dispose();
+     game.gltfLightBudget?.dispose();
+@@ -156,15 +163,18 @@ test("both production render callsites canonicalize actual light slots before dr
+   for (const call of calls) {
+     const statement = call.parent;
+     assert.ok(ts.isExpressionStatement(statement));
+-    assert.ok(ts.isBlock(statement.parent));
+-    const siblings = [...statement.parent.statements];
+-    const before = siblings[siblings.indexOf(statement) - 1];
+-    const budget = siblings[siblings.indexOf(statement) - 2];
+-    assert.equal(before?.getText(source), "this.stableLights.update();");
+-    assert.equal(
+-      budget?.getText(source),
+-      "this.gltfLightBudget.prepareFrame();",
+-    );
++    // The combined scene wraps draw in diagnostic try/finally. Locate the
++    // actual shared gate in the enclosing method rather than copying a second
++    // controller sequence or requiring both statements in the same block.
++    let owner: ts.Node = call;
++    while (!ts.isMethodDeclaration(owner)) owner = owner.parent;
++    const before = findNodes(
++      owner,
++      (node): node is ts.CallExpression =>
++        ts.isCallExpression(node) && node.end < call.pos &&
++        node.expression.getText(source) === "this.prepareSceneLightState",
++    ).at(-1);
++    assert.ok(before, "every production draw must follow the shared light gate");
+     // Toggle the first canonical light off/on: Babylon appends it to the end.
+     const first = mesh.lightSources[0];
+     first.setEnabled(false);
+@@ -184,7 +194,7 @@ test("both production render callsites canonicalize actual light slots before dr
+       );
+     };
+     compile(
+-      `${budget.getText(source)}\n${before.getText(source)}\n${statement.getText(source)}`,
++      `${before.getText(source)};\n${statement.getText(source)}`,
+     ).call(game);
+     assert.equal(draws, 1);
+   }
+@@ -195,7 +205,7 @@ test("both production render callsites canonicalize actual light slots before dr
+     ts.isCallExpression(node),
+   );
+   const stabilize = frameCalls.find(
+-    (call) => call.expression.getText(source) === "this.stableLights.update",
++    (call) => call.expression.getText(source) === "this.prepareSceneLightState",
+   )!;
+   const environment = frameCalls.find(
+     (call) =>
+@@ -219,6 +229,51 @@ test("both production render callsites canonicalize actual light slots before dr
+   }
+ });
+ 
++test("actual pre-draw helper refreshes changed receivers after budgets and before ordering", (t) => {
++  const game = fixture(t);
++  const ambient = new HemisphericLight("ambient", Vector3.Up(), game.scene);
++  const beam = new PointLight("beam membership fixture", Vector3.Zero(), game.scene);
++  beam.renderPriority = 10;
++  const mesh = MeshBuilder.CreateBox("receiver", {}, game.scene);
++  mesh.material = new StandardMaterial("receiver", game.scene);
++  game.stableLights.update();
++  assert.deepEqual(mesh.lightSources, [beam, ambient]);
++
++  beam.excludedMeshes.push(mesh);
++  game.stableLights.update();
++  assert.deepEqual(mesh.lightSources, [ambient]);
++  const phases: string[] = [];
++  const budget = game.gltfLightBudget.prepareFrame.bind(game.gltfLightBudget);
++  game.gltfLightBudget.prepareFrame = () => {
++    phases.push("budget");
++    budget();
++  };
++  game.flashlight = { beam: { prepareReceivers() {
++    assert.deepEqual(phases, ["budget"]);
++    phases.push("receivers");
++    beam.excludedMeshes.splice(0, 1);
++    assert.deepEqual(mesh.lightSources, [ambient, beam], "real Babylon re-admit appends");
++    return [mesh];
++  } } };
++  const mark = game.stableLights.markMeshesDirty.bind(game.stableLights);
++  game.stableLights.markMeshesDirty = (meshes) => {
++    assert.deepEqual(phases, ["budget", "receivers"]);
++    phases.push("dirty");
++    mark(meshes);
++  };
++  const update = game.stableLights.update.bind(game.stableLights);
++  game.stableLights.update = () => {
++    assert.deepEqual(phases, ["budget", "receivers", "dirty"]);
++    phases.push("order");
++    update();
++  };
++  game.prepareSceneLightState();
++  assert.deepEqual(phases, ["budget", "receivers", "dirty", "order"]);
++  assert.deepEqual(mesh.lightSources, [beam, ambient]);
++  assert.equal(beam.isEnabled(), true);
++  assert.equal(beam.intensity, 1);
++});
++
+ test("actual preload callback does no controller work or render after cancellation", (t) => {
+   const game = fixture(t);
+   const preload = findNodes(
+diff --git a/tests/game-webgpu-startup.test.ts b/tests/game-webgpu-startup.test.ts
+index 82ef4be..94bebb0 100644
+--- a/tests/game-webgpu-startup.test.ts
++++ b/tests/game-webgpu-startup.test.ts
+@@ -26,6 +26,7 @@ const methods = gameClass.members.filter(
+     node.name &&
+     [
+       "start",
++      "prepareSceneLightState",
+       "handleRendererFailure",
+       "isMeshReadyForCamera",
+       "assertStartupActive",
+diff --git a/tests/light-receivers.test.ts b/tests/light-receivers.test.ts
+new file mode 100644
+index 0000000..5db2edd
+--- /dev/null
++++ b/tests/light-receivers.test.ts
+@@ -0,0 +1,283 @@
++import test, { type TestContext } from "node:test";
++import assert from "node:assert/strict";
++import { setImmediate } from "node:timers/promises";
++import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
++import { Scene } from "@babylonjs/core/scene";
++import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
++import { Vector3, Matrix } from "@babylonjs/core/Maths/math.vector";
++import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
++import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
++import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
++import { Light } from "@babylonjs/core/Lights/light";
++import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
++import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
++import { MultiMaterial } from "@babylonjs/core/Materials/multiMaterial";
++import { MaterialPluginBase } from "@babylonjs/core/Materials/materialPluginBase";
++import { BoundingInfo } from "@babylonjs/core/Culling/boundingInfo";
++import { Skeleton } from "@babylonjs/core/Bones/skeleton";
++import { MorphTargetManager } from "@babylonjs/core/Morph/morphTargetManager";
++import type { Mesh } from "@babylonjs/core/Meshes/mesh";
++import "@babylonjs/core/Meshes/thinInstanceMesh";
++import "@babylonjs/core/Meshes/instancedMesh";
++import { Animation } from "@babylonjs/core/Animations/animation";
++import "@babylonjs/core/Animations/animatable";
++import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
++import { TorchReceiverLight } from "../client/light-receivers";
++
++function fixture(t: TestContext, kind: "standard" | "pbr" = "standard") {
++  const engine = new NullEngine(), scene = new Scene(engine);
++  new FreeCamera("observer", new Vector3(0, 2, -4), scene);
++  const light = new TorchReceiverLight("local player · flashlight", Vector3.Zero(), Vector3.Forward(), 0.72, 64, scene);
++  light.falloffType = Light.FALLOFF_STANDARD;
++  light.range = 24;
++  light.metadata = { localFlashlight: true };
++  light.setEnabled(false);
++  const ambient = new HemisphericLight("ambient", Vector3.Up(), scene);
++  const material = kind === "pbr" ? new PBRMaterial("shared", scene) : new StandardMaterial("shared", scene);
++  const mesh = (name: string, x: number, width = 1, updatable = false) => {
++    const value = MeshBuilder.CreateBox(name, { width, height: 1, depth: 1, updatable }, scene);
++    value.position.x = x; value.material = material; value.metadata = { artStatic: true };
++    value.computeWorldMatrix(true);
++    return value;
++  };
++  const near = mesh("near receiver", 10), far = mesh("far receiver", 100);
++  const refresh = () => { light.refreshReceivers(); return light.takeChangedReceivers(); };
++  t.after(() => { light.dispose(); scene.dispose(); engine.dispose(); });
++  return { engine, scene, light, ambient, material, mesh, near, far, refresh };
++}
++
++test("range rejects only the entire known static receiver outside STANDARD24m", (t) => {
++  const f = fixture(t);
++  const edge = f.mesh("range edge", 24.5);
++  const margin = f.mesh("numerical margin", 24.53);
++  const outside = f.mesh("fully outside", 24.56);
++  const large = f.mesh("large intersecting receiver", 70, 100);
++  f.light.refreshReceivers();
++  f.light.setEnabled(true);
++  for (const kept of [f.near, edge, margin, large])
++    assert.ok(kept.lightSources.includes(f.light), kept.name);
++  for (const excluded of [f.far, outside])
++    assert.ok(!excluded.lightSources.includes(f.light), excluded.name);
++  assert.equal(f.light.getClassName(), "SpotLight");
++  assert.equal(f.light.getTypeID(), 2);
++  assert.equal(f.light.range, 24);
++});
++
++test("moving torch or static parent is reflected before the next draw without a timer", (t) => {
++  const f = fixture(t), moving = f.mesh("moved static", 50);
++  const parent = new TransformNode("parent", f.scene);
++  moving.parent = parent;
++  f.refresh(); f.light.setEnabled(true);
++  assert.ok(!moving.lightSources.includes(f.light));
++  f.light.position.x = 40;
++  assert.ok(f.refresh().includes(moving));
++  assert.ok(moving.lightSources.includes(f.light));
++  parent.position.x = 100;
++  assert.ok(f.refresh().includes(moving));
++  assert.ok(!moving.lightSources.includes(f.light));
++  // Nonuniform transformed bounds are checked as a world AABB, not an
++  // underestimated sphere; no bounding-box center-only distance test.
++  parent.scaling.set(6, 1, 1); parent.position.x = -250;
++  f.refresh();
++  assert.ok(moving.lightSources.includes(f.light));
++});
++
++test("unknown, mutable, frozen, deformed and instanced receivers keep native membership", (t) => {
++  const f = fixture(t);
++  const kept: Mesh[] = [];
++  const dynamic = f.mesh("untagged", 100); dynamic.metadata = {}; kept.push(dynamic);
++  const mutable = f.mesh("updatable geometry", 100, 1, true); kept.push(mutable);
++  const wind = f.mesh("wind", 100); wind.metadata.windDeformed = true; kept.push(wind);
++  const animated = f.mesh("animated", 100);
++  animated.animations.push(new Animation("move", "position.x", 30, Animation.ANIMATIONTYPE_FLOAT)); kept.push(animated);
++  const animatedChild = f.mesh("animated ancestor", 100); animatedChild.parent = animated; kept.push(animatedChild);
++  const skeleton = f.mesh("skinned", 100); skeleton.skeleton = new Skeleton("rig", "rig", f.scene); kept.push(skeleton);
++  const morph = f.mesh("morph", 100); morph.morphTargetManager = new MorphTargetManager(f.scene); kept.push(morph);
++  const billboard = f.mesh("billboard", 100); billboard.billboardMode = 7; kept.push(billboard);
++  const locked = f.mesh("locked bounds", 100); locked.getBoundingInfo().isLocked = true; kept.push(locked);
++  const unsynced = f.mesh("unsynced bounds", 100); unsynced.doNotSyncBoundingInfo = true; kept.push(unsynced);
++  const invalid = f.mesh("invalid bounds", 100);
++  invalid.setBoundingInfo(new BoundingInfo(new Vector3(NaN, 0, 0), new Vector3(NaN, 1, 1))); kept.push(invalid);
++  const instanced = f.mesh("instance source", 100); const instance = instanced.createInstance("regular instance"); kept.push(instanced);
++  f.engine.getCaps().instancedArrays = true;
++  const thin = f.mesh("thin source", 100); thin.thinInstanceAdd(Matrix.Identity());
++  assert.ok(thin.hasThinInstances, "fixture creates an actual thin instance"); kept.push(thin);
++  const frozen = f.mesh("frozen material", 100); frozen.material = new StandardMaterial("frozen", f.scene); frozen.material.freeze(); kept.push(frozen);
++  const multi = f.mesh("multi material", 100); multi.material = new MultiMaterial("multi", f.scene); kept.push(multi);
++  const custom = f.mesh("unknown shader resolver", 100); custom.material = new StandardMaterial("custom", f.scene);
++  custom.material.customShaderNameResolve = (name) => name; kept.push(custom);
++  const unknownPlugin = f.mesh("unknown plugin", 100); unknownPlugin.material = new PBRMaterial("plugin material", f.scene);
++  new MaterialPluginBase(unknownPlugin.material, "UnknownVertexPolicy", 250, {}, true, true); kept.push(unknownPlugin);
++  f.refresh(); f.light.setEnabled(true);
++  for (const value of kept) assert.ok(value.lightSources.includes(f.light), value.name);
++  assert.ok(instance.lightSources.includes(f.light), "regular instances share source membership");
++  assert.ok(!f.far.lightSources.includes(f.light), "negative controls did not disable the safe branch");
++});
++
++test("later instance, frozen policy or unknown bounds readmit an earlier excluded source", (t) => {
++  const f = fixture(t);
++  f.refresh(); f.light.setEnabled(true);
++  assert.ok(!f.far.lightSources.includes(f.light));
++  const instance = f.far.createInstance("late instance");
++  f.refresh();
++  assert.ok(instance.lightSources.includes(f.light));
++  instance.dispose(); f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light));
++  f.material.freeze(); f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light));
++});
++
++test("frozen world bounds follow the same retained transform as drawing and refresh after unfreeze", (t) => {
++  const f = fixture(t);
++  f.far.freezeWorldMatrix();
++  f.refresh(); f.light.setEnabled(true);
++  f.far.position.x = 1;
++  f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light), "a frozen transform still draws at the original far position");
++  f.far.unfreezeWorldMatrix(); f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light));
++});
++
++test("registered direct animation and PBR debug material retain native membership", (t) => {
++  const f = fixture(t, "pbr");
++  const move = new Animation("move", "position.x", 30, Animation.ANIMATIONTYPE_FLOAT);
++  move.setKeys([{ frame: 0, value: 100 }, { frame: 1, value: 1 }]);
++  const animation = f.scene.beginDirectAnimation(f.far, [move], 0, 1, true);
++  assert.ok(f.scene.getAnimatableByTarget(f.far) === animation && animation, "fixture registers a real animatable");
++  assert.equal(f.far.animations.length, 0, "direct animation is not represented by node.animations");
++  f.refresh(); f.light.setEnabled(true);
++  assert.ok(f.far.lightSources.includes(f.light));
++  animation.stop(); f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light));
++  const vectorMove = new Animation("vector move", "x", 30, Animation.ANIMATIONTYPE_FLOAT);
++  vectorMove.setKeys([{ frame: 0, value: 100 }, { frame: 1, value: 1 }]);
++  const group = new AnimationGroup("direct vector target", f.scene);
++  group.addTargetedAnimation(vectorMove, f.far.position); group.start(true);
++  assert.ok(f.scene.getAnimatableByTarget(f.far.position), "group animates the vector independently of its mesh");
++  f.refresh(); assert.ok(f.far.lightSources.includes(f.light));
++  assert.equal(Reflect.get(f.light, "animatedTargets").size, 0, "animation target scratch set retains no rigs between refreshes");
++  group.stop(); group.dispose(); f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light));
++  (f.material as PBRMaterial).debugMode = 20; f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light));
++});
++
++test("counterfactual material and device caps prevent promoting an omitted other light", (t) => {
++  const f = fixture(t);
++  f.material.maxSimultaneousLights = 1;
++  f.refresh(); f.light.setEnabled(true);
++  assert.ok(f.far.lightSources.includes(f.light));
++  f.material.maxSimultaneousLights = 4; f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light));
++  f.material.maxSimultaneousLights = 1; f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light), "cap shrink restores original membership");
++  f.material.maxSimultaneousLights = 8;
++  f.engine.getCaps().maxUniformBuffersPerShaderStage = 5; f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light), "one supported light is a truncated counterfactual");
++  f.engine.getCaps().maxUniformBuffersPerShaderStage = 12; f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light));
++  f.material.maxSimultaneousLights = NaN; f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light));
++});
++
++test("caller inclusions exclusions and layer masks retain their identity and precedence", (t) => {
++  const f = fixture(t);
++  const excluded = [f.near], included = [f.near, f.far];
++  f.light.excludedMeshes = excluded; f.light.includedOnlyMeshes = included;
++  const push = excluded.push, splice = excluded.splice;
++  f.refresh(); f.light.setEnabled(true);
++  assert.ok(!f.near.lightSources.includes(f.light));
++  assert.ok(!f.far.lightSources.includes(f.light));
++  excluded.push(f.far);
++  f.light.position.x = 100; f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light), "caller exclusion survives our readmission");
++  excluded.splice(excluded.indexOf(f.far), 1); f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light));
++  f.light.includeOnlyWithLayerMask = 2; f.far.layerMask = 1; f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light));
++  f.light.includeOnlyWithLayerMask = 0; f.light.excludeWithLayerMask = 1; f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light));
++  assert.equal(f.light.excludedMeshes, excluded); assert.equal(f.light.includedOnlyMeshes, included);
++  assert.equal(excluded.push, push); assert.equal(excluded.splice, splice);
++  assert.equal(excluded.length, 1);
++  assert.ok(excluded[0] === f.near);
++});
++
++test("detach, new topology and disposal release only owned membership and references", (t) => {
++  const f = fixture(t);
++  f.light.refreshReceivers();
++  const first = f.light.takeChangedReceivers();
++  assert.ok(first.includes(f.far));
++  assert.equal(f.light.takeChangedReceivers(), first, "changed output buffer is reused");
++  assert.equal(first.length, 0);
++  f.light.setEnabled(true);
++  f.scene.removeMesh(f.far);
++  assert.equal(f.light.canAffectMesh(f.far), true, "detached receiver no longer remains in our set");
++  f.far.position.x = 1; f.scene.addMesh(f.far); f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light));
++  const late = f.mesh("late static", 200); f.refresh();
++  assert.ok(!late.lightSources.includes(f.light));
++  late.dispose();
++  assert.equal(f.light.canAffectMesh(late), true, "disposed receiver reference was released");
++  const foreign = f.light.excludedMeshes;
++  f.light.dispose(); f.light.dispose(); f.refresh();
++  assert.equal(f.light.excludedMeshes, foreign);
++  assert.ok(!f.near.lightSources.includes(f.light));
++  assert.ok(!f.scene.lights.includes(f.light));
++  assert.equal(f.light.takeChangedReceivers().length, 0);
++});
++
++test("unproved light configuration removes the local optimization without changing native light policy", (t) => {
++  const f = fixture(t);
++  f.refresh(); f.light.setEnabled(true);
++  f.light.falloffType = Light.FALLOFF_PHYSICAL; f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light));
++  f.light.falloffType = Light.FALLOFF_STANDARD; f.light.range = 30; f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light));
++  f.light.range = 24; f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light));
++  f.light.lightmapMode = Light.LIGHTMAP_SHADOWSONLY; f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light), "shadow-only lightmap is not a zero-contribution proof");
++  f.light.lightmapMode = Light.LIGHTMAP_DEFAULT; f.refresh();
++  assert.ok(!f.far.lightSources.includes(f.light));
++  f.light.parent = new TransformNode("unexpected light parent", f.scene); f.refresh();
++  assert.ok(f.far.lightSources.includes(f.light));
++});
++
++for (const kind of ["standard", "pbr"] as const)
++  test(`actual shared ${kind} keeps the far Effect when torch toggles but prepares the near SPOT variant`, async (t) => {
++    const f = fixture(t, kind);
++    await f.material.forceCompilationAsync(f.far);
++    await f.material.forceCompilationAsync(f.near);
++    const ready = async (mesh: Mesh) => {
++      for (let i = 0; i < 30; i++) {
++        f.scene.incrementRenderId();
++        if (f.material.isReadyForSubMesh(mesh, mesh.subMeshes![0], false) && mesh.subMeshes![0].effect?.isReady()) return;
++        await setImmediate();
++      }
++      assert.fail("actual material did not become ready");
++    };
++    await ready(f.far); await ready(f.near);
++    const beforeFar = f.far.subMeshes![0].effect!, beforeNear = f.near.subMeshes![0].effect!;
++    f.refresh(); f.light.setEnabled(true);
++    await ready(f.far); await ready(f.near);
++    // A hot-swap may report its old effect while the requested one is pending.
++    for (let i = 0; i < 30 && f.near.subMeshes![0].effect === beforeNear; i++) {
++      await setImmediate(); await ready(f.near);
++    }
++    assert.ok(f.far.subMeshes![0].effect === beforeFar, "far Effect must retain identity");
++    assert.ok(f.near.subMeshes![0].effect !== beforeNear, "near Effect must change for SPOTLIGHT");
++    assert.doesNotMatch(f.far.subMeshes![0].effect!.defines, /#define SPOTLIGHT/);
++    assert.match(f.near.subMeshes![0].effect!.defines, /#define SPOTLIGHT/);
++    f.light.setEnabled(false); f.refresh(); await ready(f.far);
++    assert.ok(f.far.subMeshes![0].effect === beforeFar, "OFF retains the far Effect");
++    f.light.setEnabled(true); f.material.freeze(); f.refresh();
++    for (let i = 0; i < 30; i++) {
++      await ready(f.far);
++      if (/#define SPOTLIGHT/.test(f.far.subMeshes![0].effect!.defines)) break;
++      await setImmediate();
++    }
++    assert.ok(f.far.lightSources.includes(f.light));
++    assert.match(f.far.subMeshes![0].effect!.defines, /#define SPOTLIGHT/,
++      "freeze before final gate restores native membership and an actual ready variant");
++  });
+diff --git a/tests/stable-light-state.test.ts b/tests/stable-light-state.test.ts
+index 44afc39..248ad3f 100644
+--- a/tests/stable-light-state.test.ts
++++ b/tests/stable-light-state.test.ts
+@@ -215,3 +215,185 @@ test("removing lights and disposing the controller unregisters its effective-sta
+   assert.equal(activeObservers(sun), 0);
+   streetA.dispose();
+ });
++
++async function settleMeshNotifications(stable: StableLightState) {
++  await new Promise((resolve) => setTimeout(resolve, 0));
++  stable.update();
++}
++
++for (const pbr of [false, true]) {
++  test(`${pbr ? "PBR" : "Standard"} explicit receiver dirtiness restores canonical slots after distance-only readmission`, async (t) => {
++    const { scene, beam, stable } = fixture(t);
++    const mesh = receiver(scene, pbr);
++    receiver(scene, pbr); // This unchanged receiver must not be revisited.
++    beam.range = 24;
++    beam.setEnabled(true);
++    const originalCanAffect = beam.canAffectMesh.bind(beam);
++    // Model only the consumer's distance membership decision. Babylon's actual
++    // resync, light sources, material defines and canonical ordering stay real.
++    beam.canAffectMesh = (candidate) =>
++      originalCanAffect(candidate) &&
++      Vector3.DistanceSquared(beam.position, candidate.position) <=
++        beam.range ** 2;
++    stable.update();
++    await settleMeshNotifications(stable);
++    const canonical = ids(mesh.lightSources);
++    const defines = lightDefines(scene, mesh, pbr);
++    const before = { ...stable.stats };
++
++    mesh.position.x = 100;
++    mesh._resyncLightSource(beam);
++    assert.equal(mesh.lightSources.includes(beam), false);
++    mesh.position.x = 0;
++    mesh._resyncLightSource(beam);
++    assert.equal(
++      mesh.lightSources.at(-1),
++      beam,
++      "pinned Babylon appends the readmitted light",
++    );
++    assert.notDeepEqual(ids(mesh.lightSources), canonical);
++    assert.notEqual(lightDefines(scene, mesh, pbr), defines);
++    stable.update();
++    assert.deepEqual(
++      stable.stats,
++      before,
++      "distance alone does not change the light signature",
++    );
++    assert.notDeepEqual(ids(mesh.lightSources), canonical);
++
++    stable.markMeshesDirty([mesh]);
++    stable.update();
++    assert.deepEqual(ids(mesh.lightSources), canonical);
++    assert.equal(lightDefines(scene, mesh, pbr), defines);
++    assert.equal(stable.stats.visits, before.visits + 1);
++    assert.equal(stable.stats.sorts, before.sorts + 1);
++    assert.equal(stable.stats.revisions, before.revisions);
++  });
++}
++
++test("explicit receiver dirtiness deduplicates iterable entries and visits only the marked meshes", async (t) => {
++  const { scene, stable } = fixture(t);
++  const meshes = Array.from({ length: 8 }, () => receiver(scene));
++  stable.update();
++  await settleMeshNotifications(stable);
++  const before = { ...stable.stats };
++  stable.markMeshesDirty([]);
++  stable.update();
++  assert.deepEqual(stable.stats, before);
++  stable.markMeshesDirty(
++    (function* () {
++      yield meshes[1];
++      yield meshes[1];
++      yield meshes[5];
++    })(),
++  );
++  stable.markMeshesDirty(new Set([meshes[5]]));
++  stable.update();
++  assert.equal(stable.stats.visits, before.visits + 2);
++  assert.equal(stable.stats.sorts, before.sorts);
++  assert.equal(stable.stats.revisions, before.revisions);
++  const after = { ...stable.stats };
++  stable.update();
++  assert.deepEqual(
++    stable.stats,
++    after,
++    "the existing pending collection drains once",
++  );
++});
++
++test("explicit receiver dirtiness ignores foreign and disposed meshes and releases removed pending references", async (t) => {
++  const { engine, scene, stable } = fixture(t);
++  const foreignScene = new Scene(engine);
++  const foreign = receiver(foreignScene);
++  const own = receiver(scene);
++  const disposed = receiver(scene);
++  disposed.dispose();
++  stable.update();
++  await settleMeshNotifications(stable);
++  const before = { ...stable.stats };
++  stable.markMeshesDirty([foreign, disposed]);
++  // This is a retention contract, not just an update/no-op assertion.
++  const pending = Reflect.get(stable, "pendingMeshes") as Set<Mesh>;
++  assert.equal(pending.size, 0);
++  stable.update();
++  assert.deepEqual(stable.stats, before);
++  stable.markMeshesDirty([own]);
++  assert.equal(pending.size, 1);
++  own.dispose();
++  assert.equal(
++    pending.size,
++    0,
++    "the existing mesh removal observer clears queued ownership",
++  );
++  foreignScene.dispose();
++});
++
++test("explicit receiver dirtiness does not consume input after controller or scene disposal", (t) => {
++  for (const disposeScene of [false, true]) {
++    const { scene, stable } = fixture(t);
++    const mesh = receiver(scene);
++    stable.update();
++    stable.markMeshesDirty([mesh]);
++    if (disposeScene) scene.dispose();
++    else stable.dispose();
++    const neverIterate: Iterable<Mesh> = {
++      [Symbol.iterator]() {
++        throw new Error("disposed owner must not retain/iterate new input");
++      },
++    };
++    assert.doesNotThrow(() => stable.markMeshesDirty(neverIterate));
++    assert.equal((Reflect.get(stable, "pendingMeshes") as Set<Mesh>).size, 0);
++  }
++});
++
++test("explicit receiver dirtiness cannot retain a mesh if the iterable disposes its owner", (t) => {
++  const { scene, stable } = fixture(t);
++  const first = receiver(scene),
++    second = receiver(scene);
++  stable.markMeshesDirty(
++    (function* () {
++      yield first;
++      stable.dispose();
++      yield second;
++    })(),
++  );
++  assert.equal((Reflect.get(stable, "pendingMeshes") as Set<Mesh>).size, 0);
++});
++
++test("explicit receiver dirtiness preserves cap, frozen, null-slot and custom-material fallbacks", async (t) => {
++  const { scene, ambient, stable } = fixture(t);
++  const capped = receiver(scene);
++  (capped.material as StandardMaterial).maxSimultaneousLights = 2;
++  const frozen = receiver(scene, true);
++  frozen.material!.freeze();
++  const custom = receiver(scene);
++  custom.material = new ShaderMaterial("custom receiver", scene, "unused");
++  const multi = receiver(scene);
++  multi.material = new MultiMaterial("unknown subslot", scene);
++  (multi.material as MultiMaterial).subMaterials = [
++    new StandardMaterial("known subslot", scene),
++    null,
++  ];
++  const meshes = [capped, frozen, custom, multi];
++  stable.update();
++  await settleMeshNotifications(stable);
++  // Rotate one actual membership without touching enabled/signature/topology.
++  for (const mesh of meshes) {
++    ambient.excludedMeshes.push(mesh);
++    mesh._resyncLightSource(ambient);
++    ambient.excludedMeshes.splice(ambient.excludedMeshes.indexOf(mesh), 1);
++    mesh._resyncLightSource(ambient);
++  }
++  const orders = meshes.map((mesh) => ids(mesh.lightSources));
++  const before = { ...stable.stats };
++  stable.markMeshesDirty(meshes);
++  stable.update();
++  assert.deepEqual(
++    meshes.map((mesh) => ids(mesh.lightSources)),
++    orders,
++  );
++  assert.equal(stable.stats.visits, before.visits + meshes.length);
++  assert.equal(stable.stats.skipped, before.skipped + meshes.length);
++  assert.equal(stable.stats.sorts, before.sorts);
++  assert.equal(stable.stats.revisions, before.revisions);
++});
+diff --git a/tests/vehicle-lighting.test.ts b/tests/vehicle-lighting.test.ts
+index 3685d0a..f997cef 100644
+--- a/tests/vehicle-lighting.test.ts
++++ b/tests/vehicle-lighting.test.ts
+@@ -15,6 +15,7 @@ import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+ import { PointLight } from "@babylonjs/core/Lights/pointLight";
+ import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
+ import { VehicleLighting } from "../client/vehicle-lighting";
++import { TorchReceiverLight } from "../client/light-receivers";
+ import manifest from "../shared/data/assets/vehicles-manifest.json";
+ import { applyArtLighting } from "../client/art-lighting";
+ import { sunState, moonState } from "../shared/weather";
+@@ -63,6 +64,56 @@ function selection(scene: Scene, lighting: VehicleLighting) {
+   return map.getCustomRenderList!(0, candidates, candidates.length)!;
+ }
+ 
++test("only the player owns range policy and pre-ON receiver changes survive until the final gate", (t) => {
++  const { scene, root, lighting } = fixture(t, "player");
++  const near = box(scene, "known near", 0, 0.6, 8);
++  const far = box(scene, "known far", 100, 0.6, 8);
++  near.metadata.artStatic = far.metadata.artStatic = true;
++  new HemisphericLight("ambient", Vector3.Up(), scene);
++  assert.ok(lighting.light instanceof TorchReceiverLight);
++  lighting.update(root, 1, true, "low");
++  assert.ok(near.lightSources.includes(lighting.light));
++  assert.ok(!far.lightSources.includes(lighting.light));
++  const shadow = lighting.light.getShadowGenerator() as ShadowGenerator;
++  const candidates = shadow.getShadowMap()!.renderList;
++  const changes = lighting.prepareReceivers();
++  assert.ok(changes.includes(far), "pre-ON refresh does not consume the final dirty list");
++  assert.ok(lighting.prepareReceivers() === changes, "output buffer is reused");
++  assert.equal(changes.length, 0);
++  assert.equal(lighting.light.intensity, 1.6);
++  assert.equal(lighting.light.range, 24);
++  assert.equal(shadow.mapSize, 128);
++  assert.ok(selection(scene, lighting).includes(near));
++  // A cap decision after pose update must be applied by the final render gate.
++  (far.material as StandardMaterial).maxSimultaneousLights = 1;
++  assert.ok(lighting.prepareReceivers().includes(far));
++  assert.ok(far.lightSources.includes(lighting.light));
++  (far.material as StandardMaterial).maxSimultaneousLights = 4;
++  assert.ok(lighting.prepareReceivers().includes(far));
++  assert.ok(!far.lightSources.includes(lighting.light));
++  assert.ok(shadow.getShadowMap()!.renderList === candidates, "receiver policy never replaces caster list");
++  lighting.update(root, 1, false, "high");
++  assert.equal(lighting.light.intensity, 0);
++  assert.equal(lighting.light.isEnabled(), false);
++  assert.equal(lighting.light.shadowEnabled, true);
++  // Changes while OFF are resolved on the next activation, before enable.
++  root.position.x = 100;
++  lighting.prepareReceivers();
++  lighting.update(root, 1, true, "low");
++  assert.ok(far.lightSources.includes(lighting.light));
++  assert.ok(lighting.prepareReceivers().includes(far));
++  assert.ok(!near.lightSources.includes(lighting.light));
++  const car = new VehicleLighting(scene, "vehicle");
++  try {
++    assert.ok(!(car.light instanceof TorchReceiverLight));
++    car.update(root, 1, true, "low");
++    assert.ok(far.lightSources.includes(car.light), "car retains the original global membership");
++    assert.equal(car.prepareReceivers().length, 0);
++  } finally { car.dispose(); }
++  lighting.dispose();
++  assert.equal(lighting.prepareReceivers().length, 0);
++});
++
+ test("model-derived beam follows translation, 90 degree yaw, pitch and parent transforms in actual world metres", (t) => {
+   const { scene, root, lighting } = fixture(t);
+   const origin = manifest.lights.frontCentres

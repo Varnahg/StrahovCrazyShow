@@ -1,0 +1,37 @@
+{
+  "atUTC": "2026-10-17T20:06:03.333Z",
+  "snapshotId": "97561841da34e834ad1d3a3d07458d4f14df0f81c4d7124ad52f64ff38cb0ec6",
+  "copiedCodeFiles": 560,
+  "newCodeFiles": 2,
+  "results": [
+    {
+      "name": "targeted",
+      "startedAt": "2026-10-17T20:04:59.842Z",
+      "finishedAt": "2026-10-17T20:05:06.507Z",
+      "exitCode": 0,
+      "command": "node --import tsx --test tests/light-receivers.test.ts tests/vehicle-lighting.test.ts tests/flashlight.test.ts tests/stable-light-state.test.ts tests/game-light-lifecycle.test.ts tests/game-diagnostics.test.ts tests/game-webgpu-startup.test.ts",
+      "log": "torch-receivers-v1-targeted.log",
+      "sha256": "77ebc67ab103275e6e306e34ab0f89701d4e25b024a866b3827c3464fb9ed7d5"
+    },
+    {
+      "name": "types",
+      "startedAt": "2026-10-17T20:05:06.518Z",
+      "finishedAt": "2026-10-17T20:05:37.347Z",
+      "exitCode": 0,
+      "command": "node ./node_modules/typescript/bin/tsc --noEmit",
+      "log": "torch-receivers-v1-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build",
+      "startedAt": "2026-10-17T20:05:37.347Z",
+      "finishedAt": "2026-10-17T20:06:03.081Z",
+      "exitCode": 0,
+      "command": "node ./node_modules/vite/bin/vite.js build --configLoader native",
+      "log": "torch-receivers-v1-build.log",
+      "sha256": "944dc998b300bc40904fd6fdb18235bac0e060a8571bf72801796ed34d92ab6b"
+    }
+  ],
+  "sharedMetadataUnchanged": true,
+  "scope": "Targeted/fullTS/build only for GPU hypothesis test. Full suite/integration and final acceptance remain pending."
+}
