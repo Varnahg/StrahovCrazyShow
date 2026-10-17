@@ -1,0 +1,57 @@
+{
+  "kind": "unaccepted-async-startup-candidate",
+  "baseSnapshot": "c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5",
+  "baseNativeRevision": "2cd0e47990ea6fe0d046d03b3ac8966f207097b2",
+  "overlays": [
+    {
+      "path": "client/game.ts",
+      "before": "462d127ece6762e6180d6a815b461fd5226be708e25dbf4affb188e6021d5ffe",
+      "nativeWorkingSha256": "53abfd6c376140b089025cc9f6f43246188866399a7d6cbcd7439a680ba2c373",
+      "after": "1fd79288303f7c7947dc86f39e6d4f5f4292f1bd7a6023f383f9f9680f6a1967",
+      "method": "verified exact native change adapter retaining all C5 phases, renderer failure guards, preload visuals and profiling"
+    },
+    {
+      "path": "client/webgpu-pipeline-preparation.ts",
+      "before": null,
+      "nativeWorkingSha256": "6c7e6e2315c5068641c1079e7bd577a3fb9618d0375f054a2faf3e3b111d709b",
+      "after": "6c7e6e2315c5068641c1079e7bd577a3fb9618d0375f054a2faf3e3b111d709b",
+      "method": "new owned module/test"
+    },
+    {
+      "path": "tests/webgpu-pipeline-preparation.test.ts",
+      "before": null,
+      "nativeWorkingSha256": "a0facf433f6e54eca1ab90441ccb2499dbe5947de9b4e64a0b7e7b052959416d",
+      "after": "a0facf433f6e54eca1ab90441ccb2499dbe5947de9b4e64a0b7e7b052959416d",
+      "method": "new owned module/test"
+    },
+    {
+      "path": "tests/game-webgpu-startup.test.ts",
+      "before": "e462f1277a8e9f79bc8176a442684a5aaefccd2990f6cd9d1f7f1db95cfb32f0",
+      "nativeWorkingSha256": "d5dfb51860ad9bb8c626829dcf72b151764f9fbf266896817076fd908d4297df",
+      "after": "d34873abfcd26456e8041ecd3c74e4cb70af39543b2fc0ceb99d3d1a5449c499",
+      "method": "reviewed fixture adapter preserving C5 imports/controllers/pendingPlayers/cleanup; add helper IO and the actual preload closure"
+    },
+    {
+      "path": "tests/game-light-preparation.test.ts",
+      "before": "c2653e75483b4f541bc274b27152207c9e5f886c891c8dc5785da9ddeee608a4",
+      "nativeWorkingSha256": "c37ebc3deea120e34b4aa67a454d0a90eda852f5611429c5c44fd8026712012c",
+      "after": "8f2b5a9ba6792b4536119658947d18c43b4c19ab197b219adfadb7e754691204",
+      "method": "reviewed fixture adapter preserving C5 imports/controllers/pendingPlayers/cleanup; add helper IO and the actual preload closure"
+    },
+    {
+      "path": "tests/game-light-lifecycle.test.ts",
+      "before": "671fecfc30e674a9a9a7b398a551d34de3b5c3429f01cd174ed279b5aa39138a",
+      "nativeWorkingSha256": "5011bea9d1694613faad3c03424b951bfdcb1fa5ca235b52a113d54b0d77dc4e",
+      "after": "44b32775f331e95811c4805aae91222f0b3a515837c1ddb36e01c6ea4cc5774e",
+      "method": "reviewed fixture adapter preserving C5 imports/controllers/pendingPlayers/cleanup; add helper IO and the actual preload closure; C5 startContent AST and explicit absent QA fence token"
+    },
+    {
+      "path": "tests/game-startup.test.ts",
+      "before": "ace7cad67ce763bf6f433125a18f2763854b641efe191fecc23db4c1a53daf03",
+      "nativeWorkingSha256": null,
+      "after": "86df45d1ce674c723c6027f5ef244c5b9c93628bdf38c10ba91869d6c53adf8e",
+      "method": "C5-only VM fixture: import actual inert helper and supply it to existing environment; all original tests/assertions retained. Not a native tracked file."
+    }
+  ],
+  "scope": "Production C5 source with normal timestamp timing and no QA fence/cadence intervention. Only owned startup helper/Game/test overlays; no future B6 coverage or gameplay skip scope. Played C5 source and dist remain immutable."
+}

@@ -77,3 +77,10 @@ Full `pnpm test`, `pnpm build`, isolated `pnpm test:integration` and actual Edge
 ## Current checkpoint
 
 2026-10-16: issues KEY-22 through KEY-34 created; goal active. Commit `2899f08` closes the shadow include registration path. Actual Babylon wrapper/include processing changes from 1/3 to 3/3 passing tests, with the five-HTML-response negative control retained. GPU reproduction and native wrapper declarations remain open. Vegetation and surface WGSL implementations are in progress. Production default is not yet flipped.
+
+
+## Checkpoint 2026-10-18: startup pipelines
+
+Verified startup-only async pipeline preparation is integrated: native8d20cecc72066b498e735b8b2524fd23baa19eff → main232cffb1fd67b47766fedd2b27c933ddf786e617. Native1296/1296 and combined production1352/1352 tests, both builds and isolated integration passed. The protected played4193/C5 stays unchanged. [Evidence and limits](evidence/webgpu-migration-20261016/hitches-v5/README.md) retain three diagnostic startup pairs, a production pair, the slower41s production smoke, cancellation/reentry, and all source identities.
+
+This is partial progress. First F in B6 still causes a6.2s interval after about1.17s CPU and59new synchronous pipelines. Default renderer and final FPS/visual/multiplayer acceptance are unchanged. Next research targets the actual B6 presentation/regular-instance coverage missing from spawn-only preparation; no extra cache is approved by the current duplicate inventory.
