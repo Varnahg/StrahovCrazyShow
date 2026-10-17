@@ -2,7 +2,7 @@
 title: 'KEY-31: odstranit dlouhé čekání po změně světel a materiálů'
 type: 'bugfix'
 created: '2026-10-17'
-status: 'draft'
+status: 'in-progress'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '86e0b6460514231b97d3159b640e85a7f2337c1f'
@@ -52,7 +52,11 @@ context:
 **Execution:**
 - [x] Rekonstruovat tři hitch řetězce a ověřit sémantiku časů, souběžnou síť a server.
 - [x] Baseline4194: stávající profil a skutečný B6/F přechod; uložit source a raw data.
-- [ ] Po profilu uzavřít varianty a přesně přidělit runtime/test soubory. Spec zůstává draft do technického rozhodnutí; lidské oprávnění nechybí.
+- [x] Uzavřít první implementovatelnou variantu: konzervativní vyloučení vzdálených statických přijímačů lokální svítilny. Task `webgpu-torch-receivers-20261017`; jeho GPU přínos zatím není ověřený.
+- [ ] `client/light-receivers.ts`: omezený správce vlastních exclusions pouze pro prokazatelně bezpečné statické Standard/PBR bounds mimo STANDARD dosah. Unknown/frozen/deformed/instances/cap fallback, aktualizace před draw, cleanup vlastních references.
+- [ ] `client/vehicle-lighting.ts`: připojit pouze hráčskou svítilnu před změnou enabled a pohybem, zachovat ON/OFF, intenzitu, street budget i shadow casters. Ověřit pořadí všech dalších světelných změn; není-li v tomto místě bezpečné, předat koordinátorovi potřebný Game entrypoint místo rozšíření scope.
+- [ ] `tests/light-receivers.test.ts`, `tests/vehicle-lighting.test.ts`, `tests/flashlight.test.ts`: skutečné Babylon světlo/material/effect regrese, bounds/cap/instance/deformation/exclusions/topology/disposal; cílený refaktor a scopedTS.
+- [ ] `client/stable-light-state.ts` + jeho test: explicitní markMeshesDirty pro změněné receivers bez celé nové cache či scan. Task `webgpu-receiver-ordering-20261017`. Root `client/game.ts` sjednotí pre-draw přípravu: budget→receivers→dirty→stable-order, jak pro preload/warmup/finální readiness render, tak pro gameplay. Actual Game lifecycle/startup/diagnostics fixtures zahrnou skutečný helper.
 - [ ] Implementace, cílený refaktor, regrese, samostatný commit a integrace; nový kandidát a srovnatelný důkaz.
 
 **Acceptance Criteria:**
@@ -61,13 +65,17 @@ context:
 
 ## Implementation Notes
 
-Původní4193 procesy při pokračování neběžely; obnoven totožný frozenC5, žádný rebuild. QA task má vlastní porty/cache. Oficiální BMAD renderer použil týmové overrides. Produkční oprava zatím není zvolená.
+Původní4193 procesy při pokračování neběžely; obnoven totožný frozenC5, žádný rebuild. QA task má vlastní porty/cache. Oficiální BMAD renderer použil týmové overrides. Níže zvolený kandidát není přijatou produkční opravou do skutečného ověření.
+
+Rozhodnutí pro první kandidát17.10: zmenšit doložený zbytečný F material/effect churn bezpečným receiver range vyloučením; nečekat s touto prokázanou CPU příčinou na přesné určení následného GPU/RAF čekání. Žádná mezera v lidském záměru, nevratná změna ani nové oprávnění. Rozsah jsou2runtime soubory a3testy; Game wiring případně samostatně po koordinaci. Před přijetím musí skutečný obraz a celá pauza projít samostatným měřením. Negativní přínos znamená kandidáta nepřijmout.
 
 Dokončený baseline profil nevysvětlil několikasekundové mezery synchronním endFrame/flush (max1,7ms). Jeho globální raw maxima patří startupu, proto vznikla jen QA kopie cadence: dvě bodová volání existujícího snapshotu při rawFrameMs>=250, bez nové diagnostické vrstvy či hooků.9/9 actual Game testů a fullTS/build PASS. F3755,6ms:raw+1/process+1/queue3699,1ms/CPU56,5ms; noc4049,7ms:raw+1/process+1/queue4002,4ms/CPU47,3ms. Generace/epochy/host shodné, bezcap/background/errors. Prodleva tedy leží v doručení rendering opportunity; GPU příčina zůstává hypotéza.
 
 Kontrolní QA-only timestamp-query OFF před Game/Scene zásek neodstranilo. Snapshot02cbf7ad…feb0af, session199a3381-ff90-48b2-8b30-a0279f182a51: první F má948,4ms CPU burst a poté3472,1ms interval; raw+1/process+1/queue3418,6ms/CPU53,5ms. Requested feature zůstává dostupná, engine timing flag je false. FullTS/Vite build PASS. Jeden běh nedokazuje rychlostní rozdíl; OFF se nepřijímá jako produkční oprava. Factory per-pass queries přidávají resolve/copy/submit/mapAsync, ale nejsou nutnou podmínkou této reprodukce. Clustered lighting bylo odmítnuto jako úzká oprava: nepodporuje aktuální shadow/STANDARD falloff a mění binding/lifecycle.
 
 Následuje QA-only fence po skutečném endFrame submit. Pinned pořadí potvrzuje test skutečných WebGPUEngine.endFrame+flushFramebuffer; právě jeden pending observer/Promise, bez await či flush v herní smyčce.17/17 actual Game testů a scopedTS3361/0 PASS; nezávislé read-only review nemá blokující nález. Raw epoch se zapisuje, ale není součástí fence guardu: při korelaci RAF musí být shodný. Completion latency zahrnuje dřívější GPU frontu i doručení callbacku; není čistým časem GPU. Kód existuje pouze v oddělené QA cache.
+
+Následné GPU ověření opravilo tento předběžný review závěr: první fence nevznikla, protože aggregate health.valid odmítalo pending shader validation. Nových22actual testů přes skutečný RenderHealth/CompilationProfile tuto chybu reprodukuje a opravuje pouze diagnostickou eligibility. Reálný retest snapshot3cf48f74…54507b/session8716d28a…e073: prvníF na prahuB6 se zónououtside,1586msGameCPU,56programů/796Effect změn,8568msRAFmezera a8725,2ms post-submit completionlatency. SíťovéJS aHTTP pokračujíuvnitř; konkrétníGPU/driver příčina stále neníprokázána. [Druhý archiv](../../../docs/performance/evidence/webgpu-migration-20261016/hitches-v2/README.md) obsahujeplnédůkazy/omezení. WT d82eb6342541c7216d395b9d8fe5c89c4b02beeb integrován jako main8b7e61be020efeba30e36e3649b04697149d2240,133ostatníchdirtysouborůbyteovězachováno.
 
 Výzkum a probe je průběžně commitnutý WT3258d49 → main221edc8. Při cadence buildu pnpm11 ověřovací default install přepsal31 instalačních metadat/bin shim souborů ve sdílené závislostní složce; kontrolovaných6 core/patch hashů zůstalo shodných, C5 source/dist se nepřepisovaly. Další QA build přešel na přímý Node tsc + Vite configLoader native;31metadata hashů, root entries a .vite-temp mtime před/po jsou shodné. Žádná neznámá metadata se nevracela odhadem.
 
@@ -81,8 +89,12 @@ Porovnat přesnou async pipeline přípravu, omezený předstih pro B6, konzerva
 
 Read-only audit pinned9.30: convenience createRenderPipelineAsync používá geometry buffers/override=null/textureState=0 a nemá úplný render state, proto není bezpečný drop-in. Přesné vstupy jsou až v _draw před getRenderPipeline. Existující preWarmPipeline používá správný zachycený cache token, ale nemá pending dedup ani generation/disposal guard před vložením výsledku. Startup-only sběr musí navíc pokrýt vlastní clear cache a timestamp submit cesty. Živé F není pouze async přepínač: ShadowDepthWrapper při změně base Effectu disponuje dosavadní depth efekty a vytváří nové náhodné tokeny. Připravit ON a během čekání obnovit/renderovat OFF může zrušit právě připravovaný výsledek. Široký engine patch zatím není zvolený; nejprve dokončit fence důkaz a porovnání variant.
 
+Vybraný receiver postup má menší zásah do lifecycle a nemění aktivní světla ani samotné shadery. Zůstává stejný konečný STANDARD falloff24m; mimo konzervativní bound je příspěvek nula. Trvale enabled/intensity0 bylo odmítnuto: může vytlačit pouliční lampu z dnešního4slot rozpočtu, zvýšit cap a vykreslovat shadow map i při OFF. Culling nesmí jiné světlo povýšit přes cap; neznámé capy i regular/thin instance sdílení se proto zatím vůbec neoptimalizují. Žádné kuželové culling ani250ms stale receiver interval. Potenciální náklad nového membership průchodu se musí změřit, není automaticky zanedbatelný.
+
 Primární zdroje: [W3C LoAF](https://www.w3.org/TR/long-animation-frames/), [GPUWeb GPUDevice](https://gpuweb.github.io/types/interfaces/GPUDevice.html#createrenderpipelineasync), pinned Babylon9.30 a [Edge Performance](https://learn.microsoft.com/en-us/microsoft-edge/devtools/performance/reference). Konkrétní GPU/driver příčina ještě není prokázaná.
 
 ## Verification
 
 Cílené pinned CPU reprodukce a strictTS. Stabilní native i combined `pnpm test`, `pnpm build`, izolované `pnpm test:integration` podle runtime rozsahu. GPU série na odděleném checkpointu;4193 se nepřepisuje. Neprovedené scénáře zůstanou UNVERIFIED.
+
+Rozpracovanéreceiverzapojení: actualGame frame/startup/lifecycle22/22PASS nad přesnýmmezisnapshotem19:49UTC. Leafordering13/13 + scopedTS2954/0PASS; vlastní receiverleaf se ještě dokončuje. Žádný ztěchtovýsledkůzatímneprokazujeGPUzlepšenínebohotovoufullpipelinekandidáta.
