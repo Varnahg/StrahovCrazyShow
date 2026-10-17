@@ -30,6 +30,9 @@
     "Historický a1eb953f benchmark a frozen4188 neměnit. public/assets zůstávají sdílené read-only v historickém snapshotu; případné změny potřebují vlastní rezervaci a oddělení předem.",
     "Nové závislosti/staged validace patří do .cache/webgpu-migration pod rootem; node_modules původního4188 je cizí rezervace.",
     "Po dokončení pouze vlastních přesných souborů commit, předání a release. Root potvrzuje přijetí a integraci.",
-    "Přímý node CLI, nikdy pnpm exec bootstrap. První nativní GPU profil koordinuje root před výkonovými zásahy."
+    "Přímý node CLI, nikdy pnpm exec bootstrap. První nativní GPU profil koordinuje root před výkonovými zásahy.",
+    "17.10 po hitches-v4: 80 nových first-F WGSL bez duplicit nepodporuje deduplikační cache. Další omezený celek je startup-only exact async pipeline request pod stávajícím loading coverem; runtime F zůstává otevřené.",
+    "Leaf píše pouze webgpu-pipeline-preparation.ts, odpovídající test, handoff a cache/pipeline/async-startup-20261017. Native descriptor/cache token z aktuálního draw, žádný fallback/falešný pipeline, pending/result scope s lifecycle a skutečnou následnou spotřebou. Root vlastní Game wiring a GPU.",
+    "Žádná změna dependencies/patchů nebo sdíleného buildu bez samostatné dohody. Zachovat celé timeouty, ready-but-unconsumed blokaci, dvě kompletní acceptance draws a finální submission gate. Fast/WebGL beze změny; chybějící descriptor/hook kontrakt nelze tiše považovat za připravený."
   ]
 }
