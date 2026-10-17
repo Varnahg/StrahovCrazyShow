@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-b6-variant-proof-20261018",
+  "title": "KEY-31: doložit chybějící B6 presentation a shader varianty před další opravou",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/b6-variant-proof-20261018/",
+    "docs/agents/handoffs/webgpu-b6-variant-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Skutečné připnuté metody/controller a sampler porovnají spawn etapy se zaznamenanou denní B6 OFF/ON; reprodukce oddělí důkaz, hypotézu a neprovedený GPU test.",
+    "Zaznamenány ordered typy/falloff/shadow/filter/priority/capy a skutečné main Effect defines pro reprezentativní Standard, PBR a regular-instance přijímač; stejné počty nejsou vydávány za identitu.",
+    "Skutečný presentation přechod doloží attach/detach B6 instancí, camera/shadow pass a restore při zachování actor/physics/network; main reuse je oddělené od depth Effect/token reuse.",
+    "Cache-only proof nevnáší produkční kód, runtime cache, nové assets ani změny hraných snapshotů. Návrh dalšího kandidáta vychází z výsledku."
+  ],
+  "verification": [
+    "Lehký cílený CPU proof s actual pinned Babylon9.30 a byte-identickými C5/native zdroji; lze nahradit pouze jasně popsané IO, ne zkoumaný algoritmus.",
+    "Zmrazit zdroje/testy/probe/output s SHA, skutečný log a limity; žádné načítání celé produkční scény, full test/build/integration nebo GPU bez další resource rezervace.",
+    "Pokud důkaz potřebuje velkou GLB/world zátěž nebo další writePaths, před spuštěním vrátit potřebu rootovi; nedělat falešně hotovou readiness ani skrýt chybějící textury."
+  ],
+  "notes": [
+    "Autorizované pokračování uživatelského cíle přes BMAD, zaměřené na dlouhé F hitches. Koordinátor root; nespouštět nový/reentrant BMAD workflow.",
+    "Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow. Startup unit native8d20cecc72066b498e735b8b2524fd23baa19eff je v main232cffb1fd67b47766fedd2b27c933ddf786e617; metadata hitches-v5 obsahují plné důkazy.",
+    "Předchozí firstF v2: b6:0 x-4.903796/y2.6201/z-77.051910, medium1512x642, denní preview18.10.10:00Z, CPU1172.2ms/gap6197.4ms/+80modulů/+59sync. Přesné raw a builtin benchmark jsou v hitches-v5.",
+    "B6 props jsou mimo spawn vypnuté a odebrané ze scene.meshes. Typově ekvivalentní B6/street POINT samy nedokazují nový layout. Night anchor se zachytí z Prague dateKey jednou při startu; porovnat hranice17./18.10.",
+    "Předchozí shadow proof hitches-v3 ukazuje zánik budoucího PBR ON depth při OFF renderu. Neopravňuje automaticky variantovou cache; nejprve určit podíl missing main/instance a depth reuse.",
+    "Aktuální spec v primary _bmad-output/implementation-artifacts/webgpu-migration-20261017/spec-key-31-long-frame-gaps.md. Tato fáze je důkaz před návrhem dvou denních B6 etap, nikoli jejich povolená implementace.",
+    "Používat přímý node/tsx se zakázanou transpile cache a readonly dependencies-v5. Žádný install/pnpm bootstrap, žádné změny node_modules, cizích souborů či procesů. Po předání ukončit vlastní pomocné procesy a release."
+  ]
+}
