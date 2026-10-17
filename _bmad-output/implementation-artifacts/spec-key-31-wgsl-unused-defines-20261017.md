@@ -2,7 +2,7 @@
 title: 'KEY-31: doložit nepoužité WGSL konstanty před optimalizací startupu'
 type: 'feature'
 created: '2026-10-17'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'd0a0f98044216638fbfc425999ae5e0dded1bf38'
@@ -56,8 +56,8 @@ Runtime pracovní kopie: `C:/Users/rezac/.codex/worktrees/webgpu-comparison/Stra
 - [x] Profiler a jeho test: dokončit a refaktorovat omezený lexer/provenance/region comparison; vlastní task `webgpu-shader-inventory-20261016` a owner `webgpu-mig-01a14497-unused-20261017`.
 - [x] Game a integrační fixture: zapojit oba flags shodným gate; rootovy rezervace `webgpu-migrate-root-20261016` a `webgpu-migrate-frame-fixture-20261016`.
 - [x] Nezávislé review přesného vlastního diffu; opravy jen ve vlastněných souborech, poté cílené testy a scoped TS.
-- [ ] Root po uživatelském testu vytvoří nový označený immutable checkpoint a jeden skutečný Edge sběr. Vyhodnotí počty, unknown/limity a režii; bez přínosu experiment uzavře bez cache.
-- [ ] Samostatné commity a integrace pouze po relevantním ověření; aktualizovat KEY-31/32 a předání. Celá migrace zůstává otevřená do své funkční/výkonové přejímky.
+- [x] Root po uživatelském testu vytvoří nový označený immutable checkpoint a jeden skutečný Edge sběr. Vyhodnotí počty, unknown/limity a režii; bez přínosu experiment uzavře bez cache.
+- [x] Samostatné commity a integrace pouze po relevantním ověření; aktualizovat KEY-31/32 a předání. Celá migrace zůstává otevřená do své funkční/výkonové přejímky.
 
 **Acceptance Criteria:**
 - Given skutečné pinned vstupy, when se liší pouze nepoužitý safe define, then odvozená rovnost je přesně potvrzená a oba runtime výsledky zůstanou byte-identické s originálem.
@@ -76,11 +76,17 @@ BMAD krok03 převzal již existující implementaci; `baseline_commit` je skute�
 
 Po výslovném dokončení uživatelského testu17.10 proběhlo33/33 cílených testů a scopedTS2957/0 bez další změny source/test freeze, proto původní statické review platí. Root přijal CPU celek a vytvořil samostatné commity `cad8b4f45f0d88c2613ccf3828ae468b27b407f1` (inventář) a `5cdb14e25afbdf83a9f5fa0707b31fed5caea184` (Game gate). Native-v14 snapshot `ecb77e181ed33b8777755cdd426636e0d7a9eb98334df9301d33e353bafadb09` obsahuje8451inputů a prošel1216/1216/fullbuild/TypeScript/izolovanouintegrací. GPU sběr a integrace do main ještě nejsou přijaté. Ruční C4 test odhalil nezávislou existující chybu světelných UBO a zastaveného renderu (KEY-39); tento inventář v C4 neběžel.
 
+Aktuální stav po dokončení kroku03: produkční v14 sběr rozpoznal516 modulů,0raw/body duplicates a48 dodatečných odvozených shod/48skupin; unknown/kapacitní ztráty0, pouze16bounded details jsou oříznuté. CaptureCPU1154.7ms/max7.8ms je režie experimentu, ne přínos optimalizace. Výstup se sourceID je v inventory-v14 evidence. Volba: žádná runtime cache/normalizace. Samostatné commity cad8b4f/5cdb14e jsou integrovány do main jako4a8e343 a součást a2acbed. Následná úplná native-v16 a combined-v5 pipeline prošla1260/1260 a1320/1320, obě strictTS/build/isolatedintegration PASS. Matice je pokrytá skutečnými33 profiler testy a Game gate fixtures; výsledky jsou v příslušných handoffech a safety-v16 evidence. GPU sběr a integrace jsou pro tento omezený experiment dokončené, otevřený celkový startup/FPS cíl se nemění. Následuje formální třívrstvé BMAD review pouze tohoto vlastního diffu.
+
 ## Spec Change Log
 
 ## Review Triage Log
 
 17.10: nezávislé předběžné statické review pěti vlastních cest vrátilo `[]`. Diff SHA256 `A4D6A6BCB0197D2877AAE4CC2CCDC5F05871B0C3EA5C8FBB5240EAF24E1D7375`; zdroj profileru `991C3FF5EC2B09C3CAE4CC715343582B2688DC8B8332C776663244B392DD9499`. Reviewer ověřil pinned provenance, lexer, závislosti, přesnou rovnost, limity, lifecycle/accessors/privacy a Game gate. Nespouštěl testy/TS/build/GPU. Jde o statický výsledek, nikoli splnění testové matice nebo předčasný přechod do dokončeného BMAD kroku04.
+
+Formální krok04: blind-hunter `[]`, edge-case-hunter `[]`. Verification-gap reviewer doložil jednu mezeru pokrytí: žádný test nemění hodnotu ponechané použité/unsafe/tranzitivní deklarace. Verdict **medium**, route **patch** (chybí regrese identity, runtime ji aktuálně zachovává). Doložený mutační scénář by odstranil všechny deklarace ze srovnání a dosavadní testy by falešné shody nezachytily. Přidělen původnímu autorovi pouze tabulkový regresní test + handoff; žádná změna runtime WGSL ani cache.
+
+Patch uzavřen:4nové tabulkové případy měníUSED,UNSAFE aLEAF v řetězciCHAIN→MIDDLE→LEAF; unused-only kontrola se nadále shoduje. Celý profiler soubor37/37PASS, scopedTS2957/0. Přesná izolovaná mutace keepguardu dává3FAIL/1PASS, takže nový test skutečně zachytí uvedenou chybu. Původní verification-gap reviewer provedl statický recheck a potvrdil uzavření. TestSHA06061bf3f704a8c8ada8c1dc47d33a5b7c6585387605a2c4faaddf4ddd5ab7af; runtimeSHA991c3ff5ec2b09c3cae4cc715343582b2688dc8b8332c776663244b392dd9499 bezezměny. Samostatný WTcommit86e0b6460514231b97d3159b640e85a7f2337c1f, main5482afb4e9344e3a419023cb81c88c1013626a4e. Nová regrese není zpětně součástí frozenv16/C5 manifestů; jejich runtime zůstává identický. Žádný nález tohoto experimentu nebyl odložen. BMAD kroky04/05 dokončené pouze pro tento omezený experiment, nikoli pro celýKEY31/22výkonovýcíl.
 
 ## Design Notes
 

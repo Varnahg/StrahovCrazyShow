@@ -57,11 +57,11 @@ Runtime WT: `C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow`
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Shadow helper + `tests/webgpu-shadow-freshness.test.ts`: readiness základního materiálu před super readiness, explicitní shoda LIGHTn/type pouze podle skutečného BindLights limitu a lighting enable podmínek; refaktor a pinned regrese. Task `webgpu-shadow-freshness-20261017`.
-- [ ] Health + `tests/render-health.test.ts`: instanční catch celého snímku, zachované návraty/výjimky, deduplikace a lifecycle bez per-frame snapshotu. Task `webgpu-render-failure-20261017`.
-- [ ] Ruční startup/preview + jejich dva skutečné testy: po chybě nepokračovat end/submit, uzavřít scope a bez čekání zachovat původní chybu. Task `webgpu-manual-frame-failure-20261017`.
-- [ ] Root: zapojit factory do vegetace a skutečných tree testů pod `webgpu-shadow-integration-20261017`; Game/UI a jejich skutečné lifecycle/startup fixtures pod existujícími root rezervacemi.
-- [ ] Ověřit úplnou testovou matici, review přesného vlastního diffu a integrační snapshot; jednotlivé opravy commitovat samostatně, neproniknout do cizího WIP.
+- [x] Shadow helper + `tests/webgpu-shadow-freshness.test.ts`: readiness základního materiálu před super readiness, explicitní shoda LIGHTn/type pouze podle skutečného BindLights limitu a lighting enable podmínek; refaktor a pinned regrese. Task `webgpu-shadow-freshness-20261017`.
+- [x] Health + `tests/render-health.test.ts`: instanční catch celého snímku, zachované návraty/výjimky, deduplikace a lifecycle bez per-frame snapshotu. Task `webgpu-render-failure-20261017`.
+- [x] Ruční startup/preview + jejich dva skutečné testy: po chybě nepokračovat end/submit, uzavřít scope a bez čekání zachovat původní chybu. Task `webgpu-manual-frame-failure-20261017`.
+- [x] Root: zapojit factory do vegetace a skutečných tree testů pod `webgpu-shadow-integration-20261017`; Game/UI a jejich skutečné lifecycle/startup fixtures pod existujícími root rezervacemi.
+- [x] Ověřit úplnou testovou matici, review přesného vlastního diffu a integrační snapshot; jednotlivé opravy commitovat samostatně, neproniknout do cizího WIP.
 
 **Acceptance Criteria:**
 - Given aktuální světla odlišná od starého depth efektu, when nastane shadow pass před hlavním draw, then není svázán80B buffer do96B deklarace ani chybějící LightN.
@@ -73,6 +73,12 @@ Runtime WT: `C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow`
 
 Kroky01/02 BMAD pokračují konkrétním child KEY-39 v již schváleném cíli, bez nového backlogu či změny rozsahu hry. Výzkum/varianty a cílené reprodukce předcházely opravě. Uživatel již ukončil ruční test; původní build/archiv zůstává zachovaný. Záměr nemá otevřené lidské rozhodnutí ani nevratný krok.
 
+Implementační checkpoint `8363c7603028a5a11b2f3d54f7a702c34ccfb608` obsahuje samostatné commity helperu `652620ecc68ed1173164df1591aac088f85a97ed`, health `5de904d34bad801e1007c5493a81a33bf4aea617`, Game/UI `5fe04527217bca1d382052cf5d96d7f067a05bb6`, vegetace `d8008394dd732d107d9dfec2047c4e576a9aa1e3` a ručních callerů `16bce5117c3a0413b96a19a581e1111904425fb1`. Native-v16 snapshot `f1d6c2bdd58f6c73fbaeec1f0b6326a4bda9e4c04449bc112cdd05ad609f4397` zahrnuje8453 vstupů. Plná pipeline a samostatný combined-v5 jsou rozpracované; to není GPU přijetí ani integrace do main.
+
+Aktuální ověření: native-v16 1260/1260, combined-v5 1320/1320, obě strictTS/build/izolované integrace PASS. Pět samostatných commitů je v main do `a2acbed882412138713780f530a260c34253411d`; metadata a48důkazovýchcest následně v `59a6161401538b964fc27059a9b1ced65faee30e`. Main committed runtime shodný s8363c76, physical549sourcefiles shodných sC5. Cizí WIP zůstává pouze pracovní; verification105foreignřádků nebylo commitnuto.
+
+C5 Edge session4ecc6280-d257-4858-ada1-3ab856ce4691:1559souvislýchrecords,0faults; Game běžel9min11,3s. Chůze přes skutečný severní portál a schody doB6:0/zpět, F-on amedium/high/low +day/night/golden/real,10persistentpreviewcyklů na stejnémrenderer3, Sam/detail→Alex. Vyššípatra, přesné původnímístopádu, řízenýfault/restart a úplné funkční/FPSpřijetí zůstávají neověřené. Proto KEY-39spec zůstává in-progress; dílčíGPUtest se nepovyšuje na uzavřenou přejímku. Doloženézáseky8,001s/7,075s/6,564s patří nadáleKEY-31.
+
 ## Spec Change Log
 
 ## Review Triage Log
@@ -80,6 +86,8 @@ Kroky01/02 BMAD pokračují konkrétním child KEY-39 v již schváleném cíli,
 Předběžný statický review shadow factory: `[]`,14/14CPU aTS2954/0. Health review prokázalo dvě mezery: pozdníRAF při0loops a inlinefault stále vydávalyend/submit. PinnedRED28/30 následoval `_processFrame` i `endFrame` terminalveto,32/32PASS/TS2956/0. Rootintegration reviewP2 našlo environment restore při cancel jižvadnéhoprewarm: vlastníRED1FAIL, sdílenýisRetired guard opraviloběcancel/tickcesty,42/42Game/UI/light/diagnosticsPASS a re-review[]. Zdravýtimeoutrestore zůstává.
 
 Navazující audit nutnéhranice odhalil ručnístartup/preview render-throw→endFrame předhealthreport. To je porušení jižschváleného invariantuno-invalid-submit, nikoli nováfunkce. Přidělen disjunktní callerfix, beznovýchhooků/profileru; skutečnýflush/submit je nutné odlišitod completioncheck counteru. Runtime GPU/pipeline přijetíje stáleotevřené.
+
+Ruční callery finálně47/47PASS aTS2987/0. Review prokázalo mikroúlohový závod mezi frame rejection a popErrorScope výsledkem; synchronní fail původní chybou jej opravil (pinned RED→green). Re-review bez nálezů. Následné přejmenování čistě privátního predikátu `active` na `canRenderFrame` předchází kolizi s cizím persistent-preview stavem;47/47 znovuPASS.
 
 ## Design Notes
 

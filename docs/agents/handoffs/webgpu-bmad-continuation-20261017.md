@@ -1,5 +1,11 @@
 # WebGPU: pokračování přes projektový BMAD
 
+## Aktuální checkpoint17.10.2026 po dokončení uživatelského testu
+
+Uživatel výslovně ukončil test a povolil ověřování. Runtime do main integrován pěti samostatnými commity do a2acbed; evidence59a6161. Native-v16:1260/1260 a combined-v5:1320/1320, oba fullbuild/strictTS/integration PASS. C5 Edge průchod má1559souvislýchrecords,0faults, skutečný vstup/recepci B6/zpět a10persistenteditorcyklů; stále bez celé přejímky a s vícesekundovými záseky. Novější [evidence](../../performance/evidence/webgpu-migration-20261016/safety-v16/README.md) má přednost před historickými stavy níže.
+
+BMADKEY31 krok03 dokončen včetně skutečného v14 inventáře; krok04 blind/edge bez nálezů, verification-gap našel jeden chybějící regresní test ponechaných konstant. Omezený inventářový experiment nyní prošel i kroky04/05 a jeho spec je done; celkový cíl zůstává otevřený. Jeho patch je samostatně v main5482afb4e9344e3a419023cb81c88c1013626a4e:37/37PASS, scopedTS2957/0, izolovaná mutace3FAIL/1PASS a re-review uzavřené. KEY39 implementace+integrace jsou hotové, acceptance/fault-restart zůstává výslovně otevřená. Nevytvářet duplicitní backlog ani označit celou migraci za Done. Navazující chat až po úplném cíli.
+
 Koordinátor `webgpu-migration-01a14497-root`, metadatový task `webgpu-bmad-continuation-20261017`, owner `webgpu-migration-01a14497-bmad`. Uživatel17.10 výslovně zadal pokračovat migračními tasky pomocí BMAD; původní úplný cíl KEY-22 se nemění.
 
 ## Převzaté podklady a rozhodnutí
