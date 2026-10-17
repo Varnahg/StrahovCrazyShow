@@ -2,7 +2,7 @@
 title: 'KEY-31: odstranit dlouhé čekání po změně světel a materiálů'
 type: 'bugfix'
 created: '2026-10-17'
-status: 'draft'
+status: 'ready-for-dev'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '86e0b6460514231b97d3159b640e85a7f2337c1f'
@@ -53,8 +53,11 @@ context:
 - [x] Implementovat a prověřit konzervativní receiver kandidát včetně společného Game gate a StableLightState.63 nativních/79 kombinovaných cílených testů, fullTS/QA build PASS; výkonový pilot kandidáta zamítl.
 - [x] Uložit experiment18701037dd3d8faae9b7bd1807ecfbf23e18aec4 a přesně jej vrátit db9018b8114770e0c71cd2e9b4000303d210b55e. Runtime není v main.
 - [x] Skutečný PBR/TreeWind/Fresh wrapper CPU proof: OFF render ruší připravené ON depth varianty, jejich další zdroj/defines jsou shodné, tokeny nové. GLSL/NullEngine není GPU přejímka.
-- [ ] V Edge použít existující UI benchmark přes první F a uložit compilation.start/end. Ověřit limity inventáře, generaci, před/po raw/body/odvozené skupiny a skutečný export.
-- [ ] Podle tohoto výsledku zvolit jeden další úzký zásah; před kódem doplnit konkrétní soubory/task/varianty. Technické rozhodnutí zůstává otevřené, nikoli lidské oprávnění.
+- [x] V Edge použít existující UI benchmark přes první F a uložit compilation.start/end. Všech80nových WGSL modulů známých, žádné raw/body ani nové odvozené duplicity, limity nedosaženy, health pending/errors0. [Úplná evidence](../../../docs/performance/evidence/webgpu-migration-20261016/hitches-v4/README.md).
+- [x] Zvolit další úzký zásah: exact async pipeline preparation pouze během stávajícího startupu, pod coverem a bez rozšíření variant. Hitches-v4 neposkytuje důvod pro identickou WGSL cache; stable torch mění fixed-cap výběr a vyžaduje širší redesign.
+- [ ] `webgpu-migrate-pipeline-20261016`: nový `client/webgpu-pipeline-preparation.ts` a stejnojmenný test. Vlastněné instance miss/callsite brány použijí native descriptor a token, bounded async pending/result; skutečnou pipeline zapíše původní synchronní cache cesta až při dalším aktuálním požadavku. Žádné pozdní async cache zápisy. Privátní pending signál neopustí vlastní draw/clear hranici; skutečné chyby zůstanou chybami.
+- [ ] Root `client/game.ts`: scope před prepareLighting až přes finální startup gate, helper frame completeness + pending/unconsumed vstupují do existující readiness. Incomplete RTT se musí znovu skutečně vykreslit. Zachovat dvě kompletní acceptance draws, timeouty, aktuální varianty, abort/dispose a ownership hooků. WebGL/fast nemění chování; žádná async scope během hraní.
+- [ ] Prototyp ověřit skutečnou pinned cache/draw/clear cestou, instancing/texture/MRT/MSAA descriptor parity, pending dedup/limity, rejection/abort/dispose/stalecontext, RTT retry a integrací readiness. Pak jediný QA startup pilot; teprve s doloženým přínosem širší stabilní pipeline.
 - [ ] U přijatého kandidáta dokončit refaktor, regrese, stabilní native i kombinovaný test/build/integraci, GPU obraz a srovnatelné cold/warm/startup měření; samostatný commit/main/Linear.
 
 **AC:** Given stejný přechod F/čas/quality/B6, when se použije kandidát, then musí zkrátit celou prodlevu při stejném světle/obrazu a bez nepřiznaného přesunu do startupu. Given výkonové tvrzení, then musí mít odpovídající produkční důkaz se zdrojem, GPU, rozlišením, p95/p99 a zdravým lifecycle. Neprovedené přejímky zůstávají neověřené.
@@ -62,14 +65,15 @@ context:
 ## Implementation Notes
 
 Záměr je stále schválené odstranění dlouhých záseků. Nejsou nové intent gaps ani nevratné kroky. Po negativním pilotu se workflow vrací k technickému plánování; nejde o požadavek na nové potvrzení. Frozen intent a původní baseline zůstávají beze změny.
+Vybraný navazující celek ověřuje async mechanismus na současných startup variantách. Nezakrývá gameplay neúplným obrazem ani netvrdí, že tím opravil první F; jeho budoucí varianty a shadow lifecycle zůstávají otevřené. Nenavyšuje coverage, takže nemůže skrytě přesunout B6 kompilace do načítání. Celý vstup→ready se musí změřit.
 Receiver pilot v b6:0:6179,5ms gap proti6344,2ms původní kontroly o3,681cm vedle. Trvalý ON light gate4,576ms proti0,018ms; časný shodný ambient má frame p50/p95/p99 33,7/41,0/45,2 proti30,4/39,3/42,8ms. Jeden pár není statistické A/B, ale nepodporuje přijetí. Oba receiver tasky jsou blokované na novém užitečném návrhu; parent cíl pokračuje.
-Startup inventáře mají0raw/body duplicit, ale29/28odvozených skupin po bezpečném odstranění nepoužitých defines. Neobsahují první F. Efektové počty nelze rozdělit na main/depth odečítáním. UI benchmark již poskytuje potřebné před/po snapshoty bez další diagnostické vrstvy.
+Startup inventáře mají0raw/body duplicit, ale29/28odvozených skupin po bezpečném odstranění nepoužitých defines. Nový UI benchmark první F obsahuje:728→808modulů,0raw/body opakování,38→38odvozených skupin/opakování. Žádné unknown/limited calls. Burst1062,2ms a6179,1ms gap jsou celé uvnitř okna; fence6265,1ms. Identická WGSL cache ani normalizace za účelem deduplikace nemají pro tento F doložený přínos. Pipeline descriptor identity z59calls neznáme; main/depth podíl nelze odečítat. Sběr samotného textového inventáře stál209,8msCPU, již započtených. Žádná další diagnostická vrstva nevznikla.
 
 ## Design Notes
 
 - Čistá normalizace generated WGSL const je menší varianta než cache, ale vyžaduje provenance, pozdější reference, zachování chyb a limity. Private per-engine processor bod musí být vlastněný a otestovaný. Pozdější komentované defines a effect.uniqueId zůstávají; přínos je hypotéza.
 - Přesný async prewarm potřebuje skutečné instance overrides, texture state a main/shadow descriptor, deduplikaci a generation guard před vložením. PBR future shadow identitu musí udržet přes OFF render; pouhé přidržení Effect refcountu nestačí.
-- Pevné sloty všech současných typů vyžadují union HEMI+DIR+3POINT+SPOT, tedy6shaderových slotů při4fyzicky aktivních světlech. Je to širší nezměřená změna budgetu/bindingů/stínů. Naivní intensity0, vypnutí stínů, falešné ready a delší watchdog nejsou řešení.
+- Původní odhad6pevných slotů nebyl úplný: místní pěší svítilna a auto vzdáleného řidiče mohou mít současně2SPOT. Union je nejméně HEMI+DIR+3POINT+2SPOT; current art budget omezuje ulice, nikoli všechny non-street zdroje. Naivní intensity0 může změnit výběr fixed-cap materiálů. Jde o širší nezměřenou změnu, nikoli bezpečný jednořádkový fix. Vypnutí stínů, falešné ready a delší watchdog nejsou řešení.
 
 ## Verification
 
@@ -79,6 +83,8 @@ Full pnpm test/build/izolovaná integration se pro zamítnutý receiver pokus ne
 ## Spec Change Log
 
 17.10: první implementační varianta po GPU pilotu zamítnuta a vrácena. Další rozhodnutí se opírá o skutečný lifecycle proof a chybějící runtime inventář; status draft znamená technický průzkum, ne čekání na souhlas.
+
+17.10 21:10UTC: doplněn skutečný inventář prvního F. Deduplikační hypotéza pro tento burst nepotvrzena. Výzkum další změny porovnává stabilní fyzickou skladbu světel a přesnou async přípravu; nelze pouze zadržet obraz do kompilace a nazvat to odstraněním záseku.
 
 ## Review Triage Log
 
