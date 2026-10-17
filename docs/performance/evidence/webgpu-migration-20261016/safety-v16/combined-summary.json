@@ -1,0 +1,975 @@
+{
+  "atUTC": "2026-10-17T17:41:33.936Z",
+  "kind": "combined-correctness-walkthrough-not-performance-acceptance",
+  "snapshotId": "c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5",
+  "nativeSource": "8363c7603028a5a11b2f3d54f7a702c34ccfb608",
+  "mainRuntimeCommit": "a2acbed882412138713780f530a260c34253411d",
+  "sessionId": "4ecc6280-d257-4858-ada1-3ab856ce4691",
+  "url": "http://127.0.0.1:4193/?renderBackend=webgpu",
+  "recordRange": [
+    0,
+    1558
+  ],
+  "records": 1559,
+  "prefixBytes": 8244310,
+  "prefixSha256": "e969f8a582137109be1be7aae90201f94b38921b93e249fde37e7ba72a2c391b",
+  "entry": {
+    "seq": 30,
+    "atMs": 10642,
+    "kind": "mode-change",
+    "data": {
+      "mode": "multi"
+    }
+  },
+  "ready": {
+    "seq": 227,
+    "atMs": 45993.3,
+    "kind": "game-ready",
+    "data": {
+      "mode": "multi"
+    }
+  },
+  "startupMs": 35351.3,
+  "frameWindows": 531,
+  "frameFrom": 38729,
+  "frameTo": 597239.099999994,
+  "faults": [],
+  "zones": [
+    "outside",
+    "b6:0"
+  ],
+  "qualities": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "route": [
+    {
+      "seq": 231,
+      "atMs": 46040.7,
+      "zone": "outside",
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      }
+    },
+    {
+      "seq": 790,
+      "atMs": 315584,
+      "zone": "b6:0",
+      "position": {
+        "x": -5.164730548858643,
+        "y": 2.6211495399475098,
+        "z": -77.05072784423828
+      }
+    },
+    {
+      "seq": 794,
+      "atMs": 317325.5,
+      "zone": "outside",
+      "position": {
+        "x": -5.164627552032471,
+        "y": 2.619992733001709,
+        "z": -77.20404052734375
+      }
+    },
+    {
+      "seq": 814,
+      "atMs": 324117.4,
+      "zone": "b6:0",
+      "position": {
+        "x": -5.166438102722168,
+        "y": 2.6200520992279053,
+        "z": -74.13735961914062
+      }
+    },
+    {
+      "seq": 1091,
+      "atMs": 439746.1,
+      "zone": "outside",
+      "position": {
+        "x": -5.164423942565918,
+        "y": 2.620171546936035,
+        "z": -77.44651794433594
+      }
+    }
+  ],
+  "endPosition": {
+    "x": -5.156938552856445,
+    "y": 0.820099949836731,
+    "z": -89.94512939453125
+  },
+  "actions": [
+    "Multi Alex at persisted low quality, actual active/unfrozen Edge1512x642",
+    "Medium/day; W10s north, A12s west to building wall, W15s north, A16s west",
+    "Normal mouse drag180deg, W4s to stairs, W4s andW1.5s through portal to reception; no jumping",
+    "F on in B6; night; high; low; golden; actual time; S4s thenS3s back outside",
+    "Open ready persistent editor then10close/reopen cycles; all closed and frontEnabled true; Sam+face thenrestoreAlex",
+    "Exit through UI; menu kept available for user"
+  ],
+  "events": [
+    {
+      "seq": 15,
+      "atMs": 1807.2,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "engine-ready",
+        "engineStartupWallMs": 104.09999999403954,
+        "scope": "asynchronous engine initialization wall time; not CPU or GPU execution"
+      }
+    },
+    {
+      "seq": 16,
+      "atMs": 1902.6,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "create",
+        "sceneCpuMs": 13.199999988079071,
+        "rigCpuMs": 80.90000000596046,
+        "totalCpuMs": 94.09999999403954,
+        "scope": "synchronous surface creation only; asynchronous engine initialization excluded",
+        "meshes": 27,
+        "materials": 8,
+        "textures": 8
+      }
+    },
+    {
+      "seq": 18,
+      "atMs": 1952,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "frame",
+        "rendererId": 1,
+        "frames": 1,
+        "renderCpuMs": 7.800000011920929,
+        "readinessCpuMs": 4.799999982118607,
+        "preparationAgeMs": 144.7000000178814,
+        "activationAgeMs": null,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 23,
+      "atMs": 2378.3,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "ready-frame",
+        "rendererId": 1,
+        "frames": 7,
+        "preparationAgeMs": 570.9000000059605,
+        "scope": "validated submitted preview frame; no FPS claim"
+      }
+    },
+    {
+      "seq": 28,
+      "atMs": 10633.5,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 1
+      }
+    },
+    {
+      "seq": 29,
+      "atMs": 10634.6,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "dispose",
+        "builds": 1
+      }
+    },
+    {
+      "seq": 30,
+      "atMs": 10642,
+      "kind": "mode-change",
+      "data": {
+        "mode": "multi"
+      }
+    },
+    {
+      "seq": 33,
+      "atMs": 10806,
+      "kind": "quality-change",
+      "data": {
+        "rendering": {
+          "mode": "auto",
+          "quality": "medium",
+          "targetFps": 60,
+          "effectiveTargetFps": 60,
+          "presentationHz": null,
+          "hardwareScaling": 1,
+          "renderScale": 1,
+          "budgets": {
+            "architectureDetailMetres": 76,
+            "avatarNearMetres": 15,
+            "avatarMediumMetres": 60,
+            "grassRangeMetres": 45,
+            "grassTiles": 24,
+            "grassDensity": 0.65,
+            "b6PropRadiusMetres": 18,
+            "shadowMapSize": 1024,
+            "postProcesses": true
+          },
+          "reason": "warmup",
+          "revision": 0,
+          "statistics": null
+        }
+      }
+    },
+    {
+      "seq": 37,
+      "atMs": 10813.7,
+      "kind": "quality-change",
+      "data": {
+        "rendering": {
+          "mode": "low",
+          "quality": "low",
+          "targetFps": 60,
+          "effectiveTargetFps": 60,
+          "presentationHz": null,
+          "hardwareScaling": 1.3,
+          "renderScale": 0.7692307692307692,
+          "budgets": {
+            "architectureDetailMetres": 55,
+            "avatarNearMetres": 10,
+            "avatarMediumMetres": 36,
+            "grassRangeMetres": 35,
+            "grassTiles": 16,
+            "grassDensity": 0.375,
+            "b6PropRadiusMetres": 13,
+            "shadowMapSize": 512,
+            "postProcesses": false
+          },
+          "reason": "manual",
+          "revision": 1,
+          "statistics": null
+        }
+      }
+    },
+    {
+      "seq": 41,
+      "atMs": 12382.4,
+      "kind": "quality-change",
+      "data": {
+        "rendering": {
+          "mode": "low",
+          "quality": "low",
+          "targetFps": 60,
+          "effectiveTargetFps": 59.9,
+          "presentationHz": 59.9,
+          "hardwareScaling": 1.3,
+          "renderScale": 0.7692307692307692,
+          "budgets": {
+            "architectureDetailMetres": 55,
+            "avatarNearMetres": 10,
+            "avatarMediumMetres": 36,
+            "grassRangeMetres": 35,
+            "grassTiles": 16,
+            "grassDensity": 0.375,
+            "b6PropRadiusMetres": 13,
+            "shadowMapSize": 512,
+            "postProcesses": false
+          },
+          "reason": "manual",
+          "revision": 2,
+          "statistics": null
+        }
+      }
+    },
+    {
+      "seq": 227,
+      "atMs": 45993.3,
+      "kind": "game-ready",
+      "data": {
+        "mode": "multi"
+      }
+    },
+    {
+      "seq": 384,
+      "atMs": 127386.9,
+      "kind": "quality-change",
+      "data": {
+        "rendering": {
+          "mode": "medium",
+          "quality": "medium",
+          "targetFps": 60,
+          "effectiveTargetFps": 59.9,
+          "presentationHz": 59.9,
+          "hardwareScaling": 1,
+          "renderScale": 1,
+          "budgets": {
+            "architectureDetailMetres": 76,
+            "avatarNearMetres": 15,
+            "avatarMediumMetres": 60,
+            "grassRangeMetres": 45,
+            "grassTiles": 24,
+            "grassDensity": 0.65,
+            "b6PropRadiusMetres": 18,
+            "shadowMapSize": 1024,
+            "postProcesses": true
+          },
+          "reason": "manual",
+          "revision": 3,
+          "statistics": {
+            "durationMs": 2014.699999988079,
+            "samples": 121,
+            "averageFps": 60.055588644567145,
+            "medianFrameMs": 16.69999998807907,
+            "p95FrameMs": 16.900000005960464,
+            "p99FrameMs": 18.400000005960464,
+            "slowFrameFraction": 0.008264462809917356,
+            "averageCpuFrameMs": 12.829752065918662,
+            "averageGpuFrameMs": null
+          }
+        }
+      }
+    },
+    {
+      "seq": 918,
+      "atMs": 373030.4,
+      "kind": "quality-change",
+      "data": {
+        "rendering": {
+          "mode": "high",
+          "quality": "high",
+          "targetFps": 60,
+          "effectiveTargetFps": 59.9,
+          "presentationHz": 59.9,
+          "hardwareScaling": 1,
+          "renderScale": 1,
+          "budgets": {
+            "architectureDetailMetres": 100,
+            "avatarNearMetres": 22,
+            "avatarMediumMetres": 90,
+            "grassRangeMetres": 60,
+            "grassTiles": 32,
+            "grassDensity": 1,
+            "b6PropRadiusMetres": 24,
+            "shadowMapSize": 2048,
+            "postProcesses": true
+          },
+          "reason": "manual",
+          "revision": 4,
+          "statistics": {
+            "durationMs": 2003.5999999940395,
+            "samples": 74,
+            "averageFps": 36.933519664713586,
+            "medianFrameMs": 26,
+            "p95FrameMs": 31.900000005960464,
+            "p99FrameMs": 37.29999998211861,
+            "slowFrameFraction": 1,
+            "averageCpuFrameMs": 26.094594592580926,
+            "averageGpuFrameMs": null
+          }
+        }
+      }
+    },
+    {
+      "seq": 985,
+      "atMs": 397217.5,
+      "kind": "quality-change",
+      "data": {
+        "rendering": {
+          "mode": "low",
+          "quality": "low",
+          "targetFps": 60,
+          "effectiveTargetFps": 59.9,
+          "presentationHz": 59.9,
+          "hardwareScaling": 1.3,
+          "renderScale": 0.7692307692307692,
+          "budgets": {
+            "architectureDetailMetres": 55,
+            "avatarNearMetres": 10,
+            "avatarMediumMetres": 36,
+            "grassRangeMetres": 35,
+            "grassTiles": 16,
+            "grassDensity": 0.375,
+            "b6PropRadiusMetres": 13,
+            "shadowMapSize": 512,
+            "postProcesses": false
+          },
+          "reason": "manual",
+          "revision": 5,
+          "statistics": {
+            "durationMs": 2013.5999999940395,
+            "samples": 68,
+            "averageFps": 33.770361541617646,
+            "medianFrameMs": 28.599999994039536,
+            "p95FrameMs": 38.80000001192093,
+            "p99FrameMs": 42.19999998807907,
+            "slowFrameFraction": 1,
+            "averageCpuFrameMs": 28.50441176531946,
+            "averageGpuFrameMs": null
+          }
+        }
+      }
+    },
+    {
+      "seq": 1155,
+      "atMs": 464953.6,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "engine-ready",
+        "engineStartupWallMs": 172.2000000178814,
+        "scope": "asynchronous engine initialization wall time; not CPU or GPU execution"
+      }
+    },
+    {
+      "seq": 1156,
+      "atMs": 464989.6,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "create",
+        "sceneCpuMs": 3.800000011920929,
+        "rigCpuMs": 31.599999994039536,
+        "totalCpuMs": 35.400000005960464,
+        "scope": "synchronous surface creation only; asynchronous engine initialization excluded",
+        "meshes": 27,
+        "materials": 8,
+        "textures": 8
+      }
+    },
+    {
+      "seq": 1159,
+      "atMs": 465181,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "frame",
+        "rendererId": 3,
+        "frames": 1,
+        "renderCpuMs": 2.600000023841858,
+        "readinessCpuMs": 0.699999988079071,
+        "preparationAgeMs": 227.30000001192093,
+        "activationAgeMs": null,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1172,
+      "atMs": 465923.6,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "frame",
+        "rendererId": 3,
+        "frames": 2,
+        "renderCpuMs": 3,
+        "readinessCpuMs": 84.40000000596046,
+        "preparationAgeMs": 970,
+        "activationAgeMs": null,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1178,
+      "atMs": 466330.2,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "ready-frame",
+        "rendererId": 3,
+        "frames": 3,
+        "preparationAgeMs": 1376.5999999940395,
+        "scope": "validated submitted preview frame; no FPS claim"
+      }
+    },
+    {
+      "seq": 1286,
+      "atMs": 515412.5,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1289,
+      "atMs": 516130.7,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": true,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1291,
+      "atMs": 516238.8,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "resume-frame",
+        "rendererId": 3,
+        "frames": 4,
+        "renderCpuMs": 1.0999999940395355,
+        "readinessCpuMs": 0.09999999403953552,
+        "preparationAgeMs": 51285.19999998808,
+        "activationAgeMs": 108.09999999403954,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1294,
+      "atMs": 516839.4,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1297,
+      "atMs": 517502.8,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": true,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1299,
+      "atMs": 517611,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "resume-frame",
+        "rendererId": 3,
+        "frames": 6,
+        "renderCpuMs": 0.5,
+        "readinessCpuMs": 0.09999999403953552,
+        "preparationAgeMs": 52657.40000000596,
+        "activationAgeMs": 108.2000000178814,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1301,
+      "atMs": 518245.1,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1305,
+      "atMs": 518907.2,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": true,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1307,
+      "atMs": 519008.9,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "resume-frame",
+        "rendererId": 3,
+        "frames": 8,
+        "renderCpuMs": 0.7000000178813934,
+        "readinessCpuMs": 0,
+        "preparationAgeMs": 54055.30000001192,
+        "activationAgeMs": 101.7000000178814,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1309,
+      "atMs": 519654.2,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1311,
+      "atMs": 520343.8,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": true,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1313,
+      "atMs": 520452.9,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "resume-frame",
+        "rendererId": 3,
+        "frames": 10,
+        "renderCpuMs": 1,
+        "readinessCpuMs": 0,
+        "preparationAgeMs": 55499.30000001192,
+        "activationAgeMs": 109.10000002384186,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1316,
+      "atMs": 521060.8,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1319,
+      "atMs": 521752.4,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": true,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1321,
+      "atMs": 521849.4,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "resume-frame",
+        "rendererId": 3,
+        "frames": 12,
+        "renderCpuMs": 0.4000000059604645,
+        "readinessCpuMs": 0,
+        "preparationAgeMs": 56895.80000001192,
+        "activationAgeMs": 97,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1323,
+      "atMs": 522480.9,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1327,
+      "atMs": 523162.1,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": true,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1329,
+      "atMs": 523259.1,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "resume-frame",
+        "rendererId": 3,
+        "frames": 14,
+        "renderCpuMs": 0.4000000059604645,
+        "readinessCpuMs": 0.09999999403953552,
+        "preparationAgeMs": 58305.5,
+        "activationAgeMs": 97,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1331,
+      "atMs": 523885.1,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1334,
+      "atMs": 524596.9,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": true,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1336,
+      "atMs": 524707.7,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "resume-frame",
+        "rendererId": 3,
+        "frames": 16,
+        "renderCpuMs": 0.5,
+        "readinessCpuMs": 0,
+        "preparationAgeMs": 59754.09999999404,
+        "activationAgeMs": 110.7999999821186,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1338,
+      "atMs": 525331.8,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1341,
+      "atMs": 526006.7,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": true,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1343,
+      "atMs": 526102.4,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "resume-frame",
+        "rendererId": 3,
+        "frames": 18,
+        "renderCpuMs": 0.699999988079071,
+        "readinessCpuMs": 0,
+        "preparationAgeMs": 61148.80000001192,
+        "activationAgeMs": 95.7000000178814,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1346,
+      "atMs": 526729.1,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1349,
+      "atMs": 527429.2,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": true,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1351,
+      "atMs": 527494.2,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "resume-frame",
+        "rendererId": 3,
+        "frames": 20,
+        "renderCpuMs": 0.699999988079071,
+        "readinessCpuMs": 0.09999999403953552,
+        "preparationAgeMs": 62540.59999999404,
+        "activationAgeMs": 65,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1353,
+      "atMs": 528194.6,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1357,
+      "atMs": 528880,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": true,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1359,
+      "atMs": 528973.3,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "resume-frame",
+        "rendererId": 3,
+        "frames": 22,
+        "renderCpuMs": 0.4000000059604645,
+        "readinessCpuMs": 0.09999999403953552,
+        "preparationAgeMs": 64019.69999998808,
+        "activationAgeMs": 93.2999999821186,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1386,
+      "atMs": 537510.4,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "update",
+        "rigCpuMs": 18.80000001192093,
+        "builds": 2,
+        "meshes": 30,
+        "materials": 9,
+        "textures": 11
+      }
+    },
+    {
+      "seq": 1401,
+      "atMs": 538923.5,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "ready-frame",
+        "rendererId": 3,
+        "frames": 25,
+        "preparationAgeMs": 1690.9000000059605,
+        "scope": "validated submitted preview frame; no FPS claim"
+      }
+    },
+    {
+      "seq": 1496,
+      "atMs": 580193.7,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "update",
+        "rigCpuMs": 16.900000005960464,
+        "builds": 3,
+        "meshes": 27,
+        "materials": 8,
+        "textures": 11
+      }
+    },
+    {
+      "seq": 1500,
+      "atMs": 580391.8,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "ready-frame",
+        "rendererId": 3,
+        "frames": 27,
+        "preparationAgeMs": 342.2999999821186,
+        "scope": "validated submitted preview frame; no FPS claim"
+      }
+    },
+    {
+      "seq": 1505,
+      "atMs": 581003.8,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "active",
+        "active": false,
+        "rendererId": 3
+      }
+    },
+    {
+      "seq": 1543,
+      "atMs": 597276.8,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "dispose",
+        "builds": 3
+      }
+    },
+    {
+      "seq": 1550,
+      "atMs": 599301.1,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "engine-ready",
+        "engineStartupWallMs": 278.90000000596046,
+        "scope": "asynchronous engine initialization wall time; not CPU or GPU execution"
+      }
+    },
+    {
+      "seq": 1551,
+      "atMs": 599338.7,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "create",
+        "sceneCpuMs": 2,
+        "rigCpuMs": 35.400000005960464,
+        "totalCpuMs": 37.400000005960464,
+        "scope": "synchronous surface creation only; asynchronous engine initialization excluded",
+        "meshes": 27,
+        "materials": 8,
+        "textures": 8
+      }
+    },
+    {
+      "seq": 1552,
+      "atMs": 599379,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "frame",
+        "rendererId": 4,
+        "frames": 1,
+        "renderCpuMs": 1.399999976158142,
+        "readinessCpuMs": 0.699999988079071,
+        "preparationAgeMs": 77.80000001192093,
+        "activationAgeMs": null,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1555,
+      "atMs": 599517,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "frame",
+        "rendererId": 4,
+        "frames": 2,
+        "renderCpuMs": 2.300000011920929,
+        "readinessCpuMs": 93.90000000596046,
+        "preparationAgeMs": 215.80000001192093,
+        "activationAgeMs": null,
+        "scope": "CPU wall intervals for displayed-mesh readiness and scene.render; GPU completion checked separately"
+      }
+    },
+    {
+      "seq": 1557,
+      "atMs": 599696.4,
+      "kind": "avatar-preview",
+      "data": {
+        "phase": "ready-frame",
+        "rendererId": 4,
+        "frames": 9,
+        "preparationAgeMs": 395.2000000178814,
+        "scope": "validated submitted preview frame; no FPS claim"
+      }
+    }
+  ],
+  "limits": [
+    "Only outside and B6:0 reception, no upper floors/two stairs and no exact old user fault position",
+    "One real multiplayer client; no remote avatarLOD cohort or fault injection/restart",
+    "No clean comparable FPS series; qualities/lights/camera/scene/preview changed",
+    "Pre-ready first frame-hitch is not a post-ready game hitch",
+    "Capture is immutable JSONL prefix; menu session may append later"
+  ],
+  "uiHealthBeforeExit": {
+    "bootStage": "ready",
+    "renderHealth": "ready",
+    "renderErrorCount": 0
+  }
+}

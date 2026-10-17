@@ -1,0 +1,203 @@
+{
+  "sourceCommit": "779c1218de601d8ec6b4b921d8ca4ceff76afed6",
+  "snapshotId": "0a7ee48a4ec6dc7c260c1e204d322dfd4cea04c1fc9849efeafcd11659e25ed0",
+  "sessionId": "a3930f53-1a85-4add-92a6-77a4e0b2b2dc",
+  "scope": "Diagnostic profileEnvironment=1; one production startup, not FPS acceptance. Inventory captured at preparation end, before final submission gate.",
+  "events": {
+    "mode-change": {
+      "seq": 18,
+      "atMs": 9957.4
+    },
+    "lighting-preparation": {
+      "seq": 253,
+      "atMs": 44998
+    },
+    "webgpu-preparation-profile": {
+      "seq": 254,
+      "atMs": 44999
+    },
+    "game-ready": {
+      "seq": 259,
+      "atMs": 57104.9
+    }
+  },
+  "modeToReadyMs": 47147.5,
+  "lightingElapsedMs": 24475,
+  "tailAfterLightingEventMs": 12106.900000000001,
+  "inventory": {
+    "enabled": true,
+    "scope": "Per-device successful module calls; exact text equality confirms duplicates. Body identity only from observed pinned WGSL prefix construction. Unknown/limited calls are not evidence of uniqueness.",
+    "overheadScope": "Capture/setStage CPU only; nested inside engine timings. Snapshot/serialization cost excluded. Text limit counts UTF-16 code units, not total JavaScript heap. Diagnostic overhead, not a performance improvement.",
+    "limits": {
+      "maxEntries": 1024,
+      "maxCodeUnits": 33554432,
+      "maxStages": 16,
+      "maxRows": 16
+    },
+    "calls": 662,
+    "rawKnown": 662,
+    "rawRepeated": 0,
+    "bodyKnown": 662,
+    "bodyRepeated": 0,
+    "descriptorUnknown": 0,
+    "bodyUnknown": 0,
+    "limited": 0,
+    "rawHashConflicts": 0,
+    "bodyHashConflicts": 0,
+    "unrecognizedPrefix": 0,
+    "stageOverflow": 0,
+    "ambiguousBodies": 0,
+    "evidenceTruncated": false,
+    "retainedEntries": 662,
+    "retainedCodeUnits": 19972253,
+    "released": false,
+    "cpuTotalMs": 264.89999905228615,
+    "cpuMaxMs": 2,
+    "stages": [
+      {
+        "name": "unassigned",
+        "calls": 0,
+        "rawKnown": 0,
+        "rawRepeated": 0,
+        "bodyKnown": 0,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "construction",
+        "calls": 2,
+        "rawKnown": 2,
+        "rawRepeated": 0,
+        "bodyKnown": 2,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "assets",
+        "calls": 32,
+        "rawKnown": 32,
+        "rawRepeated": 0,
+        "bodyKnown": 32,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "current-off",
+        "calls": 92,
+        "rawKnown": 92,
+        "rawRepeated": 0,
+        "bodyKnown": 92,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "current-on",
+        "calls": 98,
+        "rawKnown": 98,
+        "rawRepeated": 0,
+        "bodyKnown": 98,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-0-off",
+        "calls": 82,
+        "rawKnown": 82,
+        "rawRepeated": 0,
+        "bodyKnown": 82,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-0-on",
+        "calls": 88,
+        "rawKnown": 88,
+        "rawRepeated": 0,
+        "bodyKnown": 88,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-1-off",
+        "calls": 4,
+        "rawKnown": 4,
+        "rawRepeated": 0,
+        "bodyKnown": 4,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-1-on",
+        "calls": 0,
+        "rawKnown": 0,
+        "rawRepeated": 0,
+        "bodyKnown": 0,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-2-off",
+        "calls": 86,
+        "rawKnown": 86,
+        "rawRepeated": 0,
+        "bodyKnown": 86,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "night-2-on",
+        "calls": 92,
+        "rawKnown": 92,
+        "rawRepeated": 0,
+        "bodyKnown": 92,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      },
+      {
+        "name": "restore",
+        "calls": 86,
+        "rawKnown": 86,
+        "rawRepeated": 0,
+        "bodyKnown": 86,
+        "bodyRepeated": 0,
+        "descriptorUnknown": 0,
+        "bodyUnknown": 0,
+        "limited": 0
+      }
+    ],
+    "rawDuplicateGroups": 0,
+    "bodyDuplicateGroups": 0,
+    "exportTruncated": false,
+    "rawDuplicates": [],
+    "bodyDuplicates": []
+  },
+  "validation": {
+    "targetedTests": 44,
+    "buildAndTypeScript": "PASS",
+    "fullSuite": "NOT RUN",
+    "integration": "NOT RUN"
+  },
+  "decision": "No exact raw/body duplicates observed among 662 fully recognized retained calls. Do not add exact-source cache or strip known outer prefix based on this run. Next observation examines proven-unused generated scalar constants; no runtime transformation authorized by this evidence."
+}
