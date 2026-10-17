@@ -490,6 +490,25 @@ test("actual Game cancellation settles pending new effects without restoring dis
   assert.equal(f.game.cancelLightPreparation, undefined);
 });
 
+test("retired renderer cancels lighting without restoring environment or issuing another draw", async (t) => {
+  for (const explicitCancel of [true, false]) {
+    const f = fixture(t);
+    f.effects(false);
+    const pending = f.start();
+    f.tick();
+    const states = f.states.length, draws = f.draws;
+    f.game.rendererFailed = true;
+    assert.equal(f.game.disposed, false, "failure precedes final scene disposal");
+    if (explicitCancel) f.game.cancelLightPreparation();
+    else f.tick();
+    assert.equal((await pending).status, "disposed");
+    assert.equal(f.states.length, states, "no restore/upload after a terminal fault");
+    assert.equal(f.draws, draws);
+    assert.equal(f.game.cancelLightPreparation, undefined);
+    assert.equal(f.hasTimer, false);
+  }
+});
+
 test("actual Game timeout reports incomplete work and restores OFF while allowing startup caller to decide", async (t) => {
   const f = fixture(t);
   f.effects(false);

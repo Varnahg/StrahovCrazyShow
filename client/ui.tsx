@@ -297,6 +297,7 @@ export function App() {
         !!room.current &&
         connectedRef.current &&
         modeRef.current === "multi" &&
+        game.current?.ready === true &&
         !game.current?.respawnPending,
       send: (inputs) => room.current!.send("inputs", inputs),
       onOverflow: (snapshot) => {
@@ -537,6 +538,7 @@ export function App() {
           userBenchmark.current = false;
           setReady(false);
           setError(message);
+          inputBuffer.current?.reset("renderer-failure");
         };
         g.network = mode === "multi";
         syncNetworkStage(g);
@@ -554,6 +556,8 @@ export function App() {
         g.onNotice = notice;
         g.onInput = (input) => {
           if (
+            game.current === g &&
+            g.ready &&
             room.current &&
             modeRef.current === "multi" &&
             connectedRef.current
@@ -562,7 +566,7 @@ export function App() {
           }
         };
         g.onInputFrame = () => {
-          inputBuffer.current?.flush("frame");
+          if (game.current === g && g.ready) inputBuffer.current?.flush("frame");
         };
         g.onBeforeInputFrame = drainAuthorities;
         g.onNetworkDiagnostics = () =>
