@@ -7,7 +7,7 @@ import ts from "typescript";
 // Execute the actual UI effect. Replace imports/GPU IO, not startup ownership.
 const source = ts.createSourceFile(
   "ui.tsx",
-  readFileSync(new URL("../client/ui.tsx", import.meta.url), "utf8"),
+  readFileSync(process.env.GAME_UI_SOURCE ?? new URL("../client/ui.tsx", import.meta.url), "utf8"),
   ts.ScriptTarget.Latest,
   true,
   ts.ScriptKind.TSX,
@@ -56,7 +56,7 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(
-  `(function(env) { const exports={}; const {mode,canvas,sessionDiagnostics,modeRef,loadModule,profileRef,game,lightingPreviewRef,idRef,setStats,userBenchmark,setBenchmark,benchmarkBuildIdentity,saveLocalBenchmark,setWorldSelection,notice,weatherRef,quality,targetFps,syncNetworkStage,drainAuthorities,setReady,setError,t,getRendererInfo,testImportMeta}=env; ${compiled}; return runEffect(); })`,
+  `(function(env) { const exports={}; const {mode,canvas,sessionDiagnostics,modeRef,loadModule,profileRef,game,lightingPreviewRef,idRef,setStats,userBenchmark,setBenchmark,benchmarkBuildIdentity,saveLocalBenchmark,setWorldSelection,notice,weatherRef,quality,targetFps,syncNetworkStage,drainAuthorities,setReady,setError,t,getRendererInfo,testImportMeta,inputBuffer}=env; ${compiled}; return runEffect(); })`,
 ).runInThisContext();
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
@@ -79,6 +79,7 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
     ready = false;
   const errors: string[] = [];
   const events: string[] = [];
+  const inputResets: string[] = [];
   const canvas = { current: {} };
   const initialCanvas = canvas.current;
   class Game {
@@ -122,6 +123,7 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
       name === "./game" ? { Game } : { createGameEngine: () => promise },
     setStats: noop,
     userBenchmark: { current: false },
+    inputBuffer: { current: { reset: (reason: string) => inputResets.push(reason) } },
     setBenchmark: noop,
     benchmarkBuildIdentity: null,
     saveLocalBenchmark: noop,
@@ -148,6 +150,7 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
     cleanup,
     errors,
     events,
+    inputResets,
     state,
     stats: () => ({ gameCount, gameDisposals, ready }),
   };
@@ -233,10 +236,12 @@ test("a live renderer failure clears UI ready and a retired callback cannot alte
   callback("Device lost; restart required");
   assert.equal(f.stats().ready, false);
   assert.equal(f.errors.at(-1), "Device lost; restart required");
+  assert.deepEqual(f.inputResets, ["renderer-failure"]);
   f.cleanup();
   const count = f.errors.length;
   callback("retired renderer");
   assert.equal(f.errors.length, count);
+  assert.deepEqual(f.inputResets, ["renderer-failure"], "retired callback cannot reset a replacement queue");
 });
 
 test("loss between Game start settlement and UI continuation cannot announce game-ready", async () => {
@@ -247,4 +252,45 @@ test("loss between Game start settlement and UI continuation cannot announce gam
   assert.equal(f.stats().gameDisposals, 1);
   f.cleanup();
   assert.equal(f.engine.disposed, 1);
+});
+
+test("actual UI transport gate rejects absent, preparing and failed Game owners", () => {
+  let predicate: ts.Node | undefined;
+  const findPredicate = (node: ts.Node) => {
+    if (ts.isNewExpression(node) && node.expression.getText(source) === "FrameInputBuffer") {
+      const options = node.arguments?.[0];
+      if (options && ts.isObjectLiteralExpression(options)) {
+        const property = options.properties.find((entry) =>
+          ts.isPropertyAssignment(entry) && entry.name.getText(source) === "canSend",
+        ) as ts.PropertyAssignment | undefined;
+        predicate = property?.initializer;
+      }
+    }
+    ts.forEachChild(node, findPredicate);
+  };
+  findPredicate(source);
+  assert.ok(predicate);
+  const code = ts.transpileModule(`const canSend = ${predicate.getText(source)};`, {
+    compilerOptions: { target: ts.ScriptTarget.ES2022 },
+  }).outputText;
+  const create = new Script(`(function(env) {
+    const { room, connectedRef, modeRef, game } = env;
+    ${code}
+    return canSend;
+  })`).runInThisContext();
+  const game = { current: null as { ready: boolean; respawnPending: boolean } | null };
+  const connectedRef = { current: true }, modeRef = { current: "multi" };
+  const gate = create({ room: { current: {} }, connectedRef, modeRef, game });
+  assert.equal(gate(), false);
+  game.current = { ready: false, respawnPending: false };
+  assert.equal(gate(), false);
+  game.current.ready = true;
+  assert.equal(gate(), true);
+  game.current.ready = false;
+  assert.equal(gate(), false, "terminal renderer cannot send a queued packet");
+  game.current = { ready: true, respawnPending: true };
+  assert.equal(gate(), false);
+  game.current.respawnPending = false;
+  modeRef.current = "guest";
+  assert.equal(gate(), false);
 });

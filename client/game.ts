@@ -560,21 +560,29 @@ export class Game {
       this.renderErrorCount = health.errorCount;
       this.canvas.dataset.renderErrorCount = String(this.renderErrorCount);
       this.canvas.dataset.renderHealth = health.phase;
-      if (this.renderErrorCount <= 5)
-        sessionDiagnostics.event("render-fault", {
-          ...fault,
-          rendererId: health.rendererId,
-          purpose: health.purpose,
-          count: health.errorCount,
-        });
-      if (fault.channel === "device") {
-        this.handleRendererFailure("Grafické zařízení se odpojilo. Opusť demo a spusť scénu znovu.");
-        return;
+      try {
+        if (this.renderErrorCount <= 5)
+          sessionDiagnostics.event("render-fault", {
+            ...fault,
+            rendererId: health.rendererId,
+            purpose: health.purpose,
+            count: health.errorCount,
+          });
+      } finally {
+        if (health.phase === "invalid" || health.phase === "restart-required")
+          this.handleRendererFailure(fault.channel === "device"
+            ? "Grafické zařízení se odpojilo. Opusť demo a spusť scénu znovu."
+            : "Vykreslování se zastavilo. Opusť demo a spusť scénu znovu.");
       }
-      if (this.renderErrorCount === 1)
-        this.notice("Část prostředí se nepodařilo vykreslit. Obnov stránku.");
+    });
+    this.environmentProfile = createEnvironmentProfile(window.location, {
+      onSlowFrame: (sample) => sessionDiagnostics.event("environment-work", {
+        ...sample, rendererId: this.renderHealth.rendererId,
+      }),
     });
     this.compilationProfile = new WebGpuCompilationProfile(this.engine, {
+      captureShaderInventory: this.environmentProfile !== undefined,
+      captureUnusedDefineInventory: this.environmentProfile !== undefined,
       onError: (channel, error, label) => this.renderHealth.report(
         channel, `${label}: ${error instanceof Error ? error.message : String(error)}`,
       ),
@@ -584,11 +592,7 @@ export class Game {
         ...sample, rendererId: this.renderHealth.rendererId, purpose: "game",
       }),
     });
-    this.environmentProfile = createEnvironmentProfile(window.location, {
-      onSlowFrame: (sample) => sessionDiagnostics.event("environment-work", {
-        ...sample, rendererId: this.renderHealth.rendererId,
-      }),
-    });
+    this.compilationProfile.setStage("construction");
     if (this.environmentProfile) {
       sessionDiagnostics.event("environment-profiling", {
         rendererId: this.renderHealth.rendererId,
@@ -742,15 +746,26 @@ export class Game {
     if (this.disposed || this.rendererFailed) return;
     this.rendererFailed = true;
     this.ready = false;
-    this.startupAbort.abort();
-    this.disposeStartupAssets();
-    this.cancelLightPreparation?.();
-    this.engine.stopRenderLoop();
-    this.benchmark?.profile.dispose();
+    const attempt = (stage: string, cleanup: () => void) => {
+      try { cleanup(); }
+      catch (error) {
+        try {
+          sessionDiagnostics.event("renderer-failure-cleanup-error", {
+            stage, rendererId: this.renderHealth?.rendererId, message: String(error),
+          });
+        } catch { /* Failure reporting must not prevent remaining teardown/UI work. */ }
+      }
+    };
+    const benchmark = this.benchmark;
     this.benchmark = undefined;
-    this.blur();
-    this.notice(message);
-    this.onRendererFailure?.(message);
+    attempt("abort", () => this.startupAbort.abort());
+    attempt("startup-assets", () => this.disposeStartupAssets());
+    attempt("light-preparation", () => this.cancelLightPreparation?.());
+    attempt("render-loop", () => this.engine.stopRenderLoop());
+    attempt("benchmark", () => benchmark?.profile.dispose());
+    attempt("held-input", () => this.blur());
+    attempt("ui", () => this.onRendererFailure?.(message));
+    attempt("notice", () => this.notice(message));
   }
   private assertStartupActive() {
     const health = this.renderHealth.snapshot();
@@ -818,6 +833,7 @@ export class Game {
     this.sim = new Simulation();
     this.canvas.dataset.physicsStage = "ready";
     this.canvas.dataset.bootStage = "avatar-and-props";
+    this.compilationProfile.setStage("assets");
     this.actor = this.sim.add("local");
     // Streamed materials must be rendered while glTF assets finish their
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
@@ -940,6 +956,7 @@ export class Game {
       throw new Error(`Přípravu 3D scény se nepodařilo dokončit (${preparation.status}).`);
     }
     this.canvas.dataset.bootStage = "submitted-frame";
+    this.compilationProfile.setStage("submitted-frame");
     await waitForRenderStartup({
       engine: this.engine,
       health: this.renderHealth,
@@ -954,6 +971,7 @@ export class Game {
     });
     this.assertStartupActive();
     this.canvas.dataset.renderHealth = "ready";
+    this.compilationProfile.setStage("ready");
     this.ready = true;
     this.canvas.dataset.bootStage = "ready";
     this.engine.runRenderLoop(() => this.frame());
@@ -1092,6 +1110,7 @@ export class Game {
     };
   }
   updatePlayers(players: Player[]) {
+    if (this.disposed || this.rendererFailed) return;
     const ids = new Set(players.map((p) => p.id));
     for (const [id, a] of this.avatars)
       if (!ids.has(id)) {
@@ -1118,6 +1137,7 @@ export class Game {
     this.avatarPool.pruneUnused();
   }
   setProfile(profile: Profile) {
+    if (this.disposed || this.rendererFailed) return;
     this.profile = profile;
     this.localPlayer = { ...this.localPlayer, ...profile };
     const a = this.avatars.get(this.localId);
@@ -1414,6 +1434,7 @@ export class Game {
     this.weather = weather;
   }
   applyAdaptiveQuality(next: AdaptiveQualitySnapshot) {
+    if (this.disposed || this.rendererFailed) return;
     if (next.revision === this.appliedQualityRevision) return;
     this.appliedQualityRevision = next.revision;
     this.quality = next.quality;
@@ -1425,17 +1446,19 @@ export class Game {
       this.engine.setHardwareScalingLevel(next.hardwareScaling);
   }
   setQuality(mode: string) {
+    if (this.disposed || this.rendererFailed) return;
     if (isRenderQualityMode(mode))
       this.applyAdaptiveQuality(this.adaptive.setMode(mode));
   }
   setTargetFps(fps: number) {
+    if (this.disposed || this.rendererFailed) return;
     if (isRenderTargetFps(fps))
       this.applyAdaptiveQuality(this.adaptive.setTargetFps(fps));
   }
   startBenchmark() {
     if (!this.ready || this.disposed || this.rendererFailed) return false;
-    // Keep failed-render raw samples available for diagnosis. Their start/end
-    // health and error counts invalidate performance claims in UI and reports.
+    // Faulted renderers retain automatic diagnostic records, but cannot start
+    // another performance sample until a fresh Game has completed preparation.
     this.benchmark?.profile.dispose();
     sessionDiagnostics.event("benchmark-start", {
       rendererId: this.renderHealth.rendererId,
@@ -1561,7 +1584,9 @@ export class Game {
     else if (this.sim && data.parked)
       this.sim.setParkedCar({ x: data.x, y: data.y, z: data.z }, data.yaw);
   }
-  resize = () => this.engine.resize();
+  resize = () => {
+    if (!this.disposed && !this.rendererFailed) this.engine.resize();
+  };
   private clearHeldInput() {
     this.keys.clear();
     this.orbiting = false;
@@ -2290,6 +2315,7 @@ export class Game {
     return lighting;
   }
   private prepareLighting(render: () => void) {
+    const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
     // The same controller/materials survive into gameplay; no proxy shaders.
     this.flashlight ??= new PlayerFlashlight(this.scene);
     const night = selectLightingPreview("night").instant!;
@@ -2359,22 +2385,21 @@ export class Game {
       }
     };
     const restore = () => {
-      if (!this.disposed)
+      if (!isRetired()) {
+        this.compilationProfile.setStage("restore");
         apply(this.timeOverride ?? Date.now(), this.flashlightOn);
+      }
     };
     return prepareLightVariants({
-      apply: (stage) =>
-        stage === "restore"
-          ? restore()
-          : apply(
-              stage.startsWith("night")
-                ? night
-                : (this.timeOverride ?? Date.now()),
-              stage.endsWith("-on"),
-              stage.startsWith("night-")
-                ? Number(stage.split("-")[1])
-                : undefined,
-            ),
+      apply: (stage) => {
+        if (stage === "restore") return restore();
+        this.compilationProfile.setStage(stage);
+        apply(
+          stage.startsWith("night") ? night : (this.timeOverride ?? Date.now()),
+          stage.endsWith("-on"),
+          stage.startsWith("night-") ? Number(stage.split("-")[1]) : undefined,
+        );
+      },
       restore,
       // The first progress draw establishes the actual active list, including
       // the real torch prop, instancing and currently selected avatar meshes.
@@ -2408,7 +2433,7 @@ export class Game {
             this.cancelLightPreparation = undefined;
         };
       },
-      isDisposed: () => this.disposed || this.scene.isDisposed,
+      isDisposed: isRetired,
       revision: () => [
         this.quality,
         this.timeOverride,

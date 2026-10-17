@@ -32,6 +32,12 @@ const methods = gameClass.members.filter(
       "disposeStartupAsset",
       "disposeStartupAssets",
       "trackStartupAsset",
+      "applyAdaptiveQuality",
+      "setQuality",
+      "setTargetFps",
+      "resize",
+      "updatePlayers",
+      "setProfile",
     ].includes(node.name.getText(source)),
 );
 const compiled = ts.transpileModule(
@@ -63,6 +69,20 @@ const make = new Script(`(function(env) {
   const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, SurfacePack, CinematicAtmosphere, VehicleLighting, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady } = env;
   ${compiled}
   return StartupGame;
+})`).runInThisContext();
+
+const gameConstructor = gameClass.members.find(ts.isConstructorDeclaration)!;
+const healthAssignment = gameConstructor.body!.statements.find((statement) =>
+  ts.isExpressionStatement(statement) && ts.isBinaryExpression(statement.expression) &&
+  statement.expression.left.getText(source) === "this.renderHealth",
+)!;
+assert.ok(healthAssignment);
+const initializeHealth = new Script(`(function(env) {
+  const { RenderHealth, sessionDiagnostics } = env;
+  ${ts.transpileModule(`function initialize() { ${healthAssignment.getText(source)} }`, {
+    compilerOptions: { target: ts.ScriptTarget.ES2022 },
+  }).outputText}
+  return initialize;
 })`).runInThisContext();
 
 function deferred<T>() {
@@ -109,6 +129,7 @@ function fixture(
     simulations = 0,
     failures = 0;
   const events: { kind: string; data: unknown }[] = [];
+  const shaderStages: string[] = [];
   let gateReadiness: (() => boolean) | undefined;
   const disposable = () => ({ dispose: () => disposedAssets++ });
   const carAsset = {
@@ -127,10 +148,7 @@ function fixture(
     vegetation.resolve(vegetationAsset);
     car.resolve(carAsset);
   }
-  let game: any;
-  const health = new RenderHealth(engine, "game", (fault) => {
-    if (fault.channel === "device") game.handleRendererFailure(fault.message);
-  });
+  let game: any, health: RenderHealth;
   const StartupGame = make({
     arePreparationEffectsReady,
     exports: {},
@@ -184,7 +202,6 @@ function fixture(
   });
   game = Object.assign(new StartupGame(), {
     engine,
-    renderHealth: health,
     startupAbort: new AbortController(),
     startupAssets: new Set(),
     rendererFailed: false,
@@ -207,13 +224,21 @@ function fixture(
     blur() {},
     notice() {},
     onRendererFailure: () => failures++,
-    compilationProfile: { snapshot: () => ({}) },
+    compilationProfile: {
+      snapshot: () => ({}),
+      setStage: (stage: string) => shaderStages.push(stage),
+    },
     prepareLighting: async () => ({
       status: options.preparation ?? "complete",
       elapsedMs: 1,
       stages: [],
     }),
   });
+  initializeHealth({
+    RenderHealth,
+    sessionDiagnostics: { event: (kind: string, data: unknown) => events.push({ kind, data }) },
+  }).call(game);
+  health = game.renderHealth;
   return {
     game,
     engine,
@@ -222,6 +247,7 @@ function fixture(
     gate,
     loops,
     events,
+    shaderStages,
     gateReadiness: () => gateReadiness!(),
     completeAssets: () => {
       interior.resolve(interiorAsset);
@@ -241,11 +267,13 @@ test("actual Game start cannot become playable until the submitted-frame gate su
   assert.equal(f.stats().gateCalls, 1);
   assert.equal(f.game.ready, false);
   assert.equal(f.game.canvas.dataset.bootStage, "submitted-frame");
+  assert.equal(f.shaderStages.at(-1), "submitted-frame");
   assert.equal(f.loops.size, 0, "preload loop is stopped before the gate");
   f.gate.resolve();
   await start;
   assert.equal(f.game.ready, true);
   assert.equal(f.health.snapshot().valid, true);
+  assert.equal(f.shaderStages.at(-1), "ready");
   assert.equal(f.loops.size, 1);
 });
 
@@ -345,4 +373,71 @@ test("loss after submitted-gate settlement cannot resume a new gameplay loop", a
   await assert.rejects(start);
   assert.equal(f.game.ready, false);
   assert.equal(f.loops.size, 0);
+});
+
+test("actual Game health callback retires a ready renderer on validation and render faults", async (t) => {
+  for (const channel of ["validation", "render"] as const) {
+    const f = fixture(t), start = f.game.start();
+    await settle(); f.gate.resolve(); await start;
+    assert.equal(f.game.ready, true);
+    f.health.report(channel, new Error("render cannot continue"));
+    assert.equal(f.game.ready, false, channel);
+    assert.equal(f.game.rendererFailed, true);
+    assert.equal(f.loops.size, 0);
+    assert.equal(f.stats().failures, 1);
+    f.health.report(channel, new Error("duplicate later error"));
+    assert.equal(f.stats().failures, 1, "terminal UI transition is latched");
+  }
+});
+
+test("render fault rejects pending Game startup and releases late assets", async (t) => {
+  const f = fixture(t, { holdAssets: true }), start = f.game.start();
+  await settle();
+  f.health.report("render", new TypeError("missing Light1 buffer"));
+  await assert.rejects(start);
+  assert.equal(f.loops.size, 0);
+  assert.equal(f.stats().failures, 1);
+  f.completeAssets(); await settle();
+  assert.equal(f.stats().disposedAssets, 3);
+  assert.equal(f.game.ready, false);
+});
+
+test("failure teardown attempts every owned stage and delivers UI despite cleanup errors", async (t) => {
+  const f = fixture(t), start = f.game.start();
+  await settle(); f.gate.resolve(); await start;
+  let blurCalls = 0;
+  f.game.cancelLightPreparation = () => { throw new Error("preparation cleanup"); };
+  f.game.benchmark = { profile: { dispose() { throw new Error("benchmark cleanup"); } } };
+  f.game.blur = () => blurCalls++;
+  f.game.notice = () => { throw new Error("notice sink"); };
+  assert.doesNotThrow(() => f.health.report("render", new Error("original failure")));
+  assert.equal(f.game.rendererFailed, true);
+  assert.equal(f.game.ready, false);
+  assert.equal(f.loops.size, 0);
+  assert.equal(f.game.benchmark, undefined);
+  assert.equal(blurCalls, 1);
+  assert.equal(f.stats().failures, 1);
+  assert.equal(f.events.filter((event) => event.kind === "renderer-failure-cleanup-error").length, 3);
+});
+
+test("retired Game cannot resize, change GPU quality, or create remote/profile avatars", (t) => {
+  const f = fixture(t);
+  f.game.rendererFailed = true;
+  delete f.game.applyAdaptiveQuality;
+  delete f.game.updatePlayers;
+  f.game.profile = { marker: "unchanged" };
+  const rejectMutation = () => { throw new Error("retired GPU mutation"); };
+  t.mock.method(f.engine, "resize", rejectMutation);
+  f.game.adaptive = { setMode: rejectMutation, setTargetFps: rejectMutation };
+  f.game.setCarQuality = rejectMutation;
+  f.game.makeAvatar = rejectMutation;
+  assert.doesNotThrow(() => {
+    f.game.resize();
+    f.game.setQuality("high");
+    f.game.setTargetFps(144);
+    f.game.applyAdaptiveQuality({ revision: 100, quality: "high", hardwareScaling: 1 });
+    f.game.updatePlayers([{ id: "late-peer" }]);
+    f.game.setProfile({ marker: "replacement" });
+  });
+  assert.deepEqual(f.game.profile, { marker: "unchanged" });
 });

@@ -18,6 +18,7 @@ import { PlayerFlashlight } from "../client/flashlight";
 import { StableLightState } from "../client/stable-light-state";
 import { prepareLightVariants } from "../client/light-preparation";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
+import { createEnvironmentProfile } from "../client/environment-profile";
 import { selectLightingPreview } from "../client/lighting-preview";
 
 const source = ts.createSourceFile(
@@ -133,6 +134,7 @@ function fixture(t: import("node:test").TestContext) {
     camera,
     engine,
     renderHealth: { snapshot: () => health },
+    compilationProfile: { setStage() {} },
     stableLights,
     lights: streets,
     ready: false,
@@ -281,6 +283,52 @@ function fixture(t: import("node:test").TestContext) {
     },
   };
 }
+
+test("actual Game shader inventory follows the real loopback diagnostic opt-in", () => {
+  const constructor = declaration.members.find(ts.isConstructorDeclaration)!;
+  const assignments = constructor.body!.statements.filter((statement) => {
+    if (!ts.isExpressionStatement(statement) || !ts.isBinaryExpression(statement.expression))
+      return false;
+    return ["this.environmentProfile", "this.compilationProfile"].includes(
+      statement.expression.left.getText(source),
+    );
+  });
+  assert.equal(assignments.length, 2);
+  const body = ts.transpileModule(
+    `function initialize() { ${assignments.map((node) => node.getText(source)).join("\n")} }`,
+    { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
+  ).outputText;
+  const initialize = new Script(`(function(environment) {
+    const { createEnvironmentProfile, WebGpuCompilationProfile, sessionDiagnostics, window } = environment;
+    ${body}
+    return initialize;
+  })`).runInThisContext();
+  for (const [url, expected] of [
+    ["http://127.0.0.1:4193/", false],
+    ["https://example.com/?profileEnvironment=1", false],
+    ["http://127.0.0.1:4193/?profileEnvironment=1", true],
+  ] as const) {
+    let captured: { shader: boolean; unusedDefines: boolean } | undefined;
+    const run = initialize({
+      createEnvironmentProfile,
+      WebGpuCompilationProfile: class {
+        constructor(_engine: unknown, options: {
+          captureShaderInventory: boolean;
+          captureUnusedDefineInventory: boolean;
+        }) {
+          captured = {
+            shader: options.captureShaderInventory,
+            unusedDefines: options.captureUnusedDefineInventory,
+          };
+        }
+      },
+      sessionDiagnostics: { event() {} },
+      window: { location: new URL(url) },
+    });
+    run.call({ engine: {}, renderHealth: { rendererId: 1 } });
+    assert.deepEqual(captured, { shader: expected, unusedDefines: expected }, url);
+  }
+});
 
 test("actual Game prepares current/night OFF/ON with one real torch and restores current requested state", async (t) => {
   const f = fixture(t);
@@ -440,6 +488,25 @@ test("actual Game cancellation settles pending new effects without restoring dis
   assert.equal(f.game.ready, false);
   assert.equal(f.hasTimer, false);
   assert.equal(f.game.cancelLightPreparation, undefined);
+});
+
+test("retired renderer cancels lighting without restoring environment or issuing another draw", async (t) => {
+  for (const explicitCancel of [true, false]) {
+    const f = fixture(t);
+    f.effects(false);
+    const pending = f.start();
+    f.tick();
+    const states = f.states.length, draws = f.draws;
+    f.game.rendererFailed = true;
+    assert.equal(f.game.disposed, false, "failure precedes final scene disposal");
+    if (explicitCancel) f.game.cancelLightPreparation();
+    else f.tick();
+    assert.equal((await pending).status, "disposed");
+    assert.equal(f.states.length, states, "no restore/upload after a terminal fault");
+    assert.equal(f.draws, draws);
+    assert.equal(f.game.cancelLightPreparation, undefined);
+    assert.equal(f.hasTimer, false);
+  }
 });
 
 test("actual Game timeout reports incomplete work and restores OFF while allowing startup caller to decide", async (t) => {
