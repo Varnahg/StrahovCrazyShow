@@ -1,0 +1,84 @@
+{
+  "generation_hash": "ce20385889019000b383",
+  "inputs": {
+    "project_root": "C:\\Users\\rezac\\.codex\\worktrees\\bmad-integration\\StrahovCrazyShow",
+    "renderer_sha256": "8496d0d8b449d64c21b42a9aab3b13fc8a813a430c0695ffd84ad75bb1da7942",
+    "resolved_values": {
+      "config.core.communication_language": "Czech",
+      "config.core.document_output_language": "Czech",
+      "config.modules.bmm.implementation_artifacts": "C:\\Users\\rezac\\.codex\\worktrees\\bmad-integration\\StrahovCrazyShow/_bmad-output/implementation-artifacts",
+      "config.modules.bmm.planning_artifacts": "C:\\Users\\rezac\\.codex\\worktrees\\bmad-integration\\StrahovCrazyShow/_bmad-output/planning-artifacts",
+      "customization.workflow.activation_steps_append": [],
+      "customization.workflow.activation_steps_prepend": [
+        "Načti {project-root}/AGENTS.md a {project-root}/docs/agents/bmad-policy.md. Použij existující autorizaci, přidělený task a živé rezervace; tento hook nenahrazuje povinnou kontrolu před prvním zápisem rendereru."
+      ],
+      "customization.workflow.implementation_handoff": "Jako koordinátor nejdřív přečti {spec_file} a projektovou policy. Specifikace popisuje\nzadaný výsledek; nepřebíjí uživatelské zadání, AGENTS.md, task JSON ani živé rezervace.\nPro dítě vyber autorizovaný disjunktní task. Předej jeho přesné ID, unikátní owner,\nabsolutní pracovní kopii, writePaths, potřebné resources, testy a cestu předání.\nPokud předáváš vlastní rozpracované soubory, nejdřív dolož převod a uvolni jejich\nrezervaci. Nikdy nerezervuj stejné cesty zároveň za rodiče a dítě. Není-li disjunktní\ntask připravený, implementuj přímo pouze v rozsahu vlastní platné rezervace.\n\nSpouštíš-li implementačního podagenta, dej mu tento kontext a instrukce:\n- Načti {spec_file}, všechny soubory z jeho context, kořenový AGENTS.md a\n  docs/agents/bmad-policy.md z předané absolutní pracovní kopie.\n- Jsi podagent s konkrétním implementačním zadáním. Nespouštěj rekurzivně žádný\n  BMAD workflow, renderer ani další podagenty. Nezačínej další katalogový task.\n- Před prvním zápisem ověř git status, git worktree list a živý registr a získej\n  vlastní claim přiděleného tasku pod předaným owner. Při kolizi nezapisuj a vrať\n  důkaz koordinátorovi. --adopt-dirty použij pouze pro doložené předání, ne k obejití kolize.\n- Pracuj pouze v přidělených writePaths; neměň specifikaci nebo společné soubory,\n  pokud nejsou tvoje. Nutnou změnu rozsahu vrať koordinátorovi.\n- Proveď zadanou implementaci, cílený refaktoring i relevantní ověření. Zachovej\n  podklady, cache a lifecycle; těžké kontroly spusť jen s přidělenými resources.\n- Nevyžaduj nové potvrzení již autorizované běžné práce. Skutečně chybějící\n  rozhodnutí nebo konflikt pravidel pojmenuj a předej koordinátorovi.\n- Diff, staging a případný explicitně přidělený commit omez na doložené vlastní\n  změny tasku. Nikdy nepřebírej celý dirty strom ani cizí staged/untracked WIP.\n- Sepiš přidělené předání s přesnými soubory, skutečnými výsledky kontrol, hashy\n  a omezeními. Ukonči vlastní pomocné procesy a uvolni claim. Stav tasku, Linear\n  a přijetí integrace řídí koordinátor; samotné dokončení specifikace není Done.\n\nNení-li k dispozici nástroj pro podagenty, proveď stejné kroky přímo pod svou\nplatnou rezervací. Nepředstírej delegaci, výsledky kontrol ani přijetí integrátorem.\n",
+      "customization.workflow.on_complete": "",
+      "customization.workflow.oneshot_review_layers": [
+        {
+          "id": "blind-hunter",
+          "instruction": "Spusť nezávislého podagenta pouze pro čtení. Předej absolutní pracovní kopii,\nAGENTS.md a docs/agents/bmad-policy.md a přesný seznam/diff vlastních změn tohoto\ntasku. Nepředávej všechny změněné soubory společného checkoutu.\nPodagent zkontroluje pouze předané změny a potřebné okolí kódu. Každý nález uvede\nmísto, spouštěcí podmínku, důkaz a praktický dopad. Počet nálezů nemá minimum;\nčistý výsledek po provedeném přezkumu je platný a vrací se jako [].\nChybějící nebo nečitelný vstup je omezení přezkumu, ne čistý výsledek.\nPodagent nic nezapisuje, necommituje a nespouští skills, renderer, testovací servery\nani další podagenty. Vrátí pouze nálezy nebo výslovné omezení přezkumu.\n",
+          "name": "Blind Hunter"
+        }
+      ],
+      "customization.workflow.open_spec": "",
+      "customization.workflow.persistent_facts": [
+        "file:{project-root}/docs/agents/bmad-policy.md"
+      ],
+      "customization.workflow.review_layers": [
+        {
+          "id": "blind-hunter",
+          "instruction": "Spusť nezávislého podagenta pouze pro čtení. Předej absolutní cestu pracovní kopie,\nAGENTS.md a docs/agents/bmad-policy.md, přesný seznam vlastních změn tasku a tento úkol:\nPřečti unified diff v {diff_file}; jde o celý předmět review. Hledej doložené chyby,\nregrese a chybějící chování, ne domnělé nedostatky k naplnění kvóty. Každý nález\nmusí uvést místo, konkrétní spouštěcí podmínku, důkaz a praktický dopad. Počet nálezů\nnemá minimum. Pokud nejsou podložené nálezy, vrať prázdný seznam [].\nPrázdný nebo nečitelný vstup označ jako neprovedené review, ne jako čistý výsledek.\nNic nezapisuj ani necommituj, nespouštěj skills, renderer, testovací servery ani\ndalší podagenty. Vrať pouze nálezy nebo výslovné omezení přezkumu.\n",
+          "name": "Blind Hunter"
+        },
+        {
+          "id": "edge-case-hunter",
+          "instruction": "Launch a context-free subagent with this prompt:\n\nRead `{skill-root}/review-prompts/edge-case-hunter.md` completely and follow it as your review instructions.\n\nclaims_file (leave unread until your instructions call for it): {claims_file}\n\nReview content: the unified diff at `{diff_file}`. Read that file — it is the content under review.\n\nDo not invoke any skill, and do not spawn subagents of your own — you are the reviewer. If the instruction file is unreadable, report that exact failure and stop. Return your findings as text in your final message; do not route them through any findings-reporting tool the host may offer.\n\n",
+          "name": "Edge Case Hunter"
+        },
+        {
+          "id": "verification-gap",
+          "instruction": "Launch a context-free subagent with this prompt:\n\nRead `{skill-root}/review-prompts/verification-gap.md` completely and follow it as your review instructions.\n\nReview content: the unified diff at `{diff_file}`. Read that file — it is the content under review.\n\nDo not invoke any skill, and do not spawn subagents of your own — you are the reviewer. If the instruction file is unreadable, report that exact failure and stop. Return your findings as text in your final message; do not route them through any findings-reporting tool the host may offer.\n\n",
+          "name": "Verification Gap Reviewer"
+        }
+      ]
+    },
+    "source_sha256": {
+      "compile-epic-context.md": "6793b15ae85766cee529e6b349e45f2c6ec9e3212019611c29e8c77b4dc4b924",
+      "references/claims-check.md": "50ea17cb89a78ef815286dde2dabfd09f1dc9841d07a10857f88b39ab7b9bd2a",
+      "references/deletion-check.md": "0f1f124e4e957147e89164a272b10bedc694ad0d9ad2618c8610ac74ee9cb0da",
+      "review-prompts/edge-case-hunter.md": "8fc046af1cbf4ecc928207cec75e29c3c260adb86cc7da77537ade3b3a3b9448",
+      "review-prompts/verification-gap.md": "45ab0b8c4c56c5c055c97a293a8591a67e256d0b1a2058ce1f093cd866be8d03",
+      "spec-template.md": "e217325964857ebd90a9508bf171eddc2c4ad1b0b9b32a119775ac5c015695fd",
+      "step-01-clarify-and-route.md": "1e8095b08e9e9c57d9b24678b524e07d0b6bbb5af72ba213622f12a1c7d909cc",
+      "step-02-plan.md": "5c999430f818f58fc5e4f64309a1b0f81358ce0ddcfbd3f44b25d56279ef25d8",
+      "step-03-implement.md": "15fd02d2f655d4102c515134ed6aa40cd055bd9d811e49d529512f8f36d09b03",
+      "step-04-review.md": "f6b3f3fa5d3af0b324db2efee9351d4c348bdc0dfa4dad6c058eb4fd37921333",
+      "step-05-present.md": "551e0847e2ebb64575180a5dacca5786b9b9d7825dcd986e1b3b58442eaf713a",
+      "step-oneshot.md": "241fa52e227c048a5d8e4428bef0f153267475f697640899deb218b58ebfd378",
+      "sync-sprint-status.md": "7ff44d21f5d813f4993780271eec8df2fce1373f525ff80e595b7c10618c4c36",
+      "workflow.md": "481ff00ef349a9c7845feca02bbfd5722b1e318ccabac858355da6c90c2d8a39"
+    }
+  },
+  "outputs": {
+    "compile-epic-context.md": "6793b15ae85766cee529e6b349e45f2c6ec9e3212019611c29e8c77b4dc4b924",
+    "references/claims-check.md": "50ea17cb89a78ef815286dde2dabfd09f1dc9841d07a10857f88b39ab7b9bd2a",
+    "references/deletion-check.md": "0f1f124e4e957147e89164a272b10bedc694ad0d9ad2618c8610ac74ee9cb0da",
+    "review-prompts/edge-case-hunter.md": "8fc046af1cbf4ecc928207cec75e29c3c260adb86cc7da77537ade3b3a3b9448",
+    "review-prompts/verification-gap.md": "45ab0b8c4c56c5c055c97a293a8591a67e256d0b1a2058ce1f093cd866be8d03",
+    "spec-template.md": "e217325964857ebd90a9508bf171eddc2c4ad1b0b9b32a119775ac5c015695fd",
+    "step-01-clarify-and-route.md": "6df06eaea8d35992fddf142bc9e53d8cc8568c2fe2b5509ae0c414cd20064274",
+    "step-02-plan.md": "d2c801952a940bb918f271dee0956e4c175d8001a4289bb6a8967fc3612140bc",
+    "step-03-implement.md": "40779a247090234fd766803a1d792c82880024330af07c7b7e54376a6c1690b8",
+    "step-04-review.md": "43a5eb6d20cbfd1d3bf1207d258bd61419a6f1a561503b0292634ef77d4973ef",
+    "step-05-present.md": "f40de6f8758dbf2a9a540a87057c12857deb12e3e84ef4ea42669a87245824d3",
+    "step-oneshot.md": "b025ffc36a2d10c12197c9b4cf0d2fc3fc0191aefdd2de7ff3796516fdec8234",
+    "sync-sprint-status.md": "94395bb121180581dfe4ced05849651f4adcd6e75f4894cad068e770965909e1",
+    "workflow.md": "3cb619fe0fa84f9978e67d78dcbc6e74f0a7d98b37ee9c8fa1d787cc52568662"
+  },
+  "project_root": "C:\\Users\\rezac\\.codex\\worktrees\\bmad-integration\\StrahovCrazyShow",
+  "project_slug": "strahovcrazyshow",
+  "root_hash": "19ea94a40ad0",
+  "schema_version": 1,
+  "skill": "bmad-build"
+}

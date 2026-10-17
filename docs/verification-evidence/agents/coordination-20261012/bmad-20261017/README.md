@@ -39,12 +39,16 @@ Uživatel zvolil oficiální projektové nástroje a automatické použití podl
 | Dokumentační pilot | PASS; vlastní claim autora, 26 odkazů a čtyři finální hashy, skutečný renderovaný dispatch | [pilot](../../../../../_bmad-output/implementation-artifacts/bmad-pilot-20261017/README.md) |
 | Nezávislé review pilotu | Tři vrstvy; jeden low nález opraven autorem, ostatní bez nálezů; review nenahrazuje spuštěné kontroly | [review](review.json) |
 | Místní odkazy zapojení | PASS; všechny kontrolované cíle existují | [seznam a počet](local-links.json) |
+| Skutečná discovery v novém kontextu | PASS; 29 BMAD skills v předaném katalogu ještě před čtením disku | [zjištění a limity](skill-discovery.json) |
+| Smoke kontrola v main po merge | PASS; čeština, projektové jméno, renderer a katalog | [výsledek](main-smoke.json) |
 
 `npx` nebylo na PATH. Úspěšný příkaz používá `pnpm --config.enable-global-virtual-store=false --config.node-linker=hoisted dlx bmad-method@6.12.4 install` s projektovými parametry z návodu. Kořenová příčina chyby pnpm nebyla prokázána; doložen je rozdíl výsledků těchto dvou režimů.
 
 ## Pilot, vlastnictví a integrace
 
-Pilot použil skutečně renderovaný `bmad-build`, připravenou [specifikaci](../../../../../_bmad-output/planning-artifacts/bmad-pilot-20261017.md) a delegovaný task s vlastní rezervací. Tři nezávislé review vrstvy vedly k jedné opravě návodu: renderer používají build/build-auto, ostatní skills mají vlastní aktivaci. Autor opravu a dotčené kontroly dokončil; koordinátor ověřil konečné hashy a odkazy. Stav/specifikace nepřebíjí přijetí integrátorem. Publikaci do main zaznamená [integrační předání](../../../../agents/handoffs/bmad-integrate-20261017.md).
+Pilot použil skutečně renderovaný `bmad-build`, připravenou [specifikaci](../../../../../_bmad-output/planning-artifacts/bmad-pilot-20261017.md) a delegovaný task s vlastní rezervací. Tři nezávislé review vrstvy vedly k jedné opravě návodu: renderer používají build/build-auto, ostatní skills mají vlastní aktivaci. Autor opravu a dotčené kontroly dokončil; koordinátor ověřil konečné hashy a odkazy. Stav/specifikace nepřebíjí přijetí integrátorem.
+
+Funkční celek byl přijat do main v samostatném commitu `f13cc3ac44669dcecf165f452de87df8b07a8e7c`. Fast-forward změnil přesně 297 ověřených cest; všech 132 původních dirty hashů a původní git status zůstaly shodné. [Integrační výsledek](integration.json), [předání](../../../../agents/handoffs/bmad-integrate-20261017.md). Historický `changes-manifest.json` popisuje funkční commit před tímto závěrečným doplněním metadat.
 
 [main-before.json](main-before.json) zachycuje 132 původních dirty cest v hlavním checkoutu. [coordination-inputs.json](coordination-inputs.json) dokládá synchronizované koordinační vstupy: jejich cizí změny nejsou součástí BMAD commitů. Samostatný společný `docs/verification.md` drží jiný vlastník; tato evidence jej nepřepisuje.
 
