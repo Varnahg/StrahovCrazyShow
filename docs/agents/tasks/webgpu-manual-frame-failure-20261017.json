@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-manual-frame-failure-20261017",
+  "title": "KEY-39: neodesílat vadný ruční startup/preview snímek",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/render-startup.ts",
+    "client/avatar-preview.ts",
+    "tests/render-startup.test.ts",
+    "tests/avatar-preview-webgpu.test.ts",
+    "docs/agents/handoffs/webgpu-manual-frame-failure-20261017.md",
+    ".cache/webgpu-migration-checks/manual-frame-failure/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Reprodukčně doložit současné render-throw→endFrame/flush/submit před health.report ve skutečných obou callers. Counter onSubmittedWorkDone není queue.submit.",
+    "Po synchronním render faultu nebo ztrátě vlastníka přeskočit endFrame; scope uzavřít právě jednou a Promise spotřebovat. Zachovat první původní throw včetně undefined/null/0/false před chybou finalizace/reportera.",
+    "Preview nesmí po render failure čekat na nikdy nekončící queue/compilation promise. Zdravý frame má původní normální end/submit; žádný nový engine hook/profiler ani změna scheduleru mimo nutný failure řetězec.",
+    "Implementace + cílený refaktoring + pinned regrese + scoped TS společně, bez změn frozen snapshots/dependencies/cizího WIP. Root dodá combined overlay a GPU přejímku.",
+    "Žádný GPU/build/full suite/server/instalace. Přímý implementační podagent nespouští další BMAD workflow."
+  ],
+  "verification": [
+    "RED/green skutečných startup a preview paths s pinned WebGPUEngine endFrame/flush/submit spolupracovníky: render throw, pozdější scope rejection, pending queue/compiler, healthy success, abort/disposal běhemrenderu, truthy i falsy errors.",
+    "Scoped TypeScript, diff check, přesný manifest/hash a předání; nepřejmenovat neprovedenou GPU kontrolu na PASS."
+  ],
+  "notes": [
+    "Root před implementací přijal read-only důkaz: render-startup169 a avatar-preview487 volalyendFrame před hlášenímrender faultu. Health terminal veto tuto dosudnenahlášenouchybu nemůže zachytit.",
+    "WT C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow; readonlydependencies-v5. AGENTS/policy/BMADspec39 načíst z primárníkopie.",
+    "Přidělen shader_inventory jako samostatnýdisjunktní task; předchozíhealthscope jižpředánrootu. ParentKEY39/KEY22, root specifikace _bmad-output/implementation-artifacts/spec-key-39-shadow-freshness-20261017.md."
+  ]
+}

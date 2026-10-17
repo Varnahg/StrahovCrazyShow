@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-shadow-integration-20261017",
+  "title": "KEY-39: zapojit ověřenou shadow factory do vegetace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/vegetation.ts",
+    "tests/tree-appearance.test.ts",
+    "docs/agents/handoffs/webgpu-shadow-integration-20261017.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Použít dohodnutou createWebGpuShadowDepthWrapper factory v existujících místech tvorby PBR stromových wrapperů, zachovat zdroje, geometrii, shadow záměr i disposal.",
+    "Game/UI/render-health jsou oddělené root/child rezervace. Nenahrazovat frozen C4/native-v14 ani sdílené assety.",
+    "Ověřit cílené skutečné zapojení, refaktoring a plnou následnou pipeline/GPU pod rootem; neoznačit statický import za GPU přijetí."
+  ],
+  "verification": [
+    "Cílené tree/shadow regrese a strict build ve stabilním snapshotu; původní uživatelská posloupnost quality/time/F bez UBO errors."
+  ],
+  "notes": [
+    "Integrační task přidělen rootu pro KEY-39. Implementaci helperu vlastní webgpu-shadow-freshness-20261017; metadata/spec vlastní webgpu-bmad-continuation-20261017.",
+    "Před zápisem claim, před commit/integrací přesný diff a testy; rootovo .cache/webgpu-migration zůstává pod jeho původním taskem."
+  ]
+}
