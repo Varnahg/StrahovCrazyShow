@@ -30,10 +30,150 @@ type ShaderEvidence = {
 type RawEvidence = ShaderEvidence & {
   text: string; body?: BodyEvidence; bodyOffset?: number;
   countedBody?: BodyEvidence; ambiguous: boolean; roles: number;
+  derived?: DerivedEvidence; countedDerived?: DerivedEvidence;
+  defines?: { removed: number; retained: number; unsafe: number };
+  defineTable?: Region; ambiguousDefines?: boolean;
 };
 type BodyEvidence = ShaderEvidence & {
   sample: RawEvidence; offset: number; variants: number;
 };
+type Region = { start: number; end: number };
+type DefineRow = Region & { name: string; safe: boolean; references: Set<string> };
+type DefineAnalysis = { regions: Region[]; rows: DefineRow[]; keep: Set<string> };
+type DerivedEvidence = ShaderEvidence & {
+  sample: RawEvidence; regions: Region[]; variants: number;
+};
+type Provenance = { text: string; role: "vertex" | "fragment"; table: Region };
+type PostFrame = { depth: number; role?: "vertex" | "fragment"; table?: string; calls: number };
+const PROVENANCE_ENTRIES = 8, PROVENANCE_CODE_UNITS = 512 * 1024;
+const TABLE_CODE_UNITS = 64 * 1024, TABLE_ROWS = 1024;
+const LINE_BREAK = /[\n\v\f\r\u0085\u2028\u2029]/;
+const BLANKSPACE = /[ \t\n\v\f\r\u0085\u200e\u200f\u2028\u2029]/;
+const IDENT_START = /[A-Za-z_]/, IDENT_CONTINUE = /[A-Za-z0-9_]/;
+const OTHER_TOKEN = /[0-9.,:;@()[\]+\-*/%&|^!~=<>}]/;
+
+/** Identifier/reference scan, not a WGSL parser. Unsupported code is unknown.
+ * Comments follow WGSL 3.2/3.3, including nested blocks and every line break. */
+function scanWGSL(text: string, start: number, end: number,
+  visit: (token: string, offset: number, depth: number) => void) {
+  const nesting: string[] = [];
+  for (let i = start; i < end;) {
+    const c = text[i], next = text[i + 1];
+    if (BLANKSPACE.test(c)) { i++; continue; }
+    if (c === "/" && next === "/") {
+      i += 2;
+      while (i < end && !LINE_BREAK.test(text[i])) i++;
+      continue;
+    }
+    if (c === "/" && next === "*") {
+      let nesting = 1; i += 2;
+      while (i < end && nesting) {
+        if (text[i] === "/" && text[i + 1] === "*") { nesting++; i += 2; }
+        else if (text[i] === "*" && text[i + 1] === "/") { nesting--; i += 2; }
+        else i++;
+      }
+      if (nesting) return false;
+      continue;
+    }
+    if (IDENT_START.test(c)) {
+      const first = i++;
+      while (i < end && IDENT_CONTINUE.test(text[i])) i++;
+      visit(text.slice(first, i), first, nesting.length);
+      continue;
+    }
+    visit(c, i, nesting.length);
+    if (c === "{" || c === "(" || c === "[") nesting.push(c);
+    else if (c === "}" || c === ")" || c === "]") {
+      if (nesting.pop() !== (c === "}" ? "{" : c === ")" ? "(" : "[")) return false;
+    }
+    // Non-ASCII identifiers, directives, quotes and unexpected controls are
+    // deliberately unsupported, rather than risking an omitted reference.
+    else if (!OTHER_TOKEN.test(c)) return false;
+    i++;
+  }
+  return nesting.length === 0;
+}
+
+function analyzeDefines(text: string, bodyOffset: number, table: Region): DefineAnalysis | undefined {
+  const rows: DefineRow[] = [];
+  const names = new Set<string>();
+  const byName = new Map<string, DefineRow>();
+  let position = table.start;
+  while (position < table.end) {
+    const end = text.indexOf("\n", position);
+    if (end < position || end >= table.end || rows.length >= TABLE_ROWS) return;
+    const match = /^const ([A-Za-z_][A-Za-z0-9_]*) = ([^;\r\v\f\u0085\u2028\u2029]+);$/.exec(text.slice(position, end));
+    if (!match || names.has(match[1])) return;
+    const [, name, value] = match;
+    const references = new Set<string>();
+    if (!scanWGSL(value, 0, value.length, (token) => references.add(token))) return;
+    // Deliberately narrow legal-name/literal subset; lower-case and reserved
+    // names stay in place. NULL is the only all-uppercase WGSL reserved word.
+    const safeName = /^[A-Z][A-Z0-9_]{0,63}$/.test(name) && name !== "NULL";
+    const safeLiteral = /^(true|false)$/.test(value) ||
+      (/^(0|[1-9][0-9]{0,9})$/.test(value) && Number(value) <= 2147483647);
+    rows.push({ name, start: position, end: end + 1, safe: safeName && safeLiteral, references });
+    byName.set(name, rows[rows.length - 1]);
+    names.add(name); position = end + 1;
+  }
+  if (!rows.length) return;
+  const keep = new Set(rows.filter((row) => !row.safe).map((row) => row.name));
+  const starts = new Set(rows.map((row) => row.start));
+  let tableTokens = 0, misplaced = false, previous = "";
+  if (!scanWGSL(text, bodyOffset, text.length, (token, offset, depth) => {
+    if (offset >= table.start && offset < table.end) {
+      if (starts.has(offset)) {
+        tableTokens++;
+        if (token !== "const" || depth !== 0 ||
+          (offset === table.start && previous !== "" && previous !== ";" && previous !== "}")) misplaced = true;
+      }
+    } else if (names.has(token)) keep.add(token);
+    previous = token;
+  }) || misplaced || tableTokens !== rows.length) return;
+  // Keep all dependencies of used or unsafe declarations (including cycles).
+  const pending = [...keep];
+  for (let i = 0; i < pending.length; i++) {
+    for (const dependency of byName.get(pending[i])!.references)
+      if (names.has(dependency) && !keep.has(dependency)) {
+        keep.add(dependency); pending.push(dependency);
+      }
+  }
+  const regions: Region[] = [];
+  let from = bodyOffset;
+  for (const row of rows) if (!keep.has(row.name)) {
+    if (from < row.start) regions.push({ start: from, end: row.start });
+    // Keep the newline: even the derived view must never join lexical tokens.
+    from = row.end - 1;
+  }
+  regions.push({ start: from, end: text.length });
+  return { regions, rows, keep };
+}
+
+function derivedFingerprint(text: string, regions: Region[]) {
+  let hash = 2166136261;
+  for (const region of regions)
+    for (let i = region.start; i < region.end; i++)
+      hash = Math.imul(hash ^ text.charCodeAt(i), 16777619);
+  return hash >>> 0;
+}
+function sameDerived(a: RawEvidence, regions: Region[], b: DerivedEvidence) {
+  let leftRegion = 0, rightRegion = 0;
+  let left = regions[0].start, right = b.regions[0].start;
+  while (leftRegion < regions.length && rightRegion < b.regions.length) {
+    if (left === regions[leftRegion].end) {
+      left = regions[++leftRegion]?.start ?? 0; continue;
+    }
+    if (right === b.regions[rightRegion].end) {
+      right = b.regions[++rightRegion]?.start ?? 0; continue;
+    }
+    if (a.text.charCodeAt(left++) !== b.sample.text.charCodeAt(right++)) return false;
+  }
+  while (leftRegion < regions.length && left === regions[leftRegion].end)
+    left = regions[++leftRegion]?.start ?? 0;
+  while (rightRegion < b.regions.length && right === b.regions[rightRegion].end)
+    right = b.regions[++rightRegion]?.start ?? 0;
+  return leftRegion === regions.length && rightRegion === b.regions.length;
+}
 
 // Fingerprints index candidates only. Equality below, not the hash, proves reuse.
 function shaderFingerprint(text: string, offset = 0) {
@@ -55,6 +195,15 @@ function ownString(value: unknown, name: string): string | undefined {
   return descriptor && "value" in descriptor && typeof descriptor.value === "string"
     ? descriptor.value : undefined;
 }
+function dataMethod(target: object, name: string): unknown {
+  let cursor: object | null = target;
+  while (cursor) {
+    const descriptor = Object.getOwnPropertyDescriptor(cursor, name);
+    if (descriptor) return "value" in descriptor ? descriptor.value : undefined;
+    cursor = Object.getPrototypeOf(cursor);
+  }
+  return undefined;
+}
 
 /** Diagnostic-only bounded evidence. No GPU object or descriptor is retained. */
 class ShaderInventory {
@@ -74,8 +223,23 @@ class ShaderInventory {
   private released = false;
   private cpuTotalMs = 0;
   private cpuMaxMs = 0;
+  private pending: Provenance[] = [];
+  private finals: Provenance[] = [];
+  private frames: PostFrame[] = [];
+  private postDepth = 0;
+  private provenanceUnits = 0;
+  private derived: DerivedEvidence[] = [];
+  private derivedIndex = new Map<number, DerivedEvidence[]>();
+  private unused = {
+    analyzed: 0, unknown: 0, repeated: 0, removedDeclarations: 0,
+    retainedDeclarations: 0, unsafeDeclarations: 0, provenanceUnknown: 0,
+    provenanceLimited: 0, analysisUnknown: 0, hashConflicts: 0,
+  };
+  private defineNames = new Map<string, { omitted: number; retained: number }>();
+  private namesTruncated = false;
 
-  constructor(private readonly now: () => number, limits?: Partial<ShaderInventoryLimits>) {
+  constructor(private readonly now: () => number, limits?: Partial<ShaderInventoryLimits>,
+    private readonly captureUnused = false) {
     this.limits = { ...INVENTORY_LIMITS };
     for (const key of Object.keys(this.limits) as (keyof ShaderInventoryLimits)[]) {
       const value = limits?.[key];
@@ -83,6 +247,172 @@ class ShaderInventory {
         this.limits[key] = Math.max(key === "maxStages" ? 2 : 1,
           Math.min(this.limits[key], Math.floor(value)));
     }
+  }
+
+  private reserveProvenance(chars: number) {
+    while ((this.provenanceUnits + chars > PROVENANCE_CODE_UNITS ||
+        this.codeUnits + this.provenanceUnits + chars > this.limits.maxCodeUnits) &&
+        this.dropProvenance()) { /* bounded eviction leaves missing provenance unknown */ }
+    if (this.provenanceUnits + chars > PROVENANCE_CODE_UNITS ||
+        this.codeUnits + this.provenanceUnits + chars > this.limits.maxCodeUnits) {
+      this.unused.provenanceLimited++; return false;
+    }
+    this.provenanceUnits += chars;
+    return true;
+  }
+  private dropProvenance() {
+    const list = this.pending.length ? this.pending : this.finals;
+    const first = list[0];
+    if (!first) return false;
+    this.removeProvenance(list, [first]); this.unused.provenanceLimited++;
+    return true;
+  }
+  beginPost(args: unknown[]) {
+    const frame: PostFrame = { depth: ++this.postDepth, calls: 0,
+      role: typeof args[2] === "boolean" ? args[2] ? "fragment" : "vertex" : undefined };
+    if (frame.depth <= 4) this.frames.push(frame);
+    else this.unused.provenanceLimited++;
+    return frame;
+  }
+  noteConverted(result: unknown) {
+    if (this.released || this.postDepth > 4) return;
+    this.measure(() => {
+      const frame = this.frames.at(-1);
+      if (!frame) return;
+      frame.calls++;
+      if (frame.calls !== 1 || typeof result !== "string" || !result.length) return;
+      if (result.length > TABLE_CODE_UNITS) { this.unused.provenanceLimited++; return; }
+      if (this.reserveProvenance(result.length)) frame.table = result;
+    });
+  }
+  endPost(frame: PostFrame, result: unknown) {
+    if (this.released || frame.depth > 4) return;
+    this.measure(() => {
+      if (frame.calls !== 1 || !frame.table || !frame.role || typeof result !== "string") {
+        this.unused.provenanceUnknown++; return;
+      }
+      const start = result.indexOf(frame.table);
+      if (start < 0 || result.indexOf(frame.table, start + 1) >= 0) {
+        this.unused.provenanceUnknown++; return;
+      }
+      this.storeProvenance(this.pending, {
+        text: result, role: frame.role, table: { start, end: start + frame.table.length },
+      });
+    });
+  }
+  leavePost(frame: PostFrame) {
+    if (this.released) return;
+    if (frame.table) this.provenanceUnits -= frame.table.length;
+    if (frame.depth <= 4) this.frames.pop();
+    this.postDepth--;
+  }
+  private storeProvenance(list: Provenance[], evidence: Provenance) {
+    if (this.pending.length + this.finals.length >= PROVENANCE_ENTRIES) {
+      this.dropProvenance();
+    }
+    if (this.reserveProvenance(evidence.text.length)) list.push(evidence);
+  }
+  private removeProvenance(list: Provenance[], matches: Provenance[]) {
+    for (const match of matches) {
+      const index = list.indexOf(match);
+      if (index >= 0) { list.splice(index, 1); this.provenanceUnits -= match.text.length; }
+    }
+  }
+  noteFinalized(args: unknown[], result: unknown) {
+    if (this.released) return;
+    this.measure(() => {
+      for (const [index, role] of (["vertex", "fragment"] as const).entries()) {
+        const code = args[index];
+        const matches = this.pending.filter((item) => item.role === role && item.text === code);
+        this.removeProvenance(this.pending, matches);
+        const final = ownString(result, role + "Code");
+        const first = matches[0];
+        if (!first || !final || matches.some((item) =>
+          item.table.start !== first.table.start || item.table.end !== first.table.end)) {
+          this.unused.provenanceUnknown++; continue;
+        }
+        const table = first.text.slice(first.table.start, first.table.end);
+        const start = final.indexOf(table);
+        if (start < 0 || final.indexOf(table, start + 1) >= 0) {
+          this.unused.provenanceUnknown++; continue;
+        }
+        this.storeProvenance(this.finals, {
+          text: final, role, table: { start, end: start + table.length },
+        });
+      }
+    });
+  }
+  resetProvenance() {
+    this.pending = []; this.finals = []; this.frames = [];
+    this.postDepth = 0; this.provenanceUnits = 0;
+  }
+  private takeFinal(source: string, role: string): Region | undefined {
+    // Pinned Effect.functions adds this one diagnostic line after finalize.
+    // Its content is retained in comparison, never normalized or stripped.
+    let prefix = 0;
+    if (source.startsWith(`//#define SHADER_NAME ${role}:`)) {
+      const end = source.indexOf("\n");
+      if (end < 0 || end > 512 || /[\r\v\f\u0085\u2028\u2029]/.test(source.slice(0, end))) return;
+      prefix = end + 1;
+    }
+    const matches = this.finals.filter((item) => item.role === role &&
+      sameShaderRegion(source, prefix, item.text, 0));
+    this.removeProvenance(this.finals, matches);
+    const first = matches[0];
+    if (!first || matches.some((item) => item.table.start !== first.table.start || item.table.end !== first.table.end)) return;
+    return { start: prefix + first.table.start, end: prefix + first.table.end };
+  }
+  private derive(entry: RawEvidence, table: Region, bodyOffset: number) {
+    if (entry.ambiguousDefines) return;
+    if (entry.defineTable && (entry.defineTable.start !== table.start || entry.defineTable.end !== table.end)) {
+      entry.ambiguousDefines = true; entry.defines = undefined; entry.derived = undefined;
+      return;
+    }
+    entry.defineTable = table;
+    if (entry.defines) return;
+    const analysis = analyzeDefines(entry.text, bodyOffset, table);
+    if (!analysis) { this.unused.analysisUnknown++; return; }
+    entry.defines = { removed: 0, retained: 0, unsafe: 0 };
+    for (const row of analysis.rows) {
+      const retained = analysis.keep.has(row.name);
+      entry.defines[retained ? "retained" : "removed"]++;
+      if (!row.safe) entry.defines.unsafe++;
+      if (!/^[A-Za-z_][A-Za-z0-9_]{0,63}$/.test(row.name)) continue;
+      let count = this.defineNames.get(row.name);
+      if (!count) {
+        if (this.defineNames.size >= this.limits.maxRows) { this.namesTruncated = true; continue; }
+        this.defineNames.set(row.name, count = { omitted: 0, retained: 0 });
+      }
+      count[retained ? "retained" : "omitted"]++;
+    }
+    const hash = derivedFingerprint(entry.text, analysis.regions);
+    const bucket = this.derivedIndex.get(hash) ?? [];
+    let derived = bucket.find((candidate) => {
+      if (sameDerived(entry, analysis.regions, candidate)) return true;
+      this.unused.hashConflicts++; return false;
+    });
+    if (!derived) {
+      derived = {
+        id: this.derived.length + 1, hash, sample: entry, regions: analysis.regions,
+        chars: analysis.regions.reduce((sum, region) => sum + region.end - region.start, 0),
+        variants: 0, calls: 0, vertex: 0, fragment: 0, unknown: 0, stages: [],
+      };
+      this.derived.push(derived); bucket.push(derived); this.derivedIndex.set(hash, bucket);
+    }
+    entry.derived = derived;
+  }
+  private recordDerived(entry: RawEvidence, role: ShaderRole) {
+    if (!this.captureUnused) return;
+    if (!entry.derived || !entry.defines || entry.ambiguous) { this.unused.unknown++; return; }
+    this.unused.analyzed++;
+    if (entry.derived.calls) this.unused.repeated++;
+    if (entry.countedDerived !== entry.derived) {
+      entry.derived.variants++; entry.countedDerived = entry.derived;
+    }
+    this.record(entry.derived, role);
+    this.unused.removedDeclarations += entry.defines.removed;
+    this.unused.retainedDeclarations += entry.defines.retained;
+    this.unused.unsafeDeclarations += entry.defines.unsafe;
   }
 
   private measure(work: () => void) {
@@ -122,7 +452,7 @@ class ShaderInventory {
       this.rawHashConflicts++;
     }
     if (this.raw.length >= this.limits.maxEntries ||
-        this.codeUnits + text.length > this.limits.maxCodeUnits) return undefined;
+        this.codeUnits + this.provenanceUnits + text.length > this.limits.maxCodeUnits) return undefined;
     const entry: RawEvidence = {
       id: this.raw.length + 1, hash, chars: text.length, text, calls: 0,
       vertex: 0, fragment: 0, unknown: 0, stages: [], ambiguous: false, roles: 0,
@@ -150,6 +480,7 @@ class ShaderInventory {
       if (!result.startsWith(prefix) || !sameShaderRegion(result, prefix.length, source, 0)) {
         this.unrecognizedPrefix++; return;
       }
+      const table = this.captureUnused ? this.takeFinal(source, type) : undefined;
       const entry = this.getRaw(result);
       if (!entry) return;
       entry.roles |= type === "vertex" ? 1 : 2;
@@ -160,6 +491,9 @@ class ShaderInventory {
         entry.body = undefined;
         return;
       }
+      if (table) this.derive(entry, {
+        start: prefix.length + table.start, end: prefix.length + table.end,
+      }, prefix.length);
       if (entry.body) return;
       const offset = prefix.length, hash = shaderFingerprint(result, offset);
       const bucket = this.bodyIndex.get(hash) ?? [];
@@ -201,17 +535,27 @@ class ShaderInventory {
       try { code = ownString(descriptor, "code"); }
       catch (error) {
         this.bump("descriptorUnknown");
+        if (this.captureUnused) this.unused.unknown++;
         throw error;
       }
-      if (code === undefined) { this.bump("descriptorUnknown"); return; }
+      if (code === undefined) {
+        this.bump("descriptorUnknown");
+        if (this.captureUnused) this.unused.unknown++;
+        return;
+      }
       const entry = this.getRaw(code);
-      if (!entry) { this.bump("limited"); return; }
+      if (!entry) {
+        this.bump("limited");
+        if (this.captureUnused) this.unused.unknown++;
+        return;
+      }
       let label: string | undefined;
       try { label = ownString(descriptor, "label"); }
       catch { /* Unknown role must not discard already proven code evidence. */ }
       const role: ShaderRole = label === "vertex" || label === "fragment" ? label
         : entry.roles === 1 ? "vertex" : entry.roles === 2 ? "fragment" : "unknown";
       this.bump("rawKnown");
+      this.recordDerived(entry, role);
       if (entry.calls) this.bump("rawRepeated");
       this.record(entry, role);
       if (entry.body && !entry.ambiguous) {
@@ -236,11 +580,11 @@ class ShaderInventory {
     const repeated = <T extends ShaderEvidence>(entries: T[]) => entries
       .filter((entry) => entry.calls > 1)
       .sort((a, b) => b.calls - a.calls || a.id - b.id);
-    const raw = repeated(this.raw), bodies = repeated(this.bodies);
+    const raw = repeated(this.raw), bodies = repeated(this.bodies), derived = repeated(this.derived);
     return {
       enabled: true,
       scope: "Per-device successful module calls; exact text equality confirms duplicates. Body identity only from observed pinned WGSL prefix construction. Unknown/limited calls are not evidence of uniqueness.",
-      overheadScope: "Capture/setStage CPU only; nested inside engine timings. Snapshot/serialization cost excluded. Text limit counts UTF-16 code units, not total JavaScript heap. Diagnostic overhead, not a performance improvement.",
+      overheadScope: "Text capture/setStage CPU only; nested inside engine timings. Hook entry/cleanup and snapshot/serialization excluded. Text limit counts retained UTF-16 code units (raw plus pending provenance), not total JavaScript heap. Diagnostic overhead, not a performance improvement.",
       limits: { ...this.limits }, ...this.counts,
       rawHashConflicts: this.rawHashConflicts,
       bodyHashConflicts: this.bodyHashConflicts,
@@ -248,7 +592,7 @@ class ShaderInventory {
       ambiguousBodies: this.raw.filter((entry) => entry.ambiguous).length,
       evidenceTruncated: this.counts.limited > 0,
       retainedEntries: this.released ? 0 : this.raw.length,
-      retainedCodeUnits: this.codeUnits, released: this.released,
+      retainedCodeUnits: this.codeUnits + this.provenanceUnits, released: this.released,
       cpuTotalMs: this.cpuTotalMs, cpuMaxMs: this.cpuMaxMs,
       stages: this.stages.map((entry) => ({ name: entry.name, ...entry.counts })),
       rawDuplicateGroups: raw.length, bodyDuplicateGroups: bodies.length,
@@ -257,6 +601,19 @@ class ShaderInventory {
       bodyDuplicates: bodies.slice(0, this.limits.maxRows).map((entry) => ({
         ...project(entry), variants: entry.variants,
       })),
+      unusedDefines: this.captureUnused ? {
+        scope: "Observed owned convert/post/finalize provenance; exact derived equality omits only unreferenced generated uppercase non-reserved bool/small decimal-int declarations. Newlines and all other text remain. Candidate only, not semantic equivalence or a runtime/cache change. Counts per analyzed module call; names per distinct analyzed raw text.",
+        ...this.unused, pendingEntries: this.pending.length + this.finals.length,
+        ambiguous: this.raw.filter((entry) => entry.ambiguousDefines).length,
+        evidenceTruncated: this.unused.provenanceLimited > 0 || this.counts.limited > 0,
+        pendingCodeUnits: this.provenanceUnits,
+        duplicateGroups: derived.length,
+        exportTruncated: derived.length > this.limits.maxRows || this.namesTruncated,
+        names: [...this.defineNames].map(([name, counts]) => ({ name, ...counts })),
+        duplicates: derived.slice(0, this.limits.maxRows).map((entry) => ({
+          ...project(entry), variants: entry.variants,
+        })),
+      } : null,
     };
   }
 
@@ -265,6 +622,9 @@ class ShaderInventory {
     for (const entry of this.raw) entry.text = "";
     this.rawIndex.clear();
     this.bodyIndex.clear();
+    this.derivedIndex.clear();
+    for (const entry of this.raw) entry.defines = undefined;
+    this.resetProvenance();
     this.codeUnits = 0;
   }
 }
@@ -281,6 +641,8 @@ export type CompilationProfileOptions = {
   now?: () => number;
   slowCallMs?: number;
   captureShaderInventory?: boolean;
+  /** Requires captureShaderInventory; comparison only, never changes WGSL. */
+  captureUnusedDefineInventory?: boolean;
   /** Diagnostics may lower these limits, never exceed the fixed hard caps. */
   shaderInventoryLimits?: Partial<ShaderInventoryLimits>;
   onSlowCall?: (event: {
@@ -340,6 +702,7 @@ const createMetrics = () =>
   ) as Record<CompilationPhase, Metric>;
 const owners = new WeakSet<object>();
 const deviceOwners = new WeakMap<object, WebGpuCompilationProfile>();
+const processorOwners = new WeakMap<object, WebGpuCompilationProfile>();
 const BUNDLE_KEYS = [
   "numEnableEffects",
   "numEnableDrawWrapper",
@@ -381,9 +744,11 @@ export class WebGpuCompilationProfile {
   private observerErrors = 0;
   private device?: object;
   private tint?: object;
+  private processor?: object;
   private engineCleanups: (() => void)[] = [];
   private deviceCleanups: (() => void)[] = [];
   private tintCleanups: (() => void)[] = [];
+  private processorCleanups: (() => void)[] = [];
   private lifecycleCleanups: (() => void)[] = [];
   private readonly now: () => number;
   private inventory?: ShaderInventory;
@@ -408,12 +773,22 @@ export class WebGpuCompilationProfile {
       );
     owners.add(engine);
     if (options.captureShaderInventory) {
-      this.inventory = new ShaderInventory(this.now, options.shaderInventoryLimits);
+      this.inventory = new ShaderInventory(this.now, options.shaderInventoryLimits,
+        options.captureUnusedDefineInventory === true);
       this.install(
         engine, "_getWGSLShader", "engine._getWGSLShader", undefined,
         this.engineCleanups, undefined, undefined,
         (args, result) => this.inventory?.noteWGSL(args, result),
       );
+      if (options.captureUnusedDefineInventory) {
+        this.safe(() => {
+          if (typeof dataMethod(engine, "_getShaderProcessor") === "function")
+            this.install(engine, "_getShaderProcessor", "engine._getShaderProcessor", undefined,
+              this.engineCleanups, () => this.bindProcessor());
+          else this.hooks["engine._getShaderProcessor"] = "unavailable";
+        });
+        this.safe(() => this.bindProcessor());
+      }
     }
     const disposed = engine.onDisposeObservable.add(() => this.dispose());
     const restored = engine.onContextRestoredObservable.add(() =>
@@ -753,7 +1128,8 @@ export class WebGpuCompilationProfile {
       this.metrics = createMetrics();
       if (this.inventory) {
         this.inventory.release();
-        this.inventory = new ShaderInventory(this.now, this.options.shaderInventoryLimits);
+        this.inventory = new ShaderInventory(this.now, this.options.shaderInventoryLimits,
+          this.options.captureUnusedDefineInventory === true);
       }
     }
     this.hooks["module.getCompilationInfo"] = "not-created";
@@ -830,6 +1206,67 @@ export class WebGpuCompilationProfile {
     else this.hooks["tint.convertSpirV2WGSL"] = "not-created";
   }
 
+  private bindProcessor() {
+    if (!this.active || !this.inventory || !this.options.captureUnusedDefineInventory) return;
+    const descriptor = Object.getOwnPropertyDescriptor(this.engine, "_shaderProcessorWGSL");
+    const next = descriptor && "value" in descriptor && descriptor.value &&
+      typeof descriptor.value === "object" ? descriptor.value as object : undefined;
+    if (next && next === this.processor) return;
+    this.detach(this.processorCleanups);
+    if (this.processor && processorOwners.get(this.processor) === this)
+      processorOwners.delete(this.processor);
+    this.processor = undefined;
+    this.inventory.resetProvenance();
+    const names = ["_convertDefinesToConst", "postProcessor", "finalizeShaders"] as const;
+    if (!next || processorOwners.has(next)) {
+      for (const name of names)
+        this.hooks[`processor.${name}`] = next ? "ownership-conflict" : "unavailable";
+      return;
+    }
+    this.processor = next;
+    processorOwners.set(next, this);
+    for (const name of names) this.installProcessor(next, name);
+  }
+
+  private installProcessor(target: object,
+    name: "_convertDefinesToConst" | "postProcessor" | "finalizeShaders") {
+    const hook = `processor.${name}`;
+    const descriptor = Object.getOwnPropertyDescriptor(target, name);
+    const original = dataMethod(target, name);
+    if (typeof original !== "function") { this.hooks[hook] = "unavailable"; return; }
+    const owner = this;
+    const wrapper: Method = function (...args) {
+      const inventory = owner.inventory;
+      if (!owner.active || owner.processor !== target || this !== target || !inventory)
+        return Reflect.apply(original, this, args);
+      let frame: PostFrame | undefined;
+      if (name === "postProcessor") owner.safe(() => { frame = inventory.beginPost(args); });
+      try {
+        const result = Reflect.apply(original, this, args);
+        if (owner.inventory === inventory && owner.active) owner.safe(() => {
+          if (name === "_convertDefinesToConst") inventory.noteConverted(result);
+          else if (name === "finalizeShaders") inventory.noteFinalized(args, result);
+          else if (frame) inventory.endPost(frame, result);
+        });
+        return result;
+      } finally {
+        if (frame) owner.safe(() => inventory.leavePost(frame!));
+      }
+    };
+    try {
+      Object.defineProperty(target, name, {
+        value: wrapper, writable: true, configurable: descriptor?.configurable ?? true,
+        enumerable: descriptor?.enumerable ?? false,
+      });
+      this.hooks[hook] = "installed";
+      this.processorCleanups.push(() => {
+        if (Object.getOwnPropertyDescriptor(target, name)?.value !== wrapper) return;
+        if (descriptor) Object.defineProperty(target, name, descriptor);
+        else Reflect.deleteProperty(target, name);
+      });
+    } catch { this.hooks[hook] = "unavailable"; }
+  }
+
   snapshot() {
     const finite = (value: unknown) =>
       typeof value === "number" && Number.isFinite(value) ? value : null;
@@ -880,6 +1317,7 @@ export class WebGpuCompilationProfile {
     this.active = false;
     this.detach(this.deviceCleanups);
     this.detach(this.tintCleanups);
+    this.detach(this.processorCleanups);
     this.detach(this.engineCleanups);
     this.detach(this.lifecycleCleanups);
     if (this.device && deviceOwners.get(this.device) === this)
@@ -887,6 +1325,9 @@ export class WebGpuCompilationProfile {
     owners.delete(this.engine);
     this.device = undefined;
     this.tint = undefined;
+    if (this.processor && processorOwners.get(this.processor) === this)
+      processorOwners.delete(this.processor);
+    this.processor = undefined;
     this.inventory?.release();
     for (const metric of Object.values(this.metrics)) metric.pending = 0;
   }

@@ -1,5 +1,54 @@
 # Předání: webgpu-shader-inventory-20261016
 
+## Aktuální výsledek po ukončení ručního testu 17. 10. 2026
+
+Uživatel výslovně dokončil ruční test a root vrátil původní tří-souborový WIP autorovi k ověření. Znovu načteny aktuální primární AGENTS/policy/BMAD spec a získán claim `webgpu-shader-inventory-20261016` jako `webgpu-mig-01a14497-unused-20261017 --adopt-dirty`; převzetí navazuje na výslovný předchozí handoff SHA `83eadff7738b0c960e9609db237aa70c40f8b6c28743e444210530dbffa548e6`. Žádný restart implementace ani nové BMAD workflow.
+
+Současný profiler a test byly znovu přesně zkopírovány do `.cache/webgpu-migration-checks/shader-inventory/`. Freeze SHA z nezávislého review se nezměnily (`991c3ff5…9499` / `f2db43c0…1fc9`); po ověření nebyla potřebná další runtime/test oprava ani refaktoring. Předchozí označení posledních úprav jako neověřených v historických sekcích níže je tímto uzavřené.
+
+- `TSX_DISABLE_CACHE=1 node --import tsx --test tests/webgpu-compilation-profile.test.ts`: **33/33 PASS**, 0 failures, exit0; `unused-final-20261017.log`.
+- `node typecheck.mjs`: **2957 souborů, 0 diagnostics**, exit0; `unused-types-final-20261017.log`.
+- Manifest `unused-manifest-20261017.json`, SHA-256 `dc2e6935a8b07a838a1a72fe668fc73fcbdf01a3388c96422f4be40508590566`, ověřuje přesnou shodu všech5 staging inputs se současným WT, config/harness, pinned Babylon primární zdroje, readonly dependencies-v5 cestu a oba skutečné výsledkové logy. Ověřovaný WT HEAD `233eeb3` plus přesně identifikovaný vlastní diff.
+- Původní nezávislý statický review vrátil `[]` nad stejnými zdrojovými SHA. K aktuálnímu diffu nepřibyly žádné runtime/test změny; doplnila se jen evidence tohoto ověření.
+
+Všechny vlastní procesy doběhly; žádný server/GPU/full-suite/build/integrace se nespouštěly. CPU důkaz neurčuje skutečné produkční duplicity ani výkonový přínos. Root nyní koordinuje samostatný commit a integraci po BMAD review; podagent zatím nic nestagoval ani necommitoval. Dále zbývá rootovo Game ověření a produkční Edge sběr, následně celá migrační přejímka.
+
+## Předání rozpracovaného ověření rootu 17. 10. 2026
+
+Načten nový primární `AGENTS.md`, `docs/agents/bmad-policy.md` a BMAD specifikace `_bmad-output/implementation-artifacts/spec-key-31-wgsl-unused-defines-20261017.md` včetně task contextu. BMAD vede root; podagent další workflow nespouštěl. Výslovný příjemce tohoto implementačního WIP je `webgpu-migration-01a14497-root`, který autorizoval předání stejného scope a pozdější `--adopt-dirty` pro ověření. Uživatelův ruční test dosud není ukončený.
+
+Nezávislý read-only reviewer `resume_plan_review` potvrdil níže uvedené přesné freeze hashy a vrátil prázdný seznam actionable nálezů `[]`. To je statické review bez spouštění kontrol, **nikoli nový test PASS**. Root přijal tento výsledek; BMAD metadata jsou integrovaná v main `1377f133c8553c90e9fa57501dd535f67e7c2ee3`. Runtime implementace se tím necommitovala ani nepřijala.
+
+- `client/webgpu-compilation-profile.ts`: SHA-256 `991c3ff5ec2b09c3cae4cc715343582b2688dc8b8332c776663244b392dd9499`.
+- `tests/webgpu-compilation-profile.test.ts`: SHA-256 `f2db43c07501ee8763ff621d890647c3d97d85a86242d690a5e4c5d3aa281fc9`.
+- Třetí předávaný soubor je toto předání. Žádné ostatní dirty cesty nejsou součástí tohoto tasku.
+
+Zbývá po výslovném konci ručního testu znovu zkopírovat **současné** dva zdroje do existujícího vlastního stagingu (kopie v `.cache/webgpu-migration-checks/shader-inventory/` jsou starší než poslední freeze), spustit cílený test a scoped TS, opravit případné skutečné chyby, vytvořit manifest důkazů, samostatný commit/integraci a produkční Edge sběr pod rezervací rootu. Přesný otevřený seznam neověřených změn a dosavadní výsledky jsou níže. Během ručního testu žádné další testy/TS/GPU neběžely. Podagent nemá pomocné procesy ani porty; po tomto předání uvolní svůj claim a slot. Uvolnění není Done.
+
+## Pokračování 17. 10. 2026 — implementace před závěrečným ověřením
+
+Příjemce původního výzkumného handoffu je nyní `shader_inventory`, owner `webgpu-mig-01a14497-unused-20261017`. Root doložil převod a zachoval původní dirty diff/SHA v `.cache/webgpu-migration/inventory-transfer-20261017.json`; claim s `--adopt-dirty` převzal pouze tento dokument. Base HEAD `6582860`. Žádná změna běžících snapshotů, assetů nebo dependencies.
+
+Implementované API je `captureUnusedDefineInventory?: boolean`, účinné jen spolu s `captureShaderInventory`. Obsahuje pouze druhou schválenou observační vrstvu. Zachytí skutečný výsledek owned `_convertDefinesToConst` uvnitř `postProcessor`, přes přesnou shodu argumentů a výstupu `finalizeShaders` doloží tabulku v konečném body a připustí pouze známý jednořádkový `SHADER_NAME` prefix z pinned Effect.functions. Ten zůstává v odvozeném porovnání. Shader, descriptor, receiver, původní výsledky/výjimky ani Promise se nepřepisují.
+
+Konzervativní scanner respektuje [WGSL 3.2/3.3](https://www.w3.org/TR/WGSL/#blankspace-and-line-breaks) včetně všech line breaks a vnořených blokových komentářů. Identifikátory mimo ASCII, neznámé direktivy, nevyvážené bloky a nejednoznačná nebo ne-top-level tabulka vedou na unknown. Kandidátem k vynechání je jen nepoužitá konstanta s uppercase ASCII názvem do64 znaků (kromě reserved `NULL`) a jednoduchým bool nebo kladným decimal-int literálem0..2147483647. Lowercase, reserved/komplexní hodnoty zůstávají; zachovávají se také všechny jejich tranzitivní závislosti. Jde záměrně o podmnožinu legálních jmen/literálů. Přesná odvozená shoda není tvrzení sémantické nebo cache ekvivalence.
+
+Pevný32Mi UTF-16 budget se sdílí mezi raw evidencí a čekající provenance. Provenance má navíc8 záznamů/512Ki znaků, nejvýš4 vnořené postProcessor rámce a64Ki/1024řádků tabulky. Evikce je explicitně počítaná a chybějící provenance zůstává unknown. Odvozené identity drží pouze rozsahy již uloženého raw textu; fingerprint se vždy ověřuje úplnou rovností, bez allocation per znak. Po analýze se uvolní dočasné tokeny a dependency sets; přetrvává jen číselný souhrn, bounded16 jmen a numeric ranges. Disposal/nová device generation uvolňuje texty i provenance. Default-off nečte procesor ani shaderové texty.
+
+Průběžný izolovaný CPU běh měl27/27 PASS. Následný rozšířený běh `.cache/webgpu-migration-checks/shader-inventory/unused-v1.log` měl31/32 PASS: jediný fail byl překlep očekávaného hex hashe známé kolize (`c466019e` místo správného `c465019e`); test skutečně potvrdil dvě různé identity. Scoped TS `unused-types-v1.log` měl1diagnostic kvůli unii fixture objektů s optional undefined klíči. Obě fixture chyby jsou opravené.
+
+**Aktuálně neověřené:** opakování po těchto opravách, následné statické zpřesnění rozlišování všech závorek/top-level hranice, konfliktní provenance stejného raw textu a accessor-safe discovery, plus nová regrese ambiguities. Root dne17.10. vyhradil ruční test uživatele, takže další testy a TS jsou zastavené až do jeho zprávy. Žádný můj testový, TS, serverový či GPU proces neběží (ověřeno CIM). Samostatný runtime commit bude vytvořen teprve po skutečném závěrečném ověření a nezávislém review.
+
+## Navazující observační vrstva schválená před implementací
+
+Nad čistým `779c121` root schválil `captureUnusedDefineInventory: true` spolu s původním `captureShaderInventory`; žádné runtime shadery se neupravují. V13 měl662 přesně známých raw/body volání bez shod a bez ztráty evidence. Offline probe `v13-generated-const-probe.log` doložil, že pinned processor přidává materiálové defines i jako skutečné `const` deklarace uvnitř těla: odlišný nepoužitý define tedy vytváří odlišné body. Opakovaný stejný body s jiným vnějším komentářovým prefixem byl správně detekován jako shoda.
+
+Zvolený rozsah je observační: zachytit skutečný výstup `_convertDefinesToConst` na konkrétním engine-owned processoru uvnitř jeho postProcessor, doložit jeho přenos přes finalize do konečného body, konzervativně určit reference a porovnat jen odvozené pohledy. Nejasná provenance, syntaxe, top-level pozice nebo limity znamenají unknown/keep. Zbylé komentáře, bindings, layout i použitá deklarace musí zůstat přesné. Žádný obecný stripping všech konstant či komentářů, žádná cache a žádné změny návratů GPU/processor API.
+
+Adversariální primární review před implementací: Babylon `_convertDefinesToConst` přijímá numeric prefix, ne jen literály. I `1/0` či `1; const_assert false` by generátorem prošly. Nepřítomnost referencí proto nestačí k bezpečnému odstranění možného shader-creation erroru. První rozsah ponechá komplexní/neprokázané initializery a jejich tranzitivní závislosti; k vynechání připustí jen striktně ověřené jednoduché skalární literály a legální názvy. Odvozená shoda zůstává diagnostický kandidát, nikoli důkaz plné sémantické či cache ekvivalence. Lexer musí bezpečně rozlišovat všechny WGSL line breaks (nebo je odmítnout jako unknown), vnořené komentáře a všechny reference mimo generated table včetně atributů, array bounds a const_assert; shadowing smí vést ke konzervativnímu keep.
+
+Původní paměťové/exportní limity se nezvyšují; provenance a dočasná textová evidence mají vlastní malé limity a sdílí textový budget s raw evidencí. Následuje relevantní implementace, CPU regrese a scoped TS, bez GPU/build/full suite.
+
 - Vlastník: `webgpu-mig-01a14497-shader-inventory` (`render_diagnosis`); příjemce: root.
 - WT: `C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow`, `codex/webgpu-migration`, základ `3898e7d`.
 - Scope: `client/webgpu-compilation-profile.ts`, `tests/webgpu-compilation-profile.test.ts`, toto předání a `.cache/webgpu-migration-checks/shader-inventory/`.
