@@ -1,10 +1,21 @@
 # WebGPU migration root handoff (ongoing)
 
+## Aktuální cíl a checkpoint 18.10.2026
+
+Uživatel aktualizoval cílovou sekvenci: dokončit schválenou migraci na výchozí nativní WebGPU pro hru i editor včetně produkční přejímky, potom pokračovat na souvisejících projektových issues performance/FPS drops v Linear. Hotovo až po jejich vyřešení. V celém procesu používat projektový BMAD. Starší zakončení předáním do jiného chatu je nahrazené; není aktuální závěrečný úkol.
+
+Startup-only async celek native8d20cecc72066b498e735b8b2524fd23baa19eff → main232cffb1fd67b47766fedd2b27c933ddf786e617. Evidence6eef0b3 → main6c96968, BMAD9208c1f. Native1296/1296 a kombinovaná produkce1352/1352, oba buildy/integration PASS. [Hitches-v5](../../performance/evidence/webgpu-migration-20261016/hitches-v5/README.md) obsahuje všechny běhy,41s outlier, skutečné limity a původní gameplayF6197,4msgap, který není opravený. Default a finální přejímka zůstávají otevřené.
+
+Další autorizovaný úkol je webgpu-b6-variant-proof-20261018: lehký CPU důkaz actual B6 presentation/layout/instance/pass a main/depth reuse, nikoli produkční implementace ani nová cache. Jeho cache a handoff vlastní samostatný leaf podle registru. Root vede existující BMAD spec-key-31-long-frame-gaps; nenastavuje celý cíl jako complete.
+
+Hraná4193/API2588 stále frozenC5 c4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5, runtime record .cache/webgpu-migration/runs/combined-v5-preserved-20261017-1816/runtime.json; klient je v menu. Vlastní4194/API2589 je async-production-v3 ec2802daf9426f63814054627adf5a18f04cd54eb2da20e800eb1a89feb6c563, run async-production-candidate1; měření ukončené, karta about:blank, služby dál vlastní root. Starší4192/4188 a cizí WIP se nepřepisují. Níže jsou historické checkpointy, ne aktuální příkazy.
+
+
 ## Novější checkpoint17.10.2026: main a2acbed / C5
 
 Runtime integrován v pěti samostatných commitech po native1260/1260 a combined1320/1320, obou fullbuild/strictTS/integraci. C5 obsahuje30 zachovaných foreignoverlayů a physicalmain549souborů se shoduje; indexclean. [Úplná nová evidence](../../performance/evidence/webgpu-migration-20261016/safety-v16/README.md) nahrazuje níže uvedené rozpracované stavy jako aktuální checkpoint, historické záznamy se nemažou.
 
-Current4193/API2588 = frozen combined-v5, snapshotc4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5, runtime recordruns/combined-v5/runtime.json. Native14/16 vlastní služby identitycheckedstopped. Edge tab2070822964/browser3/window2070822965 je v menu, Alex; GPUhra ukončena. C5session4ecc6280-d257-4858-ada1-3ab856ce4691:1559prefixrecords,0faults, B6:0 přes skutečnývstup a zpět,10persistentpreviewcyclesrenderer3 +Sam/detail a návratAlex. FullGPU/FPSdefaultacceptance není hotová; KEY31záseky přetrvávají. Navazující autorizovaný chat01a13624-c16c-7c11-aa35-070e349e0266 se aktivuje teprvepo úplnémcíli.
+Current4193/API2588 = frozen combined-v5, snapshotc4e22edd3b691fce2827b5132ccbc09ec404a0aa6fd1338925ffddbe8a5be6f5, runtime recordruns/combined-v5/runtime.json. Native14/16 vlastní služby identitycheckedstopped. Edge tab2070822964/browser3/window2070822965 je v menu, Alex; GPUhra ukončena. C5session4ecc6280-d257-4858-ada1-3ab856ce4691:1559prefixrecords,0faults, B6:0 přes skutečnývstup a zpět,10persistentpreviewcyclesrenderer3 +Sam/detail a návratAlex. FullGPU/FPSdefaultacceptance není hotová; KEY31záseky přetrvávají. Původní následný chat byl od18.10 nahrazen novou cílovou sekvencí uvedenou nahoře.
 
 ## Aktuální pokračování 17.10.2026 — KEY-39 má prioritu
 
@@ -24,7 +35,7 @@ BMAD6.12.4 je v primárním checkoutu; oficiální bmad-build byl spuštěn po r
 
 **17 October 2026 — user takes over manual testing.** User explicitly asks to test the game personally. The current immutable combined-v4 build (snapshot1383fc9296d70d256ead4c6df0ac87892cdcd522426272bc8e7288613266f277) is running at http://127.0.0.1:4193/?renderBackend=webgpu, runtime record `.cache/webgpu-migration/runs/combined-v4-functional-20261017/runtime.json`, Edge tab2070822960/browser3. Leave this source/dist/assets/dependency set unchanged and do not replace the4193 services while this test is underway. Root stopped UI control and marked the tab as a deliverable. No builds, heavy validation, profiling or additional3D scenes during the user's test; agents may perform light edits/static review only. Sessionc063cf2e-4c92-49af-9283-cd55783b4e93 currently contains the root's preceding functional actions; new actions after this handoff belong to the user's manual test. User is currently outdoors beside the blue car after driving, with night preview active. Automatic logs are under combined-v4/.cache/game-diagnostics. Await the user's completion/feedback before resuming dependent GPU work; this is a testing handoff, not completed migration or authorization to activate the next goal. The root plan's next diagnostic checkpoint must not overwrite this live build.
 
-2026-10-16: user explicitly resumed the full migration goal. Native-v3 remains a protected live user playtest. After the full current objective has actually passed its completion audit, the user explicitly requests activating/continuing the goal in `codex://threads/01a13624-c16c-7c11-aa35-070e349e0266`. This is authorization to send that task the continuation instruction at that time; do not trigger it before this migration is complete. Keep this as an outstanding final handoff action, not a substitute for finishing the migration.
+Historie16.10: uživatel tehdy požadoval po migraci navázat v chatu `codex://threads/01a13624-c16c-7c11-aa35-070e349e0266`. Aktualizace cíle18.10 tento konečný krok nahradila přímým pokračováním na performance/FPS-drop issues přes BMAD; starší handoff není aktuální závěrečný úkol.
 
 ### Current primary integration and next work (20:36 UTC)
 
