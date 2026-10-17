@@ -1,0 +1,54 @@
+{
+  "atUTC": "2026-10-17T17:52:29.030Z",
+  "task": "webgpu-shader-inventory-20261016",
+  "owner": "webgpu-mig-01a14497-retained-regression",
+  "scope": "Test-only review correction; no runtime change and no addition to previously frozen native-v16/C5 test manifests.",
+  "inputs": [
+    {
+      "path": "client/webgpu-compilation-profile.ts",
+      "sha256": "991c3ff5ec2b09c3cae4cc715343582b2688dc8b8332c776663244b392dd9499"
+    },
+    {
+      "path": "client/render-health.ts",
+      "sha256": "7a5027922feb2292e9238917a7af58a2371187446d8cc36f0324562e49d583a4"
+    },
+    {
+      "path": "client/webgpu-validation.ts",
+      "sha256": "f0804292f54bb2121b813edfade18dd19af8949111b532db258860532b25645e"
+    },
+    {
+      "path": "shared/session-diagnostics.ts",
+      "sha256": "ad1850d3e1409beaa2374dfa67c6a6d7a8d8cbab159da2a774c66dd4d436fe1f"
+    },
+    {
+      "path": "tests/webgpu-compilation-profile.test.ts",
+      "sha256": "06061bf3f704a8c8ada8c1dc47d33a5b7c6585387605a2c4faaddf4ddd5ab7af"
+    }
+  ],
+  "runtimeSha256": "991c3ff5ec2b09c3cae4cc715343582b2688dc8b8332c776663244b392dd9499",
+  "mutationSha256": "b20b4571e8c2163765fd4f486fdd1b216f7fcb195fe86bf98f7c5d0d7b2cd92f",
+  "readonlyDependencies": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration\\dependencies-v5\\node_modules",
+  "command": "TSX_DISABLE_CACHE=1 node --import tsx --test --test-name-pattern=\"retained define values\" tests/webgpu-compilation-profile.test.ts",
+  "checks": [
+    {
+      "runtime": "unchanged production copy",
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "retained-green.log",
+      "sha256": "7c9b019eb6b783a98a1ffcb4d3e0788bd27896bc9d2c9d6b1d7a7684dcf931ef"
+    },
+    {
+      "runtime": "isolated comparison keep-guard mutation only",
+      "tests": 4,
+      "passed": 1,
+      "failed": 3,
+      "exitCode": 1,
+      "matchingControlPassed": true,
+      "log": "retained-mutation-red.log",
+      "sha256": "35d5c6276011c60605195173aff7fbabf0b8b75b59131380be8821edba87aab3"
+    }
+  ],
+  "limitation": "Only the four new table cases ran. No broader tests, TS, build, integration, GPU or server. Full verification belongs to root."
+}

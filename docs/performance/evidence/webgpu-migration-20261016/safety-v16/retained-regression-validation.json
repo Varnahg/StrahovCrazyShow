@@ -1,0 +1,29 @@
+{
+  "atUTC": "2026-10-17T17:54:30.912Z",
+  "scope": "Test-only BMAD review correction after immutable native-v16/C5; runtime and served snapshots unchanged. Not retroactively included in their full-suite manifests.",
+  "testSha256": "06061bf3f704a8c8ada8c1dc47d33a5b7c6585387605a2c4faaddf4ddd5ab7af",
+  "runtimeSha256": "991c3ff5ec2b09c3cae4cc715343582b2688dc8b8332c776663244b392dd9499",
+  "checks": {
+    "fullProfilerFile": {
+      "tests": 37,
+      "passed": 37,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "retained-full-tests.log"
+    },
+    "scopedTypes": {
+      "files": 2957,
+      "diagnostics": 0,
+      "exitCode": 0,
+      "log": "retained-scoped-types.log"
+    },
+    "isolatedMutation": {
+      "tests": 4,
+      "passed": 1,
+      "failed": 3,
+      "exitCode": 1,
+      "log": "retained-mutation-red.log"
+    }
+  },
+  "review": "Original verification-gap reviewer statically confirmed the gap closed; two other review layers returned[] before this test-only patch."
+}

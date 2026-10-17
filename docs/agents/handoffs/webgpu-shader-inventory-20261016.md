@@ -1,5 +1,22 @@
 # Předání: webgpu-shader-inventory-20261016
 
+## Test-only oprava review: hodnoty zachovaných deklarací, 17. 10. 2026
+
+Root výslovně předal task pouze k doplnění regresního testu; owner `webgpu-mig-01a14497-retained-regression`, WT baseline `ad4b4a2fbc8ff6287b834c09b9bb3d61a5bd2e6c`. Runtime se neměnil. Doplněna jedna tabulka se čtyřmi samostatnými případy: změna přímo použitého `USED`, unsafe initializeru `UNSAFE`, zachované tranzitivní závislosti `LEAF` v řetězci `CHAIN → MIDDLE → LEAF` a změna pouze `UNUSED` jako pozitivní kontrola. Testy ověřují přímo počet odvozených skupin, jejich calls/variants a repeated counts, nikoli pouze účetní počty zachovaných deklarací.
+
+Finální vlastní staging je `.cache/webgpu-migration-checks/shader-inventory/retained-regression-20261017/`. Obsahuje aktuální test a byte-identickou kopii runtime s readonly dependencies-v5. Spuštěn **jen** `TSX_DISABLE_CACHE=1 node --import tsx --test --test-name-pattern="retained define values" tests/webgpu-compilation-profile.test.ts`:
+
+- Běžný runtime: **4/4 PASS**, exit 0, `retained-green.log`.
+- Izolovaná mutace v této cache odstranila pouze `if (!keep.has(row.name))` z vytváření srovnávacích regionů: **1/4 PASS, 3 FAIL**, exit 1, `retained-mutation-red.log`. Každá změna zachované hodnoty správně odhalila chybnou jedinou skupinu místo dvou; unused-only kontrola nadále prošla.
+- Po mutaci byla staging kopie obnovena přesnými původními bajty. WT i staging runtime SHA-256 zůstávají `991c3ff5ec2b09c3cae4cc715343582b2688dc8b8332c776663244b392dd9499`; shoda s Git HEAD je ověřená. Mutant byl pouze samostatná cache evidence (`runtime-mutant.ts`), žádný runtime commit ani změna dependencies.
+- Nový test SHA-256: `06061bf3f704a8c8ada8c1dc47d33a5b7c6585387605a2c4faaddf4ddd5ab7af`.
+- Manifest `retained-regression-20261017/manifest.json` SHA-256: `7ed1a3afac0fc9d11246a68497c29271742880c3aa1dd4668790af38c660167f`.
+- Vlastní diff check PASS; samotná tabulková regrese přidává 33 řádků v jediném testovém souboru.
+
+Žádné další testy, scoped TS, build, full suite, integrace, GPU či servery se nespouštěly. Pro rootovo následné ověření celého 37testového souboru jsou ve stejném stagingu připravené `typecheck.mjs` a `tsconfig.json`; jejich kontrolu provede root. **Native-v16 a C5 runtime i jejich historické testové manifesty zůstávají beze změny**; tyto čtyři testy se nevydávají za součást dřívější plné pipeline.
+
+Výslovné předání rootu: pouze změna `tests/webgpu-compilation-profile.test.ts`, toto předání a vlastní cache evidence. Nic nestagované ani commitované, vlastní procesy skončily. Po předání uvolním claim; root provede samostatný testový commit a další kontrolu.
+
 ## Aktuální výsledek po ukončení ručního testu 17. 10. 2026
 
 Uživatel výslovně dokončil ruční test a root vrátil původní tří-souborový WIP autorovi k ověření. Znovu načteny aktuální primární AGENTS/policy/BMAD spec a získán claim `webgpu-shader-inventory-20261016` jako `webgpu-mig-01a14497-unused-20261017 --adopt-dirty`; převzetí navazuje na výslovný předchozí handoff SHA `83eadff7738b0c960e9609db237aa70c40f8b6c28743e444210530dbffa548e6`. Žádný restart implementace ani nové BMAD workflow.
@@ -98,3 +115,5 @@ Manifest přesných inputs včetně testů a SHA logů je `.cache/webgpu-migrati
 - Commit zahrnuje pouze profiler, jeho cílené testy a toto předání; přesný SHA a potvrzení release dostane root zprávou. Žádný root/primary WIP není přibalen.
 - Vlastní procesy ukončené, žádné porty/GPU. Rezervace se uvolní po commitu. KEY-31 průběžně aktualizován; celek není označen Done.
 - Root vlastní již schválené loopback opt-in Game wiring (`profileEnvironment=1`), `setStage` pro assets/preparation/submitted-frame/ready a skutečný sběr. Výkonové přejímky musí inventář vypnout. Snapshot lze logovat přímo nebo pod technickým klíčem `timing`; klíč obsahující `profile` privacy filtr záměrně odstraní.
+
+Root17.10 následně ověřil celý profiler soubor37/37 PASS a scopedTS2957/0; static recheck původní verification-gap vrstvy potvrdil uzavření. Runtime a frozenv16/C5 bezezměny; nová regrese není zpětně součástí jejich manifestů. [Oddělená evidence](../../performance/evidence/webgpu-migration-20261016/safety-v16/retained-regression-validation.json).
