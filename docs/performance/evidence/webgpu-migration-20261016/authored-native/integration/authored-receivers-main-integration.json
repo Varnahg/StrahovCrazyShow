@@ -1,0 +1,132 @@
+{
+  "source": "b033b3868768cc326dd0b98703da9053a381bd9e",
+  "beforeHead": "8b949b7a091ef21dd08192285e93ff29e42f14dc",
+  "afterHead": "246002fc8ff48a439ec4c88733243e3f552f77d9",
+  "paths": [
+    "client/authored-light-preparation.ts",
+    "tests/authored-light-preparation.test.ts",
+    "tests/game-preparation-baseline.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-low-vehicle-preparation.test.ts",
+    "tests/game-quality-preparation.test.ts",
+    "tests/game-authored-light-preparation.test.ts",
+    "client/game.ts"
+  ],
+  "nativeSnapshot": "777a1bbb3552b800947cf62adcf6db141c72d3d72600fbfcbeeca42d287e05f6",
+  "combinedSnapshot": "c5937a7933a7af516f7cdb231d3c8138b12403e91def043fde7684541cacacfb",
+  "overlays": [
+    {
+      "path": "client/authored-light-preparation.ts",
+      "originalSha256": null,
+      "sha256": "1b455b8a87995433fdf79e59965d11453fca514fbeb055166ac21283c03c6a18",
+      "source": ".cache\\webgpu-hitch-validation-20261017\\authored-ibl-v2\\client\\authored-light-preparation.ts",
+      "bytes": 4566,
+      "workingBefore": null,
+      "workingAfter": "1b455b8a87995433fdf79e59965d11453fca514fbeb055166ac21283c03c6a18",
+      "method": "native-delta"
+    },
+    {
+      "path": "tests/authored-light-preparation.test.ts",
+      "originalSha256": null,
+      "sha256": "6bcbdd8d996e9322cf38b56ec61fd89ffc1ac0d678382a488664a63b5e8a83ed",
+      "source": ".cache\\webgpu-hitch-validation-20261017\\authored-ibl-v2\\tests\\authored-light-preparation.test.ts",
+      "bytes": 11690,
+      "workingBefore": null,
+      "workingAfter": "6bcbdd8d996e9322cf38b56ec61fd89ffc1ac0d678382a488664a63b5e8a83ed",
+      "method": "native-delta"
+    },
+    {
+      "path": "tests/game-preparation-baseline.test.ts",
+      "originalSha256": null,
+      "sha256": "460944a7c148e1d26371adae048cfc05752979f3063ac68db044dce3d068a302",
+      "source": ".cache\\webgpu-hitch-validation-20261017\\authored-ibl-v2\\tests\\game-preparation-baseline.test.ts",
+      "bytes": 7537,
+      "workingBefore": null,
+      "workingAfter": "460944a7c148e1d26371adae048cfc05752979f3063ac68db044dce3d068a302",
+      "method": "native-delta"
+    },
+    {
+      "path": "tests/game-light-preparation.test.ts",
+      "originalSha256": "8352410c5c7ea9dce4ce1fa874db1c5754e4eca11adf5e79da4916b98691c7e5",
+      "sha256": "602ac9d167484019f72de1f3df3b0a2ef401fc695241da769cc5711825a97d23",
+      "source": "native preimage + exact helper VM binding",
+      "bytes": 27599,
+      "workingBefore": "27637ab0cb54953b8d99837cc0f0858eb6ae44b43f2d308bf382867d7ba3720d",
+      "workingAfter": "d2d635bd406b6667dadbba8f1e8c1d55253f5c1299df6e232b1b0c648ce01832",
+      "method": "reviewed-semantic-merge"
+    },
+    {
+      "path": "tests/game-low-vehicle-preparation.test.ts",
+      "originalSha256": "02a61722e6c799fb9de8b819fa59410340b7349a77130561b363e7c694ead5ed",
+      "sha256": "8043ee329a3eb1f9d1f1de51482da9ac99d633267d68a3f0564cfa8b138a0658",
+      "source": "native preimage + exact helper VM binding",
+      "bytes": 28005,
+      "workingBefore": "02a61722e6c799fb9de8b819fa59410340b7349a77130561b363e7c694ead5ed",
+      "workingAfter": "8043ee329a3eb1f9d1f1de51482da9ac99d633267d68a3f0564cfa8b138a0658",
+      "method": "native-delta"
+    },
+    {
+      "path": "tests/game-quality-preparation.test.ts",
+      "originalSha256": "eefce0a8d635fa604669ed35a30b8dfd67b44e5291784f1bd919f3684e22a414",
+      "sha256": "ecae906edddd023391bfe4005d832b46660418a66c5a6965d2887afa9a52cbd9",
+      "source": "native preimage + baseline inputs; intentional requested sync before low",
+      "bytes": 9412,
+      "workingBefore": "076619062a4b17267c7706b1d8de01f6efd6a76d2b4d31166825e11ac0c5be4b",
+      "workingAfter": "2c342e11b031afe311b4969fcb83ddd6d617dfaf3988a2c9ce11cf6d50e037a3",
+      "method": "reviewed-semantic-merge"
+    },
+    {
+      "path": "tests/game-authored-light-preparation.test.ts",
+      "originalSha256": null,
+      "sha256": "124c743c0477fdd63317cf7351f419c880d575bc6fc70d44f669ab71a98da6d3",
+      "source": ".cache\\webgpu-standard-lod-define-proof-20261018\\case\\tests\\game.test.ts; native bootstrap, fog and explicit true capability",
+      "bytes": 29977,
+      "workingBefore": null,
+      "workingAfter": "124c743c0477fdd63317cf7351f419c880d575bc6fc70d44f669ab71a98da6d3",
+      "method": "native-delta"
+    },
+    {
+      "path": "patches/@babylonjs__core@9.30.0.patch",
+      "sha256": "4b5db0c0716db43a7225b78fc2914f2e6f0d88e7a95c7408cf9f5c2312a99f15",
+      "originalSha256": "21114f6048abdcba932a8640adf1a97b6281939d99ae6d53fbfe96ef76bf0503",
+      "workingBefore": "21114f6048abdcba932a8640adf1a97b6281939d99ae6d53fbfe96ef76bf0503",
+      "workingAfter": "4b5db0c0716db43a7225b78fc2914f2e6f0d88e7a95c7408cf9f5c2312a99f15",
+      "method": "native-delta"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "8550e368c800f23b0763aa1e6a9e317ef4de90d272da2b7e9a1aa6a9ea11f0b6",
+      "originalSha256": "03d4edcd8f9d92fa7b6b320f5600709dd62612a5bad7867cef61875e7ecd8b53",
+      "workingBefore": "03d4edcd8f9d92fa7b6b320f5600709dd62612a5bad7867cef61875e7ecd8b53",
+      "workingAfter": "8550e368c800f23b0763aa1e6a9e317ef4de90d272da2b7e9a1aa6a9ea11f0b6",
+      "method": "native-delta"
+    },
+    {
+      "path": "tests/standard-ibl-defines.test.ts",
+      "sha256": "0cc147d6728d2e2132310d44422025b54fc6aef5814d4cf0bbefb8c45761cedb",
+      "originalSha256": null,
+      "workingBefore": null,
+      "workingAfter": "0cc147d6728d2e2132310d44422025b54fc6aef5814d4cf0bbefb8c45761cedb",
+      "method": "native-delta"
+    },
+    {
+      "path": "client/game.ts",
+      "originalSha256": "df6569dc0455e84702a1b9c1ad598fb984cb34cc312f9403667b0583333ee91d",
+      "sha256": "32f02d0f457765719cae8ba23194e368ff709cfbf04d2580298f176e14f941b6",
+      "workingBefore": "7b9cdaf8f56e7c734e97a3c6563d59b72a600bc6fb34f955153ed4bc593c92dd",
+      "workingAfter": "388caed28049fd41b70d485446de2db65978c75de264949677e6ce486373dd68",
+      "method": "reviewed-semantic-merge"
+    },
+    {
+      "path": "tests/material-defines-wgsl-order.test.ts",
+      "originalSha256": "7af27e254640c67611de4f3030cdccf230245bdce44a511951fe6a4b5ff016d4",
+      "sha256": "9f36988918c6542a63ffecebdd2ea377651de0dda96fc5d018339ed4ce1b8dc8",
+      "workingBefore": "7af27e254640c67611de4f3030cdccf230245bdce44a511951fe6a4b5ff016d4",
+      "workingAfter": "9f36988918c6542a63ffecebdd2ea377651de0dda96fc5d018339ed4ce1b8dc8",
+      "method": "native-delta"
+    }
+  ],
+  "otherWorkingPathsPreserved": 130,
+  "atUTC": "2026-10-18T19:46:03.926Z",
+  "scope": "Only this owned component is committed. Combined source preserves its reviewed C5 overlays. No protected played build changes."
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-authored-light-native-20261018",
+  "title": "KEY-31: převést ověřenou přípravu authored materiálů a její regrese",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/authored-light-preparation.ts",
+    "tests/authored-light-preparation.test.ts",
+    "tests/game-authored-light-preparation.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-low-vehicle-preparation.test.ts",
+    "tests/game-quality-preparation.test.ts",
+    "tests/game-preparation-baseline.test.ts",
+    ".cache/webgpu-authored-light-native-20261018/",
+    "docs/agents/handoffs/webgpu-authored-light-native-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přenést pouze ověřený helper1b455b8a a testy z frozen kandidátů; Game import a dvě metody integruje root pod vlastní rezervací.",
+    "Testy musí být přenositelné do čistého repozitáře, bez absolutních cache cest a povinných diagnostických reportů. Zachovat původní legacy assertions a hranice změněné jednorázovou synchronizací prostředí.",
+    "Actual factory/Game regrese nastaví skutečný fog a textureLOD=true, pokryje fresh receiver i obě pořadí kvalit a vlastní lifecycle. Native bootstrap nesmí záviset na C5 preload metodě.",
+    "Cílený refaktoring, bez rozšíření helperu na NPC či nových warm etap, shaderových nebo časových změn."
+  ],
+  "verification": [
+    "Lehké cílené CPU testy po root složení Game, source/hash evidence a handoff. Žádný full build/test/install/GPU.",
+    "Veškeré dependencies jsou read-only. Root zajišťuje nové clean/combined checkpointy a integraci; nepřepisovat cizí WIP ani commitovat."
+  ],
+  "notes": [
+    "Přímé implementační zadání koordinátora v BMAD kroku03, bez rekurzivního workflow. Před zápisem claim.",
+    "Kandidát authored-ibl-v2 obsahuje helper a corrected VM/TypeScript/report guard; fog/LOD proof dodává captrue a fresh receiver. Root složí native Game pomocí ověřených celých metod a zachová C5 rozdíly odděleně.",
+    "Oprava světových shaderů je dílčí; poslední actualGPU má0novýchprogramů, ale max471,5ms. Celá migrace není přijata.",
+    "18.10.2026 root integrated vendor WT418a3824→main8b949b7a and receiver WT b033b386→main246002fc. Fresh native1439/combined1499, both full TS/build/isolatedintegration PASS. Evidence docs/performance/evidence/webgpu-migration-20261016/authored-native/README.md. Combined diagnostic0programs/max471.5ms; subsequent normalnative5programs/max573ms, so full native GPU acceptance remains OPEN. Protected builds unchanged; ownQA stopped."
+  ]
+}

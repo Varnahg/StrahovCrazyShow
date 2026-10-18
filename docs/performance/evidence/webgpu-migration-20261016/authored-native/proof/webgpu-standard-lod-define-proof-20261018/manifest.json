@@ -1,0 +1,283 @@
+{
+  "task": "webgpu-standard-lod-define-proof-20261018",
+  "createdAt": "2026-10-18T18:43:35.740Z",
+  "outcome": "private-declaration-candidate-green-awaiting-production-GPU",
+  "vendorFiles": [
+    {
+      "package": "core",
+      "path": "Materials/standardMaterial.pure.d.ts",
+      "oldSha256": "8cf3184e7b2566b99c3602e5dcc409eefd2cff795ad3546bebe2a02f0477a07d",
+      "sha256": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c"
+    },
+    {
+      "package": "core",
+      "path": "Materials/standardMaterial.pure.js",
+      "oldSha256": "91e9810b0fea2366e407cd58e2cbb1bbde31c39525c03b1aba75efcc5e218f33",
+      "sha256": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37"
+    }
+  ],
+  "copyVerification": {
+    "unchangedCoreFiles": 10035,
+    "unchangedLoaderFiles": 823,
+    "copiedSourcesVerified": 226
+  },
+  "tests": {
+    "trueCap": {
+      "pass": 14,
+      "fail": 0
+    },
+    "falseCap": {
+      "pass": 14,
+      "fail": 0
+    },
+    "redTrueFresh": {
+      "pass": 7,
+      "fail": 5
+    },
+    "references": {
+      "true": 2,
+      "false": 2
+    },
+    "preservedAssertions": 52
+  },
+  "artifacts": [
+    {
+      "path": "analysis.md",
+      "sha256": "c5d3bae627c76022e4784ccaad8e237a0ca95aa3ba866f112f10987c3247455c",
+      "bytes": 2155
+    },
+    {
+      "path": "case/package.json",
+      "sha256": "e1d35f209df3333959931c04ed25681db3ca4d63e919fad0ca93340b4b7b333f",
+      "bytes": 1340
+    },
+    {
+      "path": "case/tests/game.test.ts",
+      "sha256": "4195d7daa9cba2d0ebd89765ad026adb437005d816301be4add41e3b09a91c19",
+      "bytes": 30035
+    },
+    {
+      "path": "case/tests/processor.test.ts",
+      "sha256": "746f2fc7e6ad22a3f4d4520f70b7db819950ca8c58b28bfd675bb2ee230e9c1b",
+      "bytes": 14490
+    },
+    {
+      "path": "case/tests/report-game-green-false.json",
+      "sha256": "9f20d1308bb9e6f7dd98ef11f0ab8e7edf567851eb2a0fd7fdfc672c154e17b5",
+      "bytes": 723134
+    },
+    {
+      "path": "case/tests/report-game-green-true.json",
+      "sha256": "25015a5f8f08ad636c09df746812e998c8017a712a48319b7843015a57901b5b",
+      "bytes": 725341
+    },
+    {
+      "path": "case/tests/report-game-red-true-fresh.json",
+      "sha256": "aa58e382cd351031b2682867a571aaa0a464590a4ca47266dd7393736e193b3c",
+      "bytes": 642130
+    },
+    {
+      "path": "case/tests/report-game-red-true.json",
+      "sha256": "b70ce2d712ca55aaa90199f83c839cd7158ec7973df1ddb94f8e7a0b35b97b65",
+      "bytes": 628227
+    },
+    {
+      "path": "case/tests/report-processor-green-false.json",
+      "sha256": "8258d8dfb3c62dfb476ffa121d96d41c7942c81a1f9bba27f25ae2078a03b236",
+      "bytes": 2049615
+    },
+    {
+      "path": "case/tests/report-processor-green-true.json",
+      "sha256": "63d119abe89fa39c4ae9192bf7fd0ec652c2217fdc493df6277edbdc1aa1ceff",
+      "bytes": 2044361
+    },
+    {
+      "path": "case/tests/report-processor-reference-false.json",
+      "sha256": "83789057beccd4050c07e52c793b40c125bac07c209a3f7604718f77d56bbd63",
+      "bytes": 6120971
+    },
+    {
+      "path": "case/tests/report-processor-reference-true.json",
+      "sha256": "4c3f3fe6c9a1a7c45b80d5e8d4baa8745f199cf85344c874801f39f9173ad411",
+      "bytes": 6104794
+    },
+    {
+      "path": "case/tsconfig.json",
+      "sha256": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c",
+      "bytes": 572
+    },
+    {
+      "path": "finalize.mjs",
+      "sha256": "6a68680a0fd17b9962b8db301e8cbc859c8d7d43d2aa639135cb1e59cf093fea",
+      "bytes": 4715
+    },
+    {
+      "path": "fresh-difference.json",
+      "sha256": "a7f6021aa15b8ebe35059b6a4f65b4b14c708c7c7f57add78db84784286ad136",
+      "bytes": 660
+    },
+    {
+      "path": "green-false-game.test.ts.txt",
+      "sha256": "4195d7daa9cba2d0ebd89765ad026adb437005d816301be4add41e3b09a91c19",
+      "bytes": 30035
+    },
+    {
+      "path": "green-false-processor.test.ts.txt",
+      "sha256": "746f2fc7e6ad22a3f4d4520f70b7db819950ca8c58b28bfd675bb2ee230e9c1b",
+      "bytes": 14490
+    },
+    {
+      "path": "green-true-game.test.ts.txt",
+      "sha256": "4195d7daa9cba2d0ebd89765ad026adb437005d816301be4add41e3b09a91c19",
+      "bytes": 30035
+    },
+    {
+      "path": "green-true-processor.test.ts.txt",
+      "sha256": "746f2fc7e6ad22a3f4d4520f70b7db819950ca8c58b28bfd675bb2ee230e9c1b",
+      "bytes": 14490
+    },
+    {
+      "path": "inputs.json",
+      "sha256": "e00db5fc8fe35cf0d15edfa5d7d66b8b8475f006b6aac234a3daf9d1f9505945",
+      "bytes": 2181040
+    },
+    {
+      "path": "peer-review.json",
+      "sha256": "50f12dc98d3cb25b06bce1804ec2411d535755c134bf48b143b8ceb9550feabf",
+      "bytes": 302
+    },
+    {
+      "path": "preimages/fog.test.ts.txt",
+      "sha256": "bcd4adb1c606497d211985372b12907bcfce27b354cf27110954f46e5d2996c9",
+      "bytes": 24857
+    },
+    {
+      "path": "preimages/standardMaterial.pure.d.ts",
+      "sha256": "8cf3184e7b2566b99c3602e5dcc409eefd2cff795ad3546bebe2a02f0477a07d",
+      "bytes": 28138
+    },
+    {
+      "path": "preimages/standardMaterial.pure.js",
+      "sha256": "91e9810b0fea2366e407cd58e2cbb1bbde31c39525c03b1aba75efcc5e218f33",
+      "bytes": 159265
+    },
+    {
+      "path": "red-true-fresh-game.test.ts.txt",
+      "sha256": "4195d7daa9cba2d0ebd89765ad026adb437005d816301be4add41e3b09a91c19",
+      "bytes": 30035
+    },
+    {
+      "path": "red-true-game.test.ts.txt",
+      "sha256": "7a362fbc33fab1da768c201047f7a502363484bce5d077f66f02643e8d6acd90",
+      "bytes": 30030
+    },
+    {
+      "path": "reference-false-processor.test.ts.txt",
+      "sha256": "746f2fc7e6ad22a3f4d4520f70b7db819950ca8c58b28bfd675bb2ee230e9c1b",
+      "bytes": 14490
+    },
+    {
+      "path": "reference-false.json",
+      "sha256": "83789057beccd4050c07e52c793b40c125bac07c209a3f7604718f77d56bbd63",
+      "bytes": 6120971
+    },
+    {
+      "path": "reference-true-processor.test.ts.txt",
+      "sha256": "746f2fc7e6ad22a3f4d4520f70b7db819950ca8c58b28bfd675bb2ee230e9c1b",
+      "bytes": 14490
+    },
+    {
+      "path": "reference-true.json",
+      "sha256": "4c3f3fe6c9a1a7c45b80d5e8d4baa8745f199cf85344c874801f39f9173ad411",
+      "bytes": 6104794
+    },
+    {
+      "path": "run-green-false.json",
+      "sha256": "d7616f35cfce7981d50dfdb19877ce21b8a4aa60f12bfeef011bae64f0613eb2",
+      "bytes": 1095
+    },
+    {
+      "path": "run-green-false.log",
+      "sha256": "a36753502905371bac62c7ecd8a3a574c5e9fc82c65a8707ee62af8146687817",
+      "bytes": 3503
+    },
+    {
+      "path": "run-green-true.json",
+      "sha256": "19ba7e6e0465d3d81e9c80c400791401c90b34f2a78c3e5f1fadee6da46d2987",
+      "bytes": 1094
+    },
+    {
+      "path": "run-green-true.log",
+      "sha256": "fd6b0d06032a502936cb0e6ad82cba3cc29c2ddc301ef582464a5f92d8ff6b35",
+      "bytes": 3500
+    },
+    {
+      "path": "run-red-true-fresh.json",
+      "sha256": "42aae99367ff7c1c8ab137e4dd10e51323c7c47aefc90d56581b548b2d9be1a0",
+      "bytes": 927
+    },
+    {
+      "path": "run-red-true-fresh.log",
+      "sha256": "d06694865ff620c0490256892fd1200d9ff7e032b14b07bfede9b0833f994857",
+      "bytes": 6778
+    },
+    {
+      "path": "run-red-true.json",
+      "sha256": "d167ff01402ac1b81ee4bf4ca714bdb5ead11cf6c4004c47afef4a207182bbda",
+      "bytes": 927
+    },
+    {
+      "path": "run-red-true.log",
+      "sha256": "6fd83bdc9eeaedeef4ea2a2a79eb0d52a4556ed7230b2194b3ee897e0bea2065",
+      "bytes": 6764
+    },
+    {
+      "path": "run-reference-false.json",
+      "sha256": "50b94ed7c5df715db3b0da5997355d00b6839ed63f63ede236b5ad7ae6125eec",
+      "bytes": 943
+    },
+    {
+      "path": "run-reference-false.log",
+      "sha256": "d8fed781b74ffa891310303de614a9cc82d866a5f020ceee2cf105dc0f3a4ab9",
+      "bytes": 542
+    },
+    {
+      "path": "run-reference-true.json",
+      "sha256": "7f794aa53695c5d553009338b465c044b59824fadf5807320852c5e438735a12",
+      "bytes": 942
+    },
+    {
+      "path": "run-reference-true.log",
+      "sha256": "b766865a69e3d992e266b55dbd89013b36f4417f81331e41ff4923739792ec7d",
+      "bytes": 542
+    },
+    {
+      "path": "run.mjs",
+      "sha256": "70922066bb74ca8a74d87ee18d74b8ed9514387075b1960844e1f1934f86e093",
+      "bytes": 1923
+    },
+    {
+      "path": "summary.json",
+      "sha256": "93f95e820abf20fd654f02f636cb3360e32a9351807610edffc74bf33512536e",
+      "bytes": 45306
+    },
+    {
+      "path": "verify-inputs.mjs",
+      "sha256": "7d196f7ab6b87e2b27f61aed933a20d77b1c6e0bc490ac7074aceaecbdca237b",
+      "bytes": 2265
+    }
+  ],
+  "handoff": {
+    "path": "docs/agents/handoffs/webgpu-standard-lod-define-proof-20261018.md",
+    "sha256": "5d9f496ee869896bb9d7574e2d11f1e3ec87f97718edb2675851916eb07422ad"
+  },
+  "notRun": [
+    "GPU",
+    "build",
+    "full TypeScript",
+    "full suite",
+    "integration",
+    "install",
+    "commit"
+  ]
+}

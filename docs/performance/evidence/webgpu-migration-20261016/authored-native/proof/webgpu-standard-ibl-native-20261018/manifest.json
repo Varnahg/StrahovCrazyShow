@@ -1,0 +1,348 @@
+{
+  "schemaVersion": 1,
+  "task": "webgpu-standard-ibl-native-20261018",
+  "owner": "webgpu-standard-ibl-native-01a14497-child",
+  "createdUtc": "2026-10-18T19:03:19.497Z",
+  "worktree": "C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow",
+  "branch": "codex/webgpu-migration",
+  "baseCommit": "26378f4a05d8668f0416b031901b5fb8ae815f8b",
+  "scope": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/standard-ibl-defines.test.ts"
+  ],
+  "preimages": {
+    "patch": {
+      "sha256": "21114f6048abdcba932a8640adf1a97b6281939d99ae6d53fbfe96ef76bf0503",
+      "bytes": 12130
+    },
+    "lock": {
+      "sha256": "03d4edcd8f9d92fa7b6b320f5600709dd62612a5bad7867cef61875e7ecd8b53"
+    },
+    "package": {
+      "sha256": "e1d35f209df3333959931c04ed25681db3ca4d63e919fad0ca93340b4b7b333f"
+    }
+  },
+  "outputs": {
+    "patches/@babylonjs__core@9.30.0.patch": {
+      "sha256": "4b5db0c0716db43a7225b78fc2914f2e6f0d88e7a95c7408cf9f5c2312a99f15",
+      "bytes": 13052
+    },
+    "pnpm-lock.yaml": {
+      "sha256": "8550e368c800f23b0763aa1e6a9e317ef4de90d272da2b7e9a1aa6a9ea11f0b6",
+      "bytes": 60408
+    },
+    "tests/standard-ibl-defines.test.ts": {
+      "sha256": "0cc147d6728d2e2132310d44422025b54fc6aef5814d4cf0bbefb8c45761cedb",
+      "bytes": 7928
+    }
+  },
+  "vendorInputs": {
+    "oldRoot": "C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow/.cache/webgpu-hitch-validation-20261017/grass-preparation-v2/node_modules/@babylonjs/core",
+    "correctedRoot": "C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow/.cache/webgpu-standard-lod-define-proof-20261018/case/node_modules/@babylonjs/core",
+    "files": {
+      "Materials/standardMaterial.pure.js": {
+        "oldSha256": "46d48bd7c3abbb2c763bd598dd0df35881dfcd2aefd3dee4f3103bab36e946e0",
+        "correctedSha256": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+        "appliedSha256": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37"
+      },
+      "Materials/standardMaterial.pure.d.ts": {
+        "oldSha256": "09d7280a79391fb48b20bf743b646d3a4ce779f4704a18a017f8965b77a3c37d",
+        "correctedSha256": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+        "appliedSha256": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c"
+      }
+    }
+  },
+  "checks": {
+    "oldPatchIsExactPrefix": true,
+    "newPatchOnlyTwoAppendedFileHunks": true,
+    "lockHashSubstitutionCount": 6,
+    "reverseSubstitutionEqualsPreimage": true,
+    "packageUnchanged": true,
+    "deltaGitApplyCheckExit": 0,
+    "deltaGitApplyExit": 0,
+    "appliedFilesEqualCorrectedProof": true,
+    "gitDiffCheckExit": 0,
+    "readonlyDependenciesUnmodified": true
+  },
+  "testRuns": {
+    "red01": {
+      "start": "2026-10-18T18:59:14.847Z",
+      "end": "2026-10-18T18:59:44.860Z",
+      "status": null,
+      "error": "spawnSync C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe ETIMEDOUT",
+      "args": [
+        "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\red\\node_modules\\tsx\\dist\\cli.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "tests/standard-ibl-defines.test.ts"
+      ],
+      "testSha256": "65c8f0115aab0dca2acdeb1c442b35bff16e318d63661827ba70015dea2d01e6",
+      "coreSha256": "46d48bd7c3abbb2c763bd598dd0df35881dfcd2aefd3dee4f3103bab36e946e0",
+      "logSha256": "368eede319c6516c407a92bf47c7177cceebdb5fcd879c48c0a2dbfc19058458"
+    },
+    "green01": {
+      "start": "2026-10-18T18:59:24.847Z",
+      "end": "2026-10-18T18:59:26.490Z",
+      "status": 1,
+      "error": null,
+      "args": [
+        "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\green\\node_modules\\tsx\\dist\\cli.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "tests/standard-ibl-defines.test.ts"
+      ],
+      "testSha256": "65c8f0115aab0dca2acdeb1c442b35bff16e318d63661827ba70015dea2d01e6",
+      "coreSha256": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+      "logSha256": "7fa556b920ded04fc71fb939d95da82dbf70479491ea1d09fbf44580fa9e6027"
+    },
+    "red02": {
+      "start": "2026-10-18T19:01:36.397Z",
+      "end": "2026-10-18T19:01:42.491Z",
+      "status": 1,
+      "error": null,
+      "args": [
+        "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\red\\node_modules\\tsx\\dist\\cli.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "tests/standard-ibl-defines.test.ts"
+      ],
+      "testSha256": "ee8423f353ded57e483d8b50ee6c9ec324751077177b871a715fd2730282ca59",
+      "coreSha256": "46d48bd7c3abbb2c763bd598dd0df35881dfcd2aefd3dee4f3103bab36e946e0",
+      "logSha256": "c31a39f050c1a5ae3c1e56e2925ecbf2c4bbc6e84929f35cd545d7b19b9993f4"
+    },
+    "green02": {
+      "start": "2026-10-18T19:01:43.089Z",
+      "end": "2026-10-18T19:01:48.820Z",
+      "status": 0,
+      "error": null,
+      "args": [
+        "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\green\\node_modules\\tsx\\dist\\cli.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "tests/standard-ibl-defines.test.ts"
+      ],
+      "testSha256": "ee8423f353ded57e483d8b50ee6c9ec324751077177b871a715fd2730282ca59",
+      "coreSha256": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+      "logSha256": "a21b165ed09becdef0995a1451f9d6af1e938252885ea04f171291142d237362"
+    },
+    "red03": {
+      "start": "2026-10-18T19:03:52.772Z",
+      "end": "2026-10-18T19:03:55.797Z",
+      "status": 1,
+      "error": null,
+      "args": [
+        "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\red\\node_modules\\tsx\\dist\\cli.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "tests/standard-ibl-defines.test.ts"
+      ],
+      "testSha256": "d4889fbb14c42b07562caae8b4f8da3064efaf0d2fb23ed167ad0b9c02ef44de",
+      "coreSha256": "46d48bd7c3abbb2c763bd598dd0df35881dfcd2aefd3dee4f3103bab36e946e0",
+      "logSha256": "44dfb40736e8a2cd10f2c65fc37e5ec268395fd663258de37f993746b3f70fd3"
+    },
+    "green03": {
+      "start": "2026-10-18T19:03:52.773Z",
+      "end": "2026-10-18T19:03:55.823Z",
+      "status": 0,
+      "error": null,
+      "args": [
+        "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\green\\node_modules\\tsx\\dist\\cli.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "tests/standard-ibl-defines.test.ts"
+      ],
+      "testSha256": "d4889fbb14c42b07562caae8b4f8da3064efaf0d2fb23ed167ad0b9c02ef44de",
+      "coreSha256": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+      "logSha256": "5027a8d097e3040dab3658a6b280085d6ee8770a51c1cd255476683cbec771fd"
+    },
+    "red04": {
+      "start": "2026-10-18T19:07:58.623Z",
+      "end": "2026-10-18T19:08:00.623Z",
+      "status": 1,
+      "error": null,
+      "args": [
+        "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\red\\node_modules\\tsx\\dist\\cli.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "tests/standard-ibl-defines.test.ts"
+      ],
+      "testSha256": "0cc147d6728d2e2132310d44422025b54fc6aef5814d4cf0bbefb8c45761cedb",
+      "coreSha256": "46d48bd7c3abbb2c763bd598dd0df35881dfcd2aefd3dee4f3103bab36e946e0",
+      "logSha256": "99ac607bf311af181ae087d441df05b1f98682d7e995ae2352a451c23ffa9c39"
+    },
+    "green04": {
+      "start": "2026-10-18T19:07:58.632Z",
+      "end": "2026-10-18T19:08:00.585Z",
+      "status": 0,
+      "error": null,
+      "args": [
+        "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\green\\node_modules\\tsx\\dist\\cli.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "tests/standard-ibl-defines.test.ts"
+      ],
+      "testSha256": "0cc147d6728d2e2132310d44422025b54fc6aef5814d4cf0bbefb8c45761cedb",
+      "coreSha256": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+      "logSha256": "56f4734bef062a2b1ecee6790c2ea40e735890bc1bc460bf27dfdd46dfa231e8"
+    }
+  },
+  "result": {
+    "red02": {
+      "pass": 0,
+      "fail": 4,
+      "reason": "Fresh receiver fails exact warmed Effect identity for both caps; null-to-cube missing USESPHERICALFROMREFLECTIONMAP in serialized defines for both caps."
+    },
+    "green02": {
+      "pass": 4,
+      "fail": 0
+    },
+    "attempt01": "Preserved: red timed out after30s; green2/4 failed because test used nonexistent public cube.isDisposed property. Corrected assertion uses actual scene texture membership/readiness; identity assertions now avoid cyclic-object diff formatting.",
+    "red03": {
+      "pass": 0,
+      "fail": 4,
+      "reason": "Fresh receiver fails exact warmed Effect identity for both caps; null-to-cube missing USESPHERICALFROMREFLECTIONMAP in serialized defines for both caps."
+    },
+    "green03": {
+      "pass": 4,
+      "fail": 0
+    },
+    "finalTestCase": "04; after peer review, readiness uses a4s wall-clock deadline rather than40 event-loop turns, with identical actual draw+Effect.isReady guard",
+    "red04": {
+      "pass": 0,
+      "fail": 4,
+      "reason": "Fresh receiver fails exact warmed Effect identity for both caps; null-to-cube missing USESPHERICALFROMREFLECTIONMAP in serialized defines for both caps."
+    },
+    "green04": {
+      "pass": 4,
+      "fail": 0
+    }
+  },
+  "priorProof": {
+    "manifestSha256": "3c2c0873e65e518950213bf9e075e6952c0fd2d5b9c145e4b30e1688654d5e73",
+    "handoff": "docs/agents/handoffs/webgpu-standard-lod-define-proof-20261018.md"
+  },
+  "limits": [
+    "NullEngine replaces only raw cube upload; no new GPU, pixels, FPS or pipeline-duration evidence.",
+    "No fresh install, full TypeScript, full suite, build or integration in this task; root owns these.",
+    "Actual GPU root-reported1bc02a has0 new programs/modules but13 sync pipelines and471.5ms max remain; KEY31 is not complete.",
+    "No commit/staging or changes to Game/helper/shared dependencies."
+  ],
+  "artifacts": {
+    "analysis.md": {
+      "sha256": "b9aef8b12e565899cb65190c4c57950b05d35d686d1f1ca326d6746275725440",
+      "bytes": 978
+    },
+    "green-01.json": {
+      "sha256": "1e1aafd22b2735eff99ccbb2792b5cfd3ebc1a9c1f333548cc18d6ff0a68b1bb",
+      "bytes": 627
+    },
+    "green-01.log": {
+      "sha256": "7fa556b920ded04fc71fb939d95da82dbf70479491ea1d09fbf44580fa9e6027",
+      "bytes": 2855
+    },
+    "green-01.test.ts.txt": {
+      "sha256": "65c8f0115aab0dca2acdeb1c442b35bff16e318d63661827ba70015dea2d01e6",
+      "bytes": 7464
+    },
+    "green-02.json": {
+      "sha256": "dfe0003fde8e5adbca4d354fea0865c1031f5f4f61b3ae7fc701c0162a935b3c",
+      "bytes": 627
+    },
+    "green-02.log": {
+      "sha256": "a21b165ed09becdef0995a1451f9d6af1e938252885ea04f171291142d237362",
+      "bytes": 1327
+    },
+    "green-02.test.ts.txt": {
+      "sha256": "ee8423f353ded57e483d8b50ee6c9ec324751077177b871a715fd2730282ca59",
+      "bytes": 7580
+    },
+    "new-hunks.patch": {
+      "sha256": "62df36584751f793dc139a5c1afc2953b796f709e6817110e2b2016a1e610925",
+      "bytes": 922
+    },
+    "red-01.json": {
+      "sha256": "684d84bed26df59d5d7cb80612075badc1f899477dcd47cdb80d39ce2cf15ce9",
+      "bytes": 744
+    },
+    "red-01.log": {
+      "sha256": "368eede319c6516c407a92bf47c7177cceebdb5fcd879c48c0a2dbfc19058458",
+      "bytes": 68
+    },
+    "red-01.test.ts.txt": {
+      "sha256": "65c8f0115aab0dca2acdeb1c442b35bff16e318d63661827ba70015dea2d01e6",
+      "bytes": 7464
+    },
+    "red-02.json": {
+      "sha256": "17d5373b6a902f72737484a36cbb3f691a14e98897d306bc4f1cab45ca50e737",
+      "bytes": 625
+    },
+    "red-02.log": {
+      "sha256": "c31a39f050c1a5ae3c1e56e2925ecbf2c4bbc6e84929f35cd545d7b19b9993f4",
+      "bytes": 13180
+    },
+    "red-02.test.ts.txt": {
+      "sha256": "ee8423f353ded57e483d8b50ee6c9ec324751077177b871a715fd2730282ca59",
+      "bytes": 7580
+    },
+    "run.mjs": {
+      "sha256": "97cf62348d830f78b022c8a61c65a032ea04c6d65ed794c7561ebca44226c333",
+      "bytes": 1382
+    },
+    "green-03.json": {
+      "sha256": "12e02825bf97733d7726d498f4ba2cb7d692fced1f06b5f9ae328c043bee4e30",
+      "bytes": 627
+    },
+    "green-03.log": {
+      "sha256": "5027a8d097e3040dab3658a6b280085d6ee8770a51c1cd255476683cbec771fd",
+      "bytes": 1326
+    },
+    "green-03.test.ts.txt": {
+      "sha256": "d4889fbb14c42b07562caae8b4f8da3064efaf0d2fb23ed167ad0b9c02ef44de",
+      "bytes": 7808
+    },
+    "red-03.json": {
+      "sha256": "bc5987a177f5e9e614fe0fb450fc03c46a55b22c8ed8a3532619de664d4d03a2",
+      "bytes": 625
+    },
+    "red-03.log": {
+      "sha256": "44dfb40736e8a2cd10f2c65fc37e5ec268395fd663258de37f993746b3f70fd3",
+      "bytes": 13178
+    },
+    "red-03.test.ts.txt": {
+      "sha256": "d4889fbb14c42b07562caae8b4f8da3064efaf0d2fb23ed167ad0b9c02ef44de",
+      "bytes": 7808
+    },
+    "green-04.json": {
+      "sha256": "0882ea260546ba279dc1d927b508b369a598bf2b7be4e9dbb4245858ea0d3724",
+      "bytes": 627
+    },
+    "green-04.log": {
+      "sha256": "56f4734bef062a2b1ecee6790c2ea40e735890bc1bc460bf27dfdd46dfa231e8",
+      "bytes": 1327
+    },
+    "green-04.test.ts.txt": {
+      "sha256": "0cc147d6728d2e2132310d44422025b54fc6aef5814d4cf0bbefb8c45761cedb",
+      "bytes": 7928
+    },
+    "red-04.json": {
+      "sha256": "3ff592a662ec1ea63cd1c7efa10e6a42319cd5a3676f69427a5a9160c4a5fa13",
+      "bytes": 625
+    },
+    "red-04.log": {
+      "sha256": "99ac607bf311af181ae087d441df05b1f98682d7e995ae2352a451c23ffa9c39",
+      "bytes": 13183
+    },
+    "red-04.test.ts.txt": {
+      "sha256": "0cc147d6728d2e2132310d44422025b54fc6aef5814d4cf0bbefb8c45761cedb",
+      "bytes": 7928
+    }
+  },
+  "updatedUtc": "2026-10-18T19:08:34.407Z",
+  "review": {
+    "reviewer": "/root/functional_record",
+    "findings": [],
+    "advisory": "Async shader imports may outlive40 event-loop turns; changed to bounded4s elapsed time and reran RED04/GREEN04.",
+    "noReviewExecution": true
+  }
+}
