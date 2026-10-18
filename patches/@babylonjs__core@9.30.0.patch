@@ -157,3 +157,51 @@ diff --git a/Materials/materialHelper.functions.js b/Materials/materialHelper.fu
              defines["HEMILIGHT" + index] = false;
              defines["POINTLIGHT" + index] = false;
              defines["DIRLIGHT" + index] = false;
+diff --git a/Materials/materialDefines.js b/Materials/materialDefines.js
+index 265bd1e..c482f2f 100644
+--- a/Materials/materialDefines.js
++++ b/Materials/materialDefines.js
+@@ -229,7 +229,41 @@ export class MaterialDefines {
+                     break;
+             }
+         }
+-        return result;
++        return canonicalResult(result);
+     }
+ }
++// Project QA: bounded flat-literal serialization only. Custom order-sensitive
++// processors are outside the verified contract; no universal API guarantee.
++/** Project QA candidate derived from the accepted isolated CPU proof.
++ * Input contract: a completed flat literal define block, not arbitrary shader
++ * preprocessor text. No property reads, _keys changes or persistent cache.
++ */
++const MAX_CHARS = 32768;
++const MAX_DEFINES = 1024;
++// Signed decimal constants cover native -1 indices and PBR numeric strings.
++// Hex/suffixes/expressions are deliberately outside this proof's contract.
++const literal = '[+-]?(?:(?:0|[1-9][0-9]*)(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?';
++const linePattern = new RegExp(`^#define ([A-Za-z_][A-Za-z0-9_]*)(?: (${literal}))?$`);
++const reserved = new Set(['defined', 'true', 'false', 'WEBGPU', 'WEBGL1', 'WEBGL2', 'NATIVE', 'IS_NDC_HALF_ZRANGE', 'USE_REVERSE_DEPTHBUFFER', 'USE_EXACT_SRGB_CONVERSIONS', ...Object.getOwnPropertyNames(Object.prototype)]);
++function canonicalResult(text) {
++    if (!text || text.length > MAX_CHARS || !text.endsWith('\n') || /[^\x20-\x7e\n]/.test(text))
++        return text;
++    const lines = text.slice(0, -1).split('\n');
++    if (lines.length > MAX_DEFINES)
++        return text;
++    const seen = new Set();
++    const records = [];
++    for (const line of lines) {
++        const match = linePattern.exec(line);
++        if (!match)
++            return text;
++        const [, name, value] = match;
++        if (name.includes('__') || name.startsWith('GL_') || reserved.has(name) || seen.has(name) || value !== undefined && !Number.isFinite(Number(value)))
++            return text;
++        seen.add(name);
++        records.push({ name, line });
++    }
++    records.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
++    return records.map(record => record.line).join('\n') + '\n';
++}
+ //# sourceMappingURL=materialDefines.js.map
+\ No newline at end of file
