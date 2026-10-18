@@ -1,0 +1,94 @@
+TAP version 13
+# BJS - [14:13:00]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:13:00]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual opaque dispatch is sky first then near to far, with frame-cache invalidation and untouched alpha queues
+ok 1 - actual opaque dispatch is sky first then near to far, with frame-cache invalidation and untouched alpha queues
+  ---
+  duration_ms: 72.3801
+  type: 'test'
+  ...
+# BJS - [14:13:00]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:13:00]: Babylon.js v9.30.0 - Null engine
+# Subtest: native instance LOD draw groups sort by active instance centres, excluding layerMask0 and without extra getLOD or world changes
+ok 2 - native instance LOD draw groups sort by active instance centres, excluding layerMask0 and without extra getLOD or world changes
+  ---
+  duration_ms: 45.1834
+  type: 'test'
+  ...
+# Subtest: readonly public LOD selection agrees with actual Babylon distance, exact boundaries, screen coverage and orthographic modes
+ok 3 - readonly public LOD selection agrees with actual Babylon distance, exact boundaries, screen coverage and orthographic modes
+  ---
+  duration_ms: 4.866
+  type: 'test'
+  ...
+# BJS - [14:13:00]: Babylon.js v9.30.0 - Null engine
+# Subtest: arbitrary custom LOD selection uses deterministic safe fallback without invoking the selector from sorting
+ok 4 - arbitrary custom LOD selection uses deterministic safe fallback without invoking the selector from sorting
+  ---
+  duration_ms: 38.8953
+  type: 'test'
+  ...
+# BJS - [14:13:00]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:13:00]: Babylon.js v9.30.0 - Null engine
+# Subtest: material-first actual PBR dispatch groups shared materials and reduces real mustRebind without changing draw membership
+ok 5 - material-first actual PBR dispatch groups shared materials and reduces real mustRebind without changing draw membership
+  ---
+  duration_ms: 48.3271
+  type: 'test'
+  ...
+# Subtest: pure current-pass MultiMaterial keys never call cache-resetting material/default/LOD/readiness/transform access
+ok 6 - pure current-pass MultiMaterial keys never call cache-resetting material/default/LOD/readiness/transform access
+  ---
+  duration_ms: 2.6447
+  type: 'test'
+  ...
+# BJS - [14:13:00]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual camera-pass override and MultiMaterial children bind in material-first order without extra invalidation
+ok 7 - actual camera-pass override and MultiMaterial children bind in material-first order without extra invalidation
+  ---
+  duration_ms: 73.2212
+  type: 'test'
+  ...
+# BJS - [14:13:00]: Babylon.js v9.30.0 - Null engine
+# Subtest: material-first preserves actual alpha, transparent and shadow dispatch while keeping sky first
+ok 8 - material-first preserves actual alpha, transparent and shadow dispatch while keeping sky first
+  ---
+  duration_ms: 64.3946
+  type: 'test'
+  ...
+# BJS - [14:13:01]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:13:01]: Babylon.js v9.30.0 - Null engine
+# Subtest: material-first preserves native LOD/instance membership, custom selector calls and geometry transforms
+ok 9 - material-first preserves native LOD/instance membership, custom selector calls and geometry transforms
+  ---
+  duration_ms: 46.0139
+  type: 'test'
+  ...
+# Subtest: material-first factories add no observers or caches and deterministic ties preserve authored depth state
+ok 10 - material-first factories add no observers or caches and deterministic ties preserve authored depth state
+  ---
+  duration_ms: 2.4229
+  type: 'test'
+  ...
+# BJS - [14:13:01]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual ArtLighting initialization selects near-to-far for WebGL opaque dispatch
+ok 11 - actual ArtLighting initialization selects near-to-far for WebGL opaque dispatch
+  ---
+  duration_ms: 44.0487
+  type: 'test'
+  ...
+# Subtest: actual ArtLighting initialization selects material-first for WebGPU opaque dispatch
+ok 12 - actual ArtLighting initialization selects material-first for WebGPU opaque dispatch
+  ---
+  duration_ms: 46.3948
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1985.5325

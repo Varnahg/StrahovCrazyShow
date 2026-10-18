@@ -1,0 +1,55 @@
+TAP version 13
+# BJS - [14:12:58]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:12:58]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual ArtLighting initialization selects near-to-far for WebGL opaque dispatch
+ok 1 - actual ArtLighting initialization selects near-to-far for WebGL opaque dispatch
+  ---
+  duration_ms: 63.6302
+  type: 'test'
+  ...
+# Subtest: actual ArtLighting initialization selects material-first for WebGPU opaque dispatch
+not ok 2 - actual ArtLighting initialization selects material-first for WebGPU opaque dispatch
+  ---
+  duration_ms: 39.0373
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-opaque-order-native-20261018\\validation-02\\tests\\opaque-sort.test.ts:666:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+        'backdrop',
+    -   'far-shared',
+        'near-shared',
+        'middle-other',
+    +   'far-shared'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'backdrop'
+    1: 'far-shared'
+    2: 'near-shared'
+    3: 'middle-other'
+  actual:
+    0: 'backdrop'
+    1: 'near-shared'
+    2: 'middle-other'
+    3: 'far-shared'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-opaque-order-native-20261018\validation-02\tests\opaque-sort.test.ts:751:14)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1697.6094

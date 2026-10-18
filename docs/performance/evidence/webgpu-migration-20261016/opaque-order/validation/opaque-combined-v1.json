@@ -1,0 +1,34 @@
+{
+  "snapshotId": "5d247248f50a762877e9079bb4fcd65280e959e8014eb3f65b2662e397c518cb",
+  "results": [
+    {
+      "phase": "build",
+      "startedAt": "2026-10-18T12:21:55.196Z",
+      "finishedAt": "2026-10-18T12:22:43.740Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1-build.log",
+      "sha256": "1db80971673c25d079906cb1f2165be105a14feb7316ca1146dd5db253819053"
+    },
+    {
+      "phase": "test",
+      "startedAt": "2026-10-18T12:22:48.725Z",
+      "finishedAt": "2026-10-18T12:26:24.695Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1-test.log",
+      "sha256": "2fe39109d8826a26314f18a8a0aff9c025341be1fb3eae8f643b6aaab4f392c3"
+    },
+    {
+      "phase": "integration",
+      "startedAt": "2026-10-18T12:26:29.282Z",
+      "finishedAt": "2026-10-18T12:26:52.261Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test:integration",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1-integration.log",
+      "sha256": "583d5d2cf3b9573e2b0b19d2cb0d8de94e03ee96282fd3210de88f8d4423d34f"
+    }
+  ],
+  "sharedMetadataUnchanged": true,
+  "scope": "combined checkpoint with exactly three owned opaque material-order source/test changes. Full TypeScript/build, complete tests and isolated integration. Original WebGL path and all foreign combined behavior retained; no backend-default/vendor/quality change."
+}

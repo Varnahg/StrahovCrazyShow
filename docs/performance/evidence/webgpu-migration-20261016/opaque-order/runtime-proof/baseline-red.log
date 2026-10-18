@@ -1,0 +1,61 @@
+BJS - [14:11:49]: Babylon.js v9.30.0 - Null engine
+BJS - [14:11:49]: Babylon.js v9.30.0 - Null engine
+✖ actual ArtLighting initialization selects near-to-far for WebGL opaque dispatch (150.1095ms)
+✖ actual ArtLighting initialization selects material-first for WebGPU opaque dispatch (116.0806ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2133.6036
+
+✖ failing tests:
+
+test at tests\opaque-sort.test.ts:666:3
+✖ actual ArtLighting initialization selects near-to-far for WebGL opaque dispatch (150.1095ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  -   'backdrop',
+      'near-shared',
+      'middle-other',
+      'far-shared'
+    ]
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-opaque-order-native-20261018\validation\tests\opaque-sort.test.ts:736:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'near-shared', 'middle-other', 'far-shared' ],
+    expected: [ 'backdrop', 'near-shared', 'middle-other', 'far-shared' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\opaque-sort.test.ts:666:3
+✖ actual ArtLighting initialization selects material-first for WebGPU opaque dispatch (116.0806ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  -   'backdrop',
+  -   'far-shared',
+      'near-shared',
+      'middle-other',
+  +   'far-shared'
+    ]
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-opaque-order-native-20261018\validation\tests\opaque-sort.test.ts:736:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'near-shared', 'middle-other', 'far-shared' ],
+    expected: [ 'backdrop', 'far-shared', 'near-shared', 'middle-other' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
