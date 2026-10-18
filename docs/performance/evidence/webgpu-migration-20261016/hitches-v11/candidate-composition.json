@@ -1,0 +1,18 @@
+{
+  "kind": "unaccepted-inactive-light-vendor-qa",
+  "parentSnapshot": "0e15522126720f08e892de60685df25f5d20c313c562c952151de7d94d9f964a",
+  "leafRecord": "manifest.json",
+  "leafSha256": "1f7fd825af1633d4efc227ffdc033d7e85540bd6400f7c03b7bbf0f4822d9eac",
+  "changed": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml"
+  ],
+  "added": [
+    "tests/inactive-light-defines-helper.test.ts",
+    "tests/inactive-light-defines-history.test.ts"
+  ],
+  "dependencyRuntimeChanges": [
+    "core/Materials/materialHelper.functions.js"
+  ],
+  "scope": "Same V3 application with three inactive falloff resets in physically isolated pinned Babylon core/loaders. Prior vendor patch retained. No active/global lighting change, cache, callback or readiness/deadline relaxation. Full suite/integration and GPU acceptance pending."
+}

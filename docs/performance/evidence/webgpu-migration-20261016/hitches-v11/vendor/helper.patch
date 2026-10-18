@@ -1,0 +1,13 @@
+diff --git a/Materials/materialHelper.functions.js b/Materials/materialHelper.functions.js
+--- a/Materials/materialHelper.functions.js
++++ b/Materials/materialHelper.functions.js
+@@ -673,6 +673,9 @@
+     for (let index = lightIndex; index < maxLightCount; index++) {
+         if (defines["LIGHT" + index] !== undefined) {
+             defines["LIGHT" + index] = false;
++            defines["LIGHT_FALLOFF_PHYSICAL" + index] = false;
++            defines["LIGHT_FALLOFF_GLTF" + index] = false;
++            defines["LIGHT_FALLOFF_STANDARD" + index] = false;
+             defines["HEMILIGHT" + index] = false;
+             defines["POINTLIGHT" + index] = false;
+             defines["DIRLIGHT" + index] = false;

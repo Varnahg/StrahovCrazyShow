@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-inactive-light-defines-20261018",
+  "title": "KEY-31: přenést ověřený inactive light reset do nativního patch a regresí",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/inactive-light-defines-helper.test.ts",
+    "tests/inactive-light-defines-history.test.ts",
+    ".cache/webgpu-migration-checks/inactive-light-defines-native-20261018/",
+    "docs/agents/handoffs/webgpu-inactive-light-defines-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přenést pouze schválené3false assignments a přesný lock hash z QA manifestu1f7fd825af1633d4efc227ffdc033d7e85540bd6400f7c03b7bbf0f4822d9eac. Zachovat celý starý patch a verze, žádné jiné runtime změny.",
+    "Přenést obě skutečné regresní testové sady, odstranit pouze QA-specifický absolutní prefix z identity assertion; zachovat skutečný loader/core realpath a instanceof důkaz. Cíleně refaktorovat zbylé nepoužité probe proměnné/importy bez oslabení assertions.",
+    "Žádný zápis do instalovaných node_modules, žádný install nebo změna hraných4193/4192/4188. Testovat pouze přes vlastní kopii nativního source import closure a frozen QA dependencies; root vytvoří úplný čistý snapshot a provede plnou validaci/integraci."
+  ],
+  "verification": [
+    "Stávající QA16/16+77/77, scopedTS0,6file patch roundtrip a10860dependencyhashes jsou vstup, ne náhrada nového ověření přenesených testů. Ověřit cílené16testů po úpravě identity/refaktoringu a nativní source closure.",
+    "Původní helper bug potvrzen actual history; GPU Day V3 pilot/control2 vytváří62mod/45sync a3.31/3.18s gap. V4 oba piloty0mod/0sync a137.9/155.3ms maxima, health0. Startup kolísá V3 43.08/43.74s, V4 47.07/42.68s; není statisticky přijatá celá migrace.",
+    "Předat vlastní diff, changed source/test SHA, skutečné cílené logy, cleanup a hranice. Fullsuite/build/integration/GPU provádí root, bez commitu od leaf."
+  ],
+  "notes": [
+    "Přímé root zadání přes pokračující BMAD, bez rekurzivního workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow. Owner webgpu-inactive-light-native-01a14497.",
+    "Před prvním zápisem claim a audit status. Handoff QA vlastníka je docs/agents/handoffs/webgpu-inactive-light-defines-qa-20261018.md; jeho prefix je po release readonly. V4 produkční snapshotbf28a56507b6b0650d214169c8cf94aa3b2d8abc4012a8b098e4e1366340c8c0 obsahuje navíc nezaintegrované coverage prototypy: tyto runtime soubory nekopírovat do nativního tasku.",
+    "Stale frozen draw/explicit Node light/fallback string jsou popsané hranice, ne nové opravy tohoto tasku. TSX_DISABLE_CACHE=1, žádný velkýasset/fullworld/GPU. Po předání ukončit procesy a release."
+  ]
+}
