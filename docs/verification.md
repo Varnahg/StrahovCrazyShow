@@ -545,3 +545,9 @@ Zůstává Day preview ve spawnu:869.2msCPU/29programů/0RTT a3593.8msgap; na tr
 [Evidence hitches-v11](performance/evidence/webgpu-migration-20261016/hitches-v11/README.md). Tři reset assignments v izolovaném pinned helperu odstranily historii inactive falloff flags. RED15fail/1pass→GREEN16/16,77related, scopedTS0, celý patch roundtrip6/6,10860dependency hashes. Combined snapshotbf28a565…40c8c0:1384/1384 pnpm test, build/fullTS a izolovaná integration PASS.
 
 Dva V3 Day přechody62mod/45sync a3309.5/3178.9ms; dva V4 přechody0mod/0sync a137.9/155.3ms. Zůstává≥100ms CPU prodleva. V4 venkovníF4mod/2sync,max157.9ms; nový B6 průchod neproveden. Startup V3 43.0761/43.7435s, V4 47.0673/42.6754s kolísá, absence regrese neprokázaná. Scene/traffic/cap histogram a čas přechodu se místy liší; přechodová FPS nejsou steady FPS přejímka. Health/dispose bez chyb, hrané4193/4192/4188 beze změny. Nativní vendor-only přenos a jeho plná validace/integrace jsou samostatný pokračující celek.
+
+## WebGPU KEY-31: Nativní inactive falloff fix integrován (18.10.2026)
+
+[Evidence hitches-v12](performance/evidence/webgpu-migration-20261016/hitches-v12/README.md): WT76978db3250c9a8a3ce3fc99f44f93fb4aedc8a1 → mainf9e3806d99e683bd54fb9d1f8d354f499ba31948. Pouze3reset assignments v pinned Babylon helperu,6patch SHA substitutions v lock a2actual regresní testy. Native snapshoteb061b9eb34a0cdf8a94560ad7803ef9235ab1447e9b4d986c7cb640e2f0b7b3:1312/1312 pnpm test, fullTS/build a isolatedintegration PASS; source/dependencies beze změny. Čtecí review bez nálezů. Main integrace zachovala133jinýchworkingcest, hrané4193/4192/4188 beze změny.
+
+Úspěšný Day GPU výsledek V4 zatím zahrnuje QA prewarm; ten se do tohoto commitu nepřenáší. Nelze tedy tvrdit vyřešené všechny nativní záseky ani dokončenou migraci. Pokračuje přesná coverage a startup rozpočet, B6/funkční přejímka a srovnatelné renderer série.

@@ -1,0 +1,35 @@
+{
+  "kind": "native-vendor-only",
+  "sourceHead": "15f910258ddec0c2cb100fb4e41d54d2023e5877",
+  "leafSha256": "00ab7390cd1dceb631350d8c5afa0e3674462dcfbc0d1c88bbd2175d1c7d51b7",
+  "changedFiles": [
+    {
+      "path": "patches/@babylonjs__core@9.30.0.patch",
+      "inputSha256": "5e2a931df89822e98cdea08310fcd84f734aed60ba95499c93cda0eccca77115",
+      "sha256": "0811815a615a8e501c4542ee2fa38fcc5fdd1a4394fbc610cb0aa5a0ae62c578",
+      "bytes": 9813
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "inputSha256": "f1df0465d34b3f6e7c2094af08129d72db0f7f554082bfbd43e1f8814ca615fa",
+      "sha256": "54bae00191e01af417fffb8f243917dd299987c614121c09840475ed2b1b9ca8",
+      "bytes": 60408
+    },
+    {
+      "path": "tests/inactive-light-defines-helper.test.ts",
+      "inputSha256": null,
+      "sha256": "a6c2ee9b07b9f960f094de1b20600a58237c210606bb95608a90b22f612c88d2",
+      "bytes": 9238
+    },
+    {
+      "path": "tests/inactive-light-defines-history.test.ts",
+      "inputSha256": null,
+      "sha256": "0f103de140a9e2981ed3ad1365ed3d432ce8e6ecf6e78f6fc3399b3433b20359",
+      "bytes": 11457
+    }
+  ],
+  "dependencyRuntimeChanges": [
+    "core/Materials/materialHelper.functions.js"
+  ],
+  "scope": "Tracked native working tree plus exactly the vendor patch/lock and two regression tests. Does not include QA B6/day/camera/inventory coverage prototypes. Assets/public/docs are explicit readonly source links, not GPU acceptance evidence."
+}

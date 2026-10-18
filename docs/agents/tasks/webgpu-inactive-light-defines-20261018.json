@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-inactive-light-defines-20261018",
   "title": "KEY-31: přenést ověřený inactive light reset do nativního patch a regresí",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "patches/@babylonjs__core@9.30.0.patch",
@@ -26,6 +26,7 @@
   "notes": [
     "Přímé root zadání přes pokračující BMAD, bez rekurzivního workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow. Owner webgpu-inactive-light-native-01a14497.",
     "Před prvním zápisem claim a audit status. Handoff QA vlastníka je docs/agents/handoffs/webgpu-inactive-light-defines-qa-20261018.md; jeho prefix je po release readonly. V4 produkční snapshotbf28a56507b6b0650d214169c8cf94aa3b2d8abc4012a8b098e4e1366340c8c0 obsahuje navíc nezaintegrované coverage prototypy: tyto runtime soubory nekopírovat do nativního tasku.",
-    "Stale frozen draw/explicit Node light/fallback string jsou popsané hranice, ne nové opravy tohoto tasku. TSX_DISABLE_CACHE=1, žádný velkýasset/fullworld/GPU. Po předání ukončit procesy a release."
+    "Stale frozen draw/explicit Node light/fallback string jsou popsané hranice, ne nové opravy tohoto tasku. TSX_DISABLE_CACHE=1, žádný velkýasset/fullworld/GPU. Po předání ukončit procesy a release.",
+    "Root přijal a integroval pouze4nativefiles: WT76978db3250c9a8a3ce3fc99f44f93fb4aedc8a1 → mainf9e3806d99e683bd54fb9d1f8d354f499ba31948. Native snapshoteb061b9e…f0b7b3:1312/1312/build/isolatedintegration PASS, review bez nálezů. Hitches-v12. Hranébuildy a133dalšíchworkingcest zachované; QA prewarm prototypy nebyly integrovány a migrace/KEY-31 zůstávají otevřené."
   ]
 }
