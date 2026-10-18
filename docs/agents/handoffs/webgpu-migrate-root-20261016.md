@@ -227,3 +227,8 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## Warm material switch CPU proof přijat
 
 18.10 V2manifest7a25099dad279c07ef5cf203004802438fe657db392bb209a7dc1a91ec1dda23,3×5/5,scopedTS2963/0. V1review odkazy/observerčas opravené bez změny měřených bytes; finálníreview beználezů. Hitches-v21 uchovává46artefaktů. Další výzkum může porovnat čistouserializaci, nevznikla runtimecache. Childprocessyukončené/claimreleased.
+
+
+## Day13 experiment dokončen, runtime odložen
+
+18.10 hitches-v22: manifestc989fc77778c484cbdf53d3f7bcb717837ece01ab18b8b4812069924a7f1eec7, snapshotb9d812…b513f,63artefaktů.74/80/1338tests a build/integrationPASS, dvěGPUsekvenceF~150ms místo5–6s. Startup+2.9/+6.3s všakregredoval, Day~200ms; nativeGame se nemění. TaskQAuzavřen jakoexperiment, nikoli přijetí migrace. Všechno vlastníGPU/serveryukončené, kartaaboutblank. Dalšívýzkum mázlevnitcelou přípravu podlewarmCPUproofu a pakzopakovatstartup/interakce; žádnácachedefaultvybraná.
