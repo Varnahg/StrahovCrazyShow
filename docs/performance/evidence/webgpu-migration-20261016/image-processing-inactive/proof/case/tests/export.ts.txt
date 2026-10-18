@@ -1,0 +1,8 @@
+import fs from "node:fs";
+import { createHash } from "node:crypto";
+import { originalSource, patchedSource } from "./prototype";
+const hash=(value:string)=>createHash("sha256").update(value).digest("hex");
+fs.writeFileSync(new URL("../../original-method.txt",import.meta.url),originalSource,{flag:"wx"});
+fs.writeFileSync(new URL("../../patched-method.txt",import.meta.url),patchedSource,{flag:"wx"});
+const result={originalFunctionSha256:hash(originalSource),patchedFunctionSha256:hash(patchedSource),marker:"defines.VIGNETTE = false;",insertAfter:["defines.VIGNETTEBLENDMODEMULTIPLY = false;","defines.VIGNETTEBLENDMODEOPAQUE = false;","defines.SAMPLER3DGREENDEPTH = false;","defines.SAMPLER3DBGRMAP = false;"],inverseExact:patchedSource.replace(/\n                    defines\.(VIGNETTEBLENDMODEMULTIPLY|VIGNETTEBLENDMODEOPAQUE|SAMPLER3DGREENDEPTH|SAMPLER3DBGRMAP) = false;/g,"")===originalSource};
+fs.writeFileSync(new URL("../../prototype.json",import.meta.url),JSON.stringify(result,null,2)+"\n",{flag:"wx"});console.log(result);

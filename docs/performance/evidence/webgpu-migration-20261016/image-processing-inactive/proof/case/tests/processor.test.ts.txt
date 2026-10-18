@@ -1,0 +1,122 @@
+import test,{after} from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import {setImmediate as turn} from "node:timers/promises";
+import {NullEngine} from "@babylonjs/core/Engines/nullEngine";
+import {Scene} from "@babylonjs/core/scene";
+import {FreeCamera} from "@babylonjs/core/Cameras/freeCamera";
+import {Vector3} from "@babylonjs/core/Maths/math.vector";
+import {MeshBuilder} from "@babylonjs/core/Meshes/meshBuilder";
+import {HemisphericLight} from "@babylonjs/core/Lights/hemisphericLight";
+import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
+import {PBRMaterial} from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import {RawTexture} from "@babylonjs/core/Materials/Textures/rawTexture";
+import {ImageProcessingConfiguration} from "@babylonjs/core/Materials/imageProcessingConfiguration";
+import {ImageProcessingConfigurationDefines} from "@babylonjs/core/Materials/imageProcessingConfiguration.defines";
+import {ThinImageProcessingPostProcess} from "@babylonjs/core/PostProcesses/thinImageProcessingPostProcess";
+import {ShaderLanguage} from "@babylonjs/core/Materials/shaderLanguage";
+import {WebGPUShaderProcessorWGSL} from "@babylonjs/core/Engines/WebGPU/webgpuShaderProcessorsWGSL";
+import {WebGPUShaderProcessingContext} from "@babylonjs/core/Engines/WebGPU/webgpuShaderProcessingContext";
+import {CHILDREN,original,originalSource,patchedSource,withPrototype} from "./prototype";
+import "../client/render-shaders";
+
+const report:any={scope:"Actual pinned materials/processors and postprocess shader; no driver/pixel/FPS claim",cases:[]};
+after(()=>fs.writeFileSync(new URL(`report-processor-${process.env.PROOF_RUN}.json`,import.meta.url),JSON.stringify(report,null,2)+"\n",{flag:"wx"}));
+const json=(value:any)=>JSON.parse(JSON.stringify(value));
+const publicValues=(value:any)=>Object.fromEntries(Object.entries(value).filter(([key])=>!key.startsWith("_")));
+
+test("four children have symmetric inactive reset and exact active/reactivation values across64config cases",async()=>{
+  const engine=new NullEngine(),scene=new Scene(engine),texture=new RawTexture(new Uint8Array(64),4,4,5,scene,false,false);
+  let count=0;
+  try{for(const post of [false,true])for(const apply of [false,true])for(const enabled of [false,true])for(const mode of [0,1])for(const green of [false,true])for(const bgr of [false,true]){
+    const config=new ImageProcessingConfiguration();config.vignetteEnabled=true;config.vignetteBlendMode=mode;config.colorGradingEnabled=true;config.colorGradingTexture=texture;config.colorGradingWithGreenDepth=green;config.colorGradingBGR=bgr;
+    config.applyByPostProcess=post;config.isEnabled=true;
+    const a=new ImageProcessingConfigurationDefines(),b=new ImageProcessingConfigurationDefines();original.call(config,a,post);original.call(config,b,post);
+    const active=publicValues(a);assert.equal(a.VIGNETTEBLENDMODEMULTIPLY,mode===0);assert.equal(a.VIGNETTEBLENDMODEOPAQUE,mode!==0);
+    config.applyByPostProcess=apply;config.isEnabled=enabled;original.call(config,a,post);
+    await withPrototype(true,()=>config.prepareDefines(b,post));
+    if(post===apply&&enabled)assert.deepEqual(publicValues(b),publicValues(a));
+    else{
+      for(const name of CHILDREN)assert.equal(b[name],false,name);
+      assert.deepEqual(Object.fromEntries(Object.entries(publicValues(b)).filter(([name])=>!CHILDREN.includes(name as any))),Object.fromEntries(Object.entries(publicValues(a)).filter(([name])=>!CHILDREN.includes(name as any))));
+      assert.equal(b.VIGNETTE,false);assert.equal(b.COLORGRADING,false);assert.equal(b.IMAGEPROCESSING,false);
+    }
+    config.applyByPostProcess=post;config.isEnabled=true;await withPrototype(true,()=>config.prepareDefines(b,post));assert.deepEqual(publicValues(b),active);count++;
+  }}finally{texture.dispose();scene.dispose();engine.dispose();}
+  assert.equal(count,64);report.cases.push({kind:"configuration-matrix",count});
+});
+
+test("in-process replacement restores the exact original descriptor even after failure",async()=>{
+  const before=Object.getOwnPropertyDescriptor(ImageProcessingConfiguration.prototype,"prepareDefines"),failure={failure:true};
+  await assert.rejects(withPrototype(true,()=>{throw failure;}),error=>error===failure);
+  assert.deepEqual(Object.getOwnPropertyDescriptor(ImageProcessingConfiguration.prototype,"prepareDefines"),before);
+  assert.equal(ImageProcessingConfiguration.prototype.prepareDefines,original);
+  assert.equal(patchedSource.split("defines.VIGNETTE = false;").length,2);assert.equal(original.toString(),originalSource);
+});
+
+class ProcessingEngine extends NullEngine {
+  readonly sources=new Map<any,{vertex:string;fragment:string}>();
+  readonly prefixes=new Map<any,string[]>();
+  constructor(native:boolean){super();this._isWebGPU=native;this._webGLVersion=2;this._shaderPlatformName=native?"WEBGPU":"WEBGL2";this.getCaps().standardDerivatives=true;this.getCaps().textureLOD=true;}
+  override _getShaderProcessor(language:ShaderLanguage){
+    if(!this.isWebGPU)return super._getShaderProcessor(language);
+    const processor:any=new WebGPUShaderProcessorWGSL(),convert=processor._convertDefinesToConst,prefixes=this.prefixes;
+    processor._convertDefinesToConst=function(...args:any[]){const result=Reflect.apply(convert,this,args),context=this._webgpuProcessingContext,list=prefixes.get(context)??[];list.push(result);prefixes.set(context,list);return result;};return processor;
+  }
+  override _getShaderProcessingContext(language:ShaderLanguage){return this.isWebGPU?new WebGPUShaderProcessingContext(language):super._getShaderProcessingContext(language);}
+  override createShaderProgram(...args:Parameters<NullEngine["createShaderProgram"]>){this.sources.set(args[0],{vertex:args[1],fragment:args[2]});return super.createShaderProgram(...args);}
+}
+function strip(source:string,prefix?:string){if(!prefix)return source;const at=source.indexOf(prefix);assert.ok(at>=0);assert.equal(source.indexOf(prefix,at+prefix.length),-1);return source.slice(0,at)+source.slice(at+prefix.length);}
+function capture(engine:ProcessingEngine,effect:any,material?:any){
+  assert.ok(effect?.isReady());const sources=engine.sources.get(effect.getPipelineContext())!;assert.ok(sources);
+  const prefixes=engine.prefixes.get(effect._processingContext)??[];if(engine.isWebGPU)assert.equal(prefixes.length,2);
+  return{defines:effect.defines,body:{vertex:strip(sources.vertex,prefixes[0]),fragment:strip(sources.fragment,prefixes[1])},prefixes,
+    layout:{processing:json(effect._processingContext),attributes:effect.getAttributesNames(),uniforms:effect.getUniformNames(),samplers:effect.getSamplers(),uniformBuffers:json(effect._uniformBuffersNames),materialLocations:material?json(material._uniformBuffer._uniformLocations):null,materialSizes:material?json(material._uniformBuffer._uniformSizes):null}};
+}
+async function untilReady(action:()=>void,ready:()=>boolean){const end=performance.now()+4000;do{action();await turn();}while(!ready()&&performance.now()<end);assert.equal(ready(),true);}
+
+async function materialHistory(native:boolean,kind:"standard"|"pbr",patched:boolean){return withPrototype(patched,async()=>{
+  const engine=new ProcessingEngine(native),scene=new Scene(engine);new FreeCamera("camera",new Vector3(0,0,-5),scene);new HemisphericLight("sky",Vector3.Up(),scene);
+  const material=kind==="standard"?new StandardMaterial("actual Standard",scene):new PBRMaterial("actual PBR",scene);
+  const warm=MeshBuilder.CreateBox("preloaded",{},scene);warm.material=material;const cold=warm.clone("fresh",null,true)!;cold.setEnabled(false);
+  const drawn=new Set<string>();for(const mesh of [warm,cold])mesh.onAfterRenderObservable.add(()=>drawn.add(mesh.name));
+  const draw=(mesh:typeof warm)=>untilReady(()=>{drawn.clear();engine.beginFrame();scene.render();engine.endFrame();},()=>drawn.has(mesh.name)&&!!mesh.subMeshes[0].effect?.isReady());
+  try{
+    await draw(warm);const active=capture(engine,warm.subMeshes[0].effect,material);assert.match(active.defines,/^#define VIGNETTEBLENDMODEMULTIPLY$/m);
+    scene.imageProcessingConfiguration.isEnabled=false;await draw(warm);const warmEffect=warm.subMeshes[0].effect!,old=capture(engine,warmEffect,material),before=engine.sources.size;
+    warm.setEnabled(false);cold.setEnabled(true);await draw(cold);const freshEffect=cold.subMeshes[0].effect!,fresh=capture(engine,freshEffect,material),newPrograms=engine.sources.size-before;
+    assert.deepEqual(old.body,fresh.body,"inactive shader arithmetic unchanged despite historical flags");assert.deepEqual(old.layout,fresh.layout);
+    if(patched){assert.equal(freshEffect,warmEffect);assert.equal(freshEffect.getPipelineContext(),warmEffect.getPipelineContext());assert.equal(newPrograms,0);assert.equal(old.defines,fresh.defines);}
+    else{assert.equal(newPrograms,1);assert.notEqual(old.defines,fresh.defines);}
+    return{active,old,fresh,newPrograms};
+  }finally{scene.dispose();engine.dispose();}
+});}
+
+for(const native of [false,true])for(const kind of ["standard","pbr"] as const)test(`actual ${native?"WGSL":"GLSL"} ${kind} inactive source and binding layout parity`,async()=>{
+  const baseline=await materialHistory(native,kind,false),candidate=await materialHistory(native,kind,true);
+  for(const name of ["old","fresh"] as const){assert.deepEqual(candidate[name].body,baseline[name].body);assert.deepEqual(candidate[name].layout,baseline[name].layout);}
+  assert.deepEqual(candidate.active,baseline.active,"active method source/defines/layout remain unchanged");report.cases.push({kind:"material-processor",language:native?"WGSL":"GLSL",material:kind,baseline,candidate});
+});
+
+async function postProcessHistory(native:boolean,patched:boolean){return withPrototype(patched,async()=>{
+  const engine=new ProcessingEngine(native),scene=new Scene(engine),config=new ImageProcessingConfiguration();
+  const texture=new RawTexture(new Uint8Array(64),4,4,5,scene,false,false);config.colorGradingEnabled=true;config.colorGradingTexture=texture;config.vignetteEnabled=true;
+  const process=new ThinImageProcessingPostProcess("actual IP",engine,{imageProcessingConfiguration:config,shaderLanguage:native?ShaderLanguage.WGSL:ShaderLanguage.GLSL});
+  const captureCurrent=async()=>{await untilReady(()=>{},()=>process.isReady());return capture(engine,process.effect);};
+  try{
+    const active:any[]=[];
+    for(const mode of [0,1])for(const green of [false,true])for(const bgr of [false,true]){
+      config.vignetteBlendMode=mode;config.colorGradingWithGreenDepth=green;config.colorGradingBGR=bgr;
+      const snapshot=await captureCurrent();assert.match(snapshot.defines,/VIGNETTE/);assert.match(snapshot.defines,/COLORGRADING/);active.push({mode,green,bgr,snapshot});
+    }
+    config.isEnabled=false;const disabled=await captureCurrent();assert.match(disabled.defines,/FROMLINEARSPACE/);assert.doesNotMatch(disabled.defines,/#define IMAGEPROCESSING;/);
+    assert.match(disabled.body.fragment,/applyImageProcessing/);assert.match(disabled.body.fragment,/toGammaSpace|pow/);
+    config.isEnabled=true;const reactivated=await captureCurrent();assert.deepEqual(reactivated,active.at(-1).snapshot);
+    return{active,disabled,reactivated};
+  }finally{process.dispose();texture.dispose();scene.dispose();engine.dispose();}
+});}
+for(const native of [false,true])test(`actual ${native?"WGSL":"GLSL"} postprocess keeps active modes/LUT and disabled FROMLINEARSPACE gamma`,async()=>{
+  const baseline=await postProcessHistory(native,false),candidate=await postProcessHistory(native,true);
+  assert.deepEqual(candidate.active,baseline.active);assert.deepEqual(candidate.reactivated,baseline.reactivated);assert.deepEqual(candidate.disabled.body,baseline.disabled.body);assert.deepEqual(candidate.disabled.layout,baseline.disabled.layout);
+  report.cases.push({kind:"postprocess",language:native?"WGSL":"GLSL",baseline,candidate});
+});

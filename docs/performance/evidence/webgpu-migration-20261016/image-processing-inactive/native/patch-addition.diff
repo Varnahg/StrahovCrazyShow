@@ -1,0 +1,11 @@
+@@ -557,6 +570,10 @@
+                 if (forPostProcess !== this.applyByPostProcess || !this._isEnabled) {
+                     defines.WHITEBALANCE = false;
+                     defines.VIGNETTE = false;
++                    defines.VIGNETTEBLENDMODEMULTIPLY = false;
++                    defines.VIGNETTEBLENDMODEOPAQUE = false;
++                    defines.SAMPLER3DGREENDEPTH = false;
++                    defines.SAMPLER3DBGRMAP = false;
+                     defines.TONEMAPPING = 0;
+                     defines.CONTRAST = false;
+                     defines.EXPOSURE = false;

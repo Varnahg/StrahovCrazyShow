@@ -1,0 +1,281 @@
+{
+  "task": "webgpu-image-processing-inactive-proof-20261018",
+  "createdAt": "2026-10-18T20:23:24.753Z",
+  "base": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\authored-native-v3",
+  "baseSnapshot": "777a1bbb3552b800947cf62adcf6db141c72d3d72600fbfcbeeca42d287e05f6",
+  "sourcePins": [
+    {
+      "path": "client/game.ts",
+      "sha256": "32f02d0f457765719cae8ba23194e368ff709cfbf04d2580298f176e14f941b6"
+    },
+    {
+      "path": "client/architecture-reality.ts",
+      "sha256": "9e1c55065a1bfb32afffbd1e884e6c1126b962f5bfe951e7ba65cc516c4005e6"
+    },
+    {
+      "path": "client/outdoor-artifacts.ts",
+      "sha256": "8f8bdb7d28b05cc4f173fe2e6cb444dbc7e1f3e71f45de64441937d0ec825a12"
+    },
+    {
+      "path": "client/cinematic.ts",
+      "sha256": "b01306e45a67cb1b050a8cd18879bafd215c48db7d683de6cf228cb4e1d86bac"
+    },
+    {
+      "path": "client/authored-light-preparation.ts",
+      "sha256": "1b455b8a87995433fdf79e59965d11453fca514fbeb055166ac21283c03c6a18"
+    },
+    {
+      "path": "client/light-preparation.ts",
+      "sha256": "375c506df25927806207d21644c56f868e4f67e6f726576cb2ae5db01850cd5e"
+    },
+    {
+      "path": "client/render-quality-preparation.ts",
+      "sha256": "3dd4cc6c9837f67b97d086b903c469bfed48affd538589dc98d10536373a78fc"
+    },
+    {
+      "path": "client/strict-material-preparation.ts",
+      "sha256": "a1c384e975ddd5d4d5f7d6fcb917f916e37b82c7a4d00a79b10aa5a99d12019a"
+    },
+    {
+      "path": "client/render-shaders.ts",
+      "sha256": "e73d2d242eb18d2c876cee60f6811bc41061520eee4718d1e9eb583252e60fd0"
+    },
+    {
+      "path": "shared/world.ts",
+      "sha256": "394fe4d61db507be8881af44a3dc417ed9c3674688cef3ba6cb9b9534a15a936"
+    },
+    {
+      "path": "shared/outdoor-artifacts.ts",
+      "sha256": "5b13c7733e7d193c4e46dd43d55c864d4ae544ccdbe2f343dfaa9d4ae86a3674"
+    }
+  ],
+  "pinnedDependencies": [
+    {
+      "path": "Materials/imageProcessingConfiguration.pure.js",
+      "sha256": "f0b452b09bfe47b6eccf4c6369480391cb25a02e497cd8fddc182fcec5bfe043"
+    },
+    {
+      "path": "Materials/imageProcessingConfiguration.defines.js",
+      "sha256": "823adc07e135f06a6628c7d17b878aa56a2ca83947251c9a8b45effac0770217"
+    },
+    {
+      "path": "Materials/imageProcessingConfiguration.functions.js",
+      "sha256": "835aa93f7ed176a8ac1fdf5fa541ecea98be0bed0476e5375087d841e4211535"
+    },
+    {
+      "path": "Shaders/ShadersInclude/imageProcessingFunctions.js",
+      "sha256": "31d72e6d7a20baf98b5b9913fca08bbe853350a22ddce2aa29200e1c2fe96d27"
+    },
+    {
+      "path": "ShadersWGSL/ShadersInclude/imageProcessingFunctions.js",
+      "sha256": "688282e51c8343e58c247d9fccd85d7ff5adf926c8f5bcf42ebd604b35944a7d"
+    }
+  ],
+  "prototype": {
+    "originalFunctionSha256": "f018e5117c257db2d80b4b06033f44035ac7ab4602928c2d35cb4ed3c28f93b0",
+    "patchedFunctionSha256": "bfe5b69008f3a6cb0e6d0d1bfcdb2bc9686712fcc2e89021307ee739cc916231",
+    "marker": "defines.VIGNETTE = false;",
+    "insertAfter": [
+      "defines.VIGNETTEBLENDMODEMULTIPLY = false;",
+      "defines.VIGNETTEBLENDMODEOPAQUE = false;",
+      "defines.SAMPLER3DGREENDEPTH = false;",
+      "defines.SAMPLER3DBGRMAP = false;"
+    ],
+    "inverseExact": true
+  },
+  "artifacts": [
+    {
+      "path": "analysis.md",
+      "sha256": "33b34085e47cd2f34d147db4846c963a69d0081fb5c6100fce4d084ea8c904c4",
+      "bytes": 1954
+    },
+    {
+      "path": "assemble.mjs",
+      "sha256": "24c43e4a4f661c5c1679eeabf4f003851bb35179ddca2d362568967418294036",
+      "bytes": 5435
+    },
+    {
+      "path": "case/package.json",
+      "sha256": "e1d35f209df3333959931c04ed25681db3ca4d63e919fad0ca93340b4b7b333f",
+      "bytes": 1340
+    },
+    {
+      "path": "case/tests/export.ts",
+      "sha256": "16e02f7f49099a1c64a937c4830d5f7100d92a546742dbabb0e4110e0d4b25a2",
+      "bytes": 1036
+    },
+    {
+      "path": "case/tests/history.test.ts",
+      "sha256": "bac0ff97c9f006c7633a79527e3591e166e655eeddb18a5ea224a70480960062",
+      "bytes": 32435
+    },
+    {
+      "path": "case/tests/processor.test.ts",
+      "sha256": "1f7f0b9536bc6c2c6d8139d36006af8bd4aeb38cca91b306d8ba342b94b4050d",
+      "bytes": 11899
+    },
+    {
+      "path": "case/tests/prototype.ts",
+      "sha256": "08f2f7311b0ea9c658223ab761383fd27d1eaec1117a1ba51d37b54bdf532e74",
+      "bytes": 2142
+    },
+    {
+      "path": "case/tests/report-game-final01.json",
+      "sha256": "d3a20d1ac94a5db02d2d86629721e9bfb7aac5f587c3d1e7892af76090d31979",
+      "bytes": 399607
+    },
+    {
+      "path": "case/tests/report-game-green01.json",
+      "sha256": "835bf823abdf2c4b89861b1126b86b1936c2bfeaf667b904961cc3e18aeae515",
+      "bytes": 383478
+    },
+    {
+      "path": "case/tests/report-game-matrix01.json",
+      "sha256": "b4a142f6a65fea67561b3b16f3397cf3c47895345b42b33f3d95f1a8a9149510",
+      "bytes": 1213
+    },
+    {
+      "path": "case/tests/report-game-red01.json",
+      "sha256": "067b59d3e3c8479a2576c6192040ea7fab7c6aa4fd422734acf731f2bed9db4e",
+      "bytes": 323383
+    },
+    {
+      "path": "case/tests/report-processor-final01.json",
+      "sha256": "5c8836946d92762212ea435aaed1f34d8be4ced067a6003181c9025255db7330",
+      "bytes": 5165892
+    },
+    {
+      "path": "case/tests/report-processor-matrix01.json",
+      "sha256": "5c8836946d92762212ea435aaed1f34d8be4ced067a6003181c9025255db7330",
+      "bytes": 5165892
+    },
+    {
+      "path": "case/tsconfig.json",
+      "sha256": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c",
+      "bytes": 572
+    },
+    {
+      "path": "final01-history.test.ts.txt",
+      "sha256": "bac0ff97c9f006c7633a79527e3591e166e655eeddb18a5ea224a70480960062",
+      "bytes": 32435
+    },
+    {
+      "path": "final01-processor.test.ts.txt",
+      "sha256": "1f7f0b9536bc6c2c6d8139d36006af8bd4aeb38cca91b306d8ba342b94b4050d",
+      "bytes": 11899
+    },
+    {
+      "path": "final01.json",
+      "sha256": "4e5b3b679c4345368db4179f8d6b2b2c41958b5151dd6f6611b2d8634fd3595f",
+      "bytes": 790
+    },
+    {
+      "path": "final01.log",
+      "sha256": "a3bb5c80138d50d803c40a790f86395ecabb49c7d14c0a8d2836d6001772aa5a",
+      "bytes": 5039
+    },
+    {
+      "path": "finalize.mjs",
+      "sha256": "c92169fa731a5099659d6020aef5f598d96023c85c83d1aba7a2ac2500fd46b9",
+      "bytes": 8673
+    },
+    {
+      "path": "green01-history.test.ts.txt",
+      "sha256": "bac0ff97c9f006c7633a79527e3591e166e655eeddb18a5ea224a70480960062",
+      "bytes": 32435
+    },
+    {
+      "path": "green01.json",
+      "sha256": "e1edd49922699f65ff7bf145c8025fdf68161c1f7171d8ebf3ee674307d9b158",
+      "bytes": 661
+    },
+    {
+      "path": "green01.log",
+      "sha256": "60d8d4d6d7d03d54a2c7baad3662a6176fcdee60ba2017fe68f5425e9f2f159c",
+      "bytes": 540
+    },
+    {
+      "path": "history-original.test.ts.txt",
+      "sha256": "124c743c0477fdd63317cf7351f419c880d575bc6fc70d44f669ab71a98da6d3",
+      "bytes": 30025
+    },
+    {
+      "path": "inputs.json",
+      "sha256": "7bfe4b6446ca4e03a49824d39941464e491759babae7712ef15772c58663e093",
+      "bytes": 1437
+    },
+    {
+      "path": "matrix01-history.test.ts.txt",
+      "sha256": "bac0ff97c9f006c7633a79527e3591e166e655eeddb18a5ea224a70480960062",
+      "bytes": 32435
+    },
+    {
+      "path": "matrix01-processor.test.ts.txt",
+      "sha256": "1f7f0b9536bc6c2c6d8139d36006af8bd4aeb38cca91b306d8ba342b94b4050d",
+      "bytes": 11899
+    },
+    {
+      "path": "matrix01.json",
+      "sha256": "fe0de17ab6be953812754fef09d03f60921effc4d5d25b2d26acca357b906887",
+      "bytes": 883
+    },
+    {
+      "path": "matrix01.log",
+      "sha256": "296425abddcdceeca93501f1e2d20df7f3e6437078041633c910da9f92a066cc",
+      "bytes": 2650
+    },
+    {
+      "path": "original-method.txt",
+      "sha256": "f018e5117c257db2d80b4b06033f44035ac7ab4602928c2d35cb4ed3c28f93b0",
+      "bytes": 3083
+    },
+    {
+      "path": "patched-method.txt",
+      "sha256": "bfe5b69008f3a6cb0e6d0d1bfcdb2bc9686712fcc2e89021307ee739cc916231",
+      "bytes": 3317
+    },
+    {
+      "path": "prototype.json",
+      "sha256": "b464b68ae04bb9f5d1d6ef45d505c13f315c5007dc26b407576848225c8df511",
+      "bytes": 464
+    },
+    {
+      "path": "red01-history.test.ts.txt",
+      "sha256": "45cf44a228383dc16e125927124c182c3f5e28d93f52dc399ef3e12cc389c582",
+      "bytes": 32355
+    },
+    {
+      "path": "red01.json",
+      "sha256": "357c729d638961f2ffbc1616f605de5ee32123e580a43feff0b4f31a18751615",
+      "bytes": 661
+    },
+    {
+      "path": "red01.log",
+      "sha256": "cecb1b69fe41c2f6a84b2022377988aad164819a3ef4bc2954a2a649e5cac275",
+      "bytes": 2084
+    },
+    {
+      "path": "run.mjs",
+      "sha256": "784c3103460becd3fe95d4971f7567631b9ef35bc91fdda5e6c250e58b700380",
+      "bytes": 1481
+    },
+    {
+      "path": "summary.json",
+      "sha256": "0572774d3e8c755f79335e8335692cf5113139f78e90727bb650ad64f015703c",
+      "bytes": 5288
+    }
+  ],
+  "handoff": {
+    "path": "docs/agents/handoffs/webgpu-image-processing-inactive-proof-20261018.md",
+    "sha256": "80fc4c8b9afd9647984196631e0723b9d0b48419c3de4f335e5991b55ebf8b48"
+  },
+  "validation": {
+    "red": 2,
+    "green": 18,
+    "failed": 0,
+    "skipped": 0,
+    "fullTypecheck": false,
+    "build": false,
+    "GPU": false
+  }
+}

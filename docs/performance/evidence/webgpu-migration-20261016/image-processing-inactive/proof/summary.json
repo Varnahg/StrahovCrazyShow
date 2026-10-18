@@ -1,0 +1,193 @@
+{
+  "baseSnapshot": "777a1bbb3552b800947cf62adcf6db141c72d3d72600fbfcbeeca42d287e05f6",
+  "prototype": {
+    "originalFunctionSha256": "f018e5117c257db2d80b4b06033f44035ac7ab4602928c2d35cb4ed3c28f93b0",
+    "patchedFunctionSha256": "bfe5b69008f3a6cb0e6d0d1bfcdb2bc9686712fcc2e89021307ee739cc916231",
+    "marker": "defines.VIGNETTE = false;",
+    "insertAfter": [
+      "defines.VIGNETTEBLENDMODEMULTIPLY = false;",
+      "defines.VIGNETTEBLENDMODEOPAQUE = false;",
+      "defines.SAMPLER3DGREENDEPTH = false;",
+      "defines.SAMPLER3DBGRMAP = false;"
+    ],
+    "inverseExact": true
+  },
+  "red": {
+    "cases": [
+      {
+        "initialQuality": "low",
+        "newPrograms": 3,
+        "deltas": [
+          {
+            "name": "reality glass 0 0",
+            "oldEffect": 21,
+            "newEffect": 24,
+            "removed": [
+              "#define SAMPLER3DBGRMAP",
+              "#define SAMPLER3DGREENDEPTH",
+              "#define VIGNETTEBLENDMODEMULTIPLY"
+            ],
+            "added": []
+          },
+          {
+            "name": "reality glass 0 1",
+            "oldEffect": 22,
+            "newEffect": 25,
+            "removed": [
+              "#define SAMPLER3DBGRMAP",
+              "#define SAMPLER3DGREENDEPTH",
+              "#define VIGNETTEBLENDMODEMULTIPLY"
+            ],
+            "added": []
+          },
+          {
+            "name": "outdoor-artifacts:outdoor-dark-metal",
+            "oldEffect": 20,
+            "newEffect": 23,
+            "removed": [
+              "#define SAMPLER3DBGRMAP",
+              "#define SAMPLER3DGREENDEPTH",
+              "#define VIGNETTEBLENDMODEMULTIPLY"
+            ],
+            "added": []
+          }
+        ]
+      },
+      {
+        "initialQuality": "medium",
+        "newPrograms": 3,
+        "deltas": [
+          {
+            "name": "reality glass 0 0",
+            "oldEffect": 41,
+            "newEffect": 50,
+            "removed": [
+              "#define SAMPLER3DBGRMAP",
+              "#define SAMPLER3DGREENDEPTH",
+              "#define VIGNETTEBLENDMODEMULTIPLY"
+            ],
+            "added": []
+          },
+          {
+            "name": "reality glass 0 1",
+            "oldEffect": 42,
+            "newEffect": 51,
+            "removed": [
+              "#define SAMPLER3DBGRMAP",
+              "#define SAMPLER3DGREENDEPTH",
+              "#define VIGNETTEBLENDMODEMULTIPLY"
+            ],
+            "added": []
+          },
+          {
+            "name": "outdoor-artifacts:outdoor-dark-metal",
+            "oldEffect": 40,
+            "newEffect": 49,
+            "removed": [
+              "#define SAMPLER3DBGRMAP",
+              "#define SAMPLER3DGREENDEPTH",
+              "#define VIGNETTEBLENDMODEMULTIPLY"
+            ],
+            "added": []
+          }
+        ]
+      }
+    ],
+    "testsFailed": 2
+  },
+  "green": {
+    "histories": [
+      {
+        "initialQuality": "low",
+        "stages": 41,
+        "newPrograms": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "disposed": 0,
+        "caps": [
+          4
+        ],
+        "strictReuse": true
+      },
+      {
+        "initialQuality": "medium",
+        "stages": 41,
+        "newPrograms": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "disposed": 0,
+        "caps": [
+          4
+        ],
+        "strictReuse": true
+      }
+    ],
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 5790.0145
+  },
+  "configurationMatrix": 64,
+  "shaderCases": [
+    {
+      "language": "GLSL",
+      "material": "standard",
+      "baselineExtra": 1,
+      "patchedExtra": 0,
+      "inactiveBodyLayoutExact": true,
+      "activeExact": true
+    },
+    {
+      "language": "GLSL",
+      "material": "pbr",
+      "baselineExtra": 1,
+      "patchedExtra": 0,
+      "inactiveBodyLayoutExact": true,
+      "activeExact": true
+    },
+    {
+      "language": "WGSL",
+      "material": "standard",
+      "baselineExtra": 1,
+      "patchedExtra": 0,
+      "inactiveBodyLayoutExact": true,
+      "activeExact": true
+    },
+    {
+      "language": "WGSL",
+      "material": "pbr",
+      "baselineExtra": 1,
+      "patchedExtra": 0,
+      "inactiveBodyLayoutExact": true,
+      "activeExact": true
+    }
+  ],
+  "postprocess": [
+    {
+      "language": "GLSL",
+      "activeCombinations": 8,
+      "activeAndReactivatedExact": true,
+      "inactiveBodyLayoutExact": true,
+      "fromLinearSpacePreserved": true
+    },
+    {
+      "language": "WGSL",
+      "activeCombinations": 8,
+      "activeAndReactivatedExact": true,
+      "inactiveBodyLayoutExact": true,
+      "fromLinearSpacePreserved": true
+    }
+  ],
+  "limits": [
+    "The actual native same-session startup flag history was not captured; this CPU proof reproduces the source-justified sequence and exact three-flag delta.",
+    "History uses native actual3factory materials and41Game stages with synthetic canvas/TextureIO, free-space collision and selected small scene; processor cases separately use actualStandard/PBR and ThinImageProcessingPostProcess.",
+    "GLSL/WGSL preprocessed body/layout equivalence is not hardware validation or pixel/FPS acceptance.",
+    "Four inactive writes only, including OPAQUE symmetry; active branch and gamma/saturate remain unchanged."
+  ]
+}

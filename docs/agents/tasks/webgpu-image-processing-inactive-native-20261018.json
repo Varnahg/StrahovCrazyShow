@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-image-processing-inactive-native-20261018",
+  "title": "KEY-31: převést ověřený reset neaktivních image-processing příznaků",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/image-processing-inactive-defines.test.ts",
+    "tests/game-authored-light-preparation.test.ts",
+    ".cache/webgpu-image-processing-inactive-native-20261018/",
+    "docs/agents/handoffs/webgpu-image-processing-inactive-native-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přenést pouze ověřené čtyři false assignments za defines.VIGNETTE=false v existující prepareDefines earlyreturn. Pinned source method f018e511…→bfe5b690…, privátní celý JS b961f563…; ostatní patch hunks byteově zachovat.",
+    "Lockfile změní jen související patch hash, žádné verze/package manifest. Shared installed dependencies a hranébuildy se nemění.",
+    "Přenositelná actual Standard/PBR/submesh a postprocess/config regrese bez cache/absolutních cest; zachovat aktivní režimy a disabled/mismatch/reactivation/FROMLINEARSPACE kontrakt. Přidat prokázanou native cold preload historii do existing actualGame fixture bez oslabení starých assertions.",
+    "Cílený refaktoring fixture, vlastnictví a finally cleanup. Žádná nová runtime diagnostika, další přípravné etapy, camera/LOD zásah nebo širší native Game změna."
+  ],
+  "verification": [
+    "Lehké cílené actual red/green pomocí readonly původních a privátních nových dependencies; přesná source/patch/lock/test evidence a handoff.",
+    "Root zajišťuje fresh install, full TS/test/build/isolatedintegration a srovnatelnou GPU kontrolu; child nesmí spouštět heavy/GPU/servery, commit ani editovat main."
+  ],
+  "notes": [
+    "Přímé root implementační zadání v BMAD kroku03; před zápisem claim a přečíst předané18/18proof výsledky i independent review. Bez rekurzivního workflow.",
+    "První privátní production B1:736318b2,0novýchprogramů/0modulů/2sync,55.3FPS,p9927.5,max171.8ms proti plainA1 5/10/12,max573. A2 control a konečná přejímka běží uroota. Nepředstírat dokončený celý KEY31;172ms stále překračuje původnícíl.",
+    "Původní patch obsahuje dřívější exposure/IBL/shadow úpravy. Nepřepsat je, negenerovat nový upgrade ani měnit aktivní imageprocessing větev. Native runtime integrace až po root ověření.",
+    "Root accepted the bounded ImageProcessing fix after actual material/processor proof and A1/B1/A2:5/0/5 new programs,12/2/12 sync,max573/171.8/582.3ms,4 intervals>100ms remain in each. Fresh installed native1446/combined1506, both fullTS/build/isolatedintegration PASS; WT0eba3cf5e5c0659779d9c365b732b07b37693846→main6a7f7554bf585a52a40f38cd5a6626fbbb8bbde5. Evidence docs/performance/evidence/webgpu-migration-20261016/image-processing-inactive/README.md. Protected builds unchanged; own QA stopped. Entire KEY31/migration remains open."
+  ]
+}

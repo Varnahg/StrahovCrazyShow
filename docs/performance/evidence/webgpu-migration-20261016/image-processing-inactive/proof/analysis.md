@@ -1,0 +1,9 @@
+# Neaktivní image-processing příznaky: rozhodnutí před counterfactualem
+
+Přesná native/C5 source historie: native assets Scene.render předchází Cinematic; C5 jej vytvoří a nastaví prostředí ještě před prvním preload draw. Výchozí ImageProcessingConfiguration je enabled=true/post=false. PrepareDefines active větev nastaví childflags i při vypnutých parent efektech; early return (disabled nebo postprocess mismatch) resetuje parents, nikoli4children. Mixin začíná se všemi4false. Tato historie vysvětluje možnost dvou klíčů pro stejný finální stav; native same-session startup requesty zatím zachycené nejsou.
+
+Guard audit pinned9.30: GLSL imageProcessingFunctions4–31 má SAMPLER* pod COLORGRADING&&!COLORGRADING3D, VIGNETTE children58–66 pod VIGNETTE. WGSL vignette32–40 má stejný parentguard, SAMPLER* v WGSL není použito. Uniform/sampler layout závisí na parent gates. Postprocess FROMLINEARSPACE může dál provádět gamma/saturate i bez IMAGEPROCESSING; toto se nesmí změnit.
+
+Varianty: další warm historie přidají práci a neřeší fresh receiver; výpočet config-child writes před earlyreturn sjednotí klíče, ale mění hodnoty v neaktivní větvi podle nedůležitých nastavení; key stripping by globálně zasáhl i aktivní účinek. Preferovaný privátní counterfactual po RED: reset přesně4children nafalse ve stávajícímearly-return. OPAQUE musí být symetrický kMULTIPLY. Aktivní větev, parentgates, FROMLINEARSPACE a IMAGEPROCESSINGPOSTPROCESS zůstávají přesně původní. Bez cache/novýchstages/lifecyclezdrojů či FS změny vendoru.
+
+První krok je uložený RED se skutečnými native factory/material/Scene draws před Cinematic a freshdisabled receiverem, včetně původních41Game etap. Teprve potom je dovolena in-process náhrada přesné metody a její obnovování v finally. NullEngine a shaderprocessor důkaz není GPU/pixel/FPS měření.

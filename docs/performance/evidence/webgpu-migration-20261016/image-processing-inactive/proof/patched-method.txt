@@ -1,0 +1,65 @@
+prepareDefines(defines, forPostProcess = false) {
+                if (forPostProcess !== this.applyByPostProcess || !this._isEnabled) {
+                    defines.WHITEBALANCE = false;
+                    defines.VIGNETTE = false;
+                    defines.VIGNETTEBLENDMODEMULTIPLY = false;
+                    defines.VIGNETTEBLENDMODEOPAQUE = false;
+                    defines.SAMPLER3DGREENDEPTH = false;
+                    defines.SAMPLER3DBGRMAP = false;
+                    defines.TONEMAPPING = 0;
+                    defines.CONTRAST = false;
+                    defines.EXPOSURE = false;
+                    defines.COLORCURVES = false;
+                    defines.COLORGRADING = false;
+                    defines.COLORGRADING3D = false;
+                    defines.DITHER = false;
+                    defines.IMAGEPROCESSING = false;
+                    defines.SKIPFINALCOLORCLAMP = this.skipFinalColorClamp;
+                    defines.IMAGEPROCESSINGPOSTPROCESS = this.applyByPostProcess && this._isEnabled;
+                    return;
+                }
+                defines.WHITEBALANCE = this._whiteBalanceEnabled;
+                defines.VIGNETTE = this.vignetteEnabled;
+                defines.VIGNETTEBLENDMODEMULTIPLY = this.vignetteBlendMode === _a._VIGNETTEMODE_MULTIPLY;
+                defines.VIGNETTEBLENDMODEOPAQUE = !defines.VIGNETTEBLENDMODEMULTIPLY;
+                if (!this._toneMappingEnabled) {
+                    defines.TONEMAPPING = 0;
+                }
+                else {
+                    switch (this._toneMappingType) {
+                        case _a.TONEMAPPING_KHR_PBR_NEUTRAL:
+                            defines.TONEMAPPING = 3;
+                            break;
+                        case _a.TONEMAPPING_ACES:
+                            defines.TONEMAPPING = 2;
+                            break;
+                        default:
+                            defines.TONEMAPPING = 1;
+                            break;
+                    }
+                }
+                defines.CONTRAST = this.contrast !== 1.0;
+                defines.EXPOSURE = this.exposure !== 1.0;
+                defines.COLORCURVES = this.colorCurvesEnabled && !!this.colorCurves;
+                defines.COLORGRADING = this.colorGradingEnabled && !!this.colorGradingTexture;
+                if (defines.COLORGRADING) {
+                    defines.COLORGRADING3D = this.colorGradingTexture.is3D;
+                }
+                else {
+                    defines.COLORGRADING3D = false;
+                }
+                defines.SAMPLER3DGREENDEPTH = this.colorGradingWithGreenDepth;
+                defines.SAMPLER3DBGRMAP = this.colorGradingBGR;
+                defines.DITHER = this._ditheringEnabled;
+                defines.IMAGEPROCESSINGPOSTPROCESS = this.applyByPostProcess;
+                defines.SKIPFINALCOLORCLAMP = this.skipFinalColorClamp;
+                defines.IMAGEPROCESSING =
+                    defines.WHITEBALANCE ||
+                        defines.VIGNETTE ||
+                        !!defines.TONEMAPPING ||
+                        defines.CONTRAST ||
+                        defines.EXPOSURE ||
+                        defines.COLORCURVES ||
+                        defines.COLORGRADING ||
+                        defines.DITHER;
+            }

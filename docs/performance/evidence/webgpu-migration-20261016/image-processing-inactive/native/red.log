@@ -1,0 +1,1641 @@
+TAP version 13
+# BJS - [22:37:31]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:37:31]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual authored factories retain browser texture metadata in bounded IO adapter
+ok 1 - actual authored factories retain browser texture metadata in bounded IO adapter
+  ---
+  duration_ms: 343.664
+  type: 'test'
+  ...
+# BJS - [22:37:31]: Babylon.js v9.30.0 - Null engine
+# Subtest: native cold opposite fog view, initial low
+not ok 2 - native cold opposite fog view, initial low
+  ---
+  duration_ms: 379.9548
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-image-processing-inactive-native-20261018\\red\\tests\\game-authored-light-preparation.test.ts:105:47'
+  failureType: 'testCodeFailure'
+  error: |-
+    fresh inactive receivers must reuse the native preloaded then disabled variants
+    
+    3 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 3
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-image-processing-inactive-native-20261018\red\tests\game-authored-light-preparation.test.ts:203:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# BJS - [22:37:32]: Babylon.js v9.30.0 - Null engine
+# Subtest: native cold opposite fog view, initial medium
+not ok 3 - native cold opposite fog view, initial medium
+  ---
+  duration_ms: 277.0966
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-image-processing-inactive-native-20261018\\red\\tests\\game-authored-light-preparation.test.ts:105:47'
+  failureType: 'testCodeFailure'
+  error: |-
+    fresh inactive receivers must reuse the native preloaded then disabled variants
+    
+    3 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 3
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-image-processing-inactive-native-20261018\red\tests\game-authored-light-preparation.test.ts:203:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# BJS - [22:37:32]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:37:32]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual inner Game selects target light membership after environment and preserves WebGL scope
+ok 4 - actual inner Game selects target light membership after environment and preserves WebGL scope
+  ---
+  duration_ms: 7.6948
+  type: 'test'
+  ...
+# BJS - [22:37:32]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:37:32]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:37:32]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:37:32]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:37:32]: Babylon.js v9.30.0 - Null engine
+# Subtest: fresh actual glass submeshes reuse representative vehicle1 after its vehicle0-to1 history
+ok 5 - fresh actual glass submeshes reuse representative vehicle1 after its vehicle0-to1 history
+  ---
+  duration_ms: 132.6324
+  type: 'test'
+  ...
+# Subtest: actual inner authored lease restores flags on cancel
+ok 6 - actual inner authored lease restores flags on cancel
+  ---
+  duration_ms: 2.3439
+  type: 'test'
+  ...
+# Subtest: actual inner authored lease restores flags on retired
+ok 7 - actual inner authored lease restores flags on retired
+  ---
+  duration_ms: 1.8222
+  type: 'test'
+  ...
+# Subtest: actual inner authored lease restores flags on timeout
+ok 8 - actual inner authored lease restores flags on timeout
+  ---
+  duration_ms: 1.8574
+  type: 'test'
+  ...
+# Subtest: actual inner authored lease restores flags on health
+ok 9 - actual inner authored lease restores flags on health
+  ---
+  duration_ms: 2.0325
+  type: 'test'
+  ...
+# Subtest: actual inner authored lease restores flags on throw
+ok 10 - actual inner authored lease restores flags on throw
+  ---
+  duration_ms: 1.6486
+  type: 'test'
+  ...
+# BJS - [22:37:27]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:37:27]: Babylon.js v9.30.0 - Null engine
+# Subtest: inactive configuration and postprocess mismatch lose history and reactivate both vignette modes and LUT channels
+not ok 11 - inactive configuration and postprocess mismatch lose history and reactivate both vignette modes and LUT channels
+  ---
+  duration_ms: 12.4951
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-image-processing-inactive-native-20261018\\red\\tests\\image-processing-inactive-defines.test.ts:25:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    identical final configuration must not depend on prior active processing
+    + actual - expected
+    ... Skipped lines
+    
+      {
+        COLORCURVES: false,
+        COLORGRADING3D: false,
+        COLORGRADING: false,
+        CONTRAST: false,
+    ...
+        VIGNETTE: false,
+    +   VIGNETTEBLENDMODEMULTIPLY: true,
+    -   VIGNETTEBLENDMODEMULTIPLY: false,
+        VIGNETTEBLENDMODEOPAQUE: false,
+        WHITEBALANCE: false
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    VERTEXOUTPUT_INVARIANT: false
+    IMAGEPROCESSING: false
+    WHITEBALANCE: false
+    VIGNETTE: false
+    VIGNETTEBLENDMODEMULTIPLY: false
+    VIGNETTEBLENDMODEOPAQUE: false
+    TONEMAPPING: 0
+    CONTRAST: false
+    COLORCURVES: false
+    COLORGRADING: false
+    COLORGRADING3D: false
+    SAMPLER3DGREENDEPTH: false
+    SAMPLER3DBGRMAP: false
+    DITHER: false
+    IMAGEPROCESSINGPOSTPROCESS: false
+    EXPOSURE: false
+    SKIPFINALCOLORCLAMP: false
+  actual:
+    VERTEXOUTPUT_INVARIANT: false
+    IMAGEPROCESSING: false
+    WHITEBALANCE: false
+    VIGNETTE: false
+    VIGNETTEBLENDMODEMULTIPLY: true
+    VIGNETTEBLENDMODEOPAQUE: false
+    TONEMAPPING: 0
+    CONTRAST: false
+    COLORCURVES: false
+    COLORGRADING: false
+    COLORGRADING3D: false
+    SAMPLER3DGREENDEPTH: false
+    SAMPLER3DBGRMAP: false
+    DITHER: false
+    IMAGEPROCESSINGPOSTPROCESS: false
+    EXPOSURE: false
+    SKIPFINALCOLORCLAMP: false
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-image-processing-inactive-native-20261018\red\tests\image-processing-inactive-defines.test.ts:48:18)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.start (node:internal/test_runner/test:1242:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+  ...
+# BJS - [22:37:27]: Babylon.js v9.30.0 - Null engine
+# Subtest: GLSL standard: fresh inactive submesh reuses the preloaded receiver's Effect and layout
+not ok 12 - GLSL standard: fresh inactive submesh reuses the preloaded receiver's Effect and layout
+  ---
+  duration_ms: 69.2573
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-image-processing-inactive-native-20261018\\red\\tests\\image-processing-inactive-defines.test.ts:114:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    no new program for identical inactive processing
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-image-processing-inactive-native-20261018\red\tests\image-processing-inactive-defines.test.ts:129:14)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# BJS - [22:37:27]: Babylon.js v9.30.0 - Null engine
+# Subtest: GLSL pbr: fresh inactive submesh reuses the preloaded receiver's Effect and layout
+not ok 13 - GLSL pbr: fresh inactive submesh reuses the preloaded receiver's Effect and layout
+  ---
+  duration_ms: 40.4566
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-image-processing-inactive-native-20261018\\red\\tests\\image-processing-inactive-defines.test.ts:114:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    no new program for identical inactive processing
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-image-processing-inactive-native-20261018\red\tests\image-processing-inactive-defines.test.ts:129:14)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# BJS - [22:37:28]: Babylon.js v9.30.0 - Null engine
+# Subtest: WGSL standard: fresh inactive submesh reuses the preloaded receiver's Effect and layout
+not ok 14 - WGSL standard: fresh inactive submesh reuses the preloaded receiver's Effect and layout
+  ---
+  duration_ms: 163.1923
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-image-processing-inactive-native-20261018\\red\\tests\\image-processing-inactive-defines.test.ts:114:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    no new program for identical inactive processing
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-image-processing-inactive-native-20261018\red\tests\image-processing-inactive-defines.test.ts:129:14)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# BJS - [22:37:28]: Babylon.js v9.30.0 - Null engine
+# Subtest: WGSL pbr: fresh inactive submesh reuses the preloaded receiver's Effect and layout
+not ok 15 - WGSL pbr: fresh inactive submesh reuses the preloaded receiver's Effect and layout
+  ---
+  duration_ms: 166.7603
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-image-processing-inactive-native-20261018\\red\\tests\\image-processing-inactive-defines.test.ts:114:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    no new program for identical inactive processing
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-image-processing-inactive-native-20261018\red\tests\image-processing-inactive-defines.test.ts:129:14)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# BJS - [22:37:28]: Babylon.js v9.30.0 - Null engine
+# Subtest: GLSL postprocess retains active modes, LUT orientation and disabled FROMLINEARSPACE gamma
+not ok 16 - GLSL postprocess retains active modes, LUT orientation and disabled FROMLINEARSPACE gamma
+  ---
+  duration_ms: 16.3587
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-image-processing-inactive-native-20261018\\red\\tests\\image-processing-inactive-defines.test.ts:136:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    inactive postprocess must not retain prior vignette/LUT mode flags
+    + actual - expected
+    ... Skipped lines
+    
+      {
+        body: {
+          fragment: '#define SHADER_NAME fragment:imageProcessing\n' +
+            'precision highp float;\n' +
+            'varying vec2 vUV;uniform sampler2D textureSampler;\n' +
+    ...
+        },
+    +   defines: '#define TONEMAPPING 0;\n#define FROMLINEARSPACE;\n',
+    -   defines: '#define VIGNETTEBLENDMODEOPAQUE;\n' +
+    -     '#define TONEMAPPING 0;\n' +
+    -     '#define FROMLINEARSPACE;\n' +
+    -     '#define SAMPLER3DGREENDEPTH;\n' +
+    -     '#define SAMPLER3DBGRMAP;\n',
+        layout: {
+          attributes: [
+            'position'
+          ],
+          materialLocations: null,
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    defines: |-
+      #define VIGNETTEBLENDMODEOPAQUE;
+      #define TONEMAPPING 0;
+      #define FROMLINEARSPACE;
+      #define SAMPLER3DGREENDEPTH;
+      #define SAMPLER3DBGRMAP;
+      
+    body:
+      vertex: |-
+        #define SHADER_NAME vertex:postprocess
+        precision highp float;
+        attribute vec2 position;uniform vec2 scale;varying vec2 vUV;const vec2 madd=vec2(0.5,0.5);
+        #define CUSTOM_VERTEX_DEFINITIONS
+        void main(void) {
+        #define CUSTOM_VERTEX_MAIN_BEGIN
+        vUV=(position*madd+madd)*scale;gl_Position=vec4(position,0.0,1.0);
+        #define CUSTOM_VERTEX_MAIN_END
+        }
+      fragment: |-
+        #define SHADER_NAME fragment:imageProcessing
+        precision highp float;
+        varying vec2 vUV;uniform sampler2D textureSampler;
+        #ifdef EXPOSURE
+        uniform float exposureLinear;
+        #endif
+        #ifdef CONTRAST
+        uniform float contrast;
+        #endif
+        #ifdef WHITEBALANCE
+        uniform mat3 whiteBalanceMatrix;
+        #endif
+        #if defined(VIGNETTE) || defined(DITHER)
+        uniform vec2 vInverseScreenSize;
+        #endif
+        #ifdef VIGNETTE
+        uniform vec4 vignetteSettings1;uniform vec4 vignetteSettings2;
+        #endif
+        #ifdef COLORCURVES
+        uniform vec4 vCameraColorCurveNegative;uniform vec4 vCameraColorCurveNeutral;uniform vec4 vCameraColorCurvePositive;
+        #endif
+        #ifdef COLORGRADING
+        #ifdef COLORGRADING3D
+        uniform highp sampler3D txColorTransform;
+        #else
+        uniform sampler2D txColorTransform;
+        #endif
+        uniform vec4 colorTransformSettings;
+        #endif
+        #ifdef DITHER
+        uniform float ditherIntensity;
+        #endif
+        
+        const float PI=3.1415926535897932384626433832795;const float TWO_PI=6.283185307179586;const float HALF_PI=1.5707963267948966;const float RECIPROCAL_PI=0.3183098861837907;const float RECIPROCAL_PI2=0.15915494309189535;const float RECIPROCAL_PI4=0.07957747154594767;const float HALF_MIN=5.96046448e-08; 
+        const float LinearEncodePowerApprox=2.2;const float GammaEncodePowerApprox=1.0/LinearEncodePowerApprox;const vec3 LuminanceEncodeApprox=vec3(0.2126,0.7152,0.0722);const float Epsilon=0.0000001;
+        #define saturate(x) clamp(x,0.0,1.0)
+        #define absEps(x) abs(x)+Epsilon
+        #define maxEps(x) max(x,Epsilon)
+        #define saturateEps(x) clamp(x,Epsilon,1.0)
+        mat3 transposeMat3(mat3 inMatrix) {vec3 i0=inMatrix[0];vec3 i1=inMatrix[1];vec3 i2=inMatrix[2];mat3 outMatrix=mat3(
+        vec3(i0.x,i1.x,i2.x),
+        vec3(i0.y,i1.y,i2.y),
+        vec3(i0.z,i1.z,i2.z)
+        );return outMatrix;}
+        mat3 inverseMat3(mat3 inMatrix) {float a00=inMatrix[0][0],a01=inMatrix[0][1],a02=inMatrix[0][2];float a10=inMatrix[1][0],a11=inMatrix[1][1],a12=inMatrix[1][2];float a20=inMatrix[2][0],a21=inMatrix[2][1],a22=inMatrix[2][2];float b01=a22*a11-a12*a21;float b11=-a22*a10+a12*a20;float b21=a21*a10-a11*a20;float det=a00*b01+a01*b11+a02*b21;return mat3(b01,(-a22*a01+a02*a21),(a12*a01-a02*a11),
+        b11,(a22*a00-a02*a20),(-a12*a00+a02*a10),
+        b21,(-a21*a00+a01*a20),(a11*a00-a01*a10))/det;}
+        #if USE_EXACT_SRGB_CONVERSIONS
+        vec3 toLinearSpaceExact(vec3 color)
+        {vec3 nearZeroSection=0.0773993808*color;vec3 remainingSection=pow(0.947867299*(color+vec3(0.055)),vec3(2.4));
+        #if defined(WEBGL2) || defined(WEBGPU) || defined(NATIVE)
+        return mix(remainingSection,nearZeroSection,lessThanEqual(color,vec3(0.04045)));
+        #else
+        return
+        vec3(
+        color.r<=0.04045 ? nearZeroSection.r : remainingSection.r,
+        color.g<=0.04045 ? nearZeroSection.g : remainingSection.g,
+        color.b<=0.04045 ? nearZeroSection.b : remainingSection.b);
+        #endif
+        }
+        vec3 toGammaSpaceExact(vec3 color)
+        {vec3 nearZeroSection=12.92*color;vec3 remainingSection=1.055*pow(color,vec3(0.41666))-vec3(0.055);
+        #if defined(WEBGL2) || defined(WEBGPU) || defined(NATIVE)
+        return mix(remainingSection,nearZeroSection,lessThanEqual(color,vec3(0.0031308)));
+        #else
+        return
+        vec3(
+        color.r<=0.0031308 ? nearZeroSection.r : remainingSection.r,
+        color.g<=0.0031308 ? nearZeroSection.g : remainingSection.g,
+        color.b<=0.0031308 ? nearZeroSection.b : remainingSection.b);
+        #endif
+        }
+        #endif
+        float toLinearSpace(float color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        float nearZeroSection=0.0773993808*color;float remainingSection=pow(0.947867299*(color+0.055),2.4);return color<=0.04045 ? nearZeroSection : remainingSection;
+        #else
+        return pow(color,LinearEncodePowerApprox);
+        #endif
+        }
+        vec3 toLinearSpace(vec3 color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        return toLinearSpaceExact(color);
+        #else
+        return pow(color,vec3(LinearEncodePowerApprox));
+        #endif
+        }
+        vec4 toLinearSpace(vec4 color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        return vec4(toLinearSpaceExact(color.rgb),color.a);
+        #else
+        return vec4(pow(color.rgb,vec3(LinearEncodePowerApprox)),color.a);
+        #endif
+        }
+        float toGammaSpace(float color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        float nearZeroSection=12.92*color;float remainingSection=1.055*pow(color,0.41666)-0.055;return color<=0.0031308 ? nearZeroSection : remainingSection;
+        #else
+        return pow(color,GammaEncodePowerApprox);
+        #endif
+        }
+        vec3 toGammaSpace(vec3 color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        return toGammaSpaceExact(color);
+        #else
+        return pow(color,vec3(GammaEncodePowerApprox));
+        #endif
+        }
+        vec4 toGammaSpace(vec4 color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        return vec4(toGammaSpaceExact(color.rgb),color.a);
+        #else
+        return vec4(pow(color.rgb,vec3(GammaEncodePowerApprox)),color.a);
+        #endif
+        }
+        float square(float value)
+        {return value*value;}
+        vec3 square(vec3 value)
+        {return value*value;}
+        float pow5(float value) {float sq=value*value;return sq*sq*value;}
+        vec3 double_refract(vec3 I,vec3 N,float eta) {vec3 Tfront=refract(I,N,1.0/eta);vec3 Nback=normalize(reflect(N,Tfront));return refract(Tfront,-Nback,eta);}
+        float getLuminanceUnclamped(vec3 color)
+        {return dot(color,LuminanceEncodeApprox);}
+        float getLuminance(vec3 color)
+        {return saturate(getLuminanceUnclamped(color));}
+        float getRand(vec2 seed) {return fract(sin(dot(seed.xy ,vec2(12.9898,78.233)))*43758.5453);}
+        float dither(vec2 seed,float varianceAmount) {float rand=getRand(seed);float normVariance=varianceAmount/255.0;float dither=mix(-normVariance,normVariance,rand);return dither;}
+        const float rgbdMaxRange=255.;vec4 toRGBD(vec3 color) {float maxRGB=maxEps(max(color.r,max(color.g,color.b)));float D =max(rgbdMaxRange/maxRGB,1.);D =saturate(floor(D)/255.);vec3 rgb=color.rgb*D;rgb=toGammaSpace(rgb);return vec4(saturate(rgb),D);}
+        vec3 fromRGBD(vec4 rgbd) {rgbd.rgb=toLinearSpace(rgbd.rgb);return rgbd.rgb/rgbd.a;}
+        vec3 parallaxCorrectNormal( vec3 vertexPos,vec3 origVec,vec3 cubeSize,vec3 cubePos ) {vec3 invOrigVec=vec3(1.)/origVec;vec3 halfSize=cubeSize*0.5;vec3 intersecAtMaxPlane=(cubePos+halfSize-vertexPos)*invOrigVec;vec3 intersecAtMinPlane=(cubePos-halfSize-vertexPos)*invOrigVec;vec3 largestIntersec=max(intersecAtMaxPlane,intersecAtMinPlane);float distance=min(min(largestIntersec.x,largestIntersec.y),largestIntersec.z);vec3 intersectPositionWS=vertexPos+origVec*distance;return intersectPositionWS-cubePos;}
+        vec3 equirectangularToCubemapDirection(vec2 uv) {float longitude=uv.x*TWO_PI-PI;float latitude=HALF_PI-uv.y*PI;vec3 direction;direction.x=cos(latitude)*sin(longitude);direction.y=sin(latitude);direction.z=cos(latitude)*cos(longitude);return direction;}
+        float sqrtClamped(float value) {return sqrt(max(value,0.));}
+        float avg(vec3 value) {return dot(value,vec3(0.333333333));}
+        #if defined(WEBGL2) || defined(WEBGPU) || defined(NATIVE)
+        precision highp int;uint extractBits(uint value,int offset,int width) {return (value>>offset) & ((1u<<width)-1u);}
+        int onlyBitPosition(uint value) {return (floatBitsToInt(float(value))>>23)-0x7f;}
+        vec3 singleScatterToMultiScatterAlbedo(vec3 rho_ss) {vec3 s=sqrt(max(vec3(1.0)-rho_ss,vec3(0.0)));return (vec3(1.0)-s)*(vec3(1.0)-vec3(0.139)*s)/(vec3(1.0)+vec3(1.17)*s);}
+        vec3 multiScatterToSingleScatterAlbedo(vec3 rho_ms) {vec3 s=4.09712+4.20863*rho_ms-sqrt(9.59217+41.6808*rho_ms+17.7126*rho_ms*rho_ms);return 1.0-s*s;}
+        vec3 multiScatterToSingleScatterAlbedo(vec3 rho_ms,float aniso) {vec3 s=4.09712+4.20863*rho_ms-sqrt(9.59217+41.6808*rho_ms+17.7126*rho_ms*rho_ms);return (1.0-s*s)/maxEps(1.0-aniso*s*s);}
+        float min3(vec3 v) {return min(v.x,min(v.y,v.z));}
+        float max3(vec3 v) {return max(v.x,max(v.y,v.z));}
+        float uint2float(uint i) {return uintBitsToFloat(0x3F800000u | (i>>9u))-1.0;}
+        vec2 plasticSequence(const uint rstate) {return vec2(uint2float(rstate*3242174889u),
+        uint2float(rstate*2447445414u));}
+        #endif
+        
+        #if defined(COLORGRADING) && !defined(COLORGRADING3D)
+        /** 
+        * Polyfill for SAMPLE_TEXTURE_3D,which is unsupported in WebGL.
+        * sampler3dSetting.x=textureOffset (0.5/textureSize).
+        * sampler3dSetting.y=textureSize.
+        */
+        #define inline
+        vec3 sampleTexture3D(sampler2D colorTransform,vec3 color,vec2 sampler3dSetting)
+        {float sliceSize=2.0*sampler3dSetting.x; 
+        #ifdef SAMPLER3DGREENDEPTH
+        float sliceContinuous=(color.g-sampler3dSetting.x)*sampler3dSetting.y;
+        #else
+        float sliceContinuous=(color.b-sampler3dSetting.x)*sampler3dSetting.y;
+        #endif
+        float sliceInteger=floor(sliceContinuous);float sliceFraction=sliceContinuous-sliceInteger;
+        #ifdef SAMPLER3DGREENDEPTH
+        vec2 sliceUV=color.rb;
+        #else
+        vec2 sliceUV=color.rg;
+        #endif
+        sliceUV.x*=sliceSize;sliceUV.x+=sliceInteger*sliceSize;sliceUV=saturate(sliceUV);vec4 slice0Color=texture2D(colorTransform,sliceUV);sliceUV.x+=sliceSize;sliceUV=saturate(sliceUV);vec4 slice1Color=texture2D(colorTransform,sliceUV);vec3 result=mix(slice0Color.rgb,slice1Color.rgb,sliceFraction);
+        #ifdef SAMPLER3DBGRMAP
+        color.rgb=result.rgb;
+        #else
+        color.rgb=result.bgr;
+        #endif
+        return color;}
+        #endif
+        #if TONEMAPPING==3
+        const float PBRNeutralStartCompression=0.8-0.04;const float PBRNeutralDesaturation=0.15;vec3 PBRNeutralToneMapping( vec3 color ) {float x=min(color.r,min(color.g,color.b));float offset=x<0.08 ? x-6.25*x*x : 0.04;color-=offset;float peak=max(color.r,max(color.g,color.b));if (peak<PBRNeutralStartCompression) return color;float d=1.-PBRNeutralStartCompression;float newPeak=1.-d*d/(peak+d-PBRNeutralStartCompression);color*=newPeak/peak;float g=1.-1./(PBRNeutralDesaturation*(peak-newPeak)+1.);return mix(color,newPeak*vec3(1,1,1),g);}
+        #endif
+        #if TONEMAPPING==2
+        const mat3 ACESInputMat=mat3(
+        vec3(0.59719,0.07600,0.02840),
+        vec3(0.35458,0.90834,0.13383),
+        vec3(0.04823,0.01566,0.83777)
+        );const mat3 ACESOutputMat=mat3(
+        vec3( 1.60475,-0.10208,-0.00327),
+        vec3(-0.53108, 1.10813,-0.07276),
+        vec3(-0.07367,-0.00605, 1.07602)
+        );vec3 RRTAndODTFit(vec3 v)
+        {vec3 a=v*(v+0.0245786)-0.000090537;vec3 b=v*(0.983729*v+0.4329510)+0.238081;return a/b;}
+        vec3 ACESFitted(vec3 color)
+        {color=ACESInputMat*color;color=RRTAndODTFit(color);color=ACESOutputMat*color;color=saturate(color);return color;}
+        #endif
+        #define CUSTOM_IMAGEPROCESSINGFUNCTIONS_DEFINITIONS
+        vec4 applyImageProcessing(vec4 result) {
+        #define CUSTOM_IMAGEPROCESSINGFUNCTIONS_UPDATERESULT_ATSTART
+        #ifdef WHITEBALANCE
+        result.rgb=whiteBalanceMatrix*result.rgb;result.rgb=max(result.rgb,0.0);
+        #endif
+        #ifdef EXPOSURE
+        result.rgb*=exposureLinear;
+        #endif
+        #ifdef VIGNETTE
+        vec2 viewportXY=gl_FragCoord.xy*vInverseScreenSize;viewportXY=viewportXY*2.0-1.0;vec3 vignetteXY1=vec3(viewportXY*vignetteSettings1.xy+vignetteSettings1.zw,1.0);float vignetteTerm=dot(vignetteXY1,vignetteXY1);float vignette=pow(vignetteTerm,vignetteSettings2.w);vec3 vignetteColor=vignetteSettings2.rgb;
+        #ifdef VIGNETTEBLENDMODEMULTIPLY
+        vec3 vignetteColorMultiplier=mix(vignetteColor,vec3(1,1,1),vignette);result.rgb*=vignetteColorMultiplier;
+        #endif
+        #ifdef VIGNETTEBLENDMODEOPAQUE
+        result.rgb=mix(vignetteColor,result.rgb,vignette);
+        #endif
+        #endif
+        #if TONEMAPPING==3
+        result.rgb=PBRNeutralToneMapping(result.rgb);
+        #elif TONEMAPPING==2
+        result.rgb=ACESFitted(result.rgb);
+        #elif TONEMAPPING==1
+        const float tonemappingCalibration=1.590579;result.rgb=1.0-exp2(-tonemappingCalibration*result.rgb);
+        #endif
+        result.rgb=toGammaSpace(result.rgb);result.rgb=saturate(result.rgb);
+        #ifdef CONTRAST
+        vec3 resultHighContrast=result.rgb*result.rgb*(3.0-2.0*result.rgb);if (contrast<1.0) {result.rgb=mix(vec3(0.5,0.5,0.5),result.rgb,contrast);} else {result.rgb=mix(result.rgb,resultHighContrast,contrast-1.0);}
+        result.rgb=max(result.rgb,0.);
+        #endif
+        #ifdef COLORGRADING
+        vec3 colorTransformInput=result.rgb*colorTransformSettings.xxx+colorTransformSettings.yyy;
+        #ifdef COLORGRADING3D
+        vec3 colorTransformOutput=texture(txColorTransform,colorTransformInput).rgb;
+        #else
+        vec3 colorTransformOutput=sampleTexture3D(txColorTransform,colorTransformInput,colorTransformSettings.yz).rgb;
+        #endif
+        result.rgb=mix(result.rgb,colorTransformOutput,colorTransformSettings.www);
+        #endif
+        #ifdef COLORCURVES
+        float luma=getLuminance(result.rgb);vec2 curveMix=clamp(vec2(luma*3.0-1.5,luma*-3.0+1.5),vec2(0.0),vec2(1.0));vec4 colorCurve=vCameraColorCurveNeutral+curveMix.x*vCameraColorCurvePositive-curveMix.y*vCameraColorCurveNegative;result.rgb*=colorCurve.rgb;result.rgb=mix(vec3(luma),result.rgb,colorCurve.a);
+        #endif
+        #ifdef DITHER
+        float rand=getRand(gl_FragCoord.xy*vInverseScreenSize);float dither=mix(-ditherIntensity,ditherIntensity,rand);result.rgb=saturate(result.rgb+vec3(dither));
+        #endif
+        #define CUSTOM_IMAGEPROCESSINGFUNCTIONS_UPDATERESULT_ATEND
+        return result;}
+        #define CUSTOM_FRAGMENT_DEFINITIONS
+        void main(void)
+        {vec4 result=texture2D(textureSampler,vUV);result.rgb=max(result.rgb,vec3(0.));
+        #ifdef IMAGEPROCESSING
+        #ifndef FROMLINEARSPACE
+        result.rgb=toLinearSpace(result.rgb);
+        #endif
+        result=applyImageProcessing(result);
+        #else
+        #ifdef FROMLINEARSPACE
+        result=applyImageProcessing(result);
+        #endif
+        #endif
+        gl_FragColor=result;}
+    layout:
+      processing: ~
+      attributes:
+        0: 'position'
+      uniforms:
+        0: 'scale'
+        1: 'textureSampler'
+      samplers:
+      uniformBuffers:
+      materialLocations: ~
+      materialSizes: ~
+  actual:
+    defines: |-
+      #define TONEMAPPING 0;
+      #define FROMLINEARSPACE;
+      
+    body:
+      vertex: |-
+        #define SHADER_NAME vertex:postprocess
+        precision highp float;
+        attribute vec2 position;uniform vec2 scale;varying vec2 vUV;const vec2 madd=vec2(0.5,0.5);
+        #define CUSTOM_VERTEX_DEFINITIONS
+        void main(void) {
+        #define CUSTOM_VERTEX_MAIN_BEGIN
+        vUV=(position*madd+madd)*scale;gl_Position=vec4(position,0.0,1.0);
+        #define CUSTOM_VERTEX_MAIN_END
+        }
+      fragment: |-
+        #define SHADER_NAME fragment:imageProcessing
+        precision highp float;
+        varying vec2 vUV;uniform sampler2D textureSampler;
+        #ifdef EXPOSURE
+        uniform float exposureLinear;
+        #endif
+        #ifdef CONTRAST
+        uniform float contrast;
+        #endif
+        #ifdef WHITEBALANCE
+        uniform mat3 whiteBalanceMatrix;
+        #endif
+        #if defined(VIGNETTE) || defined(DITHER)
+        uniform vec2 vInverseScreenSize;
+        #endif
+        #ifdef VIGNETTE
+        uniform vec4 vignetteSettings1;uniform vec4 vignetteSettings2;
+        #endif
+        #ifdef COLORCURVES
+        uniform vec4 vCameraColorCurveNegative;uniform vec4 vCameraColorCurveNeutral;uniform vec4 vCameraColorCurvePositive;
+        #endif
+        #ifdef COLORGRADING
+        #ifdef COLORGRADING3D
+        uniform highp sampler3D txColorTransform;
+        #else
+        uniform sampler2D txColorTransform;
+        #endif
+        uniform vec4 colorTransformSettings;
+        #endif
+        #ifdef DITHER
+        uniform float ditherIntensity;
+        #endif
+        
+        const float PI=3.1415926535897932384626433832795;const float TWO_PI=6.283185307179586;const float HALF_PI=1.5707963267948966;const float RECIPROCAL_PI=0.3183098861837907;const float RECIPROCAL_PI2=0.15915494309189535;const float RECIPROCAL_PI4=0.07957747154594767;const float HALF_MIN=5.96046448e-08; 
+        const float LinearEncodePowerApprox=2.2;const float GammaEncodePowerApprox=1.0/LinearEncodePowerApprox;const vec3 LuminanceEncodeApprox=vec3(0.2126,0.7152,0.0722);const float Epsilon=0.0000001;
+        #define saturate(x) clamp(x,0.0,1.0)
+        #define absEps(x) abs(x)+Epsilon
+        #define maxEps(x) max(x,Epsilon)
+        #define saturateEps(x) clamp(x,Epsilon,1.0)
+        mat3 transposeMat3(mat3 inMatrix) {vec3 i0=inMatrix[0];vec3 i1=inMatrix[1];vec3 i2=inMatrix[2];mat3 outMatrix=mat3(
+        vec3(i0.x,i1.x,i2.x),
+        vec3(i0.y,i1.y,i2.y),
+        vec3(i0.z,i1.z,i2.z)
+        );return outMatrix;}
+        mat3 inverseMat3(mat3 inMatrix) {float a00=inMatrix[0][0],a01=inMatrix[0][1],a02=inMatrix[0][2];float a10=inMatrix[1][0],a11=inMatrix[1][1],a12=inMatrix[1][2];float a20=inMatrix[2][0],a21=inMatrix[2][1],a22=inMatrix[2][2];float b01=a22*a11-a12*a21;float b11=-a22*a10+a12*a20;float b21=a21*a10-a11*a20;float det=a00*b01+a01*b11+a02*b21;return mat3(b01,(-a22*a01+a02*a21),(a12*a01-a02*a11),
+        b11,(a22*a00-a02*a20),(-a12*a00+a02*a10),
+        b21,(-a21*a00+a01*a20),(a11*a00-a01*a10))/det;}
+        #if USE_EXACT_SRGB_CONVERSIONS
+        vec3 toLinearSpaceExact(vec3 color)
+        {vec3 nearZeroSection=0.0773993808*color;vec3 remainingSection=pow(0.947867299*(color+vec3(0.055)),vec3(2.4));
+        #if defined(WEBGL2) || defined(WEBGPU) || defined(NATIVE)
+        return mix(remainingSection,nearZeroSection,lessThanEqual(color,vec3(0.04045)));
+        #else
+        return
+        vec3(
+        color.r<=0.04045 ? nearZeroSection.r : remainingSection.r,
+        color.g<=0.04045 ? nearZeroSection.g : remainingSection.g,
+        color.b<=0.04045 ? nearZeroSection.b : remainingSection.b);
+        #endif
+        }
+        vec3 toGammaSpaceExact(vec3 color)
+        {vec3 nearZeroSection=12.92*color;vec3 remainingSection=1.055*pow(color,vec3(0.41666))-vec3(0.055);
+        #if defined(WEBGL2) || defined(WEBGPU) || defined(NATIVE)
+        return mix(remainingSection,nearZeroSection,lessThanEqual(color,vec3(0.0031308)));
+        #else
+        return
+        vec3(
+        color.r<=0.0031308 ? nearZeroSection.r : remainingSection.r,
+        color.g<=0.0031308 ? nearZeroSection.g : remainingSection.g,
+        color.b<=0.0031308 ? nearZeroSection.b : remainingSection.b);
+        #endif
+        }
+        #endif
+        float toLinearSpace(float color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        float nearZeroSection=0.0773993808*color;float remainingSection=pow(0.947867299*(color+0.055),2.4);return color<=0.04045 ? nearZeroSection : remainingSection;
+        #else
+        return pow(color,LinearEncodePowerApprox);
+        #endif
+        }
+        vec3 toLinearSpace(vec3 color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        return toLinearSpaceExact(color);
+        #else
+        return pow(color,vec3(LinearEncodePowerApprox));
+        #endif
+        }
+        vec4 toLinearSpace(vec4 color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        return vec4(toLinearSpaceExact(color.rgb),color.a);
+        #else
+        return vec4(pow(color.rgb,vec3(LinearEncodePowerApprox)),color.a);
+        #endif
+        }
+        float toGammaSpace(float color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        float nearZeroSection=12.92*color;float remainingSection=1.055*pow(color,0.41666)-0.055;return color<=0.0031308 ? nearZeroSection : remainingSection;
+        #else
+        return pow(color,GammaEncodePowerApprox);
+        #endif
+        }
+        vec3 toGammaSpace(vec3 color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        return toGammaSpaceExact(color);
+        #else
+        return pow(color,vec3(GammaEncodePowerApprox));
+        #endif
+        }
+        vec4 toGammaSpace(vec4 color)
+        {
+        #if USE_EXACT_SRGB_CONVERSIONS
+        return vec4(toGammaSpaceExact(color.rgb),color.a);
+        #else
+        return vec4(pow(color.rgb,vec3(GammaEncodePowerApprox)),color.a);
+        #endif
+        }
+        float square(float value)
+        {return value*value;}
+        vec3 square(vec3 value)
+        {return value*value;}
+        float pow5(float value) {float sq=value*value;return sq*sq*value;}
+        vec3 double_refract(vec3 I,vec3 N,float eta) {vec3 Tfront=refract(I,N,1.0/eta);vec3 Nback=normalize(reflect(N,Tfront));return refract(Tfront,-Nback,eta);}
+        float getLuminanceUnclamped(vec3 color)
+        {return dot(color,LuminanceEncodeApprox);}
+        float getLuminance(vec3 color)
+        {return saturate(getLuminanceUnclamped(color));}
+        float getRand(vec2 seed) {return fract(sin(dot(seed.xy ,vec2(12.9898,78.233)))*43758.5453);}
+        float dither(vec2 seed,float varianceAmount) {float rand=getRand(seed);float normVariance=varianceAmount/255.0;float dither=mix(-normVariance,normVariance,rand);return dither;}
+        const float rgbdMaxRange=255.;vec4 toRGBD(vec3 color) {float maxRGB=maxEps(max(color.r,max(color.g,color.b)));float D =max(rgbdMaxRange/maxRGB,1.);D =saturate(floor(D)/255.);vec3 rgb=color.rgb*D;rgb=toGammaSpace(rgb);return vec4(saturate(rgb),D);}
+        vec3 fromRGBD(vec4 rgbd) {rgbd.rgb=toLinearSpace(rgbd.rgb);return rgbd.rgb/rgbd.a;}
+        vec3 parallaxCorrectNormal( vec3 vertexPos,vec3 origVec,vec3 cubeSize,vec3 cubePos ) {vec3 invOrigVec=vec3(1.)/origVec;vec3 halfSize=cubeSize*0.5;vec3 intersecAtMaxPlane=(cubePos+halfSize-vertexPos)*invOrigVec;vec3 intersecAtMinPlane=(cubePos-halfSize-vertexPos)*invOrigVec;vec3 largestIntersec=max(intersecAtMaxPlane,intersecAtMinPlane);float distance=min(min(largestIntersec.x,largestIntersec.y),largestIntersec.z);vec3 intersectPositionWS=vertexPos+origVec*distance;return intersectPositionWS-cubePos;}
+        vec3 equirectangularToCubemapDirection(vec2 uv) {float longitude=uv.x*TWO_PI-PI;float latitude=HALF_PI-uv.y*PI;vec3 direction;direction.x=cos(latitude)*sin(longitude);direction.y=sin(latitude);direction.z=cos(latitude)*cos(longitude);return direction;}
+        float sqrtClamped(float value) {return sqrt(max(value,0.));}
+        float avg(vec3 value) {return dot(value,vec3(0.333333333));}
+        #if defined(WEBGL2) || defined(WEBGPU) || defined(NATIVE)
+        precision highp int;uint extractBits(uint value,int offset,int width) {return (value>>offset) & ((1u<<width)-1u);}
+        int onlyBitPosition(uint value) {return (floatBitsToInt(float(value))>>23)-0x7f;}
+        vec3 singleScatterToMultiScatterAlbedo(vec3 rho_ss) {vec3 s=sqrt(max(vec3(1.0)-rho_ss,vec3(0.0)));return (vec3(1.0)-s)*(vec3(1.0)-vec3(0.139)*s)/(vec3(1.0)+vec3(1.17)*s);}
+        vec3 multiScatterToSingleScatterAlbedo(vec3 rho_ms) {vec3 s=4.09712+4.20863*rho_ms-sqrt(9.59217+41.6808*rho_ms+17.7126*rho_ms*rho_ms);return 1.0-s*s;}
+        vec3 multiScatterToSingleScatterAlbedo(vec3 rho_ms,float aniso) {vec3 s=4.09712+4.20863*rho_ms-sqrt(9.59217+41.6808*rho_ms+17.7126*rho_ms*rho_ms);return (1.0-s*s)/maxEps(1.0-aniso*s*s);}
+        float min3(vec3 v) {return min(v.x,min(v.y,v.z));}
+        float max3(vec3 v) {return max(v.x,max(v.y,v.z));}
+        float uint2float(uint i) {return uintBitsToFloat(0x3F800000u | (i>>9u))-1.0;}
+        vec2 plasticSequence(const uint rstate) {return vec2(uint2float(rstate*3242174889u),
+        uint2float(rstate*2447445414u));}
+        #endif
+        
+        #if defined(COLORGRADING) && !defined(COLORGRADING3D)
+        /** 
+        * Polyfill for SAMPLE_TEXTURE_3D,which is unsupported in WebGL.
+        * sampler3dSetting.x=textureOffset (0.5/textureSize).
+        * sampler3dSetting.y=textureSize.
+        */
+        #define inline
+        vec3 sampleTexture3D(sampler2D colorTransform,vec3 color,vec2 sampler3dSetting)
+        {float sliceSize=2.0*sampler3dSetting.x; 
+        #ifdef SAMPLER3DGREENDEPTH
+        float sliceContinuous=(color.g-sampler3dSetting.x)*sampler3dSetting.y;
+        #else
+        float sliceContinuous=(color.b-sampler3dSetting.x)*sampler3dSetting.y;
+        #endif
+        float sliceInteger=floor(sliceContinuous);float sliceFraction=sliceContinuous-sliceInteger;
+        #ifdef SAMPLER3DGREENDEPTH
+        vec2 sliceUV=color.rb;
+        #else
+        vec2 sliceUV=color.rg;
+        #endif
+        sliceUV.x*=sliceSize;sliceUV.x+=sliceInteger*sliceSize;sliceUV=saturate(sliceUV);vec4 slice0Color=texture2D(colorTransform,sliceUV);sliceUV.x+=sliceSize;sliceUV=saturate(sliceUV);vec4 slice1Color=texture2D(colorTransform,sliceUV);vec3 result=mix(slice0Color.rgb,slice1Color.rgb,sliceFraction);
+        #ifdef SAMPLER3DBGRMAP
+        color.rgb=result.rgb;
+        #else
+        color.rgb=result.bgr;
+        #endif
+        return color;}
+        #endif
+        #if TONEMAPPING==3
+        const float PBRNeutralStartCompression=0.8-0.04;const float PBRNeutralDesaturation=0.15;vec3 PBRNeutralToneMapping( vec3 color ) {float x=min(color.r,min(color.g,color.b));float offset=x<0.08 ? x-6.25*x*x : 0.04;color-=offset;float peak=max(color.r,max(color.g,color.b));if (peak<PBRNeutralStartCompression) return color;float d=1.-PBRNeutralStartCompression;float newPeak=1.-d*d/(peak+d-PBRNeutralStartCompression);color*=newPeak/peak;float g=1.-1./(PBRNeutralDesaturation*(peak-newPeak)+1.);return mix(color,newPeak*vec3(1,1,1),g);}
+        #endif
+        #if TONEMAPPING==2
+        const mat3 ACESInputMat=mat3(
+        vec3(0.59719,0.07600,0.02840),
+        vec3(0.35458,0.90834,0.13383),
+        vec3(0.04823,0.01566,0.83777)
+        );const mat3 ACESOutputMat=mat3(
+        vec3( 1.60475,-0.10208,-0.00327),
+        vec3(-0.53108, 1.10813,-0.07276),
+        vec3(-0.07367,-0.00605, 1.07602)
+        );vec3 RRTAndODTFit(vec3 v)
+        {vec3 a=v*(v+0.0245786)-0.000090537;vec3 b=v*(0.983729*v+0.4329510)+0.238081;return a/b;}
+        vec3 ACESFitted(vec3 color)
+        {color=ACESInputMat*color;color=RRTAndODTFit(color);color=ACESOutputMat*color;color=saturate(color);return color;}
+        #endif
+        #define CUSTOM_IMAGEPROCESSINGFUNCTIONS_DEFINITIONS
+        vec4 applyImageProcessing(vec4 result) {
+        #define CUSTOM_IMAGEPROCESSINGFUNCTIONS_UPDATERESULT_ATSTART
+        #ifdef WHITEBALANCE
+        result.rgb=whiteBalanceMatrix*result.rgb;result.rgb=max(result.rgb,0.0);
+        #endif
+        #ifdef EXPOSURE
+        result.rgb*=exposureLinear;
+        #endif
+        #ifdef VIGNETTE
+        vec2 viewportXY=gl_FragCoord.xy*vInverseScreenSize;viewportXY=viewportXY*2.0-1.0;vec3 vignetteXY1=vec3(viewportXY*vignetteSettings1.xy+vignetteSettings1.zw,1.0);float vignetteTerm=dot(vignetteXY1,vignetteXY1);float vignette=pow(vignetteTerm,vignetteSettings2.w);vec3 vignetteColor=vignetteSettings2.rgb;
+        #ifdef VIGNETTEBLENDMODEMULTIPLY
+        vec3 vignetteColorMultiplier=mix(vignetteColor,vec3(1,1,1),vignette);result.rgb*=vignetteColorMultiplier;
+        #endif
+        #ifdef VIGNETTEBLENDMODEOPAQUE
+        result.rgb=mix(vignetteColor,result.rgb,vignette);
+        #endif
+        #endif
+        #if TONEMAPPING==3
+        result.rgb=PBRNeutralToneMapping(result.rgb);
+        #elif TONEMAPPING==2
+        result.rgb=ACESFitted(result.rgb);
+        #elif TONEMAPPING==1
+        const float tonemappingCalibration=1.590579;result.rgb=1.0-exp2(-tonemappingCalibration*result.rgb);
+        #endif
+        result.rgb=toGammaSpace(result.rgb);result.rgb=saturate(result.rgb);
+        #ifdef CONTRAST
+        vec3 resultHighContrast=result.rgb*result.rgb*(3.0-2.0*result.rgb);if (contrast<1.0) {result.rgb=mix(vec3(0.5,0.5,0.5),result.rgb,contrast);} else {result.rgb=mix(result.rgb,resultHighContrast,contrast-1.0);}
+        result.rgb=max(result.rgb,0.);
+        #endif
+        #ifdef COLORGRADING
+        vec3 colorTransformInput=result.rgb*colorTransformSettings.xxx+colorTransformSettings.yyy;
+        #ifdef COLORGRADING3D
+        vec3 colorTransformOutput=texture(txColorTransform,colorTransformInput).rgb;
+        #else
+        vec3 colorTransformOutput=sampleTexture3D(txColorTransform,colorTransformInput,colorTransformSettings.yz).rgb;
+        #endif
+        result.rgb=mix(result.rgb,colorTransformOutput,colorTransformSettings.www);
+        #endif
+        #ifdef COLORCURVES
+        float luma=getLuminance(result.rgb);vec2 curveMix=clamp(vec2(luma*3.0-1.5,luma*-3.0+1.5),vec2(0.0),vec2(1.0));vec4 colorCurve=vCameraColorCurveNeutral+curveMix.x*vCameraColorCurvePositive-curveMix.y*vCameraColorCurveNegative;result.rgb*=colorCurve.rgb;result.rgb=mix(vec3(luma),result.rgb,colorCurve.a);
+        #endif
+        #ifdef DITHER
+        float rand=getRand(gl_FragCoord.xy*vInverseScreenSize);float dither=mix(-ditherIntensity,ditherIntensity,rand);result.rgb=saturate(result.rgb+vec3(dither));
+        #endif
+        #define CUSTOM_IMAGEPROCESSINGFUNCTIONS_UPDATERESULT_ATEND
+        return result;}
+        #define CUSTOM_FRAGMENT_DEFINITIONS
+        void main(void)
+        {vec4 result=texture2D(textureSampler,vUV);result.rgb=max(result.rgb,vec3(0.));
+        #ifdef IMAGEPROCESSING
+        #ifndef FROMLINEARSPACE
+        result.rgb=toLinearSpace(result.rgb);
+        #endif
+        result=applyImageProcessing(result);
+        #else
+        #ifdef FROMLINEARSPACE
+        result=applyImageProcessing(result);
+        #endif
+        #endif
+        gl_FragColor=result;}
+    layout:
+      processing: ~
+      attributes:
+        0: 'position'
+      uniforms:
+        0: 'scale'
+        1: 'textureSampler'
+      samplers:
+      uniformBuffers:
+      materialLocations: ~
+      materialSizes: ~
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-image-processing-inactive-native-20261018\red\tests\image-processing-inactive-defines.test.ts:158:14)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: WGSL postprocess retains active modes, LUT orientation and disabled FROMLINEARSPACE gamma
+not ok 17 - WGSL postprocess retains active modes, LUT orientation and disabled FROMLINEARSPACE gamma
+  ---
+  duration_ms: 22.9072
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-image-processing-inactive-native-20261018\\red\\tests\\image-processing-inactive-defines.test.ts:136:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    inactive postprocess must not retain prior vignette/LUT mode flags
+    + actual - expected
+    ... Skipped lines
+    
+      {
+        body: {
+          fragment: '//#define SHADER_NAME fragment:imageProcessing\n' +
+            'diagnostic(off, chromium.unreachable_code);\n' +
+            'struct FragmentInputs {\n' +
+    ...
+        },
+    +   defines: '#define TONEMAPPING 0;\n#define FROMLINEARSPACE;\n',
+    -   defines: '#define VIGNETTEBLENDMODEOPAQUE;\n' +
+    -     '#define TONEMAPPING 0;\n' +
+    -     '#define FROMLINEARSPACE;\n' +
+    -     '#define SAMPLER3DGREENDEPTH;\n' +
+    -     '#define SAMPLER3DBGRMAP;\n',
+        layout: {
+          attributes: [
+            'position'
+          ],
+          materialLocations: null,
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    defines: |-
+      #define VIGNETTEBLENDMODEOPAQUE;
+      #define TONEMAPPING 0;
+      #define FROMLINEARSPACE;
+      #define SAMPLER3DGREENDEPTH;
+      #define SAMPLER3DBGRMAP;
+      
+    body:
+      vertex: |-
+        //#define SHADER_NAME vertex:postprocess
+        diagnostic(off, chromium.unreachable_code);
+        struct VertexInputs {
+          @builtin(vertex_index) vertexIndex : u32,
+          @builtin(instance_index) instanceIndex : u32,
+        @location(0) position : vec2<f32>,
+        };
+        var<private> vertexInputs : VertexInputs;
+        struct FragmentInputs {
+          @builtin(position) position : vec4<f32>,
+          @location(0) @interpolate(perspective, center) vUV : vec2<f32>,
+        };
+        var<private> vertexOutputs : FragmentInputs;
+        
+        struct LeftOver {
+          scale : vec2<f32>,
+        };
+        @group(1) @binding(3) var<uniform> uniforms : LeftOver;
+        struct Internals {
+        yFactor_: f32,
+        textureOutputHeight_: f32,
+        };
+        @group(1) @binding(2) var<uniform> internals : Internals;
+        
+        
+        
+        const madd=vec2(0.5,0.5);
+        //#define CUSTOM_VERTEX_DEFINITIONS
+        @vertex
+        fn main(input : VertexInputs)->FragmentInputs {
+          vertexInputs = input;
+        
+        //#define CUSTOM_VERTEX_MAIN_BEGIN
+        vertexOutputs.vUV=(vertexInputs.position*madd+madd)*uniforms.scale;
+        vertexOutputs.position=vec4(vertexInputs.position,0.0,1.0);
+        //#define CUSTOM_VERTEX_MAIN_END
+          vertexOutputs.position.y = vertexOutputs.position.y * internals.yFactor_;
+          return vertexOutputs;
+        }
+      fragment: |-
+        //#define SHADER_NAME fragment:imageProcessing
+        diagnostic(off, chromium.unreachable_code);
+        struct FragmentInputs {
+          @builtin(position) position : vec4<f32>,
+          @builtin(front_facing) frontFacing : bool,
+          @location(0) @interpolate(perspective, center) vUV : vec2<f32>,
+        };
+        var<private> fragmentInputs : FragmentInputs;
+        struct FragmentOutputs {
+          @location(0) color : vec4<f32>,
+        };
+        var<private> fragmentOutputs : FragmentOutputs;
+        
+        struct LeftOver {
+          scale : vec2<f32>,
+        };
+        @group(1) @binding(3) var<uniform> uniforms : LeftOver;
+        struct Internals {
+        yFactor_: f32,
+        textureOutputHeight_: f32,
+        };
+        @group(1) @binding(2) var<uniform> internals : Internals;
+        
+        @group(1) @binding(1) var textureSamplerSampler: sampler;
+        @group(1) @binding(0) var textureSampler: texture_2d<f32>;
+        const PI: f32=3.1415926535897932384626433832795;
+        const TWO_PI: f32=6.283185307179586;
+        const HALF_PI: f32=1.5707963267948966;
+        const RECIPROCAL_PI: f32=0.3183098861837907;
+        const RECIPROCAL_PI2: f32=0.15915494309189535;
+        const RECIPROCAL_PI4: f32=0.07957747154594767;
+        const HALF_MIN: f32=5.96046448e-08;
+        const LinearEncodePowerApprox: f32=2.2;
+        const GammaEncodePowerApprox: f32=1.0/LinearEncodePowerApprox;
+        const LuminanceEncodeApprox: vec3f=vec3f(0.2126,0.7152,0.0722);
+        const Epsilon:f32=0.0000001;
+        fn square(x: f32)->f32 {return x*x;
+        }
+        fn saturate(x: f32)->f32 {return clamp(x,0.0,1.0);
+        }
+        fn saturateVec3(x: vec3f)->vec3f {return clamp(x,vec3f(),vec3f(1.0));
+        }
+        fn saturateEps(x: f32)->f32 {return clamp(x,Epsilon,1.0);
+        }
+        fn maxEps(x: f32)->f32 {return max(x,Epsilon);
+        }
+        fn maxEpsVec3(x: vec3f)->vec3f {return max(x,vec3f(Epsilon));
+        }
+        fn absEps(x: f32)->f32 {return abs(x)+Epsilon;
+        }
+        fn transposeMat3(inMatrix: mat3x3f)->mat3x3f {let i0: vec3f=inMatrix[0];
+        let i1: vec3f=inMatrix[1];
+        let i2: vec3f=inMatrix[2];
+        let outMatrix:mat3x3f=mat3x3f(
+        vec3(i0.x,i1.x,i2.x),
+        vec3(i0.y,i1.y,i2.y),
+        vec3(i0.z,i1.z,i2.z)
+        );
+        return outMatrix;
+        }
+        fn inverseMat3(inMatrix: mat3x3f)->mat3x3f {let a00: f32=inMatrix[0][0];
+        let a01: f32=inMatrix[0][1];
+        let a02: f32=inMatrix[0][2];
+        let a10: f32=inMatrix[1][0];
+        let a11: f32=inMatrix[1][1];
+        let a12: f32=inMatrix[1][2];
+        let a20: f32=inMatrix[2][0];
+        let a21: f32=inMatrix[2][1];
+        let a22: f32=inMatrix[2][2];
+        let b01: f32=a22*a11-a12*a21;
+        let b11: f32=-a22*a10+a12*a20;
+        let b21: f32=a21*a10-a11*a20;
+        let det: f32=a00*b01+a01*b11+a02*b21;
+        return mat3x3f(b01/det,(-a22*a01+a02*a21)/det,(a12*a01-a02*a11)/det,
+        b11/det,(a22*a00-a02*a20)/det,(-a12*a00+a02*a10)/det,
+        b21/det,(-a21*a00+a01*a20)/det,(a11*a00-a01*a10)/det);
+        }
+        fn toLinearSpace(color: f32)->f32
+        {
+        return pow(color,LinearEncodePowerApprox);
+        }
+        fn toLinearSpaceVec3(color: vec3f)->vec3f
+        {
+        return pow(color,vec3f(LinearEncodePowerApprox));
+        }
+        fn toLinearSpaceVec4(color: vec4<f32>)->vec4<f32>
+        {
+        return vec4f(pow(color.rgb,vec3f(LinearEncodePowerApprox)),color.a);
+        }
+        fn toGammaSpace(color: vec4<f32>)->vec4<f32>
+        {
+        return vec4<f32>(pow(color.rgb,vec3f(GammaEncodePowerApprox)),color.a);
+        }
+        fn toGammaSpaceVec3(color: vec3f)->vec3f
+        {
+        return pow(color,vec3f(GammaEncodePowerApprox));
+        }
+        fn squareVec3(value: vec3f)->vec3f
+        {return value*value;
+        }
+        fn pow5(value: f32)->f32 {let sq: f32=value*value;
+        return sq*sq*value;
+        }
+        fn double_refract(I: vec3f,N: vec3f,eta: f32)->vec3f {let Tfront: vec3f=refract(I,N,1.0/eta);
+        let Nback: vec3f=normalize(reflect(N,Tfront));
+        return refract(Tfront,-Nback,eta);
+        }
+        fn getLuminanceUnclamped(color: vec3f)->f32
+        {return dot(color,LuminanceEncodeApprox);
+        }
+        fn getLuminance(color: vec3f)->f32
+        {return saturate(getLuminanceUnclamped(color));
+        }
+        fn getRand(seed: vec2<f32>)->f32 {return fract(sin(dot(seed.xy ,vec2<f32>(12.9898,78.233)))*43758.5453);
+        }
+        fn dither(seed: vec2<f32>,varianceAmount: f32)->f32 {let rand: f32=getRand(seed);
+        let normVariance: f32=varianceAmount/255.0;
+        let dither: f32=mix(-normVariance,normVariance,rand);
+        return dither;
+        }
+        const rgbdMaxRange: f32=255.0;
+        fn toRGBD(color: vec3f)->vec4<f32> {let maxRGB: f32=max(max(color.r,max(color.g,color.b)),Epsilon);
+        var D: f32 =max(rgbdMaxRange/maxRGB,1.);
+        D =clamp(floor(D)/255.0,0.,1.);
+        var rgb: vec3f =color.rgb*D;
+        rgb=toGammaSpaceVec3(rgb);
+        return vec4<f32>(saturateVec3(rgb),D);
+        }
+        fn fromRGBD(rgbd: vec4<f32>)->vec3f {let rgb=toLinearSpaceVec3(rgbd.rgb);
+        return rgb/rgbd.a;
+        }
+        fn parallaxCorrectNormal(vertexPos: vec3f,origVec: vec3f,cubeSize: vec3f,cubePos: vec3f)->vec3f {let invOrigVec: vec3f=vec3f(1.)/origVec;
+        let halfSize: vec3f=cubeSize*0.5;
+        let intersecAtMaxPlane: vec3f=(cubePos+halfSize-vertexPos)*invOrigVec;
+        let intersecAtMinPlane: vec3f=(cubePos-halfSize-vertexPos)*invOrigVec;
+        let largestIntersec: vec3f=max(intersecAtMaxPlane,intersecAtMinPlane);
+        let distance: f32=min(min(largestIntersec.x,largestIntersec.y),largestIntersec.z);
+        let intersectPositionWS: vec3f=vertexPos+origVec*distance;
+        return intersectPositionWS-cubePos;
+        }
+        fn equirectangularToCubemapDirection(uv : vec2f)->vec3f {var longitude : f32=uv.x*TWO_PI-PI;
+        var latitude : f32=HALF_PI-uv.y*PI;
+        var direction : vec3f;
+        direction.x=cos(latitude)*sin(longitude);
+        direction.y=sin(latitude);
+        direction.z=cos(latitude)*cos(longitude);
+        return direction;
+        }
+        fn sqrtClamped(value: f32)->f32 {return sqrt(max(value,0.));
+        }
+        fn avg(value: vec3f)->f32 {return dot(value,vec3f(0.333333333));
+        }
+        fn singleScatterToMultiScatterAlbedo(rho_ss: vec3f)->vec3f {let s: vec3f=sqrt(max(vec3f(1.0)-rho_ss,vec3f(0.0)));
+        return (vec3f(1.0)-s)*(vec3f(1.0)-vec3f(0.139)*s)/(vec3f(1.0)+vec3f(1.17)*s);
+        }
+        fn multiScatterToSingleScatterAlbedo(rho_ms: vec3f)->vec3f {let s: vec3f=4.09712f+4.20863f*rho_ms-sqrt(9.59217f+41.6808f*rho_ms+17.7126f*rho_ms*rho_ms);
+        return 1.0f-s*s;
+        }
+        fn multiScatterToSingleScatterAlbedoWithAniso(rho_ms: vec3f,aniso: f32)->vec3f {let s: vec3f=4.09712+4.20863f*rho_ms-sqrt(9.59217f+41.6808f*rho_ms+17.7126f*rho_ms*rho_ms);
+        return (vec3f(1.0f)-s*s)/maxEpsVec3(vec3f(1.0f)-vec3f(aniso)*s*s);
+        }
+        fn min3(v: vec3f)->f32 {return min(v.x,min(v.y,v.z));
+        }
+        fn max3(v: vec3f)->f32 {return max(v.x,max(v.y,v.z));
+        }
+        fn uint2float(i: u32)->f32 {return bitcast<f32>(0x3F800000u | (i>>9u))-1.0;
+        }
+        fn plasticSequence(rstate: u32)->vec2f {return vec2f(uint2float(rstate*3242174889u),
+        uint2float(rstate*2447445414u));
+        }
+        //#define CUSTOM_IMAGEPROCESSINGFUNCTIONS_DEFINITIONS
+        fn applyImageProcessing(result: vec4f)->vec4f {
+        //#define CUSTOM_IMAGEPROCESSINGFUNCTIONS_UPDATERESULT_ATSTART
+        var rgb=result.rgb;
+        rgb=toGammaSpaceVec3(rgb);
+        rgb=saturateVec3(rgb);
+        //#define CUSTOM_IMAGEPROCESSINGFUNCTIONS_UPDATERESULT_ATEND
+        return vec4f(rgb,result.a);
+        }
+        //#define CUSTOM_FRAGMENT_DEFINITIONS
+        @fragment
+        fn main(input: FragmentInputs)->FragmentOutputs {  fragmentInputs = input;
+          var result: vec4f=textureSample(textureSampler,textureSamplerSampler,input.vUV);
+        result=vec4f(max(result.rgb,vec3f(0.)),result.a);
+        result=applyImageProcessing(result);
+        fragmentOutputs.color=result;
+          return fragmentOutputs;
+        }
+    layout:
+      processing:
+        vertexBufferKindToNumberOfComponents:
+        shaderLanguage: 1
+        _attributeNextLocation: 1
+        _varyingNextLocation: 1
+        freeGroupIndex: 1
+        freeBindingIndex: 4
+        availableVaryings:
+          vUV: 0
+        availableAttributes:
+          position: 0
+        availableBuffers:
+          Internals:
+            binding:
+              groupIndex: 1
+              bindingIndex: 2
+          LeftOver:
+            binding:
+              groupIndex: 1
+              bindingIndex: 3
+        availableTextures:
+          textureSampler:
+            isTextureArray: false
+            isStorageTexture: false
+            textures:
+              0:
+                groupIndex: 1
+                bindingIndex: 0
+            sampleType: 'float'
+            autoBindSampler: true
+        availableSamplers:
+          textureSamplerSampler:
+            binding:
+              groupIndex: 1
+              bindingIndex: 1
+            type: 'filtering'
+        orderedAttributes:
+          0: 'position'
+        bindGroupLayoutEntries:
+          0:
+          1:
+            0:
+              binding: 0
+              visibility: 2
+              texture:
+                sampleType: 'float'
+                viewDimension: '2d'
+                multisampled: false
+            1:
+              binding: 1
+              visibility: 2
+              sampler:
+                type: 'filtering'
+            2:
+              binding: 2
+              visibility: 3
+              buffer:
+                type: 'uniform'
+            3:
+              binding: 3
+              visibility: 3
+              buffer:
+                type: 'uniform'
+        bindGroupLayoutEntryInfo:
+          0: ~
+          1:
+            0:
+              name: 'textureSampler'
+              index: 0
+              nameInArrayOfTexture: 'textureSampler'
+            1:
+              name: 'textureSamplerSampler'
+              index: 1
+            2:
+              name: 'Internals'
+              index: 2
+            3:
+              name: 'LeftOver'
+              index: 3
+        bindGroupEntries:
+          0:
+          1:
+            0:
+              binding: 0
+            1:
+              binding: 1
+            2:
+              binding: 2
+              resource:
+                offset: 0
+                size: 0
+            3:
+              binding: 3
+              resource:
+                offset: 0
+                size: 0
+        bufferNames:
+          0: 'Internals'
+          1: 'LeftOver'
+        textureNames:
+          0: 'textureSampler'
+        samplerNames:
+          0: 'textureSamplerSampler'
+        leftOverUniforms:
+          0:
+            name: 'scale'
+            type: 'vec2<f32>'
+            length: 0
+      attributes:
+        0: 'position'
+      uniforms:
+        0: 'scale'
+        1: 'textureSampler'
+      samplers:
+      uniformBuffers:
+      materialLocations: ~
+      materialSizes: ~
+  actual:
+    defines: |-
+      #define TONEMAPPING 0;
+      #define FROMLINEARSPACE;
+      
+    body:
+      vertex: |-
+        //#define SHADER_NAME vertex:postprocess
+        diagnostic(off, chromium.unreachable_code);
+        struct VertexInputs {
+          @builtin(vertex_index) vertexIndex : u32,
+          @builtin(instance_index) instanceIndex : u32,
+        @location(0) position : vec2<f32>,
+        };
+        var<private> vertexInputs : VertexInputs;
+        struct FragmentInputs {
+          @builtin(position) position : vec4<f32>,
+          @location(0) @interpolate(perspective, center) vUV : vec2<f32>,
+        };
+        var<private> vertexOutputs : FragmentInputs;
+        
+        struct LeftOver {
+          scale : vec2<f32>,
+        };
+        @group(1) @binding(3) var<uniform> uniforms : LeftOver;
+        struct Internals {
+        yFactor_: f32,
+        textureOutputHeight_: f32,
+        };
+        @group(1) @binding(2) var<uniform> internals : Internals;
+        
+        
+        
+        const madd=vec2(0.5,0.5);
+        //#define CUSTOM_VERTEX_DEFINITIONS
+        @vertex
+        fn main(input : VertexInputs)->FragmentInputs {
+          vertexInputs = input;
+        
+        //#define CUSTOM_VERTEX_MAIN_BEGIN
+        vertexOutputs.vUV=(vertexInputs.position*madd+madd)*uniforms.scale;
+        vertexOutputs.position=vec4(vertexInputs.position,0.0,1.0);
+        //#define CUSTOM_VERTEX_MAIN_END
+          vertexOutputs.position.y = vertexOutputs.position.y * internals.yFactor_;
+          return vertexOutputs;
+        }
+      fragment: |-
+        //#define SHADER_NAME fragment:imageProcessing
+        diagnostic(off, chromium.unreachable_code);
+        struct FragmentInputs {
+          @builtin(position) position : vec4<f32>,
+          @builtin(front_facing) frontFacing : bool,
+          @location(0) @interpolate(perspective, center) vUV : vec2<f32>,
+        };
+        var<private> fragmentInputs : FragmentInputs;
+        struct FragmentOutputs {
+          @location(0) color : vec4<f32>,
+        };
+        var<private> fragmentOutputs : FragmentOutputs;
+        
+        struct LeftOver {
+          scale : vec2<f32>,
+        };
+        @group(1) @binding(3) var<uniform> uniforms : LeftOver;
+        struct Internals {
+        yFactor_: f32,
+        textureOutputHeight_: f32,
+        };
+        @group(1) @binding(2) var<uniform> internals : Internals;
+        
+        @group(1) @binding(1) var textureSamplerSampler: sampler;
+        @group(1) @binding(0) var textureSampler: texture_2d<f32>;
+        const PI: f32=3.1415926535897932384626433832795;
+        const TWO_PI: f32=6.283185307179586;
+        const HALF_PI: f32=1.5707963267948966;
+        const RECIPROCAL_PI: f32=0.3183098861837907;
+        const RECIPROCAL_PI2: f32=0.15915494309189535;
+        const RECIPROCAL_PI4: f32=0.07957747154594767;
+        const HALF_MIN: f32=5.96046448e-08;
+        const LinearEncodePowerApprox: f32=2.2;
+        const GammaEncodePowerApprox: f32=1.0/LinearEncodePowerApprox;
+        const LuminanceEncodeApprox: vec3f=vec3f(0.2126,0.7152,0.0722);
+        const Epsilon:f32=0.0000001;
+        fn square(x: f32)->f32 {return x*x;
+        }
+        fn saturate(x: f32)->f32 {return clamp(x,0.0,1.0);
+        }
+        fn saturateVec3(x: vec3f)->vec3f {return clamp(x,vec3f(),vec3f(1.0));
+        }
+        fn saturateEps(x: f32)->f32 {return clamp(x,Epsilon,1.0);
+        }
+        fn maxEps(x: f32)->f32 {return max(x,Epsilon);
+        }
+        fn maxEpsVec3(x: vec3f)->vec3f {return max(x,vec3f(Epsilon));
+        }
+        fn absEps(x: f32)->f32 {return abs(x)+Epsilon;
+        }
+        fn transposeMat3(inMatrix: mat3x3f)->mat3x3f {let i0: vec3f=inMatrix[0];
+        let i1: vec3f=inMatrix[1];
+        let i2: vec3f=inMatrix[2];
+        let outMatrix:mat3x3f=mat3x3f(
+        vec3(i0.x,i1.x,i2.x),
+        vec3(i0.y,i1.y,i2.y),
+        vec3(i0.z,i1.z,i2.z)
+        );
+        return outMatrix;
+        }
+        fn inverseMat3(inMatrix: mat3x3f)->mat3x3f {let a00: f32=inMatrix[0][0];
+        let a01: f32=inMatrix[0][1];
+        let a02: f32=inMatrix[0][2];
+        let a10: f32=inMatrix[1][0];
+        let a11: f32=inMatrix[1][1];
+        let a12: f32=inMatrix[1][2];
+        let a20: f32=inMatrix[2][0];
+        let a21: f32=inMatrix[2][1];
+        let a22: f32=inMatrix[2][2];
+        let b01: f32=a22*a11-a12*a21;
+        let b11: f32=-a22*a10+a12*a20;
+        let b21: f32=a21*a10-a11*a20;
+        let det: f32=a00*b01+a01*b11+a02*b21;
+        return mat3x3f(b01/det,(-a22*a01+a02*a21)/det,(a12*a01-a02*a11)/det,
+        b11/det,(a22*a00-a02*a20)/det,(-a12*a00+a02*a10)/det,
+        b21/det,(-a21*a00+a01*a20)/det,(a11*a00-a01*a10)/det);
+        }
+        fn toLinearSpace(color: f32)->f32
+        {
+        return pow(color,LinearEncodePowerApprox);
+        }
+        fn toLinearSpaceVec3(color: vec3f)->vec3f
+        {
+        return pow(color,vec3f(LinearEncodePowerApprox));
+        }
+        fn toLinearSpaceVec4(color: vec4<f32>)->vec4<f32>
+        {
+        return vec4f(pow(color.rgb,vec3f(LinearEncodePowerApprox)),color.a);
+        }
+        fn toGammaSpace(color: vec4<f32>)->vec4<f32>
+        {
+        return vec4<f32>(pow(color.rgb,vec3f(GammaEncodePowerApprox)),color.a);
+        }
+        fn toGammaSpaceVec3(color: vec3f)->vec3f
+        {
+        return pow(color,vec3f(GammaEncodePowerApprox));
+        }
+        fn squareVec3(value: vec3f)->vec3f
+        {return value*value;
+        }
+        fn pow5(value: f32)->f32 {let sq: f32=value*value;
+        return sq*sq*value;
+        }
+        fn double_refract(I: vec3f,N: vec3f,eta: f32)->vec3f {let Tfront: vec3f=refract(I,N,1.0/eta);
+        let Nback: vec3f=normalize(reflect(N,Tfront));
+        return refract(Tfront,-Nback,eta);
+        }
+        fn getLuminanceUnclamped(color: vec3f)->f32
+        {return dot(color,LuminanceEncodeApprox);
+        }
+        fn getLuminance(color: vec3f)->f32
+        {return saturate(getLuminanceUnclamped(color));
+        }
+        fn getRand(seed: vec2<f32>)->f32 {return fract(sin(dot(seed.xy ,vec2<f32>(12.9898,78.233)))*43758.5453);
+        }
+        fn dither(seed: vec2<f32>,varianceAmount: f32)->f32 {let rand: f32=getRand(seed);
+        let normVariance: f32=varianceAmount/255.0;
+        let dither: f32=mix(-normVariance,normVariance,rand);
+        return dither;
+        }
+        const rgbdMaxRange: f32=255.0;
+        fn toRGBD(color: vec3f)->vec4<f32> {let maxRGB: f32=max(max(color.r,max(color.g,color.b)),Epsilon);
+        var D: f32 =max(rgbdMaxRange/maxRGB,1.);
+        D =clamp(floor(D)/255.0,0.,1.);
+        var rgb: vec3f =color.rgb*D;
+        rgb=toGammaSpaceVec3(rgb);
+        return vec4<f32>(saturateVec3(rgb),D);
+        }
+        fn fromRGBD(rgbd: vec4<f32>)->vec3f {let rgb=toLinearSpaceVec3(rgbd.rgb);
+        return rgb/rgbd.a;
+        }
+        fn parallaxCorrectNormal(vertexPos: vec3f,origVec: vec3f,cubeSize: vec3f,cubePos: vec3f)->vec3f {let invOrigVec: vec3f=vec3f(1.)/origVec;
+        let halfSize: vec3f=cubeSize*0.5;
+        let intersecAtMaxPlane: vec3f=(cubePos+halfSize-vertexPos)*invOrigVec;
+        let intersecAtMinPlane: vec3f=(cubePos-halfSize-vertexPos)*invOrigVec;
+        let largestIntersec: vec3f=max(intersecAtMaxPlane,intersecAtMinPlane);
+        let distance: f32=min(min(largestIntersec.x,largestIntersec.y),largestIntersec.z);
+        let intersectPositionWS: vec3f=vertexPos+origVec*distance;
+        return intersectPositionWS-cubePos;
+        }
+        fn equirectangularToCubemapDirection(uv : vec2f)->vec3f {var longitude : f32=uv.x*TWO_PI-PI;
+        var latitude : f32=HALF_PI-uv.y*PI;
+        var direction : vec3f;
+        direction.x=cos(latitude)*sin(longitude);
+        direction.y=sin(latitude);
+        direction.z=cos(latitude)*cos(longitude);
+        return direction;
+        }
+        fn sqrtClamped(value: f32)->f32 {return sqrt(max(value,0.));
+        }
+        fn avg(value: vec3f)->f32 {return dot(value,vec3f(0.333333333));
+        }
+        fn singleScatterToMultiScatterAlbedo(rho_ss: vec3f)->vec3f {let s: vec3f=sqrt(max(vec3f(1.0)-rho_ss,vec3f(0.0)));
+        return (vec3f(1.0)-s)*(vec3f(1.0)-vec3f(0.139)*s)/(vec3f(1.0)+vec3f(1.17)*s);
+        }
+        fn multiScatterToSingleScatterAlbedo(rho_ms: vec3f)->vec3f {let s: vec3f=4.09712f+4.20863f*rho_ms-sqrt(9.59217f+41.6808f*rho_ms+17.7126f*rho_ms*rho_ms);
+        return 1.0f-s*s;
+        }
+        fn multiScatterToSingleScatterAlbedoWithAniso(rho_ms: vec3f,aniso: f32)->vec3f {let s: vec3f=4.09712+4.20863f*rho_ms-sqrt(9.59217f+41.6808f*rho_ms+17.7126f*rho_ms*rho_ms);
+        return (vec3f(1.0f)-s*s)/maxEpsVec3(vec3f(1.0f)-vec3f(aniso)*s*s);
+        }
+        fn min3(v: vec3f)->f32 {return min(v.x,min(v.y,v.z));
+        }
+        fn max3(v: vec3f)->f32 {return max(v.x,max(v.y,v.z));
+        }
+        fn uint2float(i: u32)->f32 {return bitcast<f32>(0x3F800000u | (i>>9u))-1.0;
+        }
+        fn plasticSequence(rstate: u32)->vec2f {return vec2f(uint2float(rstate*3242174889u),
+        uint2float(rstate*2447445414u));
+        }
+        //#define CUSTOM_IMAGEPROCESSINGFUNCTIONS_DEFINITIONS
+        fn applyImageProcessing(result: vec4f)->vec4f {
+        //#define CUSTOM_IMAGEPROCESSINGFUNCTIONS_UPDATERESULT_ATSTART
+        var rgb=result.rgb;
+        rgb=toGammaSpaceVec3(rgb);
+        rgb=saturateVec3(rgb);
+        //#define CUSTOM_IMAGEPROCESSINGFUNCTIONS_UPDATERESULT_ATEND
+        return vec4f(rgb,result.a);
+        }
+        //#define CUSTOM_FRAGMENT_DEFINITIONS
+        @fragment
+        fn main(input: FragmentInputs)->FragmentOutputs {  fragmentInputs = input;
+          var result: vec4f=textureSample(textureSampler,textureSamplerSampler,input.vUV);
+        result=vec4f(max(result.rgb,vec3f(0.)),result.a);
+        result=applyImageProcessing(result);
+        fragmentOutputs.color=result;
+          return fragmentOutputs;
+        }
+    layout:
+      processing:
+        vertexBufferKindToNumberOfComponents:
+        shaderLanguage: 1
+        _attributeNextLocation: 1
+        _varyingNextLocation: 1
+        freeGroupIndex: 1
+        freeBindingIndex: 4
+        availableVaryings:
+          vUV: 0
+        availableAttributes:
+          position: 0
+        availableBuffers:
+          Internals:
+            binding:
+              groupIndex: 1
+              bindingIndex: 2
+          LeftOver:
+            binding:
+              groupIndex: 1
+              bindingIndex: 3
+        availableTextures:
+          textureSampler:
+            isTextureArray: false
+            isStorageTexture: false
+            textures:
+              0:
+                groupIndex: 1
+                bindingIndex: 0
+            sampleType: 'float'
+            autoBindSampler: true
+        availableSamplers:
+          textureSamplerSampler:
+            binding:
+              groupIndex: 1
+              bindingIndex: 1
+            type: 'filtering'
+        orderedAttributes:
+          0: 'position'
+        bindGroupLayoutEntries:
+          0:
+          1:
+            0:
+              binding: 0
+              visibility: 2
+              texture:
+                sampleType: 'float'
+                viewDimension: '2d'
+                multisampled: false
+            1:
+              binding: 1
+              visibility: 2
+              sampler:
+                type: 'filtering'
+            2:
+              binding: 2
+              visibility: 3
+              buffer:
+                type: 'uniform'
+            3:
+              binding: 3
+              visibility: 3
+              buffer:
+                type: 'uniform'
+        bindGroupLayoutEntryInfo:
+          0: ~
+          1:
+            0:
+              name: 'textureSampler'
+              index: 0
+              nameInArrayOfTexture: 'textureSampler'
+            1:
+              name: 'textureSamplerSampler'
+              index: 1
+            2:
+              name: 'Internals'
+              index: 2
+            3:
+              name: 'LeftOver'
+              index: 3
+        bindGroupEntries:
+          0:
+          1:
+            0:
+              binding: 0
+            1:
+              binding: 1
+            2:
+              binding: 2
+              resource:
+                offset: 0
+                size: 0
+            3:
+              binding: 3
+              resource:
+                offset: 0
+                size: 0
+        bufferNames:
+          0: 'Internals'
+          1: 'LeftOver'
+        textureNames:
+          0: 'textureSampler'
+        samplerNames:
+          0: 'textureSamplerSampler'
+        leftOverUniforms:
+          0:
+            name: 'scale'
+            type: 'vec2<f32>'
+            length: 0
+      attributes:
+        0: 'position'
+      uniforms:
+        0: 'scale'
+        1: 'textureSampler'
+      samplers:
+      uniformBuffers:
+      materialLocations: ~
+      materialSizes: ~
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-image-processing-inactive-native-20261018\red\tests\image-processing-inactive-defines.test.ts:158:14)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 8
+# fail 9
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6450.7756

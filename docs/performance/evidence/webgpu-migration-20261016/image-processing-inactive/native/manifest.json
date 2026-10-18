@@ -1,0 +1,127 @@
+{
+  "task": "webgpu-image-processing-inactive-native-20261018",
+  "createdAt": "2026-10-18T20:40:18.229Z",
+  "owned": [
+    {
+      "path": "patches/@babylonjs__core@9.30.0.patch",
+      "sha256": "10d6dff4b05849f0e6262f439900466a78426c73c385961949405f893e53f1e8",
+      "bytes": 13636
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "14815c569092aa38180ecd8059881bc2a5e8380e2a304046b07c3dbdcc7a918e",
+      "bytes": 60408
+    },
+    {
+      "path": "tests/image-processing-inactive-defines.test.ts",
+      "sha256": "32b55ecab7bf47a1ca4d89674bd9fbee8c1b8c31193a44bdf30cf95a6342f033",
+      "bytes": 11560
+    },
+    {
+      "path": "tests/game-authored-light-preparation.test.ts",
+      "sha256": "2de4f692e3bfec85019466b7461028772f6058cad0aa2514b5171c6d713cf90a",
+      "bytes": 32288
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "inputs.json",
+      "sha256": "b7a6d071aaa077307ce5d2e45af3893b8400a5abe58e989dcf894f204d5be636",
+      "bytes": 1124
+    },
+    {
+      "path": "transfer.mjs",
+      "sha256": "386400f3ac15ce0108c451afa4259e5d19c8998f41679f2088335d93b499de1e",
+      "bytes": 4311
+    },
+    {
+      "path": "validate.mjs",
+      "sha256": "eb98cc4d50f404eec2ccdea1dfba35e1665697b77a926ea60b19751e21829248",
+      "bytes": 3870
+    },
+    {
+      "path": "finalize.mjs",
+      "sha256": "dc0d0e0a20c9401ba1de09017d1be72cdeb05f7d73bafef7e192201b9610d3e0",
+      "bytes": 9594
+    },
+    {
+      "path": "patch-addition.diff",
+      "sha256": "4d098e61b048ae4280d2ae6a563187aab10bd94cd17e133cc4d57f9a2e095f07",
+      "bytes": 584
+    },
+    {
+      "path": "patch-roundtrip.json",
+      "sha256": "295252b4f62d2761bcdd22ec0784be61789241db8f20ea50843da7ecae58ea7f",
+      "bytes": 1919
+    },
+    {
+      "path": "preservation.json",
+      "sha256": "361bd75889b462962655a18f0927803bd091ffa862ff4df1496a562c5ace2e6b",
+      "bytes": 441
+    },
+    {
+      "path": "setup-attempts.json",
+      "sha256": "50e0e79e1d69d103fde230b4e2b585dc5000643b30ddbb73b1c811decd11630e",
+      "bytes": 792
+    },
+    {
+      "path": "summary.json",
+      "sha256": "4b79dd95a8e2cfdc45eca787f54d99988d1d9ffabd1f5be76d5fcdb30e7384ad",
+      "bytes": 586
+    },
+    {
+      "path": "owned.diff",
+      "sha256": "9143341c46e628a0efd955ddf051a5f5996d84cfe8e2bed7f149b7f5c1915489",
+      "bytes": 23597
+    },
+    {
+      "path": "red.json",
+      "sha256": "3b6287ef510de50478c12aa78f5d0ad2d8420a9e4bf6762da4285530cb6529ed",
+      "bytes": 977
+    },
+    {
+      "path": "red.log",
+      "sha256": "43b601457c3d8b3f19fe01cafef5d442589047280d14d31d81db80d7967367db",
+      "bytes": 71059
+    },
+    {
+      "path": "green.json",
+      "sha256": "63756f270c1657a4f3430137d4ddb7e688c84eadd3eaf85686b38b9eca72d940",
+      "bytes": 979
+    },
+    {
+      "path": "green.log",
+      "sha256": "af52cec5ed53d3f423de249311fb14dbd702c698ff835ed965d60de0ed27a688",
+      "bytes": 4744
+    }
+  ],
+  "handoff": {
+    "path": "docs/agents/handoffs/webgpu-image-processing-inactive-native-20261018.md",
+    "sha256": "a654fa9eb63f313a8891d50ee47f574d98133f230cfdf124af7537939d72444e",
+    "bytes": 2820
+  },
+  "dependencies": {
+    "old": {
+      "path": "@babylonjs/core/Materials/imageProcessingConfiguration.pure.js",
+      "sha256": "f0b452b09bfe47b6eccf4c6369480391cb25a02e497cd8fddc182fcec5bfe043",
+      "bytes": 51011
+    },
+    "new": {
+      "path": "@babylonjs/core/Materials/imageProcessingConfiguration.pure.js",
+      "sha256": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+      "bytes": 51245
+    }
+  },
+  "validation": {
+    "redPass": 8,
+    "redFail": 9,
+    "greenPass": 17,
+    "greenFail": 0,
+    "skip": 0,
+    "patchRoundtrip": 9,
+    "fullTypecheck": false,
+    "build": false,
+    "GPU": false,
+    "install": false
+  }
+}
