@@ -1,0 +1,381 @@
+✖ actual MaterialDefines distribution canonicalizes complete literal blocks without a new public API (5.0234ms)
+✔ actual serializer preserves complete unknown blocks and reserved names byte for byte (0.75ms)
+✖ actual serializer caps chars and define rows exactly (2.0712ms)
+✔ actual clone/equality/reset and mutable key order remain untouched (0.5749ms)
+✖ actual getter order, receiver, original throws and later unsafe mutation stay observable (0.6799ms)
+✖ flat-result contract does not claim to reject every multiline property by origin (0.3247ms)
+BJS - [07:15:45]: Babylon.js v9.30.0 - Null engine
+BJS - [07:15:45]: Babylon.js v9.30.0 - Null engine
+✖ patched distribution actual native WGSL/order reuse pbr (265.3011ms)
+BJS - [07:15:45]: Babylon.js v9.30.0 - Null engine
+✖ patched distribution actual native WGSL/order reuse standard (73.3701ms)
+BJS - [07:15:45]: Babylon.js v9.30.0 - Null engine
+✖ patched distribution actual native WGSL/order reuse surface (65.538ms)
+BJS - [07:15:45]: Babylon.js v9.30.0 - Null engine
+✖ patched distribution actual native WGSL/order reuse photo (66.0013ms)
+BJS - [07:15:45]: Babylon.js v9.30.0 - Null engine
+✖ patched distribution actual native WGSL/order reuse wind (54.3303ms)
+BJS - [07:15:46]: Babylon.js v9.30.0 - Null engine
+✖ patched distribution actual native WGSL/order reuse car (61.1111ms)
+BJS - [07:15:46]: Babylon.js v9.30.0 - Null engine
+✖ patched distribution actual native WGSL/order reuse photo-grass (53.2087ms)
+BJS - [07:15:46]: Babylon.js v9.30.0 - Null engine
+✖ patched distribution actual native WGSL/order reuse photo-grass-thin (57.2617ms)
+BJS - [07:15:46]: Babylon.js v9.30.0 - Null engine
+✖ patched distribution actual native WGSL/order reuse grass-thin (56.7015ms)
+BJS - [07:15:46]: Babylon.js v9.30.0 - Null engine
+✖ patched distribution actual native WGSL/order reuse hair (51.5392ms)
+BJS - [07:15:46]: Babylon.js v9.30.0 - Null engine
+✖ known unsupported order-sensitive custom processor remains an explicit limitation (60.1216ms)
+✔ actual tiny GLB and rendering tests share one physical core/loaders identity (15.7638ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 3
+ℹ fail 15
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4655.0299
+
+✖ failing tests:
+
+test at tests\material-defines-serialization.test.ts:1:669
+✖ actual MaterialDefines distribution canonicalizes complete literal blocks without a new public API (5.0234ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '#define Z\n' +
+  +   '#define NUM_SAMPLES 0\n' +
+  +   '#define ALPHATESTVALUE 0.5\n' +
+  - '#define ALPHATESTVALUE 0.5\n' +
+  -   '#define EXP 1.25e+2\n' +
+      '#define INDEX -1\n' +
+  +   '#define EXP 1.25e+2\n'
+  -   '#define NUM_SAMPLES 0\n' +
+  -   '#define Z\n'
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-serialization.test.ts:23:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '#define Z\n#define NUM_SAMPLES 0\n#define ALPHATESTVALUE 0.5\n#define INDEX -1\n#define EXP 1.25e+2\n',
+    expected: '#define ALPHATESTVALUE 0.5\n#define EXP 1.25e+2\n#define INDEX -1\n#define NUM_SAMPLES 0\n#define Z\n',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-serialization.test.ts:1:2228
+✖ actual serializer caps chars and define rows exactly (2.0712ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be strictly unequal to:
+  
+  '#define M1024\n' +
+    '#define M1023\n' +
+    '#define M1022\n' +
+    '#define M1021\n' +
+    '#define M1020\n' +
+    '#define M1019\n' +
+    '#define M1018\n' +
+    '#define M1017\n' +
+    '#define M1016\n' +
+    '#define M1015\n' +
+    '#define M1014\n' +
+    '#define M1013\n' +
+    '#define M1012\n' +
+    '#define M1011\n' +
+    '#define M1010\n' +
+    '#define M1009\n' +
+    '#define M1008\n' +
+    '#define M1007\n' +
+    '#define M1006\n' +
+    '#define M1005\n' +
+    '#define M1004\n' +
+    '#define M1003\n' +
+    '#define M1002\n' +
+    '#define M1001\n' +
+    '#define M1000\n' +
+    '#define M999\n' +
+    '#define M998\n' +
+    '#define M997\n' +
+    '#define M996\n' +
+    '#define M995\n' +
+    '#define M994\n' +
+    '#define M993\n' +
+    '#define M992\n' +
+    '#define M991\n' +
+    '#define M990\n' +
+    '#define M989\n' +
+    '#define M988\n' +
+    '#define M987\n' +
+    '#define M986\n' +
+    '#define M985\n' +
+    '#define M984\n' +
+    '#define M983\n' +
+    '#define M982\n' +
+    '#define M981\n' +
+    '#define M980\n' +
+    '#define M979\n' +
+  ...
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-serialization.test.ts:36:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '#define M1024\n#define M1023\n#define M1022\n#define M1021\n#define M1020\n#define M1019\n#define M1018\n#define M1017\n#define M1016\n#define M1015\n#define M1014\n#define M1013\n#define M1012\n#define M1011\n#define M1010\n#define M1009\n#define M1008\n#define M1007\n#define M1006\n#define M1005\n#define M1004\n#define M1003\n#define M1002\n#define M1001\n#define M1000\n#define M999\n#define M998\n#define M997\n#define M996\n#define M995\n#define M994\n#define M993\n#define M992\n#define M991\n#define M990\n#define M989\n#define M988\n#define M987\n#define M986\n#define M985\n#define M984\n#define M983\n#define M982\n#define M981\n#define M980\n#define M979\n#define M978\n#define M977\n#define M976\n#define M975\n#define M974\n#define M973\n#define M972\n#define M971\n#define M970\n#define M969\n#define M968\n#define M967\n#define M966\n#define M965\n#define M964\n#define M963\n#define M962\n#define M961\n#define M960\n#define M959\n#define M958\n#define M957\n#define M956\n#define M955\n#define M954\n#define M953\n#define M952\n#define M951\n#define M950\n#define M949\n#define M948\n#define M947\n#define M946\n#define M945\n#define M944\n#define M943\n#define M942\n#define M941\n#define M940\n#define M939\n#define M938\n#define M937\n#define M936\n#define M935\n#define M934\n#define M933\n#define M932\n#define M931\n#define M930\n#define M929\n#define M928\n#define M927\n#define M926\n#define M925\n#define M924\n#define M923\n#define M922\n#define M921\n#define M920\n#define M919\n#define M918\n#define M917\n#define M916\n#define M915\n#define M914\n#define M913\n#define M912\n#define M911\n#define M910\n#define M909\n#define M908\n#define M907\n#define M906\n#define M905\n#define M904\n#define M903\n#define M902\n#define M901\n#define M900\n#define M899\n#define M898\n#define M897\n#define M896\n#define M895\n#define M894\n#define M893\n#define M892\n#define M891\n#define M890\n#define M889\n#define M888\n#define M887\n#define M886\n#define M885\n#define M884\n#define M883\n#define M882\n#define M881\n#define M880\n#define M879\n#define M878\n#define M877\n#define M876\n#define M875\n#define M874\n#define M873\n#define M872\n#define M871\n#define M870\n#define M869\n#define M868\n#define M867\n#define M866\n#define M865\n#define M864\n#define M863\n#define M862\n#define M861\n#define M860\n#define M859\n#define M858\n#define M857\n#define M856\n#define M855\n#define M854\n#define M853\n#define M852\n#define M851\n#define M850\n#define M849\n#define M848\n#define M847\n#define M846\n#define M845\n#define M844\n#define M843\n#define M842\n#define M841\n#define M840\n#define M839\n#define M838\n#define M837\n#define M836\n#define M835\n#define M834\n#define M833\n#define M832\n#define M831\n#define M830\n#define M829\n#define M828\n#define M827\n#define M826\n#define M825\n#define M824\n#define M823\n#define M822\n#define M821\n#define M820\n#define M819\n#define M818\n#define M817\n#define M816\n#define M815\n#define M814\n#define M813\n#define M812\n#define M811\n#define M810\n#define M809\n#define M808\n#define M807\n#define M806\n#define M805\n#define M804\n#define M803\n#define M802\n#define M801\n#define M800\n#define M799\n#define M798\n#define M797\n#define M796\n#define M795\n#define M794\n#define M793\n#define M792\n#define M791\n#define M790\n#define M789\n#define M788\n#define M787\n#define M786\n#define M785\n#define M784\n#define M783\n#define M782\n#define M781\n#define M780\n#define M779\n#define M778\n#define M777\n#define M776\n#define M775\n#define M774\n#define M773\n#define M772\n#define M771\n#define M770\n#define M769\n#define M768\n#define M767\n#define M766\n#define M765\n#define M764\n#define M763\n#define M762\n#define M761\n#define M760\n#define M759\n#define M758\n#define M757\n#define M756\n#define M755\n#define M754\n#define M753\n#define M752\n#define M751\n#define M750\n#define M749\n#define M748\n#define M747\n#define M746\n#define M745\n#define M744\n#define M743\n#define M742\n#define M741\n#define M740\n#define M739\n#define M738\n#define M737\n#define M736\n#define M735\n#define M734\n#define M733\n#define M732\n#define M731\n#define M730\n#define M729\n#define M728\n#define M727\n#define M726\n#define M725\n#define M724\n#define M723\n#define M722\n#define M721\n#define M720\n#define M719\n#define M718\n#define M717\n#define M716\n#define M715\n#define M714\n#define M713\n#define M712\n#define M711\n#define M710\n#define M709\n#define M708\n#define M707\n#define M706\n#define M705\n#define M704\n#define M703\n#define M702\n#define M701\n#define M700\n#define M699\n#define M698\n#define M697\n#define M696\n#define M695\n#define M694\n#define M693\n#define M692\n#define M691\n#define M690\n#define M689\n#define M688\n#define M687\n#define M686\n#define M685\n#define M684\n#define M683\n#define M682\n#define M681\n#define M680\n#define M679\n#define M678\n#define M677\n#define M676\n#define M675\n#define M674\n#define M673\n#define M672\n#define M671\n#define M670\n#define M669\n#define M668\n#define M667\n#define M666\n#define M665\n#define M664\n#define M663\n#define M662\n#define M661\n#define M660\n#define M659\n#define M658\n#define M657\n#define M656\n#define M655\n#define M654\n#define M653\n#define M652\n#define M651\n#define M650\n#define M649\n#define M648\n#define M647\n#define M646\n#define M645\n#define M644\n#define M643\n#define M642\n#define M641\n#define M640\n#define M639\n#define M638\n#define M637\n#define M636\n#define M635\n#define M634\n#define M633\n#define M632\n#define M631\n#define M630\n#define M629\n#define M628\n#define M627\n#define M626\n#define M625\n#define M624\n#define M623\n#define M622\n#define M621\n#define M620\n#define M619\n#define M618\n#define M617\n#define M616\n#define M615\n#define M614\n#define M613\n#define M612\n#define M611\n#define M610\n#define M609\n#define M608\n#define M607\n#define M606\n#define M605\n#define M604\n#define M603\n#define M602\n#define M601\n#define M600\n#define M599\n#define M598\n#define M597\n#define M596\n#define M595\n#define M594\n#define M593\n#define M592\n#define M591\n#define M590\n#define M589\n#define M588\n#define M587\n#define M586\n#define M585\n#define M584\n#define M583\n#define M582\n#define M581\n#define M580\n#define M579\n#define M578\n#define M577\n#define M576\n#define M575\n#define M574\n#define M573\n#define M572\n#define M571\n#define M570\n#define M569\n#define M568\n#define M567\n#define M566\n#define M565\n#define M564\n#define M563\n#define M562\n#define M561\n#define M560\n#define M559\n#define M558\n#define M557\n#define M556\n#define M555\n#define M554\n#define M553\n#define M552\n#define M551\n#define M550\n#define M549\n#define M548\n#define M547\n#define M546\n#define M545\n#define M544\n#define M543\n#define M542\n#define M541\n#define M540\n#define M539\n#define M538\n#define M537\n#define M536\n#define M535\n#define M534\n#define M533\n#define M532\n#define M531\n#define M530\n#define M529\n#define M528\n#define M527\n#define M526\n#define M525\n#define M524\n#define M523\n#define M522\n#define M521\n#define M520\n#define M519\n#define M518\n#define M517\n#define M516\n#define M515\n#define M514\n#define M513\n#define M512\n#define M511\n#define M510\n#define M509\n#define M508\n#define M507\n#define M506\n#define M505\n#define M504\n#define M503\n#define M502\n#define M501\n#define M500\n#define M499\n#define M498\n#define M497\n#define M496\n#define M495\n#define M494\n#define M493\n#define M492\n#define M491\n#define M490\n#define M489\n#define M488\n#define M487\n#define M486\n#define M485\n#define M484\n#define M483\n#define M482\n#define M481\n#define M480\n#define M479\n#define M478\n#define M477\n#define M476\n#define M475\n#define M474\n#define M473\n#define M472\n#define M471\n#define M470\n#define M469\n#define M468\n#define M467\n#define M466\n#define M465\n#define M464\n#define M463\n#define M462\n#define M461\n#define M460\n#define M459\n#define M458\n#define M457\n#define M456\n#define M455\n#define M454\n#define M453\n#define M452\n#define M451\n#define M450\n#define M449\n#define M448\n#define M447\n#define M446\n#define M445\n#define M444\n#define M443\n#define M442\n#define M441\n#define M440\n#define M439\n#define M438\n#define M437\n#define M436\n#define M435\n#define M434\n#define M433\n#define M432\n#define M431\n#define M430\n#define M429\n#define M428\n#define M427\n#define M426\n#define M425\n#define M424\n#define M423\n#define M422\n#define M421\n#define M420\n#define M419\n#define M418\n#define M417\n#define M416\n#define M415\n#define M414\n#define M413\n#define M412\n#define M411\n#define M410\n#define M409\n#define M408\n#define M407\n#define M406\n#define M405\n#define M404\n#define M403\n#define M402\n#define M401\n#define M400\n#define M399\n#define M398\n#define M397\n#define M396\n#define M395\n#define M394\n#define M393\n#define M392\n#define M391\n#define M390\n#define M389\n#define M388\n#define M387\n#define M386\n#define M385\n#define M384\n#define M383\n#define M382\n#define M381\n#define M380\n#define M379\n#define M378\n#define M377\n#define M376\n#define M375\n#define M374\n#define M373\n#define M372\n#define M371\n#define M370\n#define M369\n#define M368\n#define M367\n#define M366\n#define M365\n#define M364\n#define M363\n#define M362\n#define M361\n#define M360\n#define M359\n#define M358\n#define M357\n#define M356\n#define M355\n#define M354\n#define M353\n#define M352\n#define M351\n#define M350\n#define M349\n#define M348\n#define M347\n#define M346\n#define M345\n#define M344\n#define M343\n#define M342\n#define M341\n#define M340\n#define M339\n#define M338\n#define M337\n#define M336\n#define M335\n#define M334\n#define M333\n#define M332\n#define M331\n#define M330\n#define M329\n#define M328\n#define M327\n#define M326\n#define M325\n#define M324\n#define M323\n#define M322\n#define M321\n#define M320\n#define M319\n#define M318\n#define M317\n#define M316\n#define M315\n#define M314\n#define M313\n#define M312\n#define M311\n#define M310\n#define M309\n#define M308\n#define M307\n#define M306\n#define M305\n#define M304\n#define M303\n#define M302\n#define M301\n#define M300\n#define M299\n#define M298\n#define M297\n#define M296\n#define M295\n#define M294\n#define M293\n#define M292\n#define M291\n#define M290\n#define M289\n#define M288\n#define M287\n#define M286\n#define M285\n#define M284\n#define M283\n#define M282\n#define M281\n#define M280\n#define M279\n#define M278\n#define M277\n#define M276\n#define M275\n#define M274\n#define M273\n#define M272\n#define M271\n#define M270\n#define M269\n#define M268\n#define M267\n#define M266\n#define M265\n#define M264\n#define M263\n#define M262\n#define M261\n#define M260\n#define M259\n#define M258\n#def'... 3229 more characters,
+    expected: '#define M1024\n#define M1023\n#define M1022\n#define M1021\n#define M1020\n#define M1019\n#define M1018\n#define M1017\n#define M1016\n#define M1015\n#define M1014\n#define M1013\n#define M1012\n#define M1011\n#define M1010\n#define M1009\n#define M1008\n#define M1007\n#define M1006\n#define M1005\n#define M1004\n#define M1003\n#define M1002\n#define M1001\n#define M1000\n#define M999\n#define M998\n#define M997\n#define M996\n#define M995\n#define M994\n#define M993\n#define M992\n#define M991\n#define M990\n#define M989\n#define M988\n#define M987\n#define M986\n#define M985\n#define M984\n#define M983\n#define M982\n#define M981\n#define M980\n#define M979\n#define M978\n#define M977\n#define M976\n#define M975\n#define M974\n#define M973\n#define M972\n#define M971\n#define M970\n#define M969\n#define M968\n#define M967\n#define M966\n#define M965\n#define M964\n#define M963\n#define M962\n#define M961\n#define M960\n#define M959\n#define M958\n#define M957\n#define M956\n#define M955\n#define M954\n#define M953\n#define M952\n#define M951\n#define M950\n#define M949\n#define M948\n#define M947\n#define M946\n#define M945\n#define M944\n#define M943\n#define M942\n#define M941\n#define M940\n#define M939\n#define M938\n#define M937\n#define M936\n#define M935\n#define M934\n#define M933\n#define M932\n#define M931\n#define M930\n#define M929\n#define M928\n#define M927\n#define M926\n#define M925\n#define M924\n#define M923\n#define M922\n#define M921\n#define M920\n#define M919\n#define M918\n#define M917\n#define M916\n#define M915\n#define M914\n#define M913\n#define M912\n#define M911\n#define M910\n#define M909\n#define M908\n#define M907\n#define M906\n#define M905\n#define M904\n#define M903\n#define M902\n#define M901\n#define M900\n#define M899\n#define M898\n#define M897\n#define M896\n#define M895\n#define M894\n#define M893\n#define M892\n#define M891\n#define M890\n#define M889\n#define M888\n#define M887\n#define M886\n#define M885\n#define M884\n#define M883\n#define M882\n#define M881\n#define M880\n#define M879\n#define M878\n#define M877\n#define M876\n#define M875\n#define M874\n#define M873\n#define M872\n#define M871\n#define M870\n#define M869\n#define M868\n#define M867\n#define M866\n#define M865\n#define M864\n#define M863\n#define M862\n#define M861\n#define M860\n#define M859\n#define M858\n#define M857\n#define M856\n#define M855\n#define M854\n#define M853\n#define M852\n#define M851\n#define M850\n#define M849\n#define M848\n#define M847\n#define M846\n#define M845\n#define M844\n#define M843\n#define M842\n#define M841\n#define M840\n#define M839\n#define M838\n#define M837\n#define M836\n#define M835\n#define M834\n#define M833\n#define M832\n#define M831\n#define M830\n#define M829\n#define M828\n#define M827\n#define M826\n#define M825\n#define M824\n#define M823\n#define M822\n#define M821\n#define M820\n#define M819\n#define M818\n#define M817\n#define M816\n#define M815\n#define M814\n#define M813\n#define M812\n#define M811\n#define M810\n#define M809\n#define M808\n#define M807\n#define M806\n#define M805\n#define M804\n#define M803\n#define M802\n#define M801\n#define M800\n#define M799\n#define M798\n#define M797\n#define M796\n#define M795\n#define M794\n#define M793\n#define M792\n#define M791\n#define M790\n#define M789\n#define M788\n#define M787\n#define M786\n#define M785\n#define M784\n#define M783\n#define M782\n#define M781\n#define M780\n#define M779\n#define M778\n#define M777\n#define M776\n#define M775\n#define M774\n#define M773\n#define M772\n#define M771\n#define M770\n#define M769\n#define M768\n#define M767\n#define M766\n#define M765\n#define M764\n#define M763\n#define M762\n#define M761\n#define M760\n#define M759\n#define M758\n#define M757\n#define M756\n#define M755\n#define M754\n#define M753\n#define M752\n#define M751\n#define M750\n#define M749\n#define M748\n#define M747\n#define M746\n#define M745\n#define M744\n#define M743\n#define M742\n#define M741\n#define M740\n#define M739\n#define M738\n#define M737\n#define M736\n#define M735\n#define M734\n#define M733\n#define M732\n#define M731\n#define M730\n#define M729\n#define M728\n#define M727\n#define M726\n#define M725\n#define M724\n#define M723\n#define M722\n#define M721\n#define M720\n#define M719\n#define M718\n#define M717\n#define M716\n#define M715\n#define M714\n#define M713\n#define M712\n#define M711\n#define M710\n#define M709\n#define M708\n#define M707\n#define M706\n#define M705\n#define M704\n#define M703\n#define M702\n#define M701\n#define M700\n#define M699\n#define M698\n#define M697\n#define M696\n#define M695\n#define M694\n#define M693\n#define M692\n#define M691\n#define M690\n#define M689\n#define M688\n#define M687\n#define M686\n#define M685\n#define M684\n#define M683\n#define M682\n#define M681\n#define M680\n#define M679\n#define M678\n#define M677\n#define M676\n#define M675\n#define M674\n#define M673\n#define M672\n#define M671\n#define M670\n#define M669\n#define M668\n#define M667\n#define M666\n#define M665\n#define M664\n#define M663\n#define M662\n#define M661\n#define M660\n#define M659\n#define M658\n#define M657\n#define M656\n#define M655\n#define M654\n#define M653\n#define M652\n#define M651\n#define M650\n#define M649\n#define M648\n#define M647\n#define M646\n#define M645\n#define M644\n#define M643\n#define M642\n#define M641\n#define M640\n#define M639\n#define M638\n#define M637\n#define M636\n#define M635\n#define M634\n#define M633\n#define M632\n#define M631\n#define M630\n#define M629\n#define M628\n#define M627\n#define M626\n#define M625\n#define M624\n#define M623\n#define M622\n#define M621\n#define M620\n#define M619\n#define M618\n#define M617\n#define M616\n#define M615\n#define M614\n#define M613\n#define M612\n#define M611\n#define M610\n#define M609\n#define M608\n#define M607\n#define M606\n#define M605\n#define M604\n#define M603\n#define M602\n#define M601\n#define M600\n#define M599\n#define M598\n#define M597\n#define M596\n#define M595\n#define M594\n#define M593\n#define M592\n#define M591\n#define M590\n#define M589\n#define M588\n#define M587\n#define M586\n#define M585\n#define M584\n#define M583\n#define M582\n#define M581\n#define M580\n#define M579\n#define M578\n#define M577\n#define M576\n#define M575\n#define M574\n#define M573\n#define M572\n#define M571\n#define M570\n#define M569\n#define M568\n#define M567\n#define M566\n#define M565\n#define M564\n#define M563\n#define M562\n#define M561\n#define M560\n#define M559\n#define M558\n#define M557\n#define M556\n#define M555\n#define M554\n#define M553\n#define M552\n#define M551\n#define M550\n#define M549\n#define M548\n#define M547\n#define M546\n#define M545\n#define M544\n#define M543\n#define M542\n#define M541\n#define M540\n#define M539\n#define M538\n#define M537\n#define M536\n#define M535\n#define M534\n#define M533\n#define M532\n#define M531\n#define M530\n#define M529\n#define M528\n#define M527\n#define M526\n#define M525\n#define M524\n#define M523\n#define M522\n#define M521\n#define M520\n#define M519\n#define M518\n#define M517\n#define M516\n#define M515\n#define M514\n#define M513\n#define M512\n#define M511\n#define M510\n#define M509\n#define M508\n#define M507\n#define M506\n#define M505\n#define M504\n#define M503\n#define M502\n#define M501\n#define M500\n#define M499\n#define M498\n#define M497\n#define M496\n#define M495\n#define M494\n#define M493\n#define M492\n#define M491\n#define M490\n#define M489\n#define M488\n#define M487\n#define M486\n#define M485\n#define M484\n#define M483\n#define M482\n#define M481\n#define M480\n#define M479\n#define M478\n#define M477\n#define M476\n#define M475\n#define M474\n#define M473\n#define M472\n#define M471\n#define M470\n#define M469\n#define M468\n#define M467\n#define M466\n#define M465\n#define M464\n#define M463\n#define M462\n#define M461\n#define M460\n#define M459\n#define M458\n#define M457\n#define M456\n#define M455\n#define M454\n#define M453\n#define M452\n#define M451\n#define M450\n#define M449\n#define M448\n#define M447\n#define M446\n#define M445\n#define M444\n#define M443\n#define M442\n#define M441\n#define M440\n#define M439\n#define M438\n#define M437\n#define M436\n#define M435\n#define M434\n#define M433\n#define M432\n#define M431\n#define M430\n#define M429\n#define M428\n#define M427\n#define M426\n#define M425\n#define M424\n#define M423\n#define M422\n#define M421\n#define M420\n#define M419\n#define M418\n#define M417\n#define M416\n#define M415\n#define M414\n#define M413\n#define M412\n#define M411\n#define M410\n#define M409\n#define M408\n#define M407\n#define M406\n#define M405\n#define M404\n#define M403\n#define M402\n#define M401\n#define M400\n#define M399\n#define M398\n#define M397\n#define M396\n#define M395\n#define M394\n#define M393\n#define M392\n#define M391\n#define M390\n#define M389\n#define M388\n#define M387\n#define M386\n#define M385\n#define M384\n#define M383\n#define M382\n#define M381\n#define M380\n#define M379\n#define M378\n#define M377\n#define M376\n#define M375\n#define M374\n#define M373\n#define M372\n#define M371\n#define M370\n#define M369\n#define M368\n#define M367\n#define M366\n#define M365\n#define M364\n#define M363\n#define M362\n#define M361\n#define M360\n#define M359\n#define M358\n#define M357\n#define M356\n#define M355\n#define M354\n#define M353\n#define M352\n#define M351\n#define M350\n#define M349\n#define M348\n#define M347\n#define M346\n#define M345\n#define M344\n#define M343\n#define M342\n#define M341\n#define M340\n#define M339\n#define M338\n#define M337\n#define M336\n#define M335\n#define M334\n#define M333\n#define M332\n#define M331\n#define M330\n#define M329\n#define M328\n#define M327\n#define M326\n#define M325\n#define M324\n#define M323\n#define M322\n#define M321\n#define M320\n#define M319\n#define M318\n#define M317\n#define M316\n#define M315\n#define M314\n#define M313\n#define M312\n#define M311\n#define M310\n#define M309\n#define M308\n#define M307\n#define M306\n#define M305\n#define M304\n#define M303\n#define M302\n#define M301\n#define M300\n#define M299\n#define M298\n#define M297\n#define M296\n#define M295\n#define M294\n#define M293\n#define M292\n#define M291\n#define M290\n#define M289\n#define M288\n#define M287\n#define M286\n#define M285\n#define M284\n#define M283\n#define M282\n#define M281\n#define M280\n#define M279\n#define M278\n#define M277\n#define M276\n#define M275\n#define M274\n#define M273\n#define M272\n#define M271\n#define M270\n#define M269\n#define M268\n#define M267\n#define M266\n#define M265\n#define M264\n#define M263\n#define M262\n#define M261\n#define M260\n#define M259\n#define M258\n#def'... 3229 more characters,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-serialization.test.ts:2:1085
+✖ actual getter order, receiver, original throws and later unsafe mutation stay observable (0.6799ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '#define Z\n#define A 0.5\n'
+  - '#define A 0.5\n#define Z\n'
+             ^
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-serialization.test.ts:58:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '#define Z\n#define A 0.5\n',
+    expected: '#define A 0.5\n#define Z\n',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-serialization.test.ts:2:2108
+✖ flat-result contract does not claim to reject every multiline property by origin (0.3247ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '#define Z 1\n#define A 2\n'
+  - '#define A 2\n#define Z 1\n'
+             ^
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-serialization.test.ts:67:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '#define Z 1\n#define A 2\n',
+    expected: '#define A 2\n#define Z 1\n',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:935
+✖ patched distribution actual native WGSL/order reuse pbr (265.3011ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 2
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:17:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:935
+✖ patched distribution actual native WGSL/order reuse standard (73.3701ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  4 !== 5
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:17:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 5,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:935
+✖ patched distribution actual native WGSL/order reuse surface (65.538ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  7 !== 8
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:17:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:935
+✖ patched distribution actual native WGSL/order reuse photo (66.0013ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  10 !== 11
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:17:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 10,
+    expected: 11,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:935
+✖ patched distribution actual native WGSL/order reuse wind (54.3303ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  13 !== 14
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:17:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 13,
+    expected: 14,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:935
+✖ patched distribution actual native WGSL/order reuse car (61.1111ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  16 !== 17
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:17:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 16,
+    expected: 17,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:935
+✖ patched distribution actual native WGSL/order reuse photo-grass (53.2087ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  19 !== 20
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:17:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 19,
+    expected: 20,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:935
+✖ patched distribution actual native WGSL/order reuse photo-grass-thin (57.2617ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  22 !== 23
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:17:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 22,
+    expected: 23,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:935
+✖ patched distribution actual native WGSL/order reuse grass-thin (56.7015ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  25 !== 26
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:17:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 25,
+    expected: 26,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:935
+✖ patched distribution actual native WGSL/order reuse hair (51.5392ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  28 !== 29
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:17:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 28,
+    expected: 29,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\material-defines-wgsl-order.test.ts:1:1955
+✖ known unsupported order-sensitive custom processor remains an explicit limitation (60.1216ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  31 !== 32
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\fixtures\material-defines-order\scenario.ts:177:26)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-qa-20261018\candidate\tests\material-defines-wgsl-order.test.ts:23:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 31,
+    expected: 32,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

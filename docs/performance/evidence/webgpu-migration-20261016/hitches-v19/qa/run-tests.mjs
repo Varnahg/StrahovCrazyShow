@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,openSync,closeSync,readdirSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import {dirname,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=dirname(fileURLToPath(import.meta.url)),candidate=resolve(root,'candidate'),input=JSON.parse(readFileSync(resolve(root,'input-manifest.json'))),suite=process.argv[2]??'targeted';assert.ok(['targeted','related'].includes(suite));
+const files=suite==='targeted'?['tests/material-defines-serialization.test.ts','tests/material-defines-wgsl-order.test.ts']:input.relatedTests;
+const args=['--import','tsx','--test','--test-concurrency=1',...files];
+const log=resolve(root,suite+'-final.log'),fd=openSync(log,'w'),startedAt=new Date().toISOString();
+const hash=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
+const runtimeSha=hash(resolve(root,'dependencies/node_modules/@babylonjs/core/Materials/materialDefines.js'));
+const result=spawnSync(process.execPath,args,{cwd:candidate,env:{...process.env,TSX_DISABLE_CACHE:'1',DEFINE_ORDER_REPORT:resolve(root,suite+'-final-report.json')},stdio:['ignore',fd,fd]});closeSync(fd);
+const fixtures=Object.fromEntries(readdirSync(resolve(candidate,'tests/fixtures/material-defines-order')).map(name=>['tests/fixtures/material-defines-order/'+name,hash(resolve(candidate,'tests/fixtures/material-defines-order',name))]));
+const record={suite,startedAt,endedAt:new Date().toISOString(),command:[process.execPath,...args],cwd:candidate,exitCode:result.status,signal:result.signal,error:result.error?.message,materialDefinesSha256:runtimeSha,tests:Object.fromEntries(files.map(p=>[p,hash(resolve(candidate,p))])),fixtures,log};
+writeFileSync(resolve(root,suite+'-run.json'),JSON.stringify(record,null,2)+'\n');console.log(JSON.stringify(record));console.log(readFileSync(log,'utf8').split(/\r?\n/).slice(-12).join('\n'));process.exitCode=result.status??1;

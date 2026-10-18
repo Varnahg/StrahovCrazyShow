@@ -212,3 +212,8 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## Define-order proof převzat, izolovaný QA kandidát
 
 18.10 hitches-v18/manifest96eb1c7…f355,16/16actual CPU a čtecí review clean.10shader/plugin/attribute větví baseline4→canonical3programy a shodný WGSL/layout; order-sensitive custom hook explicitně negative. Mirror baseline0/1RED zachovaný, nikoli canonicalregrese. Nový webgpu-define-order-qa-20261018 má pouze vlastní cache/handoff, fyzické core/loaders a copiedpatch/lock/testy, runtime Game/V4/hranýbuild beze změny. Root po targeted review připraví nový samostatný build a GPU porovnání; žádný přínos se zatím netvrdí.
+
+
+## Define-order QA a GPU evidence převzaty
+
+18.10 hitches-v19:118artefaktů, QA37b2d5e…bb228, snapshotfc6efd2b…1d525, target18/related103/full1402 +build+isolatedintegrationPASS, runtime/evidence/rawreviewsclean sexplicitnímilimity. Čerstvé B6outward1,66s→0,106s aexit2,02s→0,928s při menším počtu kompilací; firstF~0,32s/startup/steadyFPSnevyřešené. Spatials/NPC/facingvýjimka normal-b6-2 podrobněvREADME. GPUownservicesvšechnyidentity-stop, kartaabout:blank, hranébezezměny. Nativepřenos oddělený webgpu-define-order-native-20261018 jen7files+gzipfixture;15QAstageoverlayse nepřenáší.

@@ -2,8 +2,10 @@
   "schemaVersion": 1,
   "id": "webgpu-define-order-qa-20261018",
   "title": "KEY-31: izolovaný projektový QA kandidát stabilního pořadí defines",
-  "status": "ready",
-  "dependsOn": ["webgpu-define-order-proof-20261018"],
+  "status": "done",
+  "dependsOn": [
+    "webgpu-define-order-proof-20261018"
+  ],
   "writePaths": [
     ".cache/webgpu-migration-checks/define-order-qa-20261018/",
     "docs/agents/handoffs/webgpu-define-order-qa-20261018.md"
@@ -15,7 +17,7 @@
     "Zachovat přesnou whole-block validaci,32768chars/1024defines, ordinal-name ordering, original line/literal spelling, all-or-nothing byte-identický fallback a reserved names. Helper neexportovat jako nový Babylon public API. Žádný global flag nebo pozdější mutace cache key/existujících Effects.",
     "Výsledek je QA kandidát pro doložené aktuální projektové default processor/plugin cesty. Negativní order-sensitive hook je skutečný známý limit; syntax guard ho neumí odmítnout. Neprezentovat jako univerzální Babylon API fix. Bez produkční přejímky/integrace nebo automatického rozšíření na další callback podporu.",
     "Fyzické nesdílené kopie core i loaders v novém dependency rootu, nlink1 a žádné zapisovatelné junction cíle. Ostatní dependencies mohou být readonly propojené. Zdrojové/test/loaders importy musí mít jednu vlastní QA core identitu. Úplné input/output SHA pro core/loaders, jediný runtime rozdíl materialDefines.js; původní inactive-falloff/helper a ostatní patches zachovat.",
-    "Copied patches/@babylonjs__core@9.30.0.patch a pnpm-lock.yaml odpovídají hunku a SHA; staré patch bytes zachovat. Patch roundtrip vůči originální9.30.0 bez oslabení původních oprav. Pouze copied patch/lock, dvě úzké testové položky pro literal serializer a actual native WGSL/order reuse plus potřebný lokální proof harness. Vše ostatní source byte-identické.",
+    "Copied patches/@babylonjs__core@9.30.0.patch a pnpm-lock.yaml odpovídají hunku a SHA; staré patch bytes zachovat. Patch roundtrip vůči originální9.30.0 bez oslabení původních oprav. Pouze copied patch/lock, dvě nové úzké testové položky pro literal serializer a actual native WGSL/order reuse plus potřebný lokální proof harness. Vše ostatní source byte-identické.",
     "Úplné15stage pokrytí,30s timeout, skutečné ready draws/final submit a native effect cache/disposal zachované. CPU důkaz nesmí předstírat GPU benefit. Mirrored baseline RED z předchozího proofu archivovat/odkázat jako neověřený limit, neřešit ho v tomto celku ani zamlčet."
   ],
   "verification": [
@@ -28,6 +30,9 @@
     "Přímý root task existujícího BMAD. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow; owner webgpu-define-order-qa-01a14497. Před zápisem claim, žádný rekurzivní workflow.",
     "Výzkum a rozhodnutí: toString bounded candidate má actual same-engine16/16proof a shodné default WGSL/layout pro10větví; běžné projektové rendering hooks nepozorují pořadí, diagnostické hashy ano. Rebuild/slot předdeklarace mění mutable state; nový cache není potřebný. WebGPU-only key varianta vyžaduje disjunktní raw/canonical namespace a kompatibilitu obou stran hitu; guard no-processCodeAfterIncludes by vyloučil i built-in PBR/Standard plugin callbacks. Proto nyní menší projektový serialization QA experiment, nikoli neprokázaný jiný cache mechanismus.",
     "Proof manifest96eb1c7cc96c2a97d3c6eccc03d6c82714dcf5401a3b6b234b959ff4a50af355.73.1µs/3073chars je pouze Node microbench, ne startup odhad. V4 normal start40.3144/41.6261s, B6outward22mod16sync/963.2ms aexit28/16/2142.3ms jsou referenční limity. Počtyvariant/scény kolísají, nový backend benefit musí být skutečně změřen.",
-    "Nové kopie mají využít stejný izolovaný dependency postup jako inactive-light-defines-qa; nepsat skrze V4 node_modules junction. Pokud je k přenosu skutečných testů potřeba více než dohodnuté dvě cílové test položky, nejprve rootovi navrhnout konkrétní scope změnu."
+    "Nové kopie mají využít stejný izolovaný dependency postup jako inactive-light-defines-qa; nepsat skrze V4 node_modules junction. Pokud je k přenosu skutečných testů potřeba více než dohodnuté dvě cílové test položky, nejprve rootovi navrhnout konkrétní scope změnu.",
+    "Root 18.10 rozšířil pouze copied test rozsah: v tests/inactive-light-defines-helper.test.ts odstranit dvě hardcoded QA path assertions core.includes(inactive-light-defines-qa-20261018) a !core.includes(dependencies-v5), stejně jako již integrovaný native test. Ponechat original core/loaders realpath equality a actual tinyGLB instanceof/dispose assertions beze změny, bez formátování zbytku nebo přeskočení testu. Nový QA manifest+nlink+identitytest dokládá vlastní fyzickou kopii. Jde o třetí změněnou test položku, nikoli runtime změnu; zahrnout do overlay a zopakovat relevantní kompletní file test.",
+    "Root18.10 autorizoval pouze fyzické kopie3existujících V4 GLB campus-hatchback-near/medium/far (cca7.9MB) do candidate/public/models/vehicles pro existující wgsl-avatar-car regresi. Původní assets readonly, žádná regenerace/změna. Input/outputSHA a přesné source refs do testAssets manifestu. Root full snapshot používá původní readonly public V4 a ověří shodnéSHA, nikoli zápis duplicitních fixtures přes public junction. Celý related běh bez skipu po doplnění vstupů.",
+    "Root přijal izolovaný QA celek: manifest37b2d5e1c31f62d4f4d0cdebaaf3063cd1ad8f3e64156ddf58a2a99563fbb228, fullV6fc6efd2bcf91bd2b1720b35f090d74656352486ea7f09a2199dc69d14c61d525. Target18/18, related103/103noskip, types3170/0, roundtrip7/7, full1402/1402+build+isolatedintegration PASS, runtime/evidence review clean. Fresh V4B6outward28mod22sync/1661.7ms→V6 2/1/105.6ms, exit26/15/2018.5→12/8/928.1. Pozice5.9cm/selection/NPC/history confounds; prvníF~0.32s a startupbenefit nevyřešené. Done pouze pro QA component, ne celá migrace nebo nativní přijetí. Následuje samostatný native transfer task."
   ]
 }
