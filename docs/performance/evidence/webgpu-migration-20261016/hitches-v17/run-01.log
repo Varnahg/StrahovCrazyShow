@@ -1,0 +1,97 @@
+BJS - [06:39:09]: Babylon.js v9.30.0 - Null engine
+BJS - [06:39:10]: Babylon.js v9.30.0 - Null engine
+✖ fresh outside ON: actual merged box, S/D/H and original geometry (635.5592ms)
+BJS - [06:39:11]: Babylon.js v9.30.0 - Null engine
+✖ inside/outward/exit history: final full defines equal fresh outside; repeated Effects reused (442.0938ms)
+BJS - [06:39:11]: Babylon.js v9.30.0 - Null engine
+✖ hidden camera-pass readiness creates current shader without a draw; later draw reuses it (377.7996ms)
+✖ exception path releases original controller, lights, observers and Effects (276.9827ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4970.9689
+
+✖ failing tests:
+
+test at proof.test.ts:2:12603
+✖ fresh outside ON: actual merged box, S/D/H and original geometry (635.5592ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok([...effects].every(e=>e.isDisposed))
+  
+      at withFixture (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-exit-variant-proof-20261018\proof.test.ts:146:206)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at proof.test.ts:2:13121
+✖ inside/outward/exit history: final full defines equal fresh outside; repeated Effects reused (442.0938ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok([...effects].every(e=>e.isDisposed))
+  
+      at withFixture (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-exit-variant-proof-20261018\proof.test.ts:146:206)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at proof.test.ts:2:14079
+✖ hidden camera-pass readiness creates current shader without a draw; later draw reuses it (377.7996ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok([...effects].every(e=>e.isDisposed))
+  
+      at withFixture (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-exit-variant-proof-20261018\proof.test.ts:146:206)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at proof.test.ts:2:15075
+✖ exception path releases original controller, lights, observers and Effects (276.9827ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /owned sentinel failure/. Input:
+  
+  'AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n' +
+    '\n' +
+    '  assert.ok([...effects].every(e=>e.isDisposed))\n'
+  
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-exit-variant-proof-20261018\proof.test.ts:172:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+    
+      assert.ok([...effects].every(e=>e.isDisposed))
+    
+        at withFixture (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-exit-variant-proof-20261018\proof.test.ts:146:206)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\b6-exit-variant-proof-20261018\proof.test.ts:172:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7),
+    expected: /owned sentinel failure/,
+    operator: 'rejects',
+    diff: 'simple'
+  }

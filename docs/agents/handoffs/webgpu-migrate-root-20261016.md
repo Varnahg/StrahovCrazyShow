@@ -202,3 +202,8 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## V4 normální režim: první F lepší, exit stále otevřený
 
 18.10 hitches-v16 archivuje22 artefaktů/18gzip, čtecí raw a archive review PASS. Beze změny JS, pouze bez profileEnvironment: startup40,3144 a41,6261s; Golden/F maxima117,9/110,3ms, B6 firstF203,2ms. Otočení ven963,2ms a odchod2142,3ms s novými shader moduly zůstávají. CelýV4 není přijat. Vypnutý engine lifecycle profiler neposkytuje resources0; běžný health/dispose čistý. Nový task webgpu-b6-exit-variant-proof-20261018 má disjunktní cache/handoff pro skutečný merged box entry-dark-metal a fresh-vs-history/hidden readiness důkaz; native kód se nemění. Linear6296f93c-fff6-44d4-bee4-da772d312d66.
+
+
+## B6 exit proof přijat, pořadí defines samostatně
+
+18.10 root přijal b6-exit proof manifest97fd7099…17f,4/4CPU + čtecí review bez blokujících nálezů, hitches-v17. Outside history správné/reuse, hidden precheck pouzeEffect. Vedlejší inside pořadí stejných hodnot je oddělený mechanismus, ne atribuce exit14programů. Nový task webgpu-define-order-proof-20261018 porovná same-engine duplicitu a čistý bounded literal-block sort po original toString, bez _keys mutace/cache nebo native patch. Custom callbacks/flat-block provenance a CPU/WGSL versusGPU limity jsou výslovné.
