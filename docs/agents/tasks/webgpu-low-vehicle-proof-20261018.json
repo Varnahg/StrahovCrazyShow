@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-low-vehicle-proof-20261018",
+  "title": "KEY-31: doložit chybějící low varianty světla auta z uživatelského průchodu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-low-vehicle-proof-20261018/",
+    "docs/agents/handoffs/webgpu-low-vehicle-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Izolovaný skutečný Babylon CPU proof porovná současných13lightstages s následnou jízdou na low a0/1mappedPOINT. Žádná změna produkčního kódu nebo hranýchsnapshotů.",
+    "Použít skutečné PlayerFlashlight/VehicleLighting, Standard/PBR materiály a ready/render dispatch; doložit shadowEnabled rozdíl a chybějící Effect defines. NullEngine není GPU/FPS důkaz.",
+    "Porovnat skutečný vehiclebeam warmup s dočasným shadowOFF svítilny; zvolit pouze minimální věrohodný kandidát bez proxy shaderů, cache nebo nové diagnostiky. Ověřit obnovu světel a opakované použití připravených Effectů.",
+    "Doložené source a userlog witnesses oddělit od hypotézy GPU backpressure; proof nesmí tvrdit, že opravil všechny záseky nebo samotný903ms gap."
+  ],
+  "verification": [
+    "Lehký cílený CPU test lze spustit po root potvrzení ukončeného user průchodu; žádný build/fullsuite/integration/server/GPU ani velký dependency hash sweep.",
+    "Frozen zdrojový základ5d247248f50a762877e9079bb4fcd65280e959e8014eb3f65b2662e397c518cb, readonly pinned dependencies. Přesné zdrojové/preimage hashy, výsledky včetně neúspěchů a stručný handoff.",
+    "Bez staging/commitu od dítěte, bez dalšího BMAD rendereru nebo podagentů."
+  ],
+  "notes": [
+    "Uživatel sdělil test tam máš, pořád jsou viditelné záseky celé hry. Actual4196 user seq1014..1695:44hitches>=100ms,14>=250,5>=500, všeoutside; 22při jízdě. Frozenraw SHA52cdf6bde7f27268ee6f628d347ba636a9ebb13d42aa504be2fb0a949434d425.",
+    "Game-dispose1695 a současnéEdge menu potvrzují ukončený průchod. Hrané4195/4196 se nesmějí měnit. Root spouští pouze oddělený cílený CPU proof, žádné nové GPU měření.",
+    "VehicleLighting low car má shadowEnabled=false, zatímco PlayerFlashlight low true; startup zatím používá jen torch. Před903ms gap seq1296 se vseq1291 změnil enabledLights3→2 a vzniklo5programů/387Effectchanges při stabilním low50%. Kauzalita celého gapu ještě není dokázaná.",
+    "Root accepted the bounded CPU proof after independent review with no findings: 5/5 pass, no runtime/GPU claim. Durable evidence: docs/performance/evidence/webgpu-migration-20261016/user-4196-20261018/vehicle-proof/. Follow-up candidate is a separate task; KEY-31 remains In Progress."
+  ]
+}
