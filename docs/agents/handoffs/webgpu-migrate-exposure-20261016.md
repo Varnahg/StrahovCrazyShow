@@ -43,3 +43,7 @@ Dílčí `exposure-green-v2.log` obsahuje jednu později opravenou testovou domn
 - Původní session environment fáze je skutečně drahá, ale podíl expozice zatím nemá přímé produkční podfázové měření. Root jej doplňuje odděleně; reálný foreground/occlusion stav zůstává součástí měření.
 - Root provede novou čistou instalaci s novým patch hashem v odděleném snapshotu, stabilní plnou sadu/build/integraci a skutečnou WebGPU paritu včetně bloom, času/počasí, různých avatarů a světel. Plná instalace kombinovaného patche nebyla v tomto CPU tasku spuštěna.
 - Žádný vlastní dlouhožijící proces, server, GPU ani build. Testovací procesy skončily. Po commitu přesných čtyř souborů a předání rootovi bude rezervace uvolněna; integrátor spravuje Linear a konečné přijetí.
+
+## Závěrečné přijetí koordinátorem18.10.2026
+
+Doplněný GPU průchod a nezávislé review dokončily původní scope KEY-36. [Produkční evidence](../../performance/evidence/webgpu-migration-20261016/exposure-acceptance/README.md) prokazuje dvě skutečné exposure hodnoty ve spojitém rendereru, modrá→noc→modrá snímky a zachovaný bloom.8actualBabylon regresí nad skutečně použitými exposure dependencies znovu8/8PASS; samotná implementace zůstává main667ce466. Jednotlivý setter-frame a izolovaný CPU/FPS přínos nejsou změřené. Nové QA také obsahuje jiné dosud nepřijaté změny; jejich přejímku tento výsledek nenahrazuje. Vlastní QA služby ukončené, hranébuildy zachované. Koordinátor webgpu-exposure-acceptance-01a14497.
