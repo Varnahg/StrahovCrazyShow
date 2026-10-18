@@ -587,7 +587,7 @@ export class Game {
     this.compilationProfile = new WebGpuCompilationProfile(this.engine, {
       captureShaderInventory: this.environmentProfile !== undefined,
       captureUnusedDefineInventory: this.environmentProfile !== undefined,
-      shaderInventoryLimits: this.environmentProfile ? { maxStages: 19 } : undefined,
+      shaderInventoryLimits: this.environmentProfile ? { maxStages: 21 } : undefined,
       onError: (channel, error, label) => this.renderHealth.report(
         channel, `${label}: ${error instanceof Error ? error.message : String(error)}`,
       ),
@@ -2388,41 +2388,81 @@ export class Game {
     const night = selectLightingPreview("night").instant!;
     const includeDayPointVariants = this.engine.isWebGPU;
     const day = includeDayPointVariants ? selectLightingPreview("day").instant! : null;
+    const includeLowVehicleVariants = this.engine.isWebGPU && this.quality === "low";
+    let vehicleLease: {
+      car: TransformNode;
+      parked: TransformNode;
+      carEnabled: boolean;
+      parkedEnabled: boolean;
+    } | undefined;
+    const restoreVehicle = () => {
+      const lease = vehicleLease;
+      vehicleLease = undefined;
+      if (!lease || isRetired()) return;
+      // Restore only the concrete nodes whose flags this preparation changed.
+      // A replacement root never receives the previous owner's saved flags.
+      try {
+        if (!lease.car.isDisposed()) lease.car.setEnabled(lease.carEnabled);
+      } finally {
+        if (!lease.parked.isDisposed()) lease.parked.setEnabled(lease.parkedEnabled);
+      }
+    };
+    const vehicleRootsLive = () => this.car && this.parkedCar && this.car !== this.parkedCar &&
+      !this.car.isDisposed() && !this.parkedCar.isDisposed();
+    const showVehicle = () => {
+      if (vehicleLease && (vehicleLease.car !== this.car || vehicleLease.parked !== this.parkedCar))
+        restoreVehicle();
+      // A root can be disposed without being replaced or changing mesh count.
+      // Validate every reuse, not only acquisition of the visual lease.
+      if (!vehicleRootsLive())
+        throw new Error("Příprava světel auta nemá platné vlastní vizuální kořeny.");
+      if (!vehicleLease) {
+        const car = this.car, parked = this.parkedCar;
+        vehicleLease = { car, parked, carEnabled: car.isEnabled(false), parkedEnabled: parked.isEnabled(false) };
+      }
+      vehicleLease.car.setEnabled(true);
+      vehicleLease.parked.setEnabled(false);
+    };
     const apply = (
       instant: number,
       flashlightOn: boolean,
       streetCount?: number,
+      vehicle = false,
     ) => {
       const pos = this.actor.position;
       this.updateWorldPresentation(pos);
       const self = this.avatars.get(this.localId);
-      const position = new Vector3(pos.x, pos.y, pos.z);
-      const feet = position.add(new Vector3(0, -0.8, 0));
-      // Settle the same collision-aware follow camera behind the loading cover.
-      // This is presentation only; no simulation or animation time advances.
-      this.updateCameraFollow(position, self?.eyeHeight ?? 1.63, 1);
-      const view = this.localAvatarPresentation.update({
-        camera: this.camera.position,
-        feet,
-        bodyHeight: self?.bodyHeight ?? 1.8,
-        bodyWidthScale: self ? self.measurements.legSpacing / 0.105 : 1,
-        nearPlane: this.camera.minZ,
-        firstPerson: this.firstPerson,
-        vehicle: this.actor.vehicle,
-      });
-      if (self)
-        this.updateAvatarPresentation(
-          this.localId,
-          self,
+      let cameraLight = false;
+      if (!vehicle) {
+        const position = new Vector3(pos.x, pos.y, pos.z);
+        const feet = position.add(new Vector3(0, -0.8, 0));
+        // Settle the same collision-aware follow camera behind the loading cover.
+        // This is presentation only; no simulation or animation time advances.
+        this.updateCameraFollow(position, self?.eyeHeight ?? 1.63, 1);
+        const view = this.localAvatarPresentation.update({
+          camera: this.camera.position,
           feet,
-          0,
-          view.visible,
-          view.resetAnimation,
-        );
+          bodyHeight: self?.bodyHeight ?? 1.8,
+          bodyWidthScale: self ? self.measurements.legSpacing / 0.105 : 1,
+          nearPlane: this.camera.minZ,
+          firstPerson: this.firstPerson,
+          vehicle: this.actor.vehicle,
+        });
+        if (self)
+          this.updateAvatarPresentation(
+            this.localId,
+            self,
+            feet,
+            0,
+            view.visible,
+            view.resetAnimation,
+          );
+        cameraLight = view.cameraLight;
+      }
       const lighting = this.updateRenderEnvironment(
         pos,
         self,
-        view.cameraLight,
+        cameraLight,
         0,
         performance.now() / 1000,
         instant,
@@ -2454,7 +2494,14 @@ export class Game {
       }
     };
     const restore = () => {
+      restoreVehicle();
       if (!isRetired()) {
+        if (includeLowVehicleVariants && !vehicleRootsLive()) {
+          // Inactive update never reads the disposed root's world matrix. Stop
+          // this owned beam, but do not run normal presentation on dead roots.
+          this.vehicleLighting?.update(this.car, 0, false, this.quality);
+          throw new Error("Vizuální kořen auta zanikl během přípravy světel.");
+        }
         options?.restoreQuality?.();
         this.compilationProfile.setStage("restore");
         apply(this.timeOverride ?? Date.now(), this.flashlightOn);
@@ -2463,9 +2510,14 @@ export class Game {
     return prepareLightVariants({
       timeoutMs: options?.timeoutMs,
       includeDayPointVariants,
+      includeLowVehicleVariants,
       apply: (stage) => {
         if (stage === "restore") return restore();
+        const vehicle = stage.startsWith("vehicle-");
+        if (vehicle) showVehicle();
+        else restoreVehicle();
         this.compilationProfile.setStage(stage);
+        if (vehicle) return apply(night, false, Number(stage.split("-")[1]), true);
         const isNight = stage.startsWith("night-");
         const isDay = stage.startsWith("day-");
         apply(
@@ -2516,8 +2568,12 @@ export class Game {
         this.weather,
         this.scene.meshes.length,
         this.scene.materials.length,
+        this.car,
+        this.parkedCar,
+        this.car?.isDisposed(),
+        this.parkedCar?.isDisposed(),
       ],
-      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials"],
+      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials", "car", "parkedCar", "carDisposed", "parkedCarDisposed"],
       isVisible: () => !document.hidden,
       onVisibilityChange: (callback) => {
         document.addEventListener("visibilitychange", callback);
@@ -2527,7 +2583,7 @@ export class Game {
       setTimer: (callback, milliseconds) =>
         window.setTimeout(callback, milliseconds),
       clearTimer: (timer) => window.clearTimeout(timer as number),
-    });
+    }).finally(restoreVehicle);
   }
 
   frame() {

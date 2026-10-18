@@ -378,7 +378,7 @@ test("actual Game shader inventory follows the real loopback diagnostic opt-in",
       window: { location: new URL(url) },
     });
     run.call({ engine: {}, renderHealth: { rendererId: 1 } });
-    assert.deepEqual(captured, { shader: expected, unusedDefines: expected, maxStages: expected ? 19 : undefined }, url);
+    assert.deepEqual(captured, { shader: expected, unusedDefines: expected, maxStages: expected ? 21 : undefined }, url);
   }
 });
 
