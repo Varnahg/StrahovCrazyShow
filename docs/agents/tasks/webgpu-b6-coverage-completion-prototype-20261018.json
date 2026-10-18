@@ -18,7 +18,7 @@
   ],
   "verification": [
     "Lehké targeted testy a cílený refaktoring společně: původní follow parity včetně vozidla/first-person a clamp/smoothing, actual isolated orbit clip, stavy B6/day stage a restore/timeout/dispose/late requests.",
-    "Cache kopie může měnit client/game.ts, client/light-preparation.ts, nový client/camera-orbit.ts a podle potřeby export dosavadního default pitch v client/camera-look.ts; jejich odpovídající testy a pouze nutné skutečné Game VM bindings. Seznam všech output cest/hashů/diffů uvést v předání.",
+    "Cache kopie může měnit client/game.ts, client/light-preparation.ts, nový client/camera-orbit.ts a podle potřeby export dosavadního default pitch v client/camera-look.ts; jejich odpovídající testy a pouze nutné skutečné Game VM bindings. Dále výslovně client/webgpu-compilation-profile.ts a tests/webgpu-compilation-profile.test.ts pouze pro pevný explicitní stage strop20 při zachovaném default16 a ostatních limitech. Seznam všech output cest/hashů/diffů uvést v předání.",
     "Root provede fullTS/build/GPU pilot; fullsuite/integration a native integrace až podle přínosu. Frozen snapshot musí obsahovat nové testy. Žádný pnpm install/velké assets/full world CPU scéna."
   ],
   "notes": [
@@ -27,6 +27,7 @@
     "Menší B day/spawn1 má v CPU proofu actual Alex12drawn/7Effects pro OFF/ON byte-identické defines i identity jako B6. A B6lights+spawncamera je zbytečný další prezentační režim. Entry clipped orbit zachytí dogleg handrails/treads i8původníchGLB částí.",
     "Použít existující default pitch/distance jako explicitní společné konstanty, nikoli nové náhodné pózy. Body/target/yaw odvodit z shared B6 layout; původní first-person výpočet a normální frame chování zachovat.",
     "Jde o částečné doplnění doložených missů. Netvrdit pokrytí všech počasí/avatarů/LOD/editor transformů ani opravu každého přepnutí času. Další startup cenu musí měřit root, timeout se nezvyšuje.",
-    "Přímý node/tsx TSX_DISABLE_CACHE=1 a read-only dependencies-v5. Nezasahovat do root QA prefixu, native/main ani ostatních caches. Předat zdroje/testy/diffy/SHA/logy/limity, ukončit vlastní procesy a release bez commitu."
+    "Přímý node/tsx TSX_DISABLE_CACHE=1 a read-only dependencies-v5. Nezasahovat do root QA prefixu, native/main ani ostatních caches. Předat zdroje/testy/diffy/SHA/logy/limity, ukončit vlastní procesy a release bez commitu.",
+    "18.10 cílený RED33/34 doložil, že původní inventory konfigurace maxStages20 je oříznuta na default16. Root povoluje úzký pátý runtime overlay: explicitní limit clamp2..20, default16 beze změny. Ostatní hard caps zachovat; test default/explicit20/oversized/fractional/invalid a skutečný18label capture/overflow. Jde o opravu existující bounded konfigurace, ne novou diagnostickou vrstvu. Scope cest se nemění, stále celý vlastní cache prefix."
   ]
 }
