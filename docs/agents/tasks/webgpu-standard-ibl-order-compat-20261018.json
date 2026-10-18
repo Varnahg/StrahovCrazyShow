@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-standard-ibl-order-compat-20261018",
+  "title": "KEY-31: zachovat historickou WGSL/order regresi s novou deklarací LOD",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/material-defines-wgsl-order.test.ts",
+    ".cache/webgpu-standard-ibl-order-compat-20261018/",
+    "docs/agents/handoffs/webgpu-standard-ibl-order-compat-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Historická gzip baseline a její hash zůstanou beze změny.",
+    "Pouze očekávaný Standard valuebag v no-reflection fixture doplní explicitní LODBASEDMICROSFURACE:false s ověřením původní absence klíče a REFLECTION=false.",
+    "Žádné filtrování actual hodnot ani oslabení ostatních přesných shader/body/prefix/metadata/context/program/lifecycle assertions. Runtime beze změny."
+  ],
+  "verification": [
+    "Předchozí celá sada1438/1439 a source audit prokazují jediný rozdíl308vs307polí. Cílený celý material-defines-wgsl-order test po opravě; root zopakuje úplné stabilní checkpointy."
+  ],
+  "notes": [
+    "Root koordinátor; nezávislý render_diagnosis potvrdil pouze novou false deklaraci LOD. USESPHERICALFROMREFLECTIONMAP již historická baseline obsahuje jako false.",
+    "Jde o přiznanou aktualizaci očekávaného kontraktu po vendor fixu, nikoli regenerování reference z kandidáta.",
+    "18.10.2026 root integrated vendor WT418a3824→main8b949b7a and receiver WT b033b386→main246002fc. Fresh native1439/combined1499, both full TS/build/isolatedintegration PASS. Evidence docs/performance/evidence/webgpu-migration-20261016/authored-native/README.md. Combined diagnostic0programs/max471.5ms; subsequent normalnative5programs/max573ms, so full native GPU acceptance remains OPEN. Protected builds unchanged; ownQA stopped."
+  ]
+}

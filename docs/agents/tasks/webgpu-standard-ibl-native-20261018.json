@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-standard-ibl-native-20261018",
+  "title": "KEY-31: převést ověřené Standard IBL deklarace do projektového patche",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/standard-ibl-defines.test.ts",
+    ".cache/webgpu-standard-ibl-native-20261018/",
+    "docs/agents/handoffs/webgpu-standard-ibl-native-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přidat pouze USESPHERICALFROMREFLECTIONMAP a LODBASEDMICROSFURACE deklarace do existujícího pinned Standard JS/d.ts patche; ostatní patch hunks zachovat byteově.",
+    "Lockfile změní pouze související hash patche, žádná verze nebo upgrade. Package manifest je read-only.",
+    "Přenositelná regrese skutečného Standard materiálu, reflection cube a čerstvého submeshe dokládá shodný Effect/context po warm historii, pro textureLOD true i false. Neověřovat jen přítomnost řádku implementace.",
+    "Žádný zásah do readonly dependencies, main, Game nebo hraných buildů; žádný commit před root přijetím."
+  ],
+  "verification": [
+    "Cílené lehké CPU red/green přes existující frozen old/new závislosti, přesné source/patch/lock hashy a cílený refaktoring test fixture.",
+    "Čistý install, full TypeScript/test/build/integration a GPU patří rootovi s jeho heavy-validation rezervací; podagent je nespouští.",
+    "Předat integrovatelný diff a handoff, ukončit vlastní procesy a uvolnit claim."
+  ],
+  "notes": [
+    "Root autorizuje přímou implementaci v BMAD kroku03; rezervovat před zápisem, bez rekurzivního workflow.",
+    "Privátní nový core JS716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37/d.tsdef7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c. LOD proof manifest3c2c0873e65e518950213bf9e075e6952c0fd2d5b9c145e4b30e1688654d5e73,28/28 true/false a exactGLSL/WGSL parity, peerreview[].",
+    "Poslední actualGPU copied1bc02a… měl0novýchprogramů/0modulů a healthvalid. Není to dokončení KEY31:13syncpipelines a max471,5ms zůstávají; dalšíNPC i pozdnízáseky jsou otevřené.",
+    "18.10.2026 root integrated vendor WT418a3824→main8b949b7a and receiver WT b033b386→main246002fc. Fresh native1439/combined1499, both full TS/build/isolatedintegration PASS. Evidence docs/performance/evidence/webgpu-migration-20261016/authored-native/README.md. Combined diagnostic0programs/max471.5ms; subsequent normalnative5programs/max573ms, so full native GPU acceptance remains OPEN. Protected builds unchanged; ownQA stopped."
+  ]
+}

@@ -1,0 +1,342 @@
+TAP version 13
+# BJS - [21:08:00]: Babylon.js v9.30.0 - Null engine
+# BJS - [21:08:00]: Babylon.js v9.30.0 - Null engine
+# Subtest: Standard reflection reuses warmed Effects for fresh submeshes, textureLOD=false
+not ok 1 - Standard reflection reuses warmed Effects for fresh submeshes, textureLOD=false
+  ---
+  duration_ms: 314.8086
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\red\\tests\\standard-ibl-defines.test.ts:100:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    same real material/layout/light state must reuse the warmed Effect
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-standard-ibl-native-20261018\red\tests\standard-ibl-defines.test.ts:115:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# BJS - [21:08:00]: Babylon.js v9.30.0 - Null engine
+# Subtest: Standard reflection null/cube lifecycle retains actual values and cube Effect reuse, textureLOD=false
+not ok 2 - Standard reflection null/cube lifecycle retains actual values and cube Effect reuse, textureLOD=false
+  ---
+  duration_ms: 15.8483
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\red\\tests\\standard-ibl-defines.test.ts:132:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /^#define USESPHERICALFROMREFLECTIONMAP$/m. Input:
+    
+    '#define ALPHABLEND\n' +
+      '#define AMBIENTDIRECTUV 0\n' +
+      '#define AREALIGHTSUPPORTED\n' +
+      '#define BUMPDIRECTUV 0\n' +
+      '#define BonesPerMesh 0\n' +
+      '#define CAMERA_PERSPECTIVE\n' +
+      '#define CLUSTLIGHT_BATCH 0\n' +
+      '#define CLUSTLIGHT_SLICES 0\n' +
+      '#define DETAILDIRECTUV 0\n' +
+      '#define DETAIL_NORMALBLENDMETHOD 0\n' +
+      '#define DIFFUSEDIRECTUV 0\n' +
+      '#define EMISSIVEDIRECTUV 0\n' +
+      '#define FOG\n' +
+      '#define FRESNEL\n' +
+      '#define HEMILIGHT0\n' +
+      '#define LIGHT0\n' +
+      '#define LIGHT1\n' +
+      '#define LIGHTCOUNT 2\n' +
+      '#define LIGHTMAPDIRECTUV 0\n' +
+      '#define MATERIALPLUGIN_1\n' +
+      '#define MAXLIGHTCOUNT 4\n' +
+      '#define NORMAL\n' +
+      '#define NUM_BONE_INFLUENCERS 0\n' +
+      '#define NUM_MORPH_INFLUENCERS 0\n' +
+      '#define OPACITYDIRECTUV 0\n' +
+      '#define ORDER_INDEPENDENT_TRANSPARENCY_16BITS\n' +
+      '#define PREPASS_ALBEDO_INDEX -1\n' +
+      '#define PREPASS_ALBEDO_SQRT_INDEX -1\n' +
+      '#define PREPASS_COLOR_INDEX -1\n' +
+      '#define PREPASS_DEPTH_INDEX -1\n' +
+      '#define PREPASS_IRRADIANCE_INDEX -1\n' +
+      '#define PREPASS_IRRADIANCE_LEGACY_INDEX -1\n' +
+      '#define PREPASS_LOCAL_POSITION_INDEX -1\n' +
+      '#define PREPASS_MESH_BLEND_TAG_INDEX -1\n' +
+      '#define PREPASS_NORMALIZED_VIEW_DEPTH_INDEX -1\n' +
+      '#define PREPASS_NORMAL_INDEX -1\n' +
+      '#define PREPASS_OBJECT_ID_INDEX -1\n' +
+      '#define PREPASS_POSITION_INDEX -1\n' +
+      '#define PREPASS_REFLECTIVITY_INDEX -1\n' +
+      '#define PREPASS_SCREENSPACE_DEPTH_INDEX -1\n' +
+      '#define PREPASS_VELOCITY_INDEX -1\n' +
+      '#define PREPASS_VELOCITY_LINEAR_INDEX -1\n' +
+      '#define PREPASS_WORLD_NORMAL_INDEX -1\n' +
+      '#define REFLECTION\n' +
+      '#define REFLECTIONFRESNEL\n' +
+      '#define REFLECTIONMAP_3D\n' +
+      '#define REFLECTIONMAP_CUBIC\n' +
+      '#define REFLECTIONMAP_OPPOSITEZ\n' +
+      '#define RIGHT_HANDED\n' +
+      '#define ROUGHNESS\n' +
+      '#define SAMPLER3DBGRMAP\n' +
+      '#define SAMPLER3DGREENDEPTH\n' +
+      '#define SCENE_MRT_COUNT 0\n' +
+      '#define SPECULARDIRECTUV 0\n' +
+      '#define SPECULARTERM\n' +
+      '#define SPOTLIGHT1\n' +
+      '#define TEXTURE_REPETITION_MODE 0\n' +
+      '#define TONEMAPPING 0\n' +
+      '#define VERTEX_PULLING_USE_INDEX_BUFFER\n' +
+      '#define VIGNETTEBLENDMODEMULTIPLY\n'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    #define ALPHABLEND
+    #define AMBIENTDIRECTUV 0
+    #define AREALIGHTSUPPORTED
+    #define BUMPDIRECTUV 0
+    #define BonesPerMesh 0
+    #define CAMERA_PERSPECTIVE
+    #define CLUSTLIGHT_BATCH 0
+    #define CLUSTLIGHT_SLICES 0
+    #define DETAILDIRECTUV 0
+    #define DETAIL_NORMALBLENDMETHOD 0
+    #define DIFFUSEDIRECTUV 0
+    #define EMISSIVEDIRECTUV 0
+    #define FOG
+    #define FRESNEL
+    #define HEMILIGHT0
+    #define LIGHT0
+    #define LIGHT1
+    #define LIGHTCOUNT 2
+    #define LIGHTMAPDIRECTUV 0
+    #define MATERIALPLUGIN_1
+    #define MAXLIGHTCOUNT 4
+    #define NORMAL
+    #define NUM_BONE_INFLUENCERS 0
+    #define NUM_MORPH_INFLUENCERS 0
+    #define OPACITYDIRECTUV 0
+    #define ORDER_INDEPENDENT_TRANSPARENCY_16BITS
+    #define PREPASS_ALBEDO_INDEX -1
+    #define PREPASS_ALBEDO_SQRT_INDEX -1
+    #define PREPASS_COLOR_INDEX -1
+    #define PREPASS_DEPTH_INDEX -1
+    #define PREPASS_IRRADIANCE_INDEX -1
+    #define PREPASS_IRRADIANCE_LEGACY_INDEX -1
+    #define PREPASS_LOCAL_POSITION_INDEX -1
+    #define PREPASS_MESH_BLEND_TAG_INDEX -1
+    #define PREPASS_NORMALIZED_VIEW_DEPTH_INDEX -1
+    #define PREPASS_NORMAL_INDEX -1
+    #define PREPASS_OBJECT_ID_INDEX -1
+    #define PREPASS_POSITION_INDEX -1
+    #define PREPASS_REFLECTIVITY_INDEX -1
+    #define PREPASS_SCREENSPACE_DEPTH_INDEX -1
+    #define PREPASS_VELOCITY_INDEX -1
+    #define PREPASS_VELOCITY_LINEAR_INDEX -1
+    #define PREPASS_WORLD_NORMAL_INDEX -1
+    #define REFLECTION
+    #define REFLECTIONFRESNEL
+    #define REFLECTIONMAP_3D
+    #define REFLECTIONMAP_CUBIC
+    #define REFLECTIONMAP_OPPOSITEZ
+    #define RIGHT_HANDED
+    #define ROUGHNESS
+    #define SAMPLER3DBGRMAP
+    #define SAMPLER3DGREENDEPTH
+    #define SCENE_MRT_COUNT 0
+    #define SPECULARDIRECTUV 0
+    #define SPECULARTERM
+    #define SPOTLIGHT1
+    #define TEXTURE_REPETITION_MODE 0
+    #define TONEMAPPING 0
+    #define VERTEX_PULLING_USE_INDEX_BUFFER
+    #define VIGNETTEBLENDMODEMULTIPLY
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-standard-ibl-native-20261018\red\tests\standard-ibl-defines.test.ts:142:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# BJS - [21:08:00]: Babylon.js v9.30.0 - Null engine
+# Subtest: Standard reflection reuses warmed Effects for fresh submeshes, textureLOD=true
+not ok 3 - Standard reflection reuses warmed Effects for fresh submeshes, textureLOD=true
+  ---
+  duration_ms: 23.8984
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\red\\tests\\standard-ibl-defines.test.ts:100:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    same real material/layout/light state must reuse the warmed Effect
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-standard-ibl-native-20261018\red\tests\standard-ibl-defines.test.ts:115:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: Standard reflection null/cube lifecycle retains actual values and cube Effect reuse, textureLOD=true
+not ok 4 - Standard reflection null/cube lifecycle retains actual values and cube Effect reuse, textureLOD=true
+  ---
+  duration_ms: 19.0017
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-standard-ibl-native-20261018\\red\\tests\\standard-ibl-defines.test.ts:132:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /^#define USESPHERICALFROMREFLECTIONMAP$/m. Input:
+    
+    '#define ALPHABLEND\n' +
+      '#define AMBIENTDIRECTUV 0\n' +
+      '#define AREALIGHTSUPPORTED\n' +
+      '#define BUMPDIRECTUV 0\n' +
+      '#define BonesPerMesh 0\n' +
+      '#define CAMERA_PERSPECTIVE\n' +
+      '#define CLUSTLIGHT_BATCH 0\n' +
+      '#define CLUSTLIGHT_SLICES 0\n' +
+      '#define DETAILDIRECTUV 0\n' +
+      '#define DETAIL_NORMALBLENDMETHOD 0\n' +
+      '#define DIFFUSEDIRECTUV 0\n' +
+      '#define EMISSIVEDIRECTUV 0\n' +
+      '#define FOG\n' +
+      '#define FRESNEL\n' +
+      '#define HEMILIGHT0\n' +
+      '#define LIGHT0\n' +
+      '#define LIGHT1\n' +
+      '#define LIGHTCOUNT 2\n' +
+      '#define LIGHTMAPDIRECTUV 0\n' +
+      '#define MATERIALPLUGIN_1\n' +
+      '#define MAXLIGHTCOUNT 4\n' +
+      '#define NORMAL\n' +
+      '#define NUM_BONE_INFLUENCERS 0\n' +
+      '#define NUM_MORPH_INFLUENCERS 0\n' +
+      '#define OPACITYDIRECTUV 0\n' +
+      '#define ORDER_INDEPENDENT_TRANSPARENCY_16BITS\n' +
+      '#define PREPASS_ALBEDO_INDEX -1\n' +
+      '#define PREPASS_ALBEDO_SQRT_INDEX -1\n' +
+      '#define PREPASS_COLOR_INDEX -1\n' +
+      '#define PREPASS_DEPTH_INDEX -1\n' +
+      '#define PREPASS_IRRADIANCE_INDEX -1\n' +
+      '#define PREPASS_IRRADIANCE_LEGACY_INDEX -1\n' +
+      '#define PREPASS_LOCAL_POSITION_INDEX -1\n' +
+      '#define PREPASS_MESH_BLEND_TAG_INDEX -1\n' +
+      '#define PREPASS_NORMALIZED_VIEW_DEPTH_INDEX -1\n' +
+      '#define PREPASS_NORMAL_INDEX -1\n' +
+      '#define PREPASS_OBJECT_ID_INDEX -1\n' +
+      '#define PREPASS_POSITION_INDEX -1\n' +
+      '#define PREPASS_REFLECTIVITY_INDEX -1\n' +
+      '#define PREPASS_SCREENSPACE_DEPTH_INDEX -1\n' +
+      '#define PREPASS_VELOCITY_INDEX -1\n' +
+      '#define PREPASS_VELOCITY_LINEAR_INDEX -1\n' +
+      '#define PREPASS_WORLD_NORMAL_INDEX -1\n' +
+      '#define REFLECTION\n' +
+      '#define REFLECTIONFRESNEL\n' +
+      '#define REFLECTIONMAP_3D\n' +
+      '#define REFLECTIONMAP_CUBIC\n' +
+      '#define REFLECTIONMAP_OPPOSITEZ\n' +
+      '#define RIGHT_HANDED\n' +
+      '#define ROUGHNESS\n' +
+      '#define SAMPLER3DBGRMAP\n' +
+      '#define SAMPLER3DGREENDEPTH\n' +
+      '#define SCENE_MRT_COUNT 0\n' +
+      '#define SPECULARDIRECTUV 0\n' +
+      '#define SPECULARTERM\n' +
+      '#define SPOTLIGHT1\n' +
+      '#define TEXTURE_REPETITION_MODE 0\n' +
+      '#define TONEMAPPING 0\n' +
+      '#define VERTEX_PULLING_USE_INDEX_BUFFER\n' +
+      '#define VIGNETTEBLENDMODEMULTIPLY\n'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    #define ALPHABLEND
+    #define AMBIENTDIRECTUV 0
+    #define AREALIGHTSUPPORTED
+    #define BUMPDIRECTUV 0
+    #define BonesPerMesh 0
+    #define CAMERA_PERSPECTIVE
+    #define CLUSTLIGHT_BATCH 0
+    #define CLUSTLIGHT_SLICES 0
+    #define DETAILDIRECTUV 0
+    #define DETAIL_NORMALBLENDMETHOD 0
+    #define DIFFUSEDIRECTUV 0
+    #define EMISSIVEDIRECTUV 0
+    #define FOG
+    #define FRESNEL
+    #define HEMILIGHT0
+    #define LIGHT0
+    #define LIGHT1
+    #define LIGHTCOUNT 2
+    #define LIGHTMAPDIRECTUV 0
+    #define MATERIALPLUGIN_1
+    #define MAXLIGHTCOUNT 4
+    #define NORMAL
+    #define NUM_BONE_INFLUENCERS 0
+    #define NUM_MORPH_INFLUENCERS 0
+    #define OPACITYDIRECTUV 0
+    #define ORDER_INDEPENDENT_TRANSPARENCY_16BITS
+    #define PREPASS_ALBEDO_INDEX -1
+    #define PREPASS_ALBEDO_SQRT_INDEX -1
+    #define PREPASS_COLOR_INDEX -1
+    #define PREPASS_DEPTH_INDEX -1
+    #define PREPASS_IRRADIANCE_INDEX -1
+    #define PREPASS_IRRADIANCE_LEGACY_INDEX -1
+    #define PREPASS_LOCAL_POSITION_INDEX -1
+    #define PREPASS_MESH_BLEND_TAG_INDEX -1
+    #define PREPASS_NORMALIZED_VIEW_DEPTH_INDEX -1
+    #define PREPASS_NORMAL_INDEX -1
+    #define PREPASS_OBJECT_ID_INDEX -1
+    #define PREPASS_POSITION_INDEX -1
+    #define PREPASS_REFLECTIVITY_INDEX -1
+    #define PREPASS_SCREENSPACE_DEPTH_INDEX -1
+    #define PREPASS_VELOCITY_INDEX -1
+    #define PREPASS_VELOCITY_LINEAR_INDEX -1
+    #define PREPASS_WORLD_NORMAL_INDEX -1
+    #define REFLECTION
+    #define REFLECTIONFRESNEL
+    #define REFLECTIONMAP_3D
+    #define REFLECTIONMAP_CUBIC
+    #define REFLECTIONMAP_OPPOSITEZ
+    #define RIGHT_HANDED
+    #define ROUGHNESS
+    #define SAMPLER3DBGRMAP
+    #define SAMPLER3DGREENDEPTH
+    #define SCENE_MRT_COUNT 0
+    #define SPECULARDIRECTUV 0
+    #define SPECULARTERM
+    #define SPOTLIGHT1
+    #define TEXTURE_REPETITION_MODE 0
+    #define TONEMAPPING 0
+    #define VERTEX_PULLING_USE_INDEX_BUFFER
+    #define VIGNETTEBLENDMODEMULTIPLY
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-standard-ibl-native-20261018\red\tests\standard-ibl-defines.test.ts:142:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 0
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1727.0946
