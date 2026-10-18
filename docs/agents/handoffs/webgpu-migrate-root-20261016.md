@@ -237,3 +237,7 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## Pure serializer A/B/C uzavřen negativně
 
 18.10 hitches-v23, manifestf3ca7d…2197,208artefaktů. Differential6/warm9×5/classWGSL3×18/TS3172-0,reviewbez nálezů. ToString−3–5% nepřineslwhole-renderbenefit, proto žádnýnovýpatch/build. Read-only širšísloty/scheduler varianty uložené s limity. Nový webgpu-define-memo-proof-20261018 má vlastníprefix a explicitnítestowner; ne productioncache, nezměnit engineownershipbez samostatnévolby.
+
+## Explicit-owner memo CPU proof přijat, production lifetime samostatně
+
+18.10 hitches-v24: manifest a475e6f…eae, 161 artefaktů, functional10/10, A/M18/18,6×5warm,54exact snapshots,scopedTS3172/0 a review[]. Whole warm−27 až−37%, churn+7,74%; žádný GPU/FPS důkaz ani runtime změna. Leaf claim uvolněn. Root vybral engine-owned interní adapter po porovnání variant; task webgpu-define-memo-owner-qa-20261018 má vlastní disjunktní cache/handoff a aktivního vlastníka. VeřejnétoString zůstane pure, loss/dispose/reentry/custom override musí mít regresní důkaz. Převzetí runtime až po samostatném review a celém day13 startup/interakce A/B. Hraný4193 beze změny.

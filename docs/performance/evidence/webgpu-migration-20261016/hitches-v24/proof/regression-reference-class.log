@@ -1,0 +1,41 @@
+✖ actual MaterialDefines distribution canonicalizes complete literal blocks without a new public API (6.3212ms)
+✔ actual serializer preserves complete unknown blocks and reserved names byte for byte (1.3599ms)
+✔ actual serializer caps chars and define rows exactly (2.8268ms)
+✔ actual clone/equality/reset and mutable key order remain untouched (1.4538ms)
+✔ actual getter order, receiver, original throws and later unsafe mutation stay observable (0.8684ms)
+✔ flat-result contract does not claim to reject every multiline property by origin (0.2825ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 390.5916
+
+✖ failing tests:
+
+test at tests\material-defines-serialization.test.ts:1:699
+✖ actual MaterialDefines distribution canonicalizes complete literal blocks without a new public API (6.3212ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+      'MaterialDefines',
+  +   '__beginOwner',
+  +   '__endOwner',
+  +   '__ownerActive',
+  +   '__reference'
+    ]
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-memo-proof-20261018\fixture\tests\material-defines-serialization.test.ts:21:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'MaterialDefines', '__beginOwner', '__endOwner', '__ownerActive', '__reference' ],
+    expected: [ 'MaterialDefines' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

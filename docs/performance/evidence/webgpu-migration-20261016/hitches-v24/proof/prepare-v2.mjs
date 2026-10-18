@@ -1,0 +1,7 @@
+import fs from'node:fs';import assert from'node:assert/strict';import{createHash}from'node:crypto';import{dirname,resolve}from'node:path';import{fileURLToPath,pathToFileURL}from'node:url';
+const root=dirname(fileURLToPath(import.meta.url)),sha=b=>createHash('sha256').update(b).digest('hex'),original=fs.readFileSync(resolve(root,'reference.js'),'utf8'),v1=JSON.parse(fs.readFileSync(resolve(root,'input-manifest.json')));assert.equal(sha(original),v1.originalSha);
+const tail=`\nimport { installReference, memoResult } from ${JSON.stringify(pathToFileURL(resolve(root,'owner-control.mjs')).href)};\ninstallReference(canonicalResult);\n`;
+const modules={reference:original,memo:original.replace('return canonicalResult(result);','return memoResult(result);'),capture:original.replace('function canonicalResult(text) {','function canonicalResult(text) {\n    globalThis.__memoRawCapture?.(text);')};
+assert.equal(modules.memo.replace('return memoResult(result);','return canonicalResult(result);'),original);
+fs.mkdirSync(resolve(root,'modules-v2'));const hashes={};for(const[name,source]of Object.entries(modules)){fs.writeFileSync(resolve(root,'modules-v2',name+'.mjs'),source+tail,{flag:'wx'});hashes[name]=sha(source+tail);}
+fs.writeFileSync(resolve(root,'input-v2.json'),JSON.stringify({...v1,modules:hashes,moduleDirectory:'modules-v2',reason:'Preserve exact public core namespace. Owner API is separate test module; original18assertions unchanged.',previousInputSha:sha(fs.readFileSync(resolve(root,'input-manifest.json')))},null,2)+'\n',{flag:'wx'});

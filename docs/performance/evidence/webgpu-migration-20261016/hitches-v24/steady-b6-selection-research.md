@@ -1,0 +1,11 @@
+# Čtecí hranice steady B6 výkonu
+
+18. 10. 2026, audit shader_inventory nad V6 raw v hitches-v19; žádné nové testy nebo GPU. Samples1444/1484 mají823completed main draw callbacks,0abandoned; preparation4,4/6,9ms a bindDraw21,1/23,3ms. Source groups jsou úplné: architecture-reality287calls/7,9–9,4ms, stromy118/3,6–4,4ms, unclassified328/10,3–13,1ms. Poslední skupinu nelze celou vydávat za B6 ani celé draw callbacky za GPU execution.
+
+EnabledMeshCandidates již filtruje3802→2535enabled kandidátů. Native Scene před frustum provádí readiness/worldmatrix/LOD (scene.pure.js:3919–3959). Octree může omezit tuto selection část, ne skutečně frustum-visible draw calls. Její komponenta navíc přepisuje providers a nesleduje automaticky každé B6 addMesh; moving assets a editované pivots vyžadují invalidaci.
+
+Batching už existuje podle building/material a B6 floor/material (architecture-reality:1350–1422, b6-reality:431–459,568–646). Nejde o tisíce jednotlivých oken. World asset attach v world-asset-identity:35–50 výslovně unfreeze matrice kvůli editovatelným pivotům; nelze je automaticky prohlásit immutable. Další merge musí zachovat nezávislé LOD, světelný výběr, pivoty a shadow ownership. Terrain/surfaces už mají96m submesh chunks; větší bloky mění draw/overdraw tradeoff. Opaque sort je front-to-back, nikoli pouhý material sort.
+
+Hráč ve steady stojí na z−76,983 uvnitř B6, ale kamera na z−79,263 před vstupem. PlayerInside proto neopravňuje skrýt venek. Konzervativní viditelnost musí respektovat kameru, vstup, okna, sklo, schodiště a oddělené shadow casters. B6 již culluje některé detaily/patra a záměrně ponechává envelope a exterior-entry.
+
+Starý C4 fast/bundle pilot zaznamenal452reuse, ale jen53,5→54,2FPS a horšíp99 v jediném páru. Není to souhlas s fast defaultem ani B6 výkonový důkaz. Nejmenší další případný pokus je existující staticFrustum0/1 nad stejným QA checkpointem, se skutečnými lastRenderTests/Rejected/Unsafe/Output a obrazem. Root znovu ověřil, že tento query wiring je ve V6/C5, **nikoli v native day13**; parametr na native URL by nebyl testem této funkce. Pokus by mířil na7,5ms selection část, ne automaticky celé řešení23FPS. Bez přínosu není důvod zavádět novou octree.

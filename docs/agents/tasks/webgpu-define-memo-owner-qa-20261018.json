@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-define-memo-owner-qa-20261018",
+  "title": "KEY-31: izolovaný engine-owned memo kandidát",
+  "status": "ready",
+  "dependsOn": ["webgpu-define-memo-proof-20261018"],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/define-memo-owner-qa-20261018/",
+    "docs/agents/handoffs/webgpu-define-memo-owner-qa-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před implementací zaznamenat výzkum a rozhodnutí mezi modulovým memo, optional engine argumentem a explicitním interním adapterem. Izolovaný proof má whole-render přínos, ale ne produkční lifetime ani GPU důkaz. Vybraná QA varianta musí dodržet per-engine/device ownership; žádná tichá výjimka z docs/performance/webgpu-migration.md55.",
+    "Zvolit explicitní interní adapter pro skutečné PBR a Standard callsites, které již znají engine. Může jít o interní statickou metodu MaterialDefines bez nového module exportu. Původní veřejné toString() zůstane čisté; adapter jednou přečte skutečnou metodu, zachycenou stock identitu rozliší od custom/později zabalené metody. Custom fallback musí dostat0argumentů, stejný receiver a původní return/throw. Nepoužívat později přepsatelný prototype jako stock identitu.",
+    "Stock adapter i veřejné toString sdílejí přesný původní raw loop bez změny _keys/getter pořadí, počtu čtení, mutation/throw chování a string spelling. Cache lookup a případný insert jsou až po dokončeném raw textu. Když getter zruší owner nebo změní device/epoch, výsledek se čistě kanonizuje a nesmí využít obsolete owner. Žádný ambient current-engine nebo LastCreatedEngine/Scene.",
+    "Soukromý WeakMap engine→owner, pro každý živý WebGPU engine/device vlastní FIFO64položek a262144combined codeunits, převzaté z proofu. Entries pouze primitive string→string a účetní počítadlo; unknown/fallback/already-sorted/empty/oversized se neukládají. Velká entry nesmí vyprázdnit jiné. WebGL, neznámý/neinicializovaný/disposed owner mají čistou kanonizaci, žádný GPU resource cache nebo shader-byte změna.",
+    "Na device loss vyprázdnit a deaktivovat danou generaci, na skutečně nový device vytvořit prázdnou, na engine dispose vyprázdnit a odstranit vlastní registrace/reference. Project factory má doNotHandleContextLost:true, takže samotné engine lost/restored observables nestačí. Vybrat doložené vlastní device.lost sledování nebo explicitní project invalidaci; případná nutná project změna vyžaduje předem koordinaci. Late starý callback nesmí vyčistit nový owner ani druhý engine. Pending health není důvod vypnout memo při startupu.",
+    "Promise loss handler nesmí držet engine/device/cache po zrušení vlastníka přes neodpojitelné closure. Použít doložené weak/detachable cell řešení s guardy a clean fallbackem, ne neomezené observe přeregistrace. Ověřit loss rejection, dispose-before-loss, device replacement bez observable, stale callback, reentry A→B→A a exceptions. Logical codeunits nejsou heap limit; životnost a reference výslovně doložit.",
+    "Povolený copied vendor rozsah: core Materials/materialDefines.js, Materials/PBR/pbrBaseMaterial.pure.js, Materials/standardMaterial.pure.js a pouze nutné jejich declaration změny. Změny mimo tuto hranici nejprve předat rootovi. Předchozí patch hunks mimo aktuální MaterialDefines hunk zachovat; copied patch/lock odpovídají přesným final dependency bytes. Žádný Game/day13/stage/camera/quality/default nebo produkční diagnostický zásah.",
+    "Actual výkonový proof musí měřit skutečný adapter path. Současný h21 toString wrapper by spustil custom fallback a memo obešel; upravit pouze testové měřicí hranice transparentně, zachovat neinstrumentovaný celý render a příslušné snapshots. Neprohlašovat rychlost čistého test owneru za rychlost nového engine owneru. Root až po review připraví immutable day13+memo GPU/startup A/B a případné native přijetí."
+  ],
+  "verification": [
+    "Původní18 actual MaterialDefines/WGSL/plugin/attribute testů beze změny assertions, plus actual PBR/Standard callsite a explicit lifecycle regrese. Dva enginy se stejným textem, jejich oddělené limity/dispose/device generation; custom override/getter/wrapper s0args; veřejná extraargs/return/throw/rebuild/clone/equality a původní namespace zachované.",
+    "Deterministický RED pro nové memo/ownership požadavky nad referencí, poté GREEN; původní correctness se nesmí přepsat podle výsledku. Actual warm i promíchaný/churn proof se zachovaným WGSL/layout/uniform/refcount/events/reset a source receipts. CPU timing koordinovat s rootem, více proložených procesů. Churn režii a retained logical sizes zachovat v reportu.",
+    "Vlastní fyzické core/loaders nebo doložený test-only resolver se stejnou jedinou identitou; shipping QA dependency musí být fyzická kopie bez hardlink zápisů do frozen inputs. Žádný install do WT/main/hraných dependencies, assets regenerace, GPU/port/fullsuite/build. ScopedTS a relevantní targeted testy, cílený refaktoring, exact manifest/preimages/output/patch roundtrip/command/log/handoff; bez commitu, po cleanup release."
+  ],
+  "notes": [
+    "Přímý BMAD podúkol, cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, owner webgpu-define-memo-owner-qa-01a14497. Načíst AGENTS/policy/task/registry, claim před zápisem. Žádný další workflow.",
+    "Source kotvy: PBR engine970/toString1182, Standard engine838/toString1264; MaterialDefines nezná engine. Factory client/render-engine.ts198–205 má doNotHandleContextLost:true; webgpuEngine.pure.js473–500 potom nepřeposílá device loss do observables. watchWebGpuValidation:54 je relevantní příklad current-device guardu. Read-only audit functional_record vybral explicit adapter jako konzervativnější proti změně argumentů custom override.",
+    "Native/current A module43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4 a patch21114f6048abdcba932a8640adf1a97b6281939d99ae6d53fbfe96ef76bf0503 zůstávají readonly reference. Day13baseline b9d812d3262ec6e781b6d268b4ca0fec108ab0b32591dbfba83a70d0578b513f se nemění; userhraný4193 rovněž.",
+    "Jde o izolovaný QA kandidát po podloženém CPU proofu, nikoli automaticky přijatou produkční cache. Vlastnictví zde musí být skutečně implementované/ověřené, ne nahrazené textovou výjimkou. Celý startup/GPU/frame p95/p99 a paměť zůstávají root přejímce."
+  ]
+}
