@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-b6-entry-view-proof-20261018",
+  "title": "KEY-31: ověřit jediný přípravný pohled pro B6 vstupní materiály",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/b6-entry-view-proof-20261018/",
+    "docs/agents/handoffs/webgpu-b6-entry-view-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Porovnat současný flat landing pohled s jedním source-derived pohledem před vstupem podle existujícího CameraFollow a identifikované shared entry geometrie.",
+    "Skutečné camera-pass draws musí zachovat8 regular-instance částí původních reception-counter/noticeboard a zahrnout b6 stair:entry-metal i b6:concrete stair treads. Attached/frustum counts samotné nejsou draw důkaz.",
+    "Pouze cache-only CPU proof. Žádný runtime camera/actor/physics/network zásah, view grid, nová geometrie nebo nepodložené shipping doporučení."
+  ],
+  "verification": [
+    "Původní malé GLB a skutečné entry materiály/mesh konstrukce; runtime source/pinned dependency SHA. Bounded scéna bez plné B6/world geometrie nebo velkých assetů.",
+    "Použít skutečný read-only collision kontrakt pro výpočet, pokud jej lze v tomto malém scope korektně sestavit. Stub/recorded clip explicitně označit; takový výsledek není potvrzením produkčního collision solve.",
+    "Zachovat lifecycle, cleanup a rozdíl CPU/GLSL versus WGSL/GPU. Žádný build/fulltests/integration/GPU/install."
+  ],
+  "notes": [
+    "Koordinátor root, přímá delegace bez reentrant BMAD. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow.",
+    "Read-only podklady: hitches-v6 proof a hitches-v7 pilot, frozen a94 snapshot .cache/webgpu-hitch-validation-20261017/b6-preparation-v1. Původní cache neměnit.",
+    "Zbývající GPU firstF materiálové přípravy entry-metal27.4ms a concrete treads25.2ms. Flat kamera na landing míří vodorovně a nemusí vidět rám/canopy za ní. Nezvolit náhodnou pózu; odvození a nejistoty doložit.",
+    "Žádné předčasné změny Game/CameraFollow ani rozšiřování testovací geometrie na celý svět. Potřebný větší scope vrátit rootovi před spuštěním.",
+    "Read-only dependencies-v5, TSX_DISABLE_CACHE=1, vlastní handoff/source/probe/output SHA, release po ukončení pomocných procesů, bez commitu."
+  ]
+}
