@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-define-serializer-qa-20261018",
+  "title": "KEY-31: změřit a zlevnit čistou serializaci defines",
+  "status": "ready",
+  "dependsOn": ["webgpu-material-switch-cost-proof-20261018", "webgpu-native-day-coverage-qa-20261018"],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/define-serializer-qa-20261018/",
+    "docs/agents/handoffs/webgpu-define-serializer-qa-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před změnou zaznamenat výzkum skutečného MaterialDefines.toString/canonicalResult a souvisejících getter/plugin/cache/lifecycle kontraktů. Hitches-v21 měří celétoString, nikoli izolovaný parser; nejprve rozlišit původní textloop a canonicalizer na skutečných vstupních blocích/instancích, bez produkční extrapolace.",
+    "Porovnat rozumné varianty včetně současného records+name comparator, přímého lexical sort validovaných celých řádků, omezení parsing/dočasných alokací, žádné změny a bounded memo pouze hotového původního stringu. Memo v tomto tasku pouze analyzovat včetně ownership/paměti/invalidace; nepřidávat persistentní cache ani nový production profiler. Vybrat nejmenší variantu až podle důkazů, ne jen snadné implementace.",
+    "Pure kandidáti smějí měnit pouze copied core Materials/materialDefines.js canonicalResult internals. Původní toString property read order/receiver/throws/_keys/rebuild/clone/equality a raw result loop beze změny. Whole-block fallback, ASCII/name/reserved/numeric grammar, přesný spelling, limity32768/1024 i opaque/multiline input kontrakt zachovat byte-exact proti současnému canonicalizeru.",
+    "Default řazení celých řádků vyžaduje formální argument pro unique ASCII identifikátory včetně prefixů a chybějícího numeric value; ověřit proti primary ECMAScript CompareArrayElements/IsLessThan a diferenciální corpus včetně prefix/digit/underscore/mixed-case, numeric edge, unsafe/duplicate/limit fallback. Regex nebo ruční scanner nesmí nechtěně rozšířit přijatou gramatiku.",
+    "Po rovnocennosti měřit původníloop/helper/fullserializer a actual warm material switch v koordinovaném CPU okně, více samostatných procesů a proložené pořadí variant. Zachovat raw neúspěchy, všechny výsledky a observer/JIT/GC limity. Žádné per-frame36→794 násobení nebo tvrzeníGPUvýhody.",
+    "Každý actual runtime proces má jedinou fyzickou core/loaders identitu. Vstupní define-order-qa dependencies a všechny native/QA/hranýchbuildů bytes jen readonly. Vlastní copied dependency a source closure pouze zde, bez install/hardlink zápisu do zdrojů. Pokud varianta není účinná, předat negativní výsledek; nevybírat ji pro snazší GREEN.",
+    "Je-li čistý kandidát podložený, připravit v tomto prefixu pouze jeho copied vendor patch/lock (původní12130B patch se zachovanými předchozími hunks, lock pouze potřebný patch hash) a smysluplné regrese/differential důkazy. Žádný Game/day13/stage/default/camera/shader output nebo production cache zásah. Root teprve po review ověří nový immutable day13GPU/startup checkpoint před jakoukoli native integrací."
+  ],
+  "verification": [
+    "Aktuální18actual MaterialDefines/WGSL/plugin/attribute regresí zachovat a spustit nad kandidátem, včetně getter/throw/late mutation/limits a compressedbaseline. Diferenciální testy musí používat skutečný původní i kandidátní kód, ne jeho ručně opisovanou náhradu. New grammar prefix/finite/custom fallback cases jsou chování, ne pouze implementation shape.",
+    "Actual warm PBR/Standard/CampusSurfaceArt mechanismus z hitches-v21: output WGSL/defines/layout/uniforms/Effect identity/refcount a cleanup zachované, warm0novýchprogramů a genuine1. Externítextures/instance/shadow/GPUlimity výslovné; relevantní scopedTS. Nepřepisovat staréproofraw ani původnítesty mimo vlastníprefix.",
+    "Získat vlastní claim předzápisem; cílený refaktoring, přesný manifest/preimages/outputs, command/log/hash a handoff. Předčasovaným CPU během domluvit root okno; žádný GPU/port/fullsuite/build. Bez commitu, ukončit vlastníprocesy a release ažpo předání."
+  ],
+  "notes": [
+    "Přímý podúkol pokračujícího projektového BMAD, bez rekurzivního workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, owner webgpu-serializer-qa-01a14497. NačístAGENTS/policy/task a stav/worktrees/registry.",
+    "Current native patch21114f6048abdcba932a8640adf1a97b6281939d99ae6d53fbfe96ef76bf0503, lock03d4edcd8f9d92fa7b6b320f5600709dd62612a5bad7867cef61875e7ecd8b53, actual core materialDefines43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4. Přijatý warmproof V2manifest7a25099dad279c07ef5cf203004802438fe657db392bb209a7dc1a91ec1dda23, frozen traces/raw05–07 bezezměny.",
+    "Day13 b9d812d3262ec6e781b6d268b4ca0fec108ab0b32591dbfba83a70d0578b513f je immutable root GPUbaseline: F~150ms, Day~200ms, startup36–38s. Jeho příprava13etap/30s/readiness se touto prací nemění. Hraná4193 zůstane úplně stejná.",
+    "Primary standard: https://tc39.es/ecma262/2025/multipage/indexed-collections.html#sec-comparearrayelements a https://tc39.es/ecma262/2025/multipage/abstract-operations.html#sec-islessthan. Spec popisuje řazení, nikoli rychlost V8. Custom order-sensitive hooks z původního proofu zůstávají nepodporovaná větev; optimalizace nesmí měnit současný smluvený výstup."
+  ]
+}
