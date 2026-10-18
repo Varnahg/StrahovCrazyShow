@@ -1,0 +1,93 @@
+BJS - [06:58:43]: Babylon.js v9.30.0 - Null engine
+✔ guard accepts exact literal blocks, preserves spelling, bounds, idempotence and value distinctions (3.6411ms)
+✔ unknown syntax and reserved macros fall back atomically with exact bytes (0.544ms)
+✔ wrapper preserves receiver/arguments, getter read order, throw, later values and original descriptor (1.1936ms)
+BJS - [06:58:43]: Babylon.js v9.30.0 - Null engine
+BJS - [06:58:43]: Babylon.js v9.30.0 - Null engine
+✔ same-engine pbr native WGSL baseline and bounded counterfactual (344.9658ms)
+BJS - [06:58:43]: Babylon.js v9.30.0 - Null engine
+BJS - [06:58:43]: Babylon.js v9.30.0 - Null engine
+✔ same-engine standard native WGSL baseline and bounded counterfactual (103.6877ms)
+BJS - [06:58:43]: Babylon.js v9.30.0 - Null engine
+BJS - [06:58:43]: Babylon.js v9.30.0 - Null engine
+✔ same-engine surface native WGSL baseline and bounded counterfactual (155.1572ms)
+BJS - [06:58:43]: Babylon.js v9.30.0 - Null engine
+BJS - [06:58:43]: Babylon.js v9.30.0 - Null engine
+✔ same-engine photo native WGSL baseline and bounded counterfactual (140.6148ms)
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+✔ same-engine wind native WGSL baseline and bounded counterfactual (123.9487ms)
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+✔ same-engine car native WGSL baseline and bounded counterfactual (134.7221ms)
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+✖ same-engine car-fallback native WGSL baseline and bounded counterfactual (54.119ms)
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+✔ same-engine photo-grass native WGSL baseline and bounded counterfactual (136.6574ms)
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+✖ same-engine photo-grass-thin native WGSL baseline and bounded counterfactual (3.9234ms)
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+✖ same-engine grass-thin native WGSL baseline and bounded counterfactual (16.1426ms)
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+✔ same-engine hair native WGSL baseline and bounded counterfactual (124.9841ms)
+BJS - [06:58:44]: Babylon.js v9.30.0 - Null engine
+✔ syntactically safe literals cannot guarantee arbitrary custom preProcessor equivalence (129.4386ms)
+✔ bounded local transform microbench; no startup/driver-performance inference (149.981ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 13
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4548.9264
+
+✖ failing tests:
+
+test at proof.test.ts:3:2730
+✖ same-engine car-fallback native WGSL baseline and bounded counterfactual (54.119ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:152:12)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:201:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at proof.test.ts:3:2730
+✖ same-engine photo-grass-thin native WGSL baseline and bounded counterfactual (3.9234ms)
+  RangeError: Offset is outside the bounds of the DataView
+      at DataView.prototype.getFloat32 (<anonymous>)
+      at GetFloatValue (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Buffers\bufferUtils.ts:51:29)
+      at EnumerateFloatValues (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Buffers\bufferUtils.ts:209:73)
+      at GetFloatData (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Buffers\bufferUtils.ts:252:9)
+      at VertexBuffer.getFloatData (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Buffers\buffer.pure.ts:681:16)
+      at Geometry.getVerticesData (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Meshes\geometry.ts:464:29)
+      at Mesh.getVerticesData (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Meshes\mesh.pure.ts:1319:35)
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:125:83)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:201:24)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+
+test at proof.test.ts:3:2730
+✖ same-engine grass-thin native WGSL baseline and bounded counterfactual (16.1426ms)
+  RangeError: Offset is outside the bounds of the DataView
+      at DataView.prototype.getFloat32 (<anonymous>)
+      at GetFloatValue (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Buffers\bufferUtils.ts:51:29)
+      at EnumerateFloatValues (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Buffers\bufferUtils.ts:209:73)
+      at GetFloatData (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Buffers\bufferUtils.ts:252:9)
+      at VertexBuffer.getFloatData (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Buffers\buffer.pure.ts:681:16)
+      at Geometry.getVerticesData (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Meshes\geometry.ts:464:29)
+      at Mesh.getVerticesData (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\inactive-light-defines-qa-20261018\dependencies\dev\core\src\Meshes\mesh.pure.ts:1319:35)
+      at scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:125:83)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:201:24)
+      at Test.runInAsyncScope (node:async_hooks:227:14)

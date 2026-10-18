@@ -1,0 +1,58 @@
+BJS - [07:00:15]: Babylon.js v9.30.0 - Null engine
+✔ guard accepts exact literal blocks, preserves spelling, bounds, idempotence and value distinctions (3.4267ms)
+✔ unknown syntax and reserved macros fall back atomically with exact bytes (0.4983ms)
+✔ wrapper preserves receiver/arguments, getter read order, throw, later values and original descriptor (1.2201ms)
+BJS - [07:00:15]: Babylon.js v9.30.0 - Null engine
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+✔ same-engine pbr native WGSL baseline and bounded counterfactual (346.812ms)
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+✔ same-engine standard native WGSL baseline and bounded counterfactual (116.0461ms)
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+✔ same-engine surface native WGSL baseline and bounded counterfactual (140.5069ms)
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+✔ same-engine photo native WGSL baseline and bounded counterfactual (152.5725ms)
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+✔ same-engine wind native WGSL baseline and bounded counterfactual (124.2316ms)
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+✔ same-engine car native WGSL baseline and bounded counterfactual (131.3168ms)
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+✖ same-engine car-fallback native WGSL baseline and bounded counterfactual (22.698ms)
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+✔ same-engine photo-grass native WGSL baseline and bounded counterfactual (131.4218ms)
+BJS - [07:00:16]: Babylon.js v9.30.0 - Null engine
+BJS - [07:00:17]: Babylon.js v9.30.0 - Null engine
+✔ same-engine photo-grass-thin native WGSL baseline and bounded counterfactual (130.3783ms)
+BJS - [07:00:17]: Babylon.js v9.30.0 - Null engine
+BJS - [07:00:17]: Babylon.js v9.30.0 - Null engine
+✔ same-engine grass-thin native WGSL baseline and bounded counterfactual (132.8396ms)
+BJS - [07:00:17]: Babylon.js v9.30.0 - Null engine
+BJS - [07:00:17]: Babylon.js v9.30.0 - Null engine
+✔ same-engine hair native WGSL baseline and bounded counterfactual (125.0998ms)
+BJS - [07:00:17]: Babylon.js v9.30.0 - Null engine
+✔ syntactically safe literals cannot guarantee arbitrary custom preProcessor equivalence (136.6887ms)
+✔ bounded local transform microbench; no startup/driver-performance inference (163.7271ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4757.3365
+
+✖ failing tests:
+
+test at proof.test.ts:3:2730
+✖ same-engine car-fallback native WGSL baseline and bounded counterfactual (22.698ms)
+  Error: Actual draw did not settle: car-fallback/A four after three
+      at render (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:148:13)
+      at async scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:150:69)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:210:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

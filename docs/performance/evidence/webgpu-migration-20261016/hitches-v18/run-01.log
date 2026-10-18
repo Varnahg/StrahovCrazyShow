@@ -1,0 +1,74 @@
+BJS - [06:53:18]: Babylon.js v9.30.0 - Null engine
+✔ guard accepts exact literal blocks, preserves spelling, bounds, idempotence and value distinctions (4.3568ms)
+✔ unknown syntax and reserved macros fall back atomically with exact bytes (0.8418ms)
+✔ wrapper preserves receiver/arguments, getter read order, throw, later values and original descriptor (1.6172ms)
+BJS - [06:53:18]: Babylon.js v9.30.0 - Null engine
+✖ same-engine pbr native WGSL baseline and bounded counterfactual (253.3822ms)
+BJS - [06:53:18]: Babylon.js v9.30.0 - Null engine
+✖ same-engine standard native WGSL baseline and bounded counterfactual (74.5047ms)
+BJS - [06:53:18]: Babylon.js v9.30.0 - Null engine
+✖ same-engine surface native WGSL baseline and bounded counterfactual (46.9205ms)
+BJS - [06:53:18]: Babylon.js v9.30.0 - Null engine
+✖ same-engine photo native WGSL baseline and bounded counterfactual (26.7203ms)
+✖ same-engine wind native WGSL baseline and bounded counterfactual (25.4519ms)
+✔ bounded local transform microbench; no startup/driver-performance inference (183.3907ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 4
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3188.8232
+
+✖ failing tests:
+
+test at proof.test.ts:2:2656
+✖ same-engine pbr native WGSL baseline and bounded counterfactual (253.3822ms)
+  TypeError: effect.getVertexShaderSource is not a function
+      at sample (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:102:27)
+      at render (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:109:292)
+      at async scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:112:5)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:158:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at proof.test.ts:2:2656
+✖ same-engine standard native WGSL baseline and bounded counterfactual (74.5047ms)
+  TypeError: effect.getVertexShaderSource is not a function
+      at sample (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:102:27)
+      at render (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:109:292)
+      at async scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:112:5)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:158:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at proof.test.ts:2:2656
+✖ same-engine surface native WGSL baseline and bounded counterfactual (46.9205ms)
+  TypeError: effect.getVertexShaderSource is not a function
+      at sample (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:102:27)
+      at render (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:109:292)
+      at async scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:112:5)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:158:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at proof.test.ts:2:2656
+✖ same-engine photo native WGSL baseline and bounded counterfactual (26.7203ms)
+  TypeError: effect.getVertexShaderSource is not a function
+      at sample (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:102:27)
+      at render (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:109:292)
+      at async scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:112:5)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:158:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at proof.test.ts:2:2656
+✖ same-engine wind native WGSL baseline and bounded counterfactual (25.4519ms)
+  TypeError: effect.getVertexShaderSource is not a function
+      at sample (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:102:27)
+      at render (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:109:292)
+      at async scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:112:5)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-order-proof-20261018\proof.test.ts:158:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

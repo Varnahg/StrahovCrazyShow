@@ -579,3 +579,8 @@ Samostatná V4 referenční série: první Golden OFF0mod/0sync/max124.5ms, prvn
 ## WebGPU KEY-31: přesný B6 exit a pořadí defines (18.10.2026)
 
 [Hitches-v17](performance/evidence/webgpu-migration-20261016/hitches-v17/README.md):4/4actual CPU proof/čtecí review PASS,16artefaktů hash/gzip ověřeno. Původní merged entry-dark-metal PBR cap4 má outside po historii exact správné defines a opakované Effect reuse; další inactive history bug nepotvrzen. Hidden camera-pass readiness připraví Effect, ne GPU pipeline. Freshinside vs outside-firstinside má stejné public hodnoty a odlišné pořadí4řádků, zatím bez same-engine/GPU atribuce. Nový disjunktní define-order proof ověří tento mechanismus a bounded hotový-result normalizaci v actual PBR/Standard/WGSL/plugin cestách. Runtime/vendor/hranýbuild nezměněné, žádné uzavření KEY-31.
+
+
+## WebGPU KEY-31: same-engine define-order důkaz (18.10.2026)
+
+[Hitches-v18](performance/evidence/webgpu-migration-20261016/hitches-v18/README.md):16/16CPU + čtecí review PASS,27artefaktů verified.10actual PBR/Standard/plugin/instance WGSL větví má baseline4programy a bounded canonical3 při stejných hodnotách/kódu mimo captured generated const/layout. Genuine value change zůstává jinýEffect. Unknown text fallback/getters/latermutation/lifecycle zachované. Negativní order-sensitive preProcessor mění kód, tudíž ne univerzální vendor bezpečnost. Mirrored car baseline RED0/1 zachován a nepočítán do pokrytí. GPU/startup neověřené; nový samostatný projektový QA serialization task vytváří vlastní fyzické dependencies a nesahá na native/hranýbuild.
