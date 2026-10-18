@@ -1,0 +1,17 @@
+[
+  {
+    "path": "client/qa-routine-profile.ts",
+    "before": "{ id: \"MaterialDefines.toString\", target: MaterialDefines.prototype, key: \"toString\" }",
+    "after": "{ id: \"MaterialDefines._SerializeForEngine\", target: MaterialDefines, key: \"_SerializeForEngine\" }"
+  },
+  {
+    "path": "tests/qa-routine-profile.test.ts",
+    "before": "[MaterialDefines.prototype, \"toString\"]",
+    "after": "[MaterialDefines, \"_SerializeForEngine\"]"
+  },
+  {
+    "path": "tests/qa-routine-profile.test.ts",
+    "before": "\"MaterialDefines.toString\"",
+    "after": "\"MaterialDefines._SerializeForEngine\""
+  }
+]

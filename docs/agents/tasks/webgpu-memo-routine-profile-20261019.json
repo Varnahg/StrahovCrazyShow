@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-memo-routine-profile-20261019",
+  "title": "KEY-31: změřit skutečnou cenu interního serializer memo bez vypnutí cache",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-memo-routine-profile-20261019/",
+    "docs/agents/handoffs/webgpu-memo-routine-profile-20261019.md",
+    "docs/performance/evidence/webgpu-migration-20261016/memo-routine-profile/",
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/webgpu-memo-routine-profile-20261019/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4200",
+    "port:2595"
+  ],
+  "acceptance": [
+    "Současný routine candidate se stejným max8 timerem, pouze přesné4current memo vendor delta a static serializer target místo prototype toString; žádné nové profiler API či native runtime změny.",
+    "Cílený test prokazuje nezměněnou stock toString identitu, zachovaný static receiver/return/throw a descriptor restore při completion/exception. Zdrojové SHA a aktuální correctness/build ověřené.",
+    "Jeden skutečný produkční Edge průjezd se stejnýmiLow/night/0ambient podmínkami. Porovnat počty/cenu interního serializeru a readiness/binding s již zachovanýmA profilem; nehlásit instrumentovanéFPS jako přímý A/B zisk. Hrané buildy a cizí WIP bezezměny."
+  ],
+  "verification": [
+    "Targeted helper/Game/mesh tests, fullTypeScript/build; bounded skutečný Edge capture + source/session/health/cleanup/protected hash; independentread-onlyreview a scoped evidence integrace."
+  ],
+  "notes": [
+    "Navazuje na dokončený šestiběhový čistý pilot main07b26c6d, memo nyní nepřijato. Konkrétní chybějící odpověď je CPU cena static vstupu, nikoli dalšíFPSopakování. Dvě syncpipeline mají přímý vykázaný čas0–0,2ms, deferreddriverwork tím není vyloučená.",
+    "Admin webgpu-01a15102-admin přidělil rozsah; vlastníkem dalšího QA je webgpu-01a15102-memo-routines. Full migration a KEY-31 zůstávají otevřené.",
+    "Dokončený mechanismproof: serializer499calls29,7ms/429calls24,4ms,33/33targeted/fullTS/buildPASS, raw+UIexact a review[]. Native memo nadále nepřijato; další krok průzkum světelné invalidace. Evidence memo-routine-profile/README.md."
+  ]
+}
