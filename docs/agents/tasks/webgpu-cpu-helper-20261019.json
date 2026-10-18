@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-cpu-helper-20261019",
+  "title": "KEY-31: bounded QA adapter standardního JS CPU profileru",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [".cache/webgpu-cpu-helper-20261019/", "docs/agents/handoffs/webgpu-cpu-helper-20261019.md"],
+  "resources": [],
+  "acceptance": [
+    "Pouze copied helper a jeho testy; žádný produkční runtime, browser/GPU/server, build nebo shared dependencies.",
+    "Jeden profiler16ms/max2000, idempotentní stop/buffer-full/rejection cleanup, busy gate do ukončení stopPromise, oddělený DOM export ažpo metrikách. Původní chyby nesmějí být přepsané.",
+    "Export createCpuSampler(runtime) a beginQaCpuProfile(): stopFunction|undefined; return stopFunction(reason:string):void. Žádné32KiB session recordy ani neomezená historie trace.",
+    "Cílený refaktoring, skutečné lifecycle testy helperu a handoff/manifest přesných souborů."
+  ],
+  "verification": ["Lehké Node/tsx cílené testy, scoped typy, manifest SHA. Root provede Game zapojení, fullTS/build a Edge sběr."],
+  "notes": ["Přímé implementační zadání koordinátora v již spuštěném BMAD oneshot; další workflow nespouštět. Před zápisem vlastní disjunktní claim, po předání release."]
+}

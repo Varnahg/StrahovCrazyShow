@@ -1,0 +1,10 @@
+import {readFileSync,writeFileSync,mkdirSync,symlinkSync,existsSync} from 'node:fs';
+import {join} from 'node:path';
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+const root=import.meta.dirname,base=join(root,'candidate-v1'),out=join(root,'red-completion');assert.ok(!existsSync(out));mkdirSync(join(out,'tests'),{recursive:true});
+symlinkSync(join(base,'client'),join(out,'client'),'junction');symlinkSync(join(base,'shared'),join(out,'shared'),'junction');symlinkSync(join(base,'node_modules'),join(out,'node_modules'),'junction');
+writeFileSync(join(out,'package.json'),'{"type":"module"}');
+const extra=`\ntest("completion metric error still stops captured CPU owner once",t=>{const x=fixture(t);x.game.startBenchmark();const error=new Error("original completion failure");x.scene.getActiveIndices=()=>{throw error;};assert.throws(()=>x.finish(),e=>e===error);assert.deepEqual(x.cpuCaptures[0].stops,["benchmark-completion-error"]);x.game.handleRendererFailure("cleanup");assert.equal(x.cpuCaptures[0].stops.length,1);});\n`;
+writeFileSync(join(root,'completion-regression.txt'),extra);writeFileSync(join(out,'tests/game-light-switch-profile.test.ts'),readFileSync(join(base,'tests/game-light-switch-profile.test.ts'),'utf8')+extra);
+const r=spawnSync(process.execPath,['--import','tsx','--test','tests/game-light-switch-profile.test.ts'],{cwd:out,env:{...process.env,TSX_DISABLE_CACHE:'1'},encoding:'utf8'});writeFileSync(join(root,'completion-red.log'),(r.stdout??'')+(r.stderr??''));console.log((r.stdout??'').slice(-2200));assert.equal(r.status,1);
