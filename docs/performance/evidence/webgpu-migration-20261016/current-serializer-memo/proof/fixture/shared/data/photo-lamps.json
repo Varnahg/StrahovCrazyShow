@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "classification": "reference-interpreted-not-surveyed",
+  "provider": "IPR Praha",
+  "captureDate": "2024-06-08",
+  "source": "https://gs-pub.praha.eu/imgs/rest/services/ort/letecke_snimkovani/ImageServer",
+  "sourceImage": "assets/reference/lighting/central-parking-ortho-2024.jpg",
+  "sourceGeoreference": "assets/reference/lighting/central-parking-ortho-2024.json",
+  "sourceImageSha256": "f1209447c33a3d9d951ba955c7e4d91e89a56e41bba6c084a768266dcd3d5866",
+  "attribution": "datový podklad © IPR Praha",
+  "license": "CC BY",
+  "placements": [
+    {
+      "id": "ipr2024-parking-south-west",
+      "x": 60.8,
+      "z": 33.5,
+      "basePixel": [208, 715],
+      "positionUncertaintyMetres": 0.8,
+      "height": 5,
+      "heightProvenance": "typology-inferred-not-measured; scan pole fragment confounded by nearby 2023 tree crown",
+      "provenance": "reference-interpreted-not-surveyed",
+      "modelStyle": "white-parking-pole",
+      "reference": "White pole and separate narrow lamp-head shadow at the southern end of the red sports court. Manually distinguished from tree shadows and the parked car.",
+      "sourceNodes": ["1127273", "1127281"]
+    },
+    {
+      "id": "ipr2024-parking-south-central",
+      "x": 131,
+      "z": 32,
+      "basePixel": [910, 700],
+      "positionUncertaintyMetres": 0.6,
+      "height": 5,
+      "heightProvenance": "scan-guided-estimate-not-surveyed; isolated 2023 lamp-head vertices reach 4.768m above DMR",
+      "provenance": "reference-interpreted-not-surveyed",
+      "modelStyle": "white-parking-pole",
+      "reference": "White pole at the southern parking-row edge immediately east of the footpath. Narrow pole and its lamp-head shadow are separate from the adjacent parked vehicles.",
+      "sourceNodes": ["1123623"]
+    }
+  ],
+  "limitations": [
+    "Historical aerial reference, not a current inventory or surveyed pole coordinate.",
+    "Rendered fixture shape and warm light colour/intensity/range are artistic approximations; actual luminaire photometry and switching times are unknown.",
+    "Other ambiguous candidates, including a northern approach-road shadow and a possible object beneath tree cover, were not published."
+  ]
+}

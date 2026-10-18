@@ -1,0 +1,12 @@
+import ts from './node_modules/typescript/lib/typescript.js';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root = dirname(fileURLToPath(import.meta.url)), base = resolve(root, 'fixture');
+const config = ts.readConfigFile(resolve(base, 'tsconfig.json'), ts.sys.readFile);
+if (config.error) throw new Error(ts.flattenDiagnosticMessageText(config.error.messageText, '\n'));
+const options = ts.parseJsonConfigFileContent(config.config, ts.sys, base).options;
+const program = ts.createProgram(['tests/material-defines-serialization.test.ts', 'tests/material-defines-wgsl-order.test.ts'].map(path => resolve(base, path)), { ...options, noEmit: true });
+const errors = ts.getPreEmitDiagnostics(program);
+console.log(ts.formatDiagnostics(errors, { getCurrentDirectory: () => base, getCanonicalFileName: path => path, getNewLine: () => '\n' }));
+console.log(JSON.stringify({ files: program.getSourceFiles().length, errors: errors.length, scope: 'Current actual fixture closure and merged vendor declarations; JS owner behavior is execution-tested separately.' }));
+process.exitCode = errors.length ? 1 : 0;
