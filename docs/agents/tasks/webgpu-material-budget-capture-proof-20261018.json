@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-material-budget-capture-proof-20261018",
+  "title": "KEY-31: doložit pořadí prvního zachycení material light budgetu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/material-budget-capture-proof-20261018/",
+    "docs/agents/handoffs/webgpu-material-budget-capture-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze bounded CPU proof nad frozen V4 a fyzickými pinned dependencies. Žádná runtime oprava, nový profiler/cache nebo změna hraných buildů.",
+    "Navázat na existující skutečný tiny-glTF/delayed-onReady fixture. Jeden vlastní PBR vytvořený během loadu porovnat při zachycení baseline před globální inflací a při odloženém prvním zachycení po ní. Použít skutečný loader, Scene observer pořadí a GltfLightBudget; ne přepsanou imitaci globálního setteru.",
+    "Zvlášť zkoumat známý baseline4 před preparation readiness a po prepareFrame; zachovat explicitní fixed deklarace. Pokud lze actual Effect/defines/render doložit malou scénou, ověřit skutečnou kompilaci/reuse, nikoli pouze číselný cap. Pokud nelze, ponechat hranici výslovnou.",
+    "Vysvětlit co je prokázaný mechanismus, reprodukovaná možnost a co nelze přiřadit produkčním timingům. V3 cap42 materiály byly disabled/active0, photographic grass draws0 ve všech gameplay vzorcích a bez shadow/depth caster; samotný histogram není výkonová příčina."
+  ],
+  "verification": [
+    "Zdrojová východiska: glTFLoader.pure.js412–426 globální max(cap,scene.lights.length) před awaited extension/READY; scene.pure.js2779 odložený onNewMaterialAdded; photo-grass-resources100–105 vlastní PBR; GltfLightBudget.initialDeclaration343 fixed klasifikace42.",
+    "Přímý node/tsx TSX_DISABLE_CACHE=1, malé skutečné GLB, omezené await/deadlines, cleanup loader extension/observers/resources i při selhání. Žádný fullworld/velkýasset/fullsuite/build/integration/GPU/install.",
+    "Source/probe/output/log SHA, explicitní event order a omezení, cílený refaktoring fixture. Handoff/release bez commitu; případnou opravu rozhodne root z důkazů."
+  ],
+  "notes": [
+    "Přímé root zadání přes existující BMAD, žádný rekurzivní workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow; owner webgpu-budget-capture-01a14497.",
+    "Readonly sources: frozen inactive-light-v4 bf28a56507b6b0650d214169c8cf94aa3b2d8abc4012a8b098e4e1366340c8c0, aktuální tests/gltf-light-budget.test.ts a jeho pinned imports. QA dependencies nikdy nepsat; vlastní prefix pro každou odvozenou fixture.",
+    "HistogramV3control2 cap4×216/cap42×2/unavailable45; V4pilot2 cap4×218/unavailable45. Dvě cap42 jsou photographic leaves shared flat/bent PBR, nikoli aktivní CC0 stromové materiály. Čas prvního capture není v raw; neopakovat hypotézu jako naměřenou příčinu startupu."
+  ]
+}
