@@ -1,0 +1,43 @@
+✔ actual MaterialDefines distribution canonicalizes complete literal blocks without a new public API (2.8123ms)
+✔ actual serializer preserves complete unknown blocks and reserved names byte for byte (0.515ms)
+✔ actual serializer caps chars and define rows exactly (1.3913ms)
+✔ actual clone/equality/reset and mutable key order remain untouched (0.5914ms)
+✔ actual getter order, receiver, original throws and later unsafe mutation stay observable (0.7959ms)
+✔ flat-result contract does not claim to reject every multiline property by origin (0.7621ms)
+node:fs:622
+  return binding.open(
+                 ^
+
+Error: EEXIST: file already exists, open 'C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\define-serializer-qa-20261018\regression-records-source.json'
+    at Object.openSync (node:fs:622:18)
+    at Object.writeFileSync (node:fs:2497:35)
+    at load (file:///C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow/.cache/webgpu-migration-checks/define-serializer-qa-20261018/variant-loader.mjs:12:233)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at loadWithHooks (node:internal/modules/customization_hooks:374:18)
+    at #loadSync (node:internal/modules/esm/loader:825:16)
+    at ModuleLoader.load (node:internal/modules/esm/loader:783:26)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:494:31)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:560:36)
+    at afterResolve (node:internal/modules/esm/loader:607:52) {
+  errno: -4075,
+  code: 'EEXIST',
+  syscall: 'open',
+  path: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\define-serializer-qa-20261018\\regression-records-source.json'
+}
+
+Node.js v24.19.0
+✖ tests\material-defines-wgsl-order.test.ts (262.4523ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 563.9802
+
+✖ failing tests:
+
+test at tests\material-defines-wgsl-order.test.ts:1:1
+✖ tests\material-defines-wgsl-order.test.ts (262.4523ms)
+  'test failed'

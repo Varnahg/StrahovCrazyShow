@@ -1,0 +1,207 @@
+diff --git a/PostProcesses/imageProcessingPostProcess.js b/PostProcesses/imageProcessingPostProcess.js
+index c514ea1a28f4d9381e5b745a8c8398a76d494760..1aef6cc0de3973ee9594ccf0c0538808901c82f3 100644
+--- a/PostProcesses/imageProcessingPostProcess.js
++++ b/PostProcesses/imageProcessingPostProcess.js
+@@ -338,11 +338,15 @@ let ImageProcessingPostProcess = (() => {
+                     ...options,
+                     blockCompilation: true,
+                 };
++                const suppliedEffectWrapper = localOptions.effectWrapper;
++                const ownedEffectWrapper = suppliedEffectWrapper == null ? new ThinImageProcessingPostProcess(name, engine, localOptions) : null;
+                 super(name, ThinImageProcessingPostProcess.FragmentUrl, {
+-                    effectWrapper: typeof options === "number" || !options.effectWrapper ? new ThinImageProcessingPostProcess(name, engine, localOptions) : undefined,
+                     ...localOptions,
++                    // Keep the resolved wrapper after the spread, including explicit undefined options.
++                    effectWrapper: suppliedEffectWrapper ?? ownedEffectWrapper,
+                 });
+                 __runInitializers(this, _instanceExtraInitializers);
++                this._ownedImageProcessingWrapper = ownedEffectWrapper;
+                 // Applied here (not just inside ThinImageProcessingPostProcess's own constructor) so that `temperature`/
+                 // `tint` are honored even when a caller supplies their own pre-built `effectWrapper`, in which case the
+                 // thin wrapper above is never constructed and its own application of these options never runs.
+@@ -365,9 +369,15 @@ let ImageProcessingPostProcess = (() => {
+                 this._effectWrapper._updateParameters();
+             }
+             dispose(camera) {
+-                super.dispose(camera);
+-                if (this._imageProcessingConfiguration) {
+-                    this.imageProcessingConfiguration.applyByPostProcess = false;
++                const ownedEffectWrapper = this._ownedImageProcessingWrapper;
++                this._ownedImageProcessingWrapper = null;
++                try {
++                    // Only this constructor's wrapper owns its configuration cleanup.
++                    ownedEffectWrapper?.dispose();
++                }
++                finally {
++                    // Every camera still needs base teardown, also on repeated/reentrant calls.
++                    super.dispose(camera);
+                 }
+             }
+         },
+diff --git a/PostProcesses/postProcess.pure.js b/PostProcesses/postProcess.pure.js
+index c1a7836d3fa0752b5af76534049d23f63080d88a..52afa346cb94cd6d1309ac5c2742d089d83ce9d3 100644
+--- a/PostProcesses/postProcess.pure.js
++++ b/PostProcesses/postProcess.pure.js
+@@ -822,7 +822,11 @@ let PostProcess = (() => {
+                 this.onApplyObservable.clear();
+                 this.onBeforeRenderObservable.clear();
+                 this.onSizeChangedObservable.clear();
+-                this.onEffectCreatedObservable.clear();
++                // This observable aliases the wrapper's event source. A supplied wrapper
++                // and its subscribers belong to the caller, possibly shared by other passes.
++                if (!this._useExistingThinPostProcess) {
++                    this.onEffectCreatedObservable.clear();
++                }
+             }
+             /**
+              * Serializes the post process to a JSON object
+diff --git a/Materials/shadowDepthWrapper.js b/Materials/shadowDepthWrapper.js
+--- a/Materials/shadowDepthWrapper.js
++++ b/Materials/shadowDepthWrapper.js
+@@ -175,8 +175,13 @@ export class ShadowDepthWrapper {
+         }
+         if (!this.doNotInjectCode) {
+             // Declare the shadow map includes
+-            const vertexNormalBiasCode = this._options && this._options.remappedVariables
+-                ? `#include<shadowMapVertexNormalBias>(${this._options.remappedVariables.join(",")})`
++            // Native material varyings are qualified; explicit normal remaps still win.
++            const normalBiasRemapping = origEffect.shaderLanguage === 1 /* ShaderLanguage.WGSL */ &&
++                !this._options?.remappedVariables?.some((name, index) => index % 2 === 0 && name === "vNormalW")
++                ? [...(this._options?.remappedVariables ?? []), "vNormalW", "vertexOutputs.vNormalW"]
++                : this._options?.remappedVariables;
++            const vertexNormalBiasCode = normalBiasRemapping
++                ? `#include<shadowMapVertexNormalBias>(${normalBiasRemapping.join(",")})`
+                 : `#include<shadowMapVertexNormalBias>`, vertexMetricCode = this._options && this._options.remappedVariables
+                 ? `#include<shadowMapVertexMetric>(${this._options.remappedVariables.join(",")})`
+                 : `#include<shadowMapVertexMetric>`, fragmentSoftTransparentShadow = this._options && this._options.remappedVariables
+@@ -207,7 +212,12 @@ export class ShadowDepthWrapper {
+             else {
+                 fragmentCode = fragmentCode.replace(/#define SHADOWDEPTH_SOFTTRANSPARENTSHADOW|#define CUSTOM_FRAGMENT_BEFORE_FOG/g, fragmentSoftTransparentShadow);
+             }
+-            fragmentCode = fragmentCode.replace(/void\s+?main/g, Effect.IncludesShadersStore["shadowMapFragmentExtraDeclaration"] + "\nvoid main");
++            if (origEffect.shaderLanguage === 1 /* ShaderLanguage.WGSL */) {
++                fragmentCode = fragmentCode.replace(/@fragment/g, "#include<shadowMapFragmentExtraDeclaration>\n@fragment");
++            }
++            else {
++                fragmentCode = fragmentCode.replace(/void\s+?main/g, Effect.IncludesShadersStore["shadowMapFragmentExtraDeclaration"] + "\nvoid main");
++            }
+             if (hasLocationForFragment) {
+                 fragmentCode = fragmentCode.replace(/#define SHADOWDEPTH_FRAGMENT/g, fragmentBlockCode);
+             }
+diff --git a/Materials/imageProcessingConfiguration.pure.js b/Materials/imageProcessingConfiguration.pure.js
+index 13847e9..a87ae64 100644
+--- a/Materials/imageProcessingConfiguration.pure.js
++++ b/Materials/imageProcessingConfiguration.pure.js
+@@ -263,8 +263,10 @@ let ImageProcessingConfiguration = (() => {
+                 if (this._exposure === value) {
+                     return;
+                 }
++                // Exposure is a uniform while its enabled shader variant stays unchanged.
++                const valueOnly = (this._exposure !== 1.0) === (value !== 1.0);
+                 this._exposure = value;
+-                this._updateParameters();
++                this._updateParameters(valueOnly);
+             }
+             /**
+              * Gets whether the tone mapping effect is enabled.
+@@ -538,8 +540,19 @@ let ImageProcessingConfiguration = (() => {
+             /**
+              * Method called each time the image processing information changes requires to recompile the effect.
+              */
+-            _updateParameters() {
+-                this.onUpdateParameters.notifyObservers(this);
++            _updateParameters(exposureValueOnly = false) {
++                // Tag this dispatch, not the configuration: a direct nested notification
++                // must remain a full update. Observables reuse EventState during nesting.
++                const state = this.onUpdateParameters._eventState;
++                const previousUserInfo = state.userInfo;
++                const marker = exposureValueOnly ? (this._exposureValueUpdate ??= {}) : undefined;
++                try {
++                    this.onUpdateParameters.notifyObservers(this, -1, undefined, undefined, marker);
++                }
++                finally {
++                    // Preserve the enclosing dispatch also when an observer throws.
++                    state.userInfo = previousUserInfo;
++                }
+             }
+             /**
+              * Gets the current class name.
+diff --git a/Materials/imageProcessing.js b/Materials/imageProcessing.js
+index 49ba489..d89076d 100644
+--- a/Materials/imageProcessing.js
++++ b/Materials/imageProcessing.js
+@@ -63,7 +63,12 @@ export function ImageProcessingMixin(base) {
+             }
+             // Attaches observer
+             if (this._imageProcessingConfiguration) {
+-                this._imageProcessingObserver = this._imageProcessingConfiguration.onUpdateParameters.add(() => {
++                this._imageProcessingObserver = this._imageProcessingConfiguration.onUpdateParameters.add((_configuration, state) => {
++                    // Keep all notifications (notably bloom exposure), but do not scan
++                    // every scene submesh for a value-only exposure uniform change.
++                    if (state.userInfo && state.userInfo === this._imageProcessingConfiguration._exposureValueUpdate) {
++                        return;
++                    }
+                     // Ensure the effect will be rebuilt.
+                     if (this._markAllSubMeshesAsImageProcessingDirty) {
+                         this._markAllSubMeshesAsImageProcessingDirty();
+diff --git a/Materials/materialHelper.functions.js b/Materials/materialHelper.functions.js
+--- a/Materials/materialHelper.functions.js
++++ b/Materials/materialHelper.functions.js
+@@ -673,6 +673,9 @@
+     for (let index = lightIndex; index < maxLightCount; index++) {
+         if (defines["LIGHT" + index] !== undefined) {
+             defines["LIGHT" + index] = false;
++            defines["LIGHT_FALLOFF_PHYSICAL" + index] = false;
++            defines["LIGHT_FALLOFF_GLTF" + index] = false;
++            defines["LIGHT_FALLOFF_STANDARD" + index] = false;
+             defines["HEMILIGHT" + index] = false;
+             defines["POINTLIGHT" + index] = false;
+             defines["DIRLIGHT" + index] = false;
+diff --git a/Materials/materialDefines.js b/Materials/materialDefines.js
+index 265bd1e..c482f2f 100644
+--- a/Materials/materialDefines.js
++++ b/Materials/materialDefines.js
+@@ -229,7 +229,41 @@ export class MaterialDefines {
+                     break;
+             }
+         }
+-        return result;
++        return canonicalResult(result);
+     }
+ }
++// Project QA: bounded flat-literal serialization only. Custom order-sensitive
++// processors are outside the verified contract; no universal API guarantee.
++/** Project QA candidate derived from the accepted isolated CPU proof.
++ * Input contract: a completed flat literal define block, not arbitrary shader
++ * preprocessor text. No property reads, _keys changes or persistent cache.
++ */
++const MAX_CHARS = 32768;
++const MAX_DEFINES = 1024;
++// Signed decimal constants cover native -1 indices and PBR numeric strings.
++// Hex/suffixes/expressions are deliberately outside this proof's contract.
++const literal = '[+-]?(?:(?:0|[1-9][0-9]*)(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?';
++const linePattern = new RegExp(`^#define ([A-Za-z_][A-Za-z0-9_]*)(?: (${literal}))?$`);
++const reserved = new Set(['defined', 'true', 'false', 'WEBGPU', 'WEBGL1', 'WEBGL2', 'NATIVE', 'IS_NDC_HALF_ZRANGE', 'USE_REVERSE_DEPTHBUFFER', 'USE_EXACT_SRGB_CONVERSIONS', ...Object.getOwnPropertyNames(Object.prototype)]);
++function canonicalResult(text) {
++    if (!text || text.length > MAX_CHARS || !text.endsWith('\n') || /[^\x20-\x7e\n]/.test(text))
++        return text;
++    const lines = text.slice(0, -1).split('\n');
++    if (lines.length > MAX_DEFINES)
++        return text;
++    const seen = new Set();
++    const records = [];
++    for (const line of lines) {
++        const match = linePattern.exec(line);
++        if (!match)
++            return text;
++        const [, name, value] = match;
++        if (name.includes('__') || name.startsWith('GL_') || reserved.has(name) || seen.has(name) || value !== undefined && !Number.isFinite(Number(value)))
++            return text;
++        seen.add(name);
++        records.push({ name, line });
++    }
++    records.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
++    return records.map(record => record.line).join('\n') + '\n';
++}
+ //# sourceMappingURL=materialDefines.js.map
+\ No newline at end of file

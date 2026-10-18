@@ -232,3 +232,8 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## Day13 experiment dokončen, runtime odložen
 
 18.10 hitches-v22: manifestc989fc77778c484cbdf53d3f7bcb717837ece01ab18b8b4812069924a7f1eec7, snapshotb9d812…b513f,63artefaktů.74/80/1338tests a build/integrationPASS, dvěGPUsekvenceF~150ms místo5–6s. Startup+2.9/+6.3s všakregredoval, Day~200ms; nativeGame se nemění. TaskQAuzavřen jakoexperiment, nikoli přijetí migrace. Všechno vlastníGPU/serveryukončené, kartaaboutblank. Dalšívýzkum mázlevnitcelou přípravu podlewarmCPUproofu a pakzopakovatstartup/interakce; žádnácachedefaultvybraná.
+
+
+## Pure serializer A/B/C uzavřen negativně
+
+18.10 hitches-v23, manifestf3ca7d…2197,208artefaktů. Differential6/warm9×5/classWGSL3×18/TS3172-0,reviewbez nálezů. ToString−3–5% nepřineslwhole-renderbenefit, proto žádnýnovýpatch/build. Read-only širšísloty/scheduler varianty uložené s limity. Nový webgpu-define-memo-proof-20261018 má vlastníprefix a explicitnítestowner; ne productioncache, nezměnit engineownershipbez samostatnévolby.

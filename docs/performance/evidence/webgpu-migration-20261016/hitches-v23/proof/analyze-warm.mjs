@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+const read=p=>JSON.parse(fs.readFileSync(new URL(p,import.meta.url),'utf8'));
+const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
+const stats=xs=>{const a=[...xs].sort((a,b)=>a-b),i=a.length>>1;return{n:a.length,min:a[0],median:a.length%2?a[i]:(a[i-1]+a[i])/2,max:a.at(-1)};};
+const runData=read('warm-runs.json').runs.map(run=>({...run,data:read(run.report)})),baseline=runData[0].data.cases;
+const summarize=rows=>{const frames=rows.flatMap(row=>row.frames.filter(f=>f.switched));return{samples:frames.length,serializer:stats(frames.map(f=>f.metrics.samples.serializerInclusive.totalMs)),readiness:stats(frames.map(f=>f.metrics.samples.materialReadyInclusive.totalMs)),render:stats(frames.map(f=>f.cpu.syncMs)),unchangedRender:stats(rows.flatMap(row=>row.frames.filter(f=>!f.switched).map(f=>f.cpu.syncMs))),cacheCalls:[...new Set(frames.map(f=>f.metrics.counts.cacheHits))],newPrograms:[...new Set(frames.map(f=>f.newPrograms))]};};
+const summary={scope:'Node/NullEngine warm actual material comparison, 36submeshes per frame; inclusive metrics, no GPU/production extrapolation',variants:{},crossVariantInvariantEquality:[]};
+for(const run of runData){assert.equal(run.status,0);for(const row of run.data.cases.filter(c=>!c.fail)){const expected=baseline.find(c=>c.kind===row.kind&&!c.fail);assert.deepEqual(row.variantSnapshots,expected.variantSnapshots,run.run+' '+row.kind+' fulldefines/Effect/shader/layout/uniforms');assert.deepEqual(row.pluginUniformData,expected.pluginUniformData);assert.ok(row.cleanup.allEffectsDisposed&&row.cleanup.contextsDisposed);assert.equal(row.genuineValue.newPrograms,1);summary.crossVariantInvariantEquality.push({run:run.run,variant:run.variant,kind:row.kind,fullSnapshotSha256:hash(row.variantSnapshots),sameAsRecords:true,cleanup:row.cleanup});}}
+for(const variant of ['records','lines','indexed'])summary.variants[variant]=Object.fromEntries(['pbr','standard','surface'].map(kind=>{const runs=runData.filter(r=>r.variant===variant),rows=runs.map(r=>r.data.cases.find(c=>c.kind===kind&&!c.fail));return[kind,{...summarize(rows),perRun:rows.map((row,i)=>({run:runs[i].run,...summarize([row])}))}];}));
+fs.writeFileSync(new URL('warm-summary.json',import.meta.url),JSON.stringify(summary,null,2)+'\n');
+console.log(JSON.stringify(Object.fromEntries(Object.entries(summary.variants).map(([variant,kinds])=>[variant,Object.fromEntries(Object.entries(kinds).map(([kind,data])=>[kind,{serializer:data.serializer.median,ready:data.readiness.median,render:data.render.median,perRun:data.perRun.map(r=>({run:r.run,serializer:r.serializer.median,render:r.render.median}))}]))])),null,2));
