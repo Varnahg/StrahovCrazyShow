@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-image-processing-user-build-20261018",
+  "title": "Předat neměnný build s přijatou opravou neaktivních shaderových příznaků",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-image-processing-user-build-20261018/",
+    "docs/agents/handoffs/webgpu-image-processing-user-build-20261018.md"
+  ],
+  "resources": [
+    "port:4199",
+    "port:2594"
+  ],
+  "acceptance": [
+    "Samostatný neměnný source/test snapshot3d405db9 a ověřený dist; native runtime main6a7f7554, native1446/combined1506 a oba build/integrace PASS.",
+    "Vlastní skryté služby4199/2594, běžné počasí, bez HMR a nových copied profilerů. Původní hrané4198 a starší verze neměnit.",
+    "Pravdivě popsat přijatý dílčí posun a zbývající záseky; combined kontrola0programů/2pipeline/max202.5ms není přejímka celé migrace."
+  ],
+  "verification": [
+    "Source/dist hash, HTTPhealth, vlastní PID/start/path a skutečný Edge vstup/obraz/ready/cleanup. GPU a heavy práci koordinuje root.",
+    "Dist a packages po předání nerebuildovat; další změny dostanou nový snapshot. Držet rezervaci po celou dobu běhu vlastních služeb."
+  ],
+  "notes": [
+    "Root koordinátor; porty4199/2594 byly při předchozí čtecí kontrole volné, znovu ověřit před startem.",
+    "A1/B1/A2 čisté opravy:5/0/5programů,12/2/12sync,max573/171.8/582.3ms, stále4intervaly nad100ms. Hraný combined má samostatný výsledek, ne stejnou garanciFPS.",
+    "4199/2594 běží nad immutable3d405db9. Source598/dist17 hashes verified; actual Edge ready/image/health/dispose,0errors. Window background interval excluded from performance claims; final smoke764x325 onlyhealth. Separate controlled combineddrive0program/2sync/max202.5ms,4>100ms remain. Evidence docs/performance/evidence/webgpu-migration-20261016/image-processing-user-build-4199/README.md. Keep claim while services live; oldbuilds unchanged."
+  ]
+}

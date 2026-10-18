@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdirSync,existsSync,readdirSync,realpathSync,symlinkSync} from 'node:fs';
+import {join,dirname,resolve} from 'node:path';
+import {createHash} from 'node:crypto';
+const root=import.meta.dirname,repo=resolve(root,'../..'),from=join(repo,'.cache/webgpu-hitch-validation-20261017/image-processing-combined-v2'),out=join(root,'snapshot'),sha=b=>createHash('sha256').update(b).digest('hex');
+const manifest=JSON.parse(readFileSync(join(from,'source-manifest.json'))),validation=JSON.parse(readFileSync(join(from,'../image-processing-combined-v2-validation.json')));
+assert.match(process.argv[2]??'',/^[a-f0-9]{64}$/);assert.equal(manifest.snapshotId,process.argv[2]);assert.equal(sha(JSON.stringify(manifest.files)),manifest.snapshotId);assert.equal(validation.snapshotId,manifest.snapshotId);assert.ok(validation.sharedMetadataUnchanged);assert.deepEqual(validation.results.map(r=>r.phase).sort(),['build','integration','test']);for(const r of validation.results){assert.equal(r.exitCode,0);assert.equal(sha(readFileSync(r.log)),r.sha256);}assert.ok(!existsSync(out));mkdirSync(out);
+for(const[p,hash]of Object.entries(manifest.files)){const b=readFileSync(join(from,p));assert.equal(sha(b),hash);mkdirSync(dirname(join(out,p)),{recursive:true});writeFileSync(join(out,p),b);}writeFileSync(join(out,'source-manifest.json'),readFileSync(join(from,'source-manifest.json')));
+// Reuse only the completed immutable distribution and frozen packages. This
+// snapshot is never rebuilt; new changes receive a new snapshot and dist.
+for(const top of ['assets','public','docs','node_modules','dist'])symlinkSync(realpathSync(join(from,top)),join(out,top),'junction');
+const deliveredCode={};function record(dir,prefix){for(const e of readdirSync(dir,{withFileTypes:true})){const p=join(dir,e.name),key=prefix+e.name;if(e.isDirectory())record(p,key+'/');else deliveredCode[key]=sha(readFileSync(p));}}record(join(out,'dist/assets'),'assets/');deliveredCode['index.html']=sha(readFileSync(join(out,'dist/index.html')));
+writeFileSync(join(root,'build-identity.json'),JSON.stringify({snapshotId:manifest.snapshotId,source:from,ownSnapshot:out,validation,dist:realpathSync(join(out,'dist')),deliveredCode,scope:'Frozen complete combined source/tests with integrated inactive ImageProcessing fix and existing authored/grass preparation; original gameplay lighting retained. Immutable dist/packages reused read-only; own API/runtime diagnostics. Normal weather and production API.'},null,2)+'\n');console.log(JSON.stringify({snapshotId:manifest.snapshotId,sourceFiles:Object.keys(manifest.files).length,deliveredCodeFiles:Object.keys(deliveredCode).length}));
