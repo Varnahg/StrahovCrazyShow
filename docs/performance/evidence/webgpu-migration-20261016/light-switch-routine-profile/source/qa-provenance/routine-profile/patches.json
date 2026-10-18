@@ -1,0 +1,82 @@
+[
+  {
+    "path": "client/game.ts",
+    "before": "import { snapshotBenchmarkDiagnostics }",
+    "after": "import { createMaterialRoutineProfile, type RoutineCallProfile } from \"./qa-routine-profile\";\nimport { snapshotBenchmarkDiagnostics }"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "    lightSwitch?: {\n      meshDraw?: MeshDrawProfile;",
+    "after": "    lightSwitch?: {\n      routines?: RoutineCallProfile;\n      routineCleanup?: ReturnType<RoutineCallProfile[\"dispose\"]>;\n      meshDraw?: MeshDrawProfile;"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "      try { state.meshDraw = new MeshDrawProfile(this.scene); }",
+    "after": "      try { state.meshDraw = new MeshDrawProfile(this.scene); state.routines = createMaterialRoutineProfile(); }"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "  private stopLightSwitchProfile(",
+    "after": "  private stopRoutineProfile(state: NonNullable<NonNullable<Game[\"benchmark\"]>[\"lightSwitch\"]>) {\n    const routines = state.routines;\n    state.routines = undefined;\n    try { if (routines) state.routineCleanup = routines.dispose(); } catch { state.errors++; }\n  }\n  private stopLightSwitchProfile("
+  },
+  {
+    "path": "client/game.ts",
+    "before": "    state.closed = true;\n    state.sample = undefined;",
+    "after": "    state.closed = true;\n    this.stopRoutineProfile(state);\n    state.sample = undefined;"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "        limit: 8, scope: MESH_DRAW_PROFILE_SCOPE,",
+    "after": "        limit: 8, scope: MESH_DRAW_PROFILE_SCOPE, routineCleanup: state.routineCleanup,"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "      state.meshDraw!.beginFrame(reason);",
+    "after": "      state.meshDraw!.beginFrame(reason);\n      state.routines!.beginFrame();"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "      const timing = state.meshDraw!.endFrame();",
+    "after": "      const callTiming = state.routines!.endFrame();\n      const timing = state.meshDraw!.endFrame();"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "          rendererId: this.renderHealth.rendererId, ...sample, timing,",
+    "after": "          rendererId: this.renderHealth.rendererId, ...sample, timing, callTiming,"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "      if (state.attempts === 8) {\n        const profile = state.meshDraw;",
+    "after": "      if (state.attempts === 8) {\n        this.stopRoutineProfile(state);\n        const profile = state.meshDraw;"
+  },
+  {
+    "path": "tests/game-light-switch-profile.test.ts",
+    "before": "import test, {type TestContext}",
+    "after": "import { createMaterialRoutineProfile } from \"../client/qa-routine-profile\";\nimport test, {type TestContext}"
+  },
+  {
+    "path": "tests/game-light-switch-profile.test.ts",
+    "before": "  const noop=()=>{},disposable=()=>({dispose:noop});",
+    "after": "  const routineProfiles:ReturnType<typeof createMaterialRoutineProfile>[]=[];\n  const noop=()=>{},disposable=()=>({dispose:noop});"
+  },
+  {
+    "path": "tests/game-light-switch-profile.test.ts",
+    "before": "  const globals={performance:",
+    "after": "  const globals={createMaterialRoutineProfile:()=>{const p=createMaterialRoutineProfile();routineProfiles.push(p);return p;},performance:"
+  },
+  {
+    "path": "tests/game-light-switch-profile.test.ts",
+    "before": "const methods=[\"startBenchmark\",",
+    "after": "const methods=[\"stopRoutineProfile\",\"startBenchmark\","
+  },
+  {
+    "path": "tests/game-light-switch-profile.test.ts",
+    "before": "  return {game,scene,mesh,material,point,profiles,events,order,baseline,",
+    "after": "  return {game,scene,mesh,material,point,profiles,routineProfiles,events,order,baseline,"
+  },
+  {
+    "path": "tests/game-light-switch-profile.test.ts",
+    "before": "assert.equal(sample.data.timing.topSources.length,8);assert.ok(",
+    "after": "assert.equal(sample.data.timing.topSources.length,8);assert.equal(sample.data.callTiming.rows.length,8);assert.ok("
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-routine-profile-20261019",
+  "title": "KEY-31: změřit vlastní CPU cenu konkrétních materiálových rutin",
+  "status": "done",
+  "dependsOn": ["webgpu-cpu-profile-20261018"],
+  "writePaths": [
+    ".cache/webgpu-routine-profile-20261019/",
+    "docs/agents/handoffs/webgpu-routine-profile-20261019.md",
+    "docs/performance/evidence/webgpu-migration-20261016/light-switch-routine-profile/",
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/webgpu-routine-profile-20261019/"
+  ],
+  "resources": ["heavy-validation", "gpu", "workspace-build", "port:4200", "port:2595"],
+  "acceptance": [
+    "Izolovaný copied native26878bbf s existujícím max8 MeshDraw profilem; žádný JS sampler/policy ani změna main, cizíhoWIP nebo hranýchbuildů.",
+    "Časovat pouze8 konkrétních rutin potvrzených předchozími stacky. Výslovnýbenchmark vlastní wrappers, aktivníhodiny pouze v dosavadních max8sampleframes. Po konci/faultu/dispose plná přesná obnova descriptorů.",
+    "Zaznamenat calls/inclusive/selfSelectedCpuMs, selected-child subtraction, clock/depth/restore errors a přiznanou režii; žádné dvojité sčítání parent/child času a žádný GPU-time claim.",
+    "Zdrojové/Game lifecycle regrese, relevantní refaktoring, fullTS/build a jediný skutečný controlled Edge capture. Výsledek určí další opravovaný mechanismus, samotnédiagnostickéFPS nejsou zlepšení."
+  ],
+  "verification": ["Přesné source/test manifesty a Gameinverse, cílenétesty, fullTS/build, chráněný4199SHApřed/po; vlastní4200/2595ukončit po sběru.", "Samostatný commit evidence a integrace do main bez133cizíchcest, průběžnýLinear KEY-31. Plná migrace zůstává otevřená."],
+  "notes": ["Předchozí637samples source52abcad6 potvrzují PBR/define/cachebind/UBO cestu, ale199sub8msgaps znemožňují převod countsnačas. Nyní je konkrétní chybějícíotázka selfCPU vybranýchrutin, nikoli dalšíobecnýprofiler.", "Base26878bbf v původníreadonlyQAkopii; taskhelper má disjunktnícache/handoff a lehkétesty. Rootkoordinujeheavy/GPU/porty a vlastníGamezapojení."]
+}
