@@ -2,8 +2,11 @@
   "schemaVersion": 1,
   "id": "webgpu-define-serializer-qa-20261018",
   "title": "KEY-31: změřit a zlevnit čistou serializaci defines",
-  "status": "ready",
-  "dependsOn": ["webgpu-material-switch-cost-proof-20261018", "webgpu-native-day-coverage-qa-20261018"],
+  "status": "done",
+  "dependsOn": [
+    "webgpu-material-switch-cost-proof-20261018",
+    "webgpu-native-day-coverage-qa-20261018"
+  ],
   "writePaths": [
     ".cache/webgpu-migration-checks/define-serializer-qa-20261018/",
     "docs/agents/handoffs/webgpu-define-serializer-qa-20261018.md"
@@ -27,6 +30,7 @@
     "Přímý podúkol pokračujícího projektového BMAD, bez rekurzivního workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, owner webgpu-serializer-qa-01a14497. NačístAGENTS/policy/task a stav/worktrees/registry.",
     "Current native patch21114f6048abdcba932a8640adf1a97b6281939d99ae6d53fbfe96ef76bf0503, lock03d4edcd8f9d92fa7b6b320f5600709dd62612a5bad7867cef61875e7ecd8b53, actual core materialDefines43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4. Přijatý warmproof V2manifest7a25099dad279c07ef5cf203004802438fe657db392bb209a7dc1a91ec1dda23, frozen traces/raw05–07 bezezměny.",
     "Day13 b9d812d3262ec6e781b6d268b4ca0fec108ab0b32591dbfba83a70d0578b513f je immutable root GPUbaseline: F~150ms, Day~200ms, startup36–38s. Jeho příprava13etap/30s/readiness se touto prací nemění. Hraná4193 zůstane úplně stejná.",
-    "Primary standard: https://tc39.es/ecma262/2025/multipage/indexed-collections.html#sec-comparearrayelements a https://tc39.es/ecma262/2025/multipage/abstract-operations.html#sec-islessthan. Spec popisuje řazení, nikoli rychlost V8. Custom order-sensitive hooks z původního proofu zůstávají nepodporovaná větev; optimalizace nesmí měnit současný smluvený výstup."
+    "Primary standard: https://tc39.es/ecma262/2025/multipage/indexed-collections.html#sec-comparearrayelements a https://tc39.es/ecma262/2025/multipage/abstract-operations.html#sec-islessthan. Spec popisuje řazení, nikoli rychlost V8. Custom order-sensitive hooks z původního proofu zůstávají nepodporovaná větev; optimalizace nesmí měnit současný smluvený výstup.",
+    "Root přijal dokončený negativní experiment po nezávislém review []: manifestf3ca7da09c745b34511097c5126d08c33e0a5b6619dafda28ae1ff6641b62197,202artefaktů,6differential/9x5warm/3x18regresí/TS3172-0. Pure varianty nezlepšily celý render; selectedVariant:null, žádný patch/lock/dependency copy. Navazuje samostatný explicit-owner memo proof, nikoli produkční cache."
   ]
 }

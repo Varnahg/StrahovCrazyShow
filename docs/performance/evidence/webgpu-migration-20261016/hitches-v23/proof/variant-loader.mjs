@@ -1,0 +1,12 @@
+import { registerHooks } from 'node:module';
+import fs from 'node:fs';
+import { createHash } from 'node:crypto';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import assert from 'node:assert/strict';
+const root=dirname(fileURLToPath(import.meta.url)),variant=process.env.SERIALIZER_VARIANT;
+assert.ok(['records','lines','indexed'].includes(variant));
+const hash=s=>createHash('sha256').update(s).digest('hex'),inputs=JSON.parse(fs.readFileSync(resolve(root,'proof-inputs.json')));
+const target=pathToFileURL(fs.realpathSync(resolve(root,'baseline/node_modules/@babylonjs/core/Materials/materialDefines.js'))).href;
+const replacement=fs.readFileSync(resolve(root,'variants',variant+'.js'),'utf8');assert.equal(hash(replacement),inputs.variants[variant].runtimeSha256);
+registerHooks({load(url,context,nextLoad){const result=nextLoad(url,context);if(url!==target)return result;const original=String(result.source);assert.equal(hash(original),inputs.originalSha256);if(process.env.SERIALIZER_RECEIPT)fs.writeFileSync(resolve(root,process.env.SERIALIZER_RECEIPT),JSON.stringify({createdAt:new Date().toISOString(),variant,target,physicalInputSha256:hash(original),loadedRuntimeSha256:hash(replacement),scope:'test-only module source selection, no physical dependency writes/prototype wrapper/helper exports',classIdentity:'one unchanged physical core/loaders resolution per process'},null,2)+'\n',{flag:'wx'});return{...result,source:replacement};}});

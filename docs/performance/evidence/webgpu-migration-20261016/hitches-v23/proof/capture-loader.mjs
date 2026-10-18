@@ -1,0 +1,11 @@
+import { registerHooks } from 'node:module';
+import fs from 'node:fs';
+import { createHash } from 'node:crypto';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { dirname, resolve } from 'node:path';
+import assert from 'node:assert/strict';
+const root=dirname(fileURLToPath(import.meta.url)),file=fs.realpathSync(resolve(root,'baseline/node_modules/@babylonjs/core/Materials/materialDefines.js')),target=pathToFileURL(file).href;
+const hash=s=>createHash('sha256').update(s).digest('hex'),entries=new Map();let calls=0,omitted=0,bytes=0,loadedSourceSha256=null,tappedSourceSha256=null;
+globalThis.__serializerRawCapture=text=>{calls++;const entry=entries.get(text);if(entry){entry.count++;return;}if(entries.size>=128||bytes+text.length*2>2*1024*1024){omitted++;return;}bytes+=text.length*2;entries.set(text,{count:1,sha256:hash(text),text});};
+registerHooks({load(url,context,nextLoad){const result=nextLoad(url,context);if(url!==target)return result;const source=String(result.source);assert.equal(hash(source),'43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4');const needle='function canonicalResult(text) {';assert.equal(source.split(needle).length,2);const tapped=source.replace(needle,()=>needle+'\n    globalThis.__serializerRawCapture(text);');loadedSourceSha256=hash(source);tappedSourceSha256=hash(tapped);return{...result,source:tapped};}});
+process.on('exit',()=>{if(!entries.size)return;fs.writeFileSync(resolve(root,'actual-raw-corpus.json'),JSON.stringify({createdAt:new Date().toISOString(),scope:'Separate untimed actual warm fixture pass; single tap at actual helper entry after unchanged original raw loop. Not a runtime cache or measured candidate.',target,loadedSourceSha256,tappedSourceSha256,tap:'globalThis.__serializerRawCapture(text);',calls,omitted,retainedBytesUtf16:bytes,unique:entries.size,records:[...entries.values()]},null,2)+'\n',{flag:'wx'});});

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-define-memo-proof-20261018",
+  "title": "KEY-31: ověřit omezené memo hotového define textu",
+  "status": "ready",
+  "dependsOn": ["webgpu-material-switch-cost-proof-20261018", "webgpu-define-serializer-qa-20261018"],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/define-memo-proof-20261018/",
+    "docs/agents/handoffs/webgpu-define-memo-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejdříve zaznamenat mechanismus a varianty včetně negativního pure A/B/C výsledku. Current A zůstává referencí: parser−3–5% nezlepšil celý warm render. Memo je nyní pouze izolovaný důkaz, žádná produkční cache, vendor patch/lock nebo native kandidát.",
+    "Explicitně vytvořený a vyčištěný testový owner s Map<string,string>. Původní actual MaterialDefines.toString loop musí vždy dokončit všechny reads/throws před lookupem přes celý exact raw string. Miss deleguje skutečnému současnému A canonicalizeru. Žádný hash-only klíč, isDirty/material/Effect identity nebo druhé čtení getterů.",
+    "Nejmenší proof memo ukládá pouze canonicalResult(raw)!==raw: tím vynechá unknown fallback i již seřazené validní bloky bez nového parseru. Empty/oversized vstupy bez cache; položku větší než celý budget neukládat a neeviktovat kvůli ní ostatní. Pevně omezit počet položek a součet key.length+value.length, např.64 a256Ki code units pro první experiment; nejde o určené optimum ani garantovaný fyzický heap limit.",
+    "První kandidát může mít FIFO bez hit mutation; porovnat režii a churn proti referenci, případně odůvodnit LRU jako oddělenou variantu. Testovat cold/warm/unique/miss-only/churn přes cap i near-limit bloky a clear/dispose. Žádné callbacky nebo user objects v entries; jen primitive stringy a číselné počítadlo. Při getter throw žádná částečná vnější entry; reentry a pozdější mutation zachovají výsledky/pořadí.",
+    "Zachytit omezenou skutečnou posloupnost raw přístupů, ne odvozovat hitrate z Effectcachehits. Homogenní9raw corpus z předchozího tasku není reprezentativní celéhry. Přidat promíchané actual baseline větve10plugin/regular/thin fixture a kontrolované unikátní/churn sekvence; jejich pořadí explicitně označit jako testové, nikoli produkční trace.",
+    "Actual PBR/Standard/CampusSurfaceArt warm řetězec s jednou fyzickou core/loaders identitou musí zachovat WGSL/defines/layout/forwarded uniforms/Effect IDs/refcount/events/reset, warm0novýchprogramů a genuine1. Měřit celý synchronní render i raw/helper/full scope a hit/miss/eviction/retained codeunits, v několika proložených samostatných procesech. Samotný vysoký hitrate neopravňuje přijetí.",
+    "Výslovně nevyřešené produkční ownership: projektová GPU cache pravidla vyžadují engine/device generation, MaterialDefines engine nezná. Testový explicit owner není automatické schválení modulové cross-scene cache. V reportu porovnat module lifetime bez engine refs, engine-owned adapter a per-Defines WeakMap; root rozhodne samostatně před případným produkčním experimentem. Nepoužívat LastCreatedEngine/Scene ani skryté globální engine odhady."
+  ],
+  "verification": [
+    "Původní source/current A i ostatní dependency bytes pouze readonly. Povolena test-only source loader/closure instrumentace ve vlastním prefixu s exact receipt; musí být jasné, že není shipping module. Žádný install/produkční patch/dependency změna/GPU/fullsuite/build.",
+    "Actual18class/WGSL/plugin/attribute testů a diferenciální corpus s prefix/numeric/reserved/unknown/limits, getters/throws/reentry/late mutation. Explicit owner clear mezi fixtures, dvě oddělené owners, žádné zachované engine/material/Effect/observer refs. Logický codeunit limit není heap záruka; nevydávat nulové resource count z NullEngine za GPU proof.",
+    "Cílený refaktoring proofu, scopedTS, všechny neúspěšné raw běhy zachovat. Před časováním potvrdit root CPU okno. Samostatný manifest/source/preimages/outputs/commands/logy/hash a handoff; bez commitu, ukončit procesy a release po předání. Pokud celý řetězec nepřinese prokazatelný přínos, negativní výsledek je platný."
+  ],
+  "notes": [
+    "Přímý BMAD podúkol, bez rekurzivního workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, owner webgpu-define-memo-proof-01a14497. Načíst AGENTS/policy/task a registry; claim před zápisem.",
+    "Pure A/B/C manifest f3ca7da09c745b34511097c5126d08c33e0a5b6619dafda28ae1ff6641b62197; warm V2 manifest7a25099dad279c07ef5cf203004802438fe657db392bb209a7dc1a91ec1dda23. Současný raw loop a module SHA43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4 jsou reference.",
+    "Root mixed-define-fixture-corpus.json v .cache/webgpu-hitch-validation-20261017 obsahuje100výskytů/49unique/max3135codeunits z fixture SHA355ec327…896f. Obsahuje baseline i canonical větve; pro actual raw předhelperem rozlišit baseline.states.defines. Canonical bloky lze použít jako explicitní already-sorted test, ne je vydávat za rawtrace.",
+    "User požaduje nepřidávat cache bez doloženého přínosu. Tento task proto nic nepřidává do hry; testuje zásadní hypotézu před jakoukoli produkční implementací. Stejný day13 GPU/startup A/B a rozhodnutí o lifetime jsou povinné až u případného dalšího kandidáta."
+  ]
+}
