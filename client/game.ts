@@ -2389,6 +2389,17 @@ export class Game {
     const includeDayPointVariants = this.engine.isWebGPU;
     const day = includeDayPointVariants ? selectLightingPreview("day").instant! : null;
     const includeLowVehicleVariants = this.engine.isWebGPU && this.quality === "low";
+    let deactivateGrass: (() => void) | undefined;
+    const stopGrassPreparation = () => {
+      const stop = deactivateGrass;
+      deactivateGrass = undefined;
+      stop?.();
+    };
+    const beginGrassPreparation = () => {
+      stopGrassPreparation();
+      if (this.engine.isWebGPU && !isRetired())
+        deactivateGrass = this.vegetation?.beginGrassPreparation();
+    };
     let vehicleLease: {
       car: TransformNode;
       parked: TransformNode;
@@ -2429,6 +2440,7 @@ export class Game {
       streetCount?: number,
       vehicle = false,
     ) => {
+      beginGrassPreparation();
       const pos = this.actor.position;
       this.updateWorldPresentation(pos);
       const self = this.avatars.get(this.localId);
@@ -2572,8 +2584,10 @@ export class Game {
         this.parkedCar,
         this.car?.isDisposed(),
         this.parkedCar?.isDisposed(),
+        this.vegetation,
+        this.vegetation?.grassPreparationRevision,
       ],
-      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials", "car", "parkedCar", "carDisposed", "parkedCarDisposed"],
+      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials", "car", "parkedCar", "carDisposed", "parkedCarDisposed", "vegetation", "grassResources"],
       isVisible: () => !document.hidden,
       onVisibilityChange: (callback) => {
         document.addEventListener("visibilitychange", callback);
@@ -2583,7 +2597,10 @@ export class Game {
       setTimer: (callback, milliseconds) =>
         window.setTimeout(callback, milliseconds),
       clearTimer: (timer) => window.clearTimeout(timer as number),
-    }).finally(restoreVehicle);
+    }).finally(() => {
+      try { restoreVehicle(); }
+      finally { stopGrassPreparation(); }
+    });
   }
 
   frame() {

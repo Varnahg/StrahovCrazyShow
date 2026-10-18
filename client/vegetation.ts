@@ -767,6 +767,14 @@ export class VegetationController {
     }
   }
 
+  get grassPreparationRevision(): object | undefined {
+    return this.photographicGrass?.shaderPreparationRevision;
+  }
+  beginGrassPreparation(): (() => void) | undefined {
+    if (this.disposed || this.scene.isDisposed) return;
+    return this.photographicGrass?.beginShaderPreparation();
+  }
+
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
