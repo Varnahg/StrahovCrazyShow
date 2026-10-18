@@ -593,3 +593,10 @@ Samostatná V4 referenční série: první Golden OFF0mod/0sync/max124.5ms, prvn
 Čerstvá správněnatočená V4B6reference protiV6: outward28mod/22sync/max1661,7ms→2/1/105,6ms; exit26/15/2018,5ms→12/8/928,1ms. FirstF325,8vs317,1ms a nízké steadyFPS zůstávají; CPUpráce přiF neklesla. Startup40,1465vs40,3903s nepodporuje obecné zrychlení. Pozice5,9cm, B6selection/NPC/časování a koncová vzdálenost se liší; nejde o finálnírenderer A/B. Oba healthy rawaudityPASS. V4normal-b6-2 s otočenýmavatarem poS je zachovaný, ale vyloučený z příméhoporovnání. Detailníhitchlogjeomezený4/s, prázdnépole nevylučujeUImax>100ms.
 
 Přijat pouze izolovanýQA component, ne celámigrace. Samostatnýnative task přenese7files patch/lock/testy+gzipfixture bezGame/15QAetap; potřebuje vlastnífullpipeline a WebGPU/WebGLsmoke. Default renderer anihraný4193/C5/4192/4188se nemění, KEY31otevřený.
+
+
+## WebGPU KEY-31: nativní define-order komponenta (18.10.2026)
+
+[Hitches-v20](performance/evidence/webgpu-migration-20261016/hitches-v20/README.md): přesně7souborů, WT c18844f2264dd773269406346e62318d0dee3338 → main7eb777763c9cbf1b090d672d755d12d0a59a987d;132dalšíchworkingcest zachováno. Native snapshot2a3dba44ea28dbeffa5324fe22c35011b1e333c4233bb99ed487ee7e057d3584,1330/1330 bezskipů+fullTS/build+isolatedintegrationPASS, leaf18/103/scopedTS0, čtecí reviewbezblokujících nálezů. Gzipfixture bounded/integrity checked, žádnáQA15stage/Game/default změna.
+
+Edge WebGPU i WebGL2 funkční smoke načtení/Golden/F/pohyb/menu bez render/asset/health errors,1512×642,medium,Alex/1relace. Výkon NEPŘIJAT: native firstF6265ms/82WGSLmod/57sync, WebGL21414,6ms;10s přechodovéFPS11,4/36,7, startup33,460/35,152s nejsou statistickéA/B. Native9etap nemáQAcoverage, nelze mu připsat V6B6zlepšení. Resourceleaks/device-loss/úplnýmatrixneověřené, game-disposeprázdný. Bothownservicesidentitystop,kartaaboutblank, hranébezezměny. Next bounded CPU proof rozliší cenu již připravených materiálů; KEY31/migračnícílotevřené.
