@@ -14,12 +14,19 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Light } from "@babylonjs/core/Lights/light";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlayerFlashlight } from "../client/flashlight";
 import { VehicleLighting } from "../client/vehicle-lighting";
 import { StableLightState } from "../client/stable-light-state";
 import { GltfLightBudget } from "../client/gltf-light-budget";
 import { prepareLightVariants } from "../client/light-preparation";
+import { prepareRenderQualities } from "../client/render-quality-preparation";
+import { MANUAL_HARDWARE_SCALING } from "../shared/render-quality";
+import { PhotographicGrass } from "../client/photographic-grass";
+import { acquireGrassResources } from "../client/photo-grass-resources";
+import { VegetationController } from "../client/vegetation";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
 import { applyArtLighting } from "../client/art-lighting";
 import { selectLightingPreview } from "../client/lighting-preview";
@@ -46,18 +53,19 @@ const methods = declaration.members.filter(
   (n) =>
     n.name &&
     [
+      "prepareLighting",
       "prepareLightingVariants",
       "isMeshReadyForCamera",
       "updateRenderEnvironment",
     ].includes(n.name.getText(source)),
 );
-assert.equal(methods.length, 3);
+assert.equal(methods.length, 4);
 const code = ts.transpileModule(
   `class TestGame {${methods.map((n) => n.getText(source)).join("\n")}}`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(
-  `(env)=>{const {PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,arePreparationEffectsReady,selectLightingPreview,applyArtLighting,performance,window,document}=env;${code};return TestGame;}`,
+  `(env)=>{const {PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,applyArtLighting,performance,window,document}=env;${code};return TestGame;}`,
 ).runInThisContext();
 const anchor = Date.parse("2026-10-18T12:45:00Z");
 const select = (mode: Parameters<typeof selectLightingPreview>[0]) =>
@@ -82,8 +90,11 @@ function fixture(
   t: import("node:test").TestContext,
   quality = "low",
   webgpu = true,
+  withGrass = false,
 ) {
-  const engine = new NullEngine(),
+  const engine = new NullEngine();
+  if (withGrass) engine.getCaps().instancedArrays = true;
+  const
     scene = new Scene(engine);
   scene.useRightHandedSystem = true;
   const camera = new FreeCamera(
@@ -123,6 +134,7 @@ function fixture(
       scene,
     );
     p.range = 22;
+    p.falloffType = Light.FALLOFF_STANDARD;
     return p;
   });
   const root = new TransformNode("actual torch root", scene),
@@ -187,7 +199,7 @@ function fixture(
     position: Object.freeze({ x: 0, y: 0.8, z: 0 }),
     vehicle: false,
   });
-  const requested = { quality, revision: 17 };
+  const requested = { quality, revision: 17, hardwareScaling: 1 };
   const gameEngine = {
     isWebGPU: webgpu,
     get currentRenderPassId() {
@@ -211,6 +223,8 @@ function fixture(
     Vector3,
     MeshBuilder,
     prepareLightVariants,
+    prepareRenderQualities,
+    MANUAL_HARDWARE_SCALING,
     arePreparationEffectsReady: () => arePreparationEffectsReady(engine),
     selectLightingPreview: select,
     applyArtLighting,
@@ -248,6 +262,12 @@ function fixture(
     disposed: false,
     rendererFailed: false,
     adaptive: { state: requested },
+    applyRenderQuality(next: string, scale: number) {
+      // Tests the actual quality scheduler + light pipeline activation, not
+      // GPU target formats or the unrelated postprocess quality implementation.
+      game.quality = next;
+      game.hardwareScaling = scale;
+    },
     keys: new Set(),
     inputSeq: 15,
     yaw: 0.2,
@@ -300,6 +320,22 @@ function fixture(
       assert.ok(!stage.startsWith("vehicle-"));
     },
   });
+  const grassPack = withGrass ? JSON.parse(readFileSync(new URL("../public/models/vegetation/grass/geometry.json", import.meta.url), "utf8")) : undefined;
+  const grassRecipe = withGrass ? JSON.parse(readFileSync(new URL("../public/models/vegetation/grass/material.json", import.meta.url), "utf8")) : undefined;
+  const acquireGrass = () => acquireGrassResources(scene, grassPack, grassRecipe, 1024, (channel,gamma) => {
+    // Actual NullEngine Texture IO, no image decode or material readiness mock.
+    const texture = new Texture("/textures/vegetation/grass/"+grassPack.textures.files[channel].file,scene,false,false);texture.gammaSpace=gamma;return {texture,ready:Promise.resolve()};
+  });
+  const grass = withGrass ? new PhotographicGrass(scene,grassPack,grassRecipe,acquireGrass()) : undefined;
+  if (grass) {
+    // Real forwarding methods/owner. Unrelated live world selection stays out
+    // of this bounded Game wiring fixture, as do avatar/world presentation.
+    const vegetation = Object.assign(Object.create(VegetationController.prototype), {scene,disposed:false,photographicGrass:grass,update(){}});
+    game.vegetation=vegetation;
+  }
+  const grassFrames: {stage:string;quality:string;enabled:boolean;drawn:boolean;ready:boolean;count:number}[]=[];
+  let observedGrass: import("@babylonjs/core/Meshes/mesh").Mesh | undefined, grassDrawn=false;
+  const grassMesh = () => scene.meshes.find(mesh=>mesh.metadata?.photoGrassPreparation) as import("@babylonjs/core/Meshes/mesh").Mesh | undefined;
   const invariant = () =>
     JSON.stringify({
       actor,
@@ -324,8 +360,12 @@ function fixture(
     budget.prepareFrame();
     stable.update();
     drawn.clear();
+    const preparation=grassMesh();
+    if(preparation&&preparation!==observedGrass){observedGrass=preparation;preparation.onAfterRenderObservable.add(()=>{if(engine.currentRenderPassId===camera.renderPassId)grassDrawn=true;});}
+    grassDrawn=false;
     scene.render();
     draws++;
+    if(withGrass)grassFrames.push({stage,quality:game.quality,enabled:preparation?.isEnabled()??false,drawn:grassDrawn,ready:preparation?.subMeshes[0]._getDrawWrapper(camera.renderPassId)?.effect?.isReady()??false,count:preparation?.thinInstanceCount??0});
     if (
       subjects.every(
         (s) =>
@@ -360,6 +400,7 @@ function fixture(
     beam.dispose();
     budget.dispose();
     stable.dispose();
+    grass?.dispose();
     scene.dispose();
     engine.dispose();
     assert.equal(loop, undefined);
@@ -385,6 +426,11 @@ function fixture(
     initial,
     draw,
     tick,
+    grass,
+    grassMesh,
+    grassFrames,
+    replaceGrassResources() { assert.ok(grass); const next=acquireGrass();(grass as any).installResources(next);return next; },
+    startAllQualities: () => game.prepareLighting(draw),
     start: (options?: { timeoutMs: number; restoreQuality?: () => void }) =>
       game.prepareLightingVariants(draw, undefined, options),
     stage: () => stage,
@@ -636,4 +682,48 @@ test("final restore applies latest quality/time/profile before accepted readines
     19,
     "19 named opt-in inventory labels fit maxStages21 including overflow",
   );
+});
+
+test("WebGPU preparation includes the actual FAR helper in all41 stages and all3 quality passes", async t => {
+  const f=fixture(t,"medium",true,true), requested={...f.requested};
+  const result=await f.finish(f.startAllQualities());
+  assert.equal(result.status,"complete");assert.equal(result.stages.length,41);
+  assert.deepEqual(result.qualities.map((q:any)=>[q.quality,q.stageCount]),[["low",15],["high",13],["medium",13]]);
+  for(const entry of result.stages){
+    const frames=f.grassFrames.filter(frame=>frame.stage===entry.stage&&frame.quality===entry.passQuality&&frame.enabled&&frame.drawn&&frame.ready&&frame.count===1);
+    assert.ok(frames.length>=2,`${entry.passQuality}/${entry.stage} has two actual ready FAR draws`);
+    assert.ok(entry.renders>=3);
+  }
+  assert.deepEqual(f.requested,requested);assert.equal(f.game.quality,"medium");assert.equal(f.game.preparingRenderQuality,false);assert.equal(f.invariant(),f.initial);
+  const mesh=f.grassMesh()!;assert.ok(mesh);assert.equal(mesh.isEnabled(),false);assert.equal(mesh.isDisposed(),false);assert.equal(f.grass!.stats.instances,0);
+  f.draw();assert.equal(f.grassFrames.at(-1)!.enabled,false);assert.equal(f.grassFrames.at(-1)!.drawn,false,"helper is disabled before normal gameplay submission");
+});
+
+test("WebGL preparation never constructs or activates the FAR helper",async t=>{
+  const f=fixture(t,"low",false,true),result=await f.finish(f.startAllQualities());assert.equal(result.status,"complete");assert.equal(result.stages.length,9);assert.equal(f.grassMesh(),undefined);assert.ok(f.grassFrames.every(frame=>!frame.enabled&&!frame.drawn));
+});
+
+test("same-count grass resource replacement restarts actual Game preparation and stale stop cannot disable the new activation",async t=>{
+  const f=fixture(t,"medium",true,true),pending=f.start();await f.until("current-off");const old=f.grassMesh()!,count=f.scene.meshes.length,materials=f.scene.materials.length;
+  f.replaceGrassResources();const stale=f.grass!.beginShaderPreparation()!;const next=f.grassMesh()!;
+  assert.equal(old.isDisposed(),true);assert.notEqual(next,old);assert.equal(f.scene.meshes.length,count);assert.equal(f.scene.materials.length,materials);
+  await f.tick();stale();assert.equal(next.isEnabled(),true);
+  const result=await f.finish(pending);assert.equal(result.status,"complete");assert.ok(result.stages[0].restartReasons.grassResources>=1);assert.equal(next.isEnabled(),false);
+});
+
+for(const ending of ["cancel","disposed","fault","timeout","throw"] as const)test(`actual FAR activation is disabled on ${ending}`,async t=>{
+  const f=fixture(t,"medium",true,true),pending=f.start({timeoutMs:1000});await f.until("current-off");const mesh=f.grassMesh()!;assert.equal(mesh.isEnabled(),true);
+  if(ending==="cancel")f.game.cancelLightPreparation();
+  if(ending==="disposed"){f.game.disposed=true;f.game.cancelLightPreparation();}
+  if(ending==="fault"){f.game.rendererFailed=true;f.game.cancelLightPreparation();}
+  if(ending==="timeout")f.advanceClock(1001);
+  if(ending==="throw")f.hook(()=>{f.hook();throw Error("grass scope draw failure");});
+  const result=await f.finish(pending);assert.equal(result.status,ending==="timeout"?"timeout":ending==="throw"?"failed":"disposed");assert.equal(mesh.isEnabled(),false);assert.equal(mesh.isDisposed(),false);assert.equal(f.game.cancelLightPreparation,undefined);
+});
+
+test("actual Game failed FAR initialization cannot leak a clone or report complete",async t=>{
+  const f=fixture(t,"medium",true,true),resource=(f.grass as any).resources,clone=resource.clone.bind(resource),before=f.scene.meshes.length;
+  resource.clone=(level:string,name:string)=>{const mesh=clone(level,name);mesh.makeGeometryUnique=()=>{throw Error("unique geometry failure");};return mesh;};
+  const result=await f.finish(f.start());assert.equal(result.status,"failed");assert.equal(f.grassMesh(),undefined);assert.equal(f.scene.meshes.length,before);
+  resource.clone=clone;
 });

@@ -32,6 +32,7 @@ import {
   type PhotoGrassWindState,
 } from "./photo-grass-wind";
 import { PhotoGrassBatch, type GrassRootState } from "./photo-grass-batch";
+import { PhotoGrassPreparation } from "./photo-grass-preparation";
 import type { SourceGrassRecipe } from "./photo-grass-source-material";
 import { grassVisibility, setGrassVisibility } from "./photo-grass-transition";
 import {
@@ -145,6 +146,7 @@ export class PhotographicGrass {
   private allocationDirty = false;
   private disposed = false;
   private resources?: GrassResources;
+  private shaderPreparation?: PhotoGrassPreparation;
   private wind: PhotoGrassWindState = createPhotoGrassWindState();
   private disposeObserver: Observer<Scene> | null = null;
   private pendingResources = new Set<GrassResources>();
@@ -190,6 +192,7 @@ export class PhotographicGrass {
     }
   }
   private installResources(lease: GrassResources) {
+    this.disposeShaderPreparation();
     for (const batch of this.batches.values()) batch.dispose();
     this.batches.clear();
     this.resources?.release();
@@ -213,6 +216,20 @@ export class PhotographicGrass {
     this.stats.textureHeight = lease.textureHeight;
     this.stats.ready = true;
     this.lastUpdate = -Infinity;
+  }
+  /** Identity only for the bounded startup revision gate, never a frame scan. */
+  get shaderPreparationRevision(): object | undefined {
+    return this.resources;
+  }
+  beginShaderPreparation(): (() => void) | undefined {
+    if (this.disposed || this.scene.isDisposed || !this.resources) return;
+    this.shaderPreparation ??= new PhotoGrassPreparation(this.resources);
+    return this.shaderPreparation.begin();
+  }
+  private disposeShaderPreparation() {
+    const owned = this.shaderPreparation;
+    this.shaderPreparation = undefined;
+    owned?.dispose();
   }
   private async loadResources(_legacySize?: 1024 | 2048) {
     const lease = acquireGrassResources(
@@ -748,6 +765,7 @@ export class PhotographicGrass {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.disposeShaderPreparation();
     if (this.disposeObserver) {
       this.scene.onDisposeObservable.remove(this.disposeObserver);
       this.disposeObserver = null;
