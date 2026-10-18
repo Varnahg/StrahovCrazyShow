@@ -2,11 +2,26 @@
   "schemaVersion": 1,
   "id": "webgpu-migrate-exposure-20261016",
   "title": "Zachovat exposure binding bez zbytečné material define invalidace",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
-  "writePaths": ["patches/@babylonjs__core@9.30.0.patch", "pnpm-lock.yaml", "tests/image-processing-value-updates.test.ts", "docs/agents/handoffs/webgpu-migrate-exposure-20261016.md", ".cache/webgpu-migration-checks/exposure/"],
+  "writePaths": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/image-processing-value-updates.test.ts",
+    "docs/agents/handoffs/webgpu-migrate-exposure-20261016.md",
+    ".cache/webgpu-migration-checks/exposure/"
+  ],
   "resources": [],
-  "acceptance": ["Doložené CPU red/green a úplný notify/binding/bloom/frozen/reentrant kontrakt; ostatní změny stále invalidují stejně.", "Žádná kvantizace, upgrade nebo zásah do hraného snapshotu/dependencies. Původní ownership/shadow patch zachovaný."],
-  "verification": ["Skutečné Babylon materiály, uniformy a postprocess, strict TS, patch byte/lock kontrola; root následně nová čistá instalace/full pipeline/GPU."],
-  "notes": ["Přidělen render_diagnosis, owner webgpu-mig-01a14497-exposure. Výzkum KEY32 předchází implementaci.", "Jen fyzická vlastní kopie core v rezervovaném outputu, přímý Node CLI; nikdy pnpm exec/install ani edit přes junction do živých dependencies."]
+  "acceptance": [
+    "Doložené CPU red/green a úplný notify/binding/bloom/frozen/reentrant kontrakt; ostatní změny stále invalidují stejně.",
+    "Žádná kvantizace, upgrade nebo zásah do hraného snapshotu/dependencies. Původní ownership/shadow patch zachovaný."
+  ],
+  "verification": [
+    "Skutečné Babylon materiály, uniformy a postprocess, strict TS, patch byte/lock kontrola; root následně nová čistá instalace/full pipeline/GPU."
+  ],
+  "notes": [
+    "Přidělen render_diagnosis, owner webgpu-mig-01a14497-exposure. Výzkum KEY32 předchází implementaci.",
+    "Jen fyzická vlastní kopie core v rezervovaném outputu, přímý Node CLI; nikdy pnpm exec/install ani edit přes junction do živých dependencies.",
+    "18.10 root přijal GPU exposure/image/bloom scope po nezávislém review, evidence docs/performance/evidence/webgpu-migration-20261016/exposure-acceptance/. Runtime main667ce466,8/8regresí opětPASS; samostatnýCPU/FPS přínos neprokázán. CelýKEY31/migrace zůstávajíotevřené."
+  ]
 }

@@ -1,0 +1,65 @@
+TAP version 13
+# BJS - [20:07:13]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:07:17]: Babylon.js v9.30.0 - Null engine
+# Subtest: exposure values keep real Standard/PBR/multi/instance effects without scene traversal, including frozen materials
+ok 1 - exposure values keep real Standard/PBR/multi/instance effects without scene traversal, including frozen materials
+  ---
+  duration_ms: 3271.5705
+  type: 'test'
+  ...
+# BJS - [20:07:17]: Babylon.js v9.30.0 - Null engine
+# Subtest: 1↔non1 exposure still prepares real shader variants; all other configuration changes retain dirty notification
+ok 2 - 1↔non1 exposure still prepares real shader variants; all other configuration changes retain dirty notification
+  ---
+  duration_ms: 58.3688
+  type: 'test'
+  ...
+# BJS - [20:07:17]: Babylon.js v9.30.0 - Null engine
+# Subtest: observer masks, late notification subscribers and disposal during dispatch retain their ownership
+ok 3 - observer masks, late notification subscribers and disposal during dispatch retain their ownership
+  ---
+  duration_ms: 27.7289
+  type: 'test'
+  ...
+# BJS - [20:07:17]: Babylon.js v9.30.0 - Null engine
+# Subtest: exposure→contrast and contrast→exposure nested setters preserve the full update and do not leak the value marker
+ok 4 - exposure→contrast and contrast→exposure nested setters preserve the full update and do not leak the value marker
+  ---
+  duration_ms: 60.706
+  type: 'test'
+  ...
+# BJS - [20:07:17]: Babylon.js v9.30.0 - Null engine
+# Subtest: direct nested notifications remain full updates, and a throwing observer cannot taint later updates
+ok 5 - direct nested notifications remain full updates, and a throwing observer cannot taint later updates
+  ---
+  duration_ms: 26.6664
+  type: 'test'
+  ...
+# BJS - [20:07:17]: Babylon.js v9.30.0 - Null engine
+# Subtest: late materials and independently owned configurations start with current exposure and retain observer disposal
+ok 6 - late materials and independently owned configurations start with current exposure and retain observer disposal
+  ---
+  duration_ms: 28.8608
+  type: 'test'
+  ...
+# Subtest: actual cinematic pipeline receives every exposure update and keeps bloom bindings/chain intact
+ok 7 - actual cinematic pipeline receives every exposure update and keeps bloom bindings/chain intact
+  ---
+  duration_ms: 562.8315
+  type: 'test'
+  ...
+# Subtest: WebGPU leftovers transport exact float values through both existing UBO cache modes
+ok 8 - WebGPU leftovers transport exact float values through both existing UBO cache modes
+  ---
+  duration_ms: 2.3428
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15219.2014
