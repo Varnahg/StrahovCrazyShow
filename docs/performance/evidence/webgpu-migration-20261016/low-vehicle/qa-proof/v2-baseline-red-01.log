@@ -1,0 +1,60 @@
+TAP version 13
+# BJS - [15:36:01]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:36:01]: Babylon.js v9.30.0 - Null engine
+# Subtest: single live-scene root disposal fails closed: car
+not ok 1 - single live-scene root disposal fails closed: car
+  ---
+  duration_ms: 312.7655
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate-v2\\tests\\game-low-vehicle-preparation.test.ts:535:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'complete'
+    - 'failed'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'failed'
+  actual: 'complete'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-low-vehicle-candidate-20261018\candidate-v2\tests\game-low-vehicle-preparation.test.ts:550:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: single live-scene root disposal fails closed: parked
+not ok 2 - single live-scene root disposal fails closed: parked
+  ---
+  duration_ms: 212.4256
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate-v2\\tests\\game-low-vehicle-preparation.test.ts:535:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'complete'
+    - 'failed'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'failed'
+  actual: 'complete'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-low-vehicle-candidate-20261018\candidate-v2\tests\game-low-vehicle-preparation.test.ts:550:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3899.7138

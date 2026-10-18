@@ -1,0 +1,34 @@
+{
+  "snapshotId": "5c6b36ad783a332030bf21f25344d17b43e6ea0005c9f0bb5a754bae7444c483",
+  "results": [
+    {
+      "phase": "build",
+      "startedAt": "2026-10-18T13:43:03.736Z",
+      "finishedAt": "2026-10-18T13:43:59.202Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\low-vehicle-v2-build.log",
+      "sha256": "68f4015d1837b23c0ab0bfa9a5d2b4f1bccdb5e0bbb96df07914cd1b2699b8d7"
+    },
+    {
+      "phase": "test",
+      "startedAt": "2026-10-18T13:53:12.019Z",
+      "finishedAt": "2026-10-18T13:57:31.803Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\low-vehicle-v2-test.log",
+      "sha256": "549c785ea0df8fe724fe7f30f0bdb54b30319c2d79cb9e23b5fcc4514c1bfe22"
+    },
+    {
+      "phase": "integration",
+      "startedAt": "2026-10-18T13:57:33.638Z",
+      "finishedAt": "2026-10-18T13:57:58.234Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test:integration",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\low-vehicle-v2-integration.log",
+      "sha256": "4ed5818c4e1f774fde2e0c65c2e71fae9f7cd642b648335380615678d2ef024a"
+    }
+  ],
+  "sharedMetadataUnchanged": true,
+  "scope": "Combined low vehicle preparation checkpoint: prior exact-source TypeScript/build reused, complete tests and isolated integration added. Source and pinned dependencies verified without mutation. Narrow gameplay pilot separate; entire migration remains incomplete."
+}

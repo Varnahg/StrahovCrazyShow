@@ -1,0 +1,50 @@
+{
+  "source": "a86136ef6183c4319cce0bb41b5ed638542b0d3e",
+  "beforeHead": "d8a361d3efad8e66c478278478b8afead0d6b748",
+  "afterHead": "42f7336f7e3bf9e651e6ee921ef9dad63cf580cd",
+  "paths": [
+    "client/game.ts",
+    "client/light-preparation.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-low-vehicle-preparation.test.ts"
+  ],
+  "nativeSnapshot": "9b58c828897da633b06f13b41d559de818bb2bf9b7614b54acf23fbae7f3c88c",
+  "combinedSnapshot": "5c6b36ad783a332030bf21f25344d17b43e6ea0005c9f0bb5a754bae7444c483",
+  "overlays": [
+    {
+      "path": "client/game.ts",
+      "originalSha256": "1a09a91819d44ecb10e9a6702354f6b0653a0f3376720543e3cbd60a0dac0f37",
+      "sha256": "1e1ba86a036123f2e4f530c3e053820e6353b045648c5171096fb46a1cb54c34",
+      "workingBefore": "afda745eda1aaac4abfcdfe99cb694174bd12af1201db7d4056667cfc132fa74",
+      "workingAfter": "53e78cd878d3a65cfcff10f0e4ce6691e0300960f79283d9f0983a76e042d305",
+      "method": "reviewed-semantic-merge"
+    },
+    {
+      "path": "client/light-preparation.ts",
+      "originalSha256": "6bb6cd90be0eb2e1cf5b88b6fd930123ec34349c242e4db3fb8ce767e52eb58c",
+      "sha256": "375c506df25927806207d21644c56f868e4f67e6f726576cb2ae5db01850cd5e",
+      "workingBefore": "6bb6cd90be0eb2e1cf5b88b6fd930123ec34349c242e4db3fb8ce767e52eb58c",
+      "workingAfter": "375c506df25927806207d21644c56f868e4f67e6f726576cb2ae5db01850cd5e",
+      "method": "native-delta"
+    },
+    {
+      "path": "tests/game-light-preparation.test.ts",
+      "originalSha256": "408ed8e49867141d6fdfb216eab0507d225520071bc210a1e4b07928c8bb4c51",
+      "sha256": "8352410c5c7ea9dce4ce1fa874db1c5754e4eca11adf5e79da4916b98691c7e5",
+      "workingBefore": "ef2a8ea5ece60988dc79d2ae76e03c2fa412aba842033a88570e24e51cd8aea1",
+      "workingAfter": "27637ab0cb54953b8d99837cc0f0858eb6ae44b43f2d308bf382867d7ba3720d",
+      "method": "reviewed-semantic-merge"
+    },
+    {
+      "path": "tests/game-low-vehicle-preparation.test.ts",
+      "originalSha256": null,
+      "sha256": "5e1ab8dec9f1febd2e33ed41c4539f7672f9ff36a603681790b73129eea3d89e",
+      "workingBefore": null,
+      "workingAfter": "5e1ab8dec9f1febd2e33ed41c4539f7672f9ff36a603681790b73129eea3d89e",
+      "method": "native-delta"
+    }
+  ],
+  "otherWorkingPathsPreserved": 132,
+  "atUTC": "2026-10-18T14:04:38.346Z",
+  "scope": "Only four owned native files committed. Combined Game and existing test preserve foreign overlays byte-for-byte except the reviewed vehicle preparation delta. No protected played build changes."
+}

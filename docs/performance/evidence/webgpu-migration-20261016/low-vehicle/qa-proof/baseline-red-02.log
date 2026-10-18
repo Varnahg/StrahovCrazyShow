@@ -1,0 +1,69 @@
+TAP version 13
+# BJS - [15:26:56]: Babylon.js v9.30.0 - Null engine
+# Subtest: low WebGPU actual Game prepares two car variants before original13 and subsequent driving reuses Effects
+not ok 1 - low WebGPU actual Game prepares two car variants before original13 and subsequent driving reuses Effects
+  ---
+  duration_ms: 256.0464
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\tests\\game-low-vehicle-preparation.test.ts:438:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+    -   'vehicle-0',
+    -   'vehicle-1',
+        'current-off',
+        'current-on',
+        'night-0-off',
+        'night-0-on',
+        'night-1-off',
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'vehicle-0'
+    1: 'vehicle-1'
+    2: 'current-off'
+    3: 'current-on'
+    4: 'night-0-off'
+    5: 'night-0-on'
+    6: 'night-1-off'
+    7: 'night-1-on'
+    8: 'night-2-off'
+    9: 'night-2-on'
+    10: 'day-0-off'
+    11: 'day-0-on'
+    12: 'day-1-off'
+    13: 'day-1-on'
+    14: 'restore'
+  actual:
+    0: 'current-off'
+    1: 'current-on'
+    2: 'night-0-off'
+    3: 'night-0-on'
+    4: 'night-1-off'
+    5: 'night-1-on'
+    6: 'night-2-off'
+    7: 'night-2-on'
+    8: 'day-0-off'
+    9: 'day-0-on'
+    10: 'day-1-off'
+    11: 'day-1-on'
+    12: 'restore'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-low-vehicle-candidate-20261018\candidate\tests\game-low-vehicle-preparation.test.ts:442:10)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3277.2554
