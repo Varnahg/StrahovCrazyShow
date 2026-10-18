@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "id": "webgpu-fresnel-disposal-20261016",
   "title": "KEY-37: uvolnit pouze vlastněné Fresnel parametry bez globální invalidace",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": ["client/cinematic.ts", "tests/cinematic-fresnel-disposal.test.ts", "docs/agents/handoffs/webgpu-fresnel-disposal-20261016.md", ".cache/webgpu-migration-checks/fresnel/"],
   "resources": [],
   "acceptance": ["Zaznamenat pouze skutečně přijaté vlastní Fresnel identity; detach po identity guard a veřejný resetDrawCache jednou pro dotčený material. Žádné globální Fresnel setter invalidace, cizí opacity/replacement/shared object beze změny.", "Zachovat skutečné render/alpha/defines pro frozen i unfrozen materiál, ostatní scene environment cleanup a idempotentní lifecycle. Cizí primary cinematic WIP se neadoptuje ani nepřepíše."],
   "verification": ["Předem doložené varianty/null-stale-define a disabled-constructor mechanismy; red/green actual Babylon test, cílený refaktoring, scoped strictTS.", "Oddělená hashovaná combined cinematic kopie s primary WIP jen v cache pro následný root merge; nikdy do čistého runtime commitu. Bez install/pnpm exec/build/fullsuite/GPU/server."],
-  "notes": ["Přidělen render_diagnosis po read-only a in-memory reprodukci; root drží GPU/heavy a frozen user services.", "Použít readonly dependencies-v5. Samostatný čistý runtime/test/handoff commit a release. KEY-37 a root funkční/GPU přejímka zůstávají otevřené."]
+  "notes": ["Přidělen render_diagnosis po read-only a in-memory reprodukci; root drží GPU/heavy a frozen user services.", "Použity readonly dependencies-v5. Samostatný runtime/test/handoff commit dacb5ddf integrován do main dc858ce8; původní implementační rezervace uvolněna.", "18.10 root přijal úzký KEY-37 po clean1367/combined1427/fullTS/build/integration a Edge GPU obrazu oken den/noc, všech kvalit a dvou menu reentries. Evidence docs/performance/evidence/webgpu-migration-20261016/quality-visual-acceptance/README.md; 3 ready/3 disposal, chyby0, nezávislé review bez nálezů. Done neznamená splnění celkového FPS, změření samostatné cleanup doby nebo GPU paměti; migrační cíl a KEY-31 zůstávají aktivní."]
 }
