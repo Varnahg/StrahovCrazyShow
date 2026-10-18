@@ -7,7 +7,7 @@
 - Finalrun02:80/80PASS,0skip,7.585s, exit0. Oba41stage případy mají2targetdrawstages,cap4,0disposed a low car1/0/1/0=0/0/0/0novýchprogramů. Fresh2receivers=0nových a strictsameEffect/context. Helper15tests +actualGame10 +baseline7 +původnílight/vehicle/quality48.
 - Run01:71PASS/9FAIL bylo výhradněENOENT mé physicalclosure pro2původnígrassJSON. Vrun02 doplněny přesnégeometry.json/material.json; native soubory mezi běhy nezměněné. Oba běhy i source snapshots zachovány.
 - Readonly privatecore716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37/d.tsdef7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c; bezinstalace/patchedeps. Testová sourceclosure je fyzická, pouzenode_modules junction readonly. ŽádnýfullTS/build/fullsuite/GPU/server/commit.
-- Limity: syntetickécanvas/textureIO, NullEngineGLSL, volnýcamera collision adapter, izolované3authoredrodiny. Žádný GPU/pixel/FPS závěr ani NPC rozšíření. Runtimehelper nicnovéhonealokuje, flaglease má původnílifecycle; stage/timeouts nezměněné. Root zajišťuje fullclean/combined a integraci.
+- Limity: syntetickécanvas/textureIO, NullEngineGLSL, volnýcamera collision adapter, izolované3authoredrodiny. Žádný GPU/pixel/FPS závěr ani NPC rozšíření. Runtimehelper nealokuje nové GPU prostředky, meshe ani materiály; vytváří pomocné CPU Array/Map/Set, flaglease má původnílifecycle; stage/timeouts nezměněné. Root zajišťuje fullclean/combined a integraci.
 - Vlastní Node jobs skončily, žádné porty. Claim se uvolní bezprostředně po předání frozenmanifestu; release není přijetí tasku.
 
 ## Root integration and remaining GPU work
