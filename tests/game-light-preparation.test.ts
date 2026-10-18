@@ -37,7 +37,7 @@ const declaration = source.statements.find(
 )!;
 const members = declaration.members.filter(
   (node) =>
-    node.name && ["prepareLighting", "isMeshReadyForCamera"].includes(node.name.getText(source)),
+    node.name && ["prepareLightingVariants", "isMeshReadyForCamera"].includes(node.name.getText(source)),
 );
 const compiled = ts.transpileModule(
   `class PreparationGame { ${members.map((node) => node.getText(source)).join("\n")} };`,
@@ -79,6 +79,7 @@ function fixture(t: import("node:test").TestContext) {
   let effectsReady = true,
     draws = 0,
     readyCalls = 0;
+  let observeRender: (() => void) | undefined;
   const states: {
     instant: number;
     enabled: boolean;
@@ -223,6 +224,7 @@ function fixture(t: import("node:test").TestContext) {
   const render = () => {
     assert.equal(game.ready, false);
     assert.equal(engine.currentRenderPassId, 901);
+    observeRender?.();
     draws++;
     stableLights.update();
     lightStates.push({
@@ -246,13 +248,13 @@ function fixture(t: import("node:test").TestContext) {
     lightStates,
     engine,
     health,
-    start: (pipelines?: { isReady(): boolean }) => {
+    start: (pipelines?: { isReady(): boolean }, options?: { timeoutMs: number; restoreQuality?: () => void }) => {
       assert.equal(
-        typeof game.prepareLighting,
+        typeof game.prepareLightingVariants,
         "function",
         "actual Game must prepare its initial light variants before ready",
       );
-      return game.prepareLighting(render, pipelines);
+      return game.prepareLightingVariants(render, pipelines, options);
     },
     tick() {
       now += 16;
@@ -265,10 +267,11 @@ function fixture(t: import("node:test").TestContext) {
       }
       assert.equal(loop, undefined);
     },
-    timeout() {
-      now = 30001;
+    timeout(atMs = 30001) {
+      now = atMs;
       timer?.();
     },
+    observeRender(callback: () => void) { observeRender = callback; },
     effects(value: boolean) {
       effectsReady = value;
     },
@@ -297,6 +300,38 @@ test("actual Game light stages wait for pipeline and complete-frame readiness", 
   assert.equal(result.status, "complete");
   assert.equal(result.stages.length, 9);
   assert.ok(result.stages.every((stage: { renders: number }) => stage.renders >= 3));
+});
+
+test("actual inner preparation restores requested quality before its complete restore draws", async (t) => {
+  const f = fixture(t), latestInstant = 1792303200000;
+  let stage = "", restoredDraws = 0, restored = false;
+  f.game.compilationProfile.setStage = (value: string) => { stage = value; };
+  f.observeRender(() => {
+    if (stage !== "restore") return;
+    restoredDraws++;
+    assert.equal(restored, true);
+    assert.equal(f.game.quality, "high");
+    assert.equal(f.states.at(-1)?.quality, "high");
+    assert.equal(f.states.at(-1)?.instant, latestInstant);
+  });
+  const pending = f.start(undefined, { timeoutMs: 30_000, restoreQuality() {
+    restored = true;
+    f.game.quality = "high";
+    f.game.timeOverride = latestInstant;
+  } });
+  f.finish();
+  assert.equal((await pending).status, "complete");
+  assert.ok(restoredDraws >= 3, "restore still requires progress plus two complete acceptance draws");
+});
+
+test("actual inner preparation consumes the supplied remaining timeout", async (t) => {
+  const f = fixture(t);
+  f.effects(false);
+  const pending = f.start(undefined, { timeoutMs: 250 });
+  f.tick(); f.timeout(251);
+  assert.equal(f.hasTimer, false, "the shorter remaining budget must expire without waiting for30s");
+  assert.equal((await pending).status, "timeout");
+  assert.equal(f.game.ready, false);
 });
 
 test("actual Game shader inventory follows the real loopback diagnostic opt-in", () => {

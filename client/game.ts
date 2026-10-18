@@ -14,6 +14,7 @@ import { SceneTextureDiagnostics } from "./texture-diagnostics";
 import { StableLightState } from "./stable-light-state";
 import { GltfLightBudget } from "./gltf-light-budget";
 import { prepareLightVariants } from "./light-preparation";
+import { prepareRenderQualities } from "./render-quality-preparation";
 import { WebGpuPipelinePreparation } from "./webgpu-pipeline-preparation";
 import { arePreparationEffectsReady } from "./strict-material-preparation";
 import { selectLightingPreview } from "./lighting-preview";
@@ -47,6 +48,8 @@ import {
 import {
   isRenderQualityMode,
   isRenderTargetFps,
+  MANUAL_HARDWARE_SCALING,
+  type RenderQuality,
 } from "../shared/render-quality";
 import {
   readGpuDiagnostics,
@@ -1459,15 +1462,22 @@ export class Game {
   }
   applyAdaptiveQuality(next: AdaptiveQualitySnapshot) {
     if (this.disposed || this.rendererFailed) return;
+    if (this.preparingRenderQuality) return;
     if (next.revision === this.appliedQualityRevision) return;
     this.appliedQualityRevision = next.revision;
-    this.quality = next.quality;
+    this.applyRenderQuality(next.quality, next.hardwareScaling);
+  }
+  private preparingRenderQuality = false;
+  /** Render-only overrides never write the user's adaptive controller state. */
+  private applyRenderQuality(quality: RenderQuality, hardwareScaling: number) {
+    if (this.disposed || this.rendererFailed || this.scene?.isDisposed) return;
+    this.quality = quality;
     this.setCarQuality?.(this.quality);
     if (
-      Math.abs(this.engine.getHardwareScalingLevel() - next.hardwareScaling) >
+      Math.abs(this.engine.getHardwareScalingLevel() - hardwareScaling) >
       0.0001
     )
-      this.engine.setHardwareScalingLevel(next.hardwareScaling);
+      this.engine.setHardwareScalingLevel(hardwareScaling);
   }
   setQuality(mode: string) {
     if (this.disposed || this.rendererFailed) return;
@@ -2339,6 +2349,39 @@ export class Game {
     return lighting;
   }
   private prepareLighting(render: () => void, pipelines?: Pick<WebGpuPipelinePreparation, "isReady">) {
+    if (!this.engine.isWebGPU) return this.prepareLightingVariants(render, pipelines);
+    const isDisposed = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
+    const restoreQuality = () => {
+      if (!this.preparingRenderQuality) return;
+      this.preparingRenderQuality = false;
+      if (isDisposed()) return;
+      const requested = this.adaptive.state;
+      // A temporary quality does not change the requested revision. Restore
+      // explicitly, even when that revision was applied before preparation.
+      this.applyRenderQuality(requested.quality, requested.hardwareScaling);
+      this.appliedQualityRevision = requested.revision;
+    };
+    return prepareRenderQualities({
+      initialQuality: this.adaptive.state.quality,
+      applyQuality: (quality) => {
+        this.preparingRenderQuality = true;
+        this.applyRenderQuality(quality, MANUAL_HARDWARE_SCALING[quality]);
+      },
+      prepare: ({ timeoutMs, finalPass }) => this.prepareLightingVariants(
+        render,
+        pipelines,
+        { timeoutMs, restoreQuality: finalPass ? restoreQuality : undefined },
+      ),
+      restore: restoreQuality,
+      isDisposed,
+      now: () => performance.now(),
+    });
+  }
+  private prepareLightingVariants(
+    render: () => void,
+    pipelines?: Pick<WebGpuPipelinePreparation, "isReady">,
+    options?: { timeoutMs: number; restoreQuality?: () => void },
+  ) {
     const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
     // The same controller/materials survive into gameplay; no proxy shaders.
     this.flashlight ??= new PlayerFlashlight(this.scene);
@@ -2412,11 +2455,13 @@ export class Game {
     };
     const restore = () => {
       if (!isRetired()) {
+        options?.restoreQuality?.();
         this.compilationProfile.setStage("restore");
         apply(this.timeOverride ?? Date.now(), this.flashlightOn);
       }
     };
     return prepareLightVariants({
+      timeoutMs: options?.timeoutMs,
       includeDayPointVariants,
       apply: (stage) => {
         if (stage === "restore") return restore();
