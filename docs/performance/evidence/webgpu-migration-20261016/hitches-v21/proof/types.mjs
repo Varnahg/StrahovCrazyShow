@@ -1,0 +1,12 @@
+import ts from './node_modules/typescript/lib/typescript.js';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root = dirname(fileURLToPath(import.meta.url));
+const config = ts.readConfigFile(resolve(root, '../../webgpu-hitch-validation-20261017/define-order-v6/tsconfig.json'), ts.sys.readFile);
+if (config.error) throw Error(ts.flattenDiagnosticMessageText(config.error.messageText, '\n'));
+const options = ts.parseJsonConfigFileContent(config.config, ts.sys, root).options;
+const program = ts.createProgram(['proof.test.ts', 'trace.ts', 'native-engine.ts'].map(path => resolve(root, path)), { ...options, noEmit: true });
+const errors = ts.getPreEmitDiagnostics(program);
+console.log(ts.formatDiagnostics(errors, { getCurrentDirectory: () => root, getCanonicalFileName: path => path, getNewLine: () => '\n' }));
+console.log(JSON.stringify({ files: program.getSourceFiles().length, errors: errors.length }));
+process.exitCode = errors.length ? 1 : 0;
