@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdirSync,existsSync,symlinkSync,readdirSync,openSync,closeSync,realpathSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import {dirname,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=dirname(fileURLToPath(import.meta.url)),input=JSON.parse(readFileSync(resolve(root,'input-manifest.json'))),stage=resolve(root,'baseline-final-red'),candidate=resolve(root,'candidate'),hash=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
+assert.ok(!existsSync(stage));mkdirSync(stage);const sources={};
+function copy(from,p){const target=resolve(stage,p);assert.ok(target.startsWith(stage+'\\'));mkdirSync(dirname(target),{recursive:true});writeFileSync(target,readFileSync(from),{flag:'wx'});sources[p]=hash(target);assert.equal(sources[p],hash(from));}
+for(const p of Object.keys(input.copied))copy(resolve(input.source,p),p);
+const tests=['tests/material-defines-serialization.test.ts','tests/material-defines-wgsl-order.test.ts'];
+const fixtures=readdirSync(resolve(candidate,'tests/fixtures/material-defines-order')).map(n=>'tests/fixtures/material-defines-order/'+n);
+for(const p of [...tests,...fixtures])copy(resolve(candidate,p),p);
+const originalModules=resolve(input.packageRoots.core.from,'../..');symlinkSync(originalModules,resolve(stage,'node_modules'),'junction');
+const core=realpathSync(resolve(stage,'node_modules/@babylonjs/core/Materials/materialDefines.js'));assert.equal(hash(core),input.inputs['core/Materials/materialDefines.js']);
+const fd=openSync(resolve(root,'baseline-final-red.log'),'w'),startedAt=new Date().toISOString(),args=['--import','tsx','--test','--test-concurrency=1',...tests];
+const result=spawnSync(process.execPath,args,{cwd:stage,env:{...process.env,TSX_DISABLE_CACHE:'1',DEFINE_ORDER_REPORT:resolve(root,'baseline-final-red-report.json')},stdio:['ignore',fd,fd]});closeSync(fd);
+const record={startedAt,endedAt:new Date().toISOString(),cwd:stage,command:[process.execPath,...args],exitCode:result.status,signal:result.signal,materialDefinesPath:core,materialDefinesSha256:hash(core),tests:Object.fromEntries(tests.map(p=>[p,sources[p]])),fixtures:Object.fromEntries(fixtures.map(p=>[p,sources[p]])),sources};
+writeFileSync(resolve(root,'baseline-final-red-run.json'),JSON.stringify(record,null,2)+'\n');assert.equal(result.status,1,'baseline must fail ordering/reuse assertions');
+const log=readFileSync(resolve(root,'baseline-final-red.log'),'utf8');assert.match(log,/tests 18/);assert.match(log,/pass 3/);assert.match(log,/fail 15/);assert.doesNotMatch(log,/SyntaxError|ERR_MODULE_NOT_FOUND|ENOENT/);console.log(JSON.stringify({expectedFailure:true,passed:3,failed:15,materialDefinesSha256:record.materialDefinesSha256,tests:record.tests,fixtures:record.fixtures}));

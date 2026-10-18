@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,realpathSync,lstatSync,statSync,existsSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {resolve,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import ts from './dependencies/node_modules/typescript/lib/typescript.js';
+const root=dirname(fileURLToPath(import.meta.url)),core=resolve(root,'dependencies/node_modules/@babylonjs/core'),candidate=resolve(root,'candidate'),file=resolve(core,'Materials/materialDefines.js');
+const hash=data=>createHash('sha256').update(data).digest('hex'),input=JSON.parse(readFileSync(resolve(root,'input-manifest.json'))),before=readFileSync(resolve(input.packageRoots.core.from,'Materials/materialDefines.js'),'utf8');
+const previousRecord=existsSync(resolve(root,'patch-record.json'))?JSON.parse(readFileSync(resolve(root,'patch-record.json'))):null;
+const current=readFileSync(file);assert.ok(hash(current)===input.inputs['core/Materials/materialDefines.js']||hash(current)===previousRecord?.materialDefinesAfterSha,'only owned prior output may be replaced');
+if(previousRecord&&!existsSync(resolve(root,'materialDefines.failed-01.js'))){writeFileSync(resolve(root,'materialDefines.failed-01.js'),current,{flag:'wx'});writeFileSync(resolve(root,'patch-record-01.json'),JSON.stringify(previousRecord,null,2)+'\n',{flag:'wx'});}
+assert.equal(hash(before),input.inputs['core/Materials/materialDefines.js']);assert.equal(lstatSync(core).isSymbolicLink(),false);assert.ok(realpathSync(file).startsWith(root));assert.equal(statSync(file).nlink,1);
+const accepted=readFileSync(resolve(root,'accepted-proof/canonical-result.ts'),'utf8');assert.equal(hash(accepted),'b4892c57e483f6b4a06ff97c59c1378cb9682cb17f3be2acb942644c28883dc2');
+const source=accepted.slice(0,accepted.indexOf('/** Process-local')).replaceAll('export const ','const ').replace('export function canonicalResult','function canonicalResult').replace('/** Counterfactual CPU proof only; never installed in the application.','/** Project QA candidate derived from the accepted isolated CPU proof.');
+const js=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
+assert.ok(!js.includes('export ')&&!js.includes('withCanonicalResult'));
+const eol=before.includes('\r\n')?'\r\n':'\n',comment='// Project QA: bounded flat-literal serialization only. Custom order-sensitive'+eol+'// processors are outside the verified contract; no universal API guarantee.'+eol;
+assert.equal(before.split('        return result;').length,2);
+const sourceMap='//# sourceMappingURL=materialDefines.js.map';assert.ok(before.includes(sourceMap));
+const after=before.replace('        return result;','        return canonicalResult(result);').replace(sourceMap,()=>comment+js.replace(/\r?\n/g,eol)+sourceMap);
+assert.equal(ts.createSourceFile('materialDefines.js',after,ts.ScriptTarget.Latest,true).parseDiagnostics.length,0,'generated runtime must parse');
+const beforeFile=resolve(root,'materialDefines.before.js');if(!existsSync(beforeFile))writeFileSync(beforeFile,before,{flag:'wx'});else assert.equal(hash(readFileSync(beforeFile)),hash(before));writeFileSync(file,after);
+let diff;try{diff=execFileSync('git',['-c','core.autocrlf=false','diff','--no-index','--no-ext-diff','--',beforeFile,file],{encoding:'utf8'});}catch(e){if(e.status!==1)throw e;diff=e.stdout;}
+const lines=diff.replace(/\r\n/g,'\n').split('\n');lines[0]='diff --git a/Materials/materialDefines.js b/Materials/materialDefines.js';const minus=lines.findIndex(l=>l.startsWith('--- ')),plus=lines.findIndex(l=>l.startsWith('+++ '));assert.ok(minus>0&&plus===minus+1);lines[minus]='--- a/Materials/materialDefines.js';lines[plus]='+++ b/Materials/materialDefines.js';const hunk=lines.join('\n');
+const patchFile=resolve(candidate,'patches/@babylonjs__core@9.30.0.patch'),oldPatch=readFileSync(resolve(input.source,'patches/@babylonjs__core@9.30.0.patch')),oldHash=hash(oldPatch);assert.equal(oldHash,'0811815a615a8e501c4542ee2fa38fcc5fdd1a4394fbc610cb0aa5a0ae62c578');assert.ok([oldHash,previousRecord?.newPatchSha].includes(hash(readFileSync(patchFile))));
+const newPatch=Buffer.concat([oldPatch,Buffer.from(hunk)]),newHash=hash(newPatch),lockFile=resolve(candidate,'pnpm-lock.yaml'),oldLock=readFileSync(resolve(input.source,'pnpm-lock.yaml'),'utf8');assert.ok([hash(oldLock),previousRecord?.lockAfterSha].includes(hash(readFileSync(lockFile))));
+const count=oldLock.split(oldHash).length-1;assert.equal(count,6);const newLock=oldLock.replaceAll(oldHash,newHash);assert.equal(newLock.replaceAll(newHash,oldHash),oldLock);
+writeFileSync(patchFile,newPatch);writeFileSync(lockFile,newLock);writeFileSync(resolve(root,'materialDefines.patch'),hunk);
+writeFileSync(resolve(root,'patch-record.json'),JSON.stringify({acceptedContractSha:hash(accepted),privateHelperSourceSha:hash(source),privateHelperJsSha:hash(js),materialDefinesBeforeSha:hash(before),materialDefinesAfterSha:hash(after),oldPatchSha:oldHash,newPatchSha:newHash,preservedOldPatchBytes:oldPatch.length,lockBeforeSha:hash(oldLock),lockAfterSha:hash(newLock),lockHashOccurrences:count,onlyRuntimeChange:'MaterialDefines.toString returns private exact bounded canonicalResult after original reads'},null,2)+'\n');
+console.log(JSON.stringify({newPatchSha:newHash,materialDefinesSha:hash(after),lockSubstitutions:count}));

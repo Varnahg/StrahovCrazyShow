@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-define-order-native-20261018",
+  "title": "KEY-31: nativní přenos ověřeného pořadí literal defines",
+  "status": "ready",
+  "dependsOn": ["webgpu-define-order-qa-20261018"],
+  "writePaths": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/material-defines-serialization.test.ts",
+    "tests/material-defines-wgsl-order.test.ts",
+    "tests/fixtures/material-defines-order/",
+    ".cache/webgpu-migration-checks/define-order-native-20261018/",
+    "docs/agents/handoffs/webgpu-define-order-native-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přenést pouze schválený sedmisouborový runtime/testový celek z QA manifestu37b2d5e1c31f62d4f4d0cdebaaf3063cd1ad8f3e64156ddf58a2a99563fbb228. Patch/lock byte-exact kandidát (21114f6048abdcba932a8640adf1a97b6281939d99ae6d53fbfe96ef76bf0503 /03d4edcd8f9d92fa7b6b320f5600709dd62612a5bad7867cef61875e7ecd8b53), žádný nový runtime hunk nebo helper změna.",
+    "Native current preimages patch0811815a615a8e501c4542ee2fa38fcc5fdd1a4394fbc610cb0aa5a0ae62c578 a lock54bae00191e01af417fffb8f243917dd299987c614121c09840475ed2b1b9ca8 ověřit před zápisem. Game/etapy/readiness/camera/default renderer/package.json se nemění. QA15stage overlay se nepřenáší a jeho B6výsledky se nesmí automaticky připsat native hře.",
+    "Dvě nové test položky a scenario/provenance fixture převzít s původními assertions. Nepřenášet copied inactive-light-defines-helper test: native již historické path asserts nemá. Žádné plošné formátování existujících native testů.",
+    "Baseline JSON9 709 634B se uloží pouze jako baseline.json.gz. Gzip roundtrip má byte-exact původní SHA355ec327227af96c64c83c354636894d0ba3e5128913d95c9716900294a4896f. Test načte přes import.meta.url+gunzipSync s maxOutputLength, ověří rozbalenou délku/SHA před JSON.parse; nerozbaluje na disk. Pro běžnou hru žádné nové IO.",
+    "Provenance uvede compressed/uncompressed SHA/délky a existující archiv hitches-v18 místo neplatného accepted-proof pseudo-root. Zachovat negative custom-hook a mirrored baseline RED limity; nic se neprohlašuje za univerzální Babylon callback podporu nebo vyřešený mirrored lifecycle.",
+    "Vlastní validační source closure pouze v rezervovaném cache prefixu, frozen fyzické QA core/loaders readonly z define-order-qa dependencies. Žádný install ani zápis WT/main/node_modules nebo hraných dependencies. Jedna core/loaders identita; source i cílové input/output hashy. Žádné asset regenerace nebo GPU/port/fullsuite/build."
+  ],
+  "verification": [
+    "Gzip roundtrip a všechny baseline assertions stejné.18přenesených actual class/WGSL/plugin/attribute testů nad skutečným patchnutým dependency, relevantní native shader/light/GLB/ownership regrese a scoped TS; TSX_DISABLE_CACHE=1. Pokud environment closure potřebuje3stávající car GLB pro existing tests, pouze readonly link nebo vlastní kopie v cache s přesnýmiSHA, žádný nativeassetzápis.",
+    "Předat exact7files diff/preimages/outputmanifest, testy/logy, dependency identity a nezměněné scope. Cíleně refaktorovat pouze fixture loader/provenance, ne oslabovat assertions. Žádný commit; root po review provede plný native snapshot test/build/integration a potřebnou WebGPU/WebGL smoke, pak samostatný commit/main/Linear.",
+    "Původní source+QA proof/dependencies zůstávají beze změny. Own procesy ukončit, handoff dle šablony, release až po předání. Při kolizi nebo driftu preimage nepsat a vrátit rootovi."
+  ],
+  "notes": [
+    "Přímý root task existujícího BMAD. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow; owner webgpu-define-order-native-01a14497. PřečístAGENTS/policy, gitstatus/worktrees/claims, vlastní claim před zápisem, bez rekurzivního workflow.",
+    "V6 QA1402/1402+fullTS/build+isolatedintegrationPASS, actual Edgeaudyty zdravé. Smyslem je odstranit doložené duplicitní varianty; přesný GPUzisk omezujeodlišnýspatial selection/NPC/pohyb. FirstF a exit stále mají~317/928ms. Startup není prokázaně rychlejší. Parentgoal/KEY31 zůstávajíotevřené.",
+    "Global MaterialDefines serializer nemáWebGPUguard; přijatý kontrakt je současný projektový defaultprocessor/plugin matrix. Custom pořadovězávislýhook vnegativeproofu měníWGSL a není automatickyfallback. WebGL aplikaci musírootpraktickyověřit, native totožnýshaderhelpernení bezpodmínečnýlibAPIpromise."
+  ]
+}

@@ -584,3 +584,12 @@ Samostatná V4 referenční série: první Golden OFF0mod/0sync/max124.5ms, prvn
 ## WebGPU KEY-31: same-engine define-order důkaz (18.10.2026)
 
 [Hitches-v18](performance/evidence/webgpu-migration-20261016/hitches-v18/README.md):16/16CPU + čtecí review PASS,27artefaktů verified.10actual PBR/Standard/plugin/instance WGSL větví má baseline4programy a bounded canonical3 při stejných hodnotách/kódu mimo captured generated const/layout. Genuine value change zůstává jinýEffect. Unknown text fallback/getters/latermutation/lifecycle zachované. Negativní order-sensitive preProcessor mění kód, tudíž ne univerzální vendor bezpečnost. Mirrored car baseline RED0/1 zachován a nepočítán do pokrytí. GPU/startup neověřené; nový samostatný projektový QA serialization task vytváří vlastní fyzické dependencies a nesahá na native/hranýbuild.
+
+
+## WebGPU KEY-31: define-order QA a B6 porovnání (18.10.2026)
+
+[Hitches-v19](performance/evidence/webgpu-migration-20261016/hitches-v19/README.md) archivuje118ověřených artefaktů. QA manifest37b2d5e…bb228, V6fc6efd2b…1d525: genuine finalRED15FAIL/3PASS, targeted18/18, related103/103noskip, scopedTS3170/0, patchroundtrip7/7, full1402/1402+build+isolatedintegrationPASS. Runtime/evidence review bez blokujících nálezů;10 860dep souborů a původnímetadata zachované.
+
+Čerstvá správněnatočená V4B6reference protiV6: outward28mod/22sync/max1661,7ms→2/1/105,6ms; exit26/15/2018,5ms→12/8/928,1ms. FirstF325,8vs317,1ms a nízké steadyFPS zůstávají; CPUpráce přiF neklesla. Startup40,1465vs40,3903s nepodporuje obecné zrychlení. Pozice5,9cm, B6selection/NPC/časování a koncová vzdálenost se liší; nejde o finálnírenderer A/B. Oba healthy rawaudityPASS. V4normal-b6-2 s otočenýmavatarem poS je zachovaný, ale vyloučený z příméhoporovnání. Detailníhitchlogjeomezený4/s, prázdnépole nevylučujeUImax>100ms.
+
+Přijat pouze izolovanýQA component, ne celámigrace. Samostatnýnative task přenese7files patch/lock/testy+gzipfixture bezGame/15QAetap; potřebuje vlastnífullpipeline a WebGPU/WebGLsmoke. Default renderer anihraný4193/C5/4192/4188se nemění, KEY31otevřený.
