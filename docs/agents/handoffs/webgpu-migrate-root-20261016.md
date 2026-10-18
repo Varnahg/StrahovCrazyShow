@@ -207,3 +207,8 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## B6 exit proof přijat, pořadí defines samostatně
 
 18.10 root přijal b6-exit proof manifest97fd7099…17f,4/4CPU + čtecí review bez blokujících nálezů, hitches-v17. Outside history správné/reuse, hidden precheck pouzeEffect. Vedlejší inside pořadí stejných hodnot je oddělený mechanismus, ne atribuce exit14programů. Nový task webgpu-define-order-proof-20261018 porovná same-engine duplicitu a čistý bounded literal-block sort po original toString, bez _keys mutace/cache nebo native patch. Custom callbacks/flat-block provenance a CPU/WGSL versusGPU limity jsou výslovné.
+
+
+## Define-order proof převzat, izolovaný QA kandidát
+
+18.10 hitches-v18/manifest96eb1c7…f355,16/16actual CPU a čtecí review clean.10shader/plugin/attribute větví baseline4→canonical3programy a shodný WGSL/layout; order-sensitive custom hook explicitně negative. Mirror baseline0/1RED zachovaný, nikoli canonicalregrese. Nový webgpu-define-order-qa-20261018 má pouze vlastní cache/handoff, fyzické core/loaders a copiedpatch/lock/testy, runtime Game/V4/hranýbuild beze změny. Root po targeted review připraví nový samostatný build a GPU porovnání; žádný přínos se zatím netvrdí.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-define-order-proof-20261018",
   "title": "KEY-31: doložit stejné varianty lišící se pořadím defines",
-  "status": "ready",
+  "status": "done",
   "dependsOn": ["webgpu-b6-exit-variant-proof-20261018"],
   "writePaths": [
     ".cache/webgpu-migration-checks/define-order-proof-20261018/",
@@ -27,6 +27,7 @@
     "Přímý root task v existujícím BMAD; cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, owner webgpu-define-order-proof-01a14497. Claim před zápisem, žádný rekurzivní workflow.",
     "Vstup b6-exit manifest97fd7099d849864d67429a9cc082276458b594dadbed34ace91815c469bdd17f. Freshinside vs outside-firstinside mají jen pořadí LIGHT3/HEMILIGHT3/LIGHTCOUNT/MAXLIGHTCOUNT odlišné; outsideexit exact reuse funguje. Full source references v analysis.md původního proofu.",
     "Varianty: plošný rebuild sort mění _keys a pozdější opaque hodnoty; guard pouze při rebuild nezajistí budoucí změny hodnot/getters. Bool/number-only guard neřeší skutečné PBR numeric strings. Hotový-result transform zachová původní getter pořadí, změnu hodnot i clone semantics, ale stojí alokace/sort a může měnit order-sensitive custom hooks. Předdeklarace všech slotů přidává falešné klíče a ovlivňuje needRebuild; obecná cache je zbytečně širší. Zvolen pouze bounded counterfactual, produkční přínos neznámý.",
-    "Primární externí podklady: https://www.w3.org/TR/WGSL/#declaration-and-scope a https://registry.khronos.org/OpenGL/specs/gl/GLSLangSpec.4.60.html. Nejsou samy důkazem bezpečnosti libovolných custom callbacks/strings. Pinned PreparePreProcessors a WGSL _convertDefinesToConst použít jako actual source."
+    "Primární externí podklady: https://www.w3.org/TR/WGSL/#declaration-and-scope a https://registry.khronos.org/OpenGL/specs/gl/GLSLangSpec.4.60.html. Nejsou samy důkazem bezpečnosti libovolných custom callbacks/strings. Pinned PreparePreProcessors a WGSL _convertDefinesToConst použít jako actual source.",
+    "Root přijal bounded proof16/16 a čtecí review bez blokujících nálezů. Manifest96eb1c7cc96c2a97d3c6eccc03d6c82714dcf5401a3b6b234b959ff4a50af355.10actual větví baseline4→canonical3 programy, WGSL mimo zachycený generated prefix/layout/values shodné. Custom order-sensitive hook má prokázaný rozdíl, univerzální patch není doložen. Mirror baseline RED0/1 zachovaný, není pokrytí nebo canonical regrese. GPU/startup přínos neověřen; následuje samostatný projektový QA kandidát, nikoli produkční integrace."
   ]
 }

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-define-order-qa-20261018",
+  "title": "KEY-31: izolovaný projektový QA kandidát stabilního pořadí defines",
+  "status": "ready",
+  "dependsOn": ["webgpu-define-order-proof-20261018"],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/define-order-qa-20261018/",
+    "docs/agents/handoffs/webgpu-define-order-qa-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze vlastní QA source/dependency kopie nad immutable V4 bf28a56507b6b0650d214169c8cf94aa3b2d8abc4012a8b098e4e1366340c8c0. Native/main, původní V4/V5, readonly dependencies a hrané4193/4192/4188 beze změny. Žádný install nebo package version update.",
+    "Přenést přesný ověřený canonical-result kontrakt b4892c57e483f6b4a06ff97c59c1378cb9682cb17f3be2acb942644c28883dc2 do kopie pinned Materials/materialDefines.js. Originální toString provede původní čtení a místo return result vrátí čistý canonical result; žádný procesní prototype wrapper v aplikaci, _keys/rebuild/clone/reset/isEqual změna nebo nová cache. Jediný library runtime soubor, žádné Game/stage/camera/readiness/timeout zásahy.",
+    "Zachovat přesnou whole-block validaci,32768chars/1024defines, ordinal-name ordering, original line/literal spelling, all-or-nothing byte-identický fallback a reserved names. Helper neexportovat jako nový Babylon public API. Žádný global flag nebo pozdější mutace cache key/existujících Effects.",
+    "Výsledek je QA kandidát pro doložené aktuální projektové default processor/plugin cesty. Negativní order-sensitive hook je skutečný známý limit; syntax guard ho neumí odmítnout. Neprezentovat jako univerzální Babylon API fix. Bez produkční přejímky/integrace nebo automatického rozšíření na další callback podporu.",
+    "Fyzické nesdílené kopie core i loaders v novém dependency rootu, nlink1 a žádné zapisovatelné junction cíle. Ostatní dependencies mohou být readonly propojené. Zdrojové/test/loaders importy musí mít jednu vlastní QA core identitu. Úplné input/output SHA pro core/loaders, jediný runtime rozdíl materialDefines.js; původní inactive-falloff/helper a ostatní patches zachovat.",
+    "Copied patches/@babylonjs__core@9.30.0.patch a pnpm-lock.yaml odpovídají hunku a SHA; staré patch bytes zachovat. Patch roundtrip vůči originální9.30.0 bez oslabení původních oprav. Pouze copied patch/lock, dvě úzké testové položky pro literal serializer a actual native WGSL/order reuse plus potřebný lokální proof harness. Vše ostatní source byte-identické.",
+    "Úplné15stage pokrytí,30s timeout, skutečné ready draws/final submit a native effect cache/disposal zachované. CPU důkaz nesmí předstírat GPU benefit. Mirrored baseline RED z předchozího proofu archivovat/odkázat jako neověřený limit, neřešit ho v tomto celku ani zamlčet."
+  ],
+  "verification": [
+    "Targeted actual patched MaterialDefines serializer cases: deterministic order/reuse, non-equivalent values, complete fallback/bounds/getters/throws/later mutations/clone/equality a přesně původní pinovaná třída. Nepoužívat pouze kopii funkce jako důkaz distribuce.",
+    "Actual PBR/Standard/native WGSL a10ověřených plugin/attribute cest z předchozího proofu; na skutečné QA dependency ověřit očekávaný reuse/layout, neinstalovat do testu druhý canonicalizer přes patch. Relevantní stávající core patch/shadow/WGSL regrese, scoped TypeScript, actual malý GLB identity kontrola, failure/disposal. Žádný fullsuite/build/GPU/port; root je provede nad stabilním snapshotem podle výsledku.",
+    "Zaznamenat genuine baseline failure nové ordering assertion proti nezměněné QA core a success proti patchi, source/dependency/test SHA a příkazy. Cíleně refaktorovat sdílený helper/fixture, bez zbytečného per-frame stavu. TSX_DISABLE_CACHE=1 přímýnode/tsx; žádné sdílené metadata/.bin/tool-cache zápisy.",
+    "Freeze exact overlay/dependency manifests, diffs/logs, podklady a handoff; ukončit procesy/release bez commitu. Root porovná celý startup, Golden/F a samostatný B6 F/outward/exit bez podrobného profileru; zhoršení/bez přínosu znamená další rozhodnutí, nikoli automatické přijetí."
+  ],
+  "notes": [
+    "Přímý root task existujícího BMAD. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow; owner webgpu-define-order-qa-01a14497. Před zápisem claim, žádný rekurzivní workflow.",
+    "Výzkum a rozhodnutí: toString bounded candidate má actual same-engine16/16proof a shodné default WGSL/layout pro10větví; běžné projektové rendering hooks nepozorují pořadí, diagnostické hashy ano. Rebuild/slot předdeklarace mění mutable state; nový cache není potřebný. WebGPU-only key varianta vyžaduje disjunktní raw/canonical namespace a kompatibilitu obou stran hitu; guard no-processCodeAfterIncludes by vyloučil i built-in PBR/Standard plugin callbacks. Proto nyní menší projektový serialization QA experiment, nikoli neprokázaný jiný cache mechanismus.",
+    "Proof manifest96eb1c7cc96c2a97d3c6eccc03d6c82714dcf5401a3b6b234b959ff4a50af355.73.1µs/3073chars je pouze Node microbench, ne startup odhad. V4 normal start40.3144/41.6261s, B6outward22mod16sync/963.2ms aexit28/16/2142.3ms jsou referenční limity. Počtyvariant/scény kolísají, nový backend benefit musí být skutečně změřen.",
+    "Nové kopie mají využít stejný izolovaný dependency postup jako inactive-light-defines-qa; nepsat skrze V4 node_modules junction. Pokud je k přenosu skutečných testů potřeba více než dohodnuté dvě cílové test položky, nejprve rootovi navrhnout konkrétní scope změnu."
+  ]
+}
