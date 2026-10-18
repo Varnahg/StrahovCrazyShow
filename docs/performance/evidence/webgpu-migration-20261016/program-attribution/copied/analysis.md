@@ -1,0 +1,9 @@
+# Omezené přiřazení nových požadavků
+
+Pinned Babylon9.30: effect.functions createAndPreparePipelineContext volá _preparePipelineContextAsync(context,args7 defines) před návratem; _key je prázdný. Effect._onRenderingStateCompiled nastaví context před onCompileObservable. PBR/Standard material notification následuje createEffect, ale async shader import může nechat context null. Proto je identita contextu vhodná, text defines ani Effect.uniqueId nejsou samy identitou nového požadavku. Fallback může vytvořit nový context pro stejný Effect; opakované prepare stejného contextu jsou oddělené požadavky.
+
+Varianty: zvýšení8detailů míchá cachehits a neposkytne vazbu na přípravu; textové seskupení není identita; dodatečné promise handlery a ready polling jsou zbytečné. Volba: existující hook uloží max32requestů pouze během local benchmarku, stávající material observer připojí max4primitive users; max32vlastněných compile observers pro null/pending contexts. Hotový cachehit nevytvoří request. Existující promise timing handler může zaznamenat outcome bez nové Promise větve.
+
+Definitions jsou bounded na16KiB serializovaného obsahu v chunks≤1024, names/attributes jsou omezené; každýrequest se loguje samostatně přes reálný sanitizer a32KiB recordlimit. Žádnýshader source, žádná draw/GPUčas atribuce. End/restart/devicegeneration/dispose uvolní context/effect references a observers; eventcallback i introspection chyby se nesmí dostat do rendereru. Pending či unmatched se exportují výslovně. Toto není runtime optimalizace ani nové přijetí KEY31.
+
+Review P2: původní16KiB defines limit nezaručilcelý32KiB JSON record s4Unicode/escaped uživateli. Oprava pouzebudget přiadduser s1024B rezervou prologger; genuineRED1vs33 aGREEN54/54. Gate zpřesněn explicitním existing environmentProfile, ne automatické recording samotné. linkedAtMs označuje join contextu, nikoli původní čas metadata. FullTS/build/GPU neprovedeny dítětem.

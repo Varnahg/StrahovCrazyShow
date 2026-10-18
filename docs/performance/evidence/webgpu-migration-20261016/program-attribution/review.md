@@ -1,0 +1,5 @@
+# Nezávislé review a interpretace
+
+Runtime V1 review našlo pouze P2 celkového32KiB exportního limitu. První oprava pokryla Unicode/control znaky, recheck doložil zvětšení při redakci token=a. V2 měří obě skutečné sanitizace. Reviewer ověřil manifest2c4242ed8054aac0747d361896bb6c0f0ea2a01006802e74e27520260de78d0c, obě změněnéSHA a byte shodu dalších4souborů. Uložený genuineRED ukládá1summary místo33records; GREEN55/55 zachová33/dropped0 v obou krajních případech. Finální nálezy[]; reviewer testy znovu nespouštěl.
+
+Další nezávislý čtecí rozbor skutečné session potvrzuje14requests, všechny matched/fulfilled a plnédefines. Původních6 jsou dvěglass a sharedoutdoor PBR při3→2 světlech; dalších8 jsou medium geometrické/materiálové varianty5simulovaných cestujících přítomných užpo ready. Fixní osvětlení nefixuje transit čas. Dlouhé mezery nejsou změřenýGPUčas, notifications nepotvrzují draw a4users nejsou úplnýseznam. Capture nedokládá, zda příprava chybí kvůli active-list pokrytí nebo pozdějšímu uvolnění. Další zásah se zvolí až po tomto rozlišení.
