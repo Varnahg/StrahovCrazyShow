@@ -223,3 +223,17 @@ Hitches-v24 má161artefaktů, manifest a475e6f75f1f511f59ae149cab3749446505eb260
 Samostatný engine-owned kandidát prošel prvními15lifecycle/18reference/18owner testy, actualwarm smoke5/5 a scopedTS3173/0. Nejde o finální review nebo přijetí; timing a whole-game/startup teprve následují. Statický review nalezl restored-notify-before-flagfalse problém, návrh jej opravil a přidal přesnou regresi; testy pokrývají device loss i bez přeposlání observables.
 
 Orientační V6 staticFrustum B6 pair19.8→22.9FPS se nepřijímá jako účinek optimalizace: ON má0tests/0rejections/545unsafe a nezúžil kandidáty. Pozdní OFFmainCPU zpomalení nemá doloženou příčinu, dynamickéNPC/auta se lišily. Stejnáprojekce1514×644 a kamera8.50cmblízko nestačí pro kauzalitu. OFFdispose tail chybí a není lifecycleproof. Žádná změna defaultu nebo hranýchbuildů; detailní raw lokálně uchován. Frozenintent/baseline/in-progress a neprovedená závěrečná matrix zůstávají platné.
+
+## Výslovná změna priority uživatele18.10.2026 a integrace day13
+
+Uživatel: „časová cena na startu mi nevadí, ale chci aby to pak běželo rychle a svižně“. Delší přiznané načítání už neblokuje přípravu variant, která odstraňuje záseky po vstupu. To nahrazuje původní požadavek nezhoršit startup; nemění úplnou readiness, timeout ani přijetí plynulosti hry. Celkový cíl/in-progress zůstává.
+
+Přijato day13 BEZmemo: WT c9f62e95f4cb40ff9b777480b544764939b4b8ce → main90e893cf70094b3a15c177841ffe6f1936f72831, přesně6source/testfiles. Clean1338/fullTS/build/integration a nový combinedbce0990518c8ce652da7cd73d899a4c068a52d80fbe3cbc950c5126432124dc1 se1398/fullTS/build/integrationPASS. Dva foreign překryvy zachované reverzibilními hunks, dalších130workingpathsbyte-identical. Novýfrozen4195/API2590, hrané4193/4192/4188 se nemění. Memo2GPU páry zůstaly výkonově nepřijaté; nové cache nebo odstranění etap se nepřenáší. Následuje skutečná přejímka buildu a zbývajících gameplay/FPS scénářů, nikoli další startup optimalizační série.
+
+## Vyřešená mezera auto→low v přípravě kvalit
+
+Skutečný defaultauto4195 po medium přípravě přešel na low a prvníF měl3993.4ms/49syncpipeline. Sourceaudit doložil změnu HDRmain targetu, bump/LOD/light budgetů a torchmapy ažpřiON. Vybrána konečná3quality matrix předready; selective-low-F nepokrýváostatnístavy a gameplayasync gate vyžaduje novývalidframe lifecycle. Temporaryrenderquality neměnírequestedadaptivecontroller; nejnovějšívolba se obnoví vposlednírestore readiness.30s/pass a90s/celýaktivnírozpočet, původníhealth/cancel/visibility/finalsubmit zachované. No memo.
+
+WT61377f61530f51433c51b565f03773421d4b3b35 → main0703258da75d98cf192a8a4f11bb360baa765585,5source/testfiles. Clean412bdb1367/1367 acombined205b4d1427/1427,fullTS/build/integrationPASS. Source/refactor/reviewuzavřen sconstructor-orderRED/GREEN; Game wrapper8tests,helper19,actualinner19. WorkingC5merge zachoval219members a startup/preload; další131dirtypathsbytyzachované. Late-requestqualityeventběhemloadingoverride není samostatněemitován, renderrestoreje správný.
+
+Edge auto→low50% při1514×643: firstF150.4ms/3sync místo3993.4/49. Low→high224.4ms0mod1sync→medium162.4ms0/0→low152.8ms0/0→repeatF113.7ms0/0, healthvalid/chyby0. Startup57.6603s/39complete stages je přiznanácena. Frozen4195v2snapshot205b4dda8028dd20b90dbd75177ba6ebd8d3fcf41d02cd97a8c44c42a6b9d05d zůstávákvyzkoušení. P95/p99 a~40–45FPS stále nejsoufinálnícíl; B6,vozidla,remoteavatars,editorlifecycle a1/3relace přejímkazbývají. KEY31/default/migračnícílzůstáváInProgress; žádnéfalešnéDone podle tohotoprůchodu.
