@@ -1,0 +1,8 @@
+import fs from 'node:fs';import path from 'node:path';import {fileURLToPath} from 'node:url';import {spawnSync} from 'node:child_process';import {createHash} from 'node:crypto';import assert from 'node:assert/strict';
+const root=path.dirname(fileURLToPath(import.meta.url)),cwd=path.join(root,'candidate'),id=process.argv[2];assert.match(id??'',/^\d+$/);
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const names=['client/game.ts','client/webgpu-compilation-profile.ts','client/render-incident-profile.ts','tests/webgpu-compilation-profile.test.ts','tests/render-incident-profile.test.ts','tests/webgpu-program-attribution.test.ts'];
+const sources=names.map(name=>{const bytes=fs.readFileSync(path.join(cwd,name)),out=path.join(root,'runs',id,name);fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,bytes,{flag:'wx'});return{path:name,sha256:hash(bytes)};});
+const args=[path.join(cwd,'node_modules/tsx/dist/cli.mjs'),'--test','--test-reporter=tap',...names.filter(n=>n.startsWith('tests/'))];
+const startedAt=new Date().toISOString(),result=spawnSync(process.execPath,args,{cwd,env:{...process.env,TSX_DISABLE_CACHE:'1'},encoding:'utf8',timeout:90000,maxBuffer:3*1024*1024});
+const log=(result.stdout??'')+(result.stderr??'');fs.writeFileSync(path.join(root,`run-${id}.log`),log,{flag:'wx'});fs.writeFileSync(path.join(root,`run-${id}.json`),JSON.stringify({startedAt,finishedAt:new Date().toISOString(),args,status:result.status,error:result.error?.message??null,sources,logSha256:hash(log)},null,2)+'\n',{flag:'wx'});console.log(log);process.exitCode=result.status??1;
