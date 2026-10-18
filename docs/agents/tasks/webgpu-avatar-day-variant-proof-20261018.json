@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-avatar-day-variant-proof-20261018",
+  "title": "KEY-31: porovnat skutečné avatarové denní varianty spawn a B6",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/avatar-day-variant-proof-20261018/",
+    "docs/agents/handoffs/webgpu-avatar-day-variant-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Bounded CPU proof skutečného Alex near avatara a jeho main draw materiálů: skin/skeleton, garment, ocular, hair/strands alpha cesty. Nepoužívat proxy box místo zkoumaného avatara.",
+    "Porovnat day B6 OFF/ON, variantu A B6 světla s kamerou ve spawn pose a variantu B existující day/spawn apply se skutečným mapped POINT count1 včetně intensity0. Úplné defines, skutečný camera pass, main Effect identity/reuse a light/shadow/cap fingerprint.",
+    "Oddělit viditelný/hidden avatar, actual attachment/LOD a shader-ready od skutečného draw. Bez falešné připravenosti, nové cache, runtime zásahu nebo GPU přejímky."
+  ],
+  "verification": [
+    "Použít byte-identické frozen a94/ec280 zdroje a pinned Babylon9.30; zaznamenat source/probe/output SHA a explicitní IO stubs. Předchozí B6 proof a hitches-v7 jsou kontext.",
+    "Lehké CPU scénáře, cleanup vlastních scén/zdrojů a neporušené requested state. Žádný full world, velké GLB, fullsuite/build/integration/GPU nebo install. Pokud skutečný avatar vyžaduje rozšíření zátěže, požádat root o konkrétní scope před spuštěním."
+  ],
+  "notes": [
+    "Koordinátor root, přímá delegace bez dalšího BMAD workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow.",
+    "Cílem je průzkum před dalším QA. Nový bounded výsledek nesmí přepisovat původní frozen proof/prototypy. Žádná produkční implementace není tímto taskem autorizovaná.",
+    "Hitches-v7: zbývá20modulů/10preparations/10sync, top main příprava avatar170.7ms a entry52.6ms. Dominantní wrapped-depth churn neprokázán. Preferovat menší existující apply(day,torch,1), jen pokud skutečné full defines/reuse sedí.",
+    "Prototyp A94 už používá16 inventory stage labels. Toto je CPU proof; neměnit runtime limity ani přidávat diagnostické hooks.",
+    "Read-only dependencies-v5, přímý node/tsx s TSX_DISABLE_CACHE=1. Předat důkazy/limity a release bez commitu."
+  ]
+}
