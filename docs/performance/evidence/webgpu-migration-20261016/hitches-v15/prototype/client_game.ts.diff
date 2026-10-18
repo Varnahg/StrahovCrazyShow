@@ -1,0 +1,89 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\inactive-light-v4\\client\\game.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\avatar-day-far-prototype-20261018\\candidate\\client\\game.ts"
+index d97b947..14da44f 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\inactive-light-v4\\client\\game.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\avatar-day-far-prototype-20261018\\candidate\\client\\game.ts"
+@@ -15,6 +15,7 @@ import { SceneTextureDiagnostics } from "./texture-diagnostics";
+ import { StableLightState } from "./stable-light-state";
+ import { GltfLightBudget } from "./gltf-light-budget";
+ import { prepareLightVariants } from "./light-preparation";
++import { AvatarPreparationFarPlane } from "./avatar-preparation-far-plane";
+ import { WebGpuPipelinePreparation } from "./webgpu-pipeline-preparation";
+ import { arePreparationEffectsReady } from "./strict-material-preparation";
+ import { selectLightingPreview } from "./lighting-preview";
+@@ -2603,6 +2604,8 @@ export class Game {
+   }
+   private prepareLighting(render: () => void, pipelines?: Pick<WebGpuPipelinePreparation, "isReady">) {
+     const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
++    const avatarFarPlane = new AvatarPreparationFarPlane(this.camera);
++    let avatarDayView = false;
+     // The same controller/materials survive into gameplay; no proxy shaders.
+     this.flashlight ??= new PlayerFlashlight(this.scene);
+     const night = selectLightingPreview("night").instant!;
+@@ -2711,6 +2714,8 @@ export class Game {
+         day!, flashlightOn, undefined, true);
+     };
+     const restore = () => {
++      avatarDayView = false;
++      avatarFarPlane.restore();
+       const hadB6 = !!savedCamera;
+       leaveB6();
+       if (!isRetired()) {
+@@ -2722,6 +2727,8 @@ export class Game {
+       includeB6DayPair,
+       includeDayPointVariants,
+       apply: (stage) => {
++        avatarDayView = false;
++        avatarFarPlane.restore();
+         if (stage === "restore") return restore();
+         this.compilationProfile.setStage(stage);
+         if (stage === "b6-day-off" || stage === "b6-day-on") {
+@@ -2733,6 +2740,7 @@ export class Game {
+           stage.endsWith("-on"),
+           stage.startsWith("night-") || stage.startsWith("day-") ? Number(stage.split("-")[1]) : undefined,
+         );
++        avatarDayView = stage === "day-1-off" || stage === "day-1-on";
+       },
+       restore,
+       // The first progress draw establishes the actual active list, including
+@@ -2756,15 +2764,25 @@ export class Game {
+           arePreparationEffectsReady(this.engine)
+         );
+       },
+-      render,
++      render: () => {
++        // Re-read live rigs even when a replacement preserves mesh counts.
++        // This bounded loading-only work never enters the interactive loop.
++        if (avatarDayView) avatarFarPlane.apply(this.avatars.values());
++        render();
++      },
+       run: (callback) => this.engine.runRenderLoop(callback),
+       stop: (callback) => this.engine.stopRenderLoop(callback),
+       onDispose: (callback) => {
+-        this.cancelLightPreparation = callback;
+-        const observer = this.scene.onDisposeObservable.add(callback);
++        const cancel = () => {
++          avatarDayView = false;
++          avatarFarPlane.restore();
++          callback();
++        };
++        this.cancelLightPreparation = cancel;
++        const observer = this.scene.onDisposeObservable.add(cancel);
+         return () => {
+           this.scene.onDisposeObservable.remove(observer);
+-          if (this.cancelLightPreparation === callback)
++          if (this.cancelLightPreparation === cancel)
+             this.cancelLightPreparation = undefined;
+         };
+       },
+@@ -2789,7 +2807,10 @@ export class Game {
+       setTimer: (callback, milliseconds) =>
+         window.setTimeout(callback, milliseconds),
+       clearTimer: (timer) => window.clearTimeout(timer as number),
+-    }).finally(leaveB6);
++    }).finally(() => {
++      avatarFarPlane.restore();
++      leaveB6();
++    });
+   }
+ 
+   frame() {

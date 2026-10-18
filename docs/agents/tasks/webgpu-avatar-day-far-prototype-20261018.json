@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-avatar-day-far-prototype-20261018",
   "title": "KEY-31: izolovaný QA experiment užší Day1 far plane",
-  "status": "ready",
+  "status": "done",
   "dependsOn": ["webgpu-avatar-day-view-proof-20261018"],
   "writePaths": [
     ".cache/webgpu-migration-checks/avatar-day-far-prototype-20261018/",
@@ -25,6 +25,7 @@
     "Přímé root zadání přes existující BMAD, žádný rekurzivní workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow. Owner webgpu-avatar-day-far-01a14497. Claim až po dokončení závislého proofu.",
     "World Day1 je užitečná kombinace při GoldenHour, svítání/soumraku, lunar DIR, řízeném autě a B6 pohledu ven. Far-only není předem přijaté zúžení coverage; sdílené Effecty/B6/shadow pass mohou část práce zachovat nebo přesunout. TreeWind mimo main frustum stále vytváří base/depth Effect. Úspora není prokázaná.",
     "V4 prvníGoldenOFF0mod/0sync/max124.5ms, prvníGoldenF4mod/2sync/max210.9ms; navazující předvolby zahřáté0/0. Cloud0.96 neznamená vypnutýDIR, ale v tomto běhu vypnul celestial shadows. Zdrojový počet3/4 spolu s kontraktem odpovídá HEMI+DIR+POINT(+SPOT), není to přímý per-light export.",
-    "TSX_DISABLE_CACHE=1, žádné sdílené dependency zápisy. Předat exact overlay/source/test SHA, cílené logy, lifecycle a limity společně; freeze/handoff/release bez commitu."
+    "TSX_DISABLE_CACHE=1, žádné sdílené dependency zápisy. Předat exact overlay/source/test SHA, cílené logy, lifecycle a limity společně; freeze/handoff/release bez commitu.",
+    "Root přijal pouze dokončený negativní experiment a předání: hitches-v15. CPU64/64, scoped TS a fullTS/build PASS; V5 Golden16mod/12sync/max1178.4ms a F24/16/1748.7ms proti V4 0/0/124.5 a4/2/210.9. Startup43.2566 proti43.5224s bez doložené výhody. Raw audit PASS s ambientními limity. Far-only runtime zamítnut, žádná native integrace ani uzavření KEY-31; další B6/fullsuite/integrace této varianty nebyly provedeny."
   ]
 }

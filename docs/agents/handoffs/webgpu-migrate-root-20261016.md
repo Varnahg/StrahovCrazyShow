@@ -193,3 +193,7 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## Avatar view V2 a světelné kontroly převzaty
 
 18.10 hitches-v14 archivuje70artefaktů včetně původní V1 sP2, přesného RED/GREEN V2 a V4 raw/UI šesti světelných oken. V2 restore přijat po nezávislém review; far-only CPU coverage není world ani GPU přijetí. Samostatný task webgpu-avatar-day-far-prototype-20261018 zapisuje pouze copied cache/handoff. První V4 GoldenF a samostatný cold B6 budou nutné kontroly proti ztrátě coverage. Own služby po sérii stojí, měřicí karta about:blank, hrané4193/4192/4188 nezměněné.
+
+## Far-only V5 zamítnut
+
+18.10 hitches-v15 archivuje48 artefaktů včetně přesného QA overlay,64 testů/fullTS/build a produkčního raw/UI. V5 Golden16/12modulů/sync max1178,4ms a první F24/16 max1748,7ms proti V4 0/0/124,5 a4/2/210,9. Startup43,2566 proti43,5224s neprokazuje úsporu. Čtecí audit ověřil8265 souvislých záznamů, platné akce/health a cleanup resources0; ambientní historie omezuje úplnou atribuci. Task done pouze jako dokončený negativní experiment, žádná runtime integrace. Native/main/hranýbuild beze změny, own4194/2589 služby zastavené podle identity. Linear9a1c0c44-9c4c-49da-83f2-3d8153b4403e. Další měření plného V4 použije existující režim bez profileEnvironment=1: zachová základní startup/FPS/module/pipeline/health důkazy, vypne drahý inventář a engine/environment hooks; není to nová diagnostická vrstva ani izolovaný inventory-only A/B.

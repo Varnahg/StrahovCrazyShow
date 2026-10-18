@@ -1,0 +1,54 @@
+BJS - [05:38:27]: Babylon.js v9.30.0 - Null engine
+BJS - [05:38:27]: Babylon.js v9.30.0 - Null engine
+✖ Day1 far scope restores before every stage/restart and leaves all fifteen original gates (82.7766ms)
+✖ Day1 far scope restores synchronously on cancellation and after timeout or actual apply failure (7.9627ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2752.5837
+
+✖ failing tests:
+
+test at tests\game-light-preparation.test.ts:9:21776
+✖ Day1 far scope restores before every stage/restart and leaves all fifteen original gates (82.7766ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(f.camera.maxZ < 1100)
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\avatar-day-far-prototype-20261018\candidate\tests\game-light-preparation.test.ts:871:36)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\game-light-preparation.test.ts:9:22626
+✖ Day1 far scope restores synchronously on cancellation and after timeout or actual apply failure (7.9627ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(f.camera.maxZ < 1100)
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\avatar-day-far-prototype-20261018\candidate\tests\game-light-preparation.test.ts:886:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
