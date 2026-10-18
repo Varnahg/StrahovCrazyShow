@@ -185,3 +185,7 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## Dílčí nativní editor a další CPU proof
 
 18.10 editor-native-v1 zaznamenává6actual WebGPU presetů a Alex doplňky/detail/otočení na čistémnativeeb061 snapshotu, warnings/errors0; žádnéFPS tvrzení. Own4194/API2589 ukončeno, karta about:blank. Přidělen pouze cache/handoff taskwebgpu-avatar-day-view-proof-20261018: exact narrow perspective coverage, vertices/bounds, main/shadow a restore/lifecycle před případnýmQA runtime zásahem. Další read-only audit ověřuje význam neaktivních grass cap42 z předchozího histogramu; není to doložená aktivní výkonová regrese.
+
+## Material budget capture proof převzat
+
+18.10 root přijal5/5CPUproof, manifestd9a5226f…029c, reviewer beználezů, hitches-v13. Oba mechanismy (latecapturefixed42 a known4 readiness předrepair) jsou reprodukované možnosti, ne produkční timingatribuce. Taskdone pouze proproof, runtimebezezměny. Avatar-view proof zatím opravujeP2 neúplného focal/reference/getTarget restore; jeho původní119captures nejsou přijaté jako kompletnírestore.

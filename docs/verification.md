@@ -555,3 +555,7 @@ Dva V3 Day přechody62mod/45sync a3309.5/3178.9ms; dva V4 přechody0mod/0sync a1
 ## WebGPU: šest nativních editorových předloh (18.10.2026)
 
 [Dílčí evidence editor-native-v1](performance/evidence/webgpu-migration-20261016/editor-native-v1/README.md), native snapshoteb061b9e…f0b7b3, Edge WebGPU1. Všech6presetů ready a vizuálně vykreslených; Alex brýle/vousy/detail/otočení, poté návrat naAlex bez doplňků.14hashovaných artefaktů, browser warnings/errors0. Interní preview361×244; CSS zvlášť neměřeno. Není to FPS/pixel parity, herní LOD/multiplayer ani resource-count přejímka. Vlastní scéna a služby ukončené, hranébuildy nezměněné.
+
+## WebGPU KEY-31: material budget capture proof (18.10.2026)
+
+[Hitches-v13](performance/evidence/webgpu-migration-20261016/hitches-v13/README.md): skutečný tiny-glTF/global cap setter/deferred Scene observer a GltfLightBudget,5/5 PASS. Late prvnícapture drží42; known4 readiness předprepareFrame vytvoříEffect42 potom4; guard před readiness pouze4. Explicit7/42 zachované, LIGHTCOUNT2 a skutečnýcamera-pass draw. Nezávisléreview bez nálezů. KontrolovanýREADYgap/NullEngine není produkčníGPUtiming. Původnícap42grass byl neaktivní; nelze mu připsat Day/startup náklad. Bezruntimeopravy, další cache/diagnostiky nebo změny hranýchbuildů.

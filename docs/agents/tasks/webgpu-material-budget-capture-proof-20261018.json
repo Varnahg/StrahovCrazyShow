@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-material-budget-capture-proof-20261018",
   "title": "KEY-31: doložit pořadí prvního zachycení material light budgetu",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     ".cache/webgpu-migration-checks/material-budget-capture-proof-20261018/",
@@ -23,6 +23,7 @@
   "notes": [
     "Přímé root zadání přes existující BMAD, žádný rekurzivní workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow; owner webgpu-budget-capture-01a14497.",
     "Readonly sources: frozen inactive-light-v4 bf28a56507b6b0650d214169c8cf94aa3b2d8abc4012a8b098e4e1366340c8c0, aktuální tests/gltf-light-budget.test.ts a jeho pinned imports. QA dependencies nikdy nepsat; vlastní prefix pro každou odvozenou fixture.",
-    "HistogramV3control2 cap4×216/cap42×2/unavailable45; V4pilot2 cap4×218/unavailable45. Dvě cap42 jsou photographic leaves shared flat/bent PBR, nikoli aktivní CC0 stromové materiály. Čas prvního capture není v raw; neopakovat hypotézu jako naměřenou příčinu startupu."
+    "HistogramV3control2 cap4×216/cap42×2/unavailable45; V4pilot2 cap4×218/unavailable45. Dvě cap42 jsou photographic leaves shared flat/bent PBR, nikoli aktivní CC0 stromové materiály. Čas prvního capture není v raw; neopakovat hypotézu jako naměřenou příčinu startupu.",
+    "Root přijal bounded proof5/5 a nezávislé čtecí review bez nálezů; manifestd9a5226f0aa76c7cf4d9250915e59716c3f243e73ff95c6dfc08ae5297d3029c, evidencehitches-v13. Skutečný loader/Scene/guard/Effect pořadí, žádný runtime zásah nebo produkční timing atribuce. Další oprava není z tohoto histogramu automaticky schválená."
   ]
 }
