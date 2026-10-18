@@ -1,0 +1,157 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\define-order-native-v1\\tests\\game-light-preparation.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\native-day-coverage-qa-20261018\\candidate\\tests\\game-light-preparation.test.ts"
+index 15e4065..0a6e196 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\define-order-native-v1\\tests\\game-light-preparation.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\native-day-coverage-qa-20261018\\candidate\\tests\\game-light-preparation.test.ts"
+@@ -323,17 +323,19 @@ test("actual Game shader inventory follows the real loopback diagnostic opt-in",
+     ["https://example.com/?profileEnvironment=1", false],
+     ["http://127.0.0.1:4193/?profileEnvironment=1", true],
+   ] as const) {
+-    let captured: { shader: boolean; unusedDefines: boolean } | undefined;
++    let captured: { shader: boolean; unusedDefines: boolean; maxStages: number | undefined } | undefined;
+     const run = initialize({
+       createEnvironmentProfile,
+       WebGpuCompilationProfile: class {
+         constructor(_engine: unknown, options: {
+           captureShaderInventory: boolean;
+           captureUnusedDefineInventory: boolean;
++          shaderInventoryLimits?: { maxStages: number };
+         }) {
+           captured = {
+             shader: options.captureShaderInventory,
+             unusedDefines: options.captureUnusedDefineInventory,
++            maxStages: options.shaderInventoryLimits?.maxStages,
+           };
+         }
+       },
+@@ -341,7 +343,7 @@ test("actual Game shader inventory follows the real loopback diagnostic opt-in",
+       window: { location: new URL(url) },
+     });
+     run.call({ engine: {}, renderHealth: { rendererId: 1 } });
+-    assert.deepEqual(captured, { shader: expected, unusedDefines: expected }, url);
++    assert.deepEqual(captured, { shader: expected, unusedDefines: expected, maxStages: expected ? 19 : undefined }, url);
+   }
+ });
+ 
+@@ -576,3 +578,122 @@ test("actual readiness error restores camera pass and leaves the requested OFF s
+   assert.equal(f.game.cancelLightPreparation, undefined);
+   assert.equal(f.hasTimer, false);
+ });
++
++/** Existing native Game fixture: actual light/torch objects, controlled clocks
++ * and readiness boundaries. This does not claim a GPU draw or shader proof. */
++function dayFixture(t: import("node:test").TestContext, webgpu = true) {
++  const f = fixture(t);
++  let stage = "";
++  Object.assign(f.engine, {
++    isWebGPU: webgpu,
++    _compiledEffects: {
++      requested: { isReady: () => f.engine.areAllEffectsReady(), getEngine: () => f.engine, isDisposed: false },
++    },
++  });
++  f.game.compilationProfile.setStage = (value: string) => { stage = value; };
++  new DirectionalLight("actual day sun", Vector3.Down(), f.scene);
++  const environment = f.game.updateRenderEnvironment;
++  f.game.updateRenderEnvironment = (...args: unknown[]) => {
++    const result = environment(...args);
++    return stage.startsWith("day-") ? { night: 0 } : result;
++  };
++  return Object.assign(f, {
++    getStage: () => stage,
++    advanceTo(value: string) {
++      for (let ticks = 0; stage !== value && ticks < 200; ticks++) f.tick();
++      assert.equal(stage, value);
++    },
++  });
++}
++
++test("native WebGPU day0/day1 keeps the full spawn presentation and actual OFF/ON light membership", async (t) => {
++  const f = dayFixture(t), actor = JSON.stringify(f.game.actor);
++  const camera = f.game.camera, position = camera.position.clone();
++  const cameraShape = [camera.fov, camera.minZ, camera.maxZ];
++  const receiver = f.scene.meshes.find(mesh => mesh.name === "actual beam caster")!;
++  const pending = f.start();
++  const expected: [string, boolean, number, string[]][] = [
++    ["day-0-off", false, 0, ["DirectionalLight", "HemisphericLight"]],
++    ["day-0-on", true, 0, ["SpotLight", "DirectionalLight", "HemisphericLight"]],
++    ["day-1-off", false, 1, ["PointLight", "DirectionalLight", "HemisphericLight"]],
++    ["day-1-on", true, 1, ["SpotLight", "PointLight", "DirectionalLight", "HemisphericLight"]],
++  ];
++  for (const [stage, on, count, types] of expected) {
++    f.advanceTo(stage);
++    assert.equal(f.states.at(-1)!.instant, selectLightingPreview("day").instant);
++    assert.equal(f.states.at(-1)!.enabled, on);
++    assert.equal(f.streets.filter(light => light.isEnabled()).length, count);
++    assert.ok(f.streets.every(light => light.intensity === 0), "enabled POINT with zero radiance still prepares its define");
++    assert.deepEqual(receiver.lightSources.map(light => light.getClassName()), types);
++    assert.equal(f.game.flashlightOn, false);
++    assert.equal(JSON.stringify(f.game.actor), actor);
++    assert.deepEqual([camera.fov, camera.minZ, camera.maxZ], cameraShape);
++    assert.ok(camera.position.equals(position), "day stages use the original fixture camera path, no synthetic view");
++  }
++  f.finish(); const result = await pending;
++  assert.equal(result.status, "complete");
++  assert.equal(result.stages.length, 13);
++  assert.deepEqual(result.stages.slice(-5).map((s: { stage: string }) => s.stage), ["day-0-off", "day-0-on", "day-1-off", "day-1-on", "restore"]);
++  assert.ok(result.stages.every((s: { renders: number }) => s.renders >= 3));
++  assert.equal(f.game.ready, false);
++  assert.equal(f.game.flashlight.beam.light.isEnabled(), false);
++  assert.equal(f.engine.currentRenderPassId, 901);
++  assert.equal(f.hasTimer, false);
++});
++
++test("native day pending effects retain the stage, reacquire a replacement rig and restore latest requests", async (t) => {
++  const f = dayFixture(t), actor = JSON.stringify(f.game.actor);
++  const pending = f.start(); f.advanceTo("day-0-off"); f.effects(false);
++  const replacement = { ...f.rig };
++  f.game.quality = "low"; f.game.timeOverride = 1792303200000;
++  f.game.weather = {}; f.game.profile = {}; f.game.avatars.set("local", replacement);
++  f.tick(); f.tick();
++  assert.equal(f.getStage(), "day-0-off");
++  assert.equal(f.states.at(-1)!.self, replacement);
++  assert.equal(f.game.ready, false);
++  f.effects(true); f.advanceTo("day-1-on");
++  assert.equal(f.streets.filter(light => light.isEnabled()).length, 1);
++  f.game.flashlightOn = true;
++  f.finish(); const result = await pending;
++  assert.equal(result.status, "complete");
++  const day = result.stages.find((s: { stage: string }) => s.stage === "day-0-off")!;
++  assert.equal(day.restarts, 1);
++  assert.equal(day.restartReasons.weather, 1);
++  assert.equal(f.states.at(-1)!.instant, 1792303200000);
++  assert.equal(f.states.at(-1)!.self, replacement);
++  assert.equal(f.states.at(-1)!.quality, "low");
++  assert.equal(f.game.flashlight.beam.light.isEnabled(), true);
++  assert.equal(JSON.stringify(f.game.actor), actor);
++});
++
++test("native day timeout and terminal retirement retain the original cleanup and 30 second deadline", async (t) => {
++  for (const stage of ["day-0-on", "day-1-on"]) for (const ending of ["timeout", "disposed", "failed"] as const) {
++    const f = dayFixture(t), pending = f.start(); f.advanceTo(stage); f.effects(false);
++    const states = f.states.length, draws = f.draws;
++    if (ending === "timeout") f.timeout();
++    else {
++      if (ending === "disposed") f.game.disposed = true;
++      else f.game.rendererFailed = true;
++      f.game.cancelLightPreparation();
++    }
++    const result = await pending;
++    assert.equal(result.status, ending === "timeout" ? "timeout" : "disposed");
++    if (ending === "timeout") {
++      assert.equal(result.activeElapsedMs, 30001);
++      assert.equal(f.game.flashlight.beam.light.isEnabled(), false);
++      assert.equal(f.states.at(-1)!.instant, f.game.timeOverride);
++    } else assert.equal(f.states.length, states, "retired owner receives no restore");
++    assert.equal(f.draws, draws);
++    assert.equal(f.game.cancelLightPreparation, undefined);
++    assert.equal(f.hasTimer, false);
++    assert.equal(f.game.ready, false);
++  }
++});
++
++test("native WebGL preparation remains nine stages without an independent day preview", async (t) => {
++  const f = dayFixture(t, false), pending = f.start(); f.finish();
++  const result = await pending;
++  assert.equal(result.status, "complete");
++  assert.equal(result.stages.length, 9);
++  assert.ok(result.stages.every((s: { stage: string }) => !s.stage.startsWith("day-")));
++});

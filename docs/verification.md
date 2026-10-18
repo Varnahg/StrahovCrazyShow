@@ -605,3 +605,10 @@ Edge WebGPU i WebGL2 funkční smoke načtení/Golden/F/pohyb/menu bez render/as
 ## WebGPU KEY-31: cena přepnutí připravených materiálů (18.10.2026)
 
 [Hitches-v21](performance/evidence/webgpu-migration-20261016/hitches-v21/README.md): actual PBR/Standard/plugin proof,3×5/5 a scopedTS2963/0, V2čtecí review bez zbývajících nálezů. Warm přepnutí36submeshes má36cachehitů/serializací/resetů,0novýchprogramů; genuine define změna1program. Největší úzký měřenýscope je celétoString, nikoli samotnýcachelookup. Scopesvnořené, observerrežie výslovná, GPUbindings/pipeline/submission nejsou pokryté. Žádné násobení na produkci ani runtimecache.46artefaktů včetně zachovanéhoV1 a negativníchfixtureběhů. Taskdone je dokončený CPUproof, nikoli výkonová přejímka KEY31.
+
+
+## WebGPU KEY-31: izolovaný day13 experiment (18.10.2026)
+
+[Hitches-v22](performance/evidence/webgpu-migration-20261016/hitches-v22/README.md): copied6files nad native2a3d, snapshotb9d812d3262ec6e781b6d268b4ca0fec108ab0b32591dbfba83a70d0578b513f. Baseline65PASS/9FAIL→74/74,related80/80,scopedTS0,full1338/1338 bezskipů/fullTS/build/isolatedintegrationPASS. Read-only review čisté. WebGPU13/WebGL9,19opt-in/default16, původní30s/readiness zachované.
+
+Dva kandidátní Edgepilotní běhy mají Golden0mod/max125.1/130.3ms aF4mod3sync/max149.1/151.8ms. Čerstvá9stage referenceGolden72mod51sync/4112ms,F82mod57sync/5175ms; staršíF6265ms. DayON zůstává~200ms/4mod1sync. Startup kandidát36.374/38.448s proti33.460/32.143s, regrese+2.9/+6.3s je výslovná. Wholecamera/weather/resolution shodné, ambient/časování/panel/cadence rozdíly vREADME. UIexporty jsou zdrojemdelta/max, rawbezend/actionmarkerů.63artefaktů ověřených, servicesstopped, hranébezezměny. QAexperimentdone, runtimeintegraceodložená; KEY31/default/celýmigračnícílotevřené.

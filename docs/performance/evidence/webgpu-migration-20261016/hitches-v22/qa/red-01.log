@@ -1,0 +1,327 @@
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+BJS - [09:01:59]: Babylon.js v9.30.0 - Null engine
+✔ actual Game light stages wait for pipeline and complete-frame readiness (68.093ms)
+✖ actual Game shader inventory follows the real loopback diagnostic opt-in (12.7421ms)
+✔ actual Game prepares current/night OFF/ON with one real torch and restores current requested state (5.8208ms)
+✔ night preparation respects low quality and the actual celestial key slot (9.2746ms)
+✔ actual Game overlaps shader diagnostics while retaining preparation barriers (4.0061ms)
+✔ actual Game does not accept native hot-swap readiness while a new effect is pending (4.2049ms)
+✔ late validation failure still stops actual Game variant preparation (2.0484ms)
+✔ settings/avatar changes during wait are preserved and current local rig is reacquired (3.1842ms)
+✔ actual Game cancellation settles pending new effects without restoring disposed objects (2.2128ms)
+✔ retired renderer cancels lighting without restoring environment or issuing another draw (4.1325ms)
+✔ actual Game timeout reports incomplete work and restores OFF while allowing startup caller to decide (1.4636ms)
+✔ production startup awaits preparation before ready and records its outcome; dispose aborts first (0.4562ms)
+✔ actual readiness error restores camera pass and leaves the requested OFF state intact (1.3988ms)
+✖ native WebGPU day0/day1 keeps the full spawn presentation and actual OFF/ON light membership (3.4547ms)
+✖ native day pending effects retain the stage, reacquire a replacement rig and restore latest requests (3.1187ms)
+✖ native day timeout and terminal retirement retain the original cleanup and 30 second deadline (3.2361ms)
+✔ native WebGL preparation remains nine stages without an independent day preview (2.6062ms)
+✔ bounded batches and exactly one owned loop prepare the finite light counts with actual ready draws (4.1351ms)
+✔ old hot-swapped ready meshes do not complete while the new engine effect is pending (0.4575ms)
+✖ optional native day coverage has exactly thirteen stages and two completed readiness draws per stage (3.7934ms)
+✖ native day stages consume the original shared deadline instead of receiving a fresh budget (0.8405ms)
+✔ progress render can unlock draw-dependent readiness without counting as ready completion (0.4818ms)
+✔ settings changes restart only the current stage and preserve cumulative render counts (0.5212ms)
+✔ disposal settles waiting work even after the engine has stopped requesting frames (0.2719ms)
+✔ independent timeout settles a background startup before its first RAF (0.187ms)
+✔ readiness failure restores requested state and cleans all owned callbacks (0.2995ms)
+✔ pending effects can become ready; a new effect from the first ready draw restarts ready confirmation (0.5545ms)
+✔ deadline is checked after an uninterruptible draw and disposed queue entries are skipped (0.4718ms)
+✔ hidden time pauses the active deadline and resumes with the original remaining budget (0.8745ms)
+✔ visible watchdog still expires without RAF and hidden-before-first-frame can resume (0.5265ms)
+✔ resume never resets already consumed active time and disposal while hidden settles immediately (0.2513ms)
+✔ visible uninterruptible work consumes the budget before any later hidden state (0.2212ms)
+✔ visible render and check overruns remain charged and retain their measured call cost (0.3055ms)
+✔ a hidden resumed owner detaches a synchronously replayed disposal during visibility subscription (0.2029ms)
+✔ stage diagnostics retain real callback gaps, named restart causes and inclusive call costs (0.717ms)
+✔ unused define observation follows pinned post/finalize/Effect prefix without changing shader text (18.5935ms)
+✔ references in bounds attributes assertions and all WGSL line endings are kept; nested comments are ignored (6.0298ms)
+✔ unsafe initializers retain transitive references and narrow literal/name checks never erase errors (2.2767ms)
+✔ retained define values: referenced declaration preserves derived identity (0.9116ms)
+✔ retained define values: unsafe initializer preserves derived identity (0.8248ms)
+✔ retained define values: transitive dependency preserves derived identity (0.9945ms)
+✔ retained define values: unused-only control preserves derived identity (0.9952ms)
+✔ unknown provenance and non top-level or unsupported bodies never become derived matches (2.0708ms)
+✔ unused define capture requires both flags and never evaluates processor accessors (0.8141ms)
+✔ derived fingerprint collisions require exact region equality (1.455ms)
+✔ conflicting generated-table provenance for the same raw text becomes ambiguous (1.111ms)
+✔ provenance capacity shares the text budget, evicts stale evidence and remains explicit (1.4616ms)
+✔ processor provenance respects generation, cleanup, later owners and original throws (1.3909ms)
+✔ finalize observation never invokes accessors and rejects duplicate or nested generated tables (1.7304ms)
+✔ fully populated derived inventory survives real diagnostics privacy limits without shader bodies (11.4073ms)
+✔ inventory uses actual pinned WGSL construction and exact raw/body equality across stages (1.034ms)
+✔ known FNV collisions never count unequal raw or body text as duplicates (0.6504ms)
+✔ body identity preserves original comments and rejects unobserved or ambiguous prefix guesses (0.6013ms)
+✔ inventory never reads shader accessors twice and an observation error cannot suppress validation (2.0159ms)
+✔ disabled inventory does no descriptor or stage text work and installs no WGSL hook (0.5559ms)
+✔ entry, text, stage and exported row limits remain explicit without losing known repeats (0.7304ms)
+✔ unrecognized WGSL method output remains raw-only and input/return/throw semantics stay intact (0.6918ms)
+✔ restoration drops old evidence and disposal releases text while retaining bounded numeric results (0.7612ms)
+✖ bounded inventory survives the real client and server privacy filters without any shader text (6.4555ms)
+✖ stage limit keeps default16 and only explicit values can use the bounded21 ceiling (0.6031ms)
+✖ native13 preparation inventory retains all18 names with explicit19 and one truthful overflow slot (3.0493ms)
+✔ only compilation-info diagnostics receive the validation kind, regardless of channel and label (2.5141ms)
+✔ profile preserves returns and receivers, separates CPU phases and marks shared cache scope (1.4898ms)
+✔ async pipeline keeps original Promise identity, records completion latency and reports rejection once (0.9567ms)
+✔ fulfilled shader compilation information with error messages invalidates the shader channel (1.0144ms)
+✔ fulfilled compilation errors use the health tracking branch without a duplicate callback (4.0662ms)
+✔ late compilation information cannot invalidate a disposed owner (0.9212ms)
+✔ compilation-info API failure is reported without replacing the original shader module or including observer cost (0.4089ms)
+✔ warnings do not become failures and native async preparation retains original rejection identity (0.869ms)
+✔ restore detaches the old device and late old operations cannot taint the new generation (0.6393ms)
+✔ pre-init attachment observes init resources and lazy Tint's very first conversion (0.6798ms)
+✔ cleanup restores inherited/own methods, preserves a later owner and disables retained wrappers (0.3806ms)
+✔ instrumentation callbacks cannot replace sync throws or returned values and slow labels are bounded (0.3603ms)
+✔ absent or immutable hooks stay explicitly unavailable and WebGL remains untouched (0.3206ms)
+ℹ tests 74
+ℹ suites 0
+ℹ pass 65
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3452.8867
+
+✖ failing tests:
+
+test at tests\game-light-preparation.test.ts:5:4582
+✖ actual Game shader inventory follows the real loopback diagnostic opt-in (12.7421ms)
+  AssertionError [ERR_ASSERTION]: http://127.0.0.1:4193/?profileEnvironment=1
+  + actual - expected
+  
+    {
+  +   maxStages: undefined,
+  -   maxStages: 19,
+      shader: true,
+      unusedDefines: true
+    }
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\game-light-preparation.test.ts:346:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { shader: true, unusedDefines: true, maxStages: undefined },
+    expected: { shader: true, unusedDefines: true, maxStages: 19 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\game-light-preparation.test.ts:9:9043
+✖ native WebGPU day0/day1 keeps the full spawn presentation and actual OFF/ON light membership (3.4547ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'restore'
+  - 'day-0-off'
+  
+      at Object.advanceTo (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\game-light-preparation.test.ts:604:14)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\game-light-preparation.test.ts:622:7)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'restore',
+    expected: 'day-0-off',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\game-light-preparation.test.ts:9:10901
+✖ native day pending effects retain the stage, reacquire a replacement rig and restore latest requests (3.1187ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'restore'
+  - 'day-0-off'
+  
+      at Object.advanceTo (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\game-light-preparation.test.ts:604:14)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\game-light-preparation.test.ts:646:32)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'restore',
+    expected: 'day-0-off',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\game-light-preparation.test.ts:9:12022
+✖ native day timeout and terminal retirement retain the original cleanup and 30 second deadline (3.2361ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'restore'
+  - 'day-0-on'
+  
+      at Object.advanceTo (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\game-light-preparation.test.ts:604:14)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\game-light-preparation.test.ts:671:53)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'restore',
+    expected: 'day-0-on',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\light-preparation.test.ts:1:2954
+✖ optional native day coverage has exactly thirteen stages and two completed readiness draws per stage (3.7934ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  9 !== 13
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\light-preparation.test.ts:178:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 9,
+    expected: 13,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\light-preparation.test.ts:1:3620
+✖ native day stages consume the original shared deadline instead of receiving a fresh budget (0.8405ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'restore'
+  - 'day-0-off'
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\light-preparation.test.ts:192:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'restore',
+    expected: 'day-0-off',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\webgpu-compilation-profile.test.ts:5:18446
+✖ bounded inventory survives the real client and server privacy filters without any shader text (6.4555ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  16 !== 21
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\webgpu-compilation-profile.test.ts:696:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 16,
+    expected: 21,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\webgpu-compilation-profile.test.ts:5:19934
+✖ stage limit keeps default16 and only explicit values can use the bounded21 ceiling (0.6031ms)
+  AssertionError [ERR_ASSERTION]: 19
+  
+  16 !== 19
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\webgpu-compilation-profile.test.ts:724:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 16,
+    expected: 19,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\webgpu-compilation-profile.test.ts:5:20514
+✖ native13 preparation inventory retains all18 names with explicit19 and one truthful overflow slot (3.0493ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+  
+    [
+      'unassigned',
+      'construction',
+      'assets',
+      'current-off',
+  ...
+      'day-1-on',
+  +   'overflow'
+  -   'restore',
+  -   'submitted-frame',
+  -   'ready'
+    ]
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\native-day-coverage-qa-20261018\red-01-source\tests\webgpu-compilation-profile.test.ts:744:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [
+      'unassigned', 'construction',
+      'assets',     'current-off',
+      'current-on', 'night-0-off',
+      'night-0-on', 'night-1-off',
+      'night-1-on', 'night-2-off',
+      'night-2-on', 'day-0-off',
+      'day-0-on',   'day-1-off',
+      'day-1-on',   'overflow'
+    ],
+    expected: [
+      'unassigned',      'construction',
+      'assets',          'current-off',
+      'current-on',      'night-0-off',
+      'night-0-on',      'night-1-off',
+      'night-1-on',      'night-2-off',
+      'night-2-on',      'day-0-off',
+      'day-0-on',        'day-1-off',
+      'day-1-on',        'restore',
+      'submitted-frame', 'ready'
+    ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

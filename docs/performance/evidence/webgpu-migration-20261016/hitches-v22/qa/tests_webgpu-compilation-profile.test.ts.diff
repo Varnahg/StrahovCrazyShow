@@ -1,0 +1,74 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\define-order-native-v1\\tests\\webgpu-compilation-profile.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\native-day-coverage-qa-20261018\\candidate\\tests\\webgpu-compilation-profile.test.ts"
+index ce48477..40a6006 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\define-order-native-v1\\tests\\webgpu-compilation-profile.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\native-day-coverage-qa-20261018\\candidate\\tests\\webgpu-compilation-profile.test.ts"
+@@ -693,7 +693,7 @@ test("bounded inventory survives the real client and server privacy filters with
+     const timing = f.profile.snapshot();
+     assert.equal(timing.shaderInventory!.limits.maxEntries, 1024);
+     assert.equal(timing.shaderInventory!.limits.maxCodeUnits, 32 * 1024 * 1024);
+-    assert.equal(timing.shaderInventory!.limits.maxStages, 16);
++    assert.equal(timing.shaderInventory!.limits.maxStages, 21);
+     assert.equal(timing.shaderInventory!.limits.maxRows, 16);
+     const data = { stage: "preparation-end", timing };
+     assert.doesNotMatch(JSON.stringify(data), /PRIVATE_SHADER_TEXT|#define/);
+@@ -713,6 +713,60 @@ test("bounded inventory survives the real client and server privacy filters with
+   } finally { f.profile.dispose(); }
+ });
+ 
++test("stage limit keeps default16 and only explicit values can use the bounded21 ceiling", () => {
++  for (const [requested, expected] of [
++    [undefined, 16], [19, 19], [21, 21], [999, 21], [19.9, 19],
++    [Number.NaN, 16], [Infinity, 16], [-1, 2], [0, 2],
++  ] as const) {
++    const f = inventoryFixture(requested === undefined ? {} : { shaderInventoryLimits: { maxStages: requested } });
++    try {
++      const limits = f.profile.snapshot().shaderInventory!.limits;
++      assert.equal(limits.maxStages, expected, String(requested));
++      assert.equal(limits.maxEntries, 1024);
++      assert.equal(limits.maxCodeUnits, 32 * 1024 * 1024);
++      assert.equal(limits.maxRows, 16);
++    } finally { f.profile.dispose(); }
++  }
++});
++
++test("native13 preparation inventory retains all18 names with explicit19 and one truthful overflow slot", async () => {
++  const names = ["construction", "assets", "current-off", "current-on",
++    "night-0-off", "night-0-on", "night-1-off", "night-1-on", "night-2-off", "night-2-on",
++    "day-0-off", "day-0-on", "day-1-off", "day-1-on", "restore", "submitted-frame", "ready"];
++  const f = inventoryFixture({ shaderInventoryLimits: { maxStages: 19 } });
++  try {
++    for (const name of names) {
++      f.profile.setStage(name);
++      f.emit("PRIVATE_DAY_SHADER_BODY", "#define SAME 1");
++    }
++    await settle();
++    let timing = f.profile.snapshot(), inventory = timing.shaderInventory!;
++    assert.deepEqual(inventory.stages.map(s => s.name), ["unassigned", ...names]);
++    assert.equal(inventory.stageOverflow, 0);
++    assert.equal(inventory.calls, 17);
++    assert.equal(inventory.rawRepeated, 16);
++    f.profile.setStage("extra"); f.emit("PRIVATE_DAY_SHADER_BODY", "#define SAME 1");
++    await settle(); timing = f.profile.snapshot(); inventory = timing.shaderInventory!;
++    assert.equal(inventory.stages.length, 19);
++    assert.equal(inventory.stages.at(-1)!.name, "overflow");
++    assert.equal(inventory.stageOverflow, 1);
++    const sanitized = sanitizeDiagnosticsData({ stage: "preparation-end", timing });
++    assert.deepEqual(sanitized.timing, timing);
++    assert.doesNotMatch(JSON.stringify(sanitized), /PRIVATE_DAY_SHADER_BODY|#define/);
++    const record = { seq: 0, atMs: 10, kind: "webgpu-inventory", data: sanitized };
++    assert.ok(diagnosticsByteLength(record) < MAX_DIAGNOSTICS_RECORD_BYTES);
++    const wire = validateDiagnosticsBatch({ schemaVersion: 1,
++      sessionId: "11111111-1111-4111-8111-111111111111", batchId: 0, records: [record] });
++    assert.ok(wire); assert.deepEqual(wire.records[0].data, sanitized);
++    f.profile.dispose();
++    const released = f.profile.snapshot().shaderInventory!;
++    assert.equal(released.released, true);
++    assert.equal(released.retainedCodeUnits, 0); assert.equal(released.retainedEntries, 0);
++    f.profile.setStage("late");
++    assert.deepEqual(f.profile.snapshot().shaderInventory, released);
++  } finally { f.profile.dispose(); }
++});
++
+ test("only compilation-info diagnostics receive the validation kind, regardless of channel and label", async () => {
+   const f = fixture();
+   const tracked: {

@@ -1,0 +1,35 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\define-order-native-v1\\client\\light-preparation.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\native-day-coverage-qa-20261018\\candidate\\client\\light-preparation.ts"
+index cf8f238..096d7ea 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\define-order-native-v1\\client\\light-preparation.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\native-day-coverage-qa-20261018\\candidate\\client\\light-preparation.ts"
+@@ -3,6 +3,7 @@ export type LightPreparationStage =
+   | "current-off"
+   | "current-on"
+   | `night-${0 | 1 | 2}-${"off" | "on"}`
++  | `day-${0 | 1}-${"off" | "on"}`
+   | "restore";
+ type PreparationTiming = { calls: number; totalMs: number; maxMs: number };
+ const timing = (): PreparationTiming => ({ calls: 0, totalMs: 0, maxMs: 0 });
+@@ -74,9 +75,11 @@ export type LightPreparationOptions = {
+   timeoutMs?: number;
+   batchSize?: number;
+   batchMs?: number;
++  /** Existing spawn presentation with zero/one mapped POINT, OFF and ON. */
++  includeDayPointVariants?: boolean;
+ };
+ 
+-const stages: readonly LightPreparationStage[] = [
++const baselineStages: readonly LightPreparationStage[] = [
+   "current-off",
+   "current-on",
+   "night-0-off",
+@@ -98,6 +101,9 @@ const stages: readonly LightPreparationStage[] = [
+ export function prepareLightVariants(
+   options: LightPreparationOptions,
+ ): Promise<LightPreparationResult> {
++  const stages: readonly LightPreparationStage[] = options.includeDayPointVariants
++    ? [...baselineStages.slice(0, -1), "day-0-off", "day-0-on", "day-1-off", "day-1-on", "restore"]
++    : baselineStages;
+   const started = options.now();
+   const timeout = Math.max(1, options.timeoutMs ?? 30_000);
+   const batchSize = Math.max(1, Math.floor(options.batchSize ?? 128));
