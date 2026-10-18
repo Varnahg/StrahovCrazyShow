@@ -655,3 +655,11 @@ Edge pilot A1/B1/A2: start44,5/50,5/42,9FPS; B6den26,9→33FPS a main25,62→18,
 EdgeA1/B1/A2 prvníjízda:38,1/42/37FPS,p9527,6/31,8/27,7ms,p99314,9/230,9/327,9ms,max803,7/424,1/865,7ms,novémoduly24/8/24,pipeline15/6/15. Interně1470x666;B1/A2CSS1912x866,A1o1pxvyšší. TrajektorieB1končídál;jemnýprofilerzapnutý;jenjedenB. P95 ani počet>=100ms se nezlepšil; listí/fotografickátráva a hromadnáEffectzměna zůstává. KEY31 ani celámigrace nejsouhotové.
 
 [Předaný4197](agents/handoffs/webgpu-low-vehicle-user-build-20261018.md),API2592,immutable5c6b36ad,běžnépočasí. Edgecomplete41stages→ready→dispose,healthvalid/pending0/chyby0. Stacionárnísmoke57,8FPS/p9522/p9930,9/max63,1ms,auto low77%,1470x666;nenídůkazplynuléjízdy. Službyběží,kartavmenu,hraný4196/4195/staršíverzebezezměny. QA4194zastavené.
+
+## WebGPU: FAR thin-instance příprava odstranila první travní shluk
+
+18.10.2026: Clean: 1403/1403 testů, combined: 1463/1463, žádné skipy; oba úplný TypeScript/build a izolovaná integrace PASS. Runtime commit `213a887a4a31f88eb346f4268543ed3891ed9b72` → main `cb236094bf1679a6dd735a7dfe73dea7233816c8`. Integrátor zachoval jeden cizí Game překryv a133 dalších pracovních cest. Před i po každé fázi ověřeny celé source/test a připnuté dependency bajty; sdílená metadata beze změny.
+
+Produkční Edge A1/B1/A2, Nvidia Pascal, Low 77 %, noc, jedna relace, interní rozlišení 1175×500. Nové programy 8/6/8, moduly 16/12/16, sync pipeline 21/19/21. První FAR 1/0/1; kontrolní shluk 78,3+189 / 84,6+188,4 ms v B1 chybí při skutečném FAR draw. FPS 45,7/48,2/42,2; p99 189/34,2/188,4 ms; maxima 829,3/728,8/895,8 ms. CSS A1 je o 1 px vyšší; konce trajektorií se liší, nejde o izolovaný důkaz celkového FPS ani konečné přijetí migrace.
+
+Všech 41 etap complete, health valid, pending 0, errors 0. Helper je po ready disabled a není v úplném aktivním inventáři; drží jeden mesh/Geometry a pevné buffery. Lighting 44,842/47,029/46,466 s, vstup→ready 60,921/65,041/63,788 s. Zbylé světelné kompilace a delší mezery trvají. Hrané 4197 a starší buildy jsou nezměněné; KEY-31 zůstává otevřené. [Důkazy a limity](performance/evidence/webgpu-migration-20261016/grass-preparation/candidate/README.md).

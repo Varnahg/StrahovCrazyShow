@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-grass-preparation-candidate-20261018",
+  "title": "KEY-31: izolovaný kandidát přípravy skutečné thin-instance trávy",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-grass-preparation-candidate-20261018/",
+    "docs/agents/handoffs/webgpu-grass-preparation-candidate-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze copied kandidát nad frozen low-vehicle-v2 5c6b36ad; žádné native/primary source, pinned dependencies nebo hrané verze se nemění.",
+    "Povolené copied runtime delty: nový client/photo-grass-preparation.ts, client/photographic-grass.ts, client/vegetation.ts a client/game.ts. Testy: nový tests/photo-grass-preparation.test.ts a rozšíření skutečné Game fixture v tests/game-low-vehicle-preparation.test.ts. Jiný nutný soubor předem koordinovat.",
+    "Jediný skutečný FAR PhotoGrassBatch aktuálních resources: vlastní Geometry před flush, skutečné matrix/photoGrassFade buffery/count1, vlastní fade0 a wind metadata, alwaysSelectAsActiveMesh pouze na vlastním mesh. Nesahat na živé roots/batches/transitions/selection/statistics, kameru, mapu či actor/physics/network.",
+    "PhotographicGrass vlastní tento batch i jeho drawWrapper po přípravě DISABLED až do resources replacement/dispose. Doložený deferred Effect.dispose vylučuje okamžité zahození. Žádný vlastní shader cache-map, PersistentMode/refCount/setEffect patch, nový observer loop nebo hot-path per-frame práce.",
+    "VegetationController pouze deleguje aktivační API. Game aktivuje skutečný batch přes všechny původní WebGPU lighting stages a všechny připravované kvality, aby neponechal walking/day/high větev nepřipravenou. Počet41etap, původní30s/pass/90s budgets, úplná readiness a latest settings zůstanou. WebGL cestu neměnit.",
+    "Deaktivace je idempotentní, zachycuje konkrétní vlastní batch a stará deaktivace nesmí ovlivnit náhradu/novější aktivaci. Normal restore, cancel, timeout a chyby nesmějí ponechat helper enabled; scene/controller disposal a installResources jej zruší před uvolněním starých resources.",
+    "Cílený refaktoring sdílí owned cleanup a používá skutečné produkční factory/controller moduly. Kandidát neprohlašuje WGSL pixel/GPU výkon nebo odstranění všech záseků."
+  ],
+  "verification": [
+    "Lehké cílené CPU regresní testy skutečné factory a owner lifecycle: unique geometry/buffery, živé state/texture/material identity beze změny, fade0/nenulovýthin branch, disabled retained Effect po skutečném deferred cleanup, repeated begin/deactivate, stale callback, replacement, dispose a init failure.",
+    "Actual Game fixture: helper aktivní napříč relevantními původními WebGPU etapami/qualities, WebGL nedotčen, normal restore/cancel/error cleanup a původní pipeline/readiness limity. Zachovat původní testy a doložit RED/GREEN nové mezery.",
+    "Bez full-source TS/build/fullsuite/integration/GPU/browser/server. Syntax/transpile není full typecheck a musí tak být označené. Root později provede fullTS/build a skutečný proložený GPU pilot na vlastním4194.",
+    "Manifest musí uvádět baseSnapshotId, přesný copied root a changes[path,originalSha256|null,sha256]. Zapsat skutečné výsledky a omezení, zastavit vlastní procesy, handoff a release; bez stagingu/commitu či rekurzivního BMAD."
+  ],
+  "notes": [
+    "Průzkum a varianty v pokračující primary BMAD specifikaci spec-key-31-long-frame-gaps.md. Proof V2 bbec84d752c7b76ec96f5f14972422d4e77ee313bf0adba298d4855a2ffbc2c9:6/6PASS, skutečný mapped POINT STANDARD, native NullEngine TextureIO a explicitníinstancedArrays adapter; neníGPUdůkaz.",
+    "Prostý warm+dispose zničil posledníEffect a přidalpozději1program. Handover je bezpečný teprve po skutečném získání OBOUvariant, proto se nevolí další event bookkeeping. Živý empty batch by zasáhl allocation/slot/selection invarianty, proto se volí jeden oddělený retained owner.",
+    "FAR a medium sdílí stejný skutečný flat material/Effect; další LOD nebo shaderové varianty nepřidávat bez důkazu. Kvality a světla pokrývají již existující41etapy; žádné nové světelné stavy.",
+    "Výchozí B1 low/high/medium příprava21.7/20.0/5.3s. Nové náklady je nutné změřit proti nezměněným limitům, ne limit automaticky zvedat. Hraný4197 a starší snapshoty zůstávají neměnné; ruční okno čeká na vyjasnění.",
+    "18.10.2026 user explicitly answered Ne, pokračuj v opravách a měření for4197. Heavy/GPU window is available to root after candidate freeze; child remains within its lightCPU scope. Protected4197 stays unchanged.",
+    "Dílčí FAR příprava přijata po A1/B1/A2 a full clean1403/combined1463 test/build/integration PASS; runtime213a887a → maincb236094. Evidence docs/performance/evidence/webgpu-migration-20261016/grass-preparation/candidate/README.md. Celý KEY-31 a migrační cíl zůstávají otevřené; hrané snapshoty nezměněné."
+  ]
+}
