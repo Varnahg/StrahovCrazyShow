@@ -102,13 +102,26 @@ const code=ts.transpileModule(`class ProofGame {${methods.map(n=>n.getText(tree)
 const make=new Script(`(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,applyArtLighting,clampOrbitPitch,performance,window,document}=env;${code};return ProofGame;}`).runInThisContext();
 const anchor=Date.parse("2026-10-18T12:45:00Z"),select=(mode:Parameters<typeof selectLightingPreview>[0])=>selectLightingPreview(mode,anchor);
 
-for(const initialQuality of ["low","medium"]) test(`native cold opposite fog view, initial ${initialQuality}`,async t=>{
+for(const initialQuality of ["low","medium"] as const) test(`native cold opposite fog view, initial ${initialQuality}`,async (t:import("node:test").TestContext)=>{
   const preparedView=false;
   const f=factories(t),{engine,scene,camera,budget}=f;
   const row:any={history:"native",preparedView,initialQuality,textureLOD,initialFog:{mode:scene.fogMode,density:scene.fogDensity,enabled:scene.fogEnabled},stages:[],replays:[],status:"started"};report.cases.push(row);
   const sun=new DirectionalLight("celestial",Vector3.Down(),scene),ambient=new HemisphericLight("sky",Vector3.Up(),scene);
-  const cinematic=new CinematicAtmosphere(scene,camera,sun),stable=new StableLightState(scene),beam=new VehicleLighting(scene),torch=new PlayerFlashlight(scene);
   const pos=Object.freeze({x:(f.low.x+f.high.x)/2,y:(f.low.y+f.high.y)/2-.6,z:f.low.z-20});
+  // Native assets are actually drawn before Cinematic exists. Preserve that
+  // history, rather than starting every material with disabled processing.
+  f.architecture.update(pos,initialQuality);f.outdoor.update(pos.x,pos.z,initialQuality);
+  const originals=f.names.map(name=>f.target.find(m=>m.material?.name===name&&m.isEnabled())!);
+  assert.ok(originals.every(Boolean));
+  const cold=originals.map(mesh=>{const clone=(mesh as Mesh).clone("cold inactive "+mesh.name,null,true)!;clone.setEnabled(false);assert.equal(clone.material,mesh.material);assert.equal(clone.geometry,(mesh as Mesh).geometry);return clone;});
+  const preloadDraws=new Set<number>();for(const mesh of originals){assert.ok(mesh instanceof Mesh);mesh.onAfterRenderObservable.add(()=>{if(engine.currentRenderPassId===camera.renderPassId)preloadDraws.add(mesh.uniqueId);});}
+  const preloadDeadline=performance.now()+4000;
+  do{budget.prepareFrame();preloadDraws.clear();engine.beginFrame();scene.render();engine.endFrame();await turn();}
+  while((!originals.every(mesh=>preloadDraws.has(mesh.uniqueId))||!arePreparationEffectsReady(engine))&&performance.now()<preloadDeadline);
+  assert.ok(originals.every(mesh=>preloadDraws.has(mesh.uniqueId)));assert.ok(arePreparationEffectsReady(engine));
+  assert.equal(scene.imageProcessingConfiguration.isEnabled,true);
+  row.nativePreload=originals.map(mesh=>{const effect=mesh.subMeshes[0]._getDrawWrapper(camera.renderPassId)!.effect!;assert.match(effect.defines,/^#define VIGNETTEBLENDMODEMULTIPLY$/m);return{name:mesh.material?.name,effectId:effect.uniqueId,defines:effect.defines};});
+  const cinematic=new CinematicAtmosphere(scene,camera,sun),stable=new StableLightState(scene),beam=new VehicleLighting(scene),torch=new PlayerFlashlight(scene);
   const actor={position:pos,yaw:0,vehicle:false},car=new TransformNode("actual driving visual",scene),parked=new TransformNode("actual parked visual",scene);car.position.copyFromFloats(pos.x,pos.y-.8,pos.z);car.setEnabled(false);
   const root=new TransformNode("local rig",scene),elbow=new TransformNode("actual right elbow",scene);root.position.copyFromFloats(pos.x,pos.y-.8,pos.z);elbow.parent=root;elbow.position.y=1.3;elbow.rotation.x=-Math.PI/2;
   const rig={root,rightElbow:elbow,eyeHeight:1.63,bodyHeight:1.8,measurements:{legSpacing:.105},target:{id:"local",vehicle:false}};
@@ -170,6 +183,10 @@ for(const initialQuality of ["low","medium"]) test(`native cold opposite fog vie
   await deferred();row.afterDeferred=capturedEffects.map(effect=>({id:effect.uniqueId,disposed:effect.isDisposed}));
   assert.ok(capturedEffects.every(effect=>!effect.isDisposed));
   const vehicleReferences=[stageReferences.get("low/vehicle-0")!,stageReferences.get("low/vehicle-1")!];
+  for(const mesh of cold){assert.equal(mesh.subMeshes[0]._getDrawWrapper(camera.renderPassId)?.effect,undefined);assert.equal(mesh.subMeshes[0].materialDefines,undefined);}
+  for(const mesh of f.target)mesh.setEnabled(false);
+  f.target.splice(0,f.target.length,...cold);
+  for(const mesh of cold){mesh.setEnabled(true);mesh.alwaysSelectAsActiveMesh=true;mesh.onAfterRenderObservable.add(()=>{if(engine.currentRenderPassId===camera.renderPassId)drawn.add(mesh.uniqueId);});}
   game.applyRenderQuality("low",MANUAL_HARDWARE_SCALING.low);
   actor.vehicle=true;car.setEnabled(true);parked.setEnabled(false);game.alignVehicleCamera();game.updateCameraFollow(new Vector3(pos.x,pos.y,pos.z),rig.eyeHeight,1);
   const replayReferences=new Map<number,Map<string,{effect:any;context:any;defines:string}>>();
@@ -182,7 +199,8 @@ for(const initialQuality of ["low","medium"]) test(`native cold opposite fog vie
     assert.ok(snapshot.families.every(family=>family.drawn&&family.ready),"all authored families actually draw");
     for(const family of snapshot.families){assert.match(family.defines!,/^#define MAXLIGHTCOUNT 4$/m);assert.doesNotMatch(family.defines!,/^#define SHADOW/m);}
     for(const family of snapshot.families) assert.match(family.defines!,/^#define FOG$/m,"actual fog remains enabled in every target replay");
-    assert.equal(programs-before,0,"two vehicle stages must prevent every target replay compilation");
+    row.expected=Array.from(vehicleReferences[count],([name,value])=>({name,effectId:value.effect.uniqueId,defines:value.defines}));
+    assert.equal(programs-before,0,"fresh inactive receivers must reuse the native preloaded then disabled variants");
     for(const name of f.names){const effect=actualEffect(name)!;const prior=vehicleReferences[count].get(name);if(prior){assert.equal(effect,prior.effect);assert.equal(effect.getPipelineContext(),prior.context);assert.equal(effect.defines,prior.defines);}}
     replayReferences.set(count,new Map(f.names.map(name=>{const effect=actualEffect(name)!;return[name,{effect,context:effect.getPipelineContext(),defines:effect.defines}];})));
   }
