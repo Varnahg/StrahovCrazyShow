@@ -1,0 +1,34 @@
+{
+  "snapshotId": "eb061b9eb34a0cdf8a94560ad7803ef9235ab1447e9b4d986c7cb640e2f0b7b3",
+  "results": [
+    {
+      "phase": "test",
+      "startedAt": "2026-10-18T02:25:25.835Z",
+      "finishedAt": "2026-10-18T02:28:08.372Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\inactive-light-native-v1-test.log",
+      "sha256": "dfb660e68695fc128c75192981ad3c0d0ad4f91e06a08c67547cc26dbce98db6"
+    },
+    {
+      "phase": "build",
+      "startedAt": "2026-10-18T02:28:14.832Z",
+      "finishedAt": "2026-10-18T02:28:59.011Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\inactive-light-native-v1-build.log",
+      "sha256": "c294d77c0811c5e801563a7035b0d9ab151bf3643881323097a5cdd20a549276"
+    },
+    {
+      "phase": "integration",
+      "startedAt": "2026-10-18T02:29:03.881Z",
+      "finishedAt": "2026-10-18T02:29:27.345Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test:integration",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\inactive-light-native-v1-integration.log",
+      "sha256": "e89a7ab37d957f59d1988a7608b0f3a25e28271530444c87a7e7169d9b7c87d0"
+    }
+  ],
+  "sharedMetadataUnchanged": true,
+  "scope": "Complete pure native snapshot: vendor patch/lock and two regression tests only. Full tests, production build and isolated integration; frozen QA dependency core/loaders, independent tool outputs."
+}

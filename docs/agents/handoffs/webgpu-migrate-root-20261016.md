@@ -177,3 +177,7 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## V4 bez nové Day kompilace
 
 18.10: QA vendor task přijat po16/16+77/77, source/provenance review, full combined1384/1384+build+integration a2Daypilotech. Hitches-v11 zachovává52artefaktů/raws a přesné limity startupu/scény. Leaf native přenos převzat rootem pod rezervací webgpu-inactive-light-native-root-01a14497 s doloženým handoffem4772d8f4…21e0; čistý native snapshoteb061b9eb34a0cdf8a94560ad7803ef9235ab1447e9b4d986c7cb640e2f0b7b3 nyní prochází úplnou sadou. Runtime ještě necommitnut ani integrován; nesmí se přibalit do tohoto metadatového celku. Linear82644f23-57ec-45ac-8df7-cf10f5ccf7fe.
+
+## Nativní inactive falloff fix integrován
+
+18.10 root převzal vlastníka webgpu-inactive-light-defines-20261018, přijal manifest00ab7390…51b7 a1312/1312/build/integration, commit76978db→mainf9e3806. Review bez nálezů,20file hitches-v12 archiv. Instalované dependencies nepřepsané,133ostatníchmainworkingcest zachováno. Taskdone znamená pouze tento4file celek; po předání root uvolní jeho rezervaci. Další čtecí průzkum porovnává potřebu a cenu zbývajících QA prewarm etap. Linear203e087a-596c-4eec-bbb3-9c393f5022f0.

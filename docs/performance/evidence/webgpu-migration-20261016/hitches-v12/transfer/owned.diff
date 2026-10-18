@@ -1,0 +1,647 @@
+diff --git a/patches/@babylonjs__core@9.30.0.patch b/patches/@babylonjs__core@9.30.0.patch
+index 58ca259..7b45c2c 100644
+--- a/patches/@babylonjs__core@9.30.0.patch
++++ b/patches/@babylonjs__core@9.30.0.patch
+@@ -144,3 +144,16 @@ index 49ba489..d89076d 100644
+                      // Ensure the effect will be rebuilt.
+                      if (this._markAllSubMeshesAsImageProcessingDirty) {
+                          this._markAllSubMeshesAsImageProcessingDirty();
++diff --git a/Materials/materialHelper.functions.js b/Materials/materialHelper.functions.js
++--- a/Materials/materialHelper.functions.js
+++++ b/Materials/materialHelper.functions.js
++@@ -673,6 +673,9 @@
++     for (let index = lightIndex; index < maxLightCount; index++) {
++         if (defines["LIGHT" + index] !== undefined) {
++             defines["LIGHT" + index] = false;
+++            defines["LIGHT_FALLOFF_PHYSICAL" + index] = false;
+++            defines["LIGHT_FALLOFF_GLTF" + index] = false;
+++            defines["LIGHT_FALLOFF_STANDARD" + index] = false;
++             defines["HEMILIGHT" + index] = false;
++             defines["POINTLIGHT" + index] = false;
++             defines["DIRLIGHT" + index] = false;
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index f518997..d295e79 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -5,7 +5,7 @@ settings:
+   excludeLinksFromLockfile: false
+ 
+ patchedDependencies:
+-  '@babylonjs/core@9.30.0': 5e2a931df89822e98cdea08310fcd84f734aed60ba95499c93cda0eccca77115
++  '@babylonjs/core@9.30.0': 0811815a615a8e501c4542ee2fa38fcc5fdd1a4394fbc610cb0aa5a0ae62c578
+ 
+ importers:
+ 
+@@ -13,10 +13,10 @@ importers:
+     dependencies:
+       '@babylonjs/core':
+         specifier: 9.30.0
+-        version: 9.30.0(patch_hash=5e2a931df89822e98cdea08310fcd84f734aed60ba95499c93cda0eccca77115)
++        version: 9.30.0(patch_hash=0811815a615a8e501c4542ee2fa38fcc5fdd1a4394fbc610cb0aa5a0ae62c578)
+       '@babylonjs/loaders':
+         specifier: 9.30.0
+-        version: 9.30.0(@babylonjs/core@9.30.0(patch_hash=5e2a931df89822e98cdea08310fcd84f734aed60ba95499c93cda0eccca77115))(babylonjs-gltf2interface@9.30.0)
++        version: 9.30.0(@babylonjs/core@9.30.0(patch_hash=0811815a615a8e501c4542ee2fa38fcc5fdd1a4394fbc610cb0aa5a0ae62c578))(babylonjs-gltf2interface@9.30.0)
+       '@colyseus/core':
+         specifier: 0.18.9
+         version: 0.18.9(@colyseus/better-call@1.3.3)(@colyseus/schema@5.0.36(typescript@5.9.3))(@colyseus/ws-transport@0.18.4)(express@5.3.0(supports-color@10.2.2))(supports-color@10.2.2)
+@@ -1064,11 +1064,11 @@ packages:
+ 
+ snapshots:
+ 
+-  '@babylonjs/core@9.30.0(patch_hash=5e2a931df89822e98cdea08310fcd84f734aed60ba95499c93cda0eccca77115)': {}
++  '@babylonjs/core@9.30.0(patch_hash=0811815a615a8e501c4542ee2fa38fcc5fdd1a4394fbc610cb0aa5a0ae62c578)': {}
+ 
+-  '@babylonjs/loaders@9.30.0(@babylonjs/core@9.30.0(patch_hash=5e2a931df89822e98cdea08310fcd84f734aed60ba95499c93cda0eccca77115))(babylonjs-gltf2interface@9.30.0)':
++  '@babylonjs/loaders@9.30.0(@babylonjs/core@9.30.0(patch_hash=0811815a615a8e501c4542ee2fa38fcc5fdd1a4394fbc610cb0aa5a0ae62c578))(babylonjs-gltf2interface@9.30.0)':
+     dependencies:
+-      '@babylonjs/core': 9.30.0(patch_hash=5e2a931df89822e98cdea08310fcd84f734aed60ba95499c93cda0eccca77115)
++      '@babylonjs/core': 9.30.0(patch_hash=0811815a615a8e501c4542ee2fa38fcc5fdd1a4394fbc610cb0aa5a0ae62c578)
+       babylonjs-gltf2interface: 9.30.0
+ 
+   '@better-auth/utils@0.3.1': {}
+diff --git a/tests/inactive-light-defines-helper.test.ts b/tests/inactive-light-defines-helper.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/inactive-light-defines-helper.test.ts
+@@ -0,0 +1,259 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { realpathSync } from "node:fs";
++import { createRequire } from "node:module";
++import { setImmediate } from "node:timers/promises";
++import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
++import { Scene } from "@babylonjs/core/scene";
++import { Vector3 } from "@babylonjs/core/Maths/math.vector";
++import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
++import { Mesh } from "@babylonjs/core/Meshes/mesh";
++import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
++import { PointLight } from "@babylonjs/core/Lights/pointLight";
++import { Light } from "@babylonjs/core/Lights/light";
++import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
++import { PBRMaterialDefines } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
++import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
++import {
++  PrepareDefinesForLights,
++  GetSupportedSimultaneousLights,
++} from "@babylonjs/core/Materials/materialHelper.functions";
++import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
++import "@babylonjs/loaders/glTF";
++import "../client/render-shaders";
++
++const flags = [
++  "LIGHT_FALLOFF_PHYSICAL",
++  "LIGHT_FALLOFF_GLTF",
++  "LIGHT_FALLOFF_STANDARD",
++];
++const modes = [
++  ["physical", Light.FALLOFF_PHYSICAL, flags[0]],
++  ["gltf", Light.FALLOFF_GLTF, flags[1]],
++  ["standard", Light.FALLOFF_STANDARD, flags[2]],
++] as const;
++function fixture() {
++  const engine = new NullEngine(),
++    scene = new Scene(engine);
++  scene.shadowsEnabled = false;
++  const camera = new FreeCamera("c", new Vector3(0, 1, -5), scene);
++  camera.setTarget(Vector3.Zero());
++  scene.activeCamera = camera;
++  const mesh = MeshBuilder.CreateBox("m", {}, scene);
++  const lights = Array.from(
++    { length: 4 },
++    (_, i) => new PointLight("p" + i, new Vector3(i, 3, 1), scene),
++  );
++  return {
++    engine,
++    scene,
++    mesh,
++    lights,
++    dispose() {
++      scene.dispose();
++      engine.dispose();
++    },
++  };
++}
++for (const [name, falloff, selected] of modes)
++  test("actual helper inactive/cap/disabled/reactivation " + name, () => {
++    const f = fixture();
++    try {
++      for (const l of f.lights) l.falloffType = falloff;
++      const d: any = new PBRMaterialDefines();
++      d.USEPHYSICALLIGHTFALLOFF = true;
++      d.USEGLTFLIGHTFALLOFF = false;
++      const prepare = (cap: number, disabled = false) => {
++        d.markAsLightDirty();
++        PrepareDefinesForLights(f.scene, f.mesh, d, true, cap, disabled);
++        assert.equal(d.USEPHYSICALLIGHTFALLOFF, true);
++        assert.equal(d.USEGLTFLIGHTFALLOFF, false);
++      };
++      const inactive = (from: number) => {
++        for (let i = from; i < 4; i++)
++          for (const flag of flags) assert.equal(d[flag + i], false);
++      };
++      prepare(4);
++      for (let i = 0; i < 4; i++) assert.equal(d[selected + i], true);
++      prepare(2);
++      assert.equal(d.LIGHTCOUNT, 2);
++      inactive(2);
++      assert.equal(d[selected + "0"], true);
++      assert.equal(d[selected + "1"], true);
++      prepare(4);
++      for (let i = 0; i < 4; i++) assert.equal(d[selected + i], true);
++      prepare(4, true);
++      assert.equal(d.LIGHTCOUNT, 0);
++      inactive(0);
++      prepare(4);
++      f.scene.lightsEnabled = false;
++      prepare(4);
++      inactive(0);
++      f.scene.lightsEnabled = true;
++      prepare(4);
++      f.lights[2].setEnabled(false);
++      f.lights[3].setEnabled(false);
++      prepare(4);
++      inactive(2);
++      f.lights[2].setEnabled(true);
++      prepare(4);
++      assert.equal(d[selected + "2"], true);
++      inactive(3);
++      // Unsupported/cap-excluded indices are deliberately outside this patch's loop.
++      d.LIGHT_FALLOFF_STANDARD99 = true;
++      prepare(4);
++      assert.equal(d.LIGHT_FALLOFF_STANDARD99, true);
++      d.markAsProcessed();
++      d._areLightsDirty = false;
++      d[selected + "3"] = true;
++      const before = d.toString();
++      PrepareDefinesForLights(f.scene, f.mesh, d, true, 4, true);
++      assert.equal(d.toString(), before, "dirty=false stays a complete no-op");
++    } finally {
++      f.dispose();
++    }
++  });
++for (const MaterialClass of [PBRMaterial, StandardMaterial])
++  test(
++    "frozen fastpath stays unchanged and unfreeze cleans " + MaterialClass.name,
++    async () => {
++      const f = fixture();
++      try {
++        for (const l of f.lights) l.falloffType = Light.FALLOFF_GLTF;
++        const material = new MaterialClass("frozen", f.scene);
++        f.mesh.material = material;
++        material.maxSimultaneousLights = 4;
++        const sub = f.mesh.subMeshes![0];
++        for (let attempt = 0; attempt < 8; attempt += 1) {
++          f.scene.render();
++          await setImmediate();
++        }
++        const before = sub.effect!;
++        assert.ok(before.isReady());
++        material.freeze();
++        f.lights[2].setEnabled(false);
++        f.lights[3].setEnabled(false);
++        // Test the actual frozen readiness fastpath. Drawing an intentionally stale
++        // frozen shader after removing light bindings already hangs unpatched
++        // NullEngine; that separate behavior is not claimed as acceptance here.
++        assert.equal(material.isReadyForSubMesh(f.mesh, sub, false), true);
++        assert.equal(
++          sub.effect,
++          before,
++          "do not bypass the native frozen fastpath",
++        );
++        material.unfreeze();
++        f.scene.render();
++        for (let i = 2; i < 4; i++)
++          for (const flag of flags)
++            assert.equal((sub.materialDefines as any)[flag + i], false);
++      } finally {
++        f.dispose();
++      }
++    },
++  );
++test("actual capability clamp clears previous slots and reactivation restores them", () => {
++  const f = fixture();
++  const caps = f.engine.getCaps(),
++    old = caps.maxUniformBuffersPerShaderStage;
++  try {
++    for (const l of f.lights) l.falloffType = Light.FALLOFF_PHYSICAL;
++    const d: any = new PBRMaterialDefines();
++    caps.maxUniformBuffersPerShaderStage = 8;
++    assert.equal(GetSupportedSimultaneousLights(f.scene, 4), 4);
++    PrepareDefinesForLights(f.scene, f.mesh, d, true, 4);
++    assert.equal(d.LIGHT_FALLOFF_PHYSICAL3, true);
++    caps.maxUniformBuffersPerShaderStage = 6;
++    assert.equal(GetSupportedSimultaneousLights(f.scene, 4), 2);
++    d.markAsLightDirty();
++    PrepareDefinesForLights(f.scene, f.mesh, d, true, 4);
++    assert.equal(d.LIGHTCOUNT, 2);
++    assert.equal(d.MAXLIGHTCOUNT, 2);
++    for (let i = 2; i < 4; i++)
++      for (const flag of flags) assert.equal(d[flag + i], false);
++    caps.maxUniformBuffersPerShaderStage = 8;
++    d.markAsLightDirty();
++    PrepareDefinesForLights(f.scene, f.mesh, d, true, 4);
++    assert.equal(d.LIGHTCOUNT, 4);
++    assert.equal(d.LIGHT_FALLOFF_PHYSICAL3, true);
++  } finally {
++    caps.maxUniformBuffersPerShaderStage = old;
++    f.dispose();
++  }
++});
++function smallGlb() {
++  const bytes = Buffer.alloc(44);
++  [0, 0, 0, 1, 0, 0, 0, 1, 0].forEach((v, i) => bytes.writeFloatLE(v, i * 4));
++  [0, 1, 2].forEach((v, i) => bytes.writeUInt16LE(v, 36 + i * 2));
++  const document = {
++    asset: { version: "2.0" },
++    scene: 0,
++    scenes: [{ nodes: [0] }],
++    nodes: [{ mesh: 0 }],
++    meshes: [
++      {
++        primitives: [{ attributes: { POSITION: 0 }, indices: 1, material: 0 }],
++      },
++    ],
++    materials: [{ name: "qa-pbr" }],
++    buffers: [{ byteLength: bytes.length }],
++    bufferViews: [
++      { buffer: 0, byteOffset: 0, byteLength: 36, target: 34962 },
++      { buffer: 0, byteOffset: 36, byteLength: 6, target: 34963 },
++    ],
++    accessors: [
++      {
++        bufferView: 0,
++        componentType: 5126,
++        count: 3,
++        type: "VEC3",
++        min: [0, 0, 0],
++        max: [1, 1, 0],
++      },
++      { bufferView: 1, componentType: 5123, count: 3, type: "SCALAR" },
++    ],
++  };
++  const text = Buffer.from(JSON.stringify(document)),
++    padded = Buffer.alloc(Math.ceil(text.length / 4) * 4, 32);
++  text.copy(padded);
++  const out = Buffer.alloc(12 + 8 + padded.length + 8 + bytes.length);
++  out.writeUInt32LE(0x46546c67, 0);
++  out.writeUInt32LE(2, 4);
++  out.writeUInt32LE(out.length, 8);
++  out.writeUInt32LE(padded.length, 12);
++  out.writeUInt32LE(0x4e4f534a, 16);
++  padded.copy(out, 20);
++  const at = 20 + padded.length;
++  out.writeUInt32LE(bytes.length, at);
++  out.writeUInt32LE(0x004e4942, at + 4);
++  bytes.copy(out, at + 8);
++  return new Uint8Array(out);
++}
++test("real tiny GLB loader resolves the same core class identity", async () => {
++  const require = createRequire(import.meta.url),
++    loaderRequire = createRequire(
++      require.resolve("@babylonjs/loaders/package.json"),
++    );
++  const core = realpathSync(require.resolve("@babylonjs/core/package.json"));
++  assert.equal(
++    realpathSync(loaderRequire.resolve("@babylonjs/core/package.json")),
++    core,
++  );
++  const f = fixture();
++  let container;
++  try {
++    container = await LoadAssetContainerAsync(smallGlb(), f.scene, {
++      pluginExtension: ".glb",
++    });
++    assert.ok(container.materials.some((m) => m instanceof PBRMaterial));
++    assert.ok(
++      container.meshes.some(
++        (m) => m instanceof Mesh && m.getTotalVertices() === 3,
++      ),
++    );
++    assert.ok(container.meshes.every((m) => m.getScene() === f.scene));
++  } finally {
++    container?.dispose();
++    f.dispose();
++  }
++});
+diff --git a/tests/inactive-light-defines-history.test.ts b/tests/inactive-light-defines-history.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/inactive-light-defines-history.test.ts
+@@ -0,0 +1,316 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { setImmediate } from "node:timers/promises";
++import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
++import { Scene } from "@babylonjs/core/scene";
++import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
++import { Vector3 } from "@babylonjs/core/Maths/math.vector";
++import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
++import "@babylonjs/core/Meshes/instancedMesh";
++import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
++import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
++import { Texture } from "@babylonjs/core/Materials/Textures/texture";
++import { Light } from "@babylonjs/core/Lights/light";
++import { PointLight } from "@babylonjs/core/Lights/pointLight";
++import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
++import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
++import { SpotLight } from "@babylonjs/core/Lights/spotLight";
++import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
++import { StableLightState } from "../client/stable-light-state";
++import { arePreparationEffectsReady } from "../client/strict-material-preparation";
++import "../client/render-shaders";
++
++const sequence = [
++  ["night2ON", false, 2, true],
++  ["day0OFF-first", true, 0, false],
++  ["day0ON", true, 0, true],
++  ["day1OFF", true, 1, false],
++  ["day1ON", true, 1, true],
++  ["B6OFF", true, 1, false],
++  ["B6ON", true, 1, true],
++  ["restore-night1OFF", false, 1, false],
++  ["runtimeDayOFF", true, 0, false],
++  ["runtimeDayON", true, 0, true],
++] as const;
++const falloffs = [
++  "LIGHT_FALLOFF_PHYSICAL",
++  "LIGHT_FALLOFF_GLTF",
++  "LIGHT_FALLOFF_STANDARD",
++];
++// Actual main-pass CPU regression; NullEngine textures/PCF fallback do not prove GPU image parity.
++async function run(
++  falloff: number,
++  globalMode: "physical" | "gltf" | "standard",
++) {
++  const engine: any = new NullEngine({
++    renderWidth: 800,
++    renderHeight: 450,
++    textureSize: 16,
++    deterministicLockstep: false,
++    lockstepMaxSteps: 1,
++  });
++  engine.getCaps().instancedArrays = true;
++  const scene = new Scene(engine);
++  scene.useRightHandedSystem = true;
++  const camera = new FreeCamera("one main pass", new Vector3(0, 3, -9), scene);
++  camera.setTarget(new Vector3(0, 1, 0));
++  scene.activeCamera = camera;
++  new HemisphericLight("hemi", Vector3.Up(), scene);
++  const sun = new DirectionalLight("sun", new Vector3(0, -1, 1), scene);
++  const points = [0, 1].map((i) => {
++    const p = new PointLight(
++      "mapped-point" + i,
++      new Vector3(i * 3, 3, 0),
++      scene,
++    );
++    p.falloffType = falloff;
++    return p;
++  });
++  const b6 = new PointLight("B6 point fill", new Vector3(1, 2, 1), scene);
++  b6.falloffType = falloff;
++  b6.setEnabled(false);
++  const torch = new SpotLight(
++    "torch",
++    new Vector3(0, 3, -4),
++    new Vector3(0, -0.2, 1),
++    Math.PI / 3,
++    2,
++    scene,
++  );
++  torch.falloffType = Light.FALLOFF_STANDARD;
++  torch.renderPriority = 10;
++  const shadow = new ShadowGenerator(32, torch);
++  shadow.usePercentageCloserFiltering = true;
++  shadow.filteringQuality = ShadowGenerator.QUALITY_LOW;
++  const stable = new StableLightState(scene),
++    rows: any[] = [],
++    subjects: any[] = [],
++    observers: any[] = [];
++  let drawn = new Set<any>();
++  const textures: Texture[] = [];
++  try {
++    for (const [kind, instanced] of [
++      ["PBR", false],
++      ["Standard", false],
++      ["PBR", true],
++      ["Standard", true],
++    ] as const) {
++      const name = kind + (instanced ? "-alpha-instance" : "-opaque");
++      const material: any =
++        kind === "PBR"
++          ? new PBRMaterial(name, scene)
++          : new StandardMaterial(name, scene);
++      material.maxSimultaneousLights = 4;
++      if (kind === "PBR") {
++        material.usePhysicalLightFalloff = globalMode === "physical";
++        material.useGLTFLightFalloff = globalMode === "gltf";
++      }
++      const source: any = MeshBuilder.CreateBox(
++        name + " source",
++        { size: 1 },
++        scene,
++      );
++      source.material = material;
++      source.position.set(subjects.length * 2 - 3, 1, 1);
++      source.receiveShadows = true;
++      let mesh = source;
++      if (instanced) {
++        const texture = new Texture(
++          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB5kAAAAASUVORK5CYII=",
++          scene,
++        );
++        texture.hasAlpha = true;
++        textures.push(texture);
++        assert.equal(texture.isReady(), true);
++        if (kind === "PBR") {
++          material.albedoTexture = texture;
++          material.useAlphaFromAlbedoTexture = true;
++          material.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHATEST;
++        } else {
++          material.diffuseTexture = texture;
++          material.useAlphaFromDiffuseTexture = true;
++          material.transparencyMode = StandardMaterial.MATERIAL_ALPHATEST;
++        }
++        source.isVisible = false;
++        mesh = source.createInstance(name + " actual instance");
++        mesh.position.copyFrom(source.position);
++      }
++      subjects.push({
++        name,
++        mesh,
++        source,
++        material,
++        instanced,
++        subMesh: source.subMeshes[0],
++      });
++      const observer = source.onAfterRenderObservable.add(() => {
++        if (engine.currentRenderPassId !== camera.renderPassId) return;
++        const s = source._instanceDataStorage,
++          p = s.useMonoDataStorageRenderPass
++            ? s.dataStorageRenderPass
++            : s.renderPasses[engine.currentRenderPassId];
++        const batch = p?.batchCache;
++        if (!batch) return;
++        for (const sub of source.subMeshes) {
++          if (batch.renderSelf[sub._id]) drawn.add(source);
++          for (const i of batch.visibleInstances[sub._id] ?? []) drawn.add(i);
++        }
++      });
++      observers.push([source, observer]);
++    }
++    shadow.getShadowMap()!.renderList = subjects.map((s) => s.mesh);
++    for (const [label, day, pointCount, on] of sequence) {
++      sun.setEnabled(day);
++      torch.setEnabled(on);
++      b6.setEnabled(label.startsWith("B6"));
++      for (let i = 0; i < points.length; i++)
++        points[i].setEnabled(!label.startsWith("B6") && i < pointCount);
++      for (let attempt = 0; attempt < 12; attempt++) {
++        stable.update();
++        drawn = new Set();
++        scene.render();
++        await setImmediate();
++        if (
++          arePreparationEffectsReady(engine) &&
++          subjects.every((s) => drawn.has(s.mesh))
++        )
++          break;
++        if (attempt === 11) throw Error("Frame did not become ready: " + label);
++      }
++      for (const s of subjects) {
++        assert.ok(drawn.has(s.mesh));
++        const sub = s.source.subMeshes[0],
++          effect = sub._getDrawWrapper(camera.renderPassId)?.effect;
++        assert.equal(sub, s.subMesh, "same submesh object throughout sequence");
++        assert.ok(effect?.isReady());
++        const flags = Object.fromEntries(
++          Object.keys(sub._getDrawWrapper(camera.renderPassId).defines)
++            .filter((k) =>
++              /^(LIGHT|POINTLIGHT|DIRLIGHT|HEMILIGHT|SPOTLIGHT|SHADOW)/.test(k),
++            )
++            .map((k) => [
++              k,
++              sub._getDrawWrapper(camera.renderPassId).defines[k],
++            ]),
++        );
++        rows.push({
++          stage: label,
++          subject: s.name,
++          materialId: s.material.uniqueId,
++          meshId: s.mesh.uniqueId,
++          subMeshId: sub._id,
++          pass: camera.renderPassId,
++          drawn: true,
++          instances: s.instanced,
++          receiveShadows: s.source.receiveShadows,
++          cap: s.material.maxSimultaneousLights,
++          alpha: s.material.transparencyMode,
++          texture: s.material
++            .getActiveTextures()
++            .map((t: any) => ({
++              id: t.uniqueId,
++              alpha: t.hasAlpha,
++              width: t.getSize().width,
++              height: t.getSize().height,
++              type: t.textureType,
++              format: t.textureFormat,
++              sampling: t.samplingMode,
++            })),
++          ordered: s.source.lightSources.map((l: any) => ({
++            id: l.uniqueId,
++            name: l.name,
++            type: l.getClassName(),
++            falloff: l.falloffType,
++            priority: l.renderPriority,
++            shadow: !!(
++              l.shadowEnabled &&
++              l.getShadowGenerator()?.getShadowMap()?.renderList?.length
++            ),
++            filter: l.getShadowGenerator()?.filter,
++          })),
++          effect: {
++            id: effect.uniqueId,
++            disposed: effect.isDisposed,
++            defines: effect.defines,
++          },
++          flags,
++        });
++      }
++    }
++    return { rows };
++  } finally {
++    for (const [s, o] of observers) s.onAfterRenderObservable.remove(o);
++    stable.dispose();
++    shadow.dispose();
++    for (const t of textures) t.dispose();
++    scene.dispose();
++    engine.dispose();
++    assert.equal(scene.isDisposed, true);
++  }
++}
++
++for (const [mode, falloff] of [
++  ["standard", Light.FALLOFF_STANDARD],
++  ["physical", Light.FALLOFF_PHYSICAL],
++  ["gltf", Light.FALLOFF_GLTF],
++] as const)
++  for (const globalMode of ["physical", "gltf", "standard"] as const)
++    test(
++      "native helper history reuse for " +
++        mode +
++        " light / " +
++        globalMode +
++        " PBR mode",
++      async () => {
++        const result = await run(falloff, globalMode);
++        for (const subject of [...new Set(result.rows.map((r) => r.subject))]) {
++          const first = result.rows.find(
++              (r) => r.subject === subject && r.stage === "day0OFF-first",
++            )!,
++            last = result.rows.find(
++              (r) => r.subject === subject && r.stage === "runtimeDayOFF",
++            )!;
++          assert.equal(first.effect.defines, last.effect.defines);
++          assert.equal(first.effect.id, last.effect.id);
++          assert.deepEqual(first.ordered, last.ordered);
++          assert.deepEqual(first.texture, last.texture);
++          for (const key of [
++            "materialId",
++            "meshId",
++            "subMeshId",
++            "pass",
++            "instances",
++            "receiveShadows",
++            "cap",
++            "alpha",
++          ] as const)
++            assert.equal(first[key], last[key]);
++          for (const row of result.rows.filter((r) => r.subject === subject)) {
++            assert.equal(
++              row.effect.defines.includes("#define INSTANCES\n"),
++              row.instances,
++            );
++            assert.equal(
++              row.effect.defines.includes("#define ALPHATEST\n"),
++              row.instances,
++            );
++            if (subject.startsWith("PBR")) {
++              assert.equal(row.flags.USEPHYSICALLIGHTFALLOFF, undefined); // Global flags are checked from the complete Effect string.
++              assert.equal(
++                row.effect.defines.includes(
++                  "#define USEPHYSICALLIGHTFALLOFF\n",
++                ),
++                globalMode === "physical",
++              );
++              assert.equal(
++                row.effect.defines.includes("#define USEGLTFLIGHTFALLOFF\n"),
++                globalMode === "gltf",
++              );
++            }
++            for (let i = row.ordered.length; i < row.cap; i++)
++              for (const prefix of falloffs)
++                assert.equal(!!row.flags[prefix + i], false);
++          }
++        }
++      },
++    );
