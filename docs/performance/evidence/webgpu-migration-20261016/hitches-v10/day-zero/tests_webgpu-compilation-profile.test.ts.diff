@@ -1,0 +1,82 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-coverage-v2\\tests\\webgpu-compilation-profile.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\day-zero-prototype-20261018\\candidate\\tests\\webgpu-compilation-profile.test.ts"
+index 5ab3056..841fef9 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-coverage-v2\\tests\\webgpu-compilation-profile.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\day-zero-prototype-20261018\\candidate\\tests\\webgpu-compilation-profile.test.ts"
+@@ -410,10 +410,11 @@ test("finalize observation never invokes accessors and rejects duplicate or nest
+ });
+ 
+ test("fully populated derived inventory survives real diagnostics privacy limits without shader bodies", async () => {
+-  const f = unusedFixture();
++  for (const maxStages of [undefined, 21]) {
++  const f = unusedFixture({ shaderInventoryLimits: { maxStages } });
+   try {
+     for (let i = 0; i < 40; i++) {
+-      f.profile.setStage(`phase-${i % 20}`);
++      f.profile.setStage(`phase-${i % 21}`);
+       const body = `fn PRIVATE_SHADER_BODY_${i}() {}`;
+       f.emit(body, body, { [`UNUSED_${i}`]: "0" });
+       f.emit(body, body, { [`UNUSED_${i}`]: "0" });
+@@ -421,6 +422,7 @@ test("fully populated derived inventory survives real diagnostics privacy limits
+     }
+     await settle();
+     const timing = f.profile.snapshot();
++    assert.equal(timing.shaderInventory!.stages.length, maxStages ?? 16);
+     assert.doesNotMatch(JSON.stringify(timing), /PRIVATE_SHADER_BODY|const |#define/);
+     assert.equal(timing.shaderInventory!.unusedDefines!.duplicates.length, 16);
+     assert.equal(timing.shaderInventory!.unusedDefines!.names.length, 16);
+@@ -433,6 +435,7 @@ test("fully populated derived inventory survives real diagnostics privacy limits
+     assert.ok(wire);
+     assert.deepEqual(wire.records[0].data, sanitized);
+   } finally { f.profile.dispose(); }
++  }
+ });
+ 
+ test("inventory uses actual pinned WGSL construction and exact raw/body equality across stages", async () => {
+@@ -590,29 +593,30 @@ test("entry, text, stage and exported row limits remain explicit without losing
+   } finally { f.profile.dispose(); }
+ });
+ 
+-test("bounded startup coverage labels fit twenty stages without changing other inventory limits", async () => {
+-  const f = inventoryFixture({ shaderInventoryLimits: { maxStages: 20 } });
++test("twenty named startup labels including ready fit before the reserved twenty-first overflow slot", async () => {
++  const f = inventoryFixture({ shaderInventoryLimits: { maxStages: 21 } });
+   const labels = ["construction", "assets", "current-off", "current-on",
+     "night-0-off", "night-0-on", "night-1-off", "night-1-on", "night-2-off", "night-2-on",
+-    "day-1-off", "day-1-on", "b6-day-off", "b6-day-on", "restore", "submitted", "ready"];
++    "day-0-off", "day-0-on", "day-1-off", "day-1-on", "b6-day-off", "b6-day-on", "restore", "submitted", "ready"];
+   try {
+     for (const label of labels) { f.profile.setStage(label); f.emit("fn main() {}"); }
+     await settle();
+     const inventory = f.profile.snapshot().shaderInventory!;
+-    assert.deepEqual(inventory.limits, { maxEntries: 1024, maxCodeUnits: 32 * 1024 * 1024, maxStages: 20, maxRows: 16 });
++    assert.deepEqual(inventory.limits, { maxEntries: 1024, maxCodeUnits: 32 * 1024 * 1024, maxStages: 21, maxRows: 16 });
++    assert.equal(inventory.stages.length, 20);
+     assert.deepEqual(inventory.stages.map(s => s.name), ["unassigned", ...labels]);
+     assert.equal(inventory.stageOverflow, 0); assert.equal(inventory.evidenceTruncated, false);
+     assert.equal(inventory.retainedEntries, 1);
+     assert.deepEqual(sanitizeDiagnosticsData({ inventory }).inventory, inventory);
+-    f.profile.setStage("one-spare"); f.profile.setStage("over-capacity");
+-    assert.equal(f.profile.snapshot().shaderInventory!.stages.length, 20);
++    f.profile.setStage("over-capacity");
++    assert.equal(f.profile.snapshot().shaderInventory!.stages.length, 21);
+     assert.equal(f.profile.snapshot().shaderInventory!.stages.at(-1)!.name, "overflow");
+   } finally { f.profile.dispose(); }
+ });
+ 
+-test("explicit stage limits clamp to two through twenty while absent and invalid inputs retain sixteen", () => {
++test("explicit stage limits clamp to two through twenty-one while absent and invalid inputs retain sixteen", () => {
+   const cases: [unknown, number][] = [[undefined, 16], [null, 16], [NaN, 16], [Infinity, 16], [-Infinity, 16], ["20", 16],
+-    [-5, 2], [0, 2], [1.9, 2], [2.9, 2], [19.9, 19], [20, 20], [20.9, 20], [999, 20]];
++    [-5, 2], [0, 2], [1.9, 2], [2.9, 2], [19.9, 19], [20, 20], [20.9, 20], [21, 21], [21.9, 21], [999, 21]];
+   for (const [value, expected] of cases) {
+     const f = inventoryFixture({ shaderInventoryLimits: { maxStages: value as number } });
+     try {
+@@ -692,7 +696,7 @@ test("bounded inventory survives the real client and server privacy filters with
+     const timing = f.profile.snapshot();
+     assert.equal(timing.shaderInventory!.limits.maxEntries, 1024);
+     assert.equal(timing.shaderInventory!.limits.maxCodeUnits, 32 * 1024 * 1024);
+-    assert.equal(timing.shaderInventory!.limits.maxStages, 20);
++    assert.equal(timing.shaderInventory!.limits.maxStages, 21);
+     assert.equal(timing.shaderInventory!.limits.maxRows, 16);
+     const data = { stage: "preparation-end", timing };
+     assert.doesNotMatch(JSON.stringify(data), /PRIVATE_SHADER_TEXT|#define/);

@@ -1,0 +1,33 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-coverage-v2\\client\\light-preparation.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\day-zero-prototype-20261018\\candidate\\client\\light-preparation.ts"
+index 13629db..dbf2ff8 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-coverage-v2\\client\\light-preparation.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\day-zero-prototype-20261018\\candidate\\client\\light-preparation.ts"
+@@ -3,7 +3,7 @@ export type LightPreparationStage =
+   | "current-off"
+   | "current-on"
+   | `night-${0 | 1 | 2}-${"off" | "on"}`
+-  | `day-1-${"off" | "on"}`
++  | `day-${0 | 1}-${"off" | "on"}`
+   | `b6-day-${"off" | "on"}`
+   | "restore";
+ type PreparationTiming = { calls: number; totalMs: number; maxMs: number };
+@@ -78,8 +78,8 @@ export type LightPreparationOptions = {
+   batchMs?: number;
+   /** QA-only coverage pair, using the owner's actual hidden B6 presentation. */
+   includeB6DayPair?: boolean;
+-  /** Existing spawn presentation with one mapped POINT, covering day entry. */
+-  includeDayPointPair?: boolean;
++  /** Existing spawn presentation with zero/one mapped POINT, OFF and ON. */
++  includeDayPointVariants?: boolean;
+ };
+ 
+ const baselineStages: readonly LightPreparationStage[] = [
+@@ -106,7 +106,7 @@ export function prepareLightVariants(
+ ): Promise<LightPreparationResult> {
+   const stages: readonly LightPreparationStage[] = [
+     ...baselineStages.slice(0, -1),
+-    ...(options.includeDayPointPair ? ["day-1-off", "day-1-on"] as const : []),
++    ...(options.includeDayPointVariants ? ["day-0-off", "day-0-on", "day-1-off", "day-1-on"] as const : []),
+     ...(options.includeB6DayPair ? ["b6-day-off", "b6-day-on"] as const : []),
+     "restore",
+   ];

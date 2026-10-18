@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-light-define-history-proof-20261018",
+  "title": "KEY-31: doložit závislost shader defines na historii světelných slotů",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/light-define-history-proof-20261018/",
+    "docs/agents/handoffs/webgpu-light-define-history-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Na stejném skutečném PBR a Standard submeshi porovnat celou sekvenci night2ON→day0OFF→day0ON→day1/B6→restore→runtimeDayOFF. Stejný pass, instancing, receiveShadows, material cap a texturové/IBL metadata; žádná záměna modelu či vytvoření nového materiálu mezi řádky.",
+    "Doložit úplné defines a Effect identity/reuse, zvlášť neaktivní LIGHT_FALLOFF_* sloty. Porovnat hypotetické minimální vyčištění těchto flagů pouze v samostatné CPU variantě, pokud základní reprodukce historii skutečně prokáže.",
+    "Oddělit source-level mechanismus od atribuce produkčních31nových programů; žádná pipeline/WGSL cache, runtime patch nebo GPU tvrzení."
+  ],
+  "verification": [
+    "Pinned Babylon9.30 a frozen day-zero-v3 0e15522126720f08e892de60685df25f5d20c313c562c952151de7d94d9f964a. Actual PrepareDefinesForLights/PBR/Standard readiness a skutečné draw, nikoli přepsaný shaderový mock.",
+    "Malý CPU fixture bez plné scény/velkých GLB; explicitní IO/caps/GLSL limity. Volitelný skutečný malý car PBR submesh jen pokud není potřeba těžký asset; proxy neoznačovat jako přesnou car reprodukci.",
+    "Zdroj/probe/output SHA, skutečné testové logy, cleanup/lifecycle a přímé rozdíly defines. Žádný fullsuite/build/integration/GPU/install. Předání a release bez commitu."
+  ],
+  "notes": [
+    "Přímé root zadání přes stávající BMAD, žádný novýworkflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow.",
+    "V3day0 vzniklo70/76modulů, ale UI Day stále31prepare/62modules/45sync; OFFcar Effects437/438 nové, následnéONreuse270/271. Export nemá per-stage Effect/submesh/full-defines, raw/bodyduplicates0 a derived+7 nejsou úplnáatribuce.",
+    "Zdrojovýkandidát: materialHelper.functions.js672–701 nečistíinactiveLIGHT_FALLOFF_*, zatímco activePrepareDefinesForLight870–884 je mění. STANDARD2 z night2ON může přežít prvníday0OFF a být odstraněn day0ON. Musí se ověřit, ne jen zopakovat hypotéza.",
+    "Příprava stage světla nepřepisuje: preparingLighting chrání updatePreloadVisuals. PendingGlass/SurfacePack a budoucí ambientLOD zůstávají další hypotézy, neřešit je nepodloženě v tomto malém proofu.",
+    "Přímé readonly imports, TSX_DISABLE_CACHE=1, žádné kopírování celého projektu. Do frozen snapshotů nebo dependencies-v5 nezapisovat. Pokud je nutná úprava helperu pro counterfactual, izolovat přesný source výřez ve vlastním prefixu, nikdy přepsat původní modul.",
+    "Root přijal pouze dokončený QA experiment/CPU proof a předání. Evidence hitches-v10; V3 Day pilot negativní (3.3095s gap), žádná native runtime integrace ani uzavření KEY-31. Další oprava v samostatném webgpu-inactive-light-defines-qa-20261018."
+  ]
+}

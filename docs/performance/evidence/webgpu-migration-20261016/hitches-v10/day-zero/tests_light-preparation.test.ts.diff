@@ -1,0 +1,23 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-coverage-v2\\tests\\light-preparation.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\day-zero-prototype-20261018\\candidate\\tests\\light-preparation.test.ts"
+index 8f30125..c0ffb93 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-coverage-v2\\tests\\light-preparation.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\day-zero-prototype-20261018\\candidate\\tests\\light-preparation.test.ts"
+@@ -183,13 +183,13 @@ test("optional B6 pair is exactly two extra stages before restore under the exis
+   assert.ok(result.activeElapsedMs < 100, "fixture's original overall deadline was not replaced");
+ });
+ 
+-test("day POINT pair stays before B6 with two completed readiness draws and the same overall deadline", async () => {
+-  const f = fixture({ includeDayPointPair: true, includeB6DayPair: true });
+-  const pending = f.start(); f.tick(); f.finish();
++test("day zero/one POINT variants stay before B6 with two completed readiness draws and the same overall deadline", async () => {
++  const f = fixture({ includeDayPointVariants: true, includeB6DayPair: true, batchSize: 5 });
++  const pending = f.start(); f.finish();
+   const result = await pending;
+   assert.equal(result.status, "complete");
+-  assert.equal(result.stages.length, 13);
+-  assert.deepEqual(result.stages.slice(-5).map(s => s.stage), ["day-1-off", "day-1-on", "b6-day-off", "b6-day-on", "restore"]);
++  assert.equal(result.stages.length, 15);
++  assert.deepEqual(result.stages.slice(-7).map(s => s.stage), ["day-0-off", "day-0-on", "day-1-off", "day-1-on", "b6-day-off", "b6-day-on", "restore"]);
+   assert.ok(result.stages.every(s => s.renders === 3 && s.checks === 10));
+   assert.ok(result.activeElapsedMs < 100);
+   assert.equal(f.state().runs, 1); assert.equal(f.state().stops, 1);

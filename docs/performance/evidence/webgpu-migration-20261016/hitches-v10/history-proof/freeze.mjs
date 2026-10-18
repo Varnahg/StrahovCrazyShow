@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {readFileSync,readdirSync,writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {resolve,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=dirname(fileURLToPath(import.meta.url)),wt=resolve(root,'../../..'),source=resolve(wt,'.cache/webgpu-hitch-validation-20261017/day-zero-v3'),deps=resolve(wt,'.cache/webgpu-migration/dependencies-v5');
+const hash=path=>createHash('sha256').update(readFileSync(path)).digest('hex');
+const input=JSON.parse(readFileSync(resolve(source,'source-manifest.json'))),report=JSON.parse(readFileSync(resolve(root,'report.json')));
+assert.equal(input.snapshotId,report.sourceSnapshotId);assert.equal(report.passed,true);
+const sources=Object.fromEntries(['client/stable-light-state.ts','client/strict-material-preparation.ts','client/render-shaders.ts','client/game.ts','client/light-preparation.ts'].map(path=>{const sha=hash(resolve(source,path));assert.equal(sha,input.files[path]);return[path,sha]}));
+const core=resolve(deps,'node_modules/@babylonjs/core');
+assert.equal(JSON.parse(readFileSync(resolve(core,'package.json'))).version,'9.30.0');
+const dependencies=Object.fromEntries(['package.json','Engines/nullEngine.pure.js','Engines/webgpuEngine.pure.js','Materials/materialHelper.functions.js','Materials/materialDefines.js','Materials/PBR/pbrBaseMaterial.pure.js','Materials/standardMaterial.pure.js','Materials/effect.pure.js','Meshes/mesh.js','Meshes/subMesh.pure.js','Lights/light.js','Lights/Shadows/shadowGenerator.js'].map(path=>[path,hash(resolve(core,path))]));
+const artifacts=Object.fromEntries(readdirSync(root,{withFileTypes:true}).filter(e=>e.isFile()&&e.name!=='manifest.json').map(e=>[e.name,hash(resolve(root,e.name))]));
+const handoff=resolve(wt,'docs/agents/handoffs/webgpu-light-define-history-proof-20261018.md');
+const result={frozenAt:new Date().toISOString(),task:'webgpu-light-define-history-proof-20261018',sourceSnapshotId:input.snapshotId,sourceManifestSha:hash(resolve(source,'source-manifest.json')),sources,dependencies,artifacts,handoff:{path:handoff,sha256:hash(handoff)},scope:'cache-only representative CPU proof; baseline then isolated instance-method counterfactual; no dependency/production modifications',validation:{passed:true,subjects:4,stages:10,variants:2,captures:80,command:'TSX_DISABLE_CACHE=1 node --import tsx probe.ts',startedAt:report.startedAt,endedAt:report.endedAt},limitations:report.limitations};
+writeFileSync(resolve(root,'manifest.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify({manifestSha:hash(resolve(root,'manifest.json')),probeSha:artifacts['probe.ts'],reportSha:artifacts['report.json'],handoffSha:result.handoff.sha256},null,2));
