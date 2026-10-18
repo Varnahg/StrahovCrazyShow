@@ -1,0 +1,47 @@
+BJS - [02:18:34]: Babylon.js v9.30.0 - Null engine
+{"passed":false,"rows":17,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    pass: 1,\n    position: [\n+     110.00296326343567,\n+     1.5760000658991529,\n+     7.000000874836473\n-     110.00296024046645,\n-     1.5728126372665479,\n-     7.005108935751448\n    ],\n    target: [\n+     109.99999999986747,\n+     -1.5439998971344866,\n+     12.00000014455047\n-     110.000000000092,\n-     -1.5439998957799768,\n-     12.000000145274207\n    ]\n  }\n","startedAt":"2026-10-18T00:18:34.786Z","endedAt":"2026-10-18T00:18:35.415Z"}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
+    pass: 1,
+    position: [
++     110.00296326343567,
++     1.5760000658991529,
++     7.000000874836473
+-     110.00296024046645,
+-     1.5728126372665479,
+-     7.005108935751448
+    ],
+    target: [
++     109.99999999986747,
++     -1.5439998971344866,
++     12.00000014455047
+-     110.000000000092,
+-     -1.5439998957799768,
+-     12.000000145274207
+    ]
+  }
+
+    at <anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\avatar-day-variant-proof-20261018\probe.ts:169:269) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: {
+    position: [ 110.00296326343567, 1.5760000658991529, 7.000000874836473 ],
+    target: [ 109.99999999986747, -1.5439998971344866, 12.00000014455047 ],
+    pass: 1
+  },
+  expected: {
+    position: [ 110.00296024046645, 1.5728126372665479, 7.005108935751448 ],
+    target: [ 110.000000000092, -1.5439998957799768, 12.000000145274207 ],
+    pass: 1
+  },
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

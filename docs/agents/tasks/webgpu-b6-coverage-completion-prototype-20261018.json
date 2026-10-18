@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-b6-coverage-completion-prototype-20261018",
+  "title": "KEY-31: QA doplnění avatarových a vstupních variant",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/b6-coverage-completion-prototype-20261018/",
+    "docs/agents/handoffs/webgpu-b6-coverage-completion-prototype-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze cache overlay nad frozen a94; původní pilot/zdroje/hranou verzi zachovat. Žádný native runtime commit ani server/GPU leafem.",
+    "Přidat day mapped-POINT1 OFF/ON přes již ověřený skutečný spawn apply. Pouze ON by nepokrylo doložené vstupní OFF missy. Žádná avatar/actor teleportace nebo nová cache.",
+    "Nahradit flat B6 kameru jedinou source-derived clipped orbit pose ověřenou CPU proofem. Sdílet malý čistý výpočet s existujícím CameraFollow; běžný follow musí zachovat výsledek, pitch/cameraArm/snap historii a alokační náklady.",
+    "Příprava mění pouze camera pose a původní presentation API. Skutečné sim.cameraDistance je read-only; Game pitch/yaw/distance/actor/cameraArm/vehicleCameraSnap se pro virtuální B6 nepřepisují. Zachovat latest-request restore/spatial refresh, timeout30s, dvě complete draws a finální gate.",
+    "Další2stage labels musí zůstat pravdivě viditelné v existující opt-in diagnostice. Lze explicitně použít bounded maxStages20 pouze v lokálním inventory režimu; žádné nové hooks/diagnostická vrstva nebo neomezený limit."
+  ],
+  "verification": [
+    "Lehké targeted testy a cílený refaktoring společně: původní follow parity včetně vozidla/first-person a clamp/smoothing, actual isolated orbit clip, stavy B6/day stage a restore/timeout/dispose/late requests.",
+    "Cache kopie může měnit client/game.ts, client/light-preparation.ts, nový client/camera-orbit.ts a podle potřeby export dosavadního default pitch v client/camera-look.ts; jejich odpovídající testy a pouze nutné skutečné Game VM bindings. Seznam všech output cest/hashů/diffů uvést v předání.",
+    "Root provede fullTS/build/GPU pilot; fullsuite/integration a native integrace až podle přínosu. Frozen snapshot musí obsahovat nové testy. Žádný pnpm install/velké assets/full world CPU scéna."
+  ],
+  "notes": [
+    "Přímé zadání root koordinátora přes existující BMAD; žádný nový workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow.",
+    "Read-only base .cache/webgpu-hitch-validation-20261017/b6-preparation-v1 a94ea6ced62b1aa5a3e7c5f94aa4884cce83f30bb5063cda2e4e126507f4eb78. Číst oba nové proofy avatar-day-variant-proof a b6-entry-view-proof, jejich přesné IO a collision limity.",
+    "Menší B day/spawn1 má v CPU proofu actual Alex12drawn/7Effects pro OFF/ON byte-identické defines i identity jako B6. A B6lights+spawncamera je zbytečný další prezentační režim. Entry clipped orbit zachytí dogleg handrails/treads i8původníchGLB částí.",
+    "Použít existující default pitch/distance jako explicitní společné konstanty, nikoli nové náhodné pózy. Body/target/yaw odvodit z shared B6 layout; původní first-person výpočet a normální frame chování zachovat.",
+    "Jde o částečné doplnění doložených missů. Netvrdit pokrytí všech počasí/avatarů/LOD/editor transformů ani opravu každého přepnutí času. Další startup cenu musí měřit root, timeout se nezvyšuje.",
+    "Přímý node/tsx TSX_DISABLE_CACHE=1 a read-only dependencies-v5. Nezasahovat do root QA prefixu, native/main ani ostatních caches. Předat zdroje/testy/diffy/SHA/logy/limity, ukončit vlastní procesy a release bez commitu."
+  ]
+}
