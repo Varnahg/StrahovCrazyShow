@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-low-vehicle-user-build-20261018",
+  "title": "Předat neměnný build s přípravou světel auta",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-low-vehicle-user-build-20261018/",
+    "docs/agents/handoffs/webgpu-low-vehicle-user-build-20261018.md"
+  ],
+  "resources": [
+    "port:4197",
+    "port:2592"
+  ],
+  "acceptance": [
+    "Publikovat samostatný frozen snapshot zdrojů i testů až po přesné clean/combined validaci a integraci vlastního runtime commitu.",
+    "Vlastní skryté služby 4197/2592 s identitou procesů, běžným počasím a neměnným produkčním dist; bez HMR a bez zásahu do 4196/4195 nebo starších hraných verzí.",
+    "Předat úzký doložený přínos a přetrvávající záseky pravdivě; žádné prohlášení o dokončení celé migrace."
+  ],
+  "verification": [
+    "Zdrojový a dist hash, úplná validace, HTTP health a skutečný Edge vstup/obraz/cleanup.",
+    "Před startem znovu ověřit rezervované porty. Proces ukončit pouze podle vlastní ověřené identity."
+  ],
+  "notes": [
+    "Porty 4197/2592 při kontrole 18.10.2026 13:52 UTC nenaslouchaly. Root koordinátor spravuje tento nový snapshot.",
+    "4197/API2592 active, frozen5c6b36ad after complete validation and runtime main42f7336f. Edge smoke complete41 stages, ready/dispose, health valid/pending0/errors0; benchmark57.8FPS/p9522ms/p9930.9ms on auto low77%,1470x666. User build left in menu; services and reservation remain active."
+  ]
+}

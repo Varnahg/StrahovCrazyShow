@@ -1,0 +1,908 @@
+{
+  "task": "webgpu-low-vehicle-candidate-20261018",
+  "version": 2,
+  "createdAt": "2026-10-18T13:38:16.108Z",
+  "baseSnapshotId": "5d247248f50a762877e9079bb4fcd65280e959e8014eb3f65b2662e397c518cb",
+  "base": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1",
+  "candidate": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate-v2",
+  "previous": {
+    "manifest": "v1/manifest.json",
+    "sha256": "7e5bdfd87c5a84182767d2d3d35f095b266253fc3ec0d48b7bceb80a7c55ce24",
+    "candidate": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate"
+  },
+  "changes": [
+    {
+      "path": "client/game.ts",
+      "originalSha256": "afda745eda1aaac4abfcdfe99cb694174bd12af1201db7d4056667cfc132fa74",
+      "sha256": "53e78cd878d3a65cfcff10f0e4ce6691e0300960f79283d9f0983a76e042d305",
+      "bytes": 125576
+    },
+    {
+      "path": "client/light-preparation.ts",
+      "originalSha256": "6bb6cd90be0eb2e1cf5b88b6fd930123ec34349c242e4db3fb8ce767e52eb58c",
+      "sha256": "375c506df25927806207d21644c56f868e4f67e6f726576cb2ae5db01850cd5e",
+      "bytes": 15049
+    },
+    {
+      "path": "tests/game-low-vehicle-preparation.test.ts",
+      "originalSha256": null,
+      "sha256": "5e1ab8dec9f1febd2e33ed41c4539f7672f9ff36a603681790b73129eea3d89e",
+      "bytes": 20614
+    },
+    {
+      "path": "tests/game-light-preparation.test.ts",
+      "originalSha256": "ef2a8ea5ece60988dc79d2ae76e03c2fa412aba842033a88570e24e51cd8aea1",
+      "sha256": "27637ab0cb54953b8d99837cc0f0858eb6ae44b43f2d308bf382867d7ba3720d",
+      "bytes": 27593
+    }
+  ],
+  "v1Delta": [
+    {
+      "path": "client/game.ts",
+      "originalSha256": "a54ba0d02444a9b0b09f89a5e3774107af5c855954aaded6e1b21c404a2aa5a9",
+      "sha256": "53e78cd878d3a65cfcff10f0e4ce6691e0300960f79283d9f0983a76e042d305"
+    },
+    {
+      "path": "tests/game-low-vehicle-preparation.test.ts",
+      "originalSha256": "6b9862883dca24beb51bd7272949625e98b5812cf9f1a38f0b9788d3be0dad9b",
+      "sha256": "5e1ab8dec9f1febd2e33ed41c4539f7672f9ff36a603681790b73129eea3d89e"
+    }
+  ],
+  "inputs": {
+    "base": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1",
+    "snapshot": "5d247248f50a762877e9079bb4fcd65280e959e8014eb3f65b2662e397c518cb",
+    "files": {
+      "client/game.ts": {
+        "sha256": "afda745eda1aaac4abfcdfe99cb694174bd12af1201db7d4056667cfc132fa74",
+        "bytes": 122923
+      },
+      "client/render-shaders.ts": {
+        "sha256": "e73d2d242eb18d2c876cee60f6811bc41061520eee4718d1e9eb583252e60fd0",
+        "bytes": 1542
+      },
+      "client/session-diagnostics.ts": {
+        "sha256": "87ceadf7be528b9e7210bba6415880c2dc37706c6b6118cd51d25183b3a1ad4c",
+        "bytes": 32253
+      },
+      "shared/session-diagnostics.ts": {
+        "sha256": "ad1850d3e1409beaa2374dfa67c6a6d7a8d8cbab159da2a774c66dd4d436fe1f",
+        "bytes": 5996
+      },
+      "client/render-incident-profile.ts": {
+        "sha256": "19804049816000fe30ee12a625407d21bacfac7e0bdd37cd0a0e9d2bd609df30",
+        "bytes": 11434
+      },
+      "client/benchmark-render-profile.ts": {
+        "sha256": "8cab03d2bd16c4edd7cd49bfc3e16fe1f14f0703c0ac3ca1043f8ba3b291eefd",
+        "bytes": 5286
+      },
+      "client/environment-profile.ts": {
+        "sha256": "ef00886e7da8d89a3d84340e26dbae49c4bf6348886d2fdd43e9eecaeecabfc5",
+        "bytes": 6859
+      },
+      "client/webgpu-frame-lifecycle-profile.ts": {
+        "sha256": "73785cff97d6ac499c6db7bc933d8aebbf9b88ddcb0a58ad461443b60be6397c",
+        "bytes": 31800
+      },
+      "client/game-diagnostics.ts": {
+        "sha256": "29ef2286c87f89fe89a3a07b25c0eeba2d3076bd728a374aff68b75638306df7",
+        "bytes": 5286
+      },
+      "client/mesh-draw-profile.ts": {
+        "sha256": "e6b498800f387842d08b8166ac1a874f54089bda15e4202cfb24f2c1318aa035",
+        "bytes": 14286
+      },
+      "client/render-cost.ts": {
+        "sha256": "8c98a6c86a4da09b07b79c0f059f17e099f2747b11e1154d93892ce2016cc021",
+        "bytes": 10521
+      },
+      "client/network-timeline.ts": {
+        "sha256": "496e6fa02a921414948e535c8b4253c3bc1e3438b185ec9d4d686fdfcd1bc123",
+        "bytes": 11776
+      },
+      "shared/input-timeline.ts": {
+        "sha256": "8d9d46f22550157639aeb7f3e4f23e0f88aa9f45416944062d1d5c9c28ab767f",
+        "bytes": 9339
+      },
+      "shared/netcode.ts": {
+        "sha256": "b92ae0f5937e58e14baf954ef06109c88e7a365e56b87afea371b901a624b532",
+        "bytes": 10505
+      },
+      "shared/types.ts": {
+        "sha256": "5f1385d0568ba0d008bd02fc5c3c0d2e5fea294da486b8f092c3d400edea0300",
+        "bytes": 2497
+      },
+      "shared/vehicle.ts": {
+        "sha256": "9cdb914602a99e23f68ab607f9be5226ecdb1f1850c83e2177ccfea458562703",
+        "bytes": 18779
+      },
+      "shared/network-diagnostics.ts": {
+        "sha256": "77c95f08fdf6018a34c0f8748a2ae964daab5daa4744b4838dd76433bae5b368",
+        "bytes": 3296
+      },
+      "client/texture-diagnostics.ts": {
+        "sha256": "1470b6e468deac913d3d82b266d3a6890aced7f6133fba274cfe96259236727c",
+        "bytes": 1062
+      },
+      "client/stable-light-state.ts": {
+        "sha256": "4adfb37dae15ca6a0b9e1b65634266b6791ffc1d8c1aca01858a9557c7f7b8bc",
+        "bytes": 8159
+      },
+      "client/gltf-light-budget.ts": {
+        "sha256": "a6599ea1a18aa29e3661072083c4f77e396d21d1c85f5430d67f70c70f87fd90",
+        "bytes": 18374
+      },
+      "client/light-preparation.ts": {
+        "sha256": "6bb6cd90be0eb2e1cf5b88b6fd930123ec34349c242e4db3fb8ce767e52eb58c",
+        "bytes": 14742
+      },
+      "client/render-quality-preparation.ts": {
+        "sha256": "3dd4cc6c9837f67b97d086b903c469bfed48affd538589dc98d10536373a78fc",
+        "bytes": 5905
+      },
+      "shared/render-quality.ts": {
+        "sha256": "e9506573186c6d6e50af5e0db17458959ae61f808d1ad4158cdc03589ffbeada",
+        "bytes": 2312
+      },
+      "client/webgpu-pipeline-preparation.ts": {
+        "sha256": "6c7e6e2315c5068641c1079e7bd577a3fb9618d0375f054a2faf3e3b111d709b",
+        "bytes": 16409
+      },
+      "client/strict-material-preparation.ts": {
+        "sha256": "a1c384e975ddd5d4d5f7d6fcb917f916e37b82c7a4d00a79b10aa5a99d12019a",
+        "bytes": 2999
+      },
+      "client/lighting-preview.ts": {
+        "sha256": "9ff873576d22c0e958d1e432c3e5dfc0053d1348d396da45fbd79ff2d47b2db2",
+        "bytes": 4096
+      },
+      "shared/events.ts": {
+        "sha256": "a194685b74238aadd6d90ef3c179cf3e55cc0e2af5698828955b5fb6c8a98115",
+        "bytes": 3495
+      },
+      "shared/weather.ts": {
+        "sha256": "e9c9faed4a1200d020324bcc6a1b42b32c340f5f1dbcb26f36bc6f904226b542",
+        "bytes": 9745
+      },
+      "client/avatar-renderer.ts": {
+        "sha256": "c8fc566c54810b109118628ee8bdecef4da5a07cdceb1da09eeabf279401bece",
+        "bytes": 27591
+      },
+      "client/avatar-presets.ts": {
+        "sha256": "0d078d680f0525c804a8d1712a366fe1071a6a9f1357a550ae58648e896b3073",
+        "bytes": 3039
+      },
+      "client/data/character-geometry.json": {
+        "sha256": "c7ebd5b440e7b5188a6cc6223999838ac0cb03af44101a0ae62c9b6849ed75af",
+        "bytes": 593586
+      },
+      "client/data/skinned-character-geometry.json": {
+        "sha256": "8809116cd9d3f35c471f76429c863a58624126315031addb27642c22159ba8dc",
+        "bytes": 3932427
+      },
+      "client/avatar-garments.ts": {
+        "sha256": "40173ae81387516755d96b8097b0b331dd1e96b5d3cf183a85b8462eed4f8f6d",
+        "bytes": 9022
+      },
+      "client/data/student-garments.json": {
+        "sha256": "03ef63d845c1027184d75fa17b219ae60133150efcdf2c68bc08031d5d8d1cba",
+        "bytes": 9067255
+      },
+      "client/avatar-eyes.ts": {
+        "sha256": "37660084ef4966348d4c409426999ba64a0e93851ae50daa0e10d78c3567f0ca",
+        "bytes": 1981
+      },
+      "client/data/student-eyes.json": {
+        "sha256": "cfdc617ca51583b923fae30d15b226c8ba7f3fec6d9903246b51d9327a2a8d0e",
+        "bytes": 78067
+      },
+      "client/avatar-hair.ts": {
+        "sha256": "7ea131c5d2f053a1b4e890820c8a050696aa6e460170806a81f0847623fd0d65",
+        "bytes": 7914
+      },
+      "client/data/student-hair.json": {
+        "sha256": "1ea53714fc6cffca8b8d91be890551e5744797a54235352763172de7144e93f3",
+        "bytes": 3145429
+      },
+      "client/data/student-hair-calibration.json": {
+        "sha256": "2e2ef9e2af558f30557a12d45e362503ba6b08f79562d006460df54a89548b8e",
+        "bytes": 735
+      },
+      "client/avatar-skinned.ts": {
+        "sha256": "acc4ff9e4d930e11909aa756f20f24d21db1f56671f115bfa415f18f849f9ae4",
+        "bytes": 5822
+      },
+      "client/character-materials.ts": {
+        "sha256": "c0b06d3bf1cc25b8ac33cf3a124c95b74fe3f99bad23a0553f6e4adb01935733",
+        "bytes": 7351
+      },
+      "client/world-renderer.ts": {
+        "sha256": "008949b703584dbc4d25fc443c3b395d876ad702cca4dae6c744f1a6f632b68d",
+        "bytes": 32004
+      },
+      "client/vegetation.ts": {
+        "sha256": "30e87157ea7477dff6697f0470a7ee91a89660f803eae449d2383907482bdfe1",
+        "bytes": 29933
+      },
+      "client/photographic-grass.ts": {
+        "sha256": "08d44d654e094ae28deae009394d04f7cc6c2fefc61f03944007aa05a5e444c5",
+        "bytes": 27162
+      },
+      "shared/terrain.ts": {
+        "sha256": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f",
+        "bytes": 14152
+      },
+      "shared/data/terrain-grid.json": {
+        "sha256": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+        "bytes": 318259
+      },
+      "shared/data/reality-ground.json": {
+        "sha256": "9a144e2556c960677ce1d486477f0730ced54455662c1075ffc081fc90a6d878",
+        "bytes": 48903
+      },
+      "shared/terrain-patches.ts": {
+        "sha256": "71bece3e3bb764b690cc59b77573fa8f60e38afae3f2e9d03cb0213b1b8b0c25",
+        "bytes": 2188
+      },
+      "shared/data/north-court-terrain-patch.json": {
+        "sha256": "8ab204a289b1eabc45359c56fca050170f1729f7832da15345ed4c2f7b35c292",
+        "bytes": 30228
+      },
+      "client/photo-grass-placement.ts": {
+        "sha256": "030f3d57ee93617d168a604cc517c3d59877e72b68d4aa9786396175a96ad06b",
+        "bytes": 4797
+      },
+      "shared/world.ts": {
+        "sha256": "394fe4d61db507be8881af44a3dc417ed9c3674688cef3ba6cb9b9534a15a936",
+        "bytes": 9016
+      },
+      "shared/b6-interior.ts": {
+        "sha256": "ebbe42ea88ca9f0593d774e4df69e416629ff13ed5258fb1501a6f652bd98988",
+        "bytes": 17099
+      },
+      "shared/b6-stairs.ts": {
+        "sha256": "1217e48fabdbc128c89906bffad5c8681d3bf509b77f191333a7ce143b7fe48d",
+        "bytes": 8019
+      },
+      "shared/b6-entry.ts": {
+        "sha256": "464ba1aa21e8dc2ddf3ede80a2aa3672cfe8bc720716c80a3d1e6794cfd9b620",
+        "bytes": 4003
+      },
+      "shared/b6-facade-plan.ts": {
+        "sha256": "53b4406baf9df10650e79c849d1cd56c6454ccb3bbeebda334fea1b4ae700c45",
+        "bytes": 1861
+      },
+      "shared/data/map.json": {
+        "sha256": "cc41d5fc78ffbff275468cdd191e96c74e1c9dc09a74be7bc82a918184c7f64c",
+        "bytes": 359410
+      },
+      "shared/vegetation.ts": {
+        "sha256": "da310b4c7441e98816f9fe6900145c530f7dcb6c3846fb1ff55511568a510075",
+        "bytes": 13238
+      },
+      "shared/data/landcover.json": {
+        "sha256": "92425a36cfdf4bac15415c31e947bbd0e09576f5a650f9589284ee55e5402e3b",
+        "bytes": 133300
+      },
+      "shared/data/surveyed-trees.json": {
+        "sha256": "1e3ad99f1640a14921ed7fc7c797c841fa2ca404e3c7c4cd4a39ffb64463ac75",
+        "bytes": 53231
+      },
+      "shared/data/tree-reconstruction.json": {
+        "sha256": "5956d701a781deaca2d6346c9feae7a4678cf9d94dcef97dbbca4ecdd5dfe367",
+        "bytes": 166023
+      },
+      "shared/streets.ts": {
+        "sha256": "b216be738513a39bb81c42fddacb78fa4ad0a2a6eb2da0a0879cc97d399d7da9",
+        "bytes": 14861
+      },
+      "shared/data/streets.json": {
+        "sha256": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14",
+        "bytes": 973837
+      },
+      "shared/data/road-calibration.json": {
+        "sha256": "b794e4f06f7dfa58e1ec3c34845f6b5b8a8551743231d4ad09da49c70b3e7b76",
+        "bytes": 22851
+      },
+      "shared/data/photo-lamps.json": {
+        "sha256": "138e8564ff13f84803ce562c69daca1f8c621127871a5805264ba17f1a7de781",
+        "bytes": 2222
+      },
+      "shared/data/b6-entry-paving.json": {
+        "sha256": "6d37d1172e331b5b6a41924656b1b86ace49f83822df5887671d043b72b39bf3",
+        "bytes": 2468
+      },
+      "shared/data/building-catalog.json": {
+        "sha256": "ed435ec06401b5ea8ea604ca75af0a9fd3a2d7e8252ca65f018853c19a3a804b",
+        "bytes": 156377
+      },
+      "shared/data/campus-coverage.json": {
+        "sha256": "d6882c0d41f717b382ff4fe9a6b5a39e2aa7b0ca15defdcdab886b2314b6bff2",
+        "bytes": 559
+      },
+      "shared/data/gameplay-placement.json": {
+        "sha256": "53ed8754ecfff552143abf182d1fa8445563a40e7208ce56fb8ad7a948706e27",
+        "bytes": 770
+      },
+      "shared/data/stadium-stops.json": {
+        "sha256": "d1c2e7734556439cf98a98f719665d993a03705d39518d69c328f562a4c94464",
+        "bytes": 3842
+      },
+      "shared/landmark-reality.ts": {
+        "sha256": "a96539cb85b272911a47ab24af1aae5540227be01b321ac0dcfc6b81e2b893e9",
+        "bytes": 48111
+      },
+      "shared/stadium-exterior.ts": {
+        "sha256": "5a4ff8cf5077a8b47128504c388614bde31b2eb646967c631918f3231d4cc6a1",
+        "bytes": 4905
+      },
+      "shared/world-asset-identity.ts": {
+        "sha256": "a6173d4759b8fa490f931b772c2d833926926cc1efd3bb838d85e30533643a20",
+        "bytes": 586
+      },
+      "shared/journal.ts": {
+        "sha256": "2f3e5992a8be368653b6a32b20fd3a27459507765c8edd72f16bd2c205936d79",
+        "bytes": 3927
+      },
+      "shared/data/journal.json": {
+        "sha256": "c622454965838edc6ec622c15b8bcbf06f16a188ba0cd3cf4f46dc69a599dfd1",
+        "bytes": 62200
+      },
+      "client/photo-grass-budget.ts": {
+        "sha256": "119026716ffe311b9b0d2980aa255d739cd55a04ddf6b81b0f8c139d0ca0854e",
+        "bytes": 3066
+      },
+      "client/photo-grass-resources.ts": {
+        "sha256": "14ebd248bc3a2bde786c9b52b80d82dfed604b387c6b87a3706f533cd3d5ac0f",
+        "bytes": 7690
+      },
+      "client/photo-grass-wind.ts": {
+        "sha256": "0813e3f65e5e9e215b8e1628da081fd3f60924e00602ed26b90c58e213b7c8e9",
+        "bytes": 6803
+      },
+      "client/photo-grass-transition.ts": {
+        "sha256": "6f019c148b39a4697891a33112888edf317f7292a316b896bbde2efc27621e47",
+        "bytes": 759
+      },
+      "client/photo-grass-source-material.ts": {
+        "sha256": "694bfe9c309e9565f549d59c4ae6d68bd7de70afd2ab2ab7af20e0a9b5840ef4",
+        "bytes": 2639
+      },
+      "client/photo-grass-batch.ts": {
+        "sha256": "5c7d13bd394925eeab4922b8ac79939f920475779de68fb6c10621aa43d6949e",
+        "bytes": 6247
+      },
+      "client/photo-grass-selection.ts": {
+        "sha256": "73c13ab3a9d9bb810e77c17019599a8e6127a66695d851ead9f66f0d13297d13",
+        "bytes": 1993
+      },
+      "client/tree-appearance.ts": {
+        "sha256": "cdbb418181563e62c542fafdc7829b3160cf0072d5d29395cc1d618d5c44392a",
+        "bytes": 5658
+      },
+      "client/tree-wind.ts": {
+        "sha256": "7ecfdb5570a86a00c727f8578e3c6d1ccd70491179375933cd28b0dbaf34f558",
+        "bytes": 3873
+      },
+      "client/webgpu-shadow-readiness.ts": {
+        "sha256": "d1ed280ecc3c6530c1bef75ea49de34c65034dd41e9f3f0814333b9e7729ae9d",
+        "bytes": 5907
+      },
+      "client/grass-material.ts": {
+        "sha256": "e9bf4edbb73c6c9a23c2297f336c55d1b28a1210fcc690edc2d13c6760ea7312",
+        "bytes": 5769
+      },
+      "client/static-submesh-chunks.ts": {
+        "sha256": "86c542c0962865c4eb06d573d0a95fdae44e4f2ff612f1378819935b8218bf31",
+        "bytes": 4339
+      },
+      "client/vegetation-selection.ts": {
+        "sha256": "076ef5103aaa79e31f24957c4f1486aff7961d403a024583fb5071cc28472801",
+        "bytes": 2313
+      },
+      "client/streets-renderer.ts": {
+        "sha256": "e67e3266d54948c96c7909904d6678500f9bc20813e2c01d974aa26b2f5542cc",
+        "bytes": 32606
+      },
+      "client/surface-pack.ts": {
+        "sha256": "50d77ce3ea9af58281fb196ae3386c99a6e84909d3b6ce5a80307223c1bac90c",
+        "bytes": 11151
+      },
+      "shared/data/assets/surfaces-manifest.json": {
+        "sha256": "c3cf978e1db6e20f21946a8cb3e0d5716dbc730f671b09151f27ad373013d474",
+        "bytes": 10986
+      },
+      "client/cinematic-art.ts": {
+        "sha256": "7aa011a230a17e0703ebda08ead509c6534b80af9c6dc23924a7e715c3a29b77",
+        "bytes": 12250
+      },
+      "client/world-build-stages.ts": {
+        "sha256": "13864e87066624bb53b9583800da7946ec8618a2e533ea6ff952fb5abbfa62e7",
+        "bytes": 6328
+      },
+      "client/road-details.ts": {
+        "sha256": "a42666f3b8c48f84dc69bd82f542075d0e6a584d0b2448179b5724d9dc38ed18",
+        "bytes": 10582
+      },
+      "shared/road-details.ts": {
+        "sha256": "1c51db1d24b8ef5c0f57c27bb3fe2e8cbe3bdafd7dc5715df164319625084050",
+        "bytes": 9595
+      },
+      "shared/transit.ts": {
+        "sha256": "69f6e13442f8cf7aa5a513959c543cd618d097d2a61d786f0f9bb7add57b028f",
+        "bytes": 18192
+      },
+      "shared/data/transit.json": {
+        "sha256": "66c4f8f5aebce2f5fb244e0fad54b514a32e41bdbc19415c75c488335d7867ce",
+        "bytes": 113644
+      },
+      "shared/data/transit-navigation.json": {
+        "sha256": "f7aa23c3d0daf9ef43b0af13d72ecd27eaf01877b823b445377e722b056690c0",
+        "bytes": 15489
+      },
+      "shared/terrain-entities.ts": {
+        "sha256": "8460192bd81483def617d977775dd251817bc7f9bf0aa05ed65de66c95620bf1",
+        "bytes": 1749
+      },
+      "client/terrain-renderer.ts": {
+        "sha256": "c10acc586efbc5230d245e3107ad0717642a0ef911f5de96745901dad8ba7c67",
+        "bytes": 11219
+      },
+      "client/architecture-reality.ts": {
+        "sha256": "9e1c55065a1bfb32afffbd1e884e6c1126b962f5bfe951e7ba65cc516c4005e6",
+        "bytes": 47276
+      },
+      "shared/building-roofs.ts": {
+        "sha256": "4784c7ce2bee437d3f43ecc7880a67d3740b2d9df681a4ce51747e8be16ec3ca",
+        "bytes": 1303
+      },
+      "shared/data/facade-reality.json": {
+        "sha256": "1a43b7d3db5f8ec0b9da67b02434b322e6fb4bfbe78a8de105b9c1a701c33ad6",
+        "bytes": 11856
+      },
+      "shared/data/market-detail-kit.json": {
+        "sha256": "a1a26b7d18188c1c4e6a4509e7a099edea66a77987a2b8b503ab5638cd051950",
+        "bytes": 535297
+      },
+      "shared/data/b4-panel-kit.json": {
+        "sha256": "6513ff48c1628eaace4705cd69e6e1f5f946a39ef9d08aa1b83bb6e5f4a790a6",
+        "bytes": 2229538
+      },
+      "shared/b4-facade-plan.ts": {
+        "sha256": "6dd8cea292c5fa82984150513bcbaa823c601ddaeac8bd8865a378ca7dd8f80c",
+        "bytes": 1965
+      },
+      "shared/data/b4-facade-plan.json": {
+        "sha256": "fa9343fdb925c5f670dab75e8c86bf99fa4eb9100c7df7246156a77171c21172",
+        "bytes": 15708
+      },
+      "client/world-asset-identity.ts": {
+        "sha256": "16986d42f7873472d11dd0118ca0014399762d09ae7d412871f2ce7fb1d2da00",
+        "bytes": 1813
+      },
+      "client/architecture-depth.ts": {
+        "sha256": "05441065f2b70ca5d5289971a401345923529ec880269627cb05345931940148",
+        "bytes": 1452
+      },
+      "client/b4-panel-material.ts": {
+        "sha256": "c8171233109b5096d232fbdd484c56faba2a620b6b7442fe8edd7251738d865a",
+        "bytes": 1396
+      },
+      "client/building-window-model.ts": {
+        "sha256": "3d7290ffdd33ea704d094fac735856c2ec56600f78d03655dd3268735901bff2",
+        "bytes": 11294
+      },
+      "shared/data/building-window-kit.json": {
+        "sha256": "b5f2e1a719b7bc4cb9b3cf11d838dd06d66bcae6b9b7a767f6a72271f195d6d3",
+        "bytes": 28215
+      },
+      "client/landmark-reality.ts": {
+        "sha256": "85ff541342d6674530d2bf680b93738985fdfc0ad07ef754c22863aa7bba3a98",
+        "bytes": 9983
+      },
+      "client/photogrammetry-repairs.ts": {
+        "sha256": "21228e7609a0ae7a4920dfbea350cd7738ff79e0e835b52d2e06836d26f33d49",
+        "bytes": 1432
+      },
+      "shared/photogrammetry-repairs.ts": {
+        "sha256": "16ff0813cb5f0fe0bec05561f5483c07095b0658100c2b92a60a9d3ef55b1e91",
+        "bytes": 832
+      },
+      "shared/photogrammetry-gameplay.ts": {
+        "sha256": "9ce098866da1e59272d08590ca6e45123182a73946506bbcd03b6639cf7a2365",
+        "bytes": 2435
+      },
+      "shared/photogrammetry.ts": {
+        "sha256": "1643ca85940021765e5b2ca2ad9b2b55b482b41267c2942521e226dc89b20054",
+        "bytes": 12275
+      },
+      "client/photogrammetry-ground.ts": {
+        "sha256": "a16d6077fa89b97a53292c41e0703c82916e12cbfa8c13da6b62e4eef9133038",
+        "bytes": 2624
+      },
+      "shared/photogrammetry-ground.ts": {
+        "sha256": "94c3c4d69a2ae5c645033cf9e7e8f729f5a17dd2e052294e9aaa19ea47cbdf64",
+        "bytes": 15858
+      },
+      "shared/data/photogrammetry-ground-repairs.json": {
+        "sha256": "c0cf042ca71571784a66a5fc90ca45172cc5e629dbc8058cc6d396cefa388165",
+        "bytes": 10758
+      },
+      "client/campus-exterior.ts": {
+        "sha256": "449ad689cc3279736749184e1a1c00a944a8475029d1b50cb6cfd3c26a18ef4e",
+        "bytes": 6522
+      },
+      "shared/campus-exterior.ts": {
+        "sha256": "52cae0aa7e6f14d8aa9dcafa6b2854a1060e23d770676cc099cb12f9f1e5948c",
+        "bytes": 21116
+      },
+      "shared/data/north-court-style.json": {
+        "sha256": "584dffa3dfaef557e39451bbd0603465164595e9f508dec673bdb3d84fbe2872",
+        "bytes": 6152
+      },
+      "client/outdoor-artifacts.ts": {
+        "sha256": "8f8bdb7d28b05cc4f173fe2e6cb444dbc7e1f3e71f45de64441937d0ec825a12",
+        "bytes": 11259
+      },
+      "shared/outdoor-artifacts.ts": {
+        "sha256": "5b13c7733e7d193c4e46dd43d55c864d4ae544ccdbe2f343dfaa9d4ae86a3674",
+        "bytes": 21777
+      },
+      "shared/data/outdoor-artifacts.json": {
+        "sha256": "a9dce42997d941929e9a1c5a0318c54c61e66692f98d24b6c5a4cbcb7d0227cb",
+        "bytes": 219061
+      },
+      "shared/outdoor-world.ts": {
+        "sha256": "1dd105c1f0ef67ba40254ac00e1d60aaeae1fa972f95d5ce2d60f4625f0c51ac",
+        "bytes": 1149
+      },
+      "shared/outdoor-landmarks.ts": {
+        "sha256": "4ce904c8c1bcc0a0e904423d8ca640affae19be14c2936b4d7b8d8e343e6d47d",
+        "bytes": 22313
+      },
+      "client/b6-reality.ts": {
+        "sha256": "942cc969ebf9b4249086353c08090630720758fc3c63cbca648e72fb7b0bb422",
+        "bytes": 27552
+      },
+      "shared/b6-props.ts": {
+        "sha256": "06e822f7f2463bc8266b0254431ce64fbe4a8ef7684f3235e0c57592a5e8c3ce",
+        "bytes": 5178
+      },
+      "shared/data/assets/b6-manifest.json": {
+        "sha256": "299b5a62b3f7da36a21f90d4a98233871d1608d6c748a41f3ea4c0e97d6fc1ef",
+        "bytes": 6826
+      },
+      "shared/data/assets/environment-manifest.json": {
+        "sha256": "c1e8ce89a4d42fde0fcf1996d475b535e859ad06b3fbba824b1fd7a3b0f62af7",
+        "bytes": 14874
+      },
+      "shared/b6-stair-materials.ts": {
+        "sha256": "1f2d7aa8c33893a5ecdaf35739cc73d3e60371b1014d0f7875edf456d89def4c",
+        "bytes": 3760
+      },
+      "client/b6-exterior-concrete.ts": {
+        "sha256": "2b5257f5a3df1c4ed05e3a0297dd7df691ba6e0559c89ef6c64c2589da92edc4",
+        "bytes": 2327
+      },
+      "client/model-review.ts": {
+        "sha256": "e6728f7464c330160a5fddefb222088ab0591344b787fc2fbb98672a2f5d7dfb",
+        "bytes": 1748
+      },
+      "client/benchmark-snapshot.ts": {
+        "sha256": "34388f1a537306d3d48456aa3852ddf59c327a1ca4452234e669457f7c8ebfce",
+        "bytes": 417
+      },
+      "client/active-mesh-candidates.ts": {
+        "sha256": "22bbd1c5714b244e8ae516f06686e38d9f81cc7aab8856eb0d96b673db682a16",
+        "bytes": 14154
+      },
+      "client/transform-updates.ts": {
+        "sha256": "0b42765e5b1c01fb2701825c4e76f9a582123f9fc236528c4df4e47dcad72a2c",
+        "bytes": 1333
+      },
+      "client/animation.ts": {
+        "sha256": "731e47e04d2f02fab21c7d71b2a0abe1f51efe330d4281f6c69a90081a04f9a6",
+        "bytes": 38099
+      },
+      "client/avatar-lod.ts": {
+        "sha256": "a101cbeae2e28d472de28004018cc1e1f4f8441dc6bb35ae881029ed8fbdea34",
+        "bytes": 16069
+      },
+      "client/local-avatar-presentation.ts": {
+        "sha256": "24aac859c3e268661afe8dfa03cac53b4c173380c0e9536a25cdaed9b1907673",
+        "bytes": 1960
+      },
+      "client/contact-shadows.ts": {
+        "sha256": "921029fcc718812a7248244b38f021363763135197dedba884fe424424480837",
+        "bytes": 4404
+      },
+      "client/adaptive-quality.ts": {
+        "sha256": "b4285f66fd7a7bff7ccde749561dae13c2db35f7fd4ce4d6cddfc111f4632034",
+        "bytes": 12737
+      },
+      "client/gpu-diagnostics.ts": {
+        "sha256": "7ea09b58834d7eac3c5881faf4641a551cd72721a292683b87b549742ddc8de6",
+        "bytes": 9196
+      },
+      "client/presentation-rate.ts": {
+        "sha256": "347a95d22c2ea5fd19b7355d6c684bde7fff7f6247dc91315310d14b2523c696",
+        "bytes": 3188
+      },
+      "client/cinematic.ts": {
+        "sha256": "db72123f8856b5175069f27946b4c025069d16e97be33860dbc680352e50d6d5",
+        "bytes": 29612
+      },
+      "client/static-submesh-shadows.ts": {
+        "sha256": "c66326364ce044f41b239281d84eb4420089a29b4b2fa32cd41a62d2ec931497",
+        "bytes": 1797
+      },
+      "client/sky-reflection.ts": {
+        "sha256": "af0ae394f32e7fc07015b441fc69e26055df200276ffa8f6711521ff33ab810a",
+        "bytes": 4889
+      },
+      "client/camera-look.ts": {
+        "sha256": "ee9b633d008d6264b183e4bebf901db25e51eeaf16b15312743aa23b3294082d",
+        "bytes": 1106
+      },
+      "client/art-lighting.ts": {
+        "sha256": "16da0c493cb8b06fe5e8664753de52a5f43ae4a8ae8f78417cdd77385dafc80a",
+        "bytes": 14947
+      },
+      "client/atmosphere-sky.ts": {
+        "sha256": "e865234e7749dac386663ca5bee5c3198827cfecb6b087f2a9982ce2082b9216",
+        "bytes": 24758
+      },
+      "client/atmosphere-wgsl.ts": {
+        "sha256": "40f0278c1d92a73afb0c9c0f68678f09ddd42ec2a7078f5748b91b646a13a796",
+        "bytes": 10067
+      },
+      "shared/astronomy.ts": {
+        "sha256": "c66fddb8f82c5f8b0d880419897b3f0d3a18e60e4b7e1bd9da678440a3effb48",
+        "bytes": 3261
+      },
+      "client/atmosphere-light.ts": {
+        "sha256": "264606ba863fe02daa761f8685006a3ddbbfb7fd4e28f83dab7404322d1ac269",
+        "bytes": 2001
+      },
+      "client/data/bright-stars.json": {
+        "sha256": "33ced036ba4934b54ba1934379f672aeb5d7d5f76b3e05c82e7bea55abbb19ff",
+        "bytes": 41270
+      },
+      "client/opaque-sort.ts": {
+        "sha256": "c23d4cba6fb16b39d4f6330aa73cfe86adde410f43bf1520303137f453544e48",
+        "bytes": 8165
+      },
+      "client/vehicle-lighting.ts": {
+        "sha256": "7903f0be0f4b98affc599d7c9cb323581fa482b640b969d9ffc90eb433461891",
+        "bytes": 10277
+      },
+      "shared/data/assets/vehicles-manifest.json": {
+        "sha256": "b92e9bdf3c892579fbb2b6d74ba799ee3f45b6c9f1a3eb090867f6df67119b07",
+        "bytes": 5346
+      },
+      "client/flashlight.ts": {
+        "sha256": "f9d7586c1c4b992004d8683c39be16cda6429e67b860ad8481e3487b432ec824",
+        "bytes": 4657
+      },
+      "client/i18n.ts": {
+        "sha256": "8a155a27e71a558934ec8526625513903bfab74a2c80e91fd9e74dd186551d63",
+        "bytes": 6270
+      },
+      "client/i18n-messages.ts": {
+        "sha256": "a08728019cce0ba2a50904b89f8a1ea34719fa687d2402d70cc061f231f6f06f",
+        "bytes": 33505
+      },
+      "client/i18n-content.ts": {
+        "sha256": "b4fc028d707e5bd1449d00fd802df0ebc53337a97b5d035bc99578f672a2c960",
+        "bytes": 14050
+      },
+      "client/data/journal-en.json": {
+        "sha256": "41e8a4fbefdd108115a2a017da52801f3fa37aa624cf372b63b9f1a7ba1de15b",
+        "bytes": 21988
+      },
+      "client/map-navigation.ts": {
+        "sha256": "9142676a040da5d5f785390269ba0cfa2d318ba54ae69a181fd831f25574524a",
+        "bytes": 20979
+      },
+      "shared/campus-routes.ts": {
+        "sha256": "71ab953c15386d9b5491f5b8189746cf612e24f402f1333427739ad93b63bcd5",
+        "bytes": 8943
+      },
+      "client/minimap-math.ts": {
+        "sha256": "d8de7383a82cd2606080ae344dd7c229fd94694fa20ba3969194024bb91d7cda",
+        "bytes": 3617
+      },
+      "client/navigation-physics.ts": {
+        "sha256": "cdd24d1dbe8308b580039a2333821c42d73048b3ba2291e8f8734bd9d7c27499",
+        "bytes": 4486
+      },
+      "shared/simulation.ts": {
+        "sha256": "11f6016a254b33b7b042ee1c225027b78c1b17b5913753c42d065ee8162d9ea5",
+        "bytes": 24807
+      },
+      "shared/physics-step.ts": {
+        "sha256": "2acabf70b479863aa54e13699ba84b299dec7a64ddb32bffa1ccb24db0747680",
+        "bytes": 1099
+      },
+      "client/weather-particles.ts": {
+        "sha256": "9add947d9ec1de1f609cc5811581017c481d76f37aaf2d2172fa6d4bb02ca956",
+        "bytes": 2333
+      },
+      "client/render-health.ts": {
+        "sha256": "7a5027922feb2292e9238917a7af58a2371187446d8cc36f0324562e49d583a4",
+        "bytes": 12400
+      },
+      "client/webgpu-validation.ts": {
+        "sha256": "f0804292f54bb2121b813edfade18dd19af8949111b532db258860532b25645e",
+        "bytes": 3821
+      },
+      "client/render-startup.ts": {
+        "sha256": "8cba9b39c2448bd81f11bdf0fbd90634c0d8ef0450878bbe005e9a8adc7fcc54",
+        "bytes": 8842
+      },
+      "client/on-demand-render.ts": {
+        "sha256": "a5904b6966e44a1e4566f6f176794525f14f3d82a858fd8c9c9dfcd15f4060a8",
+        "bytes": 2191
+      },
+      "client/webgpu-compilation-profile.ts": {
+        "sha256": "cbeef371271c44f4e55d7c4aafe3a47f3d1cc123caa254c3817a3f5c6d308876",
+        "bytes": 51029
+      },
+      "shared/controls.ts": {
+        "sha256": "744ddfb810a5d5dbd75e4998d1b58d15ec51ddae4c99c36ce5f7322f7861d823",
+        "bytes": 1681
+      },
+      "client/labels.ts": {
+        "sha256": "12b63aaeeb9e5b1eed53dc65b78bc4f345ec7d5fb84147f8bb6d8b5ba0730d87",
+        "bytes": 9504
+      },
+      "client/interaction.ts": {
+        "sha256": "8f2bb8746132fa003f9df461d497ea67d2b0b79b1ad25140ff39de06fcd90398",
+        "bytes": 4697
+      },
+      "client/sky-weather.ts": {
+        "sha256": "7cf17545963ed300a78434ae720f871adffb8a1d97f6ff315d093d7a54fba7c2",
+        "bytes": 11967
+      },
+      "client/transit-renderer.ts": {
+        "sha256": "7e174d991d075631be034e113f871462679206455a22914da69ade2372bed292",
+        "bytes": 16053
+      },
+      "client/car-pack.ts": {
+        "sha256": "63ebf92c74d6cef8f7e34869b3a7ec0081f6220cd2e9033e1f79d274fa22679f",
+        "bytes": 16043
+      },
+      "client/car-shadow-proxy.ts": {
+        "sha256": "53669a6f3d39a051968c70a57c3311f7fff5e20bbe8ba045d51f96298cd7c2ce",
+        "bytes": 5610
+      },
+      "client/car-material-budget.ts": {
+        "sha256": "610d27d1cfdf61c4e7d49f434b597abfe2b4b1455678e350dcac79f5eff29220",
+        "bytes": 821
+      },
+      "client/car-paint-instances.ts": {
+        "sha256": "e2f3e63e78c603dbff22c7fa1b894e41de6020e66e33bd68e28b6b07c7a9ec7e",
+        "bytes": 4890
+      },
+      "shared/data/assets/transit-manifest.json": {
+        "sha256": "6c8ac02219def228c438726a6a8cf6b5d7cda991f98e6281dc288417e34417d0",
+        "bytes": 2520
+      },
+      "client/assets.ts": {
+        "sha256": "10df97aa8e7e719f721d1dc9c807d415e742740a3dbf98649f0cd1f67dfc14fb",
+        "bytes": 17669
+      },
+      "shared/environment.ts": {
+        "sha256": "90c6a3722226110255fc1d57edc294696a8077c7cc364dda0b063c223d315f52",
+        "bytes": 1951
+      },
+      "tests/light-preparation.test.ts": {
+        "sha256": "cff5b0515d6cba7cba2f2b9d32aac54e0fd52de0687bcf37282e8e612963a709",
+        "bytes": 16890
+      },
+      "tests/game-light-preparation.test.ts": {
+        "sha256": "ef2a8ea5ece60988dc79d2ae76e03c2fa412aba842033a88570e24e51cd8aea1",
+        "bytes": 27593
+      },
+      "tests/game-quality-preparation.test.ts": {
+        "sha256": "076619062a4b17267c7706b1d8de01f6efd6a76d2b4d31166825e11ac0c5be4b",
+        "bytes": 9335
+      },
+      "tests/game-light-lifecycle.test.ts": {
+        "sha256": "44b32775f331e95811c4805aae91222f0b3a515837c1ddb36e01c6ea4cc5774e",
+        "bytes": 11337
+      },
+      "tests/vehicle-lighting.test.ts": {
+        "sha256": "853f89942bb96e872526208c87e23b8a325ae71dfcc79a9e2c40007806f1f0b0",
+        "bytes": 16965
+      },
+      "tests/flashlight.test.ts": {
+        "sha256": "ee6010035fe3d5589af9188b83960a48062fa1b18c698a38e5c8c7bea870a1e2",
+        "bytes": 12841
+      },
+      "package.json": {
+        "sha256": "e1d35f209df3333959931c04ed25681db3ca4d63e919fad0ca93340b4b7b333f",
+        "bytes": 1340
+      },
+      "tsconfig.json": {
+        "sha256": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c",
+        "bytes": 572
+      }
+    },
+    "core": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\define-order-qa-20261018\\dependencies\\node_modules\\@babylonjs\\core"
+  },
+  "artifacts": [
+    {
+      "path": "analysis-v2.md",
+      "sha256": "7c06beca45736dbb03cc92c24767d7b398011c51425d064c9f22e7cbe7858620",
+      "bytes": 1734
+    },
+    {
+      "path": "validate-v2.mjs",
+      "sha256": "c30ca76068723e4958c9489dfe3c9acbaa937496169b1f08f0080c6e33cc6a5d",
+      "bytes": 3033
+    },
+    {
+      "path": "v2-baseline-red-01.log",
+      "sha256": "b5266f9bc08ee5731c36f31b8762eb7bba866c0f32e05af15844264ee8b6b465",
+      "bytes": 2222
+    },
+    {
+      "path": "v2-baseline-red-01.json",
+      "sha256": "63bb8044d821fe1782cae3d6b26e92b0c9ffefb40f5573bf20aca8eb4885201a",
+      "bytes": 1464
+    },
+    {
+      "path": "v2-targeted-01.log",
+      "sha256": "48c0a72a0d6805713d5f13660d3591792ec0b7b979ad6be86d89d4dc59b95ce8",
+      "bytes": 8914
+    },
+    {
+      "path": "v2-targeted-01.json",
+      "sha256": "3408d9a81227c2bd092d3150846ff6bc5eaddd3857fc8d1f07b68aea61e2c58b",
+      "bytes": 1269
+    },
+    {
+      "path": "v2-types-01.log",
+      "sha256": "d68a64f2a898563f31d37d5809751f506de2895bac5bd9bc63b0c3ed299ef3e2",
+      "bytes": 27
+    },
+    {
+      "path": "v2-delta.diff",
+      "sha256": "4e900399633cc48f8325598fec1eaa52de1671b1c688e5ae06b532cdc079a029",
+      "bytes": 5865
+    },
+    {
+      "path": "inputs.json",
+      "sha256": "647a61ec3d2ec5ccf0fe78a59a9b783d4800898ec4c31f58cda78c69c94ee5d7",
+      "bytes": 29210
+    },
+    {
+      "path": "docs/agents/handoffs/webgpu-low-vehicle-candidate-20261018.md",
+      "sha256": "b66054753441bec6f53ca91ed8cc4aa3316be4968aa0dc56efdc1f5a71c043be",
+      "bytes": 5166
+    }
+  ],
+  "validation": {
+    "baselineRed": {
+      "passed": 0,
+      "failed": 2,
+      "actual": "complete",
+      "expected": "failed"
+    },
+    "targeted": {
+      "passed": 31,
+      "failed": 0
+    },
+    "scopedTS": {
+      "files": 3363,
+      "errors": 0
+    },
+    "relatedRerun": false
+  },
+  "limits": [
+    "CPU/NullEngine frontend and explicitly bounded IO adapters; no GPU/WGSL/pixel/fullworld claim.",
+    "No native runtime, played build or dependency edits.",
+    "Root owns full QA/build/GPU/integration acceptance."
+  ]
+}

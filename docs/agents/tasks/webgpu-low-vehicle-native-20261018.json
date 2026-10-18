@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-low-vehicle-native-20261018",
+  "title": "KEY-31: integrovat doloženou přípravu nízké kvality světel auta",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/light-preparation.ts",
+    "tests/game-low-vehicle-preparation.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "docs/agents/handoffs/webgpu-low-vehicle-native-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přenést přesný přijatý V2 delta dvou low WebGPU vehicle etap před původní player etapy. Game.ts zůstává pod explicitní rezervací webgpu-migrate-root-20261016 stejného koordinátora.",
+    "Zachovat aktuální native/combined odlišnosti a cizí WIP. Bez změny limitů přípravy, readiness, běžného chování světel nebo výchozího backendu.",
+    "Předat vlastní čtyři runtime/test soubory společně s cílenými testy, full clean/combined pipeline a samostatným commitem a integrací."
+  ],
+  "verification": [
+    "Actual Game a helper testy, disposal/cancel/replacement/latest-state; scoped TypeScript.",
+    "Nad stabilními clean i combined snapshoty pnpm test, pnpm build a izolovaný pnpm test:integration; heavy-validation a integrační port drží root task.",
+    "GPU A1/B1/A2 má shodné interní rozlišení a 24/8/24 nové moduly, 15/6/15 pipeline. Jde pouze o dílčí opravu; přetrvávající materiálové a vegetační záseky se nesmějí označit za vyřešené."
+  ],
+  "notes": [
+    "Kandidát V2 5c6b36ad783a332030bf21f25344d17b43e6ea0005c9f0bb5a754bae7444c483; review P2 single-root disposal opraveno a regresně pokryto, závěrečné review bez nálezů.",
+    "A1/B1/A2 maxima 803.7/424.1/865.7 ms, p99 314.9/230.9/327.9 ms. CSS A1 o 1 px vyšší, A2/B1 shodně 1912x866; interně všechny 1470x666. Konce trajektorií se liší; nepoužít jako konečnou performance přejímku.",
+    "Hrané 4195/4196 a starší snapshoty zůstávají neměnné. Linear KEY-31 a migrační cíl zůstávají otevřené.",
+    "Accepted and integrated as a86136ef → main 42f7336f. Native 1387/1387 and combined 1447/1447, both full TypeScript/build/integration PASS; evidence docs/performance/evidence/webgpu-migration-20261016/low-vehicle/README.md. Narrow preparation improvement only; KEY-31 remains open."
+  ]
+}

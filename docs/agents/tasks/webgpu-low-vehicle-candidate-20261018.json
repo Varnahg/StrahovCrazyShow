@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-low-vehicle-candidate-20261018",
+  "title": "KEY-31: izolovaný kandidát přípravy low světel skutečného auta",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-low-vehicle-candidate-20261018/",
+    "docs/agents/handoffs/webgpu-low-vehicle-candidate-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze copied candidate nad frozen5d2472; behavior delty client/game.ts, client/light-preparation.ts a jejich relevantní testy. Žádná změna hraných4195/4196 nebo main/WT runtime.",
+    "Připravit skutečný vehicle controller na low při0/1mappedPOINT v konečných dvou etapách před původními13player etapami. Výchozí helper volba vypnutá, zapíná se pouze pro WebGPU low. Původní pořadí a kompletní final restore/readiness zachovat.",
+    "Dočasně zobrazit skutečný driving root a skrýt parked root při jeho existujícím transformu; nepřepisovat actor.vehicle/position, fyziku, input, síť, kameru ani adaptivní requested state. Použít normální updateRenderEnvironment/headlight budget, nikoli proxy světlo nebo shader.",
+    "Idempotentní ownership-guarded obnova vizuálních rootů při přechodu na player stage, chybě a timeoutu. Při dispose žádné další GPU volání; replacement rootů nesmí obnovovat cizí objekty. Finální přijetí musí číst nejnovější quality/time/profile požadavek.",
+    "Bez změny30s/pass a90s celkem, bez nové cache/diagnostiky nebo snížení herní kvality. ActualCPU proof nepovažovat za GPU přijetí."
+  ],
+  "verification": [
+    "Zachovat původní testy a doplnit actual Game/helper wiring pro dvě vehicle etapy, actual beam shadow=false na low, původní torch/player etapy a source readiness po restore.",
+    "Targeted testy zahrnou cancel/dispose/throw/timeout a late requested quality i root replacement; actor/physics/input/camera hodnoty invariantní. ScopedTS, cílený refaktoring a přesný malý manifest/handoff.",
+    "Žádný build/fullsuite/integration/server/GPU/staging/commit od dítěte. Root sestaví vlastní QA a porovná firstcar/odjezd od lampy v celé scéně až po převzetí."
+  ],
+  "notes": [
+    "Předchází actual CPU proof a6b06be69e2eacdf929bb6bb404aafe42fabe9b628ff17e989e1aa1336d248a1:5/5PASS, lowPBR0/1POINT vytvoří2novéprogramy po13torch etapách; actualcarwarm zajistí exactEffectreuse/0nových. Standard se může opřít o enginecache, medium/nonreceiver nejsou stejnéchybějícípřípady.",
+    "Root přiděluje functional_record explicitní leaf task; žádný rekurzivníBMAD/podagenti. Hranébuildy neměnné; uživatelskýprůchod skončil a bylzmrazen. B6-only kandidát zůstává odložený.",
+    "Programová mezera je doložená; příčina celého903ms čekání a všechny44uživatelskézáseky tím ještě nejsou vysvětlené ani vyřešené.",
+    "Accepted and integrated as a86136ef → main 42f7336f. Native 1387/1387 and combined 1447/1447, both full TypeScript/build/integration PASS; evidence docs/performance/evidence/webgpu-migration-20261016/low-vehicle/README.md. Narrow preparation improvement only; KEY-31 remains open."
+  ]
+}

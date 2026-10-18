@@ -1,0 +1,205 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1\\client\\game.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\client\\game.ts"
+index e4f5211..4ac8502 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1\\client\\game.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\client\\game.ts"
+@@ -603,7 +603,7 @@ export class Game {
+     this.compilationProfile = new WebGpuCompilationProfile(this.engine, {
+       captureShaderInventory: this.environmentProfile !== undefined,
+       captureUnusedDefineInventory: this.environmentProfile !== undefined,
+-      shaderInventoryLimits: this.environmentProfile ? { maxStages: 19 } : undefined,
++      shaderInventoryLimits: this.environmentProfile ? { maxStages: 21 } : undefined,
+       onError: (channel, error, label) => this.renderHealth.report(
+         channel, `${label}: ${error instanceof Error ? error.message : String(error)}`,
+       ),
+@@ -2658,41 +2658,77 @@ export class Game {
+     const night = selectLightingPreview("night").instant!;
+     const includeDayPointVariants = this.engine.isWebGPU;
+     const day = includeDayPointVariants ? selectLightingPreview("day").instant! : null;
++    const includeLowVehicleVariants = this.engine.isWebGPU && this.quality === "low";
++    let vehicleLease: {
++      car: TransformNode;
++      parked: TransformNode;
++      carEnabled: boolean;
++      parkedEnabled: boolean;
++    } | undefined;
++    const restoreVehicle = () => {
++      const lease = vehicleLease;
++      vehicleLease = undefined;
++      if (!lease || isRetired()) return;
++      // Restore only the concrete nodes whose flags this preparation changed.
++      // A replacement root never receives the previous owner's saved flags.
++      try {
++        if (!lease.car.isDisposed()) lease.car.setEnabled(lease.carEnabled);
++      } finally {
++        if (!lease.parked.isDisposed()) lease.parked.setEnabled(lease.parkedEnabled);
++      }
++    };
++    const showVehicle = () => {
++      if (vehicleLease && (vehicleLease.car !== this.car || vehicleLease.parked !== this.parkedCar))
++        restoreVehicle();
++      if (!vehicleLease) {
++        const car = this.car, parked = this.parkedCar;
++        if (!car || !parked || car === parked || car.isDisposed() || parked.isDisposed())
++          throw new Error("Příprava světel auta nemá platné vlastní vizuální kořeny.");
++        vehicleLease = { car, parked, carEnabled: car.isEnabled(false), parkedEnabled: parked.isEnabled(false) };
++      }
++      vehicleLease.car.setEnabled(true);
++      vehicleLease.parked.setEnabled(false);
++    };
+     const apply = (
+       instant: number,
+       flashlightOn: boolean,
+       streetCount?: number,
++      vehicle = false,
+     ) => {
+       const pos = this.actor.position;
+       this.updateWorldPresentation(pos);
+       const self = this.avatars.get(this.localId);
+-      const position = new Vector3(pos.x, pos.y, pos.z);
+-      const feet = position.add(new Vector3(0, -0.8, 0));
+-      // Settle the same collision-aware follow camera behind the loading cover.
+-      // This is presentation only; no simulation or animation time advances.
+-      this.updateCameraFollow(position, self?.eyeHeight ?? 1.63, 1);
+-      const view = this.localAvatarPresentation.update({
+-        camera: this.camera.position,
+-        feet,
+-        bodyHeight: self?.bodyHeight ?? 1.8,
+-        bodyWidthScale: self ? self.measurements.legSpacing / 0.105 : 1,
+-        nearPlane: this.camera.minZ,
+-        firstPerson: this.firstPerson,
+-        vehicle: this.actor.vehicle,
+-      });
+-      if (self)
+-        this.updateAvatarPresentation(
+-          this.localId,
+-          self,
++      let cameraLight = false;
++      if (!vehicle) {
++        const position = new Vector3(pos.x, pos.y, pos.z);
++        const feet = position.add(new Vector3(0, -0.8, 0));
++        // Settle the same collision-aware follow camera behind the loading cover.
++        // This is presentation only; no simulation or animation time advances.
++        this.updateCameraFollow(position, self?.eyeHeight ?? 1.63, 1);
++        const view = this.localAvatarPresentation.update({
++          camera: this.camera.position,
+           feet,
+-          0,
+-          view.visible,
+-          view.resetAnimation,
+-        );
++          bodyHeight: self?.bodyHeight ?? 1.8,
++          bodyWidthScale: self ? self.measurements.legSpacing / 0.105 : 1,
++          nearPlane: this.camera.minZ,
++          firstPerson: this.firstPerson,
++          vehicle: this.actor.vehicle,
++        });
++        if (self)
++          this.updateAvatarPresentation(
++            this.localId,
++            self,
++            feet,
++            0,
++            view.visible,
++            view.resetAnimation,
++          );
++        cameraLight = view.cameraLight;
++      }
+       const lighting = this.updateRenderEnvironment(
+         pos,
+         self,
+-        view.cameraLight,
++        cameraLight,
+         0,
+         performance.now() / 1000,
+         instant,
+@@ -2724,6 +2760,7 @@ export class Game {
+       }
+     };
+     const restore = () => {
++      restoreVehicle();
+       if (!isRetired()) {
+         options?.restoreQuality?.();
+         this.compilationProfile.setStage("restore");
+@@ -2733,9 +2770,14 @@ export class Game {
+     return prepareLightVariants({
+       timeoutMs: options?.timeoutMs,
+       includeDayPointVariants,
++      includeLowVehicleVariants,
+       apply: (stage) => {
+         if (stage === "restore") return restore();
++        const vehicle = stage.startsWith("vehicle-");
++        if (vehicle) showVehicle();
++        else restoreVehicle();
+         this.compilationProfile.setStage(stage);
++        if (vehicle) return apply(night, false, Number(stage.split("-")[1]), true);
+         const isNight = stage.startsWith("night-");
+         const isDay = stage.startsWith("day-");
+         apply(
+@@ -2786,8 +2828,10 @@ export class Game {
+         this.weather,
+         this.scene.meshes.length,
+         this.scene.materials.length,
++        this.car,
++        this.parkedCar,
+       ],
+-      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials"],
++      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials", "car", "parkedCar"],
+       isVisible: () => !document.hidden,
+       onVisibilityChange: (callback) => {
+         document.addEventListener("visibilitychange", callback);
+@@ -2797,7 +2841,7 @@ export class Game {
+       setTimer: (callback, milliseconds) =>
+         window.setTimeout(callback, milliseconds),
+       clearTimer: (timer) => window.clearTimeout(timer as number),
+-    });
++    }).finally(restoreVehicle);
+   }
+ 
+   frame() {
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1\\client\\light-preparation.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\client\\light-preparation.ts"
+index 096d7ea..27d74b9 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1\\client\\light-preparation.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\client\\light-preparation.ts"
+@@ -1,5 +1,6 @@
+ /** Startup-only preparation of actual scene variants. No physics or input. */
+ export type LightPreparationStage =
++  | `vehicle-${0 | 1}`
+   | "current-off"
+   | "current-on"
+   | `night-${0 | 1 | 2}-${"off" | "on"}`
+@@ -77,6 +78,8 @@ export type LightPreparationOptions = {
+   batchMs?: number;
+   /** Existing spawn presentation with zero/one mapped POINT, OFF and ON. */
+   includeDayPointVariants?: boolean;
++  /** Real low-quality vehicle SPOT, without its shadow, before player variants. */
++  includeLowVehicleVariants?: boolean;
+ };
+ 
+ const baselineStages: readonly LightPreparationStage[] = [
+@@ -101,9 +104,12 @@ const baselineStages: readonly LightPreparationStage[] = [
+ export function prepareLightVariants(
+   options: LightPreparationOptions,
+ ): Promise<LightPreparationResult> {
+-  const stages: readonly LightPreparationStage[] = options.includeDayPointVariants
++  const playerStages: readonly LightPreparationStage[] = options.includeDayPointVariants
+     ? [...baselineStages.slice(0, -1), "day-0-off", "day-0-on", "day-1-off", "day-1-on", "restore"]
+     : baselineStages;
++  const stages: readonly LightPreparationStage[] = options.includeLowVehicleVariants
++    ? ["vehicle-0", "vehicle-1", ...playerStages]
++    : playerStages;
+   const started = options.now();
+   const timeout = Math.max(1, options.timeoutMs ?? 30_000);
+   const batchSize = Math.max(1, Math.floor(options.batchSize ?? 128));
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1\\tests\\game-light-preparation.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\tests\\game-light-preparation.test.ts"
+index 1726d16..5feae4a 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\opaque-combined-v1\\tests\\game-light-preparation.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\tests\\game-light-preparation.test.ts"
+@@ -385,7 +385,7 @@ test("actual Game shader inventory follows the real loopback diagnostic opt-in",
+       window: { location: new URL(url) },
+     });
+     run.call({ engine: {}, renderHealth: { rendererId: 1 } });
+-    assert.deepEqual(captured, { shader: expected, unusedDefines: expected, maxStages: expected ? 19 : undefined }, url);
++    assert.deepEqual(captured, { shader: expected, unusedDefines: expected, maxStages: expected ? 21 : undefined }, url);
+   }
+ });
+ 

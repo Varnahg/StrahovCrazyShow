@@ -1,0 +1,89 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\client\\game.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate-v2\\client\\game.ts"
+index 4ac8502..322abb6 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\client\\game.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate-v2\\client\\game.ts"
+@@ -2677,13 +2677,17 @@ export class Game {
+         if (!lease.parked.isDisposed()) lease.parked.setEnabled(lease.parkedEnabled);
+       }
+     };
++    const vehicleRootsLive = () => this.car && this.parkedCar && this.car !== this.parkedCar &&
++      !this.car.isDisposed() && !this.parkedCar.isDisposed();
+     const showVehicle = () => {
+       if (vehicleLease && (vehicleLease.car !== this.car || vehicleLease.parked !== this.parkedCar))
+         restoreVehicle();
++      // A root can be disposed without being replaced or changing mesh count.
++      // Validate every reuse, not only acquisition of the visual lease.
++      if (!vehicleRootsLive())
++        throw new Error("Příprava světel auta nemá platné vlastní vizuální kořeny.");
+       if (!vehicleLease) {
+         const car = this.car, parked = this.parkedCar;
+-        if (!car || !parked || car === parked || car.isDisposed() || parked.isDisposed())
+-          throw new Error("Příprava světel auta nemá platné vlastní vizuální kořeny.");
+         vehicleLease = { car, parked, carEnabled: car.isEnabled(false), parkedEnabled: parked.isEnabled(false) };
+       }
+       vehicleLease.car.setEnabled(true);
+@@ -2762,6 +2766,12 @@ export class Game {
+     const restore = () => {
+       restoreVehicle();
+       if (!isRetired()) {
++        if (includeLowVehicleVariants && !vehicleRootsLive()) {
++          // Inactive update never reads the disposed root's world matrix. Stop
++          // this owned beam, but do not run normal presentation on dead roots.
++          this.vehicleLighting?.update(this.car, 0, false, this.quality);
++          throw new Error("Vizuální kořen auta zanikl během přípravy světel.");
++        }
+         options?.restoreQuality?.();
+         this.compilationProfile.setStage("restore");
+         apply(this.timeOverride ?? Date.now(), this.flashlightOn);
+@@ -2830,8 +2840,10 @@ export class Game {
+         this.scene.materials.length,
+         this.car,
+         this.parkedCar,
++        this.car?.isDisposed(),
++        this.parkedCar?.isDisposed(),
+       ],
+-      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials", "car", "parkedCar"],
++      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials", "car", "parkedCar", "carDisposed", "parkedCarDisposed"],
+       isVisible: () => !document.hidden,
+       onVisibilityChange: (callback) => {
+         document.addEventListener("visibilitychange", callback);
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\tests\\game-low-vehicle-preparation.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate-v2\\tests\\game-low-vehicle-preparation.test.ts"
+index 52a6889..819aae2 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate\\tests\\game-low-vehicle-preparation.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-low-vehicle-candidate-20261018\\candidate-v2\\tests\\game-low-vehicle-preparation.test.ts"
+@@ -531,6 +531,35 @@ for (const ending of [
+     assert.equal(f.invariant(), f.initial);
+   });
+ 
++for (const disposedRoot of ["car", "parked"] as const)
++  test(`single live-scene root disposal fails closed: ${disposedRoot}`, async (t) => {
++    const f = fixture(t), pending = f.start();
++    await f.until("vehicle-0");
++    const dead = f[disposedRoot];
++    dead.dispose();
++    assert.equal(f.scene.isDisposed, false);
++    assert.equal(f.game.disposed, false);
++    assert.equal(f.game.car, f.car);
++    assert.equal(f.game.parkedCar, f.parked);
++    let disposedWrites = 0, disposedWorldReads = 0;
++    const setEnabled = dead.setEnabled, world = dead.computeWorldMatrix;
++    dead.setEnabled = function (enabled) { disposedWrites++; return setEnabled.call(this, enabled); };
++    dead.computeWorldMatrix = function (...args) { disposedWorldReads++; return Reflect.apply(world, this, args); };
++    const before = f.counts();
++    const result = await f.finish(pending);
++    assert.equal(result.status, "failed");
++    assert.equal(result.stages.length, 1);
++    assert.ok(result.stages[0].restartReasons[disposedRoot === "car" ? "carDisposed" : "parkedCarDisposed"] >= 1);
++    assert.equal(disposedWrites, 0, "never setEnabled on the disposed leased node");
++    assert.equal(disposedWorldReads, 0, "never compute a disposed root for beam pose");
++    assert.equal(f.counts().draws, before.draws, "failed ownership cannot render another acceptance frame");
++    assert.equal(f.beam.light.isEnabled(), false);
++    assert.equal(f.game.cancelLightPreparation, undefined);
++    if (disposedRoot === "car") assert.equal(f.parked.isEnabled(false), true);
++    else assert.equal(f.car.isEnabled(false), false);
++    assert.equal(f.invariant(), f.initial);
++  });
++
+ test("replacement roots restart the vehicle stage and never receive the old lease flags", async (t) => {
+   const f = fixture(t),
+     pending = f.start();

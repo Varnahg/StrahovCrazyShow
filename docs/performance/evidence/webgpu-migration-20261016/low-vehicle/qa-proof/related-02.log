@@ -1,0 +1,184 @@
+TAP version 13
+# BJS - [15:27:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:08]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:08]: Babylon.js v9.30.0 - Null engine
+# Subtest: third-person torch follows actual right-hand FK for six builds, all headings and parent transforms
+ok 1 - third-person torch follows actual right-hand FK for six builds, all headings and parent transforms
+  ---
+  duration_ms: 198.5835
+  type: 'test'
+  ...
+# Subtest: first-person hidden rig uses the displayed RH camera direction and a projected lower-right origin
+ok 2 - first-person hidden rig uses the displayed RH camera direction and a projected lower-right origin
+  ---
+  duration_ms: 23.9192
+  type: 'test'
+  ...
+# Subtest: steady torch updates reuse the prop/light and do not repeat enabled or light-source resynchronization
+ok 3 - steady torch updates reuse the prop/light and do not repeat enabled or light-source resynchronization
+  ---
+  duration_ms: 13.7661
+  type: 'test'
+  ...
+# Subtest: profile replacement and missing/disposed rigs do not recreate orphan props or lose controller-owned materials
+ok 4 - profile replacement and missing/disposed rigs do not recreate orphan props or lose controller-owned materials
+  ---
+  duration_ms: 33.1067
+  type: 'test'
+  ...
+# Subtest: 128/256/512 torch shadows share one generator and real scene scheduling emits zero shadow passes while off
+ok 5 - 128/256/512 torch shadows share one generator and real scene scheduling emits zero shadow passes while off
+  ---
+  duration_ms: 85.2246
+  type: 'test'
+  ...
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# Subtest: Game installs one scene-owned budget/order pair before world creation
+ok 6 - Game installs one scene-owned budget/order pair before world creation
+  ---
+  duration_ms: 84.4505
+  type: 'test'
+  ...
+# Subtest: both production render callsites canonicalize actual light slots before drawing
+ok 7 - both production render callsites canonicalize actual light slots before drawing
+  ---
+  duration_ms: 57.2787
+  type: 'test'
+  ...
+# Subtest: actual preload callback does no controller work or render after cancellation
+ok 8 - actual preload callback does no controller work or render after cancellation
+  ---
+  duration_ms: 17.2375
+  type: 'test'
+  ...
+# Subtest: actual Game disposal detaches controllers before scene teardown and is idempotent
+ok 9 - actual Game disposal detaches controllers before scene teardown and is idempotent
+  ---
+  duration_ms: 22.7034
+  type: 'test'
+  ...
+# Subtest: quality initialization works before the constructor creates its scene
+ok 10 - quality initialization works before the constructor creates its scene
+  ---
+  duration_ms: 2.4778
+  type: 'test'
+  ...
+# Subtest: actual Game prepares three render qualities without changing requested auto state
+ok 11 - actual Game prepares three render qualities without changing requested auto state
+  ---
+  duration_ms: 2.1685
+  type: 'test'
+  ...
+# Subtest: actual Game puts each manual requested quality last and restores its scaling
+ok 12 - actual Game puts each manual requested quality last and restores its scaling
+  ---
+  duration_ms: 1.2064
+  type: 'test'
+  ...
+# Subtest: late quality and FPS requests survive temporary rendering and are restored inside final readiness
+ok 13 - late quality and FPS requests survive temporary rendering and are restored inside final readiness
+  ---
+  duration_ms: 0.6605
+  type: 'test'
+  ...
+# Subtest: returned failure stops further quality passes and restores requested rendering
+ok 14 - returned failure stops further quality passes and restores requested rendering
+  ---
+  duration_ms: 0.6865
+  type: 'test'
+  ...
+# Subtest: throw preserves the original failure and restores render-only override
+ok 15 - throw preserves the original failure and restores render-only override
+  ---
+  duration_ms: 0.9117
+  type: 'test'
+  ...
+# Subtest: retired Game does not mutate render resources during quality cleanup
+ok 16 - retired Game does not mutate render resources during quality cleanup
+  ---
+  duration_ms: 0.5124
+  type: 'test'
+  ...
+# Subtest: WebGL keeps one original light preparation without quality overrides
+ok 17 - WebGL keeps one original light preparation without quality overrides
+  ---
+  duration_ms: 0.4516
+  type: 'test'
+  ...
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# BJS - [15:27:05]: Babylon.js v9.30.0 - Null engine
+# Subtest: model-derived beam follows translation, 90 degree yaw, pitch and parent transforms in actual world metres
+ok 18 - model-derived beam follows translation, 90 degree yaw, pitch and parent transforms in actual world metres
+  ---
+  duration_ms: 21.6945
+  type: 'test'
+  ...
+# Subtest: day, parking and invalid input disable the bounded beam; steady updates never repeat whole-scene light resync
+ok 19 - day, parking and invalid input disable the bounded beam; steady updates never repeat whole-scene light resync
+  ---
+  duration_ms: 17.0036
+  type: 'test'
+  ...
+# Subtest: medium and high use one 256/512 shadow target, low has no pass, and resized maps keep the real culling callback
+ok 20 - medium and high use one 256/512 shadow target, low has no pass, and resized maps keep the real culling callback
+  ---
+  duration_ms: 74.6443
+  type: 'test'
+  ...
+# Subtest: off/on reuses configured shadows without a second global light-dirty pass or an off light slot
+ok 21 - off/on reuses configured shadows without a second global light-dirty pass or an off light slot
+  ---
+  duration_ms: 5.9019
+  type: 'test'
+  ...
+# Subtest: shadow candidates reuse storage while empty transitions and moved/reenabled casters remain current
+ok 22 - shadow candidates reuse storage while empty transitions and moved/reenabled casters remain current
+  ---
+  duration_ms: 6.9617
+  type: 'test'
+  ...
+# Subtest: actual shadow frustum rejects behind/lateral/far/glass/faded/disabled casters while retaining crossing large bounds
+ok 23 - actual shadow frustum rejects behind/lateral/far/glass/faded/disabled casters while retaining crossing large bounds
+  ---
+  duration_ms: 19.9571
+  type: 'test'
+  ...
+# Subtest: reactivation, low-to-shadow return, large pose changes and new meshes invalidate stale broad phase immediately
+ok 24 - reactivation, low-to-shadow return, large pose changes and new meshes invalidate stale broad phase immediately
+  ---
+  duration_ms: 5.2075
+  type: 'test'
+  ...
+# Subtest: wind depth ownership and disposal are safe, idempotent and do not delete a replacement owner's wrapper
+ok 25 - wind depth ownership and disposal are safe, idempotent and do not delete a replacement owner's wrapper
+  ---
+  duration_ms: 4.5526
+  type: 'test'
+  ...
+# Subtest: exact 02:00 moonless night frees zero celestial key so hemisphere, two streets and headlight fit four material slots
+ok 26 - exact 02:00 moonless night frees zero celestial key so hemisphere, two streets and headlight fit four material slots
+  ---
+  duration_ms: 107.1802
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6738.6054
