@@ -1,0 +1,42 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-preparation-prototype-20261018\\..\\..\\webgpu-hitch-validation-20261017\\async-production-v3\\tests\\cinematic.test.ts" "b/candidate\\tests\\cinematic.test.ts"
+index 177a0e2..615f9ce 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-preparation-prototype-20261018\\..\\..\\webgpu-hitch-validation-20261017\\async-production-v3\\tests\\cinematic.test.ts"
++++ "b/candidate\\tests\\cinematic.test.ts"
+@@ -312,3 +312,37 @@ test("cinematic quality creates one complete postprocess chain per activation an
+   assert.equal(camera._postProcesses.filter(Boolean).length, postProcesses.length);
+   assert.equal(atmosphere.stats.shadowMapSize, 1024);
+ });
++
++test("hidden spatial preparation refreshes actual caster selection at dt0 and restores it without advancing cadence", (t) => {
++  const engine = new ReflectionTestEngine(), scene = new Scene(engine);
++  const camera = new FreeCamera("spatial preparation camera", new Vector3(0, 3, -5), scene);
++  scene.activeCamera = camera;
++  const sun = new DirectionalLight("spatial sun", Vector3.Down(), scene);
++  sun.intensity = 1;
++  const near = MeshBuilder.CreateBox("spawn caster", {}, scene);
++  const far = MeshBuilder.CreateBox("B6 stand-in for spatial distance only", {}, scene);
++  near.material = new StandardMaterial("near opaque", scene);
++  far.material = new StandardMaterial("far opaque", scene); far.position.x = 200;
++  near.computeWorldMatrix(true); far.computeWorldMatrix(true);
++  const atmosphere = new CinematicAtmosphere(scene, camera, sun);
++  t.after(() => { atmosphere.dispose(); scene.dispose(); engine.dispose(); });
++  const update = (x: number, forceSpatialSelection?: boolean) => atmosphere.update({
++    dt: 0, player: { x, y: 0, z: 0 }, quality: "low", cloud: 0, daylight: 1,
++    keySource: "sun", forceSpatialSelection,
++  });
++  update(0);
++  const map = sun.getShadowGenerator()!.getShadowMap()!;
++  assert.ok(map.renderList!.includes(near) && !map.renderList!.includes(far),
++    JSON.stringify({ list: map.renderList!.map((mesh) => mesh.name), source: atmosphere.stats.shadowSource,
++      intensity: sun.intensity, direction: sun.direction.asArray(), visits: atmosphere.stats.selectionMeshVisits }));
++  const visits = atmosphere.stats.selectionMeshVisits;
++  update(200);
++  assert.equal(atmosphere.stats.selectionMeshVisits, visits, "ordinary dt0 call keeps its existing cadence");
++  assert.ok(map.renderList!.includes(near));
++  update(200, true);
++  assert.ok(map.renderList!.includes(far) && !map.renderList!.includes(near));
++  assert.equal(Reflect.get(atmosphere, "timer"), 0);
++  update(0, true);
++  assert.ok(map.renderList!.includes(near) && !map.renderList!.includes(far));
++  assert.equal(Reflect.get(atmosphere, "timer"), 0);
++});

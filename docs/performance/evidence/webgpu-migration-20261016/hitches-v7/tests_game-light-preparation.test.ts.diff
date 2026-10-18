@@ -1,0 +1,226 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-preparation-prototype-20261018\\..\\..\\webgpu-hitch-validation-20261017\\async-production-v3\\tests\\game-light-preparation.test.ts" "b/candidate\\tests\\game-light-preparation.test.ts"
+index 6937ac6..2a843dc 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-preparation-prototype-20261018\\..\\..\\webgpu-hitch-validation-20261017\\async-production-v3\\tests\\game-light-preparation.test.ts"
++++ "b/candidate\\tests\\game-light-preparation.test.ts"
+@@ -20,6 +20,10 @@ import { prepareLightVariants } from "../client/light-preparation";
+ import { arePreparationEffectsReady } from "../client/strict-material-preparation";
+ import { createEnvironmentProfile } from "../client/environment-profile";
+ import { selectLightingPreview } from "../client/lighting-preview";
++import { B6_LAYOUT } from "../shared/b6-interior";
++import { clampOrbitPitch } from "../client/camera-look";
++import { LocalAvatarPresentation } from "../client/local-avatar-presentation";
++import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+ 
+ const source = ts.createSourceFile(
+   "game.ts",
+@@ -38,7 +42,7 @@ const declaration = source.statements.find(
+ const members = declaration.members.filter(
+   (node) =>
+     node.name &&
+-    ["prepareLighting", "isMeshReadyForCamera"].includes(
++    ["prepareLighting", "isMeshReadyForCamera", "updateCameraFollow", "footFirstPerson", "updateWorldPresentation", "updateRenderEnvironment"].includes(
+       node.name.getText(source),
+     ),
+ );
+@@ -47,7 +51,7 @@ const compiled = ts.transpileModule(
+   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
+ ).outputText;
+ const make = new Script(`(function(environment) {
+-  const { PlayerFlashlight, Vector3, prepareLightVariants, arePreparationEffectsReady, selectLightingPreview, performance, window, document } = environment;
++  const { PlayerFlashlight, Vector3, prepareLightVariants, arePreparationEffectsReady, selectLightingPreview, B6_LAYOUT, clampOrbitPitch, applyArtLighting, performance, window, document } = environment;
+   ${compiled}
+   return PreparationGame;
+ })`).runInThisContext();
+@@ -55,6 +59,7 @@ const make = new Script(`(function(environment) {
+ function fixture(t: import("node:test").TestContext) {
+   const realEngine = new NullEngine();
+   const scene = new Scene(realEngine);
++  scene.useRightHandedSystem = true;
+   const camera = new FreeCamera(
+     "actual startup camera",
+     new Vector3(0, 2, -4),
+@@ -82,6 +87,7 @@ function fixture(t: import("node:test").TestContext) {
+   let effectsReady = true,
+     draws = 0,
+     readyCalls = 0;
++  let stage = "";
+   const states: {
+     instant: number;
+     enabled: boolean;
+@@ -95,6 +101,8 @@ function fixture(t: import("node:test").TestContext) {
+     prepareLightVariants,
+     arePreparationEffectsReady,
+     selectLightingPreview,
++    B6_LAYOUT,
++    clampOrbitPitch,
+     performance: { now: () => now },
+     document: {
+       hidden: false,
+@@ -141,7 +149,7 @@ function fixture(t: import("node:test").TestContext) {
+     camera,
+     engine,
+     renderHealth: { snapshot: () => health },
+-    compilationProfile: { setStage() {} },
++    compilationProfile: { setStage(value: string) { stage = value; } },
+     stableLights,
+     lights: streets,
+     ready: false,
+@@ -246,6 +254,10 @@ function fixture(t: import("node:test").TestContext) {
+   });
+   return {
+     game,
++    camera,
++    get stage() { return stage; },
++    realCameraFollow: Game.prototype.updateCameraFollow.bind(game),
++    realWorldPresentation: Game.prototype.updateWorldPresentation.bind(game),
+     scene,
+     states,
+     rig,
+@@ -588,3 +600,147 @@ test("actual readiness error restores camera pass and leaves the requested OFF s
+   assert.equal(f.game.cancelLightPreparation, undefined);
+   assert.equal(f.hasTimer, false);
+ });
++
++function b6Fixture(t: import("node:test").TestContext) {
++  const f = fixture(t);
++  f.engine.isWebGPU = true; f.scene.useRightHandedSystem = true;
++  Object.assign(f.engine, { _compiledEffects: { requested: {
++    isDisposed: false, getEngine: () => f.engine, isReady: () => f.engine.areAllEffectsReady(),
++  } } });
++  Object.assign(f.game, { firstPerson: false, yaw: Math.PI, pitch: 0.28, distance: 8,
++    cameraArm: 8, vehicleCameraSnap: false,
++    sim: { cameraDistance: (from: Vector3, to: Vector3, actor: unknown) => {
++      assert.ok(actor === f.game.actor); return Vector3.Distance(from, to);
++    } },
++  });
++  Object.freeze(f.game.actor.position); Object.freeze(f.game.actor);
++  const presentation = new LocalAvatarPresentation();
++  f.game.localAvatarPresentation = presentation;
++  Object.assign(f.rig, { root: new TransformNode("unchanged actor presentation", f.scene),
++    rightElbow: new TransformNode("unchanged hand", f.scene) });
++  const rootPosition = (f.rig as any).root.position.clone();
++  const world: { stage: string; pos: number[] }[] = [];
++  const environment: { stage: string; pos: number[]; force: boolean; self: unknown; instant: number; on: boolean }[] = [];
++  let savedPosition: Vector3 | undefined, savedMatrix: number[] | undefined;
++  let savedView: typeof presentation.state | undefined, savedArm = 0;
++  const setStage = f.game.compilationProfile.setStage;
++  f.game.compilationProfile.setStage = (stage: string) => {
++    if (stage === "b6-day-off" && !savedPosition) {
++      savedMatrix = Array.from(f.camera.getViewMatrix(true).m);
++      savedPosition = f.camera.position.clone();
++      savedView = { ...presentation.state }; savedArm = f.game.cameraArm;
++    }
++    setStage(stage);
++  };
++  f.game.b6Reality = { stats: { loadedAssets: 2 }, update({ player }: { player: Vector3 }) {
++    world.push({ stage: f.stage, pos: [player.x, player.y, player.z] });
++  } };
++  f.game.updateWorldPresentation = f.realWorldPresentation;
++  f.game.updateCameraFollow = (position: Vector3, height: number, dt: number) => {
++    assert.ok(!f.stage.startsWith("b6-day"), "synthetic position never enters follow-camera history");
++    if (savedPosition && f.stage === "restore") {
++      assert.ok(Vector3.Distance(f.camera.position, savedPosition) < 1e-8, "restore starts from pre-B6 camera");
++      const restored = Array.from(f.camera.getViewMatrix(true).m);
++      assert.ok(restored.every((value, index) => Math.abs(value - savedMatrix![index]) < 1e-5));
++      savedPosition = undefined; savedMatrix = undefined;
++    }
++    f.realCameraFollow(position, height, dt);
++  };
++  f.game.updateAvatarPresentation = () => {
++    assert.ok(!f.stage.startsWith("b6-day"), "synthetic position never enters avatar LOD/animation/contact history");
++  };
++  const originalEnvironment = f.game.updateRenderEnvironment;
++  f.game.updateRenderEnvironment = (pos: Vector3, self: any, cameraLight: boolean, dt: number,
++    time: number, instant: number, on: boolean, phaseEnds: unknown, force: boolean) => {
++    environment.push({ stage: f.stage, pos: [pos.x, pos.y, pos.z], force, self, instant, on });
++    if (f.stage.startsWith("b6-day")) {
++      assert.equal(cameraLight, true); assert.equal(dt, 0); assert.equal(phaseEnds, undefined);
++      assert.deepEqual(presentation.state, savedView);
++      assert.equal(f.game.cameraArm, savedArm);
++      assert.ok((f.rig as any).root.position.equals(rootPosition));
++      // Actual camera-origin PlayerFlashlight update, with a live minimum rig.
++      f.game.flashlight.update(self, f.camera, on, cameraLight, f.game.quality);
++      return { night: 0 };
++    }
++    return originalEnvironment.call(f.game, pos, self, cameraLight, dt, time, instant, on);
++  };
++  return Object.assign(f, { world, environment,
++    advanceTo(stage: string) { for (let i = 0; f.stage !== stage && i < 200; i++) f.tick(); assert.equal(f.stage, stage); },
++  });
++}
++
++test("B6 pair uses source-derived landing and real camera torch, then restores latest requests without teleporting", async (t) => {
++  const f = b6Fixture(t), initialActor = JSON.stringify(f.game.actor);
++  const pending = f.start(); f.advanceTo("b6-day-on");
++  const b6 = f.environment.filter((entry) => entry.stage.startsWith("b6-day"));
++  assert.deepEqual(b6.map((entry) => entry.on), [false, true]);
++  assert.ok(b6.every((entry) => entry.force && entry.instant === selectLightingPreview("day").instant));
++  assert.deepEqual(b6[0].pos, [B6_LAYOUT.entry.x, B6_LAYOUT.foundationOffset + 0.8, B6_LAYOUT.entry.landingMaxZ]);
++  assert.ok(f.camera.position.equals(new Vector3(B6_LAYOUT.entry.x,
++    B6_LAYOUT.foundationOffset + f.rig.eyeHeight, B6_LAYOUT.entry.landingMaxZ)));
++  assert.ok(Vector3.Distance(f.game.flashlight.beam.light.direction, new Vector3(0, 0, 1)) < 1e-5);
++  assert.equal(f.game.firstPerson, false);
++  f.game.quality = "high"; f.game.timeOverride = 1792303200000; f.game.flashlightOn = true;
++  f.game.yaw = 0.75; f.game.pitch = 0.6; f.game.firstPerson = true;
++  f.finish(); const result = await pending;
++  assert.equal(result.status, "complete"); assert.equal(result.stages.length, 11);
++  assert.equal(JSON.stringify(f.game.actor), initialActor);
++  assert.equal(f.game.firstPerson, true); assert.equal(f.game.yaw, 0.75); assert.equal(f.game.pitch, 0.6);
++  assert.equal(f.game.flashlightOn, true); assert.equal(f.game.quality, "high");
++  assert.equal(f.environment.at(-1)!.instant, 1792303200000);
++  assert.ok(f.environment.some((entry) => entry.stage === "restore" && entry.force));
++  assert.equal(f.camera.position.x, f.game.actor.position.x);
++  assert.equal(f.camera.position.z, f.game.actor.position.z);
++  assert.ok(Math.abs(f.camera.position.y - (f.game.actor.position.y - 0.8 + f.rig.eyeHeight)) < 1e-8);
++  assert.equal(f.engine.currentRenderPassId, 901); assert.equal(f.game.ready, false);
++});
++
++test("B6 controller identity and loaded-asset revision restart only the pending coverage stage", async (t) => {
++  const f = b6Fixture(t); const pending = f.start(); f.advanceTo("b6-day-off");
++  f.effects(false); f.game.b6Reality.stats.loadedAssets++;
++  f.tick();
++  f.game.b6Reality = { ...f.game.b6Reality, stats: { ...f.game.b6Reality.stats } };
++  f.tick(); f.effects(true); f.finish();
++  const result = await pending;
++  const stage = result.stages.find((entry: { stage: string }) => entry.stage === "b6-day-off")!;
++  assert.equal(stage.restarts, 2);
++  assert.equal(stage.restartReasons.b6Assets, 1); assert.equal(stage.restartReasons.b6Controller, 1);
++  assert.equal(result.status, "complete");
++});
++
++test("B6 timeout restores presentation under the original 30 second deadline", async (t) => {
++  const f = b6Fixture(t); const pending = f.start(); f.advanceTo("b6-day-on");
++  f.effects(false); f.timeout();
++  const result = await pending;
++  assert.equal(result.status, "timeout"); assert.ok(result.activeElapsedMs >= 30000);
++  assert.equal(f.environment.at(-1)!.stage, "restore"); assert.equal(f.environment.at(-1)!.force, true);
++  assert.equal(f.game.flashlight.beam.light.isEnabled(), false); assert.equal(f.hasTimer, false);
++});
++
++test("disposed or failed B6 preparation never restores camera/environment into retired objects", async (t) => {
++  for (const reason of ["disposed", "rendererFailed"] as const) {
++    const f = b6Fixture(t); const pending = f.start(); f.advanceTo("b6-day-on");
++    f.game[reason] = true;
++    f.camera.setTarget = () => { assert.fail("retired camera touched"); };
++    f.game.updateWorldPresentation = () => { assert.fail("retired world updated"); };
++    f.game.updateRenderEnvironment = () => { assert.fail("retired environment updated"); };
++    f.game.cancelLightPreparation();
++    assert.equal((await pending).status, "disposed"); assert.equal(f.hasTimer, false);
++  }
++});
++
++test("actual environment method forwards optional spatial refresh without shifting existing phase profiling", () => {
++  const Game = make({ applyArtLighting: () => ({ night: 0 }), performance: { now: () => 17 } });
++  const seen: { forceSpatialSelection?: boolean; dt: number }[] = [];
++  const game = Object.assign(new Game(), {
++    skyWeather: { update: () => ({ sun: { daylight: 1 }, moon: {}, wind: { x: 0, z: 0 } }) },
++    car: { isEnabled: () => false }, actor: { vehicle: false }, weather: { cloud: 0, rain: 0 },
++    avatars: new Map(), localId: "local", cinematic: { update: (value: typeof seen[number]) => seen.push(value) },
++  });
++  const phaseEnds = { sky: 0, lighting: 0, vegetation: 0, transit: 0, particles: 0, surfaces: 0 };
++  game.updateRenderEnvironment({ x: 0, y: 0, z: 0 }, undefined, true, 0, 0, 123, false, phaseEnds, true);
++  assert.equal(seen[0].forceSpatialSelection, true); assert.equal(seen[0].dt, 0);
++  assert.ok(Object.values(phaseEnds).every((value) => value === 17));
++  game.updateRenderEnvironment({ x: 0, y: 0, z: 0 }, undefined, false, 0, 0, 456, false);
++  assert.equal(seen[1].forceSpatialSelection, undefined);
++});

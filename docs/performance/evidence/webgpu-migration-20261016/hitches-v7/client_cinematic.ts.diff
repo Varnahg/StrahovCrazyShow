@@ -1,0 +1,29 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-preparation-prototype-20261018\\..\\..\\webgpu-hitch-validation-20261017\\async-production-v3\\client\\cinematic.ts" "b/candidate\\client\\cinematic.ts"
+index a21a789..075259c 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-preparation-prototype-20261018\\..\\..\\webgpu-hitch-validation-20261017\\async-production-v3\\client\\cinematic.ts"
++++ "b/candidate\\client\\cinematic.ts"
+@@ -324,6 +324,8 @@ type AtmosphereInput = {
+     target: { id: string; vehicle: boolean };
+   }>;
+   localId?: string;
++  /** Hidden preparation moved the presentation without advancing its clock. */
++  forceSpatialSelection?: boolean;
+ };
+ 
+ /** Real cast shadows, restrained highlights and reflection of the current sky.
+@@ -722,11 +724,13 @@ export class CinematicAtmosphere {
+       this.stats.bloomWeight = bloom.weight;
+     } else this.stats.bloomThreshold = this.stats.bloomWeight = 0;
+     this.timer += dt;
+-    if (this.timer > 0.4 || qualityChanged || shadowsStarted) {
++    const refresh = this.timer > 0.4 || qualityChanged || shadowsStarted;
++    if (refresh) {
+       this.timer = 0;
+       this.configureGlass();
+-      if (shadows) this.selectCasters(input);
+     }
++    if (shadows && (refresh || input.forceSpatialSelection === true))
++      this.selectCasters(input);
+     this.environmentTimer += dt;
+     const top = this.scene.clearColor;
+     const delta = Math.max(

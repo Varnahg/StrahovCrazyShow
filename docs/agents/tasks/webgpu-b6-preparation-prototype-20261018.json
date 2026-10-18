@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-b6-preparation-prototype-20261018",
   "title": "KEY-31: izolovaný QA experiment denní B6 přípravy",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     ".cache/webgpu-migration-checks/b6-preparation-prototype-20261018/",
@@ -25,6 +25,7 @@
     "Vlastní prefix obsahuje overlay client/game.ts, client/light-preparation.ts, client/cinematic.ts a odpovídající tests, assembly script a evidence. Needitovat originály ani root QA prefix.",
     "B6 proof doložil missing DIR pro dva noční starty, 8 skutečných regular-instance částí a main reuse, ale wrapped leaf depth churn přetrvává. Source-derived landing(-4.85,-76.95) eye3.43 směrem approachRoute.last vykreslí těchto8; plná geometrie/avatar zůstává GPU otázkou.",
     "Nepoužívat CameraFollow/LocalAvatarPresentation/updateAvatarPresentation na syntetickou B6 pozici. Při restore použít latest požadavky. Na disposed/failed scéne neobnovovat rendering. Standardní runtime a WebGL beze změny mimo explicitní QA startup etapy.",
-    "Read-only dependencies-v5, TSX_DISABLE_CACHE=1 přímý node/tsx; žádný install nebo full world/GLB/GPU. Předání a release po ukončení vlastních procesů, bez commitu."
+    "Read-only dependencies-v5, TSX_DISABLE_CACHE=1 přímý node/tsx; žádný install nebo full world/GLB/GPU. Předání a release po ukončení vlastních procesů, bez commitu.",
+    "18.10 root přijal pouze dokončení QA experimentu:44/44 targeted,fullTS/build,nezávislé review a jeden inside GPU pilot. FirstF8163.8→1905.8ms gap,80→20modulů,59→10sync; startup32.4408→37.2335s. Hitches-v7 obsahuje celý raw a významné selection/ambient confoundy. Žádná native/main runtime integrace, fullsuite/integration tohoto kandidáta ani konečná přejímka. Zbývající avatar/entry main coverage a opakované matched běhy pokračují navazujícím scope."
   ]
 }
