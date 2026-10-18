@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-quality-preparation-20261018",
+  "title": "KEY-31: konečná příprava všech render kvalit před hraním",
+  "status": "done",
+  "dependsOn": [
+    "webgpu-native-day-coverage-qa-20261018"
+  ],
+  "writePaths": [
+    "client/render-quality-preparation.ts",
+    "tests/render-quality-preparation.test.ts",
+    ".cache/webgpu-migration-checks/quality-preparation-20261018/",
+    "docs/agents/handoffs/webgpu-quality-preparation-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Existující BMAD přímý podúkol. Nejdříve zapsat již provedený source/repro průzkum a porovnání all3quality matrix, selective low-F a gameplay transition gate; vybraná první varianta je konečná úplná quality matrix během loadingu, uživatel výslovně přijímá delší startup.",
+    "Implementovat malý opakovaně použitelný startup orchestrátor nad existující LightPreparationResult, bez změny Game/light helper/quality policy. Root vlastní Game wiring. Připravit low/medium/high právě jednou, počáteční requested quality dát poslední; poslední callback dostane final-pass příznak pro skutečnou restore readiness. WebGL root ponechá původní jednu přípravu.",
+    "Neměnit adaptive requested mode/revision/warmup, žádné setQuality přes veřejný user setter. Synchronous apply-quality callback root použije jen dočasné render nastavení; prepare callback spustí skutečný light helper s daným zbývajícím timeoutem. Latest-request restoration v finally, retirement guard; failure/cancel nesmí vytvořit ready nebo pokračovat další quality.",
+    "Konečné limity: původní nejvýše30s aktivního času pro quality pass a pevný celkový90s aktivní strop všech3passů. Do rozpočtu započíst i synchronní apply/restoration režii a čas mezi passy; odečíst pouze skutečně vykázané hidden pausedMs. Late settings nesmí resetovat čas ani přidávat neomezené passy. Nezavádět druhou render smyčku, unbounded polling či falešnou readiness.",
+    "Výsledek zachová původní status/elapsed/active/paused/failureStep a původní stage údaje; přidat jasnou quality atribuci/krátké per-quality výsledky, aby se opakovaná stage jména nevydávala za jediný průchod. Existující bounded shader inventory nebude rozšiřován novou diagnostickou vrstvou ani vydáván za kompletní52label inventory.",
+    "Porovnat throw/failure restore chování s LightPreparationResult; cleanup nesmí překrýt původní chybu a disposed scénu znovu aktualizovat. Použít nejmenší API, které root zapojí do actual apply/world/LOD/postprocess/shadow a stávajícího async pipeline scope; žádné proxy shaders/cache."
+  ],
+  "verification": [
+    "Cílené meaningful testy: pořadí3kvalit pro každýrequested start, stejné callbacks/timeoutbudgets, fixedpass limit, active vs hidden timing, apply/prepare failures, timeout po sync overrun, dispose a late restore; žádné duplicate run/timer/resource. Root poté actual Game tests a clean/combined fullpipeline+Edge auto→low→firstF i ruční roundtrip všechkvalit.",
+    "Cílený refaktoring+scopedTS; předat přesné files/diff/testlogs/SHA a API použití. Žádný build/fullsuite/GPU/port/install ani commit leafem; rezervaci po předání a cleanup uvolnit."
+  ],
+  "notes": [
+    "Owner webgpu-quality-preparation-01a14497, WT C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow. NačístAGENTS/policy/task/registry, claim předzápisem; žádnýrecursiveBMAD.",
+    "Důkaz .cache/webgpu-day13-user-build-20261018/active-auto-low-first-f-session.jsonl SHA9731a38b1b7e35705e9980e1e883897fca33700ee54a80e56cef44486ddac467, first-f-auto.json. Mediumpreparationcomplete40008ms/ready40053; low64114ms,scale0.5od83571ms;F107004ms,max3993.4ms,8modules/49sync pipelines. Změna na low měla také4.2015s mezeru. Source no memo, currentmain90e893/sourceWTc9f62e.",
+    "Root současně upraví Game a své existing Game testy pod vlastními claims; helper API před implementací krátce oznámit rootovi. Low mění HDR/main attachment/shadow map/bumps/LOD; high filter/LOD. Pipeline retention po qualityroundtrip musí root praktickyověřit; není předemslíbená.",
+    "Root přijal komponentu po review, clean1367/combined1427+fullTS/build/integration a skutečném auto-lowF/qualityroundtrip; WT61377f6153→main0703258da7. ColdF4s→150ms, repeat114ms. NeníDoneceléKEY31/FPSmatrix; latest user accepts~58sstartup. Handoff Gamequality obsahuje přesnádata a známémeze."
+  ]
+}

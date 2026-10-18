@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-game-quality-preparation-20261018",
+  "title": "KEY-31: zapojit kvality do skutečné Game přípravy",
+  "status": "done",
+  "dependsOn": [
+    "webgpu-native-day-coverage-qa-20261018"
+  ],
+  "writePaths": [
+    "tests/game-quality-preparation.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-webgpu-startup.test.ts",
+    "tests/game-light-lifecycle.test.ts",
+    ".cache/webgpu-migration-checks/game-quality-preparation-20261018/",
+    "docs/agents/handoffs/webgpu-game-quality-preparation-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Root upraví client/game.ts pod již drženou explicitní root rezervací; nový helper píše disjunktní quality-preparation agent. Oddělit původní actual single-quality light stage metodu od wrapperu pro3quality předready, aby stávající světelné assertions zůstaly zachované.",
+    "Dočasná render quality/scaling nesmí měnit requested adaptive mode/revision/window/target. Refaktorovat společné skutečné applyQuality nastavení; při přípravě držet requested controller state odděleně. Latest restore explicitně v poslední restore readiness etapě a idempotentní cleanup na failure/dispose, žádné další rebuild po přijetí final ready.",
+    "Původní async pipeline scope musí pokrývat všechnyquality včetně lowHDR-off a flashlightON mapy, následnérestore a finálnísubmittedframe. WebGL původní9stages; žádná novácache, fakeGPU/proxy materials, qualitydowngrade nebo změnaadaptivnípolicy.",
+    "User18.10 přijímá delšístartup. Zůstávají konečné30s/pass a90s/celouqualitymatrix active limity, cancel/visibility/health a úplná readiness. Neprodlužovatopakovanědeadline při late requests. Opt-in inventory popsat agregovaně/bounded, bezslibuúplnéqualityatribuce tamkdeneexistuje."
+  ],
+  "verification": [
+    "Skutečný Gamewrapper s realadaptivecontroller: auto/manualstate nezměněný po3temporary qualities, všechna13lightingstate wiring přesactualinner method, latestsettings/restore/scaling, failed/disposed/cancel/throw a původníWebGL cesta. Existing actualNullEngine světelné assertions přesunoutna nověpojmenovanou inner metodu, neoslabovatje.",
+    "Cílenérefactoring/tests/scopedTS, nezávisléreview, clean+combinedfullpipeline a Edgeauto→low→F +manualqualityroundtrips před přijetím. Zachovat vlastní6fileday13commit a cizíprimaryWIP/hranésnapshoty."
+  ],
+  "notes": [
+    "Root owner webgpu-game-quality-preparation-01a14497. Game podwebgpu-migrate-root-20261016; heavy/GPUroot. Novýdefaultauto důkaz first-f-auto.json a raw9731a38b…c467. Původní singlequalityday13funkce v commitc9f62e /main90e893 je acceptedcomponent, ale nikoliceláKEY31.",
+    "Root přijal komponentu po review, clean1367/combined1427+fullTS/build/integration a skutečném auto-lowF/qualityroundtrip; WT61377f6153→main0703258da7. ColdF4s→150ms, repeat114ms. NeníDoneceléKEY31/FPSmatrix; latest user accepts~58sstartup. Handoff Gamequality obsahuje přesnádata a známémeze."
+  ]
+}
