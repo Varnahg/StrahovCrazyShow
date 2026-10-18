@@ -1,0 +1,2 @@
+
+test("completion metric error still stops captured CPU owner once",t=>{const x=fixture(t);x.game.startBenchmark();const error=new Error("original completion failure");x.scene.getActiveIndices=()=>{throw error;};assert.throws(()=>x.finish(),e=>e===error);assert.deepEqual(x.cpuCaptures[0].stops,["benchmark-completion-error"]);x.game.handleRendererFailure("cleanup");assert.equal(x.cpuCaptures[0].stops.length,1);});

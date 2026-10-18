@@ -1,0 +1,62 @@
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+✔ actual native draw samples final membership/vehicle once, idle and unchanged frames do not sample (158.2153ms)
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+✔ eight attempts detach observers; later changed baselines count omissions only once (45.4576ms)
+✔ gating keeps ordinary/WebGL/nonlocal and retired games without mesh observers (28.9017ms)
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+✔ restart and actual benchmark completion close old ownership before callback/restart (40.3595ms)
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+✔ actual native fault closes observer window once (34.42ms)
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+✔ actual native dispose closes observer window once (25.7639ms)
+✔ diagnostic start/end/export/cleanup errors cannot prevent draw or replace original renderer error (92.8367ms)
+BJS - [00:06:32]: Babylon.js v9.30.0 - Null engine
+BJS - [00:06:33]: Babylon.js v9.30.0 - Null engine
+BJS - [00:06:33]: Babylon.js v9.30.0 - Null engine
+BJS - [00:06:33]: Babylon.js v9.30.0 - Null engine
+✔ all eight separate actual samples survive native recorder sanitization/collector limits (116.4136ms)
+✔ actual CPU capture ends after metrics and before reentrant benchmark callback (20.2196ms)
+✔ actual CPU ownership is tied to old benchmark state, with recording/fault/dispose cleanup (18.6304ms)
+✔ CPU capture is absent for nonlocal/WebGL and cleans up original startup failure (19.0166ms)
+✖ completion metric error still stops captured CPU owner once (30.555ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 11
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2923.6701
+
+✖ failing tests:
+
+test at tests\game-light-switch-profile.test.ts:1:15587
+✖ completion metric error still stops captured CPU owner once (30.555ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   'benchmark-completion-error'
+  - ]
+  
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\29fa\StrahovCrazyShow\.cache\webgpu-cpu-profile-20261018\red-completion\tests\game-light-switch-profile.test.ts:141:262)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ 'benchmark-completion-error' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

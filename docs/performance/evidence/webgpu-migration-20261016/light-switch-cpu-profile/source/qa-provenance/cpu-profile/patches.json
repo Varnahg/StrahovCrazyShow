@@ -1,0 +1,67 @@
+[
+  {
+    "path": "client/game.ts",
+    "before": "import { snapshotBenchmarkDiagnostics }",
+    "after": "import { beginQaCpuProfile } from \"./qa-cpu-profile\";\nimport { snapshotBenchmarkDiagnostics }"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "    lightSwitch?: {\n      meshDraw?: MeshDrawProfile;",
+    "after": "    lightSwitch?: {\n      cpuStop?: (reason: string) => void;\n      meshDraw?: MeshDrawProfile;"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "    this.benchmark = {\n      start: performance.now(),",
+    "after": "    const cpuStop = sessionDiagnostics.isRecording && this.engine.isWebGPU ? beginQaCpuProfile() : undefined;\n    try {\n    this.benchmark = {\n      start: performance.now(),"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "        lastVehicle: this.actor.vehicle, lastRevision: this.stableLights.stats.revisions,",
+    "after": "        cpuStop, lastVehicle: this.actor.vehicle, lastRevision: this.stableLights.stats.revisions,"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "    return true;\n  }\n  private stopLightSwitchProfile(",
+    "after": "    return true;\n    } catch (error) { cpuStop?.(\"benchmark-start-error\"); throw error; }\n  }\n  private stopLightSwitchProfile("
+  },
+  {
+    "path": "client/game.ts",
+    "before": "    if (!state || state.closed) return;\n    state.closed = true;",
+    "after": "    if (reason !== \"benchmark-end\") {\n      const cpuStop = state?.cpuStop;\n      if (state) state.cpuStop = undefined;\n      cpuStop?.(reason);\n    }\n    if (!state || state.closed) return;\n    state.closed = true;"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "        this.benchmark = undefined;\n        this.stopLightSwitchProfile(b.lightSwitch, \"benchmark-end\");",
+    "after": "        this.benchmark = undefined;\n        const cpuStop = b.lightSwitch?.cpuStop;\n        if (b.lightSwitch) b.lightSwitch.cpuStop = undefined;\n        let result: Benchmark;\n        let cpuStopReason = \"benchmark-end\";\n        try {\n        this.stopLightSwitchProfile(b.lightSwitch, \"benchmark-end\");"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "        this.onBenchmark?.({",
+    "after": "        result = {"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "          weatherAtEnd: this.weather ? structuredClone(this.weather) : null,\n        });",
+    "after": "          weatherAtEnd: this.weather ? structuredClone(this.weather) : null,\n        };\n        } catch (error) { cpuStopReason = \"benchmark-completion-error\"; throw error; }\n        finally { cpuStop?.(cpuStopReason); }\n        this.onBenchmark?.(result);"
+  },
+  {
+    "path": "tests/game-light-switch-profile.test.ts",
+    "before": "  const noop=()=>{},disposable=()=>({dispose:noop});",
+    "after": "  const cpuCaptures:{stops:string[]}[]=[];\n  const noop=()=>{},disposable=()=>({dispose:noop});"
+  },
+  {
+    "path": "tests/game-light-switch-profile.test.ts",
+    "before": "  const globals={performance:",
+    "after": "  const globals={beginQaCpuProfile:()=>{const capture={stops:[] as string[]};cpuCaptures.push(capture);return(reason:string)=>{capture.stops.push(reason);order.push(\"cpu-stop\");};},performance:"
+  },
+  {
+    "path": "tests/game-light-switch-profile.test.ts",
+    "before": "captureModelReview:()=>({}),captureRenderCostInventory:",
+    "after": "captureModelReview:()=>{order.push(\"metrics\");return{};},captureRenderCostInventory:"
+  },
+  {
+    "path": "tests/game-light-switch-profile.test.ts",
+    "before": "  return {game,scene,mesh,material,point,profiles,events,order,baseline,",
+    "after": "  return {game,scene,mesh,material,point,profiles,events,order,baseline,cpuCaptures,"
+  }
+]

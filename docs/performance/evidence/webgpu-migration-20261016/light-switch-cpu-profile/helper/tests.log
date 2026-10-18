@@ -1,0 +1,76 @@
+TAP version 13
+# Subtest: one owned capture; stop once; no export until Promise resolves; preserve raw trace and clocks
+ok 1 - one owned capture; stop once; no export until Promise resolves; preserve raw trace and clocks
+  ---
+  duration_ms: 2.136
+  type: 'test'
+  ...
+# Subtest: construction and synchronous stop reentrance cannot create a second profiler
+ok 2 - construction and synchronous stop reentrance cannot create a second profiler
+  ---
+  duration_ms: 0.237
+  type: 'test'
+  ...
+# Subtest: old stop closure cannot touch a reentrant new capture published after settlement
+ok 3 - old stop closure cannot touch a reentrant new capture published after settlement
+  ---
+  duration_ms: 0.2132
+  type: 'test'
+  ...
+# Subtest: samplebufferfull stops and detaches once; late manual stop preserves reason
+ok 4 - samplebufferfull stops and detaches once; late manual stop preserves reason
+  ---
+  duration_ms: 0.2086
+  type: 'test'
+  ...
+# Subtest: unavailable and constructor exceptions publish truthful status and release reservation
+ok 5 - unavailable and constructor exceptions publish truthful status and release reservation
+  ---
+  duration_ms: 0.3607
+  type: 'test'
+  ...
+# Subtest: stop rejection is handled asynchronously and unblocks next capture
+ok 6 - stop rejection is handled asynchronously and unblocks next capture
+  ---
+  duration_ms: 0.3426
+  type: 'test'
+  ...
+# Subtest: stop throw is handled asynchronously and unblocks next capture
+ok 7 - stop throw is handled asynchronously and unblocks next capture
+  ---
+  duration_ms: 0.2551
+  type: 'test'
+  ...
+# Subtest: publisher exceptions never escape or leave sampler busy
+ok 8 - publisher exceptions never escape or leave sampler busy
+  ---
+  duration_ms: 0.2903
+  type: 'test'
+  ...
+# Subtest: listener failures still stop constructed profiler and remove failure cannot suppress stop
+ok 9 - listener failures still stop constructed profiler and remove failure cannot suppress stop
+  ---
+  duration_ms: 0.2935
+  type: 'test'
+  ...
+# Subtest: clock failures and unprintable errors cannot leak exceptions
+ok 10 - clock failures and unprintable errors cannot leak exceptions
+  ---
+  duration_ms: 0.4055
+  type: 'test'
+  ...
+# Subtest: default singleton constructs exactly 16ms/2000 and publishes only last raw trace in owned DOM
+ok 11 - default singleton constructs exactly 16ms/2000 and publishes only last raw trace in owned DOM
+  ---
+  duration_ms: 1.9749
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 506.3022

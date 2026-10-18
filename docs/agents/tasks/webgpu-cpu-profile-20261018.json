@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-cpu-profile-20261018",
+  "title": "KEY-31: určit funkční CPU hotspot zbývajících změn světel",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-cpu-profile-20261018/",
+    "docs/agents/handoffs/webgpu-cpu-profile-20261018.md",
+    "docs/performance/evidence/webgpu-migration-20261016/light-switch-cpu-profile/",
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/webgpu-cpu-profile-20261018/"
+  ],
+  "resources": ["heavy-validation", "gpu", "workspace-build", "port:4200", "port:2595"],
+  "acceptance": [
+    "Pouze izolovaný QA snapshot z přijatého native909ebf8a a existujícího light-switch profilu26878bbf; runtime main/29fa/WT ani hrané4188/4192–4199 neměnit.",
+    "Nejdříve ověřit standardní browser JS Self-Profiling API, bezpečnostní policy, rozlišení časovače a lifecycle z primárních zdrojů. Dostupnost potvrdit skutečným konstruktorovým pokusem v hlavním realm QA stránky.",
+    "Jeden bounded profiler pouze pro explicitní benchmark; stop/export až po uzavření benchmarkových metrik, fault/restart/dispose cleanup a zachované původní chyby. Trace neukládat do32KiB session recordu.",
+    "Zachovat source/test/bundle hash a oddělit diagnostické CPU stacky od čistého FPS A/B. Sampling gaps nejsou GPU/idle důkaz. Nezapínat browser flags ani origin trial.",
+    "Z konkrétních stacků odvodit další varianty opravy; tento task sám neimplementuje neprokázanou cache, light-slot ani renderer optimalizaci."
+  ],
+  "verification": [
+    "Cílené CPU lifecycle/limit/export testy, exact source inverse a bounded skutečný produkční GPU sběr; full TS/build isolated snapshotu.",
+    "Zapsat skutečné výsledky, profilovací režii, neověřené příčiny a doporučený další krok. Samostatný scoped commit evidence a metadata; žádný cizí WIP."
+  ],
+  "notes": [
+    "Pokračování uživatelem vytvořeného cíle01a15102. Původní chat01a14497 má autoritativní stavidle/posledníturncompleted, QA4194/2589 i root4192/2587/2568 bezlisteneru. Admin/root/BMAD zastavené práce předány; živé claims4193,4195–4199 ponechány.",
+    "KEY-31 poslední diagnostika: příprava123,7/64,8ms vs bind-draw44,1/28,5ms; exact funkce zatím nedoložena. Dosavadní sampler má3/3úplnévzorky,0omissions/errors; nejde o čistéFPSA/B.",
+    "BMAD musí být vykreslen v této worktree podle její policy, bez přebírání starého renderovaného workflow."
+  ]
+}
