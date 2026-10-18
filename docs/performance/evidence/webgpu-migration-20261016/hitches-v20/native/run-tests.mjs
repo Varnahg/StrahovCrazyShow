@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import {resolve,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=dirname(fileURLToPath(import.meta.url)),source=JSON.parse(fs.readFileSync(resolve(root,'source-manifest.json'))),suite=process.argv[2]??'targeted';assert.ok(['targeted','related'].includes(suite));
+const files=source[suite],args=['--import','tsx','--test','--test-concurrency=1',...files],log=resolve(root,suite+'.log'),fd=fs.openSync(log,'w'),startedAt=new Date().toISOString(),hash=p=>createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const result=spawnSync(process.execPath,args,{cwd:source.candidate,env:{...process.env,TSX_DISABLE_CACHE:'1',DEFINE_ORDER_REPORT:resolve(root,suite+'-report.json')},stdio:['ignore',fd,fd]});fs.closeSync(fd);
+const record={suite,startedAt,endedAt:new Date().toISOString(),command:[process.execPath,...args],cwd:source.candidate,exitCode:result.status,signal:result.signal,sourceManifestSha:hash(resolve(root,'source-manifest.json')),dependencyRoot:source.dependencies,log};fs.writeFileSync(resolve(root,suite+'-run.json'),JSON.stringify(record,null,2)+'\n');console.log(JSON.stringify(record));console.log(fs.readFileSync(log,'utf8').split(/\r?\n/).slice(-11).join('\n'));process.exitCode=result.status??1;

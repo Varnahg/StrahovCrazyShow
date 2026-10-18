@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,readdirSync,existsSync} from 'node:fs';
+import {join} from 'node:path';
+import {createHash} from 'node:crypto';
+const root=import.meta.dirname,checkpoint='define-order-native-v1',[sessionId,label]=process.argv.slice(2);
+assert.match(sessionId??'',/^[a-f0-9-]{36}$/);assert.match(label??'',/^define-native-(webgpu|webgl2)-smoke-[1-9]$/);
+const dir=join(root,checkpoint,'.cache/game-diagnostics'),parts=readdirSync(dir).filter(n=>n.startsWith(sessionId));
+assert.deepEqual(parts,[sessionId+'.jsonl'],'Rotated/extra parts need explicit reconstruction');
+const bytes=readFileSync(join(dir,parts[0])),batches=bytes.toString().trim().split('\n').map(JSON.parse),records=batches.flatMap(b=>b.records??[]);
+assert.ok(records.length);assert.ok(records.every((r,i)=>r.seq===i),'Sequence gap');
+const snapshotId=JSON.parse(readFileSync(join(root,checkpoint,'source-manifest.json'))).snapshotId;
+assert.ok(batches.every(b=>b.source.buildSnapshotId===snapshotId),'Source identity drift');
+const entry=records.find(r=>r.kind==='network-connecting'),ready=records.find(r=>r.kind==='game-ready'),dispose=records.find(r=>r.kind==='game-dispose');
+assert.ok(entry&&ready&&dispose,'Incomplete lifecycle');
+const summary={checkpoint,label,sessionId,snapshotId,sha256:createHash('sha256').update(bytes).digest('hex'),bytes:bytes.length,records:records.length,sequence:[records[0].seq,records.at(-1).seq],startupMs:ready.atMs-entry.atMs,entry,ready,preparation:records.find(r=>r.kind==='lighting-preparation')??null,compilation:records.find(r=>r.kind==='webgpu-preparation-profile')??null,benchmarks:records.filter(r=>/benchmark/.test(r.kind)),dispose,errors:records.filter(r=>/fault|error|failure/.test(r.kind))};
+for(const suffix of ['session.jsonl','summary.json'])assert.ok(!existsSync(join(root,label+'-'+suffix)),'Preserve prior freeze');
+writeFileSync(join(root,label+'-session.jsonl'),bytes);writeFileSync(join(root,label+'-summary.json'),JSON.stringify(summary,null,2)+'\n');
+console.log(JSON.stringify({label,sessionId,snapshotId,records:records.length,startupMs:summary.startupMs,errors:summary.errors.length,dispose:dispose.data,sha256:summary.sha256}));
