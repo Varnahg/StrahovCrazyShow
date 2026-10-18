@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-grass-user-build-20261018",
+  "title": "Předat neměnný build s ověřenou přípravou FAR trávy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-grass-user-build-20261018/",
+    "docs/agents/handoffs/webgpu-grass-user-build-20261018.md"
+  ],
+  "resources": [
+    "port:4198",
+    "port:2593"
+  ],
+  "acceptance": [
+    "Samostatný immutable source/test snapshot 4a968ff7 s již integrovaným runtime maincb236094 a plným clean1403/combined1463 test/build/integration PASS.",
+    "Neměnný produkční dist a readonly balíčky; vlastní skryté služby4198/2593, běžné počasí, bez HMR a bez nového copied attribution profileru.",
+    "Zachovat hrané4197/4196/4195 i staršíverze. Popsat pouze odstraněný první FAR shluk a otevřené světelné/NPC záseky."
+  ],
+  "verification": [
+    "Ověřit úplnou source/dist identitu, HTTPhealth a vlastní PID/start/path. Skutečný Edge entry/obraz/ready/cleanup; žádná nová performance garance ze stacionárního smoke.",
+    "GPU/heavy okno vlastní root; během měření koordinovat CPU práci. Procesy ukončovat jen podle ověřené vlastní identity."
+  ],
+  "notes": [
+    "18.10.2026 porty4198/2593 při read-only kontrole neobsazené. Uživatel požaduje viditelný měřitelný progress; tento build zpřístupní poslední přijatý runtime beze změny dosavadních verzí.",
+    "Počet41etap a timeouty/readiness beze změny. Další authored coverage proof probíhá v oddělené cache; tento snapshot se už nebude přestavovat.",
+    "4198/API2593 běží nad immutable4a968ff7, potvrzeno41complete→ready→dispose a healthvalid/errors0. Běžnépočasí, kartu ponechatvmenu a držetclaim, dokudslužbyběží. Backgroundtimeout zachován jako neúspěšnýpokus. Důkazy docs/performance/evidence/webgpu-migration-20261016/grass-user-build-4198/."
+  ]
+}
