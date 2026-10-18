@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "task": "webgpu-opaque-order-qa-20261018",
+  "owner": "webgpu-opaque-order-01a14497-child",
+  "createdAt": "2026-10-18T11:42:07.814Z",
+  "baseSnapshotId": "205b4dda8028dd20b90dbd75177ba6ebd8d3fcf41d02cd97a8c44c42a6b9d05d",
+  "base": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\quality-combined-v1",
+  "candidate": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-opaque-order-20261018\\candidate",
+  "changes": [
+    {
+      "path": "client/opaque-sort.ts",
+      "originalSha256": "aed5ad0b4c4704422e9575ca3f71a1d69503a0bc7a182f80505538564122b3d0",
+      "sha256": "cd9701bac29087517634545db62ca71b16ef0029cc0f985aafc4de9ad54074ff",
+      "bytes": 8174
+    },
+    {
+      "path": "client/art-lighting.ts",
+      "originalSha256": "39aa6772e6d398b8ef54ed8eea31fe25aa3859148d5ea9b7ccc5c3d7a09b9707",
+      "sha256": "88e8542359a2108037e9cc4edf1444600134ff377baea248a9877c96f94c4983",
+      "bytes": 14808
+    },
+    {
+      "path": "tests/opaque-sort.test.ts",
+      "originalSha256": "6d9c957a4eef496fddac3ea04229d98971b997c690d416838e9501002acc1642",
+      "sha256": "17b0684aef8c27df7bceadb3a32bb98fca78ea9fc2c288041e99da759a91fea5",
+      "bytes": 22612
+    }
+  ],
+  "copiedInputs": {
+    "client/opaque-sort.ts": {
+      "sha256": "aed5ad0b4c4704422e9575ca3f71a1d69503a0bc7a182f80505538564122b3d0",
+      "bytes": 6638
+    },
+    "client/art-lighting.ts": {
+      "sha256": "39aa6772e6d398b8ef54ed8eea31fe25aa3859148d5ea9b7ccc5c3d7a09b9707",
+      "bytes": 14804
+    },
+    "client/atmosphere-sky.ts": {
+      "sha256": "e865234e7749dac386663ca5bee5c3198827cfecb6b087f2a9982ce2082b9216",
+      "bytes": 24758
+    },
+    "client/atmosphere-wgsl.ts": {
+      "sha256": "40f0278c1d92a73afb0c9c0f68678f09ddd42ec2a7078f5748b91b646a13a796",
+      "bytes": 10067
+    },
+    "shared/astronomy.ts": {
+      "sha256": "c66fddb8f82c5f8b0d880419897b3f0d3a18e60e4b7e1bd9da678440a3effb48",
+      "bytes": 3261
+    },
+    "shared/weather.ts": {
+      "sha256": "e9c9faed4a1200d020324bcc6a1b42b32c340f5f1dbcb26f36bc6f904226b542",
+      "bytes": 9745
+    },
+    "client/atmosphere-light.ts": {
+      "sha256": "264606ba863fe02daa761f8685006a3ddbbfb7fd4e28f83dab7404322d1ac269",
+      "bytes": 2001
+    },
+    "client/data/bright-stars.json": {
+      "sha256": "33ced036ba4934b54ba1934379f672aeb5d7d5f76b3e05c82e7bea55abbb19ff",
+      "bytes": 41270
+    },
+    "tests/opaque-sort.test.ts": {
+      "sha256": "6d9c957a4eef496fddac3ea04229d98971b997c690d416838e9501002acc1642",
+      "bytes": 9191
+    },
+    "client/render-shaders.ts": {
+      "sha256": "e73d2d242eb18d2c876cee60f6811bc41061520eee4718d1e9eb583252e60fd0",
+      "bytes": 1542
+    },
+    "package.json": {
+      "sha256": "e1d35f209df3333959931c04ed25681db3ca4d63e919fad0ca93340b4b7b333f",
+      "bytes": 1340
+    },
+    "tsconfig.json": {
+      "sha256": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c",
+      "bytes": 572
+    }
+  },
+  "dependencyIdentity": {
+    "nodeModules": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\quality-combined-v1\\node_modules",
+    "core": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\define-order-qa-20261018\\dependencies\\node_modules\\@babylonjs\\core\\package.json",
+    "loaderCore": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\define-order-qa-20261018\\dependencies\\node_modules\\@babylonjs\\core\\package.json",
+    "pinned": [
+      "Rendering/renderingGroup.js",
+      "Meshes/subMesh.pure.js",
+      "Meshes/abstractMesh.pure.js",
+      "Materials/multiMaterial.pure.js",
+      "Materials/PBR/pbrBaseMaterial.pure.js",
+      "Materials/pushMaterial.js",
+      "scene.pure.js"
+    ]
+  },
+  "preservation": {
+    "originalNearToFarBodyExact": true,
+    "originalFourTestsExact": true,
+    "readOnlyInputsChecked": true
+  },
+  "validation": {
+    "tests": 10,
+    "pass": 10,
+    "fail": 0,
+    "log": "targeted-01.log",
+    "scopedTS": {
+      "files": 2971,
+      "errors": 0,
+      "log": "types-01.log"
+    },
+    "whitespace": {
+      "status": "not separately rechecked during root GPU window",
+      "reason": "Initial no-index check returned1 with LF/CRLF warning; scoped Prettier already completed. Not claimed as a passed separate Git check."
+    }
+  },
+  "artifacts": [
+    {
+      "path": "analysis.md",
+      "sha256": "58afd92ba58a2887becc7048fe0184a27cb57c294ee7a85a6cedf0e39ec53456",
+      "bytes": 2595
+    },
+    {
+      "path": "assemble.mjs",
+      "sha256": "822ee91dde7822749d2016ae024cc0f0473b390c476736f97bf584dec7b02c20",
+      "bytes": 2277
+    },
+    {
+      "path": "candidate/client/art-lighting.ts",
+      "sha256": "88e8542359a2108037e9cc4edf1444600134ff377baea248a9877c96f94c4983",
+      "bytes": 14808
+    },
+    {
+      "path": "candidate/client/atmosphere-light.ts",
+      "sha256": "264606ba863fe02daa761f8685006a3ddbbfb7fd4e28f83dab7404322d1ac269",
+      "bytes": 2001
+    },
+    {
+      "path": "candidate/client/atmosphere-sky.ts",
+      "sha256": "e865234e7749dac386663ca5bee5c3198827cfecb6b087f2a9982ce2082b9216",
+      "bytes": 24758
+    },
+    {
+      "path": "candidate/client/atmosphere-wgsl.ts",
+      "sha256": "40f0278c1d92a73afb0c9c0f68678f09ddd42ec2a7078f5748b91b646a13a796",
+      "bytes": 10067
+    },
+    {
+      "path": "candidate/client/data/bright-stars.json",
+      "sha256": "33ced036ba4934b54ba1934379f672aeb5d7d5f76b3e05c82e7bea55abbb19ff",
+      "bytes": 41270
+    },
+    {
+      "path": "candidate/client/opaque-sort.ts",
+      "sha256": "cd9701bac29087517634545db62ca71b16ef0029cc0f985aafc4de9ad54074ff",
+      "bytes": 8174
+    },
+    {
+      "path": "candidate/client/render-shaders.ts",
+      "sha256": "e73d2d242eb18d2c876cee60f6811bc41061520eee4718d1e9eb583252e60fd0",
+      "bytes": 1542
+    },
+    {
+      "path": "candidate/package.json",
+      "sha256": "e1d35f209df3333959931c04ed25681db3ca4d63e919fad0ca93340b4b7b333f",
+      "bytes": 1340
+    },
+    {
+      "path": "candidate/shared/astronomy.ts",
+      "sha256": "c66fddb8f82c5f8b0d880419897b3f0d3a18e60e4b7e1bd9da678440a3effb48",
+      "bytes": 3261
+    },
+    {
+      "path": "candidate/shared/weather.ts",
+      "sha256": "e9c9faed4a1200d020324bcc6a1b42b32c340f5f1dbcb26f36bc6f904226b542",
+      "bytes": 9745
+    },
+    {
+      "path": "candidate/tests/opaque-sort.test.ts",
+      "sha256": "17b0684aef8c27df7bceadb3a32bb98fca78ea9fc2c288041e99da759a91fea5",
+      "bytes": 22612
+    },
+    {
+      "path": "candidate/tsconfig.json",
+      "sha256": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c",
+      "bytes": 572
+    },
+    {
+      "path": "candidate.patch",
+      "sha256": "f8732743993eb54550333c37f8ee19ce59f667a67fcad3697b99dd684dced81c",
+      "bytes": 18611
+    },
+    {
+      "path": "freeze-attempt-note.md",
+      "sha256": "64dec0ffe1af77145a3a688114cf0940d0bf947398dc48358b72bd328a84b71e",
+      "bytes": 851
+    },
+    {
+      "path": "freeze.mjs",
+      "sha256": "2e2315da09431d3624463a9d6a8c93d1a9401600972cb84cd40bec83e198a437",
+      "bytes": 4878
+    },
+    {
+      "path": "inputs.json",
+      "sha256": "2c7fd5a6aff7b80e5ae72b3d7c7e7ea3ece60164a3c747525832415f62b8ea82",
+      "bytes": 2420
+    },
+    {
+      "path": "preimages/client/art-lighting.ts",
+      "sha256": "39aa6772e6d398b8ef54ed8eea31fe25aa3859148d5ea9b7ccc5c3d7a09b9707",
+      "bytes": 14804
+    },
+    {
+      "path": "preimages/client/opaque-sort.ts",
+      "sha256": "aed5ad0b4c4704422e9575ca3f71a1d69503a0bc7a182f80505538564122b3d0",
+      "bytes": 6638
+    },
+    {
+      "path": "preimages/tests/opaque-sort.test.ts",
+      "sha256": "6d9c957a4eef496fddac3ea04229d98971b997c690d416838e9501002acc1642",
+      "bytes": 9191
+    },
+    {
+      "path": "targeted-01.json",
+      "sha256": "96a45b50d28acfa8e95cf3ba8cc4fe9e6c149f1335bbd55ae8260b6c0b1ca61c",
+      "bytes": 908
+    },
+    {
+      "path": "targeted-01.log",
+      "sha256": "7bce75fd2528760a6826b8e3c3e1cd5e1aaf62bda1a5c6705afb574dbb0d8f24",
+      "bytes": 1899
+    },
+    {
+      "path": "types-01.log",
+      "sha256": "8eab848003a6cf7c6b0e7779e77d9e54f08a4625093937beb43c2f5e2504ec91",
+      "bytes": 27
+    },
+    {
+      "path": "validate.mjs",
+      "sha256": "120275793547150a6032023e073efae923a32720f41022dedecaae2bada458b8",
+      "bytes": 2104
+    }
+  ],
+  "handoff": {
+    "path": "docs/agents/handoffs/webgpu-opaque-order-qa-20261018.md",
+    "sha256": "69d57d6f9bca4ab4051dfabc2bb1335ca53ffb270a12bc4fc73a96af4154c9b5",
+    "bytes": 5842
+  },
+  "limitations": [
+    "Isolated copied candidate, not production default or accepted performance",
+    "Actual Babylon NullEngine dispatch/binding/ownership proof, not GPU pixels/overdraw/FPS",
+    "Unknown/custom MultiMaterial child semantics use stable container fallback, never invoke custom resolver while sorting",
+    "Equal-depth opaque image outcome requires root GPU comparison; depth offsets are preserved, not claimed pixel-equivalent"
+  ]
+}

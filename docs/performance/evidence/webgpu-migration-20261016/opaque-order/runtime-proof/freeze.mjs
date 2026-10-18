@@ -1,0 +1,20 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {resolve,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+const root=dirname(fileURLToPath(import.meta.url)),repo=resolve(root,'../..'),qa=resolve(repo,'.cache/webgpu-opaque-order-20261018/candidate'),sha=b=>createHash('sha256').update(b).digest('hex'),inputs=JSON.parse(fs.readFileSync(resolve(root,'inputs.json'))),validation=JSON.parse(fs.readFileSync(resolve(root,'validation-inputs-03.json')));
+const expected=['c23d4cba6fb16b39d4f6330aa73cfe86adde410f43bf1520303137f453544e48','16da0c493cb8b06fe5e8664753de52a5f43ae4a8ae8f78417cdd77385dafc80a','81e19c4964d19c68b5fb167f87565eae9d7114404e102a0d42506508808ce1ed'];
+const changes=inputs.changes.map((r,i)=>{const b=fs.readFileSync(resolve(repo,r.path));assert.equal(sha(b),expected[i]);assert.equal(sha(fs.readFileSync(resolve(root,'preimages',r.path))),r.originalSha256);return {...r,sha256:sha(b),bytes:b.length};});
+const oldTests=fs.readFileSync(resolve(qa,'tests/opaque-sort.test.ts'),'utf8'),newTests=fs.readFileSync(resolve(repo,'tests/opaque-sort.test.ts'),'utf8');assert.ok(newTests.includes(oldTests.slice(oldTests.indexOf('function setup()'))),'all original4 + QA6 bodies exact');
+const oldSort=fs.readFileSync(resolve(qa,'client/opaque-sort.ts'),'utf8'),newSort=fs.readFileSync(resolve(repo,'client/opaque-sort.ts'),'utf8');assert.equal(newSort,oldSort.replace('Isolated QA alternative: only opaque ordering changes.','Group opaque draws by material after the sky.'));
+for(const [p,r] of Object.entries(validation.inputs))assert.equal(sha(fs.readFileSync(resolve(repo,p))),r.sha256,p+' native unchanged');
+const paths=changes.map(c=>c.path),diff=spawnSync('git',['diff','--',...paths],{cwd:repo,encoding:'utf8',maxBuffer:1024*1024});assert.equal(diff.status,0);fs.writeFileSync(resolve(root,'owned.diff'),diff.stdout,{flag:'wx'});
+const check=spawnSync('git',['diff','--check','--',...paths],{cwd:repo,encoding:'utf8'});assert.equal(check.status,0,check.stdout+check.stderr);
+const artifacts=[];function record(path,absolute=resolve(root,path)){const b=fs.readFileSync(absolute);artifacts.push({path,sha256:sha(b),bytes:b.length});}
+for(const entry of fs.readdirSync(root,{withFileTypes:true}))if(entry.isFile()&&entry.name!=='manifest.json')record(entry.name);
+for(const p of paths)record('preimages/'+p);
+const handoff='docs/agents/handoffs/webgpu-opaque-order-native-20261018.md';record(handoff,resolve(repo,handoff));
+const manifest={task:inputs.task,createdAt:new Date().toISOString(),baseHead:'7a8f988',qaManifest:'dad73df72b08f3eb6e314bf7e2d3ed1ddc482af73e0c751968f94481f070f1d1',changes,validation:{baseline:{passed:1,failed:1},targeted:{passed:12,failed:0},related:{passed:8,failed:0},typeScript:{files:2981,errors:0},sourceInputs:validation,oldTenBodiesExact:true,qaComparatorExactExceptComment:true,whitespaceCheck:check.status},artifacts,limits:['NullEngine backend routing seam is not GPU shader/image/performance proof.','Root owns full clean/combined validation and integration.','No dependency byte-invariant sweep claimed.']};
+const body=JSON.stringify(manifest,null,2)+'\n';fs.writeFileSync(resolve(root,'manifest.json'),body,{flag:'wx'});console.log(JSON.stringify({manifestSha256:sha(body),changes,artifacts:artifacts.length}));

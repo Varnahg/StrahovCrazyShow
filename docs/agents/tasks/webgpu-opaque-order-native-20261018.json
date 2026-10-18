@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-opaque-order-native-20261018",
+  "title": "KEY-31: přijmout materiálové řazení opaque objektů pouze pro WebGPU",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/opaque-sort.ts",
+    "client/art-lighting.ts",
+    "tests/opaque-sort.test.ts",
+    "docs/agents/handoffs/webgpu-opaque-order-native-20261018.md",
+    ".cache/webgpu-opaque-order-native-20261018/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přenést přesný ověřený comparator z isolated QA dfbf5c; žádný nový algoritmus, cache, kvalita nebo vendor patch.",
+    "ArtLighting vybere material-first pouze pokud skutečný engine.isWebGPU; WebGL2 ponechá původní sky-first near-to-far. Zachovat shader/lights/alpha/shadow semantics.",
+    "Actual Babylon regresní testy včetně backend selection, LOD, MultiMaterial/pass override a nulových vedlejších účinků; cílený refaktoring a předání společně.",
+    "Root před runtime přijetím provede úplný čistý a combined checkpoint; hraný4195 a cizí WIP zůstávají neměnné. Celkový WebGPU default/FPS matrix zůstává otevřený."
+  ],
+  "verification": [
+    "Lehké cílené testy a scopedTS nad připnutými dependencies bez instalace. Žádný fullsuite/build/integration/GPU/server od podagenta.",
+    "Zachovat původní4testy a6QAactualregresí; backend selection musí testovat skutečný ArtLighting callsite nebo jeho přesný běžící initializer, nikoli pouze textovou přítomnost ternary.",
+    "Dodat přesné source/test SHA, diff a handoff, bez staging/commitu; root integruje."
+  ],
+  "notes": [
+    "Root přijal kandidáta k plnému ověření po Edge A1/B1/A2 pilotu: spawn44.5/50.5/42.9FPS, B6day26.9→33, HUD-onlynight24.1→28.6 s lepším p95. Ambient/pozice se mírně liší; neprohlašuje finální optimálnost ani splnění60FPS.",
+    "A2/B1 mají stejné1514×643; prvníA1 mělheight644. Vyšší nočnítail s otevřenýmreportem zůstává uchovaný, kauzalita neprokázaná. F stále18modules/15sync a2.1s vkontrole. Přijetí sortingu není vyřešení shadercoverage.",
+    "Explicitní leaf zadání pro functional_record; žádný rekurzivní BMAD/podagent. GPU okno skončilo a vlastníQA4194 zastaveno.",
+    "18.10 převzato rootem z explicitního handoffu: manifest cf10f4764a92ab9fbdb539650f591fa80d4e438bd3ae587ff2ce186f87bc27db, RED1/2→targeted12/12,related8/8,TS2981/0, review[]. Clean fdf502:1375/1375/fullTS/build/integrationPASS, combined5d2472:1435/1435/fullTS/build/integrationPASS. WT03d4480019366e8586ecc4c94b4541dddecaac0a→maina1d954221c1585800f84c1e5dfdb46c3bb36a798; pouze3files, dalších134workingpaths zachováno. Done je tento runtime celek, nikoli KEY31 či celá migrace."
+  ]
+}

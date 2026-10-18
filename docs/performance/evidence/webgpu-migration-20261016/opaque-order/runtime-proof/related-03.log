@@ -1,0 +1,66 @@
+TAP version 13
+# BJS - [14:13:32]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:13:32]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:13:32]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:13:32]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:13:32]: Babylon.js v9.30.0 - Null engine
+# Subtest: exact moonless 02:00 reserves headlight and B6 slots without raising the four-light material cap
+ok 1 - exact moonless 02:00 reserves headlight and B6 slots without raising the four-light material cap
+  ---
+  duration_ms: 103.6769
+  type: 'test'
+  ...
+# Subtest: lit lunar key reserves one street slot immediately for driving and restores it immediately on exit
+ok 2 - lit lunar key reserves one street slot immediately for driving and restores it immediately on exit
+  ---
+  duration_ms: 37.0481
+  type: 'test'
+  ...
+# Subtest: real dusk keeps solar key, hemisphere, B6 and car by reducing street capacity to zero
+ok 3 - real dusk keeps solar key, hemisphere, B6 and car by reducing street capacity to zero
+  ---
+  duration_ms: 48.6234
+  type: 'test'
+  ...
+# Subtest: daytime car request consumes no beam slot and low quality retains at most one mapped street lamp
+ok 4 - daytime car request consumes no beam slot and low quality retains at most one mapped street lamp
+  ---
+  duration_ms: 28.8137
+  type: 'test'
+  ...
+# Subtest: nearest movement retains its half-second cadence while a capacity change immediately refreshes the nearest lamp
+ok 5 - nearest movement retains its half-second cadence while a capacity change immediately refreshes the nearest lamp
+  ---
+  duration_ms: 48.984
+  type: 'test'
+  ...
+# BJS - [14:13:31]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:13:31]: Babylon.js v9.30.0 - Null engine
+# BJS - [14:13:31]: Babylon.js v9.30.0 - Null engine
+# Subtest: Babylon Light override still scans identical toggles but steady ArtLighting no longer does
+ok 6 - Babylon Light override still scans identical toggles but steady ArtLighting no longer does
+  ---
+  duration_ms: 123.1758
+  type: 'test'
+  ...
+# Subtest: lamp guard retains exact two-nearest night states, movement, quality and new-mesh lighting
+ok 7 - lamp guard retains exact two-nearest night states, movement, quality and new-mesh lighting
+  ---
+  duration_ms: 40.6645
+  type: 'test'
+  ...
+# Subtest: lamp guard compares requested own state beneath an inactive parent and preserves parent reactivation
+ok 8 - lamp guard compares requested own state beneath an inactive parent and preserves parent reactivation
+  ---
+  duration_ms: 32.3081
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2071.0306

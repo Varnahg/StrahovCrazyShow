@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-opaque-order-qa-20261018",
+  "title": "KEY-31: izolovaný material-first kandidát pro průběžné FPS",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-opaque-order-20261018/",
+    "docs/agents/handoffs/webgpu-opaque-order-qa-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pracovat pouze v copied QA source z frozen combined205b4dda, bez změny produkčního defaultu nebo hraného4195.",
+    "Porovnat strict near-to-far, material-first a coarse depth buckets. První kandidát zachová sky-first a seskupí pouze opaque queue podle skutečného current-render-pass materiálu.",
+    "Zachovat alpha/transparent/shadow fronty, skutečné LOD/instance draws a transformace. Comparator nesmí volat getLOD/readiness ani resetovat draw cache přes SubMesh.getMaterial.",
+    "Žádná nová cache, diagnostika nebo změna kvality. Implementace, cílený refaktor a skutečné Babylon regresní testy společně; GPU přínos zůstává rozhodnutím root po A/B."
+  ],
+  "verification": [
+    "Actual render dispatch včetně MultiMaterial, render-pass override, alpha/transparent a instancí/LOD; všechny původní opaque-sort testy zachované.",
+    "Lehké cílené testy přes připnuté readonly dependencies-v5 nebo aktuální quality snapshot. Scoped TypeScript, hashovaný manifest přesně změněných copied files, samostatný handoff.",
+    "Žádný build/fullsuite/integration/server/GPU bez root koordinace; žádné commity nebo staging od podagenta."
+  ],
+  "notes": [
+    "Uživatel18.10 přijal delší startup, prioritou je plynulé hraní. Steady profile quality run: render19.536ms/main12.735ms, shader creation0; bind/draw10.128ms ve18vzorcích. Jde o hypotézu CPU úspory, overdraw může celek zhoršit.",
+    "Root přiděluje functional_record explicitní leaf implementaci; žádný rekurzivní BMAD. Copied client/opaque-sort.ts, client/art-lighting.ts, tests/opaque-sort.test.ts jsou jediné povolené behavior delty. Handoff uvést ostatní přenesené zdroje a dependencies.",
+    "18.10 převzato: manifest dad73df72b08f3eb6e314bf7e2d3ed1ddc482af73e0c751968f94481f070f1d1, targeted10/10, scopedTS2971/0, fullTS/build QA dfbf5c PASS a nezávislé review[]. Pilot A1/B1/A2 uložen v docs/performance/evidence/webgpu-migration-20261016/opaque-order/. Done znamená dokončený izolovaný experiment; produkční přenos řídí webgpu-opaque-order-native-20261018, KEY31 a celá migrační přejímka zůstávají otevřené. Žádný vlastní proces nebo rezervace dítěte nezůstaly."
+  ]
+}

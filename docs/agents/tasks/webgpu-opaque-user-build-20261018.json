@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-opaque-user-build-20261018",
+  "title": "Předat samostatný frozen build s ověřeným WebGPU opaque řazením",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-opaque-user-build-20261018/",
+    "docs/agents/handoffs/webgpu-opaque-user-build-20261018.md"
+  ],
+  "resources": ["port:4196", "port:2591"],
+  "acceptance": [
+    "Před startem ověřit úplnou clean/combined pipeline a přesnou source/dist identitu. Nový immutable snapshot zdrojů i testů; žádná HMR karta.",
+    "Spustit vlastní skryté služby4196/2591 s identity runtime record a běžným počasím, nikoli QA fixture. Služby nikdy neukončovat jen podle portu.",
+    "Hraný4195 i starší4193/4192/4188 ponechat bez změny. Publikovaná URL není tvrzení o dokončení všech FPS/hitch/multiplayer požadavků."
+  ],
+  "verification": [
+    "HealthHTTP, dist/source hashes a skutečný Edge vstup/obraz; CPU/GPU ověření pouze root při současných původních rezervacích.",
+    "Vlastní snapshot/runtime/disk paths a známá omezení předat; rezervaci držet po dobu běhu služby."
+  ],
+  "notes": [
+    "Root koordinátor; porty při čtecí kontrole12:12UTC nenaslouchaly. Před startem znovu ověřit skutečný stav.",
+    "Uživatel požaduje průběžnou integraci a možnost zkoušet nové buildy při zachování hraného snapshotu. Tato URL je další oddělený kandidát.",
+    "18.10 spuštěno4196/API2591 ze frozen5d247248f50a762877e9079bb4fcd65280e959e8014eb3f65b2662e397c518cb po clean1375/combined1435/fullTS/build/integrationPASS. Edge ready/dispose a healthvalid/pending0/chyby0 ověřeno; vlastní hráč odešel do menu. Služby běží, rezervace zůstává aktivní; viz vlastní handoff. Zdrojový runtime maina1d954221c1585800f84c1e5dfdb46c3bb36a798. Hraný4195 a starší verze beze změny."
+  ]
+}
