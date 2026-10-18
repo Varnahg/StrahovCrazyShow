@@ -1,0 +1,68 @@
+// Exact a94 Game method; source SHA e241eab8b0bc2c71f4c6a74c639babb097973ab36779c6ce35e69198f2d59b6b.
+  private updateCameraFollow(
+    renderPosition: Vector3,
+    eyeHeight: number,
+    dt: number,
+  ) {
+    // A first-person sky look stores a steep slope. Restore the original orbit
+    // range before V/vehicle transitions can reuse it as a camera-height offset.
+    if (!this.footFirstPerson) this.pitch = clampOrbitPitch(this.pitch);
+    const target = new Vector3(
+      renderPosition.x,
+      renderPosition.y + (this.actor.vehicle ? 0.7 : 0.6),
+      renderPosition.z,
+    );
+    let desired =
+      this.firstPerson && !this.actor.vehicle
+        ? new Vector3(
+            renderPosition.x,
+            renderPosition.y - 0.8 + eyeHeight,
+            renderPosition.z,
+          )
+        : target.add(
+            new Vector3(
+              -Math.sin(this.yaw) * this.distance,
+              2 + this.pitch * 4,
+              -Math.cos(this.yaw) * this.distance,
+            ),
+          );
+    if (!this.firstPerson || this.actor.vehicle) {
+      const delta = desired.subtract(target).normalize(),
+        length = this.sim.cameraDistance(target, desired, this.actor);
+      this.cameraArm =
+        length < this.cameraArm
+          ? length
+          : this.cameraArm +
+            (length - this.cameraArm) * (1 - Math.exp(-dt * 5));
+      desired = target.add(delta.scale(this.cameraArm));
+    }
+    if (this.firstPerson && !this.actor.vehicle)
+      this.camera.position.copyFrom(desired);
+    else {
+      if (this.vehicleCameraSnap) {
+        this.camera.position.copyFrom(desired);
+        this.vehicleCameraSnap = false;
+      } else
+        this.camera.position = Vector3.Lerp(
+          this.camera.position,
+          desired,
+          1 - Math.exp(-dt * 12),
+        );
+      const safe = this.sim.cameraDistance(
+          target,
+          this.camera.position,
+          this.actor,
+        ),
+        delta = this.camera.position.subtract(target);
+      if (safe < delta.length() - 0.005)
+        this.camera.position = target.add(delta.normalize().scale(safe));
+    }
+    this.camera.setTarget(
+      this.firstPerson && !this.actor.vehicle
+        ? this.camera.position.add(
+            new Vector3(Math.sin(this.yaw), -this.pitch, Math.cos(this.yaw)),
+          )
+        : target,
+    );
+  }
+

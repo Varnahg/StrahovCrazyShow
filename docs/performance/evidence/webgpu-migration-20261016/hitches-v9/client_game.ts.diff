@@ -1,0 +1,127 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-preparation-v1\\client\\game.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-coverage-completion-prototype-20261018\\candidate\\client\\game.ts"
+index 452b4a2..a65a9a7 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-preparation-v1\\client\\game.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-coverage-completion-prototype-20261018\\candidate\\client\\game.ts"
+@@ -64,7 +64,8 @@ import {
+   type PresentationRateMeasurement,
+ } from "./presentation-rate";
+ import { CinematicAtmosphere } from "./cinematic";
+-import { clampOrbitPitch, nextCameraPitch } from "./camera-look";
++import { clampOrbitPitch, nextCameraPitch, DEFAULT_ORBIT_PITCH } from "./camera-look";
++import { DEFAULT_ORBIT_DISTANCE, orbitCameraTarget, orbitCameraDesired } from "./camera-orbit";
+ import { SurfacePack } from "./surface-pack";
+ import { B6_LAYOUT } from "../shared/b6-interior";
+ import { groundHeight, PARKING_SLOTS } from "../shared/terrain";
+@@ -323,7 +324,7 @@ export class Game {
+   cinematic?: CinematicAtmosphere;
+   surfacePack?: SurfacePack;
+   b6Reality?: B6RealityController;
+-  cameraArm = 8;
++  cameraArm = DEFAULT_ORBIT_DISTANCE;
+   private readonly localAvatarPresentation = new LocalAvatarPresentation();
+   sim!: Simulation;
+   actor!: Actor;
+@@ -395,8 +396,8 @@ export class Game {
+   private avatarSetupReady = false;
+   private pendingPlayers: Player[] | null = null;
+   yaw = Math.PI;
+-  pitch = 0.28;
+-  distance = 8;
++  pitch = DEFAULT_ORBIT_PITCH;
++  distance = DEFAULT_ORBIT_DISTANCE;
+   seq = 0;
+   networkTimeline = new NetworkTimeline();
+   private networkPresentation?: TimelinePresentation & {
+@@ -600,6 +601,7 @@ export class Game {
+     this.compilationProfile = new WebGpuCompilationProfile(this.engine, {
+       captureShaderInventory: this.environmentProfile !== undefined,
+       captureUnusedDefineInventory: this.environmentProfile !== undefined,
++      shaderInventoryLimits: this.environmentProfile ? { maxStages: 20 } : undefined,
+       onError: (channel, error, label) => this.renderHealth.report(
+         channel, `${label}: ${error instanceof Error ? error.message : String(error)}`,
+       ),
+@@ -2145,11 +2147,7 @@ export class Game {
+     // A first-person sky look stores a steep slope. Restore the original orbit
+     // range before V/vehicle transitions can reuse it as a camera-height offset.
+     if (!this.footFirstPerson) this.pitch = clampOrbitPitch(this.pitch);
+-    const target = new Vector3(
+-      renderPosition.x,
+-      renderPosition.y + (this.actor.vehicle ? 0.7 : 0.6),
+-      renderPosition.z,
+-    );
++    const target = orbitCameraTarget(renderPosition, this.actor.vehicle);
+     let desired =
+       this.firstPerson && !this.actor.vehicle
+         ? new Vector3(
+@@ -2157,13 +2155,7 @@ export class Game {
+             renderPosition.y - 0.8 + eyeHeight,
+             renderPosition.z,
+           )
+-        : target.add(
+-            new Vector3(
+-              -Math.sin(this.yaw) * this.distance,
+-              2 + this.pitch * 4,
+-              -Math.cos(this.yaw) * this.distance,
+-            ),
+-          );
++        : orbitCameraDesired(target, this.yaw, this.pitch, this.distance);
+     if (!this.firstPerson || this.actor.vehicle) {
+       const delta = desired.subtract(target).normalize(),
+         length = this.sim.cameraDistance(target, desired, this.actor);
+@@ -2614,8 +2606,9 @@ export class Game {
+     // The same controller/materials survive into gameplay; no proxy shaders.
+     this.flashlight ??= new PlayerFlashlight(this.scene);
+     const night = selectLightingPreview("night").instant!;
++    const includeDayPointPair = this.engine.isWebGPU;
+     const includeB6DayPair = this.engine.isWebGPU && !!this.b6Reality;
+-    const day = includeB6DayPair ? selectLightingPreview("day").instant! : null;
++    const day = includeDayPointPair || includeB6DayPair ? selectLightingPreview("day").instant! : null;
+     let savedCamera: { position: Vector3; target: Vector3 } | undefined;
+     const leaveB6 = () => {
+       const saved = savedCamera;
+@@ -2698,15 +2691,19 @@ export class Game {
+       if (!this.b6Reality) throw new Error("B6 příprava ztratila vlastníka interiéru.");
+       savedCamera ??= { position: this.camera.position.clone(), target: this.camera.getTarget().clone() };
+       const self = this.avatars.get(this.localId);
+-      // Canonical source-derived ground-floor landing, looking inward along
+-      // the existing approach route. No recorded player coordinate or teleport.
++      // Canonical landing and inward route direction, with the original orbit
++      // defaults. Only camera pose changes; follow history remains untouched.
+       const pos = new Vector3(B6_LAYOUT.entry.x, B6_LAYOUT.foundationOffset + 0.8,
+         B6_LAYOUT.entry.landingMaxZ);
+-      const target = B6_LAYOUT.approachRoute[B6_LAYOUT.approachRoute.length - 1];
+-      const eye = B6_LAYOUT.foundationOffset + (self?.eyeHeight ?? 1.63);
++      const route = B6_LAYOUT.approachRoute[B6_LAYOUT.approachRoute.length - 1];
++      const yaw = Math.atan2(route[0] - pos.x, route[1] - pos.z);
++      const target = orbitCameraTarget(pos, false);
++      const desired = orbitCameraDesired(target, yaw, DEFAULT_ORBIT_PITCH, DEFAULT_ORBIT_DISTANCE);
+       this.updateWorldPresentation(pos);
+-      this.camera.position.set(pos.x, eye, pos.z);
+-      this.camera.setTarget(new Vector3(target[0], eye, target[1]));
++      const distance = this.sim.cameraDistance(target, desired, this.actor);
++      const direction = desired.subtract(target).normalize();
++      this.camera.position.copyFrom(target.add(direction.scale(distance)));
++      this.camera.setTarget(target);
+       this.camera.getViewMatrix(true);
+       // The same camera-origin flashlight path as first-person gameplay. Do
+       // not update CameraFollow, avatar LOD/animation or visibility history here.
+@@ -2723,6 +2720,7 @@ export class Game {
+     };
+     return prepareLightVariants({
+       includeB6DayPair,
++      includeDayPointPair,
+       apply: (stage) => {
+         if (stage === "restore") return restore();
+         this.compilationProfile.setStage(stage);
+@@ -2731,9 +2729,9 @@ export class Game {
+           return;
+         }
+         apply(
+-          stage.startsWith("night") ? night : (this.timeOverride ?? Date.now()),
++          stage.startsWith("night") ? night : stage.startsWith("day-1-") ? day! : (this.timeOverride ?? Date.now()),
+           stage.endsWith("-on"),
+-          stage.startsWith("night-") ? Number(stage.split("-")[1]) : undefined,
++          stage.startsWith("night-") ? Number(stage.split("-")[1]) : stage.startsWith("day-1-") ? 1 : undefined,
+         );
+       },
+       restore,

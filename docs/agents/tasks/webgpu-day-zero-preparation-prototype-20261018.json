@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-day-zero-preparation-prototype-20261018",
+  "title": "KEY-31: QA příprava denního světla bez POINT",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/day-zero-prototype-20261018/",
+    "docs/agents/handoffs/webgpu-day-zero-preparation-prototype-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Cache-only overlay nad frozen b6-coverage-v2 snapshot36431c878f1c0c151af4bc259918a108dee60b15d1d294ecb7e6e40ee12ad42b. Zachovat všechny předchozí snapshoty a runtime zdroje.",
+    "Přidat day-0-off/on přes existující skutečný spawn apply se streetCount0. Doložený OFF přechod je DIR+HEMI; ON je zdrojově odůvodněná mezera SPOT+DIR+HEMI, dosud neměřená. Žádná cache/nové světlo/změna shaderu/actor teleport.",
+    "Stávající day-1 i B6 etapy, source orbit a latest restore zachovat. Původní30s visible deadline, pending/fault guards a dvě kompletní acceptance draws beze změny.",
+    "Přesně20pojmenovaných inventory položek včetně unassigned potřebuje navíc vyhrazený overflow slot. Explicitní hardcap a lokální opt-in nastavení21, default16 a všechny další limity zachovat. Žádná nová diagnostická vrstva."
+  ],
+  "verification": [
+    "Lehké targeted testy původnímatice+dvěetapy, správný day/count0 a point1, timeout/restore/revision/lifecycle bez oslabení assertions.",
+    "Actual inventory20pojmenovaných labels včetně posledního ready se nesmí změnit na overflow; další label overflow, default16/invalid/finiteclamp a skutečnéprivacy roundtrip včetněfull derived dat při explicit21.",
+    "Změny copied client/game.ts, client/light-preparation.ts, client/webgpu-compilation-profile.ts a odpovídající tests; další copied soubory jen nezměněné inputs. Zmrazit exact diff/SHA/testlog/handoff. Root provede fullTS/build/GPU a vyhodnotístartup cenu."
+  ],
+  "notes": [
+    "Přímé zadání root přes existující BMAD; žádný novýworkflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow.",
+    "V2 pilotfirstFvB6 má0novýchmodulů/pipeline, max190ms, ale spawnDay má869.2msCPU/29programů/0RTT a3593.8msgap (seq835/842/851). Source audit art-lighting.ts419–422 +Game apply dokládá chybějící day0. Přesnou atribuci všechWGSL nelzeexportovat; neříkatžeONbugužbylzměřen.",
+    "Varianty porovnány: pouzeOFF je menší, ale neřešíFvenku/odchodzB6se zapnutou svítilnou; OFF/ON zvoleno pro rozsah zadání. Startup cena se musí změřit, současnáprep21.12s z30s není povolení limitprodloužit.",
+    "Použít nový vlastníprefix, readonly imports/dependencies-v5, TSX_DISABLE_CACHE=1 přímýnode/tsx. ŽádnéGPU/build/fullsuite/install nebo změnyrootQA/native/main. Předání a release bezcommitu."
+  ]
+}

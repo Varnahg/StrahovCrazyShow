@@ -1,0 +1,52 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-preparation-v1\\tests\\webgpu-compilation-profile.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-coverage-completion-prototype-20261018\\candidate\\tests\\webgpu-compilation-profile.test.ts"
+index c7d5988..5ab3056 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-preparation-v1\\tests\\webgpu-compilation-profile.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-coverage-completion-prototype-20261018\\candidate\\tests\\webgpu-compilation-profile.test.ts"
+@@ -590,6 +590,38 @@ test("entry, text, stage and exported row limits remain explicit without losing
+   } finally { f.profile.dispose(); }
+ });
+ 
++test("bounded startup coverage labels fit twenty stages without changing other inventory limits", async () => {
++  const f = inventoryFixture({ shaderInventoryLimits: { maxStages: 20 } });
++  const labels = ["construction", "assets", "current-off", "current-on",
++    "night-0-off", "night-0-on", "night-1-off", "night-1-on", "night-2-off", "night-2-on",
++    "day-1-off", "day-1-on", "b6-day-off", "b6-day-on", "restore", "submitted", "ready"];
++  try {
++    for (const label of labels) { f.profile.setStage(label); f.emit("fn main() {}"); }
++    await settle();
++    const inventory = f.profile.snapshot().shaderInventory!;
++    assert.deepEqual(inventory.limits, { maxEntries: 1024, maxCodeUnits: 32 * 1024 * 1024, maxStages: 20, maxRows: 16 });
++    assert.deepEqual(inventory.stages.map(s => s.name), ["unassigned", ...labels]);
++    assert.equal(inventory.stageOverflow, 0); assert.equal(inventory.evidenceTruncated, false);
++    assert.equal(inventory.retainedEntries, 1);
++    assert.deepEqual(sanitizeDiagnosticsData({ inventory }).inventory, inventory);
++    f.profile.setStage("one-spare"); f.profile.setStage("over-capacity");
++    assert.equal(f.profile.snapshot().shaderInventory!.stages.length, 20);
++    assert.equal(f.profile.snapshot().shaderInventory!.stages.at(-1)!.name, "overflow");
++  } finally { f.profile.dispose(); }
++});
++
++test("explicit stage limits clamp to two through twenty while absent and invalid inputs retain sixteen", () => {
++  const cases: [unknown, number][] = [[undefined, 16], [null, 16], [NaN, 16], [Infinity, 16], [-Infinity, 16], ["20", 16],
++    [-5, 2], [0, 2], [1.9, 2], [2.9, 2], [19.9, 19], [20, 20], [20.9, 20], [999, 20]];
++  for (const [value, expected] of cases) {
++    const f = inventoryFixture({ shaderInventoryLimits: { maxStages: value as number } });
++    try {
++      assert.deepEqual(f.profile.snapshot().shaderInventory!.limits,
++        { maxEntries: 1024, maxCodeUnits: 32 * 1024 * 1024, maxStages: expected, maxRows: 16 });
++    } finally { f.profile.dispose(); }
++  }
++});
++
+ test("unrecognized WGSL method output remains raw-only and input/return/throw semantics stay intact", async () => {
+   const f = fixture();
+   const failure = new Error("original failure");
+@@ -660,7 +692,7 @@ test("bounded inventory survives the real client and server privacy filters with
+     const timing = f.profile.snapshot();
+     assert.equal(timing.shaderInventory!.limits.maxEntries, 1024);
+     assert.equal(timing.shaderInventory!.limits.maxCodeUnits, 32 * 1024 * 1024);
+-    assert.equal(timing.shaderInventory!.limits.maxStages, 16);
++    assert.equal(timing.shaderInventory!.limits.maxStages, 20);
+     assert.equal(timing.shaderInventory!.limits.maxRows, 16);
+     const data = { stage: "preparation-end", timing };
+     assert.doesNotMatch(JSON.stringify(data), /PRIVATE_SHADER_TEXT|#define/);

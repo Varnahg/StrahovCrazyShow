@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-b6-coverage-completion-prototype-20261018",
   "title": "KEY-31: QA doplnění avatarových a vstupních variant",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     ".cache/webgpu-migration-checks/b6-coverage-completion-prototype-20261018/",
@@ -28,6 +28,7 @@
     "Použít existující default pitch/distance jako explicitní společné konstanty, nikoli nové náhodné pózy. Body/target/yaw odvodit z shared B6 layout; původní first-person výpočet a normální frame chování zachovat.",
     "Jde o částečné doplnění doložených missů. Netvrdit pokrytí všech počasí/avatarů/LOD/editor transformů ani opravu každého přepnutí času. Další startup cenu musí měřit root, timeout se nezvyšuje.",
     "Přímý node/tsx TSX_DISABLE_CACHE=1 a read-only dependencies-v5. Nezasahovat do root QA prefixu, native/main ani ostatních caches. Předat zdroje/testy/diffy/SHA/logy/limity, ukončit vlastní procesy a release bez commitu.",
-    "18.10 cílený RED33/34 doložil, že původní inventory konfigurace maxStages20 je oříznuta na default16. Root povoluje úzký pátý runtime overlay: explicitní limit clamp2..20, default16 beze změny. Ostatní hard caps zachovat; test default/explicit20/oversized/fractional/invalid a skutečný18label capture/overflow. Jde o opravu existující bounded konfigurace, ne novou diagnostickou vrstvu. Scope cest se nemění, stále celý vlastní cache prefix."
+    "18.10 cílený RED33/34 doložil, že původní inventory konfigurace maxStages20 je oříznuta na default16. Root povoluje úzký pátý runtime overlay: explicitní limit clamp2..20, default16 beze změny. Ostatní hard caps zachovat; test default/explicit20/oversized/fractional/invalid a skutečný18label capture/overflow. Jde o opravu existující bounded konfigurace, ne novou diagnostickou vrstvu. Scope cest se nemění, stále celý vlastní cache prefix.",
+    "18.10 root přijal dokončení izolovaného QA:72/72+35/35 targeted,fullTS/build,statickéreview a skutečnýpilot36431. PrvníFvB6 beznovýchmodulů/pipeline, zbytkovýCPU188.1ms/max190ms; startup39.0587s/prep21.1177s. Hitches-v9 zachovává otevřený day-preview869.2msCPU+3593.8msgap i menší prodlevy na trase. Nejde o native/runtime přijetí nebo dokončenou migraci; navazuje webgpu-day-zero-preparation-prototype-20261018."
   ]
 }
