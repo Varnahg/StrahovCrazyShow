@@ -1,0 +1,113 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\inactive-light-v4\\tests\\game-light-preparation.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\avatar-day-far-prototype-20261018\\candidate\\tests\\game-light-preparation.test.ts"
+index 47eba30..7df70fd 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\inactive-light-v4\\tests\\game-light-preparation.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\avatar-day-far-prototype-20261018\\candidate\\tests\\game-light-preparation.test.ts"
+@@ -17,6 +17,7 @@ import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+ import { PlayerFlashlight } from "../client/flashlight";
+ import { StableLightState } from "../client/stable-light-state";
+ import { prepareLightVariants } from "../client/light-preparation";
++import { AvatarPreparationFarPlane } from "../client/avatar-preparation-far-plane";
+ import { arePreparationEffectsReady } from "../client/strict-material-preparation";
+ import { createEnvironmentProfile } from "../client/environment-profile";
+ import { selectLightingPreview } from "../client/lighting-preview";
+@@ -52,7 +53,7 @@ const compiled = ts.transpileModule(
+   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
+ ).outputText;
+ const make = new Script(`(function(environment) {
+-  const { PlayerFlashlight, Vector3, prepareLightVariants, arePreparationEffectsReady, selectLightingPreview, B6_LAYOUT, clampOrbitPitch, DEFAULT_ORBIT_PITCH, DEFAULT_ORBIT_DISTANCE, orbitCameraTarget, orbitCameraDesired, applyArtLighting, performance, window, document } = environment;
++  const { PlayerFlashlight, Vector3, prepareLightVariants, AvatarPreparationFarPlane, arePreparationEffectsReady, selectLightingPreview, B6_LAYOUT, clampOrbitPitch, DEFAULT_ORBIT_PITCH, DEFAULT_ORBIT_DISTANCE, orbitCameraTarget, orbitCameraDesired, applyArtLighting, performance, window, document } = environment;
+   ${compiled}
+   return PreparationGame;
+ })`).runInThisContext();
+@@ -100,6 +101,7 @@ function fixture(t: import("node:test").TestContext) {
+     PlayerFlashlight,
+     Vector3,
+     prepareLightVariants,
++    AvatarPreparationFarPlane,
+     arePreparationEffectsReady,
+     selectLightingPreview,
+     B6_LAYOUT,
+@@ -135,6 +137,7 @@ function fixture(t: import("node:test").TestContext) {
+     },
+   };
+   const rig = {
++    root: new TransformNode("actual fixture avatar", scene),
+     eyeHeight: 1.63,
+     bodyHeight: 1.8,
+     measurements: { legSpacing: 0.105 },
+@@ -849,3 +852,75 @@ test("actual environment method forwards optional spatial refresh without shifti
+   game.updateRenderEnvironment({ x: 0, y: 0, z: 0 }, undefined, false, 0, 0, 456, false);
+   assert.equal(seen[1].forceSpatialSelection, undefined);
+ });
++
++function avatarFarFixture(t: import("node:test").TestContext) {
++  const f = b6Fixture(t);
++  f.camera.maxZ = 1100;
++  const body = MeshBuilder.CreateBox("actual attached avatar bounds", { height: 2 }, f.scene);
++  body.parent = (f.rig as any).root;
++  body.position.y = 1;
++  const fullAtApply: { stage: string; maxZ: number }[] = [];
++  const setStage = f.game.compilationProfile.setStage;
++  f.game.compilationProfile.setStage = (stage: string) => {
++    fullAtApply.push({ stage, maxZ: f.camera.maxZ });
++    setStage(stage);
++  };
++  return Object.assign(f, { body, fullAtApply });
++}
++
++test("Day1 far scope restores before every stage/restart and leaves all fifteen original gates", async (t) => {
++  const f = avatarFarFixture(t), pending = f.start();
++  f.advanceTo("day-0-on"); assert.equal(f.camera.maxZ, 1100);
++  f.advanceTo("day-1-off"); assert.ok(f.camera.maxZ < 1100); const firstFar = f.camera.maxZ;
++  f.effects(false); f.body.position.z = -20; f.game.weather = {};
++  f.tick(); assert.equal(f.stage, "day-1-off"); assert.ok(f.camera.maxZ > firstFar);
++  f.effects(true); f.advanceTo("day-1-on"); assert.ok(f.camera.maxZ < 1100);
++  f.advanceTo("b6-day-off"); assert.equal(f.camera.maxZ, 1100);
++  f.finish(); const result = await pending;
++  assert.equal(result.status, "complete"); assert.equal(result.stages.length, 15);
++  assert.ok(result.stages.every((stage: { renders: number }) => stage.renders >= 3));
++  assert.ok(f.fullAtApply.every(entry => entry.maxZ === 1100));
++  assert.equal(f.camera.maxZ, 1100); assert.equal(f.hasTimer, false);
++});
++
++test("Day1 far scope restores synchronously on cancellation and after timeout or actual apply failure", async (t) => {
++  for (const ending of ["cancel", "timeout", "failure", "rendererFailed"] as const) {
++    const f = avatarFarFixture(t), pending = f.start(); f.advanceTo("day-1-on");
++    assert.ok(f.camera.maxZ < 1100);
++    if (ending === "timeout") f.timeout();
++    else if (ending === "failure") {
++      f.game.weather = {}; f.game.updateRenderEnvironment = () => { throw new Error("actual apply failure"); }; f.tick();
++    } else {
++      f.game[ending === "cancel" ? "disposed" : "rendererFailed"] = true;
++      f.game.updateWorldPresentation = () => assert.fail("retired world touched");
++      f.game.cancelLightPreparation();
++      assert.equal(f.camera.maxZ, 1100, "restore must precede cancellation settlement/disposal");
++    }
++    const result = await pending;
++    assert.equal(result.status, ending === "timeout" ? "timeout" : ending === "failure" ? "failed" : "disposed");
++    assert.equal(f.camera.maxZ, 1100); assert.equal(f.hasTimer, false);
++    assert.equal(f.game.cancelLightPreparation, undefined);
++  }
++});
++
++test("Day1 draws re-read all live rigs even when mesh counts and stage revision are unchanged", async (t) => {
++  const f = avatarFarFixture(t), remote = new TransformNode("remote current rig", f.scene);
++  const part = MeshBuilder.CreateBox("remote current part", {}, f.scene); part.parent = remote;
++  f.game.avatars.set("remote", { root: remote });
++  const pending = f.start(); f.advanceTo("day-1-off"); f.effects(false);
++  const initialFar = f.camera.maxZ, count = f.scene.meshes.length;
++  remote.position.z = -35; f.tick();
++  assert.equal(f.scene.meshes.length, count); assert.ok(f.camera.maxZ > initialFar + 30);
++  f.effects(true); f.finish(); const result = await pending;
++  assert.equal(result.status, "complete");
++  assert.equal(result.stages.find((stage: { stage: string }) => stage.stage === "day-1-off")!.restarts, 0);
++  assert.equal(f.camera.maxZ, 1100);
++});
++
++test("unexpected Day1 bounds errors fail real preparation instead of silently taking the full-view fallback", async (t) => {
++  const f = avatarFarFixture(t), pending = f.start(); f.advanceTo("day-1-off"); f.effects(false);
++  f.body.getBoundingInfo = () => { throw new Error("unexpected live bounds failure"); };
++  f.tick(); const result = await pending;
++  assert.equal(result.status, "failed"); assert.equal(result.failureStep, "render");
++  assert.equal(f.camera.maxZ, 1100); assert.equal(f.hasTimer, false);
++});
