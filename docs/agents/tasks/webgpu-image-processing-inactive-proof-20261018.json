@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-image-processing-inactive-proof-20261018",
+  "title": "KEY-31: prokázat historické image-processing child defines ve skutečných materiálech",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-image-processing-inactive-proof-20261018/",
+    "docs/agents/handoffs/webgpu-image-processing-inactive-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejdřív skutečný red reproduktor Standard/PBR a submesh historie active→disabled versus fresh disabled, při identické finální konfiguraci. Zaznamenat celé defines/Effect/context a skutečný draw/readiness, ne normalizovat porovnání.",
+    "Prověřit actual Cinematic medium/high→low lifecycle a Game41stage history, včetně glass a outdoor actual factories i farstandard pokud potřebný; odlišit prokázaný mechanismus od dosud chybějící native startupové historie.",
+    "Porovnat varianty: další prewarm historie, přesunutí config-child writes před earlyreturn, canonical false reset všech čtyř neaktivních childflags, globální key stripping. Vybrat nejmenší korektní cestu dle skutečných shader guards/kontraktu; nepřidat cache ani změnit aktivní obrazové efekty.",
+    "Pouze po baseline reprodukci povolen privátní proof patche prepareDefines earlyreturn resetující VIGNETTEBLENDMODEMULTIPLY/OPAQUE a SAMPLER3DGREENDEPTH/BGRMAP; žádné native/vendor/lock/dependency zápisy. Lze použít přesnou in-process source-metodu s obnovou v finally a doloženou inverse, nebo vlastní fyzickou kopii bez shared zápisů.",
+    "Doložit GLSL/WGSL processedbody/layout shodu neaktivních variant a zachování aktivního vignette/colorgrading chování včetně obou módů, toggle a postprocess mismatch. Nevydávat NullEngine za GPU/FPS přijetí."
+  ],
+  "verification": [
+    "Lehké cílené CPU red/green a source/reference audits, refaktoring fixture a přesný manifest/handoff. Bez fullTS/build/fullsuite/install/GPU/server/commit.",
+    "Dřívější proofy jsou readonly. Zachovat všechny neúspěšné pokusy, logy a vstupy; případnou chybějící podstatnou vazbu přiznat. Root po přijetí provede produkční experiment a integraci."
+  ],
+  "notes": [
+    "Přímé zadání root koordinátora v existujícím BMAD kroku03, bez rekurzivního workflow. Claim unikátního owner před zápisy.",
+    "Native capture7acd1818:500/501/502/504 proti dřívějším actualwarm79/81/83/49 liší pouze tři childflags;503 má navíc očekávaný dříve opravený LOD proti starému reference. Není to nový LOD declaration bug ani UV rozdíl.",
+    "Pinned9.30 prepareDefines569–583 earlyreturn childflags neresetuje; activebranch587/615–616 nastavuje i při vypnutých parentfeatures. Mixin defaults jsou false. Native same-sessionwarm capture zatím chybí, proto je causal runtime přejímka otevřená.",
+    "Reset čtyř childflags je hypoteticky nejmenší mechanism repair; žádná automatická produkční autorizace mimo task. Před privátní změnou doložit shader guards, alternativy, cache/lifecycle/image dopady.",
+    "Root accepted the bounded ImageProcessing fix after actual material/processor proof and A1/B1/A2:5/0/5 new programs,12/2/12 sync,max573/171.8/582.3ms,4 intervals>100ms remain in each. Fresh installed native1446/combined1506, both fullTS/build/isolatedintegration PASS; WT0eba3cf5e5c0659779d9c365b732b07b37693846→main6a7f7554bf585a52a40f38cd5a6626fbbb8bbde5. Evidence docs/performance/evidence/webgpu-migration-20261016/image-processing-inactive/README.md. Protected builds unchanged; own QA stopped. Entire KEY31/migration remains open."
+  ]
+}

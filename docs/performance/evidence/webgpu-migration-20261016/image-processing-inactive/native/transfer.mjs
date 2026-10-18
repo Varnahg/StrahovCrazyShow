@@ -1,0 +1,36 @@
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {fileURLToPath} from 'node:url';import {createHash} from 'node:crypto';
+const root=path.dirname(fileURLToPath(import.meta.url)),wt=path.resolve(root,'../..'),proof=path.join(wt,'.cache/webgpu-image-processing-inactive-proof-20261018');
+const hash=b=>createHash('sha256').update(b).digest('hex');fs.mkdirSync(path.join(root,'preimages'),{recursive:true});
+const patchPath='patches/@babylonjs__core@9.30.0.patch',lockPath='pnpm-lock.yaml';
+const oldPatch=fs.readFileSync(fs.existsSync(path.join(root,'preimages/core.patch'))?path.join(root,'preimages/core.patch'):path.join(wt,patchPath),'utf8'),oldLock=fs.readFileSync(fs.existsSync(path.join(root,'preimages/pnpm-lock.yaml'))?path.join(root,'preimages/pnpm-lock.yaml'):path.join(wt,lockPath),'utf8');
+assert.equal(hash(oldPatch),'4b5db0c0716db43a7225b78fc2914f2e6f0d88e7a95c7408cf9f5c2312a99f15');
+if(!fs.existsSync(path.join(root,'preimages/core.patch')))fs.writeFileSync(path.join(root,'preimages/core.patch'),oldPatch,{flag:'wx'});
+if(!fs.existsSync(path.join(root,'preimages/pnpm-lock.yaml')))fs.writeFileSync(path.join(root,'preimages/pnpm-lock.yaml'),oldLock,{flag:'wx'});
+const addition=`@@ -557,6 +570,10 @@
+                 if (forPostProcess !== this.applyByPostProcess || !this._isEnabled) {
+                     defines.WHITEBALANCE = false;
+                     defines.VIGNETTE = false;
++                    defines.VIGNETTEBLENDMODEMULTIPLY = false;
++                    defines.VIGNETTEBLENDMODEOPAQUE = false;
++                    defines.SAMPLER3DGREENDEPTH = false;
++                    defines.SAMPLER3DBGRMAP = false;
+                     defines.TONEMAPPING = 0;
+                     defines.CONTRAST = false;
+                     defines.EXPOSURE = false;
+`;
+const nextHeader='diff --git a/Materials/imageProcessing.js b/Materials/imageProcessing.js';assert.equal(oldPatch.split(nextHeader).length,2);
+const newPatch=oldPatch.replace(nextHeader,addition+nextHeader),newHash=hash(newPatch);assert.equal(newPatch.replace(addition,''),oldPatch);
+const oldHash=hash(oldPatch);assert.equal(oldLock.split(oldHash).length-1,6);const newLock=oldLock.replaceAll(oldHash,newHash);assert.equal(newLock.replaceAll(newHash,oldHash),oldLock);
+const gameTest='tests/game-authored-light-preparation.test.ts',oldTest=fs.readFileSync(path.join(wt,gameTest),'utf8');
+assert.equal(hash(oldTest),JSON.parse(fs.readFileSync(path.join(proof,'inputs.json'),'utf8')).historySourceSha256);
+assert.equal(oldTest,fs.readFileSync(path.join(proof,'history-original.test.ts.txt'),'utf8'));
+fs.writeFileSync(path.join(root,'preimages/game-authored-light-preparation.test.ts'),oldTest,{flag:'wx'});
+let history=fs.readFileSync(path.join(proof,'case/tests/history.test.ts'),'utf8');assert.equal(hash(history),'bac0ff97c9f006c7633a79527e3591e166e655eeddb18a5ea224a70480960062');
+history=history.replace('import {variant} from "./prototype";\n','').replace('import {ImageProcessingConfiguration} from "@babylonjs/core/Materials/imageProcessingConfiguration";\n','');
+history=history.replace('variant(async (t:import("node:test").TestContext)=>{','async (t:import("node:test").TestContext)=>{').replace('  row.status="complete";\n}));','  row.status="complete";\n});');
+assert.equal(history.includes('./prototype'),false);fs.writeFileSync(path.join(wt,gameTest),history);
+assert.ok([oldPatch,newPatch].includes(fs.readFileSync(path.join(wt,patchPath),'utf8')));assert.ok([oldLock,newLock].includes(fs.readFileSync(path.join(wt,lockPath),'utf8')));
+fs.writeFileSync(path.join(wt,patchPath),newPatch);fs.writeFileSync(path.join(wt,lockPath),newLock);
+fs.writeFileSync(path.join(root,'patch-addition.diff'),addition,{flag:'wx'});
+fs.writeFileSync(path.join(root,'inputs.json'),JSON.stringify({wt,proof,oldPatchHash:oldHash,newPatchHash:newHash,oldLockHash:hash(oldLock),newLockHash:hash(newLock),lockSubstitutions:6,originalGameTestHash:hash(oldTest),gameTestHash:hash(history),oldDependencies:path.join(wt,'.cache/webgpu-hitch-validation-20261017/authored-native-v3/node_modules'),newDependencies:path.join(wt,'.cache/webgpu-migration/image-processing-inactive-deps-v1/node_modules')},null,2)+'\n',{flag:'wx'});
+console.log({newPatchHash:newHash,gameTestHash:hash(history)});

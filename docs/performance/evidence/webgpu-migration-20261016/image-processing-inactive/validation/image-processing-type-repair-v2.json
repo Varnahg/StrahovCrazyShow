@@ -1,0 +1,20 @@
+{
+  "changes": [
+    {
+      "path": "tests/game-authored-light-preparation.test.ts",
+      "before": "2de4f692e3bfec85019466b7461028772f6058cad0aa2514b5171c6d713cf90a",
+      "after": "e7f35fa3fc907ef06548bff28928d5a5300facf06483cc03dd14582324393f66",
+      "change": "Literal readonly low/medium tuple; no values or runtime behavior changed."
+    },
+    {
+      "path": "tests/image-processing-inactive-defines.test.ts",
+      "before": "32b55ecab7bf47a1ca4d89674bd9fbee8c1b8c31193a44bdf30cf95a6342f033",
+      "after": "b8c9448399d4346c9f8cc7ebd3f40630665a98c920e16913cb9a7e08a3e5348d",
+      "change": "Assert actual generated prefix is a string before collecting it; preserves exact existing output comparisons."
+    }
+  ],
+  "runtimeChanged": false,
+  "failedSnapshot": "ed8075f28d9e106f6d8d3a4faa34f3fb91bce940614e396ef9041cb435d8d03e",
+  "failedBuildLog": "image-processing-native-v1-build.log",
+  "scope": "Three full TypeScript diagnostics in two test files. All failed V1 artifacts remain unchanged."
+}

@@ -1,0 +1,341 @@
+import {AuthoredLightPreparation} from "../client/authored-light-preparation";
+import {variant} from "./prototype";
+import test, {after} from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import {setImmediate as turn,setTimeout as pause} from "node:timers/promises";
+import {createHash} from "node:crypto";
+import {Script} from "node:vm";
+import ts from "typescript";
+import {NullEngine} from "@babylonjs/core/Engines/nullEngine";
+import {Scene} from "@babylonjs/core/scene";
+import {FreeCamera} from "@babylonjs/core/Cameras/freeCamera";
+import {Vector3} from "@babylonjs/core/Maths/math.vector";
+import {InternalTexture,InternalTextureSource} from "@babylonjs/core/Materials/Textures/internalTexture";
+import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
+import {ImageProcessingConfiguration} from "@babylonjs/core/Materials/imageProcessingConfiguration";
+import {TransformNode} from "@babylonjs/core/Meshes/transformNode";
+import {DirectionalLight} from "@babylonjs/core/Lights/directionalLight";
+import {HemisphericLight} from "@babylonjs/core/Lights/hemisphericLight";
+import {PointLight} from "@babylonjs/core/Lights/pointLight";
+import {Light} from "@babylonjs/core/Lights/light";
+import {MeshBuilder} from "@babylonjs/core/Meshes/meshBuilder";
+import {Mesh} from "@babylonjs/core/Meshes/mesh";
+import {buildArchitectureReality} from "../client/architecture-reality";
+import {createOutdoorArtifacts} from "../client/outdoor-artifacts";
+import {buildOutdoorArtifactPlan} from "../shared/outdoor-artifacts";
+import {BUILDINGS} from "../shared/world";
+import {CinematicAtmosphere} from "../client/cinematic";
+import {GltfLightBudget} from "../client/gltf-light-budget";
+import {StableLightState} from "../client/stable-light-state";
+import {VehicleLighting} from "../client/vehicle-lighting";
+import {PlayerFlashlight} from "../client/flashlight";
+import {prepareLightVariants} from "../client/light-preparation";
+import {prepareRenderQualities} from "../client/render-quality-preparation";
+import {MANUAL_HARDWARE_SCALING} from "../shared/render-quality";
+import {arePreparationEffectsReady} from "../client/strict-material-preparation";
+import {applyArtLighting} from "../client/art-lighting";
+import {selectLightingPreview} from "../client/lighting-preview";
+import {sunState,moonState} from "../shared/weather";
+import {clampOrbitPitch} from "../client/camera-look";
+import "../client/render-shaders";
+
+const sha=(s:string)=>createHash("sha256").update(s).digest("hex");
+// Explicit WebGPU capability adapter; NullEngine otherwise reports false.
+const textureLOD=true;
+const report:any={scope:"Actual source factory/GLSL frontend; synthetic canvas/texture upload only, no pixels/WGSL/GPU claim",cases:[]};
+after(()=>{ if(process.env.PROOF_RUN) fs.writeFileSync(new URL(`report-game-${process.env.PROOF_RUN}.json`,import.meta.url),JSON.stringify(report,null,2)+"\n",{flag:"wx"}); });
+
+class IOEngine extends NullEngine {
+  override createCanvas(width:number,height:number):any {
+    const gradient={addColorStop(){}};
+    const canvas:any={width,height,remove(){}};
+    const context=new Proxy({canvas,createLinearGradient:()=>gradient,createRadialGradient:()=>gradient,measureText:(text:string)=>({width:text.length*8})} as any,{get:(target,key)=>key in target?target[key]:()=>{},set:(target,key,value)=>{target[key]=value;return true;}});
+    canvas.getContext=()=>context;return canvas;
+  }
+  override updateDynamicTexture(texture:InternalTexture,..._args:any[]) { texture.isReady=true; }
+  override createRawCubeTexture(...args:Parameters<NullEngine["createRawCubeTexture"]>) {
+    const texture=new InternalTexture(this,InternalTextureSource.CubeRaw);
+    texture.isCube=texture.isReady=true;texture.width=texture.height=texture.baseWidth=texture.baseHeight=args[1];
+    texture.generateMipMaps=args[4]??false;texture.samplingMode=args[6]??3;return texture;
+  }
+  override updateRawCubeTexture(..._args:any[]) {}
+}
+
+function factories(t:import("node:test").TestContext, override?:IOEngine) {
+  const engine=override??new IOEngine({renderWidth:256,renderHeight:256,textureSize:1,deterministicLockstep:false,lockstepMaxSteps:4});engine.getCaps().textureLOD=textureLOD;
+  const scene=new Scene(engine);scene.useRightHandedSystem=true;
+  // Exact frozen Game constructor fog state, before factories/Cinematic/preparation.
+  scene.fogMode=Scene.FOGMODE_EXP;scene.fogDensity=0.0018;
+  const budget=new GltfLightBudget(scene);
+  const cleanups:(()=>void)[]=[];
+  const previous=Object.getOwnPropertyDescriptor(globalThis,"document");
+  let architecture:ReturnType<typeof buildArchitectureReality>;
+  try { Object.defineProperty(globalThis,"document",{value:{},configurable:true});architecture=buildArchitectureReality({scene,buildings:BUILDINGS.filter(b=>b.id==="53929057")}); }
+  finally {if(previous)Object.defineProperty(globalThis,"document",previous);else Reflect.deleteProperty(globalThis,"document");}
+  assert.equal(architecture.metrics.buildings,1);
+  const plan=buildOutdoorArtifactPlan(),id="node/4002100657";
+  const outdoor=createOutdoorArtifacts(scene,{...plan,artifacts:plan.artifacts.filter(x=>x.id===id),parts:plan.parts.filter(x=>x.artifactId===id&&x.material==="outdoor-dark-metal"),colliders:plan.colliders.filter(x=>x.artifactId===id)});
+  assert.ok(outdoor.meshes.length>0);
+  const names=["reality glass 0 0","reality glass 0 1","outdoor-artifacts:outdoor-dark-metal"];
+  const target=scene.meshes.filter(m=>names.includes(m.material?.name??""));assert.ok(names.every(n=>target.some(m=>m.material?.name===n)));
+  const low=new Vector3(Infinity,Infinity,Infinity),high=new Vector3(-Infinity,-Infinity,-Infinity);
+  for(const m of target){m.computeWorldMatrix(true);const b=m.getBoundingInfo().boundingBox;low.minimizeInPlace(b.minimumWorld);high.maximizeInPlace(b.maximumWorld);}
+  const camera=new FreeCamera("actual camera pass",new Vector3((low.x+high.x)/2,(low.y+high.y)/2,low.z-20),scene);camera.fov=2.3;camera.maxZ=1000;camera.setTarget(low.add(high).scale(.5));scene.activeCamera=camera;
+  // The factory owns a complete one-building pack. Exclude unrelated authored
+  // materials from this bounded test, without altering any target geometry.
+  for(const mesh of scene.meshes)if(!target.includes(mesh))mesh.setEnabled(false);
+  t.after(()=>{try{for(const cleanup of cleanups.reverse())cleanup();}finally{outdoor.dispose();architecture.dispose();budget.dispose();scene.dispose();engine.dispose();}assert.equal(scene.meshes.length,0);assert.equal(scene.materials.length,0);});
+  return {engine,scene,camera,architecture,outdoor,target,names,low,high,budget,cleanups};
+}
+
+test("actual authored factories retain browser texture metadata in bounded IO adapter",t=>{
+  const f=factories(t);
+  report.cases.push({kind:"factory",bounds:[f.low.asArray(),f.high.asArray()],targets:f.target.map(m=>({name:m.name,material:m.material?.name,enabled:m.isEnabled(),vertices:m.getTotalVertices(),indices:m.getTotalIndices(),bounds:m.getBoundingInfo().boundingBox.centerWorld.asArray()})),materials:f.names.map(n=>{const m:any=f.scene.materials.find(x=>x.name===n)!;return{name:n,max:m.maxSimultaneousLights,diffuse:m.diffuseTexture?.getClassName(),diffuseReady:m.diffuseTexture?.isReady(),emissive:m.emissiveTexture?.getClassName(),emissiveReady:m.emissiveTexture?.isReady(),emissiveIllumination:m.useEmissiveAsIllumination};})});
+  const lit:any=f.scene.materials.find(x=>x.name==="reality glass 0 1");assert.ok(lit.diffuseTexture?.isReady());assert.ok(lit.emissiveTexture?.isReady());assert.equal(lit.useEmissiveAsIllumination,true);
+});
+
+const gameSource=fs.readFileSync(new URL("../client/game.ts",import.meta.url),"utf8");
+const tree=ts.createSourceFile("game.ts",gameSource,ts.ScriptTarget.Latest,true),declaration=tree.statements.find((n):n is ts.ClassDeclaration=>ts.isClassDeclaration(n)&&n.name?.text==="Game")!;
+const selected=["prepareLighting","prepareLightingVariants","isMeshReadyForCamera","updateRenderEnvironment","applyRenderQuality","updateCameraFollow","alignVehicleCamera","footFirstPerson"];
+const methods=declaration.members.filter(n=>n.name&&selected.includes(n.name.getText(tree)));assert.equal(methods.length,selected.length);
+report.methods=methods.map(n=>({name:n.name!.getText(tree),sha256:sha(n.getText(tree))}));
+const code=ts.transpileModule(`class ProofGame {${methods.map(n=>n.getText(tree)).join("\n")}}`,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
+const make=new Script(`(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,applyArtLighting,clampOrbitPitch,performance,window,document}=env;${code};return ProofGame;}`).runInThisContext();
+const anchor=Date.parse("2026-10-18T12:45:00Z"),select=(mode:Parameters<typeof selectLightingPreview>[0])=>selectLightingPreview(mode,anchor);
+
+for(const initialQuality of ["low","medium"]) test(`native cold opposite fog view, initial ${initialQuality}`,variant(async (t:import("node:test").TestContext)=>{
+  const preparedView=false;
+  const f=factories(t),{engine,scene,camera,budget}=f;
+  const row:any={history:"native",preparedView,initialQuality,textureLOD,initialFog:{mode:scene.fogMode,density:scene.fogDensity,enabled:scene.fogEnabled},stages:[],replays:[],status:"started"};report.cases.push(row);
+  const sun=new DirectionalLight("celestial",Vector3.Down(),scene),ambient=new HemisphericLight("sky",Vector3.Up(),scene);
+  const pos=Object.freeze({x:(f.low.x+f.high.x)/2,y:(f.low.y+f.high.y)/2-.6,z:f.low.z-20});
+  // Native assets are actually drawn before Cinematic exists. Preserve that
+  // history, rather than starting every material with disabled processing.
+  f.architecture.update(pos,initialQuality);f.outdoor.update(pos.x,pos.z,initialQuality);
+  const originals=f.names.map(name=>f.target.find(m=>m.material?.name===name&&m.isEnabled())!);
+  assert.ok(originals.every(Boolean));
+  const cold=originals.map(mesh=>{const clone=(mesh as Mesh).clone("cold inactive "+mesh.name,null,true)!;clone.setEnabled(false);assert.equal(clone.material,mesh.material);assert.equal(clone.geometry,(mesh as Mesh).geometry);return clone;});
+  const preloadDraws=new Set<number>();for(const mesh of originals){assert.ok(mesh instanceof Mesh);mesh.onAfterRenderObservable.add(()=>{if(engine.currentRenderPassId===camera.renderPassId)preloadDraws.add(mesh.uniqueId);});}
+  const preloadDeadline=performance.now()+4000;
+  do{budget.prepareFrame();preloadDraws.clear();engine.beginFrame();scene.render();engine.endFrame();await turn();}
+  while((!originals.every(mesh=>preloadDraws.has(mesh.uniqueId))||!arePreparationEffectsReady(engine))&&performance.now()<preloadDeadline);
+  assert.ok(originals.every(mesh=>preloadDraws.has(mesh.uniqueId)));assert.ok(arePreparationEffectsReady(engine));
+  assert.equal(scene.imageProcessingConfiguration.isEnabled,true);
+  row.nativePreload=originals.map(mesh=>{const effect=mesh.subMeshes[0]._getDrawWrapper(camera.renderPassId)!.effect!;assert.match(effect.defines,/^#define VIGNETTEBLENDMODEMULTIPLY$/m);return{name:mesh.material?.name,effectId:effect.uniqueId,defines:effect.defines};});
+  const cinematic=new CinematicAtmosphere(scene,camera,sun),stable=new StableLightState(scene),beam=new VehicleLighting(scene),torch=new PlayerFlashlight(scene);
+  const actor={position:pos,yaw:0,vehicle:false},car=new TransformNode("actual driving visual",scene),parked=new TransformNode("actual parked visual",scene);car.position.copyFromFloats(pos.x,pos.y-.8,pos.z);car.setEnabled(false);
+  const root=new TransformNode("local rig",scene),elbow=new TransformNode("actual right elbow",scene);root.position.copyFromFloats(pos.x,pos.y-.8,pos.z);elbow.parent=root;elbow.position.y=1.3;elbow.rotation.x=-Math.PI/2;
+  const rig={root,rightElbow:elbow,eyeHeight:1.63,bodyHeight:1.8,measurements:{legSpacing:.105},target:{id:"local",vehicle:false}};
+  const lights=[0,1].map(i=>{const light=new PointLight(`mapped POINT ${i}`,new Vector3(pos.x+i,pos.y+3,pos.z+3),scene);light.falloffType=Light.FALLOFF_STANDARD;light.range=22;return light;});
+  const skyMaterial=new StandardMaterial("sky IO only",scene);skyMaterial.disableLighting=true;skyMaterial.disableDepthWrite=true;skyMaterial.backFaceCulling=false;
+  let callback:(()=>void)|undefined,stage="",programs=0;
+  const original=engine.createShaderProgram;engine.createShaderProgram=function(...args){programs++;return Reflect.apply(original,this,args);};
+  const routing={isWebGPU:true,get currentRenderPassId(){return engine.currentRenderPassId;},set currentRenderPassId(v){engine.currentRenderPassId=v;},
+    runRenderLoop(next:()=>void){assert.equal(callback,undefined);callback=next;},stopRenderLoop(next:()=>void){if(callback===next)callback=undefined;},
+    getHardwareScalingLevel:()=>engine.getHardwareScalingLevel(),setHardwareScalingLevel:(scale:number)=>engine.setHardwareScalingLevel(scale)};
+  const Game=make({AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,
+    arePreparationEffectsReady:()=>arePreparationEffectsReady(engine),selectLightingPreview:select,applyArtLighting,clampOrbitPitch,performance,
+    window:{setTimeout,clearTimeout},document:{hidden:false,addEventListener(){},removeEventListener(){},pointerLockElement:null}});
+  const requested=Object.freeze({quality:initialQuality,revision:7,hardwareScaling:1});
+  const game:any=Object.assign(new Game(),{engine:routing,scene,camera,sun,ambient,lights,lamps:new StandardMaterial("lamp fixture",scene),clouds:[],
+    car,parkedCar:parked,vehicleLighting:beam,flashlight:torch,cinematic,stableLights:stable,gltfLightBudget:budget,
+    actor,localId:"local",avatars:new Map([["local",rig]]),quality:initialQuality,adaptive:{state:requested},profile:Object.freeze({preset:0}),weather:Object.freeze({cloud:.99,rain:0,wind:0}),
+    timeOverride:select("night").instant,flashlightOn:false,disposed:false,rendererFailed:false,firstPerson:false,yaw:preparedView?0:Math.PI,pitch:.28,distance:8,cameraArm:20,vehicleCameraSnap:true,
+    sim:{cameraDistance:(from:Vector3,to:Vector3)=>Vector3.Distance(from,to)},
+    renderHealth:{snapshot:()=>({errorCount:0,pendingPreparationOperations:0,phase:"preparing"})},compilationProfile:{setStage(value:string){stage=value;}},
+    skyWeather:{atmosphere:{material:skyMaterial,update(){},dispose(){}},update:({instant}:{instant:number})=>({sun:sunState(instant),moon:moonState(instant),wind:{x:0,z:0}})},
+    updateWorldPresentation(position:typeof pos){assert.equal(position,pos);f.architecture.update(position,game.quality);f.outdoor.update(position.x,position.z,game.quality);for(const mesh of scene.meshes)if(mesh.metadata?.sourcePack!==undefined&&!f.target.includes(mesh))mesh.setEnabled(false);},
+    localAvatarPresentation:{update:()=>({visible:true,cameraLight:false,resetAnimation:false})},updateAvatarPresentation(){},
+  });
+  const drawn=new Set<number>(),contexts=new Map<object,number>(),stageMap=new Map<string,any>(),capturedEffects:any[]=[];
+  const stageReferences=new Map<string,Map<string,{effect:any;context:any;defines:string}>>();
+  const actualEffect=(name:string)=>f.target.find(m=>m.material?.name===name&&drawn.has(m.uniqueId))?.subMeshes[0]?._getDrawWrapper(camera.renderPassId)?.effect;
+  for(const mesh of f.target){ assert.ok(mesh instanceof Mesh); mesh.onAfterRenderObservable.add(()=>{if(engine.currentRenderPassId===camera.renderPassId)drawn.add(mesh.uniqueId);}); }
+  const capture=(label:string)=>({label,fog:{mode:scene.fogMode,density:scene.fogDensity,enabled:scene.fogEnabled},programs,yaw:game.yaw,quality:game.quality,lights:scene.lights.filter(l=>l.isEnabled()).map(l=>({type:l.getTypeID(),name:l.name,shadow:l.shadowEnabled})),
+    imageProcessing:{enabled:scene.imageProcessingConfiguration.isEnabled,post:scene.imageProcessingConfiguration.applyByPostProcess},
+    families:f.names.map(name=>{const material:any=scene.materials.find(m=>m.name===name)!;const mesh=f.target.find(m=>m.material===material&&drawn.has(m.uniqueId));const effect=mesh?.subMeshes[0]?._getDrawWrapper(camera.renderPassId)?.effect;
+      const context=effect?.getPipelineContext();if(context&&!contexts.has(context))contexts.set(context,contexts.size+1);if(effect&&!capturedEffects.includes(effect))capturedEffects.push(effect);
+      return {name,drawn:!!mesh,mesh:mesh?.name,cap:material.maxSimultaneousLights,effectId:effect?.uniqueId,contextId:context?contexts.get(context):null,ready:effect?.isReady(),disposed:effect?.isDisposed,
+        defines:effect?.defines,definesSha256:effect?sha(effect.defines):null,attributes:effect?.getAttributesNames(),reflection:!!material.reflectionTexture,reflectionFresnel:!!material.reflectionFresnelParameters,
+        diffuse:!!material.diffuseTexture,emissive:!!material.emissiveTexture,
+        lodValue:(mesh?.subMeshes[0]?._getDrawWrapper(camera.renderPassId)?.defines as any)?.LODBASEDMICROSFURACE,
+        lodKeyKnown:(mesh?.subMeshes[0]?._getDrawWrapper(camera.renderPassId)?.defines as any)?._keys?.includes("LODBASEDMICROSFURACE"),
+        sphericalDefineValue:(mesh?.subMeshes[0]?._getDrawWrapper(camera.renderPassId)?.defines as any)?.USESPHERICALFROMREFLECTIONMAP,
+        sphericalKeyKnown:(mesh?.subMeshes[0]?._getDrawWrapper(camera.renderPassId)?.defines as any)?._keys?.includes("USESPHERICALFROMREFLECTIONMAP")};})});
+  const draw=()=>{budget.prepareFrame();stable.update();drawn.clear();engine.beginFrame();scene.render();engine.endFrame();const key=game.quality+"/"+stage;stageMap.set(key,capture(stage));stageReferences.set(key,new Map(f.names.flatMap(name=>{const effect=actualEffect(name);return effect?[[name,{effect,context:effect.getPipelineContext(),defines:effect.defines}] as const]:[]})));};
+  const deferred=async()=>{await pause(0);await turn();engine.beginFrame();engine.endFrame();await turn();};
+  f.cleanups.push(()=>{game.cancelLightPreparation?.();torch.dispose();beam.dispose();stable.dispose();cinematic.dispose();assert.equal(callback,undefined);contexts.clear();stageReferences.clear();capturedEffects.length=0;});
+  game.updateWorldPresentation(pos);game.updateCameraFollow(new Vector3(pos.x,pos.y,pos.z),rig.eyeHeight,1);
+  // Exercise the actual native bootstrap: no C5 preload call before preparation.
+  row.preloadImageProcessing={enabled:scene.imageProcessingConfiguration.isEnabled,post:scene.imageProcessingConfiguration.applyByPostProcess};
+  const initialCamera={position:camera.position.clone(),rotation:camera.rotation.clone(),fov:camera.fov,minZ:camera.minZ,maxZ:camera.maxZ,pitch:game.pitch};
+  const startYaw=game.yaw;const preparation=game.prepareLighting(draw);let complete=false;void preparation.then(()=>{complete=true;},()=>{complete=true;});
+  const deadline=performance.now()+35000;
+  while(!complete&&performance.now()<deadline){callback?.();await turn();}
+  assert.ok(complete,"bounded whole preparation finished");row.preparation=await preparation;row.stages=[...stageMap.values()];
+  assert.equal(row.preparation.status,"complete");assert.equal(row.preparation.stages.length,41);assert.deepEqual(row.preparation.qualities.map((x:any)=>x.quality),initialQuality==="low"?["medium","high","low"]:["low","high","medium"]);
+  assert.equal(row.stages.length,41);assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>family.cap===4)));
+  assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>s.quality==="low"&&s.label.startsWith("vehicle-")?(family.drawn&&family.ready):!family.drawn)));
+  assert.ok(f.target.every(mesh=>!mesh.alwaysSelectAsActiveMesh),"all scoped flags restored before gameplay");
+  assert.equal(game.yaw,startYaw);assert.equal(actor.vehicle,false);assert.equal(car.isEnabled(),false);assert.equal(parked.isEnabled(),true);assert.equal(game.adaptive.state,requested);
+  assert.ok(Vector3.Distance(camera.position,initialCamera.position)<1e-9);assert.ok(Vector3.Distance(camera.rotation,initialCamera.rotation)<1e-9);
+  assert.equal(camera.fov,initialCamera.fov);assert.equal(camera.minZ,initialCamera.minZ);assert.equal(camera.maxZ,initialCamera.maxZ);assert.equal(game.pitch,initialCamera.pitch);
+  row.restored={cameraPosition:camera.position.asArray(),cameraRotation:camera.rotation.asArray(),yaw:game.yaw,pitch:game.pitch,quality:game.quality,car:car.isEnabled(),parked:parked.isEnabled(),actorVehicle:actor.vehicle};
+  await deferred();row.afterDeferred=capturedEffects.map(effect=>({id:effect.uniqueId,disposed:effect.isDisposed}));
+  assert.ok(capturedEffects.every(effect=>!effect.isDisposed));
+  const vehicleReferences=[stageReferences.get("low/vehicle-0")!,stageReferences.get("low/vehicle-1")!];
+  for(const mesh of cold){assert.equal(mesh.subMeshes[0]._getDrawWrapper(camera.renderPassId)?.effect,undefined);assert.equal(mesh.subMeshes[0].materialDefines,undefined);}
+  for(const mesh of f.target)mesh.setEnabled(false);
+  f.target.splice(0,f.target.length,...cold);
+  for(const mesh of cold){mesh.setEnabled(true);mesh.alwaysSelectAsActiveMesh=true;mesh.onAfterRenderObservable.add(()=>{if(engine.currentRenderPassId===camera.renderPassId)drawn.add(mesh.uniqueId);});}
+  game.applyRenderQuality("low",MANUAL_HARDWARE_SCALING.low);
+  actor.vehicle=true;car.setEnabled(true);parked.setEnabled(false);game.alignVehicleCamera();game.updateCameraFollow(new Vector3(pos.x,pos.y,pos.z),rig.eyeHeight,1);
+  const replayReferences=new Map<number,Map<string,{effect:any;context:any;defines:string}>>();
+  for(const [index,count] of [1,0,1,0].entries()) {
+    game.updateRenderEnvironment(pos,rig,false,0,0,game.timeOverride,false);
+    lights.forEach((light,i)=>{light.setEnabled(i<count);light.intensity=i<count?.7:0;});
+    const before=programs;const started=performance.now();
+    do {draw();await turn();} while(!f.names.every(name=>f.target.some(m=>m.material?.name===name&&drawn.has(m.uniqueId)))&&performance.now()-started<2500);
+    const snapshot=capture("car-"+count);row.replays.push({...snapshot,newPrograms:programs-before});
+    assert.ok(snapshot.families.every(family=>family.drawn&&family.ready),"all authored families actually draw");
+    for(const family of snapshot.families){assert.match(family.defines!,/^#define MAXLIGHTCOUNT 4$/m);assert.doesNotMatch(family.defines!,/^#define SHADOW/m);}
+    for(const family of snapshot.families) assert.match(family.defines!,/^#define FOG$/m,"actual fog remains enabled in every target replay");
+    row.expected=Array.from(vehicleReferences[count],([name,value])=>({name,effectId:value.effect.uniqueId,defines:value.defines}));
+    assert.equal(programs-before,0,"fresh inactive receivers must reuse the native preloaded then disabled variants");
+    for(const name of f.names){const effect=actualEffect(name)!;const prior=vehicleReferences[count].get(name);if(prior){assert.equal(effect,prior.effect);assert.equal(effect.getPipelineContext(),prior.context);assert.equal(effect.defines,prior.defines);}}
+    replayReferences.set(count,new Map(f.names.map(name=>{const effect=actualEffect(name)!;return[name,{effect,context:effect.getPipelineContext(),defines:effect.defines}];})));
+  }
+  row.status="complete";
+}));
+
+
+// Real helper/Scene/material lifecycle through the actual inner Game method.
+// Clock/render callbacks are bounded scheduler seams; the native factory cases above own draw proof.
+function innerLifecycle(t: import("node:test").TestContext, webgpu = true) {
+  const engine = new NullEngine(), scene = new Scene(engine);
+  const camera = new FreeCamera("inner pass", new Vector3(0, 1, -4), scene);
+  scene.activeCamera = camera;
+  const material = new StandardMaterial("metadata receiver", scene);
+  material.metadata = { exteriorOnlyGlass: true };
+  const meshes = [0, 1].map(i => {
+    const mesh = MeshBuilder.CreateBox("receiver " + i, {}, scene);
+    mesh.material = material; mesh.metadata = { sourcePack: "architecture-reality" };
+    return mesh;
+  });
+  const point = new PointLight("membership changes during environment", Vector3.Up(), scene);
+  const car = new TransformNode("car", scene), parked = new TransformNode("parked", scene);
+  car.setEnabled(false);
+  let now = 0, callback: (() => void) | undefined, stage = "", failEnvironment = false, healthError = false;
+  const draws: { stage: string; flags: boolean[] }[] = [];
+  const Game = make({AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,
+    MANUAL_HARDWARE_SCALING,arePreparationEffectsReady:()=>true,selectLightingPreview:select,applyArtLighting,clampOrbitPitch,
+    performance:{now:()=>now},window:{setTimeout:()=>1,clearTimeout(){}},
+    document:{hidden:false,addEventListener(){},removeEventListener(){}}});
+  const game:any=Object.assign(new Game(),{
+    engine:{isWebGPU:webgpu,runRenderLoop(next:()=>void){callback=next;},stopRenderLoop(next:()=>void){if(callback===next)callback=undefined;}},
+    scene,camera,quality:"low",car,parkedCar:parked,actor:{position:{x:0,y:0,z:0},vehicle:false},avatars:new Map(),
+    localId:"local",lights:[],flashlight:{},timeOverride:select("night").instant,flashlightOn:false,
+    compilationProfile:{setStage(value:string){stage=value;}},renderHealth:{snapshot:()=>({errorCount:Number(healthError),pendingPreparationOperations:0})},
+    updateWorldPresentation(){assert.ok(meshes.every(m=>!m.alwaysSelectAsActiveMesh));},updateCameraFollow(){},
+    localAvatarPresentation:{update:()=>({visible:true,cameraLight:false,resetAnimation:false})},
+    updateRenderEnvironment(){point.includedOnlyMeshes=[meshes[0]];if(failEnvironment)throw new Error("environment fault");return{night:1};},
+  });
+  const pending=game.prepareLightingVariants(()=>{draws.push({stage,flags:meshes.map(m=>m.alwaysSelectAsActiveMesh)});});
+  t.after(async()=>{game.cancelLightPreparation?.();await pending;scene.dispose();engine.dispose();assert.equal(callback,undefined);});
+  return {game,scene,meshes,draws,pending,tick:()=>callback?.(),setNow:(value:number)=>{now=value;},
+    fail:()=>{failEnvironment=true;},fault:()=>{healthError=true;},active:()=>!!callback};
+}
+
+test("actual inner Game selects target light membership after environment and preserves WebGL scope", async t=>{
+  for(const webgpu of [true,false]) {
+    const f=innerLifecycle(t,webgpu);f.tick();
+    assert.deepEqual(f.draws[0].flags,webgpu?[true,true]:[false,false]);
+    let settled=false;void f.pending.then(()=>{settled=true;});
+    for(let i=0;!settled&&i<150;i++){f.tick();await turn();}
+    const result=await f.pending;
+    assert.equal(result.status,"complete");assert.equal(result.stages.length,webgpu?15:9);
+    assert.ok(f.draws.every(d=>d.flags.every(flag=>flag===(webgpu&&d.stage.startsWith("vehicle-")))));
+    assert.ok(f.meshes.every(m=>!m.alwaysSelectAsActiveMesh));
+  }
+});
+
+test("fresh actual glass submeshes reuse representative vehicle1 after its vehicle0-to1 history",async t=>{
+  const f=factories(t),{engine,scene,camera,budget}=f;
+  const sun=new DirectionalLight("celestial",Vector3.Down(),scene),hemi=new HemisphericLight("sky",Vector3.Up(),scene);
+  sun.setEnabled(false);
+  const point=new PointLight("mapped point",Vector3.Up(),scene);point.falloffType=Light.FALLOFF_STANDARD;point.setEnabled(false);
+  const cinematic=new CinematicAtmosphere(scene,camera,sun),beam=new VehicleLighting(scene),stable=new StableLightState(scene),car=new TransformNode("car",scene);
+  const position={x:(f.low.x+f.high.x)/2,y:(f.low.y+f.high.y)/2,z:f.low.z-20};car.position.copyFromFloats(position.x,position.y,position.z);
+  f.architecture.update(position,"low");f.outdoor.update(position.x,position.z,"low");
+  const warm=f.names.map(name=>f.target.find(m=>m.material?.name===name&&m.isEnabled())??f.target.find(m=>m.material?.name===name)!);
+  const cold=warm.slice(0,2).map(mesh=>{
+    const clone=(mesh as Mesh).clone("fresh actual receiver "+mesh.name,null,true)!;
+    clone.setEnabled(false);
+    assert.equal(clone.geometry,(mesh as Mesh).geometry,"actual source geometry is shared, no new recipe");
+    assert.equal(clone.material,mesh.material,"same actual material identity");
+    return clone;
+  });
+  for(const mesh of scene.meshes)if(!warm.includes(mesh))mesh.setEnabled(false);
+  for(const mesh of warm)mesh.setEnabled(true);
+  for(const quality of ["medium","low"])cinematic.update({dt:0,player:position,quality,cloud:.99,daylight:0,keySource:"none",avatars:[],localId:"local"});
+  beam.update(car,1,true,"low");
+  const helper=new AuthoredLightPreparation(scene),drawn=new Set<number>();
+  for(const mesh of [...warm,...cold]) {
+    assert.ok(mesh instanceof Mesh);
+    mesh.onAfterRenderObservable.add(()=>{if(engine.currentRenderPassId===camera.renderPassId)drawn.add(mesh.uniqueId);});
+  }
+  let programs=0;const original=engine.createShaderProgram;
+  engine.createShaderProgram=function(...args){programs++;return Reflect.apply(original,this,args);};
+  const effectOf=(mesh:import("@babylonjs/core/Meshes/abstractMesh").AbstractMesh)=>mesh.subMeshes[0]._getDrawWrapper(camera.renderPassId)?.effect;
+  const snapshot=(mesh:import("@babylonjs/core/Meshes/abstractMesh").AbstractMesh)=>{
+    const wrapper=mesh.subMeshes[0]._getDrawWrapper(camera.renderPassId),effect=wrapper?.effect,defines:any=wrapper?.defines;
+    return{name:mesh.name,material:mesh.material?.name,effectId:effect?.uniqueId,defines:effect?.defines,
+      value:defines?.LODBASEDMICROSFURACE,key:defines?._keys?.includes("LODBASEDMICROSFURACE"),attributes:effect?.getAttributesNames()};
+  };
+  const drawUntil=async(meshes:typeof warm)=>{
+    const deadline=performance.now()+4000;
+    do{budget.prepareFrame();stable.update();drawn.clear();engine.beginFrame();scene.render();engine.endFrame();await turn();}
+    while((!meshes.every(m=>drawn.has(m.uniqueId))||!arePreparationEffectsReady(engine))&&performance.now()<deadline);
+    assert.ok(meshes.every(m=>drawn.has(m.uniqueId)),"every actual receiver rendered in the camera pass");
+    assert.ok(arePreparationEffectsReady(engine));
+  };
+  f.cleanups.push(()=>{helper.dispose();beam.dispose();stable.dispose();cinematic.dispose();});
+  const warmStates:any[]=[];
+  for(const count of [0,1]){
+    point.setEnabled(count===1);point.intensity=count?.7:0;
+    const release=helper.begin();
+    try{await drawUntil(warm);warmStates.push(warm.slice(0,2).map(snapshot));}
+    finally{release();}
+  }
+  const references=warm.slice(0,2).map(mesh=>({effect:effectOf(mesh)!,context:effectOf(mesh)!.getPipelineContext()}));
+  for(const mesh of cold){assert.equal(effectOf(mesh),undefined,"cold receiver has never requested an effect");assert.equal(mesh.subMeshes[0].materialDefines,undefined);}
+  for(const mesh of warm.slice(0,2))mesh.setEnabled(false);
+  for(const mesh of cold){mesh.setEnabled(true);mesh.alwaysSelectAsActiveMesh=true;}
+  const before=programs;
+  await drawUntil([...cold,warm[2]]);
+  const result={kind:"fresh-submesh",textureLOD,warm:warmStates,cold:cold.map(snapshot),newPrograms:programs-before,
+    sameEffect:cold.map((mesh,i)=>effectOf(mesh)===references[i].effect),sameContext:cold.map((mesh,i)=>effectOf(mesh)!.getPipelineContext()===references[i].context)};
+  report.cases.push(result);
+  assert.equal(result.newPrograms,0,"first readiness of a different receiver must reuse the prepared actual variant");
+  assert.deepEqual(result.sameEffect,[true,true]);assert.deepEqual(result.sameContext,[true,true]);
+  for(const [i,mesh] of cold.entries())assert.equal(effectOf(mesh)!.defines,references[i].effect.defines);
+  await pause(0);await turn();engine.beginFrame();engine.endFrame();await turn();
+  assert.ok(references.every(x=>!x.effect.isDisposed));
+});
+
+for(const ending of ["cancel","retired","timeout","health","throw"] as const)
+  test("actual inner authored lease restores flags on "+ending,async t=>{
+    const f=innerLifecycle(t);
+    if(ending==="throw")f.fail();
+    f.tick();
+    if(ending!=="throw")assert.ok(f.meshes.some(m=>m.alwaysSelectAsActiveMesh));
+    if(ending==="cancel")f.game.cancelLightPreparation();
+    if(ending==="retired")f.game.disposed=true;
+    if(ending==="timeout")f.setNow(30001);
+    if(ending==="health")f.fault();
+    f.tick();const result=await f.pending;
+    assert.equal(result.status,ending==="timeout"?"timeout":ending==="health"||ending==="throw"?"failed":"disposed");
+    assert.ok(f.meshes.every(m=>!m.alwaysSelectAsActiveMesh));
+    assert.equal(f.active(),false);
+  });

@@ -1,0 +1,34 @@
+{
+  "snapshotId": "909ebf8a019b26aff5561a0aaba97b976a26d033746da85ae958c6f4034589a5",
+  "results": [
+    {
+      "phase": "build",
+      "startedAt": "2026-10-18T20:45:17.634Z",
+      "finishedAt": "2026-10-18T20:46:00.940Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\image-processing-native-v2-build.log",
+      "sha256": "80a9bc0086b702e4503028959e5cab8c3edef486f4a7555bc92d1c3e14f7fbe8"
+    },
+    {
+      "phase": "test",
+      "startedAt": "2026-10-18T20:46:03.230Z",
+      "finishedAt": "2026-10-18T20:49:35.166Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\image-processing-native-v2-test.log",
+      "sha256": "6028505214f17dd04b1322ede64a8c80c71dcaf66fe50b73e4a3b728ffe691d4"
+    },
+    {
+      "phase": "integration",
+      "startedAt": "2026-10-18T20:49:37.122Z",
+      "finishedAt": "2026-10-18T20:50:01.034Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test:integration",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\image-processing-native-v2-integration.log",
+      "sha256": "6cc80ebfbef73ca5b8480e1c8973c32bedde25c79ed1b7d854a999da436d34c1"
+    }
+  ],
+  "sharedMetadataUnchanged": true,
+  "scope": "Image-processing native checkpoint with a fresh project-patched installation: full TypeScript, production build, complete test suite and isolated integration. Source and pinned dependencies verified; only four reviewed patch/lock/test changes."
+}

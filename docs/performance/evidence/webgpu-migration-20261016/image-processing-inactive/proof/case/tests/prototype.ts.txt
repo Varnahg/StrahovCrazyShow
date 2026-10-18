@@ -1,0 +1,26 @@
+import assert from "node:assert/strict";
+import { ImageProcessingConfiguration } from "@babylonjs/core/Materials/imageProcessingConfiguration";
+export const CHILDREN=["VIGNETTEBLENDMODEMULTIPLY","VIGNETTEBLENDMODEOPAQUE","SAMPLER3DGREENDEPTH","SAMPLER3DBGRMAP"] as const;
+export const originalDescriptor=Object.getOwnPropertyDescriptor(ImageProcessingConfiguration.prototype,"prepareDefines")!;
+export const original=originalDescriptor.value as ImageProcessingConfiguration["prepareDefines"];
+export const originalSource=original.toString();
+const marker="defines.VIGNETTE = false;";
+assert.equal(originalSource.split(marker).length,2);
+const replacement=marker+"\n"+CHILDREN.map(name=>`                    defines.${name} = false;`).join("\n");
+export const patchedSource=originalSource.replace(marker,replacement);
+assert.equal(patchedSource.replace(replacement,marker),originalSource,"exact source inverse");
+// The pinned emitted method refers only to this and its class alias _a. Keep
+// its complete source and active branch; change precisely the inactive writes.
+const patched=new Function("_a",`return ({${patchedSource}}).prepareDefines;`)(ImageProcessingConfiguration) as typeof original;
+export async function withPrototype<T>(enabled:boolean,run:()=>Promise<T>|T):Promise<T>{
+  const before=Object.getOwnPropertyDescriptor(ImageProcessingConfiguration.prototype,"prepareDefines")!;
+  assert.equal(before.value,original,"single in-process owner");
+  if(enabled)Object.defineProperty(ImageProcessingConfiguration.prototype,"prepareDefines",{...before,value:patched});
+  try{return await run();}
+  finally{
+    assert.equal(Object.getOwnPropertyDescriptor(ImageProcessingConfiguration.prototype,"prepareDefines")!.value,enabled?patched:original);
+    Object.defineProperty(ImageProcessingConfiguration.prototype,"prepareDefines",before);
+    assert.deepEqual(Object.getOwnPropertyDescriptor(ImageProcessingConfiguration.prototype,"prepareDefines"),before);
+  }
+}
+export const variant=<T extends (...args:any[])=>Promise<unknown>>(callback:T)=>(...args:Parameters<T>)=>withPrototype(process.env.IP_RESET==="1",()=>callback(...args));
