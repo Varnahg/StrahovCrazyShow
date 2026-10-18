@@ -584,6 +584,7 @@ export class Game {
     this.compilationProfile = new WebGpuCompilationProfile(this.engine, {
       captureShaderInventory: this.environmentProfile !== undefined,
       captureUnusedDefineInventory: this.environmentProfile !== undefined,
+      shaderInventoryLimits: this.environmentProfile ? { maxStages: 19 } : undefined,
       onError: (channel, error, label) => this.renderHealth.report(
         channel, `${label}: ${error instanceof Error ? error.message : String(error)}`,
       ),
@@ -2342,6 +2343,8 @@ export class Game {
     // The same controller/materials survive into gameplay; no proxy shaders.
     this.flashlight ??= new PlayerFlashlight(this.scene);
     const night = selectLightingPreview("night").instant!;
+    const includeDayPointVariants = this.engine.isWebGPU;
+    const day = includeDayPointVariants ? selectLightingPreview("day").instant! : null;
     const apply = (
       instant: number,
       flashlightOn: boolean,
@@ -2414,13 +2417,16 @@ export class Game {
       }
     };
     return prepareLightVariants({
+      includeDayPointVariants,
       apply: (stage) => {
         if (stage === "restore") return restore();
         this.compilationProfile.setStage(stage);
+        const isNight = stage.startsWith("night-");
+        const isDay = stage.startsWith("day-");
         apply(
-          stage.startsWith("night") ? night : (this.timeOverride ?? Date.now()),
+          isNight ? night : isDay ? day! : (this.timeOverride ?? Date.now()),
           stage.endsWith("-on"),
-          stage.startsWith("night-") ? Number(stage.split("-")[1]) : undefined,
+          isNight || isDay ? Number(stage.split("-")[1]) : undefined,
         );
       },
       restore,

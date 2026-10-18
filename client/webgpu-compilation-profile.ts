@@ -245,7 +245,7 @@ class ShaderInventory {
       const value = limits?.[key];
       if (typeof value === "number" && Number.isFinite(value))
         this.limits[key] = Math.max(key === "maxStages" ? 2 : 1,
-          Math.min(this.limits[key], Math.floor(value)));
+          Math.min(key === "maxStages" ? 21 : this.limits[key], Math.floor(value)));
     }
   }
 
