@@ -1,3 +1,4 @@
+import { AuthoredLightPreparation } from "../client/authored-light-preparation";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -44,7 +45,7 @@ const compiled = ts.transpileModule(
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(`(function(environment) {
-  const { PlayerFlashlight, Vector3, prepareLightVariants, arePreparationEffectsReady, selectLightingPreview, performance, window, document } = environment;
+  const { AuthoredLightPreparation, PlayerFlashlight, Vector3, prepareLightVariants, arePreparationEffectsReady, selectLightingPreview, performance, window, document } = environment;
   ${compiled}
   return PreparationGame;
 })`).runInThisContext();
@@ -88,6 +89,7 @@ function fixture(t: import("node:test").TestContext) {
     pass: number;
   }[] = [];
   const Game = make({
+    AuthoredLightPreparation,
     PlayerFlashlight,
     Vector3,
     prepareLightVariants,

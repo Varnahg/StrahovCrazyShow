@@ -1,3 +1,4 @@
+import { AuthoredLightPreparation } from "./authored-light-preparation";
 import "./render-shaders";
 import { sessionDiagnostics } from "./session-diagnostics";
 import { createEnvironmentProfile } from "./environment-profile";
@@ -2361,10 +2362,26 @@ export class Game {
       this.applyRenderQuality(requested.quality, requested.hardwareScaling);
       this.appliedQualityRevision = requested.revision;
     };
+    let synchronizeEnvironment = true;
     return prepareRenderQualities({
       initialQuality: this.adaptive.state.quality,
       applyQuality: (quality) => {
         this.preparingRenderQuality = true;
+        if (synchronizeEnvironment) {
+          synchronizeEnvironment = false;
+          // Establish the requested environment before temporary qualities.
+          // This callback is inside the original pass and total time budgets.
+          const requested = this.adaptive.state;
+          this.applyRenderQuality(requested.quality, requested.hardwareScaling);
+          this.updateRenderEnvironment(
+            this.actor.position,
+            this.avatars.get(this.localId),
+            false,
+            0,
+            performance.now() / 1000,
+          );
+          if (isDisposed()) return;
+        }
         this.applyRenderQuality(quality, MANUAL_HARDWARE_SCALING[quality]);
       },
       prepare: ({ timeoutMs, finalPass }) => this.prepareLightingVariants(
@@ -2389,6 +2406,13 @@ export class Game {
     const includeDayPointVariants = this.engine.isWebGPU;
     const day = includeDayPointVariants ? selectLightingPreview("day").instant! : null;
     const includeLowVehicleVariants = this.engine.isWebGPU && this.quality === "low";
+    const authoredPreparation = includeLowVehicleVariants ? new AuthoredLightPreparation(this.scene) : undefined;
+    let stopAuthoredPreparation: (() => void) | undefined;
+    const restoreAuthoredPreparation = () => {
+      const stop = stopAuthoredPreparation;
+      stopAuthoredPreparation = undefined;
+      stop?.();
+    };
     let deactivateGrass: (() => void) | undefined;
     const stopGrassPreparation = () => {
       const stop = deactivateGrass;
@@ -2441,6 +2465,7 @@ export class Game {
       vehicle = false,
     ) => {
       beginGrassPreparation();
+      restoreAuthoredPreparation();
       const pos = this.actor.position;
       this.updateWorldPresentation(pos);
       const self = this.avatars.get(this.localId);
@@ -2504,6 +2529,8 @@ export class Game {
           light.intensity = enabled ? lighting.night * 0.7 : 0;
         }
       }
+      // Select after environment and forced street membership describe this stage.
+      if (vehicle) stopAuthoredPreparation = authoredPreparation?.begin();
     };
     const restore = () => {
       restoreVehicle();
@@ -2598,8 +2625,11 @@ export class Game {
         window.setTimeout(callback, milliseconds),
       clearTimer: (timer) => window.clearTimeout(timer as number),
     }).finally(() => {
-      try { restoreVehicle(); }
-      finally { stopGrassPreparation(); }
+      try { restoreVehicle(); } finally {
+        try { restoreAuthoredPreparation(); } finally {
+          try { authoredPreparation?.dispose(); } finally { stopGrassPreparation(); }
+        }
+      }
     });
   }
 
