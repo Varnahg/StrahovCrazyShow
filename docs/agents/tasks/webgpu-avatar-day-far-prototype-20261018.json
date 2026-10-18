@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-avatar-day-far-prototype-20261018",
+  "title": "KEY-31: izolovaný QA experiment užší Day1 far plane",
+  "status": "ready",
+  "dependsOn": ["webgpu-avatar-day-view-proof-20261018"],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/avatar-day-far-prototype-20261018/",
+    "docs/agents/handoffs/webgpu-avatar-day-far-prototype-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze copied QA overlay nad immutable V4 bf28a56507b6b0650d214169c8cf94aa3b2d8abc4012a8b098e4e1366340c8c0, s frozen patched dependencies. Native/main/hranýbuild a V4 se nemění. Neimplementovat současně material-budget capture opravu.",
+    "Z proofu V2 0cadc7d49b71a567cb3ac27974a8e6e3502676640d13afb232b0d4fa9dff3730 převzít jen far-only princip: během day-1-off/on omezit pouze camera.maxZ podle konzervativních skutečných avatar bounds v původním view a původního minZ. Žádný setTarget, pose/FOV/minZ/pass, teleport, layer/visibility mask nebo fake readiness.",
+    "Zachovat všechny aktuálně zapojené vykreslované avatar rigs, nikoli pouze jméno Alex nebo jedinou lokální postavu. Konzervativní union může u vzdálených avatarů úsporu zmenšit. Prázdný/neplatný envelope znamená původní plný view; neznamená vynechat readiness nebo zamlčet skutečné výjimky.",
+    "Před každou další etapou a na restore/timeout/cancel/dispose přesně a idempotentně vrátit původní maxZ. Zachovat ostatní camera/history/actor/animation stav, původní B6 clipped orbit a entry/restore spatial refresh. Žádný nový dlouhodobý cache nebo observer, pouze omezený stage scope.",
+    "Všech15etap, úplná dvě ready draws, původní30s timeout, final submit gate i inventory21/default16 zůstávají. Přesná varianta světla/cap/instancing/shadow/profilu se nemění. Runtime scope pouze copied Game + případný malý helper a odpovídající testy; ostatní runtime kopie byte-identické."
+  ],
+  "verification": [
+    "Cílené helper testy actual perspective/bounds včetně více rigů, bez setTarget a bez pose mutation, konzervativní skinned bounds a původní minZ/maxZ, prázdné/invalid input/fallback. Nevyvozovat pixel coverage jen z draw callbacku.",
+    "Game wiring testy před day1/po day1/B6/restore a failure/restart/timeout/dispose; preserve native gates a field ownership. Aktuální VM fixtures adaptovat bez oslabení assertions. Cílený refaktoring helperu/state, žádné per-frame cache nebo zbytečná retence rigů.",
+    "Leaf nedělá fullsuite/build/GPU/install. Root bude porovnávat celý startup protiV4 a první Golden OFF/F, plus samostatný cold B6 entry/F/outward/exit. Nové world kompilace nebo ztráta pokrytí znamenají odmítnutí kandidáta. Multiplayer/clear-weather a celé přijetí zůstávají neověřené."
+  ],
+  "notes": [
+    "Přímé root zadání přes existující BMAD, žádný rekurzivní workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow. Owner webgpu-avatar-day-far-01a14497. Claim až po dokončení závislého proofu.",
+    "World Day1 je užitečná kombinace při GoldenHour, svítání/soumraku, lunar DIR, řízeném autě a B6 pohledu ven. Far-only není předem přijaté zúžení coverage; sdílené Effecty/B6/shadow pass mohou část práce zachovat nebo přesunout. TreeWind mimo main frustum stále vytváří base/depth Effect. Úspora není prokázaná.",
+    "V4 prvníGoldenOFF0mod/0sync/max124.5ms, prvníGoldenF4mod/2sync/max210.9ms; navazující předvolby zahřáté0/0. Cloud0.96 neznamená vypnutýDIR, ale v tomto běhu vypnul celestial shadows. Zdrojový počet3/4 spolu s kontraktem odpovídá HEMI+DIR+POINT(+SPOT), není to přímý per-light export.",
+    "TSX_DISABLE_CACHE=1, žádné sdílené dependency zápisy. Předat exact overlay/source/test SHA, cílené logy, lifecycle a limity společně; freeze/handoff/release bez commitu."
+  ]
+}

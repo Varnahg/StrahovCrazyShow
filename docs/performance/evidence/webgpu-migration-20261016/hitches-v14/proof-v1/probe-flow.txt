@@ -1,0 +1,88 @@
+  const history = () => ({yaw:game.yaw,pitch:game.pitch,distance:game.distance,cameraArm:game.cameraArm,vehicleCameraSnap:game.vehicleCameraSnap,firstPerson:game.firstPerson,footFirstPerson:game.footFirstPerson,local:JSON.stringify(game.localAvatarPresentation.state),actor:JSON.stringify(actor),phase:rig.animation.phase,gait:rig.animation.gait,pose:rig.root.getDescendants(false).map((node:any)=>({id:node.uniqueId,position:node.position?.asArray(),rotation:node.rotation?.asArray(),quaternion:node.rotationQuaternion?.asArray(),scaling:node.scaling?.asArray()}))});
+  const eligible = () => parts.filter((m:any)=>scene.meshes.includes(m)&&m.isEnabled()&&m.isVisible);
+  const cameraState = () => ({position:camera.position.clone(),rotation:camera.rotation.clone(),quaternion:camera.rotationQuaternion?.clone()??null,up:camera.upVector.clone(),fov:camera.fov,fovMode:camera.fovMode,minZ:camera.minZ,maxZ:camera.maxZ,mode:camera.mode,pass:camera.renderPassId,view:Array.from(camera.getViewMatrix(true).m),projection:Array.from(camera.getProjectionMatrix(true).m)});
+  function restoreCamera(saved:ReturnType<typeof cameraState>){camera.position.copyFrom(saved.position);camera.rotation.copyFrom(saved.rotation);camera.rotationQuaternion=saved.quaternion?.clone()??null;camera.upVector.copyFrom(saved.up);camera.fov=saved.fov;camera.fovMode=saved.fovMode;camera.minZ=saved.minZ;camera.maxZ=saved.maxZ;camera.mode=saved.mode;camera.getViewMatrix(true);camera.getProjectionMatrix(true);}
+  function assertCameraRestored(saved:ReturnType<typeof cameraState>){const current=cameraState();for(const key of ['fov','fovMode','minZ','maxZ','mode','pass']as const)assert.equal(current[key],saved[key]);assert.ok(current.position.equals(saved.position));assert.ok(current.rotation.equals(saved.rotation));for(const key of ['view','projection']as const)assert.ok(current[key].every((v,i)=>Math.abs(v-saved[key][i])<1e-5));}
+  function avatarEnvelope(){
+    const minimum=new Vector3(Infinity,Infinity,Infinity),maximum=new Vector3(-Infinity,-Infinity,-Infinity);
+    for(const mesh of eligible()){mesh.computeWorldMatrix(true);const box=mesh.getBoundingInfo().boundingBox;minimum.minimizeInPlace(box.minimumWorld);maximum.maximizeInPlace(box.maximumWorld);}
+    const center=Vector3.Center(minimum,maximum),radius=Vector3.Distance(minimum,maximum)/2+camera.minZ;
+    return{minimum,maximum,center,radius};
+  }
+  function fitAvatar(){
+    assert.equal(camera.mode,0,'same perspective camera');assert.equal(camera.fovMode,0,'vertical FOV fixture');
+    const {minimum,maximum,center,radius}=avatarEnvelope();
+    const distance=Vector3.Distance(camera.position,center);assert.ok(distance>radius+camera.minZ,'camera must remain outside conservative avatar envelope');
+    const aspect=engine.getAspectRatio(camera),pixelReserve=1+4/engine.getRenderHeight();
+    const fov=2*Math.atan(Math.tan(Math.asin(radius/distance))*pixelReserve/Math.min(1,aspect));
+    const originalFov=camera.fov,originalFar=camera.maxZ;camera.setTarget(center);camera.fov=fov;camera.maxZ=Math.min(originalFar,distance+radius+camera.minZ);camera.getViewMatrix(true);camera.getProjectionMatrix(true);
+    return{minimum:minimum.asArray(),maximum:maximum.asArray(),center:center.asArray(),radius,distance,aspect,pixelReserve,fov,originalFov,far:camera.maxZ,originalFar,near:camera.minZ,position:camera.position.asArray()};
+  }
+  function projectionCoverage(){
+    const viewProjection=camera.getViewMatrix(true).multiply(camera.getProjectionMatrix(true));const near=engine.isNDCHalfZRange?0:-1;
+    const project=(x:number,y:number,z:number,m:any)=>{const w=x*m[3]+y*m[7]+z*m[11]+m[15];return{x:(x*m[0]+y*m[4]+z*m[8]+m[12])/w,y:(x*m[1]+y*m[5]+z*m[9]+m[13])/w,z:(x*m[2]+y*m[6]+z*m[10]+m[14])/w,w};};
+    const outside=(p:any)=>![p.x,p.y,p.z,p.w].every(Number.isFinite)||p.w<=0||Math.abs(p.x)>1+1e-5||Math.abs(p.y)>1+1e-5||p.z<near-1e-5||p.z>1+1e-5;
+    return eligible().map((mesh:any)=>{
+      const source=mesh.sourceMesh??mesh;mesh.computeWorldMatrix(true);source.skeleton?.prepare(true);
+      const positions=source.getPositionData(true,true);assert.ok(positions,'actual positions including skeleton/morph');
+      const matrix=mesh.getWorldMatrix().multiply(viewProjection).m;let clipped=0,minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity,minZ=Infinity,maxZ=-Infinity;
+      for(let i=0;i<positions.length;i+=3){const p=project(positions[i],positions[i+1],positions[i+2],matrix);if(outside(p))clipped++;minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);minZ=Math.min(minZ,p.z);maxZ=Math.max(maxZ,p.z);}
+      const corners=mesh.getBoundingInfo().boundingBox.vectorsWorld;const clippedBounds=corners.filter((p:any)=>outside(project(p.x,p.y,p.z,viewProjection.m))).length;
+      return{name:mesh.name,vertices:positions.length/3,clippedVertices:clipped,clippedBounds,ndc:{minX,maxX,minY,maxY,minZ,maxZ},skinned:!!source.skeleton,morphed:!!source.morphTargetManager,instance:mesh.isAnInstance};
+    });
+  }
+  async function withNarrow<T>(callback:(fit:any)=>Promise<T>,mode='both'){const saved=cameraState(),before=history();try{const fit=fitAvatar();if(mode==='fov-only')camera.maxZ=saved.maxZ;else if(mode==='far-only'){const far=camera.maxZ;restoreCamera(saved);camera.maxZ=far;}camera.getViewMatrix(true);camera.getProjectionMatrix(true);fit.mode=mode;fit.fov=camera.fov;fit.far=camera.maxZ;return await callback(fit);}finally{restoreCamera(saved);assertCameraRestored(saved);assert.deepEqual(history(),before,'camera-only view preserves follow/actor/LOD/animation history');}}
+
+  // Bounded witnesses, explicitly not production-world coverage. One farther
+  // opaque mesh intersects the original main view. A real wind/wrapper path is
+  // positioned on the original torch ray and remains subject to native culling.
+  const farMesh=MeshBuilder.CreateBox('representative far world receiver',{size:1},scene);farMesh.position.copyFrom(camera.position.add(avatarEnvelope().center.subtract(camera.position).scale(2)));farMesh.material=new StandardMaterial('representative world Standard',scene);farMesh.receiveShadows=true;farMesh.metadata={depthCaster:'opaque'};
+  const leafMesh=MeshBuilder.CreatePlane('representative shadow-only wind leaf',{size:.6},scene);const beam=game.flashlight.beam.light;
+  leafMesh.position.copyFrom(beam.position.add(beam.direction.normalizeToNew().scale(6)));leafMesh.receiveShadows=true;leafMesh.metadata={depthCaster:'alpha-test',windDeformed:true};
+  const leaf=new PBRMaterial('representative real TreeWind wrapper',scene);leaf.albedoTexture=new Texture('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB5kAAAAASUVORK5CYII=',scene);leaf.albedoTexture.hasAlpha=true;configureTreeMaterial(leaf);new TreeWindPlugin(leaf,{time:0,x:1,z:0});leafMesh.material=leaf;
+  engine._isWebGPU=true;try{leafWrapper=createWebGpuShadowDepthWrapper(leaf,scene);}finally{engine._isWebGPU=false;}leaf.shadowDepthWrapper=leafWrapper;game.witnessWrapper=leafWrapper;
+  worldWitnesses=[farMesh,leafMesh];
+  for(const mesh of worldWitnesses){const o=mesh.onAfterRenderObservable.add(()=>{if(engine.currentRenderPassId===camera.renderPassId)worldMain.add(mesh);});observers.push([mesh.onAfterRenderObservable,o]);}
+  const effectObserver=leaf.onEffectCreatedObservable.add(({effect}:any)=>worldEvents.push({stage:currentStage,pass:engine.currentRenderPassId,effectId:effect.uniqueId,definesSha:sha(effect.defines),kind:engine.currentRenderPassId===camera.renderPassId?'main-base':'shadow-base'}));observers.push([leaf.onEffectCreatedObservable,effectObserver]);
+  const torchShadow=beam.getShadowGenerator();assert.ok(torchShadow);
+  const shadowObserver=torchShadow.onAfterShadowMapRenderMeshObservable.add((mesh:any)=>{if(worldWitnesses.includes(mesh))worldShadow.add(mesh);});observers.push([torchShadow.onAfterShadowMapRenderMeshObservable,shadowObserver]);
+  const baseline=()=>apply(now,false);
+  baseline();await render('baseline-spawn-night-off');
+  report.projections=[];report.comparisons=[];report.restores=[];
+  for(const on of [false,true]){
+    apply(day,on,1);
+    const narrow=await withNarrow(async fit=>{const row=await render('narrow-first-'+on);const projection=projectionCoverage();assert.ok(projection.every(p=>p.clippedVertices===0),'no actual avatar vertices clipped');assert.ok(projection.every(p=>p.clippedBounds===0),'whole conservative near bounds fit');row.fit=fit;row.projection=projection;row.leafShadowEffect=leafWrapper.getEffect(leafMesh.subMeshes![0],torchShadow,torchShadow.getShadowMap().renderPassId)?.effect?.uniqueId??null;return row;});
+    report.restores.push({after:'narrow-'+on,pass:camera.renderPassId,success:true});
+    const whole=await render('whole-day1-'+on);whole.projection=projectionCoverage();
+    const repeat=await withNarrow(async fit=>{const row=await render('narrow-reuse-'+on);row.fit=fit;row.projection=projectionCoverage();return row;});
+    const fovOnly=await withNarrow(async fit=>{const row=await render('fov-only-'+on);row.fit=fit;row.projection=projectionCoverage();return row;},'fov-only');
+    const farOnly=await withNarrow(async fit=>{const row=await render('far-only-'+on);row.fit=fit;row.projection=projectionCoverage();return row;},'far-only');
+    assert.ok(!narrow.world.main.includes(farMesh.name));assert.ok(!farOnly.world.main.includes(farMesh.name));assert.ok(fovOnly.world.main.includes(farMesh.name),'FOV alone cannot exclude aligned far geometry');
+    for(const row of [fovOnly,farOnly])assert.ok(row.projection.every((p:any)=>p.clippedVertices===0&&p.clippedBounds===0),'projection, not merely draw, covers every part');
+    if(on){assert.ok(narrow.world.shadow.includes(leafMesh.name));assert.ok(!narrow.world.main.includes(leafMesh.name));assert.ok(narrow.world.effectEvents.some((e:any)=>e.kind==='shadow-base'));assert.ok(narrow.leafShadowEffect!==null);}
+    reference(on);const b6row=await render('B6-reference-'+on);b6row.projection=projectionCoverage();
+    for(const compared of [whole,repeat,fovOnly,farOnly,b6row]){
+      let count=0;for(let i=0;i<narrow.parts.length;i++){const first=narrow.parts[i],second=compared.parts[i];assert.equal(first.name,second.name);if(!first.drawn)continue;assert.equal(second.drawn,true,first.name+' '+compared.label);assert.equal(second.effect.defines,first.effect.defines,'full defines '+first.name);assert.equal(second.effect.id,first.effect.id,'native Effect reuse '+first.name);assert.equal(second.cap,first.cap);count++;}
+      report.comparisons.push({first:narrow.label,other:compared.label,drawn:count,sameFullDefines:true,sameEffect:true});
+    }
+    baseline();await render('restore-'+on);
+  }
+  apply(day,true,1);await render('exception-reference');const injected=new Error('owned camera callback failure');let caught:any;
+  try{await withNarrow(async()=>{throw injected;});}catch(error){caught=error;}assert.equal(caught,injected);report.restores.push({after:'injected-exception',originalError:true,success:true});
+  baseline();const final=await render('final-restore');assert.equal(JSON.stringify(actor),beforeActor);assert.equal(JSON.stringify(weather),beforeWeather);assert.equal(game.ready,false);assert.equal(game.timeOverride,null);assert.equal(game.flashlightOn,false);
+  report.ownership={actorUnchanged:true,weatherUnchanged:true,rigNear:rig.lod.level,followHistoryDuringNarrow:'deepEqual',cameraRestore:'pose/projection/near/far/fov/pass verified on success and exception',requestedFlashlight:false,requestedTime:null,ready:false};
+  report.passed=true;
+}catch(error){report.error=String(error);throw error;}finally{
+  for(const[o,h]of observers)o.remove(h);stable?.dispose();game?.witnessWrapper?.dispose();game?.flashlight?.dispose();b6?.dispose();game?.avatars?.get('local')?.root.dispose();pool?.dispose();scene.dispose();engine.createRawTexture=rawUpload;engine.dispose();
+  report.endedAt=new Date().toISOString();report.cleanup={sceneDisposed:scene.isDisposed,rawTextureReferences:rawTextures.map(t=>({id:t.uniqueId,references:t._references}))};
+  report.limitations=['NullEngine GLSL/CPU, no WGSL/GPU pipeline or performance proof','Actual six preset near rigs plus selected extras; current pose projection only, not all animation poses or future morphs','Raw upload completion adapter preserves original bytes/metadata; URL textures are native NullEngine dummy uploads','Default Game distance8/pitch0.28 actual follow method with explicit no-obstacle collision IO; no full-world clip','Sky/IBL IO stubs; cloud0.96 leaves celestial shadows inactive','Two representative world witnesses establish mechanism only; actual terrain/large meshes can still intersect any narrow frustum','Reference B6 moves only the owned fixture rig for comparison; narrow view never moves it'];
+  writeFileSync(new URL('case-'+spec.index+(spec.extras?'-extras':'')+'.json',import.meta.url),JSON.stringify(report,null,2)+'\n');
+  console.log(JSON.stringify({preset:spec.name,passed:report.passed??false,rows:report.rows.length,error:report.error,startedAt:report.startedAt,endedAt:report.endedAt}));
+}
+return report;
+}
+
+const specs=[{index:0,name:'Alex'},{index:1,name:'Robin'},{index:2,name:'Eli'},{index:3,name:'Sam'},{index:4,name:'Mia'},{index:5,name:'Niki'},{index:0,name:'Alex extras',extras:true}];
+const startedAt=new Date().toISOString();const cases=[];
+for(const spec of process.argv.includes('--all')?specs:specs.slice(0,1))cases.push(await scenario(spec));
+writeFileSync(new URL('report.json',import.meta.url),JSON.stringify({startedAt,endedAt:new Date().toISOString(),passed:cases.every(c=>c.passed),cases},null,2)+'\n');

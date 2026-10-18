@@ -1,0 +1,25 @@
+BJS - [05:09:02]: Babylon.js v9.30.0 - Null engine
+{"preset":"Alex","passed":false,"rows":2,"error":"AssertionError [ERR_ASSERTION]: focalDistance\n+ actual - expected\n\n+ 8.717856710818625\n- 8.586873523819381\n","startedAt":"2026-10-18T03:09:02.112Z","endedAt":"2026-10-18T03:09:02.648Z"}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: focalDistance
++ actual - expected
+
++ 8.717856710818625
+- 8.586873523819381
+
+    at assertCameraRestored (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\avatar-day-view-proof-20261018\probe.ts:157:239)
+    at withNarrow (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\avatar-day-view-proof-20261018\probe.ts:186:446)
+    at async scenario (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\avatar-day-view-proof-20261018\probe.ts:206:18)
+    at async <anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\avatar-day-view-proof-20261018\probe.ts:239:84) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 8.717856710818625,
+  expected: 8.586873523819381,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

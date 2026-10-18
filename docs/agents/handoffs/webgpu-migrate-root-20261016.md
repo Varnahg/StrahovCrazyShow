@@ -189,3 +189,7 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## Material budget capture proof převzat
 
 18.10 root přijal5/5CPUproof, manifestd9a5226f…029c, reviewer beználezů, hitches-v13. Oba mechanismy (latecapturefixed42 a known4 readiness předrepair) jsou reprodukované možnosti, ne produkční timingatribuce. Taskdone pouze proproof, runtimebezezměny. Avatar-view proof zatím opravujeP2 neúplného focal/reference/getTarget restore; jeho původní119captures nejsou přijaté jako kompletnírestore.
+
+## Avatar view V2 a světelné kontroly převzaty
+
+18.10 hitches-v14 archivuje70artefaktů včetně původní V1 sP2, přesného RED/GREEN V2 a V4 raw/UI šesti světelných oken. V2 restore přijat po nezávislém review; far-only CPU coverage není world ani GPU přijetí. Samostatný task webgpu-avatar-day-far-prototype-20261018 zapisuje pouze copied cache/handoff. První V4 GoldenF a samostatný cold B6 budou nutné kontroly proti ztrátě coverage. Own služby po sérii stojí, měřicí karta about:blank, hrané4193/4192/4188 nezměněné.
