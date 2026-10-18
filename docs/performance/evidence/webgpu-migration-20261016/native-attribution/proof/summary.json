@@ -1,0 +1,27 @@
+{
+  "validation": {
+    "passed": 61,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 3604.8572,
+    "log": "run-02.log"
+  },
+  "priorRun": {
+    "pass": 57,
+    "fail": 4,
+    "cause": "Fixture expected synchronous physical Observable removal; pinned remove disables immediately and defers array removal through setTimeout. Runtime unchanged; final test waits timer turn."
+  },
+  "gameLifecycle": [
+    "explicit benchmark with local recording and WebGPU; profileEnvironment not required",
+    "native BenchmarkRenderProfile retained",
+    "restart/stale stop",
+    "actual native completion block disposes before result callback and immediate restart",
+    "actual native handleRendererFailure and dispose",
+    "initialization exception cleanup"
+  ],
+  "limitations": [
+    "Existing incident has additional idle phase observables and shader/material counters inside the benchmark; this capture is not clean FPS acceptance.",
+    "No startup or preparation changes, C5 preload or mesh-draw/raw-frame instrumentation.",
+    "No full TypeScript/build/GPU performed by leaf."
+  ]
+}

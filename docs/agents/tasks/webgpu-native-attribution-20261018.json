@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-native-attribution-20261018",
+  "title": "KEY-31: přiřadit pět nových programů běžného nativního buildu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-native-attribution-20261018/",
+    "docs/agents/handoffs/webgpu-native-attribution-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze fyzický copied source/test checkpoint nad authored-native-v3 777a1bbb, nikoli main, WT runtime ani hrané buildy.",
+    "Převzít přesně již reviewed bounded compilation a incident profiler; native Game mění jen opt-in local WebGPU diagnostic benchmark attribution a její cleanup/export.",
+    "Žádný C5 preload, mesh draw profiler, startup/frame výpočet, příprava světel, nová cache, vyšší limit ani nový diagnostický framework.",
+    "Native původní BenchmarkRenderProfile zůstane; vlastní nový incident pouze během opt-in okna. Stop při restart/end/fault/dispose, wrapper transparency a source inverse doložené.",
+    "Actual native Game fixture bez C5 předpokladů, původní profiler limity a anonymizace zachované. Cílený refaktoring a testy předat společně."
+  ],
+  "verification": [
+    "Lehké cílené profiler a actual-native-Game testy, přesné manifesty/hashy a handoff. Žádný install/fullsuite/fullTS/build/GPU/port ani commit.",
+    "Root zajistí plný TS/build, kontrolu source parity a jediný produkční sběr. Diagnostický FPS výsledek není běžné výkonové přijetí."
+  ],
+  "notes": [
+    "Přímé implementační zadání root koordinátora v existujícím BMAD kroku03, bez rekurzivního workflow. Před zápisem claim s unikátním owner.",
+    "Normal native run ec2bd31f:49.6FPS,p9984.8,max573ms,+5programs/+10modules/+12sync,ambient0. Nelze je přiřadit z plain telemetry; původní41stage metody/helper/strictguard jsou identické s reviewed combined0program runem.",
+    "Předem porovnány plain log inference (nedostatečná), celé C5 Game (neizolované) a nejmenší přenos existující attribution (zvolený). Zdroj/GUI role ani task stav nejsou přejímka celé migrace.",
+    "Root fullTS/build PASS, actual Edge capture5/5 requests with fulldefines,0omitted/unmatched/errors. FARglass2,farfacade1,outdoormetal2; max586.7ms remains. Diagnostic task complete, no runtime optimization/native GPU acceptance. Evidence docs/performance/evidence/webgpu-migration-20261016/native-attribution/README.md. OwnQA stopped, protected builds unchanged."
+  ]
+}

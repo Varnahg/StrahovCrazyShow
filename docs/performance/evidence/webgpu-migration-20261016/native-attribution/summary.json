@@ -1,0 +1,674 @@
+{
+  "source": "7acd18186c4e3625b78d5a1a8faa03b95fdd184f4c7e0bb6e973186f6201420f",
+  "session": "f2a02c1f-1e20-4c69-b472-93b54794ba12",
+  "fps": 47.8,
+  "p95Ms": 24,
+  "p99Ms": 38.30000001192093,
+  "maxMs": 586.6999999880791,
+  "viewport": {
+    "height": 650,
+    "width": 1528
+  },
+  "renderResolution": {
+    "height": 500,
+    "width": 1175
+  },
+  "ambient": {
+    "buses": 0,
+    "cars": 0,
+    "passengers": 0
+  },
+  "gpu": {
+    "backend": "webgpu",
+    "classification": "unknown",
+    "classificationLabel": "Typ grafiky nelze určit",
+    "compatibilityMode": true,
+    "context": {
+      "actualAntialias": null,
+      "defaultFramebuffer": null,
+      "requestedAntialias": true,
+      "sampleBuffers": null,
+      "samples": null
+    },
+    "gpuTimingScope": "main-render-pass-only",
+    "renderer": "pascal",
+    "requestedPowerPreference": "high-performance",
+    "vendor": "nvidia",
+    "version": "unknown version",
+    "warnings": [
+      "Prohlížeč neposkytl jednoznačný název grafiky. Výběr karty ověř v jeho diagnostice nebo ve Správci úloh."
+    ],
+    "webglVersion": null
+  },
+  "health": {
+    "end": {
+      "counts": {
+        "device": 0,
+        "effect": 0,
+        "pipeline": 0,
+        "render": 0,
+        "shader": 0,
+        "texture": 0,
+        "validation": 0
+      },
+      "errorCount": 0,
+      "firstErrors": [],
+      "generation": 1,
+      "pendingOperations": 0,
+      "pendingPreparationOperations": 0,
+      "pendingShaderValidationOperations": 0,
+      "phase": "ready",
+      "purpose": "game",
+      "rendererId": 2,
+      "valid": true
+    },
+    "start": {
+      "counts": {
+        "device": 0,
+        "effect": 0,
+        "pipeline": 0,
+        "render": 0,
+        "shader": 0,
+        "texture": 0,
+        "validation": 0
+      },
+      "errorCount": 0,
+      "firstErrors": [],
+      "generation": 1,
+      "pendingOperations": 0,
+      "pendingPreparationOperations": 0,
+      "pendingShaderValidationOperations": 0,
+      "phase": "ready",
+      "purpose": "game",
+      "rendererId": 2,
+      "valid": true
+    },
+    "valid": true
+  },
+  "compilationDelta": {
+    "asyncPipeline": 0,
+    "compilerLoad": 0,
+    "glslToSpirv": 0,
+    "shaderModule": 10,
+    "shaderPreparation": 5,
+    "shaderValidation": 10,
+    "spirvToWgsl": 0,
+    "submit": 955,
+    "syncPipeline": 12
+  },
+  "summary": {
+    "kind": "summary",
+    "generation": 1,
+    "reason": "benchmark-end",
+    "captured": 5,
+    "omitted": 0,
+    "unmatched": 0,
+    "waitingEffects": 5,
+    "observersOmitted": 0,
+    "notificationsUnmatched": 937,
+    "observerErrors": 0,
+    "scope": "Preparation request and observed material/compile notification only; neither draw adoption nor GPU execution time",
+    "rendererId": 2
+  },
+  "requests": [
+    {
+      "request": 500,
+      "atMs": 127099.30000001192,
+      "usersOmitted": 0,
+      "users": [
+        {
+          "material": "reality glass 0 0",
+          "mesh": "reality 8111356 far reality glass 0 0",
+          "attributes": [
+            "position",
+            "normal",
+            "uv"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "reality glass 1 0",
+          "mesh": "reality 8111356 far reality glass 1 0",
+          "attributes": [
+            "position",
+            "normal",
+            "uv"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "reality glass 2 0",
+          "mesh": "reality 8111356 far reality glass 2 0",
+          "attributes": [
+            "position",
+            "normal",
+            "uv"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        }
+      ],
+      "definesSha256": "83199ce06f8a0f432b5a6db14037f5fc925b6dc1d5d8b3f6a9499a0f9914caac"
+    },
+    {
+      "request": 501,
+      "atMs": 127118.30000001192,
+      "usersOmitted": 0,
+      "users": [
+        {
+          "material": "reality far standard",
+          "mesh": "reality 53929062 far reality far standard",
+          "attributes": [
+            "position",
+            "normal",
+            "uv"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "reality far standard",
+          "mesh": "reality 53929069 far reality far standard",
+          "attributes": [
+            "position",
+            "normal",
+            "uv"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "reality far end",
+          "mesh": "reality 53929062 far reality far end",
+          "attributes": [
+            "position",
+            "normal",
+            "uv"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "reality far end",
+          "mesh": "reality 53929069 far reality far end",
+          "attributes": [
+            "position",
+            "normal",
+            "uv"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        }
+      ],
+      "definesSha256": "16590338804289c3af2aad71c8dacfade1646cc72df8e312cc405f25b0815de0"
+    },
+    {
+      "request": 502,
+      "atMs": 127151.89999997616,
+      "usersOmitted": 32,
+      "users": [
+        {
+          "material": "outdoor-artifacts:outdoor-dark-metal",
+          "mesh": "outdoor-artifact:node/4002100657:outdoor-dark-metal:both",
+          "attributes": [
+            "position",
+            "normal"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "outdoor-artifacts:outdoor-dark-metal",
+          "mesh": "outdoor-artifact:node/6798562519:outdoor-dark-metal:both",
+          "attributes": [
+            "position",
+            "normal"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "outdoor-artifacts:outdoor-dark-metal",
+          "mesh": "outdoor-artifact:node/6798562520:outdoor-dark-metal:both",
+          "attributes": [
+            "position",
+            "normal"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "outdoor-artifacts:outdoor-dark-metal",
+          "mesh": "outdoor-artifact:node/6798562521:outdoor-dark-metal:both",
+          "attributes": [
+            "position",
+            "normal"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 870,
+              "name": "mapped-lamp:ipr2024-parking-south-central",
+              "type": 0,
+              "shadowEnabled": true,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        }
+      ],
+      "definesSha256": "32fd73bbaac3f9b46b5ae4b569d79d2e51ddf7269e28566b293ada6eb6b1742f"
+    },
+    {
+      "request": 503,
+      "atMs": 132073.5,
+      "usersOmitted": 0,
+      "users": [
+        {
+          "material": "reality glass 0 0",
+          "mesh": "reality 8111356 far reality glass 0 0",
+          "attributes": [
+            "position",
+            "normal",
+            "uv"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "reality glass 1 0",
+          "mesh": "reality 8111356 far reality glass 1 0",
+          "attributes": [
+            "position",
+            "normal",
+            "uv"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "reality glass 2 0",
+          "mesh": "reality 8111356 far reality glass 2 0",
+          "attributes": [
+            "position",
+            "normal",
+            "uv"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        }
+      ],
+      "definesSha256": "b346fa2535fae3561294b68f52ff9cea3fc401a975f81fc7f7b61fa7b3229af5"
+    },
+    {
+      "request": 504,
+      "atMs": 132103.80000001192,
+      "usersOmitted": 46,
+      "users": [
+        {
+          "material": "outdoor-artifacts:outdoor-dark-metal",
+          "mesh": "outdoor-artifact:node/6798562519:outdoor-dark-metal:both",
+          "attributes": [
+            "position",
+            "normal"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "outdoor-artifacts:outdoor-dark-metal",
+          "mesh": "outdoor-artifact:node/6798562520:outdoor-dark-metal:both",
+          "attributes": [
+            "position",
+            "normal"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "outdoor-artifacts:outdoor-dark-metal",
+          "mesh": "outdoor-artifact:node/6798562521:outdoor-dark-metal:both",
+          "attributes": [
+            "position",
+            "normal"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        },
+        {
+          "material": "outdoor-artifacts:outdoor-dark-metal",
+          "mesh": "outdoor-artifact:node/6798562522:outdoor-dark-metal:both",
+          "attributes": [
+            "position",
+            "normal"
+          ],
+          "lights": [
+            {
+              "id": 14616,
+              "name": "shared car · simulated low beam",
+              "type": 2,
+              "shadowEnabled": false,
+              "falloff": 3
+            },
+            {
+              "id": 97,
+              "name": "sky",
+              "type": 3,
+              "shadowEnabled": true,
+              "falloff": 0
+            }
+          ]
+        }
+      ],
+      "definesSha256": "937e50b32d250b6fa9bced98d513664ba1e261929582f5538b3f67956998eb82"
+    }
+  ]
+}

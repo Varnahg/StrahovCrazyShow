@@ -1,0 +1,35 @@
+{
+  "edits": [
+    {
+      "from": "import { prepareLightVariants } from \"./light-preparation\";",
+      "to": "import { prepareLightVariants } from \"./light-preparation\";\nimport { RenderIncidentProfile } from \"./render-incident-profile\";"
+    },
+    {
+      "from": "  private readonly compilationProfile: WebGpuCompilationProfile;",
+      "to": "  private readonly compilationProfile: WebGpuCompilationProfile;\n  private stopProgramAttribution?: () => void;"
+    },
+    {
+      "from": "    this.compilationProfile = new WebGpuCompilationProfile(this.engine, {",
+      "to": "    this.compilationProfile = new WebGpuCompilationProfile(this.engine, {\n      onProgramAttribution: (record) => sessionDiagnostics.event(\"webgpu-program-attribution\", {\n        ...record, rendererId: this.renderHealth.rendererId,\n      }),"
+    },
+    {
+      "from": "    this.benchmark?.profile.dispose();\n    sessionDiagnostics.event(\"benchmark-start\", {",
+      "to": "    this.benchmark?.profile.dispose();\n    this.stopProgramAttribution?.();\n    // Copied diagnostic only: ordinary startup stays unchanged. The existing\n    // recorder already restricts recording to local hosts; an explicit\n    // benchmark owns this observer window independently of profileEnvironment.\n    if (sessionDiagnostics.isRecording && this.engine.isWebGPU) {\n      const incident = new RenderIncidentProfile(this.scene);\n      let detach: (() => void) | undefined;\n      const stop = () => {\n        if (this.stopProgramAttribution !== stop) return;\n        this.stopProgramAttribution = undefined;\n        try { detach?.(); }\n        finally {\n          try { this.compilationProfile.endProgramAttribution(); }\n          finally { incident.dispose(); }\n        }\n      };\n      this.stopProgramAttribution = stop;\n      try {\n        this.compilationProfile.beginProgramAttribution();\n        detach = incident.observeProgramUsers((effect, user) =>\n          this.compilationProfile.observeProgramUser(effect, user));\n      } catch (error) {\n        try { stop(); } finally { throw error; }\n      }\n    }\n    sessionDiagnostics.event(\"benchmark-start\", {"
+    },
+    {
+      "from": "    attempt(\"benchmark\", () => benchmark?.profile.dispose());",
+      "to": "    attempt(\"benchmark\", () => benchmark?.profile.dispose());\n    attempt(\"program-attribution\", () => this.stopProgramAttribution?.());"
+    },
+    {
+      "from": "        b.profile.dispose();\n        const durationSeconds",
+      "to": "        b.profile.dispose();\n        this.stopProgramAttribution?.();\n        const durationSeconds"
+    },
+    {
+      "from": "    sessionDiagnostics.event(\"game-dispose\", {});",
+      "to": "    this.stopProgramAttribution?.();\n    sessionDiagnostics.event(\"game-dispose\", {});"
+    }
+  ],
+  "inverseSha256": "32f02d0f457765719cae8ba23194e368ff709cfbf04d2580298f176e14f941b6",
+  "before": "32f02d0f457765719cae8ba23194e368ff709cfbf04d2580298f176e14f941b6",
+  "after": "a25cd280a5c1a2973a0a1ffae9494ba830ad23bec714384a8afb8e15cb7a22be"
+}
