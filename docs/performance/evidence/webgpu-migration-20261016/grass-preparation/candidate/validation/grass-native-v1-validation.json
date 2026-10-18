@@ -1,0 +1,34 @@
+{
+  "snapshotId": "8cf63e20cdf754648e48ba845031902da1cce5b3135fc9f453f65b88839f40ef",
+  "results": [
+    {
+      "phase": "build",
+      "startedAt": "2026-10-18T15:45:13.307Z",
+      "finishedAt": "2026-10-18T15:46:01.833Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\grass-native-v1-build.log",
+      "sha256": "e8118fc0dd7f86b63d46e5334d526ba5b6563cebb32eb367e8880cecd7f76b39"
+    },
+    {
+      "phase": "test",
+      "startedAt": "2026-10-18T15:46:04.938Z",
+      "finishedAt": "2026-10-18T15:49:20.175Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\grass-native-v1-test.log",
+      "sha256": "add38fd0794015391393f26d44820a412b0b47a3871e36e3e378c509fa3ce4d8"
+    },
+    {
+      "phase": "integration",
+      "startedAt": "2026-10-18T15:49:22.870Z",
+      "finishedAt": "2026-10-18T15:49:47.255Z",
+      "exitCode": 0,
+      "command": "pnpm --config.verify-deps-before-run=false test:integration",
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\grass-native-v1-integration.log",
+      "sha256": "8189817f0da70fbc349a6ea7b22b1407c99127a66c0fc00aa53be5d5095db2fc"
+    }
+  ],
+  "sharedMetadataUnchanged": true,
+  "scope": "Clean native grass preparation checkpoint: full TypeScript, production build, complete test suite and isolated integration. Source and pinned dependencies verified; only six reviewed source/test changes."
+}

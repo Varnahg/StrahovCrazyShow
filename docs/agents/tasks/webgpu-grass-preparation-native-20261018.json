@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-grass-preparation-native-20261018",
+  "title": "KEY-31: přenést ověřenou přípravu thin-instance trávy do nativních zdrojů",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/photo-grass-preparation.ts",
+    "client/photographic-grass.ts",
+    "client/vegetation.ts",
+    "tests/photo-grass-preparation.test.ts",
+    "tests/game-low-vehicle-preparation.test.ts",
+    ".cache/webgpu-grass-preparation-native-20261018/",
+    "docs/agents/handoffs/webgpu-grass-preparation-native-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přenést přesných pět vlastních souborů copied candidate-v2 manifest71529a57 nad současný native základ; Game.ts přenese root pod svou explicitní rezervací.",
+    "Zachovat jeden retained disabled FAR owner, unique Geometry a vlastní fade/wind. Žádný nový cache-map, per-frame práce, změna světel, výchozího backendu, počtu etap či timeoutů.",
+    "Zachovat všechny preimages, cizí WIP a hrané4197/4196/4195 i starší snapshoty. Bez zápisu do primary, pinned dependencies a bez commitu."
+  ],
+  "verification": [
+    "Doložit byte shodu přenesených pěti souborů s V2 a manifest původních i výsledných SHA; lightweight cílené owner/grass testy.",
+    "Game wiring, full clean/combined test/build/integration a GPU acceptance provádí root. Dítě nespouští fullsuite/build/GPU/server.",
+    "Předat samostatný handoff a manifest, ukončit pomocné procesy a uvolnit claim. Žádný rekurzivní BMAD."
+  ],
+  "notes": [
+    "BMAD spec-key-31-long-frame-gaps.md pokračuje v kroku03. Copied V2 full TypeScript/build PASS, actualowner7/7 a dřívější runtime28/28+related5/5; dvě nezávislé kontroly bez konkrétních vad.",
+    "GPU B1 proti A1: první skutečné FAR1536instances/33792triangles bez nové kompilace; kontrolní grass shluk78/189ms chybí. Novéprogramy8→6, moduly16→12, syncpipeline21→19. A2 kontrola ještě běží; native přenos není integrace ani celková přejímka.",
+    "Hlavní sourcebookkeeping a Game drží root; integrace pouze po ověřeném clean/combined checkpointu. KEY-31 zůstává otevřené.",
+    "Dílčí FAR příprava přijata po A1/B1/A2 a full clean1403/combined1463 test/build/integration PASS; runtime213a887a → maincb236094. Evidence docs/performance/evidence/webgpu-migration-20261016/grass-preparation/candidate/README.md. Celý KEY-31 a migrační cíl zůstávají otevřené; hrané snapshoty nezměněné."
+  ]
+}
