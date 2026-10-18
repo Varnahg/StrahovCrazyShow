@@ -1,3 +1,4 @@
+import { AuthoredLightPreparation } from "../client/authored-light-preparation";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -65,7 +66,7 @@ const code = ts.transpileModule(
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(
-  `(env)=>{const {PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,applyArtLighting,performance,window,document}=env;${code};return TestGame;}`,
+  `(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,applyArtLighting,performance,window,document}=env;${code};return TestGame;}`,
 ).runInThisContext();
 const anchor = Date.parse("2026-10-18T12:45:00Z");
 const select = (mode: Parameters<typeof selectLightingPreview>[0]) =>
@@ -219,6 +220,7 @@ function fixture(
   // The only engine adapter is Game's backend/scheduler routing. All material,
   // light, shadow, cache, readiness and actual draws use the real NullEngine.
   const Game = make({
+    AuthoredLightPreparation,
     PlayerFlashlight,
     Vector3,
     MeshBuilder,

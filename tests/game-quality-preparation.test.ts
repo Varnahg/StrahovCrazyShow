@@ -92,6 +92,10 @@ function fixture(mode: RenderQualityMode = "auto") {
     rendererFailed: false,
     ready: false,
     scene: { isDisposed: false },
+    actor: { position: { x: 0, y: 0, z: 0 } },
+    localId: "local",
+    avatars: new Map(),
+    updateRenderEnvironment() {},
     quality: adaptive.state.quality,
     engine: {
       isWebGPU: true,
@@ -264,7 +268,7 @@ test("retired Game does not mutate render resources during quality cleanup", asy
   const result = await f.start();
   assert.equal(result.status, "disposed");
   assert.equal(f.passes.length, 1);
-  assert.deepEqual(f.applied, ["low"]);
+  assert.deepEqual(f.applied, ["medium", "low"]);
   assert.equal(f.game.ready, false);
 });
 
