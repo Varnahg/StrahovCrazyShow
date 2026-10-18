@@ -2,8 +2,11 @@
   "schemaVersion": 1,
   "id": "webgpu-define-memo-proof-20261018",
   "title": "KEY-31: ověřit omezené memo hotového define textu",
-  "status": "ready",
-  "dependsOn": ["webgpu-material-switch-cost-proof-20261018", "webgpu-define-serializer-qa-20261018"],
+  "status": "done",
+  "dependsOn": [
+    "webgpu-material-switch-cost-proof-20261018",
+    "webgpu-define-serializer-qa-20261018"
+  ],
   "writePaths": [
     ".cache/webgpu-migration-checks/define-memo-proof-20261018/",
     "docs/agents/handoffs/webgpu-define-memo-proof-20261018.md"
@@ -27,6 +30,7 @@
     "Přímý BMAD podúkol, bez rekurzivního workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, owner webgpu-define-memo-proof-01a14497. Načíst AGENTS/policy/task a registry; claim před zápisem.",
     "Pure A/B/C manifest f3ca7da09c745b34511097c5126d08c33e0a5b6619dafda28ae1ff6641b62197; warm V2 manifest7a25099dad279c07ef5cf203004802438fe657db392bb209a7dc1a91ec1dda23. Současný raw loop a module SHA43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4 jsou reference.",
     "Root mixed-define-fixture-corpus.json v .cache/webgpu-hitch-validation-20261017 obsahuje100výskytů/49unique/max3135codeunits z fixture SHA355ec327…896f. Obsahuje baseline i canonical větve; pro actual raw předhelperem rozlišit baseline.states.defines. Canonical bloky lze použít jako explicitní already-sorted test, ne je vydávat za rawtrace.",
-    "User požaduje nepřidávat cache bez doloženého přínosu. Tento task proto nic nepřidává do hry; testuje zásadní hypotézu před jakoukoli produkční implementací. Stejný day13 GPU/startup A/B a rozhodnutí o lifetime jsou povinné až u případného dalšího kandidáta."
+    "User požaduje nepřidávat cache bez doloženého přínosu. Tento task proto nic nepřidává do hry; testuje zásadní hypotézu před jakoukoli produkční implementací. Stejný day13 GPU/startup A/B a rozhodnutí o lifetime jsou povinné až u případného dalšího kandidáta.",
+    "Root přijal izolovaný CPU proof po review []: manifest a475e6f75f1f511f59ae149cab3749446505eb260145ef871edf95b432e4deae, functional10/10, A/M18/18,6warm x5/5,54snapshots exact,TS3172/0. Whole warm−27 až−37%, churn+7.74%; pouze explicit test owner. Produkční ownership a GPU zůstávají samostatnému navazujícímu QA tasku."
   ]
 }

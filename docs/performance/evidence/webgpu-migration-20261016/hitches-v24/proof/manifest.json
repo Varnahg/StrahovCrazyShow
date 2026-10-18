@@ -1,0 +1,908 @@
+{
+  "schemaVersion": 1,
+  "task": "webgpu-define-memo-proof-20261018",
+  "owner": "webgpu-define-memo-proof-01a14497",
+  "createdAt": "2026-10-18T08:28:41.385Z",
+  "worktree": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow",
+  "branch": "codex/webgpu-migration",
+  "baseCommit": "17bc0c2",
+  "scope": "Isolated CPU proof only; no shipping cache, native/runtime/dependency mutation, or GPU proof",
+  "sourceManifest": {
+    "createdAt": "2026-10-18T08:07:15.892Z",
+    "pureManifestSha": "f3ca7da09c745b34511097c5126d08c33e0a5b6619dafda28ae1ff6641b62197",
+    "warmManifestSha": "7a25099dad279c07ef5cf203004802438fe657db392bb209a7dc1a91ec1dda23",
+    "physical": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\define-order-qa-20261018\\dependencies\\node_modules\\@babylonjs\\core\\Materials\\materialDefines.js",
+    "dependencies": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\define-order-qa-20261018\\dependencies\\node_modules",
+    "originalSha": "43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4",
+    "sourceFiles": {
+      "tests/material-defines-serialization.test.ts": "5ec6cc7e831a3b6123e0f91cc2c93fa4c413eb6f5b655eb0cfa8bb365e988e6d",
+      "tests/material-defines-wgsl-order.test.ts": "7af27e254640c67611de4f3030cdccf230245bdce44a511951fe6a4b5ff016d4",
+      "tests/fixtures/material-defines-order/scenario.ts": "ce82aa19cd9ce07a6ef26466f61ecbcfe6f172f3c94e5062881f4dbaf95b6da4",
+      "client/stable-light-state.ts": "4adfb37dae15ca6a0b9e1b65634266b6791ffc1d8c1aca01858a9557c7f7b8bc",
+      "client/gltf-light-budget.ts": "a6599ea1a18aa29e3661072083c4f77e396d21d1c85f5430d67f70c70f87fd90",
+      "client/cinematic-art.ts": "7aa011a230a17e0703ebda08ead509c6534b80af9c6dc23924a7e715c3a29b77",
+      "client/photogrammetry-lighting.ts": "9b9d67f4e79ce6648087c991c35820715800c123e26192197d5298c665aa270d",
+      "shared/render-quality.ts": "e9506573186c6d6e50af5e0db17458959ae61f808d1ad4158cdc03589ffbeada",
+      "shared/photogrammetry.ts": "1643ca85940021765e5b2ca2ad9b2b55b482b41267c2942521e226dc89b20054",
+      "shared/streets.ts": "b216be738513a39bb81c42fddacb78fa4ad0a2a6eb2da0a0879cc97d399d7da9",
+      "shared/data/streets.json": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14",
+      "shared/data/road-calibration.json": "b794e4f06f7dfa58e1ec3c34845f6b5b8a8551743231d4ad09da49c70b3e7b76",
+      "shared/data/photo-lamps.json": "138e8564ff13f84803ce562c69daca1f8c621127871a5805264ba17f1a7de781",
+      "shared/data/b6-entry-paving.json": "6d37d1172e331b5b6a41924656b1b86ace49f83822df5887671d043b72b39bf3",
+      "shared/terrain.ts": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f",
+      "shared/data/terrain-grid.json": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03",
+      "shared/data/reality-ground.json": "9a144e2556c960677ce1d486477f0730ced54455662c1075ffc081fc90a6d878",
+      "shared/terrain-patches.ts": "71bece3e3bb764b690cc59b77573fa8f60e38afae3f2e9d03cb0213b1b8b0c25",
+      "shared/data/north-court-terrain-patch.json": "8ab204a289b1eabc45359c56fca050170f1729f7832da15345ed4c2f7b35c292",
+      "client/data/photogrammetry-lighting.json": "c3d409773211ec7eebde2ecf2eccc57e52c0f6d5c8c1fdb02af9b6834c7ea9de",
+      "client/tree-wind.ts": "7ecfdb5570a86a00c727f8578e3c6d1ccd70491179375933cd28b0dbaf34f558",
+      "client/car-paint-instances.ts": "e2f3e63e78c603dbff22c7fa1b894e41de6020e66e33bd68e28b6b07c7a9ec7e",
+      "client/photo-grass-wind.ts": "0813e3f65e5e9e215b8e1628da081fd3f60924e00602ed26b90c58e213b7c8e9",
+      "client/photo-grass-transition.ts": "6f019c148b39a4697891a33112888edf317f7292a316b896bbde2efc27621e47",
+      "client/grass-material.ts": "e9bf4edbb73c6c9a23c2297f336c55d1b28a1210fcc690edc2d13c6760ea7312",
+      "client/render-shaders.ts": "e73d2d242eb18d2c876cee60f6811bc41061520eee4718d1e9eb583252e60fd0",
+      "client/avatar-hair.ts": "7ea131c5d2f053a1b4e890820c8a050696aa6e460170806a81f0847623fd0d65",
+      "shared/types.ts": "5f1385d0568ba0d008bd02fc5c3c0d2e5fea294da486b8f092c3d400edea0300",
+      "client/avatar-renderer.ts": "62586721221fb2715a1fe4712406995d644c2490c2eaebd55e3c65f0c7f6b680",
+      "client/avatar-presets.ts": "0d078d680f0525c804a8d1712a366fe1071a6a9f1357a550ae58648e896b3073",
+      "client/data/character-geometry.json": "c7ebd5b440e7b5188a6cc6223999838ac0cb03af44101a0ae62c9b6849ed75af",
+      "client/data/skinned-character-geometry.json": "8809116cd9d3f35c471f76429c863a58624126315031addb27642c22159ba8dc",
+      "client/avatar-garments.ts": "40173ae81387516755d96b8097b0b331dd1e96b5d3cf183a85b8462eed4f8f6d",
+      "client/data/student-garments.json": "03ef63d845c1027184d75fa17b219ae60133150efcdf2c68bc08031d5d8d1cba",
+      "client/avatar-eyes.ts": "37660084ef4966348d4c409426999ba64a0e93851ae50daa0e10d78c3567f0ca",
+      "client/data/student-eyes.json": "cfdc617ca51583b923fae30d15b226c8ba7f3fec6d9903246b51d9327a2a8d0e",
+      "client/avatar-skinned.ts": "acc4ff9e4d930e11909aa756f20f24d21db1f56671f115bfa415f18f849f9ae4",
+      "client/character-materials.ts": "c0b06d3bf1cc25b8ac33cf3a124c95b74fe3f99bad23a0553f6e4adb01935733",
+      "client/data/student-hair.json": "1ea53714fc6cffca8b8d91be890551e5744797a54235352763172de7144e93f3",
+      "client/data/student-hair-calibration.json": "2e2ef9e2af558f30557a12d45e362503ba6b08f79562d006460df54a89548b8e",
+      "tests/fixtures/material-defines-order/baseline.json.gz": "68cda48595cfa73bd7b1561ff5d4fbc47590d4ddcc46226f14d8221f67466858",
+      "tests/fixtures/material-defines-order/provenance.json": "59676c4dc973823809e0c76806b7c34ad231c3922852fd96273a7b30e742840e",
+      "package.json": "e1d35f209df3333959931c04ed25681db3ca4d63e919fad0ca93340b4b7b333f",
+      "tsconfig.json": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c",
+      "pnpm-workspace.yaml": "5dfd82bf6883a1c666882a3cc05a02d40b10d01eb59275919bdf392c03996748",
+      "pnpm-lock.yaml": "03d4edcd8f9d92fa7b6b320f5600709dd62612a5bad7867cef61875e7ecd8b53",
+      "patches/@babylonjs__core@9.30.0.patch": "21114f6048abdcba932a8640adf1a97b6281939d99ae6d53fbfe96ef76bf0503",
+      "warm.test.ts": "5efbbddec14bdb2b954024261127acdbcaa09e57c8d138e28968a4014f9a81e6",
+      "trace.ts": "b8ec1d9ee56e2f0e5a405d715ebeaa1e9dd0097476821ca14d74c3f996de75d0",
+      "native-engine.ts": "78706d5e5c586bc7f767f19f15248a9bdfad35c82383886a75340081aa090929",
+      "input-manifest.json": "94b3553807902a9537397009853e13e1a808b68345845ff421198d7e18c935e1"
+    },
+    "baselineSha": "355ec327227af96c64c83c354636894d0ba3e5128913d95c9716900294a4896f",
+    "mixedInventorySha": "d889b6dae9dc74ba3bfbd8374478c457f5142d90db3f1dccbd2e7a8749c044e0",
+    "modules": {
+      "reference": "1b425699ab533a4b3bd5b88639e9fc2baadfcd214f34cc062eb3714c73cf211c",
+      "memo": "009b8128300eb873086a5d6b33d59fbd965fbe60cce30db157b3d18da76bc2d8",
+      "capture": "f36514945a42de91b79f1d66fef447aee84fe7144e05d0a665274dfd367a5f65"
+    },
+    "adaptations": [
+      "exact frozen baseline source closure",
+      "post-loop return only for memo",
+      "test-only explicit owner exports; no shipping module",
+      "separate bounded untimed raw capture"
+    ],
+    "moduleDirectory": "modules-v2",
+    "reason": "Preserve exact public core namespace. Owner API is separate test module; original18assertions unchanged.",
+    "previousInputSha": "6f59d69dcd3c0cfa5f685cdb9f58ff74928f1ef12db86755eaa7fbe1d5671c98"
+  },
+  "validation": {
+    "functional": "10/10",
+    "nativeRegression": {
+      "reference": "18/18",
+      "memo": "18/18"
+    },
+    "warmFreshProcesses": "6 x 5/5",
+    "microFreshProcesses": "6 x exit 0",
+    "crossVariantSnapshots": "54/54 exact",
+    "scopedTypeScript": {
+      "files": 3172,
+      "errors": 0,
+      "log": "types-01.log",
+      "completionAt": "2026-10-18T08:15:56.643Z",
+      "startAt": null
+    },
+    "negativeEvidence": [
+      "regression-reference-class.log: V1 fixture namespace 5 PASS/1 FAIL, assertion retained and V2 fixed",
+      "analysis-01.log: initial analysis script syntax error; raw results unchanged",
+      "cap-plus-churn: 0 hits and approximately 7.74 percent slower full serializer",
+      "unique misses/unknown helper overhead; details in report.md"
+    ],
+    "processes": "All own child processes finished; parent notified CPU window released before this metadata freeze"
+  },
+  "junctions": [
+    {
+      "path": "node_modules",
+      "target": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\define-order-qa-20261018\\dependencies\\node_modules"
+    },
+    {
+      "path": "fixture/node_modules",
+      "target": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\define-order-qa-20261018\\dependencies\\node_modules"
+    }
+  ],
+  "handoff": {
+    "path": "docs/agents/handoffs/webgpu-define-memo-proof-20261018.md",
+    "bytes": 9148,
+    "sha256": "b1c54ac8a7d19400ce025fac0b99f584122a170248458a2460e4422aa346b225"
+  },
+  "files": [
+    {
+      "path": "analysis-01.log",
+      "bytes": 2112,
+      "sha256": "2db0a013feedda9d6ccc8b5ff2ff7c4a0868ca6f12805eb86c7bb60b273d072a"
+    },
+    {
+      "path": "analysis-02.log",
+      "bytes": 3309,
+      "sha256": "4ae78b3a10a2dd085e4ff881705aa7d4b22f5ab116f0f2cf839593089e4623ac"
+    },
+    {
+      "path": "analyze.mjs",
+      "bytes": 5628,
+      "sha256": "479d2b2f7e7d398a78b1f017434757e03e1473c28132cce7b366070af950a0bb"
+    },
+    {
+      "path": "attach-hooks.mjs",
+      "bytes": 1073,
+      "sha256": "a2ccda2b4d8b5094a17ef9379f7f70009cea75d68523ec8004d873c9f3c5e1c2"
+    },
+    {
+      "path": "capture-01-owners.json",
+      "bytes": 331705,
+      "sha256": "3951e38a09e3f0077ddb0799b5937c8f6cef2c6f169c84c6510b5d2855214608"
+    },
+    {
+      "path": "capture-01-source.json",
+      "bytes": 505,
+      "sha256": "799d8d156e642c21a7e941831a5336c2bfdc6aaa15ea8735cf56df3cbf6d0243"
+    },
+    {
+      "path": "capture-01-warm.json",
+      "bytes": 1159576,
+      "sha256": "3e92865ff22cc99e0d71632487d56318775022c64f6f4f0768d113b5e71b1c5a"
+    },
+    {
+      "path": "capture-01.log",
+      "bytes": 700,
+      "sha256": "3e461df471d09946f9e1b8956aea0c68096899a7875963a31b44b84f03486db6"
+    },
+    {
+      "path": "capture-02-owners.json",
+      "bytes": 331705,
+      "sha256": "3951e38a09e3f0077ddb0799b5937c8f6cef2c6f169c84c6510b5d2855214608"
+    },
+    {
+      "path": "capture-02-source.json",
+      "bytes": 505,
+      "sha256": "f17b762ebf17a4c39b2d53a93d88bbe92edd4c7bc7a3a417b8a4e52f9197f479"
+    },
+    {
+      "path": "capture-02-warm.json",
+      "bytes": 1159492,
+      "sha256": "18068fca2c7d8fba189a1c3095e1e71ae1de557e05114946f6e2da78d78af253"
+    },
+    {
+      "path": "capture-02.log",
+      "bytes": 698,
+      "sha256": "4f779ca0437a9ea85caf57c676f0ab49c62029ee839abcee3c6121fa5f54535e"
+    },
+    {
+      "path": "capture-runs.json",
+      "bytes": 1795,
+      "sha256": "dbcadaa944cf6c0866fd61e6080e789fb19394cdf44833206c41ca73ce870868"
+    },
+    {
+      "path": "capture-v2-runs.json",
+      "bytes": 1895,
+      "sha256": "19726ac8a0814d04d504cd31a9a31c23debec091a77d8eac6ce27532581367d1"
+    },
+    {
+      "path": "decision.md",
+      "bytes": 3118,
+      "sha256": "41256821c549407ce1838f5a7350e03d60b18fdae51f2445dac815fea41b02c4"
+    },
+    {
+      "path": "fixture-adaptations.json",
+      "bytes": 949,
+      "sha256": "2111aada7b1fa332b3d9508282ff568cd9665ac1a23fec8237a9cfcd6726ea29"
+    },
+    {
+      "path": "fixture/client/avatar-eyes.ts",
+      "bytes": 1981,
+      "sha256": "37660084ef4966348d4c409426999ba64a0e93851ae50daa0e10d78c3567f0ca"
+    },
+    {
+      "path": "fixture/client/avatar-garments.ts",
+      "bytes": 9022,
+      "sha256": "40173ae81387516755d96b8097b0b331dd1e96b5d3cf183a85b8462eed4f8f6d"
+    },
+    {
+      "path": "fixture/client/avatar-hair.ts",
+      "bytes": 7914,
+      "sha256": "7ea131c5d2f053a1b4e890820c8a050696aa6e460170806a81f0847623fd0d65"
+    },
+    {
+      "path": "fixture/client/avatar-presets.ts",
+      "bytes": 3039,
+      "sha256": "0d078d680f0525c804a8d1712a366fe1071a6a9f1357a550ae58648e896b3073"
+    },
+    {
+      "path": "fixture/client/avatar-renderer.ts",
+      "bytes": 25638,
+      "sha256": "62586721221fb2715a1fe4712406995d644c2490c2eaebd55e3c65f0c7f6b680"
+    },
+    {
+      "path": "fixture/client/avatar-skinned.ts",
+      "bytes": 5822,
+      "sha256": "acc4ff9e4d930e11909aa756f20f24d21db1f56671f115bfa415f18f849f9ae4"
+    },
+    {
+      "path": "fixture/client/car-paint-instances.ts",
+      "bytes": 4890,
+      "sha256": "e2f3e63e78c603dbff22c7fa1b894e41de6020e66e33bd68e28b6b07c7a9ec7e"
+    },
+    {
+      "path": "fixture/client/cinematic-art.ts",
+      "bytes": 12250,
+      "sha256": "7aa011a230a17e0703ebda08ead509c6534b80af9c6dc23924a7e715c3a29b77"
+    },
+    {
+      "path": "fixture/client/data/character-geometry.json",
+      "bytes": 593586,
+      "sha256": "c7ebd5b440e7b5188a6cc6223999838ac0cb03af44101a0ae62c9b6849ed75af"
+    },
+    {
+      "path": "fixture/client/data/photogrammetry-lighting.json",
+      "bytes": 13204,
+      "sha256": "c3d409773211ec7eebde2ecf2eccc57e52c0f6d5c8c1fdb02af9b6834c7ea9de"
+    },
+    {
+      "path": "fixture/client/data/skinned-character-geometry.json",
+      "bytes": 3932427,
+      "sha256": "8809116cd9d3f35c471f76429c863a58624126315031addb27642c22159ba8dc"
+    },
+    {
+      "path": "fixture/client/data/student-eyes.json",
+      "bytes": 78067,
+      "sha256": "cfdc617ca51583b923fae30d15b226c8ba7f3fec6d9903246b51d9327a2a8d0e"
+    },
+    {
+      "path": "fixture/client/data/student-garments.json",
+      "bytes": 9067255,
+      "sha256": "03ef63d845c1027184d75fa17b219ae60133150efcdf2c68bc08031d5d8d1cba"
+    },
+    {
+      "path": "fixture/client/data/student-hair-calibration.json",
+      "bytes": 735,
+      "sha256": "2e2ef9e2af558f30557a12d45e362503ba6b08f79562d006460df54a89548b8e"
+    },
+    {
+      "path": "fixture/client/data/student-hair.json",
+      "bytes": 3145429,
+      "sha256": "1ea53714fc6cffca8b8d91be890551e5744797a54235352763172de7144e93f3"
+    },
+    {
+      "path": "fixture/client/gltf-light-budget.ts",
+      "bytes": 18374,
+      "sha256": "a6599ea1a18aa29e3661072083c4f77e396d21d1c85f5430d67f70c70f87fd90"
+    },
+    {
+      "path": "fixture/client/grass-material.ts",
+      "bytes": 5769,
+      "sha256": "e9bf4edbb73c6c9a23c2297f336c55d1b28a1210fcc690edc2d13c6760ea7312"
+    },
+    {
+      "path": "fixture/client/character-materials.ts",
+      "bytes": 7351,
+      "sha256": "c0b06d3bf1cc25b8ac33cf3a124c95b74fe3f99bad23a0553f6e4adb01935733"
+    },
+    {
+      "path": "fixture/client/photo-grass-transition.ts",
+      "bytes": 759,
+      "sha256": "6f019c148b39a4697891a33112888edf317f7292a316b896bbde2efc27621e47"
+    },
+    {
+      "path": "fixture/client/photo-grass-wind.ts",
+      "bytes": 6803,
+      "sha256": "0813e3f65e5e9e215b8e1628da081fd3f60924e00602ed26b90c58e213b7c8e9"
+    },
+    {
+      "path": "fixture/client/photogrammetry-lighting.ts",
+      "bytes": 16898,
+      "sha256": "9b9d67f4e79ce6648087c991c35820715800c123e26192197d5298c665aa270d"
+    },
+    {
+      "path": "fixture/client/render-shaders.ts",
+      "bytes": 1542,
+      "sha256": "e73d2d242eb18d2c876cee60f6811bc41061520eee4718d1e9eb583252e60fd0"
+    },
+    {
+      "path": "fixture/client/stable-light-state.ts",
+      "bytes": 8159,
+      "sha256": "4adfb37dae15ca6a0b9e1b65634266b6791ffc1d8c1aca01858a9557c7f7b8bc"
+    },
+    {
+      "path": "fixture/client/tree-wind.ts",
+      "bytes": 3873,
+      "sha256": "7ecfdb5570a86a00c727f8578e3c6d1ccd70491179375933cd28b0dbaf34f558"
+    },
+    {
+      "path": "fixture/input-manifest.json",
+      "bytes": 1371,
+      "sha256": "94b3553807902a9537397009853e13e1a808b68345845ff421198d7e18c935e1"
+    },
+    {
+      "path": "fixture/native-engine.ts",
+      "bytes": 1267,
+      "sha256": "78706d5e5c586bc7f767f19f15248a9bdfad35c82383886a75340081aa090929"
+    },
+    {
+      "path": "fixture/package.json",
+      "bytes": 1340,
+      "sha256": "e1d35f209df3333959931c04ed25681db3ca4d63e919fad0ca93340b4b7b333f"
+    },
+    {
+      "path": "fixture/patches/@babylonjs__core@9.30.0.patch",
+      "bytes": 12130,
+      "sha256": "21114f6048abdcba932a8640adf1a97b6281939d99ae6d53fbfe96ef76bf0503"
+    },
+    {
+      "path": "fixture/pnpm-lock.yaml",
+      "bytes": 60408,
+      "sha256": "03d4edcd8f9d92fa7b6b320f5600709dd62612a5bad7867cef61875e7ecd8b53"
+    },
+    {
+      "path": "fixture/pnpm-workspace.yaml",
+      "bytes": 159,
+      "sha256": "5dfd82bf6883a1c666882a3cc05a02d40b10d01eb59275919bdf392c03996748"
+    },
+    {
+      "path": "fixture/shared/data/b6-entry-paving.json",
+      "bytes": 2468,
+      "sha256": "6d37d1172e331b5b6a41924656b1b86ace49f83822df5887671d043b72b39bf3"
+    },
+    {
+      "path": "fixture/shared/data/north-court-terrain-patch.json",
+      "bytes": 30228,
+      "sha256": "8ab204a289b1eabc45359c56fca050170f1729f7832da15345ed4c2f7b35c292"
+    },
+    {
+      "path": "fixture/shared/data/photo-lamps.json",
+      "bytes": 2222,
+      "sha256": "138e8564ff13f84803ce562c69daca1f8c621127871a5805264ba17f1a7de781"
+    },
+    {
+      "path": "fixture/shared/data/reality-ground.json",
+      "bytes": 48903,
+      "sha256": "9a144e2556c960677ce1d486477f0730ced54455662c1075ffc081fc90a6d878"
+    },
+    {
+      "path": "fixture/shared/data/road-calibration.json",
+      "bytes": 22851,
+      "sha256": "b794e4f06f7dfa58e1ec3c34845f6b5b8a8551743231d4ad09da49c70b3e7b76"
+    },
+    {
+      "path": "fixture/shared/data/streets.json",
+      "bytes": 973837,
+      "sha256": "d1d9d27cfbd0cb62a4d1be9c3d1e1eff774e126fc257d61d1e32d51c6c687b14"
+    },
+    {
+      "path": "fixture/shared/data/terrain-grid.json",
+      "bytes": 318259,
+      "sha256": "5f4b45cf22507bbafdba96c17e4fb19e5c5e5188b85b2e55ec666b03109a7e03"
+    },
+    {
+      "path": "fixture/shared/photogrammetry.ts",
+      "bytes": 12275,
+      "sha256": "1643ca85940021765e5b2ca2ad9b2b55b482b41267c2942521e226dc89b20054"
+    },
+    {
+      "path": "fixture/shared/render-quality.ts",
+      "bytes": 2312,
+      "sha256": "e9506573186c6d6e50af5e0db17458959ae61f808d1ad4158cdc03589ffbeada"
+    },
+    {
+      "path": "fixture/shared/streets.ts",
+      "bytes": 14861,
+      "sha256": "b216be738513a39bb81c42fddacb78fa4ad0a2a6eb2da0a0879cc97d399d7da9"
+    },
+    {
+      "path": "fixture/shared/terrain-patches.ts",
+      "bytes": 2188,
+      "sha256": "71bece3e3bb764b690cc59b77573fa8f60e38afae3f2e9d03cb0213b1b8b0c25"
+    },
+    {
+      "path": "fixture/shared/terrain.ts",
+      "bytes": 14152,
+      "sha256": "22b4a167879f43816d3a8f681167425f341b4d839bd7a0d1eef966d03bbf160f"
+    },
+    {
+      "path": "fixture/shared/types.ts",
+      "bytes": 2497,
+      "sha256": "5f1385d0568ba0d008bd02fc5c3c0d2e5fea294da486b8f092c3d400edea0300"
+    },
+    {
+      "path": "fixture/tests/fixtures/material-defines-order/baseline.json.gz",
+      "bytes": 1370891,
+      "sha256": "68cda48595cfa73bd7b1561ff5d4fbc47590d4ddcc46226f14d8221f67466858"
+    },
+    {
+      "path": "fixture/tests/fixtures/material-defines-order/provenance.json",
+      "bytes": 1717,
+      "sha256": "59676c4dc973823809e0c76806b7c34ad231c3922852fd96273a7b30e742840e"
+    },
+    {
+      "path": "fixture/tests/fixtures/material-defines-order/scenario.ts",
+      "bytes": 16342,
+      "sha256": "ce82aa19cd9ce07a6ef26466f61ecbcfe6f172f3c94e5062881f4dbaf95b6da4"
+    },
+    {
+      "path": "fixture/tests/material-defines-serialization.test.ts",
+      "bytes": 5257,
+      "sha256": "b13bfc4c9dd4a54ff8377fb647f75191d4ae92030d612d52b75df6cd71f3642d"
+    },
+    {
+      "path": "fixture/tests/material-defines-wgsl-order.test.ts",
+      "bytes": 5349,
+      "sha256": "451a2a8272288b8c37ba11afca2e783f9673e6a98d0e2a327d318d56ff45fca1"
+    },
+    {
+      "path": "fixture/trace.ts",
+      "bytes": 6035,
+      "sha256": "b8ec1d9ee56e2f0e5a405d715ebeaa1e9dd0097476821ca14d74c3f996de75d0"
+    },
+    {
+      "path": "fixture/tsconfig.json",
+      "bytes": 572,
+      "sha256": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c"
+    },
+    {
+      "path": "fixture/warm.test.ts",
+      "bytes": 18824,
+      "sha256": "8fd18a1bc324d035f26db7ad3de931f7de6c9b4e802b0f4297bc4dc4cf1c4a0e"
+    },
+    {
+      "path": "freeze-attempt1-note.md",
+      "bytes": 1412,
+      "sha256": "146c2a3033c1d2afa9028d1ec5d53a63c991aa5e0c6cf501568e378800a662e9"
+    },
+    {
+      "path": "freeze.mjs",
+      "bytes": 6811,
+      "sha256": "ceae499a15dde0f8c1968f50abe3beeceb118f01dd399e74959aaac8cd880a8c"
+    },
+    {
+      "path": "functional-01.log",
+      "bytes": 1044,
+      "sha256": "025a3076562040973accbef37dec953c0cfb8aad7f654004cb9081f2217a4026"
+    },
+    {
+      "path": "functional.test.mjs",
+      "bytes": 9172,
+      "sha256": "cc1f0b9ae440631b40d2843da1a7f58e6526ed99ab65fa3a0a6e64611a86c1be"
+    },
+    {
+      "path": "input-manifest.json",
+      "bytes": 6683,
+      "sha256": "6f59d69dcd3c0cfa5f685cdb9f58ff74928f1ef12db86755eaa7fbe1d5671c98"
+    },
+    {
+      "path": "input-v2.json",
+      "bytes": 6928,
+      "sha256": "92fb14cdd77258b987a916b554b85d2e268080f8a5726edd65efb03056463511"
+    },
+    {
+      "path": "loader.mjs",
+      "bytes": 1172,
+      "sha256": "2bbccdcb2dc8d0c9a94419bd2d878705dcfa760e393aeaf7ca6753ad22bf273f"
+    },
+    {
+      "path": "memo-owner.mjs",
+      "bytes": 2545,
+      "sha256": "7ecc8f334340313d7f3d3ab06f0538eb0aa8c9344a19efa5f6c975d736327b7f"
+    },
+    {
+      "path": "micro-01-reference.json",
+      "bytes": 18945,
+      "sha256": "e63feb3b7ed044f6b5808cd1cffa8d15bb55ef7c68e0728aef69a18cfb662832"
+    },
+    {
+      "path": "micro-01-reference.log",
+      "bytes": 517,
+      "sha256": "c59d6d0d8b684155c593de533169acba07935ca8613d44326bbee35d4873e6e6"
+    },
+    {
+      "path": "micro-02-memo.json",
+      "bytes": 19277,
+      "sha256": "5926d581353658b561a1da9addc742def524a07ae0eb0864d919d8d5f8b19a7d"
+    },
+    {
+      "path": "micro-02-memo.log",
+      "bytes": 502,
+      "sha256": "4e956fa5b927375a5463acb889498e4ec44e4ccd13887ad8f07345cdaf962f6d"
+    },
+    {
+      "path": "micro-03-memo.json",
+      "bytes": 19270,
+      "sha256": "293b3fa09fc147d46bc3d18aca533c409ae77c64427f2016f4f7cf2c93ea072e"
+    },
+    {
+      "path": "micro-03-memo.log",
+      "bytes": 500,
+      "sha256": "c597a9171c006cb82c1aa12cc190f6204b67355b15ba1fd40d9ee3516ef27687"
+    },
+    {
+      "path": "micro-04-reference.json",
+      "bytes": 18941,
+      "sha256": "1caf379193848420d9ef4c02c9e9bc433b2eeff0e686ec406354623f8fdd8d5a"
+    },
+    {
+      "path": "micro-04-reference.log",
+      "bytes": 496,
+      "sha256": "426bd1b76ffb09b0139479cf65fc9ea9908ec298bd144be7d070a7ba0fb6988c"
+    },
+    {
+      "path": "micro-05-reference.json",
+      "bytes": 18984,
+      "sha256": "c6666f348047bd1df8793459a1a64801dc758c5000b1cbda8e93b6b5b1b5837a"
+    },
+    {
+      "path": "micro-05-reference.log",
+      "bytes": 518,
+      "sha256": "d0427567a9ff965c346509982b02d79fd94050348c9e5b93c598a71f8bcf177b"
+    },
+    {
+      "path": "micro-06-memo.json",
+      "bytes": 19257,
+      "sha256": "537fee3cd563b9e4d0cc0010941efd567dada6e8aa74c4c6ba453a3c8aedab17"
+    },
+    {
+      "path": "micro-06-memo.log",
+      "bytes": 503,
+      "sha256": "1ac53531f943780ce5f1cdc2ee7789fbc1a4d61c722d02d051e9a06255f17c81"
+    },
+    {
+      "path": "micro.mjs",
+      "bytes": 4779,
+      "sha256": "96b46b1b9abd2be1036f78ae7cf5e56ec96c7a3ab39941151e88673fcc453fa3"
+    },
+    {
+      "path": "mixed-blocks.json",
+      "bytes": 1016997,
+      "sha256": "256e04795d6d45c3ee2dea82630087b35752580d544fb07827cd4f79f3a637ed"
+    },
+    {
+      "path": "modules-v2/capture.mjs",
+      "bytes": 9170,
+      "sha256": "f36514945a42de91b79f1d66fef447aee84fe7144e05d0a665274dfd367a5f65"
+    },
+    {
+      "path": "modules-v2/memo.mjs",
+      "bytes": 9124,
+      "sha256": "009b8128300eb873086a5d6b33d59fbd965fbe60cce30db157b3d18da76bc2d8"
+    },
+    {
+      "path": "modules-v2/reference.mjs",
+      "bytes": 9129,
+      "sha256": "1b425699ab533a4b3bd5b88639e9fc2baadfcd214f34cc062eb3714c73cf211c"
+    },
+    {
+      "path": "modules/capture.mjs",
+      "bytes": 9593,
+      "sha256": "8747320d87081ae8d14d870abda2fe41cea868283696e2b034f547aa614ba689"
+    },
+    {
+      "path": "modules/memo.mjs",
+      "bytes": 9549,
+      "sha256": "33e04def5615fac681311165d1a7e239475547f5793e38e2f5b0eb5f3fee3d8e"
+    },
+    {
+      "path": "modules/reference.mjs",
+      "bytes": 9552,
+      "sha256": "78795edcc12b9441d26bb86624062de3f49582c4f39a2e991d7622e970078470"
+    },
+    {
+      "path": "owner-control.mjs",
+      "bytes": 713,
+      "sha256": "cca80166bba025a05250b4200d0a1a56aeb83c9dac4eb8be502254dec64ca0c0"
+    },
+    {
+      "path": "package.json",
+      "bytes": 18,
+      "sha256": "1239d4d885dcad42201a27ed9324f8f0f760b78700d8db9ced39a511cffe7eae"
+    },
+    {
+      "path": "prepare-v2.mjs",
+      "bytes": 1558,
+      "sha256": "d9e9cab46150369757a7e92167fc9643eeeedfc0f59df561e07d4bd659ce3d6f"
+    },
+    {
+      "path": "prepare.mjs",
+      "bytes": 5283,
+      "sha256": "6a41bfd24fd7ea704d27588d5e303d5057ef04817820ce8e11ae4624805b0ac4"
+    },
+    {
+      "path": "reference-harness.mjs",
+      "bytes": 15918,
+      "sha256": "ba069770971422b90fff93c69212b53e4184ecd80273ea100582f30df63c6fb7"
+    },
+    {
+      "path": "reference.js",
+      "bytes": 8894,
+      "sha256": "43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4"
+    },
+    {
+      "path": "regression-reference-class-owners.json",
+      "bytes": 5788,
+      "sha256": "9023ce4377381ccc8ce01efcf81a6e87bbc0f779adf115d58d06c1eda470bd28"
+    },
+    {
+      "path": "regression-reference-class-source.json",
+      "bytes": 507,
+      "sha256": "80f0461d7e656cd9856d9922c5613dee31c1771db17503a81826dd2e6096f093"
+    },
+    {
+      "path": "regression-reference-class.log",
+      "bytes": 1763,
+      "sha256": "794e12fbac3be781b9b56352cf2819991f6e519836a85bfd983b243785bff9b7"
+    },
+    {
+      "path": "regression-runs.json",
+      "bytes": 2054,
+      "sha256": "d90611150280542b6c7b991a249f8dae04cb6717c2a65ab9fb081b689df0ee49"
+    },
+    {
+      "path": "regression-v2-memo-class-owners.json",
+      "bytes": 5816,
+      "sha256": "cea2591da3f5022929448c330943045f0a3037131984c5e679c82f348b0e0343"
+    },
+    {
+      "path": "regression-v2-memo-class-source.json",
+      "bytes": 502,
+      "sha256": "a3042ada7d272cc97e091a2a0cfaf1e996de113c6c754c88d8e1c11d2854682d"
+    },
+    {
+      "path": "regression-v2-memo-class.log",
+      "bytes": 676,
+      "sha256": "127664506c0e8a72cb05d53f131b92a63f8ddcf043bcd83bd782eaa5f2859bbe"
+    },
+    {
+      "path": "regression-v2-memo-wgsl-owners.json",
+      "bytes": 11451,
+      "sha256": "c4788f9805ed62d6fa29421f8d0dd9bc75e1c199786883086e0b4619f3fd5d1b"
+    },
+    {
+      "path": "regression-v2-memo-wgsl-report.json",
+      "bytes": 9394918,
+      "sha256": "18b7104d08ba3908c5c422a81cbd961b65b9d6e753afdb75d788861f829d94e2"
+    },
+    {
+      "path": "regression-v2-memo-wgsl-source.json",
+      "bytes": 502,
+      "sha256": "a3042ada7d272cc97e091a2a0cfaf1e996de113c6c754c88d8e1c11d2854682d"
+    },
+    {
+      "path": "regression-v2-memo-wgsl.log",
+      "bytes": 1678,
+      "sha256": "24b3fb648f57e28bd01836d3eab4715442122a914490510752601ee72c18fbfc"
+    },
+    {
+      "path": "regression-v2-reference-class-owners.json",
+      "bytes": 5788,
+      "sha256": "9023ce4377381ccc8ce01efcf81a6e87bbc0f779adf115d58d06c1eda470bd28"
+    },
+    {
+      "path": "regression-v2-reference-class-source.json",
+      "bytes": 507,
+      "sha256": "898d76acde2b2ff3e762b9a69edea59047838bb7d303c0a444d7f728cab8b6e6"
+    },
+    {
+      "path": "regression-v2-reference-class.log",
+      "bytes": 677,
+      "sha256": "2e073320aa63c9688aa66c50e908635be349d27430148591ba5a233768a15657"
+    },
+    {
+      "path": "regression-v2-reference-wgsl-owners.json",
+      "bytes": 11324,
+      "sha256": "391b42a5077d3997ac3c4f81e25e6e554d07e92a055b3a6aca8a574825367dc8"
+    },
+    {
+      "path": "regression-v2-reference-wgsl-report.json",
+      "bytes": 9394918,
+      "sha256": "a7125b7a9b3096752f96bed9b873ce1ce124ba883f79db7c8df9e12fe6c4d816"
+    },
+    {
+      "path": "regression-v2-reference-wgsl-source.json",
+      "bytes": 507,
+      "sha256": "898d76acde2b2ff3e762b9a69edea59047838bb7d303c0a444d7f728cab8b6e6"
+    },
+    {
+      "path": "regression-v2-reference-wgsl.log",
+      "bytes": 1680,
+      "sha256": "557ac46981b91fa4c513db7e7640ed78ea296f06f55185cc3f8cc6f5381cb4e1"
+    },
+    {
+      "path": "regression-v2-runs.json",
+      "bytes": 8459,
+      "sha256": "b24944d83998cea5950571545dd74b1a52e13e0392e1e763f39455c05c605399"
+    },
+    {
+      "path": "report.md",
+      "bytes": 10149,
+      "sha256": "4e1a9932d1917382f0f41d99e67a3e3d392125af9854ca2cf7de5eeb5ad9cdf1"
+    },
+    {
+      "path": "review-v1/freeze-metadata-attempt1.mjs",
+      "bytes": 6721,
+      "sha256": "2fafec4cd841438519df637b31478b43ae8e6ee67bbcdd25e1f6bcad3bd5eac8"
+    },
+    {
+      "path": "review-v1/loader.mjs",
+      "bytes": 1166,
+      "sha256": "2b3986fa4d35225ef2c462eb815fc970542cdf31eaf794f8cacb34af460e84f4"
+    },
+    {
+      "path": "review-v1/micro.mjs",
+      "bytes": 4740,
+      "sha256": "1aebae405bf2ba749094c30bf18f9aff27f315570428907da09c16f00aee37ec"
+    },
+    {
+      "path": "review-v1/scope-hooks.mjs",
+      "bytes": 1750,
+      "sha256": "160c7b975a25c77378491184531c25e18c85b19aabf139e55df27749dfce70cc"
+    },
+    {
+      "path": "run.mjs",
+      "bytes": 2684,
+      "sha256": "efa527cdb3dde5ddb9ab991a1515abff1f08d3c807b695a899daa7312a67613a"
+    },
+    {
+      "path": "scope-hooks.mjs",
+      "bytes": 1769,
+      "sha256": "7c0b275fc46e3858026617476bed7d4d06b30c047be9ff3386ed79594ee7097b"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 143982,
+      "sha256": "f8289cab72ea8a00e4f15256e78c4db18097d0940d0e17d81466172c52fa40ae"
+    },
+    {
+      "path": "timed-runs.json",
+      "bytes": 19410,
+      "sha256": "85a59b958983f3667a9fc15285d8c3eac755d1d43615607f3ed16c24043671cf"
+    },
+    {
+      "path": "types-01.log",
+      "bytes": 148,
+      "sha256": "d2773995cdaebec477d34293a464d45e4fcafd2f9c47b82b16f72f1cecf393d7"
+    },
+    {
+      "path": "types.mjs",
+      "bytes": 1046,
+      "sha256": "c55764d9138fef209ed37bb89476b3011f490b9fa7421c8bd29c59830726ff22"
+    },
+    {
+      "path": "validation-integrity.json",
+      "bytes": 97579,
+      "sha256": "cbdfec255df7eaa1cf9a8729431b3b0d2096e5f7ccf18269172c6a48bd5f04bc"
+    },
+    {
+      "path": "warm-01-reference-owners.json",
+      "bytes": 4736,
+      "sha256": "8b9976a3e70937ce1a6d0221ca04d5db3ef2fddb3ab9cf5540c9f2c8f19b3354"
+    },
+    {
+      "path": "warm-01-reference-source.json",
+      "bytes": 507,
+      "sha256": "898d76acde2b2ff3e762b9a69edea59047838bb7d303c0a444d7f728cab8b6e6"
+    },
+    {
+      "path": "warm-01-reference.json",
+      "bytes": 1159517,
+      "sha256": "23ce31f49d288a1d77e0df212be29ee58806fd4f9e5f24eb1780052580bcd7be"
+    },
+    {
+      "path": "warm-01-reference.log",
+      "bytes": 699,
+      "sha256": "b72b454b1a37f3762142ad71bb16ce6f6b30fcb4f222cfc869b161993dde507f"
+    },
+    {
+      "path": "warm-02-memo-owners.json",
+      "bytes": 4808,
+      "sha256": "64b8480fbd20d5e0520977398d2e28a2c98f67e285ac8c4aee8caba30c054d86"
+    },
+    {
+      "path": "warm-02-memo-source.json",
+      "bytes": 502,
+      "sha256": "a3042ada7d272cc97e091a2a0cfaf1e996de113c6c754c88d8e1c11d2854682d"
+    },
+    {
+      "path": "warm-02-memo.json",
+      "bytes": 1159642,
+      "sha256": "00644eaa26d13174db1db719778e46299857e5f3f5b42a29380a8b9299f5549c"
+    },
+    {
+      "path": "warm-02-memo.log",
+      "bytes": 696,
+      "sha256": "d009e609b585dcadde42dfca8a4484d39184b1d35155402fb007b874a9da81a5"
+    },
+    {
+      "path": "warm-03-memo-owners.json",
+      "bytes": 4808,
+      "sha256": "64b8480fbd20d5e0520977398d2e28a2c98f67e285ac8c4aee8caba30c054d86"
+    },
+    {
+      "path": "warm-03-memo-source.json",
+      "bytes": 502,
+      "sha256": "a3042ada7d272cc97e091a2a0cfaf1e996de113c6c754c88d8e1c11d2854682d"
+    },
+    {
+      "path": "warm-03-memo.json",
+      "bytes": 1159605,
+      "sha256": "ada7c9ea5f4e75da82d43edb826cb9f0d5377990655b5be7d8f00d34db5963c1"
+    },
+    {
+      "path": "warm-03-memo.log",
+      "bytes": 698,
+      "sha256": "178764ba7b9359f2cf4cf9187d75eba8d9adef6a43599c610a1f6bf5e4c73310"
+    },
+    {
+      "path": "warm-04-reference-owners.json",
+      "bytes": 4736,
+      "sha256": "8b9976a3e70937ce1a6d0221ca04d5db3ef2fddb3ab9cf5540c9f2c8f19b3354"
+    },
+    {
+      "path": "warm-04-reference-source.json",
+      "bytes": 507,
+      "sha256": "898d76acde2b2ff3e762b9a69edea59047838bb7d303c0a444d7f728cab8b6e6"
+    },
+    {
+      "path": "warm-04-reference.json",
+      "bytes": 1159562,
+      "sha256": "682fa13df533e3700ed6954d35cd2e8b98dc4b0621b7d9704df1e19d4ddd2b8c"
+    },
+    {
+      "path": "warm-04-reference.log",
+      "bytes": 699,
+      "sha256": "464e281899e22a64e429023bf0025adce60cb65d7b1c2064e302f9306d735bb4"
+    },
+    {
+      "path": "warm-05-reference-owners.json",
+      "bytes": 4736,
+      "sha256": "8b9976a3e70937ce1a6d0221ca04d5db3ef2fddb3ab9cf5540c9f2c8f19b3354"
+    },
+    {
+      "path": "warm-05-reference-source.json",
+      "bytes": 507,
+      "sha256": "898d76acde2b2ff3e762b9a69edea59047838bb7d303c0a444d7f728cab8b6e6"
+    },
+    {
+      "path": "warm-05-reference.json",
+      "bytes": 1159559,
+      "sha256": "429270158b02bb7a936c60a4c97e426e30aeda0a46f242f967496be7d4c8e62c"
+    },
+    {
+      "path": "warm-05-reference.log",
+      "bytes": 698,
+      "sha256": "d0ca7860f0e4142fefde2ae073f542be4b3b1165a7705ec7ba54a148558a79f8"
+    },
+    {
+      "path": "warm-06-memo-owners.json",
+      "bytes": 4808,
+      "sha256": "64b8480fbd20d5e0520977398d2e28a2c98f67e285ac8c4aee8caba30c054d86"
+    },
+    {
+      "path": "warm-06-memo-source.json",
+      "bytes": 502,
+      "sha256": "a3042ada7d272cc97e091a2a0cfaf1e996de113c6c754c88d8e1c11d2854682d"
+    },
+    {
+      "path": "warm-06-memo.json",
+      "bytes": 1159668,
+      "sha256": "8b9ab816f570e193ca7308db6c369aff0cfcd970ec98df7970c231c1f00a68af"
+    },
+    {
+      "path": "warm-06-memo.log",
+      "bytes": 697,
+      "sha256": "9c399d561acc345d80e84da59adb25ffb902e199535163ad1c418375d5754733"
+    }
+  ]
+}

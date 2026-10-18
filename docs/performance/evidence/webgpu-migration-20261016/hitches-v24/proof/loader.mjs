@@ -1,0 +1,11 @@
+import {registerHooks} from 'node:module';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {dirname,resolve} from 'node:path';
+const root=dirname(fileURLToPath(import.meta.url)),mode=process.env.MEMO_MODE;
+assert.ok(['reference','memo','capture'].includes(mode));
+const input=JSON.parse(fs.readFileSync(resolve(root,'input-v2.json'))),target=pathToFileURL(input.physical).href,replacement=fs.readFileSync(resolve(root,input.moduleDirectory,mode+'.mjs'),'utf8'),sha=s=>createHash('sha256').update(s).digest('hex');
+assert.equal(sha(replacement),input.modules[mode]);
+registerHooks({load(url,context,next){const result=next(url,context);if(url!==target)return result;assert.equal(sha(String(result.source)),input.originalSha);if(process.env.MEMO_RECEIPT)fs.writeFileSync(resolve(root,process.env.MEMO_RECEIPT),JSON.stringify({mode,target,originalSha:input.originalSha,loadedSha:sha(replacement),scope:'Test-only same physical module URL, explicit test owner, no dependency file write'},null,2)+'\n',{flag:'wx'});return{...result,source:replacement};}});
