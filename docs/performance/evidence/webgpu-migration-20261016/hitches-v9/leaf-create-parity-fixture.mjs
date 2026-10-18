@@ -1,0 +1,10 @@
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+const input = readFileSync(new URL('../../webgpu-hitch-validation-20261017/b6-preparation-v1/client/game.ts', import.meta.url), 'utf8');
+if (createHash('sha256').update(input).digest('hex') !== 'e241eab8b0bc2c71f4c6a74c639babb097973ab36779c6ce35e69198f2d59b6b') throw Error('Frozen follow input changed');
+const start = input.indexOf('  private updateCameraFollow(');
+const end = input.indexOf('  /** Diagnostic lifetime', start);
+if (start < 0 || end < start) throw Error('Missing exact follow boundary');
+const folder = new URL('candidate/tests/fixtures/', import.meta.url);
+mkdirSync(folder, { recursive: true });
+writeFileSync(new URL('camera-follow-before-orbit.ts.txt', folder), '// Exact a94 Game method; source SHA e241eab8b0bc2c71f4c6a74c639babb097973ab36779c6ce35e69198f2d59b6b.\n' + input.slice(start, end));

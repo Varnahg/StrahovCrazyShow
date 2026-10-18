@@ -1,0 +1,23 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-preparation-v1\\tests\\light-preparation.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-coverage-completion-prototype-20261018\\candidate\\tests\\light-preparation.test.ts"
+index ddd594c..8f30125 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-preparation-v1\\tests\\light-preparation.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-coverage-completion-prototype-20261018\\candidate\\tests\\light-preparation.test.ts"
+@@ -183,6 +183,18 @@ test("optional B6 pair is exactly two extra stages before restore under the exis
+   assert.ok(result.activeElapsedMs < 100, "fixture's original overall deadline was not replaced");
+ });
+ 
++test("day POINT pair stays before B6 with two completed readiness draws and the same overall deadline", async () => {
++  const f = fixture({ includeDayPointPair: true, includeB6DayPair: true });
++  const pending = f.start(); f.tick(); f.finish();
++  const result = await pending;
++  assert.equal(result.status, "complete");
++  assert.equal(result.stages.length, 13);
++  assert.deepEqual(result.stages.slice(-5).map(s => s.stage), ["day-1-off", "day-1-on", "b6-day-off", "b6-day-on", "restore"]);
++  assert.ok(result.stages.every(s => s.renders === 3 && s.checks === 10));
++  assert.ok(result.activeElapsedMs < 100);
++  assert.equal(f.state().runs, 1); assert.equal(f.state().stops, 1);
++});
++
+ test("progress render can unlock draw-dependent readiness without counting as ready completion", async () => {
+   let draws = 0;
+   const f = fixture({

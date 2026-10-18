@@ -1,0 +1,37 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-preparation-v1\\client\\light-preparation.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-coverage-completion-prototype-20261018\\candidate\\client\\light-preparation.ts"
+index 64c3f0f..13629db 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-preparation-v1\\client\\light-preparation.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-coverage-completion-prototype-20261018\\candidate\\client\\light-preparation.ts"
+@@ -3,6 +3,7 @@ export type LightPreparationStage =
+   | "current-off"
+   | "current-on"
+   | `night-${0 | 1 | 2}-${"off" | "on"}`
++  | `day-1-${"off" | "on"}`
+   | `b6-day-${"off" | "on"}`
+   | "restore";
+ type PreparationTiming = { calls: number; totalMs: number; maxMs: number };
+@@ -77,6 +78,8 @@ export type LightPreparationOptions = {
+   batchMs?: number;
+   /** QA-only coverage pair, using the owner's actual hidden B6 presentation. */
+   includeB6DayPair?: boolean;
++  /** Existing spawn presentation with one mapped POINT, covering day entry. */
++  includeDayPointPair?: boolean;
+ };
+ 
+ const baselineStages: readonly LightPreparationStage[] = [
+@@ -101,9 +104,12 @@ const baselineStages: readonly LightPreparationStage[] = [
+ export function prepareLightVariants(
+   options: LightPreparationOptions,
+ ): Promise<LightPreparationResult> {
+-  const stages: readonly LightPreparationStage[] = options.includeB6DayPair
+-    ? [...baselineStages.slice(0, -1), "b6-day-off", "b6-day-on", "restore"]
+-    : baselineStages;
++  const stages: readonly LightPreparationStage[] = [
++    ...baselineStages.slice(0, -1),
++    ...(options.includeDayPointPair ? ["day-1-off", "day-1-on"] as const : []),
++    ...(options.includeB6DayPair ? ["b6-day-off", "b6-day-on"] as const : []),
++    "restore",
++  ];
+   const started = options.now();
+   const timeout = Math.max(1, options.timeoutMs ?? 30_000);
+   const batchSize = Math.max(1, Math.floor(options.batchSize ?? 128));
