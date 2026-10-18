@@ -2,8 +2,10 @@
   "schemaVersion": 1,
   "id": "webgpu-define-memo-owner-qa-20261018",
   "title": "KEY-31: izolovaný engine-owned memo kandidát",
-  "status": "ready",
-  "dependsOn": ["webgpu-define-memo-proof-20261018"],
+  "status": "done",
+  "dependsOn": [
+    "webgpu-define-memo-proof-20261018"
+  ],
   "writePaths": [
     ".cache/webgpu-migration-checks/define-memo-owner-qa-20261018/",
     "docs/agents/handoffs/webgpu-define-memo-owner-qa-20261018.md"
@@ -28,6 +30,7 @@
     "Přímý BMAD podúkol, cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, owner webgpu-define-memo-owner-qa-01a14497. Načíst AGENTS/policy/task/registry, claim před zápisem. Žádný další workflow.",
     "Source kotvy: PBR engine970/toString1182, Standard engine838/toString1264; MaterialDefines nezná engine. Factory client/render-engine.ts198–205 má doNotHandleContextLost:true; webgpuEngine.pure.js473–500 potom nepřeposílá device loss do observables. watchWebGpuValidation:54 je relevantní příklad current-device guardu. Read-only audit functional_record vybral explicit adapter jako konzervativnější proti změně argumentů custom override.",
     "Native/current A module43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4 a patch21114f6048abdcba932a8640adf1a97b6281939d99ae6d53fbfe96ef76bf0503 zůstávají readonly reference. Day13baseline b9d812d3262ec6e781b6d268b4ca0fec108ab0b32591dbfba83a70d0578b513f se nemění; userhraný4193 rovněž.",
-    "Jde o izolovaný QA kandidát po podloženém CPU proofu, nikoli automaticky přijatou produkční cache. Vlastnictví zde musí být skutečně implementované/ověřené, ne nahrazené textovou výjimkou. Celý startup/GPU/frame p95/p99 a paměť zůstávají root přejímce."
+    "Jde o izolovaný QA kandidát po podloženém CPU proofu, nikoli automaticky přijatou produkční cache. Vlastnictví zde musí být skutečně implementované/ověřené, ne nahrazené textovou výjimkou. Celý startup/GPU/frame p95/p99 a paměť zůstávají root přejímce.",
+    "Root přijal izolovaný QA leaf po dvou nezávislých review[]: manifest5341d84182ccaf0728f63833b2e2fd8d2972c1867773053278d25253d0e52815, lifecycle15/15, reference/owner18/18,6warm×5/5,54exact snapshots,scopedTS3173/0,patchroundtrip10/10. Whole warm CPU benefit, churn+12.59%; ne GPU/startup/native přijetí. Root immutable day13+memo snapshot a23e4ed620bfabd7860645e1edb0c9c3c56d6545c54f8db4c59f76ebb73e04f4 obsahuje575source/test/provenancefiles a explicitportable15test, fyzických10860deps ověřeno. Childclaimreleased."
   ]
 }

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-day13-user-build-20261018",
+  "title": "Předat nový neměnný build s přípravou denních variant",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [".cache/webgpu-day13-user-build-20261018/", "docs/agents/handoffs/webgpu-day13-user-build-20261018.md"],
+  "resources": ["port:4195", "port:2590"],
+  "acceptance": [
+    "Spustit pouze přesnou kopii dokončeného fullvalidated day13 combined snapshotu a jeho dist, s odděleným API/preview, zdroji/testy/dependency provenance a skutečným běžným počasím. Žádná HMR ani memo cache.",
+    "Zachovat hrané4193/4192/4188. Vlastní start/stop musí ověřovat identitu procesů, Windows služby spustit hidden. Předat URL a přesná omezení; neprohlašovat celou migraci za dokončenou."
+  ],
+  "verification": [
+    "Guard source/dist/package SHA, před startem ověřit volné vlastní porty a health/HTML. Praktický GPU průchod rootem pouze pod jeho existující gpu/heavy-validation rezervací.",
+    "Procesy a provozní PID zůstanou jen v lokálním runtime záznamu. Handoff a stav tasku oddělují spuštěný uživatelský build od dokončené přejímky."
+  ],
+  "notes": ["Root owner webgpu-day13-user-build-01a14497. Uživatel18.10 přijímá delší přiznaný startup ve prospěch svižného hraní; snapshot bez cache má ověřené odstranění sekundových spawn světelných blokací. B6/quality/steadyFPS/finalmatrix zůstávají samostatné."]
+}

@@ -621,3 +621,15 @@ Dva kandidátní Edgepilotní běhy mají Golden0mod/max125.1/130.3ms aF4mod3syn
 ## WebGPU KEY-31: explicit-owner memo CPU proof (18.10.2026)
 
 [Hitches-v24](performance/evidence/webgpu-migration-20261016/hitches-v24/README.md): manifest a475e6f75f1f511f59ae149cab3749446505eb260145ef871edf95b432e4deae, 161 archivních artefaktů, review bez nálezů. Functional10/10, A/M18/18, šest warm procesů5/5, 54 exact snapshotů, scopedTS3172/0. Celý sync warm řetězec PBR/Standard/plugin zrychlil o27–37%, unique churn se zhoršil o7,74%. Raw loop vždy zachován; FIFO64/262144 combined codeunits je logický limit, nikoli heap záruka. Explicitní testový owner není produkční engine/device lifetime; runtime, patch/lock/dependencies a hrané verze se nezměnily. Následuje samostatný engine-owned QA adapter a teprve potom celý startup/GPU A/B. Nejde o FPS ani výkonovou přejímku migrace.
+
+## WebGPU: delší start přijat uživatelem, day13 integrováno (18.10.2026)
+
+Uživatel výslovně upřednostnil svižné hraní před cenou startu. [Předání](agents/handoffs/webgpu-day-coverage-native-20261018.md): vlastní6file commit c9f62e95 → main90e893cf, bez memo. Clean b9d812 snapshot1338/1338/fullTS/build/integration a nový combined bce099 snapshot1398/1398/fullTS/build/integrationPASS; source/tests/dependencies invariant. Dvě foreign hunk overlays reverzibilní, dalších130dirtypaths zachováno. Dříve blokující delší startup je přiznaná uživatelská volba, nikoli oslabená readiness/timeout. PrvníF v day13 pilotech~140–150ms proti native9~5–6s; zbytkovéhitches/FPS a finální přejímka otevřené. Novýfrozen4195/API2590, staréhranéslužbybezezměny.
+
+Engine-owned memo QA zůstává mimo main: CPU54exact snapshots/15lifecycle/full1338+15/build/integrationPASS, ale dva Edgepáry nedoložily stabilní přínos pro hraní. F FPS40.7→34.7 a44.9→36.5 s vyšším průměrným renderCPU; ambientní workload se liší, příčina není jednoznačně doložená. Jen část menšího startup rozdílu vznikla v přípravě. Frozen manifest5341d841…e52815 a úplná lokální raw evidence zůstávají zachované; nepřijato podle CPU fixture.
+
+## WebGPU: příprava všech kvalit a skutečný auto-low průchod (18.10.2026)
+
+[Předání](agents/handoffs/webgpu-game-quality-preparation-20261018.md): WT61377f6153→main0703258da7,5source/testfiles, bezmemo či změnyadaptivepolicy. Clean412bdb1367/1367 acombined205b4d1427/1427,fullTS/build/integrationPASS; reviewbezblokujících nálezů,2foreignoverlays a131ostatníchdirtypaths zachováno. Bounded3quality×13stages,30s/pass90s/celáactivepříprava,latestrequestedrestore a plnáreadyzachované. Constructor-order chyba zachycena a opravená sRED/GREEN.
+
+Skutečný defaultauto po ready přejde medium→low: původní firstF3993.4ms/49sync nyní150.4ms/3sync. Qualityroundtrip maxima224.4/162.4/152.8ms, repeatF113.7ms, beznovýchmodulů a nejvýše1sync při přepínání. Healthvalid/chyby0. Startup57.6603s/39complete stages je přiznaná uživatelem přijatá cena. BěžnéFPS a p95/p99 cíle ještě nesplněné; nejde o konečnoumigračnípřejímku ani úplnéB6/vehicle/remoteavatar pokrytí. [Frozen4195](agents/handoffs/webgpu-day13-user-build-20261018.md) zůstáváoddělený a neměnný; původníhranéslužbyzachované.

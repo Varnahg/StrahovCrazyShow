@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-day-coverage-native-20261018",
+  "title": "KEY-31: integrovat ověřené denní varianty pro plynulejší hraní",
+  "status": "done",
+  "dependsOn": [
+    "webgpu-native-day-coverage-qa-20261018"
+  ],
+  "writePaths": [
+    "client/light-preparation.ts",
+    "client/webgpu-compilation-profile.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/light-preparation.test.ts",
+    "tests/webgpu-compilation-profile.test.ts",
+    "docs/agents/handoffs/webgpu-day-coverage-native-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Převzít přesně šest source/test změn z přijatého native-day13-v1 snapshotu b9d812d3262ec6e781b6d268b4ca0fec108ab0b32591dbfba83a70d0578b513f; client/game.ts zapisuje tentýž root pod živou explicitní rezervací webgpu-migrate-root-20261016. Žádná memo cache, B6 camera či foreign C5 přenos do nativního commitu.",
+    "Uživatel18.10.2026 výslovně přijímá delší startup ve prospěch rychlého a svižného hraní. Day13 blokace kvůli startup ceně tím odpadla; původní timeout, úplná readiness, WebGL9 a pravdivé měření zůstávají.",
+    "Čisté preimages musí souhlasit s WT/primary HEAD. Primary Game a Game test obsahují cizí WIP: integrovat pouze přesné ověřené hunks, nikdy nekopírovat celý kandidát přes working soubor. Ostatní WIP uchovat byte-for-byte.",
+    "Samostatný runtime commit, bezpečná průběžná integrace do main a nový izolovaný build/URL. Hrané4193/4192/4188 neměnit. KEY31/default/celá migrace nejsou dokončené jen podle spawnF."
+  ],
+  "verification": [
+    "Existující clean snapshot1338/1338/fullTS/build/isolatedintegration a opakované skutečné EdgeGolden/F/Day piloty jsou exactsource důkaz, neopakovat bez změny. Ověřit navíc nový combined working snapshot s testy a správnými pinned dependencies.",
+    "Read-only review přesného přenosu, integrace jen vlastních souborů, ověřit zachování foreign diffů a úplnou source/build identitu. Průběžně aktualizovat Linear a BMAD podle nové uživatelské priority."
+  ],
+  "notes": [
+    "Koordinátor a implementátor /root, owner webgpu-day-native-01a14497. Pět dalších source/test cest jsou disjunktní k root claimu Game. heavy-validation/gpu/workspace-build/2568 vlastní root,4194/2589 vlastní hitch-validation. Žádný další BMAD renderer.",
+    "Předchozí výzkum/variants/refactoring/review v hitches-v22. Čerstvé reference1/2 18.10.2026 potvrzují F152.3/137.5ms,Golden124.4/121.3ms,healthvalid bezrender/asseterrors. Nová experimentální cache se nepřenáší.",
+    "Integrovaný6filecomponent WTc9f62e95→main90e893cf,clean1338/combined1398+build/integrationPASS. Handoffexplicitněeviduje dalšíauto-low4smezeru,nepřijímáceléKEY31. Helperprocessystopped,claimreleased; navazuje disjunktníqualitymatrixhelper+rootGamewiring."
+  ]
+}
