@@ -171,6 +171,34 @@ test("old hot-swapped ready meshes do not complete while the new engine effect i
   assert.equal(f.state().loop || f.state().timer || f.state().abort, false);
 });
 
+test("optional native day coverage has exactly thirteen stages and two completed readiness draws per stage", async () => {
+  const f = fixture({ includeDayPointVariants: true, batchSize: 5 });
+  const pending = f.start(); f.finish(); const result = await pending;
+  assert.equal(result.status, "complete");
+  assert.equal(result.stages.length, 13);
+  assert.deepEqual(result.stages.slice(-5).map(s => s.stage), ["day-0-off", "day-0-on", "day-1-off", "day-1-on", "restore"]);
+  assert.ok(result.stages.every(s => s.renders === 3 && s.checks === 10));
+  assert.equal(f.state().runs, 1); assert.equal(f.state().stops, 1);
+  assert.equal(f.state().restores, 1);
+  assert.equal(f.state().loop || f.state().timer || f.state().abort, false);
+});
+
+test("native day stages consume the original shared deadline instead of receiving a fresh budget", async () => {
+  let stage = "";
+  const f = fixture({ includeDayPointVariants: true, batchSize: 5, timeoutMs: 30_000,
+    apply(value) { stage = value; }, effectsReady: () => !stage.startsWith("day-") });
+  const pending = f.start();
+  for (let ticks = 0; !stage.startsWith("day-") && ticks < 60; ticks++) f.tick();
+  assert.equal(stage, "day-0-off");
+  f.jump(30_000); f.tick();
+  const result = await pending;
+  assert.equal(result.status, "timeout");
+  assert.ok(result.activeElapsedMs >= 30_000);
+  assert.equal(result.stages.at(-1)!.stage, "day-0-off");
+  assert.equal(f.state().restores, 1);
+  assert.equal(f.state().loop || f.state().timer || f.state().abort, false);
+});
+
 test("progress render can unlock draw-dependent readiness without counting as ready completion", async () => {
   let draws = 0;
   const f = fixture({
