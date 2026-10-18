@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-native-day-coverage-qa-20261018",
+  "title": "KEY-31: izolovaný nativní kandidát denních světelných variant",
+  "status": "ready",
+  "dependsOn": ["webgpu-define-order-native-20261018"],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/native-day-coverage-qa-20261018/",
+    "docs/agents/handoffs/webgpu-native-day-coverage-qa-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Izolovaný cache kandidát nad native source/snapshot2a3dba44ea28dbeffa5324fe22c35011b1e333c4233bb99ed487ee7e057d3584 po define-order opravě. Před změnou ověřit source/hash a důkazy; žádný celý C5/V6 Game ani cizí phased-world/UI/preload/pipeline-retention přenos.",
+    "Přenést jen prokázané spawn day0/day1 OFF/ON coverage přes existující actual apply a plný původní camera frustum. WebGPU13etap, WebGL a default prepareLightVariants9etap. Žádné B6 pair/camera/actor přesuny, nový avatar renderer, far-only experiment, fake readiness nebo zvýšení30s timeoutu.",
+    "Povolené copied candidate změny: client/game.ts pouze profiler configuration a prepareLighting day selection/wiring; client/light-preparation.ts pouze typ, optional includeDayPointVariants a13stage volba; tests/game-light-preparation.test.ts a tests/light-preparation.test.ts s původními assertions a novými přesnými větvemi. Zachovat původníscene.activeMeshes, strict readiness/pending/current Effects, dvěcomplete draws, restore nejnovějšího požadavku, visibility/abort/dispose.",
+    "Opt-in inventory zůstane pravdivý: unassigned+17Game jmen=18položek a1overflow => explicit maxStages19 pouze při existujícím environmentProfile. Dále lze copied client/webgpu-compilation-profile.ts a jeho test změnit pouze na již ověřený bounded hardcap21 při zachování default16 a ostatních limitů; žádná nová hook/diagnostická vrstva. Ověřit default/explicit19/21/oversized/fractional/invalid/overflow/privacy/release.",
+    "Výzkum rozliší GPU důkazy V6 oproti nativnímu9stage firstF6.265s/82mod57sync. Native20.107s prep a V6společných9etap14.236s se lišíhistoriípreload/rendercalls; +4QAetapy4.36–4.67s nejsou zaručená nativepredikce. Vybraný13stage kandidát musí root prakticky změřit a odmítnout při timeoutu/regresi; žádný slib odstranění všech82modulů nebo B6 missů.",
+    "Všechny původní source/QA/hranýchbuildů/dependencies bytes zachované. Frozen actual core/loaders z define-order-qa readonly. Žádný install/GPU/port/fullsuite/build, změna native/primary/node_modules nebo assetgenerace. Samostatný diff přes6copied source/test souborů, hashy a handoff."
+  ],
+  "verification": [
+    "Implementace + cílený refaktoring: čisté sdílené odvození stage času/countu pouze pokud snižuje duplicitu bez nového stavu. Ověřit explicit stage order13/9 a actual Game volání Day0/1OFF/ON včetně shader/pointlight/presentation/restore kontraktů; full existing relevant targeted tests bez oslabení assertů, scopedTS.",
+    "Timeout/cancel/late settings/final-ready a WebGL inertní stage cesta zachované. Inventory18labels bezoverflow při19; dalšíjménooverflow. Negativní baseline pro novou funkčnost musí být zachované vedleGREEN, žádné vydávání nového počtu etap za GPU přínos.",
+    "Root připraví úplný immutable native13stage build se všemi testy a vlastní4194/API2589. Měří celý vstup→ready, prvníGolden/F bezprofileEnvironment, stejnouquality/resolution,shaderdelta/hitch/health; teprve po přijetí fullpipeline/runtimecommit. Leaf necommitne, ukončí vlastníprocesy a předá/release."
+  ],
+  "notes": [
+    "Přímý podúkol existujícího BMAD, owner webgpu-native-day-qa-01a14497, cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow. NačístAGENTS/policy/task, ownclaim předzápisem; žádné rekurzivníworkflow.",
+    "Volba proti variantám: bezdayetap nativeprvníF stále6.265s; +B6pair má odlišnýspatial/camera/lifecycle a není nutnýpro prvníspawnGolden/F. Far-only zamítnutV5. Stabilnísloty/cache redesign mění širšíkontrakt. Čtyřdenníetapy jsou nejmenší jižpodloženýcoveragekandidát, ale startuptradeoff se teprveměří.",
+    "Source odkazy a podklady: hitches-v8/v9/v10/v11/v15/v19/v20 cíleně dle funkce, V6 Game2604–2782 a light-preparation108–128; nativeGame2340–2480. Existing QA inventoryhardcap21 je jediné povolené konfiguračnírozšíření. Samostatný material-switch-cost proof běží v jiném prefixu; neměnit jeho výstupy."
+  ]
+}
