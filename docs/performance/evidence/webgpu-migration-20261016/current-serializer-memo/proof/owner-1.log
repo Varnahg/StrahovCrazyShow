@@ -1,0 +1,25 @@
+BJS - [00:35:49]: Babylon.js v9.30.0 - Null engine
+BJS - [00:35:49]: Babylon.js v9.30.0 - Null engine
+✔ public API is pure; actual adapter reads custom method once with zero args and captured stock identity (3.6568ms)
+✔ shared raw loop preserves exact getter order, late keys, repeated reads and falsy throws even on cache hits (0.9821ms)
+✔ an actual owner hit skips canonical sorting only after fresh original value reads; public method remains pure (0.3803ms)
+✔ memo does not alter material descriptors, clone/equality/rebuild, and a throwing method getter precedes owner acquisition (0.7144ms)
+✔ separate engines own bounded FIFO caches; hits do not reorder and unchanged/unknown/oversized blocks do not evict (21.8405ms)
+✔ WebGL, unknown, uninitialized, disposed and unsupported WeakRef stay pure without registrations (0.373ms)
+✔ two actual NullEngine lifecycles with explicit device IO tokens never share memo or disposal (10.3449ms)
+✔ direct device loss and rejection deactivate only their generation with doNotHandleContextLost behavior (0.8476ms)
+✔ device replacement, stale loss, context events and A→B→A reentry invalidate old leases without duplicate subscriptions (0.8273ms)
+✔ getter disposal/device change and reentrant observation cannot hit or repopulate an obsolete owner (0.8978ms)
+✔ pending callbacks retain only weak cells and disposal removes own observers without removing another owner (0.6259ms)
+✔ observer or lost access failures use clean canonical fallback and do not alter raw getter throws (0.3848ms)
+✔ a previously registered throwing disposal observer keeps its exception after memo cleanup (0.5033ms)
+✔ replacement device during restored observer notification is suspended, not permanently marked lost (0.2078ms)
+✔ source ownership callback factories have no strong outer capture and public namespace remains unchanged (2.2411ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 313.7344

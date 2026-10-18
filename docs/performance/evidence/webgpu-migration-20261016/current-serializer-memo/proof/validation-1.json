@@ -1,0 +1,146 @@
+{
+  "revision": 1,
+  "runs": [
+    {
+      "label": "owner",
+      "args": [
+        "--test",
+        "owner.test.mjs"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-memo-current-proof-20261019",
+      "env": {},
+      "startedAt": "2026-10-18T22:35:49.434Z",
+      "finishedAt": "2026-10-18T22:35:49.843Z",
+      "exitCode": 0,
+      "error": null,
+      "passed": 15,
+      "failed": 0,
+      "log": "owner-1.log",
+      "sha256": "96318e7e65baa78f2f18d0ba714a142ee1add1077c74ee7def4235052b17934d"
+    },
+    {
+      "label": "reference-class",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../reference-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "tests/material-defines-serialization.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-memo-current-proof-20261019\\fixture",
+      "env": {
+        "OWNER_MODE": "reference",
+        "OWNER_RECEIPT": "reference-class-1-source.json",
+        "DEFINE_ORDER_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-memo-current-proof-20261019\\reference-class-1-report.json"
+      },
+      "startedAt": "2026-10-18T22:35:49.846Z",
+      "finishedAt": "2026-10-18T22:35:50.274Z",
+      "exitCode": 0,
+      "error": null,
+      "passed": 6,
+      "failed": 0,
+      "log": "reference-class-1.log",
+      "sha256": "9d20bbca8d78f47185e916496ddf51f38b84c1e08d5d89a67a61df25fe0428d3"
+    },
+    {
+      "label": "reference-wgsl",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../reference-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "tests/material-defines-wgsl-order.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-memo-current-proof-20261019\\fixture",
+      "env": {
+        "OWNER_MODE": "reference",
+        "OWNER_RECEIPT": "reference-wgsl-1-source.json",
+        "DEFINE_ORDER_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-memo-current-proof-20261019\\reference-wgsl-1-report.json"
+      },
+      "startedAt": "2026-10-18T22:35:50.275Z",
+      "finishedAt": "2026-10-18T22:35:54.065Z",
+      "exitCode": 0,
+      "error": null,
+      "passed": 12,
+      "failed": 0,
+      "log": "reference-wgsl-1.log",
+      "sha256": "0b4dc6a07365ea5e3762d0ef0a57bad0470e9cd5560e15b68f2e4d3dc3516701"
+    },
+    {
+      "label": "owner-class",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../reference-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "tests/material-defines-serialization.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-memo-current-proof-20261019\\fixture",
+      "env": {
+        "OWNER_MODE": "owner",
+        "OWNER_RECEIPT": "owner-class-1-source.json",
+        "DEFINE_ORDER_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-memo-current-proof-20261019\\owner-class-1-report.json"
+      },
+      "startedAt": "2026-10-18T22:35:54.066Z",
+      "finishedAt": "2026-10-18T22:35:54.476Z",
+      "exitCode": 0,
+      "error": null,
+      "passed": 6,
+      "failed": 0,
+      "log": "owner-class-1.log",
+      "sha256": "a6fbcf2361d5cb5a0d25a77457865faa5e88993d5e8d6a57038ae7b08566eeb0"
+    },
+    {
+      "label": "owner-wgsl",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../reference-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "tests/material-defines-wgsl-order.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-memo-current-proof-20261019\\fixture",
+      "env": {
+        "OWNER_MODE": "owner",
+        "OWNER_RECEIPT": "owner-wgsl-1-source.json",
+        "DEFINE_ORDER_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-memo-current-proof-20261019\\owner-wgsl-1-report.json"
+      },
+      "startedAt": "2026-10-18T22:35:54.477Z",
+      "finishedAt": "2026-10-18T22:35:58.246Z",
+      "exitCode": 0,
+      "error": null,
+      "passed": 12,
+      "failed": 0,
+      "log": "owner-wgsl-1.log",
+      "sha256": "13a329ffb4cce60665af36952c890757035811fc2ac91489464e6c53f27506e4"
+    },
+    {
+      "label": "types",
+      "args": [
+        "types.mjs"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-memo-current-proof-20261019",
+      "env": {},
+      "startedAt": "2026-10-18T22:35:58.247Z",
+      "finishedAt": "2026-10-18T22:36:13.124Z",
+      "exitCode": 0,
+      "error": null,
+      "passed": 0,
+      "failed": 0,
+      "log": "types-1.log",
+      "sha256": "aeb3ccc6242a5933c45ed5273954abe14a12f19775bf322fd0e56f629a3afb9d"
+    }
+  ]
+}

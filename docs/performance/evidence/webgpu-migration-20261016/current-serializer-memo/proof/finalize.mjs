@@ -1,0 +1,23 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root = dirname(fileURLToPath(import.meta.url)), sha = bytes => createHash('sha256').update(bytes).digest('hex');
+const original = fs.readFileSync(join(root, 'manifest-1.json'));
+assert.equal(sha(original), 'aeaa0263a9e80b6265c767072356bc011b89ae7d130fe9829831934e4c60d478');
+const manifest = JSON.parse(original);
+assert.equal(manifest.tests.passed, 51); assert.equal(manifest.tests.failed, 0); assert.equal(manifest.types.exitCode, 0);
+for (const [path, expected] of Object.entries(manifest.files)) assert.equal(sha(fs.readFileSync(join(root, path))), expected);
+const parity = JSON.parse(fs.readFileSync(join(root, 'parity-comparison.json')));
+assert.equal(parity.exact, true); assert.equal(parity.results, 11); assert.equal(parity.states, 55);
+for (const [path, expected] of Object.entries(parity.inputs)) assert.equal(sha(fs.readFileSync(join(root, path))), expected);
+const added = Object.fromEntries(['compare.mjs', 'parity-comparison.json', 'finalize.mjs'].map(path => [path, sha(fs.readFileSync(join(root, path)))]));
+const record = { priorManifest: sha(original), added,
+  reason: 'Manual current A/M exact comparison completed after initial automatic freeze. Add only its provenance and this finalizer; no source/test/runtime changes or repeated test runs.' };
+fs.writeFileSync(join(root, 'finalize-record.json'), JSON.stringify(record, null, 2) + '\n', { flag: 'wx' });
+Object.assign(manifest.artifacts, added, { 'finalize-record.json': sha(fs.readFileSync(join(root, 'finalize-record.json'))) });
+manifest.finalization = { priorManifest: record.priorManifest, record: 'finalize-record.json', scope: record.reason };
+fs.writeFileSync(join(root, 'manifest-2.json'), JSON.stringify(manifest, null, 2) + '\n', { flag: 'wx' });
+fs.writeFileSync(join(root, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
+console.log(JSON.stringify({ manifestSha256: sha(fs.readFileSync(join(root, 'manifest.json'))), artifacts: Object.keys(manifest.artifacts).length, tests: manifest.tests.passed, parity: parity.states }));
