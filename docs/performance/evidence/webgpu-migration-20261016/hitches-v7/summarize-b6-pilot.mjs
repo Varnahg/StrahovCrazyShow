@@ -1,0 +1,18 @@
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { createHash } from 'node:crypto';
+const [run, benchmark, output]=process.argv.slice(2);
+for(const value of [run,benchmark,output])if(!/^[a-z0-9-]+$/.test(value??''))throw Error('Expected owned evidence basename');
+const base=import.meta.dirname,raw=readFileSync(join(base,run+'-session.jsonl')),bytes=readFileSync(join(base,benchmark+'.json'));
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const records=raw.toString().trim().split('\n').flatMap(l=>JSON.parse(l).records??[]),b=JSON.parse(bytes);
+const start=records.find(r=>r.kind==='benchmark-start'),end=records.find(r=>r.kind==='benchmark-end');
+if(!start||!end||records.filter(r=>r.kind==='benchmark-start').length!==1)throw Error('Expected one benchmark');
+if(records.some((r,i)=>r.seq!==i))throw Error('Sequence gap');
+const a=b.compilation.start,z=b.compilation.end;
+const metricDeltas=Object.fromEntries(Object.keys(a.metrics).map(k=>[k,Object.fromEntries(['calls','completed','failures','pending','cpuTotalMs','asyncTotalMs'].map(field=>[field,z.metrics[k][field]-a.metrics[k][field]]))]));
+const inventory=s=>{const i=s.shaderInventory,u=i?.unusedDefines;return i?{calls:i.calls,rawKnown:i.rawKnown,rawRepeated:i.rawRepeated,bodyKnown:i.bodyKnown,bodyRepeated:i.bodyRepeated,limited:i.limited,descriptorUnknown:i.descriptorUnknown,bodyUnknown:i.bodyUnknown,evidenceTruncated:i.evidenceTruncated,cpuTotalMs:i.cpuTotalMs,unused:{analyzed:u.analyzed,unknown:u.unknown,repeated:u.repeated,duplicateGroups:u.duplicateGroups,provenanceLimited:u.provenanceLimited,analysisUnknown:u.analysisUnknown}}:null;};
+const hitches=records.filter(r=>r.kind==='frame-hitch'&&r.atMs>=start.atMs&&r.atMs<=end.atMs&&r.data.frameMs>100).map(r=>({seq:r.seq,atMs:r.atMs,frameMs:r.data.frameMs,intervalStartMs:r.data.intervalStartMs,intervalEndMs:r.data.intervalEndMs,previousCpuMs:r.data.previousFrame?.cpuMs,previousRenderWork:r.data.previousFrame?.renderWork,position:r.data.previousContext?.position,zone:r.data.previousContext?.zone,flashlight:r.data.previousContext?.flashlight,visibility:r.data.visibility,afterVisibilityChange:r.data.afterVisibilityChange}));
+const result={run,sourceSnapshotId:b.sourceSnapshotId,rawSha256:hash(raw),benchmarkSha256:hash(bytes),records:records.length,window:{startSeq:start.seq,endSeq:end.seq,startAtMs:start.atMs,endAtMs:end.atMs},result:{frames:b.frames,durationSeconds:b.durationSeconds,fps:b.averageFps,p95FrameMs:b.p95FrameMs,p99FrameMs:b.p99FrameMs,renderErrors:b.renderErrorCount,assetErrors:b.assetLoadErrorCount},health:b.renderHealth,gpu:b.gpu,viewport:b.viewport,renderResolution:b.renderResolution,quality:b.quality,scene:b.sceneView,ambient:b.ambient,weatherAtStart:b.weatherAtStart,weatherAtEnd:b.weatherAtEnd,metricDeltas,inventory:{start:inventory(a),end:inventory(z)},hitches,limitations:['Single diagnostic pilot, not statistical or steady FPS acceptance.','Includes inventory overhead; compare only against same instrumentation.','No new queue-completion fence in this normal-timing production source.']};
+const target=join(base,output+'.json');if(existsSync(target))throw Error('Preserve previous summary');writeFileSync(target,JSON.stringify(result,null,2)+'\n');
+console.log(JSON.stringify({output,source:b.sourceSnapshotId,fps:b.averageFps,modules:metricDeltas.shaderModule.calls,sync:metricDeltas.syncPipeline.calls,async:metricDeltas.asyncPipeline.calls,hitches:hitches.map(({previousRenderWork,...h})=>h)}));

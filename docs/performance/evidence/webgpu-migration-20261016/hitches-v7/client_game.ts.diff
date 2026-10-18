@@ -1,0 +1,118 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-preparation-prototype-20261018\\..\\..\\webgpu-hitch-validation-20261017\\async-production-v3\\client\\game.ts" "b/candidate\\client\\game.ts"
+index 4fbddf0..452b4a2 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\b6-preparation-prototype-20261018\\..\\..\\webgpu-hitch-validation-20261017\\async-production-v3\\client\\game.ts"
++++ "b/candidate\\client\\game.ts"
+@@ -2500,6 +2500,7 @@ export class Game {
+     instant = this.timeOverride ?? Date.now(),
+     flashlightOn = this.flashlightOn,
+     phaseEnds?: { sky: number; lighting: number; vegetation: number; transit: number; particles: number; surfaces: number },
++    forceSpatialSelection?: boolean,
+   ) {
+     if (this.environmentProfile)
+       this.profiledPreviousExposure = this.scene.imageProcessingConfiguration.exposure;
+@@ -2598,6 +2599,7 @@ export class Game {
+       daylight: sun.daylight,
+       avatars: this.avatars.values(),
+       localId: this.localId,
++      forceSpatialSelection,
+     });
+     this.environmentProfile?.mark("cinematic");
+     if (this.environmentProfile) {
+@@ -2612,10 +2614,23 @@ export class Game {
+     // The same controller/materials survive into gameplay; no proxy shaders.
+     this.flashlight ??= new PlayerFlashlight(this.scene);
+     const night = selectLightingPreview("night").instant!;
++    const includeB6DayPair = this.engine.isWebGPU && !!this.b6Reality;
++    const day = includeB6DayPair ? selectLightingPreview("day").instant! : null;
++    let savedCamera: { position: Vector3; target: Vector3 } | undefined;
++    const leaveB6 = () => {
++      const saved = savedCamera;
++      savedCamera = undefined;
++      if (saved && !isRetired()) {
++        this.camera.position.copyFrom(saved.position);
++        this.camera.setTarget(saved.target);
++        this.camera.getViewMatrix(true);
++      }
++    };
+     const apply = (
+       instant: number,
+       flashlightOn: boolean,
+       streetCount?: number,
++      forceSpatialSelection = false,
+     ) => {
+       const pos = this.actor.position;
+       this.updateWorldPresentation(pos);
+@@ -2651,6 +2666,8 @@ export class Game {
+         performance.now() / 1000,
+         instant,
+         flashlightOn,
++        undefined,
++        forceSpatialSelection,
+       );
+       if (streetCount !== undefined) {
+         // A first walk can leave the last lamp's range and change POINT defines.
+@@ -2677,16 +2694,42 @@ export class Game {
+         }
+       }
+     };
++    const applyB6 = (flashlightOn: boolean) => {
++      if (!this.b6Reality) throw new Error("B6 příprava ztratila vlastníka interiéru.");
++      savedCamera ??= { position: this.camera.position.clone(), target: this.camera.getTarget().clone() };
++      const self = this.avatars.get(this.localId);
++      // Canonical source-derived ground-floor landing, looking inward along
++      // the existing approach route. No recorded player coordinate or teleport.
++      const pos = new Vector3(B6_LAYOUT.entry.x, B6_LAYOUT.foundationOffset + 0.8,
++        B6_LAYOUT.entry.landingMaxZ);
++      const target = B6_LAYOUT.approachRoute[B6_LAYOUT.approachRoute.length - 1];
++      const eye = B6_LAYOUT.foundationOffset + (self?.eyeHeight ?? 1.63);
++      this.updateWorldPresentation(pos);
++      this.camera.position.set(pos.x, eye, pos.z);
++      this.camera.setTarget(new Vector3(target[0], eye, target[1]));
++      this.camera.getViewMatrix(true);
++      // The same camera-origin flashlight path as first-person gameplay. Do
++      // not update CameraFollow, avatar LOD/animation or visibility history here.
++      this.updateRenderEnvironment(pos, self, true, 0, performance.now() / 1000,
++        day!, flashlightOn, undefined, true);
++    };
+     const restore = () => {
++      const hadB6 = !!savedCamera;
++      leaveB6();
+       if (!isRetired()) {
+         this.compilationProfile.setStage("restore");
+-        apply(this.timeOverride ?? Date.now(), this.flashlightOn);
++        apply(this.timeOverride ?? Date.now(), this.flashlightOn, undefined, hadB6);
+       }
+     };
+     return prepareLightVariants({
++      includeB6DayPair,
+       apply: (stage) => {
+         if (stage === "restore") return restore();
+         this.compilationProfile.setStage(stage);
++        if (stage === "b6-day-off" || stage === "b6-day-on") {
++          applyB6(stage === "b6-day-on");
++          return;
++        }
+         apply(
+           stage.startsWith("night") ? night : (this.timeOverride ?? Date.now()),
+           stage.endsWith("-on"),
+@@ -2735,8 +2778,10 @@ export class Game {
+         this.weather,
+         this.scene.meshes.length,
+         this.scene.materials.length,
++        includeB6DayPair ? this.b6Reality : undefined,
++        includeB6DayPair ? this.b6Reality?.stats.loadedAssets : undefined,
+       ],
+-      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials"],
++      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials", "b6Controller", "b6Assets"],
+       isVisible: () => !document.hidden,
+       onVisibilityChange: (callback) => {
+         document.addEventListener("visibilitychange", callback);
+@@ -2746,7 +2791,7 @@ export class Game {
+       setTimer: (callback, milliseconds) =>
+         window.setTimeout(callback, milliseconds),
+       clearTimer: (timer) => window.clearTimeout(timer as number),
+-    });
++    }).finally(leaveB6);
+   }
+ 
+   frame() {
