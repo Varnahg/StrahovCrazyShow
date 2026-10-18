@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-program-attribution-candidate-20261018",
+  "title": "KEY-31: omezeně přiřadit zbývající nové programy ke skutečným materiálům",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-program-attribution-candidate-20261018/",
+    "docs/agents/handoffs/webgpu-program-attribution-candidate-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze copied experiment nad frozen grass-preparation-v2 4a968ff7e2fe262bd2dec98bd771f705eb7682418e2dd975f8bf33ae436bee61. Native, primary, dependencies a hrané snapshoty neměnit.",
+    "Povolené copied runtime delty: client/webgpu-compilation-profile.ts, client/render-incident-profile.ts a client/game.ts. Testy: tests/webgpu-compilation-profile.test.ts, tests/render-incident-profile.test.ts, nový tests/webgpu-program-attribution.test.ts. Nutnou další cestu předem koordinovat.",
+    "Rozšířit pouze existující lokální diagnostiku během aktivního benchmarku: nejvýše32 skutečných požadavků _preparePipelineContextAsync, spojení pipeline-context identitou s Effectem a skutečnými materiál/submesh/geometry uživateli přes stávající observer. Cache-hit či pouhé přepnutí hotového Effectu nesmí vytvořit nový požadavek.",
+    "Max4 různí uživatelé na požadavek, defines nejvýše16KiB v úsecích nejvýše1024 znaků, explicitní omitted/truncated/unmatched. Bez shader source, nového frameworku, trvalého cache-map nebo běžné per-frame práce. Žádné čtení SubMesh.getMaterial, žádné readiness polling, mutace rendereru, nové Promise handlery ani změny this/arguments/return/promise identity/exceptions původních hooků.",
+    "Při pozdním contextu nejvýše jeden vlastněný compile observer na čekající Effect, s pevným limitem a úklidem. Dispose, konec benchmarku, generace a opakované spuštění nesmí držet GPU/material reference nebo přimíchat staré záznamy. Export jen primitivní metadata přes existující logger a skutečný sanitizer.",
+    "Příprava, její výsledek a pozorovaný uživatel jsou odlišné důkazy. Samotný záznam nepotvrzuje skutečné použití při draw ani GPU čas; nesmí přisuzovat celé následné mezery kompilaci. Žádná další oprava či cache před výsledkem měření."
+  ],
+  "verification": [
+    "Lehké targeted CPU testy: cache-hit/switch, rozdílné contexts se stejnými defines, synchronní i pozdní context, sdílený Effect, fallback/opakovaná příprava, limity, sanitizer, dispose/generation/late notification a wrapper transparency.",
+    "Před implementací ověř skutečné pořadí pinned Babylon9.30 effect.functions a PBR observerů, existující hook API a logger limity. Pokud návrh není korektní, vrať důkaz a lepší nejmenší variantu koordinátorovi.",
+    "Bez build/fullsuite/GPU/server nebo package install. Exact manifest původních/výsledných SHA, cílený refaktoring a handoff; žádný commit ani rekurzivní BMAD. Root provede později fullTS/build a jeden skutečný sběr, teprve potom rozhodne o další opravě."
+  ],
+  "notes": [
+    "Průzkum po A1/B1/A2 trávy: odstraněn1cílovýprogram, ale B1 stále3novéprogramy při vstupu a3při změně světel3→2, následné728.8/668.4ms mezery. Současný WGSL inventory je plný1024položek a8materialdetailů vynechává většinu499/431notifications.",
+    "Porovnáno: zvýšení8detailů zvětšuje log bez vazby na novékompilace; metadata jednou zaEffect může limit zaplnit cache-hits; vybrán bounded32 skutečných příprav a připojení metadat existujícím observerem. Nejde o novou obecnou diagnostickou vrstvu, ale chybějící vazbu mezi dvěma stávajícími měřeními.",
+    "Pinned effect.functions.js186–198 předává context a defines; getPipelineContext/getAttributesNames jsou pure gettery. _key argument je prázdný, nepoužívat jej jakoidentitu. PBRnotification může předcházet completion; prověř synchronní i async pořadí.",
+    "Aktivní BMADspec-key-31-long-frame-gaps pokračuje v implementaci; grassruntime má samostatnou probíhající plnou validaci a integraci rootem. Tento copied experiment nesmí její vstupy změnit ani ji zdržet. Uživatelskápriorita je plynulost běhu, nikoli kratšístartup.",
+    "Copied V2 přijata pouze jako měřicí experiment:55/55targeted, fullTS/buildPASS, production28e287…14requests/14matched. Runtime se neintegruje; samostatná evidence docs/performance/evidence/webgpu-migration-20261016/program-attribution/. Zbývá skutečná oprava nepřipravených programů; KEY-31 otevřené."
+  ]
+}
