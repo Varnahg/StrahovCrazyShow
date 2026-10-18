@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-avatar-day-view-proof-20261018",
+  "title": "KEY-31: doložit užší skutečný avatarový pohled pro Day1 přípravu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/avatar-day-view-proof-20261018/",
+    "docs/agents/handoffs/webgpu-avatar-day-view-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze bounded CPU proof nad frozen V4 bf28a56507b6b0650d214169c8cf94aa3b2d8abc4012a8b098e4e1366340c8c0 a jeho fyzickou QA core/loaders identitou s inactive falloff fixem. Žádný native/QA runtime patch nebo změna hraných buildů.",
+    "Nejprve projít skutečný avatar rig/bounds/LOD, Game prewarm a camera/Cinematic/shadow/light-budget řetězec. Porovnat těsnější perspective view/frustum, layer/visibility mask, scissor a forceCompilation; vybrat nejmenší variantu zachovávající skutečný main pass/instancing a readiness, bez teleportu nebo nového camera objektu/passu.",
+    "Na skutečném source-derived avataru porovnat celý původní Day1 view, kandidátní omezený view a doloženou B6 referenci pro OFF/ON. Změřené actual draw captures musí zachovat požadované submeshe, celé Effect defines/identity/reuse, alpha/instancing/skinning/light flags. Bounds nesmí být ručně zvolený dojem; vysvětlit dynamické skinned bounds a rezervu.",
+    "Pokud to zvládne malá CPU fixture, rozšířit na6skutečných výchozích avatarů a relevantní brýle/vousy/hair časti. Jasně oddělit provedené kombinace, skutečný LOD a neověřené konfigurace. Skryté připravené alternativy nejsou důkazem actual draw.",
+    "Obnovit veškerý camera pose/projection stav, zachovat CameraFollow historii/actor/animation stav. Ověřit restore po úspěchu i výjimce a cleanup všech vlastních observers/IO adaptérů/resources. Žádná cache, retence nebo nová diagnostická vrstva."
+  ],
+  "verification": [
+    "Navázat na avatar-day-variant-proof-20261018 (hitches-v8): actual Alex12drawn/7mainEffects při plnémspawnview; jeho RawTexture IO adapter lze explicitně převzít se zachovanými původními daty/metadaty. NullEngine/GLSL/PCFfallback limity uvést, žádné fake ready.",
+    "Zaznamenat skutečné sources/probe/output/test SHA a source odkazy; tvrzení o budoucím FPS/startup zlepšení z CPU proofu nevyvozovat. V4 Day1pair4.17–4.92s a70–74/76–80modulů zahrnuje také svět; ušetřit lze jen dosud neprokázanou část.",
+    "Žádný fullworld/velké GLB/fullsuite/build/integration/GPU/install. Přímý node/tsx TSX_DISABLE_CACHE=1. Výstupy jen vlastní prefix/handoff, cílený refaktoring probe a běhy ukončit; handoff+release bez commitu."
+  ],
+  "notes": [
+    "Přímé root zadání v pokračujícím BMAD; žádný rekurzivní workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, owner webgpu-avatar-day-view-01a14497.",
+    "Native helper fix je již WT76978db3250c9a8a3ce3fc99f44f93fb4aedc8a1 → mainf9e3806d99e683bd54fb9d1f8d354f499ba31948. Změna nečiní žádnou existující přidanou dvojici automaticky redundantní. V4zůstávácontrol, jehoB6clipped orbit/spatialrestore a30s readiness timeout se nemění.",
+    "Těsný avatar view je kandidát, nikoli předem schválený shipping design. Pokud skutečný shadow/baseEffect řetězec vyžaduje světové materiály i při vyloučení z main view, doložit to a neobcházet fixture. Orthographic kamera mění shader define; scissor sám neculluje svět. Případné nové GPU experimenty rozhodne root až z důkazů."
+  ]
+}

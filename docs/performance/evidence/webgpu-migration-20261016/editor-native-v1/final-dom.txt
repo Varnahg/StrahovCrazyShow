@@ -1,0 +1,151 @@
+- main:
+  - link "s•trahov":
+    - /url: "#"
+  - generic: HRATELNÉ DEMO · 0.1
+  - text: Jazyk
+  - combobox "Jazyk":
+    - option "Čeština" [selected]
+    - option "English"
+  - link "Poznej kopec ↗":
+    - /url: https://wiki.sh.cvut.cz/kolej/bloky/blok_6
+  - generic: PRAHA · 50.08065° N, 14.39175° E
+  - heading "Na kopci. Ve svém živlu." [level=1]:
+    - text: Na kopci.
+    - text: Ve svém živlu.
+  - paragraph: Tvůj Strahov v prohlížeči. Potkej ostatní, najdi svou partu a objev, co se děje mezi bloky.
+  - generic: ↗ Celý areál
+  - generic: ◉ Společný svět
+  - generic: ☁ Skutečné počasí
+  - region "Velká interaktivní mapa":
+    - generic: Strahov
+    - button "Otáčet mapu podle směru postavy" [disabled]:
+      - generic: ↑
+      - text: S
+    - group "Mapa kolejního areálu Strahov podle OpenStreetMap":
+      - generic: "11"
+      - generic: "12"
+      - generic: "4"
+      - generic: "2"
+      - generic: "9"
+      - generic: "1"
+      - generic: "8"
+      - generic: "5"
+      - generic: "10"
+      - generic: "7"
+      - generic: "3"
+      - generic: "6"
+      - 'generic "3 míst: Blok 6, Klubovna B6, Společné místnosti B6"':
+        - generic: "3"
+      - generic "Kancelář SH / SÚZ"
+      - generic "Fotokomora"
+      - generic "Hudebna B10"
+      - generic "Včely · okolí B11"
+      - generic "Silicon Gym / boulder"
+      - 'generic "3 míst: SHerna B4, Studentská prádelna, Hudebna B4"':
+        - generic: "3"
+      - 'generic "2 míst: Klubovna SH, Sedmička / Klub 007"':
+        - generic: "2"
+      - generic "Fotbálek SH"
+      - generic "Hudebna B9"
+      - generic "MacGyver / 3D tisk"
+      - 'generic "2 míst: Buzerák / SHOW, Mezi bloky"':
+        - generic: "2"
+      - 'generic "2 míst: Zahrádky SH, Školicí centrum SH"':
+        - generic: "2"
+      - generic "Grilovací centrum"
+      - generic "R-ko / Recharging Bar"
+      - generic "Stadion Strahov · 191 A"
+      - generic "Stadion Strahov · 191 B"
+      - generic: 50 m
+    - group "Ovládání mapy":
+      - button "Přiblížit mapu": +
+      - button "Oddálit mapu" [disabled]: −
+      - button "Sledovat moji postavu" [disabled]: ⌖
+      - button "Zobrazit celý areál": ⛶
+    - button "Mobiliář a dominanty"
+    - paragraph: Kolečko přibližuje, tažení posouvá. Kliknutím označíš cíl; Enter označí střed mapy.
+  - generic: STRAHOV / KOLEJNÍ AREÁL
+  - generic: © OpenStreetMap contributors
+  - paragraph: Samostatně modelovaný Strahov podle map a fotografických předloh. Referenční 3D podklad © IPR Praha, 2023, CC BY. Hratelný interiér B6 je rekonstrukce podle plánů a fotografií. Všechny uvedené akce jsou fiktivní.
+  - complementary:
+    - generic: ZAČNI U SEBE
+    - heading "Kdo dnes přijde?" [level=2]
+    - region "Vytvoření vlastní postavy":
+      - text: Jak ti budeme říkat?
+      - textbox "Jak ti budeme říkat?":
+        - /placeholder: Tvoje přezdívka
+        - text: QA záseky
+      - generic: TVOJE POSTAVA
+      - generic "3D náhled postavy. Pro otočení táhni myší nebo použij šipky pod náhledem."
+      - generic "Otočení náhledu":
+        - button "Otočit postavu doleva": ↶
+        - button "Zepředu" [active]
+        - button "Otočit postavu doprava": ↷
+        - button "Celá postava" [pressed]
+      - generic: Začni s předlohou
+      - generic: 6 podob · tvoje úpravy
+      - group "Výchozí předloha postavy":
+        - button "Alex" [pressed]:
+          - generic: Alex
+        - button "Robin":
+          - generic: Robin
+        - button "Eli":
+          - generic: Eli
+        - button "Sam":
+          - generic: Sam
+        - button "Mia":
+          - generic: Mia
+        - button "Niki":
+          - generic: Niki
+      - paragraph:
+        - strong: Alex
+        - text: · Krátký střih · mikina. Výběr předlohy obnoví její vzhled.
+      - group "Části editoru":
+        - button "Obličej a vlasy" [pressed]
+        - button "Oblečení"
+      - group "Odstín pokožky":
+        - generic: Odstín pokožky
+        - 'button "Odstín pokožky, odstín 1: #f0d2b4"'
+        - 'button "Odstín pokožky, odstín 2: #e9c4a6"'
+        - 'button "Odstín pokožky, odstín 3: #d7a77f" [pressed]':
+          - generic: ✓
+        - 'button "Odstín pokožky, odstín 4: #bf8f72"'
+        - 'button "Odstín pokožky, odstín 5: #bc8662"'
+        - 'button "Odstín pokožky, odstín 6: #8f5c42"'
+        - 'button "Odstín pokožky, odstín 7: #6b4636"'
+        - 'button "Odstín pokožky, odstín 8: #4c3027"'
+        - generic "Zvolit vlastní barvu":
+          - generic: +
+          - generic: "Odstín pokožky: vlastní barva"
+          - 'textbox "Odstín pokožky: vlastní barva"': "#d7a77f"
+      - group "Barva vlasů a vousů":
+        - generic: Barva vlasů a vousů
+        - 'button "Barva vlasů a vousů, odstín 1: #211e1d"'
+        - 'button "Barva vlasů a vousů, odstín 2: #352823" [pressed]':
+          - generic: ✓
+        - 'button "Barva vlasů a vousů, odstín 3: #69513e"'
+        - 'button "Barva vlasů a vousů, odstín 4: #a17c4c"'
+        - 'button "Barva vlasů a vousů, odstín 5: #d4b77b"'
+        - 'button "Barva vlasů a vousů, odstín 6: #914f36"'
+        - 'button "Barva vlasů a vousů, odstín 7: #928c85"'
+        - 'button "Barva vlasů a vousů, odstín 8: #c8c5be"'
+        - generic "Zvolit vlastní barvu":
+          - generic: +
+          - generic: "Barva vlasů a vousů: vlastní barva"
+          - 'textbox "Barva vlasů a vousů: vlastní barva"': "#352823"
+      - text: Tvar obličeje
+      - slider "Tvar obličeje Užší Širší": "0.45"
+      - generic: Užší
+      - generic: Širší
+      - checkbox "Brýle"
+      - text: Brýle
+      - checkbox "Vousy"
+      - text: Vousy
+      - paragraph: Vzhled a přezdívka zůstávají v tomto prohlížeči.
+    - button "Vstoupit do společného světa ↗":
+      - text: Vstoupit do společného světa
+      - generic: ↗
+    - button "Prohlédnout si Strahov sám"
+    - paragraph: Přezdívka není účet ani ověřená identita. Demo neověřuje bydliště. Vzhled se uloží jen v tomto prohlížeči.
+  - generic: STRAHOV CRAZY SHOW
+  - generic: Pro lidi, kteří žijí na kopci.

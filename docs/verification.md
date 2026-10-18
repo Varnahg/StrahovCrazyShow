@@ -551,3 +551,7 @@ Dva V3 Day přechody62mod/45sync a3309.5/3178.9ms; dva V4 přechody0mod/0sync a1
 [Evidence hitches-v12](performance/evidence/webgpu-migration-20261016/hitches-v12/README.md): WT76978db3250c9a8a3ce3fc99f44f93fb4aedc8a1 → mainf9e3806d99e683bd54fb9d1f8d354f499ba31948. Pouze3reset assignments v pinned Babylon helperu,6patch SHA substitutions v lock a2actual regresní testy. Native snapshoteb061b9eb34a0cdf8a94560ad7803ef9235ab1447e9b4d986c7cb640e2f0b7b3:1312/1312 pnpm test, fullTS/build a isolatedintegration PASS; source/dependencies beze změny. Čtecí review bez nálezů. Main integrace zachovala133jinýchworkingcest, hrané4193/4192/4188 beze změny.
 
 Úspěšný Day GPU výsledek V4 zatím zahrnuje QA prewarm; ten se do tohoto commitu nepřenáší. Nelze tedy tvrdit vyřešené všechny nativní záseky ani dokončenou migraci. Pokračuje přesná coverage a startup rozpočet, B6/funkční přejímka a srovnatelné renderer série.
+
+## WebGPU: šest nativních editorových předloh (18.10.2026)
+
+[Dílčí evidence editor-native-v1](performance/evidence/webgpu-migration-20261016/editor-native-v1/README.md), native snapshoteb061b9e…f0b7b3, Edge WebGPU1. Všech6presetů ready a vizuálně vykreslených; Alex brýle/vousy/detail/otočení, poté návrat naAlex bez doplňků.14hashovaných artefaktů, browser warnings/errors0. Interní preview361×244; CSS zvlášť neměřeno. Není to FPS/pixel parity, herní LOD/multiplayer ani resource-count přejímka. Vlastní scéna a služby ukončené, hranébuildy nezměněné.

@@ -181,3 +181,7 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## Nativní inactive falloff fix integrován
 
 18.10 root převzal vlastníka webgpu-inactive-light-defines-20261018, přijal manifest00ab7390…51b7 a1312/1312/build/integration, commit76978db→mainf9e3806. Review bez nálezů,20file hitches-v12 archiv. Instalované dependencies nepřepsané,133ostatníchmainworkingcest zachováno. Taskdone znamená pouze tento4file celek; po předání root uvolní jeho rezervaci. Další čtecí průzkum porovnává potřebu a cenu zbývajících QA prewarm etap. Linear203e087a-596c-4eec-bbb3-9c393f5022f0.
+
+## Dílčí nativní editor a další CPU proof
+
+18.10 editor-native-v1 zaznamenává6actual WebGPU presetů a Alex doplňky/detail/otočení na čistémnativeeb061 snapshotu, warnings/errors0; žádnéFPS tvrzení. Own4194/API2589 ukončeno, karta about:blank. Přidělen pouze cache/handoff taskwebgpu-avatar-day-view-proof-20261018: exact narrow perspective coverage, vertices/bounds, main/shadow a restore/lifecycle před případnýmQA runtime zásahem. Další read-only audit ověřuje význam neaktivních grass cap42 z předchozího histogramu; není to doložená aktivní výkonová regrese.
