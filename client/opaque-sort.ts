@@ -6,6 +6,7 @@ import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { SubMesh } from "@babylonjs/core/Meshes/subMesh";
 import type { Scene } from "@babylonjs/core/scene";
+import { MultiMaterial } from "@babylonjs/core/Materials/multiMaterial";
 
 /** Read only the public native LOD contract. Calling getLOD while sorting is
  * unsafe: it also pre-activates meshes and can reset the current instance batch.
@@ -50,12 +51,52 @@ export function readNativeLod(
   return source;
 }
 
-const materialTie = (a: SubMesh, b: SubMesh) =>
-  (a.getMaterial(false)?.uniqueId ?? -1) -
-    (b.getMaterial(false)?.uniqueId ?? -1) ||
+const drawableTie = (a: SubMesh, b: SubMesh) =>
   a.getRenderingMesh().uniqueId - b.getRenderingMesh().uniqueId ||
   a.materialIndex - b.materialIndex ||
   a.indexStart - b.indexStart;
+
+const materialTie = (a: SubMesh, b: SubMesh) =>
+  (a.getMaterial(false)?.uniqueId ?? -1) -
+    (b.getMaterial(false)?.uniqueId ?? -1) || drawableTie(a, b);
+
+function declaredPassMaterialId(subMesh: SubMesh, passId: number): number {
+  const mesh = subMesh.getRenderingMesh();
+  const material = mesh.getMaterialForRenderPass(passId) ?? mesh.material;
+  if (
+    material instanceof MultiMaterial &&
+    material.getSubMaterial === MultiMaterial.prototype.getSubMaterial
+  ) {
+    // Neither SubMesh.getMaterial(false) nor getSubMaterial is a pure lookup:
+    // they can reset draw caches or allocate a default material. Read only the
+    // native declared child. Invalid/null/custom cases keep container order;
+    // the renderer still owns their actual fallback/binding semantics.
+    return (
+      material.subMaterials[subMesh.materialIndex]?.uniqueId ??
+      material.uniqueId
+    );
+  }
+  return material?.uniqueId ?? -1;
+}
+
+/** Group opaque draws by material after the sky. No distance scan,
+ * LOD selection, readiness, world mutation, persistent cache or observers. */
+export function createSkyFirstMaterialComparator(
+  scene: Scene,
+  sky: AbstractMesh,
+) {
+  const engine = scene.getEngine();
+  return (a: SubMesh, b: SubMesh) => {
+    const skyA = a.getMesh() === sky,
+      skyB = b.getMesh() === sky;
+    if (skyA !== skyB) return skyA ? -1 : 1;
+    const passId = engine.currentRenderPassId;
+    return (
+      declaredPassMaterialId(a, passId) - declaredPassMaterialId(b, passId) ||
+      drawableTie(a, b)
+    );
+  };
+}
 
 /** Sky remains first. Other opaque draws go near to far, using the closest
  * actually active instance belonging to each native LOD draw group. No private

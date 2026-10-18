@@ -13,7 +13,10 @@ import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import type { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import type { PointLight } from "@babylonjs/core/Lights/pointLight";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { createSkyFirstOpaqueComparator } from "./opaque-sort";
+import {
+  createSkyFirstMaterialComparator,
+  createSkyFirstOpaqueComparator,
+} from "./opaque-sort";
 
 export interface ArtLightingContext {
   scene: Scene;
@@ -212,7 +215,9 @@ function initialize(context: ArtLightingContext, input: ArtLightingInput) {
   box.alphaIndex = -1000;
   context.scene.setRenderingOrder(
     0,
-    createSkyFirstOpaqueComparator(context.scene, box),
+    context.scene.getEngine().isWebGPU
+      ? createSkyFirstMaterialComparator(context.scene, box)
+      : createSkyFirstOpaqueComparator(context.scene, box),
   );
   const state: LightingState = {
     cloud: input.weather?.cloud ?? 0.4,
