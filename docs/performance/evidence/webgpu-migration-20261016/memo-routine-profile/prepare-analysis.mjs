@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdirSync,readdirSync,copyFileSync} from 'node:fs';
+import {join} from 'node:path';
+const root=import.meta.dirname,run=join(root,'run-01'),logs=join(root,'candidate-v1/.cache/game-diagnostics');
+mkdirSync(join(run,'all-sessions'),{recursive:true});
+for(const n of readdirSync(logs).filter(n=>n.endsWith('.jsonl')))copyFileSync(join(logs,n),join(run,'all-sessions',n));
+let t=readFileSync(join(root,'analyze.mjs'),'utf8');
+const before="names=readdirSync(logs).filter(x=>x.endsWith('.jsonl'));assert.equal(names.length,1);";
+assert.ok(t.includes(before));t=t.replace(before,"names=readdirSync(logs).filter(x=>x.endsWith('.jsonl')).filter(x=>{const rows=readFileSync(join(logs,x),'utf8').trim().split(/\\r?\\n/).map(JSON.parse);return rows.flatMap(r=>r.records??[]).some(r=>r.kind==='benchmark-start');});assert.equal(names.length,1);");
+writeFileSync(join(root,'analyze.mjs'),t);
