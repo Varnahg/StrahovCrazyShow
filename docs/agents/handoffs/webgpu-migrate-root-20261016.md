@@ -197,3 +197,8 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## Far-only V5 zamítnut
 
 18.10 hitches-v15 archivuje48 artefaktů včetně přesného QA overlay,64 testů/fullTS/build a produkčního raw/UI. V5 Golden16/12modulů/sync max1178,4ms a první F24/16 max1748,7ms proti V4 0/0/124,5 a4/2/210,9. Startup43,2566 proti43,5224s neprokazuje úsporu. Čtecí audit ověřil8265 souvislých záznamů, platné akce/health a cleanup resources0; ambientní historie omezuje úplnou atribuci. Task done pouze jako dokončený negativní experiment, žádná runtime integrace. Native/main/hranýbuild beze změny, own4194/2589 služby zastavené podle identity. Linear9a1c0c44-9c4c-49da-83f2-3d8153b4403e. Další měření plného V4 použije existující režim bez profileEnvironment=1: zachová základní startup/FPS/module/pipeline/health důkazy, vypne drahý inventář a engine/environment hooks; není to nová diagnostická vrstva ani izolovaný inventory-only A/B.
+
+
+## V4 normální režim: první F lepší, exit stále otevřený
+
+18.10 hitches-v16 archivuje22 artefaktů/18gzip, čtecí raw a archive review PASS. Beze změny JS, pouze bez profileEnvironment: startup40,3144 a41,6261s; Golden/F maxima117,9/110,3ms, B6 firstF203,2ms. Otočení ven963,2ms a odchod2142,3ms s novými shader moduly zůstávají. CelýV4 není přijat. Vypnutý engine lifecycle profiler neposkytuje resources0; běžný health/dispose čistý. Nový task webgpu-b6-exit-variant-proof-20261018 má disjunktní cache/handoff pro skutečný merged box entry-dark-metal a fresh-vs-history/hidden readiness důkaz; native kód se nemění. Linear6296f93c-fff6-44d4-bee4-da772d312d66.
