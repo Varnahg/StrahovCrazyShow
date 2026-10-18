@@ -205,3 +205,27 @@ index 265bd1e..c482f2f 100644
 +}
  //# sourceMappingURL=materialDefines.js.map
 \ No newline at end of file
+diff --git a/Materials/standardMaterial.pure.js b/Materials/standardMaterial.pure.js
+--- a/Materials/standardMaterial.pure.js
++++ b/Materials/standardMaterial.pure.js
+@@ -46,6 +46,8 @@
+         this.OPACITYDIRECTUV = 0;
+         this.OPACITYRGB = false;
+         this.REFLECTION = false;
++        this.USESPHERICALFROMREFLECTIONMAP = false;
++        this.LODBASEDMICROSFURACE = false;
+         this.EMISSIVE = false;
+         this.EMISSIVEDIRECTUV = 0;
+         this.SPECULAR = false;
+diff --git a/Materials/standardMaterial.pure.d.ts b/Materials/standardMaterial.pure.d.ts
+--- a/Materials/standardMaterial.pure.d.ts
++++ b/Materials/standardMaterial.pure.d.ts
+@@ -106,6 +106,8 @@
+     OPACITYDIRECTUV: number;
+     OPACITYRGB: boolean;
+     REFLECTION: boolean;
++    USESPHERICALFROMREFLECTIONMAP: boolean;
++    LODBASEDMICROSFURACE: boolean;
+     EMISSIVE: boolean;
+     EMISSIVEDIRECTUV: number;
+     SPECULAR: boolean;

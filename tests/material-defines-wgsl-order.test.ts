@@ -24,7 +24,23 @@ for(const kind of kinds)test('patched distribution actual native WGSL/order reus
   assert.deepEqual(Object.getOwnPropertyDescriptor(MaterialDefines.prototype,'toString'),descriptor,'no process-local serializer wrapper');
   // The accepted JSON baseline omits undefined-valued properties. Same-engine
   // exact public values (including undefined) are asserted inside scenario.
-  for(const index of [1,2]){assert.deepEqual(candidate.states[index].metadata,baseline.states[index].metadata);assert.deepEqual(candidate.states[index].body,baseline.states[index].body);assert.deepEqual(JSON.parse(JSON.stringify(candidate.states[index].values)),baseline.states[index].values);assert.equal(candidate.states[index].defines,expected.states[index].defines);for(const stage of [0,1])assert.deepEqual(candidate.states[index].prefixes[stage].split('\n').sort(),baseline.states[index].prefixes[stage].split('\n').sort());}
+  for(const index of [1,2]) {
+    const historicalValues = baseline.states[index].values;
+    if(kind === 'standard') {
+      // The later IBL fix explicitly declares this formerly absent false field.
+      // Keep the historical bytes and every actual value; this fixture has no IBL.
+      assert.equal(Object.hasOwn(historicalValues, 'LODBASEDMICROSFURACE'), false);
+      assert.equal(historicalValues.REFLECTION, false);
+    }
+    const expectedValues = kind === 'standard'
+      ? {...historicalValues, LODBASEDMICROSFURACE: false}
+      : historicalValues;
+    assert.deepEqual(candidate.states[index].metadata,baseline.states[index].metadata);
+    assert.deepEqual(candidate.states[index].body,baseline.states[index].body);
+    assert.deepEqual(JSON.parse(JSON.stringify(candidate.states[index].values)),expectedValues);
+    assert.equal(candidate.states[index].defines,expected.states[index].defines);
+    for(const stage of [0,1])assert.deepEqual(candidate.states[index].prefixes[stage].split('\n').sort(),baseline.states[index].prefixes[stage].split('\n').sort());
+  }
   assert.deepEqual(candidate.pluginUniforms,baseline.pluginUniforms);assert.equal(candidate.programs,baseline.programs-1);assert.equal(candidate.extraReferenceReleased,true);
 });
 test('known unsupported order-sensitive custom processor remains an explicit limitation',async()=>{
