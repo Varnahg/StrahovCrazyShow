@@ -574,3 +574,8 @@ Samostatná V4 referenční série: první Golden OFF0mod/0sync/max124.5ms, prvn
 ## WebGPU KEY-31: normální V4 a zbytkové B6 přechody (18.10.2026)
 
 [Hitches-v16](performance/evidence/webgpu-migration-20261016/hitches-v16/README.md) uchovává22 ověřených artefaktů ze stejného V4 bf28a565 bez existujícího profileEnvironment opt-in, bez změny JS. Golden/F: startup40,3144s, maxima117,9/110,3ms,0/0 a4/2 modulů/sync. Čerstvé B6: startup41,6261s; OFF28,4FPS, firstF23,5FPS/203,2ms/2mod1sync, steadyON24,3FPS/85,6ms. Otočení ven22mod16sync/max963,2ms a výstup28mod16sync/max2142,3ms stále selhávají proti plynulosti; celá oprava nepřijatá. Oba raw/health audity PASS; bez vypnutého lifecycle profileru netvrdíme resources0. Query-off nevypíná GPU timestamp a neizoluje režii samotného inventáře. Chybí plné defines/slot attribution; nový bounded task webgpu-b6-exit-variant-proof-20261018 porovná skutečný merged entry-dark-metal mesh po fresh outside a po B6 historii. Hrané buildy a runtime main stejné, vlastní služby ukončeny.
+
+
+## WebGPU KEY-31: přesný B6 exit a pořadí defines (18.10.2026)
+
+[Hitches-v17](performance/evidence/webgpu-migration-20261016/hitches-v17/README.md):4/4actual CPU proof/čtecí review PASS,16artefaktů hash/gzip ověřeno. Původní merged entry-dark-metal PBR cap4 má outside po historii exact správné defines a opakované Effect reuse; další inactive history bug nepotvrzen. Hidden camera-pass readiness připraví Effect, ne GPU pipeline. Freshinside vs outside-firstinside má stejné public hodnoty a odlišné pořadí4řádků, zatím bez same-engine/GPU atribuce. Nový disjunktní define-order proof ověří tento mechanismus a bounded hotový-result normalizaci v actual PBR/Standard/WGSL/plugin cestách. Runtime/vendor/hranýbuild nezměněné, žádné uzavření KEY-31.

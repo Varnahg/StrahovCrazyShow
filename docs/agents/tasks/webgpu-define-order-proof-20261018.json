@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-define-order-proof-20261018",
+  "title": "KEY-31: doložit stejné varianty lišící se pořadím defines",
+  "status": "ready",
+  "dependsOn": ["webgpu-b6-exit-variant-proof-20261018"],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/define-order-proof-20261018/",
+    "docs/agents/handoffs/webgpu-define-order-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze izolovaný CPU proof/counterfactual nad frozen V4 a patched9.30.0. Žádný filesystem vendor/native/main/V4/hranýbuild zápis, nová cache nebo další loading etapa. Původní b6-exit proof zůstane byte-identický.",
+    "Nejprve doložit same-engine duplicitu: skutečné identické PBR/Standard vlastnosti a geometry se dvěma pořadími vzniku light slotů, actual native readiness/draw. Shodné konečné public define hodnoty/sloty/geometry, odlišný plný string a native Effect cache key/Effect identity. Efekt mezi dvěma nezávislými enginy není tato reprodukce.",
+    "Counterfactual kandidát je čistá normalizace až hotového původního MaterialDefines.toString result, bez mutace _keys/rebuild/clone/isEqual a bez dalšího čtení getters. Pouze celý blok unikátních jednoduchých #define ASCII identifier s prázdnou boolean hodnotou nebo celým doloženým finite numeric literal. Zachovat původní spelling a line bytes; po úplné validaci řadit řádky deterministicky. Žádný partial sort. Unknown/duplicate/conditional/undef/function macro/comment/expression/CR/Unicode linebreak/unsafe reserved macro vrací byte-identický původní text. Prázdný blok také beze změny. Omezená velikost/počet řádků s fallbackem, žádné persistentní mapy nebo cache.",
+    "Parser hotového výsledku nemůže poznat, zda dva čisté unikátní literal řádky vznikly z jednoho multiline value. Pokud je přijme, přesně uvést tento flat-block kontrakt; neslibovat blanket odmítnutí všech multiline properties. Accessor receiver/read order/throw a pozdější změna hodnot zůstávají původní, protože serializace se provede originální metodou před čistou transformací.",
+    "Případný process-local wrapper MaterialDefines.prototype.toString má přesný receiver/args, scope jen vlastního izolovaného procesu, identity restore v finally, žádné zápisy do sdílených dependencies. Baseline/counterfactual oddělit, assertions nesmí nahradit readiness/draw ani falšovat material flags. Původní function identity a cleanup ověřit i při throw.",
+    "Porovnat skutečný pinned native WGSL processor, PBR/Standard a relevantní používané plugin callback cesty podle existujících tests/wgsl-surface-materials.test.ts. Shader-language selection, uniform/texture/sampler/attribute/binding metadata musí zůstat shodné; samotná set-equality defines není univerzální shader semantic proof. Pořadí hotových generated literal konstant může být jiné, veškerý jiný kód musí mít doloženou shodu nebo vysvětlený rozdíl. NullEngine pipeline frontend není driver validation.",
+    "Custom preProcessor/processCodeAfterIncludes nebo další callback může pořadí defines pozorovat: syntaktický guard není univerzální ekvivalence všech Babylon rozšíření. Doložit skutečné hooky projektu a jasně vymezit nepodporované/nevěrohodné větve; univerzální vendor patch z tohoto úkolu nevyplývá. Žádná atribuce celé B6 exit mezery pouze podle tohoto mechanismu."
+  ],
+  "verification": [
+    "Cílené CPU regrese actual same-engine duplicate/reuse, PBR numeric strings NUM_SAMPLES=0 a ALPHATESTVALUE=0.5, Standard, hodnotové rozdíly, unknown fallback, getters/throw/later mutation, capacity a idempotence. Původní B6 geometry/history assertions zachovat v kopii podle potřeby.",
+    "Report přesných original/canonical strings, values, Effect IDs/cache keys, zpracovaných WGSL a layout metadata. Uvést lokální CPU cenu transformace pouze jako microbench, nikoli startup/FPS/GPU úsporu. TSX_DISABLE_CACHE=1, bez install/build/fullsuite/GPU/portů.",
+    "Předat source/dependency/input/probe/report/log SHA, porovnání variant, cílený refaktor, cleanup a známé limity. Freeze/handoff/release bez commitu; root čtecí review a případný skutečný GPU experiment budou samostatné."
+  ],
+  "notes": [
+    "Přímý root task v existujícím BMAD; cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, owner webgpu-define-order-proof-01a14497. Claim před zápisem, žádný rekurzivní workflow.",
+    "Vstup b6-exit manifest97fd7099d849864d67429a9cc082276458b594dadbed34ace91815c469bdd17f. Freshinside vs outside-firstinside mají jen pořadí LIGHT3/HEMILIGHT3/LIGHTCOUNT/MAXLIGHTCOUNT odlišné; outsideexit exact reuse funguje. Full source references v analysis.md původního proofu.",
+    "Varianty: plošný rebuild sort mění _keys a pozdější opaque hodnoty; guard pouze při rebuild nezajistí budoucí změny hodnot/getters. Bool/number-only guard neřeší skutečné PBR numeric strings. Hotový-result transform zachová původní getter pořadí, změnu hodnot i clone semantics, ale stojí alokace/sort a může měnit order-sensitive custom hooks. Předdeklarace všech slotů přidává falešné klíče a ovlivňuje needRebuild; obecná cache je zbytečně širší. Zvolen pouze bounded counterfactual, produkční přínos neznámý.",
+    "Primární externí podklady: https://www.w3.org/TR/WGSL/#declaration-and-scope a https://registry.khronos.org/OpenGL/specs/gl/GLSLangSpec.4.60.html. Nejsou samy důkazem bezpečnosti libovolných custom callbacks/strings. Pinned PreparePreProcessors a WGSL _convertDefinesToConst použít jako actual source."
+  ]
+}
