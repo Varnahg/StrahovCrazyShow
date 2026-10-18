@@ -2,8 +2,10 @@
   "schemaVersion": 1,
   "id": "webgpu-material-switch-cost-proof-20261018",
   "title": "KEY-31: rozlišit cenu přepnutí již připravených materiálů",
-  "status": "ready",
-  "dependsOn": ["webgpu-define-order-qa-20261018"],
+  "status": "done",
+  "dependsOn": [
+    "webgpu-define-order-qa-20261018"
+  ],
   "writePaths": [
     ".cache/webgpu-migration-checks/material-switch-cost-proof-20261018/",
     "docs/agents/handoffs/webgpu-material-switch-cost-proof-20261018.md"
@@ -23,6 +25,7 @@
   "notes": [
     "Přímý podúkol pokračujícího projektového BMAD; bez rekurzivního rendereru/workflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow, owner webgpu-material-switch-proof-01a14497. Přečíst AGENTS/policy a status/worktrees; vlastní claim před zápisem.",
     "Výzkum resume_plan_review ukazuje mesh-draw-profile172–182/306–321; pinned mesh.pure2142–2239, PBR963–1198, Light.setEnabled382–384, DrawWrapper50–59, WebGPUDrawContext79. V6 QA má15etap; native je pouze9etap a jeho nový smoke stále6.265sF/82WGSLmod/57sync, nelze tyto varianty smíchat.",
-    "Nativní define-order runtime c18844f2264dd773269406346e62318d0dee3338 → main7eb777763c9cbf1b090d672d755d12d0a59a987d;1330tests/build/integration PASS. Výkonové řešení a KEY31 zůstávají otevřené."
+    "Nativní define-order runtime c18844f2264dd773269406346e62318d0dee3338 → main7eb777763c9cbf1b090d672d755d12d0a59a987d;1330tests/build/integration PASS. Výkonové řešení a KEY31 zůstávají otevřené.",
+    "Root přijal V2 manifest7a25099dad279c07ef5cf203004802438fe657db392bb209a7dc1a91ec1dda23:3x5/5,scopedTS2963/0, nezávislé review po2evidence opravách beználezů. Hitches-v21 archiv46artefaktů; žádný runtime/GPUbenefit ani novácache."
   ]
 }

@@ -222,3 +222,8 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## Nativní define-order integrace
 
 18.10 runtime c18844f2264dd773269406346e62318d0dee3338 → main7eb777763c9cbf1b090d672d755d12d0a59a987d, přesně7files,132foreignworkingcestzachováno. Native1330/fullTS/build/integrationPASS a oba Edgebackendyhealthyfunctional. Hitches-v20 archiv38artefaktů. NativefirstF6,265s/82mod57sync stále výkonověnepřijat, žádnáQAcoverageintegrace. Nový material-switch-cost-proof má vlastní cache/handoff pro CPU proof jižpřipravenýchmateriálů. Nativeclaimrootpřevzatpochildrelease; po tomtohandoffu uvolnit.
+
+
+## Warm material switch CPU proof přijat
+
+18.10 V2manifest7a25099dad279c07ef5cf203004802438fe657db392bb209a7dc1a91ec1dda23,3×5/5,scopedTS2963/0. V1review odkazy/observerčas opravené bez změny měřených bytes; finálníreview beználezů. Hitches-v21 uchovává46artefaktů. Další výzkum může porovnat čistouserializaci, nevznikla runtimecache. Childprocessyukončené/claimreleased.

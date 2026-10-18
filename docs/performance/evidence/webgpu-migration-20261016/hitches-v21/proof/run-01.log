@@ -1,0 +1,127 @@
+BJS - [08:55:03]: Babylon.js v9.30.0 - Null engine
+BJS - [08:55:03]: Babylon.js v9.30.0 - Null engine
+✖ warm actual pbr switch costs and invariants (305.453ms)
+BJS - [08:55:03]: Babylon.js v9.30.0 - Null engine
+✖ warm actual standard switch costs and invariants (67.9491ms)
+BJS - [08:55:03]: Babylon.js v9.30.0 - Null engine
+✖ warm actual surface switch costs and invariants (62.6178ms)
+✖ actual observer failure preserves its identity and releases every local hook/resource (38.0501ms)
+✔ hook receiver/arguments/throws and later owner stay unchanged (0.8931ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 1
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1942.9802
+
+✖ failing tests:
+
+test at proof.test.ts:1:12211
+✖ warm actual pbr switch costs and invariants (305.453ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+      allEffectsDisposed: true,
+  +   contextsDisposed: false,
+  -   contextsDisposed: true,
+      engine: true,
+      hooks: 0,
+      observers: 0,
+      openScopes: 0,
+      scene: true
+  
+      at fixture (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\material-switch-cost-proof-20261018\proof.test.ts:109:12)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\material-switch-cost-proof-20261018\proof.test.ts:113:136)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { hooks: 0, observers: 0, scene: true, engine: true, allEffectsDisposed: true, contextsDisposed: false, openScopes: 0 },
+    expected: { hooks: 0, observers: 0, scene: true, engine: true, allEffectsDisposed: true, contextsDisposed: true, openScopes: 0 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at proof.test.ts:1:12211
+✖ warm actual standard switch costs and invariants (67.9491ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+      allEffectsDisposed: true,
+  +   contextsDisposed: false,
+  -   contextsDisposed: true,
+      engine: true,
+      hooks: 0,
+      observers: 0,
+      openScopes: 0,
+      scene: true
+  
+      at fixture (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\material-switch-cost-proof-20261018\proof.test.ts:109:12)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\material-switch-cost-proof-20261018\proof.test.ts:113:136)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { hooks: 0, observers: 0, scene: true, engine: true, allEffectsDisposed: true, contextsDisposed: false, openScopes: 0 },
+    expected: { hooks: 0, observers: 0, scene: true, engine: true, allEffectsDisposed: true, contextsDisposed: true, openScopes: 0 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at proof.test.ts:1:12211
+✖ warm actual surface switch costs and invariants (62.6178ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+      allEffectsDisposed: true,
+  +   contextsDisposed: false,
+  -   contextsDisposed: true,
+      engine: true,
+      hooks: 0,
+      observers: 0,
+      openScopes: 0,
+      scene: true
+  
+      at fixture (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\material-switch-cost-proof-20261018\proof.test.ts:109:12)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\material-switch-cost-proof-20261018\proof.test.ts:113:136)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { hooks: 0, observers: 0, scene: true, engine: true, allEffectsDisposed: true, contextsDisposed: false, openScopes: 0 },
+    expected: { hooks: 0, observers: 0, scene: true, engine: true, allEffectsDisposed: true, contextsDisposed: true, openScopes: 0 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at proof.test.ts:1:12299
+✖ actual observer failure preserves its identity and releases every local hook/resource (38.0501ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+      allEffectsDisposed: true,
+  +   contextsDisposed: false,
+  -   contextsDisposed: true,
+      engine: true,
+      hooks: 0,
+      observers: 0,
+      openScopes: 0,
+      scene: true
+  
+      at fixture (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\material-switch-cost-proof-20261018\proof.test.ts:109:12)
+      at async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-migration-checks\material-switch-cost-proof-20261018\proof.test.ts:114:109)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { hooks: 0, observers: 0, scene: true, engine: true, allEffectsDisposed: true, contextsDisposed: false, openScopes: 0 },
+    expected: { hooks: 0, observers: 0, scene: true, engine: true, allEffectsDisposed: true, contextsDisposed: true, openScopes: 0 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
