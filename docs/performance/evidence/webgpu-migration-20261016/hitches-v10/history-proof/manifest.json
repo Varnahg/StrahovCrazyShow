@@ -1,0 +1,56 @@
+{
+  "frozenAt": "2026-10-18T01:29:27.050Z",
+  "task": "webgpu-light-define-history-proof-20261018",
+  "sourceSnapshotId": "0e15522126720f08e892de60685df25f5d20c313c562c952151de7d94d9f964a",
+  "sourceManifestSha": "27bf9f8659e529126dda3c78708edc7311cc4a0f615db53c7339a8d2c81affc0",
+  "sources": {
+    "client/stable-light-state.ts": "4adfb37dae15ca6a0b9e1b65634266b6791ffc1d8c1aca01858a9557c7f7b8bc",
+    "client/strict-material-preparation.ts": "a1c384e975ddd5d4d5f7d6fcb917f916e37b82c7a4d00a79b10aa5a99d12019a",
+    "client/render-shaders.ts": "e73d2d242eb18d2c876cee60f6811bc41061520eee4718d1e9eb583252e60fd0",
+    "client/game.ts": "983182d6d2870bededa8d4896d40b3127b5ce69571d45bc196f90cd819758a04",
+    "client/light-preparation.ts": "43fa59c2555ea9f70a9a9f62ad69c686718c420a89938a66c2c3786e0cc3f93b"
+  },
+  "dependencies": {
+    "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79",
+    "Engines/nullEngine.pure.js": "5c844b68167f2dca140491cb224b5c7cfab3472e4f6ce8676057d575e909b921",
+    "Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+    "Materials/materialHelper.functions.js": "b7ae2d99bd444fbd807995aeefa8e35986dd58bdeab770a678312c030c7712fd",
+    "Materials/materialDefines.js": "fcb89b6c947b81c0907b80caf9f3259b83b0f597922a149f5288f1e9082ca847",
+    "Materials/PBR/pbrBaseMaterial.pure.js": "fc3a71a18055e31c9e222a81294ad352d5d8a2088d97a65b04b208402302fbf5",
+    "Materials/standardMaterial.pure.js": "46d48bd7c3abbb2c763bd598dd0df35881dfcd2aefd3dee4f3103bab36e946e0",
+    "Materials/effect.pure.js": "8bffd8b31a0ef5afd663c8c2234ed7064f87c617d22de5a1933a34e566aa0539",
+    "Meshes/mesh.js": "0fc3570806ebb94349e9a3f11ca4225d1f619644ade226b8ac785c85ccae97d7",
+    "Meshes/subMesh.pure.js": "d9b6f61a0f5ad773ab23c67393a8bad278dea133f539887458d1e208f8df1458",
+    "Lights/light.js": "d3c3d0e22c4fcbdb6057eeafa0ac8379627aa40853ce30e7428d0e1030af7c77",
+    "Lights/Shadows/shadowGenerator.js": "2c094f0c900a6cffd385a17fe8e0ceafe04b801d0e4bb460784ca22223bd62ac"
+  },
+  "artifacts": {
+    "freeze.mjs": "f44c710f71ad60f36a8abdd0621dc0e9bc34462d7bb83b1ba2cfa4f75ab140f6",
+    "package.json": "a90fc33418afa2b9cbf4768524b021135b965ecdf993457505bfae3ac44a8428",
+    "probe-final.log": "41594c8995c7a95b65b7187e19ee085b5c7e2f420c3f6a5f55b1ef818f29173c",
+    "probe-initial.log": "4ae52436f2c4ec16809b9d5afa09b7c41961206e271ad51ae40aafd75c3f380f",
+    "probe.ts": "8f3bfad4cf71d3c109d0bda945c1470b6852ffe19e38520a4bddf4bdc4b403ee",
+    "report.json": "0891df7074a0e35cbb838c6fd2eeb5b0f3b7bab8f250a12c2f73b8923eb58e02"
+  },
+  "handoff": {
+    "path": "C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\docs\\agents\\handoffs\\webgpu-light-define-history-proof-20261018.md",
+    "sha256": "8bd70d7fe6f827b8d9fc705555c27d2a6565d698ab6e4b8adb61d770f72e9356"
+  },
+  "scope": "cache-only representative CPU proof; baseline then isolated instance-method counterfactual; no dependency/production modifications",
+  "validation": {
+    "passed": true,
+    "subjects": 4,
+    "stages": 10,
+    "variants": 2,
+    "captures": 80,
+    "command": "TSX_DISABLE_CACHE=1 node --import tsx probe.ts",
+    "startedAt": "2026-10-18T01:28:08.205Z",
+    "endedAt": "2026-10-18T01:28:08.599Z"
+  },
+  "limitations": [
+    "Representative PBR/Standard geometry, not exact production car or attribution of all31programs",
+    "NullEngine GLSL frontend and native dummy URL textures; no GPU/actual image/driver pipeline proof",
+    "CPU instancing capability enabled; actual requested PCF falls back to supported POISSON",
+    "Fixed camera/material/pass/geometry/alpha/texture metadata, no IBL texture; global production IBL/plugin state remains outside this fixture"
+  ]
+}

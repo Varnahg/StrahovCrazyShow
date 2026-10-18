@@ -1,0 +1,75 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-coverage-v2\\tests\\game-light-preparation.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\day-zero-prototype-20261018\\candidate\\tests\\game-light-preparation.test.ts"
+index 2c983a2..47eba30 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-hitch-validation-20261017\\b6-coverage-v2\\tests\\game-light-preparation.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-migration-checks\\day-zero-prototype-20261018\\candidate\\tests\\game-light-preparation.test.ts"
+@@ -364,7 +364,7 @@ test("actual Game shader inventory follows the real loopback diagnostic opt-in",
+       window: { location: new URL(url) },
+     });
+     run.call({ engine: {}, renderHealth: { rendererId: 1 } });
+-    assert.deepEqual(captured, { shader: expected, unusedDefines: expected, limits: expected ? { maxStages: 20 } : undefined }, url);
++    assert.deepEqual(captured, { shader: expected, unusedDefines: expected, limits: expected ? { maxStages: 21 } : undefined }, url);
+   }
+ });
+ 
+@@ -693,7 +693,7 @@ test("B6 pair uses source-derived landing and real camera torch, then restores l
+   f.game.quality = "high"; f.game.timeOverride = 1792303200000; f.game.flashlightOn = true;
+   f.game.yaw = 0.75; f.game.pitch = 0.6; f.game.firstPerson = true;
+   f.finish(); const result = await pending;
+-  assert.equal(result.status, "complete"); assert.equal(result.stages.length, 13);
++  assert.equal(result.status, "complete"); assert.equal(result.stages.length, 15);
+   assert.equal(JSON.stringify(f.game.actor), initialActor);
+   assert.equal(f.game.firstPerson, true); assert.equal(f.game.yaw, 0.75); assert.equal(f.game.pitch, 0.6);
+   assert.equal(f.game.flashlightOn, true); assert.equal(f.game.quality, "high");
+@@ -761,8 +761,8 @@ test("virtual B6 uses read-only collision at source target and leaves follow his
+ });
+ 
+ test("day pair retains the same timeout and does not touch retired targets", async (t) => {
+-  for (const ending of ["timeout", "disposed"] as const) {
+-    const f = b6Fixture(t), pending = f.start(); f.advanceTo("day-1-on"); f.effects(false);
++  for (const stage of ["day-0-on", "day-1-on"]) for (const ending of ["timeout", "disposed"] as const) {
++    const f = b6Fixture(t), pending = f.start(); f.advanceTo(stage); f.effects(false);
+     if (ending === "timeout") f.timeout();
+     else {
+       f.game.disposed = true;
+@@ -778,6 +778,41 @@ test("day pair retains the same timeout and does not touch retired targets", asy
+   }
+ });
+ 
++test("day zero POINT stages use actual OFF/ON membership without changing requested state or later point-one coverage", async (t) => {
++  const f = b6Fixture(t), beforeActor = JSON.stringify(f.game.actor);
++  new DirectionalLight("day sun", Vector3.Down(), f.scene);
++  const receiver = f.scene.meshes.find(m => m.name === "actual beam caster")!;
++  const original = f.game.updateRenderEnvironment;
++  f.game.updateRenderEnvironment = (...args: any[]) => {
++    const result = original(...args);
++    return f.stage.startsWith("day-") ? { night: 0 } : result;
++  };
++  const pending = f.start(); f.advanceTo("day-0-off");
++  assert.equal(f.environment.at(-1)!.instant, selectLightingPreview("day").instant);
++  assert.deepEqual(f.environment.at(-1)!.pos, [0, 1, 0]);
++  assert.equal(f.environment.at(-1)!.on, false);
++  assert.ok(f.streets.every(light => !light.isEnabled() && light.intensity === 0));
++  assert.deepEqual(receiver.lightSources.map(light => light.getClassName()), ["DirectionalLight", "HemisphericLight"]);
++  f.effects(false); f.game.weather = {}; f.game.quality = "low"; f.game.timeOverride = 1792303200000;
++  const replacement = { ...f.rig }; f.game.avatars.set("local", replacement); f.game.profile = {};
++  f.tick(); assert.equal(f.stage, "day-0-off", "pending shaders keep the requested day0 variant active");
++  assert.equal(f.environment.at(-1)!.self, replacement);
++  f.effects(true); f.advanceTo("day-0-on");
++  assert.equal(f.environment.at(-1)!.on, true);
++  assert.ok(f.streets.every(light => !light.isEnabled() && light.intensity === 0));
++  assert.deepEqual(receiver.lightSources.map(light => light.getClassName()), ["SpotLight", "DirectionalLight", "HemisphericLight"]);
++  assert.equal(f.game.flashlightOn, false, "preparation does not change the requested torch");
++  f.advanceTo("day-1-off");
++  assert.deepEqual(f.streets.map(light => [light.isEnabled(), light.intensity]), [[true, 0], [false, 0], [false, 0]]);
++  f.finish(); const result = await pending;
++  assert.equal(result.status, "complete"); assert.equal(result.stages.length, 15);
++  const day0 = result.stages.find((stage: { stage: string }) => stage.stage === "day-0-off")!;
++  assert.equal(day0.restarts, 1); assert.equal(day0.restartReasons.weather, 1);
++  assert.equal(f.environment.at(-1)!.instant, 1792303200000);
++  assert.equal(f.game.flashlightOn, false); assert.equal(f.game.flashlight.beam.light.isEnabled(), false);
++  assert.equal(JSON.stringify(f.game.actor), beforeActor); assert.equal(f.game.ready, false);
++});
++
+ test("B6 timeout restores presentation under the original 30 second deadline", async (t) => {
+   const f = b6Fixture(t); const pending = f.start(); f.advanceTo("b6-day-on");
+   f.effects(false); f.timeout();

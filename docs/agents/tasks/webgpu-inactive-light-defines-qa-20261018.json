@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-inactive-light-defines-qa-20261018",
+  "title": "KEY-31: izolovaná oprava neaktivních light falloff defines",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-migration-checks/inactive-light-defines-qa-20261018/",
+    "docs/agents/handoffs/webgpu-inactive-light-defines-qa-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze vlastní QA source/dependency kopie nad frozen day-zero-v3; původní native/main, dependencies-v5, hrané4193/4192/4188 a ostatní cache beze změny.",
+    "Minimální pinned9.30 vendor hunk v PrepareDefinesForLights: při existujícím resetu neaktivního slotu vyčistit LIGHT_FALLOFF_PHYSICAL/GLTF/STANDARD. Nedotýkat se aktivních slotů ani globálních USEPHYSICALLIGHTFALLOFF/USEGLTFLIGHTFALLOFF. Žádný plugin, wrapper, cache nebo další průchod scénou.",
+    "Zachovat stávající core patch a verze; kopie patch/lock metadata mají přesně odpovídat novému hunku/hashům. Nativní distribuční změny budou až samostatně po přijetí.",
+    "Nový dependency root: fyzické nesdílené kopie core i loaders, bez hardlinků nebo zapisovatelných junction targetů. Ostatní závislosti mohou být read-only propojené. Všechny source/test/loaders importy musí používat jednu QA core identitu; původníV5 hashy se nesmí změnit."
+  ],
+  "verification": [
+    "Cílené actual-helper/PBR/Standard regrese historie všech3falloff typů, inactive/active/reactivation, cap/disableLighting a materiálovýglobalphysical/glTF flag. Oddělit přesně opravený nativní loop od nepokrytých vlastních pluginů/cap-excluded stavů.",
+    "Prokázat source diff a dependency identity/realpaths, ideálně skutečným malým GLB loaderem+instanceof protiQAcore. Všechny kopírovanécore/loaders vstupy/výstupy hashovat, jedinýruntime rozdíl je zvolenýhunk.",
+    "Použít již existující příslušné core patch/reflection/shadow regrese podle scope; ne fullsuite/build/GPU. Root provede úplný snapshot a GPU pilot. Runtime/Test/provenance/lockdiff/handoff předat společně."
+  ],
+  "notes": [
+    "Přímérootzadání přes existujícíBMAD; žádnýdalšíworkflow. Cwd C:/Users/rezac/.codex/worktrees/webgpu-comparison/StrahovCrazyShow.",
+    "CPUproof light-define-history manifest20187e11... potvrzuje4cesty a pouzeSTANDARD2diff/novýEffect; není to atribucevšech31produkčníchprogramů neboGPUekvivalence. Nízkýsourcefix je zvolen předpluginem, protožehelperužmádirtyguard/activecount a nulovýnovýlifecycle.",
+    "Read-only dependencies-v5; do jeho.realpaths nesmí vést žádnýzápis. Nevytvářet root .pnpm/.modules.yaml/.vite* jako zapisovatelnéjunctiony doV5. Před kopiemi zkontrolovat skutečné symlinky a kam importy směřují.",
+    "Vlastnícandidate smí měnit pouze copied patches/@babylonjs__core@9.30.0.patch, pnpm-lock.yaml, cílené nové/odpovídající testy a kopii Babylon helperu vQAdeps. Workspace/package verze se nemění. Žádný install/lifecycle script; pokud je potřeba pnpm lockfile-only nebo jiná mutace mimo tento předpoklad, nejprve konkrétně navrhnout rootovi.",
+    "Copy/script/test použije přímý node/tsx TSX_DISABLE_CACHE=1. Žádné velké world/GLB ani GPU. Zmrazit přesnépathy/SHA/diffy/tests a návrhrootassembleru včetně nového node_modules targetu; vlastníprocesy ukončit, handoff+release, bezcommitu."
+  ]
+}
