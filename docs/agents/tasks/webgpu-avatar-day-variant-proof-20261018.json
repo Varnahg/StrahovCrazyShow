@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-avatar-day-variant-proof-20261018",
   "title": "KEY-31: porovnat skutečné avatarové denní varianty spawn a B6",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     ".cache/webgpu-migration-checks/avatar-day-variant-proof-20261018/",
@@ -23,6 +23,7 @@
     "Cílem je průzkum před dalším QA. Nový bounded výsledek nesmí přepisovat původní frozen proof/prototypy. Žádná produkční implementace není tímto taskem autorizovaná.",
     "Hitches-v7: zbývá20modulů/10preparations/10sync, top main příprava avatar170.7ms a entry52.6ms. Dominantní wrapped-depth churn neprokázán. Preferovat menší existující apply(day,torch,1), jen pokud skutečné full defines/reuse sedí.",
     "Prototyp A94 už používá16 inventory stage labels. Toto je CPU proof; neměnit runtime limity ani přidávat diagnostické hooks.",
-    "Read-only dependencies-v5, přímý node/tsx s TSX_DISABLE_CACHE=1. Předat důkazy/limity a release bez commitu."
+    "Read-only dependencies-v5, přímý node/tsx s TSX_DISABLE_CACHE=1. Předat důkazy/limity a release bez commitu.",
+    "18.10 root přijal bounded proof po nezávislém review: actual Alex12drawn/7Effects,6přesných A/B/reentry porovnání OFF/ON, metadata texture IO a cleanup PASS. Hitches-v8; NullEngine/GLSL/POISSON a fixture distance5 místo default8 jsou explicitní limity. Navazuje pouze izolovaný QA task webgpu-b6-coverage-completion-prototype-20261018, nikoli přijetí migrace."
   ]
 }
