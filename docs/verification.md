@@ -559,3 +559,9 @@ Dva V3 Day přechody62mod/45sync a3309.5/3178.9ms; dva V4 přechody0mod/0sync a1
 ## WebGPU KEY-31: material budget capture proof (18.10.2026)
 
 [Hitches-v13](performance/evidence/webgpu-migration-20261016/hitches-v13/README.md): skutečný tiny-glTF/global cap setter/deferred Scene observer a GltfLightBudget,5/5 PASS. Late prvnícapture drží42; known4 readiness předprepareFrame vytvoříEffect42 potom4; guard před readiness pouze4. Explicit7/42 zachované, LIGHTCOUNT2 a skutečnýcamera-pass draw. Nezávisléreview bez nálezů. KontrolovanýREADYgap/NullEngine není produkčníGPUtiming. Původnícap42grass byl neaktivní; nelze mu připsat Day/startup náklad. Bezruntimeopravy, další cache/diagnostiky nebo změny hranýchbuildů.
+
+## WebGPU KEY-31: avatar view V2 a světelné kontroly (18.10.2026)
+
+[Hitches-v14](performance/evidence/webgpu-migration-20261016/hitches-v14/README.md): opravený CPU proof V2, manifest0cadc7d4…3730. Sedm konfigurací,119 captures/70porovnání,77přesných restore kontrol včetně21výjimek. ReviewP2 focal/reference drift opraven RED→GREEN, V1 zachována. Far-only mění pouze maxZ; skutečné vrcholy/bounds uvnitř, world shadow práce přesto zůstává. Není to GPU výkonový důkaz.
+
+Samostatná V4 referenční série: první Golden OFF0mod/0sync/max124.5ms, prvníF4/2/max210.9ms; následný Day/Blue/Night/fullMoon0/0, maxima119.5–161.4ms. Jde o zahřáté pořadí, ne6coldtestů. Health/dispose bez chyb, cloud0.96 vypnul celestial shadows, nikoli kladnýDIR. Source+count podporují D+P+H(+S), bez přímého per-light exportu. B6/clear/multiplayer neověřené. Následný avatar far QA experiment je oddělený a musí zachovat world Golden/B6 coverage; native a hrané buildy beze změny.
