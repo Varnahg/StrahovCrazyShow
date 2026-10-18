@@ -173,3 +173,7 @@ Choice follows native-v3/v4 evidence of expensive environment CPU work and the e
 ## V3 negativní Day pilot a historie defines
 
 18.10: přijato předání day-zero prototype a light-define-history proof pouze jako dokončený QA experiment/průzkum. Hitches-v10 archivuje source/test diffs,108/108targeted, fullTS/build, raw3,104records a CPU80drawcaptures. V3 Day31programů/62modulů/45sync,835msCPU+3309.5msgap, startup43.0761s. PBR/Standard history bug prokázaný; izolovaný třířádkový vendor fix v samostatném tasku je dalším kandidátem. Původní user build, cizí WIP a nativní runtime se nemění. Linear KEY-31 komentář808f7c06-3745-4714-b904-763ddedd9d97.
+
+## V4 bez nové Day kompilace
+
+18.10: QA vendor task přijat po16/16+77/77, source/provenance review, full combined1384/1384+build+integration a2Daypilotech. Hitches-v11 zachovává52artefaktů/raws a přesné limity startupu/scény. Leaf native přenos převzat rootem pod rezervací webgpu-inactive-light-native-root-01a14497 s doloženým handoffem4772d8f4…21e0; čistý native snapshoteb061b9eb34a0cdf8a94560ad7803ef9235ab1447e9b4d986c7cb640e2f0b7b3 nyní prochází úplnou sadou. Runtime ještě necommitnut ani integrován; nesmí se přibalit do tohoto metadatového celku. Linear82644f23-57ec-45ac-8df7-cf10f5ccf7fe.

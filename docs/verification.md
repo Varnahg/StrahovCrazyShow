@@ -539,3 +539,9 @@ Zůstává Day preview ve spawnu:869.2msCPU/29programů/0RTT a3593.8msgap; na tr
 ## WebGPU KEY-31: V3 negativní Day pilot a historie defines (18.10.2026)
 
 [Evidence hitches-v10](performance/evidence/webgpu-migration-20261016/hitches-v10/README.md). QA V3 cílené108/108/fullTS/build PASS, ale Day stále835ms CPU +3309.5ms mezera/31novýchprogramů; startup43.0761s. Nejde o přijatou opravu. Actual-helper CPU proof na4PBR/Standard cestách prokazuje zbylé inactive LIGHT_FALLOFF_STANDARD2 a jiné Effect identity při stejné aktivní scéně. Counterfactual obnovuje reuse,80actualdraw captures. Není to úplná atribuce všech31programů ani GPU parity. Vybraný navazující izolovaný QA task čistí3falloff příznaky v pinned helperu; core/loaders musí mít vlastní fyzické kopie. Fullsuite/integration a konečná GPU přejímka tohoto celku neprovedené, native runtime a hrané4193/4192/4188 beze změny.
+
+## WebGPU KEY-31: V4 bez nové Day kompilace (18.10.2026)
+
+[Evidence hitches-v11](performance/evidence/webgpu-migration-20261016/hitches-v11/README.md). Tři reset assignments v izolovaném pinned helperu odstranily historii inactive falloff flags. RED15fail/1pass→GREEN16/16,77related, scopedTS0, celý patch roundtrip6/6,10860dependency hashes. Combined snapshotbf28a565…40c8c0:1384/1384 pnpm test, build/fullTS a izolovaná integration PASS.
+
+Dva V3 Day přechody62mod/45sync a3309.5/3178.9ms; dva V4 přechody0mod/0sync a137.9/155.3ms. Zůstává≥100ms CPU prodleva. V4 venkovníF4mod/2sync,max157.9ms; nový B6 průchod neproveden. Startup V3 43.0761/43.7435s, V4 47.0673/42.6754s kolísá, absence regrese neprokázaná. Scene/traffic/cap histogram a čas přechodu se místy liší; přechodová FPS nejsou steady FPS přejímka. Health/dispose bez chyb, hrané4193/4192/4188 beze změny. Nativní vendor-only přenos a jeho plná validace/integrace jsou samostatný pokračující celek.
