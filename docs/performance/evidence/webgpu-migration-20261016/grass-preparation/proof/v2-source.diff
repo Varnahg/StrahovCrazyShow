@@ -1,0 +1,101 @@
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-grass-thin-preparation-proof-20261018\\proof.test.ts" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-grass-thin-preparation-proof-20261018\\proof-v2.test.ts"
+index 63ef6c1..9095209 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-grass-thin-preparation-proof-20261018\\proof.test.ts"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-grass-thin-preparation-proof-20261018\\proof-v2.test.ts"
+@@ -9,6 +9,8 @@ import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+ import { PointLight } from "@babylonjs/core/Lights/pointLight";
++import { Light } from "@babylonjs/core/Lights/light";
++import { Color3 } from "@babylonjs/core/Maths/math.color";
+ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+ import { acquireGrassResources, type GrassResources } from "../webgpu-hitch-validation-20261017/low-vehicle-v2/client/photo-grass-resources";
+@@ -22,7 +24,7 @@ const pack = JSON.parse(fs.readFileSync(new URL("public/models/vegetation/grass/
+ const recipe = JSON.parse(fs.readFileSync(new URL("public/models/vegetation/grass/material.json", base), "utf8"));
+ const hash = (x: string | Uint8Array) => createHash("sha256").update(x).digest("hex");
+ const report: any = { limits: ["Actual CPU thin branch with explicit NullEngine capability adaptation, not GPU/hardware rendering", "Pinned NullEngine.createTexture synthetic ready1x1 texture IO, no pixel decoding; real production geometry/recipe/PBR/plugin", "GLSL frontend, not nativeWGSL pipeline proof"], geometry: { sourceGeometrySha256: pack.sourceGeometrySha256, farTriangles: pack.levels.far.triangles, mediumTriangles: pack.levels.medium.triangles }, cases: [] };
+-after(() => fs.writeFileSync(new URL(`report-${process.env.PROOF_RUN}.json`, import.meta.url), JSON.stringify(report, null, 2) + "\n", { flag: "wx" }));
++after(() => fs.writeFileSync(new URL(`report-v2-${process.env.PROOF_RUN}.json`, import.meta.url), JSON.stringify(report, null, 2) + "\n", { flag: "wx" }));
+ 
+ async function fixture(name: string) {
+   const row: any = { name, complete: false, captures: [] }; report.cases.push(row);
+@@ -32,7 +34,14 @@ async function fixture(name: string) {
+   scene.useRightHandedSystem = true;
+   const camera = new FreeCamera("grass proof camera", new Vector3(0, .3, -1), scene); camera.minZ = .01; camera.setTarget(new Vector3(0, .02, 2)); scene.activeCamera = camera;
+   new HemisphericLight("ambient", Vector3.Up(), scene);
+-  const point = new PointLight("mapped POINT", new Vector3(0, 3, 2), scene); point.setEnabled(false);
++  const point = new PointLight("mapped POINT", new Vector3(0, 3, 2), scene);
++  // Exact mapped-light contract from frozen streets-renderer.ts / streets.ts.
++  // The bounded fixture position is intentional; no world-placement claim.
++  point.diffuse = Color3.FromHexString("#ffd6a0");
++  point.range = 22;
++  point.falloffType = Light.FALLOFF_STANDARD;
++  point.intensity = 0;
++  point.setEnabled(false);
+   const car = new TransformNode("existing car pose", scene), beam = new VehicleLighting(scene), stable = new StableLightState(scene);
+   let programs = 0, ioCalls = 0, materialDisposals = 0, textureDisposals = 0, currentThinCalls = 0, currentInstances: number[] = [];
+   const program = engine.createShaderProgram, drawElements = engine.drawElementsType;
+@@ -63,7 +72,21 @@ async function fixture(name: string) {
+     (b.mesh as any)._renderWithThinInstances = function (...args: unknown[]) { currentThinCalls++; return Reflect.apply(method, this, args); };
+     return b;
+   }
+-  function lighting(n: number) { point.setEnabled(n === 1); beam.update(car, 1, true, "low"); stable.update(); assert.equal(beam.light.shadowEnabled, false); }
++  let pointCount = 0;
++  function lighting(n: number) {
++    pointCount = n;
++    point.setEnabled(n === 1);
++    point.intensity = n === 1 ? .7 : 0;
++    beam.update(car, 1, true, "low"); stable.update();
++    assert.equal(point.getTypeID(), 0);
++    assert.equal(point.falloffType, Light.FALLOFF_STANDARD);
++    assert.equal(point.renderPriority, 0);
++    assert.equal(point.lightmapMode, Light.LIGHTMAP_DEFAULT);
++    assert.equal(point.getShadowGenerator(), null);
++    assert.equal(beam.light.renderPriority, 10);
++    assert.equal(beam.light.falloffType, Light.FALLOFF_STANDARD);
++    assert.equal(beam.light.shadowEnabled, false);
++  }
+   function frame() { currentThinCalls = 0; currentInstances = []; engine.beginFrame(); scene.render(); engine.endFrame(); }
+   async function settle(mesh?: any) {
+     for (let i = 0; i < 8; i++) { frame(); await turn(); }
+@@ -71,7 +94,16 @@ async function fixture(name: string) {
+   }
+   function capture(label: string, mesh?: any) {
+     const effect = mesh?.subMeshes[0]?._getDrawWrapper(camera.renderPassId)?.effect;
+-    const result = { label, programs, enabled: mesh?.isEnabled(), count: mesh?.thinInstanceCount ?? 0, hasThinInstances: mesh?.hasThinInstances ?? false, thinCalls: currentThinCalls, submittedInstances: currentInstances.slice(), attributes: effect?.getAttributesNames() ?? [], vertexBuffers: mesh?.getVerticesDataKinds() ?? [], effectId: effect?.uniqueId ?? null, effectDisposed: effect?.isDisposed ?? null, defines: effect?.defines ?? null, definesSha256: effect ? hash(effect.defines) : null, geometryIndices: mesh?.getTotalIndices() ?? 0, allocatedBytes: [...batches].find(b => b.mesh === mesh)?.allocatedBytes ?? 0 };
++    const activeLightOrder = mesh?.lightSources.map((light: Light) => ({type:light.getTypeID(),falloff:light.falloffType,priority:light.renderPriority})) ?? [];
++    if (effect) {
++      assert.deepEqual(activeLightOrder.map((light: {type:number}) => light.type), pointCount ? [2,0,3] : [2,3], "actual sorted light slots");
++      const standardFlags = effect.defines.split("\n").filter((line:string) => /^#define LIGHT_FALLOFF_STANDARD\d+$/.test(line));
++      assert.deepEqual(standardFlags, pointCount ? ["#define LIGHT_FALLOFF_STANDARD0", "#define LIGHT_FALLOFF_STANDARD1"] : ["#define LIGHT_FALLOFF_STANDARD0"], "all active STANDARD slots and no stale inactive flags");
++      assert.match(effect.defines, new RegExp(`^#define LIGHTCOUNT ${pointCount+2}$`,"m"));
++      assert.equal(/^#define POINTLIGHT1$/m.test(effect.defines), pointCount === 1);
++      assert.equal(/^#define LIGHT2$/m.test(effect.defines), pointCount === 1);
++    }
++    const result = { label, pointCount, activeLightOrder, programs, enabled: mesh?.isEnabled(), count: mesh?.thinInstanceCount ?? 0, hasThinInstances: mesh?.hasThinInstances ?? false, thinCalls: currentThinCalls, submittedInstances: currentInstances.slice(), attributes: effect?.getAttributesNames() ?? [], vertexBuffers: mesh?.getVerticesDataKinds() ?? [], effectId: effect?.uniqueId ?? null, effectDisposed: effect?.isDisposed ?? null, defines: effect?.defines ?? null, definesSha256: effect ? hash(effect.defines) : null, geometryIndices: mesh?.getTotalIndices() ?? 0, allocatedBytes: [...batches].find(b => b.mesh === mesh)?.allocatedBytes ?? 0 };
+     row.captures.push(result); return { ...result, effect };
+   }
+   async function endDeferredDisposal() { await pause(0); await turn(); engine.beginFrame(); engine.endFrame(); await turn(); }
+@@ -95,6 +127,7 @@ for (const control of ["ready-only", "noninstance", "zero-count"] as const)
+       if (subject) subject.setEnabled(false);
+       const ordinary = f.batch(); f.addRoot(ordinary);
+       for (const n of [0, 1]) { f.lighting(n); const before = f.counts().programs; await f.settle(ordinary.mesh); const s = f.capture(`first ordinary FAR point${n}`, ordinary.mesh); f.assertThin(s); assert.equal(f.counts().programs - before, 1); }
++      f.lighting(0); const beforeReturn = f.counts().programs; await f.settle(ordinary.mesh); f.assertThin(f.capture("ordinary FAR return0 after1", ordinary.mesh)); assert.equal(f.counts().programs, beforeReturn);
+       f.row.complete = true;
+     } finally { await f.dispose(); }
+   });
+diff --git "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-grass-thin-preparation-proof-20261018\\run.mjs" "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-grass-thin-preparation-proof-20261018\\run-v2.mjs"
+index 35c3aa5..32a6844 100644
+--- "a/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-grass-thin-preparation-proof-20261018\\run.mjs"
++++ "b/C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-grass-thin-preparation-proof-20261018\\run-v2.mjs"
+@@ -6,7 +6,7 @@ import {createHash} from 'node:crypto';
+ import {spawnSync} from 'node:child_process';
+ const root=dirname(fileURLToPath(import.meta.url)),repo=resolve(root,'../..'),base=resolve(repo,'.cache/webgpu-hitch-validation-20261017/low-vehicle-v2'),id=process.argv[2],sha=b=>createHash('sha256').update(b).digest('hex');assert.match(id??'',/^\d+$/);
+ const manifest=JSON.parse(fs.readFileSync(resolve(base,'source-manifest.json')));assert.equal(manifest.snapshotId,'5c6b36ad783a332030bf21f25344d17b43e6ea0005c9f0bb5a754bae7444c483');
+-const names=['client/photo-grass-resources.ts','client/photo-grass-batch.ts','client/photo-grass-wind.ts','client/photo-grass-source-material.ts','client/photo-grass-budget.ts','client/photo-grass-transition.ts','client/vehicle-lighting.ts','client/stable-light-state.ts'];const inputs=names.map(path=>{const b=fs.readFileSync(resolve(base,path));assert.equal(sha(b),manifest.files[path],path);return{path,sha256:sha(b),bytes:b.length};});for(const path of ['public/models/vegetation/grass/geometry.json','public/models/vegetation/grass/material.json']){const b=fs.readFileSync(resolve(base,path));inputs.push({path,sha256:sha(b),bytes:b.length,realPath:fs.realpathSync(resolve(base,path))});}
++const names=['client/photo-grass-resources.ts','client/photo-grass-batch.ts','client/photo-grass-wind.ts','client/photo-grass-source-material.ts','client/photo-grass-budget.ts','client/photo-grass-transition.ts','client/vehicle-lighting.ts','client/stable-light-state.ts','client/streets-renderer.ts','client/art-lighting.ts','shared/streets.ts'];const inputs=names.map(path=>{const b=fs.readFileSync(resolve(base,path));assert.equal(sha(b),manifest.files[path],path);return{path,sha256:sha(b),bytes:b.length};});for(const path of ['public/models/vegetation/grass/geometry.json','public/models/vegetation/grass/material.json']){const b=fs.readFileSync(resolve(base,path));inputs.push({path,sha256:sha(b),bytes:b.length,realPath:fs.realpathSync(resolve(base,path))});}
+ const packages=resolve(root,'node_modules');if(!fs.existsSync(packages))fs.symlinkSync(fs.realpathSync(resolve(base,'node_modules')),packages,'junction');assert.equal(fs.realpathSync(resolve(packages,'@babylonjs/core')),fs.realpathSync(resolve(base,'node_modules/@babylonjs/core')));
+ const pattern=process.env.PROOF_PATTERN??(process.env.PROOF_UNSAFE_GEOMETRY==='1'?'temporary FAR ownership':null);
+-const args=[resolve(base,'node_modules/tsx/dist/cli.mjs'),'--test','--test-reporter=tap',...(pattern?['--test-name-pattern='+pattern]:[]),'proof.test.ts'],startedAt=new Date().toISOString();const r=spawnSync(process.execPath,args,{cwd:root,encoding:'utf8',timeout:60000,maxBuffer:2*1024*1024,env:{...process.env,TSX_DISABLE_CACHE:'1',PROOF_RUN:id}}),log=(r.stdout??'')+(r.stderr??'');fs.writeFileSync(resolve(root,`run-${id}.log`),log,{flag:'wx'});for(const x of inputs)assert.equal(sha(fs.readFileSync(resolve(base,x.path))),x.sha256,x.path+' invariant');fs.writeFileSync(resolve(root,`run-${id}.json`),JSON.stringify({startedAt,finishedAt:new Date().toISOString(),base,snapshot:manifest.snapshotId,inputs,args,status:r.status,error:r.error?.message??null,unsafeGeometry:process.env.PROOF_UNSAFE_GEOMETRY==='1',testSha256:sha(fs.readFileSync(resolve(root,'proof.test.ts'))),logSha256:sha(log),core:fs.realpathSync(resolve(packages,'@babylonjs/core'))},null,2)+'\n',{flag:'wx'});console.log(log);process.exitCode=r.status??1;
++const args=[resolve(base,'node_modules/tsx/dist/cli.mjs'),'--test','--test-reporter=tap',...(pattern?['--test-name-pattern='+pattern]:[]),'proof-v2.test.ts'],startedAt=new Date().toISOString();const r=spawnSync(process.execPath,args,{cwd:root,encoding:'utf8',timeout:60000,maxBuffer:2*1024*1024,env:{...process.env,TSX_DISABLE_CACHE:'1',PROOF_RUN:id}}),log=(r.stdout??'')+(r.stderr??'');fs.writeFileSync(resolve(root,`run-v2-${id}.log`),log,{flag:'wx'});for(const x of inputs)assert.equal(sha(fs.readFileSync(resolve(base,x.path))),x.sha256,x.path+' invariant');fs.writeFileSync(resolve(root,`run-v2-${id}.json`),JSON.stringify({startedAt,finishedAt:new Date().toISOString(),base,snapshot:manifest.snapshotId,inputs,args,status:r.status,error:r.error?.message??null,unsafeGeometry:process.env.PROOF_UNSAFE_GEOMETRY==='1',testSha256:sha(fs.readFileSync(resolve(root,'proof-v2.test.ts'))),logSha256:sha(log),core:fs.realpathSync(resolve(packages,'@babylonjs/core'))},null,2)+'\n',{flag:'wx'});console.log(log);process.exitCode=r.status??1;

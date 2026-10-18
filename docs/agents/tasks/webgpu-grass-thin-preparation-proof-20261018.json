@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-grass-thin-preparation-proof-20261018",
+  "title": "KEY-31: doložit přípravu skutečné FAR thin-instance trávy před jízdou",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-grass-thin-preparation-proof-20261018/",
+    "docs/agents/handoffs/webgpu-grass-thin-preparation-proof-20261018.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze izolovaný malý CPU proof nad frozen low-vehicle-v2 5c6b36ad. Žádné produkční source/dependency, hrané buildy ani živé roots se nemění.",
+    "Doložit celý řetězec: resource ready bez aktivní trávy, první skutečný FAR PhotoGrassBatch s matrix/photoGrassFade a nenulovým thin count, shader defines/attributes a Effect identity. Neodvozovat přesné defines z hash svědka.",
+    "Porovnat čekání na textury, neinstancovaný source, nulový count a dočasný skutečný FAR batch. Kontroly nesmí sdílenou engine cache nechtěně připravit jiné větvi její program.",
+    "Pro přípravu použít skutečnou geometrii, sdílený PBR/plugin a běžné světlo auta na low s 0/1 POINT. Následný běžný batch musí použít stejný Effect bez nového programu. Material forceCompilation uvést jako alternativu pouze s konkrétní instancing/pipeline hranicí.",
+    "Doložit vlastnictví a cleanup dočasného batch: žádná změna živých roots, selection, wind state, materiálů či textur; opakování i disposal. Odlišit NullEngine/front-end důkaz od skutečného WebGPU/GPU/vzhledu."
+  ],
+  "verification": [
+    "Jeden malý cílený runner a skutečné produkční resource/batch/controller moduly. Bez build/fullsuite/scoped full-source TS/GPU/server. Každou nutnou schopnostní/IO adaptaci explicitně zdokumentovat.",
+    "Pokud NullEngine nepokrývá skutečnou thin-instance větev, výslovně uvést omezení a nepřejmenovat fallback za hardware důkaz. Test musí ověřit skutečné pozorované defines i atributy.",
+    "Přesné hashe vstupů, skutečný výsledek, neúspěšné pokusy a doporučení nejmenšího kandidáta předat rootovi. Bez stagingu/commitu nebo rekurzivního BMAD."
+  ],
+  "notes": [
+    "A1/B1/A2 první jízda: stejné photographic leaves shared flat PBR, jeden nový program při první FAR trávě. B1 192 instancí / 4224 trojúhelníků / 20480B, předtím ready=true, ale draws/instances/buffers/cachedTiles=0. Stromové meshe275 a pendingTreeLoads0 beze změny.",
+    "photo-grass-resources.ts vytváří geometrii a 5 textur, ready čeká pouze na textury. photo-grass-batch.ts připojí matrix a photoGrassFade až ve flush; plugin přidává atribut jen hasThinInstances. Game příprava bere activeMeshes při spawn bez trávy.",
+    "Předchozí goal turn byl progress: runtime a86136ef→main42f7336f, metadata97a0d8b→main7211ed77, nový immutable4197 předán. Celý cíl a KEY-31 zůstávají otevřené.",
+    "Na odpověď o ručním testu4197 se čeká. GPU, buildy, celé sady a zátěžové testy neběží; tento proof je pouze malá izolovaná CPU kontrola. Hrané4197/4196/4195 i starší verze se nesmějí změnit.",
+    "Root accepted corrected V2 after independent review without remaining findings:6/6PASS, explicit NullEngine/GLSL/TextureIO limits. Durable evidence docs/performance/evidence/webgpu-migration-20261016/grass-preparation/. Runtime candidate is separate; KEY-31 remains open."
+  ]
+}

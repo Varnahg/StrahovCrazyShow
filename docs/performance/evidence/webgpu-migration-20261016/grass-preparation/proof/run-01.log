@@ -1,0 +1,29 @@
+TAP version 13
+# BJS - [16:28:56]: Babylon.js v9.30.0 - Null engine
+# Subtest: isolated ready-only does not prepare the actual first FAR thin path
+not ok 1 - isolated ready-only does not prepare the actual first FAR thin path
+  ---
+  duration_ms: 106.2088
+  type: 'test'
+  location: 'C:\\Users\\rezac\\.codex\\worktrees\\webgpu-comparison\\StrahovCrazyShow\\.cache\\webgpu-grass-thin-preparation-proof-20261018\\proof.test.ts:86:3'
+  failureType: 'testCodeFailure'
+  error: 'real ready Effect after actual renders'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    Object.settle (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-grass-thin-preparation-proof-20261018\proof.test.ts:68:99)
+    async TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\webgpu-comparison\StrahovCrazyShow\.cache\webgpu-grass-thin-preparation-proof-20261018\proof.test.ts:95:84)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2296.0587
