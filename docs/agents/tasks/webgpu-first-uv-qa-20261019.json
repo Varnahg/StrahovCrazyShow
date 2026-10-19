@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-first-uv-qa-20261019",
+  "title": "KEY-31: ověřit první UV matrix bez redundantního dirty scanu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-first-uv-qa-20261019/",
+    "docs/agents/handoffs/webgpu-first-uv-qa-20261019.md",
+    "docs/performance/evidence/webgpu-migration-20261016/first-uv-qa/",
+    "_bmad-output/implementation-artifacts/webgpu-first-uv-qa-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-9880f493210d/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4200",
+    "port:2595"
+  ],
+  "acceptance": [
+    "Pouzeisolatedcandidate nad currentnative8fb SDWf8,Texture.pure.js exactpreimage. Žádnémainpatch/lock/root/hranénode_modules mutace.",
+    "WebGPU only: skip Scene.markAllMaterialsAsDirty při zcelaPRVNÍM výpočtu UVmatice; math/cacheidentity i všechny pozdějšíidentity přechody zachovat,WebGLhistorické chování. ScopepouzeověřenéstockprojectTexturecesty, ne univerzálníthirdpartyoverride historie.",
+    "ActualTexture/PBR/Standard/NodeMaterial shaderdefines/matrices parity,clone/uBase/UVtransforms/toggle/noScene/later transitions; meaningfulred/green a přesnýinverse.",
+    "RootactualplainMediumstejnároute rozhodne o přínosu a featureparitě; není automatickéFPS/default přijetí. Nepříznivý/nejasnývýsledek neintegrovat."
+  ],
+  "verification": [
+    "Targetedcandidateproof/fullTS/productionbuild s jednoznačnýmQAoverlaySHA a actualEdgecar/UV/health/framehitches.",
+    "Předánífiles/proof/limits/sourceinverse,procesyukončitpředrelease."
+  ],
+  "notes": [
+    "ActualMediumCPUprofilef80source trace784: Texture.getTextureMatrix→Scene.markAllMaterialsDirty→Material._markAllSubMeshesAsDirty→fullscene scan ventryCPU196.8ms;4stackobservations. First-vs-later transition zatímnepřiřazený, candidateGPUověřípřínos.",
+    "StockPBR/Standard/NodeMaterial rozhodujíUVidentity ažpocallgetTextureMatrix;sentineltrue→firstcomputedfalse nemůžeinvalidovatještěnepoužitoustockmatici. Projektclient/loaders/core nemajígetTextureMatrixassignmentoverride.",
+    "Varianty: eagerstartup/factoryhooky nepokryjílateclones;dirtyindexnepokrývárenderPass/MultiMaterial/instances;disableoptUV měnívarying/bindingbudget. Onefirstcompute guard je nejmenšípinnedsemantics-preservingstockcandidate. Thirdpartyoverride cohistorickyvracelidentitybezsuper zůstáváznámý nepodporovanýkontrakt, netvrdituniversálníSDKfix.",
+    "PřímáleafimplementacebezBMADrendereru;rootQA vlastníworkflow/actualruntimeverification."
+  ]
+}
