@@ -2,22 +2,19 @@
   "schemaVersion": 1,
   "id": "ci-lfs-pilot-20261019",
   "title": "KEY-44: autonomní LFS preflight pilot s reálným selháním a obnovou",
-  "status": "blocked",
+  "status": "done",
   "dependsOn": [
     "ci-required-gates-20261019"
   ],
   "writePaths": [
     "scripts/check-lfs-assets.mjs",
     "tests/lfs-assets.test.ts",
+    "tests/lfs-assets-edge-cases.test.ts",
     ".github/workflows/ci.yml",
     "docs/agents/handoffs/ci-lfs-pilot-20261019.md",
-    "docs/verification-evidence/ci-lfs-pilot-20261019/",
-    "_bmad-output/implementation-artifacts/ci-lfs-pilot-20261019/",
-    ".cache/ci-lfs-pilot-20261019/"
+    ".cache/ci-lfs-pilot-worker-20261019/"
   ],
-  "resources": [
-    "github-ci-validation"
-  ],
+  "resources": [],
   "acceptance": [
     "Úzký preflight rozpozná chybějící nebo nestáhnuté tracked LFS objekty; skutečné soubory projdou a nedojde k načtení velkých assetů celých do RAM.",
     "Autonomní task projde red-test PR, skutečným neúspěšným CI a odmítnutým merge; uchová se diff a selhání, nová agentní relace práci obnoví a opraví.",
@@ -30,6 +27,8 @@
     "Nová agentní relace obnoví práci z handoffu a zachovaného commitu; SHA/diff/run ID doloženy."
   ],
   "notes": [
+    "Integrátor přijal implementaci a obnovu po plném GitHub run39326894249:25targeted/1516full PASS, build/integrace PASS, oba review nálezy opravené a znovu zkontrolované. Tento závěrečný stav se publikuje přes PR #8; finální head musí stále projít strict CI a SHA-vázaným acceptance. Linear se uzavře až po merge a ověření main.",
+    "Review 19.10: koordinátor rozšířil scope o samostatné edge-case testy, aby původní22testů zůstalo bajtově beze změny. Opravit pouze trim platné koncové mezery rootu a doplnit úspěšné malé assety64/1024B. Před změnou scope vlastní source claim uvolněn, poté nový claim.",
     "Výslovné zadání uživatele; KEY-44. Blokované do přijetí CI a ochrany main.",
     "Podagent si přečte AGENTS/policy, vlastní disjunktní claim; žádný rekurzivní BMAD. Převod po red fázi je výslovný, zdokumentovaný, nikoli převzetí podle stáří.",
     "Koordinátor připraví před spuštěním pilotu jeho renderer/spec rezervaci a administrativně aktualizuje status."
