@@ -1,0 +1,198 @@
+$ node scripts/test-docker.mjs
+ Image strahov-crazy-show:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 645B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.78kB done
+#2 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#3 ...
+
+#4 [auth] docker/dockerfile:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#3 DONE 1.0s
+
+#5 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#5 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#5 CACHED
+
+#6 [internal] load metadata for docker.io/library/node:24-bookworm-slim
+#6 ...
+
+#7 [auth] library/node:pull token for registry-1.docker.io
+#7 DONE 0.0s
+
+#6 [internal] load metadata for docker.io/library/node:24-bookworm-slim
+#6 DONE 0.7s
+
+#8 [internal] load .dockerignore
+#8 transferring context: 1.07kB done
+#8 DONE 0.0s
+
+#9 [dependencies 1/5] FROM docker.io/library/node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5
+#9 resolve docker.io/library/node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5 0.0s done
+#9 DONE 0.0s
+
+#10 [internal] load build context
+#10 transferring context: 559.20kB 0.4s done
+#10 DONE 0.5s
+
+#11 [dependencies 5/5] COPY patches/ ./patches/
+#11 CACHED
+
+#12 [dependencies 2/5] WORKDIR /app
+#12 CACHED
+
+#13 [dependencies 3/5] RUN npm install --global pnpm@11.25.0
+#13 CACHED
+
+#14 [dependencies 4/5] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#14 CACHED
+
+#15 [build 1/5] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --frozen-lockfile --store-dir=/pnpm/store
+#15 CACHED
+
+#16 [build 2/5] COPY . .
+#16 DONE 7.3s
+
+#17 [build 3/5] RUN test ! -d assets/blender
+#17 DONE 0.5s
+
+#18 [build 4/5] RUN node scripts/check-runtime-assets.mjs
+#18 4.072 Runtime assets: checked 7538 files; no Git LFS pointers.
+#18 DONE 4.1s
+
+#19 [build 5/5] RUN VITE_MULTIPLAYER_URL=/ pnpm build
+#19 2.621 $ tsc --noEmit && vite build
+#19 39.27 vite v8.3.4 building client environment for production...
+#19 39.30 transforming...
+#19 41.11 ✓ 1597 modules transformed.
+#19 46.11 rendering chunks...
+#19 48.35 computing gzip size...
+#19 48.80 dist/index.html                                    0.58 kB │ gzip:     0.36 kB
+#19 48.80 dist/assets/index-OAL0G7O6.css                    49.49 kB │ gzip:    12.22 kB
+#19 48.80 dist/assets/render-shaders-CRIfXshU.js             0.03 kB │ gzip:     0.05 kB
+#19 48.80 dist/assets/vegetation-BRFz_Axy.js                 0.14 kB │ gzip:     0.13 kB
+#19 48.80 dist/assets/b6-reality-CtCfwq5N.js                 0.15 kB │ gzip:     0.13 kB
+#19 48.80 dist/assets/rolldown-runtime-hePW80VL.js           0.71 kB │ gzip:     0.42 kB
+#19 48.80 dist/assets/render-engine-rVoc56RP.js              3.21 kB │ gzip:     1.67 kB
+#19 48.80 dist/assets/avatar-preview-DiUe-_2u.js             6.74 kB │ gzip:     3.12 kB
+#19 48.80 dist/assets/on-demand-render-Fqebz4-R.js           7.02 kB │ gzip:     2.42 kB
+#19 48.80 dist/assets/assets-DmPMQUD1.js                     7.80 kB │ gzip:     3.40 kB
+#19 48.80 dist/assets/environment-manifest-Bkq6KwiW.js       8.06 kB │ gzip:     2.29 kB
+#19 48.80 dist/assets/transit-renderer-D5mIfGup.js           9.32 kB │ gzip:     3.85 kB
+#19 48.80 dist/assets/car-pack-DOwRaHXR.js                  11.24 kB │ gzip:     4.19 kB
+#19 48.80 dist/assets/game-BtQEK30l.js                   3,305.86 kB │ gzip:   550.36 kB
+#19 48.80 dist/assets/babylon-E8WlbcY7.js                4,179.64 kB │ gzip:   968.31 kB
+#19 48.80 dist/assets/index-BI_mGI9C.js                  6,497.91 kB │ gzip: 2,254.35 kB
+#19 48.80 dist/assets/avatar-renderer-BWc8fadR.js       14,918.57 kB │ gzip: 4,802.30 kB
+#19 48.80 
+#19 48.80 [33m[INEFFECTIVE_DYNAMIC_IMPORT] [0mclient/b6-reality.ts is dynamically imported by client/game.ts but also statically imported by client/world-renderer.ts, dynamic import will not move module into another chunk.
+#19 48.80 
+#19 48.80 [plugin builtin:vite-reporter] 
+#19 48.80 (!) Some chunks are larger than 1100 kB after minification. Consider:
+#19 48.80 - Using dynamic import() to code-split the application
+#19 48.80 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+#19 48.80 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#19 48.80 [33m[INEFFECTIVE_DYNAMIC_IMPORT] [0mclient/vegetation.ts is dynamically imported by client/game.ts but also statically imported by client/world-renderer.ts, dynamic import will not move module into another chunk.
+#19 48.80 
+#19 48.80 ✓ built in 9.52s
+#19 48.80 [33m[PLUGIN_TIMINGS] [0mJavaScript callbacks ran for 4.4s of this 9.5s build (46%).
+#19 48.80 The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+#19 48.80   - plugin vite:prepare-out-dir renderStart (42%, 4.0s, 1 call)
+#19 48.80 Additional callback time came from callbacks under 1s.
+#19 48.80 See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+#19 48.80 
+#19 DONE 49.0s
+
+#20 [runtime 3/7] COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
+#20 CACHED
+
+#21 [runtime 4/7] COPY --from=build --chown=node:node /app/package.json /app/tsconfig.json ./
+#21 CACHED
+
+#22 [runtime 5/7] COPY --from=build --chown=node:node /app/server ./server
+#22 CACHED
+
+#23 [runtime 6/7] COPY --from=build --chown=node:node /app/shared ./shared
+#23 CACHED
+
+#24 [production-dependencies 1/1] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --prod --frozen-lockfile --store-dir=/pnpm/store
+#24 CACHED
+
+#25 [runtime 7/7] COPY --from=build --chown=node:node /app/dist ./dist
+#25 CACHED
+
+#26 exporting to image
+#26 exporting layers 0.0s done
+#26 exporting manifest sha256:d072b49edc694a2baeba655fd92f39de3e8bedab6f070dcbbd60764128f06124 0.0s done
+#26 exporting config sha256:a144d1c4e1842bbc3e5fcd2a63b9084440b5016fbedac05f76109fb654b06bde 0.0s done
+#26 exporting attestation manifest sha256:8afef0e4be33e84485e9a2d6b239728df7d100b0afd9b682f4222a5d14e02f39
+#26 exporting attestation manifest sha256:8afef0e4be33e84485e9a2d6b239728df7d100b0afd9b682f4222a5d14e02f39 0.0s done
+#26 exporting manifest list sha256:d783579238620c26b5cb2f7ba64dd70247b479de465f5e47bbf5a48df3eaca72 0.0s done
+#26 naming to docker.io/library/strahov-crazy-show:local done
+#26 unpacking to docker.io/library/strahov-crazy-show:local 0.0s done
+#26 DONE 0.2s
+
+#27 resolving provenance for metadata file
+#27 DONE 0.0s
+ Image strahov-crazy-show:local Built 
+ Network strahov-docker-test-11740-1792445860391_default Creating 
+ Network strahov-docker-test-11740-1792445860391_default Creating 
+ Network strahov-docker-test-11740-1792445860391_default Created 
+ Network strahov-docker-test-11740-1792445860391_default Created 
+ Container strahov-docker-test-11740-1792445860391-game-1 Creating 
+ Container strahov-docker-test-11740-1792445860391-game-1 Created 
+ Container strahov-docker-test-11740-1792445860391-game-1 Starting 
+ Container strahov-docker-test-11740-1792445860391-game-1 Started 
+ Container strahov-docker-test-11740-1792445860391-game-1 Waiting 
+ Container strahov-docker-test-11740-1792445860391-game-1 Healthy 
+PASS Docker HTTP/assets/cache/guest/diagnostics/matchmaking/two clients
+Room connection was closed unexpectedly (4002): 
+PASS: singleton world, guest boundary, two clients, walking, physical car W/A/D/brake/reverse/exit/re-entry on native DMR and authored assets, global/DM chat, consent, explicit blocking rejection, event ownership, session resume and weather endpoint.
+PASS Docker HTTP/assets/cache/guest/diagnostics/matchmaking/two clients
+ Container strahov-docker-test-11740-1792445860391-game-1 Stopping 
+PASS Docker SIGTERM odpojil oba skutečné SDK klienty.
+ Container strahov-docker-test-11740-1792445860391-game-1 Stopped 
+ Container strahov-docker-test-11740-1792445860391-game-1 Starting 
+ Container strahov-docker-test-11740-1792445860391-game-1 Started 
+ Container strahov-docker-test-11740-1792445860391-game-1 Waiting 
+ Container strahov-docker-test-11740-1792445860391-game-1 Healthy 
+Room connection was closed unexpectedly (4002): 
+PASS Docker HTTP/assets/cache/guest/diagnostics/matchmaking/two clients/restart identity
+PASS Docker image, Compose, skutečná herní integrace, SIGTERM a restart.
+game-1  | Strahov multiplayer: http://0.0.0.0:2567 — world bm33eTO6b
+game-1  | Error: Herní protokol se změnil. Obnov stránku.
+game-1  |     at StrahovRoom.onAuth (/app/server/index.ts:386:13)
+game-1  |     at StrahovRoom._onJoin (file:///app/node_modules/.pnpm/@colyseus+core@0.18.9_@colyseus+better-call@1.3.3_@colyseus+schema@5.0.36_typescript@5._959717d2ea641411bd67bd9ba29a66c4/node_modules/@colyseus/core/build/Room.mjs:1106:38)
+game-1  |     at connectClientToRoom (file:///app/node_modules/.pnpm/@colyseus+core@0.18.9_@colyseus+better-call@1.3.3_@colyseus+schema@5.0.36_typescript@5._959717d2ea641411bd67bd9ba29a66c4/node_modules/@colyseus/core/build/Transport.mjs:132:24)
+game-1  |     at WebSocketServer.onConnection (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:192:13)
+game-1  |     at WebSocketServer.emit (node:events:514:28)
+game-1  |     at file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:123:120
+game-1  |     at WebSocketServer.completeUpgrade (/app/node_modules/.pnpm/ws@8.22.0/node_modules/ws/lib/websocket-server.js:450:5)
+game-1  |     at WebSocketServer.handleUpgrade (/app/node_modules/.pnpm/ws@8.22.0/node_modules/ws/lib/websocket-server.js:356:10)
+game-1  |     at completeUpgrade (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:123:70)
+game-1  |     at Server.<anonymous> (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:129:9)
+game-1  | Strahov multiplayer: http://0.0.0.0:2567 — world ZIxYAUZ4m
+game-1  | Error: Platná multiplayerová relace je vyžadována.
+game-1  |     at StrahovRoom.onAuth (/app/server/index.ts:390:13)
+game-1  |     at StrahovRoom._onJoin (file:///app/node_modules/.pnpm/@colyseus+core@0.18.9_@colyseus+better-call@1.3.3_@colyseus+schema@5.0.36_typescript@5._959717d2ea641411bd67bd9ba29a66c4/node_modules/@colyseus/core/build/Room.mjs:1106:38)
+game-1  |     at connectClientToRoom (file:///app/node_modules/.pnpm/@colyseus+core@0.18.9_@colyseus+better-call@1.3.3_@colyseus+schema@5.0.36_typescript@5._959717d2ea641411bd67bd9ba29a66c4/node_modules/@colyseus/core/build/Transport.mjs:132:24)
+game-1  |     at WebSocketServer.onConnection (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:192:13)
+game-1  |     at WebSocketServer.emit (node:events:514:28)
+game-1  |     at file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:123:120
+game-1  |     at WebSocketServer.completeUpgrade (/app/node_modules/.pnpm/ws@8.22.0/node_modules/ws/lib/websocket-server.js:450:5)
+game-1  |     at WebSocketServer.handleUpgrade (/app/node_modules/.pnpm/ws@8.22.0/node_modules/ws/lib/websocket-server.js:356:10)
+game-1  |     at completeUpgrade (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:123:70)
+game-1  |     at Server.<anonymous> (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:129:9)
+ Container strahov-docker-test-11740-1792445860391-game-1 Stopping 
+ Container strahov-docker-test-11740-1792445860391-game-1 Stopped 
+ Container strahov-docker-test-11740-1792445860391-game-1 Removing 
+ Container strahov-docker-test-11740-1792445860391-game-1 Removed 
+ Network strahov-docker-test-11740-1792445860391_default Removing 
+ Network strahov-docker-test-11740-1792445860391_default Removed 

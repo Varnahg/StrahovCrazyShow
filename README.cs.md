@@ -6,7 +6,7 @@ Virtuální Strahov pro prohlížeč: kolejní areál podle map, ortofota a skut
 
 **Hlavní hra používá samostatné modely s doloženým původem.** Historický 3D sken IPR je prostorová předloha, kterou lze samostatně prohlížet; jeho spojené stromy, auta ani povrchy se do hry nenačítají. Budovy, auta, stromy a hřiště mají vlastní identitu a transformaci. [Modely budov](docs/reality-pack/separate-assets/README.md), [jednotlivé stromy](docs/vegetation/realistic-pack.md), [kontrola modelů a terénu](docs/model-review/README.md).
 
-Demo neobsahuje přihlášení přes IS, ověření bydliště ani skutečné studentské profily. Přezdívka je pouze označení dočasné relace. Přístup výhradně pro obyvatele Strahova se nevynucuje. Veřejné nasazení není součástí této verze.
+Demo neobsahuje přihlášení přes IS, ověření bydliště ani skutečné studentské profily. Přezdívka je pouze označení dočasné relace. Přístup výhradně pro obyvatele Strahova se nevynucuje. [Návod Dockeru](docs/deployment/docker.md) popisuje provoz tohoto dema na vlastním serveru.
 
 ## Současná verze
 
@@ -28,6 +28,16 @@ Součástí zůstávají CZ/EN rozhraní i všech 36 článků deníku, průsvit
 **Známá omezení zůstávají:** studený výběr trávy v CPU studii zabral přibližně **265 ms při prvním medium výběru a 181 ms při přepnutí na high**; nižší počet draw calls tyto záseky neřeší. Prudký **švih při sprintovém obratu o 180°** není vyřešený opravou podpírající nohy. **Denní a skupinová přejímka 60 FPS na GeForce GTX 1060 není ověřená.** Plná fotografická věrnost a kvalita postav úrovně Hogwarts Legacy zůstávají otevřené; inspirace určuje atmosféru a čitelnost, nepřebírá cizí assety.
 
 Interiéry jsou určené jen pro kolejní bloky, školicí centrum, R-ko a Potraviny; ostatní budovy včetně stadionu mají pouze exteriér. Detail B6 je hotový v mezích dokumentované rekonstrukce, ostatní povolené interiéry nikoli. Společný svět, samostatný host, úprava postavy, akce, komunikace, mapa, deník, B6, auto, astronomie a demonstrační PID doprava jsou hratelné. Uživatelské diagnostiky zůstávají místní. Viz [přejímací seznam](docs/acceptance.md); historické checkpointy jsou zachované v [ověření](docs/verification.md).
+
+## Spuštění v Dockeru
+
+S Git LFS a běžícím Docker enginem pro Linux kontejnery spusť `git lfs pull` a potom:
+
+```sh
+docker compose up -d --build
+```
+
+Otevři [http://localhost:8080](http://localhost:8080). Jeden kontejner poskytuje web, API i multiplayer; grafika běží v prohlížeči hráče. Hostitel nepotřebuje Node.js ani serverovou GPU. Restart resetuje dočasný společný svět. [Návod Dockeru](docs/deployment/docker.md) popisuje nastavení, logy, aktualizace, HTTPS nasazení a ověření.
 
 ## Lokální spuštění
 
@@ -201,7 +211,7 @@ Klient i server používají společnou kolizní geometrii a pevnou simulaci **6
 | `assets/blender/`, `public/models/` | Editovatelné modely a herní exporty                                                 |
 | `docs/`                             | Reference, původ dat, geometrické audity, testy a známá omezení                     |
 
-Ověřování IS lze později doplnit před vydání herní relace bez přepisování pohybu a sociálních funkcí. Trvalé účty, hlas, skutečný import komunitních akcí, ekonomika, hráčské vybavování pokojů, zabezpečená administrace a veřejné nasazení patří do další etapy. Sdílený svět má konečnou hardwarovou a síťovou kapacitu; současné demo není neomezené MMO.
+Ověřování IS lze později doplnit před vydání herní relace bez přepisování pohybu a sociálních funkcí. Trvalé účty, hlas, skutečný import komunitních akcí, ekonomika, hráčské vybavování pokojů a zabezpečená administrace patří do další etapy. Sdílený svět má konečnou hardwarovou a síťovou kapacitu; současné demo není neomezené MMO.
 
 ## Původ podkladů a licence
 

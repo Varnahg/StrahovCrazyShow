@@ -1,0 +1,39 @@
+# Include only build inputs. Local secrets, dependencies, caches, Git history,
+# research archives and Blender sources must not enter the build context.
+**
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!tsconfig.json
+!vite.config.ts
+!index.html
+!patches/
+!patches/**
+!client/
+!client/**
+!server/
+!server/**
+!shared/
+!shared/**
+!scripts/
+!scripts/**
+!tests/
+!tests/**
+!public/
+!public/**
+
+# pnpm build typechecks tests as well as application code. These source JSON
+# fixtures are imported by the character tests; model authoring files are not.
+!assets/sources/characters/blender-human-base/source.json
+!assets/sources/characters/student-hair/constraints.json
+!assets/sources/characters/student-hair/ear-source-audit.json
+!assets/sources/characters/student-hair/geometry-audit.json
+!assets/sources/characters/student-hair/short04-before-ear-contour.json
+!assets/sources/characters/student-hair/short04-ear-repair.json
+!assets/sources/characters/student-hair/source.json
+
+**/.env
+**/.env.*
+**/node_modules
+**/__pycache__
+**/*.pyc

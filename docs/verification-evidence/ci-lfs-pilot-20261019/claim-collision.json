@@ -1,0 +1,21 @@
+{
+  "time": "2026-10-19T20:53:54.090Z",
+  "command": "node scripts/agent-tasks.mjs claim --task ci-lfs-pilot-20261019 --owner ci-01a155b2-pilot-red-collision-probe",
+  "exitCode": 1,
+  "stderr": "agent-tasks: Task ci-lfs-pilot-20261019 is already owned by ci-01a155b2-pilot-red; use heartbeat or an owner-authorized release\n",
+  "claimUnchanged": true,
+  "filesUnchanged": true,
+  "sourceHashesBefore": {
+    "scripts/check-lfs-assets.mjs": null,
+    "tests/lfs-assets.test.ts": null,
+    ".github/workflows/ci.yml": "b6e66cb8f5be7c77206dfeb206aafbf856aad63f9b11fab9fe62d16f9612a1bc",
+    "docs/agents/handoffs/ci-lfs-pilot-20261019.md": null
+  },
+  "sourceHashesAfter": {
+    "scripts/check-lfs-assets.mjs": null,
+    "tests/lfs-assets.test.ts": null,
+    ".github/workflows/ci.yml": "b6e66cb8f5be7c77206dfeb206aafbf856aad63f9b11fab9fe62d16f9612a1bc",
+    "docs/agents/handoffs/ci-lfs-pilot-20261019.md": null
+  },
+  "note": "Full operational registry comparison is retained only in ignored local collision.json."
+}

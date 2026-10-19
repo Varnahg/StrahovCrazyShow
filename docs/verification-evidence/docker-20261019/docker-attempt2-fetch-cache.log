@@ -1,0 +1,196 @@
+$ node scripts/test-docker.mjs
+ Image strahov-crazy-show:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 645B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.78kB 0.0s done
+#2 DONE 0.0s
+
+#3 [auth] docker/dockerfile:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#4 DONE 1.0s
+
+#5 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#5 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#5 CACHED
+
+#6 [internal] load metadata for docker.io/library/node:24-bookworm-slim
+#6 ...
+
+#7 [auth] library/node:pull token for registry-1.docker.io
+#7 DONE 0.0s
+
+#6 [internal] load metadata for docker.io/library/node:24-bookworm-slim
+#6 DONE 0.6s
+
+#8 [internal] load .dockerignore
+#8 transferring context: 1.07kB done
+#8 DONE 0.0s
+
+#9 [internal] load build context
+#9 DONE 0.0s
+
+#10 [dependencies 1/5] FROM docker.io/library/node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5
+#10 resolve docker.io/library/node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5 0.0s done
+#10 DONE 0.0s
+
+#9 [internal] load build context
+#9 transferring context: 561.37kB 0.9s done
+#9 DONE 0.9s
+
+#11 [dependencies 4/5] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#11 CACHED
+
+#12 [dependencies 5/5] COPY patches/ ./patches/
+#12 CACHED
+
+#13 [production-dependencies 1/1] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --prod --frozen-lockfile --store-dir=/pnpm/store
+#13 CACHED
+
+#14 [dependencies 2/5] WORKDIR /app
+#14 CACHED
+
+#15 [dependencies 3/5] RUN npm install --global pnpm@11.25.0
+#15 CACHED
+
+#16 [runtime 3/7] COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
+#16 CACHED
+
+#17 [build 1/5] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --frozen-lockfile --store-dir=/pnpm/store
+#17 CACHED
+
+#18 [build 2/5] COPY . .
+#18 DONE 4.7s
+
+#19 [build 3/5] RUN test ! -d assets/blender
+#19 DONE 0.4s
+
+#20 [build 4/5] RUN node scripts/check-runtime-assets.mjs
+#20 3.131 Runtime assets: checked 7538 files; no Git LFS pointers.
+#20 DONE 3.2s
+
+#21 [build 5/5] RUN VITE_MULTIPLAYER_URL=/ pnpm build
+#21 0.898 $ tsc --noEmit && vite build
+#21 28.70 vite v8.3.4 building client environment for production...
+#21 28.72 transforming...
+#21 29.61 ✓ 1597 modules transformed.
+#21 33.79 rendering chunks...
+#21 34.73 computing gzip size...
+#21 35.11 dist/index.html                                    0.58 kB │ gzip:     0.36 kB
+#21 35.11 dist/assets/index-OAL0G7O6.css                    49.49 kB │ gzip:    12.22 kB
+#21 35.11 dist/assets/render-shaders-CRIfXshU.js             0.03 kB │ gzip:     0.05 kB
+#21 35.11 dist/assets/vegetation-BRFz_Axy.js                 0.14 kB │ gzip:     0.13 kB
+#21 35.11 dist/assets/b6-reality-CtCfwq5N.js                 0.15 kB │ gzip:     0.13 kB
+#21 35.11 dist/assets/rolldown-runtime-hePW80VL.js           0.71 kB │ gzip:     0.42 kB
+#21 35.11 dist/assets/render-engine-rVoc56RP.js              3.21 kB │ gzip:     1.67 kB
+#21 35.11 dist/assets/avatar-preview-DiUe-_2u.js             6.74 kB │ gzip:     3.12 kB
+#21 35.11 dist/assets/on-demand-render-Fqebz4-R.js           7.02 kB │ gzip:     2.42 kB
+#21 35.11 dist/assets/assets-DmPMQUD1.js                     7.80 kB │ gzip:     3.40 kB
+#21 35.11 dist/assets/environment-manifest-Bkq6KwiW.js       8.06 kB │ gzip:     2.29 kB
+#21 35.11 dist/assets/transit-renderer-D5mIfGup.js           9.32 kB │ gzip:     3.85 kB
+#21 35.11 dist/assets/car-pack-DOwRaHXR.js                  11.24 kB │ gzip:     4.19 kB
+#21 35.11 dist/assets/game-BtQEK30l.js                   3,305.86 kB │ gzip:   550.36 kB
+#21 35.11 dist/assets/babylon-E8WlbcY7.js                4,179.64 kB │ gzip:   968.31 kB
+#21 35.11 dist/assets/index-BI_mGI9C.js                  6,497.91 kB │ gzip: 2,254.35 kB
+#21 35.11 dist/assets/avatar-renderer-BWc8fadR.js       14,918.57 kB │ gzip: 4,802.30 kB
+#21 35.11 
+#21 35.11 [33m[INEFFECTIVE_DYNAMIC_IMPORT] [0mclient/b6-reality.ts is dynamically imported by client/game.ts but also statically imported by client/world-renderer.ts, dynamic import will not move module into another chunk.
+#21 35.11 
+#21 35.12 [plugin builtin:vite-reporter] 
+#21 35.12 (!) Some chunks are larger than 1100 kB after minification. Consider:
+#21 35.12 - Using dynamic import() to code-split the application
+#21 35.12 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+#21 35.12 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#21 35.12 [33m[INEFFECTIVE_DYNAMIC_IMPORT] [0mclient/vegetation.ts is dynamically imported by client/game.ts but also statically imported by client/world-renderer.ts, dynamic import will not move module into another chunk.
+#21 35.12 
+#21 35.12 ✓ built in 6.41s
+#21 35.12 [33m[PLUGIN_TIMINGS] [0mJavaScript callbacks ran for 3.9s of this 6.4s build (61%).
+#21 35.12 The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+#21 35.12   - plugin vite:prepare-out-dir renderStart (56%, 3.6s, 1 call)
+#21 35.12 Additional callback time came from callbacks under 1s.
+#21 35.12 See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+#21 35.12 
+#21 DONE 35.3s
+
+#22 [runtime 4/7] COPY --from=build --chown=node:node /app/package.json /app/tsconfig.json ./
+#22 DONE 0.2s
+
+#23 [runtime 5/7] COPY --from=build --chown=node:node /app/server ./server
+#23 DONE 0.1s
+
+#24 [runtime 6/7] COPY --from=build --chown=node:node /app/shared ./shared
+#24 DONE 0.1s
+
+#25 [runtime 7/7] COPY --from=build --chown=node:node /app/dist ./dist
+#25 DONE 3.6s
+
+#26 exporting to image
+#26 exporting layers
+#26 exporting layers 38.6s done
+#26 exporting manifest sha256:150168efba62c3c874682b7b918d12ca67524a79ea7161e8c11ef670f6b9f8de 0.0s done
+#26 exporting config sha256:c9fec076bc246e59f25a6dc64bc3a6fdf6e504d357a4fa031876e5d7de0ad0c2 0.0s done
+#26 exporting attestation manifest sha256:a68d1c4445f062867b3d69c0be0afd7e138f42871986c39c44eca5af8aead8d8 0.0s done
+#26 exporting manifest list sha256:cedc68a2965e9233c49cc51469505f07042738d19a8e244b7e8ccde351f6eb0e
+#26 exporting manifest list sha256:cedc68a2965e9233c49cc51469505f07042738d19a8e244b7e8ccde351f6eb0e 0.0s done
+#26 naming to docker.io/library/strahov-crazy-show:local done
+#26 unpacking to docker.io/library/strahov-crazy-show:local
+#26 unpacking to docker.io/library/strahov-crazy-show:local 18.8s done
+#26 DONE 57.5s
+
+#27 resolving provenance for metadata file
+#27 DONE 0.0s
+ Image strahov-crazy-show:local Built 
+ Network strahov-docker-test-42912-1792444812333_default Creating 
+ Network strahov-docker-test-42912-1792444812333_default Creating 
+ Network strahov-docker-test-42912-1792444812333_default Created 
+ Network strahov-docker-test-42912-1792444812333_default Created 
+ Container strahov-docker-test-42912-1792444812333-game-1 Creating 
+ Container strahov-docker-test-42912-1792444812333-game-1 Created 
+ Container strahov-docker-test-42912-1792444812333-game-1 Starting 
+ Container strahov-docker-test-42912-1792444812333-game-1 Started 
+ Container strahov-docker-test-42912-1792444812333-game-1 Waiting 
+ Container strahov-docker-test-42912-1792444812333-game-1 Healthy 
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+200 !== 304
+
+    at <anonymous> (C:\Users\rezac\.codex\worktrees\docker-single-container\StrahovCrazyShow\scripts\integration-docker.ts:48:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 200,
+  expected: 304,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0
+game-1  | Strahov multiplayer: http://0.0.0.0:2567 — world otxIAhvwb
+ Container strahov-docker-test-42912-1792444812333-game-1 Stopping 
+ Container strahov-docker-test-42912-1792444812333-game-1 Stopped 
+ Container strahov-docker-test-42912-1792444812333-game-1 Removing 
+ Container strahov-docker-test-42912-1792444812333-game-1 Removed 
+ Network strahov-docker-test-42912-1792444812333_default Removing 
+ Network strahov-docker-test-42912-1792444812333_default Removed 
+file:///C:/Users/rezac/.codex/worktrees/docker-single-container/StrahovCrazyShow/scripts/test-docker.mjs:93
+          new Error(
+          ^
+
+Error: C:\Users\rezac\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe --import tsx scripts/integration-docker.ts skončil 1
+
+    at ChildProcess.<anonymous> (file:///C:/Users/rezac/.codex/worktrees/docker-single-container/StrahovCrazyShow/scripts/test-docker.mjs:93:11)
+    at Object.onceWrapper (node:events:631:26)
+    at ChildProcess.emit (node:events:509:28)
+    at maybeClose (node:internal/child_process:1141:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:306:5)
+
+Node.js v24.19.0
+[ELIFECYCLE] Command failed with exit code 1.

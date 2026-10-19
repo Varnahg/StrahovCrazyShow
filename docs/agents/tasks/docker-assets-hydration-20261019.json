@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-assets-hydration-20261019",
+  "title": "KEY-45: materializovat existující Git LFS obsah v nové Docker worktree",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "assets/blender/buildings/source-plan.json",
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/",
+    "public/models/vegetation/realistic/strahov-individual-trees.glb",
+    "public/models/vegetation/runtime/far.glb",
+    "docs/agents/handoffs/docker-assets-hydration-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze vyzvednutí existujících přesných LFS objektů, žádná regenerace ani změna pointerů/historie."
+  ],
+  "verification": [
+    "git lfs checkout; git status zůstane bez asset diffu; runtime asset checker projde."
+  ],
+  "notes": [
+    "Nová managed worktree byla vytvořena s LFS pointery; kořenový clone už drží potřebné objekty. Cwd C:/Users/rezac/.codex/worktrees/docker-single-container/StrahovCrazyShow; KEY-45.",
+    "Technické převzetí integrátorem: všechny Docker funkční a regresní kontroly PASS, viz evidence/docker-20261019 a PR#9. V kandidátní větvi jde o připravený konečný stav; pro společný main platí až po přijetí PR přes povinné CI a exact-head project-acceptance. KEY-45 zůstává do merge In Progress; širší GPU timeouty zůstávají KEY-8."
+  ]
+}
