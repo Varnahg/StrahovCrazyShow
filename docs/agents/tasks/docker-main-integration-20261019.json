@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "docker-main-integration-20261019",
   "title": "KEY-45: čistý PR nad přijatým remote main a kontrolovaná integrace",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     ".github/workflows/ci.yml",
@@ -18,13 +18,6 @@
     "docs/agents/handoffs/ci-lfs-pilot-20261019.md",
     "docs/agents/handoffs/ci-pilot-coordination-20261019.md",
     "docs/agents/handoffs/ci-required-gates-20261019.md",
-    "docs/agents/tasks/bmad-issues-analysis-20261019.json",
-    "docs/agents/tasks/bmad-issues-movement-20261019.json",
-    "docs/agents/tasks/bmad-issues-performance-20261019.json",
-    "docs/agents/tasks/bmad-issues-rendering-20261019.json",
-    "docs/agents/tasks/ci-lfs-pilot-20261019.json",
-    "docs/agents/tasks/ci-pilot-coordination-20261019.json",
-    "docs/agents/tasks/ci-required-gates-20261019.json",
     "docs/analysis/issues-20261019/README.md",
     "docs/analysis/issues-20261019/consolidation.md",
     "docs/analysis/issues-20261019/linear-after.json",
@@ -33,7 +26,6 @@
     "docs/analysis/issues-20261019/performance.md",
     "docs/analysis/issues-20261019/rendering.md",
     "docs/analysis/issues-20261019/verification.json",
-    "docs/verification-evidence/agents/coordination-20261012/ci-bootstrap-20261019/README.md",
     "docs/verification-evidence/ci-lfs-pilot-20261019/README.md",
     "docs/verification-evidence/ci-lfs-pilot-20261019/blocked-merge.json",
     "docs/verification-evidence/ci-lfs-pilot-20261019/claim-collision.json",
@@ -68,6 +60,8 @@
   ],
   "notes": [
     "CI koordinátor doložil merge#7/#8 a release vlastních scopes; registry bez CIclaims. Vlastní branch dosud nepushed; rebase --onto origin/main df6b53af vynechá cizí nepublikovaný commit pouze z Docker větve. Původní main/WIP se nemaže ani nepublikuje.",
-    "Tyto writePaths zahrnují pouze přijetí již hotových upstream souborů/rebase vlastní čisté worktree; ne nové editace cizích funkcí. Root dál vlastní své source/evidence."
+    "Tyto writePaths zahrnují pouze přijetí již hotových upstream souborů/rebase vlastní čisté worktree; ne nové editace cizích funkcí. Root dál vlastní své source/evidence.",
+    "Task katalog při závěrečné integraci vlastní paralelní dev-coordination-maintenance claim téhož koordinátora; integrační claim má pouze disjunktní upstream soubory a GitHub zdroj.",
+    "Technické převzetí integrátorem: všechny Docker funkční a regresní kontroly PASS, viz evidence/docker-20261019 a PR#9. V kandidátní větvi jde o připravený konečný stav; pro společný main platí až po přijetí PR přes povinné CI a exact-head project-acceptance. KEY-45 zůstává do merge In Progress; širší GPU timeouty zůstávají KEY-8."
   ]
 }

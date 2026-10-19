@@ -14,8 +14,8 @@
     "gpu",
     "port:2568",
     "port:8080",
-    "port:18080"
-    ,"port:18081"
+    "port:18080",
+    "port:18081"
   ],
   "acceptance": [
     "Ověřená identita source/test snapshotu a produkční image; skutečné testy/build/SDK/browser/stop/restart.",
@@ -24,11 +24,12 @@
   "verification": [
     "pnpm test; pnpm build; pnpm test:integration; docker compose build/up; skutečné browser dvě relace a host; shutdown/restart."
   ],
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "notes": [
     "Authorized user plan 19.10.2026; KEY-45 https://linear.app/gigeconomy/issue/KEY-45.",
     "Cwd C:/Users/rezac/.codex/worktrees/docker-single-container/StrahovCrazyShow; base df6b53af; no foreign WIP adopted. Runtime server/index released by diary owner in documented thread handoff before claim.",
-    "Research and alternatives in _bmad-output/implementation-artifacts/docker-20261019/spec.md; renderer output owned only by docker-root."
+    "Research and alternatives in _bmad-output/implementation-artifacts/docker-20261019/spec.md; renderer output owned only by docker-root.",
+    "Technické převzetí integrátorem: všechny Docker funkční a regresní kontroly PASS, viz evidence/docker-20261019 a PR#9. V kandidátní větvi jde o připravený konečný stav; pro společný main platí až po přijetí PR přes povinné CI a exact-head project-acceptance. KEY-45 zůstává do merge In Progress; širší GPU timeouty zůstávají KEY-8."
   ]
 }

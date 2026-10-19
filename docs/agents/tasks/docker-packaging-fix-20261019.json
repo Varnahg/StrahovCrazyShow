@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "docker-packaging-fix-20261019",
   "title": "KEY-45: opravit doložené Docker build-context výjimky",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     ".dockerignore",
@@ -19,6 +19,7 @@
     "Skutečný Docker build context audit a image build vroot validation."
   ],
   "notes": [
-    "matchesOrParentMatches z Moby prokázal !assets/ reinclusion všech podkladů; předchozí build zastaven v owned CLI16120, root test runner uklízí project."
+    "matchesOrParentMatches z Moby prokázal !assets/ reinclusion všech podkladů; předchozí build zastaven v owned CLI16120, root test runner uklízí project.",
+    "Technické převzetí integrátorem: všechny Docker funkční a regresní kontroly PASS, viz evidence/docker-20261019 a PR#9. V kandidátní větvi jde o připravený konečný stav; pro společný main platí až po přijetí PR přes povinné CI a exact-head project-acceptance. KEY-45 zůstává do merge In Progress; širší GPU timeouty zůstávají KEY-8."
   ]
 }
