@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-system-telemetry-20261019",
+  "title": "KEY-31/32: systémová GPU/CPU/paměťová telemetrie pro další ruční test",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-system-telemetry-20261019/",
+    "scripts/analyze-system-gpu.mjs",
+    "tests/system-gpu-telemetry.test.mjs",
+    "docs/performance/system-gpu-telemetry.md",
+    "docs/performance/evidence/webgpu-migration-20261016/system-gpu-telemetry/",
+    "docs/agents/handoffs/webgpu-system-telemetry-20261019.md",
+    "_bmad-output/implementation-artifacts/webgpu-system-telemetry-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-9880f493210d/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "system-gpu-telemetry"
+  ],
+  "acceptance": [
+    "Samostatný záznam celého GPU a GPU enginů/paměti jednotlivých PID, CPU uživatelský/kernel čas procesu, UTC/monotonic provenance a režie sběru. Chybějící data zůstanou null/error, nikoli0.",
+    "Korelace s existujícími herními JSONL a source/session; celéGPU/VRAM se nesmí odvozovat ze součtu zdvojených processmem ani ze součtu paralelníchGPUenginů. Rozlišit fakta a limity CPU/driver/GPU atribuce.",
+    "Připravit a ověřit další test proti neměnnému4203source65d028. Žádné přepsání hraných buildů, nový renderer, SDK patch nebo profiler v aplikaci. Linear, vlastní commit a main integrace nástroje po review."
+  ],
+  "verification": [
+    "Cílené parser/correlation testy a krátký skutečný sběr Windows/NVIDIA se správnými PID/adapter identity a bounded cleanup. Neměnit GPU nastavení ani spouštět zátěžové benchmarky během uživatelského testu."
+  ],
+  "notes": [
+    "Výslovný požadavek uživatele19.10.2026: logovat celéGPU/procesy a zjistitCPU/ovladač/grafiku/6GBVRAM. Původní31kherníchvzorků nemáGPUtimestamps; systémovéprocento nebylo historicky měřené.",
+    "Koordinátor root vlastní analýzu, dokumentaci, review a spuštění sběru; sampler helper má disjunktní skript/cache/handoff. Existing4203serve zůstává pod vlastnímclaimem. BMAD oneshot v novém rezervovaném prefixu.",
+    "Přijatoexternínástroj: captureSHA6ddb22c6,16helperchecks+PS/nativecompilePASS; root12/12UTC/PID/missing/streamtests aCLIactualsmokePASS; independentreview4fixes/final[]. Smoke04po30swarmup5steadyownCPU0.84–4.39%,NV0–0.786%,WMIunknown,cleanupPASS. Herníruntime bezezměny. Rootlivecapture běží podsamostatnýmtelemetryclaimem, nikolihelperem."
+  ]
+}

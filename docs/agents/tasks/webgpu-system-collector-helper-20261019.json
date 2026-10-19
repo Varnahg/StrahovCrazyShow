@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-system-collector-helper-20261019",
+  "title": "Implementovat nízkonákladový Windows/NVIDIA systémový GPU sampler",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/capture-system-gpu.ps1",
+    ".cache/webgpu-system-collector-helper-20261019/",
+    "docs/agents/handoffs/webgpu-system-collector-helper-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Průzkum skutečně dostupných primárních Windows PDH/GPU counterů a NVIDIAquery. Vybrat lehký bounded sběr celéhoGPU,perPID GPUenginů/paměti,CPUprocesuser/kernel,identity PID+start,rolebrowserGPU/renderer bez logování plných commandlines. UTC a skutečnáperioda; unknownneznamená0.",
+    "PowerShell sampler má explicitníOutputDirectory,DurationSeconds,IntervalSeconds,stop soubor/cleanup; pomocnéprocesy sPID/start/path,hidden a žádnáelevace/systemsettings. CPU/memory/karty bezezměny. NVIDIAutilization/power/clocks/temp/memory/throttle pokudpodporované; portablemissingproviderchyba.",
+    "Průběžně dohodnout skutečnéJSONLschema sroot. Žádnéhernízměny,instalace,fulltests,build,GPUzátěž či browser. JedinýkrátkýOSsmoke nejvýše5vzorků po koordinaci; nepřidávatdiagnostiku dohraného buildu."
+  ],
+  "verification": [
+    "PSScript parser,rawcapabilities a 5sample systémovýsmoke,skutečnýčas aCPUrežie loggeru,cleanup/výpadekprovideru,hashhandoff. PřímádelegacebezBMADrekurze."
+  ],
+  "notes": [
+    "Root aktualizuje Linear/BMAD a vytvoří korelátor. Pinnedsource65d028na4203bezezměny. Shelljenread-onlyHWcounterqueries aownwrites. GPUcapture přímo vprohlížeči nynínenípožadovaný.",
+    "Přijatoexternínástroj: captureSHA6ddb22c6,16helperchecks+PS/nativecompilePASS; root12/12UTC/PID/missing/streamtests aCLIactualsmokePASS; independentreview4fixes/final[]. Smoke04po30swarmup5steadyownCPU0.84–4.39%,NV0–0.786%,WMIunknown,cleanupPASS. Herníruntime bezezměny. Rootlivecapture běží podsamostatnýmtelemetryclaimem, nikolihelperem."
+  ]
+}
