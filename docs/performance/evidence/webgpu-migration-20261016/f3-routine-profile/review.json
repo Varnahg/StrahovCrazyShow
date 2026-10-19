@@ -1,0 +1,11 @@
+{
+  "reviewer": "/root/cpu_profile_blind",
+  "scopeReview": [],
+  "initialEvidenceFindings": [
+    {"verdict": "medium", "finding": "Provozní PID receipts v připravovaném verzovaném archivu", "resolution": "Výslovně označené provenance projekce bez processes/PID; plné receipts pouze ignored cache."},
+    {"verdict": "low", "finding": "Popis encoded délek bez encodedBytes", "resolution": "Doplněny a ověřeny encodedBytes všech50 položek."}
+  ],
+  "findings": [],
+  "finalReport": "Oba nálezy uzavřené. Projekce označené a bez processes/PID; původní runtime archivy chybí. Všech50 encoded/decoded SHA i obě délky souhlasí. Raw session a benchmark mají stále shodné SHA s původními lokálními důkazy. README opravy popisuje přesně.",
+  "scope": "Nezávislý čtecí scope a raw audit; žádné nové GPU měření reviewerem. Výsledek je přijetí příčinného profilu, nikoli hotová migrace nebo další FPS optimalizace."
+}

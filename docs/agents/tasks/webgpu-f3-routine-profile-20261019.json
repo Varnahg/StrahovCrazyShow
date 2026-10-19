@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-f3-routine-profile-20261019",
+  "title": "KEY-31/32: změřit zbývající materiálové CPU rutiny po přijatém F3",
+  "status": "done",
+  "dependsOn": ["webgpu-schema-native-20261019"],
+  "writePaths": [".cache/webgpu-f3-routine-profile-20261019/", "docs/agents/handoffs/webgpu-f3-routine-profile-20261019.md", "docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/", "_bmad/render/bmad-build/", "_bmad-output/implementation-artifacts/webgpu-f3-routine-profile-20261019/"],
+  "resources": ["heavy-validation", "gpu", "workspace-build", "port:4200", "port:2595"],
+  "acceptance": ["Navázat na actualmain9edcc F3, nikoli starý909serializer nebo nepřijatýmemo. Zdejšínative-clean3c4 reference zůstane immutable. Pouze novýQA snapshot s již přijatým max8routine timerem; přesný F3 toString zůstává aktivní a wrapper nemění WeakMap key/return/throw ani výsledné shadery.", "Doložit zdrojovéSHA, explicitní scope měřených nested walltimes a restore při completion/exception. Nepřidat novou diagnostickou vrstvu, cache nebo runtime opravu bez výsledku tohoto měření.", "Jeden skutečný Edge průjezd Low/night/1actual/0ambient podle existujícího scénáře. Při jiné zátěži data zachovat/označit; instrumentovanáFPS není přímé A/B ani finálnípřejímka. Vybrat další skutečně dominantnířetězec pro cílený průzkum a porovnat rozumnévarianty."],
+  "verification": ["Existující cílené helper/Game/mesh checks a TypeScript/build v izolovaném snapshotu, skutečnýGPU capture, úplný raw/source/health/cleanup/protectedbytes. Independentreview a scopedcommit/main/Linear."],
+  "notes": ["Rootwebgpu-01a15102-admin koordinuje. PředchozíF3 raw mediánfirstCPU123,7/render115,4ms a later71,1ms; zbývá8intervalů>=100ms ze3matchingF3běhů. PředF3toString61/51ms vs memo30/24ms; aktuální rutinaF3dosud přímozměřená není.", "Použít existující .cache/webgpu-routine-profile-20261019 a helper jako read-only vzor, přesný novýnative-clean-f3 z .cache/webgpu-serializer-schema-qa-20261019 jakozdroj app/tests/deps. Nativepatch/package/lock/Game/UItracked a hranésnapshoty mimo write scope."]
+}
