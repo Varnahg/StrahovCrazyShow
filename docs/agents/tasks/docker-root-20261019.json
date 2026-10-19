@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-root-20261019",
+  "title": "KEY-45: závislosti, dokumentace, BMAD a integrační test Dockeru",
+  "writePaths": [
+    "package.json",
+    "pnpm-lock.yaml",
+    "README.md",
+    "README.cs.md",
+    "docs/deployment/docker.md",
+    "scripts/integration-docker.ts",
+    "scripts/test-docker.mjs",
+    "docs/agents/handoffs/docker-root-20261019.md",
+    "docs/verification-evidence/docker-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-9eb55619960b/",
+    "_bmad-output/implementation-artifacts/docker-20261019/",
+    ".cache/docker-20261019/",
+    "node_modules/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Explicitní prod express5.3.0/tsx4.23.15; frozen lockfile bez ostatních upgrade.",
+    "CZ/EN návod a skutečné smoke/lifecycle testy; evidence odděluje PASS od omezení.",
+    "Vlastní diff reviewed; necommitovat cizí WIP; jednotlivé ověřené celky integrovat do main."
+  ],
+  "verification": [
+    "Targeted tests; dokumentace/odkazy; následně samostatný validation task pro full pipeline a Docker/browser."
+  ],
+  "status": "ready",
+  "dependsOn": [],
+  "notes": [
+    "Authorized user plan 19.10.2026; KEY-45 https://linear.app/gigeconomy/issue/KEY-45.",
+    "Cwd C:/Users/rezac/.codex/worktrees/docker-single-container/StrahovCrazyShow; base df6b53af; no foreign WIP adopted. Runtime server/index released by diary owner in documented thread handoff before claim.",
+    "Research and alternatives in _bmad-output/implementation-artifacts/docker-20261019/spec.md; renderer output owned only by docker-root."
+  ]
+}
