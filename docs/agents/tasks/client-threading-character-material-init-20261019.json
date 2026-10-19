@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "client-threading-character-material-init-20261019",
   "title": "Ověřit a omezit redundantní průchody scény při vzniku materiálů NPC",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "client/character-materials.ts",
@@ -23,6 +23,7 @@
     "Readonly dependencies, žádné instalace nebo runtime flag změny. Full test/build/GPU patří koordinátorovi s heavy-validation rezervací."
   ],
   "notes": [
+    "KEY-41 přijatý úzký celek: RED128–352→GREEN32foreignreads/32wrappers,34targetedPASS,review[]. Clean1491/1491 a combined1524/1524 bounded fullsuite,oba build/TS/integrationPASS. Edge6editorpresetů/face/recolor,2Game ready/dispose,error0; evidence docs/performance/evidence/client-threading-character-materials-20261019/. Žádné FPSA/B nebo worker přijetí; KEY-40/KEY-5 pokračují.",
     "KEY-40 v souvislosti KEY-32. Lab4204 skutečně potvrdil transit envelope78.9/69.9/46.6ms při hraní; neatribuuje zatím náklad konkrétní funkci. Tento úkol ověřuje samostatný zdrojově doložený amplification mechanism před složitějším workerem.",
     "Původní vlákno01a15102 bylo informováno o úzkém character-materials scope; jeho shadow-pass/game/ui/cinematic práce se nemění.",
     "BMAD koordinátor již provedl Deep Recon a Build investigation v9b78. Podagent další workflow nespouští."
