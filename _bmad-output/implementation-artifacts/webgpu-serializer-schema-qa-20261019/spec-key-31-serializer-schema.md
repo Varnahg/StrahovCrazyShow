@@ -2,7 +2,7 @@
 title: 'KEY-31: metadata fastpath kanonické serializace'
 type: 'chore'
 created: '2026-10-19'
-status: 'in-progress'
+status: 'done'
 route: 'oneshot'
 review_loop_iteration: 0
 context: ['{project-root}/docs/agents/bmad-policy.md']
@@ -17,6 +17,10 @@ Zmenšit doloženou cenu MaterialDefines.toString napříč skutečnými objekty
 </frozen-after-approval>
 
 ## Implementation Notes
+
+- Dokončení pouzetohotometadatafeature: runtimeexactF3 main9edcc05132df1b3f9aa2c37c897fd11b29dad5fe (WT54cca498…),133foreignpreserved. Replication3A/3F3matchingmediánmax157,6→128,6ms,p9924,1→21,7,>=10010/8stále; actualreadyidle33,978/35,345s a nezamčenétakty přiznané. W4differentloadretained,2pre-benchmarkabortspreserved. Source/rawreviews[].
+- Freshnativeinstall1module3cc/10860audit/exactpatch+6lockrefs; clean576source3c4/1453tests, knowncombined589source77d/1513tests, oba fullTS/build/4integrationPASS. ActualfreshbuiltcombinedN1torch/editor6ready/car/menu healthvalid/pending0/errors0; primarybenchmark2, firstwalkingattempt+transientsretained. Stalependingreceiptopravenpoindependentauditusezachovánímoriginálu.
+- Native evidence196payloads encoded/decodedSHA/délkyaudit[], úzkýnativepřenosintegrován, parentQA/native/integrationtasksdone. KEY31/32/default/celýmigračnícílstáleopen; následuje novýrezervovanýúkol na remainingCPUhitches nadF3, nikoli rozšířeníhotovéhointent. Zdejšívalidatedsnapshots bezezměn, userplayedpreserved. Plnáfunkční/obrazová/LOD/lifecycle/multiplayer a Medium3sessionsWebGL2/WebGPU přejímka neprohlašována za dokončenou.
 
 - F3 checkpoint: frozen e898manifest/3ccpayload, rootfull1448/fullTS/buildPASS nad603file193477b9. První build opomněl VITE_SOURCE_SNAPSHOT_ID; B1UIidnull, serverheader/distmanifest193. Collector správně odmítl, raw/obraz140msmaximum preserved+excluded, A2stoppedbeforeclient. Rebuild bezezměny source s env+embeddedIDguard prošel, validB2UIid193. F3integration/freshnative/combined dosudneprovedeny.
 - Platný EdgeA3/B2/A4 má max168,3/139,3/179,3ms,p9923,8/29,7/42,1,>=100ms4/3/5,FPS56,7/57/55,2 při1actual0ambient/Low77/night/stejnémrozlišení/0newprograms2syncpipelines/healthvalid. FirstpreviousCPU/render162,8/152→134,7/124,7→175,3/161,1ms. Reviewraw[]. JedinývalidB a různéclocks/idle/trajektorie nestačí knativeacceptance; A4afterP5/810nevylučujepomalýcontrol. Dalšíakce je řízené opakováníprodukcí, nikolidalšícache čidefaultflip. SharedF3evidence409payloads; rootQA pokračuje.

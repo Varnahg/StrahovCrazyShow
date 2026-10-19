@@ -1,5 +1,7 @@
 # KEY-31: nativní přenos immutable serializer schema F3
 
+Root integrace dokončena: WT54cca498c95bb7b8a6894863f41c3ee56d8e4bd5 → main9edcc05132df1b3f9aa2c37c897fd11b29dad5fe. Native úkol je přijatý; celá migrace/KEY31/32nejsouDone. Úplná evidence a navazující předání: docs/agents/handoffs/webgpu-serializer-schema-qa-20261019.md a docs/performance/evidence/webgpu-migration-20261016/serializer-schema-qa/native/README.md.
+
 ## Root ověření před integrací
 
 - Root převzal explicitní předání přes claim webgpu-01a15102-schema-native-root s adopt-dirty; osm payloadů stále odpovídá manifestu1655d900. Native source/patch/lock/test review[].

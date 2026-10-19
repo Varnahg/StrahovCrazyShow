@@ -1,0 +1,73 @@
+{
+  "sourceA": "909ebf8a019b26aff5561a0aaba97b976a26d033746da85ae958c6f4034589a5",
+  "sourceB": "193477b9df5b54d3256ee8cf8285344ebd76dd55aeb929a7f5bfbd0d6b43ccab",
+  "runs": [
+    [
+      "w1",
+      "reference"
+    ],
+    [
+      "w2",
+      "candidate-v3"
+    ],
+    [
+      "w3",
+      "candidate-v3"
+    ],
+    [
+      "w4",
+      "reference"
+    ],
+    [
+      "w5",
+      "reference"
+    ],
+    [
+      "w6",
+      "candidate-v3"
+    ]
+  ],
+  "schedule": {
+    "ready": "Poll enabled public Svítilna button from immediately after join, at1s intervals; hostUTC observation and actual telemetry ready-to-benchmark delta retained. UI waitFor selector deadline was too short for startup; no source/runtime change.",
+    "preview": "Wait public Zepředu enabled before join",
+    "postReadyMs": 30000,
+    "setup": "Night; close; S1900; E marker; confirm entry hint; GPU before; idle until target",
+    "benchmark": "Open settings; start10s; close; E; W8000; space2500; no observations during interval"
+  },
+  "conditions": {
+    "viewport": [
+      1528,
+      650
+    ],
+    "internal": [
+      1175,
+      500
+    ],
+    "quality": "low77%",
+    "lightingInstant": 1792447200000,
+    "actualSessions": 1,
+    "ambient": {
+      "buses": 0,
+      "passengers": 0,
+      "cars": 0
+    }
+  },
+  "scope": "F3 feature replication within native WebGPU; not final WebGL2/WebGPU acceptance or three-session matrix. Every run retained; thermal/clocks recorded, not locked; no detailed profiler.",
+  "initialAttempt": {
+    "id": "r1",
+    "benchmarkPerformed": false,
+    "reason": "Startup selector wait ended before ready and timing gate was not yet established. Stopped before any benchmark; no outcome-based exclusion."
+  },
+  "clockRepair": {
+    "id": "v1",
+    "benchmarkPerformed": false,
+    "reason": "Cross-cell closure assignment did not expose the observed timestamp; changed UI orchestration to return an explicit immutable timing object, verified before new series. Stopped before any benchmark, no game/runtime edits or outcome-based exclusion."
+  },
+  "additionalRuns": [
+    [
+      "w7",
+      "reference"
+    ]
+  ],
+  "additionalReason": "W4 has2simulated passengers versus prespecified0. Retain as valid different-load run, add one reference before inspecting its outcome to obtain3matching controls. No filtering by speed/hitch result."
+}

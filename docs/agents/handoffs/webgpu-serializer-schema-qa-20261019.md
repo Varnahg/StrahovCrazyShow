@@ -1,4 +1,13 @@
-# Serializer schema QA: průběžné předání
+# Serializer schema QA: převzato a nativně integrováno
+
+## Dokončený úzký celek 19.10.
+
+- RuntimeF3 main9edcc05132df1b3f9aa2c37c897fd11b29dad5fe, WT54cca498c95bb7b8a6894863f41c3ee56d8e4bd5.10source/task/handoff souborů,133foreignpaths v obou checkoutech byteexact. Metadata feature/taskdone, **KEY31/32 a celý migrační cíl nikoli**.
+- Replication7complete/3matchingA+3F3: medianmax157,6→128,6,p9924,1→21,7,p9518,4→18,1,FPS57,3→57,8;>=100ms10/8stále. W4jinázátěž2ambient/3sync zachovaný, extraW7předem; R1/V1abortedbeforebenchmark. Hostobservedidle30,627–30,648s, actualreadyidle33,978/35,345smediany, takty/trajektorie různé. Independentrawreview[], žádnýfinálníMedium/3peer/WebGL2důkaz.
+- Exactnative3cc/patcha586/lock35e3; freshcopyinstall,10860fresh+sharedbytesauditPASS,1changedmodule/core-loaderidentity. Clean3c4be6…576files1453/fullTS/build/4integrationPASS, knowncombined77d606…589files1513/fullTS/build/4integrationPASS. VITEID/sourcebytesverified. Offlineinstallfailure metadataPostCSS zachovaný, frozenonlinepokusPASS.
+- ActualnativecombinedEdgeN1:torchon/off,šestustálenýcheditorů,Game,explicitněpotvrzenéauto/jízda,menu. Source77d/seq0–1155/primary2ndbenchmarkUIraw1match/healthvalid/pending0/allerrors0. Walkfirstattempt a Eli/Samtransienty zachované a správněodlišené, retryreadypixelysprávné. ŽádnéperformanceporovnáváníN1. Independentfinalreview potvrdilúzkouintegraci; stalependingreceiptopravenpřiznaněsezachovánímpre-smoke verze.
+- Evidence docs/performance/evidence/webgpu-migration-20261016/serializer-schema-qa/native/README.md:196encoded/decodedSHA+délky nezávisleověřeny[], source/raw/pipeline/omezenípotvrzena. Vlastníports2568/4200/2595stopped,kartyzavřené/viewportreset,4199code17+HTMLexact; pracovním/shared/playeddependenciesžádnýinstall. Docs/verification.md cizíWIPponechaný, samostatnáevidence prointegrátora.
+- Další práce je **nový samostatný úkol** nad mainF3: cíleně určit zbytekCPUrozpočtu zbývajícíchsvětelnýchzáseků (dosudfirstpreviousCPU123,7/render115,4ms), neopakovat hotovoumetadataimplementaci. Použít již existujícíměřicímechanismy, novouQAcache/rezervaci; zdejší validatednative-clean/combo/dependencies držetneměnné jako referenci. Pak dalšífunkční/obrazová/multiplayer/lifecyclepřejímka a finalWebGL2/WebGPU/Medium/3sessions. Syntheticunique-shapechurn+40,2%stálelimit. Není žádnýdefaultflip ani předčasnáaktivacenavazujícíhojinéhocíle.
 
 ## Navazující shared F3 checkpoint
 
