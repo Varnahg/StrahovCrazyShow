@@ -169,17 +169,129 @@ diff --git a/Materials/materialHelper.functions.js b/Materials/materialHelper.fu
              defines["POINTLIGHT" + index] = false;
              defines["DIRLIGHT" + index] = false;
 diff --git a/Materials/materialDefines.js b/Materials/materialDefines.js
-index 265bd1e..c482f2f 100644
+index 265bd1e3..212da7fd 100644
 --- a/Materials/materialDefines.js
 +++ b/Materials/materialDefines.js
-@@ -229,7 +229,41 @@ export class MaterialDefines {
+@@ -1,3 +1,42 @@
++// QA metadata-only fastpath: state exists before class binding for ESM cycles.
++var defineSchemas = new WeakMap();
++var defineSchemaReady = false;
++var defineSchemaInterns = [];
++var defineSchemaInternUnits = 0;
++function findInternedDefineSchema(count, names, previousNames) {
++    for (const entry of defineSchemaInterns) {
++        const candidate = entry.schema;
++        if (candidate.names.length !== count) continue;
++        // Cheap miss rejection only; a hit still requires the entire sequence.
++        if (count > 0 && (candidate.names[0] !== (names ? names[0] : previousNames[0]) ||
++            candidate.names[count - 1] !== (names ? names[count - 1] : previousNames[count - 1]))) continue;
++        let equal = true;
++        for (let index = 0; index < count; index++) {
++            if (candidate.names[index] !== (names ? names[index] : previousNames[index])) { equal = false; break; }
++        }
++        if (equal) return candidate;
++    }
++    return undefined;
++}
++function internDefineSchema(names, order, units) {
++    // Re-check in case a reentrant completed call published the same shape.
++    const prior = findInternedDefineSchema(names.length, names, undefined);
++    if (prior) return prior;
++    const schema = Object.freeze({ names: Object.freeze(names), order: Object.freeze(order), validNames: true });
++    while (defineSchemaInterns.length >= 32 || defineSchemaInternUnits + units > 262144) {
++        const oldest = defineSchemaInterns.shift();
++        defineSchemaInternUnits -= oldest.units;
++    }
++    defineSchemaInterns.push(Object.freeze({ schema, units }));
++    defineSchemaInternUnits += units;
++    return schema;
++}
++
++
++const schemaNamePattern = /^[A-Za-z_][A-Za-z0-9_]*(?![\s\S])/;
++const schemaLiteralPattern = /^[+-]?(?:(?:0|[1-9][0-9]*)(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?(?![\s\S])/;
++const SCHEMA_MAX_NAMES = 1024, SCHEMA_MAX_NAME_UNITS = 32768;
++
+ /**
+  * Manages the defines for the Material
+  */
+@@ -212,24 +251,107 @@ export class MaterialDefines {
+      * @returns - String of material define information
+      */
+     toString() {
+-        let result = "";
++        const cacheable = this !== null && (typeof this === "object" || typeof this === "function");
++        let schema = cacheable && defineSchemaReady ? defineSchemas.get(this) : undefined;
++        const fragments = { __proto__: null };
++        let names = schema ? null : { __proto__: null };
++        let matches = !!schema, count = 0, chars = 0, rows = 0, safeValues = true;
+         for (let index = 0; index < this._keys.length; index++) {
+             const prop = this._keys[index];
+             const value = this[prop];
+             const type = typeof value;
++            let fragment;
+             switch (type) {
+                 case "number":
+                 case "string":
+-                    result += "#define " + prop + " " + value + "\n";
++                    fragment = "#define " + prop + " " + value + "\n";
+                     break;
+                 default:
+                     if (value) {
+-                        result += "#define " + prop + "\n";
++                        fragment = "#define " + prop + "\n";
+                     }
                      break;
              }
++            fragments[index] = fragment;
++            if (fragment !== undefined) { chars += fragment.length; rows++; }
++            if (type === "number") safeValues = safeValues && Number.isFinite(value);
++            else if (type === "string") safeValues = safeValues && schemaLiteralPattern.test(value) && Number.isFinite(Number(value));
++            else if (type !== "boolean" && type !== "undefined" && value !== null) safeValues = false;
++            if (matches && schema.names[index] !== prop) {
++                matches = false;
++                names = { __proto__: null };
++                for (let previous = 0; previous < index && previous < SCHEMA_MAX_NAMES; previous++) names[previous] = schema.names[previous];
++            }
++            if (names && index < SCHEMA_MAX_NAMES) names[index] = prop;
++            count++;
++        }
++        if (matches && count !== schema.names.length) matches = false;
++        let sharedPointer = false;
++        if (cacheable && defineSchemaReady && !matches && count <= SCHEMA_MAX_NAMES) {
++            const shared = findInternedDefineSchema(count, names, schema?.names);
++            if (shared) { schema = shared; matches = true; sharedPointer = true; }
++        }
++        if (matches && safeValues && chars <= 32768 && rows <= 1024) {
++            let result = "";
++            for (const index of schema.order) { const fragment = fragments[index]; if (fragment !== undefined) result += fragment; }
++            if (sharedPointer) defineSchemas.set(this, schema);
++            return result;
++        }
++        let raw = "";
++        for (let index = 0; index < count; index++) { const fragment = fragments[index]; if (fragment !== undefined) raw += fragment; }
++        const result = canonicalResult(raw);
++        if (sharedPointer) defineSchemas.set(this, schema);
++        if (cacheable && defineSchemaReady && count <= SCHEMA_MAX_NAMES && !matches) {
++            const observed = [], seen = new Set();
++            let units = 0, valid = true;
++            for (let index = 0; index < count; index++) {
++                const name = names ? names[index] : schema.names[index];
++                if (typeof name !== "string" || !schemaNamePattern.test(name) || name.includes("__") || name.startsWith("GL_") || reserved.has(name) || seen.has(name)) { valid = false; break; }
++                units += name.length;
++                if (units > SCHEMA_MAX_NAME_UNITS) { valid = false; break; }
++                seen.add(name); observed.push(name);
++            }
++            if (valid) {
++                const order = observed.map((_, index) => index).sort((a, b) => observed[a] < observed[b] ? -1 : observed[a] > observed[b] ? 1 : 0);
++                defineSchemas.set(this, internDefineSchema(observed, order, units));
++            }
          }
--        return result;
-+        return canonicalResult(result);
+         return result;
      }
  }
+-//# sourceMappingURL=materialDefines.js.map
+\ No newline at end of file
 +// Project QA: bounded flat-literal serialization only. Custom order-sensitive
 +// processors are outside the verified contract; no universal API guarantee.
 +/** Project QA candidate derived from the accepted isolated CPU proof.
@@ -214,8 +326,8 @@ index 265bd1e..c482f2f 100644
 +    records.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
 +    return records.map(record => record.line).join('\n') + '\n';
 +}
- //# sourceMappingURL=materialDefines.js.map
-\ No newline at end of file
++//# sourceMappingURL=materialDefines.js.map
++defineSchemaReady = true;
 diff --git a/Materials/standardMaterial.pure.js b/Materials/standardMaterial.pure.js
 --- a/Materials/standardMaterial.pure.js
 +++ b/Materials/standardMaterial.pure.js
