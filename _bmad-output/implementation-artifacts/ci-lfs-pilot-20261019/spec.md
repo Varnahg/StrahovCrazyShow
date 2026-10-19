@@ -2,7 +2,7 @@
 title: 'KEY-44: Autonomní LFS preflight pilot a obnova'
 type: 'feature'
 created: '2026-10-19'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'a9f1805808c653d2a9fb9cd81def446bfaead588'
 review_loop_iteration: 0
@@ -51,11 +51,11 @@ CLI: `node scripts/check-lfs-assets.mjs [--root DIR]`. Inventář je committed H
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `tests/lfs-assets.test.ts`: skutečné malé dočasné Git/LFS fixtures; CLI black-box testy výše uvedených stavů. Syntetické pointery lze vložit přímo do indexu pomocí hash-object/update-index, aby fixture nepotřebovala stahování ani globální hooks.
-- [ ] `scripts/check-lfs-assets.mjs`: nejprve zřetelně nedokončený red stub; obnova jej nahradí minimální bounded implementací podle původních testů.
-- [ ] `.github/workflows/ci.yml`: zapojit targeted test a kontrolu pracovních assetů před velkou sadou.
-- [ ] Vlastní předání: zaznamenat testy, původní chyby, procesy, owner a převod. Žádný vlastní commit/push dítěte; provede koordinátor.
-- [ ] Koordinátor: zachovat red commit/run, skutečné odmítnutí merge, obnovit v nové relaci, nezávisle review, přijmout green SHA a integrovat samostatně.
+- [x] `tests/lfs-assets.test.ts`: skutečné malé dočasné Git/LFS fixtures; CLI black-box testy výše uvedených stavů. Syntetické pointery lze vložit přímo do indexu pomocí hash-object/update-index, aby fixture nepotřebovala stahování ani globální hooks.
+- [x] `scripts/check-lfs-assets.mjs`: nejprve zřetelně nedokončený red stub; obnova jej nahradí minimální bounded implementací podle původních testů.
+- [x] `.github/workflows/ci.yml`: zapojit targeted test a kontrolu pracovních assetů před velkou sadou.
+- [x] Vlastní předání: zaznamenat testy, původní chyby, procesy, owner a převod. Žádný vlastní commit/push dítěte; provede koordinátor.
+- [x] Koordinátor: zachovat red commit/run, skutečné odmítnutí merge, obnovit v nové relaci, nezávisle review, přijmout green SHA a integrovat samostatně.
 
 **Acceptance Criteria:**
 - Given checkout s pointerem, when preflight běží, then skončí nenulově před parsováním modelů a uvede přesnou cestu.
@@ -69,9 +69,11 @@ Výzkum skutečné worktree: 12/12 pracovních LFS souborů jsou pointery, přes
 
 ## Implementation Notes
 
+Přijetí implementace integrátorem: opravený head 600c7a736e4b8dc93ecfd2bd0b09d318226052b2 prošel GitHub run 39326894249. Targeted25/25, full 1516/1516, skip0, build a všechny integrační scénáře PASS; všech12 skutečných LFS souborů ready. Dva review nálezy opraveny, oba následné přezkumy []. Původní test hash je beze změny. Závěrečná metadata čekají pouze na vlastní strict CI a SHA-vázaný merge PR #8; finální integrační identita je v PR a Linear KEY-44, které se uzavírá až po main ověření.
+
 Red fáze je výslovně plánovaný test obnovy na izolované větvi; nesmí se vydávat za hotovou funkci. Kód může být záměrně nekompletní, testy musejí vyjadřovat skutečné požadované chování. Koordinátor a implementer mají oddělené writePaths. CLI nepřejímá zámky ani nevybírá další task.
 
-RED checkpoint e0ea60e642c1a1e177a6d1dfcf04c90dc18301b6 zachován v PR #8. GitHub run39324153438 selhal na22 testech (21fail/1pass); mergeHTTP405, main beze změny. Skutečná kolize claimu odmítnuta bez změn. Předchůdce i checkpoint koordinátor provedli handoff/release, nová relace pilot_recovery nyní implementuje původní kontrakt; testSHA256042aa1dec471509a696520608b3b223bf7c945a8d073fcea41ff3f10f74713de se musí zachovat.
+RED checkpoint e0ea60e642c1a1e177a6d1dfcf04c90dc18301b6 zachován v PR #8. GitHub run 39324153438 selhal na22 testech (21 fail/1 pass); mergeHTTP405, main beze změny. Skutečná kolize claimu odmítnuta bez změn. Předchůdce i checkpoint koordinátor provedli handoff/release, nová relace pilot_recovery nyní implementuje původní kontrakt; testSHA256042aa1dec471509a696520608b3b223bf7c945a8d073fcea41ff3f10f74713de se musí zachovat.
 
 ## Spec Change Log
 
@@ -79,13 +81,13 @@ RED checkpoint e0ea60e642c1a1e177a6d1dfcf04c90dc18301b6 zachován v PR #8. GitHu
 
 - Blind: `[]`.
 - Edge: low/patch — trim() zkracuje platnou POSIX cestu končící mezerou; nahradit pouze odebráním terminátoru řádku, doplnit Linux regresi.
-- Verification gap: medium/patch — úspěšné původní fixtures mají2048B, takže netestují přijetí běžného obsahu přes pointer parser. Doplnit64B a1024B úspěšné black-box scénáře v samostatném souboru; původní test hash zachovat.
+- Verification gap: medium/patch — úspěšné původní fixtures mají2048 B, takže netestují přijetí běžného obsahu přes pointer parser. Doplnit64 B a1024 B úspěšné black-box scénáře v samostatném souboru; původní test hash zachovat.
 
-Obnova nové relace: původní testy beze změny, 22/22 PASS přímým během (47.356s). První wrapper timeout není testový výsledek a původní log je zachován. Skutečný lokální checkout správně odmítnut jako12pointerů. Nezávislé review a GitHub GREEN přejímka zatím čekají.
+Obnova nové relace: původní testy beze změny, 22/22 PASS přímým během (47.356 s). První wrapper timeout není testový výsledek a původní log je zachován. Skutečný lokální checkout správně odmítnut jako12 pointerů. Nezávislé review a GitHub GREEN přejímka zatím čekají.
 
 ## Verification
 
 - `node --test tests/lfs-assets.test.ts`: cílené lehké fixture testy bez dependencies/GPU.
-- Kolizní claim během vlastního claimu: exit1, žádný změněný scope ani source.
+- Kolizní claim během vlastního claimu: exit 1, žádný změněný scope ani source.
 - Skutečné GitHub red a green runy; chybový merge request za aktivního rulesetu; zachovaný head/base main.
 - Nezávislé read-only review finálního diffu, původní test hash a SHA-vázané přijetí.

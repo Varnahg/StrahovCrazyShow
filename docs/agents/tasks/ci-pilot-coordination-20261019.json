@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "ci-pilot-coordination-20261019",
   "title": "KEY-44: koordinovat jeden autonomní pilot a doložit obnovu",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [
     "ci-required-gates-20261019"
   ],
@@ -33,6 +33,7 @@
     "Závěrečné GitHub main CI a kontrola vlastních claims/procesů."
   ],
   "notes": [
+    "Koordinátor přijal doložený RED/HTTP405/novou relaci/GREEN cyklus po run39326894249. Závěrečná metadata v PR #8 se sloučí pouze přes finální povinné gates; skutečný merge a main run jsou zaznamenané v PR/Linear KEY-44. Claim se drží až do dokončení tohoto kroku.",
     "KEY-44; výslovně autorizovaný jeden autonomní pilot, žádný obecný scheduler.",
     "Parent nesmí měnit zdrojové/testové soubory tasku ci-lfs-pilot-20261019 při claimu dítěte.",
     "Dokončení CI evidence je navazující přijetí téhož user tasku; docs/verification.md má cizí WIP."
