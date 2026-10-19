@@ -1,0 +1,306 @@
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:04]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:05]: Babylon.js v9.30.0 - Null engine
+BJS - [19:54:05]: Babylon.js v9.30.0 - Null engine
+▶ new character materials traverse foreign draw wrappers at most once before sharing
+  ✖ skin (63.5835ms)
+  ℹ skin: 192 foreign material reads for 32 draw wrappers
+  ✖ hair (9.9409ms)
+  ℹ hair: 160 foreign material reads for 32 draw wrappers
+  ✖ strands-short02 (11.4344ms)
+  ℹ strands-short02: 352 foreign material reads for 32 draw wrappers
+  ✖ strands-short04 (7.2118ms)
+  ℹ strands-short04: 320 foreign material reads for 32 draw wrappers
+  ✖ beard (8.8401ms)
+  ℹ beard: 224 foreign material reads for 32 draw wrappers
+  ✖ cloth (8.5591ms)
+  ℹ cloth: 224 foreign material reads for 32 draw wrappers
+  ✖ denim (7.7308ms)
+  ℹ denim: 224 foreign material reads for 32 draw wrappers
+  ✖ leather (5.7634ms)
+  ℹ leather: 128 foreign material reads for 32 draw wrappers
+  ✖ eye (8.2805ms)
+  ℹ eye: 128 foreign material reads for 32 draw wrappers
+  ✖ ocular (6.6593ms)
+  ℹ ocular: 320 foreign material reads for 32 draw wrappers
+  ✖ iris (6.1281ms)
+  ℹ iris: 128 foreign material reads for 32 draw wrappers
+  ✖ metal (3.0924ms)
+  ℹ metal: 128 foreign material reads for 32 draw wrappers
+  ✖ rubber (3.5721ms)
+  ℹ rubber: 128 foreign material reads for 32 draw wrappers
+✖ new character materials traverse foreign draw wrappers at most once before sharing (155.2551ms)
+✔ all character surfaces retain values, textures, plugins and first-ready defines (450.9454ms)
+✔ character cache retains shared textures through prune and releases them once on dispose (19.5049ms)
+✔ later edits invalidate every consumer after initial material configuration (24.9007ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 3
+ℹ fail 14
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2912.0758
+
+✖ failing tests:
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ skin (63.5835ms)
+  AssertionError [ERR_ASSERTION]: skin: 192 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ hair (9.9409ms)
+  AssertionError [ERR_ASSERTION]: hair: 160 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ strands-short02 (11.4344ms)
+  AssertionError [ERR_ASSERTION]: strands-short02: 352 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ strands-short04 (7.2118ms)
+  AssertionError [ERR_ASSERTION]: strands-short04: 320 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ beard (8.8401ms)
+  AssertionError [ERR_ASSERTION]: beard: 224 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ cloth (8.5591ms)
+  AssertionError [ERR_ASSERTION]: cloth: 224 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ denim (7.7308ms)
+  AssertionError [ERR_ASSERTION]: denim: 224 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ leather (5.7634ms)
+  AssertionError [ERR_ASSERTION]: leather: 128 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ eye (8.2805ms)
+  AssertionError [ERR_ASSERTION]: eye: 128 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ ocular (6.6593ms)
+  AssertionError [ERR_ASSERTION]: ocular: 320 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ iris (6.1281ms)
+  AssertionError [ERR_ASSERTION]: iris: 128 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ metal (3.0924ms)
+  AssertionError [ERR_ASSERTION]: metal: 128 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at .cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43
+✖ rubber (3.5721ms)
+  AssertionError [ERR_ASSERTION]: rubber: 128 reads exceed one traversal of 32 foreign wrappers
+      at TestContext.t (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:60:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at TestContext.test (node:internal/test_runner/test:394:20)
+      at TestContext.<anonymous> (C:\Users\rezac\.codex\worktrees\9b78\StrahovCrazyShow\.cache\client-threading-character-material-init-20261019\snapshot\tests\character-material-init.test.ts:55:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

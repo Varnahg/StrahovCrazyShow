@@ -1,0 +1,195 @@
+diff --git a/client/character-materials.ts b/client/character-materials.ts
+index 9a87edf2..26069802 100644
+--- a/client/character-materials.ts
++++ b/client/character-materials.ts
+@@ -89,98 +89,101 @@ export class CharacterMaterials {
+ 
+   get(color: string, surface: CharacterSurface) {
+     const key = `${surface}:${color.toLowerCase()}`;
+-    let material = this.materials.get(key);
+-    if (material) return material;
+-    material = new PBRMaterial(`character ${key}`, this.scene);
+-    material.albedoColor = Color3.FromHexString(color).toLinearSpace();
+-    material.metallic = surface === "metal" ? 0.65 : 0;
+-    material.roughness = {
+-      skin: 0.53,
+-      hair: 0.54,
+-      "strands-short02": 0.76,
+-      "strands-short04": 0.76,
+-      beard: 0.9,
+-      cloth: 0.88,
+-      denim: 0.94,
+-      leather: 0.56,
+-      eye: 0.14,
+-      ocular: 0.3,
+-      iris: 0.22,
+-      metal: 0.37,
+-      rubber: 0.86,
+-    }[surface];
+-    material.environmentIntensity = surface === "eye" ? 0.9 : 0.65;
+-    material.metadata = { characterSurface: surface, paletteColor: color };
+-    if (surface === "strands-short02" || surface === "strands-short04") {
+-      const style = surface === "strands-short02" ? "short02" : "short04";
+-      let maps = this.hairTextures.get(style);
+-      if (!maps) {
+-        maps = createStudentHairTextures(this.scene, style);
+-        this.hairTextures.set(style, maps);
++    const cached = this.materials.get(key);
++    if (cached) return cached;
++    const material = new PBRMaterial(`character ${key}`, this.scene);
++    // Configure this new material before sharing it with the cache or meshes.
++    material.atomicMaterialsUpdate(() => {
++      material.albedoColor = Color3.FromHexString(color).toLinearSpace();
++      material.metallic = surface === "metal" ? 0.65 : 0;
++      material.roughness = {
++        skin: 0.53,
++        hair: 0.54,
++        "strands-short02": 0.76,
++        "strands-short04": 0.76,
++        beard: 0.9,
++        cloth: 0.88,
++        denim: 0.94,
++        leather: 0.56,
++        eye: 0.14,
++        ocular: 0.3,
++        iris: 0.22,
++        metal: 0.37,
++        rubber: 0.86,
++      }[surface];
++      material.environmentIntensity = surface === "eye" ? 0.9 : 0.65;
++      material.metadata = { characterSurface: surface, paletteColor: color };
++      if (surface === "strands-short02" || surface === "strands-short04") {
++        const style = surface === "strands-short02" ? "short02" : "short04";
++        let maps = this.hairTextures.get(style);
++        if (!maps) {
++          maps = createStudentHairTextures(this.scene, style);
++          this.hairTextures.set(style, maps);
++        }
++        configureStudentHairMaterial(material, style, maps);
+       }
+-      configureStudentHairMaterial(material, style, maps);
+-    }
+-    if (surface === "ocular") {
+-      const atlas =
+-        EYE_PALETTES.find((entry) => entry.color === color)?.atlas ?? "brown";
+-      let texture = this.eyeTextures.get(atlas);
+-      if (!texture) {
+-        texture = new Texture(
+-          `/models/characters/student-eyes/${atlas}.png`,
+-          this.scene,
+-          false,
+-          true,
+-          Texture.TRILINEAR_SAMPLINGMODE,
+-        );
+-        texture.gammaSpace = true;
+-        texture.hasAlpha = false;
+-        this.eyeTextures.set(atlas, texture);
++      if (surface === "ocular") {
++        const atlas =
++          EYE_PALETTES.find((entry) => entry.color === color)?.atlas ?? "brown";
++        let texture = this.eyeTextures.get(atlas);
++        if (!texture) {
++          texture = new Texture(
++            `/models/characters/student-eyes/${atlas}.png`,
++            this.scene,
++            false,
++            true,
++            Texture.TRILINEAR_SAMPLINGMODE,
++          );
++          texture.gammaSpace = true;
++          texture.hasAlpha = false;
++          this.eyeTextures.set(atlas, texture);
++        }
++        material.albedoColor = Color3.White();
++        material.albedoTexture = texture;
++        material.indexOfRefraction = 1.376;
++        material.clearCoat.isEnabled = true;
++        material.clearCoat.intensity = 1;
++        material.clearCoat.roughness = 0.08;
++        material.clearCoat.indexOfRefraction = 1.376;
++        material.transparencyMode = PBRMaterial.PBRMATERIAL_OPAQUE;
++        material.metadata.sourceLicense = "CC0-1.0";
++        material.metadata.eyeAtlas = atlas;
+       }
+-      material.albedoColor = Color3.White();
+-      material.albedoTexture = texture;
+-      material.indexOfRefraction = 1.376;
+-      material.clearCoat.isEnabled = true;
+-      material.clearCoat.intensity = 1;
+-      material.clearCoat.roughness = 0.08;
+-      material.clearCoat.indexOfRefraction = 1.376;
+-      material.transparencyMode = PBRMaterial.PBRMATERIAL_OPAQUE;
+-      material.metadata.sourceLicense = "CC0-1.0";
+-      material.metadata.eyeAtlas = atlas;
+-    }
+-    if (surface === "beard") {
+-      // Stubble blends over an opaque head, never cuts a hole in skin.
+-      material.alpha = 0.42;
+-      material.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHABLEND;
+-    }
+-    // No per-character screen-space scattering/prepass. Small highlights and
+-    // a broad skin lobe remain compatible with ordinary instanced PBR draws.
+-    if (surface === "skin") {
+-      material.clearCoat.isEnabled = true;
+-      material.clearCoat.intensity = 0.055;
+-      material.clearCoat.roughness = 0.5;
+-    }
+-    if (surface === "cloth" || surface === "denim") {
+-      material.sheen.isEnabled = true;
+-      material.sheen.intensity = 0.12;
+-      material.sheen.color = new Color3(0.38, 0.38, 0.38);
+-      material.sheen.roughness = 0.85;
+-    }
+-    const textureKind =
+-      surface === "skin" || surface === "beard"
+-        ? "skin"
+-        : surface === "hair"
+-          ? "hair"
+-          : surface === "cloth" || surface === "denim"
+-            ? "cloth"
+-            : undefined;
+-    if (textureKind) {
+-      let texture = this.textures.get(textureKind);
+-      if (!texture) {
+-        texture = microNormal(this.scene, textureKind);
+-        this.textures.set(textureKind, texture);
++      if (surface === "beard") {
++        // Stubble blends over an opaque head, never cuts a hole in skin.
++        material.alpha = 0.42;
++        material.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHABLEND;
+       }
+-      material.bumpTexture = texture;
+-    }
++      // No per-character screen-space scattering/prepass. Small highlights and
++      // a broad skin lobe remain compatible with ordinary instanced PBR draws.
++      if (surface === "skin") {
++        material.clearCoat.isEnabled = true;
++        material.clearCoat.intensity = 0.055;
++        material.clearCoat.roughness = 0.5;
++      }
++      if (surface === "cloth" || surface === "denim") {
++        material.sheen.isEnabled = true;
++        material.sheen.intensity = 0.12;
++        material.sheen.color = new Color3(0.38, 0.38, 0.38);
++        material.sheen.roughness = 0.85;
++      }
++      const textureKind =
++        surface === "skin" || surface === "beard"
++          ? "skin"
++          : surface === "hair"
++            ? "hair"
++            : surface === "cloth" || surface === "denim"
++              ? "cloth"
++              : undefined;
++      if (textureKind) {
++        let texture = this.textures.get(textureKind);
++        if (!texture) {
++          texture = microNormal(this.scene, textureKind);
++          this.textures.set(textureKind, texture);
++        }
++        material.bumpTexture = texture;
++      }
++    });
+     this.materials.set(key, material);
+     return material;
+   }

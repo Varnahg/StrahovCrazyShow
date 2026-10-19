@@ -1,0 +1,141 @@
+{
+  "source": "1fbc05af4154cafb1fd6834748d86dde6d10c539d5431c3fda6323b430ba5752",
+  "cleanSource": "ced7586d5ad54cefa3dc789a337e7788c1062e149deefb2f12745712d4a797c0",
+  "session": "e0a7fc0c-6986-4a75-8904-8f4d3fc2b69a",
+  "records": 1333,
+  "rawSha256": "32d5cfd795c59d882c3bdd2f8915ed908979f3232b99d6a0e7da17de9d09e929",
+  "rawBytes": 1436285,
+  "ready": [
+    {
+      "seq": 465,
+      "atMs": 161159.3,
+      "kind": "game-ready",
+      "data": {
+        "mode": "multi"
+      }
+    },
+    {
+      "seq": 1258,
+      "atMs": 429518.7,
+      "kind": "game-ready",
+      "data": {
+        "mode": "multi"
+      }
+    }
+  ],
+  "dispose": [
+    {
+      "seq": 790,
+      "atMs": 316553.4,
+      "kind": "game-dispose",
+      "data": {}
+    },
+    {
+      "seq": 1322,
+      "atMs": 457171,
+      "kind": "game-dispose",
+      "data": {}
+    }
+  ],
+  "errorRecords": [],
+  "benchmark": {
+    "date": "2026-10-19T18:22:25.440Z",
+    "health": {
+      "start": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      },
+      "end": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      },
+      "valid": true
+    },
+    "avatars": 1,
+    "ambient": {
+      "buses": 0,
+      "passengers": 2,
+      "cars": 0
+    },
+    "quality": "medium",
+    "viewport": {
+      "width": 1912,
+      "height": 867
+    },
+    "renderResolution": {
+      "width": 1912,
+      "height": 867
+    },
+    "averageFps": 50.6,
+    "p95FrameMs": 26.69999998807907,
+    "p99FrameMs": 37.80000001192093,
+    "scope": "Single visual/health smoke, different scene/time from baseline. Not matched FPS acceptance."
+  },
+  "visualChecks": [
+    "six editor presets",
+    "face eyes/glasses/beard/hair recolor",
+    "game medium daylight and walking",
+    "editor recreation after Game disposal",
+    "second Game entry and teardown"
+  ],
+  "limits": [
+    "No pixel-difference baseline; visual smoke plus CPU parameter/define parity.",
+    "One actual GPU multiplayer relation; no3session worker or FPS acceptance.",
+    "No worker architecture shipped; redundant material initialization scans reduced.",
+    "Default fullclean test had two4s readiness timeouts under load; focused and bounded full rerun passed with identical source/timeouts."
+  ],
+  "runtime": {
+    "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\9b78\\StrahovCrazyShow\\.cache\\client-threading-validation-20261019\\combined",
+    "snapshotId": "1fbc05af4154cafb1fd6834748d86dde6d10c539d5431c3fda6323b430ba5752",
+    "apiPort": 2600,
+    "owner": "threading-01a15535-validation",
+    "url": "http://127.0.0.1:4205/",
+    "task": "client-threading-validation-20261019",
+    "processes": [
+      {
+        "pid": 9160,
+        "path": "C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "startUTC": "2026-10-19T18:17:10.7028035Z"
+      },
+      {
+        "pid": 14812,
+        "path": "C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "startUTC": "2026-10-19T18:17:10.7276549Z"
+      }
+    ]
+  }
+}
