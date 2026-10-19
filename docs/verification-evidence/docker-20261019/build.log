@@ -1,0 +1,41 @@
+$ tsc --noEmit && vite build
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 1597 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                    0.58 kB │ gzip:     0.36 kB
+dist/assets/index-OAL0G7O6.css                    49.49 kB │ gzip:    12.22 kB
+dist/assets/render-shaders-CRIfXshU.js             0.03 kB │ gzip:     0.05 kB
+dist/assets/vegetation-Gr2flW5H.js                 0.14 kB │ gzip:     0.13 kB
+dist/assets/b6-reality-D259O9x9.js                 0.15 kB │ gzip:     0.13 kB
+dist/assets/rolldown-runtime-hePW80VL.js           0.71 kB │ gzip:     0.42 kB
+dist/assets/render-engine-D7DPRv4c.js              3.21 kB │ gzip:     1.67 kB
+dist/assets/avatar-preview-CcFTf8gr.js             6.74 kB │ gzip:     3.12 kB
+dist/assets/on-demand-render-Fqebz4-R.js           7.02 kB │ gzip:     2.42 kB
+dist/assets/assets-B4kguy9W.js                     7.80 kB │ gzip:     3.40 kB
+dist/assets/environment-manifest-Bkq6KwiW.js       8.06 kB │ gzip:     2.29 kB
+dist/assets/transit-renderer-DcwTQIwd.js           9.32 kB │ gzip:     3.85 kB
+dist/assets/car-pack-CqZu-oGy.js                  11.24 kB │ gzip:     4.19 kB
+dist/assets/game-ZlUY3Ru3.js                   3,305.86 kB │ gzip:   550.36 kB
+dist/assets/babylon-E8WlbcY7.js                4,179.64 kB │ gzip:   968.31 kB
+dist/assets/index-CWe4Qhgq.js                  6,497.93 kB │ gzip: 2,254.37 kB
+dist/assets/avatar-renderer-B8Bb65qy.js       14,918.57 kB │ gzip: 4,802.30 kB
+
+[INEFFECTIVE_DYNAMIC_IMPORT] client/b6-reality.ts is dynamically imported by client/game.ts but also statically imported by client/world-renderer.ts, dynamic import will not move module into another chunk.
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 1100 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[INEFFECTIVE_DYNAMIC_IMPORT] client/vegetation.ts is dynamically imported by client/game.ts but also statically imported by client/world-renderer.ts, dynamic import will not move module into another chunk.
+
+✓ built in 24.80s
+[PLUGIN_TIMINGS] JavaScript callbacks ran for 20.1s of this 24.8s build (81%).
+The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+  - plugin vite:prepare-out-dir renderStart (72%, 17.8s, 1 call)
+  - plugin vite:css-post renderChunk (7%, 1.8s, 15 calls)
+Additional callback time came from callbacks under 1s.
+See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+

@@ -6,7 +6,7 @@ Virtual Strahov in your browser: a student campus based on maps, orthophotograph
 
 **The main game uses separate models with documented provenance.** The historical IPR 3D scan is a spatial reference with a separate viewer; its merged trees, cars and surfaces are not loaded into the game. Buildings, vehicles, trees and courts have individual identities and transforms. See [building models](docs/reality-pack/separate-assets/README.md), [individual trees](docs/vegetation/realistic-pack.md) and [model and terrain review](docs/model-review/README.md).
 
-There is no IS sign-in, residency verification, password or real student profile. A nickname identifies a temporary session only. Access is not restricted to Strahov residents. Public deployment is outside this version's scope.
+There is no IS sign-in, residency verification, password or real student profile. A nickname identifies a temporary session only. Access is not restricted to Strahov residents. The [Docker guide](docs/deployment/docker.md) describes self-hosting this demo.
 
 ## Current version
 
@@ -30,6 +30,16 @@ The interface supports **Czech and English**, switchable on the landing page and
 **Known limits remain:** cold grass selection took about **265 ms at the first medium selection and 181 ms when switching to high** in the CPU study; those stalls are not resolved by lower draw counts. The abrupt **180° sprint swing** is still open despite the planted-foot repair. **Daytime and crowd 60 FPS on GeForce GTX 1060 remains unverified.** Full photographic fidelity and Hogwarts Legacy-level character quality are unfinished; that game inspires atmosphere/readability, without reusing its assets.
 
 Intended interiors are dormitory blocks, the training centre, R-ko and the grocery building; all other buildings, including the stadium, are exterior-only. Detailed B6 is complete within its documented reconstruction scope; other permitted interiors are not complete. The shared world, isolated guest mode, character editing, events, communication, map, journal, B6, car, astronomy and demonstration PID traffic are playable. User diagnostics stay local. See the [acceptance checklist](docs/acceptance.md); historical checkpoints remain in [verification](docs/verification.md).
+
+## Run with Docker
+
+With Git LFS and a running Linux Docker engine, run `git lfs pull`, then:
+
+```sh
+docker compose up -d --build
+```
+
+Open [http://localhost:8080](http://localhost:8080). One container serves the website, API and multiplayer; graphics run in the player's browser. No host Node.js or server GPU is needed. Restarting resets the temporary shared world. See the [Docker guide](docs/deployment/docker.md) for configuration, logs, updates, HTTPS hosting and verification.
 
 ## Run locally
 
@@ -194,7 +204,7 @@ Client and server share collision geometry and fixed **60 Hz** simulation. Serve
 | `assets/blender/`, `public/models/` | Editable models and game exports                                               |
 | `docs/`                             | References, provenance, geometry audits, tests and limitations                 |
 
-IS verification could later precede session issuance without rewriting movement or social features. Persistent accounts, voice, real event imports, an economy, player room furnishing, secured administration and public deployment belong to a later stage. Hardware/network capacity is finite; this demo is not an unlimited MMO.
+IS verification could later precede session issuance without rewriting movement or social features. Persistent accounts, voice, real event imports, an economy, player room furnishing and secured administration belong to a later stage. Hardware/network capacity is finite; this demo is not an unlimited MMO.
 
 ## Provenance and licences
 

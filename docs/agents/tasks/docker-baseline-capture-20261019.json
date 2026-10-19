@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-baseline-capture-20261019",
+  "title": "KEY-45: zachovat vlastní diagnostiku srovnávacího Node běhu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/game-diagnostics/",
+    "docs/agents/handoffs/docker-baseline-capture-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze vlastní syntetická relace2b56e64a v čisté Docker worktree, bez publikace raw diagnostiky.",
+    "Baseline Node21988 ukončen, cizí logy/procesy nepřevzaté."
+  ],
+  "verification": [
+    "Faktická identita source/port8080 a browser DOMready; žádný klientský source diff."
+  ],
+  "notes": [
+    "Baseline vytvořil diagnostiku podle původní loopback politiky mimo původní taskprefix; zjištěno a server zastaven. Dodatečné doložení vlastnictví jediného vlastního výstupu, není bypass cizí kolize.",
+    "Technické převzetí integrátorem: všechny Docker funkční a regresní kontroly PASS, viz evidence/docker-20261019 a PR#9. V kandidátní větvi jde o připravený konečný stav; pro společný main platí až po přijetí PR přes povinné CI a exact-head project-acceptance. KEY-45 zůstává do merge In Progress; širší GPU timeouty zůstávají KEY-8."
+  ]
+}
