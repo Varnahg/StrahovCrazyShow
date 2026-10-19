@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "ci-required-gates-20261019",
+  "title": "KEY-44: zavést skutečnou GitHub CI a ochranu main",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".github/workflows/ci.yml",
+    "docs/agents/ci.md",
+    "docs/agents/handoffs/ci-required-gates-20261019.md",
+    "docs/verification-evidence/ci-main-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-95e969760fc5/",
+    "_bmad-output/implementation-artifacts/ci-required-gates-20261019/",
+    ".cache/ci-main-20261019/"
+  ],
+  "resources": [
+    "github-ci-validation"
+  ],
+  "acceptance": [
+    "Skutečný PR a main GitHub run úspěšně ověří frozen install, skutečné LFS objekty, katalog, README, celou pnpm test sadu, build a izolovanou integraci.",
+    "main vyžaduje PR, aktuální base, přesné úspěšné CI/secret/acceptance checks; zakazuje force-push a deletion bez trvalého bypassu; žádný povinný lidský approval.",
+    "Přijetí review/praktických důkazů je vázané na konkrétní head SHA; herní/GPU přejímka se netvrdí.",
+    "Všechny změny mají vlastní diff, refaktoring, review a handoff; cizí WIP se nepřebírá."
+  ],
+  "verification": [
+    "node scripts/agent-tasks.mjs validate",
+    "Statická inspekce workflow a primárních GitHub/pnpm zdrojů; nezávislé review.",
+    "Skutečné GitHub-hosted pnpm test, pnpm build, pnpm test:integration a check:readme; uložit ID runu, SHA, počty a časy.",
+    "GET ruleset a branch rules po aplikaci; GitHub merge pouze ověřeného head SHA."
+  ],
+  "notes": [
+    "Výslovné zadání uživatele 19.10.2026 v chatu 01a155b2; Linear KEY-44.",
+    "Izolovaná managed worktree z publikovaného db9108dd. Lokální GPU/hraný snapshot se nemění.",
+    "github-ci-validation označuje samostatný vzdálený GitHub-hosted runner, který nesdílí fyzický CPU/GPU/port ani dist s místním heavy-validation. Místní celé testy/build vyžadují zvláštní resource task.",
+    "docs/verification.md má cizí dirty WIP; důkazy zde v samostatném adresáři a docs/agents/ci.md."
+  ]
+}
