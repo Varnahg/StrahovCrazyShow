@@ -1,0 +1,181 @@
+{
+  "acceptance": "NOT ACCEPTED: interleaved workload/thermal conditions differ, hitches persist, full checkpoint/integration not run for this candidate.",
+  "runs": [
+    {
+      "id": "c1",
+      "diagnostic": false,
+      "source": "65d028c6e4c61555c7ae56e89b3b25268bc1a5abbd4b7a8dabe19213edc71e60",
+      "session": "2dbcdd42-b711-4e39-b2d3-52ce0248ebbe",
+      "fps": 45.5,
+      "p95": 32.09999996423721,
+      "p99": 102.69999998807907,
+      "max": 155.39999997615814,
+      "over100": 5,
+      "programs": 4,
+      "modules": 8,
+      "sync": 5,
+      "ambient": {
+        "buses": 2,
+        "passengers": 0,
+        "cars": 1
+      },
+      "distance": 101.54756771359656,
+      "errors": 0,
+      "assetErrors": 0
+    },
+    {
+      "id": "x1",
+      "diagnostic": false,
+      "source": "06754993e63049552768a7114f7a7fb8233cae0c2770a23336e9e071df8bc220",
+      "session": "3790ca26-4128-40e3-b068-f3627b247d36",
+      "fps": 32.1,
+      "p95": 89.60000002384186,
+      "p99": 146.80000001192093,
+      "max": 222.5,
+      "over100": 10,
+      "programs": 9,
+      "modules": 18,
+      "sync": 10,
+      "ambient": {
+        "buses": 2,
+        "passengers": 3,
+        "cars": 0
+      },
+      "distance": 99.21329716399642,
+      "errors": 0,
+      "assetErrors": 0
+    },
+    {
+      "id": "c2",
+      "diagnostic": false,
+      "source": "65d028c6e4c61555c7ae56e89b3b25268bc1a5abbd4b7a8dabe19213edc71e60",
+      "session": "0e336678-2f3a-458b-850b-164847078704",
+      "fps": 42.5,
+      "p95": 32.10000002384186,
+      "p99": 93.69999998807907,
+      "max": 187.19999998807907,
+      "over100": 4,
+      "programs": 5,
+      "modules": 10,
+      "sync": 6,
+      "ambient": {
+        "buses": 0,
+        "passengers": 12,
+        "cars": 0
+      },
+      "distance": 100.94932674607568,
+      "errors": 0,
+      "assetErrors": 0
+    },
+    {
+      "id": "g1",
+      "diagnostic": true,
+      "source": "65d028c6e4c61555c7ae56e89b3b25268bc1a5abbd4b7a8dabe19213edc71e60",
+      "session": "2568c822-0662-4c7d-944a-2692061210ec",
+      "fps": 41.7,
+      "p95": 33.10000002384186,
+      "p99": 95.19999998807907,
+      "max": 211,
+      "over100": 4,
+      "programs": 4,
+      "modules": 8,
+      "sync": 5,
+      "ambient": {
+        "buses": 1,
+        "passengers": 2,
+        "cars": 0
+      },
+      "distance": 101.1998808281446,
+      "errors": 0,
+      "assetErrors": 0
+    },
+    {
+      "id": "g2",
+      "diagnostic": true,
+      "source": "ec5ddd67fc497d9ec31cca171b1cc767f5498ac9fc05566500d4821cbdba6283",
+      "session": "5d47af14-3eb2-4bf9-b65b-c493e39173fc",
+      "fps": 41.4,
+      "p95": 34.69999998807907,
+      "p99": 106.5,
+      "max": 168.10000002384186,
+      "over100": 5,
+      "programs": 5,
+      "modules": 10,
+      "sync": 6,
+      "ambient": {
+        "buses": 0,
+        "passengers": 6,
+        "cars": 0
+      },
+      "distance": 101.6038805140199,
+      "errors": 0,
+      "assetErrors": 0
+    }
+  ],
+  "diagnosticOnly": {
+    "g1": {
+      "moduleCalls": 8,
+      "rawRepeatedCalls": 4,
+      "bodyRepeatedCalls": 4,
+      "stageOverflow": 1,
+      "exactDuplicateScope": "Successful actual final module code string equality only; not evidence of equal earlier source/ABI/effect key or retained Effect."
+    },
+    "g2": {
+      "requests": [
+        {
+          "request": 237,
+          "atMs": 83251.79999995232,
+          "fulfilled": true,
+          "shadow": true,
+          "pbr": false,
+          "depthPrepass": false,
+          "users": 0,
+          "unmatched": true
+        },
+        {
+          "request": 238,
+          "atMs": 83406.69999998808,
+          "fulfilled": true,
+          "shadow": true,
+          "pbr": true,
+          "depthPrepass": false,
+          "users": 0,
+          "unmatched": true
+        },
+        {
+          "request": 239,
+          "atMs": 86131.29999995232,
+          "fulfilled": true,
+          "shadow": true,
+          "pbr": true,
+          "depthPrepass": true,
+          "users": 0,
+          "unmatched": true
+        },
+        {
+          "request": 240,
+          "atMs": 88012.89999997616,
+          "fulfilled": true,
+          "shadow": true,
+          "pbr": true,
+          "depthPrepass": true,
+          "users": 0,
+          "unmatched": true
+        },
+        {
+          "request": 241,
+          "atMs": 88124.29999995232,
+          "fulfilled": true,
+          "shadow": true,
+          "pbr": true,
+          "depthPrepass": false,
+          "users": 0,
+          "unmatched": true
+        }
+      ],
+      "allNewProgramsShadow": true,
+      "usersUnmatched": 5,
+      "scope": "Preparation request provenance; no material identity or draw adoption claim."
+    }
+  }
+}

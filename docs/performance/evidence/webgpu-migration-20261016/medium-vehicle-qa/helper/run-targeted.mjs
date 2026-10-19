@@ -1,0 +1,5 @@
+import fs from'node:fs';import path from'node:path';import{fileURLToPath,pathToFileURL}from'node:url';import{createRequire}from'node:module';import{spawnSync}from'node:child_process';
+const own=path.dirname(fileURLToPath(import.meta.url)),candidate=path.join(own,'candidate'),require=createRequire(path.join(candidate,'package.json')),label=process.argv[2]||'targeted',pattern=process.argv[3];
+const files=process.argv.slice(4);const args=['--import',pathToFileURL(require.resolve('tsx/esm')).href,'--test',...(pattern?['--test-name-pattern',pattern]:[]),...(files.length?files:['tests/game-low-vehicle-preparation.test.ts'])];
+const startedUTC=new Date().toISOString(),r=spawnSync(process.execPath,args,{cwd:candidate,encoding:'utf8',timeout:120000});
+fs.writeFileSync(path.join(own,label+'.log'),(r.stdout||'')+(r.stderr||''));fs.writeFileSync(path.join(own,label+'.json'),JSON.stringify({args,startedUTC,endedUTC:new Date().toISOString(),exitCode:r.status,error:r.error?.message||null},null,2));console.log(JSON.stringify({label,exit:r.status}));console.log((r.stdout||'').slice(-6500));process.exitCode=r.status??1;

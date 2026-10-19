@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-medium-vehicle-helper-20261019",
+  "title": "KEY-31: rozšířit skutečnou vehicle přípravu na WebGPU kvality",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-medium-vehicle-helper-20261019/",
+    "docs/agents/handoffs/webgpu-medium-vehicle-helper-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejprve celá chain prepareAllRenderQualities/prepareLightingVariants/light-preparation/AuthoredLightPreparation/vehicle shadow quality a restore/revision testy v currentclean067. Rozlišit doloženou chybějící Medium/High větev od neidentifikovaných zbylýchprogramů.",
+    "Implementovat/refaktorovat jen copied client/game.ts,client/light-preparation.ts,client/render-quality-preparation.ts a relevantní testy. Žádnéroot/foreignWIP/deps/assets/pin/timeoutmutace,žádné novéprofilery/cache. Zachovat skutečné stíny a hodnoty/kvality,Game/actor/physics/camera neměnit.",
+    "Před volbou API porovnat prostérozšíření0/1, nutný2POINTcase, quality-derivedcount versus všechny0/1/2stages a restart při změněkvality. Zvolit nejmenší úplné řešení; Low redundanci/cenu a WebGL původní pořadí výslovně ověřit. Koordinátor autorizoval interníOptions/consumer změnu jen v této kopii.",
+    "ActualGame/light/quality/author light CPU reprodukce pokryje nové pořadí, skutečnýshadowenabled/mapSize podlequality, zero/one/two mapped lamps podlebudget, ready/revision/restore/abort/dispose/rootreplacement. Přenosné běžné testy bezenv/loader,exactsource/testmanifest/inverse/handoff.",
+    "Pouze lehké cílené CPU testy,bezbuild/fullsuite/install/GPU/server. RootQAownsheavy/GPUaactualEdge,helpernespouštídalšíBMADrenderer neboagent. Pokudvýsledeknejasný či vadnýfeaturemístoúplnéhopokrytí oznámit,nepřijímatpodlepouhýchunitů."
+  ],
+  "verification": [
+    "Cílené actualGame/light preparation/quality fixtures, meaningful RED→GREEN,všechnyown changes a scope source067. PředGPUoznámitkonecCPUtests;nativepromotionrootřešísamostatněkvůliforeignGameWIP.",
+    "Koordinátor po actual public Game.setQuality RED před zápisem autorizuje třetí copied helper render-quality-preparation a relevantní render-quality/game-quality testy. Ostatní omezení se nemění."
+  ],
+  "notes": [
+    "Base .cache/webgpu-garment-init-qa-20261019/snapshot source06754993e63049552768a7114f7a7fb8233cae0c2770a23336e9e071df8bc220;node_modulesf8jechráněnýaktivnímuser4202taskem,smísejenčíst/junction. Combinedbasec29rootQAvezmepozději.",
+    "Dosavadní Game zahrnujevehicle0/1jenvLow;Mediummáshadow256,High512až2streetPOINT. ActualCPUtrace3320ukázalvehicleupdateBeam/shadowtarget/passcreationnaentry,aleCPUshare nenízměřen. F8sharing užje vmain,nepřidávatdalšíEffectcache.",
+    "Předpřejímkou praktickézměřeníběžnéhry;kopieproduktovéhofixtureneníGPUproof. MainGame/clienGame/testsdirtyWIPnesmítentohelperadoptovat aniupravovat.",
+    "Schváleno po actualGame.setQuality/applyAdaptiveQuality RED: optional requestedQuality callback v existujícím render-quality-preparation; po complete finalattempt při jiné latest quality přidat tailpass s původním started/paused/90s total a min(30s,remaining), bez resetu/timerů/cache. Stable3passes/48stages se nemění. Přesně toto je rozšíření původního copiedscope, nikoli převzetí root/main WIP.",
+    "Převzato pouze copied152/152 CPU/preparation/lifecycle helper předání s manifestb7f2ddfb. Rootsource65d028/fullTS/build/review[]; celéGPU přijetí se tím neuzavírá. Helperreleased."
+  ]
+}

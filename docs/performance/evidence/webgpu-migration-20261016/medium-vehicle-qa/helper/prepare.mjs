@@ -1,0 +1,9 @@
+import fs from'node:fs';import path from'node:path';import{fileURLToPath}from'node:url';import{createHash}from'node:crypto';
+const own=path.dirname(fileURLToPath(import.meta.url)),base=path.resolve(own,'../webgpu-garment-init-qa-20261019/snapshot'),out=path.join(own,'candidate');
+if(fs.existsSync(out))throw Error('candidate already exists');fs.mkdirSync(out,{recursive:true});
+for(const name of ['client','shared','tests'])fs.cpSync(path.join(base,name),path.join(out,name),{recursive:true});
+for(const name of ['package.json','tsconfig.json'])fs.copyFileSync(path.join(base,name),path.join(out,name));
+for(const name of ['node_modules','public','assets'])if(fs.existsSync(path.join(base,name)))fs.symlinkSync(fs.realpathSync(path.join(base,name)),path.join(out,name),'junction');
+const sha=b=>createHash('sha256').update(b).digest('hex');const inputs={};for(const n of ['client/game.ts','client/light-preparation.ts','client/avatar-garments.ts','client/vehicle-lighting.ts','client/render-quality-preparation.ts','client/authored-light-preparation.ts','client/art-lighting.ts','tests/game-low-vehicle-preparation.test.ts','tests/game-light-preparation.test.ts','tests/game-quality-preparation.test.ts','tests/game-authored-light-preparation.test.ts','tests/light-preparation.test.ts','tests/render-quality-preparation.test.ts','tests/vehicle-lighting.test.ts','tests/authored-light-preparation.test.ts'])inputs[n]=sha(fs.readFileSync(path.join(base,n)));
+if(inputs['client/avatar-garments.ts']!=='068dc194c63ad686269f80f4b55bb177cb6e16eac67e284a4544cd92b8d604e1')throw Error('wrong base garment');
+fs.writeFileSync(path.join(own,'inputs.json'),JSON.stringify({base,sourceSnapshotId:'06754993e63049552768a7114f7a7fb8233cae0c2770a23336e9e071df8bc220',inputs,borrowedLinks:['node_modules','public','assets']},null,2));console.log('owned source/test copy prepared; borrowed deps untouched');

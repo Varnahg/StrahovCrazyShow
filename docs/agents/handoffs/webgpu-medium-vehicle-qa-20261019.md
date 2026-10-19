@@ -1,0 +1,9 @@
+# Průběžné předání: webgpu-medium-vehicle-qa-20261019
+
+- Vlastník `webgpu-01a15102-medium-vehicle-qa`, koordinátor `/root`; cwd29fa, výchozí HEAD `f19816356d597b2b0b0d76f23774d6bec2c0c310`.
+- Částečný výsledek: implementovaný copied kandidát přípravy Medium/High a pozdní kvality,152/152/fullTS/build a nezávislé reviewPASS. Runtime není přijat do main; GPU záseky trvají a kontrolní provoz se lišil. Task zůstáváready/rozpracovaný.
+- Přesné zdroje, refaktoring, kontrakty, alternativy a RED/GREEN vhelper předání a evidence `docs/performance/evidence/webgpu-migration-20261016/medium-vehicle-qa/README.md`. Root source65d028/582souborů; pouze3runtime+5testů vkopii. Donor attributionec5ddd/583files/213testů ověřen samostatně; nejde o nový production instrument.
+- Pět actual Edge relací včetně raw/frame/source/session/health, UI1:1 a obrazů. Výsledek není FPS A/B přijetí. Čtyři z8nových modulů vg1 přesné duplicity; pět z5nových programů vg2 stínové, všichni materiáloví uživateléunmatched. Zatím žádný důkaz konkrétního efektového uvolnění nebo konkrétního materiálu.
+- Cizích133rozpracovaných cest se nepřebírá. Root/main Game ani balíčky nebyly upravené. Hrané4201/4202 a starší jsou zachované.
+- Procesy: vlastní start.ps1/stop.ps1 vzáznamech c1/x1/c2/g1/g2; PID/start/path/cwd kontrola předstopem. Všechny vlastní služby4200/2595 a měřicí karty ukončené. Živé4201/4202 zůstávají pod původními serveclaims. GPUviewport obnoven. QA rezervace zatím držená; release není dokončení.
+- Další krok: reprodukovat skutečný shadow Effect lifetime/cache key a porovnat exact metadata sdílení, omezený prewarm lease a pokrytí casterů. Nejdřív důkaz mechanismu, potom další implementace. Celý pnpm test/build/integration a native promotion až nad přijatým stabilním celkem. KEY-31/32 a migrační cíl zůstávají otevřené.
