@@ -31,7 +31,7 @@ jobs:
           package-manager-cache: false
 
       - name: Test LFS asset preflight
-        run: node --test tests/lfs-assets.test.ts
+        run: node --test tests/lfs-assets.test.ts tests/lfs-assets-edge-cases.test.ts
 
       - name: Check working LFS assets
         run: node scripts/check-lfs-assets.mjs

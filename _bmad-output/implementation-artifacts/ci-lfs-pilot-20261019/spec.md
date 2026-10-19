@@ -77,6 +77,10 @@ RED checkpoint e0ea60e642c1a1e177a6d1dfcf04c90dc18301b6 zachován v PR #8. GitHu
 
 ## Review Triage Log
 
+- Blind: `[]`.
+- Edge: low/patch — trim() zkracuje platnou POSIX cestu končící mezerou; nahradit pouze odebráním terminátoru řádku, doplnit Linux regresi.
+- Verification gap: medium/patch — úspěšné původní fixtures mají2048B, takže netestují přijetí běžného obsahu přes pointer parser. Doplnit64B a1024B úspěšné black-box scénáře v samostatném souboru; původní test hash zachovat.
+
 Obnova nové relace: původní testy beze změny, 22/22 PASS přímým během (47.356s). První wrapper timeout není testový výsledek a původní log je zachován. Skutečný lokální checkout správně odmítnut jako12pointerů. Nezávislé review a GitHub GREEN přejímka zatím čekají.
 
 ## Verification

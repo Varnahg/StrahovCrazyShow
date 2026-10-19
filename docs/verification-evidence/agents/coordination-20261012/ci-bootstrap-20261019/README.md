@@ -7,3 +7,5 @@ Výslovné zadání uživatele: CI, ochrana main, skutečná GitHub přejímka a
 Linear: https://linear.app/gigeconomy/issue/KEY-44
 
 Následná administrativní příprava: přidán blocked task `ci-pilot-coordination-20261019`. Pilotní source task má oddělené soubory od koordinátora (spec/evidence/renderer); vzdálené ověřování patří koordinátorovi. Oba zůstávají blocked do skutečného přijetí CI. Toto nejsou spuštěné implementační rezervace.
+
+Při pozdějším rozšíření source tasku o review regrese první administrativní claim odmítla nová rezervace `docker-01a155e8-admin`. Složený PowerShell příkaz bohužel nepřenesl nenulový exit do navazující operace; vlastní task JSON v izolované worktree byl rozšířen před opětovným claimem. Cizí soubor ani rezervace nebyly přepsány či odstraněny. Po zjištění se katalogové zápisy zastavily, po uvolnění slotu původním vlastníkem uspěl nový administrativní claim s doloženým převzetím jediné vlastní dirty task definice. Přesný rozsah a katalog byly znovu ověřeny. Navazující závislé rezervační operace se kontrolují jednotlivě, nikoli podle posledního exit code celé skupiny příkazů.
