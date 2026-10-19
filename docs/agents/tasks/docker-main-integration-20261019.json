@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-main-integration-20261019",
+  "title": "KEY-45: čistý PR nad přijatým remote main a kontrolovaná integrace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".github/workflows/ci.yml",
+    "_bmad-output/implementation-artifacts/ci-lfs-pilot-20261019/spec.md",
+    "_bmad-output/implementation-artifacts/ci-required-gates-20261019/spec.md",
+    "_bmad-output/specs/spec-issues-20261019/.memlog.md",
+    "_bmad-output/specs/spec-issues-20261019/SPEC.md",
+    "docs/agents/ci.md",
+    "docs/agents/handoffs/bmad-issues-analysis-20261019.md",
+    "docs/agents/handoffs/bmad-issues-movement-20261019.md",
+    "docs/agents/handoffs/bmad-issues-performance-20261019.md",
+    "docs/agents/handoffs/bmad-issues-rendering-20261019.md",
+    "docs/agents/handoffs/ci-lfs-pilot-20261019.md",
+    "docs/agents/handoffs/ci-pilot-coordination-20261019.md",
+    "docs/agents/handoffs/ci-required-gates-20261019.md",
+    "docs/agents/tasks/bmad-issues-analysis-20261019.json",
+    "docs/agents/tasks/bmad-issues-movement-20261019.json",
+    "docs/agents/tasks/bmad-issues-performance-20261019.json",
+    "docs/agents/tasks/bmad-issues-rendering-20261019.json",
+    "docs/agents/tasks/ci-lfs-pilot-20261019.json",
+    "docs/agents/tasks/ci-pilot-coordination-20261019.json",
+    "docs/agents/tasks/ci-required-gates-20261019.json",
+    "docs/analysis/issues-20261019/README.md",
+    "docs/analysis/issues-20261019/consolidation.md",
+    "docs/analysis/issues-20261019/linear-after.json",
+    "docs/analysis/issues-20261019/linear-before.json",
+    "docs/analysis/issues-20261019/movement.md",
+    "docs/analysis/issues-20261019/performance.md",
+    "docs/analysis/issues-20261019/rendering.md",
+    "docs/analysis/issues-20261019/verification.json",
+    "docs/verification-evidence/agents/coordination-20261012/ci-bootstrap-20261019/README.md",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/README.md",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/blocked-merge.json",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/claim-collision.json",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/first-green-github.json",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/preflight-reproduction.json",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/recovery-local.json",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/red-github.json",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/red-local.json",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/review.md",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/verified-code-github.json",
+    "docs/verification-evidence/ci-main-20261019/README.md",
+    "docs/verification-evidence/ci-main-20261019/final-pr-ci.json",
+    "docs/verification-evidence/ci-main-20261019/first-ci.json",
+    "docs/verification-evidence/ci-main-20261019/main-ci.json",
+    "docs/verification-evidence/ci-main-20261019/merge.json",
+    "docs/verification-evidence/ci-main-20261019/review.md",
+    "docs/verification-evidence/ci-main-20261019/ruleset.json",
+    "scripts/check-lfs-assets.mjs",
+    "tests/lfs-assets-edge-cases.test.ts",
+    "tests/lfs-assets.test.ts",
+    "docs/agents/handoffs/docker-main-integration-20261019.md"
+  ],
+  "resources": [
+    "github-ci-validation"
+  ],
+  "acceptance": [
+    "Převzít pouze přijatý origin/main2c13b61bf9779c9ce1d931edcc06bc8bed47bb63 a vlastní Docker commity; nepublikovat cizí lokální df6b53af analýzu.",
+    "Povinné verify/source-secret-hygiene/project-acceptance na přesném SHA, merge přesPR bezbypassu."
+  ],
+  "verification": [
+    "git diff a ancestor kontrola, CI nad aktuální head/base, zachované runtime/test/browser důkazy, doložená shoda klient/server/shared/patch proti přijatému base."
+  ],
+  "notes": [
+    "CI koordinátor doložil merge#7/#8 a release vlastních scopes; registry bez CIclaims. Vlastní branch dosud nepushed; rebase --onto origin/main df6b53af vynechá cizí nepublikovaný commit pouze z Docker větve. Původní main/WIP se nemaže ani nepublikuje.",
+    "Tyto writePaths zahrnují pouze přijetí již hotových upstream souborů/rebase vlastní čisté worktree; ne nové editace cizích funkcí. Root dál vlastní své source/evidence."
+  ]
+}
