@@ -1,0 +1,47 @@
+{
+  "source": {
+    "scripts/capture-system-gpu.ps1": {
+      "sha256": "6ddb22c68e2d4b30fbf4734c346c0422545d78fcd81ccad5b62236594f3737fb",
+      "bytes": 33791,
+      "newFile": true
+    }
+  },
+  "rootTests": 12,
+  "rootTestFailures": 0,
+  "helperChecks": 16,
+  "PSNativeCompile": "PASS",
+  "actualSampleCount": 20,
+  "steadySamples": 5,
+  "logger": {
+    "peakOneCorePercent": 85.7657861753537,
+    "steadySamples": 5,
+    "steadyPeakOneCorePercent": 4.3903848744848615,
+    "totalMeasuredCpuMs": 4531.25,
+    "maxCollectionMs": 408.48590000000013
+  },
+  "devices": [
+    {
+      "id": "GPU-cc7ecdea-9134-6b9a-e713-0febb5cdcf8e",
+      "name": "NVIDIA GeForce GTX 1060",
+      "samples": 20,
+      "utilPeakPercent": 0,
+      "memoryControllerPeakPercent": 3,
+      "memoryUsedPeakMiB": 300,
+      "memoryTotalMiB": 6144,
+      "memoryUsedFirstMiB": 300,
+      "memoryUsedLastMiB": 300,
+      "tempPeakC": 56,
+      "graphicsMinMHz": 139,
+      "graphicsMaxMHz": 139,
+      "powerPeakW": 6.77
+    }
+  ],
+  "oldGameSessions": 3,
+  "oldSessionsNoTemporalOverlap": true,
+  "review": {
+    "initialFindings": 4,
+    "resolved": 4,
+    "finalFindings": []
+  },
+  "scope": "External tooling accepted; no game/runtime change or performance bottleneck conclusion."
+}
