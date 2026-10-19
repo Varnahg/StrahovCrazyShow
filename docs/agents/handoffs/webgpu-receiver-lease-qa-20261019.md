@@ -1,0 +1,8 @@
+# Předání receiver-lease QA
+
+- Vlastník/integrátorwebgpu-01a15102-receiver-lease,29fa. Izolovaný currentnative909e+car-only32m/8m prostorový lease/explicitnímutationbridge/ordering. Žádná změna nativepatche/locku/hranýchbuildů.
+- Helper10/10/scopedTS2958/0, rootQA102/102/fullTS/buildPASS. Failed101/102ASTadjacencyfixture a původnísource zachované; test opraven na skutečné nové pořadí i původnípreload, runtime bezezměny. Finálnísource23140d1131f390c4ac1e59523348baeebf243cf3f5e0de2aade5c8fe453fcd67.
+- DokončenoactualEdgeA1/M1/A2: FPS55,1/52,7/54,5,p9521,4/23,8/22,5,p9930/30,5/28,7,max167,2/187,9/187,7ms,4>=100msvšude. StejnéLow/night/1actual/0ambient/1528×650/1175×500/0programů+modulů/2syncpipeline/healthvalid. Rozdílnétakty/idle/trajektorie přiznané, nejde ocausalregressionproof.
+- **NEPŘIJATO do native runtime.** M1101eligible1067excluded/cumulative7rebuilds nejsou benchmarkdelta ani úsporaserializercalls. CPU160meshproof nenahradil produkčnívýsledek. Reviewcode[], další nezávislýrawaudit nemožný kvůlimodelcapacity; root deterministickyauditUIraw/source/seq/health/focus dokončen.
+- Evidence `docs/performance/evidence/webgpu-migration-20261016/receiver-lease-qa/README.md`,108payloadSHA+raw+helperproof+obraz+zdroje/provenance. Vlastní4200/2595procesyskončily, viewportreset/kartazavřená, protected4199code+HTMLexact.133foreignWIPzachované.
+- Taskdone znamenádokončenéodmítnutíexperimentu, KEY31/32migraceopen. Následujícívolba mázasáhnoutdominatníserializationvceléscéně, ne dalšímrangefilteremoptimalizovatjenoffscreenmeshe. Samostatnýevidencecommit/mainintegrace a Linear následují.

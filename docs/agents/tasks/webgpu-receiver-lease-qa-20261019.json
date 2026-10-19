@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-receiver-lease-qa-20261019",
+  "title": "KEY-31: ověřit prostorový lease přijímačů bez per-frame scanu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-receiver-lease-qa-20261019/",
+    "docs/agents/handoffs/webgpu-receiver-lease-qa-20261019.md",
+    "docs/performance/evidence/webgpu-migration-20261016/receiver-lease-qa/",
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/webgpu-receiver-lease-qa-20261019/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4200",
+    "port:2595"
+  ],
+  "acceptance": [
+    "Nejdřív porovnat současný499submeshserializer CPU problém a zamítnutý starý range scan. Nový vratný QA postup musí mít předpočítané eligibility/bounds, pohybovou rezervu a žádný plný audit ustáleného snímku.",
+    "Skutečný Babylon CPU replay OFF/ON a pohyb přes2hranice musí zachovat světelný výsledek, cizí masks/lists, truncation/cap, velké/deformované/unknown/instance fallbacky, životnícyklus a explicitní invalidaci všech použitých předpokladů. Chybějící produkční invalidace nesmí být vydávána za bezpečný runtime.",
+    "Podle výsledku sestavit izolovaný současný native QA bez memo a případně měřit Edge. Bez doloženého přínosu/neporušených kontraktů žádná nativepatch/Game/main změna. Hranébuildy a133foreignWIP zachovat."
+  ],
+  "verification": [
+    "Aktuální source/dependencySHA, relevantní targeted/types a CPUreplay; před GPU/buildem stabilnícandidate a kontrola klientů; independentreview. Fullsuite/build/integration native a combined až pro přijatý runtime celek."
+  ],
+  "notes": [
+    "Root navazuje na main82c23e39 a KEY31/32. Současná memo není přijata; nevracet starý scan18701037/db9018. Není novýLinearissue ani změna přejímacích limitů.",
+    "Childhelper disjunktní .cache/webgpu-receiver-lease-helper-20261019, přímé zadání bez rekurzivníhoBMAD. Root vede BMAD, commit/main/Linear a vlastní všechny dalšíQA/GPU výstupy.",
+    "DokončenýQAexperiment: helper10/10/scopedTS0,root102/102/fullTS/buildPASS,EdgeA/M/Abezpřínosu(max167,2/187,9/187,7,4>=100všude). NativeintegraceNEPŘIJATA. Evidence receiver-lease-qa/README.md,KEY31/32open."
+  ]
+}

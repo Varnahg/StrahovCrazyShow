@@ -1,0 +1,62 @@
+[
+  {
+    "path": "client/vehicle-lighting.ts",
+    "before": "import { SpotLight }",
+    "after": "import { CarReceiverLeaseLight } from \"./qa-receiver-lease\";\nimport { SpotLight }"
+  },
+  {
+    "path": "client/vehicle-lighting.ts",
+    "before": "    this.light = new SpotLight(",
+    "after": "    const BeamLight = kind === \"vehicle\" && scene.getEngine().isWebGPU ? CarReceiverLeaseLight : SpotLight;\n    this.light = new BeamLight("
+  },
+  {
+    "path": "client/vehicle-lighting.ts",
+    "before": "      localFlashlight: kind === \"player\",\n    };",
+    "after": "      localFlashlight: kind === \"player\",\n    };\n    if (this.light instanceof CarReceiverLeaseLight) {\n      this.light.configureStockVehicleLease({ kind: \"vehicle\", range: 32, movementReserveMetres: 8 });\n    }"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "import { AuthoredLightPreparation }",
+    "after": "import { ReceiverLeaseInputs } from \"./qa-receiver-lease-inputs\";\nimport { AuthoredLightPreparation }"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "  private readonly stableLights: StableLightState;",
+    "after": "  private readonly stableLights: StableLightState;\n  private receiverLeaseInputs?: ReceiverLeaseInputs;"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "    this.canvas.dataset.renderHealth = \"ready\";",
+    "after": "    // Copied QA: retain the complete original preparation, then build static\n    // bounds before announcing ready. No range policy ran during prewarm.\n    this.receiverLeaseInputs = ReceiverLeaseInputs.create(this.scene, this.vehicleLighting?.light, this.gltfLightBudget);\n    this.receiverLeaseInputs?.prepareFrame(this.quality);\n    this.canvas.dataset.renderHealth = \"ready\";"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "    this.gltfLightBudget.prepareFrame();\n    this.stableLights.update();\n    this.scene.render();",
+    "after": "    this.gltfLightBudget.prepareFrame();\n    this.stableLights.markMeshesDirty(this.receiverLeaseInputs?.prepareFrame(this.quality, this.preparingRenderQuality) ?? []);\n    this.stableLights.update();\n    this.scene.render();"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "        const healthAtEnd = this.renderHealth.snapshot();",
+    "after": "        // One bounded existing-recorder event answers whether the production\n        // candidate actually reduced membership work; no per-frame log layer.\n        if (this.receiverLeaseInputs) sessionDiagnostics.event(\"receiver-lease-summary\", this.receiverLeaseInputs.snapshot());\n        const healthAtEnd = this.renderHealth.snapshot();"
+  },
+  {
+    "path": "client/game.ts",
+    "before": "    this.vehicleLighting?.dispose();",
+    "after": "    this.receiverLeaseInputs?.dispose();\n    this.receiverLeaseInputs = undefined;\n    this.vehicleLighting?.dispose();"
+  },
+  {
+    "path": "tests/game-webgpu-startup.test.ts",
+    "before": "import { RenderHealth }",
+    "after": "import { ReceiverLeaseInputs } from \"../client/qa-receiver-lease-inputs\";\nimport { RenderHealth }"
+  },
+  {
+    "path": "tests/game-webgpu-startup.test.ts",
+    "before": "arePreparationEffectsReady } = env;",
+    "after": "arePreparationEffectsReady, ReceiverLeaseInputs } = env;"
+  },
+  {
+    "path": "tests/game-webgpu-startup.test.ts",
+    "before": "    arePreparationEffectsReady,\n    exports: {},",
+    "after": "    arePreparationEffectsReady,\n    ReceiverLeaseInputs,\n    exports: {},"
+  }
+]

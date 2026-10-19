@@ -1,0 +1,122 @@
+{
+  "reference": {
+    "lease": false,
+    "meshes": 160,
+    "stages": [
+      {
+        "reason": "activation",
+        "gateMs": 0.8061999999999898,
+        "frameCpuMs": 30.208499999999958,
+        "serializers": 160,
+        "programs": 0,
+        "stats": null
+      },
+      {
+        "reason": "lease-boundary1",
+        "gateMs": 0.02419999999983702,
+        "frameCpuMs": 2.1997999999998683,
+        "serializers": 0,
+        "programs": 0,
+        "stats": null
+      },
+      {
+        "reason": "lease-boundary2",
+        "gateMs": 0.027700000000095315,
+        "frameCpuMs": 1.702099999999973,
+        "serializers": 0,
+        "programs": 0,
+        "stats": null
+      }
+    ],
+    "steady": {
+      "gates": 200,
+      "totalGateMs": 0.7190999999997985,
+      "perGateMs": 0.0035954999999989923,
+      "fullMeshVisitsDelta": 0,
+      "recordVisitsDelta": 0
+    },
+    "scope": "Single short CPU/NullEngine WGSL replay, instrumented serializer counts; no statistical/GPU/FPS inference"
+  },
+  "lease": {
+    "lease": true,
+    "meshes": 160,
+    "stages": [
+      {
+        "reason": "activation",
+        "gateMs": 4.187599999999975,
+        "frameCpuMs": 12.239100000000008,
+        "serializers": 46,
+        "programs": 0,
+        "stats": {
+          "rebuilds": 1,
+          "fullMeshVisits": 160,
+          "refreshes": 1,
+          "recordVisits": 160,
+          "steadyGates": 1,
+          "offGates": 0,
+          "invalidations": 1,
+          "membershipChanges": 114,
+          "errors": 0,
+          "eligible": 160,
+          "excluded": 114,
+          "lastInvalidation": "light-configuration"
+        }
+      },
+      {
+        "reason": "lease-boundary1",
+        "gateMs": 0.30960000000004584,
+        "frameCpuMs": 2.401700000000119,
+        "serializers": 4,
+        "programs": 0,
+        "stats": {
+          "rebuilds": 1,
+          "fullMeshVisits": 160,
+          "refreshes": 2,
+          "recordVisits": 320,
+          "steadyGates": 1,
+          "offGates": 0,
+          "invalidations": 1,
+          "membershipChanges": 118,
+          "errors": 0,
+          "eligible": 160,
+          "excluded": 110,
+          "lastInvalidation": "light-configuration"
+        }
+      },
+      {
+        "reason": "lease-boundary2",
+        "gateMs": 0.28530000000000655,
+        "frameCpuMs": 3.7835999999999785,
+        "serializers": 10,
+        "programs": 0,
+        "stats": {
+          "rebuilds": 1,
+          "fullMeshVisits": 160,
+          "refreshes": 3,
+          "recordVisits": 480,
+          "steadyGates": 1,
+          "offGates": 0,
+          "invalidations": 1,
+          "membershipChanges": 128,
+          "errors": 0,
+          "eligible": 160,
+          "excluded": 100,
+          "lastInvalidation": "light-configuration"
+        }
+      }
+    ],
+    "steady": {
+      "gates": 200,
+      "totalGateMs": 1.1148999999998068,
+      "perGateMs": 0.005574499999999034,
+      "fullMeshVisitsDelta": 0,
+      "recordVisitsDelta": 0
+    },
+    "scope": "Single short CPU/NullEngine WGSL replay, instrumented serializer counts; no statistical/GPU/FPS inference"
+  },
+  "limitations": [
+    "Whole conservative static eligibility and bounds require explicit mutation invalidation",
+    "Movement boundaries add membership work absent in stock; report those costs, not only activation savings",
+    "Original global prewarm is preserved and all replay stages add zero programs; this does not prove production completeness"
+  ]
+}
