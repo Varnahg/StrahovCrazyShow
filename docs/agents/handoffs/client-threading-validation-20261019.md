@@ -8,3 +8,9 @@
 - Plain vlastní4205/2600 (bezshaderinventory) servíroval17codeSHA a správnýembeddedsource. API9160/start18:17:10.7028035Z a preview14812/start18:17:10.7276549Z byly ověřeně ukončené; karta2070823371/okno2070823372zavřené. Porty4205/2600/2568volné. Původní4203/menu astaršíbezezměny.
 - Následuje samostatný commit/runtime integrace main a aktualizaceKEY-41. KEY-40/KEY-5 a širšícíl zůstávají aktivní: nevznikl worker, funkčníatribucezbývajícíchtransit/rendererhitchesneníhotová. Původnímigračnívláknojeaktuálněpozastavené a nesmísezačít automatickyresumovat.
 - Tatoevidence nahrazuje přímýzásah do cizího docs/verification.md. Jeho vlastníkintegrátormůže přidatodkazpřipozdějšíkoordinovanéevidenci.
+
+## Dokončená integrace
+
+Runtime, test a evidence: WT `226b2be960d063174267b7d2ebeb0df2e042ad41` → lokální main `cb2bed4209337fdd278951502b605af5be89edfb`. 53 vlastních souborů, žádný cizí staged/dirty obsah. Po cherry-pick ověřeny přesné runtime/test SHA proti testovanému checkpointu; vlastní cesty v main čisté. Nezávislé závěrečné evidence review ověřilo45/45hashů,1333rawrecords,počtytestů/health/lifecycle a limity; nálezy[]. Research dříve WT0a25422b9c28829168723be8bc106aa1a27cf667 → main9f1127f49291aca9784fd19f6f8ef50928653827.
+
+KEY-41 lze uzavřít jen pro tuto CPU opravu. KEY-40/KEY-5 a cíl zůstávají aktivní, bez tvrzení o dokončeném multithreadingu či FPS. Všechny vlastní měřicí procesy už skončily; po metadata publikaci se uvolní admin, runtime a validační rezervace. Žádný push na remote nebyl v tomto kole proveden.
