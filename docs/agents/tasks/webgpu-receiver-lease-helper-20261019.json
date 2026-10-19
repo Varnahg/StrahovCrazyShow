@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-receiver-lease-helper-20261019",
+  "title": "KEY-31: izolovaný bounded receiver lease prototyp a CPU regrese",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-receiver-lease-helper-20261019/",
+    "docs/agents/handoffs/webgpu-receiver-lease-helper-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přímé rootzadání: vyvinout izolovaný lease prototyp podle doloženého současného řetězce; žádný zápis do native/main/hranýchcopií. Reuse exactpinnedBabylon packages readonly.",
+    "Předpočítané eligibility/worldAABB pro prokazatelněstatickéreceivery; O(1) pozice uvnitř konzervativní pohybové rezervy, refresh před jejím překročením. Explicitní invalidate kontrakt, změny membership a jejich předání pro původní ordering. Neobcházet captruncation, custom/deformed/instances, masks/lists, off/shadows nebo disposal.",
+    "Actual Babylon tests + krátký CPU replay off/on a2leasehranice, včetně readiness/Effect/defines a nepřipravenýchvariant rizika. Reportovat elapsed/calls jako CPUfixture, ne produkčníGPU/FPS. Bez per-frame celoscénového auditu; pokud nelze bezpečný kontrakt doložit, vrátit konkrétní problém místo tvrzení hotovo."
+  ],
+  "verification": [
+    "Přímé cílené Node tests, scopedTypeScript, zdrojovéSHA/payloadmanifest, explicitní dokumentace callerinvalidations a knownlimitations, handoff a ukončení vlastních lehkýchprocesů. Bez install/build/fullsuite/GPU/serveru/commitu."
+  ],
+  "notes": [
+    "Zadánírootwebgpu-01a15102; BMADvede root. Načíst AGENTS/policy/torchreceiverhandoff a současné native909ebf8a zdroje. Dalšískillworkflow ani podagent nejsou součástí zadání.",
+    "DokončenýQAexperiment: helper10/10/scopedTS0,root102/102/fullTS/buildPASS,EdgeA/M/Abezpřínosu(max167,2/187,9/187,7,4>=100všude). NativeintegraceNEPŘIJATA. Evidence receiver-lease-qa/README.md,KEY31/32open."
+  ]
+}

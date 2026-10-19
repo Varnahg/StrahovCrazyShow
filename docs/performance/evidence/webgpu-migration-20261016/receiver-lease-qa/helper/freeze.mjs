@@ -1,0 +1,18 @@
+import fs from'node:fs';import assert from'node:assert/strict';import{createHash}from'node:crypto';import{dirname,join}from'node:path';import{fileURLToPath}from'node:url';
+const root=dirname(fileURLToPath(import.meta.url)),sha=b=>createHash('sha256').update(b).digest('hex');
+const input=JSON.parse(fs.readFileSync(join(root,'input-manifest.json')));
+for(const[path,expected]of Object.entries(input.inputs))assert.equal(sha(fs.readFileSync(path)),expected,'Readonly input drift '+path);
+const baseline=fs.readFileSync(join(input.current,'source-manifest.json')),source=JSON.parse(baseline);
+assert.equal(source.snapshotId,'909ebf8a019b26aff5561a0aaba97b976a26d033746da85ae958c6f4034589a5');
+assert.equal(sha(JSON.stringify(source.files)),source.snapshotId);
+fs.writeFileSync(join(root,'baseline-source-manifest.json'),baseline,{flag:'wx'});
+const dependency=fs.readFileSync(join(input.current,'qa-provenance/image-processing-clean-install.json'));
+fs.writeFileSync(join(root,'baseline-dependencies.json'),dependency,{flag:'wx'});
+const dep=JSON.parse(dependency);assert.equal(dep.verifiedInstalledFiles,10860);assert.equal(dep.exitCode,0);
+const tests=fs.readFileSync(join(root,'tests-2.log'),'utf8'),types=fs.readFileSync(join(root,'types-2.log'),'utf8'),replay=JSON.parse(fs.readFileSync(join(root,'replay-2.json')));
+assert.match(tests,/# pass 10/);assert.match(tests,/# fail 0/);assert.match(types,/"errors":0/);
+assert.ok(replay.lease.stages.every(stage=>stage.programs===0));assert.equal(replay.lease.steady.fullMeshVisitsDelta,0);assert.equal(replay.lease.steady.recordVisitsDelta,0);
+const artifacts={};function walk(dir,prefix=''){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(entry.isSymbolicLink()||entry.name==='manifest.json')continue;const path=prefix?prefix+'/'+entry.name:entry.name;if(entry.isDirectory())walk(join(dir,entry.name),path);else artifacts[path]=sha(fs.readFileSync(join(dir,entry.name)));}}walk(root);
+const files=['client/qa-receiver-lease.ts','client/qa-stable-light-state.ts','tests/fixture.ts','tests/qa-receiver-lease.test.ts','replay.ts'];
+const manifest={schemaVersion:1,task:'webgpu-receiver-lease-helper-20261019',baseSnapshotId:source.snapshotId,sourceManifestSha256:sha(baseline),dependencyProvenanceSha256:sha(dependency),readonlyModulePath:fs.realpathSync(join(root,'node_modules')),files:Object.fromEntries(files.map(p=>[p,artifacts[p]])),tests:{passed:10,failed:0,exitCode:0,log:'tests-2.log'},types:{files:2958,errors:0,exitCode:0,log:'types-2.log'},artifacts,scope:'Private lease QA correctness and short single CPU replay only; no production mutation contract acceptance, GPU/FPS/build/integration or native commit.'};
+fs.writeFileSync(join(root,'manifest.json'),JSON.stringify(manifest,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({sha256:sha(fs.readFileSync(join(root,'manifest.json'))),files:manifest.files,artifacts:Object.keys(artifacts).length}));

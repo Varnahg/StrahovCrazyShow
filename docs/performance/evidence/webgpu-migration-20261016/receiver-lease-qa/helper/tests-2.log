@@ -1,0 +1,80 @@
+TAP version 13
+# BJS - [01:45:16]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:45:16]: Babylon.js v9.30.0 - Null engine
+# Subtest: default bypass preserves global prewarm; OFF→ON and two movement boundaries readmit before range entry
+ok 1 - default bypass preserves global prewarm; OFF→ON and two movement boundaries readmit before range entry
+  ---
+  duration_ms: 315.9932
+  type: 'test'
+  ...
+# BJS - [01:45:16]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:45:16]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:45:16]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:45:16]: Babylon.js v9.30.0 - Null engine
+# Subtest: readmission reuses globally prewarmed actual PBR/Standard effects/defines with no new program
+ok 2 - readmission reuses globally prewarmed actual PBR/Standard effects/defines with no new program
+  ---
+  duration_ms: 77.9083
+  type: 'test'
+  ...
+# Subtest: whole bounds, counterfactual cap, external masks/lists and unknown/deformed/instances retain native behavior
+ok 3 - whole bounds, counterfactual cap, external masks/lists and unknown/deformed/instances retain native behavior
+  ---
+  duration_ms: 7.2571
+  type: 'test'
+  ...
+# Subtest: explicit caps/lights invalidation prevents promotion; material/frozen changes rebuild before draw
+ok 4 - explicit caps/lights invalidation prevents promotion; material/frozen changes rebuild before draw
+  ---
+  duration_ms: 14.5062
+  type: 'test'
+  ...
+# Subtest: explicit bounds/geometry/animation/topology invalidation updates cached proof; movement alone does not rescan
+ok 5 - explicit bounds/geometry/animation/topology invalidation updates cached proof; movement alone does not rescan
+  ---
+  duration_ms: 3.4984
+  type: 'test'
+  ...
+# BJS - [01:45:16]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:45:16]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:45:16]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:45:16]: Babylon.js v9.30.0 - Null engine
+# Subtest: the policy is not a readiness provider: omitting original ON prewarm still creates programs
+ok 6 - the policy is not a readiness provider: omitting original ON prewarm still creates programs
+  ---
+  duration_ms: 39.1336
+  type: 'test'
+  ...
+# Subtest: OFF does not scan; bypass restores original membership; detached/disposed ownership is released
+ok 7 - OFF does not scan; bypass restores original membership; detached/disposed ownership is released
+  ---
+  duration_ms: 2.8883
+  type: 'test'
+  ...
+# Subtest: masks/lists/config invalidations and unsupported light mode fail open without changing stock properties
+ok 8 - masks/lists/config invalidations and unsupported light mode fail open without changing stock properties
+  ---
+  duration_ms: 2.0255
+  type: 'test'
+  ...
+# Subtest: receiver policy does not mute intensity, shadow mode or the independent caster list
+ok 9 - receiver policy does not mute intensity, shadow mode or the independent caster list
+  ---
+  duration_ms: 31.2164
+  type: 'test'
+  ...
+# Subtest: material replacement is an explicit rebuild event and unknown subclasses remain native
+ok 10 - material replacement is an explicit rebuild event and unknown subclasses remain native
+  ---
+  duration_ms: 2.7385
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2063.3928

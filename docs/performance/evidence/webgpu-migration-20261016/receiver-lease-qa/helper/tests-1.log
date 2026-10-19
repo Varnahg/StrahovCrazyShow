@@ -1,0 +1,66 @@
+TAP version 13
+# BJS - [01:43:10]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:43:11]: Babylon.js v9.30.0 - Null engine
+# Subtest: default bypass preserves global prewarm; OFF→ON and two movement boundaries readmit before range entry
+ok 1 - default bypass preserves global prewarm; OFF→ON and two movement boundaries readmit before range entry
+  ---
+  duration_ms: 352.1526
+  type: 'test'
+  ...
+# BJS - [01:43:11]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:43:11]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:43:11]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:43:11]: Babylon.js v9.30.0 - Null engine
+# Subtest: readmission reuses globally prewarmed actual PBR/Standard effects/defines with no new program
+ok 2 - readmission reuses globally prewarmed actual PBR/Standard effects/defines with no new program
+  ---
+  duration_ms: 65.0082
+  type: 'test'
+  ...
+# Subtest: whole bounds, counterfactual cap, external masks/lists and unknown/deformed/instances retain native behavior
+ok 3 - whole bounds, counterfactual cap, external masks/lists and unknown/deformed/instances retain native behavior
+  ---
+  duration_ms: 8.9957
+  type: 'test'
+  ...
+# Subtest: explicit caps/lights invalidation prevents promotion; material/frozen changes rebuild before draw
+ok 4 - explicit caps/lights invalidation prevents promotion; material/frozen changes rebuild before draw
+  ---
+  duration_ms: 14.2358
+  type: 'test'
+  ...
+# Subtest: explicit bounds/geometry/animation/topology invalidation updates cached proof; movement alone does not rescan
+ok 5 - explicit bounds/geometry/animation/topology invalidation updates cached proof; movement alone does not rescan
+  ---
+  duration_ms: 3.2703
+  type: 'test'
+  ...
+# BJS - [01:43:11]: Babylon.js v9.30.0 - Null engine
+# BJS - [01:43:11]: Babylon.js v9.30.0 - Null engine
+# Subtest: the policy is not a readiness provider: omitting original ON prewarm still creates programs
+ok 6 - the policy is not a readiness provider: omitting original ON prewarm still creates programs
+  ---
+  duration_ms: 45.4854
+  type: 'test'
+  ...
+# Subtest: OFF does not scan; bypass restores original membership; detached/disposed ownership is released
+ok 7 - OFF does not scan; bypass restores original membership; detached/disposed ownership is released
+  ---
+  duration_ms: 4.2947
+  type: 'test'
+  ...
+# Subtest: masks/lists/config invalidations and unsupported light mode fail open without changing stock properties
+ok 8 - masks/lists/config invalidations and unsupported light mode fail open without changing stock properties
+  ---
+  duration_ms: 2.6195
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2309.9274

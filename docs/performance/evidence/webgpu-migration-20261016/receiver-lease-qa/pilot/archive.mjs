@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdirSync,readdirSync} from 'node:fs';
+import {join,dirname} from 'node:path';
+import {createHash} from 'node:crypto';
+import {gzipSync,gunzipSync} from 'node:zlib';
+const root=import.meta.dirname,out=join(root,'../../docs/performance/evidence/webgpu-migration-20261016/receiver-lease-qa'),helper=join(root,'../webgpu-receiver-lease-helper-20261019'),hash=b=>createHash('sha256').update(b).digest('hex'),files={};
+function put(p,b){const zipped=b.length>50000&&!p.endsWith('.jpg'),path=p+(zipped?'.gz':''),payload=zipped?gzipSync(b,{level:9}):b;mkdirSync(dirname(join(out,path)),{recursive:true});writeFileSync(join(out,path),payload);assert.deepEqual(zipped?gunzipSync(payload):payload,b);files[path]={sha256:hash(payload),originalSha256:hash(b),originalBytes:b.length,encoding:zipped?'gzip':'identity'};}
+for(const e of readdirSync(root,{withFileTypes:true}))if(e.isFile()&&!['commit-evidence.mjs','prepare-commit.mjs','integration-receipt.json'].includes(e.name))put('pilot/'+e.name,readFileSync(join(root,e.name)));
+const source=JSON.parse(readFileSync(join(root,'candidate-v1/source-manifest.json'))),seed=JSON.parse(readFileSync(join(root,'seed-manifest.json')));
+for(const[p,sha]of Object.entries(source.files)){const b=readFileSync(join(root,'candidate-v1',p));assert.equal(hash(b),sha,p);if(seed.files[p]!==sha)put('source/'+p,b);}
+put('source/source-manifest.json',readFileSync(join(root,'candidate-v1/source-manifest.json')));
+for(const run of ['a1','m1','a2']){const dir=join(root,'runs',run);for(const e of readdirSync(dir))if(e!=='runtime.json')put('runs/'+run+'/'+e,readFileSync(join(dir,e)));const {processes,...runtime}=JSON.parse(readFileSync(join(dir,'runtime.json')));put('runs/'+run+'/identity.json',Buffer.from(JSON.stringify({...runtime,scope:'Operational process identities omitted.'},null,2)+'\n'));}
+const hm=JSON.parse(readFileSync(join(helper,'manifest.json')));put('helper/manifest.json',readFileSync(join(helper,'manifest.json')));for(const[p,sha]of Object.entries(hm.artifacts)){const b=readFileSync(join(helper,p));assert.equal(hash(b),sha,p);put('helper/'+p,b);}
+const prior=join(root,'../webgpu-routine-profile-20261019/run-01/session.jsonl'),b=readFileSync(prior),records=b.toString().trim().split(/\r?\n/).flatMap(x=>JSON.parse(x).records??[]);
+put('prior-source-costs.json',Buffer.from(JSON.stringify({source:'0ac5b4db9e77fe178f08ab3dd40cfb20f4af7724d61270eb9d5ffd9df2056e06',sessionSha256:hash(b),scope:'Existing earlier instrumented native source-cost evidence; not a new production capture or causal A/M timing.',samples:records.filter(x=>x.kind==='light-switch-mesh-sample').map(x=>({reason:x.data.timing.reason,topSources:x.data.timing.topSources,topMeshes:x.data.timing.topMeshes}))},null,2)+'\n'));
+writeFileSync(join(out,'artifact-manifest.json'),JSON.stringify({source:source.snapshotId,base:seed.snapshotId,scope:'Range-only QA experiment rejected for native integration; preserved CPU proof and complete A/M/A production evidence. No production runtime or full migration acceptance.',files},null,2)+'\n');console.log(JSON.stringify({files:Object.keys(files).length,source:source.snapshotId}));

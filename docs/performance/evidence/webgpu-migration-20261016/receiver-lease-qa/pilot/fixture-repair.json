@@ -1,0 +1,24 @@
+{
+  "before": "b38366b7d9d3de7eab69beb1c5d766b819e4f8be14f50d40745d41e612fb5a93",
+  "after": "23140d1131f390c4ac1e59523348baeebf243cf3f5e0de2aade5c8fe453fcd67",
+  "path": "tests/game-light-lifecycle.test.ts",
+  "changes": [
+    [
+      "  for (const call of calls) {",
+      "  let receiverGates = 0;\n  for (const call of calls) {"
+    ],
+    [
+      "    const budget = siblings[siblings.indexOf(statement) - 2];",
+      "    let budget = siblings[siblings.indexOf(statement) - 2];\n    let receiverGate: ts.Statement | undefined;\n    if (budget?.getText(source).startsWith(\"this.stableLights.markMeshesDirty(\")) {\n      receiverGate = budget; receiverGates++;\n      assert.equal(receiverGate.getText(source), \"this.stableLights.markMeshesDirty(this.receiverLeaseInputs?.prepareFrame(this.quality, this.preparingRenderQuality) ?? []);\");\n      budget = siblings[siblings.indexOf(statement) - 3];\n    }"
+    ],
+    [
+      "`${budget.getText(source)}\\n${before.getText(source)}\\n${statement.getText(source)}`",
+      "`${budget.getText(source)}\\n${receiverGate?.getText(source) ?? \"\"}\\n${before.getText(source)}\\n${statement.getText(source)}`"
+    ],
+    [
+      "  assert.equal(ambient.intensity, 1);",
+      "  assert.equal(receiverGates, 1, \"only interactive draw adds receiver gate; original global prewarm remains unchanged\");\n  assert.equal(ambient.intensity, 1);"
+    ]
+  ],
+  "reason": "Retain both exact production callsite checks and execute budget→receiver gate→stable→draw for the interactive site; the preload site retains budget→stable→draw. One original adjacent-statement assertion failed after intentional insertion; no runtime behavior was changed."
+}
