@@ -1,0 +1,36 @@
+{
+  "source": "604293f79a2f76d77eb291a617471ee6176b481ad65770d1763bd22ee034bc4c",
+  "tests": {
+    "command": "pnpm --config.verify-deps-before-run=false test",
+    "passed": 1448,
+    "failed": 0,
+    "exitCode": 0,
+    "log": "full-test-2.log",
+    "sha256": "6bf3f5bb1dcf565946cd6d8795df98ffeaab34958376e8e26ace07f2f0fd83f6"
+  },
+  "build": {
+    "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+    "exitCode": 0,
+    "log": "build-1.log",
+    "sha256": "cbef9dafa684853e6443271b423ad68c0d0cec653b6ec202b9ab29c708f8751f",
+    "scope": "Includes full tsc --noEmit."
+  },
+  "integration": {
+    "command": "pnpm --config.verify-deps-before-run=false test:integration",
+    "exitCode": 0,
+    "log": "integration-1.log",
+    "sha256": "f03d2aa73fa8fb9347e7f150e2fbe0ce644d9b42c8a27d130bd2db7b771a22d9",
+    "scope": "Original fixed2568 runner, all four scenarios; owned server stopped and port claim released."
+  },
+  "runtime": {
+    "payloadSha256": "e4f6ef0b87f24c9c482705ed1dab46b4853ededb3eb97e040e66c7dab258c3e0",
+    "sourceBytesVerified": true,
+    "privatePnpmRuntimeProbe": true
+  },
+  "pnpmAttempt": {
+    "log": "full-test-1.log",
+    "testsStarted": false,
+    "autoInstallFailed": true,
+    "scope": "pnpm11 default verifyDepsBeforeRun attempted install, failed on package-map and changed private junctions. Retained physical copies restored; repair receipt verified all10860 original and private files. No source drift; not counted as a test run."
+  }
+}

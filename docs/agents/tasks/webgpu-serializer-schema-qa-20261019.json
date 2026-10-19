@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-serializer-schema-qa-20261019",
+  "title": "KEY-31: ověřit kanonickou serializaci s metadaty pořadí místo opakovaného parseru",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [".cache/webgpu-serializer-schema-qa-20261019/", "docs/agents/handoffs/webgpu-serializer-schema-qa-20261019.md", "docs/performance/evidence/webgpu-migration-20261016/serializer-schema-qa/", "_bmad/render/bmad-build/", "_bmad-output/implementation-artifacts/webgpu-serializer-schema-qa-20261019/"],
+  "resources": ["heavy-validation", "gpu", "workspace-build", "port:4200", "port:2595"],
+  "acceptance": ["Předem doložit rozdíl proti starému parser-only experimentu a rawtext memo; volba cílí prokázaných61/51ms toString napříč objekty, nikoli jenoffscreen meshe.", "Jednosouborový current MaterialDefines QA, žádný přenos nepřijatého receiverlease/memo. Metadata pouze jedna omezená slabá schema jmen/permutace na defines, žádné hodnoty/textvýsledky/engine/device/resources. Přesný původnígetterloop/inlineformat/throws, fullnamescheck každýcall, původnícanonicalResult fallback při nejistotě.", "Diferenciální corpus včetně proxy/getter/coercion/reentrance/limits/unsafe grammar, současné regrese a skutečný celýwarmřetězec před GPU. Produkčnípřínos ověřit v izolovaném currentnative, jinakruntime neintegrovat; hranésnapshoty/cizíWIP bezezměny."],
+  "verification": ["ChildCPUproof+scopedtypes, rootaktuální tests/55WGSLstates parity a stablefullTS/build, podle výsledku čistýEdgeA/B/A. Fullclean/combinedtest/build/isolatedintegration ažpro přijatýnative patch. BMADindependentreview+scopedevidencecommit/main/Linear."],
+  "notes": ["Navazuje na a32f578a a d17da3a6 CPUprofile. Dřívější define-serializer QA měnil pouze records→lines.sort/parser hotovéhotextu; metadataWeakMap/directemission zatímnezkoušeny. Gpuclock/trajectorylimity přiznat.", "Root BMAD/claim/controller; helperdisjunktní .cache/webgpu-serializer-schema-helper-20261019. Žádná změna dalších vendorcallsite nebo engineAPI vtomtotasku."]
+}

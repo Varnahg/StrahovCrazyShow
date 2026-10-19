@@ -1,0 +1,10 @@
+{
+  "before": "43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4",
+  "after": "e4f6ef0b87f24c9c482705ed1dab46b4853ededb3eb97e040e66c7dab258c3e0",
+  "restored": "43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4",
+  "prefixSha256": "0fdc726ccf0874442ea7dbe2aa725e60c54a9cbe42fef863659724932abe73a5",
+  "newMethodSha256": "cb5b5d2b809e8a29c136cf6ed54151a053f3688da58c03c535a61bbbf9921417",
+  "originalMethod": "    toString() {\n        let result = \"\";\n        for (let index = 0; index < this._keys.length; index++) {\n            const prop = this._keys[index];\n            const value = this[prop];\n            const type = typeof value;\n            switch (type) {\n                case \"number\":\n                case \"string\":\n                    result += \"#define \" + prop + \" \" + value + \"\\n\";\n                    break;\n                default:\n                    if (value) {\n                        result += \"#define \" + prop + \"\\n\";\n                    }\n                    break;\n            }\n        }\n        return canonicalResult(result);\n    }",
+  "footer": "\ndefineSchemaReady = true;\n",
+  "exact": true
+}

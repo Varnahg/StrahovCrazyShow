@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-schema-shared-helper-20261019",
+  "title": "KEY-31: doložit studená metadata a sdílet pouze shodná immutable schema",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [".cache/webgpu-schema-shared-helper-20261019/", "docs/agents/handoffs/webgpu-schema-shared-helper-20261019.md"],
+  "resources": [],
+  "acceptance": ["Přímýrootleaf bez dalšíhoBMAD. Nejprve CPUreprodukce first-use metadata nad teplými Effecty: fresh skutečné submeshe/defines, žádné nové shaderprogramy. A/F1 případněM. Původní F1payload e4f6... zůstane frozen.", "Pokud cold/retention proof podpoří sdílení, nový jedinýcopiedMaterialDefines.js variant sdílí jen immutable names/order mezi shodnými skutečně přečtenými fullsekvencemi. Per-definesWeakMap stále1metadata pointer, žádné values/fragments/results/engine/device references. Globalstrongintern index max32schemat/max262144combinednameunits, schema per-entry stále1024names/32768units. Přiznat slaběretained metadata mimoindex a skutečnýheaplimit.", "Stejný getter/coercion/throws/fallback/init/reentrance kontrakt. Lookup porovnává celou observedsekvenci, při nejistotě nezměněnýcanonicalResult. Žádný constructor/property read navíc, žádná deduplikace podle pouhé délky/hash bez equality. Childdo root pipeline/hranýchdeps nezapisuje.", "Differential+current18/55states exact, actualwholewarm/coldCPU a unique-schema-churn/retention report. Rawvýsledky včetněregresí, boundedmetadata/sourceaudit a scopeCPU≠GPU. Root měří heavybench do svýchvýstupů po předánífrozenrunneru."],
+  "verification": ["DirectlightCPUtests+scopedTS+frozenSHA/handoff, bez install/build/GPU/serverů/commitu. Benchmarkrunner přijme rootoutputDir a zdrojovéinvarianty; root držíheavy-validation."],
+  "notes": ["Současný F1 má root1448tests/build/integrationPASS, ale Edge M2 matching0ambient:1>=100místo4 a zároveňmax223,9ms vsA158,9/167,1. Rawprevious render209,5ms protiA146,8ms; příčina firstpeak ještěneníprokázaná. F1nenípřijat. Novýproof nesmí vydávat hypotézu metadata miss/GCza fakt.", "Koordinátorwebgpu-01a15102-schema vlastnírootBMAD/QA. Použít currentnative909/e4fF1/frozen c6180manifest. PokudCPUcoldnepodpoříhypotézu, vrátitomezení a nezavádětdalšícache naslepo."]
+}

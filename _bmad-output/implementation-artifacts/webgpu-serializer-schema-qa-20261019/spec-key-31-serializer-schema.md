@@ -1,0 +1,34 @@
+---
+title: 'KEY-31: metadata fastpath kanonické serializace'
+type: 'chore'
+created: '2026-10-19'
+status: 'in-progress'
+route: 'oneshot'
+review_loop_iteration: 0
+context: ['{project-root}/docs/agents/bmad-policy.md']
+---
+
+<frozen-after-approval reason="Autorizovaný navazující úzký QA důkaz před runtime změnou">
+
+## Intent
+
+Zmenšit doloženou cenu MaterialDefines.toString napříč skutečnými objekty bez změny getterů, chyb a výsledného shaderového textu. Ověřit slabě vlastněná omezená metadata pořadí klíčů a přímou emisi pro přesně prokázaný bezpečný případ; při nejistotě ponechat původní canonicalResult. Nejprve diferenciální a celý warmřetězec CPU proof, potom podle výsledku izolovaný currentnative Edge pilot. Bez hodnotové/result/GPU cache a bez převzetí nepřijatých memo/receiver změn. Hrané snapshoty a cizí WIP zachovat.
+
+</frozen-after-approval>
+
+## Implementation Notes
+
+- F1 checkpoint19.10.: helper74/74 + root52cases/156calls/2initprobes,11wholeWGSL/55states exact; soukromý602file snapshot604293f7 plná sada1448/1448/fullTS/build/4integration PASS. Pnpm11 první auto-install pokus selhal před testy a změnil vlastní aliasy; retained private kopie obnovené,10860original/private hashy exact, další příkazy config.verify-deps-before-run=false. Failed log zachovaný; nejde o fresh patch/combined acceptance.
+- F1 EdgeA1/M1/A2/M2/A3 archived v serializer-schema-qa/f1. M1nesrovnatelný kvůli2ambient pasažérům. MatchingA2/M2/A3: FPS56,5/56,5/56,5,p9926,4/25,7/26ms,max158,9/223,9/167,1ms,>=100ms4/1/4. Vše0newprograms/modules+2syncpipeline/healthvalid. F1runtimeNEPŘIJATO. Previous render146,8→209,5ms při první špičce; specifická příčina/GC/coldmiss zatím hypotéza. Code+5rawreviews[] nezaměňovat za výkonové přijetí.
+- Navazující CPU cold reproduktor root šestA/F1/M/M/F1/A exit0,36nových skutečných defines/draws/calls a0newprograms nad held warm Effects. F1cold PBR23,862ms protiA14,339/M11,122; Std14,587 protiA8,801/M7,430, hotF1lepší. To podporuje first-use metadata hypotézu vNode, ne přímou GPU kauzalitu. Disjunktní shared-helper smí na tomto důkazu vyzkoušet sdílení immutable identických fullobservednames/order: max32indexentries/262144combinednameunits, dosavadní per-entry bounds. Nadále žádnévalues/results/engine/device, přesná sequence equality, stejnégettery/fallback/reentrance. Indexbound není totalheapbound; weaklivekeys mohou držet metadata mimoindex. Přijetí vyžaduje celý CPU+produkční důkaz.
+
+- Doplnění předchozího experimentu: po commitu range-only evidence a32f578a konečně dokončen nezávislý raw audit[], potvrzené3seq/source/UI shody po0,1ms zaokrouhlení/health/visiblefocused; capacity chyby byly dočasné. Linear má samostatný následný záznam. Závěr nepřijetí range runtime beze změny; nejde o review tohoto nového schema kandidáta.
+
+- Root claimwebgpu-01a15102-schema vlastní QA/evidenci/BMAD/heavy/gpu/4200/2595. Helpertask disjunktnícache/handoff, implementace+refaktoring+CPUproof společně, bez dalšího workflow. Skutečný render vypsal stejný plně přečtený workflowfe8292081bd751763aeb; step01/02/template/oneshot route, story_key prázdný. Jediný vratnýQA cíl, malý footprint1vendorfile+tests, bez intentgaps/irreversibility, protooneshot.
+- Primární zdroje: exactcurrentnative909ebf8a MaterialDefines.js, přijatý kanonický literal kontrakt a současné MaterialDefines WGSL regrese. Routineprofild17da3a6: toString61,2/50,8ms při499/431calls, createEffect2/1,3ms. Cullingrangepilot a32f578a nepřinesl makrozlepšení; jeho code se nepřenáší. Skutečný starší topSources proof ukazuje výrazné náklady také u stromů/rozsáhlého terénu/povrchů, které úzký statickýrangefilter neřeší.
+- Porovnané varianty: starý parser-only QA měnil records→lines.sort/regex parser celého hotového textu, bez wholewarm přínosu; nový schema/permutation WeakMap nebyl zkoušen. Rawtext engine/device memo zlevnilo serializer61→30ms, ale6čistýchběhů nepodpořilo celkovou integraci. Conelease má širší matematický/shadow/direction kontrakt a pouze dílčí objektové pokrytí; meshpartition zasahuje assets/LOD/drawcount. Celé připravené materialstates cache nese Effect/UBO/light-slot/lifecycle riziko. Metadata fastpath je menší nový kandidát s širším doloženým CPU cílem, přínos dosud hypotéza.
+- Jediný copiedMaterialDefines.js: stock getterloop se všemi původními _keys.length/_keys[index]/this[prop] reads a inlineformátováním/throws. Žádné čtení v seřazeném pořadí ani mutace _keys. Každýcall zkontroluje kompletní skutečně přečtenou namessekvenci. Immutable bounded schema může obsahovat jen primitive jména/permutaci/validflags,1schema/instance,max1024names/max32768combinednameunits. Žádné hodnoty, řádky, výsledný text, engine/device/material reference v metadatech; slabý keynení garance nulovéretence.
+- Unsafe/dynamic/mismatch/duplicates/reserved/limits/invalidnumeric/multiline/unexpected propertykeys použijí celé nezměněné canonicalResult(raw). Spelling výsledku musí být exact. Pozor JavaScript $ před newline; fullmatch musí být skutečně celá hodnota. Object/Symbol/BigInt/coercion/getter exceptions i reentrance mají stejný průběh, scratch pouze percall. Inicializátor metadataWeakMap před classbinding nesmí přidat TDZ do ESM/cyclic/empty případu. Původní parser zůstává oracle/fallback beze změny.
+- Ověření: differential corpus a přesný currentoracle, current18regresí a55celých WGSLstates, explicitní limit/retention/shape mutation/getter/coercion/reentrance/throws. CPUinterleaving A/schema/memo nad celým skutečným Standard/PBR warm řetězcem, ne jen helpercalls; načíst/připnout všechny vstupy/logy včetně nepříznivých výsledků. Samotný syntheticCPU nebo cachehitcount není výkonová přejímka.
+- PokudCPU podpoří další práci: root soukromě zkopíruje currentcore/loaders se stejnou classidentity a jedinou payload změnou; žádná editace sdílených node_modules. Source595app/testbase+runtimeprovenance, fullTS/build/targeted a čistý EdgeA/B/A bez podrobného profileru, stejnáweather/time/resolution/avatars/input. Fullclean/combinedtest/build/isolatedintegration před případným nativepatch přijetím. IndependentBMAD review; selháníreview nástroje se přizná, ne označí[].
+- Samostatné commity a průběžný Linear. Nevydávat dílčíproof za vyřešenýKEY31/32 nebo defaultmigraci. Root musí zachovat133foreignWIP, skutečné hrané4188/4192–4199 a před GPU ověřit identity klientů. Riziko paměti/fallbackchurn/startupu měřit a přiznat. Bez doloženého celého přínosu runtime neintegrovat.

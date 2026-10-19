@@ -1,0 +1,35 @@
+✓ Lockfile passes supply-chain policies (verified 3h ago)
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+   ╭────────────────────────────────────────────────────────────────────────╮
+   │                                                                        │
+   │                  Update available! 11.25.0 → 12.14.0.                  │
+   │                  Changelog: https://pnpm.io/v/12.14.0                  │
+   │   To update, run: Invoke-WebRequest https://get.pnpm.io/install.ps1    │
+   │                 -UseBasicParsing | Invoke-Expression                   │
+   │                                                                        │
+   ╰────────────────────────────────────────────────────────────────────────╯
+
+[ENOENT] ENOENT: no such file or directory, open 'C:\Users\rezac\.codex\worktrees\29fa\StrahovCrazyShow\.cache\webgpu-serializer-schema-qa-20261019\dependencies\node_modules\.package-map.json'
+
+pnpm: ENOENT: no such file or directory, open 'C:\Users\rezac\.codex\worktrees\29fa\StrahovCrazyShow\.cache\webgpu-serializer-schema-qa-20261019\dependencies\node_modules\.package-map.json'
+    at async open (node:internal/fs/promises:697:25)
+    at async Object.writeFile (node:internal/fs/promises:1317:14)
+    at async writePackageMap (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:210624:3)
+    at async headlessInstall (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:212639:7)
+    at async tryFrozenInstall (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:217786:56)
+    at async _install (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:217457:33)
+[ERROR] Command failed with exit code 4294963238: "C:\Users\rezac\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" "C:\Users\rezac\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules\pnpm\bin\pnpm.mjs" install
+
+pnpm: Command failed with exit code 4294963238: "C:\Users\rezac\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" "C:\Users\rezac\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules\pnpm\bin\pnpm.mjs" install
+    at getFinalError (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:89986:14)
+    at makeError (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:92293:21)
+    at getSyncResult (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:94137:10)
+    at spawnSubprocessSync (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:94097:14)
+    at execaCoreSync (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:94027:23)
+    at callBoundExeca (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:96555:23)
+    at boundExeca (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:96532:49)
+    at sync2 (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:96691:10)
+    at runPnpmCli (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:276904:5)
+    at runDepsStatusCheck (file:///C:/Users/rezac/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/dist/pnpm.mjs:278122:7)
