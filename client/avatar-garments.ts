@@ -80,26 +80,29 @@ function materialFor(
     cache.textures.set(family, maps);
   }
   const material = new PBRMaterial("CC0 student garment " + key, scene);
-  material.albedoColor = Color3.FromHexString(color).toLinearSpace();
-  material.metallic = 0;
-  material.roughness = part === "trousers" ? 0.94 : 0.88;
-  material.bumpTexture = maps.normal;
-  material.ambientTexture = maps.ao;
-  material.ambientTextureStrength = 0.45;
-  material.useAmbientInGrayScale = true;
-  material.environmentIntensity = 0.65;
-  material.alpha = 1;
-  material.transparencyMode = PBRMaterial.PBRMATERIAL_OPAQUE;
-  material.sheen.isEnabled = true;
-  material.sheen.intensity = 0.14;
-  material.sheen.roughness = 0.85;
-  material.metadata = {
-    paletteColor: color,
-    characterSurface: part === "trousers" ? "denim" : "cloth",
-    source: "MakeHuman system clothing",
-    license: "CC0-1.0",
-    asset: family,
-  };
+  // Configure this new material before sharing it with the cache or meshes.
+  material.atomicMaterialsUpdate(() => {
+    material.albedoColor = Color3.FromHexString(color).toLinearSpace();
+    material.metallic = 0;
+    material.roughness = part === "trousers" ? 0.94 : 0.88;
+    material.bumpTexture = maps.normal;
+    material.ambientTexture = maps.ao;
+    material.ambientTextureStrength = 0.45;
+    material.useAmbientInGrayScale = true;
+    material.environmentIntensity = 0.65;
+    material.alpha = 1;
+    material.transparencyMode = PBRMaterial.PBRMATERIAL_OPAQUE;
+    material.sheen.isEnabled = true;
+    material.sheen.intensity = 0.14;
+    material.sheen.roughness = 0.85;
+    material.metadata = {
+      paletteColor: color,
+      characterSurface: part === "trousers" ? "denim" : "cloth",
+      source: "MakeHuman system clothing",
+      license: "CC0-1.0",
+      asset: family,
+    };
+  });
   entry = { material, users: 1 };
   cache.materials.set(key, entry);
   return { key, ...entry };
