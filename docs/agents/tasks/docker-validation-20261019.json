@@ -4,6 +4,8 @@
   "title": "KEY-45: stabilní test/build/integrace a Docker browser přejímka",
   "writePaths": [
     "dist/",
+    ".cache/docker-runtime-tests/",
+    ".cache/docker-packaging-tests/",
     "docs/agents/handoffs/docker-validation-20261019.md"
   ],
   "resources": [
@@ -13,6 +15,7 @@
     "port:2568",
     "port:8080",
     "port:18080"
+    ,"port:18081"
   ],
   "acceptance": [
     "Ověřená identita source/test snapshotu a produkční image; skutečné testy/build/SDK/browser/stop/restart.",
