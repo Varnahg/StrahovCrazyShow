@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "client-threading-lab-20261019",
+  "title": "Izolované měření produkčního CPU řetězce a rozhodovací worker prototyp",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/client-threading-lab-20261019/",
+    "docs/performance/evidence/client-threading-20261019/",
+    "docs/agents/handoffs/client-threading-lab-20261019.md",
+    "_bmad-output/implementation-artifacts/client-threading-lab-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-2e5169e7e102/"
+  ],
+  "resources": ["heavy-validation", "gpu", "port:4204", "port:2599"],
+  "acceptance": [
+    "Nejdřív použít existující bounded environment/render profil v oddělené kopii frozen produkčního source65d028; ověřit skutečnou URL/source, živé klienty, foreground a izolovaný API/log output. Hrané4203/4202/4201 a starší beze změny.",
+    "Před worker implementací v tomto izolovaném experimentu určit reprodukovaný CPU hotspot a varianty. Nejmenší čistý kandidát cold grass placement má už slice/cache; jeho worker pouze pokud doložená cena stojí za přenos a lifetime složitost. Render worker neoznačit za paralelizaci scene.render.",
+    "Lokální pilot musí zachovat zdrojové matice/vzhled a input/network/lifecycle; žádný zásah do shared source, balíčků nebo readonly půjčených dependencies. Případné prototype změny pouze v nové vlastní cache kopii.",
+    "CPU test ani malý worker smoke není GPU/FPS důkaz. Přínos posuzovat na produkčním cold/warm A/B a pravdivě oddělit neprovedené kontroly. Před přenosem do client/ samostatný disjunktní runtime task.",
+    "Evidence vlastní URL/PID/start/hash, raw výsledky a cleanup. Uvolnit GPU/heavy až po ukončení vlastní scény a pomocných procesů."
+  ],
+  "verification": [
+    "BMAD build přes fresh9b78 renderer; source-backed profil a cílené testy vybrané varianty.",
+    "Existující produkční build lze byte-exact readonly půjčit pro baseline; žádný nový výkonový claim podle background/scaled scény.",
+    "Kandidát vyžaduje vlastní build s tests a skutečný Edge; full test/build/integration až na stabilním změnovém checkpointu, port2568 pouze s doplněnou rezervací."
+  ],
+  "notes": [
+    "Koordinátor threading-01a15535-admin získal globální admin slot v původním webgpu-comparison checkoutu po výslovném předání sedmi pending JSONů; jejich SHA ověřeny, beze změny.",
+    "KEY-40; výzkum a srovnání v _bmad-output/planning-artifacts/research/technical-client-threading-2026-10-19/. Původní vlákno drží shadow-pass opravy; toto vlákno je neimplementuje souběžně."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "client-threading-character-material-init-20261019",
+  "title": "Ověřit a omezit redundantní průchody scény při vzniku materiálů NPC",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/character-materials.ts",
+    "tests/character-material-init.test.ts",
+    ".cache/client-threading-character-material-init-20261019/",
+    "docs/agents/handoffs/client-threading-character-material-init-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejdřív pinned actual Babylon CPU RED a porovnání variant. CharacterMaterials.get nastavuje nový dosud nesdílený PBR přes mnoho dirty setterů; potvrdit počet cizích mesh/submesh traversal a skutečné ready/defines hodnoty. Žádná předem tvrzená příčina celých transit hitches.",
+    "Pokud potvrzené, nejmenší veřejný atomicMaterialsUpdate celek pouze kolem počátečních setterů nového materiálu, před cache publikací. Žádná scene-wide dirty suppression, nová cache, změna palet/textur/parametrů nebo SDK patch.",
+    "Zachovat cache identity, color/surface behavior, hair plugin/ocular/clearcoat/sheen/alpha, textury a prune/dispose lifecycle. Běžné pozdější změny sdíleného materiálu musí dál invalidovat spotřebitele. Cílený refaktoring bez plošného formátování.",
+    "Skutečná regrese testuje snížený počet cizích průchodů a paritu všech povrchů, cache hit/prune/recreate/dispose a obnovenou invalidaci. NullEngine test neprohlašovat za FPS/GPU přejímku.",
+    "Podagent samostatný claim, vlastní artefakty/handoff. Necommituje; integrátor přebírá pouze ověřené vlastní delta, provede stabilní fullsuite/build/integration a GPU paritu mimo hrané verze."
+  ],
+  "verification": [
+    "Lehké targeted actual-Babylon testy; použít existující student-garment-init.test.ts jako metodický precedent, ne kopírovat test implementace.",
+    "Readonly dependencies, žádné instalace nebo runtime flag změny. Full test/build/GPU patří koordinátorovi s heavy-validation rezervací."
+  ],
+  "notes": [
+    "KEY-40 v souvislosti KEY-32. Lab4204 skutečně potvrdil transit envelope78.9/69.9/46.6ms při hraní; neatribuuje zatím náklad konkrétní funkci. Tento úkol ověřuje samostatný zdrojově doložený amplification mechanism před složitějším workerem.",
+    "Původní vlákno01a15102 bylo informováno o úzkém character-materials scope; jeho shadow-pass/game/ui/cinematic práce se nemění.",
+    "BMAD koordinátor již provedl Deep Recon a Build investigation v9b78. Podagent další workflow nespouští."
+  ]
+}

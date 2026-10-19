@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "client-threading-validation-20261019",
+  "title": "Validace a integrace ověřeného CPU celku s vlastní produkční kandidátní verzí",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/client-threading-validation-20261019/",
+    "docs/performance/evidence/client-threading-20261019/",
+    "docs/performance/evidence/client-threading-character-materials-20261019/",
+    "docs/agents/handoffs/client-threading-lab-20261019.md",
+    "docs/agents/handoffs/client-threading-validation-20261019.md",
+    "_bmad-output/implementation-artifacts/client-threading-lab-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-2e5169e7e102/"
+  ],
+  "resources": ["heavy-validation", "gpu", "port:4205", "port:2600", "port:2568"],
+  "acceptance": [
+    "Převzít pouze přesné vlastní reviewované CPU delta po handoffu a uvolnění jeho runtime claimu; source/test ownership mít samostatně. Hrané buildy, readonly SDK a cizí WIP zachovat.",
+    "Stabilní vlastní clean/combined snapshot zahrne testy; pnpm test/build a izolovaný integration2568 podle checkpointu. Kandidát má vlastní dist bez junction do hraného dist, explicitní sourcehash/identitu portů a automatické logy.",
+    "Skutečná produkční Edge parita postav/materiálů a lifecycle, varianty cache/prune/recreate; oddělit od FPS přejímky. Bez srovnatelného plain A/B netvrdit procenta zrychlení ani uzavření KEY-40/KEY-5.",
+    "Vlastní ověřené celky samostatně commitovat a koordinovaně integrovat do main; žádné cizí staged/dirty soubory. Research/diagnostická evidence a runtimefix jsou oddělené commity.",
+    "Před uvolněním měřicích zdrojů ukončit pouze vlastní scény/procesy dle identity. Runtime stav a neprovedené kontroly výslovně předat."
+  ],
+  "verification": [
+    "Scoped review+targeted regresní testy; stabilní pnpm test/build/isolated pnpm test:integration.",
+    "HTTP/code/source SHA a PID/start/path; renderer health, obraz/avatar lifecycle na vlastním4205, source/rozlišení/reálné relace uvedeny.",
+    "Přijetí runtime mechanismu nesmí znamenat hotovou FPS migraci ani vícevláknovou architekturu."
+  ],
+  "notes": [
+    "Lab původního vlastníka threading-01a15535-lab byl zastaven a předán v docs/agents/handoffs/client-threading-lab-20261019.md. Tentýž root výslovně přebírá vlastní evidence/spec artefakty k dokončení/integraci; adopt-dirty jen tyto vlastní cesty.",
+    "KEY-40; shared docs/verification.md je cizí WIP a nepřebírá se, výsledky mají samostatnou evidenci a odkaz v handoffu pro integračního vlastníka."
+  ]
+}
