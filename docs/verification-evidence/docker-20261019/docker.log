@@ -1,0 +1,322 @@
+$ node scripts/test-docker.mjs
+ Image strahov-crazy-show:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 645B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.78kB 0.0s done
+#2 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#3 ...
+
+#4 [auth] docker/dockerfile:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#3 DONE 1.1s
+
+#5 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#5 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.1s done
+#5 CACHED
+
+#6 [internal] load metadata for docker.io/library/node:24-bookworm-slim
+#6 ...
+
+#7 [auth] library/node:pull token for registry-1.docker.io
+#7 DONE 0.0s
+
+#6 [internal] load metadata for docker.io/library/node:24-bookworm-slim
+#6 DONE 0.7s
+
+#8 [internal] load .dockerignore
+#8 transferring context: 1.07kB 0.0s done
+#8 DONE 0.0s
+
+#9 [dependencies 1/5] FROM docker.io/library/node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5
+#9 resolve docker.io/library/node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5 0.0s done
+#9 DONE 0.0s
+
+#10 [internal] load build context
+#10 transferring context: 634.36kB 0.7s done
+#10 DONE 0.7s
+
+#11 [dependencies 2/5] WORKDIR /app
+#11 CACHED
+
+#12 [dependencies 3/5] RUN npm install --global pnpm@11.25.0
+#12 CACHED
+
+#13 [dependencies 4/5] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#13 DONE 0.1s
+
+#14 [dependencies 5/5] COPY patches/ ./patches/
+#14 DONE 0.1s
+
+#15 [build 1/5] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --frozen-lockfile --store-dir=/pnpm/store
+#15 2.522 ? Verifying lockfile against supply-chain policies (207 entries)...
+#15 2.839 Lockfile is up to date, resolution step is skipped
+#15 3.136 Progress: resolved 1, reused 0, downloaded 0, added 0
+#15 3.441 Packages: +152
+#15 3.441 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#15 4.144 Progress: resolved 152, reused 0, downloaded 0, added 0
+#15 5.147 Progress: resolved 152, reused 150, downloaded 0, added 0
+#15 5.801 Packages are copied from the content-addressable store to the virtual store.
+#15 5.801   Content-addressable store is at: /pnpm/store/v11
+#15 5.801   Virtual store is at:             node_modules/.pnpm
+#15 6.161 Progress: resolved 152, reused 150, downloaded 1, added 3
+#15 7.174 Progress: resolved 152, reused 150, downloaded 1, added 15
+#15 8.215 Progress: resolved 152, reused 150, downloaded 1, added 61
+#15 9.226 Progress: resolved 152, reused 150, downloaded 1, added 99
+#15 ...
+
+#16 [production-dependencies 1/1] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --prod --frozen-lockfile --store-dir=/pnpm/store
+#16 2.515 ? Verifying lockfile against supply-chain policies (207 entries)...
+#16 2.853 Lockfile is up to date, resolution step is skipped
+#16 3.185 Progress: resolved 1, reused 0, downloaded 0, added 0
+#16 3.393 Packages: +104
+#16 3.393 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#16 4.234 Progress: resolved 104, reused 0, downloaded 0, added 0
+#16 5.236 Progress: resolved 104, reused 104, downloaded 0, added 0
+#16 5.805 Packages are copied from the content-addressable store to the virtual store.
+#16 5.805   Content-addressable store is at: /pnpm/store/v11
+#16 5.805   Virtual store is at:             node_modules/.pnpm
+#16 6.241 Progress: resolved 104, reused 104, downloaded 0, added 3
+#16 7.291 Progress: resolved 104, reused 104, downloaded 0, added 22
+#16 8.297 Progress: resolved 104, reused 104, downloaded 0, added 73
+#16 9.307 Progress: resolved 104, reused 104, downloaded 0, added 103
+#16 9.806 
+#16 9.806    ╭──────────────────────────────────────────────────────────────────────╮
+#16 9.806    │                                                                      │
+#16 9.806    │                 Update available! 11.25.0 → 12.14.0.                 │
+#16 9.806    │                 Changelog: https://pnpm.io/v/12.14.0                 │
+#16 9.806    │   To update, run: curl -fsSL https://get.pnpm.io/install.sh | sh -   │
+#16 9.806    │                                                                      │
+#16 9.806    ╰──────────────────────────────────────────────────────────────────────╯
+#16 9.806 
+#16 ...
+
+#15 [build 1/5] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --frozen-lockfile --store-dir=/pnpm/store
+#15 10.33 
+#15 10.33    ╭──────────────────────────────────────────────────────────────────────╮
+#15 10.33    │                                                                      │
+#15 10.33    │                 Update available! 11.25.0 → 12.14.0.                 │
+#15 10.33    │                 Changelog: https://pnpm.io/v/12.14.0                 │
+#15 10.33    │   To update, run: curl -fsSL https://get.pnpm.io/install.sh | sh -   │
+#15 10.33    │                                                                      │
+#15 10.33    ╰──────────────────────────────────────────────────────────────────────╯
+#15 10.33 
+#15 10.33 Progress: resolved 152, reused 150, downloaded 2, added 149
+#15 11.33 Progress: resolved 152, reused 150, downloaded 2, added 150
+#15 12.42 Progress: resolved 152, reused 150, downloaded 2, added 151
+#15 ...
+
+#16 [production-dependencies 1/1] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --prod --frozen-lockfile --store-dir=/pnpm/store
+#16 15.70 ✓ Lockfile passes supply-chain policies (207 entries in 13.1s)
+#16 16.71 Progress: resolved 104, reused 104, downloaded 0, added 104
+#16 16.71 Progress: resolved 104, reused 104, downloaded 0, added 104, done
+#16 18.98 
+#16 18.98 dependencies:
+#16 18.98 + @babylonjs/core 9.30.0
+#16 18.98 + @babylonjs/loaders 9.30.0
+#16 18.98 + @colyseus/core 0.18.9
+#16 18.98 + @colyseus/schema 5.0.36
+#16 18.98 + @colyseus/sdk 0.18.5
+#16 18.98 + @colyseus/ws-transport 0.18.4
+#16 18.98 + @dimforge/rapier3d-compat 0.21.0
+#16 18.98 + earcut 3.2.4
+#16 18.98 + express 5.3.0
+#16 18.98 + react 19.3.0
+#16 18.98 + react-dom 19.3.0
+#16 18.98 + suncalc 2.1.1
+#16 18.98 + tsx 4.23.15
+#16 18.98 
+#16 18.98 devDependencies: skipped
+#16 18.98 
+#16 19.05 Done in 18.1s using pnpm v11.25.0
+#16 DONE 19.4s
+
+#15 [build 1/5] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --frozen-lockfile --store-dir=/pnpm/store
+#15 16.71 Progress: resolved 152, reused 150, downloaded 2, added 152
+#15 16.71 Progress: resolved 152, reused 150, downloaded 2, added 152, done
+#15 17.79 [WARN] Request took 10461ms: https://registry.npmjs.org/playwright
+#15 19.88 [WARN] Request took 17096ms: https://registry.npmjs.org/@rolldown%2Fpluginutils
+#15 19.88 ✓ Lockfile passes supply-chain policies (207 entries in 17.3s)
+#15 21.32 
+#15 21.32 dependencies:
+#15 21.32 + @babylonjs/core 9.30.0
+#15 21.32 + @babylonjs/loaders 9.30.0
+#15 21.32 + @colyseus/core 0.18.9
+#15 21.32 + @colyseus/schema 5.0.36
+#15 21.32 + @colyseus/sdk 0.18.5
+#15 21.32 + @colyseus/ws-transport 0.18.4
+#15 21.32 + @dimforge/rapier3d-compat 0.21.0
+#15 21.32 + earcut 3.2.4
+#15 21.32 + express 5.3.0
+#15 21.32 + react 19.3.0
+#15 21.32 + react-dom 19.3.0
+#15 21.32 + suncalc 2.1.1
+#15 21.32 + tsx 4.23.15
+#15 21.32 
+#15 21.32 devDependencies:
+#15 21.32 + @types/earcut 3.0.0
+#15 21.32 + @types/express 5.0.6
+#15 21.32 + @types/node 24.19.1
+#15 21.32 + @types/react 19.3.0
+#15 21.32 + @types/react-dom 19.3.0
+#15 21.32 + @vitejs/plugin-react 6.1.2
+#15 21.32 + concurrently 10.0.6
+#15 21.32 + playwright 1.64.1
+#15 21.32 + prettier 3.9.9
+#15 21.32 + typescript 5.9.3
+#15 21.32 + vite 8.3.4
+#15 21.32 
+#15 ...
+
+#11 [dependencies 2/5] WORKDIR /app
+#11 CACHED
+
+#15 [build 1/5] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --frozen-lockfile --store-dir=/pnpm/store
+#15 21.40 Done in 20.5s using pnpm v11.25.0
+#15 DONE 21.7s
+
+#17 [runtime 3/7] COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
+#17 DONE 4.6s
+
+#18 [build 2/5] COPY . .
+#18 DONE 10.6s
+
+#19 [build 3/5] RUN test ! -d assets/blender
+#19 DONE 0.4s
+
+#20 [build 4/5] RUN node scripts/check-runtime-assets.mjs
+#20 3.392 Runtime assets: checked 7538 files; no Git LFS pointers.
+#20 DONE 3.5s
+
+#21 [build 5/5] RUN VITE_MULTIPLAYER_URL=/ pnpm build
+#21 1.085 $ tsc --noEmit && vite build
+#21 31.37 vite v8.3.4 building client environment for production...
+#21 31.39 transforming...
+#21 32.42 ✓ 1597 modules transformed.
+#21 38.07 rendering chunks...
+#21 38.97 computing gzip size...
+#21 39.33 dist/index.html                                    0.58 kB │ gzip:     0.36 kB
+#21 39.33 dist/assets/index-OAL0G7O6.css                    49.49 kB │ gzip:    12.22 kB
+#21 39.33 dist/assets/render-shaders-CRIfXshU.js             0.03 kB │ gzip:     0.05 kB
+#21 39.33 dist/assets/vegetation-BRFz_Axy.js                 0.14 kB │ gzip:     0.13 kB
+#21 39.33 dist/assets/b6-reality-CtCfwq5N.js                 0.15 kB │ gzip:     0.13 kB
+#21 39.33 dist/assets/rolldown-runtime-hePW80VL.js           0.71 kB │ gzip:     0.42 kB
+#21 39.33 dist/assets/render-engine-rVoc56RP.js              3.21 kB │ gzip:     1.67 kB
+#21 39.33 dist/assets/avatar-preview-DiUe-_2u.js             6.74 kB │ gzip:     3.12 kB
+#21 39.33 dist/assets/on-demand-render-Fqebz4-R.js           7.02 kB │ gzip:     2.42 kB
+#21 39.33 dist/assets/assets-DmPMQUD1.js                     7.80 kB │ gzip:     3.40 kB
+#21 39.33 dist/assets/environment-manifest-Bkq6KwiW.js       8.06 kB │ gzip:     2.29 kB
+#21 39.33 dist/assets/transit-renderer-D5mIfGup.js           9.32 kB │ gzip:     3.85 kB
+#21 39.33 dist/assets/car-pack-DOwRaHXR.js                  11.24 kB │ gzip:     4.19 kB
+#21 39.33 dist/assets/game-BtQEK30l.js                   3,305.86 kB │ gzip:   550.36 kB
+#21 39.33 dist/assets/babylon-E8WlbcY7.js                4,179.64 kB │ gzip:   968.31 kB
+#21 39.33 dist/assets/index-BI_mGI9C.js                  6,497.91 kB │ gzip: 2,254.35 kB
+#21 39.33 dist/assets/avatar-renderer-BWc8fadR.js       14,918.57 kB │ gzip: 4,802.30 kB
+#21 39.33 
+#21 39.33 [33m[INEFFECTIVE_DYNAMIC_IMPORT] [0mclient/b6-reality.ts is dynamically imported by client/game.ts but also statically imported by client/world-renderer.ts, dynamic import will not move module into another chunk.
+#21 39.33 
+#21 39.33 [plugin builtin:vite-reporter] 
+#21 39.33 (!) Some chunks are larger than 1100 kB after minification. Consider:
+#21 39.33 - Using dynamic import() to code-split the application
+#21 39.33 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+#21 39.33 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#21 39.33 [33m[INEFFECTIVE_DYNAMIC_IMPORT] [0mclient/vegetation.ts is dynamically imported by client/game.ts but also statically imported by client/world-renderer.ts, dynamic import will not move module into another chunk.
+#21 39.33 
+#21 39.33 ✓ built in 7.96s
+#21 39.33 [33m[PLUGIN_TIMINGS] [0mJavaScript callbacks ran for 5.4s of this 7.9s build (67%).
+#21 39.33 The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+#21 39.33   - plugin vite:prepare-out-dir renderStart (64%, 5.0s, 1 call)
+#21 39.33 Additional callback time came from callbacks under 1s.
+#21 39.33 See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+#21 39.33 
+#21 DONE 39.5s
+
+#22 [runtime 4/7] COPY --from=build --chown=node:node /app/package.json /app/tsconfig.json ./
+#22 DONE 0.3s
+
+#23 [runtime 5/7] COPY --from=build --chown=node:node /app/server ./server
+#23 DONE 0.1s
+
+#24 [runtime 6/7] COPY --from=build --chown=node:node /app/shared ./shared
+#24 DONE 0.1s
+
+#25 [runtime 7/7] COPY --from=build --chown=node:node /app/dist ./dist
+#25 DONE 4.0s
+
+#26 exporting to image
+#26 exporting layers
+#26 exporting layers 44.5s done
+#26 exporting manifest sha256:5f7fb151b45ddad419daae25faca916f3a79ccf5917ce5f47ebf4e28d1e83dfd 0.0s done
+#26 exporting config sha256:c62c57726a2533a5bc7ac29dde9f685ca2fcd6ecea69e845bf2a47dedee43170 0.0s done
+#26 exporting attestation manifest sha256:1f346f0824375d367a0bc0872ca33122792ec5dd4cb19654db44d39f99632797 0.0s done
+#26 exporting manifest list sha256:9c71704eca41d0da32170df7cb5cd839f6bffdae1ab74c2b7dd02f0fe51126e1
+#26 exporting manifest list sha256:9c71704eca41d0da32170df7cb5cd839f6bffdae1ab74c2b7dd02f0fe51126e1 0.0s done
+#26 naming to docker.io/library/strahov-crazy-show:local done
+#26 unpacking to docker.io/library/strahov-crazy-show:local
+#26 unpacking to docker.io/library/strahov-crazy-show:local 15.2s done
+#26 DONE 59.9s
+
+#27 resolving provenance for metadata file
+#27 DONE 0.0s
+ Image strahov-crazy-show:local Built 
+ Network strahov-docker-test-14328-1792446546513_default Creating 
+ Network strahov-docker-test-14328-1792446546513_default Creating 
+ Network strahov-docker-test-14328-1792446546513_default Created 
+ Network strahov-docker-test-14328-1792446546513_default Created 
+ Container strahov-docker-test-14328-1792446546513-game-1 Creating 
+ Container strahov-docker-test-14328-1792446546513-game-1 Created 
+ Container strahov-docker-test-14328-1792446546513-game-1 Starting 
+ Container strahov-docker-test-14328-1792446546513-game-1 Started 
+ Container strahov-docker-test-14328-1792446546513-game-1 Waiting 
+ Container strahov-docker-test-14328-1792446546513-game-1 Healthy 
+PASS Docker compiled frontend admission {"matchmaking":["/matchmake/joinById/bmemOhfTL"],"sockets":["/rhSmbLUgQ/bmemOhfTL"]}
+PASS Docker HTTP/assets/cache/guest/diagnostics/matchmaking/two clients
+Room connection was closed unexpectedly (4002): 
+PASS: singleton world, guest boundary, two clients, walking, physical car W/A/D/brake/reverse/exit/re-entry on native DMR and authored assets, global/DM chat, consent, explicit blocking rejection, event ownership, session resume and weather endpoint.
+PASS Docker HTTP/assets/cache/guest/diagnostics/matchmaking/two clients
+ Container strahov-docker-test-14328-1792446546513-game-1 Stopping 
+PASS Docker SIGTERM odpojil oba skutečné SDK klienty.
+ Container strahov-docker-test-14328-1792446546513-game-1 Stopped 
+ Container strahov-docker-test-14328-1792446546513-game-1 Starting 
+ Container strahov-docker-test-14328-1792446546513-game-1 Started 
+ Container strahov-docker-test-14328-1792446546513-game-1 Waiting 
+ Container strahov-docker-test-14328-1792446546513-game-1 Healthy 
+Room connection was closed unexpectedly (4002): 
+PASS Docker HTTP/assets/cache/guest/diagnostics/matchmaking/two clients/restart identity
+PASS Docker image, Compose, skutečná herní integrace, SIGTERM a restart.
+game-1  | Strahov multiplayer: http://0.0.0.0:2567 — world bmemOhfTL
+game-1  | Error: Herní protokol se změnil. Obnov stránku.
+game-1  |     at StrahovRoom.onAuth (/app/server/index.ts:386:13)
+game-1  |     at StrahovRoom._onJoin (file:///app/node_modules/.pnpm/@colyseus+core@0.18.9_@colyseus+better-call@1.3.3_@colyseus+schema@5.0.36_typescript@5._959717d2ea641411bd67bd9ba29a66c4/node_modules/@colyseus/core/build/Room.mjs:1106:38)
+game-1  |     at connectClientToRoom (file:///app/node_modules/.pnpm/@colyseus+core@0.18.9_@colyseus+better-call@1.3.3_@colyseus+schema@5.0.36_typescript@5._959717d2ea641411bd67bd9ba29a66c4/node_modules/@colyseus/core/build/Transport.mjs:132:24)
+game-1  |     at WebSocketServer.onConnection (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:192:13)
+game-1  |     at WebSocketServer.emit (node:events:514:28)
+game-1  |     at file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:123:120
+game-1  |     at WebSocketServer.completeUpgrade (/app/node_modules/.pnpm/ws@8.22.0/node_modules/ws/lib/websocket-server.js:450:5)
+game-1  |     at WebSocketServer.handleUpgrade (/app/node_modules/.pnpm/ws@8.22.0/node_modules/ws/lib/websocket-server.js:356:10)
+game-1  |     at completeUpgrade (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:123:70)
+game-1  |     at Server.<anonymous> (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:129:9)
+game-1  | Strahov multiplayer: http://0.0.0.0:2567 — world vB4B_I1x9
+game-1  | Error: Platná multiplayerová relace je vyžadována.
+game-1  |     at StrahovRoom.onAuth (/app/server/index.ts:390:13)
+game-1  |     at StrahovRoom._onJoin (file:///app/node_modules/.pnpm/@colyseus+core@0.18.9_@colyseus+better-call@1.3.3_@colyseus+schema@5.0.36_typescript@5._959717d2ea641411bd67bd9ba29a66c4/node_modules/@colyseus/core/build/Room.mjs:1106:38)
+game-1  |     at connectClientToRoom (file:///app/node_modules/.pnpm/@colyseus+core@0.18.9_@colyseus+better-call@1.3.3_@colyseus+schema@5.0.36_typescript@5._959717d2ea641411bd67bd9ba29a66c4/node_modules/@colyseus/core/build/Transport.mjs:132:24)
+game-1  |     at WebSocketServer.onConnection (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:192:13)
+game-1  |     at WebSocketServer.emit (node:events:514:28)
+game-1  |     at file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:123:120
+game-1  |     at WebSocketServer.completeUpgrade (/app/node_modules/.pnpm/ws@8.22.0/node_modules/ws/lib/websocket-server.js:450:5)
+game-1  |     at WebSocketServer.handleUpgrade (/app/node_modules/.pnpm/ws@8.22.0/node_modules/ws/lib/websocket-server.js:356:10)
+game-1  |     at completeUpgrade (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:123:70)
+game-1  |     at Server.<anonymous> (file:///app/node_modules/.pnpm/@colyseus+ws-transport@0.18.4_@colyseus+core@0.18.9_express@5.3.0_supports-color@10.2.2_/node_modules/@colyseus/ws-transport/build/WebSocketTransport.mjs:129:9)
+ Container strahov-docker-test-14328-1792446546513-game-1 Stopping 
+ Container strahov-docker-test-14328-1792446546513-game-1 Stopped 
+ Container strahov-docker-test-14328-1792446546513-game-1 Removing 
+ Container strahov-docker-test-14328-1792446546513-game-1 Removed 
+ Network strahov-docker-test-14328-1792446546513_default Removing 
+ Network strahov-docker-test-14328-1792446546513_default Removed 
