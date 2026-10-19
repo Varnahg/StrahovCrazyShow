@@ -1,0 +1,12 @@
+{
+  "schemaVersion":1,
+  "id":"webgpu-serializer-fragments-qa-20261019",
+  "title":"KEY-31/32: porovnat per-call fragmenty proti aktuálnímu F3",
+  "status":"done",
+  "dependsOn":["webgpu-f3-routine-profile-20261019"],
+  "writePaths":[".cache/webgpu-serializer-fragments-qa-20261019/","docs/agents/handoffs/webgpu-serializer-fragments-qa-20261019.md","docs/performance/evidence/webgpu-migration-20261016/serializer-fragments-qa/","_bmad/render/bmad-build/","_bmad-output/implementation-artifacts/webgpu-serializer-fragments-qa-20261019/"],
+  "resources":["heavy-validation","gpu","workspace-build","port:4200","port:2595"],
+  "acceptance":["Vyjít z aktuálního F3 a doložené entry37,4ms/499 a revision24ms/431, nikoli starého serializeru/memo. Nejprve porovnat rozumné varianty a původní read/coercion/throw/pořadí/fallback řetězec.","V izolované kopii ověřit vynechání neemitovaných fragment zápisů; žádný nový persistentní stav/cache. Densearray/prefix metadata jsou alternativy s vlastními sémantickými/paměťovými náklady, nikoli automaticky přijatý runtime.","Diferenciální a skutečné Standard/PBR/WGSL/wholewarm/cold kontroly proti stejnému F3, opakované proložené CPU běhy. Zisk ze samotného mikrotestu není důkaz FPS. Kandidát bez doloženého přínosu se neintegruje do runtime.","Při doloženém CPU přínosu vytvořit nový immutable produkční QA kandidát a čisté srovnatelné Edge opakování bez routine timeru. Zachovat hrané snapshoty/cizíWIP; nezávislé review, scopedcommit/main/Linear."],
+  "verification":["Znovupoužít stávající semantic corpus, warm/cold native CPU fixtures s aktuálním F3 a source receipts, bounds/reentrancy/prototype fallback. Cílené testy/TS/build podle skutečné implementace; nepřepisovat původní source ani dependencies.","Před GPU ověřit actualclients a protectedbytes; zaznamenat limity. Pokud CPU kandidát neprojde, ukončit jej důkazem odmítnutí bez nového GPU běhu."],
+  "notes":["Root webgpu-01a15102-admin koordinuje. Průzkum původního per-call nullproto fragments identifikoval zbytečný zápis undefined; helper read-only porovnal prefix/densearray/regex/memo/invalidaci. Materiály zůstávají přesně stejné, native main patch mimo scope.","Read-only základy .cache/webgpu-serializer-schema-qa-20261019/native-clean-f3 a .cache/webgpu-schema-shared-helper-20261019/fixture. Přenos do nativepatch/lock musí mít po přijetí samostatnou rezervaci."]
+}
