@@ -1,0 +1,8 @@
+{
+  "reviewer": "cpu_sampler_review",
+  "scope": "Read-only CPU helper adaptation and final source-map analyzer/current six captures",
+  "findings": [],
+  "verified": {"sourceFiles":586,"servedFiles":27,"usedSourceMaps":5,"embeddedAppSources":164,"benchmarkStartMaxDifferenceMs":0.6},
+  "limits": ["Samples show stack presence, not CPU duration/share", "Recorder timeOrigin is estimated; brackets use direct performance.now without offset", "Hitch attribution uses intervalStartMs/intervalEndMs and previousFrame", "No environment-work event inside any six capture", "GPU timing unavailable; no comparable FPS A/B or worker benefit claim"],
+  "grassInclusiveSamples": {"run-05":{"update":47,"advancePreparation":15,"selectRoots":9,"advanceTilePreparation":2,"prepareTile":1,"flush":14},"run-06":{"update":38,"advancePreparation":16,"selectRoots":9,"advanceTilePreparation":2,"prepareTile":2,"flush":9}}
+}
