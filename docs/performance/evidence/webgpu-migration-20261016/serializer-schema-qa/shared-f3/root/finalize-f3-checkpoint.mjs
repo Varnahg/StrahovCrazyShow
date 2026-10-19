@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,readdirSync} from 'node:fs';
+import {join} from 'node:path';
+import {createHash} from 'node:crypto';
+const root=import.meta.dirname,candidate=join(root,'candidate-v3'),sha=b=>createHash('sha256').update(b).digest('hex'),source=JSON.parse(readFileSync(join(candidate,'source-manifest.json'))),payload='3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768';
+for(const[p,s]of Object.entries(source.files))assert.equal(sha(readFileSync(join(candidate,p))),s,p);
+assert.equal(sha(readFileSync(join(candidate,'node_modules/@babylonjs/core/Materials/materialDefines.js'))),payload);
+const test=readFileSync(join(root,'f3-full-test.log')),build=readFileSync(join(root,'f3-build-with-id.log'));assert.match(test.toString(),/pass 1448/);assert.match(test.toString(),/fail 0/);assert.match(build.toString(),/built in/);
+function scan(dir,prefix=''){return readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?scan(join(dir,e.name),prefix+e.name+'/'):/\.(js|html|css|wasm)$/.test(e.name)?[[prefix+e.name,sha(readFileSync(join(dir,e.name)))]]:[]);}
+const dist=Object.fromEntries(scan(join(candidate,'dist')));assert.ok(Object.keys(dist).filter(p=>p.endsWith('.js')).some(p=>readFileSync(join(candidate,'dist',p),'utf8').includes(source.snapshotId)),'Required client identity must be embedded before pilot');
+writeFileSync(join(root,'dist-manifest-f3.json'),JSON.stringify(dist,null,2)+'\n');
+writeFileSync(join(root,'validation-f3.json'),JSON.stringify({source:source.snapshotId,payloadSha256:payload,tests:{command:'pnpm --config.verify-deps-before-run=false test',passed:1448,failed:0,exitCode:0,log:'f3-full-test.log',sha256:sha(test)},build:{command:'pnpm --config.verify-deps-before-run=false build --configLoader native',env:{VITE_SOURCE_SNAPSHOT_ID:source.snapshotId},exitCode:0,log:'f3-build-with-id.log',sha256:sha(build),scope:'Full tsc --noEmit and Vite build, embedded client snapshot ID verified'},integration:{performed:false,scope:'No F3 integration yet. This is private override GPU QA, not clean/combined production patch acceptance.'},scope:'Source and private payload exact after tests/build. Earlier missing-ID build/run preserved and excluded. F1/F2 CPU and F3 synthetic churn limits retained; production FPS/firstpeak benefit not yet accepted.'},null,2)+'\n');console.log(JSON.stringify({source:source.snapshotId,passed:1448,build:true,payloadVerified:true,clientIdentityEmbedded:true}));

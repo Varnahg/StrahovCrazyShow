@@ -1,0 +1,24 @@
+{
+  "source": "193477b9df5b54d3256ee8cf8285344ebd76dd55aeb929a7f5bfbd0d6b43ccab",
+  "payloadSha256": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+  "tests": {
+    "command": "pnpm --config.verify-deps-before-run=false test",
+    "passed": 1448,
+    "failed": 0,
+    "exitCode": 0,
+    "log": "f3-full-test.log",
+    "sha256": "8c07daada3923226a32825b5aa9c4f27da8b48fd5616ce39c39a0b63fbd2a3be"
+  },
+  "build": {
+    "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+    "exitCode": 0,
+    "log": "f3-build.log",
+    "sha256": "feb3cb0b33d4016d78215e499d7d5f41d9ccc649d530572af6da4dc0c4aa2405",
+    "scope": "Full tsc --noEmit and Vite build"
+  },
+  "integration": {
+    "performed": false,
+    "scope": "No F3 integration yet. This is private override GPU QA, not clean/combined production patch acceptance."
+  },
+  "scope": "Source and private payload exact after tests/build. F1/F2 CPU and F3 synthetic churn limits retained; production FPS/firstpeak benefit not yet accepted."
+}

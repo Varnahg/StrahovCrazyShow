@@ -1,0 +1,216 @@
+import assert from 'node:assert/strict';
+import {inspectOwner,holdOwnerForCleanup} from '../../../../owner-inspection.mjs';
+import {setImmediate} from 'node:timers/promises';
+import {NullEngine} from '@babylonjs/core/Engines/nullEngine';
+import {Scene} from '@babylonjs/core/scene';
+import {FreeCamera} from '@babylonjs/core/Cameras/freeCamera';
+import {Vector3,Matrix} from '@babylonjs/core/Maths/math.vector';
+import {Color4} from '@babylonjs/core/Maths/math.color';
+import '@babylonjs/core/Meshes/instancedMesh';
+import '@babylonjs/core/Meshes/thinInstanceMesh';
+import {MeshBuilder} from '@babylonjs/core/Meshes/meshBuilder';
+import {PBRMaterial} from '@babylonjs/core/Materials/PBR/pbrMaterial';
+import {StandardMaterial} from '@babylonjs/core/Materials/standardMaterial';
+import {Texture} from '@babylonjs/core/Materials/Textures/texture';
+import {ShaderLanguage} from '@babylonjs/core/Materials/shaderLanguage';
+import {WebGPUShaderProcessorWGSL} from '@babylonjs/core/Engines/WebGPU/webgpuShaderProcessorsWGSL';
+import {WebGPUShaderProcessingContext} from '@babylonjs/core/Engines/WebGPU/webgpuShaderProcessingContext';
+import {PointLight} from '@babylonjs/core/Lights/pointLight';
+import {SpotLight} from '@babylonjs/core/Lights/spotLight';
+import {DirectionalLight} from '@babylonjs/core/Lights/directionalLight';
+import {HemisphericLight} from '@babylonjs/core/Lights/hemisphericLight';
+import {Light} from '@babylonjs/core/Lights/light';
+import {UniformBuffer} from '@babylonjs/core/Materials/uniformBuffer';
+import {StableLightState} from '../../../client/stable-light-state';
+import {GltfLightBudget} from '../../../client/gltf-light-budget';
+import {CampusSurfaceArtPlugin,campusSurfaceArt} from '../../../client/cinematic-art';
+import {PhotogrammetryNightPlugin,PHOTOGRAMMETRY_WINDOW_FACADES} from '../../../client/photogrammetry-lighting';
+import {TreeWindPlugin} from '../../../client/tree-wind';
+import {installCarPaintInstances,CAR_PAINT_COLOR_BUFFER} from '../../../client/car-paint-instances';
+import {PhotoGrassWind,createPhotoGrassWindState} from '../../../client/photo-grass-wind';
+import {GrassWindPlugin} from '../../../client/grass-material';
+import {StudentHairTintPlugin} from '../../../client/avatar-hair';
+
+
+class NativeProcessingEngine extends NullEngine {
+  readonly sources: { vertex: string; fragment: string }[] = [];
+  constructor(native = true) {
+    super();
+    this._isWebGPU = native;
+    // Test IO token, not an actual GPU device.
+    (this as any)._device = native ? {lost:new Promise(()=>{})} : undefined;
+    this._webGLVersion = 2;
+    this._shaderPlatformName = native ? "WEBGPU" : "WEBGL2";
+    this.getCaps().standardDerivatives = true;
+  }
+  override _getShaderProcessor(language: ShaderLanguage) {
+    return this.isWebGPU
+      ? new WebGPUShaderProcessorWGSL()
+      : super._getShaderProcessor(language);
+  }
+  override _getShaderProcessingContext(language: ShaderLanguage) {
+    return this.isWebGPU
+      ? new WebGPUShaderProcessingContext(language)
+      : super._getShaderProcessingContext(language);
+  }
+  override createShaderProgram(
+    ...args: Parameters<NullEngine["createShaderProgram"]>
+  ) {
+    this.sources.push({ vertex: args[1], fragment: args[2] });
+    return super.createShaderProgram(...args);
+  }
+}
+// Exact original serializer body used only as a read-only comparison oracle.
+// It is never installed on the patched class or used to render.
+const originalDescriptor={value:function(this:any){
+        let result = "";
+        for (let index = 0; index < this._keys.length; index++) {
+            const prop = this._keys[index];
+            const value = this[prop];
+            const type = typeof value;
+            switch (type) {
+                case "number":
+                case "string":
+                    result += "#define " + prop + " " + value + "\n";
+                    break;
+                default:
+                    if (value) {
+                        result += "#define " + prop + "\n";
+                    }
+                    break;
+            }
+        }
+        return result;
+    }};
+const copy=(object:any)=>JSON.parse(JSON.stringify(object));
+const values=(defines:any)=>Object.fromEntries(Object.entries(defines).filter(([name])=>!name.startsWith('_')).sort(([a],[b])=>a.localeCompare(b)));
+class CapturingEngine extends NativeProcessingEngine {
+  readonly prefixes=new Map<any,string[]>();
+  readonly hookCalls:any[]=[];
+  orderSensitive=false;
+  // Same NullEngine GPU-only teardown boundary as wgsl-avatar-car.test.ts.
+  // Actual instance selection, buffers, binding and draw dispatch stay native.
+  unbindInstanceAttributes() {}
+  override _getShaderProcessor(language:ShaderLanguage){
+    const processor:any=super._getShaderProcessor(language),original=processor._convertDefinesToConst;
+    const prefixes=this.prefixes;
+    processor._convertDefinesToConst=function(...args:any[]){const result=Reflect.apply(original,this,args);const context=this._webgpuProcessingContext;const list=prefixes.get(context)??[];assert.ok(typeof result === "string");list.push(result);prefixes.set(context,list);return result;};
+    if(this.orderSensitive)processor.preProcessor=(source:string,defines:string[])=>{
+      const slot=defines.indexOf('#define LIGHT3'),count=defines.findIndex(line=>line.startsWith('#define LIGHTCOUNT '));
+      this.hookCalls.push({slot,count,value:slot<count?1:2});
+      return `const syntheticOrderWitness = ${slot<count?1:2};\n`+source;
+    };
+    return processor;
+  }
+}
+function withoutGeneratedPrefix(source:string,prefix:string){
+  const first=source.indexOf(prefix);assert.ok(first>=0,'actual generated block present');assert.equal(source.indexOf(prefix,first+prefix.length),-1,'unique provenance block');
+  return source.slice(0,first)+source.slice(first+prefix.length);
+}
+// Mirrored fallback is a separately preserved RED baseline, never silently
+// converted into a passing canonicalization coverage assertion.
+export const kinds=['pbr','standard','surface','photo','wind','car','photo-grass','photo-grass-thin','grass-thin','hair'] as const;
+type Kind=typeof kinds[number]|'car-fallback';
+export async function scenario(kind:Kind,orderSensitive=false){
+  const canonical=true;
+  const engine:any=new CapturingEngine(),scene=new Scene(engine);scene.useRightHandedSystem=true;
+  engine.orderSensitive=orderSensitive;
+  const instanced=kind==='car'||kind.endsWith('-thin');
+  if(instanced||kind==='car-fallback')engine.getCaps().instancedArrays=true;
+  const camera=new FreeCamera('same camera',new Vector3(0,0,-5),scene);camera.setTarget(Vector3.Zero());scene.activeCamera=camera;
+  const point=new PointLight('B6 point',new Vector3(2,2,2),scene);point.falloffType=Light.FALLOFF_STANDARD;point.setEnabled(false);
+  const sun=new DirectionalLight('sun',new Vector3(0,-1,0),scene),hemi=new HemisphericLight('sky',Vector3.Up(),scene);
+  const torch=new SpotLight('torch',new Vector3(0,1,-3),new Vector3(0,-.1,1),.72,64,scene);torch.falloffType=Light.FALLOFF_STANDARD;torch.renderPriority=10;
+  const budget=new GltfLightBudget(scene),stable=new StableLightState(scene),observers:any[]=[];
+  const result:any={kind,canonical,orderSensitive,states:[],cleanup:null};
+  const plugins:any[]=[];
+  try {
+    const texture=new Texture('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB5kAAAAASUVORK5CYII=',scene);texture.hasAlpha=kind==='photo'||kind==='hair';
+    const materials=[0,1].map(i=>{
+      const material:any=kind==='standard'?new StandardMaterial('same Standard '+i,scene):new PBRMaterial('same PBR '+i,scene);
+      if(kind==='standard')material.diffuseTexture=texture;
+      else{material.metallic=0;material.roughness=.6;material.alphaCutOff=.5;material.albedoTexture=texture;}
+      if(kind==='surface')plugins.push(new CampusSurfaceArtPlugin(material,campusSurfaceArt('asphalt')!));
+      if(kind==='photo'){material.transparencyMode=PBRMaterial.PBRMATERIAL_ALPHATEST;plugins.push(new PhotogrammetryNightPlugin(material,[PHOTOGRAMMETRY_WINDOW_FACADES[0]],{night:1,activity:.6,disposed:false}));}
+      if(kind==='wind')plugins.push(new TreeWindPlugin(material,{time:0,x:1,z:0}));
+      if(kind.startsWith('photo-grass'))plugins.push(new PhotoGrassWind(material,createPhotoGrassWindState()));
+      if(kind==='grass-thin')plugins.push(new GrassWindPlugin(material,{time:0,windX:1,windZ:0,playerX:0,playerY:0,playerZ:0,range:12}));
+      if(kind==='hair'){material.transparencyMode=PBRMaterial.PBRMATERIAL_ALPHATEST;plugins.push(new StudentHairTintPlugin(material));}
+      assert.equal(material.shaderLanguage,ShaderLanguage.WGSL);return material;
+    });
+    const meshes=[0,1].map(i=>{const mesh=MeshBuilder.CreateBox('same geometry '+i,{},scene);mesh.material=materials[i];mesh.receiveShadows=false;mesh.setEnabled(i===0);return mesh;});
+    let activeTargets:any[]=meshes;
+    if(kind.startsWith('car')){
+      installCarPaintInstances(meshes);plugins.push(...materials.map(m=>m.pluginManager.getPlugin('CarPaintFallback')));
+      activeTargets=meshes.map((mesh,i)=>{mesh.setEnabled(true);mesh.isVisible=false;const instance=mesh.createInstance('actual paint instance '+i);instance.instancedBuffers[CAR_PAINT_COLOR_BUFFER]=new Color4(.2,.3,.4,1);if(kind==='car-fallback')instance.scaling.x=-1;instance.setEnabled(i===0);return instance;});
+    }
+    if(kind.endsWith('-thin'))for(const mesh of meshes){mesh.thinInstanceSetBuffer('matrix',new Float32Array(Matrix.Identity().asArray()),16,true);if(kind==='photo-grass-thin')mesh.thinInstanceSetBuffer('photoGrassFade',new Float32Array([0,1,0,0]),4,true);}
+    assert.deepEqual(meshes[0].getVerticesDataKinds(),meshes[1].getVerticesDataKinds());
+    for(const kind of meshes[0].getVerticesDataKinds())assert.deepEqual(meshes[0].getVertexBuffer(kind)?.getData(),meshes[1].getVertexBuffer(kind)?.getData());
+    let draws=0;
+    for(const mesh of meshes)observers.push([mesh.onAfterRenderObservable,mesh.onAfterRenderObservable.add(()=>{if(engine.currentRenderPassId===camera.renderPassId)draws++})]);
+    const drawSubmesh=(index:number)=>(kind==='car-fallback'?activeTargets[index]:meshes[index]).subMeshes[0];
+    const sample=(label:string,index:number)=>{
+      const wrapper:any=drawSubmesh(index)._getDrawWrapper(camera.renderPassId),effect:any=wrapper.effect,context=effect._processingContext;
+      const prefixes=engine.prefixes.get(context);assert.equal(prefixes.length,2);
+      const vertex=effect.vertexSourceCode,fragment=effect.fragmentSourceCode;
+      const metadata=copy(context);assert.equal(metadata.shaderLanguage,ShaderLanguage.WGSL);
+      const original=Reflect.apply(originalDescriptor.value,wrapper.defines,[]);
+      const row={label,index,draws,language:materials[index].shaderLanguage,cap:materials[index].maxSimultaneousLights,lights:meshes[index].lightSources.map(l=>({name:l.name,type:l.getTypeID(),falloff:l.falloffType})),activeTarget:activeTargets[index].name,activeTargetLights:activeTargets[index].lightSources.map((l:any)=>l.name),lightsDirty:wrapper.defines._areLightsDirty,effect:effect.uniqueId,key:effect._key,defines:effect.defines,original,values:values(wrapper.defines),keys:wrapper.defines._keys.slice(),vertex,fragment,prefixes:prefixes.slice(),body:{vertex:withoutGeneratedPrefix(vertex,prefixes[0]),fragment:withoutGeneratedPrefix(fragment,prefixes[1])},metadata};
+      result.states.push(row);return row;
+    };
+    const render=async(label:string,index:number)=>{
+      for(let attempt=0;attempt<16;attempt++){
+        draws=0;budget.prepareFrame();stable.update();scene.render();await setImmediate();
+        const wrapper:any=drawSubmesh(index)._getDrawWrapper(camera.renderPassId),effect=wrapper?.effect;
+        const expectedCount=materials[index].disableLighting?0:Math.min(materials[index].maxSimultaneousLights,meshes[index].lightSources.length);
+        // A drawn ready hot-swap fallback is not the requested new variant.
+        if(draws&&effect?.isReady()&&wrapper.defines?.LIGHTCOUNT===expectedCount&&Object.values(engine._compiledEffects).every((e:any)=>e.isReady())){
+          assert.equal(effect.isDisposed,false);return sample(label,index);
+        }
+      }
+      result.unresolved={label,attemptedFrames:16,last:sample(label+' UNRESOLVED',index)};
+      throw Error('Actual draw did not settle: '+kind+'/'+label);
+    };
+    await render('A three lights',0);point.setEnabled(true);const a=await render('A four after three',0);
+    activeTargets[0].setEnabled(false);activeTargets[1].setEnabled(true);const b=await render('B fresh four',1);
+    assert.deepEqual(a.values,b.values);assert.deepEqual(a.lights,b.lights);assert.equal(a.cap,4);assert.equal(b.cap,4);
+    assert.notEqual(a.original,b.original);assert.deepEqual(a.original.split("\n").sort(),b.original.split("\n").sort());
+    if(canonical){assert.equal(a.effect,b.effect);assert.equal(a.key,b.key);assert.equal(a.defines,b.defines)}
+    else{assert.notEqual(a.effect,b.effect);assert.notEqual(a.key,b.key);assert.notEqual(a.defines,b.defines)}
+    assert.deepEqual(a.metadata,b.metadata);
+    if(orderSensitive&&!canonical)assert.notDeepEqual(a.body,b.body,'unsupported custom preProcessor observes define order');
+    else assert.deepEqual(a.body,b.body);
+
+    if(kind!=='standard'){assert.equal(a.values.NUM_SAMPLES,'0');assert.equal(a.values.ALPHATESTVALUE,'0.5')}
+    assert.equal(a.values.INSTANCES,instanced);
+    if(kind==='car'){assert.equal(a.values.INSTANCESCOLOR,true);assert.ok(a.metadata.orderedAttributes.includes('instanceColor'));assert.match(a.vertex,/instanceColor/)}
+    if(kind==='car-fallback'){assert.equal(a.values.INSTANCESCOLOR,false);assert.match(a.fragment,/surfaceAlbedo \*= uniforms\.carPaintFallback/)}
+    if(kind.endsWith('-thin'))assert.equal(a.values.THIN_INSTANCES,true);
+    if(kind==='photo-grass-thin'){assert.ok(a.metadata.orderedAttributes.includes('photoGrassFade'));assert.match(a.vertex,/vertexInputs\.photoGrassFade/)}
+    if(kind==='photo-grass'){assert.ok(!a.metadata.orderedAttributes.includes('photoGrassFade'));assert.doesNotMatch(a.vertex,/vertexInputs\.photoGrassFade/)}
+    if(kind==='hair')assert.match(a.fragment,/studentHairSource/);
+    const before=Object.keys(engine._compiledEffects).length;await render('B repeat four',1);assert.equal(Object.keys(engine._compiledEffects).length,before);
+    const shared=drawSubmesh(1)._getDrawWrapper(camera.renderPassId).effect,refs=shared._refCount;
+    const extra=engine.createEffect(shared.name,{attributes:shared.getAttributesNames(),uniformsNames:[],samplers:[],defines:shared.defines,shaderLanguage:ShaderLanguage.WGSL},engine);
+    assert.equal(extra,shared);assert.equal(shared._refCount,refs+1);extra.dispose();assert.equal(shared._refCount,refs);assert.equal(shared.isDisposed,false);assert.equal(engine._compiledEffects[shared.key],shared);result.extraReferenceReleased=true;
+    if(kind==='standard')materials[1].disableLighting=true;else materials[1].alphaCutOff=.25;
+    const changed=await render('B genuine value change',1);assert.notEqual(changed.effect,b.effect);assert.notEqual(changed.key,b.key);
+    if(kind==='standard')assert.equal(changed.values.LIGHTCOUNT,0);else assert.equal(changed.values.ALPHATESTVALUE,'0.25');
+    if(plugins.length){
+      const buffer=new UniformBuffer(engine),ubo=plugins[0].getUniforms(ShaderLanguage.WGSL).ubo??[];
+      try{for(const uniform of ubo)buffer.addUniform(uniform.name,uniform.size);if(ubo.length){buffer.create();plugins[0].bindForSubMesh(buffer,scene,engine,drawSubmesh(0));plugins[0].hardBindForSubMesh(buffer,scene,engine,drawSubmesh(0));result.pluginUniforms=Array.from(buffer.getData())}else result.pluginUniforms=[];}finally{buffer.dispose()}
+    }
+    result.memo=inspectOwner(engine);
+    if(process.env.OWNER_MODE==="owner")assert.ok(result.memo?.entries>0,"actual stock adapter owns cached text for this plugin path");
+    result.programs=engine.sources.length;result.effectCount=Object.keys(engine._compiledEffects).length;result.layoutEqual=true;result.bodyExact=!orderSensitive||canonical;
+  } finally {
+    for(const [observable,observer]of observers)observable.remove(observer);observers.length=0;stable.dispose();budget.dispose();scene.dispose();
+    const effects:any[]=Object.values(engine._compiledEffects);for(const effect of effects)effect.dispose(true);const checkMemo=holdOwnerForCleanup(engine);engine.dispose();await setImmediate();result.memoCleanup=checkMemo();
+    if(process.env.OWNER_MODE==="owner")assert.deepEqual(result.memoCleanup,{entries:0,units:0,active:false,disposed:true,engine:false,device:false,observers:0});
+    result.hookCalls=engine.hookCalls.slice();
+    result.cleanup={scene:scene.isDisposed,engine:engine.isDisposed,effects:effects.every(e=>e.isDisposed),observers:observers.length};assert.deepEqual(result.cleanup,{scene:true,engine:true,effects:true,observers:0});engine.prefixes.clear();engine.sources.length=0;engine.hookCalls.length=0;
+  }
+  return result;
+}
+

@@ -1,0 +1,1418 @@
+{
+  "decision": "F3 exploratory production pilot only: compare maximum and tails jointly. One valid F3 sample does not establish repeatability or migration acceptance. F3a1 is an auxiliary early control with longer ready idle; primary sequence is F3a3/F3b2/F3a4. Missing-client-ID F3b1 is retained separately and excluded; F3a2 had no new client or benchmark.",
+  "matched": [
+    "f3a3",
+    "f3b2",
+    "f3a4"
+  ],
+  "results": [
+    {
+      "run": "f3a1",
+      "source": "909ebf8a019b26aff5561a0aaba97b976a26d033746da85ae958c6f4034589a5",
+      "session": "11afd800-0b4e-4563-a22f-5c39304e38d2",
+      "records": 543,
+      "fps": 55.6,
+      "p95": 22.099999964237213,
+      "p99": 33.10000002384186,
+      "max": 163.39999997615814,
+      "over50": 4,
+      "over100": 4,
+      "viewport": {
+        "width": 1528,
+        "height": 650
+      },
+      "renderResolution": {
+        "width": 1175,
+        "height": 500
+      },
+      "quality": "low",
+      "avatars": 1,
+      "ambient": {
+        "buses": 0,
+        "passengers": 0,
+        "cars": 0
+      },
+      "lightingInstant": 1792447200000,
+      "position": {
+        "x": 109.97286987304688,
+        "y": -3.671151351928711,
+        "z": 121.92953491210938
+      },
+      "health": true,
+      "delta": {
+        "glslToSpirv": 0,
+        "spirvToWgsl": 0,
+        "compilerLoad": 0,
+        "shaderPreparation": 0,
+        "shaderModule": 0,
+        "shaderValidation": 0,
+        "syncPipeline": 2,
+        "asyncPipeline": 0,
+        "submit": 1111
+      },
+      "ready": [
+        {
+          "seq": 275,
+          "atMs": 51893.3
+        }
+      ],
+      "benchmarkStart": [
+        {
+          "seq": 459,
+          "atMs": 163414.5
+        }
+      ],
+      "scope": "Uninstrumented current serializer schema pilot; no detailed timer or sampler. Exact one private vendor JS change; raw telemetry retained, not full migration acceptance.",
+      "comparable": true,
+      "exclusion": null,
+      "startupModeToReadyMs": 42829.9,
+      "readyIdleMs": 111521.2,
+      "uiRawMatches": 1,
+      "browserStates": [
+        {
+          "seq": 2,
+          "atMs": 455.5,
+          "kind": "browser-state",
+          "data": {
+            "reason": "start",
+            "visibility": "visible",
+            "focused": true
+          }
+        },
+        {
+          "seq": 3,
+          "atMs": 458.6,
+          "kind": "browser-state",
+          "data": {
+            "reason": "pageshow",
+            "visibility": "visible",
+            "focused": true
+          }
+        }
+      ],
+      "hitches": [
+        {
+          "atMs": 789.2999999999884,
+          "frameMs": 163.4,
+          "previousFrame": {
+            "frameStartedAtMs": 164018.89999997616,
+            "frameMs": 16.6,
+            "cpuMs": 158.5,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 5.4,
+              "world": 0.8,
+              "avatarsAndCamera": 0.3,
+              "environment": 4.1,
+              "render": 147.8,
+              "labels": 0.1
+            }
+          },
+          "currentCpuMs": 21.5
+        },
+        {
+          "atMs": 938.2999999999884,
+          "frameMs": 145.9,
+          "previousFrame": {
+            "frameStartedAtMs": 164182.19999998808,
+            "frameMs": 163.4,
+            "cpuMs": 21.5,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 1.9,
+              "world": 0.2,
+              "avatarsAndCamera": 0.2,
+              "environment": 0.8,
+              "render": 18.3,
+              "labels": 0.1
+            }
+          },
+          "currentCpuMs": 24.7
+        },
+        {
+          "atMs": 5006.899999999994,
+          "frameMs": 109.1,
+          "previousFrame": {
+            "frameStartedAtMs": 168291.60000002384,
+            "frameMs": 14.6,
+            "cpuMs": 105.5,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 0.3,
+              "world": 0.1,
+              "avatarsAndCamera": 0.1,
+              "environment": 5.6,
+              "render": 99.4,
+              "labels": 0
+            }
+          },
+          "currentCpuMs": 20.7
+        },
+        {
+          "atMs": 5152.100000000006,
+          "frameMs": 145.5,
+          "previousFrame": {
+            "frameStartedAtMs": 168400.69999998808,
+            "frameMs": 109.1,
+            "cpuMs": 20.7,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 0.9,
+              "world": 0.2,
+              "avatarsAndCamera": 0.1,
+              "environment": 4.5,
+              "render": 14.9,
+              "labels": 0.1
+            }
+          },
+          "currentCpuMs": 20.1
+        }
+      ],
+      "weatherAtStart": {
+        "temperature": 10.8,
+        "wind": 0.9,
+        "windDirection": 45,
+        "rain": 0,
+        "cloud": 0.96,
+        "observedAt": 1792101550000,
+        "fetchedAt": 1792101607591,
+        "source": "Řízené testovací počasí · uložený záznam",
+        "sourceKind": "station",
+        "cloudSource": "Řízený meteorologický model · benchmark",
+        "stale": true,
+        "status": "fallback",
+        "humidity": 87,
+        "fieldSources": {
+          "windGust": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "humidity": {
+            "kind": "station",
+            "source": "Meteostanice Silicon Hill",
+            "observedAt": 1792101550000,
+            "stale": true
+          },
+          "visibility": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "snowfall": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "liquidPrecipitation": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "precipitationType": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          }
+        },
+        "cloudObservedAt": 1792101600000,
+        "cloudStale": true,
+        "cloudWindSource": "Řízené modelové proudění · benchmark",
+        "cloudLayers": {
+          "low": 0,
+          "mid": 0.41,
+          "high": 0.9
+        },
+        "cloudWinds": {
+          "low": {
+            "speed": 3.7,
+            "direction": 308
+          },
+          "mid": {
+            "speed": 22.45,
+            "direction": 6
+          },
+          "high": {
+            "speed": 21.12,
+            "direction": 348
+          }
+        },
+        "windGust": 2.1,
+        "visibility": 24100,
+        "snowfall": 0,
+        "liquidPrecipitation": 0,
+        "precipitationType": "none"
+      },
+      "weatherAtEnd": {
+        "temperature": 10.8,
+        "wind": 0.9,
+        "windDirection": 45,
+        "rain": 0,
+        "cloud": 0.96,
+        "observedAt": 1792101550000,
+        "fetchedAt": 1792101607591,
+        "source": "Řízené testovací počasí · uložený záznam",
+        "sourceKind": "station",
+        "cloudSource": "Řízený meteorologický model · benchmark",
+        "stale": true,
+        "status": "fallback",
+        "humidity": 87,
+        "fieldSources": {
+          "windGust": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "humidity": {
+            "kind": "station",
+            "source": "Meteostanice Silicon Hill",
+            "observedAt": 1792101550000,
+            "stale": true
+          },
+          "visibility": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "snowfall": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "liquidPrecipitation": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "precipitationType": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          }
+        },
+        "cloudObservedAt": 1792101600000,
+        "cloudStale": true,
+        "cloudWindSource": "Řízené modelové proudění · benchmark",
+        "cloudLayers": {
+          "low": 0,
+          "mid": 0.41,
+          "high": 0.9
+        },
+        "cloudWinds": {
+          "low": {
+            "speed": 3.7,
+            "direction": 308
+          },
+          "mid": {
+            "speed": 22.45,
+            "direction": 6
+          },
+          "high": {
+            "speed": 21.12,
+            "direction": 348
+          }
+        },
+        "windGust": 2.1,
+        "visibility": 24100,
+        "snowfall": 0,
+        "liquidPrecipitation": 0,
+        "precipitationType": "none"
+      },
+      "gpu": {
+        "before": {
+          "atUTC": "2026-10-19T08:40:03.977Z",
+          "args": [
+            "--query-gpu=timestamp,name,driver_version,temperature.gpu,clocks.current.graphics,clocks.current.memory,utilization.gpu,pstate",
+            "--format=csv,noheader,nounits"
+          ],
+          "exitCode": 0,
+          "csv": "2026/10/19 10:40:03.967, NVIDIA GeForce GTX 1060, 582.28, 72, 873, 2999, 25, P3",
+          "error": "",
+          "scope": "Host NVIDIA driver snapshot; not per-page GPU time or a fixed-clock guarantee."
+        },
+        "after": {
+          "atUTC": "2026-10-19T08:40:43.408Z",
+          "args": [
+            "--query-gpu=timestamp,name,driver_version,temperature.gpu,clocks.current.graphics,clocks.current.memory,utilization.gpu,pstate",
+            "--format=csv,noheader,nounits"
+          ],
+          "exitCode": 0,
+          "csv": "2026/10/19 10:40:43.398, NVIDIA GeForce GTX 1060, 582.28, 71, 873, 2999, 17, P3",
+          "error": "",
+          "scope": "Host NVIDIA driver snapshot; not per-page GPU time or a fixed-clock guarantee."
+        }
+      }
+    },
+    {
+      "run": "f3a3",
+      "source": "909ebf8a019b26aff5561a0aaba97b976a26d033746da85ae958c6f4034589a5",
+      "session": "0dbe7caa-afaf-457a-aa80-d2c094b6948f",
+      "records": 406,
+      "fps": 56.7,
+      "p95": 20.200000047683716,
+      "p99": 23.80000001192093,
+      "max": 168.30000001192093,
+      "over50": 4,
+      "over100": 4,
+      "viewport": {
+        "width": 1528,
+        "height": 650
+      },
+      "renderResolution": {
+        "width": 1175,
+        "height": 500
+      },
+      "quality": "low",
+      "avatars": 1,
+      "ambient": {
+        "buses": 0,
+        "passengers": 0,
+        "cars": 0
+      },
+      "lightingInstant": 1792447200000,
+      "position": {
+        "x": 109.9642562866211,
+        "y": -3.678923320770264,
+        "z": 120.98414611816406
+      },
+      "health": true,
+      "delta": {
+        "glslToSpirv": 0,
+        "spirvToWgsl": 0,
+        "compilerLoad": 0,
+        "shaderPreparation": 0,
+        "shaderModule": 0,
+        "shaderValidation": 0,
+        "syncPipeline": 2,
+        "asyncPipeline": 0,
+        "submit": 1133
+      },
+      "ready": [
+        {
+          "seq": 283,
+          "atMs": 51597.3
+        }
+      ],
+      "benchmarkStart": [
+        {
+          "seq": 345,
+          "atMs": 83437.7
+        }
+      ],
+      "scope": "Uninstrumented current serializer schema pilot; no detailed timer or sampler. Exact one private vendor JS change; raw telemetry retained, not full migration acceptance.",
+      "comparable": true,
+      "exclusion": null,
+      "startupModeToReadyMs": 42671.3,
+      "readyIdleMs": 31840.399999999994,
+      "uiRawMatches": 1,
+      "browserStates": [
+        {
+          "seq": 2,
+          "atMs": 464.3,
+          "kind": "browser-state",
+          "data": {
+            "reason": "start",
+            "visibility": "visible",
+            "focused": true
+          }
+        },
+        {
+          "seq": 3,
+          "atMs": 467.4,
+          "kind": "browser-state",
+          "data": {
+            "reason": "pageshow",
+            "visibility": "visible",
+            "focused": true
+          }
+        }
+      ],
+      "hitches": [
+        {
+          "atMs": 775.4000000000087,
+          "frameMs": 168.3,
+          "previousFrame": {
+            "frameStartedAtMs": 84021.39999997616,
+            "frameMs": 16.6,
+            "cpuMs": 162.8,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 6.7,
+              "world": 0.4,
+              "avatarsAndCamera": 0.4,
+              "environment": 3.2,
+              "render": 152,
+              "labels": 0.1
+            }
+          },
+          "currentCpuMs": 23
+        },
+        {
+          "atMs": 929.1000000000058,
+          "frameMs": 154.7,
+          "previousFrame": {
+            "frameStartedAtMs": 84189.80000001192,
+            "frameMs": 168.3,
+            "cpuMs": 23,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 2.3,
+              "world": 0.2,
+              "avatarsAndCamera": 0.2,
+              "environment": 1,
+              "render": 18.8,
+              "labels": 0.5
+            }
+          },
+          "currentCpuMs": 22.4
+        },
+        {
+          "atMs": 5489.5,
+          "frameMs": 109.2,
+          "previousFrame": {
+            "frameStartedAtMs": 88791.69999998808,
+            "frameMs": 17.4,
+            "cpuMs": 106.8,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 0.4,
+              "world": 0.1,
+              "avatarsAndCamera": 0,
+              "environment": 4.7,
+              "render": 101.4,
+              "labels": 0.2
+            }
+          },
+          "currentCpuMs": 26
+        },
+        {
+          "atMs": 5635.100000000006,
+          "frameMs": 125,
+          "previousFrame": {
+            "frameStartedAtMs": 88928.5,
+            "frameMs": 27.6,
+            "cpuMs": 16.1,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 0.3,
+              "world": 0.1,
+              "avatarsAndCamera": 0.1,
+              "environment": 4.8,
+              "render": 10.8,
+              "labels": 0
+            }
+          },
+          "currentCpuMs": 19.3
+        }
+      ],
+      "weatherAtStart": {
+        "temperature": 10.8,
+        "wind": 0.9,
+        "windDirection": 45,
+        "rain": 0,
+        "cloud": 0.96,
+        "observedAt": 1792101550000,
+        "fetchedAt": 1792101607591,
+        "source": "Řízené testovací počasí · uložený záznam",
+        "sourceKind": "station",
+        "cloudSource": "Řízený meteorologický model · benchmark",
+        "stale": true,
+        "status": "fallback",
+        "humidity": 87,
+        "fieldSources": {
+          "windGust": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "humidity": {
+            "kind": "station",
+            "source": "Meteostanice Silicon Hill",
+            "observedAt": 1792101550000,
+            "stale": true
+          },
+          "visibility": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "snowfall": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "liquidPrecipitation": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "precipitationType": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          }
+        },
+        "cloudObservedAt": 1792101600000,
+        "cloudStale": true,
+        "cloudWindSource": "Řízené modelové proudění · benchmark",
+        "cloudLayers": {
+          "low": 0,
+          "mid": 0.41,
+          "high": 0.9
+        },
+        "cloudWinds": {
+          "low": {
+            "speed": 3.7,
+            "direction": 308
+          },
+          "mid": {
+            "speed": 22.45,
+            "direction": 6
+          },
+          "high": {
+            "speed": 21.12,
+            "direction": 348
+          }
+        },
+        "windGust": 2.1,
+        "visibility": 24100,
+        "snowfall": 0,
+        "liquidPrecipitation": 0,
+        "precipitationType": "none"
+      },
+      "weatherAtEnd": {
+        "temperature": 10.8,
+        "wind": 0.9,
+        "windDirection": 45,
+        "rain": 0,
+        "cloud": 0.96,
+        "observedAt": 1792101550000,
+        "fetchedAt": 1792101607591,
+        "source": "Řízené testovací počasí · uložený záznam",
+        "sourceKind": "station",
+        "cloudSource": "Řízený meteorologický model · benchmark",
+        "stale": true,
+        "status": "fallback",
+        "humidity": 87,
+        "fieldSources": {
+          "windGust": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "humidity": {
+            "kind": "station",
+            "source": "Meteostanice Silicon Hill",
+            "observedAt": 1792101550000,
+            "stale": true
+          },
+          "visibility": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "snowfall": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "liquidPrecipitation": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "precipitationType": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          }
+        },
+        "cloudObservedAt": 1792101600000,
+        "cloudStale": true,
+        "cloudWindSource": "Řízené modelové proudění · benchmark",
+        "cloudLayers": {
+          "low": 0,
+          "mid": 0.41,
+          "high": 0.9
+        },
+        "cloudWinds": {
+          "low": {
+            "speed": 3.7,
+            "direction": 308
+          },
+          "mid": {
+            "speed": 22.45,
+            "direction": 6
+          },
+          "high": {
+            "speed": 21.12,
+            "direction": 348
+          }
+        },
+        "windGust": 2.1,
+        "visibility": 24100,
+        "snowfall": 0,
+        "liquidPrecipitation": 0,
+        "precipitationType": "none"
+      },
+      "gpu": {
+        "before": {
+          "atUTC": "2026-10-19T08:47:22.865Z",
+          "args": [
+            "--query-gpu=timestamp,name,driver_version,temperature.gpu,clocks.current.graphics,clocks.current.memory,utilization.gpu,pstate",
+            "--format=csv,noheader,nounits"
+          ],
+          "exitCode": 0,
+          "csv": "2026/10/19 10:47:22.854, NVIDIA GeForce GTX 1060, 582.28, 70, 835, 2999, 29, P3",
+          "error": "",
+          "scope": "Host NVIDIA driver snapshot; not per-page GPU time or a fixed-clock guarantee."
+        },
+        "after": {
+          "atUTC": "2026-10-19T08:47:53.200Z",
+          "args": [
+            "--query-gpu=timestamp,name,driver_version,temperature.gpu,clocks.current.graphics,clocks.current.memory,utilization.gpu,pstate",
+            "--format=csv,noheader,nounits"
+          ],
+          "exitCode": 0,
+          "csv": "2026/10/19 10:47:53.191, NVIDIA GeForce GTX 1060, 582.28, 71, 860, 2999, 19, P3",
+          "error": "",
+          "scope": "Host NVIDIA driver snapshot; not per-page GPU time or a fixed-clock guarantee."
+        }
+      }
+    },
+    {
+      "run": "f3b2",
+      "source": "193477b9df5b54d3256ee8cf8285344ebd76dd55aeb929a7f5bfbd0d6b43ccab",
+      "session": "f707fd3d-60f0-4de6-9059-8b53bf97d62d",
+      "records": 373,
+      "fps": 57,
+      "p95": 19.80000001192093,
+      "p99": 29.69999998807907,
+      "max": 139.30000001192093,
+      "over50": 4,
+      "over100": 3,
+      "viewport": {
+        "width": 1528,
+        "height": 650
+      },
+      "renderResolution": {
+        "width": 1175,
+        "height": 500
+      },
+      "quality": "low",
+      "avatars": 1,
+      "ambient": {
+        "buses": 0,
+        "passengers": 0,
+        "cars": 0
+      },
+      "lightingInstant": 1792447200000,
+      "position": {
+        "x": 109.94806671142578,
+        "y": -3.6600677490234377,
+        "z": 122.76799774169922
+      },
+      "health": true,
+      "delta": {
+        "glslToSpirv": 0,
+        "spirvToWgsl": 0,
+        "compilerLoad": 0,
+        "shaderPreparation": 0,
+        "shaderModule": 0,
+        "shaderValidation": 0,
+        "syncPipeline": 2,
+        "asyncPipeline": 0,
+        "submit": 1139
+      },
+      "ready": [
+        {
+          "seq": 262,
+          "atMs": 52977.9
+        }
+      ],
+      "benchmarkStart": [
+        {
+          "seq": 313,
+          "atMs": 74659.3
+        }
+      ],
+      "scope": "Uninstrumented current serializer schema pilot; no detailed timer or sampler. Exact one private vendor JS change; raw telemetry retained, not full migration acceptance.",
+      "comparable": true,
+      "exclusion": null,
+      "startupModeToReadyMs": 41893.5,
+      "readyIdleMs": 21681.4,
+      "uiRawMatches": 1,
+      "browserStates": [
+        {
+          "seq": 2,
+          "atMs": 699.4,
+          "kind": "browser-state",
+          "data": {
+            "reason": "start",
+            "visibility": "visible",
+            "focused": true
+          }
+        },
+        {
+          "seq": 3,
+          "atMs": 702.3,
+          "kind": "browser-state",
+          "data": {
+            "reason": "pageshow",
+            "visibility": "visible",
+            "focused": true
+          }
+        }
+      ],
+      "hitches": [
+        {
+          "atMs": 752,
+          "frameMs": 139.3,
+          "previousFrame": {
+            "frameStartedAtMs": 75245,
+            "frameMs": 17.9,
+            "cpuMs": 134.7,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 5.2,
+              "world": 0.6,
+              "avatarsAndCamera": 0.2,
+              "environment": 3.9,
+              "render": 124.7,
+              "labels": 0.1
+            }
+          },
+          "currentCpuMs": 26.7
+        },
+        {
+          "atMs": 907.6999999999971,
+          "frameMs": 130.2,
+          "previousFrame": {
+            "frameStartedAtMs": 75414,
+            "frameMs": 29.7,
+            "cpuMs": 16.6,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 1,
+              "world": 0.1,
+              "avatarsAndCamera": 0.1,
+              "environment": 0.2,
+              "render": 15.2,
+              "labels": 0
+            }
+          },
+          "currentCpuMs": 22.8
+        },
+        {
+          "atMs": 5098.899999999994,
+          "frameMs": 80.8,
+          "previousFrame": {
+            "frameStartedAtMs": 79660.60000002384,
+            "frameMs": 14.6,
+            "cpuMs": 80.2,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 0.2,
+              "world": 0.1,
+              "avatarsAndCamera": 0,
+              "environment": 4.8,
+              "render": 75,
+              "labels": 0.1
+            }
+          },
+          "currentCpuMs": 16.6
+        },
+        {
+          "atMs": 5243.599999999991,
+          "frameMs": 122.2,
+          "previousFrame": {
+            "frameStartedAtMs": 79760.19999998808,
+            "frameMs": 18.8,
+            "cpuMs": 18.2,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 0.5,
+              "world": 0,
+              "avatarsAndCamera": 0.1,
+              "environment": 4.1,
+              "render": 13.4,
+              "labels": 0.1
+            }
+          },
+          "currentCpuMs": 20.2
+        }
+      ],
+      "weatherAtStart": {
+        "temperature": 10.8,
+        "wind": 0.9,
+        "windDirection": 45,
+        "rain": 0,
+        "cloud": 0.96,
+        "observedAt": 1792101550000,
+        "fetchedAt": 1792101607591,
+        "source": "Řízené testovací počasí · uložený záznam",
+        "sourceKind": "station",
+        "cloudSource": "Řízený meteorologický model · benchmark",
+        "stale": true,
+        "status": "fallback",
+        "humidity": 87,
+        "fieldSources": {
+          "windGust": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "humidity": {
+            "kind": "station",
+            "source": "Meteostanice Silicon Hill",
+            "observedAt": 1792101550000,
+            "stale": true
+          },
+          "visibility": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "snowfall": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "liquidPrecipitation": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "precipitationType": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          }
+        },
+        "cloudObservedAt": 1792101600000,
+        "cloudStale": true,
+        "cloudWindSource": "Řízené modelové proudění · benchmark",
+        "cloudLayers": {
+          "low": 0,
+          "mid": 0.41,
+          "high": 0.9
+        },
+        "cloudWinds": {
+          "low": {
+            "speed": 3.7,
+            "direction": 308
+          },
+          "mid": {
+            "speed": 22.45,
+            "direction": 6
+          },
+          "high": {
+            "speed": 21.12,
+            "direction": 348
+          }
+        },
+        "windGust": 2.1,
+        "visibility": 24100,
+        "snowfall": 0,
+        "liquidPrecipitation": 0,
+        "precipitationType": "none"
+      },
+      "weatherAtEnd": {
+        "temperature": 10.8,
+        "wind": 0.9,
+        "windDirection": 45,
+        "rain": 0,
+        "cloud": 0.96,
+        "observedAt": 1792101550000,
+        "fetchedAt": 1792101607591,
+        "source": "Řízené testovací počasí · uložený záznam",
+        "sourceKind": "station",
+        "cloudSource": "Řízený meteorologický model · benchmark",
+        "stale": true,
+        "status": "fallback",
+        "humidity": 87,
+        "fieldSources": {
+          "windGust": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "humidity": {
+            "kind": "station",
+            "source": "Meteostanice Silicon Hill",
+            "observedAt": 1792101550000,
+            "stale": true
+          },
+          "visibility": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "snowfall": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "liquidPrecipitation": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "precipitationType": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          }
+        },
+        "cloudObservedAt": 1792101600000,
+        "cloudStale": true,
+        "cloudWindSource": "Řízené modelové proudění · benchmark",
+        "cloudLayers": {
+          "low": 0,
+          "mid": 0.41,
+          "high": 0.9
+        },
+        "cloudWinds": {
+          "low": {
+            "speed": 3.7,
+            "direction": 308
+          },
+          "mid": {
+            "speed": 22.45,
+            "direction": 6
+          },
+          "high": {
+            "speed": 21.12,
+            "direction": 348
+          }
+        },
+        "windGust": 2.1,
+        "visibility": 24100,
+        "snowfall": 0,
+        "liquidPrecipitation": 0,
+        "precipitationType": "none"
+      },
+      "gpu": {
+        "before": {
+          "atUTC": "2026-10-19T08:49:22.858Z",
+          "args": [
+            "--query-gpu=timestamp,name,driver_version,temperature.gpu,clocks.current.graphics,clocks.current.memory,utilization.gpu,pstate",
+            "--format=csv,noheader,nounits"
+          ],
+          "exitCode": 0,
+          "csv": "2026/10/19 10:49:22.845, NVIDIA GeForce GTX 1060, 582.28, 72, 911, 2999, 21, P3",
+          "error": "",
+          "scope": "Host NVIDIA driver snapshot; not per-page GPU time or a fixed-clock guarantee."
+        },
+        "after": {
+          "atUTC": "2026-10-19T08:49:47.803Z",
+          "args": [
+            "--query-gpu=timestamp,name,driver_version,temperature.gpu,clocks.current.graphics,clocks.current.memory,utilization.gpu,pstate",
+            "--format=csv,noheader,nounits"
+          ],
+          "exitCode": 0,
+          "csv": "2026/10/19 10:49:47.792, NVIDIA GeForce GTX 1060, 582.28, 72, 911, 2999, 17, P3",
+          "error": "",
+          "scope": "Host NVIDIA driver snapshot; not per-page GPU time or a fixed-clock guarantee."
+        }
+      }
+    },
+    {
+      "run": "f3a4",
+      "source": "909ebf8a019b26aff5561a0aaba97b976a26d033746da85ae958c6f4034589a5",
+      "session": "491493a5-2b27-446e-bab5-8cc19c80d59d",
+      "records": 477,
+      "fps": 55.2,
+      "p95": 22.899999976158142,
+      "p99": 42.10000002384186,
+      "max": 179.30000001192093,
+      "over50": 5,
+      "over100": 5,
+      "viewport": {
+        "width": 1528,
+        "height": 650
+      },
+      "renderResolution": {
+        "width": 1175,
+        "height": 500
+      },
+      "quality": "low",
+      "avatars": 1,
+      "ambient": {
+        "buses": 0,
+        "passengers": 0,
+        "cars": 0
+      },
+      "lightingInstant": 1792447200000,
+      "position": {
+        "x": 109.9598388671875,
+        "y": -3.6735188484191896,
+        "z": 121.67815399169922
+      },
+      "health": true,
+      "delta": {
+        "glslToSpirv": 0,
+        "spirvToWgsl": 0,
+        "compilerLoad": 0,
+        "shaderPreparation": 0,
+        "shaderModule": 0,
+        "shaderValidation": 0,
+        "syncPipeline": 2,
+        "asyncPipeline": 0,
+        "submit": 1103
+      },
+      "ready": [
+        {
+          "seq": 268,
+          "atMs": 53835.5
+        }
+      ],
+      "benchmarkStart": [
+        {
+          "seq": 364,
+          "atMs": 107127.2
+        }
+      ],
+      "scope": "Uninstrumented current serializer schema pilot; no detailed timer or sampler. Exact one private vendor JS change; raw telemetry retained, not full migration acceptance.",
+      "comparable": true,
+      "exclusion": null,
+      "startupModeToReadyMs": 43408.6,
+      "readyIdleMs": 53291.7,
+      "uiRawMatches": 1,
+      "browserStates": [
+        {
+          "seq": 2,
+          "atMs": 469.3,
+          "kind": "browser-state",
+          "data": {
+            "reason": "start",
+            "visibility": "visible",
+            "focused": true
+          }
+        },
+        {
+          "seq": 3,
+          "atMs": 472.4,
+          "kind": "browser-state",
+          "data": {
+            "reason": "pageshow",
+            "visibility": "visible",
+            "focused": true
+          }
+        }
+      ],
+      "hitches": [
+        {
+          "atMs": 825.1000000000058,
+          "frameMs": 179.3,
+          "previousFrame": {
+            "frameStartedAtMs": 107747.39999997616,
+            "frameMs": 15.2,
+            "cpuMs": 175.3,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 7.7,
+              "world": 1.1,
+              "avatarsAndCamera": 0.4,
+              "environment": 5,
+              "render": 161.1,
+              "labels": 0
+            }
+          },
+          "currentCpuMs": 25.4
+        },
+        {
+          "atMs": 930.4000000000087,
+          "frameMs": 112.5,
+          "previousFrame": {
+            "frameStartedAtMs": 107926.69999998808,
+            "frameMs": 179.3,
+            "cpuMs": 25.4,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 2.4,
+              "world": 0.3,
+              "avatarsAndCamera": 0.2,
+              "environment": 0.8,
+              "render": 21.2,
+              "labels": 0.5
+            }
+          },
+          "currentCpuMs": 18.4
+        },
+        {
+          "atMs": 3504.199999999997,
+          "frameMs": 103.7,
+          "previousFrame": {
+            "frameStartedAtMs": 110508,
+            "frameMs": 23.5,
+            "cpuMs": 99.6,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 0.3,
+              "world": 0,
+              "avatarsAndCamera": 0.1,
+              "environment": 84.2,
+              "render": 15,
+              "labels": 0
+            }
+          },
+          "currentCpuMs": 19.5
+        },
+        {
+          "atMs": 5136.600000000006,
+          "frameMs": 108.3,
+          "previousFrame": {
+            "frameStartedAtMs": 112134,
+            "frameMs": 18.2,
+            "cpuMs": 107.5,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 0.2,
+              "world": 0.1,
+              "avatarsAndCamera": 0.1,
+              "environment": 5.5,
+              "render": 101.6,
+              "labels": 0
+            }
+          },
+          "currentCpuMs": 21.3
+        },
+        {
+          "atMs": 5276.300000000003,
+          "frameMs": 116.5,
+          "previousFrame": {
+            "frameStartedAtMs": 112265.19999998808,
+            "frameMs": 22.9,
+            "cpuMs": 17,
+            "gpuMs": null,
+            "phases": {
+              "simulation": 0.4,
+              "world": 0.1,
+              "avatarsAndCamera": 0.1,
+              "environment": 4.1,
+              "render": 12.3,
+              "labels": 0
+            }
+          },
+          "currentCpuMs": 21.8
+        }
+      ],
+      "weatherAtStart": {
+        "temperature": 10.8,
+        "wind": 0.9,
+        "windDirection": 45,
+        "rain": 0,
+        "cloud": 0.96,
+        "observedAt": 1792101550000,
+        "fetchedAt": 1792101607591,
+        "source": "Řízené testovací počasí · uložený záznam",
+        "sourceKind": "station",
+        "cloudSource": "Řízený meteorologický model · benchmark",
+        "stale": true,
+        "status": "fallback",
+        "humidity": 87,
+        "fieldSources": {
+          "windGust": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "humidity": {
+            "kind": "station",
+            "source": "Meteostanice Silicon Hill",
+            "observedAt": 1792101550000,
+            "stale": true
+          },
+          "visibility": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "snowfall": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "liquidPrecipitation": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "precipitationType": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          }
+        },
+        "cloudObservedAt": 1792101600000,
+        "cloudStale": true,
+        "cloudWindSource": "Řízené modelové proudění · benchmark",
+        "cloudLayers": {
+          "low": 0,
+          "mid": 0.41,
+          "high": 0.9
+        },
+        "cloudWinds": {
+          "low": {
+            "speed": 3.7,
+            "direction": 308
+          },
+          "mid": {
+            "speed": 22.45,
+            "direction": 6
+          },
+          "high": {
+            "speed": 21.12,
+            "direction": 348
+          }
+        },
+        "windGust": 2.1,
+        "visibility": 24100,
+        "snowfall": 0,
+        "liquidPrecipitation": 0,
+        "precipitationType": "none"
+      },
+      "weatherAtEnd": {
+        "temperature": 10.8,
+        "wind": 0.9,
+        "windDirection": 45,
+        "rain": 0,
+        "cloud": 0.96,
+        "observedAt": 1792101550000,
+        "fetchedAt": 1792101607591,
+        "source": "Řízené testovací počasí · uložený záznam",
+        "sourceKind": "station",
+        "cloudSource": "Řízený meteorologický model · benchmark",
+        "stale": true,
+        "status": "fallback",
+        "humidity": 87,
+        "fieldSources": {
+          "windGust": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "humidity": {
+            "kind": "station",
+            "source": "Meteostanice Silicon Hill",
+            "observedAt": 1792101550000,
+            "stale": true
+          },
+          "visibility": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "snowfall": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "liquidPrecipitation": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          },
+          "precipitationType": {
+            "kind": "model",
+            "source": "Open-Meteo · model",
+            "observedAt": 1792101600000,
+            "stale": true
+          }
+        },
+        "cloudObservedAt": 1792101600000,
+        "cloudStale": true,
+        "cloudWindSource": "Řízené modelové proudění · benchmark",
+        "cloudLayers": {
+          "low": 0,
+          "mid": 0.41,
+          "high": 0.9
+        },
+        "cloudWinds": {
+          "low": {
+            "speed": 3.7,
+            "direction": 308
+          },
+          "mid": {
+            "speed": 22.45,
+            "direction": 6
+          },
+          "high": {
+            "speed": 21.12,
+            "direction": 348
+          }
+        },
+        "windGust": 2.1,
+        "visibility": 24100,
+        "snowfall": 0,
+        "liquidPrecipitation": 0,
+        "precipitationType": "none"
+      },
+      "gpu": {
+        "before": {
+          "atUTC": "2026-10-19T08:52:18.851Z",
+          "args": [
+            "--query-gpu=timestamp,name,driver_version,temperature.gpu,clocks.current.graphics,clocks.current.memory,utilization.gpu,pstate",
+            "--format=csv,noheader,nounits"
+          ],
+          "exitCode": 0,
+          "csv": "2026/10/19 10:52:18.841, NVIDIA GeForce GTX 1060, 582.28, 72, 847, 2999, 26, P3",
+          "error": "",
+          "scope": "Host NVIDIA driver snapshot; not per-page GPU time or a fixed-clock guarantee."
+        },
+        "after": {
+          "atUTC": "2026-10-19T08:52:45.904Z",
+          "args": [
+            "--query-gpu=timestamp,name,driver_version,temperature.gpu,clocks.current.graphics,clocks.current.memory,utilization.gpu,pstate",
+            "--format=csv,noheader,nounits"
+          ],
+          "exitCode": 0,
+          "csv": "2026/10/19 10:52:45.893, NVIDIA GeForce GTX 1060, 582.28, 72, 822, 810, 26, P5",
+          "error": "",
+          "scope": "Host NVIDIA driver snapshot; not per-page GPU time or a fixed-clock guarantee."
+        }
+      }
+    }
+  ],
+  "scope": "Descriptive Low first-drive pilot, one actual session. All matching loads retained; GPU clocks/idle/trajectory variation documented. No causal percentage, Medium/three-peer or final migration acceptance. No detailed profiler."
+}

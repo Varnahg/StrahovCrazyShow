@@ -1,0 +1,28 @@
+var defineSchemaInterns = [];
+var defineSchemaInternUnits = 0;
+function findInternedDefineSchema(count, names, previousNames) {
+    for (const entry of defineSchemaInterns) {
+        const candidate = entry.schema;
+        if (candidate.names.length !== count) continue;
+        let equal = true;
+        for (let index = 0; index < count; index++) {
+            if (candidate.names[index] !== (names ? names[index] : previousNames[index])) { equal = false; break; }
+        }
+        if (equal) return candidate;
+    }
+    return undefined;
+}
+function internDefineSchema(names, order, units) {
+    // Re-check in case a reentrant completed call published the same shape.
+    const prior = findInternedDefineSchema(names.length, names, undefined);
+    if (prior) return prior;
+    const schema = Object.freeze({ names: Object.freeze(names), order: Object.freeze(order), validNames: true });
+    while (defineSchemaInterns.length >= 32 || defineSchemaInternUnits + units > 262144) {
+        const oldest = defineSchemaInterns.shift();
+        defineSchemaInternUnits -= oldest.units;
+    }
+    defineSchemaInterns.push(Object.freeze({ schema, units }));
+    defineSchemaInternUnits += units;
+    return schema;
+}
+

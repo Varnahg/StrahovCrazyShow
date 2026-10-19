@@ -1,0 +1,7 @@
+{
+  "beforeSha256": "330085a4a299d05f71b75a6aade9b69fc2ef8d38edc0594ae1a922c33e7c0d54",
+  "afterSha256": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+  "addedGuard": "        // Cheap miss rejection only; a hit still requires the entire sequence.\n        if (count > 0 && (candidate.names[0] !== (names ? names[0] : previousNames[0]) ||\n            candidate.names[count - 1] !== (names ? names[count - 1] : previousNames[count - 1]))) continue;",
+  "exactInverse": true,
+  "scope": "Only cheap count/endpoint rejection before existing complete observed-name equality. No hit based only on endpoints/hash; no added keys/value/constructor reads or cache."
+}
