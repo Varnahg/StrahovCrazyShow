@@ -2,6 +2,8 @@
 
 CI běží na každém PR a push do `main`. Job `verify` používá SHA-připnuté actions, Node 24, pnpm 11.25.0, frozen lockfile a skutečné Git LFS objekty. Postupně kontroluje katalog tasků, odkazy README, celou sadu testů, produkční build a izolovanou integraci na portu 2568. Log obsahuje testovaný Git commit i PR head/base. Linux GitHub-hosted runner je samostatný stroj; jeho ephemeral porty a build nekolidují s místním hraným snapshotem. Místní plné kontroly dál vyžadují `heavy-validation`, build `workspace-build`, integrace `port:2568`.
 
+Před instalací dependencies běží malé CLI testy `node --test tests/lfs-assets.test.ts` a `node scripts/check-lfs-assets.mjs`. Preflight čte inventář committed `HEAD` a ověřuje skutečné pracovní soubory: existenci, běžný typ a umístění uvnitř checkoutu, deklarovanou velikost a nepřítomnost LFS pointeru. Lze jej spustit také jako `node scripts/check-lfs-assets.mjs --root CESTA`. Čte nanejvýš 1024 bajtů z jednoho souboru, nic nestahuje ani nepřepisuje. `downloaded: true` v LFS inventáři potvrzuje pouze objektové úložiště, nikoli připravenost checkoutu. Preflight není checksum kontrola stejně dlouhého poškozeného modelu; původní `git lfs fsck` a asset testy zůstávají součástí CI. [Pilot a důkaz obnovy](../verification-evidence/ci-lfs-pilot-20261019/README.md).
+
 ## Povinné podmínky integrace
 
 Aktivní ruleset `main` vyžaduje PR, větev aktuální vůči `main` a úspěšné checky `verify`, `source-secret-hygiene` a status `project-acceptance`. Force-push a smazání jsou zakázané. Pravidla nemají trvalý bypass; povinný počet lidských approvals je nula. Přesné nasazené nastavení a první skutečné runy dokládá [evidence KEY-44](../verification-evidence/ci-main-20261019/README.md).

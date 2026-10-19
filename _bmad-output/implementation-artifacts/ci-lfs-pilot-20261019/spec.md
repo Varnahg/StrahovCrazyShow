@@ -2,7 +2,7 @@
 title: 'KEY-44: Autonomní LFS preflight pilot a obnova'
 type: 'feature'
 created: '2026-10-19'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 baseline_commit: 'a9f1805808c653d2a9fb9cd81def446bfaead588'
 review_loop_iteration: 0
@@ -71,9 +71,13 @@ Výzkum skutečné worktree: 12/12 pracovních LFS souborů jsou pointery, přes
 
 Red fáze je výslovně plánovaný test obnovy na izolované větvi; nesmí se vydávat za hotovou funkci. Kód může být záměrně nekompletní, testy musejí vyjadřovat skutečné požadované chování. Koordinátor a implementer mají oddělené writePaths. CLI nepřejímá zámky ani nevybírá další task.
 
+RED checkpoint e0ea60e642c1a1e177a6d1dfcf04c90dc18301b6 zachován v PR #8. GitHub run39324153438 selhal na22 testech (21fail/1pass); mergeHTTP405, main beze změny. Skutečná kolize claimu odmítnuta bez změn. Předchůdce i checkpoint koordinátor provedli handoff/release, nová relace pilot_recovery nyní implementuje původní kontrakt; testSHA256042aa1dec471509a696520608b3b223bf7c945a8d073fcea41ff3f10f74713de se musí zachovat.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Obnova nové relace: původní testy beze změny, 22/22 PASS přímým během (47.356s). První wrapper timeout není testový výsledek a původní log je zachován. Skutečný lokální checkout správně odmítnut jako12pointerů. Nezávislé review a GitHub GREEN přejímka zatím čekají.
 
 ## Verification
 
