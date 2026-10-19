@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-packaging-fix-20261019",
+  "title": "KEY-45: opravit doložené Docker build-context výjimky",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".dockerignore",
+    "Dockerfile",
+    "compose.yaml",
+    "docs/agents/handoffs/docker-packaging-fix-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Build context neobsahuje assets/blender, pouze vyžadované characterJSON; public zůstává celý.",
+    "Převzetí vlastních souborů původního packaging agenta podle jeho handoffu; žádný cizí WIP."
+  ],
+  "verification": [
+    "Skutečný Docker build context audit a image build vroot validation."
+  ],
+  "notes": [
+    "matchesOrParentMatches z Moby prokázal !assets/ reinclusion všech podkladů; předchozí build zastaven v owned CLI16120, root test runner uklízí project."
+  ]
+}
