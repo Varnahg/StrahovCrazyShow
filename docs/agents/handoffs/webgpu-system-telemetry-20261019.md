@@ -9,3 +9,7 @@
 - Procesy: všechnyhelperověřovacíprocesyukončené. Následující vlastníručnícapture je v.cache/webgpu-system-telemetry-20261019/manual-01; skutečnáPID/start/path pouze vignored runtime/launchreceipt. Ukončení vlastnímSTOPsouborem/duration, claimdržetdopůvodníhookamžikuukončení. Operationalruntime se necommituje.
 - Omezení: krátkýidle-hostsmoke nenígarancežádnérežiepřihře. BrowserGPUprocesmůžeobsluhovatvícekaret. ProprotectedWMIprocesyneníCPUčasdostupný. BezWPRstack/schedulertrace nelzedefinitivněodlišitCPUrunning/ready/driverwait. Hernífullsuite/build/integrationneměněnéhryzdemajíjinýscope.
 - CizíWIP a ostatní rozpracované vlastníúkoly zůstávají mimo tento commit. Migračnícíl/KEY31/32nezavřené. Dalšíkrok: ručnítest20smenupřed,Mediumprůjezd/auto/svítilna,Highstejnátrasa,20smenu a20spo zavření, následněkorelovatnovéraws.
+
+## Dokončení měření a koordinační předání19.10.2026
+
+Uživatel test výslovně dokončil. Capture se zastavil vlastnímSTOP,617samples,cleanupErrors[]. Vlastnícollector/NVIDIAprocessy už neexistují. Frozen raw/odvození: .cache/webgpu-system-telemetry-20261019/manual-analysis-01/. Zdroj65d028; GPUmedian31/max47%,VRAM3420/6144MiB, renderCPUwall dominantní, drivercause neprokázaná a žádná doloženájízda. Data a metody jsou předané novému worker výzkumu přes evidence/system-gpu-telemetry/coordination-handoff.md. Po uložení tohoto předání se claim uvolní; skutečnýstav vlastníků je vregistru. Živébuildy4201/4202/4203 zůstávají chráněné svými serveclaims.
