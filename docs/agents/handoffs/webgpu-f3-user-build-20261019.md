@@ -1,0 +1,12 @@
+# Živé předání F3 verze4201
+
+**URL:** http://127.0.0.1:4201/?renderBackend=webgpu. Owner `webgpu-01a15102-f3-user`, task `webgpu-f3-user-build-20261019`, cwd29fa. Rezervace portů4201/2596 i immutable vypůjčeného dist/deps **zůstává aktivní**, protože služby běží pro uživatele. Task zůstáváready; nejde o Done celé migrace.
+
+- Source `77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52`, MaterialDefines `3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768`. Přesně již přijatý native-combined F3,589source/test files a19distcode SHA. Žádný nový compile ani odmítnuté sparse/primitivecache/routineprofiler; stávající automaticdiagnostiky knowncombined verze zachované.
+- Vlastní `.cache/webgpu-f3-user-build-20261019/snapshot` obsahuje přesné kopie manifestu; readonly dist vede do frozen native-combined F3 a dependencies do frozen fresh native-clean F3. Tyto vstupy jsou explicitně chráněné claimem. **Nikdy tyto dist/deps ani snapshot nepřebuildovat/neinstalovat za běhu.** Další opravy do jiné kopie/portu.
+- Služby: `node --import tsx server/index.ts` se cwd vlastnísnapshot, HOST127.0.0.1/PORT2596/TSX_DISABLE_CACHE1/STRAHOV_SOURCE_SNAPSHOT_ID; preview `node <owncache>/preview.mjs`, stejnécwd,4201proxyAPI/WS2596. Pouze127.0.0.1. SkutečnéPID/startUTC/path jen v ignored `live/runtime.json`; stdout/stderr ve stejném liveadresáři.
+- Start `powershell -NoProfile -ExecutionPolicy Bypass -File .cache/webgpu-f3-user-build-20261019/start.ps1`; READY potvrzeno a `verify.mjs` ověřilHTTPhealth,589source bytes a všech19skutečněservírovanýchbajtovýchSHA, embeddedsource77d a jednotnoucore/loadersidentitu. Ověření browser/GPU se zde znovu nespouštělo. Předchozí nativecombined1513/1513+fullTS/build+4integrace a omezenýnativeGPU smoke patří k přesně stejnému source/dist, viz navazující evidence.
+- Původní4199 má aktuálně shodných17deliveredcode SHA a servírovanéHTML proti původní buildidentity.4188/4192/starší snapshoty se neotevřely k zápisu. CizíWIP zůstává mimo změny.
+- Ukončení jen přes vlastní `stop.ps1`, které ověří task/cwd/PID/start/path/command a ukončí pouze shodné vlastníprocesy. Pak zkontrolovat4201/2596nenaslouchají a teprve následněrelease. Nezastavovat podleportu/stáří. Do té dobyheartbeat≤15min.
+
+Evidence: `docs/performance/evidence/webgpu-migration-20261016/f3-user-build-4201/README.md`. Build zpřístupňuje dílčí přijatéF3;≥100ms hitches, Medium,≥3actual, úplnáfunkčnípřejímka a default zůstávají otevřené. Staré pilotní157,6→128,6ms nejsou novým měřením tohoto webserveru.
