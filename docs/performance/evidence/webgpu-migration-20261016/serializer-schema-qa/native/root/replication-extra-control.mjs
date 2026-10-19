@@ -1,0 +1,4 @@
+import assert from'node:assert/strict';import{readFileSync,writeFileSync}from'node:fs';import{join}from'node:path';
+const root=import.meta.dirname,b=JSON.parse(readFileSync(join(root,'runs-f3-replica/w4/benchmark.json')));assert.equal(b.ambient.passengers,2);
+for(const name of ['start.ps1','stop.ps1','collect.mjs','gpu-state.mjs']){const p=join(root,'replica-'+name),s=readFileSync(p,'utf8');assert.ok(s.includes("'w6'"));writeFileSync(p,s.replaceAll("'w6'","'w6','w7'"));}
+const p=join(root,'replication-protocol.json'),v=JSON.parse(readFileSync(p));v.additionalRuns=[['w7','reference']];v.additionalReason='W4 has2simulated passengers versus prespecified0. Retain as valid different-load run, add one reference before inspecting its outcome to obtain3matching controls. No filtering by speed/hitch result.';writeFileSync(p,JSON.stringify(v,null,2)+'\n');

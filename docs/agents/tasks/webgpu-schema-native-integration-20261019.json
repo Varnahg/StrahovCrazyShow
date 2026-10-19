@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-schema-native-integration-20261019",
+  "title": "KEY-31: rezervovat2568 pro clean a combined integraci nativního serializer patche",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [],
+  "resources": ["port:2568"],
+  "acceptance": ["Pouze procesní rezervace standardního integračního portu; source/logy vlastní root serializer QA task. Spouštět sekvenčně, původní skripty bezezměny."],
+  "verification": ["Před/po každé integraci ověřit skutečnýport; cizí proces neukončovat. Po dokončení cleanup a release."],
+  "notes": ["Root webgpu-01a15102-schema drží heavy-validation v parentQA. Native task je předaný scoped payload; fresh install a full clean/combined pipeline probíhají před runtime integrací."]
+}

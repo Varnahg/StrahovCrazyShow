@@ -1,0 +1,168 @@
+{
+  "sources": {
+    "native-clean-f3": {
+      "snapshotId": "3c4be6d025f8524687e2eeb1cdf8f99f1c007ef12593ddda7c7db1ceb650fa03",
+      "files": 576
+    },
+    "native-combined-f3": {
+      "snapshotId": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+      "files": 589
+    }
+  },
+  "payloadSha256": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+  "cleanPassed": 1453,
+  "combinedPassed": 1513,
+  "fullTypesBuild": true,
+  "isolatedIntegrations": {
+    "clean": true,
+    "combined": true,
+    "scope": "Original fixed2568 runner, four scenarios each; verify owned port cleanup separately."
+  },
+  "freshInstall": {
+    "source": "3c4be6d025f8524687e2eeb1cdf8f99f1c007ef12593ddda7c7db1ceb650fa03",
+    "packageFiles": 10860,
+    "actualMaterialSha256": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    "originalSharedFilesUnchanged": true,
+    "otherPackageFilesExact": true,
+    "appLoaderSameCoreIdentity": true,
+    "physicalCopiesWitness": [
+      "@babylonjs/core/scene.js",
+      "@babylonjs/loaders/glTF/glTFFileLoader.js"
+    ],
+    "sourceManifestUnchanged": true,
+    "install": {
+      "command": "pnpm install --frozen-lockfile --ignore-scripts --package-import-method=copy",
+      "exitCode": 0,
+      "log": "native-install-2.log",
+      "sha256": "db9482399875e9a36cc925c6b0104043572ee9b6acdd957e62503b43874dc299"
+    },
+    "firstOfflineAttempt": {
+      "exitCode": 1,
+      "log": "native-install-1.log",
+      "reason": "Missing cached postcss metadata; no source edits, retried online with frozen lock."
+    }
+  },
+  "pipeline": {
+    "scope": "Sequential actual pnpm commands over native clean and accepted-combined snapshots; no GPU benchmark during these checks.",
+    "jobs": [
+      {
+        "label": "clean-build",
+        "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\native-clean-f3",
+        "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+        "source": "3c4be6d025f8524687e2eeb1cdf8f99f1c007ef12593ddda7c7db1ceb650fa03",
+        "startedAtUTC": "2026-10-19T09:39:55.916Z",
+        "env": {
+          "VITE_SOURCE_SNAPSHOT_ID": "3c4be6d025f8524687e2eeb1cdf8f99f1c007ef12593ddda7c7db1ceb650fa03",
+          "STRAHOV_SOURCE_SNAPSHOT_ID": "3c4be6d025f8524687e2eeb1cdf8f99f1c007ef12593ddda7c7db1ceb650fa03",
+          "GIT_CEILING_DIRECTORIES": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019",
+          "pnpm_config_verify_deps_before_run": "false"
+        },
+        "state": "finished",
+        "exitCode": 0,
+        "finishedAtUTC": "2026-10-19T09:40:43.822Z",
+        "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\native-clean-build.log",
+        "sha256": "481c8d9c9e4b35e19f342a48c35c4257c6cc360a7baf72d5df61872a0c4c1b6a"
+      },
+      {
+        "label": "clean-integration",
+        "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\native-clean-f3",
+        "command": "pnpm --config.verify-deps-before-run=false test:integration",
+        "source": "3c4be6d025f8524687e2eeb1cdf8f99f1c007ef12593ddda7c7db1ceb650fa03",
+        "startedAtUTC": "2026-10-19T09:40:43.833Z",
+        "env": {
+          "VITE_SOURCE_SNAPSHOT_ID": "3c4be6d025f8524687e2eeb1cdf8f99f1c007ef12593ddda7c7db1ceb650fa03",
+          "STRAHOV_SOURCE_SNAPSHOT_ID": "3c4be6d025f8524687e2eeb1cdf8f99f1c007ef12593ddda7c7db1ceb650fa03",
+          "GIT_CEILING_DIRECTORIES": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019",
+          "pnpm_config_verify_deps_before_run": "false"
+        },
+        "state": "finished",
+        "exitCode": 0,
+        "finishedAtUTC": "2026-10-19T09:41:09.028Z",
+        "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\native-clean-integration.log",
+        "sha256": "01cedb08f0da7d1c439f26b37af4a922f7ccc13d5410abc161f9e6873efaed88"
+      },
+      {
+        "label": "combined-test",
+        "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\native-combined-f3",
+        "command": "pnpm --config.verify-deps-before-run=false test",
+        "source": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+        "startedAtUTC": "2026-10-19T09:41:09.038Z",
+        "env": {
+          "VITE_SOURCE_SNAPSHOT_ID": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+          "STRAHOV_SOURCE_SNAPSHOT_ID": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+          "GIT_CEILING_DIRECTORIES": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019",
+          "pnpm_config_verify_deps_before_run": "false"
+        },
+        "state": "finished",
+        "exitCode": 0,
+        "finishedAtUTC": "2026-10-19T09:44:10.345Z",
+        "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\native-combined-test.log",
+        "sha256": "d0b2487d5bb1247fcf904ae83aa54ff63047acb077ae64c22aef74545bd33896"
+      },
+      {
+        "label": "combined-build",
+        "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\native-combined-f3",
+        "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+        "source": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+        "startedAtUTC": "2026-10-19T09:44:10.355Z",
+        "env": {
+          "VITE_SOURCE_SNAPSHOT_ID": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+          "STRAHOV_SOURCE_SNAPSHOT_ID": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+          "GIT_CEILING_DIRECTORIES": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019",
+          "pnpm_config_verify_deps_before_run": "false"
+        },
+        "state": "finished",
+        "exitCode": 0,
+        "finishedAtUTC": "2026-10-19T09:44:53.279Z",
+        "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\native-combined-build.log",
+        "sha256": "0c760db3ea071fe296437edc907487ffb57f5c1bd52e90e66b6595e04bbb36e3"
+      },
+      {
+        "label": "combined-integration",
+        "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\native-combined-f3",
+        "command": "pnpm --config.verify-deps-before-run=false test:integration",
+        "source": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+        "startedAtUTC": "2026-10-19T09:44:53.292Z",
+        "env": {
+          "VITE_SOURCE_SNAPSHOT_ID": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+          "STRAHOV_SOURCE_SNAPSHOT_ID": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+          "GIT_CEILING_DIRECTORIES": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019",
+          "pnpm_config_verify_deps_before_run": "false"
+        },
+        "state": "finished",
+        "exitCode": 0,
+        "finishedAtUTC": "2026-10-19T09:45:13.733Z",
+        "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\native-combined-integration.log",
+        "sha256": "b255c82379dbccf5d216580325f4f6ce489839bdaf111fda55230e1d337d4c78"
+      }
+    ]
+  },
+  "gpuSmoke": {
+    "completed": true,
+    "scope": "Limited actual native-built combined smoke only; not final image/LOD/lifecycle/multiplayer or performance acceptance.",
+    "source": "77d6064f02cd5bfb6cc394dc22858bc56996be77dbf6482fd11cb765e39d2a52",
+    "session": "2f4e46a9-5d0f-4553-a9c1-1808d2887ab8",
+    "records": 1156,
+    "primaryBenchmarkOrdinal": 2,
+    "uiRawMatches": 1,
+    "healthValid": true,
+    "pending": 0,
+    "renderErrors": 0,
+    "assetErrors": 0,
+    "browserErrors": 0,
+    "carEnteredAndDriven": true,
+    "editorPresets": [
+      "Mia",
+      "Robin",
+      "Niki",
+      "Alex",
+      "Eli",
+      "Sam"
+    ],
+    "evidence": "runs-native/n1/",
+    "firstWalkingAttemptPreserved": true,
+    "transientEditorImagesPreserved": true,
+    "independentReview": "One stale pre-smoke pending field corrected; raw/source/pipeline/car contexts otherwise verified."
+  },
+  "remaining": "KEY31/32 remaining hitches, synthetic churn limits, final Medium and3-session WebGL2/WebGPU comparison and complete functional/image/lifecycle acceptance."
+}

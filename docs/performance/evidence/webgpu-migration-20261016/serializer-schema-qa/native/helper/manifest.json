@@ -1,0 +1,71 @@
+{
+  "task": "webgpu-schema-native-20261019",
+  "owner": "webgpu-01a15102-schema-native",
+  "files": {
+    "patches/@babylonjs__core@9.30.0.patch": "a586e5501d61c197ade5604a23b5f64a3e01d171ef4f839bbe94001f1d6b422b",
+    "pnpm-lock.yaml": "35e3b0d65cf484678129b0c54a3e42acde1b2540308f125ba08bec5c56f33e0c",
+    "tests/material-defines-schema.test.ts": "21a38840fdb6733123cd7ecafa0845661e07b201afc271a0a7a6fe7c8b22390b",
+    "tests/material-defines-schema-shared.test.ts": "12064f6124d2140edcd00e61bb5b926cdd38459024abdd416ef21b5e551896ff",
+    "tests/fixtures/serializer-schema/installed.ts": "58c835492b54397de7baf75f0839ecfd7a4ed98011fb23f31378406597378e57",
+    "tests/fixtures/serializer-schema/LICENSE.md": "9362ea9ea17cb221a20cbbd63f404710834cc273d2a9a7b60314fd68ab702cd6",
+    "tests/fixtures/serializer-schema/materialDefines.oracle.mjs": "43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4",
+    "tests/fixtures/serializer-schema/provenance.json": "114363051e16b8059f6e73eef0038bdf5138d058de4db1c84eeb17ed61c91d4a"
+  },
+  "inputs": {
+    ".cache/webgpu-schema-shared-helper-20261019/candidate/Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    ".cache/webgpu-schema-shared-helper-20261019/manifest.json": "e898c89f0f9c5e32d7c2d61fb6df4cd9cf0e07004d81293739b83e4ed97a1492",
+    ".cache/webgpu-schema-shared-helper-20261019/shared.test.mjs": "d3e083ec1e0115579f73210747abe7f338bfd3f089972ff8b427a90464347fe1",
+    ".cache/webgpu-serializer-schema-qa-20261019/candidate-v3/tests/material-defines-schema.test.ts": "a638b5ff0eedfbd4adf3ffd50c9c008cd31f20f9882ab763b1e0253d25588d4d",
+    ".cache/webgpu-serializer-schema-qa-20261019/reference/node_modules/@babylonjs/core/Materials/materialDefines.js": "43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4",
+    ".cache/webgpu-serializer-schema-qa-20261019/candidate-v3/node_modules/@babylonjs/core/Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768"
+  },
+  "artifacts": {
+    ".cache/webgpu-schema-native-20261019/before.lock": "14815c569092aa38180ecd8059881bc2a5e8380e2a304046b07c3dbdcc7a918e",
+    ".cache/webgpu-schema-native-20261019/before.patch": "10d6dff4b05849f0e6262f439900466a78426c73c385961949405f893e53f1e8",
+    ".cache/webgpu-schema-native-20261019/first-light-results.json": "697964d4b54f8b15ae98e7d2a67fb27680dc3a40d9f196fe1343f648fead6297",
+    ".cache/webgpu-schema-native-20261019/first-types-failed.log": "5e309ec7d1559c8e38ab21d506d5e3fe07c82be1c2bfa72338f71c2b9464151f",
+    ".cache/webgpu-schema-native-20261019/freeze.mjs": "974c00e38726240c9428ab3a1037ccc6f5266de9f69921e9ee83766a818ad5c8",
+    ".cache/webgpu-schema-native-20261019/light-results.json": "ca00d3ce3b290daefae5facbe11467af38a1152ec398ff4095720999ac94872e",
+    ".cache/webgpu-schema-native-20261019/new-material-defines.patch": "db570b3e550a23eca4eed73f9e5ba6d29c2c2519a392f0fecba6b669829ec8d4",
+    ".cache/webgpu-schema-native-20261019/new-test.log": "681a139e68f352852f7c7222185eca9cde17e8d083e89aa2725811487d50352b",
+    ".cache/webgpu-schema-native-20261019/new-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".cache/webgpu-schema-native-20261019/old-material-defines.patch": "8a485be2c2b69ffb683c461aab0c43a918c1f8d1bf9bfa4524d9d7e62a749fb2",
+    ".cache/webgpu-schema-native-20261019/old-test.log": "65f73d9ba9698267c65fa3da6276f31f8db0d07a48cc5307dce8e939f8531c25",
+    ".cache/webgpu-schema-native-20261019/patch-proof.json": "ab88032864a854dca80eaef26391cb3fbb36a2ab3d5cee963683dfea32b7bae2",
+    ".cache/webgpu-schema-native-20261019/prepare.mjs": "a115bf0e26d12968e541cfbf873dcbe249efcdf13445079b599d02396de9c5a4",
+    ".cache/webgpu-schema-native-20261019/pristine-materialDefines.js": "fcb89b6c947b81c0907b80caf9f3259b83b0f597922a149f5288f1e9082ca847",
+    ".cache/webgpu-schema-native-20261019/run-light.mjs": "5cf866a2205317653acad82a7340116d2148076e482638f3593f56243dd52ca2"
+  },
+  "tests": {
+    "passed": 7,
+    "failed": 0,
+    "exitCode": 0,
+    "scope": "52 differential cases/156 calls +2 initialization probes +5 shared metadata tests",
+    "red": {
+      "passed": 2,
+      "failed": 5,
+      "exitCode": 1
+    },
+    "scopedTypes": {
+      "exitCode": 0
+    }
+  },
+  "proof": {
+    "oldHash": "10d6dff4b05849f0e6262f439900466a78426c73c385961949405f893e53f1e8",
+    "newHash": "a586e5501d61c197ade5604a23b5f64a3e01d171ef4f839bbe94001f1d6b422b",
+    "oldLockHash": "14815c569092aa38180ecd8059881bc2a5e8380e2a304046b07c3dbdcc7a918e",
+    "newLockHash": "35e3b0d65cf484678129b0c54a3e42acde1b2540308f125ba08bec5c56f33e0c",
+    "lockReferences": 6,
+    "pristineSha256": "fcb89b6c947b81c0907b80caf9f3259b83b0f597922a149f5288f1e9082ca847",
+    "oracleSha256": "43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4",
+    "payloadSha256": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    "otherPatchSectionsByteExact": true,
+    "lockInverseExact": true,
+    "materialDefinesReplayExact": true
+  },
+  "limitations": [
+    "No fresh install/full suite/full project types/build/integration/GPU/commit by leaf; root owns these gates.",
+    "Public corpus exercises installed runtime; private metadata assertions inspect an isolated copy of exact installed source bytes.",
+    "No new FPS claim. F3 synthetic unique-shape churn regression remains a known measured limitation."
+  ]
+}

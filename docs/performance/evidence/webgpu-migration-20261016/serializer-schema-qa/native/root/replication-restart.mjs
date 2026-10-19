@@ -1,0 +1,5 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+const root=import.meta.dirname;
+for(const name of ['start.ps1','stop.ps1','collect.mjs','gpu-state.mjs']){const p=join(root,'replica-'+name);writeFileSync(p,readFileSync(p,'utf8').replaceAll("'r1','r2','r3','r4','r5','r6'","'r1','v1','v2','v3','v4','v5','v6'"));}
+const p=join(root,'replication-protocol.json'),protocol=JSON.parse(readFileSync(p));protocol.runs=protocol.runs.map(([id,source])=>[id.replace('r','v'),source]);protocol.schedule.ready='Poll enabled public Svítilna button from immediately after join, at1s intervals; hostUTC observation and actual telemetry ready-to-benchmark delta retained. UI waitFor selector deadline was too short for startup; no source/runtime change.';protocol.initialAttempt={id:'r1',benchmarkPerformed:false,reason:'Startup selector wait ended before ready and timing gate was not yet established. Stopped before any benchmark; no outcome-based exclusion.'};writeFileSync(p,JSON.stringify(protocol,null,2)+'\n');writeFileSync(join(root,'runs-f3-replica/r1/aborted.json'),JSON.stringify(protocol.initialAttempt,null,2)+'\n');
