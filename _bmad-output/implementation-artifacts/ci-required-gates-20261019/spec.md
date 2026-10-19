@@ -2,7 +2,7 @@
 title: 'KEY-44: Povinná CI a přijetí změn do main'
 type: 'chore'
 created: '2026-10-19'
-status: 'in-review'
+status: 'done'
 baseline_commit: 'db9108ddd3d069030abebd0fcccd6ecefbd0ff53'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -48,11 +48,11 @@ Zachovat BMAD 6.12.4, dependency lockfile, existující testy, LFS a cizí WIP. 
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `.github/workflows/ci.yml`: jeden Ubuntu job; LFS checkout, Node/pnpm, frozen install, task validate, README, full tests, build, integration. Pinned actions, read permissions, timeout a rušení staršího běhu stejného PR.
-- [ ] `docs/agents/ci.md`: popsat přesné checky, SHA-vázané přijetí, aktualizaci base, obnovu a praktické důkazy.
-- [ ] `docs/verification-evidence/ci-main-20261019/`: uložit výzkum, rozhodnutí, GitHub SHA/run/ruleset výsledky a review.
-- [ ] `docs/agents/handoffs/ci-required-gates-20261019.md`: skutečné výsledky a omezení, předání integrátorovi.
-- [ ] GitHub: otevřít vlastní PR, přijmout review, ověřit skutečnou CI, vytvořit aktivní ruleset pro main, merge přesně ověřeného head a ověřit main run.
+- [x] `.github/workflows/ci.yml`: jeden Ubuntu job; LFS checkout, Node/pnpm, frozen install, task validate, README, full tests, build, integration. Pinned actions, read permissions, timeout a rušení staršího běhu stejného PR.
+- [x] `docs/agents/ci.md`: popsat přesné checky, SHA-vázané přijetí, aktualizaci base, obnovu a praktické důkazy.
+- [x] `docs/verification-evidence/ci-main-20261019/`: uložit výzkum, rozhodnutí, GitHub SHA/run/ruleset výsledky a review.
+- [x] `docs/agents/handoffs/ci-required-gates-20261019.md`: skutečné výsledky a omezení, předání integrátorovi.
+- [x] GitHub: otevřít vlastní PR, přijmout review, ověřit skutečnou CI, vytvořit aktivní ruleset pro main, merge přesně ověřeného head a ověřit main run.
 
 **Acceptance Criteria:**
 - Given čistý checkout, when GitHub provede CI, then projdou skutečné existující testy, build a celá síťová integrace se staženými assety.
@@ -69,6 +69,8 @@ Náklady: runner-minuty a LFS přenos. Herní výkon, vzhled a cache se nemění
 ## Implementation Notes
 
 Specifikace vznikla z průzkumu a již výslovně schváleného rozsahu; projektová policy nevyžaduje opakování souhlasu. Pilot má vlastní blocked task.
+
+Přijato: PR #7, head 94e6481415eba8802d02d34f9e09c06e9bb65137, merge a9f1805808c653d2a9fb9cd81def446bfaead588. PR run39321039004 PASS; main run39321924235 PASS (5m6s). Všech 1491 testů, build, celá integrace, LFS, frozen install a dokumentace prošly. Ruleset25433383 aktivní, bez bypassu. Tři review vrstvy a následná kontrola finální delta vrátily []. Všechny execution položky byly dokončeny, podklady jsou v docs/verification-evidence/ci-main-20261019/ a Linear KEY-44. Pilot je další samostatný task, nikoli nedokončená část CI změny.
 
 ## Spec Change Log
 

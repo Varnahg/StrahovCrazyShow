@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "ci-lfs-pilot-20261019",
   "title": "KEY-44: autonomní LFS preflight pilot s reálným selháním a obnovou",
-  "status": "blocked",
+  "status": "ready",
   "dependsOn": [
     "ci-required-gates-20261019"
   ],
@@ -11,13 +11,9 @@
     "tests/lfs-assets.test.ts",
     ".github/workflows/ci.yml",
     "docs/agents/handoffs/ci-lfs-pilot-20261019.md",
-    "docs/verification-evidence/ci-lfs-pilot-20261019/",
-    "_bmad-output/implementation-artifacts/ci-lfs-pilot-20261019/",
-    ".cache/ci-lfs-pilot-20261019/"
+    ".cache/ci-lfs-pilot-worker-20261019/"
   ],
-  "resources": [
-    "github-ci-validation"
-  ],
+  "resources": [],
   "acceptance": [
     "Úzký preflight rozpozná chybějící nebo nestáhnuté tracked LFS objekty; skutečné soubory projdou a nedojde k načtení velkých assetů celých do RAM.",
     "Autonomní task projde red-test PR, skutečným neúspěšným CI a odmítnutým merge; uchová se diff a selhání, nová agentní relace práci obnoví a opraví.",
