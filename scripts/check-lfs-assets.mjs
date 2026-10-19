@@ -120,7 +120,7 @@ function checkAsset(root, file) {
 function main() {
   const root = realpathSync(parseRoot(process.argv.slice(2)));
   if (!statSync(root).isDirectory()) throw new Error("Root must be a directory");
-  const topLevel = git(root, ["rev-parse", "--show-toplevel"], "Git repository root check").stdout.trim();
+  const topLevel = git(root, ["rev-parse", "--show-toplevel"], "Git repository root check").stdout.replace(/\r?\n$/, "");
   if (realpathSync(topLevel) !== root) throw new Error("Root must be the Git checkout root directory");
   const files = inventory(root);
   let failures = 0;

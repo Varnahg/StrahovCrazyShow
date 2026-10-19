@@ -9,6 +9,7 @@
   "writePaths": [
     "scripts/check-lfs-assets.mjs",
     "tests/lfs-assets.test.ts",
+    "tests/lfs-assets-edge-cases.test.ts",
     ".github/workflows/ci.yml",
     "docs/agents/handoffs/ci-lfs-pilot-20261019.md",
     ".cache/ci-lfs-pilot-worker-20261019/"
@@ -26,6 +27,7 @@
     "Nová agentní relace obnoví práci z handoffu a zachovaného commitu; SHA/diff/run ID doloženy."
   ],
   "notes": [
+    "Review 19.10: koordinátor rozšířil scope o samostatné edge-case testy, aby původní22testů zůstalo bajtově beze změny. Opravit pouze trim platné koncové mezery rootu a doplnit úspěšné malé assety64/1024B. Před změnou scope vlastní source claim uvolněn, poté nový claim.",
     "Výslovné zadání uživatele; KEY-44. Blokované do přijetí CI a ochrany main.",
     "Podagent si přečte AGENTS/policy, vlastní disjunktní claim; žádný rekurzivní BMAD. Převod po red fázi je výslovný, zdokumentovaný, nikoli převzetí podle stáří.",
     "Koordinátor připraví před spuštěním pilotu jeho renderer/spec rezervaci a administrativně aktualizuje status."
