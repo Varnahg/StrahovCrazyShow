@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-medium-attribution-20261019",
+  "title": "KEY-31/32: přiřadit dodatečné Medium programy na současném F3",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-medium-attribution-20261019/",
+    "docs/agents/handoffs/webgpu-medium-attribution-20261019.md",
+    "docs/performance/evidence/webgpu-migration-20261016/medium-attribution/",
+    "_bmad-output/implementation-artifacts/webgpu-medium-attribution-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-9880f493210d/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4200",
+    "port:2595"
+  ],
+  "acceptance": [
+    "Přesná kopie současného clean F3 3c4be6 včetně testů a patche MD3cc; pouze šest existujících bounded attribution donor souborů s ověřením preimage a výsledných SHA.",
+    "Jeden skutečný Edge Medium sběr přiřadí nové preparations k materiálům; úplnost/omitted/unmatched a chybové stavy explicitně. Žádná výkonová přejímka z diagnostického běhu.",
+    "Žádný nový profiler/cache ani produkční změna, hráčské snapshoty a cizí WIP beze změny. Výsledek určí následující opravu přípravy."
+  ],
+  "verification": [
+    "Přesná source parity, cílené existující profiler/attribution testy, fullTS/build nad izolovaným snapshotem a praktický Edge Medium průjezd.",
+    "Handoff s raw záznamy, zdrojem, skutečným viewport/quality/backend a omezeními. Ukončit vlastní procesy před release."
+  ],
+  "notes": [
+    "Koordinátor stávajícího cíle; BMAD oneshot QA přenos existujícího mechanismu. Dosavadní Medium +17 preparations/+18 syncpipelines, 5>=100ms; příčina jednotlivých requestů dosud neznámá.",
+    "Varianty: plain telemetry nemá material identity; nové hooky zbytečně rozšiřují diagnostiku; existující reviewed šestifile donor má přesné F3 preimages, zvolen. No profileEnvironment=1.",
+    "Před změnou přípravy bude samostatný průzkum a úzký implementační task.",
+    "Přijat bounded diagnostic capture,61/61+fullTS/build,17requests/2matched/15shadowunmatched explicit; ownservices stopped. Evidence medium-attribution/README.md. Nejde o výkonovou přejímku."
+  ]
+}
