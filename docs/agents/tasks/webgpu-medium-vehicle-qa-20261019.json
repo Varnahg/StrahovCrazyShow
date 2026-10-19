@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-medium-vehicle-qa-20261019",
+  "title": "KEY-31: ověřit vehicle přípravu Medium/High bez změny stínů",
+  "status": "blocked",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-medium-vehicle-qa-20261019/",
+    "docs/agents/handoffs/webgpu-medium-vehicle-qa-20261019.md",
+    "docs/performance/evidence/webgpu-migration-20261016/medium-vehicle-qa/",
+    "_bmad-output/implementation-artifacts/webgpu-medium-vehicle-qa-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-9880f493210d/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4200",
+    "port:2595"
+  ],
+  "acceptance": [
+    "Současný clean F3 včetně testů, bez diagnostického donor overlay. Rozšířit pouze existující vehicle-0/1 stages na všechny WebGPU kvality a pojmenování odpovídajícím způsobem sjednotit.",
+    "Zachovat stíny, kvality, mapování světel, fyziku, assety, camera/play behavior, readiness/timeout/revision/restore a lifecycle. Žádná nová cache/derivedshader sharing.",
+    "Plain Edge Medium firstdrive rozhodne, zda počet nových programů klesne a zda nezhoršuje hitches. Nulový či nejasný přínos neopravňuje k native integraci. Hrané snapshoty/cizíWIP beze změny."
+  ],
+  "verification": [
+    "Cílené actualGame/light/quality preparation testy a fullTS/build v vlastní kopii; inverse source/hash; source-manifest obsahuje testy.",
+    "Actual production Edge Medium2040x986/1Alex/night/car stejnéroute. Nejde o úplnou FPS A/B přejímku kvůli trafficclock. Evidence/handoff, samostatný commit po přijetí/odmítnutí."
+  ],
+  "notes": [
+    "Výzkum medium-attribution/README.md main6da2b4f:2mainleaves carSPOTshadow+15shadowprograms. Game vehicle stages pouzeLow;Medium shadow256 není připravený.",
+    "Varianty: příprava existujících skutečných prostředků předReady (zvoleno jako nejmenší kandidát, vyššístartup přijatelný); sharing ShadowDepthWrapper GUID potřebuje kompletní source/ABI/refcount/lifecycle průzkum a je rizikovější; snížení/vypnutí stínů nepřijatelné.",
+    "Neúspěšný kandidát zachovat jako odmítnutý, nepovažovat jeho testy za hotovouKEY31/32. BMADoneshot QA v povolenémcache scope.",
+    "Před implementací průzkum prokázal omezení širší přípravy: nové submeshe stále dostanou nové GUID. Kandidát zatím nebyl vytvořen/testován; přednost má izolované sdílení přesných derived programů s lifecycle proof, poté podle zbytků příprava."
+  ]
+}
