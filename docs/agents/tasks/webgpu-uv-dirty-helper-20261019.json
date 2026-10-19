@@ -1,0 +1,12 @@
+{
+  "schemaVersion":1,
+  "id":"webgpu-uv-dirty-helper-20261019",
+  "title":"KEY-31/32: omezeně změřit skutečné UV identity invalidace",
+  "status":"done",
+  "dependsOn":[],
+  "writePaths":[".cache/webgpu-uv-dirty-helper-20261019/","docs/agents/handoffs/webgpu-uv-dirty-helper-20261019.md"],
+  "resources":[],
+  "acceptance":["Pouze copied pinnedTexture f27/SDWf8, žádná optimalizace ani změna notifikací/math. QA named exports capture start/stop/read, defaultdisabled,64eventsmax,boundednames/parameters; clear scene/texture references po read/abort.","Změřit jen skutečné UV identity notification: textureid/name,first-vs-existingmatrix,old/newidentity,uBase/UVfields a synchronní markAllMaterialsAsDirty duration. Žádné timestampy pro každý běžný fastpath,getter nebo materiál, žádné callbackswaps.","Postcapture wrapper inventory až po trace stop: total declared pass-slot lengths/live wrappers/max length/submeshcount; nic z inventory uvnitř benchmarku. Selhání QA nesmí změnit return,throw,math ani notifikace.","Actual original/candidateTexture matrix/dirty/throw/noScene parity,disabled/overflow/repeated lifecycle a přesnýinverse; rawproof+handoff. BezGPU/fullsuite/build/install, přímýBMADleaf."],
+  "verification":["Cílené lehké CPU proof, exactpreimage/candidate/inverse hashes; rootownsGameintegration/build/actualcapture."],
+  "notes":["PředchozífirstUVguard nenípřijat,proto probe musí běžet nad nezměněným f27 a nesmí přeskočitprvní notification. Profil9765 doložilcallchain,nefirst/lateraniCPUshare. Plainc78 márender686.7ms alejinýprovoz/88C,nelzeodvoditpříčinu.","Rootkoordinátorautorizuje přesně tento helper; žádný další BMADrenderer/delegace/runtimepin nebo foreignWIP." ]
+}
