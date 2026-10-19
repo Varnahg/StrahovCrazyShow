@@ -1,0 +1,166 @@
+{
+  "sources": {
+    "fixture/cold.test.ts": "2dc4c9a96f2ce6a24acbbadb054889dc81d81ebb7b6fe8c041c369bb4d57f920",
+    "fixture/native-engine.ts": "4f1ece38d594671d1e6824e6acb9cb77e435584fc4480e26331bd8e076d39efb",
+    "variant-loader.mjs": "b8420f8a55eb358e1fc5c59736a82c4d8cabddad4b2a8a4490d3a4b041d34a25",
+    "variants/F1/Materials/materialDefines.js": "e4f6ef0b87f24c9c482705ed1dab46b4853ededb3eb97e040e66c7dab258c3e0"
+  },
+  "runs": [
+    {
+      "label": "cold-1-A",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "cold.test.ts"
+      ],
+      "env": {
+        "SCHEMA_VARIANT": "A",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-1-A-source.json",
+        "COLD_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-1-A.json",
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "startedAt": "2026-10-19T08:14:11.129Z",
+      "finishedAt": "2026-10-19T08:14:13.296Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-1-A.log",
+      "sha256": "1838c6dee7429819b5c8545c238f8ae5efebe9f644102294fc9319f8aab92cd6"
+    },
+    {
+      "label": "cold-2-F1",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "cold.test.ts"
+      ],
+      "env": {
+        "SCHEMA_VARIANT": "F1",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-2-F1-source.json",
+        "COLD_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-2-F1.json",
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "startedAt": "2026-10-19T08:14:13.310Z",
+      "finishedAt": "2026-10-19T08:14:15.424Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-2-F1.log",
+      "sha256": "d6264597c6cc8a0eb62c8b6ad01e3289e569cf4cb3ba8aa888ec5ae660d3f27f"
+    },
+    {
+      "label": "cold-3-M",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "cold.test.ts"
+      ],
+      "env": {
+        "SCHEMA_VARIANT": "M",
+        "OWNER_MODE": "owner",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-3-M-source.json",
+        "COLD_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-3-M.json",
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "startedAt": "2026-10-19T08:14:15.433Z",
+      "finishedAt": "2026-10-19T08:14:17.556Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-3-M.log",
+      "sha256": "ac7a3494974a36f128fd99115b251ee24fc72ce01a69061067ff9ce603398897"
+    },
+    {
+      "label": "cold-4-M",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "cold.test.ts"
+      ],
+      "env": {
+        "SCHEMA_VARIANT": "M",
+        "OWNER_MODE": "owner",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-4-M-source.json",
+        "COLD_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-4-M.json",
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "startedAt": "2026-10-19T08:14:17.564Z",
+      "finishedAt": "2026-10-19T08:14:19.687Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-4-M.log",
+      "sha256": "ace4f9a73027997797987c9e8d20ace9f465c9561ce596d28a23f1973f924321"
+    },
+    {
+      "label": "cold-5-F1",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "cold.test.ts"
+      ],
+      "env": {
+        "SCHEMA_VARIANT": "F1",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-5-F1-source.json",
+        "COLD_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-5-F1.json",
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "startedAt": "2026-10-19T08:14:19.695Z",
+      "finishedAt": "2026-10-19T08:14:22.165Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-5-F1.log",
+      "sha256": "e933279cd938a7efe2cf3a95a638ef4728bcc1d8fe202d0c39765ec5cb373da7"
+    },
+    {
+      "label": "cold-6-A",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "cold.test.ts"
+      ],
+      "env": {
+        "SCHEMA_VARIANT": "A",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-6-A-source.json",
+        "COLD_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-6-A.json",
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "startedAt": "2026-10-19T08:14:22.172Z",
+      "finishedAt": "2026-10-19T08:14:24.276Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\cold-f1\\cold-6-A.log",
+      "sha256": "ed5356a35717a7be34acf810b16978b933d645a38b94b481a372185528e7c5a9"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "source": "193477b9df5b54d3256ee8cf8285344ebd76dd55aeb929a7f5bfbd0d6b43ccab",
+  "payloadSha256": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+  "tests": {
+    "command": "pnpm --config.verify-deps-before-run=false test",
+    "passed": 1448,
+    "failed": 0,
+    "exitCode": 0,
+    "log": "f3-full-test.log",
+    "sha256": "8c07daada3923226a32825b5aa9c4f27da8b48fd5616ce39c39a0b63fbd2a3be"
+  },
+  "build": {
+    "command": "pnpm --config.verify-deps-before-run=false build --configLoader native",
+    "env": {
+      "VITE_SOURCE_SNAPSHOT_ID": "193477b9df5b54d3256ee8cf8285344ebd76dd55aeb929a7f5bfbd0d6b43ccab"
+    },
+    "exitCode": 0,
+    "log": "f3-build-with-id.log",
+    "sha256": "f2d454b7bbaf15d43de01e347bcbed3693d8d8a414c4292aa244d7547dc71612",
+    "scope": "Full tsc --noEmit and Vite build, embedded client snapshot ID verified"
+  },
+  "integration": {
+    "performed": false,
+    "scope": "No F3 integration yet. This is private override GPU QA, not clean/combined production patch acceptance."
+  },
+  "scope": "Source and private payload exact after tests/build. Earlier missing-ID build/run preserved and excluded. F1/F2 CPU and F3 synthetic churn limits retained; production FPS/firstpeak benefit not yet accepted."
+}

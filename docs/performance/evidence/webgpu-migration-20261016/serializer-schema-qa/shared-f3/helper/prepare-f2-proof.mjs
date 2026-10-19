@@ -1,0 +1,3 @@
+import fs from'node:fs';import{dirname,join,resolve}from'node:path';import{fileURLToPath}from'node:url';import{createHash}from'node:crypto';const root=dirname(fileURLToPath(import.meta.url)),f1=resolve(root,'../webgpu-serializer-schema-helper-20261019'),sha=b=>createHash('sha256').update(b).digest('hex'),copied={};
+for(const p of['differential.test.mjs','types.mjs']){const b=fs.readFileSync(join(f1,p));fs.writeFileSync(join(root,p),b,{flag:'wx'});copied[p]=sha(b);}
+fs.writeFileSync(join(root,'proof-adapters.json'),JSON.stringify({copied,scope:'Unchanged frozenF1 differential8/actual9blocks and scopedtypes fixture. F2 uses own candidate module, same native oracle; no assertion weakening.'},null,2)+'\n',{flag:'wx'});
