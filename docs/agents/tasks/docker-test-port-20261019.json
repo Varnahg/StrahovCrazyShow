@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-test-port-20261019",
+  "title": "KEY-45: izolovaný Docker test port po kolizi s existujícím KeyCraft",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/docker-test-port-20261019.md"
+  ],
+  "resources": [
+    "port:18082"
+  ],
+  "acceptance": [
+    "Použít volný18082; existující KeyCraft8080/18080 neměnit."
+  ],
+  "verification": [
+    "Socket preflight, Docker Compose project namespace, cleanup owned container."
+  ],
+  "notes": [
+    "Doplňuje docker-validation heavy/gpu claim; žádné cizí kontejnery se neukončují."
+  ]
+}
