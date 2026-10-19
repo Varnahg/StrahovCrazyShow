@@ -1,0 +1,7 @@
+// QA metadata-only fastpath: state exists before class binding for ESM cycles.
+var defineSchemas = new WeakMap();
+var defineSchemaReady = false;
+const schemaNamePattern = /^[A-Za-z_][A-Za-z0-9_]*(?![\s\S])/;
+const schemaLiteralPattern = /^[+-]?(?:(?:0|[1-9][0-9]*)(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?(?![\s\S])/;
+const SCHEMA_MAX_NAMES = 1024, SCHEMA_MAX_NAME_UNITS = 32768;
+

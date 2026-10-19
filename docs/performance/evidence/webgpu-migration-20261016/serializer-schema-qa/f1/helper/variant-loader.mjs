@@ -1,0 +1,10 @@
+import fs from'node:fs';import assert from'node:assert/strict';import{registerHooks}from'node:module';import{createHash}from'node:crypto';import{dirname,join,resolve}from'node:path';import{fileURLToPath,pathToFileURL}from'node:url';
+const root=dirname(fileURLToPath(import.meta.url)),mode=process.env.SCHEMA_VARIANT;assert.ok(['A','F','M'].includes(mode));const sha=b=>createHash('sha256').update(b).digest('hex');
+const current=JSON.parse(fs.readFileSync(join(root,'input-manifest.json'))).current;
+const changes=JSON.parse(fs.readFileSync(resolve(root,'../webgpu-memo-current-proof-20261019/runtime-changes.json'))).changes;
+const targets=new Map(),loaded=[];
+for(const change of changes.filter(c=>c.path.endsWith('.js'))){const physical=fs.realpathSync(join(current,'node_modules',change.path));assert.equal(sha(fs.readFileSync(physical)),change.before);
+let selected=physical;if(mode==='F'&&change.path.endsWith('/materialDefines.js'))selected=join(root,'candidate/Materials/materialDefines.js');if(mode==='M')selected=resolve(root,'../webgpu-memo-current-proof-20261019/candidate/node_modules',change.path);
+const source=fs.readFileSync(selected,'utf8');const expected=mode==='M'?change.sha256:mode==='F'&&change.path.endsWith('/materialDefines.js')?JSON.parse(fs.readFileSync(join(root,'input-manifest.json'))).afterSha256:change.before;assert.equal(sha(source),expected);targets.set(pathToFileURL(physical).href,{path:change.path,physicalSha:change.before,source,selectedSha:expected});}
+registerHooks({load(url,context,next){const target=targets.get(url);if(!target)return next(url,context);assert.equal(sha(fs.readFileSync(fileURLToPath(url))),target.physicalSha);loaded.push({path:target.path,url,loadedSha:target.selectedSha,physicalSha:target.physicalSha});return{format:'module',source:target.source,shortCircuit:true};}});
+process.on('exit',()=>{if(process.env.SCHEMA_RECEIPT)fs.writeFileSync(process.env.SCHEMA_RECEIPT,JSON.stringify({mode,loaded,scope:'Exact selected complete source at same actual current core module URLs; no file mutation or second core identity.'},null,2)+'\n',{flag:'wx'});});

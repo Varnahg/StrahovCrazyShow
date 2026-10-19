@@ -1,0 +1,310 @@
+{
+  "sources": {
+    "candidate/Materials/materialDefines.js": "e4f6ef0b87f24c9c482705ed1dab46b4853ededb3eb97e040e66c7dab258c3e0",
+    "variant-loader.mjs": "3135772f3e18510e929b4b18207cd196a067f83a957960851395a68973b582c6",
+    "fixture/warm.test.ts": "1dd284a27065ae26c089fec58bf3301e282f2ce37697bc0fc46fcb8ba3832bc6",
+    "fixture/native-engine.ts": "4f1ece38d594671d1e6824e6acb9cb77e435584fc4480e26331bd8e076d39efb",
+    "fixture/trace.ts": "b8ec1d9ee56e2f0e5a405d715ebeaa1e9dd0097476821ca14d74c3f996de75d0",
+    "fixture/client/stable-light-state.ts": "4adfb37dae15ca6a0b9e1b65634266b6791ffc1d8c1aca01858a9557c7f7b8bc",
+    "fixture/client/gltf-light-budget.ts": "a6599ea1a18aa29e3661072083c4f77e396d21d1c85f5430d67f70c70f87fd90",
+    "fixture/client/cinematic-art.ts": "7aa011a230a17e0703ebda08ead509c6534b80af9c6dc23924a7e715c3a29b77"
+  },
+  "runs": [
+    {
+      "label": "correctness-A-class",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "tests/material-defines-serialization.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019\\fixture",
+      "env": {
+        "SCHEMA_VARIANT": "A",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-A-class-source.json",
+        "DEFINE_ORDER_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-A-class-report.json"
+      },
+      "startedAt": "2026-10-19T00:20:19.456Z",
+      "finishedAt": "2026-10-19T00:20:19.867Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-A-class.log",
+      "sha256": "8736f9fa1a40bdefc96071099ad0e9959cd1ae88cc9731d38c8ada04169cc715",
+      "passed": 6,
+      "failed": 0
+    },
+    {
+      "label": "correctness-A-wgsl",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "tests/material-defines-wgsl-order.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019\\fixture",
+      "env": {
+        "SCHEMA_VARIANT": "A",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-A-wgsl-source.json",
+        "DEFINE_ORDER_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-A-wgsl-report.json"
+      },
+      "startedAt": "2026-10-19T00:20:19.880Z",
+      "finishedAt": "2026-10-19T00:20:24.123Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-A-wgsl.log",
+      "sha256": "48061ee99c698bb911af3f4776b92fcef7bebd7d6cf33988402425b6f62541c1",
+      "passed": 12,
+      "failed": 0
+    },
+    {
+      "label": "correctness-F-class",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "tests/material-defines-serialization.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019\\fixture",
+      "env": {
+        "SCHEMA_VARIANT": "F",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-F-class-source.json",
+        "DEFINE_ORDER_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-F-class-report.json"
+      },
+      "startedAt": "2026-10-19T00:20:24.136Z",
+      "finishedAt": "2026-10-19T00:20:24.530Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-F-class.log",
+      "sha256": "39d614732d317f52ba5a40001ca502596a398915037b0f9a7c0ddec50527ee98",
+      "passed": 6,
+      "failed": 0
+    },
+    {
+      "label": "correctness-F-wgsl",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "tests/material-defines-wgsl-order.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019\\fixture",
+      "env": {
+        "SCHEMA_VARIANT": "F",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-F-wgsl-source.json",
+        "DEFINE_ORDER_REPORT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-F-wgsl-report.json"
+      },
+      "startedAt": "2026-10-19T00:20:24.541Z",
+      "finishedAt": "2026-10-19T00:20:28.710Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\correctness-F-wgsl.log",
+      "sha256": "d74f7bb849caba4f7aa2b7235970cb4195550ef72d38b523b72436a74edd9a3f",
+      "passed": 12,
+      "failed": 0
+    },
+    {
+      "label": "types",
+      "args": [
+        "types.mjs"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019",
+      "env": {},
+      "startedAt": "2026-10-19T00:20:28.722Z",
+      "finishedAt": "2026-10-19T00:20:44.785Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\types.log",
+      "sha256": "75ec16ecf8b0093c31050816b3355fc023c75ce4dcb04f71a5f30485acaef165",
+      "passed": 0,
+      "failed": 0
+    },
+    {
+      "label": "warm-1-A",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "warm.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019\\fixture",
+      "env": {
+        "SCHEMA_VARIANT": "A",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-1-A-source.json",
+        "WARM_REPORT": "file:///C:/Users/rezac/.codex/worktrees/29fa/StrahovCrazyShow/.cache/webgpu-serializer-schema-qa-20261019/warm-1-A.json"
+      },
+      "startedAt": "2026-10-19T00:20:44.801Z",
+      "finishedAt": "2026-10-19T00:20:51.713Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-1-A.log",
+      "sha256": "fd0de020e88ce4f34b8ea2e0b26b7be1155e6febc9947e42739bf2cdc6402beb",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "label": "warm-2-F",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "warm.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019\\fixture",
+      "env": {
+        "SCHEMA_VARIANT": "F",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-2-F-source.json",
+        "WARM_REPORT": "file:///C:/Users/rezac/.codex/worktrees/29fa/StrahovCrazyShow/.cache/webgpu-serializer-schema-qa-20261019/warm-2-F.json"
+      },
+      "startedAt": "2026-10-19T00:20:51.726Z",
+      "finishedAt": "2026-10-19T00:20:58.688Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-2-F.log",
+      "sha256": "70ee95c0696fccef6e82a982be8d8f7d3c5dece2894410a7c16cdc1325282e7e",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "label": "warm-3-M",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "warm.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019\\fixture",
+      "env": {
+        "SCHEMA_VARIANT": "M",
+        "OWNER_MODE": "owner",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-3-M-source.json",
+        "WARM_REPORT": "file:///C:/Users/rezac/.codex/worktrees/29fa/StrahovCrazyShow/.cache/webgpu-serializer-schema-qa-20261019/warm-3-M.json"
+      },
+      "startedAt": "2026-10-19T00:20:58.701Z",
+      "finishedAt": "2026-10-19T00:21:05.138Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-3-M.log",
+      "sha256": "1ab90b93e3ed7a78822d238366f176530680c6b12262c2f4609284fc7e1f123d",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "label": "warm-4-M",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "warm.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019\\fixture",
+      "env": {
+        "SCHEMA_VARIANT": "M",
+        "OWNER_MODE": "owner",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-4-M-source.json",
+        "WARM_REPORT": "file:///C:/Users/rezac/.codex/worktrees/29fa/StrahovCrazyShow/.cache/webgpu-serializer-schema-qa-20261019/warm-4-M.json"
+      },
+      "startedAt": "2026-10-19T00:21:05.151Z",
+      "finishedAt": "2026-10-19T00:21:11.516Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-4-M.log",
+      "sha256": "09b50984ab293f4445dc9f94c1f8251176ea5b48a95bbed63c258aff032df68b",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "label": "warm-5-F",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "warm.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019\\fixture",
+      "env": {
+        "SCHEMA_VARIANT": "F",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-5-F-source.json",
+        "WARM_REPORT": "file:///C:/Users/rezac/.codex/worktrees/29fa/StrahovCrazyShow/.cache/webgpu-serializer-schema-qa-20261019/warm-5-F.json"
+      },
+      "startedAt": "2026-10-19T00:21:11.528Z",
+      "finishedAt": "2026-10-19T00:21:17.945Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-5-F.log",
+      "sha256": "b1e7a1c43bee8796317b36ef9b6b55cb67815b522a56f0ab900d546f0ace1e48",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "label": "warm-6-A",
+      "args": [
+        "--import",
+        "../node_modules/tsx/dist/loader.mjs",
+        "--import",
+        "../variant-loader.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=60000",
+        "warm.test.ts"
+      ],
+      "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-helper-20261019\\fixture",
+      "env": {
+        "SCHEMA_VARIANT": "A",
+        "OWNER_MODE": "reference",
+        "SCHEMA_RECEIPT": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-6-A-source.json",
+        "WARM_REPORT": "file:///C:/Users/rezac/.codex/worktrees/29fa/StrahovCrazyShow/.cache/webgpu-serializer-schema-qa-20261019/warm-6-A.json"
+      },
+      "startedAt": "2026-10-19T00:21:17.957Z",
+      "finishedAt": "2026-10-19T00:21:24.834Z",
+      "exitCode": 0,
+      "error": null,
+      "log": "C:\\Users\\rezac\\.codex\\worktrees\\29fa\\StrahovCrazyShow\\.cache\\webgpu-serializer-schema-qa-20261019\\warm-6-A.log",
+      "sha256": "e50fd3d723fb6480efae7e551d46f00ff4b9e822edbdc262abbe6c4340ffae7c",
+      "passed": 5,
+      "failed": 0
+    }
+  ]
+}

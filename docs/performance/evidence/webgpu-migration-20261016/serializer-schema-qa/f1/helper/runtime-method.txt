@@ -1,0 +1,61 @@
+    toString() {
+        const cacheable = this !== null && (typeof this === "object" || typeof this === "function");
+        const schema = cacheable && defineSchemaReady ? defineSchemas.get(this) : undefined;
+        const fragments = { __proto__: null };
+        let names = schema ? null : { __proto__: null };
+        let matches = !!schema, count = 0, chars = 0, rows = 0, safeValues = true;
+        for (let index = 0; index < this._keys.length; index++) {
+            const prop = this._keys[index];
+            const value = this[prop];
+            const type = typeof value;
+            let fragment;
+            switch (type) {
+                case "number":
+                case "string":
+                    fragment = "#define " + prop + " " + value + "\n";
+                    break;
+                default:
+                    if (value) {
+                        fragment = "#define " + prop + "\n";
+                    }
+                    break;
+            }
+            fragments[index] = fragment;
+            if (fragment !== undefined) { chars += fragment.length; rows++; }
+            if (type === "number") safeValues = safeValues && Number.isFinite(value);
+            else if (type === "string") safeValues = safeValues && schemaLiteralPattern.test(value) && Number.isFinite(Number(value));
+            else if (type !== "boolean" && type !== "undefined" && value !== null) safeValues = false;
+            if (matches && schema.names[index] !== prop) {
+                matches = false;
+                names = { __proto__: null };
+                for (let previous = 0; previous < index && previous < SCHEMA_MAX_NAMES; previous++) names[previous] = schema.names[previous];
+            }
+            if (names && index < SCHEMA_MAX_NAMES) names[index] = prop;
+            count++;
+        }
+        if (matches && count !== schema.names.length) matches = false;
+        if (matches && safeValues && chars <= 32768 && rows <= 1024) {
+            let result = "";
+            for (const index of schema.order) { const fragment = fragments[index]; if (fragment !== undefined) result += fragment; }
+            return result;
+        }
+        let raw = "";
+        for (let index = 0; index < count; index++) { const fragment = fragments[index]; if (fragment !== undefined) raw += fragment; }
+        const result = canonicalResult(raw);
+        if (cacheable && defineSchemaReady && count <= SCHEMA_MAX_NAMES && !matches) {
+            const observed = [], seen = new Set();
+            let units = 0, valid = true;
+            for (let index = 0; index < count; index++) {
+                const name = names ? names[index] : schema.names[index];
+                if (typeof name !== "string" || !schemaNamePattern.test(name) || name.includes("__") || name.startsWith("GL_") || reserved.has(name) || seen.has(name)) { valid = false; break; }
+                units += name.length;
+                if (units > SCHEMA_MAX_NAME_UNITS) { valid = false; break; }
+                seen.add(name); observed.push(name);
+            }
+            if (valid) {
+                const order = observed.map((_, index) => index).sort((a, b) => observed[a] < observed[b] ? -1 : observed[a] > observed[b] ? 1 : 0);
+                defineSchemas.set(this, Object.freeze({ names: Object.freeze(observed), order: Object.freeze(order), validNames: true }));
+            }
+        }
+        return result;
+    }

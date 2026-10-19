@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-schema-integration-port-20261019",
+  "title": "KEY-31: rezervovat2568 pro izolovanou integraci serializer QA",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [],
+  "resources": ["port:2568"],
+  "acceptance": ["Resource-only rezervace pro root, který současně vlastní heavy-validation a všechny výstupy přes webgpu-serializer-schema-qa-20261019. Spustit skutečné pnpm test:integration na pevném2568 pouze bez cizího listeneru; ukončit vlastní server a uvolnit port."],
+  "verification": ["Skutečný currentcandidate source604293f79a2f76d77eb291a617471ee6176b481ad65770d1763bd22ee034bc4c, všechny čtyřiintegračníscénáře, log/exit/cleanup v rootQAprefixu; nejde o GPU přejímku."],
+  "notes": ["Samostatný portclaim umožní zachovat hlavníQAclaim/rozpracovanéartefakty bez přepisovánícizích rezervací. CLI pnpm --config.verify-deps-before-run=false zabrání auto-install přepisusoukroméhopayloadu."]
+}

@@ -1,0 +1,11 @@
+import fs from'node:fs';import assert from'node:assert/strict';import{createHash}from'node:crypto';import{dirname,join,resolve}from'node:path';import{fileURLToPath}from'node:url';
+const root=dirname(fileURLToPath(import.meta.url)),current=resolve(root,'../webgpu-memo-pilot-20261019/reference'),source=join(current,'node_modules/@babylonjs/core/Materials/materialDefines.js'),sha=b=>createHash('sha256').update(b).digest('hex');
+const before=fs.readFileSync(source,'utf8');assert.equal(sha(before),'43a75f4ae32d48c9f23a815f8f2996e895ce3e8d3574f4a04504ee00444916f4');
+const start=before.indexOf('    toString() {'),end=before.indexOf('\n    }\n}',start)+6;assert.ok(start>0&&end>start);
+const prefix=fs.readFileSync(join(root,'runtime-prefix.txt'),'utf8'),method=fs.readFileSync(join(root,'runtime-method.txt'),'utf8').trimEnd();
+const after=prefix+before.slice(0,start)+method+before.slice(end)+'\ndefineSchemaReady = true;\n';
+assert.equal(after.slice(after.indexOf('function canonicalResult('),after.indexOf('\ndefineSchemaReady = true;')),before.slice(before.indexOf('function canonicalResult(')));
+fs.mkdirSync(join(root,'candidate/Materials'),{recursive:true});fs.writeFileSync(join(root,'candidate/Materials/materialDefines.js'),after,{flag:'wx'});fs.mkdirSync(join(root,'preimages'),{recursive:true});fs.writeFileSync(join(root,'preimages/materialDefines.js'),before,{flag:'wx'});
+fs.symlinkSync(fs.realpathSync(join(current,'node_modules')),join(root,'node_modules'),'junction');
+fs.writeFileSync(join(root,'input-manifest.json'),JSON.stringify({current,source,beforeSha256:sha(before),afterSha256:sha(after),canonicalizerUnchanged:true,scope:'One copied JS module; readonly original dependencies, no patch/lock/callsite changes.'},null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({before:sha(before),after:sha(after)}));
