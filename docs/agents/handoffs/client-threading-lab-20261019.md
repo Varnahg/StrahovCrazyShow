@@ -1,0 +1,10 @@
+# Předání rozhodovacího profilu CPU vláken
+
+- Vlastník threading-01a15535-lab, cwd9b78; KEY-40. Hraná4203 a starší beze změny, SDK junction pouze readonly.
+- Vlastní izolované API2599 PID2248/start17:40:44.7048348Z a preview4204 PID41436/start17:40:44.7332779Z byly ověřeny a ukončeny přes PID/start/path/commandguard. Vlastní karta2070823358 a její samostatné okno2070823359 zavřeny. Porty4204/2599 nemají listener.
+- Evidence `docs/performance/evidence/client-threading-20261019/README.md`: 5500 souvislých records, raw SHA60f8c1e0…9d94fc, přesný produkční source65d028, skutečný export benchmarku/screenshot, startup failure preserved a limity.
+- Výsledek: dominantní CPU draw/active-mesh práce; post-ready transit envelope26,8–86,9ms, ve stejných událostech vegetation0–0,3ms; samostatná quality transition cinematic325,3ms. Žádný worker/FPS přínos zatím přijat.
+- BMAD fresh renderer2e5169e7e102/7dd88a77841d79f60052, oneshot lab spec. Independent harness review: jeden READY link flag nedostatek, opraven; ostatní nálezy[]. Nevyžaduje fullsuite/build, protože žádný herní source se neměnil, doručených21JS/CSS/HTML souborů byte-identických.
+- Navazující disjunktní task client-threading-character-material-init-20261019: nejdřív actual Babylon RED a podle něj úzká per-material batch inicializace. Vlastní source/test/handoff drží podagent; rodič nemá psát do jeho scope během claim. Žádná atribuce celého transit hitch ani nahrazení shader fixu původního vlákna.
+- Koordinační incident: při druhém admin claim jsem omylem spustil příkaz z9b78 a registroval56 copied dirty paths. Před jakýmkoli zápisem do admin-scope jsem chybný claim hned release; žádný převzatý soubor nebyl upraven. Následný claim byl správně z původního webgpu-comparison po kontrole7 předaných SHA; vytvořena pouze vlastní nová task definice a slot opět uvolněn. Cizí WIP zůstalo nedotčené; omyl není autorizace jeho převzetí.
+- Po předání lab GPU/heavy/port claims uvolnit. Pro nový build/test samostatná rezervace; nepovažovat dosavadní profil za hotovou optimalizaci.

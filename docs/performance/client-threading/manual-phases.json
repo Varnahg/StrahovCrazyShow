@@ -1,0 +1,105 @@
+{
+  "inputSha256": "8c2fea5401289b1465b35aae9154f1365ab8ef8413ca2933c5a39e2d90229a88",
+  "selection": "Longest manual quality block; visible/focused complete windows, exclude 2s around browser-state and first2s of quality block. Same selection as original manual-analysis derive.mjs.",
+  "quality": {
+    "medium": {
+      "frames": 8761,
+      "windows": 184,
+      "phases": {
+        "simulation": {
+          "meanMs": 0.34036068941901615,
+          "maxMs": 18.6,
+          "windowsWithPhaseMaxOver5ms": 1,
+          "windowsWithPhaseMaxOver20ms": 0
+        },
+        "world": {
+          "meanMs": 0.11666476429631317,
+          "maxMs": 5.2,
+          "windowsWithPhaseMaxOver5ms": 2,
+          "windowsWithPhaseMaxOver20ms": 0
+        },
+        "avatarsAndCamera": {
+          "meanMs": 0.10896016436479851,
+          "maxMs": 1.2,
+          "windowsWithPhaseMaxOver5ms": 0,
+          "windowsWithPhaseMaxOver20ms": 0
+        },
+        "environment": {
+          "meanMs": 1.1086519803675383,
+          "maxMs": 53.7,
+          "windowsWithPhaseMaxOver5ms": 111,
+          "windowsWithPhaseMaxOver20ms": 8
+        },
+        "render": {
+          "meanMs": 15.989019518319829,
+          "maxMs": 186.4,
+          "windowsWithPhaseMaxOver5ms": 184,
+          "windowsWithPhaseMaxOver20ms": 129
+        },
+        "labels": {
+          "meanMs": 0.025453715329300308,
+          "maxMs": 1.8,
+          "windowsWithPhaseMaxOver5ms": 0,
+          "windowsWithPhaseMaxOver20ms": 0
+        }
+      },
+      "positionSpanMetres": {
+        "x": 137.03658866882324,
+        "z": 122.77382469177246
+      },
+      "vehicleWindows": 0
+    },
+    "high": {
+      "frames": 7578,
+      "windows": 175,
+      "phases": {
+        "simulation": {
+          "meanMs": 0.3831353919239906,
+          "maxMs": 3.8,
+          "windowsWithPhaseMaxOver5ms": 0,
+          "windowsWithPhaseMaxOver20ms": 0
+        },
+        "world": {
+          "meanMs": 0.13338611770915818,
+          "maxMs": 8.5,
+          "windowsWithPhaseMaxOver5ms": 6,
+          "windowsWithPhaseMaxOver20ms": 0
+        },
+        "avatarsAndCamera": {
+          "meanMs": 0.04664819213512804,
+          "maxMs": 0.5,
+          "windowsWithPhaseMaxOver5ms": 0,
+          "windowsWithPhaseMaxOver20ms": 0
+        },
+        "environment": {
+          "meanMs": 1.767471628397994,
+          "maxMs": 34.3,
+          "windowsWithPhaseMaxOver5ms": 128,
+          "windowsWithPhaseMaxOver20ms": 7
+        },
+        "render": {
+          "meanMs": 18.41657429400897,
+          "maxMs": 137.6,
+          "windowsWithPhaseMaxOver5ms": 175,
+          "windowsWithPhaseMaxOver20ms": 146
+        },
+        "labels": {
+          "meanMs": 0.016231195566112435,
+          "maxMs": 0.5,
+          "windowsWithPhaseMaxOver5ms": 0,
+          "windowsWithPhaseMaxOver20ms": 0
+        }
+      },
+      "positionSpanMetres": {
+        "x": 144.0304775238037,
+        "z": 109.98121738433838
+      },
+      "vehicleWindows": 0
+    }
+  },
+  "limits": [
+    "Environment includes multiple controllers, not just grass. No exclusive grass timings or cache misses in this test.",
+    "Per-phase maxima are maxima over selected windows; they need not belong to the longest frame.",
+    "CPU wall scope excludes later HUD/recorder work; this is not per-thread CPU running time or a GPU measurement."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "client-threading-research-20261019",
+  "title": "Výzkum přínosného vícevláknového rozdělení klienta v Edge",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/client-threading-research-20261019/",
+    "docs/performance/client-threading/",
+    "docs/agents/handoffs/client-threading-research-20261019.md",
+    "_bmad-output/planning-artifacts/research/technical-client-threading-2026-10-19/",
+    "_bmad-output/implementation-artifacts/client-threading-20261019/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Výzkum současné produkční CPU/render/GPU cesty a primárních Worker/OffscreenCanvas/Babylon podkladů; fakta oddělit od hypotéz a chybějících měření.",
+    "Porovnat main-thread optimalizaci, render worker a paralelní čisté úlohy včetně přenosů dat, input/HUD, multiplayeru, lifecycle a paměti; samotný přesun stejné smyčky není automatický FPS přínos.",
+    "Před implementací určit nejmenší ověřitelný prototyp a rozhodovací kritéria pro FPS/p95/p99, UI/input odezvu, CPU vláken a GPU/VRAM na skutečné scéně. Hrané4201/4202/4203 a starší, cizíWIP a původníWebGPUcíl zachovat."
+  ],
+  "verification": [
+    "Čtecí průzkum a zdrojované rozhodnutí v předaných cestách; žádné GPU, build, fullsuite, síťový server nebo runtime změny v tomto tasku.",
+    "Před další implementací samostatný disjunktní task a rezervace včetně BMAD renderer outputs, testů a zdrojů."
+  ],
+  "notes": [
+    "Výslovný uživatelský cíl a souhlas „Ano, koordinuj obě vlákna“ ověřen čtením vlákna01a15535-be83-7be2-94c5-595287555490 dne19.10.2026. Příjemce nové vlákno/worktree9b78; root01a15102 připravil katalog v vlastní administrativní rezervaci.",
+    "Původní vlákno01a15102-92ff-7250-a7a5-b7ec6305e1c4 nadále vlastní WebGPU migraci a opravu shadow pass/cache lifecycle. Worker architekturu nebude implementovat souběžně. Sdílené Game/UI/render-engine body před budoucími změnami koordinovat.",
+    "Autoritativní frozen test65d028 není celý přijatýmain: obsahuje izolovaný Medium/High vehicle kandidát.617 systémovýchvzorků/1368 herníchrecordů,182 activeforegroundOS; GPUmedian31/max47%,VRAM3420/6144MiB, renderCPUwall~89–90%. Neprokazuje výhodu workeru ani driver rootcause.",
+    "Předání a otisky7pendingadminJSONů: C:/Users/rezac/.codex/worktrees/29fa/StrahovCrazyShow/docs/performance/evidence/webgpu-migration-20261016/system-gpu-telemetry/coordination-handoff.md. Globální registr vlastníků má přednost před copied task stavy."
+  ]
+}
