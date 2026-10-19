@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-shadow-share-native-qa-20261019",
+  "title": "KEY-31: freshinstall clean/combined přejímka exact shadow sharing",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-shadow-share-native-qa-20261019/",
+    "docs/agents/handoffs/webgpu-shadow-share-native-qa-20261019.md",
+    "docs/performance/evidence/webgpu-migration-20261016/shadow-share-native/",
+    "_bmad-output/implementation-artifacts/webgpu-shadow-share-native-qa-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-9880f493210d/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4200",
+    "port:2595"
+  ],
+  "acceptance": [
+    "Přesně převzít ověřený f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29 ShadowDepthWrapper payload, ostatní pinované patche bezezměny včetně MD3cc.",
+    "Portable regresní19case fixture ověřuje skutečný nainstalovaný modul bez runtime sourceoverlay; SHA/inverse a lockhash konzistence. Žádný nový algorithm,cache či feature scope.",
+    "Nový frozenlockfile freshinstall musí vytvořit přesný payload a jednotnou core/loaders identitu; stableclean i existingacceptedcombined source/test snapshot pnpmtest/build/isolatedintegration, actualGPU podle nutnébyteparity.",
+    "Hrané4201/4199/4188/4192 a cizíWIP zachovat. Nižší početshaderrequests není dokončená plynulost; KEY31/32/default/fullgoal otevřené."
+  ],
+  "verification": [
+    "Freshinstall SHAparity a clean/combined pnpmtest/build/testintegration, evidence/handoff s omezenými skutečnýmiGPUdůkazy.",
+    "Každý vlastníunitcommit samostatně, žádné cizíWIP, metadataúkolu řídíkoordinátor."
+  ],
+  "notes": [
+    "Předchází shadow-share-qa main552ad5dd;1453/fullTS/build/4integration,helper19+ABIparity,actualMedium6programs7sync,5>=100ms zůstává.",
+    "Leafje příméBMADimplementační zadání bezrendereru; rootQA používáBMADoneshot pro přesný převod jižreviewedruntimepayload.",
+    "Výstupyhelper source-inverse/manifest zůstávajíimmutable, novémodifikace pouzevrámcinativeportabletest/pin tasku.",
+    "Nativecode main1757002 integrated; fresh10860/clean1472/combined1532/obabuildy/2x4integration/nativeGPU6programs7sync valid.5>=100ms unresolved, noFPS/default acceptance. Evidence shadow-share-native/README.md; ownservices stopped."
+  ]
+}
