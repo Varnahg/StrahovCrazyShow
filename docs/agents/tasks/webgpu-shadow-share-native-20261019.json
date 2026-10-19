@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-shadow-share-native-20261019",
+  "title": "KEY-31: převést exact shadow sharing do projektového patche a portable regresí",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-shadow-share-native-20261019/",
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/webgpu-shadow-sharing.test.ts",
+    "tests/fixtures/webgpu-shadow-sharing/",
+    "docs/agents/handoffs/webgpu-shadow-share-native-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přesně převzít ověřený f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29 ShadowDepthWrapper payload, ostatní pinované patche bezezměny včetně MD3cc.",
+    "Portable regresní19case fixture ověřuje skutečný nainstalovaný modul bez runtime sourceoverlay; SHA/inverse a lockhash konzistence. Žádný nový algorithm,cache či feature scope.",
+    "Pouze explicitní vlastnípatch/lock/novétesty; žádná mutace workspace/hraných node_modules,install/fullsuite/build/GPU/server. Root owns freshinstall/fullvalidation/nativeintegration.",
+    "Hrané4201/4199/4188/4192 a cizíWIP zachovat. Nižší početshaderrequests není dokončená plynulost; KEY31/32/default/fullgoal otevřené."
+  ],
+  "verification": [
+    "Lehképortabletesty proti skutečnému reviewedpayload přesownread-onlyadapter; patch přesněrekonstruujeupstream→candidate, packagehasha6lockrefs doložitbezvymyšlenéalgoritmizace.",
+    "Každý vlastníunitcommit samostatně, žádné cizíWIP, metadataúkolu řídíkoordinátor."
+  ],
+  "notes": [
+    "Předchází shadow-share-qa main552ad5dd;1453/fullTS/build/4integration,helper19+ABIparity,actualMedium6programs7sync,5>=100ms zůstává.",
+    "Leafje příméBMADimplementační zadání bezrendereru; rootQA používáBMADoneshot pro přesný převod jižreviewedruntimepayload.",
+    "Výstupyhelper source-inverse/manifest zůstávajíimmutable, novémodifikace pouzevrámcinativeportabletest/pin tasku.",
+    "Root přijal exactpin po freshinstall10860parity,clean1472/combined1532+obaTS/build+2x4integration a actualnativeCM6programs/7sync/errors0.5>=100ms stále, není FPSA/B/default acceptance. OwnGPUservices stopped."
+  ]
+}
