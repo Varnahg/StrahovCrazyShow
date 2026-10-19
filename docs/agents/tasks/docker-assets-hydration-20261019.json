@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "docker-assets-hydration-20261019",
+  "title": "KEY-45: materializovat existující Git LFS obsah v nové Docker worktree",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "assets/blender/buildings/source-plan.json",
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/",
+    "public/models/vegetation/realistic/strahov-individual-trees.glb",
+    "public/models/vegetation/runtime/far.glb",
+    "docs/agents/handoffs/docker-assets-hydration-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze vyzvednutí existujících přesných LFS objektů, žádná regenerace ani změna pointerů/historie."
+  ],
+  "verification": [
+    "git lfs checkout; git status zůstane bez asset diffu; runtime asset checker projde."
+  ],
+  "notes": [
+    "Nová managed worktree byla vytvořena s LFS pointery; kořenový clone už drží potřebné objekty. Cwd C:/Users/rezac/.codex/worktrees/docker-single-container/StrahovCrazyShow; KEY-45."
+  ]
+}
