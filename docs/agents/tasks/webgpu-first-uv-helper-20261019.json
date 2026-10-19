@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-first-uv-helper-20261019",
+  "title": "KEY-31: přesný WebGPU first-UV matrix candidate a regrese",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-first-uv-helper-20261019/",
+    "docs/agents/handoffs/webgpu-first-uv-helper-20261019.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouzeisolatedcandidate nad currentnative8fb SDWf8,Texture.pure.js exactpreimage. Žádnémainpatch/lock/root/hranénode_modules mutace.",
+    "WebGPU only: skip Scene.markAllMaterialsAsDirty při zcelaPRVNÍM výpočtu UVmatice; math/cacheidentity i všechny pozdějšíidentity přechody zachovat,WebGLhistorické chování. ScopepouzeověřenéstockprojectTexturecesty, ne univerzálníthirdpartyoverride historie.",
+    "ActualTexture/PBR/Standard/NodeMaterial shaderdefines/matrices parity,clone/uBase/UVtransforms/toggle/noScene/later transitions; meaningfulred/green a přesnýinverse.",
+    "RootactualplainMediumstejnároute rozhodne o přínosu a featureparitě; není automatickéFPS/default přijetí. Nepříznivý/nejasnývýsledek neintegrovat."
+  ],
+  "verification": [
+    "LehkéCPUregrese a fulloriginal/candidatedescriptor/math/invalidation comparison; žádnýinstall/fullsuite/build/GPU/server/commit.",
+    "Předánífiles/proof/limits/sourceinverse,procesyukončitpředrelease."
+  ],
+  "notes": [
+    "ActualMediumCPUprofilef80source trace784: Texture.getTextureMatrix→Scene.markAllMaterialsDirty→Material._markAllSubMeshesAsDirty→fullscene scan ventryCPU196.8ms;4stackobservations. First-vs-later transition zatímnepřiřazený, candidateGPUověřípřínos.",
+    "StockPBR/Standard/NodeMaterial rozhodujíUVidentity ažpocallgetTextureMatrix;sentineltrue→firstcomputedfalse nemůžeinvalidovatještěnepoužitoustockmatici. Projektclient/loaders/core nemajígetTextureMatrixassignmentoverride.",
+    "Varianty: eagerstartup/factoryhooky nepokryjílateclones;dirtyindexnepokrývárenderPass/MultiMaterial/instances;disableoptUV měnívarying/bindingbudget. Onefirstcompute guard je nejmenšípinnedsemantics-preservingstockcandidate. Thirdpartyoverride cohistorickyvracelidentitybezsuper zůstáváznámý nepodporovanýkontrakt, netvrdituniversálníSDKfix.",
+    "PřímáleafimplementacebezBMADrendereru;rootQA vlastníworkflow/actualruntimeverification."
+  ]
+}
