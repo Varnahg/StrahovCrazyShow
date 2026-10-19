@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "ci-pilot-coordination-20261019",
+  "title": "KEY-44: koordinovat jeden autonomní pilot a doložit obnovu",
+  "status": "ready",
+  "dependsOn": [
+    "ci-required-gates-20261019"
+  ],
+  "writePaths": [
+    "docs/agents/ci.md",
+    "_bmad/render/bmad-build/strahovcrazyshow-95e969760fc5/",
+    "_bmad-output/implementation-artifacts/ci-lfs-pilot-20261019/",
+    "_bmad-output/implementation-artifacts/ci-required-gates-20261019/spec.md",
+    "docs/agents/handoffs/ci-required-gates-20261019.md",
+    "docs/agents/handoffs/ci-pilot-coordination-20261019.md",
+    "docs/verification-evidence/ci-main-20261019/",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/",
+    ".cache/ci-lfs-pilot-20261019/"
+  ],
+  "resources": [
+    "github-ci-validation"
+  ],
+  "acceptance": [
+    "CI celek je nejprve přijatý do remote main pod aktivním rulesetem.",
+    "Jeden pilot má red test, skutečně neúspěšnou GitHub CI, odmítnutý merge, zachovaný checkpoint a obnovu v nové agentní relaci.",
+    "Finální nezávislé review, plná CI a SHA-vázané přijetí umožní samostatný merge; zveřejněny důkazy a úklid.",
+    "Kolize claime se odmítne bez změny zdrojů/rezervace; starý claim se nepřebírá podle stáří."
+  ],
+  "verification": [
+    "Read-only review testů, implementace a finálního diffu.",
+    "GitHub red/green run, REST odmítnutí merge, head/base/source identita.",
+    "Předání a obnovení nové agentní relace se stejnými zachovanými testy.",
+    "Závěrečné GitHub main CI a kontrola vlastních claims/procesů."
+  ],
+  "notes": [
+    "KEY-44; výslovně autorizovaný jeden autonomní pilot, žádný obecný scheduler.",
+    "Parent nesmí měnit zdrojové/testové soubory tasku ci-lfs-pilot-20261019 při claimu dítěte.",
+    "Dokončení CI evidence je navazující přijetí téhož user tasku; docs/verification.md má cizí WIP."
+  ]
+}

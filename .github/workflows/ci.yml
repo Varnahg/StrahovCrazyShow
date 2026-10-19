@@ -30,6 +30,12 @@ jobs:
           node-version: "24"
           package-manager-cache: false
 
+      - name: Test LFS asset preflight
+        run: node --test tests/lfs-assets.test.ts
+
+      - name: Check working LFS assets
+        run: node scripts/check-lfs-assets.mjs
+
       - name: Install pinned pnpm
         run: npm install --global pnpm@11.25.0
 

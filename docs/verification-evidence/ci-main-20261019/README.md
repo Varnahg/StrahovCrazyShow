@@ -1,6 +1,6 @@
 # KEY-44: povinná GitHub CI a ochrana main
 
-Stav: první skutečná GitHub CI prošla, ruleset aktivní; finální kandidát a merge se přijímají na přesné SHA v PR/Linear.
+Stav: přijato a sloučeno přes PR #7, ruleset aktivní. Finální head `94e6481415eba8802d02d34f9e09c06e9bb65137`, merge `a9f1805808c653d2a9fb9cd81def446bfaead588`.
 
 Baseline: `db9108ddd3d069030abebd0fcccd6ecefbd0ff53`, samostatná větev `codex/ci-required-gates`, owner `ci-01a155b2-gates`, task `ci-required-gates-20261019`.
 
@@ -25,6 +25,8 @@ Podklady: `package.json`, `pnpm-workspace.yaml`, `.gitattributes`, `tests/vegeta
 - Runner použil Ubuntu 24.04 (`20261012.334.1`) a oznámil migraci ubuntu-latest na Ubuntu 26 od 19.10.2026. Finální workflow připíná již ověřenou řadu `ubuntu-24.04`; nové SHA musí znovu projít CI.
 
 ## Koordinace a provoz
+
+Finální PR CI [39321039004](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39321039004) PASS (5m22s), [final-pr-ci.json](final-pr-ci.json). Po SHA-vázaném přijetí v Linear KEY-44 byl PR sloučen bez bypassu, [merge.json](merge.json). Skutečná CI samotného main [39321924235](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39321924235) PASS (5m6s), [main-ci.json](main-ci.json). Dodatečné nezávislé review Ubuntu pinu/evidence vrátilo `[]`.
 
 Na výslovný dodatečný pokyn uživatele vlastníci odstavili všechny evidované preview/dev procesní rezervace. Potvrzení přišlo od relací buildings, sync, repairs, webgpu-migration, webgpu-01a15102 a threading-01a15535. Jejich snapshoty a nepřijatý WIP zůstaly zachované; deník a grass prototype zůstávají pod zdrojovými claims bez procesních prostředků. Žádný cizí proces nebyl ukončen podle samotného portu. Místní celé testy/build/GPU se při této CI přejímce nespouštěly.
 
