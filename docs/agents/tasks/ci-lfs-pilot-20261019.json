@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "ci-lfs-pilot-20261019",
+  "title": "KEY-44: autonomní LFS preflight pilot s reálným selháním a obnovou",
+  "status": "blocked",
+  "dependsOn": [
+    "ci-required-gates-20261019"
+  ],
+  "writePaths": [
+    "scripts/check-lfs-assets.mjs",
+    "tests/lfs-assets.test.ts",
+    ".github/workflows/ci.yml",
+    "docs/agents/handoffs/ci-lfs-pilot-20261019.md",
+    "docs/verification-evidence/ci-lfs-pilot-20261019/",
+    "_bmad-output/implementation-artifacts/ci-lfs-pilot-20261019/",
+    ".cache/ci-lfs-pilot-20261019/"
+  ],
+  "resources": [
+    "github-ci-validation"
+  ],
+  "acceptance": [
+    "Úzký preflight rozpozná chybějící nebo nestáhnuté tracked LFS objekty; skutečné soubory projdou a nedojde k načtení velkých assetů celých do RAM.",
+    "Autonomní task projde red-test PR, skutečným neúspěšným CI a odmítnutým merge; uchová se diff a selhání, nová agentní relace práci obnoví a opraví.",
+    "Po green review/CI a SHA-vázaném přijetí se pilot integruje samostatným PR; claim/process cleanup je doložen.",
+    "Neúspěšný kolizní claim nezmění zdroje ani aktivní rezervaci."
+  ],
+  "verification": [
+    "node --test tests/lfs-assets.test.ts (CPU fixtures, žádné herní procesy)",
+    "GitHub CI red a následně green; skutečné odmítnutí merge při fail checku.",
+    "Nová agentní relace obnoví práci z handoffu a zachovaného commitu; SHA/diff/run ID doloženy."
+  ],
+  "notes": [
+    "Výslovné zadání uživatele; KEY-44. Blokované do přijetí CI a ochrany main.",
+    "Podagent si přečte AGENTS/policy, vlastní disjunktní claim; žádný rekurzivní BMAD. Převod po red fázi je výslovný, zdokumentovaný, nikoli převzetí podle stáří.",
+    "Koordinátor připraví před spuštěním pilotu jeho renderer/spec rezervaci a administrativně aktualizuje status."
+  ]
+}
