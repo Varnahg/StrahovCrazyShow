@@ -12,9 +12,11 @@
     "dev": "concurrently -k -n SERVER,CLIENT \"pnpm dev:server\" \"pnpm dev:client\"",
     "dev:client": "vite --host 127.0.0.1",
     "dev:server": "tsx watch server/index.ts",
+    "start": "node --import tsx server/index.ts",
     "build": "tsc --noEmit && vite build",
     "test": "tsx --test tests/*.test.ts",
     "test:integration": "node scripts/test-integration.mjs",
+    "test:docker": "node scripts/test-docker.mjs",
     "check:readme": "node scripts/check-readme-links.mjs",
     "map:fetch": "node scripts/fetch-map.mjs"
   },
@@ -27,19 +29,22 @@
     "@colyseus/ws-transport": "latest",
     "@dimforge/rapier3d-compat": "0.21.0",
     "earcut": "^3.2.4",
+    "express": "5.3.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "suncalc": "^2.1.1"
+    "suncalc": "^2.1.1",
+    "tsx": "4.23.15"
   },
   "devDependencies": {
     "@types/earcut": "^3.0.0",
+    "@types/express": "^5.0.0",
     "@types/node": "^24.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "latest",
     "concurrently": "latest",
     "prettier": "^3.9.9",
-    "tsx": "latest",
+    "playwright": "1.64.1",
     "typescript": "~5.9.0",
     "vite": "latest"
   }

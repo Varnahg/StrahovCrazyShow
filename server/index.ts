@@ -25,6 +25,11 @@ import type { Player, Profile } from "../shared/types";
 import { getWeather } from "./weather";
 import { createLocalBenchmarkHandler } from "./local-benchmarks";
 import { createSessionDiagnosticsHandler } from "./session-diagnostics";
+import {
+  createServerReadiness,
+  createStaticClientHandler,
+  readServerConfig,
+} from "./runtime";
 import { respawnServerPlayer, synchronizePlayer } from "./respawn";
 import { MotionEncoder } from "../shared/motion-codec";
 import {
@@ -43,6 +48,11 @@ import {
   type Authority,
   type MotionPacket,
 } from "../shared/netcode";
+const config = readServerConfig();
+const staticClient = config.staticDir
+  ? await createStaticClientHandler(config.staticDir)
+  : undefined;
+const readiness = createServerReadiness();
 const sessions = new Map<
   string,
   { id: string; profile: Profile; expires: number; savedState?: ActorState }
@@ -537,7 +547,7 @@ class StrahovRoom extends Room {
   }
 }
 const http = createServer();
-const listenHost = "127.0.0.1";
+const listenHost = config.host;
 const sessionDiagnostics = createSessionDiagnosticsHandler({ listenHost });
 const localBenchmarks = createLocalBenchmarkHandler({ listenHost });
 const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
@@ -552,7 +562,7 @@ const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
     return;
   }
   if (req.url === "/api/health") {
-    res.end(JSON.stringify({ ok: true, demo: true }));
+    readiness.reply(res);
     return;
   }
   if (req.url === "/api/weather") {
@@ -634,21 +644,20 @@ const server = new Server({
   express: (app) => {
     app.use((req: IncomingMessage, res: ServerResponse, next: () => void) => {
       if (req.url?.startsWith("/api/")) void handleApi(req, res);
-      else if (
-        req.url?.startsWith("/matchmake/") &&
-        !req.url.startsWith("/matchmake/joinById/" + worldId)
-      ) {
-        res
-          .writeHead(403, { "Content-Type": "application/json" })
-          .end(JSON.stringify({ error: "Demo používá jediný společný svět." }));
-      } else next();
+      else next();
     });
+    if (staticClient) app.use(staticClient);
   },
 });
+// Colyseus dispatches matchmaking before Express. Enforce this at its controller,
+// before a rejected create request can construct a second physics simulation.
+matchMaker.controller.exposedMethods = ["joinById"];
+server.onBeforeShutdown(() => readiness.stop());
 server.define("strahov", StrahovRoom);
-await server.listen(Number(process.env.PORT || 2567), listenHost);
+await server.listen(config.port, listenHost);
 const room = await matchMaker.createRoom("strahov", {});
 worldId = room.roomId;
+readiness.ready();
 console.log(
-  `Strahov multiplayer: http://127.0.0.1:${process.env.PORT || 2567} — world ${worldId}`,
+  `Strahov multiplayer: http://${listenHost.includes(":") ? `[${listenHost}]` : listenHost}:${config.port} — world ${worldId}`,
 );
