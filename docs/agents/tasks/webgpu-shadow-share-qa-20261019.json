@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-shadow-share-qa-20261019",
+  "title": "KEY-31: přijmout shadow program sharing podle actual Medium průjezdu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-shadow-share-qa-20261019/",
+    "docs/agents/handoffs/webgpu-shadow-share-qa-20261019.md",
+    "docs/performance/evidence/webgpu-migration-20261016/shadow-share-qa/",
+    "_bmad-output/implementation-artifacts/webgpu-shadow-share-qa-20261019/",
+    "_bmad/render/bmad-build/strahovcrazyshow-9880f493210d/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4200",
+    "port:2595"
+  ],
+  "acceptance": [
+    "Pouze copied clean F3source/test/deps s exact reviewed helper ShadowDepthWrapper overlay. Žádné změny hraných dependency stromů.",
+    "WebGPU pouze: token sdílet uvnitř wrapperu a stejného origEffect jen při úplné shodě derivedvertex/fragment source,shaderlanguage,orderedABI/indexparameters; žádná customEffectcache, žádné sdílení DrawWrapper contexts. WebGL beze změny.",
+    "Acquire/release pro každý skutečný enginecache acquire vyvážit při depthvariant replacement/baseeffectchange/meshdispose/wrapperdispose; passové aliasy nevlastní dalšíacquire. Zachovat FreshWebGPU readiness, stíny, image/feature funkce.",
+    "Cílený refaktoring, actual pinned module CPUproof se stejnými/různými source/ABI/base a lifecycle. Root rozhodne až po fullTS/build a actual plain Medium Edge capture; nepříznivý/neurčitý výsledek neintegrovat."
+  ],
+  "verification": [
+    "Přesné SHA/preimage/nativepatch inverse, cílené tests/fullTS/build; skutečná Medium1actual/Alex/night2040x986 firstdrive se sourceidentitou a health/counter důkazy.",
+    "Evidence/handoff vownscope,bez cizíWIP; žádný install/build/sharedGPU podagentem."
+  ],
+  "notes": [
+    "Aktuální main6da2b4f medium-attribution:2mainleafrequests+15shadowSPOTrequests ve4definesgroups. Opakovanédefines dosud nejsou důkazem stejného source/ABI, helperto musíprokázat.",
+    "Primární pinned ShadowDepthWrapper._makeEffect tokenRandomGUID perSubMesh/generator, enginecreateEffect cachekey token+fullDefines. Přímé delegované zadání bez rekurzivníhoBMAD; rootBMADproQA.",
+    "Rozumnévarianty: širšívehiclepreparation má intrinsic coveragegap a delšístartup; přesné sharing řeší násobení programů i mimo spawn, ale musívyřešit ownership. Vypnutí/snížení stínů nepřípustné.",
+    "Root přijal isolatedQA: helper19/19+descriptorparity,1453/fullTS/build/4integration, actual6programs/7sync avšak5>=100ms; nativepatch/fullgoal otevřené. Evidence shadow-share-qa/README.md. Ownprocesses stopped."
+  ]
+}

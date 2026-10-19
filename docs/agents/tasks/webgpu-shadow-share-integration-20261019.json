@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-shadow-share-integration-20261019",
+  "title": "KEY-31: rezervovat2568 pro izolovanou shadow sharing integraci",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [],
+  "resources": [
+    "port:2568"
+  ],
+  "acceptance": [
+    "Pouze portová koordinace root QA pnpm test:integration, ne nový runtime patch."
+  ],
+  "verification": [
+    "Root spustí izolovaný server podle scripts/test-integration.mjs, ověří skutečné ukončení po testech."
+  ],
+  "notes": [
+    "Doprovází webgpu-shadow-share-qa-20261019, který vlastní heavy-validation/GPU/workspace a výstupy. Rezervovat před samotnou integrací.",
+    "Root přijal isolatedQA: helper19/19+descriptorparity,1453/fullTS/build/4integration, actual6programs/7sync avšak5>=100ms; nativepatch/fullgoal otevřené. Evidence shadow-share-qa/README.md. Ownprocesses stopped."
+  ]
+}
