@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-medium-vehicle-qa-20261019",
   "title": "KEY-31: ověřit vehicle přípravu Medium/High bez změny stínů",
-  "status": "blocked",
+  "status": "ready",
   "dependsOn": [],
   "writePaths": [
     ".cache/webgpu-medium-vehicle-qa-20261019/",
@@ -19,7 +19,7 @@
     "port:2595"
   ],
   "acceptance": [
-    "Současný clean F3 včetně testů, bez diagnostického donor overlay. Rozšířit pouze existující vehicle-0/1 stages na všechny WebGPU kvality a pojmenování odpovídajícím způsobem sjednotit.",
+    "Současný clean067/combinedc29 včetně přijatého SDWf8 a garment068, bez diagnostického donor overlay. Rozšířit stávající vehicle přípravu na WebGPU Medium/High a všechny skutečně povolené počty mapped POINT světel; sjednotit interní názvy/API a zachovat Low/WebGL kontrakt včetně doložené volby případného vehicle-2 stage.",
     "Zachovat stíny, kvality, mapování světel, fyziku, assety, camera/play behavior, readiness/timeout/revision/restore a lifecycle. Žádná nová cache/derivedshader sharing.",
     "Plain Edge Medium firstdrive rozhodne, zda počet nových programů klesne a zda nezhoršuje hitches. Nulový či nejasný přínos neopravňuje k native integraci. Hrané snapshoty/cizíWIP beze změny."
   ],
@@ -31,6 +31,8 @@
     "Výzkum medium-attribution/README.md main6da2b4f:2mainleaves carSPOTshadow+15shadowprograms. Game vehicle stages pouzeLow;Medium shadow256 není připravený.",
     "Varianty: příprava existujících skutečných prostředků předReady (zvoleno jako nejmenší kandidát, vyššístartup přijatelný); sharing ShadowDepthWrapper GUID potřebuje kompletní source/ABI/refcount/lifecycle průzkum a je rizikovější; snížení/vypnutí stínů nepřijatelné.",
     "Neúspěšný kandidát zachovat jako odmítnutý, nepovažovat jeho testy za hotovouKEY31/32. BMADoneshot QA v povolenémcache scope.",
-    "Před implementací průzkum prokázal omezení širší přípravy: nové submeshe stále dostanou nové GUID. Kandidát zatím nebyl vytvořen/testován; přednost má izolované sdílení přesných derived programů s lifecycle proof, poté podle zbytků příprava."
+    "Původní odklad kvůli per-submesh GUID je vyřešen přijatým exact shadow sharing v main1757002e. Nyní znovu otevřeno po native6program/12module/7sync a combined9/18/10 pilotu; UV notifications nejsou nutnou příčinou záseků. Current baseline source067/c29 zahrnuje také main145cbe95 garment fix. Kandidát zatím nebyl vytvořen ani GPU ověřen.",
+    "Koordinátor předem autorizuje nezbytnou interní změnu LightPreparationOptions a všech jejích copied Game/test consumers v tomto omezeném QA; žádné public user API, SDK cache, snižování stínů nebo prodlužování timeoutů. Prověřit dynamickou změnu kvality/revision/restore před volbou boolean versus quality-dependent counts. Root/main Game WIP se tímto nepřebírá.",
+    "19.10. checkpoint: copiedsource65d028152/152/fullTS/build/review[],plainc1/x1/c2 skutečné~100m průjezdy. Provoz/takty nejsou matched, hitches155/222/187ms přetrvávají, runtime NENÍ přijat do main. g1pouze4z8novýchmodulůexactrawduplicates;g2všech5novýchprogramůstínovéSM_SPOTLIGHT,usersunmatched5. Evidence medium-vehicle-qa/README.md; další krok shadowEffect lifetime/cachekey reprodukce, ne slepé warm etapy. Žádný fulltest/integration/defaultacceptance."
   ]
 }

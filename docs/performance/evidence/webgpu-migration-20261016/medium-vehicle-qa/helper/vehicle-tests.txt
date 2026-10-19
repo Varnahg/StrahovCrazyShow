@@ -1,0 +1,73 @@
+
+for (const quality of ["medium", "high"] as const)
+  test(`${quality} WebGPU prepares zero/one/two actual POINTs with the real car shadow`, async (t) => {
+    // Actual Strahov astronomy on this moonless night leaves ambient + car,
+    // hence two available POINT slots. This must not be a clamped one-POINT test.
+    const f = fixture(t, quality, true, false, Date.parse("2026-10-10T12:00:00Z"));
+    const result = await f.finish(f.start());
+    assert.equal(result.status, "complete");
+    assert.deepEqual(result.stages.map((s: any) => s.stage), ["vehicle-0", "vehicle-1", "vehicle-2", ...originalStages]);
+    for (const count of [0, 1, 2]) {
+      const state = f.stages.get(`vehicle-${count}`)!;
+      assert.ok(state, "actual vehicle stage drew both Standard and PBR receivers");
+      assert.equal(state.quality, quality);
+      assert.equal(state.car, true); assert.equal(state.parked, false);
+      assert.equal(state.beam, true); assert.equal(state.shadow, true);
+      assert.equal(state.shadowMapSize, quality === "medium" ? 256 : 512);
+      assert.equal(state.nonStreet, 2, "actual below-horizon celestial key leaves ambient and car");
+      assert.equal(state.points, count);
+      assert.equal(state.nonStreet + state.points, 2 + count);
+      assert.ok(state.draws >= 2);
+      assert.ok(result.stages.find((s: any) => s.stage === `vehicle-${count}`).renders >= 3);
+      for (const effect of state.effects as { defines: string }[]) {
+        assert.match(effect.defines, /^#define SPOTLIGHT\d+$/m);
+        assert.match(effect.defines, /^#define SHADOW\d+$/m);
+        assert.equal((effect.defines.match(/^#define POINTLIGHT\d+$/gm) ?? []).length, count);
+      }
+    }
+    const generator = f.beam.light.getShadowGenerator()!, map = generator.getShadowMap()!, before = f.counts().programs;
+    for (const count of [0, 1, 2]) assert.deepEqual(await f.drive(count), f.stages.get(`vehicle-${count}`)!.effects);
+    assert.equal(f.beam.light.getShadowGenerator(), generator);
+    assert.equal(generator.getShadowMap(), map, "entering the prepared quality must retain the actual RTT/pass");
+    assert.equal(f.counts().programs, before);
+    assert.equal(f.invariant(), f.initial);
+  });
+
+test("Low vehicle2 is explicitly the same clamped one-POINT state without shadows", async (t) => {
+  const f = fixture(t), result = await f.finish(f.start());
+  assert.equal(result.status, "complete");
+  const one = f.stages.get("vehicle-1")!, two = f.stages.get("vehicle-2")!;
+  assert.equal(one.points, 1); assert.equal(two.points, 1);
+  assert.equal(one.shadow, false); assert.equal(two.shadow, false);
+  assert.deepEqual(two.effects, one.effects, "redundant Low request adds no different main material variant");
+});
+
+for (const requested of ["medium", "high"] as const)
+  test(`all qualities finish with requested ${requested} car shadow map retained before entry`, async (t) => {
+    const f = fixture(t, requested), result = await f.finish(f.startAllQualities());
+    assert.equal(result.status, "complete"); assert.equal(result.stages.length, 48);
+    assert.deepEqual(result.qualities.map((q: any) => [q.quality, q.stageCount]), requested === "medium" ? [["low",16],["high",16],["medium",16]] : [["low",16],["medium",16],["high",16]]);
+    assert.equal(f.game.quality, requested); assert.equal(f.game.preparingRenderQuality, false);
+    const shadow = f.beam.light.getShadowGenerator()!;
+    assert.equal(shadow.mapSize, requested === "medium" ? 256 : 512);
+    const map = shadow.getShadowMap()!, pass = map.renderPassId;
+    assert.equal(f.beam.light.isEnabled(), false);
+    await f.drive(1);
+    assert.equal(shadow.getShadowMap(), map); assert.equal(map.renderPassId, pass);
+  });
+
+test("late requested quality during final pass prepares its actual map before gameplay entry", async (t) => {
+  const f = fixture(t, "medium"); let changed = false;
+  f.hook(() => {
+    if (!changed && f.game.quality === "medium" && f.stage() === "current-off") {
+      changed = true; f.requested.quality = "high";
+    }
+  });
+  const result = await f.finish(f.startAllQualities());
+  assert.equal(result.status, "complete"); assert.equal(changed, true);
+  assert.equal(f.game.quality, "high");
+  const shadow = f.beam.light.getShadowGenerator()!;
+  assert.equal(shadow.mapSize, 512, "inactive requested restore must not leave the earlier256 map for first entry to resize");
+  const map = shadow.getShadowMap()!; await f.drive(1);
+  assert.equal(shadow.getShadowMap(), map);
+});
