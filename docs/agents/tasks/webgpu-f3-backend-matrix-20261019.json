@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-f3-backend-matrix-20261019",
+  "title": "KEY-31/32/34: skutečný F3 Medium backend matrix WebGL2/CM/NCM",
+  "status": "blocked",
+  "dependsOn": [
+    "webgpu-schema-native-20261019"
+  ],
+  "writePaths": [
+    ".cache/webgpu-f3-backend-matrix-20261019/",
+    ".cache/webgpu-serializer-schema-qa-20261019/native-clean-f3/dist/",
+    "docs/agents/handoffs/webgpu-f3-backend-matrix-20261019.md",
+    "docs/performance/evidence/webgpu-migration-20261016/f3-backend-matrix/",
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/webgpu-f3-backend-matrix-20261019/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "port:4200",
+    "port:2595"
+  ],
+  "acceptance": [
+    "Přesný již validovaný native-cleanF3 source3c4be6d…/MD3cc739…/testy/dist. Žádný runtimepatch, diagnostika, cache, rebuild nebo tichýfallback. Vybrat existující veřejné renderBackend hodnoty před tvorbouenginu a doložit skutečnýbackend+compatibilityMode.",
+    "V Edge9proložených běhů,3backend×3opakování, jedna actualrelace, Alex, MediumCSS/internal2040×986, night1792447200000 a stejnéřízenépočasí. FreshAPI/engine/run,30sodactualpublicreadyidle, stejnývstupdoauta/W8000/space2500, bezpozorováníběhem10s. Background3D/náročnéprocesy nesmí kontaminovat; přiuživatelskémtestuGPUodložit.",
+    "PorovnatFPS/p95/p99/max/≥100ms/compilation/submission/veřejnědostupnébundle counters/startup; rawsource/session/UI/health, CSS/internal/antialias/GPUclockstemp/scene/avatars/ambient. Neplatný či jinakzatíženýběh zachovat a vyloučit jen sdůkazem. PřiNCMchybě jej nepřijmouta nepokračovatslepě vtéto větvi; validníGL/CMsrovnání lze dokončit.",
+    "Výsledekje jednoactualMediumpilot a CM/NCMrozhodnutí, nikoli dokončená≥3actual/funkční/lifecyclepřejímka. Žádné defaultzapnutí bez celkovéacceptance. Explicitněpřiznatdriver/browsercache/clock/trajectoryomezení, nezaměnitcounterzaGPUčas.",
+    "Nezávisléreview, scopedcommit/main/Linear. Hrané4201/4199/4192/4188astarší+133WIPbezezměny. Vlastníslužby/tabyuklidit, viewportreset, rezervaciuvolnitažpoté."
+  ],
+  "verification": [
+    "Předpřevzetímverify576source/test bytes a frozen nativeclean distSHA, singlecore/MDhash. Předešlé1453/fullTSbuild/4integracePASS se neopakují pro nezměněnýruntime; novým důkazem budeactualEdgeproductionmatrix.",
+    "ZdokumentovanýLatinorder GL/CM/NCM, CM/NCM/GL, NCM/GL/CM; start/stopstrictPIDidentity, codehashserved a rawseq0contiguous/UI1:1. Výsledkyvčetněchyb a výluk uchovat;9validběhů nebozdůvodněnéNCMreject+3GL/CMpairs."
+  ],
+  "notes": [
+    "BLOCKED/pending: g1/c1 skutečné Medium průjezdy mají rozdílnou UTC ambient zátěž; ENDcounts nejsou workloadtrace. c1 navíc17newprogram/18syncpipeline poReady. Po cleanupu root pokračuje upstream attribution/Mediumcoverage a řízením traffic/fyzikálního clocku; nejde o externí blokaci uživatelem ani hotovou migraci. Žádný NCM engine nebyl spuštěn; partial handoff/evidence jsou zachované.",
+    "Userpriorityplynulostpředstartupem. PinnedprimaryWebGPUEngine._draw2896–2913reusefastBundle pouzeNCM, resetDrawContextinvalidujebundles; současnýtoString/F3se nemění. Stávajícífast výsledkybeznovýchdůkazůneopravňujídefault.",
+    "Borrowednativeclean dist explicitreadonlyreservation; freshcleannode_modules je chráněný živou4201rezervací jiného vlastního tasku, pouzečtení. NovýsourcelogscacheaAPI4200/2595jsou vlastní; žádnýzásahdohranéslužby."
+  ]
+}
