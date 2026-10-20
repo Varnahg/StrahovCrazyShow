@@ -1,0 +1,171 @@
+{
+  "conclusion": "success",
+  "event": "pull_request",
+  "headSha": "42fa92a823b4e57936bf9fbf8c0bc82f04bdb95a",
+  "jobs": [
+    {
+      "completedAt": "2026-10-20T07:23:20Z",
+      "conclusion": "success",
+      "databaseId": 118503461355,
+      "name": "verify",
+      "startedAt": "2026-10-20T07:14:53Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-20T07:14:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-20T07:14:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:15:49Z",
+          "conclusion": "success",
+          "name": "Checkout source and LFS assets",
+          "number": 2,
+          "startedAt": "2026-10-20T07:14:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:15:53Z",
+          "conclusion": "success",
+          "name": "Set up Node 24",
+          "number": 3,
+          "startedAt": "2026-10-20T07:15:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:15:58Z",
+          "conclusion": "success",
+          "name": "Test LFS asset preflight",
+          "number": 4,
+          "startedAt": "2026-10-20T07:15:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:15:58Z",
+          "conclusion": "success",
+          "name": "Check working LFS assets",
+          "number": 5,
+          "startedAt": "2026-10-20T07:15:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:16:01Z",
+          "conclusion": "success",
+          "name": "Install pinned pnpm",
+          "number": 6,
+          "startedAt": "2026-10-20T07:15:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:16:03Z",
+          "conclusion": "success",
+          "name": "Record verification identity",
+          "number": 7,
+          "startedAt": "2026-10-20T07:16:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:16:10Z",
+          "conclusion": "success",
+          "name": "Install locked dependencies",
+          "number": 8,
+          "startedAt": "2026-10-20T07:16:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:16:10Z",
+          "conclusion": "success",
+          "name": "Validate agent task catalog",
+          "number": 9,
+          "startedAt": "2026-10-20T07:16:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:16:11Z",
+          "conclusion": "success",
+          "name": "Check README links",
+          "number": 10,
+          "startedAt": "2026-10-20T07:16:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:22:25Z",
+          "conclusion": "success",
+          "name": "Run all tests",
+          "number": 11,
+          "startedAt": "2026-10-20T07:16:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:23:00Z",
+          "conclusion": "success",
+          "name": "Build production client",
+          "number": 12,
+          "startedAt": "2026-10-20T07:22:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:23:18Z",
+          "conclusion": "success",
+          "name": "Run isolated multiplayer integration",
+          "number": 13,
+          "startedAt": "2026-10-20T07:23:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:23:18Z",
+          "conclusion": "success",
+          "name": "Post Set up Node 24",
+          "number": 25,
+          "startedAt": "2026-10-20T07:23:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:23:19Z",
+          "conclusion": "success",
+          "name": "Post Checkout source and LFS assets",
+          "number": 26,
+          "startedAt": "2026-10-20T07:23:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T07:23:19Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 27,
+          "startedAt": "2026-10-20T07:23:19Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39385260988/job/118503461355"
+    }
+  ],
+  "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39385260988",
+  "summary": [
+    "verify\tRecord verification identity\t2026-10-20T07:16:01.4760985Z ^[[36;1mprintf 'PR head: %s\\nPR base: %s\\n' \"$PR_HEAD\" \"$PR_BASE\"^[[0m",
+    "verify\tRecord verification identity\t2026-10-20T07:16:01.4931146Z PR head: 42fa92a823b4e57936bf9fbf8c0bc82f04bdb95a",
+    "verify\tRecord verification identity\t2026-10-20T07:16:01.4932647Z PR base: db23fff93ad1a696f5089ae7f95051a75d317f3c",
+    "verify\tBuild production client\t2026-10-20T07:23:00.2796726Z ^[[32m✓ built in 5.70s^[[39m",
+    "verify\tRun isolated multiplayer integration\t2026-10-20T07:23:06.0903972Z PASS: real SDK queued vehicle respawn, fresh epoch forced authority and current presence, duplicate/old-epoch rejection, fresh scheduled movement, protected foreign driver, canonical isolated-world cleanup.",
+    "verify\tRun isolated multiplayer integration\t2026-10-20T07:23:12.4543280Z PASS: singleton world, guest boundary, two clients, walking, physical car W/A/D/brake/reverse/exit/re-entry on native DMR and authored assets, global/DM chat, consent, explicit blocking rejection, event ownership, session resume and weather endpoint.",
+    "verify\tRun isolated multiplayer integration\t2026-10-20T07:23:14.5226740Z PASS: 12 authenticated peers in one world; every peer sees every identity, above the old eight-player boundary; movement reaches every observer; position error <=0.51mm, exact ack and authoritative grounded bit; targeted keyframe restores an empty decoder without resetting locomotion or losing remote players; repeated ineffective quiz/decline commands do not fan out state to the world; contact changes update the two participants without broadcasting to ten unrelated peers; disconnect removes the player everywhere; resuming the same identity reconstructs the full shared world; guest cannot join or read authored meeting/presence from public HTTP",
+    "verify\tRun isolated multiplayer integration\t2026-10-20T07:23:18.5379434Z   \"completed\": true,"
+  ],
+  "logSha256": "b86cd1bdc806f1c66124ad41f2b804d6c2a6a97e994d7d231856ed9d1ae6bf5b",
+  "archiveSha256": "16437f61535d28f28281cc2c6bdf8af008ff6a3761144c8ba8c8958d4b5492f9",
+  "testSummary": [
+    "verify\tTest LFS asset preflight\t2026-10-20T07:15:58.5103554Z ℹ tests 25",
+    "verify\tTest LFS asset preflight\t2026-10-20T07:15:58.5105086Z ℹ pass 25",
+    "verify\tTest LFS asset preflight\t2026-10-20T07:15:58.5105687Z ℹ fail 0",
+    "verify\tTest LFS asset preflight\t2026-10-20T07:15:58.5106603Z ℹ skipped 0",
+    "verify\tTest LFS asset preflight\t2026-10-20T07:15:58.5107747Z ℹ duration_ms 4820.672006",
+    "verify\tRun all tests\t2026-10-20T07:22:25.0895467Z ℹ tests 1675",
+    "verify\tRun all tests\t2026-10-20T07:22:25.0895718Z ℹ pass 1675",
+    "verify\tRun all tests\t2026-10-20T07:22:25.0895839Z ℹ fail 0",
+    "verify\tRun all tests\t2026-10-20T07:22:25.0896227Z ℹ skipped 0",
+    "verify\tRun all tests\t2026-10-20T07:22:25.0896508Z ℹ duration_ms 372887.704705"
+  ]
+}

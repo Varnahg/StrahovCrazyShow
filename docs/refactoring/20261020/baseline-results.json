@@ -1,0 +1,36 @@
+{
+  "sourceCommit": "db23fff93ad1a696f5089ae7f95051a75d317f3c",
+  "auditStartCommit": "b3ad9b134688f45b4e0f97d9e0db84b3ac2716c4",
+  "currentMetadataCommit": "703a45c9afaae7ccbda3f36c877287d4203e0bd9",
+  "runtimeAndTestDiff": [],
+  "command": "pnpm exec tsx --test --test-concurrency=1 tests/*.test.ts",
+  "platform": "win32",
+  "node": "v24.19.0",
+  "tests": 1672,
+  "pass": 1671,
+  "fail": 0,
+  "skipped": 1,
+  "durationMs": 1857011.6461,
+  "reasonForSerial": "Předchozí přijatá evidence doložila lokální Windows contention časových Git/procesních fixtures; stejná celá sada a limity beze změn.",
+  "log": ".cache/refactor-validation/baseline-test.log",
+  "build": {
+    "command": "pnpm build",
+    "exitCode": 0,
+    "log": "baseline-build.log",
+    "knownWarnings": [
+      "Chunk size over 1100 kB",
+      "Ineffective dynamic import of vegetation also statically imported by world-renderer"
+    ]
+  },
+  "integration": {
+    "command": "pnpm test:integration",
+    "exitCode": 0,
+    "log": "baseline-integration.log",
+    "port": 2568
+  },
+  "publishedLogs": [
+    "baseline-test.log.gz",
+    "baseline-build.log.gz",
+    "baseline-integration.log.gz"
+  ]
+}
