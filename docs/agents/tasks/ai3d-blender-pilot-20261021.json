@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "ai3d-blender-pilot-20261021",
+  "title": "Ověřit textem vytvořený vlastní3D objekt a editovatelnou animaci v Blenderu",
+  "status": "ready",
+  "dependsOn": [
+    "ai3d-geometry-research-20261021",
+    "ai3d-motion-research-20261021",
+    "ai3d-blender-research-20261021"
+  ],
+  "writePaths": [
+    "_bmad-output/planning-artifacts/research/technical-text-to-3d-animation-workflows-2026-10-21/pilot/",
+    ".cache/ai3d-pilot-20261021/",
+    "docs/agents/handoffs/ai3d-blender-pilot-20261021.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu"
+  ],
+  "acceptance": [
+    "Po porovnání variant provést malý nezávislý text→bpy→originální kinetický objekt s pojmenovanými díly/pivoty/materiály a upravitelnými klíči.",
+    "Zachovat editovatelný blend, skutečný GLB animovaný export a nový import; porovnat vybrané transformační pózy, časování a endpoint smyčky, doložit skutečnou Blender verzi/RNA/export preset/hashes.",
+    "Statický CPU render a vizuální kontrola představují pouze pilot tvorby, nikoli důkaz kvality všech AI generátorů nebo herního výkonu.",
+    "Bez změn produkčních assetů, bez placené generace/instalace/API, bez vlastního síťového procesu; po běhu ukončené vlastní helpery a předání resources."
+  ],
+  "verification": [
+    "Lehká statická kontrola vlastního skriptu, skutečný připnutý Blender background CPU-only běh ve vlastním výstupním adresáři a reimport exportu.",
+    "Zaznamenat původní chyby a nedoložené vlastnosti; žádný unit/mock nevydávat za úspěšný export.",
+    "Před startem ověřit registry, skutečný executable a koordinovat okno s KEY53; po skončení ověřit cleanup."
+  ],
+  "notes": [
+    "Výslovný uživatelský modelovací/text-animation výzkum KEY58; pilot je experiment bez produkční implementace a bez nového BMAD build workflow.",
+    "Volba/varianty musí být nejdříve zaznamenané v parentem rezervovaném root/pilot-decision.md.",
+    "GPU rezervováno konzervativně pro Blender; renderer explicitně CyclesCPU, žádný FPS benchmark. Koordinátor KEY53 informován předstartem, jeho A/B má další samostatné okno."
+  ]
+}
