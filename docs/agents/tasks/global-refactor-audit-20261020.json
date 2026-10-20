@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-audit-20261020",
+  "title": "KEY-48: audit celé codebase, varianty refaktoringu a aktuálnost dokumentace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/refactoring/20261020/",
+    "docs/agents/handoffs/global-refactor-audit-20261020.md",
+    "_bmad-output/implementation-artifacts/global-refactor-20261020/",
+    "_bmad/render/bmad-build/refactor-20261020-6d7863b12a26/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Inventář pokryje vlastní runtime, skripty, testy a živou dokumentaci; generated/vendor/historická evidence jsou výslovně rozlišeny.",
+    "Před každou změnou doložit volající, veřejné kontrakty, varianty, náklady, cache/lifecycle a provázané generátory.",
+    "Zachovat cizí WIP a aktivní scopes, oddělit důkazy od hypotéz a naplánovaných kontrol."
+  ],
+  "verification": [
+    "node scripts/agent-tasks.mjs validate",
+    "Čtecí TypeScript AST inventář, noUnused diagnostika, dependency/reachability a místní odkazy dokumentace.",
+    "Výstupy obsahují zdrojový commit, skutečné výsledky a omezení."
+  ],
+  "notes": [
+    "Autorizováno uživatelem 20.10.2026 v relaci 01a15658-1415-7d41-9efe-6d3be9dd9f34. Linear KEY-48.",
+    "Izolovaná větev codex/global-refactor z main 22de9054. Audit nepřebírá cizí implementaci.",
+    "Jednotlivé implementační a validační scopes vzniknou až podle doložených závěrů auditu."
+  ]
+}
