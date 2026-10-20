@@ -8,7 +8,8 @@
     ".cache/performance-snapshot/refactor-baseline-20261020/",
     ".cache/performance-snapshot/refactor-world-20261020/",
     ".cache/refactor-preview/",
-    "docs/agents/handoffs/global-refactor-world-visual-20261020.md"
+    "docs/agents/handoffs/global-refactor-world-visual-20261020.md",
+    ".cache/performance-snapshot/refactor-baseline-20261020-b/"
   ],
   "resources": [
     "heavy-validation",
@@ -30,6 +31,8 @@
   ],
   "notes": [
     "Použít až po uvolnění validačního heavy-validation okna. Task vlastní jen své výstupy, nemění společný performance-snapshot.mjs ani uživatelův testovací build.",
-    "Snapshot skript v současné verzi neobsahuje patches/; reprodukční patch lze přidat před uzavřením vlastní dependency evidence, s ověřenými hashy a výslovným doplněním manifestu."
+    "Snapshot skript v současné verzi neobsahuje patches/; reprodukční patch lze přidat před uzavřením vlastní dependency evidence, s ověřenými hashy a výslovným doplněním manifestu.",
+    "První freezer session81193 skončil na sandbox EPERM při node_modules junction; původní výstup zůstává zachovaný a není přijatý. Druhý pokus má nové jméno refactor-baseline-20261020-b a běžný uživatelský kontext. Vlastnictví/předání: refactor-01a15658-visual, docs/agents/handoffs/global-refactor-world-visual-20261020.md.",
+    "Nové autodev regresní testy čtou AGENTS.md, docs/agents/bmad-policy.md a dvě .agents/skills/bmad-build šablony. Před prvním buildem dodat tyto přesné byte-identické závislosti do vlastní kopie a uvést hashovaný dependency sidecar; původní frozen soubory ani jejich manifest se nepřepisují."
   ]
 }
