@@ -14,6 +14,13 @@ const foreground = (data) =>
   !data.afterVisibilityChange &&
   data.context?.visibility !== "hidden" &&
   data.context?.visible !== false;
+// Identity changes retain transport evidence and its original connected time.
+// The full event still belongs to lifecycle history and server-clock boundaries.
+const isConnectionTransition = (kind, data) =>
+  kind === "network-connected" ||
+  kind === "network-connecting" ||
+  kind === "network-disconnected" ||
+  (kind === "network-left" && data.reason !== "identity-change");
 // Exact frequency tables avoid retaining every raw interval twice and copying
 // millions of samples for percentile sorting when reading retained 128 MiB logs.
 function samples() {
@@ -552,14 +559,7 @@ export async function summarizeDiagnosticFiles(files) {
           counts.actions++;
           retainLatest(actions, record);
         }
-        if (
-          [
-            "network-connected",
-            "network-connecting",
-            "network-disconnected",
-            "network-left",
-          ].includes(kind)
-        )
+        if (isConnectionTransition(kind, data))
           connectionEvents.push({
             seq: record.seq,
             atMs: record.atMs,
