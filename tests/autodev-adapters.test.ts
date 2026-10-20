@@ -52,7 +52,6 @@ const {
   planningInputHashes,
   assertPlanningReady,
   prepareWorkerInput,
-  executeWorkerInput,
   resumeWorkerAttempt,
   authorizationBinding,
   validatePresentation,
@@ -1777,6 +1776,25 @@ test("historical invalid presentation cannot repair away a substantive previous 
   assert.equal(await readFile(f.ctx.data.specFile, "utf8"), f.specText);
 });
 
+test("adapters retain the established public API after separating source ownership", async () => {
+  const adapters = await import(
+    new URL("../scripts/autodev/adapters.mjs", import.meta.url).href
+  );
+  assert.deepEqual(Object.keys(adapters), [
+    "assertStageScope",
+    "auditScope",
+    "createAdapter",
+    "ignoredSnapshot",
+    "inScope",
+    "parseDirty",
+    "reconcileSpecification",
+    "safePath",
+    "sourceIdentity",
+    "workingSnapshot",
+    "writeSpecification",
+  ]);
+});
+
 test("source identity is invariant across add/commit, covers new tests and deletions", async (t) => {
   const { root, ctx } = await fixture(t);
   await writeFile(path.join(root, "src/a.txt"), "after\n");
@@ -1867,6 +1885,33 @@ test("stage audit rejects changes to controller evidence by a source worker", as
   assert.throws(() => assertStageScope({}, { "src/a": null }, []), {
     code: "STAGE_SCOPE",
   });
+});
+
+test("stage audit canonicalizes before scope checks and distinguishes absent from deleted paths", () => {
+  assert.doesNotThrow(() =>
+    assertStageScope(
+      { "foreign/file": { sha256: "same", mode: 0o644 } },
+      { "foreign/file": { mode: 0o644, sha256: "same" } },
+      [],
+    ),
+  );
+  for (const [before, after] of [
+    [{}, { "foreign/file": null }],
+    [{ "foreign/file": null }, {}],
+    [{ "foreign/file": { sha256: "before" } }, { "foreign/file": null }],
+  ]) {
+    assert.throws(() => assertStageScope(before, after, []), {
+      code: "STAGE_SCOPE",
+      message: "This stage changed another owner's path: foreign/file",
+    });
+    assert.doesNotThrow(() => assertStageScope(before, after, ["foreign/"]));
+  }
+  for (const allowed of [[], ["foreign/"]]) {
+    assert.throws(
+      () => assertStageScope({}, { "foreign/file": { sha256: undefined } }, allowed),
+      { code: "INVALID_JSON", message: "State must contain JSON values only" },
+    );
+  }
 });
 
 test("scope guards reject junction escape and preserve both renamed paths", async (t) => {
