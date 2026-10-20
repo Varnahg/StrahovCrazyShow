@@ -10,6 +10,7 @@ const items = [
   { id: "chat", label: "Chat" },
   { id: "activities", label: "Aktivity" },
   { id: "settings", label: "Nastavení" },
+  { id: "feedback", label: "Zpětná vazba", shortcut: "F8" },
 ] as const;
 
 /** Static navigation does not need to rerender with the game's stats/clock. */
@@ -24,7 +25,7 @@ export const WorldDock = memo(function WorldDock({
   requestCount: number;
   onToggle: (panel: string) => void;
 }) {
-  useLocale();
+  const locale = useLocale();
   return (
     <nav
       className="dock world-dock"
@@ -32,7 +33,7 @@ export const WorldDock = memo(function WorldDock({
       aria-describedby="world-dock-help"
     >
       {items.map((item) => {
-        const label = t(item.label);
+        const label = item.id === "feedback" ? locale === "cs" ? "Zpětná vazba" : "Feedback" : t(item.label);
         const active =
           panel === item.id || (item.id === "journal" && journalOpen);
         const shortcut = "shortcut" in item ? item.shortcut : undefined;

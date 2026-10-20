@@ -25,6 +25,7 @@ import type { Player, Profile } from "../shared/types";
 import { getWeather } from "./weather";
 import { createLocalBenchmarkHandler } from "./local-benchmarks";
 import { createSessionDiagnosticsHandler } from "./session-diagnostics";
+import { createFeedbackService } from "./feedback";
 import {
   createServerReadiness,
   createStaticClientHandler,
@@ -550,7 +551,9 @@ const http = createServer();
 const listenHost = config.host;
 const sessionDiagnostics = createSessionDiagnosticsHandler({ listenHost });
 const localBenchmarks = createLocalBenchmarkHandler({ listenHost });
+const feedback = await createFeedbackService();
 const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
+  if (await feedback.handle(req, res)) return;
   if (await sessionDiagnostics(req, res)) return;
   if (await localBenchmarks(req, res)) return;
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -652,7 +655,10 @@ const server = new Server({
 // Colyseus dispatches matchmaking before Express. Enforce this at its controller,
 // before a rejected create request can construct a second physics simulation.
 matchMaker.controller.exposedMethods = ["joinById"];
-server.onBeforeShutdown(() => readiness.stop());
+server.onBeforeShutdown(async () => {
+  readiness.stop();
+  await feedback.close();
+});
 server.define("strahov", StrahovRoom);
 await server.listen(config.port, listenHost);
 const room = await matchMaker.createRoom("strahov", {});

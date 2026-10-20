@@ -19,19 +19,23 @@ COPY . .
 RUN test ! -d assets/blender
 RUN node scripts/check-runtime-assets.mjs
 # The SDK resolves / against the browser origin, including HTTPS and its port.
-RUN VITE_MULTIPLAYER_URL=/ pnpm build
+# The frozen install/cache key above already verifies manifests and patches.
+# COPY may refresh identical input mtimes; do not let pnpm 11 reinstall them.
+RUN VITE_MULTIPLAYER_URL=/ pnpm --config.verify-deps-before-run=false run build
 
 FROM node:24-bookworm-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
     PORT=2567 \
-    STATIC_DIR=/app/dist
+    STATIC_DIR=/app/dist \
+    FEEDBACK_DIR=/data/feedback
 COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/package.json /app/tsconfig.json ./
 COPY --from=build --chown=node:node /app/server ./server
 COPY --from=build --chown=node:node /app/shared ./shared
 COPY --from=build --chown=node:node /app/dist ./dist
+RUN mkdir -p /data/feedback && chown node:node /data/feedback
 USER node
 EXPOSE 2567
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \

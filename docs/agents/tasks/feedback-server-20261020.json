@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "status": "done",
+  "dependsOn": [],
+  "resources": [],
+  "acceptance": [
+    "Implementace odpovídá schválenému výzkumu, automatický snímek bez HUD, žádný další scene.render a žádné trvalé preserveDrawingBuffer.",
+    "Zachovat host isolation, malé bounded fronty, jasné selhání a lifecycle; praktický nebo cílený test doložit přesně, ne hypoteticky."
+  ],
+  "verification": [
+    "Cílené relevantní CPU testy a typová kontrola před předáním.",
+    "Celá sada/build/integrace a browser/GPU pouze pod samostatnou validation rezervací."
+  ],
+  "notes": [
+    "Výslovné uživatelské zadání20Oct2026: kompletně implementovat podle KEY-51, navázat na KEY-21, prakticky ověřit a integrovat do main. Cizí WIP se nepřebírá.",
+    "Implementace v izolované worktree codex/player-feedback-20261020 na c713c2ae. Shared kontrakt vlastní root; subagenti mají disjunktní soubory. Capture WIP KEY-21 zůstává chráněný, dokud nebude doložené předání.",
+    "Root aktualizuje Linear a provádí integraci; podagenti předají kód, cílený refaktoring a relevantní testy společně. Žádné samostatné commity subagentů.",
+    "Integrátor převzal dokončený vlastní výsledek: cílené testy/review i skutečný produkční tok nebo Docker/HTTP lifecycle podle scope prošly. Přijetí dílčího tasku není tvrzením o dokončeném main CI celého KEY-52."
+  ],
+  "id": "feedback-server-20261020",
+  "title": "Persistentní příjem, fronta a Linear adapter pro hlášení",
+  "writePaths": [
+    "server/feedback.ts",
+    "server/feedback-store.ts",
+    "server/feedback-linear.ts",
+    "tests/feedback-server.test.ts",
+    "tests/feedback-store.test.ts",
+    "tests/feedback-linear.test.ts",
+    "docs/agents/handoffs/feedback-server-20261020.md"
+  ]
+}

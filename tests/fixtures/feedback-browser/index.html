@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Feedback browser regression fixture</title>
+    <style>
+      body {
+        margin: 24px;
+        background: #10212b;
+        color: #edf2ee;
+        font:
+          15px/1.5 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 1000px;
+        margin: auto;
+      }
+      .fixture-controls {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 16px 0;
+      }
+      .fixture-controls button {
+        padding: 10px;
+        color: #edf2ee;
+        background: #26414f;
+        border: 1px solid #aec2ca;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .fixture-controls button:focus-visible {
+        outline: 3px solid #f2d494;
+      }
+      pre {
+        background: #091820;
+        padding: 16px;
+        overflow: auto;
+        max-height: 350px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      p {
+        max-width: 80ch;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

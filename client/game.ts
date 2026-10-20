@@ -1,6 +1,8 @@
 import { AuthoredLightPreparation } from "./authored-light-preparation";
 import "./render-shaders";
 import { sessionDiagnostics } from "./session-diagnostics";
+import { RenderedFrameCapture } from "./rendered-frame-capture";
+import type { FeedbackFrame } from "../shared/feedback";
 import { createEnvironmentProfile } from "./environment-profile";
 import { WebGpuFrameLifecycleProfile } from "./webgpu-frame-lifecycle-profile";
 import {
@@ -349,6 +351,32 @@ export class Game {
     this.selectedTarget = selection;
     this.onSelection?.(selection);
   }
+  /** Capture has no render/camera mutation or transport; the engine owns submission. */
+  captureFeedback(signal?: AbortSignal) {
+    if (!this.ready || this.disposed || this.rendererFailed)
+      return Promise.resolve({ capture: { state: "unavailable" as const, reason: "no-frame" }, image: null });
+    this.feedbackCapture ??= new RenderedFrameCapture({
+      engine: this.engine,
+      frame: (): FeedbackFrame | null => {
+        if (!this.ready || this.disposed || this.rendererFailed || !this.feedbackFrameId) return null;
+        const position = this.avatars.get(this.localId)?.root.position ?? this.actor.position;
+        const camera = this.camera.globalPosition;
+        const rotation = this.camera.rotationQuaternion?.toEulerAngles() ?? this.camera.rotation;
+        return {
+          frameId: this.feedbackFrameId,
+          renderedAtUTC: new Date(performance.timeOrigin + this.feedbackRenderCompletedAtMs).toISOString(),
+          renderCompletedAtMs: this.feedbackRenderCompletedAtMs,
+          position: { x: position.x, y: position.y, z: position.z },
+          camera: { x: camera.x, y: camera.y, z: camera.z, yaw: rotation.y, pitch: rotation.x },
+          renderWidth: this.engine.getRenderWidth(), renderHeight: this.engine.getRenderHeight(),
+          cssWidth: this.canvas.clientWidth, cssHeight: this.canvas.clientHeight,
+          quality: this.quality,
+          backend: this.engine.isWebGPU ? this.engine.compatibilityMode ? "webgpu" : "webgpu-fast" : "webgl2",
+        };
+      },
+    });
+    return this.feedbackCapture.capture(signal);
+  }
   benchmark?: {
     start: number;
     frames: number[];
@@ -430,6 +458,9 @@ export class Game {
   lights: PointLight[] = [];
   disposed = false;
   renderErrorCount = 0;
+  private feedbackCapture?: RenderedFrameCapture;
+  private feedbackFrameId = 0;
+  private feedbackRenderCompletedAtMs = 0;
   readonly renderHealth: RenderHealth;
   private readonly startupAbort = new AbortController();
   private rendererFailed = false;
@@ -2851,6 +2882,8 @@ export class Game {
     this.gltfLightBudget.prepareFrame();
     this.stableLights.update();
     this.scene.render();
+    this.feedbackFrameId++;
+    this.feedbackRenderCompletedAtMs = performance.now();
     const engineWork = this.benchmark?.profile.endFrame();
     const renderEnded = performance.now();
     for (const [id, a] of this.avatars) {
@@ -3072,6 +3105,7 @@ export class Game {
   }
   dispose() {
     if (this.disposed) return;
+    this.feedbackCapture?.dispose();
     this.disposed = true;
     this.ready = false;
     this.startupAbort.abort();

@@ -1,0 +1,90 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.diagnostics
+#1 transferring dockerfile: 2.08kB 0.0s done
+#1 DONE 0.1s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 ...
+
+#3 [auth] docker/dockerfile:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 DONE 8.7s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#4 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#4 CACHED
+
+#5 [internal] load metadata for docker.io/library/node:24-bookworm-slim
+#5 ...
+
+#6 [auth] library/node:pull token for registry-1.docker.io
+#6 DONE 0.0s
+
+#5 [internal] load metadata for docker.io/library/node:24-bookworm-slim
+#5 DONE 1.6s
+
+#7 [internal] load .dockerignore
+#7 transferring context: 1.07kB done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 DONE 0.0s
+
+#9 [dependencies 1/5] FROM docker.io/library/node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5
+#9 resolve docker.io/library/node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5 0.0s done
+#9 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 567.98kB 0.5s done
+#8 DONE 0.5s
+
+#10 [dependencies 4/5] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#10 CACHED
+
+#11 [dependencies 5/5] COPY patches/ ./patches/
+#11 CACHED
+
+#12 [dependencies 2/5] WORKDIR /app
+#12 CACHED
+
+#13 [dependencies 3/5] RUN npm install --global pnpm@11.25.0
+#13 CACHED
+
+#14 [build 1/5] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --frozen-lockfile --store-dir=/pnpm/store
+#14 CACHED
+
+#15 [build 2/5] COPY . .
+#15 DONE 15.6s
+
+#16 [build 3/5] RUN test ! -d assets/blender
+#16 DONE 0.6s
+
+#17 [build 4/5] RUN node scripts/check-runtime-assets.mjs
+#17 3.093 Runtime assets: checked 7538 files; no Git LFS pointers.
+#17 DONE 3.1s
+
+#18 [build 5/5] RUN VITE_MULTIPLAYER_URL=/ pnpm --config.verify-deps-before-run=error run build
+#18 1.053 [ERR_PNPM_VERIFY_DEPS_BEFORE_RUN] Patches were modified
+#18 1.053 
+#18 1.053 Run "pnpm install"
+#18 ERROR: process "/bin/sh -c VITE_MULTIPLAYER_URL=/ pnpm --config.verify-deps-before-run=error run build" did not complete successfully: exit code: 1
+------
+ > [build 5/5] RUN VITE_MULTIPLAYER_URL=/ pnpm --config.verify-deps-before-run=error run build:
+1.053 [ERR_PNPM_VERIFY_DEPS_BEFORE_RUN] Patches were modified
+1.053 
+1.053 Run "pnpm install"
+------
+Dockerfile.diagnostics:24
+--------------------
+  22 |     # The frozen install/cache key above already verifies manifests and patches.
+  23 |     # COPY may refresh identical input mtimes; do not let pnpm 11 reinstall them.
+  24 | >>> RUN VITE_MULTIPLAYER_URL=/ pnpm --config.verify-deps-before-run=error run build
+  25 |     
+  26 |     FROM node:24-bookworm-slim AS runtime
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c VITE_MULTIPLAYER_URL=/ pnpm --config.verify-deps-before-run=error run build" did not complete successfully: exit code: 1
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/udpjzumpkj90lz9excw7pbyvj

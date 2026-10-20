@@ -1,0 +1,210 @@
+.feedback-dialog {
+  color-scheme: dark;
+  box-sizing: border-box;
+  width: min(620px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 22px;
+  overflow: auto;
+  border: 1px solid #bba879;
+  border-radius: 8px;
+  background: #14242e;
+  color: #eef2ed;
+  box-shadow: 0 24px 90px #0009;
+  font:
+    14px/1.5 system-ui,
+    sans-serif;
+  overscroll-behavior: contain;
+}
+.feedback-dialog::backdrop {
+  background: #061019bd;
+}
+.feedback-dialog .feedback-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.feedback-dialog h2 {
+  margin: 0;
+  color: #f2dda7;
+  font:
+    28px Georgia,
+    serif;
+}
+.feedback-dialog h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+.feedback-dialog button {
+  min-height: 40px;
+  padding: 8px 13px;
+  border: 1px solid #829398;
+  border-radius: 4px;
+  background: #213945;
+  color: #f3f5f0;
+  font: inherit;
+  cursor: pointer;
+}
+.feedback-dialog button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.feedback-dialog button:hover:not(:disabled) {
+  background: #31505e;
+}
+.feedback-dialog .feedback-close {
+  margin-left: auto;
+  min-width: 40px;
+  font-size: 22px;
+  padding: 0 8px;
+}
+.feedback-dialog :is(button, input, textarea, summary):focus-visible {
+  outline: 3px solid #f2d494;
+  outline-offset: 3px;
+}
+.feedback-dialog .feedback-muted {
+  color: #b9c9ce;
+  font-size: 12px;
+}
+.feedback-dialog .feedback-fields {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  display: grid;
+  gap: 9px;
+}
+.feedback-dialog legend {
+  padding: 0 0 8px;
+}
+.feedback-dialog .feedback-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.feedback-dialog .feedback-kinds label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #617c88;
+  border-radius: 4px;
+}
+.feedback-dialog input[type="radio"] {
+  accent-color: #ead39e;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+}
+.feedback-dialog :is(textarea, input[type="email"]) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  background: #0b1c26;
+  border: 1px solid #82959d;
+  border-radius: 4px;
+  color: #f3f6f1;
+  padding: 9px;
+  font: inherit;
+}
+.feedback-dialog textarea {
+  resize: vertical;
+}
+.feedback-dialog textarea::placeholder {
+  color: #a8bac3;
+}
+.feedback-dialog summary {
+  min-height: 34px;
+  padding-top: 5px;
+  cursor: pointer;
+  color: #e9d8af;
+}
+.feedback-dialog .feedback-details {
+  display: grid;
+  gap: 8px;
+  padding: 8px 0;
+}
+.feedback-dialog .feedback-photo {
+  margin: 5px 0;
+  padding: 12px;
+  background: #0d1f29;
+  border: 1px solid #496470;
+  border-radius: 4px;
+  display: grid;
+  gap: 9px;
+}
+.feedback-dialog .feedback-photo img {
+  width: 100%;
+  max-height: 230px;
+  object-fit: contain;
+  border-radius: 3px;
+  background: #06121a;
+}
+.feedback-dialog .feedback-photo button {
+  justify-self: start;
+}
+.feedback-dialog .feedback-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: end;
+  margin-top: 18px;
+}
+.feedback-dialog .feedback-send {
+  background: #dfc68f;
+  color: #14212a;
+  border-color: #dfc68f;
+  font-weight: 700;
+}
+.feedback-dialog .feedback-send:hover:not(:disabled) {
+  background: #f2dcae;
+}
+.feedback-dialog .feedback-error {
+  color: #ffd0b9;
+  padding: 8px 0;
+}
+.feedback-dialog .feedback-result {
+  padding: 15px 0;
+}
+.feedback-dialog .feedback-pending {
+  margin-top: 20px;
+  border-top: 1px solid #627b87;
+  padding-top: 16px;
+}
+.feedback-dialog .feedback-pending ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.feedback-dialog .feedback-pending li {
+  border: 1px solid #58727f;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.feedback-dialog .feedback-pending-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 90px;
+  overflow: auto;
+  margin: 0 0 10px;
+}
+.feedback-dialog .feedback-pending-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+@media (max-width: 480px) {
+  .feedback-dialog {
+    width: calc(100% - 16px);
+    max-height: calc(100dvh - 16px);
+    padding: 16px;
+  }
+  .feedback-dialog h2 {
+    font-size: 25px;
+  }
+  .feedback-dialog .feedback-actions > button {
+    flex: 1;
+  }
+}

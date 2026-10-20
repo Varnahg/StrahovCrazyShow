@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "feedback-publication-20261020",
+  "title": "KEY-52: publikovat ověřený feedback přes PR a main CI",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/feedback-publication-20261020.md"
+  ],
+  "resources": [
+    "github-ci-validation"
+  ],
+  "acceptance": [
+    "Přesný vlastní diff, zelená PR/main CI a přijatá integrace bez cizího WIP."
+  ],
+  "verification": [
+    "GitHub PR a source-secret-hygiene+verify vázané na skutečnýcommit; ověřit vzdálenýmain po merge."
+  ],
+  "notes": [
+    "Součást výslovně uživatelem autorizované integrace KEY-52. Získat teprve po lokální přejímce a domluvě s perfkoordinátorem. Předání může zapsat stejný root pod tímto disjunktnímclaimem."
+  ]
+}

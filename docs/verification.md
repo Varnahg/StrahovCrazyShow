@@ -14,6 +14,16 @@ Každý výsledek platí jen pro zaznamenané source ID a podmínky ověření. 
 
 Funkční přejímka není FPS benchmark ani důkaz zrychlení. Úplná fotografická věrnost, všechny povolené interiéry a denní i davová přejímka 60 FPS na GeForce GTX 1060 zůstávají otevřené. Uživatelské diagnostiky zůstávají místní.
 
+## Herní zpětná vazba · KEY-52 · 20./21. října 2026
+
+Krátký CZ/EN formulář v menu, docku, pod F8 a při chybě startu používá automatický snímek samotné3Dscény bez HUD. Hráč má náhled a odebrání. Server potvrzuje až trvalé uložení; omezená IndexedDB fronta zachová čekající text i Blob. Skutečné produkční reporty KEY-55, offline/close/reopen KEY-56 i finální KEY-57 byly doručené do soukromého Linear a jejich stažené přílohy jsou bajtově shodné s originály. Replay202/same receipt a conflict409 ověřeny. [Úplná přejímka včetně původních selhání](verification-evidence/feedback-20261020/README.md).
+
+Finální image:28060b WebP, SHA23a23beda3872f6c74c6625f35d790f0aabf5a66e1a74c4803639aad490fddf4. Source23badec8 včetně testů, clientBuildIdsha256-86ce14d1...; visibleIAB/UHD630/D3D11, Mia, guest ready/0errors, správný menu/F8/return/reopenfocus a odebrání snímku. Multiplayer také connected/0errors. Docker později prošel node-owned persistentním volume, skutečným HTTP příjmem, compiled frontend admission přesCUA, SDK scénáři, SIGTERM/exit0, restartem a zachovanou stejnou příjemkou/reportem. Vlastní pomocné prostředky jsou uklizené.
+
+PR CI39502968333/head791e61a1 prošlo1830/1830,0fail/0skip, včetně skutečného Chromium/React/nativeIndexedDB testu. Build/TypeScript i celá izolovaná integrace prošly. První CI1830testů mělo jedinou zastaralou HUD aserci; log i oprava jsou zachované. Lokální úplná Windows sada byla přerušena bez úplného výsledku a neníPASS. Nový Docker-only scopedbuild fix má8cílených deployment testů, negativní CLI kontrolu a nezávislý čtecí review bez nálezů. Aktuální kombinaci s přijatým b05a base ověřuje nová přesná CI a přijetí integrátora v [PR19](https://github.com/Varnahg/StrahovCrazyShow/pull/19) a [KEY-52](https://linear.app/gigeconomy/issue/KEY-52/implementovat-herni-feedback-se-snimkem-bez-hud-a-dorucenim-do-linear).
+
+Jeden provozní benchmark před finálními opravami:10,03s/1avatar/plná hra sHUD, medium/dennídemo,580×668CSS i interně,38,3FPS/p9532,6ms/p9939,3ms/UHD630. Není A/B důkaz nebo splnění60FPS. Edge se stejným dřívějším buildem timeoutoval při přípravě světel stejně jako historická baseline; příčina prostředí není prokázaná. Watchdog ani readiness nebyly obcházené a WebGPU pixely se touto přejímkou netvrdí. Actualcredentialscan38textových souborů finálního klienta je negativní; credential zůstává jen v neveřejné serverové konfiguraci.
+
 ## Historická evidence
 
 **Následující původní záznamy jsou zachované včetně kotvených nadpisů, tehdejšího slova „aktuální“, portů, hashů, neúspěšných pokusů a provenience. Každé tvrzení platí k datu a checkpointu dané sekce.** D2/P5, tehdejší protokol 9 a preview 4179 nejsou současný návod ani důkaz běžící služby. Novější PASS nesmazává dřívější selhání a staré FPS se nepřenášejí na dnešní zdroje.

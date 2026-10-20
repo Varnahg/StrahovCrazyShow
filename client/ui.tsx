@@ -1,4 +1,8 @@
 import { HudIcon } from "./hud-icons";
+import { FeedbackDialog } from "./feedback";
+import { CLIENT_BUILD_ID } from "./build-identity";
+import { sanitizeDiagnosticsText } from "../shared/session-diagnostics";
+import type { FeedbackContext } from "../shared/feedback";
 import { sessionDiagnostics } from "./session-diagnostics";
 import { getRendererInfo } from "./gpu-diagnostics";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
@@ -142,7 +146,11 @@ const initialActivity: ActivityState = {
   },
 };
 export function App() {
-  useLocale();
+  const feedbackLocale = useLocale();
+  const feedbackLocaleRef = useRef(feedbackLocale);
+  feedbackLocaleRef.current = feedbackLocale;
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const recentFeedbackErrors = useRef<NonNullable<FeedbackContext["events"]>>([]);
   const mapDialog = useRef<HTMLElement>(null),
     mapClose = useRef<HTMLButtonElement>(null);
   const [journalOpen, setJournalOpen] = useState(false),
@@ -289,6 +297,58 @@ export function App() {
     weatherRef = useRef(weather),
     chatEnd = useRef<HTMLDivElement>(null),
     carState = useRef<any>(null);
+  const openFeedback = useCallback(() => {
+    // Only one modal focus owner may remain active behind the native dialog.
+    setJournalOpen(false);
+    setEmotesOpen(false);
+    setShowForm(false);
+    setPanel("");
+    game.current?.setUiModal(true);
+    if (document.pointerLockElement) document.exitPointerLock();
+    setFeedbackOpen(true);
+  }, []);
+  const closeFeedback = useCallback(() => setFeedbackOpen(false), []);
+  const captureFeedback = useCallback((signal: AbortSignal) =>
+    game.current?.captureFeedback(signal) ?? Promise.resolve({
+      capture: { state: "unavailable" as const, reason: "no-frame" }, image: null,
+    }), []);
+  const feedbackContext = useCallback((): FeedbackContext => {
+    const current = game.current;
+    const now = performance.now();
+    return {
+      clientBuildId: CLIENT_BUILD_ID,
+      mode: modeRef.current === "multi" ? "multiplayer" : modeRef.current === "guest" ? "guest" : "menu",
+      locale: feedbackLocaleRef.current,
+      page: modeRef.current === "menu" ? "menu" : current?.ready ? "game" : "startup-error",
+      userAgent: navigator.userAgent.slice(0, 512),
+      renderErrors: current?.renderErrorCount ?? 0,
+      renderHealth: current?.canvas.dataset.renderHealth,
+      events: recentFeedbackErrors.current.filter(event => now - event.atMs <= 30000),
+    };
+  }, []);
+  useEffect(() => {
+    const record = (kind: string, detail: string) => {
+      const now = performance.now();
+      recentFeedbackErrors.current = [...recentFeedbackErrors.current.filter(event => now - event.atMs <= 30000),
+        { atMs: now, kind, detail: sanitizeDiagnosticsText(detail, 256) }].slice(-30);
+    };
+    const error = (event: ErrorEvent) => record("js-error", event.message);
+    const rejected = () => record("unhandled-rejection", "Asynchronous operation failed");
+    const key = (event: KeyboardEvent) => {
+      if (event.code !== "F8" || event.repeat || event.defaultPrevented ||
+          (event.target as Element | null)?.closest("input,textarea,select,[contenteditable]")) return;
+      event.preventDefault();
+      openFeedback();
+    };
+    window.addEventListener("error", error);
+    window.addEventListener("unhandledrejection", rejected);
+    window.addEventListener("keydown", key);
+    return () => {
+      window.removeEventListener("error", error);
+      window.removeEventListener("unhandledrejection", rejected);
+      window.removeEventListener("keydown", key);
+    };
+  }, [openFeedback]);
   if (!inputBuffer.current)
     inputBuffer.current = new FrameInputBuffer({
       now: () => performance.now(),
@@ -444,6 +504,7 @@ export function App() {
       setEmotesOpen((open) => !open);
     };
     const close = () => {
+      setFeedbackOpen(false);
       setJournalOpen(false);
       setEmotesOpen(false);
       setShowForm(false);
@@ -461,8 +522,8 @@ export function App() {
     };
   }, []);
   useEffect(() => {
-    game.current?.setUiModal(journalOpen || emotesOpen || showForm || !!panel);
-  }, [journalOpen, emotesOpen, showForm, panel, ready]);
+    game.current?.setUiModal(feedbackOpen || journalOpen || emotesOpen || showForm || !!panel);
+  }, [feedbackOpen, journalOpen, emotesOpen, showForm, panel, ready]);
   useEffect(() => {
     chatEnd.current?.scrollIntoView({ block: "nearest" });
   }, [messages, channel]);
@@ -910,6 +971,10 @@ export function App() {
     room.current?.send(action, data);
   };
   const togglePanel = useCallback((value: string) => {
+    if (value === "feedback") {
+      openFeedback();
+      return;
+    }
     game.current?.blur();
     if (document.pointerLockElement) document.exitPointerLock();
     setEmotesOpen(false);
@@ -919,7 +984,7 @@ export function App() {
     }
     setJournalOpen(false);
     setPanel((p) => (p === value ? "" : value));
-  }, []);
+  }, [openFeedback]);
   const openJournal = (id?: string) => {
     game.current?.blur();
     if (document.pointerLockElement) document.exitPointerLock();
@@ -982,6 +1047,8 @@ export function App() {
       compact={mode !== "menu"}
     />
   );
+  const feedbackDialog = <FeedbackDialog open={feedbackOpen} onClose={closeFeedback}
+    getContext={feedbackContext} capture={captureFeedback} />;
   if (mode === "menu")
     return (
       <main className="welcome">
@@ -991,6 +1058,9 @@ export function App() {
           </a>
           <span className="demo-badge">{t("HRATELNÉ DEMO · 0.1")}</span>
           <LanguagePicker />
+          <button type="button" className="secondary" onClick={openFeedback} aria-keyshortcuts="F8">
+            {feedbackLocale === "cs" ? "Zpětná vazba" : "Feedback"}
+          </button>
           <a
             href="https://wiki.sh.cvut.cz/kolej/bloky/blok_6"
             target="_blank"
@@ -1067,6 +1137,7 @@ export function App() {
           <span>STRAHOV CRAZY SHOW</span>
           <span>{t("Pro lidi, kteří žijí na kopci.")}</span>
         </footer>
+        {feedbackDialog}
       </main>
     );
   return (
@@ -1084,6 +1155,9 @@ export function App() {
           </div>
           <p>{t("Připravuji celý kopec…")}</p>
           {error && <p className="error">{localizeNotice(error)}</p>}
+          <button type="button" className="secondary" onClick={openFeedback} aria-keyshortcuts="F8">
+            {feedbackLocale === "cs" ? "Nahlásit problém" : "Report a problem"}
+          </button>
           <button
             type="button"
             className="secondary"
@@ -2589,6 +2663,7 @@ export function App() {
         onClose={() => setEmotesOpen(false)}
         onChoose={playEmote}
       />
+      {feedbackDialog}
     </main>
   );
 }

@@ -1,0 +1,134 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: cker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#4 CACHED
+
+#5 [internal] load metadata for docker.io/library/node:24-bookworm-slim
+#5 DONE 0.4s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 1.07kB done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 DONE 0.0s
+
+#8 [dependencies 1/5] FROM docker.io/library/node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5
+#8 resolve docker.io/library/node:24-bookworm-slim@sha256:a5f4366e834695d5f363b920c104953a535d3a9864d1bdf74566a0ebe01daee5 0.0s done
+#8 DONE 0.1s
+
+#7 [internal] load build context
+#7 transferring context: 101.76MB 4.8s
+#7 transferring context: 201.01MB 9.9s
+#7 transferring context: 296.89MB 15.0s
+#7 transferring context: 390.42MB 20.1s
+#7 transferring context: 449.39MB 25.1s
+#7 transferring context: 487.28MB 30.2s
+#7 transferring context: 548.98MB 35.3s
+#7 transferring context: 649.36MB 40.4s
+#7 transferring context: 749.04MB 45.4s
+#7 transferring context: 827.82MB 50.5s
+#7 transferring context: 902.45MB 55.6s
+#7 transferring context: 1.00GB 60.6s
+#7 transferring context: 1.10GB 65.7s
+#7 transferring context: 1.17GB 70.7s
+#7 transferring context: 1.25GB 75.8s
+#7 transferring context: 1.32GB 80.8s
+#7 transferring context: 1.33GB 81.3s done
+#7 DONE 81.4s
+
+#9 [dependencies 5/5] COPY patches/ ./patches/
+#9 CACHED
+
+#10 [dependencies 2/5] WORKDIR /app
+#10 CACHED
+
+#11 [dependencies 3/5] RUN npm install --global pnpm@11.25.0
+#11 CACHED
+
+#12 [dependencies 4/5] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#12 CACHED
+
+#13 [build 1/5] RUN --mount=type=cache,id=strahov-pnpm,target=/pnpm/store     pnpm install --frozen-lockfile --store-dir=/pnpm/store
+#13 CACHED
+
+#14 [build 2/5] COPY . .
+#14 DONE 14.7s
+
+#15 [build 3/5] RUN test ! -d assets/blender
+#15 DONE 1.0s
+
+#16 [build 4/5] RUN node scripts/check-runtime-assets.mjs
+#16 4.078 Runtime assets: checked 7538 files; no Git LFS pointers.
+#16 DONE 4.1s
+
+#17 [build 5/5] RUN VITE_MULTIPLAYER_URL=/ pnpm build
+#17 2.237 [ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY] Aborted removal of modules directory due to no TTY
+#17 2.237 
+#17 2.237 If you are running pnpm in CI, set the CI environment variable to "true", or set "confirmModulesPurge" to "false".
+#17 2.329 [ERROR] Command failed with exit code 1: pnpm install
+#17 2.329 
+#17 2.329 pnpm: Command failed with exit code 1: pnpm install
+#17 2.329     at getFinalError (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:89986:14)
+#17 2.329     at makeError (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:92293:21)
+#17 2.329     at getSyncResult (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:94137:10)
+#17 2.329     at spawnSubprocessSync (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:94097:14)
+#17 2.329     at execaCoreSync (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:94027:23)
+#17 2.329     at callBoundExeca (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:96555:23)
+#17 2.329     at boundExeca (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:96532:49)
+#17 2.329     at sync2 (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:96687:14)
+#17 2.329     at runPnpmCli (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:276906:5)
+#17 2.329     at runDepsStatusCheck (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:278122:7)
+#17 ERROR: process "/bin/sh -c VITE_MULTIPLAYER_URL=/ pnpm build" did not complete successfully: exit code: 1
+------
+ > [build 5/5] RUN VITE_MULTIPLAYER_URL=/ pnpm build:
+2.329     at getFinalError (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:89986:14)
+2.329     at makeError (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:92293:21)
+2.329     at getSyncResult (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:94137:10)
+2.329     at spawnSubprocessSync (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:94097:14)
+2.329     at execaCoreSync (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:94027:23)
+2.329     at callBoundExeca (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:96555:23)
+2.329     at boundExeca (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:96532:49)
+2.329     at sync2 (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:96687:14)
+2.329     at runPnpmCli (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:276906:5)
+2.329     at runDepsStatusCheck (file:///usr/local/lib/node_modules/pnpm/dist/pnpm.mjs:278122:7)
+------
+Dockerfile:22
+
+--------------------
+
+  20 |     RUN node scripts/check-runtime-assets.mjs
+
+  21 |     # The SDK resolves / against the browser origin, including HTTPS and its port.
+
+  22 | >>> RUN VITE_MULTIPLAYER_URL=/ pnpm build
+
+  23 |     
+
+  24 |     FROM node:24-bookworm-slim AS runtime
+
+--------------------
+
+failed to solve: process "/bin/sh -c VITE_MULTIPLAYER_URL=/ pnpm build" did not complete successfully: exit code: 1
+
+
+
+View build details: docker-desktop://dashboard/build/default/default/ysl8rjebm0bxkrnioog6wbcuv
+
+
+
+1 !== 0
+
+    at run (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/player-feedback-validation/docker-smoke.mjs:26:10)
+    at async file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/player-feedback-validation/docker-smoke.mjs:37:3 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 1,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0
