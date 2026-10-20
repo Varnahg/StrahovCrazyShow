@@ -17,3 +17,9 @@ Raw DOM/console stavy, screenshoty a gzip build logy v docs/refactoring/20261020
 Explicitní QA WebGPU kandidát také skončil light-preparation timeout; raw JSON/screenshot a hash přidány do uvedené evidence. Není to WebGPU A/B proti baseline ani důkaz příčiny. OS inventář uvádí Intel UHD630/31.0.101.2140 a NVIDIA GTX1060/32.0.15.8228; skutečně vybraný adaptér nebyl kvůli nedokončenému startupu potvrzen.
 
 Všechny vlastní testovací browser karty uzavřeny. Vlastní baseline PID22936 a kandidát PID33892 ukončeny po porovnání přesného UTC startu, executable a command. Port4290 bez listeneru. Snapshoty se po uzavření identity neměnily. Vizuální acceptance zůstává neprovedená kvůli doloženému výchozímu startup problému; žádný visual/GPU/FPS PASS. Předávám koordinátorovi refactor-01a15658-audit k dalšímu nezávislému šetření; rezervace se nyní uvolní, release neznamená Done. Uživatel20.10. povolil zprávami domluvit bezpečné předání chráněného Game/UI a trávy; zprávy vlastníkům odeslané, jejich WIP zatím nedotčené.
+
+## Dokončená funkční přejímka ve viditelném IAB
+
+Stejné frozen zdroje baseline336a9b1d a kandidátaa3feebd se bez změny kódu/timeoutů v IAB spustily a prošly fyzickými scénáři: plnýHUD/authored svět, chůzeA/D aorbit, autoW/A/D/brzda/vystoupení, respawn a terénnístyky, B6severnívstup/schody/podesta/lobby/výstup. Renderer u obouready/lightcomplete/0errors. SkutečnýIntelUHD630ANGLE-D3D11, CSS/render580×668,medium. DřívějšíEdge1912×914timeouty zachované; změněnýbrowser/viewport není důkaz přesné příčiny nebo FPS přínosu. RawJSONL+SHA,screenshoty,identity a CI1675/1675PASS v docs/refactoring/20261020/world-visual/.
+
+VlastníIABbaselinePID25364 a candidatePID40384 po přesnémUTC/command ověření ukončeny, vlastní kartyuzavřeny,4290bezlisteneru. Předávám refactor-01a15658-audit k integraci prvního celku; hlavníKEY48pokračuje.

@@ -2,7 +2,7 @@
 title: 'KEY-48: odstranit nevyužitý světový renderer'
 type: 'refactor'
 created: '2026-10-20'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '885d07fc2e22576f0ce6c6ceaea08fd8a8d9dc95'
 review_loop_iteration: 0
@@ -76,3 +76,7 @@ Přesun mrtvého kódu ho pouze přemístí, jeho zapojení by měnilo hru. Alia
 - node --import tsx --test tests/graphics.test.ts tests/architecture-reality.test.ts tests/b6-reality.test.ts tests/landmark-reality.test.ts tests/building-foundation.test.ts tests/campus-exterior.test.ts tests/stadium-exterior.test.ts -- zachovaná geometrie a chování.
 - pnpm build; pnpm test:integration -- stabilní checkpoint pod validační rezervací.
 - Produkční vizuální scénář pod GPU rezervací -- kanonické budovy, B6 a terén bez rozdílu; žádné FPS tvrzení.
+
+## Přijetí prvního celku20.10.2026
+
+PR13 head42fa92a8 má celou CI1675/1675PASS, build a4SDKintegracePASS, run39385260988. Viditelný IAB ověřil samostatně původní336a9b1d i kandidátníaa3feebd snapshot: celý authored svět sHUD, camera/A/D, fyzickéauto, respawn, terén/plot/budovy a B6schody/vstup/lobby včetně sestupu. Oba bootready/lightcomplete/renderhealthready/0errors. Skutečný adaptér IntelUHD630/ANGLE-D3D11, CSSiinternal580×668, medium. Žádné nové FPS/p95/p99 ani performance závěry; předchozíEdge timeouty zůstávají přiznané s nedoloženou přesnou příčinou. Důkazy a rawdiagnostics v docs/refactoring/20261020/world-visual/. Všechny vlastníkarty/serverprocesyukončené,4290volný. Lokální BMADdone neoznačuje celýKEY48 ani dosud neprovedenou mainintegraci.
