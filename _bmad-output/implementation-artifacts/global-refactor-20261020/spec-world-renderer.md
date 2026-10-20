@@ -4,6 +4,7 @@ type: 'refactor'
 created: '2026-10-20'
 status: 'ready-for-dev'
 route: 'dispatch'
+baseline_commit: '885d07fc2e22576f0ce6c6ceaea08fd8a8d9dc95'
 review_loop_iteration: 0
 context:
   - '{project-root}/AGENTS.md'
@@ -69,4 +70,3 @@ Přesun mrtvého kódu ho pouze přemístí, jeho zapojení by měnilo hru. Alia
 - node --import tsx --test tests/graphics.test.ts tests/architecture-reality.test.ts tests/b6-reality.test.ts tests/landmark-reality.test.ts tests/building-foundation.test.ts tests/campus-exterior.test.ts tests/stadium-exterior.test.ts -- zachovaná geometrie a chování.
 - pnpm build; pnpm test:integration -- stabilní checkpoint pod validační rezervací.
 - Produkční vizuální scénář pod GPU rezervací -- kanonické budovy, B6 a terén bez rozdílu; žádné FPS tvrzení.
-
