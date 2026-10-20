@@ -19,7 +19,9 @@ COPY . .
 RUN test ! -d assets/blender
 RUN node scripts/check-runtime-assets.mjs
 # The SDK resolves / against the browser origin, including HTTPS and its port.
-RUN VITE_MULTIPLAYER_URL=/ pnpm build
+# The frozen install/cache key above already verifies manifests and patches.
+# COPY may refresh identical input mtimes; do not let pnpm 11 reinstall them.
+RUN VITE_MULTIPLAYER_URL=/ pnpm --config.verify-deps-before-run=false run build
 
 FROM node:24-bookworm-slim AS runtime
 WORKDIR /app

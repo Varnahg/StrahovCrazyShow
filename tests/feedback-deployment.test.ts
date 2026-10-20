@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import {
   mkdtemp,
   mkdir,
@@ -9,7 +11,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import test from "node:test";
 import { runFeedbackIntegration } from "../scripts/integration-feedback";
 
@@ -20,6 +22,80 @@ const docker = await import(
 const integration = await import(
   new URL("../scripts/test-integration.mjs", import.meta.url).href
 );
+
+test("Docker build runs the frozen dependency tree without an implicit pnpm install", async () => {
+  const dockerfile = await readFile(
+    new URL("../Dockerfile", import.meta.url),
+    "utf8",
+  );
+  const invocation = dockerfile.match(
+    /^RUN VITE_MULTIPLAYER_URL=\/ pnpm ([^\r\n]+)$/m,
+  )?.[1];
+  assert.ok(invocation);
+  const arguments_ = invocation.trim().split(/\s+/);
+  assert.ok(arguments_.every((value) => /^[-a-zA-Z0-9_.=]+$/.test(value)));
+  const pnpmEntry = process.env.npm_execpath;
+  // pnpm run exports npm_execpath; targeted pnpm exec on Windows may not.
+  const command = pnpmEntry
+    ? process.execPath
+    : process.platform === "win32"
+      ? "cmd.exe"
+      : "pnpm";
+  const commandArguments = pnpmEntry
+    ? [pnpmEntry, ...arguments_]
+    : process.platform === "win32"
+      ? ["/d", "/s", "/c", ["pnpm", ...arguments_].join(" ")]
+      : arguments_;
+  const directory = await mkdtemp(join(tmpdir(), "feedback-docker-pnpm-"));
+  try {
+    await writeFile(
+      join(directory, "package.json"),
+      JSON.stringify({
+        name: "feedback-build-probe",
+        private: true,
+        scripts: { build: "node probe.mjs" },
+        dependencies: {
+          ["feedback-install-must-not-run-" + randomUUID()]: "0.0.0",
+        },
+      }),
+    );
+    await writeFile(
+      join(directory, "pnpm-workspace.yaml"),
+      "packages:\n  - '.'\n",
+    );
+    await writeFile(
+      join(directory, "probe.mjs"),
+      "import {writeFileSync} from 'node:fs'; writeFileSync('build-ran.txt','verified-build');\n",
+    );
+    const env: NodeJS.ProcessEnv = {
+      ...process.env,
+      npm_config_offline: "true",
+      pnpm_config_offline: "true",
+    };
+    for (const key of Object.keys(env))
+      if (/^LINEAR_/i.test(key)) delete env[key];
+    await promisify(execFile)(command, commandArguments, {
+      cwd: directory,
+      env,
+      windowsHide: true,
+      timeout: 30_000,
+      maxBuffer: 1024 * 1024,
+    });
+    assert.equal(
+      await readFile(join(directory, "build-ran.txt"), "utf8"),
+      "verified-build",
+    );
+    assert.equal(
+      (await readdir(directory)).includes("node_modules"),
+      false,
+      "A build must not replace or reinstall the already frozen dependency tree",
+    );
+  } finally {
+    assert.equal(dirname(resolve(directory)), resolve(tmpdir()));
+    assert.ok(basename(directory).startsWith("feedback-docker-pnpm-"));
+    await rm(directory, { recursive: true, force: true });
+  }
+});
 
 test("isolated integration excludes inherited feedback/Linear settings while preserving NODE_OPTIONS", () => {
   const directory = join(tmpdir(), "strahov-integration-feedback-unit");
