@@ -104,6 +104,14 @@ const CAR_ASSET_ID = "strahov-compact",
   CAR_ENTITY_ID = "campus-car";
 const AUTHORED_SUSPENSION = 0.32,
   GROUND_ORIGIN_OFFSET = -0.0112;
+const PARKING_COLOURS = [
+  "#aeb5b9",
+  "#ededdf",
+  "#343b43",
+  "#5d6c7a",
+  "#8e3833",
+  "#b5b09c",
+] as const;
 
 /** Both imported car paths share the same exact steering/spin/suspension rule.
  * Scratch rotations belong to this rig pair and cannot survive its disposal.
@@ -360,15 +368,7 @@ export async function loadCar(
           CAR_ENTITY_ID,
         );
     car.setEnabled(false);
-    const colours = [
-        "#aeb5b9",
-        "#ededdf",
-        "#343b43",
-        "#5d6c7a",
-        "#8e3833",
-        "#b5b09c",
-      ],
-      paintSources = new Map<string, Mesh>();
+    const paintSources = new Map<string, Mesh>();
     const parkingRoots = new Map<string, TransformNode>();
     for (const [index, slot] of (options.sourceParking === false
       ? []
@@ -397,7 +397,7 @@ export async function loadCar(
           source.material instanceof PBRMaterial &&
           source.material.metadata?.vehiclePaint
         ) {
-          const key = part.id + ":" + (index % colours.length);
+          const key = part.id + ":" + (index % PARKING_COLOURS.length);
           let variant = paintSources.get(key);
           if (!variant) {
             variant = source.clone(
@@ -406,10 +406,10 @@ export async function loadCar(
               true,
             )!;
             const material = source.material.clone(
-              "parking enamel " + (index % colours.length),
+              "parking enamel " + (index % PARKING_COLOURS.length),
             )!;
             material.albedoColor = Color3.FromHexString(
-              colours[index % colours.length],
+              PARKING_COLOURS[index % PARKING_COLOURS.length],
             ).toLinearSpace();
             paintMaterials.push(material);
             variant.material = material;
@@ -484,15 +484,7 @@ async function loadReviewedCar(
       position(rig, CAR_SPAWN.x, CAR_SPAWN.z, CAR_SPAWN.yaw);
     }
     driving.root.setEnabled(false);
-    const parkingRoots = new Map<string, TransformNode>(),
-      colours = [
-        "#aeb5b9",
-        "#ededdf",
-        "#343b43",
-        "#5d6c7a",
-        "#8e3833",
-        "#b5b09c",
-      ];
+    const parkingRoots = new Map<string, TransformNode>();
     for (const [index, slot] of (options.sourceParking === false
       ? []
       : PARKING_SLOTS
@@ -500,7 +492,7 @@ async function loadReviewedCar(
       const rig = create(
         slot.id,
         "parking-bay",
-        colours[index % colours.length],
+        PARKING_COLOURS[index % PARKING_COLOURS.length],
         false,
       );
       position(rig, slot.x, slot.z, slot.yaw);
