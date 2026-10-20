@@ -59,6 +59,9 @@ const {
   completeSpecification,
   hasRequiredPresentation,
   assertPriorReadiness,
+  buildWorkerSchema,
+  prepareWorkerSchema,
+  presentationWorkerPaths,
 } = await import(new URL("../scripts/autodev/codex.mjs", import.meta.url).href);
 
 const sourceRoot = path.resolve(
@@ -550,13 +553,14 @@ process.stdin.setEncoding('utf8'); process.stdin.on('data',s=>prompt+=s);
 process.stdin.on('end',()=>{
   const args=process.argv.slice(2), out=args[args.indexOf('-o')+1];
   const schema=args.includes('--output-schema')?args[args.indexOf('--output-schema')+1]:'';
-  fs.appendFileSync(${JSON.stringify(ledger)},JSON.stringify({out,bytes:Buffer.byteLength(prompt),sha256:crypto.createHash('sha256').update(prompt).digest('hex')})+'\\n');
+  fs.appendFileSync(${JSON.stringify(ledger)},JSON.stringify({out,bytes:Buffer.byteLength(prompt),sha256:crypto.createHash('sha256').update(prompt).digest('hex'),schemaSha256:schema?crypto.createHash('sha256').update(fs.readFileSync(schema)).digest('hex'):null})+'\\n');
   const readBlock=name=>{const start=prompt.indexOf('<authorized-input name='+JSON.stringify(name)+' ');if(start<0)return null;const body=prompt.indexOf('\\n',start)+1;return JSON.parse(prompt.slice(body,prompt.indexOf('\\n</authorized-input>',body)));};
   const prior=readBlock('prior-readiness.json');
   const assessment=prior?{sha256:prior.sha256,authorizationSha256:prior.authorizationSha256,intentGaps:prior.result.intentGaps.map((text,index)=>({index,text,resolution:'workflow-keep-full',reason:'Existing single-task authorization covers this internal scope-presentation decision.'})),runtimeBlockers:prior.result.runtimeBlockers.map((text,index)=>({index,text,resolution:'spec-presentation',reason:'The bounded document amendment supplies the missing format.'}))}:undefined;
   const ready={ready:true,intentGaps:[],runtimeBlockers:[],evidence:['Complete verified inline step2/template and unchanged original candidate inspected.'],...(assessment?{priorReadiness:assessment}:{})};
   let value=Object.hasOwn(overrides,path.basename(out))?overrides[path.basename(out)]:schema.endsWith('spec-completion.json')?{...ready,presentation:${JSON.stringify(validPlan().presentation)}}:schema.includes('plan-readiness')?ready:out.includes('verification')?'No verification gaps found.':'[]';
   if(value?.priorReadiness==='from-input')value={...value,priorReadiness:assessment};
+  if(value?.fixtureExit){process.stderr.write('controlled fixture failure\\n');process.exitCode=value.fixtureExit;return;}
   fs.writeFileSync(out,typeof value==='string'?value:JSON.stringify(value),'utf8');
 });`,
   );
@@ -644,6 +648,552 @@ async function specCompletionFixture(
     checkpoint,
   };
 }
+
+function completionAnswer(ctx: any) {
+  const prior = ctx.data.specCompletionInputV1.priorReadiness;
+  return {
+    ready: true,
+    intentGaps: [],
+    runtimeBlockers: [],
+    evidence: ["Frozen candidate inspected"],
+    presentation: validPlan().presentation,
+    priorReadiness: {
+      sha256: prior.sha256,
+      authorizationSha256: prior.authorizationSha256,
+      intentGaps: prior.result.intentGaps.map(
+        (text: string, index: number) => ({
+          index,
+          text,
+          resolution: "workflow-keep-full",
+          reason:
+            "The existing single-task authorization settles only this internal size decision.",
+        }),
+      ),
+      runtimeBlockers: prior.result.runtimeBlockers.map(
+        (text: string, index: number) => ({
+          index,
+          text,
+          resolution: "spec-presentation",
+          reason:
+            "The bounded document presentation supplies the missing format.",
+        }),
+      ),
+    },
+  };
+}
+function invalidHistoricalCompletion(ctx: any) {
+  const value = completionAnswer(ctx);
+  value.presentation.acceptanceCriteria[0].when =
+    "Když proběhne kontrola, pak se zachová původní chování.";
+  value.presentation.acceptanceCriteria[0].then = "";
+  value.presentation.tasks.push({
+    path: "tests/read-only-existing.test.ts",
+    action: "Run unchanged read-only test",
+    reason: "Verify existing behavior",
+    basis: "intent",
+  });
+  value.presentation.tasks.push({
+    path: "handoff.md",
+    action: "Publish controller handoff",
+    reason: "Controller integration",
+    basis: "controller:0",
+  });
+  value.presentation.routeFacts.footprint = [
+    "src/new.txt: implementation [basis: intent]",
+  ];
+  return value;
+}
+function historicalCompletionWorker(
+  f: any,
+  answer = invalidHistoricalCompletion,
+) {
+  return async (ctx: any, options: any) => {
+    if (
+      options.kind === "spec-completion" &&
+      !ctx.state.attempts["spec-completion:v1"]
+    ) {
+      const built = await buildWorkerPrompt(ctx, options),
+        prompt = built.prompt.split("\nSTRICT PRESENTATION CONTRACT:")[0],
+        output = path.join(ctx.runDir, "spec-completion-v1.json"),
+        script = path.join(ctx.runDir, "original-completion.mjs"),
+        schema = path.join(ctx.runDir, "original-unbound-schema.json"),
+        raw = JSON.stringify(answer(ctx));
+      await writeFile(schema, JSON.stringify({ type: "object" }));
+      await writeFile(
+        script,
+        `import fs from 'node:fs';process.stdin.resume();process.stdin.on('end',()=>{fs.writeFileSync(${JSON.stringify(output)},${JSON.stringify(raw)});process.stdout.write(JSON.stringify({type:'item.completed',item:{type:'agent_message',text:${JSON.stringify(raw)}}})+'\\n');});`,
+      );
+      const input = await prepareWorkerInput(
+        ctx,
+        "spec-completion:v1",
+        [script, "--output-schema", schema, "-o", output, "-"],
+        prompt,
+        { ...built.provenance, promptSha256: sha(prompt) },
+        process.execPath,
+      );
+      await ctx.supervise({
+        key: "spec-completion:v1",
+        command: input.command,
+        args: input.args,
+        cwd: ctx.data.worktree,
+        heartbeat: options.heartbeat,
+      });
+      return runWorker(ctx, options);
+    }
+    return f.worker(ctx, options);
+  };
+}
+async function historicalCompletionBytes(ctx: any) {
+  const dir = path.join(
+    ctx.runDir,
+    "attempts",
+    ctx.state.attempts["spec-completion:v1"].id,
+  );
+  const request = JSON.parse(
+    await readFile(path.join(dir, "request.json"), "utf8"),
+  );
+  return Promise.all(
+    [
+      path.join(dir, "request.json"),
+      path.join(dir, "receipt.json"),
+      request.args[2],
+      path.join(ctx.runDir, "spec-completion-v1.json"),
+    ].map((file) => readFile(file, "utf8")),
+  );
+}
+
+test("bound presentation schema represents blocked null results and exact worker targets including directory-scope boundaries", async (t) => {
+  const f = await fixture(t);
+  await bmadFixture(f, false);
+  const schema = await buildWorkerSchema(f.ctx, "plan"),
+    presentation = schema.properties.presentation.anyOf.find(
+      (item: any) => item.type === "object",
+    );
+  assert.ok(
+    schema.properties.presentation.anyOf.some(
+      (item: any) => item.type === "null",
+    ),
+  );
+  assert.deepEqual(presentation.properties.tasks.items.properties.path.enum, [
+    "src/a.txt",
+    "src/new.txt",
+  ]);
+  assert.deepEqual(
+    presentation.properties.routeFacts.properties.footprint.items.enum,
+    ["src/a.txt", "src/new.txt"],
+  );
+  for (const field of ["given", "when", "then"]) {
+    const pattern = new RegExp(
+      presentation.properties.acceptanceCriteria.items.properties[field]
+        .pattern,
+    );
+    assert.equal(pattern.test(""), false);
+    assert.equal(pattern.test("   "), false);
+    assert.equal(pattern.test("výsledek"), true);
+  }
+  assert.ok(
+    !presentation.properties.tasks.items.properties.path.enum.includes(
+      "handoff.md",
+    ),
+  );
+  assert.ok(
+    !presentation.properties.routeFacts.properties.footprint.items.enum.includes(
+      "src/new.txt: description [basis: intent]",
+    ),
+  );
+  f.ctx.data.workerTask.writePaths = ["src/"];
+  let dispatches = 0;
+  f.ctx.supervise = async () => {
+    dispatches++;
+    throw new Error("unexpected dispatch");
+  };
+  await assert.rejects(runWorker(f.ctx, { kind: "plan" }), {
+    code: "PLAN_PATHS_REQUIRED",
+  });
+  assert.equal(dispatches, 0);
+  await writeFile(path.join(f.root, "src/new.txt"), "concrete candidate\n");
+  const candidate = await sourceIdentity(f.root, f.ctx.data.baseSha, ["src/"]);
+  f.ctx.data.sourceDigest = candidate.digest;
+  f.ctx.data.specCompletionContract = {
+    version: 2,
+    sourceDigest: candidate.digest,
+    workerPaths: candidate.identity.files.map((entry: any) => entry.file),
+  };
+  assert.deepEqual(presentationWorkerPaths(f.ctx, "spec-completion"), [
+    "src/new.txt",
+  ]);
+  const completion = await buildWorkerSchema(f.ctx, "spec-completion");
+  assert.deepEqual(
+    completion.properties.presentation.anyOf[0].properties.tasks.items
+      .properties.path.enum,
+    ["src/new.txt"],
+  );
+});
+
+test("immutable per-attempt schema is delivered through the native executor and tampering stops before child spawn", async (t) => {
+  const f = await fixture(t);
+  await bmadFixture(f, false);
+  const built = await buildWorkerPrompt(f.ctx, { kind: "plan" }),
+    binding = await prepareWorkerSchema(f.ctx, "schema-proof", "plan"),
+    original = await readFile(binding.path, "utf8"),
+    output = path.join(f.ctx.runDir, "schema-observed.json"),
+    program = path.join(f.ctx.runDir, "schema-reader.mjs");
+  await writeFile(
+    program,
+    `import fs from 'node:fs';import crypto from 'node:crypto';process.stdin.resume();process.stdin.on('end',()=>{const args=process.argv.slice(2),file=args[args.indexOf('--output-schema')+1],bytes=fs.readFileSync(file);fs.writeFileSync(${JSON.stringify(output)},JSON.stringify({sha256:crypto.createHash('sha256').update(bytes).digest('hex'),schema:JSON.parse(bytes)}));});`,
+  );
+  const input = await prepareWorkerInput(
+    f.ctx,
+    "schema-proof",
+    [program, "--output-schema", binding.path, "-"],
+    built.prompt,
+    { ...built.provenance, outputSchema: binding },
+    process.execPath,
+  );
+  await execute(input.command, input.args, { cwd: f.root });
+  const observed = await readFile(output, "utf8");
+  assert.equal(JSON.parse(observed).sha256, binding.sha256);
+  assert.deepEqual(
+    JSON.parse(observed).schema.properties.presentation.anyOf[0].properties
+      .tasks.items.properties.path.enum,
+    ["src/a.txt", "src/new.txt"],
+  );
+  await writeFile(binding.path, original + " ");
+  await assert.rejects(
+    execute(input.command, input.args, { cwd: f.root }),
+    /WORKER_SCHEMA/,
+  );
+  assert.equal(await readFile(output, "utf8"), observed);
+  await assert.rejects(prepareWorkerSchema(f.ctx, "schema-proof", "plan"), {
+    code: "WORKER_SCHEMA",
+  });
+  assert.equal(await readFile(binding.path, "utf8"), original + " ");
+});
+
+test("terminal runWorker receipt rejects schema tamper on resume without reaching supervision or spawning again", async (t) => {
+  const f = await fixture(t);
+  await bmadFixture(f, false);
+  f.ctx.supervise = nativeSupervisor(f.ctx);
+  const fake = await protocol2WorkerFixture(f.ctx, {
+    "plan-v2.json": validPlan(),
+  });
+  const result = await fake.worker(f.ctx, { kind: "plan" }),
+    attempt = f.ctx.state.attempts["plan:v2"],
+    directory = path.join(f.ctx.runDir, "attempts", attempt.id),
+    request = await readFile(path.join(directory, "request.json")),
+    receipt = await readFile(path.join(directory, "receipt.json")),
+    binding = result.provenance.outputSchema,
+    schema = await readFile(binding.path, "utf8");
+  assert.equal(attempt.status, "complete");
+  assert.equal(JSON.parse(receipt.toString("utf8")).exitCode, 0);
+  assert.equal((await fake.ledgerRows()).length, 1);
+  await writeFile(binding.path, schema + " ");
+  const supervise = f.ctx.supervise;
+  let resumeSupervisionCalls = 0;
+  f.ctx.supervise = async (options: any) => {
+    resumeSupervisionCalls++;
+    return supervise(options);
+  };
+  for (let resume = 0; resume < 2; resume++)
+    await assert.rejects(fake.worker(f.ctx, { kind: "plan" }), {
+      code: "WORKER_SCHEMA",
+    });
+  assert.equal(
+    resumeSupervisionCalls,
+    0,
+    "The resume guard runs before terminal receipt supervision, not in an executor replay",
+  );
+  assert.equal((await fake.ledgerRows()).length, 1);
+  assert.deepEqual(Object.keys(f.ctx.state.attempts), ["plan:v2"]);
+  assert.deepEqual(
+    await readFile(path.join(directory, "request.json")),
+    request,
+  );
+  assert.deepEqual(
+    await readFile(path.join(directory, "receipt.json")),
+    receipt,
+  );
+  assert.equal(await readFile(binding.path, "utf8"), schema + " ");
+});
+
+for (const blocker of ["intentGaps", "runtimeBlockers"]) {
+  test(`plan stage preserves blocked null ${blocker} and repeats without a fake spec or new model attempt`, async (t) => {
+    const f = await fixture(t);
+    await bmadFixture(f, false);
+    delete f.ctx.data.plan;
+    const blocked = {
+        ...validPlan(),
+        ready: false,
+        [blocker]: ["Original unresolved condition"],
+        presentation: null,
+      },
+      rendererLog = path.join(f.ctx.runDir, "renderer-result.txt");
+    await writeFile(
+      rendererLog,
+      `read and follow ${f.ctx.data.renderedWorkflow}\n`,
+    );
+    const supervise = nativeSupervisor(f.ctx);
+    f.ctx.supervise = (options: any) =>
+      options.key === "bmad-render"
+        ? Promise.resolve({ exitCode: 0, stdoutPath: rendererLog })
+        : supervise(options);
+    const fake = await protocol2WorkerFixture(f.ctx, {
+        "plan-v2.json": blocked,
+      }),
+      adapter = createAdapter({ worker: fake.worker }),
+      code = blocker === "intentGaps" ? "INTENT_GAPS" : "RUNTIME_BLOCKERS";
+    await assert.rejects(adapter.runStage("plan", f.ctx), { code });
+    const original = digest(f.ctx.data.plan),
+      attempts = Object.keys(f.ctx.state.attempts),
+      resultBytes = await readFile(f.ctx.data.plan.outputPath),
+      evidence = await readFile(path.join(f.root, "artifacts/plan.json"));
+    assert.deepEqual(f.ctx.data.plan.result, blocked);
+    assert.deepEqual(JSON.parse(evidence.toString("utf8")), {
+      ...blocked,
+      provenance: f.ctx.data.plan.provenance,
+    });
+    assert.equal(f.ctx.data.spec, undefined);
+    assert.equal(f.ctx.data.specFile, undefined);
+    await assert.rejects(readFile(path.join(f.root, "artifacts/spec.md")), {
+      code: "ENOENT",
+    });
+    await assert.rejects(adapter.runStage("plan", f.ctx), { code });
+    assert.equal(digest(f.ctx.data.plan), original);
+    assert.deepEqual(await readFile(f.ctx.data.plan.outputPath), resultBytes);
+    assert.deepEqual(
+      await readFile(path.join(f.root, "artifacts/plan.json")),
+      evidence,
+    );
+    assert.deepEqual(Object.keys(f.ctx.state.attempts), attempts);
+    assert.equal((await fake.ledgerRows()).length, 1);
+    assert.equal(f.ctx.data.spec, undefined);
+    await assert.rejects(readFile(path.join(f.root, "artifacts/spec.md")), {
+      code: "ENOENT",
+    });
+  });
+
+  test(`blocked null presentation preserves substantive ${blocker} before format validation or contract repair`, async (t) => {
+    const f = await specCompletionFixture(t, {
+      "spec-completion-v1.json": {
+        ready: false,
+        intentGaps: [],
+        runtimeBlockers: [],
+        [blocker]: ["A real prerequisite or product choice remains unresolved"],
+        evidence: ["Blocked, no invented presentation"],
+        presentation: null,
+        priorReadiness: "from-input",
+      },
+    });
+    const adapter = createAdapter({ worker: f.worker });
+    for (let resume = 0; resume < 2; resume++)
+      await assert.rejects(adapter.runStage("review", f.ctx), {
+        code: blocker === "intentGaps" ? "INTENT_GAPS" : "RUNTIME_BLOCKERS",
+      });
+    assert.equal(f.ctx.data.specCompletionV1.result.presentation, null);
+    assert.equal(f.ctx.data.specCompletionRepairV2, undefined);
+    assert.equal(f.ctx.data.specAmendmentV1, undefined);
+    assert.equal((await f.ledgerRows()).length, 1);
+    assert.equal(await readFile(f.ctx.data.specFile, "utf8"), f.specText);
+    const blockedPlan = {
+      ...validPlan(),
+      ready: false,
+      [blocker]: ["Cannot proceed"],
+      presentation: null,
+    };
+    assert.doesNotThrow(() => validateWorkerResult("plan", blockedPlan));
+    f.ctx.data.plan = { result: blockedPlan, provenance: f.ctx.planProvenance };
+    await assert.rejects(adapter.runStage("implement", f.ctx), {
+      code: blocker === "intentGaps" ? "INTENT_GAPS" : "RUNTIME_BLOCKERS",
+    });
+    assert.equal((await f.ledgerRows()).length, 1);
+  });
+}
+
+test("valid original unbound completion remains the selected v1 proof without contract repair", async (t) => {
+  const f = await specCompletionFixture(t),
+    adapter = createAdapter({
+      worker: historicalCompletionWorker(f, completionAnswer),
+      linear: { async comment() {} } as any,
+    });
+  await adapter.runStage("review", f.ctx);
+  const original = await historicalCompletionBytes(f.ctx);
+  assert.equal(f.ctx.data.specCompletionRepairV2, undefined);
+  assert.equal(f.ctx.state.attempts["spec-completion:v2"], undefined);
+  assert.equal(
+    f.ctx.data.planReadinessV3.completionIdentity.key,
+    "spec-completion:v1",
+  );
+  await adapter.runStage("review", f.ctx);
+  assert.deepEqual(await historicalCompletionBytes(f.ctx), original);
+  assert.equal((await f.ledgerRows()).length, 4);
+});
+
+for (const boundary of [
+  "none",
+  "after-spec-completion-v2-intent",
+  "after-spec-completion-v2-result",
+  "after-v2-receipt",
+]) {
+  test(`bounded completion contract repair resumes ${boundary} preserving actual invalid-v1 shape and immutable attempts`, async (t) => {
+    const f = await specCompletionFixture(t),
+      ctx = f.ctx,
+      source = ctx.data.sourceDigest,
+      frozen = ctx.data.spec.frozenSha256;
+    let crashed = false;
+    ctx.fault = async (point: string) => {
+      if (!crashed && point === boundary) {
+        crashed = true;
+        throw new Error("contract boundary crash");
+      }
+    };
+    const supervise = ctx.supervise;
+    ctx.supervise = async (options: any) => {
+      const receipt = await supervise(options);
+      if (
+        !crashed &&
+        boundary === "after-v2-receipt" &&
+        options.key === "spec-completion:v2"
+      ) {
+        crashed = true;
+        throw new Error("contract boundary crash");
+      }
+      return receipt;
+    };
+    const adapter = createAdapter({
+      worker: historicalCompletionWorker(f),
+      linear: { async comment() {} } as any,
+    });
+    if (boundary !== "none") {
+      await assert.rejects(
+        adapter.runStage("review", ctx),
+        /contract boundary crash/,
+      );
+      Object.assign(
+        ctx.state,
+        JSON.parse(await readFile(f.checkpoint, "utf8")),
+      );
+    }
+    await adapter.runStage("review", ctx);
+    const original = await historicalCompletionBytes(ctx),
+      repair = ctx.data.specCompletionRepairV2;
+    assert.equal(repair.result.presentation.acceptanceCriteria[0].then, "");
+    assert.match(
+      repair.result.presentation.acceptanceCriteria[0].when,
+      /Když.*pak/,
+    );
+    assert.ok(
+      repair.result.presentation.tasks.some(
+        (task: any) => task.path === "handoff.md",
+      ),
+    );
+    assert.match(
+      repair.result.presentation.routeFacts.footprint[0],
+      /description|implementation/,
+    );
+    assert.equal(repair.rawSha256, sha(original[3]));
+    assert.equal(repair.inputSha256, sha(original[2]));
+    assert.equal(ctx.data.sourceDigest, source);
+    assert.equal(ctx.data.spec.frozenSha256, frozen);
+    assert.equal(
+      ctx.data.specAmendmentV1.completionIdentity.key,
+      "spec-completion:v2",
+    );
+    assert.equal(
+      ctx.data.planReadinessV3.completionIdentity.key,
+      "spec-completion:v2",
+    );
+    assert.equal(
+      ctx.data.planReadinessInputV3.completionHistory.originalFailure.rawSha256,
+      repair.rawSha256,
+    );
+    const selected = ctx.data.specCompletionV2.provenance.outputSchema;
+    assert.equal(selected.contractVersion, 2);
+    const schema = JSON.parse(await readFile(selected.path, "utf8"));
+    assert.deepEqual(
+      schema.properties.presentation.anyOf[0].properties.tasks.items.properties
+        .path.enum,
+      ["src/new.txt"],
+    );
+    assert.equal(
+      (await f.ledgerRows()).find((row: any) =>
+        row.out.endsWith("spec-completion-v2.json"),
+      ).schemaSha256,
+      selected.sha256,
+    );
+    const keys = Object.keys(ctx.state.attempts),
+      before = (await f.ledgerRows()).length;
+    await adapter.runStage("review", ctx);
+    assert.deepEqual(await historicalCompletionBytes(ctx), original);
+    assert.deepEqual(Object.keys(ctx.state.attempts), keys);
+    assert.equal((await f.ledgerRows()).length, before);
+    assert.equal(before, 5);
+  });
+}
+
+for (const outcome of ["blocked", "invalid", "failed"]) {
+  test(`bounded completion v2 ${outcome} is a stable stop without another completion generation`, async (t) => {
+    const value =
+      outcome === "blocked"
+        ? {
+            ready: false,
+            intentGaps: [],
+            runtimeBlockers: ["Still blocked"],
+            evidence: ["Cannot proceed"],
+            presentation: null,
+            priorReadiness: "from-input",
+          }
+        : outcome === "invalid"
+          ? {
+              ready: true,
+              intentGaps: [],
+              runtimeBlockers: [],
+              evidence: ["invalid output"],
+              presentation: null,
+              priorReadiness: "from-input",
+            }
+          : { fixtureExit: 7 };
+    const f = await specCompletionFixture(t, {
+        "spec-completion-v2.json": value,
+      }),
+      adapter = createAdapter({ worker: historicalCompletionWorker(f) });
+    const code =
+      outcome === "blocked"
+        ? "RUNTIME_BLOCKERS"
+        : outcome === "invalid"
+          ? "SPEC_PRESENTATION"
+          : "WORKER_FAILED";
+    for (let resume = 0; resume < 2; resume++)
+      await assert.rejects(adapter.runStage("review", f.ctx), { code });
+    assert.equal((await f.ledgerRows()).length, 1);
+    assert.equal(f.ctx.data.specAmendmentV1, undefined);
+    assert.equal(f.ctx.state.attempts["plan-readiness:v3"], undefined);
+    assert.ok(
+      !Object.keys(f.ctx.state.attempts).some((key) =>
+        key.startsWith("spec-completion:v3"),
+      ),
+    );
+    assert.equal(await readFile(f.ctx.data.specFile, "utf8"), f.specText);
+  });
+}
+
+test("historical invalid presentation cannot repair away a substantive previous readiness blocker", async (t) => {
+  const f = await specCompletionFixture(t),
+    adapter = createAdapter({
+      worker: historicalCompletionWorker(f, (ctx: any) => {
+        const result = invalidHistoricalCompletion(ctx);
+        result.priorReadiness.runtimeBlockers[0].resolution =
+          "runtime-prerequisite";
+        return result;
+      }),
+    });
+  for (let resume = 0; resume < 2; resume++)
+    await assert.rejects(adapter.runStage("review", f.ctx), {
+      code: "RUNTIME_BLOCKERS",
+    });
+  assert.equal(f.ctx.data.specCompletionRepairV2, undefined);
+  assert.equal(f.ctx.state.attempts["spec-completion:v2"], undefined);
+  assert.equal(await readFile(f.ctx.data.specFile, "utf8"), f.specText);
+});
 
 test("source identity is invariant across add/commit, covers new tests and deletions", async (t) => {
   const { root, ctx } = await fixture(t);

@@ -32,114 +32,143 @@
       }
     },
     "presentation": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["tasks", "ioMatrix", "acceptanceCriteria", "routeFacts"],
-      "properties": {
-        "tasks": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["path", "action", "reason", "basis"],
-            "properties": {
-              "path": {
-                "type": "string"
-              },
-              "action": {
-                "type": "string"
-              },
-              "reason": {
-                "type": "string"
-              },
-              "basis": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "ioMatrix": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "scenario",
-              "input",
-              "output",
-              "errorHandling",
-              "basis"
-            ],
-            "properties": {
-              "scenario": {
-                "type": "string"
-              },
-              "input": {
-                "type": "string"
-              },
-              "output": {
-                "type": "string"
-              },
-              "errorHandling": {
-                "type": "string"
-              },
-              "basis": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "acceptanceCriteria": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["given", "when", "then", "basis"],
-            "properties": {
-              "given": {
-                "type": "string"
-              },
-              "when": {
-                "type": "string"
-              },
-              "then": {
-                "type": "string"
-              },
-              "basis": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "routeFacts": {
+      "anyOf": [
+        {
           "type": "object",
           "additionalProperties": false,
-          "required": ["footprint", "irreversibles", "newDependencies"],
+          "required": ["tasks", "ioMatrix", "acceptanceCriteria", "routeFacts"],
           "properties": {
-            "footprint": {
+            "tasks": {
               "type": "array",
+              "minItems": 1,
               "items": {
-                "type": "string"
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["path", "action", "reason", "basis"],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "pattern": "^[^\\r\\n]*\\S[^\\r\\n]*$",
+                    "description": "Exact relative worker WRITE target only; never a read-only check input or controller artifact."
+                  },
+                  "action": {
+                    "type": "string",
+                    "pattern": "^[^\\r\\n]*\\S[^\\r\\n]*$"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "pattern": "^[^\\r\\n]*\\S[^\\r\\n]*$"
+                  },
+                  "basis": {
+                    "type": "string",
+                    "pattern": "^[^\\r\\n]*\\S[^\\r\\n]*$"
+                  }
+                }
               }
             },
-            "irreversibles": {
+            "ioMatrix": {
               "type": "array",
+              "minItems": 1,
               "items": {
-                "type": "string"
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "scenario",
+                  "input",
+                  "output",
+                  "errorHandling",
+                  "basis"
+                ],
+                "properties": {
+                  "scenario": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  },
+                  "input": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  },
+                  "output": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  },
+                  "errorHandling": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  },
+                  "basis": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  }
+                }
               }
             },
-            "newDependencies": {
+            "acceptanceCriteria": {
               "type": "array",
+              "minItems": 1,
               "items": {
-                "type": "string"
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["given", "when", "then", "basis"],
+                "properties": {
+                  "given": {
+                    "type": "string",
+                    "pattern": "^[^\\r\\n]*\\S[^\\r\\n]*$"
+                  },
+                  "when": {
+                    "type": "string",
+                    "pattern": "^[^\\r\\n]*\\S[^\\r\\n]*$",
+                    "description": "Only the triggering action/event. Put the expected outcome in then, never combine both here."
+                  },
+                  "then": {
+                    "type": "string",
+                    "pattern": "^[^\\r\\n]*\\S[^\\r\\n]*$",
+                    "description": "Nonempty expected outcome, separately from the when trigger."
+                  },
+                  "basis": {
+                    "type": "string",
+                    "pattern": "^[^\\r\\n]*\\S[^\\r\\n]*$"
+                  }
+                }
+              }
+            },
+            "routeFacts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["footprint", "irreversibles", "newDependencies"],
+              "properties": {
+                "footprint": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  },
+                  "minItems": 1,
+                  "description": "Only exact relative worker WRITE filenames; no descriptions, basis annotations or controller paths."
+                },
+                "irreversibles": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  }
+                },
+                "newDependencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  }
+                }
               }
             }
           }
+        },
+        {
+          "type": "null"
         }
-      }
+      ],
+      "description": "Use null when ready=false or substantive gaps/blockers prevent truthful presentation. ready=true without blockers requires the complete object."
     },
     "priorReadiness": {
       "type": "object",

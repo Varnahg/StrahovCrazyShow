@@ -40,6 +40,7 @@ import {
   completeSpecification,
   hasRequiredPresentation,
   assertPriorReadiness,
+  OUTPUT_SCHEMA_VERSION,
 } from "./codex.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -1090,6 +1091,176 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       ([name, sha256]) => hashes?.[name] !== sha256,
     );
   }
+  function completionIdentity(ctx) {
+    const completion = ctx.data.specCompletionV2 ?? ctx.data.specCompletionV1;
+    if (!completion)
+      throw problem("SPEC_RECONCILIATION", "Selected completion is missing");
+    return {
+      key: ctx.data.specCompletionV2
+        ? "spec-completion:v2"
+        : "spec-completion:v1",
+      attemptId: completion.attemptId,
+      resultSha256: digest(completion.result),
+      outputSchema: completion.provenance?.outputSchema ?? null,
+    };
+  }
+  function completionHistory(ctx) {
+    return {
+      selected: completionIdentity(ctx),
+      originalFailure: ctx.data.specCompletionRepairV2 ?? null,
+    };
+  }
+  async function planningCompletion(ctx, snapshot, input, authorization) {
+    const baseChecks = async (completion) => {
+      assertStageScope(
+        ctx.data.specCompletionBeforeV1,
+        await workingSnapshot(ctx.data.worktree),
+        [],
+      );
+      await assertSource(ctx);
+      validateWorkerResult("plan-readiness-v3", completion.result);
+      if (
+        planInputNamesMismatch(completion.provenance?.inlineInputs, snapshot) ||
+        completion.provenance?.authorizationSha256 !== digest(authorization)
+      )
+        throw problem(
+          "SPEC_MIGRATION",
+          "Completion lacks verified instructions/authorization",
+        );
+    };
+    const readyChecks = (completion) => {
+      // Truthful blocked/null results stop here before any presentation repair.
+      assertPlanningReady(completion.result);
+      assertPriorReadiness(
+        input.priorReadiness,
+        completion.result.priorReadiness,
+        authorization,
+      );
+      validatePresentation(completion.result.presentation, ctx);
+    };
+    if (!ctx.data.specCompletionRepairV2) {
+      try {
+        let completion = ctx.data.specCompletionV1;
+        if (!completion) {
+          completion = await worker(ctx, {
+            kind: "spec-completion",
+            heartbeat: beats(ctx),
+          });
+          await baseChecks(completion);
+          await ctx.save({ specCompletionV1: completion });
+        }
+        readyChecks(completion);
+        return completion;
+      } catch (error) {
+        if (error.code !== "SPEC_PRESENTATION") throw error;
+        // This sole compatibility repair is for the old unbound output
+        // contract, not a retry of a current schema-constrained worker.
+        if (
+          ctx.data.specAmendmentV1 ||
+          ctx.data.planReadinessInputV3 ||
+          ctx.state.attempts["plan-readiness:v3"] ||
+          !ctx.state.attempts["spec-completion:v1"]
+        )
+          throw error;
+        const original = await resumeWorkerAttempt(ctx, "spec-completion:v1");
+        if (
+          original.receipt.exitCode !== 0 ||
+          !original.inputPath ||
+          !original.inputSha256 ||
+          original.provenance.deliveryProtocol !== DELIVERY_PROTOCOL ||
+          original.provenance.specFormatVersion !== 1 ||
+          original.provenance.outputSchema
+        )
+          throw error;
+        let result;
+        try {
+          result = JSON.parse(original.raw);
+        } catch {
+          throw error;
+        }
+        const record = {
+          result,
+          provenance: original.provenance,
+          attemptId: original.receipt.attemptId,
+        };
+        await baseChecks(record);
+        assertPlanningReady(result);
+        assertPriorReadiness(
+          input.priorReadiness,
+          result.priorReadiness,
+          authorization,
+        );
+        try {
+          validatePresentation(result.presentation, ctx);
+          throw problem(
+            "SPEC_MIGRATION",
+            "Original completion has no demonstrated presentation violation",
+          );
+        } catch (failure) {
+          if (failure.code !== "SPEC_PRESENTATION") throw failure;
+        }
+        const failure = {
+          key: "spec-completion:v1",
+          requestDigest: original.requestDigest,
+          receipt: original.receipt,
+          inputPath: original.inputPath,
+          inputSha256: original.inputSha256,
+          outputPath: original.outputPath,
+          raw: original.raw,
+          rawSha256: digest(original.raw),
+          result,
+          resultSha256: digest(result),
+          validationCode: "SPEC_PRESENTATION",
+        };
+        await ctx.save({
+          specCompletionRepairV2: failure,
+          specCompletionInputV2: {
+            ...input,
+            completionHistory: { originalFailure: failure },
+            outputContract: ctx.data.specCompletionContract,
+          },
+        });
+        await ctx.fault("after-spec-completion-v2-intent");
+      }
+    }
+    const prior = ctx.data.specCompletionRepairV2;
+    const original = await resumeWorkerAttempt(ctx, "spec-completion:v1");
+    if (
+      original.requestDigest !== prior.requestDigest ||
+      original.inputSha256 !== prior.inputSha256 ||
+      digest(original.receipt) !== digest(prior.receipt) ||
+      digest(original.raw) !== prior.rawSha256 ||
+      digest(
+        ctx.data.specCompletionInputV2.completionHistory.originalFailure,
+      ) !== digest(prior) ||
+      digest(ctx.data.specCompletionInputV2.outputContract) !==
+        digest(ctx.data.specCompletionContract)
+    )
+      throw problem(
+        "SPEC_MIGRATION",
+        "Original failed completion or repair contract changed",
+      );
+    let completion = ctx.data.specCompletionV2;
+    if (!completion) {
+      completion = await worker(ctx, {
+        kind: "spec-completion-v2",
+        heartbeat: beats(ctx),
+      });
+      await baseChecks(completion);
+      if (
+        completion.provenance?.outputSchema?.contractVersion !==
+        OUTPUT_SCHEMA_VERSION
+      )
+        throw problem(
+          "WORKER_SCHEMA",
+          "Contract repair lacks its bound output schema",
+        );
+      await ctx.save({ specCompletionV2: completion });
+      await ctx.fault("after-spec-completion-v2-result");
+    }
+    readyChecks(completion);
+    return completion;
+  }
   async function completeLegacyPlanning(ctx, snapshot) {
     if (ctx.data.specAmendmentV1?.completed && ctx.data.planReadinessV3) {
       await assertSource(ctx);
@@ -1124,6 +1295,16 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
         throw problem(
           "SPEC_RECONCILIATION",
           "Cached proof lost its original negative readiness",
+        );
+      if (
+        digest(ctx.data.planReadinessV3.completionIdentity) !==
+          digest(completionIdentity(ctx)) ||
+        digest(ctx.data.specAmendmentV1.completionIdentity) !==
+          digest(completionIdentity(ctx))
+      )
+        throw problem(
+          "SPEC_RECONCILIATION",
+          "Cached proof does not identify the actual selected completion",
         );
       assertPriorReadiness(
         ctx.data.specCompletionInputV1.priorReadiness,
@@ -1187,8 +1368,22 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
         "SPEC_MIGRATION",
         "Completion requires the preserved unsuccessful original readiness",
       );
-    await assertSource(ctx);
+    const candidateIdentity = await assertSource(ctx);
     const authorization = authorizationBinding(ctx);
+    const contract = {
+      version: OUTPUT_SCHEMA_VERSION,
+      sourceDigest: ctx.data.sourceDigest,
+      workerPaths: candidateIdentity.identity.files
+        .map((entry) => entry.file)
+        .sort(),
+    };
+    if (!ctx.data.specCompletionContract)
+      await ctx.save({ specCompletionContract: contract });
+    else if (digest(ctx.data.specCompletionContract) !== digest(contract))
+      throw problem(
+        "WORKER_SCHEMA",
+        "Concrete completion worker files changed",
+      );
     if (!ctx.data.specCompletionInputV1) {
       const specText = await recordedSpecificationText(ctx),
         candidate = await assertSource(ctx);
@@ -1227,39 +1422,16 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
         digest(ctx.data.planReadinessV2.result)
     )
       throw problem("SPEC_MIGRATION", "Frozen completion input changed");
-    if (!ctx.data.specCompletionV1) {
-      const completion = await worker(ctx, {
-        kind: "spec-completion",
-        heartbeat: beats(ctx),
-      });
-      assertStageScope(
-        ctx.data.specCompletionBeforeV1,
-        await workingSnapshot(ctx.data.worktree),
-        [],
-      );
-      await assertSource(ctx);
-      validateWorkerResult("spec-completion", completion.result);
-      validatePresentation(completion.result.presentation, ctx);
-      if (
-        planInputNamesMismatch(completion.provenance?.inlineInputs, snapshot) ||
-        completion.provenance?.authorizationSha256 !== digest(authorization)
-      )
-        throw problem(
-          "SPEC_MIGRATION",
-          "Completion lacks verified instructions/authorization",
-        );
-      await ctx.save({ specCompletionV1: completion });
-    }
-    assertPriorReadiness(
-      input.priorReadiness,
-      ctx.data.specCompletionV1.result.priorReadiness,
+    const completion = await planningCompletion(
+      ctx,
+      snapshot,
+      input,
       authorization,
     );
-    assertPlanningReady(ctx.data.specCompletionV1.result);
     const target = completeSpecification(
       ctx,
       input.specText,
-      ctx.data.specCompletionV1.result.presentation,
+      completion.result.presentation,
     );
     if (!ctx.data.specAmendmentV1) {
       if ((await recordedSpecificationText(ctx)) !== input.specText)
@@ -1306,6 +1478,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
             targetSha256: digest(target),
           },
           authorization,
+          completionIdentity: completionIdentity(ctx),
           size: {
             characters: target.length,
             words: target.trim().split(/\s+/).length,
@@ -1336,7 +1509,8 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
           ...input,
           binding: readinessBinding(ctx, snapshot),
           specText: target,
-          completionAssessment: ctx.data.specCompletionV1.result.priorReadiness,
+          completionAssessment: completion.result.priorReadiness,
+          completionHistory: completionHistory(ctx),
         },
         planReadinessBeforeV3: await workingSnapshot(ctx.data.worktree),
       });
@@ -1347,7 +1521,9 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       digest(ctx.data.planReadinessInputV3.priorReadiness) !==
         digest(input.priorReadiness) ||
       digest(ctx.data.planReadinessInputV3.completionAssessment) !==
-        digest(ctx.data.specCompletionV1.result.priorReadiness)
+        digest(completion.result.priorReadiness) ||
+      digest(ctx.data.planReadinessInputV3.completionHistory) !==
+        digest(completionHistory(ctx))
     )
       throw problem("SPEC_MIGRATION", "Amended readiness binding changed");
     if (!ctx.data.planReadinessV3) {
@@ -1377,7 +1553,9 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
           binding: ctx.data.planReadinessInputV3.binding,
           sourceDigest: ctx.data.sourceDigest,
           priorReadiness: input.priorReadiness,
-          completionAssessment: ctx.data.specCompletionV1.result.priorReadiness,
+          completionAssessment: completion.result.priorReadiness,
+          completionIdentity: completionIdentity(ctx),
+          completionHistory: completionHistory(ctx),
         },
       });
     }
@@ -1385,7 +1563,8 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       path.join(ctx.runDir, "spec-completion-v1-evidence.json"),
       {
         input,
-        completion: ctx.data.specCompletionV1,
+        completion,
+        completionHistory: completionHistory(ctx),
         amendment: ctx.data.specAmendmentV1,
         readiness: ctx.data.planReadinessV3,
       },
@@ -1892,6 +2071,8 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
     const legacy =
       ctx.data.plan.provenance?.deliveryProtocol !== DELIVERY_PROTOCOL;
     if (legacy) await ensurePlanningReady(ctx);
+    if (ctx.data.plan.result.presentation === null)
+      assertPlanningReady(ctx.data.plan.result);
     await writeSpecification(
       ctx,
       snapshot,

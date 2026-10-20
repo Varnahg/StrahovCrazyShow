@@ -8,11 +8,13 @@ import {
   object,
   digest,
   atomicWriteJson,
+  canonicalJson,
 } from "./store.mjs";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const moduleFile = fileURLToPath(import.meta.url);
 export const DELIVERY_PROTOCOL = 2;
+export const OUTPUT_SCHEMA_VERSION = 2;
 const planInputNames = ["step-02-plan.md", "spec-template.md"];
 export function planningInputHashes(snapshot) {
   return Object.fromEntries(
@@ -45,6 +47,7 @@ export async function executeWorkerInput(file, expectedHash) {
     digest(input.prompt) !== input.provenance?.promptSha256
   )
     throw problem("WORKER_INPUT", "Invalid immutable worker input");
+  await verifyWorkerSchema(input);
   return new Promise((resolve, reject) => {
     const child = spawn(input.command, input.args, {
       windowsHide: true,
@@ -77,6 +80,108 @@ export async function executeWorkerInput(file, expectedHash) {
     });
     child.stdin.end(input.prompt, "utf8");
   });
+}
+
+async function verifyWorkerSchema(input) {
+  const binding = input.provenance?.outputSchema;
+  if (binding === undefined) return; // Original immutable requests retain their original contract.
+  const index = input.args.indexOf("--output-schema");
+  if (
+    !object(binding) ||
+    binding.contractVersion !== OUTPUT_SCHEMA_VERSION ||
+    index < 0 ||
+    input.args[index + 1] !== binding.path ||
+    !/^[a-f0-9]{64}$/.test(binding.sha256 ?? "") ||
+    digest(await readFile(binding.path, "utf8")) !== binding.sha256
+  )
+    throw problem(
+      "WORKER_SCHEMA",
+      "Immutable output schema changed before worker execution",
+    );
+}
+
+export function presentationWorkerPaths(ctx, kind) {
+  let paths;
+  if (kind === "plan") {
+    paths = ctx.data.workerTask.writePaths;
+    if (paths.some((file) => file.endsWith("/")))
+      throw problem(
+        "PLAN_PATHS_REQUIRED",
+        "New planning requires concrete worker file paths; directory worker scopes are not supported by this planner contract",
+      );
+  } else {
+    const contract = ctx.data.specCompletionContract;
+    if (
+      !object(contract) ||
+      contract.version !== OUTPUT_SCHEMA_VERSION ||
+      contract.sourceDigest !== ctx.data.sourceDigest
+    )
+      throw problem(
+        "WORKER_SCHEMA",
+        "Completion requires exact frozen candidate worker files",
+      );
+    paths = contract.workerPaths;
+  }
+  if (
+    !Array.isArray(paths) ||
+    !paths.length ||
+    paths.some(
+      (file) => typeof file !== "string" || !file || file.endsWith("/"),
+    )
+  )
+    throw problem(
+      "WORKER_SCHEMA",
+      "No concrete worker write targets are available",
+    );
+  return [...new Set(paths)].sort();
+}
+
+export async function buildWorkerSchema(ctx, kind) {
+  const schemaKind = kind === "spec-completion-v2" ? "spec-completion" : kind;
+  const schema = JSON.parse(
+    await readFile(path.join(directory, `schemas/${schemaKind}.json`), "utf8"),
+  );
+  if (["plan", "spec-completion", "spec-completion-v2"].includes(kind)) {
+    const presentation = schema.properties.presentation.anyOf.find(
+      (entry) => entry.type === "object",
+    );
+    const paths = presentationWorkerPaths(ctx, kind),
+      bases = Object.keys(authorizationBinding(ctx).bases).sort();
+    presentation.properties.tasks.items.properties.path.enum = paths;
+    presentation.properties.routeFacts.properties.footprint.items.enum = paths;
+    for (const group of ["tasks", "ioMatrix", "acceptanceCriteria"])
+      presentation.properties[group].items.properties.basis.enum = bases;
+  }
+  return schema;
+}
+
+export async function prepareWorkerSchema(ctx, key, kind) {
+  const schemaKind = kind === "spec-completion-v2" ? "spec-completion" : kind;
+  const schema = await buildWorkerSchema(ctx, kind);
+  const file = path.join(
+      ctx.runDir,
+      "schemas",
+      digest(key).slice(0, 24),
+      `${schemaKind}.json`,
+    ),
+    text = `${canonicalJson(schema)}\n`;
+  let existing;
+  try {
+    existing = await readFile(file, "utf8");
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
+  if (existing !== undefined && existing !== text)
+    throw problem(
+      "WORKER_SCHEMA",
+      "An immutable attempt schema already exists with different contents",
+    );
+  if (existing === undefined) await atomicWriteJson(file, schema);
+  return {
+    path: file,
+    sha256: digest(text),
+    contractVersion: OUTPUT_SCHEMA_VERSION,
+  };
 }
 
 export async function prepareWorkerInput(
@@ -161,6 +266,7 @@ export async function resumeWorkerAttempt(ctx, key) {
     if (digest(raw) !== args[3])
       throw problem("WORKER_INPUT", "Recorded stdin input changed");
     const input = JSON.parse(raw);
+    await verifyWorkerSchema(input);
     args = input.args;
     provenance = input.provenance;
   }
@@ -190,6 +296,8 @@ export async function resumeWorkerAttempt(ctx, key) {
       promptSha256: digest(args.at(-1) ?? ""),
     },
     requestDigest: request.requestDigest,
+    inputSha256: request.args[1] === "--execute-input" ? request.args[3] : null,
+    inputPath: request.args[1] === "--execute-input" ? request.args[2] : null,
   };
 }
 const snapshotFiles = [
@@ -390,7 +498,12 @@ export function validatePresentation(value, ctx) {
       ![
         ...value.tasks.map((task) => task.path),
         ...value.routeFacts.footprint,
-      ].every(scoped)
+      ].every(
+        (file) =>
+          scoped(file) &&
+          (!ctx.data.specCompletionContract ||
+            ctx.data.specCompletionContract.workerPaths.includes(file)),
+      )
     )
       throw problem(
         "SPEC_PRESENTATION",
@@ -617,6 +730,7 @@ export function workerArguments({ kind, schema, output, prompt }) {
 }
 
 export function validateWorkerResult(kind, value, { legacy = false } = {}) {
+  if (kind === "spec-completion-v2") kind = "spec-completion";
   const strings = (items) =>
     Array.isArray(items) && items.every((item) => typeof item === "string");
   if (!object(value))
@@ -635,8 +749,12 @@ export function validateWorkerResult(kind, value, { legacy = false } = {}) {
         "WORKER_OUTPUT",
         "Readiness validator must return explicit readiness, separate blockers and evidence",
       );
-    if (kind === "spec-completion") validatePresentation(value.presentation);
+    const blocked =
+      !value.ready || value.intentGaps.length || value.runtimeBlockers.length;
+    if (kind === "spec-completion" && !blocked)
+      validatePresentation(value.presentation);
     if (
+      !blocked &&
       ["spec-completion", "plan-readiness-v3"].includes(kind) &&
       !object(value.priorReadiness)
     )
@@ -645,6 +763,21 @@ export function validateWorkerResult(kind, value, { legacy = false } = {}) {
         "Completion and final readiness must reconcile the entire previous negative result",
       );
   } else if (kind === "plan") {
+    if (
+      (!legacy || value.ready !== undefined) &&
+      (typeof value.ready !== "boolean" ||
+        !strings(value.intentGaps) ||
+        !strings(value.runtimeBlockers))
+    )
+      throw problem(
+        "WORKER_OUTPUT",
+        "Plan must declare explicit readiness and blocker arrays",
+      );
+    if (
+      typeof value.ready === "boolean" &&
+      (!value.ready || value.intentGaps.length || value.runtimeBlockers.length)
+    )
+      return value;
     if (
       typeof value.research !== "string" ||
       typeof value.decision !== "string" ||
@@ -812,14 +945,21 @@ export async function buildWorkerPrompt(ctx, { kind, lens, identity }) {
         : "";
     prompt = `You are the independent reviewer already launched by the controller. Execute only this reviewer task; do not launch another process or agent. Read-only; do not edit files, stage, commit, or invoke a workflow.\nWorktree: ${worktree}\nProject instructions: ${path.join(worktree, "AGENTS.md")} and ${path.join(worktree, "docs/agents/bmad-policy.md")}\nReview scope paths: ${JSON.stringify(ctx.data.workerTask.writePaths)}\nFrozen source identity: ${identity}\nDiff SHA256: ${diffSha256}\n\n${block}\n\nDelivery protocol 2: the hash-verified snapshot instruction files named above are supplied in full below. Use these exact inline instruction bodies instead of reopening their ignored paths. Preserve the native lens method/output format, including reading the diff from its provided file path; the diff text is intentionally not included in this prompt. ${deferredClaims}If any required input cannot be read, report the limitation; never claim a clean review.\n${lensInput}`;
   } else if (
-    ["plan-readiness", "plan-readiness-v3", "spec-completion"].includes(kind)
+    [
+      "plan-readiness",
+      "plan-readiness-v3",
+      "spec-completion",
+      "spec-completion-v2",
+    ].includes(kind)
   ) {
     const input =
-      kind === "spec-completion"
-        ? ctx.data.specCompletionInputV1
-        : kind === "plan-readiness-v3"
-          ? ctx.data.planReadinessInputV3
-          : ctx.data.planReadinessInputV2;
+      kind === "spec-completion-v2"
+        ? ctx.data.specCompletionInputV2
+        : kind === "spec-completion"
+          ? ctx.data.specCompletionInputV1
+          : kind === "plan-readiness-v3"
+            ? ctx.data.planReadinessInputV3
+            : ctx.data.planReadinessInputV2;
     if (!object(input) || input.protocol !== DELIVERY_PROTOCOL)
       throw problem(
         "PLAN_NOT_READY",
@@ -836,13 +976,17 @@ export async function buildWorkerPrompt(ctx, { kind, lens, identity }) {
     );
     prompt +=
       "\nThe authorization record is the controller/coordinator's documented decision under existing project authority, NOT a new user approval. Keep-full is already selected for this single frozen scope; exact token count is unmeasured, not an unresolved user choice. Do not convert this administrative formatting decision into an intentGap. Still report actual user-visible intent gaps and runtime blockers.\n";
-    if (kind === "spec-completion")
+    if (kind === "spec-completion" || kind === "spec-completion-v2")
       prompt +=
         "\nYour sole task is bounded specification presentation completion. Return presentation.tasks with path/action/reason, meaningful I/O success and error rows, and system-level Given/When/Then acceptance not duplicated from the matrix, plus observed routeFacts. Each derived item must cite an existing key in authorization.bases. Derive only existing requirements from the original frozen assignment and implemented candidate; do not introduce requirements, repair code, or propose a different plan. Include an execution task covering matrix edge tests. The controller preserves the exact frozen block and appends the missing derived matrix outside it, replaces only the incomplete Tasks & Acceptance presentation and appends a change-log entry. If faithful completion is impossible, return ready=false with actual gaps/blockers. No human confirmation is needed for this already authorized presentation repair.\n";
     if (kind === "plan-readiness-v3")
       prompt +=
         "\nValidate the completed specification, including its derived matrix outside the unchanged legacy frozen block, against the exact template and original plan/candidate. The original incomplete plan remains historical evidence, not a demand to repeat implementation. This is the single post-amendment validation; false/invalid results stop the run without retry. Do not waive real missing format, evidence, input or semantic requirements.\n";
-    if (["spec-completion", "plan-readiness-v3"].includes(kind)) {
+    if (
+      ["spec-completion", "spec-completion-v2", "plan-readiness-v3"].includes(
+        kind,
+      )
+    ) {
       if (
         !object(input.priorReadiness) ||
         digest(input.priorReadiness.result) !== input.priorReadiness.sha256
@@ -864,6 +1008,12 @@ export async function buildWorkerPrompt(ctx, { kind, lens, identity }) {
         );
       prompt +=
         "\nReconcile EVERY original intentGap and runtimeBlocker in order, retaining its exact index and text. Return priorReadiness with the supplied result SHA, authorization SHA and per-item resolution/reason. Allowed automatic resolutions are narrowly workflow-keep-full (the existing delegated size/keep-full presentation decision) and, for runtimeBlockers only, spec-presentation (the explicitly repaired document format). Actual product intent, missing runtime prerequisites and uncertain classifications must remain product-intent/runtime-prerequisite/unresolved and ready=false. Never rename/drop a question, claim a new user decision, or use generic authorization to answer a business/product question. In the final readiness pass independently reassess the ORIGINAL TEXT and the completion's classification/reason; a new clean opinion alone cannot erase earlier gaps. This is semantic model assessment with deterministic identity/type/completeness checks, not a formal semantic proof.\n";
+      if (input.completionHistory)
+        prompt += deliver(
+          "completion-history.json",
+          JSON.stringify(input.completionHistory),
+          digest(JSON.stringify(input.completionHistory)),
+        );
     }
   } else {
     const common = await readFile(
@@ -907,6 +1057,10 @@ export async function buildWorkerPrompt(ctx, { kind, lens, identity }) {
       prompt = `${common}\n${context}\nspec_file: ${ctx.data.specFile}\n\n${handoff}\n\nController binding: you are the already-dispatched implementation worker, not the coordinator. Your stable executor already acquired the supplied claim; verify it without re-claiming or releasing it. The controller owns specification/status, artifacts, handoff publication, staging and remote actions. Apply the implementation/refactoring/verification instructions only inside workerTask.writePaths. Return your handoff as the supplied structured output. Do not edit spec or evidence, install dependencies, run heavy checks, or enter another BMAD step. The exact verified spec is also delivered inline, so its contents do not depend on reading a generated path.\n${deliver("spec.md", specText, specSha256)}`;
     }
   }
+  if (["plan", "spec-completion", "spec-completion-v2"].includes(kind)) {
+    const paths = presentationWorkerPaths(ctx, kind);
+    prompt += `\nSTRICT PRESENTATION CONTRACT: tasks describe only worker WRITE actions. tasks.path and routeFacts.footprint are exact raw relative filenames from ${JSON.stringify(paths)}, with no annotations. Read-only source/test inputs belong in Code Map or the existing Verification section; manifest check commands and controller handoff/artifact publication are already controller-owned and must NOT be added as worker tasks. routeFacts.irreversibles describes worker changes only; controller external effects are recorded separately. Each given, when and then is a separate nonempty single-line field: given=precondition, when=trigger, then=expected outcome. Do not place the outcome in when or leave then empty. For a real blocked/undecided result, return ready=false with the substantive gaps/blockers and presentation:null instead of inventing tasks or acceptance. Never repair the original response by parsing/relabeling its prose; derive a new bounded structured presentation from the unchanged original inputs.\n`;
+  }
   return {
     prompt,
     provenance: {
@@ -921,6 +1075,7 @@ export async function buildWorkerPrompt(ctx, { kind, lens, identity }) {
         "plan-readiness",
         "plan-readiness-v3",
         "spec-completion",
+        "spec-completion-v2",
       ].includes(kind)
         ? {
             authorizationSha256: digest(authorizationBinding(ctx)),
@@ -1050,11 +1205,13 @@ export async function runWorker(
           ? "plan-readiness:v3"
           : kind === "spec-completion"
             ? "spec-completion:v1"
-            : kind === "plan"
-              ? ctx.state.attempts.plan
-                ? "plan"
-                : "plan:v2"
-              : kind;
+            : kind === "spec-completion-v2"
+              ? "spec-completion:v2"
+              : kind === "plan"
+                ? ctx.state.attempts.plan
+                  ? "plan"
+                  : "plan:v2"
+                : kind;
   const output = path.join(
     ctx.runDir,
     `${key.replaceAll(":", "-")}.${kind === "review" ? "txt" : "json"}`,
@@ -1069,7 +1226,12 @@ export async function runWorker(
     actualOutput = resumed.outputPath;
   } else {
     const built = await buildWorkerPrompt(ctx, { kind, lens, identity });
-    provenance = built.provenance;
+    const outputSchema =
+      kind === "review" ? null : await prepareWorkerSchema(ctx, key, kind);
+    provenance = {
+      ...built.provenance,
+      ...(outputSchema ? { outputSchema } : {}),
+    };
     const input = await prepareWorkerInput(
       ctx,
       key,
@@ -1077,7 +1239,7 @@ export async function runWorker(
         ...prefixArgs,
         ...workerArguments({
           kind,
-          schema: path.join(directory, `schemas/${kind}.json`),
+          schema: outputSchema?.path,
           output,
           prompt: "-",
         }),

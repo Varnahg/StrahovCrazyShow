@@ -103,3 +103,17 @@ Původní B1/B2/E1–E4/V1/V2 a pořadí V3 potvrzené po opravě. E-P2-resume (
 Každý nález vyhodnocen samostatně před seskupením. Detail a uzavření v docs/verification-evidence/bmad-controller-20261020/review-spec-format.md. Plná sada před opravami62/62 PASS není důkazem chybějících regresí; nové cílené testy a následná stabilní přejímka mají vlastní evidence. Frozen záměr se nemění.
 
 SF-V3 recheck — medium, patch testů: kombinace již zapsaného toText a stále existujícího zaznamenaného tempu je produkčně správně odmítnutá, chybí však přímá regrese. Doplnit zachování obou souborů/checkpointu a0novýchworkerů při dvojím resume. Produkční kód se nemění; testový followup čeká na dokončení právě běžící úplné sady.
+
+### Review svázaného output kontraktu
+
+| ID | Verdikt | Důkaz a směr |
+| --- | --- | --- |
+| SC-B1 blind | false | Nepodporovaný completed-amendment mezistav z nepublikovaného fbeb582; zveřejněný main jej nevytváří a jediný skutečný run je před amendmentem/v3. Automatická obecná migrace meziverzí není slíbená. |
+| SC-E1 edge | false | Samostatně posouzený stejný technicky možný, ale nepodporovaný upgrade mezistavu; neznámá metadata správně nezpůsobí přijetí či další práci. |
+| SC-V1 verification | medium | Chybí skutečná plan-stage regrese null presentation pro oba typy blokací a repeat resume. Patch testů. |
+| SC-V2 verification | medium | Chybí schema-tamper test přes převzetí hotového receipt, kde executor znovu neběží. Patch testů. |
+| SC-V3 verification Other | false | Baseline blob potvrzuje starší metadata, ale ne existenci podporovaného consumeru; vyhodnoceno individuálně před seskupením s B1/E1. |
+
+Detail a následné uzavření: docs/verification-evidence/bmad-controller-20261020/review-schema-contract.md. Root targeted3/3 PASS; autor19/19 PASS. Produkční kód se kvůli testovému followupu nemění.
+
+SC-V1/V2 uzavřeny: autor3/3 PASS14.144s, tsc0; nezávislý verification recheck potvrdil skutečné plan/resume cesty a byte-identitu původních asercí po odečtení vložených bloků. Produkční kód beze změny. Detail review-schema-contract.md; skutečný pilot a finální CI ještě následují.
