@@ -9,3 +9,9 @@ Raw logy a výsledky: docs/refactoring/20261020/baseline-{test,build,integration
 Žádný vlastní dlouhožijící proces neběží. Toto je pouze výchozí fáze: výsledné refaktoringové ověření ještě neproběhlo, task není Done. Claim se uvolňuje pro samostatně rezervovanou produkční snapshot/GPU přejímku a později se znovu získá pro finální stabilní checkpoint. CPU/NullEngine výsledky nejsou GPU/FPS důkaz.
 
 Publikované gzip logy jsou po dekompresi byte-identické s původními .cache/refactor-validation/*.log; původní záznamy zůstaly zachované. SHA-256 obou podob a velikosti uvádí docs/refactoring/20261020/baseline-log-manifest.json. Komprese zachovává i nativní CRLF/trailing terminálové bajty, které nejsou formátováním zdrojového kódu.
+
+## World renderer checkpoint53d60811,20.10.2026
+
+Immutable candidate aa3feebd0118246a55bf2fc6b10d2605acbaad7c9718f5b374ab67b450faa968 obsahuje zdroje i testy před dalšími disjunktními změnami. Jeho tsc/Vite buildPASS (log v world-visual evidenci). Izolovaný node scripts/test-integration.mjs (přesný pnpm test:integration entry) nejprve v sandboxu nedosáhl loopback health-ready přes potvrzený start vlastního serveru; zachován world-integration.log. Opakování v běžném uživatelském kontextu bez změny zdrojů/limitů exit0: všechny4 skutečnéSDK scénáře PASS, protocol11, singleton/guest/privacy,12peers, physicalcar W/A/D/brake/reverse, respawn/network/recovery/backlog. Výstup obsahuje očekávaná uzavření relací4002. Původní a opakovaný log bajtově zachované jako .gz v docs/refactoring/20261020/world-visual/, souhrn world-validation.json.
+
+Script ukončil vlastní server a await serverClosed; OS port2568 po dokončení bez listeneru. Žádné pomocné procesy nezůstávají. Plná baseline není vydávána za finální sadu nového checkpointu; celá sada/build/integrace poběží také v PR CI. Vizuální přejímka zůstává otevřená kvůli doloženému stejnému startup timeoutu baseline/kandidáta. Release této validační fáze není dokončeníKEY48.

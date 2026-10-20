@@ -46,7 +46,7 @@ Doložené rozpory: kořenové README označují D2/protokol 9/preview 4179 za s
 
 ## Ověření a hranice
 
-Závislosti odpovídají pnpm-lock.yaml, 12 původních LFS objektů je vybaleno a preflight prošel bez změny assetů. Běží celá nezměněná sada se sériovým souběhem kvůli již doložené lokální contention procesních fixtures; žádný test ani limit nebyl změněn. Výsledky teprve budou doplněny. Build, izolovaná integrace a skutečný produkční scénář následují nad stabilními checkpointy.
+Závislosti odpovídají pnpm-lock.yaml, 12 původních LFS objektů je vybaleno a preflight prošel bez změny assetů. Celá nezměněná baseline sada se sériovým souběhem kvůli doložené lokální contention procesních fixtures skončila1671 PASS/0 FAIL/1 platformní skip; žádný test ani limit nebyl změněn. Baseline build a izolovaná integrace PASS. První world checkpoint53d60811 má55 cílených testů, build, izolovanou integraci a3 nezávislá review bez nálezů. Skutečná produkční vizuální přejímka zůstává otevřená: baseline i kandidát mají startup timeout při přípravě světel; přesné raw stavy/identity/build/integration logy a limity jsou ve [world-visual evidenci](world-visual/evidence-manifest.json).
 
 Pět cizích rezervací nad pozastaveným WIP je stále obsazených. Game/UI/session-diagnostics a tráva se do získání doloženého předání neupravují. Žádný výsledek CPU/NullEngine ani odstranění zdrojových řádků není GPU/FPS důkaz.
 

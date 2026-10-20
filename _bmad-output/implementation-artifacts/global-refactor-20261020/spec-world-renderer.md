@@ -2,7 +2,7 @@
 title: 'KEY-48: odstranit nevyužitý světový renderer'
 type: 'refactor'
 created: '2026-10-20'
-status: 'ready-for-dev'
+status: 'in-review'
 route: 'dispatch'
 baseline_commit: '885d07fc2e22576f0ce6c6ceaea08fd8a8d9dc95'
 review_loop_iteration: 0
@@ -45,10 +45,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] client/world-renderer.ts -- odstranit mrtvé kořeny, uzavřené pomocníky a následně nepoužité barvy/importy -- odstranit druhý návrh světa.
-- [ ] client/world-renderer.ts -- použít architectureEdges s projekcí šesti polí -- jediný algoritmus bez nového veřejného tvaru.
-- [ ] tests/graphics.test.ts -- doplnit kontraktní případy matice -- chránit API bez kopie algoritmu.
-- [ ] docs/agents/handoffs/global-refactor-world-renderer-20261020.md -- předat diff, zdroje, testy a limity -- přijetí integrátorem.
+- [x] client/world-renderer.ts -- odstranit mrtvé kořeny, uzavřené pomocníky a následně nepoužité barvy/importy -- odstranit druhý návrh světa.
+- [x] client/world-renderer.ts -- použít architectureEdges s projekcí šesti polí -- jediný algoritmus bez nového veřejného tvaru.
+- [x] tests/graphics.test.ts -- doplnit kontraktní případy matice -- chránit API bez kopie algoritmu.
+- [x] docs/agents/handoffs/global-refactor-world-renderer-20261020.md -- předat diff, zdroje, testy a limity -- přijetí integrátorem.
 
 **Acceptance Criteria:**
 - Given výchozí přijatý zdroj, when porovnáme AST buildWorld před a po, then tělo i signatura budou shodné.
@@ -57,9 +57,15 @@ context:
 
 ## Implementation Notes
 
+Výchozí sada 1671 PASS / 0 FAIL / 1 platformní skip, build a izolovaná integrace PASS. Baseline je zmrazený v refactor-baseline-20261020-b, snapshot 336a9b1dbde06271c5d158f14a0a7c85b0c0c55ebdee1e290eaac3c067044c89 (8518 souborů včetně testů). Původní neúspěšný freezer zůstává zachovaný. Implementační zápisy mohou začít až nyní; první tři veřejné exporty a canonical AST hash buildWorld zachycuje world-renderer-contract.json.
+
+Převzetí koordinátorem: přečten celý taskový diff (801 řádků); samostatně ověřena bajtová shoda deklarací buildWorld, WorldBuildContext a FacadeEdge, zachované exporty i nezměněný architecture-reality.ts. Všechna čtyři implementační zadání splněna. Matice má kontraktní testy; 55 cílených testů PASS a diferenciální porovnání 488 polygonů / 6333 hran PASS. Produkční vizuální přejímka a ověření stabilního kandidáta zůstávají otevřené.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+20. 10. 2026: spuštěny všechny tři nezávislé vrstvy nad taskovým diffem SHA-256 8a255d54676bba93040f9128292b6aced195d8dae757c4b9521d3b9db01c947a. Blind hunter: []; edge-case hunter: []; verification-gap: No verification gaps found. Žádné nálezy k triáži, opravě nebo odložení.
 
 ## Design Notes
 

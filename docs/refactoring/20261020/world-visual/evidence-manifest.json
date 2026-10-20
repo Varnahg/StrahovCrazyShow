@@ -1,0 +1,103 @@
+{
+  "observedAt": "2026-10-20T07:04:34.402Z",
+  "baseline": "336a9b1dbde06271c5d158f14a0a7c85b0c0c55ebdee1e290eaac3c067044c89",
+  "candidate": "aa3feebd0118246a55bf2fc6b10d2605acbaad7c9718f5b374ab67b450faa968",
+  "defaultBackend": "webgl2",
+  "baselineAttempts": 2,
+  "candidateAttempts": 1,
+  "status": "startup-failed-both",
+  "blockedVisualAcceptance": true,
+  "knownStage": "light-preparation",
+  "evidence": {
+    "baseline-failure.json": {
+      "sha256": "75dbd9333bb25b6b2c29ffef95e559cbe969250bf80ab347187e92b61e19e236",
+      "bytes": 2607
+    },
+    "candidate-failure.json": {
+      "sha256": "6acddc8fd0c3bf37301f4d63cb4f70fd725facca8599a3d8f0d1873cc98dd90b",
+      "bytes": 2077
+    },
+    "baseline-client-identity.json": {
+      "sha256": "558366fa198cd3415efac2777af56b92d3ec27cec3314daaa853c1180adf0e51",
+      "bytes": 290
+    },
+    "candidate-client-identity.json": {
+      "sha256": "7710f1ba5fe53a1c79d162fac27698b9557a7aa660825da2259957f8ab6b55d0",
+      "bytes": 301
+    },
+    "baseline-dependency-manifest.json": {
+      "sha256": "0b8ccdddbca927314646a494d39c796e5035d1118a083fb0ffa44071103b7a93",
+      "bytes": 2128
+    },
+    "candidate-dependency-manifest.json": {
+      "sha256": "efd15fe58843bb226ab5d2835d504ed118b3efed9ee65a51667eb5071e7928c7",
+      "bytes": 2128
+    },
+    "baseline-timeout.jpg": {
+      "sha256": "07d524ce15c8fd003e678d568dd4da6336455d1c80788e537f425b6e5a2d713d",
+      "bytes": 16757
+    },
+    "candidate-timeout.jpg": {
+      "sha256": "07d524ce15c8fd003e678d568dd4da6336455d1c80788e537f425b6e5a2d713d",
+      "bytes": 16757
+    },
+    "baseline-snapshot-build.log.gz": {
+      "rawSha256": "f522ffe9dc2387b34acb6f01da4a16186224d2f16cddfbfb0609cea7233e159c",
+      "sha256": "71b803d9c33992a23bd2bfe2219c9c49a698c24ea3a35f08e33c397e38212a33",
+      "rawBytes": 2775
+    },
+    "candidate-snapshot-build.log.gz": {
+      "rawSha256": "c6fc3ee7282ee7db0a151bb6e65d07915850bab5c6cabf418bd2904d8359fbe4",
+      "sha256": "db465ffee4aac39aad8023daa6c32b15405d17b928fa7a9182becb221a962fce",
+      "rawBytes": 2777
+    },
+    "candidate-webgpu-failure.json": {
+      "sha256": "2196e34c6b4d96adb8ec811831f0072b8232eb6e97363bf9863a355ffb763366",
+      "bytes": 2493
+    },
+    "candidate-webgpu-timeout.jpg": {
+      "sha256": "07d524ce15c8fd003e678d568dd4da6336455d1c80788e537f425b6e5a2d713d",
+      "bytes": 16757
+    },
+    "world-integration.log.gz": {
+      "sha256": "6398be06b0c509e25d2a970d0e39f9f40867acf0da5a36e1e4e9f3eafebb9051",
+      "bytes": 306
+    },
+    "world-integration-b.log.gz": {
+      "sha256": "480d242489856fd9f09d036e54184e99ca12f856dde9aac64f25b188aa37570d",
+      "bytes": 1086
+    },
+    "world-validation.json": {
+      "sha256": "f62911bf24e7599c75196a0bf68cacd4959dbe729cd9e22b052daa51f9f93356",
+      "bytes": 1009
+    }
+  },
+  "additionalQa": {
+    "backend": "webgpu",
+    "attempts": 1,
+    "status": "light-preparation-timeout",
+    "notBaselineComparison": true
+  },
+  "cleanup": {
+    "baselineServer": 22936,
+    "candidateServer": 33892,
+    "stopped": true,
+    "ownGpuTabsClosed": true,
+    "port4290Listener": false
+  },
+  "osGpuInventory": [
+    {
+      "name": "Intel(R) UHD Graphics 630",
+      "driverVersion": "31.0.101.2140"
+    },
+    {
+      "name": "NVIDIA GeForce GTX 1060",
+      "driverVersion": "32.0.15.8228"
+    }
+  ],
+  "actualSelectedGpuUnavailable": true,
+  "changedFrozenPaths": [
+    "client/world-renderer.ts",
+    "tests/graphics.test.ts"
+  ]
+}
