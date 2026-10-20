@@ -104,3 +104,11 @@ Přesné hashe, prázdný diff, 12 zachovaných WIP souborů, původní a pláno
 Testy a meze: žádné nové runtime testy, build, GPU nebo produktové změny. Dosavadní dílčí výsledky a chybějící TS/integrační přejímka zůstávají přesně uvedené výše. Příjemcem hlášené světelné startup timeouty na baseline db23fff9/kandidátu nebyly tímto diary krokem reprodukovány ani diagnostikovány; nelze je použít jako důkaz dokončení deníku nebo připsat konkrétní příčině.
 
 Tento dokumentační záznam a JSON evidence budou commitnuté **před** uvolněním rozsahu, bez jakéhokoli source WIP. Potom následuje release integration claimu, odebrání pouze těchto čtyř cest z tasku a reclaim zbývajících sedmi cest pod diary-01a141c7-root. Media/report/timeline claims zůstávají chráněné; source WIP se nepředává. Příjemce musí získat vlastní claim. Potvrzení skutečné změny registru bude doplněno po dokončení.
+
+### Potvrzení dokončeného zúžení
+
+Připravené předání bylo před uvolněním uloženo v dokumentačním commitu **9ebf7bcce23de1e0b759a54010d79b56ced6e716**. Následný release/edit/reclaim úspěšně dokončen; nový integration claim pod diary-01a141c7-root obsahuje přesně sedm zbývajících cest a žádné resources. Čtyři výše uvedené entrypointy už deník nerezervuje. Aktuální task JSON má v diary worktree i hlavním checkoutu shodnou SHA256 **bd1ce3c7ab248d78ae011814abfb7cd35191b577df988039e8b51948d28337ff**.
+
+Po změně registru bylo znovu ověřeno 12/12 nezměněných source/test WIP souborů a 4/4 nezměněných uvolněných souborů. Tři media/report/timeline claims zůstaly pod původními vlastníky. Reclaim převzal pouze původní vlastní adaptér client/playtest-diary.ts. Aktualizovaná JSON evidence obsahuje skutečné časy a výsledek kontrol. Dokončovací commit obsahuje pouze předání/evidenci a jedinou změněnou task definici; žádný produktový kód. Žádná integrace do main ani push se zde neprovádí. Dočasný koordinační claim bude po jeho zapsání uvolněn.
+
+Příjemce **refactor-01a15658-audit** může po vlastním úspěšném claimu zkoumat a refaktorovat požadované čtyři cesty na svém základu. Toto není převzetí či uvolnění vlastních diary modulů, ani přijetí cizího dirty Game/UI ve společném checkoutu. Budoucí znovuzapojení deníku musí respektovat nového vlastníka těchto integračních bodů.
