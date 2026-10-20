@@ -40,6 +40,164 @@ const triple = (value: unknown) => {
   if (!Array.isArray(value) || value.length !== 3) throw new Error("triple");
   return value.map((v) => number(v));
 };
+function projectGpu(value: unknown) {
+  const gpu = object(value);
+  const result: Record<string, any> = {
+    renderer: text(gpu.renderer),
+    vendor: text(gpu.vendor),
+    classification: choice(gpu.classification, [
+      "integrated",
+      "dedicated",
+      "software",
+      "unknown",
+    ]),
+  };
+  if (gpu.version !== undefined) result.version = text(gpu.version);
+  if (gpu.context !== undefined) {
+    const context = object(gpu.context);
+    const sampleCount = (value: unknown, maximum: number) => {
+      if (value === null) return null;
+      const count = number(value, 0, maximum);
+      if (!Number.isInteger(count)) throw new Error("sample count");
+      return count;
+    };
+    result.context = {
+      requestedAntialias: choice(context.requestedAntialias, [
+        true,
+        false,
+        null,
+      ]),
+      actualAntialias: choice(context.actualAntialias, [true, false, null]),
+      defaultFramebuffer: choice(context.defaultFramebuffer, [
+        true,
+        false,
+        null,
+      ]),
+      sampleBuffers: sampleCount(context.sampleBuffers, 1),
+      samples: sampleCount(context.samples, 64),
+    };
+    if (
+      context.defaultFramebuffer !== true &&
+      (context.sampleBuffers !== null || context.samples !== null)
+    )
+      throw new Error("offscreen sample count");
+  }
+  if (gpu.webglVersion !== undefined)
+    result.webglVersion = choice(gpu.webglVersion, [1, 2, null]);
+  if (gpu.requestedPowerPreference !== undefined)
+    result.requestedPowerPreference = choice(gpu.requestedPowerPreference, [
+      "default",
+      "high-performance",
+      "low-power",
+      "unknown",
+    ]);
+  return result;
+}
+
+function projectSceneView(value: unknown) {
+  const view = object(value),
+    p = object(view.position);
+  const result: Record<string, any> = {
+    position: {
+      x: number(p.x, -1e6, 1e6),
+      y: number(p.y, -1e6, 1e6),
+      z: number(p.z, -1e6, 1e6),
+    },
+    yaw: number(view.yaw, -1e6, 1e6),
+    pitch: number(view.pitch, -1e6, 1e6),
+    lightingInstant: number(view.lightingInstant, 0, 8640000000000000),
+  };
+  if (view.camera !== undefined) {
+    const camera = object(view.camera),
+      position = object(camera.position);
+    const matrix = (value: unknown) => {
+      if (!Array.isArray(value) || value.length !== 16)
+        throw new Error("camera matrix");
+      return value.map((v) => number(v, -1e8, 1e8));
+    };
+    result.camera = {
+      position: {
+        x: number(position.x, -1e6, 1e6),
+        y: number(position.y, -1e6, 1e6),
+        z: number(position.z, -1e6, 1e6),
+      },
+      fov: number(camera.fov, 0.001, Math.PI),
+      minZ: number(camera.minZ, 0.001, 1e6),
+      maxZ: number(camera.maxZ, 0.001, 1e6),
+      viewMatrix: matrix(camera.viewMatrix),
+      projectionMatrix: matrix(camera.projectionMatrix),
+    };
+    if (result.camera.maxZ <= result.camera.minZ)
+      throw new Error("camera clip planes");
+  }
+  return result;
+}
+
+function projectRenderCost(value: unknown) {
+  const cost = object(value);
+  const result: Record<string, any> = {};
+  const keys: Record<string, string[]> = {
+    inventory: [
+      "registeredMeshes",
+      "enabledVisibleGeometryMeshes",
+      "hiddenGeometryMeshes",
+      "enabledRegularInstances",
+      "uniqueGeometries",
+      "uniqueGeometryTriangles",
+      "enabledPotentialTriangles",
+      "registeredMaterials",
+      "enabledDistinctMaterials",
+      "materialLightAssignmentGroups",
+      "lights",
+      "enabledLights",
+    ],
+    shadows: [
+      "shadowCasters",
+      "alphaCasters",
+      "glassMaterials",
+      "skyUpdates",
+      "shadowMapSize",
+      "shadowCandidates",
+      "shadowFrustumRejected",
+      "shadowInactiveRejected",
+      "selectionMeshVisits",
+      "glassVisits",
+    ],
+    surfaces: ["meshVisits", "conversionPasses", "materialUpdates"],
+    vegetation: [
+      "treeInstances",
+      "mappedTrees",
+      "inferredTrees",
+      "photoInterpretedTrees",
+      "grassTiles",
+      "grassClumps",
+      "visibleGrassTiles",
+      "visibleGrassClumps",
+      "uniqueTreeModels",
+      "loadedTreeMeshes",
+      "bootstrapBytes",
+      "activeTreeTriangles",
+      "pendingTreeLoads",
+    ],
+  };
+  for (const [group, names] of Object.entries(keys))
+    if (cost[group]) result[group] = fields(cost[group], names);
+  if (cost.inventory?.enabledMeshCountsByMaterialClass)
+    result.inventory.enabledMeshCountsByMaterialClass = fields(
+      cost.inventory.enabledMeshCountsByMaterialClass,
+      ["PBRMaterial", "StandardMaterial", "ShaderMaterial", "MultiMaterial"],
+    );
+  if (cost.inventory?.enabledTreeMeshesByLod)
+    result.inventory.enabledTreeMeshesByLod = triple(
+      cost.inventory.enabledTreeMeshesByLod,
+    );
+  if (cost.vegetation?.treeDetailCounts)
+    result.vegetation.treeDetailCounts = triple(
+      cost.vegetation.treeDetailCounts,
+    );
+  return result;
+}
+
 export function projectLocalBenchmark(value: unknown) {
   const raw = object(value);
   if (
@@ -73,56 +231,7 @@ export function projectLocalBenchmark(value: unknown) {
     renderResolution: dimensions(raw.renderResolution),
     quality: choice(raw.quality, ["low", "medium", "high"]),
   };
-  const gpu = object(raw.gpu);
-  result.gpu = {
-    renderer: text(gpu.renderer),
-    vendor: text(gpu.vendor),
-    classification: choice(gpu.classification, [
-      "integrated",
-      "dedicated",
-      "software",
-      "unknown",
-    ]),
-  };
-  if (gpu.version !== undefined) result.gpu.version = text(gpu.version);
-  if (gpu.context !== undefined) {
-    const context = object(gpu.context);
-    const sampleCount = (value: unknown, maximum: number) => {
-      if (value === null) return null;
-      const count = number(value, 0, maximum);
-      if (!Number.isInteger(count)) throw new Error("sample count");
-      return count;
-    };
-    result.gpu.context = {
-      requestedAntialias: choice(context.requestedAntialias, [
-        true,
-        false,
-        null,
-      ]),
-      actualAntialias: choice(context.actualAntialias, [true, false, null]),
-      defaultFramebuffer: choice(context.defaultFramebuffer, [
-        true,
-        false,
-        null,
-      ]),
-      sampleBuffers: sampleCount(context.sampleBuffers, 1),
-      samples: sampleCount(context.samples, 64),
-    };
-    if (
-      context.defaultFramebuffer !== true &&
-      (context.sampleBuffers !== null || context.samples !== null)
-    )
-      throw new Error("offscreen sample count");
-  }
-  if (gpu.webglVersion !== undefined)
-    result.gpu.webglVersion = choice(gpu.webglVersion, [1, 2, null]);
-  if (gpu.requestedPowerPreference !== undefined)
-    result.gpu.requestedPowerPreference = choice(gpu.requestedPowerPreference, [
-      "default",
-      "high-performance",
-      "low-power",
-      "unknown",
-    ]);
+  result.gpu = projectGpu(raw.gpu);
   if (raw.avatarLod)
     result.avatarLod = fields(raw.avatarLod, ["near", "medium", "far"]);
   for (const key of ["triangles", "drawCalls", "grassClumps"])
@@ -133,43 +242,7 @@ export function projectLocalBenchmark(value: unknown) {
     ]);
   if (raw.ambient)
     result.ambient = fields(raw.ambient, ["buses", "passengers", "cars"]);
-  if (raw.sceneView) {
-    const view = object(raw.sceneView),
-      p = object(view.position);
-    result.sceneView = {
-      position: {
-        x: number(p.x, -1e6, 1e6),
-        y: number(p.y, -1e6, 1e6),
-        z: number(p.z, -1e6, 1e6),
-      },
-      yaw: number(view.yaw, -1e6, 1e6),
-      pitch: number(view.pitch, -1e6, 1e6),
-      lightingInstant: number(view.lightingInstant, 0, 8640000000000000),
-    };
-    if (view.camera !== undefined) {
-      const camera = object(view.camera),
-        position = object(camera.position);
-      const matrix = (value: unknown) => {
-        if (!Array.isArray(value) || value.length !== 16)
-          throw new Error("camera matrix");
-        return value.map((v) => number(v, -1e8, 1e8));
-      };
-      result.sceneView.camera = {
-        position: {
-          x: number(position.x, -1e6, 1e6),
-          y: number(position.y, -1e6, 1e6),
-          z: number(position.z, -1e6, 1e6),
-        },
-        fov: number(camera.fov, 0.001, Math.PI),
-        minZ: number(camera.minZ, 0.001, 1e6),
-        maxZ: number(camera.maxZ, 0.001, 1e6),
-        viewMatrix: matrix(camera.viewMatrix),
-        projectionMatrix: matrix(camera.projectionMatrix),
-      };
-      if (result.sceneView.camera.maxZ <= result.sceneView.camera.minZ)
-        throw new Error("camera clip planes");
-    }
-  }
+  if (raw.sceneView) result.sceneView = projectSceneView(raw.sceneView);
   if (raw.frameWork)
     result.frameWork = fields(raw.frameWork, ["cpuMs", "gpuMs"], true);
   // Exact numeric whitelist; no renderer names, paths or arbitrary stage keys.
@@ -253,68 +326,6 @@ export function projectLocalBenchmark(value: unknown) {
         true,
       );
   }
-  if (raw.renderCost) {
-    const cost = object(raw.renderCost);
-    result.renderCost = {};
-    const keys: Record<string, string[]> = {
-      inventory: [
-        "registeredMeshes",
-        "enabledVisibleGeometryMeshes",
-        "hiddenGeometryMeshes",
-        "enabledRegularInstances",
-        "uniqueGeometries",
-        "uniqueGeometryTriangles",
-        "enabledPotentialTriangles",
-        "registeredMaterials",
-        "enabledDistinctMaterials",
-        "materialLightAssignmentGroups",
-        "lights",
-        "enabledLights",
-      ],
-      shadows: [
-        "shadowCasters",
-        "alphaCasters",
-        "glassMaterials",
-        "skyUpdates",
-        "shadowMapSize",
-        "shadowCandidates",
-        "shadowFrustumRejected",
-        "shadowInactiveRejected",
-        "selectionMeshVisits",
-        "glassVisits",
-      ],
-      surfaces: ["meshVisits", "conversionPasses", "materialUpdates"],
-      vegetation: [
-        "treeInstances",
-        "mappedTrees",
-        "inferredTrees",
-        "photoInterpretedTrees",
-        "grassTiles",
-        "grassClumps",
-        "visibleGrassTiles",
-        "visibleGrassClumps",
-        "uniqueTreeModels",
-        "loadedTreeMeshes",
-        "bootstrapBytes",
-        "activeTreeTriangles",
-        "pendingTreeLoads",
-      ],
-    };
-    for (const [group, names] of Object.entries(keys))
-      if (cost[group]) result.renderCost[group] = fields(cost[group], names);
-    if (cost.inventory?.enabledMeshCountsByMaterialClass)
-      result.renderCost.inventory.enabledMeshCountsByMaterialClass = fields(
-        cost.inventory.enabledMeshCountsByMaterialClass,
-        ["PBRMaterial", "StandardMaterial", "ShaderMaterial", "MultiMaterial"],
-      );
-    if (cost.inventory?.enabledTreeMeshesByLod)
-      result.renderCost.inventory.enabledTreeMeshesByLod = triple(
-        cost.inventory.enabledTreeMeshesByLod,
-      );
-    if (cost.vegetation?.treeDetailCounts)
-      result.renderCost.vegetation.treeDetailCounts = triple(
-        cost.vegetation.treeDetailCounts,
-      );
-  }
+  if (raw.renderCost) result.renderCost = projectRenderCost(raw.renderCost);
   return result;
 }

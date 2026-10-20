@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-entrypoints-20261020",
+  "title": "KEY-48: sjednotit zachycení car pose a reset diagnostiky klienta",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/game.ts",
+    "client/ui.tsx",
+    "tests/room-callbacks.test.ts",
+    "docs/agents/handoffs/global-refactor-entrypoints-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Private capturePreviousCarPose sdílí2ASTtotožné bloky, ponechá přesně původní umístění/cally/reconcile/actor.step pořadí a3čerstvé alokace bezcache/reuse.",
+    "Lokální resetConnectionDiagnostics sdílí5totožných trojic ve stávajících callbacks: probe.reset→timeline.resetRttSelection→resetDiagnosticContext. Aktuálníreflookup, efekty/deps/timery a ostatní authority/sender/bootstrap reset se nemění.",
+    "VeřejnéAPI/hra/výstupy/errorvalidace bezezměny. Zachovat předaný runtime bindingcleanup a neupravovat cizíprimaryWIP."
+  ],
+  "verification": [
+    "node --import tsx --test tests/game-interpolation.test.ts tests/client-recovery.test.ts tests/prediction-replay.test.ts tests/room-callbacks.test.ts",
+    "Kontraktní testy nových private helperů používají skutečné produkční AST. Zachovat čerstvou nezávislou pose před actor.step a po reconcile a původní pořadí5diagnostic resetů, stale callback a cleanup chování."
+  ],
+  "notes": [
+    "Read-only audit implement_quaternion prošel celéGame3157/UI2874/SessionDiagnostics937 řádků, relevantnícallery/testy, AST2shodnépose bloky a5shodnýchdiagnostic trojic. Záznam v auditu KEY48.",
+    "Uživatel20.10 výslovně povolil domluvu předání. Diary0a598a6a uvolnil4entrypointy s nulovým vlastním diffem; primaryGame/UIWIP není převzat.",
+    "Současný Game/UI bindingcleanup převzat od refactor-01a15658-bindings-runtime, handoff global-refactor-bindings-runtime-20261020.md. Koordinátor předává příjemci refactor-01a15658-entrypoints přesnéSHA v entrypoints-transfer.json.",
+    "Bez rekurzivníhoBMAD, stagingu/commitu/fullsuite/build/integrace/GPU. Přidělený implementátor provede výzkum, varianty, refaktoring, cílenétesty a handoff společně.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
+  ]
+}

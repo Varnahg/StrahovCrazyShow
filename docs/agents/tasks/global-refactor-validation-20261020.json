@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "global-refactor-validation-20261020",
   "title": "KEY-48: reprodukovatelné výchozí a výsledné testy, build a izolovaná integrace",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "node_modules/",
@@ -41,6 +41,7 @@
   "notes": [
     "Vlastní izolovaná pracovní kopie .cache/refactor-20261020. Žádné cizí procesy se neukončují.",
     "Každé nové spuštění celé pipeline vyžaduje stabilní checkpoint a obnovu rezervace. Port před startem ověřit na OS.",
-    "LFS materializace nepřegeneruje assety; očekává se nulový Git diff v jejich cestách."
+    "LFS materializace nepřegeneruje assety; očekává se nulový Git diff v jejich cestách.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
   ]
 }

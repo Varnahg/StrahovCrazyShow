@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-documentation-20261020",
+  "title": "KEY-48: Sjednotit aktuální dokumentaci a oddělit historii",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "README.md",
+    "README.cs.md",
+    "docs/README.md",
+    "docs/acceptance.md",
+    "docs/performance/README.md",
+    "docs/agents/architecture.md",
+    "docs/verification.md",
+    "docs/agents/handoffs/global-refactor-documentation-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Živé návody souhlasí s aktuálním kódem/protokolem11 a skripty, anglická/česká verze věcně shodná.",
+    "Historické datované důkazy, odkazy, zdroje a provenience zůstanou zachované; žádný neověřený FPS/live-port/default-WebGPU závěr.",
+    "V mapě jsou aktuální klient/server/shared/scripts/autodev/Docker/CI; nevzniká druhý registr vlastníků."
+  ],
+  "verification": [
+    "Ověřit lokální odkazy v upravených dokumentech a tvrzení proti zdrojům; reportovat i existující chybné odkazy zvlášť."
+  ],
+  "notes": [
+    "Výslovně objednaný celkový refaktoring KEY-48; průzkum/porovnání variant v docs/refactoring/20261020/README.md.",
+    "Pouze přesný disjunktní scope; podagent přečte pravidla a policy, získá vlastní claim, nevyvolává rekurzivní BMAD. Implementace, cílený refaktoring, ověření a handoff společně.",
+    "Plný build/test/integrace a praktická přejímka patří koordinátorovi pod samostatnou rezervací. Žádné cizí Game/UI/tráva WIP.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
+  ]
+}

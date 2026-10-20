@@ -1,9 +1,9 @@
 import { AuthoredLightPreparation } from "../client/authored-light-preparation";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { Script } from "node:vm";
 import ts from "typescript";
+import { readGameSource } from "./helpers/game-source";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
@@ -22,24 +22,10 @@ import { arePreparationEffectsReady } from "../client/strict-material-preparatio
 import { createEnvironmentProfile } from "../client/environment-profile";
 import { selectLightingPreview } from "../client/lighting-preview";
 
-const source = ts.createSourceFile(
-  "game.ts",
-  readFileSync(
-    process.env.GAME_PREPARATION_SOURCE ??
-      new URL("../client/game.ts", import.meta.url),
-    "utf8",
-  ),
-  ts.ScriptTarget.Latest,
-  true,
+const { source, gameClass: declaration, selectMembers } = readGameSource(
+  process.env.GAME_PREPARATION_SOURCE,
 );
-const declaration = source.statements.find(
-  (node): node is ts.ClassDeclaration =>
-    ts.isClassDeclaration(node) && node.name?.text === "Game",
-)!;
-const members = declaration.members.filter(
-  (node) =>
-    node.name && ["prepareLightingVariants", "isMeshReadyForCamera"].includes(node.name.getText(source)),
-);
+const members = selectMembers(["prepareLightingVariants", "isMeshReadyForCamera"]);
 const compiled = ts.transpileModule(
   `class PreparationGame { ${members.map((node) => node.getText(source)).join("\n")} };`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },

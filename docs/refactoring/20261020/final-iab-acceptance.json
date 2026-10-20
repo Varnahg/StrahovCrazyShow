@@ -1,0 +1,269 @@
+{
+  "sourceSnapshotId": "66d1cf97fb312e83c20b4c7ac12310f912c08440a89d926bdd087cbe5582a136",
+  "url": "http://127.0.0.1:4290/",
+  "browser": "Visible IAB",
+  "scenarios": [
+    {
+      "name": "Avatar preview",
+      "result": "passed",
+      "presets": [
+        "Alex",
+        "Mia"
+      ],
+      "checks": [
+        "ready preview",
+        "face detail toggle",
+        "shirt colour change",
+        "rotation"
+      ],
+      "screenshots": [
+        "final-iab-avatar-alex.jpg",
+        "final-iab-avatar-mia.jpg",
+        "final-iab-avatar-shirt.jpg"
+      ]
+    },
+    {
+      "name": "Physical car",
+      "result": "passed",
+      "checks": [
+        "E enter",
+        "W accelerate",
+        "A left steering",
+        "D right steering",
+        "S brake/reverse input",
+        "Space handbrake",
+        "HUD waits for stopping",
+        "E exit",
+        "R respawn"
+      ],
+      "screenshots": [
+        "final-iab-car-left.jpg",
+        "final-iab-car-brake.jpg"
+      ]
+    },
+    {
+      "name": "Terrain, B6 and camera",
+      "result": "passed",
+      "checks": [
+        "actual held-key route past court/B7",
+        "railing contact blocked edge approach",
+        "recentered ascent",
+        "landing and lobby",
+        "descent",
+        "camera orbit",
+        "A screen-left and D screen-right in oblique view"
+      ],
+      "screenshots": [
+        "final-iab-b6-entry.jpg",
+        "final-iab-b6-rail-contact.jpg",
+        "final-iab-b6-landing.jpg",
+        "final-iab-b6-lobby.jpg",
+        "final-iab-b6-descent-orbit.jpg",
+        "final-iab-orbit-a.jpg",
+        "final-iab-orbit-d.jpg"
+      ]
+    },
+    {
+      "name": "Multiplayer connect/leave/rejoin and car",
+      "result": "passed",
+      "checks": [
+        "shared-world HUD population 1",
+        "connected renderer ready",
+        "shared physical car drive/steer/brake/exit",
+        "explicit leave returns editor with retained nickname",
+        "rejoin connected and ready"
+      ],
+      "screenshots": [
+        "final-iab-multiplayer.jpg",
+        "final-iab-multiplayer-car.jpg"
+      ]
+    },
+    {
+      "name": "Guest boundary beside live multiplayer",
+      "result": "passed",
+      "checks": [
+        "Alex in separate solo world",
+        "guest network offline and full renderer ready",
+        "People panel explicitly contains no players/data",
+        "other tab remains connected with population 1",
+        "both render-error-count 0"
+      ],
+      "screenshots": [
+        "final-iab-guest-boundary.jpg"
+      ]
+    }
+  ],
+  "stages": [
+    {
+      "name": "Solo ready",
+      "time": "2026-10-20T09:23:05.335Z",
+      "dom": {
+        "canvases": [
+          {
+            "attributes": {
+              "data-b6-stage": "ready",
+              "data-boot-stage": "ready",
+              "data-car-stage": "ready",
+              "data-engine": "Babylon.js v9.30.0",
+              "data-light-preparation": "complete",
+              "data-network-stage": "offline",
+              "data-physics-stage": "ready",
+              "data-render-error-count": "0",
+              "data-render-health": "ready",
+              "data-scan-stage": "reference-only",
+              "data-world-mode": "authored-separate-assets"
+            },
+            "cssHeight": 668,
+            "cssWidth": 580,
+            "height": 668,
+            "width": 580
+          }
+        ],
+        "gpu": [
+          "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        ],
+        "modules": [
+          "/assets/index-DZBCVZuF.js"
+        ]
+      }
+    },
+    {
+      "name": "Solo after route",
+      "time": "2026-10-20T09:27:09.518Z",
+      "dom": {
+        "attributes": [
+          {
+            "data-b6-stage": "ready",
+            "data-boot-stage": "ready",
+            "data-car-stage": "ready",
+            "data-engine": "Babylon.js v9.30.0",
+            "data-light-preparation": "complete",
+            "data-network-stage": "offline",
+            "data-physics-stage": "ready",
+            "data-recovery-stage": "restored",
+            "data-render-error-count": "0",
+            "data-render-health": "ready",
+            "data-scan-stage": "reference-only",
+            "data-world-mode": "authored-separate-assets"
+          }
+        ],
+        "position": [
+          "translate(-6.688358783721924,-82.97062683105469) rotate(0) scale(1.2261841405002663)"
+        ]
+      }
+    },
+    {
+      "name": "Multiplayer ready after car",
+      "time": "2026-10-20T09:29:37.916Z",
+      "dom": {
+        "attributes": [
+          {
+            "data-b6-stage": "ready",
+            "data-boot-stage": "ready",
+            "data-car-stage": "ready",
+            "data-engine": "Babylon.js v9.30.0",
+            "data-light-preparation": "complete",
+            "data-network-stage": "connected",
+            "data-physics-stage": "ready",
+            "data-render-error-count": "0",
+            "data-render-health": "ready",
+            "data-scan-stage": "reference-only",
+            "data-world-mode": "authored-separate-assets"
+          }
+        ],
+        "header": "1 na kopci · společný svět\nDEMO\n11:29\nPraha\nR\nAkce\nMapaM\nDeníkJ\nLidé\nChat\nAktivity\nNastavení\n\nTab: nabídka · Enter: otevřít · Esc: zavřít. Kliknutím do hry pokr"
+      }
+    },
+    {
+      "name": "Returned after multiplayer leave",
+      "time": "2026-10-20T09:29:54.475Z",
+      "dom": {
+        "canvases": [
+          {
+            "data-engine": "Babylon.js v9.30.0",
+            "data-preview-state": "ready"
+          }
+        ],
+        "header": "s•trahov\nJazyk\nČeština\nEnglish\nPoznej kopec ↗\nPRAHA · 50.08065° N, 14.39175° E\nNa kopci.\nVe svém živlu.\n\nTvůj Strahov v prohlížeči. Potkej ostatní, najdi svou partu a objev, co se "
+      }
+    },
+    {
+      "name": "Multiplayer rejoined and ready",
+      "time": "2026-10-20T09:30:36.595Z",
+      "dom": {
+        "attributes": [
+          {
+            "data-b6-stage": "ready",
+            "data-boot-stage": "ready",
+            "data-car-stage": "ready",
+            "data-engine": "Babylon.js v9.30.0",
+            "data-light-preparation": "complete",
+            "data-network-stage": "connected",
+            "data-physics-stage": "ready",
+            "data-render-error-count": "0",
+            "data-render-health": "ready",
+            "data-scan-stage": "reference-only",
+            "data-world-mode": "authored-separate-assets"
+          }
+        ],
+        "header": "1 na kopci · společný svět\nDEMO\n11:30\nPraha\nR\nAkce\nMapaM\nDeníkJ\nLidé\nChat\nAktivity\nNastavení\n\nTab: nabídka · Enter: otev"
+      }
+    },
+    {
+      "name": "Guest isolated while multiplayer stays connected",
+      "time": "2026-10-20T09:31:54.792Z",
+      "guest": {
+        "canvases": [
+          {
+            "attributes": {
+              "data-b6-stage": "ready",
+              "data-boot-stage": "ready",
+              "data-car-stage": "ready",
+              "data-engine": "Babylon.js v9.30.0",
+              "data-light-preparation": "complete",
+              "data-network-stage": "offline",
+              "data-physics-stage": "ready",
+              "data-render-error-count": "0",
+              "data-render-health": "ready",
+              "data-scan-stage": "reference-only",
+              "data-world-mode": "authored-separate-assets"
+            },
+            "cssHeight": 720,
+            "cssWidth": 1280,
+            "height": 720,
+            "width": 1280
+          }
+        ],
+        "modules": [
+          "/assets/index-DZBCVZuF.js"
+        ],
+        "text": "s•\nSamostatná prohlídka\nDEMO\n☁ 7,3 °C\nstanice · čerstvá data\n11:31\nPraha\nH\nAkce\nMapa\nDeník\nLidé\nChat\nAktivity\nNastavení\n\nTab: nabídka · Enter: otevřít · Esc: zavřít. Kliknutím do hry pokračuješ.\n\nMezi bloky\n↑\nS\n11\n12\n4\n2\n9\n1\n8\n5\n10\n7\n3\n6\n2\n2\n2\n2\n10 m\n+\n−\n⌖\n⛶\n\nKolečko přibližuje, tažení posouvá. Kliknutím označíš cíl; Enter označí střed mapy.\n\n© OSM / IPR\n?\nOvládání\nG\nRychlá gesta (G)\n21 FPS\nF\nE · najít značku\nTVŮJ KOPEC\nLidé na kopci\n×\n\nJsi v samostatném světě. Žádní hráči ani jejich data se sem neposílají."
+      },
+      "multiplayer": {
+        "attributes": [
+          {
+            "data-b6-stage": "ready",
+            "data-boot-stage": "ready",
+            "data-car-stage": "ready",
+            "data-engine": "Babylon.js v9.30.0",
+            "data-light-preparation": "complete",
+            "data-network-stage": "connected",
+            "data-physics-stage": "ready",
+            "data-render-error-count": "0",
+            "data-render-health": "ready",
+            "data-scan-stage": "reference-only",
+            "data-world-mode": "authored-separate-assets"
+          }
+        ],
+        "text": "1 na kopci · společný svět\nDEMO\n11:31\nPraha\nR\nAkce\nMapaM\nDeníkJ\nLidé\nChat\nAktivity\nNastavení\n\nTab: nabídka · Enter: otevřít · Esc: zavřít. Kliknutím do hry pokr"
+      }
+    }
+  ],
+  "logs": {
+    "multiplayer": [],
+    "guest": []
+  },
+  "performanceConclusion": null,
+  "completedAt": "2026-10-20T09:31:54.906Z",
+  "status": "passed"
+}

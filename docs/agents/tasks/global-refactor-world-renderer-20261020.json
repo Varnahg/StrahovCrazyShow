@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "global-refactor-world-renderer-20261020",
   "title": "KEY-48: odstranit mrtvý privátní renderer a sjednotit facadeEdges bez změny API",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "client/world-renderer.ts",
@@ -24,6 +24,7 @@
   "notes": [
     "Spec: _bmad-output/implementation-artifacts/global-refactor-20261020/spec-world-renderer.md; rozhodnutí docs/refactoring/20261020/README.md.",
     "Podagent začne až po koordinátorově potvrzení ukončení výchozí nezměněné sady; žádný zápis do baseline během jejího měření.",
-    "Přímý implementační task: žádný další BMAD renderer/workflow/subagent, žádný commit ani změny specifikace/katalogu. Integrátor dělá review a samostatný commit."
+    "Přímý implementační task: žádný další BMAD renderer/workflow/subagent, žádný commit ani změny specifikace/katalogu. Integrátor dělá review a samostatný commit.",
+    "Přijato a integrováno PR13 do main e3d188c9dab59d0b7c581f0b5c57dc208a3a2caf. Přesný headde230983, standardní CI/project-acceptance a IAB přejímka; raw důkazy v docs/refactoring/20261020/world-visual/. Celý KEY48 pokračuje samostatně."
   ]
 }

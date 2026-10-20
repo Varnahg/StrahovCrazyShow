@@ -156,7 +156,7 @@ export class InputQueue {
     this.lastAt = now;
     return true;
   }
-  consume(now: number, tick?: number) {
+  consume(_now: number, tick?: number) {
     const input = this.pending.shift();
     if (input) {
       this.queuedAt.delete(input.seq);

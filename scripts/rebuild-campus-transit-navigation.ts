@@ -38,6 +38,7 @@ const files = [
   "shared/stadium-exterior.ts",
   "shared/transit.ts",
   "shared/terrain-entities.ts",
+  "shared/quaternion.ts",
   "shared/data/transit.json",
   "scripts/rebuild-campus-transit-navigation.ts",
 ];

@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { Script } from "node:vm";
 import ts from "typescript";
+import { readGameSource } from "./helpers/game-source";
 import { AdaptiveQualityController } from "../client/adaptive-quality";
 import { prepareRenderQualities } from "../client/render-quality-preparation";
 import {
@@ -13,20 +13,9 @@ import {
 } from "../shared/render-quality";
 import type { LightPreparationResult } from "../client/light-preparation";
 
-const source = ts.createSourceFile(
-  "game.ts",
-  readFileSync(
-    process.env.GAME_QUALITY_SOURCE ??
-      new URL("../client/game.ts", import.meta.url),
-    "utf8",
-  ),
-  ts.ScriptTarget.Latest,
-  true,
+const { source, gameClass: declaration, selectMembers } = readGameSource(
+  process.env.GAME_QUALITY_SOURCE,
 );
-const declaration = source.statements.find(
-  (node): node is ts.ClassDeclaration =>
-    ts.isClassDeclaration(node) && node.name?.text === "Game",
-)!;
 const names = [
   "prepareLighting",
   "applyAdaptiveQuality",
@@ -34,9 +23,7 @@ const names = [
   "setQuality",
   "setTargetFps",
 ];
-const methods = declaration.members.filter(
-  (node) => node.name && names.includes(node.name.getText(source)),
-);
+const methods = selectMembers(names);
 const compiled = ts.transpileModule(
   `class QualityGame { ${methods.map((node) => node.getText(source)).join("\n")} }`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },

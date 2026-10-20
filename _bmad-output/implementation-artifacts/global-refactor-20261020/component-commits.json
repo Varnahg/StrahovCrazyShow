@@ -1,0 +1,123 @@
+[
+  {
+    "commit": "32cb382d2c66c7b8f39b0aa1239f4e8eaaed7242",
+    "message": "refactor: share exact quaternion math across terrain and vehicles",
+    "files": [
+      "docs/agents/handoffs/global-refactor-quaternion-20261020.md",
+      "scripts/rebuild-campus-transit-navigation.ts",
+      "shared/data/transit-navigation.json",
+      "shared/quaternion.ts",
+      "shared/terrain-entities.ts",
+      "shared/vehicle.ts",
+      "tests/quaternion.test.ts",
+      "tests/transit-navigation-source.test.ts"
+    ]
+  },
+  {
+    "commit": "9074be22d849b9e802e6428f71bc0027c7e35fcb",
+    "message": "refactor: share avatar surface fitting and parking colours",
+    "files": [
+      "client/assets.ts",
+      "client/avatar-renderer.ts",
+      "docs/agents/handoffs/global-refactor-avatar-20261020.md",
+      "tests/student-eyes.test.ts",
+      "tests/student-garments.test.ts"
+    ]
+  },
+  {
+    "commit": "e78e3b499197ca60f2f52971fbbec6a20c72bffb",
+    "message": "refactor: separate autodev source ownership helpers",
+    "files": [
+      "docs/agents/handoffs/global-refactor-autodev-source-20261020.md",
+      "scripts/autodev/adapters.mjs",
+      "scripts/autodev/source.mjs",
+      "tests/autodev-adapters.test.ts"
+    ]
+  },
+  {
+    "commit": "8e88ee6f5f136fdb98e3a6ecc2068ea02bacbc42",
+    "message": "refactor: simplify actor movement and benchmark projection",
+    "files": [
+      "docs/agents/handoffs/global-refactor-simulation-benchmark-20261020.md",
+      "shared/local-benchmark.ts",
+      "shared/simulation.ts",
+      "tests/local-benchmarks.test.ts"
+    ]
+  },
+  {
+    "commit": "a7aba5a9aa9766049a97b5931b02c68e140b811f",
+    "message": "refactor: share game fixtures and make reference output explicit",
+    "files": [
+      "docs/agents/handoffs/global-refactor-fixtures-python-20261020.md",
+      "scripts/create-north-court-style.py",
+      "scripts/fetch-expansion-reference.py",
+      "scripts/fetch-streets.py",
+      "tests/game-light-lifecycle.test.ts",
+      "tests/game-light-preparation.test.ts",
+      "tests/game-quality-preparation.test.ts",
+      "tests/game-webgpu-startup.test.ts",
+      "tests/helpers/game-source.ts"
+    ]
+  },
+  {
+    "commit": "f5ef6b3f906c6e693c1c6074571d21eeb0208eef",
+    "message": "refactor: share grass resource disposal without lifecycle changes",
+    "files": [
+      "client/photo-grass-resources.ts",
+      "docs/agents/handoffs/global-refactor-grass-resources-20261020.md",
+      "tests/photo-grass.test.ts"
+    ]
+  },
+  {
+    "commit": "a407213ed3cedb7a77beaec828d7a9c653cfba13",
+    "message": "fix: freeze regression prerequisites and locked patches",
+    "files": [
+      "docs/agents/handoffs/global-refactor-snapshot-20261020.md",
+      "scripts/performance-snapshot.mjs",
+      "tests/performance-snapshot.test.ts"
+    ]
+  },
+  {
+    "commit": "005842cd0305efa81c7c46349b44f2e6e604ff66",
+    "message": "refactor: share car pose capture and connection diagnostics reset",
+    "files": [
+      "client/game.ts",
+      "client/ui.tsx",
+      "docs/agents/handoffs/global-refactor-entrypoints-20261020.md",
+      "tests/room-callbacks.test.ts"
+    ]
+  },
+  {
+    "commit": "7c0685450667e567c379ebbba9f69006a8b9eeb0",
+    "message": "refactor: remove unused runtime bindings while preserving APIs",
+    "files": [
+      "client/car-pack.ts",
+      "client/main.tsx",
+      "client/render-incident-profile.ts",
+      "docs/agents/handoffs/global-refactor-bindings-runtime-20261020.md",
+      "shared/b6-props.ts",
+      "shared/netcode.ts",
+      "shared/photogrammetry-ground.ts"
+    ]
+  },
+  {
+    "commit": "7712edb57cae1ab02841ec70519a7f371240a6b4",
+    "message": "test: remove unused bindings without dropping fixture side effects",
+    "files": [
+      "docs/agents/handoffs/global-refactor-bindings-tests-20261020.md",
+      "tests/fixtures/material-defines-order/scenario.ts",
+      "tests/game-authored-light-preparation.test.ts",
+      "tests/gltf-light-budget.test.ts",
+      "tests/locomotion-quality.test.ts",
+      "tests/netcode.test.ts",
+      "tests/night-lighting.test.ts",
+      "tests/opaque-sort.test.ts",
+      "tests/photo-grass-preparation.test.ts",
+      "tests/realistic-car-pack.test.ts",
+      "tests/terrain-patch.test.ts",
+      "tests/weather.test.ts",
+      "tests/webgpu-compilation-profile.test.ts",
+      "tests/webgpu-frame-lifecycle-profile.test.ts"
+    ]
+  }
+]

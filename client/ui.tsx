@@ -85,7 +85,6 @@ import {
 } from "../shared/transit";
 import {
   PROTOCOL_VERSION,
-  type Input,
   type Authority,
 } from "../shared/netcode";
 
@@ -330,6 +329,11 @@ export function App() {
     mapClose,
   );
   const notice = (message: string) => setToast(message);
+  const resetConnectionDiagnostics = () => {
+    networkProbeRef.current?.reset();
+    game.current?.networkTimeline.resetRttSelection();
+    game.current?.resetDiagnosticContext();
+  };
   const applyReceivedAuthority = ({
     packet,
     receivedAt,
@@ -413,9 +417,7 @@ export function App() {
     return () => {
       clearInterval(timer);
       clearInterval(probeTimer);
-      networkProbeRef.current?.reset();
-      game.current?.networkTimeline.resetRttSelection();
-      game.current?.resetDiagnosticContext();
+      resetConnectionDiagnostics();
     };
   }, [connected]);
   useEffect(() => {
@@ -649,9 +651,7 @@ export function App() {
     room.current = r;
     authorityBufferRef.current?.reset();
     bootstrapAuthorityRef.current = null;
-    networkProbeRef.current?.reset();
-    game.current?.networkTimeline.resetRttSelection();
-    game.current?.resetDiagnosticContext();
+    resetConnectionDiagnostics();
     connectedRef.current = true;
     setConnected(true);
     const callbacks = currentRoomCallbacks(r, () => room.current === r);
@@ -761,9 +761,7 @@ export function App() {
       inputBuffer.current?.reset("room-left");
       bootstrapAuthorityRef.current = null;
       authorityBufferRef.current?.reset();
-      networkProbeRef.current?.reset();
-      game.current?.networkTimeline.resetRttSelection();
-      game.current?.resetDiagnosticContext();
+      resetConnectionDiagnostics();
       playersRef.current = [];
       playersById.current.clear();
       setPlayers([]);
@@ -817,9 +815,7 @@ export function App() {
       if (identityChanged) {
         bootstrapAuthorityRef.current = null;
         authorityBufferRef.current?.reset();
-        networkProbeRef.current?.reset();
-        game.current?.networkTimeline.resetRttSelection();
-        game.current?.resetDiagnosticContext();
+        resetConnectionDiagnostics();
         carState.current = null;
         inputBuffer.current?.reset("identity-changed");
       }
@@ -893,9 +889,7 @@ export function App() {
     inputBuffer.current?.reset("leave");
     bootstrapAuthorityRef.current = null;
     authorityBufferRef.current?.reset();
-    networkProbeRef.current?.reset();
-    game.current?.networkTimeline.resetRttSelection();
-    game.current?.resetDiagnosticContext();
+    resetConnectionDiagnostics();
     void previousRoom?.leave().catch(() => {});
     modeRef.current = "menu";
     setMode("menu");

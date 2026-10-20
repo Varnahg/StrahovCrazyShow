@@ -98,7 +98,6 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
-import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Ray } from "@babylonjs/core/Culling/ray";
 import type { LinesMesh } from "@babylonjs/core/Meshes/linesMesh";
 import { ScreenLabels } from "./labels";
@@ -114,18 +113,11 @@ import {
 import earcut from "earcut";
 import { Simulation, initPhysics, type Actor } from "../shared/simulation";
 import {
-  BUILDINGS,
-  B6_BOXES,
-  MAP,
   PLACES,
   SPAWN,
   CAR_SPAWN,
   HUNT_POINTS,
-  BOUNDS,
-  blockNumber,
   zoneAt,
-  GROUND_RECTS,
-  TREES,
 } from "../shared/world";
 import { type Weather } from "../shared/weather";
 import { SkyWeatherController } from "./sky-weather";
@@ -140,7 +132,6 @@ import type {
   Player,
   Profile,
   Input,
-  AvatarConfig,
   Vec3,
 } from "../shared/types";
 import {
@@ -1057,7 +1048,7 @@ export class Game {
     m.material = this.mat(color);
     return m;
   }
-  label(text: string, x: number, y: number, z: number, width = 4) {
+  label(text: string, x: number, y: number, z: number, _width = 4) {
     this.labels.set(`place:${text}:${x}:${y}:${z}`, text, { x, y, z });
   }
   polygonBuilding(points: [number, number][], height: number, color: string) {
@@ -1377,6 +1368,14 @@ export class Game {
       !modeChanged && !packet.resync && error < 0.35 ? old.z - corrected.z : 0,
     );
     this.previousPosition.set(corrected.x, corrected.y, corrected.z);
+    this.capturePreviousCarPose();
+    // Reconciliation has replaced both endpoints. Do not bind a new segment to
+    // the old phase; the current-pose fallback is exact for this collapsed pair.
+    this.networkPresentation = undefined;
+    if (explicitRespawn) this.snapRecoveryPresentation();
+    return true;
+  }
+  private capturePreviousCarPose() {
     const carPose = this.sim.car.getVisualPose();
     this.previousCarPose = {
       position: new Vector3(
@@ -1391,11 +1390,6 @@ export class Game {
         carPose.rotation.w,
       ),
     };
-    // Reconciliation has replaced both endpoints. Do not bind a new segment to
-    // the old phase; the current-pose fallback is exact for this collapsed pair.
-    this.networkPresentation = undefined;
-    if (explicitRespawn) this.snapRecoveryPresentation();
-    return true;
   }
   private resetPredictionHistory(priority = false) {
     this.accumulator = 0;
@@ -2046,20 +2040,7 @@ export class Game {
         this.actor.position.y,
         this.actor.position.z,
       );
-      const carPose = this.sim.car.getVisualPose();
-      this.previousCarPose = {
-        position: new Vector3(
-          carPose.position.x,
-          carPose.position.y,
-          carPose.position.z,
-        ),
-        rotation: new Quaternion(
-          carPose.rotation.x,
-          carPose.rotation.y,
-          carPose.rotation.z,
-          carPose.rotation.w,
-        ),
-      };
+      this.capturePreviousCarPose();
       this.actor.step(input, FIXED_DT);
       this.sim.tick(time);
       this.seq = input.seq;

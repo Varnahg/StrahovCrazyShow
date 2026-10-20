@@ -48,18 +48,18 @@ function fixture() {
         return buffers;
       },
     };
-    createShaderModule(descriptor: unknown) {
+    createShaderModule(_descriptor: unknown) {
       assert.equal(this instanceof Device, true);
       tick(3);
       return this.module;
     }
-    createRenderPipeline(descriptor: unknown) {
+    createRenderPipeline(_descriptor: unknown) {
       assert.equal(this instanceof Device, true);
       tick(31);
       if (this.failSync) throw this.failSync;
       return this.pipeline;
     }
-    createRenderPipelineAsync(descriptor: unknown) {
+    createRenderPipelineAsync(_descriptor: unknown) {
       assert.equal(this instanceof Device, true);
       tick(2);
       return this.pending.promise;
@@ -89,7 +89,7 @@ function fixture() {
     _initializeLimits() {
       return this._device?.createShaderModule({ label: "engine init" });
     },
-    _compileRawShaderToSpirV(value: unknown, stage: unknown) {
+    _compileRawShaderToSpirV(value: unknown, _stage: unknown) {
       tick(11);
       return value;
     },

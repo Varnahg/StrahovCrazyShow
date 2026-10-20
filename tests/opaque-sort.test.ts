@@ -68,9 +68,9 @@ const pose = (mesh: AbstractMesh) => ({
 
 test("actual opaque dispatch is sky first then near to far, with frame-cache invalidation and untouched alpha queues", async () => {
   const { engine, scene, camera, draws, box, sky } = setup();
-  const far = box("far", 60),
-    middle = box("middle", 20),
-    near = box("near", 5);
+  box("far", 60);
+  box("middle", 20);
+  box("near", 5);
   const alphaNear = box("alpha-near", 15),
     alphaFar = box("alpha-far", 35);
   alphaNear.material!.alpha = alphaFar.material!.alpha = 0.4;
@@ -148,8 +148,8 @@ test("native instance LOD draw groups sort by active instance centres, excluding
     instance.isVisible = true;
     instance.layerMask = mask;
   }
-  const occluder = box("occluder", 12),
-    midOccluder = box("middle-occluder", 50);
+  box("occluder", 12);
+  box("middle-occluder", 50);
   let lodCalls = 0,
     afterEvaluation = 0;
   master.onLODLevelSelection = () => {
