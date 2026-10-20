@@ -20,7 +20,8 @@
     "Finální review: přesné client/capture soubory se po zastavení root zápisů předávají původním implementerům na malé opravy. Root focus WIP vclient/feedback.tsx je doložený vlastnídiff a předanýclientagentovi; ostatní původní zdroje jsou committed a3e2ea82. Root zůstává integrátor.",
     "Finální integrátor převzal přesné releasedclient/capture/deployment scopes po jejich r2 handoffech a85CPUtestech. Vlastníresearchcommitc713c2a se smí přenéstbez jeho cizíchpředků na čistýorigin/main. Všechny změny jsou doložené vlastní; originálnímaincheckout/cizíWIPnezměněn.",
     "KatalogovéJSONzůstávají poddev-coordination-maintenance; při přenosuvlastníchcommitůjeintegrátorkrátkýmiúpravami kryje samostatnýmadminclaimem, nikoli dlouhourootrezervací katalogu.",
-    "GitHubOAuth odmítl newworkflow bezworkflow scope. Nativníbrowserregrese běží přes novýtests/feedback-browser.test.ts vstávajícíLinux CIverify, se systemChrome. Samostatnýworkflow se odstraní před prvním úspěšným pushem; žádnérozšířenícredentials."
+    "GitHubOAuth odmítl newworkflow bezworkflow scope. Nativníbrowserregrese běží přes novýtests/feedback-browser.test.ts vstávajícíLinux CIverify, se systemChrome. Samostatnýworkflow se odstraní před prvním úspěšným pushem; žádnérozšířenícredentials.",
+    "První fullPRCI7da1ab62 měl1830testů:1829PASS/nativebrowserPASS,1FAILstarýHUDdockcount7vs8. Root přebírá pouzetests/hud-status.test.ts pro aktualizaci zamýšleného počtu aF8/CZ-ENlabelasercí; nemění produkčníchováníaniostatníhudhistrorii."
   ],
   "id": "feedback-implementation-20261020",
   "title": "Implementovat herní feedback a integrovat server, UI a capture",
@@ -83,6 +84,7 @@
     "tests/feedback-store.test.ts",
     "tests/feedback-ui.test.ts",
     "tests/fixtures/feedback-browser/",
+    "tests/hud-status.test.ts",
     "tests/rendered-frame-capture.test.ts",
     "vite.config.ts"
   ]

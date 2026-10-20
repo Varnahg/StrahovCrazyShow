@@ -77,10 +77,16 @@ test("the real dock renders labelled native buttons, shortcut metadata, and acce
         onToggle() {},
       }),
     );
-    assert.equal((html.match(/<button /g) || []).length, 7);
+    assert.equal((html.match(/<button /g) || []).length, 8);
     assert.equal((html.match(/aria-pressed="true"/g) || []).length, 1);
     assert.match(html, /aria-keyshortcuts="M"/);
     assert.match(html, /aria-keyshortcuts="J"/);
+    assert.match(
+      html,
+      locale === "cs"
+        ? /aria-label="Zpětná vazba"[^>]*aria-keyshortcuts="F8"/
+        : /aria-label="Feedback"[^>]*aria-keyshortcuts="F8"/,
+    );
     assert.match(html, /aria-describedby="world-dock-help"/);
     assert.match(html, /id="world-dock-help"/);
     assert.match(html, /<b aria-hidden="true">3<\/b>/);
