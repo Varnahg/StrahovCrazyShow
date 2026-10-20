@@ -3,7 +3,7 @@ title: 'KEY-52: herní zpětná vazba s čistým snímkem'
 type: feature
 created: 2026-10-20
 status: in-review
-baseline_commit: ba91b84c17918ee16a9472c57f38b427fa6e21da
+baseline_commit: b05a7c4e2d7332aeecfef2e3c2c7b14bcd592c13
 route: dispatch
 review_loop_iteration: 0
 context: [docs/agents/bmad-policy.md]
@@ -92,3 +92,9 @@ Cílené CPU testy průběžně. Nad stabilním checkpointem pnpm test, pnpm bui
 Publikační rozhodnutí: GitHub odmítl nový workflow kvůli chybějícímu OAuth workflow scope. Test běží místo něj v normální pnpm test sadě přes tests/feedback-browser.test.ts a existující verify job. Oficiální Ubuntu24.04 runner obsahuje Chrome (https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md); Playwright podporuje chrome channel (https://playwright.dev/docs/browsers). Širší credential nebyl vyžádán ani použit. Mimo Linux CI se browser regrese spouští explicitně, běžné CPU testy a samostatná praktická GPU přejímka zůstávají oddělené.
 
 První úplná CI nad7da1ab62:1830 testů,1829 PASS,1 FAIL,0skip. Skutečný native browser test prošel za14,6s. Jediné selhání byl historický test HUD očekávající7tlačítek místo nových8. Oprava zachovává explicitní počet a doplňuje CZ/ENlabel+F8asercí; odvozování počtu z implementačního seznamu by tuto regresi nechránilo. Cílený HUD test2/2PASS, plná CI se opakuje nad novým přesným head. Původní log se uchovává.
+
+## Přejímka po Docker opravě a novém base
+
+Docker skutečně prošel image buildem, node/healthy/namedvolume, HTTP202 a přesným diskovým reportem, compiled frontend admission přes CUA, HTTP/SDK scénáři, SIGTERM/exit0, restartem a totožným reportem/receipt/replay. Vlastní kontejnery, ověřený volume, procesy a karty byly uklizené. Pnpm diagnostika přesně potvrdila Patches were modified; narrow fix má8cílených testů, negativní CLI kontrolu a nezávislý review bez nálezů.
+
+Přijatý b05a main byl připojen do d47380559f09d2098b91d0026d03f3f174ee818d. Porovnání client/server/shared/package/lock/workspace/vite/Docker/Compose vůči již ověřenému7c70e4ee bylo prázdné; nový base přidává podpůrný řadič a testy, nikoli Game runtime. Praktické důkazy aktuálního clientBuildId86ce14d1 proto zůstávají použitelné; celá nová kombinace dostává vlastní finální CI. Záznam přijetí a mainmerge bude v PR19/KEY52, dokud není ověřený, celek není Done.

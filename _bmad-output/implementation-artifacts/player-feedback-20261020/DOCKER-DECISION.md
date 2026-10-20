@@ -30,3 +30,7 @@ Funkční oprava nemění balíčky, lockfile, allowBuilds, assety ani NODE_OPTI
 Opakovat skutečný Docker build, node-owned volume + HTTP202/persisted report, compiled frontend přes CUA, SDK integraci, SIGTERM a restart/replay a bezpečný cleanup vlastního disposable projektu. Do těchto výsledků zůstává project-acceptance nevydaný. Herní klient/server/shared zdroje se touto opravou nemění; již ověřené snímky a jejich clientBuildId zůstávají stejné. Nový PR head bude mít nové celé CI.
 
 Nezávislý čtecí review aktuálního Docker/test diffu vrátil [] (bez spouštění Dockeru). Cílená TypeScript kontrola deployment testu prošla.
+
+## Skutečný konečný výsledek
+
+Image s vybraným scoped příkazem byl postaven a spuštěn. User node, healthy, jeden zapisovatelný namedvolume; skutečný feedback POST202 a soukromý diskový obsah přesně odpovídají. CUA ověřila compiled frontend network admission. HTTP/SDK scénáře, SIGTERM/exit0/noOOM, restart, zachovaná stejná příjemka/report/replay202 a odmítnutí staré session prošly. Cleanup odstranil pouze kontrolovaný jedinečný projekt a jeho volume. Důkazy a původní selhání jsou v docs/verification-evidence/feedback-20261020/.

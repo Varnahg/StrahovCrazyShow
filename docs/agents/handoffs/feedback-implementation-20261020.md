@@ -14,3 +14,10 @@ Před praktickou přejímkou si feedback koordinátor znovu vyžádá vlastní v
 
 ## Narrow review handoff 20Oct21:20UTC
 Root pozastavil zápisy a uvolnil svůj claim, admin upravil přesné rozsahy, root znovu claimnul pouze zbývající své soubory. Původní client author přebírá přesně vlastní client task včetně rootového necommitovaného focus fixu vclient/feedback.tsx (nativníshowModal/connectedtriggerrestore); tento WIP je rootův, výslovně předaný, nikoli cizí. Původní capture author přebírá své tři committed soubory pro opravu nativeencode timeout ownership. Původníserverauthor má novýdisjunktnítask feedback-deployment-regressions-20261020 pouze proHTTPintegration/Dockerharness. Ownserver2592 zastaven a ownIABscényuzavřeny před release validation; žádné pomocnéprocesyparenta nezůstávají.
+
+
+## Převzetí finálního checkpointu
+
+Všechny client/server/capture/deployment výsledky i jejich úzké review opravy jsou převzaté. SkutečnéKEY55/56/57 a byte-exact soukromé snímky, nativeIDB offline/close/reopen, finální autofocus/return/reopen/remove, HTTP replay/conflict a Docker lifecycle jsou doložené v evidence README. Dílčí tasky jsou Done až po tomto převzetí; root/validation/publication celek zůstává před main přijetím neuzavřený. Nový b05a upstream je přijatý přes PR20; jeho client/server/shared/runtime config diff je prázdný, žádné cizí WIP nebylo přeneseno. Kombinovaný d473 checkpoint bude mít vlastní aktuální CI.
+
+User navíc výslovně zadal následný aktivní cíl: po úplném dokončení tohoto feedbacku zkoumat nejlepší workflow Meshy/AI/LLM/text→Blender/postavy/objekty/rig a pokračovat v reprodukovatelné výkonové analýze. Cíl byl uložen nástrojem create_goal; neznamená povolení neobjednaných produkčních modelových změn před výzkumem a přijetím tohoto celku.
