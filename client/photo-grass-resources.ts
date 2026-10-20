@@ -83,6 +83,11 @@ export function acquireGrassResources(
       pending: Promise<void>[] = [],
       sources = new Map<string, Mesh>(),
       ownedMaterials: PBRMaterial[] = [];
+    const disposeOwnedAssets = () => {
+      for (const mesh of sources.values()) mesh.dispose(false, false);
+      for (const material of ownedMaterials) material.dispose(false, false);
+      for (const texture of loaded) texture.dispose();
+    };
     try {
       for (const channel of [
         "albedo",
@@ -176,9 +181,7 @@ export function acquireGrassResources(
             scene.onDisposeObservable.remove(disposeObserver);
             disposeObserver = null;
           }
-          for (const mesh of sources.values()) mesh.dispose(false, false);
-          for (const material of ownedMaterials) material.dispose(false, false);
-          for (const texture of loaded) texture.dispose();
+          disposeOwnedAssets();
           cache!.delete(key);
         },
       };
@@ -188,9 +191,7 @@ export function acquireGrassResources(
       );
       cache.set(key, shared);
     } catch (error) {
-      for (const mesh of sources.values()) mesh.dispose(false, false);
-      for (const material of ownedMaterials) material.dispose(false, false);
-      for (const texture of loaded) texture.dispose();
+      disposeOwnedAssets();
       void Promise.allSettled(pending);
       throw error;
     }
