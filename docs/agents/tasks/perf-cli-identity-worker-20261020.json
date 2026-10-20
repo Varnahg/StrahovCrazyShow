@@ -1,0 +1,26 @@
+{
+  "acceptance": [
+    "network-left s přesným reason=identity-change nezruší poslední skutečně connected stav; samo připojení nevytvoří.",
+    "Ostatní leave/disconnected/connecting události, guest/age/chronologie, server-clock hranice a raw percentily zůstanou zachované.",
+    "Implementace, cílený refaktoring a skutečné CLI regrese společně; původní logy se nepřepisují."
+  ],
+  "writePaths": [
+    "scripts/diagnostics-report.mjs",
+    "tests/diagnostics-report.test.ts"
+  ],
+  "notes": [
+    "Konkrétní offline diagnostická část KEY-2, samostatné přidělení KEY-50.",
+    "Žádné změny Game/UI/recorder/síť/GPU, neprohlašovat FPS zlepšení.",
+    "Podagent řadiče nespouští další BMAD workflow; řadič vlastní ostatní artefakty."
+  ],
+  "dependsOn": [],
+  "schemaVersion": 1,
+  "status": "ready",
+  "title": "KEY-50: úzká CLI klasifikace identity-change a regrese",
+  "verification": [
+    "node --test tests/diagnostics-report.test.ts",
+    "node docs/performance/evidence/diagnostic-identity-20261020/accept-cli.mjs"
+  ],
+  "id": "perf-cli-identity-worker-20261020",
+  "resources": []
+}
