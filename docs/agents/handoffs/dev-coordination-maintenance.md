@@ -63,3 +63,7 @@ Koordinátor po release dokumentace znovu rezervoval katalog a převzal14 vlastn
 
 ## KEY-50: bootstrap disjunktního CLI běhu20.10.2026
 Owner perfcli-01a155b2-admin získal čistý katalogový claim. Založeny pouze perf-cli-identity-{coordination,controller,worker}-20261020 s přesnými scopes; cizí tasky a claims beze změny. Koordinátor má vlastní evidence, controller renderer/spec a worker pouze diagnostics-report.mjs +jeho test. Výběr a skutečný red baseline jsou v docs/performance/evidence/diagnostic-identity-20261020/. Po validaci a commitnutí bootstrapu admin slot uvolní; vytvoření tasku není dokončení KEY-50.
+
+## KEY-50: závěrečné katalogové převzetí20.10.2026
+
+Owner perfcli-01a155b2-admin získal nový claim po skutečném dokončení runu a uvolnění controller/worker claims. Změněny jen status/notes3vlastních perf-cli-identity tasků na done; writePaths/resources/dependsOn i cizí tasky zůstaly stejné. Podklad: completed run, PR17/main CI a repeat run/resume bez duplicit v docs/performance/evidence/diagnostic-identity-20261020/. Admin claim se uvolní po commitnutém předání a kontrole katalogu.
