@@ -14,3 +14,7 @@
 - Omezení a další krok: počkat na dokončení určeného chatu včetně jeho pilotu; poté zachovat vlastní metadata, aktualizovat větev na skutečně přijatý main, načíst změněné instrukce a znovu vymezit/rezerovat výstupy. Nezahajovat práci v controller/autodev, check-lfs-assets ani lfs-assets-help během pilotu.
 - Integrátor: nic nebylo předáno jako přijatý funkční celek. Celkový refaktoringový cíl zůstává nedokončený.
 
+
+## Pokračování po dokončení závislosti
+
+Chat 01a155b2-1927-7681-9a9e-090b6c7bd974 skončil; přijatý origin/main db23fff9 má zelenou PR i main CI. Vlastní metadata byla zachována commity 607721c2 a d710198c. Nový task global-refactor-update-20261020 přebírá pouze aktualizaci pracovní kopie a replay vlastních metadata commitů; proto se auditní rezervace před jeho claimem opět uvolňuje. Vlastní auditní handoff i task JSON patří stále této relaci; žádný cizí WIP se nepřebírá. Nový auditní claim vznikne až po aktualizaci.
