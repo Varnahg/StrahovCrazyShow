@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-20T16:46:52.0326368Z",
+  "sourceCommit": "ab39b7185d0c9fb5e393c654818f43de82e07886",
+  "cli": {
+    "startedAt": "2026-10-20T16:45:23.7784924Z",
+    "finishedAt": "2026-10-20T16:45:24.338572Z",
+    "exitCode": 1
+  },
+  "observed": {
+    "syntheticFixture": true,
+    "inputSha256": "4056d5f4cb396a9b0dfd92d2cc915a7bda3ed1f8146fbfa99873f15e52dd96c6",
+    "actualInconsistentWindows": 0,
+    "expectedInconsistentWindows": 2,
+    "frames": 9,
+    "observedClock": {
+      "callbacks": 20,
+      "droppedMs": 12
+    },
+    "comparableIntervals": 2,
+    "inputUnchanged": true
+  },
+  "existingTests": {
+    "skipped": 0,
+    "command": "node --test tests/diagnostics-report.test.ts",
+    "passed": 29,
+    "failed": 0,
+    "durationMs": 808.1976
+  },
+  "files": [
+    {
+      "file": "scripts/diagnostics-report.mjs",
+      "sha256": "3c402e4cfd1913733520ea18aa6f3c76b9c180c8bd88684706945757ed2390e4"
+    },
+    {
+      "file": "tests/diagnostics-report.test.ts",
+      "sha256": "e1e8c131407b3c4c2412b96a9032c28518d9e6c373dc0ee5c48f94c9a8b4f8d6"
+    },
+    {
+      "file": "docs/performance/evidence/diagnostic-identity-20261020/accept-cli.mjs",
+      "sha256": "8c4a0d7d323e62648fcf985df61f3e5eb6f1d56245de7bb5fab003dc431c9b8f"
+    },
+    {
+      "file": "docs/performance/evidence/diagnostic-identity-20261020/input.jsonl",
+      "sha256": "4056d5f4cb396a9b0dfd92d2cc915a7bda3ed1f8146fbfa99873f15e52dd96c6"
+    }
+  ]
+}

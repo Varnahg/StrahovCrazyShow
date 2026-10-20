@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { runInNewContext } from "node:vm";
+import ts from "typescript";
 import { pngFixture } from "./png-fixture";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
@@ -29,6 +31,126 @@ const at = (distance: number) => ({
 });
 
 const atlasPixels = (path: string) => pngFixture(readFileSync(path)).nearest;
+
+// Exercise the production private functions with controlled surfaces without
+// exporting a test API or reproducing their interpolation algorithm.
+const surfaceSource = ts.createSourceFile(
+  "avatar-renderer.ts",
+  readFileSync(new URL("../client/avatar-renderer.ts", import.meta.url), "utf8"),
+  ts.ScriptTarget.ES2022,
+  true,
+  ts.ScriptKind.TS,
+);
+const surfaceCode = ts.transpileModule(
+  surfaceSource.statements
+    .filter(ts.isFunctionDeclaration)
+    .filter((node) =>
+      ["frontSurfaceZ", "faceSurfaceZ", "shirtSurfaceZ"].includes(
+        node.name?.text ?? "",
+      ),
+    )
+    .map((node) => node.getText(surfaceSource))
+    .join("\n") + "\n({ faceSurfaceZ, shirtSurfaceZ });",
+  { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
+).outputText;
+type Surface = { positions: number[]; indices: number[] };
+function surfaceFitting(head: Surface, male = head, female = male) {
+  return runInNewContext(surfaceCode, {
+    anatomy: {
+      head,
+      bodies: {
+        male: { near: { shirt: male } },
+        female: { near: { shirt: female } },
+      },
+    },
+  }) as {
+    faceSurfaceZ(x: number, y: number, width: number): number;
+    shirtSurfaceZ(preset: number, x: number, y: number): number;
+  };
+}
+
+test("surface fitting preserves face coordinates, front depth and the stricter shirt border", () => {
+  const surface = {
+    positions: [0, 0, 2, 1, 0, 2, 0, 1, 2],
+    indices: [0, 1, 2],
+  };
+  const fitting = surfaceFitting(surface);
+  for (const [x, y] of [
+    [0, 0],
+    [0.5, 0],
+    [0, 0.5],
+    [0.5, 0.5],
+  ]) {
+    assert.equal(fitting.faceSurfaceZ(x * 0.4, y * 0.235, 0.4), 0.39);
+    assert.equal(fitting.shirtSurfaceZ(0, x, y), 2);
+  }
+  for (const [x, y] of [
+    [-0.5e-6, 0.25],
+    [0.25, -0.5e-6],
+    [1 + 0.5e-6, 0],
+  ]) {
+    assert.ok(
+      Math.abs(fitting.faceSurfaceZ(x * 0.4, y * 0.235, 0.4) - 0.39) < 1e-14,
+    );
+    assert.equal(fitting.shirtSurfaceZ(0, x, y), 0.14);
+  }
+  for (const [x, y] of [[-2e-6, 0.25], [0.25, -2e-6], [1 + 2e-6, 0]])
+    assert.equal(fitting.faceSurfaceZ(x * 0.4, y * 0.235, 0.4), 0.082);
+
+  const sloped = surfaceFitting({
+    positions: [0, 0, 1, 1, 0, 3, 0, 1, 5],
+    indices: [0, 1, 2],
+  });
+  assert.equal(sloped.faceSurfaceZ(0.1, 0.1175, 0.4), 3.5 * 0.195);
+  assert.equal(sloped.shirtSurfaceZ(0, 0.25, 0.5), 3.5);
+  for (const indices of [[0, 1, 2, 3, 4, 5], [5, 4, 3, 2, 1, 0]]) {
+    const layered = surfaceFitting({
+      positions: [...surface.positions, 0, 0, -3, 1, 0, -3, 0, 1, -3],
+      indices,
+    });
+    assert.equal(layered.faceSurfaceZ(0.1, 0.1175, 0.4), 0.39);
+    assert.equal(layered.shirtSurfaceZ(0, 0.25, 0.5), 2);
+  }
+  const female = {
+    ...surface,
+    positions: surface.positions.map((v, i) => (i % 3 === 2 ? 3 : v)),
+  };
+  const presets = surfaceFitting(surface, surface, female);
+  for (const preset of [0, 1, 3, 5, -1, 2.1, NaN])
+    assert.equal(presets.shirtSurfaceZ(preset, 0.25, 0.5), 2);
+  for (const preset of [2, 4])
+    assert.equal(presets.shirtSurfaceZ(preset, 0.25, 0.5), 3);
+});
+
+test("surface fitting preserves determinant cutoff and finite fallbacks", () => {
+  for (const height of [0, 0.5e-12, 1e-12]) {
+    const fitting = surfaceFitting({
+      positions: [0, 0, 2, 1, 0, 2, 0, height, 2],
+      indices: [0, 1, 2],
+    });
+    assert.equal(fitting.faceSurfaceZ(0, 0, 0.4), height < 1e-12 ? 0.082 : 0.39);
+    assert.equal(fitting.shirtSurfaceZ(0, 0, 0), height < 1e-12 ? 0.14 : 2);
+  }
+  for (const surface of [
+    { positions: [], indices: [] },
+    { positions: [0, 0, NaN, 1, 0, 2, 0, 1, 2], indices: [0, 1, 2] },
+    { positions: [0, 0, Infinity, 1, 0, 2, 0, 1, 2], indices: [0, 1, 2] },
+  ]) {
+    const fitting = surfaceFitting(surface);
+    assert.equal(fitting.faceSurfaceZ(0.1, 0.1175, 0.4), 0.082);
+    assert.equal(fitting.shirtSurfaceZ(0, 0.25, 0.5), 0.14);
+  }
+  const fitting = surfaceFitting({
+    positions: [0, 0, -3, 1, 0, -3, 0, 1, -3],
+    indices: [0, 1, 2],
+  });
+  assert.equal(fitting.faceSurfaceZ(0.1, 0.1175, 0.4), -3 * 0.195);
+  assert.equal(fitting.shirtSurfaceZ(0, 0.25, 0.5), -3);
+  for (const [x, y] of [[2, 2], [NaN, 0], [0, Infinity]]) {
+    assert.equal(fitting.faceSurfaceZ(x, y, 0.4), 0.082);
+    assert.equal(fitting.shirtSurfaceZ(0, x, y), 0.14);
+  }
+});
 
 test("runtime instance UVs address opaque pupils and light sclerae in all three real PNG atlases", () => {
   const engine = new NullEngine(),

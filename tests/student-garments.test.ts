@@ -223,6 +223,16 @@ test("production creates sewn clothes directly and near/medium/far never reactiv
   const engine = new NullEngine(),
     scene = new Scene(engine),
     pool = new AvatarPrimitivePool(scene);
+  // Measured from the unchanged production rigs at 1701bd07; keep the badge
+  // surface fit and garment attachment unchanged for every preset.
+  const badgeDepths = [
+    0.13408384939688628,
+    0.13408384939688628,
+    0.14116097056287685,
+    0.13365290654870554,
+    0.13408384939688628,
+    0.13408384939688628,
+  ];
   for (let index = 0; index < 6; index++) {
     const config = {
         ...applyAvatarPreset(index, DEFAULT_AVATAR),
@@ -293,7 +303,7 @@ test("production creates sewn clothes directly and near/medium/far never reactiv
     const badge = rig.root
       .getChildMeshes()
       .find((m) => m.name.endsWith(" badge"))!;
-    assert.ok(Number.isFinite(badge.position.z) && badge.position.z > 0.08);
+    assert.equal(badge.position.z, badgeDepths[index]);
     rig.root.dispose();
   }
   pool.pruneUnused();

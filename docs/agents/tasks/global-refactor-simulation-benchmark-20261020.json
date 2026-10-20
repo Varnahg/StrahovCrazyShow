@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-simulation-benchmark-20261020",
+  "title": "KEY-48: Zpřehlednit větvení Actor.step a projekci benchmarku",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/simulation.ts",
+    "shared/local-benchmark.ts",
+    "tests/local-benchmarks.test.ts",
+    "docs/agents/handoffs/global-refactor-simulation-benchmark-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zachovat pořadí Rapier/gravitace/vstupů i veřejné API; odstranit pouze doložené redundantní else/vehicle podmínky pěší větve.",
+    "Rozdělit privátní validační bloky benchmarku ve stejném souboru beze změny pořadí validace, zpráv, nullable/truthiness/whitelist a pořadí klíčů."
+  ],
+  "verification": [
+    "node --import tsx --test tests/physics.test.ts tests/terrain.test.ts tests/prediction-replay.test.ts tests/timeline-physics.test.ts tests/recovery-physics.test.ts tests/controls.test.ts tests/local-benchmarks.test.ts"
+  ],
+  "notes": [
+    "Výslovně objednaný celkový refaktoring KEY-48; průzkum/porovnání variant v docs/refactoring/20261020/README.md.",
+    "Pouze přesný disjunktní scope; podagent přečte pravidla a policy, získá vlastní claim, nevyvolává rekurzivní BMAD. Implementace, cílený refaktoring, ověření a handoff společně.",
+    "Plný build/test/integrace a praktická přejímka patří koordinátorovi pod samostatnou rezervací. Žádné cizí Game/UI/tráva WIP.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
+  ]
+}

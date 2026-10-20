@@ -7,7 +7,7 @@ import earcut from "earcut";
 import {TERRAIN_PATCH} from "../shared/terrain-patches";
 import {groundHeight,legacyGroundHeight,sourceGroundHeight,buildingBaseHeight,createTerrainTiles,terrainCollisionData,drapeTriangles} from "../shared/terrain";
 import {BUILDINGS,GROUND_RECTS,TERRAIN_COVERAGE} from "../shared/world";
-import {Actor,Simulation,initPhysics} from "../shared/simulation";
+import {Simulation,initPhysics} from "../shared/simulation";
 import {B6_ENTRY_PAVING,streetSurfaceAt,isStreetSurface} from "../shared/streets";
 import {B6_LAYOUT,b6EntranceHeight} from "../shared/b6-interior";
 const idle={x:0,z:0,yaw:0,jump:false,seq:0};

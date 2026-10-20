@@ -1,6 +1,6 @@
 import authored from "./data/assets/b6-manifest.json";
 import furniture from "./data/assets/environment-manifest.json";
-import { B6_ROOM_AREAS, B6_LAYOUT, B6_STAIR_CORES } from "./b6-interior";
+import { B6_ROOM_AREAS, B6_STAIR_CORES } from "./b6-interior";
 
 export const B6_ASSET_MANIFEST = {
   assets: [

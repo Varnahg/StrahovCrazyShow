@@ -577,6 +577,161 @@ test("five atlas maps, two materials and LOD geometry are shared while controlle
   engine.dispose();
 });
 
+test("atlas loader failure disposes only completed maps and preserves cleanup exception priority", () => {
+  for (const failCleanup of [false, true]) {
+    const engine = new NullEngine(),
+      scene = new Scene(engine),
+      loaderError = new Error("controlled atlas loader failure"),
+      cleanupError = new Error("controlled texture disposal failure"),
+      calls: string[] = [],
+      disposed: string[] = [],
+      textures: Texture[] = [];
+    let throwOnDispose = failCleanup;
+    try {
+      assert.throws(
+        () =>
+          acquireGrassResources(scene, pack, recipe, 1024, (channel) => {
+            calls.push(channel);
+            if (channel === "normal") throw loaderError;
+            const texture = new Texture(null, scene);
+            textures.push(texture);
+            texture.onDisposeObservable.add(() => disposed.push(channel));
+            if (channel === "albedo") {
+              const dispose = texture.dispose.bind(texture);
+              texture.dispose = () => {
+                dispose();
+                if (throwOnDispose) throw cleanupError;
+              };
+            }
+            return texture;
+          }),
+        (error) => error === (failCleanup ? cleanupError : loaderError),
+      );
+      assert.deepEqual(calls, ["albedo", "alpha", "normal"]);
+      assert.deepEqual(
+        disposed,
+        failCleanup ? ["albedo"] : ["albedo", "alpha"],
+      );
+      assert.equal(scene.meshes.length, 0);
+      assert.equal(scene.materials.length, 0);
+      assert.deepEqual(scene.textures, failCleanup ? [textures[1]] : []);
+      throwOnDispose = false;
+      let reloaded = 0;
+      const retry = acquireGrassResources(scene, pack, recipe, 1024, () => {
+        reloaded++;
+        return new Texture(null, scene);
+      });
+      assert.equal(
+        reloaded,
+        5,
+        "Failed initialization cannot populate the cache",
+      );
+      retry.release();
+    } finally {
+      throwOnDispose = false;
+      scene.dispose();
+      engine.dispose();
+    }
+  }
+});
+
+test("missing LOD disposes partial geometry before materials and maps without masking a cleanup failure", () => {
+  for (const failCleanup of [false, true]) {
+    const engine = new NullEngine(),
+      scene = new Scene(engine),
+      cleanupError = new Error("controlled mesh disposal failure"),
+      incomplete = { ...pack, levels: { ...pack.levels } },
+      disposed: string[] = [],
+      calls: string[] = [];
+    let throwOnDispose = failCleanup;
+    Object.defineProperty(incomplete.levels, "medium", {
+      get() {
+        // New-mesh/material notifications are deferred. Inspect the actual
+        // partial group exactly when its next missing LOD is requested.
+        assert.equal(scene.meshes.length, 1);
+        assert.equal(scene.materials.length, 2);
+        for (const mesh of scene.meshes) {
+          mesh.onDisposeObservable.add(() =>
+            disposed.push("mesh:" + mesh.name),
+          );
+          const dispose = mesh.dispose.bind(mesh);
+          mesh.dispose = (...args) => {
+            dispose(...args);
+            if (throwOnDispose) throw cleanupError;
+          };
+        }
+        for (const material of scene.materials)
+          material.onDisposeObservable.add(() =>
+            disposed.push("material:" + material.name),
+          );
+        return undefined;
+      },
+    });
+    try {
+      assert.throws(
+        () =>
+          acquireGrassResources(scene, incomplete, recipe, 1024, (channel) => {
+            calls.push(channel);
+            const texture = new Texture(null, scene);
+            texture.onDisposeObservable.add(() =>
+              disposed.push("texture:" + channel),
+            );
+            return texture;
+          }),
+        (error) =>
+          failCleanup
+            ? error === cleanupError
+            : error instanceof Error &&
+              error.message === "Missing photographic leaf LOD medium",
+      );
+      assert.deepEqual(calls, [
+        "albedo",
+        "alpha",
+        "normal",
+        "normalBent",
+        "arm",
+      ]);
+      assert.deepEqual(
+        disposed,
+        failCleanup
+          ? ["mesh:photographic leaf source near"]
+          : [
+              "mesh:photographic leaf source near",
+              "material:photographic leaves · shared flat PBR",
+              "material:photographic leaves · shared bent PBR",
+              ...calls.map((channel) => "texture:" + channel),
+            ],
+      );
+      assert.equal(scene.meshes.length, 0);
+      assert.equal(scene.geometries.length, 0);
+      assert.equal(scene.materials.length, failCleanup ? 2 : 0);
+      assert.equal(
+        scene.textures.filter(
+          (texture) => texture !== scene.environmentBRDFTexture,
+        ).length,
+        failCleanup ? 5 : 0,
+      );
+      throwOnDispose = false;
+      let reloaded = 0;
+      const retry = acquireGrassResources(scene, pack, recipe, 1024, () => {
+        reloaded++;
+        return new Texture(null, scene);
+      });
+      assert.equal(
+        reloaded,
+        5,
+        "A valid retry must construct a new resource group",
+      );
+      assert.equal(retry.sources.size, 3);
+      retry.release();
+    } finally {
+      throwOnDispose = false;
+      scene.dispose();
+      engine.dispose();
+    }
+  }
+});
+
 test("source exclusions, world-metre placement and bounded cache survive eviction", () => {
   const placement = createPhotoGrassPlacement(),
     classifier = placementClassifier(BUILDINGS, MAP.paths),

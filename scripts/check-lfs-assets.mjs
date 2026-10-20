@@ -118,7 +118,21 @@ function checkAsset(root, file) {
 }
 
 function main() {
-  const root = realpathSync(parseRoot(process.argv.slice(2)));
+  const args = process.argv.slice(2);
+  if (args.length === 1 && (args[0] === "--help" || args[0] === "-h")) {
+    console.log(`Usage: node scripts/check-lfs-assets.mjs [--root DIR]
+       node scripts/check-lfs-assets.mjs --help | -h
+
+Check local Git LFS working files against the HEAD inventory.
+By default, use the current working directory, which must be the Git checkout root.
+  --root DIR  Check the Git checkout at DIR instead.
+  --help, -h  Show this help (must be the only argument).
+
+Checks file sizes and rejects unmaterialized LFS pointers.
+No checksum validation is performed; no assets are downloaded.`);
+    return 0;
+  }
+  const root = realpathSync(parseRoot(args));
   if (!statSync(root).isDirectory()) throw new Error("Root must be a directory");
   const topLevel = git(root, ["rev-parse", "--show-toplevel"], "Git repository root check").stdout.replace(/\r?\n$/, "");
   if (realpathSync(topLevel) !== root) throw new Error("Root must be the Git checkout root directory");

@@ -1,0 +1,35 @@
+{
+  "sourceSnapshotId": "aa3feebd0118246a55bf2fc6b10d2605acbaad7c9718f5b374ab67b450faa968",
+  "commit": "53d608113b6e8dbafaebf6fd6a0e4661b1f8f806",
+  "targeted": {
+    "tests": 55,
+    "pass": 55,
+    "fail": 0
+  },
+  "review": {
+    "blind": [],
+    "edges": [],
+    "verificationGaps": []
+  },
+  "build": {
+    "exitCode": 0,
+    "mode": "tsc --noEmit and vite build --configLoader native"
+  },
+  "integration": {
+    "entry": "node scripts/test-integration.mjs",
+    "equivalentPackageScript": "pnpm test:integration",
+    "firstAttempt": {
+      "exitCode": 1,
+      "result": "sandbox loopback health not ready despite owned server startup",
+      "log": "world-integration.log.gz"
+    },
+    "secondAttempt": {
+      "exitCode": 0,
+      "result": "all four real SDK scenarios passed in normal user context",
+      "log": "world-integration-b.log.gz"
+    },
+    "port": 2568,
+    "cleanupConfirmed": true
+  },
+  "visualAcceptance": "open; baseline and candidate startup timeout; no GPU/FPS assertion"
+}

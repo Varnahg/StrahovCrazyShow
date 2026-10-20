@@ -1,58 +1,85 @@
 # Výkonový audit plné aplikace
 
-Tato složka odděluje nová měření od starší studie v `docs/optimization-study`. Výsledek vždy patří konkrétnímu otisku zdrojů. Změna klienta, serveru, sdílené simulace nebo assetu vyžaduje nový snapshot; starší čísla se nepřenášejí na novou verzi.
+Výsledek patří konkrétnímu otisku zdrojů a podmínkám běhu. Změna klienta, serveru, fyziky nebo assetu vyžaduje nový snapshot; stará čísla se nepřenášejí. [Aktuální stav a historické výsledky](../verification.md), [přejímkový cíl](../acceptance.md). Tento návod neurčuje běžící testovací URL.
 
-## Reprodukce izolovaného testu
+## Izolace a identita
 
-V kořenu projektu vytvořit snapshot: `node scripts/performance-snapshot.mjs audit-YYYYMMDD-a`. Skript porovná SHA-256 všech vstupů před kopírováním, po něm i v kopii. Při nesouladu testovat nesmí. Složka `.cache/performance-snapshot/audit-YYYYMMDD-a` má vlastní zdroje a připojené stejné `node_modules`; balíček a lock jsou hashované.
+Před přípravou rezervuj vstupy/výstupy a zdroje podle [koordinace](../agents/README.md): `heavy-validation`, pro GPU také `gpu`, pro build `workspace-build` a každý port zvlášť. Ověř skutečné procesy i 3D scény. Uživatelský tab a hranou verzi neměň. HMR karta není izolovaný produkční test.
 
-V novém terminálu přejít do snapshotu a spustit:
+Z kořene vytvoř nový snapshot (příklad jména):
 
 ```powershell
+node scripts/performance-snapshot.mjs audit-YYYYMMDD-a
+Set-Location .cache/performance-snapshot/audit-YYYYMMDD-a
+```
+
+[Skript](../../scripts/performance-snapshot.mjs) porovná vstupní SHA-256 před/po kopírování a v kopii. Obsahuje runtime, assety, testy, manifest/lockfile a explicitní dokumentační fixtures; vývojová evidence mimo seznam se nekopíruje. Neshoda nebo neúplný snapshot není základ měření. Závislosti jsou připojené z pracovního prostředí, proto zaznamenej i jejich instalaci z frozen lockfile.
+
+Následující build spusť v adresáři právě vytvořeného snapshotu. Sváž klienta s jeho manifestem. Snapshot používá junction již nainstalovaných závislostí; přímé Node CLI zabrání nečekané reinstalaci a native config loader nezapisuje Vite cache do vypůjčeného node_modules:
+
+```powershell
+$env:VITE_SOURCE_SNAPSHOT_ID=(Get-Content -Raw source-manifest.json | ConvertFrom-Json).snapshotId
+node node_modules/typescript/bin/tsc --noEmit
+if ($LASTEXITCODE -ne 0) { throw "TypeScript kontrola selhala." }
+node node_modules/vite/bin/vite.js build --configLoader native
+```
+
+Ověř úspěšný exit také u buildu. Změní-li se zdroj nebo test, vytvoř novou kopii; už hrané zdroje se nepřestavují. V odděleném terminálu z kořene repozitáře přejdi do stejného snapshotu a spusť vlastní server:
+
+```powershell
+Set-Location .cache/performance-snapshot/audit-YYYYMMDD-a
 $env:PORT='2570'
 $env:STRAHOV_PERF_TELEMETRY=(Join-Path (Get-Location) 'server-telemetry.jsonl')
 node --import ./scripts/performance-server-preload.mjs --import tsx server/index.ts
 ```
 
-V dalším terminálu ve stejném snapshotu:
+V dalším terminálu stejného snapshotu spusť `node scripts/performance-preview.mjs`. [Preview](../../scripts/performance-preview.mjs) má výchozí **127.0.0.1:4175**, API **2570** a strict port; `STRAHOV_PERF_PREVIEW_PORT` / `STRAHOV_PERF_API_PORT` umožňují jiné předem rezervované porty. Preview API server samo nespustí a zakazuje dev kombinaci 5173/2567. Ověř skutečnou URL, source identity a načtené assety, nikoli jen jméno složky.
+
+## Skutečné síťové relace
+
+[performance-network.ts](../../scripts/performance-network.ts) importuje současný `PROTOCOL_VERSION` (**11**) a používá [ScriptTimelineClient](../../scripts/timeline-client.ts) se serverovými tick/epoch authority. Starý popis protokolu 2 a pevného počtu příkazů v batchi není kontraktem současného harnessu. Následující síťové příkazy spusť v adresáři vytvořeného snapshotu.
 
 ```powershell
 node --import tsx scripts/performance-network.ts http://127.0.0.1:2570 30 30 crowded network-30-crowded.json 3
-node --import tsx scripts/performance-network.ts http://127.0.0.1:2570 100 30 crowded network-100-crowded.json 3
+node --import tsx scripts/performance-network.ts http://127.0.0.1:2570 100 30 distributed network-100-distributed.json 50
 ```
 
-Pro rozptýlení použít `100 30 distributed network-100-distributed.json 50`. Pohyb probíhá pouze platnými veřejnými zprávami; žádné teleportování, manipulace se serverovou simulací ani obcházení limitů. Před další stovkou relací vyčkat, až se obnoví standardní limit 150 nových relací za minutu. Při headless testu musí být server před kohortou prázdný; harness to kontroluje počtem řádků v autentizovaných motion zprávách. Vypnout pouze proces izolovaného serveru; hlavní vývojový server na 2567 test nepoužívá.
+Argumenty jsou endpoint, počet botů, délka záznamu, layout, výstup, warmup a volitelná očekávaná populace. Samotné označení `distributed` neprokazuje rozptýlení: ověř pozice, dráhy a obálku v JSON. Harness odmítá dev server 2567, kontroluje populaci přes autentizované motion zprávy a měří skutečný postup ticku, vstupy/ack, resync a chyby. Veřejný `/api/health` populaci nevydává.
 
-Harness generuje souvislou `seq`, kanonizuje vstupy shodně s klientem, odesílá 2 příkazy každých 1/30 s a používá protokol 2. Sleduje skutečný postup serverového `tick` proti uplynulému času, počet hráčů v každém paketu, autoritativní potvrzení, resynchronizace, délku pohybu každého klienta a reálnou výslednou prostorovou obálku. Označení `distributed` samo o sobě nedokazuje úspěšné rozptýlení; zkontrolovat obálku a pozice v JSON.
+Pro browser + 99 botů použij poslední argument `100`, např. `99 180 crowded network-99-browser.json 15 100` za endpointem. Renderová syntetická skupina se nevydává za skutečné relace. Před další kohortou respektuj serverový limit vydávání relací; port ani limit neopravňují ukončit cizí proces.
 
-Shrnutí a raw soubory přesunout do evidence příkazem z kořene projektu:
+## Produkční GPU přejímka
+
+Použij celou hru s HUD, reálnými relacemi a různými avatary. Zaznamenej:
+
+- Zdrojový hash/manifest, příkazy, časy, délku/warmup a počet opakování; browser/verzi, CPU, skutečný GPU adaptér/ovladač, napájení a další zátěž.
+- Skutečný backend, CSS viewport, DPR a interní backbuffer. Nízká/adaptivní kvalita může měnit interní rozlišení; cílová FPS nejsou naměřená FPS.
+- Kvalitu, kameru/místo, den/noc, skutečný UTC čas, počasí a případný explicitní QA fixture. Pro A/B drž srovnatelné podmínky.
+- Skutečnou síťovou populaci i počet zobrazených avatarů, ambientní NPC, chyby assetů/shaderů/pipeline a připravenost scény.
+- Kompletní původní benchmark JSON: snímky, skutečné trvání, FPS, p95/p99 dob snímků a screenshot celé scény/HUD. Kvantily nepřepočítávej ze zaokrouhlených HUD FPS.
+
+Po dokončené přípravě nech scénu zahřát; opakovaná série používá alespoň 3×10 s, pro srovnání 1/30/100 relací a hustou/rozptýlenou scénu, vždy s uvedenými podmínkami. Projdi také B6 a nádvoří. Změna kvality vyžaduje nové ustálení. Jediný krátký pohled neprokazuje plynulost celého světa.
+
+**WebGL2 je default.** WebGPU (`renderBackend=webgpu` / `webgpu-fast`) je explicitní loopback QA; platnost vyžaduje příslušné health/readiness gates a metodiku [WebGPU workflow](webgpu-migration.md). Timeout přípravy nebo neplatný health není FPS vzorek. Úspěch CPU/NullEngine ani snížený počet draw calls není GPU zrychlení.
+
+Cíl 60 FPS na GeForce GTX 1060 za dne a s davem zůstává otevřený; výsledky jiného adaptéru nebo rozlišení jej neuzavírají. Historické Intel série mají vlastní přísnější limity a omezení v odkazované evidenci.
+
+## Význam serverových čísel a uložení
+
+CPU znamená proces serveru vůči jednomu jádru; 100 % = jedno jádro. `tickHzObserved` vychází z přijatých ticků a monotónního času. Downlink počítá Colyseus zprávy, bez WS/TCP/IP/TLS hlaviček jde o spodní hranici provozu. Ack age není ping ani čas do pixelu. `monitorEventLoopDelay` je serverové vzorkování, nikoli interval renderových snímků. Loopback bez latence/ztrát neprokazuje internetové chování.
+
+Po ukončení měření se z adresáře snapshotu vrať do původního kořene repozitáře. [Reportér](../../scripts/performance-report.mjs) odtud zpracuje výstupy:
 
 ```powershell
+Set-Location ../../..
 node scripts/performance-report.mjs .cache/performance-snapshot/audit-YYYYMMDD-a docs/performance/evidence/audit-YYYYMMDD-a
 ```
 
-## Význam serverových čísel
+Výstupní adresář musí patřit rezervovanému tasku. Uchovej neúspěšné/vyloučené pokusy i původní raw data. Ukonči pouze vlastní server/boty/preview, ověř cleanup a předej důkazy. Uživatelské diagnostiky zůstávají místní.
 
-- CPU je spotřeba **procesu serveru** vůči času jednoho jádra. 100 % znamená jedno celé jádro. Součet počítače ani CPU procesu botů v čísle nejsou.
-- `tickHzObserved` porovnává skutečné přijaté tick hodnoty s monotónními hodinami měřicího klienta; není to počet callbacků `setInterval`.
-- Downlink počítá skutečné binární Colyseus zprávy všech typů. Motion payload je veden zvlášť. WS, TCP, IP a TLS hlavičky chybějí; jde tedy o spodní hranici síťového provozu.
-- Ack age je čas od odeslání konkrétního potvrzeného vstupu do přijetí autoritativního stavu. Nejde o ping ani čas do zobrazení pixelu.
-- `perf_hooks.monitorEventLoopDelay` se vzorkuje po 10 ms; rozlišení Windows časovačů je v něm obsažené. Nezaměňovat ho s intervalem renderových snímků nebo každým fyzikálním krokem.
-- Loopback bez simulace latence či ztrát neprokazuje chování přes internet. Stejný počítač zároveň vytváří zátěž botů a může mít souběžné procesy.
+## Historický kontext
 
-## Produkční browser benchmark
-
-1. Po dokončení integrace vytvořit nový neměnný snapshot. V jeho složce provést `node node_modules/vite/bin/vite.js build`, potom `node scripts/performance-preview.mjs`. Preview na `http://127.0.0.1:4175` přesměruje `/api` i `/realtime` výhradně na izolovaný server 2570.
-2. Použít nový vlastní browserový tab. Neobnovovat uživatelův herní tab. Hrát plnou aplikaci v multiplayeru se standardním HUD; počet skutečných síťových relací ověřit autentizovanými motion řádky a počtem avatarů v benchmarku. Veřejné `/api/health` záměrně neposkytuje multiplayerovou přítomnost. Syntetická renderová skupina nemůže být uváděná jako síťový test.
-3. Z benchmarku uložit skutečný `renderer` včetně výrobce/adaptéru. Cílový adaptér je Intel UHD Graphics 630. Jiný adaptér či software renderer znamená jiné měření. Zaznamenat model CPU, prohlížeč a verzi, napájení a souběžné těžké procesy.
-4. Zapsat CSS viewport, DPR a **skutečné** rozlišení backbufferu. Předpoklad 1080p se nesmí vydávat za skutečnost, pokud okno tolik neměří. Nízké nastavení může snížit interní rozlišení; obě hodnoty zveřejnit.
-5. Po načtení a zkompilování materiálů nechat scénu alespoň 15 s zahřát. Potom změřit minimálně 3×10 s vestavěným tlačítkem FPS. Jedna série: 1 hráč, 30 hráčů na nádvoří, 100 hráčů na nádvoří a 100 hráčů rozptýlených po areálu. Pro 30 celkem spustit 29 skutečných botů plus browser, pro 100 celkem 99 botů plus browser. Pro renderer mohou ostatní během vzorku stát; oddělený síťový test musí opravdu hýbat všemi.
-6. V každé variantě zaznamenat nízkou i vysokou kvalitu, směr kamery a viditelnou část areálu. Zvlášť projít trasu kolem B6 a přes nádvoří. Po změně kvality znovu zahřát. Porovnání vyžaduje stejný pohled, světlo a počasí; živé počasí zaznamenat, řízené podmínky označit.
-7. Uložit kompletní JSON benchmarku: počet snímků, skutečné trvání, průměrné FPS, p95/p99 **nezprůměrovaných** `Engine.getDeltaTime()` snímků, počet avatarů, trojúhelníky, GPU, viewport a backbuffer. P95/p99 nepřepočítávat ze zaokrouhleného HUD FPS. Přidat screenshot plného HUD a místa měření.
-
-Po připojení browseru lze pro celkových sto účastníků spustit například `node --import tsx scripts/performance-network.ts http://127.0.0.1:2570 99 180 crowded network-99-browser.json 15 100`. Poslední argument deklaruje sto autentizovaných motion řádků (99 botů a jeden browser); samotné vytvoření 99 sessions tak nemůže omylem vydávat neúplnou scénu za stovku.
-
-Výsledek nad 30 FPS v jednom desetisekundovém pohledu neprokazuje plynulost celého světa. Při méně než 30 FPS nebo p95 nad 33,3 ms uvést nesplněný výkonový cíl v dané konfiguraci. Bez cílového adaptéru a požadovaného rozlišení zůstane tento konkrétní cíl neověřený.
+Následující původní předintegrační výsledky jsou z 10. 10. 2026. Popisují tehdejší snapshot/harness a jeho limity, nikoli současný protokol, stav KEY-48 nebo aktuální GPU výkon.
 
 ## Předintegrační serverová evidence
 

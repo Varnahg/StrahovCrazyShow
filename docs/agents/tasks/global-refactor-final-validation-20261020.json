@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-final-validation-20261020",
+  "title": "KEY-48: finální neměnný checkpoint, plná pipeline a skutečná přejímka",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/refactor-final-20261020/",
+    ".cache/refactor-final-validation/",
+    "docs/agents/handoffs/global-refactor-final-validation-20261020.md",
+    ".cache/performance-snapshot/refactor-final-20261020-b/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4290"
+  ],
+  "acceptance": [
+    "Zmrazit celý stabilní přijatý refaktorovaný zdroj včetně všech testů, patchů a explicitních statických prerequisites; hash před/po a vkopii musí souhlasit. Původní baseline a world kopie se nemění.",
+    "Použít frozen-lockfile závislosti a potvrdit patch/lock identitu, sourceSnapshotID a compiled module SHA. VITE_MULTIPLAYER_URL=/ pro vlastní server; žádná cizí verze/port se nepřebírá.",
+    "Plná sada se stejnými očekáváními/limity, build a všechny izolované SDK scénáře PASS. Lokálně lze použít shodné přímé Node entrypoints bez reinstalace borrowed node_modules, souběh1 kvůli doložené Windows contention.",
+    "Skutečná celá produkční hra sHUD: avatar/editor, kanonické budovy/terén/B6/schody/kamera/A/D/fyzickéauto, vlastní multiplayer connect/leave a izolovaný host. Každý výsledek svázat sURL a klientskouidentitou. Žádné nové FPS/p95/p99 nebo cílové GTX1060 závěry.",
+    "Na konci uzavřít vlastní GPU karty a ověřená vlastní PID; pevné porty volné. Důkazy a omezení předat, teprve po skutečné integraci uzavřítKEY48."
+  ],
+  "verification": [
+    "node scripts/performance-snapshot.mjs refactor-final-20261020-b --reuse-ipr-from refactor-baseline-20261020-b",
+    "Ve frozen kopii: VITE_SOURCE_SNAPSHOT_ID ze source-manifest, VITE_MULTIPLAYER_URL=/; přímé Node tsc --noEmit a Vite build --configLoader native.",
+    "Přímý tsx CLI entrypoint --test --test-concurrency=1 tests/*.test.ts (stejná celá pnpm test sada); node scripts/test-integration.mjs (stejný pnpm test:integration entrypoint).",
+    "Skutečný viditelný IAB s potvrzenými canvasdata/GPU/rozlišením a zaznamenanými screenshoty/scénáři; ostatní scény neměnit a nic z HUD nevydávat za benchmark."
+  ],
+  "notes": [
+    "Všechny implementační scopes předány a jejich claims uvolněné. Společný diff77f5db1b… má3nezávislá review bez nálezů, source se po review nemění bez nového posouzení.",
+    "Původní Edge startup timeouty zachované; stejné baseline/world frozen zdroje prošly ve viditelném IAB. Přesná příčina se netvrdí a časové limity se nemění.",
+    "Tento task provádí pouze vlastní finální výstupy/procesy. Zdrojové opravy po případném selhání vyžadují příslušný původní task/claim a nové cílené ověření.",
+    "Původní refactor-final-20261020(ID671a0a25…) má buildPASS a zůstává neměnný. Před testy nový staged check odhalil extraEOF v novém source.mjs, nyní odstraněný se stejným AST a Node syntaxPASS; nová kopie-b váže poslední zdrojový byte. Žádná změna testovýchlimitů nebo chování.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
+  ]
+}

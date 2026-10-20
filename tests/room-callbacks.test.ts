@@ -17,6 +17,7 @@ import {
 import { NetworkProbe } from "../client/network-probe";
 import { NetworkTimeline } from "../client/network-timeline";
 import { readWebGpuMainPassTiming } from "../client/gpu-diagnostics";
+import { snapshotAcceptedAuthorityDiagnostics } from "../client/game-diagnostics";
 
 // Execute the actual UI subscriptions, without booting React/WebGL. This catches
 // a missing guard on any handler, not only the helper's isolated behavior.
@@ -35,6 +36,7 @@ const declarations = app.body!.statements.flatMap((node) =>
   ts.isVariableStatement(node) ? [...node.declarationList.declarations] : [],
 );
 const callbackNames = [
+  "resetConnectionDiagnostics",
   "applyReceivedAuthority",
   "drainAuthorities",
   "syncNetworkStage",
@@ -201,6 +203,7 @@ assert.ok(simulationIndex >= 0);
 // Retain the actual contiguous frame prefix and whole simulation method. Only
 // the unrelated render tail is omitted; callback ordering is not reconstructed.
 const gameMethodsScript = compileScript(`({
+  ${executableGameMethod("capturePreviousCarPose")},
   ${executableGameMethod("updateNetworkPresentation")},
   ${executableGameMethod("advanceSimulation")},
   frame() { ${frame
@@ -208,6 +211,102 @@ const gameMethodsScript = compileScript(`({
     .map((node) => node.getText(gameSource))
     .join("\n")} }
 })`);
+
+const poseMethodsScript = compileScript(`({
+  ${executableGameMethod("capturePreviousCarPose")},
+  ${executableGameMethod("reconcile")},
+  ${executableGameMethod("advanceSimulation")}
+})`);
+
+for (const path of ["simulation", "reconcile"] as const) {
+  test(`actual Game ${path} captures one detached fresh car pose at the original boundary`, () => {
+    const events: string[] = [];
+    const rawPose = {
+      position: { x: 1, y: 2, z: 3 },
+      rotation: { x: 0.1, y: 0.2, z: 0.3, w: 0.9 },
+    };
+    const context = createContext({
+      Vector3, Quaternion, FIXED_DT, canonicalInput, movementFromKeys,
+      snapshotAcceptedAuthorityDiagnostics,
+      sessionDiagnostics: { event() {} },
+      performance: { now: () => 1000 },
+    });
+    const game: any = {
+      ...poseMethodsScript.runInContext(context),
+      ready: true, disposed: false, network: false, respawnPending: false,
+      accumulator: 0, seq: 0, yaw: 0, keys: new Set(),
+      localId: "self", lastAuthorityTick: -1,
+      previousPosition: new Vector3(90, 80, 70),
+      visualOffset: Vector3.Zero(), carSnapshots: [],
+      diagnosticNetwork: { authorityPackets: 0, corrections: 0, resyncs: 0 },
+      prediction: { states: new Map(), inputs: [], acknowledge() {} },
+      snapshots: { remove() {} },
+      networkTimeline: { acceptAuthority: () => ({ accepted: true, replay: [], rebase: false }) },
+      resetPredictionHistory() {},
+      trafficInstant: () => 1234,
+      onInputFrame: () => events.push("input-frame"),
+    };
+    const assertPose = () => {
+      const captured = game.previousCarPose;
+      assert.ok(captured.position instanceof Vector3);
+      assert.ok(captured.rotation instanceof Quaternion);
+      assert.notEqual(captured, rawPose);
+      assert.notEqual(captured.position, rawPose.position);
+      assert.notEqual(captured.rotation, rawPose.rotation);
+      assert.deepEqual(captured.position.asArray(), Object.values(rawPose.position));
+      assert.deepEqual(captured.rotation.asArray(), Object.values(rawPose.rotation));
+    };
+    game.actor = {
+      position: { x: 10, y: 20, z: 30 }, vehicle: true,
+      step() {
+        events.push("step");
+        assertPose();
+        rawPose.position.x += 50;
+        rawPose.rotation.w += 0.1;
+      },
+      restore(state: { position: { x: number; y: number; z: number } }) {
+        events.push("restore");
+        this.position = { ...state.position };
+        rawPose.position.x = state.position.x + 1;
+        rawPose.rotation.w = state.position.y + 2;
+      },
+    };
+    game.sim = {
+      car: { getVisualPose() {
+        events.push("pose");
+        assert.deepEqual(game.previousPosition.asArray(), Object.values(game.actor.position));
+        return rawPose;
+      } },
+      tick: () => events.push("tick"),
+    };
+    let previous: any;
+    for (const tick of [1, 2]) {
+      events.length = 0;
+      if (path === "simulation") game.advanceSimulation(FIXED_DT, 1000);
+      else {
+        assert.equal(game.reconcile({
+          tick, ack: tick, time: 1000, resync: true,
+          state: { position: { x: tick * 10, y: 20, z: 30 }, vehicle: true },
+        }, 1000), true);
+        assertPose();
+      }
+      assert.deepEqual(events, path === "simulation"
+        ? ["pose", "step", "tick", "input-frame"] : ["restore", "pose"]);
+      const captured = game.previousCarPose;
+      if (previous) {
+        assert.notEqual(captured, previous);
+        assert.notEqual(captured.position, previous.position);
+        assert.notEqual(captured.rotation, previous.rotation);
+      }
+      const position = captured.position.asArray(), rotation = captured.rotation.asArray();
+      rawPose.position.y += 100;
+      rawPose.rotation.z += 0.25;
+      assert.deepEqual(captured.position.asArray(), position);
+      assert.deepEqual(captured.rotation.asArray(), rotation);
+      previous = captured;
+    }
+  });
+}
 
 function deferred<T>() {
   let resolve!: (value: T) => void, reject!: (error: unknown) => void;
@@ -422,6 +521,7 @@ function fixture() {
   }
   const context = createContext(environment);
   const callbacks = callbacksScript.runInContext(context) as {
+    resetConnectionDiagnostics: () => void;
     installFrameHooks: (game: Record<string, any>) => void;
     syncNetworkStage: (game: {
       network: boolean;
@@ -1091,6 +1191,62 @@ test("actual UI connection timer cleanup resets diagnostic context without repla
   assert.deepEqual(cleared, [1, 2]);
   assert.equal(ui.game.networkTimeline, timeline);
   assert.equal(ui.effects.filter((effect) => effect === "game.resetDiagnosticContext").length, 1);
+});
+
+for (const boundary of ["bind", "room-close", "leave", "identity-change", "timer-cleanup"] as const) {
+  test(`actual UI ${boundary} resets probe, timing confidence and frame context in order`, async () => {
+    const ui = fixture(), room = new FakeRoom();
+    ui.bind(room);
+    const order: string[] = [];
+    const probe = ui.networkProbeRef.current;
+    const resetProbe = probe.reset;
+    probe.reset = function () { order.push("probe"); resetProbe.call(this); };
+    ui.game.networkTimeline.resetRttSelection = () => order.push("timeline");
+    ui.game.resetDiagnosticContext = () => order.push("context");
+    if (boundary === "bind") ui.bind(new FakeRoom());
+    else if (boundary === "room-close") room.close();
+    else if (boundary === "leave") ui.leave();
+    else if (boundary === "timer-cleanup") {
+      Object.assign(ui.environment, { connected: true, setInterval: () => 1, clearInterval() {} });
+      const cleanup = timingScript.runInContext(ui.context) as () => void;
+      cleanup();
+    } else {
+      const connecting = ui.connect();
+      await advanceToJoin(ui);
+      ui.joins[0].result.resolve(new FakeRoom());
+      assert.equal(await connecting, true);
+    }
+    const expected = ["probe", "timeline", "context"];
+    assert.deepEqual(order, boundary === "identity-change" ? [...expected, ...expected] : expected);
+  });
+}
+
+test("actual UI diagnostic reset resolves each current owner without retaining previous refs", () => {
+  const ui = fixture();
+  const order: string[] = [];
+  const finalOwner = {
+    resetDiagnosticContext: () => order.push("current context"),
+  };
+  const nextOwner = {
+    networkTimeline: { resetRttSelection() {
+      order.push("current timeline");
+      ui.environment.game.current = finalOwner;
+    } },
+  };
+  ui.environment.game.current = {
+    networkTimeline: { resetRttSelection: () => assert.fail("stale timeline") },
+    resetDiagnosticContext: () => assert.fail("stale context"),
+  };
+  ui.networkProbeRef.current = { reset() {
+    order.push("current probe");
+    ui.environment.game.current = nextOwner;
+  } } as NetworkProbe;
+  ui.resetConnectionDiagnostics();
+  assert.deepEqual(order, ["current probe", "current timeline", "current context"]);
+  ui.networkProbeRef.current = null as unknown as NetworkProbe;
+  ui.environment.game.current = null;
+  assert.doesNotThrow(() => ui.resetConnectionDiagnostics());
+  assert.equal(order.length, 3);
 });
 
 test("actual UI hook assignments drain authority before Game simulation and flush its generated input afterward", (t) => {

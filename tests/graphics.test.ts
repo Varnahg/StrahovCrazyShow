@@ -71,6 +71,104 @@ test("clockwise and counterclockwise footprints keep outward facade normals", ()
   }
 });
 
+test("facade edges retain point identity, order, six public keys and signed zero", () => {
+  const rectangle: [number, number][] = [
+    [0, 0],
+    [16, 0],
+    [16, 70],
+    [0, 70],
+  ];
+  const cases = [
+    {
+      points: rectangle,
+      expected: [
+        { length: 16, nx: 0, nz: -1, long: false },
+        { length: 70, nx: 1, nz: -0, long: true },
+        { length: 16, nx: 0, nz: 1, long: false },
+        { length: 70, nx: -1, nz: -0, long: true },
+      ],
+    },
+    {
+      points: [...rectangle].reverse(),
+      expected: [
+        { length: 16, nx: -0, nz: 1, long: false },
+        { length: 70, nx: 1, nz: 0, long: true },
+        { length: 16, nx: -0, nz: -1, long: false },
+        { length: 70, nx: -1, nz: 0, long: true },
+      ],
+    },
+  ];
+  for (const { points, expected } of cases) {
+    for (const closed of [false, true]) {
+      const polygon = closed ? [...points, points[0]] : [...points];
+      const original = polygon.slice();
+      for (const point of polygon) Object.freeze(point);
+      Object.freeze(polygon);
+      const edges = facadeEdges(polygon);
+      assert.equal(edges.length, 4);
+      for (const [index, edge] of edges.entries()) {
+        assert.deepEqual(Object.keys(edge), [
+          "a", "b", "length", "nx", "nz", "long",
+        ]);
+        const { a, b, ...values } = edge;
+        assert.equal(a, points[index]);
+        assert.equal(b, points[(index + 1) % points.length]);
+        assert.deepEqual(values, expected[index]);
+      }
+      assert.deepEqual(polygon, original);
+    }
+  }
+});
+
+test("facade edges preserve empty, repeated and minimum-length polygon behavior", () => {
+  const degenerate: [number, number][][] = [
+    [],
+    [[5, 6]],
+    [[5, 6], [5, 6]],
+    [[5, 6], [5, 6], [5, 6]],
+  ];
+  for (const points of degenerate) assert.deepEqual(facadeEdges(points), []);
+
+  const repeated: [number, number][] = [
+    [0, 0],
+    [16, 0],
+    [16, 0],
+    [16, 70],
+    [0, 70],
+  ];
+  const edges = facadeEdges(repeated);
+  assert.equal(edges.length, 4);
+  for (const [index, [from, to]] of [[0, 1], [2, 3], [3, 4], [4, 0]].entries()) {
+    assert.equal(edges[index].a, repeated[from]);
+    assert.equal(edges[index].b, repeated[to]);
+  }
+  for (const width of [0.08 - Number.EPSILON, 0.08]) {
+    const points: [number, number][] = [
+      [0, 0], [width, 0], [width, 1], [0, 1],
+    ];
+    const result = facadeEdges(points);
+    assert.deepEqual(
+      result.map((edge) => edge.length),
+      width < 0.08 ? [1, 1] : [0.08, 1, 0.08, 1],
+    );
+    assert.equal(result[0].a, points[width < 0.08 ? 1 : 0]);
+    assert.equal(result[0].b, points[width < 0.08 ? 2 : 1]);
+  }
+});
+
+test("facade long classification retains its strict tangent threshold", () => {
+  for (const [x, expected] of [[0.88, false], [0.88000001, true]] as const) {
+    const z = Math.sqrt(1 - x * x);
+    const points: [number, number][] = [
+      [0, 0], [x, z], [100 + x, z], [100, 0],
+    ];
+    const edges = facadeEdges(points);
+    assert.equal(edges[0].length, 1);
+    assert.equal(edges[0].long, expected);
+    assert.equal(edges[1].long, true);
+  }
+});
+
 test("catalogued dormitories retain long facades while B1 and Potraviny remain other types", () => {
   for (const b of BUILDINGS) {
     const architecture = buildingArchitecture(b);

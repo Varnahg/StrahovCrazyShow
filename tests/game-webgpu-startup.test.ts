@@ -1,45 +1,30 @@
 import test, { type TestContext } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { Script } from "node:vm";
 import ts from "typescript";
+import { readGameSource } from "./helpers/game-source";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { RenderHealth } from "../client/render-health";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
 
-const source = ts.createSourceFile(
-  "game.ts",
-  readFileSync(
-    process.env.GAME_STARTUP_SOURCE ??
-      new URL("../client/game.ts", import.meta.url),
-    "utf8",
-  ),
-  ts.ScriptTarget.Latest,
-  true,
+const { source, gameClass, selectMembers } = readGameSource(
+  process.env.GAME_STARTUP_SOURCE,
 );
-const gameClass = source.statements.find(
-  (node): node is ts.ClassDeclaration =>
-    ts.isClassDeclaration(node) && node.name?.text === "Game",
-)!;
-const methods = gameClass.members.filter(
-  (node) =>
-    node.name &&
-    [
-      "start",
-      "handleRendererFailure",
-      "isMeshReadyForCamera",
-      "assertStartupActive",
-      "disposeStartupAsset",
-      "disposeStartupAssets",
-      "trackStartupAsset",
-      "applyAdaptiveQuality",
-      "setQuality",
-      "setTargetFps",
-      "resize",
-      "updatePlayers",
-      "setProfile",
-    ].includes(node.name.getText(source)),
-);
+const methods = selectMembers([
+  "start",
+  "handleRendererFailure",
+  "isMeshReadyForCamera",
+  "assertStartupActive",
+  "disposeStartupAsset",
+  "disposeStartupAssets",
+  "trackStartupAsset",
+  "applyAdaptiveQuality",
+  "setQuality",
+  "setTargetFps",
+  "resize",
+  "updatePlayers",
+  "setProfile",
+]);
 const compiled = ts.transpileModule(
   `class StartupGame { ${methods.map((node) => node.getText(source)).join("\n")} };`,
   {

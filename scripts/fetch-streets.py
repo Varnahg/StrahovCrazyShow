@@ -258,8 +258,9 @@ def build(osm):
     print(json.dumps({k: v for k, v in audit.items() if k != "excludedWays"}, ensure_ascii=True))
 
 
-def ortho():
+def ortho(output_dir=None):
     # One georeferenced open-data image for visual interpretation. Never a game texture.
+    output_dir = DOCS if output_dir is None else output_dir
     lon0, lat0 = unproject(BOUNDS["minX"] - 10, BOUNDS["maxZ"] + 10)
     lon1, lat1 = unproject(BOUNDS["maxX"] + 10, BOUNDS["minZ"] - 10)
     trans = Transformer.from_crs(4326, 3857, always_xy=True)
@@ -274,8 +275,8 @@ def ortho():
     if "href" not in result:
         raise RuntimeError(result)
     image = request(result["href"])
-    (DOCS / "strahov-ortho-2024.jpg").write_bytes(image)
-    write_json(DOCS / "ortho-georeference.json", {
+    (output_dir / "strahov-ortho-2024.jpg").write_bytes(image)
+    write_json(output_dir / "ortho-georeference.json", {
         "provider": "IPR Praha", "attribution": "datový podklad © IPR Praha",
         "license": "CC BY 4.0 (IPR open-data portal)",
         "licenseUrl": "https://geoportalpraha.cz/data-a-sluzby/otevrena-data",

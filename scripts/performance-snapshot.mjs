@@ -30,6 +30,14 @@ const entries = [
   "assets",
   "scripts",
   "tests",
+  // Frozen pnpm installs resolve the pinned Babylon patch from this directory.
+  "patches",
+  // Exact static inputs read by autodev regressions, without the remaining
+  // live documentation or agent/skill trees.
+  "AGENTS.md",
+  "docs/agents/bmad-policy.md",
+  ".agents/skills/bmad-build/step-02-plan.md",
+  ".agents/skills/bmad-build/spec-template.md",
   // Static serialized source used by the stadium archive regression. Evolving
   // verification reports and the remaining documentation stay outside runtime.
   "docs/reality-pack/landmarks/geometry-source.json",

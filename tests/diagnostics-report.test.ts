@@ -1,8 +1,10 @@
 import test, { type TestContext } from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { mkdtemp, writeFile, readFile, rm, utimes } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
+import { fileURLToPath } from "node:url";
 // The report is intentionally directly runnable by plain Node, without tsx.
 // @ts-expect-error JavaScript CLI module has no separate declaration file.
 import * as diagnosticsCli from "../scripts/diagnostics-report.mjs";
@@ -438,6 +440,201 @@ test("connection inconsistency checks event order and sampled-context age, exclu
   assert.deepEqual(result.missingSequences, []);
 });
 
+test("identity changes preserve established connection evidence without creating or restoring it", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  const cases = [
+    { kinds: ["network-connected", "network-left"], expected: 3 },
+    { kinds: ["network-connected", "network-left", "network-left"], expected: 3 },
+    { kinds: ["network-left"], expected: 0 },
+    { kinds: ["network-left", "network-left"], expected: 0 },
+    { kinds: ["network-connected", "network-disconnected", "network-left"], expected: 0 },
+    { kinds: ["network-connected", "network-connecting", "network-left"], expected: 0 },
+    {
+      kinds: ["network-connected", "network-disconnected", "network-left", "network-connected", "network-left"],
+      expected: 3,
+    },
+  ];
+  for (const { kinds, expected } of cases) {
+    await t.test(kinds.join(" → "), async () => {
+      const events = kinds.map((kind, seq) =>
+        record(seq, kind, { reason: "identity-change" }),
+      );
+      const windows = ["connecting", "offline", "disconnected", "connected"].map(
+        (connection, index) => record(events.length + index, "frame-window", {
+          frameMs: [16],
+          context: { mode: "multiplayer", connection },
+        }),
+      );
+      await writeFile(path, row(0, [
+        ...events,
+        ...windows,
+        record(events.length + windows.length, "frame-window", {
+          frameMs: [100],
+          context: { mode: "guest", connection: "offline" },
+        }),
+        record(events.length + windows.length + 1, "session-end", {}),
+      ]));
+      const result = await summarizeDiagnosticFiles([path]);
+      assert.equal(result.network.inconsistentConnectionWindows, expected);
+      assert.equal(result.performance.frames, 5, "guest raw frames still count");
+      assert.equal(result.performance.p99FrameMs, 100);
+      assert.equal(
+        result.incidents.find((item: { code: string }) =>
+          item.code === "connection-state-inconsistent")?.count ?? 0,
+        expected,
+      );
+      assert.deepEqual(
+        result.lifecycle.filter((item: { kind: string }) => item.kind === "network-left"),
+        events.filter((item) => item.kind === "network-left"),
+        "identity-change lifecycle records retain their exact kind, reason and time",
+      );
+    });
+  }
+});
+
+test("all other leave reasons end connection evidence and identity changes cannot revive it", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  const reasons = [
+    {}, { reason: "left" }, { reason: "" }, { reason: null },
+    { reason: 0 }, { reason: true }, { reason: {} }, { reason: [] },
+    { reason: ["identity-change"] }, { reason: { value: "identity-change" } },
+    { reason: "Identity-change" }, { reason: "IDENTITY-CHANGE" },
+    { reason: " identity-change" }, { reason: "identity-change " },
+  ];
+  for (const data of reasons) {
+    await t.test(JSON.stringify(data), async () => {
+      const window = (seq: number) => record(seq, "frame-window", {
+        frameMs: [16], context: { mode: "multiplayer", connection: "offline" },
+      });
+      await writeFile(path, row(0, [
+        record(0, "network-connected", {}),
+        record(1, "network-left", data),
+        window(2),
+        record(3, "network-left", { reason: "identity-change" }),
+        window(4),
+        record(5, "network-connected", {}),
+        record(6, "network-left", { reason: "identity-change" }),
+        window(7),
+        record(8, "session-end", {}),
+      ]));
+      const result = await summarizeDiagnosticFiles([path]);
+      assert.equal(result.network.inconsistentConnectionWindows, 1);
+      assert.deepEqual(result.lifecycle.find((item: { seq: number }) => item.seq === 1).data, data);
+    });
+  }
+});
+
+test("identity changes retain the original connected timestamp for context age and fallback", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  for (const [contextAtMs, expected] of [
+    [999, 0], [1000, 1], [1500, 1], [2000, 1], [2500, 1],
+    [undefined, 1], [null, 1], ["999", 1], [{ atMs: 999 }, 1],
+  ] as const) {
+    await t.test(String(JSON.stringify(contextAtMs)), async () => {
+      await writeFile(path, row(0, [
+        record(0, "network-connected", {}, 1000),
+        record(1, "network-left", { reason: "identity-change" }, 2000),
+        record(2, "frame-window", {
+          frameMs: [16], contextAtMs,
+          context: { mode: "multiplayer", connection: "connecting" },
+        }, 3000),
+        record(3, "session-end", {}, 4000),
+      ]));
+      const result = await summarizeDiagnosticFiles([path]);
+      assert.equal(result.network.inconsistentConnectionWindows, expected);
+    });
+  }
+});
+
+test("identity classification sorts shuffled files by sequence, deduplicates and preserves time warnings", async (t) => {
+  const directory = await fixture(t),
+    a = join(directory, "a.jsonl"),
+    b = join(directory, "b.jsonl");
+  const window = (seq: number, contextAtMs: number) => record(seq, "frame-window", {
+    frameMs: [16], contextAtMs,
+    context: { mode: "multiplayer", connection: "offline" },
+  });
+  const first = row(0, [
+    window(4, 1000),
+    record(1, "network-left", { reason: "identity-change" }),
+    record(0, "network-connected", {}, 1000),
+  ]);
+  await writeFile(a, first + "\n" + first);
+  await writeFile(b, row(1, [
+    window(7, 6500),
+    record(6, "network-left", { reason: "identity-change" }),
+    record(5, "network-disconnected", {}, 3500),
+    record(3, "network-left", { reason: "identity-change" }),
+    window(2, 1500),
+    record(8, "session-end", {}),
+  ]));
+  const originals = await Promise.all([readFile(a), readFile(b)]);
+  const forward = await summarizeDiagnosticFiles([a, b]);
+  const reverse = await summarizeDiagnosticFiles([b, a]);
+  assert.equal(forward.network.inconsistentConnectionWindows, 2);
+  assert.deepEqual(reverse.network, forward.network);
+  assert.deepEqual(reverse.lifecycle, forward.lifecycle);
+  assert.deepEqual(reverse.performance, forward.performance);
+  assert.equal(forward.performance.frames, 3);
+  assert.equal(forward.records, 9);
+  assert.deepEqual(forward.missingSequences, []);
+  for (const result of [forward, reverse])
+    assert.ok(result.warnings.includes("Monotonic time went backwards at sequence 5"));
+  assert.deepEqual(await Promise.all([readFile(a), readFile(b)]), originals);
+});
+
+test("plain Node JSON/text CLI preserves identity semantics, raw statistics, clock boundaries and malformed input bytes", async (t) => {
+  const directory = await fixture(t),
+    path = join(directory, "identity evidence.jsonl");
+  const evidence = new URL("../docs/performance/evidence/diagnostic-identity-20261020/input.jsonl", import.meta.url);
+  const original = await readFile(evidence);
+  const input = Buffer.concat([original, Buffer.from('\nnull\n{"truncated":')]);
+  await writeFile(path, input);
+  const env = { ...process.env };
+  delete env.NODE_OPTIONS;
+  const invoke = (args: string[]) => {
+    const result = spawnSync(process.execPath, [
+      fileURLToPath(new URL("../scripts/diagnostics-report.mjs", import.meta.url)),
+      path, ...args,
+    ], {
+      cwd: directory, env, encoding: "utf8", windowsHide: true,
+      timeout: 30000, maxBuffer: 4 * 1024 * 1024,
+    });
+    assert.equal(result.error, undefined);
+    assert.equal(result.signal, null);
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stderr, "");
+    return result.stdout;
+  };
+  const json = JSON.parse(invoke(["--json"]));
+  assert.deepEqual(await readFile(path), input);
+  const text = invoke([]);
+  assert.deepEqual(await readFile(path), input);
+  assert.deepEqual(await readFile(evidence), original);
+  assert.equal(json.sessions.length, 1);
+  const session = json.sessions[0];
+  assert.equal(session.network.inconsistentConnectionWindows, 2);
+  assert.equal(session.incidents.find((item: { code: string }) =>
+    item.code === "connection-state-inconsistent").count, 2);
+  assert.equal(session.performance.frames, 9);
+  assert.equal(session.performance.averageFps, 9000 / 264);
+  assert.equal(session.performance.p50FrameMs, 16);
+  assert.equal(session.performance.p95FrameMs, 100);
+  assert.equal(session.performance.p99FrameMs, 100);
+  assert.equal(session.performance.maxFrameMs, 100);
+  assert.deepEqual(session.serverClock.observed, { callbacks: 20, droppedMs: 12 });
+  assert.equal(session.serverClock.comparableIntervals, 2);
+  assert.equal(session.incidents.find((item: { code: string }) =>
+    item.code === "recording-incomplete").count, 2);
+  assert.ok(session.lifecycle.some((item: { kind: string; data: { reason?: unknown } }) =>
+    item.kind === "network-left" && item.data.reason === "identity-change"));
+  assert.match(text, /INCIDENT \[medium\] connection-state-inconsistent: 2\./);
+  assert.match(text, /Foreground 9 frames: 34\.09 FPS; p95 100\.00 ms; p99 100\.00 ms; worst 100\.00 ms/);
+  assert.match(text, /observed increments 20 callbacks \/ 12\.00 ms dropped across 2 comparable intervals/);
+  assert.match(text, /LIFECYCLE .*network-left \{"reason":"identity-change"\}/);
+  assert.match(text, /WARNING: .*truncated/);
+});
+
 test("large repeated detail streams are bounded while incident and raw sample counts remain exact", async (t) => {
   const directory = await fixture(t),
     path = join(directory, id + ".jsonl");
@@ -526,6 +723,29 @@ const clockRecord = (
       },
     },
   });
+
+test("identity-change remains a server-clock boundary and rejects pre-change sampled context", async (t) => {
+  const path = join(await fixture(t), id + ".jsonl");
+  await writeFile(path, row(0, [
+    record(0, "network-connected", {}),
+    clockRecord(1, 100, 10),
+    clockRecord(2, 110, 15),
+    record(3, "network-left", { reason: "identity-change" }),
+    clockRecord(4, 999, 1000, 2500),
+    clockRecord(5, 500, 100),
+    clockRecord(6, 510, 107),
+    record(7, "session-end", {}),
+  ]));
+  const { serverClock: clock } = await summarizeDiagnosticFiles([path]);
+  assert.deepEqual(clock.observed, { callbacks: 20, droppedMs: 12 });
+  assert.equal(clock.comparableIntervals, 2);
+  assert.equal(clock.samples, 4);
+  assert.equal(clock.diagnostics.staleContexts, 1);
+  assert.equal(clock.diagnostics.lifecycleBoundaries, 3);
+  assert.deepEqual(clock.segments.map((segment: { fromSeq: number; toSeq: number }) =>
+    [segment.fromSeq, segment.toSeq]), [[1, 2], [5, 6]]);
+  assert.deepEqual(clock.segments[1].baseline, { callbacks: 500, droppedTotalMs: 100 });
+});
 
 test("server clock separates observed increments, sampled callbacks and historical lifetime peaks", async (t) => {
   const path = join(await fixture(t), id + ".jsonl");

@@ -116,7 +116,8 @@ export async function scenario(kind:Kind,orderSensitive=false){
   if(instanced||kind==='car-fallback')engine.getCaps().instancedArrays=true;
   const camera=new FreeCamera('same camera',new Vector3(0,0,-5),scene);camera.setTarget(Vector3.Zero());scene.activeCamera=camera;
   const point=new PointLight('B6 point',new Vector3(2,2,2),scene);point.falloffType=Light.FALLOFF_STANDARD;point.setEnabled(false);
-  const sun=new DirectionalLight('sun',new Vector3(0,-1,0),scene),hemi=new HemisphericLight('sky',Vector3.Up(),scene);
+  new DirectionalLight('sun',new Vector3(0,-1,0),scene);
+  new HemisphericLight('sky',Vector3.Up(),scene);
   const torch=new SpotLight('torch',new Vector3(0,1,-3),new Vector3(0,-.1,1),.72,64,scene);torch.falloffType=Light.FALLOFF_STANDARD;torch.renderPriority=10;
   const budget=new GltfLightBudget(scene),stable=new StableLightState(scene),observers:any[]=[];
   const result:any={kind,canonical,orderSensitive,states:[],cleanup:null};

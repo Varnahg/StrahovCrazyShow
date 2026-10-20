@@ -7,8 +7,6 @@ import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Material } from "@babylonjs/core/Materials/material";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import "@babylonjs/core/Meshes/instancedMesh";
 import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import type { Geometry } from "@babylonjs/core/Meshes/geometry";
@@ -143,12 +141,17 @@ function formMesh(shape: AvatarForm, name: string, scene: Scene) {
   return mesh;
 }
 
-/** Fit small features to the actual authored face, rather than a guessed egg.
- * This runs only on creation/edit, never in the animation/render loop. */
-function faceSurfaceZ(x: number, y: number, width: number) {
-  const { positions, indices } = anatomy.head;
-  const px = x / width,
-    py = y / 0.235;
+/** Frontmost authored triangle at an XY point, in the source coordinates. */
+function frontSurfaceZ(
+  { positions, indices }: {
+    positions: readonly number[];
+    indices: readonly number[];
+  },
+  x: number,
+  y: number,
+  minimumWeight: number,
+  maximumWeightSum: number,
+) {
   let maximum = -Infinity;
   for (let i = 0; i < indices.length; i += 3) {
     const ai = indices[i] * 3,
@@ -162,9 +165,10 @@ function faceSurfaceZ(x: number, y: number, width: number) {
       cy = positions[ci + 1];
     const denominator = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
     if (Math.abs(denominator) < 1e-12) continue;
-    const a = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / denominator;
-    const b = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / denominator;
-    if (a < -1e-6 || b < -1e-6 || a + b > 1 + 1e-6) continue;
+    const a = ((by - cy) * (x - cx) + (cx - bx) * (y - cy)) / denominator;
+    const b = ((cy - ay) * (x - cx) + (ax - cx) * (y - cy)) / denominator;
+    if (a < minimumWeight || b < minimumWeight || a + b > maximumWeightSum)
+      continue;
     maximum = Math.max(
       maximum,
       a * positions[ai + 2] +
@@ -172,35 +176,22 @@ function faceSurfaceZ(x: number, y: number, width: number) {
         (1 - a - b) * positions[ci + 2],
     );
   }
+  return maximum;
+}
+
+/** Fit small features to the actual authored face, rather than a guessed egg.
+ * This runs only on creation/edit, never in the animation/render loop. */
+function faceSurfaceZ(x: number, y: number, width: number) {
+  const px = x / width,
+    py = y / 0.235;
+  const maximum = frontSurfaceZ(anatomy.head, px, py, -1e-6, 1 + 1e-6);
   return Number.isFinite(maximum) ? maximum * 0.195 : 0.082;
 }
 
 function shirtSurfaceZ(preset: number, x: number, y: number) {
-  const { positions, indices } =
+  const shirt =
     anatomy.bodies[preset === 2 || preset === 4 ? "female" : "male"].near.shirt;
-  let front = -Infinity;
-  for (let i = 0; i < indices.length; i += 3) {
-    const ai = indices[i] * 3,
-      bi = indices[i + 1] * 3,
-      ci = indices[i + 2] * 3;
-    const ax = positions[ai],
-      ay = positions[ai + 1],
-      bx = positions[bi],
-      by = positions[bi + 1],
-      cx = positions[ci],
-      cy = positions[ci + 1];
-    const denominator = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
-    if (Math.abs(denominator) < 1e-12) continue;
-    const a = ((by - cy) * (x - cx) + (cx - bx) * (y - cy)) / denominator,
-      b = ((cy - ay) * (x - cx) + (ax - cx) * (y - cy)) / denominator;
-    if (a < 0 || b < 0 || a + b > 1) continue;
-    front = Math.max(
-      front,
-      a * positions[ai + 2] +
-        b * positions[bi + 2] +
-        (1 - a - b) * positions[ci + 2],
-    );
-  }
+  const front = frontSurfaceZ(shirt, x, y, 0, 1);
   return Number.isFinite(front) ? front : 0.14;
 }
 

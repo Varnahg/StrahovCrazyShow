@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "issue": "KEY-50",
+  "task": "perf-cli-identity-controller-20261020",
+  "workerTask": "perf-cli-identity-worker-20261020",
+  "repository": "Varnahg/StrahovCrazyShow",
+  "baseBranch": "main",
+  "intentFile": "docs/agents/assignments/perf-cli-identity-20261020.md",
+  "artifactDir": "_bmad-output/implementation-artifacts/perf-cli-identity-20261020",
+  "handoffFile": "docs/agents/handoffs/perf-cli-identity-controller-20261020.md",
+  "checks": [
+    {
+      "id": "diagnostics-tests",
+      "command": "node",
+      "args": [
+        "--test",
+        "tests/diagnostics-report.test.ts"
+      ]
+    },
+    {
+      "id": "identity-cli-acceptance",
+      "command": "node",
+      "args": [
+        "docs/performance/evidence/diagnostic-identity-20261020/accept-cli.mjs"
+      ]
+    }
+  ],
+  "prTitle": "Opravit rozlišení identity-change v CLI diagnostiky výkonových incidentů",
+  "linearStates": {
+    "active": "In Progress",
+    "done": "Done"
+  },
+  "acceptance": {
+    "kind": "cli",
+    "description": "Plain-Node JSON/text CLI rozlišuje identity-change od skutečného leave, zachovává raw performance a server-clock hranice i vstupní bytes. Offline oprava nemění herní/GPU runtime; není FPS přejímkou parent KEY-2."
+  },
+  "merge": true
+}

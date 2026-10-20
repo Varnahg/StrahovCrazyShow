@@ -1,0 +1,213 @@
+{
+  "status": "passed",
+  "sourceCommit": "7712edb57cae1ab02841ec70519a7f371240a6b4",
+  "sourceSnapshotId": "66d1cf97fb312e83c20b4c7ac12310f912c08440a89d926bdd087cbe5582a136",
+  "frozenFiles": 8528,
+  "reusedUnchangedIprFiles": 7038,
+  "review": {
+    "diffSha256": "77f5db1bf42cde382e631aa67b98ac7f6f44f13b02b168a7b356e4039e5b8a80",
+    "blind": [],
+    "edgeCases": [],
+    "verificationGaps": []
+  },
+  "build": {
+    "exitCode": 0,
+    "log": "build-b.log",
+    "viteDurationSeconds": 19.44,
+    "knownWarnings": [
+      "Large chunks",
+      "Ineffective dynamic imports already statically imported"
+    ]
+  },
+  "tests": {
+    "status": "passed",
+    "exitCode": 0,
+    "command": "node node_modules/tsx/dist/cli.mjs --test --test-concurrency=1 tests/*.test.ts",
+    "tests": 1708,
+    "suites": 0,
+    "pass": 1707,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 1,
+    "todo": 0,
+    "duration_ms": 1873425.3253,
+    "log": "final-test-b.log.gz"
+  },
+  "integration": {
+    "status": "passed",
+    "exitCode": 0,
+    "command": "node scripts/test-integration.mjs",
+    "port": 2568,
+    "scenarios": 4,
+    "authenticatedPeers": 12,
+    "portFreeAfterExit": true,
+    "log": "final-integration-b.log.gz"
+  },
+  "functionalAcceptance": {
+    "status": "passed",
+    "url": "http://127.0.0.1:4290/",
+    "browser": "Visible IAB",
+    "gpu": "Intel UHD 630 / ANGLE D3D11",
+    "quality": "medium",
+    "soloMultiplayerResolution": {
+      "css": [
+        580,
+        668
+      ],
+      "internal": [
+        580,
+        668
+      ]
+    },
+    "guestResolution": [
+      {
+        "css": [
+          1280,
+          720
+        ],
+        "internal": [
+          1280,
+          720
+        ]
+      }
+    ],
+    "scenarios": [
+      "Avatar preview",
+      "Physical car",
+      "Terrain, B6 and camera",
+      "Multiplayer connect/leave/rejoin and car",
+      "Guest boundary beside live multiplayer"
+    ],
+    "warnings": 0,
+    "errors": 0,
+    "record": "final-iab-acceptance.json",
+    "servedIdentity": "final-served-identity.json",
+    "performanceMeasurement": false,
+    "otherUserScene": "Not inspected: automatic review rejected access to existing remote user tab. No bypass or performance inference."
+  },
+  "performanceConclusion": null,
+  "optionalUnusedDiagnostics": {
+    "initial": 53,
+    "remaining": 4,
+    "reason": "Unchanged authoring-hash inputs; no model regeneration for cosmetic changes."
+  },
+  "archives": [
+    {
+      "path": "final-source-manifest.json.gz",
+      "sourceBytes": 1056087,
+      "sourceSha256": "4ce70f066151886f62f15a9a5b945c5ac5659bc3c1f0daca8297528e2ca5025b",
+      "archiveBytes": 350938,
+      "archiveSha256": "e29592ab6070e05333bbe7920b03ac281b0f18bbbbfc9dfcc1308abfb9ffc1f5"
+    },
+    {
+      "path": "final-dependency-manifest.json.gz",
+      "sourceBytes": 2138,
+      "sourceSha256": "435933c0ca0eeec984a2505ec4c995878aa613714a1aff4aadff2508deb34b8a",
+      "archiveBytes": 1153,
+      "archiveSha256": "690a06925449d099f5cc3b7fe53572fbe9e12f734e3a46fd1679b59386bf0ce7"
+    },
+    {
+      "path": "final-build-b.log.gz",
+      "sourceBytes": 2859,
+      "sourceSha256": "13f1433ebf46cfff3e3dc8791ed1d75d44a6722c70957e1606ce6e3b794b1d7a",
+      "archiveBytes": 1184,
+      "archiveSha256": "0a21434b1564aba7af427c5bac4081de56cfe0e0fcdf5e107628a7eb0fb63d9f"
+    },
+    {
+      "path": "final-first-final-build.log.gz",
+      "sourceBytes": 2859,
+      "sourceSha256": "c3cbd6bf690761203c785cc882cb72b207efb2912814cad407c3a69c08b1efa3",
+      "archiveBytes": 1185,
+      "archiveSha256": "502378d2aa22e2c539ec02bba42298fbdb054f8c92c7fac5b4ecc1211cc6b920"
+    },
+    {
+      "path": "final-test-b.log.gz",
+      "sourceBytes": 256214,
+      "sourceSha256": "3656c1eda90685d4d2c33507b3654af31d30370e0d3c723b4fef33de6cc93feb",
+      "archiveBytes": 74886,
+      "archiveSha256": "2a529bca40a6dbb1b222d752b93f1685c12c706cd938242fb1978e78150db823"
+    },
+    {
+      "path": "final-integration-b.log.gz",
+      "sourceBytes": 2094,
+      "sourceSha256": "310611d17f37763caf4db701f162f2f5c5cea8ce0365b6c26b43dd1ce828a4cb",
+      "archiveBytes": 1087,
+      "archiveSha256": "408cca6f5a1cd35fd6e66077d2dcd37a4ce080709d86a84ee4231877665f2602"
+    },
+    {
+      "path": "final-server-b.stdout.log.gz",
+      "sourceBytes": 63,
+      "sourceSha256": "061a678466631aeb7027fe35ffe35a6078daf5abe694817278a46db780247e64",
+      "archiveBytes": 83,
+      "archiveSha256": "e27bad0d136d50341b1bb5b6a360b099a7f52a7e616f5c33000deaa92c3a4e3e"
+    },
+    {
+      "path": "final-server-b.stderr.log.gz",
+      "sourceBytes": 0,
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "archiveBytes": 20,
+      "archiveSha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e"
+    }
+  ],
+  "client": {
+    "modulePath": "/assets/index-DZBCVZuF.js",
+    "moduleSha256": "291245ffbaefa06055f12a2de50cb5ed5b692913f9e332c3366d22ef181c7281",
+    "indexSha256": "ceda71b8e3b589dfc2320e9d1a018cbcf6e8840b27c89239b3da2503ffc79c64",
+    "embeddedSourceIdChunks": [
+      "game-e32x1qju.js",
+      "index-DZBCVZuF.js"
+    ]
+  },
+  "recordedAt": "2026-10-20T09:33:31.931Z",
+  "postReviewChanges": [
+    {
+      "scope": "Executable source",
+      "change": "Only surplus EOF removed from new source.mjs; identical printed AST. See post-review-hygiene.json."
+    },
+    {
+      "scope": "Documentation and evidence",
+      "change": "Final guide wording, current source/CI identities and subsequent actual verification evidence. Original historical suffix is byte-identical; local links and claims checked against primary sources."
+    }
+  ],
+  "cleanup": {
+    "stoppedPid": 47628,
+    "identityMatched": true,
+    "checkedAt": "2026-10-20T09:32:37.5083699Z",
+    "port4290Free": true,
+    "port2568Free": true,
+    "ownBrowserTabsClosed": true
+  },
+  "frozenAfterVerification": {
+    "checkedAt": "2026-10-20T09:33:31.917Z",
+    "files": 8528,
+    "mismatches": [],
+    "installedPatchedFiles": 9
+  },
+  "documentation": {
+    "status": "passed",
+    "record": "final-documentation-checks.json",
+    "independentReview": {
+      "reviewers": [
+        "review_final_docs_blind",
+        "review_maintenance_edges",
+        "review_maintenance_verification"
+      ],
+      "findings": [
+        {
+          "id": "explicit-snapshot-cwd",
+          "status": "fixed-and-confirmed"
+        },
+        {
+          "id": "premature-final-ci-wording",
+          "status": "fixed-and-confirmed"
+        }
+      ],
+      "remainingFindings": [],
+      "confirmedAt": "2026-10-20T09:40:50.956Z"
+    }
+  },
+  "publicationEvidence": {
+    "url": "https://linear.app/gigeconomy/issue/KEY-48/celkovy-refaktoring-codebase-a-sjednoceni-aktualni-dokumentace",
+    "recordType": "Exact-head PR acceptance and final main CI; maintained externally to avoid a self-referential source commit."
+  }
+}

@@ -1,0 +1,387 @@
+{
+  "at": "2026-10-20T17:37:57.168Z",
+  "runId": "key-50-73ab89b4aced",
+  "status": "complete",
+  "executor": {
+    "at": "2026-10-20T17:08:46.9250520Z",
+    "head": "6971dfb52ff823a1031b40492833b57b2d888b02",
+    "issue": "KEY-50",
+    "freshRun": true,
+    "existingRuns": 0,
+    "assignmentSha256": "0e6ac6a67d961d40825b82c39db1ec7bf45bb408d4a2fc50bd7cd174b805527e",
+    "fixtureSha256": "4056d5f4cb396a9b0dfd92d2cc915a7bda3ed1f8146fbfa99873f15e52dd96c6",
+    "controllerSource": [
+      {
+        "file": "scripts/autodev/adapters.mjs",
+        "sha256": "f0f2c6c4a1a2f6d0276792b8a442f93f89edf30e109fbfd434bd9dcb3282263b"
+      },
+      {
+        "file": "scripts/autodev/codex.mjs",
+        "sha256": "94657cab689ce35eedd79096d3d131c6e44dd47e602a5fe79f2b66992a8e9ce0"
+      },
+      {
+        "file": "scripts/autodev/engine.mjs",
+        "sha256": "5248f5a8cf72b527b5f1ca2c392b56dd041985ced6876b068d4bb45d52c35b3b"
+      },
+      {
+        "file": "scripts/autodev/github.mjs",
+        "sha256": "72641ba4f3566ac0c5e721eb952da50486ad68dd9f1bca5b66262dd0f0f98269"
+      },
+      {
+        "file": "scripts/autodev/linear.mjs",
+        "sha256": "db4e83b416c73be2571d588744dee8f35e3f79509d0e77e6217705facff1201d"
+      },
+      {
+        "file": "scripts/autodev/process.mjs",
+        "sha256": "27c26e422a53892cf1dcd6fb71ee6eab7c3b3dc099af62e1f5b40265f7823aec"
+      },
+      {
+        "file": "scripts/autodev/source.mjs",
+        "sha256": "b5e40cce34e9198fc8cdd26783c3d1027e8dddd40185498b37d1564ac5585559"
+      },
+      {
+        "file": "scripts/autodev/store.mjs",
+        "sha256": "1b680aaa4300874580350ba5b9511aadce47b343bb761f30efd529618942e605"
+      },
+      {
+        "file": "scripts/autodev/supervisor.mjs",
+        "sha256": "b367f982f2bd6fd54756e4cc5e0141ac96b0371a13d2d2ab60282f58c8e0f81b"
+      },
+      {
+        "file": "scripts/autodev/prompts/common.md",
+        "sha256": "617e421b4f9b0814efcf650eff59a0ad1e0f2997993438f26baef956b82c8101"
+      },
+      {
+        "file": "scripts/autodev/schemas/implement.json",
+        "sha256": "f47eeb928d7ea0ff5ea63f21ff62515b558c6fe100db36762b5cd5e49bcf48bd"
+      },
+      {
+        "file": "scripts/autodev/schemas/plan-readiness-v3.json",
+        "sha256": "080f125734c31018975424fa6fb3c9fd27813d17361e4e18f680a73ef838e42e"
+      },
+      {
+        "file": "scripts/autodev/schemas/plan-readiness.json",
+        "sha256": "cb118e6f0a2d63179ccbe4f0582e2db8ffbda5ee822ff3a90b9ed0f12ffe20d7"
+      },
+      {
+        "file": "scripts/autodev/schemas/plan.json",
+        "sha256": "c1e586db92de3c0f7716ddc08ab163ae0d9d021e38591e673dcabc464d2bb89f"
+      },
+      {
+        "file": "scripts/autodev/schemas/spec-completion.json",
+        "sha256": "23c214395cc0060dfa7596335dfeb3df2c221d3a42ad2ad20ae1a76c40025490"
+      }
+    ]
+  },
+  "baseSha": "6971dfb52ff823a1031b40492833b57b2d888b02",
+  "sourceDigest": "00d1665ecfa474fc3a10fff071459eb37490e240c0a08ddd074230fe45176240",
+  "sourceFiles": [
+    {
+      "file": "scripts/diagnostics-report.mjs",
+      "sha256": "c90b915c7026f8c937bacd73247d5b6490e55740ccb921a2e66ff1d4007522e6"
+    },
+    {
+      "file": "tests/diagnostics-report.test.ts",
+      "sha256": "110a12aaac58bb41ea981534738b022b24d781abba5a8254ec64eb6eb9d2ddfe"
+    }
+  ],
+  "immutableAcceptance": [
+    {
+      "file": "docs/performance/evidence/diagnostic-identity-20261020/accept-cli.mjs",
+      "sha256": "8c4a0d7d323e62648fcf985df61f3e5eb6f1d56245de7bb5fab003dc431c9b8f",
+      "currentRootSha256": "8c4a0d7d323e62648fcf985df61f3e5eb6f1d56245de7bb5fab003dc431c9b8f",
+      "workerSha256": "8c4a0d7d323e62648fcf985df61f3e5eb6f1d56245de7bb5fab003dc431c9b8f"
+    },
+    {
+      "file": "docs/performance/evidence/diagnostic-identity-20261020/input.jsonl",
+      "sha256": "4056d5f4cb396a9b0dfd92d2cc915a7bda3ed1f8146fbfa99873f15e52dd96c6",
+      "currentRootSha256": "4056d5f4cb396a9b0dfd92d2cc915a7bda3ed1f8146fbfa99873f15e52dd96c6",
+      "workerSha256": "4056d5f4cb396a9b0dfd92d2cc915a7bda3ed1f8146fbfa99873f15e52dd96c6"
+    }
+  ],
+  "attempts": [
+    {
+      "key": "bmad-render",
+      "id": "bced78684c14da73c9b5fd0a",
+      "exitCode": 0,
+      "requestDigest": "23aa0c3294e790a58a1a4f342499b46f80273fc227c657755fb758ccee05649c",
+      "receiptSha256": "eeb44b07df467d970ec19682765a8058d9a71da527cfb56e5dd7dabe0fe6c9bb",
+      "stdoutSha256": "7ebf6b8861e204ba57fdbc44569e8602102b34a1cca0b3a067ccc5ef67eadd83",
+      "thread": null
+    },
+    {
+      "key": "check:diagnostics-tests:00d1665ecfa474fc3a10fff0",
+      "id": "9ae405cf3fc74cda5398c835",
+      "exitCode": 0,
+      "requestDigest": "e04272070aee55c0473ead809a24ffb49c8000817bf3b93a7d8875b0170af07c",
+      "receiptSha256": "ddda6549c735dd84fa6a0ccc2c377d08d79825c9a6b0609bcbf41e7292e3b2e6",
+      "stdoutSha256": "7e178465a870289df402e7af2c65e52e3888f7ec01003312f45e15628d9dbeed",
+      "thread": null
+    },
+    {
+      "key": "check:identity-cli-acceptance:00d1665ecfa474fc3a10fff0",
+      "id": "a0ba97560e884eae5466545a",
+      "exitCode": 0,
+      "requestDigest": "3d206a76099c1245715f74959fdf0385988aa35370404e8bb2386f770230e423",
+      "receiptSha256": "337bea7c8169f8714d17e9ae0e3e67f7950e41bc74d982877e5640f0cd58cc40",
+      "stdoutSha256": "5be85ec9e9d349e8042943424ce88ef70ccb3a2044cce366ea3dca3a1b4de2d0",
+      "thread": null
+    },
+    {
+      "key": "implement",
+      "id": "507d79915bd8624eb7c43826",
+      "exitCode": 0,
+      "requestDigest": "2c1dcb3037f89674749b1e8eb68adfc3c6985cde959de77a35c07a65548d5a37",
+      "receiptSha256": "6cced65af1a38bfc9b9b9862700dfed93fbe651f039c0dc8e9cc666a8bae02bf",
+      "stdoutSha256": "22f87de5f2dd2f76fdbbdf8a9eaccbaa8a986c14ba740a721ce28e4ce66d56bc",
+      "thread": "01a15a4e-c1fb-71c2-9790-28315b6b973a"
+    },
+    {
+      "key": "plan:v2",
+      "id": "73f81a00763a619b02dbf079",
+      "exitCode": 0,
+      "requestDigest": "77b95cfa4d05d3ebbbad72282781963fa2ce84022e83dc822e1a639ddb73ae7e",
+      "receiptSha256": "678bd8d431014bd6d8918e6118a1fd769cf565eb7742fe5f801c1b78a3905d7f",
+      "stdoutSha256": "c852d7c064a770763641ffc0189e7d9852b2bb9b5bec55af5d2ccbf5bc964679",
+      "thread": "01a15a4a-4e15-7c93-a9d6-d35157140ed6"
+    },
+    {
+      "key": "review:v2:blind:00d1665ecfa474fc3a10fff071459eb3",
+      "id": "d1edcc9ba087b095a7be5cf5",
+      "exitCode": 0,
+      "requestDigest": "6e3c4f5ca53fc0cab16dd4e86f921c6440fac4da671d772c68c228df12d5b2bf",
+      "receiptSha256": "d305fa5f7b420463c83aa7ebbbaa77e3619d692999fe97900957ebcb592b29a6",
+      "stdoutSha256": "e9fa7352a6e8d8840f6bb765022ef3d6480dedba0694945ef4a2421400a58928",
+      "thread": "01a15a53-152b-7d42-8a0a-6faed5d54260"
+    },
+    {
+      "key": "review:v2:edge:00d1665ecfa474fc3a10fff071459eb3",
+      "id": "153230cdcf5f98595c38d944",
+      "exitCode": 0,
+      "requestDigest": "059785d9435ea8b59261da32768c2ecf077cd0af050385203d949a5bf9d35269",
+      "receiptSha256": "f3ff1e23aaf1b637e40ead75fa63976580b567b5c40f0ea69386e0e8344ecfda",
+      "stdoutSha256": "a69156f8361b05ce02db6974c8c2ecba51a2c56d91c3cf42f8282259bf9303fa",
+      "thread": "01a15a53-1561-7d11-a28b-f3c6187b1b12"
+    },
+    {
+      "key": "review:v2:verification:00d1665ecfa474fc3a10fff071459eb3",
+      "id": "803b15ee485cf80c03cd303b",
+      "exitCode": 0,
+      "requestDigest": "79c800bc9bcff1945bf8b4738b2095d19cf1ff2a7f055c5dd558aa804ed02ff7",
+      "receiptSha256": "3350331a79bde7b33cfaf0ae578d87586a1fcac1d270bb8c0e280f93e71c57df",
+      "stdoutSha256": "e022fdffd7be3bd9ca3751c9d30e926ec5a560d94cbf3a2611fde0a6bc1a4ebe",
+      "thread": "01a15a53-1561-7173-b2d9-1cae130a9eea"
+    }
+  ],
+  "dispatches": [
+    {
+      "key": "bmad-render",
+      "attemptId": "bced78684c14da73c9b5fd0a",
+      "at": "2026-10-20T17:09:37.954Z"
+    },
+    {
+      "key": "plan:v2",
+      "attemptId": "73f81a00763a619b02dbf079",
+      "at": "2026-10-20T17:09:40.560Z"
+    },
+    {
+      "key": "implement",
+      "attemptId": "507d79915bd8624eb7c43826",
+      "at": "2026-10-20T17:14:32.379Z"
+    },
+    {
+      "key": "review:v2:blind:00d1665ecfa474fc3a10fff071459eb3",
+      "attemptId": "d1edcc9ba087b095a7be5cf5",
+      "at": "2026-10-20T17:19:15.449Z"
+    },
+    {
+      "key": "review:v2:verification:00d1665ecfa474fc3a10fff071459eb3",
+      "attemptId": "803b15ee485cf80c03cd303b",
+      "at": "2026-10-20T17:19:15.471Z"
+    },
+    {
+      "key": "review:v2:edge:00d1665ecfa474fc3a10fff071459eb3",
+      "attemptId": "153230cdcf5f98595c38d944",
+      "at": "2026-10-20T17:19:15.495Z"
+    },
+    {
+      "key": "check:diagnostics-tests:00d1665ecfa474fc3a10fff0",
+      "attemptId": "9ae405cf3fc74cda5398c835",
+      "at": "2026-10-20T17:21:24.056Z"
+    },
+    {
+      "key": "check:identity-cli-acceptance:00d1665ecfa474fc3a10fff0",
+      "attemptId": "a0ba97560e884eae5466545a",
+      "at": "2026-10-20T17:21:26.904Z"
+    }
+  ],
+  "sourceCommitCount": 1,
+  "commitSha": "70b0bd52de09ad7530ce914112078b6ce02209ce",
+  "pr": {
+    "number": 17,
+    "url": "https://github.com/Varnahg/StrahovCrazyShow/pull/17",
+    "head": "70b0bd52de09ad7530ce914112078b6ce02209ce",
+    "base": "6971dfb52ff823a1031b40492833b57b2d888b02",
+    "mergeSha": "d1269d5a1a7b30a9fb271705c89c61a26f107b41",
+    "merged": true
+  },
+  "reviews": [
+    {
+      "lens": "blind",
+      "attemptId": "d1edcc9ba087b095a7be5cf5",
+      "completed": true,
+      "findings": [],
+      "rawSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "lens": "edge",
+      "attemptId": "153230cdcf5f98595c38d944",
+      "completed": true,
+      "findings": [],
+      "rawSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "lens": "verification",
+      "attemptId": "803b15ee485cf80c03cd303b",
+      "completed": true,
+      "findings": [],
+      "rawSha256": "cf87c32d185d257a566f972441f0b6160112e6bf4ec0bc1cd98dfbbdf87ce05b"
+    }
+  ],
+  "checks": [
+    {
+      "args": [
+        "--test",
+        "tests/diagnostics-report.test.ts"
+      ],
+      "attemptId": "9ae405cf3fc74cda5398c835",
+      "command": "node",
+      "exitCode": 0,
+      "finishedAt": "2026-10-20T17:21:25.495Z",
+      "id": "diagnostics-tests",
+      "requestDigest": "e04272070aee55c0473ead809a24ffb49c8000817bf3b93a7d8875b0170af07c",
+      "schemaVersion": 1,
+      "signal": null,
+      "stderrPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-50-73ab89b4aced\\attempts\\9ae405cf3fc74cda5398c835\\stderr.log",
+      "stdoutPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-50-73ab89b4aced\\attempts\\9ae405cf3fc74cda5398c835\\stdout.log",
+      "workerExitCode": 0
+    },
+    {
+      "args": [
+        "docs/performance/evidence/diagnostic-identity-20261020/accept-cli.mjs"
+      ],
+      "attemptId": "a0ba97560e884eae5466545a",
+      "command": "node",
+      "exitCode": 0,
+      "finishedAt": "2026-10-20T17:21:27.863Z",
+      "id": "identity-cli-acceptance",
+      "requestDigest": "3d206a76099c1245715f74959fdf0385988aa35370404e8bb2386f770230e423",
+      "schemaVersion": 1,
+      "signal": null,
+      "stderrPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-50-73ab89b4aced\\attempts\\a0ba97560e884eae5466545a\\stderr.log",
+      "stdoutPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-50-73ab89b4aced\\attempts\\a0ba97560e884eae5466545a\\stdout.log",
+      "workerExitCode": 0
+    }
+  ],
+  "cliAcceptance": {
+    "syntheticFixture": true,
+    "inputSha256": "4056d5f4cb396a9b0dfd92d2cc915a7bda3ed1f8146fbfa99873f15e52dd96c6",
+    "actualInconsistentWindows": 2,
+    "expectedInconsistentWindows": 2,
+    "frames": 9,
+    "observedClock": {
+      "callbacks": 20,
+      "droppedMs": 12
+    },
+    "comparableIntervals": 2,
+    "inputUnchanged": true
+  },
+  "ciChecks": [
+    {
+      "appId": 15368,
+      "baseSha": "6971dfb52ff823a1031b40492833b57b2d888b02",
+      "checkId": 118775409527,
+      "conclusion": "success",
+      "event": "pull_request",
+      "headSha": "70b0bd52de09ad7530ce914112078b6ce02209ce",
+      "name": "verify",
+      "runAttempt": 1,
+      "runId": 39465415395,
+      "status": "completed",
+      "testMergeSha": "da876859f2b0a96db0e1bedad2351762f8f02013",
+      "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39465415395"
+    },
+    {
+      "appId": 15368,
+      "baseSha": "6971dfb52ff823a1031b40492833b57b2d888b02",
+      "checkId": 118775409011,
+      "conclusion": "success",
+      "event": "pull_request",
+      "headSha": "70b0bd52de09ad7530ce914112078b6ce02209ce",
+      "name": "source-secret-hygiene",
+      "runAttempt": 1,
+      "runId": 39465415405,
+      "status": "completed",
+      "testMergeSha": "da876859f2b0a96db0e1bedad2351762f8f02013",
+      "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39465415405"
+    }
+  ],
+  "mainChecks": [
+    {
+      "appId": 15368,
+      "baseSha": null,
+      "checkId": 118779429793,
+      "conclusion": "success",
+      "event": "push",
+      "headSha": "d1269d5a1a7b30a9fb271705c89c61a26f107b41",
+      "name": "verify",
+      "runAttempt": 1,
+      "runId": 39466573882,
+      "status": "completed",
+      "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39466573882"
+    },
+    {
+      "appId": 15368,
+      "baseSha": null,
+      "checkId": 118779430088,
+      "conclusion": "success",
+      "event": "push",
+      "headSha": "d1269d5a1a7b30a9fb271705c89c61a26f107b41",
+      "name": "source-secret-hygiene",
+      "runAttempt": 1,
+      "runId": 39466574098,
+      "status": "completed",
+      "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39466574098"
+    }
+  ],
+  "acceptance": {
+    "baseSha": "6971dfb52ff823a1031b40492833b57b2d888b02",
+    "evidenceUrl": "https://github.com/Varnahg/StrahovCrazyShow/pull/17",
+    "headSha": "70b0bd52de09ad7530ce914112078b6ce02209ce"
+  },
+  "repeat": {
+    "results": [
+      {
+        "command": "resume",
+        "exitCode": 0,
+        "status": "complete"
+      },
+      {
+        "command": "run",
+        "exitCode": 0,
+        "status": "complete"
+      }
+    ],
+    "unchanged": true,
+    "stateSha256": "164ba946dd2bcf0edf07e3c3dc3a1a13853f9479271d9d8732efe2126703f3cd"
+  },
+  "linear": {
+    "issue": "KEY-50",
+    "status": "Done",
+    "markerComments": 1,
+    "commentId": "81b88228-8d7b-4bc2-8052-9723aa7f0ce6",
+    "parent": "KEY-2",
+    "parentStatus": "In Progress"
+  },
+  "coordinatorNote": "The first PowerShell launcher failed before Start-Process; the original helper is retained. The actual controller run started once from zero prior KEY-50 runs; no fault injection, manual state edits or repair generations."
+}

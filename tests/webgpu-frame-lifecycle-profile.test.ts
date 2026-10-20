@@ -52,7 +52,7 @@ function fixture() {
       tick(this.label === "query" ? 17 : 11);
       return this.result;
     }
-    beginRenderPass(descriptor: unknown) {
+    beginRenderPass(_descriptor: unknown) {
       assert.ok(this instanceof Encoder);
       tick(2);
       return new Pass();
@@ -61,7 +61,7 @@ function fixture() {
   class Device {
     features = new Set(["timestamp-query"]);
     queue = {
-      submit(buffers: unknown) {
+      submit(_buffers: unknown) {
         tick(1);
         return submitted;
       },
@@ -140,7 +140,7 @@ function fixture() {
       return { timerQuery: {} };
     }
     _initializeLimits() {}
-    _isOverFrameTime(timestamp: number) {
+    _isOverFrameTime(_timestamp: number) {
       return this.capped;
     }
     _queueNewFrameForRenderLoop() {

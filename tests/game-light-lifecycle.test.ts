@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { Script } from "node:vm";
 import ts from "typescript";
+import { readGameSource } from "./helpers/game-source";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -20,27 +20,7 @@ import { GltfLightBudget } from "../client/gltf-light-budget";
 // Extract the production lifecycle code instead of restating its hook calls.
 // Only browser/render IO is replaced: real Babylon scene, materials, lights and
 // both controllers still execute. This is a wiring/ownership test, not GPU QA.
-const source = ts.createSourceFile(
-  "game.ts",
-  readFileSync(
-    process.env.GAME_LIGHT_SOURCE ??
-      new URL("../client/game.ts", import.meta.url),
-    "utf8",
-  ),
-  ts.ScriptTarget.Latest,
-  true,
-);
-const gameClass = source.statements.find(
-  (node): node is ts.ClassDeclaration =>
-    ts.isClassDeclaration(node) && node.name?.text === "Game",
-)!;
-function member(name: string) {
-  const result = gameClass.members.find(
-    (node) => node.name?.getText(source) === name,
-  );
-  assert.ok(result, `Game.${name} must exist`);
-  return result;
-}
+const { source, gameClass, member } = readGameSource(process.env.GAME_LIGHT_SOURCE);
 function findNodes<T extends ts.Node>(
   node: ts.Node,
   predicate: (node: ts.Node) => node is T,

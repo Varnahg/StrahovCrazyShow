@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-fixtures-python-20261020",
+  "title": "KEY-48: Odstranit opakované fixture načítání a skrytý Python výstup",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/helpers/game-source.ts",
+    "tests/game-quality-preparation.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-light-lifecycle.test.ts",
+    "tests/game-webgpu-startup.test.ts",
+    "scripts/fetch-streets.py",
+    "scripts/fetch-expansion-reference.py",
+    "scripts/create-north-court-style.py",
+    "docs/agents/handoffs/global-refactor-fixtures-python-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Fixture zachovají každé GAME_*_SOURCE, pořadí AST členů, lokální VM a orákula; neaplikovat na odlišný UI efekt.",
+    "ortho má volitelný explicitní výstupní adresář, bez globální mutace volajícího, původní DOCS default zůstane dynamický při volání.",
+    "Odstranit okamžité přepsání sportTag se stejným výsledkem/pořadím JSON; bez network/Blender/download/generování assetů."
+  ],
+  "verification": [
+    "node --import tsx --test tests/game-quality-preparation.test.ts tests/game-light-preparation.test.ts tests/game-light-lifecycle.test.ts tests/game-webgpu-startup.test.ts",
+    "Python AST/compile a stubované I/O porovnání původního a nového chování bez stahování."
+  ],
+  "notes": [
+    "Výslovně objednaný celkový refaktoring KEY-48; průzkum/porovnání variant v docs/refactoring/20261020/README.md.",
+    "Pouze přesný disjunktní scope; podagent přečte pravidla a policy, získá vlastní claim, nevyvolává rekurzivní BMAD. Implementace, cílený refaktoring, ověření a handoff společně.",
+    "Plný build/test/integrace a praktická přejímka patří koordinátorovi pod samostatnou rezervací. Žádné cizí Game/UI/tráva WIP.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
+  ]
+}

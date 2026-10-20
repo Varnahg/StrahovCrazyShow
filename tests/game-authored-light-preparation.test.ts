@@ -190,7 +190,7 @@ for(const initialQuality of ["low","medium"] as const) test(`native cold opposit
   game.applyRenderQuality("low",MANUAL_HARDWARE_SCALING.low);
   actor.vehicle=true;car.setEnabled(true);parked.setEnabled(false);game.alignVehicleCamera();game.updateCameraFollow(new Vector3(pos.x,pos.y,pos.z),rig.eyeHeight,1);
   const replayReferences=new Map<number,Map<string,{effect:any;context:any;defines:string}>>();
-  for(const [index,count] of [1,0,1,0].entries()) {
+  for(const [,count] of [1,0,1,0].entries()) {
     game.updateRenderEnvironment(pos,rig,false,0,0,game.timeOverride,false);
     lights.forEach((light,i)=>{light.setEnabled(i<count);light.intensity=i<count?.7:0;});
     const before=programs;const started=performance.now();
@@ -260,7 +260,8 @@ test("actual inner Game selects target light membership after environment and pr
 
 test("fresh actual glass submeshes reuse representative vehicle1 after its vehicle0-to1 history",async t=>{
   const f=factories(t),{engine,scene,camera,budget}=f;
-  const sun=new DirectionalLight("celestial",Vector3.Down(),scene),hemi=new HemisphericLight("sky",Vector3.Up(),scene);
+  const sun=new DirectionalLight("celestial",Vector3.Down(),scene);
+  new HemisphericLight("sky",Vector3.Up(),scene);
   sun.setEnabled(false);
   const point=new PointLight("mapped point",Vector3.Up(),scene);point.falloffType=Light.FALLOFF_STANDARD;point.setEnabled(false);
   const cinematic=new CinematicAtmosphere(scene,camera,sun),beam=new VehicleLighting(scene),stable=new StableLightState(scene),car=new TransformNode("car",scene);

@@ -201,7 +201,7 @@ test("actual visible shoe vertices stay above flat roads, a 12% incline and 15/3
     for (const direction of [1, -1])
       for (const speed of [1.8, 4.6, 7]) {
         const c = setup(),
-          floor = (x: number, z: number) =>
+          floor = (_x: number, z: number) =>
             kind === "slope"
               ? 0.12 * z
               : kind === "stairs"
@@ -273,7 +273,7 @@ test("actual visible shoe vertices stay above flat roads, a 12% incline and 15/3
 test("15cm capsule steps on known stairs are softened by the visual pelvis without moving the root", () => {
   for (const direction of [1, -1]) {
     const c = setup(),
-      floor = (x: number, z: number) => 0.15 * Math.floor(z / 0.35);
+      floor = (_x: number, z: number) => 0.15 * Math.floor(z / 0.35);
     let previousHead = 0,
       maximumDelta = 0;
     for (let i = 0; i < 240; i++) {

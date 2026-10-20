@@ -14,7 +14,6 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import {
   GLTFFileLoader,
-  GLTFLoaderState,
 } from "@babylonjs/loaders/glTF/glTFFileLoader";
 import {
   registerGLTFExtension,

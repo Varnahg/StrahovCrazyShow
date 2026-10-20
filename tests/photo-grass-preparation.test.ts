@@ -12,7 +12,6 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Light } from "@babylonjs/core/Lights/light";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { PhotoGrassPreparation } from "../client/photo-grass-preparation";
 import { PhotographicGrass } from "../client/photographic-grass";
 import { acquireGrassResources, type GrassResources } from "../client/photo-grass-resources";
 import { PhotoGrassBatch, type GrassRootState } from "../client/photo-grass-batch";

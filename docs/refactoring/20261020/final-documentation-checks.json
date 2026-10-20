@@ -1,0 +1,105 @@
+{
+  "checkedAt": "2026-10-20T09:39:03.692Z",
+  "status": "passed",
+  "readmeCheck": {
+    "status": "passed",
+    "localLinksEach": 19
+  },
+  "localLinks": 405,
+  "newMissingTargets": [],
+  "preexistingHistoricalMissingTargets": [
+    {
+      "file": "docs/verification.md",
+      "target": "vegetation/realism-audit-20261012/README.md"
+    },
+    {
+      "file": "docs/verification.md",
+      "target": "vegetation/realism-audit-20261012/tree-audit.json"
+    },
+    {
+      "file": "docs/verification.md",
+      "target": "vegetation/realism-audit-20261012/ground-audit.json"
+    }
+  ],
+  "reports": [
+    {
+      "file": "README.md",
+      "bytes": 7562,
+      "sha256": "50b367c465d3dbc032956aae2e69aa31802996c81a7b95210f7c8e9a708377b5",
+      "localLinks": 19
+    },
+    {
+      "file": "README.cs.md",
+      "bytes": 7917,
+      "sha256": "afc2d5b4939f5c7ae4f31449e47b25f23d74fff78789814fbed1b0ce4d6ab710",
+      "localLinks": 19
+    },
+    {
+      "file": "docs/README.md",
+      "bytes": 1825,
+      "sha256": "4a5a2462460ad4f2da5e0df446d00864883f76e421bd26c0040dfa9b1c925960",
+      "localLinks": 25
+    },
+    {
+      "file": "docs/acceptance.md",
+      "bytes": 6119,
+      "sha256": "caaec71cafbd6d1ea5a771377c4b853487aa7328040486689d42ffd1db317922",
+      "localLinks": 11
+    },
+    {
+      "file": "docs/performance/README.md",
+      "bytes": 10233,
+      "sha256": "bdbcebcd236b1fae32de0c77d4f00a67dd0537d88048c91dd196db0d56a1b60d",
+      "localLinks": 11
+    },
+    {
+      "file": "docs/agents/architecture.md",
+      "bytes": 11379,
+      "sha256": "bfd0084ec5a722c833bb4b66860f02a4c29dd21a693f644ac4774d80444b6fed",
+      "localLinks": 45
+    },
+    {
+      "file": "docs/verification.md",
+      "bytes": 148265,
+      "sha256": "4f9dc68e80b0c79e74a587ff678c82d12df3f97800a00ada14255d3d420fcd6f",
+      "localLinks": 275
+    }
+  ],
+  "historicalSuffix": {
+    "bytes": 143500,
+    "sha256": "374eb1f46423c98c23e1249e24110907b14c6b9b4bf631d06c4be14843c56e78"
+  },
+  "liveCodeMatchesFrozen": {
+    "files": 611,
+    "mismatched": []
+  },
+  "reviewCorrections": [
+    {
+      "finding": "Explicit frozen working directory missing before build",
+      "resolution": "Set-Location added after snapshot creation; server/preview/network cwd explicit; report returns three levels to original repository root."
+    },
+    {
+      "finding": "Final PR CI wording premature",
+      "resolution": "Verification now describes ongoing evidence collection in KEY-48 without asserting CI already ran."
+    }
+  ],
+  "independentReview": {
+    "reviewers": [
+      "review_final_docs_blind",
+      "review_maintenance_edges",
+      "review_maintenance_verification"
+    ],
+    "findings": [
+      {
+        "id": "explicit-snapshot-cwd",
+        "status": "fixed-and-confirmed"
+      },
+      {
+        "id": "premature-final-ci-wording",
+        "status": "fixed-and-confirmed"
+      }
+    ],
+    "remainingFindings": [],
+    "confirmedAt": "2026-10-20T09:40:50.956Z"
+  }
+}
