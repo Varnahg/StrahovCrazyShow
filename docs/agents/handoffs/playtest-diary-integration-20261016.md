@@ -112,3 +112,42 @@ Připravené předání bylo před uvolněním uloženo v dokumentačním commit
 Po změně registru bylo znovu ověřeno 12/12 nezměněných source/test WIP souborů a 4/4 nezměněných uvolněných souborů. Tři media/report/timeline claims zůstaly pod původními vlastníky. Reclaim převzal pouze původní vlastní adaptér client/playtest-diary.ts. Aktualizovaná JSON evidence obsahuje skutečné časy a výsledek kontrol. Dokončovací commit obsahuje pouze předání/evidenci a jedinou změněnou task definici; žádný produktový kód. Žádná integrace do main ani push se zde neprovádí. Dočasný koordinační claim bude po jeho zapsání uvolněn.
 
 Příjemce **refactor-01a15658-audit** může po vlastním úspěšném claimu zkoumat a refaktorovat požadované čtyři cesty na svém základu. Toto není převzetí či uvolnění vlastních diary modulů, ani přijetí cizího dirty Game/UI ve společném checkoutu. Budoucí znovuzapojení deníku musí respektovat nového vlastníka těchto integračních bodů.
+
+## Úzké předání capture mechanismu pro feedback KEY-52 — 20. 10. 2026
+
+**Příjemce: feedback-impl-01a15a3e-root**, chat `01a15a3e-59e3-73f1-9173-357f36b3985a`, worktree `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020`, task **feedback-capture-20261020**. Přes read_thread bylo ověřeno přímé lidské zadání implementovat formulář→server→Linear s automatickým snímkem bez HUD a souhlas „Ano, domluv úzké předání“. Tento záznam neobsahuje žádnou konfiguraci ani přístupové údaje příjemce.
+
+### Rozhodnutí a vlastnictví
+
+Původní koordinátor KEY-21 **výslovně předává k read-only využití a extrakci pouze jednorázovou capture primitivu** z níže identifikovaného WIP do nového `client/rendered-frame-capture.ts`, jeho vlastního `tests/rendered-frame-capture.test.ts` a `docs/agents/handoffs/feedback-capture-20261020.md`. Příjemce před zápisem získá vlastní disjunktní claim, provede vlastní úzký refaktoring a ověření a nese odpovědnost za nový modul. Doložené odvození si zachová v handoffu včetně původního SHA.
+
+Původní `client/playtest-capture.ts`, `tests/playtest-capture.test.ts`, `shared/playtest-diary.ts` a další diary soubory se **nemění, nepřebírají, necommitují a jejich rezervace se neuvolňují**. Celý deník zůstává pozastavený. Nový modul nebude záviset na neintegrovaném diary protokolu ani jeho transportu. Budoucí přepojení samotného deníku na společnou primitivu vyžaduje samostatné předání; není součástí tohoto svolení.
+
+### Přesná provenience
+
+Zdrojová worktree je `C:/Users/rezac/.codex/worktrees/playtest-diary/StrahovCrazyShow`, dokumentační HEAD před tímto předáním `0a598a6a5db4bb4e81469543c72b96b5d88720ed`, runtime základ9d98ffc. Tři zdrojové soubory jsou stále untracked WIP, nikoli přijatý runtime commit:
+
+- `client/playtest-capture.ts` — SHA256 **cf408483376eaa0303b2fcab9027305354a9d89c74d654954d693a2a08a164c8**.
+- `tests/playtest-capture.test.ts` — SHA256 **bc779a567ab8a927bd0eb2d20ec3e68633adcdad7f266eaebe6855de4b94a880**.
+- `shared/playtest-diary.ts` — SHA256 **818d55aff03e4eadc98155dd7f72f7dcf11e2dff807b4f602bec3edce6a7ad6f**; pouze reference pro minimální obecný snímek kamery/renderu a odpojení plain dat.
+
+Strojově čitelný rozsah, hashe, kotvy kódu, testy a statické nálezy jsou v [evidenci capture předání](../../performance/evidence/playtest-diary-20261016/feedback-capture-handoff-20261020.json).
+
+### Co lze odvodit a co vynechat
+
+Využitelný základ: omezený engine/canvas adaptér a end-frame observer; spotřeba skutečného čerstvého frame; kontrola rozměrů; soukromý snapshot času, kamery a matic; kopie existujícího canvasu přes `drawImage` do jednoho vlastního 2D canvasu; právě jedna asynchronní komprese `toBlob`; explicitní chyby, storno a odpojení observeru. Žádný druhý scene.render, RTT, změna kamery/rozlišení, framebuffer nastavení ani trvalé preserveDrawingBuffer.
+
+Nepřebírat automatické travel/zone/turn triggery, bursty, diary identity/schema/event protokol, hlavičky, hash/upload/retry frontu, retenční politiku ani `server/playtest-artifacts.ts`. Pro metadata použít minimální obecný kontrakt odpovídající aktuálnímu produkčnímu rendereru příjemce. Čas a stav se vážou ke zkopírovanému snímku, nikoli ke skončení komprese. Kopie canvasu vylučuje DOM HUD, nikoli prvky, které by byly kreslené přímo do canvasu; to je potřeba ověřit na aktuální hře.
+
+### Meze důkazů a povinné kontroly odvozené primitivy
+
+V tomto předání nebyly spuštěny nové testy ani GPU. Historická zpráva media agenta uváděla10client+8server cílených testů PASS, po nich ale následovaly úzké TS chyby a nedokončené opravy. Neexistuje přijatý finální TS/produkční/GPU výsledek pro nynější hash. Současný capture test má10pojmenovaných testů s mock canvas/engine; jejich obsah byl nyní pouze přečten. Tyto důkazy nepotvrzují framebuffer pixely, orientaci, korelaci skutečné kamery ani režii GPU.
+
+Nezávislé čtecí posouzení `/root/capture_handoff_check` potvrdilo mechanismus a zaznamenalo omezení, která se nemají slepě zkopírovat:
+
+1. Timeout původního požadavku hlídá čekání na frame a před kompresí se ruší. Chybí encode timeout; nevrácený toBlob callback může ponechat encoding/idle neukončené.
+2. Chybí storno jednotlivého požadavku. Browserovou kompresi nelze fyzicky zrušit; nové API musí logicky dokončit storno a odmítnout pozdní výsledek bez souběžného encoderu.
+3. submitFrame drží živou referenci do endFrame. Caller musí zachovat skutečný frame; kopie metadat je odpojená, ale není hluboce zmrazená a původní callbacky dostávají stejný objekt používaný následnou async cestou.
+4. Původní capture-copied callback se vyvolá před nastavením encoding příznaku. Synchronní dispose v callbacku může být následovaný spuštěním komprese. Nová primitiva musí vlastnictví a generation guard nastavit před externími callbacky nebo znovu zkontrolovat lifecycle.
+
+Příjemce ověří samostatné storno, chybějící frame, encode timeout, pozdní callback po nové generaci, opakované otevření/zavření, mutaci předaných metadat, dispose ze synchronního callbacku a omezený počet encoderů. Prakticky ověří snímek současné hry bez HUD, skutečnou kameru/postprocessing/rozlišení, nulový další render a cenu kopie. Tímto handoffem se nestvrzuje dokončení KEY-21 ani funkčnost nového feedbacku.
