@@ -1,0 +1,280 @@
+$ tsx --test tests/*.test.ts
+BJS - [22:34:35]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:35]: Babylon.js v9.30.0 - Null engine
+✔ effective enabled cache keeps scene order and invisible masters through own, ancestor and reparent changes (65.3224ms)
+BJS - [22:34:35]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:35]: Babylon.js v9.30.0 - Null engine
+✔ same-task new/remove/stream replacement cannot miss meshes before deferred notifications and disposal releases listeners (38.1136ms)
+✔ preexisting or later custom candidate providers retain ownership (16.9404ms)
+✔ actual native rendering retains instance LOD, thin instances, disabled sources and dynamic view/parent transitions (558.3388ms)
+✔ startup shaders do not immediately lower quality; sustained overload does (4.9348ms)
+✔ a single long frame and moderate timing jitter do not cause degradation (11.0217ms)
+✔ slow frames use real elapsed windows at 60 and 144 FPS goals (9.7935ms)
+✔ continuous GPU overload reaches a bounded floor, preserving world budgets (6.0649ms)
+✔ measured CPU limit lowers scene detail before reducing pixels (0.8498ms)
+✔ without an actual GPU timing query, RAF and CPU durations cannot prove CPU bound (1.3283ms)
+✔ manual quality remains fixed even at low FPS and switching back resumes adaptation (2.0964ms)
+✔ hidden tabs and fixed-condition benchmarks cannot poison quality history (10.9927ms)
+✔ long tab gaps and invalid clock samples reset or leave measurements unchanged (2.2189ms)
+✔ recovery waits for sustained healthy presentation and failed probes back off (4.1728ms)
+✔ targets do not impose a 60 FPS cap and only an independent ceiling limits the goal (3.2611ms)
+✔ limited scaling still permits lower scene detail; presets and validators are explicit (2.2233ms)
+✔ idle presentation cadence recognizes 60 and 144 Hz without deriving a ceiling from the game (2.3387ms)
+✔ presentation preflight never starts timers without a browser (0.6395ms)
+✔ validates planned overlaps and reports clean, unreserved tasks (2537.888ms)
+✔ claim records source and owner, gates heartbeat/release, and preserves edits (8369.8671ms)
+✔ independent simultaneous CLI processes have exactly one conflicting winner (3032.6183ms)
+✔ path claims compare case-insensitive ancestors but allow neighboring filenames (5509.7748ms)
+✔ exclusive resources serialize disjoint file scopes and resource-only tasks (7190.0237ms)
+✔ port resource aliases and out-of-range ports cannot bypass exclusivity (6973.1908ms)
+✔ dirty staged, unstaged and untracked paths require explicit adoption (4826.2861ms)
+✔ a staged rename blocks both the source and destination scopes (3268.5398ms)
+✔ status and dependencies gate claims, with cycles and unknown ids rejected (8429.1382ms)
+✔ unsafe paths and malformed task structure fail validation (17258.6316ms)
+✔ stale heartbeat remains reserved until the actual owner releases (6607.3226ms)
+✔ corrupt registry and abandoned mutex fail closed without deleting evidence (6758.4844ms)
+✔ linked Git worktrees use one registry and retain original claim scope (10897.583ms)
+✔ an owner can release even if catalog edits are invalid, without claiming completion (4660.327ms)
+✔ argument mistakes cannot mutate the registry (3013.1863ms)
+BJS - [22:34:45]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:46]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:47]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:48]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:48]: Babylon.js v9.30.0 - Null engine
+✔ flashlight carries the right forearm forward without changing leg IK and releases it in a vehicle (485.8043ms)
+✔ real rig walks, runs and sprints from measured travel at 30/60/144 FPS (550.4985ms)
+✔ stopping against an obstacle settles both limbs without root bob or time-driven steps (96.4364ms)
+✔ a one-frame interpolation gap preserves the distance-driven gait instead of restarting a step (30.926ms)
+✔ body rotation takes the shortest path across the minus-pi/plus-pi seam (44.7416ms)
+✔ gestures remain in the shoulders and smoothly return both arms to idle (122.475ms)
+✔ teleports, sleeping tabs and vehicle transitions cannot become a rapid stride (34.0152ms)
+✔ articulated knees/elbows/ankles preserve human proportions and closed shared silhouettes (234.319ms)
+✔ planted feet stay at their world anchors while knees bend and the body moves (249.8671ms)
+✔ jump folds knees and returns to stable grounded contact without moving the root (39.9948ms)
+✔ authored facial relief has outward normals and explicit Blender winding in either scene handedness (180.2296ms)
+✔ skin, cloth, hair and eyes have shared role-specific linear PBR materials without losing chosen colours (254.9249ms)
+✔ all six hairstyles leave both pupils visible and expose a stable first-person eye height (218.5756ms)
+BJS - [22:34:38]: Babylon.js v9.30.0 - Null engine
+✔ sill and jamb UVs use physical lengths with unit geometric normals (5.9218ms)
+✔ real near geometry has outward nonzero normals, valid tangent frames and closed frame returns (388.9032ms)
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+Reality geometry audit {
+  buildings: 120,
+  windows: 3242,
+  detailTriangles: 1326031,
+  farTriangles: 11661,
+  source: 'shared/data/facade-reality.json',
+  windowModelSource: 'shared/data/building-window-kit.json',
+  marketModelSource: 'shared/data/market-detail-kit.json',
+  b4PanelModelSource: 'shared/data/b4-panel-kit.json',
+  authoredDetail: 'near',
+  measured: false
+} { meshes: 1109 }
+BJS - [22:34:41]: Babylon.js v9.30.0 - Null engine
+✔ headless architecture retains authored texture recipes without requesting their images (72.5425ms)
+✔ photo interpreted window pitch fits every original edge and retains outward normals (55.3028ms)
+✔ B6 north end preserves broad blank piers and sparse core openings (1.5828ms)
+✔ B12 three levels retain narrow transom windows, B1 and shops have no dorm grid (0.5479ms)
+✔ 007 doorway is at southeast club, reception and R-ko POI retain explicit uncertainty (0.4689ms)
+✔ architecture batches remain bounded (2585.6586ms)
+✔ B6 north reception shell preserves the canonical opening and closes the former west entry (1899.5744ms)
+BJS - [22:34:38]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+✔ exact moonless 02:00 reserves headlight and B6 slots without raising the four-light material cap (346.8228ms)
+✔ lit lunar key reserves one street slot immediately for driving and restores it immediately on exit (278.2093ms)
+✔ real dusk keeps solar key, hemisphere, B6 and car by reducing street capacity to zero (98.5561ms)
+✔ daytime car request consumes no beam slot and low quality retains at most one mapped street lamp (113.5899ms)
+✔ nearest movement retains its half-second cadence while a capacity change immediately refreshes the nearest lamp (138.6492ms)
+BJS - [22:34:34]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:34]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:34]: Babylon.js v9.30.0 - Null engine
+✔ Babylon Light override still scans identical toggles but steady ArtLighting no longer does (339.3546ms)
+✔ lamp guard retains exact two-nearest night states, movement, quality and new-mesh lighting (104.0221ms)
+✔ lamp guard compares requested own state beneath an inactive parent and preserves parent reactivation (78.5821ms)
+Source/public asset metadata {
+  kind: 'environment',
+  bytes: 14874,
+  sha256: 'c1e8ce89a4d42fde0fcf1996d475b535e859ad06b3fbba824b1fd7a3b0f62af7'
+}
+Source/public asset metadata {
+  kind: 'b6',
+  bytes: 6826,
+  sha256: '299b5a62b3f7da36a21f90d4a98233871d1608d6c748a41f3ea4c0e97d6fc1ef'
+}
+Source/public asset metadata {
+  kind: 'surfaces',
+  bytes: 10986,
+  sha256: 'c3cf978e1db6e20f21946a8cb3e0d5716dbc730f671b09151f27ad373013d474'
+}
+Source/public asset metadata {
+  kind: 'transit',
+  bytes: 2520,
+  sha256: '6c8ac02219def228c438726a6a8cf6b5d7cda991f98e6281dc288417e34417d0'
+}
+✔ environment imported manifest is byte-identical to its public counterpart and satisfies the runtime schema (19.7329ms)
+✔ b6 imported manifest is byte-identical to its public counterpart and satisfies the runtime schema (6.1938ms)
+✔ surfaces imported manifest is byte-identical to its public counterpart and satisfies the runtime schema (22.2818ms)
+✔ transit imported manifest is byte-identical to its public counterpart and satisfies the runtime schema (4.1755ms)
+✔ runtime module graph imports metadata from source rather than the Vite public directory (1801.7046ms)
+✔ public-import guard catches module edges while allowing public asset fetch URLs (5.0883ms)
+✔ lunar phase photometry has an opposition surge and inverse-square distance falloff (3.4215ms)
+✔ atmospheric extinction smoothly removes keys at horizon and chooses the dominant real body (1.5618ms)
+✔ model visibility controls EXP fog in metres with bounded artistic fallback (1.8247ms)
+✔ snow/mixed precipitation is sourced from phase and intensity, never a temperature threshold (8.8216ms)
+BJS - [22:34:33]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:33]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:33]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:34]: Babylon.js v9.30.0 - Null engine
+✔ native sky and celestial materials preserve GLSL host uniforms, textures, geometry and cleanup (393.7192ms)
+✔ all native sky stages produce matching Babylon uniform/sampler interfaces and retain engine Y transform (506.5715ms)
+✔ the existing nine-value celestial matrix keeps Babylon native UBO column padding (0.8809ms)
+BJS - [22:34:32]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:33]: Babylon.js v9.30.0 - Null engine
+✔ USNO sidereal epoch and map axes put rising stars east and the pole north (2.4539ms)
+✔ J2000 sky matrix preserves catalog directions and matches independent ERFA precession fixture (0.885ms)
+✔ catalog contains real bright stars and baked Gaussian points are nonempty at their coordinates (64.9494ms)
+✔ night visibility respects astronomical twilight and full-moon sky brightening (0.8877ms)
+✔ cloud noise has deterministic, periodic variation without image seams (232.5ms)
+✔ calibrated cloud atlas matches requested fractions with filtered samples (138.0552ms)
+✔ crisp star profiles preserve flux across subpixel placement and magnitude ordering (31.1082ms)
+✔ atmosphere reuses two textures across updates and disposal is idempotent (275.5504ms)
+✔ cloud layers ease changes and model FROM wind advects during a frozen astronomy preview (124.753ms)
+BJS - [22:34:35]: Babylon.js v9.30.0 - Null engine
+✔ actual sky, sun and moon shaders pass the pinned Babylon GLSL→SPIR-V→WGSL CPU pipeline (2575.4504ms)
+✔ cloud and star textures retain mipmaps, trilinear filtering and their wrap modes (376.7402ms)
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+BJS - [22:34:39]: Babylon.js v9.30.0 - Null engine
+✔ selection uses real source/material metadata and leaves resources and unrelated flags intact (92.551ms)
+✔ camera-masked and degenerate candidates cannot hide a drawable representative (10.2226ms)
+✔ disabled, invisible and parent-disabled objects are never activated (27.7391ms)
+✔ deduplication keeps material identities, vertex attributes and shadow inputs distinct (24.5513ms)
+✔ same material/layout with distinct actual light membership is not collapsed (18.8814ms)
+✔ real regular/thin instances and instanced vertex attributes are explicitly unsupported (13.4456ms)
+✔ skinned, morph and baked-animation meshes remain explicitly outside the scope (10.3662ms)
+✔ the active camera render-pass material controls eligibility (10.1852ms)
+✔ missing geometry and MultiMaterial are not advertised as covered (8.1687ms)
+✔ prior true flags and external false writes survive release and repeated disposal (6.4368ms)
+✔ a stale release cannot disable a newer activation of the same helper (8.1934ms)
+✔ LOD and same-count replacement are selected anew without touching disposed predecessors (9.6046ms)
+✔ partial selection failure rolls back earlier flags and preserves the original exception (8.5534ms)
+✔ cleanup continues after one flag setter fails and retains its exact exception (9.1642ms)
+✔ scene disposal during a lease is safe and releases the helper lifecycle (4.5821ms)
+✔ 80 queued snapshots become one ordinary reconciliation with the original receipt time (9.1519ms)
+✔ respawn and newer forced epochs are immediate barriers and cannot be coalesced away (0.7418ms)
+✔ new-epoch ordinary bootstrap is a barrier and lifecycle reset clears pending old-room state (0.332ms)
+✔ blind authority repair resumes none with one new blind and unchanged original evidence (106235.3998ms)
+✔ blind authority repair resumes after-blind-authority-intent with one new blind and unchanged original evidence (98244.3997ms)
+✔ blind authority repair resumes after-blind-authority-result with one new blind and unchanged original evidence (69555.3197ms)
+✔ blind authority repair resumes after-authority-receipt with one new blind and unchanged original evidence (53107.6271ms)
+✔ blind authority repair rejects native error history even with exit zero and exact refusal (40107.6699ms)
+✔ blind authority repair rejects native turn.failed history even with exit zero and exact refusal (30225.9055ms)
+✔ blind authority allowlist rejects changed refusal bytes, extra stdout prose and findings in every original lens (52257.8724ms)
+✔ blind authority repair does not apply to newer bound inputs (26093.1886ms)
+✔ blind authority repair requires all original identity-valid terminal receipts (32853.1281ms)
+✔ blind authority repair never dispatches while an original native reviewer is live (22804.5751ms)
+✔ blind authority repair rejects absent or changed authority before replacement dispatch (25964.684ms)
+✔ blind authority replacement invalid remains a stable stop without another generation (35075.8051ms)
+✔ blind authority replacement failed remains a stable stop without another generation (37328.1097ms)
+ℹ Native attempt failure before fixture cleanup: C:\Users\rezac\AppData\Local\Temp\autodev-adapters-3hkKTi\repo\.git\autodev\test\attempts\69d2848d6e4bd4e4456679bb
+receipt.json:
+{"attemptId":"69d2848d6e4bd4e4456679bb","exitCode":7,"finishedAt":"2026-10-20T20:45:00.896Z","requestDigest":"fb0d3e31365723030d630aa9790dd039337d6df6c6c4af7f2f903a1944dc6440","schemaVersion":1,"signal":null,"stderrPath":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-3hkKTi\\repo\\.git\\autodev\\test\\attempts\\69d2848d6e4bd4e4456679bb\\stderr.log","stdoutPath":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-3hkKTi\\repo\\.git\\autodev\\test\\attempts\\69d2848d6e4bd4e4456679bb\\stdout.log","workerExitCode":7}
+
+request.json:
+{"args":["C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\scripts\\autodev\\codex.mjs","--execute-input","C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-3hkKTi\\repo\\.git\\autodev\\test\\input-6d406931c7659448801c0d73.json","e63ccdcc2d90eb0ba169808fd53af7e186ae5c6106d7b41d56e111751081752a"],"attemptId":"69d2848d6e4bd4e4456679bb","command":"C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","cwd":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-3hkKTi\\repo","heartbeat":[{"args":["C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-3hkKTi\\repo\\scripts\\agent-tasks.mjs","heartbeat","--task","controller","--owner","autodev:test"],"command":"C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","cwd":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-3hkKTi\\repo","intervalMs":60000},{"args":["C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-3hkKTi\\repo\\scripts\\agent-tasks.mjs","heartbeat","--task","worker","--owner","autodev:test:worker"],"command":"C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","cwd":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-3hkKTi\\repo","intervalMs":60000}],"key":"review:authority-v1:blind:b0667c4187aec9ab93863660d3b7bbe3","requestDigest":"fb0d3e31365723030d630aa9790dd039337d6df6c6c4af7f2f903a1944dc6440","runId":"test","schemaVersion":1,"stderrPath":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-3hkKTi\\repo\\.git\\autodev\\test\\attempts\\69d2848d6e4bd4e4456679bb\\stderr.log","stdoutPath":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-3hkKTi\\repo\\.git\\autodev\\test\\attempts\\69d2848d6e4bd4e4456679bb\\stdout.log","token":"43732566-89fc-457e-bba0-d2861ab59783"}
+
+stderr.log:
+controlled fixture failure
+
+stdout.log:
+
+✔ blind authority replacement finding remains a stable stop without another generation (38313.0296ms)
+✔ bound presentation schema represents blocked null results and exact worker targets including directory-scope boundaries (2967.4665ms)
+✔ immutable per-attempt schema is delivered through the native executor and tampering stops before child spawn (5679.1995ms)
+✔ terminal runWorker receipt rejects schema tamper on resume without reaching supervision or spawning again (6281.0287ms)
+✔ plan stage preserves blocked null intentGaps and repeats without a fake spec or new model attempt (12041.2754ms)
+✔ blocked null presentation preserves substantive intentGaps before format validation or contract repair (22081.1778ms)
+✔ plan stage preserves blocked null runtimeBlockers and repeats without a fake spec or new model attempt (7694.7149ms)
+✔ blocked null presentation preserves substantive runtimeBlockers before format validation or contract repair (19438.6687ms)
+✔ valid original unbound completion remains the selected v1 proof without contract repair (29795.3445ms)
+✔ bounded completion contract repair resumes none preserving actual invalid-v1 shape and immutable attempts (29975.4622ms)
+✔ bounded completion contract repair resumes after-spec-completion-v2-intent preserving actual invalid-v1 shape and immutable attempts (33609.9329ms)
+✔ bounded completion contract repair resumes after-spec-completion-v2-result preserving actual invalid-v1 shape and immutable attempts (37070.5102ms)
+✔ bounded completion contract repair resumes after-v2-receipt preserving actual invalid-v1 shape and immutable attempts (33097.0427ms)
+✔ bounded completion v2 blocked is a stable stop without another completion generation (19659.4902ms)
+✔ bounded completion v2 invalid is a stable stop without another completion generation (18450.6746ms)
+✔ bounded completion v2 failed is a stable stop without another completion generation (18475.4791ms)
+ℹ Native attempt failure before fixture cleanup: C:\Users\rezac\AppData\Local\Temp\autodev-adapters-s5Lkop\repo\.git\autodev\test\attempts\803d0378e5c1dcaa774cea16
+receipt.json:
+{"attemptId":"803d0378e5c1dcaa774cea16","exitCode":7,"finishedAt":"2026-10-20T20:50:38.898Z","requestDigest":"748392b25584fb6508b3718133af8ab98b183a01ae4f348bb3af39e1d2503032","schemaVersion":1,"signal":null,"stderrPath":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-s5Lkop\\repo\\.git\\autodev\\test\\attempts\\803d0378e5c1dcaa774cea16\\stderr.log","stdoutPath":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-s5Lkop\\repo\\.git\\autodev\\test\\attempts\\803d0378e5c1dcaa774cea16\\stdout.log","workerExitCode":7}
+
+request.json:
+{"args":["C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\scripts\\autodev\\codex.mjs","--execute-input","C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-s5Lkop\\repo\\.git\\autodev\\test\\input-2136aabe2e2ab3c018530fc0.json","a0aa601c51a1512de5d3021e88901088dd2049c1d210596a9d29efc3d65639e0"],"attemptId":"803d0378e5c1dcaa774cea16","command":"C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","cwd":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-s5Lkop\\repo","heartbeat":[{"args":["C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-s5Lkop\\repo\\scripts\\agent-tasks.mjs","heartbeat","--task","controller","--owner","autodev:test"],"command":"C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","cwd":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-s5Lkop\\repo","intervalMs":60000},{"args":["C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-s5Lkop\\repo\\scripts\\agent-tasks.mjs","heartbeat","--task","worker","--owner","autodev:test:worker"],"command":"C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","cwd":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-s5Lkop\\repo","intervalMs":60000}],"key":"spec-completion:v2","requestDigest":"748392b25584fb6508b3718133af8ab98b183a01ae4f348bb3af39e1d2503032","runId":"test","schemaVersion":1,"stderrPath":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-s5Lkop\\repo\\.git\\autodev\\test\\attempts\\803d0378e5c1dcaa774cea16\\stderr.log","stdoutPath":"C:\\Users\\rezac\\AppData\\Local\\Temp\\autodev-adapters-s5Lkop\\repo\\.git\\autodev\\test\\attempts\\803d0378e5c1dcaa774cea16\\stdout.log","token":"05f41845-921a-4be7-ae98-fc0e53e534df"}
+
+stderr.log:
+controlled fixture failure
+
+stdout.log:
+
+✔ historical invalid presentation cannot repair away a substantive previous readiness blocker (22774.8478ms)
+✔ adapters retain the established public API after separating source ownership (1.7865ms)
+✔ source identity is invariant across add/commit, covers new tests and deletions (6286.7519ms)
+✔ ignored audit detects edits at an existing ignored path and additions outside scope (3182.5999ms)
+✔ stage audit rejects changes to controller evidence by a source worker (2806.6099ms)
+✔ stage audit canonicalizes before scope checks and distinguishes absent from deleted paths (1.006ms)
+✔ scope guards reject junction escape and preserve both renamed paths (2415.7149ms)
+✔ Codex worker disables apps, MCP, agents and shell network without overriding model (0.696ms)
+✔ Linear decodes both observed issue identities and rejects tool errors (0.588ms)
+✔ missing Codex executable rejects startup and bounded close does not hang (11.433ms)
+✔ Linear lost create response reconciles the original comment without duplicate creation (0.6655ms)
+✔ CI checkout evidence binds test merge SHA and explicit base from the correct step (1.1332ms)
+✔ GitHub checks accept observed empty PR arrays only with exact run and checkout evidence (0.9138ms)
+✔ PR crash after remote create recovers the single PR and merged replay does not remerge (0.9461ms)
+✔ commit resumes after crash by exact parent/tree/marker without a second commit (10190.8943ms)
+✔ commit refuses pre-existing staged contents (5644.0064ms)
+✔ verification detects a check that changes reviewed source (6139.3726ms)
+✔ unknown supervised verification retains the validation resource claim (6351.5543ms)
+✔ finalize replays remaining release after crash without repeating external progress (4170.3192ms)
+✔ implementation and review replay after progress failure preserve their own evidence without another worker (16523.0308ms)
+✔ BMAD snapshot validates every used instruction and rejects missing or altered snapshots (2796.1257ms)
+✔ specification uses the snapshot template and preserves frozen/body identity through all statuses and replay (2782.0658ms)
+✔ intent gaps persist as a draft and block implementation without another model attempt (7524.3555ms)
+✔ plan spec replay after progress failure preserves exact bytes and original planner result (6300.0104ms)
+✔ snapshot prompts preserve blind/verification separation and delay edge claims (2611.111ms)
+✔ review parsers retain native lens outputs and never treat invalid/incomplete results as clean (1.983ms)

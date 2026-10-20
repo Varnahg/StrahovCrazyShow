@@ -160,6 +160,21 @@ const receiptFor = (value: unknown, id: string): FeedbackReceipt | null => {
     : null;
 };
 
+const MAX_RETRY_AFTER_MS = 5 * 60_000;
+function retryAfterMs(value: string | null, now: number): number | null {
+  if (!value || value.length > 128) return null;
+  const header = value.trim();
+  // Retry-After is an integer number of seconds or an HTTP date, never a fraction.
+  const delay = /^\d+$/.test(header)
+    ? Number(header) * 1000
+    : /^[A-Za-z]{3,9}(?:,| )/.test(header)
+      ? Date.parse(header) - now
+      : NaN;
+  return Number.isFinite(delay)
+    ? Math.max(0, Math.min(delay, MAX_RETRY_AFTER_MS))
+    : null;
+}
+
 /** Persistent, bounded delivery. An HTTP response is success only with the matching receipt. */
 export class FeedbackOutbox {
   private readonly storage: FeedbackStorage;
@@ -318,7 +333,10 @@ export class FeedbackOutbox {
             ? {
                 ...entry,
                 attempts: 0,
-                nextAttemptAtMs: this.now(),
+                nextAttemptAtMs:
+                  entry.error === "http-429"
+                    ? Math.max(this.now(), entry.nextAttemptAtMs)
+                    : this.now(),
                 blocked: false,
                 error: undefined,
               }
@@ -385,6 +403,7 @@ export class FeedbackOutbox {
     const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
     let error = "network";
     let blocked = false;
+    let retryAfter: number | null = null;
     let receipt: FeedbackReceipt | null = null;
     try {
       const body = new FormData();
@@ -410,7 +429,16 @@ export class FeedbackOutbox {
         error = "receipt";
       } else {
         error = "http-" + response.status;
-        blocked = response.status >= 400 && response.status < 500;
+        blocked =
+          response.status >= 400 &&
+          response.status < 500 &&
+          response.status !== 408 &&
+          response.status !== 429;
+        if (response.status === 429)
+          retryAfter = retryAfterMs(
+            response.headers.get("Retry-After"),
+            this.now(),
+          );
       }
     } catch {
       error = controller.signal.aborted ? "timeout" : "network";
@@ -430,7 +458,11 @@ export class FeedbackOutbox {
                     error,
                     blocked,
                     nextAttemptAtMs:
-                      this.now() + (this.delays[item.attempts - 1] ?? 0),
+                      this.now() +
+                      Math.max(
+                        this.delays[item.attempts - 1] ?? 0,
+                        retryAfter ?? 0,
+                      ),
                   }
                 : item,
             ),

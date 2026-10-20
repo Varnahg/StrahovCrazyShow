@@ -2,8 +2,8 @@
 title: 'KEY-52: herní zpětná vazba s čistým snímkem'
 type: feature
 created: 2026-10-20
-status: in-progress
-baseline_commit: c713c2aedcafdb02358f05e4c9c51b607edeebc4
+status: in-review
+baseline_commit: ba91b84c17918ee16a9472c57f38b427fa6e21da
 route: dispatch
 review_loop_iteration: 0
 context: [docs/agents/bmad-policy.md]
@@ -40,11 +40,11 @@ Nikdy: převzetí cizího WIP/claimu bez doloženého předání; změna frozen 
 - Výzkum: _bmad-output/planning-artifacts/research/technical-early-game-feedback-2026-10-20/research.md.
 
 ## Tasks & Acceptance
-- [ ] shared/feedback.ts a tests/feedback-contract.test.ts: validace obálky, limity, explicitní technický allowlist.
-- [ ] server/feedback*.ts + testy: multipart příjem, persistentní inbox/outbox, Linear upload/create/readback a obnova.
-- [ ] client/feedback.tsx, feedback.css, feedback-outbox.ts + testy: přístupný formulář a offline fronta.
-- [ ] client/rendered-frame-capture.ts + testy: sdílitelná jednorázová kopie/encode; reuse předání KEY-21 podle skutečné autorizace.
-- [ ] Game/UI/dock/buildidentity/serverindex/compose/docs: integrace, persistentní volume, samostatné nastavení.
+- [x] shared/feedback.ts a tests/feedback-contract.test.ts: validace obálky, limity, explicitní technický allowlist.
+- [x] server/feedback*.ts + testy: multipart příjem, persistentní inbox/outbox, Linear upload/create/readback a obnova.
+- [x] client/feedback.tsx, feedback.css, feedback-outbox.ts + testy: přístupný formulář a offline fronta.
+- [x] client/rendered-frame-capture.ts + testy: sdílitelná jednorázová kopie/encode; reuse předání KEY-21 podle skutečné autorizace.
+- [x] Game/UI/dock/buildidentity/serverindex/compose/docs: integrace, persistentní volume, samostatné nastavení.
 - [ ] scripts/feedback-browser.ts a evidence: skutečný celý tok a regresní přejímka; review a integrace do main.
 
 Given běžná hra, when hráč otevře feedback, then automatický image neobsahuje HUD/chat/minimapu/jmenovky a odpovídá uvedenému frame.
@@ -54,9 +54,11 @@ Given rapid reopen/leave/rejoin, when doběhne starý encode, then neovlivní no
 Given ověřený checkpoint, when integrátor přijme, then vlastní commity jsou v main a cizí WIP zachován.
 
 ## Implementation Notes
+- Přejímka 20Oct: cílené testy74/74, první produkční build a izolovaná integrace PASS. Reálný formulář→server→Linear vytvořil KEY-55; příloha z Linear má přesně shodné bajty a SHA jako lokální automatický snímek bez HUD. Visible IAB je ready/0errors; Edge timeout se opakuje i v historické baseline, bez prokázané příčiny. Native focus byl opraven a čeká na finální browser retest. Offline fronta při vypnutém serveru zachovala report i denní snímek; reload ještě čeká. Plná lokální Windows sada byla přerušena, přesný PR/main Linux CI je povinný.
+- Publikační diff musí obsahovat pouze vlastní výzkum c713c2ae a feature a3e2ea82 plus vlastní přejímkové opravy. Původní baseline měla navíc nesouvisející commit analýzy issues, který není v remote main; před publikací se vlastní commity přenesou na čistý origin/main, bez cizího WIP.
 - Předchozí autorizace nahrazuje opakované BMAD schválení podle projektové policy.
 - Scope je jeden hráčský cíl napříč vrstvami; tasky mají disjunktní zápisy.
-- Provozní vstupy: serverový Linear credential není v process/user/machine. Uživatel požádán o konfiguraci. Capture předání zatím čeká; nezávislé server/UI moduly mohou pokračovat.
+- Provozní vstupy byly doplněny uživatelem do soukromé ignorované konfigurace; skutečný Linear tok byl ověřen. KEY-21 poskytl úzké read-only předání, původní diary WIP ani jeho rezervace se nepřebírají.
 - Preferovaná řešení a alternativy jsou v již dokončeném výzkumu. Pro příjem native FormData parser Node24 s pevným limitem těla; bez nové závislosti. Async disk spool na jednom procesu, persistentní volume.
 - První testovací Linear issue bude explicitně označené jako přejímka KEY-52, aby nešlo o fingovaný uživatelský problém.
 
@@ -64,5 +66,27 @@ Given ověřený checkpoint, when integrátor přijme, then vlastní commity jso
 
 ## Review Triage Log
 
+| Nález | Verdikt | Důkaz a postup |
+|---|---|---|
+| Blind B1 Docker harness | medium / patch | Nový named volume skutečně porušuje dosavadní nulový početmountů. Deployment author opraví přesnou namedvolume aserci a cleanup jen vlastního disposableprojektu. |
+| Blind B2 Compose OAuth/status | medium / patch | Worker čte ACCESS_TOKEN/STATUS_ID a dokumentace je nabízí, Compose je nepředával. Doplněny pouze envnames. |
+| Blind B3 standalone image | high / patch | Docker USERnode nemohl zapisovat výchozí/app/.cache. ENVFEEDBACK_DIR nyní používá připravenýnode-owned/data/feedback. |
+| Edge E1 normalizace buildID | high / patch | WhitespaceclientBuildId projde původní rawtruthiness a uložíseprázdný, restartvalidace selže. Canonical hodnota musí být neprázdná a <=128 předaccept; regresnítest zahrnuje normalizaci aopakovanouvalidaci. |
+| Edge E2 dočasné4xx | medium / patch |408/429 se původněblocked true. Client author opraví boundedretry/Retry-After uvnitř stávajícíchlimitů a přidáregrese. |
+| Edge E3 timeoutenkodéru | medium / patch | Timeout původněfyzickýlockuvolnilpředcallbackem. Capture author ponechálockaždocallbacku, logickývýsledekvrátívčas, bitmapuuvolní. Při navždyzaseknutémnativeencoderu má stránka busy, nevznikají dalšíenkodéry. |
+| Gap V1 nativeIDB | medium / patch | DosavadníreloadtestpoužívalMemoryStorage. Skutečnýručníbrowserflowjižprošel; novýCIbrowserharnesspřidábudoucíregresi blob+metadata napříčconnection/reload. |
+| Gap V2 UIqueued/accepted | medium / patch | SSRnetestujesubmit. StejnýrealReactbrowserharnessmusípozorovatqueuedpřiofflineapřijetíažpomatchingreceipt. |
+| Gap V3 Gameframecaller | medium / patch | Ručníčítačfixturebyneodhalilodstraněníincrement. RootdoplníběhovýtestskutečnéhorenderphasecallerusopravdovýmcaptureaIOseams, včetněrenderthrow. |
+| Gap V4 HTTPregistrace | medium / patch | Samostatnéservice testynechránídispatchvserver/index. BěžnáisolatedintegracedostanetemporaryspoolaskutečnýPOST/dedup/conflict. |
+
+Všechny tři vrstvy byly spuštěny před čtením výsledků; žádný nález nebyl vynechán. Opravy zachovávají již schválený intent a nemění veřejný kontrakt. Nativefocus z praktické přejímky je přímá lokální oprava, nikoli nový schvalovací krok.
+
+
 ## Verification
 Cílené CPU testy průběžně. Nad stabilním checkpointem pnpm test, pnpm build, pnpm test:integration pod zdroji heavy-validation/workspace-build/2568. Skutečný izolovaný server a browser pod gpu/2592/4207. Ověřit obrázek, retry/restart, host, startup, CZ/EN, keyboard a nezduplikované vzdálené issue. Profilovat celé hraní včetně HUD s hash/testy, CSS/internal rozlišením, GPU a FPS/p95/p99; žádný mock nebo NullEngine nevydávat za GPU důkaz.
+
+## Checkpoint po review
+
+85/85 cílených testů PASS, kompletní tsc --noEmit PASS. Všechny runtime opravy a testové moduly jsou připravené. Nový skutečný browser CI a finální plná CI/integrace zatím čekají; tato specifikace není označena done.
+
+Publikační rozhodnutí: GitHub odmítl nový workflow kvůli chybějícímu OAuth workflow scope. Test běží místo něj v normální pnpm test sadě přes tests/feedback-browser.test.ts a existující verify job. Oficiální Ubuntu24.04 runner obsahuje Chrome (https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md); Playwright podporuje chrome channel (https://playwright.dev/docs/browsers). Širší credential nebyl vyžádán ani použit. Mimo Linux CI se browser regrese spouští explicitně, běžné CPU testy a samostatná praktická GPU přejímka zůstávají oddělené.

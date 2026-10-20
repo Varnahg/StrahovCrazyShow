@@ -78,3 +78,41 @@ test("actual feedback keyboard/error effect opens F8 outside text entry and rele
   cleanup();
   assert.equal(listeners.size, 0);
 });
+
+
+test("native feedback focus captures the trigger before opening and restores it after node removal", () => {
+  const source = ts.createSourceFile("feedback.tsx", readFileSync(new URL("../client/feedback.tsx", import.meta.url), "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  let effect: ts.ArrowFunction | undefined;
+  const visit = (node: ts.Node) => {
+    if (ts.isCallExpression(node) && node.expression.getText(source) === "useEffect" && ts.isArrowFunction(node.arguments[0]) && node.arguments[0].getText(source).includes("element.showModal()")) effect = node.arguments[0];
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  assert.ok(effect);
+  const js = ts.transpileModule("const effect=" + effect.getText(source) + "; effect();", { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText;
+  const calls: string[] = [];
+  class Element {
+    isConnected = true;
+    constructor(readonly name: string) {}
+    focus() { calls.push(this.name); doc.activeElement = this; }
+  }
+  const trigger = new Element("trigger"), close = new Element("close"), description = new Element("description");
+  const doc = { activeElement: trigger };
+  const dialog = { current: {
+    showModal() { close.focus(); },
+    close() { calls.push("native-close"); },
+  } };
+  const cleanup = new Script(js).runInNewContext({ open: true, nativeDialog: true, dialog, description: { current: description }, document: doc, HTMLElement: Element });
+  assert.equal(doc.activeElement, description);
+  // Unmount can detach the description before passive effect cleanup.
+  description.isConnected = false;
+  cleanup();
+  assert.equal(doc.activeElement, trigger);
+  assert.deepEqual(calls, ["close", "description", "native-close", "trigger"]);
+  calls.length = 0;
+  doc.activeElement = trigger;
+  const detachedCleanup = new Script(js).runInNewContext({ open: true, nativeDialog: true, dialog, description: { current: description }, document: doc, HTMLElement: Element });
+  trigger.isConnected = false;
+  detachedCleanup();
+  assert.equal(calls.includes("trigger"), false);
+});

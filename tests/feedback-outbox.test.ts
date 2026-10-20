@@ -304,8 +304,8 @@ test("2xx with a wrong, absent or invalid receipt is queued and retry keeps the 
   }
 });
 
-test("all 4xx remain visible without automatic retries; 413 is identifiable and manual retry is explicit", async () => {
-  for (const status of [400, 409, 413, 429]) {
+test("terminal 4xx remain visible without automatic retries; 413 is identifiable and manual retry is explicit", async () => {
+  for (const status of [400, 403, 409, 413]) {
     const storage = new MemoryStorage(),
       original = report();
     let calls = 0;
@@ -326,6 +326,88 @@ test("all 4xx remain visible without automatic retries; 413 is identifiable and 
       await box.retry(original.id);
       assert.equal(calls, 2);
       assert.equal(storage.entries.length, 1);
+    } finally {
+      box.dispose();
+    }
+  }
+});
+
+test("408 and 429 retry automatically within the existing attempt and age budgets", async () => {
+  for (const status of [408, 429]) {
+    const storage = new MemoryStorage();
+    let now = 100,
+      calls = 0;
+    const box = new FeedbackOutbox({
+      storage,
+      now: () => now,
+      retryDelaysMs: [1000],
+      fetch: request(async () => {
+        calls++;
+        return new Response(null, { status });
+      }),
+    });
+    try {
+      await box.enqueue(report(), null);
+      assert.equal(storage.entries[0].blocked, false);
+      await box.flush();
+      assert.equal(calls, 1);
+      now += 1000;
+      await box.flush();
+      assert.equal(calls, 2);
+      now += 1000;
+      await box.flush();
+      assert.equal(calls, 2);
+      now += FEEDBACK_LIMITS.pendingAgeMs;
+      await box.retry();
+      assert.equal(calls, 2);
+      assert.equal(storage.entries.length, 1);
+    } finally {
+      box.dispose();
+    }
+  }
+});
+
+test("429 respects integer/date Retry-After, caps long waits and ignores invalid values", async () => {
+  const initial = Date.parse("2026-10-20T10:00:00.000Z");
+  for (const [header, delay] of [
+    ["120", 120_000],
+    ["Tue, 20 Oct 2026 10:00:30 GMT", 30_000],
+    ["999999999", 300_000],
+    ["not-a-date", 1000],
+    ["-1", 1000],
+    ["1.5", 1000],
+    ["Tue, 20 Oct 2026 09:00:00 GMT", 1000],
+  ] as const) {
+    const storage = new MemoryStorage(),
+      original = report();
+    let now = initial,
+      calls = 0;
+    const box = new FeedbackOutbox({
+      storage,
+      now: () => now,
+      retryDelaysMs: [1000],
+      fetch: request(async () => {
+        calls++;
+        return calls === 1
+          ? new Response(null, {
+              status: 429,
+              headers: { "Retry-After": header },
+            })
+          : receipt(original.id);
+      }),
+    });
+    try {
+      await box.enqueue(original, null);
+      assert.equal(storage.entries[0].nextAttemptAtMs, initial + delay, header);
+      await box.retry(original.id);
+      assert.equal(calls, 1, "manual retry must respect rate-limit delay");
+      now += delay - 1;
+      await box.flush();
+      assert.equal(calls, 1);
+      now++;
+      await box.flush();
+      assert.equal(calls, 2);
+      assert.equal(storage.entries.length, 0);
     } finally {
       box.dispose();
     }
