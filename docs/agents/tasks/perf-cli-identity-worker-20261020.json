@@ -11,11 +11,12 @@
   "notes": [
     "Konkrétní offline diagnostická část KEY-2, samostatné přidělení KEY-50.",
     "Žádné změny Game/UI/recorder/síť/GPU, neprohlašovat FPS zlepšení.",
-    "Podagent řadiče nespouští další BMAD workflow; řadič vlastní ostatní artefakty."
+    "Podagent řadiče nespouští další BMAD workflow; řadič vlastní ostatní artefakty.",
+    "Koordinátor převzal kompletní KEY-50/run key-50-73ab89b4aced: PR17/merge d1269d5a,65cílených a1744PR/main testů PASS, skutečná CLI přejímka a repeat run/resume bez duplicit. KEY-50 Done, parent KEY-2 In Progress. Evidence docs/performance/evidence/diagnostic-identity-20261020/README.md; původní scope/resources se nemění."
   ],
   "dependsOn": [],
   "schemaVersion": 1,
-  "status": "ready",
+  "status": "done",
   "title": "KEY-50: úzká CLI klasifikace identity-change a regrese",
   "verification": [
     "node --test tests/diagnostics-report.test.ts",
