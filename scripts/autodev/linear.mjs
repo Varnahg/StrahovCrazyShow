@@ -205,27 +205,27 @@ export class LinearClient {
       );
     });
   }
-  async call(name, args, mutating = false) {
+  async call(name, args, mutating = false, { beforeMutation } = {}) {
     await this.start();
     const entry = this.tools.get(name);
     if (!entry) throw problem("LINEAR_PROTOCOL", `Missing tool ${name}`);
+    const params = {
+      threadId: this.threadId,
+      server: "codex_apps",
+      tool: entry.key,
+      arguments: args,
+    };
+    // Keep the guard on this invocation, after lookup and transport startup.
+    // rpc dispatches synchronously before its returned promise can suspend.
+    if (mutating && beforeMutation) await beforeMutation();
     return decodeToolResult(
-      await this.rpc(
-        "mcpServer/tool/call",
-        {
-          threadId: this.threadId,
-          server: "codex_apps",
-          tool: entry.key,
-          arguments: args,
-        },
-        mutating,
-      ),
+      await this.rpc("mcpServer/tool/call", params, mutating),
     );
   }
   async getIssue(id) {
     return normalizeIssue(await this.call("linear.get_issue", { id }));
   }
-  async setState(issue, stateName) {
+  async setState(issue, stateName, { beforeMutation } = {}) {
     const team = issue.teamId ?? issue.team?.id ?? issue.team;
     if (typeof team !== "string")
       throw problem("LINEAR_PROTOCOL", "Issue lacks a team identity");
@@ -249,6 +249,7 @@ export class LinearClient {
       "linear.save_issue",
       { id: issue.id, state: matches[0].id },
       true,
+      { beforeMutation },
     );
   }
   async comments(issueId) {

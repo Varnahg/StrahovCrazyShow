@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "controller-external-acceptance-worker-20261020",
+  "title": "KEY-54: implementace, refaktoring a testy externí praktické přejímky řadiče",
+  "writePaths": [
+    "scripts/autodev/store.mjs",
+    "scripts/autodev/external-acceptance.mjs",
+    "scripts/autodev/adapters.mjs",
+    "scripts/autodev/github.mjs",
+    "tests/autodev-store.test.ts",
+    "tests/autodev-external-acceptance.test.ts",
+    "tests/autodev-adapters.test.ts",
+    "tests/autodev-engine.test.ts",
+    "docs/agents/bmad-controller.md",
+    "docs/agents/handoffs/controller-external-acceptance-worker-20261020.md",
+    "scripts/autodev/linear.mjs"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Stávající CLI kontrakt i všechny dokončené běhy zůstanou kompatibilní; žádná změna fází ani worker protokolu.",
+    "External varianta před první GitHub mutací vyžaduje přesný validní neměnný receipt oprávněného koordinátora a hashované důkazy; žádný bypass přes přímý GitHub klient.",
+    "Missing receipt zastaví před accept a resume po vydání bez duplicit; neplatné/změněné důkazy zůstanou zachované a blokují accept/merge včetně obnovy po pádu."
+  ],
+  "verification": [
+    "Cílené node --test tests/autodev-store.test.ts tests/autodev-external-acceptance.test.ts tests/autodev-adapters.test.ts tests/autodev-engine.test.ts.",
+    "Konkrétní regrese paths/authority/identities/content tamper, pending→resume, postaccept změna, merge:false a intent/crash reconciliation.",
+    "Cílený refaktoring, žádné staging/commit/publicace podagentem; handoff se skutečnými výsledky."
+  ],
+  "notes": [
+    "Konkrétní implementační delegace od root; podagent nerenderuje BMAD ani nespouští další workflow/subagenty.",
+    "Spec: _bmad-output/implementation-artifacts/controller-external-acceptance-20261020/spec.md; vyčkat explicitního ready zadání.",
+    "Nedotýkat se client/transit-renderer.ts ani herního kódu; neprovádět GPU/full suite/build bez samostatné rezervace.",
+    "Případná přesná renderer rezervace v prepare musí odpovídat skutečnému budoucímu worktree prefixu a stagingům; zahrnout kontrolu do podpory pokud jiný aktivní prefix blokuje dosavadní příliš širokou rezervaci.",
+    "E3 čtecí re-review prokázalo nutnost stejného guardu bezprostředně před nativním Linear save_issue dispatch po async status lookup. Koordinátor rozšířil scope po doloženém release; jde o existující přejímku/Done boundary, nikoli nový cíl."
+  ],
+  "status": "ready",
+  "dependsOn": []
+}

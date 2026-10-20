@@ -1,0 +1,52 @@
+{
+  "diffSha256": "46e3ec499c2e1bafa39ed9c4f8f00d0cb3bf9d251e911dabc3efc2d8a88f848a",
+  "allLayersCompleted": true,
+  "parallelism": "Čtecí vrstvy spouštěny po dostupném slotu; žádná triáž ani oprava před výsledkem všech tří.",
+  "findings": [
+    {
+      "lens": "blind",
+      "id": "B1",
+      "location": "scripts/autodev/adapters.mjs:2511",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "Engine po after-stage:merge naváže přímo ve finalize. Ta před Linear Done ani po čekání na main CI znovu neověřuje external proof, takže missing/changed evidence či uvolněná autorita projde do complete.",
+      "group": "finalization"
+    },
+    {
+      "lens": "edge",
+      "id": "E1",
+      "location": "scripts/autodev/external-acceptance.mjs:332-361",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "Evidence se hashují před asynchronním sourceIdentity a závěrečnou kontrolou autority. Následně se znovu čte pouze receipt. Změna evidence v těchto čekáních není před návratem proofu zjištěna.",
+      "group": "evidence-recheck"
+    },
+    {
+      "lens": "edge",
+      "id": "E2",
+      "location": "scripts/autodev/adapters.mjs:2511-2542",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "Stejný doložený chybějící finalization guard jako B1; zachovat samostatný původní nález a opravit společnou příčinu.",
+      "group": "finalization"
+    },
+    {
+      "lens": "verification",
+      "id": "V1",
+      "location": "scripts/autodev/adapters.mjs:1970",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "Ověřená mezera testů: fixtures a custom engine adapter vkládají externalAuthority ručně; žádný test nepřejímá skutečný prepare checkpoint. Přidat skutečný prepare→external acceptance test, bez ruční náhrady uložené autority.",
+      "group": "prepare-test"
+    },
+    {
+      "lens": "verification",
+      "id": "V2",
+      "location": "tests/autodev-external-acceptance.test.ts:268",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "Ověřená mezera testů: task bytes jsou v base/HEAD/worktree stejné; test mění jen uložený hash. Doložit rozdílné verze a nezávislé porovnání původního base blobu.",
+      "group": "base-test"
+    }
+  ]
+}

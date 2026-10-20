@@ -14,9 +14,12 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import childProcess from "node:child_process";
+import { syncBuiltinESMExports } from "node:module";
 import { createHash } from "node:crypto";
 const {
   auditScope,
+  inScope,
   ignoredSnapshot,
   sourceIdentity,
   workingSnapshot,
@@ -25,11 +28,16 @@ const {
   parseDirty,
   createAdapter,
   writeSpecification,
+  bmadRenderPrefix,
+  assertBmadRenderScope,
 } = await import(
   new URL("../scripts/autodev/adapters.mjs", import.meta.url).href
 );
 const { GitHubClient, checkoutEvidence, execute } = await import(
   new URL("../scripts/autodev/github.mjs", import.meta.url).href
+);
+const { ensureExternalAcceptance } = await import(
+  new URL("../scripts/autodev/external-acceptance.mjs", import.meta.url).href
 );
 const { supervise: nativeSupervise } = await import(
   new URL("../scripts/autodev/process.mjs", import.meta.url).href
@@ -71,6 +79,30 @@ const sourceRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
 );
+
+test("renderer reservation covers only its resolved worktree prefix including staging and remains broad-scope compatible", () => {
+  const worktree = path.resolve(sourceRoot, "../autodev-key-53-fixture"),
+    prefix = bmadRenderPrefix(worktree);
+  assert.equal(
+    prefix,
+    `_bmad/render/bmad-build/autodev-key-53-fixture-${createHash("sha256").update(worktree).digest("hex").slice(0, 12)}/`,
+  );
+  assert.equal(assertBmadRenderScope(worktree, [prefix]), prefix);
+  assert.equal(
+    assertBmadRenderScope(worktree, ["_bmad/render/bmad-build/"]),
+    prefix,
+  );
+  for (const scope of [
+    prefix.slice(0, -1),
+    `${prefix}snapshot/`,
+    `${prefix}.staging-probe/`,
+    bmadRenderPrefix(`${worktree}-other`),
+  ])
+    assert.throws(() => assertBmadRenderScope(worktree, [scope]), {
+      code: "TASK_SCOPE",
+    });
+  assert.equal(inScope(`${prefix}.staging-123/workflow.md`, [prefix]), true);
+});
 const git = async (root: string, ...args: string[]) =>
   (await execute("git", ["-C", root, ...args], { cwd: root })).stdout.trim();
 function definition(
@@ -91,6 +123,438 @@ function definition(
     notes: [],
   };
 }
+
+async function preparedExternalFixture(t: any) {
+  const f = await fixture(t),
+    ctx = f.ctx;
+  for (const [task, owner] of [
+    ["controller", "autodev:test"],
+    ["worker", "autodev:test:worker"],
+  ])
+    await execute(
+      process.execPath,
+      ["scripts/agent-tasks.mjs", "release", "--task", task, "--owner", owner],
+      { cwd: f.root },
+    );
+  const worktree = path.join(f.folder, `autodev-${ctx.runId}`),
+    controller = definition("controller", [
+      "artifacts/",
+      "handoff.md",
+      bmadRenderPrefix(worktree),
+    ]),
+    authority = definition("authority", ["evidence/"]);
+  const authorityBytes = `${JSON.stringify(authority, null, 2)}\n`;
+  await writeFile(
+    path.join(f.root, "docs/agents/tasks/controller.json"),
+    JSON.stringify(controller),
+  );
+  await writeFile(
+    path.join(f.root, "docs/agents/tasks/authority.json"),
+    authorityBytes,
+  );
+  await writeFile(
+    path.join(f.root, "intent.md"),
+    "Implement only the explicitly assigned runtime change.\n",
+  );
+  await writeFile(path.join(f.root, ".gitignore"), "ignored/\nevidence/\n");
+  ctx.assignment = {
+    ...ctx.assignment,
+    schemaVersion: 1,
+    intentFile: "intent.md",
+    merge: true,
+    acceptance: {
+      kind: "external",
+      description: "Measured production A/B",
+      authority: { task: "authority", owner: "coordinator" },
+      receiptFile: "evidence/receipt.json",
+      evidenceFiles: [{ id: "ab", path: "evidence/ab.txt" }],
+    },
+  };
+  ctx.state.assignmentPath = path.join(f.root, "assignment.json");
+  ctx.state.assignmentDigest = digest(ctx.assignment);
+  await writeFile(ctx.state.assignmentPath, JSON.stringify(ctx.assignment));
+  await git(
+    f.root,
+    "add",
+    "--",
+    "docs/agents/tasks/controller.json",
+    "docs/agents/tasks/authority.json",
+    "intent.md",
+    ".gitignore",
+    "assignment.json",
+  );
+  await git(
+    f.root,
+    "commit",
+    "-m",
+    "external assignment and exact renderer reservation",
+  );
+  const baseSha = await git(f.root, "rev-parse", "HEAD");
+  await git(
+    f.root,
+    "remote",
+    "add",
+    "origin",
+    "https://github.com/unit/repo.git",
+  );
+  await execute(
+    process.execPath,
+    [
+      "scripts/agent-tasks.mjs",
+      "claim",
+      "--task",
+      "authority",
+      "--owner",
+      "coordinator",
+    ],
+    { cwd: f.root },
+  );
+  // Keep the real prepare/Git worktree/claim path. Only redirect its remote
+  // fetch transport to this fixture; origin identity remains the actual URL.
+  const originalSpawn = childProcess.spawn;
+  t.mock.method(childProcess, "spawn", (...args: any[]) => {
+    if (args[0] === "git" && args[1][2] === "fetch" && args[1][3] === "origin")
+      args[1] = [
+        "-C",
+        args[1][1],
+        "fetch",
+        f.root,
+        "main:refs/remotes/origin/main",
+      ];
+    return Reflect.apply(originalSpawn, childProcess, args);
+  });
+  syncBuiltinESMExports();
+  t.after(() => {
+    t.mock.restoreAll();
+    syncBuiltinESMExports();
+  });
+  ctx.state.data = {};
+  const preparation = createAdapter({
+    github: {
+      async repo() {
+        return { full_name: "unit/repo" };
+      },
+      async branch() {
+        return { commit: { sha: baseSha } };
+      },
+    },
+    linear: {
+      async getIssue() {
+        return { id: "issue-1", identifier: "KEY-1" };
+      },
+      async setState() {},
+      async comment() {},
+    },
+  });
+  await preparation.runStage("prepare", ctx);
+  assert.equal(ctx.data.baseSha, baseSha);
+  assert.deepEqual(ctx.data.externalAuthority, {
+    task: authority,
+    taskSha256: sha(authorityBytes),
+  });
+  assert.equal((await f.registry()).claims.length, 3);
+  assert.equal(ctx.data.worktree, worktree);
+  await writeFile(path.join(worktree, "src/new.txt"), "prepared candidate\n");
+  ctx.data.sourceDigest = (
+    await sourceIdentity(worktree, baseSha, ctx.data.workerTask.writePaths)
+  ).digest;
+  await git(worktree, "add", "--", "src/new.txt");
+  await git(worktree, "commit", "-m", "candidate");
+  ctx.data.commitSha = await git(worktree, "rev-parse", "HEAD");
+  await mkdir(path.join(f.root, "evidence"));
+  const evidenceFile = path.join(f.root, "evidence/ab.txt"),
+    evidence = "original measured A/B\n";
+  await writeFile(evidenceFile, evidence);
+  await writeFile(
+    path.join(f.root, "evidence/receipt.json"),
+    JSON.stringify({
+      schemaVersion: 1,
+      kind: "external-acceptance",
+      decision: "pass",
+      runId: ctx.runId,
+      assignmentDigest: ctx.state.assignmentDigest,
+      baseSha,
+      commitSha: ctx.data.commitSha,
+      sourceDigest: ctx.data.sourceDigest,
+      authority: {
+        task: "authority",
+        owner: "coordinator",
+        taskSha256: sha(authorityBytes),
+      },
+      issuedAt: "2026-10-20T20:00:00.000Z",
+      summary: "Comparable A/B accepted",
+      evidence: [{ id: "ab", path: "evidence/ab.txt", sha256: sha(evidence) }],
+    }),
+  );
+  const github = new GitHubClient({ repository: "unit/repo" }),
+    mutations: string[] = [];
+  const pr: any = {
+    number: 9,
+    state: "open",
+    draft: false,
+    merged: false,
+    body: `<!-- autodev:${ctx.runId} -->`,
+    html_url: "https://github.com/unit/repo/pull/9",
+    head: {
+      sha: ctx.data.commitSha,
+      ref: ctx.data.branch,
+      repo: { full_name: "unit/repo" },
+    },
+    base: { sha: baseSha, ref: "main", repo: { full_name: "unit/repo" } },
+  };
+  ctx.data.prNumber = 9;
+  github.pr = async () => pr;
+  github.branch = async () => ({ commit: { sha: baseSha } });
+  github.checks = async () => [
+    { name: "verify" },
+    { name: "source-secret-hygiene" },
+  ];
+  github.pages = async () => [];
+  github.api = async (method: string, _endpoint: string, body: any) => {
+    mutations.push(method);
+    if (method === "PATCH") pr.body = body.body;
+    return {};
+  };
+  const acceptance = await github.accept(ctx, "actual prepare acceptance");
+  await ctx.save({ acceptance });
+  return { ...f, github, pr, mutations, evidenceFile, evidence };
+}
+
+test("actual prepare freezes external base authority and its checkpoint feeds successful direct acceptance", async (t) => {
+  const f = await preparedExternalFixture(t);
+  assert.deepEqual(f.mutations, ["PATCH", "POST"]);
+  assert.equal(
+    f.ctx.data.acceptance.externalAcceptance.authority.taskSha256,
+    f.ctx.data.externalAuthority.taskSha256,
+  );
+  assert.deepEqual(
+    await ensureExternalAcceptance(f.ctx, { requirePinned: true }),
+    f.ctx.data.acceptance.externalAcceptance,
+  );
+});
+
+test("external finalize guards native Linear Done after status lookup and transport startup", async (t) => {
+  const f = await preparedExternalFixture(t),
+    ctx = f.ctx;
+  await git(f.root, "merge", "--no-ff", "--no-edit", ctx.data.branch);
+  ctx.data.mergeSha = await git(f.root, "rev-parse", "HEAD");
+  f.pr.merged = true;
+  f.pr.merge_commit_sha = ctx.data.mergeSha;
+  f.github.waitChecks = async () => [
+    { name: "verify", headSha: ctx.data.mergeSha, conclusion: "success" },
+  ];
+  const linear = new LinearClient({ cwd: f.root });
+  const issue = {
+    id: "issue-1",
+    identifier: "KEY-1",
+    teamId: "team-1",
+    status: "Active",
+  };
+  const events: string[] = [];
+  let mode = "lookup",
+    pendingSave = false,
+    saves = 0;
+  linear.start = async () => {
+    linear.threadId = "fixture-thread";
+    linear.tools = new Map(
+      [
+        "linear.get_issue",
+        "linear.list_issue_statuses",
+        "linear.save_issue",
+        "linear.list_comments",
+        "linear.save_comment",
+      ].map((name) => [name, { key: name }]),
+    );
+    if (pendingSave) {
+      events.push("save transport ready");
+      if (mode === "transport")
+        await writeFile(
+          f.evidenceFile,
+          "changed during save transport startup",
+        );
+    }
+  };
+  linear.rpc = async (method: string, params: any, mutating: boolean) => {
+    assert.equal(method, "mcpServer/tool/call");
+    events.push(params.tool);
+    if (params.tool === "linear.get_issue")
+      return { structuredContent: { ...issue } };
+    if (params.tool === "linear.list_issue_statuses") {
+      pendingSave = true;
+      if (mode === "lookup")
+        await writeFile(f.evidenceFile, "changed during status lookup");
+      return { structuredContent: [{ id: "done-state", name: "Done" }] };
+    }
+    if (params.tool === "linear.save_issue") {
+      assert.equal(mutating, true);
+      assert.deepEqual(params.arguments, {
+        id: "issue-1",
+        state: "done-state",
+      });
+      saves++;
+      pendingSave = false;
+      issue.status = "Done";
+      return { structuredContent: { ...issue } };
+    }
+    if (params.tool === "linear.list_comments")
+      return { structuredContent: { comments: [] } };
+    if (params.tool === "linear.save_comment")
+      return {
+        structuredContent: { id: "comment-1", body: params.arguments.body },
+      };
+    throw new Error(`Unexpected fixture RPC: ${params.tool}`);
+  };
+  const adapter = createAdapter({ github: f.github, linear });
+  for (const boundary of ["lookup", "transport"]) {
+    mode = boundary;
+    pendingSave = false;
+    events.length = 0;
+    await writeFile(f.evidenceFile, f.evidence);
+    await assert.rejects(adapter.runStage("finalize", ctx), {
+      code: "EXTERNAL_ACCEPTANCE_CHANGED",
+    });
+    assert.equal(saves, 0);
+    assert.equal(issue.status, "Active");
+    assert.ok(events.includes("linear.list_issue_statuses"));
+    assert.ok(events.includes("save transport ready"));
+    assert.equal(events.includes("linear.save_issue"), false);
+    assert.equal(ctx.data.finalizationReady, undefined);
+    assert.equal((await f.registry()).claims.length, 3);
+    assert.equal(
+      await readFile(f.evidenceFile, "utf8"),
+      boundary === "lookup"
+        ? "changed during status lookup"
+        : "changed during save transport startup",
+    );
+  }
+  mode = "valid";
+  pendingSave = false;
+  await writeFile(f.evidenceFile, f.evidence);
+  assert.deepEqual(await adapter.runStage("finalize", ctx), {
+    finalized: true,
+  });
+  assert.equal(saves, 1);
+  assert.equal(issue.status, "Done");
+  assert.deepEqual(await adapter.runStage("finalize", ctx), {
+    finalized: true,
+  });
+  assert.equal(saves, 1);
+  assert.deepEqual(
+    (await f.registry()).claims.map((claim: any) => claim.task),
+    ["authority"],
+  );
+});
+
+test("native Linear setState keeps unguarded CLI behavior and does not repeat an existing Done state", async () => {
+  const linear = new LinearClient();
+  const issue = { id: "issue-1", teamId: "team-1", status: "Active" };
+  let saves = 0;
+  linear.start = async () => {
+    linear.threadId = "fixture-thread";
+    linear.tools = new Map(
+      ["linear.list_issue_statuses", "linear.save_issue"].map((name) => [
+        name,
+        { key: name },
+      ]),
+    );
+  };
+  linear.rpc = async (_method: string, params: any, mutating: boolean) => {
+    if (params.tool === "linear.list_issue_statuses")
+      return { structuredContent: [{ id: "done-state", name: "Done" }] };
+    assert.equal(params.tool, "linear.save_issue");
+    assert.equal(mutating, true);
+    saves++;
+    issue.status = "Done";
+    return { structuredContent: { ...issue } };
+  };
+  await linear.setState({ ...issue }, "Done");
+  await linear.setState({ ...issue }, "Done");
+  assert.equal(saves, 1);
+});
+
+test("external finalize rechecks proof after merge checkpoint, main CI waits and finalizationReady crash resume", async (t) => {
+  const f = await preparedExternalFixture(t),
+    ctx = f.ctx,
+    effects: string[] = [];
+  await git(f.root, "merge", "--no-ff", "--no-edit", ctx.data.branch);
+  ctx.data.mergeSha = await git(f.root, "rev-parse", "HEAD");
+  f.pr.merged = true;
+  f.pr.merge_commit_sha = ctx.data.mergeSha;
+  let duringChecks = false;
+  f.github.waitChecks = async () => {
+    if (duringChecks) await writeFile(f.evidenceFile, "changed during main CI");
+    return [
+      { name: "verify", headSha: ctx.data.mergeSha, conclusion: "success" },
+    ];
+  };
+  const adapter = createAdapter({
+    github: f.github,
+    linear: {
+      async getIssue() {
+        return { id: "KEY-1" };
+      },
+      async setState() {
+        effects.push("Done");
+      },
+      async comment() {
+        effects.push("progress");
+      },
+    },
+  });
+  await writeFile(f.evidenceFile, "changed after merge checkpoint");
+  await assert.rejects(adapter.runStage("finalize", ctx), {
+    code: "EXTERNAL_ACCEPTANCE_CHANGED",
+  });
+  assert.deepEqual(effects, []);
+  assert.equal((await f.registry()).claims.length, 3);
+  await writeFile(f.evidenceFile, f.evidence);
+  duringChecks = true;
+  await assert.rejects(adapter.runStage("finalize", ctx), {
+    code: "EXTERNAL_ACCEPTANCE_CHANGED",
+  });
+  assert.deepEqual(effects, []);
+  assert.equal(ctx.data.finalizationReady, undefined);
+  assert.equal((await f.registry()).claims.length, 3);
+  assert.equal(
+    await readFile(f.evidenceFile, "utf8"),
+    "changed during main CI",
+  );
+  await writeFile(f.evidenceFile, f.evidence);
+  duringChecks = false;
+  ctx.fault = async (point: string) => {
+    if (point === "after-worker-release")
+      throw new Error("finalize checkpoint crash");
+  };
+  await assert.rejects(
+    adapter.runStage("finalize", ctx),
+    /finalize checkpoint crash/,
+  );
+  assert.equal(ctx.data.finalizationReady, true);
+  assert.deepEqual(effects, ["Done", "progress"]);
+  assert.deepEqual(
+    (await f.registry()).claims.map((claim: any) => claim.task).sort(),
+    ["authority", "controller"],
+  );
+  await writeFile(f.evidenceFile, "changed before finalizationReady resume");
+  ctx.fault = async () => {};
+  await assert.rejects(adapter.runStage("finalize", ctx), {
+    code: "EXTERNAL_ACCEPTANCE_CHANGED",
+  });
+  assert.deepEqual(effects, ["Done", "progress"]);
+  assert.deepEqual(
+    (await f.registry()).claims.map((claim: any) => claim.task).sort(),
+    ["authority", "controller"],
+  );
+  await writeFile(f.evidenceFile, f.evidence);
+  assert.deepEqual(await adapter.runStage("finalize", ctx), {
+    finalized: true,
+  });
+  assert.deepEqual(effects, ["Done", "progress"]);
+  assert.deepEqual(
+    (await f.registry()).claims.map((claim: any) => claim.task),
+    ["authority"],
+  );
+});
 async function fixture(t: any) {
   const folder = await mkdtemp(path.join(tmpdir(), "autodev-adapters-")),
     root = path.join(folder, "repo");
@@ -112,7 +576,11 @@ async function fixture(t: any) {
     path.join(sourceRoot, "scripts/agent-tasks.mjs"),
     path.join(root, "scripts/agent-tasks.mjs"),
   );
-  const controllerTask = definition("controller", ["artifacts/", "handoff.md"]),
+  const controllerTask = definition("controller", [
+      "artifacts/",
+      "handoff.md",
+      bmadRenderPrefix(root),
+    ]),
     workerTask = definition("worker", ["src/a.txt", "src/new.txt"]),
     validationTask = definition("validation", [], ["heavy-validation"]);
   for (const task of [controllerTask, workerTask, validationTask])
@@ -1781,8 +2249,10 @@ test("adapters retain the established public API after separating source ownersh
     new URL("../scripts/autodev/adapters.mjs", import.meta.url).href
   );
   assert.deepEqual(Object.keys(adapters), [
+    "assertBmadRenderScope",
     "assertStageScope",
     "auditScope",
+    "bmadRenderPrefix",
     "createAdapter",
     "ignoredSnapshot",
     "inScope",
@@ -1908,7 +2378,12 @@ test("stage audit canonicalizes before scope checks and distinguishes absent fro
   }
   for (const allowed of [[], ["foreign/"]]) {
     assert.throws(
-      () => assertStageScope({}, { "foreign/file": { sha256: undefined } }, allowed),
+      () =>
+        assertStageScope(
+          {},
+          { "foreign/file": { sha256: undefined } },
+          allowed,
+        ),
       { code: "INVALID_JSON", message: "State must contain JSON values only" },
     );
   }
@@ -2142,6 +2617,24 @@ test("commit resumes after crash by exact parent/tree/marker without a second co
   await adapter.runStage("commit", ctx);
   assert.equal(ctx.data.commitSha, committed);
   assert.equal(await git(root, "rev-list", "--count", "HEAD"), "2");
+});
+
+test("external commit handoff explicitly awaits practical acceptance without self-referencing its commit", async (t) => {
+  const { root, ctx } = await fixture(t);
+  ctx.assignment.acceptance = {
+    kind: "external",
+    description: "Comparable production A/B",
+  };
+  await writeFile(path.join(root, "src/new.txt"), "runtime candidate\n");
+  ctx.data.sourceDigest = (
+    await sourceIdentity(root, ctx.data.baseSha, ctx.data.workerTask.writePaths)
+  ).digest;
+  await createAdapter().runStage("commit", ctx);
+  const handoff = await readFile(path.join(root, "handoff.md"), "utf8");
+  assert.match(handoff, /před externí praktickou přejímkou/);
+  assert.match(handoff, /připnutý receipt nezávislého koordinátora/);
+  assert.equal(handoff.includes(ctx.data.commitSha), false);
+  assert.equal(handoff.includes("tímto CLI ověřením"), false);
 });
 
 test("commit refuses pre-existing staged contents", async (t) => {

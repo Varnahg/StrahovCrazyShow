@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-20T21:28:29.7952566Z",
+  "scope": "Sériové porovnání jediné původní fixture, bez souběžné plné sady nebo CPU/GPU benchmarku; běžná systémová zátěž nebyla řízená.",
+  "test": "blind authority repair never dispatches while an original native reviewer is live",
+  "baseline": {
+    "kind": "original-baseline-legacy-fixture",
+    "sourceSnapshotId": "5a123c5cbe7ceca84f03798254f32acf21debe97e62647c71751a7bef0500496",
+    "startedAt": "2026-10-20T21:25:07.9293547Z",
+    "finishedAt": "2026-10-20T21:25:29.5373181Z",
+    "exitCode": 0,
+    "cwd": "C:\\Users\\rezac\\.codex\\worktrees\\ci-main-autonomous-pilot\\StrahovCrazyShow\\.cache\\performance-snapshot\\transit-runtime-20261020-baseline",
+    "stdoutSha256": "233f85151283114e6d88488a48c44d0c5ebc2a6c12d64cc5a0c55490ad9fe0af",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidate": {
+    "kind": "candidate-legacy-fixture",
+    "base": "ba91b84c17918ee16a9472c57f38b427fa6e21da",
+    "startedAt": "2026-10-20T21:27:30.5390561Z",
+    "finishedAt": "2026-10-20T21:27:52.3121098Z",
+    "exitCode": 0,
+    "sourceStable": true,
+    "files": {
+      "tests/autodev-engine.test.ts": "9c80a45aeabd9d7c0ec7ecd93754325a68b8e378ac3f11ba2e4730e8f8dfb732",
+      "tests/autodev-adapters.test.ts": "2626b43c98ce271a6f4425375d557ec755aab77f37c8dfa153aaea0b34b66c39",
+      "tests/autodev-external-acceptance.test.ts": "a5255f3292551cb4397ee2ffdef96f9404c7a95f3253044dcfb3469517ede1b4",
+      "scripts/autodev/store.mjs": "2e3b4395351f646d26f52b505c3436ae4b49759463a220193e891fa9ee4420d6",
+      "tests/autodev-store.test.ts": "d8cfd97ba23da9d8a18640c980b6873a4a3b19caa458799f57f4050c534bc6ae",
+      "scripts/autodev/adapters.mjs": "4f1f6e8b18af5963a1c0e6fcb73612feeb90db1e33e2e810e6ff51d01f585690",
+      "scripts/autodev/external-acceptance.mjs": "6b3b43b75f6c325479aeff421b68a477cbef8447f4a3672e6ef5aa6498c92287",
+      "scripts/autodev/linear.mjs": "117108ece7d0bd513de09c3a126b86d788d8cad3f9f1dd0a48efb39b66729aa4",
+      "scripts/autodev/github.mjs": "20be7bf2e833cd7671ea4de72a991729e63efad724784fb79c286a7e66b28402",
+      "docs/agents/bmad-controller.md": "b7696c6d0c9f85ddd16f68006957d21589d97a0e79e3124ef1de50cdcd0ec7bb"
+    },
+    "stdoutSha256": "d2e2642cee269e80c6591bcd391745144aafcb8cd9cfa413fc56966063392942",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "result": "Obě varianty1/1 PASS, původní test/timeout beze změny. Dřívější souběžné selhání je zachované; příčina není prokázaná jako jediný faktor, ale aktuální kandidát touto kontrolou prochází."
+}
