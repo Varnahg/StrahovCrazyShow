@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-validation-20261020",
+  "title": "KEY-48: reprodukovatelné výchozí a výsledné testy, build a izolovaná integrace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "node_modules/",
+    "dist/",
+    ".cache/refactor-validation/",
+    "assets/blender/buildings/source-plan.json",
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_alpha_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_arm_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_diff_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_dry_diff_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.exr",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_rough_8k.exr",
+    "public/models/vegetation/realistic/strahov-individual-trees.glb",
+    "public/models/vegetation/runtime/far.glb",
+    "docs/agents/handoffs/global-refactor-validation-20261020.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Použít závislosti z frozen lockfile a původní LFS objekty, bez změny manifestů, lockfile nebo modelů.",
+    "Spustit celou sadu, build a izolovanou integraci nad identifikovaným stabilním checkpointem; uchovat i původní neúspěchy.",
+    "Nepoužívat CPU/NullEngine výsledky jako GPU důkaz nebo tvrzení o FPS."
+  ],
+  "verification": [
+    "pnpm install --frozen-lockfile; git lfs checkout; node scripts/check-lfs-assets.mjs",
+    "pnpm test (při doložené lokální contention zachovat všechny testy a omezit souběh bez změn očekávání)",
+    "pnpm build; pnpm test:integration",
+    "git status --short; manifest SHA zahrnující zdroje a testy"
+  ],
+  "notes": [
+    "Vlastní izolovaná pracovní kopie .cache/refactor-20261020. Žádné cizí procesy se neukončují.",
+    "Každé nové spuštění celé pipeline vyžaduje stabilní checkpoint a obnovu rezervace. Port před startem ověřit na OS.",
+    "LFS materializace nepřegeneruje assety; očekává se nulový Git diff v jejich cestách."
+  ]
+}
