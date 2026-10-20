@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "acceptance": [
+    "Pouze testovací vrstva; žádná změna produkčního klienta, serveru, fyziky nebo veřejného API.",
+    "Výzkum, varianty, cílený refaktoring a relevantní skutečné ověření; zachovat cizí WIP a deníkové rezervace."
+  ],
+  "verification": [
+    "pnpm exec tsx --test tests/recorded-walkthrough-replay.test.ts",
+    "pnpm test / pnpm build / pnpm test:integration s validační rezervací",
+    "Skutečný browser renderer přehraje oba testové scénáře; evidovat limity sampled pozic a jakékoli selhání."
+  ],
+  "notes": [
+    "Uživatel 20. 10. 2026 požaduje replikovat oba vlastní průchody mapou pouze v testech; sampled renderer replay není deterministický input/physics replay.",
+    "Výchozí přijatý main ab39b7185d0c9fb5e393c654818f43de82e07886; izolovaná managed worktree recorded-playtest-replay.",
+    "Linear KEY-49: https://linear.app/gigeconomy/issue/KEY-49; vlastní změny a předání této relace, žádný cizí WIP."
+  ],
+  "id": "recorded-walkthrough-replay-20261020",
+  "title": "Testovací přehrávání zaznamenaných tras v reálném rendereru",
+  "writePaths": [
+    "tests/replay/browser-entry.ts",
+    "tests/replay/run.mjs",
+    "tests/replay/README.md",
+    "tests/replay/replay.mjs",
+    "tests/recorded-walkthrough-replay.test.ts",
+    "_bmad/render/bmad-build/",
+    "_bmad/render/bmad-review/",
+    "_bmad-output/implementation-artifacts/recorded-walkthrough-20261020/",
+    "docs/agents/handoffs/recorded-walkthrough-replay-20261020.md",
+    "docs/performance/evidence/recorded-walkthrough-20261020/",
+    ".cache/recorded-walkthrough/",
+    "docs/verification.md"
+  ]
+}
