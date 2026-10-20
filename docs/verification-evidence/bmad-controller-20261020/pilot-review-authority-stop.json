@@ -1,0 +1,532 @@
+{
+  "at": "2026-10-20T04:23:17.151Z",
+  "executorCommit": "938254e3fe874de24b89ade193f8f8e5b7a95d6d",
+  "runId": "key-47-c1ef58bf36c0",
+  "error": {
+    "at": "2026-10-20T04:14:22.412Z",
+    "code": "REVIEW_OUTPUT",
+    "message": "Blind output lacks a finding location or reports an incomplete review",
+    "stage": "review"
+  },
+  "sourceDigest": "eab6516de7c14a86d0b53bddae3eec1832ea7734f2b4073b38a23015290bd108",
+  "implementationAttempt": "e05980c9326af6af6e251ed3",
+  "frozenSha256": "539febe5eb262cc3382640d45116ff009ff3d49cdc753c500dd65768a8de0eb4",
+  "amendmentCompleted": true,
+  "readiness": {
+    "attemptId": "079c6f7df9ab3f85887d5354",
+    "binding": {
+      "frozenSha256": "539febe5eb262cc3382640d45116ff009ff3d49cdc753c500dd65768a8de0eb4",
+      "intentSha256": "ea7b010acf08a9af91c920f431b696f3fea2f914fefa656fba6cbbd4779a4faf",
+      "planSha256": "3847e08fe09f8b0f0edb9922e26b3e58fda6b59c16974726d624f5dfde64b3ae",
+      "snapshotSha256": "98e48cb72aa17d9e19f302745a5047d0de6b3ee22409197426566ceeb39d10b8",
+      "specBodySha256": "f83c1c2e4d979af201c2e271c4b5a76c2c99b4a0927ff4b627e4146b162a3b18"
+    },
+    "completionAssessment": {
+      "authorizationSha256": "2d536203be9ffc3eb433ad3ff3f5d28a8de5ca11e33d504dfd9cc48e1784d02f",
+      "intentGaps": [
+        {
+          "index": 0,
+          "reason": "Původní položka řeší délku prezentace jediného přiděleného rozsahu a sama neuvádí věcnou otázku CLI. Dokumentované scopeDecision.choice=keep-full tuto administrativní volbu uzavírá v rámci existující delegace. Nejde o novou uživatelskou odpověď ani rozhodnutí o produktu.",
+          "resolution": "workflow-keep-full",
+          "text": "Pro zachování současné rozsáhlé specifikace chybí doložená uživatelská volba „Keep full spec“ versus „Split“, kterou krok 02.6 vyžaduje při překročení 1600 tokenů. Věcný záměr CLI další rozhodnutí nevyžaduje."
+        }
+      ],
+      "runtimeBlockers": [
+        {
+          "index": 0,
+          "reason": "Původní položka spojuje neměřený tokenový počet s rozsahovou branou. Přesný počet zůstává neměřený; žádný náhradní počet není vydáván za tokeny. Existující rozhodnutí keep-full platí bez ohledu na délku a přijímá její riziko, takže podle výslovně dodaného rozhodnutí nejde o zbývající podmínku pokračování.",
+          "resolution": "workflow-keep-full",
+          "text": "Chybí doložený tokenový počet a uzavření rozsahové podmínky kroku 02.6. Specifikace má 15 567 znaků a 1 848 jednotek oddělených mezerami; přesný počet modelových tokenů nebyl ověřen."
+        },
+        {
+          "index": 1,
+          "reason": "Chybějící významné úspěšné i chybové scénáře dodává presentation.ioMatrix odvozená z původního zadání a zachovaného ověřovacího kontraktu. Řadič ji podle výslovného pokynu připojí mimo přesný zmrazený blok.",
+          "resolution": "spec-presentation",
+          "text": "Plná specifikace postrádá povinnou I/O & Edge-Case Matrix, přestože CLI má významné úspěšné i chybové scénáře."
+        },
+        {
+          "index": 2,
+          "reason": "presentation.tasks dodává pouze worker WRITE úkoly ve formátu cesta–akce–důvod, včetně testování argumentových okrajů matice. Systémová acceptanceCriteria mají samostatné neprázdné given, when a then; when obsahuje pouze spouštěcí událost. Kritéria neopakují I/O scénáře a připravenost se neopírá o status in-review.",
+          "resolution": "spec-presentation",
+          "text": "Tasks & Acceptance nesplňuje požadovaný formát úkolů cesta–akce–důvod a akceptačních kritérií Given/When/Then. Samotné označení in-review připravenost nedokládá."
+        }
+      ],
+      "sha256": "f3493d6a698a06dba691a0a594fd76b936eb079e03541e0ba09b86b923c10e0d"
+    },
+    "completionHistory": {
+      "originalFailure": {
+        "inputPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\input-36211870db17b405efc43832.json",
+        "inputSha256": "20d4943443f6504fb94280e5757c4077292ddbd83da922fd229aaecf03c9baff",
+        "key": "spec-completion:v1",
+        "outputPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\spec-completion-v1.json",
+        "raw": "{\n  \"ready\": true,\n  \"intentGaps\": [],\n  \"runtimeBlockers\": [],\n  \"evidence\": [\n    \"Přečteny AGENTS.md a docs/agents/bmad-policy.md. Existující přidělení a checkpointy řadiče zůstávají zachovány; další potvrzení není potřeba.\",\n    \"Posouzeny všechny dodané autorizované vstupy: step-02-plan.md, spec-template.md, original-plan.json, frozen-intent.txt, original-spec.md, candidate.diff, project-authorization.json a prior-readiness.json. Úplné doručení instrukcí odstraňuje původní blokaci jejich nedostupného obsahu.\",\n    \"Lokální spec.md má SHA-256 699845966221d25f18b58a3f72b3e84d8bc4c854ee33927845cd2bc7e44eda6e, shodné s original-spec.md. Doplnění prezentace zachovává přesný zmrazený blok; odvozená matice patří mimo něj.\",\n    \"Plán porovnává čtyři varianty. Kandidát realizuje zvolenou časnou větev před filesystem/Git operacemi, přijímá pouze jediný alias a zachovává parseRoot i původní ověřovací režim. Nebyl zjištěn rozpor se zmrazeným záměrem.\",\n    \"implementation.json uvádí sourceDigest eab6516de7c14a86d0b53bddae3eec1832ea7734f2b4073b38a23015290bd108. Přímo ověřené SHA-256 skriptu f8342e2873a6c74d3082a987993321a94d64ea6eb95f8fce555bb655924e78e2 a nového testu 217511cfa7cac897082c957cc876ea5f6438bddd6919cf840c3fbd06bb1b3771 odpovídají implementační evidenci.\",\n    \"Implementační evidence hlásí 51 úspěšných testů, jeden POSIX test přeskočený na Windows a úspěšný samostatný běh nápovědy. Testy nebyly opakovány; oba původní testové soubory byly přečteny.\",\n    \"scopeDecision.choice=keep-full uzavírá administrativní rozhodnutí o délce jediného přiděleného rozsahu. Přesný počet tokenů zůstává výslovně neměřený; není tvrzen nový uživatelský souhlas ani odpověď na produktovou otázku.\",\n    \"Výsledek umožňuje řadiči provést popsané doplnění prezentace a pokračovat se stejným kandidátem. Nezávislá review, povinné CI na přesném head, SHA-vázané přijetí a chráněný merge zůstávají navazujícími branami řadiče.\",\n    \"Proběhlo pouze čtení a kontrola identit. Nebyly upraveny soubory, spuštěny workflow či agenti, vytvořeny commity ani změněny služby.\"\n  ],\n  \"presentation\": {\n    \"tasks\": [\n      {\n        \"path\": \"scripts/check-lfs-assets.mjs\",\n        \"action\": \"Obsloužit přesně samostatné --help a -h na začátku main: vypsat nápovědu na stdout a vrátit 0 před parseRoot a filesystem/Git operacemi. Ostatní argumenty předat zachovanému parseru; args získat jednou.\",\n        \"reason\": \"Zajistit nezávislou nápovědu nejmenší zvolenou změnou a zachovat dosavadní ověřování i odmítání chybných kombinací.\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"path\": \"tests/lfs-assets-help.test.ts\",\n        \"action\": \"Pokrýt black-box testy úspěšné i chybové scénáře nápovědy a argumentové okraje z matice. Použít absolutní process.execPath, existující vlastní temp adresář, varianty cwd a PATH, odstranění všech variant PATH při jeho vyprázdnění a izolaci GIT_* a NODE_OPTIONS. Ověřit normální ukončení, návratové kódy, stdout/stderr a bezpečný úklid vlastní fixture.\",\n        \"reason\": \"Prokázat funkčnost obou aliasů bez checkoutu i Git v PATH a zabránit tichému přeskočení kontroly při smíchaných argumentech.\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"path\": \"tests/lfs-assets.test.ts\",\n        \"action\": \"Ponechat soubor beze změn a zahrnout jej do přiděleného společného testovacího příkazu pro zachované úspěšné i chybové scénáře ověřovacího režimu.\",\n        \"reason\": \"Doložit zachování existujících kontrol inventáře HEAD, souborů, pointerů, velikostí, cest a argumentů.\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"path\": \"tests/lfs-assets-edge-cases.test.ts\",\n        \"action\": \"Ponechat soubor beze změn a zahrnout jej do stejného cíleného běhu; zaznamenat skutečný výsledek včetně případného platformního přeskočení testu POSIX cesty.\",\n        \"reason\": \"Zachovat doložené okraje malých materializovaných souborů a platné POSIX cesty s koncovou mezerou.\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"path\": \"docs/agents/handoffs/bmad-controller-live-pilot-20261020.md\",\n        \"action\": \"Předat řadiči dvousouborový diff, skutečné výsledky příkazu node --test tests/lfs-assets.test.ts tests/lfs-assets-edge-cases.test.ts tests/lfs-assets-help.test.ts a samostatného node scripts/check-lfs-assets.mjs --help, identitu kandidáta a stav vlastních procesů a temp fixtures.\",\n        \"reason\": \"Umožnit řadiči doloženou přejímku a integraci přiděleného rozsahu.\",\n        \"basis\": \"controller:0\"\n      }\n    ],\n    \"ioMatrix\": [\n      {\n        \"scenario\": \"Samostatná nápověda v checkoutu\",\n        \"input\": \"Právě jeden argument --help nebo -h; cwd je checkout a PATH je zděděný.\",\n        \"output\": \"Exit 0, nápověda na stdout, prázdný stderr. Text vysvětlí výchozí cwd jako kořen checkoutu, --root DIR, kontrolu velikostí a pointerů, absenci checksumu a stahování a samostatnost help argumentu.\",\n        \"errorHandling\": \"Proces musí normálně skončit bez chyby spuštění nebo signálu.\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"scenario\": \"Nápověda bez checkoutu nebo Git v PATH\",\n        \"input\": \"Samostatné --help nebo -h; existující temp nerepozitářový cwd se zděděným nebo prázdným PATH, případně checkout s prázdným PATH.\",\n        \"output\": \"Exit 0, stejná nápověda na stdout a prázdný stderr bez potřeby ověřovat checkout či spouštět Git.\",\n        \"errorHandling\": \"Použít existující cwd, aby se skutečně spustilo CLI; selhání spuštění nebo signál nesmí zastoupit výsledek nápovědy.\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"scenario\": \"Smíchané nebo opakované help argumenty\",\n        \"input\": \"Help alias před nebo za --root DIR, neznámou volbou či pozičním argumentem; opakovaný alias nebo oba aliasy společně.\",\n        \"output\": \"Exit 1, prázdný stdout a argumentová diagnostika Invalid arguments s usage na stderr.\",\n        \"errorHandling\": \"Nezobrazit úspěšnou nápovědu a tiše nepřeskočit kontrolu; argumentovou chybu zachovat také mimo Git s prázdným PATH.\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"scenario\": \"Původní neplatné argumenty\",\n        \"input\": \"Samostatné --unknown, --root bez hodnoty nebo neočekávaný poziční argument.\",\n        \"output\": \"Zachované odmítnutí: exit 1, prázdný stdout a argumentová diagnostika s usage na stderr.\",\n        \"errorHandling\": \"Chybu rozpoznat parserem před filesystem/Git operacemi.\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"scenario\": \"Platný ověřovací režim\",\n        \"input\": \"Žádné argumenty v kořeni checkoutu nebo --root DIR pro platný checkout; inventář HEAD a pracovní soubory splňují stávající kontroly.\",\n        \"output\": \"Zachovaný exit 0 a souhrn připravených souborů; kontrolují se velikosti a pointery bez checksumu a stahování.\",\n        \"errorHandling\": \"Zachovat dosavadní zpracování prázdného inventáře a materializovaných souborů.\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"scenario\": \"Nezpůsobilé pracovní assety\",\n        \"input\": \"Ověřovací režim s chybějícím souborem, chybnou velikostí, nematerializovaným pointerem nebo nebezpečnou cestou.\",\n        \"output\": \"Zachovaný neúspěšný výsledek, diagnostika dotčeného souboru a souhrn selhání.\",\n        \"errorHandling\": \"Exit 1; soubory ani LFS cache neopravovat, nestahovat a nezveřejňovat obsah assetů v diagnostice.\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"scenario\": \"Neplatný root nebo nedostupný inventář\",\n        \"input\": \"Ověřovací režim s chybějícím rootem, nerepozitářovým rootem, chybějícím HEAD, neplatným inventářem nebo selháním Git LFS.\",\n        \"output\": \"Zachované selhání s diagnostikou odpovídající původnímu ověřovacímu režimu.\",\n        \"errorHandling\": \"Exit 1; nevyhodnotit neúplnou kontrolu jako úspěch.\",\n        \"basis\": \"intent\"\n      }\n    ],\n    \"acceptanceCriteria\": [\n      {\n        \"given\": \"Kandidát KEY-47 vychází z přiděleného dvousouborového rozsahu.\",\n        \"when\": \"Když řadič porovná kandidáta se základem, pak zdrojové změny zahrnují pouze scripts/check-lfs-assets.mjs a tests/lfs-assets-help.test.ts a hra/GPU nemá změněný runtime.\",\n        \"then\": \"\",\n        \"basis\": \"acceptance\"\n      },\n      {\n        \"given\": \"Testovací běh vlastní své pomocné procesy a dočasné fixtures.\",\n        \"when\": \"Když ověřování skončí, pak vlastní procesy jsou dokončené a bezpečně uklizené jsou pouze vlastní temp fixtures.\",\n        \"then\": \"\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"given\": \"Řadič přebírá konkrétní kandidát jediného přiděleného pilotu.\",\n        \"when\": \"Když jej přijímá k integraci, pak jsou doložena nezávislá blind/edge/verification review, povinné GitHub checky na přesném head, SHA-vázané přijetí a chráněný merge.\",\n        \"then\": \"\",\n        \"basis\": \"intent\"\n      },\n      {\n        \"given\": \"Řadič byl ukončen po vytvoření PR před lokálním checkpointem.\",\n        \"when\": \"Když je běh obnoven, pak pokračuje se stejnou identitou a zachová omezení jednoho worktree, worker attemptu pro daný krok, commitu, PR a provozního Linear komentáře.\",\n        \"then\": \"\",\n        \"basis\": \"intent\"\n      }\n    ],\n    \"routeFacts\": {\n      \"footprint\": [\n        \"scripts/check-lfs-assets.mjs: úzká změna řízení CLI v main. [basis: intent]\",\n        \"tests/lfs-assets-help.test.ts: nový samostatný black-box testovací modul. [basis: intent]\",\n        \"BMAD plán, evidence, předání a renderer patří řadiči; původní regresní soubory zůstávají beze změny. [basis: intent]\"\n      ],\n      \"irreversibles\": [\n        \"Přidělený běh řadiče zahrnuje vnější účinky v Linear, push, publikaci PR a chráněný merge; proto zůstává route=dispatch i při malém zdrojovém diffu. [basis: intent]\"\n      ],\n      \"newDependencies\": []\n    }\n  },\n  \"priorReadiness\": {\n    \"sha256\": \"f3493d6a698a06dba691a0a594fd76b936eb079e03541e0ba09b86b923c10e0d\",\n    \"authorizationSha256\": \"2d536203be9ffc3eb433ad3ff3f5d28a8de5ca11e33d504dfd9cc48e1784d02f\",\n    \"intentGaps\": [\n      {\n        \"index\": 0,\n        \"text\": \"Pro zachování současné rozsáhlé specifikace chybí doložená uživatelská volba „Keep full spec“ versus „Split“, kterou krok 02.6 vyžaduje při překročení 1600 tokenů. Věcný záměr CLI další rozhodnutí nevyžaduje.\",\n        \"resolution\": \"workflow-keep-full\",\n        \"reason\": \"Původní text řeší pouze délku prezentace již přiděleného rozsahu. Existující scopeDecision.choice=keep-full tuto administrativní volbu výslovně uzavírá bez ohledu na délku. Nejde o novou uživatelskou odpověď ani rozhodnutí o chování produktu.\"\n      }\n    ],\n    \"runtimeBlockers\": [\n      {\n        \"index\": 0,\n        \"text\": \"Chybí doložený tokenový počet a uzavření rozsahové podmínky kroku 02.6. Specifikace má 15 567 znaků a 1 848 jednotek oddělených mezerami; přesný počet modelových tokenů nebyl ověřen.\",\n        \"resolution\": \"workflow-keep-full\",\n        \"reason\": \"Existující rozhodnutí keep-full přijímá riziko délky pro celý jediný zmrazený rozsah. Přesný počet tokenů zůstává výslovně neměřený; počty znaků a slov jej nenahrazují. Podle dodané delegace není toto měření další podmínkou pokračování.\"\n      },\n      {\n        \"index\": 1,\n        \"text\": \"Plná specifikace postrádá povinnou I/O & Edge-Case Matrix, přestože CLI má významné úspěšné i chybové scénáře.\",\n        \"resolution\": \"spec-presentation\",\n        \"reason\": \"presentation.ioMatrix dodává významné úspěšné i chybové scénáře odvozené z existujícího zadání a zachovaných kontraktů. Řadič ji podle výslovného pokynu připojí mimo nezměněný zmrazený blok.\"\n      },\n      {\n        \"index\": 2,\n        \"text\": \"Tasks & Acceptance nesplňuje požadovaný formát úkolů cesta–akce–důvod a akceptačních kritérií Given/When/Then. Samotné označení in-review připravenost nedokládá.\",\n        \"resolution\": \"spec-presentation\",\n        \"reason\": \"presentation.tasks dodává cestu, akci a důvod včetně pokrytí okrajů matice testy. presentation.acceptanceCriteria obsahuje systémové podmínky a formulace Když/Pak bez opakování I/O scénářů. Připravenost vychází z tohoto doplnění a posouzení vstupů, nikoli ze statusu in-review.\"\n      }\n    ]\n  }\n}",
+        "rawSha256": "631058f07ebec4bf7821b394c3487bcac8bff0f9be59ac1862d3f4a2ca08eebb",
+        "receipt": {
+          "attemptId": "8c438cd6b1af902c78419a5c",
+          "exitCode": 0,
+          "finishedAt": "2026-10-20T03:25:15.404Z",
+          "requestDigest": "27df2e6497b0d8b157cb8997e55eafae33b2c988a245cdab343c81695b4774b7",
+          "schemaVersion": 1,
+          "signal": null,
+          "stderrPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\attempts\\8c438cd6b1af902c78419a5c\\stderr.log",
+          "stdoutPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\attempts\\8c438cd6b1af902c78419a5c\\stdout.log",
+          "workerExitCode": 0
+        },
+        "requestDigest": "27df2e6497b0d8b157cb8997e55eafae33b2c988a245cdab343c81695b4774b7",
+        "result": {
+          "evidence": [
+            "Přečteny AGENTS.md a docs/agents/bmad-policy.md. Existující přidělení a checkpointy řadiče zůstávají zachovány; další potvrzení není potřeba.",
+            "Posouzeny všechny dodané autorizované vstupy: step-02-plan.md, spec-template.md, original-plan.json, frozen-intent.txt, original-spec.md, candidate.diff, project-authorization.json a prior-readiness.json. Úplné doručení instrukcí odstraňuje původní blokaci jejich nedostupného obsahu.",
+            "Lokální spec.md má SHA-256 699845966221d25f18b58a3f72b3e84d8bc4c854ee33927845cd2bc7e44eda6e, shodné s original-spec.md. Doplnění prezentace zachovává přesný zmrazený blok; odvozená matice patří mimo něj.",
+            "Plán porovnává čtyři varianty. Kandidát realizuje zvolenou časnou větev před filesystem/Git operacemi, přijímá pouze jediný alias a zachovává parseRoot i původní ověřovací režim. Nebyl zjištěn rozpor se zmrazeným záměrem.",
+            "implementation.json uvádí sourceDigest eab6516de7c14a86d0b53bddae3eec1832ea7734f2b4073b38a23015290bd108. Přímo ověřené SHA-256 skriptu f8342e2873a6c74d3082a987993321a94d64ea6eb95f8fce555bb655924e78e2 a nového testu 217511cfa7cac897082c957cc876ea5f6438bddd6919cf840c3fbd06bb1b3771 odpovídají implementační evidenci.",
+            "Implementační evidence hlásí 51 úspěšných testů, jeden POSIX test přeskočený na Windows a úspěšný samostatný běh nápovědy. Testy nebyly opakovány; oba původní testové soubory byly přečteny.",
+            "scopeDecision.choice=keep-full uzavírá administrativní rozhodnutí o délce jediného přiděleného rozsahu. Přesný počet tokenů zůstává výslovně neměřený; není tvrzen nový uživatelský souhlas ani odpověď na produktovou otázku.",
+            "Výsledek umožňuje řadiči provést popsané doplnění prezentace a pokračovat se stejným kandidátem. Nezávislá review, povinné CI na přesném head, SHA-vázané přijetí a chráněný merge zůstávají navazujícími branami řadiče.",
+            "Proběhlo pouze čtení a kontrola identit. Nebyly upraveny soubory, spuštěny workflow či agenti, vytvořeny commity ani změněny služby."
+          ],
+          "intentGaps": [],
+          "presentation": {
+            "acceptanceCriteria": [
+              {
+                "basis": "acceptance",
+                "given": "Kandidát KEY-47 vychází z přiděleného dvousouborového rozsahu.",
+                "then": "",
+                "when": "Když řadič porovná kandidáta se základem, pak zdrojové změny zahrnují pouze scripts/check-lfs-assets.mjs a tests/lfs-assets-help.test.ts a hra/GPU nemá změněný runtime."
+              },
+              {
+                "basis": "intent",
+                "given": "Testovací běh vlastní své pomocné procesy a dočasné fixtures.",
+                "then": "",
+                "when": "Když ověřování skončí, pak vlastní procesy jsou dokončené a bezpečně uklizené jsou pouze vlastní temp fixtures."
+              },
+              {
+                "basis": "intent",
+                "given": "Řadič přebírá konkrétní kandidát jediného přiděleného pilotu.",
+                "then": "",
+                "when": "Když jej přijímá k integraci, pak jsou doložena nezávislá blind/edge/verification review, povinné GitHub checky na přesném head, SHA-vázané přijetí a chráněný merge."
+              },
+              {
+                "basis": "intent",
+                "given": "Řadič byl ukončen po vytvoření PR před lokálním checkpointem.",
+                "then": "",
+                "when": "Když je běh obnoven, pak pokračuje se stejnou identitou a zachová omezení jednoho worktree, worker attemptu pro daný krok, commitu, PR a provozního Linear komentáře."
+              }
+            ],
+            "ioMatrix": [
+              {
+                "basis": "intent",
+                "errorHandling": "Proces musí normálně skončit bez chyby spuštění nebo signálu.",
+                "input": "Právě jeden argument --help nebo -h; cwd je checkout a PATH je zděděný.",
+                "output": "Exit 0, nápověda na stdout, prázdný stderr. Text vysvětlí výchozí cwd jako kořen checkoutu, --root DIR, kontrolu velikostí a pointerů, absenci checksumu a stahování a samostatnost help argumentu.",
+                "scenario": "Samostatná nápověda v checkoutu"
+              },
+              {
+                "basis": "intent",
+                "errorHandling": "Použít existující cwd, aby se skutečně spustilo CLI; selhání spuštění nebo signál nesmí zastoupit výsledek nápovědy.",
+                "input": "Samostatné --help nebo -h; existující temp nerepozitářový cwd se zděděným nebo prázdným PATH, případně checkout s prázdným PATH.",
+                "output": "Exit 0, stejná nápověda na stdout a prázdný stderr bez potřeby ověřovat checkout či spouštět Git.",
+                "scenario": "Nápověda bez checkoutu nebo Git v PATH"
+              },
+              {
+                "basis": "intent",
+                "errorHandling": "Nezobrazit úspěšnou nápovědu a tiše nepřeskočit kontrolu; argumentovou chybu zachovat také mimo Git s prázdným PATH.",
+                "input": "Help alias před nebo za --root DIR, neznámou volbou či pozičním argumentem; opakovaný alias nebo oba aliasy společně.",
+                "output": "Exit 1, prázdný stdout a argumentová diagnostika Invalid arguments s usage na stderr.",
+                "scenario": "Smíchané nebo opakované help argumenty"
+              },
+              {
+                "basis": "intent",
+                "errorHandling": "Chybu rozpoznat parserem před filesystem/Git operacemi.",
+                "input": "Samostatné --unknown, --root bez hodnoty nebo neočekávaný poziční argument.",
+                "output": "Zachované odmítnutí: exit 1, prázdný stdout a argumentová diagnostika s usage na stderr.",
+                "scenario": "Původní neplatné argumenty"
+              },
+              {
+                "basis": "intent",
+                "errorHandling": "Zachovat dosavadní zpracování prázdného inventáře a materializovaných souborů.",
+                "input": "Žádné argumenty v kořeni checkoutu nebo --root DIR pro platný checkout; inventář HEAD a pracovní soubory splňují stávající kontroly.",
+                "output": "Zachovaný exit 0 a souhrn připravených souborů; kontrolují se velikosti a pointery bez checksumu a stahování.",
+                "scenario": "Platný ověřovací režim"
+              },
+              {
+                "basis": "intent",
+                "errorHandling": "Exit 1; soubory ani LFS cache neopravovat, nestahovat a nezveřejňovat obsah assetů v diagnostice.",
+                "input": "Ověřovací režim s chybějícím souborem, chybnou velikostí, nematerializovaným pointerem nebo nebezpečnou cestou.",
+                "output": "Zachovaný neúspěšný výsledek, diagnostika dotčeného souboru a souhrn selhání.",
+                "scenario": "Nezpůsobilé pracovní assety"
+              },
+              {
+                "basis": "intent",
+                "errorHandling": "Exit 1; nevyhodnotit neúplnou kontrolu jako úspěch.",
+                "input": "Ověřovací režim s chybějícím rootem, nerepozitářovým rootem, chybějícím HEAD, neplatným inventářem nebo selháním Git LFS.",
+                "output": "Zachované selhání s diagnostikou odpovídající původnímu ověřovacímu režimu.",
+                "scenario": "Neplatný root nebo nedostupný inventář"
+              }
+            ],
+            "routeFacts": {
+              "footprint": [
+                "scripts/check-lfs-assets.mjs: úzká změna řízení CLI v main. [basis: intent]",
+                "tests/lfs-assets-help.test.ts: nový samostatný black-box testovací modul. [basis: intent]",
+                "BMAD plán, evidence, předání a renderer patří řadiči; původní regresní soubory zůstávají beze změny. [basis: intent]"
+              ],
+              "irreversibles": [
+                "Přidělený běh řadiče zahrnuje vnější účinky v Linear, push, publikaci PR a chráněný merge; proto zůstává route=dispatch i při malém zdrojovém diffu. [basis: intent]"
+              ],
+              "newDependencies": []
+            },
+            "tasks": [
+              {
+                "action": "Obsloužit přesně samostatné --help a -h na začátku main: vypsat nápovědu na stdout a vrátit 0 před parseRoot a filesystem/Git operacemi. Ostatní argumenty předat zachovanému parseru; args získat jednou.",
+                "basis": "intent",
+                "path": "scripts/check-lfs-assets.mjs",
+                "reason": "Zajistit nezávislou nápovědu nejmenší zvolenou změnou a zachovat dosavadní ověřování i odmítání chybných kombinací."
+              },
+              {
+                "action": "Pokrýt black-box testy úspěšné i chybové scénáře nápovědy a argumentové okraje z matice. Použít absolutní process.execPath, existující vlastní temp adresář, varianty cwd a PATH, odstranění všech variant PATH při jeho vyprázdnění a izolaci GIT_* a NODE_OPTIONS. Ověřit normální ukončení, návratové kódy, stdout/stderr a bezpečný úklid vlastní fixture.",
+                "basis": "intent",
+                "path": "tests/lfs-assets-help.test.ts",
+                "reason": "Prokázat funkčnost obou aliasů bez checkoutu i Git v PATH a zabránit tichému přeskočení kontroly při smíchaných argumentech."
+              },
+              {
+                "action": "Ponechat soubor beze změn a zahrnout jej do přiděleného společného testovacího příkazu pro zachované úspěšné i chybové scénáře ověřovacího režimu.",
+                "basis": "intent",
+                "path": "tests/lfs-assets.test.ts",
+                "reason": "Doložit zachování existujících kontrol inventáře HEAD, souborů, pointerů, velikostí, cest a argumentů."
+              },
+              {
+                "action": "Ponechat soubor beze změn a zahrnout jej do stejného cíleného běhu; zaznamenat skutečný výsledek včetně případného platformního přeskočení testu POSIX cesty.",
+                "basis": "intent",
+                "path": "tests/lfs-assets-edge-cases.test.ts",
+                "reason": "Zachovat doložené okraje malých materializovaných souborů a platné POSIX cesty s koncovou mezerou."
+              },
+              {
+                "action": "Předat řadiči dvousouborový diff, skutečné výsledky příkazu node --test tests/lfs-assets.test.ts tests/lfs-assets-edge-cases.test.ts tests/lfs-assets-help.test.ts a samostatného node scripts/check-lfs-assets.mjs --help, identitu kandidáta a stav vlastních procesů a temp fixtures.",
+                "basis": "controller:0",
+                "path": "docs/agents/handoffs/bmad-controller-live-pilot-20261020.md",
+                "reason": "Umožnit řadiči doloženou přejímku a integraci přiděleného rozsahu."
+              }
+            ]
+          },
+          "priorReadiness": {
+            "authorizationSha256": "2d536203be9ffc3eb433ad3ff3f5d28a8de5ca11e33d504dfd9cc48e1784d02f",
+            "intentGaps": [
+              {
+                "index": 0,
+                "reason": "Původní text řeší pouze délku prezentace již přiděleného rozsahu. Existující scopeDecision.choice=keep-full tuto administrativní volbu výslovně uzavírá bez ohledu na délku. Nejde o novou uživatelskou odpověď ani rozhodnutí o chování produktu.",
+                "resolution": "workflow-keep-full",
+                "text": "Pro zachování současné rozsáhlé specifikace chybí doložená uživatelská volba „Keep full spec“ versus „Split“, kterou krok 02.6 vyžaduje při překročení 1600 tokenů. Věcný záměr CLI další rozhodnutí nevyžaduje."
+              }
+            ],
+            "runtimeBlockers": [
+              {
+                "index": 0,
+                "reason": "Existující rozhodnutí keep-full přijímá riziko délky pro celý jediný zmrazený rozsah. Přesný počet tokenů zůstává výslovně neměřený; počty znaků a slov jej nenahrazují. Podle dodané delegace není toto měření další podmínkou pokračování.",
+                "resolution": "workflow-keep-full",
+                "text": "Chybí doložený tokenový počet a uzavření rozsahové podmínky kroku 02.6. Specifikace má 15 567 znaků a 1 848 jednotek oddělených mezerami; přesný počet modelových tokenů nebyl ověřen."
+              },
+              {
+                "index": 1,
+                "reason": "presentation.ioMatrix dodává významné úspěšné i chybové scénáře odvozené z existujícího zadání a zachovaných kontraktů. Řadič ji podle výslovného pokynu připojí mimo nezměněný zmrazený blok.",
+                "resolution": "spec-presentation",
+                "text": "Plná specifikace postrádá povinnou I/O & Edge-Case Matrix, přestože CLI má významné úspěšné i chybové scénáře."
+              },
+              {
+                "index": 2,
+                "reason": "presentation.tasks dodává cestu, akci a důvod včetně pokrytí okrajů matice testy. presentation.acceptanceCriteria obsahuje systémové podmínky a formulace Když/Pak bez opakování I/O scénářů. Připravenost vychází z tohoto doplnění a posouzení vstupů, nikoli ze statusu in-review.",
+                "resolution": "spec-presentation",
+                "text": "Tasks & Acceptance nesplňuje požadovaný formát úkolů cesta–akce–důvod a akceptačních kritérií Given/When/Then. Samotné označení in-review připravenost nedokládá."
+              }
+            ],
+            "sha256": "f3493d6a698a06dba691a0a594fd76b936eb079e03541e0ba09b86b923c10e0d"
+          },
+          "ready": true,
+          "runtimeBlockers": []
+        },
+        "resultSha256": "250015f93536473f6a9951372ba93bb82ed09714c22a4587fa07d74fe0f2eb20",
+        "validationCode": "SPEC_PRESENTATION"
+      },
+      "selected": {
+        "attemptId": "7aec03ccfcc73b9d0b1a3345",
+        "key": "spec-completion:v2",
+        "outputSchema": {
+          "contractVersion": 2,
+          "path": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\schemas\\2136aabe2e2ab3c018530fc0\\spec-completion.json",
+          "sha256": "16f7f5336678a09d6ca1308734c4d9c62afc36d5d25448d48fb695a864ed6af6"
+        },
+        "resultSha256": "62a97c437b317931a1d076cf43ebf598673223c86692e8ca7d55b3165a87b807"
+      }
+    },
+    "completionIdentity": {
+      "attemptId": "7aec03ccfcc73b9d0b1a3345",
+      "key": "spec-completion:v2",
+      "outputSchema": {
+        "contractVersion": 2,
+        "path": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\schemas\\2136aabe2e2ab3c018530fc0\\spec-completion.json",
+        "sha256": "16f7f5336678a09d6ca1308734c4d9c62afc36d5d25448d48fb695a864ed6af6"
+      },
+      "resultSha256": "62a97c437b317931a1d076cf43ebf598673223c86692e8ca7d55b3165a87b807"
+    },
+    "exitCode": 0,
+    "outputPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\plan-readiness-v3.json",
+    "priorReadiness": {
+      "attemptId": "5bdd6b0efb96a2032bf60c34",
+      "authorizationSha256": "2d536203be9ffc3eb433ad3ff3f5d28a8de5ca11e33d504dfd9cc48e1784d02f",
+      "result": {
+        "evidence": [
+          "AGENTS.md a docs/agents/bmad-policy.md byly přečteny. Úplné dodané step-02-plan.md a spec-template.md byly posouzeny; původní blokace nedoručeného obsahu je odstraněna.",
+          "Posouzeny byly všechny autorizované vstupy: instrukce, šablona, původní plán, zmrazený záměr, specifikace a kandidátní diff.",
+          "Hash specifikace odpovídá dodanému original-spec.md; původní zadání je v ní obsaženo doslova. Existující autorizace a checkpointy řadiče zůstávají zachovány.",
+          "Plán porovnává čtyři varianty. Kandidát realizuje vybranou časnou větev před filesystem/Git operacemi, přijímá pouze samostatné aliasy a zachovává původní parser.",
+          "implementation.json uvádí sourceDigest eab6516de7c14a86d0b53bddae3eec1832ea7734f2b4073b38a23015290bd108; ověřené hashe obou souborů odpovídají jeho záznamu. Záznam hlásí 51 úspěšných testů, jeden přeskočený a úspěšný běh nápovědy; kontroly nebyly opakovány.",
+          "Nebyl zjištěn věcný rozpor kandidáta se zmrazeným záměrem. Pokračování beze změny implementace je slučitelné se zadáním, ale současné plánovací artefakty mají uvedené neuzavřené požadavky. Nic nebylo změněno ani spuštěno jako workflow."
+        ],
+        "intentGaps": [
+          "Pro zachování současné rozsáhlé specifikace chybí doložená uživatelská volba „Keep full spec“ versus „Split“, kterou krok 02.6 vyžaduje při překročení 1600 tokenů. Věcný záměr CLI další rozhodnutí nevyžaduje."
+        ],
+        "ready": false,
+        "runtimeBlockers": [
+          "Chybí doložený tokenový počet a uzavření rozsahové podmínky kroku 02.6. Specifikace má 15 567 znaků a 1 848 jednotek oddělených mezerami; přesný počet modelových tokenů nebyl ověřen.",
+          "Plná specifikace postrádá povinnou I/O & Edge-Case Matrix, přestože CLI má významné úspěšné i chybové scénáře.",
+          "Tasks & Acceptance nesplňuje požadovaný formát úkolů cesta–akce–důvod a akceptačních kritérií Given/When/Then. Samotné označení in-review připravenost nedokládá."
+        ]
+      },
+      "sha256": "f3493d6a698a06dba691a0a594fd76b936eb079e03541e0ba09b86b923c10e0d"
+    },
+    "provenance": {
+      "authorizationSha256": "2d536203be9ffc3eb433ad3ff3f5d28a8de5ca11e33d504dfd9cc48e1784d02f",
+      "deliveryProtocol": 2,
+      "diffSha256": "3cfa33b96c5f59fbe494028c797e7f5444aaa56e43b629d4c1aea6d90a316a05",
+      "inlineInputs": {
+        "candidate.diff": "3cfa33b96c5f59fbe494028c797e7f5444aaa56e43b629d4c1aea6d90a316a05",
+        "completion-history.json": "596e844b50782ce5862cb7c456dd1af3ac8cef6498f7366ff243f041c946a110",
+        "completion-reconciliation.json": "891bab046e8a49caa3aa7996b20e8aec2b4845fd5dfe5d4295b21251b0f8cc08",
+        "frozen-intent.txt": "ea7b010acf08a9af91c920f431b696f3fea2f914fefa656fba6cbbd4779a4faf",
+        "original-plan.json": "3847e08fe09f8b0f0edb9922e26b3e58fda6b59c16974726d624f5dfde64b3ae",
+        "original-spec.md": "b2af1963dc21fa42ad9a77ec892a49e354d4d3aeb12174b9186fbe09f9122d6d",
+        "prior-readiness.json": "92fb6ed62964d24f908e668e77be475c38e336a6eba38b1e5212cdfe7c41d414",
+        "project-authorization.json": "2d536203be9ffc3eb433ad3ff3f5d28a8de5ca11e33d504dfd9cc48e1784d02f",
+        "spec-template.md": "e217325964857ebd90a9508bf171eddc2c4ad1b0b9b32a119775ac5c015695fd",
+        "step-02-plan.md": "7786b908de80269c0a99691101702cb6de99ec5dc4e5325a6a384790af8c83ae"
+      },
+      "outputSchema": {
+        "contractVersion": 2,
+        "path": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\schemas\\2049df4582f66dae9a26ea33\\plan-readiness-v3.json",
+        "sha256": "3ac067b1c88f97c48e13da7ea0383aa60abd159cde4ab063c7b3bb93cea179a6"
+      },
+      "promptSha256": "adc45a3fc3763dd3dec1178f9ce5378047ce6d11e384e0279be9b48b54bb176b",
+      "snapshot": {
+        "directory": "C:\\Users\\rezac\\.codex\\worktrees\\ci-main-autonomous-pilot\\autodev-key-47-c1ef58bf36c0\\_bmad\\render\\bmad-build\\autodev-key-47-c1ef58bf36c0-69f49613d226\\607a5d7f6c796647d31c",
+        "generation": "607a5d7f6c796647d31c",
+        "manifestSha256": "98e48cb72aa17d9e19f302745a5047d0de6b3ee22409197426566ceeb39d10b8"
+      },
+      "specFormatVersion": 1,
+      "specSha256": "b2af1963dc21fa42ad9a77ec892a49e354d4d3aeb12174b9186fbe09f9122d6d"
+    },
+    "result": {
+      "evidence": [
+        "Přečteny AGENTS.md a docs/agents/bmad-policy.md a posouzeno všech deset autorizovaných vstupů. Úplné doručení step-02-plan.md a spec-template.md odstraňuje původní blokaci nedostupných instrukcí.",
+        "Lokální spec.md má SHA-256 b2af1963dc21fa42ad9a77ec892a49e354d4d3aeb12174b9186fbe09f9122d6d, shodné s dodanou specifikací. Celý zmrazený blok je totožný s verzí před doplněním; původní zadání je obsaženo doslova. Open Questions nejsou přítomny.",
+        "Ověřeno sedm úplných řádků matice mimo zachovaný zmrazený blok, dva úkoly cesta–akce–důvod pouze pro přidělené worker writePaths a čtyři systémová kritéria s neprázdnými oddělenými Given/When/Then. Doplnění odpovídá vybrané completion v2 a nezavádí nový produktový požadavek.",
+        "completion-history.json zachovává odmítnutou v1 s chybou SPEC_PRESENTATION. Její ready=true nebylo převzato jako důkaz. Vybraná v2 používá opravený kontrakt v rámci zadaného upgradu protokolu; původní plan ani implement nebyly opakovány.",
+        "Plán porovnává čtyři varianty. Kandidát realizuje zvolenou časnou větev před filesystem/Git operacemi, přijímá pouze samostatný alias a zachovává původní parser. Nebyl zjištěn rozpor se zmrazeným záměrem.",
+        "implementation.json uvádí sourceDigest eab6516de7c14a86d0b53bddae3eec1832ea7734f2b4073b38a23015290bd108. Přímo ověřené hashe skriptu f8342e2873a6c74d3082a987993321a94d64ea6eb95f8fce555bb655924e78e2 a testu 217511cfa7cac897082c957cc876ea5f6438bddd6919cf840c3fbd06bb1b3771 odpovídají implementační evidenci.",
+        "Implementační evidence hlásí 51 úspěšných testů, jeden platformní skip a úspěšný samostatný běh nápovědy. Testy nebyly opakovány. Nezávislá review, povinné CI na přesném head, SHA-vázané přijetí a chráněný merge zůstávají branami řadiče.",
+        "Kandidát může pokračovat beze změny zmrazeného záměru. Proběhlo pouze čtení a kontrola identit a struktury; nebyly měněny soubory ani služby, spouštěny workflow či agenti ani vytvářeny commity."
+      ],
+      "intentGaps": [],
+      "priorReadiness": {
+        "authorizationSha256": "2d536203be9ffc3eb433ad3ff3f5d28a8de5ca11e33d504dfd9cc48e1784d02f",
+        "intentGaps": [
+          {
+            "index": 0,
+            "reason": "Původní text řeší délku prezentace jediného přiděleného rozsahu a výslovně neidentifikuje věcnou otázku CLI. Dokumentované rozhodnutí řadiče keep-full tuto administrativní volbu uzavírá podle dodaného oprávnění. Nejde o novou uživatelskou odpověď ani rozhodnutí o produktu.",
+            "resolution": "workflow-keep-full",
+            "text": "Pro zachování současné rozsáhlé specifikace chybí doložená uživatelská volba „Keep full spec“ versus „Split“, kterou krok 02.6 vyžaduje při překročení 1600 tokenů. Věcný záměr CLI další rozhodnutí nevyžaduje."
+          }
+        ],
+        "runtimeBlockers": [
+          {
+            "index": 0,
+            "reason": "Položka spojuje chybějící měření s rozsahovou branou. Přesný počet tokenů zůstává neměřený a není nahrazen počtem znaků či slov. Výslovně dodané rozhodnutí keep-full platí bez ohledu na délku a přijímá její riziko; podle tohoto konkrétního rozhodnutí měření není zbývající podmínkou pokračování.",
+            "resolution": "workflow-keep-full",
+            "text": "Chybí doložený tokenový počet a uzavření rozsahové podmínky kroku 02.6. Specifikace má 15 567 znaků a 1 848 jednotek oddělených mezerami; přesný počet modelových tokenů nebyl ověřen."
+          },
+          {
+            "index": 1,
+            "reason": "Aktuální specifikace již obsahuje úplnou sedmiřádkovou matici významných úspěšných i chybových scénářů. Scénáře vycházejí z původního zadání a zachovaného ověřovacího kontraktu. Umístění mimo nezměněný legacy frozen blok je výslovně zadané.",
+            "resolution": "spec-presentation",
+            "text": "Plná specifikace postrádá povinnou I/O & Edge-Case Matrix, přestože CLI má významné úspěšné i chybové scénáře."
+          },
+          {
+            "index": 2,
+            "reason": "Aktuální dokument obsahuje dva přidělené worker úkoly ve formátu cesta–akce–důvod, včetně testování okrajů matice. Čtyři systémová kritéria mají samostatné neprázdné Given/When/Then, událost v When a výsledek v Then; neopakují I/O scénáře. Oprava byla ověřena proti dokumentu a vybrané v2, nikoli odvozena ze statusu in-review nebo z odmítnuté v1.",
+            "resolution": "spec-presentation",
+            "text": "Tasks & Acceptance nesplňuje požadovaný formát úkolů cesta–akce–důvod a akceptačních kritérií Given/When/Then. Samotné označení in-review připravenost nedokládá."
+          }
+        ],
+        "sha256": "f3493d6a698a06dba691a0a594fd76b936eb079e03541e0ba09b86b923c10e0d"
+      },
+      "ready": true,
+      "runtimeBlockers": []
+    },
+    "sourceDigest": "eab6516de7c14a86d0b53bddae3eec1832ea7734f2b4073b38a23015290bd108",
+    "stderrPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\attempts\\079c6f7df9ab3f85887d5354\\stderr.log",
+    "stdoutPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\attempts\\079c6f7df9ab3f85887d5354\\stdout.log"
+  },
+  "reviews": [
+    {
+      "lens": "blind",
+      "key": "review:v2:blind:eab6516de7c14a86d0b53bddae3eec18",
+      "attemptId": "e1b1b97f9235c55a82e6c722",
+      "thread": "01a15782-beb6-7a71-9e3a-ce34cceb54fb",
+      "receipt": {
+        "attemptId": "e1b1b97f9235c55a82e6c722",
+        "exitCode": 0,
+        "finishedAt": "2026-10-20T04:13:00.952Z",
+        "requestDigest": "bcfeab25d4a06ae6a5ff5cee0f850d764ce204226f6ce2985e95aed18b382892",
+        "schemaVersion": 1,
+        "signal": null,
+        "stderrPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\attempts\\e1b1b97f9235c55a82e6c722\\stderr.log",
+        "stdoutPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\attempts\\e1b1b97f9235c55a82e6c722\\stdout.log",
+        "workerExitCode": 0
+      },
+      "raw": "Omezení přezkumu: Diff byl přečten a jeho SHA256 odpovídá zadání. Povinné inline znění `docs/agents/bmad-policy.md` však chybí a protokol zakazuje soubor znovu otevřít. Přezkum proto není dokončený; nelze vrátit `[]` jako čistý výsledek.",
+      "rawSha256": "2e83cc0289d527fd685ca75b3d484d2ae9490c5ebc363eeb68f68f9700e9bc34",
+      "inputPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\input-7f658288f831749944ff4d4a.json",
+      "inputSha256": "ef891f9dc28d0d16ccff45ec5af76970fba98edc6fadbbff1730fb79905bda39",
+      "provenance": {
+        "deliveryProtocol": 2,
+        "diffSha256": "3cfa33b96c5f59fbe494028c797e7f5444aaa56e43b629d4c1aea6d90a316a05",
+        "inlineInputs": {},
+        "promptSha256": "e0e9f9d664a690a3711c1cbd1971cdeb8d708c4a3fff4097b10d6a9feec80248",
+        "snapshot": {
+          "directory": "C:\\Users\\rezac\\.codex\\worktrees\\ci-main-autonomous-pilot\\autodev-key-47-c1ef58bf36c0\\_bmad\\render\\bmad-build\\autodev-key-47-c1ef58bf36c0-69f49613d226\\607a5d7f6c796647d31c",
+          "generation": "607a5d7f6c796647d31c",
+          "manifestSha256": "98e48cb72aa17d9e19f302745a5047d0de6b3ee22409197426566ceeb39d10b8"
+        },
+        "specSha256": null
+      },
+      "authorities": [
+        {
+          "file": "AGENTS.md",
+          "sha256": "a40a7b039275e345d697c81debfd8ec81351f416fd9018321e1d2f9ecec6c841",
+          "completeBodyInPrompt": false
+        },
+        {
+          "file": "docs/agents/bmad-policy.md",
+          "sha256": "8edb0acd4e0b74d2162e339f2f5032f9143a93da95142935192d27a7bf693596",
+          "completeBodyInPrompt": false
+        }
+      ],
+      "policyReadCommands": []
+    },
+    {
+      "lens": "edge",
+      "key": "review:v2:edge:eab6516de7c14a86d0b53bddae3eec18",
+      "attemptId": "20098f30d006abc5232e9229",
+      "thread": "01a15782-bf38-7ec2-8332-3cccb3448c9e",
+      "receipt": {
+        "attemptId": "20098f30d006abc5232e9229",
+        "exitCode": 0,
+        "finishedAt": "2026-10-20T04:14:22.276Z",
+        "requestDigest": "1da268294796379e21cdb9ba3e0cc9924827b595384c22861eb4f8ed0220e658",
+        "schemaVersion": 1,
+        "signal": null,
+        "stderrPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\attempts\\20098f30d006abc5232e9229\\stderr.log",
+        "stdoutPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\attempts\\20098f30d006abc5232e9229\\stdout.log",
+        "workerExitCode": 0
+      },
+      "raw": "[]",
+      "rawSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "inputPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\input-1a41ff6282637aa2a7148ff8.json",
+      "inputSha256": "b929606bfff2b5de3f166efc6a907a26d5fe731be1404a30bfdb9b4599d974f6",
+      "provenance": {
+        "deliveryProtocol": 2,
+        "diffSha256": "3cfa33b96c5f59fbe494028c797e7f5444aaa56e43b629d4c1aea6d90a316a05",
+        "inlineInputs": {
+          "references/claims-check.md": "50ea17cb89a78ef815286dde2dabfd09f1dc9841d07a10857f88b39ab7b9bd2a",
+          "references/deletion-check.md": "0f1f124e4e957147e89164a272b10bedc694ad0d9ad2618c8610ac74ee9cb0da",
+          "review-prompts/edge-case-hunter.md": "8fc046af1cbf4ecc928207cec75e29c3c260adb86cc7da77537ade3b3a3b9448"
+        },
+        "promptSha256": "ac8479a30254334cb0d2e2ca93948bc8061119d378c0904428e0d852419c084e",
+        "snapshot": {
+          "directory": "C:\\Users\\rezac\\.codex\\worktrees\\ci-main-autonomous-pilot\\autodev-key-47-c1ef58bf36c0\\_bmad\\render\\bmad-build\\autodev-key-47-c1ef58bf36c0-69f49613d226\\607a5d7f6c796647d31c",
+          "generation": "607a5d7f6c796647d31c",
+          "manifestSha256": "98e48cb72aa17d9e19f302745a5047d0de6b3ee22409197426566ceeb39d10b8"
+        },
+        "specSha256": "b2af1963dc21fa42ad9a77ec892a49e354d4d3aeb12174b9186fbe09f9122d6d"
+      },
+      "authorities": [
+        {
+          "file": "AGENTS.md",
+          "sha256": "a40a7b039275e345d697c81debfd8ec81351f416fd9018321e1d2f9ecec6c841",
+          "completeBodyInPrompt": false
+        },
+        {
+          "file": "docs/agents/bmad-policy.md",
+          "sha256": "8edb0acd4e0b74d2162e339f2f5032f9143a93da95142935192d27a7bf693596",
+          "completeBodyInPrompt": false
+        }
+      ],
+      "policyReadCommands": [
+        "\"C:\\\\Users\\\\rezac\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command \"Get-Content -LiteralPath 'AGENTS.md' -Raw; Get-Content -LiteralPath 'docs/agents/bmad-policy.md' -Raw\"",
+        "\"C:\\\\Users\\\\rezac\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command \"Get-Content -LiteralPath 'AGENTS.md' -Raw; Get-Content -LiteralPath 'docs/agents/bmad-policy.md' -Raw\""
+      ]
+    },
+    {
+      "lens": "verification",
+      "key": "review:v2:verification:eab6516de7c14a86d0b53bddae3eec18",
+      "attemptId": "d8830f505caa94a16dc2f1a6",
+      "thread": "01a15782-bf31-7c20-8c4e-af1d311711dc",
+      "receipt": {
+        "attemptId": "d8830f505caa94a16dc2f1a6",
+        "exitCode": 0,
+        "finishedAt": "2026-10-20T04:13:44.643Z",
+        "requestDigest": "459c3d67d5d13ab28060167e97099ef8f5a2e4c0fdc6f29755685611456ca55e",
+        "schemaVersion": 1,
+        "signal": null,
+        "stderrPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\attempts\\d8830f505caa94a16dc2f1a6\\stderr.log",
+        "stdoutPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\attempts\\d8830f505caa94a16dc2f1a6\\stdout.log",
+        "workerExitCode": 0
+      },
+      "raw": "No verification gaps found.",
+      "rawSha256": "cf87c32d185d257a566f972441f0b6160112e6bf4ec0bc1cd98dfbbdf87ce05b",
+      "inputPath": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.git\\autodev\\runs\\key-47-c1ef58bf36c0\\input-b6cc13fb99024259d502f013.json",
+      "inputSha256": "b9bd35b1f2c8680eed94104404c005998a27ab3185b3e3a4414912d46a2681b6",
+      "provenance": {
+        "deliveryProtocol": 2,
+        "diffSha256": "3cfa33b96c5f59fbe494028c797e7f5444aaa56e43b629d4c1aea6d90a316a05",
+        "inlineInputs": {
+          "review-prompts/verification-gap.md": "45ab0b8c4c56c5c055c97a293a8591a67e256d0b1a2058ce1f093cd866be8d03"
+        },
+        "promptSha256": "5ce2d827980859259c42a2326b3c4f49b0a4cc5eca09c21e3e543d5cbc82d23a",
+        "snapshot": {
+          "directory": "C:\\Users\\rezac\\.codex\\worktrees\\ci-main-autonomous-pilot\\autodev-key-47-c1ef58bf36c0\\_bmad\\render\\bmad-build\\autodev-key-47-c1ef58bf36c0-69f49613d226\\607a5d7f6c796647d31c",
+          "generation": "607a5d7f6c796647d31c",
+          "manifestSha256": "98e48cb72aa17d9e19f302745a5047d0de6b3ee22409197426566ceeb39d10b8"
+        },
+        "specSha256": null
+      },
+      "authorities": [
+        {
+          "file": "AGENTS.md",
+          "sha256": "a40a7b039275e345d697c81debfd8ec81351f416fd9018321e1d2f9ecec6c841",
+          "completeBodyInPrompt": false
+        },
+        {
+          "file": "docs/agents/bmad-policy.md",
+          "sha256": "8edb0acd4e0b74d2162e339f2f5032f9143a93da95142935192d27a7bf693596",
+          "completeBodyInPrompt": false
+        }
+      ],
+      "policyReadCommands": [
+        "\"C:\\\\Users\\\\rezac\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command \"Get-Content -LiteralPath 'AGENTS.md'; Get-Content -LiteralPath 'docs/agents/bmad-policy.md'\"",
+        "\"C:\\\\Users\\\\rezac\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command \"Get-Content -LiteralPath 'AGENTS.md'; Get-Content -LiteralPath 'docs/agents/bmad-policy.md'\""
+      ]
+    }
+  ],
+  "commitAbsent": true,
+  "prAbsent": true,
+  "note": "Unperformed blind review is not accepted. No raw output/checkpoint/spec edits; all three terminal original review results preserved."
+}

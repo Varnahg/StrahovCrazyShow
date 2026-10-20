@@ -2,7 +2,7 @@
 title: 'BMAD řadič jednoho přiděleného Linear úkolu'
 type: feature
 created: '2026-10-20'
-status: in-review
+status: done
 route: dispatch
 baseline_commit: ceddc0802cd98dccfbee9d44fc00d6331ac9d749
 review_loop_iteration: 0
@@ -45,8 +45,8 @@ Mimo rozsah: backlog scheduler, dávky úkolů, upgrade BMAD, zásahy do herníh
 - [x] Idempotentní projekt/Git/Linear/GitHub/Codex adaptéry + cílené testy (17/17,9/9 hashů ověřeno).
 - [x] Skutečná BMAD spec/readiness a snapshot review lenses;24/24 adapter testů a skutečný5-prompt binding smoke exit0.
 - [x] Procesní crash/recovery audit:7 scénářů, společně38/38, skutečný kill/souběh/unknown;5/5 hashů vlastních QA souborů ověřeno.
-- [ ] Návod, nezávislé review, plná relevantní lokální sada a skutečná GitHub CI.
-- [ ] Jeden explicitně přidělený živý Linear pilot, pád controlleru, resume, jediný PR a chráněná integrace.
+- [x] Návod, nezávislé review, plná relevantní lokální sada a skutečná GitHub CI; finální řadičový head má samostatnou externí integrační bránu.
+- [x] Jeden explicitně přidělený živý Linear pilot, pád controlleru, resume, jediný PR a chráněná integrace.
 Přejímka vyžaduje skutečný CLI/backend průchod a důkaz nulových duplicit; samotné mocks nestačí.
 
 ## Implementation Notes
@@ -89,3 +89,47 @@ Cílené testy přes `node --import tsx --test tests/autodev-*.test.ts`; celý `
 
 ### Doplnění cíleného rechecku
 Původní B1/B2/E1–E4/V1/V2 a pořadí V3 potvrzené po opravě. E-P2-resume (high): při více check attempts musí release čekat na všechny terminal receipts, nejen aktuální A; přidává se regrese s živým B a selháním auditu po A. V3-SHA (medium): fixture musí rozlišit skutečné base/head/no-ff merge SHA, jinak nezachytí použití starého base CI. Oba body patch, žádný odklad; podrobnosti v review-2.md. Frozen záměr se nemění.
+
+### Review opravy SPEC prezentace
+
+| ID | Verdikt | Ověření a směr |
+| --- | --- | --- |
+| SF-B1 blind | false | Nepublikovaný353b4c31 nemá žádného existujícího protocol2 plan consumeru; skutečný jediný legacy run a nové specFormatVersion=1 jsou rozlišeny. Neznámý meziformát zůstává nepodporovaný/fail-closed. |
+| SF-E1 edge | medium | String.replace interpretuje dolarové tokeny I/O obsahu; callback musí zachovat doslovné bajty. patch. |
+| SF-E2 edge | high | Vlastní UUID temp po kill před rename chybí v durable identity a blokuje resume přes STAGE_SCOPE. Přesný předem vlastněný temp/prefix musí být obnovitelný. patch. |
+| SF-V1 verification | medium | Chybí ready=true regrese původních runtime-prerequisite/unresolved blokací; rozšířit testy pro completion i finální readiness. patch testů. |
+| SF-V2 verification | medium | Kontrola hlavičky neprokazuje řádky matrix a escaping; ověřit konkrétní výstup nové i doplněné specifikace. patch testů. |
+
+Každý nález vyhodnocen samostatně před seskupením. Detail a uzavření v docs/verification-evidence/bmad-controller-20261020/review-spec-format.md. Plná sada před opravami62/62 PASS není důkazem chybějících regresí; nové cílené testy a následná stabilní přejímka mají vlastní evidence. Frozen záměr se nemění.
+
+SF-V3 recheck — medium, patch testů: kombinace již zapsaného toText a stále existujícího zaznamenaného tempu je produkčně správně odmítnutá, chybí však přímá regrese. Doplnit zachování obou souborů/checkpointu a0novýchworkerů při dvojím resume. Produkční kód se nemění; testový followup čeká na dokončení právě běžící úplné sady.
+
+### Review svázaného output kontraktu
+
+| ID | Verdikt | Důkaz a směr |
+| --- | --- | --- |
+| SC-B1 blind | false | Nepodporovaný completed-amendment mezistav z nepublikovaného fbeb582; zveřejněný main jej nevytváří a jediný skutečný run je před amendmentem/v3. Automatická obecná migrace meziverzí není slíbená. |
+| SC-E1 edge | false | Samostatně posouzený stejný technicky možný, ale nepodporovaný upgrade mezistavu; neznámá metadata správně nezpůsobí přijetí či další práci. |
+| SC-V1 verification | medium | Chybí skutečná plan-stage regrese null presentation pro oba typy blokací a repeat resume. Patch testů. |
+| SC-V2 verification | medium | Chybí schema-tamper test přes převzetí hotového receipt, kde executor znovu neběží. Patch testů. |
+| SC-V3 verification Other | false | Baseline blob potvrzuje starší metadata, ale ne existenci podporovaného consumeru; vyhodnoceno individuálně před seskupením s B1/E1. |
+
+Detail a následné uzavření: docs/verification-evidence/bmad-controller-20261020/review-schema-contract.md. Root targeted3/3 PASS; autor19/19 PASS. Produkční kód se kvůli testovému followupu nemění.
+
+SC-V1/V2 uzavřeny: autor3/3 PASS14.144s, tsc0; nezávislý verification recheck potvrdil skutečné plan/resume cesty a byte-identitu původních asercí po odečtení vložených bloků. Produkční kód beze změny. Detail review-schema-contract.md; skutečný pilot a finální CI ještě následují.
+
+### Review úplných authority vstupů
+
+| ID | Verdikt | Důkaz a směr |
+| --- | --- | --- |
+| RA-E1 edge | medium | Matcher ignoruje explicitní top-level error/turn.failed mimo přesné dvě agent messages; receipt exit0 sám tento rozpor neodmítne. Patch guardu a native regrese. |
+| RA-V1 verification | medium | Historický prompt fixture generuje stejný produkční helper jako matcher; změna pevného textu zůstane zelená. Patch nezávislé historické fixture a native průchodu. |
+| RA-V2 verification | medium | Chybí negativní cache-selection regrese po změně vybraného attemptId. Patch testu REVIEW_INPUT a0novýchworkerů. |
+
+Všechny vrstvy dokončeny před individuální triage; blind bez nálezů. Každý bod posouzen samostatně, bez seskupení odlišných příčin. Detail a uzavření v docs/verification-evidence/bmad-controller-20261020/review-authority.md. Frozen záměr se nemění.
+
+RA-E1/V1/V2 uzavřeny: cílený followup3/3 PASS86.153s, tsc0; nezávislé edge/verification rechecky potvrdily guard i regresní citlivost a zachování původních asercí. Žádný nález nezůstává otevřený. Finální diff42b953e3, detail review-authority.md a review-authority-final-validation.json. Živý pilot a konečná CI následují.
+
+## Lokální předání závěrečného kandidáta
+
+Pilot KEY-47 dokončen přes PR#11, merge 8d96a0c2fae3633bba75ea235a9fd1b97d5ff03d, skutečné PR/main CI a opakované run/resume bez duplicit. Všechna review findings uzavřena; nic nebylo odloženo. Stav done tohoto BMAD artefaktu znamená dokončené lokální předání; konečné KEY-46 Done stále vyžaduje CI/acceptance/merge/mainCI oprav řadiče v navazujícím PR. Podrobnosti docs/verification-evidence/bmad-controller-20261020/README.md.

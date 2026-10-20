@@ -1,0 +1,253 @@
+{
+  "at": "2026-10-20T03:34:12.974Z",
+  "source": {
+    "at": "2026-10-20T03:19:11.433Z",
+    "base": "353b4c31acd367d6310ddc913d018d850dbb8f0b",
+    "reviewDiff": "0f283dd4c6bbcbaaf05314627f18632705264f5ee99ff1ddeb6c944f20e36a45",
+    "files": [
+      {
+        "file": ".github/workflows/ci.yml",
+        "sha256": "5e6868e6589ab9b902244b005ff989cd90283f5e63c69a6087fe21335cbd77fe"
+      },
+      {
+        "file": ".github/workflows/source-secrets.yml",
+        "sha256": "5c052826082d2732700ad5dfe1aaa57484cf098d1c98dc1900b45350c3080fbe"
+      },
+      {
+        "file": "package.json",
+        "sha256": "52c317376b3fa3c0d9fe64614adc52adff6caab52a9d6b35f611ca026d7743ee"
+      },
+      {
+        "file": "pnpm-lock.yaml",
+        "sha256": "cb0c10f624a76ccd59ef44ed6a61935c58512a2a13711d6bf439a68f015359a7"
+      },
+      {
+        "file": "scripts/autodev.mjs",
+        "sha256": "89b178913f6ccd6b945c2b499c47376aa6f76726a4f049f995f1519ade62f00a"
+      },
+      {
+        "file": "scripts/autodev/adapters.mjs",
+        "sha256": "cf539bd0179f39df6646a2e40a29b1185a0340aa96d3f0dfa64776de336ad11e"
+      },
+      {
+        "file": "scripts/autodev/codex.mjs",
+        "sha256": "86017354a3e4e154bc26fda920087a724c76acf0b8a79c43f80b58ed22460be9"
+      },
+      {
+        "file": "scripts/autodev/engine.mjs",
+        "sha256": "5248f5a8cf72b527b5f1ca2c392b56dd041985ced6876b068d4bb45d52c35b3b"
+      },
+      {
+        "file": "scripts/autodev/github.mjs",
+        "sha256": "72641ba4f3566ac0c5e721eb952da50486ad68dd9f1bca5b66262dd0f0f98269"
+      },
+      {
+        "file": "scripts/autodev/linear.mjs",
+        "sha256": "db4e83b416c73be2571d588744dee8f35e3f79509d0e77e6217705facff1201d"
+      },
+      {
+        "file": "scripts/autodev/process.mjs",
+        "sha256": "27c26e422a53892cf1dcd6fb71ee6eab7c3b3dc099af62e1f5b40265f7823aec"
+      },
+      {
+        "file": "scripts/autodev/prompts/common.md",
+        "sha256": "617e421b4f9b0814efcf650eff59a0ad1e0f2997993438f26baef956b82c8101"
+      },
+      {
+        "file": "scripts/autodev/schemas/implement.json",
+        "sha256": "f47eeb928d7ea0ff5ea63f21ff62515b558c6fe100db36762b5cd5e49bcf48bd"
+      },
+      {
+        "file": "scripts/autodev/schemas/plan-readiness-v3.json",
+        "sha256": "080f125734c31018975424fa6fb3c9fd27813d17361e4e18f680a73ef838e42e"
+      },
+      {
+        "file": "scripts/autodev/schemas/plan-readiness.json",
+        "sha256": "cb118e6f0a2d63179ccbe4f0582e2db8ffbda5ee822ff3a90b9ed0f12ffe20d7"
+      },
+      {
+        "file": "scripts/autodev/schemas/plan.json",
+        "sha256": "459ce6bb3e8fb7850bc2375c8e387a1dc482879dcad4f44d02744e790af78bda"
+      },
+      {
+        "file": "scripts/autodev/schemas/spec-completion.json",
+        "sha256": "5723c3a568907362d8fffc0a99d76de9b95a1e5fdca837209dfcd3d426fcc407"
+      },
+      {
+        "file": "scripts/autodev/store.mjs",
+        "sha256": "1b680aaa4300874580350ba5b9511aadce47b343bb761f30efd529618942e605"
+      },
+      {
+        "file": "scripts/autodev/supervisor.mjs",
+        "sha256": "b367f982f2bd6fd54756e4cc5e0141ac96b0371a13d2d2ab60282f58c8e0f81b"
+      },
+      {
+        "file": "scripts/test-autodev.mjs",
+        "sha256": "639160363ea976ab48085065ee15ff0b3199bcf112c634a0aee91c2f84ef7ce4"
+      },
+      {
+        "file": "tests/autodev-adapters.test.ts",
+        "sha256": "d079eaf786875218cd88c9b8bc618f6a26ac9b3adbe552b70263a9d26a2ac849"
+      },
+      {
+        "file": "tests/autodev-engine.test.ts",
+        "sha256": "8a15e441b79260d8673eb534c42b27aeaa34ccc19bfa4dbe52fa2d03e88593ae"
+      },
+      {
+        "file": "tests/autodev-recovery.test.ts",
+        "sha256": "a863ee5f75480381b41c3c4baff8deb95f7bc59ab89d6f65adde5fdd28770ae5"
+      },
+      {
+        "file": "tests/autodev-store.test.ts",
+        "sha256": "9e80a7a9ad370709f1efb095aa466efd04aeeb31dc21e9af298dec5f5f3e5d3a"
+      },
+      {
+        "file": "tests/fixtures/autodev/controller.mjs",
+        "sha256": "4ff06ee0d77eee109d0a2e10029dbf6519dc52cd42198a2ace02b0ef9935245b"
+      },
+      {
+        "file": "tests/fixtures/autodev/harness.ts",
+        "sha256": "2c71bb7841ddf1da113e1d774e887dc70f5617fc2b84966f007bd56d6bffeafe"
+      },
+      {
+        "file": "tests/fixtures/autodev/worker.mjs",
+        "sha256": "f9ef7dec026404a8ae8581ca8513837575faba395e356151a599f5ef2c265db0"
+      },
+      {
+        "file": "tsconfig.json",
+        "sha256": "46b95a330e28d6bad669471a706e4b3627edd261486f7a278b8e6dae89fa244c"
+      }
+    ],
+    "bundleSha256": "a87def5a95dcfa78349901308114e520b00c2e5d49df0800a19b4480457aa130",
+    "changesSinceFirstFull": [
+      {
+        "file": "tests/autodev-adapters.test.ts",
+        "sha256": "d079eaf786875218cd88c9b8bc618f6a26ac9b3adbe552b70263a9d26a2ac849"
+      }
+    ]
+  },
+  "sourceHeadAtFinish": "fbeb58218c596e9828047c83194fb8412a1cec5b",
+  "note": "The local commit changed Git metadata during the run; all28 recorded source/config/test bytes remained identical before/after. This checkpoint precedes the new structured-output contract repair.",
+  "tests": {
+    "total": 1615,
+    "passed": 1614,
+    "failed": 0,
+    "skipped": 1,
+    "durationMs": 794414.4141,
+    "skip": "Existing POSIX trailing-space path test on Windows"
+  },
+  "checks": [
+    {
+      "name": "catalog",
+      "command": "node",
+      "arguments": [
+        "scripts/agent-tasks.mjs",
+        "validate"
+      ],
+      "startedAt": "2026-10-20T03:19:11.4886167Z",
+      "completedAt": "2026-10-20T03:19:12.4576175Z",
+      "exitCode": 0
+    },
+    {
+      "name": "readme",
+      "command": "node",
+      "arguments": [
+        "scripts/check-readme-links.mjs"
+      ],
+      "startedAt": "2026-10-20T03:19:12.4794229Z",
+      "completedAt": "2026-10-20T03:19:12.6047075Z",
+      "exitCode": 0
+    },
+    {
+      "name": "lfs",
+      "command": "node",
+      "arguments": [
+        "scripts/check-lfs-assets.mjs"
+      ],
+      "startedAt": "2026-10-20T03:19:12.6172871Z",
+      "completedAt": "2026-10-20T03:19:13.9177326Z",
+      "exitCode": 0
+    },
+    {
+      "name": "test",
+      "command": "pnpm",
+      "arguments": [
+        "test",
+        "--test-concurrency=1"
+      ],
+      "startedAt": "2026-10-20T03:19:13.9221929Z",
+      "completedAt": "2026-10-20T03:32:29.2976830Z",
+      "exitCode": 0
+    },
+    {
+      "name": "build",
+      "command": "pnpm",
+      "arguments": [
+        "build"
+      ],
+      "startedAt": "2026-10-20T03:32:29.3010079Z",
+      "completedAt": "2026-10-20T03:33:18.4352101Z",
+      "exitCode": 0
+    },
+    {
+      "name": "integration",
+      "command": "pnpm",
+      "arguments": [
+        "test:integration"
+      ],
+      "startedAt": "2026-10-20T03:33:18.4411776Z",
+      "completedAt": "2026-10-20T03:33:38.5292525Z",
+      "exitCode": 0
+    }
+  ],
+  "logs": [
+    {
+      "file": ".cache/bmad-controller-development/final-serial-catalog.stdout.log",
+      "sha256": "d1955adf24bc609fef6f7fc34ab501c6b76a72bfd1a53bf39f332c04bc34d82d"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-catalog.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-readme.stdout.log",
+      "sha256": "936af9cbb894c7b84308a44a3ac189f4a6d8966ee1107a85b8eabae22acbab24"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-readme.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-lfs.stdout.log",
+      "sha256": "fbca358581ee3a4483c86df28457c7a090337940c92bd84651154f077d0b9807"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-lfs.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-test.stdout.log",
+      "sha256": "b9822147c5d22d8dfa0f10fbe21ddffef6559539348de6dd51dfa14695bf2552"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-test.stderr.log",
+      "sha256": "f257c191e98aa0aa3d495e4a0e6e9683d8817734c92a2827926f24b1434b3f68"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-build.stdout.log",
+      "sha256": "202c78d9fba83cb68e6e4f3cdc445f81eea6a83316eddd28afcb7bee0f5a845e"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-build.stderr.log",
+      "sha256": "d5fec269d1c68bf15fb7618d6e9e1096c3268898eb59e3cf49311a5ef93c2e99"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-integration.stdout.log",
+      "sha256": "d172cfcd76ed7f0651e1e34fe0a37576ff46a0aa7b04b49609606afe9fa60859"
+    },
+    {
+      "file": ".cache/bmad-controller-development/final-serial-integration.stderr.log",
+      "sha256": "00f4f5dd0a1cd6c132a074b9b1214bf099c53e451ef568c0253fbfe0160546fb"
+    }
+  ]
+}

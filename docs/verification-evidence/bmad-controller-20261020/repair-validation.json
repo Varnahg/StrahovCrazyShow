@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-20",
+  "base": "c1c56327240d5634fa3f4670fc7264e6a4287238",
+  "sourceBundleSha256": "a5b0c51e34c6db357fdf1f171f720536a7009f81ba2371f6aa68b44acf6ae2d7",
+  "sources": [
+    {
+      "file": "scripts/autodev/adapters.mjs",
+      "sha256": "7848ef4373fe0119e776702a19d1453f1a421796e2d008c7a90f43d281827168"
+    },
+    {
+      "file": "scripts/autodev/codex.mjs",
+      "sha256": "84515a1601c0b9934004278426402ab7ce39ee50bec0222e117171ffc2cd536e"
+    },
+    {
+      "file": "scripts/autodev/github.mjs",
+      "sha256": "72641ba4f3566ac0c5e721eb952da50486ad68dd9f1bca5b66262dd0f0f98269"
+    },
+    {
+      "file": "scripts/autodev/linear.mjs",
+      "sha256": "db4e83b416c73be2571d588744dee8f35e3f79509d0e77e6217705facff1201d"
+    },
+    {
+      "file": "scripts/autodev/prompts/common.md",
+      "sha256": "617e421b4f9b0814efcf650eff59a0ad1e0f2997993438f26baef956b82c8101"
+    },
+    {
+      "file": "scripts/autodev/schemas/implement.json",
+      "sha256": "f47eeb928d7ea0ff5ea63f21ff62515b558c6fe100db36762b5cd5e49bcf48bd"
+    },
+    {
+      "file": "scripts/autodev/schemas/plan-readiness.json",
+      "sha256": "cb118e6f0a2d63179ccbe4f0582e2db8ffbda5ee822ff3a90b9ed0f12ffe20d7"
+    },
+    {
+      "file": "scripts/autodev/schemas/plan.json",
+      "sha256": "bcc675b832a2b6815e288ecaa7b9c71f6a9190ae42a58a9bc5cce2c8215bd4b0"
+    },
+    {
+      "file": "tests/autodev-adapters.test.ts",
+      "sha256": "f2e7bfc33722e590cdd5cffacc2fc9cff9f6278adcac2796f4ce107afada5d93"
+    }
+  ],
+  "reviewDiffSha256": "789b634311211e8351238dfe7a67c166399798f396863a698523948864d4d053",
+  "authorChecks": [
+    {
+      "command": "node --test tests/autodev-adapters.test.ts",
+      "tests": 45,
+      "passed": 45,
+      "failed": 0,
+      "exitCode": 0,
+      "durationSeconds": 244.489
+    },
+    {
+      "command": "pnpm exec tsc --noEmit",
+      "exitCode": 0
+    },
+    {
+      "command": "syntax, Prettier, git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "parentChecks": [
+    "All nine source hashes independently matched handoff.",
+    "Installed codex exec --help confirms prompt - reads stdin.",
+    "Six-file review snapshot includes new schema and tests."
+  ],
+  "limitations": [
+    "New subprocess transport/recovery tests use a narrow Node fixture instead of model intelligence; live model upgrade remains pending."
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "startedAt": "2026-10-20T02:41:40.9393706Z",
+  "completedAt": "2026-10-20T02:50:13.1678329Z",
+  "exitCode": 0,
+  "command": "node --test tests/autodev-adapters.test.ts",
+  "tests": 62,
+  "pass": 62,
+  "fail": 0,
+  "skip": 0,
+  "durationMs": 511980.2731,
+  "source": {
+    "base": "353b4c31acd367d6310ddc913d018d850dbb8f0b",
+    "diffSha256": "019cd9eb42f1b5e8293ec40b531a4cb5e4b622ee497202d7dc56f03840372ff9",
+    "files": [
+      {
+        "file": "scripts/autodev/adapters.mjs",
+        "sha256": "b87e419af54ea72743b76029c1d52d84a464a64c832661fd73dda6b0747f7734"
+      },
+      {
+        "file": "scripts/autodev/codex.mjs",
+        "sha256": "4a6322e4d717d6fe05c68f48071da044d9dc60333024274d75d8a2cf625f7283"
+      },
+      {
+        "file": "scripts/autodev/schemas/plan.json",
+        "sha256": "459ce6bb3e8fb7850bc2375c8e387a1dc482879dcad4f44d02744e790af78bda"
+      },
+      {
+        "file": "scripts/autodev/schemas/spec-completion.json",
+        "sha256": "5723c3a568907362d8fffc0a99d76de9b95a1e5fdca837209dfcd3d426fcc407"
+      },
+      {
+        "file": "scripts/autodev/schemas/plan-readiness-v3.json",
+        "sha256": "080f125734c31018975424fa6fb3c9fd27813d17361e4e18f680a73ef838e42e"
+      },
+      {
+        "file": "tests/autodev-adapters.test.ts",
+        "sha256": "2d8b1a4f6d75fe5a9f0b4f1f76c39fa76a757c8108507208e71d4611207e91c3"
+      },
+      {
+        "file": "docs/agents/bmad-controller.md",
+        "sha256": "f2678158750849203f58afd4e76b30d53599b0ef26c7b3a72ea77e9a82730919"
+      }
+    ]
+  },
+  "logs": [
+    {
+      "path": ".cache/bmad-controller-development/spec-format-full.stdout.log",
+      "sha256": "f1776ef74e4c2407d629306699e702c53cbd3ff0064cdf95d0f674ad60d7eba7"
+    },
+    {
+      "path": ".cache/bmad-controller-development/spec-format-full.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "limitation": "Checkpoint before independent review fixes. Passing tests did not cover the identified replacement-token and pre-rename crash bugs; followup required."
+}

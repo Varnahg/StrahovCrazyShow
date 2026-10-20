@@ -1,0 +1,42 @@
+{
+  "runId": "key-47-c1ef58bf36c0",
+  "stage": "review",
+  "problem": "Generated snapshot references inaccessible to sandboxed model processes; legacy plan lacks explicit runtime-readiness guard. No old incomplete review is accepted.",
+  "planRisks": [
+    "Blokace úplné připravenosti: oba povinné renderované soubory hlásí odepřený přístup. Není doloženo, že chybějí; jejich obsah nebyl přečten a nelze potvrdit úplnost plánovacího kroku vůči nim.",
+    "Použití args.includes pro help by mohlo přijmout zakázané kombinace a tiše přeskočit kontrolu assetů. Nutná je přesná kontrola jediného argumentu.",
+    "Přesunutí větve až za realpathSync nebo Git kontrolu by porušilo nezávislost nápovědy na checkoutu a dostupnosti Git.",
+    "Test s pouhým přidáním PATH: '' může na Windows stále předat zděděný Path. Neexistující cwd by testovalo selhání spuštění místo nápovědy.",
+    "Zelený regresní výsledek ani nová funkčnost zatím nejsou doloženy. Předpokládaný nulový zásah do hry, asset cache a správy deskriptorů vychází z navrženého rozsahu; musí jej potvrdit implementační diff a cílené testy."
+  ],
+  "reviewResults": [
+    {
+      "key": "review:blind:eab6516de7c14a86d0b53bddae3eec18",
+      "attemptId": "b8fde5bb6d0743f16dc224e9",
+      "threadId": "01a156bd-890f-7770-aa7f-11e7e4460598",
+      "exitCode": 0,
+      "finishedAt": "2026-10-20T00:37:52.011Z",
+      "stdoutSha256": "6652675f52bc05901f642c5182ca1712b5e7ef2fb24be0c78750d516129f9741",
+      "finalMessage": "[]"
+    },
+    {
+      "key": "review:edge:eab6516de7c14a86d0b53bddae3eec18",
+      "attemptId": "b0e57585351ad920ec3d6979",
+      "threadId": "01a156bd-89b2-7442-b34e-5da21464717a",
+      "exitCode": 0,
+      "finishedAt": "2026-10-20T00:37:18.343Z",
+      "stdoutSha256": "230caba1406017f42c1c08b778e508a87e8c686ed9770358479c6e000cd91031",
+      "finalMessage": "Review stopped: the required instruction file was unreadable.\n\n`Get-Content` reported “Access to the path … is denied” and “Cannot find path … because it does not exist” for:\n\n`C:\\Users\\rezac\\.codex\\worktrees\\ci-main-autonomous-pilot\\autodev-key-47-c1ef58bf36c0\\_bmad\\render\\bmad-build\\autodev-key-47-c1ef58bf36c0-69f49613d226\\607a5d7f6c796647d31c\\review-prompts\\edge-case-hunter.md`\n\nNo review was performed or files changed."
+    },
+    {
+      "key": "review:verification:eab6516de7c14a86d0b53bddae3eec18",
+      "attemptId": "ff0e45bfcd565e85fe6c43c0",
+      "threadId": "01a156bd-89fa-7ba1-84f6-44f7f5e7a64b",
+      "exitCode": 0,
+      "finishedAt": "2026-10-20T00:37:23.115Z",
+      "stdoutSha256": "0bbc71b8bd2bb33aca5256e5d86387a5c6dcd091a02f8ed7817139e5d400e2f5",
+      "finalMessage": "Review stopped: the required instruction file was unreadable:\n\n`C:\\Users\\rezac\\.codex\\worktrees\\ci-main-autonomous-pilot\\autodev-key-47-c1ef58bf36c0\\_bmad\\render\\bmad-build\\autodev-key-47-c1ef58bf36c0-69f49613d226\\607a5d7f6c796647d31c\\review-prompts\\verification-gap.md`\n\n`Get-Content` reported “Access to the path … is denied,” followed by “Cannot find path … because it does not exist.”\n\nNo review was performed and no files were changed."
+    }
+  ],
+  "repair": "Deliver hash-verified source instructions and review inputs in prompt; explicit blockers and bounded protocol upgrade with original terminal evidence retained."
+}
