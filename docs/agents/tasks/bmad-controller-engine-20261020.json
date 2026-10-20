@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "dependsOn": [],
+  "resources": [],
+  "acceptance": [
+    "Pouze vlastní task scope, zachovat cizí WIP a projektové rezervace.",
+    "Doložit implementaci, cílený refaktoring a skutečné ověření; žádný samotný mock výsledek není živá přejímka."
+  ],
+  "verification": [
+    "Cílené Node testy a kontrola vlastního diffu."
+  ],
+  "notes": [
+    "KEY-46; výslovné zadání uživatele 20.10.2026. Podagent nespouští rekurzivní BMAD a vlastní jen přidělené soubory.",
+    "Čeká na uzavření kontraktu před implementací; vlastní state/lock/lifecycle a své testy.",
+    "Kontrakt připraven: _bmad-output/implementation-artifacts/bmad-controller-20261020/contract.md. Implementace se deleguje sekvenčně podle BMAD kroku 3."
+  ],
+  "id": "bmad-controller-engine-20261020",
+  "title": "KEY-46: deterministický run/status/resume engine a durable lifecycle",
+  "status": "ready",
+  "writePaths": [
+    "scripts/autodev.mjs",
+    "scripts/autodev/engine.mjs",
+    "scripts/autodev/store.mjs",
+    "scripts/autodev/process.mjs",
+    "scripts/autodev/supervisor.mjs",
+    "tests/autodev-engine.test.ts",
+    "tests/autodev-store.test.ts",
+    "docs/agents/handoffs/bmad-controller-engine-20261020.md"
+  ]
+}

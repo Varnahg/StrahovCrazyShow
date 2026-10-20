@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "bmad-controller-live-pilot-worker-20261020",
+  "title": "KEY-47: nápověda LFS CLI a regresní test",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/check-lfs-assets.mjs",
+    "tests/lfs-assets-help.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze výslovně zadaný rozsah; doložené skutečné výsledky a ukončené vlastní procesy."
+  ],
+  "verification": [
+    "Podle specifikace KEY-46/KEY-47 a manifestu přiděleného pilotu."
+  ],
+  "notes": [
+    "Implementační worker jediného pilotu; samostatný stabilní owner a claim ověřený před zápisem. Žádné cizí testy ani runtime."
+  ]
+}

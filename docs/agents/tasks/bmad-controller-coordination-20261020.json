@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "dependsOn": [],
+  "resources": [
+    "github-ci-validation"
+  ],
+  "acceptance": [
+    "Pouze vlastní task scope, zachovat cizí WIP a projektové rezervace.",
+    "Doložit implementaci, cílený refaktoring a skutečné ověření; žádný samotný mock výsledek není živá přejímka."
+  ],
+  "verification": [
+    "Cílené Node testy a kontrola vlastního diffu."
+  ],
+  "notes": [
+    "KEY-46; výslovné zadání uživatele 20.10.2026. Podagent nespouští rekurzivní BMAD a vlastní jen přidělené soubory.",
+    "Rodičovský renderer byl dokončen a předán do read-only užití. Jeho prefix po release odebrán, aby nekolidoval s budoucím live pilot rendererem; dosavadní vlastní docs/spec WIP doložen v handoffu."
+  ],
+  "id": "bmad-controller-coordination-20261020",
+  "title": "KEY-46: výzkum, kontrakt, koordinace a živá přejímka řadiče",
+  "status": "ready",
+  "writePaths": [
+    "docs/agents/bmad-controller.md",
+    "docs/agents/handoffs/bmad-controller-coordination-20261020.md",
+    "docs/verification-evidence/bmad-controller-20261020/",
+    "_bmad-output/implementation-artifacts/bmad-controller-20261020/",
+    ".cache/bmad-controller-development/",
+    "docs/agents/assignments/bmad-controller-pilot-20261020.json",
+    "docs/agents/assignments/bmad-controller-pilot-20261020.md"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "research",
+    "alternatives",
+    "decision",
+    "steps",
+    "sources",
+    "risks",
+    "intentGaps",
+    "codeMap"
+  ],
+  "properties": {
+    "research": { "type": "string" },
+    "alternatives": { "type": "array", "items": { "type": "string" } },
+    "decision": { "type": "string" },
+    "steps": { "type": "array", "items": { "type": "string" } },
+    "sources": { "type": "array", "items": { "type": "string" } },
+    "risks": { "type": "array", "items": { "type": "string" } },
+    "intentGaps": { "type": "array", "items": { "type": "string" } },
+    "codeMap": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "role"],
+        "properties": {
+          "path": { "type": "string" },
+          "role": { "type": "string" }
+        }
+      }
+    }
+  }
+}

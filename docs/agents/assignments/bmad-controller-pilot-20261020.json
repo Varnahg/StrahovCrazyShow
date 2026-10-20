@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "issue": "KEY-47",
+  "task": "bmad-controller-live-pilot-20261020",
+  "workerTask": "bmad-controller-live-pilot-worker-20261020",
+  "repository": "Varnahg/StrahovCrazyShow",
+  "baseBranch": "main",
+  "intentFile": "docs/agents/assignments/bmad-controller-pilot-20261020.md",
+  "artifactDir": "_bmad-output/implementation-artifacts/bmad-controller-live-pilot-20261020",
+  "handoffFile": "docs/agents/handoffs/bmad-controller-live-pilot-20261020.md",
+  "checks": [
+    {
+      "id": "lfs-cli-tests",
+      "command": "node",
+      "args": [
+        "--test",
+        "tests/lfs-assets.test.ts",
+        "tests/lfs-assets-edge-cases.test.ts",
+        "tests/lfs-assets-help.test.ts"
+      ]
+    },
+    {
+      "id": "lfs-help",
+      "command": "node",
+      "args": [
+        "scripts/check-lfs-assets.mjs",
+        "--help"
+      ]
+    }
+  ],
+  "prTitle": "Přidat samostatnou nápovědu LFS kontrolního CLI",
+  "linearStates": {
+    "active": "In Progress",
+    "done": "Done"
+  },
+  "acceptance": {
+    "kind": "cli",
+    "description": "CLI --help/-h funguje bez Git checkoutu a bez Git v PATH, existující LFS kontroly zůstávají zelené. Hra/GPU nemá změněný runtime."
+  },
+  "merge": true
+}
