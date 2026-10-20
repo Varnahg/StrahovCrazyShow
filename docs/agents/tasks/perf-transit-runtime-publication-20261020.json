@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "perf-transit-runtime-publication-20261020",
+  "title": "KEY-53/54: sériové GitHub integrační okno",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [],
+  "resources": [
+    "github-ci-validation"
+  ],
+  "acceptance": [
+    "Publikace a exact-head/base přijetí se neprolíná s jiným koordinátorem; úspěch vyžaduje chráněný merge a zelenou main CI."
+  ],
+  "verification": [
+    "Skutečné GitHub run/check/checkout identity, aktuální head/base a compare proof."
+  ],
+  "notes": [
+    "Zápisy vlastní root coordination a gate tasky; tento task pouze rezervuje vzdálené integrační okno.",
+    "Po přijetí/uvolnění lze navázat dalším přiděleným PR; existence ready není pokyn k nové práci."
+  ]
+}

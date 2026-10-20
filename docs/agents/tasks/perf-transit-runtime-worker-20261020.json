@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "perf-transit-runtime-worker-20261020",
+  "title": "KEY-53: implementovat a ověřit úklid NPC poolu jen po mutaci rigů",
+  "writePaths": [
+    "client/transit-renderer.ts",
+    "tests/transit-pool-pruning.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Stabilní kohorta NPC nevykonává redundantní pool sweep; vytvoření/odebrání/výměna identity vyvolá jeden sweep po dokončení update.",
+    "Pending úklid přežije přerušený update a nuluje se až po úspěchu; plný dispose, živé materiály/instance, LOD a async completion zachovají chování.",
+    "Bez změny počtu/detailu NPC, tras, fyziky, materiálů a dalších runtime modulů; implementace i cílený refaktoring součástí jediného scope."
+  ],
+  "verification": [
+    "node --import tsx --test tests/transit-pool-pruning.test.ts tests/avatar-lod.test.ts",
+    "Skutečné Babylon lifecycle regrese: stable, LOD/hidden, shared survival/last release/recreate, same-count replacement, multiple mutations, interrupted update/prune, teardown.",
+    "Vlastní výsledky předat řadiči; externí CPU/GPUA/B neoznačovat jako provedené workerem."
+  ],
+  "notes": [
+    "Explicitně přidělený child KEY-53 z KEY-5; primární handoff fps-transit-cost.md:7 a výzkum docs/performance/evidence/transit-calendar-20261020/research/.",
+    "Worker žádný další BMAD/renderer/subagent nespouští, dodrží frozen intent a vlastní claim; žádný staging cizích souborů.",
+    "Cesty byly20.10ověřené čisté ve všech18worktrees; source baseline7e174d991d075631be034e113f871462679206455a22914da69ade2372bed292. Těsně před claim znovu ověřit skutečný stav."
+  ],
+  "status": "ready",
+  "dependsOn": []
+}

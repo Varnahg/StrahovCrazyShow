@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "name": "KEY-53 daytime scheduled passenger cohort at normal multiplayer spawn",
+  "qaDisclosure": "Local QA fixture: frozen transit timetable and lighting instant, synthetic fixed weather, two real SDK test clients. Ambient NPCs remain the game's fictional timetable simulation.",
+  "instant": 1792502700000,
+  "instantISO": "2026-10-20T13:25:00.000Z",
+  "quality": "medium",
+  "backend": "webgl2",
+  "targetFps": 60,
+  "yaw": -1.4,
+  "pitch": 0.1,
+  "distance": 8,
+  "spawn": { "x": 110, "z": 12 },
+  "expectedPassengers": 12,
+  "warmupMs": 20000,
+  "repetitions": 3,
+  "weather": {
+    "temperature": 18,
+    "wind": 0,
+    "windDirection": 0,
+    "rain": 0,
+    "cloud": 0,
+    "observedAt": 1792502700000,
+    "fetchedAt": 1792502700000,
+    "source": "Explicit QA synthetic weather fixture",
+    "cloudSource": "Explicit QA synthetic clear sky",
+    "cloudWindSource": "Explicit QA zero wind",
+    "stale": true,
+    "cloudStale": true,
+    "status": "fallback",
+    "sourceKind": "model"
+  },
+  "peers": [
+    { "nickname": "QA peer blue", "avatar": { "preset": 1, "skin": "#c78b63", "hair": "#201a15", "shirt": "#315dce", "trousers": "#424242", "glasses": true, "beard": false, "face": 1 }, "interests": [], "social": false, "firstTime": false },
+    { "nickname": "QA peer red", "avatar": { "preset": 2, "skin": "#e8bd97", "hair": "#784321", "shirt": "#c53c42", "trousers": "#243e32", "glasses": false, "beard": true, "face": 2 }, "interests": [], "social": false, "firstTime": false }
+  ]
+}

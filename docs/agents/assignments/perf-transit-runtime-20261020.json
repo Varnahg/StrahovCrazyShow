@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "issue": "KEY-53",
+  "task": "perf-transit-runtime-controller-20261020",
+  "workerTask": "perf-transit-runtime-worker-20261020",
+  "repository": "Varnahg/StrahovCrazyShow",
+  "baseBranch": "main",
+  "intentFile": "docs/agents/assignments/perf-transit-runtime-20261020.md",
+  "artifactDir": "_bmad-output/implementation-artifacts/perf-transit-runtime-20261020",
+  "handoffFile": "docs/agents/handoffs/perf-transit-runtime-controller-20261020.md",
+  "checks": [
+    {
+      "id": "transit-pool-lifecycle",
+      "command": "node",
+      "args": [
+        "--import",
+        "tsx",
+        "--test",
+        "tests/transit-pool-pruning.test.ts",
+        "tests/avatar-lod.test.ts",
+        "tests/skinned-avatar.test.ts"
+      ]
+    }
+  ],
+  "prTitle": "Omezit opakovaný úklid NPC poolu v dopravním rendereru",
+  "linearStates": {
+    "active": "In Progress",
+    "done": "Done"
+  },
+  "acceptance": {
+    "kind": "external",
+    "description": "Přesný runtime kandidát zachovává NPC, LOD, materiály a lifecycle. Koordinátor přijme pouze srovnatelné proložené A1/B1/A2/B2/A3/B3 v celé produkční hře/HUD se třemi skutečnými různorodými relacemi a stejnou NPC kohortou, CPU profile odděleným od plain FPS/p95/p99, shodnými podmínkami a úplnými raw důkazy včetně vyloučených/selhaných pokusů. Měřitelný CPU přínos musí překonat variabilitu; counter nebo testy samy nestačí. Parent KEY-5 zůstává otevřený. Před accept/merge je nutný nezávislý externí receipt pro přesné run/base/commit/source a tyto tři úplné evidence balíky.",
+    "authority": {
+      "task": "perf-transit-runtime-coordination-20261020",
+      "owner": "perftransit-01a155b2-coordinator"
+    },
+    "receiptFile": ".cache/perf-transit-runtime-20261020/external-acceptance.json",
+    "evidenceFiles": [
+      {
+        "id": "baseline",
+        "path": "docs/performance/evidence/transit-calendar-20261020/measurement/baseline.json"
+      },
+      {
+        "id": "candidate",
+        "path": "docs/performance/evidence/transit-calendar-20261020/measurement/candidate.json"
+      },
+      {
+        "id": "comparison",
+        "path": "docs/performance/evidence/transit-calendar-20261020/measurement/comparison.json"
+      }
+    ]
+  },
+  "merge": true
+}
