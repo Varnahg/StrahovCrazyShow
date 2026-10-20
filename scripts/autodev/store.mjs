@@ -246,11 +246,81 @@ export function validateAssignment(value) {
     fail("linearStates requires active and done names");
   if (
     !object(value.acceptance) ||
-    value.acceptance.kind !== "cli" ||
+    !["cli", "external"].includes(value.acceptance.kind) ||
     typeof value.acceptance.description !== "string" ||
     !value.acceptance.description.trim()
   )
-    fail("V1 supports an explicit CLI acceptance description only");
+    fail("Acceptance requires an explicit cli or external description");
+  if (value.acceptance.kind === "external") {
+    const acceptance = value.acceptance;
+    if (
+      Object.keys(acceptance).some(
+        (key) =>
+          ![
+            "kind",
+            "description",
+            "authority",
+            "receiptFile",
+            "evidenceFiles",
+          ].includes(key),
+      )
+    )
+      fail("Unknown external acceptance field");
+    if (
+      !object(acceptance.authority) ||
+      Object.keys(acceptance.authority).sort().join(",") !== "owner,task" ||
+      typeof acceptance.authority.task !== "string" ||
+      !/^[a-z0-9][a-z0-9_-]{0,95}$/.test(acceptance.authority.task ?? "") ||
+      typeof acceptance.authority.owner !== "string" ||
+      !/^[A-Za-z0-9][A-Za-z0-9:._-]{0,159}$/.test(acceptance.authority.owner)
+    )
+      fail("External acceptance requires an explicit task and owner");
+    if (
+      [value.task, value.workerTask, value.validationTask].includes(
+        acceptance.authority.task,
+      )
+    )
+      fail(
+        "External authority must be independent of controller, worker and validation",
+      );
+    const file = (candidate, label) => {
+      relativeFile(candidate, label);
+      if (
+        /[\[\]{}]/.test(candidate) ||
+        candidate
+          .split("/")
+          .some(
+            (part) =>
+              /[. ]$/.test(part) ||
+              /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(part),
+          )
+      )
+        fail(`${label} must be an exact portable file path`);
+    };
+    file(acceptance.receiptFile, "receiptFile");
+    if (
+      !Array.isArray(acceptance.evidenceFiles) ||
+      !acceptance.evidenceFiles.length
+    )
+      fail("External acceptance requires explicit evidence files");
+    const evidenceIds = new Set(),
+      paths = new Set([acceptance.receiptFile.toLowerCase()]);
+    for (const evidence of acceptance.evidenceFiles) {
+      if (
+        !object(evidence) ||
+        Object.keys(evidence).sort().join(",") !== "id,path" ||
+        typeof evidence.id !== "string" ||
+        !/^[a-z0-9][a-z0-9-]{0,63}$/.test(evidence.id) ||
+        evidenceIds.has(evidence.id)
+      )
+        fail("Evidence IDs must be unique explicit identifiers");
+      file(evidence.path, "evidence path");
+      if (paths.has(evidence.path.toLowerCase()))
+        fail("External evidence paths must be distinct");
+      evidenceIds.add(evidence.id);
+      paths.add(evidence.path.toLowerCase());
+    }
+  }
   if (!Array.isArray(value.checks) || value.checks.length === 0)
     fail("At least one explicit check is required");
   const ids = new Set();

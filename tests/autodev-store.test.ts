@@ -104,3 +104,62 @@ test("canonical digests ignore object key order but freeze behavior, and run IDs
     code: "INVALID_RUN_ID",
   });
 });
+
+test("external manifest freezes independent authority and an exact immutable evidence list", () => {
+  const acceptance = {
+    kind: "external",
+    description: "Comparable production A/B",
+    authority: { task: "coordinator", owner: "run:coordinator" },
+    receiptFile: "evidence/acceptance.json",
+    evidenceFiles: [{ id: "ab", path: "evidence/ab.json" }],
+  };
+  const original = { ...assignment(), acceptance };
+  assert.deepEqual(store.validateAssignment(original), original);
+  const bad = [
+    { unknown: true },
+    { authority: { ...acceptance.authority, key: "ignored" } },
+    { authority: { task: original.workerTask, owner: "owner" } },
+    { authority: { task: original.task, owner: "owner" } },
+    { authority: { task: 123, owner: "owner" } },
+    { authority: { task: "coordinator", owner: "bad owner" } },
+    { evidenceFiles: [] },
+    {
+      evidenceFiles: [...acceptance.evidenceFiles, ...acceptance.evidenceFiles],
+    },
+    { evidenceFiles: [{ id: "ab", path: acceptance.receiptFile }] },
+    { evidenceFiles: [{ id: "ab", path: "evidence/ab.json", ignored: true }] },
+    {
+      evidenceFiles: [
+        { id: "a", path: "A.json" },
+        { id: "b", path: "a.json" },
+      ],
+    },
+    ...[
+      "../proof",
+      "/proof",
+      "C:/proof",
+      "proof\\x",
+      "proof/*",
+      "proof/[a]",
+      "proof/./x",
+      "proof/.git/x",
+      "proof/x.",
+      "proof/CON.txt",
+      "proof//x",
+    ].map((receiptFile) => ({ receiptFile })),
+  ];
+  for (const patch of bad)
+    assert.throws(
+      () =>
+        store.validateAssignment({
+          ...original,
+          acceptance: { ...acceptance, ...patch },
+        }),
+      { code: "INVALID_ASSIGNMENT" },
+    );
+  assert.throws(
+    () =>
+      store.validateAssignment({ ...original, validationTask: "coordinator" }),
+    { code: "INVALID_ASSIGNMENT" },
+  );
+});

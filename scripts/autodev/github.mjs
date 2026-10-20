@@ -1,5 +1,10 @@
 import { spawn } from "node:child_process";
 import { problem } from "./store.mjs";
+import {
+  ensureExternalAcceptance,
+  externalAcceptanceBody,
+  externalProofDigest,
+} from "./external-acceptance.mjs";
 
 export function execute(
   command,
@@ -367,6 +372,7 @@ export class GitHubClient {
     }
   }
   async accept(ctx, body) {
+    const externalAcceptance = await ensureExternalAcceptance(ctx);
     const pr = await this.pr(ctx.data.prNumber);
     this.assertPr(pr, ctx);
     const base = await this.branch(ctx.assignment.baseBranch);
@@ -387,11 +393,13 @@ export class GitHubClient {
     const marker = `<!-- autodev:${ctx.runId} -->`;
     if (!pr.body?.includes(marker))
       throw problem("PR_IDENTITY", "Run marker is missing from PR evidence");
-    const expectedBody = `${marker}\n${body}`;
-    if (pr.body !== expectedBody)
+    const expectedBody = `${marker}\n${body}${externalAcceptanceBody(externalAcceptance)}`;
+    if (pr.body !== expectedBody) {
+      await ensureExternalAcceptance(ctx, { requirePinned: true });
       await this.api("PATCH", this.endpoint(`/pulls/${pr.number}`), {
         body: expectedBody,
       });
+    }
     this.assertPr(await this.pr(pr.number), ctx);
     const statuses = await this.pages(
       `/commits/${ctx.data.commitSha}/statuses`,
@@ -399,23 +407,73 @@ export class GitHubClient {
     const latest = statuses.find(
       (status) => status.context === "project-acceptance",
     );
+    await ensureExternalAcceptance(ctx, { requirePinned: true });
     if (latest?.state !== "success" || latest.target_url !== pr.html_url)
       await this.api("POST", this.endpoint(`/statuses/${ctx.data.commitSha}`), {
         state: "success",
         context: "project-acceptance",
-        description: "Reviewed CLI evidence and required CI accepted",
+        description: externalAcceptance
+          ? "External practical evidence and required CI accepted"
+          : "Reviewed CLI evidence and required CI accepted",
         target_url: pr.html_url,
       });
     return {
       headSha: ctx.data.commitSha,
       baseSha: ctx.data.baseSha,
       evidenceUrl: pr.html_url,
+      ...(externalAcceptance ? { externalAcceptance } : {}),
     };
   }
+  async assertExternalMerge(ctx, pr, proof) {
+    const intent = ctx.data.mergeIntent;
+    if (
+      !pr.merged ||
+      intent?.headSha !== ctx.data.commitSha ||
+      intent?.baseSha !== ctx.data.baseSha ||
+      externalProofDigest(intent?.externalAcceptance) !==
+        externalProofDigest(proof) ||
+      !/^[a-f0-9]{40}$/.test(pr.merge_commit_sha ?? "")
+    )
+      throw problem(
+        "MERGE_IDENTITY",
+        "Merged external candidate has no matching durable merge intent",
+      );
+    const commit = await this.api(
+      "GET",
+      this.endpoint(`/git/commits/${pr.merge_commit_sha}`),
+    );
+    if (
+      commit.sha !== pr.merge_commit_sha ||
+      commit.parents?.length !== 2 ||
+      commit.parents[0].sha !== intent.baseSha ||
+      commit.parents[1].sha !== intent.headSha
+    )
+      throw problem(
+        "MERGE_IDENTITY",
+        "Remote merge parents differ from this run's merge intent",
+      );
+    await ensureExternalAcceptance(ctx, { requirePinned: true });
+  }
   async merge(ctx) {
+    const externalAcceptance = await ensureExternalAcceptance(ctx, {
+      requirePinned: true,
+    });
     const pr = await this.pr(ctx.data.prNumber);
     this.assertPr(pr, ctx, { allowMerged: Boolean(pr.merged) });
-    if (pr.merged) return pr.merge_commit_sha;
+    if (
+      externalAcceptance &&
+      externalProofDigest(ctx.data.acceptance?.externalAcceptance) !==
+        externalProofDigest(externalAcceptance)
+    )
+      throw problem(
+        "EXTERNAL_ACCEPTANCE_CHANGED",
+        "Merge acceptance does not match the pinned external proof",
+      );
+    if (pr.merged) {
+      if (externalAcceptance)
+        await this.assertExternalMerge(ctx, pr, externalAcceptance);
+      return pr.merge_commit_sha;
+    }
     if (pr.state !== "open" || pr.draft)
       throw problem("PR_NOT_READY", "PR is not open and ready");
     if (
@@ -430,9 +488,25 @@ export class GitHubClient {
       (await this.branch(ctx.assignment.baseBranch)).commit.sha !== pr.base.sha
     )
       throw problem("BASE_CHANGED", "Base advanced before merge");
-    await ctx.save({
-      mergeIntent: { headSha: pr.head.sha, baseSha: pr.base.sha },
-    });
+    const mergeIntent = {
+      headSha: pr.head.sha,
+      baseSha: pr.base.sha,
+      ...(externalAcceptance ? { externalAcceptance } : {}),
+    };
+    if (
+      externalAcceptance &&
+      ctx.data.mergeIntent &&
+      (ctx.data.mergeIntent.headSha !== mergeIntent.headSha ||
+        ctx.data.mergeIntent.baseSha !== mergeIntent.baseSha ||
+        externalProofDigest(ctx.data.mergeIntent.externalAcceptance) !==
+          externalProofDigest(externalAcceptance))
+    )
+      throw problem(
+        "MERGE_IDENTITY",
+        "Existing merge intent has a different external proof",
+      );
+    await ctx.save({ mergeIntent });
+    await ensureExternalAcceptance(ctx, { requirePinned: true });
     const result = await this.api(
       "PUT",
       this.endpoint(`/pulls/${pr.number}/merge`),
@@ -440,6 +514,16 @@ export class GitHubClient {
     );
     if (!result?.merged || !result.sha)
       throw problem("UNKNOWN_EFFECT", "Merge outcome was not confirmed");
+    if (externalAcceptance) {
+      const merged = await this.pr(pr.number);
+      this.assertPr(merged, ctx, { allowMerged: true });
+      if (merged.merge_commit_sha !== result.sha)
+        throw problem(
+          "MERGE_IDENTITY",
+          "Merge response differs from the recorded remote PR",
+        );
+      await this.assertExternalMerge(ctx, merged, externalAcceptance);
+    }
     return result.sha;
   }
 }

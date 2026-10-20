@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "perf-transit-runtime-measure-20261020",
+  "title": "Srovnatelná CPU a produkční před/po přejímka runtime dopravní optimalizace",
+  "writePaths": [
+    "docs/performance/evidence/transit-calendar-20261020/measurement/",
+    "docs/agents/handoffs/perf-transit-runtime-measure-20261020.md",
+    ".cache/performance-transit-measure-20261020/",
+    ".cache/performance-snapshot/transit-runtime-20261020-baseline/",
+    ".cache/performance-snapshot/transit-runtime-20261020-candidate/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Výchozí a kandidátní runtime/test/asset identity jsou zmrazené a raw výsledky zůstávají zachované.",
+    "Před/po má stejný scénář, vstupy, kvalitu, obraz/HUD, reálné relace, GPU, rozlišení a oddělený profil od plain měření; uvádí CPU a FPS/p95/p99 bez zaměňování.",
+    "Regrese výstupů, lifecycle a chování je vyhodnocena; neprokázaný nebo negativní přínos není přijetí."
+  ],
+  "verification": [
+    "Sériová proložená A/B měření stejného kódu a vstupů, opakované raw intervaly a nezměněné semantic hashes.",
+    "Produkční hra se skutečnou URL/source identity a stejnými actual relacemi/avatar konfigurací.",
+    "Před měřením živé claims a skutečné procesy/scény; ukončení pouze vlastních pomocných procesů."
+  ],
+  "notes": [
+    "Task se nesmí claimnout přes feedback-validation-20261020. Vyčkat skutečného předání a uvolnění společných zdrojů.",
+    "Žádné zásahy do uživatelova neměnného hraného buildu. CPU mikroprofil není důkaz celého FPS.",
+    "Pouze testovací pomocníci/snapshoty/evidence; runtime implementace patří budoucímu controller worker tasku.",
+    "20.10 po doloženém release odděleny heavy/GPU/build/port zdroje do perf-transit-runtime-validation-20261020; tento task umožňuje přípravu helperu během cizího měřicího okna. Zátěž/build/server vyžadují navíc resource-only claim."
+  ],
+  "status": "ready",
+  "dependsOn": []
+}

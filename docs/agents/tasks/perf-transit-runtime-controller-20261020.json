@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "perf-transit-runtime-controller-20261020",
+  "title": "KEY-53: čerstvý BMAD řadič runtime optimalizace úklidu NPC",
+  "writePaths": [
+    "_bmad/render/bmad-build/autodev-key-53-776f5f92725b-4be13dffb905/",
+    "_bmad-output/implementation-artifacts/perf-transit-runtime-20261020/",
+    "docs/agents/handoffs/perf-transit-runtime-controller-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přesný nový run KEY-53 použije vlastní renderer prefix, jediný plán/implementaci a tři skutečná nezávislá review.",
+    "Runtime se nepřijme pouze podle testů; external gate vyžaduje identitně svázanou praktickou A/B evidence a koordinátorův receipt.",
+    "Po receipt/resume tentýž PR/commit projde chráněným merge a zelenou main CI bez opakovaného workeru."
+  ],
+  "verification": [
+    "Oficiální BMAD snapshot, aktuální ruleset/CI identity, raw receipts/checks/reviews.",
+    "Status missing-receipt před accept a pozdější resume bez duplicit.",
+    "Výkonové/GPU měření patří samostatnému externímu koordinátorovi."
+  ],
+  "notes": [
+    "LinearKEY-53, assignment docs/agents/assignments/perf-transit-runtime-20261020.json a .md. Podpůrné KEY-54 musí být skutečně integrované a zelené před startem.",
+    "RunIdkey-53-776f5f92725b vypočten z kanonické Git common identity; budoucí Windows Path.resolve prefix nezávisle potvrzen uv/PythonSHA4be13dffb905.",
+    "Task je ready rozsah, nikoli pokyn spustit před baseline/bootstrap. Runtime worker má pouze dva disjunktní soubory."
+  ],
+  "status": "ready",
+  "dependsOn": []
+}
