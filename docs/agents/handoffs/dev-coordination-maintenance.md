@@ -60,3 +60,6 @@ Finální dokumentační agent předal všech osm cest zpět koordinátorovi a v
 ## KEY-48: převzetí všech dokončených scopes
 
 Koordinátor po release dokumentace znovu rezervoval katalog a převzal14 vlastních dosud ready úkolů jako done. Základem jsou dokončené handoffy, cílené kontroly,3nezávislá code review bez nálezů, plná sada1708/1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře/12peers a skutečná finální IAB přejímka. Dvě závěrečné dokumentační položky opravili a potvrdili všichni3revieweři. Stav scopes znamená převzetí výsledků integrátorem; celkový KEY-48/goal se uzavře po exact-head PR/main CI a merge, evidovaných externě. Foreign tasky/claims/writePaths/resources se nemění. Žádný vlastní server/GPU proces už neběží; porty2568/4290 volné.
+
+## KEY-50: bootstrap disjunktního CLI běhu20.10.2026
+Owner perfcli-01a155b2-admin získal čistý katalogový claim. Založeny pouze perf-cli-identity-{coordination,controller,worker}-20261020 s přesnými scopes; cizí tasky a claims beze změny. Koordinátor má vlastní evidence, controller renderer/spec a worker pouze diagnostics-report.mjs +jeho test. Výběr a skutečný red baseline jsou v docs/performance/evidence/diagnostic-identity-20261020/. Po validaci a commitnutí bootstrapu admin slot uvolní; vytvoření tasku není dokončení KEY-50.

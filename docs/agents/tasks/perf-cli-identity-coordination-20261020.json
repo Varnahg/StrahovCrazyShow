@@ -1,0 +1,29 @@
+{
+  "acceptance": [
+    "Vymezit existující mezeru KEY-2 jako KEY-50, doložit reprodukci a varianty před implementací.",
+    "Ověřit nový run řadiče, skutečné CLI, review, PR, merge a main CI; parent KEY-2 nezavírat podle této dílčí opravy."
+  ],
+  "writePaths": [
+    "docs/agents/assignments/perf-cli-identity-20261020.json",
+    "docs/agents/assignments/perf-cli-identity-20261020.md",
+    "docs/performance/evidence/diagnostic-identity-20261020/",
+    "docs/agents/handoffs/perf-cli-identity-coordination-20261020.md",
+    ".cache/perf-cli-identity-20261020/"
+  ],
+  "notes": [
+    "Výslovné zadání uživatele20.10.2026: vybrat malý performance-related CLI úkol a dokončit přes řadič od čistého startu.",
+    "Žádné runtime/GPU změny, převzetí cizího WIP ani ruční zásah do run state/receipts."
+  ],
+  "dependsOn": [],
+  "schemaVersion": 1,
+  "status": "ready",
+  "title": "KEY-50: výběr, reprodukce a přejímka čerstvého výkonového CLI běhu",
+  "verification": [
+    "node scripts/agent-tasks.mjs validate",
+    "Cílená plain-Node reprodukce a skutečné GitHub PR/main CI."
+  ],
+  "id": "perf-cli-identity-coordination-20261020",
+  "resources": [
+    "github-ci-validation"
+  ]
+}
