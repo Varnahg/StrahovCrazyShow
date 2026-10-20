@@ -101,3 +101,34 @@ test("feedback removes credential-like values and secret URL queries from techni
   assert.ok(!JSON.stringify(parsed.report).includes("token=private"));
   assert.ok(parsed.report.message.includes("[redacted]"));
 });
+
+test("acknowledgeable build identities remain valid after durable normalization", () => {
+  for (const clientBuildId of [
+    "   ",
+    "\0\t\n",
+    "a".repeat(119) + " Bearer a",
+  ]) {
+    const result = validateFeedbackReport({
+      ...input(),
+      context: { ...input().context, clientBuildId },
+    });
+    assert.equal(result.ok, false, JSON.stringify(clientBuildId));
+  }
+  for (const clientBuildId of [
+    " test-build ",
+    "a".repeat(128),
+    "Bearer example-credential",
+    "https://example.com/build?token=private",
+  ]) {
+    const result = validateFeedbackReport({
+      ...input(),
+      context: { ...input().context, clientBuildId },
+    });
+    assert.ok(result.ok);
+    const restored = validateFeedbackReport(
+      JSON.parse(JSON.stringify(result.report)),
+    );
+    assert.ok(restored.ok);
+    assert.deepEqual(restored.report, result.report);
+  }
+});

@@ -210,6 +210,10 @@ export function validateFeedbackReport(value: unknown): FeedbackValidation {
     locale: ctx.locale as "cs" | "en",
     page: ctx.page as FeedbackContext["page"],
   };
+  // The durable record is validated again on startup. Never acknowledge a
+  // value whose normalization would make that second validation reject it.
+  if (!context.clientBuildId || context.clientBuildId.length > 128)
+    return fail("invalid-context");
   if (text(ctx.userAgent, 512))
     context.userAgent = technical(ctx.userAgent as string);
   if (

@@ -37,7 +37,7 @@ Engine má pouze public `onEndFrameObservable.add/remove` a `getRenderingCanvas`
 
 Výstup bez upscalingu zachová poměr stran, delší strana nejvýše1920px, počet pixelů/bytes podle FEEDBACK_LIMITS. Jediný toBlob žádá WebP0.9 a vrací skutečný WebP/PNG/JPEG MIME. Null, prázdný blob, nepodporovaný MIME, překročení bytes nebo výjimka vrátí encoding. Bez endFrame do2500ms vrátí timeout; při běžících endFrame bez čerstvého platného renderu no-frame. No-view, busy a cancelled jsou explicitní výsledky s image:null. Není upload, objectURL ani DOM snapshot.
 
-Module-owned slot blokuje další kopii/encode i mezi dvěma instancemi/Game generacemi. Abort/dispose během encode okamžitě logicky vrátí cancelled a uvolní vlastní bitmapu, ale slot zůstane obsazený do native callbacku nebo pevného encode timeoutu5000ms. Po hard timeoutu jde pouze o logické omezení: fyzicky hung browser encode zastavit nelze. Každý late callback ověřuje konkrétní operation token a nemůže uvolnit nový slot, nulovat cizí canvas ani změnit nový draft.
+Module-owned slot blokuje další kopii/encode i mezi dvěma instancemi/Game generacemi. Abort/dispose během encode okamžitě logicky vrátí cancelled a uvolní vlastní bitmapu, timer a abort listener. Pevný encode timeout5000ms stejně dokončí požadavek s timeout a uklidí jeho zdroje. Fyzický encoder slot v obou případech zůstane obsazený až do původního native callbacku; další otevření i nový Game do té doby dostává busy. Pokud callback nikdy nepřijde, pořizování dalších snímků zůstane nedostupné, aby nemohlo vznikat více fyzických encode. Každý late callback ověřuje konkrétní operation token a nemůže uvolnit nový slot, nulovat cizí canvas ani změnit nový draft. Toto zpřesnění nahrazuje původní timeout release z první implementace; viz review oprava níže.
 
 Refaktoring: společné `settle/release/stopFrameWait/releaseCanvas` sjednocují všechny úklidové větve; `active` chrání reentranci; nevzniká idle observer ani idle bitmapa. Canvas je líný a každá operace vlastní konkrétní objekt; po dokončení/stornu má rozměry0×0. Není trvalá obrazová cache ani opakované kopírování.
 
@@ -50,7 +50,7 @@ Refaktoring: společné `settle/release/stopFrameWait/releaseCanvas` sjednocují
 - `pnpm exec prettier --write client/rendered-frame-capture.ts tests/rendered-frame-capture.test.ts` — provedeno pouze ve vlastních souborech. `git diff --check` nad vlastními cestami bez hlášení (nové untracked soubory ještě nejsou staged).
 - Výstupy příkazů zůstávají v tool transcriptu relace; nebyly vytvořeny další log soubory mimo rezervovaný rozsah.
 
-Snapshot manifest zahrnuje implementaci i testy po posledním úspěšném běhu:
+Historický snapshot první implementace zahrnuje implementaci i testy tehdejšího úspěšného běhu; aktuální manifest po review je níže:
 
 | Soubor                               | SHA-256                                                          |
 | ------------------------------------ | ---------------------------------------------------------------- |
@@ -65,3 +65,22 @@ Snapshot manifest zahrnuje implementaci i testy po posledním úspěšném běhu
 - Rezervace: všechny zápisy a CPU procesy končí tímto předáním; následný CLI release je poslední akce podagenta. Jeho skutečný výsledek dostává integrátor ve zprávě relace, další zápis po release podagent neprovádí.
 
 Integrátor: k doplnění po kontrole konkrétního diffu/hashů a společného ověření. Společný docs/verification.md podagent neupravoval.
+
+## Oprava po review — 20. 10. 2026 21:22 UTC
+
+Původní autor znovu získal disjunktní claim pod `feedback-impl-01a15a3e-capture` na HEAD `7b6d02d69cff3de7e8f99041a9a0299dceda46f6`. Root výslovně předal pouze tři původní committed soubory; cizí současné Docker/UI/spec/task/evidence WIP se nepřebírá a podagent do něj nezapsal. Žádný další BMAD ani agent.
+
+Doložený mechanismus: původní encode timeout volal `settle` s výchozím uvolněním, takže po5000ms uvolnil encoderOwner, i když native toBlob může stále pracovat. Nové otevření mohlo spustit další native encode. Požadovaný timeout znamená včasný výsledek pro formulář, nikoli fyzické přerušení browserové práce. Vzhledem k necancellovatelnému API je zachování slotu do callbacku jediné malé řešení, které zachová jednu fyzickou kompresi; zrušení slotu po libovolné časové rezervě by mělo tutéž chybu. Trvale chybějící callback omezí pouze další fotografie, nikoli hru nebo odeslání textu.
+
+Změna: `settle/release` nyní společně uklidí timer, bitmapu a listener i při ponechání fyzického slotu. Timeout předá `unlockEncoder=false`, stejně jako storno běžící komprese. Původní native callback u settled požadavku uvolní pouze svůj operation token; kontrola identity globálního vlastníka zůstala zachována. Odstraněn duplicitní abort cleanup canvasu. Rozsah/runtime API, rozměry, vzhled, cache a render hook se nemění.
+
+Ověření pouze změněného modulu: `pnpm exec tsx --test tests/rendered-frame-capture.test.ts` — exit0, **17/17 PASS**, poslední běh520.4ms v21:22 UTC. Tři původní timeout testy byly opraveny: opakované requesty po timeoutu zůstávají busy; timer/observer/abort listener a bitmapa jsou uklizené; cancel nevytvoří další encode ani po delším čekání; timeout→dispose→nový Game je busy do původního callbacku a jeho duplikát neodemkne nového vlastníka. Převzaté ostatní cílené testy prošly stejným během. Žádné širší testy, build, GPU nebo server.
+
+Aktuální manifest po review opravě včetně testů:
+
+| Soubor                               | SHA-256                                                          |
+| ------------------------------------ | ---------------------------------------------------------------- |
+| client/rendered-frame-capture.ts     | 29bbada293276edcd91eadc3fe94c232be2bcddc722c837524cb0aadb439b864 |
+| tests/rendered-frame-capture.test.ts | 38aa3bab3b986e6d20966651d1bc26668e511f9729af9ad5c192de464030e9de |
+
+Po konečné kontrole formátování/diffu následuje release claimu a zpráva rootovi. Bez vlastních pomocných procesů, stagingu nebo commitu; společné ověření a přijetí provede root.

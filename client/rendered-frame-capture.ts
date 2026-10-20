@@ -158,9 +158,6 @@ export class RenderedFrameCapture {
           unavailable("cancelled", requestedAtMs, operation.capturedAtMs),
           !operation.encoding,
         );
-        // toBlob snapshots its input synchronously. Keep the encoder slot, but
-        // release our bitmap promptly when the caller no longer wants it.
-        this.releaseCanvas(operation);
       };
       signal?.addEventListener("abort", operation.abort, { once: true });
       operation.frameTimer = this.environment.setTimeout(() => {
@@ -289,12 +286,13 @@ export class RenderedFrameCapture {
             operation.requestedAtMs,
             operation.capturedAtMs,
           ),
+          false,
         );
       }, ENCODE_TIMEOUT_MS);
       canvas.toBlob(
         (blob) => {
-          // A cancelled/timed-out native encode can finish after a new draft.
-          // It never owns that draft's promise, timer or canvas.
+          // Logical timeout/cancellation keeps the native encoder slot until
+          // this callback. A duplicate old callback never owns a new draft.
           if (this.operation !== operation) return;
           if (operation.settled) {
             this.release(operation);
@@ -358,7 +356,7 @@ export class RenderedFrameCapture {
   private settle(
     operation: CaptureOperation,
     result: RenderedFrameCaptureResult,
-    release = true,
+    unlockEncoder = true,
   ): void {
     if (this.operation !== operation) return;
     if (!operation.settled) {
@@ -368,7 +366,7 @@ export class RenderedFrameCapture {
         operation.signal?.removeEventListener("abort", operation.abort);
       operation.resolve(result);
     }
-    if (release) this.release(operation);
+    this.release(operation, unlockEncoder);
   }
 
   private releaseCanvas(operation: CaptureOperation): void {
@@ -378,13 +376,17 @@ export class RenderedFrameCapture {
     operation.canvas = undefined;
   }
 
-  private release(operation: CaptureOperation): void {
+  private release(operation: CaptureOperation, unlockEncoder = true): void {
     this.stopFrameWait(operation);
     if (operation.encodeTimer !== undefined) {
       this.environment.clearTimeout(operation.encodeTimer);
       operation.encodeTimer = undefined;
     }
     this.releaseCanvas(operation);
+    // toBlob snapshots its bitmap but cannot be physically cancelled. Dispose,
+    // abort and timeout release request resources without starting a second
+    // encoder; only its original native callback can unlock the slot.
+    if (!unlockEncoder) return;
     if (this.operation === operation) this.operation = undefined;
     if (RenderedFrameCapture.encoderOwner === operation)
       RenderedFrameCapture.encoderOwner = undefined;

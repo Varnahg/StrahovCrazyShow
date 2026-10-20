@@ -14,7 +14,8 @@
   "notes": [
     "Výslovné uživatelské zadání20Oct2026: kompletně implementovat podle KEY-51, navázat na KEY-21, prakticky ověřit a integrovat do main. Cizí WIP se nepřebírá.",
     "Implementace v izolované worktree codex/player-feedback-20261020 na c713c2ae. Shared kontrakt vlastní root; subagenti mají disjunktní soubory. Capture WIP KEY-21 zůstává chráněný, dokud nebude doložené předání.",
-    "Root aktualizuje Linear a provádí integraci; podagenti předají kód, cílený refaktoring a relevantní testy společně. Žádné samostatné commity subagentů."
+    "Root aktualizuje Linear a provádí integraci; podagenti předají kód, cílený refaktoring a relevantní testy společně. Žádné samostatné commity subagentů.",
+    "Explicitní narrow handoff root→původníclientauthor20Oct: rootprovedlfocusfixvfeedback.tsx, vizliveownuncommitteddiff; novýwriter může adoptovat pouze tento doloženýWIP. Opravit429/408retry a nativnífocus; doplnit skutečný browsernativeIDB/form submit regression harness s vlastníCIworkflow. LokálníGPU/build/server nespuštět; rootprovádíheavy/přejímku. Povolenýtestovýharnessport4207 rezervuje root při jeho spuštění."
   ],
   "id": "feedback-client-20261020",
   "title": "Krátký přístupný formulář, náhled a browser outbox",
@@ -24,6 +25,9 @@
     "client/feedback-outbox.ts",
     "tests/feedback-outbox.test.ts",
     "tests/feedback-form.test.ts",
-    "docs/agents/handoffs/feedback-client-20261020.md"
+    "docs/agents/handoffs/feedback-client-20261020.md",
+    "scripts/feedback-browser.ts",
+    "tests/fixtures/feedback-browser/",
+    ".github/workflows/feedback-browser.yml"
   ]
 }

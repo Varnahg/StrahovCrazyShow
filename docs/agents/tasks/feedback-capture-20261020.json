@@ -14,7 +14,8 @@
   "notes": [
     "Výslovné uživatelské zadání20Oct2026: kompletně implementovat podle KEY-51, navázat na KEY-21, prakticky ověřit a integrovat do main. Cizí WIP se nepřebírá.",
     "Implementace v izolované worktree codex/player-feedback-20261020 na c713c2ae. Shared kontrakt vlastní root; subagenti mají disjunktní soubory. Capture WIP KEY-21 zůstává chráněný, dokud nebude doložené předání.",
-    "Root aktualizuje Linear a provádí integraci; podagenti předají kód, cílený refaktoring a relevantní testy společně. Žádné samostatné commity subagentů."
+    "Root aktualizuje Linear a provádí integraci; podagenti předají kód, cílený refaktoring a relevantní testy společně. Žádné samostatné commity subagentů.",
+    "Finálníreview: encodetimeout nesmí uvolnit globálnílock dokud nevrátí nativecallback. Vráceno původnímu authorovi k opravě a regresím; rootnepíše do těchto3cest."
   ],
   "id": "feedback-capture-20261020",
   "title": "Sdílitelný jednorázový capture běžného snímku bez HUD",

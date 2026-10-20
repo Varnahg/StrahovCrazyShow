@@ -14,6 +14,16 @@ Každý výsledek platí jen pro zaznamenané source ID a podmínky ověření. 
 
 Funkční přejímka není FPS benchmark ani důkaz zrychlení. Úplná fotografická věrnost, všechny povolené interiéry a denní i davová přejímka 60 FPS na GeForce GTX 1060 zůstávají otevřené. Uživatelské diagnostiky zůstávají místní.
 
+## Herní zpětná vazba · KEY-52 · 20. října 2026
+
+Krátký formulář v menu, docku, pod F8 a při chybě startu je napojený na samostatný serverový příjem a soukromé Linear issues. Automatická fotografie používá nový úspěšný běžný frame a neobsahuje HTML HUD. Hráč ji může odebrat. Klient potvrzuje přijetí až po trvalé serverové příjemce; do té doby uchovává omezenou IndexedDB frontu.
+
+První skutečný produkční tok vytvořil [KEY-55](https://linear.app/gigeconomy/issue/KEY-55/game-bug-key-52-acceptance-automaticky-test-skutecneho-toku-kratky). Report a snímek odeslaný při vypnutém serveru přežil zavření klienta a po novém otevření vytvořil [KEY-56](https://linear.app/gigeconomy/issue/KEY-56/game-idea-key-52-acceptance-offlinereload-zkusebni-obecny-napad). Obě přílohy byly nezávisle staženy z Linear a porovnány bajt po bajtu se serverovým originálem. Identický opakovaný POST vrací stejnou příjemku202, změněný obsah stejnéhoID konflikt409. [Původní obrazové a strojové důkazy](verification-evidence/feedback-20261020/) zůstávají zachované.
+
+Visible IAB na skutečném Intel UHD630/ANGLE D3D11 prošel guest i multiplayerem s HUD, připraveným rendererem a nulovým počtem renderovacích chyb. Jednorázové měření před závěrečnými review opravami: pevná medium, denní demo, jeden avatar, CSS i interně580×668,10,03s,38,3FPS,p9532,6ms,p9939,3ms. Jde o provozní důkaz, nikoli A/B přínos nebo splnění60FPS. Edge se stejným buildem timeoutoval při přípravě světel; stejné omezení je doložené také u dřívější přijaté baseline a jeho příčina zůstává neprokázaná. Watchdog ani readiness se neobchází.
+
+Průběžně prošly cílené CPU regrese, produkční build/TypeScript a celá izolovaná integrace. Lokální úplná Windows sada byla přerušena bez úplného výsledku a není PASS. Finální přesný PR/main Linux CI, nový browser CI a poslední checkpoint po review opravách se doplní před přijetím. Tři review vrstvy přijaly10konkrétních oprav a regresí; nic z jejich výsledků se neslučuje s cizím WIP. Serverový credential zůstává jen v neveřejné ignorované konfiguraci; kontrola publikačního diffu jej nenašla.
+
 ## Historická evidence
 
 **Následující původní záznamy jsou zachované včetně kotvených nadpisů, tehdejšího slova „aktuální“, portů, hashů, neúspěšných pokusů a provenience. Každé tvrzení platí k datu a checkpointu dané sekce.** D2/P5, tehdejší protokol 9 a preview 4179 nejsou současný návod ani důkaz běžící služby. Novější PASS nesmazává dřívější selhání a staré FPS se nepřenášejí na dnešní zdroje.

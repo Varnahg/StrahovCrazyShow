@@ -37,6 +37,7 @@ test("the immediate form is accessible in Czech and English without capturing or
       assert.match(html, /<dialog[^>]+aria-labelledby=/);
       assert.match(html, /aria-modal="true"/);
       assert.match(html, /<textarea[^>]+required=""/);
+      assert.match(html, /<textarea[^>]+autofocus=""/i);
       assert.match(html, /type="email"/);
       assert.match(html, /<details>/);
       assert.match(html, /role="status"/);

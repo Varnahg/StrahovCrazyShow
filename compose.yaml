@@ -12,8 +12,10 @@ services:
       FEEDBACK_DIR: /data/feedback
       FEEDBACK_ALLOWED_ORIGINS: ${FEEDBACK_ALLOWED_ORIGINS:-}
       LINEAR_API_KEY: ${LINEAR_API_KEY:-}
+      LINEAR_ACCESS_TOKEN: ${LINEAR_ACCESS_TOKEN:-}
       LINEAR_TEAM_ID: ${LINEAR_TEAM_ID:-}
       LINEAR_PROJECT_ID: ${LINEAR_PROJECT_ID:-}
+      LINEAR_STATUS_ID: ${LINEAR_STATUS_ID:-}
     volumes:
       - feedback-data:/data/feedback
 volumes:

@@ -1,5 +1,6 @@
 import test, { type TestContext } from "node:test";
 import assert from "node:assert/strict";
+import { getEventListeners } from "node:events";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { EventState } from "@babylonjs/core/Misc/observable";
@@ -415,14 +416,25 @@ test("abort during encode settles now and keeps one encoder slot until its late 
   assert.equal(result.capture.state, "unavailable");
 });
 
-test("hard encoder timeout releases a hung operation; its eventual callback cannot touch the next canvas", async (t) => {
+test("encoder timeout settles and cleans request resources but stays busy until its native callback", async (t) => {
   const f = fixture(t);
-  const first = f.capture.capture();
+  const controller = new AbortController();
+  const first = f.capture.capture(controller.signal);
   f.render();
   const oldCanvas = f.canvases[0];
+  assert.equal(getEventListeners(controller.signal, "abort").length, 1);
   f.clock.advance(5000);
   assert.equal((await first).capture.reason, "timeout");
   assert.deepEqual([oldCanvas.width, oldCanvas.height], [0, 0]);
+  assert.equal(f.clock.jobs.size, 0);
+  assert.equal(f.observable.hasObservers(), false);
+  assert.equal(getEventListeners(controller.signal, "abort").length, 0);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    f.clock.advance(5000);
+    assert.equal((await f.capture.capture()).capture.reason, "busy");
+  }
+  assert.equal(f.canvases.length, 1);
+  oldCanvas.finish();
   const next = f.capture.capture();
   f.render();
   const newCanvas = f.canvases[1];
@@ -433,7 +445,7 @@ test("hard encoder timeout releases a hung operation; its eventual callback cann
   assert.equal((await next).capture.state, "ready");
 });
 
-test("cancelled hung encode also expires, and dispose is idempotent before/after copying", async (t) => {
+test("cancelled encode retains its native lock past timeout, and dispose is idempotent before/after copying", async (t) => {
   const f = fixture(t);
   const controller = new AbortController();
   const pending = f.capture.capture(controller.signal);
@@ -441,6 +453,9 @@ test("cancelled hung encode also expires, and dispose is idempotent before/after
   controller.abort();
   assert.equal((await pending).capture.reason, "cancelled");
   f.clock.advance(5000);
+  assert.equal((await f.capture.capture()).capture.reason, "busy");
+  assert.equal(f.clock.jobs.size, 0);
+  f.canvases[0].finish();
   const next = f.capture.capture();
   f.capture.dispose();
   f.capture.dispose();
@@ -537,14 +552,19 @@ test("Game dispose/rejoin shares one encoder lock until the old native callback"
   assert.equal((await next).capture.state, "ready");
 });
 
-test("old Game hard timeout releases only its lock; a late native result cannot unlock a new Game", async (t) => {
+test("old Game timeout keeps rejoined Games busy until native completion without unlocking a newer owner", async (t) => {
   const oldGame = fixture(t);
   const newGame = fixture(t);
   const oldRequest = oldGame.capture.capture();
   oldGame.render();
-  oldGame.capture.dispose();
-  assert.equal((await oldRequest).capture.reason, "cancelled");
   oldGame.clock.advance(5000);
+  assert.equal((await oldRequest).capture.reason, "timeout");
+  oldGame.capture.dispose();
+  assert.equal(oldGame.clock.jobs.size, 0);
+  assert.equal((await newGame.capture.capture()).capture.reason, "busy");
+  assert.equal(newGame.canvases.length, 0);
+  assert.equal(newGame.observable.hasObservers(), false);
+  oldGame.canvases[0].finish();
   const next = newGame.capture.capture();
   newGame.render();
   oldGame.canvases[0].finish();

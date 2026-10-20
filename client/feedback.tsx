@@ -55,6 +55,7 @@ const copy = {
     cancel: "Zrušit",
     done: "Hotovo",
     accepted: "Přijato. Děkujeme za zpětnou vazbu.",
+    earlierAccepted: "Dříve odeslané hlášení bylo přijato.",
     queued:
       "Čeká na odeslání. Hlášení je uložené v tomto prohlížeči; jeho stav a další možnosti najdeš níže.",
     waiting: "Čekající hlášení",
@@ -117,6 +118,7 @@ const copy = {
     cancel: "Cancel",
     done: "Done",
     accepted: "Received. Thank you for your feedback.",
+    earlierAccepted: "Your earlier report was received.",
     queued:
       "Waiting to send. Your report is saved in this browser; see its status and available actions below.",
     waiting: "Pending reports",
@@ -210,6 +212,7 @@ export function FeedbackDialog({
     image: null,
   });
   const [preview, setPreview] = useState<string | null>(null);
+  const [earlierAccepted, setEarlierAccepted] = useState(false);
   const [pending, setPending] = useState<FeedbackPending[]>([]);
   const [busy, setBusy] = useState(false),
     [result, setResult] = useState<"accepted" | "queued" | null>(null);
@@ -223,6 +226,8 @@ export function FeedbackDialog({
     outbox.current = box;
     let alive = true;
     const refresh = (accepted?: { id: string }) => {
+      if (accepted && accepted.id !== envelope.current?.id && alive)
+        setEarlierAccepted(true);
       if (accepted?.id === envelope.current?.id && alive) {
         setResult("accepted");
         setMessage("");
@@ -252,17 +257,31 @@ export function FeedbackDialog({
     };
   }, []);
 
+  const nativeDialog =
+    typeof HTMLDialogElement !== "undefined" &&
+    typeof HTMLDialogElement.prototype.showModal === "function";
   useEffect(() => {
     if (!open || !dialog.current) return;
     const element = dialog.current;
-    if (typeof element.showModal === "function") element.showModal();
-    else element.setAttribute("open", "");
+    if (!nativeDialog) {
+      element.setAttribute("open", "");
+      return () => element.removeAttribute("open");
+    }
+    // Capture the trigger before showModal moves focus. Native dialog owns
+    // inertness/Tab/Escape; a second document-level trap would fight its focus.
+    const previous =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    element.showModal();
+    description.current?.focus();
     return () => {
-      if (typeof element.close === "function") element.close();
-      else element.removeAttribute("open");
+      element.close();
+      // React can remove the node before passive cleanup, so restore explicitly.
+      if (previous?.isConnected) previous.focus();
     };
-  }, [open]);
-  useDialogFocus(open, dialog, onClose, description);
+  }, [open, nativeDialog]);
+  useDialogFocus(open && !nativeDialog, dialog, onClose, description);
 
   useEffect(() => {
     if (!open) {
@@ -453,6 +472,7 @@ export function FeedbackDialog({
       <p id={id + "-privacy"} className="feedback-muted">
         {c.privacy}
       </p>
+      {earlierAccepted && <p role="status">{c.earlierAccepted}</p>}
       {result ? (
         <div className="feedback-result" role="status">
           <p>{c[result]}</p>
@@ -482,6 +502,7 @@ export function FeedbackDialog({
             </label>
             <textarea
               ref={description}
+              autoFocus
               id={id + "-message"}
               required
               maxLength={FEEDBACK_LIMITS.message}
