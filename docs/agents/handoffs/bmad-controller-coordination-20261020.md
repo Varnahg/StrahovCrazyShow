@@ -14,3 +14,11 @@
 - Dokončení, skutečné PR/CI/merge SHA a živý pilot se doplní až podle výsledků. Rezervace koordinátora zatím zůstává aktivní; tento dokument ji neuvolňuje.
 
 20.10.2026: Zápis rodičovského BMAD rendereru je ukončen; jeho snapshot se dále pouze čte. Koordinátor uvolňuje a obnoví vlastní rezervaci bez renderer prefixu, aby pozdější samostatný pilot mohl legitimně rezervovat svůj renderer. Dosavadní vlastní dokumenty/spec/evidence se přebírají jako doložené vlastní WIP.
+
+## Závěrečné lokální předání po živém pilotu
+
+Základ řadiče přijat PR#10; následné opravy doručení/spec/schema/authority v samostatných commitech353b4c31,fbeb5821,938254e3,be173c4f, vždy výzkum → implementace/refaktoring → cílené testy → nezávislé review/recheck. Žádný nález nezůstal otevřený. Historické neúspěchy a přesné hranice jednotlivých testových checkpointů jsou zachované v [souhrnu](../../verification-evidence/bmad-controller-20261020/README.md).
+
+Pilot [PR#11](https://github.com/Varnahg/StrahovCrazyShow/pull/11) merged 8d96a0c2fae3633bba75ea235a9fd1b97d5ff03d; skutečný pád při živém workeru i po vytvoření PR, resume téhož attemptu/PR, přesné PR/main CI, Linear KEY-47 Done a release. Opakované run/resume0, byte-identický stav,1implementace/1commit/1PR/1Linear marker comment. Původní source/frozen/spec/readiness a raw review evidence zachované.
+
+Root přebírá hotové výsledky autora a zajišťuje poslední chráněný PR této integrační větve. Konečné přijetí head/base a mainCI bude v GitHub acceptance záznamu a KEY-46; do té doby KEY-46 není Done a koordinační claim zůstává aktivní. Primární checkout/cizí WIP ani hraný build nebyly měněny; cizí rezervace zůstaly vlastníkům.

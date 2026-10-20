@@ -2,7 +2,7 @@
 title: 'BMAD řadič jednoho přiděleného Linear úkolu'
 type: feature
 created: '2026-10-20'
-status: in-review
+status: done
 route: dispatch
 baseline_commit: ceddc0802cd98dccfbee9d44fc00d6331ac9d749
 review_loop_iteration: 0
@@ -45,8 +45,8 @@ Mimo rozsah: backlog scheduler, dávky úkolů, upgrade BMAD, zásahy do herníh
 - [x] Idempotentní projekt/Git/Linear/GitHub/Codex adaptéry + cílené testy (17/17,9/9 hashů ověřeno).
 - [x] Skutečná BMAD spec/readiness a snapshot review lenses;24/24 adapter testů a skutečný5-prompt binding smoke exit0.
 - [x] Procesní crash/recovery audit:7 scénářů, společně38/38, skutečný kill/souběh/unknown;5/5 hashů vlastních QA souborů ověřeno.
-- [ ] Návod, nezávislé review, plná relevantní lokální sada a skutečná GitHub CI.
-- [ ] Jeden explicitně přidělený živý Linear pilot, pád controlleru, resume, jediný PR a chráněná integrace.
+- [x] Návod, nezávislé review, plná relevantní lokální sada a skutečná GitHub CI; finální řadičový head má samostatnou externí integrační bránu.
+- [x] Jeden explicitně přidělený živý Linear pilot, pád controlleru, resume, jediný PR a chráněná integrace.
 Přejímka vyžaduje skutečný CLI/backend průchod a důkaz nulových duplicit; samotné mocks nestačí.
 
 ## Implementation Notes
@@ -129,3 +129,7 @@ SC-V1/V2 uzavřeny: autor3/3 PASS14.144s, tsc0; nezávislý verification recheck
 Všechny vrstvy dokončeny před individuální triage; blind bez nálezů. Každý bod posouzen samostatně, bez seskupení odlišných příčin. Detail a uzavření v docs/verification-evidence/bmad-controller-20261020/review-authority.md. Frozen záměr se nemění.
 
 RA-E1/V1/V2 uzavřeny: cílený followup3/3 PASS86.153s, tsc0; nezávislé edge/verification rechecky potvrdily guard i regresní citlivost a zachování původních asercí. Žádný nález nezůstává otevřený. Finální diff42b953e3, detail review-authority.md a review-authority-final-validation.json. Živý pilot a konečná CI následují.
+
+## Lokální předání závěrečného kandidáta
+
+Pilot KEY-47 dokončen přes PR#11, merge 8d96a0c2fae3633bba75ea235a9fd1b97d5ff03d, skutečné PR/main CI a opakované run/resume bez duplicit. Všechna review findings uzavřena; nic nebylo odloženo. Stav done tohoto BMAD artefaktu znamená dokončené lokální předání; konečné KEY-46 Done stále vyžaduje CI/acceptance/merge/mainCI oprav řadiče v navazujícím PR. Podrobnosti docs/verification-evidence/bmad-controller-20261020/README.md.

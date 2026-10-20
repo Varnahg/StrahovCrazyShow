@@ -28,3 +28,7 @@ Both security tasks accepted after source review, 7/7 Node and tsx regressions, 
 
 
 Building coordinator buildings-01a12b28-coordinator,2026-10-12: accepted building-production-verification and building-main-publication as done after main/origin7f65653,684tests/build, documented initial integration timeout plus unchanged full retryPASS, actual B2 gameplay with B3 runtime parity, and8357 source/277 HTTP hashes. Only building-main-preview retains its own live ports4179/2570. No scope of an active writer was expanded. Foreign vegetation WIP preserved.
+
+## KEY-46 / KEY-47: přijetí katalogových výsledků 20.10.2026
+
+Owner bmadctl-01a155b2-admin převzal pouze sedm tasků bmad-controller-{engine,adapters,recovery-qa,validation,live-pilot,live-pilot-worker,coordination}-20261020. Status done zaznamenává integrátorovo převzetí; žádné writePaths/resources/dependsOn ani cizí tasky se nemění. Základ řadiče PR10 a skutečný pilot PR11 mají úspěšné PR/main CI, crash/resume a opakované run/resume bez duplicit. Evidence a zbývající konečná GitHub brána řadičového PR: docs/verification-evidence/bmad-controller-20261020/README.md. KEY-46 zůstává In Progress do konečné main CI. Katalog239tasků, README odkazy a diff check prošly; kontrola metadata diffu potvrzuje změnu pouze status/notes sedmi vlastních tasků. Po publikaci tohoto checkpointu se admin claim uvolní.
