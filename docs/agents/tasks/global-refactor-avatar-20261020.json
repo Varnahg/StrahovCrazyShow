@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-avatar-20261020",
+  "title": "KEY-48: Sjednotit barycentrický průchod avatara a palety aut",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/avatar-renderer.ts",
+    "client/assets.ts",
+    "tests/student-eyes.test.ts",
+    "tests/student-garments.test.ts",
+    "docs/agents/handoffs/global-refactor-avatar-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Zachovat tolerance, normalizaci, fallbacky, měřítka, pořadí výpočtů i veřejné exporty.",
+    "Jeden privátní barycentrický kernel bez alokací v každém trojúhelníku; jedna místní paleta, odlišný load/disposal zachován."
+  ],
+  "verification": [
+    "node --import tsx --test tests/student-eyes.test.ts tests/student-garments.test.ts tests/skinned-avatar.test.ts tests/student-garment-init.test.ts tests/animation.test.ts tests/native-car-models.test.ts"
+  ],
+  "notes": [
+    "Výslovně objednaný celkový refaktoring KEY-48; průzkum/porovnání variant v docs/refactoring/20261020/README.md.",
+    "Pouze přesný disjunktní scope; podagent přečte pravidla a policy, získá vlastní claim, nevyvolává rekurzivní BMAD. Implementace, cílený refaktoring, ověření a handoff společně.",
+    "Plný build/test/integrace a praktická přejímka patří koordinátorovi pod samostatnou rezervací. Žádné cizí Game/UI/tráva WIP.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
+  ]
+}

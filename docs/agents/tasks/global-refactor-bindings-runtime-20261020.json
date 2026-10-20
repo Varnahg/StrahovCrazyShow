@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-bindings-runtime-20261020",
+  "title": "KEY-48: bindings-runtime",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/avatar-renderer.ts",
+    "client/car-pack.ts",
+    "client/main.tsx",
+    "client/render-incident-profile.ts",
+    "client/game.ts",
+    "client/ui.tsx",
+    "shared/b6-props.ts",
+    "shared/netcode.ts",
+    "shared/photogrammetry-ground.ts",
+    "docs/agents/handoffs/global-refactor-bindings-runtime-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Odstranit jen doložené nepoužité importy a zbytečné uložení private scene; side-effect registrace a evaluace modulů zachovat.",
+    "Veřejné parametry consume(now,tick) a Game.label width nesmazat; jen _now/_width při stejné pozici/defaultu/aritě. Žádné změny řízení, startupvalidace, geometrie či UI."
+  ],
+  "verification": [
+    "node --import tsx --test tests/render-incident-profile.test.ts tests/netcode.test.ts tests/network-diagnostics.test.ts tests/input-backlog.test.ts tests/timeline-physics.test.ts tests/b6-reality.test.ts tests/photogrammetry-ground.test.ts tests/realistic-car-pack.test.ts tests/car-webgpu-parity.test.ts tests/student-eyes.test.ts tests/student-garments.test.ts"
+  ],
+  "notes": [
+    "Výslovně objednaný celkový refaktoring; doplňující audit všech53diagnostik a nativegrass řetězce20.10.2026.",
+    "Read-only průzkum a porovnání variant před zápisem; vlastní claim, přesný scope, společné implementační/testové předání. Bez rekurzivního BMAD.",
+    "Vlastník diary uvolnil Game/UI/sessiondiagnostics/snapshot s nulovým vlastním diffem; důkaz0a598a6a5db4bb4e81469543c72b96b5d88720ed. Cizí primarycheckout WIP není převzat. Grass transfer zachovaný, experiment se neaplikuje.",
+    "Podagent neprovádí staging/commit ani plnou sadu/build/integraci/GPU; koordinátor přebírá po skutečném handoffu/release.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
+  ]
+}

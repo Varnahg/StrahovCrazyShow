@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-bindings-tests-20261020",
+  "title": "KEY-48: bindings-tests",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/autodev-adapters.test.ts",
+    "tests/fixtures/material-defines-order/scenario.ts",
+    "tests/game-authored-light-preparation.test.ts",
+    "tests/gltf-light-budget.test.ts",
+    "tests/local-benchmarks.test.ts",
+    "tests/locomotion-quality.test.ts",
+    "tests/netcode.test.ts",
+    "tests/night-lighting.test.ts",
+    "tests/opaque-sort.test.ts",
+    "tests/photo-grass-preparation.test.ts",
+    "tests/realistic-car-pack.test.ts",
+    "tests/terrain-patch.test.ts",
+    "tests/weather.test.ts",
+    "tests/webgpu-compilation-profile.test.ts",
+    "tests/webgpu-frame-lifecycle-profile.test.ts",
+    "docs/agents/handoffs/global-refactor-bindings-tests-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Odstranit pouze nepoužité testové bindingy/importy. New light a box konstrukce ponechat jako výrazy ve stejném pořadí.",
+    "Mock/callback parametry jen _prefix při stejné pozici/aritě/forwardingu. Nezměnit aserce, limity, baseline/provenienci, fixture počet ani logiku."
+  ],
+  "verification": [
+    "Spustit změněné lehké sady a material-defines-wgsl-order.test.ts. U autodev po samotném odebrání nepoužitého importu ověřit syntax a přímé source/scope testy přes --test-name-pattern; celá tasková102testová sada už prošla před tímto čistě mechanickým editem, finální plná sada poběží vCI.",
+    "Neměnit aserce ani limity; doložit před/po řádky s constructor sideeffecty a stejnou aritu parametrů."
+  ],
+  "notes": [
+    "Výslovně objednaný celkový refaktoring; doplňující audit všech53diagnostik a nativegrass řetězce20.10.2026.",
+    "Read-only průzkum a porovnání variant před zápisem; vlastní claim, přesný scope, společné implementační/testové předání. Bez rekurzivního BMAD.",
+    "Vlastník diary uvolnil Game/UI/sessiondiagnostics/snapshot s nulovým vlastním diffem; důkaz0a598a6a5db4bb4e81469543c72b96b5d88720ed. Cizí primarycheckout WIP není převzat. Grass transfer zachovaný, experiment se neaplikuje.",
+    "Podagent neprovádí staging/commit ani plnou sadu/build/integraci/GPU; koordinátor přebírá po skutečném handoffu/release.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
+  ]
+}

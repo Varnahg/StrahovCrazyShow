@@ -36,3 +36,27 @@ Owner bmadctl-01a155b2-admin převzal pouze sedm tasků bmad-controller-{engine,
 ## KEY-48 — 20. 10. 2026, refactor-01a15658-admin
 
 V izolované pracovní kopii `.cache/refactor-20261020`, větev `codex/global-refactor`, základ `22de9054`, byl vytvořen pouze vlastní task `docs/agents/tasks/global-refactor-audit-20261020.json`. Task je dosud necommitnutý a patří relaci `01a15658-1415-7d41-9efe-6d3be9dd9f34`; žádné cizí změny nebyly převzaty. Validace: 237 task definitions, PASS. Žádný vlastní server ani GPU proces neběží. Uživatel výslovně přikázal počkat na dokončení chatu `01a155b2-1927-7681-9a9e-090b6c7bd974`; administrativní rezervace se proto uvolňuje, aby jeho dokončení neblokovala. Při pokračování zachovat tento vlastní JSON a přehodnotit průzkum po aktualizaci větve.
+
+## KEY-48: další disjunktní celky 20. 10. 2026
+
+Koordinátor refactor-01a15658-coordination připravil šest explicitně objednaných úkolů global-refactor-{quaternion,avatar,autodev-source,documentation,simulation-benchmark,fixtures-python}-20261020. Každý má přesné zdroje, testy i handoff; žádný nezahrnuje pět chráněných cizích WIP scopes. Samostatné zdrojové rezervace musí získat implementátoři před zápisem. Validate PASS: 250 definic, 9 živých rezervací. Žádná změna runtime/CLI/schema ani cizích tasků. Admin slot se po předání uvolňuje; release není implementace ani Done.
+
+## KEY-48: převzetí a dokončovací scopes20.10.2026
+
+Příjemce refactor-01a15658-audit získal admin claim po explicitním předání dokumentace (včetně architecture.md) od refactor-01a15658-docs a přebírá jen vlastní původní katalog/admin metadata. Nové čtyři disjunktní dokončovací tasky: bindings-runtime, bindings-tests, grass-resources, snapshot. Chrání API/sideeffecty/authoringhashy; no worker activation, no cizíprimaryWIP. Game/UI/snapshot cesty jsou výslovně uvolněné diary vlastníkem s nulovým source diffem v0a598a6a. Nové tasky nenahrazují claims ani přejímku. Admin slot se po validaci/předání uvolňuje.
+
+Dokončovací příkazy upřesněny podle skutečných filenames: network-diagnostics.test.ts; u pouhého import cleanupu autodev cílené source/scope testy místo druhého28minutového opakování celé102testové sady. Finální plná CI se neruší. Přesné explicitní testové předání bindings-tests-transfer.json má příjemce refactor-01a15658-bindings-tests a SHA15souborů.
+
+KEY48posledníklientskýtask global-refactor-entrypoints-20261020 má přesný Game/UI/room-callbacks/handoffscope, důkazy z úplnéhoauditu a explicitnípředání již převzatého bindingcleanup. Bez novéfunkce/API/lifecycle změny.
+
+## Finální ověření a první přijetí KEY-48
+
+World-renderer/world-visual tasky označeny done až po skutečném PR13 merge e3d188c9, standardních checkech/project-acceptance a fyzickém IAB průchodu. Založen přesný global-refactor-final-validation-20261020 pro novou immutable kopii, všechny testy/build/integraci a QA. Původní kopie a cizí WIP se nemění; review70souborů je bez nálezů. Admin slot se po validaci uvolňuje.
+
+Finálnírezervace po řádnémrelease rozšířena pouze o refactor-final-20261020-b; původní kopie671a0a25 a její buildlog se nepřepisují. Jediný zdrojovýrozdíl je EOFhygiena s totožnýmAST, doložená post-review-hygiene.json.
+
+Finální dokumentační agent předal všech osm cest zpět koordinátorovi a v 09:00 UTC uvolnil claim. Administrativní slot se nyní uvolňuje před úzkým převzetím dokumentace pro skutečné výsledky pipeline. Stavy zbývajících tasků se před společným závěrečným ověřením nepředjímají. Žádný source ani cizí task se při tomto převzetí nemění.
+
+## KEY-48: převzetí všech dokončených scopes
+
+Koordinátor po release dokumentace znovu rezervoval katalog a převzal14 vlastních dosud ready úkolů jako done. Základem jsou dokončené handoffy, cílené kontroly,3nezávislá code review bez nálezů, plná sada1708/1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře/12peers a skutečná finální IAB přejímka. Dvě závěrečné dokumentační položky opravili a potvrdili všichni3revieweři. Stav scopes znamená převzetí výsledků integrátorem; celkový KEY-48/goal se uzavře po exact-head PR/main CI a merge, evidovaných externě. Foreign tasky/claims/writePaths/resources se nemění. Žádný vlastní server/GPU proces už neběží; porty2568/4290 volné.

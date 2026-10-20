@@ -46,9 +46,11 @@ Doložené rozpory: kořenové README označují D2/protokol 9/preview 4179 za s
 
 ## Ověření a hranice
 
-Závislosti odpovídají pnpm-lock.yaml, 12 původních LFS objektů je vybaleno a preflight prošel bez změny assetů. Celá nezměněná baseline sada se sériovým souběhem kvůli doložené lokální contention procesních fixtures skončila1671 PASS/0 FAIL/1 platformní skip; žádný test ani limit nebyl změněn. Baseline build a izolovaná integrace PASS. První world checkpoint53d60811 má55 cílených testů, build, izolovanou integraci a3 nezávislá review bez nálezů. Skutečná produkční vizuální přejímka zůstává otevřená: baseline i kandidát mají startup timeout při přípravě světel; přesné raw stavy/identity/build/integration logy a limity jsou ve [world-visual evidenci](world-visual/evidence-manifest.json).
+Závislosti odpovídají frozen lockfile; LFS preflight prošel bez změny assetů. [Výchozí plná sada](baseline-results.json) měla 1 671 PASS, 0 FAIL a 1 platformní skip; build a izolovaná integrace prošly. Rendererový celek je přijatý v [PR #13](https://github.com/Varnahg/StrahovCrazyShow/pull/13), merge e3d188c9. Jeho [samostatná evidence](world-visual/evidence-manifest.json) zachovává původní Edge timeouty i úspěšnou praktickou kontrolu obou kopií ve viditelném IAB. Přesná příčina timeoutů není prokázaná.
 
-Pět cizích rezervací nad pozastaveným WIP je stále obsazených. Game/UI/session-diagnostics a tráva se do získání doloženého předání neupravují. Žádný výsledek CPU/NullEngine ani odstranění zdrojových řádků není GPU/FPS důkaz.
+Uživatel výslovně autorizoval domluvu předání. Vlastníci následně uvolnili Game/UI/session-diagnostics/snapshot a native grass scopes; nulový předaný source diff a worker experiment jsou rozlišené v doložených handoffech. Cizí primary WIP ani worker experiment nebyly převzaté a zbývající diary rezervace zůstaly chráněné.
+
+[Závěrečný záznam](final-validation.json) váže celý dokončený zdrojový checkpoint 7712edb5 a immutable kopii 66d1cf97… včetně všech testů. Tři nezávislá code review jsou bez nálezů. Plná sada (1 708 testů: 1 707 PASS, 0 FAIL, 1 platformní skip), TypeScript/build, všechny čtyři SDK scénáře i skutečná IAB přejímka celého checkpointu prošly. [Závěrečná dokumentační kontrola](final-documentation-checks.json) eviduje dvě opravené a všemi třemi reviewery potvrzené položky, 405 místních odkazů bez nových chyb a zachovanou historii. Žádný CPU/NullEngine výsledek ani odstranění řádků není důkaz GPU výkonu.
 
 
 ### Doplnění Pythonu a hranice autodev

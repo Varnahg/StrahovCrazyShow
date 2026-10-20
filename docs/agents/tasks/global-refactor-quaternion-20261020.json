@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-quaternion-20261020",
+  "title": "KEY-48: Sdílet přesnou quaternion matematiku",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/quaternion.ts",
+    "shared/terrain-entities.ts",
+    "shared/vehicle.ts",
+    "scripts/rebuild-campus-transit-navigation.ts",
+    "shared/data/transit-navigation.json",
+    "tests/transit-navigation-source.test.ts",
+    "tests/quaternion.test.ts",
+    "docs/agents/handoffs/global-refactor-quaternion-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Ponechat veřejné typy, pojmenované obálky a numerické pořadí operací; žádná normalizace/cache/mutace.",
+    "Generátor a test obsahují stejný nový source hash vstup; data mimo sourceHashes jsou přesně shodná."
+  ],
+  "verification": [
+    "node --import tsx --test tests/quaternion.test.ts tests/vehicle.test.ts tests/recovery-physics.test.ts tests/transit.test.ts tests/transit-navigation-source.test.ts tests/native-car-models.test.ts tests/realistic-car-pack.test.ts tests/transform-updates.test.ts"
+  ],
+  "notes": [
+    "Výslovně objednaný celkový refaktoring KEY-48; průzkum/porovnání variant v docs/refactoring/20261020/README.md.",
+    "Pouze přesný disjunktní scope; podagent přečte pravidla a policy, získá vlastní claim, nevyvolává rekurzivní BMAD. Implementace, cílený refaktoring, ověření a handoff společně.",
+    "Plný build/test/integrace a praktická přejímka patří koordinátorovi pod samostatnou rezervací. Žádné cizí Game/UI/tráva WIP.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
+  ]
+}

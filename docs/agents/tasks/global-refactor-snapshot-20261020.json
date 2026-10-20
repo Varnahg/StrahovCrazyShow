@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-snapshot-20261020",
+  "title": "KEY-48: snapshot",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/performance-snapshot.mjs",
+    "tests/benchmark-snapshot.test.ts",
+    "tests/performance-snapshot.test.ts",
+    "docs/agents/handoffs/global-refactor-snapshot-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Frozen snapshot zahrnuje přesný patch a aktuální statické regresní prerequisites AGENTS/policy/dvě bmadbuildšablony, nikoli celé live dokumenty či WIP.",
+    "Původní immutable kopie a jejich identita se nikdy nepřepíší. Zachovat no-overwrite, sourcebefore/after/hash, reusehistoricalIPR a dependency junction kontrakty.",
+    "Úzký zdrojový refaktoring pouze pokud sníží doloženou duplicitu; žádné nowe CLI/API či automatická instalace závislostí."
+  ],
+  "verification": [
+    "node --import tsx --test tests/benchmark-snapshot.test.ts tests/performance-snapshot.test.ts",
+    "Nový CLI test použije minimální dočasný fixture root bez skutečných modelů/stahování a ověří všechny prerequisites v manifestu i bytes, no overwrite a mutation rejection."
+  ],
+  "notes": [
+    "Výslovně objednaný celkový refaktoring; doplňující audit všech53diagnostik a nativegrass řetězce20.10.2026.",
+    "Read-only průzkum a porovnání variant před zápisem; vlastní claim, přesný scope, společné implementační/testové předání. Bez rekurzivního BMAD.",
+    "Vlastník diary uvolnil Game/UI/sessiondiagnostics/snapshot s nulovým vlastním diffem; důkaz0a598a6a5db4bb4e81469543c72b96b5d88720ed. Cizí primarycheckout WIP není převzat. Grass transfer zachovaný, experiment se neaplikuje.",
+    "Podagent neprovádí staging/commit ani plnou sadu/build/integraci/GPU; koordinátor přebírá po skutečném handoffu/release.",
+    "20.10.2026: koordinátor převzal dokončený scope po doložených handoffech, cílených kontrolách a nezávislém review. Společný checkpoint7712edb5/frozen-b66d1cf97 má celou sadu1707PASS/0FAIL/1platformnískip, build/TypeScript,4SDK scénáře a skutečnou IAB přejímku; viz docs/refactoring/20261020/final-validation.json. Exact-head PR/main přijetí a uzavření KEY-48 se evidují samostatně."
+  ]
+}
