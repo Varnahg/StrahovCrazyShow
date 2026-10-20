@@ -34,7 +34,7 @@ const { GitHubClient, checkoutEvidence, execute } = await import(
 const { supervise: nativeSupervise } = await import(
   new URL("../scripts/autodev/process.mjs", import.meta.url).href
 );
-const { atomicWriteJson } = await import(
+const { atomicWriteJson, digest } = await import(
   new URL("../scripts/autodev/store.mjs", import.meta.url).href
 );
 const { LinearClient, decodeToolResult, normalizeIssue } = await import(
@@ -54,6 +54,11 @@ const {
   prepareWorkerInput,
   executeWorkerInput,
   resumeWorkerAttempt,
+  authorizationBinding,
+  validatePresentation,
+  completeSpecification,
+  hasRequiredPresentation,
+  assertPriorReadiness,
 } = await import(new URL("../scripts/autodev/codex.mjs", import.meta.url).href);
 
 const sourceRoot = path.resolve(
@@ -207,6 +212,45 @@ async function fixture(t: any) {
 
 const sha = (text: string) => createHash("sha256").update(text).digest("hex");
 const validPlan = () => ({
+  presentation: {
+    tasks: [
+      {
+        path: "src/new.txt",
+        action: "Implement and test the assigned input cases",
+        reason: "Preserve the assigned behavior and its edge cases",
+        basis: "intent",
+      },
+    ],
+    ioMatrix: [
+      {
+        scenario: "valid input",
+        input: "assigned valid input",
+        output: "assigned successful result",
+        errorHandling: "no error",
+        basis: "intent",
+      },
+      {
+        scenario: "invalid input",
+        input: "unsupported input",
+        output: "unchanged rejection",
+        errorHandling: "report input error",
+        basis: "intent",
+      },
+    ],
+    acceptanceCriteria: [
+      {
+        given: "the assigned existing callers",
+        when: "the implementation is integrated",
+        then: "the original caller contract remains unchanged",
+        basis: "acceptance",
+      },
+    ],
+    routeFacts: {
+      footprint: ["src/new.txt"],
+      irreversibles: [],
+      newDependencies: [],
+    },
+  },
   ready: true,
   runtimeBlockers: [] as string[],
   research: "Read the CLI and its callers; preserve existing behavior.",
@@ -229,8 +273,10 @@ async function bmadFixture(f: any, createSpec = true) {
   await mkdir(path.join(root, "references"));
   const files: Record<string, string> = {
     "workflow.md": "# BMAD fixture workflow\n",
-    "step-02-plan.md":
-      "# Step 2: Plan\nInvestigate code, compare options, identify intent gaps and code map.\n",
+    "step-02-plan.md": await readFile(
+      path.join(sourceRoot, ".agents/skills/bmad-build/step-02-plan.md"),
+      "utf8",
+    ),
     "spec-template.md": await readFile(
       path.join(sourceRoot, ".agents/skills/bmad-build/spec-template.md"),
       "utf8",
@@ -269,6 +315,9 @@ async function bmadFixture(f: any, createSpec = true) {
   f.ctx.data.plan = { result: validPlan(), provenance: f.ctx.planProvenance };
   f.ctx.data.intent =
     "Preserve this exact user-owned requirement, including punctuation!";
+  f.ctx.planProvenance.authorizationSha256 = digest(
+    authorizationBinding(f.ctx),
+  );
   f.ctx.assignment.intentFile = "intent.md";
   if (createSpec) await writeSpecification(f.ctx, snapshot, "ready-for-dev");
   return snapshot;
@@ -335,7 +384,9 @@ function nativeSupervisor(ctx: any) {
         runId: ctx.runId,
         runDir: ctx.runDir,
         state: ctx.state,
-        persist: async () => {},
+        persist: async () => {
+          await ctx.persistFixture?.();
+        },
         emit: (event: any) => ctx.emit(event),
         fault: (point: string) => ctx.fault(point),
       },
@@ -368,6 +419,7 @@ async function legacyFixture(
   t: any,
   liveLens?: string,
   rawByLens: Record<string, string> = {},
+  missingPresentation = false,
 ) {
   const f = await fixture(t),
     snapshot = await bmadFixture(f, false),
@@ -376,6 +428,25 @@ async function legacyFixture(
     "Original renderer inputs were inaccessible (EACCES); this is retained historical evidence.",
   ];
   await writeSpecification(ctx, snapshot, "ready-for-dev");
+  if (missingPresentation) {
+    delete ctx.data.plan.result.presentation;
+    const original = (await readFile(ctx.data.specFile, "utf8"))
+      .replace(
+        /## I\/O & Edge-Case Matrix[\s\S]*?(?=<\/frozen-after-approval>)/,
+        "",
+      )
+      .replace(
+        /## Tasks & Acceptance[\s\S]*?(?=## Implementation Notes)/,
+        "## Tasks & Acceptance\n\n**Execution:**\n- [ ] implement the change\n\n**Acceptance Criteria:**\n- preserve behavior\n\n",
+      )
+      .replace(/\n## Controller Planning Decisions[\s\S]*$/, "\n");
+    await writeFile(ctx.data.specFile, original);
+    ctx.data.spec = {
+      ...ctx.data.spec,
+      ...specIdentity(original),
+      initialText: original,
+    };
+  }
   delete ctx.data.plan.result.ready;
   delete ctx.data.plan.result.runtimeBlockers;
   ctx.data.plan.provenance = {
@@ -465,12 +536,29 @@ async function legacyFixture(
     immutableBytes,
   };
 }
-async function protocol2WorkerFixture(ctx: any) {
+async function protocol2WorkerFixture(
+  ctx: any,
+  overrides: Record<string, any> = {},
+) {
   const program = path.join(ctx.runDir, "fake-codex.mjs"),
     ledger = path.join(ctx.runDir, "v2-workers.jsonl");
   await writeFile(
     program,
-    `import fs from 'node:fs';import crypto from 'node:crypto';let prompt='';process.stdin.setEncoding('utf8');process.stdin.on('data',s=>prompt+=s);process.stdin.on('end',()=>{const args=process.argv.slice(2);const out=args[args.indexOf('-o')+1];const schema=args.includes('--output-schema')?args[args.indexOf('--output-schema')+1]:'';fs.appendFileSync(${JSON.stringify(ledger)},JSON.stringify({out,bytes:Buffer.byteLength(prompt),sha256:crypto.createHash('sha256').update(prompt).digest('hex')})+'\\n');const result=schema.endsWith('plan-readiness.json')?JSON.stringify({ready:true,intentGaps:[],runtimeBlockers:[],evidence:['Complete verified inline step2/template and unchanged original candidate inspected.']}):out.includes('verification')?'No verification gaps found.':'[]';fs.writeFileSync(out,result,'utf8');});`,
+    `import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node:crypto';
+const overrides=${JSON.stringify(overrides)}; let prompt='';
+process.stdin.setEncoding('utf8'); process.stdin.on('data',s=>prompt+=s);
+process.stdin.on('end',()=>{
+  const args=process.argv.slice(2), out=args[args.indexOf('-o')+1];
+  const schema=args.includes('--output-schema')?args[args.indexOf('--output-schema')+1]:'';
+  fs.appendFileSync(${JSON.stringify(ledger)},JSON.stringify({out,bytes:Buffer.byteLength(prompt),sha256:crypto.createHash('sha256').update(prompt).digest('hex')})+'\\n');
+  const readBlock=name=>{const start=prompt.indexOf('<authorized-input name='+JSON.stringify(name)+' ');if(start<0)return null;const body=prompt.indexOf('\\n',start)+1;return JSON.parse(prompt.slice(body,prompt.indexOf('\\n</authorized-input>',body)));};
+  const prior=readBlock('prior-readiness.json');
+  const assessment=prior?{sha256:prior.sha256,authorizationSha256:prior.authorizationSha256,intentGaps:prior.result.intentGaps.map((text,index)=>({index,text,resolution:'workflow-keep-full',reason:'Existing single-task authorization covers this internal scope-presentation decision.'})),runtimeBlockers:prior.result.runtimeBlockers.map((text,index)=>({index,text,resolution:'spec-presentation',reason:'The bounded document amendment supplies the missing format.'}))}:undefined;
+  const ready={ready:true,intentGaps:[],runtimeBlockers:[],evidence:['Complete verified inline step2/template and unchanged original candidate inspected.'],...(assessment?{priorReadiness:assessment}:{})};
+  let value=Object.hasOwn(overrides,path.basename(out))?overrides[path.basename(out)]:schema.endsWith('spec-completion.json')?{...ready,presentation:${JSON.stringify(validPlan().presentation)}}:schema.includes('plan-readiness')?ready:out.includes('verification')?'No verification gaps found.':'[]';
+  if(value?.priorReadiness==='from-input')value={...value,priorReadiness:assessment};
+  fs.writeFileSync(out,typeof value==='string'?value:JSON.stringify(value),'utf8');
+});`,
   );
   const worker = (context: any, options: any) =>
     runWorker(context, options, {
@@ -490,6 +578,71 @@ async function protocol2WorkerFixture(ctx: any) {
     }
   };
   return { worker, ledgerRows };
+}
+
+async function specCompletionFixture(
+  t: any,
+  overrides: Record<string, any> = {},
+  priorResult?: any,
+) {
+  const f = await legacyFixture(t, undefined, {}, true),
+    ctx = f.ctx;
+  ctx.state.stage = "review";
+  const specText = await readFile(ctx.data.specFile, "utf8");
+  const blocked = priorResult ?? {
+    ready: false,
+    intentGaps: ["Keep full versus Split was not recorded"],
+    runtimeBlockers: ["Missing matrix and structured tasks/acceptance"],
+    evidence: [
+      "Candidate meets the original intent; presentation is incomplete",
+    ],
+  };
+  const receipt = await originalAttempt(
+    ctx,
+    "plan-readiness:v2",
+    JSON.stringify(blocked),
+  );
+  ctx.data.planReadinessV2 = { result: blocked, attemptId: receipt.attemptId };
+  ctx.data.planReadinessInputV2 = {
+    protocol: 2,
+    plan: ctx.data.plan.result,
+    intent: ctx.data.intent,
+    specText,
+    candidateDiff: await readFile(
+      path.join(ctx.runDir, "source-diff.txt"),
+      "utf8",
+    ),
+    sourceDigest: ctx.data.sourceDigest,
+    binding: {
+      planSha256: digest(ctx.data.plan.result),
+      intentSha256: digest(ctx.data.intent),
+      specBodySha256: ctx.data.spec.bodySha256,
+      frozenSha256: ctx.data.spec.frozenSha256,
+      snapshotSha256: ctx.data.bmadSnapshot.manifestSha256,
+    },
+  };
+  ctx.data.planReadinessBeforeV2 = await workingSnapshot(f.root);
+  const checkpoint = path.join(ctx.runDir, "fixture-state.json"),
+    save = ctx.save;
+  // Match the engine's single-writer checkpoint contract; parallel native
+  // review notifications must not race atomic renames in this test fixture.
+  let writes = Promise.resolve();
+  ctx.persistFixture = () => {
+    const snapshot = structuredClone(ctx.state);
+    writes = writes.then(() => atomicWriteJson(checkpoint, snapshot));
+    return writes;
+  };
+  ctx.save = async (patch: any) => {
+    await save(patch);
+    await ctx.persistFixture();
+  };
+  await ctx.persistFixture();
+  return {
+    ...f,
+    ...(await protocol2WorkerFixture(ctx, overrides)),
+    specText,
+    checkpoint,
+  };
 }
 
 test("source identity is invariant across add/commit, covers new tests and deletions", async (t) => {
@@ -2399,6 +2552,9 @@ test("adapter merge adopts an exact legacy merged PR before acceptance while fre
   );
   await git(f.root, "switch", branch);
   ctx.assignment.merge = true;
+  ctx.data.plan.provenance.authorizationSha256 = digest(
+    authorizationBinding(ctx),
+  );
   ctx.data.prNumber = 9;
   ctx.data.acceptance = {
     headSha: ctx.data.commitSha,
@@ -2582,6 +2738,618 @@ test("merge=true finalize gates Linear Done and claim release on successful main
   assert.deepEqual(f.ctx.data.mainChecks, mainChecks);
   assert.equal((await f.registry()).claims.length, 0);
 });
+
+test("spec presentation follows the real template, typed formats and existing authorization without changing route to oneshot", async (t) => {
+  const f = await fixture(t),
+    snapshot = await bmadFixture(f),
+    plan = validPlan();
+  const text = renderSpecification(f.ctx, snapshot, plan);
+  assert.match(snapshot.files["step-02-plan.md"].text, /Footprint/);
+  assert.match(
+    snapshot.files["spec-template.md"].text,
+    /I\/O & Edge-Case Matrix/,
+  );
+  assert.equal(hasRequiredPresentation(text), true);
+  const frozen = text.match(
+    /<frozen-after-approval\b[\s\S]*?<\/frozen-after-approval>/,
+  )![0];
+  assert.match(frozen, /## I\/O & Edge-Case Matrix/);
+  assert.match(text, /`src\/new.txt` -- Implement and test/);
+  assert.match(text, /Given the assigned existing callers, when/);
+  assert.match(text, /route: "dispatch"/);
+  assert.match(text, /no new user approval is claimed/);
+  assert.equal(authorizationBinding(f.ctx).scopeDecision.tokenCount, null);
+  for (const invalid of [
+    undefined,
+    { ...plan.presentation, tasks: ["weak prose"] },
+    { ...plan.presentation, ioMatrix: [] },
+    { ...plan.presentation, acceptanceCriteria: ["unstructured acceptance"] },
+  ])
+    assert.throws(
+      () => validateWorkerResult("plan", { ...plan, presentation: invalid }),
+      { code: "SPEC_PRESENTATION" },
+    );
+  const outside = structuredClone(plan.presentation);
+  outside.tasks[0].path = "outside.txt";
+  assert.throws(() => validatePresentation(outside, f.ctx), {
+    code: "SPEC_PRESENTATION",
+  });
+  const unknownBasis = structuredClone(plan.presentation);
+  unknownBasis.ioMatrix[0].basis = "invented requirement";
+  assert.throws(() => validatePresentation(unknownBasis, f.ctx), {
+    code: "SPEC_PRESENTATION",
+  });
+  const prompt = await buildWorkerPrompt(f.ctx, { kind: "plan" });
+  assert.ok(
+    prompt.prompt.includes(JSON.stringify(authorizationBinding(f.ctx))),
+  );
+  assert.equal(
+    prompt.provenance.authorizationSha256,
+    digest(authorizationBinding(f.ctx)),
+  );
+});
+
+test("spec matrix rendering preserves every dollar replacement token and escapes pipes/newlines in both new and legacy documents", async (t) => {
+  const f = await fixture(t),
+    snapshot = await bmadFixture(f),
+    plan = validPlan();
+  const tokens = "$$ $& $' $" + "`";
+  plan.presentation.ioMatrix = [
+    {
+      scenario: `literal ${tokens}`,
+      input: `--help | -h\n${tokens}\r\nčeský řádek`,
+      output: `result ${tokens}`,
+      errorHandling: `error ${tokens}`,
+      basis: "intent",
+    },
+  ];
+  const expectedRow = `| literal ${tokens} | --help \\| -h<br>${tokens}<br>český řádek | result ${tokens} | error ${tokens} |`;
+  const old = (await readFile(f.ctx.data.specFile, "utf8")).replace(
+    /## I\/O & Edge-Case Matrix[\s\S]*?(?=<\/frozen-after-approval>)/,
+    "",
+  );
+  const legacy = completeSpecification(f.ctx, old, plan.presentation);
+  for (const text of [renderSpecification(f.ctx, snapshot, plan), legacy]) {
+    assert.equal(
+      text.split("\n").filter((line: string) => line === expectedRow).length,
+      1,
+    );
+    assert.equal(hasRequiredPresentation(text), true);
+  }
+  assert.equal(
+    specIdentity(legacy).frozenSha256,
+    specIdentity(old).frozenSha256,
+  );
+});
+
+for (const boundary of ["create", "partial", "write"]) {
+  test(`native controller kill after amendment temp ${boundary} resumes its exact owned prefix without changing source or duplicating workers`, async (t) => {
+    const f = await specCompletionFixture(t),
+      ctx = f.ctx,
+      original = await f.immutableBytes(),
+      frozen = ctx.data.spec.frozenSha256,
+      source = ctx.data.sourceDigest;
+    const script = path.join(ctx.runDir, "kill-controller.mjs");
+    await writeFile(
+      script,
+      `import {readFile,writeFile} from 'node:fs/promises';
+import {createAdapter} from ${JSON.stringify(new URL("../scripts/autodev/adapters.mjs", import.meta.url).href)};
+import {runWorker} from ${JSON.stringify(new URL("../scripts/autodev/codex.mjs", import.meta.url).href)};
+import {supervise} from ${JSON.stringify(new URL("../scripts/autodev/process.mjs", import.meta.url).href)};
+import {atomicWriteJson} from ${JSON.stringify(new URL("../scripts/autodev/store.mjs", import.meta.url).href)};
+const state=JSON.parse(await readFile(${JSON.stringify(f.checkpoint)},'utf8'));let queue=Promise.resolve();
+const persist=()=>{const snapshot=structuredClone(state);queue=queue.then(()=>atomicWriteJson(${JSON.stringify(f.checkpoint)},snapshot));return queue;};
+const ctx={repo:${JSON.stringify(f.root)},runId:${JSON.stringify(ctx.runId)},runDir:${JSON.stringify(ctx.runDir)},assignment:${JSON.stringify(ctx.assignment)},state,get data(){return state.data;},save:async patch=>{state.data={...state.data,...patch};await persist();},emit:async()=>{},fault:async point=>{
+ if(point!==${JSON.stringify(boundary === "write" ? "after-spec-amendment-temp-write" : "after-spec-amendment-temp-create")})return;
+ ${boundary === "partial" ? "const target=Buffer.from(state.data.specAmendmentV1.toText,'utf8');const cut=target.indexOf(Buffer.from('ž'))+1;if(cut<2)throw new Error('Missing multibyte fixture');await writeFile(state.data.specAmendmentV1.temporary.path,target.subarray(0,cut));" : ""}
+ process.stdout.write('AMENDMENT_KILL_READY\\n');await new Promise(()=>setInterval(()=>{},1000));
+}};
+ctx.supervise=options=>supervise({runId:ctx.runId,runDir:ctx.runDir,state,persist,emit:ctx.emit,fault:ctx.fault},options);
+await createAdapter({worker:(ctx,options)=>runWorker(ctx,options,{command:process.execPath,prefixArgs:[${JSON.stringify(path.join(ctx.runDir, "fake-codex.mjs"))}]}),linear:{async comment(){}}}).runStage('review',ctx);
+`,
+    );
+    const child = spawn(process.execPath, [script], {
+      cwd: f.root,
+      windowsHide: true,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "",
+      stderr = "",
+      closed = false;
+    child.stdout.setEncoding("utf8");
+    child.stderr.setEncoding("utf8");
+    child.stdout.on("data", (text) => (stdout += text));
+    child.stderr.on("data", (text) => (stderr += text));
+    const exited = new Promise<void>((resolve) =>
+      child.once("close", () => {
+        closed = true;
+        resolve();
+      }),
+    );
+    try {
+      await waitFor(async () => {
+        if (closed)
+          throw new Error(`Controller exited before kill boundary: ${stderr}`);
+        return stdout.includes("AMENDMENT_KILL_READY");
+      }, "native amendment controller kill boundary");
+      child.kill();
+      await exited;
+    } finally {
+      if (!closed) {
+        child.kill();
+        await exited;
+      }
+    }
+    Object.assign(ctx.state, JSON.parse(await readFile(f.checkpoint, "utf8")));
+    const amendment = ctx.data.specAmendmentV1,
+      temp = amendment.temporary.path,
+      bytes = await readFile(temp),
+      target = Buffer.from(amendment.toText, "utf8");
+    assert.equal(amendment.temporary.wasAbsent, true);
+    assert.equal(amendment.completed, false);
+    assert.ok(bytes.equals(target.subarray(0, bytes.length)));
+    if (boundary === "create") assert.equal(bytes.length, 0);
+    if (boundary === "partial") {
+      assert.ok(bytes.length > 0 && bytes.length < target.length);
+      assert.equal(
+        bytes.at(-1),
+        0xc5,
+        "The prefix stops inside a UTF-8 character",
+      );
+    }
+    if (boundary === "write") assert.ok(bytes.equals(target));
+    const adapter = createAdapter({
+      worker: f.worker,
+      linear: { async comment() {} } as any,
+    });
+    if (boundary === "create") {
+      for (const invalid of [
+        Buffer.from("foreign bytes"),
+        Buffer.concat([target, Buffer.from("extra")]),
+      ]) {
+        await writeFile(temp, invalid);
+        await assert.rejects(adapter.runStage("review", ctx), {
+          code: "BMAD_SPEC_TEMP",
+        });
+        assert.deepEqual(await readFile(temp), invalid);
+      }
+      await writeFile(temp, bytes);
+      const foreign = `${ctx.data.specFile}.foreign.tmp`;
+      await writeFile(foreign, "foreign temp must survive");
+      await assert.rejects(adapter.runStage("review", ctx), {
+        code: "STAGE_SCOPE",
+      });
+      assert.equal(
+        await readFile(foreign, "utf8"),
+        "foreign temp must survive",
+      );
+      assert.deepEqual(await readFile(temp), bytes);
+      await rm(foreign);
+      await rm(temp);
+      await symlink(
+        ctx.runDir,
+        temp,
+        process.platform === "win32" ? "junction" : "dir",
+      );
+      await assert.rejects(adapter.runStage("review", ctx), (error: any) =>
+        [
+          "SYMLINK_PATH",
+          "SCOPE_SYMLINK",
+          "BMAD_SPEC_TEMP",
+          "UNSAFE_PATH",
+        ].includes(error.code),
+      );
+      await rm(temp);
+      await writeFile(temp, bytes);
+    }
+    await adapter.runStage("review", ctx);
+    assert.equal(ctx.data.specAmendmentV1.completed, true);
+    await assert.rejects(readFile(temp), { code: "ENOENT" });
+    assert.equal(await readFile(ctx.data.specFile, "utf8"), amendment.toText);
+    assert.equal(ctx.data.spec.frozenSha256, frozen);
+    assert.equal(ctx.data.sourceDigest, source);
+    assert.deepEqual(await f.immutableBytes(), original);
+    await adapter.runStage("review", ctx);
+    assert.equal((await f.ledgerRows()).length, 5);
+  });
+}
+
+for (const boundary of [
+  "none",
+  "after-spec-completion-input",
+  "after-spec-amendment-intent",
+  "after-spec-amendment-write",
+  "after-spec-amendment-checkpoint",
+]) {
+  test(`bounded spec completion preserves original evidence and resumes ${boundary} from durable state without another implementation`, async (t) => {
+    const f = await specCompletionFixture(t),
+      ctx = f.ctx,
+      original = await f.immutableBytes(),
+      plan = digest(ctx.data.plan),
+      implementation = digest(ctx.data.implementation),
+      oldReadiness = digest(ctx.data.planReadinessV2),
+      oldInput = digest(ctx.data.planReadinessInputV2),
+      frozen = ctx.data.spec.frozenSha256,
+      source = ctx.data.sourceDigest,
+      oldBefore = digest(ctx.data.reviewBefore);
+    let interrupted = false;
+    ctx.fault = async (point: string) => {
+      if (!interrupted && point === boundary) {
+        interrupted = true;
+        throw new Error("spec completion crash");
+      }
+    };
+    const adapter = createAdapter({
+      worker: f.worker,
+      linear: { async comment() {} } as any,
+    });
+    if (boundary !== "none") {
+      await assert.rejects(
+        adapter.runStage("review", ctx),
+        /spec completion crash/,
+      );
+      Object.assign(
+        ctx.state,
+        JSON.parse(await readFile(f.checkpoint, "utf8")),
+      );
+      if (boundary === "after-spec-amendment-write") {
+        const exactTarget = await readFile(ctx.data.specFile, "utf8");
+        await writeFile(
+          ctx.data.specFile,
+          exactTarget.replace("Preserve this exact", "Tamper this exact"),
+        );
+        await assert.rejects(adapter.runStage("review", ctx), {
+          code: "BMAD_SPEC",
+        });
+        await writeFile(ctx.data.specFile, exactTarget);
+        const amendment = ctx.data.specAmendmentV1,
+          temporary = amendment.temporary.path,
+          prefix = Buffer.from(amendment.toText, "utf8").subarray(0, 41),
+          checkpoint = await readFile(f.checkpoint),
+          attempts = Object.keys(ctx.state.attempts),
+          workerCount = (await f.ledgerRows()).length;
+        assert.equal(exactTarget, amendment.toText);
+        assert.equal(amendment.completed, false);
+        await writeFile(temporary, prefix);
+        for (let resume = 0; resume < 2; resume++) {
+          Object.assign(
+            ctx.state,
+            JSON.parse((await readFile(f.checkpoint)).toString("utf8")),
+          );
+          await assert.rejects(adapter.runStage("review", ctx), {
+            code: "BMAD_SPEC_TEMP",
+          });
+          assert.deepEqual(
+            await readFile(ctx.data.specFile),
+            Buffer.from(exactTarget, "utf8"),
+          );
+          assert.deepEqual(await readFile(temporary), prefix);
+          assert.deepEqual(await readFile(f.checkpoint), checkpoint);
+          assert.equal(ctx.data.specAmendmentV1.completed, false);
+          assert.deepEqual(Object.keys(ctx.state.attempts), attempts);
+          assert.equal((await f.ledgerRows()).length, workerCount);
+          assert.equal(ctx.state.attempts["plan-readiness:v3"], undefined);
+          assert.ok(
+            !Object.keys(ctx.state.attempts).some((key) =>
+              key.startsWith("review:v2:"),
+            ),
+          );
+        }
+        // Remove only this test-injected ambiguous temp, then retain the
+        // existing positive replay assertions for the actual rename crash.
+        await rm(temporary);
+      }
+    }
+    await adapter.runStage("review", ctx);
+    const amended = await readFile(ctx.data.specFile, "utf8");
+    assert.equal(hasRequiredPresentation(amended), true);
+    assert.equal(ctx.data.spec.frozenSha256, frozen);
+    assert.equal(ctx.data.sourceDigest, source);
+    assert.equal(digest(ctx.data.plan), plan);
+    assert.equal(digest(ctx.data.implementation), implementation);
+    assert.equal(digest(ctx.data.planReadinessV2), oldReadiness);
+    assert.equal(digest(ctx.data.planReadinessInputV2), oldInput);
+    assert.equal(digest(ctx.data.reviewBefore), oldBefore);
+    assert.deepEqual(await f.immutableBytes(), original);
+    assert.equal(ctx.data.specAmendmentV1.fromText, f.specText);
+    assert.equal(ctx.data.specAmendmentV1.completed, true);
+    assert.equal(ctx.data.specAmendmentV1.size.characters, amended.length);
+    assert.equal(ctx.data.specAmendmentV1.size.tokenCount, null);
+    assert.equal(ctx.data.planReadinessV3.result.ready, true);
+    assert.equal(
+      digest(ctx.data.specCompletionInputV1.priorReadiness.result),
+      digest(ctx.data.planReadinessV2.result),
+    );
+    assert.deepEqual(
+      ctx.data.planReadinessInputV3.priorReadiness,
+      ctx.data.specCompletionInputV1.priorReadiness,
+    );
+    assert.deepEqual(
+      ctx.data.planReadinessV3.priorReadiness,
+      ctx.data.specCompletionInputV1.priorReadiness,
+    );
+    assert.deepEqual(
+      ctx.data.planReadinessInputV3.completionAssessment,
+      ctx.data.specCompletionV1.result.priorReadiness,
+    );
+    assert.equal(ctx.data.planReadinessV3.provenance.specSha256, sha(amended));
+    assert.ok(
+      amended.indexOf("## I/O & Edge-Case Matrix") >
+        amended.indexOf("</frozen-after-approval>"),
+    );
+    const receiptBytes = async () =>
+      Promise.all(
+        ["spec-completion:v1", "plan-readiness:v3"].map(async (key) =>
+          readFile(
+            path.join(
+              ctx.runDir,
+              "attempts",
+              ctx.state.attempts[key].id,
+              "receipt.json",
+            ),
+            "utf8",
+          ),
+        ),
+      );
+    const receipts = await receiptBytes();
+    await adapter.runStage("review", ctx);
+    assert.deepEqual(await receiptBytes(), receipts);
+    assert.equal((await f.ledgerRows()).length, 5);
+    assert.equal(await readFile(ctx.data.specFile, "utf8"), amended);
+    assert.equal(
+      JSON.parse(
+        await readFile(
+          path.join(ctx.runDir, "spec-completion-v1.json"),
+          "utf8",
+        ),
+      ).ready,
+      true,
+      "Raw completion model output is never overwritten by evidence",
+    );
+  });
+}
+
+test("bounded spec completion rejects ineligible stages, changed sources and unproven original receipts before any new dispatch", async (t) => {
+  const f = await specCompletionFixture(t),
+    ctx = f.ctx,
+    adapter = createAdapter({ worker: f.worker });
+  ctx.data.plan.result.intentGaps.push(
+    "A real product outcome needs a user decision",
+  );
+  await assert.rejects(adapter.runStage("review", ctx), {
+    code: "INTENT_GAPS",
+  });
+  ctx.data.plan.result.intentGaps.pop();
+  for (const field of [
+    "stagingIntent",
+    "commitIntent",
+    "prNumber",
+    "reviewBeforeV2",
+    "reviewsV2",
+    "verifiedSourceDigest",
+  ]) {
+    ctx.data[field] = true;
+    await assert.rejects(adapter.runStage("review", ctx), {
+      code: "SPEC_MIGRATION",
+    });
+    delete ctx.data[field];
+  }
+  ctx.state.stage = "accept";
+  await assert.rejects(adapter.runStage("accept", ctx), {
+    code: "SPEC_MIGRATION",
+  });
+  ctx.state.stage = "review";
+  const readinessReceipt = path.join(
+      ctx.runDir,
+      "attempts",
+      ctx.state.attempts["plan-readiness:v2"].id,
+      "receipt.json",
+    ),
+    exact = await readFile(readinessReceipt, "utf8");
+  await writeFile(readinessReceipt, "{corrupt");
+  await assert.rejects(adapter.runStage("review", ctx), {
+    code: "CORRUPT_STATE",
+  });
+  await writeFile(readinessReceipt, exact);
+  await rm(readinessReceipt);
+  try {
+    await assert.rejects(adapter.runStage("review", ctx), {
+      code: "UNKNOWN_ATTEMPT",
+    });
+  } finally {
+    await writeFile(readinessReceipt, exact);
+  }
+  const candidate = await readFile(path.join(f.root, "src/new.txt"), "utf8");
+  await writeFile(path.join(f.root, "src/new.txt"), "unreviewed change\n");
+  await assert.rejects(adapter.runStage("review", ctx), {
+    code: "SOURCE_CHANGED",
+  });
+  await writeFile(path.join(f.root, "src/new.txt"), candidate);
+  assert.equal((await f.ledgerRows()).length, 0);
+  assert.equal(await readFile(ctx.data.specFile, "utf8"), f.specText);
+});
+
+test("bounded spec completion cannot clear new readiness gaps or retry its fixed generation", async (t) => {
+  const blocked = {
+    ready: false,
+    intentGaps: ["Actual unresolved user-visible requirement"],
+    runtimeBlockers: [],
+    evidence: ["Spec still needs an actual decision"],
+    priorReadiness: "from-input",
+  };
+  const f = await specCompletionFixture(t, {
+      "plan-readiness-v3.json": blocked,
+    }),
+    adapter = createAdapter({ worker: f.worker });
+  for (let attempt = 0; attempt < 2; attempt++)
+    await assert.rejects(adapter.runStage("review", f.ctx), {
+      code: "INTENT_GAPS",
+    });
+  assert.equal((await f.ledgerRows()).length, 2);
+  assert.equal(f.ctx.data.reviewsV2, undefined);
+  assert.equal(f.ctx.data.planReadinessV3.result.ready, false);
+  assert.ok(
+    !Object.keys(f.ctx.state.attempts).some((key) => key.includes(":v4")),
+  );
+});
+
+test("bounded spec completion rejects invalid model presentation without writing spec or redispatching", async (t) => {
+  const invalid = {
+    ready: true,
+    intentGaps: [],
+    runtimeBlockers: [],
+    evidence: ["incomplete output"],
+    presentation: { tasks: [] },
+  };
+  const f = await specCompletionFixture(t, {
+      "spec-completion-v1.json": invalid,
+    }),
+    adapter = createAdapter({ worker: f.worker });
+  for (let attempt = 0; attempt < 2; attempt++)
+    await assert.rejects(adapter.runStage("review", f.ctx), {
+      code: "SPEC_PRESENTATION",
+    });
+  assert.equal((await f.ledgerRows()).length, 1);
+  assert.equal(await readFile(f.ctx.data.specFile, "utf8"), f.specText);
+  assert.equal(f.ctx.data.specAmendmentV1, undefined);
+  assert.equal(f.ctx.data.planReadinessV3, undefined);
+});
+
+for (const classification of ["missing", "product-intent"]) {
+  test(`bounded spec completion retains a previous product question with ${classification} reconciliation despite a new ready=true answer`, async (t) => {
+    const priorResult = {
+      ready: false,
+      intentGaps: ["Should this CLI send telemetry to an external service?"],
+      runtimeBlockers: [],
+      evidence: [
+        "The original request does not decide this visible product behavior.",
+      ],
+    };
+    const f = await specCompletionFixture(t, {}, priorResult);
+    const assessment = {
+      sha256: digest(priorResult),
+      authorizationSha256: digest(authorizationBinding(f.ctx)),
+      intentGaps: [
+        {
+          index: 0,
+          text: priorResult.intentGaps[0],
+          resolution: "product-intent",
+          reason:
+            "This changes product behavior and is not the internal keep-full decision.",
+        },
+      ],
+      runtimeBlockers: [],
+    };
+    const clean: any = {
+      ready: true,
+      intentGaps: [],
+      runtimeBlockers: [],
+      evidence: ["A new clean opinion is insufficient"],
+      presentation: validPlan().presentation,
+    };
+    if (classification !== "missing") clean.priorReadiness = assessment;
+    const fake = await protocol2WorkerFixture(f.ctx, {
+        "spec-completion-v1.json": clean,
+      }),
+      adapter = createAdapter({ worker: fake.worker });
+    for (let attempt = 0; attempt < 2; attempt++)
+      await assert.rejects(adapter.runStage("review", f.ctx), {
+        code:
+          classification === "missing" ? "SPEC_RECONCILIATION" : "INTENT_GAPS",
+      });
+    assert.equal((await fake.ledgerRows()).length, 1);
+    assert.equal(await readFile(f.ctx.data.specFile, "utf8"), f.specText);
+    assert.equal(f.ctx.data.specAmendmentV1, undefined);
+    assert.equal(f.ctx.data.planReadinessV3, undefined);
+    const prior = { result: priorResult, sha256: digest(priorResult) };
+    for (const intentGaps of [
+      [],
+      [{ ...assessment.intentGaps[0], text: "renamed question" }],
+      [{ ...assessment.intentGaps[0], index: 1 }],
+      [assessment.intentGaps[0], assessment.intentGaps[0]],
+    ])
+      assert.throws(
+        () =>
+          assertPriorReadiness(
+            prior,
+            { ...assessment, intentGaps },
+            authorizationBinding(f.ctx),
+          ),
+        { code: "SPEC_RECONCILIATION" },
+      );
+  });
+}
+
+for (const stage of ["spec-completion-v1", "plan-readiness-v3"]) {
+  for (const classification of ["runtime-prerequisite", "unresolved"]) {
+    test(`prior runtime blocker ${classification} stops ${stage} despite ready=true without later reviews or repeated dispatch`, async (t) => {
+      const priorResult = {
+        ready: false,
+        intentGaps: [],
+        runtimeBlockers: [
+          "A required offline verification tool is unavailable.",
+        ],
+        evidence: ["Execution prerequisite remains unproven."],
+      };
+      const f = await specCompletionFixture(t, {}, priorResult),
+        original = await f.immutableBytes();
+      const assessment = {
+        sha256: digest(priorResult),
+        authorizationSha256: digest(authorizationBinding(f.ctx)),
+        intentGaps: [],
+        runtimeBlockers: [
+          {
+            index: 0,
+            text: priorResult.runtimeBlockers[0],
+            resolution: classification,
+            reason:
+              "Document formatting does not establish this execution prerequisite.",
+          },
+        ],
+      };
+      const clean: any = {
+        ready: true,
+        intentGaps: [],
+        runtimeBlockers: [],
+        evidence: ["New empty arrays cannot discard the prior blocker."],
+        priorReadiness: assessment,
+      };
+      if (stage === "spec-completion-v1")
+        clean.presentation = validPlan().presentation;
+      const fake = await protocol2WorkerFixture(f.ctx, {
+          [`${stage}.json`]: clean,
+        }),
+        adapter = createAdapter({ worker: fake.worker });
+      await assert.rejects(adapter.runStage("review", f.ctx), {
+        code: "RUNTIME_BLOCKERS",
+      });
+      const stoppedSpec = await readFile(f.ctx.data.specFile, "utf8");
+      assert.equal(
+        stoppedSpec,
+        stage === "spec-completion-v1"
+          ? f.specText
+          : f.ctx.data.specAmendmentV1.toText,
+      );
+      const attempts = Object.keys(f.ctx.state.attempts);
+      await assert.rejects(adapter.runStage("review", f.ctx), {
+        code: "RUNTIME_BLOCKERS",
+      });
+      assert.equal(await readFile(f.ctx.data.specFile, "utf8"), stoppedSpec);
+      assert.equal(
+        specIdentity(stoppedSpec).frozenSha256,
+        specIdentity(f.specText).frozenSha256,
+      );
+      assert.deepEqual(await f.immutableBytes(), original);
+      assert.deepEqual(Object.keys(f.ctx.state.attempts), attempts);
+      assert.equal(
+        (await fake.ledgerRows()).length,
+        stage === "spec-completion-v1" ? 1 : 2,
+      );
+      assert.ok(!attempts.some((key) => key.startsWith("review:v2:")));
+      assert.equal(f.ctx.data.reviewsV2, undefined);
+    });
+  }
+}
 
 for (const targetStatus of ["in-review", "done"]) {
   test(`spec ${targetStatus} file-write crash resumes from its on-disk intent before source validation`, async (t) => {

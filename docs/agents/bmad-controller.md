@@ -22,6 +22,8 @@ Plánovací krok používá připnutý BMAD snapshot a jeho šablonu; řadič vy
 
 Řadič předává hashově ověřený obsah instrukcí přes standardní vstup. Worker tak nemusí otevírat chráněný adresář rendereru a dlouhý prompt nenaráží na limit argumentů procesu. Plán výslovně rozlišuje otázky na uživatele, provozní blokace a připravenost; prázdný seznam otázek sám nestačí. Nezávislé review zachovává své vstupy: blind a verification nedostávají claims, edge načítá specifikaci až v předepsané pozdní fázi.
 
+Plná specifikace obsahuje strukturovanou I/O matici, úkoly cesta–akce–důvod a kritéria Given/When/Then. Řadič zaznamená zachování jediného již přiděleného scope jako rozhodnutí podle projektové autorizace; nejde o novou odpověď uživatele. Počet znaků/slov se nevydává za přesný počet modelových tokenů.
+
 Commit používá konkrétní vlastní soubory. Publish dohledá existující PR ve všech stavech. Přijetí vyžaduje aktuální head/base, úspěšné povinné GitHub checky a doloženou praktickou přejímku podle [CI pravidel](ci.md). Merge používá očekávané head SHA a neobchází ruleset. Linear `Done` přichází až po merge a CI pro tento merge commit na main. Katalogový task administrativně přebírá koordinátor.
 
 ## Pád a obnovení
@@ -32,6 +34,8 @@ Worker běží pod odděleným supervisorem s vlastní identitou a trvalým výs
 Známé selhání testu/review zachová log a zabrání integraci. V1 neobsahuje neomezený automatický repair loop. Provozní JSON nesmaž ani neupravuj jako prostředek „opravy“; mohl by tím zaniknout důkaz již provedené mutace.
 
 Přechod starého běhu na protokol předávání vstupů2 je omezený opravný krok: zachová původní plán a dokončenou implementaci, dočká/převezme původní review procesy podle jejich uložených requestů a receipts a přidá samostatné čtecí ověření připravenosti a review s novými stabilními klíči. Při nejasném výsledku původního procesu další worker nevznikne. Historické neprovedené review se nepočítá jako úspěch; opakované resume neopakuje již zahájený opravný krok.
+
+Pro doložený starý neúplný spec lze před commitem/stagingem a před v2 review provést jeden čtecí krok doplnění prezentace. Zápis používá trvalý záměr s přesnými hashi původního a nového textu; zamčený blok i zdroje implementace zůstávají stejné. Záměr předem eviduje také jediný vlastní dočasný soubor. Po pádu lze dokončit jeho přesný bajtový prefix; cizí cesta, jiný obsah nebo sdílený či odkazovaný soubor zůstávají zachované a blokují pokračování. Původní negativní readiness se předává celá do doplnění i nové kontroly. Každá otázka/blokace musí mít jednoznačné vypořádání; skutečná produktová otázka nebo chybějící posouzení zastaví pokračování. Význam textu posuzují modelové kroky, řadič kontroluje úplnost, identitu a omezený typ oprávnění. Jiné stavy se automaticky nepřepisují.
 
 Pro kontrolovaný test pádu lze nastavit `AUTODEV_TEST_CRASH_AT=after-pr-create`. Řadič se úmyslně ukončí po vytvoření PR před uložením jeho lokálního checkpointu. Jednorázový marker zamezí opakovanému pádu při resume. Tento režim používej pouze pro přidělený testovací run; změna kódu ani ochrany main není potřeba.
 

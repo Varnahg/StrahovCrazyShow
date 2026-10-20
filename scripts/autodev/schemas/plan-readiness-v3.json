@@ -1,0 +1,112 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ready",
+    "intentGaps",
+    "runtimeBlockers",
+    "evidence",
+    "priorReadiness"
+  ],
+  "properties": {
+    "ready": {
+      "type": "boolean"
+    },
+    "intentGaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "runtimeBlockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "priorReadiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "authorizationSha256",
+        "intentGaps",
+        "runtimeBlockers"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string"
+        },
+        "authorizationSha256": {
+          "type": "string"
+        },
+        "intentGaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["index", "text", "resolution", "reason"],
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "text": {
+                "type": "string"
+              },
+              "resolution": {
+                "type": "string",
+                "enum": [
+                  "workflow-keep-full",
+                  "spec-presentation",
+                  "product-intent",
+                  "runtime-prerequisite",
+                  "unresolved"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "runtimeBlockers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["index", "text", "resolution", "reason"],
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "text": {
+                "type": "string"
+              },
+              "resolution": {
+                "type": "string",
+                "enum": [
+                  "workflow-keep-full",
+                  "spec-presentation",
+                  "product-intent",
+                  "runtime-prerequisite",
+                  "unresolved"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

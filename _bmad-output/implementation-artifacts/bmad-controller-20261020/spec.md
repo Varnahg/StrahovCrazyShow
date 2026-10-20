@@ -89,3 +89,17 @@ Cílené testy přes `node --import tsx --test tests/autodev-*.test.ts`; celý `
 
 ### Doplnění cíleného rechecku
 Původní B1/B2/E1–E4/V1/V2 a pořadí V3 potvrzené po opravě. E-P2-resume (high): při více check attempts musí release čekat na všechny terminal receipts, nejen aktuální A; přidává se regrese s živým B a selháním auditu po A. V3-SHA (medium): fixture musí rozlišit skutečné base/head/no-ff merge SHA, jinak nezachytí použití starého base CI. Oba body patch, žádný odklad; podrobnosti v review-2.md. Frozen záměr se nemění.
+
+### Review opravy SPEC prezentace
+
+| ID | Verdikt | Ověření a směr |
+| --- | --- | --- |
+| SF-B1 blind | false | Nepublikovaný353b4c31 nemá žádného existujícího protocol2 plan consumeru; skutečný jediný legacy run a nové specFormatVersion=1 jsou rozlišeny. Neznámý meziformát zůstává nepodporovaný/fail-closed. |
+| SF-E1 edge | medium | String.replace interpretuje dolarové tokeny I/O obsahu; callback musí zachovat doslovné bajty. patch. |
+| SF-E2 edge | high | Vlastní UUID temp po kill před rename chybí v durable identity a blokuje resume přes STAGE_SCOPE. Přesný předem vlastněný temp/prefix musí být obnovitelný. patch. |
+| SF-V1 verification | medium | Chybí ready=true regrese původních runtime-prerequisite/unresolved blokací; rozšířit testy pro completion i finální readiness. patch testů. |
+| SF-V2 verification | medium | Kontrola hlavičky neprokazuje řádky matrix a escaping; ověřit konkrétní výstup nové i doplněné specifikace. patch testů. |
+
+Každý nález vyhodnocen samostatně před seskupením. Detail a uzavření v docs/verification-evidence/bmad-controller-20261020/review-spec-format.md. Plná sada před opravami62/62 PASS není důkazem chybějících regresí; nové cílené testy a následná stabilní přejímka mají vlastní evidence. Frozen záměr se nemění.
+
+SF-V3 recheck — medium, patch testů: kombinace již zapsaného toText a stále existujícího zaznamenaného tempu je produkčně správně odmítnutá, chybí však přímá regrese. Doplnit zachování obou souborů/checkpointu a0novýchworkerů při dvojím resume. Produkční kód se nemění; testový followup čeká na dokončení právě běžící úplné sady.

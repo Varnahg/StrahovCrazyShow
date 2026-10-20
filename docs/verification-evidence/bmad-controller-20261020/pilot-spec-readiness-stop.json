@@ -1,0 +1,19 @@
+{
+  "ready": false,
+  "intentGaps": [
+    "Pro zachování současné rozsáhlé specifikace chybí doložená uživatelská volba „Keep full spec“ versus „Split“, kterou krok 02.6 vyžaduje při překročení 1600 tokenů. Věcný záměr CLI další rozhodnutí nevyžaduje."
+  ],
+  "runtimeBlockers": [
+    "Chybí doložený tokenový počet a uzavření rozsahové podmínky kroku 02.6. Specifikace má 15 567 znaků a 1 848 jednotek oddělených mezerami; přesný počet modelových tokenů nebyl ověřen.",
+    "Plná specifikace postrádá povinnou I/O & Edge-Case Matrix, přestože CLI má významné úspěšné i chybové scénáře.",
+    "Tasks & Acceptance nesplňuje požadovaný formát úkolů cesta–akce–důvod a akceptačních kritérií Given/When/Then. Samotné označení in-review připravenost nedokládá."
+  ],
+  "evidence": [
+    "AGENTS.md a docs/agents/bmad-policy.md byly přečteny. Úplné dodané step-02-plan.md a spec-template.md byly posouzeny; původní blokace nedoručeného obsahu je odstraněna.",
+    "Posouzeny byly všechny autorizované vstupy: instrukce, šablona, původní plán, zmrazený záměr, specifikace a kandidátní diff.",
+    "Hash specifikace odpovídá dodanému original-spec.md; původní zadání je v ní obsaženo doslova. Existující autorizace a checkpointy řadiče zůstávají zachovány.",
+    "Plán porovnává čtyři varianty. Kandidát realizuje vybranou časnou větev před filesystem/Git operacemi, přijímá pouze samostatné aliasy a zachovává původní parser.",
+    "implementation.json uvádí sourceDigest eab6516de7c14a86d0b53bddae3eec1832ea7734f2b4073b38a23015290bd108; ověřené hashe obou souborů odpovídají jeho záznamu. Záznam hlásí 51 úspěšných testů, jeden přeskočený a úspěšný běh nápovědy; kontroly nebyly opakovány.",
+    "Nebyl zjištěn věcný rozpor kandidáta se zmrazeným záměrem. Pokračování beze změny implementace je slučitelné se zadáním, ale současné plánovací artefakty mají uvedené neuzavřené požadavky. Nic nebylo změněno ani spuštěno jako workflow."
+  ]
+}

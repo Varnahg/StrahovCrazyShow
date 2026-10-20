@@ -5,6 +5,7 @@ import { promisify } from "node:util";
 import { createReadStream } from "node:fs";
 import {
   lstat,
+  open,
   readFile,
   mkdir,
   writeFile,
@@ -34,6 +35,11 @@ import {
   resumeWorkerAttempt,
   parseReviewResult,
   DELIVERY_PROTOCOL,
+  authorizationBinding,
+  validatePresentation,
+  completeSpecification,
+  hasRequiredPresentation,
+  assertPriorReadiness,
 } from "./codex.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -71,6 +77,7 @@ function assertSpecCompletion(ctx) {
 }
 
 export async function reconcileSpecification(ctx) {
+  await reconcileSpecAmendment(ctx);
   const recorded = ctx.data.spec;
   if (!recorded?.pendingStatus) return;
   const pending = recorded.pendingStatus;
@@ -129,6 +136,156 @@ export async function reconcileSpecification(ctx) {
       "BMAD_SPEC",
       "Specification differs from both recorded status-transition endpoints",
     );
+}
+
+async function reconcileSpecAmendment(ctx) {
+  const amendment = ctx.data.specAmendmentV1;
+  if (!amendment || amendment.completed) return;
+  const from = specIdentity(amendment.fromText),
+    to = specIdentity(amendment.toText);
+  if (
+    digest(from) !== digest(amendment.from) ||
+    digest(to) !== digest(amendment.to) ||
+    from.frozenSha256 !== to.frozenSha256 ||
+    from.frozenSha256 !== ctx.data.spec.frozenSha256 ||
+    ctx.data.spec.sha256 !== from.sha256 ||
+    ctx.data.sourceDigest !== amendment.sourceDigest ||
+    !hasRequiredPresentation(amendment.toText)
+  )
+    throw problem(
+      "BMAD_SPEC",
+      "Invalid durable specification amendment identity",
+    );
+  const source = await sourceIdentity(
+    ctx.data.worktree,
+    ctx.data.baseSha,
+    ctx.data.workerTask.writePaths,
+  );
+  if (source.digest !== amendment.sourceDigest)
+    throw problem(
+      "SOURCE_CHANGED",
+      "Source changed during specification amendment",
+    );
+  const current = await readFile(ctx.data.specFile, "utf8");
+  if (current !== amendment.fromText && current !== amendment.toText)
+    throw problem(
+      "BMAD_SPEC",
+      "Specification differs from both amendment endpoints",
+    );
+  const temporary = await inspectAmendmentTemp(ctx, amendment);
+  if (current === amendment.toText && temporary.exists)
+    throw problem(
+      "BMAD_SPEC_TEMP",
+      "A temp alongside the completed endpoint is ambiguous; preserved",
+    );
+  assertStageScope(amendment.before, await workingSnapshot(ctx.data.worktree), [
+    slash(path.relative(ctx.data.worktree, ctx.data.specFile)),
+    ...(temporary.exists ? [temporary.relative] : []),
+  ]);
+  if (current === amendment.fromText && temporary.exists)
+    await finishAmendmentTemp(ctx, amendment);
+  if (current === amendment.toText || temporary.exists)
+    await ctx.save({
+      spec: { ...ctx.data.spec, ...to, pendingStatus: null },
+      specAmendmentV1: { ...amendment, completed: true },
+    });
+}
+
+async function inspectAmendmentTemp(ctx, amendment) {
+  const temp = amendment.temporary;
+  if (
+    !object(temp) ||
+    !/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(temp.nonce ?? "") ||
+    temp.path !== `${ctx.data.specFile}.amendment-${temp.nonce}.tmp` ||
+    temp.owner !== ctx.data.owner ||
+    temp.wasAbsent !== true ||
+    temp.targetSha256 !== amendment.to.sha256
+  )
+    throw problem(
+      "BMAD_SPEC_TEMP",
+      "Missing exact durable amendment temp identity",
+    );
+  const relative = slash(path.relative(ctx.data.worktree, temp.path));
+  if (
+    !inScope(relative, ctx.data.controllerTask.writePaths) ||
+    Object.hasOwn(amendment.before, relative)
+  )
+    throw problem(
+      "BMAD_SPEC_TEMP",
+      "Amendment temp was not absent inside the controller claim",
+    );
+  await safePath(ctx.data.worktree, relative);
+  const target = Buffer.from(amendment.toText, "utf8");
+  let stat;
+  try {
+    stat = await lstat(temp.path);
+  } catch (error) {
+    if (error.code === "ENOENT")
+      return { ...temp, relative, target, exists: false };
+    throw error;
+  }
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1)
+    throw problem(
+      "BMAD_SPEC_TEMP",
+      "Amendment temp is not an unshared regular file; preserved",
+    );
+  const bytes = await readFile(temp.path);
+  if (
+    bytes.length > target.length ||
+    !bytes.equals(target.subarray(0, bytes.length))
+  )
+    throw problem(
+      "BMAD_SPEC_TEMP",
+      "Amendment temp is not an exact target byte-prefix; preserved",
+    );
+  return { ...temp, relative, target, exists: true, stat, bytes };
+}
+
+async function finishAmendmentTemp(ctx, amendment) {
+  // The durable nonce/path, observed absence and held controller claim bind
+  // this one file. Complete only its exact UTF-8 byte-prefix, never truncate
+  // unknown contents or sweep other temporary paths.
+  const temp = await inspectAmendmentTemp(ctx, amendment);
+  const handle = await open(temp.path, temp.exists ? "r+" : "wx+");
+  const sameFile = (a, b) =>
+    a.dev === b.dev && a.ino === b.ino && b.isFile() && b.nlink === 1;
+  let identity;
+  try {
+    identity = await handle.stat();
+    if (temp.exists && !sameFile(temp.stat, identity))
+      throw problem(
+        "BMAD_SPEC_TEMP",
+        "Amendment temp identity changed before opening",
+      );
+    if (!temp.exists) await ctx.fault("after-spec-amendment-temp-create");
+    const prefix = await handle.readFile();
+    if (
+      prefix.length > temp.target.length ||
+      !prefix.equals(temp.target.subarray(0, prefix.length)) ||
+      !sameFile(identity, await lstat(temp.path))
+    )
+      throw problem(
+        "BMAD_SPEC_TEMP",
+        "Amendment temp changed while opening; preserved",
+      );
+    await handle.writeFile(temp.target.subarray(prefix.length));
+    await handle.sync();
+  } finally {
+    await handle.close();
+  }
+  const complete = await inspectAmendmentTemp(ctx, amendment);
+  if (
+    !complete.exists ||
+    !sameFile(identity, complete.stat) ||
+    !complete.bytes.equals(temp.target)
+  )
+    throw problem(
+      "BMAD_SPEC_TEMP",
+      "Amendment temp changed before rename; preserved",
+    );
+  await ctx.fault("after-spec-amendment-temp-write");
+  await rename(temp.path, ctx.data.specFile);
+  await ctx.fault("after-spec-amendment-write");
 }
 
 async function recordedSpecificationText(ctx, { allowInitial = false } = {}) {
@@ -788,8 +945,12 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
     if (native) {
       if (
         !object(ctx.data.plan.provenance.inlineInputs) ||
-        canonicalJson(ctx.data.plan.provenance.inlineInputs) !==
-          canonicalJson(planningInputHashes(snapshot))
+        planInputNamesMismatch(
+          ctx.data.plan.provenance.inlineInputs,
+          snapshot,
+        ) ||
+        ctx.data.plan.provenance.authorizationSha256 !==
+          digest(authorizationBinding(ctx))
       )
         throw problem(
           "PLAN_NOT_READY",
@@ -836,6 +997,8 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
         "PLAN_NOT_READY",
         "Original plan differs from its terminal receipt output",
       );
+    if (ctx.data.specCompletionInputV1 || ctx.data.specAmendmentV1)
+      return completeLegacyPlanning(ctx, snapshot);
     if (!ctx.data.planReadinessInputV2) {
       if (ctx.data.sourceDigest) await assertSource(ctx);
       else await audit(ctx);
@@ -912,6 +1075,13 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       path.join(ctx.runDir, "delivery-v2-readiness.json"),
       ctx.data.planReadinessV2,
     );
+    if (
+      ctx.data.planReadinessV2.result.ready === false &&
+      !ctx.data.plan.result.presentation &&
+      ctx.data.spec?.created &&
+      !hasRequiredPresentation(await recordedSpecificationText(ctx))
+    )
+      return completeLegacyPlanning(ctx, snapshot);
     assertPlanningReady(ctx.data.planReadinessV2.result);
     return ctx.data.planReadinessV2;
   }
@@ -919,6 +1089,325 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
     return Object.entries(planningInputHashes(snapshot)).some(
       ([name, sha256]) => hashes?.[name] !== sha256,
     );
+  }
+  async function completeLegacyPlanning(ctx, snapshot) {
+    if (ctx.data.specAmendmentV1?.completed && ctx.data.planReadinessV3) {
+      await assertSource(ctx);
+      const amendment = ctx.data.specAmendmentV1;
+      if (
+        ctx.data.spec.bodySha256 !== amendment.to.bodySha256 ||
+        ctx.data.spec.frozenSha256 !== amendment.from.frozenSha256 ||
+        ctx.data.sourceDigest !== amendment.sourceDigest ||
+        digest(ctx.data.planReadinessV3.binding) !==
+          digest(readinessBinding(ctx, snapshot)) ||
+        digest(amendment.authorization) !== digest(authorizationBinding(ctx))
+      )
+        throw problem(
+          "SPEC_MIGRATION",
+          "Completed specification proof changed",
+        );
+      validateWorkerResult(
+        "plan-readiness-v3",
+        ctx.data.planReadinessV3.result,
+      );
+      if (
+        !object(ctx.data.planReadinessV3.priorReadiness) ||
+        digest(ctx.data.planReadinessV3.priorReadiness.result) !==
+          digest(ctx.data.planReadinessV2.result) ||
+        digest(ctx.data.planReadinessV3.priorReadiness) !==
+          digest(ctx.data.specCompletionInputV1.priorReadiness) ||
+        ctx.data.planReadinessV3.provenance?.specSha256 !==
+          amendment.to.sha256 ||
+        ctx.data.planReadinessV3.provenance?.authorizationSha256 !==
+          digest(authorizationBinding(ctx))
+      )
+        throw problem(
+          "SPEC_RECONCILIATION",
+          "Cached proof lost its original negative readiness",
+        );
+      assertPriorReadiness(
+        ctx.data.specCompletionInputV1.priorReadiness,
+        ctx.data.planReadinessV3.result.priorReadiness,
+        authorizationBinding(ctx),
+      );
+      assertPlanningReady(ctx.data.planReadinessV3.result);
+      return ctx.data.planReadinessV3;
+    }
+    // One explicitly bounded precommit migration, never a retry-until-green.
+    if (
+      ctx.state.stage !== "review" ||
+      ctx.data.commitSha ||
+      ctx.data.stagingIntent ||
+      ctx.data.commitIntent ||
+      ctx.data.prNumber ||
+      ctx.data.prIntent ||
+      ctx.data.reviewsV2 ||
+      ctx.data.reviewBeforeV2 ||
+      ctx.data.deliveryV2 ||
+      ctx.data.verifiedSourceDigest ||
+      ctx.data.plan.provenance?.deliveryProtocol === DELIVERY_PROTOCOL ||
+      ctx.data.plan.result.presentation ||
+      Object.keys(ctx.state.attempts).some(
+        (key) => key.startsWith("review:v2:") || key.startsWith("check:"),
+      )
+    )
+      throw problem(
+        "SPEC_MIGRATION",
+        "Specification completion is restricted to legacy precommit/pre-v2-review candidates",
+      );
+    const originals = await settleLegacyReviews(ctx, true);
+    assertNoLegacyFindings(ctx, originals);
+    for (const [key, expected] of [
+      ["plan", ctx.data.plan],
+      ["implement", ctx.data.implementation],
+      ["plan-readiness:v2", ctx.data.planReadinessV2],
+    ]) {
+      if (!expected || !ctx.state.attempts[key])
+        throw problem("SPEC_MIGRATION", `Missing original ${key} evidence`);
+      const terminal = await resumeWorkerAttempt(ctx, key);
+      let result;
+      try {
+        result = JSON.parse(terminal.raw);
+      } catch {
+        throw problem("SPEC_MIGRATION", `Invalid original ${key} output`);
+      }
+      if (
+        terminal.receipt.exitCode !== 0 ||
+        digest(result) !== digest(expected.result) ||
+        (expected.attemptId &&
+          expected.attemptId !== terminal.receipt.attemptId)
+      )
+        throw problem(
+          "SPEC_MIGRATION",
+          `Original ${key} terminal identity differs`,
+        );
+    }
+    if (ctx.data.planReadinessV2.result.ready !== false)
+      throw problem(
+        "SPEC_MIGRATION",
+        "Completion requires the preserved unsuccessful original readiness",
+      );
+    await assertSource(ctx);
+    const authorization = authorizationBinding(ctx);
+    if (!ctx.data.specCompletionInputV1) {
+      const specText = await recordedSpecificationText(ctx),
+        candidate = await assertSource(ctx);
+      if (hasRequiredPresentation(specText))
+        throw problem("SPEC_MIGRATION", "No missing presentation to complete");
+      await ctx.save({
+        specCompletionInputV1: {
+          protocol: DELIVERY_PROTOCOL,
+          binding: readinessBinding(ctx, snapshot),
+          plan: ctx.data.plan.result,
+          intent: ctx.data.intent,
+          specText,
+          candidateDiff: candidate.diff,
+          sourceDigest: candidate.digest,
+          authorization,
+          priorReadiness: {
+            result: ctx.data.planReadinessV2.result,
+            sha256: digest(ctx.data.planReadinessV2.result),
+            attemptId: ctx.data.planReadinessV2.attemptId,
+            authorizationSha256: digest(authorization),
+          },
+        },
+        specCompletionBeforeV1: await workingSnapshot(ctx.data.worktree),
+      });
+      await ctx.fault("after-spec-completion-input");
+    }
+    const input = ctx.data.specCompletionInputV1;
+    if (
+      digest(input.authorization) !== digest(authorization) ||
+      input.sourceDigest !== ctx.data.sourceDigest ||
+      input.binding.planSha256 !== digest(ctx.data.plan.result) ||
+      input.binding.intentSha256 !== digest(ctx.data.intent) ||
+      input.binding.snapshotSha256 !== snapshot.identity.manifestSha256 ||
+      input.binding.frozenSha256 !== ctx.data.spec.frozenSha256 ||
+      digest(input.priorReadiness?.result) !==
+        digest(ctx.data.planReadinessV2.result)
+    )
+      throw problem("SPEC_MIGRATION", "Frozen completion input changed");
+    if (!ctx.data.specCompletionV1) {
+      const completion = await worker(ctx, {
+        kind: "spec-completion",
+        heartbeat: beats(ctx),
+      });
+      assertStageScope(
+        ctx.data.specCompletionBeforeV1,
+        await workingSnapshot(ctx.data.worktree),
+        [],
+      );
+      await assertSource(ctx);
+      validateWorkerResult("spec-completion", completion.result);
+      validatePresentation(completion.result.presentation, ctx);
+      if (
+        planInputNamesMismatch(completion.provenance?.inlineInputs, snapshot) ||
+        completion.provenance?.authorizationSha256 !== digest(authorization)
+      )
+        throw problem(
+          "SPEC_MIGRATION",
+          "Completion lacks verified instructions/authorization",
+        );
+      await ctx.save({ specCompletionV1: completion });
+    }
+    assertPriorReadiness(
+      input.priorReadiness,
+      ctx.data.specCompletionV1.result.priorReadiness,
+      authorization,
+    );
+    assertPlanningReady(ctx.data.specCompletionV1.result);
+    const target = completeSpecification(
+      ctx,
+      input.specText,
+      ctx.data.specCompletionV1.result.presentation,
+    );
+    if (!ctx.data.specAmendmentV1) {
+      if ((await recordedSpecificationText(ctx)) !== input.specText)
+        throw problem(
+          "BMAD_SPEC",
+          "Original specification changed before amendment",
+        );
+      const nonce = randomUUID(),
+        temporaryPath = `${ctx.data.specFile}.amendment-${nonce}.tmp`;
+      try {
+        await lstat(temporaryPath);
+        throw problem(
+          "BMAD_SPEC_TEMP",
+          "Planned amendment temp already exists; preserved",
+        );
+      } catch (error) {
+        if (error.code !== "ENOENT") throw error;
+      }
+      const before = await workingSnapshot(ctx.data.worktree);
+      if (
+        Object.hasOwn(
+          before,
+          slash(path.relative(ctx.data.worktree, temporaryPath)),
+        )
+      )
+        throw problem(
+          "BMAD_SPEC_TEMP",
+          "Planned amendment temp was not absent",
+        );
+      await ctx.save({
+        specAmendmentV1: {
+          fromText: input.specText,
+          toText: target,
+          from: specIdentity(input.specText),
+          to: specIdentity(target),
+          sourceDigest: ctx.data.sourceDigest,
+          completed: false,
+          before,
+          temporary: {
+            nonce,
+            path: temporaryPath,
+            owner: ctx.data.owner,
+            wasAbsent: true,
+            targetSha256: digest(target),
+          },
+          authorization,
+          size: {
+            characters: target.length,
+            words: target.trim().split(/\s+/).length,
+            tokenCount: null,
+          },
+        },
+      });
+      await ctx.fault("after-spec-amendment-intent");
+    }
+    if (ctx.data.specAmendmentV1.toText !== target)
+      throw problem(
+        "BMAD_SPEC",
+        "Durable amendment differs from the preserved completion result",
+      );
+    await reconcileSpecAmendment(ctx);
+    if (!ctx.data.specAmendmentV1.completed) {
+      await atomicText(
+        path.join(ctx.runDir, "spec-before-completion-v1.md"),
+        input.specText,
+      );
+      await finishAmendmentTemp(ctx, ctx.data.specAmendmentV1);
+      await reconcileSpecAmendment(ctx);
+      await ctx.fault("after-spec-amendment-checkpoint");
+    }
+    if (!ctx.data.planReadinessInputV3) {
+      await ctx.save({
+        planReadinessInputV3: {
+          ...input,
+          binding: readinessBinding(ctx, snapshot),
+          specText: target,
+          completionAssessment: ctx.data.specCompletionV1.result.priorReadiness,
+        },
+        planReadinessBeforeV3: await workingSnapshot(ctx.data.worktree),
+      });
+    }
+    if (
+      digest(ctx.data.planReadinessInputV3.binding) !==
+        digest(readinessBinding(ctx, snapshot)) ||
+      digest(ctx.data.planReadinessInputV3.priorReadiness) !==
+        digest(input.priorReadiness) ||
+      digest(ctx.data.planReadinessInputV3.completionAssessment) !==
+        digest(ctx.data.specCompletionV1.result.priorReadiness)
+    )
+      throw problem("SPEC_MIGRATION", "Amended readiness binding changed");
+    if (!ctx.data.planReadinessV3) {
+      const result = await worker(ctx, {
+        kind: "plan-readiness-v3",
+        heartbeat: beats(ctx),
+      });
+      assertStageScope(
+        ctx.data.planReadinessBeforeV3,
+        await workingSnapshot(ctx.data.worktree),
+        [],
+      );
+      await assertSource(ctx);
+      validateWorkerResult("plan-readiness-v3", result.result);
+      if (
+        planInputNamesMismatch(result.provenance?.inlineInputs, snapshot) ||
+        result.provenance?.authorizationSha256 !== digest(authorization) ||
+        result.provenance?.specSha256 !== digest(target)
+      )
+        throw problem(
+          "SPEC_MIGRATION",
+          "Final readiness lacks amended specification provenance",
+        );
+      await ctx.save({
+        planReadinessV3: {
+          ...result,
+          binding: ctx.data.planReadinessInputV3.binding,
+          sourceDigest: ctx.data.sourceDigest,
+          priorReadiness: input.priorReadiness,
+          completionAssessment: ctx.data.specCompletionV1.result.priorReadiness,
+        },
+      });
+    }
+    await atomicWriteJson(
+      path.join(ctx.runDir, "spec-completion-v1-evidence.json"),
+      {
+        input,
+        completion: ctx.data.specCompletionV1,
+        amendment: ctx.data.specAmendmentV1,
+        readiness: ctx.data.planReadinessV3,
+      },
+    );
+    assertPriorReadiness(
+      input.priorReadiness,
+      ctx.data.planReadinessV3.result.priorReadiness,
+      authorization,
+    );
+    assertPlanningReady(ctx.data.planReadinessV3.result);
+    return ctx.data.planReadinessV3;
+  }
+  function assertNoLegacyFindings(ctx, originals) {
+    if (
+      [...originals, ...(ctx.data.reviews ?? [])].some(
+        (review) => review.result?.findings?.length,
+      )
+    )
+      throw problem(
+        "REVIEW_FINDINGS",
+        "Original review has unresolved findings; input delivery cannot clear them",
+      );
   }
   async function legacyReviewScope(ctx, originals) {
     const after = await workingSnapshot(ctx.data.worktree);
@@ -1031,15 +1520,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
   }
   async function ensureReviewsV2(ctx, auditLegacyBefore = false) {
     const originals = await settleLegacyReviews(ctx, auditLegacyBefore);
-    if (
-      [...originals, ...(ctx.data.reviews ?? [])].some(
-        (review) => review.result?.findings?.length,
-      )
-    )
-      throw problem(
-        "REVIEW_FINDINGS",
-        "Original review has unresolved findings; input delivery cannot clear them",
-      );
+    assertNoLegacyFindings(ctx, originals);
     const readiness = await ensurePlanningReady(ctx);
     await assertSource(ctx);
     const binding = {
