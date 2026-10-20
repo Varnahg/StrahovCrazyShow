@@ -8,3 +8,13 @@ services:
       - "${BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-8080}:2567"
     restart: unless-stopped
     stop_grace_period: 30s
+    environment:
+      FEEDBACK_DIR: /data/feedback
+      FEEDBACK_ALLOWED_ORIGINS: ${FEEDBACK_ALLOWED_ORIGINS:-}
+      LINEAR_API_KEY: ${LINEAR_API_KEY:-}
+      LINEAR_TEAM_ID: ${LINEAR_TEAM_ID:-}
+      LINEAR_PROJECT_ID: ${LINEAR_PROJECT_ID:-}
+    volumes:
+      - feedback-data:/data/feedback
+volumes:
+  feedback-data:

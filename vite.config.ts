@@ -1,6 +1,12 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+const clientBuildId = execFileSync(process.execPath, [fileURLToPath(new URL("./scripts/build-identity.mjs", import.meta.url))], {
+  encoding: "utf8", windowsHide: true,
+}).trim();
 export default defineConfig({
+  define: { "import.meta.env.VITE_CLIENT_BUILD_ID": JSON.stringify(clientBuildId) },
   plugins: [react()],
   optimizeDeps: {
     entries: ["index.html", "client/**/*.ts", "client/**/*.tsx"],

@@ -1,5 +1,6 @@
 /** Original lightweight line icons. One SVG path per control, no image fetches. */
 const paths: Record<string, string> = {
+  feedback: "M4 3h16v13H9l-5 5V3 M12 6v5 M12 13v1",
   events: "M5 5h14v15H5z M8 3v4 M16 3v4 M5 10h14 M9 14h2 M14 14h2 M9 17h2",
   map: "M12 2 21 12 12 22 3 12Z M15 8l-2 6-5 2 2-6Z",
   journal:
