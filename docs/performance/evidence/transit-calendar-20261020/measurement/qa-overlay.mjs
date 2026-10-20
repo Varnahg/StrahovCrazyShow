@@ -9,10 +9,11 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 const xyz = value => ({x: value.x, y: value.y, z: value.z});
 const digest = async value => [...new Uint8Array(await crypto.subtle.digest('SHA-256',
   new TextEncoder().encode(JSON.stringify(value))))].map(n => n.toString(16).padStart(2, '0')).join('');
+let disposeInstalledQA;
 
 export function installTransitQA(game) {
   if (!['127.0.0.1', 'localhost'].includes(location.hostname)) throw new Error('Local QA only');
-  document.getElementById('transit-qa')?.remove();
+  disposeInstalledQA?.();
   const panel = document.createElement('section');
   panel.id = 'transit-qa';
   panel.style.cssText = 'position:fixed;right:8px;top:8px;z-index:100000;background:#101820ee;color:white;padding:10px;font:12px monospace;max-width:460px;border:1px solid #f5b642';
@@ -32,12 +33,19 @@ export function installTransitQA(game) {
   panel.append(title, controls);
   document.body.append(panel);
   let busy = false, prepared = false, latest = null, context, latestRaw;
-  let exportURL;
+  let exportURL, exportLink;
   const revokeExport = () => {
     if (exportURL) URL.revokeObjectURL(exportURL);
     exportURL = undefined;
+    exportLink?.remove();
+    exportLink = undefined;
   };
-  window.addEventListener('pagehide', revokeExport, {once: true});
+  window.addEventListener('pagehide', revokeExport);
+  disposeInstalledQA = () => {
+    revokeExport();
+    window.removeEventListener('pagehide', revokeExport);
+    panel.remove();
+  };
   const results = new Map(), buttons = [];
   const tell = (phase, data = {}) => {
     const value = {phase, ...identity, ...data};
@@ -70,6 +78,7 @@ export function installTransitQA(game) {
   }
   async function saveRaw(raw) {
     latest = await deliverAttempt(raw, value => post('attempt', value, true), saved => {
+      revokeExport();
       latestRaw = saved;
       if (!results.has(saved.attemptId)) results.set(saved.attemptId, saved);
       window.__transitQARawExport = JSON.stringify({attempts: [...results.values()]}, null, 2);
@@ -234,12 +243,12 @@ export function installTransitQA(game) {
     tell(prepared ? 'ready' : 'waiting', {attempts: results.size, latest});
   });
   action('Vypsat celý raw export', async () => {
-    document.getElementById('transit-qa-raw-export')?.remove();
     revokeExport();
     const raw = window.__transitQARawExport ?? '{"attempts":[]}';
     const blob = new Blob([raw], {type: 'application/json'});
     exportURL = URL.createObjectURL(blob);
     const link = document.createElement('a');
+    exportLink = link;
     link.id = 'transit-qa-raw-export';
     link.href = exportURL;
     link.download = 'transit-qa-' + (context?.startId ?? 'empty') + '.json';
