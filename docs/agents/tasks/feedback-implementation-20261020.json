@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "acceptance": [
+    "Implementace odpovídá schválenému výzkumu, automatický snímek bez HUD, žádný další scene.render a žádné trvalé preserveDrawingBuffer.",
+    "Zachovat host isolation, malé bounded fronty, jasné selhání a lifecycle; praktický nebo cílený test doložit přesně, ne hypoteticky."
+  ],
+  "verification": [
+    "Cílené relevantní CPU testy a typová kontrola před předáním.",
+    "Celá sada/build/integrace a browser/GPU pouze pod samostatnou validation rezervací."
+  ],
+  "notes": [
+    "Výslovné uživatelské zadání20Oct2026: kompletně implementovat podle KEY-51, navázat na KEY-21, prakticky ověřit a integrovat do main. Cizí WIP se nepřebírá.",
+    "Implementace v izolované worktree codex/player-feedback-20261020 na c713c2ae. Shared kontrakt vlastní root; subagenti mají disjunktní soubory. Capture WIP KEY-21 zůstává chráněný, dokud nebude doložené předání.",
+    "Root aktualizuje Linear a provádí integraci; podagenti předají kód, cílený refaktoring a relevantní testy společně. Žádné samostatné commity subagentů.",
+    "20Oct2026: po dokončení rendereru root zúžil claim na přesný vlastní player-feedback-20261020-db4fab14c5e6 prefix včetně jeho stagingů. Zdrojový root WIP je doložený vlastní implementací v této izolované worktree; reclaim --adopt-dirty pouze vlastního rozsahu. Validation claim dočasně uvolněn po ukončenéminstall/LFS/TS, bez vlastníchserverů/GPUscén, pro vyžádané sdílené měřicí okno perf koordinátora."
+  ],
+  "id": "feedback-implementation-20261020",
+  "title": "Implementovat herní feedback a integrovat server, UI a capture",
+  "writePaths": [
+    "_bmad/render/bmad-build/player-feedback-20261020-db4fab14c5e6/",
+    "_bmad-output/implementation-artifacts/player-feedback-20261020/",
+    "shared/feedback.ts",
+    "tests/feedback-contract.test.ts",
+    "client/game.ts",
+    "client/ui.tsx",
+    "client/world-dock.tsx",
+    "client/hud-icons.tsx",
+    "client/build-identity.ts",
+    "scripts/build-identity.mjs",
+    "tests/build-identity.test.ts",
+    "vite.config.ts",
+    "server/index.ts",
+    "compose.yaml",
+    "docs/deployment/feedback.md",
+    "tests/feedback-game.test.ts",
+    "tests/feedback-ui.test.ts",
+    "docs/agents/handoffs/feedback-implementation-20261020.md"
+  ]
+}
