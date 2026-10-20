@@ -41,6 +41,10 @@ import {
   hasRequiredPresentation,
   assertPriorReadiness,
   OUTPUT_SCHEMA_VERSION,
+  readWorkerAttemptInput,
+  readReviewAuthority,
+  isLegacyBlindAuthorityInput,
+  isExactLegacyBlindAuthorityRefusal,
 } from "./codex.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -1697,6 +1701,243 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
     );
     return originals;
   }
+  async function reconcileBlindAuthority(ctx, binding, snapshot) {
+    if (
+      ctx.state.stage !== "review" ||
+      ctx.data.commitSha ||
+      ctx.data.stagingIntent ||
+      ctx.data.commitIntent ||
+      ctx.data.prNumber ||
+      ctx.data.verifiedSourceDigest ||
+      !ctx.data.reviewBeforeV2 ||
+      !ctx.data.reviewV2Binding
+    )
+      throw problem(
+        "REVIEW_OUTPUT",
+        "Blind authority repair is restricted to the original precommit review checkpoint",
+      );
+    const lenses = ["blind", "edge", "verification"],
+      prefix = ctx.data.sourceDigest.slice(0, 32);
+    // Do not dispatch anything while an original is live, missing, uncertain,
+    // or corrupt. State.status alone is not proof of a terminal worker.
+    for (const lens of lenses) {
+      const key = `review:v2:${lens}:${prefix}`,
+        attempt = ctx.state.attempts[key];
+      if (
+        !attempt ||
+        !/^[a-f0-9]{24}$/.test(attempt.id) ||
+        (await readJson(
+          path.join(ctx.runDir, "attempts", attempt.id, "receipt.json"),
+          { optional: true },
+        )) === undefined
+      )
+        throw problem(
+          "UNKNOWN_ATTEMPT",
+          `No terminal original review receipt for ${lens}`,
+        );
+    }
+    const settled = await Promise.allSettled(
+      lenses.map(async (lens) => {
+        const key = `review:v2:${lens}:${prefix}`,
+          input = await readWorkerAttemptInput(ctx, key),
+          original = await resumeWorkerAttempt(ctx, key);
+        if (original.receipt.exitCode !== 0)
+          throw problem(
+            "WORKER_FAILED",
+            `Original ${lens} reviewer failed; no replacement is authorized`,
+          );
+        if (
+          input.provenance.deliveryProtocol !== DELIVERY_PROTOCOL ||
+          input.provenance.promptSha256 !== digest(input.prompt) ||
+          input.provenance.diffSha256 !== binding.diffSha256 ||
+          digest(input.provenance.snapshot) !== digest(ctx.data.bmadSnapshot) ||
+          input.provenance.specSha256 !==
+            (lens === "edge" ? ctx.data.spec.sha256 : null)
+        )
+          throw problem(
+            "REVIEW_INPUT",
+            `Original ${lens} review binding changed`,
+          );
+        const bytes = await readFile(original.outputPath),
+          stdout = await readFile(original.receipt.stdoutPath);
+        if (
+          typeof original.raw !== "string" ||
+          !Buffer.from(original.raw, "utf8").equals(bytes)
+        )
+          throw problem(
+            "REVIEW_OUTPUT",
+            "Original review output is not exact UTF-8",
+          );
+        let result = null,
+          failure = null;
+        try {
+          result = parseReviewResult(lens, original.raw);
+        } catch (error) {
+          if (error.code !== "REVIEW_OUTPUT") throw error;
+          failure = { code: error.code, message: error.message };
+        }
+        return {
+          lens,
+          key,
+          input,
+          bytes,
+          stdout,
+          result,
+          failure,
+          record: {
+            lens,
+            key,
+            requestDigest: original.requestDigest,
+            inputPath: original.inputPath,
+            inputSha256: original.inputSha256,
+            provenance: original.provenance,
+            outputPath: original.outputPath,
+            receipt: original.receipt,
+            raw: original.raw,
+            rawSha256: digest(original.raw),
+            stdoutSha256: createHash("sha256").update(stdout).digest("hex"),
+            result,
+            failure,
+          },
+        };
+      }),
+    );
+    const rejected = settled.find((entry) => entry.status === "rejected");
+    if (rejected) throw rejected.reason;
+    const entries = settled.map((entry) => entry.value);
+    if (entries.some((entry) => entry.result?.findings.length))
+      throw problem(
+        "REVIEW_FINDINGS",
+        "An original review has findings; authority delivery cannot clear them",
+      );
+    for (const entry of entries.filter((entry) => entry.lens !== "blind"))
+      if (entry.failure)
+        throw problem(
+          "REVIEW_OUTPUT",
+          `Original ${entry.lens} review is incomplete; no replacement is authorized`,
+        );
+    const toReview = (entry) => ({
+      lens: entry.lens,
+      result: entry.result,
+      provenance: entry.record.provenance,
+      outputPath: entry.record.outputPath,
+      attemptId: entry.record.receipt.attemptId,
+      exitCode: entry.record.receipt.exitCode,
+      stdoutPath: entry.record.receipt.stdoutPath,
+      stderrPath: entry.record.receipt.stderrPath,
+    });
+    const blind = entries[0];
+    assertStageScope(
+      ctx.data.reviewBeforeV2,
+      await workingSnapshot(ctx.data.worktree),
+      [],
+    );
+    await assertSource(ctx);
+    if (!blind.failure && !ctx.data.blindAuthorityRepairV1)
+      return entries.map(toReview);
+    if (
+      !isLegacyBlindAuthorityInput(ctx, snapshot, blind.input) ||
+      !isExactLegacyBlindAuthorityRefusal(blind.bytes, blind.stdout)
+    )
+      throw problem(
+        "REVIEW_OUTPUT",
+        "Original blind output is not the exact coordinator-reviewed authority refusal",
+      );
+    const originals = entries.map((entry) => entry.record),
+      authority = (await readReviewAuthority(ctx)).binding,
+      intent = {
+        version: 1,
+        key: `review:authority-v1:blind:${prefix}`,
+        binding,
+        authority,
+        originals,
+      };
+    if (!ctx.data.blindAuthorityRepairV1) {
+      await ctx.save({ blindAuthorityRepairV1: intent });
+      await ctx.fault("after-blind-authority-intent");
+    } else if (digest(ctx.data.blindAuthorityRepairV1) !== digest(intent))
+      throw problem(
+        "REVIEW_INPUT",
+        "Original reviews or authority input changed after repair intent",
+      );
+    if (!ctx.data.blindAuthorityReviewV1) {
+      const replacement = {
+        lens: "blind",
+        ...(await worker(ctx, {
+          kind: "review",
+          lens: "blind",
+          identity: ctx.data.sourceDigest,
+          heartbeat: beats(ctx),
+          authorityRepair: true,
+        })),
+      };
+      assertStageScope(
+        ctx.data.reviewBeforeV2,
+        await workingSnapshot(ctx.data.worktree),
+        [],
+      );
+      await assertSource(ctx);
+      if (
+        digest(replacement.provenance?.projectAuthority) !==
+          digest(authority) ||
+        replacement.provenance?.diffSha256 !== binding.diffSha256 ||
+        digest(replacement.provenance?.snapshot) !==
+          digest(ctx.data.bmadSnapshot)
+      )
+        throw problem(
+          "REVIEW_INPUT",
+          "Replacement blind did not receive the exact authority/candidate inputs",
+        );
+      parseReviewResult("blind", replacement.result.raw);
+      await ctx.save({ blindAuthorityReviewV1: replacement });
+      await ctx.fault("after-blind-authority-result");
+    }
+    if (
+      parseReviewResult("blind", ctx.data.blindAuthorityReviewV1.result.raw)
+        .findings.length
+    )
+      throw problem(
+        "REVIEW_FINDINGS",
+        "Replacement blind has findings; no further authority attempt is allowed",
+      );
+    return [ctx.data.blindAuthorityReviewV1, ...entries.slice(1).map(toReview)];
+  }
+  function assertAuthoritySelection(ctx, binding) {
+    const intent = ctx.data.blindAuthorityRepairV1;
+    if (!intent) return;
+    if (
+      digest(intent.binding) !== digest(binding) ||
+      !ctx.data.blindAuthorityReviewV1
+    )
+      throw problem("REVIEW_INPUT", "Cached authority repair binding changed");
+    for (const review of ctx.data.reviewsV2) {
+      if (review.lens === "blind") {
+        if (
+          digest(review) !== digest(ctx.data.blindAuthorityReviewV1) ||
+          digest(review.provenance.projectAuthority) !==
+            digest(intent.authority)
+        )
+          throw problem(
+            "REVIEW_INPUT",
+            "Cached proof replaced the authority blind result",
+          );
+      } else {
+        const original = intent.originals.find(
+          (entry) => entry.lens === review.lens,
+        );
+        if (
+          !original ||
+          review.attemptId !== original.receipt.attemptId ||
+          digest(review.provenance) !== digest(original.provenance) ||
+          digest(review.result) !== digest(original.result)
+        )
+          throw problem(
+            "REVIEW_INPUT",
+            "Cached proof replaced an original valid review",
+          );
+      }
+    }
+  }
   async function ensureReviewsV2(ctx, auditLegacyBefore = false) {
     const originals = await settleLegacyReviews(ctx, auditLegacyBefore);
     assertNoLegacyFindings(ctx, originals);
@@ -1716,25 +1957,43 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
     )
       throw problem("REVIEW_OUTPUT", "Validated review input changed");
     if (!ctx.data.reviewsV2) {
+      let results;
+      const blindKey = `review:v2:blind:${ctx.data.sourceDigest.slice(0, 32)}`,
+        snapshot = await loadBmadSnapshot(
+          ctx.data.renderedWorkflow,
+          ctx.data.bmadSnapshot,
+        );
+      if (
+        ctx.data.blindAuthorityRepairV1 ||
+        (ctx.state.attempts[blindKey] &&
+          isLegacyBlindAuthorityInput(
+            ctx,
+            snapshot,
+            await readWorkerAttemptInput(ctx, blindKey),
+          ))
+      )
+        results = await reconcileBlindAuthority(ctx, binding, snapshot);
       if (!ctx.data.reviewBeforeV2)
         await ctx.save({
           reviewBeforeV2: await workingSnapshot(ctx.data.worktree),
           reviewV2Binding: binding,
         });
-      const settled = await Promise.allSettled(
-        ["blind", "edge", "verification"].map(async (lens) => ({
-          lens,
-          ...(await worker(ctx, {
-            kind: "review",
-            lens,
-            identity: ctx.data.sourceDigest,
-            heartbeat: beats(ctx),
-          })),
-        })),
-      );
-      const failed = settled.find((entry) => entry.status === "rejected");
+      const settled = results
+        ? null
+        : await Promise.allSettled(
+            ["blind", "edge", "verification"].map(async (lens) => ({
+              lens,
+              ...(await worker(ctx, {
+                kind: "review",
+                lens,
+                identity: ctx.data.sourceDigest,
+                heartbeat: beats(ctx),
+              })),
+            })),
+          );
+      const failed = settled?.find((entry) => entry.status === "rejected");
       if (failed) throw failed.reason;
-      const results = settled.map((entry) => entry.value);
+      results ??= settled.map((entry) => entry.value);
       assertStageScope(
         ctx.data.reviewBeforeV2,
         await workingSnapshot(ctx.data.worktree),
@@ -1754,6 +2013,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       }
       await ctx.save({ reviewsV2: results });
     }
+    assertAuthoritySelection(ctx, binding);
     if (
       ctx.data.reviewsV2.length !== 3 ||
       new Set(ctx.data.reviewsV2.map((review) => review.lens)).size !== 3
@@ -1784,6 +2044,14 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       readiness,
       reviews: ctx.data.reviewsV2,
       legacyReviews: ctx.data.legacyReviewSettlementV2 ?? [],
+      ...(ctx.data.blindAuthorityRepairV1
+        ? {
+            authorityRepair: {
+              intent: ctx.data.blindAuthorityRepairV1,
+              replacement: ctx.data.blindAuthorityReviewV1,
+            },
+          }
+        : {}),
     };
     const proofSha256 = digest(proof);
     await atomicWriteJson(path.join(ctx.runDir, "delivery-v2.json"), proof);

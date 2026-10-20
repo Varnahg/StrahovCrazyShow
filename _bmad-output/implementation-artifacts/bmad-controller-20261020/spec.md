@@ -117,3 +117,15 @@ SF-V3 recheck — medium, patch testů: kombinace již zapsaného toText a stál
 Detail a následné uzavření: docs/verification-evidence/bmad-controller-20261020/review-schema-contract.md. Root targeted3/3 PASS; autor19/19 PASS. Produkční kód se kvůli testovému followupu nemění.
 
 SC-V1/V2 uzavřeny: autor3/3 PASS14.144s, tsc0; nezávislý verification recheck potvrdil skutečné plan/resume cesty a byte-identitu původních asercí po odečtení vložených bloků. Produkční kód beze změny. Detail review-schema-contract.md; skutečný pilot a finální CI ještě následují.
+
+### Review úplných authority vstupů
+
+| ID | Verdikt | Důkaz a směr |
+| --- | --- | --- |
+| RA-E1 edge | medium | Matcher ignoruje explicitní top-level error/turn.failed mimo přesné dvě agent messages; receipt exit0 sám tento rozpor neodmítne. Patch guardu a native regrese. |
+| RA-V1 verification | medium | Historický prompt fixture generuje stejný produkční helper jako matcher; změna pevného textu zůstane zelená. Patch nezávislé historické fixture a native průchodu. |
+| RA-V2 verification | medium | Chybí negativní cache-selection regrese po změně vybraného attemptId. Patch testu REVIEW_INPUT a0novýchworkerů. |
+
+Všechny vrstvy dokončeny před individuální triage; blind bez nálezů. Každý bod posouzen samostatně, bez seskupení odlišných příčin. Detail a uzavření v docs/verification-evidence/bmad-controller-20261020/review-authority.md. Frozen záměr se nemění.
+
+RA-E1/V1/V2 uzavřeny: cílený followup3/3 PASS86.153s, tsc0; nezávislé edge/verification rechecky potvrdily guard i regresní citlivost a zachování původních asercí. Žádný nález nezůstává otevřený. Finální diff42b953e3, detail review-authority.md a review-authority-final-validation.json. Živý pilot a konečná CI následují.

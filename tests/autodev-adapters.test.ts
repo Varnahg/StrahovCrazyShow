@@ -62,6 +62,10 @@ const {
   buildWorkerSchema,
   prepareWorkerSchema,
   presentationWorkerPaths,
+  readReviewAuthority,
+  readWorkerAttemptInput,
+  LEGACY_BLIND_AUTHORITY_REFUSAL,
+  LEGACY_BLIND_AUTHORITY_PROGRESS,
 } = await import(new URL("../scripts/autodev/codex.mjs", import.meta.url).href);
 
 const sourceRoot = path.resolve(
@@ -119,6 +123,14 @@ async function fixture(t: any) {
     );
   await writeFile(path.join(root, "src/a.txt"), "before\n");
   await writeFile(path.join(root, ".gitignore"), "ignored/\n");
+  await copyFile(
+    path.join(sourceRoot, "AGENTS.md"),
+    path.join(root, "AGENTS.md"),
+  );
+  await copyFile(
+    path.join(sourceRoot, "docs/agents/bmad-policy.md"),
+    path.join(root, "docs/agents/bmad-policy.md"),
+  );
   await git(root, "init", "-b", "main");
   await git(root, "config", "user.name", "Fixture");
   await git(root, "config", "user.email", "fixture@example.invalid");
@@ -128,6 +140,8 @@ async function fixture(t: any) {
     "--",
     "src/a.txt",
     ".gitignore",
+    "AGENTS.md",
+    "docs/agents/bmad-policy.md",
     "scripts/agent-tasks.mjs",
     "docs/agents/tasks/controller.json",
     "docs/agents/tasks/worker.json",
@@ -760,6 +774,574 @@ async function historicalCompletionBytes(ctx: any) {
       path.join(ctx.runDir, "spec-completion-v1.json"),
     ].map((file) => readFile(file, "utf8")),
   );
+}
+
+// Independent pre-repair prompt/provenance fixture for the test snapshot.
+// Substitute only runtime paths and identities; do not use the production
+// fingerprint generator, whose fixed wording this regression must constrain.
+function historicalBlindAuthorityInput(ctx: any, snapshot: any) {
+  const prompt = `You are the independent reviewer already launched by the controller. Execute only this reviewer task; do not launch another process or agent. Read-only; do not edit files, stage, commit, or invoke a workflow.
+Worktree: ${ctx.data.worktree}
+Project instructions: ${path.join(ctx.data.worktree, "AGENTS.md")} and ${path.join(ctx.data.worktree, "docs/agents/bmad-policy.md")}
+Review scope paths: ${JSON.stringify(ctx.data.workerTask.writePaths)}
+Frozen source identity: ${ctx.data.sourceDigest}
+Diff SHA256: ${ctx.data.sourceDiffSha256}
+
+Read ${path.join(ctx.runDir, "source-diff.txt")}; report evidenced findings, clean [].
+
+Delivery protocol 2: the hash-verified snapshot instruction files named above are supplied in full below. Use these exact inline instruction bodies instead of reopening their ignored paths. Preserve the native lens method/output format, including reading the diff from its provided file path; the diff text is intentionally not included in this prompt. If any required input cannot be read, report the limitation; never claim a clean review.
+`;
+  return {
+    prompt,
+    provenance: {
+      deliveryProtocol: 2,
+      inlineInputs: {},
+      snapshot: snapshot.identity,
+      specSha256: null,
+      diffSha256: ctx.data.sourceDiffSha256,
+      promptSha256: sha(prompt),
+    },
+  };
+}
+
+async function reviewAuthorityFixture(
+  t: any,
+  {
+    newerBlind = false,
+    replacement = "[]",
+    liveLens,
+    failedLens,
+    stdoutEvents = [],
+  }: {
+    newerBlind?: boolean;
+    replacement?: any;
+    liveLens?: string;
+    failedLens?: string;
+    stdoutEvents?: any[];
+  } = {},
+): Promise<any> {
+  const f = await specCompletionFixture(t),
+    ctx = f.ctx;
+  const replacementName = `review-authority-v1-blind-${ctx.data.sourceDigest.slice(0, 32)}.txt`;
+  const fake = await protocol2WorkerFixture(ctx, {
+    [replacementName]: replacement,
+  });
+  const planningWorker = historicalCompletionWorker({
+    ...f,
+    worker: fake.worker,
+  });
+  const originalWorker = async (context: any, options: any) => {
+    if (options.kind !== "review") return planningWorker(context, options);
+    const key = `review:v2:${options.lens}:${context.data.sourceDigest.slice(0, 32)}`,
+      built =
+        options.lens === "blind" && !newerBlind
+          ? historicalBlindAuthorityInput(context, f.snapshot)
+          : await buildWorkerPrompt(context, options),
+      output = path.join(context.runDir, `${key.replaceAll(":", "-")}.txt`),
+      raw =
+        options.lens === "blind"
+          ? LEGACY_BLIND_AUTHORITY_REFUSAL
+          : options.lens === "edge"
+            ? "[]"
+            : "No verification gaps found.",
+      script = path.join(
+        context.runDir,
+        `original-authority-${options.lens}.mjs`,
+      );
+    const { prompt, provenance } = built;
+    const messages =
+      options.lens === "blind" ? [LEGACY_BLIND_AUTHORITY_PROGRESS, raw] : [raw];
+    const finish = `fs.writeFileSync(${JSON.stringify(output)},${JSON.stringify(raw)});for(const text of ${JSON.stringify(messages)})process.stdout.write(JSON.stringify({type:'item.completed',item:{type:'agent_message',text}})+'\\n');for(const event of ${JSON.stringify(options.lens === "blind" ? stdoutEvents : [])})process.stdout.write(JSON.stringify(event)+'\\n');process.exitCode=${options.lens === failedLens ? 7 : 0};`;
+    const gate = path.join(context.runDir, "finish-original-authority-review");
+    await writeFile(
+      script,
+      `import fs from 'node:fs';process.stdin.resume();process.stdin.on('end',()=>{${options.lens === liveLens ? `fs.writeFileSync(${JSON.stringify(path.join(context.runDir, "authority-live-started"))},'started');const end=Date.now()+60000;const timer=setInterval(()=>{if(fs.existsSync(${JSON.stringify(gate)})){clearInterval(timer);${finish}}else if(Date.now()>end){clearInterval(timer);process.exitCode=9;}},20);` : finish}});`,
+    );
+    const input = await prepareWorkerInput(
+      context,
+      key,
+      [script, "-o", output, "-"],
+      prompt,
+      provenance,
+      process.execPath,
+    );
+    await context.supervise({
+      key,
+      command: input.command,
+      args: input.args,
+      cwd: context.data.worktree,
+      heartbeat: options.heartbeat,
+    });
+    return runWorker(context, options);
+  };
+  const initialRun = createAdapter({
+    worker: originalWorker,
+    linear: { async comment() {} } as any,
+  }).runStage("review", ctx);
+  initialRun.catch(() => {});
+  if (liveLens) {
+    await waitFor(async () => {
+      try {
+        return await readFile(
+          path.join(ctx.runDir, "authority-live-started"),
+          "utf8",
+        );
+      } catch (error: any) {
+        if (error.code === "ENOENT") return false;
+        throw error;
+      }
+    }, "live original authority review");
+    return {
+      ...f,
+      ...fake,
+      initialRun,
+      liveGate: path.join(ctx.runDir, "finish-original-authority-review"),
+    };
+  }
+  await assert.rejects(initialRun, { code: "REVIEW_OUTPUT" });
+  assert.equal(ctx.data.specAmendmentV1.completed, true);
+  assert.equal(
+    ctx.data.specAmendmentV1.completionIdentity.key,
+    "spec-completion:v2",
+  );
+  assert.equal(ctx.data.planReadinessV3.result.ready, true);
+  const originals = await Promise.all(
+    ["blind", "edge", "verification"].map(async (lens) => {
+      const key = `review:v2:${lens}:${ctx.data.sourceDigest.slice(0, 32)}`,
+        input = await readWorkerAttemptInput(ctx, key),
+        resumed = await resumeWorkerAttempt(ctx, key);
+      return {
+        lens,
+        key,
+        input,
+        resumed,
+        directory: path.join(
+          ctx.runDir,
+          "attempts",
+          ctx.state.attempts[key].id,
+        ),
+      };
+    }),
+  );
+  const originalBytes = () =>
+    Promise.all(
+      originals.flatMap(({ directory, input, resumed }) =>
+        [
+          path.join(directory, "request.json"),
+          path.join(directory, "receipt.json"),
+          input.inputPath,
+          resumed.outputPath,
+          resumed.receipt.stdoutPath,
+        ].map((file) => readFile(file)),
+      ),
+    );
+  return { ...f, ...fake, originals, originalBytes };
+}
+
+for (const boundary of [
+  "none",
+  "after-blind-authority-intent",
+  "after-blind-authority-result",
+  "after-authority-receipt",
+]) {
+  test(`blind authority repair resumes ${boundary} with one new blind and unchanged original evidence`, async (t) => {
+    const f = await reviewAuthorityFixture(t, {
+        stdoutEvents: [
+          {
+            type: "item.completed",
+            item: {
+              type: "command_execution",
+              command: "read-only optional lookup",
+              exit_code: 1,
+              status: "completed",
+            },
+          },
+        ],
+      }),
+      ctx = f.ctx,
+      originals = await f.originalBytes(),
+      source = ctx.data.sourceDigest,
+      frozen = ctx.data.spec.frozenSha256,
+      preserved = () =>
+        digest([
+          ctx.data.implementation,
+          ctx.data.plan,
+          ctx.data.specAmendmentV1,
+          ctx.data.specCompletionV2,
+          ctx.data.planReadinessV3,
+          ctx.data.planReadinessInputV3,
+        ]),
+      originalPlanning = preserved();
+    let crashed = false;
+    ctx.fault = async (point: string) => {
+      if (!crashed && point === boundary) {
+        crashed = true;
+        throw new Error("authority boundary crash");
+      }
+    };
+    const supervise = ctx.supervise;
+    ctx.supervise = async (options: any) => {
+      const receipt = await supervise(options);
+      if (
+        !crashed &&
+        boundary === "after-authority-receipt" &&
+        options.key.startsWith("review:authority-v1:")
+      ) {
+        crashed = true;
+        throw new Error("authority boundary crash");
+      }
+      return receipt;
+    };
+    const adapter = createAdapter({
+      worker: f.worker,
+      linear: { async comment() {} } as any,
+    });
+    if (boundary !== "none") {
+      await assert.rejects(
+        adapter.runStage("review", ctx),
+        /authority boundary crash/,
+      );
+      Object.assign(
+        ctx.state,
+        JSON.parse(await readFile(f.checkpoint, "utf8")),
+      );
+    }
+    await adapter.runStage("review", ctx);
+    const intent = ctx.data.blindAuthorityRepairV1,
+      input = await readWorkerAttemptInput(ctx, intent.key);
+    assert.equal(intent.originals[0].failure.code, "REVIEW_OUTPUT");
+    assert.equal(intent.originals[0].result, null);
+    assert.equal(intent.originals[0].raw, LEGACY_BLIND_AUTHORITY_REFUSAL);
+    assert.equal(
+      intent.originals[0].rawSha256,
+      sha(LEGACY_BLIND_AUTHORITY_REFUSAL),
+    );
+    for (const original of f.originals.slice(1)) {
+      const selected = ctx.data.reviewsV2.find(
+        (review: any) => review.lens === original.lens,
+      );
+      assert.equal(selected.attemptId, original.resumed.receipt.attemptId);
+      assert.deepEqual(selected.provenance, original.resumed.provenance);
+      assert.equal(selected.result.rawSha256, sha(original.resumed.raw));
+    }
+    const authority = await readReviewAuthority(ctx);
+    assert.deepEqual(input.provenance.projectAuthority, authority.binding);
+    const delivered = (await f.ledgerRows()).find((row: any) =>
+      row.out.includes("review-authority-v1-blind-"),
+    );
+    assert.equal(delivered.sha256, input.provenance.promptSha256);
+    assert.equal(delivered.bytes, Buffer.byteLength(input.prompt, "utf8"));
+    for (const [name, file] of Object.entries(authority.files) as [
+      string,
+      any,
+    ][]) {
+      assert.ok(input.prompt.includes(file.text));
+      assert.equal(input.provenance.inlineInputs[name], sha(file.text));
+    }
+    for (const forbidden of [
+      LEGACY_BLIND_AUTHORITY_REFUSAL,
+      LEGACY_BLIND_AUTHORITY_PROGRESS,
+      ctx.data.specFile,
+      ctx.data.intent,
+      "claims_file (leave unread",
+    ])
+      assert.ok(!input.prompt.includes(forbidden), forbidden);
+    assert.equal(ctx.data.sourceDigest, source);
+    assert.equal(ctx.data.spec.frozenSha256, frozen);
+    assert.equal(preserved(), originalPlanning);
+    assert.deepEqual(await f.originalBytes(), originals);
+    assert.equal((await f.ledgerRows()).length, 3);
+    assert.equal(
+      Object.keys(ctx.state.attempts).filter((key) =>
+        key.startsWith("review:authority-"),
+      ).length,
+      1,
+    );
+    const keys = Object.keys(ctx.state.attempts);
+    await adapter.runStage("review", ctx);
+    assert.deepEqual(Object.keys(ctx.state.attempts), keys);
+    assert.deepEqual(await f.originalBytes(), originals);
+    assert.equal(preserved(), originalPlanning);
+    assert.equal((await f.ledgerRows()).length, 3);
+    if (boundary === "none") {
+      const reviews = structuredClone(ctx.data.reviewsV2);
+      for (const lens of ["edge", "blind"]) {
+        await ctx.save({
+          reviewsV2: reviews.map((review: any) =>
+            review.lens === lens
+              ? { ...review, attemptId: "f".repeat(24) }
+              : { ...review },
+          ),
+        });
+        await assert.rejects(adapter.runStage("review", ctx), {
+          code: "REVIEW_INPUT",
+        });
+        assert.deepEqual(Object.keys(ctx.state.attempts), keys);
+        assert.deepEqual(await f.originalBytes(), originals);
+        assert.equal((await f.ledgerRows()).length, 3);
+        assert.equal(preserved(), originalPlanning);
+        await ctx.save({ reviewsV2: structuredClone(reviews) });
+      }
+    }
+  });
+}
+
+for (const type of ["error", "turn.failed"]) {
+  test(`blind authority repair rejects native ${type} history even with exit zero and exact refusal`, async (t) => {
+    const event = { type, error: { message: "explicit failed model turn" } },
+      f = await reviewAuthorityFixture(t, { stdoutEvents: [event] }),
+      bytes = await f.originalBytes(),
+      keys = Object.keys(f.ctx.state.attempts),
+      original = f.originals[0],
+      adapter = createAdapter({
+        worker: f.worker,
+        linear: { async comment() {} } as any,
+      });
+    assert.equal(original.resumed.receipt.exitCode, 0);
+    assert.equal(original.resumed.raw, LEGACY_BLIND_AUTHORITY_REFUSAL);
+    const stdout = await readFile(original.resumed.receipt.stdoutPath, "utf8");
+    assert.ok(stdout.includes(`${JSON.stringify(event)}\n`));
+    for (let resume = 0; resume < 2; resume++) {
+      await assert.rejects(adapter.runStage("review", f.ctx), {
+        code: "REVIEW_OUTPUT",
+      });
+      assert.equal(f.ctx.data.blindAuthorityRepairV1, undefined);
+      assert.deepEqual(await f.originalBytes(), bytes);
+      assert.deepEqual(Object.keys(f.ctx.state.attempts), keys);
+      assert.equal((await f.ledgerRows()).length, 2);
+    }
+  });
+}
+
+test("blind authority allowlist rejects changed refusal bytes, extra stdout prose and findings in every original lens", async (t) => {
+  const f = await reviewAuthorityFixture(t),
+    ctx = f.ctx,
+    before = await f.originalBytes(),
+    adapter = createAdapter({
+      worker: f.worker,
+      linear: { async comment() {} } as any,
+    }),
+    edge = {
+      location: "src/a.ts:3",
+      trigger_condition: "Failure between steps",
+      guard_snippet: "reconcile();",
+      potential_consequence: "Duplicate side effect",
+      kind: "claim",
+      confidence: "high",
+    },
+    gap =
+      "### Missing assertion\n- **Changed surface:** src/a.ts:1\n- **Impacted consumer or site:** src/caller.ts:4\n- **Existing test evidence:** tests/a.ts:3 reads the old branch\n- **Missing verification:** Assert failure return value\n- **Demonstration:** Invert the branch; current assertions still pass\n- **Consequence:** Caller reports success after failure\n- **Disposition:** patch — add caller regression\n";
+  const mutations = [
+    {
+      lens: "blind",
+      raw: `${LEGACY_BLIND_AUTHORITY_REFUSAL}\n`,
+      code: "REVIEW_OUTPUT",
+    },
+    {
+      lens: "blind",
+      raw: `${LEGACY_BLIND_AUTHORITY_REFUSAL} Extra.`,
+      code: "REVIEW_OUTPUT",
+    },
+    {
+      lens: "blind",
+      raw: "Review not performed because a different input was missing.",
+      code: "REVIEW_OUTPUT",
+    },
+    {
+      lens: "blind",
+      raw: '[{"location":"src/a.ts:3","description":"Failure duplicates the write"}]',
+      code: "REVIEW_FINDINGS",
+    },
+    { lens: "edge", raw: JSON.stringify([edge]), code: "REVIEW_FINDINGS" },
+    { lens: "verification", raw: gap, code: "REVIEW_FINDINGS" },
+  ];
+  for (const mutation of mutations) {
+    const original = f.originals.find(
+        (item: any) => item.lens === mutation.lens,
+      ),
+      file = original.resumed.outputPath,
+      bytes = await readFile(file);
+    await writeFile(file, mutation.raw);
+    await assert.rejects(adapter.runStage("review", ctx), {
+      code: mutation.code,
+    });
+    assert.equal(await readFile(file, "utf8"), mutation.raw);
+    await writeFile(file, bytes);
+  }
+  const blind = f.originals[0],
+    stdout = blind.resumed.receipt.stdoutPath,
+    stdoutBytes = await readFile(stdout);
+  for (const text of [
+    `${stdoutBytes.toString("utf8")}${JSON.stringify({ type: "item.completed", item: { type: "agent_message", text: "Extra prose" } })}\n`,
+    stdoutBytes
+      .toString("utf8")
+      .replace(
+        LEGACY_BLIND_AUTHORITY_REFUSAL,
+        `${LEGACY_BLIND_AUTHORITY_REFUSAL} `,
+      ),
+  ]) {
+    await writeFile(stdout, text);
+    await assert.rejects(adapter.runStage("review", ctx), {
+      code: "REVIEW_OUTPUT",
+    });
+    assert.equal(await readFile(stdout, "utf8"), text);
+  }
+  await writeFile(stdout, stdoutBytes);
+  assert.deepEqual(await f.originalBytes(), before);
+  assert.equal(ctx.data.blindAuthorityRepairV1, undefined);
+  assert.equal((await f.ledgerRows()).length, 2);
+});
+
+test("blind authority repair does not apply to newer bound inputs", async (t) => {
+  const f = await reviewAuthorityFixture(t, { newerBlind: true }),
+    bytes = await f.originalBytes(),
+    adapter = createAdapter({
+      worker: f.worker,
+      linear: { async comment() {} } as any,
+    });
+  for (let resume = 0; resume < 2; resume++)
+    await assert.rejects(adapter.runStage("review", f.ctx), {
+      code: "REVIEW_OUTPUT",
+    });
+  assert.equal(f.ctx.data.blindAuthorityRepairV1, undefined);
+  assert.deepEqual(await f.originalBytes(), bytes);
+  assert.equal((await f.ledgerRows()).length, 2);
+});
+
+test("blind authority repair requires all original identity-valid terminal receipts", async (t) => {
+  const f = await reviewAuthorityFixture(t),
+    originals = await f.originalBytes(),
+    keys = Object.keys(f.ctx.state.attempts),
+    adapter = createAdapter({
+      worker: f.worker,
+      linear: { async comment() {} } as any,
+    }),
+    original = f.originals[2],
+    receiptFile = path.join(original.directory, "receipt.json"),
+    bytes = await readFile(receiptFile),
+    receipt = JSON.parse(bytes.toString("utf8"));
+  for (const variant of ["missing", "corrupt", "mismatch", "failed"]) {
+    if (variant === "missing") await rm(receiptFile);
+    else
+      await writeFile(
+        receiptFile,
+        variant === "corrupt"
+          ? "{"
+          : JSON.stringify({
+              ...receipt,
+              ...(variant === "mismatch"
+                ? { requestDigest: "0".repeat(64) }
+                : { exitCode: 7 }),
+            }),
+      );
+    const changed = variant === "missing" ? null : await readFile(receiptFile);
+    await assert.rejects(adapter.runStage("review", f.ctx), {
+      code:
+        variant === "missing" || variant === "mismatch"
+          ? "UNKNOWN_ATTEMPT"
+          : variant === "failed"
+            ? "WORKER_FAILED"
+            : "CORRUPT_STATE",
+    });
+    if (variant === "missing")
+      await assert.rejects(readFile(receiptFile), { code: "ENOENT" });
+    else assert.deepEqual(await readFile(receiptFile), changed);
+    assert.equal(f.ctx.data.blindAuthorityRepairV1, undefined);
+    assert.deepEqual(Object.keys(f.ctx.state.attempts), keys);
+    assert.equal((await f.ledgerRows()).length, 2);
+    await writeFile(receiptFile, bytes);
+    assert.deepEqual(await f.originalBytes(), originals);
+  }
+});
+
+test("blind authority repair never dispatches while an original native reviewer is live", async (t) => {
+  const f = await reviewAuthorityFixture(t, { liveLens: "edge" }),
+    keys = Object.keys(f.ctx.state.attempts);
+  try {
+    await assert.rejects(
+      createAdapter({ worker: f.worker }).runStage("review", f.ctx),
+      { code: "UNKNOWN_ATTEMPT" },
+    );
+    assert.equal(f.ctx.data.blindAuthorityRepairV1, undefined);
+    assert.deepEqual(Object.keys(f.ctx.state.attempts), keys);
+    assert.equal((await f.ledgerRows()).length, 2);
+  } finally {
+    await writeFile(f.liveGate, "finish");
+    await assert.rejects(f.initialRun, { code: "REVIEW_OUTPUT" });
+  }
+});
+
+test("blind authority repair rejects absent or changed authority before replacement dispatch", async (t) => {
+  const f = await reviewAuthorityFixture(t),
+    ctx = f.ctx;
+  ctx.fault = async (point: string) => {
+    if (point === "after-blind-authority-intent")
+      throw new Error("intent saved");
+  };
+  const adapter = createAdapter({
+    worker: f.worker,
+    linear: { async comment() {} } as any,
+  });
+  await assert.rejects(adapter.runStage("review", ctx), /intent saved/);
+  ctx.fault = async () => {};
+  const file = path.join(f.root, "docs/agents/bmad-policy.md"),
+    bytes = await readFile(file);
+  for (const variant of ["missing", "changed"]) {
+    if (variant === "missing") await rm(file);
+    else await writeFile(file, `${bytes.toString("utf8")}\nchanged`);
+    await assert.rejects(
+      buildWorkerPrompt(ctx, {
+        kind: "review",
+        lens: "blind",
+        identity: ctx.data.sourceDigest,
+        authorityRepair: true,
+      }),
+      { code: "REVIEW_INPUT" },
+    );
+    await assert.rejects(adapter.runStage("review", ctx));
+    assert.equal((await f.ledgerRows()).length, 2);
+    assert.equal(
+      Object.keys(ctx.state.attempts).some((key) =>
+        key.startsWith("review:authority-"),
+      ),
+      false,
+    );
+    await writeFile(file, bytes);
+  }
+});
+
+for (const outcome of ["invalid", "failed", "finding"]) {
+  test(`blind authority replacement ${outcome} remains a stable stop without another generation`, async (t) => {
+    const replacement =
+        outcome === "failed"
+          ? { fixtureExit: 7 }
+          : outcome === "invalid"
+            ? "Review not performed."
+            : '[{"location":"src/a.ts:3","description":"Failure duplicates the write"}]',
+      f = await reviewAuthorityFixture(t, { replacement }),
+      before = await f.originalBytes(),
+      adapter = createAdapter({
+        worker: f.worker,
+        linear: { async comment() {} } as any,
+      });
+    for (let resume = 0; resume < 2; resume++)
+      await assert.rejects(adapter.runStage("review", f.ctx), {
+        code:
+          outcome === "failed"
+            ? "WORKER_FAILED"
+            : outcome === "finding"
+              ? "REVIEW_FINDINGS"
+              : "REVIEW_OUTPUT",
+      });
+    assert.deepEqual(await f.originalBytes(), before);
+    assert.equal((await f.ledgerRows()).length, 3);
+    assert.equal(
+      Object.keys(f.ctx.state.attempts).filter((key) =>
+        key.startsWith("review:authority-"),
+      ).length,
+      1,
+    );
+  });
 }
 
 test("bound presentation schema represents blocked null results and exact worker targets including directory-scope boundaries", async (t) => {
@@ -1800,6 +2382,22 @@ test("snapshot prompts preserve blind/verification separation and delay edge cla
     });
     assert.equal(result.provenance.diffSha256, sha(diff));
     assert.equal(result.provenance.promptSha256, sha(result.prompt));
+    const authority = await readReviewAuthority(f.ctx);
+    assert.deepEqual(result.provenance.projectAuthority, authority.binding);
+    for (const [name, file] of Object.entries(authority.files) as [
+      string,
+      any,
+    ][]) {
+      assert.ok(result.prompt.includes(file.text));
+      assert.equal(result.provenance.inlineInputs[name], file.sha256);
+    }
+    assert.match(
+      result.prompt,
+      /may run ordinary read-only inspection commands/,
+    );
+    assert.match(result.prompt, /Only for these explicitly supplied paths/);
+    assert.match(result.prompt, /does not prohibit opening the diff_file/);
+    assert.ok(!result.prompt.includes("do not launch another process"));
     assert.ok(
       !result.prompt.includes(diff),
       "Native review launch keeps the diff file-only",

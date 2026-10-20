@@ -240,7 +240,7 @@ function outputPath(args, runDir) {
   return output;
 }
 
-export async function resumeWorkerAttempt(ctx, key) {
+export async function readWorkerAttemptInput(ctx, key) {
   const attempt = ctx.state.attempts[key];
   if (!attempt || !/^[a-f0-9]{24}$/.test(attempt.id))
     throw problem("UNKNOWN_ATTEMPT", `Missing immutable worker attempt ${key}`);
@@ -260,7 +260,8 @@ export async function resumeWorkerAttempt(ctx, key) {
       `Recorded worker request identity differs for ${key}`,
     );
   let args = request.args,
-    provenance;
+    provenance,
+    prompt;
   if (args[1] === "--execute-input") {
     const raw = await readFile(args[2], "utf8");
     if (digest(raw) !== args[3])
@@ -269,8 +270,25 @@ export async function resumeWorkerAttempt(ctx, key) {
     await verifyWorkerSchema(input);
     args = input.args;
     provenance = input.provenance;
+    prompt = input.prompt;
   }
   const output = outputPath(args, ctx.runDir);
+  return {
+    request,
+    outputPath: output,
+    prompt: prompt ?? args.at(-1) ?? "",
+    provenance: provenance ?? {
+      deliveryProtocol: 1,
+      promptSha256: digest(args.at(-1) ?? ""),
+    },
+    requestDigest: request.requestDigest,
+    inputSha256: request.args[1] === "--execute-input" ? request.args[3] : null,
+    inputPath: request.args[1] === "--execute-input" ? request.args[2] : null,
+  };
+}
+export async function resumeWorkerAttempt(ctx, key) {
+  const input = await readWorkerAttemptInput(ctx, key),
+    request = input.request;
   const receipt = await ctx.supervise({
     key,
     command: request.command,
@@ -282,7 +300,7 @@ export async function resumeWorkerAttempt(ctx, key) {
   });
   let raw;
   try {
-    raw = await readFile(output, "utf8");
+    raw = await readFile(input.outputPath, "utf8");
   } catch (error) {
     if (error.code !== "ENOENT") throw error;
     raw = null;
@@ -290,14 +308,11 @@ export async function resumeWorkerAttempt(ctx, key) {
   return {
     receipt,
     raw,
-    outputPath: output,
-    provenance: provenance ?? {
-      deliveryProtocol: 1,
-      promptSha256: digest(args.at(-1) ?? ""),
-    },
-    requestDigest: request.requestDigest,
-    inputSha256: request.args[1] === "--execute-input" ? request.args[3] : null,
-    inputPath: request.args[1] === "--execute-input" ? request.args[2] : null,
+    outputPath: input.outputPath,
+    provenance: input.provenance,
+    requestDigest: input.requestDigest,
+    inputSha256: input.inputSha256,
+    inputPath: input.inputPath,
   };
 }
 const snapshotFiles = [
@@ -875,7 +890,104 @@ function reviewBlock(step, lens) {
     .replace(/^Launch a context-free subagent with this prompt:\s*/, "");
 }
 
-export async function buildWorkerPrompt(ctx, { kind, lens, identity }) {
+export const LEGACY_BLIND_AUTHORITY_REFUSAL =
+  "Omezení přezkumu: Diff byl přečten a jeho SHA256 odpovídá zadání. Povinné inline znění `docs/agents/bmad-policy.md` však chybí a protokol zakazuje soubor znovu otevřít. Přezkum proto není dokončený; nelze vrátit `[]` jako čistý výsledek.";
+export const LEGACY_BLIND_AUTHORITY_PROGRESS =
+  "Přečtu dodaný diff a relevantní kód v rozsahu review. Vrátím jen doložené nálezy, případně omezení přezkumu.\n";
+
+// This is a comparison fingerprint of the one coordinator-reviewed legacy
+// delivery error, never a prompt to dispatch or a generic prose classifier.
+export function legacyBlindAuthorityPrompt(ctx, snapshot) {
+  const worktree = ctx.data.worktree,
+    diffFile = path.join(ctx.runDir, "source-diff.txt");
+  const block = reviewBlock(
+    snapshot.files["step-04-review.md"].text,
+    "blind",
+  ).replaceAll("{diff_file}", diffFile);
+  return `You are the independent reviewer already launched by the controller. Execute only this reviewer task; do not launch another process or agent. Read-only; do not edit files, stage, commit, or invoke a workflow.\nWorktree: ${worktree}\nProject instructions: ${path.join(worktree, "AGENTS.md")} and ${path.join(worktree, "docs/agents/bmad-policy.md")}\nReview scope paths: ${JSON.stringify(ctx.data.workerTask.writePaths)}\nFrozen source identity: ${ctx.data.sourceDigest}\nDiff SHA256: ${ctx.data.sourceDiffSha256}\n\n${block}\n\nDelivery protocol 2: the hash-verified snapshot instruction files named above are supplied in full below. Use these exact inline instruction bodies instead of reopening their ignored paths. Preserve the native lens method/output format, including reading the diff from its provided file path; the diff text is intentionally not included in this prompt. If any required input cannot be read, report the limitation; never claim a clean review.\n`;
+}
+export function isLegacyBlindAuthorityInput(ctx, snapshot, input) {
+  return (
+    input.provenance?.deliveryProtocol === DELIVERY_PROTOCOL &&
+    input.provenance.projectAuthority === undefined &&
+    object(input.provenance.inlineInputs) &&
+    Object.keys(input.provenance.inlineInputs).length === 0 &&
+    input.prompt === legacyBlindAuthorityPrompt(ctx, snapshot) &&
+    input.provenance.promptSha256 === digest(input.prompt)
+  );
+}
+export function isExactLegacyBlindAuthorityRefusal(rawBytes, stdoutBytes) {
+  if (!Buffer.from(LEGACY_BLIND_AUTHORITY_REFUSAL, "utf8").equals(rawBytes))
+    return false;
+  const stdout = stdoutBytes.toString("utf8");
+  if (!Buffer.from(stdout, "utf8").equals(stdoutBytes)) return false;
+  let messages;
+  try {
+    const events = stdout
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .map((line) => JSON.parse(line));
+    if (
+      events.some(
+        (event) => event.type === "error" || event.type === "turn.failed",
+      )
+    )
+      return false;
+    messages = events
+      .filter(
+        (event) =>
+          event.type === "item.completed" &&
+          event.item?.type === "agent_message",
+      )
+      .map((event) => event.item.text);
+  } catch {
+    return false;
+  }
+  return (
+    messages.length === 2 &&
+    messages[0] === LEGACY_BLIND_AUTHORITY_PROGRESS &&
+    messages[1] === LEGACY_BLIND_AUTHORITY_REFUSAL &&
+    Buffer.from(messages[1], "utf8").equals(rawBytes)
+  );
+}
+export async function readReviewAuthority(ctx) {
+  const files = {};
+  for (const name of ["AGENTS.md", "docs/agents/bmad-policy.md"]) {
+    const file = path.join(ctx.data.worktree, name);
+    let text;
+    try {
+      text = await readFile(file, "utf8");
+    } catch {
+      throw problem(
+        "REVIEW_INPUT",
+        `Required project authority is unreadable: ${name}`,
+      );
+    }
+    if (!text.trim())
+      throw problem(
+        "REVIEW_INPUT",
+        `Required project authority is empty: ${name}`,
+      );
+    files[name] = { path: file, text, sha256: digest(text) };
+  }
+  return {
+    files,
+    binding: {
+      version: 1,
+      files: Object.fromEntries(
+        Object.entries(files).map(([name, file]) => [
+          name,
+          { path: file.path, sha256: file.sha256 },
+        ]),
+      ),
+    },
+  };
+}
+
+export async function buildWorkerPrompt(
+  ctx,
+  { kind, lens, identity, authorityRepair = false },
+) {
   const snapshot = await loadBmadSnapshot(
     ctx.data.renderedWorkflow,
     ctx.data.bmadSnapshot,
@@ -883,6 +995,7 @@ export async function buildWorkerPrompt(ctx, { kind, lens, identity }) {
   const paths = snapshot.files,
     worktree = ctx.data.worktree;
   let prompt,
+    projectAuthority,
     specSha256 = null,
     diffSha256 = null;
   const inlineInputs = {};
@@ -895,6 +1008,22 @@ export async function buildWorkerPrompt(ctx, { kind, lens, identity }) {
       .map((name) => deliver(name, paths[name].text, paths[name].sha256))
       .join("");
   if (kind === "review") {
+    const authority = await readReviewAuthority(ctx);
+    projectAuthority = authority.binding;
+    if (
+      authorityRepair &&
+      (lens !== "blind" ||
+        !ctx.data.blindAuthorityRepairV1 ||
+        digest(projectAuthority) !==
+          digest(ctx.data.blindAuthorityRepairV1.authority))
+    )
+      throw problem(
+        "REVIEW_INPUT",
+        "Blind authority repair inputs differ from their durable intent",
+      );
+    const authorityInput = Object.entries(authority.files)
+      .map(([name, file]) => deliver(name, file.text, file.sha256))
+      .join("");
     const diffFile = path.join(ctx.runDir, "source-diff.txt");
     let diff;
     try {
@@ -943,7 +1072,10 @@ export async function buildWorkerPrompt(ctx, { kind, lens, identity }) {
       lens === "edge"
         ? "claims_file is NOT included inline: read that original spec file only at the native late claims step, after tracing. "
         : "";
-    prompt = `You are the independent reviewer already launched by the controller. Execute only this reviewer task; do not launch another process or agent. Read-only; do not edit files, stage, commit, or invoke a workflow.\nWorktree: ${worktree}\nProject instructions: ${path.join(worktree, "AGENTS.md")} and ${path.join(worktree, "docs/agents/bmad-policy.md")}\nReview scope paths: ${JSON.stringify(ctx.data.workerTask.writePaths)}\nFrozen source identity: ${identity}\nDiff SHA256: ${diffSha256}\n\n${block}\n\nDelivery protocol 2: the hash-verified snapshot instruction files named above are supplied in full below. Use these exact inline instruction bodies instead of reopening their ignored paths. Preserve the native lens method/output format, including reading the diff from its provided file path; the diff text is intentionally not included in this prompt. ${deferredClaims}If any required input cannot be read, report the limitation; never claim a clean review.\n${lensInput}`;
+    const inlinePaths = Object.keys(inlineInputs).map(
+      (name) => authority.files[name]?.path ?? paths[name].path,
+    );
+    prompt = `You are the independent reviewer already launched by the controller. Execute only this reviewer task. You may run ordinary read-only inspection commands to read the diff and relevant code. Do not launch other agents, workflows, servers or long-running helper processes. Do not edit files, stage or commit.\nWorktree: ${worktree}\nProject instructions: ${path.join(worktree, "AGENTS.md")} and ${path.join(worktree, "docs/agents/bmad-policy.md")}\nReview scope paths: ${JSON.stringify(ctx.data.workerTask.writePaths)}\nFrozen source identity: ${identity}\nDiff SHA256: ${diffSha256}\n\n${block}\n\nDelivery protocol 2: complete hash-verified bodies are supplied below for EXACTLY these paths: ${JSON.stringify(inlinePaths)}. Only for these explicitly supplied paths, use their inline bodies instead of reopening them. Other required references may be read with ordinary read-only commands. This instruction does not prohibit opening the diff_file${lens === "edge" ? " or the deferred claims_file" : ""}. Preserve the native lens method/output format, including reading the diff from its provided file path; the diff text is intentionally not included in this prompt. ${deferredClaims}If a required input is unavailable, report the limitation; never claim a clean review.\n${authorityInput}${lensInput}`;
   } else if (
     [
       "plan-readiness",
@@ -1070,6 +1202,7 @@ export async function buildWorkerPrompt(ctx, { kind, lens, identity }) {
       snapshot: snapshot.identity,
       specSha256,
       diffSha256,
+      ...(projectAuthority ? { projectAuthority } : {}),
       ...([
         "plan",
         "plan-readiness",
@@ -1193,12 +1326,22 @@ export function parseReviewResult(lens, raw) {
 
 export async function runWorker(
   ctx,
-  { kind, lens, identity, heartbeat },
+  { kind, lens, identity, heartbeat, authorityRepair = false },
   { command = "codex", prefixArgs = [] } = {},
 ) {
+  if (
+    authorityRepair &&
+    (kind !== "review" || lens !== "blind" || !ctx.data.blindAuthorityRepairV1)
+  )
+    throw problem(
+      "REVIEW_INPUT",
+      "No durable intent authorizes this single blind repair",
+    );
   const key =
     kind === "review"
-      ? `review:v2:${lens}:${identity.slice(0, 32)}`
+      ? authorityRepair
+        ? `review:authority-v1:blind:${identity.slice(0, 32)}`
+        : `review:v2:${lens}:${identity.slice(0, 32)}`
       : kind === "plan-readiness"
         ? "plan-readiness:v2"
         : kind === "plan-readiness-v3"
@@ -1225,7 +1368,12 @@ export async function runWorker(
     ({ receipt, provenance, raw } = resumed);
     actualOutput = resumed.outputPath;
   } else {
-    const built = await buildWorkerPrompt(ctx, { kind, lens, identity });
+    const built = await buildWorkerPrompt(ctx, {
+      kind,
+      lens,
+      identity,
+      authorityRepair,
+    });
     const outputSchema =
       kind === "review" ? null : await prepareWorkerSchema(ctx, key, kind);
     provenance = {
