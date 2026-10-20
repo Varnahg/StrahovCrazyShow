@@ -11,7 +11,6 @@ import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
 import {
   acquireCarPack,
   CAR_PACK_MANIFEST,
-  type CarLod,
   type CarRig,
 } from "../client/car-pack";
 import { VEHICLE_WHEELS, VEHICLE_TUNING } from "../shared/vehicle";

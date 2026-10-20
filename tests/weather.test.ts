@@ -7,7 +7,6 @@ import {
   pragueStationInstant,
   sunState,
   windVector,
-  type Weather,
 } from "../shared/weather";
 import {
   createWeatherProvider,
