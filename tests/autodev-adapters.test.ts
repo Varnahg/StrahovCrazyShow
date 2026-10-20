@@ -5,6 +5,7 @@ import {
   mkdir,
   writeFile,
   readFile,
+  readdir,
   copyFile,
   rm,
   symlink,
@@ -30,6 +31,12 @@ const {
 const { GitHubClient, checkoutEvidence, execute } = await import(
   new URL("../scripts/autodev/github.mjs", import.meta.url).href
 );
+const { supervise: nativeSupervise } = await import(
+  new URL("../scripts/autodev/process.mjs", import.meta.url).href
+);
+const { atomicWriteJson } = await import(
+  new URL("../scripts/autodev/store.mjs", import.meta.url).href
+);
 const { LinearClient, decodeToolResult, normalizeIssue } = await import(
   new URL("../scripts/autodev/linear.mjs", import.meta.url).href
 );
@@ -42,6 +49,11 @@ const {
   buildWorkerPrompt,
   parseReviewResult,
   runWorker,
+  planningInputHashes,
+  assertPlanningReady,
+  prepareWorkerInput,
+  executeWorkerInput,
+  resumeWorkerAttempt,
 } = await import(new URL("../scripts/autodev/codex.mjs", import.meta.url).href);
 
 const sourceRoot = path.resolve(
@@ -73,7 +85,14 @@ async function fixture(t: any) {
     root = path.join(folder, "repo");
   t.after(async () => {
     assert.ok(folder.startsWith(path.join(tmpdir(), "autodev-adapters-")));
-    await rm(folder, { recursive: true, force: true });
+    try {
+      await reportNativeFailures(
+        path.join(root, ".git/autodev/test"),
+        (message: string) => t.diagnostic(message),
+      );
+    } finally {
+      await rm(folder, { recursive: true, force: true });
+    }
   });
   await mkdir(path.join(root, "src"), { recursive: true });
   await mkdir(path.join(root, "scripts"));
@@ -188,6 +207,8 @@ async function fixture(t: any) {
 
 const sha = (text: string) => createHash("sha256").update(text).digest("hex");
 const validPlan = () => ({
+  ready: true,
+  runtimeBlockers: [] as string[],
   research: "Read the CLI and its callers; preserve existing behavior.",
   alternatives: ["early help", "shared parser"],
   decision: "Early help matches the assignment.",
@@ -240,12 +261,235 @@ async function bmadFixture(f: any, createSpec = true) {
   f.ctx.data.renderedWorkflow = path.join(root, "workflow.md");
   const snapshot = await loadBmadSnapshot(f.ctx.data.renderedWorkflow);
   f.ctx.data.bmadSnapshot = snapshot.identity;
-  f.ctx.data.plan = { result: validPlan() };
+  f.ctx.planProvenance = {
+    deliveryProtocol: 2,
+    inlineInputs: planningInputHashes(snapshot),
+    snapshot: snapshot.identity,
+  };
+  f.ctx.data.plan = { result: validPlan(), provenance: f.ctx.planProvenance };
   f.ctx.data.intent =
     "Preserve this exact user-owned requirement, including punctuation!";
   f.ctx.assignment.intentFile = "intent.md";
   if (createSpec) await writeSpecification(f.ctx, snapshot, "ready-for-dev");
   return snapshot;
+}
+function cleanReview(ctx: any, lens: string) {
+  return {
+    result: parseReviewResult(
+      lens,
+      lens === "verification" ? "No verification gaps found." : "[]",
+    ),
+    provenance: { deliveryProtocol: 2, diffSha256: ctx.data.sourceDiffSha256 },
+    attemptId: lens,
+  };
+}
+
+async function waitFor(read: () => Promise<any>, label: string) {
+  const until = Date.now() + 15_000;
+  while (Date.now() < until) {
+    const value = await read();
+    if (value) return value;
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  throw new Error(`Timed out: ${label}`);
+}
+async function reportNativeFailures(
+  runDir: string,
+  report: (message: string) => void,
+) {
+  const attempts = path.join(runDir, "attempts");
+  let entries;
+  try {
+    entries = await readdir(attempts, { withFileTypes: true });
+  } catch (error: any) {
+    if (error.code === "ENOENT") return;
+    throw error;
+  }
+  const read = async (file: string) => {
+    try {
+      return await readFile(file, "utf8");
+    } catch (error: any) {
+      return `[unavailable: ${error.code}]`;
+    }
+  };
+  for (const entry of entries.filter((entry) => entry.isDirectory())) {
+    const dir = path.join(attempts, entry.name),
+      raw = await read(path.join(dir, "receipt.json"));
+    let receipt;
+    try {
+      receipt = JSON.parse(raw);
+    } catch {
+      /* Preserve invalid/missing receipt diagnostics too. */
+    }
+    if (receipt?.exitCode === 0 && !receipt.signal && !receipt.heartbeatError)
+      continue;
+    report(
+      `Native attempt failure before fixture cleanup: ${dir}\nreceipt.json:\n${raw}\nrequest.json:\n${await read(path.join(dir, "request.json"))}\nstderr.log:\n${await read(path.join(dir, "stderr.log"))}\nstdout.log:\n${await read(path.join(dir, "stdout.log"))}`,
+    );
+  }
+}
+function nativeSupervisor(ctx: any) {
+  return (options: any) =>
+    nativeSupervise(
+      {
+        runId: ctx.runId,
+        runDir: ctx.runDir,
+        state: ctx.state,
+        persist: async () => {},
+        emit: (event: any) => ctx.emit(event),
+        fault: (point: string) => ctx.fault(point),
+      },
+      options,
+    );
+}
+async function originalAttempt(
+  ctx: any,
+  key: string,
+  raw: string,
+  gate?: string,
+  writes: Record<string, string> = {},
+) {
+  const output = path.join(ctx.runDir, `original-${sha(key).slice(0, 16)}.txt`);
+  const write = Object.entries({ ...writes, [output]: raw })
+    .map(
+      ([file, text]) =>
+        `fs.writeFileSync(${JSON.stringify(file)},${JSON.stringify(text)},'utf8');`,
+    )
+    .join("");
+  const script = `const fs=require('node:fs');${gate ? `const limit=Date.now()+60000;const timer=setInterval(()=>{if(fs.existsSync(${JSON.stringify(gate)})){clearInterval(timer);${write}}else if(Date.now()>limit){clearInterval(timer);process.exitCode=9;}},20);` : write}`;
+  return ctx.supervise({
+    key,
+    command: process.execPath,
+    args: ["-e", script, "--", "-o", output],
+    cwd: ctx.data.worktree,
+  });
+}
+async function legacyFixture(
+  t: any,
+  liveLens?: string,
+  rawByLens: Record<string, string> = {},
+) {
+  const f = await fixture(t),
+    snapshot = await bmadFixture(f, false),
+    ctx = f.ctx;
+  ctx.data.plan.result.risks = [
+    "Original renderer inputs were inaccessible (EACCES); this is retained historical evidence.",
+  ];
+  await writeSpecification(ctx, snapshot, "ready-for-dev");
+  delete ctx.data.plan.result.ready;
+  delete ctx.data.plan.result.runtimeBlockers;
+  ctx.data.plan.provenance = {
+    deliveryProtocol: 1,
+    snapshot: snapshot.identity,
+  };
+  ctx.supervise = nativeSupervisor(ctx);
+  await originalAttempt(ctx, "plan", JSON.stringify(ctx.data.plan.result));
+  const implementation = {
+    summary: "One completed implementation",
+    changedFiles: ["src/new.txt"],
+    checks: [],
+    risks: [],
+  };
+  const implementationReceipt = await originalAttempt(
+    ctx,
+    "implement",
+    JSON.stringify(implementation),
+  );
+  ctx.data.implementation = {
+    result: implementation,
+    attemptId: implementationReceipt.attemptId,
+  };
+  await writeFile(
+    path.join(f.root, "src/new.txt"),
+    "candidate from the original implementation\n",
+  );
+  const source = await sourceIdentity(
+    f.root,
+    ctx.data.baseSha,
+    ctx.data.workerTask.writePaths,
+  );
+  Object.assign(ctx.data, {
+    sourceDigest: source.digest,
+    sourceDiffSha256: sha(source.diff),
+  });
+  await writeFile(path.join(ctx.runDir, "source-diff.txt"), source.diff);
+  await writeSpecification(ctx, snapshot, "in-review");
+  ctx.data.reviewBefore = await workingSnapshot(f.root);
+  delete ctx.data.reviews;
+  const originals: string[] = [];
+  let live: Promise<any> | undefined, gate: string | undefined;
+  for (const lens of ["blind", "edge", "verification"]) {
+    const key = `review:${lens}:${source.digest.slice(0, 32)}`;
+    originals.push(key);
+    const raw =
+      rawByLens[lens] ??
+      (lens === "blind"
+        ? "[]"
+        : "Review stopped: the required instruction file was unreadable. No review was performed or files changed.");
+    if (lens === liveLens) {
+      gate = path.join(ctx.runDir, "finish-original-review");
+      live = originalAttempt(ctx, key, raw, gate);
+      live.catch(() => {});
+      await waitFor(
+        async () => ctx.state.attempts[key],
+        "original dispatch checkpoint",
+      );
+    } else await originalAttempt(ctx, key, raw);
+  }
+  const { worker, ledgerRows } = await protocol2WorkerFixture(ctx);
+  const immutableBytes = async () => {
+    const entries: Record<string, string> = {};
+    for (const key of ["plan", "implement", ...originals]) {
+      const dir = path.join(ctx.runDir, "attempts", ctx.state.attempts[key].id);
+      for (const name of ["request.json", "receipt.json"]) {
+        try {
+          entries[`${key}/${name}`] = await readFile(
+            path.join(dir, name),
+            "utf8",
+          );
+        } catch (error: any) {
+          if (error.code !== "ENOENT") throw error;
+        }
+      }
+    }
+    return entries;
+  };
+  return {
+    ...f,
+    snapshot,
+    worker,
+    originals,
+    live,
+    gate,
+    ledgerRows,
+    immutableBytes,
+  };
+}
+async function protocol2WorkerFixture(ctx: any) {
+  const program = path.join(ctx.runDir, "fake-codex.mjs"),
+    ledger = path.join(ctx.runDir, "v2-workers.jsonl");
+  await writeFile(
+    program,
+    `import fs from 'node:fs';import crypto from 'node:crypto';let prompt='';process.stdin.setEncoding('utf8');process.stdin.on('data',s=>prompt+=s);process.stdin.on('end',()=>{const args=process.argv.slice(2);const out=args[args.indexOf('-o')+1];const schema=args.includes('--output-schema')?args[args.indexOf('--output-schema')+1]:'';fs.appendFileSync(${JSON.stringify(ledger)},JSON.stringify({out,bytes:Buffer.byteLength(prompt),sha256:crypto.createHash('sha256').update(prompt).digest('hex')})+'\\n');const result=schema.endsWith('plan-readiness.json')?JSON.stringify({ready:true,intentGaps:[],runtimeBlockers:[],evidence:['Complete verified inline step2/template and unchanged original candidate inspected.']}):out.includes('verification')?'No verification gaps found.':'[]';fs.writeFileSync(out,result,'utf8');});`,
+  );
+  const worker = (context: any, options: any) =>
+    runWorker(context, options, {
+      command: process.execPath,
+      prefixArgs: [program],
+    });
+  const ledgerRows = async () => {
+    try {
+      return (await readFile(ledger, "utf8"))
+        .trim()
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => JSON.parse(line));
+    } catch (error: any) {
+      if (error.code === "ENOENT") return [];
+      throw error;
+    }
+  };
+  return { worker, ledgerRows };
 }
 
 test("source identity is invariant across add/commit, covers new tests and deletions", async (t) => {
@@ -674,10 +918,7 @@ test("implementation and review replay after progress failure preserve their own
           attemptId: "implement",
         };
       }
-      return {
-        result: { summary: "clean", findings: [] },
-        attemptId: options.lens,
-      };
+      return cleanReview(_ctx, options.lens);
     },
   });
   await assert.rejects(
@@ -772,6 +1013,7 @@ test("intent gaps persist as a draft and block implementation without another mo
     worker: async () => {
       calls++;
       return {
+        provenance: f.ctx.planProvenance,
         result: {
           ...validPlan(),
           intentGaps: ["Which user-visible output is required?"],
@@ -812,7 +1054,7 @@ test("plan spec replay after progress failure preserves exact bytes and original
   const adapter = createAdapter({
     worker: async () => {
       calls++;
-      return { result: validPlan() };
+      return { result: validPlan(), provenance: f.ctx.planProvenance };
     },
     linear: {
       async comment() {
@@ -855,6 +1097,25 @@ test("snapshot prompts preserve blind/verification separation and delay edge cla
     });
     assert.equal(result.provenance.diffSha256, sha(diff));
     assert.equal(result.provenance.promptSha256, sha(result.prompt));
+    assert.ok(
+      !result.prompt.includes(diff),
+      "Native review launch keeps the diff file-only",
+    );
+    assert.ok(
+      result.prompt.includes(path.join(f.ctx.runDir, "source-diff.txt")),
+    );
+    assert.ok(!result.prompt.includes(f.ctx.data.intent));
+    if (lens !== "blind") {
+      const name =
+        lens === "edge"
+          ? "review-prompts/edge-case-hunter.md"
+          : "review-prompts/verification-gap.md";
+      assert.ok(result.prompt.includes(snapshot.files[name].text));
+      assert.equal(
+        result.provenance.inlineInputs[name],
+        snapshot.files[name].sha256,
+      );
+    }
     assert.ok(!result.prompt.includes(f.ctx.assignment.intentFile));
     assert.ok(!result.prompt.includes("plan.json"));
     assert.ok(!result.prompt.includes("workflow.md"));
@@ -1149,6 +1410,811 @@ function freshPr(overrides: any = {}) {
     ...overrides,
   };
 }
+
+test("protocol 2 stdin transport delivers more than 64 KiB UTF-8 and rejects input tampering before spawn", async (t) => {
+  const f = await fixture(t),
+    text = "Příliš žluťoučký kůň 🐎 — přesné podklady\n".repeat(2500),
+    marker = path.join(f.ctx.runDir, "transport-starts");
+  assert.ok(Buffer.byteLength(text, "utf8") > 65536);
+  const script = `const fs=require('node:fs');fs.appendFileSync(${JSON.stringify(marker)},'start\\n');let s='';process.stdin.setEncoding('utf8');process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>{process.stdout.write(s);process.stderr.write('český stderr 🐎');});`;
+  const prepared = await prepareWorkerInput(
+    f.ctx,
+    "transport-v2",
+    ["-e", script],
+    text,
+    { promptSha256: sha(text) },
+    process.execPath,
+  );
+  assert.ok(prepared.args.join(" ").length < 4096);
+  const result = await execute(prepared.command, prepared.args, {
+    cwd: f.root,
+  });
+  assert.equal(result.stdout, text);
+  assert.equal(result.stderr, "český stderr 🐎");
+  const original = await readFile(prepared.file, "utf8");
+  await writeFile(prepared.file, original.replace("Příliš", "Changed"));
+  await assert.rejects(
+    execute(prepared.command, prepared.args, { cwd: f.root }),
+    /Immutable worker input changed/,
+  );
+  assert.equal(await readFile(marker, "utf8"), "start\n");
+  await assert.rejects(
+    prepareWorkerInput(f.ctx, "bad-provenance", [], text, {
+      promptSha256: "0".repeat(64),
+    }),
+    { code: "WORKER_INPUT" },
+  );
+  const missing = await prepareWorkerInput(
+    f.ctx,
+    "missing-command",
+    [],
+    "input",
+    { promptSha256: sha("input") },
+    "autodev-missing-worker-7b9e",
+  );
+  await assert.rejects(
+    execute(missing.command, missing.args, { cwd: f.root }),
+    /WORKER_START/,
+  );
+  const failed = await prepareWorkerInput(
+    f.ctx,
+    "early-exit",
+    ["-e", "process.exit(7)"],
+    text,
+    { promptSha256: sha(text) },
+    process.execPath,
+  );
+  await assert.rejects(
+    execute(failed.command, failed.args, { cwd: f.root }),
+    (error: any) => error.exitCode === 7,
+  );
+});
+
+test("plan and legacy-readiness payloads contain exact verified inline snapshot bodies through real stdin", async (t) => {
+  const f = await fixture(t),
+    snapshot = await bmadFixture(f);
+  const built = await buildWorkerPrompt(f.ctx, { kind: "plan" });
+  for (const name of ["step-02-plan.md", "spec-template.md"]) {
+    assert.ok(built.prompt.includes(snapshot.files[name].text));
+    assert.equal(
+      built.provenance.inlineInputs[name],
+      snapshot.files[name].sha256,
+    );
+  }
+  const echo =
+    "let s='';process.stdin.setEncoding('utf8');process.stdin.on('data',x=>s+=x);process.stdin.on('end',()=>process.stdout.write(s));";
+  const prepared = await prepareWorkerInput(
+    f.ctx,
+    "plan-delivery-proof",
+    ["-e", echo],
+    built.prompt,
+    built.provenance,
+    process.execPath,
+  );
+  assert.equal(
+    (await execute(prepared.command, prepared.args, { cwd: f.root })).stdout,
+    built.prompt,
+  );
+  const specText = await readFile(f.ctx.data.specFile, "utf8");
+  f.ctx.data.planReadinessInputV2 = {
+    protocol: 2,
+    plan: f.ctx.data.plan.result,
+    intent: f.ctx.data.intent,
+    specText,
+    candidateDiff: "candidate",
+    sourceDigest: "a".repeat(64),
+  };
+  const upgrade = await buildWorkerPrompt(f.ctx, { kind: "plan-readiness" });
+  assert.ok(upgrade.prompt.includes(specText));
+  assert.ok(upgrade.prompt.includes(JSON.stringify(f.ctx.data.plan.result)));
+  assert.ok(upgrade.prompt.includes(snapshot.files["step-02-plan.md"].text));
+});
+
+test("structured readiness failures block implement, review and acceptance despite empty user intent gaps", async (t) => {
+  const f = await fixture(t);
+  await bmadFixture(f);
+  await writeFile(path.join(f.root, "src/new.txt"), "candidate\n");
+  const source = await sourceIdentity(
+    f.root,
+    f.ctx.data.baseSha,
+    f.ctx.data.workerTask.writePaths,
+  );
+  Object.assign(f.ctx.data, {
+    sourceDigest: source.digest,
+    sourceDiffSha256: sha(source.diff),
+  });
+  let dispatches = 0,
+    accepts = 0;
+  const adapter = createAdapter({
+    worker: async () => {
+      dispatches++;
+      throw new Error("must not dispatch");
+    },
+    github: {
+      async accept() {
+        accepts++;
+      },
+    } as any,
+  });
+  const invalid = [
+    { ready: undefined, runtimeBlockers: [] },
+    { ready: "true", runtimeBlockers: [] },
+    { ready: false, runtimeBlockers: [] },
+    { ready: true, runtimeBlockers: undefined },
+    { ready: true, runtimeBlockers: ["Required input is unreadable"] },
+  ];
+  for (const fields of invalid) {
+    f.ctx.data.plan.result = { ...validPlan(), ...fields };
+    for (const stage of ["implement", "review", "accept"])
+      await assert.rejects(adapter.runStage(stage, f.ctx), (error: any) =>
+        ["WORKER_OUTPUT", "PLAN_NOT_READY", "RUNTIME_BLOCKERS"].includes(
+          error.code,
+        ),
+      );
+  }
+  assert.equal(dispatches, 0);
+  assert.equal(accepts, 0);
+  assert.doesNotThrow(() =>
+    assertPlanningReady({
+      ...validPlan(),
+      risks: ["A prior EACCES was resolved; prose is not a control field."],
+    }),
+  );
+});
+
+test("legacy terminal reviews upgrade once with real immutable receipts and preserve implementation, spec and original failure evidence", async (t) => {
+  const f = await legacyFixture(t),
+    original = await f.immutableBytes(),
+    source = f.ctx.data.sourceDigest,
+    spec = await readFile(f.ctx.data.specFile, "utf8"),
+    implementation = JSON.stringify(f.ctx.data.implementation),
+    plan = JSON.stringify(f.ctx.data.plan);
+  const adapter = createAdapter({
+    worker: f.worker,
+    linear: { async comment() {}, async close() {} } as any,
+  });
+  await adapter.runStage("review", f.ctx);
+  assert.deepEqual(await f.immutableBytes(), original);
+  assert.equal(f.ctx.data.sourceDigest, source);
+  assert.equal(JSON.stringify(f.ctx.data.implementation), implementation);
+  assert.equal(JSON.stringify(f.ctx.data.plan), plan);
+  assert.equal(await readFile(f.ctx.data.specFile, "utf8"), spec);
+  assert.equal(
+    f.ctx.data.legacyReviewSettlementV2.filter(
+      (entry: any) => entry.failure?.code === "REVIEW_OUTPUT",
+    ).length,
+    2,
+  );
+  const first = await f.ledgerRows();
+  assert.equal(first.length, 4);
+  assert.equal(
+    first.filter((row: any) => row.out.includes("plan-readiness")).length,
+    1,
+  );
+  for (const [key, attempt] of Object.entries(f.ctx.state.attempts) as [
+    string,
+    any,
+  ][]) {
+    if (key !== "plan-readiness:v2" && !key.startsWith("review:v2:")) continue;
+    const request = JSON.parse(
+      await readFile(
+        path.join(f.ctx.runDir, "attempts", attempt.id, "request.json"),
+        "utf8",
+      ),
+    );
+    const input = JSON.parse(await readFile(request.args[2], "utf8"));
+    const output = input.args[input.args.indexOf("-o") + 1],
+      received = first.find((row: any) => row.out === output);
+    assert.equal(received.sha256, input.provenance.promptSha256);
+    assert.equal(received.bytes, Buffer.byteLength(input.prompt, "utf8"));
+    if (key === "plan-readiness:v2") {
+      for (const name of ["step-02-plan.md", "spec-template.md"])
+        assert.ok(input.prompt.includes(f.snapshot.files[name].text));
+    } else {
+      assert.ok(
+        !input.prompt.includes(
+          await readFile(path.join(f.ctx.runDir, "source-diff.txt"), "utf8"),
+        ),
+      );
+      assert.ok(!input.prompt.includes(spec));
+    }
+  }
+  await adapter.runStage("review", f.ctx);
+  assert.equal((await f.ledgerRows()).length, 4);
+  assert.equal(f.ctx.data.reviewsV2.length, 3);
+  assert.ok(
+    f.ctx.data.reviewsV2.every(
+      (entry: any) =>
+        entry.provenance.deliveryProtocol === 2 && entry.result.completed,
+    ),
+  );
+  const edge = f.originals.find((key) => key.includes(":edge:"))!;
+  const result = await resumeWorkerAttempt(f.ctx, edge);
+  assert.throws(() => parseReviewResult("edge", result.raw), {
+    code: "REVIEW_OUTPUT",
+  });
+});
+
+test("legacy original live review must finish before any protocol 2 model is dispatched", async (t) => {
+  const f = await legacyFixture(t, "verification");
+  const adapter = createAdapter({
+    worker: f.worker,
+    linear: { async comment() {}, async close() {} } as any,
+  });
+  let connected = false;
+  f.ctx.emit = async (event: any) => {
+    if (event.type === "worker-connected" && event.key === f.originals[2])
+      connected = true;
+  };
+  const upgrading = adapter.runStage("review", f.ctx);
+  upgrading.catch(() => {});
+  try {
+    await waitFor(async () => connected, "resumed original reviewer identity");
+    assert.equal((await f.ledgerRows()).length, 0);
+    assert.ok(
+      !Object.keys(f.ctx.state.attempts).some(
+        (key) => key.startsWith("review:v2:") || key === "plan-readiness:v2",
+      ),
+    );
+    await writeFile(f.gate!, "finish");
+    await f.live;
+    await upgrading;
+    assert.equal((await f.ledgerRows()).length, 4);
+  } finally {
+    await writeFile(f.gate!, "finish");
+    await f.live?.catch(() => {});
+    await upgrading.catch(() => {});
+  }
+});
+
+test("legacy actionable findings survive delivery upgrade and resume before any clean replacement dispatch", async (t) => {
+  const f = await legacyFixture(t, undefined, {
+    blind:
+      "src/new.txt:1 — The candidate omits the assigned validation and accepts invalid input.",
+  });
+  const original = await f.immutableBytes();
+  let accepts = 0;
+  const adapter = createAdapter({
+    worker: f.worker,
+    github: {
+      async accept() {
+        accepts++;
+      },
+    } as any,
+  });
+  for (const stage of ["review", "review", "accept"])
+    await assert.rejects(adapter.runStage(stage, f.ctx), {
+      code: "REVIEW_FINDINGS",
+    });
+  assert.equal(
+    f.ctx.data.legacyReviewSettlementV2[0].result.findings.length,
+    1,
+  );
+  assert.ok(
+    f.ctx.data.legacyReviewSettlementV2.some((entry: any) => entry.failure),
+  );
+  assert.equal((await f.ledgerRows()).length, 0);
+  assert.equal(accepts, 0);
+  assert.equal(f.ctx.data.deliveryV2, undefined);
+  assert.deepEqual(await f.immutableBytes(), original);
+});
+
+test("legacy review checkpoint replay permits only the exact controller artifact backed by saved terminal results", async (t) => {
+  const f = await legacyFixture(t, undefined, {
+    edge: "[]",
+    verification: "No verification gaps found.",
+  });
+  f.ctx.data.reviews = await Promise.all(
+    f.originals.map(async (key) => {
+      const original = await resumeWorkerAttempt(f.ctx, key),
+        lens = key.split(":")[1];
+      return {
+        lens,
+        attemptId: original.receipt.attemptId,
+        result: parseReviewResult(lens, original.raw),
+      };
+    }),
+  );
+  const artifact = path.join(f.root, "artifacts/review.json");
+  await atomicWriteJson(artifact, {
+    baseSha: f.ctx.data.baseSha,
+    sourceDigest: f.ctx.data.sourceDigest,
+    diffSha256: f.ctx.data.sourceDiffSha256,
+    spec: {
+      path: f.ctx.data.specFile,
+      sha256: f.ctx.data.spec.sha256,
+      frozenSha256: f.ctx.data.spec.frozenSha256,
+    },
+    snapshot: f.ctx.data.bmadSnapshot,
+    reviews: f.ctx.data.reviews,
+  });
+  const exact = await readFile(artifact, "utf8");
+  const adapter = createAdapter({
+    worker: f.worker,
+    linear: { async comment() {} } as any,
+  });
+  await writeFile(artifact, exact + " ");
+  await assert.rejects(adapter.runStage("review", f.ctx), {
+    code: "STAGE_SCOPE",
+  });
+  await writeFile(artifact, exact);
+  const unexpected = path.join(f.root, "artifacts/unexpected.txt");
+  await writeFile(unexpected, "not a controller checkpoint\n");
+  await assert.rejects(adapter.runStage("review", f.ctx), {
+    code: "STAGE_SCOPE",
+  });
+  await rm(unexpected);
+  assert.equal((await f.ledgerRows()).length, 0);
+  await adapter.runStage("review", f.ctx);
+  await adapter.runStage("review", f.ctx);
+  assert.equal((await f.ledgerRows()).length, 4);
+  assert.equal(await readFile(artifact, "utf8"), exact);
+  // A checkpointed finding is also blocking, even if another cached/native
+  // result later looks clean. Delivery does not constitute repair or triage.
+  f.ctx.data.reviews[0].result.findings.push({
+    kind: "blind",
+    raw: "src/new.txt:1 — retained finding",
+  });
+  await assert.rejects(adapter.runStage("accept", f.ctx), {
+    code: "REVIEW_FINDINGS",
+  });
+  assert.equal((await f.ledgerRows()).length, 4);
+});
+
+test("legacy readiness resumes the pre-file spec checkpoint from exact initialText and rejects missing created or changed frozen specs", async (t) => {
+  const f = await fixture(t),
+    snapshot = await bmadFixture(f, false),
+    ctx = f.ctx;
+  delete ctx.data.implementation;
+  const save = ctx.save;
+  ctx.save = async (patch: any) => {
+    await save(patch);
+    if (patch.spec?.created === false)
+      throw new Error("crash before first spec file write");
+  };
+  await assert.rejects(
+    writeSpecification(ctx, snapshot, "ready-for-dev"),
+    /crash before first spec file write/,
+  );
+  ctx.save = save;
+  const initial = ctx.data.spec.initialText,
+    frozen = ctx.data.spec.frozenSha256;
+  await assert.rejects(readFile(ctx.data.specFile), { code: "ENOENT" });
+  delete ctx.data.plan.result.ready;
+  delete ctx.data.plan.result.runtimeBlockers;
+  ctx.data.plan.provenance = {
+    deliveryProtocol: 1,
+    snapshot: snapshot.identity,
+  };
+  ctx.supervise = nativeSupervisor(ctx);
+  await originalAttempt(ctx, "plan", JSON.stringify(ctx.data.plan.result));
+  const fake = await protocol2WorkerFixture(ctx);
+  let implementations = 0;
+  const adapter = createAdapter({
+    worker: async (context: any, options: any) => {
+      if (options.kind !== "implement") return fake.worker(context, options);
+      implementations++;
+      await originalAttempt(
+        context,
+        "implement",
+        JSON.stringify({
+          summary: "Recovered specification implementation",
+          changedFiles: ["src/new.txt"],
+          checks: [],
+          risks: [],
+        }),
+        undefined,
+        {
+          [path.join(f.root, "src/new.txt")]:
+            "implemented once after readiness\n",
+        },
+      );
+      return runWorker(context, options);
+    },
+    linear: { async comment() {} } as any,
+  });
+  ctx.data.spec.created = true;
+  await assert.rejects(adapter.runStage("implement", ctx), {
+    code: "BMAD_SPEC",
+  });
+  ctx.data.spec.created = false;
+  ctx.data.spec.initialText = initial.replace(
+    "Preserve this exact",
+    "Change this exact",
+  );
+  await assert.rejects(adapter.runStage("implement", ctx), {
+    code: "BMAD_SPEC",
+  });
+  assert.equal((await fake.ledgerRows()).length, 0);
+  ctx.data.spec.initialText = initial;
+  await adapter.runStage("implement", ctx);
+  const implementationId = ctx.data.implementation.attemptId;
+  await adapter.runStage("implement", ctx);
+  assert.equal(implementations, 1);
+  assert.equal((await fake.ledgerRows()).length, 1);
+  assert.equal(ctx.data.implementation.attemptId, implementationId);
+  assert.equal(ctx.data.planReadinessInputV2.specText, initial);
+  assert.equal(ctx.data.spec.frozenSha256, frozen);
+  assert.equal(ctx.data.spec.created, true);
+  assert.equal(
+    await readFile(path.join(f.root, "src/new.txt"), "utf8"),
+    "implemented once after readiness\n",
+  );
+});
+
+test("live legacy implementation settles its native receipt and final candidate before readiness can dispatch", async (t) => {
+  const f = await fixture(t),
+    snapshot = await bmadFixture(f),
+    ctx = f.ctx;
+  await writeSpecification(ctx, snapshot, "in-progress");
+  delete ctx.data.implementation;
+  delete ctx.data.plan.result.ready;
+  delete ctx.data.plan.result.runtimeBlockers;
+  ctx.data.plan.provenance = {
+    deliveryProtocol: 1,
+    snapshot: snapshot.identity,
+  };
+  ctx.supervise = nativeSupervisor(ctx);
+  await originalAttempt(ctx, "plan", JSON.stringify(ctx.data.plan.result));
+  ctx.data.implementationBefore = await workingSnapshot(f.root);
+  const gate = path.join(ctx.runDir, "finish-original-implementation"),
+    candidate =
+      "candidate written only at original implementation completion\n";
+  const live = originalAttempt(
+    ctx,
+    "implement",
+    JSON.stringify({
+      summary: "Original live implementation",
+      changedFiles: ["src/new.txt"],
+      checks: [],
+      risks: [],
+    }),
+    gate,
+    { [path.join(f.root, "src/new.txt")]: candidate },
+  );
+  live.catch(() => {});
+  await waitFor(
+    async () => ctx.state.attempts.implement,
+    "original implementation dispatch",
+  );
+  const fake = await protocol2WorkerFixture(ctx);
+  let connected = false;
+  ctx.emit = async (event: any) => {
+    if (event.type === "worker-connected" && event.key === "implement")
+      connected = true;
+  };
+  const adapter = createAdapter({
+    worker: fake.worker,
+    linear: { async comment() {} } as any,
+  });
+  const resumed = adapter.runStage("implement", ctx);
+  resumed.catch(() => {});
+  try {
+    await waitFor(
+      async () => connected || (await fake.ledgerRows()).length,
+      "original implementation reconnect before readiness",
+    );
+    assert.equal(connected, true);
+    assert.equal((await fake.ledgerRows()).length, 0);
+    assert.equal(ctx.state.attempts["plan-readiness:v2"], undefined);
+    await assert.rejects(readFile(path.join(f.root, "src/new.txt")), {
+      code: "ENOENT",
+    });
+    const requestPath = path.join(
+        ctx.runDir,
+        "attempts",
+        ctx.state.attempts.implement.id,
+        "request.json",
+      ),
+      request = await readFile(requestPath, "utf8");
+    await writeFile(gate, "finish");
+    const receipt = await live;
+    await resumed;
+    assert.equal(ctx.data.implementation.attemptId, receipt.attemptId);
+    assert.equal(await readFile(requestPath, "utf8"), request);
+    const adopted = await resumeWorkerAttempt(ctx, "implement");
+    assert.deepEqual(adopted.receipt, receipt);
+    assert.equal((await fake.ledgerRows()).length, 1);
+    assert.equal(
+      ctx.data.planReadinessInputV2.sourceDigest,
+      ctx.data.sourceDigest,
+    );
+    assert.ok(
+      ctx.data.planReadinessInputV2.candidateDiff.includes(candidate.trim()),
+    );
+    assert.equal(
+      await readFile(path.join(f.root, "src/new.txt"), "utf8"),
+      candidate,
+    );
+  } finally {
+    await writeFile(gate, "finish");
+    await live.catch(() => {});
+    await resumed.catch(() => {});
+  }
+});
+
+test("corrupt or mismatched legacy receipts prevent all replacement attempts and preserve bytes", async (t) => {
+  const f = await legacyFixture(t),
+    key = f.originals[1],
+    file = path.join(
+      f.ctx.runDir,
+      "attempts",
+      f.ctx.state.attempts[key].id,
+      "receipt.json",
+    ),
+    original = await readFile(file, "utf8");
+  const adapter = createAdapter({ worker: f.worker });
+  for (const changed of [
+    "{corrupt",
+    JSON.stringify({ ...JSON.parse(original), requestDigest: "0".repeat(64) }),
+  ]) {
+    await writeFile(file, changed);
+    await assert.rejects(adapter.runStage("review", f.ctx), (error: any) =>
+      ["CORRUPT_STATE", "UNKNOWN_ATTEMPT"].includes(error.code),
+    );
+    assert.equal(await readFile(file, "utf8"), changed);
+    assert.equal((await f.ledgerRows()).length, 0);
+    assert.ok(
+      !Object.keys(f.ctx.state.attempts).some(
+        (attempt) =>
+          attempt.startsWith("review:v2:") || attempt === "plan-readiness:v2",
+      ),
+    );
+  }
+  await writeFile(file, original);
+  const originalSupervise = f.ctx.supervise;
+  f.ctx.supervise = async (options: any) => {
+    if (options.key === key)
+      throw Object.assign(new Error("Receipt permission failure"), {
+        code: "EACCES",
+      });
+    return originalSupervise(options);
+  };
+  const preserved = await f.immutableBytes();
+  await assert.rejects(adapter.runStage("review", f.ctx), { code: "EACCES" });
+  assert.deepEqual(await f.immutableBytes(), preserved);
+  assert.equal((await f.ledgerRows()).length, 0);
+  f.ctx.supervise = originalSupervise;
+  await rm(file);
+  try {
+    await assert.rejects(adapter.runStage("review", f.ctx), {
+      code: "UNKNOWN_ATTEMPT",
+    });
+    assert.equal((await f.ledgerRows()).length, 0);
+  } finally {
+    await writeFile(file, original);
+  }
+});
+
+test("legacy readiness blockers remain blocked across resume without repeating or mixing review versions", async (t) => {
+  const f = await legacyFixture(t);
+  let calls = 0;
+  const adapter = createAdapter({
+    worker: async (ctx: any, options: any) => {
+      calls++;
+      assert.equal(options.kind, "plan-readiness");
+      const built = await buildWorkerPrompt(ctx, options);
+      return {
+        result: {
+          ready: false,
+          intentGaps: [],
+          runtimeBlockers: ["A required prerequisite remains unavailable"],
+          evidence: ["Read-only validation found a blocker"],
+        },
+        provenance: built.provenance,
+        attemptId: "bounded-readiness",
+      };
+    },
+  });
+  for (const stage of ["review", "review", "accept"])
+    await assert.rejects(adapter.runStage(stage, f.ctx), {
+      code: "RUNTIME_BLOCKERS",
+    });
+  assert.equal(calls, 1);
+  assert.equal(f.ctx.data.reviewsV2, undefined);
+  assert.equal(f.ctx.data.deliveryV2, undefined);
+});
+
+test("native worker failure diagnostics preserve exact stderr and receipt before fixture cleanup", async (t) => {
+  const f = await fixture(t);
+  f.ctx.supervise = nativeSupervisor(f.ctx);
+  const receipt = await f.ctx.supervise({
+    key: "diagnostic-failure",
+    command: process.execPath,
+    args: [
+      "-e",
+      "process.stderr.write('diagnostic české selhání\\n');process.stdout.write('worker started\\n');process.exitCode=7;",
+    ],
+    cwd: f.root,
+  });
+  assert.equal(receipt.exitCode, 7);
+  const messages: string[] = [];
+  await reportNativeFailures(f.ctx.runDir, (message) => messages.push(message));
+  assert.equal(messages.length, 1);
+  assert.ok(messages[0].includes('"exitCode":7'));
+  assert.ok(messages[0].includes(receipt.attemptId));
+  assert.ok(messages[0].includes('"key":"diagnostic-failure"'));
+  assert.ok(messages[0].includes("stderr.log:\ndiagnostic české selhání\n"));
+  assert.ok(messages[0].includes("stdout.log:\nworker started\n"));
+});
+
+test("legacy acceptance upgrade after commit changes only run evidence and preserves the committed tree", async (t) => {
+  const f = await legacyFixture(t);
+  await git(f.root, "add", "--", "src/new.txt", "artifacts");
+  await git(f.root, "commit", "-m", "legacy candidate");
+  f.ctx.data.commitSha = await git(f.root, "rev-parse", "HEAD");
+  f.ctx.data.commitIntent = {
+    tree: await git(f.root, "show", "-s", "--format=%T", "HEAD"),
+  };
+  f.ctx.data.ciChecks = [
+    { name: "verify", url: "fixture", checkId: 1, appId: 15368 },
+  ];
+  const before = await git(f.root, "status", "--porcelain=v1"),
+    tree = f.ctx.data.commitIntent.tree;
+  let accepts = 0;
+  const adapter = createAdapter({
+    worker: f.worker,
+    github: {
+      async accept(_ctx: any, body: string) {
+        accepts++;
+        assert.match(body, /Protocol 2 input-delivery evidence/);
+        return { headSha: f.ctx.data.commitSha, baseSha: f.ctx.data.baseSha };
+      },
+    } as any,
+    linear: { async comment() {}, async close() {} } as any,
+  });
+  await adapter.runStage("accept", f.ctx);
+  assert.equal(accepts, 1);
+  assert.equal(await git(f.root, "status", "--porcelain=v1"), before);
+  assert.equal(await git(f.root, "show", "-s", "--format=%T", "HEAD"), tree);
+  assert.equal(f.ctx.data.deliveryV2Published, undefined);
+  assert.equal(
+    f.ctx.data.acceptanceDeliverySha256,
+    f.ctx.data.deliveryV2.proofSha256,
+  );
+});
+
+test("production runWorker preserves typed runtime blockers and rejects zero-exit unperformed reviews without redispatch", async (t) => {
+  const f = await fixture(t);
+  await bmadFixture(f);
+  await writeFile(path.join(f.root, "src/new.txt"), "candidate\n");
+  const source = await sourceIdentity(
+    f.root,
+    f.ctx.data.baseSha,
+    f.ctx.data.workerTask.writePaths,
+  );
+  Object.assign(f.ctx.data, {
+    sourceDigest: source.digest,
+    sourceDiffSha256: sha(source.diff),
+  });
+  await writeFile(path.join(f.ctx.runDir, "source-diff.txt"), source.diff);
+  f.ctx.supervise = nativeSupervisor(f.ctx);
+  const executable = path.join(f.ctx.runDir, "blocked-model.mjs"),
+    ledger = path.join(f.ctx.runDir, "blocked-starts");
+  const blockedPlan = {
+    ...validPlan(),
+    ready: false,
+    runtimeBlockers: ["Required source cannot be read"],
+  };
+  const unperformed =
+    "Review stopped: the required instruction file was unreadable. No review was performed or files changed.";
+  await writeFile(
+    executable,
+    `import fs from 'node:fs';process.stdin.resume();process.stdin.on('end',()=>{const args=process.argv.slice(2),out=args[args.indexOf('-o')+1];fs.appendFileSync(${JSON.stringify(ledger)},'start\\n');fs.writeFileSync(out,args.includes('--output-schema')?${JSON.stringify(JSON.stringify(blockedPlan))}:${JSON.stringify(unperformed)},'utf8');});`,
+  );
+  const launch = { command: process.execPath, prefixArgs: [executable] };
+  const plan = await runWorker(f.ctx, { kind: "plan" }, launch);
+  assert.equal(plan.provenance.deliveryProtocol, 2);
+  assert.throws(() => assertPlanningReady(plan.result), {
+    code: "RUNTIME_BLOCKERS",
+  });
+  await runWorker(f.ctx, { kind: "plan" }, launch);
+  for (const lens of ["edge", "verification"]) {
+    for (let replay = 0; replay < 2; replay++)
+      await assert.rejects(
+        runWorker(
+          f.ctx,
+          { kind: "review", lens, identity: source.digest },
+          launch,
+        ),
+        { code: "REVIEW_OUTPUT" },
+      );
+    assert.equal(
+      f.ctx.state.attempts[`review:v2:${lens}:${source.digest.slice(0, 32)}`]
+        .status,
+      "complete",
+    );
+  }
+  assert.equal((await readFile(ledger, "utf8")).trim().split("\n").length, 3);
+});
+
+for (const boundary of ["before-intent", "after-intent", "after-dispatch"]) {
+  test(`bounded delivery upgrade resumes ${boundary} with one immutable v2 attempt per role`, async (t) => {
+    const f = await legacyFixture(t),
+      originalBytes = await f.immutableBytes(),
+      originalSave = f.ctx.save,
+      originalEmit = f.ctx.emit;
+    let faulted = false;
+    if (boundary !== "after-dispatch")
+      f.ctx.save = async (patch: any) => {
+        if (patch.planReadinessInputV2 && !faulted) {
+          faulted = true;
+          if (boundary === "after-intent") await originalSave(patch);
+          throw new Error("upgrade boundary interruption");
+        }
+        await originalSave(patch);
+      };
+    else
+      f.ctx.emit = async (event: any) => {
+        if (
+          event.type === "supervisor-dispatched" &&
+          event.key === "plan-readiness:v2" &&
+          !faulted
+        ) {
+          faulted = true;
+          throw new Error("upgrade boundary interruption");
+        }
+        return originalEmit(event);
+      };
+    const adapter = createAdapter({
+      worker: f.worker,
+      linear: { async comment() {}, async close() {} } as any,
+    });
+    let interrupted: any;
+    try {
+      await adapter.runStage("review", f.ctx);
+    } catch (error) {
+      interrupted = error;
+    }
+    f.ctx.save = originalSave;
+    f.ctx.emit = originalEmit;
+    let recordedRequest: string | undefined, recordedId: string | undefined;
+    if (boundary === "after-dispatch") {
+      recordedId = f.ctx.state.attempts["plan-readiness:v2"].id;
+      const attemptDir = path.join(f.ctx.runDir, "attempts", recordedId!);
+      recordedRequest = await readFile(
+        path.join(attemptDir, "request.json"),
+        "utf8",
+      );
+      await waitFor(async () => {
+        try {
+          return JSON.parse(
+            await readFile(path.join(attemptDir, "receipt.json"), "utf8"),
+          );
+        } catch {
+          return null;
+        }
+      }, "independent readiness receipt after controller interruption");
+    } else assert.equal((await f.ledgerRows()).length, 0);
+    assert.match(interrupted?.message ?? "", /upgrade boundary interruption/);
+    await adapter.runStage("review", f.ctx);
+    await adapter.runStage("review", f.ctx);
+    assert.deepEqual(await f.immutableBytes(), originalBytes);
+    const rows = await f.ledgerRows();
+    assert.equal(rows.length, 4);
+    assert.equal(
+      rows.filter((row: any) => row.out.includes("plan-readiness")).length,
+      1,
+    );
+    const v2Keys = Object.keys(f.ctx.state.attempts).filter(
+      (key) => key.startsWith("review:v2:") || key === "plan-readiness:v2",
+    );
+    assert.equal(v2Keys.length, 4);
+    assert.ok(
+      v2Keys.every((key) => f.ctx.state.attempts[key].status === "complete"),
+    );
+    if (recordedId) {
+      assert.equal(f.ctx.state.attempts["plan-readiness:v2"].id, recordedId);
+      assert.equal(
+        await readFile(
+          path.join(f.ctx.runDir, "attempts", recordedId, "request.json"),
+          "utf8",
+        ),
+        recordedRequest,
+      );
+    }
+  });
+}
 function githubContext() {
   return {
     runId: "fixture",
@@ -1293,6 +2359,135 @@ test("fresh merge requires current open PR, acceptance and base, and sends an ex
   await assert.rejects(client.merge(ctx), { code: "PR_NOT_READY" });
   pr = freshPr({ state: "closed" });
   await assert.rejects(client.merge(ctx), { code: "PR_NOT_READY" });
+  assert.equal(requests.length, 0);
+});
+
+test("adapter merge adopts an exact legacy merged PR before acceptance while fresh and stale candidates retain current guards", async (t) => {
+  const f = await fixture(t),
+    ctx = f.ctx,
+    snapshot = await bmadFixture(f),
+    branch = "codex/legacy-merge-fixture",
+    github = new GitHubClient({ repository: "unit/repo" });
+  // The fixture checks byte-frozen snapshot hashes across real checkouts.
+  await git(f.root, "config", "core.autocrlf", "false");
+  await git(f.root, "switch", "-c", branch);
+  await writeFile(path.join(f.root, "src/new.txt"), "legacy merge candidate\n");
+  const source = await sourceIdentity(
+    f.root,
+    ctx.data.baseSha,
+    ctx.data.workerTask.writePaths,
+  );
+  Object.assign(ctx.data, {
+    sourceDigest: source.digest,
+    sourceDiffSha256: sha(source.diff),
+    branch,
+  });
+  await writeFile(path.join(ctx.runDir, "source-diff.txt"), source.diff);
+  await writeSpecification(ctx, snapshot, "in-review");
+  await git(f.root, "add", "--", "src/new.txt", "artifacts");
+  await git(f.root, "commit", "-m", "legacy reviewed candidate");
+  ctx.data.commitSha = await git(f.root, "rev-parse", "HEAD");
+  ctx.data.commitIntent = {
+    tree: await git(f.root, "show", "-s", "--format=%T", "HEAD"),
+  };
+  await git(f.root, "switch", "main");
+  await git(f.root, "merge", "--no-ff", "--no-edit", branch);
+  const mergedSha = await git(f.root, "rev-parse", "HEAD");
+  assert.equal(
+    new Set([ctx.data.baseSha, ctx.data.commitSha, mergedSha]).size,
+    3,
+  );
+  await git(f.root, "switch", branch);
+  ctx.assignment.merge = true;
+  ctx.data.prNumber = 9;
+  ctx.data.acceptance = {
+    headSha: ctx.data.commitSha,
+    baseSha: ctx.data.baseSha,
+  };
+  ctx.data.ciChecks = [
+    { name: "verify", url: "fixture", checkId: 1, appId: 15368 },
+  ];
+  let pr = freshPr({
+      merged: true,
+      merge_commit_sha: mergedSha,
+      state: "closed",
+      head: {
+        sha: ctx.data.commitSha,
+        ref: branch,
+        repo: { full_name: "unit/repo" },
+      },
+      base: { sha: mergedSha, ref: "main", repo: { full_name: "unit/repo" } },
+      body: "<!-- autodev:test -->\nLegacy acceptance evidence",
+    }),
+    currentBase = mergedSha,
+    workers = 0,
+    baseReads = 0;
+  const requests: any[] = [];
+  github.pr = async () => pr;
+  github.branch = async () => {
+    baseReads++;
+    return { commit: { sha: currentBase } };
+  };
+  github.checks = async () => ctx.data.ciChecks;
+  github.pages = async () => [];
+  github.api = async (method: string, endpoint: string, body: any) => {
+    requests.push({ method, endpoint, body });
+    if (method === "PATCH") pr.body = body.body;
+    return method === "PUT" ? { merged: true, sha: mergedSha } : {};
+  };
+  const adapter = createAdapter({
+    github,
+    worker: async (context: any, options: any) => {
+      workers++;
+      return cleanReview(context, options.lens);
+    },
+    linear: { async comment() {} } as any,
+  });
+  assert.deepEqual(await adapter.runStage("merge", ctx), {
+    mergeSha: mergedSha,
+  });
+  assert.equal(workers, 0);
+  assert.equal(baseReads, 0);
+  assert.equal(requests.length, 0);
+  assert.equal(ctx.data.acceptanceDeliverySha256, undefined);
+  const currentHead = pr.head.sha;
+  pr.head.sha = "4".repeat(40);
+  await assert.rejects(adapter.runStage("merge", ctx), { code: "PR_IDENTITY" });
+  pr.merged = false;
+  await assert.rejects(adapter.runStage("merge", ctx), { code: "PR_IDENTITY" });
+  pr.head.sha = currentHead;
+  pr.state = "open";
+  pr.base.sha = ctx.data.baseSha;
+  await assert.rejects(adapter.runStage("merge", ctx), {
+    code: "BASE_CHANGED",
+  });
+  assert.equal(requests.length, 0);
+  currentBase = ctx.data.baseSha;
+  ctx.data.acceptance.headSha = "5".repeat(40);
+  await adapter.runStage("merge", ctx);
+  assert.equal(
+    workers,
+    3,
+    "All fresh review receipts are reused during refreshed acceptance",
+  );
+  assert.equal(ctx.data.acceptance.headSha, currentHead);
+  assert.equal(
+    ctx.data.acceptanceDeliverySha256,
+    ctx.data.deliveryV2.proofSha256,
+  );
+  assert.deepEqual(
+    requests.map((request) => request.method),
+    ["PATCH", "POST", "PUT"],
+  );
+  assert.deepEqual(requests[2].body, {
+    sha: currentHead,
+    merge_method: "merge",
+  });
+  requests.length = 0;
+  ctx.data.acceptance.headSha = "6".repeat(40);
+  await assert.rejects(adapter.runStage("merge", ctx), {
+    code: "ACCEPTANCE_CHANGED",
+  });
   assert.equal(requests.length, 0);
 });
 
@@ -1449,15 +2644,8 @@ for (const targetStatus of ["in-review", "done"]) {
     assert.equal(saved.state.data.spec.pendingStatus.toSha256, sha(disk));
     f.ctx.state.data = saved.state.data;
     const adapter = createAdapter({
-      worker: async (_ctx: any, options: any) => ({
-        result: parseReviewResult(
-          options.lens,
-          options.lens === "verification"
-            ? "No verification gaps found."
-            : "[]",
-        ),
-        attemptId: options.lens,
-      }),
+      worker: async (_ctx: any, options: any) =>
+        cleanReview(_ctx, options.lens),
       linear: { async comment() {}, async close() {} } as any,
     });
     const stage = targetStatus === "done" ? "verify" : "review";

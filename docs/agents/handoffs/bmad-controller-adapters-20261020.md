@@ -150,3 +150,96 @@ Aktuální bundle včetně testů (stejných osm cest a stejný algoritmus jako 
 | `tests/autodev-adapters.test.ts` | `67830b5d0c1f40339d08da3b6f335e744126a2f0e5c7d17b33eadd286e4a3313` |
 
 Ostatních šest hashů z předchozí tabulky zůstává shodných. Po tomto předání se stejný adapter claim uvolňuje; žádný commit, remote akce, nový workflow ani další agent nebyly spuštěny.
+
+## Addendum: runtime delivery protocol 2 a bezpečné pokračování původního runu
+
+Souhrnná integrační evidence: [runtime-input-repair.md](../../verification-evidence/bmad-controller-20261020/runtime-input-repair.md). Aktuální předání: **45/45 adapter testů PASS, tsc exit 0**, devět hashů níže; původní pilotní state/requests/receipts a implementace byly z této delegace pouze čtené. Závěrečná Win32_Process kontrola našla **0** Node procesů vlastních adapter fixtures.
+
+20. 10. 2026. Nový základ této opravy je `c1c56327240d5634fa3f4670fc7264e6a4287238`, stejná vývojová worktree nyní na `codex/bmad-controller-pilot-evidence`. Vlastní cesty byly při zahájení committed/clean; úspěšný claim `bmad-controller-adapters-20261020`, owner `bmadctl-01a155b2-adapters`, bez adopt-dirty. Parent docs WIP se nepřebíral. Změny: `adapters.mjs`, `codex.mjs`, `schemas/plan.json`, nový `schemas/plan-readiness.json`, adapter test a tento handoff. Engine, supervisor, GitHub/Linear moduly, upstream renderer a pilotní checkout se neměnily.
+
+### Průzkum a volba před implementací
+
+Read-only prohlídka skutečného runu `key-47-c1ef58bf36c0` potvrdila:
+
+- Planner `1565c7acd1bb16be238919a9` dostal pouze cesty k `step-02-plan.md` a `spec-template.md`. `Get-Content` i `Get-Item` skončily odepřením přístupu. Finální plán omezení pravdivě uváděl v research/decision/risks, ale měl `intentGaps: []`; starý controller neměl samostatný runtime readiness kontrakt a dispatchoval implementaci.
+- Implementační attempt `e05980c9326af6af6e251ed3` skončil exit 0. Nebyl opakován ani měněn.
+- Edge `b0e57585351ad920ec3d6979` a verification `ff0e45bfcd565e85fe6c43c0` měly terminal receipts exit 0, ale raw výstupy výslovně oznámily nečitelné lens instructions a **No review was performed**. Tyto texty nejsou clean review. Blind `b8fde5bb6d0743f16dc224e9` naopak přečetl common-dir diff a vrátil `[]`; parent doložil oba skutečné úspěšné Get-Content v jeho logu.
+- Parentův read-only ACL průzkum doložil protected snapshot adresář s OWNER RIGHTS/SYSTEM/Administrators bez zděděného CodexSandboxUsers, zatímco dostupný spec dědil příslušná sandboxová práva. Pinned renderer používá `tempfile.mkdtemp` a přejmenování staging adresáře. Přesné vytváření ACL Pythonem nebylo trasované; doloženým selháním je nedoručení povinných vstupů modelu, nikoli chybějící soubor. Viz parent [baseline](../../verification-evidence/bmad-controller-20261020/pilot-upgrade-baseline.json) a [ACL evidence](../../verification-evidence/bmad-controller-20261020/pilot-snapshot-acl.json).
+
+Porovnány změny ACL/sandbox oprávnění, kopie snapshotu do dalších přístupných artefaktů, opakování původního workflow a inline doručení přes stdin. Zvoleno **inline doručení přesně hashově ověřených snapshot instrukcí**, bez změny oprávnění a bez druhé implementace. Kopírování by přidalo další vlastnictví/cache a po commitu měnilo kandidátní tree; opakování původních pokusů by porušilo jejich immutable identity. Celý prompt v argv navíc může překročit Windows CreateProcess limit. Parent ověřil podporu `codex exec -` v instalovaném CLI; používá se stdin s krátkými, explicitními argv.
+
+### Implementované chování
+
+1. **Nové plánování:** skutečné step 2 a template jsou vloženy do promptu v plném ověřeném UTF-8 znění. Provenance uvádí `deliveryProtocol: 2`, jednotlivé SHA a hash celého promptu. Schema vyžaduje `ready` a `runtimeBlockers` odděleně od `intentGaps`. Missing/invalid/false readiness nebo neprázdné blockers zastaví postup před novou implementací. Prose v risks/decision se neparsuje heuristikou.
+2. **Review metodika:** inline jsou pouze hashově ověřené původní lens/reference instrukce. Původní step 4 vyžaduje file-only diff, proto zůstává `diff_file` cesta a ověřený SHA; diff text v review promptu není. Blind/verification nemají claims text. Edge zachovává skutečné pozdní čtení původního dostupného `spec_file`, nikoli předčasně vložený spec s pokynem jej ignorovat.
+3. **Transport:** malý executor uvnitř stávajícího `codex.mjs` přečte immutable input JSON, zkontroluje jeho SHA i prompt provenance před spawnem a předá text do `codex exec ... -` přes stdin. Ponechává streaming stdout/stderr, správný start/failure exit/signál a nepovažuje odmítnutý stdin za úspěšné doručení. Žádný shell ani dlouhý `node -e` bootstrap. Supervisor API a sandbox flags zůstaly shodné.
+4. **Bounded legacy upgrade:** staré requesty se nejdřív přes `ctx.supervise` znovu navážou s **přesnými původními command/args/cwd/heartbeat**. Všechny nahrazované review attempts musejí vrátit identity-valid terminal receipt; state.status sám nestačí. Live se dočká, unknown/corrupt/missing/EACCES blokují jakýkoli nový v2 dispatch. Raw původní výsledky a chyby se zachovávají v samostatné evidenci, včetně explicitních unperformed reviews.
+5. Jeden stabilní `plan-readiness:v2` read-only worker dostane původní plan/frozen intent/spec, skutečné inline instrukce a existující kandidát. Nesmí měnit frozen intent, reimplementovat nebo dělat remote akce. Při úspěchu následuje nejvýše jeden `review:v2:<lens>:<source>` attempt pro každou lens. V2 fail nevyvolá v3/retry smyčku. Starý plan, implement attempt, receipts a source identity zůstávají stejné.
+6. **Checkpointy/evidence:** původní `reviewBefore` se uchová a neinterpretuje proti novým legitimním controller artefaktům. Nový `reviewBeforeV2` vzniká po settlementu/readiness. Guard běží při review a před accept/merge, i když run už prošel původními stages. Před commitem může vzniknout controller-owned `review-v2.json`; po commitu se zapisuje pouze runDir evidence a nové controller state fields. HEAD/tree zůstávají neměnné. Acceptance body používá novou jednoznačnou delivery proof identitu a výsledky; historické v1 artefakty nejsou vydávány za nová validní review.
+
+Sdílené helpery sjednocují input hash/transport, replay původního requestu, strukturované readiness a verzi review proofu. Jediným zapisujícím subjektem skutečného run state zůstává engine přes své ctx.save/persist. Tato delegace **needitovala pilotní state, request, receipt ani žádný soubor pilotní worktree**; jen je četla pro průzkum. Žádný skutečný nový modelový pilot nebo remote mutation zde nebyly spuštěny.
+
+### Skutečné ověření
+
+| Kontrola                                               | Výsledek                                  |
+| ------------------------------------------------------ | ----------------------------------------- |
+| První cílený subset                                    | **8/8 PASS**, exit 0, 66.812 s            |
+| Druhý cílený subset                                    | **7/7 PASS**, exit 0, 102.993 s           |
+| Kompletní `node --test tests/autodev-adapters.test.ts` | **45/45 PASS**, exit **0**, **244.489 s** |
+| `pnpm exec tsc --noEmit`                               | **exit 0**                                |
+| Syntax/Prettier/git diff whitespace                    | **exit 0**                                |
+
+Testy používají skutečné Node subprocessy, produkční stdin executor, produkční supervise/request/receipt mechanismus a skutečné dočasné Git/claim fixtures. Přenesly přes **64 KiB** vícebajtového českého/emoji textu bez ztráty, odmítly změněný input před spawnem, ověřily missing executable i exit 7. Každá v2 role má skutečný ledger přijatého stdin hash/byte count. Produkční runWorker parser s exit 0 a explicitním unperformed review vrací REVIEW_OUTPUT; opakované volání nesmí spustit další kopii.
+
+Legacy scénáře pokrývají čekání na živého reviewera bez nových v2 workers, corrupt/mismatched/missing/IO-failed receipt, nesměšování blokované readiness s clean review, zachování původních request/receipt bajtů, jednoznačnou identitu před/po upgrade intentu i po dispatch a post-commit upgrade s nezměněným Git tree. Native worker inteligenci v těchto testech nahrazuje úzký Node program; nejde o tvrzení, že skutečný modelový upgrade pilotu už proběhl. Ten provede root po review tohoto checkpointu.
+
+### Aktuální zdrojový snapshot
+
+Bundle nyní obsahuje devět souborů (nově plan-readiness schema), stejný lexikografický JSON/SHA256 algoritmus: **`a5b0c51e34c6db357fdf1f171f720536a7009f81ba2371f6aa68b44acf6ae2d7`**.
+
+| Soubor                                        | SHA256                                                             |
+| --------------------------------------------- | ------------------------------------------------------------------ |
+| `scripts/autodev/adapters.mjs`                | `7848ef4373fe0119e776702a19d1453f1a421796e2d008c7a90f43d281827168` |
+| `scripts/autodev/codex.mjs`                   | `84515a1601c0b9934004278426402ab7ce39ee50bec0222e117171ffc2cd536e` |
+| `scripts/autodev/github.mjs`                  | `72641ba4f3566ac0c5e721eb952da50486ad68dd9f1bca5b66262dd0f0f98269` |
+| `scripts/autodev/linear.mjs`                  | `db4e83b416c73be2571d588744dee8f35e3f79509d0e77e6217705facff1201d` |
+| `scripts/autodev/prompts/common.md`           | `617e421b4f9b0814efcf650eff59a0ad1e0f2997993438f26baef956b82c8101` |
+| `scripts/autodev/schemas/implement.json`      | `f47eeb928d7ea0ff5ea63f21ff62515b558c6fe100db36762b5cd5e49bcf48bd` |
+| `scripts/autodev/schemas/plan-readiness.json` | `cb118e6f0a2d63179ccbe4f0582e2db8ffbda5ee822ff3a90b9ed0f12ffe20d7` |
+| `scripts/autodev/schemas/plan.json`           | `bcc675b832a2b6815e288ecaa7b9c71f6a9190ae42a58a9bc5cce2c8215bd4b0` |
+| `tests/autodev-adapters.test.ts`              | `f2e7bfc33722e590cdd5cffacc2fc9cff9f6278adcac2796f4ce107afada5d93` |
+
+Všechny vlastní testovací subprocessy skončily, fixtures se uklidily. Žádný nový claim pro pilot, nový workflow, další agent, commit nebo vzdálená mutace nevznikly. Po dokončení předání se vlastní adapter rezervace uvolňuje. Následuje root review, samostatná integrace opravy a řízené resume původního runu; změna neopravuje obecné ACL ani nepřijímá nečitelné zbývající vstupy.
+
+## Addendum: opravy cíleného review delivery v2
+
+20. 10. 2026, stejný vlastník, worktree a base `c1c56327240d5634fa3f4670fc7264e6a4287238`; úspěšný `claim --adopt-dirty` převzal jen doložené vlastní cesty. Podklad a triage: [review-delivery-v2.md](../../verification-evidence/bmad-controller-20261020/review-delivery-v2.md). Tento followup změnil pouze `scripts/autodev/adapters.mjs`, `tests/autodev-adapters.test.ts` a tento handoff.
+
+- **B1:** platné původní raw findings i již uložené `data.reviews[].result.findings` blokují upgrade před jakýmkoli novým workerem; opakované review/accept nemohou nález vymazat čistou další odpovědí. Původní výsledky zůstávají archivované. Zvoleno zachování blokace; automatická triage či oprava by přidala neobjednaný repair loop.
+- **B2:** scope audit může přijmout pouze konkrétní `review.json`, jehož přesné kanonické bajty odpovídají uloženým datům a tři výsledky odpovídají původním terminal receipts, attempt IDs a parsovaným raw výsledkům. Změněný obsah ani další controller soubor nepovolí. Blanket výjimka pro artifactDir by skryla cizí zápisy.
+- **E1:** společný helper reconciliuje pending spec status a ověřuje celý hash, body i frozen blok. Readiness smí při chybějícím souboru použít přesnou uloženou `initialText` jen pro `created=false`; již vytvořený nebo změněný spec zůstává blokovaný. Nevzniká nový plán/spec ani druhá implementace.
+- **E2/V2:** merge nejprve čtecím PR lookupem a existujícím GitHub identity guardem ověří, zda mutace už proběhla. Potvrzený merged PR převezme přesné merge SHA bez nového přijetí proti již posunutému main. Dosud otevřený PR dál vyžaduje delivery-v2 proof, aktuální acceptance i exact head/base guardy. GitHub/Linear ani engine/supervisor zdroje nebyly měněny.
+- **V1:** skutečný původní implementační subprocess čeká na řízenou bránu a až při dokončení zapisuje kandidáta. Resume nejprve naváže původní worker, do té doby nemá žádný readiness attempt/dispatch; pak převezme stejný receipt a request a validuje dokončený source. Test by nepodmíněný readiness před dočkáním odmítl. Sdílený fixture helper sjednocuje jen dosavadní fake Codex transport, produkční supervisor zůstává skutečný.
+
+Ověření stabilního patche: `node --test --test-name-pattern "legacy actionable findings|legacy review checkpoint replay|legacy readiness resumes the pre-file|live legacy implementation settles|adapter merge adopts" tests/autodev-adapters.test.ts` **5/5 PASS**, exit **0**, **66.972 s**; `pnpm exec tsc --noEmit`, Prettier check a `git diff --check` **exit 0**. První běh měl 4/5 PASS: nová merge fixture při skutečném checkoutu zdědila Windows autocrlf a správně narazila na změněný snapshot hash. Oprava je pouze `core.autocrlf=false` v jejím dočasném Git před commit/checkout; uvedený druhý běh prošel celý. Native subprocess/request/receipt a dočasné Git/claim operace běžely skutečně, GitHub odpovědi jsou řízené adapter-level fixture transporty.
+
+Koordinátor výslovně převzal **jediný celý adapter test nad tímto stabilním checkpointem** souběžně s cílenými rechecky; zde se celá sada znovu nespouštěla. Všechny vlastní testovací procesy skončily, závěrečná Win32_Process kontrola: **0** Node procesů adapter fixtures. Pilotní worktree/state/requests/receipts ani parent docs se neměnily. Žádný remote efekt, commit, další agent či workflow.
+
+Aktuální devítisouborový bundle (stejný lexikografický JSON/SHA256 algoritmus): **`7e0049b5320dd26b7cebaab73bb8a8b9be4c119d7cc4e2f0a3419c6ae1365879`**. Změněné hashe:
+
+| Soubor                           | SHA256                                                             |
+| -------------------------------- | ------------------------------------------------------------------ |
+| `scripts/autodev/adapters.mjs`   | `eb757442893c0f3683636da81f8ff2ac3aece7ada8b7a03804defb680fc825f3` |
+| `tests/autodev-adapters.test.ts` | `d611302d7d0549a14cc55d7a8fcc3f3a8eae0243a0f4897740ac0163dd4003a4` |
+
+Ostatních sedm hashů z předchozí devítisouborové tabulky je shodných. Po tomto předání se adapter claim uvolňuje; další krok je integrátorův cílený recheck a širší adapter sada nad neměnnými zdroji.
+
+## Addendum: zachování diagnostiky neúspěšného native workeru
+
+Koordinátorův následný celý běh skutečně skončil **49/50 PASS, exit 1, 299.911 s**. Jediné selhání: `legacy acceptance upgrade after commit changes only run evidence and preserves the committed tree`, `review:v2:verification:66e7a8fff0ed3cfda7dfac5d21c2613f`, exit 1. Původní runner logy zůstávají v `.cache/bmad-controller-development/adapter-v2-final.{stdout,stderr}.log` a `adapter-v2-final-result.json`; konkrétní receipt/stderr odstranil tehdejší fixture cleanup. Jeho neexistence byla ověřena. **Příčina původního selhání z dostupné evidence není prokázaná.** Shared ledger append, start/transport failure i supervisor heartbeat failure jsou rozlišitelné možnosti, nikoli zjištění. Tři předchozí cílené rechecky byly podle koordinátora čisté; nenahrazují tento neúspěšný širší běh.
+
+Původní vlastník převzal vlastní scope přes úspěšný `claim --adopt-dirty`. Změněny pouze `tests/autodev-adapters.test.ts` a tento handoff. Před úklidem každého fixture se nyní vypíšou receipt, request, stderr a stdout všech neúspěšných či nejasných native attempts pomocí test-runner diagnostic. Chybějící/poškozený receipt není tiše vynechán; cleanup pokračuje v `finally`. Ponechávání všech temp stromů by hromadilo testovací data bez zajištění čitelného reportu, produkční retry či změna sdíleného ledgeru by bez příčiny byly neověřeným workaroundem. Proto se produkční kód ani fixture transport neměnily.
+
+Nový skutečný native subprocess s exit 7 a českým stderr ověřil zachování přesných logů, attempt identity a exit údajů před odstraněním fixture. Přesný neúspěšný postcommit scénář byl omezeně spuštěn třikrát, vždy **PASS**: 13.148 s; 15.249 s včetně nového diagnostického testu (**2/2 PASS**); 14.018 s. Původní chyba se nezopakovala, její příčinu tedy nelze uzavřít ani označit za prokázaný flake. `pnpm exec tsc --noEmit`, Prettier a diff check: **exit 0**. Celá sada se zde neopakovala. Všechny vlastní procesy skončily; Win32_Process kontrola: **0** adapter fixture Node procesů.
+
+Nový test SHA256: **`9e9774dcc124400df845f494fa43b2f050ba4af553e7d1f5467bf88b44e0015b`**. Osm produkčních hashů z předchozího předání zůstává shodných; devítisouborový bundle: **`57d41d4b032aa5172f4944ca07eab92fa36fcf46d628b473e61c44330d435963`**. Pilotní checkout/state/receipts a vzdálené služby beze změny. Po předání se claim uvolňuje; koordinátor určí konečné ověření s novou diagnostikou, která při opakování selhání zachová dosud chybějící konkrétní důkaz.

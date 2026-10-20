@@ -9,9 +9,13 @@
     "sources",
     "risks",
     "intentGaps",
-    "codeMap"
+    "codeMap",
+    "ready",
+    "runtimeBlockers"
   ],
   "properties": {
+    "ready": { "type": "boolean" },
+    "runtimeBlockers": { "type": "array", "items": { "type": "string" } },
     "research": { "type": "string" },
     "alternatives": { "type": "array", "items": { "type": "string" } },
     "decision": { "type": "string" },

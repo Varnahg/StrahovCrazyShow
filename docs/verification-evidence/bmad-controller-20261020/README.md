@@ -25,7 +25,15 @@ Po opravách a nezávislém rechecku jsou všechny nálezy uzavřené: engine17/
 Druhá plná sada s výchozí konkurencí měla1575 pass,1 fail,1 skip: starší LFS fixture překročila15s timeout Git procesu. Cílený recheck24 pass a1 skip. Finální běh snížil pouze souběžnost přes standardní Node přepínač; žádný test, očekávání, timeout ani package konfigurace se neměnily. Původní logy obou neúspěchů zůstaly zachované.
 
 ## Integrační stav
-Nový GitHub PR/main CI a živý pilot KEY-47 zatím nejsou v tomto checkpointu potvrzené. Doplní se skutečné výsledky, SHA a URL; lokální checkpoint není prohlášení o dokončení celého KEY-46.
+[PR#10](https://github.com/Varnahg/StrahovCrazyShow/pull/10) přijal řadič z head `3b4c265e3916c4608fab1f09767bc77ca5cb3790` a base `ceddc0802cd98dccfbee9d44fc00d6331ac9d749`. [Přijetí integrátora](https://github.com/Varnahg/StrahovCrazyShow/pull/10#issuecomment-6280380691) navazuje na uzavřená review, lokální procesní přejímku a skutečné GitHub checky. Oba PR joby doložily testMergeSha `6a5ec326cb5e97f90a2d908c79c64017e27d6fba`; merge s exact-head guardem vytvořil `c1c56327240d5634fa3f4670fc7264e6a4287238`.
+
+[PR CI a přijetí](github-controller-acceptance.json), [main CI](github-controller-main-ci.json): verify i source-secret-hygiene success na přesném merge SHA. Žádný bypass ani změna ochrany main. Zdrojový strom místního řadiče shodný s přijatým main.
+
+Živý pilot KEY-47 běží pod `key-47-c1ef58bf36c0`. Nejprve skutečně [zastavil před workerem kvůli cizí rezervaci rendereru](pilot-reservation-stop.json); vlastník po koordinační zprávě svou rezervaci uvolnil a běžné resume zachovalo tutéž pracovní kopii. [Souběžné resume](pilot-concurrent-resume.json) správně odmítnuto jako BUSY, exit3.
+
+[Skutečný SIGKILL controlleru během implementace](pilot-worker-crash.json) ponechal původního supervisora16592 a attempt `e05980c9326af6af6e251ed3` živé. [Následné čtení](pilot-worker-survived.json) doložilo pokračování téhož modelového vlákna a růst událostí4→28. Resume se připojilo ke stejnému attemptu, který dokončil exit0.
+
+Pilot současně odhalil nečitelné snapshot instrukce a chybějící explicitní provozní readiness: [výzkum, varianty a oprava](runtime-input-repair.md). Orchestrace zastavena na review před commitem/PR; [baseline hotové implementace](pilot-upgrade-baseline.json) uchovává přesné hashe. Neprovedená review se nepřijímají. Dokončení opravy, PR crash/reconcile a přijetí pilotu se zatím netvrdí.
 
 ## Provozní omezení
 V1 má jeden explicitní issue, nikoli scheduler. Při neprokázaném výsledku procesu/externí mutace zastaví unknown a nevytváří další worker nebo PR. Úmyslná poškození receipt/checkpointu jsou lokální fixtures; neoznačují se za živý backend test. Herní/GPU výkon nebyl změnou ověřován ani tvrzen.

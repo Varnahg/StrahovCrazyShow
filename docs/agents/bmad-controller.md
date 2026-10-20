@@ -20,6 +20,8 @@ Koordinátor před spuštěním připraví v administrativní rezervaci dva disj
 ## Průchod a integrace
 Plánovací krok používá připnutý BMAD snapshot a jeho šablonu; řadič vytváří spec.md s výchozím commitem a neměnným zadáním. Nevyjasněný podstatný požadavek zastaví implementaci. Následuje samostatný implementační worker, původní blind/edge/verification review postupy ze snapshotu a skutečné kontroly. Pomocný status specifikace done znamená dokončené lokální ověření; Linear Done nadále vyžaduje merge a main CI. Modelové tvrzení o úspěchu není exit code testu. Zdrojový kandidát včetně testů má vlastní obsahovou identitu; změna po review ruší platnost příslušných důkazů.
 
+Řadič předává hashově ověřený obsah instrukcí přes standardní vstup. Worker tak nemusí otevírat chráněný adresář rendereru a dlouhý prompt nenaráží na limit argumentů procesu. Plán výslovně rozlišuje otázky na uživatele, provozní blokace a připravenost; prázdný seznam otázek sám nestačí. Nezávislé review zachovává své vstupy: blind a verification nedostávají claims, edge načítá specifikaci až v předepsané pozdní fázi.
+
 Commit používá konkrétní vlastní soubory. Publish dohledá existující PR ve všech stavech. Přijetí vyžaduje aktuální head/base, úspěšné povinné GitHub checky a doloženou praktickou přejímku podle [CI pravidel](ci.md). Merge používá očekávané head SHA a neobchází ruleset. Linear `Done` přichází až po merge a CI pro tento merge commit na main. Katalogový task administrativně přebírá koordinátor.
 
 ## Pád a obnovení
@@ -28,6 +30,8 @@ Stav, provozní logy a výsledky pokusů jsou v Git common directory pod `autode
 Worker běží pod odděleným supervisorem s vlastní identitou a trvalým výsledkem. Po pádu controlleru může dokončit a udržovat heartbeat. `resume` převezme právě tento výsledek nebo naváže sledování; neopakuje spawn podle stáří či PID. Pokud zmizí supervisor bez terminálního výsledku, stav je `unknown`. Vyžaduje doložení skutečného stavu procesů; automatický retry by mohl vytvořit dvojí práci.
 
 Známé selhání testu/review zachová log a zabrání integraci. V1 neobsahuje neomezený automatický repair loop. Provozní JSON nesmaž ani neupravuj jako prostředek „opravy“; mohl by tím zaniknout důkaz již provedené mutace.
+
+Přechod starého běhu na protokol předávání vstupů2 je omezený opravný krok: zachová původní plán a dokončenou implementaci, dočká/převezme původní review procesy podle jejich uložených requestů a receipts a přidá samostatné čtecí ověření připravenosti a review s novými stabilními klíči. Při nejasném výsledku původního procesu další worker nevznikne. Historické neprovedené review se nepočítá jako úspěch; opakované resume neopakuje již zahájený opravný krok.
 
 Pro kontrolovaný test pádu lze nastavit `AUTODEV_TEST_CRASH_AT=after-pr-create`. Řadič se úmyslně ukončí po vytvoření PR před uložením jeho lokálního checkpointu. Jednorázový marker zamezí opakovanému pádu při resume. Tento režim používej pouze pro přidělený testovací run; změna kódu ani ochrany main není potřeba.
 

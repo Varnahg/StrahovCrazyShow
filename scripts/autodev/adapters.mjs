@@ -29,6 +29,11 @@ import {
   renderSpecification,
   specIdentity,
   validateWorkerResult,
+  assertPlanningReady,
+  planningInputHashes,
+  resumeWorkerAttempt,
+  parseReviewResult,
+  DELIVERY_PROTOCOL,
 } from "./codex.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -124,6 +129,31 @@ export async function reconcileSpecification(ctx) {
       "BMAD_SPEC",
       "Specification differs from both recorded status-transition endpoints",
     );
+}
+
+async function recordedSpecificationText(ctx, { allowInitial = false } = {}) {
+  await reconcileSpecification(ctx);
+  const recorded = ctx.data.spec;
+  let text;
+  try {
+    text = await readFile(ctx.data.specFile, "utf8");
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    if (!allowInitial || recorded?.created !== false)
+      throw problem("BMAD_SPEC", "Previously created specification is missing");
+    text = recorded.initialText;
+  }
+  const identity = specIdentity(text);
+  if (
+    identity.sha256 !== recorded?.sha256 ||
+    identity.bodySha256 !== recorded?.bodySha256 ||
+    identity.frozenSha256 !== recorded?.frozenSha256
+  )
+    throw problem(
+      "BMAD_SPEC",
+      "Specification changed outside its controller checkpoint",
+    );
+  return text;
 }
 
 export async function writeSpecification(ctx, snapshot, requestedStatus) {
@@ -712,16 +742,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
   async function assertSource(ctx) {
     await reconcileSpecification(ctx);
     await audit(ctx);
-    if (ctx.data.spec) {
-      const currentSpec = specIdentity(
-        await readFile(ctx.data.specFile, "utf8"),
-      );
-      if (currentSpec.sha256 !== ctx.data.spec.sha256)
-        throw problem(
-          "BMAD_SPEC",
-          "Specification changed outside its controller checkpoint",
-        );
-    }
+    if (ctx.data.spec) await recordedSpecificationText(ctx);
     const current = await sourceIdentity(
       ctx.data.worktree,
       ctx.data.baseSha,
@@ -740,6 +761,381 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       throw problem("SCOPE_VIOLATION", "Evidence path is not reserved");
     const absolute = await safePath(ctx.data.worktree, relative);
     await atomicWriteJson(absolute, value);
+  }
+  const reviewResults = (ctx) => ctx.data.reviewsV2 ?? ctx.data.reviews;
+  function readinessBinding(ctx, snapshot) {
+    return {
+      planSha256: digest(ctx.data.plan.result),
+      intentSha256: digest(ctx.data.intent),
+      specBodySha256: ctx.data.spec?.bodySha256 ?? null,
+      frozenSha256: ctx.data.spec?.frozenSha256 ?? null,
+      snapshotSha256: snapshot.identity.manifestSha256,
+    };
+  }
+  async function ensurePlanningReady(ctx) {
+    const snapshot = await loadBmadSnapshot(
+      ctx.data.renderedWorkflow,
+      ctx.data.bmadSnapshot,
+    );
+    validateWorkerResult("plan", ctx.data.plan?.result, { legacy: true });
+    if (ctx.data.plan.result.intentGaps.length)
+      throw problem(
+        "INTENT_GAPS",
+        "Original user-owned planning questions remain unresolved",
+      );
+    const native =
+      ctx.data.plan.provenance?.deliveryProtocol === DELIVERY_PROTOCOL;
+    if (native) {
+      if (
+        !object(ctx.data.plan.provenance.inlineInputs) ||
+        canonicalJson(ctx.data.plan.provenance.inlineInputs) !==
+          canonicalJson(planningInputHashes(snapshot))
+      )
+        throw problem(
+          "PLAN_NOT_READY",
+          "Protocol 2 plan lacks exact inline snapshot input hashes",
+        );
+      validateWorkerResult("plan", ctx.data.plan.result);
+      assertPlanningReady(ctx.data.plan.result);
+      return {
+        protocol: DELIVERY_PROTOCOL,
+        kind: "native-plan",
+        binding: readinessBinding(ctx, snapshot),
+        result: {
+          ready: true,
+          intentGaps: [],
+          runtimeBlockers: [],
+          evidence: [
+            "Required snapshot instructions were delivered inline by protocol 2.",
+          ],
+        },
+        provenance: ctx.data.plan.provenance,
+      };
+    }
+    if (!ctx.state.attempts.plan)
+      throw problem(
+        "PLAN_NOT_READY",
+        "Legacy plan has no immutable original attempt to reconcile",
+      );
+    const originalPlan = await resumeWorkerAttempt(ctx, "plan");
+    let originalValue;
+    try {
+      originalValue = JSON.parse(originalPlan.raw);
+    } catch {
+      throw problem(
+        "WORKER_OUTPUT",
+        "Original planning result is missing or invalid",
+      );
+    }
+    validateWorkerResult("plan", originalValue, { legacy: true });
+    if (
+      originalPlan.receipt.exitCode !== 0 ||
+      digest(originalValue) !== digest(ctx.data.plan.result)
+    )
+      throw problem(
+        "PLAN_NOT_READY",
+        "Original plan differs from its terminal receipt output",
+      );
+    if (!ctx.data.planReadinessInputV2) {
+      if (ctx.data.sourceDigest) await assertSource(ctx);
+      else await audit(ctx);
+      const candidate = await sourceIdentity(
+        ctx.data.worktree,
+        ctx.data.baseSha,
+        ctx.data.workerTask.writePaths,
+      );
+      const specText = ctx.data.specFile
+        ? await recordedSpecificationText(ctx, { allowInitial: true })
+        : null;
+      await ctx.save({
+        planReadinessInputV2: {
+          protocol: DELIVERY_PROTOCOL,
+          binding: readinessBinding(ctx, snapshot),
+          plan: ctx.data.plan.result,
+          intent: ctx.data.intent,
+          specText,
+          candidateDiff: candidate.diff,
+          sourceDigest: ctx.data.sourceDigest ?? null,
+        },
+        planReadinessBeforeV2: await workingSnapshot(ctx.data.worktree),
+      });
+    }
+    const input = ctx.data.planReadinessInputV2;
+    const binding = readinessBinding(ctx, snapshot);
+    // A pre-implementation validation may precede creation of the spec. All
+    // already-frozen inputs and any existing source candidate remain exact.
+    if (
+      input.binding.planSha256 !== binding.planSha256 ||
+      input.binding.intentSha256 !== binding.intentSha256 ||
+      input.binding.snapshotSha256 !== binding.snapshotSha256 ||
+      (input.binding.specBodySha256 !== null &&
+        input.binding.specBodySha256 !== binding.specBodySha256) ||
+      (input.sourceDigest !== null &&
+        input.sourceDigest !== ctx.data.sourceDigest)
+    )
+      throw problem(
+        "PLAN_NOT_READY",
+        "Legacy readiness input changed; no second upgrade attempt is permitted",
+      );
+    if (!ctx.data.planReadinessV2) {
+      const result = await worker(ctx, {
+        kind: "plan-readiness",
+        heartbeat: beats(ctx),
+      });
+      assertStageScope(
+        ctx.data.planReadinessBeforeV2,
+        await workingSnapshot(ctx.data.worktree),
+        [],
+      );
+      if (ctx.data.sourceDigest) await assertSource(ctx);
+      else await audit(ctx);
+      validateWorkerResult("plan-readiness", result.result);
+      if (
+        result.provenance?.deliveryProtocol !== DELIVERY_PROTOCOL ||
+        planInputNamesMismatch(result.provenance.inlineInputs, snapshot)
+      )
+        throw problem(
+          "PLAN_NOT_READY",
+          "Readiness validator did not receive the required verified inline instructions",
+        );
+      await ctx.save({
+        planReadinessV2: {
+          ...result,
+          protocol: DELIVERY_PROTOCOL,
+          binding: input.binding,
+          sourceDigest: input.sourceDigest,
+        },
+      });
+    }
+    validateWorkerResult("plan-readiness", ctx.data.planReadinessV2.result);
+    await atomicWriteJson(
+      path.join(ctx.runDir, "delivery-v2-readiness.json"),
+      ctx.data.planReadinessV2,
+    );
+    assertPlanningReady(ctx.data.planReadinessV2.result);
+    return ctx.data.planReadinessV2;
+  }
+  function planInputNamesMismatch(hashes, snapshot) {
+    return Object.entries(planningInputHashes(snapshot)).some(
+      ([name, sha256]) => hashes?.[name] !== sha256,
+    );
+  }
+  async function legacyReviewScope(ctx, originals) {
+    const after = await workingSnapshot(ctx.data.worktree);
+    const relative = `${ctx.assignment.artifactDir}/review.json`;
+    const allowed = [];
+    if (ctx.data.reviews && Object.hasOwn(after, relative)) {
+      // This is the one artifact the old controller wrote after its reviewer
+      // snapshot. Prove the exact saved payload and terminal worker identities;
+      // no other controller path is exempt from the read-only stage audit.
+      const reviews = ctx.data.reviews;
+      if (
+        !Array.isArray(reviews) ||
+        reviews.length !== 3 ||
+        new Set(reviews.map((review) => review.lens)).size !== 3 ||
+        reviews.some((review) => {
+          const original = originals.find((entry) =>
+            entry.key.startsWith(`review:${review.lens}:`),
+          );
+          return (
+            !original?.result ||
+            original.receipt.attemptId !== review.attemptId ||
+            digest(original.result) !== digest(review.result)
+          );
+        })
+      )
+        throw problem(
+          "REVIEW_OUTPUT",
+          "Saved legacy reviews lack matching terminal evidence",
+        );
+      const expected = {
+        baseSha: ctx.data.baseSha,
+        sourceDigest: ctx.data.sourceDigest,
+        diffSha256: ctx.data.sourceDiffSha256,
+        spec: {
+          path: ctx.data.specFile,
+          sha256: ctx.data.spec.sha256,
+          frozenSha256: ctx.data.spec.frozenSha256,
+        },
+        snapshot: ctx.data.bmadSnapshot,
+        reviews,
+      };
+      if (after[relative]?.sha256 !== digest(`${canonicalJson(expected)}\n`))
+        throw problem(
+          "STAGE_SCOPE",
+          "Legacy review artifact differs from its saved evidence",
+        );
+      allowed.push(relative);
+    }
+    assertStageScope(ctx.data.reviewBefore, after, allowed);
+  }
+  async function settleLegacyReviews(ctx, auditBefore) {
+    const keys = Object.keys(ctx.state.attempts)
+      .filter((key) => /^review:(blind|edge|verification):/.test(key))
+      .sort();
+    if (!keys.length) return [];
+    // Consume every original immutable request first. State.status alone is
+    // not a receipt; unknown/corrupt/live originals cannot authorize upgrades.
+    const settled = await Promise.allSettled(
+      keys.map(async (key) => ({
+        key,
+        ...(await resumeWorkerAttempt(ctx, key)),
+      })),
+    );
+    const failed = settled.find((entry) => entry.status === "rejected");
+    if (failed) throw failed.reason;
+    const originals = settled.map((entry) => {
+      const value = entry.value;
+      let result = null,
+        failure = null;
+      try {
+        if (value.receipt.exitCode !== 0)
+          throw problem(
+            "WORKER_FAILED",
+            "Original reviewer exited unsuccessfully",
+          );
+        result = parseReviewResult(value.key.split(":")[1], value.raw);
+      } catch (error) {
+        failure = {
+          code: error.code ?? "REVIEW_OUTPUT",
+          message: error.message,
+        };
+      }
+      return {
+        key: value.key,
+        requestDigest: value.requestDigest,
+        receipt: value.receipt,
+        raw: value.raw,
+        result,
+        failure,
+      };
+    });
+    if (
+      auditBefore &&
+      ctx.data.reviewBefore &&
+      !ctx.data.legacyReviewSettlementV2
+    )
+      await legacyReviewScope(ctx, originals);
+    if (!ctx.data.legacyReviewSettlementV2)
+      await ctx.save({ legacyReviewSettlementV2: originals });
+    else if (digest(ctx.data.legacyReviewSettlementV2) !== digest(originals))
+      throw problem(
+        "REVIEW_OUTPUT",
+        "Original review evidence changed after upgrade settlement",
+      );
+    await atomicWriteJson(
+      path.join(ctx.runDir, "legacy-reviews-v1.json"),
+      originals,
+    );
+    return originals;
+  }
+  async function ensureReviewsV2(ctx, auditLegacyBefore = false) {
+    const originals = await settleLegacyReviews(ctx, auditLegacyBefore);
+    if (
+      [...originals, ...(ctx.data.reviews ?? [])].some(
+        (review) => review.result?.findings?.length,
+      )
+    )
+      throw problem(
+        "REVIEW_FINDINGS",
+        "Original review has unresolved findings; input delivery cannot clear them",
+      );
+    const readiness = await ensurePlanningReady(ctx);
+    await assertSource(ctx);
+    const binding = {
+      sourceDigest: ctx.data.sourceDigest,
+      diffSha256: ctx.data.sourceDiffSha256,
+      specBodySha256: ctx.data.spec.bodySha256,
+      frozenSha256: ctx.data.spec.frozenSha256,
+      planSha256: digest(ctx.data.plan.result),
+      snapshotSha256: ctx.data.bmadSnapshot.manifestSha256,
+    };
+    if (
+      ctx.data.reviewV2Binding &&
+      digest(ctx.data.reviewV2Binding) !== digest(binding)
+    )
+      throw problem("REVIEW_OUTPUT", "Validated review input changed");
+    if (!ctx.data.reviewsV2) {
+      if (!ctx.data.reviewBeforeV2)
+        await ctx.save({
+          reviewBeforeV2: await workingSnapshot(ctx.data.worktree),
+          reviewV2Binding: binding,
+        });
+      const settled = await Promise.allSettled(
+        ["blind", "edge", "verification"].map(async (lens) => ({
+          lens,
+          ...(await worker(ctx, {
+            kind: "review",
+            lens,
+            identity: ctx.data.sourceDigest,
+            heartbeat: beats(ctx),
+          })),
+        })),
+      );
+      const failed = settled.find((entry) => entry.status === "rejected");
+      if (failed) throw failed.reason;
+      const results = settled.map((entry) => entry.value);
+      assertStageScope(
+        ctx.data.reviewBeforeV2,
+        await workingSnapshot(ctx.data.worktree),
+        [],
+      );
+      await assertSource(ctx);
+      for (const result of results) {
+        if (
+          result.provenance?.deliveryProtocol !== DELIVERY_PROTOCOL ||
+          result.provenance.diffSha256 !== ctx.data.sourceDiffSha256
+        )
+          throw problem(
+            "REVIEW_OUTPUT",
+            "Reviewer did not consume the current protocol 2 candidate",
+          );
+        parseReviewResult(result.lens, result.result.raw);
+      }
+      await ctx.save({ reviewsV2: results });
+    }
+    if (
+      ctx.data.reviewsV2.length !== 3 ||
+      new Set(ctx.data.reviewsV2.map((review) => review.lens)).size !== 3
+    )
+      throw problem(
+        "REVIEW_OUTPUT",
+        "Protocol 2 requires three independent lenses",
+      );
+    for (const review of ctx.data.reviewsV2) {
+      if (
+        review.provenance?.deliveryProtocol !== DELIVERY_PROTOCOL ||
+        review.provenance.diffSha256 !== ctx.data.sourceDiffSha256 ||
+        review.result.rawSha256 !== digest(review.result.raw)
+      )
+        throw problem(
+          "REVIEW_OUTPUT",
+          "Cached review proof identity is invalid",
+        );
+      if (parseReviewResult(review.lens, review.result.raw).findings.length)
+        throw problem(
+          "REVIEW_FINDINGS",
+          "Protocol 2 review has findings; no repair loop is started",
+        );
+    }
+    const proof = {
+      protocol: DELIVERY_PROTOCOL,
+      binding,
+      readiness,
+      reviews: ctx.data.reviewsV2,
+      legacyReviews: ctx.data.legacyReviewSettlementV2 ?? [],
+    };
+    const proofSha256 = digest(proof);
+    await atomicWriteJson(path.join(ctx.runDir, "delivery-v2.json"), proof);
+    await ctx.save({
+      deliveryV2: {
+        proofSha256,
+        binding,
+        readiness,
+        reviews: ctx.data.reviewsV2,
+      },
+    });
+    return proof;
   }
   async function progress(ctx, stage) {
     await lin.comment(
@@ -1004,22 +1400,27 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       );
       await ctx.save({ plan: result });
     }
-    validateWorkerResult("plan", ctx.data.plan.result);
+    validateWorkerResult("plan", ctx.data.plan.result, {
+      legacy: ctx.data.plan.provenance?.deliveryProtocol !== DELIVERY_PROTOCOL,
+    });
     await audit(ctx);
     await evidence(ctx, "plan.json", {
       ...ctx.data.plan.result,
       provenance: ctx.data.plan.provenance ?? null,
     });
+    const legacy =
+      ctx.data.plan.provenance?.deliveryProtocol !== DELIVERY_PROTOCOL;
+    if (legacy) await ensurePlanningReady(ctx);
     await writeSpecification(
       ctx,
       snapshot,
-      ctx.data.plan.result.intentGaps.length ? "draft" : "ready-for-dev",
+      ctx.data.plan.result.intentGaps.length ||
+        ctx.data.plan.result.runtimeBlockers?.length ||
+        ctx.data.plan.result.ready === false
+        ? "draft"
+        : "ready-for-dev",
     );
-    if (ctx.data.plan.result.intentGaps.length)
-      throw problem(
-        "INTENT_GAPS",
-        "Planning found unresolved user-visible intent gaps; implementation cannot start",
-      );
+    await ensurePlanningReady(ctx);
     await progress(ctx, "Výzkum a volba řešení dokončeny");
   }
   async function implementationEvidence(ctx) {
@@ -1035,12 +1436,18 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
     );
   }
   async function implement(ctx) {
-    validateWorkerResult("plan", ctx.data.plan?.result);
+    validateWorkerResult("plan", ctx.data.plan?.result, {
+      legacy: ctx.data.plan.provenance?.deliveryProtocol !== DELIVERY_PROTOCOL,
+    });
     if (ctx.data.plan.result.intentGaps.length)
       throw problem(
         "INTENT_GAPS",
         "Implementation cannot resolve user-owned intent gaps",
       );
+    const resumeDispatchedImplementation = Boolean(
+      ctx.state.attempts.implement && !ctx.data.implementation,
+    );
+    if (!resumeDispatchedImplementation) await ensurePlanningReady(ctx);
     await writeSpecification(
       ctx,
       await loadBmadSnapshot(ctx.data.renderedWorkflow, ctx.data.bmadSnapshot),
@@ -1085,6 +1492,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       sourceDiffSha256: digest(identity.diff),
       implementation: result,
     });
+    await ensurePlanningReady(ctx);
     await implementationEvidence(ctx);
   }
   async function review(ctx) {
@@ -1094,50 +1502,11 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       await loadBmadSnapshot(ctx.data.renderedWorkflow, ctx.data.bmadSnapshot),
       "in-review",
     );
-    if (!ctx.data.reviews) {
-      if (!ctx.data.reviewBefore)
-        await ctx.save({
-          reviewBefore: await workingSnapshot(ctx.data.worktree),
-        });
-      const results = await Promise.allSettled(
-        ["blind", "edge", "verification"].map(async (lens) => ({
-          lens,
-          ...(await worker(ctx, {
-            kind: "review",
-            lens,
-            identity: ctx.data.sourceDigest,
-            heartbeat: beats(ctx),
-          })),
-        })),
-      );
-      const rejected = results.find((item) => item.status === "rejected");
-      if (rejected) throw rejected.reason;
-      const reviews = results.map((item) => item.value);
-      assertStageScope(
-        ctx.data.reviewBefore,
-        await workingSnapshot(ctx.data.worktree),
-        [],
-      );
-      await assertSource(ctx);
-      await ctx.save({ reviews });
+    const proof = await ensureReviewsV2(ctx, true);
+    if (!ctx.data.commitSha && !ctx.data.stagingIntent) {
+      await evidence(ctx, "review-v2.json", proof);
+      await ctx.save({ deliveryV2Published: true });
     }
-    await evidence(ctx, "review.json", {
-      baseSha: ctx.data.baseSha,
-      sourceDigest: ctx.data.sourceDigest,
-      diffSha256: ctx.data.sourceDiffSha256,
-      spec: {
-        path: ctx.data.specFile,
-        sha256: ctx.data.spec.sha256,
-        frozenSha256: ctx.data.spec.frozenSha256,
-      },
-      snapshot: ctx.data.bmadSnapshot,
-      reviews: ctx.data.reviews,
-    });
-    if (ctx.data.reviews.some((item) => item.result.findings.length))
-      throw problem(
-        "REVIEW_FINDINGS",
-        "Independent review found actionable issues; integration is stopped",
-      );
     await progress(ctx, "Tři nezávislá review bez podložených nálezů");
   }
   async function verify(ctx) {
@@ -1217,7 +1586,8 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
     );
   }
   function handoff(ctx) {
-    return `# Předání ${ctx.assignment.task}\n\nRun: ${ctx.runId}\nOwner: ${ctx.data.owner}; worker: ${ctx.data.workerOwner}\nBase: ${ctx.data.baseSha}\nSource/test SHA256: ${ctx.data.sourceDigest}\n\n${ctx.data.implementation.result.summary}\n\n## Ověření\n\n${ctx.data.checks.map((check) => `- ${check.id}: exit ${check.exitCode}; ${[check.command, ...check.args].join(" ")}`).join("\n")}\n\nTři nezávislé review: ${ctx.data.reviews.map((review) => `${review.lens} (${review.attemptId}): ${review.result.findings.length} nálezů`).join(", ")}.\n\nPřejímka: ${ctx.assignment.acceptance.description}\n\nDůkazy: ${ctx.assignment.artifactDir}/. Surové provozní logy zůstávají v git-common-dir. Integrace a main CI se dokládají ve stejném Linear run komentáři a PR. Hra/GPU se tímto CLI ověřením nepovažuje za otestovanou. Katalog přijímá koordinátor.\n`;
+    const reviews = reviewResults(ctx);
+    return `# Předání ${ctx.assignment.task}\n\nRun: ${ctx.runId}\nOwner: ${ctx.data.owner}; worker: ${ctx.data.workerOwner}\nBase: ${ctx.data.baseSha}\nSource/test SHA256: ${ctx.data.sourceDigest}\n\n${ctx.data.implementation.result.summary}\n\n## Ověření\n\n${ctx.data.checks.map((check) => `- ${check.id}: exit ${check.exitCode}; ${[check.command, ...check.args].join(" ")}`).join("\n")}\n\nTři nezávislé review: ${reviews.map((review) => `${review.lens} (${review.attemptId}): ${review.result.findings.length} nálezů`).join(", ")}.\n\nPřejímka: ${ctx.assignment.acceptance.description}\n\nDůkazy: ${ctx.assignment.artifactDir}/. Surové provozní logy zůstávají v git-common-dir. Integrace a main CI se dokládají ve stejném Linear run komentáři a PR. Hra/GPU se tímto CLI ověřením nepovažuje za otestovanou. Katalog přijímá koordinátor.\n`;
   }
   async function commit(ctx) {
     // A completed commit may precede its checkpoint. Verify parent/tree/marker
@@ -1264,8 +1634,8 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
     await assertSource(ctx);
     if (
       !ctx.data.checks?.length ||
-      ctx.data.reviews?.length !== 3 ||
-      ctx.data.reviews.some((review) => review.result.findings.length)
+      reviewResults(ctx)?.length !== 3 ||
+      reviewResults(ctx).some((review) => review.result.findings.length)
     )
       throw problem(
         "NOT_VERIFIED",
@@ -1342,7 +1712,10 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
   }
   function prBody(ctx, accepted = false) {
     const base = `https://github.com/${ctx.assignment.repository}/blob/${ctx.data.commitSha}`;
-    return `${ctx.assignment.prTitle}\n\n${ctx.data.implementation.result.summary}\n\nIssue: ${ctx.assignment.issue}\nRun: ${ctx.runId}\nHead: ${ctx.data.commitSha}\nBase: ${ctx.data.baseSha}\nSource/test SHA256: ${ctx.data.sourceDigest}\n\n[Handoff](${base}/${ctx.assignment.handoffFile}) · [Review](${base}/${ctx.assignment.artifactDir}/review.json) · [Checks](${base}/${ctx.assignment.artifactDir}/checks.json)\n\n${ctx.assignment.acceptance.description}\n${accepted ? `\nProject acceptance: accepted for this exact head/base.\n${ctx.data.ciChecks.map((check) => `- ${check.name}: ${check.url} (check ${check.checkId}, app ${check.appId})`).join("\n")}` : ""}`;
+    const delivery = ctx.data.deliveryV2
+      ? `\n\nProtocol 2 input-delivery evidence: ${ctx.data.deliveryV2.proofSha256}. Original legacy results are retained as historical evidence, not counted as completed reviews.\n\nReadiness: ${JSON.stringify(ctx.data.deliveryV2.readiness.result)}\n\nReview results: ${JSON.stringify(ctx.data.deliveryV2.reviews.map((review) => ({ lens: review.lens, attemptId: review.attemptId, rawSha256: review.result.rawSha256, raw: review.result.raw })))}\n`
+      : "";
+    return `${ctx.assignment.prTitle}\n\n${ctx.data.implementation.result.summary}\n\nIssue: ${ctx.assignment.issue}\nRun: ${ctx.runId}\nHead: ${ctx.data.commitSha}\nBase: ${ctx.data.baseSha}\nSource/test SHA256: ${ctx.data.sourceDigest}\n\n[Handoff](${base}/${ctx.assignment.handoffFile}) · [${ctx.data.deliveryV2Published ? "Review" : "Original review artifact"}](${base}/${ctx.assignment.artifactDir}/${ctx.data.deliveryV2Published ? "review-v2.json" : "review.json"}) · [Checks](${base}/${ctx.assignment.artifactDir}/checks.json)\n\n${ctx.assignment.acceptance.description}\n${accepted ? `\nProject acceptance: accepted for this exact head/base.\n${ctx.data.ciChecks.map((check) => `- ${check.name}: ${check.url} (check ${check.checkId}, app ${check.appId})`).join("\n")}` : ""}${delivery}`;
   }
   const stages = {
     prepare,
@@ -1379,21 +1752,38 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       return { ciChecks };
     },
     accept: async (ctx) => {
+      await ensureReviewsV2(ctx);
       await assertSource(ctx);
       if (
-        ctx.data.reviews.length !== 3 ||
-        ctx.data.reviews.some((review) => review.result.findings.length) ||
+        reviewResults(ctx).length !== 3 ||
+        reviewResults(ctx).some((review) => review.result.findings.length) ||
         ctx.data.checks.some((check) => check.exitCode !== 0)
       )
         throw problem("NOT_VERIFIED", "Cannot accept unverified candidate");
       const acceptance = await gh.accept(ctx, prBody(ctx, true));
-      await ctx.save({ acceptance });
+      await ctx.save({
+        acceptance,
+        acceptanceDeliverySha256: ctx.data.deliveryV2.proofSha256,
+      });
       await progress(ctx, "Přijato pro přesný head/base a skutečné CI");
     },
-    merge: async (ctx) =>
-      ctx.assignment.merge
-        ? { mergeSha: await gh.merge(ctx) }
-        : { awaitingMerge: true },
+    merge: async (ctx) => {
+      if (!ctx.assignment.merge) return { awaitingMerge: true };
+      const pr = await gh.pr(ctx.data.prNumber);
+      gh.assertPr(pr, ctx, { allowMerged: Boolean(pr.merged) });
+      if (pr.merged) {
+        if (!/^[a-f0-9]{40}$/.test(pr.merge_commit_sha ?? ""))
+          throw problem(
+            "MERGE_IDENTITY",
+            "Merged PR has no valid merge commit identity",
+          );
+        return { mergeSha: pr.merge_commit_sha };
+      }
+      await ensureReviewsV2(ctx);
+      if (ctx.data.acceptanceDeliverySha256 !== ctx.data.deliveryV2.proofSha256)
+        await stages.accept(ctx);
+      return { mergeSha: await gh.merge(ctx) };
+    },
     finalize: async (ctx) => {
       if (!ctx.data.finalizationReady && ctx.assignment.merge) {
         const pr = await gh.pr(ctx.data.prNumber);

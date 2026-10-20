@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ready", "intentGaps", "runtimeBlockers", "evidence"],
+  "properties": {
+    "ready": { "type": "boolean" },
+    "intentGaps": { "type": "array", "items": { "type": "string" } },
+    "runtimeBlockers": { "type": "array", "items": { "type": "string" } },
+    "evidence": { "type": "array", "items": { "type": "string" } }
+  }
+}

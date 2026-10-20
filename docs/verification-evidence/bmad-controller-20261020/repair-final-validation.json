@@ -1,0 +1,66 @@
+{
+  "base": "c1c56327240d5634fa3f4670fc7264e6a4287238",
+  "startedAt": "2026-10-20T01:52:04.7369269Z",
+  "finishedAt": "2026-10-20T01:57:06.9570858Z",
+  "command": "node --test tests/autodev-adapters.test.ts",
+  "exitCode": 0,
+  "tests": 51,
+  "passed": 51,
+  "failed": 0,
+  "skipped": 0,
+  "sourceBundleSha256": "57d41d4b032aa5172f4944ca07eab92fa36fcf46d628b473e61c44330d435963",
+  "sources": [
+    {
+      "file": "scripts/autodev/adapters.mjs",
+      "sha256": "eb757442893c0f3683636da81f8ff2ac3aece7ada8b7a03804defb680fc825f3"
+    },
+    {
+      "file": "scripts/autodev/codex.mjs",
+      "sha256": "84515a1601c0b9934004278426402ab7ce39ee50bec0222e117171ffc2cd536e"
+    },
+    {
+      "file": "scripts/autodev/github.mjs",
+      "sha256": "72641ba4f3566ac0c5e721eb952da50486ad68dd9f1bca5b66262dd0f0f98269"
+    },
+    {
+      "file": "scripts/autodev/linear.mjs",
+      "sha256": "db4e83b416c73be2571d588744dee8f35e3f79509d0e77e6217705facff1201d"
+    },
+    {
+      "file": "scripts/autodev/prompts/common.md",
+      "sha256": "617e421b4f9b0814efcf650eff59a0ad1e0f2997993438f26baef956b82c8101"
+    },
+    {
+      "file": "scripts/autodev/schemas/implement.json",
+      "sha256": "f47eeb928d7ea0ff5ea63f21ff62515b558c6fe100db36762b5cd5e49bcf48bd"
+    },
+    {
+      "file": "scripts/autodev/schemas/plan-readiness.json",
+      "sha256": "cb118e6f0a2d63179ccbe4f0582e2db8ffbda5ee822ff3a90b9ed0f12ffe20d7"
+    },
+    {
+      "file": "scripts/autodev/schemas/plan.json",
+      "sha256": "bcc675b832a2b6815e288ecaa7b9c71f6a9190ae42a58a9bc5cce2c8215bd4b0"
+    },
+    {
+      "file": "tests/autodev-adapters.test.ts",
+      "sha256": "9e9774dcc124400df845f494fa43b2f050ba4af553e7d1f5467bf88b44e0015b"
+    }
+  ],
+  "stdoutSha256": "30363022c6de4c3d0ef967ad1cfe5f00b12047f8cc15b4162d684f40c664ec14",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "previousFailure": {
+    "result": {
+      "startedAt": "2026-10-20T01:40:19.5665993Z",
+      "finishedAt": "2026-10-20T01:45:19.5910888Z",
+      "command": "node --test tests/autodev-adapters.test.ts",
+      "exitCode": 1
+    },
+    "tests": 50,
+    "passed": 49,
+    "failed": 1,
+    "stdoutSha256": "fbeed8a135e8b398b0f8d49ac028e6e6ba0dc1f3374f90825b2fcbb9f2a3e19b",
+    "cause": "Unknown: exact failing worker receipt/stderr had been cleaned before the original diagnostic capture. Three bounded reproductions passed. Test-only diagnostics added; production sources unchanged."
+  },
+  "review": "All B1/B2/E1/E2/V1/V2 closed by original independent reviewers; diagnostics-only recheck confirms unchanged assertions and no retry."
+}
