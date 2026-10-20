@@ -99,7 +99,7 @@ export class RenderIncidentProfile {
   private disposed = false;
 
   constructor(
-    private readonly scene: Scene,
+    scene: Scene,
     private readonly now: () => number = () => performance.now(),
   ) {
     this.phases = new BenchmarkRenderProfile(scene, now, (renderer, duration) =>

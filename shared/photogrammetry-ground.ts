@@ -5,7 +5,6 @@ import landcover from "./data/landcover.json";
 import { B6_LAYOUT } from "./b6-interior";
 import {
   STREET_SURFACES,
-  STREET_FEATURES,
   isStreetSurface,
   type StreetPoint,
   type StreetMaterial,
