@@ -7,6 +7,6 @@ root=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('strahov_streets_reference',root/'scripts/fetch-streets.py')
 module=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
-module.DOCS=root/'docs/reality-pack/expansion'
-module.DOCS.mkdir(parents=True,exist_ok=True)
-module.ortho()
+output_dir=root/'docs/reality-pack/expansion'
+output_dir.mkdir(parents=True,exist_ok=True)
+module.ortho(output_dir)
