@@ -1,0 +1,11 @@
+# KEY-58: průběžné převzetí a syntéza
+
+Koordinátor ai3d-research-01a15a3e-root, izolovaná kopie `.cache/player-feedback-20261020`, větev `codex/ai3d-animation-workflows-20261021`. Původní sdílený checkout ani cizí WIP se nemění. Uživatelský cíl zahrnuje původní hezké/fiktivní modely a textově řízené animace; není omezený na současné herní assety.
+
+Převzaté r1/r2 geometry/motion/Blender digests a jejich handoffy jsou doložené původními subagenty, kteří své claims uvolnili. Úzký Blender pilot je rovněž předaný a heavy/GPU uvolněné; skutečný5.2.2LTS native reopen, GLB4s/63posechecks, aditivní revize a zachované mesh/Action streamy prošly. Parent nezávisle přečetl GLB bajty, receipts a oba PNG. Podrobný pilot handoff se zachovává. Žádný nový runtime/produkční asset nebyl integrován.
+
+Root přijímá výslovně pouze celý tento vlastní research run, jeho dokončené disjunktní digests/pilot a přesné čtyři child handoffy pro syntézu, závěrečné editace, staging a commit. Tyto cesty jsou nové vlastní výstupy téhož zadání, nikoli převzaté starší WIP. Před dalším zápisem se root claim řádně release/edit/reclaim rozšíří pod admin rezervací, --adopt-dirty pouze pro takto doložené vlastní výsledky. Nadále bez lokálních heavy/GPU zdrojů.
+
+Finální sémantický audit našel dvě skutečné opravy: aktuální Meshy Text to Motion API a biped retarget mají přednost před původní hypotézou založenou na užším webovém manuálu; AnimateAnyMesh inference/release musí mít vlastní odkazy vedle render.py. Obojí doplněno. Nezávislý spot-check také zabránil nepravdivému tvrzení, že Blender FBX obecně nepřenáší relativní shape-key animace. Structure/prose review dokončeno:1 přesun a5 jazykových nálezů opraveno. Mechanické citace30/30, ledger4verified/26unverified s explicitními limity. Research task a KEY-58 výzkumný výstup jsou přijaty; publikace po domluveném KEY-53 okně a celý performance goal dál pokračují.
+
+Feedback KEY-52 už je Done na main c3454da4 a jeho main CI1852/1852/build/integrace/hygiene PASS. Samostatný closing docs PR21/head65d1e140 má zelenou CI, ale jeho merge je výslovně odložen kvůli přesné base běhu KEY-53. Publication okno nyní vlastní jeho koordinátor. Následný celkový goal zůstává aktivní i po dokončení modelového reportu, protože pokračuje výkonová analýza v samostatném tasku a čeká se na nové srovnatelné KEY-53 důkazy.

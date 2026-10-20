@@ -1,0 +1,29 @@
+# Předání: ai3d-geometry-research-20261021
+
+- Vlastník: `ai3d-01a15a3e-geometry`; příjemce: koordinátor `/root`, owner `ai3d-research-01a15a3e-root`.
+- Pracovní kopie: `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020`; větev `codex/ai3d-animation-workflows-20261021`; výchozí a při předání aktuální HEAD `ecee890baee2478a1f6133890c00929f07bdaa58`.
+- Výsledek: dokončený dokumentační digest geometrie a výtvarného směru. Shortlist Meshy, Tripo, Rodin; podmíněný lokální TRELLIS.2; procedural Blender jako odlišná cesta. Žádný vítěz krásy nebo cena použitelného assetu nebyli experimentálně prokázáni.
+- Vlastní změněné soubory:
+  - `_bmad-output/planning-artifacts/research/technical-text-to-3d-animation-workflows-2026-10-21/digests/geometry/r1.md`
+  - `_bmad-output/planning-artifacts/research/technical-text-to-3d-animation-workflows-2026-10-21/digests/geometry/r2.md`
+  - `docs/agents/handoffs/ai3d-geometry-research-20261021.md`
+- Cizí WIP: výchozí untracked výzkumný adresář koordinátora; při závěru navíc `docs/performance/evidence/continuation-20261021/`. Nic z toho nebylo přebráno, upraveno, stageováno nebo commitováno. Zápisy pouze do přesných vlastních cest.
+- Podklady: celkem 34 strukturovaných skupin tvrzení G01–G34 s URL, publisher, publication/access date, confidence, class a verificationStatus. Operativní projektové dokumenty použity pouze pro oprávnění a otázky, ne jako důkaz produktů.
+- Kritické závěry:
+  - Meshy current API má 7.1/latest a T2.5; rozlišit web/Agent/API ceny a starší rozpory help/docs. Smart Topology je triangle-only; API `lowpoly` se má vypnout 30. 10. 2026.
+  - Meshy private není no-training; terms rozlišují paid/free ownership, udělenou licenci, community CC0 a non-Enterprise training.
+  - Tripo H3/P1 mají jiný účel/parametry; aktuálně čtené terms §5.2.2 mají výslovnou no-training větu, paid service license a bez garance jedinečnosti.
+  - Rodin Gen-2.5 má explicitní tier; jinak fallback starší rodiny. Doložené exporty GLB/FBX atd., PBR/Shaded a nominální kreditové příplatky. Rodin a ChatAvatar terms nejsou totožné.
+  - TRELLIS.2 model/code MIT, ale README odkazuje oddělené nvdiffrast/nvdiffrec licence se software noncommercial omezením. Konkrétní inference/export/render dependency audit před komerční volbou zůstává otevřený. Netvrdíme dědění licence na GLB.
+  - Hunyuan3D-2.1 konkrétní community licence má územní omezení mimo EU/UK/S.Korea; nejde o všechny Hunyuan verze. Buffalo1.0 release paperu sám nedokládá použitelnou distribuci.
+- Refaktoring: bez produktové implementace; r2 odděluje aktualizovanou syntézu od předběžného r1 a výslovně opravuje/nepřebíjí jeho rozpory. Cache, alokace a lifecycle běžícího produktu se neměnily.
+- Ověření: v této pracovní kopii proběhly git status/worktree/registry checks, úspěšný claim, opakované heartbeaty, `git diff --check` exit 0 (tracked diff; není validací untracked obsahu), samostatná textová kontrola všech 34 claim IDs/referencí a trailing whitespace, kontrola lokálního odkazu r2→r1. Každý rozhodovací právní/cenový odstavec dočten na primárním zdroji v tomto běhu. Praktické testy, API a Blender nebyly spuštěny.
+- Identita předaných digestů SHA-256:
+  - `r1.md`: `F5F08A98F1A5706679EBBB9C87334971E6EFA101A350009ABFFB57DADC8E2B42`
+  - `r2.md`: `5503F5B945E89334C10C4AEF933528958B11D1108356AE36E90C45383E58E40A`
+  - Jde o identitu dokumentů, nikoli runtime snapshot; žádné zdrojové/testové soubory se neměnily.
+- Procesy a zdroje: žádný helper, server, port, build, GPU, Blender ani placená služba spuštěny. Krátké shell příkazy skončily. Žádné credentials nebyly čteny ani použity.
+- Omezení a rozpočtová odchylka: původní cíl byl osm přečtených zdrojů/kolo. R1 má 15 citovaných primárních zdrojů při šesti webových dávkách; r2 19 nových citovaných URL + znovu README a dvě pomocná primární čtení, tedy 21 nových čtení při devíti dávkách. Akviziční cíl byl překročen. Koordinátor dal stop akvizice; poté jen syntéza a předání. Nezaměňovat tuto odchylku za dodržení limitu.
+- Mezery: bez generování nelze určit stylovou konzistenci, úspešnost neexistujících tvarů, retopo/UV/rig kvalitu, počet pokusů, skutečnou útratu nebo herní výkon. Blender official manual se načetl jako primární plný indexovaný text přes search, přímé otevření vrátilo 402; aktuální lokální Blender kompatibilita nebyla ověřena. Undated docs accessed nyní nemění datum publikace; chybějící dated říjnové release údaje přiznány.
+- Rezervace: při vytvoření handoff stále vlastní; po kontrolách následuje `release --task ai3d-geometry-research-20261021 --owner ai3d-01a15a3e-geometry`. Živý registr je autorita skutečného uvolnění. Stav tasku mění až integrátor.
+- Integrátor: převzít jen tři vlastní soubory, citace použít podle Gxx registru, sjednotit s motion/Blender evidence a označit pilot jako další neprovedené ověření. Žádný herní update ani commit nevznikl.
