@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "bmad-controller-live-pilot-20261020",
+  "title": "KEY-47: řadič pilotu, BMAD podklady a předání",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "_bmad-output/implementation-artifacts/bmad-controller-live-pilot-20261020/",
+    "_bmad/render/bmad-build/",
+    "docs/agents/handoffs/bmad-controller-live-pilot-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze výslovně zadaný rozsah; doložené skutečné výsledky a ukončené vlastní procesy."
+  ],
+  "verification": [
+    "Podle specifikace KEY-46/KEY-47 a manifestu přiděleného pilotu."
+  ],
+  "notes": [
+    "Výslovně přidělený jediný pilot KEY-47. Spouští pouze nový autodev řadič po integraci KEY-46; žádné automatické vybírání backlogu.",
+    "Zdrojové změny vlastní disjunktní bmad-controller-live-pilot-worker-20261020."
+  ]
+}

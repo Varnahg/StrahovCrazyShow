@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "bmad-controller-validation-20261020",
+  "title": "KEY-46: stabilní checkpoint a úplné lokální ověření",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "node_modules/",
+    "dist/",
+    "assets/blender/buildings/source-plan.json",
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_alpha_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_arm_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_diff_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_dry_diff_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.exr",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_rough_8k.exr",
+    "public/models/vegetation/realistic/strahov-individual-trees.glb",
+    "public/models/vegetation/runtime/far.glb"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Pouze výslovně zadaný rozsah; doložené skutečné výsledky a ukončené vlastní procesy."
+  ],
+  "verification": [
+    "Podle specifikace KEY-46/KEY-47 a manifestu přiděleného pilotu."
+  ],
+  "notes": [
+    "Pouze koordinátor KEY-46 po dokončení zdrojových změn a refaktoringu. Vlastní logy zůstávají v coordination scope. Žádný GPU proces.",
+    "Před frozen instalací a buildem výslovně rezervuje také jejich ignored výstupy; manifest/lockfile se nemění.",
+    "Před dalším plným testem materializuje pouze12 čistých committed HEAD LFS vstupů z jejich objektových OID. Žádná regenerace, přebírání primary WIP ani změna modelů."
+  ]
+}

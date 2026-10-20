@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "dependsOn": [],
+  "resources": [],
+  "acceptance": [
+    "Pouze vlastní task scope, zachovat cizí WIP a projektové rezervace.",
+    "Doložit implementaci, cílený refaktoring a skutečné ověření; žádný samotný mock výsledek není živá přejímka."
+  ],
+  "verification": [
+    "Cílené Node testy a kontrola vlastního diffu."
+  ],
+  "notes": [
+    "KEY-46; výslovné zadání uživatele 20.10.2026. Podagent nespouští rekurzivní BMAD a vlastní jen přidělené soubory.",
+    "Čeká na kontrakt, testy vlastních fixture procesů. Nesahat na vlastní jádro/adaptéry jiných agentů.",
+    "Kontrakt připraven: _bmad-output/implementation-artifacts/bmad-controller-20261020/contract.md. Implementace se deleguje sekvenčně podle BMAD kroku 3."
+  ],
+  "id": "bmad-controller-recovery-qa-20261020",
+  "title": "KEY-46: procesní crash/restart a idempotence testy řadiče",
+  "status": "ready",
+  "writePaths": [
+    "scripts/test-autodev.mjs",
+    "tests/autodev-recovery.test.ts",
+    "tests/fixtures/autodev/",
+    "docs/agents/handoffs/bmad-controller-recovery-qa-20261020.md"
+  ]
+}
