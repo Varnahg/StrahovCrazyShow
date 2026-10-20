@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "global-refactor-world-visual-20261020",
+  "title": "KEY-48: neměnný baseline/candidate produkční scénář světa",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/refactor-baseline-20261020/",
+    ".cache/performance-snapshot/refactor-world-20261020/",
+    ".cache/refactor-preview/",
+    "docs/agents/handoffs/global-refactor-world-visual-20261020.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4290"
+  ],
+  "acceptance": [
+    "Zmrazit zdroje, assety i testy přes existující snapshot skript, ověřit před/po hashe a zachovat dependency/patch identitu.",
+    "Spustit pouze vlastní produkční server na ověřeném volném portu4290 se STATIC_DIR vlastního neměnného dist; před každým hraním ověřit skutečnou URL a klientský snapshot ID.",
+    "Prohlédnout celou produkční scénu s HUD, kanonické budovy, B6, terén, ovládání/kameru a lifecycle. Zachovat původní chyby a odlišit je od případné regrese.",
+    "Žádná tvrzení o FPS nebo zrychlení z vizuální přejímky. Na konci ukončit jen vlastní procesy a zavřít vlastní GPU scénu."
+  ],
+  "verification": [
+    "node scripts/performance-snapshot.mjs refactor-baseline-20261020 a později refactor-world-20261020; nikdy neměnit už zmrazené zdroje.",
+    "Build přímými Node CLI ve snapshotu s již nainstalovanými zamčenými dependencies, bez automatické reinstalace přes pnpm exec v borrowed node_modules.",
+    "Skutečný browser: zaznamenat URL, build ID, GPU/backend, rozlišení, obrazové kontroly a chyby; nullengine nestačí.",
+    "Ověřit vlastní server PID/cwd/command a ukončení; nepřebírat cizí porty/procesy."
+  ],
+  "notes": [
+    "Použít až po uvolnění validačního heavy-validation okna. Task vlastní jen své výstupy, nemění společný performance-snapshot.mjs ani uživatelův testovací build.",
+    "Snapshot skript v současné verzi neobsahuje patches/; reprodukční patch lze přidat před uzavřením vlastní dependency evidence, s ověřenými hashy a výslovným doplněním manifestu."
+  ]
+}

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "global-refactor-update-20261020",
   "title": "KEY-48: aktualizovat izolovanou větev na přijatý main po dokončení KEY-46/47",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "_bmad-output/implementation-artifacts/bmad-controller-20261020/contract.md",
@@ -136,6 +136,7 @@
   ],
   "notes": [
     "Uživatel výslovně přikázal počkat na chat 01a155b2-1927-7681-9a9e-090b6c7bd974 a po jeho dokončení aktualizovat větev a pokračovat. Chat skončil, PR12 merge db23fff9 má úspěšnou PR i main CI.",
-    "Scope je přesný souborový rozdíl pracovních kopií pro aktualizaci přijatými commity, nikoli nová implementace těchto modulů. Rebase se týká jen vlastních nepublikovaných commitů 607721c2 a bootstrap metadata."
+    "Scope je přesný souborový rozdíl pracovních kopií pro aktualizaci přijatými commity, nikoli nová implementace těchto modulů. Rebase se týká jen vlastních nepublikovaných commitů 607721c2 a bootstrap metadata.",
+    "Přijato koordinátorem: rebase pouze vlastních metadata commitů na db23fff9, čistý strom, konflikt handoffu zachoval obě sekce. Evidence docs/agents/handoffs/global-refactor-update-20261020.md, commit b3ad9b134688f45b4e0f97d9e0db84b3ac2716c4."
   ]
 }
