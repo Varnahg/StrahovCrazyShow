@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createServer, request } from "node:http";
-import { mkdtemp, readdir, readFile, rm, access } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { createLocalBenchmarkHandler } from "../server/local-benchmarks";
@@ -155,6 +155,277 @@ test("virtual camera projection preserves only finite bounded geometry metadata"
       }),
     );
 });
+
+function sceneViewSample() {
+  const matrix = Array.from({ length: 16 }, (_, i) => (i % 5 === 0 ? 1 : 0));
+  return {
+    position: { x: 1, y: 2, z: 3 },
+    yaw: 0,
+    pitch: 0,
+    lightingInstant: 0,
+    camera: {
+      position: { x: 4, y: 5, z: 6 },
+      fov: 0.8,
+      minZ: 0.1,
+      maxZ: 1000,
+      viewMatrix: matrix,
+      projectionMatrix: matrix,
+    },
+  };
+}
+
+test("projection preserves diagnostic key order, nullable fields and optional-block truthiness", () => {
+  const projected = projectLocalBenchmark({
+    ...sample(),
+    gpu: {
+      ...sample().gpu,
+      version: "Fixture version",
+      context: {
+        requestedAntialias: true,
+        actualAntialias: null,
+        defaultFramebuffer: false,
+        sampleBuffers: null,
+        samples: null,
+      },
+      requestedPowerPreference: "unknown",
+    },
+    triangles: 100,
+    drawCalls: 10,
+    grassClumps: 0,
+    triangleCountScope: "all-render-passes",
+    ambient: { cars: 3, passengers: 2, buses: 1, private: "drop" },
+    sceneView: sceneViewSample(),
+    engineCpuBreakdownMs: { renderTargets: 3, mainDraw: 2, activeMeshes: 1 },
+    renderCost: {
+      ...sample().renderCost,
+      shadows: { glassVisits: 2, shadowCasters: 1, private: "drop" },
+      surfaces: { materialUpdates: 3, meshVisits: 1, conversionPasses: 2 },
+    },
+  });
+  for (const [value, keys] of [
+    [
+      projected,
+      [
+        "sourceSnapshotId",
+        "durationSeconds",
+        "frames",
+        "averageFps",
+        "p95FrameMs",
+        "p99FrameMs",
+        "renderErrorCount",
+        "assetLoadErrorCount",
+        "avatars",
+        "viewport",
+        "renderResolution",
+        "quality",
+        "gpu",
+        "avatarLod",
+        "triangles",
+        "drawCalls",
+        "grassClumps",
+        "triangleCountScope",
+        "ambient",
+        "sceneView",
+        "frameWork",
+        "engineCpuBreakdownMs",
+        "frameBreakdownMs",
+        "rendering",
+        "renderCost",
+      ],
+    ],
+    [
+      projected.gpu,
+      [
+        "renderer",
+        "vendor",
+        "classification",
+        "version",
+        "context",
+        "webglVersion",
+        "requestedPowerPreference",
+      ],
+    ],
+    [
+      projected.gpu.context,
+      [
+        "requestedAntialias",
+        "actualAntialias",
+        "defaultFramebuffer",
+        "sampleBuffers",
+        "samples",
+      ],
+    ],
+    [projected.ambient, ["buses", "passengers", "cars"]],
+    [
+      projected.sceneView,
+      ["position", "yaw", "pitch", "lightingInstant", "camera"],
+    ],
+    [
+      projected.sceneView.camera,
+      ["position", "fov", "minZ", "maxZ", "viewMatrix", "projectionMatrix"],
+    ],
+    [projected.renderCost, ["inventory", "shadows", "surfaces", "vegetation"]],
+    [
+      projected.renderCost.inventory,
+      [
+        "registeredMeshes",
+        "uniqueGeometryTriangles",
+        "enabledMeshCountsByMaterialClass",
+        "enabledTreeMeshesByLod",
+      ],
+    ],
+    [projected.renderCost.shadows, ["shadowCasters", "glassVisits"]],
+    [
+      projected.renderCost.surfaces,
+      ["meshVisits", "conversionPasses", "materialUpdates"],
+    ],
+  ] as const)
+    assert.deepEqual(Object.keys(value), keys);
+  assert.deepEqual(projected.frameWork, { cpuMs: 8.555, gpuMs: null });
+  assert.equal(projected.gpu.context.actualAntialias, null);
+  assert.equal(projected.gpu.context.samples, null);
+  assert.ok(!JSON.stringify(projected).includes("drop"));
+
+  for (const absent of [undefined, null, false, 0, ""]) {
+    const skipped = projectLocalBenchmark({
+      ...sample(),
+      avatarLod: absent,
+      ambient: absent,
+      sceneView: absent,
+      renderCost: absent,
+    });
+    for (const key of ["avatarLod", "ambient", "sceneView", "renderCost"])
+      assert.equal(Object.hasOwn(skipped, key), false);
+  }
+  const explicit = projectLocalBenchmark({
+    ...sample(),
+    gpu: {
+      ...sample().gpu,
+      version: "",
+      context: undefined,
+      webglVersion: null,
+    },
+  });
+  assert.equal(explicit.gpu.version, "");
+  assert.equal(explicit.gpu.webglVersion, null);
+  assert.equal(Object.hasOwn(explicit.gpu, "context"), false);
+  assert.throws(
+    () =>
+      projectLocalBenchmark({
+        ...sample(),
+        gpu: { ...sample().gpu, context: null },
+      }),
+    { message: "object" },
+  );
+});
+
+test("projection reports the original first validation error when several blocks are invalid", () => {
+  const base = sample(),
+    view = sceneViewSample(),
+    context = {
+      requestedAntialias: true,
+      actualAntialias: false,
+      defaultFramebuffer: true,
+      sampleBuffers: 1,
+      samples: 4,
+    };
+  const cases: [Record<string, unknown>, string][] = [
+    [{ sourceSnapshotId: "bad", frames: 1.5 }, "source"],
+    [{ frames: 1.5, durationSeconds: 0 }, "frames"],
+    [{ durationSeconds: 0, gpu: null }, "number"],
+    [{ viewport: { width: 1.5, height: NaN } }, "number"],
+    [{ viewport: { width: 1.5, height: 1 }, gpu: null }, "dimensions"],
+    [{ gpu: { ...base.gpu, renderer: 1, classification: "bad" } }, "text"],
+    [{ gpu: { ...base.gpu, version: 1, context: [] } }, "text"],
+    [
+      {
+        gpu: {
+          ...base.gpu,
+          context: { ...context, samples: 1.5 },
+          webglVersion: 3,
+        },
+      },
+      "sample count",
+    ],
+    [
+      {
+        gpu: {
+          ...base.gpu,
+          context: { ...context, defaultFramebuffer: false },
+          webglVersion: 3,
+        },
+      },
+      "offscreen sample count",
+    ],
+    [{ avatarLod: true, triangles: -1 }, "object"],
+    [{ sceneView: { ...view, position: {} }, frameWork: true }, "number"],
+    [
+      {
+        sceneView: {
+          ...view,
+          camera: { ...view.camera, position: null, fov: 0 },
+        },
+      },
+      "object",
+    ],
+    [
+      {
+        sceneView: {
+          ...view,
+          camera: { ...view.camera, viewMatrix: [], maxZ: 0.01 },
+        },
+      },
+      "camera matrix",
+    ],
+    [
+      {
+        sceneView: { ...view, camera: { ...view.camera, maxZ: 0.01 } },
+        renderCost: true,
+      },
+      "camera clip planes",
+    ],
+    [
+      {
+        rendering: { ...base.rendering, budgets: {} },
+        renderCost: { vegetation: { treeDetailCounts: [] } },
+      },
+      "postProcesses",
+    ],
+    [
+      {
+        renderCost: {
+          inventory: { registeredMeshes: -1, enabledTreeMeshesByLod: [] },
+        },
+      },
+      "number",
+    ],
+    [
+      {
+        renderCost: {
+          inventory: {
+            enabledMeshCountsByMaterialClass: { PBRMaterial: -1 },
+            enabledTreeMeshesByLod: [],
+          },
+        },
+      },
+      "number",
+    ],
+    [
+      {
+        renderCost: {
+          inventory: { enabledTreeMeshesByLod: [] },
+          vegetation: { treeDetailCounts: [-1, 0, 0] },
+        },
+      },
+      "triple",
+    ],
+  ];
+  for (const [changes, message] of cases)
+    assert.throws(() => projectLocalBenchmark({ ...base, ...changes }), {
+      message,
+    });
+});
+
 async function fixture(
   t: import("node:test").TestContext,
   config: { env?: NodeJS.ProcessEnv; listenHost?: string } = {},

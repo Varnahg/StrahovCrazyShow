@@ -695,8 +695,6 @@ export class Actor {
     this.sim.world.propagateModifiedBodyPositionsToColliders();
   }
   step(input: Input, dt = FIXED_DT) {
-    let dx = 0,
-      dz = 0;
     if (this.vehicle) {
       this.sim.car.step(
         { throttle: input.z, steer: input.x, handbrake: input.jump },
@@ -706,17 +704,16 @@ export class Actor {
       this.grounded = this.sim.car.capture().wheelContact.some(Boolean);
       this.vertical = this.sim.car.body.linvel().y;
       return;
-    } else {
-      const n = Math.max(1, Math.hypot(input.x, input.z)),
-        speed = input.run ? 7 : 4.6;
-      dx = (input.x / n) * speed * dt;
-      dz = (input.z / n) * speed * dt;
-      this.speed = Math.hypot(dx, dz) / dt;
-      if (this.speed > 0.1) this.yaw = Math.atan2(dx, dz);
     }
+    const n = Math.max(1, Math.hypot(input.x, input.z)),
+      speed = input.run ? 7 : 4.6;
+    const dx = (input.x / n) * speed * dt,
+      dz = (input.z / n) * speed * dt;
+    this.speed = Math.hypot(dx, dz) / dt;
+    if (this.speed > 0.1) this.yaw = Math.atan2(dx, dz);
     if (this.grounded) {
       this.vertical = -0.3;
-      if (input.jump && !this.vehicle) this.vertical = 6;
+      if (input.jump) this.vertical = 6;
     }
     this.vertical = Math.max(-20, this.vertical - 18 * dt);
     this.controller.computeColliderMovement(
@@ -730,12 +727,12 @@ export class Actor {
     );
     const delta = this.controller.computedMovement(),
       p = this.position;
-    if (!this.vehicle) this.speed = Math.hypot(delta.x, delta.z) / dt;
+    this.speed = Math.hypot(delta.x, delta.z) / dt;
     this.grounded = this.controller.computedGrounded();
     // Rapier's convex sweep can produce millimetre-scale rises on a perfectly
     // flat heightfield at large X. Resolve the flat contact against its actual
     // ray surface; preserve jumps, stairs, ramps and any prop above the ground.
-    if (!this.vehicle && this.vertical <= 0 && !input.jump) {
+    if (this.vertical <= 0 && !input.jump) {
       const ray = new RAPIER.Ray(
         { x: p.x + delta.x, y: p.y + 0.1, z: p.z + delta.z },
         { x: 0, y: -1, z: 0 },
