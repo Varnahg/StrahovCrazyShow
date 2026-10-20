@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "perf-transit-runtime-coordination-20261020",
+  "title": "Vybrat a dovést malý runtime performance úkol přes BMAD řadič s měřením před/po",
+  "writePaths": [
+    "docs/agents/assignments/perf-transit-runtime-20261020.json",
+    "docs/agents/assignments/perf-transit-runtime-20261020.md",
+    "docs/performance/evidence/transit-calendar-20261020/research/",
+    "docs/performance/evidence/transit-calendar-20261020/README.md",
+    "docs/agents/handoffs/perf-transit-runtime-coordination-20261020.md",
+    ".cache/perf-transit-runtime-20261020/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Výběr malého runtime CPU mechanismu z existujícího Linear performance backlogu je doložen primárním kódem a výzkumem variant.",
+    "Řadič dokončí skutečnou implementaci, review, PR, chráněný merge a zelenou CI přesného main merge; GPU přejímka nesmí být zaměněna za CLI test.",
+    "Přínos je doložen srovnatelným před/po měřením a přesnými zdroji, bez změny kvality či skryté zátěže."
+  ],
+  "verification": [
+    "Aktuální Linear, Git, claims, primární runtime/test řetězec a zmrazená acceptance.",
+    "Skutečné GitHub workflow/head/base/checkout a stav jediného controller runu.",
+    "Doložené převzetí disjunktního měření a předání; vlastní procesy ukončeny před release."
+  ],
+  "notes": [
+    "Výslovné uživatelské zadání20.10.2026 v relaci01a155b2. Předběžný kandidát shared/transit.ts: redundantní kalendářní převody při visual/physics samplování; žádná implementace před výsledkem průzkumu a baseline.",
+    "Původní KEY-50 dokončen; nové měření nesmí přebrat jeho výkonová čísla. Cizí feedback/diary/grass WIP zůstává vlastníkům.",
+    "Praktická měření vlastní samostatný task perf-transit-runtime-measure-20261020. Root zatím nevlastní runtime soubory ani renderer.",
+    "20.10: Po doloženém release/reclaim je GitHub integrační resource oddělený do perf-transit-runtime-publication-20261020, scope souborů beze změny."
+  ],
+  "status": "ready",
+  "dependsOn": []
+}

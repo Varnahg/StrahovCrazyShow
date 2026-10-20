@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "controller-external-acceptance-coordination-20261020",
+  "title": "KEY-54: BMAD podklady a přijetí externí runtime brány řadiče",
+  "writePaths": [
+    "_bmad/render/bmad-build/strahovcrazyshow-95e969760fc5/",
+    "_bmad-output/implementation-artifacts/controller-external-acceptance-20261020/",
+    "docs/agents/handoffs/controller-external-acceptance-coordination-20261020.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pinovaný BMAD render a specifikace zachovají jediný cíl: externí praktická přejímka runtime pilotu před accept/merge.",
+    "Nezávislé review, skutečné cílené kontroly a samostatná PR/main CI bez převzetí runtime či cizího WIP."
+  ],
+  "verification": [
+    "Oficiální uv renderer v tomto cwd, celý workflow a aktuální projektová policy.",
+    "Review pouze přiděleného diffu a cílené testy; plná pipeline na GitHubu."
+  ],
+  "notes": [
+    "Podpůrný krok explicitně objednaného KEY-53; read-only návrh controller_authority_edge.",
+    "Přesný root-hash vypočten stejným Python Path.resolve+SHA256 jako pinovaný renderer:95e969760fc5. Feedback drží jiný prefix; tento scope zahrnuje vlastní .staging-* uvnitř prefixu."
+  ],
+  "status": "ready",
+  "dependsOn": []
+}

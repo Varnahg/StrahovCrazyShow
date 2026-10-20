@@ -26,6 +26,12 @@ const store = await import(
 const supervisor = await import(
   new URL("../scripts/autodev/supervisor.mjs", import.meta.url).href
 );
+const { ensureExternalAcceptance, loadExternalAuthority } = await import(
+  new URL("../scripts/autodev/external-acceptance.mjs", import.meta.url).href
+);
+const { sourceIdentity } = await import(
+  new URL("../scripts/autodev/source.mjs", import.meta.url).href
+);
 type Context = {
   runId: string;
   runDir: string;
@@ -129,6 +135,165 @@ test("known stage failure retains remote-effect checkpoint and resumes only the 
   assert.equal(completed.status, "complete");
   assert.equal(calls.filter((stage) => stage === "prepare").length, 1);
   assert.equal(calls.filter((stage) => stage === "publish").length, 2);
+});
+
+test("external pending receipt resumes only accept onward with one supervised implementation and unchanged completed replay", async (t) => {
+  const input = await fixture(t),
+    repo = input.repo;
+  const git = async (...args: string[]) =>
+    (
+      await execute("git", ["-C", repo, ...args], { windowsHide: true })
+    ).stdout.trim();
+  const assignment = JSON.parse(await readFile(input.assignment, "utf8"));
+  assignment.acceptance = {
+    kind: "external",
+    description: "Measured production A/B",
+    authority: { task: "authority", owner: "coordinator" },
+    receiptFile: "proof/receipt.json",
+    evidenceFiles: [{ id: "ab", path: "proof/ab.txt" }],
+  };
+  await writeFile(input.assignment, JSON.stringify(assignment));
+  const authorityTask = {
+    schemaVersion: 1,
+    id: "authority",
+    status: "ready",
+    writePaths: ["proof/"],
+    resources: [],
+  };
+  await mkdir(path.join(repo, "docs/agents/tasks"), { recursive: true });
+  await writeFile(
+    path.join(repo, "docs/agents/tasks/authority.json"),
+    JSON.stringify(authorityTask),
+  );
+  await writeFile(path.join(repo, "source.txt"), "before\n");
+  await git("config", "user.name", "Fixture");
+  await git("config", "user.email", "fixture@example.invalid");
+  await git("config", "core.autocrlf", "false");
+  await git(
+    "add",
+    "--",
+    "source.txt",
+    "docs/agents/tasks/authority.json",
+    "assignment.json",
+  );
+  await git("commit", "-m", "base");
+  const baseSha = await git("rev-parse", "HEAD");
+  await store.atomicWriteJson(
+    path.join(repo, ".git/agent-coordination/claims.json"),
+    {
+      schemaVersion: 1,
+      claims: [
+        {
+          task: "authority",
+          owner: "coordinator",
+          worktree: repo,
+          baseHead: baseSha,
+          writePaths: authorityTask.writePaths,
+          resources: [],
+        },
+      ],
+    },
+  );
+  const calls: string[] = [];
+  let accepts = 0,
+    merges = 0;
+  const adapter = {
+    async runStage(stage: string, ctx: any) {
+      calls.push(stage);
+      if (stage === "prepare") {
+        await ctx.save({
+          baseSha,
+          worktree: repo,
+          controllerTask: { writePaths: ["artifacts/"] },
+          workerTask: { writePaths: ["source.txt"] },
+        });
+        await ctx.save({ externalAuthority: await loadExternalAuthority(ctx) });
+      }
+      if (stage === "implement") {
+        const receipt = await ctx.supervise({
+          key: "implement",
+          command: process.execPath,
+          args: [
+            "-e",
+            "require('node:fs').appendFileSync('source.txt', 'candidate\\n')",
+          ],
+          cwd: repo,
+        });
+        assert.equal(receipt.exitCode, 0);
+        await ctx.save({
+          sourceDigest: (await sourceIdentity(repo, baseSha, ["source.txt"]))
+            .digest,
+        });
+      }
+      if (stage === "commit") {
+        await git("add", "--", "source.txt");
+        await git("commit", "-m", "candidate");
+        await ctx.save({ commitSha: await git("rev-parse", "HEAD") });
+      }
+      if (stage === "accept") {
+        await ensureExternalAcceptance(ctx);
+        accepts++;
+      }
+      if (stage === "merge") {
+        await ensureExternalAcceptance(ctx, { requirePinned: true });
+        merges++;
+      }
+    },
+  };
+  const stopped = await engine.run({ ...input, adapter });
+  assert.equal(stopped.status, "stopped", stopped.lastError?.message);
+  assert.equal(stopped.stage, "accept");
+  assert.equal(stopped.lastError.code, "EXTERNAL_ACCEPTANCE_PENDING");
+  assert.equal(accepts, 0);
+  assert.equal(merges, 0);
+  await mkdir(path.join(repo, "proof"));
+  await writeFile(path.join(repo, "proof/ab.txt"), "measured evidence\n");
+  await writeFile(
+    path.join(repo, "proof/receipt.json"),
+    JSON.stringify({
+      schemaVersion: 1,
+      kind: "external-acceptance",
+      decision: "pass",
+      runId: stopped.runId,
+      assignmentDigest: stopped.assignmentDigest,
+      baseSha,
+      commitSha: stopped.data.commitSha,
+      sourceDigest: stopped.data.sourceDigest,
+      authority: {
+        task: "authority",
+        owner: "coordinator",
+        taskSha256: stopped.data.externalAuthority.taskSha256,
+      },
+      issuedAt: "2026-10-20T20:00:00.000Z",
+      summary: "Compared equal production scenarios",
+      evidence: [
+        {
+          id: "ab",
+          path: "proof/ab.txt",
+          sha256: store.digest("measured evidence\n"),
+        },
+      ],
+    }),
+  );
+  const completed = await engine.resume({
+    repo,
+    runId: stopped.runId,
+    adapter,
+  });
+  assert.equal(completed.status, "complete", completed.lastError?.message);
+  assert.equal(completed.runId, stopped.runId);
+  assert.equal(calls.filter((stage) => stage === "implement").length, 1);
+  assert.equal(Object.keys(completed.attempts).length, 1);
+  assert.equal(accepts, 1);
+  assert.equal(merges, 1);
+  assert.equal(await git("rev-list", "--count", "HEAD"), "2");
+  const stateFile = path.join(completed.runDir, "state.json"),
+    bytes = await readFile(stateFile);
+  await engine.resume({ repo, runId: completed.runId, adapter });
+  await engine.run({ ...input, adapter });
+  assert.equal((await readFile(stateFile)).equals(bytes), true);
+  assert.equal(accepts, 1);
+  assert.equal(merges, 1);
 });
 
 test("singleton rejects a second writer and status only reads while the first writer is paused", async (t) => {

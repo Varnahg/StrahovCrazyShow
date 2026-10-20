@@ -1,0 +1,16 @@
+{
+  "diffSha256": "ca4db13db8030fc1478883282d67e685c0eee864f43318a57e7412673ae0f29b",
+  "allLayersCompleted": true,
+  "resolved": ["B1", "E1", "E2", "V1", "V2"],
+  "newFindings": [
+    {
+      "id": "E3",
+      "lens": "edge",
+      "location": "scripts/autodev/adapters.mjs:2541; scripts/autodev/linear.mjs:232",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "LinearClient.setState awaituje list_issue_statuses před mutací save_issue. Změna důkazu v tomto dotazu projde přes předchozí adapter guard a je zjištěna až po Done.",
+      "action": "Před skutečný mutační dispatch předat existující proof guard; nejprve rezervovat linear.mjs a doplnit native-client regresi."
+    }
+  ]
+}

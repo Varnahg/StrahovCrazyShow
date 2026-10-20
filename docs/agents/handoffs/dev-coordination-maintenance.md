@@ -67,3 +67,19 @@ Owner perfcli-01a155b2-admin získal čistý katalogový claim. Založeny pouze 
 ## KEY-50: závěrečné katalogové převzetí20.10.2026
 
 Owner perfcli-01a155b2-admin získal nový claim po skutečném dokončení runu a uvolnění controller/worker claims. Změněny jen status/notes3vlastních perf-cli-identity tasků na done; writePaths/resources/dependsOn i cizí tasky zůstaly stejné. Podklad: completed run, PR17/main CI a repeat run/resume bez duplicit v docs/performance/evidence/diagnostic-identity-20261020/. Admin claim se uvolní po commitnutém předání a kontrole katalogu.
+
+## Runtime performance pilot — 20. 10. 2026
+
+Vlastník perftransit-01a155b2-admin přidal přesně tasky perf-transit-runtime-coordination-20261020 a perf-transit-runtime-measure-20261020 pro nové explicitní uživatelské zadání. Oddělené research/assignment/cache a měřicí scope, žádné runtime soubory přidělené bez průzkumu. Katalog validate PASS (261 definic). Root koordinační claim získán; měření se nesmí překrývat s feedback-validation. Cizí tasky/WIP se neměnily. Admin slot se po tomto zápisu uvolňuje, status ready zůstává.
+
+Druhá přesná administrativní dávka perftransit: přidán controller-external-acceptance-coordination-20261020 a controller-external-acceptance-worker-20261020 pro podpůrné KEY-54. Root renderer rezervuje vlastní skutečný prefix strahovcrazyshow-95e969760fc5 včetně stagingů; úspěšně vyrenderován snapshot f484d4f55325390b3da8. Worker má pouze explicitní řadičové source/test/docs/handoff cesty. Před claim --adopt-dirty bylo doložené, že tři převzaté metadata cesty pocházejí z předchozí vlastní dávky perftransit v této worktree. Žádné cizí zdroje nebyly převzaté. Katalog263definic validate PASS.
+
+Po doloženém release measure-helperu (žádné procesy/nové výstupy) root rozdělil jeho write scope a nové resource-only perf-transit-runtime-validation-20261020. Měřicí nástroje lze připravovat bez blokace hotového feedback validačního okna. Pět adoptovaných dirty metadata cest jsou vlastní předchozí dávky perftransit; cizí tasky beze změny.
+
+Připraveny přesné controller/worker tasky KEY-53 (perf-transit-runtime-controller-20261020 a perf-transit-runtime-worker-20261020). Controller vlastní ověřený budoucí rendererprefix a artefakty; worker pouze transit-renderer.ts a nový regresní test. Žádný runtime claim/run dosud nebyl spuštěn, vyčká přijatého KEY-54, baseline a bootstrap manifestu. Šest adoptovaných metadata cest pochází z vlastních předchozích dávek uvedených výše.
+
+Po doloženém release/reclaim vlastního root scope oddělen github-ci-validation do resource-only perf-transit-runtime-publication-20261020. Žádný GitHub run nebyl spuštěn, cizí tasky beze změny; root reclaim vlastních šesti writePaths proběhl úspěšně, katalog267PASS.
+
+Po skutečném release gate-integratora rozšířen pouze jeho worker task o scripts/autodev/linear.mjs pro doloženou E3 mutační hranici. Původní WIP převzatý z explicitního handoffu; žádné cizí soubory/claims se nemění. Opravena také nepřesná poznámka o počtu root writePaths:6, nikoli8(adoptovanémetadata).
+
+20.10 root znovu převzal pouze devět vlastních metadata změn doložených výše (osm tasků a tento handoff), sjednotil přidané konce řádků před přesným stagingem. Žádný cizí rozsah se neměnil.

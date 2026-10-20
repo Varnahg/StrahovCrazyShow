@@ -22,6 +22,10 @@ import {
 import { execute, GitHubClient } from "./github.mjs";
 import { LinearClient } from "./linear.mjs";
 import {
+  ensureExternalAcceptance,
+  loadExternalAuthority,
+} from "./external-acceptance.mjs";
+import {
   inScope,
   parseDirty,
   safePath,
@@ -489,6 +493,34 @@ function beats(ctx, includeValidation = false) {
     cwd: data.worktree,
     intervalMs: 60_000,
   }));
+}
+
+// Mirrors the pinned Python renderer: Path.resolve() native string, basename
+// slug (80 characters), then the first twelve SHA256 digits. The enclosing
+// prefix covers both immutable snapshots and .staging-* siblings.
+export function bmadRenderPrefix(worktree) {
+  const resolved = path.resolve(worktree);
+  const slug =
+    path
+      .basename(resolved)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 80)
+      .replace(/-$/g, "") || "project";
+  return `_bmad/render/bmad-build/${slug}-${digest(resolved).slice(0, 12)}/`;
+}
+
+export function assertBmadRenderScope(worktree, writePaths) {
+  const prefix = bmadRenderPrefix(worktree);
+  if (
+    !writePaths.some((scope) => scope.endsWith("/") && inScope(prefix, [scope]))
+  )
+    throw problem(
+      "TASK_SCOPE",
+      `Controller task must reserve renderer snapshots and staging in ${prefix}`,
+    );
+  return prefix;
 }
 
 export function createAdapter({ github, linear, worker = runWorker } = {}) {
@@ -1899,13 +1931,16 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       for (const file of [
         ctx.assignment.handoffFile,
         `${ctx.assignment.artifactDir}/plan.json`,
-        "_bmad/render/bmad-build/",
       ])
         if (!inScope(file, controllerTask.writePaths))
           throw problem(
             "TASK_SCOPE",
             `Controller task does not reserve ${file}`,
           );
+      assertBmadRenderScope(
+        path.join(path.dirname(ctx.repo), `autodev-${ctx.runId}`),
+        controllerTask.writePaths,
+      );
       for (const task of [controllerTask, workerTask, validationTask].filter(
         Boolean,
       ))
@@ -1932,11 +1967,18 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
           "Assignment must be committed unchanged in base",
         );
       const owner = `autodev:${ctx.runId}`;
+      const externalAuthority = await loadExternalAuthority(ctx, {
+        baseSha,
+        controllerTask,
+        workerTask,
+        validationTask,
+      });
       await ctx.save({
         baseSha,
         controllerTask,
         workerTask,
         validationTask,
+        ...(externalAuthority ? { externalAuthority } : {}),
         intent,
         intentDigest: digest(intent),
         issueId: issue.id,
@@ -2021,6 +2063,10 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
     await progress(ctx, "Připraveno; rezervace a původní zadání ověřeny");
   }
   async function plan(ctx) {
+    assertBmadRenderScope(
+      await realpath(ctx.data.worktree),
+      ctx.data.controllerTask.writePaths,
+    );
     const receipt = await ctx.supervise({
       key: "bmad-render",
       command: "uv",
@@ -2256,7 +2302,11 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
   }
   function handoff(ctx) {
     const reviews = reviewResults(ctx);
-    return `# Předání ${ctx.assignment.task}\n\nRun: ${ctx.runId}\nOwner: ${ctx.data.owner}; worker: ${ctx.data.workerOwner}\nBase: ${ctx.data.baseSha}\nSource/test SHA256: ${ctx.data.sourceDigest}\n\n${ctx.data.implementation.result.summary}\n\n## Ověření\n\n${ctx.data.checks.map((check) => `- ${check.id}: exit ${check.exitCode}; ${[check.command, ...check.args].join(" ")}`).join("\n")}\n\nTři nezávislé review: ${reviews.map((review) => `${review.lens} (${review.attemptId}): ${review.result.findings.length} nálezů`).join(", ")}.\n\nPřejímka: ${ctx.assignment.acceptance.description}\n\nDůkazy: ${ctx.assignment.artifactDir}/. Surové provozní logy zůstávají v git-common-dir. Integrace a main CI se dokládají ve stejném Linear run komentáři a PR. Hra/GPU se tímto CLI ověřením nepovažuje za otestovanou. Katalog přijímá koordinátor.\n`;
+    const practicalAcceptance =
+      ctx.assignment.acceptance.kind === "external"
+        ? "Toto předání vzniká před externí praktickou přejímkou. Lokální kontroly nepotvrzují hru/GPU; následné přijetí doloží připnutý receipt nezávislého koordinátora a GitHub záznam."
+        : "Hra/GPU se tímto CLI ověřením nepovažuje za otestovanou.";
+    return `# Předání ${ctx.assignment.task}\n\nRun: ${ctx.runId}\nOwner: ${ctx.data.owner}; worker: ${ctx.data.workerOwner}\nBase: ${ctx.data.baseSha}\nSource/test SHA256: ${ctx.data.sourceDigest}\n\n${ctx.data.implementation.result.summary}\n\n## Ověření\n\n${ctx.data.checks.map((check) => `- ${check.id}: exit ${check.exitCode}; ${[check.command, ...check.args].join(" ")}`).join("\n")}\n\nTři nezávislé review: ${reviews.map((review) => `${review.lens} (${review.attemptId}): ${review.result.findings.length} nálezů`).join(", ")}.\n\nPřejímka: ${ctx.assignment.acceptance.description}\n\nDůkazy: ${ctx.assignment.artifactDir}/. Surové provozní logy zůstávají v git-common-dir. Integrace a main CI se dokládají ve stejném Linear run komentáři a PR. ${practicalAcceptance} Katalog přijímá koordinátor.\n`;
   }
   async function commit(ctx) {
     // A completed commit may precede its checkpoint. Verify parent/tree/marker
@@ -2421,6 +2471,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       return { ciChecks };
     },
     accept: async (ctx) => {
+      await ensureExternalAcceptance(ctx);
       await ensureReviewsV2(ctx);
       await assertSource(ctx);
       if (
@@ -2429,6 +2480,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
         ctx.data.checks.some((check) => check.exitCode !== 0)
       )
         throw problem("NOT_VERIFIED", "Cannot accept unverified candidate");
+      await ensureExternalAcceptance(ctx, { requirePinned: true });
       const acceptance = await gh.accept(ctx, prBody(ctx, true));
       await ctx.save({
         acceptance,
@@ -2437,10 +2489,13 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       await progress(ctx, "Přijato pro přesný head/base a skutečné CI");
     },
     merge: async (ctx) => {
+      await ensureExternalAcceptance(ctx, { requirePinned: true });
       if (!ctx.assignment.merge) return { awaitingMerge: true };
       const pr = await gh.pr(ctx.data.prNumber);
       gh.assertPr(pr, ctx, { allowMerged: Boolean(pr.merged) });
       if (pr.merged) {
+        if (ctx.assignment.acceptance.kind === "external")
+          return { mergeSha: await gh.merge(ctx) };
         if (!/^[a-f0-9]{40}$/.test(pr.merge_commit_sha ?? ""))
           throw problem(
             "MERGE_IDENTITY",
@@ -2454,6 +2509,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
       return { mergeSha: await gh.merge(ctx) };
     },
     finalize: async (ctx) => {
+      await ensureExternalAcceptance(ctx, { requirePinned: true });
       if (!ctx.data.finalizationReady && ctx.assignment.merge) {
         const pr = await gh.pr(ctx.data.prNumber);
         gh.assertPr(pr, ctx, { allowMerged: true });
@@ -2481,10 +2537,19 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
           () => heartbeat(ctx),
         );
         await ctx.save({ mainChecks });
+        const issue = await lin.getIssue(ctx.assignment.issue);
+        await ensureExternalAcceptance(ctx, { requirePinned: true });
         await lin.setState(
-          await lin.getIssue(ctx.assignment.issue),
+          issue,
           ctx.assignment.linearStates.done,
+          ctx.assignment.acceptance.kind === "external"
+            ? {
+                beforeMutation: () =>
+                  ensureExternalAcceptance(ctx, { requirePinned: true }),
+              }
+            : undefined,
         );
+        await ensureExternalAcceptance(ctx, { requirePinned: true });
         await progress(ctx, "Sloučeno; main CI přesného merge commitu úspěšné");
       } else if (!ctx.data.finalizationReady)
         await progress(
@@ -2500,10 +2565,13 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
           "WORKER_ACTIVE",
           "Cannot release claims with unfinished supervised work",
         );
+      await ensureExternalAcceptance(ctx, { requirePinned: true });
       await ctx.save({ finalizationReady: true });
       await release(ctx, ctx.data.workerTask, ctx.data.workerOwner);
       await ctx.fault("after-worker-release");
+      await ensureExternalAcceptance(ctx, { requirePinned: true });
       await release(ctx, ctx.data.controllerTask, ctx.data.owner);
+      await ensureExternalAcceptance(ctx, { requirePinned: true });
       return { finalized: true };
     },
   };

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "perf-transit-runtime-validation-20261020",
+  "title": "KEY-53: vyhradit sériové CPU/GPU/build okno runtime A/B",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2595",
+    "port:4209"
+  ],
+  "acceptance": [
+    "Skutečné měření/buildu proběhne pouze v nepřekrývajícím se okně po ověření procesů/scén."
+  ],
+  "verification": [
+    "Živý registr, přesná identita vlastních procesů a cleanup před release."
+  ],
+  "notes": [
+    "Pouze resource-only rezervace pro měřicí helper/root; zápisy vlastní perf-transit-runtime-measure-20261020.",
+    "Feedback má dohodnuté přednostní krátké validační okno20.10; před další timed prací ověřit jeho release a skutečné procesy."
+  ]
+}

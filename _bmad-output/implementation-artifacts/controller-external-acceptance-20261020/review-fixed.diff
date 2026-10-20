@@ -1,0 +1,2182 @@
+diff --git a/scripts/autodev/store.mjs b/scripts/autodev/store.mjs
+index e7ebb28d..5ba2d057 100644
+--- a/scripts/autodev/store.mjs
++++ b/scripts/autodev/store.mjs
+@@ -246,11 +246,81 @@ export function validateAssignment(value) {
+     fail("linearStates requires active and done names");
+   if (
+     !object(value.acceptance) ||
+-    value.acceptance.kind !== "cli" ||
++    !["cli", "external"].includes(value.acceptance.kind) ||
+     typeof value.acceptance.description !== "string" ||
+     !value.acceptance.description.trim()
+   )
+-    fail("V1 supports an explicit CLI acceptance description only");
++    fail("Acceptance requires an explicit cli or external description");
++  if (value.acceptance.kind === "external") {
++    const acceptance = value.acceptance;
++    if (
++      Object.keys(acceptance).some(
++        (key) =>
++          ![
++            "kind",
++            "description",
++            "authority",
++            "receiptFile",
++            "evidenceFiles",
++          ].includes(key),
++      )
++    )
++      fail("Unknown external acceptance field");
++    if (
++      !object(acceptance.authority) ||
++      Object.keys(acceptance.authority).sort().join(",") !== "owner,task" ||
++      typeof acceptance.authority.task !== "string" ||
++      !/^[a-z0-9][a-z0-9_-]{0,95}$/.test(acceptance.authority.task ?? "") ||
++      typeof acceptance.authority.owner !== "string" ||
++      !/^[A-Za-z0-9][A-Za-z0-9:._-]{0,159}$/.test(acceptance.authority.owner)
++    )
++      fail("External acceptance requires an explicit task and owner");
++    if (
++      [value.task, value.workerTask, value.validationTask].includes(
++        acceptance.authority.task,
++      )
++    )
++      fail(
++        "External authority must be independent of controller, worker and validation",
++      );
++    const file = (candidate, label) => {
++      relativeFile(candidate, label);
++      if (
++        /[\[\]{}]/.test(candidate) ||
++        candidate
++          .split("/")
++          .some(
++            (part) =>
++              /[. ]$/.test(part) ||
++              /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(part),
++          )
++      )
++        fail(`${label} must be an exact portable file path`);
++    };
++    file(acceptance.receiptFile, "receiptFile");
++    if (
++      !Array.isArray(acceptance.evidenceFiles) ||
++      !acceptance.evidenceFiles.length
++    )
++      fail("External acceptance requires explicit evidence files");
++    const evidenceIds = new Set(),
++      paths = new Set([acceptance.receiptFile.toLowerCase()]);
++    for (const evidence of acceptance.evidenceFiles) {
++      if (
++        !object(evidence) ||
++        Object.keys(evidence).sort().join(",") !== "id,path" ||
++        typeof evidence.id !== "string" ||
++        !/^[a-z0-9][a-z0-9-]{0,63}$/.test(evidence.id) ||
++        evidenceIds.has(evidence.id)
++      )
++        fail("Evidence IDs must be unique explicit identifiers");
++      file(evidence.path, "evidence path");
++      if (paths.has(evidence.path.toLowerCase()))
++        fail("External evidence paths must be distinct");
++      evidenceIds.add(evidence.id);
++      paths.add(evidence.path.toLowerCase());
++    }
++  }
+   if (!Array.isArray(value.checks) || value.checks.length === 0)
+     fail("At least one explicit check is required");
+   const ids = new Set();
+diff --git a/scripts/autodev/external-acceptance.mjs b/scripts/autodev/external-acceptance.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/autodev/external-acceptance.mjs
+@@ -0,0 +1,389 @@
++import { createHash } from "node:crypto";
++import { execFile } from "node:child_process";
++import { constants } from "node:fs";
++import { lstat, open, realpath } from "node:fs/promises";
++import path from "node:path";
++import { promisify } from "node:util";
++import {
++  canonicalJson,
++  digest,
++  object,
++  problem,
++  readJson,
++  repositoryContext,
++  validateAssignment,
++} from "./store.mjs";
++import { git, inScope, samePath, sourceIdentity } from "./source.mjs";
++
++const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
++const execFileAsync = promisify(execFile);
++const fail = (message, code = "EXTERNAL_ACCEPTANCE_INVALID") => {
++  throw problem(code, message);
++};
++const exactKeys = (value, keys) =>
++  object(value) &&
++  Object.keys(value).sort().join(",") === [...keys].sort().join(",");
++const sameNode = (before, after) =>
++  before.dev === after.dev &&
++  before.ino === after.ino &&
++  before.isDirectory() === after.isDirectory() &&
++  before.isFile() === after.isFile() &&
++  !after.isSymbolicLink();
++const sameFile = (before, after) =>
++  sameNode(before, after) &&
++  after.isFile() &&
++  after.nlink === 1 &&
++  before.size === after.size &&
++  before.mtimeMs === after.mtimeMs &&
++  before.ctimeMs === after.ctimeMs;
++
++// Read original bytes through one handle; verify every directory and the file
++// before and after reading. This does not follow symlinks/junctions or hardlinks.
++export async function readAcceptanceFile(root, relative) {
++  if (typeof relative !== "string")
++    fail("Acceptance file path is required", "EXTERNAL_ACCEPTANCE_PATH");
++  const absoluteRoot = path.resolve(root);
++  if (!samePath(await realpath(absoluteRoot), absoluteRoot))
++    fail("Acceptance root resolves elsewhere", "EXTERNAL_ACCEPTANCE_PATH");
++  const parts = relative.split("/");
++  if (
++    !relative ||
++    /[\\:*?\[\]{}\x00-\x1f]/.test(relative) ||
++    relative.startsWith("/") ||
++    parts.some(
++      (part) =>
++        !part ||
++        part === "." ||
++        part === ".." ||
++        part.toLowerCase() === ".git" ||
++        /[. ]$/.test(part) ||
++        /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(part),
++    )
++  )
++    fail(
++      "Acceptance path is not a canonical relative file",
++      "EXTERNAL_ACCEPTANCE_PATH",
++    );
++  const chain = [];
++  let current = absoluteRoot;
++  for (let index = -1; index < parts.length; index++) {
++    if (index >= 0) current = path.join(current, parts[index]);
++    const stat = await lstat(current);
++    const leaf = index === parts.length - 1;
++    if (
++      stat.isSymbolicLink() ||
++      (leaf ? !stat.isFile() || stat.nlink !== 1 : !stat.isDirectory())
++    )
++      fail(
++        "Acceptance path contains a link or nonregular file",
++        "EXTERNAL_ACCEPTANCE_PATH",
++      );
++    chain.push({ file: current, stat });
++  }
++  const leaf = chain.at(-1);
++  const handle = await open(
++    leaf.file,
++    constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0),
++  );
++  try {
++    const before = await handle.stat();
++    if (!sameFile(leaf.stat, before))
++      fail("Acceptance file changed before opening");
++    const bytes = await handle.readFile();
++    if (!sameFile(before, await handle.stat()))
++      fail("Acceptance file changed while reading");
++    for (const entry of chain) {
++      const after = await lstat(entry.file);
++      if (
++        !(entry === leaf
++          ? sameFile(entry.stat, after)
++          : sameNode(entry.stat, after))
++      )
++        fail("Acceptance path changed while reading");
++    }
++    return { bytes, sha256: sha256(bytes) };
++  } finally {
++    await handle.close();
++  }
++}
++
++export async function loadExternalAuthority(ctx, data = ctx.data) {
++  if (ctx.assignment.acceptance?.kind !== "external") return null;
++  validateAssignment(ctx.assignment);
++  const { authority, receiptFile } = ctx.assignment.acceptance;
++  const { stdout: bytes } = await execFileAsync(
++    "git",
++    [
++      "-C",
++      ctx.repo,
++      "show",
++      `${data.baseSha}:docs/agents/tasks/${authority.task}.json`,
++    ],
++    {
++      encoding: "buffer",
++      windowsHide: true,
++      timeout: 30_000,
++      maxBuffer: 4 * 1024 * 1024,
++    },
++  );
++  let task;
++  try {
++    task = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
++  } catch {
++    fail("External authority task is not valid UTF-8 JSON");
++  }
++  if (
++    !object(task) ||
++    task.schemaVersion !== 1 ||
++    task.id !== authority.task ||
++    task.status !== "ready" ||
++    !Array.isArray(task.writePaths) ||
++    !Array.isArray(task.resources) ||
++    [...task.writePaths, ...task.resources].some(
++      (entry) => typeof entry !== "string" || !entry,
++    ) ||
++    !inScope(receiptFile, task.writePaths)
++  )
++    fail(
++      "External authority task does not reserve this receipt",
++      "EXTERNAL_ACCEPTANCE_AUTHORITY",
++    );
++  if (
++    [data.controllerTask, data.workerTask, data.validationTask]
++      .filter(Boolean)
++      .some((writer) => inScope(receiptFile, writer.writePaths))
++  )
++    fail(
++      "External receipt is writable by this run",
++      "EXTERNAL_ACCEPTANCE_AUTHORITY",
++    );
++  return { task, taskSha256: sha256(bytes) };
++}
++
++async function assertAuthority(ctx, frozen) {
++  const { commonDir } = await repositoryContext(ctx.repo);
++  const registry = await readJson(
++    path.join(commonDir, "agent-coordination/claims.json"),
++    { optional: true },
++  );
++  if (
++    !object(registry) ||
++    registry.schemaVersion !== 1 ||
++    !Array.isArray(registry.claims)
++  )
++    fail(
++      "No valid external authority claim registry",
++      "EXTERNAL_ACCEPTANCE_AUTHORITY",
++    );
++  const { authority, receiptFile } = ctx.assignment.acceptance;
++  const matches = registry.claims.filter(
++    (claim) => claim?.task === authority.task,
++  );
++  const claim = matches[0];
++  if (
++    matches.length !== 1 ||
++    !object(claim) ||
++    claim.owner !== authority.owner ||
++    typeof claim.worktree !== "string" ||
++    !path.isAbsolute(claim.worktree) ||
++    !samePath(claim.worktree, ctx.repo) ||
++    !/^[a-f0-9]{40,64}$/.test(claim.baseHead ?? "") ||
++    canonicalJson(claim.writePaths ?? null) !==
++      canonicalJson(frozen.task.writePaths) ||
++    canonicalJson(claim.resources ?? null) !==
++      canonicalJson(frozen.task.resources) ||
++    !inScope(receiptFile, claim.writePaths)
++  )
++    fail(
++      "External authority must hold its exact frozen scope in the coordinator checkout",
++      "EXTERNAL_ACCEPTANCE_AUTHORITY",
++    );
++  // The coordinator may have claimed before the run's base commit. The claim's
++  // baseHead is therefore not the candidate baseSha, and is not rewritten here.
++}
++
++function validateReceipt(ctx, frozen, receipt) {
++  const keys = [
++    "schemaVersion",
++    "kind",
++    "decision",
++    "runId",
++    "assignmentDigest",
++    "baseSha",
++    "commitSha",
++    "sourceDigest",
++    "authority",
++    "issuedAt",
++    "summary",
++    "evidence",
++  ];
++  if (
++    !exactKeys(receipt, keys) ||
++    receipt.schemaVersion !== 1 ||
++    receipt.kind !== "external-acceptance" ||
++    !["pass", "fail"].includes(receipt.decision) ||
++    typeof receipt.summary !== "string" ||
++    !receipt.summary.trim() ||
++    typeof receipt.issuedAt !== "string" ||
++    !Number.isFinite(Date.parse(receipt.issuedAt)) ||
++    new Date(receipt.issuedAt).toISOString() !== receipt.issuedAt
++  )
++    fail("Malformed external acceptance receipt");
++  for (const [key, expected] of Object.entries({
++    runId: ctx.runId,
++    assignmentDigest: ctx.state.assignmentDigest,
++    baseSha: ctx.data.baseSha,
++    commitSha: ctx.data.commitSha,
++    sourceDigest: ctx.data.sourceDigest,
++  }))
++    if (receipt[key] !== expected)
++      fail(`External receipt ${key} differs from this candidate`);
++  const authority = {
++    ...ctx.assignment.acceptance.authority,
++    taskSha256: frozen.taskSha256,
++  };
++  if (
++    !exactKeys(receipt.authority, ["task", "owner", "taskSha256"]) ||
++    canonicalJson(receipt.authority) !== canonicalJson(authority)
++  )
++    fail(
++      "External receipt authority differs from the frozen task",
++      "EXTERNAL_ACCEPTANCE_AUTHORITY",
++    );
++  const expected = ctx.assignment.acceptance.evidenceFiles;
++  if (
++    !Array.isArray(receipt.evidence) ||
++    receipt.evidence.length !== expected.length ||
++    receipt.evidence.some(
++      (entry, index) =>
++        !exactKeys(entry, ["id", "path", "sha256"]) ||
++        entry.id !== expected[index].id ||
++        entry.path !== expected[index].path ||
++        !/^[a-f0-9]{64}$/.test(entry.sha256 ?? ""),
++    )
++  )
++    fail("External receipt evidence differs from the immutable manifest list");
++  if (receipt.decision !== "pass")
++    fail(
++      "External coordinator rejected this candidate",
++      "EXTERNAL_ACCEPTANCE_REJECTED",
++    );
++}
++
++export async function ensureExternalAcceptance(
++  ctx,
++  { requirePinned = false } = {},
++) {
++  if (ctx.assignment.acceptance?.kind !== "external") return null;
++  validateAssignment(ctx.assignment);
++  if (
++    digest(ctx.assignment) !== ctx.state.assignmentDigest ||
++    !/^[a-f0-9]{40}$/.test(ctx.data.baseSha ?? "") ||
++    !/^[a-f0-9]{40}$/.test(ctx.data.commitSha ?? "") ||
++    !/^[a-f0-9]{64}$/.test(ctx.data.sourceDigest ?? "")
++  )
++    fail("Candidate/assignment identity is incomplete");
++  const frozen = await loadExternalAuthority(ctx);
++  if (
++    canonicalJson(ctx.data.externalAuthority ?? null) !== canonicalJson(frozen)
++  )
++    fail(
++      "External authority was not frozen from the run base",
++      "EXTERNAL_ACCEPTANCE_AUTHORITY",
++    );
++  await assertAuthority(ctx, frozen);
++  const pinned = ctx.data.externalAcceptance;
++  if (!pinned && (requirePinned || ctx.data.acceptance || ctx.data.mergeIntent))
++    fail(
++      "External acceptance has not been pinned",
++      "EXTERNAL_ACCEPTANCE_CHANGED",
++    );
++  const read = async (relative, receipt = false) => {
++    try {
++      return await readAcceptanceFile(ctx.repo, relative);
++    } catch (error) {
++      if (error.code === "ENOENT")
++        fail(
++          `External ${receipt ? "receipt" : "evidence"} is missing: ${relative}`,
++          pinned
++            ? "EXTERNAL_ACCEPTANCE_CHANGED"
++            : receipt
++              ? "EXTERNAL_ACCEPTANCE_PENDING"
++              : "EXTERNAL_ACCEPTANCE_INVALID",
++        );
++      throw error;
++    }
++  };
++  const original = await read(ctx.assignment.acceptance.receiptFile, true);
++  if (pinned && original.sha256 !== pinned.receiptSha256)
++    fail(
++      "External receipt bytes changed after pinning",
++      "EXTERNAL_ACCEPTANCE_CHANGED",
++    );
++  let receipt;
++  try {
++    receipt = JSON.parse(
++      new TextDecoder("utf-8", { fatal: true }).decode(original.bytes),
++    );
++  } catch {
++    fail("External receipt is not JSON; preserved");
++  }
++  validateReceipt(ctx, frozen, receipt);
++  const verifyEvidence = async () => {
++    for (const entry of receipt.evidence) {
++      if ((await read(entry.path)).sha256 !== entry.sha256)
++        fail(
++          `External evidence bytes changed: ${entry.id}`,
++          "EXTERNAL_ACCEPTANCE_CHANGED",
++        );
++    }
++  };
++  await verifyEvidence();
++  // Receipt is a cooperative acceptance of the committed, reviewed source. A
++  // direct GitHub client call must not silently accept a modified worktree.
++  if (
++    (await git(ctx.data.worktree, "rev-parse", "HEAD")).trim() !==
++      ctx.data.commitSha ||
++    (
++      await sourceIdentity(
++        ctx.data.worktree,
++        ctx.data.baseSha,
++        ctx.data.workerTask.writePaths,
++      )
++    ).digest !== ctx.data.sourceDigest
++  )
++    fail("External acceptance candidate source changed", "SOURCE_CHANGED");
++  await assertAuthority(ctx, frozen);
++  if (
++    (await read(ctx.assignment.acceptance.receiptFile, true)).sha256 !==
++    original.sha256
++  )
++    fail(
++      "External receipt changed during validation",
++      "EXTERNAL_ACCEPTANCE_CHANGED",
++    );
++  // Source identity and authority checks await external work. Evidence read
++  // before those waits is not evidence of the bytes at the mutation boundary.
++  await verifyEvidence();
++  const proof = {
++    receiptFile: ctx.assignment.acceptance.receiptFile,
++    receiptSha256: original.sha256,
++    ...receipt,
++  };
++  if (pinned && canonicalJson(pinned) !== canonicalJson(proof))
++    fail(
++      "Pinned external acceptance differs from this proof",
++      "EXTERNAL_ACCEPTANCE_CHANGED",
++    );
++  if (!pinned) await ctx.save({ externalAcceptance: proof });
++  return proof;
++}
++
++export function externalProofDigest(proof) {
++  return proof ? digest(proof) : null;
++}
++
++export function externalAcceptanceBody(proof) {
++  if (!proof) return "";
++  return `\n\nExternal acceptance: ${proof.summary}\nReceipt SHA256: ${proof.receiptSha256}\nAuthority: ${proof.authority.task} (${proof.authority.owner}; task ${proof.authority.taskSha256})\nIssued: ${proof.issuedAt}\n${proof.evidence.map((entry) => `- ${entry.id}: ${entry.path} — ${entry.sha256}`).join("\n")}\n`;
++}
+diff --git a/scripts/autodev/adapters.mjs b/scripts/autodev/adapters.mjs
+index eeb4ac60..ec3e255c 100644
+--- a/scripts/autodev/adapters.mjs
++++ b/scripts/autodev/adapters.mjs
+@@ -21,6 +21,10 @@ import {
+ } from "./store.mjs";
+ import { execute, GitHubClient } from "./github.mjs";
+ import { LinearClient } from "./linear.mjs";
++import {
++  ensureExternalAcceptance,
++  loadExternalAuthority,
++} from "./external-acceptance.mjs";
+ import {
+   inScope,
+   parseDirty,
+@@ -491,6 +495,34 @@ function beats(ctx, includeValidation = false) {
+   }));
+ }
+ 
++// Mirrors the pinned Python renderer: Path.resolve() native string, basename
++// slug (80 characters), then the first twelve SHA256 digits. The enclosing
++// prefix covers both immutable snapshots and .staging-* siblings.
++export function bmadRenderPrefix(worktree) {
++  const resolved = path.resolve(worktree);
++  const slug =
++    path
++      .basename(resolved)
++      .toLowerCase()
++      .replace(/[^a-z0-9]+/g, "-")
++      .replace(/^-|-$/g, "")
++      .slice(0, 80)
++      .replace(/-$/g, "") || "project";
++  return `_bmad/render/bmad-build/${slug}-${digest(resolved).slice(0, 12)}/`;
++}
++
++export function assertBmadRenderScope(worktree, writePaths) {
++  const prefix = bmadRenderPrefix(worktree);
++  if (
++    !writePaths.some((scope) => scope.endsWith("/") && inScope(prefix, [scope]))
++  )
++    throw problem(
++      "TASK_SCOPE",
++      `Controller task must reserve renderer snapshots and staging in ${prefix}`,
++    );
++  return prefix;
++}
++
+ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+   let gh = github,
+     lin = linear;
+@@ -1899,13 +1931,16 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+       for (const file of [
+         ctx.assignment.handoffFile,
+         `${ctx.assignment.artifactDir}/plan.json`,
+-        "_bmad/render/bmad-build/",
+       ])
+         if (!inScope(file, controllerTask.writePaths))
+           throw problem(
+             "TASK_SCOPE",
+             `Controller task does not reserve ${file}`,
+           );
++      assertBmadRenderScope(
++        path.join(path.dirname(ctx.repo), `autodev-${ctx.runId}`),
++        controllerTask.writePaths,
++      );
+       for (const task of [controllerTask, workerTask, validationTask].filter(
+         Boolean,
+       ))
+@@ -1932,11 +1967,18 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+           "Assignment must be committed unchanged in base",
+         );
+       const owner = `autodev:${ctx.runId}`;
++      const externalAuthority = await loadExternalAuthority(ctx, {
++        baseSha,
++        controllerTask,
++        workerTask,
++        validationTask,
++      });
+       await ctx.save({
+         baseSha,
+         controllerTask,
+         workerTask,
+         validationTask,
++        ...(externalAuthority ? { externalAuthority } : {}),
+         intent,
+         intentDigest: digest(intent),
+         issueId: issue.id,
+@@ -2021,6 +2063,10 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+     await progress(ctx, "Připraveno; rezervace a původní zadání ověřeny");
+   }
+   async function plan(ctx) {
++    assertBmadRenderScope(
++      await realpath(ctx.data.worktree),
++      ctx.data.controllerTask.writePaths,
++    );
+     const receipt = await ctx.supervise({
+       key: "bmad-render",
+       command: "uv",
+@@ -2256,7 +2302,11 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+   }
+   function handoff(ctx) {
+     const reviews = reviewResults(ctx);
+-    return `# Předání ${ctx.assignment.task}\n\nRun: ${ctx.runId}\nOwner: ${ctx.data.owner}; worker: ${ctx.data.workerOwner}\nBase: ${ctx.data.baseSha}\nSource/test SHA256: ${ctx.data.sourceDigest}\n\n${ctx.data.implementation.result.summary}\n\n## Ověření\n\n${ctx.data.checks.map((check) => `- ${check.id}: exit ${check.exitCode}; ${[check.command, ...check.args].join(" ")}`).join("\n")}\n\nTři nezávislé review: ${reviews.map((review) => `${review.lens} (${review.attemptId}): ${review.result.findings.length} nálezů`).join(", ")}.\n\nPřejímka: ${ctx.assignment.acceptance.description}\n\nDůkazy: ${ctx.assignment.artifactDir}/. Surové provozní logy zůstávají v git-common-dir. Integrace a main CI se dokládají ve stejném Linear run komentáři a PR. Hra/GPU se tímto CLI ověřením nepovažuje za otestovanou. Katalog přijímá koordinátor.\n`;
++    const practicalAcceptance =
++      ctx.assignment.acceptance.kind === "external"
++        ? "Toto předání vzniká před externí praktickou přejímkou. Lokální kontroly nepotvrzují hru/GPU; následné přijetí doloží připnutý receipt nezávislého koordinátora a GitHub záznam."
++        : "Hra/GPU se tímto CLI ověřením nepovažuje za otestovanou.";
++    return `# Předání ${ctx.assignment.task}\n\nRun: ${ctx.runId}\nOwner: ${ctx.data.owner}; worker: ${ctx.data.workerOwner}\nBase: ${ctx.data.baseSha}\nSource/test SHA256: ${ctx.data.sourceDigest}\n\n${ctx.data.implementation.result.summary}\n\n## Ověření\n\n${ctx.data.checks.map((check) => `- ${check.id}: exit ${check.exitCode}; ${[check.command, ...check.args].join(" ")}`).join("\n")}\n\nTři nezávislé review: ${reviews.map((review) => `${review.lens} (${review.attemptId}): ${review.result.findings.length} nálezů`).join(", ")}.\n\nPřejímka: ${ctx.assignment.acceptance.description}\n\nDůkazy: ${ctx.assignment.artifactDir}/. Surové provozní logy zůstávají v git-common-dir. Integrace a main CI se dokládají ve stejném Linear run komentáři a PR. ${practicalAcceptance} Katalog přijímá koordinátor.\n`;
+   }
+   async function commit(ctx) {
+     // A completed commit may precede its checkpoint. Verify parent/tree/marker
+@@ -2421,6 +2471,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+       return { ciChecks };
+     },
+     accept: async (ctx) => {
++      await ensureExternalAcceptance(ctx);
+       await ensureReviewsV2(ctx);
+       await assertSource(ctx);
+       if (
+@@ -2429,6 +2480,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+         ctx.data.checks.some((check) => check.exitCode !== 0)
+       )
+         throw problem("NOT_VERIFIED", "Cannot accept unverified candidate");
++      await ensureExternalAcceptance(ctx, { requirePinned: true });
+       const acceptance = await gh.accept(ctx, prBody(ctx, true));
+       await ctx.save({
+         acceptance,
+@@ -2437,10 +2489,13 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+       await progress(ctx, "Přijato pro přesný head/base a skutečné CI");
+     },
+     merge: async (ctx) => {
++      await ensureExternalAcceptance(ctx, { requirePinned: true });
+       if (!ctx.assignment.merge) return { awaitingMerge: true };
+       const pr = await gh.pr(ctx.data.prNumber);
+       gh.assertPr(pr, ctx, { allowMerged: Boolean(pr.merged) });
+       if (pr.merged) {
++        if (ctx.assignment.acceptance.kind === "external")
++          return { mergeSha: await gh.merge(ctx) };
+         if (!/^[a-f0-9]{40}$/.test(pr.merge_commit_sha ?? ""))
+           throw problem(
+             "MERGE_IDENTITY",
+@@ -2454,6 +2509,7 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+       return { mergeSha: await gh.merge(ctx) };
+     },
+     finalize: async (ctx) => {
++      await ensureExternalAcceptance(ctx, { requirePinned: true });
+       if (!ctx.data.finalizationReady && ctx.assignment.merge) {
+         const pr = await gh.pr(ctx.data.prNumber);
+         gh.assertPr(pr, ctx, { allowMerged: true });
+@@ -2481,10 +2537,10 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+           () => heartbeat(ctx),
+         );
+         await ctx.save({ mainChecks });
+-        await lin.setState(
+-          await lin.getIssue(ctx.assignment.issue),
+-          ctx.assignment.linearStates.done,
+-        );
++        const issue = await lin.getIssue(ctx.assignment.issue);
++        await ensureExternalAcceptance(ctx, { requirePinned: true });
++        await lin.setState(issue, ctx.assignment.linearStates.done);
++        await ensureExternalAcceptance(ctx, { requirePinned: true });
+         await progress(ctx, "Sloučeno; main CI přesného merge commitu úspěšné");
+       } else if (!ctx.data.finalizationReady)
+         await progress(
+@@ -2500,10 +2556,13 @@ export function createAdapter({ github, linear, worker = runWorker } = {}) {
+           "WORKER_ACTIVE",
+           "Cannot release claims with unfinished supervised work",
+         );
++      await ensureExternalAcceptance(ctx, { requirePinned: true });
+       await ctx.save({ finalizationReady: true });
+       await release(ctx, ctx.data.workerTask, ctx.data.workerOwner);
+       await ctx.fault("after-worker-release");
++      await ensureExternalAcceptance(ctx, { requirePinned: true });
+       await release(ctx, ctx.data.controllerTask, ctx.data.owner);
++      await ensureExternalAcceptance(ctx, { requirePinned: true });
+       return { finalized: true };
+     },
+   };
+diff --git a/scripts/autodev/github.mjs b/scripts/autodev/github.mjs
+index 9038fcbe..67defa9b 100644
+--- a/scripts/autodev/github.mjs
++++ b/scripts/autodev/github.mjs
+@@ -1,5 +1,10 @@
+ import { spawn } from "node:child_process";
+ import { problem } from "./store.mjs";
++import {
++  ensureExternalAcceptance,
++  externalAcceptanceBody,
++  externalProofDigest,
++} from "./external-acceptance.mjs";
+ 
+ export function execute(
+   command,
+@@ -367,6 +372,7 @@ export class GitHubClient {
+     }
+   }
+   async accept(ctx, body) {
++    const externalAcceptance = await ensureExternalAcceptance(ctx);
+     const pr = await this.pr(ctx.data.prNumber);
+     this.assertPr(pr, ctx);
+     const base = await this.branch(ctx.assignment.baseBranch);
+@@ -387,11 +393,13 @@ export class GitHubClient {
+     const marker = `<!-- autodev:${ctx.runId} -->`;
+     if (!pr.body?.includes(marker))
+       throw problem("PR_IDENTITY", "Run marker is missing from PR evidence");
+-    const expectedBody = `${marker}\n${body}`;
+-    if (pr.body !== expectedBody)
++    const expectedBody = `${marker}\n${body}${externalAcceptanceBody(externalAcceptance)}`;
++    if (pr.body !== expectedBody) {
++      await ensureExternalAcceptance(ctx, { requirePinned: true });
+       await this.api("PATCH", this.endpoint(`/pulls/${pr.number}`), {
+         body: expectedBody,
+       });
++    }
+     this.assertPr(await this.pr(pr.number), ctx);
+     const statuses = await this.pages(
+       `/commits/${ctx.data.commitSha}/statuses`,
+@@ -399,23 +407,73 @@ export class GitHubClient {
+     const latest = statuses.find(
+       (status) => status.context === "project-acceptance",
+     );
++    await ensureExternalAcceptance(ctx, { requirePinned: true });
+     if (latest?.state !== "success" || latest.target_url !== pr.html_url)
+       await this.api("POST", this.endpoint(`/statuses/${ctx.data.commitSha}`), {
+         state: "success",
+         context: "project-acceptance",
+-        description: "Reviewed CLI evidence and required CI accepted",
++        description: externalAcceptance
++          ? "External practical evidence and required CI accepted"
++          : "Reviewed CLI evidence and required CI accepted",
+         target_url: pr.html_url,
+       });
+     return {
+       headSha: ctx.data.commitSha,
+       baseSha: ctx.data.baseSha,
+       evidenceUrl: pr.html_url,
++      ...(externalAcceptance ? { externalAcceptance } : {}),
+     };
+   }
++  async assertExternalMerge(ctx, pr, proof) {
++    const intent = ctx.data.mergeIntent;
++    if (
++      !pr.merged ||
++      intent?.headSha !== ctx.data.commitSha ||
++      intent?.baseSha !== ctx.data.baseSha ||
++      externalProofDigest(intent?.externalAcceptance) !==
++        externalProofDigest(proof) ||
++      !/^[a-f0-9]{40}$/.test(pr.merge_commit_sha ?? "")
++    )
++      throw problem(
++        "MERGE_IDENTITY",
++        "Merged external candidate has no matching durable merge intent",
++      );
++    const commit = await this.api(
++      "GET",
++      this.endpoint(`/git/commits/${pr.merge_commit_sha}`),
++    );
++    if (
++      commit.sha !== pr.merge_commit_sha ||
++      commit.parents?.length !== 2 ||
++      commit.parents[0].sha !== intent.baseSha ||
++      commit.parents[1].sha !== intent.headSha
++    )
++      throw problem(
++        "MERGE_IDENTITY",
++        "Remote merge parents differ from this run's merge intent",
++      );
++    await ensureExternalAcceptance(ctx, { requirePinned: true });
++  }
+   async merge(ctx) {
++    const externalAcceptance = await ensureExternalAcceptance(ctx, {
++      requirePinned: true,
++    });
+     const pr = await this.pr(ctx.data.prNumber);
+     this.assertPr(pr, ctx, { allowMerged: Boolean(pr.merged) });
+-    if (pr.merged) return pr.merge_commit_sha;
++    if (
++      externalAcceptance &&
++      externalProofDigest(ctx.data.acceptance?.externalAcceptance) !==
++        externalProofDigest(externalAcceptance)
++    )
++      throw problem(
++        "EXTERNAL_ACCEPTANCE_CHANGED",
++        "Merge acceptance does not match the pinned external proof",
++      );
++    if (pr.merged) {
++      if (externalAcceptance)
++        await this.assertExternalMerge(ctx, pr, externalAcceptance);
++      return pr.merge_commit_sha;
++    }
+     if (pr.state !== "open" || pr.draft)
+       throw problem("PR_NOT_READY", "PR is not open and ready");
+     if (
+@@ -430,9 +488,25 @@ export class GitHubClient {
+       (await this.branch(ctx.assignment.baseBranch)).commit.sha !== pr.base.sha
+     )
+       throw problem("BASE_CHANGED", "Base advanced before merge");
+-    await ctx.save({
+-      mergeIntent: { headSha: pr.head.sha, baseSha: pr.base.sha },
+-    });
++    const mergeIntent = {
++      headSha: pr.head.sha,
++      baseSha: pr.base.sha,
++      ...(externalAcceptance ? { externalAcceptance } : {}),
++    };
++    if (
++      externalAcceptance &&
++      ctx.data.mergeIntent &&
++      (ctx.data.mergeIntent.headSha !== mergeIntent.headSha ||
++        ctx.data.mergeIntent.baseSha !== mergeIntent.baseSha ||
++        externalProofDigest(ctx.data.mergeIntent.externalAcceptance) !==
++          externalProofDigest(externalAcceptance))
++    )
++      throw problem(
++        "MERGE_IDENTITY",
++        "Existing merge intent has a different external proof",
++      );
++    await ctx.save({ mergeIntent });
++    await ensureExternalAcceptance(ctx, { requirePinned: true });
+     const result = await this.api(
+       "PUT",
+       this.endpoint(`/pulls/${pr.number}/merge`),
+@@ -440,6 +514,16 @@ export class GitHubClient {
+     );
+     if (!result?.merged || !result.sha)
+       throw problem("UNKNOWN_EFFECT", "Merge outcome was not confirmed");
++    if (externalAcceptance) {
++      const merged = await this.pr(pr.number);
++      this.assertPr(merged, ctx, { allowMerged: true });
++      if (merged.merge_commit_sha !== result.sha)
++        throw problem(
++          "MERGE_IDENTITY",
++          "Merge response differs from the recorded remote PR",
++        );
++      await this.assertExternalMerge(ctx, merged, externalAcceptance);
++    }
+     return result.sha;
+   }
+ }
+diff --git a/tests/autodev-store.test.ts b/tests/autodev-store.test.ts
+index 9854b337..682d7c7b 100644
+--- a/tests/autodev-store.test.ts
++++ b/tests/autodev-store.test.ts
+@@ -104,3 +104,62 @@ test("canonical digests ignore object key order but freeze behavior, and run IDs
+     code: "INVALID_RUN_ID",
+   });
+ });
++
++test("external manifest freezes independent authority and an exact immutable evidence list", () => {
++  const acceptance = {
++    kind: "external",
++    description: "Comparable production A/B",
++    authority: { task: "coordinator", owner: "run:coordinator" },
++    receiptFile: "evidence/acceptance.json",
++    evidenceFiles: [{ id: "ab", path: "evidence/ab.json" }],
++  };
++  const original = { ...assignment(), acceptance };
++  assert.deepEqual(store.validateAssignment(original), original);
++  const bad = [
++    { unknown: true },
++    { authority: { ...acceptance.authority, key: "ignored" } },
++    { authority: { task: original.workerTask, owner: "owner" } },
++    { authority: { task: original.task, owner: "owner" } },
++    { authority: { task: 123, owner: "owner" } },
++    { authority: { task: "coordinator", owner: "bad owner" } },
++    { evidenceFiles: [] },
++    {
++      evidenceFiles: [...acceptance.evidenceFiles, ...acceptance.evidenceFiles],
++    },
++    { evidenceFiles: [{ id: "ab", path: acceptance.receiptFile }] },
++    { evidenceFiles: [{ id: "ab", path: "evidence/ab.json", ignored: true }] },
++    {
++      evidenceFiles: [
++        { id: "a", path: "A.json" },
++        { id: "b", path: "a.json" },
++      ],
++    },
++    ...[
++      "../proof",
++      "/proof",
++      "C:/proof",
++      "proof\\x",
++      "proof/*",
++      "proof/[a]",
++      "proof/./x",
++      "proof/.git/x",
++      "proof/x.",
++      "proof/CON.txt",
++      "proof//x",
++    ].map((receiptFile) => ({ receiptFile })),
++  ];
++  for (const patch of bad)
++    assert.throws(
++      () =>
++        store.validateAssignment({
++          ...original,
++          acceptance: { ...acceptance, ...patch },
++        }),
++      { code: "INVALID_ASSIGNMENT" },
++    );
++  assert.throws(
++    () =>
++      store.validateAssignment({ ...original, validationTask: "coordinator" }),
++    { code: "INVALID_ASSIGNMENT" },
++  );
++});
+diff --git a/tests/autodev-external-acceptance.test.ts b/tests/autodev-external-acceptance.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/autodev-external-acceptance.test.ts
+@@ -0,0 +1,608 @@
++import test, { type TestContext } from "node:test";
++import assert from "node:assert/strict";
++import {
++  mkdtemp,
++  mkdir,
++  writeFile,
++  readFile,
++  copyFile,
++  rm,
++  link,
++  symlink,
++  unlink,
++} from "node:fs/promises";
++import { tmpdir } from "node:os";
++import path from "node:path";
++import { createHash } from "node:crypto";
++import childProcess from "node:child_process";
++import { syncBuiltinESMExports } from "node:module";
++import { writeFileSync } from "node:fs";
++const { GitHubClient, execute } = await import(
++  new URL("../scripts/autodev/github.mjs", import.meta.url).href
++);
++const { createAdapter } = await import(
++  new URL("../scripts/autodev/adapters.mjs", import.meta.url).href
++);
++const { ensureExternalAcceptance, loadExternalAuthority, readAcceptanceFile } =
++  await import(
++    new URL("../scripts/autodev/external-acceptance.mjs", import.meta.url).href
++  );
++const { digest } = await import(
++  new URL("../scripts/autodev/store.mjs", import.meta.url).href
++);
++const { sourceIdentity } = await import(
++  new URL("../scripts/autodev/source.mjs", import.meta.url).href
++);
++const sha = (value: string | Buffer) =>
++  createHash("sha256").update(value).digest("hex");
++const git = async (root: string, ...args: string[]) =>
++  (await execute("git", ["-C", root, ...args], { cwd: root })).stdout.trim();
++
++async function fixture(t: TestContext) {
++  const root = await mkdtemp(path.join(tmpdir(), "autodev-external-"));
++  t.after(async () => {
++    assert.ok(root.startsWith(path.join(tmpdir(), "autodev-external-")));
++    await rm(root, { recursive: true, force: true });
++  });
++  await mkdir(path.join(root, "docs/agents/tasks"), { recursive: true });
++  await mkdir(path.join(root, "scripts"));
++  await mkdir(path.join(root, "evidence"));
++  await copyFile(
++    new URL("../scripts/agent-tasks.mjs", import.meta.url),
++    path.join(root, "scripts/agent-tasks.mjs"),
++  );
++  const task = (id: string, writePaths: string[]) => ({
++    schemaVersion: 1,
++    id,
++    title: id,
++    status: "ready",
++    writePaths,
++    resources: [],
++    dependsOn: [],
++    acceptance: ["fixture"],
++    verification: ["fixture"],
++    notes: [],
++  });
++  const controllerTask = task("controller", ["artifacts/", "handoff.md"]),
++    workerTask = task("worker", ["source.txt"]),
++    authorityTask = task("authority", ["evidence/"]);
++  for (const item of [controllerTask, workerTask, authorityTask])
++    await writeFile(
++      path.join(root, `docs/agents/tasks/${item.id}.json`),
++      JSON.stringify(item),
++    );
++  await writeFile(path.join(root, "source.txt"), "base\n");
++  await writeFile(path.join(root, ".gitignore"), "evidence/\n");
++  await git(root, "init", "-b", "main");
++  await git(root, "config", "user.name", "Fixture");
++  await git(root, "config", "user.email", "fixture@example.invalid");
++  await git(root, "config", "core.autocrlf", "false");
++  await git(
++    root,
++    "add",
++    "--",
++    "source.txt",
++    ".gitignore",
++    "scripts/agent-tasks.mjs",
++    "docs/agents/tasks",
++  );
++  await git(root, "commit", "-m", "base");
++  const baseSha = await git(root, "rev-parse", "HEAD");
++  for (const [id, owner] of [
++    ["controller", "autodev:test"],
++    ["worker", "autodev:test:worker"],
++    ["authority", "coordinator"],
++  ])
++    await execute(
++      process.execPath,
++      ["scripts/agent-tasks.mjs", "claim", "--task", id, "--owner", owner],
++      { cwd: root },
++    );
++  await writeFile(path.join(root, "source.txt"), "candidate\n");
++  const sourceDigest = (
++    await sourceIdentity(root, baseSha, workerTask.writePaths)
++  ).digest;
++  await git(root, "add", "--", "source.txt");
++  await git(root, "commit", "-m", "candidate");
++  const assignment = {
++    schemaVersion: 1,
++    issue: "KEY-54",
++    task: "controller",
++    workerTask: "worker",
++    repository: "unit/repo",
++    baseBranch: "main",
++    intentFile: "intent.md",
++    artifactDir: "artifacts",
++    handoffFile: "handoff.md",
++    prTitle: "fixture",
++    checks: [{ id: "test", command: "node", args: [] }],
++    linearStates: { active: "Active", done: "Done" },
++    merge: true,
++    acceptance: {
++      kind: "external",
++      description: "Comparable A/B",
++      authority: { task: "authority", owner: "coordinator" },
++      receiptFile: "evidence/acceptance.json",
++      evidenceFiles: [{ id: "ab", path: "evidence/ab.bin" }],
++    },
++  };
++  const data: any = {
++    worktree: root,
++    baseSha,
++    commitSha: await git(root, "rev-parse", "HEAD"),
++    sourceDigest,
++    controllerTask,
++    workerTask,
++    validationTask: null,
++    branch: "main",
++    prNumber: 9,
++    owner: "autodev:test",
++    workerOwner: "autodev:test:worker",
++  };
++  const ctx: any = {
++    repo: root,
++    runId: "fixture",
++    assignment,
++    data,
++    state: { assignmentDigest: digest(assignment), data },
++    async save(patch: any) {
++      Object.assign(data, patch);
++    },
++  };
++  data.externalAuthority = await loadExternalAuthority(ctx);
++  const evidence = Buffer.from([0, 255, 13, 10, 128, 0]);
++  await writeFile(path.join(root, "evidence/ab.bin"), evidence);
++  const receipt = () => ({
++    schemaVersion: 1,
++    kind: "external-acceptance",
++    decision: "pass",
++    runId: ctx.runId,
++    assignmentDigest: ctx.state.assignmentDigest,
++    baseSha,
++    commitSha: data.commitSha,
++    sourceDigest: data.sourceDigest,
++    authority: {
++      ...assignment.acceptance.authority,
++      taskSha256: data.externalAuthority.taskSha256,
++    },
++    issuedAt: "2026-10-20T20:00:00.000Z",
++    summary: "Comparable production A/B accepted",
++    evidence: [{ id: "ab", path: "evidence/ab.bin", sha256: sha(evidence) }],
++  });
++  const receiptFile = path.join(root, assignment.acceptance.receiptFile);
++  const issue = async (value = receipt()) =>
++    writeFile(receiptFile, JSON.stringify(value));
++  const registryFile = path.join(root, ".git/agent-coordination/claims.json");
++  return { root, ctx, data, receipt, issue, receiptFile, registryFile };
++}
++
++test("external proof waits without mutation, pins exact bytes once, and preserves original binary evidence", async (t) => {
++  const f = await fixture(t);
++  await assert.rejects(ensureExternalAcceptance(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_PENDING",
++  });
++  assert.equal(f.data.externalAcceptance, undefined);
++  await f.issue();
++  const original = await readFile(f.receiptFile);
++  const proof = await ensureExternalAcceptance(f.ctx);
++  assert.equal(proof.receiptSha256, sha(original));
++  assert.deepEqual(
++    await ensureExternalAcceptance(f.ctx, { requirePinned: true }),
++    proof,
++  );
++  assert.equal((await readFile(f.receiptFile)).equals(original), true);
++  await writeFile(f.receiptFile, Buffer.concat([original, Buffer.from("\n")]));
++  await assert.rejects(ensureExternalAcceptance(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_CHANGED",
++  });
++});
++
++test("external receipt rejects fail, unknown fields and mismatched candidate identities without pinning", async (t) => {
++  const f = await fixture(t);
++  const variants: any[] = [
++    { decision: "fail" },
++    { extra: true },
++    { schemaVersion: 2 },
++    { runId: "other" },
++    { assignmentDigest: "0".repeat(64) },
++    { baseSha: "0".repeat(40) },
++    { commitSha: "0".repeat(40) },
++    { sourceDigest: "0".repeat(64) },
++    { summary: " " },
++    { issuedAt: "yesterday" },
++    { authority: { ...f.receipt().authority, owner: "worker" } },
++    { authority: { ...f.receipt().authority, taskSha256: "0".repeat(64) } },
++    { evidence: [] },
++    { evidence: [{ ...f.receipt().evidence[0], path: "../outside" }] },
++    { evidence: [{ ...f.receipt().evidence[0], id: "other" }] },
++    { evidence: [{ ...f.receipt().evidence[0], ignored: true }] },
++  ];
++  for (const patch of variants) {
++    await f.issue({ ...f.receipt(), ...patch });
++    const original = await readFile(f.receiptFile, "utf8");
++    await assert.rejects(
++      ensureExternalAcceptance(f.ctx),
++      /External|external|Malformed/,
++    );
++    assert.equal(f.data.externalAcceptance, undefined);
++    assert.equal(await readFile(f.receiptFile, "utf8"), original);
++  }
++  await writeFile(f.receiptFile, "{broken");
++  await assert.rejects(ensureExternalAcceptance(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_INVALID",
++  });
++});
++
++test("external authority requires live exact owner, worktree and frozen scope but not equal baseHead", async (t) => {
++  const f = await fixture(t);
++  await f.issue();
++  const original = JSON.parse(await readFile(f.registryFile, "utf8"));
++  for (const patch of [
++    { owner: "other" },
++    { worktree: path.dirname(f.root) },
++    { writePaths: ["evidence/acceptance.json"] },
++    { resources: ["gpu"] },
++  ]) {
++    const changed = structuredClone(original);
++    Object.assign(
++      changed.claims.find((claim: any) => claim.task === "authority"),
++      patch,
++    );
++    await writeFile(f.registryFile, JSON.stringify(changed));
++    await assert.rejects(ensureExternalAcceptance(f.ctx), {
++      code: "EXTERNAL_ACCEPTANCE_AUTHORITY",
++    });
++  }
++  const missing = structuredClone(original);
++  missing.claims = missing.claims.filter(
++    (claim: any) => claim.task !== "authority",
++  );
++  await writeFile(f.registryFile, JSON.stringify(missing));
++  await assert.rejects(ensureExternalAcceptance(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_AUTHORITY",
++  });
++  const changed = structuredClone(original);
++  changed.claims.find((claim: any) => claim.task === "authority").baseHead =
++    "b".repeat(40);
++  await writeFile(f.registryFile, JSON.stringify(changed));
++  assert.ok(await ensureExternalAcceptance(f.ctx));
++});
++
++test("external authority must be pinned from base and receipt cannot be a worker output", async (t) => {
++  const f = await fixture(t);
++  await f.issue();
++  f.data.externalAuthority.taskSha256 = "0".repeat(64);
++  await assert.rejects(ensureExternalAcceptance(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_AUTHORITY",
++  });
++  f.data.workerTask.writePaths.push("evidence/");
++  await assert.rejects(loadExternalAuthority(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_AUTHORITY",
++  });
++});
++
++test("external authority uses original base bytes despite distinct HEAD and working task definitions", async (t) => {
++  const f = await fixture(t),
++    file = path.join(f.root, "docs/agents/tasks/authority.json");
++  const baseBytes = await readFile(file),
++    baseTask = JSON.parse(baseBytes.toString("utf8"));
++  const headTask = {
++    ...baseTask,
++    title: "HEAD authority definition",
++    notes: ["HEAD differs"],
++  };
++  await writeFile(file, `${JSON.stringify(headTask, null, 2)}\n`);
++  await git(f.root, "add", "--", "docs/agents/tasks/authority.json");
++  await git(f.root, "commit", "-m", "HEAD authority differs from frozen base");
++  const headBytes = (
++    await execute(
++      "git",
++      ["-C", f.root, "show", "HEAD:docs/agents/tasks/authority.json"],
++      { cwd: f.root },
++    )
++  ).stdout;
++  const workingTask = {
++    ...baseTask,
++    title: "Uncommitted authority definition",
++    notes: ["working copy differs"],
++  };
++  await writeFile(file, JSON.stringify(workingTask));
++  const loaded = await loadExternalAuthority(f.ctx);
++  assert.deepEqual(loaded.task, baseTask);
++  assert.equal(loaded.taskSha256, sha(baseBytes));
++  assert.notEqual(loaded.taskSha256, sha(headBytes));
++  assert.notEqual(loaded.taskSha256, sha(await readFile(file)));
++  assert.deepEqual(JSON.parse(headBytes), headTask);
++  assert.deepEqual(JSON.parse(await readFile(file, "utf8")), workingTask);
++});
++
++test("external evidence is rechecked after asynchronous source verification before pinning", async (t) => {
++  const f = await fixture(t);
++  await f.issue();
++  const receiptBytes = await readFile(f.receiptFile),
++    evidenceFile = path.join(f.root, "evidence/ab.bin");
++  const spawn = childProcess.spawn;
++  let changed = false;
++  t.mock.method(childProcess, "spawn", (...args: any[]) => {
++    if (
++      args[0] === "git" &&
++      args[1].includes("--binary") &&
++      args[1].includes(f.root)
++    ) {
++      changed = true;
++      writeFileSync(evidenceFile, "changed during sourceIdentity");
++    }
++    return Reflect.apply(spawn, childProcess, args);
++  });
++  syncBuiltinESMExports();
++  try {
++    await assert.rejects(ensureExternalAcceptance(f.ctx), {
++      code: "EXTERNAL_ACCEPTANCE_CHANGED",
++    });
++    assert.equal(
++      changed,
++      true,
++      "mutation occurred after the first evidence read, during the real Git diff",
++    );
++    assert.equal(f.data.externalAcceptance, undefined);
++    assert.equal(
++      await readFile(evidenceFile, "utf8"),
++      "changed during sourceIdentity",
++    );
++    assert.equal((await readFile(f.receiptFile)).equals(receiptBytes), true);
++  } finally {
++    t.mock.restoreAll();
++    syncBuiltinESMExports();
++  }
++});
++
++test("receipt and evidence reject links, hardlinks and every unsafe path without deleting anything", async (t) => {
++  const f = await fixture(t);
++  for (const relative of [
++    "../escape",
++    "/absolute",
++    "C:/absolute",
++    "evidence\\ab.bin",
++    "evidence//ab.bin",
++    "evidence/./ab.bin",
++    ".git/config",
++    "evidence/a*",
++    "evidence/NUL",
++    "evidence/a.",
++  ])
++    await assert.rejects(readAcceptanceFile(f.root, relative), {
++      code: "EXTERNAL_ACCEPTANCE_PATH",
++    });
++  await f.issue();
++  const original = await readFile(f.receiptFile);
++  await link(f.receiptFile, path.join(f.root, "evidence/copy.json"));
++  await assert.rejects(ensureExternalAcceptance(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_PATH",
++  });
++  assert.equal((await readFile(f.receiptFile)).equals(original), true);
++  await unlink(path.join(f.root, "evidence/copy.json"));
++  const linked = path.join(f.root, "linked");
++  await symlink(
++    path.join(f.root, "evidence"),
++    linked,
++    process.platform === "win32" ? "junction" : "dir",
++  );
++  await assert.rejects(readAcceptanceFile(f.root, "linked/ab.bin"), {
++    code: "EXTERNAL_ACCEPTANCE_PATH",
++  });
++  await link(
++    path.join(f.root, "evidence/ab.bin"),
++    path.join(f.root, "evidence/copy.bin"),
++  );
++  await assert.rejects(ensureExternalAcceptance(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_PATH",
++  });
++});
++
++test("pinned proof cannot be replaced or survive changed/missing evidence or changed source", async (t) => {
++  const f = await fixture(t);
++  await f.issue();
++  await ensureExternalAcceptance(f.ctx);
++  const file = path.join(f.root, "evidence/ab.bin"),
++    original = await readFile(file);
++  await writeFile(file, "changed");
++  await assert.rejects(ensureExternalAcceptance(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_CHANGED",
++  });
++  await unlink(file);
++  await assert.rejects(ensureExternalAcceptance(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_CHANGED",
++  });
++  await writeFile(file, original);
++  await writeFile(path.join(f.root, "source.txt"), "unreviewed\n");
++  await assert.rejects(ensureExternalAcceptance(f.ctx), {
++    code: "SOURCE_CHANGED",
++  });
++});
++
++function github(f: any) {
++  const client = new GitHubClient({ repository: "unit/repo" });
++  const pr: any = {
++    number: 9,
++    state: "open",
++    draft: false,
++    merged: false,
++    html_url: "https://github.com/unit/repo/pull/9",
++    body: `<!-- autodev:${f.ctx.runId} -->`,
++    head: {
++      sha: f.data.commitSha,
++      ref: "main",
++      repo: { full_name: "unit/repo" },
++    },
++    base: {
++      sha: f.data.baseSha,
++      ref: "main",
++      repo: { full_name: "unit/repo" },
++    },
++  };
++  const mutations: any[] = [],
++    statuses: any[] = [];
++  client.pr = async () => pr;
++  client.branch = async () => ({ commit: { sha: f.data.baseSha } });
++  client.checks = async () => [
++    { name: "verify" },
++    { name: "source-secret-hygiene" },
++  ];
++  client.pages = async () => statuses;
++  client.api = async (method: string, endpoint: string, body: any) => {
++    if (method === "GET")
++      return {
++        sha: pr.merge_commit_sha,
++        parents: [{ sha: f.data.baseSha }, { sha: f.data.commitSha }],
++      };
++    assert.ok(f.data.externalAcceptance, "proof pinned before first mutation");
++    mutations.push({ method, endpoint, body });
++    if (method === "PATCH") pr.body = body.body;
++    if (method === "POST") statuses.unshift(body);
++    if (method === "PUT") {
++      pr.merged = true;
++      pr.merge_commit_sha = "f".repeat(40);
++      return { merged: true, sha: pr.merge_commit_sha };
++    }
++    return {};
++  };
++  return { client, pr, mutations };
++}
++
++test("direct GitHub accept waits for proof, publishes it once, and prevents merge after evidence tamper", async (t) => {
++  const f = await fixture(t),
++    remote = github(f);
++  await assert.rejects(remote.client.accept(f.ctx, "review"), {
++    code: "EXTERNAL_ACCEPTANCE_PENDING",
++  });
++  assert.equal(remote.mutations.length, 0);
++  await f.issue();
++  f.data.acceptance = await remote.client.accept(f.ctx, "review");
++  assert.ok(remote.pr.body.includes(f.data.externalAcceptance.receiptSha256));
++  assert.deepEqual(
++    f.data.acceptance.externalAcceptance,
++    f.data.externalAcceptance,
++  );
++  await remote.client.accept(f.ctx, "review");
++  assert.equal(remote.mutations.length, 2);
++  await writeFile(path.join(f.root, "evidence/ab.bin"), "changed");
++  await assert.rejects(remote.client.merge(f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_CHANGED",
++  });
++  assert.equal(remote.mutations.length, 2);
++});
++
++test("GitHub rechecks external proof at each mutation boundary, including after PR body update", async (t) => {
++  const f = await fixture(t),
++    remote = github(f);
++  await f.issue();
++  const api = remote.client.api.bind(remote.client);
++  remote.client.api = async (method: string, endpoint: string, body: any) => {
++    const result = await api(method, endpoint, body);
++    if (method === "PATCH") await writeFile(f.receiptFile, "changed");
++    return result;
++  };
++  await assert.rejects(remote.client.accept(f.ctx, "review"), {
++    code: "EXTERNAL_ACCEPTANCE_CHANGED",
++  });
++  assert.deepEqual(
++    remote.mutations.map((item) => item.method),
++    ["PATCH"],
++  );
++});
++
++test("external merge recovery requires original proof-bound intent and exact remote merge parents", async (t) => {
++  const f = await fixture(t),
++    remote = github(f);
++  await f.issue();
++  f.data.acceptance = await remote.client.accept(f.ctx, "review");
++  const api = remote.client.api.bind(remote.client);
++  remote.client.api = async (method: string, endpoint: string, body: any) => {
++    const result = await api(method, endpoint, body);
++    if (method === "PUT") throw new Error("crash after remote merge");
++    return result;
++  };
++  await assert.rejects(remote.client.merge(f.ctx), /crash/);
++  assert.deepEqual(
++    f.data.mergeIntent.externalAcceptance,
++    f.data.externalAcceptance,
++  );
++  assert.equal(await remote.client.merge(f.ctx), "f".repeat(40));
++  assert.equal(
++    remote.mutations.filter((item) => item.method === "PUT").length,
++    1,
++  );
++  const intent = f.data.mergeIntent;
++  delete f.data.mergeIntent;
++  await assert.rejects(remote.client.merge(f.ctx), { code: "MERGE_IDENTITY" });
++  f.data.mergeIntent = intent;
++  remote.client.api = async () => ({
++    sha: "f".repeat(40),
++    parents: [{ sha: "0".repeat(40) }, { sha: f.data.commitSha }],
++  });
++  await assert.rejects(remote.client.merge(f.ctx), { code: "MERGE_IDENTITY" });
++});
++
++test("adapter external boundaries wait before injected GitHub accept and merge=false still requires proof", async (t) => {
++  const f = await fixture(t);
++  let effects = 0;
++  const adapter = createAdapter({
++    github: {
++      async accept() {
++        effects++;
++      },
++      async merge() {
++        effects++;
++      },
++    },
++    linear: {},
++  });
++  await assert.rejects(adapter.runStage("accept", f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_PENDING",
++  });
++  f.ctx.assignment.merge = false;
++  f.ctx.state.assignmentDigest = digest(f.ctx.assignment);
++  await assert.rejects(adapter.runStage("merge", f.ctx), {
++    code: "EXTERNAL_ACCEPTANCE_CHANGED",
++  });
++  assert.equal(effects, 0);
++  await f.issue();
++  await ensureExternalAcceptance(f.ctx);
++  assert.deepEqual(await adapter.runStage("merge", f.ctx), {
++    awaitingMerge: true,
++  });
++  assert.equal(effects, 0);
++});
++
++test("fresh external merge verifies remote parents and adapter reconciliation cannot bypass its intent", async (t) => {
++  const f = await fixture(t),
++    remote = github(f);
++  await f.issue();
++  f.data.acceptance = await remote.client.accept(f.ctx, "review");
++  const api = remote.client.api.bind(remote.client);
++  remote.client.api = async (method: string, endpoint: string, body: any) =>
++    method === "GET"
++      ? {
++          sha: "f".repeat(40),
++          parents: [{ sha: "e".repeat(40) }, { sha: f.data.commitSha }],
++        }
++      : api(method, endpoint, body);
++  await assert.rejects(remote.client.merge(f.ctx), { code: "MERGE_IDENTITY" });
++  assert.equal(
++    remote.mutations.filter((item) => item.method === "PUT").length,
++    1,
++  );
++  remote.client.api = api;
++  const adapter = createAdapter({ github: remote.client, linear: {} });
++  assert.deepEqual(await adapter.runStage("merge", f.ctx), {
++    mergeSha: "f".repeat(40),
++  });
++  delete f.data.mergeIntent;
++  await assert.rejects(adapter.runStage("merge", f.ctx), {
++    code: "MERGE_IDENTITY",
++  });
++  assert.equal(
++    remote.mutations.filter((item) => item.method === "PUT").length,
++    1,
++  );
++});
+diff --git a/tests/autodev-adapters.test.ts b/tests/autodev-adapters.test.ts
+index f0c83af0..d66bc7aa 100644
+--- a/tests/autodev-adapters.test.ts
++++ b/tests/autodev-adapters.test.ts
+@@ -14,9 +14,12 @@ import { tmpdir } from "node:os";
+ import path from "node:path";
+ import { fileURLToPath } from "node:url";
+ import { spawn } from "node:child_process";
++import childProcess from "node:child_process";
++import { syncBuiltinESMExports } from "node:module";
+ import { createHash } from "node:crypto";
+ const {
+   auditScope,
++  inScope,
+   ignoredSnapshot,
+   sourceIdentity,
+   workingSnapshot,
+@@ -25,12 +28,17 @@ const {
+   parseDirty,
+   createAdapter,
+   writeSpecification,
++  bmadRenderPrefix,
++  assertBmadRenderScope,
+ } = await import(
+   new URL("../scripts/autodev/adapters.mjs", import.meta.url).href
+ );
+ const { GitHubClient, checkoutEvidence, execute } = await import(
+   new URL("../scripts/autodev/github.mjs", import.meta.url).href
+ );
++const { ensureExternalAcceptance } = await import(
++  new URL("../scripts/autodev/external-acceptance.mjs", import.meta.url).href
++);
+ const { supervise: nativeSupervise } = await import(
+   new URL("../scripts/autodev/process.mjs", import.meta.url).href
+ );
+@@ -71,6 +79,30 @@ const sourceRoot = path.resolve(
+   path.dirname(fileURLToPath(import.meta.url)),
+   "..",
+ );
++
++test("renderer reservation covers only its resolved worktree prefix including staging and remains broad-scope compatible", () => {
++  const worktree = path.resolve(sourceRoot, "../autodev-key-53-fixture"),
++    prefix = bmadRenderPrefix(worktree);
++  assert.equal(
++    prefix,
++    `_bmad/render/bmad-build/autodev-key-53-fixture-${createHash("sha256").update(worktree).digest("hex").slice(0, 12)}/`,
++  );
++  assert.equal(assertBmadRenderScope(worktree, [prefix]), prefix);
++  assert.equal(
++    assertBmadRenderScope(worktree, ["_bmad/render/bmad-build/"]),
++    prefix,
++  );
++  for (const scope of [
++    prefix.slice(0, -1),
++    `${prefix}snapshot/`,
++    `${prefix}.staging-probe/`,
++    bmadRenderPrefix(`${worktree}-other`),
++  ])
++    assert.throws(() => assertBmadRenderScope(worktree, [scope]), {
++      code: "TASK_SCOPE",
++    });
++  assert.equal(inScope(`${prefix}.staging-123/workflow.md`, [prefix]), true);
++});
+ const git = async (root: string, ...args: string[]) =>
+   (await execute("git", ["-C", root, ...args], { cwd: root })).stdout.trim();
+ function definition(
+@@ -91,6 +123,299 @@ function definition(
+     notes: [],
+   };
+ }
++
++async function preparedExternalFixture(t: any) {
++  const f = await fixture(t),
++    ctx = f.ctx;
++  for (const [task, owner] of [
++    ["controller", "autodev:test"],
++    ["worker", "autodev:test:worker"],
++  ])
++    await execute(
++      process.execPath,
++      ["scripts/agent-tasks.mjs", "release", "--task", task, "--owner", owner],
++      { cwd: f.root },
++    );
++  const worktree = path.join(f.folder, `autodev-${ctx.runId}`),
++    controller = definition("controller", [
++      "artifacts/",
++      "handoff.md",
++      bmadRenderPrefix(worktree),
++    ]),
++    authority = definition("authority", ["evidence/"]);
++  const authorityBytes = `${JSON.stringify(authority, null, 2)}\n`;
++  await writeFile(
++    path.join(f.root, "docs/agents/tasks/controller.json"),
++    JSON.stringify(controller),
++  );
++  await writeFile(
++    path.join(f.root, "docs/agents/tasks/authority.json"),
++    authorityBytes,
++  );
++  await writeFile(
++    path.join(f.root, "intent.md"),
++    "Implement only the explicitly assigned runtime change.\n",
++  );
++  await writeFile(path.join(f.root, ".gitignore"), "ignored/\nevidence/\n");
++  ctx.assignment = {
++    ...ctx.assignment,
++    schemaVersion: 1,
++    intentFile: "intent.md",
++    merge: true,
++    acceptance: {
++      kind: "external",
++      description: "Measured production A/B",
++      authority: { task: "authority", owner: "coordinator" },
++      receiptFile: "evidence/receipt.json",
++      evidenceFiles: [{ id: "ab", path: "evidence/ab.txt" }],
++    },
++  };
++  ctx.state.assignmentPath = path.join(f.root, "assignment.json");
++  ctx.state.assignmentDigest = digest(ctx.assignment);
++  await writeFile(ctx.state.assignmentPath, JSON.stringify(ctx.assignment));
++  await git(
++    f.root,
++    "add",
++    "--",
++    "docs/agents/tasks/controller.json",
++    "docs/agents/tasks/authority.json",
++    "intent.md",
++    ".gitignore",
++    "assignment.json",
++  );
++  await git(
++    f.root,
++    "commit",
++    "-m",
++    "external assignment and exact renderer reservation",
++  );
++  const baseSha = await git(f.root, "rev-parse", "HEAD");
++  await git(
++    f.root,
++    "remote",
++    "add",
++    "origin",
++    "https://github.com/unit/repo.git",
++  );
++  await execute(
++    process.execPath,
++    [
++      "scripts/agent-tasks.mjs",
++      "claim",
++      "--task",
++      "authority",
++      "--owner",
++      "coordinator",
++    ],
++    { cwd: f.root },
++  );
++  // Keep the real prepare/Git worktree/claim path. Only redirect its remote
++  // fetch transport to this fixture; origin identity remains the actual URL.
++  const originalSpawn = childProcess.spawn;
++  t.mock.method(childProcess, "spawn", (...args: any[]) => {
++    if (args[0] === "git" && args[1][2] === "fetch" && args[1][3] === "origin")
++      args[1] = [
++        "-C",
++        args[1][1],
++        "fetch",
++        f.root,
++        "main:refs/remotes/origin/main",
++      ];
++    return Reflect.apply(originalSpawn, childProcess, args);
++  });
++  syncBuiltinESMExports();
++  t.after(() => {
++    t.mock.restoreAll();
++    syncBuiltinESMExports();
++  });
++  ctx.state.data = {};
++  const preparation = createAdapter({
++    github: {
++      async repo() {
++        return { full_name: "unit/repo" };
++      },
++      async branch() {
++        return { commit: { sha: baseSha } };
++      },
++    },
++    linear: {
++      async getIssue() {
++        return { id: "issue-1", identifier: "KEY-1" };
++      },
++      async setState() {},
++      async comment() {},
++    },
++  });
++  await preparation.runStage("prepare", ctx);
++  assert.equal(ctx.data.baseSha, baseSha);
++  assert.deepEqual(ctx.data.externalAuthority, {
++    task: authority,
++    taskSha256: sha(authorityBytes),
++  });
++  assert.equal((await f.registry()).claims.length, 3);
++  assert.equal(ctx.data.worktree, worktree);
++  await writeFile(path.join(worktree, "src/new.txt"), "prepared candidate\n");
++  ctx.data.sourceDigest = (
++    await sourceIdentity(worktree, baseSha, ctx.data.workerTask.writePaths)
++  ).digest;
++  await git(worktree, "add", "--", "src/new.txt");
++  await git(worktree, "commit", "-m", "candidate");
++  ctx.data.commitSha = await git(worktree, "rev-parse", "HEAD");
++  await mkdir(path.join(f.root, "evidence"));
++  const evidenceFile = path.join(f.root, "evidence/ab.txt"),
++    evidence = "original measured A/B\n";
++  await writeFile(evidenceFile, evidence);
++  await writeFile(
++    path.join(f.root, "evidence/receipt.json"),
++    JSON.stringify({
++      schemaVersion: 1,
++      kind: "external-acceptance",
++      decision: "pass",
++      runId: ctx.runId,
++      assignmentDigest: ctx.state.assignmentDigest,
++      baseSha,
++      commitSha: ctx.data.commitSha,
++      sourceDigest: ctx.data.sourceDigest,
++      authority: {
++        task: "authority",
++        owner: "coordinator",
++        taskSha256: sha(authorityBytes),
++      },
++      issuedAt: "2026-10-20T20:00:00.000Z",
++      summary: "Comparable A/B accepted",
++      evidence: [{ id: "ab", path: "evidence/ab.txt", sha256: sha(evidence) }],
++    }),
++  );
++  const github = new GitHubClient({ repository: "unit/repo" }),
++    mutations: string[] = [];
++  const pr: any = {
++    number: 9,
++    state: "open",
++    draft: false,
++    merged: false,
++    body: `<!-- autodev:${ctx.runId} -->`,
++    html_url: "https://github.com/unit/repo/pull/9",
++    head: {
++      sha: ctx.data.commitSha,
++      ref: ctx.data.branch,
++      repo: { full_name: "unit/repo" },
++    },
++    base: { sha: baseSha, ref: "main", repo: { full_name: "unit/repo" } },
++  };
++  ctx.data.prNumber = 9;
++  github.pr = async () => pr;
++  github.branch = async () => ({ commit: { sha: baseSha } });
++  github.checks = async () => [
++    { name: "verify" },
++    { name: "source-secret-hygiene" },
++  ];
++  github.pages = async () => [];
++  github.api = async (method: string, _endpoint: string, body: any) => {
++    mutations.push(method);
++    if (method === "PATCH") pr.body = body.body;
++    return {};
++  };
++  const acceptance = await github.accept(ctx, "actual prepare acceptance");
++  await ctx.save({ acceptance });
++  return { ...f, github, pr, mutations, evidenceFile, evidence };
++}
++
++test("actual prepare freezes external base authority and its checkpoint feeds successful direct acceptance", async (t) => {
++  const f = await preparedExternalFixture(t);
++  assert.deepEqual(f.mutations, ["PATCH", "POST"]);
++  assert.equal(
++    f.ctx.data.acceptance.externalAcceptance.authority.taskSha256,
++    f.ctx.data.externalAuthority.taskSha256,
++  );
++  assert.deepEqual(
++    await ensureExternalAcceptance(f.ctx, { requirePinned: true }),
++    f.ctx.data.acceptance.externalAcceptance,
++  );
++});
++
++test("external finalize rechecks proof after merge checkpoint, main CI waits and finalizationReady crash resume", async (t) => {
++  const f = await preparedExternalFixture(t),
++    ctx = f.ctx,
++    effects: string[] = [];
++  await git(f.root, "merge", "--no-ff", "--no-edit", ctx.data.branch);
++  ctx.data.mergeSha = await git(f.root, "rev-parse", "HEAD");
++  f.pr.merged = true;
++  f.pr.merge_commit_sha = ctx.data.mergeSha;
++  let duringChecks = false;
++  f.github.waitChecks = async () => {
++    if (duringChecks) await writeFile(f.evidenceFile, "changed during main CI");
++    return [
++      { name: "verify", headSha: ctx.data.mergeSha, conclusion: "success" },
++    ];
++  };
++  const adapter = createAdapter({
++    github: f.github,
++    linear: {
++      async getIssue() {
++        return { id: "KEY-1" };
++      },
++      async setState() {
++        effects.push("Done");
++      },
++      async comment() {
++        effects.push("progress");
++      },
++    },
++  });
++  await writeFile(f.evidenceFile, "changed after merge checkpoint");
++  await assert.rejects(adapter.runStage("finalize", ctx), {
++    code: "EXTERNAL_ACCEPTANCE_CHANGED",
++  });
++  assert.deepEqual(effects, []);
++  assert.equal((await f.registry()).claims.length, 3);
++  await writeFile(f.evidenceFile, f.evidence);
++  duringChecks = true;
++  await assert.rejects(adapter.runStage("finalize", ctx), {
++    code: "EXTERNAL_ACCEPTANCE_CHANGED",
++  });
++  assert.deepEqual(effects, []);
++  assert.equal(ctx.data.finalizationReady, undefined);
++  assert.equal((await f.registry()).claims.length, 3);
++  assert.equal(
++    await readFile(f.evidenceFile, "utf8"),
++    "changed during main CI",
++  );
++  await writeFile(f.evidenceFile, f.evidence);
++  duringChecks = false;
++  ctx.fault = async (point: string) => {
++    if (point === "after-worker-release")
++      throw new Error("finalize checkpoint crash");
++  };
++  await assert.rejects(
++    adapter.runStage("finalize", ctx),
++    /finalize checkpoint crash/,
++  );
++  assert.equal(ctx.data.finalizationReady, true);
++  assert.deepEqual(effects, ["Done", "progress"]);
++  assert.deepEqual(
++    (await f.registry()).claims.map((claim: any) => claim.task).sort(),
++    ["authority", "controller"],
++  );
++  await writeFile(f.evidenceFile, "changed before finalizationReady resume");
++  ctx.fault = async () => {};
++  await assert.rejects(adapter.runStage("finalize", ctx), {
++    code: "EXTERNAL_ACCEPTANCE_CHANGED",
++  });
++  assert.deepEqual(effects, ["Done", "progress"]);
++  assert.deepEqual(
++    (await f.registry()).claims.map((claim: any) => claim.task).sort(),
++    ["authority", "controller"],
++  );
++  await writeFile(f.evidenceFile, f.evidence);
++  assert.deepEqual(await adapter.runStage("finalize", ctx), {
++    finalized: true,
++  });
++  assert.deepEqual(effects, ["Done", "progress"]);
++  assert.deepEqual(
++    (await f.registry()).claims.map((claim: any) => claim.task),
++    ["authority"],
++  );
++});
+ async function fixture(t: any) {
+   const folder = await mkdtemp(path.join(tmpdir(), "autodev-adapters-")),
+     root = path.join(folder, "repo");
+@@ -112,7 +437,11 @@ async function fixture(t: any) {
+     path.join(sourceRoot, "scripts/agent-tasks.mjs"),
+     path.join(root, "scripts/agent-tasks.mjs"),
+   );
+-  const controllerTask = definition("controller", ["artifacts/", "handoff.md"]),
++  const controllerTask = definition("controller", [
++      "artifacts/",
++      "handoff.md",
++      bmadRenderPrefix(root),
++    ]),
+     workerTask = definition("worker", ["src/a.txt", "src/new.txt"]),
+     validationTask = definition("validation", [], ["heavy-validation"]);
+   for (const task of [controllerTask, workerTask, validationTask])
+@@ -1781,8 +2110,10 @@ test("adapters retain the established public API after separating source ownersh
+     new URL("../scripts/autodev/adapters.mjs", import.meta.url).href
+   );
+   assert.deepEqual(Object.keys(adapters), [
++    "assertBmadRenderScope",
+     "assertStageScope",
+     "auditScope",
++    "bmadRenderPrefix",
+     "createAdapter",
+     "ignoredSnapshot",
+     "inScope",
+@@ -1908,7 +2239,12 @@ test("stage audit canonicalizes before scope checks and distinguishes absent fro
+   }
+   for (const allowed of [[], ["foreign/"]]) {
+     assert.throws(
+-      () => assertStageScope({}, { "foreign/file": { sha256: undefined } }, allowed),
++      () =>
++        assertStageScope(
++          {},
++          { "foreign/file": { sha256: undefined } },
++          allowed,
++        ),
+       { code: "INVALID_JSON", message: "State must contain JSON values only" },
+     );
+   }
+@@ -2144,6 +2480,24 @@ test("commit resumes after crash by exact parent/tree/marker without a second co
+   assert.equal(await git(root, "rev-list", "--count", "HEAD"), "2");
+ });
+ 
++test("external commit handoff explicitly awaits practical acceptance without self-referencing its commit", async (t) => {
++  const { root, ctx } = await fixture(t);
++  ctx.assignment.acceptance = {
++    kind: "external",
++    description: "Comparable production A/B",
++  };
++  await writeFile(path.join(root, "src/new.txt"), "runtime candidate\n");
++  ctx.data.sourceDigest = (
++    await sourceIdentity(root, ctx.data.baseSha, ctx.data.workerTask.writePaths)
++  ).digest;
++  await createAdapter().runStage("commit", ctx);
++  const handoff = await readFile(path.join(root, "handoff.md"), "utf8");
++  assert.match(handoff, /před externí praktickou přejímkou/);
++  assert.match(handoff, /připnutý receipt nezávislého koordinátora/);
++  assert.equal(handoff.includes(ctx.data.commitSha), false);
++  assert.equal(handoff.includes("tímto CLI ověřením"), false);
++});
++
+ test("commit refuses pre-existing staged contents", async (t) => {
+   const { root, ctx } = await fixture(t);
+   await writeFile(path.join(root, "src/new.txt"), "new\n");
+diff --git a/tests/autodev-engine.test.ts b/tests/autodev-engine.test.ts
+index 189b6815..94471ff4 100644
+--- a/tests/autodev-engine.test.ts
++++ b/tests/autodev-engine.test.ts
+@@ -26,6 +26,12 @@ const store = await import(
+ const supervisor = await import(
+   new URL("../scripts/autodev/supervisor.mjs", import.meta.url).href
+ );
++const { ensureExternalAcceptance, loadExternalAuthority } = await import(
++  new URL("../scripts/autodev/external-acceptance.mjs", import.meta.url).href
++);
++const { sourceIdentity } = await import(
++  new URL("../scripts/autodev/source.mjs", import.meta.url).href
++);
+ type Context = {
+   runId: string;
+   runDir: string;
+@@ -131,6 +137,165 @@ test("known stage failure retains remote-effect checkpoint and resumes only the
+   assert.equal(calls.filter((stage) => stage === "publish").length, 2);
+ });
+ 
++test("external pending receipt resumes only accept onward with one supervised implementation and unchanged completed replay", async (t) => {
++  const input = await fixture(t),
++    repo = input.repo;
++  const git = async (...args: string[]) =>
++    (
++      await execute("git", ["-C", repo, ...args], { windowsHide: true })
++    ).stdout.trim();
++  const assignment = JSON.parse(await readFile(input.assignment, "utf8"));
++  assignment.acceptance = {
++    kind: "external",
++    description: "Measured production A/B",
++    authority: { task: "authority", owner: "coordinator" },
++    receiptFile: "proof/receipt.json",
++    evidenceFiles: [{ id: "ab", path: "proof/ab.txt" }],
++  };
++  await writeFile(input.assignment, JSON.stringify(assignment));
++  const authorityTask = {
++    schemaVersion: 1,
++    id: "authority",
++    status: "ready",
++    writePaths: ["proof/"],
++    resources: [],
++  };
++  await mkdir(path.join(repo, "docs/agents/tasks"), { recursive: true });
++  await writeFile(
++    path.join(repo, "docs/agents/tasks/authority.json"),
++    JSON.stringify(authorityTask),
++  );
++  await writeFile(path.join(repo, "source.txt"), "before\n");
++  await git("config", "user.name", "Fixture");
++  await git("config", "user.email", "fixture@example.invalid");
++  await git("config", "core.autocrlf", "false");
++  await git(
++    "add",
++    "--",
++    "source.txt",
++    "docs/agents/tasks/authority.json",
++    "assignment.json",
++  );
++  await git("commit", "-m", "base");
++  const baseSha = await git("rev-parse", "HEAD");
++  await store.atomicWriteJson(
++    path.join(repo, ".git/agent-coordination/claims.json"),
++    {
++      schemaVersion: 1,
++      claims: [
++        {
++          task: "authority",
++          owner: "coordinator",
++          worktree: repo,
++          baseHead: baseSha,
++          writePaths: authorityTask.writePaths,
++          resources: [],
++        },
++      ],
++    },
++  );
++  const calls: string[] = [];
++  let accepts = 0,
++    merges = 0;
++  const adapter = {
++    async runStage(stage: string, ctx: any) {
++      calls.push(stage);
++      if (stage === "prepare") {
++        await ctx.save({
++          baseSha,
++          worktree: repo,
++          controllerTask: { writePaths: ["artifacts/"] },
++          workerTask: { writePaths: ["source.txt"] },
++        });
++        await ctx.save({ externalAuthority: await loadExternalAuthority(ctx) });
++      }
++      if (stage === "implement") {
++        const receipt = await ctx.supervise({
++          key: "implement",
++          command: process.execPath,
++          args: [
++            "-e",
++            "require('node:fs').appendFileSync('source.txt', 'candidate\\n')",
++          ],
++          cwd: repo,
++        });
++        assert.equal(receipt.exitCode, 0);
++        await ctx.save({
++          sourceDigest: (await sourceIdentity(repo, baseSha, ["source.txt"]))
++            .digest,
++        });
++      }
++      if (stage === "commit") {
++        await git("add", "--", "source.txt");
++        await git("commit", "-m", "candidate");
++        await ctx.save({ commitSha: await git("rev-parse", "HEAD") });
++      }
++      if (stage === "accept") {
++        await ensureExternalAcceptance(ctx);
++        accepts++;
++      }
++      if (stage === "merge") {
++        await ensureExternalAcceptance(ctx, { requirePinned: true });
++        merges++;
++      }
++    },
++  };
++  const stopped = await engine.run({ ...input, adapter });
++  assert.equal(stopped.status, "stopped", stopped.lastError?.message);
++  assert.equal(stopped.stage, "accept");
++  assert.equal(stopped.lastError.code, "EXTERNAL_ACCEPTANCE_PENDING");
++  assert.equal(accepts, 0);
++  assert.equal(merges, 0);
++  await mkdir(path.join(repo, "proof"));
++  await writeFile(path.join(repo, "proof/ab.txt"), "measured evidence\n");
++  await writeFile(
++    path.join(repo, "proof/receipt.json"),
++    JSON.stringify({
++      schemaVersion: 1,
++      kind: "external-acceptance",
++      decision: "pass",
++      runId: stopped.runId,
++      assignmentDigest: stopped.assignmentDigest,
++      baseSha,
++      commitSha: stopped.data.commitSha,
++      sourceDigest: stopped.data.sourceDigest,
++      authority: {
++        task: "authority",
++        owner: "coordinator",
++        taskSha256: stopped.data.externalAuthority.taskSha256,
++      },
++      issuedAt: "2026-10-20T20:00:00.000Z",
++      summary: "Compared equal production scenarios",
++      evidence: [
++        {
++          id: "ab",
++          path: "proof/ab.txt",
++          sha256: store.digest("measured evidence\n"),
++        },
++      ],
++    }),
++  );
++  const completed = await engine.resume({
++    repo,
++    runId: stopped.runId,
++    adapter,
++  });
++  assert.equal(completed.status, "complete", completed.lastError?.message);
++  assert.equal(completed.runId, stopped.runId);
++  assert.equal(calls.filter((stage) => stage === "implement").length, 1);
++  assert.equal(Object.keys(completed.attempts).length, 1);
++  assert.equal(accepts, 1);
++  assert.equal(merges, 1);
++  assert.equal(await git("rev-list", "--count", "HEAD"), "2");
++  const stateFile = path.join(completed.runDir, "state.json"),
++    bytes = await readFile(stateFile);
++  await engine.resume({ repo, runId: completed.runId, adapter });
++  await engine.run({ ...input, adapter });
++  assert.equal((await readFile(stateFile)).equals(bytes), true);
++  assert.equal(accepts, 1);
++  assert.equal(merges, 1);
++});
++
+ test("singleton rejects a second writer and status only reads while the first writer is paused", async (t) => {
+   const input = await fixture(t);
+   let entered!: () => void;
+diff --git a/docs/agents/bmad-controller.md b/docs/agents/bmad-controller.md
+index 11dabfc0..a06225fd 100644
+--- a/docs/agents/bmad-controller.md
++++ b/docs/agents/bmad-controller.md
+@@ -13,7 +13,9 @@ Volitelný `--repo CESTA` určuje výchozí Git checkout. Standardní výstup je
+ ## Příprava
+ Potřebné jsou Node24, Git/Git LFS, autentizované `gh`, `uv` pro připnutý projektový BMAD a autentizované Codex CLI. Linear používá připojení Codex Apps přes lokální `codex app-server`; žádný token se nekopíruje do manifestu. Toto rozhraní bylo prozkoumáno na CLI0.163.0-alpha.10.2 a je experimentální. Nepodporovaná verze či nedostupné připojení musí skončit čitelnou chybou.
+ 
+-Koordinátor před spuštěním připraví v administrativní rezervaci dva disjunktní tasky: `task` pro BMAD výstupy/renderer/předání a `workerTask` pro změny zdrojů a testů. Manifest obsahuje přesné issue, repository/baseBranch, intentFile, artifactDir, handoffFile, příkazy kontrol a popis praktické přejímky. V1 automaticky přijímá pouze explicitní CLI úkoly; GPU/vizuální přejímku nelze nahradit zeleným testem.
++Koordinátor před spuštěním připraví v administrativní rezervaci dva disjunktní tasky: `task` pro BMAD výstupy/renderer/předání a `workerTask` pro změny zdrojů a testů. Manifest obsahuje přesné issue, repository/baseBranch, intentFile, artifactDir, handoffFile, příkazy kontrol a popis praktické přejímky. Původní `acceptance.kind=cli` zachovává automatické přijetí CLI. Runtime úkol s praktickou přejímkou používá explicitní `external` kontrakt níže; GPU/vizuální přejímku nelze nahradit zeleným testem.
++
++Renderer může rezervovat celý `_bmad/render/bmad-build/` nebo přesný prefix budoucí worktree. Funkce `bmadRenderPrefix(worktree)` v adaptéru odpovídá připnutému Python rendereru: slug názvu adresáře a prvních 12 znaků SHA256 nativního absolutního `Path.resolve()` řetězce. Rezervace adresáře končí `/` a zahrnuje výsledné snapshoty i `.staging-*`. Prefix jiné worktree ani jeden konkrétní snapshot nestačí.
+ 
+ Řadič ověří původ checkoutu, založí jednu stabilní větev `codex/autodev-…` a worktree, získá rezervace a jejich rozsah zmrazí. Nevstupuje do cizích dirty změn a nepřebírá zastaralé claims. Neplatná rezervace zastaví práci před prvním zápisem workeru.
+ 
+@@ -26,6 +28,53 @@ Plná specifikace obsahuje strukturovanou I/O matici, úkoly cesta–akce–dův
+ 
+ Commit používá konkrétní vlastní soubory. Publish dohledá existující PR ve všech stavech. Přijetí vyžaduje aktuální head/base, úspěšné povinné GitHub checky a doloženou praktickou přejímku podle [CI pravidel](ci.md). Merge používá očekávané head SHA a neobchází ruleset. Linear `Done` přichází až po merge a CI pro tento merge commit na main. Katalogový task administrativně přebírá koordinátor.
+ 
++## Externí praktická přejímka
++
++Manifest přidává jedinou volitelnou variantu přejímky, bez nových fází nebo příkazů:
++
++```json
++{
++  "kind": "external",
++  "description": "Produkční A/B se stejnými scénáři, relacemi, rozlišením a GPU",
++  "authority": { "task": "runtime-coordination", "owner": "session-coordinator" },
++  "receiptFile": "docs/performance/evidence/example/acceptance.json",
++  "evidenceFiles": [
++    { "id": "ab", "path": "docs/performance/evidence/example/ab.json" }
++  ]
++}
++```
++
++Autorita musí být jiný task než controller, worker a validation. Její definice se načítá z připnutého base commitu. Musí rezervovat receipt, který zároveň nesmí spadat do zapisujícího scope řadiče ani workeru. Všechny cesty jsou konkrétní relativní soubory bez globů; seznam důkazů a jeho pořadí jsou neměnné. Důkazy mohou pocházet z odděleného měřicího tasku. Autorita drží vlastní aktivní rezervaci s přesným taskem, ownerem, scope a pracovní kopií `--repo`; její `baseHead` může předcházet base commitu runu. Řadič cizí claim neupravuje ani neuvolňuje.
++
++Po dokončení implementace, review, kontrol, commitu a PR CI se běh bez receiptu zastaví na `accept` s `EXTERNAL_ACCEPTANCE_PENDING`. GitHub přijetí ani merge nevzniknou. Koordinátor provede skutečnou praktickou přejímku a ve své pracovní kopii vytvoří tento dokument (všechny identity převezme ze `status` a skutečných souborů):
++
++```json
++{
++  "schemaVersion": 1,
++  "kind": "external-acceptance",
++  "decision": "pass",
++  "runId": "ID_Z_VYSTUPU",
++  "assignmentDigest": "SHA256_MANIFESTU",
++  "baseSha": "BASE_COMMIT",
++  "commitSha": "KANDIDAT_COMMIT",
++  "sourceDigest": "SHA256_ZDROJU_A_TESTU",
++  "authority": {
++    "task": "runtime-coordination",
++    "owner": "session-coordinator",
++    "taskSha256": "SHA256_PUVODNICH_BAJTU_TASK_JSON_Z_BASE"
++  },
++  "issuedAt": "2026-10-20T20:00:00.000Z",
++  "summary": "Konkrétní závěr srovnatelného měření a funkční přejímky",
++  "evidence": [
++    { "id": "ab", "path": "docs/performance/evidence/example/ab.json", "sha256": "SHA256_PUVODNICH_BAJTU_DUKAZU" }
++  ]
++}
++```
++
++`decision=fail`, neznámá pole, změněné identity, neodpovídající seznam nebo obsah souborů blokují pokračování. Receipt i důkazy musí být obyčejné soubory; symlinky, junctions a hardlinky se odmítnou. Čtení porovnává všechny komponenty cesty a stabilní handle před i po čtení. Hash se počítá z původních bajtů, ne z převyprávěného JSON. Smysl výsledků a srovnatelnost A/B posuzuje koordinátor; validátor není GPU měření ani podpisová autorita.
++
++`resume` připne první platný pass do checkpointu před mutací GitHubu a pokračuje od `accept`, bez opakování implementace. Přejímka se vynucuje také v přímém GitHub klientu před změnou PR, statusem a merge. Přijatý proof je součástí acceptance i trvalého merge intentu. Další čtení musí vrátit stejné bajty; změna či ztráta důkazu blokuje i obnovení. Již sloučený externí PR lze rekoncilovat pouze s původním proofem, intentem a přesnými rodiči merge commitu. `merge=false` neobchází přejímku. Autoritu i důkazy zachovej do dokončení běhu; chyby se neřeší mazáním původních receipts. Dokončené `run`/`resume` zůstává bez dalších efektů.
++
+ ## Pád a obnovení
+ Stav, provozní logy a výsledky pokusů jsou v Git common directory pod `autodev/runs/`. Necommitují se. Jeden controller drží OS IPC singleton; souběžné `resume` nesmí vytvořit druhého zapisujícího vlastníka.
+ 
