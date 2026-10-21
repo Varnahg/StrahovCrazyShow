@@ -1,0 +1,789 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUTC": "2026-10-21T12:35:20.052Z",
+  "cases": [
+    {
+      "id": "45291133-174c-4708-9f40-f0710ec21554",
+      "label": "ncm-low-timeout",
+      "peerDeparture": false,
+      "outcome": "rejected",
+      "error": {
+        "name": "Error",
+        "message": "Přípravu 3D scény se nepodařilo dokončit (timeout)."
+      },
+      "sourceSnapshotId": "8039555366d3fc977ecfb18e155f30000e9e8faeb36469a9e110481a2feefb93",
+      "buildId": "1498372487935cf50311cd15da97697ef33c8917365490f924834fddc5fa8edc",
+      "helperSha256": "63d576ff976601d044b2aa4f7498ff9d2c8d6a298e5aa6cff0e008213cd55f20",
+      "terminalAtMs": 46263.60000002384,
+      "terminalUTC": "2026-10-21T12:08:06.042Z",
+      "stages": {
+        "bootStage": "light-preparation",
+        "lightPreparation": "timeout",
+        "physicsStage": "ready",
+        "b6Stage": "ready",
+        "carStage": "ready",
+        "renderHealth": "invalid"
+      },
+      "health": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "invalid",
+        "valid": false,
+        "errorCount": 1,
+        "pendingOperations": 12,
+        "pendingPreparationOperations": 2,
+        "pendingShaderValidationOperations": 10,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 1,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": [
+          {
+            "channel": "pipeline",
+            "message": "Příprava světel: timeout",
+            "generation": 1
+          }
+        ]
+      },
+      "compilation": {
+        "glslToSpirv": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "spirvToWgsl": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "compilerLoad": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderPreparation": {
+          "calls": 246,
+          "completed": 246,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 211.39999973773956,
+          "cpuMaxMs": 11,
+          "asyncTotalMs": 69032.10000002384,
+          "asyncMaxMs": 733.8999999761581
+        },
+        "shaderModule": {
+          "calls": 492,
+          "completed": 492,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 85.30000078678131,
+          "cpuMaxMs": 4,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderValidation": {
+          "calls": 492,
+          "completed": 482,
+          "failures": 0,
+          "pending": 10,
+          "cpuTotalMs": 7.199999809265137,
+          "cpuMaxMs": 0.7000000476837158,
+          "asyncTotalMs": 627374.5999977589,
+          "asyncMaxMs": 4196.799999952316
+        },
+        "syncPipeline": {
+          "calls": 315,
+          "completed": 315,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 10.899999856948853,
+          "cpuMaxMs": 0.20000004768371582,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "asyncPipeline": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "submit": {
+          "calls": 242,
+          "completed": 242,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 5.899999141693115,
+          "cpuMaxMs": 0.5,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        }
+      },
+      "latency": {
+        "enabled": true,
+        "active": false,
+        "evidenceValid": true,
+        "capacity": 4096,
+        "recordedCalls": 46,
+        "availability": [
+          "installed",
+          "installed"
+        ],
+        "issues": {
+          "overflow": 0,
+          "observerErrors": 0,
+          "invalidClocks": 0,
+          "restoreConflicts": 0,
+          "restoreFailures": 0,
+          "ownerChanged": 0,
+          "unexpectedReceivers": 0
+        },
+        "channels": [
+          {
+            "name": "device.popErrorScope",
+            "calls": 23,
+            "trackedCalls": 23,
+            "settledCalls": 22,
+            "pending": 1,
+            "fulfilled": 22,
+            "rejected": 0,
+            "syncThrows": 0,
+            "unsupportedResults": 0,
+            "completionTotalMs": 20449.099999904633,
+            "completionMaxMs": 4359.100000023842,
+            "syncTotalMs": 0.8999994993209839,
+            "syncMaxMs": 0.10000002384185791
+          },
+          {
+            "name": "queue.onSubmittedWorkDone",
+            "calls": 23,
+            "trackedCalls": 23,
+            "settledCalls": 22,
+            "pending": 1,
+            "fulfilled": 22,
+            "rejected": 0,
+            "syncThrows": 0,
+            "unsupportedResults": 0,
+            "completionTotalMs": 20746.100000023842,
+            "completionMaxMs": 4374.700000047684,
+            "syncTotalMs": 0.10000002384185791,
+            "syncMaxMs": 0.10000002384185791
+          }
+        ],
+        "stoppedAtMs": 46263.39999997616,
+        "pendingAgeMaxMs": 2749.0999999046326,
+        "recordColumns": [
+          "callSequence",
+          "channel",
+          "startAtMs",
+          "settledAtMs",
+          "completionMs",
+          "outcome",
+          "nonNullResult"
+        ],
+        "outcomeCodes": {
+          "pendingAtStop": 0,
+          "fulfilled": 1,
+          "rejected": 2,
+          "synchronousThrow": 3,
+          "unsupportedResult": 4
+        },
+        "scope": "Observed original native-Promise calls on this Game device during Game.start. Completion wall latency includes browser/microtask scheduling; not GPU execution time or call-site attribution. Pending/overflow are explicit, not zero latency. No extra pop/fence/await/health operation."
+      },
+      "acceptedPerformance": false
+    },
+    {
+      "id": "ba860fc6-2d0f-43c0-99a3-de911991f9b1",
+      "label": "cm-final-gate-with-peer-departure",
+      "peerDeparture": true,
+      "outcome": "rejected",
+      "error": {
+        "name": "RenderStartupTimeoutError",
+        "message": "Renderer startup exceeded its visible-time deadline"
+      },
+      "sourceSnapshotId": "8039555366d3fc977ecfb18e155f30000e9e8faeb36469a9e110481a2feefb93",
+      "buildId": "1498372487935cf50311cd15da97697ef33c8917365490f924834fddc5fa8edc",
+      "helperSha256": "63d576ff976601d044b2aa4f7498ff9d2c8d6a298e5aa6cff0e008213cd55f20",
+      "terminalAtMs": 101837.90000009537,
+      "terminalUTC": "2026-10-21T12:14:45.726Z",
+      "stages": {
+        "bootStage": "submitted-frame",
+        "lightPreparation": "complete",
+        "physicsStage": "ready",
+        "b6Stage": "ready",
+        "carStage": "ready",
+        "renderHealth": "invalid"
+      },
+      "health": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "invalid",
+        "valid": false,
+        "errorCount": 1,
+        "pendingOperations": 2,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 2,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 1
+        },
+        "firstErrors": [
+          {
+            "channel": "render",
+            "message": "Renderer startup exceeded its visible-time deadline",
+            "generation": 1
+          }
+        ]
+      },
+      "compilation": {
+        "glslToSpirv": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "spirvToWgsl": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "compilerLoad": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderPreparation": {
+          "calls": 1017,
+          "completed": 1017,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 982.9000014066696,
+          "cpuMaxMs": 34.799999952316284,
+          "asyncTotalMs": 246888.30000293255,
+          "asyncMaxMs": 1608.2000000476837
+        },
+        "shaderModule": {
+          "calls": 2034,
+          "completed": 2034,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 419.5000020265579,
+          "cpuMaxMs": 9.399999976158142,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderValidation": {
+          "calls": 2034,
+          "completed": 2032,
+          "failures": 0,
+          "pending": 2,
+          "cpuTotalMs": 35.49999916553497,
+          "cpuMaxMs": 2.700000047683716,
+          "asyncTotalMs": 756063.2999968529,
+          "asyncMaxMs": 1662.3999999761581
+        },
+        "syncPipeline": {
+          "calls": 25,
+          "completed": 25,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0.5999999046325684,
+          "cpuMaxMs": 0.10000002384185791,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "asyncPipeline": {
+          "calls": 1029,
+          "completed": 1029,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 59.20000159740448,
+          "cpuMaxMs": 1.5,
+          "asyncTotalMs": 953206.9000029564,
+          "asyncMaxMs": 1736.0999999046326
+        },
+        "submit": {
+          "calls": 5599,
+          "completed": 5599,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 213.40000092983246,
+          "cpuMaxMs": 55.299999952316284,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        }
+      },
+      "latency": {
+        "enabled": true,
+        "active": false,
+        "evidenceValid": true,
+        "capacity": 4096,
+        "recordedCalls": 1290,
+        "availability": [
+          "installed",
+          "installed"
+        ],
+        "issues": {
+          "overflow": 0,
+          "observerErrors": 0,
+          "invalidClocks": 0,
+          "restoreConflicts": 0,
+          "restoreFailures": 0,
+          "ownerChanged": 0,
+          "unexpectedReceivers": 0
+        },
+        "channels": [
+          {
+            "name": "device.popErrorScope",
+            "calls": 645,
+            "trackedCalls": 645,
+            "settledCalls": 645,
+            "pending": 0,
+            "fulfilled": 645,
+            "rejected": 0,
+            "syncThrows": 0,
+            "unsupportedResults": 0,
+            "completionTotalMs": 17391.500000834465,
+            "completionMaxMs": 969.6999999284744,
+            "syncTotalMs": 11.0999995470047,
+            "syncMaxMs": 1.0999999046325684
+          },
+          {
+            "name": "queue.onSubmittedWorkDone",
+            "calls": 645,
+            "trackedCalls": 645,
+            "settledCalls": 645,
+            "pending": 0,
+            "fulfilled": 645,
+            "rejected": 0,
+            "syncThrows": 0,
+            "unsupportedResults": 0,
+            "completionTotalMs": 32014.700000166893,
+            "completionMaxMs": 978.0999999046326,
+            "syncTotalMs": 7.199999451637268,
+            "syncMaxMs": 0.19999992847442627
+          }
+        ],
+        "stoppedAtMs": 101837.80000007153,
+        "pendingAgeMaxMs": 0,
+        "recordColumns": [
+          "callSequence",
+          "channel",
+          "startAtMs",
+          "settledAtMs",
+          "completionMs",
+          "outcome",
+          "nonNullResult"
+        ],
+        "outcomeCodes": {
+          "pendingAtStop": 0,
+          "fulfilled": 1,
+          "rejected": 2,
+          "synchronousThrow": 3,
+          "unsupportedResult": 4
+        },
+        "scope": "Observed original native-Promise calls on this Game device during Game.start. Completion wall latency includes browser/microtask scheduling; not GPU execution time or call-site attribution. Pending/overflow are explicit, not zero latency. No extra pop/fence/await/health operation."
+      },
+      "acceptedPerformance": false
+    },
+    {
+      "id": "f1f716a8-bea2-4884-b024-d6162abea46f",
+      "label": "cm-final-gate-stable-single-session",
+      "peerDeparture": false,
+      "outcome": "rejected",
+      "error": {
+        "name": "RenderStartupTimeoutError",
+        "message": "Renderer startup exceeded its visible-time deadline"
+      },
+      "sourceSnapshotId": "8039555366d3fc977ecfb18e155f30000e9e8faeb36469a9e110481a2feefb93",
+      "buildId": "1498372487935cf50311cd15da97697ef33c8917365490f924834fddc5fa8edc",
+      "helperSha256": "63d576ff976601d044b2aa4f7498ff9d2c8d6a298e5aa6cff0e008213cd55f20",
+      "terminalAtMs": 120710.30000007153,
+      "terminalUTC": "2026-10-21T12:29:20.500Z",
+      "stages": {
+        "bootStage": "submitted-frame",
+        "lightPreparation": "complete",
+        "physicsStage": "ready",
+        "b6Stage": "ready",
+        "carStage": "ready",
+        "renderHealth": "invalid"
+      },
+      "health": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "invalid",
+        "valid": false,
+        "errorCount": 1,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 1
+        },
+        "firstErrors": [
+          {
+            "channel": "render",
+            "message": "Renderer startup exceeded its visible-time deadline",
+            "generation": 1
+          }
+        ]
+      },
+      "compilation": {
+        "glslToSpirv": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "spirvToWgsl": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "compilerLoad": {
+          "calls": 0,
+          "completed": 0,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0,
+          "cpuMaxMs": 0,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderPreparation": {
+          "calls": 1015,
+          "completed": 1015,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 998.099999666214,
+          "cpuMaxMs": 22.300000071525574,
+          "asyncTotalMs": 260768.79999661446,
+          "asyncMaxMs": 1261.3999999761581
+        },
+        "shaderModule": {
+          "calls": 2030,
+          "completed": 2030,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 446.7999999523163,
+          "cpuMaxMs": 21.899999976158142,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "shaderValidation": {
+          "calls": 2030,
+          "completed": 2030,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 32.80000114440918,
+          "cpuMaxMs": 0.5,
+          "asyncTotalMs": 836313.1999973059,
+          "asyncMaxMs": 1876
+        },
+        "syncPipeline": {
+          "calls": 25,
+          "completed": 25,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 0.7000000476837158,
+          "cpuMaxMs": 0.10000002384185791,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        },
+        "asyncPipeline": {
+          "calls": 1029,
+          "completed": 1029,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 104.59999918937683,
+          "cpuMaxMs": 34.799999952316284,
+          "asyncTotalMs": 1016977.7000015974,
+          "asyncMaxMs": 2140.6999999284744
+        },
+        "submit": {
+          "calls": 5640,
+          "completed": 5640,
+          "failures": 0,
+          "pending": 0,
+          "cpuTotalMs": 165.49999809265137,
+          "cpuMaxMs": 12.300000071525574,
+          "asyncTotalMs": 0,
+          "asyncMaxMs": 0
+        }
+      },
+      "latency": {
+        "enabled": true,
+        "active": false,
+        "evidenceValid": true,
+        "capacity": 4096,
+        "recordedCalls": 1309,
+        "availability": [
+          "installed",
+          "installed"
+        ],
+        "issues": {
+          "overflow": 0,
+          "observerErrors": 0,
+          "invalidClocks": 0,
+          "restoreConflicts": 0,
+          "restoreFailures": 0,
+          "ownerChanged": 0,
+          "unexpectedReceivers": 0
+        },
+        "channels": [
+          {
+            "name": "device.popErrorScope",
+            "calls": 655,
+            "trackedCalls": 655,
+            "settledCalls": 654,
+            "pending": 1,
+            "fulfilled": 654,
+            "rejected": 0,
+            "syncThrows": 0,
+            "unsupportedResults": 0,
+            "completionTotalMs": 17875.600000858307,
+            "completionMaxMs": 1204.1000000238419,
+            "syncTotalMs": 10.4000004529953,
+            "syncMaxMs": 1.2000000476837158
+          },
+          {
+            "name": "queue.onSubmittedWorkDone",
+            "calls": 654,
+            "trackedCalls": 654,
+            "settledCalls": 654,
+            "pending": 0,
+            "fulfilled": 654,
+            "rejected": 0,
+            "syncThrows": 0,
+            "unsupportedResults": 0,
+            "completionTotalMs": 32720.89999973774,
+            "completionMaxMs": 1204.1000000238419,
+            "syncTotalMs": 7.699999809265137,
+            "syncMaxMs": 0.3999999761581421
+          }
+        ],
+        "stoppedAtMs": 120710.20000004768,
+        "pendingAgeMaxMs": 3.100000023841858,
+        "recordColumns": [
+          "callSequence",
+          "channel",
+          "startAtMs",
+          "settledAtMs",
+          "completionMs",
+          "outcome",
+          "nonNullResult"
+        ],
+        "outcomeCodes": {
+          "pendingAtStop": 0,
+          "fulfilled": 1,
+          "rejected": 2,
+          "synchronousThrow": 3,
+          "unsupportedResult": 4
+        },
+        "scope": "Observed original native-Promise calls on this Game device during Game.start. Completion wall latency includes browser/microtask scheduling; not GPU execution time or call-site attribution. Pending/overflow are explicit, not zero latency. No extra pop/fence/await/health operation."
+      },
+      "acceptedPerformance": false
+    }
+  ],
+  "files": {
+    "ncm-low-timeout.json": {
+      "bytes": 141462,
+      "sha256": "6ff57f67e1bdffe9a433f83cbf6428c568e69582458b328c135ea4f0bd315b50"
+    },
+    "cm-final-gate-with-peer-departure.json": {
+      "bytes": 412051,
+      "sha256": "00cb67fcd803b91c6d0b06f8a9d465bc711b5d30df7f6919a4e79ef6aef41bdb"
+    },
+    "cm-final-gate-stable-single-session.json": {
+      "bytes": 424643,
+      "sha256": "623f1b4e49b649c5a5b4ebe4057a4add8df95240824aa26092e055a99e1a4cee"
+    },
+    "build-identity.json": {
+      "bytes": 7809,
+      "sha256": "6048914e6721d8fc5ff50d3c85ae03c60303b6af1b342607236c810301846ca8"
+    },
+    "http-identity.json": {
+      "bytes": 5311,
+      "sha256": "fb47421456a3bf663c8f8aba8c9d9a879a722a21043020767f8413c9db34a4f3"
+    },
+    "stable-cm-failure.png": {
+      "bytes": 80108,
+      "sha256": "fc78a99129fb8289ce7e21cff761a4cadd0a54c1224623e3acad259c1037a6d0"
+    },
+    "factory-failure.png": {
+      "bytes": 20505,
+      "sha256": "e73f4bdb7a1bb9d98bab477a18692d28f282037a8dbfe46e375b22bdb34ff32a"
+    },
+    "actual-room-cleanup.json": {
+      "bytes": 1714,
+      "sha256": "c0e7fdcb237aa95767f24572654025dd8af8831c00e3d30622b1ef01cda11021"
+    },
+    "actual-three-session-cohort.json": {
+      "bytes": 1127968,
+      "sha256": "899a604cbe8db14c873dd66a83a429eb2a5c3a2a401f8dfdf4153b2b42ac147e"
+    },
+    "cohort-wrapper-derivation.json": {
+      "bytes": 856,
+      "sha256": "1f5761f13756e22f3e2f922de8e6976a748a3672371a97f36b92f360331265df"
+    },
+    "three-avatars-day.png": {
+      "bytes": 142275,
+      "sha256": "945bc9a7c0f3aa209228d44540f8ea0e964ba66c61db4f18688afd57123df945"
+    },
+    "three-avatars-night.png": {
+      "bytes": 63561,
+      "sha256": "3d39115007f904c55e56e189c68170b4befa76d85d00ec477929090bf31df2ac"
+    }
+  },
+  "actualRoomCleanup": {
+    "sourceUiCommit": "02fdf68b",
+    "observerScriptSha256": "5f09bf9d43182f307fce3f1c5d6188bce65ead5e422fcc91670bca077b9fc2b7",
+    "observerScope": "One normally authenticated passive SDK peer; presence/motion counts only. No input producer, GPU scene, feedback provider or credentials in exported evidence.",
+    "factoryFailureJoinUTC": "2026-10-21T12:04:37.108Z",
+    "factoryFailureAutoLeaveUTC": "2026-10-21T12:04:37.288Z",
+    "latencyMs": 180,
+    "ncmFailureJoinUTC": "2026-10-21T12:07:21.720Z",
+    "ncmFailureAutoLeaveUTC": "2026-10-21T12:08:06.065Z",
+    "observerDisconnected": true,
+    "issues": [],
+    "limitation": "Specific factory rejection and real NCM timeout proved. Historical generic auth4002 branch is not independently proved."
+  },
+  "actualCohort": {
+    "sourceSnapshotId": "97863f520c22d6fab05349530ea84c88d4063226ef57b276e2078619a066bd67",
+    "durationMs": 407958.597,
+    "minRows": 3,
+    "maxRows": 3,
+    "movingClients": 2,
+    "worldCount": 1,
+    "resyncs": 0,
+    "errors": [],
+    "tickHz": 59.998,
+    "motionHz": 19.992,
+    "limitation": "Functional full-game/HUD with browser Mia4 and actual SDK Alex0/Robin1. Moving cohort is not phase-matched FPS workload. Day image has3 visible actors; night image retains3 sessions but remote actors are outside frustum."
+  },
+  "systemEvidence": {
+    "scope": "Original NVIDIA driver sample timestamps within the first observed submitted-frame sample and terminal; steady rows only, no per-process/PID/UUID publication. Polling is not an execution trace.",
+    "fromUTC": "2026-10-21T12:28:50.881Z",
+    "toUTC": "2026-10-21T12:29:20.500Z",
+    "rawSha256": "7bb39ceb53d424d34e25fd16b82a914adf68a1f4014de0705e98a4b1b8c17c82",
+    "rawBytes": 22193428,
+    "summary": {
+      "recordType": "summary",
+      "samples": 144,
+      "collectorCpuMs": 20453.125,
+      "steadySamples": 129,
+      "warmupSamples": 15,
+      "cleanupErrors": [],
+      "reason": "stop-file",
+      "elapsedMs": 291622.9519,
+      "utc": "2026-10-21T12:31:51.0716866Z",
+      "serializationTotalMs": 344.8240999999084,
+      "serializationMaxMs": 10.697999999999865,
+      "schemaVersion": 1
+    },
+    "matchedRows": 16,
+    "graphicsMHz": {
+      "count": 16,
+      "min": 607,
+      "median": 607,
+      "max": 607
+    },
+    "tempC": {
+      "count": 16,
+      "min": 65,
+      "median": 66,
+      "max": 66
+    },
+    "utilizationPercent": {
+      "count": 16,
+      "min": 32,
+      "median": 37,
+      "max": 45
+    },
+    "memoryUsedMiB": {
+      "count": 16,
+      "min": 3225,
+      "median": 3241,
+      "max": 3250
+    },
+    "powerW": {
+      "count": 16,
+      "min": 5.4,
+      "median": 8.27,
+      "max": 12.96
+    },
+    "pstates": [
+      "P8"
+    ],
+    "anyPowerOrThermalReason": false
+  },
+  "decision": "CM submitted-frame failure reproduces with a stable single session; peer departure is not required. Attribute original shader-validation jobs and requested/drawn variants before a product fix. Evaluate NCM async preparation separately. Preserve readiness and timeouts.",
+  "limitations": [
+    "Diagnostic startup observation is not plain FPS acceptance.",
+    "Scope/fence completion channels overlap; do not sum them or call them GPU execution time.",
+    "Only stable CM f1f716a8 overlaps this telemetry; preceding NCM and CM have no contemporaneous system telemetry.",
+    "1029async/25sync also exists in prior plain14d41a8e; it does not attribute a new observer regression.",
+    "Pending counts can be zero at terminal while a gate still failed readiness in its concrete callback. No readiness condition is waived.",
+    "No complete migration or main/default release acceptance is issued."
+  ]
+}
