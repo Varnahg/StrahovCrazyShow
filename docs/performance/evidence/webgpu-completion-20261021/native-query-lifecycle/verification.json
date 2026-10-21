@@ -1,0 +1,308 @@
+{
+  "checkedAtUTC": "2026-10-21T20:15:02.796Z",
+  "scope": "CPU only. Native installed query/consumer/engine code and actual RenderHealth. Fake terminal GPU IO. Four JS candidate hooks and four native declaration overlays are explicit cache-only tooling. No install/full-suite/build/GPU/performance or all34 fault attribution.",
+  "red": {
+    "label": "unchanged original native and causal witness",
+    "command": "C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\native-query-lifecycle\\verify.mjs --red",
+    "exit": 0,
+    "output": "{\"inline\":{\"command\":\"C:\\\\Users\\\\rezac\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\node\\\\bin\\\\node.exe C:\\\\Users\\\\rezac\\\\Documents\\\\GitHub\\\\StrahovCrazyShow\\\\.cache\\\\player-feedback-20261020\\\\docs\\\\performance\\\\evidence\\\\webgpu-completion-20261021\\\\native-query-lifecycle\\\\inline-red-repro.mjs\",\"exit\":0,\"tests\":null,\"pass\":null,\"fail\":null,\"logSha256\":\"dcafcbcc4bed05d03c90d9bdb1cfcfd9707c4eb93cb644b500af8f31dec34d32\"},\"witness\":{\"chain\":\"native endPass→DurationMeasure.stopPass→QuerySet.readTwoValuesAndSubtract\",\"terminalIO\":\"fake map rejection only\",\"outcomes\":[{\"mode\":\"active\",\"unhandled\":1,\"sameOriginalError\":true,\"samples\":[]},{\"mode\":\"query-dispose-only\",\"unhandled\":1,\"sameOriginalError\":true,\"samples\":[]},{\"mode\":\"engine-disposed\",\"unhandled\":0,\"sameOriginalError\":false,\"samples\":[[8,0]]}]},\"red\":{\"command\":\"C:\\\\Users\\\\rezac\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\node\\\\bin\\\\node.exe --import tsx --test --test-reporter=tap tests/webgpu-query-lifecycle.test.ts\",\"exit\":1,\"tests\":54,\"pass\":2,\"fail\":52,\"logSha256\":\"db11568819da17ac4610609795728cae6c9791b8bb22e149ff6393198efdcb72\"}}"
+  },
+  "green": {
+    "label": "isolated native candidate and actual client pipeline",
+    "command": "C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\native-query-lifecycle\\verify.mjs",
+    "exit": 0,
+    "output": "{\"green\":{\"command\":\"C:\\\\Users\\\\rezac\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\node\\\\bin\\\\node.exe --import file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-native-query-lifecycle-20261021/candidate-import.mjs --import tsx --test --test-reporter=tap tests/webgpu-query-lifecycle.test.ts tests/webgpu-validation.test.ts tests/render-health.test.ts tests/render-startup.test.ts tests/startup-preparation-loop.test.ts\",\"exit\":0,\"tests\":162,\"pass\":162,\"fail\":0,\"logSha256\":\"d3d8853ce2bf027d0cd474cc277607112cc8e5403f2e98941e34248b3089b840\"}}"
+  },
+  "types": {
+    "label": "scoped TypeScript semantic check",
+    "command": "C:\\Users\\rezac\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\native-query-lifecycle\\typecheck.mjs",
+    "exit": 0,
+    "output": "{\"diagnostics\":0,\"rootFiles\":8,\"nativeDeclarationOverlays\":4}"
+  },
+  "syntax": [
+    {
+      "file": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\native-query-lifecycle\\prepare.mjs",
+      "exit": 0
+    },
+    {
+      "file": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\native-query-lifecycle\\verify.mjs",
+      "exit": 0
+    },
+    {
+      "file": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\native-query-lifecycle\\typecheck.mjs",
+      "exit": 0
+    },
+    {
+      "file": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\native-query-lifecycle\\proof.mjs",
+      "exit": 0
+    },
+    {
+      "file": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\webgpu-completion-20261021\\native-query-lifecycle\\inline-red-repro.mjs",
+      "exit": 0
+    },
+    {
+      "file": "Engines/WebGPU/webgpuQuerySet.js",
+      "exit": 0
+    },
+    {
+      "file": "Engines/WebGPU/webgpuTimestampQuery.js",
+      "exit": 0
+    },
+    {
+      "file": "Engines/WebGPU/webgpuOcclusionQuery.js",
+      "exit": 0
+    },
+    {
+      "file": "Engines/webgpuEngine.pure.js",
+      "exit": 0
+    },
+    {
+      "file": "tests/fixtures/webgpu-query-lifecycle/fixture.mjs",
+      "exit": 0
+    },
+    {
+      "file": "tests/fixtures/webgpu-query-lifecycle/loader.mjs",
+      "exit": 0
+    },
+    {
+      "file": "tests/fixtures/webgpu-query-lifecycle/query-lifecycle.test.mjs",
+      "exit": 0
+    }
+  ],
+  "sourceBefore": {
+    "patches/@babylonjs__core@9.30.0.patch": "e82638ea49de7d93b13e1a5e5c57beb92e2d083ec5a7617f978e28a0dac8c43f",
+    "pnpm-lock.yaml": "8e6b4519cfc712b4a83a6fd893ddc37192836f582e6c4a2b95d187e03a277936",
+    "client/webgpu-validation.ts": "96b0d8b8104064baa94d64c410cfd9b5a28d98e6f769e153cfe77f85aee8ae2f",
+    "client/render-health.ts": "75f4dd319014ce747f4d5c3ef988f32284d35a4fc07fa95c8bf0e72ac62214b2",
+    "tests/webgpu-validation.test.ts": "3e54eb6d0eafdc50692b46e5de47dee4e4b66c874a71d352eccf40c7cdc714c4",
+    "tests/render-health.test.ts": "fa503cece7263f9e31815746a7b9ff84a5648837fed1feb938a13ba074c6c288",
+    "tests/render-startup.test.ts": "71bbac8f392ad9a7f3c130d85eda325e3041439550fc60d384efd26a408d94e9",
+    "tests/startup-preparation-loop.test.ts": "3b3b8c07c903063fa7ba236cb44b5cd478fd4245230296385f5a2bf9cd788a97",
+    "tests/webgpu-query-lifecycle.test.ts": "39e329530db4d6844c0a632cc9be4b2f77cb8b2c7b62bdbc09fd8165b0c7c887",
+    "tests/fixtures/webgpu-query-lifecycle/fixture.mjs": "829d2ddab19da617e7b41d347bdcc62ac9a80da964c3da28860ff586a034e027",
+    "tests/fixtures/webgpu-query-lifecycle/loader.mjs": "7a1585719ae712d2dfd9d620a038bd0519cfce9abf416c05ca134c5876dadb1e",
+    "tests/fixtures/webgpu-query-lifecycle/query-lifecycle.test.mjs": "c309c9d3ffb433e4b357762d10b8a03426189f4daab3763c095fc03acd47a9e7"
+  },
+  "sourceAfter": {
+    "patches/@babylonjs__core@9.30.0.patch": "e82638ea49de7d93b13e1a5e5c57beb92e2d083ec5a7617f978e28a0dac8c43f",
+    "pnpm-lock.yaml": "8e6b4519cfc712b4a83a6fd893ddc37192836f582e6c4a2b95d187e03a277936",
+    "client/webgpu-validation.ts": "96b0d8b8104064baa94d64c410cfd9b5a28d98e6f769e153cfe77f85aee8ae2f",
+    "client/render-health.ts": "75f4dd319014ce747f4d5c3ef988f32284d35a4fc07fa95c8bf0e72ac62214b2",
+    "tests/webgpu-validation.test.ts": "3e54eb6d0eafdc50692b46e5de47dee4e4b66c874a71d352eccf40c7cdc714c4",
+    "tests/render-health.test.ts": "fa503cece7263f9e31815746a7b9ff84a5648837fed1feb938a13ba074c6c288",
+    "tests/render-startup.test.ts": "71bbac8f392ad9a7f3c130d85eda325e3041439550fc60d384efd26a408d94e9",
+    "tests/startup-preparation-loop.test.ts": "3b3b8c07c903063fa7ba236cb44b5cd478fd4245230296385f5a2bf9cd788a97",
+    "tests/webgpu-query-lifecycle.test.ts": "39e329530db4d6844c0a632cc9be4b2f77cb8b2c7b62bdbc09fd8165b0c7c887",
+    "tests/fixtures/webgpu-query-lifecycle/fixture.mjs": "829d2ddab19da617e7b41d347bdcc62ac9a80da964c3da28860ff586a034e027",
+    "tests/fixtures/webgpu-query-lifecycle/loader.mjs": "7a1585719ae712d2dfd9d620a038bd0519cfce9abf416c05ca134c5876dadb1e",
+    "tests/fixtures/webgpu-query-lifecycle/query-lifecycle.test.mjs": "c309c9d3ffb433e4b357762d10b8a03426189f4daab3763c095fc03acd47a9e7"
+  },
+  "freshBefore": {
+    "PostProcesses/imageProcessingPostProcess.js": "c97937b740966d260475a421658cc038b8fb95756231f992468696a03484378a",
+    "PostProcesses/postProcess.pure.js": "e45a4d6682951457b861fcf2d58feecb6b587a90577c7e63bf286249fd037ab9",
+    "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "Materials/imageProcessingConfiguration.pure.js": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+    "Materials/imageProcessing.js": "902800495f4c7d3f01c51662a350150c33760dddb8de4f6e27b049623698bb3e",
+    "Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+    "Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    "Materials/standardMaterial.pure.js": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+    "Materials/standardMaterial.pure.d.ts": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+    "Meshes/mesh.pure.js": "7ceb79d2f4eaa72665e5084ffc6e752bbbb93dd84a7f97801c9cf2431afa459a",
+    "Engines/WebGPU/webgpuQuerySet.js": "dfdffba837c0fd9bed0233bdc4dd3545a665ac84cbd2e98a9005abefe817c4be",
+    "Engines/WebGPU/webgpuQuerySet.d.ts": "2f30bf7728abb653163e9cb996c230bfe589df3e932d42aa4b855f3f24aefc9c",
+    "Engines/WebGPU/webgpuTimestampQuery.js": "4756adfa1c0ac4a8777150f953071e3539aac5fa67db9034a6a5391cf87f82d6",
+    "Engines/WebGPU/webgpuTimestampQuery.d.ts": "8025be7efc8f61691ef0e2bde32653fcb49d470e4c5d3acdd093ceeab77ca431",
+    "Engines/WebGPU/webgpuOcclusionQuery.js": "30fc4e30e73dfdd5092d4e354efeced45225fcb4f0be264d8b8d537498e8bf30",
+    "Engines/WebGPU/webgpuOcclusionQuery.d.ts": "f7eeafd73ebb68feedf36d314afc234eaf86c51dc64474ed0dec696a49bdf5e0",
+    "Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+    "Engines/webgpuEngine.pure.d.ts": "9f1e9765923c09e21901c6d803979f62ffd2792c7b5f7b72b357cb79703a224b",
+    "Engines/WebGPU/webgpuBufferManager.js": "61c58c90f79daf4b0d056651cf68e913cd56e995d4a63ad13d0a25706faebbb4",
+    "Engines/WebGPU/webgpuPerfCounter.js": "1c7a32cbafcbd6e12f965282c811fb76fade7b93bffad9247ea7475a6d95b29d",
+    "Engines/thinWebGPUEngine.js": "b3e19eeb072647fc8a6b42570f6d8df847ce13631a62a5e49428343ff18bbd4f",
+    "Engines/abstractEngine.pure.js": "7f41fe41116d98982f23ab5bbe933c8d38a7d1266202c3e094c20a273da20713",
+    "Engines/engine.common.js": "e47ce87d658eb91bb5f13e589beadc935d8790e2834d56b34558ca97b5974e2c",
+    "Misc/observable.js": "453e6915f2ae323573d5d899b44a601e909a26c5ecc1e3a0dda56c5fe4bebacb",
+    "Misc/observable.pure.js": "cfe17166bc9a1120d9d2e94ac72943c53bc7c82e004acf498ed6c4f118fd3a71",
+    "Misc/perfCounter.js": "ba524c1a0be43625a6aa9d6f8d2bfcf6d2a6da41f42fcb94aada4ddc684b9aa9",
+    "Misc/logger.js": "1473ab5093fd523886d81af2f80d4e077ae29b0de0ac90b454cc0574118b9099",
+    "Engines/WebGPU/webgpuConstants.js": "c4c94d2d6f10ebf9b2ebcb1f5bf47aa5876b68532394964b8f8d94d7fa26bfd1",
+    "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+  },
+  "freshAfter": {
+    "PostProcesses/imageProcessingPostProcess.js": "c97937b740966d260475a421658cc038b8fb95756231f992468696a03484378a",
+    "PostProcesses/postProcess.pure.js": "e45a4d6682951457b861fcf2d58feecb6b587a90577c7e63bf286249fd037ab9",
+    "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "Materials/imageProcessingConfiguration.pure.js": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+    "Materials/imageProcessing.js": "902800495f4c7d3f01c51662a350150c33760dddb8de4f6e27b049623698bb3e",
+    "Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+    "Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    "Materials/standardMaterial.pure.js": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+    "Materials/standardMaterial.pure.d.ts": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+    "Meshes/mesh.pure.js": "7ceb79d2f4eaa72665e5084ffc6e752bbbb93dd84a7f97801c9cf2431afa459a",
+    "Engines/WebGPU/webgpuQuerySet.js": "dfdffba837c0fd9bed0233bdc4dd3545a665ac84cbd2e98a9005abefe817c4be",
+    "Engines/WebGPU/webgpuQuerySet.d.ts": "2f30bf7728abb653163e9cb996c230bfe589df3e932d42aa4b855f3f24aefc9c",
+    "Engines/WebGPU/webgpuTimestampQuery.js": "4756adfa1c0ac4a8777150f953071e3539aac5fa67db9034a6a5391cf87f82d6",
+    "Engines/WebGPU/webgpuTimestampQuery.d.ts": "8025be7efc8f61691ef0e2bde32653fcb49d470e4c5d3acdd093ceeab77ca431",
+    "Engines/WebGPU/webgpuOcclusionQuery.js": "30fc4e30e73dfdd5092d4e354efeced45225fcb4f0be264d8b8d537498e8bf30",
+    "Engines/WebGPU/webgpuOcclusionQuery.d.ts": "f7eeafd73ebb68feedf36d314afc234eaf86c51dc64474ed0dec696a49bdf5e0",
+    "Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+    "Engines/webgpuEngine.pure.d.ts": "9f1e9765923c09e21901c6d803979f62ffd2792c7b5f7b72b357cb79703a224b",
+    "Engines/WebGPU/webgpuBufferManager.js": "61c58c90f79daf4b0d056651cf68e913cd56e995d4a63ad13d0a25706faebbb4",
+    "Engines/WebGPU/webgpuPerfCounter.js": "1c7a32cbafcbd6e12f965282c811fb76fade7b93bffad9247ea7475a6d95b29d",
+    "Engines/thinWebGPUEngine.js": "b3e19eeb072647fc8a6b42570f6d8df847ce13631a62a5e49428343ff18bbd4f",
+    "Engines/abstractEngine.pure.js": "7f41fe41116d98982f23ab5bbe933c8d38a7d1266202c3e094c20a273da20713",
+    "Engines/engine.common.js": "e47ce87d658eb91bb5f13e589beadc935d8790e2834d56b34558ca97b5974e2c",
+    "Misc/observable.js": "453e6915f2ae323573d5d899b44a601e909a26c5ecc1e3a0dda56c5fe4bebacb",
+    "Misc/observable.pure.js": "cfe17166bc9a1120d9d2e94ac72943c53bc7c82e004acf498ed6c4f118fd3a71",
+    "Misc/perfCounter.js": "ba524c1a0be43625a6aa9d6f8d2bfcf6d2a6da41f42fcb94aada4ddc684b9aa9",
+    "Misc/logger.js": "1473ab5093fd523886d81af2f80d4e077ae29b0de0ac90b454cc0574118b9099",
+    "Engines/WebGPU/webgpuConstants.js": "c4c94d2d6f10ebf9b2ebcb1f5bf47aa5876b68532394964b8f8d94d7fa26bfd1",
+    "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+  },
+  "installedBefore": {
+    "PostProcesses/imageProcessingPostProcess.js": "c97937b740966d260475a421658cc038b8fb95756231f992468696a03484378a",
+    "PostProcesses/postProcess.pure.js": "e45a4d6682951457b861fcf2d58feecb6b587a90577c7e63bf286249fd037ab9",
+    "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "Materials/imageProcessingConfiguration.pure.js": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+    "Materials/imageProcessing.js": "902800495f4c7d3f01c51662a350150c33760dddb8de4f6e27b049623698bb3e",
+    "Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+    "Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    "Materials/standardMaterial.pure.js": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+    "Materials/standardMaterial.pure.d.ts": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+    "Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+    "Engines/WebGPU/webgpuQuerySet.js": "dfdffba837c0fd9bed0233bdc4dd3545a665ac84cbd2e98a9005abefe817c4be",
+    "Engines/WebGPU/webgpuQuerySet.d.ts": "2f30bf7728abb653163e9cb996c230bfe589df3e932d42aa4b855f3f24aefc9c",
+    "Engines/WebGPU/webgpuTimestampQuery.js": "4756adfa1c0ac4a8777150f953071e3539aac5fa67db9034a6a5391cf87f82d6",
+    "Engines/WebGPU/webgpuTimestampQuery.d.ts": "8025be7efc8f61691ef0e2bde32653fcb49d470e4c5d3acdd093ceeab77ca431",
+    "Engines/WebGPU/webgpuOcclusionQuery.js": "30fc4e30e73dfdd5092d4e354efeced45225fcb4f0be264d8b8d537498e8bf30",
+    "Engines/WebGPU/webgpuOcclusionQuery.d.ts": "f7eeafd73ebb68feedf36d314afc234eaf86c51dc64474ed0dec696a49bdf5e0",
+    "Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+    "Engines/webgpuEngine.pure.d.ts": "9f1e9765923c09e21901c6d803979f62ffd2792c7b5f7b72b357cb79703a224b",
+    "Engines/WebGPU/webgpuBufferManager.js": "61c58c90f79daf4b0d056651cf68e913cd56e995d4a63ad13d0a25706faebbb4",
+    "Engines/WebGPU/webgpuPerfCounter.js": "1c7a32cbafcbd6e12f965282c811fb76fade7b93bffad9247ea7475a6d95b29d",
+    "Engines/thinWebGPUEngine.js": "b3e19eeb072647fc8a6b42570f6d8df847ce13631a62a5e49428343ff18bbd4f",
+    "Engines/abstractEngine.pure.js": "7f41fe41116d98982f23ab5bbe933c8d38a7d1266202c3e094c20a273da20713",
+    "Engines/engine.common.js": "e47ce87d658eb91bb5f13e589beadc935d8790e2834d56b34558ca97b5974e2c",
+    "Misc/observable.js": "453e6915f2ae323573d5d899b44a601e909a26c5ecc1e3a0dda56c5fe4bebacb",
+    "Misc/observable.pure.js": "cfe17166bc9a1120d9d2e94ac72943c53bc7c82e004acf498ed6c4f118fd3a71",
+    "Misc/perfCounter.js": "ba524c1a0be43625a6aa9d6f8d2bfcf6d2a6da41f42fcb94aada4ddc684b9aa9",
+    "Misc/logger.js": "1473ab5093fd523886d81af2f80d4e077ae29b0de0ac90b454cc0574118b9099",
+    "Engines/WebGPU/webgpuConstants.js": "c4c94d2d6f10ebf9b2ebcb1f5bf47aa5876b68532394964b8f8d94d7fa26bfd1",
+    "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+  },
+  "installedAfter": {
+    "PostProcesses/imageProcessingPostProcess.js": "c97937b740966d260475a421658cc038b8fb95756231f992468696a03484378a",
+    "PostProcesses/postProcess.pure.js": "e45a4d6682951457b861fcf2d58feecb6b587a90577c7e63bf286249fd037ab9",
+    "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "Materials/imageProcessingConfiguration.pure.js": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+    "Materials/imageProcessing.js": "902800495f4c7d3f01c51662a350150c33760dddb8de4f6e27b049623698bb3e",
+    "Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+    "Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    "Materials/standardMaterial.pure.js": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+    "Materials/standardMaterial.pure.d.ts": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+    "Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+    "Engines/WebGPU/webgpuQuerySet.js": "dfdffba837c0fd9bed0233bdc4dd3545a665ac84cbd2e98a9005abefe817c4be",
+    "Engines/WebGPU/webgpuQuerySet.d.ts": "2f30bf7728abb653163e9cb996c230bfe589df3e932d42aa4b855f3f24aefc9c",
+    "Engines/WebGPU/webgpuTimestampQuery.js": "4756adfa1c0ac4a8777150f953071e3539aac5fa67db9034a6a5391cf87f82d6",
+    "Engines/WebGPU/webgpuTimestampQuery.d.ts": "8025be7efc8f61691ef0e2bde32653fcb49d470e4c5d3acdd093ceeab77ca431",
+    "Engines/WebGPU/webgpuOcclusionQuery.js": "30fc4e30e73dfdd5092d4e354efeced45225fcb4f0be264d8b8d537498e8bf30",
+    "Engines/WebGPU/webgpuOcclusionQuery.d.ts": "f7eeafd73ebb68feedf36d314afc234eaf86c51dc64474ed0dec696a49bdf5e0",
+    "Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+    "Engines/webgpuEngine.pure.d.ts": "9f1e9765923c09e21901c6d803979f62ffd2792c7b5f7b72b357cb79703a224b",
+    "Engines/WebGPU/webgpuBufferManager.js": "61c58c90f79daf4b0d056651cf68e913cd56e995d4a63ad13d0a25706faebbb4",
+    "Engines/WebGPU/webgpuPerfCounter.js": "1c7a32cbafcbd6e12f965282c811fb76fade7b93bffad9247ea7475a6d95b29d",
+    "Engines/thinWebGPUEngine.js": "b3e19eeb072647fc8a6b42570f6d8df847ce13631a62a5e49428343ff18bbd4f",
+    "Engines/abstractEngine.pure.js": "7f41fe41116d98982f23ab5bbe933c8d38a7d1266202c3e094c20a273da20713",
+    "Engines/engine.common.js": "e47ce87d658eb91bb5f13e589beadc935d8790e2834d56b34558ca97b5974e2c",
+    "Misc/observable.js": "453e6915f2ae323573d5d899b44a601e909a26c5ecc1e3a0dda56c5fe4bebacb",
+    "Misc/observable.pure.js": "cfe17166bc9a1120d9d2e94ac72943c53bc7c82e004acf498ed6c4f118fd3a71",
+    "Misc/perfCounter.js": "ba524c1a0be43625a6aa9d6f8d2bfcf6d2a6da41f42fcb94aada4ddc684b9aa9",
+    "Misc/logger.js": "1473ab5093fd523886d81af2f80d4e077ae29b0de0ac90b454cc0574118b9099",
+    "Engines/WebGPU/webgpuConstants.js": "c4c94d2d6f10ebf9b2ebcb1f5bf47aa5876b68532394964b8f8d94d7fa26bfd1",
+    "package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79"
+  },
+  "candidateBefore": {
+    "Engines/WebGPU/webgpuQuerySet.js": "d4b574db1da2207178b87280e6df60a42ffcfff206a1d5e109d69a1571adbc73",
+    "Engines/WebGPU/webgpuQuerySet.d.ts": "a55b70afa78175ae125d9bab5f6e986340b5d1f85d9922efef46b7ab26cc81e9",
+    "Engines/WebGPU/webgpuTimestampQuery.js": "7886c1e5c770c7b8783f7319151e22b47464f7dd8294f7be674dd78600772a53",
+    "Engines/WebGPU/webgpuTimestampQuery.d.ts": "1c27be1867b2d47fef66118628edb9b7313c08d8ff00bff06752d0591ba49d3a",
+    "Engines/WebGPU/webgpuOcclusionQuery.js": "6daf97a575f58e00b75e2dd2492bc321bd6ca46cdb03827053bc1543d6a5920f",
+    "Engines/WebGPU/webgpuOcclusionQuery.d.ts": "f1279d4d2b6042750adc2e77026f188cc5058b69d9d3d96998e6e8c413fc326a",
+    "Engines/webgpuEngine.pure.js": "b419f3d8b06ad05ba521ec3596eefaa8d8fb408365d2824c3ac4f7a694f4a7b7",
+    "Engines/webgpuEngine.pure.d.ts": "624339075101b1b1cb5264d861546d19d154dd40fd65a3e72b05e04c29362f8f"
+  },
+  "candidateAfter": {
+    "Engines/WebGPU/webgpuQuerySet.js": "d4b574db1da2207178b87280e6df60a42ffcfff206a1d5e109d69a1571adbc73",
+    "Engines/WebGPU/webgpuQuerySet.d.ts": "a55b70afa78175ae125d9bab5f6e986340b5d1f85d9922efef46b7ab26cc81e9",
+    "Engines/WebGPU/webgpuTimestampQuery.js": "7886c1e5c770c7b8783f7319151e22b47464f7dd8294f7be674dd78600772a53",
+    "Engines/WebGPU/webgpuTimestampQuery.d.ts": "1c27be1867b2d47fef66118628edb9b7313c08d8ff00bff06752d0591ba49d3a",
+    "Engines/WebGPU/webgpuOcclusionQuery.js": "6daf97a575f58e00b75e2dd2492bc321bd6ca46cdb03827053bc1543d6a5920f",
+    "Engines/WebGPU/webgpuOcclusionQuery.d.ts": "f1279d4d2b6042750adc2e77026f188cc5058b69d9d3d96998e6e8c413fc326a",
+    "Engines/webgpuEngine.pure.js": "b419f3d8b06ad05ba521ec3596eefaa8d8fb408365d2824c3ac4f7a694f4a7b7",
+    "Engines/webgpuEngine.pure.d.ts": "624339075101b1b1cb5264d861546d19d154dd40fd65a3e72b05e04c29362f8f"
+  },
+  "logs": {
+    "red.tap": "db11568819da17ac4610609795728cae6c9791b8bb22e149ff6393198efdcb72",
+    "green.tap": "d3d8853ce2bf027d0cd474cc277607112cc8e5403f2e98941e34248b3089b840",
+    "inline-red.log": "dcafcbcc4bed05d03c90d9bdb1cfcfd9707c4eb93cb644b500af8f31dec34d32",
+    "types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "oldTenSectionsByteExact": true,
+  "inverseLockExact": true,
+  "patchProof": {
+    "oldPatch": "597beca732c25cbb128271fad6681fd0176726962ede3218db41057359ea9b72",
+    "newPatch": "e82638ea49de7d93b13e1a5e5c57beb92e2d083ec5a7617f978e28a0dac8c43f",
+    "oldLock": "d91d6f2cdc70196ee1a44b7ae9b1adab8b8bd48f2092b138a4def94a12c668df",
+    "newLock": "8e6b4519cfc712b4a83a6fd893ddc37192836f582e6c4a2b95d187e03a277936",
+    "oldTenSectionsByteExact": true,
+    "inverseLockExact": true,
+    "lockReferences": 6,
+    "fullReverseApplyExact": true,
+    "before": {
+      "PostProcesses/imageProcessingPostProcess.js": "c97937b740966d260475a421658cc038b8fb95756231f992468696a03484378a",
+      "PostProcesses/postProcess.pure.js": "e45a4d6682951457b861fcf2d58feecb6b587a90577c7e63bf286249fd037ab9",
+      "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+      "Materials/imageProcessingConfiguration.pure.js": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+      "Materials/imageProcessing.js": "902800495f4c7d3f01c51662a350150c33760dddb8de4f6e27b049623698bb3e",
+      "Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+      "Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+      "Materials/standardMaterial.pure.js": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+      "Materials/standardMaterial.pure.d.ts": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+      "Meshes/mesh.pure.js": "7ceb79d2f4eaa72665e5084ffc6e752bbbb93dd84a7f97801c9cf2431afa459a",
+      "Engines/WebGPU/webgpuQuerySet.js": "dfdffba837c0fd9bed0233bdc4dd3545a665ac84cbd2e98a9005abefe817c4be",
+      "Engines/WebGPU/webgpuQuerySet.d.ts": "2f30bf7728abb653163e9cb996c230bfe589df3e932d42aa4b855f3f24aefc9c",
+      "Engines/WebGPU/webgpuTimestampQuery.js": "4756adfa1c0ac4a8777150f953071e3539aac5fa67db9034a6a5391cf87f82d6",
+      "Engines/WebGPU/webgpuTimestampQuery.d.ts": "8025be7efc8f61691ef0e2bde32653fcb49d470e4c5d3acdd093ceeab77ca431",
+      "Engines/WebGPU/webgpuOcclusionQuery.js": "30fc4e30e73dfdd5092d4e354efeced45225fcb4f0be264d8b8d537498e8bf30",
+      "Engines/WebGPU/webgpuOcclusionQuery.d.ts": "f7eeafd73ebb68feedf36d314afc234eaf86c51dc64474ed0dec696a49bdf5e0",
+      "Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+      "Engines/webgpuEngine.pure.d.ts": "9f1e9765923c09e21901c6d803979f62ffd2792c7b5f7b72b357cb79703a224b"
+    },
+    "after": {
+      "PostProcesses/imageProcessingPostProcess.js": "c97937b740966d260475a421658cc038b8fb95756231f992468696a03484378a",
+      "PostProcesses/postProcess.pure.js": "e45a4d6682951457b861fcf2d58feecb6b587a90577c7e63bf286249fd037ab9",
+      "Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+      "Materials/imageProcessingConfiguration.pure.js": "b961f5633437d7330ed541bb0ad7c1051787ead7b63acc5c5be8160d42a28e2b",
+      "Materials/imageProcessing.js": "902800495f4c7d3f01c51662a350150c33760dddb8de4f6e27b049623698bb3e",
+      "Materials/materialHelper.functions.js": "a6d21d15070f52d3a94ec7fd40eb22356a76a723165ce05afa67dbeded0e88ac",
+      "Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+      "Materials/standardMaterial.pure.js": "716dfac1f271ffbabbf4c35a76565d133917a4945c42f3b0c76565b7e552dc37",
+      "Materials/standardMaterial.pure.d.ts": "def7952eba897349b14afde42110df8ac9fd03d42256893d1ea3ed649a04488c",
+      "Meshes/mesh.pure.js": "7ceb79d2f4eaa72665e5084ffc6e752bbbb93dd84a7f97801c9cf2431afa459a",
+      "Engines/WebGPU/webgpuQuerySet.js": "d4b574db1da2207178b87280e6df60a42ffcfff206a1d5e109d69a1571adbc73",
+      "Engines/WebGPU/webgpuQuerySet.d.ts": "a55b70afa78175ae125d9bab5f6e986340b5d1f85d9922efef46b7ab26cc81e9",
+      "Engines/WebGPU/webgpuTimestampQuery.js": "7886c1e5c770c7b8783f7319151e22b47464f7dd8294f7be674dd78600772a53",
+      "Engines/WebGPU/webgpuTimestampQuery.d.ts": "1c27be1867b2d47fef66118628edb9b7313c08d8ff00bff06752d0591ba49d3a",
+      "Engines/WebGPU/webgpuOcclusionQuery.js": "6daf97a575f58e00b75e2dd2492bc321bd6ca46cdb03827053bc1543d6a5920f",
+      "Engines/WebGPU/webgpuOcclusionQuery.d.ts": "f1279d4d2b6042750adc2e77026f188cc5058b69d9d3d96998e6e8c413fc326a",
+      "Engines/webgpuEngine.pure.js": "b419f3d8b06ad05ba521ec3596eefaa8d8fb408365d2824c3ac4f7a694f4a7b7",
+      "Engines/webgpuEngine.pure.d.ts": "624339075101b1b1cb5264d861546d19d154dd40fd65a3e72b05e04c29362f8f"
+    }
+  },
+  "originalEvidence": {
+    "path": ".cache/webgpu-completion-20261021/validation/lifecycle-run-1/device-loss-console.json",
+    "sha256": "3cc0142f58c89f3dca345afd3ac657f486c251656647c1e1a88551fbfdb6199b",
+    "all34QueryAttribution": false
+  },
+  "diffCheck": 0
+}

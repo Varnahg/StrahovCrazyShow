@@ -578,3 +578,686 @@ index 4b5dc529..58777d7b 100644
              this._draw(subMesh, fillMode, instancesCount);
          }
          // Write current matrices as previous matrices in case of manual update
+diff --git a/Engines/WebGPU/webgpuQuerySet.js b/Engines/WebGPU/webgpuQuerySet.js
+index b3c4f27b..be039810 100644
+--- a/Engines/WebGPU/webgpuQuerySet.js
++++ b/Engines/WebGPU/webgpuQuerySet.js
+@@ -1,115 +1,114 @@
+ import * as WebGPUConstants from "./webgpuConstants.js";
++// The device Promise captures scalars only, never a retired QuerySet/engine.
++const DeviceLossStates = new WeakMap();
++function deviceLossState(device) {
++    let state = DeviceLossStates.get(device);
++    if (!state) {
++        state = { lost: false };
++        DeviceLossStates.set(device, state);
++        try { device.lost?.then(() => { state.lost = true; }, () => {}); }
++        catch { /* Broken monitoring is not proof of device loss. */ }
++    }
++    return state;
++}
+ /** @internal */
+ export class WebGPUQuerySet {
+-    get querySet() {
+-        return this._querySet;
++    get querySet() { return this._querySet; }
++    get isRetired() {
++        return this._disposed || this._lossState.lost || this._engine.isDisposed ||
++            this._engine.uniqueId !== this._engineId || this._engine._device !== this._device;
+     }
+     constructor(engine, count, type, device, bufferManager, canUseMultipleBuffers = true, label) {
+         this._dstBuffers = [];
++        this._pending = new Set();
++        this._ownedBuffers = new Set();
++        this._disposed = false;
+         this._engine = engine;
++        this._engineId = engine.uniqueId;
+         this._device = device;
++        this._lossState = deviceLossState(device);
+         this._bufferManager = bufferManager;
+         this._count = count;
+         this._canUseMultipleBuffers = canUseMultipleBuffers;
+-        this._querySet = device.createQuerySet({
+-            label: label ?? "QuerySet",
+-            type,
+-            count,
+-        });
+-        this._queryBuffer = bufferManager.createRawBuffer(8 * count, WebGPUConstants.BufferUsage.QueryResolve | WebGPUConstants.BufferUsage.CopySrc, undefined, "QueryBuffer");
+-        if (!canUseMultipleBuffers) {
+-            this._dstBuffers.push(this._bufferManager.createRawBuffer(8 * this._count, WebGPUConstants.BufferUsage.MapRead | WebGPUConstants.BufferUsage.CopyDst, undefined, "QueryBufferNoMultipleBuffers"));
+-        }
+-    }
+-    _getBuffer(firstQuery, queryCount) {
+-        if (!this._canUseMultipleBuffers && this._dstBuffers.length === 0) {
+-            return null;
+-        }
+-        const encoderResult = this._device.createCommandEncoder();
+-        let buffer;
+-        if (this._dstBuffers.length === 0) {
+-            buffer = this._bufferManager.createRawBuffer(8 * this._count, WebGPUConstants.BufferUsage.MapRead | WebGPUConstants.BufferUsage.CopyDst, undefined, "QueryBufferAdditionalBuffer");
+-        }
+-        else {
+-            buffer = this._dstBuffers[this._dstBuffers.length - 1];
+-            this._dstBuffers.length--;
+-        }
+-        encoderResult.resolveQuerySet(this._querySet, firstQuery, queryCount, this._queryBuffer, 0);
+-        encoderResult.copyBufferToBuffer(this._queryBuffer, 0, buffer, 0, 8 * queryCount);
+-        this._device.queue.submit([encoderResult.finish()]);
+-        return buffer;
+-    }
+-    async readValues(firstQuery = 0, queryCount = 1) {
+-        const buffer = this._getBuffer(firstQuery, queryCount);
+-        if (buffer === null) {
+-            return null;
+-        }
+-        const engineId = this._engine.uniqueId;
+         try {
+-            await buffer.mapAsync(1 /* WebGPUConstants.MapMode.Read */);
+-            const arrayBuf = new BigUint64Array(buffer.getMappedRange()).slice();
+-            buffer.unmap();
+-            this._dstBuffers[this._dstBuffers.length] = buffer;
+-            return arrayBuf;
+-        }
+-        catch (err) {
+-            if (this._engine.isDisposed || this._engine.uniqueId !== engineId) {
+-                // Engine disposed or context loss/restoration
+-                return null;
++            this._querySet = device.createQuerySet({ label: label ?? "QuerySet", type, count });
++            this._queryBuffer = bufferManager.createRawBuffer(8 * count, WebGPUConstants.BufferUsage.QueryResolve | WebGPUConstants.BufferUsage.CopySrc, undefined, "QueryBuffer");
++            if (!canUseMultipleBuffers) {
++                const buffer = bufferManager.createRawBuffer(8 * count, WebGPUConstants.BufferUsage.MapRead | WebGPUConstants.BufferUsage.CopyDst, undefined, "QueryBufferNoMultipleBuffers");
++                this._ownedBuffers.add(buffer);
++                this._dstBuffers.push(buffer);
+             }
+-            throw err;
+         }
++        catch (error) { try { this.dispose(); } catch {} throw error; }
+     }
+-    async readValue(firstQuery = 0) {
+-        const buffer = this._getBuffer(firstQuery, 1);
+-        if (buffer === null) {
+-            return null;
+-        }
+-        const engineId = this._engine.uniqueId;
+-        try {
+-            await buffer.mapAsync(1 /* WebGPUConstants.MapMode.Read */);
+-            const arrayBuf = new BigUint64Array(buffer.getMappedRange());
+-            const value = Number(arrayBuf[0]);
+-            buffer.unmap();
+-            this._dstBuffers[this._dstBuffers.length] = buffer;
+-            return value;
+-        }
+-        catch (err) {
+-            if (this._engine.isDisposed || this._engine.uniqueId !== engineId) {
+-                // Engine disposed or context loss/restoration
+-                return 0;
+-            }
+-            throw err;
+-        }
++    _getBuffer() {
++        if (!this._canUseMultipleBuffers && this._dstBuffers.length === 0) { return null; }
++        const buffer = this._dstBuffers.length ? this._dstBuffers.pop() :
++            this._bufferManager.createRawBuffer(8 * this._count, WebGPUConstants.BufferUsage.MapRead | WebGPUConstants.BufferUsage.CopyDst, undefined, "QueryBufferAdditionalBuffer");
++        this._ownedBuffers.add(buffer);
++        const borrowed = { buffer, done: false, unmapAttempted: false };
++        this._pending.add(borrowed);
++        return borrowed;
+     }
+-    async readTwoValuesAndSubtract(firstQuery = 0) {
+-        const buffer = this._getBuffer(firstQuery, 2);
+-        if (buffer === null) {
+-            return null;
+-        }
+-        const engineId = this._engine.uniqueId;
++    _settle(borrowed, recycle) {
++        if (borrowed.done) { return; }
++        borrowed.done = true;
++        this._pending.delete(borrowed);
++        let failed = false, failure;
++        const attempt = (cleanup) => { try { cleanup(); } catch (error) { if (!failed) { failed = true; failure = error; } } };
++        if (!borrowed.unmapAttempted) { borrowed.unmapAttempted = true; attempt(() => borrowed.buffer.unmap()); }
++        if (recycle && !failed && !this.isRetired) { this._dstBuffers.push(borrowed.buffer); }
++        else { this._ownedBuffers.delete(borrowed.buffer); attempt(() => this._bufferManager.releaseBuffer(borrowed.buffer)); }
++        if (failed) { throw failure; }
++    }
++    async _read(firstQuery, queryCount, read) {
++        if (this.isRetired) { return null; }
++        let borrowed, result = null, failed = false, failure;
+         try {
+-            await buffer.mapAsync(1 /* WebGPUConstants.MapMode.Read */);
+-            const arrayBuf = new BigUint64Array(buffer.getMappedRange());
+-            const value = Number(arrayBuf[1] - arrayBuf[0]);
+-            buffer.unmap();
+-            this._dstBuffers[this._dstBuffers.length] = buffer;
+-            return value;
++            borrowed = this._getBuffer();
++            if (borrowed === null) { return null; }
++            // Register ownership before any encoder/submit operation can fail.
++            const encoder = this._device.createCommandEncoder();
++            encoder.resolveQuerySet(this._querySet, firstQuery, queryCount, this._queryBuffer, 0);
++            encoder.copyBufferToBuffer(this._queryBuffer, 0, borrowed.buffer, 0, 8 * queryCount);
++            this._device.queue.submit([encoder.finish()]);
++            await borrowed.buffer.mapAsync(1 /* WebGPUConstants.MapMode.Read */);
++            if (!this.isRetired) { result = read(borrowed.buffer.getMappedRange()); }
+         }
+-        catch (err) {
+-            if (this._engine.isDisposed || this._engine.uniqueId !== engineId) {
+-                // Engine disposed or context loss/restoration
+-                return 0;
+-            }
+-            throw err;
++        catch (error) { failed = true; failure = error; }
++        if (borrowed) {
++            try { this._settle(borrowed, !failed); }
++            catch (error) { if (!failed) { failed = true; failure = error; } }
+         }
++        if (this.isRetired) { return null; }
++        if (failed) { throw failure; }
++        return result;
++    }
++    readValues(firstQuery = 0, queryCount = 1) {
++        return this._read(firstQuery, queryCount, (range) => new BigUint64Array(range).slice());
++    }
++    readValue(firstQuery = 0) {
++        return this._read(firstQuery, 1, (range) => Number(new BigUint64Array(range)[0]));
++    }
++    readTwoValuesAndSubtract(firstQuery = 0) {
++        return this._read(firstQuery, 2, (range) => { const values = new BigUint64Array(range); return Number(values[1] - values[0]); });
+     }
+     dispose() {
+-        this._querySet.destroy();
+-        this._bufferManager.releaseBuffer(this._queryBuffer);
+-        for (let i = 0; i < this._dstBuffers.length; ++i) {
+-            this._bufferManager.releaseBuffer(this._dstBuffers[i]);
++        if (this._disposed) { return; }
++        this._disposed = true;
++        const pending = [...this._pending], buffers = [...this._ownedBuffers];
++        this._pending.clear(); this._ownedBuffers.clear(); this._dstBuffers.length = 0;
++        // Detach ownership first: late settlement cannot recycle/release twice.
++        for (const borrowed of pending) { borrowed.done = true; }
++        let failed = false, failure;
++        const attempt = (cleanup) => { try { cleanup(); } catch (error) { if (!failed) { failed = true; failure = error; } } };
++        for (const borrowed of pending) {
++            if (!borrowed.unmapAttempted) { borrowed.unmapAttempted = true; attempt(() => borrowed.buffer.unmap()); }
+         }
++        if (this._querySet) { attempt(() => this._querySet.destroy()); }
++        if (this._queryBuffer) { attempt(() => this._bufferManager.releaseBuffer(this._queryBuffer)); }
++        for (const buffer of buffers) { attempt(() => this._bufferManager.releaseBuffer(buffer)); }
++        if (failed) { throw failure; }
+     }
+ }
+ //# sourceMappingURL=webgpuQuerySet.js.map
+\ No newline at end of file
+diff --git a/Engines/WebGPU/webgpuQuerySet.d.ts b/Engines/WebGPU/webgpuQuerySet.d.ts
+index 1de890fa..13a73ff4 100644
+--- a/Engines/WebGPU/webgpuQuerySet.d.ts
++++ b/Engines/WebGPU/webgpuQuerySet.d.ts
+@@ -11,9 +11,17 @@ export declare class WebGPUQuerySet {
+     private _querySet;
+     private _queryBuffer;
+     private _dstBuffers;
++    private _engineId;
++    private _lossState;
++    private _disposed;
++    private _pending;
++    private _ownedBuffers;
+     get querySet(): GPUQuerySet;
++    get isRetired(): boolean;
+     constructor(engine: WebGPUEngine, count: number, type: QueryType, device: GPUDevice, bufferManager: WebGPUBufferManager, canUseMultipleBuffers?: boolean, label?: string);
+     private _getBuffer;
++    private _settle;
++    private _read;
+     readValues(firstQuery?: number, queryCount?: number): Promise<BigUint64Array | null>;
+     readValue(firstQuery?: number): Promise<number | null>;
+     readTwoValuesAndSubtract(firstQuery?: number): Promise<number | null>;
+diff --git a/Engines/WebGPU/webgpuTimestampQuery.js b/Engines/WebGPU/webgpuTimestampQuery.js
+index 6540f7ea..70bcbc05 100644
+--- a/Engines/WebGPU/webgpuTimestampQuery.js
++++ b/Engines/WebGPU/webgpuTimestampQuery.js
+@@ -5,42 +5,54 @@ import { WebGPUQuerySet } from "./webgpuQuerySet.js";
+ import { Logger } from "../../Misc/logger.js";
+ /** @internal */
+ export class WebGPUTimestampQuery {
+-    get gpuFrameTimeCounter() {
+-        return this._gpuFrameTimeCounter;
+-    }
++    get gpuFrameTimeCounter() { return this._gpuFrameTimeCounter; }
+     constructor(engine, device, bufferManager) {
+         this._enabled = false;
++        this._disposed = false;
++        this._epoch = 0;
+         this._gpuFrameTimeCounter = new PerfCounter();
+         this._measureDurationState = 0;
+         this._engine = engine;
+         this._device = device;
+         this._bufferManager = bufferManager;
+     }
+-    get enable() {
+-        return this._enabled;
+-    }
++    get enable() { return this._enabled; }
+     set enable(value) {
+-        if (this._enabled === value) {
+-            return;
+-        }
++        if (this._disposed || this._enabled === value) { return; }
+         this._enabled = value;
++        this._epoch++;
+         this._measureDurationState = 0;
++        const previous = this._measureDuration;
++        this._measureDuration = undefined;
++        previous?.dispose();
+         if (value) {
+-            try {
+-                this._measureDuration = new WebGPUDurationMeasure(this._engine, this._device, this._bufferManager, 2000, "QuerySet_TimestampQuery");
+-            }
++            try { this._measureDuration = new WebGPUDurationMeasure(this._engine, this._device, this._bufferManager, 2000, "QuerySet_TimestampQuery"); }
+             catch (e) {
+                 this._enabled = false;
+                 Logger.Error("Could not create a WebGPUDurationMeasure!\nError: " + e.message + "\nMake sure timestamp query is supported and enabled in your browser.");
+-                return;
+             }
+         }
+-        else {
+-            this._measureDuration.dispose();
+-        }
++    }
++    _consume(measure, operation, source, accept, frameCycle = false) {
++        const epoch = this._epoch;
++        const current = () => !this._disposed && this._enabled && this._epoch === epoch &&
++            this._measureDuration === measure && !measure.isRetired;
++        const complete = (value, failed, error) => {
++            if (!current()) { return; }
++            if (frameCycle) { this._measureDurationState = 0; }
++            try {
++                if (failed) { this._engine._reportQueryReadError(source, error); }
++                else if (value !== null) { accept(value); }
++            }
++            catch (callbackError) {
++                // An observer/counter failure must not create another rejected child Promise.
++                try { this._engine._reportQueryReadError(source, callbackError); } catch {}
++            }
++        };
++        operation.then((value) => complete(value, false), (error) => complete(null, true, error));
+     }
+     startFrame(commandEncoder) {
+-        if (this._enabled && this._measureDurationState === 0) {
++        if (this._enabled && !this._measureDuration.isRetired && this._measureDurationState === 0) {
+             this._measureDuration.start(commandEncoder);
+             this._measureDurationState = 1;
+         }
+@@ -48,66 +60,53 @@ export class WebGPUTimestampQuery {
+     endFrame(commandEncoder) {
+         if (this._measureDurationState === 1) {
+             this._measureDurationState = 2;
+-            // eslint-disable-next-line @typescript-eslint/no-floating-promises, github/no-then
+-            this._measureDuration.stop(commandEncoder).then((duration) => {
+-                if (duration !== null && duration >= 0) {
+-                    this._gpuFrameTimeCounter.fetchNewFrame();
+-                    this._gpuFrameTimeCounter.addCount(duration, true);
+-                }
+-                this._measureDurationState = 0;
+-            });
++            const measure = this._measureDuration;
++            this._consume(measure, measure.stop(commandEncoder), "timestamp-frame", (duration) => {
++                if (duration >= 0) { this._gpuFrameTimeCounter.fetchNewFrame(); this._gpuFrameTimeCounter.addCount(duration, true); }
++            }, true);
+         }
+     }
+     startPass(descriptor, index) {
+-        if (this._enabled) {
+-            this._measureDuration.startPass(descriptor, index);
+-        }
+-        else {
+-            descriptor.timestampWrites = undefined;
+-        }
++        if (this._enabled && !this._measureDuration.isRetired) { this._measureDuration.startPass(descriptor, index); }
++        else { descriptor.timestampWrites = undefined; }
+     }
+     endPass(index, gpuPerfCounter) {
+-        if (!this._enabled || !gpuPerfCounter) {
+-            return;
+-        }
+-        const currentFrameId = this._engine.frameId;
+-        // eslint-disable-next-line @typescript-eslint/no-floating-promises, github/no-then
+-        this._measureDuration.stopPass(index).then((duration_) => {
+-            gpuPerfCounter._addDuration(currentFrameId, duration_ !== null && duration_ > 0 ? duration_ : 0);
++        if (!this._enabled || !gpuPerfCounter) { return; }
++        const currentFrameId = this._engine.frameId, measure = this._measureDuration;
++        this._consume(measure, measure.stopPass(index), "timestamp-pass", (duration) => {
++            if (duration >= 0) { gpuPerfCounter._addDuration(currentFrameId, duration); }
+         });
+     }
+     dispose() {
+-        this._measureDuration?.dispose();
++        if (this._disposed) { return; }
++        this._disposed = true;
++        this._enabled = false;
++        this._epoch++;
++        this._measureDurationState = 0;
++        const measure = this._measureDuration;
++        this._measureDuration = undefined;
++        measure?.dispose();
+     }
+ }
+ /** @internal */
+ export class WebGPUDurationMeasure {
++    get isRetired() { return this._querySet.isRetired; }
+     constructor(engine, device, bufferManager, count = 2, querySetLabel) {
+         this._count = count;
+         this._querySet = new WebGPUQuerySet(engine, count, "timestamp" /* WebGPUConstants.QueryType.Timestamp */, device, bufferManager, true, querySetLabel);
+     }
+-    start(encoder) {
+-        encoder.writeTimestamp?.(this._querySet.querySet, 0);
+-    }
++    start(encoder) { if (!this.isRetired) { encoder.writeTimestamp?.(this._querySet.querySet, 0); } }
+     async stop(encoder) {
++        if (this.isRetired) { return null; }
+         encoder.writeTimestamp?.(this._querySet.querySet, 1);
+-        return encoder.writeTimestamp ? await this._querySet.readTwoValuesAndSubtract(0) : 0;
++        return encoder.writeTimestamp ? await this._querySet.readTwoValuesAndSubtract(0) : null;
+     }
+     startPass(descriptor, index) {
+-        if (index + 3 > this._count) {
+-            throw new Error("WebGPUDurationMeasure: index out of range (" + index + ")");
+-        }
+-        descriptor.timestampWrites = {
+-            querySet: this._querySet.querySet,
+-            beginningOfPassWriteIndex: index + 2,
+-            endOfPassWriteIndex: index + 3,
+-        };
+-    }
+-    async stopPass(index) {
+-        return await this._querySet.readTwoValuesAndSubtract(index + 2);
+-    }
+-    dispose() {
+-        this._querySet.dispose();
++        if (this.isRetired) { descriptor.timestampWrites = undefined; return; }
++        if (index + 3 > this._count) { throw new Error("WebGPUDurationMeasure: index out of range (" + index + ")"); }
++        descriptor.timestampWrites = { querySet: this._querySet.querySet, beginningOfPassWriteIndex: index + 2, endOfPassWriteIndex: index + 3 };
+     }
++    async stopPass(index) { return await this._querySet.readTwoValuesAndSubtract(index + 2); }
++    dispose() { this._querySet.dispose(); }
+ }
+ //# sourceMappingURL=webgpuTimestampQuery.js.map
+\ No newline at end of file
+diff --git a/Engines/WebGPU/webgpuTimestampQuery.d.ts b/Engines/WebGPU/webgpuTimestampQuery.d.ts
+index 5c68faa0..c910e246 100644
+--- a/Engines/WebGPU/webgpuTimestampQuery.d.ts
++++ b/Engines/WebGPU/webgpuTimestampQuery.d.ts
+@@ -8,6 +8,8 @@ export declare class WebGPUTimestampQuery {
+     private _device;
+     private _bufferManager;
+     private _enabled;
++    private _disposed;
++    private _epoch;
+     private _gpuFrameTimeCounter;
+     private _measureDuration;
+     private _measureDurationState;
+@@ -15,6 +17,7 @@ export declare class WebGPUTimestampQuery {
+     constructor(engine: WebGPUEngine, device: GPUDevice, bufferManager: WebGPUBufferManager);
+     get enable(): boolean;
+     set enable(value: boolean);
++    private _consume;
+     startFrame(commandEncoder: GPUCommandEncoder): void;
+     endFrame(commandEncoder: GPUCommandEncoder): void;
+     startPass(descriptor: GPURenderPassDescriptor | GPUComputePassDescriptor, index: number): void;
+@@ -25,6 +28,7 @@ export declare class WebGPUTimestampQuery {
+ export declare class WebGPUDurationMeasure {
+     private _querySet;
+     private _count;
++    get isRetired(): boolean;
+     constructor(engine: WebGPUEngine, device: GPUDevice, bufferManager: WebGPUBufferManager, count?: number, querySetLabel?: string);
+     start(encoder: GPUCommandEncoder): void;
+     stop(encoder: GPUCommandEncoder): Promise<number | null>;
+diff --git a/Engines/WebGPU/webgpuOcclusionQuery.js b/Engines/WebGPU/webgpuOcclusionQuery.js
+index 4c63dc81..7faa7653 100644
+--- a/Engines/WebGPU/webgpuOcclusionQuery.js
++++ b/Engines/WebGPU/webgpuOcclusionQuery.js
+@@ -5,9 +5,10 @@ export class WebGPUOcclusionQuery {
+         return this._querySet.querySet;
+     }
+     get hasQueries() {
+-        return this._currentTotalIndices !== this._availableIndices.length;
++        return !this._disposed && !this._querySet.isRetired && this._currentTotalIndices !== this._availableIndices.length;
+     }
+     canBeginQuery(index) {
++        if (this._disposed || this._querySet.isRetired) { return false; }
+         if (this._frameQuerySetIsDirty === this._engine.frameId || this._queryFrameId[index] === this._engine.frameId) {
+             return false;
+         }
+@@ -19,6 +20,8 @@ export class WebGPUOcclusionQuery {
+     }
+     constructor(engine, device, bufferManager, startCount = 50, incrementCount = 100) {
+         this._availableIndices = [];
++        this._disposed = false;
++        this._epoch = 0;
+         this._frameQuerySetIsDirty = -1;
+         this._queryFrameId = [];
+         this._engine = engine;
+@@ -30,6 +33,7 @@ export class WebGPUOcclusionQuery {
+         this._allocateNewIndices(startCount);
+     }
+     createQuery() {
++        if (this._disposed) { throw new Error("Occlusion query disposed"); }
+         if (this._availableIndices.length === 0) {
+             this._allocateNewIndices();
+         }
+@@ -38,47 +42,66 @@ export class WebGPUOcclusionQuery {
+         return index;
+     }
+     deleteQuery(index) {
++        if (this._disposed) { return; }
+         this._availableIndices[this._availableIndices.length] = index;
+     }
+     isQueryResultAvailable(index) {
++        if (this._disposed || this._querySet.isRetired) { return false; }
+         this._retrieveQueryBuffer();
+         return !!this._lastBuffer && index < this._lastBuffer.length;
+     }
+     getQueryResult(index) {
++        if (this._disposed || this._querySet.isRetired) { return -1; }
+         return Number(this._lastBuffer?.[index] ?? -1);
+     }
+     _retrieveQueryBuffer() {
++        if (this._disposed || this._querySet.isRetired) { return; }
+         if (this._lastBuffer && this._frameLastBuffer === this._engine.frameId) {
+             return;
+         }
+         if (this._frameLastBuffer !== this._engine.frameId) {
+             this._frameLastBuffer = this._engine.frameId;
+             // eslint-disable-next-line @typescript-eslint/no-floating-promises, github/no-then
+-            this._querySet.readValues(0, this._currentTotalIndices).then((arrayBuffer) => {
+-                this._lastBuffer = arrayBuffer;
++            const querySet = this._querySet, epoch = this._epoch;
++            const current = () => !this._disposed && this._epoch === epoch && this._querySet === querySet && !querySet.isRetired;
++            querySet.readValues(0, this._currentTotalIndices).then((arrayBuffer) => {
++                if (current()) { this._lastBuffer = arrayBuffer; }
++            }, (error) => {
++                if (current()) { try { this._engine._reportQueryReadError("occlusion", error); } catch {} }
+             });
+         }
+     }
+     _allocateNewIndices(numIndices) {
+         numIndices = numIndices ?? this._countIncrement;
++        const querySet = new WebGPUQuerySet(this._engine, this._currentTotalIndices + numIndices, "occlusion" /* WebGPUConstants.QueryType.Occlusion */, this._device, this._bufferManager, false, "QuerySet_OcclusionQuery_count_" + (this._currentTotalIndices + numIndices));
+         this._delayQuerySetDispose();
++        this._epoch++;
++        this._lastBuffer = null;
++        this._frameLastBuffer = -1;
+         for (let i = 0; i < numIndices; ++i) {
+             this._availableIndices.push(this._currentTotalIndices + i);
+         }
+         this._currentTotalIndices += numIndices;
+-        this._querySet = new WebGPUQuerySet(this._engine, this._currentTotalIndices, "occlusion" /* WebGPUConstants.QueryType.Occlusion */, this._device, this._bufferManager, false, "QuerySet_OcclusionQuery_count_" + this._currentTotalIndices);
++        this._querySet = querySet;
+         this._frameQuerySetIsDirty = this._engine.frameId;
+     }
+     _delayQuerySetDispose() {
+         const querySet = this._querySet;
+         if (querySet) {
+             // Wait a bit before disposing of the queryset, in case some queries are still running for it
+-            setTimeout(() => querySet.dispose(), 1000);
++            setTimeout(() => {
++                try { querySet.dispose(); }
++                catch (error) { if (!this._disposed && !this._querySet.isRetired) { try { this._engine._reportQueryReadError("occlusion", error); } catch {} } }
++            }, 1000);
+         }
+     }
+     dispose() {
+-        this._querySet?.dispose();
++        if (this._disposed) { return; }
++        this._disposed = true;
++        this._epoch++;
++        this._lastBuffer = null;
+         this._availableIndices.length = 0;
++        this._querySet?.dispose();
+     }
+ }
+ //# sourceMappingURL=webgpuOcclusionQuery.js.map
+\ No newline at end of file
+diff --git a/Engines/WebGPU/webgpuOcclusionQuery.d.ts b/Engines/WebGPU/webgpuOcclusionQuery.d.ts
+index 1b5fa9a7..957b9ced 100644
+--- a/Engines/WebGPU/webgpuOcclusionQuery.d.ts
++++ b/Engines/WebGPU/webgpuOcclusionQuery.d.ts
+@@ -13,6 +13,8 @@ export declare class WebGPUOcclusionQuery {
+     private _frameLastBuffer;
+     private _frameQuerySetIsDirty;
+     private _queryFrameId;
++    private _disposed;
++    private _epoch;
+     get querySet(): GPUQuerySet;
+     get hasQueries(): boolean;
+     canBeginQuery(index: number): boolean;
+diff --git a/Engines/webgpuEngine.pure.js b/Engines/webgpuEngine.pure.js
+index 31161086..2791bc42 100644
+--- a/Engines/webgpuEngine.pure.js
++++ b/Engines/webgpuEngine.pure.js
+@@ -1,6 +1,7 @@
+ /** This file must only contain pure code and pure imports */
+ /* eslint-disable babylonjs/available */
+ import { Logger } from "../Misc/logger.js";
++import { Observable } from "../Misc/observable.js";
+ import { ThinWebGPUEngine } from "./thinWebGPUEngine.js";
+ import { Color4 } from "../Maths/math.js";
+ import { InternalTexture } from "../Materials/Textures/internalTexture.js";
+@@ -46,6 +47,34 @@ import { resetCachedPipeline } from "../Materials/effect.functions.js";
+ import { RegisterAbstractEngineDom } from "./AbstractEngine/abstractEngine.dom.pure.js";
+ import { RegisterAbstractEngineRenderPass } from "./AbstractEngine/abstractEngine.renderPass.pure.js";
+ import { WebGPUExternalTexture } from "./WebGPU/webgpuExternalTexture.js";
++// Fatal read errors are a broadcast, not a vetoable diagnostic chain. Keep
++// pinned Observable mask/scope/once/removal semantics; isolate each observer.
++class QueryReadErrorObservable extends Observable {
++    notifyObservers(eventData, mask = -1, target, currentTarget, userInfo) {
++        if (this.notifyIfTriggered) {
++            this._hasNotified = true;
++            this._lastNotifiedValue = eventData;
++        }
++        const state = this._eventState;
++        state.mask = mask;
++        state.target = target;
++        state.currentTarget = currentTarget;
++        state.lastReturnValue = eventData;
++        state.userInfo = userInfo;
++        for (const observer of this._observers) {
++            if (observer._willBeUnregistered || !(observer.mask & mask)) { continue; }
++            state.skipNextObservers = false;
++            if (observer.unregisterOnNextCall) { this._deferUnregister(observer); }
++            try {
++                state.lastReturnValue = observer.scope ? observer.callback.apply(observer.scope, [eventData, state]) : observer.callback(eventData, state);
++            }
++            catch (error) {
++                try { Logger.Error("WebGPU query observer failed: " + String(error)); } catch {}
++            }
++        }
++        return true;
++    }
++}
+ const ViewDescriptorSwapChainAntialiasing = {
+     label: `TextureView_SwapChain_ResolveTarget`,
+     dimension: "2d" /* WebGPUConstants.TextureDimension.E2d */,
+@@ -250,6 +279,7 @@ export class WebGPUEngine extends ThinWebGPUEngine {
+         super(options.antialias ?? true, options);
+         /** A unique id to identify this instance */
+         this.uniqueId = -1;
++        this.onQueryReadErrorObservable = new QueryReadErrorObservable();
+         // Page Life cycle and constants
+         this._uploadEncoderDescriptor = { label: "upload" };
+         this._renderEncoderDescriptor = { label: "render" };
+@@ -3087,17 +3117,32 @@ export class WebGPUEngine extends ThinWebGPUEngine {
+     /**
+      * Dispose and release all associated resources
+      */
++    _reportQueryReadError(source, error) {
++        try {
++            if (this.onQueryReadErrorObservable.hasObservers()) {
++                this.onQueryReadErrorObservable.notifyObservers({ error, source });
++                return;
++            }
++        }
++        catch { /* A diagnostic observer must not create a rejected child Promise. */ }
++        try { Logger.Error("WebGPU query read failed (" + source + "): " + String(error)); } catch {}
++    }
+     dispose() {
+         this._isDisposed = true;
+-        this.hideLoadingUI?.();
+-        this._timestampQuery.dispose();
+-        this._mainTexture?.destroy();
+-        this._depthTexture?.destroy();
+-        this._textureHelper.destroyDeferredTextures();
+-        this._bufferManager.destroyDeferredBuffers();
+-        this._device.destroy();
+-        _CommonDispose(this, this._renderingCanvas);
+-        super.dispose();
++        let failed = false, failure;
++        const attempt = (cleanup) => { try { cleanup(); } catch (error) { if (!failed) { failed = true; failure = error; } } };
++        attempt(() => this.hideLoadingUI?.());
++        attempt(() => this._timestampQuery?.dispose());
++        attempt(() => this._occlusionQuery?.dispose());
++        attempt(() => this._mainTexture?.destroy());
++        attempt(() => this._depthTexture?.destroy());
++        attempt(() => this._textureHelper?.destroyDeferredTextures());
++        attempt(() => this._bufferManager?.destroyDeferredBuffers());
++        attempt(() => this._device?.destroy());
++        attempt(() => _CommonDispose(this, this._renderingCanvas));
++        attempt(() => super.dispose());
++        attempt(() => this.onQueryReadErrorObservable.clear());
++        if (failed) { throw failure; }
+     }
+     //------------------------------------------------------------------------------
+     //                              Misc
+@@ -3323,4 +3368,4 @@ WebGPUEngine._GlslangDefaultOptions = {
+     wasmPath: `${Tools._DefaultCdnUrl}/glslang/glslang.wasm`,
+ };
+ WebGPUEngine._InstanceId = 0;
+-//# sourceMappingURL=webgpuEngine.pure.js.map
+\ No newline at end of file
++//# sourceMappingURL=webgpuEngine.pure.js.map
+diff --git a/Engines/webgpuEngine.pure.d.ts b/Engines/webgpuEngine.pure.d.ts
+index b055ce36..27366e22 100644
+--- a/Engines/webgpuEngine.pure.d.ts
++++ b/Engines/webgpuEngine.pure.d.ts
+@@ -32,6 +32,12 @@ import { type AbstractMesh } from "../Meshes/abstractMesh.pure.js";
+ import { PerformanceMonitor } from "../Misc/performanceMonitor.js";
+ import { type TextureSampler } from "../Materials/Textures/textureSampler.js";
+ import { type StorageBuffer } from "../Buffers/storageBuffer.js";
++import { Observable } from "../Misc/observable.js";
++/** A failed active internal query read; retired queries do not emit samples/errors. */
++export interface WebGPUQueryReadError {
++    error: unknown;
++    source: "timestamp-frame" | "timestamp-pass" | "occlusion";
++}
+ /** @internal */
+ interface IWebGPURenderPassWrapper {
+     renderPassDescriptor: Nullable<GPURenderPassDescriptor>;
+@@ -205,6 +211,10 @@ export declare class WebGPUEngine extends ThinWebGPUEngine {
+     private static _InstanceId;
+     /** A unique id to identify this instance */
+     readonly uniqueId = -1;
++    /** Fatal error broadcast: observer exceptions/skipNextObservers cannot veto delivery. */
++    readonly onQueryReadErrorObservable: Observable<WebGPUQueryReadError>;
++    /** @internal Reports without creating an unhandled observer rejection. */
++    _reportQueryReadError(source: WebGPUQueryReadError["source"], error: unknown): void;
+     private readonly _uploadEncoderDescriptor;
+     private readonly _renderEncoderDescriptor;
+     /** @internal */

@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Observable } from "@babylonjs/core/Misc/observable";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine.pure";
 import { RenderHealth } from "../client/render-health";
 import { StartupPreparationLoop, type StartupPreparationHost } from "../client/startup-preparation-loop";
@@ -49,6 +50,7 @@ function fixture(native = true) {
     queue: { onSubmittedWorkDone() { fences++; return queue; } },
   });
   if (native) {
+    Object.assign(engine, { onQueryReadErrorObservable: new Observable() });
     (engine as unknown as { _isWebGPU: boolean })._isWebGPU = true;
     (engine as unknown as { _device: unknown })._device = device;
   }

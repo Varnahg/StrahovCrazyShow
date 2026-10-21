@@ -1,5 +1,5 @@
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { watchWebGpuValidation } from "./webgpu-validation";
+import { watchWebGpuQueryReadErrors, watchWebGpuValidation } from "./webgpu-validation";
 
 export type RenderFaultChannel =
   | "effect"
@@ -95,6 +95,11 @@ export class RenderHealth {
       () => lost.remove(true),
       () => restored.remove(true),
       () => disposed.remove(true),
+      watchWebGpuQueryReadErrors(
+        engine,
+        (error, source) => this.recordFault("render", error, `GPU query ${source}`),
+        (error) => this.report("render", error),
+      ),
       watchWebGpuValidation(
         engine,
         (message) => this.report("validation", message),
