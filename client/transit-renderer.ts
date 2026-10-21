@@ -64,6 +64,7 @@ export class TransitRenderer {
   private passengers = new Map<string, PassengerVisual>();
   private displays = new Map<string, StandardMaterial>();
   private pool: AvatarPrimitivePool;
+  private poolPrunePending = false;
   private disposed = false;
   private loaded = false;
   lastFrame?: TransitFrame;
@@ -382,12 +383,14 @@ export class TransitRenderer {
       npcIds = new Set(selected.map((p) => p.id));
     for (const [id, npc] of this.passengers)
       if (!npcIds.has(id)) {
+        this.poolPrunePending = true;
         npc.rig.root.dispose();
         this.passengers.delete(id);
       }
     for (const p of selected) {
       let npc = this.passengers.get(p.id);
       if (!npc) {
+        this.poolPrunePending = true;
         const rig = createAvatarRig(this.scene, p.avatar, this.pool, p.id);
         npc = {
           rig,
@@ -425,7 +428,10 @@ export class TransitRenderer {
           animationDt,
         );
     }
-    this.pool.pruneUnused();
+    if (this.poolPrunePending) {
+      this.pool.pruneUnused();
+      this.poolPrunePending = false;
+    }
   }
   get counts() {
     return {
