@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-lifecycle-controls-20261021",
+  "title": "KEY-22: explicitní lokální QA ovládání vlastní device loss a skutečné visibility",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/common.mjs",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/qa-overlay.mjs",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/receipt.mjs",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/helper.test.mjs",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/clock.test.mjs",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/weather-latency.test.mjs",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/lifecycle-controls.mjs",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/lifecycle-controls.test.mjs",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/README.md",
+    "docs/performance/evidence/webgpu-completion-20261021/lifecycle-controls/",
+    ".cache/webgpu-completion-lifecycle-controls-20261021/",
+    "docs/agents/handoffs/webgpu-completion-lifecycle-controls-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před code zapsat celý QA→own Game/engine/device→původní device.lost/RenderHealth/UI recovery řetězec a varianty. Primární MDN GPUDevice.destroy ověřen rootem21.10: zničí právě device a jeho resources; původní webgpu-validation.ts sleduje jeho lost Promise. Syntetický health report není actual device loss; OS/global GPU crash je nepřiměřený a nepoužije se.",
+    "Přidat výslovný default-off build flag --lifecycle-controls do kanonické identity, sidecar/browser/receipt contractu a helper source seal. Flag z query nesmí aktivovat; plain výkonový build zůstává bez instalace lifecycle zásahů. Žádná produkční Game/UI/factory/validation změna ani nové runtime vlastnosti projektu.",
+    "Při explicitním uživatelském kliknutí v diagnostickém QA UI zavolat původní destroy jen přesně vlastního aktuálního ready/valid WebGPU zařízení. Ověřit immutable Game/Scene/engine/device/generation/owner a neprobíhající startup lease/pending ops, odchod/abort/rejoin/error zakáže starý callback; přesný původní receiver/return/throw zachovat. Nejvýše jednou pro dané zařízení, žádný global/per-frame hook/polling či synthetichealth success.",
+    "Přidat běžný viditelný anchor about:blank target=_blank rel=noopener pro vlastní visibility test, pouze v explicitním diagnostic režimu. Skutečné otevření z user gesture může aktivovat novou kartu a skrýt Game; netvrdit předem že vždy skryje. Žádná mutace document.hidden, synthetic visibilitychange/focus event, page-eval/hidden browser driver nebo globální správa cizích karet. Root ověří původní browser-state hidden→visible a zavře jen svůj blank.",
+    "UI přesně popíše vlastní dočasnou testovací hru a očekávanou nutnost renderer obnovit. Původní device.lost/error/Room cleanup/recovery se nepřepisuje a actual user flow se neprohlašuje za hotový z CPU fixture. Žádná data se neposílají mimo vlastní loopback QA receipt; žádný credential.",
+    "Refaktor ownership/action cleanup do úzkého helperu, bounded scalar receipt/state může použít stávající contract nebo výslovně otestované nové kind. Nepřidávat unbounded log/actual GPU handles/raw buffers; metadata flag tamper/absence musí být odmítnuté. Weak/lifecycle úklid nesmí udržovat starý Game a staré disposed zařízení.",
+    "Předat kód+refaktor+celý dosavadní119CPU helper baseline a smysluplné nové owner/default-off/action/cleanup/metadata/DOM regrese+syntax/UI parse společně. Žádný child build/install/server/GPU/full project suite/commit/rekurzivní BMAD. Root běží fullsuite source6 a bude používat výhradně frozen helperv6, dokud tento nový helper nezávisle nepřijme."
+  ],
+  "verification": [
+    "Default-off nic nečte/nemění; canonical seal odliší flagfalse/true a odmítne chybějící/tampered metadata. Tests běžných clock/shader/routine/buffer identities a receipts zachované.",
+    "Owned original destroy přesný receiver/call count a original falsy throw, unsupported WebGL/missingdevice/invalidhealth/pending/startup lease/changedgeneration/device/rejoin/aborted/disposed callbacks bez zásahu do cizího zařízení. Cleanup idempotentní, DOM anchor správný safe href/target/rel.",
+    "Lightweight CPU7původních testfiles+newlifecycle test a syntax všech helper source, UI exact marker transform/TSX parse; před/po runtime/config/asset/native SHA chráněné a jasný handoff/final source map. Actual visibility/device lost/recovery GPU teprve root."
+  ],
+  "notes": [
+    "Explicitní implementační leaf rootKEY22, autorizovaný user požadavkem praktické přejímky celého renderer lifecycle. Žádné další broad refaktory či nové schvalovací kroky. Bmad root workflow je již aktivní, leaf nerekurzuje.",
+    "Aktuální accepted helpera5b3dc00 má119CPU, frozen executable copy .cache/webgpu-completion-20261021/validation/helper-runtimes/v6. Neměnit tuto kopii, hrané buildy/snapshoty, source6 ani rootvalidation outputs. Nový helper bude samostatnýfreshseal/build, nikoliv přepsaná testovaná verze.",
+    "Root skutečné minimized/restore dříve nemělo původní hidden visibilitychange, CUA-created blank byl inactive. Normal anchor user gesture je nová testovatelná varianta, nikoli již doložený výsledek. Native APIs/OSfokus nejsou potřeba. Root browser own tab2070823608 je nyní about:blank a GPU volné pro fullsuite; nevstupovat do browseru.",
+    "Primární zdroj https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/destroy; vlastní pinned client/webgpu-validation.ts device.lost path. Při skutečném destroy se nemění GPUdriver/power/security nastavení a cizí programy se neukončují."
+  ]
+}
