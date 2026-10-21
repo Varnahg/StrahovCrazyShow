@@ -1,0 +1,16 @@
+{
+  "recordedAt": "2026-10-21T00:53:41.593Z",
+  "command": [
+    "node",
+    "--test",
+    "docs/performance/evidence/transit-calendar-20261020/measurement/materialize-raw.test.mjs"
+  ],
+  "exitCode": 0,
+  "sourceStable": true,
+  "sources": {
+    "materialize-raw.mjs": "6f18ed730b46c1f085ff8cf4c13f03bbd1b4ef2cd4c6cb962a264c8c67712258",
+    "materialize-raw.test.mjs": "6e26151ff42c70a1e4639effba50177b9272e2bd624cc3823925c5d36880954f"
+  },
+  "stdout": "▶ Raw extraction survives interrupted staging/publication and preserves unrelated existing files\n  ✔ A complete linked publish recovers; abandoned partial staging does not block retry (1410.5136ms)\n  ✔ Repeated extraction does not rewrite verified outputs (1071.2042ms)\n  ✔ A foreign alias or differing final file is preserved (1009.2538ms)\n✔ Raw extraction survives interrupted staging/publication and preserves unrelated existing files (3552.7341ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 3677.4815\n",
+  "stderr": ""
+}

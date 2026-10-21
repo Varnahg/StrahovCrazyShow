@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "external-acceptance",
+  "decision": "pass",
+  "runId": "key-53-776f5f92725b",
+  "assignmentDigest": "fc3a3d39808724c84cb79db7c2f944a91dc5704a7a6756e4ed6efbda34aa7a89",
+  "baseSha": "c3454da45b22ad9726c257d3d481d45f6243ec04",
+  "commitSha": "3ac77c7abf8fca43e6380f382aba306502ab86d6",
+  "sourceDigest": "f51f5aecb8cd78f31835b16f336ec3f5f6257a6a6db78291246fc0d075cce085",
+  "authority": {
+    "owner": "perftransit-01a155b2-coordinator",
+    "task": "perf-transit-runtime-coordination-20261020",
+    "taskSha256": "4d07cad180d7a9cb8cccd7cf2808224e66fe1c31442d01c10a8e8ef65d69ce15"
+  },
+  "issuedAt": "2026-10-21T00:08:35.495Z",
+  "summary": "Coordinator accepts the bounded removal of measured redundant NPC pool work, not an FPS gain. Complete A1/B1/A2/B2/A3/B3:36 intervals,0 failed attempts,8 parity/health/inventory flags true, same3 real sessions/12NPC, WebGL2 Intel UHD630 (Windows driver31.0.101.2140),1280x720 CSS/backbuffer,DPR1.25,medium; six screenshots independently checked. Baseline prune work22.927–35.424 microseconds/update across3 starts (pooled29.655); candidate0calls, amortized0, call mean undefined. These are profiled CPU wall durations including instrumentation, not a guaranteed net frame saving. Full update pooled0.696801→0.647914ms, but paired changes -0.123599/+0.018192/-0.041615ms do not support a robust universal7% gain. Plain FPS26.530877→26.269343; pooledp9547.6→49.1ms,p9965.3→65.3ms. No FPS/hitch improvement or causal regression claim.27 targeted lifecycle tests,12 new,3 independent reviews and1864 PR-CI tests/build/integration passed. Raw outliers and all inputs retained; clocks/temperatures/browser build were not captured. Parent KEY-5 stays open.",
+  "evidence": [
+    {
+      "id": "baseline",
+      "path": "docs/performance/evidence/transit-calendar-20261020/measurement/baseline.json",
+      "sha256": "a6d022a2d49e28b8b81147e2fd0f9d6e983151e239b985eeea9064b3bc9e92e3"
+    },
+    {
+      "id": "candidate",
+      "path": "docs/performance/evidence/transit-calendar-20261020/measurement/candidate.json",
+      "sha256": "7ac1977d5ccfc645d4cedef2fd921c8a598b8fbdbfd58801351e0cfe666c4943"
+    },
+    {
+      "id": "comparison",
+      "path": "docs/performance/evidence/transit-calendar-20261020/measurement/comparison.json",
+      "sha256": "173b5a997620418798be60393b8c5ed52b1ff249f766bb0ab803dee991faf23a"
+    }
+  ]
+}

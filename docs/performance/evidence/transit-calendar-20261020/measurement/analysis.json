@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "method": "All raw intervals retained. CPU wall times are inclusive, update contains nested prune; do not add them. Pooled frame quantiles use sorted[min(n-1,floor(n*p))]. Three independent starts per variant; intervals within a start are not independent trials.",
+  "evidence": {
+    "baseline": "a6d022a2d49e28b8b81147e2fd0f9d6e983151e239b985eeea9064b3bc9e92e3",
+    "candidate": "7ac1977d5ccfc645d4cedef2fd921c8a598b8fbdbfd58801351e0cfe666c4943",
+    "comparison": "173b5a997620418798be60393b8c5ed52b1ff249f766bb0ab803dee991faf23a"
+  },
+  "checks": {
+    "sourceParity": true,
+    "sameHarness": true,
+    "completeCampaignInventory": true,
+    "exactPerModeInterleaving": true,
+    "identicalRecordedConditions": true,
+    "identicalTransitSemantics": true,
+    "comparableCameraAndPopulation": true,
+    "allHealth": true
+  },
+  "baseline": {
+    "profileIntervals": 9,
+    "plainIntervals": 9,
+    "updates": 2438,
+    "prunes": 2438,
+    "updateMs": {
+      "count": 2438,
+      "sum": 1698.7999995946884,
+      "mean": 0.6968006561093882,
+      "median": 0.6000000238418579,
+      "p95": 1.199999988079071,
+      "p99": 1.5
+    },
+    "pruneMsPerUpdate": 0.02965545492938936,
+    "plain": {
+      "frames": 2392,
+      "fps": 26.530877082873833,
+      "frameMs": {
+        "count": 2392,
+        "sum": 90159.09999990463,
+        "mean": 37.691931438087224,
+        "median": 36.19999998807907,
+        "p95": 47.60000002384186,
+        "p99": 65.30000001192093
+      }
+    },
+    "perStart": [
+      {
+        "slot": "A1",
+        "updateMeanMs": 0.7664206641626534,
+        "pruneMsPerUpdate": 0.03542435345174642,
+        "fps": 26.31710278974598,
+        "p95Ms": 49.59999996423721,
+        "p99Ms": 68.80000001192093
+      },
+      {
+        "slot": "A2",
+        "updateMeanMs": 0.6353658530043392,
+        "pruneMsPerUpdate": 0.02292682921014181,
+        "fps": 26.658866233696244,
+        "p95Ms": 46.5,
+        "p99Ms": 66.29999995231628
+      },
+      {
+        "slot": "A3",
+        "updateMeanMs": 0.6890683231886869,
+        "pruneMsPerUpdate": 0.030683229576726877,
+        "fps": 26.616653563808985,
+        "p95Ms": 47,
+        "p99Ms": 64.09999996423721
+      }
+    ]
+  },
+  "candidate": {
+    "profileIntervals": 9,
+    "plainIntervals": 9,
+    "updates": 2421,
+    "prunes": 0,
+    "updateMs": {
+      "count": 2421,
+      "sum": 1568.600001335144,
+      "mean": 0.6479140856402908,
+      "median": 0.5999999642372131,
+      "p95": 1.100000023841858,
+      "p99": 1.399999976158142
+    },
+    "pruneMsPerUpdate": 0,
+    "plain": {
+      "frames": 2371,
+      "fps": 26.26934331073151,
+      "frameMs": {
+        "count": 2371,
+        "sum": 90257.30000001192,
+        "mean": 38.067186841000385,
+        "median": 36.19999998807907,
+        "p95": 49.10000002384186,
+        "p99": 65.29999995231628
+      }
+    },
+    "perStart": [
+      {
+        "slot": "B1",
+        "updateMeanMs": 0.6428220860065859,
+        "pruneMsPerUpdate": 0,
+        "fps": 25.937576898275125,
+        "p95Ms": 49.799999952316284,
+        "p99Ms": 68
+      },
+      {
+        "slot": "B2",
+        "updateMeanMs": 0.6535580529553464,
+        "pruneMsPerUpdate": 0,
+        "fps": 26.15628713493645,
+        "p95Ms": 51.89999997615814,
+        "p99Ms": 67.19999998807907
+      },
+      {
+        "slot": "B3",
+        "updateMeanMs": 0.6474534171708622,
+        "pruneMsPerUpdate": 0,
+        "fps": 26.714573248831446,
+        "p95Ms": 46.90000003576279,
+        "p99Ms": 61.5
+      }
+    ]
+  },
+  "pairs": [
+    {
+      "baseline": {
+        "slot": "A1",
+        "updateMeanMs": 0.7664206641626534,
+        "pruneMsPerUpdate": 0.03542435345174642,
+        "fps": 26.31710278974598,
+        "p95Ms": 49.59999996423721,
+        "p99Ms": 68.80000001192093
+      },
+      "candidate": {
+        "slot": "B1",
+        "updateMeanMs": 0.6428220860065859,
+        "pruneMsPerUpdate": 0,
+        "fps": 25.937576898275125,
+        "p95Ms": 49.799999952316284,
+        "p99Ms": 68
+      },
+      "updateDifferenceMs": -0.12359857815606756,
+      "fpsDifference": -0.37952589147085547
+    },
+    {
+      "baseline": {
+        "slot": "A2",
+        "updateMeanMs": 0.6353658530043392,
+        "pruneMsPerUpdate": 0.02292682921014181,
+        "fps": 26.658866233696244,
+        "p95Ms": 46.5,
+        "p99Ms": 66.29999995231628
+      },
+      "candidate": {
+        "slot": "B2",
+        "updateMeanMs": 0.6535580529553464,
+        "pruneMsPerUpdate": 0,
+        "fps": 26.15628713493645,
+        "p95Ms": 51.89999997615814,
+        "p99Ms": 67.19999998807907
+      },
+      "updateDifferenceMs": 0.018192199951007182,
+      "fpsDifference": -0.5025790987597958
+    },
+    {
+      "baseline": {
+        "slot": "A3",
+        "updateMeanMs": 0.6890683231886869,
+        "pruneMsPerUpdate": 0.030683229576726877,
+        "fps": 26.616653563808985,
+        "p95Ms": 47,
+        "p99Ms": 64.09999996423721
+      },
+      "candidate": {
+        "slot": "B3",
+        "updateMeanMs": 0.6474534171708622,
+        "pruneMsPerUpdate": 0,
+        "fps": 26.714573248831446,
+        "p95Ms": 46.90000003576279,
+        "p99Ms": 61.5
+      },
+      "updateDifferenceMs": -0.04161490601782469,
+      "fpsDifference": 0.09791968502246107
+    }
+  ],
+  "observed": {
+    "updateMeanChangePercent": -7.015861716040472,
+    "removedProfiledPruneMsPerUpdate": 0.02965545492938936,
+    "plainFpsChangePercent": -0.9857713008332714
+  },
+  "interpretation": "No automatic acceptance or FPS gain claim. Coordinator must interpret variability, nested timer overhead, functional parity and the frozen task acceptance."
+}
