@@ -565,7 +565,7 @@ test("production startup awaits preparation before ready and records its outcome
   const start = declaration.members
     .find((node) => node.name?.getText(source) === "start")!
     .getText(source);
-  const prepare = start.search(/await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(preloadRender, pipelinePreparation\)/);
+  const prepare = start.search(/await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(\s*preloadRender,\s*pipelinePreparation,\s*lightPreparationLoop,?\s*\)/);
   assert.ok(prepare > start.indexOf("this.updatePlayers([this.localPlayer])"));
   assert.ok(
     prepare > start.indexOf("this.engine.stopRenderLoop(preloadRender)"),

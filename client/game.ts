@@ -19,6 +19,7 @@ import { GltfLightBudget } from "./gltf-light-budget";
 import { prepareLightVariants } from "./light-preparation";
 import { prepareRenderQualities } from "./render-quality-preparation";
 import { WebGpuPipelinePreparation } from "./webgpu-pipeline-preparation";
+import { StartupPreparationLoop } from "./startup-preparation-loop";
 import { arePreparationEffectsReady } from "./strict-material-preparation";
 import { selectLightingPreview } from "./lighting-preview";
 import {
@@ -979,14 +980,20 @@ export class Game {
           renderer.resetRefreshCounter();
       },
     });
+    let lightPreparationLoop: StartupPreparationLoop | undefined;
     try {
+      lightPreparationLoop = new StartupPreparationLoop(this.engine, this.renderHealth, {
+        signal: this.startupAbort.signal,
+      });
       this.canvas.dataset.bootStage = "light-preparation";
       if (this.frameLifecycleProfile)
         sessionDiagnostics.event("engine-frame-profile", {
           stage: "preparation-start", rendererId: this.renderHealth.rendererId,
           timing: this.frameLifecycleProfile.snapshot(),
         });
-      const preparation = await this.renderHealth.guard(this.prepareLighting(preloadRender, pipelinePreparation));
+      const preparation = await this.renderHealth.guard(this.prepareLighting(
+        preloadRender, pipelinePreparation, lightPreparationLoop,
+      ));
       this.assertStartupActive();
       sessionDiagnostics.event("lighting-preparation", preparation);
       sessionDiagnostics.event("webgpu-preparation-profile", this.compilationProfile.snapshot());
@@ -1000,6 +1007,10 @@ export class Game {
         this.renderHealth.report("pipeline", `Příprava světel: ${preparation.status}`);
         throw new Error(`Přípravu 3D scény se nepodařilo dokončit (${preparation.status}).`);
       }
+      // The light state machine settles synchronously in its last tick. Its
+      // actual submission must finish before the separate RAF gate owns frames.
+      await this.renderHealth.guard(lightPreparationLoop.waitForIdle());
+      this.assertStartupActive();
       this.canvas.dataset.bootStage = "submitted-frame";
       this.compilationProfile.setStage("submitted-frame");
       await waitForRenderStartup({
@@ -1017,8 +1028,12 @@ export class Game {
       });
       this.assertStartupActive();
     } finally {
-      pipelinePreparation.dispose();
-      pipelinePreparation = undefined;
+      try {
+        lightPreparationLoop?.dispose();
+      } finally {
+        pipelinePreparation.dispose();
+        pipelinePreparation = undefined;
+      }
     }
     this.canvas.dataset.renderHealth = "ready";
     this.compilationProfile.setStage("ready");
@@ -2361,8 +2376,12 @@ export class Game {
     }
     return lighting;
   }
-  private prepareLighting(render: () => void, pipelines?: Pick<WebGpuPipelinePreparation, "isReady">) {
-    if (!this.engine.isWebGPU) return this.prepareLightingVariants(render, pipelines);
+  private prepareLighting(
+    render: () => void,
+    pipelines?: Pick<WebGpuPipelinePreparation, "isReady">,
+    loop?: Pick<StartupPreparationLoop, "run" | "stop" | "render">,
+  ) {
+    if (!this.engine.isWebGPU) return this.prepareLightingVariants(render, pipelines, undefined, loop);
     const isDisposed = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
     const restoreQuality = () => {
       if (!this.preparingRenderQuality) return;
@@ -2400,6 +2419,7 @@ export class Game {
         render,
         pipelines,
         { timeoutMs, restoreQuality: finalPass ? restoreQuality : undefined },
+        loop,
       ),
       restore: restoreQuality,
       isDisposed,
@@ -2410,6 +2430,7 @@ export class Game {
     render: () => void,
     pipelines?: Pick<WebGpuPipelinePreparation, "isReady">,
     options?: { timeoutMs: number; restoreQuality?: () => void },
+    loop?: Pick<StartupPreparationLoop, "run" | "stop" | "render">,
   ) {
     const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
     // The same controller/materials survive into gameplay; no proxy shaders.
@@ -2599,9 +2620,9 @@ export class Game {
           arePreparationEffectsReady(this.engine)
         );
       },
-      render,
-      run: (callback) => this.engine.runRenderLoop(callback),
-      stop: (callback) => this.engine.stopRenderLoop(callback),
+      render: loop ? () => loop.render(render) : render,
+      run: (callback) => loop ? loop.run(callback) : this.engine.runRenderLoop(callback),
+      stop: (callback) => loop ? loop.stop(callback) : this.engine.stopRenderLoop(callback),
       onDispose: (callback) => {
         this.cancelLightPreparation = callback;
         const observer = this.scene.onDisposeObservable.add(callback);
