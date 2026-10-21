@@ -17,7 +17,9 @@ const writeNew = (file, value) => writeFile(file, JSON.stringify(value, null, 2)
 async function dependencyIdentity(snapshot) {
   const require = createRequire(join(snapshot, 'package.json'));
   const files = ['@babylonjs/core/package.json', '@babylonjs/core/Materials/materialDefines.js',
-    '@babylonjs/core/Materials/shadowDepthWrapper.js', '@babylonjs/core/Materials/Textures/texture.pure.js'];
+    '@babylonjs/core/Materials/shadowDepthWrapper.js', '@babylonjs/core/Materials/Textures/texture.pure.js',
+    '@babylonjs/core/Materials/drawWrapper.js', '@babylonjs/core/Materials/material.pure.js', '@babylonjs/core/Materials/effect.pure.js',
+    '@babylonjs/core/Materials/multiMaterial.pure.js'];
   const dependencies = {};
   for (const name of files) dependencies[name] = sha256(await readFile(require.resolve(name)));
   const appCore = require.resolve('@babylonjs/core/package.json');

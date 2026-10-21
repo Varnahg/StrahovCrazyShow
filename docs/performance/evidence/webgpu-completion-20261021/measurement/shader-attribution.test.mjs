@@ -2,6 +2,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Observable } from '@babylonjs/core/Misc/observable';
+import { ShadowDepthWrapper } from '@babylonjs/core/Materials/shadowDepthWrapper';
+import { MultiMaterial } from '@babylonjs/core/Materials/multiMaterial';
+import { NullEngine } from '@babylonjs/core/Engines/nullEngine';
+import { Scene } from '@babylonjs/core/scene';
 import { WebGpuCompilationProfile } from '../../../../../client/webgpu-compilation-profile.ts';
 import { observeShaderAttribution, projectShaderInventory, ATTRIBUTION_LIMITS } from './shader-attribution.mjs';
 import { parseBuildOptions, browserBuildIdentity, buildDigest } from './common.mjs';
@@ -64,7 +68,7 @@ test('actual profiler keeps original module/getInfo count and validated observe 
     observer.dispose();const snapshot=observer.snapshot();
     assert.equal(snapshot.evidenceValid,true);assert.equal(snapshot.active,false);
     assert.deepEqual(snapshot.jobs.map(row=>[row[1],row[2],snapshot.stages[row[3]],row[7]]),[[1,1,'submitted-frame',1],[2,2,'submitted-frame',1]]);
-    assert.deepEqual(snapshot.mapping.effects,[[1,1,1,2,0]]);
+    assert.deepEqual(snapshot.mapping.effects,[[1,1,1,2,0,-1]]);
     assert.equal(snapshot.mapping.meshes[0].regularInstances,1);assert.equal(snapshot.mapping.meshes[0].localHiddenInstances,1);
     assert.equal(snapshot.mapping.links[0].cachedVisibleBatchCount,null);assert.equal(snapshot.mapping.links[0].previouslyUsingInstances,1);
     assert.equal(snapshot.mapping.links[0].cachedHardwareInstancing,0);assert.equal(snapshot.mapping.links[0].passID,7);
@@ -113,6 +117,7 @@ test('bounded overflow retains original calls and produces scalar JSON with expl
     for(const operation of f.operations)operation.resolve({messages:[]});await flush();observer.dispose();
     const snapshot=observer.snapshot();assert.equal(f.counts().infoCalls,4);assert.equal(snapshot.jobs.length,2);assert.equal(snapshot.modules.length,2);
     assert.ok(snapshot.issues.overflow>0);assert.equal(snapshot.evidenceValid,false);assert.ok(Buffer.byteLength(JSON.stringify(snapshot))<10000);
+    assert.equal(snapshot.jobTraceComplete,false);assert.ok(snapshot.issues.traceOverflow>0);
     assert.equal(snapshot.mapping.links.length,1);
   }finally{observer.dispose();f.dispose();}
 });
@@ -212,4 +217,135 @@ test('single bounded terminal scan retains late pending modules before completed
     assert.equal(mapping.cacheEntries,3355);assert.equal(mapping.boundedScanComplete,false);assert.ok(snapshot.issues.overflow>0);
     assert.equal(f.counts().infoCalls,3);
   }finally{observer.dispose();f.dispose();}
+});
+
+/** Actual installed constructor, effect-created ownership, MapMap/_makeEffect,
+ * DrawWrapper construction/replacement/alias and disposal. Only engine IO is fake. */
+async function pinnedShadow(f) {
+  let creations=0,contexts=0;
+  f.engine.currentRenderPassId=0;
+  f.engine.createDrawContext=()=>{contexts++;return{reset(){},dispose(){}};};
+  f.engine.createMaterialContext=()=>({});
+  f.game.scene.getEngine=()=>f.engine;
+  const makeEffect=()=>{
+    creations++;
+    const vertex=f.device.createShaderModule({label:'vertex'}),fragment=f.device.createShaderModule({label:'fragment'});
+    const effect={_pipelineContext:{stages:{vertexStage:{module:vertex},fragmentStage:{module:fragment}}},_isReady:true,_isDisposed:false,isDisposed:false,
+      isReady:()=>true,dispose(){this._isDisposed=this.isDisposed=true;},shaderLanguage:1,defines:'',
+      vertexSourceCodeBeforeMigration:'@vertex fn main() {}',fragmentSourceCodeBeforeMigration:'@fragment fn main() {}',
+      getUniformNames:()=>[],getAttributesNames:()=>[],getUniformBuffersNames:()=>[],getSamplers:()=>[],getIndexParameters:()=>({})};
+    f.engine._compiledEffects[creations]=effect;return effect;
+  };
+  f.engine.createEffect=makeEffect;
+  const base=makeEffect();for(const operation of f.operations)operation.resolve({messages:[]});await flush();
+  const material={name:'car shadow material',onEffectCreatedObservable:new Observable()};
+  const mesh=world(f,base._pipelineContext.stages.vertexStage.module,base._pipelineContext.stages.fragmentStage.module).mesh;
+  mesh.name='vehicle caster';mesh.onDisposeObservable=new Observable();mesh._internalAbstractMeshDataInfo._material=material;
+  const sub=mesh.subMeshes[0];sub.getMesh=()=>mesh;sub._getDrawWrapper=()=>({defines:null});sub._drawWrappers=[];
+  const shadow=new ShadowDepthWrapper(material,f.game.scene,{doNotInjectCode:true});material.shadowDepthWrapper=shadow;
+  material.onEffectCreatedObservable.notifyObservers({effect:base,subMesh:sub});
+  const generator={};f.profile.setStage('submitted-frame');
+  const depth=shadow._makeEffect(sub,[],generator,0);
+  const alias=shadow.getEffect(sub,generator,7);
+  return{shadow,material,mesh,sub,generator,base,depth,alias,makeEffect,counts:()=>({creations,contexts})};
+}
+function pinnedMultiMaterials(child){
+  const engine=new NullEngine(),scene=new Scene(engine),main=new MultiMaterial('ground main',scene),pass=new MultiMaterial('car per pass',scene);
+  pass.subMaterials=[child];
+  assert.equal(Object.hasOwn(pass,'subMaterials'),false);assert.equal(Object.hasOwn(pass,'_subMaterials'),true);
+  for(const material of [main,pass])Object.defineProperty(material,'subMaterials',{configurable:true,get(){throw Error('public MultiMaterial getter');}});
+  return{main,pass,dispose(){for(const material of [main,pass]){delete material.subMaterials;material.subMaterials=[];}scene.dispose();engine.dispose();}};
+}
+test('actual pinned shadow ownership maps pending main/pass aliases beyond history without getEffect/readiness or new IO',async()=>{
+  const f=fixture(),observer=observeShaderAttribution(f.game,{enabled:true,now:f.now,limits:{meshes:2,links:3}});
+  let model,multi;
+  try{
+    model=await pinnedShadow(f);
+    const entry=model.shadow._subMeshToDepthWrapper.mm.get(model.sub).get(model.generator);
+    assert.equal(entry.mainDrawWrapper,entry.drawWrapper[0]);assert.notEqual(entry.mainDrawWrapper,entry.drawWrapper[7]);
+    assert.equal(entry.mainDrawWrapper.effect,model.depth);assert.equal(model.alias.effect,model.depth);
+    assert.equal(model.shadow._subMeshToEffect.get(model.sub)[0],model.base);
+    multi=pinnedMultiMaterials(model.material);
+    model.mesh._internalAbstractMeshDataInfo._material=multi.main;
+    model.mesh._internalAbstractMeshDataInfo._materialForRenderPass=Object.assign([],{7:multi.pass});
+    model.sub.materialIndex=0;
+    const baseWrapper={effect:model.base,_wasPreviouslyUsingInstances:true};
+    const history=Array.from({length:512},()=>({...model.mesh,name:'ground history',
+      _internalAbstractMeshDataInfo:{_material:{name:'ground history'}},subMeshes:[{_id:0,_drawWrappers:Object.assign([],{0:baseWrapper})}]}));
+    f.game.scene.meshes=[...history,model.mesh];
+    // Own overrides must never be used: only native Map reads/data slots are allowed.
+    model.shadow._subMeshToEffect.get=()=>{throw Error('map override');};
+    model.shadow._subMeshToDepthWrapper.mm.get=()=>{throw Error('map override');};
+    model.shadow.getEffect=model.shadow.isReadyForSubMesh=model.shadow._makeEffect=()=>{throw Error('mutating shadow API');};
+    model.sub.getMesh=model.sub._getDrawWrapper=model.mesh.isReady=()=>{throw Error('mutating mesh API');};
+    model.depth.isReady=()=>{throw Error('readiness API');};
+    const before=model.counts(),queries=f.counts().infoCalls;observer.dispose();const snapshot=observer.snapshot(),mapping=snapshot.mapping;
+    assert.deepEqual(model.counts(),before);assert.equal(f.counts().infoCalls,queries);
+    assert.equal(snapshot.jobTraceComplete,true);assert.equal(snapshot.evidenceValid,false);assert.ok(snapshot.issues.mappingOverflow>0);assert.equal(snapshot.issues.traceOverflow,0);
+    assert.equal(mapping.meshes[0].name,'vehicle caster');assert.equal(mapping.meshesScanned,513);
+    const shadowLinks=mapping.links.filter(link=>link.shadowWrapperID);
+    assert.deepEqual(shadowLinks.map(link=>link.sourceKind),['shadow-main','shadow-pass-alias']);
+    assert.deepEqual(shadowLinks.map(link=>link.aliasPassIDs),[[0],[7]]);
+    assert.equal(shadowLinks[0].generatorID,shadowLinks[1].generatorID);assert.equal(shadowLinks[0].effectID,shadowLinks[1].effectID);
+    assert.equal(shadowLinks[0].shadowOwnerMatches,1);assert.equal(mapping.effects[0][5],1,'pending validation may already have ready Effect data flag');
+    assert.deepEqual(mapping.pendingModuleCoverage,{observed:2,linked:2,unlinked:0});assert.equal(mapping.links.length,3);
+    assert.equal(mapping.legacySubMaterialSlots,0);assert.equal(mapping.unknownSlots,0);
+    assert.doesNotMatch(JSON.stringify(snapshot),/vertexSourceCodeBeforeMigration|depthDefines|"token"|@vertex/);
+  }finally{
+    // Restore test-only poison before actual class disposal.
+    if(model){delete model.shadow._subMeshToDepthWrapper.mm.get;delete model.shadow._subMeshToEffect.get;model.shadow.dispose();}
+    multi?.dispose();observer.dispose();f.dispose();
+  }
+});
+test('actual effect-created map exposes new hot-swap base before submesh adoption and native disposal removes shadow ownership',async()=>{
+  const f=fixture(),observer=observeShaderAttribution(f.game,{enabled:true,now:f.now});let model;
+  try{
+    model=await pinnedShadow(f);
+    const next=model.makeEffect();
+    model.material.onEffectCreatedObservable.notifyObservers({effect:next,subMesh:model.sub});
+    assert.equal(model.shadow._subMeshToEffect.get(model.sub)[0],next);
+    assert.equal(model.shadow._subMeshToDepthWrapper.mm.size,0);assert.equal(model.depth.isDisposed,true);
+    assert.equal(model.sub._drawWrappers.length,0);
+    observer.dispose();const snapshot=observer.snapshot(),links=snapshot.mapping.links;
+    assert.equal(snapshot.jobTraceComplete,true);assert.equal(links[0].sourceKind,'shadow-original-base');
+    assert.equal(links[0].generatorID,0);assert.equal(links[0].passID,0);
+    assert.equal(snapshot.mapping.effects[links[0].effectID-1][2],snapshot.jobs[4][1]);
+    const sealed=observer.snapshot();model.shadow.dispose();assert.equal(model.shadow._subMeshToEffect.size,0);
+    for(const operation of f.operations)operation.resolve({messages:[]});await flush();assert.deepEqual(observer.snapshot(),sealed);
+    const rejoin=observeShaderAttribution(f.game,{enabled:true,now:f.now});rejoin.dispose();
+    assert.equal(rejoin.snapshot().mapping.links.length,0);
+  }finally{model?.shadow.dispose();observer.dispose();f.dispose();}
+});
+test('native shadow map drift and existing scan caps stay explicit while valid original job trace remains separate',async()=>{
+  const f=fixture(),observer=observeShaderAttribution(f.game,{enabled:true,now:f.now,limits:{meshScan:1}});let model;
+  try{
+    model=await pinnedShadow(f);
+    model.shadow._subMeshToDepthWrapper.set(model.sub,{},model.shadow._subMeshToDepthWrapper.get(model.sub,model.generator));
+    observer.dispose();const snapshot=observer.snapshot();
+    assert.equal(snapshot.mapping.shadowEntriesScanned,1);assert.ok(snapshot.issues.mappingOverflow>0);
+    assert.equal(snapshot.jobTraceComplete,true);assert.equal(snapshot.mapping.boundedScanComplete,false);
+    const fresh=observeShaderAttribution(f.game,{enabled:true,now:f.now});
+    let foreignCalls=0;model.shadow._subMeshToEffect={get(){foreignCalls++;throw Error('foreign map');}};
+    fresh.dispose();const drift=fresh.snapshot();assert.equal(foreignCalls,0);assert.ok(drift.mapping.unknownSlots>0);
+    assert.equal(drift.jobTraceComplete,true);assert.equal(drift.mapping.boundedScanComplete,false);
+    model.shadow._subMeshToEffect=new Map();
+    const partial=observeShaderAttribution(f.game,{enabled:true,now:f.now});
+    f.device.createShaderModule({label:'vertex'});
+    f.game.scene.meshes=new Proxy([model.mesh],{getOwnPropertyDescriptor(){throw Error('mapping-only slot failure');}});
+    partial.dispose();const failedMap=partial.snapshot();
+    assert.equal(failedMap.issues.mappingErrors,1);assert.equal(failedMap.mapping,null);
+    assert.equal(failedMap.jobTraceComplete,true);assert.equal(failedMap.evidenceValid,false);assert.equal(failedMap.jobs.length,1);
+  }finally{model?.shadow.dispose();observer.dispose();f.dispose();}
+});
+test('actual MultiMaterial missing backing data stays explicitly unknown without public getter calls or false ownership',async()=>{
+  const f=fixture(),observer=observeShaderAttribution(f.game,{enabled:true,now:f.now});let model,multi;
+  try{
+    model=await pinnedShadow(f);multi=pinnedMultiMaterials(model.material);
+    model.mesh._internalAbstractMeshDataInfo._material=multi.pass;model.sub.materialIndex=0;
+    delete multi.pass._subMaterials;
+    observer.dispose();const snapshot=observer.snapshot();
+    assert.equal(snapshot.jobTraceComplete,true);assert.equal(snapshot.evidenceValid,false);
+    assert.ok(snapshot.mapping.unknownSlots>0);assert.equal(snapshot.mapping.shadowSubMeshLookups,0);
+    assert.deepEqual(snapshot.mapping.pendingModuleCoverage,{observed:2,linked:0,unlinked:2});
+  }finally{model?.shadow.dispose();multi?.dispose();observer.dispose();f.dispose();}
 });
