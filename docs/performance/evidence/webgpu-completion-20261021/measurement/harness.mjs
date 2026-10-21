@@ -127,13 +127,14 @@ export async function run(command, input, output, label, option = 'original', ..
       await readFile(join(snapshot, 'client/style.css'), 'utf8'), loading);
     const dependencies = await dependencyIdentity(snapshot);
     const browserIdentity = browserBuildIdentity({ label, sourceSnapshotId: source.snapshotId, helperSha256: helper.sha256,
-      loading, transforms, clock: clock ?? null, weather: weather?.specification ?? null, startupLatency: options.startupLatency, dependencies });
+      loading, transforms, clock: clock ?? null, weather: weather?.specification ?? null, startupLatency: options.startupLatency, shaderAttribution: options.shaderAttribution, dependencies });
     const directory = await freshDirectory(output);
     const overlay = resolveBuildOverlay(await readFile(join(helperDirectory, 'qa-overlay.mjs'), 'utf8'), { ...browserIdentity, transforms });
     const observer = await readFile(join(helperDirectory, 'startup-observer.mjs'), 'utf8');
     const attempts = await readFile(join(helperDirectory, 'attempt-queue.mjs'), 'utf8');
     const transitClock = await readFile(join(helperDirectory, 'transit-clock.mjs'), 'utf8');
     const startupLatency = await readFile(join(helperDirectory, 'startup-latency.mjs'), 'utf8');
+    const shaderAttribution = await readFile(join(helperDirectory, 'shader-attribution.mjs'), 'utf8');
     const browserClock = (await readFile(join(helperDirectory, 'browser-clock.mjs'), 'utf8'))
       .replace("'./transit-clock.mjs'", "'virtual:webgpu-completion-clock'");
     await writeFile(join(directory, 'transformed-ui.tsx'), transformedUI, { flag: 'wx' });
@@ -152,7 +153,7 @@ export async function run(command, input, output, label, option = 'original', ..
     if (!config) throw new Error('Original production configuration unavailable');
     const virtual = '\0virtual:webgpu-completion-qa', virtualObserver = '\0virtual:webgpu-completion-observer', virtualAttempts = '\0virtual:webgpu-completion-attempts';
     const virtualClock = '\0virtual:webgpu-completion-clock', virtualBrowserClock = '\0virtual:webgpu-completion-browser-clock';
-    const virtualLatency = '\0virtual:webgpu-completion-startup-latency';
+    const virtualLatency = '\0virtual:webgpu-completion-startup-latency', virtualAttribution = '\0virtual:webgpu-completion-shader-attribution';
     let uiHits = 0, cssHits = 0;
     await build(mergeConfig(config.config, {
       root: snapshot, configFile: false, cacheDir: join(directory, '.vite'),
@@ -166,6 +167,7 @@ export async function run(command, input, output, label, option = 'original', ..
           if (id === 'virtual:webgpu-completion-clock') return virtualClock;
           if (id === 'virtual:webgpu-completion-browser-clock') return virtualBrowserClock;
           if (id === 'virtual:webgpu-completion-startup-latency') return virtualLatency;
+          if (id === 'virtual:webgpu-completion-shader-attribution') return virtualAttribution;
           if (id === 'virtual:webgpu-completion-simulation') return join(snapshot, 'shared/simulation.ts').replaceAll('\\', '/');
         },
         load(id) {
@@ -175,6 +177,7 @@ export async function run(command, input, output, label, option = 'original', ..
           if (id === virtualClock) return transitClock;
           if (id === virtualBrowserClock) return browserClock;
           if (id === virtualLatency) return startupLatency;
+          if (id === virtualAttribution) return shaderAttribution;
         },
         transform(code, id) {
           const file = id.split('?')[0].replaceAll('\\', '/');
@@ -257,7 +260,7 @@ export async function run(command, input, output, label, option = 'original', ..
     process.once('SIGTERM', () => { void stop().catch(error => { console.error(error); process.exitCode = 1; }); });
     console.log(JSON.stringify({ origin, apiPort, directory, runDirectory, buildId: identity.buildId,
       instructions: 'Root owns resource claims, the explicit API port, browser/GPU and eventual shutdown. This process owns only its preview; Ctrl+C closes only its own server/sockets.' }));
-  } else throw new Error('Usage: build SNAPSHOT OUTPUT LABEL [original|translucent] [ABS_CLOCK_JSON] [--clock ABS_JSON] [--weather ABS_JSON] [--startup-latency] | inspect BUILD | serve BUILD RUN_OUTPUT [PORT] [API_PORT]');
+  } else throw new Error('Usage: build SNAPSHOT OUTPUT LABEL [original|translucent] [ABS_CLOCK_JSON] [--clock ABS_JSON] [--weather ABS_JSON] [--startup-latency] [--shader-attribution] | inspect BUILD | serve BUILD RUN_OUTPUT [PORT] [API_PORT]');
 }
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url)
   await run(...process.argv.slice(2));

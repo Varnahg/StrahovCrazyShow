@@ -201,6 +201,7 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
     source = source.replace("'virtual:webgpu-completion-browser-clock'", JSON.stringify(adapterURL));
     source = source.replace("'virtual:webgpu-completion-clock'", JSON.stringify(pathToFileURL(join(directory, 'transit-clock.mjs')).href));
     source = source.replace("'virtual:webgpu-completion-startup-latency'", JSON.stringify(pathToFileURL(join(directory, 'startup-latency.mjs')).href));
+    source = source.replace("'virtual:webgpu-completion-shader-attribution'", JSON.stringify(pathToFileURL(join(directory, 'shader-attribution.mjs')).href));
     source = source.replace('__WEBGPU_COMPLETION_IDENTITY__', JSON.stringify(browserIdentity));
     source += '\nexport { weatherSnapshot, benchmarkSnapshot };\n// Unique DOM fixture ' + crypto.randomUUID();
     const module = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
@@ -415,3 +416,23 @@ test('clock import deferred across dispose/rejoin cannot install a late Game own
     }, async bytes => ack(bytes), clockIdentity);
   }
 });
+
+test('shader attribution overlay stays diagnostic, restores original methods and retains scalar inventory before the original failure',()=>browserFixture(async context=>{
+  const game=context.makeGame(),device={};game.engine._isWebGPU=true;game.engine._device=device;game.engine._compiledEffects={};
+  const inventory={enabled:true,calls:2,stages:[{name:'submitted-frame',calls:2}],rawDuplicates:[],bodyDuplicates:[],unusedDefines:{names:['never export']}};
+  const profile={engine:game.engine,device,active:true,generation:1,metrics:{shaderValidation:{}},
+    setStage(){},observe(operation){return operation;},
+    inspectShader(module,label){return this.observe(Promise.resolve({messages:[]}), 'shaderValidation',this.metrics.shaderValidation,1,performance.now(),label);},
+    snapshot:()=>({active:true,metrics:{},shaderInventory:inventory})};
+  game.compilationProfile=profile;
+  const inspect=profile.inspectShader,observe=profile.observe,stage=profile.setStage,primary=new Error('same failed startup');
+  await assert.rejects(context.observeStartup(game,{dataset:{}},async()=>{
+    profile.setStage('submitted-frame');const operation=profile.inspectShader({},'vertex');assert.equal(operation instanceof Promise,true);
+    await operation;throw primary;
+  }),error=>error===primary);
+  await until(()=>context.posted.length===1);
+  const raw=context.posted[0];assert.equal(raw.mode,'diagnostic');assert.equal(raw.outcome,'rejected');
+  assert.equal(raw.shaderAttribution.active,false);assert.equal(raw.shaderAttribution.jobs[0][7],1);
+  assert.equal(raw.compilation.shaderInventory.calls,2);assert.doesNotMatch(JSON.stringify(raw.compilation.shaderInventory),/never export|unusedDefines/);
+  assert.equal(profile.inspectShader,inspect);assert.equal(profile.observe,observe);assert.equal(profile.setStage,stage);
+},async value=>ack(value),{...identity,shaderAttribution:true}));
