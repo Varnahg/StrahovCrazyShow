@@ -17,7 +17,7 @@ The434 additional shader preparation pairs/868 modules have no additional pipeli
 
 ## Pinned primary mechanism and CPU reproduction
 
-Installed Babylon9.30.0 sources are authoritative: Meshes/mesh.pure.js1042–1131, Lights/Shadows/shadowGenerator.pure.js `_renderSubMeshForShadowMap`, and Scene's actual `_evaluateActiveMeshes`. `Mesh.isReady(true)` chooses hardware instancing from existing regular instances or thin instances. Actual shadow draw instead uses the current visible-instance batch or thin instances.
+Installed Babylon9.30.0 sources are authoritative: Meshes/mesh.pure.js1042–1131, Lights/Shadows/shadowGenerator.js `_renderSubMeshForShadowMap`, and Scene's actual `_evaluateActiveMeshes`. `Mesh.isReady(true)` chooses hardware instancing from existing regular instances or thin instances. Actual shadow draw instead uses the current visible-instance batch or thin instances.
 
 An inline NullEngine reproduction used actual Scene culling, Mesh.isReady and ShadowGenerator._renderSubMeshForShadowMap. Only terminal material/shadow readiness methods were replaced to capture their arguments and veto GPU drawing. The source box had one regular instance:
 
