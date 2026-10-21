@@ -1,5 +1,21 @@
 # Explicitní QA měření skutečné hry pro KEY-22
 
+## Volitelný actual routine CPU diagnostic
+
+Nový build-only příznak `--routine-cost` je výchozí `false`, povinně součást canonical build/load/browser identity i helper/dependency SHA. Staré buildy se novým helperem nepřejmenovávají: root uchoval všech19 původních helperc951 souborů ve správné5-level struktuře `validation/helper-runtimes/v4/`. Nová verze vždy potřebuje nový immutable build. Příklad příkazu pro koordinátora, nikoli zde provedený build:
+
+```powershell
+node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABSOLUTE_SNAPSHOT ABSOLUTE_NEW_BUILD routine-cost original --weather ABSOLUTE_WEATHER --routine-cost
+```
+
+Clock/ostatní flagy si zachovávají předchozí explicitní argumenty. Celý tento build a jeho10s benchmark jsou označené diagnostic; vybraných8 rutin se ale obalí **pouze** stiskem `Diagnostic ·8 skutečných framů /8 CPU rutin` po startup ACK. Akce nevolá Game.startBenchmark ani render/readiness/GPU metodu. Pozoruje následujících nejvýše8 původních skutečných `Game.scene.render` volání a native `_frameId` progress, poté automaticky obnoví své vlastněné deskriptory a uloží samostatný immutable `routine-cost` receipt se `routineProfile`. Failure/refusal/abort/rejoin/30s deadline se také uchová a nikdy nevydává za platné FPS.
+
+Přesných8 targetů: actual scene.getActiveMeshCandidates, Scene._activeMesh, TransformNode.computeWorldMatrix, Mesh.getLOD, PBRBaseMaterial/StandardMaterial.isReadyForSubMesh a bindForSubMesh. Receiver filter propustí rovnou cizí scény do originálu, bez clock/counter práce. Jediný další wrapper je actualScene render boundary; neinstaluje se žádný observer na jednotlivé meshe. Defaultoff neinstaluje wrapper ani phase observer. Cap8frames/8routines/stack32/100000selectedCallsPerFrame/128phaseEntersPerFrame/64ObjectRenderers; overflow, missing phase end, původní render throw, chybějící frame progress a foreign restoration conflict jsou explicit incomplete evidence.
+
+Public active/main/ObjectRenderer init-finish boundaries rozlišují `active/main/rtt/other`; zachová se vnoření. Každá routine×phase row obsahuje původní calls, falseReturns, throws, inclusiveMs a selfSelectedMs. SelfSelected odečte pouze vybrané děti; není univerzální self CPU. Scope časy se mohou překrývat a nesmějí se sčítat jako celý frame. Profil obsahuje režii wrapperů/clock/observerů a není FPS A/B ani GPU execution. Nevybraný frustum/reset/sort/engine/custom-material path zůstává residual. Shader inventory cap32MiB ani runtime cache/LOD/material stav se nemění.
+
+Výzkum/varianty, původní donor rawSHA, pinned pozice a oficiální primární odkazy: `../routine-cost/README.md`. Cíleně spustit původních5 test souborů **plus** `routine-cost.test.mjs` pomocí `node --import tsx --test --test-reporter=tap …`. Node strip-only bez loaderu nepodporuje existující Simulation parameter properties; tento chybný počáteční příkaz je zachovaný v důkazním logu. Testy na NullEngine a skutečném Scene/Mesh/PBR/Standard/ObjectRenderer ověřují CPU kontrakt, nikoli výkon ani obraz.
+
 Tento malý build/serve helper navazuje na přijatý `transit-calendar-20261020/measurement` Vite postup. Nemění zdrojový snapshot, produkční renderer, readiness, timeout, světla ani stíny. Nemá browser automatizaci, CDP nebo API server. Konkrétní build/GPU výsledky sem nepatří, dokud je koordinátor skutečně neprovede.
 
 ## Rozhodnutí a hranice

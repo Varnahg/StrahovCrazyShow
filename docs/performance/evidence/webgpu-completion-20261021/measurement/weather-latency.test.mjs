@@ -35,11 +35,11 @@ function deviceFixture() {
 
 test('explicit build flags preserve positional clock and reject duplicate/ambiguous input; default observer off', () => {
   const clock = resolve(directory, 'clock.json'), weather = resolve(directory, 'weather.json');
-  assert.deepEqual(parseBuildOptions([]), { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false });
+  assert.deepEqual(parseBuildOptions([]), { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false });
   assert.deepEqual(parseBuildOptions(['original', clock, '--weather', weather, '--startup-latency']),
-    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: true, shaderAttribution: false });
+    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: true, shaderAttribution: false, routineCost: false });
   assert.deepEqual(parseBuildOptions(['--weather', weather, '--clock', clock]),
-    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: false, shaderAttribution: false });
+    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: false, shaderAttribution: false, routineCost: false });
   for (const args of [['--weather'], ['--weather', '--startup-latency'], ['--startup-latency', '--startup-latency'],
     ['original', clock, '--clock', clock], ['--clock', clock, '--clock', clock], ['--weather', weather, '--weather', weather],
     ['original', 'relative.json'], ['--unknown'], ['original', 'translucent'], ['--weather=x']]) assert.throws(() => parseBuildOptions(args));
@@ -213,7 +213,7 @@ function sealedFixture(patch = {}) {
   const clock = { config, configId: sha256(JSON.stringify(config)), configSha256: sha256(clockBytes), simulationSourceSha256: source.files['shared/simulation.ts'] };
   const transforms = { ui: { before: sha256('UI original'), after: sha256('UI transformed') }, loading: { variant: 'original', before: sha256('CSS'), after: sha256('CSS') } };
   const settings = { sourceSnapshotId: source.snapshotId, helperSha256: helper.sha256, label: 'seal-fixture', loading: 'original',
-    transforms, clock, weather, startupLatency: true, shaderAttribution: true, dependencies: { 'selected.js': sha256('dependency') }, ...patch };
+    transforms, clock, weather, startupLatency: true, shaderAttribution: true, routineCost: false, dependencies: { 'selected.js': sha256('dependency') }, ...patch };
   const template = 'export const identity = __WEBGPU_COMPLETION_IDENTITY__;\n';
   const overlayBytes = Buffer.from(resolveBuildOverlay(template, settings));
   const input = { ...browserBuildIdentity(settings), transforms: settings.transforms, snapshot: '/explicit/cpu/snapshot', sourceFiles: 1,
@@ -233,12 +233,12 @@ test('canonical digest covers every required build input, explicit null/off and 
   const reordered = Object.fromEntries(Object.entries(original).reverse());
   reordered.transforms = { loading: { ...original.transforms.loading }, ui: { after: original.transforms.ui.after, before: original.transforms.ui.before } };
   assert.equal(buildDigest(reordered), original.buildId);
-  for (const key of ['sourceSnapshotId', 'helperSha256', 'label', 'loading', 'transforms', 'clock', 'weather', 'startupLatency', 'shaderAttribution', 'dependencies']) {
+  for (const key of ['sourceSnapshotId', 'helperSha256', 'label', 'loading', 'transforms', 'clock', 'weather', 'startupLatency', 'shaderAttribution', 'routineCost', 'dependencies']) {
     const missing = structuredClone(original); delete missing[key]; assert.throws(() => buildDigest(missing), /Missing/);
   }
   for (const changed of [{ sourceSnapshotId: sha256('other source') }, { helperSha256: sha256('other helper') }, { label: 'other-label' },
     { loading: 'translucent' }, { transforms: { ...original.transforms, ui: { before: sha256('different') } } },
-    { clock: null }, { weather: null }, { startupLatency: false }, { shaderAttribution: false }, { dependencies: { 'selected.js': sha256('other dependency') } }])
+    { clock: null }, { weather: null }, { startupLatency: false }, { shaderAttribution: false }, { routineCost: true }, { dependencies: { 'selected.js': sha256('other dependency') } }])
     assert.notEqual(buildDigest({ ...original, ...changed }), original.buildId);
   const plain = sealedFixture({ clock: null, weather: null, startupLatency: false, shaderAttribution: false });
   assert.doesNotThrow(() => verifyBuildSeal(plain.identity, plain.input, plain.proof));

@@ -4,13 +4,14 @@ import { installBrowserClock } from 'virtual:webgpu-completion-browser-clock';
 import { createPlannedBenchmark } from 'virtual:webgpu-completion-clock';
 import { observeStartupLatency } from 'virtual:webgpu-completion-startup-latency';
 import { observeShaderAttribution, projectShaderInventory } from 'virtual:webgpu-completion-shader-attribution';
+import { captureRoutineCost } from 'virtual:webgpu-completion-routine-cost';
 
 const identity = __WEBGPU_COMPLETION_IDENTITY__;
 const finite = value => typeof value === 'number' && Number.isFinite(value) ? value : null;
 const xyz = value => value ? { x: finite(value.x), y: finite(value.y), z: finite(value.z) } : null;
 const errorText = error => ({ name: String(error?.name ?? 'Error').slice(0, 80), message: String(error?.message ?? error).slice(0, 2000) });
 const pick = (value, keys) => Object.fromEntries(keys.filter(key => value?.[key] !== undefined).map(key => [key, value[key]]));
-const mode = identity.shaderAttribution === true || identity.startupLatency === true || identity.loading === 'translucent' || new URLSearchParams(location.search).get('profileEnvironment') === '1' ? 'diagnostic' : 'plain';
+const mode = identity.routineCost === true || identity.shaderAttribution === true || identity.startupLatency === true || identity.loading === 'translucent' || new URLSearchParams(location.search).get('profileEnvironment') === '1' ? 'diagnostic' : 'plain';
 let previousOwner;
 let sharedTransfers;
 const weatherKeys = ['temperature', 'cloud', 'rain', 'wind', 'windDirection', 'observedAt', 'fetchedAt', 'stale', 'cloudStale',
@@ -126,6 +127,7 @@ export async function observeStartup(game, canvas, start) {
   if (identity.weather) disclosure.textContent += ' Počasí: řízený uložený QA záznam, viditelně označený jako fallback.';
   if (identity.shaderAttribution) disclosure.textContent += ' Diagnostic: bounded původní shader jobs a pasivní terminal instance/effect mapping; žádné nové GPU volání.';
   if (identity.startupLatency) disclosure.textContent += ' Diagnostic: pozorované původní popErrorScope/onSubmittedWorkDone pouze při startu; latency není GPU čas.';
+  if (identity.routineCost) disclosure.textContent += ' Diagnostic: volitelných8 actual render framů /8 původních CPU rutin. Zahrnuje režii observeru; není FPS A/B ani GPU čas.';
   const status = document.createElement('pre'); status.id = 'webgpu-completion-status';
   status.style.cssText = 'white-space:pre-wrap;max-height:160px;overflow:auto';
   const output = document.createElement('pre'); output.id = 'webgpu-completion-export'; output.hidden = true;
@@ -133,7 +135,7 @@ export async function observeStartup(game, canvas, start) {
   download.style.cssText = 'display:block;color:#b8e5ff'; download.hidden = true;
   controls.append(disclosure, status, download); panel.append(title, controls, output); document.body.append(panel);
   let gameRef = game, startupTimer, sampleOverflow = false, busy = false, disposed = false, downloadURL, interruptBenchmark;
-  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, attributionOwner, planned;
+  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, attributionOwner, routineOwner, planned;
   const clockAbort = new AbortController();
   const samples = [], observerErrors = [], buttons = [];
   const ownerId = crypto.randomUUID();
@@ -286,6 +288,27 @@ export async function observeStartup(game, canvas, start) {
     await persist(raw);
   }
   action('Změřit 10 s · standardní hra + raw RAF', measure);
+  if (identity.routineCost) action('Diagnostic ·8 skutečných framů /8 CPU rutin', async () => {
+    controls.open = false;
+    const raw = { ...envelope('routine-cost'), completed: false, before: snapshot(), after: null, routineProfile: null, validationErrors: [],
+      scope: 'Selected original synchronous calls in at most8 actual Game scene.render frames. No added render/readiness/GPU calls. Instrumented CPU diagnostic, never FPS A/B.' };
+    let deadline;
+    try {
+      if (gameRef.benchmark) throw new Error('Existing Game benchmark must finish before routine diagnostic');
+      routineOwner = captureRoutineCost(gameRef, { enabled: identity.routineCost, signal: clockAbort.signal,
+        isRetired: () => disposed || !gameRef || gameRef.disposed === true });
+      deadline = setTimeout(() => routineOwner?.dispose('observer-deadline'), 30000);
+      raw.routineProfile = await routineOwner.done;
+      raw.completed = raw.routineProfile.complete;
+      if (!raw.completed) raw.validationErrors.push('Routine diagnostic incomplete: ' + raw.routineProfile.reason);
+    } catch (error) { raw.failure = errorText(error); raw.validationErrors.push(raw.failure.message); }
+    finally {
+      clearTimeout(deadline); routineOwner?.dispose();
+      raw.routineProfile ??= routineOwner?.snapshot() ?? null; routineOwner = undefined;
+      raw.after = snapshot(); raw.observerErrors = [...observerErrors];
+    }
+    await persist(raw);
+  });
   if (identity.clock?.config.benchmarkAtUTC !== undefined) action('Naplánovat jediný 10s benchmark UTC', async () => {
     const armedBefore = snapshot(), config = identity.clock.config;
     const invalid = plan => persist({ ...envelope('benchmark'), completed: false, plannedStart: plan,
@@ -320,7 +343,7 @@ export async function observeStartup(game, canvas, start) {
     if (!clockAbort.signal.aborted) {
       const abort = new Error('Clock QA owner stopped'); abort.name = 'AbortError'; clockAbort.abort(abort);
     }
-    clockOwner?.dispose(); latencyOwner?.dispose(); attributionOwner?.dispose();
+    clockOwner?.dispose(); latencyOwner?.dispose(); attributionOwner?.dispose(); routineOwner?.dispose('owner-stopped');
     unsubscribeTransfers(); buttons.forEach(button => button.disabled = true); gameRef = undefined;
   };
   const observer = game.scene.onDisposeObservable.addOnce(stop);

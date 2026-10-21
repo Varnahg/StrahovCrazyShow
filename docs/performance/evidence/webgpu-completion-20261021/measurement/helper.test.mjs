@@ -202,6 +202,7 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
     source = source.replace("'virtual:webgpu-completion-clock'", JSON.stringify(pathToFileURL(join(directory, 'transit-clock.mjs')).href));
     source = source.replace("'virtual:webgpu-completion-startup-latency'", JSON.stringify(pathToFileURL(join(directory, 'startup-latency.mjs')).href));
     source = source.replace("'virtual:webgpu-completion-shader-attribution'", JSON.stringify(pathToFileURL(join(directory, 'shader-attribution.mjs')).href));
+    source = source.replace("'virtual:webgpu-completion-routine-cost'", JSON.stringify(pathToFileURL(join(directory, 'routine-cost.mjs')).href));
     source = source.replace('__WEBGPU_COMPLETION_IDENTITY__', JSON.stringify(browserIdentity));
     source += '\nexport { weatherSnapshot, benchmarkSnapshot };\n// Unique DOM fixture ' + crypto.randomUUID();
     const module = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
@@ -253,6 +254,44 @@ test('actual overlay failure produces terminal export before teardown using a DO
     assert.equal(context.posted[0].observerErrors.length, 0);
     assert.equal(context.posted[0].mode, 'plain'); assert.equal(context.posted[0].startupLatency, null);
 }));
+
+test('routine diagnostic defaultoff has no action; explicit flag is visible and retains rejected actual-scene attempt', async () => {
+  await browserFixture(async context => {
+    const game = context.makeGame(); await context.observeStartup(game, { dataset: {} }, async () => { game.ready = true; });
+    assert.equal(context.all().some(value => value.textContent.startsWith('Diagnostic ·8 skutečných')), false);
+  });
+  await browserFixture(async context => {
+    const game = context.makeGame(); await context.observeStartup(game, { dataset: {} }, async () => { game.ready = true; });
+    await until(() => context.measureButton().disabled === false);
+    const button = context.all().find(value => value.textContent.startsWith('Diagnostic ·8 skutečných'));
+    assert.ok(button); await button.onclick();
+    await until(() => context.posted.some(value => value.kind === 'routine-cost'));
+    const raw = context.posted.find(value => value.kind === 'routine-cost');
+    assert.equal(raw.mode, 'diagnostic'); assert.equal(raw.routineCost, true); assert.equal(raw.completed, false);
+    assert.match(raw.failure.message, /actual Game scene/); assert.equal(raw.routineProfile, null);
+    assert.equal(raw.validationErrors.length, 1);
+  }, async value => ack(value), { ...identity, routineCost: true });
+});
+
+test('explicit routine UI action exports actual native scene8-frame diagnostic through immutable receipt queue', () => browserFixture(async context => {
+  const { NullEngine } = await import('@babylonjs/core/Engines/nullEngine.js');
+  const { Scene } = await import('@babylonjs/core/scene.js');
+  const { FreeCamera } = await import('@babylonjs/core/Cameras/freeCamera.js');
+  const { Vector3 } = await import('@babylonjs/core/Maths/math.vector.js');
+  const engine = new NullEngine(), scene = new Scene(engine); new FreeCamera('CPU-only actual UI capture', new Vector3(0, 0, -8), scene);
+  try {
+    const game = context.makeGame(); game.scene = scene; game.engine = engine;
+    await context.observeStartup(game, { dataset: {} }, async () => { game.ready = true; });
+    await until(() => context.measureButton().disabled === false);
+    const button = context.all().find(value => value.textContent.startsWith('Diagnostic ·8 skutečných'));
+    const attempt = button.onclick(); for (let i = 0; i < 8; i++) scene.render(); await attempt;
+    await until(() => context.posted.some(value => value.kind === 'routine-cost'));
+    const raw = context.posted.find(value => value.kind === 'routine-cost');
+    assert.equal(raw.mode, 'diagnostic'); assert.equal(raw.completed, true); assert.equal(raw.routineProfile.frames.length, 8);
+    assert.equal(raw.routineProfile.remainingRoutineHooks, 0); assert.equal(Object.hasOwn(scene, 'render'), false);
+    assert.deepEqual(raw.validationErrors, []); assert.ok(raw.before.ready && raw.after.ready);
+  } finally { scene.dispose(); engine.dispose(); }
+}, async value => ack(value), { ...identity, routineCost: true }));
 test('diagnostic overlay observes original startup calls and restores before failure receipt without replacing primary error', () => browserFixture(async context => {
   const game = context.makeGame(), primary = new Error('same startup failure');
   const pending = Promise.withResolvers(), scope = () => pending.promise, fence = () => Promise.resolve();
