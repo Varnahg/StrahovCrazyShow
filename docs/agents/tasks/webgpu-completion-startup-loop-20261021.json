@@ -8,9 +8,9 @@
   "resources": [],
   "acceptance": [
     "Existující OnDemandRender znovupoužít bez změny. MessageChannel host vlastní nejvýše jeden queued task, podporuje cancel/hidden/resume a uzavírá oba porty.",
-    "API StartupPreparationLoop(engine, health, options?), run(callback:()=>boolean), stop(callback), render(work), dispose. Synchronous verdict vzniká po celém light tick včetně restore/cleanup. CPU-only tick nevytváří frame.",
+    "API StartupPreparationLoop(engine, health, options?), run(callback:()=>boolean), stop(callback), render(work), waitForIdle():Promise<void>, dispose. Synchronous verdict vzniká po celém light tick včetně restore/cleanup. CPU-only tick nevytváří frame.",
     "Lazy beginFrame při skutečném draw; endFrame pouze po kladném verdictu, zdravé stejné generaci a bez abortu. Žádný submit po source/render/restore/cleanup/timeout/disposal chybě. Aktivní frame nikdy nepřesahuje await.",
-    "Po skutečném submitu scope validation a queue fence s health ownership; nejvýše jeden GPUflight, pending promise se spotřebuje i po retirement. stop v callbacku dovolí zdravé dokončení téhož frame; následný run nemůže obejít pending fence.",
+    "Po skutečném submitu scope validation a queue fence s health ownership; nejvýše jeden GPUflight, pending promise se spotřebuje i po retirement. stop v callbacku dovolí zdravé dokončení téhož frame; následný run ani waitForIdle před finálním gate nemohou obejít pending fence.",
     "Žádná změna variant, cache, pipeline ABI, watchdogů nebo gameplay/editor RAF. Relevantní lehké testy včetně swallowedfalse, throws, stop/run při fence, abort, hidden, loss a late work."
   ],
   "verification": ["pnpm --config.verify-deps-before-run=false exec tsx --test tests/startup-preparation-loop.test.ts tests/on-demand-render.test.ts", "Žádný build/server/GPU/fullsuite; root přejímá skutečnou hru."],
