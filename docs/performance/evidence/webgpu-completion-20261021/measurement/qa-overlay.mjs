@@ -1,0 +1,289 @@
+import { observeOperation } from 'virtual:webgpu-completion-observer';
+import { createAttemptQueue } from 'virtual:webgpu-completion-attempts';
+
+const identity = __WEBGPU_COMPLETION_IDENTITY__;
+const finite = value => typeof value === 'number' && Number.isFinite(value) ? value : null;
+const xyz = value => value ? { x: finite(value.x), y: finite(value.y), z: finite(value.z) } : null;
+const errorText = error => ({ name: String(error?.name ?? 'Error').slice(0, 80), message: String(error?.message ?? error).slice(0, 2000) });
+const pick = (value, keys) => Object.fromEntries(keys.filter(key => value?.[key] !== undefined).map(key => [key, value[key]]));
+const mode = identity.loading === 'translucent' || new URLSearchParams(location.search).get('profileEnvironment') === '1' ? 'diagnostic' : 'plain';
+let previousOwner;
+let sharedTransfers;
+const weatherKeys = ['temperature', 'cloud', 'rain', 'wind', 'windDirection', 'observedAt', 'fetchedAt', 'stale', 'cloudStale',
+  'status', 'sourceKind', 'source', 'cloudSource', 'cloudObservedAt', 'cloudWindSource', 'cloudLayers', 'cloudWinds',
+  'humidity', 'snowfall', 'precipitationType', 'windGust', 'visibility', 'liquidPrecipitation', 'fieldSources'];
+const weatherSnapshot = weather => weather ? structuredClone(pick(weather, weatherKeys)) : null;
+
+/** This owner survives Game/rejoin teardown. Only immutable transfer bytes and
+ * their download elements are retained; no game or device enters the queue. */
+function transferQueue() {
+  if (sharedTransfers) return sharedTransfers;
+  const host = document.createElement('details'); host.id = 'webgpu-completion-pending'; host.open = true;
+  host.style.cssText = 'position:fixed;bottom:6px;right:6px;z-index:100001;max-width:480px;max-height:260px;overflow:auto;background:#302015;color:white;padding:6px';
+  const summary = document.createElement('summary'); summary.textContent = 'Neodeslané raw důkazy'; host.append(summary);
+  const rows = new Map(); host.hidden = true; document.body.append(host);
+  let queue;
+  queue = createAttemptQueue({
+    async digest(bytes) {
+      return [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(bytes)))].map(n => n.toString(16).padStart(2, '0')).join('');
+    },
+    async send(bytes) {
+      const response = await fetch('/__webgpu-completion/receipt', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: bytes });
+      const receipt = await response.json();
+      if (!response.ok) throw new Error(receipt.error ?? 'Receipt HTTP ' + response.status);
+      return receipt;
+    },
+    onChange(entry) {
+      let row = rows.get(entry.attemptId);
+      if (entry.state === 'acknowledged') {
+        if (row) { URL.revokeObjectURL(row.url); row.element.remove(); rows.delete(entry.attemptId); }
+      } else {
+        if (!row) {
+          const element = document.createElement('div'), link = document.createElement('a'), retry = document.createElement('button'), state = document.createElement('span');
+          const url = URL.createObjectURL(new Blob([entry.bytes], { type: 'application/json' }));
+          link.href = url; link.download = entry.attemptId + '.json'; link.textContent = entry.kind + ' ' + entry.attemptId;
+          link.style.color = '#b8e5ff'; retry.textContent = 'Retry receipt';
+          retry.onclick = () => { void queue.retry(entry.attemptId); };
+          element.append(link, state, retry); host.append(element);
+          row = { element, url, state, retry }; rows.set(entry.attemptId, row);
+        }
+        row.state.textContent = ' · ' + entry.state + (entry.error ? ' · ' + entry.error : '');
+        row.retry.disabled = entry.state === 'pending';
+      }
+      host.hidden = rows.size === 0;
+      summary.textContent = 'Neodeslané raw důkazy: ' + rows.size;
+    },
+  });
+  sharedTransfers = queue;
+  return queue;
+}
+
+function compilationFields(value) {
+  return pick(value, ['active', 'backend', 'generation', 'attachedAfterDeviceCreation', 'timingScope', 'metrics', 'hooks',
+    'observerErrors', 'bundleCountersLastFrame', 'sharedCacheCounters']);
+}
+const compilationSnapshot = game => compilationFields(game.compilationProfile.snapshot());
+function sceneSnapshot(game, canvas) {
+  const avatars = [...game.avatars.values()].slice(0, 128).map(value => ({
+    id: value.target.id, local: value.target.id === game.localId,
+    avatar: pick(value.target.avatar, ['preset', 'skin', 'hair', 'shirt', 'trousers', 'glasses', 'beard', 'face']),
+    position: { x: finite(value.target.x), y: finite(value.target.y), z: finite(value.target.z) }, lod: value.lod.level,
+  })).sort((a, b) => String(a.id).localeCompare(String(b.id)));
+  return {
+    atMs: performance.now(), utc: new Date().toISOString(), visibility: document.visibilityState, focused: document.hasFocus(),
+    ready: game.ready, disposed: game.disposed, preparingRenderQuality: game.preparingRenderQuality,
+    stages: pick(canvas.dataset, ['bootStage', 'lightPreparation', 'physicsStage', 'b6Stage', 'carStage', 'renderHealth']),
+    backend: game.engine.isWebGPU ? 'webgpu' : 'webgl2', compatibilityMode: game.engine.isWebGPU ? game.engine.compatibilityMode : null,
+    quality: game.quality, requestedRendering: pick(game.adaptive.state, ['mode', 'quality', 'hardwareScaling', 'targetFps', 'revision']),
+    viewport: { width: innerWidth, height: innerHeight, dpr: devicePixelRatio },
+    backbuffer: { width: game.engine.getRenderWidth(), height: game.engine.getRenderHeight(), scaling: game.engine.getHardwareScalingLevel() },
+    gpu: pick(game.gpu, ['backend', 'compatibilityMode', 'gpuTimingScope', 'renderer', 'vendor', 'version', 'classification', 'context']),
+    health: game.renderHealth.snapshot(), renderErrors: game.renderErrorCount, assetErrors: game.assetLoadErrorCount,
+    network: game.network, avatarCount: game.avatars.size, avatars, avatarsOmitted: Math.max(0, game.avatars.size - avatars.length),
+    actor: xyz(game.actor?.position), vehicle: game.actor?.vehicle ?? null, yaw: game.yaw, pitch: game.pitch, distance: game.distance,
+    camera: { position: xyz(game.camera.globalPosition), fov: game.camera.fov,
+      view: Array.from(game.camera.getViewMatrix().m), projection: Array.from(game.camera.getProjectionMatrix().m) },
+    lightingInstant: game.timeOverride, trafficInstant: game.trafficInstant(), flashlight: game.flashlightOn,
+    weather: weatherSnapshot(game.weather),
+    scene: { meshes: game.scene.meshes.length, materials: game.scene.materials.length, geometries: game.scene.geometries.length,
+      activeMeshes: game.scene.getActiveMeshes().length, waitingItems: game.scene.getWaitingItemsCount() },
+    ambient: game.transit?.counts ?? null,
+  };
+}
+function benchmarkSnapshot(value) {
+  return { ...pick(value, ['date', 'sourceSnapshotId', 'durationSeconds', 'frames', 'averageFps', 'p95FrameMs', 'p99FrameMs',
+    'renderErrorCount', 'assetLoadErrorCount', 'renderHealth', 'avatars', 'viewport', 'renderResolution', 'quality',
+    'triangles', 'triangleCountScope', 'drawCalls', 'avatarLod', 'grassClumps', 'sceneView', 'frameBreakdownMs', 'engineCpuBreakdownMs',
+    'engineCpuBreakdownScope', 'frameWork']),
+    compilation: { start: compilationFields(value.compilation?.start), end: compilationFields(value.compilation?.end) },
+    weatherAtStart: weatherSnapshot(value.weatherAtStart), weatherAtEnd: weatherSnapshot(value.weatherAtEnd) };
+}
+
+/** Called from the explicit, exact build-only UI transform. Never exposes Game
+ * through window and never calls an additional render or readiness method. */
+export async function observeStartup(game, canvas, start) {
+  if (!['127.0.0.1', 'localhost', '[::1]', '::1'].includes(location.hostname))
+    throw new Error('Explicit QA build is loopback only');
+  previousOwner?.();
+  const transfers = transferQueue();
+  const panel = document.createElement('section');
+  panel.id = 'webgpu-completion-qa';
+  panel.style.cssText = 'position:fixed;right:6px;top:6px;z-index:100000;background:#101820ed;color:white;padding:8px;font:12px monospace;max-width:480px';
+  const title = document.createElement('div');
+  title.textContent = 'KEY-22 LOCAL QA · ' + identity.label + ' · ' + mode;
+  const controls = document.createElement('details'); controls.open = true;
+  const summary = document.createElement('summary'); summary.textContent = 'Měření skutečné hry'; controls.append(summary);
+  const disclosure = document.createElement('p');
+  disclosure.textContent = 'Plná hra a HUD. Čas osvětlení nemění reálný čas dopravy. Plain používá standardní Game benchmark a lehký RAF pozorovatel; bez dalších profilovacích wrapperů.';
+  const status = document.createElement('pre'); status.id = 'webgpu-completion-status';
+  status.style.cssText = 'white-space:pre-wrap;max-height:160px;overflow:auto';
+  const output = document.createElement('pre'); output.id = 'webgpu-completion-export'; output.hidden = true;
+  const download = document.createElement('a'); download.textContent = 'Stáhnout poslední raw důkaz';
+  download.style.cssText = 'display:block;color:#b8e5ff'; download.hidden = true;
+  controls.append(disclosure, status, download); panel.append(title, controls, output); document.body.append(panel);
+  let gameRef = game, startupTimer, sampleOverflow = false, busy = false, disposed = false, downloadURL, interruptBenchmark;
+  let startupResolved = false;
+  const samples = [], observerErrors = [], buttons = [];
+  const ownerId = crypto.randomUUID();
+  let sequence = 0;
+  const noteError = error => { if (observerErrors.length < 16) observerErrors.push(errorText(error)); };
+  const tell = value => { status.textContent = JSON.stringify(value, null, 1); };
+  const snapshot = () => {
+    try { return sceneSnapshot(gameRef, canvas); }
+    catch (error) { noteError(error); return { atMs: performance.now(), unavailable: true, error: errorText(error) }; }
+  };
+  const envelope = kind => ({ schemaVersion: 1, ...identity, attemptId: crypto.randomUUID(), ownerId, kind, mode,
+    atMs: performance.now(), timeOrigin: performance.timeOrigin, capturedAtUTC: new Date().toISOString(),
+    userAgent: navigator.userAgent, observerErrors: [...observerErrors] });
+  const keep = raw => {
+    // Each attempt has an independent immutable export; never silently trim one.
+    output.textContent = JSON.stringify(raw);
+    if (downloadURL) URL.revokeObjectURL(downloadURL);
+    downloadURL = URL.createObjectURL(new Blob([output.textContent], { type: 'application/json' }));
+    download.href = downloadURL; download.download = raw.attemptId + '.json'; download.hidden = false;
+    return output.textContent;
+  };
+  async function persist(raw) {
+    keep(raw);
+    const result = await transfers.enqueue(raw);
+    if (result.acknowledged) {
+      tell({ phase: raw.kind + '-saved', outcome: raw.outcome, attemptId: raw.attemptId, receipt: result.receipt,
+        basicSampleGatesPassed: raw.kind === 'benchmark' ? raw.completed && raw.validationErrors.length === 0 : false });
+    } else {
+      tell({ phase: raw.kind + '-transport-failed', attemptId: raw.attemptId, error: result.error, downloadBackup: true });
+    }
+  }
+  const updateButtons = () => buttons.forEach(button => button.disabled = busy || disposed || !startupResolved || !gameRef?.ready || transfers.pendingCount > 0);
+  const unsubscribeTransfers = transfers.subscribe(updateButtons);
+  const sampleStartup = () => {
+    if (samples.length >= 180) { sampleOverflow = true; clearInterval(startupTimer); return; }
+    const value = { seq: sequence++, ...snapshot() }; samples.push(value);
+    tell({ phase: 'startup', ...value });
+  };
+  function action(label, run) {
+    const button = document.createElement('button'); button.textContent = label;
+    button.disabled = true; button.style.cssText = 'margin:3px;padding:4px';
+    button.onclick = async () => {
+      if (busy || disposed || !gameRef?.ready) return;
+      if (transfers.pendingCount > 0 || !startupResolved) {
+        tell({ phase: 'receipt-pending', reason: 'Retained startup/attempt bytes must receive an exact ACK before another QA action.' });
+        return;
+      }
+      busy = true; buttons.forEach(value => value.disabled = true);
+      try { await run(); } catch (error) { tell({ phase: 'control-failed', error: errorText(error) }); }
+      finally { busy = false; updateButtons(); }
+    };
+    buttons.push(button); controls.append(button);
+  }
+  async function measure() {
+    if (gameRef.benchmark) throw new Error('An existing Game benchmark is active');
+    controls.open = false;
+    const owner = gameRef, before = snapshot(), original = owner.onBenchmark;
+    const raw = { ...envelope('benchmark'), completed: false, before, after: null, benchmark: null,
+      rawGameFrameMs: [], rawRafFrameMs: [], rafOverflow: false, hidden: false, focusLost: false, validationErrors: [],
+      scope: 'Standard Game.startBenchmark 10s; its intrinsic BenchmarkRenderProfile remains active. Extra RAF observer records delivery cadence, not GPU execution. No periodic snapshots or diagnostic dumps inside interval.' };
+    const rafValues = new Float64Array(20000);
+    let frames, ownedBenchmark, raf, timeout, previous, count = 0, settled = false, wrapper;
+    const visibility = () => { if (document.visibilityState !== 'visible') raw.hidden = true; };
+    const blur = () => { raw.focusLost = true; };
+    const tick = at => {
+      if (previous !== undefined) {
+        if (count < rafValues.length) rafValues[count++] = Math.max(0, at - previous);
+        else raw.rafOverflow = true;
+      }
+      previous = at; raf = requestAnimationFrame(tick);
+    };
+    try {
+      document.addEventListener('visibilitychange', visibility); window.addEventListener('blur', blur);
+      const result = await new Promise((resolve, reject) => {
+        const finish = value => { if (settled) return; settled = true; resolve(value); };
+        interruptBenchmark = () => { if (!settled) { settled = true; reject(new Error('Game disposed during benchmark')); } };
+        wrapper = value => { try { return original?.(value); } finally { finish(value); } };
+        owner.onBenchmark = wrapper;
+        timeout = setTimeout(() => { if (!settled) { settled = true; reject(new Error('Standard Game benchmark exceeded 30s observer deadline')); } }, 30000);
+        let accepted;
+        try { accepted = owner.startBenchmark(); }
+        finally {
+          // This call began with no benchmark. Capture its actual object even
+          // when startBenchmark throws after allocation, never undefined.
+          if (owner.benchmark && Array.isArray(owner.benchmark.frames)) {
+            ownedBenchmark = owner.benchmark; frames = ownedBenchmark.frames;
+          }
+        }
+        if (!accepted) return reject(new Error('Game refused benchmark'));
+        if (!ownedBenchmark || !Array.isArray(ownedBenchmark.frames)) throw new Error('Game returned no owned benchmark');
+        raf = requestAnimationFrame(tick);
+      });
+      raw.benchmark = benchmarkSnapshot(result); raw.completed = true;
+    } catch (error) { raw.failure = errorText(error); raw.validationErrors.push(raw.failure.message); }
+    finally {
+      cancelAnimationFrame(raf); clearTimeout(timeout); interruptBenchmark = undefined;
+      document.removeEventListener('visibilitychange', visibility); window.removeEventListener('blur', blur);
+      if (owner.onBenchmark === wrapper) owner.onBenchmark = original;
+      raw.rawGameFrameMs = frames ? [...frames] : []; raw.rawRafFrameMs = Array.from(rafValues.subarray(0, count));
+      raw.after = snapshot(); raw.finishedAtMs = performance.now();
+      if (!raw.completed && ownedBenchmark && owner.benchmark === ownedBenchmark) {
+        try { ownedBenchmark.profile.dispose(); }
+        catch (error) { raw.cleanupError = errorText(error); raw.validationErrors.push('Owned benchmark cleanup failed: ' + raw.cleanupError.message); }
+        finally { if (owner.benchmark === ownedBenchmark) owner.benchmark = undefined; }
+      }
+    }
+    for (const [label, state] of [['before', raw.before], ['after', raw.after]]) {
+      if (!state.ready || state.disposed || !state.health?.valid || state.assetErrors || state.renderErrors ||
+          state.health.pendingOperations || state.unavailable) raw.validationErrors.push(label + ': unready or invalid health');
+      if (state.visibility !== 'visible' || !state.focused) raw.validationErrors.push(label + ': not visible/focused');
+    }
+    if (raw.hidden || raw.focusLost || raw.rafOverflow) raw.validationErrors.push('Visibility/focus/RAF buffer changed');
+    for (const key of ['backend', 'compatibilityMode', 'quality'])
+      if (before[key] !== raw.after[key]) raw.validationErrors.push(key + ' changed');
+    if (JSON.stringify(before.backbuffer) !== JSON.stringify(raw.after.backbuffer) ||
+        JSON.stringify(before.viewport) !== JSON.stringify(raw.after.viewport)) raw.validationErrors.push('Resolution changed');
+    if (before.health?.generation !== raw.after.health?.generation || before.health?.rendererId !== raw.after.health?.rendererId)
+      raw.validationErrors.push('Renderer generation changed');
+    if (raw.benchmark?.renderHealth?.valid !== true || raw.benchmark?.frames !== raw.rawGameFrameMs.length ||
+        raw.rawGameFrameMs.length < 10 || raw.rawRafFrameMs.length < 10) raw.validationErrors.push('Incomplete standard/raw benchmark');
+    if (raw.benchmark?.sourceSnapshotId !== identity.sourceSnapshotId) raw.validationErrors.push('Benchmark source identity differs');
+    const cohort = state => (state.avatars ?? []).map(value => ({ id: value.id, avatar: value.avatar }));
+    if (before.avatarCount !== raw.after.avatarCount || before.avatarsOmitted || raw.after.avatarsOmitted ||
+        JSON.stringify(cohort(before)) !== JSON.stringify(cohort(raw.after))) raw.validationErrors.push('Avatar cohort/config changed or omitted');
+    // Conditions during movement and actual transit workload are not inferred
+    // from endpoints. Keep both actual identities for an offline campaign gate.
+    raw.observerErrors = [...observerErrors];
+    await persist(raw);
+  }
+  action('Změřit 10 s · standardní hra + raw RAF', measure);
+  action('Uložit stav', () => persist({ ...envelope('state'), state: snapshot(), compilation: compilationSnapshot(gameRef) }));
+  for (const quality of ['low', 'medium', 'high', 'auto']) action('Kvalita ' + quality, () => { gameRef.setQuality(quality); tell(snapshot()); });
+  action('Cíl 60 FPS', () => { gameRef.setTargetFps(60); tell(snapshot()); });
+  action('Svítilna', () => { gameRef.toggleFlashlight(); tell(snapshot()); });
+  const instant = document.createElement('input'); instant.type = 'text'; instant.value = '2026-10-20T22:00:00.000Z';
+  instant.setAttribute('aria-label', 'QA UTC okamžik osvětlení'); controls.append(instant);
+  action('Použít UTC osvětlení', () => {
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(instant.value) || !Number.isFinite(Date.parse(instant.value)))
+      throw new Error('Expected ISO UTC ending Z');
+    gameRef.timeOverride = Date.parse(instant.value); tell(snapshot());
+  });
+  action('Skutečný čas osvětlení', () => { gameRef.timeOverride = null; tell(snapshot()); });
+  const revoke = () => { if (downloadURL) URL.revokeObjectURL(downloadURL); downloadURL = undefined; };
+  const stop = () => {
+    clearInterval(startupTimer); interruptBenchmark?.(); disposed = true;
+    unsubscribeTransfers(); buttons.forEach(button => button.disabled = true); gameRef = undefined;
+  };
+  const observer = game.scene.onDisposeObservable.addOnce(stop);
+  const teardown = () => { stop(); unsubscribeTransfers(); observer.remove(true); revoke(); panel.remove(); window.removeEventListener('pagehide', revoke); };
+  previousOwner = teardown; window.addEventListener('pagehide', revoke);
+  return observeOperation(start, {
+    onBegin: () => { sampleStartup(); startupTimer = setInterval(sampleStartup, 1000); },
+    onObserverError: noteError,
+    onTerminal: (outcome, error) => {
+      clearInterval(startupTimer);
+      const terminal = snapshot();
+      const raw = { ...envelope('startup'), outcome, error: error ? errorText(error) : null,
+        samples, sampleOverflow, terminal, compilation: compilationSnapshot(game),
+        scope: '1Hz technical startup observer only; stopped before gameplay measurement. Existing production compilation/health hooks unchanged.' };
+      startupResolved = outcome === 'resolved';
+      void persist(raw);
+      updateButtons();
+    },
+  });
+}
