@@ -14,6 +14,20 @@ Každý výsledek platí jen pro zaznamenané source ID a podmínky ověření. 
 
 Funkční přejímka není FPS benchmark ani důkaz zrychlení. Úplná fotografická věrnost, všechny povolené interiéry a denní i davová přejímka 60 FPS na GeForce GTX 1060 zůstávají otevřené. Uživatelské diagnostiky zůstávají místní.
 
+## Původní 3D modely a animace z textu · KEY-58 · 21. října 2026
+
+[Dokončený výzkum](../_bmad-output/planning-artifacts/research/technical-text-to-3d-animation-workflows-2026-10-21/research.md) porovnává tvorbu hezkých originálních/neexistujících objektů a postav, Meshy/Tripo/Rodin, skutečné Text to Motion API, Blender/Python/LLM, rigy různých anatomií, přenositelnost, licence, soukromí a cenu. Rozlišuje doložené API od skutečně změřené kvality. Cloudové estetické srovnání neproběhlo a univerzální vítěz se netvrdí.
+
+Prakticky prošel vlastní kinetický objekt: editovatelný `.blend`, aditivní textová revize, animovaný GLB a nový import. [Pilot a původní chyby](../_bmad-output/planning-artifacts/research/technical-text-to-3d-animation-workflows-2026-10-21/pilot/README.md): Blender 5.2.2 LTS, jeden čtyřsekundový klip, 63 porovnání póz sedmi uzlů, max. chyba matice 4,17×10⁻⁷. Revize zachovala původní geometrické streamy i Actions. Nejde o herní budget, přijatou náhradu současného avatar rigu nebo FPS důkaz. Vlastní Blender procesy skončily.
+
+## Pokračující výkonová analýza · 21. října 2026
+
+[Úplná nová interpretace a priority](performance/evidence/continuation-20261021/results.md) a [report producenta](performance/evidence/transit-calendar-20261020/measurement/RESULTS.md) zachovávají všech šest startů / 36 intervalů, zdrojové a harness identity, plné raw archivy a šest původních herních snímků. Tři skuteční klienti/různé avatary/HUD, 12 simulovaných NPC, Intel UHD 630/WebGL2/medium, CSS i interní 1280×720, pevné syntetické QA počasí. Všech osm gates prošlo a nezávislé přepočty/reprodukce souhlasí; čtecí review bez zbývajících nálezů.
+
+KEY-53 odstranil redundantní malý prune scope při stejné kohortě, **FPS gain se neprokázal**. Pooled plain A/B 26,5309/26,2693 FPS, p95 47,6/49,1 ms, p99 65,3/65,3 ms; žádné outliery vyřazeny. Kvantované wrapper wall časy nejsou čistá cena instrukcí. Současný render wall přibližně 22,4–22,9 ms a active-mesh scope kolem 6 ms určují prioritu další CPU/GPU atribuce. Endpoint GPU/draw čítače nejsou intervalové distribuce; browser build/UA a takty/teploty během intervalů chybí. Stacionární Intel scénář nedokládá odstranění všech jízdních záseků, 60 FPS ani GeForce přejímku. KEY-5 a původní KEY-21 zůstávají otevřené.
+
+Runtime PR22 je přijatý main e9bc2f54289e9f444f91f4c82b9e3abe3c9c16d3 s [verify39519577977](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39519577977) a [hygiene39519577922](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39519577922) SUCCESS. Dokončená evidence producenta d274e013 se přebírá s ověřenými 39 Git-blob SHA, beze změny jeho obsahu; oba nálezy obnovovacího helperu/testu jsou uzavřené, skutečný clean-replica FS test 4/4 PASS. Závěrečné společné zveřejnění těchto podkladů, aktuální přesný head/base, required checks, project-acceptance a následné main CI dokládá [PR21](https://github.com/Varnahg/StrahovCrazyShow/pull/21). Runtime vůči e9bc se v něm nemění.
+
 ## Herní zpětná vazba · KEY-52 · 20./21. října 2026
 
 **Přijato do main:** PR19 → c3454da45b22ad9726c257d3d481d45f6243ec04. Finální PR i skutečné main CI mají 1852/1852 PASS, nula fail/skip, produkční build a plnou izolovanou integraci PASS; secret hygiene zelená. [Main joby](verification-evidence/feedback-20261020/ci-main-39509508150.json), [log](verification-evidence/feedback-20261020/ci-main-39509508150.log), [doklad přijetí](https://github.com/Varnahg/StrahovCrazyShow/pull/19#issuecomment-6303340329). KEY-52 je Done. Deset autorských LFS pointerů v místní kopii omezuje její úplnou source/asset identitu pro následné A/B; runtime GLB/textury byly skutečně načtené. [Přímá kontrola a přesné meze](verification-evidence/feedback-20261020/README.md#omezení-autorských-zdrojů-pro-následné-výkonové-srovnání).

@@ -61,3 +61,7 @@ KEY-53 řadič dokončil 27/27 cílených kontrol a tři review; skutečný [PR2
 Finální PR verify39513321459 bylo nezávisle přečtené: 1864/1864 PASS, 0 fail/skip, produkční build i izolovaná integrace PASS. Zdrojový diff baseline→candidate mění jen plánování pool sweepu na membership dirty flag a přidává test; dokumentační řadičové artefakty nejsou vykreslovací změna. Controller skončil očekávaným EXTERNAL_ACCEPTANCE_PENDING. Koordinátor potvrdil úspěšný candidate-runtime-1792538661071 build a zahájení šesti startů; zámek nebo chybějící starý controller PID nebyly vydávány za důkaz selhání a nic nebylo restartované.
 
 [Nezávislý plán interpretace](analysis-plan.md) byl zapsaný před převzetím finálních raw. Zachovává úplnou kampaň, oddělení CPU/Plain, přesný kvantilový index, párové rozdíly, vnořené scopes a rozlišení časovače. Snímky ani outliery nebudou dodatečně vybírané podle toho, zda vycházejí lépe.
+
+## Převzetí finální evidence
+
+Dokončený commit producenta d274e013a65518bf94b8e4e765866d9bc02d0197 byl po výslovném předání a release rezervací připojen bez konfliktu. Všech [39 cest a jejich SHA](accepted-key53-evidence-handoff.json) zůstává zachovaných; runtime vůči přijatému e9bc2f54 nemá diff. [Přejímka obnovovacích nástrojů](publication-review.json) uzavřela dva konkrétní nálezy a dokládá 4/4 skutečné FS testy v čisté replice. Aktuální finální integraci a CI dokládá [PR21](https://github.com/Varnahg/StrahovCrazyShow/pull/21).

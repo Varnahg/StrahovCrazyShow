@@ -1,0 +1,22 @@
+{
+  "reviewer": "/root/performance_result_verification and root portability closure",
+  "mode": "read-only source review plus actual producer filesystem receipts",
+  "findings": [],
+  "closedFindings": [
+    "Direct partial final raw write: fixed stage/fsync/exclusive link and bounded restart alias cleanup",
+    "Test depended on unversioned baseline.json: fixed gzip fixture and passed in clean source/archive-only replica"
+  ],
+  "helperSha256": "6f18ed730b46c1f085ff8cf4c13f03bbd1b4ef2cd4c6cb962a264c8c67712258",
+  "testSha256": "4152071aa1e73ce15e2a0d07751e837160d1ffd7fcbb3110ce7fdd6a8f2d7b43",
+  "actualReceipt": "../transit-calendar-20261020/measurement/archive-validation-final.json",
+  "actualResult": {
+    "exitCode": 0,
+    "pass": 4,
+    "fail": 0,
+    "sourceStable": true,
+    "derivedRawAbsentBefore": true
+  },
+  "acceptedCommit": "d274e013a65518bf94b8e4e765866d9bc02d0197",
+  "preservedFiles": 39,
+  "limits": "No repeated root filesystem/GPU experiment; actual producer receipt and stable source bytes independently read."
+}
