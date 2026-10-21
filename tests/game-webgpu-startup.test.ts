@@ -4,6 +4,7 @@ import { Script } from "node:vm";
 import ts from "typescript";
 import { readGameSource } from "./helpers/game-source";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Observable } from "@babylonjs/core/Misc/observable";
 import { RenderHealth } from "../client/render-health";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
 import { StartupPreparationLoop, type StartupPreparationHost } from "../client/startup-preparation-loop";
@@ -125,6 +126,7 @@ function fixture(
     holdAssets?: boolean;
     faultAfterGate?: boolean;
     native?: boolean;
+    queryReadErrorMonitoring?: boolean;
     holdPreparationFence?: boolean;
     holdPreparationValidation?: boolean;
     exerciseGate?: boolean;
@@ -181,6 +183,8 @@ function fixture(
     queue: { onSubmittedWorkDone() { fences++; return preparationFence.promise; } },
   });
   Object.assign(engine, { _isWebGPU: options.native ?? false, _device: device });
+  if (options.native && options.queryReadErrorMonitoring !== false)
+    Object.assign(engine, { onQueryReadErrorObservable: new Observable() });
   const interior = deferred<any>(),
     vegetation = deferred<any>(),
     car = deferred<any>();
@@ -402,6 +406,29 @@ function fixture(
     stats: () => ({ disposedAssets, gateCalls, simulations, failures }),
   };
 }
+
+test("actual native Game rejects absent query error monitoring before any preparation work", async (t) => {
+  const f = fixture(t, { native: true, queryReadErrorMonitoring: false });
+  const start = f.game.start(), rejected = assert.rejects(start, /query read error monitoring unavailable/);
+  await rejected;
+  await settle();
+  assert.equal(f.health.snapshot().phase, "invalid");
+  assert.equal(f.health.snapshot().counts.render, 1);
+  assert.equal(f.game.ready, false);
+  assert.equal(f.game.rendererFailed, true);
+  assert.equal(f.game.startupAbort.signal.aborted, true);
+  assert.equal(f.stats().failures, 1);
+  assert.equal(f.stats().simulations, 0);
+  assert.equal(f.stats().gateCalls, 0);
+  assert.equal(f.loops.size + f.pipelineScopes.length + f.game.startupAssets.size, 0);
+  assert.deepEqual(f.preparationState(), {
+    fences: 0, pushes: 0, pops: 0, queued: 0, listeners: 0, hostDisposals: 0,
+  });
+  // Failed start stops gameplay; the fixture retains normal engine ownership.
+  f.engine.dispose();
+  assert.equal(f.engine.isDisposed, true);
+  assert.equal(f.health.snapshot().phase, "disposed");
+});
 
 test("actual Game start cannot become playable until the submitted-frame gate succeeds", async (t) => {
   const f = fixture(t),

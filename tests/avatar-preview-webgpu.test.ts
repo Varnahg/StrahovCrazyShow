@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { Script, createContext } from "node:vm";
 import ts from "typescript";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Observable } from "@babylonjs/core/Misc/observable";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine.pure";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { DEFAULT_AVATAR } from "../shared/types";
@@ -55,6 +56,7 @@ const A = { ...DEFAULT_AVATAR, preset: 0 },
 function fixture(t: TestContext) {
   const engine = new NullEngine();
   (engine as unknown as { _isWebGPU: boolean })._isWebGPU = true;
+  Object.assign(engine, { onQueryReadErrorObservable: new Observable() });
   const queued = new Map<number, () => void>(),
     timers = new Map<number, () => void>();
   const calls: string[] = [],
@@ -264,6 +266,22 @@ function fixture(t: TestContext) {
     },
   };
 }
+
+test("actual native preview rejects absent query producer and releases its initialized engine", async (t) => {
+  const f = fixture(t);
+  Reflect.deleteProperty(f.engine, "onQueryReadErrorObservable");
+  const start = f.start(), rejected = assert.rejects(start, /query read error monitoring unavailable/);
+  await rejected;
+  await settle();
+  assert.equal(f.stats().creates, 1);
+  assert.equal(f.stats().disposals, 1);
+  assert.equal(f.stats().surfaceDisposals, 0, "failure precedes surface construction");
+  assert.equal(f.profiles.length, 0);
+  assert.equal(f.engine.isDisposed, true);
+  assert.equal(f.states.filter(state => state === "failed").length, 1);
+  assert.equal(f.states.includes("ready"), false);
+  assert.equal(f.queued.size + f.timers.size, 0);
+});
 
 test("preview ready follows begin/render/end, submitted work and shader compilation info", async (t) => {
   const f = fixture(t),
