@@ -545,3 +545,36 @@ diff --git a/Materials/standardMaterial.pure.d.ts b/Materials/standardMaterial.p
      EMISSIVE: boolean;
      EMISSIVEDIRECTUV: number;
      SPECULAR: boolean;
+diff --git a/Meshes/mesh.pure.js b/Meshes/mesh.pure.js
+index 4b5dc529..58777d7b 100644
+--- a/Meshes/mesh.pure.js
++++ b/Meshes/mesh.pure.js
+@@ -1846,11 +1846,27 @@ export class Mesh extends AbstractMesh {
+         if (effect && fillMode !== undefined) {
+             // Stats
+             this.getScene()._activeIndices.addCount(subMesh.indexCount * instancesCount, false);
+             // Draw
+             if (engine._currentDrawContext) {
+-                engine._currentDrawContext.useInstancing = true;
++                const drawContext = engine._currentDrawContext;
++                drawContext.useInstancing = true;
++                // Bundles bake vertex handles. Check every context before replay,
++                // including later submeshes/passes/shadow overrides after replacement.
++                // Vertex pulling has separate storage-binding refresh requirements.
++                if (engine.isWebGPU && !engine.compatibilityMode && !engine._currentMaterialContext?.useVertexPulling) {
++                    const currentBufferId = instancesBuffer?._buffer?.uniqueId;
++                    const needsPrevious = this._scene.needsPreviousWorldMatrices;
++                    const previousBufferId = needsPrevious ? instancesPreviousBuffer?._buffer?.uniqueId : null;
++                    if (currentBufferId == null || (needsPrevious && previousBufferId == null) ||
++                        drawContext._regularInstanceCurrentBufferId !== currentBufferId ||
++                        drawContext._regularInstancePreviousBufferId !== previousBufferId) {
++                        drawContext.fastBundle = undefined;
++                        drawContext._regularInstanceCurrentBufferId = currentBufferId;
++                        drawContext._regularInstancePreviousBufferId = previousBufferId;
++                    }
++                }
+             }
+             this._bind(subMesh, effect, fillMode);
+             this._draw(subMesh, fillMode, instancesCount);
+         }
+         // Write current matrices as previous matrices in case of manual update

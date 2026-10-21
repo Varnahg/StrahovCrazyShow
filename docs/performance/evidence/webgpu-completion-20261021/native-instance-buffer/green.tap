@@ -1,0 +1,111 @@
+TAP version 13
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [20:00:06]: Babylon.js v9.30.0 - Null engine
+# Subtest: full native cold Mesh.render records current and previous handles; growth rerecords instead of replaying destroyed buffers
+ok 1 - full native cold Mesh.render records current and previous handles; growth rerecords instead of replaying destroyed buffers
+  ---
+  duration_ms: 37.7956
+  type: 'test'
+  ...
+# Subtest: stable native draws retain bundle and do not alter context, bindings, indirect or UBO-slot lifecycle
+ok 2 - stable native draws retain bundle and do not alter context, bindings, indirect or UBO-slot lifecycle
+  ---
+  duration_ms: 6.5888
+  type: 'test'
+  ...
+# Subtest: later actual DrawContext and temporary SubMesh shadow override invalidate lazily after another context grows storage
+ok 3 - later actual DrawContext and temporary SubMesh shadow override invalidate lazily after another context grows storage
+  ---
+  duration_ms: 4.3389
+  type: 'test'
+  ...
+# Subtest: separate native render passes keep separate storage, invalidate their own changed matrix identities and keep stable reuse
+ok 4 - separate native render passes keep separate storage, invalidate their own changed matrix identities and keep stable reuse
+  ---
+  duration_ms: 5.8843
+  type: 'test'
+  ...
+# Subtest: first previous matrices at unchanged capacity replace current and previous identities without disturbing ready Effect
+ok 5 - first previous matrices at unchanged capacity replace current and previous identities without disturbing ready Effect
+  ---
+  duration_ms: 3.7562
+  type: 'test'
+  ...
+# Subtest: no-effect native preparation grows resources without touching an unrelated draw cache; next actual draw still validates identity
+ok 6 - no-effect native preparation grows resources without touching an unrelated draw cache; next actual draw still validates identity
+  ---
+  duration_ms: 4.575
+  type: 'test'
+  ...
+# Subtest: unknown current or previous DataBuffer IDs never authorize a cached replay, including repeated null identities
+ok 7 - unknown current or previous DataBuffer IDs never authorize a cached replay, including repeated null identities
+  ---
+  duration_ms: 13.9573
+  type: 'test'
+  ...
+# Subtest: disposed current buffer in a frozen native branch cannot replay a cached old raw handle
+ok 8 - disposed current buffer in a frozen native branch cannot replay a cached old raw handle
+  ---
+  duration_ms: 3.4435
+  type: 'test'
+  ...
+# Subtest: valid zero DataBuffer identity is cached as a scalar and stable draw reuse is retained
+ok 9 - valid zero DataBuffer identity is cached as a scalar and stable draw reuse is retained
+  ---
+  duration_ms: 10.8559
+  type: 'test'
+  ...
+# Subtest: original material dirty and outside-draw context reset still invalidate normally without resource/effect replacement
+ok 10 - original material dirty and outside-draw context reset still invalidate normally without resource/effect replacement
+  ---
+  duration_ms: 4.1474
+  type: 'test'
+  ...
+# Subtest: actual native terminal draw and allocation exceptions keep exact original falsy values and resource refcounts
+ok 11 - actual native terminal draw and allocation exceptions keep exact original falsy values and resource refcounts
+  ---
+  duration_ms: 4.6635
+  type: 'test'
+  ...
+# Subtest: WebGPU compatibility mode is unchanged and never installs regular-instance bundle bookkeeping
+ok 12 - WebGPU compatibility mode is unchanged and never installs regular-instance bundle bookkeeping
+  ---
+  duration_ms: 3.0234
+  type: 'test'
+  ...
+# Subtest: actual NullEngine WebGL native mesh path stays without WebGPU context bookkeeping
+ok 13 - actual NullEngine WebGL native mesh path stays without WebGPU context bookkeeping
+  ---
+  duration_ms: 2.8937
+  type: 'test'
+  ...
+# Subtest: vertex-pulling native path is explicitly unchanged; this pin fix does not claim its storage-refresh defect
+ok 14 - vertex-pulling native path is explicitly unchanged; this pin fix does not claim its storage-refresh defect
+  ---
+  duration_ms: 5.9281
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1651.1088
