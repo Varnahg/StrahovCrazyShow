@@ -17,7 +17,9 @@
     "docs/performance/evidence/webgpu-completion-20261021/measurement/README.md",
     "docs/performance/evidence/webgpu-completion-20261021/lifecycle-controls/",
     ".cache/webgpu-completion-lifecycle-controls-20261021/",
-    "docs/agents/handoffs/webgpu-completion-lifecycle-controls-20261021.md"
+    "docs/agents/handoffs/webgpu-completion-lifecycle-controls-20261021.md",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/shader-attribution.test.mjs",
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/buffer-lifecycle.test.mjs"
   ],
   "resources": [],
   "acceptance": [
@@ -38,6 +40,7 @@
     "Explicitní implementační leaf rootKEY22, autorizovaný user požadavkem praktické přejímky celého renderer lifecycle. Žádné další broad refaktory či nové schvalovací kroky. Bmad root workflow je již aktivní, leaf nerekurzuje.",
     "Aktuální accepted helpera5b3dc00 má119CPU, frozen executable copy .cache/webgpu-completion-20261021/validation/helper-runtimes/v6. Neměnit tuto kopii, hrané buildy/snapshoty, source6 ani rootvalidation outputs. Nový helper bude samostatnýfreshseal/build, nikoliv přepsaná testovaná verze.",
     "Root skutečné minimized/restore dříve nemělo původní hidden visibilitychange, CUA-created blank byl inactive. Normal anchor user gesture je nová testovatelná varianta, nikoli již doložený výsledek. Native APIs/OSfokus nejsou potřeba. Root browser own tab2070823608 je nyní about:blank a GPU volné pro fullsuite; nevstupovat do browseru.",
-    "Primární zdroj https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/destroy; vlastní pinned client/webgpu-validation.ts device.lost path. Při skutečném destroy se nemění GPUdriver/power/security nastavení a cizí programy se neukončují."
+    "Primární zdroj https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/destroy; vlastní pinned client/webgpu-validation.ts device.lost path. Při skutečném destroy se nemění GPUdriver/power/security nastavení a cizí programy se neukončují.",
+    "21.10 root rozšířil přesně2 existující sealed-input fixtures po documented ownWIP pause/release původního autora. Nový required lifecycleControls:false musí být v obou explicitních canonical baseline objects; missing-field/tamper guard se nesmí oslabit. Původní autor smí novýclaim --adopt-dirty výhradně svého doloženéhoWIP ve stejnémtasku."
   ]
 }
