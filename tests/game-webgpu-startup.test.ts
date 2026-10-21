@@ -6,6 +6,7 @@ import { readGameSource } from "./helpers/game-source";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { RenderHealth } from "../client/render-health";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
+import { StartupPreparationLoop, type StartupPreparationHost } from "../client/startup-preparation-loop";
 
 const { source, gameClass, selectMembers } = readGameSource(
   process.env.GAME_STARTUP_SOURCE,
@@ -51,7 +52,7 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(`(function(env) {
-  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady } = env;
+  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, StartupPreparationLoop, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady } = env;
   ${compiled}
   return StartupGame;
 })`).runInThisContext();
@@ -92,6 +93,9 @@ function fixture(
     holdPhysics?: boolean;
     holdAssets?: boolean;
     faultAfterGate?: boolean;
+    native?: boolean;
+    holdPreparationFence?: boolean;
+    holdPreparationValidation?: boolean;
   } = {},
 ) {
   const engine = new NullEngine();
@@ -105,7 +109,45 @@ function fixture(
     else loops.clear();
   });
   const physics = deferred<void>(),
-    gate = deferred<void>();
+    gate = deferred<void>(),
+    preparationFence = deferred<void>(),
+    preparationValidation = deferred<{ message: string } | null>(),
+    deviceLost = deferred<{ reason: string; message: string }>();
+  if (!options.holdPreparationFence) preparationFence.resolve();
+  if (!options.holdPreparationValidation) preparationValidation.resolve(null);
+  let fences = 0, pushes = 0, pops = 0, taskSequence = 0, hostDisposals = 0;
+  const preparationTasks = new Map<number, () => void>(), visibilityListeners = new Set<() => void>();
+  // Scheduling/GPU IO is controlled, while the actual adapter owns every step,
+  // stop, scope/fence and idle barrier. One finite IO-stub light tick is enough
+  // here; the real light catalog has separate integration regressions.
+  const host: StartupPreparationHost = {
+    requestTask(callback) {
+      assert.equal(preparationTasks.size, 0, "one queued preparation task");
+      const handle = ++taskSequence;
+      preparationTasks.set(handle, callback);
+      queueMicrotask(() => {
+        const selected = preparationTasks.get(handle);
+        if (!selected) return;
+        preparationTasks.delete(handle);
+        selected();
+      });
+      return handle;
+    },
+    cancelTask(handle) { preparationTasks.delete(handle); },
+    visible: () => true,
+    observeVisibility(callback) {
+      visibilityListeners.add(callback);
+      return () => { visibilityListeners.delete(callback); };
+    },
+    dispose() { hostDisposals++; preparationTasks.clear(); },
+  };
+  const device = Object.assign(new EventTarget(), {
+    lost: deviceLost.promise,
+    pushErrorScope(filter: string) { assert.equal(filter, "validation"); pushes++; },
+    popErrorScope() { pops++; return preparationValidation.promise; },
+    queue: { onSubmittedWorkDone() { fences++; return preparationFence.promise; } },
+  });
+  Object.assign(engine, { _isWebGPU: options.native ?? false, _device: device });
   const interior = deferred<any>(),
     vegetation = deferred<any>(),
     car = deferred<any>();
@@ -170,6 +212,14 @@ function fixture(
     VehicleLighting: class {},
     // GPU/cache IO is covered by the helper's pinned-engine tests. This fixture
     // executes actual Game ownership and both readiness integration points.
+    StartupPreparationLoop: class extends StartupPreparationLoop {
+      constructor(actualEngine: NullEngine, actualHealth: RenderHealth, actualOptions: { signal: AbortSignal }) {
+        assert.equal(actualEngine, engine);
+        assert.equal(actualHealth, health);
+        assert.equal(actualOptions.signal, game.startupAbort.signal);
+        super(actualEngine, actualHealth, { ...actualOptions, host });
+      }
+    },
     WebGpuPipelinePreparation: class {
       readonly state = { disposed: 0, renders: 0 };
       constructor(_engine: unknown, private options: {
@@ -242,11 +292,21 @@ function fixture(
       snapshot: () => ({}),
       setStage: (stage: string) => shaderStages.push(stage),
     },
-    prepareLighting: async (render: () => void, pipelines: { isReady(): boolean }) => {
+    prepareLighting: (render: () => void, pipelines: { isReady(): boolean }, loop: StartupPreparationLoop) => {
       assert.equal(pipelineScopes.length, 1);
       assert.equal(pipelines.isReady(), pipelineReady && pipelineFrameComplete);
-      render();
-      return { status: options.preparation ?? "complete", elapsedMs: 1, stages: [] };
+      const status = options.preparation ?? "complete";
+      return new Promise((resolve) => {
+        const tick = () => {
+          loop.render(render);
+          loop.stop(tick);
+          // The real light helper settles its result before the owned GPU
+          // submission has completed; Game must wait for the actual adapter.
+          resolve({ status, elapsedMs: 1, stages: [] });
+          return status === "complete";
+        };
+        loop.run(tick);
+      });
     },
   });
   initializeHealth({
@@ -260,6 +320,10 @@ function fixture(
     health,
     physics,
     gate,
+    preparationFence,
+    preparationValidation,
+    deviceLost,
+    preparationState: () => ({ fences, pushes, pops, queued: preparationTasks.size, listeners: visibilityListeners.size, hostDisposals }),
     loops,
     events,
     shaderStages,
@@ -366,6 +430,83 @@ test("actual Game final gate checks pending native effects after the variants we
     Object.assign(f.engine, { _compiledEffects: {}, _isWebGPU: false });
   }
 });
+
+test("actual whole Game startup waits for both preparation validation and its last queue fence", async (t) => {
+  const f = fixture(t, { native: true, holdPreparationFence: true, holdPreparationValidation: true });
+  const start = f.game.start();
+  await settle();
+  assert.equal(f.events.filter(event => event.kind === "lighting-preparation").length, 1);
+  assert.equal(f.game.canvas.dataset.bootStage, "light-preparation");
+  assert.equal(f.stats().gateCalls, 0, "light result alone cannot enter the separate submitted gate");
+  assert.equal(f.game.ready, false);
+  assert.equal(f.loops.size, 0);
+  assert.equal(f.pipelineScopes[0].disposed, 0);
+  assert.deepEqual(f.preparationState(), {
+    fences: 1, pushes: 1, pops: 1, queued: 0, listeners: 1, hostDisposals: 0,
+  });
+  f.preparationFence.resolve();
+  await settle();
+  assert.equal(f.stats().gateCalls, 0, "queue completion alone cannot accept an unchecked frame");
+  assert.equal(f.health.snapshot().pendingOperations, 1);
+  f.preparationValidation.resolve(null);
+  await settle();
+  assert.equal(f.stats().gateCalls, 1);
+  assert.equal(f.game.ready, false, "the final submitted gate still owns final readiness");
+  assert.equal(f.health.snapshot().pendingOperations, 0);
+  f.gate.resolve();
+  await start;
+  assert.equal(f.game.ready, true);
+  assert.equal(f.loops.size, 1);
+  assert.equal(f.pipelineScopes[0].disposed, 1);
+  assert.deepEqual(f.preparationState(), {
+    fences: 1, pushes: 1, pops: 1, queued: 0, listeners: 0, hostDisposals: 1,
+  });
+});
+
+test("actual whole Game startup preserves a preparation queue rejection and never reaches the final gate", async (t) => {
+  const f = fixture(t, { native: true, holdPreparationFence: true });
+  const failure = new Error("preparation queue rejected");
+  const start = f.game.start(), rejected = assert.rejects(start, reason => reason === failure);
+  await settle();
+  assert.equal(f.stats().gateCalls, 0);
+  assert.equal(f.preparationState().fences, 1);
+  f.preparationFence.reject(failure);
+  await rejected;
+  assert.equal(f.game.ready, false);
+  assert.equal(f.loops.size, 0);
+  assert.equal(f.stats().gateCalls, 0);
+  assert.equal(f.stats().failures, 1);
+  assert.equal(f.health.snapshot().counts.pipeline, 1);
+  assert.equal(f.pipelineScopes[0].disposed, 1);
+  assert.equal(f.preparationState().hostDisposals, 1);
+  assert.equal(f.preparationState().listeners, 0);
+});
+
+for (const retirement of ["abort", "device-loss"] as const)
+  test(`actual whole Game ${retirement} rejects a pending preparation fence and late completion stays retired`, async (t) => {
+    const f = fixture(t, { native: true, holdPreparationFence: true });
+    const start = f.game.start(), rejected = assert.rejects(start);
+    await settle();
+    assert.equal(f.preparationState().fences, 1);
+    assert.equal(f.stats().gateCalls, 0);
+    if (retirement === "abort") f.game.startupAbort.abort();
+    else f.deviceLost.resolve({ reason: "destroyed", message: "owned native device lost during preparation" });
+    await rejected;
+    assert.equal(f.game.ready, false);
+    assert.equal(f.loops.size, 0);
+    assert.equal(f.pipelineScopes[0].disposed, 1);
+    assert.equal(f.preparationState().hostDisposals, 1);
+    assert.equal(f.preparationState().queued, 0);
+    assert.equal(f.preparationState().listeners, 0);
+    f.preparationFence.resolve();
+    f.gate.resolve();
+    await settle();
+    assert.equal(f.stats().gateCalls, 0);
+    assert.equal(f.game.ready, false);
+    assert.equal(f.loops.size, 0);
+    assert.equal(f.pipelineScopes[0].disposed, 1);
+    assert.equal(f.preparationState().hostDisposals, 1);
+  });
 
 test("device loss during physics loading promptly rejects and cannot restart the Game loop", async (t) => {
   const f = fixture(t, { holdPhysics: true }),
