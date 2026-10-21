@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-pcf-readiness-20261021",
+  "title": "KEY-22: sladit PBR shadow readiness s původním PCF color-write kontextem",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/webgpu-shadow-readiness.ts",
+    "tests/webgpu-shadow-freshness.test.ts",
+    "tests/webgpu-shadow-pcf-state.test.ts",
+    "docs/performance/evidence/webgpu-completion-20261021/pcf-readiness/",
+    "docs/agents/handoffs/webgpu-completion-pcf-readiness-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejdříve zaznamenat actual owner7416b596 a pinned PBR/PCF state mechanismus, reprodukční CPU důkaz a varianty/náklady/vzhled/cache/lifecycle; actualcolorWrite bit vreceiptu chybí, kauzalitu přijme až before/after GPU.",
+    "Úzký Fresh WebGPU wrapper během celého původního base+super readiness použije skutečný PCF color-write=false kontext a vfinally obnoví původní bool. Pokud jižfalse, nevolá setter; ostatnífiltery/WebGL a veškerá dosavadní freshness/abort/disposal pravidla zůstanou.",
+    "Žádná změna timeoutů, health/validace, cache policy, stromů/LOD/geometry/texture/wind, shaderdefine pinpatch nebo skrytý renderer fallback.",
+    "Implementace+cílený refaktor+relevantní actual pinned CPU regrese se předají společně. Do main ani GPU přijetí child nezasahuje."
+  ],
+  "verification": [
+    "Actual PBR+Fresh+ShadowDepthWrapper red/green reproduktor DEPTHPREPASS a base/derived identity/dispose při PCF colorWrite true/false posloupnosti, pouze terminal IO fake.",
+    "PCF nested/no-opfalse a restoretrue, jinéfiltery, původnífalse/throw/dispose, alpha/shadow layout freshness a žádný nadbytečný setter při skutečném draw kontextu.",
+    "Cílené související CPU testy a scoped TypeScript, přesné source/pin/log SHA; žádný child build/server/GPU/fullsuite."
+  ],
+  "notes": [
+    "Actualsource80395553/build2cbf4a05/helperc951: všech812finalvalidationjobs je406novýchdepthEffects jediného tree__ipr-crown-029__lod1__leaves/material507/pass9. useInstances0/regular0/thin0, cacheReleaseSame/ref0, žádnýlateCompile; histoverflowpřiznaný, finalmodulecoverage812/812.",
+    "SourcefactorysdílíPBR+TreeWind aLODmateriály; actualbaseIDs161/163sevracejíopakovane. PinnedShadowGeneratorPCFonBeforeRendercolorWritefalse/onAfterUnbindtrue; PBRFrameBoundDefinesDEPTHPREPASS=!colorWrite. CPUrepro skutečných tříd přepínáním stavu reprodukuje base0/2 a depth1/3/4/5/6 sdisposal, bezinstancing/stalerelease.",
+    "NejmenšívybranýkandidátPCFscope veFresh, alternativa clone/passMaterial neřešíflagapřidáváresources/pluginlifecycle, globálníDEPTHPREPASS patchměnílegitimnídepthpassy, derivedvariantcachemaskujechybnýkontext. Rootvarianty/příčinuGPUověřívnovémneměnnémcheckpointu. Nekomitovat, nepouštětBMADrekurzivně."
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-pcf-snapshot-20261021",
+  "title": "KEY-22: nové immutable PCF source checkpointy pro skutečné before/after",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/webgpu-completion-20261021-candidate-5/",
+    ".cache/performance-snapshot/webgpu-completion-20261021-candidate-6/",
+    "docs/agents/handoffs/webgpu-completion-pcf-snapshot-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nové source/test/asset checkpointy nemění již hrané baseline/source3/source4 nebo jejich bundle.",
+    "Build/server/GPU používají samostatné již rezervované root resources a validation output prefix, tento task vymezuje nové snapshot soubory."
+  ],
+  "verification": [
+    "performance-snapshot before/after SHA a declared IPR reuse, úplný TypeScript a relevantní novýbuild/actualservedSHA vrootvalidationtasku.",
+    "Výsledky neoznačit za přijetí obrazu/výkonu podle samotného freezeru."
+  ],
+  "notes": [
+    "Root drží živé source3 API2597/preview4213 vodděleném revisionsclaimu; kvůli rozšíření snapshot scope tyto živé claims neuvolňuje ani nereservuje znovu."
+  ]
+}
