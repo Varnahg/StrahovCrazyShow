@@ -14,7 +14,15 @@
     "tests/game-light-lifecycle.test.ts",
     "tests/room-callbacks.test.ts",
     "docs/performance/evidence/webgpu-completion-20261021/startup-view/",
-    "docs/agents/handoffs/webgpu-completion-startup-view-20261021.md"
+    "docs/agents/handoffs/webgpu-completion-startup-view-20261021.md",
+    "tests/game-authored-light-preparation.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-low-vehicle-preparation.test.ts",
+    "tests/game-preparation-scheduler.test.ts",
+    "tests/game-preparation-baseline.test.ts",
+    "tests/game-quality-preparation.test.ts",
+    "client/render-startup.ts",
+    "tests/render-startup.test.ts"
   ],
   "resources": [],
   "acceptance": [
@@ -35,6 +43,7 @@
   "notes": [
     "Porovnáno earlyfullreconcile (moc široké physics/timeline zásahy), view-only anchor (zvoleno), nový postdrainloadingstate (nováphase/loopownership), globalwarmup (neomezená prostor×quality×light×avatar kombinace). Root schválil APIwrite client/game.ts a client/ui.tsx výslovně touto disjunktní rezervací.",
     "Target.y a ActorState.position.y jsouactorcenter; renderfeet odečítá0.8, rozdílSPAWN+1 vsserver+.8201 je settle kapsle, ne transformunits. ExistingAuthorityBuffer validuje frontier, nikoliv všechny state.position; novýviewguardnezmění jeho dosavadnípacket semantics.",
-    "Root bufferhelper119CPU/review byl samostatně commitnut8ee57e4 předcorewrites. Root může buildit proti neměnnému snapshot5/source36 i při této větviWIP. Neměnit helper files/frozen snapshoty/protectedserverenv. Nezkoumatpřístupovýtoken. Žádný rekurzivníBMAD."
+    "Root bufferhelper119CPU/review byl samostatně commitnut8ee57e4 předcorewrites. Root může buildit proti neměnnému snapshot5/source36 i při této větviWIP. Neměnit helper files/frozen snapshoty/protectedserverenv. Nezkoumatpřístupovýtoken. Žádný rekurzivníBMAD.",
+    "21.10 17:10UTC koordinátor rozšířil přesně8cest po zastavení/release doloženého vlastního WIP. Šest existujících ASTfixtures musí zahrnout faktorizované preparation helper metody. Explicitní ready revalidation v render-startup zachová stejné scope/fence/pending/error/generation/visibility/deadline gates a pouze neopakuje preparing→ready transition; původní initial default beze změny, žádné oslabení RenderHealth. Autor smí novým claim --adopt-dirty převzít výhradně svůj WIP zaznamenaný v handoffu."
   ]
 }
