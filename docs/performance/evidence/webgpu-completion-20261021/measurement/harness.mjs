@@ -1,16 +1,16 @@
 /** Explicit local build/serve CLI. No browser automation, API process spawning,
  * resource-claim takeover, or termination of any process by port. */
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
-import { dirname, resolve, join } from 'node:path';
+import { dirname, resolve, join, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
-import { sha256, inside, verifySnapshot, helperIdentity, transformUI, transformLoading, directoryHashes, previewPort } from './common.mjs';
+import { sha256, inside, verifySnapshot, helperIdentity, transformUI, transformLoading, directoryHashes, previewPort, backendPort } from './common.mjs';
 import { MAX_RECEIPT_BYTES, authorizeReceiptRequest, saveReceipt } from './receipt.mjs';
+import { validateClockConfig } from './transit-clock.mjs';
 
 const helperDirectory = dirname(fileURLToPath(import.meta.url));
 const root = resolve(helperDirectory, '../../../../..');
 const validation = join(root, '.cache/webgpu-completion-20261021/validation');
-const apiPort = 2596;
 const writeNew = (file, value) => writeFile(file, JSON.stringify(value, null, 2) + '\n', { flag: 'wx' });
 async function dependencyIdentity(snapshot) {
   const require = createRequire(join(snapshot, 'package.json'));
@@ -29,20 +29,48 @@ async function freshDirectory(input) {
   await mkdir(directory);
   return directory;
 }
-async function loadBuild(input) {
+/** Pure negative-fixture target: verifying files alone is insufficient if the
+ * sidecar then names another source or supplies different embedded clock data. */
+export function verifyBuildContract(identity, source, clockBytes) {
+  if (source.snapshotId !== identity.sourceSnapshotId) throw new Error('Build sourceSnapshotId differs from verified manifest');
+  if (!identity.clock) return;
+  if (!Buffer.isBuffer(clockBytes) || sha256(clockBytes) !== identity.clock.configSha256)
+    throw new Error('Clock config bytes changed');
+  const verified = validateClockConfig(JSON.parse(clockBytes.toString('utf8')));
+  const embedded = validateClockConfig(identity.clock.config);
+  if (sha256(JSON.stringify(verified)) !== identity.clock.configId || JSON.stringify(embedded) !== JSON.stringify(verified))
+    throw new Error('Embedded clock config content/identity differs from verified bytes');
+  const simulation = source.files['shared/simulation.ts'];
+  if ((typeof simulation === 'string' ? simulation : simulation?.sha256) !== identity.clock.simulationSourceSha256)
+    throw new Error('Clock Simulation source differs from verified manifest');
+}
+export async function loadBuild(input) {
   const directory = inside(validation, resolve(input));
   const identity = JSON.parse(await readFile(join(directory, 'identity.json'), 'utf8'));
   if ((await helperIdentity(helperDirectory)).sha256 !== identity.helperSha256) throw new Error('Helper changed since build');
   if (JSON.stringify(await directoryHashes(join(directory, 'dist'))) !== JSON.stringify(identity.bundleFiles))
     throw new Error('Immutable built bytes changed');
-  await verifySnapshot(identity.snapshot);
+  const source = await verifySnapshot(identity.snapshot);
+  const clockBytes = identity.clock ? await readFile(join(directory, 'clock-config.json')) : undefined;
+  verifyBuildContract(identity, source, clockBytes);
   return { directory, identity };
 }
-export async function run(command, input, output, label, loading = 'original') {
+export async function run(command, input, output, label, option = 'original', clockFile) {
   if (command === 'build') {
+    const loading = option;
     if (!input || !output || !/^[a-z0-9-]+$/.test(label ?? '')) throw new Error('build SNAPSHOT OUTPUT LABEL [original|translucent]');
     const snapshot = inside(join(root, '.cache'), resolve(input));
     const source = await verifySnapshot(snapshot), helper = await helperIdentity(helperDirectory);
+    let clock, clockBytes, clockPath;
+    if (clockFile) {
+      if (!isAbsolute(clockFile)) throw new Error('Clock config must be an explicit absolute file');
+      clockPath = inside(validation, clockFile); clockBytes = await readFile(clockPath);
+      const config = validateClockConfig(JSON.parse(clockBytes.toString('utf8')));
+      const simulationEntry = source.files['shared/simulation.ts'];
+      if (!simulationEntry) throw new Error('Clock build requires manifest Simulation source');
+      clock = { config, configSha256: sha256(clockBytes), configId: sha256(JSON.stringify(config)),
+        simulationSourceSha256: typeof simulationEntry === 'string' ? simulationEntry : simulationEntry.sha256 };
+    }
     const originalUI = await readFile(join(snapshot, 'client/ui.tsx'), 'utf8'), transformedUI = transformUI(originalUI);
     const originalCSS = await readFile(join(snapshot, 'client/style.css'), 'utf8'), transformedCSS = transformLoading(originalCSS, loading);
     const transforms = {
@@ -51,15 +79,19 @@ export async function run(command, input, output, label, loading = 'original') {
       loading: { file: 'client/style.css', variant: loading, before: sha256(originalCSS), after: sha256(transformedCSS),
         scope: loading === 'original' ? 'Byte-identical original CSS' : 'Only .loading background #eff3e6 to rgba(239,243,230,.96); isolated diagnostic, not accepted runtime repair' },
     };
-    const browserIdentity = { label, sourceSnapshotId: source.snapshotId, helperSha256: helper.sha256, loading,
-      buildId: sha256(JSON.stringify({ source: source.snapshotId, helper: helper.sha256, label, transforms })) };
+    const browserIdentity = { label, sourceSnapshotId: source.snapshotId, helperSha256: helper.sha256, loading, clock: clock ?? null,
+      buildId: sha256(JSON.stringify({ source: source.snapshotId, helper: helper.sha256, label, transforms, clock: clock ?? null })) };
     const directory = await freshDirectory(output);
     const overlay = (await readFile(join(helperDirectory, 'qa-overlay.mjs'), 'utf8')).replace('__WEBGPU_COMPLETION_IDENTITY__', JSON.stringify(browserIdentity));
     const observer = await readFile(join(helperDirectory, 'startup-observer.mjs'), 'utf8');
     const attempts = await readFile(join(helperDirectory, 'attempt-queue.mjs'), 'utf8');
+    const transitClock = await readFile(join(helperDirectory, 'transit-clock.mjs'), 'utf8');
+    const browserClock = (await readFile(join(helperDirectory, 'browser-clock.mjs'), 'utf8'))
+      .replace("'./transit-clock.mjs'", "'virtual:webgpu-completion-clock'");
     await writeFile(join(directory, 'transformed-ui.tsx'), transformedUI, { flag: 'wx' });
     await writeFile(join(directory, 'transformed-style.css'), transformedCSS, { flag: 'wx' });
     await writeFile(join(directory, 'resolved-overlay.mjs'), overlay, { flag: 'wx' });
+    if (clockBytes) await writeFile(join(directory, 'clock-config.json'), clockBytes, { flag: 'wx' });
     const dependencies = await dependencyIdentity(snapshot);
     await writeNew(join(directory, 'build-input.json'), { ...browserIdentity, snapshot, sourceFiles: Object.keys(source.files).length,
       helperFiles: helper.files, transforms, overlaySha256: sha256(overlay), observerSha256: sha256(observer), dependencies });
@@ -67,14 +99,28 @@ export async function run(command, input, output, label, loading = 'original') {
     const config = await loadConfigFromFile({ command: 'build', mode: 'production' }, join(snapshot, 'vite.config.ts'), snapshot, undefined, undefined, 'native');
     if (!config) throw new Error('Original production configuration unavailable');
     const virtual = '\0virtual:webgpu-completion-qa', virtualObserver = '\0virtual:webgpu-completion-observer', virtualAttempts = '\0virtual:webgpu-completion-attempts';
+    const virtualClock = '\0virtual:webgpu-completion-clock', virtualBrowserClock = '\0virtual:webgpu-completion-browser-clock';
     let uiHits = 0, cssHits = 0;
     await build(mergeConfig(config.config, {
       root: snapshot, configFile: false, cacheDir: join(directory, '.vite'),
       define: { 'import.meta.env.VITE_SOURCE_SNAPSHOT_ID': JSON.stringify(source.snapshotId), 'import.meta.env.VITE_MULTIPLAYER_URL': JSON.stringify('') },
       build: { outDir: join(directory, 'dist'), emptyOutDir: false, copyPublicDir: false, sourcemap: true },
       plugins: [{ name: 'explicit-webgpu-completion-qa', enforce: 'pre',
-        resolveId(id) { if (id === 'virtual:webgpu-completion-qa') return virtual; if (id === 'virtual:webgpu-completion-observer') return virtualObserver; if (id === 'virtual:webgpu-completion-attempts') return virtualAttempts; },
-        load(id) { if (id === virtual) return overlay; if (id === virtualObserver) return observer; if (id === virtualAttempts) return attempts; },
+        resolveId(id) {
+          if (id === 'virtual:webgpu-completion-qa') return virtual;
+          if (id === 'virtual:webgpu-completion-observer') return virtualObserver;
+          if (id === 'virtual:webgpu-completion-attempts') return virtualAttempts;
+          if (id === 'virtual:webgpu-completion-clock') return virtualClock;
+          if (id === 'virtual:webgpu-completion-browser-clock') return virtualBrowserClock;
+          if (id === 'virtual:webgpu-completion-simulation') return join(snapshot, 'shared/simulation.ts').replaceAll('\\', '/');
+        },
+        load(id) {
+          if (id === virtual) return overlay;
+          if (id === virtualObserver) return observer;
+          if (id === virtualAttempts) return attempts;
+          if (id === virtualClock) return transitClock;
+          if (id === virtualBrowserClock) return browserClock;
+        },
         transform(code, id) {
           const file = id.split('?')[0].replaceAll('\\', '/');
           if (file === join(snapshot, 'client/ui.tsx').replaceAll('\\', '/')) {
@@ -90,6 +136,7 @@ export async function run(command, input, output, label, loading = 'original') {
       }],
     }));
     await verifySnapshot(snapshot);
+    if (clockPath && sha256(await readFile(clockPath)) !== clock.configSha256) throw new Error('Clock input changed during build');
     if ((await helperIdentity(helperDirectory)).sha256 !== helper.sha256) throw new Error('Helper changed during build');
     if (JSON.stringify(await dependencyIdentity(snapshot)) !== JSON.stringify(dependencies)) throw new Error('Selected dependency bytes changed during build');
     const identity = { schemaVersion: 1, ...browserIdentity, snapshot, sourceFiles: Object.keys(source.files).length,
@@ -103,8 +150,11 @@ export async function run(command, input, output, label, loading = 'original') {
     console.log(JSON.stringify(await loadBuild(input), null, 2));
   } else if (command === 'serve') {
     const port = previewPort(label ?? process.env.STRAHOV_WEBGPU_QA_PORT ?? '4211');
+    const apiPort = backendPort(option === 'original' ? process.env.STRAHOV_WEBGPU_QA_API_PORT ?? '2596' : option);
+    if (port === apiPort) throw new Error('Preview and API must use distinct owned ports');
     const origin = 'http://127.0.0.1:' + port;
     const { directory, identity } = await loadBuild(input), runDirectory = await freshDirectory(output);
+    if (identity.clock && apiPort === 2596) throw new Error('Clock QA cannot use the immutable baseline API2596');
     const { preview } = await import('vite'), { default: express } = await import('express');
     const publicFiles = express.static(join(identity.snapshot, 'public'), { maxAge: 0, etag: true, immutable: false });
     const server = await preview({ root: identity.snapshot, configFile: false, build: { outDir: join(directory, 'dist') },
@@ -145,8 +195,8 @@ export async function run(command, input, output, label, loading = 'original') {
     process.once('SIGINT', () => { void stop().catch(error => { console.error(error); process.exitCode = 1; }); });
     process.once('SIGTERM', () => { void stop().catch(error => { console.error(error); process.exitCode = 1; }); });
     console.log(JSON.stringify({ origin, apiPort, directory, runDirectory, buildId: identity.buildId,
-      instructions: 'Root owns resource claims, API2596, browser/GPU and eventual shutdown. This process owns only its explicit preview port; Ctrl+C closes only its own server/sockets.' }));
-  } else throw new Error('Usage: build SNAPSHOT OUTPUT LABEL [original|translucent] | inspect BUILD | serve BUILD RUN_OUTPUT [PORT]');
+      instructions: 'Root owns resource claims, the explicit API port, browser/GPU and eventual shutdown. This process owns only its preview; Ctrl+C closes only its own server/sockets.' }));
+  } else throw new Error('Usage: build SNAPSHOT OUTPUT LABEL [original|translucent] [ABS_CLOCK_JSON] | inspect BUILD | serve BUILD RUN_OUTPUT [PORT] [API_PORT]');
 }
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url)
   await run(...process.argv.slice(2));

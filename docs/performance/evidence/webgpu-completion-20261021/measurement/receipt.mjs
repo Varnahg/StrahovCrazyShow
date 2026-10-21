@@ -10,6 +10,7 @@ export function validateReceipt(value, identity) {
       value.buildId !== identity.buildId || value.sourceSnapshotId !== identity.sourceSnapshotId ||
       value.helperSha256 !== identity.helperSha256 || !['startup', 'benchmark', 'state'].includes(value.kind) ||
       !['plain', 'diagnostic'].includes(value.mode)) throw new Error('Receipt identity/schema mismatch');
+  if (identity.clock && value.clockConfigId !== identity.clock.configId) throw new Error('Receipt clock config mismatch');
   if (!Number.isFinite(value.atMs) || value.atMs < 0 || !Number.isFinite(value.timeOrigin))
     throw new Error('Receipt clock missing');
   if (!Array.isArray(value.observerErrors) || value.observerErrors.length > 16) throw new Error('Observer error bounds');

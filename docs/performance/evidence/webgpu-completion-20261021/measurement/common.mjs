@@ -50,10 +50,16 @@ export async function directoryHashes(directory) {
   await walk(directory);
   return files;
 }
-export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs', 'helper.test.mjs', 'README.md'];
+export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs',
+  'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'helper.test.mjs', 'clock.test.mjs', 'README.md'];
 export function previewPort(value = '4211') {
   if (typeof value !== 'string' || !/^[1-9]\d{3,4}$/.test(value) || Number(value) < 1024 || Number(value) > 65535 || Number(value) === 2596)
     throw new Error('Expected explicit preview port1024..65535 distinct from API2596');
+  return Number(value);
+}
+export function backendPort(value = '2596') {
+  if (typeof value !== 'string' || !/^[1-9]\d{3,4}$/.test(value) || Number(value) < 1024 || Number(value) > 65535)
+    throw new Error('Expected explicit API port1024..65535');
   return Number(value);
 }
 export async function helperIdentity(directory) {

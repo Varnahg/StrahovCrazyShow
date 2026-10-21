@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { transformUI, transformLoading, START_MARKER, UI_IMPORT, sha256, inside, verifySnapshot, directoryHashes, helperIdentity, previewPort } from './common.mjs';
 import { observeOperation } from './startup-observer.mjs';
 import { createAttemptQueue } from './attempt-queue.mjs';
+import ts from 'typescript';
 import { authorizeReceiptRequest, validateReceipt, saveReceipt, MAX_RECEIPT_BYTES } from './receipt.mjs';
 
 const directory = dirname(fileURLToPath(import.meta.url));
@@ -29,6 +30,7 @@ test('actual UI transform is exact once, retains outer catch/dispose and origina
   assert.equal(transformed.split('await observeStartup(g, startupCanvas, () => g.start());').length, 2);
   assert.equal(transformed.slice(UI_IMPORT.length).replace('        await observeStartup(g, startupCanvas, () => g.start());', START_MARKER), original.replaceAll('\r\n', '\n'));
   assert.ok(transformed.includes('game.current?.dispose();'));
+  assert.equal(ts.createSourceFile('qa-ui.tsx', transformed, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX).parseDiagnostics.length, 0);
   assert.equal(sha256(original), before);
   assert.throws(() => transformUI(transformed));
   assert.throws(() => transformUI('no marker'));
@@ -109,7 +111,7 @@ test('snapshot verifies all original files, rejects drift/path escape; bundle/he
 test('overlay forbids browser engine exposure, extra readiness/render and periodic dumps during interval', async () => {
   const source = await readFile(join(directory, 'qa-overlay.mjs'), 'utf8');
   assert.doesNotMatch(source, /window\.__|\.isReady\(|\.render\(/);
-  const measurement = source.slice(source.indexOf('async function measure()'), source.indexOf("  action('Změřit"));
+  const measurement = source.slice(source.indexOf('async function measure('), source.indexOf("  action('Změřit"));
   assert.doesNotMatch(measurement, /setInterval\(/);
   assert.ok(measurement.includes('owner.startBenchmark()'));
   assert.ok(measurement.includes('ownedBenchmark = owner.benchmark; frames = ownedBenchmark.frames'));
@@ -159,7 +161,7 @@ test('explicit preview port validation and derived origin authorization preserve
   assert.equal(authorizeReceiptRequest(request, 'http://127.0.0.1:4211'), false);
 });
 
-async function browserFixture(run, transport = async bytes => ack(bytes)) {
+async function browserFixture(run, transport = async bytes => ack(bytes), browserIdentity = identity) {
   class Element {
     children = []; textContent = ''; style = {}; hidden = false;
     append(...children) { this.children.push(...children); for (const child of children) child.parent = this; }
@@ -182,10 +184,21 @@ async function browserFixture(run, transport = async bytes => ack(bytes)) {
   const previous = Object.fromEntries(Object.keys(globals).map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
   for (const [key, value] of Object.entries(globals)) Object.defineProperty(globalThis, key, { value, configurable: true, writable: true });
   try {
+    const adapterSource = `import {installBrowserClock as actual} from ${JSON.stringify(pathToFileURL(join(directory, 'browser-clock.mjs')).href)};
+      export class FixtureSimulation { tick(time) { return time; } }
+      let deferredImport;
+      export function deferSimulationImport() { deferredImport = Promise.withResolvers(); return deferredImport; }
+      export const installBrowserClock = (game, specification, dependencies = {}) => actual(game, specification,
+        {...dependencies, loadSimulation: () => { const pending = deferredImport; deferredImport = undefined;
+          return pending ? pending.promise : Promise.resolve({Simulation: FixtureSimulation}); }});\n// ${crypto.randomUUID()}`;
+    const adapterURL = 'data:text/javascript;base64,' + Buffer.from(adapterSource).toString('base64');
+    const { FixtureSimulation, deferSimulationImport } = await import(adapterURL);
     let source = await readFile(join(directory, 'qa-overlay.mjs'), 'utf8');
     source = source.replace("'virtual:webgpu-completion-observer'", JSON.stringify(pathToFileURL(join(directory, 'startup-observer.mjs')).href));
     source = source.replace("'virtual:webgpu-completion-attempts'", JSON.stringify(pathToFileURL(join(directory, 'attempt-queue.mjs')).href));
-    source = source.replace('__WEBGPU_COMPLETION_IDENTITY__', JSON.stringify(identity));
+    source = source.replace("'virtual:webgpu-completion-browser-clock'", JSON.stringify(adapterURL));
+    source = source.replace("'virtual:webgpu-completion-clock'", JSON.stringify(pathToFileURL(join(directory, 'transit-clock.mjs')).href));
+    source = source.replace('__WEBGPU_COMPLETION_IDENTITY__', JSON.stringify(browserIdentity));
     source += '\nexport { weatherSnapshot, benchmarkSnapshot };\n// Unique DOM fixture ' + crypto.randomUUID();
     const module = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
     const all = () => {
@@ -207,11 +220,15 @@ async function browserFixture(run, transport = async bytes => ack(bytes)) {
       };
       games.push(game); return game;
     };
-    await run({ ...module, body, all, makeGame, posted, created, revoked, raf,
+    await run({ ...module, FixtureSimulation, deferSimulationImport, body, all, makeGame, posted, created, revoked, raf,
       output: () => all().find(value => value.id === 'webgpu-completion-export'),
       measureButton: () => all().find(value => value.textContent.startsWith('Změřit 10 s')) });
   } finally {
     games.forEach(game => game.dispose());
+    // Crypto/transport is deliberately async. Keep this fixture's realm alive
+    // until its exact ACKs, rather than letting its pending fetch enter the
+    // next test's temporary globals and look like another owner's receipt.
+    await until(() => body.children.filter(value => value.id === 'webgpu-completion-pending').every(value => value.hidden));
     browserWindow.dispatchEvent(new Event('pagehide'));
     for (const url of created) OriginalURL.revokeObjectURL(url);
     for (const [key, descriptor] of Object.entries(previous)) {
@@ -294,3 +311,64 @@ test('weather arrays/layers, precipitation and independent benchmark start/end s
   weather.cloudWinds.low.speed = 99;
   assert.equal(benchmark.weatherAtStart.cloudWinds.low.speed, 1);
 }));
+test('clock overlay refuses Guest before its start and leaves Simulation unwrapped, retaining failed receipt', async () => {
+  const config = { schemaVersion: 1, scenarioEpochUTC: 1000, armAtUTC: Date.now() + 100000 };
+  const clockIdentity = { ...identity, clock: { config, configId: sha256(JSON.stringify(config)), configSha256: 'fixture', simulationSourceSha256: 'fixture' } };
+  await browserFixture(async context => {
+    const original = context.FixtureSimulation.prototype.tick, game = context.makeGame(); game.network = false;
+    let starts = 0;
+    await assert.rejects(context.observeStartup(game, { dataset: {} }, async () => { starts++; }), /guest/);
+    await until(() => context.posted.length === 1);
+    assert.equal(starts, 0); assert.equal(context.FixtureSimulation.prototype.tick, original);
+    assert.equal(context.posted[0].outcome, 'rejected'); assert.equal(context.posted[0].clockConfigId, clockIdentity.clock.configId);
+  }, async bytes => ack(bytes), clockIdentity);
+});
+test('clock planned button uses the actual adapter, then disposal preserves a failed attempt and restores hook', async () => {
+  const config = { schemaVersion: 1, scenarioEpochUTC: 1000, armAtUTC: Date.now() + 100000,
+    benchmarkAtUTC: Date.now() + 110000, latenessToleranceMs: 20 };
+  const clockIdentity = { ...identity, clock: { config, configId: sha256(JSON.stringify(config)), configSha256: 'fixture', simulationSourceSha256: 'fixture' } };
+  await browserFixture(async context => {
+    const original = context.FixtureSimulation.prototype.tick, game = context.makeGame(); game.network = true;
+    await context.observeStartup(game, { dataset: {} }, async () => {
+      game.sim = new context.FixtureSimulation(); game.sim.tick(Date.now()); game.trafficInstant(); game.ready = true;
+    });
+    await until(() => context.measureButton().disabled === false);
+    const startup = context.posted[0];
+    assert.equal(startup.terminal.transitClock.actualSimulationMatches, true);
+    assert.equal(startup.terminal.transitClock.physics.calls, 1); assert.equal(startup.terminal.transitClock.rendering.calls, 1);
+    const button = context.all().find(value => value.textContent === 'Naplánovat jediný 10s benchmark UTC');
+    const pending = button.onclick(); game.dispose(); await pending;
+    const raw = context.posted.find(value => value.kind === 'benchmark');
+    assert.ok(raw); assert.equal(raw.completed, false); assert.equal(raw.plannedStart.reason, 'disposed-before-start');
+    assert.equal(raw.plannedStart.actualStartUTC, null); assert.deepEqual(raw.rawGameFrameMs, []);
+    assert.equal(context.FixtureSimulation.prototype.tick, original);
+  }, async bytes => ack(bytes), clockIdentity);
+});
+test('clock import deferred across dispose/rejoin cannot install a late Game owner or poison the next startup', async () => {
+  for (const disposal of ['dispose', 'rejoin']) {
+    const config = { schemaVersion: 1, scenarioEpochUTC: 1000, armAtUTC: Date.now() + 100000 };
+    const clockIdentity = { ...identity, clock: { config, configId: sha256(JSON.stringify(config)), configSha256: 'fixture', simulationSourceSha256: 'fixture' } };
+    await browserFixture(async context => {
+      const originalTick = context.FixtureSimulation.prototype.tick;
+      const old = context.makeGame(); old.network = true;
+      const originalTraffic = old.trafficInstant, deferred = context.deferSimulationImport(); let oldStarts = 0;
+      const pending = context.observeStartup(old, { dataset: {} }, async () => { oldStarts++; old.ready = true; });
+      const rejected = assert.rejects(pending, error => error.name === 'AbortError');
+      if (disposal === 'dispose') old.dispose();
+      const fresh = context.makeGame(); fresh.network = true;
+      await context.observeStartup(fresh, { dataset: {} }, async () => {
+        fresh.sim = new context.FixtureSimulation(); fresh.sim.tick(Date.now()); fresh.trafficInstant(); fresh.ready = true;
+      });
+      const freshTick = context.FixtureSimulation.prototype.tick;
+      assert.notEqual(freshTick, originalTick);
+      deferred.resolve({ Simulation: context.FixtureSimulation }); await rejected;
+      await until(() => context.posted.filter(value => value.kind === 'startup').length === 2);
+      assert.equal(oldStarts, 0); assert.equal(old.trafficInstant, originalTraffic);
+      assert.equal(context.FixtureSimulation.prototype.tick, freshTick);
+      const failed = context.posted.find(value => value.outcome === 'rejected');
+      assert.equal(failed.error.name, 'AbortError'); assert.equal(failed.clockConfigId, clockIdentity.clock.configId);
+      assert.equal(fresh.sim.tick(Date.now()), 1000);
+      fresh.dispose(); assert.equal(context.FixtureSimulation.prototype.tick, originalTick);
+    }, async bytes => ack(bytes), clockIdentity);
+  }
+});

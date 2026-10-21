@@ -1,5 +1,7 @@
 import { observeOperation } from 'virtual:webgpu-completion-observer';
 import { createAttemptQueue } from 'virtual:webgpu-completion-attempts';
+import { installBrowserClock } from 'virtual:webgpu-completion-browser-clock';
+import { createPlannedBenchmark } from 'virtual:webgpu-completion-clock';
 
 const identity = __WEBGPU_COMPLETION_IDENTITY__;
 const finite = value => typeof value === 'number' && Number.isFinite(value) ? value : null;
@@ -63,7 +65,8 @@ function compilationFields(value) {
     'observerErrors', 'bundleCountersLastFrame', 'sharedCacheCounters']);
 }
 const compilationSnapshot = game => compilationFields(game.compilationProfile.snapshot());
-function sceneSnapshot(game, canvas) {
+function sceneSnapshot(game, canvas, clockOwner) {
+  const transitClock = clockOwner?.snapshot();
   const avatars = [...game.avatars.values()].slice(0, 128).map(value => ({
     id: value.target.id, local: value.target.id === game.localId,
     avatar: pick(value.target.avatar, ['preset', 'skin', 'hair', 'shirt', 'trousers', 'glasses', 'beard', 'face']),
@@ -83,7 +86,8 @@ function sceneSnapshot(game, canvas) {
     actor: xyz(game.actor?.position), vehicle: game.actor?.vehicle ?? null, yaw: game.yaw, pitch: game.pitch, distance: game.distance,
     camera: { position: xyz(game.camera.globalPosition), fov: game.camera.fov,
       view: Array.from(game.camera.getViewMatrix().m), projection: Array.from(game.camera.getProjectionMatrix().m) },
-    lightingInstant: game.timeOverride, trafficInstant: game.trafficInstant(), flashlight: game.flashlightOn,
+    lightingInstant: game.timeOverride, trafficInstant: transitClock ? transitClock.rendering.lastMappedUTC : game.trafficInstant(), flashlight: game.flashlightOn,
+    transitClock: transitClock ?? null,
     weather: weatherSnapshot(game.weather),
     scene: { meshes: game.scene.meshes.length, materials: game.scene.materials.length, geometries: game.scene.geometries.length,
       activeMeshes: game.scene.getActiveMeshes().length, waitingItems: game.scene.getWaitingItemsCount() },
@@ -122,19 +126,20 @@ export async function observeStartup(game, canvas, start) {
   download.style.cssText = 'display:block;color:#b8e5ff'; download.hidden = true;
   controls.append(disclosure, status, download); panel.append(title, controls, output); document.body.append(panel);
   let gameRef = game, startupTimer, sampleOverflow = false, busy = false, disposed = false, downloadURL, interruptBenchmark;
-  let startupResolved = false;
+  let startupResolved = false, readyAtUTC, clockOwner, planned;
+  const clockAbort = new AbortController();
   const samples = [], observerErrors = [], buttons = [];
   const ownerId = crypto.randomUUID();
   let sequence = 0;
   const noteError = error => { if (observerErrors.length < 16) observerErrors.push(errorText(error)); };
   const tell = value => { status.textContent = JSON.stringify(value, null, 1); };
   const snapshot = () => {
-    try { return sceneSnapshot(gameRef, canvas); }
+    try { return sceneSnapshot(gameRef, canvas, clockOwner); }
     catch (error) { noteError(error); return { atMs: performance.now(), unavailable: true, error: errorText(error) }; }
   };
   const envelope = kind => ({ schemaVersion: 1, ...identity, attemptId: crypto.randomUUID(), ownerId, kind, mode,
     atMs: performance.now(), timeOrigin: performance.timeOrigin, capturedAtUTC: new Date().toISOString(),
-    userAgent: navigator.userAgent, observerErrors: [...observerErrors] });
+    userAgent: navigator.userAgent, observerErrors: [...observerErrors], clockConfigId: identity.clock?.configId ?? null });
   const keep = raw => {
     // Each attempt has an independent immutable export; never silently trim one.
     output.textContent = JSON.stringify(raw);
@@ -175,11 +180,12 @@ export async function observeStartup(game, canvas, start) {
     };
     buttons.push(button); controls.append(button);
   }
-  async function measure() {
+  async function measure(plannedStart) {
     if (gameRef.benchmark) throw new Error('An existing Game benchmark is active');
     controls.open = false;
     const owner = gameRef, before = snapshot(), original = owner.onBenchmark;
     const raw = { ...envelope('benchmark'), completed: false, before, after: null, benchmark: null,
+      plannedStart: plannedStart ? { ...plannedStart, actualStartUTC: null } : null,
       rawGameFrameMs: [], rawRafFrameMs: [], rafOverflow: false, hidden: false, focusLost: false, validationErrors: [],
       scope: 'Standard Game.startBenchmark 10s; its intrinsic BenchmarkRenderProfile remains active. Extra RAF observer records delivery cadence, not GPU execution. No periodic snapshots or diagnostic dumps inside interval.' };
     const rafValues = new Float64Array(20000);
@@ -202,7 +208,17 @@ export async function observeStartup(game, canvas, start) {
         owner.onBenchmark = wrapper;
         timeout = setTimeout(() => { if (!settled) { settled = true; reject(new Error('Standard Game benchmark exceeded 30s observer deadline')); } }, 30000);
         let accepted;
-        try { accepted = owner.startBenchmark(); }
+        try {
+          const actualUTC = Date.now();
+          if (raw.plannedStart) {
+            raw.plannedStart.attemptedAtUTC = actualUTC;
+            raw.plannedStart.latenessMs = actualUTC - raw.plannedStart.plannedUTC;
+            if (raw.plannedStart.latenessMs < 0 || raw.plannedStart.latenessMs > raw.plannedStart.latenessToleranceMs)
+              throw new Error('Planned benchmark start outside immutable lateness tolerance');
+          }
+          accepted = owner.startBenchmark();
+          if (accepted && raw.plannedStart) raw.plannedStart.actualStartUTC = actualUTC;
+        }
         finally {
           // This call began with no benchmark. Capture its actual object even
           // when startBenchmark throws after allocation, never undefined.
@@ -246,12 +262,39 @@ export async function observeStartup(game, canvas, start) {
     const cohort = state => (state.avatars ?? []).map(value => ({ id: value.id, avatar: value.avatar }));
     if (before.avatarCount !== raw.after.avatarCount || before.avatarsOmitted || raw.after.avatarsOmitted ||
         JSON.stringify(cohort(before)) !== JSON.stringify(cohort(raw.after))) raw.validationErrors.push('Avatar cohort/config changed or omitted');
+    if (identity.clock) {
+      const a = before.transitClock, b = raw.after.transitClock;
+      if (!a?.active || !b?.active || a.configId !== identity.clock.configId || b.configId !== identity.clock.configId ||
+          a.actualSimulationMatches !== true || b.actualSimulationMatches !== true ||
+          a.physics.calls < 1 || b.physics.calls <= a.physics.calls || b.rendering.calls <= a.rendering.calls ||
+          !a.physics.methodOwned || !b.physics.methodOwned || !a.rendering.methodOwned || !b.rendering.methodOwned ||
+          a.physics.unexpectedReceivers || b.physics.unexpectedReceivers)
+        raw.validationErrors.push('Unproven clock import/instance/hooks or no physics/render progress');
+      if (identity.clock.config.benchmarkAtUTC !== undefined && !plannedStart)
+        raw.validationErrors.push('Clock comparison requires its configured planned-start button');
+    }
     // Conditions during movement and actual transit workload are not inferred
     // from endpoints. Keep both actual identities for an offline campaign gate.
     raw.observerErrors = [...observerErrors];
     await persist(raw);
   }
   action('Změřit 10 s · standardní hra + raw RAF', measure);
+  if (identity.clock?.config.benchmarkAtUTC !== undefined) action('Naplánovat jediný 10s benchmark UTC', async () => {
+    const armedBefore = snapshot(), config = identity.clock.config;
+    const invalid = plan => persist({ ...envelope('benchmark'), completed: false, plannedStart: plan,
+      before: armedBefore, after: snapshot(), benchmark: null, rawGameFrameMs: [], rawRafFrameMs: [],
+      failure: { name: 'PlannedBenchmarkError', message: plan.reason }, validationErrors: [plan.reason],
+      scope: 'Invalid planned attempt retained; no Game benchmark/FPS was produced' });
+    if (planned) throw new Error('Configured planned attempt already armed');
+    if (readyAtUTC === undefined || readyAtUTC + 30000 > config.armAtUTC) {
+      planned = { dispose() {} };
+      return invalid({ plannedUTC: config.benchmarkAtUTC, actualStartUTC: null, reason: 'Startup did not leave30s settling before static arm' });
+    }
+    planned = createPlannedBenchmark(config, { nowUTC: Date.now, setTimer: (callback, delay) => setTimeout(callback, delay),
+      clearTimer: timer => clearTimeout(timer), onStart: measure, onInvalid: invalid });
+    tell({ phase: 'planned-wait', benchmarkAtUTC: config.benchmarkAtUTC, armAtUTC: config.armAtUTC });
+    await planned.arm();
+  });
   action('Uložit stav', () => persist({ ...envelope('state'), state: snapshot(), compilation: compilationSnapshot(gameRef) }));
   for (const quality of ['low', 'medium', 'high', 'auto']) action('Kvalita ' + quality, () => { gameRef.setQuality(quality); tell(snapshot()); });
   action('Cíl 60 FPS', () => { gameRef.setTargetFps(60); tell(snapshot()); });
@@ -266,13 +309,29 @@ export async function observeStartup(game, canvas, start) {
   action('Skutečný čas osvětlení', () => { gameRef.timeOverride = null; tell(snapshot()); });
   const revoke = () => { if (downloadURL) URL.revokeObjectURL(downloadURL); downloadURL = undefined; };
   const stop = () => {
-    clearInterval(startupTimer); interruptBenchmark?.(); disposed = true;
+    clearInterval(startupTimer); planned?.dispose(); interruptBenchmark?.(); disposed = true;
+    if (!clockAbort.signal.aborted) {
+      const abort = new Error('Clock QA owner stopped'); abort.name = 'AbortError'; clockAbort.abort(abort);
+    }
+    clockOwner?.dispose();
     unsubscribeTransfers(); buttons.forEach(button => button.disabled = true); gameRef = undefined;
   };
   const observer = game.scene.onDisposeObservable.addOnce(stop);
   const teardown = () => { stop(); unsubscribeTransfers(); observer.remove(true); revoke(); panel.remove(); window.removeEventListener('pagehide', revoke); };
   previousOwner = teardown; window.addEventListener('pagehide', revoke);
-  return observeOperation(start, {
+  return observeOperation(async () => {
+    const owner = await installBrowserClock(game, identity.clock, {
+      signal: clockAbort.signal, isRetired: () => disposed || gameRef !== game || game.disposed === true,
+    });
+    // A returned async owner may have lost publication to stop/rejoin. Never
+    // publish it or call the original Game.start on the retired Game.
+    if (identity.clock && (clockAbort.signal.aborted || disposed || gameRef !== game || game.disposed === true)) {
+      owner?.dispose();
+      throw clockAbort.signal.reason ?? new Error('Clock QA owner retired before startup');
+    }
+    clockOwner = owner;
+    return start();
+  }, {
     onBegin: () => { sampleStartup(); startupTimer = setInterval(sampleStartup, 1000); },
     onObserverError: noteError,
     onTerminal: (outcome, error) => {
@@ -282,6 +341,7 @@ export async function observeStartup(game, canvas, start) {
         samples, sampleOverflow, terminal, compilation: compilationSnapshot(game),
         scope: '1Hz technical startup observer only; stopped before gameplay measurement. Existing production compilation/health hooks unchanged.' };
       startupResolved = outcome === 'resolved';
+      if (startupResolved && terminal.ready) readyAtUTC = Date.now();
       void persist(raw);
       updateButtons();
     },

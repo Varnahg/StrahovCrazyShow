@@ -1,94 +1,196 @@
 TAP version 13
-# Subtest: actual UI transform is exact once, retains outer catch/dispose and original input bytes
-ok 1 - actual UI transform is exact once, retains outer catch/dispose and original input bytes
+# Subtest: immutable explicit map handles prearm, release, fractional tick, replay and rejects invalid configuration
+ok 1 - immutable explicit map handles prearm, release, fractional tick, replay and rejects invalid configuration
   ---
-  duration_ms: 7.7078
+  duration_ms: 1.5309
+  type: 'test'
+  ...
+# Subtest: single-owner wrappers preserve receiver/result/original exception and never double-map or overwrite a foreign owner
+ok 2 - single-owner wrappers preserve receiver/result/original exception and never double-map or overwrite a foreign owner
+  ---
+  duration_ms: 0.9002
+  type: 'test'
+  ...
+# Subtest: actual Simulation collider cache, extrapolation, body creation/removal and rewind equal direct mapped reference
+ok 3 - actual Simulation collider cache, extrapolation, body creation/removal and rewind equal direct mapped reference
+  ---
+  duration_ms: 1990.5155
+  type: 'test'
+  ...
+# Subtest: vehicle render sampling and physics obstacles agree at common map phases without freezing elapsed motion
+ok 4 - vehicle render sampling and physics obstacles agree at common map phases without freezing elapsed motion
+  ---
+  duration_ms: 6.257
+  type: 'test'
+  ...
+# Subtest: real Timeline authority, replay, inputEpoch/ack/time and original Date identity remain unchanged
+ok 5 - real Timeline authority, replay, inputEpoch/ack/time and original Date identity remain unchanged
+  ---
+  duration_ms: 2.454
+  type: 'test'
+  ...
+# Subtest: browser adapter is truly default-off, rejects guest and stale arm, records actual singleton calls and cleans up
+ok 6 - browser adapter is truly default-off, rejects guest and stale arm, records actual singleton calls and cleans up
+  ---
+  duration_ms: 1.3942
+  type: 'test'
+  ...
+# Subtest: deferred import cannot install on a retired Game and a fresh rejoin keeps its own prototype hooks
+ok 7 - deferred import cannot install on a retired Game and a fresh rejoin keeps its own prototype hooks
+  ---
+  duration_ms: 0.8782
+  type: 'test'
+  ...
+# Subtest: abort between adapter resolution and owner publication releases hooks; import rejection identity remains original
+ok 8 - abort between adapter resolution and owner publication releases hooks; import rejection identity remains original
+  ---
+  duration_ms: 1.2437
+  type: 'test'
+  ...
+# Subtest: one planned benchmark records actual callback, refuses lateness and preserves timer disposal without new scheduling
+ok 9 - one planned benchmark records actual callback, refuses lateness and preserves timer disposal without new scheduling
+  ---
+  duration_ms: 1.4587
+  type: 'test'
+  ...
+# Subtest: clock receipt requires exact config ID and validated explicit API port, default remains2596
+ok 10 - clock receipt requires exact config ID and validated explicit API port, default remains2596
+  ---
+  duration_ms: 0.6987
+  type: 'test'
+  ...
+# Subtest: timer installation and cleanup faults retain an invalid planned attempt without a benchmark
+ok 11 - timer installation and cleanup faults retain an invalid planned attempt without a benchmark
+  ---
+  duration_ms: 0.5164
+  type: 'test'
+  ...
+# Subtest: importing Node bootstrap is inert and source has no Date/Timeline packet patch or frame timer
+ok 12 - importing Node bootstrap is inert and source has no Date/Timeline packet patch or frame timer
+  ---
+  duration_ms: 16.3996
+  type: 'test'
+  ...
+# Subtest: verified build identity rejects a different manifest or contradicting embedded clock config without importing a server
+ok 13 - verified build identity rejects a different manifest or contradicting embedded clock config without importing a server
+  ---
+  duration_ms: 1.5489
+  type: 'test'
+  ...
+# Subtest: pure server launch plan isolates feedback/credential/static/cwd/source policy without touching process state
+ok 14 - pure server launch plan isolates feedback/credential/static/cwd/source policy without touching process state
+  ---
+  duration_ms: 0.9001
+  type: 'test'
+  ...
+# Subtest: actual UI transform is exact once, retains outer catch/dispose and original input bytes
+ok 15 - actual UI transform is exact once, retains outer catch/dispose and original input bytes
+  ---
+  duration_ms: 97.3718
   type: 'test'
   ...
 # Subtest: loading experiment changes exactly one declaration, original is byte identical, drift fails
-ok 2 - loading experiment changes exactly one declaration, original is byte identical, drift fails
+ok 16 - loading experiment changes exactly one declaration, original is byte identical, drift fails
   ---
-  duration_ms: 1.29
+  duration_ms: 3.0856
   type: 'test'
   ...
 # Subtest: startup terminal capture precedes original UI teardown and keeps the same thrown object
-ok 3 - startup terminal capture precedes original UI teardown and keeps the same thrown object
+ok 17 - startup terminal capture precedes original UI teardown and keeps the same thrown object
   ---
-  duration_ms: 1.0539
+  duration_ms: 1.8515
   type: 'test'
   ...
 # Subtest: observer faults never replace startup failure/success and operation is called once
-ok 4 - observer faults never replace startup failure/success and operation is called once
+ok 18 - observer faults never replace startup failure/success and operation is called once
   ---
-  duration_ms: 0.6757
+  duration_ms: 0.7497
   type: 'test'
   ...
 # Subtest: receipt keeps rejected startup evidence, repeated bytes are idempotent and conflict preserves original
-ok 5 - receipt keeps rejected startup evidence, repeated bytes are idempotent and conflict preserves original
+ok 19 - receipt keeps rejected startup evidence, repeated bytes are idempotent and conflict preserves original
   ---
-  duration_ms: 47.7371
+  duration_ms: 93.3519
   type: 'test'
   ...
 # Subtest: same-origin loopback POST, identity, array and byte bounds are enforced
-ok 6 - same-origin loopback POST, identity, array and byte bounds are enforced
+ok 20 - same-origin loopback POST, identity, array and byte bounds are enforced
   ---
-  duration_ms: 4.4867
+  duration_ms: 3.7485
   type: 'test'
   ...
 # Subtest: snapshot verifies all original files, rejects drift/path escape; bundle/helper hashes are real
-ok 7 - snapshot verifies all original files, rejects drift/path escape; bundle/helper hashes are real
+ok 21 - snapshot verifies all original files, rejects drift/path escape; bundle/helper hashes are real
   ---
-  duration_ms: 30.8421
+  duration_ms: 48.2704
   type: 'test'
   ...
 # Subtest: overlay forbids browser engine exposure, extra readiness/render and periodic dumps during interval
-ok 8 - overlay forbids browser engine exposure, extra readiness/render and periodic dumps during interval
+ok 22 - overlay forbids browser engine exposure, extra readiness/render and periodic dumps during interval
   ---
-  duration_ms: 1.8192
+  duration_ms: 1.6107
   type: 'test'
   ...
 # Subtest: immutable attempt queue keeps every pending/failed body until an exact ACK and supports retry
-ok 9 - immutable attempt queue keeps every pending/failed body until an exact ACK and supports retry
+ok 23 - immutable attempt queue keeps every pending/failed body until an exact ACK and supports retry
   ---
-  duration_ms: 1.6121
+  duration_ms: 3.115
   type: 'test'
   ...
 # Subtest: explicit preview port validation and derived origin authorization preserve immutable baseline ports
-ok 10 - explicit preview port validation and derived origin authorization preserve immutable baseline ports
+ok 24 - explicit preview port validation and derived origin authorization preserve immutable baseline ports
   ---
-  duration_ms: 0.5775
+  duration_ms: 1.0058
   type: 'test'
   ...
 # Subtest: actual overlay failure produces terminal export before teardown using a DOM/transport fixture, no engine
-ok 11 - actual overlay failure produces terminal export before teardown using a DOM/transport fixture, no engine
+ok 25 - actual overlay failure produces terminal export before teardown using a DOM/transport fixture, no engine
   ---
-  duration_ms: 12.3353
+  duration_ms: 27.207
   type: 'test'
   ...
 # Subtest: delayed/failed startup ACK blocks measurement and pending downloads survive rejoin unchanged
-ok 12 - delayed/failed startup ACK blocks measurement and pending downloads survive rejoin unchanged
+ok 26 - delayed/failed startup ACK blocks measurement and pending downloads survive rejoin unchanged
   ---
-  duration_ms: 7.1557
+  duration_ms: 9.764
   type: 'test'
   ...
 # Subtest: refused, thrown and disposed benchmark attempts preserve raw failure despite cleanup errors
-ok 13 - refused, thrown and disposed benchmark attempts preserve raw failure despite cleanup errors
+ok 27 - refused, thrown and disposed benchmark attempts preserve raw failure despite cleanup errors
   ---
-  duration_ms: 26.3732
+  duration_ms: 42.0484
   type: 'test'
   ...
 # Subtest: weather arrays/layers, precipitation and independent benchmark start/end snapshots are retained
-ok 14 - weather arrays/layers, precipitation and independent benchmark start/end snapshots are retained
+ok 28 - weather arrays/layers, precipitation and independent benchmark start/end snapshots are retained
   ---
-  duration_ms: 4.9085
+  duration_ms: 8.5301
   type: 'test'
   ...
-1..14
-# tests 14
+# Subtest: clock overlay refuses Guest before its start and leaves Simulation unwrapped, retaining failed receipt
+ok 29 - clock overlay refuses Guest before its start and leaves Simulation unwrapped, retaining failed receipt
+  ---
+  duration_ms: 9.4488
+  type: 'test'
+  ...
+# Subtest: clock planned button uses the actual adapter, then disposal preserves a failed attempt and restores hook
+ok 30 - clock planned button uses the actual adapter, then disposal preserves a failed attempt and restores hook
+  ---
+  duration_ms: 11.7482
+  type: 'test'
+  ...
+# Subtest: clock import deferred across dispose/rejoin cannot install a late Game owner or poison the next startup
+ok 31 - clock import deferred across dispose/rejoin cannot install a late Game owner or poison the next startup
+  ---
+  duration_ms: 22.9043
+  type: 'test'
+  ...
+1..31
+# tests 31
 # suites 0
-# pass 14
+# pass 31
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 304.2301
+# duration_ms 2873.7492

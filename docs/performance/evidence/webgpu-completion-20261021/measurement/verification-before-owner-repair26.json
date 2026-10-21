@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 3,
+  "checkedAtUTC": "2026-10-21T09:48:34.787Z",
+  "node": "v24.19.0",
+  "scope": "Targeted CPU actual Simulation/Rapier/transit/Timeline and DOM/transport fixtures only; no browser, server/index startup, network listener, GPU, production build or invented FPS",
+  "command": "node --import tsx --test --test-reporter=tap docs/performance/evidence/webgpu-completion-20261021/measurement/helper.test.mjs docs/performance/evidence/webgpu-completion-20261021/measurement/clock.test.mjs",
+  "exitCode": 0,
+  "tests": 26,
+  "pass": 26,
+  "fail": 0,
+  "skipped": 0,
+  "logSha256": "b9f873db508cface1c4d60cb0d68808c04df75e735fe13a4825c82db59a751cb",
+  "helperSha256": "91e07e773e66a0abcc463bd9fc1ad17b2a58dcaaac807c50f68f6b50d946d60f",
+  "helperFiles": {
+    "common.mjs": "b58ae6658a6e139528ea3d9d3f7ef083737e9f25a4dd5ae004df3bff6cc30d0f",
+    "startup-observer.mjs": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+    "attempt-queue.mjs": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+    "receipt.mjs": "6aebee76673b51ed19a1af98e1942aa6716324167321293e7e42bcfd6c7ffbbf",
+    "harness.mjs": "20bc7e7868568444ce030f4069957676ef0790858a43613062b6915352ba4be9",
+    "qa-overlay.mjs": "b4b3ccc13d2f58ac823cd6892a961060dbbd0600c5d6eaa3b0485c2ceaeb06ef",
+    "transit-clock.mjs": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+    "browser-clock.mjs": "94da3ed40fd08680e2a42e52d51e2aabb3448f923d311120adc11b6c1f35a160",
+    "server-bootstrap.mjs": "64b0bbc02f737e310d1e0e55331eb4f9eb1ff1a83eefd31ebd1ff54133259a5c",
+    "helper.test.mjs": "be7b4b3382736756f827dbbbdc9ec69606e7214c1b2b3e0551202296a98645e8",
+    "clock.test.mjs": "e0f688300f8021bea62d64c95bfadeb47057798ad1a1e665298069a364679bfe",
+    "README.md": "28a4b26504ab356ea5159344be4ea3d344e7682e279387345aeb57c9fa5ed19b"
+  },
+  "helperSourceStable": true,
+  "selectedSourceBefore": {
+    "shared/simulation.ts": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
+    "shared/transit.ts": "69f6e13442f8cf7aa5a513959c543cd618d097d2a61d786f0f9bb7add57b028f",
+    "shared/input-timeline.ts": "8d9d46f22550157639aeb7f3e4f23e0f88aa9f45416944062d1d5c9c28ab767f",
+    "client/network-timeline.ts": "496e6fa02a921414948e535c8b4253c3bc1e3438b185ec9d4d686fdfcd1bc123",
+    "shared/netcode.ts": "a17866c5766e63f24d64ddcaca6f08a9033b36052820ad9bd4e97217e39b585a",
+    "shared/physics-step.ts": "2acabf70b479863aa54e13699ba84b299dec7a64ddb32bffa1ccb24db0747680",
+    "shared/data/transit.json": "66c4f8f5aebce2f5fb244e0fad54b514a32e41bdbc19415c75c488335d7867ce",
+    "shared/data/transit-navigation.json": "b9acdfac3d3671f15a65882d89ab854cb76fe81dc45eba66612c15cb637ac3f3"
+  },
+  "selectedSourceAfter": {
+    "shared/simulation.ts": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
+    "shared/transit.ts": "69f6e13442f8cf7aa5a513959c543cd618d097d2a61d786f0f9bb7add57b028f",
+    "shared/input-timeline.ts": "8d9d46f22550157639aeb7f3e4f23e0f88aa9f45416944062d1d5c9c28ab767f",
+    "client/network-timeline.ts": "496e6fa02a921414948e535c8b4253c3bc1e3438b185ec9d4d686fdfcd1bc123",
+    "shared/netcode.ts": "a17866c5766e63f24d64ddcaca6f08a9033b36052820ad9bd4e97217e39b585a",
+    "shared/physics-step.ts": "2acabf70b479863aa54e13699ba84b299dec7a64ddb32bffa1ccb24db0747680",
+    "shared/data/transit.json": "66c4f8f5aebce2f5fb244e0fad54b514a32e41bdbc19415c75c488335d7867ce",
+    "shared/data/transit-navigation.json": "b9acdfac3d3671f15a65882d89ab854cb76fe81dc45eba66612c15cb637ac3f3"
+  },
+  "selectedSourceStable": true,
+  "syntaxChecks": [
+    {
+      "file": "common.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "startup-observer.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "attempt-queue.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "receipt.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "harness.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "qa-overlay.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "transit-clock.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "browser-clock.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "server-bootstrap.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "helper.test.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "clock.test.mjs",
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "actualServerHookProven": false,
+  "actualClientGPUHookProven": false,
+  "requiredRootEvidence": "Build with immutable clock JSON, fresh isolated server-bootstrap API2597 plus requested hook proofs and actual browser Game MP clock counts. Unit proofs do not stand in for real network/GPU source matching.",
+  "developmentIterations": [
+    {
+      "tests": 23,
+      "pass": 22,
+      "fail": 1,
+      "reason": "Static source guard located async function measure() rather than the new optional parameter. Guard generalized to measure( without weakening no-render/no-periodic-snapshot assertions."
+    },
+    {
+      "tests": 25,
+      "pass": 23,
+      "fail": 2,
+      "reason": "New DOM clock fixtures exposed fixture realm teardown before async pending SHA/transport ACK; old fixture receipt reached next fixture mock fetch. Fixture now awaits its pending ACKs before restoring temporary globals; actual Guest/refused/clock code unchanged by fixture repair."
+    }
+  ]
+}
