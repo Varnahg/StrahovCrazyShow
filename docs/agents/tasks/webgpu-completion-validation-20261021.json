@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [
+    "webgpu-completion-assets-20261021"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:4211",
+    "port:2596",
+    "port:2568"
+  ],
+  "verification": [
+    "pnpm build v rezervovaném izolovaném snapshotu; plná pnpm test a test:integration nad dokončeným stabilním kandidátem, actual browser GPU image a performance gates.",
+    "Před GPU actual inventory běžících scén/portů; žádné ad hoc browser automation/CDP. Použít CUA a skutečné UI/explicitní QA build.",
+    "První neupravený main preflight je diagnostický, nikoli přijatý A/B gain nebo splnění performance cíle; meze metodiky výslovně."
+  ],
+  "notes": [
+    "Výslovná autorizovaná práce na dokončení KEY22, taskový koordinátor webgpu-completion-01a15a3e-root, pracovní kopie .cache/player-feedback-20261020. Žádný cizí WIP/hraný snapshot nepřebírat."
+  ],
+  "id": "webgpu-completion-validation-20261021",
+  "title": "KEY22: současná produkční GPU reprodukce a přejímka",
+  "writePaths": [
+    ".cache/performance-snapshot/webgpu-completion-20261021-baseline/",
+    ".cache/performance-snapshot/webgpu-completion-20261021-candidate/",
+    ".cache/webgpu-completion-20261021/validation/",
+    "docs/performance/evidence/webgpu-completion-20261021/validation/",
+    "docs/agents/handoffs/webgpu-completion-validation-20261021.md"
+  ],
+  "acceptance": [
+    "Nejprve současná diagnostická reprodukce na neměnném úplném source/test/asset snapshotu včetně identity bundlu a instalovaného pinovaného engine.",
+    "Skutečná hra i editor, všech6presetů, camera/input/drive/B6/day-night/lights/weather/quality/lifecycle/guest+MP; actual1/3sessions,Hud,adapter,rozlišení,rawFPS/p95/p99 a oddělené CPU/GPU scope.",
+    "Před finální FPS přejímkou srovnatelné proložené podmínky a čas včetně fyzikální dopravy, kontinuální systémové teploty/takty; detailní profil oddělený od potvrzujících běhů.",
+    "Staré raw/failures a hráčské verze neměnit; ukončit pouze vlastní procesy a vrátit dočasný viewport."
+  ]
+}
