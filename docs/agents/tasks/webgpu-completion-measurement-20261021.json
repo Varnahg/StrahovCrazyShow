@@ -13,6 +13,8 @@
     "Znovupoužít přijatý Vite build-only transform a přesnou identitu zdrojů/testů/assetů, helperů, transformů i bundle; původní snapshot zůstává neměnný.",
     "Explicitní QA panel před skutečným Game.start zachová i neúspěšný startup, ukazuje jen whitelisted technické kopie a nemění readiness, timeout, scheduler ani renderer.",
     "Plain měření skutečné plné hry s HUD, různými MP avatary, raw frame series a doloženými rozměry/backendem/health; diagnostické instrumentace jsou oddělené.",
+    "Volitelný explicitní QA transit clock mapuje jednou Simulation.tick argument na serveru i browseru a Game.trafficInstant render; nemění autoritativní packet/input/replay clocks, fixedtimestep, Date nebo síťové deadline. Předem dané E0/A a jednorázové plánované benchmarkUTC jsou ve stejné hashed konfiguraci.",
+    "Clock je defaultoff; samostatný server-bootstrap spouští pouze root na rezervovaném API2597, existujícíbaseline2596 se nepřenastaví. Helperdoloží skutečnéhook counts, late/failed pokusy a nezávislé fyzikální/renderové mapy, nepovažujeendpointcounts za srovnatelnouceloutrasu.",
     "CLI nepoužívá automatizaci browseru, porty či procesy bez samostatné validační rezervace. Testy helperu ověří přesné transformy, odmítnutí driftu a zachování neúspěšných důkazů."
   ],
   "verification": [
