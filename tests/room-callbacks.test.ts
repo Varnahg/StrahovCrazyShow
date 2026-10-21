@@ -18,6 +18,7 @@ import { NetworkProbe } from "../client/network-probe";
 import { NetworkTimeline } from "../client/network-timeline";
 import { readWebGpuMainPassTiming } from "../client/gpu-diagnostics";
 import { snapshotAcceptedAuthorityDiagnostics } from "../client/game-diagnostics";
+import { StartupPreparationViews } from "../client/startup-preparation-view";
 
 // Execute the actual UI subscriptions, without booting React/WebGL. This catches
 // a missing guard on any handler, not only the helper's isolated behavior.
@@ -404,6 +405,7 @@ function fixture() {
       }),
     },
     authorityBufferRef: { current: new AuthorityBuffer() },
+    startupViewsRef: { current: new StartupPreparationViews() },
     bootstrapAuthorityRef: { current: null as ReceivedAuthority | null },
     playersRef: { current: [] },
     playersById: { current: new Map<string, any>() },
@@ -422,6 +424,7 @@ function fixture() {
     ["strahov.session", "prior-session-token"],
   ]);
   const game: Record<string, any> = {
+    async completeStartupPreparation() {},
     ready: true,
     network: true,
     canvas: { dataset: {} },
@@ -598,6 +601,39 @@ function payloads(id = "self") {
     networkProbe: { nonce: 1, serverTick: 120, serverTimeMs: 1000 },
   };
 }
+
+test("actual UI accepted authority projects startup view without draining ordinary queue or bypassing not-ready reconcile", () => {
+  const ui = fixture(), room = new FakeRoom(); ui.game.ready = false; ui.bind(room);
+  room.message("welcome", payloads().welcome);
+  const packet = { ...payloads().authoritative, state: { position: { x: -3.696, y: 2.62, z: -73.087 }, yaw: 1.2, vehicle: false, grounded: true, speed: 0, vertical: 0 } };
+  room.message("authoritative", packet);
+  const bootstrap = ui.bootstrapAuthorityRef.current;
+  assert.equal(ui.state["game.reconcile"], undefined); assert.equal(ui.inputBuffer.current.snapshot().lastAck, null);
+  const projection = ui.startupViewsRef.current.read(room, "self", ui.connectionAttempt.current, ui.playersRef.current)!;
+  assert.deepEqual(projection.authority!.position, packet.state.position);
+  const ordinary = { ...packet, ack: 2, tick: 2, receivedSeq: 2, time: 1017 }; room.message("authoritative", ordinary);
+  assert.equal(ui.authorityBufferRef.current.snapshot().pending, true); assert.equal(ui.bootstrapAuthorityRef.current, bootstrap);
+  ui.drainAuthorities(); assert.equal(ui.authorityBufferRef.current.snapshot().pending, true, "not-ready drain remains a no-op");
+  ui.game.ready = true; ui.drainAuthorities();
+  const applied = ui.state["game.reconcile"] as unknown as { ack: number }[];
+  assert.equal(applied[0].ack, 2); assert.equal(ui.inputBuffer.current.snapshot().lastAck, 2);
+  assert.equal(ui.authorityBufferRef.current.snapshot().pending, false);
+});
+
+test("actual UI keeps ready false until post-drain completion handshake and cannot finish a replaced room owner", async () => {
+  for (const replace of [false, true]) {
+    const ui = fixture(), oldRoom = new FakeRoom(); ui.bind(oldRoom); oldRoom.message("welcome", payloads().welcome);
+    const startup = startOwnedGame(ui), handoff = deferred<void>(); let completedAfterDrain = false;
+    startup.game.completeStartupPreparation = async () => { completedAfterDrain = true; await handoff.promise; };
+    await setImmediate(); startup.starting.resolve(); await setImmediate();
+    assert.equal(completedAfterDrain, true); assert.notEqual(ui.state.ready, true);
+    const nextRoom = new FakeRoom(); if (replace) ui.bind(nextRoom);
+    handoff.resolve(); await setImmediate();
+    assert.equal(ui.state.ready === true, !replace);
+    if (replace) { assert.equal(ui.room.current, nextRoom); assert.deepEqual(nextRoom.leaveRequests, []); }
+    startup.cleanup(); ui.leave(); oldRoom.close(); nextRoom.close();
+  }
+});
 
 function dispatchMessages(room: FakeRoom) {
   const messages = payloads();

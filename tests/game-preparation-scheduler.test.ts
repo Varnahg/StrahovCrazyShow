@@ -19,6 +19,7 @@ const source = ts.transpileModule(
   `async function runPreparedAssets() {
     let pipelinePreparation;
     const preloadRender = () => this.draw();
+    const gameplayRender = () => this.frame();
     ${statements.slice(boundary).map(statement => statement.getText(parsed.source)).join("\n")}
   }`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
@@ -28,6 +29,10 @@ const create = new Script(`(function(env) {
     waitForRenderStartup, arePreparationEffectsReady } = env;
   ${source}; return runPreparedAssets;
 })`).runInThisContext();
+const viewMethods = new Script(ts.transpileModule(`({
+  ${parsed.member("refreshStartupPreparationView").getText(parsed.source).replace("private ", "")},
+  ${parsed.member("startupPreparationStamp").getText(parsed.source).replace("private ", "")}
+})`, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText).runInThisContext();
 
 function fixture(options: { constructionError?: Error; idleError?: Error; gateError?: Error; pendingIdle?: Promise<void>; status?: string } = {}) {
   const events: string[] = [], loops: object[] = [];
@@ -72,6 +77,7 @@ function fixture(options: { constructionError?: Error; idleError?: Error; gateEr
     },
   });
   const game = {
+    ...viewMethods,
     engine, renderHealth: health, startupAbort: abort, scene: { objectRenderers: [], getActiveMeshes: () => ({ length: 0 }) },
     canvas: { dataset: {} as Record<string, string> }, ready: false, draw() {}, frame() {}, assertStartupActive() {},
     compilationProfile: { setStage() {}, snapshot: () => ({}) },
@@ -124,6 +130,7 @@ test("the actual final gate waits for the last preparation submission after its 
 
 const qualitySource = ts.transpileModule(`class QualityGame {
   ${parsed.member("prepareLighting").getText(parsed.source)}
+  ${parsed.member("preparationPosition").getText(parsed.source)}
 }`, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText;
 const QualityGame = new Script(`(function(prepareRenderQualities, MANUAL_HARDWARE_SCALING) {
   ${qualitySource}; return QualityGame;

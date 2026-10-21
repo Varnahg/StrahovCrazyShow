@@ -1,0 +1,91 @@
+TAP version 13
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:49:46]: Skeleton "known-peer continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [19:49:46]: Skeleton "self continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# Subtest: actual Game start cannot become playable until the submitted-frame gate succeeds
+ok 1 - actual Game start cannot become playable until the submitted-frame gate succeeds
+  ---
+  duration_ms: 14.9054
+  type: 'test'
+  ...
+# Subtest: actual Game/RenderStartup finite remote frame passes50ms fences with same-pose packet identities
+ok 2 - actual Game/RenderStartup finite remote frame passes50ms fences with same-pose packet identities
+  ---
+  duration_ms: 35.5582
+  type: 'test'
+  ...
+# {"status":"ready","failure":null,"simulatedVisibleMs":100,"draws":2,"submits":2,"acceptedPackets":2,"scope":"controlled CPU scheduling, not GPU/performance data"}
+# Subtest: actual Game/RenderStartup finite remote frame passes50ms fences with continuous20Hz target movement
+ok 3 - actual Game/RenderStartup finite remote frame passes50ms fences with continuous20Hz target movement
+  ---
+  duration_ms: 7.5549
+  type: 'test'
+  ...
+# {"status":"ready","failure":null,"simulatedVisibleMs":100,"draws":2,"submits":2,"acceptedPackets":2,"scope":"controlled CPU scheduling, not GPU/performance data"}
+# Subtest: remote submitted-frame gate retries real scene-visibility change during a fence
+ok 4 - remote submitted-frame gate retries real scene-visibility change during a fence
+  ---
+  duration_ms: 6.697
+  type: 'test'
+  ...
+# Subtest: remote submitted-frame gate retries real membership change during a fence
+ok 5 - remote submitted-frame gate retries real membership change during a fence
+  ---
+  duration_ms: 7.0685
+  type: 'test'
+  ...
+# Subtest: remote submitted-frame gate retries real profile change during a fence
+ok 6 - remote submitted-frame gate retries real profile change during a fence
+  ---
+  duration_ms: 5.3146
+  type: 'test'
+  ...
+# Subtest: actual AvatarLodController scene registration change inside a fence requires another validated rendered snapshot
+ok 7 - actual AvatarLodController scene registration change inside a fence requires another validated rendered snapshot
+  ---
+  duration_ms: 78.3841
+  type: 'test'
+  ...
+# Subtest: remote frame latch preserves original queue-error during an asynchronous fence
+ok 8 - remote frame latch preserves original queue-error during an asynchronous fence
+  ---
+  duration_ms: 7.4312
+  type: 'test'
+  ...
+# Subtest: remote frame latch preserves original validation-error during an asynchronous fence
+ok 9 - remote frame latch preserves original validation-error during an asynchronous fence
+  ---
+  duration_ms: 4.4532
+  type: 'test'
+  ...
+# Subtest: remote frame latch preserves original abort during an asynchronous fence
+ok 10 - remote frame latch preserves original abort during an asynchronous fence
+  ---
+  duration_ms: 4.4471
+  type: 'test'
+  ...
+# Subtest: known remote motion prepares actual root/LOD/vehicle visibility without sampling or consuming network state
+ok 11 - known remote motion prepares actual root/LOD/vehicle visibility without sampling or consuming network state
+  ---
+  duration_ms: 191.9356
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5169.9497

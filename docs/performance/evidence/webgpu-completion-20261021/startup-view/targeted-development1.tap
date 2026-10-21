@@ -1,0 +1,524 @@
+TAP version 13
+# BJS - [19:02:14]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:14]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:15]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:15]: Babylon.js v9.30.0 - Null engine
+# Subtest: Game installs one scene-owned budget/order pair before world creation
+ok 1 - Game installs one scene-owned budget/order pair before world creation
+  ---
+  duration_ms: 80.3492
+  type: 'test'
+  ...
+# Subtest: both production render callsites canonicalize actual light slots before drawing
+ok 2 - both production render callsites canonicalize actual light slots before drawing
+  ---
+  duration_ms: 65.2083
+  type: 'test'
+  ...
+# Subtest: actual preload callback does no controller work or render after cancellation
+ok 3 - actual preload callback does no controller work or render after cancellation
+  ---
+  duration_ms: 27.5052
+  type: 'test'
+  ...
+# Subtest: actual Game disposal detaches controllers before scene teardown and is idempotent
+ok 4 - actual Game disposal detaches controllers before scene teardown and is idempotent
+  ---
+  duration_ms: 24.4524
+  type: 'test'
+  ...
+# Subtest: cancelled UI startup disposes a late engine without constructing Game
+ok 5 - cancelled UI startup disposes a late engine without constructing Game
+  ---
+  duration_ms: 22.9032
+  type: 'test'
+  ...
+# Subtest: UI transfers a ready engine to Game and cleanup releases it exactly once
+ok 6 - UI transfers a ready engine to Game and cleanup releases it exactly once
+  ---
+  duration_ms: 2.6224
+  type: 'test'
+  ...
+# Subtest: backend initialization failure is reported without constructing a fallback Game
+ok 7 - backend initialization failure is reported without constructing a fallback Game
+  ---
+  duration_ms: 13.3764
+  type: 'test'
+  ...
+# Subtest: replaced canvas never receives an engine prepared for the old canvas
+ok 8 - replaced canvas never receives an engine prepared for the old canvas
+  ---
+  duration_ms: 2.2378
+  type: 'test'
+  ...
+# Subtest: construction failure releases the engine still owned by startup exactly once
+ok 9 - construction failure releases the engine still owned by startup exactly once
+  ---
+  duration_ms: 2.0718
+  type: 'test'
+  ...
+# Subtest: start failure releases the engine through its Game owner exactly once
+ok 10 - start failure releases the engine through its Game owner exactly once
+  ---
+  duration_ms: 2.0367
+  type: 'test'
+  ...
+# Subtest: a live renderer failure clears UI ready and a retired callback cannot alter a replacement
+ok 11 - a live renderer failure clears UI ready and a retired callback cannot alter a replacement
+  ---
+  duration_ms: 1.738
+  type: 'test'
+  ...
+# Subtest: loss between Game start settlement and UI continuation cannot announce game-ready
+ok 12 - loss between Game start settlement and UI continuation cannot announce game-ready
+  ---
+  duration_ms: 2.2175
+  type: 'test'
+  ...
+# Subtest: actual UI transport gate rejects absent, preparing and failed Game owners
+ok 13 - actual UI transport gate rejects absent, preparing and failed Game owners
+  ---
+  duration_ms: 26.0717
+  type: 'test'
+  ...
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game start cannot become playable until the submitted-frame gate succeeds
+ok 14 - actual Game start cannot become playable until the submitted-frame gate succeeds
+  ---
+  duration_ms: 21.4251
+  type: 'test'
+  ...
+# Subtest: actual Game rejects an incomplete light preparation instead of announcing ready
+ok 15 - actual Game rejects an incomplete light preparation instead of announcing ready
+  ---
+  duration_ms: 3.8952
+  type: 'test'
+  ...
+# Subtest: actual Game retains async scope through final gate, rejects incomplete draws and retries object targets
+ok 16 - actual Game retains async scope through final gate, rejects incomplete draws and retries object targets
+  ---
+  duration_ms: 2.4661
+  type: 'test'
+  ...
+# Subtest: actual Game final-gate fault releases async scope and never starts gameplay
+ok 17 - actual Game final-gate fault releases async scope and never starts gameplay
+  ---
+  duration_ms: 2.1911
+  type: 'test'
+  ...
+# Subtest: actual Game final gate checks pending native effects after the variants were restored
+ok 18 - actual Game final gate checks pending native effects after the variants were restored
+  ---
+  duration_ms: 2.4675
+  type: 'test'
+  ...
+# Subtest: actual whole Game startup waits for both preparation validation and its last queue fence
+ok 19 - actual whole Game startup waits for both preparation validation and its last queue fence
+  ---
+  duration_ms: 5.4851
+  type: 'test'
+  ...
+# Subtest: actual whole Game startup preserves a preparation queue rejection and never reaches the final gate
+ok 20 - actual whole Game startup preserves a preparation queue rejection and never reaches the final gate
+  ---
+  duration_ms: 3.5016
+  type: 'test'
+  ...
+# Subtest: actual whole Game abort rejects a pending preparation fence and late completion stays retired
+ok 21 - actual whole Game abort rejects a pending preparation fence and late completion stays retired
+  ---
+  duration_ms: 1.8656
+  type: 'test'
+  ...
+# Subtest: actual whole Game device-loss rejects a pending preparation fence and late completion stays retired
+ok 22 - actual whole Game device-loss rejects a pending preparation fence and late completion stays retired
+  ---
+  duration_ms: 3.3652
+  type: 'test'
+  ...
+# Subtest: device loss during physics loading promptly rejects and cannot restart the Game loop
+ok 23 - device loss during physics loading promptly rejects and cannot restart the Game loop
+  ---
+  duration_ms: 1.8847
+  type: 'test'
+  ...
+# Subtest: late asset controllers from a failed Game are disposed without changing a replacement canvas
+ok 24 - late asset controllers from a failed Game are disposed without changing a replacement canvas
+  ---
+  duration_ms: 1.6667
+  type: 'test'
+  ...
+# Subtest: one stuck loader cannot retain other abandoned controllers
+ok 25 - one stuck loader cannot retain other abandoned controllers
+  ---
+  duration_ms: 1.3159
+  type: 'test'
+  ...
+# Subtest: loss after submitted-gate settlement cannot resume a new gameplay loop
+ok 26 - loss after submitted-gate settlement cannot resume a new gameplay loop
+  ---
+  duration_ms: 3.2491
+  type: 'test'
+  ...
+# Subtest: actual Game health callback retires a ready renderer on validation and render faults
+ok 27 - actual Game health callback retires a ready renderer on validation and render faults
+  ---
+  duration_ms: 4.6652
+  type: 'test'
+  ...
+# Subtest: render fault rejects pending Game startup and releases late assets
+ok 28 - render fault rejects pending Game startup and releases late assets
+  ---
+  duration_ms: 1.8704
+  type: 'test'
+  ...
+# Subtest: failure teardown attempts every owned stage and delivers UI despite cleanup errors
+ok 29 - failure teardown attempts every owned stage and delivers UI despite cleanup errors
+  ---
+  duration_ms: 3.4272
+  type: 'test'
+  ...
+# Subtest: retired Game cannot resize, change GPU quality, or create remote/profile avatars
+ok 30 - retired Game cannot resize, change GPU quality, or create remote/profile avatars
+  ---
+  duration_ms: 1.7904
+  type: 'test'
+  ...
+# Subtest: actual Game simulation captures one detached fresh car pose at the original boundary
+ok 31 - actual Game simulation captures one detached fresh car pose at the original boundary
+  ---
+  duration_ms: 6.9741
+  type: 'test'
+  ...
+# Subtest: actual Game reconcile captures one detached fresh car pose at the original boundary
+ok 32 - actual Game reconcile captures one detached fresh car pose at the original boundary
+  ---
+  duration_ms: 2.7807
+  type: 'test'
+  ...
+# Subtest: every current room UI subscription still applies its message
+ok 33 - every current room UI subscription still applies its message
+  ---
+  duration_ms: 7.6899
+  type: 'test'
+  ...
+# Subtest: a game installed after welcome inherits the live connection and a guest stays offline
+ok 34 - a game installed after welcome inherits the live connection and a guest stays offline
+  ---
+  duration_ms: 1.6308
+  type: 'test'
+  ...
+# Subtest: leave invalidates before the handshake and all retained callbacks remain inert in menu/guest
+ok 35 - leave invalidates before the handshake and all retained callbacks remain inert in menu/guest
+  ---
+  duration_ms: 4.0883
+  type: 'test'
+  ...
+# Subtest: replaced room cannot alter the current session, emit notices/rewards, or request motion recovery
+ok 36 - replaced room cannot alter the current session, emit notices/rewards, or request motion recovery
+  ---
+  duration_ms: 2.2401
+  type: 'test'
+  ...
+# Subtest: current onLeave disconnects once and ignores subsequent retained messages and errors
+ok 37 - current onLeave disconnects once and ignores subsequent retained messages and errors
+  ---
+  duration_ms: 2.0952
+  type: 'test'
+  ...
+# Subtest: a current multiplayer entry commits identity and token only after its join succeeds
+ok 38 - a current multiplayer entry commits identity and token only after its join succeeds
+  ---
+  duration_ms: 22.3039
+  type: 'test'
+  ...
+# Subtest: leave then guest cancels a pending session fetch without reading its body or joining
+ok 39 - leave then guest cancels a pending session fetch without reading its body or joining
+  ---
+  duration_ms: 2.5626
+  type: 'test'
+  ...
+# Subtest: direct guest entry cancels an in-flight session body before identity or join mutation
+ok 40 - direct guest entry cancels an in-flight session body before identity or join mutation
+  ---
+  duration_ms: 5.4137
+  type: 'test'
+  ...
+# Subtest: a join resolving after leave and guest entry closes its room without rebinding or effects
+ok 41 - a join resolving after leave and guest entry closes its room without rebinding or effects
+  ---
+  duration_ms: 5.9899
+  type: 'test'
+  ...
+# Subtest: the newest overlapping connection wins and a late older join cannot replace it
+ok 42 - the newest overlapping connection wins and a late older join cannot replace it
+  ---
+  duration_ms: 4.5416
+  type: 'test'
+  ...
+# Subtest: an accepted replacement invalidates old callbacks before closing the previous live room
+ok 43 - an accepted replacement invalidates old callbacks before closing the previous live room
+  ---
+  duration_ms: 4.4662
+  type: 'test'
+  ...
+# Subtest: enter cannot restore multiplayer when leave/guest runs between connect and enter continuations
+ok 44 - enter cannot restore multiplayer when leave/guest runs between connect and enter continuations
+  ---
+  duration_ms: 3.0081
+  type: 'test'
+  ...
+# Subtest: a rejected close remains harmless after explicit leave or a cancelled join
+ok 45 - a rejected close remains harmless after explicit leave or a cancelled join
+  ---
+  duration_ms: 4.7487
+  type: 'test'
+  ...
+# Subtest: cancelled fetch/json/join rejections cannot display an entry error or reconnect notice
+ok 46 - cancelled fetch/json/join rejections cannot display an entry error or reconnect notice
+  ---
+  duration_ms: 17.0792
+  type: 'test'
+  ...
+# Subtest: current connection failures still reach entry and reconnect feedback
+ok 47 - current connection failures still reach entry and reconnect feedback
+  ---
+  duration_ms: 3.3896
+  type: 'test'
+  ...
+# Subtest: authority callback rejects stale epoch before acknowledging queued inputs and retains arrival time
+ok 48 - authority callback rejects stale epoch before acknowledging queued inputs and retains arrival time
+  ---
+  duration_ms: 2.1666
+  type: 'test'
+  ...
+# Subtest: ordinary authority backlog is applied once per frame using original arrival time, while barriers stay immediate
+ok 49 - ordinary authority backlog is applied once per frame using original arrival time, while barriers stay immediate
+  ---
+  duration_ms: 3.9703
+  type: 'test'
+  ...
+# Subtest: bootstrap authority is retained until physics is ready and multiplayer state never drains into a guest
+ok 50 - bootstrap authority is retained until physics is ready and multiplayer state never drains into a guest
+  ---
+  duration_ms: 1.9216
+  type: 'test'
+  ...
+# Subtest: the actual probe callback logs main-thread contamination without feeding it into prediction
+ok 51 - the actual probe callback logs main-thread contamination without feeding it into prediction
+  ---
+  duration_ms: 2.8493
+  type: 'test'
+  ...
+# Subtest: actual UI rebind discards same-identity timing confidence without replacing the timeline
+ok 52 - actual UI rebind discards same-identity timing confidence without replacing the timeline
+  ---
+  duration_ms: 2.977
+  type: 'test'
+  ...
+# Subtest: actual UI close discards same-identity timing confidence without replacing the timeline
+ok 53 - actual UI close discards same-identity timing confidence without replacing the timeline
+  ---
+  duration_ms: 1.5361
+  type: 'test'
+  ...
+# Subtest: actual UI leave discards same-identity timing confidence without replacing the timeline
+ok 54 - actual UI leave discards same-identity timing confidence without replacing the timeline
+  ---
+  duration_ms: 1.4651
+  type: 'test'
+  ...
+# Subtest: actual UI transport diagnostics require the current connected multiplayer room
+ok 55 - actual UI transport diagnostics require the current connected multiplayer room
+  ---
+  duration_ms: 1.6916
+  type: 'test'
+  ...
+# Subtest: actual UI connection timer cleanup resets diagnostic context without replacing prediction
+ok 56 - actual UI connection timer cleanup resets diagnostic context without replacing prediction
+  ---
+  duration_ms: 1.9781
+  type: 'test'
+  ...
+# Subtest: actual UI bind resets probe, timing confidence and frame context in order
+ok 57 - actual UI bind resets probe, timing confidence and frame context in order
+  ---
+  duration_ms: 2.5446
+  type: 'test'
+  ...
+# Subtest: actual UI room-close resets probe, timing confidence and frame context in order
+ok 58 - actual UI room-close resets probe, timing confidence and frame context in order
+  ---
+  duration_ms: 2.0376
+  type: 'test'
+  ...
+# Subtest: actual UI leave resets probe, timing confidence and frame context in order
+ok 59 - actual UI leave resets probe, timing confidence and frame context in order
+  ---
+  duration_ms: 2.0375
+  type: 'test'
+  ...
+# Subtest: actual UI identity-change resets probe, timing confidence and frame context in order
+ok 60 - actual UI identity-change resets probe, timing confidence and frame context in order
+  ---
+  duration_ms: 10.3197
+  type: 'test'
+  ...
+# Subtest: actual UI timer-cleanup resets probe, timing confidence and frame context in order
+ok 61 - actual UI timer-cleanup resets probe, timing confidence and frame context in order
+  ---
+  duration_ms: 2.2836
+  type: 'test'
+  ...
+# Subtest: actual UI diagnostic reset resolves each current owner without retaining previous refs
+ok 62 - actual UI diagnostic reset resolves each current owner without retaining previous refs
+  ---
+  duration_ms: 2.4239
+  type: 'test'
+  ...
+# Subtest: actual UI hook assignments drain authority before Game simulation and flush its generated input afterward
+ok 63 - actual UI hook assignments drain authority before Game simulation and flush its generated input afterward
+  ---
+  duration_ms: 4.539
+  type: 'test'
+  ...
+# Subtest: actual Game lifecycle emits game-ready only after successful uncancelled start: success
+ok 64 - actual Game lifecycle emits game-ready only after successful uncancelled start: success
+  ---
+  duration_ms: 5.851
+  type: 'test'
+  ...
+# Subtest: actual Game lifecycle emits game-ready only after successful uncancelled start: failure
+ok 65 - actual Game lifecycle emits game-ready only after successful uncancelled start: failure
+  ---
+  duration_ms: 4.1577
+  type: 'test'
+  ...
+# Subtest: actual Game lifecycle emits game-ready only after successful uncancelled start: cancel-success
+ok 66 - actual Game lifecycle emits game-ready only after successful uncancelled start: cancel-success
+  ---
+  duration_ms: 4.222
+  type: 'test'
+  ...
+# Subtest: actual Game lifecycle emits game-ready only after successful uncancelled start: cancel-failure
+ok 67 - actual Game lifecycle emits game-ready only after successful uncancelled start: cancel-failure
+  ---
+  duration_ms: 3.6001
+  type: 'test'
+  ...
+# Subtest: terminal startup factory failure releases its joined Room without replacing the original error
+ok 68 - terminal startup factory failure releases its joined Room without replacing the original error
+  ---
+  duration_ms: 5.3347
+  type: 'test'
+  ...
+# Subtest: terminal startup start failure releases its joined Room without replacing the original error
+ok 69 - terminal startup start failure releases its joined Room without replacing the original error
+  ---
+  duration_ms: 4.6604
+  type: 'test'
+  ...
+# Subtest: terminal startup clears owned buffers and send gates before synchronous or retained Room callbacks
+ok 70 - terminal startup clears owned buffers and send gates before synchronous or retained Room callbacks
+  ---
+  duration_ms: 6.8026
+  type: 'test'
+  ...
+# Subtest: deferred consented leave from a failed startup cannot disconnect or send through the rejoined Room
+ok 71 - deferred consented leave from a failed startup cannot disconnect or send through the rejoined Room
+  ---
+  duration_ms: 7.3695
+  type: 'test'
+  ...
+# Subtest: a stale Game failure and cleanup cannot dispose the replacement Game or retire its Room
+ok 72 - a stale Game failure and cleanup cannot dispose the replacement Game or retire its Room
+  ---
+  duration_ms: 5.4629
+  type: 'test'
+  ...
+# Subtest: startup failure retires its old Room while a newer pending join keeps its own generation
+ok 73 - startup failure retires its old Room while a newer pending join keeps its own generation
+  ---
+  duration_ms: 5.8674
+  type: 'test'
+  ...
+# Subtest: Room leave reject cannot replace a terminal startup error
+ok 74 - Room leave reject cannot replace a terminal startup error
+  ---
+  duration_ms: 4.5618
+  type: 'test'
+  ...
+# Subtest: Room leave throw cannot replace a terminal startup error
+ok 75 - Room leave throw cannot replace a terminal startup error
+  ---
+  duration_ms: 3.0109
+  type: 'test'
+  ...
+# Subtest: a Guest startup failure cannot retire an unrelated multiplayer Room
+ok 76 - a Guest startup failure cannot retire an unrelated multiplayer Room
+  ---
+  duration_ms: 3.3908
+  type: 'test'
+  ...
+# Subtest: a late factory rejection cannot publish an error into a replacement Game or disconnect its Room
+ok 77 - a late factory rejection cannot publish an error into a replacement Game or disconnect its Room
+  ---
+  duration_ms: 5.889
+  type: 'test'
+  ...
+# Subtest: accepted authority projection copies actor-center pose without taking or changing actual queue/frontier
+ok 78 - accepted authority projection copies actor-center pose without taking or changing actual queue/frontier
+  ---
+  duration_ms: 4.1288
+  type: 'test'
+  ...
+# Subtest: invalid pose/mode/yaw and rejected stale authority cannot become a presentation anchor
+ok 79 - invalid pose/mode/yaw and rejected stale authority cannot become a presentation anchor
+  ---
+  duration_ms: 0.4694
+  type: 'test'
+  ...
+# Subtest: owner/self/attempt retirement and a late old finish cannot release a fresh room projection
+ok 80 - owner/self/attempt retirement and a late old finish cannot release a fresh room projection
+  ---
+  duration_ms: 0.3351
+  type: 'test'
+  ...
+# Subtest: 20Hz packet/tick identity and submillimetre jitter do not change the spatial stage key; epoch/roster/mode do
+ok 81 - 20Hz packet/tick identity and submillimetre jitter do not change the spatial stage key; epoch/roster/mode do
+  ---
+  duration_ms: 18.4972
+  type: 'test'
+  ...
+# Subtest: one visible30s final-gate budget spans first gate, delayed observer, hidden pause and handshake without reset
+ok 82 - one visible30s final-gate budget spans first gate, delayed observer, hidden pause and handshake without reset
+  ---
+  duration_ms: 0.7996
+  type: 'test'
+  ...
+1..82
+# tests 82
+# suites 0
+# pass 82
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6139.9368

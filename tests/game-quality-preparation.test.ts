@@ -18,6 +18,7 @@ const { source, gameClass: declaration, selectMembers } = readGameSource(
 );
 const names = [
   "prepareLighting",
+  "preparationPosition",
   "applyAdaptiveQuality",
   "applyRenderQuality",
   "setQuality",

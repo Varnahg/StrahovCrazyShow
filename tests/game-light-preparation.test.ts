@@ -25,7 +25,7 @@ import { selectLightingPreview } from "../client/lighting-preview";
 const { source, gameClass: declaration, selectMembers } = readGameSource(
   process.env.GAME_PREPARATION_SOURCE,
 );
-const members = selectMembers(["prepareLightingVariants", "isMeshReadyForCamera"]);
+const members = selectMembers(["prepareLightingVariants", "isMeshReadyForCamera", "applyPreparationView", "preparationPosition", "refreshStartupPreparationView", "startupPreparationCoverage"]);
 const compiled = ts.transpileModule(
   `class PreparationGame { ${members.map((node) => node.getText(source)).join("\n")} };`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },

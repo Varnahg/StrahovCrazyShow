@@ -8,6 +8,7 @@ import { getRendererInfo } from "./gpu-diagnostics";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { FrameInputBuffer } from "./network-input-buffer";
 import { AuthorityBuffer, type ReceivedAuthority } from "./authority-buffer";
+import { StartupPreparationViews } from "./startup-preparation-view";
 import { NetworkProbe } from "./network-probe";
 import type { NetworkProbeReply } from "../shared/network-diagnostics";
 
@@ -223,6 +224,7 @@ export function App() {
   );
   const inputBuffer = useRef<FrameInputBuffer | null>(null),
     authorityBufferRef = useRef<AuthorityBuffer | null>(null),
+    startupViewsRef = useRef<StartupPreparationViews | null>(null),
     bootstrapAuthorityRef = useRef<ReceivedAuthority | null>(null),
     playersById = useRef(new Map<string, Player>()),
     connectedRef = useRef(false);
@@ -378,6 +380,7 @@ export function App() {
         }),
     });
   authorityBufferRef.current ??= new AuthorityBuffer();
+  startupViewsRef.current ??= new StartupPreparationViews();
   networkProbeRef.current ??= new NetworkProbe({
     now: () => performance.now(),
     send: (request) => room.current!.send("networkProbe", request),
@@ -411,6 +414,7 @@ export function App() {
     inputBuffer.current?.reset(reason);
     bootstrapAuthorityRef.current = null;
     authorityBufferRef.current?.reset();
+    startupViewsRef.current?.reset();
     resetConnectionDiagnostics();
     playersRef.current = [];
     playersById.current.clear();
@@ -645,6 +649,10 @@ export function App() {
           inputBuffer.current?.reset("renderer-failure");
         };
         g.network = mode === "multi";
+        if (startupConnection) g.startupPreparationSource = () => {
+          if (cancelled || game.current !== g || room.current !== startupConnection.room || connectionAttempt.current !== startupConnection.attempt) return null;
+          return startupViewsRef.current?.read(startupConnection.room!, g.localId, startupConnection.attempt, playersRef.current) ?? null;
+        };
         syncNetworkStage(g);
         g.timeOverride = lightingPreviewRef.current.instant;
         g.setLocalId(idRef.current);
@@ -707,6 +715,17 @@ export function App() {
           if (carState.current) g.setCar(carState.current);
           g.setFound(activity.hunt);
           drainAuthorities();
+          await g.completeStartupPreparation();
+          if (cancelled || game.current !== g || canvas.current !== startupCanvas) return;
+          const restoredHealth = g.renderHealth.snapshot();
+          if (!g.ready || !restoredHealth.valid)
+            throw new Error(restoredHealth.firstErrors[0]?.message ?? "Renderer nedokončil obnovený pohled.");
+          if (startupConnection && (room.current !== startupConnection.room || connectionAttempt.current !== startupConnection.attempt)) {
+            const error = new Error("Startup connection owner retired");
+            error.name = "AbortError";
+            throw error;
+          }
+          if (startupConnection?.room) startupViewsRef.current?.finish(startupConnection.room);
           const rtt = networkProbeRef.current?.snapshot().predictionRoundTripMs;
           if (rtt !== null && rtt !== undefined) g.networkTimeline.setRtt(rtt);
         }
@@ -757,6 +776,7 @@ export function App() {
     let lastMotionRecovery = -Infinity;
     room.current = r;
     authorityBufferRef.current?.reset();
+    startupViewsRef.current?.begin(r, idRef.current, connectionAttempt.current);
     bootstrapAuthorityRef.current = null;
     resetConnectionDiagnostics();
     connectedRef.current = true;
@@ -782,6 +802,7 @@ export function App() {
     });
     callbacks.onMessage("welcome", (data: any) => {
       idRef.current = data.id;
+      startupViewsRef.current?.identify(r, data.id, connectionAttempt.current);
       setSelfId(data.id);
       game.current?.setLocalId(data.id);
       playersRef.current = data.players;
@@ -826,7 +847,9 @@ export function App() {
       game.current?.syncMotion(packet);
     });
     callbacks.onMessage("authoritative", (data: Authority) => {
-      const result = authorityBufferRef.current?.offer(data, performance.now());
+      const receivedAt = performance.now();
+      const result = authorityBufferRef.current?.offer(data, receivedAt);
+      if (result) startupViewsRef.current?.offer(r, data, receivedAt, result);
       if (result?.kind !== "barrier") return;
       if (
         modeRef.current === "multi" &&
@@ -868,6 +891,7 @@ export function App() {
       inputBuffer.current?.reset("room-left");
       bootstrapAuthorityRef.current = null;
       authorityBufferRef.current?.reset();
+      startupViewsRef.current?.reset();
       resetConnectionDiagnostics();
       playersRef.current = [];
       playersById.current.clear();
@@ -922,6 +946,7 @@ export function App() {
       if (identityChanged) {
         bootstrapAuthorityRef.current = null;
         authorityBufferRef.current?.reset();
+        startupViewsRef.current?.reset();
         resetConnectionDiagnostics();
         carState.current = null;
         inputBuffer.current?.reset("identity-changed");

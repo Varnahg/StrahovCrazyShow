@@ -58,9 +58,13 @@ const methods = declaration.members.filter(
       "prepareLightingVariants",
       "isMeshReadyForCamera",
       "updateRenderEnvironment",
+      "applyPreparationView",
+      "preparationPosition",
+      "refreshStartupPreparationView",
+      "startupPreparationCoverage",
     ].includes(n.name.getText(source)),
 );
-assert.equal(methods.length, 4);
+assert.equal(methods.length, 8);
 const code = ts.transpileModule(
   `class TestGame {${methods.map((n) => n.getText(source)).join("\n")}}`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },

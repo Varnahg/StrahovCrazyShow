@@ -95,7 +95,7 @@ test("actual authored factories retain browser texture metadata in bounded IO ad
 
 const gameSource=fs.readFileSync(new URL("../client/game.ts",import.meta.url),"utf8");
 const tree=ts.createSourceFile("game.ts",gameSource,ts.ScriptTarget.Latest,true),declaration=tree.statements.find((n):n is ts.ClassDeclaration=>ts.isClassDeclaration(n)&&n.name?.text==="Game")!;
-const selected=["prepareLighting","prepareLightingVariants","isMeshReadyForCamera","updateRenderEnvironment","applyRenderQuality","updateCameraFollow","alignVehicleCamera","footFirstPerson"];
+const selected=["prepareLighting","prepareLightingVariants","isMeshReadyForCamera","updateRenderEnvironment","applyRenderQuality","updateCameraFollow","alignVehicleCamera","footFirstPerson","applyPreparationView","preparationPosition","refreshStartupPreparationView","startupPreparationCoverage"];
 const methods=declaration.members.filter(n=>n.name&&selected.includes(n.name.getText(tree)));assert.equal(methods.length,selected.length);
 report.methods=methods.map(n=>({name:n.name!.getText(tree),sha256:sha(n.getText(tree))}));
 const code=ts.transpileModule(`class ProofGame {${methods.map(n=>n.getText(tree)).join("\n")}}`,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;

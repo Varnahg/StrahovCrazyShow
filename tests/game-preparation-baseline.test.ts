@@ -10,7 +10,7 @@ const methods=()=>{
   const source=fs.readFileSync(new URL('../client/game.ts',import.meta.url),'utf8');
   const tree=ts.createSourceFile('game.ts',source,ts.ScriptTarget.Latest,true);
   const game=tree.statements.find((node):node is ts.ClassDeclaration=>ts.isClassDeclaration(node)&&node.name?.text==='Game')!;
-  return ['prepareLighting','applyRenderQuality'].map(name=>game.members.find(n=>n.name?.getText(tree)===name)!.getText(tree));
+  return ['prepareLighting','applyRenderQuality','preparationPosition'].map(name=>game.members.find(n=>n.name?.getText(tree)===name)!.getText(tree));
 };
 const result=(status='complete',active=0)=>({status,failureStep:null,stages:[],elapsedMs:active,activeElapsedMs:active,pausedMs:0});
 function fixture(initial='medium') {

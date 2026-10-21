@@ -94,6 +94,10 @@ function fixture(t: import("node:test").TestContext) {
       .map((node) => node.getText(source))
       .join("\n"),
   ).call(game);
+  for (const name of ["refreshStartupPreparationView", "startupPreparationStamp"]) {
+    const body = member(name) as ts.MethodDeclaration;
+    Object.assign(game, { [name]: compile(body.body!.statements.map(node => node.getText(source)).join("\n")).bind(game) });
+  }
   assert.ok(game.stableLights instanceof StableLightState);
   assert.ok(game.gltfLightBudget instanceof GltfLightBudget);
   return game;
