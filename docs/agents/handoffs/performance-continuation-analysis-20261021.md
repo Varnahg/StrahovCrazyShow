@@ -12,3 +12,7 @@
 - Přijatá runtime integrace: PR22/head3ac77c7a skutečně main e9bc2f54289e9f444f91f4c82b9e3abe3c9c16d3; main verify39519577977 a hygiene39519577922 SUCCESS. Tím se nedokládá FPS gain. Vlastní evidence zatím čeká předání publikace od koordinátora KEY-53.
 - Procesy: žádný vlastní daemon/port/browser/GPU/Blender pro tuto analýzu neběží. Čtení CPU bez heavy/GPU rezervace; původní měření i jeho úklid patří producentovi.
 - Další krok: dokončit publikaci vlastních oddělených research/performance/feedback-evidence commitů po handback; KEY-5 a KEY-21 zůstávají otevřené. Rezervace je zatím držená kvůli finální evidenci/publikaci, heartbeat obnovován. Stav tasku změní integrátor po přijetí.
+
+## Skutečné závěrečné přijetí
+
+PR21/main `9341bcef674de81abd9ae99f1afbf211672165d4` má skutečné verify39526776393 1864/1864 PASS, 0 fail/skip, build/integraci PASS a hygiene39526776319 SUCCESS. [Doklad](https://github.com/Varnahg/StrahovCrazyShow/pull/21#issuecomment-6305781340). Publikovaný main strom je shodný s přijatým head5667e4ee; všech 39 předaných blob SHA zachováno. Tím je dřívější stav čekání v tomto předání překonaný. KEY-5 zůstává otevřený, ale vyžádaný analytický podklad, priority a reprodukce jsou dokončené. Místní postvalidation ledger a status Done pouze zrcadlí již zveřejněný doklad; žádná nová runtime změna. Po katalogovém commitu se rezervace uvolní, žádný vlastní pomocný proces neběží.
