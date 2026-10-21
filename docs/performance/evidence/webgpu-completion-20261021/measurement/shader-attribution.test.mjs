@@ -66,7 +66,8 @@ test('actual profiler keeps original module/getInfo count and validated observe 
     const model=world(f,vertex,fragment);
     f.operations[0].resolve({messages:[]});f.operations[1].resolve({messages:[]});await flush();
     observer.dispose();const snapshot=observer.snapshot();
-    assert.equal(snapshot.evidenceValid,true);assert.equal(snapshot.active,false);
+    assert.equal(snapshot.jobTraceComplete,true);assert.equal(snapshot.evidenceValid,false);assert.equal(snapshot.active,false);
+    assert.equal(snapshot.lifetime.coverage.unlinkedFinalModules,2,'direct device fixture has no original Effect owner scope');
     assert.deepEqual(snapshot.jobs.map(row=>[row[1],row[2],snapshot.stages[row[3]],row[7]]),[[1,1,'submitted-frame',1],[2,2,'submitted-frame',1]]);
     assert.deepEqual(snapshot.mapping.effects,[[1,1,1,2,0,-1]]);
     assert.equal(snapshot.mapping.meshes[0].regularInstances,1);assert.equal(snapshot.mapping.meshes[0].localHiddenInstances,1);

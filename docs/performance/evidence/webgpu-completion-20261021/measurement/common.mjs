@@ -52,7 +52,7 @@ export async function directoryHashes(directory) {
 }
 export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs',
   'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'weather-fixture.mjs', 'startup-latency.mjs',
-  'shader-attribution.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'README.md'];
+  'shader-attribution.mjs', 'shader-lifetime.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'README.md'];
 export function parseBuildOptions(args) {
   const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false };
   let loadingSeen = false;

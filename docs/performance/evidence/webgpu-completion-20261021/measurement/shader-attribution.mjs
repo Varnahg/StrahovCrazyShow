@@ -1,4 +1,5 @@
 /** Build-only diagnostic. Observe existing profiler jobs, never request GPU work. */
+import { observeShaderLifetime, readMaterialFor } from './shader-lifetime.mjs';
 export const ATTRIBUTION_LIMITS = Object.freeze({ jobs: 4096, modules: 4096, effects: 2048, meshes: 512, links: 1024, meshScan: 8192, instanceScan: 8192, stages: 24 });
 const owners = new WeakMap(), nativeThen = Promise.prototype.then;
 const nativeMapGet=Map.prototype.get,nativeMapEntries=Map.prototype.entries;
@@ -51,7 +52,8 @@ export function observeShaderAttribution(game, options = {}) {
   const limits = Object.fromEntries(Object.entries(ATTRIBUTION_LIMITS).map(([key,max]) => [key, Math.min(max, Math.max(1, Math.floor(options.limits?.[key] ?? max) || 1))]));
   const issues = { observerErrors:0, overflow:0, traceOverflow:0, mappingOverflow:0, mappingErrors:0, unknownRole:0, unknownStage:0, unmatchedJobs:0, unsupportedPromise:0, ownerChanged:0, unexpectedReceivers:0, restoreConflicts:0, restoreFailures:0, contract:0 };
   const hooks=[], jobs=[], modules=[], stages=['unobserved-before-start'], stack=[];
-  let moduleIDs = new WeakMap(), profile, engine, device, generation, currentStage=0, active=true, registered=false, sealed;
+  let moduleIDs = new WeakMap(), profile, engine, device, generation, currentStage=0, active=true, registered=false, sealed,lifetime;
+  const finalModuleIDs=new Set();
   let gameRef=game, signal=options.signal, retired=options.isRetired;
   const token={}, now=options.now ?? (() => performance.now()), availability={ inspectShader:'unavailable',observe:'unavailable',setStage:'unavailable' };
   const readNow = () => { try { const value=now(); if (Number.isFinite(value)&&value>=0) return value; } catch { issues.observerErrors++; } return null; };
@@ -70,6 +72,7 @@ export function observeShaderAttribution(game, options = {}) {
     stages.push(name); return stages.length-1;
   };
   function passiveMapping() {
+    const linkLimit=Math.max(0,limits.links-(lifetime?.linkCount()??0)),meshLimit=Math.max(0,limits.meshes-(lifetime?.ownerCount()??0));
     const result={ effectColumns:['effectID','pipelineContextID','vertexModuleID','fragmentModuleID','disposedFlag','readyFlag'],effects:[],meshes:[],links:[],cacheEntries:0,meshEntries:0,meshesScanned:0,instancesScanned:0,unobservedEffects:0,unknownSlots:0,redactedNames:0,shadowEntriesScanned:0,shadowSubMeshLookups:0,shadowOwnerMismatches:0,legacySubMaterialSlots:0,
       selection:'Pending original jobs first, then submitted-frame, then completed history; bounded candidate links and one bounded mesh scan' };
     const effectIDs=new WeakMap(), contextIDs=new WeakMap(), unobserved=new WeakSet(), materialIDs=new WeakMap();
@@ -115,27 +118,12 @@ export function observeShaderAttribution(game, options = {}) {
       return [instances.length,yes,no,unknown];
     };
     const materialFor=(mesh,sub,pass)=>{
-      const info=data(mesh,'_internalAbstractMeshDataInfo');
-      let material=data(data(info,'_materialForRenderPass'),pass)??data(info,'_material');
-      let materials=data(material,'_subMaterials');
-      if(materials===undefined&&object(material)){
-        const legacy=Object.getOwnPropertyDescriptor(material,'subMaterials');
-        if(legacy&&'value'in legacy){materials=legacy.value;result.legacySubMaterialSlots++;}
-        else for(let cursor=material;object(cursor);cursor=Object.getPrototypeOf(cursor)){
-          const descriptor=Object.getOwnPropertyDescriptor(cursor,'subMaterials');
-          if(descriptor){result.unknownSlots++;return;}
-        }
-      }
-      if(materials!==undefined){
-        if(!Array.isArray(materials)){result.unknownSlots++;return;}
-        material=data(materials,data(sub,'materialIndex'));
-      }
-      return material;
+      return readMaterialFor(mesh,sub,pass,()=>result.unknownSlots++,()=>result.legacySubMaterialSlots++);
     };
     const offer=candidate=>{
       const pair=pairFor(candidate.effect);if(!pair)return;
       const priority=pair.priority;
-      if(candidateCount>=limits.links){
+      if(candidateCount>=linkLimit){
         overflow();let replace=-1;
         for(let tier=candidates.length-1;tier>priority;tier--)if(candidates[tier].length){replace=tier;break;}
         if(replace<0)return;candidates[replace].pop();candidateCount--;
@@ -201,7 +189,7 @@ export function observeShaderAttribution(game, options = {}) {
     for(const group of candidates) for(const {mesh,sub,si,pass,wrapper,effect,material,sourceKind,shadow,generator,aliasPassIDs} of group) {
           let meshID=meshIDs.get(mesh)??0;
           if(!meshID) {
-            if(result.meshes.length>=limits.meshes) { overflow(); continue; }
+            if(result.meshes.length>=meshLimit) { overflow(); continue; }
             meshID=result.meshes.length+1; meshIDs.set(mesh,meshID); const counts=countInstances(mesh);
             const local=data(mesh,'_nodeDataStorage'), name=technicalName(data(mesh,'name')); if(name===null) result.redactedNames++;
             result.meshes.push({ id:meshID,name,regularInstances:counts[0],localVisibleInstances:counts[1],localHiddenInstances:counts[2],unknownInstances:counts[3],
@@ -240,18 +228,19 @@ export function observeShaderAttribution(game, options = {}) {
     snapshot() {
       const evidence=sealed ?? { stoppedAtMs:null,mapping:null };
       const installed=Object.values(availability).every(v=>v==='installed');
-      return { enabled:true,active,evidenceValid:installed&&Object.values(issues).every(v=>v===0)&&(active||evidence.mapping?.boundedScanComplete===true),
+      const lifetimeEvidence=lifetime?.snapshot()??null;
+      return { enabled:true,active,evidenceValid:installed&&Object.values(issues).every(v=>v===0)&&(active||evidence.mapping?.boundedScanComplete===true)&&(!lifetimeEvidence||lifetimeEvidence.evidenceComplete),
         jobTraceComplete:installed&&Object.entries(issues).every(([key,value])=>['overflow','mappingOverflow','mappingErrors'].includes(key)||value===0),
         limits:{...limits},availability:{...availability},issues:{...issues},generation:integer(generation),stages:[...stages],moduleColumns:['moduleID','roleBits','inspectionCalls'],modules:modules.map(row=>[...row]),jobs:jobs.map(row=>[...row]),
         jobColumns:['jobID','moduleID','role','stageID','profileGeneration','startedAtMs','settledAtMs','outcome'],
         roleCodes:{unknown:0,vertex:1,fragment:2,bothModuleRoles:3},flagCodes:{unknown:-1,false:0,true:1},outcomeCodes:{pendingAtStop:0,fulfilled:1,rejected:2,synchronousObserveThrow:3,unsupportedPromise:4},
-        stoppedAtMs:evidence.stoppedAtMs,mapping:evidence.mapping?structuredClone(evidence.mapping):null,
+        stoppedAtMs:evidence.stoppedAtMs,mapping:evidence.mapping?structuredClone(evidence.mapping):null,lifetime:lifetimeEvidence,
         scope:'Observed original validated shader Promise jobs only. IDs are local technical identities. Terminal mapping reads current data slots; last cached batches are not new visibility/readiness evaluation. Missing earlier/retired modules stay unobserved. No shader text/defines/GPU objects, new getCompilationInfo/render/await or whole-scene dump.' };
     },
     dispose() {
       if(!active) return;
       if(profile && (data(profile,'active')!==true || data(profile,'generation')!==generation || data(engine,'_device')!==device)) issues.ownerChanged++;
-      active=false;sealed={stoppedAtMs:readNow(),mapping:null};
+      active=false;lifetime?.dispose();sealed={stoppedAtMs:readNow(),mapping:null};
       try{sealed.mapping=passiveMapping();}catch{issues.mappingErrors++;}
       if(sealed.mapping) sealed.mapping.boundedScanComplete=sealed.mapping.unknownSlots===0&&issues.mappingOverflow===0;
       safe(()=>signal?.removeEventListener('abort',onAbort));
@@ -287,13 +276,13 @@ export function observeShaderAttribution(game, options = {}) {
     install('setStage',original=>function(...args){
       if(!active||!live()) return Reflect.apply(original,this,args);
       if(this!==profile) { issues.unexpectedReceivers++; return Reflect.apply(original,this,args); }
-      const result=Reflect.apply(original,this,args); safe(()=>{ currentStage=stage(args[0]); }); return result;
+      const result=Reflect.apply(original,this,args); safe(()=>{ currentStage=stage(args[0]);lifetime?.refresh(); }); return result;
     });
     install('inspectShader',original=>function(...args){
       if(!active||!live()) return Reflect.apply(original,this,args);
       if(this!==profile) { issues.unexpectedReceivers++; return Reflect.apply(original,this,args); }
       let info; safe(()=>{ const id=moduleID(args[0]),role=args[1]==='vertex'?1:args[1]==='fragment'?2:0;
-        if(!role) issues.unknownRole++; if(id) { modules[id-1][1]|=role; modules[id-1][2]++; } info={id,role,pushed:false}; if(stack.length<32) { stack.push(info); info.pushed=true; } else traceOverflow(); });
+        if(!role) issues.unknownRole++; if(id) { modules[id-1][1]|=role; modules[id-1][2]++;if(stages[currentStage]==='submitted-frame')finalModuleIDs.add(id); } info={id,role,pushed:false}; if(stack.length<32) { stack.push(info); info.pushed=true; } else traceOverflow(); });
       try { return Reflect.apply(original,this,args); } finally { if(info?.pushed) stack.pop(); }
     });
     install('observe',original=>function(...args){
@@ -316,6 +305,8 @@ export function observeShaderAttribution(game, options = {}) {
       return result;
     });
     if(Object.values(availability).some(value=>value!=='installed')) { observer.dispose(); return observer; }
+    lifetime=observeShaderLifetime(game,{enabled:true,limits,now:readNow,name:technicalName,valid:()=>active&&live(),stage:()=>stages[currentStage],
+      moduleID:module=>object(module)?moduleIDs?.get(module)??0:0,isFinalModule:id=>finalModuleIDs.has(id),finalModules:()=>[...finalModuleIDs]});
     signal?.addEventListener('abort',onAbort,{once:true});
     if(signal?.aborted||retired?.()) observer.dispose();
   } catch { issues.observerErrors++; observer.dispose(); }

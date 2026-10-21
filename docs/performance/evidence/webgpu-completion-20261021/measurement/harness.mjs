@@ -19,7 +19,9 @@ async function dependencyIdentity(snapshot) {
   const files = ['@babylonjs/core/package.json', '@babylonjs/core/Materials/materialDefines.js',
     '@babylonjs/core/Materials/shadowDepthWrapper.js', '@babylonjs/core/Materials/Textures/texture.pure.js',
     '@babylonjs/core/Materials/drawWrapper.js', '@babylonjs/core/Materials/material.pure.js', '@babylonjs/core/Materials/effect.pure.js',
-    '@babylonjs/core/Materials/multiMaterial.pure.js'];
+    '@babylonjs/core/Materials/multiMaterial.pure.js', '@babylonjs/core/Materials/effect.functions.js',
+    '@babylonjs/core/Engines/webgpuEngine.pure.js', '@babylonjs/core/Engines/WebGPU/webgpuPipelineContext.js',
+    '@babylonjs/core/Lights/Shadows/shadowGenerator.js', '@babylonjs/core/Lights/light.js', '@babylonjs/core/Engines/abstractEngine.pure.js'];
   const dependencies = {};
   for (const name of files) dependencies[name] = sha256(await readFile(require.resolve(name)));
   const appCore = require.resolve('@babylonjs/core/package.json');
@@ -136,7 +138,9 @@ export async function run(command, input, output, label, option = 'original', ..
     const attempts = await readFile(join(helperDirectory, 'attempt-queue.mjs'), 'utf8');
     const transitClock = await readFile(join(helperDirectory, 'transit-clock.mjs'), 'utf8');
     const startupLatency = await readFile(join(helperDirectory, 'startup-latency.mjs'), 'utf8');
-    const shaderAttribution = await readFile(join(helperDirectory, 'shader-attribution.mjs'), 'utf8');
+    const shaderAttribution = (await readFile(join(helperDirectory, 'shader-attribution.mjs'), 'utf8'))
+      .replace("'./shader-lifetime.mjs'", "'virtual:webgpu-completion-shader-lifetime'");
+    const shaderLifetime = await readFile(join(helperDirectory, 'shader-lifetime.mjs'), 'utf8');
     const browserClock = (await readFile(join(helperDirectory, 'browser-clock.mjs'), 'utf8'))
       .replace("'./transit-clock.mjs'", "'virtual:webgpu-completion-clock'");
     await writeFile(join(directory, 'transformed-ui.tsx'), transformedUI, { flag: 'wx' });
@@ -156,6 +160,7 @@ export async function run(command, input, output, label, option = 'original', ..
     const virtual = '\0virtual:webgpu-completion-qa', virtualObserver = '\0virtual:webgpu-completion-observer', virtualAttempts = '\0virtual:webgpu-completion-attempts';
     const virtualClock = '\0virtual:webgpu-completion-clock', virtualBrowserClock = '\0virtual:webgpu-completion-browser-clock';
     const virtualLatency = '\0virtual:webgpu-completion-startup-latency', virtualAttribution = '\0virtual:webgpu-completion-shader-attribution';
+    const virtualLifetime = '\0virtual:webgpu-completion-shader-lifetime';
     let uiHits = 0, cssHits = 0;
     await build(mergeConfig(config.config, {
       root: snapshot, configFile: false, cacheDir: join(directory, '.vite'),
@@ -170,6 +175,7 @@ export async function run(command, input, output, label, option = 'original', ..
           if (id === 'virtual:webgpu-completion-browser-clock') return virtualBrowserClock;
           if (id === 'virtual:webgpu-completion-startup-latency') return virtualLatency;
           if (id === 'virtual:webgpu-completion-shader-attribution') return virtualAttribution;
+          if (id === 'virtual:webgpu-completion-shader-lifetime') return virtualLifetime;
           if (id === 'virtual:webgpu-completion-simulation') return join(snapshot, 'shared/simulation.ts').replaceAll('\\', '/');
         },
         load(id) {
@@ -180,6 +186,7 @@ export async function run(command, input, output, label, option = 'original', ..
           if (id === virtualBrowserClock) return browserClock;
           if (id === virtualLatency) return startupLatency;
           if (id === virtualAttribution) return shaderAttribution;
+          if (id === virtualLifetime) return shaderLifetime;
         },
         transform(code, id) {
           const file = id.split('?')[0].replaceAll('\\', '/');
