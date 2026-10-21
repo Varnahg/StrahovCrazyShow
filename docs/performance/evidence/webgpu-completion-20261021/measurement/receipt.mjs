@@ -12,6 +12,16 @@ export function validateReceipt(value, identity) {
       value.buildId !== identity.buildId || value.sourceSnapshotId !== identity.sourceSnapshotId ||
       value.helperSha256 !== identity.helperSha256 || !['startup', 'benchmark', 'state', 'routine-cost','buffer-lifecycle'].includes(value.kind) ||
       !['plain', 'diagnostic'].includes(value.mode)) throw new Error('Receipt identity/schema mismatch');
+  if (typeof identity.lifecycleControls !== 'boolean' || value.lifecycleControls !== identity.lifecycleControls ||
+      (identity.lifecycleControls && value.mode !== 'diagnostic')) throw new Error('Receipt lifecycle-controls identity mismatch');
+  if (value.lifecycleControl !== undefined) {
+    const control = value.lifecycleControl;
+    if (!identity.lifecycleControls || value.kind !== 'state' || !control ||
+        Object.keys(control).sort().join(',') !== 'action,attempted,generation,outcome,rendererId' ||
+        control.action !== 'destroy-own-device' || control.attempted !== true || !['returned', 'threw'].includes(control.outcome) ||
+        !Number.isSafeInteger(control.rendererId) || control.rendererId < 1 || !Number.isSafeInteger(control.generation) || control.generation < 1)
+      throw new Error('Lifecycle action scalar evidence invalid');
+  }
   if (identity.clock && value.clockConfigId !== identity.clock.configId) throw new Error('Receipt clock config mismatch');
   if (!Number.isFinite(value.atMs) || value.atMs < 0 || !Number.isFinite(value.timeOrigin))
     throw new Error('Receipt clock missing');

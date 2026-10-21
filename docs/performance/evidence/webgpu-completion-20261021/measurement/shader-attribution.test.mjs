@@ -154,7 +154,7 @@ test('terminal redacts avatar/user names, does not invoke getters and bounds all
 test('new diagnostic flag is default-off, duplicate-safe and part of the canonical browser seal',()=>{
   assert.equal(parseBuildOptions([]).shaderAttribution,false);assert.equal(parseBuildOptions(['--shader-attribution']).shaderAttribution,true);
   assert.throws(()=>parseBuildOptions(['--shader-attribution','--shader-attribution']));
-  const input={sourceSnapshotId:'source',helperSha256:'helper',label:'label',loading:'original',transforms:{},clock:null,weather:null,startupLatency:false,shaderAttribution:false,routineCost:false,bufferLifecycle:false,dependencies:{}};
+  const input={sourceSnapshotId:'source',helperSha256:'helper',label:'label',loading:'original',transforms:{},clock:null,weather:null,startupLatency:false,shaderAttribution:false,routineCost:false,bufferLifecycle:false,lifecycleControls:false,dependencies:{}};
   assert.notEqual(buildDigest(input),buildDigest({...input,shaderAttribution:true}));
   assert.equal(browserBuildIdentity({...input,shaderAttribution:true}).shaderAttribution,true);
   const missing={...input};delete missing.shaderAttribution;assert.throws(()=>buildDigest(missing));

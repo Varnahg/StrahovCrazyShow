@@ -6,13 +6,14 @@ import { observeStartupLatency } from 'virtual:webgpu-completion-startup-latency
 import { observeShaderAttribution, projectShaderInventory } from 'virtual:webgpu-completion-shader-attribution';
 import { captureRoutineCost } from 'virtual:webgpu-completion-routine-cost';
 import { observeBufferLifecycle } from 'virtual:webgpu-completion-buffer-lifecycle';
+import { createLifecycleControls, createVisibilityAnchor } from 'virtual:webgpu-completion-lifecycle-controls';
 
 const identity = __WEBGPU_COMPLETION_IDENTITY__;
 const finite = value => typeof value === 'number' && Number.isFinite(value) ? value : null;
 const xyz = value => value ? { x: finite(value.x), y: finite(value.y), z: finite(value.z) } : null;
 const errorText = error => ({ name: String(error?.name ?? 'Error').slice(0, 80), message: String(error?.message ?? error).slice(0, 2000) });
 const pick = (value, keys) => Object.fromEntries(keys.filter(key => value?.[key] !== undefined).map(key => [key, value[key]]));
-const mode = identity.bufferLifecycle === true || identity.routineCost === true || identity.shaderAttribution === true || identity.startupLatency === true || identity.loading === 'translucent' || new URLSearchParams(location.search).get('profileEnvironment') === '1' ? 'diagnostic' : 'plain';
+const mode = identity.lifecycleControls === true || identity.bufferLifecycle === true || identity.routineCost === true || identity.shaderAttribution === true || identity.startupLatency === true || identity.loading === 'translucent' || new URLSearchParams(location.search).get('profileEnvironment') === '1' ? 'diagnostic' : 'plain';
 let previousOwner;
 let sharedTransfers;
 const weatherKeys = ['temperature', 'cloud', 'rain', 'wind', 'windDirection', 'observedAt', 'fetchedAt', 'stale', 'cloudStale',
@@ -130,6 +131,7 @@ export async function observeStartup(game, canvas, start) {
   if (identity.startupLatency) disclosure.textContent += ' Diagnostic: pozorované původní popErrorScope/onSubmittedWorkDone pouze při startu; latency není GPU čas.';
   if (identity.routineCost) disclosure.textContent += ' Diagnostic: volitelných8 actual render framů /8 původních CPU rutin. Zahrnuje režii observeru; není FPS A/B ani GPU čas.';
   if(identity.bufferLifecycle)disclosure.textContent+=' Diagnostic: původní buffer owner/reallocation/release/destroy a context/bundle identity; recent window, žádný encoded-resource graph ani FPS A/B.';
+  if (identity.lifecycleControls) disclosure.textContent += ' Diagnostic: zničit lze pouze zařízení této vlastní dočasné testovací hry; pak je potřeba renderer obnovit původním UI. Native ztrátu a obnovu je nutné ověřit zvlášť. Prázdnou kartu po visibility testu zavři; prohlížeč ji nemusí aktivovat.';
   const status = document.createElement('pre'); status.id = 'webgpu-completion-status';
   status.style.cssText = 'white-space:pre-wrap;max-height:160px;overflow:auto';
   const output = document.createElement('pre'); output.id = 'webgpu-completion-export'; output.hidden = true;
@@ -137,7 +139,7 @@ export async function observeStartup(game, canvas, start) {
   download.style.cssText = 'display:block;color:#b8e5ff'; download.hidden = true;
   controls.append(disclosure, status, download); panel.append(title, controls, output); document.body.append(panel);
   let gameRef = game, startupTimer, sampleOverflow = false, busy = false, disposed = false, downloadURL, interruptBenchmark;
-  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, attributionOwner, routineOwner,bufferOwner, planned;
+  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, attributionOwner, routineOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
   const clockAbort = new AbortController();
   const samples = [], observerErrors = [], buttons = [];
   const ownerId = crypto.randomUUID();
@@ -169,7 +171,8 @@ export async function observeStartup(game, canvas, start) {
       tell({ phase: raw.kind + '-transport-failed', attemptId: raw.attemptId, error: result.error, downloadBackup: true });
     }
   }
-  const updateButtons = () => buttons.forEach(button => button.disabled = busy || disposed || !startupResolved || !gameRef?.ready || transfers.pendingCount > 0);
+  const updateButtons = () => buttons.forEach(button => button.disabled = busy || disposed || !startupResolved || !gameRef?.ready || transfers.pendingCount > 0 ||
+    (button === lifecycleButton && (!lifecycleOwner?.snapshot().active || lifecycleOwner.snapshot().attempted)));
   const unsubscribeTransfers = transfers.subscribe(updateButtons);
   const sampleStartup = () => {
     if (samples.length >= 180) { sampleOverflow = true; clearInterval(startupTimer); return; }
@@ -190,6 +193,7 @@ export async function observeStartup(game, canvas, start) {
       finally { busy = false; updateButtons(); }
     };
     buttons.push(button); controls.append(button);
+    return button;
   }
   async function measure(plannedStart) {
     if (gameRef.benchmark) throw new Error('An existing Game benchmark is active');
@@ -328,6 +332,18 @@ export async function observeStartup(game, canvas, start) {
     await planned.arm();
   });
   action('Uložit stav', () => persist({ ...envelope('state'), state: snapshot(), compilation: compilationSnapshot(gameRef) }));
+  if (identity.lifecycleControls === true) {
+    controls.append(createVisibilityAnchor(document));
+    lifecycleButton = action('Diagnostic · zničit zařízení této testovací hry', () => lifecycleOwner.destroyOwnDevice());
+    lifecycleOwner = createLifecycleControls(game, { enabled: true, signal: clockAbort.signal,
+      isCurrent: () => !disposed && gameRef === game,
+      onAttempt: lifecycleControl => {
+        const raw = { ...envelope('state'), state: snapshot(), compilation: compilationSnapshot(game), lifecycleControl,
+          scope: 'Explicit original own GPUDevice.destroy call only; native device.lost/product failure/recovery remain original and are not asserted successful by this receipt.' };
+        void persist(raw).catch(noteError);
+      },
+    });
+  }
   for (const quality of ['low', 'medium', 'high', 'auto']) action('Kvalita ' + quality, () => { gameRef.setQuality(quality); tell(snapshot()); });
   action('Cíl 60 FPS', () => { gameRef.setTargetFps(60); tell(snapshot()); });
   action('Svítilna', () => { gameRef.toggleFlashlight(); tell(snapshot()); });
@@ -346,6 +362,7 @@ export async function observeStartup(game, canvas, start) {
       const abort = new Error('Clock QA owner stopped'); abort.name = 'AbortError'; clockAbort.abort(abort);
     }
     clockOwner?.dispose(); latencyOwner?.dispose(); attributionOwner?.dispose(); routineOwner?.dispose('owner-stopped');bufferOwner?.dispose('owner-stopped');
+    lifecycleOwner?.dispose();
     unsubscribeTransfers(); buttons.forEach(button => button.disabled = true); gameRef = undefined;
   };
   const observer = game.scene.onDisposeObservable.addOnce(stop);

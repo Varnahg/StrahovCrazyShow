@@ -1,5 +1,19 @@
 # Explicitní QA měření skutečné hry pro KEY-22
 
+## Volitelné lokální lifecycle ovládání
+
+Nový build-only příznak `--lifecycle-controls` je povinně canonical boolean s výchozí hodnotou `false`. Je součástí helper/source sealu, sidecar/build-input/browser identity a každého receipt; absence, typový drift a změna příznaku proti sealed bundle se odmítají. Query parametr jej nezapíná. Příklad explicitního příkazu pouze pro koordinátora s rezervovaným build/GPU:
+
+```powershell
+node docs/performance/evidence/webgpu-completion-20261021/measurement/harness.mjs build ABSOLUTE_SNAPSHOT ABSOLUTE_NEW_BUILD lifecycle original --lifecycle-controls
+```
+
+Celý takový build je diagnostic. Plain/default-off neinstaluje lifecycle owner ani nečte zařízení přes nový helper. Enabled panel nabízí běžný odkaz `about:blank`, `target=_blank`, `rel=noopener`; kliknutí může otevřít aktivní kartu, skutečné hidden→visible musí doložit root. Není přidaná mutace visibility/focus, syntetická událost, browser driver ani správa jiných karet. Po testu se zavírá jen vlastní blank.
+
+Druhé tlačítko výslovně zničí pouze zařízení této vlastní dočasné hry; renderer se potom obnovuje původním UI. Před kliknutím/voláním se ověří exact Game/Scene/engine/device/health/generation/abort/current owner, ready-valid/pending0 a nepřítomnost startup lease/quality preparation/benchmarku. Original `device.destroy` se zavolá nejvýše jednou pro dané zařízení, s původním receiverem/return/throw. Není obalen original lost Promise, RenderHealth ani Game/UI/Room failure/recovery. Bounded state receipt zaznamená pouze původní call `returned`/`threw`, nikoliv úspěšnou ztrátu či obnovu. Původní native loss a praktická recovery musí být přijaty zvlášť. Cleanup odstraní vlastní scene/abort pozorování a strong reference; žádný global/per-frame hook nebo nový polling.
+
+Nový helper vyžaduje nový immutable build/seal. Frozen helperv6/a5b3 a hráčovy testované buildy se nepřepisují. Průzkum/varianty, výchozí119 CPU a následné nové proofy jsou v `../lifecycle-controls/README.md`; CPU DOM/IO fixtures nejsou GPU/visibility/recovery přejímka. Samotný helper žádný build/server/browser/GPU neprováděl.
+
 ## Volitelný actual routine CPU diagnostic
 
 Nový build-only příznak `--routine-cost` je výchozí `false`, povinně součást canonical build/load/browser identity i helper/dependency SHA. Staré buildy se novým helperem nepřejmenovávají: root uchoval všech19 původních helperc951 souborů ve správné5-level struktuře `validation/helper-runtimes/v4/`. Nová verze vždy potřebuje nový immutable build. Příklad příkazu pro koordinátora, nikoli zde provedený build:

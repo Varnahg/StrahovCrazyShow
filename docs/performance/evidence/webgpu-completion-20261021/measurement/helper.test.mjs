@@ -11,16 +11,18 @@ import { authorizeReceiptRequest, validateReceipt, saveReceipt, MAX_RECEIPT_BYTE
 
 const directory = dirname(fileURLToPath(import.meta.url));
 const root = resolve(directory, '../../../../..');
-const identity = { buildId: 'test-build', sourceSnapshotId: 'test-source', helperSha256: 'test-helper' };
+const temporaryRoot = join(root, '.cache/webgpu-completion-lifecycle-controls-20261021');
+const identity = { buildId: 'test-build', sourceSnapshotId: 'test-source', helperSha256: 'test-helper', lifecycleControls: false };
 const startup = () => ({ schemaVersion: 1, ...identity, attemptId: '8e9e7e15-6011-438d-96a2-53be43f17792', kind: 'startup', mode: 'plain',
   atMs: 12, timeOrigin: 1000, observerErrors: [], samples: [], terminal: { ready: false }, outcome: 'rejected', error: { message: 'real failure fixture' } });
 async function withFixture(run) {
-  const fixture = await mkdtemp(join(directory, '.helper-test-'));
+  await mkdir(temporaryRoot, { recursive: true });
+  const fixture = await mkdtemp(join(temporaryRoot, 'helper-test-'));
   try { return await run(fixture); }
   finally {
     // Every recursive cleanup is confined to this test's exclusive directory.
-    const safe = inside(directory, fixture);
-    assert.ok(safe.startsWith(join(directory, '.helper-test-')));
+    const safe = inside(temporaryRoot, fixture);
+    assert.ok(safe.startsWith(join(temporaryRoot, 'helper-test-')));
     await rm(safe, { recursive: true, force: true });
   }
 }
@@ -163,7 +165,7 @@ test('explicit preview port validation and derived origin authorization preserve
   assert.equal(authorizeReceiptRequest(request, 'http://127.0.0.1:4211'), false);
 });
 
-async function browserFixture(run, transport = async bytes => ack(bytes), browserIdentity = identity) {
+async function browserFixture(run, transport = async bytes => ack(bytes), browserIdentity = identity, search = '') {
   class Element {
     children = []; textContent = ''; style = {}; hidden = false;
     append(...children) { this.children.push(...children); for (const child of children) child.parent = this; }
@@ -178,7 +180,7 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
     static revokeObjectURL(value) { revoked.add(value); OriginalURL.revokeObjectURL(value); }
   }
   Object.assign(browserDocument, { body, visibilityState: 'visible', hasFocus: () => true, createElement: () => new Element() });
-  const globals = { document: browserDocument, window: browserWindow, location: { hostname: '127.0.0.1', search: '' },
+  const globals = { document: browserDocument, window: browserWindow, location: { hostname: '127.0.0.1', search },
     navigator: { userAgent: 'Test fixture; no browser or GPU' }, innerWidth: 100, innerHeight: 100, devicePixelRatio: 1,
     URL: FixtureURL, requestAnimationFrame: callback => { const id = ++rafSequence; raf.set(id, callback); return id; },
     cancelAnimationFrame: id => raf.delete(id),
@@ -204,6 +206,7 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
     source = source.replace("'virtual:webgpu-completion-shader-attribution'", JSON.stringify(pathToFileURL(join(directory, 'shader-attribution.mjs')).href));
     source = source.replace("'virtual:webgpu-completion-routine-cost'", JSON.stringify(pathToFileURL(join(directory, 'routine-cost.mjs')).href));
     source = source.replace("'virtual:webgpu-completion-buffer-lifecycle'", JSON.stringify(pathToFileURL(join(directory, 'buffer-lifecycle.mjs')).href));
+    source = source.replace("'virtual:webgpu-completion-lifecycle-controls'", JSON.stringify(pathToFileURL(join(directory, 'lifecycle-controls.mjs')).href));
     source = source.replace('__WEBGPU_COMPLETION_IDENTITY__', JSON.stringify(browserIdentity));
     source += '\nexport { weatherSnapshot, benchmarkSnapshot };\n// Unique DOM fixture ' + crypto.randomUUID();
     const module = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
@@ -216,7 +219,7 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
       const game = {
         ready: false, disposed: false, avatars: new Map(), adaptive: { state: {} }, gpu: {}, renderErrorCount: 0, assetLoadErrorCount: 0,
         engine: { isWebGPU: true, compatibilityMode: true, getRenderWidth: () => 100, getRenderHeight: () => 100, getHardwareScalingLevel: () => 1 },
-        renderHealth: { snapshot: () => ({ phase: game.ready ? 'ready' : 'preparing', valid: game.ready && !game.disposed, rendererId: 1, generation: 1, pendingOperations: 0 }) },
+        renderHealth: { snapshot: () => ({ phase: game.ready ? 'ready' : 'preparing', valid: game.ready && !game.disposed, rendererId: 1, generation: 1, pendingOperations: 0, errorCount: 0 }) },
         compilationProfile: { snapshot: () => ({ active: true, metrics: {} }) },
         scene: { meshes: [], materials: [], geometries: [], getActiveMeshes: () => [], getWaitingItemsCount: () => 0,
           onDisposeObservable: { addOnce: callback => { disposal.add(callback); return { remove: () => disposal.delete(callback) }; } } },
@@ -243,6 +246,37 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
     }
   }
 }
+test('lifecycle controls default-off cannot be activated by a query and never inspect the device', () => browserFixture(async context => {
+  const game = context.makeGame(); let reads = 0;
+  Object.defineProperty(game.engine, '_device', { get() { reads++; throw new Error('default-off device read'); } });
+  await context.observeStartup(game, { dataset: {} }, async () => { game.ready = true; });
+  await until(() => context.posted.length === 1);
+  assert.equal(reads, 0); assert.equal(context.posted[0].mode, 'plain');
+  assert.equal(context.all().some(value => value.href === 'about:blank' || value.textContent.includes('zničit zařízení')), false);
+}, async value => ack(value), identity, '?lifecycleControls=1&lifecycle-controls=1'));
+test('explicit lifecycle DOM action is one-shot and preserves original native loss handling and immutable action transfer', () => browserFixture(async context => {
+  const game = context.makeGame(), lost = Promise.withResolvers(); let calls = 0;
+  game.startupAbort = new AbortController(); game.scene.getEngine = () => game.engine;
+  const device = { lost: lost.promise, destroy() { assert.equal(this, device); calls++; lost.resolve(); } }; game.engine._device = device;
+  // Terminal native-loss IO only: original product behavior is not implemented
+  // by the QA module and requires the separate root browser/GPU acceptance.
+  const originalLoss = lost.promise.then(() => game.dispose());
+  await context.observeStartup(game, { dataset: {} }, async () => { game.ready = true; });
+  await until(() => context.posted.length === 1);
+  const anchor = context.all().find(value => value.href === 'about:blank');
+  assert.equal(anchor.target, '_blank'); assert.equal(anchor.rel, 'noopener'); assert.equal(anchor.onclick, undefined);
+  const button = context.all().find(value => value.textContent === 'Diagnostic · zničit zařízení této testovací hry');
+  assert.equal(button.disabled, false);
+  game.startupPresentationLease = {}; await button.onclick(); assert.equal(calls, 0, 'actual pending startup handoff refuses destruction');
+  game.startupPresentationLease = undefined; await button.onclick(); assert.equal(calls, 1, 'owned ready idle device was actually called'); await originalLoss;
+  await until(() => context.posted.some(value => value.lifecycleControl));
+  const raw = context.posted.find(value => value.lifecycleControl), bytes = JSON.stringify(raw);
+  assert.equal(raw.mode, 'diagnostic'); assert.equal(raw.lifecycleControls, true);
+  assert.deepEqual(raw.lifecycleControl, { action: 'destroy-own-device', attempted: true, outcome: 'returned', rendererId: 1, generation: 1 });
+  assert.equal(game.disposed, true); assert.equal(button.disabled, true); await button.onclick(); assert.equal(calls, 1);
+  const fresh = context.makeGame(); await context.observeStartup(fresh, { dataset: {} }, async () => { fresh.ready = true; });
+  await button.onclick(); assert.equal(calls, 1); assert.equal(JSON.stringify(raw), bytes);
+}, async value => ack(value), { ...identity, lifecycleControls: true }));
 test('actual overlay failure produces terminal export before teardown using a DOM/transport fixture, no engine', () => browserFixture(async context => {
     const game = context.makeGame();
     const error = new Error('actual startup rejection fixture');

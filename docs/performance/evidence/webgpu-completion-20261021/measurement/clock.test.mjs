@@ -192,7 +192,7 @@ test('one planned benchmark records actual callback, refuses lateness and preser
 test('clock receipt requires exact config ID and validated explicit API port, default remains2596', () => {
   assert.equal(backendPort(), 2596); assert.equal(backendPort('2597'), 2597);
   for (const value of ['0', '80', '-1', '65536', '2597x', '02597']) assert.throws(() => backendPort(value));
-  const identity = { buildId: 'fixture', sourceSnapshotId: 'fixture', helperSha256: 'fixture', clock: { configId: clockId } };
+  const identity = { buildId: 'fixture', sourceSnapshotId: 'fixture', helperSha256: 'fixture', clock: { configId: clockId }, lifecycleControls: false };
   const receipt = { schemaVersion: 1, ...identity, attemptId: '8e9e7e15-6011-438d-96a2-53be43f17792', kind: 'startup', mode: 'plain',
     atMs: 1, timeOrigin: 1, observerErrors: [], outcome: 'rejected', samples: [], terminal: {}, clockConfigId: clockId };
   assert.equal(validateReceipt(receipt, identity), receipt);

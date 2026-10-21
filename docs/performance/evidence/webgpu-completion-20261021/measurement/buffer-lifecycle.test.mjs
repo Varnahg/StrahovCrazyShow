@@ -138,7 +138,7 @@ test('foreign meshes/devices, unknown overrides, bounded windows and target gaps
 });
 test('flag, canonical seal and distinct receipt reject absent/default/tampered identity and non-scalar traces',()=>{
   assert.equal(parseBuildOptions([]).bufferLifecycle,false);assert.equal(parseBuildOptions(['--buffer-lifecycle']).bufferLifecycle,true);assert.throws(()=>parseBuildOptions(['--buffer-lifecycle','--buffer-lifecycle']));
-  const input={sourceSnapshotId:sha256('source'),helperSha256:sha256('helper'),label:'buffer',loading:'original',transforms:{},clock:null,weather:null,startupLatency:false,shaderAttribution:false,routineCost:false,bufferLifecycle:false,dependencies:{}};
+  const input={sourceSnapshotId:sha256('source'),helperSha256:sha256('helper'),label:'buffer',loading:'original',transforms:{},clock:null,weather:null,startupLatency:false,shaderAttribution:false,routineCost:false,bufferLifecycle:false,lifecycleControls:false,dependencies:{}};
   assert.notEqual(buildDigest(input),buildDigest({...input,bufferLifecycle:true}));const missing={...input};delete missing.bufferLifecycle;assert.throws(()=>buildDigest(missing));
   assert.throws(()=>buildDigest({...input,bufferLifecycle:1}));
   const template='export const identity=__WEBGPU_COMPLETION_IDENTITY__;',overlayBytes=Buffer.from(resolveBuildOverlay(template,input));

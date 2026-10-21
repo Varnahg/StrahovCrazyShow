@@ -139,13 +139,14 @@ export async function run(command, input, output, label, option = 'original', ..
       await readFile(join(snapshot, 'client/style.css'), 'utf8'), loading);
     const dependencies = await dependencyIdentity(snapshot);
     const browserIdentity = browserBuildIdentity({ label, sourceSnapshotId: source.snapshotId, helperSha256: helper.sha256,
-      loading, transforms, clock: clock ?? null, weather: weather?.specification ?? null, startupLatency: options.startupLatency, shaderAttribution: options.shaderAttribution, routineCost: options.routineCost,bufferLifecycle:options.bufferLifecycle, dependencies });
+      loading, transforms, clock: clock ?? null, weather: weather?.specification ?? null, startupLatency: options.startupLatency, shaderAttribution: options.shaderAttribution, routineCost: options.routineCost,bufferLifecycle:options.bufferLifecycle, lifecycleControls: options.lifecycleControls, dependencies });
     const directory = await freshDirectory(output);
     const overlay = resolveBuildOverlay(await readFile(join(helperDirectory, 'qa-overlay.mjs'), 'utf8'), { ...browserIdentity, transforms });
     const observer = await readFile(join(helperDirectory, 'startup-observer.mjs'), 'utf8');
     const attempts = await readFile(join(helperDirectory, 'attempt-queue.mjs'), 'utf8');
     const transitClock = await readFile(join(helperDirectory, 'transit-clock.mjs'), 'utf8');
     const startupLatency = await readFile(join(helperDirectory, 'startup-latency.mjs'), 'utf8');
+    const lifecycleControls = await readFile(join(helperDirectory, 'lifecycle-controls.mjs'), 'utf8');
     const routineCore = await readFile(join(helperDirectory, 'routine-cost-core.mjs'), 'utf8');
     const routineCost = (await readFile(join(helperDirectory, 'routine-cost.mjs'), 'utf8'))
       .replace("'./routine-cost-core.mjs'", "'virtual:webgpu-completion-routine-core'");
@@ -177,6 +178,7 @@ export async function run(command, input, output, label, option = 'original', ..
     const virtualLifetime = '\0virtual:webgpu-completion-shader-lifetime';
     const virtualRoutine = '\0virtual:webgpu-completion-routine-cost', virtualRoutineCore = '\0virtual:webgpu-completion-routine-core';
     const virtualBuffer='\0virtual:webgpu-completion-buffer-lifecycle',virtualBufferCore='\0virtual:webgpu-completion-buffer-core';
+    const virtualLifecycle = '\0virtual:webgpu-completion-lifecycle-controls';
     let uiHits = 0, cssHits = 0;
     await build(mergeConfig(config.config, {
       root: snapshot, configFile: false, cacheDir: join(directory, '.vite'),
@@ -196,6 +198,7 @@ export async function run(command, input, output, label, option = 'original', ..
           if (id === 'virtual:webgpu-completion-routine-core') return virtualRoutineCore;
           if(id==='virtual:webgpu-completion-buffer-lifecycle')return virtualBuffer;
           if(id==='virtual:webgpu-completion-buffer-core')return virtualBufferCore;
+          if (id === 'virtual:webgpu-completion-lifecycle-controls') return virtualLifecycle;
           if (id === 'virtual:webgpu-completion-simulation') return join(snapshot, 'shared/simulation.ts').replaceAll('\\', '/');
         },
         load(id) {
@@ -211,6 +214,7 @@ export async function run(command, input, output, label, option = 'original', ..
           if (id === virtualRoutineCore) return routineCore;
           if(id===virtualBuffer)return bufferLifecycle;
           if(id===virtualBufferCore)return bufferCore;
+          if (id === virtualLifecycle) return lifecycleControls;
         },
         transform(code, id) {
           const file = id.split('?')[0].replaceAll('\\', '/');

@@ -10,6 +10,7 @@ import { MAX_WEATHER_BYTES, WEATHER_LABELS, weatherFixture, validateWeather, loa
 import { MAX_LATENCY_CALLS, observeStartupLatency } from './startup-latency.mjs';
 
 const directory = dirname(fileURLToPath(import.meta.url));
+const temporaryRoot = resolve(directory, '../../../../../.cache/webgpu-completion-lifecycle-controls-20261021');
 const recorded = () => ({ temperature: 8.375, wind: 0.9, windDirection: 287.125, rain: 0, cloud: 0.86,
   observedAt: 1792533600000, fetchedAt: 1792533612345, source: 'Station fixture', cloudSource: 'Model fixture',
   status: 'live', stale: false, sourceKind: 'station', cloudObservedAt: 1792533600000, cloudStale: false,
@@ -21,9 +22,10 @@ const recorded = () => ({ temperature: 8.375, wind: 0.9, windDirection: 287.125,
     snowfall: { kind: 'model', source: 'Model fixture', observedAt: 1792530000000, stale: true } } });
 const bytes = value => Buffer.from(JSON.stringify(value));
 async function withDirectory(run) {
-  const path = await mkdtemp(join(directory, '.weather-latency-test-'));
+  await mkdir(temporaryRoot, { recursive: true });
+  const path = await mkdtemp(join(temporaryRoot, 'weather-latency-test-'));
   try { return await run(path); }
-  finally { await rm(inside(directory, path), { recursive: true, force: true }); }
+  finally { await rm(inside(temporaryRoot, path), { recursive: true, force: true }); }
 }
 const flush = () => new Promise(setImmediate);
 function deviceFixture() {
@@ -35,11 +37,11 @@ function deviceFixture() {
 
 test('explicit build flags preserve positional clock and reject duplicate/ambiguous input; default observer off', () => {
   const clock = resolve(directory, 'clock.json'), weather = resolve(directory, 'weather.json');
-  assert.deepEqual(parseBuildOptions([]), { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false,bufferLifecycle:false });
+  assert.deepEqual(parseBuildOptions([]), { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false,bufferLifecycle:false, lifecycleControls:false });
   assert.deepEqual(parseBuildOptions(['original', clock, '--weather', weather, '--startup-latency']),
-    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: true, shaderAttribution: false, routineCost: false,bufferLifecycle:false });
+    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: true, shaderAttribution: false, routineCost: false,bufferLifecycle:false, lifecycleControls:false });
   assert.deepEqual(parseBuildOptions(['--weather', weather, '--clock', clock]),
-    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: false, shaderAttribution: false, routineCost: false,bufferLifecycle:false });
+    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: false, shaderAttribution: false, routineCost: false,bufferLifecycle:false, lifecycleControls:false });
   for (const args of [['--weather'], ['--weather', '--startup-latency'], ['--startup-latency', '--startup-latency'],
     ['original', clock, '--clock', clock], ['--clock', clock, '--clock', clock], ['--weather', weather, '--weather', weather],
     ['original', 'relative.json'], ['--unknown'], ['original', 'translucent'], ['--weather=x']]) assert.throws(() => parseBuildOptions(args));
@@ -213,7 +215,7 @@ function sealedFixture(patch = {}) {
   const clock = { config, configId: sha256(JSON.stringify(config)), configSha256: sha256(clockBytes), simulationSourceSha256: source.files['shared/simulation.ts'] };
   const transforms = { ui: { before: sha256('UI original'), after: sha256('UI transformed') }, loading: { variant: 'original', before: sha256('CSS'), after: sha256('CSS') } };
   const settings = { sourceSnapshotId: source.snapshotId, helperSha256: helper.sha256, label: 'seal-fixture', loading: 'original',
-    transforms, clock, weather, startupLatency: true, shaderAttribution: true, routineCost: false, bufferLifecycle: false, dependencies: { 'selected.js': sha256('dependency') }, ...patch };
+    transforms, clock, weather, startupLatency: true, shaderAttribution: true, routineCost: false, bufferLifecycle: false, lifecycleControls: false, dependencies: { 'selected.js': sha256('dependency') }, ...patch };
   const template = 'export const identity = __WEBGPU_COMPLETION_IDENTITY__;\n';
   const overlayBytes = Buffer.from(resolveBuildOverlay(template, settings));
   const input = { ...browserBuildIdentity(settings), transforms: settings.transforms, snapshot: '/explicit/cpu/snapshot', sourceFiles: 1,
@@ -233,12 +235,12 @@ test('canonical digest covers every required build input, explicit null/off and 
   const reordered = Object.fromEntries(Object.entries(original).reverse());
   reordered.transforms = { loading: { ...original.transforms.loading }, ui: { after: original.transforms.ui.after, before: original.transforms.ui.before } };
   assert.equal(buildDigest(reordered), original.buildId);
-  for (const key of ['sourceSnapshotId', 'helperSha256', 'label', 'loading', 'transforms', 'clock', 'weather', 'startupLatency', 'shaderAttribution', 'routineCost', 'dependencies']) {
+  for (const key of ['sourceSnapshotId', 'helperSha256', 'label', 'loading', 'transforms', 'clock', 'weather', 'startupLatency', 'shaderAttribution', 'routineCost', 'lifecycleControls', 'dependencies']) {
     const missing = structuredClone(original); delete missing[key]; assert.throws(() => buildDigest(missing), /Missing/);
   }
   for (const changed of [{ sourceSnapshotId: sha256('other source') }, { helperSha256: sha256('other helper') }, { label: 'other-label' },
     { loading: 'translucent' }, { transforms: { ...original.transforms, ui: { before: sha256('different') } } },
-    { clock: null }, { weather: null }, { startupLatency: false }, { shaderAttribution: false }, { routineCost: true }, { dependencies: { 'selected.js': sha256('other dependency') } }])
+    { clock: null }, { weather: null }, { startupLatency: false }, { shaderAttribution: false }, { routineCost: true }, { lifecycleControls: true }, { dependencies: { 'selected.js': sha256('other dependency') } }])
     assert.notEqual(buildDigest({ ...original, ...changed }), original.buildId);
   const plain = sealedFixture({ clock: null, weather: null, startupLatency: false, shaderAttribution: false });
   assert.doesNotThrow(() => verifyBuildSeal(plain.identity, plain.input, plain.proof));
@@ -250,10 +252,10 @@ test('canonical digest covers every required build input, explicit null/off and 
 });
 test('load seal rejects deletion/null/tamper of weather, clock and diagnostic flag before optional branch selection', () => {
   const fixture = sealedFixture(); assert.doesNotThrow(() => verifyBuildSeal(fixture.identity, fixture.input, fixture.proof));
-  for (const key of ['weather', 'clock', 'startupLatency', 'shaderAttribution']) {
+  for (const key of ['weather', 'clock', 'startupLatency', 'shaderAttribution', 'lifecycleControls']) {
     const missing = structuredClone(fixture.identity); delete missing[key];
     assert.throws(() => verifyBuildSeal(missing, fixture.input, fixture.proof), /Missing/);
-    const modified = { ...fixture.identity, [key]: ['startupLatency','shaderAttribution'].includes(key) ? false : null };
+    const modified = { ...fixture.identity, [key]: ['startupLatency','shaderAttribution', 'lifecycleControls'].includes(key) ? !fixture.identity[key] : null };
     assert.throws(() => verifyBuildSeal(modified, fixture.input, fixture.proof), /digest/);
     modified.buildId = buildDigest(modified);
     assert.throws(() => verifyBuildSeal(modified, fixture.input, fixture.proof), /digest/);
@@ -272,6 +274,9 @@ test('coherently recomputed sidecars/overlay cannot relabel the old verified bro
     bundleFiles: old.proof.bundleFiles, bundleJavaScript: old.proof.bundleJavaScript }), /absent.*browser JavaScript/);
   assert.throws(() => verifyBuildSeal(changed.identity, changed.input, { ...changed.proof, overlayBytes: old.proof.overlayBytes }), /browser overlay/);
   assert.throws(() => verifyBuildSeal(changed.identity, changed.input, { ...changed.proof, inputBytes: Buffer.concat([changed.proof.inputBytes, Buffer.from(' ')]) }), /build-input bytes/);
+  const lifecycle = sealedFixture({ lifecycleControls: true });
+  assert.throws(() => verifyBuildSeal({ ...lifecycle.identity, bundleFiles: old.identity.bundleFiles }, lifecycle.input,
+    { ...lifecycle.proof, bundleFiles: old.proof.bundleFiles, bundleJavaScript: old.proof.bundleJavaScript }), /absent.*browser JavaScript/);
   const metadata = { ...changed.identity, snapshot: '/different/valid/snapshot' };
   assert.throws(() => verifyBuildSeal(metadata, changed.input, changed.proof), /build metadata/);
 });
