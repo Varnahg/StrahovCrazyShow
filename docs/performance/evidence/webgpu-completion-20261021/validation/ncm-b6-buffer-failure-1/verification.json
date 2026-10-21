@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUTC": "2026-10-21T15:53:53.257Z",
+  "sourceSnapshotId": "36c134e1438c6ca1e1c2bb243edd20e37b1fd3dd90e8df35138d446fea231841",
+  "buildId": "63ca70a1b1f6ca6ec48ef776d82c9cdb845dc6a637058b46f0cf3545c5f4adf5",
+  "helperSha256": "c9519c21acb9e6fd576fed1962b170853ee0b1e4d4016af11690313685a1063c",
+  "url": "http://127.0.0.1:4213/?renderBackend=webgpu-fast",
+  "files": {
+    "console.json": {
+      "bytes": 1622,
+      "sha256": "95f37eca4fee3f03afe7e63e54ae07df0efcc08e5a047e6add43f93a4cb6dbbe"
+    },
+    "failure.png": {
+      "bytes": 80949,
+      "sha256": "144545a4859d21ebb0b484bcfb231d8b5bbe477c1636fb61d1b2165ca79d01e8"
+    },
+    "failure-dom.txt": {
+      "bytes": 4833,
+      "sha256": "de993731882c53b3f9f2e43e7d735e265afc2955ce6a5a74e65b960cfbc0b1cc"
+    },
+    "last-good-state.json": {
+      "bytes": 9337,
+      "sha256": "a17bcfc77f3cd75330412c61e8b08eb611902d4fef40f31076c929ac87f78458"
+    },
+    "b6-states.jsonl": {
+      "bytes": 134905,
+      "sha256": "40901bccee01ed028ee324e7a6acceca1f2ce4c00fd3f3f97b9f60c3f7c723a4"
+    },
+    "b6-ui-route.json": {
+      "bytes": 676,
+      "sha256": "d41c5f5b01da97aec9eb62110a873916d4d0e4b77e038b5bcb2e3445b9fc2909"
+    },
+    "b6-walk.jsonl": {
+      "bytes": 4479,
+      "sha256": "95bcda9134040bf243ec8c355698bc2d0c247ea36211ce415a9a375f1d0e57d5"
+    },
+    "door-outside.png": {
+      "bytes": 182555,
+      "sha256": "dfe11591ea13cbc991593e556eae9ce8bdab44db017c71b8f84726db405e162c"
+    },
+    "lobby-inside.png": {
+      "bytes": 181255,
+      "sha256": "2c6d02d3f03a90565f291b94adf7ca084cd43dd7cc55f9367a633eeebac9ea6d"
+    },
+    "feedback-preview.png": {
+      "bytes": 135012,
+      "sha256": "90fe8c0901bab87e91cc3a42bc7e503af9195adcf51ceb9e1a8bbce850026e8e"
+    },
+    "reentry.png": {
+      "bytes": 170485,
+      "sha256": "152e21a65053bcf6d9f1dbfa21ee487bd38ecca748059074656f49b2278ac76e"
+    },
+    "event-context.json": {
+      "bytes": 109729,
+      "sha256": "ee6af4ab17afd453492183dbbfafe9967694a77910cca90fe3c19bd0ac9243d0"
+    }
+  },
+  "originalLogs": [
+    {
+      "file": "f7d45a1e-7e9b-4a0b-87ad-3329221cdf6b.jsonl",
+      "bytes": 16774459,
+      "sha256": "2c38cff54ba4ab13a7ac755c95066d39590f8e212846bcd162b3d334b21a65cd"
+    },
+    {
+      "file": "f7d45a1e-7e9b-4a0b-87ad-3329221cdf6b.part-0001.jsonl",
+      "bytes": 2733430,
+      "sha256": "5c3d6e888cdfd8ad4bb1196464110d9b5c704ae202748ade5c7ecae01511d890"
+    }
+  ],
+  "faults": [
+    {
+      "seq": 8435,
+      "atMs": 2520730,
+      "kind": "render-fault",
+      "data": {
+        "channel": "validation",
+        "message": "[Buffer \"BabylonWebGPUDevice1_DataBufferUniqueId=37326_CopyDst_Vertex_Storage_size2048\"] used in submit while destroyed.\n - While calling [Queue].Submit([[CommandBuffer from CommandEncoder \"[89284|0] - UploadEncoder\"], [CommandBuffer from CommandEncoder \"[89284|0] - RenderEncoder\"]])\n",
+        "generation": 1,
+        "rendererId": 2,
+        "purpose": "game",
+        "count": 1
+      }
+    },
+    {
+      "seq": 8436,
+      "atMs": 2520733,
+      "kind": "render-fault",
+      "data": {
+        "channel": "validation",
+        "message": "[Buffer \"BabylonWebGPUDevice1_DataBufferUniqueId=37326_CopyDst_Vertex_Storage_size2048\"] used in submit while destroyed.\n - While calling [Queue].Submit([[CommandBuffer from CommandEncoder \"[89285|0] - UploadEncoder\"], [CommandBuffer from CommandEncoder \"[89285|0] - RenderEncoder\"]])\n",
+        "generation": 1,
+        "rendererId": 2,
+        "purpose": "game",
+        "count": 2
+      }
+    },
+    {
+      "seq": 8438,
+      "atMs": 2520738.8,
+      "kind": "render-fault",
+      "data": {
+        "channel": "validation",
+        "message": "[Buffer \"BabylonWebGPUDevice1_DataBufferUniqueId=37326_CopyDst_Vertex_Storage_size2048\"] used in submit while destroyed.\n - While calling [Queue].Submit([[CommandBuffer from CommandEncoder \"[89286|0] - UploadEncoder\"], [CommandBuffer from CommandEncoder \"[89286|0] - RenderEncoder\"]])\n",
+        "generation": 1,
+        "rendererId": 2,
+        "purpose": "game",
+        "count": 3
+      }
+    }
+  ],
+  "acceptedNcm": false,
+  "acceptedMigration": false,
+  "ownerKnown": false,
+  "scope": "Actual production fullGame/HUD NCM, real manual walk without teleport from spawn to B6. Both opened door leaves,12external stairs up/down/reentry and lobby capture passed before later original GPU failure. Interior stair cores were not tested.",
+  "conclusion": "Three original uncaptured validation failures report the same generic Vertex|Storage buffer37326,size2048 used after destroy on submit89284–89286. Last original saved state is valid0pending at15:32:51. No live buffer ownership or lifecycle trace exists yet;2048matches initial regular-instance capacity but does not prove its owner.",
+  "limitations": [
+    "F8 in this source is2D drawImage of the existing canvas, no RTT or extra render pass; earlier capture alone does not assign this error.",
+    "The two SDK companions left normally long before fault, no simultaneous peer departure/reload/build/otherGPU scene is observed at error.",
+    "B6 first entry transient pending2shader validations/error0 settled; later buffer fault is a distinct fatal event.",
+    "NCM startup/fullCI and short FPS pilots remain valid for their stated scopes, not lifecycle/migration acceptance.",
+    "Current8routine profiler is an independent CPU performance discriminator; it does not identify this buffer."
+  ]
+}

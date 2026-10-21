@@ -1,0 +1,116 @@
+- main:
+  - generic "3D hra Strahov"
+  - generic: s•trahov
+  - paragraph: Připravuji celý kopec…
+  - paragraph: Vykreslování se zastavilo. Opusť demo a spusť scénu znovu.
+  - button "Nahlásit problém"
+  - button "Opustit demo"
+  - button "Opustit demo": s•
+  - status: 1 na kopci · společný svět
+  - generic: DEMO
+  - generic "Řízené testovací počasí · uložený záznam · Řízený meteorologický model · benchmark · model · starší data":
+    - generic: ☁ 12,3 °C
+    - generic: stanice · starší data
+  - text: 17:35
+  - generic: Praha
+  - button "Tvoje postava": W
+  - navigation "Herní nabídka":
+    - button "Akce":
+      - generic: Akce
+    - button "Mapa":
+      - generic: Mapa
+    - button "Deník":
+      - generic: Deník
+    - button "Lidé":
+      - generic: Lidé
+    - button "Chat":
+      - generic: Chat
+    - button "Aktivity":
+      - generic: Aktivity
+    - button "Nastavení":
+      - generic: Nastavení
+    - button "Zpětná vazba":
+      - generic: Zpětná vazba
+    - paragraph: "Tab: nabídka · Enter: otevřít · Esc: zavřít. Kliknutím do hry pokračuješ."
+  - region "Interaktivní minimapa":
+    - generic: Blok 6
+    - button "Otáčet mapu podle směru postavy":
+      - generic: ↑
+      - text: S
+    - group "Mapa kolejního areálu Strahov podle OpenStreetMap":
+      - generic: "11"
+      - generic: "12"
+      - generic: "4"
+      - generic: "2"
+      - generic: "9"
+      - generic: "1"
+      - generic: "8"
+      - generic: "5"
+      - generic: "10"
+      - generic: "7"
+      - generic: "3"
+      - generic: "6"
+      - 'button "2 míst: Blok 6, Klubovna B6" [pressed]':
+        - generic: "2"
+        - generic: B6
+      - button "Kancelář SH / SÚZ"
+      - button "Fotokomora"
+      - button "Hudebna B10"
+      - button "Včely · okolí B11"
+      - button "Silicon Gym / boulder"
+      - 'button "2 míst: SHerna B4, Studentská prádelna"':
+        - generic: "2"
+      - button "Hudebna B4"
+      - button "Společné místnosti B6"
+      - 'button "2 míst: Klubovna SH, Sedmička / Klub 007"':
+        - generic: "2"
+      - button "Fotbálek SH"
+      - button "Hudebna B9"
+      - button "MacGyver / 3D tisk"
+      - 'button "2 míst: Buzerák / SHOW, Mezi bloky"':
+        - generic: "2"
+      - button "Zahrádky SH"
+      - button "Grilovací centrum"
+      - button "Školicí centrum SH"
+      - button "R-ko / Recharging Bar"
+      - button "Stadion Strahov · 191 A"
+      - button "Stadion Strahov · 191 B"
+      - generic "Tvoje virtuální poloha"
+      - generic: 10 m
+    - group "Ovládání mapy":
+      - button "Přiblížit mapu": +
+      - button "Oddálit mapu": −
+      - button "Sledovat moji postavu" [pressed]: ⌖
+      - button "Zobrazit celý areál": ⛶
+    - generic: ◆ B6
+    - strong: 4 m · směr
+    - button "Zrušit navigační cíl": ×
+    - paragraph: Kolečko přibližuje, tažení posouvá. Kliknutím označíš cíl; Enter označí střed mapy.
+  - generic "Mapa © OpenStreetMap · ODbL. Prostorová předloha © IPR Praha · CC BY · 2023": © OSM / IPR
+  - generic "Levé kliknutí vybere cíl. Tažení levým nebo pravým tlačítkem otáčí kameru, kolečko přibližuje. Esc zavře nabídku nebo uvolní myš.":
+    - button "Ovládání":
+      - text: "?"
+      - generic: Ovládání
+    - button "Rychlá gesta (G)":
+      - text: G
+      - generic: Rychlá gesta (G)
+    - generic: 34 FPS
+  - button "Svítilna (F)" [disabled] [pressed]:
+    - generic: F
+- generic: KEY-22 LOCAL QA · pcf-fixed-5 · diagnostic
+- generic "Měření skutečné hry"
+- paragraph: "Plná hra a HUD. Čas osvětlení nemění reálný čas dopravy. Plain používá standardní Game benchmark a lehký RAF pozorovatel; bez dalších profilovacích wrapperů. Počasí: řízený uložený QA záznam, viditelně označený jako fallback. Diagnostic: bounded původní shader jobs a pasivní terminal instance/effect mapping; žádné nové GPU volání."
+- generic: "{ \"phase\": \"state-saved\", \"attemptId\": \"ae0aa3c2-77a9-4808-9b57-d2c405fa4f2a\", \"receipt\": { \"persisted\": true, \"repeated\": false, \"attemptId\": \"ae0aa3c2-77a9-4808-9b57-d2c405fa4f2a\", \"sha256\": \"a17bcfc77f3cd75330412c61e8b08eb611902d4fef40f31076c929ac87f78458\", \"bytes\": 9337 }, \"basicSampleGatesPassed\": false }"
+- link "Stáhnout poslední raw důkaz":
+  - /url: blob:http://127.0.0.1:4213/917e1c5f-730f-423f-95c5-15b39c358fa9
+- button "Změřit 10 s · standardní hra + raw RAF"
+- button "Uložit stav" [active]
+- button "Kvalita low"
+- button "Kvalita medium"
+- button "Kvalita high"
+- button "Kvalita auto"
+- button "Cíl 60 FPS"
+- button "Svítilna"
+- textbox "QA UTC okamžik osvětlení": 2026-10-20T10:00:00.000Z
+- button "Použít UTC osvětlení"
+- button "Skutečný čas osvětlení"

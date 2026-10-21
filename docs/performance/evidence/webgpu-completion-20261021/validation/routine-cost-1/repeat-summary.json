@@ -1,0 +1,94 @@
+{
+  "utc": "2026-10-21T16:01:29.747Z",
+  "completed": true,
+  "validationErrors": [],
+  "complete": true,
+  "frames": 8,
+  "errors": 0,
+  "phaseErrors": 0,
+  "restores": 0,
+  "remaining": 0,
+  "active": false,
+  "rows": [
+    {
+      "id": "Mesh.getLOD",
+      "phase": "active",
+      "calls": 2022.0,
+      "meanMs": 1.5749999582767487,
+      "minMs": 1.100000023841858,
+      "maxMs": 3.399999976158142
+    },
+    {
+      "id": "PBRBaseMaterial.bindForSubMesh",
+      "phase": "main",
+      "calls": 181.0,
+      "meanMs": 3.0125000327825546,
+      "minMs": 2.1000001430511475,
+      "maxMs": 3.7000001668930054
+    },
+    {
+      "id": "PBRBaseMaterial.isReadyForSubMesh",
+      "phase": "main",
+      "calls": 181.0,
+      "meanMs": 1.037500038743019,
+      "minMs": 0.5,
+      "maxMs": 1.7000001668930054
+    },
+    {
+      "id": "Scene._activeMesh",
+      "phase": "active",
+      "calls": 208.0,
+      "meanMs": 0.46250003576278687,
+      "minMs": 0.20000004768371582,
+      "maxMs": 0.6000001430511475
+    },
+    {
+      "id": "scene.getActiveMeshCandidates",
+      "phase": "active",
+      "calls": 1.0,
+      "meanMs": 0.0,
+      "minMs": 0.0,
+      "maxMs": 0.0
+    },
+    {
+      "id": "StandardMaterial.bindForSubMesh",
+      "phase": "main",
+      "calls": 51.0,
+      "meanMs": 0.9374999701976776,
+      "minMs": 0.5999999046325684,
+      "maxMs": 1.3999998569488525
+    },
+    {
+      "id": "StandardMaterial.isReadyForSubMesh",
+      "phase": "main",
+      "calls": 51.0,
+      "meanMs": 0.38750001788139343,
+      "minMs": 0.20000004768371582,
+      "maxMs": 0.6999999284744263
+    },
+    {
+      "id": "TransformNode.computeWorldMatrix",
+      "phase": "active",
+      "calls": 2693.75,
+      "meanMs": 2.7000000178813934,
+      "minMs": 1.7999998331069946,
+      "maxMs": 3.600000023841858
+    },
+    {
+      "id": "TransformNode.computeWorldMatrix",
+      "phase": "main",
+      "calls": 384.0,
+      "meanMs": 0.2875000089406967,
+      "minMs": 0.09999990463256836,
+      "maxMs": 0.5000001192092896
+    },
+    {
+      "id": "TransformNode.computeWorldMatrix",
+      "phase": "rtt",
+      "calls": 440.0,
+      "meanMs": 0.3750000596046448,
+      "minMs": 0.10000002384185791,
+      "maxMs": 0.6000001430511475
+    }
+  ]
+}
