@@ -1,8 +1,12 @@
 # Navazující výkonová analýza
 
-Stav21Oct2026: nový čtecí analytický task, žádný vlastní GPU běh ani runtime optimalizace. Navazuje na uživatelský požadavek pokračovat ve výkonové analýze a na [metodiku](../../README.md). [KEY-5](https://linear.app/gigeconomy/issue/KEY-5/plynulost-cele-hry-rendering-cpugpu-startup-a-lifecycle) zůstává otevřený.
+Stav 21. 10. 2026: **úplná A/B kampaň je převzatá, nezávisle přepočítaná a čtecí review nemá nálezy.** [Finální výsledky a priority](results.md): 6 startů / 36 intervalů celé produkční hry se třemi skutečnými klienty a HUD. KEY-53 odstranil redundantní malý scope, ale nárůst FPS tato série neprokázala. Render wall přibližně 22,4–22,9 ms je důvod dále přiřadit konkrétní CPU/GPU příčiny. [KEY-5](https://linear.app/gigeconomy/issue/KEY-5/plynulost-cele-hry-rendering-cpugpu-startup-a-lifecycle) zůstává otevřený.
 
-## Aktuální základ
+Přijatý runtime [PR22](https://github.com/Varnahg/StrahovCrazyShow/pull/22) je v main jako e9bc2f54289e9f444f91f4c82b9e3abe3c9c16d3; skutečné main [CI](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39519577977) a [hygiene](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39519577922) prošly. Vlastní činnost zde je analýza předaných raw dat a statický asset audit; žádná nová runtime změna nebo další GPU experiment.
+
+[Úplné archivované raw vstupy](raw-sources/manifest.json), [přepočet](key53-final-independent.json), [reprodukce z gzip](key53-reproduced-from-archives.json), [CSV](key53-final-independent.csv) a [nezávislá kontrola](final-verification.json) zachovávají zdrojové identity, všechny outliery i omezení. Následující části zachycují průzkum a rozhodovací rámec **před** převzetím finálních výsledků; jejich tehdejší stav čekání je historický. Aktuální závěr určuje výsledkový report.
+
+## Výchozí základ před kampaní
 
 Main c3454da45b22ad9726c257d3d481d45f6243ec04 má ověřené push CI1852/1852, build/integraci/hygiene. Koordinátor KEY-53 vytvořil úplnou baseline8557 souborů source ID `f3b5b5c0ba9b2fb5158ee2e1ab17c8b622b86c36fe2150d36bb5d4324ed1034d`: live-before/live-after/frozen shoda a12 LFS checksumů shodných s OID. Manifest byl přímo přečten; původní4654 s10 autorskými pointery není úplná baseline. Žádný výkonový přínos z přípravy baseline neplyne.
 
@@ -50,7 +54,7 @@ Pro zmenšení **tohoto konkrétního souboru** je proto první kandidát geomet
 
 [Chrome Performance reference](https://developer.chrome.com/docs/devtools/performance/reference) rozlišuje Self Time, Total Time, Bottom-up a Call tree; pro nový záznam je potřeba uchovat skutečný výběr intervalu a matching source maps. [Babylon scene optimization](https://doc.babylonjs.com/features/featuresDeepDive/scene/optimize_your_scene) dokumentuje samostatné render/active-mesh/compilation/GPU čítače a omezení GPU timer extension. Z toho neplyne měření dostupného GPU času v naší konkrétní relaci. Stejná dokumentace uvádí změny chování při freeze a performance priority; bez aktuální obrazové/lifecycle přejímky je nelze doporučit jako automaticky bezpečnou optimalizaci.
 
-## Probíhající aktuální přejímka
+## Záznam přípravy přejímky před převzetím výsledků
 
 KEY-53 řadič dokončil 27/27 cílených kontrol a tři review; skutečný [PR22](https://github.com/Varnahg/StrahovCrazyShow/pull/22) má head `3ac77c7abf8fca43e6380f382aba306502ab86d6`, base c3454da4 a zelené verify/hygiene. V tomto checkpointu ještě není přijatý do main: koordinátor připravuje přesný produkční kandidát a vlastní srovnatelnou A/B. Úplná zdrojová baseline f3b5… zůstává výše identifikovaná. Tento report nepřevádí úspěch CI nebo počet sweepů na výkonový přínos; nové raw výsledky a jejich interpretace jsou dosud otevřený další krok.
 

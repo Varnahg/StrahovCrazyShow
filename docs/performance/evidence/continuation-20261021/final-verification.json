@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-21T00:20:02.665460+00:00",
+  "reviewer": "/root/performance_result_verification",
+  "mode": "read-only independent result verification",
+  "findings": [],
+  "confirmed": [
+    "36 intervals, 12 groups, six starts; nine plain and nine profile intervals per variant; no removed outliers",
+    "JSON/CSV interval and pair statistics, pooled summaries, frame-weighted phases",
+    "Compressed and decompressed source SHA; byte-identical JPEG; original analyzer code in d505adec",
+    "Only renderer plus test source difference; all eight producer gates true",
+    "Interval means distinguished from endpoint counters; null call mean for uncalled B prune",
+    "Post-campaign hardware explicitly labeled; bounded conclusions"
+  ],
+  "limits": [
+    "No repeated engine/GPU experiment, CI or visual acceptance by this reviewer",
+    "Camera/population tolerance gates remain producer evidence",
+    "Root separately viewed all six full-game screenshots"
+  ],
+  "reviewedReport": "results.md",
+  "mainRuntime": "e9bc2f54289e9f444f91f4c82b9e3abe3c9c16d3",
+  "mainCI": {
+    "verify": 39519577977,
+    "source-secret-hygiene": 39519577922,
+    "conclusion": "success"
+  }
+}
