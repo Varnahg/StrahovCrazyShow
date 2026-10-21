@@ -51,7 +51,35 @@ export async function directoryHashes(directory) {
   return files;
 }
 export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs',
-  'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'helper.test.mjs', 'clock.test.mjs', 'README.md'];
+  'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'weather-fixture.mjs', 'startup-latency.mjs',
+  'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'README.md'];
+export function parseBuildOptions(args) {
+  const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false };
+  let loadingSeen = false;
+  const assigned = new Set();
+  for (let index = 0; index < args.length; index++) {
+    const token = args[index];
+    if (['original', 'translucent'].includes(token) && !loadingSeen && index === 0) {
+      value.loading = token; loadingSeen = true; continue;
+    }
+    if (token === '--startup-latency') {
+      if (assigned.has(token)) throw new Error('Duplicate startup latency flag');
+      assigned.add(token); value.startupLatency = true; continue;
+    }
+    if (token === '--weather' || token === '--clock') {
+      const key = token === '--weather' ? 'weatherFile' : 'clockFile', path = args[++index];
+      if (assigned.has(token) || value[key] !== undefined || !path || path.startsWith('--')) throw new Error('Duplicate/missing explicit path: ' + token);
+      assigned.add(token); value[key] = path; continue;
+    }
+    // Retain the original positional clock argument after loading. New fixture
+    // flags never consume this position or reinterpret it as a weather path.
+    if (loadingSeen && value.clockFile === undefined && typeof token === 'string' && !token.startsWith('--') && isAbsolute(token)) {
+      value.clockFile = token; continue;
+    }
+    throw new Error('Unknown/ambiguous build option: ' + token);
+  }
+  return Object.freeze(value);
+}
 export function previewPort(value = '4211') {
   if (typeof value !== 'string' || !/^[1-9]\d{3,4}$/.test(value) || Number(value) < 1024 || Number(value) > 65535 || Number(value) === 2596)
     throw new Error('Expected explicit preview port1024..65535 distinct from API2596');
@@ -66,4 +94,37 @@ export async function helperIdentity(directory) {
   const files = {};
   for (const file of sourceFiles) files[file] = sha256(await readFile(join(directory, file)));
   return { sha256: sha256(JSON.stringify(files)), files };
+}
+const buildKeys = ['sourceSnapshotId', 'helperSha256', 'label', 'loading', 'transforms', 'clock', 'weather', 'startupLatency', 'dependencies'];
+export function canonicalJSON(value) {
+  if (value === null || typeof value === 'string' || typeof value === 'boolean') return JSON.stringify(value);
+  if (typeof value === 'number' && Number.isFinite(value)) return JSON.stringify(value);
+  if (Array.isArray(value)) return '[' + value.map(canonicalJSON).join(',') + ']';
+  if (value && Object.getPrototypeOf(value) === Object.prototype)
+    return '{' + Object.keys(value).sort().map(key => JSON.stringify(key) + ':' + canonicalJSON(value[key])).join(',') + '}';
+  throw new Error('Unsupported canonical build input');
+}
+export function canonicalBuildInput(value) {
+  if (!value || buildKeys.some(key => !Object.hasOwn(value, key))) throw new Error('Missing explicit canonical build input');
+  for (const key of ['sourceSnapshotId', 'helperSha256', 'label'])
+    if (typeof value[key] !== 'string' || !value[key]) throw new Error('Invalid canonical build identity field');
+  if (!['original', 'translucent'].includes(value.loading) || typeof value.startupLatency !== 'boolean' ||
+      !value.transforms || Object.getPrototypeOf(value.transforms) !== Object.prototype ||
+      !value.dependencies || Object.getPrototypeOf(value.dependencies) !== Object.prototype)
+    throw new Error('Invalid canonical build mode/transforms');
+  for (const key of ['clock', 'weather']) if (value[key] !== null && (!value[key] || Object.getPrototypeOf(value[key]) !== Object.prototype))
+    throw new Error('Expected explicit object/null build input: ' + key);
+  return canonicalJSON(Object.fromEntries(buildKeys.map(key => [key, value[key]])));
+}
+export const buildDigest = value => sha256(canonicalBuildInput(value));
+export function browserBuildIdentity(value) {
+  const buildId = buildDigest(value);
+  return { label: value.label, sourceSnapshotId: value.sourceSnapshotId, helperSha256: value.helperSha256,
+    loading: value.loading, clock: value.clock, weather: value.weather, startupLatency: value.startupLatency,
+    dependencies: value.dependencies, buildId };
+}
+export function resolveBuildOverlay(template, value) {
+  const marker = '__WEBGPU_COMPLETION_IDENTITY__';
+  if (template.split(marker).length !== 2) throw new Error('Expected exactly one browser build identity marker');
+  return template.replace(marker, JSON.stringify(browserBuildIdentity(value)));
 }

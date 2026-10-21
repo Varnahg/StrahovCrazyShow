@@ -2,13 +2,14 @@ import { observeOperation } from 'virtual:webgpu-completion-observer';
 import { createAttemptQueue } from 'virtual:webgpu-completion-attempts';
 import { installBrowserClock } from 'virtual:webgpu-completion-browser-clock';
 import { createPlannedBenchmark } from 'virtual:webgpu-completion-clock';
+import { observeStartupLatency } from 'virtual:webgpu-completion-startup-latency';
 
 const identity = __WEBGPU_COMPLETION_IDENTITY__;
 const finite = value => typeof value === 'number' && Number.isFinite(value) ? value : null;
 const xyz = value => value ? { x: finite(value.x), y: finite(value.y), z: finite(value.z) } : null;
 const errorText = error => ({ name: String(error?.name ?? 'Error').slice(0, 80), message: String(error?.message ?? error).slice(0, 2000) });
 const pick = (value, keys) => Object.fromEntries(keys.filter(key => value?.[key] !== undefined).map(key => [key, value[key]]));
-const mode = identity.loading === 'translucent' || new URLSearchParams(location.search).get('profileEnvironment') === '1' ? 'diagnostic' : 'plain';
+const mode = identity.startupLatency === true || identity.loading === 'translucent' || new URLSearchParams(location.search).get('profileEnvironment') === '1' ? 'diagnostic' : 'plain';
 let previousOwner;
 let sharedTransfers;
 const weatherKeys = ['temperature', 'cloud', 'rain', 'wind', 'windDirection', 'observedAt', 'fetchedAt', 'stale', 'cloudStale',
@@ -119,6 +120,8 @@ export async function observeStartup(game, canvas, start) {
   const summary = document.createElement('summary'); summary.textContent = 'Měření skutečné hry'; controls.append(summary);
   const disclosure = document.createElement('p');
   disclosure.textContent = 'Plná hra a HUD. Čas osvětlení nemění reálný čas dopravy. Plain používá standardní Game benchmark a lehký RAF pozorovatel; bez dalších profilovacích wrapperů.';
+  if (identity.weather) disclosure.textContent += ' Počasí: řízený uložený QA záznam, viditelně označený jako fallback.';
+  if (identity.startupLatency) disclosure.textContent += ' Diagnostic: pozorované původní popErrorScope/onSubmittedWorkDone pouze při startu; latency není GPU čas.';
   const status = document.createElement('pre'); status.id = 'webgpu-completion-status';
   status.style.cssText = 'white-space:pre-wrap;max-height:160px;overflow:auto';
   const output = document.createElement('pre'); output.id = 'webgpu-completion-export'; output.hidden = true;
@@ -126,7 +129,7 @@ export async function observeStartup(game, canvas, start) {
   download.style.cssText = 'display:block;color:#b8e5ff'; download.hidden = true;
   controls.append(disclosure, status, download); panel.append(title, controls, output); document.body.append(panel);
   let gameRef = game, startupTimer, sampleOverflow = false, busy = false, disposed = false, downloadURL, interruptBenchmark;
-  let startupResolved = false, readyAtUTC, clockOwner, planned;
+  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, planned;
   const clockAbort = new AbortController();
   const samples = [], observerErrors = [], buttons = [];
   const ownerId = crypto.randomUUID();
@@ -313,13 +316,15 @@ export async function observeStartup(game, canvas, start) {
     if (!clockAbort.signal.aborted) {
       const abort = new Error('Clock QA owner stopped'); abort.name = 'AbortError'; clockAbort.abort(abort);
     }
-    clockOwner?.dispose();
+    clockOwner?.dispose(); latencyOwner?.dispose();
     unsubscribeTransfers(); buttons.forEach(button => button.disabled = true); gameRef = undefined;
   };
   const observer = game.scene.onDisposeObservable.addOnce(stop);
   const teardown = () => { stop(); unsubscribeTransfers(); observer.remove(true); revoke(); panel.remove(); window.removeEventListener('pagehide', revoke); };
   previousOwner = teardown; window.addEventListener('pagehide', revoke);
   return observeOperation(async () => {
+    latencyOwner = observeStartupLatency(game.engine, { enabled: identity.startupLatency,
+      signal: clockAbort.signal, isRetired: () => disposed || gameRef !== game || game.disposed === true });
     const owner = await installBrowserClock(game, identity.clock, {
       signal: clockAbort.signal, isRetired: () => disposed || gameRef !== game || game.disposed === true,
     });
@@ -336,9 +341,11 @@ export async function observeStartup(game, canvas, start) {
     onObserverError: noteError,
     onTerminal: (outcome, error) => {
       clearInterval(startupTimer);
+      latencyOwner?.dispose();
       const terminal = snapshot();
       const raw = { ...envelope('startup'), outcome, error: error ? errorText(error) : null,
         samples, sampleOverflow, terminal, compilation: compilationSnapshot(game),
+        startupLatency: latencyOwner?.snapshot() ?? null,
         scope: '1Hz technical startup observer only; stopped before gameplay measurement. Existing production compilation/health hooks unchanged.' };
       startupResolved = outcome === 'resolved';
       if (startupResolved && terminal.ready) readyAtUTC = Date.now();

@@ -29,9 +29,11 @@ test('actual UI transform is exact once, retains outer catch/dispose and origina
   const transformed = transformUI(original);
   assert.equal(transformed.split('await observeStartup(g, startupCanvas, () => g.start());').length, 2);
   assert.equal(transformed.slice(UI_IMPORT.length).replace('        await observeStartup(g, startupCanvas, () => g.start());', START_MARKER), original.replaceAll('\r\n', '\n'));
-  assert.ok(transformed.includes('game.current?.dispose();'));
+  // The full reverse-transform equality above retains current UI ownership
+  // cleanup verbatim, including its disposeOwnedGame refactor.
+  assert.equal(sha256(await readFile(join(root, 'client/ui.tsx'))), before, 'actual UI bytes still match immediately before TSX parse');
   assert.equal(ts.createSourceFile('qa-ui.tsx', transformed, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX).parseDiagnostics.length, 0);
-  assert.equal(sha256(original), before);
+  assert.equal(sha256(await readFile(join(root, 'client/ui.tsx'))), before, 'actual UI bytes still match after TSX parse');
   assert.throws(() => transformUI(transformed));
   assert.throws(() => transformUI('no marker'));
   assert.throws(() => transformUI(START_MARKER + '\n' + START_MARKER));
@@ -198,6 +200,7 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
     source = source.replace("'virtual:webgpu-completion-attempts'", JSON.stringify(pathToFileURL(join(directory, 'attempt-queue.mjs')).href));
     source = source.replace("'virtual:webgpu-completion-browser-clock'", JSON.stringify(adapterURL));
     source = source.replace("'virtual:webgpu-completion-clock'", JSON.stringify(pathToFileURL(join(directory, 'transit-clock.mjs')).href));
+    source = source.replace("'virtual:webgpu-completion-startup-latency'", JSON.stringify(pathToFileURL(join(directory, 'startup-latency.mjs')).href));
     source = source.replace('__WEBGPU_COMPLETION_IDENTITY__', JSON.stringify(browserIdentity));
     source += '\nexport { weatherSnapshot, benchmarkSnapshot };\n// Unique DOM fixture ' + crypto.randomUUID();
     const module = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
@@ -247,7 +250,47 @@ test('actual overlay failure produces terminal export before teardown using a DO
     assert.equal(context.posted[0].terminal.stages.bootStage, 'light-preparation');
     assert.equal(context.posted[0].samples.length, 1);
     assert.equal(context.posted[0].observerErrors.length, 0);
+    assert.equal(context.posted[0].mode, 'plain'); assert.equal(context.posted[0].startupLatency, null);
 }));
+test('diagnostic overlay observes original startup calls and restores before failure receipt without replacing primary error', () => browserFixture(async context => {
+  const game = context.makeGame(), primary = new Error('same startup failure');
+  const pending = Promise.withResolvers(), scope = () => pending.promise, fence = () => Promise.resolve();
+  const queue = { onSubmittedWorkDone: fence }, device = { queue, popErrorScope: scope }; game.engine._device = device;
+  await assert.rejects(context.observeStartup(game, { dataset: {} }, () => {
+    assert.equal(device.popErrorScope(), pending.promise);
+    queue.onSubmittedWorkDone(); throw primary;
+  }), error => error === primary);
+  assert.equal(device.popErrorScope, scope); assert.equal(queue.onSubmittedWorkDone, fence);
+  const raw = JSON.parse(context.output().textContent);
+  assert.equal(raw.mode, 'diagnostic'); assert.equal(raw.startupLatency.active, false);
+  assert.equal(raw.startupLatency.recordedCalls, 2); assert.equal(raw.startupLatency.channels[0].pending, 1);
+  assert.equal(raw.error.message, primary.message); assert.equal(raw.observerErrors.length, 0);
+  pending.resolve(null); await new Promise(setImmediate);
+  assert.deepEqual(JSON.parse(context.output().textContent), raw);
+}, async value => ack(value), { ...identity, startupLatency: true }));
+test('diagnostic latency stop during pending start and rejoin cannot release fresh device hooks or mutate old receipt', () => browserFixture(async context => {
+  const old = context.makeGame(), fresh = context.makeGame();
+  const pending = Promise.withResolvers(), oldStart = Promise.withResolvers(), freshStart = Promise.withResolvers();
+  const scope = () => pending.promise, fence = () => Promise.resolve(), queue = { onSubmittedWorkDone: fence }, device = { queue, popErrorScope: scope };
+  old.engine._device = fresh.engine._device = device;
+  let oldStarted = false, freshStarted = false;
+  const starting = context.observeStartup(old, { dataset: {} }, () => { oldStarted = true; device.popErrorScope(); return oldStart.promise; });
+  await until(() => oldStarted);
+  old.dispose(); assert.equal(device.popErrorScope, scope);
+  let freshWrapper;
+  const freshStarting = context.observeStartup(fresh, { dataset: {} }, () => {
+    freshWrapper = device.popErrorScope; assert.notEqual(freshWrapper, scope);
+    freshStarted = true; return freshStart.promise;
+  });
+  await until(() => freshStarted); oldStart.resolve(); await starting;
+  assert.equal(device.popErrorScope, freshWrapper, 'late terminal must not remove fresh owner hook');
+  fresh.ready = true; freshStart.resolve(); await freshStarting;
+  await until(() => context.posted.length === 2);
+  assert.equal(device.popErrorScope, scope); assert.equal(queue.onSubmittedWorkDone, fence);
+  assert.equal(context.posted.every(value => value.mode === 'diagnostic'), true);
+  assert.equal(context.posted.find(value => value.ownerId !== context.posted.at(-1).ownerId).startupLatency.active, false);
+  pending.resolve(null);
+}, async value => ack(value), { ...identity, startupLatency: true }));
 test('delayed/failed startup ACK blocks measurement and pending downloads survive rejoin unchanged', async () => {
   const requests = [];
   await browserFixture(async context => {

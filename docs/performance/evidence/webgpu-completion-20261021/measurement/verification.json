@@ -1,32 +1,40 @@
 {
-  "schemaVersion": 4,
-  "checkedAtUTC": "2026-10-21T10:01:37.632Z",
+  "schemaVersion": 6,
+  "checkedAtUTC": "2026-10-21T11:38:40.550Z",
   "node": "v24.19.0",
-  "scope": "Targeted CPU actual Simulation/Rapier/transit/Timeline, deferred owner and DOM/transport fixtures; TSX syntax parser for actual UI transform. No server/index startup, environment/working-directory mutation, network listener, GPU, production build or fabricated FPS",
-  "command": "node --import tsx --test --test-reporter=tap docs/performance/evidence/webgpu-completion-20261021/measurement/helper.test.mjs docs/performance/evidence/webgpu-completion-20261021/measurement/clock.test.mjs",
+  "scope": "Targeted CPU actual Simulation/Rapier/transit/Timeline and DOM/transport/weather/native-Promise contract fixtures. Actual current UI bytes verified before/after TSX syntax parse. No browser, WebGPU device, server/index startup, env/cwd mutation, listener, production build or fabricated FPS.",
+  "command": "node --import tsx --test --test-reporter=tap docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\helper.test.mjs docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\clock.test.mjs docs\\performance\\evidence\\webgpu-completion-20261021\\measurement\\weather-latency.test.mjs",
   "exitCode": 0,
-  "tests": 31,
-  "pass": 31,
+  "tests": 51,
+  "pass": 51,
   "fail": 0,
   "skipped": 0,
-  "logSha256": "3a7452179f333d6f8c3871b335a679c3686e78aa79684a9eacc177f63310fed4",
-  "helperSha256": "07b3e1cd51c5bc55277f03cf936b900d47a1344237fbe9db0b139cedc5a882cf",
+  "logSha256": "0f841b28185256963afd694de14cbbbdc9bb5d4a8836c9cab72689d62969ff0c",
+  "helperBeforeSha256": "63d576ff976601d044b2aa4f7498ff9d2c8d6a298e5aa6cff0e008213cd55f20",
+  "helperSha256": "63d576ff976601d044b2aa4f7498ff9d2c8d6a298e5aa6cff0e008213cd55f20",
   "helperFiles": {
-    "common.mjs": "b58ae6658a6e139528ea3d9d3f7ef083737e9f25a4dd5ae004df3bff6cc30d0f",
+    "common.mjs": "a5475e5c362ab995ac7a3fd2147b3f98a0db964f0b6f842f9f8185ccb8754149",
     "startup-observer.mjs": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
     "attempt-queue.mjs": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
     "receipt.mjs": "6aebee76673b51ed19a1af98e1942aa6716324167321293e7e42bcfd6c7ffbbf",
-    "harness.mjs": "5c68489aa6108dc96cd7220f8fe18a2ca4c937a0d5b1b7b2cca58b98c8c13435",
-    "qa-overlay.mjs": "012a62c4f1e687ad8bc1e7ae77c1a871e6e452fce55ab3c4edb4127e41415b0e",
+    "harness.mjs": "5503683ca40aeb8e59373e32509114c210d7f3879b5c657fab8f35eddf850145",
+    "qa-overlay.mjs": "625683c1d8c674d82d604090f2970a0910c6852582c893ede6a019f9e68be576",
     "transit-clock.mjs": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
     "browser-clock.mjs": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
     "server-bootstrap.mjs": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
-    "helper.test.mjs": "92b451c2496e5e825a4f6cf05c3da897c9d920b713d6a9dc3a44dbcec266b8c7",
+    "weather-fixture.mjs": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+    "startup-latency.mjs": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+    "helper.test.mjs": "4ce66d6950573460892242717854366f94e6d8824ac34fa5ea4050a7afd029f1",
     "clock.test.mjs": "67031042ca1fce5ecfc377dc1320e0d74f91dd87eebbe2926eaf41a60196d08b",
-    "README.md": "533855def12529d64615091c716bea5cc9e8eaf2763e7cb2df32a890788649e0"
+    "weather-latency.test.mjs": "79a56f9c37a2eb77963aeecb6d609f1a638f27eb4a7d50ae092c01fddab3f803",
+    "README.md": "398c65713a1d880de4edc118c1a94f13f2079251630bc60c2a49bf57c95e183f"
   },
   "helperSourceStable": true,
   "selectedSourceBefore": {
+    "client/ui.tsx": "6aa94cf9ecd4278ef68c1e5a98377503f5bd96c667fe51e24e3ef5ac941562fe",
+    "shared/weather.ts": "e9c9faed4a1200d020324bcc6a1b42b32c340f5f1dbcb26f36bc6f904226b542",
+    "server/weather.ts": "1ecd80066e7c5f53bd23f61f8b4fde90683b26842089b101056816b8cdd52cf8",
+    "scripts/performance-preview.mjs": "58acacb9b980dae82cacab143d2b088c309a76f168bff2c8d958daa0ea392fb6",
     "shared/simulation.ts": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
     "shared/transit.ts": "69f6e13442f8cf7aa5a513959c543cd618d097d2a61d786f0f9bb7add57b028f",
     "shared/input-timeline.ts": "8d9d46f22550157639aeb7f3e4f23e0f88aa9f45416944062d1d5c9c28ab767f",
@@ -37,6 +45,10 @@
     "shared/data/transit-navigation.json": "b9acdfac3d3671f15a65882d89ab854cb76fe81dc45eba66612c15cb637ac3f3"
   },
   "selectedSourceAfter": {
+    "client/ui.tsx": "6aa94cf9ecd4278ef68c1e5a98377503f5bd96c667fe51e24e3ef5ac941562fe",
+    "shared/weather.ts": "e9c9faed4a1200d020324bcc6a1b42b32c340f5f1dbcb26f36bc6f904226b542",
+    "server/weather.ts": "1ecd80066e7c5f53bd23f61f8b4fde90683b26842089b101056816b8cdd52cf8",
+    "scripts/performance-preview.mjs": "58acacb9b980dae82cacab143d2b088c309a76f168bff2c8d958daa0ea392fb6",
     "shared/simulation.ts": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
     "shared/transit.ts": "69f6e13442f8cf7aa5a513959c543cd618d097d2a61d786f0f9bb7add57b028f",
     "shared/input-timeline.ts": "8d9d46f22550157639aeb7f3e4f23e0f88aa9f45416944062d1d5c9c28ab767f",
@@ -94,6 +106,16 @@
       "output": ""
     },
     {
+      "file": "weather-fixture.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "startup-latency.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
       "file": "helper.test.mjs",
       "exitCode": 0,
       "output": ""
@@ -102,15 +124,38 @@
       "file": "clock.test.mjs",
       "exitCode": 0,
       "output": ""
+    },
+    {
+      "file": "weather-latency.test.mjs",
+      "exitCode": 0,
+      "output": ""
     }
   ],
-  "typeScriptScope": "createSourceFile TSX parseDiagnostics for exact transformed current UI; not a whole-project semantic tsc claim",
-  "peerP2Repairs": [
-    "Deferred Simulation import observes abort/retirement before and after await; returned owner has abort disposal and caller rejects/disposes late owner before original start",
-    "Pure loadBuild contract binds verified manifest ID and exact canonical embedded clock config plus Simulation source to verified clock bytes",
-    "Pure server launch plan clears provider credential without reading it, uses own feedback path, unsets static directory, sets exact snapshot cwd/source and production loopback port policy; proof records booleans/paths only"
+  "typeScriptScope": "createSourceFile TSX parseDiagnostics for exact transformed current UI; not semantic tsc or production build",
+  "baselineHelperSha256": "07b3e1cd51c5bc55277f03cf936b900d47a1344237fbe9db0b139cedc5a882cf",
+  "retainedBaseline": "verification-before-weather-latency31.json + helper-tests-before-weather-latency31.tap",
+  "developmentIteration": {
+    "tests": 46,
+    "pass": 45,
+    "fail": 1,
+    "reason": "Historical source-string assertion expected game.current?.dispose(); current separately-owned UI refactor uses disposeOwnedGame(). Full exact reverse-transform equality passed. Removed redundant stale assertion; current UI was never edited by helper task."
+  },
+  "newContracts": [
+    "Strict explicit weather CLI/path64KiB/UTF8/shape/numeric preservation + raw/emitted/provenance drift and junction escape; no fixture leaves proxy intact",
+    "Default-off avoids engine/device access; original Promise/receiver/args/sync throw and rejection preserved; observer faults cannot replace primary failure",
+    "4096 shared scalar cap keeps original calls, explicit overflow invalidation; pending-at-stop and late settlements sealed; exact descriptor/inherited/foreign/abort/retire/rejoin ownership",
+    "DOM actual overlay diagnostics mode, terminal restore and failed receipt; old pending startup terminal cannot release fresh hooks; original31 regressions retained"
   ],
   "actualServerHookProven": false,
   "actualClientGPUHookProven": false,
-  "requiredRootEvidence": "Fresh final helper build and isolated bootstrap plus actual browser/SDK hook/source/config and visual/performance acceptance. Known preceding26 test version retained separately."
+  "actualLatencyCauseProven": false,
+  "requiredRootEvidence": "Fresh exact helper build/load/serve and focused actual startup trace; existing f511d0ab/4213 stays immutable. No browser/GPU causal result from these CPU tests.",
+  "precedingWeatherLatencyHelperSha256": "ed15a85130c8d3122e7d11dfc7131f8500aebaedc885d3e38c9e4b94eed3efea",
+  "retainedPrevious": "verification-before-build-seal46.json + helper-tests-before-build-seal46.tap",
+  "peerP2BuildSeal": {
+    "mechanism": "loadBuild formerly used mutable optional weather/clock flags without recomputing canonical build digest",
+    "repair": "Single pure canonical required-input digest for build/load including selected dependencies, exclusive input raw SHA and exact browser overlay binding, actual emitted JavaScript buildId in hash-verified bundle, source/helper/config/weather/transform/dependency branch guards",
+    "regressions": "All preceding46 retained +5 canonical/deletion/null/tamper/coherent-sidecars-old-browser/actual-JS-hash and verified-input substitution tests; explicit null/off succeeds; no new Vite/server run",
+    "scope": "Filesystem/pure CPU metadata and native-Promise fixtures only. No signing/all-bundle adversary claim; actual fresh build remains root acceptance"
+  }
 }
