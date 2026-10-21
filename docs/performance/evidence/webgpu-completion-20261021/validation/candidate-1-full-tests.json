@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "sourceSnapshotId": "40a3639ceef6ed073d0d3b84f86a43d902adcbd2350f735ad1d2b68de6b84c6c",
+  "command": "pnpm --config.verify-deps-before-run=false test",
+  "host": "Windows Node24.19",
+  "exitCode": 1,
+  "tests": 1923,
+  "pass": 1912,
+  "fail": 9,
+  "skipped": 2,
+  "cancelled": 0,
+  "durationMs": 1529070.2368,
+  "logSha256": "4048ed510af6bbf04b24868e531c562492f359aa3e3befb602c784beb09a70d2",
+  "failures": [
+    {
+      "count": 6,
+      "kind": "VM fixture missing the new StartupPreparationLoop dependency",
+      "repairCommit": "a5c7ed5d",
+      "targetedTests": "22/22 PASS"
+    },
+    {
+      "count": 3,
+      "kind": "Frozen static test inputs missing diagnostic identity JSONL, Dockerfile/Compose",
+      "repairCommit": "517361c8",
+      "targetedTests": "9/9 PASS"
+    }
+  ],
+  "limitations": [
+    "This preserved failed run is not final validation of the later repaired candidate.",
+    "Two skipped tests are reported as observed; no assertion is claimed for skipped cases."
+  ]
+}
