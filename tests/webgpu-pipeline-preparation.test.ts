@@ -289,8 +289,9 @@ test("signal/engine disposal and retained wrappers are safe, idempotent and rele
   }
 });
 
-test("WebGL, noncompatibility and snapshot hosts are inert without touching device hooks", () => {
-  for (const e of [{ isWebGPU: false }, { isWebGPU: true, compatibilityMode: false },
+test("WebGL, unknown mode and snapshot hosts are inert without touching device hooks", () => {
+  for (const e of [{ isWebGPU: false }, { isWebGPU: true },
+    { isWebGPU: false, get compatibilityMode(): boolean { throw new Error("WebGL must not inspect WebGPU mode"); } },
     { isWebGPU: true, compatibilityMode: true, snapshotRendering: true }]) {
     const helper = new WebGpuPipelinePreparation(e); let calls = 0;
     assert.equal(helper.render(() => calls++), true); assert.equal(helper.isReady(), true);
