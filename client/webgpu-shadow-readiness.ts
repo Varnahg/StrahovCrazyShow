@@ -46,23 +46,41 @@ class FreshWebGpuShadowDepthWrapper extends ShadowDepthWrapper {
   private released = false;
   private layouts = new WeakMap<Effect, LightLayout>();
 
+  private isCurrent(subMesh: SubMesh, passId: number): boolean {
+    const scene = this.baseMaterial.getScene();
+    return !this.released && !scene.isDisposed && !subMesh.getMesh().isDisposed() &&
+      scene.getEngine().currentRenderPassId === passId && !subMesh._drawWrapperOverride;
+  }
+
   override isReadyForSubMesh(subMesh: SubMesh, defines: string[], generator: ShadowGenerator,
     useInstances: boolean, passId: number): boolean {
     const material = this.baseMaterial as LitMaterial;
-    const scene = material.getScene(), engine = scene.getEngine(), mesh = subMesh.getMesh();
     // This runs before ShadowGenerator installs its depth binding override. A
     // reentrant call must not prepare the base material inside that override.
-    if (this.released || scene.isDisposed || mesh.isDisposed() ||
-        engine.currentRenderPassId !== passId || subMesh._drawWrapperOverride ||
+    if (!this.isCurrent(subMesh, passId) ||
         (!this.standalone && subMesh.getMaterial() !== material)) return false;
+    const engine = material.getScene().getEngine();
+    // Pinned PCF rendering disables color writes before refreshing the base
+    // PBR. Complete mesh readiness also asks here outside that render scope.
+    const previousColorWrite = generator.usePercentageCloserFiltering === true ? engine.getColorWrite() : undefined;
+    try {
+      if (previousColorWrite === true) engine.setColorWrite(false);
+      return this.isReadyInCurrentContext(subMesh, defines, generator, useInstances, passId);
+    } finally {
+      if (previousColorWrite === true) engine.setColorWrite(previousColorWrite);
+    }
+  }
+
+  private isReadyInCurrentContext(subMesh: SubMesh, defines: string[], generator: ShadowGenerator,
+    useInstances: boolean, passId: number): boolean {
+    const material = this.baseMaterial as LitMaterial;
+    const scene = material.getScene(), mesh = subMesh.getMesh();
     // Native standalone already performs this exact call; don't do it twice.
     // Keep the current shadow pass: changing it would mix base/draw ownership.
     if (!this.standalone && !material.isReadyForSubMesh(mesh, subMesh, useInstances)) return false;
-    if (this.released || scene.isDisposed || mesh.isDisposed() ||
-        engine.currentRenderPassId !== passId || subMesh._drawWrapperOverride ||
+    if (!this.isCurrent(subMesh, passId) ||
         !super.isReadyForSubMesh(subMesh, defines, generator, useInstances, passId)) return false;
-    if (this.released || scene.isDisposed || mesh.isDisposed() ||
-        engine.currentRenderPassId !== passId || subMesh._drawWrapperOverride) return false;
+    if (!this.isCurrent(subMesh, passId)) return false;
     const effect = this.getEffect(subMesh, generator, passId)?.effect;
     if (!effect || effect.isDisposed || typeof effect.defines !== "string") return false;
     let layout = this.layouts.get(effect);
