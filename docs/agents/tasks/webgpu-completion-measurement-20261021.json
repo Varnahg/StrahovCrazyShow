@@ -15,7 +15,9 @@
     "Plain měření skutečné plné hry s HUD, různými MP avatary, raw frame series a doloženými rozměry/backendem/health; diagnostické instrumentace jsou oddělené.",
     "Volitelný explicitní QA transit clock mapuje jednou Simulation.tick argument na serveru i browseru a Game.trafficInstant render; nemění autoritativní packet/input/replay clocks, fixedtimestep, Date nebo síťové deadline. Předem dané E0/A a jednorázové plánované benchmarkUTC jsou ve stejné hashed konfiguraci.",
     "Clock je defaultoff; samostatný server-bootstrap spouští pouze root na rezervovaném API2597, existujícíbaseline2596 se nepřenastaví. Helperdoloží skutečnéhook counts, late/failed pokusy a nezávislé fyzikální/renderové mapy, nepovažujeendpointcounts za srovnatelnouceloutrasu.",
-    "CLI nepoužívá automatizaci browseru, porty či procesy bez samostatné validační rezervace. Testy helperu ověří přesné transformy, odmítnutí driftu a zachování neúspěšných důkazů."
+    "CLI nepoužívá automatizaci browseru, porty či procesy bez samostatné validační rezervace. Testy helperu ověří přesné transformy, odmítnutí driftu a zachování neúspěšných důkazů.",
+    "Volitelná explicitní immutable weather fixture přebírá existující performance-preview mechanismus: úplné numerické Weather hodnoty beze změny zátěže, viditelné QA/fallback označení místo živého zdroje, source/emitted SHA a provenance ve stejné build/run identitě. Default bez fixture zachová původní API proxy.",
+    "Volitelný pouze diagnostický startup observer odděleně změří completion latency původních popErrorScope a queue.onSubmittedWorkDone. Nevolá je navíc, nečeká navíc, vrací původní Promise/throw a nemění health/readiness/timeout. Bounded scalar evidence, overflow a ownership/lifecycle jsou explicitní; defaultoff plain FPS cestu neinstrumentuje."
   ],
   "verification": [
     "Lehké cílené node testy helperů uvnitř vlastního prefixu; žádný build/server/GPU běh v tomto tasku.",
@@ -24,6 +26,8 @@
   "notes": [
     "Dva nezměněné main preflighty mají 1Hz RAF a řízený light timeout; jejich výsledky nejsou výkonová přejímka. Pro první rozlišení stačí existující session recorder a profileEnvironment.",
     "Nenahrazovat produkční renderer/simulaci, nezpřístupňovat Game/device do window, nepollovat mutující pipeline.isReady navíc a neodstraňovat světla, stíny nebo materiály pro lepší FPS.",
-    "Žádné zápisy do předchozího transit-calendar helperu ani jeho původní cache; nové výstupy spouští koordinátor pouze ve svém validačním scope."
+    "Žádné zápisy do předchozího transit-calendar helperu ani jeho původní cache; nové výstupy spouští koordinátor pouze ve svém validačním scope.",
+    "Dodatečné konkrétní zadání: focused NCM actual30s low timeout na6/15 stages, raw receipt0b36c7cb v rootověqa-plain-run-1. Rozdíl sync285/async0 je doložený, dominance scope/fence latency dosud ne. Nejdřív tento observer; produktový NCM fix bude samostatně rezervovaný až po měření.",
+    "Před dalším zápisem root uchová přesný přijatý helper07b3e1cd v ownedvalidationcache. Stávající běžící plainbuildf511d0ab má neměnné bundle a původní helper identity; nový helper potřebuje nový build/run. Child nespouští žádný port/server/GPU ani nepřebírárootovy cache."
   ]
 }

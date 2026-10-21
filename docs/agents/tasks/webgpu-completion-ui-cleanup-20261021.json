@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-ui-cleanup-20261021",
+  "title": "KEY-22/39: uvolnit vlastněnou MP relaci po terminálním selhání startupu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/ui.tsx",
+    "tests/room-callbacks.test.ts",
+    "docs/performance/evidence/webgpu-completion-20261021/ui-startup-ownership/",
+    "docs/agents/handoffs/webgpu-completion-ui-cleanup-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před implementací zaznamenat doložený connect→bind→room.current→Game.start failure řetězec a varianty řešení; konkrétní onAuth branch nepředstírat.",
+    "Terminální aktuální startup failure uvolní právě svou Room relaci, callbacky, buffery a connected stav, provede jednou consented leave a zachová původní chybu pro uživatele.",
+    "Sdílet teardown s existujícím leave tam, kde zachová funkční flow. Stará generace či deferred leave nesmí ukončit nově připojenou relaci; Guest nesmí opouštět cizí room.",
+    "Game zůstává vlastníkem scény/enginu, UI sítě. Žádné oslabení server onAuth, tokenů, izolace hosta nebo readiness.",
+    "Cílený refaktoring a skutečná existující UI effect/callback fixture pokryjí GPU factory/start failure, přesný leave count, původní error, pozdní callbacks/rejoin/Guest a konec odesílání. Předat konkrétní důkazy; root provede celou pipeline a actual GPU failure/rejoin."
+  ],
+  "verification": [
+    "Lehké cílené tests/room-callbacks.test.ts a relevantní nezměněné UI/network tests; žádný full build/server/GPU v child tasku.",
+    "Neopakovat BMAD v konkrétním child zadání; předat implementaci, refaktoring, zdrojové SHA a skutečné test výsledky společně."
+  ],
+  "notes": [
+    "Výslovně přidělený společný integrační soubor client/ui.tsx; jediný zapisující child jej musí samostatně rezervovat.",
+    "Doložený current catch ui.tsx686 čistí pouze Game, room.current a connected zůstávají vlastněné UI; Game.dispose Room nevlastní. Actual NCM timeout nechal error screen~2min, další první reload join měl obecný onAuth reject4002; po čekání retry fungoval. Duplicate connection je hypotéza, chybějící catch teardown je přímo prokázaný mechanismus.",
+    "Root vlastní měřicí helper a Vite QA exact UI prestart transform; nesmí se souběžně měnit označený await g.start() tak, aby helper ztratil exact kontrakt. Child předá případnou nutnou změnu markeru koordinátorovi před zápisem.",
+    "Nečíst ani vypisovat session/Linear credentials. Žádné cizí WIP nebo jiné runtime soubory."
+  ]
+}
