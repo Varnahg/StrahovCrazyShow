@@ -1,17 +1,19 @@
 {
   "schemaVersion": 1,
-  "status": "ready",
+  "status": "done",
   "dependsOn": [
     "feedback-implementation-20261020"
   ],
   "resources": [],
   "verification": [
-    "Aktuální primární zdroje skutečně přečíst; u každého tvrzení uvést URL, vydavatele, datum publikace/přístupu, confidence a meze.",
-    "Nezaměnit marketing/gallery za měřenou kvalitu nebo úspěšný export; neprovádět placené generování, instalace ani GPU/Blender bez samostatné rezervace."
+    "Načíst úplnou předanou šestistartovou kampaň a všech 36 intervalů; zkontrolovat zdrojový diff včetně testů, source/harness identity, podmínky, producentovy gates a raw SHA.",
+    "Samostatně přepočítat profile/Plain statistiky, páry, pooled hodnoty a současné fáze; rozlišit nested wall scopes, endpointy, rozlišení časovače a chybějící atribuci.",
+    "Zachovat úplné raw v byte-identických archivech a reprodukovat výsledky přímo z gzip; Python/JSON/odkazy a nezávislá čtecí verifikace bez nálezů."
   ],
   "notes": [
     "Výslovné zadání uživatele21Oct2026 po dokončení KEY52: hezké originální/vymyšlené3D objekty a postavy, textem řízené animace, editovatelný Blender/herní export; pokračování výkonové analýzy.",
-    "Použít projektovou BMAD policy; provozní source of truth jsou živé claims, nikoli tato definice. Research firewall: projekt určuje požadavky, není důkazem schopností produktů."
+    "Použít projektovou BMAD policy; provozní source of truth jsou živé claims, nikoli tato definice. Research firewall: projekt určuje požadavky, není důkazem schopností produktů.",
+    "21Oct2026 integrátor přijal výsledkový commit00a6446f po nezávislém čtecím review []; všech36 intervalů, gzip reprodukce a současné priority dokončené. Žádný prokázaný FPS gain, broader KEY-5 a60FPS zůstávají otevřené. Finální zveřejnění je samostatný goal-evidence-publication-20261021, dosud pending handback."
   ],
   "id": "performance-continuation-analysis-20261021",
   "title": "Navázat na výkonové důkazy a připravit priority dalších optimalizací",
