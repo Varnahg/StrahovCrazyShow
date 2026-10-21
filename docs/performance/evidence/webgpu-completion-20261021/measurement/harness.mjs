@@ -24,7 +24,12 @@ async function dependencyIdentity(snapshot) {
     '@babylonjs/core/Lights/Shadows/shadowGenerator.js', '@babylonjs/core/Lights/light.js', '@babylonjs/core/Engines/abstractEngine.pure.js',
     '@babylonjs/core/scene.pure.js', '@babylonjs/core/Meshes/mesh.pure.js', '@babylonjs/core/Meshes/transformNode.pure.js',
     '@babylonjs/core/Materials/PBR/pbrBaseMaterial.pure.js', '@babylonjs/core/Materials/standardMaterial.pure.js',
-    '@babylonjs/core/Rendering/objectRenderer.js', '@babylonjs/core/Misc/observable.js'];
+    '@babylonjs/core/Rendering/objectRenderer.js', '@babylonjs/core/Misc/observable.js',
+    '@babylonjs/core/Buffers/buffer.pure.js','@babylonjs/core/Buffers/dataBuffer.js','@babylonjs/core/Meshes/WebGPU/webgpuDataBuffer.js',
+    '@babylonjs/core/Engines/WebGPU/webgpuBufferManager.js',
+    '@babylonjs/core/Engines/WebGPU/webgpuDrawContext.js','@babylonjs/core/Engines/WebGPU/webgpuCacheRenderPipeline.js',
+    '@babylonjs/core/Engines/WebGPU/webgpuBundleList.js','@babylonjs/core/Meshes/instancedMesh.pure.js','@babylonjs/core/Meshes/subMesh.pure.js',
+    '@babylonjs/core/Layers/thinSelectionOutlineLayer.js'];
   const dependencies = {};
   for (const name of files) dependencies[name] = sha256(await readFile(require.resolve(name)));
   const appCore = require.resolve('@babylonjs/core/package.json');
@@ -134,7 +139,7 @@ export async function run(command, input, output, label, option = 'original', ..
       await readFile(join(snapshot, 'client/style.css'), 'utf8'), loading);
     const dependencies = await dependencyIdentity(snapshot);
     const browserIdentity = browserBuildIdentity({ label, sourceSnapshotId: source.snapshotId, helperSha256: helper.sha256,
-      loading, transforms, clock: clock ?? null, weather: weather?.specification ?? null, startupLatency: options.startupLatency, shaderAttribution: options.shaderAttribution, routineCost: options.routineCost, dependencies });
+      loading, transforms, clock: clock ?? null, weather: weather?.specification ?? null, startupLatency: options.startupLatency, shaderAttribution: options.shaderAttribution, routineCost: options.routineCost,bufferLifecycle:options.bufferLifecycle, dependencies });
     const directory = await freshDirectory(output);
     const overlay = resolveBuildOverlay(await readFile(join(helperDirectory, 'qa-overlay.mjs'), 'utf8'), { ...browserIdentity, transforms });
     const observer = await readFile(join(helperDirectory, 'startup-observer.mjs'), 'utf8');
@@ -144,6 +149,9 @@ export async function run(command, input, output, label, option = 'original', ..
     const routineCore = await readFile(join(helperDirectory, 'routine-cost-core.mjs'), 'utf8');
     const routineCost = (await readFile(join(helperDirectory, 'routine-cost.mjs'), 'utf8'))
       .replace("'./routine-cost-core.mjs'", "'virtual:webgpu-completion-routine-core'");
+    const bufferCore=await readFile(join(helperDirectory,'buffer-lifecycle-core.mjs'),'utf8');
+    const bufferLifecycle=(await readFile(join(helperDirectory,'buffer-lifecycle.mjs'),'utf8'))
+      .replace("'./buffer-lifecycle-core.mjs'","'virtual:webgpu-completion-buffer-core'");
     const shaderAttribution = (await readFile(join(helperDirectory, 'shader-attribution.mjs'), 'utf8'))
       .replace("'./shader-lifetime.mjs'", "'virtual:webgpu-completion-shader-lifetime'");
     const shaderLifetime = await readFile(join(helperDirectory, 'shader-lifetime.mjs'), 'utf8');
@@ -168,6 +176,7 @@ export async function run(command, input, output, label, option = 'original', ..
     const virtualLatency = '\0virtual:webgpu-completion-startup-latency', virtualAttribution = '\0virtual:webgpu-completion-shader-attribution';
     const virtualLifetime = '\0virtual:webgpu-completion-shader-lifetime';
     const virtualRoutine = '\0virtual:webgpu-completion-routine-cost', virtualRoutineCore = '\0virtual:webgpu-completion-routine-core';
+    const virtualBuffer='\0virtual:webgpu-completion-buffer-lifecycle',virtualBufferCore='\0virtual:webgpu-completion-buffer-core';
     let uiHits = 0, cssHits = 0;
     await build(mergeConfig(config.config, {
       root: snapshot, configFile: false, cacheDir: join(directory, '.vite'),
@@ -185,6 +194,8 @@ export async function run(command, input, output, label, option = 'original', ..
           if (id === 'virtual:webgpu-completion-shader-lifetime') return virtualLifetime;
           if (id === 'virtual:webgpu-completion-routine-cost') return virtualRoutine;
           if (id === 'virtual:webgpu-completion-routine-core') return virtualRoutineCore;
+          if(id==='virtual:webgpu-completion-buffer-lifecycle')return virtualBuffer;
+          if(id==='virtual:webgpu-completion-buffer-core')return virtualBufferCore;
           if (id === 'virtual:webgpu-completion-simulation') return join(snapshot, 'shared/simulation.ts').replaceAll('\\', '/');
         },
         load(id) {
@@ -198,6 +209,8 @@ export async function run(command, input, output, label, option = 'original', ..
           if (id === virtualLifetime) return shaderLifetime;
           if (id === virtualRoutine) return routineCost;
           if (id === virtualRoutineCore) return routineCore;
+          if(id===virtualBuffer)return bufferLifecycle;
+          if(id===virtualBufferCore)return bufferCore;
         },
         transform(code, id) {
           const file = id.split('?')[0].replaceAll('\\', '/');
@@ -280,7 +293,7 @@ export async function run(command, input, output, label, option = 'original', ..
     process.once('SIGTERM', () => { void stop().catch(error => { console.error(error); process.exitCode = 1; }); });
     console.log(JSON.stringify({ origin, apiPort, directory, runDirectory, buildId: identity.buildId,
       instructions: 'Root owns resource claims, the explicit API port, browser/GPU and eventual shutdown. This process owns only its preview; Ctrl+C closes only its own server/sockets.' }));
-  } else throw new Error('Usage: build SNAPSHOT OUTPUT LABEL [original|translucent] [ABS_CLOCK_JSON] [--clock ABS_JSON] [--weather ABS_JSON] [--startup-latency] [--shader-attribution] | inspect BUILD | serve BUILD RUN_OUTPUT [PORT] [API_PORT]');
+  } else throw new Error('Usage: build SNAPSHOT OUTPUT LABEL [original|translucent] [ABS_CLOCK_JSON] [--clock ABS_JSON] [--weather ABS_JSON] [--startup-latency] [--shader-attribution] [--routine-cost] [--buffer-lifecycle] | inspect BUILD | serve BUILD RUN_OUTPUT [PORT] [API_PORT]');
 }
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url)
   await run(...process.argv.slice(2));

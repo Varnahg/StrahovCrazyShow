@@ -3,13 +3,14 @@ import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { sha256 } from './common.mjs';
 import { validateRoutineProfile } from './routine-cost-core.mjs';
+import { validateBufferTrace } from './buffer-lifecycle-core.mjs';
 
 export const MAX_RECEIPT_BYTES = 2 * 1024 * 1024;
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export function validateReceipt(value, identity) {
   if (!value || value.schemaVersion !== 1 || !uuid.test(value.attemptId ?? '') ||
       value.buildId !== identity.buildId || value.sourceSnapshotId !== identity.sourceSnapshotId ||
-      value.helperSha256 !== identity.helperSha256 || !['startup', 'benchmark', 'state', 'routine-cost'].includes(value.kind) ||
+      value.helperSha256 !== identity.helperSha256 || !['startup', 'benchmark', 'state', 'routine-cost','buffer-lifecycle'].includes(value.kind) ||
       !['plain', 'diagnostic'].includes(value.mode)) throw new Error('Receipt identity/schema mismatch');
   if (identity.clock && value.clockConfigId !== identity.clock.configId) throw new Error('Receipt clock config mismatch');
   if (!Number.isFinite(value.atMs) || value.atMs < 0 || !Number.isFinite(value.timeOrigin))
@@ -19,6 +20,10 @@ export function validateReceipt(value, identity) {
       !Array.isArray(value.samples) || value.samples.length > 181 || !value.terminal))
     throw new Error('Startup evidence missing');
   if (value.kind === 'state' && (!value.state || !value.compilation)) throw new Error('State evidence missing');
+  if(value.kind==='buffer-lifecycle'){
+    if(identity.bufferLifecycle!==true||value.bufferLifecycle!==true||value.mode!=='diagnostic'||!value.bufferTrace||value.bufferTrace.active!==false)throw new Error('Buffer lifecycle diagnostic identity/evidence missing');
+    validateBufferTrace(value.bufferTrace);
+  }
   if (value.kind === 'routine-cost') {
     if (identity.routineCost !== true || value.routineCost !== true || value.mode !== 'diagnostic' || !value.before || !value.after ||
         !Array.isArray(value.validationErrors) || typeof value.completed !== 'boolean') throw new Error('Routine diagnostic identity/evidence missing');

@@ -203,6 +203,7 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
     source = source.replace("'virtual:webgpu-completion-startup-latency'", JSON.stringify(pathToFileURL(join(directory, 'startup-latency.mjs')).href));
     source = source.replace("'virtual:webgpu-completion-shader-attribution'", JSON.stringify(pathToFileURL(join(directory, 'shader-attribution.mjs')).href));
     source = source.replace("'virtual:webgpu-completion-routine-cost'", JSON.stringify(pathToFileURL(join(directory, 'routine-cost.mjs')).href));
+    source = source.replace("'virtual:webgpu-completion-buffer-lifecycle'", JSON.stringify(pathToFileURL(join(directory, 'buffer-lifecycle.mjs')).href));
     source = source.replace('__WEBGPU_COMPLETION_IDENTITY__', JSON.stringify(browserIdentity));
     source += '\nexport { weatherSnapshot, benchmarkSnapshot };\n// Unique DOM fixture ' + crypto.randomUUID();
     const module = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
@@ -254,6 +255,35 @@ test('actual overlay failure produces terminal export before teardown using a DO
     assert.equal(context.posted[0].observerErrors.length, 0);
     assert.equal(context.posted[0].mode, 'plain'); assert.equal(context.posted[0].startupLatency, null);
 }));
+
+test('buffer overlay persists distinct immutable raw before original fatal cleanup and keeps the original error', () => browserFixture(async context => {
+  const { WebGPUBufferManager }=await import('@babylonjs/core/Engines/WebGPU/webgpuBufferManager.js');
+  const { Observable }=await import('@babylonjs/core/Misc/observable.js');
+  const game=context.makeGame(),engine=game.engine,primary=new Error('unchanged original GPU handler error');
+  const device={createBuffer:descriptor=>({...descriptor,destroy(){}})};
+  engine._isWebGPU=true;engine.uniqueId=3;engine._device=device;engine._bufferManager=new WebGPUBufferManager(engine,device);
+  game.scene._engine=engine;game.scene.onNewMeshAddedObservable=new Observable();game.renderHealth.generation=1;
+  const original=function(message){assert.equal(this,game);assert.equal(message,'Buffer BabylonWebGPUDevice3_DataBufferUniqueId='+db.uniqueId+'_CopyDst_Vertex_Storage_size2048 used in submit while destroyed.');
+    const captured=JSON.parse(context.output().textContent);assert.equal(captured.kind,'buffer-lifecycle');assert.equal(captured.bufferTrace.reason,'renderer-failure');assert.equal(captured.bufferTrace.target.dataBufferID,db.uniqueId);
+    game.dispose();throw primary;};game.handleRendererFailure=original;
+  await context.observeStartup(game,{dataset:{}},async()=>{game.ready=true;});
+  const db=engine._bufferManager.createBuffer(2048,168);assert.ok(context.all().some(value=>value.textContent.includes('buffer owner/reallocation/release/destroy')));
+  assert.throws(()=>game.handleRendererFailure('Buffer BabylonWebGPUDevice3_DataBufferUniqueId='+db.uniqueId+'_CopyDst_Vertex_Storage_size2048 used in submit while destroyed.'),error=>error===primary);
+  await until(()=>context.posted.some(raw=>raw.kind==='buffer-lifecycle'));
+  const raws=context.posted.filter(raw=>raw.kind==='buffer-lifecycle');assert.equal(raws.length,1);assert.equal(raws[0].mode,'diagnostic');assert.equal(raws[0].bufferLifecycle,true);
+  assert.equal(raws[0].bufferTrace.target.ownerObserved,false);assert.equal(game.handleRendererFailure,original);assert.equal(game.disposed,true);
+  const bytes=JSON.stringify(raws[0]);engine._bufferManager.releaseBuffer(db);engine._bufferManager.destroyDeferredBuffers();assert.equal(JSON.stringify(raws[0]),bytes);
+},async value=>ack(value),{...identity,bufferLifecycle:true}));
+
+test('buffer overlay retains startup-rejected trace before the existing outer UI catch and dispose',()=>browserFixture(async context=>{
+  const { WebGPUBufferManager }=await import('@babylonjs/core/Engines/WebGPU/webgpuBufferManager.js');
+  const { Observable }=await import('@babylonjs/core/Misc/observable.js');
+  const game=context.makeGame(),engine=game.engine,primary=new Error('same original startup rejection'),device={createBuffer:descriptor=>({...descriptor,destroy(){}})};
+  engine._isWebGPU=true;engine.uniqueId=4;engine._device=device;engine._bufferManager=new WebGPUBufferManager(engine,device);game.scene._engine=engine;game.scene.onNewMeshAddedObservable=new Observable();
+  await assert.rejects(context.observeStartup(game,{dataset:{}},()=>{engine._bufferManager.createBuffer(2048,168);throw primary;}),error=>error===primary);
+  assert.equal(game.disposed,false);game.dispose();await until(()=>context.posted.some(raw=>raw.kind==='buffer-lifecycle'));
+  const raw=context.posted.find(raw=>raw.kind==='buffer-lifecycle');assert.equal(raw.bufferTrace.reason,'startup-rejected');assert.equal(raw.bufferTrace.resources.length,1);assert.equal(context.posted.filter(value=>value.kind==='buffer-lifecycle').length,1);
+},async value=>ack(value),{...identity,bufferLifecycle:true}));
 
 test('routine diagnostic defaultoff has no action; explicit flag is visible and retains rejected actual-scene attempt', async () => {
   await browserFixture(async context => {

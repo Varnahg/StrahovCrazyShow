@@ -224,7 +224,7 @@ test('foreign render/prototype replacement survives cleanup and marks evidence i
 test('new flag is defaultoff, strict explicit CLI, canonical/sealed/browser identity and receipt bounds', () => {
   assert.equal(parseBuildOptions([]).routineCost, false); assert.equal(parseBuildOptions(['--routine-cost']).routineCost, true);
   assert.throws(() => parseBuildOptions(['--routine-cost', '--routine-cost']));
-  const input = { sourceSnapshotId: sha256('source'), helperSha256: sha256('helper'), label: 'routine-test', loading: 'original', transforms: {}, clock: null, weather: null, startupLatency: false, shaderAttribution: false, routineCost: true, dependencies: {} };
+  const input = { sourceSnapshotId: sha256('source'), helperSha256: sha256('helper'), label: 'routine-test', loading: 'original', transforms: {}, clock: null, weather: null, startupLatency: false, shaderAttribution: false, routineCost: true, bufferLifecycle: false, dependencies: {} };
   const template = 'export const identity=__WEBGPU_COMPLETION_IDENTITY__;', overlayBytes = Buffer.from(resolveBuildOverlay(template, input));
   const sealed = { ...browserBuildIdentity(input), transforms: {}, snapshot: '/CPU-only', helperFiles: {}, sourceFiles: 0, observerSha256: 'observer', overlaySha256: sha256(overlayBytes), dependencies: {} };
   const inputBytes = Buffer.from(JSON.stringify(sealed));

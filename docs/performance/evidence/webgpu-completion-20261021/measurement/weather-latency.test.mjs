@@ -35,11 +35,11 @@ function deviceFixture() {
 
 test('explicit build flags preserve positional clock and reject duplicate/ambiguous input; default observer off', () => {
   const clock = resolve(directory, 'clock.json'), weather = resolve(directory, 'weather.json');
-  assert.deepEqual(parseBuildOptions([]), { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false });
+  assert.deepEqual(parseBuildOptions([]), { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false,bufferLifecycle:false });
   assert.deepEqual(parseBuildOptions(['original', clock, '--weather', weather, '--startup-latency']),
-    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: true, shaderAttribution: false, routineCost: false });
+    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: true, shaderAttribution: false, routineCost: false,bufferLifecycle:false });
   assert.deepEqual(parseBuildOptions(['--weather', weather, '--clock', clock]),
-    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: false, shaderAttribution: false, routineCost: false });
+    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: false, shaderAttribution: false, routineCost: false,bufferLifecycle:false });
   for (const args of [['--weather'], ['--weather', '--startup-latency'], ['--startup-latency', '--startup-latency'],
     ['original', clock, '--clock', clock], ['--clock', clock, '--clock', clock], ['--weather', weather, '--weather', weather],
     ['original', 'relative.json'], ['--unknown'], ['original', 'translucent'], ['--weather=x']]) assert.throws(() => parseBuildOptions(args));
@@ -213,7 +213,7 @@ function sealedFixture(patch = {}) {
   const clock = { config, configId: sha256(JSON.stringify(config)), configSha256: sha256(clockBytes), simulationSourceSha256: source.files['shared/simulation.ts'] };
   const transforms = { ui: { before: sha256('UI original'), after: sha256('UI transformed') }, loading: { variant: 'original', before: sha256('CSS'), after: sha256('CSS') } };
   const settings = { sourceSnapshotId: source.snapshotId, helperSha256: helper.sha256, label: 'seal-fixture', loading: 'original',
-    transforms, clock, weather, startupLatency: true, shaderAttribution: true, routineCost: false, dependencies: { 'selected.js': sha256('dependency') }, ...patch };
+    transforms, clock, weather, startupLatency: true, shaderAttribution: true, routineCost: false, bufferLifecycle: false, dependencies: { 'selected.js': sha256('dependency') }, ...patch };
   const template = 'export const identity = __WEBGPU_COMPLETION_IDENTITY__;\n';
   const overlayBytes = Buffer.from(resolveBuildOverlay(template, settings));
   const input = { ...browserBuildIdentity(settings), transforms: settings.transforms, snapshot: '/explicit/cpu/snapshot', sourceFiles: 1,

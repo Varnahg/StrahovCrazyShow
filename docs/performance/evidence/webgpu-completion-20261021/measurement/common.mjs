@@ -52,9 +52,9 @@ export async function directoryHashes(directory) {
 }
 export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs',
   'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'weather-fixture.mjs', 'startup-latency.mjs',
-  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'README.md'];
+  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'README.md'];
 export function parseBuildOptions(args) {
-  const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false };
+  const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false, bufferLifecycle:false };
   let loadingSeen = false;
   const assigned = new Set();
   for (let index = 0; index < args.length; index++) {
@@ -62,9 +62,9 @@ export function parseBuildOptions(args) {
     if (['original', 'translucent'].includes(token) && !loadingSeen && index === 0) {
       value.loading = token; loadingSeen = true; continue;
     }
-    if (token === '--startup-latency' || token === '--shader-attribution' || token === '--routine-cost') {
+    if (token === '--startup-latency' || token === '--shader-attribution' || token === '--routine-cost' || token==='--buffer-lifecycle') {
       if (assigned.has(token)) throw new Error('Duplicate diagnostic flag');
-      assigned.add(token); value[token === '--startup-latency' ? 'startupLatency' : token === '--shader-attribution' ? 'shaderAttribution' : 'routineCost'] = true; continue;
+      assigned.add(token); value[token === '--startup-latency' ? 'startupLatency' : token === '--shader-attribution' ? 'shaderAttribution' : token==='--routine-cost'?'routineCost':'bufferLifecycle'] = true; continue;
     }
     if (token === '--weather' || token === '--clock') {
       const key = token === '--weather' ? 'weatherFile' : 'clockFile', path = args[++index];
@@ -95,7 +95,7 @@ export async function helperIdentity(directory) {
   for (const file of sourceFiles) files[file] = sha256(await readFile(join(directory, file)));
   return { sha256: sha256(JSON.stringify(files)), files };
 }
-const buildKeys = ['sourceSnapshotId', 'helperSha256', 'label', 'loading', 'transforms', 'clock', 'weather', 'startupLatency', 'shaderAttribution', 'routineCost', 'dependencies'];
+const buildKeys = ['sourceSnapshotId', 'helperSha256', 'label', 'loading', 'transforms', 'clock', 'weather', 'startupLatency', 'shaderAttribution', 'routineCost', 'bufferLifecycle','dependencies'];
 export function canonicalJSON(value) {
   if (value === null || typeof value === 'string' || typeof value === 'boolean') return JSON.stringify(value);
   if (typeof value === 'number' && Number.isFinite(value)) return JSON.stringify(value);
@@ -108,7 +108,7 @@ export function canonicalBuildInput(value) {
   if (!value || buildKeys.some(key => !Object.hasOwn(value, key))) throw new Error('Missing explicit canonical build input');
   for (const key of ['sourceSnapshotId', 'helperSha256', 'label'])
     if (typeof value[key] !== 'string' || !value[key]) throw new Error('Invalid canonical build identity field');
-  if (!['original', 'translucent'].includes(value.loading) || typeof value.startupLatency !== 'boolean' || typeof value.shaderAttribution !== 'boolean' || typeof value.routineCost !== 'boolean' ||
+  if (!['original', 'translucent'].includes(value.loading) || typeof value.startupLatency !== 'boolean' || typeof value.shaderAttribution !== 'boolean' || typeof value.routineCost !== 'boolean' || typeof value.bufferLifecycle!=='boolean'||
       !value.transforms || Object.getPrototypeOf(value.transforms) !== Object.prototype ||
       !value.dependencies || Object.getPrototypeOf(value.dependencies) !== Object.prototype)
     throw new Error('Invalid canonical build mode/transforms');
@@ -120,7 +120,7 @@ export const buildDigest = value => sha256(canonicalBuildInput(value));
 export function browserBuildIdentity(value) {
   const buildId = buildDigest(value);
   return { label: value.label, sourceSnapshotId: value.sourceSnapshotId, helperSha256: value.helperSha256,
-    loading: value.loading, clock: value.clock, weather: value.weather, startupLatency: value.startupLatency, shaderAttribution: value.shaderAttribution, routineCost: value.routineCost,
+    loading: value.loading, clock: value.clock, weather: value.weather, startupLatency: value.startupLatency, shaderAttribution: value.shaderAttribution, routineCost: value.routineCost,bufferLifecycle:value.bufferLifecycle,
     dependencies: value.dependencies, buildId };
 }
 export function resolveBuildOverlay(template, value) {
