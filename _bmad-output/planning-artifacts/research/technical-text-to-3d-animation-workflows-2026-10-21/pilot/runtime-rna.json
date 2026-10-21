@@ -1,0 +1,632 @@
+{
+  "version": "5.2.2 LTS",
+  "version_tuple": [
+    5,
+    2,
+    2
+  ],
+  "build_hash": "d13f752e3b9c",
+  "binary_path": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "background": true,
+  "export_properties": {
+    "filepath": {
+      "type": "STRING",
+      "description": "Filepath used for exporting the file"
+    },
+    "check_existing": {
+      "type": "BOOLEAN",
+      "description": "Check and warn on overwriting existing files"
+    },
+    "export_import_convert_lighting_mode": {
+      "type": "ENUM",
+      "description": "Optional backwards compatibility for non-standard render engines. Applies to lights",
+      "enum": [
+        {
+          "id": "SPEC",
+          "label": "Standard"
+        },
+        {
+          "id": "COMPAT",
+          "label": "Unitless"
+        },
+        {
+          "id": "RAW",
+          "label": "Raw (Deprecated)"
+        }
+      ]
+    },
+    "gltf_export_id": {
+      "type": "STRING",
+      "description": "Identifier of caller (in case of add-on calling this exporter). Can be useful in case of Extension added by other add-ons"
+    },
+    "export_use_gltfpack": {
+      "type": "BOOLEAN",
+      "description": "Use gltfpack to simplify the mesh and/or compress its textures"
+    },
+    "export_gltfpack_tc": {
+      "type": "BOOLEAN",
+      "description": "Convert all textures to KTX2 with BasisU supercompression"
+    },
+    "export_gltfpack_tq": {
+      "type": "INT",
+      "description": "Texture encoding quality"
+    },
+    "export_gltfpack_si": {
+      "type": "FLOAT",
+      "description": "Simplify meshes targeting triangle count ratio"
+    },
+    "export_gltfpack_sa": {
+      "type": "BOOLEAN",
+      "description": "Aggressively simplify to the target ratio disregarding quality"
+    },
+    "export_gltfpack_slb": {
+      "type": "BOOLEAN",
+      "description": "Lock border vertices during simplification to avoid gaps on connected meshes"
+    },
+    "export_gltfpack_vp": {
+      "type": "INT",
+      "description": "Use N-bit quantization for positions"
+    },
+    "export_gltfpack_vt": {
+      "type": "INT",
+      "description": "Use N-bit quantization for texture coordinates"
+    },
+    "export_gltfpack_vn": {
+      "type": "INT",
+      "description": "Use N-bit quantization for normals and tangents"
+    },
+    "export_gltfpack_vc": {
+      "type": "INT",
+      "description": "Use N-bit quantization for colors"
+    },
+    "export_gltfpack_vpi": {
+      "type": "ENUM",
+      "description": "Type to use for vertex position attributes",
+      "enum": [
+        {
+          "id": "Integer",
+          "label": "Integer"
+        },
+        {
+          "id": "Normalized",
+          "label": "Normalized"
+        },
+        {
+          "id": "Floating-point",
+          "label": "Floating-point"
+        }
+      ]
+    },
+    "export_gltfpack_noq": {
+      "type": "BOOLEAN",
+      "description": "Disable quantization; produces much larger glTF files with no extensions"
+    },
+    "export_gltfpack_kn": {
+      "type": "BOOLEAN",
+      "description": "Restrict some optimization to keep named nodes and meshes attached to named nodes so that named nodes can be transformed externally"
+    },
+    "export_format": {
+      "type": "ENUM",
+      "description": "Output format. Binary is most efficient, but JSON may be easier to edit later",
+      "enum": []
+    },
+    "ui_tab": {
+      "type": "ENUM",
+      "description": "Export setting categories",
+      "enum": [
+        {
+          "id": "GENERAL",
+          "label": "General"
+        },
+        {
+          "id": "MESHES",
+          "label": "Meshes"
+        },
+        {
+          "id": "OBJECTS",
+          "label": "Objects"
+        },
+        {
+          "id": "ANIMATION",
+          "label": "Animation"
+        }
+      ]
+    },
+    "export_copyright": {
+      "type": "STRING",
+      "description": "Legal rights and conditions for the model"
+    },
+    "export_image_format": {
+      "type": "ENUM",
+      "description": "Output format for images. PNG is lossless and generally preferred, but JPEG might be preferable for web applications due to the smaller file size. Alternatively they can be omitted if they are not needed",
+      "enum": [
+        {
+          "id": "AUTO",
+          "label": "Automatic"
+        },
+        {
+          "id": "JPEG",
+          "label": "JPEG Format (.jpg)"
+        },
+        {
+          "id": "WEBP",
+          "label": "WebP Format"
+        },
+        {
+          "id": "NONE",
+          "label": "None"
+        }
+      ]
+    },
+    "export_image_add_webp": {
+      "type": "BOOLEAN",
+      "description": "Creates WebP textures for every texture. For already WebP textures, nothing happens"
+    },
+    "export_image_webp_fallback": {
+      "type": "BOOLEAN",
+      "description": "For all WebP textures, create a PNG fallback texture"
+    },
+    "export_texture_dir": {
+      "type": "STRING",
+      "description": "Folder to place texture files in. Relative to the .gltf file"
+    },
+    "export_jpeg_quality": {
+      "type": "INT",
+      "description": "Quality of JPEG export"
+    },
+    "export_image_quality": {
+      "type": "INT",
+      "description": "Quality of image export"
+    },
+    "export_keep_originals": {
+      "type": "BOOLEAN",
+      "description": "Keep original textures files if possible. WARNING: if you use more than one texture, where pbr standard requires only one, only one texture will be used. This can lead to unexpected results"
+    },
+    "export_texcoords": {
+      "type": "BOOLEAN",
+      "description": "Export UVs (texture coordinates) with meshes"
+    },
+    "export_normals": {
+      "type": "BOOLEAN",
+      "description": "Export vertex normals with meshes"
+    },
+    "export_gn_mesh": {
+      "type": "BOOLEAN",
+      "description": "Export Geometry nodes instance meshes"
+    },
+    "export_meshopt_compression_enable": {
+      "type": "BOOLEAN",
+      "description": "Compress mesh using Meshopt"
+    },
+    "export_meshopt_extension": {
+      "type": "ENUM",
+      "description": "Extension to use for meshopt compression",
+      "enum": [
+        {
+          "id": "EXT_meshopt_compression",
+          "label": "EXT_meshopt_compression"
+        },
+        {
+          "id": "KHR_meshopt_compression",
+          "label": "KHR_meshopt_compression"
+        }
+      ]
+    },
+    "export_draco_mesh_compression_enable": {
+      "type": "BOOLEAN",
+      "description": "Compress mesh using Draco"
+    },
+    "export_draco_mesh_compression_level": {
+      "type": "INT",
+      "description": "Compression level (0 = most speed, 6 = most compression, higher values currently not supported)"
+    },
+    "export_draco_position_quantization": {
+      "type": "INT",
+      "description": "Quantization bits for position values (0 = no quantization)"
+    },
+    "export_draco_normal_quantization": {
+      "type": "INT",
+      "description": "Quantization bits for normal values (0 = no quantization)"
+    },
+    "export_draco_texcoord_quantization": {
+      "type": "INT",
+      "description": "Quantization bits for texture coordinate values (0 = no quantization)"
+    },
+    "export_draco_color_quantization": {
+      "type": "INT",
+      "description": "Quantization bits for color values (0 = no quantization)"
+    },
+    "export_draco_generic_quantization": {
+      "type": "INT",
+      "description": "Quantization bits for generic values like weights or joints (0 = no quantization)"
+    },
+    "export_tangents": {
+      "type": "BOOLEAN",
+      "description": "Export vertex tangents with meshes"
+    },
+    "export_materials": {
+      "type": "ENUM",
+      "description": "Export materials",
+      "enum": [
+        {
+          "id": "EXPORT",
+          "label": "Export"
+        },
+        {
+          "id": "PLACEHOLDER",
+          "label": "Placeholder"
+        },
+        {
+          "id": "VIEWPORT",
+          "label": "Viewport"
+        },
+        {
+          "id": "NONE",
+          "label": "No export"
+        }
+      ]
+    },
+    "export_unused_images": {
+      "type": "BOOLEAN",
+      "description": "Export images not assigned to any material"
+    },
+    "export_unused_textures": {
+      "type": "BOOLEAN",
+      "description": "Export image texture nodes not assigned to any material. This feature is not standard and needs an external extension to be included in the glTF file"
+    },
+    "export_vertex_color": {
+      "type": "ENUM",
+      "description": "How to export vertex color",
+      "enum": [
+        {
+          "id": "MATERIAL",
+          "label": "Material"
+        },
+        {
+          "id": "ACTIVE",
+          "label": "Active"
+        },
+        {
+          "id": "NAME",
+          "label": "Name"
+        },
+        {
+          "id": "NONE",
+          "label": "None"
+        }
+      ]
+    },
+    "export_vertex_color_name": {
+      "type": "STRING",
+      "description": "Name of vertex color to export"
+    },
+    "export_all_vertex_colors": {
+      "type": "BOOLEAN",
+      "description": "Export all vertex colors, even if not used by any material. If no Vertex Color is used in the mesh materials, a fake COLOR_0 will be created, in order to keep material unchanged"
+    },
+    "export_active_vertex_color_when_no_material": {
+      "type": "BOOLEAN",
+      "description": "When there is no material on object, export active vertex color"
+    },
+    "export_attributes": {
+      "type": "BOOLEAN",
+      "description": "Export Attributes (when starting with underscore)"
+    },
+    "use_mesh_edges": {
+      "type": "BOOLEAN",
+      "description": "Export loose edges as lines, using the material from the first material slot"
+    },
+    "use_mesh_vertices": {
+      "type": "BOOLEAN",
+      "description": "Export loose points as glTF points, using the material from the first material slot"
+    },
+    "export_cameras": {
+      "type": "BOOLEAN",
+      "description": "Export cameras"
+    },
+    "use_selection": {
+      "type": "BOOLEAN",
+      "description": "Export selected objects only"
+    },
+    "use_visible": {
+      "type": "BOOLEAN",
+      "description": "Export visible objects only"
+    },
+    "use_renderable": {
+      "type": "BOOLEAN",
+      "description": "Export renderable objects only"
+    },
+    "use_active_collection_with_nested": {
+      "type": "BOOLEAN",
+      "description": "Include active collection and nested collections"
+    },
+    "use_active_collection": {
+      "type": "BOOLEAN",
+      "description": "Export objects in the active collection only"
+    },
+    "use_active_scene": {
+      "type": "BOOLEAN",
+      "description": "Export active scene only"
+    },
+    "collection": {
+      "type": "STRING",
+      "description": "Export only objects from this collection (and its children)"
+    },
+    "at_collection_center": {
+      "type": "BOOLEAN",
+      "description": "Export at Collection center of mass of root objects of the collection"
+    },
+    "export_extras": {
+      "type": "BOOLEAN",
+      "description": "Export custom properties as glTF extras"
+    },
+    "export_yup": {
+      "type": "BOOLEAN",
+      "description": "Export using glTF convention, +Y up"
+    },
+    "export_apply": {
+      "type": "BOOLEAN",
+      "description": "Apply modifiers (excluding Armatures) to mesh objects -WARNING: prevents exporting shape keys"
+    },
+    "export_shared_accessors": {
+      "type": "BOOLEAN",
+      "description": "Export Primitives using shared accessors for attributes"
+    },
+    "export_animations": {
+      "type": "BOOLEAN",
+      "description": "Exports active actions and NLA tracks as glTF animations"
+    },
+    "export_frame_range": {
+      "type": "BOOLEAN",
+      "description": "Clips animations to selected playback range"
+    },
+    "export_frame_step": {
+      "type": "INT",
+      "description": "How often to evaluate animated values (in frames)"
+    },
+    "export_force_sampling": {
+      "type": "BOOLEAN",
+      "description": "Apply sampling to all animations"
+    },
+    "export_sampling_interpolation_fallback": {
+      "type": "ENUM",
+      "description": "Interpolation fallback for sampled animations, when the property is not keyed",
+      "enum": [
+        {
+          "id": "LINEAR",
+          "label": "Linear"
+        },
+        {
+          "id": "STEP",
+          "label": "Step"
+        }
+      ]
+    },
+    "export_pointer_animation": {
+      "type": "BOOLEAN",
+      "description": "Export material, Light & Camera animation as Animation Pointer. Available only for baked animation mode 'NLA Tracks' and 'Scene'"
+    },
+    "export_animation_mode": {
+      "type": "ENUM",
+      "description": "Export Animation mode",
+      "enum": [
+        {
+          "id": "ACTIONS",
+          "label": "Actions"
+        },
+        {
+          "id": "ACTIVE_ACTIONS",
+          "label": "Active actions merged"
+        },
+        {
+          "id": "BROADCAST",
+          "label": "Broadcast actions"
+        },
+        {
+          "id": "NLA_TRACKS",
+          "label": "NLA Tracks"
+        },
+        {
+          "id": "SCENE",
+          "label": "Scene"
+        }
+      ]
+    },
+    "export_nla_strips_merged_animation_name": {
+      "type": "STRING",
+      "description": "Name of single glTF animation to be exported"
+    },
+    "export_def_bones": {
+      "type": "BOOLEAN",
+      "description": "Export Deformation bones only"
+    },
+    "export_hierarchy_flatten_bones": {
+      "type": "BOOLEAN",
+      "description": "Flatten Bone Hierarchy. Useful in case of non decomposable transformation matrix"
+    },
+    "export_hierarchy_flatten_objs": {
+      "type": "BOOLEAN",
+      "description": "Flatten Object Hierarchy. Useful in case of non decomposable transformation matrix"
+    },
+    "export_armature_object_remove": {
+      "type": "BOOLEAN",
+      "description": "Remove Armature object if possible. If Armature has multiple root bones, object will not be removed"
+    },
+    "export_leaf_bone": {
+      "type": "BOOLEAN",
+      "description": "Append a final bone to the end of each chain to specify last bone length (use this when you intend to edit the armature from exported data)"
+    },
+    "export_optimize_animation_size": {
+      "type": "BOOLEAN",
+      "description": "Reduce exported file size by removing duplicate keyframes"
+    },
+    "export_optimize_animation_keep_anim_armature": {
+      "type": "BOOLEAN",
+      "description": "If all keyframes are identical in a rig, force keeping the minimal animation. When off, all possible channels for the bones will be exported, even if empty (minimal animation, 2 keyframes)"
+    },
+    "export_optimize_animation_keep_anim_object": {
+      "type": "BOOLEAN",
+      "description": "If all keyframes are identical for object transformations, force keeping the minimal animation"
+    },
+    "export_optimize_disable_viewport": {
+      "type": "BOOLEAN",
+      "description": "When exporting animations, disable viewport for other objects, for performance"
+    },
+    "export_negative_frame": {
+      "type": "ENUM",
+      "description": "Negative Frames are slid or cropped",
+      "enum": [
+        {
+          "id": "SLIDE",
+          "label": "Slide"
+        },
+        {
+          "id": "CROP",
+          "label": "Crop"
+        }
+      ]
+    },
+    "export_anim_slide_to_zero": {
+      "type": "BOOLEAN",
+      "description": "Set all glTF animation starting at 0.0s. Can be useful for looping animations"
+    },
+    "export_bake_animation": {
+      "type": "BOOLEAN",
+      "description": "Force exporting animation on every object. Can be useful when using constraints or driver. Also useful when exporting only selection"
+    },
+    "export_merge_animation": {
+      "type": "ENUM",
+      "description": "Merge Animations",
+      "enum": [
+        {
+          "id": "NLA_TRACK",
+          "label": "NLA Track Names"
+        },
+        {
+          "id": "ACTION",
+          "label": "Actions"
+        },
+        {
+          "id": "NONE",
+          "label": "No Merge"
+        }
+      ]
+    },
+    "export_anim_single_armature": {
+      "type": "BOOLEAN",
+      "description": "Export all actions, bound to a single armature. WARNING: Option does not support exports including multiple armatures"
+    },
+    "export_reset_pose_bones": {
+      "type": "BOOLEAN",
+      "description": "Reset pose bones between each action exported. This is needed when some bones are not keyed on some animations"
+    },
+    "export_current_frame": {
+      "type": "BOOLEAN",
+      "description": "Export the scene in the current animation frame. When off, frame 0 is used as rest transformations for objects"
+    },
+    "export_rest_position_armature": {
+      "type": "BOOLEAN",
+      "description": "Export armatures using rest position as joints' rest pose. When off, current frame pose is used as rest pose"
+    },
+    "export_anim_scene_split_object": {
+      "type": "BOOLEAN",
+      "description": "Export Scene as seen in Viewport, But split animation by Object"
+    },
+    "export_skins": {
+      "type": "BOOLEAN",
+      "description": "Export skinning (armature) data"
+    },
+    "export_influence_nb": {
+      "type": "INT",
+      "description": "Choose how many Bone influences to export"
+    },
+    "export_all_influences": {
+      "type": "BOOLEAN",
+      "description": "Allow export of all joint vertex influences. Models may appear incorrectly in many viewers"
+    },
+    "export_morph": {
+      "type": "BOOLEAN",
+      "description": "Export shape keys (morph targets)"
+    },
+    "export_morph_normal": {
+      "type": "BOOLEAN",
+      "description": "Export vertex normals with shape keys (morph targets)"
+    },
+    "export_morph_tangent": {
+      "type": "BOOLEAN",
+      "description": "Export vertex tangents with shape keys (morph targets)"
+    },
+    "export_morph_animation": {
+      "type": "BOOLEAN",
+      "description": "Export shape keys animations (morph targets)"
+    },
+    "export_morph_reset_sk_data": {
+      "type": "BOOLEAN",
+      "description": "Reset shape keys between each action exported. This is needed when some SK channels are not keyed on some animations"
+    },
+    "export_lights": {
+      "type": "BOOLEAN",
+      "description": "Export directional, point, and spot lights. Uses \"KHR_lights_punctual\" glTF extension"
+    },
+    "export_try_sparse_sk": {
+      "type": "BOOLEAN",
+      "description": "Try using Sparse Accessor if it saves space"
+    },
+    "export_try_omit_sparse_sk": {
+      "type": "BOOLEAN",
+      "description": "Omitting Sparse Accessor if data is empty"
+    },
+    "export_gpu_instances": {
+      "type": "BOOLEAN",
+      "description": "Export using EXT_mesh_gpu_instancing. Limited to children of a given Empty. Multiple materials might be omitted"
+    },
+    "export_action_filter": {
+      "type": "BOOLEAN",
+      "description": "Filter Actions to be exported"
+    },
+    "export_convert_animation_pointer": {
+      "type": "BOOLEAN",
+      "description": "Export TRS and weights as Animation Pointer. Using KHR_animation_pointer extension"
+    },
+    "export_nla_strips": {
+      "type": "BOOLEAN",
+      "description": "When on, multiple actions become part of the same glTF animation if they're pushed onto NLA tracks with the same name. When off, all the currently assigned actions become one glTF animation"
+    },
+    "export_original_specular": {
+      "type": "BOOLEAN",
+      "description": "Export original glTF PBR Specular, instead of Blender Principled Shader Specular"
+    },
+    "will_save_settings": {
+      "type": "BOOLEAN",
+      "description": "Store glTF export settings in the Blender project"
+    },
+    "export_hierarchy_full_collections": {
+      "type": "BOOLEAN",
+      "description": "Export full hierarchy, including intermediate collections"
+    },
+    "export_extra_animations": {
+      "type": "BOOLEAN",
+      "description": "Export additional animations.\nThis feature is not standard and needs an external extension to be included in the glTF file"
+    },
+    "export_loglevel": {
+      "type": "INT",
+      "description": "Log Level"
+    },
+    "filter_glob": {
+      "type": "STRING",
+      "description": ""
+    }
+  },
+  "action_strip_properties": [
+    "rna_type",
+    "type",
+    "channelbags"
+  ],
+  "action_channelbag_properties": [
+    "rna_type",
+    "slot_handle",
+    "slot",
+    "fcurves",
+    "groups"
+  ]
+}

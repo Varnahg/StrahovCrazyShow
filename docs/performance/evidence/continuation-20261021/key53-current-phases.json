@@ -1,0 +1,872 @@
+{
+  "analyzerSha256": "f1a8d7453b98cb8a3666714e98f36562d89c22c7f1d6bfbafb2ab8f3f9ab5db5",
+  "inputs": [
+    {
+      "variant": "A",
+      "path": "C:\\Users\\rezac\\.codex\\worktrees\\ci-main-autonomous-pilot\\StrahovCrazyShow\\docs\\performance\\evidence\\transit-calendar-20261020\\measurement\\baseline.json",
+      "sha256": "a6d022a2d49e28b8b81147e2fd0f9d6e983151e239b985eeea9064b3bc9e92e3"
+    },
+    {
+      "variant": "B",
+      "path": "C:\\Users\\rezac\\.codex\\worktrees\\ci-main-autonomous-pilot\\StrahovCrazyShow\\docs\\performance\\evidence\\transit-calendar-20261020\\measurement\\candidate.json",
+      "sha256": "7ac1977d5ccfc645d4cedef2fd921c8a598b8fbdbfd58801351e0cfe666c4943"
+    }
+  ],
+  "classification": "exploratory descriptive inventory, not a second confirmatory significance test",
+  "rows": [
+    {
+      "variant": "A",
+      "slot": "A1",
+      "repetition": 1,
+      "frames": 278,
+      "phaseMeanMs": {
+        "simulation": 0.9133093535042495,
+        "world": 0.10539568220968727,
+        "avatarsAndCamera": 0.2507194235599298,
+        "environment": 1.1784172654151917,
+        "render": 21.308273384468162,
+        "labels": 0.05035971051497425
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 5.660431657334883,
+        "mainDraw": 12.428417264128761,
+        "renderTargets": 3.003956833331705
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 22.400000035762787,
+        "gpuMs": 32.052954,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "A",
+      "slot": "A1",
+      "repetition": 2,
+      "frames": 246,
+      "phaseMeanMs": {
+        "simulation": 1.3365853644483459,
+        "world": 0.12886178978090365,
+        "avatarsAndCamera": 0.3093495935928531,
+        "environment": 1.4707317073655322,
+        "render": 25.381707317945434,
+        "labels": 0.06016260143218002
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 6.215447153744659,
+        "mainDraw": 15.818699187137247,
+        "renderTargets": 3.115040651181849
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 24.900000035762787,
+        "gpuMs": 32.746118,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "A",
+      "slot": "A1",
+      "repetition": 3,
+      "frames": 267,
+      "phaseMeanMs": {
+        "simulation": 1.1711610497606828,
+        "world": 0.11048689049281431,
+        "avatarsAndCamera": 0.26479400967837274,
+        "environment": 1.3509363297666057,
+        "render": 22.65655430515161,
+        "labels": 0.05955056148521909
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 5.8898876394225415,
+        "mainDraw": 13.569662924562946,
+        "renderTargets": 2.9846441951137357
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 22.69999998807907,
+        "gpuMs": 31.894121,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "A",
+      "slot": "A2",
+      "repetition": 1,
+      "frames": 274,
+      "phaseMeanMs": {
+        "simulation": 0.940510950601884,
+        "world": 0.10583941366550696,
+        "avatarsAndCamera": 0.255109490269292,
+        "environment": 1.119708028805517,
+        "render": 21.06861313872964,
+        "labels": 0.04416058294094392
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 5.791970804007384,
+        "mainDraw": 12.154744525460432,
+        "renderTargets": 2.8919708004398066
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 21.899999976158142,
+        "gpuMs": 31.826538,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "A",
+      "slot": "A2",
+      "repetition": 2,
+      "frames": 274,
+      "phaseMeanMs": {
+        "simulation": 0.9682481760961296,
+        "world": 0.10291970689801404,
+        "avatarsAndCamera": 0.2722627755499234,
+        "environment": 1.098905108270854,
+        "render": 21.193065693343645,
+        "labels": 0.04087591388799848
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 5.803284673360142,
+        "mainDraw": 12.288686127993312,
+        "renderTargets": 2.880656935002682
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 21.899999976158142,
+        "gpuMs": 32.406869,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "A",
+      "slot": "A2",
+      "repetition": 3,
+      "frames": 254,
+      "phaseMeanMs": {
+        "simulation": 1.0618110235751144,
+        "world": 0.1208661426240065,
+        "avatarsAndCamera": 0.30511810835890885,
+        "environment": 1.3098425196381065,
+        "render": 24.005511809991102,
+        "labels": 0.04881889942124134
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 6.322047244141421,
+        "mainDraw": 14.426377950690863,
+        "renderTargets": 3.0157480331387108
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 30.30000001192093,
+        "gpuMs": 38.811843,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "A",
+      "slot": "A3",
+      "repetition": 1,
+      "frames": 258,
+      "phaseMeanMs": {
+        "simulation": 1.103875970193582,
+        "world": 0.11705426351968633,
+        "avatarsAndCamera": 0.29689922559168913,
+        "environment": 1.2542635641356772,
+        "render": 23.67480620094972,
+        "labels": 0.05542635709740395
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 6.275968992894934,
+        "mainDraw": 14.147674415924753,
+        "renderTargets": 3.0065891453924105
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 25.100000023841858,
+        "gpuMs": 31.906038,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "A",
+      "slot": "A3",
+      "repetition": 2,
+      "frames": 270,
+      "phaseMeanMs": {
+        "simulation": 1.028518517812093,
+        "world": 0.10555555820465087,
+        "avatarsAndCamera": 0.273333332935969,
+        "environment": 1.157037036507218,
+        "render": 21.665555556394434,
+        "labels": 0.06740740493491844
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 5.899259258861895,
+        "mainDraw": 12.669629629894539,
+        "renderTargets": 2.8570370382732815
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 30.69999998807907,
+        "gpuMs": 33.71578,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "A",
+      "slot": "A3",
+      "repetition": 3,
+      "frames": 271,
+      "phaseMeanMs": {
+        "simulation": 1.0542435401920023,
+        "world": 0.10885608834094226,
+        "avatarsAndCamera": 0.24723247386432662,
+        "environment": 1.1653136534004633,
+        "render": 21.323985239236556,
+        "labels": 0.042435425453960236
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 5.90996310147852,
+        "mainDraw": 12.333210330607706,
+        "renderTargets": 2.852767527763254
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 22.30000001192093,
+        "gpuMs": 32.368953,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "B",
+      "slot": "B1",
+      "repetition": 1,
+      "frames": 275,
+      "phaseMeanMs": {
+        "simulation": 0.9538181831619956,
+        "world": 0.09818181883205067,
+        "avatarsAndCamera": 0.24763636307282882,
+        "environment": 1.1105454551089893,
+        "render": 21.04327272675254,
+        "labels": 0.04218181631781838
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 5.926181819438934,
+        "mainDraw": 11.998545453331687,
+        "renderTargets": 2.889454545541243
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 22,
+        "gpuMs": 31.945954,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "B",
+      "slot": "B1",
+      "repetition": 2,
+      "frames": 234,
+      "phaseMeanMs": {
+        "simulation": 1.6551282041602664,
+        "world": 0.16111111080544627,
+        "avatarsAndCamera": 0.4089743612159012,
+        "environment": 1.5239316227599087,
+        "render": 27.688888888583225,
+        "labels": 0.058547009769667924
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 6.4098290576894055,
+        "mainDraw": 17.765811966525185,
+        "renderTargets": 3.2226495724967403
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 66.69999998807907,
+        "gpuMs": 36.588852,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "B",
+      "slot": "B1",
+      "repetition": 3,
+      "frames": 271,
+      "phaseMeanMs": {
+        "simulation": 0.9265682640110875,
+        "world": 0.11107011012925433,
+        "avatarsAndCamera": 0.26420664413388806,
+        "environment": 1.1151291512475243,
+        "render": 22.017712176725873,
+        "labels": 0.04797047948485371
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 5.935424355343259,
+        "mainDraw": 12.920664206642066,
+        "renderTargets": 2.950184501625075
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 25.099999964237213,
+        "gpuMs": 32.055954,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "B",
+      "slot": "B2",
+      "repetition": 1,
+      "frames": 256,
+      "phaseMeanMs": {
+        "simulation": 1.1941406233236194,
+        "world": 0.11249999981373549,
+        "avatarsAndCamera": 0.29531250172294676,
+        "environment": 1.3093750004190952,
+        "render": 24.07460937462747,
+        "labels": 0.056249999441206455
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 6.321093750651926,
+        "mainDraw": 14.390624998835847,
+        "renderTargets": 3.121484375325963
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 28,
+        "gpuMs": 33.441032,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "B",
+      "slot": "B2",
+      "repetition": 2,
+      "frames": 255,
+      "phaseMeanMs": {
+        "simulation": 1.240392155974519,
+        "world": 0.11294117698482439,
+        "avatarsAndCamera": 0.34470587992200663,
+        "environment": 1.2678431417427811,
+        "render": 23.969019606300428,
+        "labels": 0.10078431297751034
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 6.090980394681295,
+        "mainDraw": 14.511764704012403,
+        "renderTargets": 3.1168627439760694
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 22.599999964237213,
+        "gpuMs": 31.40379,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "B",
+      "slot": "B2",
+      "repetition": 3,
+      "frames": 277,
+      "phaseMeanMs": {
+        "simulation": 0.9335740101036182,
+        "world": 0.10000000081768105,
+        "avatarsAndCamera": 0.24765342775234678,
+        "environment": 1.0693140808856014,
+        "render": 20.685559566055396,
+        "labels": 0.03754512798915271
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 6.047292419934531,
+        "mainDraw": 11.503971116422315,
+        "renderTargets": 2.9162454884835527
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 22.100000023841858,
+        "gpuMs": 31.951787,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "B",
+      "slot": "B3",
+      "repetition": 1,
+      "frames": 251,
+      "phaseMeanMs": {
+        "simulation": 1.3199203173477811,
+        "world": 0.1366533855518022,
+        "avatarsAndCamera": 0.3115537862378763,
+        "environment": 1.347808765700139,
+        "render": 25.095219120798834,
+        "labels": 0.0486055781166867
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 6.176892430183897,
+        "mainDraw": 15.607968128297433,
+        "renderTargets": 3.0561752993747056
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 22,
+        "gpuMs": 32.131454,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "B",
+      "slot": "B3",
+      "repetition": 2,
+      "frames": 278,
+      "phaseMeanMs": {
+        "simulation": 0.9118705033827171,
+        "world": 0.10107913806284075,
+        "avatarsAndCamera": 0.25251798492541416,
+        "environment": 1.0395683446805255,
+        "render": 21.048920863180708,
+        "labels": 0.04208633153558635
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 5.826618703578016,
+        "mainDraw": 12.02661870495021,
+        "renderTargets": 2.974820144099297
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 26.399999976158142,
+        "gpuMs": 31.528873,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    },
+    {
+      "variant": "B",
+      "slot": "B3",
+      "repetition": 3,
+      "frames": 274,
+      "phaseMeanMs": {
+        "simulation": 0.9686131396867933,
+        "world": 0.1021897799342218,
+        "avatarsAndCamera": 0.26824817540001694,
+        "environment": 1.086861311519233,
+        "render": 21.47737226608026,
+        "labels": 0.046715327205449124
+      },
+      "nestedEngineMeanMs": {
+        "activeMeshes": 5.766423357011628,
+        "mainDraw": 12.51970802758732,
+        "renderTargets": 2.9784671544593615
+      },
+      "engineScope": {
+        "clock": "performance.now monotonic milliseconds",
+        "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+        "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+        "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+        "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+        "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+      },
+      "endpointFrameWork": {
+        "cpuMs": 27.69999998807907,
+        "gpuMs": 32.612118,
+        "webgpuMainPassMs": null,
+        "webgpuMainPassScope": "main-render-pass-only"
+      },
+      "endpointDrawCalls": 864,
+      "endpointTriangles": 3278920,
+      "triangleCountScope": "all-render-passes",
+      "compilationBackend": "other"
+    }
+  ],
+  "summary": {
+    "A": {
+      "intervals": 9,
+      "frames": 2392,
+      "phaseMeans": {
+        "avatarsAndCamera": {
+          "frameWeightedMeanMs": 0.2742056861320467,
+          "intervalMeanRangeMs": [
+            0.24723247386432662,
+            0.3093495935928531
+          ]
+        },
+        "environment": {
+          "frameWeightedMeanMs": 1.2301421399947792,
+          "intervalMeanRangeMs": [
+            1.098905108270854,
+            1.4707317073655322
+          ]
+        },
+        "labels": {
+          "frameWeightedMeanMs": 0.05200668885357005,
+          "intervalMeanRangeMs": [
+            0.04087591388799848,
+            0.06740740493491844
+          ]
+        },
+        "render": {
+          "frameWeightedMeanMs": 22.420819398078034,
+          "intervalMeanRangeMs": [
+            21.06861313872964,
+            25.381707317945434
+          ]
+        },
+        "simulation": {
+          "frameWeightedMeanMs": 1.0603260871359337,
+          "intervalMeanRangeMs": [
+            0.9133093535042495,
+            1.3365853644483459
+          ]
+        },
+        "world": {
+          "frameWeightedMeanMs": 0.11145484933386678,
+          "intervalMeanRangeMs": [
+            0.10291970689801404,
+            0.12886178978090365
+          ]
+        }
+      },
+      "nestedEngineMeans": {
+        "activeMeshes": {
+          "frameWeightedMeanMs": 5.966429766579017,
+          "intervalMeanRangeMs": [
+            5.660431657334883,
+            6.322047244141421
+          ]
+        },
+        "mainDraw": {
+          "frameWeightedMeanMs": 13.271153845241836,
+          "intervalMeanRangeMs": [
+            12.154744525460432,
+            15.818699187137247
+          ]
+        },
+        "renderTargets": {
+          "frameWeightedMeanMs": 2.954096989861898,
+          "intervalMeanRangeMs": [
+            2.852767527763254,
+            3.115040651181849
+          ]
+        }
+      },
+      "endpointGpuSamples": {
+        "available": 9,
+        "rangeMs": [
+          31.826538,
+          38.811843
+        ]
+      },
+      "endpointDrawCallRange": [
+        864,
+        864
+      ],
+      "endpointTriangleRange": [
+        3278920,
+        3278920
+      ]
+    },
+    "B": {
+      "intervals": 9,
+      "frames": 2371,
+      "phaseMeans": {
+        "avatarsAndCamera": {
+          "frameWeightedMeanMs": 0.2907633911653291,
+          "intervalMeanRangeMs": [
+            0.24763636307282882,
+            0.4089743612159012
+          ]
+        },
+        "environment": {
+          "frameWeightedMeanMs": 1.199493884814032,
+          "intervalMeanRangeMs": [
+            1.0395683446805255,
+            1.5239316227599087
+          ]
+        },
+        "labels": {
+          "frameWeightedMeanMs": 0.05293125253546243,
+          "intervalMeanRangeMs": [
+            0.03754512798915271,
+            0.10078431297751034
+          ]
+        },
+        "render": {
+          "frameWeightedMeanMs": 22.890468156548906,
+          "intervalMeanRangeMs": [
+            20.685559566055396,
+            27.688888888583225
+          ]
+        },
+        "simulation": {
+          "frameWeightedMeanMs": 1.1098692533538492,
+          "intervalMeanRangeMs": [
+            0.9118705033827171,
+            1.6551282041602664
+          ]
+        },
+        "world": {
+          "frameWeightedMeanMs": 0.1140868832219356,
+          "intervalMeanRangeMs": [
+            0.09818181883205067,
+            0.16111111080544627
+          ]
+        }
+      },
+      "nestedEngineMeans": {
+        "activeMeshes": {
+          "frameWeightedMeanMs": 6.045887811331747,
+          "intervalMeanRangeMs": [
+            5.766423357011628,
+            6.4098290576894055
+          ]
+        },
+        "mainDraw": {
+          "frameWeightedMeanMs": 13.589540277539,
+          "intervalMeanRangeMs": [
+            11.503971116422315,
+            17.765811966525185
+          ]
+        },
+        "renderTargets": {
+          "frameWeightedMeanMs": 3.019865036086159,
+          "intervalMeanRangeMs": [
+            2.889454545541243,
+            3.2226495724967403
+          ]
+        }
+      },
+      "endpointGpuSamples": {
+        "available": 9,
+        "rangeMs": [
+          31.40379,
+          36.588852
+        ]
+      },
+      "endpointDrawCallRange": [
+        864,
+        864
+      ],
+      "endpointTriangleRange": [
+        3278920,
+        3278920
+      ]
+    }
+  },
+  "scopeEvidence": {
+    "sourceFile": "client/game.ts",
+    "phaseMeans": "benchmark.work or engineWork divided by benchmark.frames",
+    "frameWork": "last CPU frame and last available GPU counter sample; GPU value expires after500ms at frame start",
+    "drawsAndTriangles": "current endpoint counters, not interval averages",
+    "compilation": "backend other means WebGPU hooks do not measure WebGL shader compilation"
+  },
+  "limits": [
+    "CPU wall time is not thread utilization",
+    "Engine scopes are nested and may overlap; do not add them",
+    "CPU and GPU overlap; do not sum them into frame duration",
+    "Endpoint GPU range is not mean or p95 GPU timing",
+    "No per-pass GPU attribution or CPU sampled stack added by this analysis"
+  ]
+}

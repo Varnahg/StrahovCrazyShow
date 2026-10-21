@@ -1,0 +1,38 @@
+{
+  "audit": "Fresh-context semantic citations, ai3d_citation_audit",
+  "date": "2026-10-21 Europe/Prague",
+  "newPrimaryUrlsOpened": 12,
+  "webCalls": 6,
+  "scopeAtReview": "Report refs1–26; previous independent8URL spot-check and explicit primary-source provenance used for remaining claims",
+  "perRef": {
+    "1": "supported via geometryG05", "2": "supported live", "3": "supported live", "4": "supported prior verifier, contract text only",
+    "5": "supported live paid no-training/non-exclusivity", "6": "supported live selected API prices; missing TextToMotion lead found",
+    "7": "supported live API price", "8": "supported motionS4 vendor declaration", "9": "supported prior verifier", "10": "supported prior verifier, publicGLB unresolved",
+    "11": "supported for narrower manual only", "12": "supported marketing claim; actual API lead found", "13": "supported inspected workflow via motionS11",
+    "14": "partial: render.py supports shape/export, not inference or release dates", "15": "supported BlenderS5 docs only at audit", "16": "supported prior verifier", "17": "supported normative standard",
+    "18": "supported original MCP provenance, not runtime/security proof", "19": "supported live README hardware/licence notice", "20": "supported live software licence", "21": "supported live software licence",
+    "22": "supported live specific agreement", "23": "supported saveAPI via BlenderS7, reopen not audited", "24": "supported prior officialsource verifier", "25": "supported BlenderS13 publisher statement", "26": "supported live retirement; dated changelog via geometryG20"
+  },
+  "correctableFindings": [
+    {
+      "refs": [6, 11, 12],
+      "mismatch": "Report framed Meshy motion only as marketing/manual conflict, but cited pricing already links concrete TextToMotion API.",
+      "sourceURL": "https://docs.meshy.ai/en/api/text-to-motion",
+      "correction": "Add standalone generated motion, primeFBX/swiftBVH, retarget motion_task_id and retention; no arbitrary-creature or quality promise.",
+      "triage": "Applied. Parent independently reopened TextToMotion and Animation APIs; refs27/28 explicitly document biped-only retarget and possible GLB-only result. root/meshy-motion-api-update.md has precedence over preliminary digests."
+    },
+    {
+      "refs": [14],
+      "mismatch": "render.py does not establish text conditioning or release dates.",
+      "sourceURL": "https://github.com/JarrentWu1031/AnimateAnyMesh/blob/main/utils/render.py",
+      "correction": "Add already-read test_drive.py and README; retain render.py for shape/export only.",
+      "triage": "Applied with separate refs29/30. Specific inference/export roundtrip remains untested."
+    }
+  ],
+  "limits": [
+    "Supported is documentary semantic support, not successful generation, legal clearance, output exclusivity or measured quality.",
+    "Prior eight URLs were not reopened; remaining references use explicit source provenance, not a claim of exhaustive independent live replication.",
+    "No future-date/invented publication error found; model dates, footer updates and undated live pages retain limited meaning.",
+    "Pilot was pending when audited; later actual receipts/native reopen/GLB were independently read by parent and are separate evidence."
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "recordedAt": "2026-10-21T00:55:37.361Z",
+  "command": "node --test materialize-raw.test.mjs in a clean source/archive-only replica",
+  "exitCode": 0,
+  "sourceStable": true,
+  "derivedRawAbsentBefore": true,
+  "sources": {
+    "materialize-raw.mjs": "6f18ed730b46c1f085ff8cf4c13f03bbd1b4ef2cd4c6cb962a264c8c67712258",
+    "materialize-raw.test.mjs": "4152071aa1e73ce15e2a0d07751e837160d1ffd7fcbb3110ce7fdd6a8f2d7b43",
+    "raw-archives.json": "0dbda56dd29fec798aface20f9a93f4195eb41ddf8c89e4897acd3ac1f8b0599",
+    "external-acceptance.json": "0d3ed09e330d4201860d7c10f435a1354da3e2a1fb6fd0f1615be4bbf3d59b47",
+    "baseline.json.gz": "52bc4760a0840e2853ef4d9fbc416429399643b967d79122c88529d658d56e2a",
+    "candidate.json.gz": "326625e39e020f0d27da971f8f03cbca6bdbfbc5a8a3771fedb0de292ab80ba0"
+  },
+  "stdout": "▶ Raw extraction survives interrupted staging/publication and preserves unrelated existing files\n  ✔ A complete linked publish recovers; abandoned partial staging does not block retry (1448.0413ms)\n  ✔ Repeated extraction does not rewrite verified outputs (1070.2263ms)\n  ✔ A foreign alias or differing final file is preserved (1011.5129ms)\n✔ Raw extraction survives interrupted staging/publication and preserves unrelated existing files (3741.021ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 3886.9071\n",
+  "stderr": ""
+}

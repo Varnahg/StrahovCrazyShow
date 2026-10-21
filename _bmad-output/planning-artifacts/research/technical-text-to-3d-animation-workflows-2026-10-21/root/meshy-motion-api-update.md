@@ -1,0 +1,8 @@
+# Rozhodovací doplnění z finálního citačního auditu
+
+21Oct2026. Původní motion r1/r2 čtení se soustředilo na webový Animate manuál a marketing a nedošlo k této navazující API stránce. Finální nezávislý auditor sledoval Text to Motion řádek citovaného API ceníku. Parent potom obě konkrétní primární stránky znovu otevřel a přečetl. Původní digests jsou historie, **tento dodatek má pro aktuální schopnost přednost**.
+
+- [Meshy Text to Motion API](https://docs.meshy.ai/en/api/text-to-motion), Meshy, nedatováno, přístup21Oct2026: POST `/openapi/v1/text-to-motion` dokumentuje nový samostatný pohyb z promptu; model není nutný pro generaci klipu. `prime`10kreditů/FBX, `swift`3kredity/BVH. Délka2–10s po0,5s, prompt nejvýše400znaků. Retence3dny; API úlohy nejsou ve webové My Assets. Vendor-only, netestované API/account/export.
+- [Meshy Animation API](https://docs.meshy.ai/en/api/animation), Meshy, nedatováno, přístup21Oct2026: `motion_task_id` místo preset `action_id` přenáší klip na úspěšný `rig_task_id`. **Vyžaduje biped rig; quadruped odmítá.** Při retargetu může být jen GLB a prázdná FBX URL; s vyžádaným FBX-dependent postprocessingem takový případ selže. Výsledek si při vzniku klip zkopíruje a pozdější expiry originálu jej neruší. Vendor-only, neprovedené volání.
+
+Rozhodnutí: Meshy je dokumentovaný text-motion kandidát pro dvounohé postavy a může spojit model/rig/motion u jednoho dodavatele. Není správné ponechat závěr „pouze marketingový příslib bez API“. Manuál presetů má jiný/neúplný rozsah; není důkaz, že API neexistuje. Dostupnost v konkrétním webovém účtu a skutečný export zůstávají neotestované. Univerzální pohyb nehumanoidních tvorů nebo předmětů z toho neplyne. Tento dodatek nemění zvolený Blender mechanický pilot.

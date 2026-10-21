@@ -12,3 +12,7 @@
 ## Root checkpoint20.10.2026
 
 Konečná volba KEY-53: lokální pending sweep v TransitRenderer po změně vlastněných passenger rigů. Assignment JSON/MD a přesné controller/worker scopes připravené, dosud žádný run či runtime změna. Podpůrný KEY-54 je lokálně commitnut e3f8a400, review bez otevřených nálezů, GitHub přijetí teprve následuje. Měřicí preflight v plné produkční hře prošel, zachovanéraw/identita a omezení v evidence README. Vlastní server/scéna ukončené a heavy/GPU okno předané feedback relaci. Finální A/B začne z nového přijatého main po obou integracích.
+
+## Konečný checkpoint
+
+Konečné přijetí21.10: run key-53-776f5f92725b complete, PR22/3ac77c7a sloučen do e9bc2f54, přesné main CI39519577977 a hygiene39519577922 PASS. Úplných36intervalů/6startů,8flagsTRUE,0failed attempts. Přijetí omezené na odstranění měřené prune práce (~0.030ms/update); FPS26.53→26.27 bez prokázaného zlepšení. Report a raw: docs/performance/evidence/transit-calendar-20261020/measurement/. Dokončené run/resume po integraci ponechalo checkpoint beze změny, implementační pokus jeden. Původní snapshoty/logy zachované; žádný měřicí server/scéna/Blender neběží. Konečné evidence se publikují samostatně; parent KEY-5 otevřený.

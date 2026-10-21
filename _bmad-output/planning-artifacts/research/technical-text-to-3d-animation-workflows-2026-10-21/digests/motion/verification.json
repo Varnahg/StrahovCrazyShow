@@ -1,0 +1,18 @@
+{
+  "task": "ai3d-motion-research-20261021",
+  "owner": "ai3d-01a15a3e-motion",
+  "verifiedAt": "2026-10-21T00:58:51.8659660+02:00",
+  "baseline": "ecee890baee2478a1f6133890c00929f07bdaa58",
+  "checks": [
+    { "check": "node scripts/agent-tasks.mjs validate", "exitCode": 0, "result": "283 task definitions valid; 16 active reservations at check time" },
+    { "check": "Required structured claim table fields in r1.md and r2.md", "exitCode": 0, "result": "Both contain claim, sourceURL, publisher, pub_date, accessed, confidence, class, verificationStatus" },
+    { "check": "No internal web reference IDs in deliverables", "exitCode": 0, "result": "No turnNviewN or turnNsearchN references found" },
+    { "check": "r2 relative link to r1.md", "exitCode": 0, "result": "Target exists" },
+    { "check": "git diff --check -- owned digest directory", "exitCode": 0, "result": "No tracked whitespace error reported; new files additionally read as UTF-8 for content checks" },
+    { "check": "Primary-source reading", "result": "8 sources in round 1, 8 new sources in round 2; URLs and limits in digests; browser/runtime motion quality unverified" }
+  ],
+  "notRun": ["Paid generation", "Account login or model upload", "Dependency installation", "Blender", "GPU", "Game build/tests/integration", "Animation export/import roundtrip", "Motion quality/performance benchmark"],
+  "reasonNotRun": "Explicit research-only delegation; no production code or generated model output. These are evidence boundaries, not passing tests.",
+  "processes": [],
+  "testsCreated": []
+}

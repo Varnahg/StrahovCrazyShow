@@ -1,0 +1,157 @@
+{
+  "runId": "key-53-776f5f92725b",
+  "assignmentDigest": "fc3a3d39808724c84cb79db7c2f944a91dc5704a7a6756e4ed6efbda34aa7a89",
+  "baseSha": "c3454da45b22ad9726c257d3d481d45f6243ec04",
+  "commitSha": "3ac77c7abf8fca43e6380f382aba306502ab86d6",
+  "sourceDigest": "f51f5aecb8cd78f31835b16f336ec3f5f6257a6a6db78291246fc0d075cce085",
+  "prUrl": "https://github.com/Varnahg/StrahovCrazyShow/pull/22",
+  "mergeSha": "e9bc2f54289e9f444f91f4c82b9e3abe3c9c16d3",
+  "completedStages": [
+    "prepare",
+    "plan",
+    "implement",
+    "review",
+    "verify",
+    "commit",
+    "publish",
+    "ci",
+    "accept",
+    "merge",
+    "finalize"
+  ],
+  "completedAt": "2026-10-21T00:16:37.245Z",
+  "attempts": [
+    {
+      "key": "bmad-render",
+      "id": "7529eaa62481cc69e0a9ceec",
+      "status": "complete",
+      "exitCode": 0
+    },
+    {
+      "key": "check:transit-pool-lifecycle:f51f5aecb8cd78f31835b16f",
+      "id": "9466604ea15a8f04eaa6d094",
+      "status": "complete",
+      "exitCode": 0
+    },
+    {
+      "key": "implement",
+      "id": "8400ef76b5f30d1cc780566c",
+      "status": "complete",
+      "exitCode": 0
+    },
+    {
+      "key": "plan:v2",
+      "id": "8e75067e26ede584f17293e5",
+      "status": "complete",
+      "exitCode": 0
+    },
+    {
+      "key": "review:v2:blind:f51f5aecb8cd78f31835b16f336ec3f5",
+      "id": "16226df56f22f373e930bc67",
+      "status": "complete",
+      "exitCode": 0
+    },
+    {
+      "key": "review:v2:edge:f51f5aecb8cd78f31835b16f336ec3f5",
+      "id": "0280bc015a036e3114bda7c3",
+      "status": "complete",
+      "exitCode": 0
+    },
+    {
+      "key": "review:v2:verification:f51f5aecb8cd78f31835b16f336ec3f5",
+      "id": "3da08f9967d8d20b3b853c73",
+      "status": "complete",
+      "exitCode": 0
+    }
+  ],
+  "ciChecks": [
+    {
+      "appId": 15368,
+      "baseSha": "c3454da45b22ad9726c257d3d481d45f6243ec04",
+      "checkId": 118939399270,
+      "conclusion": "success",
+      "event": "pull_request",
+      "headSha": "3ac77c7abf8fca43e6380f382aba306502ab86d6",
+      "name": "verify",
+      "runAttempt": 1,
+      "runId": 39513321459,
+      "status": "completed",
+      "testMergeSha": "1cd352128d84caa452589c23bbeaf29be6603b48",
+      "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39513321459"
+    },
+    {
+      "appId": 15368,
+      "baseSha": "c3454da45b22ad9726c257d3d481d45f6243ec04",
+      "checkId": 118939399647,
+      "conclusion": "success",
+      "event": "pull_request",
+      "headSha": "3ac77c7abf8fca43e6380f382aba306502ab86d6",
+      "name": "source-secret-hygiene",
+      "runAttempt": 1,
+      "runId": 39513321508,
+      "status": "completed",
+      "testMergeSha": "1cd352128d84caa452589c23bbeaf29be6603b48",
+      "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39513321508"
+    }
+  ],
+  "mainChecks": [
+    {
+      "appId": 15368,
+      "baseSha": null,
+      "checkId": 118959845129,
+      "conclusion": "success",
+      "event": "push",
+      "headSha": "e9bc2f54289e9f444f91f4c82b9e3abe3c9c16d3",
+      "name": "verify",
+      "runAttempt": 1,
+      "runId": 39519577977,
+      "status": "completed",
+      "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39519577977"
+    },
+    {
+      "appId": 15368,
+      "baseSha": null,
+      "checkId": 118959844866,
+      "conclusion": "success",
+      "event": "push",
+      "headSha": "e9bc2f54289e9f444f91f4c82b9e3abe3c9c16d3",
+      "name": "source-secret-hygiene",
+      "runAttempt": 1,
+      "runId": 39519577922,
+      "status": "completed",
+      "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39519577922"
+    }
+  ],
+  "receiptSha256": "0d3ed09e330d4201860d7c10f435a1354da3e2a1fb6fd0f1615be4bbf3d59b47",
+  "replay": {
+    "beforeStateSha256": "462edf054f605be2aa75c3b4c66925b54e5c6913c639ff035707ca1558cad70e",
+    "unchanged": true,
+    "results": [
+      {
+        "command": [
+          "node",
+          "scripts/autodev.mjs",
+          "run",
+          "--assignment",
+          "docs/agents/assignments/perf-transit-runtime-20261020.json"
+        ],
+        "exitCode": 0,
+        "status": "complete",
+        "stateSha256": "462edf054f605be2aa75c3b4c66925b54e5c6913c639ff035707ca1558cad70e"
+      },
+      {
+        "command": [
+          "node",
+          "scripts/autodev.mjs",
+          "resume",
+          "--run",
+          "key-53-776f5f92725b"
+        ],
+        "exitCode": 0,
+        "status": "complete",
+        "stateSha256": "462edf054f605be2aa75c3b4c66925b54e5c6913c639ff035707ca1558cad70e"
+      }
+    ]
+  },
+  "note": "Operational state and process identities remain in git-common-dir; this is a selected evidence summary. Missing external receipt stopped accept before GitHub acceptance/merge; the same run resumed after independent practical acceptance."
+}

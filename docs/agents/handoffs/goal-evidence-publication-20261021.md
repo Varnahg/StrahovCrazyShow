@@ -1,0 +1,13 @@
+# Předání: goal-evidence-publication-20261021
+
+Vlastník ai3d-goal-01a15a3e-publication; kopie `C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020`, větev codex/performance-continuation-20261021. Konkrétní uživatelské zadání: dokončit KEY-52, originální model/animace research KEY-58 a pokračující výkonové podklady. Jednotlivé vlastní celky zůstávají samostatné commity.
+
+Koordinátor Vyjádři názor výslovně předal hotový commit d274e013a65518bf94b8e4e765866d9bc02d0197/parent e9bc2f54, jeho39cest a SHA ověřeny proti evidence-handoff.json. Po jeho release všech claims a úklidu procesů získán vlastní publication zdroj. Připojeno bez konfliktu; žádná výjimka dev-coordination appendů nebyla potřeba. Všechny39 jeho soubory zůstávají byte-identické. Žádný cizí WIP nebyl převzat; původní dirty hlavní checkout ani staré KEY-21 rezervace se neměnily.
+
+Závěrečný rozsah: již přijatý feedback/main CI evidence, výzkum/pilot v _bmad-output/planning-artifacts/research/technical-text-to-3d-animation-workflows-2026-10-21/, vlastní performance/evidence/continuation-20261021/ a přijaté evidence/transit-calendar-20261020/ bajty, přesné tasky/handoffy a docs/verification.md. Runtime/tests/assets/config/patches/scripts vůči e9bc nemají diff; nevyžaduje se nová GPU kampaň pro tyto dokumenty.
+
+Přijaté review: feedback closing bez nálezů, modelový structure/prose a claim audit s opravami, nezávislý přepočet celé kampaně bez nálezů. Konkrétní P2 obnovovacího nástroje a portability testu byly opravené; helper6f18ed.../test415207... mají skutečný clean-replica4/4 PASS receipt a čtecí uzavření. Původní nálezy/verze/receipt jsou zachované. Vlastní klíč se porovnává pouze v paměti, nikdy nevypsaný; přesný Git object/gzip audit je v continuation-20261021/credential-history-audit.json.
+
+Finální GitHub přejímka probíhá v již připojeném [PR21](https://github.com/Varnahg/StrahovCrazyShow/pull/21), jeho title/body musí odpovídat tomuto celému dokončenému rozsahu. Autoritativní přesný finální head/base, accepted review, skutečná required CI, project-acceptance a následné main CI budou v komentáři přiděleného integrátora v PR; tento neměnný kandidát nepředjímá výsledek budoucího merge a nemůže obsahovat jeho hash. Bez bypassu, merge výhradně s očekávaným headem. Hotovo se potvrdí až podle tohoto skutečného výsledku.
+
+Vlastní lokální procesy/porty/browser/GPU/Blender ukončené. CI běží na odděleném GitHub runneru pod github-ci-validation rezervací, kterou root uvolní po všech vlastních bězích a předá druhému koordinátorovi konkrétní PR/head/main/run identity. Širší KEY-5/60FPS a KEY-21 se tím neuzavírají.

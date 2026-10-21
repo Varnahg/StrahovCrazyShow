@@ -2,7 +2,7 @@
 title: 'KEY-52: herní zpětná vazba s čistým snímkem'
 type: feature
 created: 2026-10-20
-status: in-review
+status: done
 baseline_commit: b05a7c4e2d7332aeecfef2e3c2c7b14bcd592c13
 route: dispatch
 review_loop_iteration: 0
@@ -45,7 +45,7 @@ Nikdy: převzetí cizího WIP/claimu bez doloženého předání; změna frozen 
 - [x] client/feedback.tsx, feedback.css, feedback-outbox.ts + testy: přístupný formulář a offline fronta.
 - [x] client/rendered-frame-capture.ts + testy: sdílitelná jednorázová kopie/encode; reuse předání KEY-21 podle skutečné autorizace.
 - [x] Game/UI/dock/buildidentity/serverindex/compose/docs: integrace, persistentní volume, samostatné nastavení.
-- [ ] scripts/feedback-browser.ts a evidence: skutečný celý tok a regresní přejímka; review a integrace do main.
+- [x] scripts/feedback-browser.ts a evidence: skutečný celý tok a regresní přejímka; review a integrace do main.
 
 Given běžná hra, when hráč otevře feedback, then automatický image neobsahuje HUD/chat/minimapu/jmenovky a odpovídá uvedenému frame.
 Given host/menu/offline, when odešle popis, then nepotřebuje multiplayer a stav odpovídá skutečnému přijetí.
@@ -98,3 +98,7 @@ První úplná CI nad7da1ab62:1830 testů,1829 PASS,1 FAIL,0skip. Skutečný nat
 Docker skutečně prošel image buildem, node/healthy/namedvolume, HTTP202 a přesným diskovým reportem, compiled frontend admission přes CUA, HTTP/SDK scénáři, SIGTERM/exit0, restartem a totožným reportem/receipt/replay. Vlastní kontejnery, ověřený volume, procesy a karty byly uklizené. Pnpm diagnostika přesně potvrdila Patches were modified; narrow fix má8cílených testů, negativní CLI kontrolu a nezávislý review bez nálezů.
 
 Přijatý b05a main byl připojen do d47380559f09d2098b91d0026d03f3f174ee818d. Porovnání client/server/shared/package/lock/workspace/vite/Docker/Compose vůči již ověřenému7c70e4ee bylo prázdné; nový base přidává podpůrný řadič a testy, nikoli Game runtime. Praktické důkazy aktuálního clientBuildId86ce14d1 proto zůstávají použitelné; celá nová kombinace dostává vlastní finální CI. Záznam přijetí a mainmerge bude v PR19/KEY52, dokud není ověřený, celek není Done.
+
+## Konečné přijetí
+
+PR19 byl přijat a sloučen do main jako c3454da45b22ad9726c257d3d481d45f6243ec04. Přesný PR head c0098509 i skutečný main prošly 1852/1852 testy bez fail/skip, produkčním buildem a izolovanou integrací; oba povinné hygiene checky jsou zelené. Main run39509508150 a hygiene39509507863. Doklad: https://github.com/Varnahg/StrahovCrazyShow/pull/19#issuecomment-6303340329 . KEY-52 i přejímkové KEY-55/56/57 jsou Done až po tomto ověření. Výše uvedené čekající kroky jsou historické checkpointy. Všechny vlastní pomocné procesy jsou ukončené. Následná úplná parity kontrola deseti autorských LFS pointerů je výslovně uvedená v evidence README; původní performance4654 není úplná A/B baseline a není důkazem optimalizace.

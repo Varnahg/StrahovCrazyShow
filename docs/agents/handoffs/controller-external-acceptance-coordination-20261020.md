@@ -11,3 +11,7 @@ Původní worker po každém předání ukončil procesy a uvolnil claim. Root d
 Stav před publikací: připraveno k samostatnému commit/PR a skutečné GitHub validaci. Main CI ani integrace zatím nepotvrzené; Linear KEY-54 zůstává In Progress. Jde o čistou řadičovou infrastrukturu, proto nevyžaduje herní GPU přejímku. Navazující runtime ji naopak musí dodat před project-acceptance a merge.
 
 Současně připravené tasky/assignment a samostatný QA harness patří dalšímu oddělenému přípravnému commitu. Jeho preflight není výkonový A/B výsledek. Žádný helper/server teď neběží; lokální heavy/GPU okno bylo21:47UTC předáno koordinovanému feedback tasku.
+
+## Konečný checkpoint
+
+KEY54 integrován přes PR20/b05a7c4e, skutečné main CI39506879669 a hygiene39506879609 PASS. Navazující KEY53 skutečně zastavil chybějící receipt a stejným resume prošel do PR22/merge/main CI. Původní testová selhání zůstávají zachovaná; žádný bypass.
