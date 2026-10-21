@@ -8,6 +8,7 @@ is manufactured by this program.
 """
 from pathlib import Path
 import csv
+import gzip
 import hashlib
 import io
 import json
@@ -26,8 +27,10 @@ inputs = []
 
 def read_json(argument):
     path = Path(argument).resolve()
-    data = path.read_bytes()
-    inputs.append({"path": str(path), "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)})
+    stored = path.read_bytes()
+    data = gzip.decompress(stored) if path.suffix == ".gz" else stored
+    inputs.append({"path": str(path), "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data),
+                   "storedSha256": hashlib.sha256(stored).hexdigest(), "storedBytes": len(stored)})
     return json.loads(data)
 
 

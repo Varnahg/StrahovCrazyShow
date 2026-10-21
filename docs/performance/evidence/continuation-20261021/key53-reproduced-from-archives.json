@@ -1,0 +1,1808 @@
+{
+  "schemaVersion": 1,
+  "analyzerSha256": "3f10917f020fff55b88e264c26ad0fe0aa6b12d841f717aa6425b667d8528ce1",
+  "inputs": [
+    {
+      "path": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\continuation-20261021\\raw-sources\\baseline.json.gz",
+      "sha256": "a6d022a2d49e28b8b81147e2fd0f9d6e983151e239b985eeea9064b3bc9e92e3",
+      "bytes": 76165916,
+      "storedSha256": "aeb0a41247e8b3129e5932b2c5740bfe4133e302f7fc69e4508b0b38e23711ee",
+      "storedBytes": 4713286
+    },
+    {
+      "path": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\continuation-20261021\\raw-sources\\candidate.json.gz",
+      "sha256": "7ac1977d5ccfc645d4cedef2fd921c8a598b8fbdbfd58801351e0cfe666c4943",
+      "bytes": 76096987,
+      "storedSha256": "c5576ccb66cd0412ef063d4f8b1aec74f0ed471f7f425490e1211ed300e429c1",
+      "storedBytes": 4709851
+    },
+    {
+      "path": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\docs\\performance\\evidence\\continuation-20261021\\raw-sources\\comparison.json.gz",
+      "sha256": "173b5a997620418798be60393b8c5ed52b1ff249f766bb0ab803dee991faf23a",
+      "bytes": 31431,
+      "storedSha256": "05a9131bce29ce312a2041c06b75eae7e2c608fc1b0108d2f999ef3961e65089",
+      "storedBytes": 6369
+    }
+  ],
+  "campaignId": "key53-runtime-ab-20261021",
+  "sourceDifferences": [
+    "client/transit-renderer.ts",
+    "tests/transit-pool-pruning.test.ts"
+  ],
+  "sourceSnapshotIds": {
+    "A": "f3b5b5c0ba9b2fb5158ee2e1ab17c8b622b86c36fe2150d36bb5d4324ed1034d",
+    "B": "bc38843693a9ccf591e500657d9e506d7d64e4a1788ccb4a6f9571eefa78a8bd"
+  },
+  "harnessSha256": "6da478e74d450e354117a2e04a8e63956b017c2ee3b38e4141ff13c3ec3fc158",
+  "recordedPhysicalCondition": {
+    "backbuffer": {
+      "height": 720,
+      "scaling": 1,
+      "width": 1280
+    },
+    "gpu": {
+      "backend": "webgl2",
+      "classification": "integrated",
+      "classificationLabel": "Integrovan\u00e1 grafika",
+      "compatibilityMode": null,
+      "context": {
+        "actualAntialias": true,
+        "defaultFramebuffer": true,
+        "requestedAntialias": true,
+        "sampleBuffers": 1,
+        "samples": 4
+      },
+      "gpuTimingScope": "whole-frame",
+      "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E9B) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "requestedPowerPreference": "high-performance",
+      "vendor": "Google Inc. (Intel)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "warnings": [
+        "Hra nyn\u00ed pou\u017e\u00edv\u00e1 integrovanou grafiku. Pokud m\u00e1\u0161 i samostatnou kartu, nastav pro tento prohl\u00ed\u017ee\u010d nebo aplikaci ve Windows vysok\u00fd v\u00fdkon a aplikaci znovu spus\u0165."
+      ],
+      "webglVersion": 2
+    },
+    "quality": "medium",
+    "scenario": {
+      "backend": "webgl2",
+      "distance": 8,
+      "expectedPassengers": 12,
+      "instant": 1792502700000,
+      "instantISO": "2026-10-20T13:25:00.000Z",
+      "name": "KEY-53 daytime scheduled passenger cohort at normal multiplayer spawn",
+      "peers": [
+        {
+          "avatar": {
+            "beard": false,
+            "face": 1,
+            "glasses": true,
+            "hair": "#201a15",
+            "preset": 1,
+            "shirt": "#315dce",
+            "skin": "#c78b63",
+            "trousers": "#424242"
+          },
+          "firstTime": false,
+          "interests": [],
+          "nickname": "QA peer blue",
+          "social": false
+        },
+        {
+          "avatar": {
+            "beard": true,
+            "face": 2,
+            "glasses": false,
+            "hair": "#784321",
+            "preset": 2,
+            "shirt": "#c53c42",
+            "skin": "#e8bd97",
+            "trousers": "#243e32"
+          },
+          "firstTime": false,
+          "interests": [],
+          "nickname": "QA peer red",
+          "social": false
+        }
+      ],
+      "pitch": 0.1,
+      "qaDisclosure": "Local QA fixture: frozen transit timetable and lighting instant, synthetic fixed weather, two real SDK test clients. Ambient NPCs remain the game's fictional timetable simulation.",
+      "quality": "medium",
+      "repetitions": 3,
+      "schemaVersion": 1,
+      "spawn": {
+        "x": 110,
+        "z": 12
+      },
+      "targetFps": 60,
+      "warmupMs": 20000,
+      "weather": {
+        "cloud": 0,
+        "cloudSource": "Explicit QA synthetic clear sky",
+        "cloudStale": true,
+        "cloudWindSource": "Explicit QA zero wind",
+        "fetchedAt": 1792502700000,
+        "observedAt": 1792502700000,
+        "rain": 0,
+        "source": "Explicit QA synthetic weather fixture",
+        "sourceKind": "model",
+        "stale": true,
+        "status": "fallback",
+        "temperature": 18,
+        "wind": 0,
+        "windDirection": 0
+      },
+      "yaw": -1.4
+    },
+    "viewport": {
+      "dpr": 1.25,
+      "height": 720,
+      "width": 1280
+    }
+  },
+  "producerChecks": {
+    "sourceParity": true,
+    "sameHarness": true,
+    "completeCampaignInventory": true,
+    "exactPerModeInterleaving": true,
+    "identicalRecordedConditions": true,
+    "identicalTransitSemantics": true,
+    "comparableCameraAndPopulation": true,
+    "allHealth": true
+  },
+  "intervals": [
+    {
+      "variant": "A",
+      "slot": "A1",
+      "mode": "profile",
+      "repetition": 1,
+      "attemptId": "d3720daa-d16a-4ef9-aa15-1dff95e9058f",
+      "startId": "A1-54495225-ba53-4393-814b-934957872179",
+      "frames": {
+        "count": 275,
+        "sum": 10034.0,
+        "mean": 36.487272727272725,
+        "median": 35.799999952316284,
+        "p95": 44,
+        "p99": 56.69999998807907,
+        "max": 60.799999952316284,
+        "zeros": 0,
+        "minPositive": 29
+      },
+      "fps": 27.406816822802472,
+      "intervalsGe50ms": 5,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 275,
+          "sum": 210.49999952316284,
+          "mean": 0.7654545437205922,
+          "median": 0.699999988079071,
+          "p95": 1.2000000476837158,
+          "p99": 1.5999999642372131,
+          "max": 1.9000000357627869,
+          "zeros": 0,
+          "minPositive": 0.3999999761581421
+        },
+        "prune": {
+          "count": 275,
+          "sum": 9.199999749660492,
+          "mean": 0.03345454454421997,
+          "median": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.10000002384185791,
+          "max": 0.19999998807907104,
+          "zeros": 185,
+          "minPositive": 0.09999996423721313
+        },
+        "pruneMsPerUpdate": 0.03345454454421997,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "A",
+      "slot": "A1",
+      "mode": "profile",
+      "repetition": 2,
+      "attemptId": "d3720daa-d16a-4ef9-aa15-1dff95e9058f",
+      "startId": "A1-54495225-ba53-4393-814b-934957872179",
+      "frames": {
+        "count": 273,
+        "sum": 10024.100000023842,
+        "mean": 36.71831501840235,
+        "median": 36.09999996423721,
+        "p95": 44.40000003576279,
+        "p99": 48.200000047683716,
+        "max": 50.60000002384186,
+        "zeros": 0,
+        "minPositive": 29.200000047683716
+      },
+      "fps": 27.234365179851626,
+      "intervalsGe50ms": 1,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 273,
+          "sum": 221.2999997138977,
+          "mean": 0.8106227095747168,
+          "median": 0.699999988079071,
+          "p95": 1.399999976158142,
+          "p99": 1.699999988079071,
+          "max": 1.899999976158142,
+          "zeros": 0,
+          "minPositive": 0.19999998807907104
+        },
+        "prune": {
+          "count": 273,
+          "sum": 11.299999594688416,
+          "mean": 0.04139193990728357,
+          "median": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.19999998807907104,
+          "max": 0.5999999642372131,
+          "zeros": 168,
+          "minPositive": 0.09999996423721313
+        },
+        "pruneMsPerUpdate": 0.04139193990728357,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "A",
+      "slot": "A1",
+      "mode": "profile",
+      "repetition": 3,
+      "attemptId": "d3720daa-d16a-4ef9-aa15-1dff95e9058f",
+      "startId": "A1-54495225-ba53-4393-814b-934957872179",
+      "frames": {
+        "count": 265,
+        "sum": 10033.199999988079,
+        "mean": 37.86113207542672,
+        "median": 36,
+        "p95": 51.19999998807907,
+        "p99": 59.80000001192093,
+        "max": 70.70000004768372,
+        "zeros": 0,
+        "minPositive": 23.700000047683716
+      },
+      "fps": 26.412311127089545,
+      "intervalsGe50ms": 18,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 265,
+          "sum": 191.30000072717667,
+          "mean": 0.721886795196893,
+          "median": 0.699999988079071,
+          "p95": 1.199999988079071,
+          "p99": 1.5,
+          "max": 1.600000023841858,
+          "zeros": 0,
+          "minPositive": 0.30000001192092896
+        },
+        "prune": {
+          "count": 265,
+          "sum": 8.300000011920929,
+          "mean": 0.03132075476196577,
+          "median": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.10000002384185791,
+          "max": 0.10000002384185791,
+          "zeros": 182,
+          "minPositive": 0.09999996423721313
+        },
+        "pruneMsPerUpdate": 0.03132075476196577,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "A",
+      "slot": "A1",
+      "mode": "plain",
+      "repetition": 1,
+      "attemptId": "24723a09-8976-4dfd-bab7-ff9dff60a233",
+      "startId": "A1-54495225-ba53-4393-814b-934957872179",
+      "frames": {
+        "count": 278,
+        "sum": 10024.5,
+        "mean": 36.05935251798561,
+        "median": 35.60000002384186,
+        "p95": 40.30000001192093,
+        "p99": 49.59999996423721,
+        "max": 50.30000001192093,
+        "zeros": 0,
+        "minPositive": 30.200000047683716
+      },
+      "fps": 27.732056461668915,
+      "intervalsGe50ms": 1,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "A",
+      "slot": "A1",
+      "mode": "plain",
+      "repetition": 2,
+      "attemptId": "24723a09-8976-4dfd-bab7-ff9dff60a233",
+      "startId": "A1-54495225-ba53-4393-814b-934957872179",
+      "frames": {
+        "count": 246,
+        "sum": 10000.699999988079,
+        "mean": 40.65325203247187,
+        "median": 37.09999996423721,
+        "p95": 64.90000003576279,
+        "p99": 70.80000001192093,
+        "max": 78.69999998807907,
+        "zeros": 0,
+        "minPositive": 31.30000001192093
+      },
+      "fps": 24.59827812056088,
+      "intervalsGe50ms": 27,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "A",
+      "slot": "A1",
+      "mode": "plain",
+      "repetition": 3,
+      "attemptId": "24723a09-8976-4dfd-bab7-ff9dff60a233",
+      "startId": "A1-54495225-ba53-4393-814b-934957872179",
+      "frames": {
+        "count": 267,
+        "sum": 10031.300000011921,
+        "mean": 37.57041198506337,
+        "median": 36.39999997615814,
+        "p95": 46.60000002384186,
+        "p99": 62.60000002384186,
+        "max": 71.60000002384186,
+        "zeros": 0,
+        "minPositive": 30.299999952316284
+      },
+      "fps": 26.61668976101629,
+      "intervalsGe50ms": 8,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "B",
+      "slot": "B1",
+      "mode": "profile",
+      "repetition": 1,
+      "attemptId": "29e7da2c-2086-4262-8e6a-d9003a4aec03",
+      "startId": "B1-32e89fa4-c0de-490e-8109-ea34aeda9588",
+      "frames": {
+        "count": 268,
+        "sum": 10008.900000035763,
+        "mean": 37.34664179117822,
+        "median": 36.19999998807907,
+        "p95": 44.80000001192093,
+        "p99": 57.90000003576279,
+        "max": 61.69999998807907,
+        "zeros": 0,
+        "minPositive": 29
+      },
+      "fps": 26.776169209307955,
+      "intervalsGe50ms": 6,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 268,
+          "sum": 185.8000002503395,
+          "mean": 0.6932835830236549,
+          "median": 0.6000000238418579,
+          "p95": 1.199999988079071,
+          "p99": 1.699999988079071,
+          "max": 2.5,
+          "zeros": 0,
+          "minPositive": 0.3999999761581421
+        },
+        "prune": {
+          "count": 0,
+          "sum": 0,
+          "mean": null,
+          "median": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "zeros": 0,
+          "minPositive": null
+        },
+        "pruneMsPerUpdate": 0.0,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "B",
+      "slot": "B1",
+      "mode": "profile",
+      "repetition": 2,
+      "attemptId": "29e7da2c-2086-4262-8e6a-d9003a4aec03",
+      "startId": "B1-32e89fa4-c0de-490e-8109-ea34aeda9588",
+      "frames": {
+        "count": 275,
+        "sum": 10030.300000011921,
+        "mean": 36.47381818186153,
+        "median": 35.80000001192093,
+        "p95": 42.60000002384186,
+        "p99": 47.80000001192093,
+        "max": 56.700000047683716,
+        "zeros": 0,
+        "minPositive": 29.69999998807907
+      },
+      "fps": 27.416926712029866,
+      "intervalsGe50ms": 2,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 275,
+          "sum": 172.09999960660934,
+          "mean": 0.6258181803876703,
+          "median": 0.5999999642372131,
+          "p95": 1,
+          "p99": 1.300000011920929,
+          "max": 1.5,
+          "zeros": 0,
+          "minPositive": 0.19999998807907104
+        },
+        "prune": {
+          "count": 0,
+          "sum": 0,
+          "mean": null,
+          "median": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "zeros": 0,
+          "minPositive": null
+        },
+        "pruneMsPerUpdate": 0.0,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "B",
+      "slot": "B1",
+      "mode": "profile",
+      "repetition": 3,
+      "attemptId": "29e7da2c-2086-4262-8e6a-d9003a4aec03",
+      "startId": "B1-32e89fa4-c0de-490e-8109-ea34aeda9588",
+      "frames": {
+        "count": 272,
+        "sum": 10017.399999976158,
+        "mean": 36.82867647050058,
+        "median": 36,
+        "p95": 44.39999997615814,
+        "p99": 58.09999996423721,
+        "max": 92.30000001192093,
+        "zeros": 0,
+        "minPositive": 23.299999952316284
+      },
+      "fps": 27.152754207743264,
+      "intervalsGe50ms": 7,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 272,
+          "sum": 166.00000023841858,
+          "mean": 0.6102941185235977,
+          "median": 0.5999999642372131,
+          "p95": 1,
+          "p99": 1.399999976158142,
+          "max": 2.5,
+          "zeros": 0,
+          "minPositive": 0.2999999523162842
+        },
+        "prune": {
+          "count": 0,
+          "sum": 0,
+          "mean": null,
+          "median": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "zeros": 0,
+          "minPositive": null
+        },
+        "pruneMsPerUpdate": 0.0,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "B",
+      "slot": "B1",
+      "mode": "plain",
+      "repetition": 1,
+      "attemptId": "53389e5e-f21b-43a1-9e08-108fcbc38c3a",
+      "startId": "B1-32e89fa4-c0de-490e-8109-ea34aeda9588",
+      "frames": {
+        "count": 275,
+        "sum": 10026.300000011921,
+        "mean": 36.459272727316076,
+        "median": 36,
+        "p95": 41.700000047683716,
+        "p99": 50.60000002384186,
+        "max": 57.200000047683716,
+        "zeros": 0,
+        "minPositive": 30.600000023841858
+      },
+      "fps": 27.42786471576484,
+      "intervalsGe50ms": 4,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "B",
+      "slot": "B1",
+      "mode": "plain",
+      "repetition": 2,
+      "attemptId": "53389e5e-f21b-43a1-9e08-108fcbc38c3a",
+      "startId": "B1-32e89fa4-c0de-490e-8109-ea34aeda9588",
+      "frames": {
+        "count": 234,
+        "sum": 9999.5,
+        "mean": 42.73290598290598,
+        "median": 40.5,
+        "p95": 62.80000001192093,
+        "p99": 72.70000004768372,
+        "max": 74,
+        "zeros": 0,
+        "minPositive": 31.100000023841858
+      },
+      "fps": 23.401170058502924,
+      "intervalsGe50ms": 28,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "B",
+      "slot": "B1",
+      "mode": "plain",
+      "repetition": 3,
+      "attemptId": "53389e5e-f21b-43a1-9e08-108fcbc38c3a",
+      "startId": "B1-32e89fa4-c0de-490e-8109-ea34aeda9588",
+      "frames": {
+        "count": 271,
+        "sum": 10046.399999976158,
+        "mean": 37.07158671577918,
+        "median": 36.19999998807907,
+        "p95": 44.89999997615814,
+        "p99": 53,
+        "max": 69.80000001192093,
+        "zeros": 0,
+        "minPositive": 29.5
+      },
+      "fps": 26.97483675750947,
+      "intervalsGe50ms": 5,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "A",
+      "slot": "A2",
+      "mode": "profile",
+      "repetition": 1,
+      "attemptId": "0b93d3f0-69f7-4473-a909-f1b8ce722311",
+      "startId": "A2-5766d6de-0541-45fb-8a20-ce21a6055197",
+      "frames": {
+        "count": 275,
+        "sum": 10040.5,
+        "mean": 36.51090909090909,
+        "median": 35.80000001192093,
+        "p95": 43.89999997615814,
+        "p99": 52.39999997615814,
+        "max": 58.80000001192093,
+        "zeros": 0,
+        "minPositive": 28
+      },
+      "fps": 27.389074249290378,
+      "intervalsGe50ms": 3,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 275,
+          "sum": 175.49999994039536,
+          "mean": 0.638181817965074,
+          "median": 0.6000000238418579,
+          "p95": 1,
+          "p99": 1.399999976158142,
+          "max": 2.300000011920929,
+          "zeros": 0,
+          "minPositive": 0.30000001192092896
+        },
+        "prune": {
+          "count": 275,
+          "sum": 7.8000001311302185,
+          "mean": 0.028363636840473522,
+          "median": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.19999998807907104,
+          "max": 0.19999998807907104,
+          "zeros": 200,
+          "minPositive": 0.09999996423721313
+        },
+        "pruneMsPerUpdate": 0.028363636840473522,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "A",
+      "slot": "A2",
+      "mode": "profile",
+      "repetition": 2,
+      "attemptId": "0b93d3f0-69f7-4473-a909-f1b8ce722311",
+      "startId": "A2-5766d6de-0541-45fb-8a20-ce21a6055197",
+      "frames": {
+        "count": 274,
+        "sum": 10033.5,
+        "mean": 36.61861313868613,
+        "median": 35.80000001192093,
+        "p95": 43.80000001192093,
+        "p99": 52,
+        "max": 56.80000001192093,
+        "zeros": 0,
+        "minPositive": 30.19999998807907
+      },
+      "fps": 27.308516469826085,
+      "intervalsGe50ms": 3,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 274,
+          "sum": 168.20000022649765,
+          "mean": 0.6138686139653199,
+          "median": 0.5999999642372131,
+          "p95": 1.0999999642372131,
+          "p99": 1.399999976158142,
+          "max": 1.5,
+          "zeros": 0,
+          "minPositive": 0.19999998807907104
+        },
+        "prune": {
+          "count": 274,
+          "sum": 6.099999964237213,
+          "mean": 0.022262773592106617,
+          "median": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.10000002384185791,
+          "max": 0.19999998807907104,
+          "zeros": 214,
+          "minPositive": 0.09999996423721313
+        },
+        "pruneMsPerUpdate": 0.022262773592106617,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "A",
+      "slot": "A2",
+      "mode": "profile",
+      "repetition": 3,
+      "attemptId": "0b93d3f0-69f7-4473-a909-f1b8ce722311",
+      "startId": "A2-5766d6de-0541-45fb-8a20-ce21a6055197",
+      "frames": {
+        "count": 271,
+        "sum": 10031.800000011921,
+        "mean": 37.01771217716576,
+        "median": 35.80000001192093,
+        "p95": 44.5,
+        "p99": 63.59999996423721,
+        "max": 95.10000002384186,
+        "zeros": 0,
+        "minPositive": 23.899999976158142
+      },
+      "fps": 27.014095177303968,
+      "intervalsGe50ms": 9,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 271,
+          "sum": 177.2999992966652,
+          "mean": 0.654243539840093,
+          "median": 0.5999999642372131,
+          "p95": 1,
+          "p99": 1.5,
+          "max": 3.300000011920929,
+          "zeros": 0,
+          "minPositive": 0.10000002384185791
+        },
+        "prune": {
+          "count": 271,
+          "sum": 4.8999998569488525,
+          "mean": 0.018081180283944107,
+          "median": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.10000002384185791,
+          "max": 0.19999998807907104,
+          "zeros": 223,
+          "minPositive": 0.09999996423721313
+        },
+        "pruneMsPerUpdate": 0.018081180283944107,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "A",
+      "slot": "A2",
+      "mode": "plain",
+      "repetition": 1,
+      "attemptId": "0a3c0ba0-03c3-4786-b102-d3fa0f7c7039",
+      "startId": "A2-5766d6de-0541-45fb-8a20-ce21a6055197",
+      "frames": {
+        "count": 274,
+        "sum": 10032.199999988079,
+        "mean": 36.61386861309518,
+        "median": 35.89999997615814,
+        "p95": 43.69999998807907,
+        "p99": 52.5,
+        "max": 65.30000001192093,
+        "zeros": 0,
+        "minPositive": 29.19999998807907
+      },
+      "fps": 27.312055182345407,
+      "intervalsGe50ms": 4,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "A",
+      "slot": "A2",
+      "mode": "plain",
+      "repetition": 2,
+      "attemptId": "0a3c0ba0-03c3-4786-b102-d3fa0f7c7039",
+      "startId": "A2-5766d6de-0541-45fb-8a20-ce21a6055197",
+      "frames": {
+        "count": 274,
+        "sum": 10040.599999964237,
+        "mean": 36.644525547314736,
+        "median": 35.80000001192093,
+        "p95": 43.80000001192093,
+        "p99": 56.39999997615814,
+        "max": 63,
+        "zeros": 0,
+        "minPositive": 27.69999998807907
+      },
+      "fps": 27.289205824450324,
+      "intervalsGe50ms": 3,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "A",
+      "slot": "A2",
+      "mode": "plain",
+      "repetition": 3,
+      "attemptId": "0a3c0ba0-03c3-4786-b102-d3fa0f7c7039",
+      "startId": "A2-5766d6de-0541-45fb-8a20-ce21a6055197",
+      "frames": {
+        "count": 254,
+        "sum": 10011.0,
+        "mean": 39.41338582677165,
+        "median": 36.89999997615814,
+        "p95": 54.19999998807907,
+        "p99": 74.70000004768372,
+        "max": 85.79999995231628,
+        "zeros": 0,
+        "minPositive": 30.099999964237213
+      },
+      "fps": 25.372090700229748,
+      "intervalsGe50ms": 19,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "B",
+      "slot": "B2",
+      "mode": "profile",
+      "repetition": 1,
+      "attemptId": "31541604-443e-4e80-bf80-13ff4c957967",
+      "startId": "B2-f6e22458-1b14-45c1-a71c-095c5b8fd68f",
+      "frames": {
+        "count": 270,
+        "sum": 10037.900000035763,
+        "mean": 37.17740740753986,
+        "median": 36,
+        "p95": 46.5,
+        "p99": 64,
+        "max": 65.30000001192093,
+        "zeros": 0,
+        "minPositive": 29
+      },
+      "fps": 26.898056366275622,
+      "intervalsGe50ms": 10,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 270,
+          "sum": 175.70000034570694,
+          "mean": 0.6507407420211369,
+          "median": 0.6000000238418579,
+          "p95": 1.100000023841858,
+          "p99": 1.4000000357627869,
+          "max": 1.5999999642372131,
+          "zeros": 0,
+          "minPositive": 0.2999999523162842
+        },
+        "prune": {
+          "count": 0,
+          "sum": 0,
+          "mean": null,
+          "median": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "zeros": 0,
+          "minPositive": null
+        },
+        "pruneMsPerUpdate": 0.0,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "B",
+      "slot": "B2",
+      "mode": "profile",
+      "repetition": 2,
+      "attemptId": "31541604-443e-4e80-bf80-13ff4c957967",
+      "startId": "B2-f6e22458-1b14-45c1-a71c-095c5b8fd68f",
+      "frames": {
+        "count": 257,
+        "sum": 10055.699999988079,
+        "mean": 39.12723735403922,
+        "median": 36.5,
+        "p95": 55.10000002384186,
+        "p99": 61.80000001192093,
+        "max": 70.70000004768372,
+        "zeros": 0,
+        "minPositive": 29.899999976158142
+      },
+      "fps": 25.557643923377256,
+      "intervalsGe50ms": 24,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 257,
+          "sum": 178.79999959468842,
+          "mean": 0.6957198427808888,
+          "median": 0.6000000238418579,
+          "p95": 1.199999988079071,
+          "p99": 1.399999976158142,
+          "max": 2.199999988079071,
+          "zeros": 0,
+          "minPositive": 0.3999999761581421
+        },
+        "prune": {
+          "count": 0,
+          "sum": 0,
+          "mean": null,
+          "median": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "zeros": 0,
+          "minPositive": null
+        },
+        "pruneMsPerUpdate": 0.0,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "B",
+      "slot": "B2",
+      "mode": "profile",
+      "repetition": 3,
+      "attemptId": "31541604-443e-4e80-bf80-13ff4c957967",
+      "startId": "B2-f6e22458-1b14-45c1-a71c-095c5b8fd68f",
+      "frames": {
+        "count": 274,
+        "sum": 10025.099999964237,
+        "mean": 36.58795620424904,
+        "median": 36,
+        "p95": 44.19999998807907,
+        "p99": 49.59999996423721,
+        "max": 51.19999998807907,
+        "zeros": 0,
+        "minPositive": 29.600000023841858
+      },
+      "fps": 27.33139819063924,
+      "intervalsGe50ms": 2,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 274,
+          "sum": 169.00000047683716,
+          "mean": 0.6167883229081648,
+          "median": 0.5999999642372131,
+          "p95": 1,
+          "p99": 1.199999988079071,
+          "max": 1.699999988079071,
+          "zeros": 0,
+          "minPositive": 0.3999999761581421
+        },
+        "prune": {
+          "count": 0,
+          "sum": 0,
+          "mean": null,
+          "median": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "zeros": 0,
+          "minPositive": null
+        },
+        "pruneMsPerUpdate": 0.0,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "B",
+      "slot": "B2",
+      "mode": "plain",
+      "repetition": 1,
+      "attemptId": "e7c5f57f-ac0b-4c3a-9eed-9f42aadc31bc",
+      "startId": "B2-f6e22458-1b14-45c1-a71c-095c5b8fd68f",
+      "frames": {
+        "count": 256,
+        "sum": 10050.899999976158,
+        "mean": 39.26132812490687,
+        "median": 36.59999996423721,
+        "p95": 59,
+        "p99": 73.70000004768372,
+        "max": 95.80000001192093,
+        "zeros": 0,
+        "minPositive": 23.400000035762787
+      },
+      "fps": 25.470355888587815,
+      "intervalsGe50ms": 22,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "B",
+      "slot": "B2",
+      "mode": "plain",
+      "repetition": 2,
+      "attemptId": "e7c5f57f-ac0b-4c3a-9eed-9f42aadc31bc",
+      "startId": "B2-f6e22458-1b14-45c1-a71c-095c5b8fd68f",
+      "frames": {
+        "count": 255,
+        "sum": 10066.0,
+        "mean": 39.47450980392157,
+        "median": 36.60000002384186,
+        "p95": 53.89999997615814,
+        "p99": 71.80000001192093,
+        "max": 182,
+        "zeros": 0,
+        "minPositive": 25.600000023841858
+      },
+      "fps": 25.332803496920324,
+      "intervalsGe50ms": 22,
+      "intervalsGe100ms": 1
+    },
+    {
+      "variant": "B",
+      "slot": "B2",
+      "mode": "plain",
+      "repetition": 3,
+      "attemptId": "e7c5f57f-ac0b-4c3a-9eed-9f42aadc31bc",
+      "startId": "B2-f6e22458-1b14-45c1-a71c-095c5b8fd68f",
+      "frames": {
+        "count": 277,
+        "sum": 10009.700000047684,
+        "mean": 36.136101083204636,
+        "median": 35.799999952316284,
+        "p95": 40.60000002384186,
+        "p99": 47.39999997615814,
+        "max": 52.80000001192093,
+        "zeros": 0,
+        "minPositive": 31.19999998807907
+      },
+      "fps": 27.67315703754163,
+      "intervalsGe50ms": 2,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "A",
+      "slot": "A3",
+      "mode": "profile",
+      "repetition": 1,
+      "attemptId": "68ca945b-e1eb-47a2-b9c0-e1af5cd03406",
+      "startId": "A3-c526f89b-9a7d-459a-b4d5-a24b6b979eaa",
+      "frames": {
+        "count": 272,
+        "sum": 10030.100000023842,
+        "mean": 36.875367647146476,
+        "median": 36.30000001192093,
+        "p95": 43.799999952316284,
+        "p99": 59.5,
+        "max": 69.39999997615814,
+        "zeros": 0,
+        "minPositive": 24.69999998807907
+      },
+      "fps": 27.118373695113057,
+      "intervalsGe50ms": 5,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 272,
+          "sum": 187.59999972581863,
+          "mean": 0.6897058813449215,
+          "median": 0.6000000238418579,
+          "p95": 1.100000023841858,
+          "p99": 1.399999976158142,
+          "max": 1.5,
+          "zeros": 0,
+          "minPositive": 0.3999999761581421
+        },
+        "prune": {
+          "count": 272,
+          "sum": 8.899999856948853,
+          "mean": 0.03272058770937078,
+          "median": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.19999998807907104,
+          "max": 0.30000001192092896,
+          "zeros": 191,
+          "minPositive": 0.09999996423721313
+        },
+        "pruneMsPerUpdate": 0.03272058770937078,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "A",
+      "slot": "A3",
+      "mode": "profile",
+      "repetition": 2,
+      "attemptId": "68ca945b-e1eb-47a2-b9c0-e1af5cd03406",
+      "startId": "A3-c526f89b-9a7d-459a-b4d5-a24b6b979eaa",
+      "frames": {
+        "count": 269,
+        "sum": 10025.100000023842,
+        "mean": 37.26802973986558,
+        "median": 36.200000047683716,
+        "p95": 44.69999998807907,
+        "p99": 59.80000001192093,
+        "max": 75.80000001192093,
+        "zeros": 0,
+        "minPositive": 29.100000023841858
+      },
+      "fps": 26.832650048314758,
+      "intervalsGe50ms": 5,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 269,
+          "sum": 183.80000042915344,
+          "mean": 0.6832713770600499,
+          "median": 0.6000000238418579,
+          "p95": 1.100000023841858,
+          "p99": 1.600000023841858,
+          "max": 2,
+          "zeros": 0,
+          "minPositive": 0.3999999761581421
+        },
+        "prune": {
+          "count": 269,
+          "sum": 8.600000083446503,
+          "mean": 0.031970260533258375,
+          "median": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.19999998807907104,
+          "max": 0.30000001192092896,
+          "zeros": 187,
+          "minPositive": 0.09999996423721313
+        },
+        "pruneMsPerUpdate": 0.031970260533258375,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "A",
+      "slot": "A3",
+      "mode": "profile",
+      "repetition": 3,
+      "attemptId": "68ca945b-e1eb-47a2-b9c0-e1af5cd03406",
+      "startId": "A3-c526f89b-9a7d-459a-b4d5-a24b6b979eaa",
+      "frames": {
+        "count": 264,
+        "sum": 10019.5,
+        "mean": 37.952651515151516,
+        "median": 36.39999997615814,
+        "p95": 46.89999997615814,
+        "p99": 66.5,
+        "max": 68.19999998807907,
+        "zeros": 0,
+        "minPositive": 30.5
+      },
+      "fps": 26.348620190628274,
+      "intervalsGe50ms": 13,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 264,
+          "sum": 183.30000001192093,
+          "mean": 0.6943181818633368,
+          "median": 0.6000000238418579,
+          "p95": 1.199999988079071,
+          "p99": 1.5,
+          "max": 1.699999988079071,
+          "zeros": 0,
+          "minPositive": 0.2999999523162842
+        },
+        "prune": {
+          "count": 264,
+          "sum": 7.1999998688697815,
+          "mean": 0.0272727267760219,
+          "median": 0,
+          "p95": 0.10000002384185791,
+          "p99": 0.19999998807907104,
+          "max": 0.20000004768371582,
+          "zeros": 195,
+          "minPositive": 0.09999996423721313
+        },
+        "pruneMsPerUpdate": 0.0272727267760219,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "A",
+      "slot": "A3",
+      "mode": "plain",
+      "repetition": 1,
+      "attemptId": "52427d3b-4e4d-43f6-b440-9927d0cec4d7",
+      "startId": "A3-c526f89b-9a7d-459a-b4d5-a24b6b979eaa",
+      "frames": {
+        "count": 258,
+        "sum": 10015.099999964237,
+        "mean": 38.81821705412495,
+        "median": 36.30000001192093,
+        "p95": 58.80000001192093,
+        "p99": 65.5,
+        "max": 72.40000003576279,
+        "zeros": 0,
+        "minPositive": 30.5
+      },
+      "fps": 25.76110073797778,
+      "intervalsGe50ms": 23,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "A",
+      "slot": "A3",
+      "mode": "plain",
+      "repetition": 2,
+      "attemptId": "52427d3b-4e4d-43f6-b440-9927d0cec4d7",
+      "startId": "A3-c526f89b-9a7d-459a-b4d5-a24b6b979eaa",
+      "frames": {
+        "count": 270,
+        "sum": 9989.899999976158,
+        "mean": 36.999629629541325,
+        "median": 36.299999952316284,
+        "p95": 43.5,
+        "p99": 51.30000001192093,
+        "max": 113.40000003576279,
+        "zeros": 0,
+        "minPositive": 23
+      },
+      "fps": 27.027297570610756,
+      "intervalsGe50ms": 3,
+      "intervalsGe100ms": 1
+    },
+    {
+      "variant": "A",
+      "slot": "A3",
+      "mode": "plain",
+      "repetition": 3,
+      "attemptId": "52427d3b-4e4d-43f6-b440-9927d0cec4d7",
+      "startId": "A3-c526f89b-9a7d-459a-b4d5-a24b6b979eaa",
+      "frames": {
+        "count": 271,
+        "sum": 10013.800000011921,
+        "mean": 36.951291512959116,
+        "median": 36.5,
+        "p95": 42.89999997615814,
+        "p99": 50.10000002384186,
+        "max": 58.5,
+        "zeros": 0,
+        "minPositive": 30.19999998807907
+      },
+      "fps": 27.062653538085183,
+      "intervalsGe50ms": 3,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "B",
+      "slot": "B3",
+      "mode": "profile",
+      "repetition": 1,
+      "attemptId": "77ec94b2-28b3-4111-978d-e5107e338476",
+      "startId": "B3-1d93b090-59f0-4d3d-a397-b288d943e484",
+      "frames": {
+        "count": 273,
+        "sum": 10034.700000047684,
+        "mean": 36.757142857317525,
+        "median": 36,
+        "p95": 43.10000002384186,
+        "p99": 52.89999997615814,
+        "max": 63.299999952316284,
+        "zeros": 0,
+        "minPositive": 29.5
+      },
+      "fps": 27.20559657973858,
+      "intervalsGe50ms": 4,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 273,
+          "sum": 171.7000002861023,
+          "mean": 0.6289377299857227,
+          "median": 0.6000000238418579,
+          "p95": 1,
+          "p99": 1.199999988079071,
+          "max": 1.300000011920929,
+          "zeros": 0,
+          "minPositive": 0.30000001192092896
+        },
+        "prune": {
+          "count": 0,
+          "sum": 0,
+          "mean": null,
+          "median": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "zeros": 0,
+          "minPositive": null
+        },
+        "pruneMsPerUpdate": 0.0,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "B",
+      "slot": "B3",
+      "mode": "profile",
+      "repetition": 2,
+      "attemptId": "77ec94b2-28b3-4111-978d-e5107e338476",
+      "startId": "B3-1d93b090-59f0-4d3d-a397-b288d943e484",
+      "frames": {
+        "count": 260,
+        "sum": 10032.400000035763,
+        "mean": 38.586153846291396,
+        "median": 36.40000003576279,
+        "p95": 50.59999996423721,
+        "p99": 73.19999998807907,
+        "max": 95.39999997615814,
+        "zeros": 0,
+        "minPositive": 22.899999976158142
+      },
+      "fps": 25.91603205604573,
+      "intervalsGe50ms": 14,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 260,
+          "sum": 179.5000004172325,
+          "mean": 0.6903846169893558,
+          "median": 0.6000000238418579,
+          "p95": 1.199999988079071,
+          "p99": 1.600000023841858,
+          "max": 4.400000035762787,
+          "zeros": 0,
+          "minPositive": 0.2999999523162842
+        },
+        "prune": {
+          "count": 0,
+          "sum": 0,
+          "mean": null,
+          "median": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "zeros": 0,
+          "minPositive": null
+        },
+        "pruneMsPerUpdate": 0.0,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "B",
+      "slot": "B3",
+      "mode": "profile",
+      "repetition": 3,
+      "attemptId": "77ec94b2-28b3-4111-978d-e5107e338476",
+      "startId": "B3-1d93b090-59f0-4d3d-a397-b288d943e484",
+      "frames": {
+        "count": 272,
+        "sum": 10006.800000011921,
+        "mean": 36.78970588239677,
+        "median": 35.90000003576279,
+        "p95": 44.5,
+        "p99": 55,
+        "max": 59.30000001192093,
+        "zeros": 0,
+        "minPositive": 28.80000001192093
+      },
+      "fps": 27.181516568700882,
+      "intervalsGe50ms": 7,
+      "intervalsGe100ms": 0,
+      "profile": {
+        "update": {
+          "count": 272,
+          "sum": 170.0000001192093,
+          "mean": 0.6250000004382694,
+          "median": 0.5999999642372131,
+          "p95": 1.0999999642372131,
+          "p99": 1.399999976158142,
+          "max": 1.5,
+          "zeros": 0,
+          "minPositive": 0.19999998807907104
+        },
+        "prune": {
+          "count": 0,
+          "sum": 0,
+          "mean": null,
+          "median": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "zeros": 0,
+          "minPositive": null
+        },
+        "pruneMsPerUpdate": 0.0,
+        "scope": "CPU monotonic wall time, update includes nested prune and wrapper overhead; not GPU time"
+      }
+    },
+    {
+      "variant": "B",
+      "slot": "B3",
+      "mode": "plain",
+      "repetition": 1,
+      "attemptId": "4e4e72f8-a033-4b58-a233-b95bfa183e03",
+      "startId": "B3-1d93b090-59f0-4d3d-a397-b288d943e484",
+      "frames": {
+        "count": 251,
+        "sum": 10036.300000011921,
+        "mean": 39.98525896419092,
+        "median": 38,
+        "p95": 52.10000002384186,
+        "p99": 64.60000002384186,
+        "max": 67.70000004768372,
+        "zeros": 0,
+        "minPositive": 29.899999976158142
+      },
+      "fps": 25.009216543915773,
+      "intervalsGe50ms": 20,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "B",
+      "slot": "B3",
+      "mode": "plain",
+      "repetition": 2,
+      "attemptId": "4e4e72f8-a033-4b58-a233-b95bfa183e03",
+      "startId": "B3-1d93b090-59f0-4d3d-a397-b288d943e484",
+      "frames": {
+        "count": 278,
+        "sum": 10004.699999988079,
+        "mean": 35.988129496359996,
+        "median": 35.69999998807907,
+        "p95": 40.10000002384186,
+        "p99": 45.89999997615814,
+        "max": 49.59999996423721,
+        "zeros": 0,
+        "minPositive": 29.600000023841858
+      },
+      "fps": 27.786940138168188,
+      "intervalsGe50ms": 0,
+      "intervalsGe100ms": 0
+    },
+    {
+      "variant": "B",
+      "slot": "B3",
+      "mode": "plain",
+      "repetition": 3,
+      "attemptId": "4e4e72f8-a033-4b58-a233-b95bfa183e03",
+      "startId": "B3-1d93b090-59f0-4d3d-a397-b288d943e484",
+      "frames": {
+        "count": 274,
+        "sum": 10017.5,
+        "mean": 36.56021897810219,
+        "median": 35.700000047683716,
+        "p95": 44.39999997615814,
+        "p99": 52.30000001192093,
+        "max": 67.30000001192093,
+        "zeros": 0,
+        "minPositive": 29.30000001192093
+      },
+      "fps": 27.352133765909656,
+      "intervalsGe50ms": 5,
+      "intervalsGe100ms": 0
+    }
+  ],
+  "startModeSummaries": [
+    {
+      "slot": "A1",
+      "mode": "profile",
+      "frames": {
+        "count": 813,
+        "sum": 30091.30000001192,
+        "mean": 37.01266912670593,
+        "median": 35.90000003576279,
+        "p95": 46.59999996423721,
+        "p99": 55.80000001192093,
+        "max": 70.70000004768372,
+        "zeros": 0,
+        "minPositive": 23.700000047683716
+      },
+      "fps": 27.017775901994195,
+      "update": {
+        "count": 813,
+        "sum": 623.0999999642372,
+        "mean": 0.7664206641626534,
+        "median": 0.699999988079071,
+        "p95": 1.300000011920929,
+        "p99": 1.5999999642372131,
+        "max": 1.9000000357627869,
+        "zeros": 0,
+        "minPositive": 0.19999998807907104
+      },
+      "prune": {
+        "count": 813,
+        "sum": 28.799999356269836,
+        "mean": 0.03542435345174642,
+        "median": 0,
+        "p95": 0.10000002384185791,
+        "p99": 0.10000002384185791,
+        "max": 0.5999999642372131,
+        "zeros": 535,
+        "minPositive": 0.09999996423721313
+      },
+      "pruneMsPerUpdate": 0.03542435345174642
+    },
+    {
+      "slot": "A1",
+      "mode": "plain",
+      "frames": {
+        "count": 791,
+        "sum": 30056.5,
+        "mean": 37.99810366624526,
+        "median": 36.19999998807907,
+        "p95": 49.59999996423721,
+        "p99": 68.80000001192093,
+        "max": 78.69999998807907,
+        "zeros": 0,
+        "minPositive": 30.200000047683716
+      },
+      "fps": 26.31710278974598
+    },
+    {
+      "slot": "B1",
+      "mode": "profile",
+      "frames": {
+        "count": 815,
+        "sum": 30056.600000023842,
+        "mean": 36.87926380371024,
+        "median": 36,
+        "p95": 44,
+        "p99": 57.30000001192093,
+        "max": 92.30000001192093,
+        "zeros": 0,
+        "minPositive": 23.299999952316284
+      },
+      "fps": 27.115508740155356,
+      "update": {
+        "count": 815,
+        "sum": 523.9000000953674,
+        "mean": 0.6428220860065859,
+        "median": 0.5999999642372131,
+        "p95": 1.100000023841858,
+        "p99": 1.399999976158142,
+        "max": 2.5,
+        "zeros": 0,
+        "minPositive": 0.19999998807907104
+      },
+      "prune": {
+        "count": 0,
+        "sum": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "p99": null,
+        "max": null,
+        "zeros": 0,
+        "minPositive": null
+      },
+      "pruneMsPerUpdate": 0.0
+    },
+    {
+      "slot": "B1",
+      "mode": "plain",
+      "frames": {
+        "count": 780,
+        "sum": 30072.19999998808,
+        "mean": 38.55410256408728,
+        "median": 36.59999996423721,
+        "p95": 49.799999952316284,
+        "p99": 68,
+        "max": 74,
+        "zeros": 0,
+        "minPositive": 29.5
+      },
+      "fps": 25.937576898275125
+    },
+    {
+      "slot": "A2",
+      "mode": "profile",
+      "frames": {
+        "count": 820,
+        "sum": 30105.80000001192,
+        "mean": 36.714390243916974,
+        "median": 35.80000001192093,
+        "p95": 44.10000002384186,
+        "p99": 56.69999998807907,
+        "max": 95.10000002384186,
+        "zeros": 0,
+        "minPositive": 23.899999976158142
+      },
+      "fps": 27.237276538064936,
+      "update": {
+        "count": 820,
+        "sum": 520.9999994635582,
+        "mean": 0.6353658530043392,
+        "median": 0.5999999642372131,
+        "p95": 1,
+        "p99": 1.399999976158142,
+        "max": 3.300000011920929,
+        "zeros": 0,
+        "minPositive": 0.10000002384185791
+      },
+      "prune": {
+        "count": 820,
+        "sum": 18.799999952316284,
+        "mean": 0.02292682921014181,
+        "median": 0,
+        "p95": 0.10000002384185791,
+        "p99": 0.10000002384185791,
+        "max": 0.19999998807907104,
+        "zeros": 637,
+        "minPositive": 0.09999996423721313
+      },
+      "pruneMsPerUpdate": 0.02292682921014181
+    },
+    {
+      "slot": "A2",
+      "mode": "plain",
+      "frames": {
+        "count": 802,
+        "sum": 30083.799999952316,
+        "mean": 37.5109725685191,
+        "median": 36.09999996423721,
+        "p95": 46.5,
+        "p99": 66.29999995231628,
+        "max": 85.79999995231628,
+        "zeros": 0,
+        "minPositive": 27.69999998807907
+      },
+      "fps": 26.658866233696244
+    },
+    {
+      "slot": "B2",
+      "mode": "profile",
+      "frames": {
+        "count": 801,
+        "sum": 30118.69999998808,
+        "mean": 37.60137328338087,
+        "median": 36.19999998807907,
+        "p95": 49.5,
+        "p99": 61.5,
+        "max": 70.70000004768372,
+        "zeros": 0,
+        "minPositive": 29
+      },
+      "fps": 26.594773346801723,
+      "update": {
+        "count": 801,
+        "sum": 523.5000004172325,
+        "mean": 0.6535580529553464,
+        "median": 0.6000000238418579,
+        "p95": 1.100000023841858,
+        "p99": 1.399999976158142,
+        "max": 2.199999988079071,
+        "zeros": 0,
+        "minPositive": 0.2999999523162842
+      },
+      "prune": {
+        "count": 0,
+        "sum": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "p99": null,
+        "max": null,
+        "zeros": 0,
+        "minPositive": null
+      },
+      "pruneMsPerUpdate": 0.0
+    },
+    {
+      "slot": "B2",
+      "mode": "plain",
+      "frames": {
+        "count": 788,
+        "sum": 30126.600000023842,
+        "mean": 38.23172588835513,
+        "median": 36.10000002384186,
+        "p95": 51.89999997615814,
+        "p99": 67.19999998807907,
+        "max": 182,
+        "zeros": 0,
+        "minPositive": 23.400000035762787
+      },
+      "fps": 26.15628713493645
+    },
+    {
+      "slot": "A3",
+      "mode": "profile",
+      "frames": {
+        "count": 805,
+        "sum": 30074.700000047684,
+        "mean": 37.35987577645675,
+        "median": 36.30000001192093,
+        "p95": 45.09999996423721,
+        "p99": 63.30000001192093,
+        "max": 75.80000001192093,
+        "zeros": 0,
+        "minPositive": 24.69999998807907
+      },
+      "fps": 26.76668428941016,
+      "update": {
+        "count": 805,
+        "sum": 554.700000166893,
+        "mean": 0.6890683231886869,
+        "median": 0.6000000238418579,
+        "p95": 1.100000023841858,
+        "p99": 1.4000000357627869,
+        "max": 2,
+        "zeros": 0,
+        "minPositive": 0.2999999523162842
+      },
+      "prune": {
+        "count": 805,
+        "sum": 24.699999809265137,
+        "mean": 0.030683229576726877,
+        "median": 0,
+        "p95": 0.10000002384185791,
+        "p99": 0.19999998807907104,
+        "max": 0.30000001192092896,
+        "zeros": 573,
+        "minPositive": 0.09999996423721313
+      },
+      "pruneMsPerUpdate": 0.030683229576726877
+    },
+    {
+      "slot": "A3",
+      "mode": "plain",
+      "frames": {
+        "count": 799,
+        "sum": 30018.799999952316,
+        "mean": 37.57046307878888,
+        "median": 36.30000001192093,
+        "p95": 47,
+        "p99": 64.09999996423721,
+        "max": 113.40000003576279,
+        "zeros": 0,
+        "minPositive": 23
+      },
+      "fps": 26.616653563808985
+    },
+    {
+      "slot": "B3",
+      "mode": "profile",
+      "frames": {
+        "count": 805,
+        "sum": 30073.900000095367,
+        "mean": 37.35888198769611,
+        "median": 36.09999996423721,
+        "p95": 47,
+        "p99": 57.69999998807907,
+        "max": 95.39999997615814,
+        "zeros": 0,
+        "minPositive": 22.899999976158142
+      },
+      "fps": 26.767396313662253,
+      "update": {
+        "count": 805,
+        "sum": 521.2000008225441,
+        "mean": 0.6474534171708622,
+        "median": 0.5999999642372131,
+        "p95": 1.100000023841858,
+        "p99": 1.399999976158142,
+        "max": 4.400000035762787,
+        "zeros": 0,
+        "minPositive": 0.19999998807907104
+      },
+      "prune": {
+        "count": 0,
+        "sum": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "p99": null,
+        "max": null,
+        "zeros": 0,
+        "minPositive": null
+      },
+      "pruneMsPerUpdate": 0.0
+    },
+    {
+      "slot": "B3",
+      "mode": "plain",
+      "frames": {
+        "count": 803,
+        "sum": 30058.5,
+        "mean": 37.43275217932752,
+        "median": 36,
+        "p95": 46.90000003576279,
+        "p99": 61.5,
+        "max": 67.70000004768372,
+        "zeros": 0,
+        "minPositive": 29.30000001192093
+      },
+      "fps": 26.714573248831446
+    }
+  ],
+  "pairs": [
+    {
+      "pair": 1,
+      "mode": "profile",
+      "fpsDeltaBminusA": 0.09773283816116063,
+      "p95DeltaMsBminusA": -2.599999964237213,
+      "p99DeltaMsBminusA": 1.5,
+      "updateMeanDeltaMsBminusA": -0.12359857815606756,
+      "prunePerUpdateDeltaMsBminusA": -0.03542435345174642
+    },
+    {
+      "pair": 1,
+      "mode": "plain",
+      "fpsDeltaBminusA": -0.37952589147085547,
+      "p95DeltaMsBminusA": 0.19999998807907104,
+      "p99DeltaMsBminusA": -0.800000011920929
+    },
+    {
+      "pair": 2,
+      "mode": "profile",
+      "fpsDeltaBminusA": -0.6425031912632129,
+      "p95DeltaMsBminusA": 5.399999976158142,
+      "p99DeltaMsBminusA": 4.800000011920929,
+      "updateMeanDeltaMsBminusA": 0.018192199951007182,
+      "prunePerUpdateDeltaMsBminusA": -0.02292682921014181
+    },
+    {
+      "pair": 2,
+      "mode": "plain",
+      "fpsDeltaBminusA": -0.5025790987597958,
+      "p95DeltaMsBminusA": 5.399999976158142,
+      "p99DeltaMsBminusA": 0.9000000357627869
+    },
+    {
+      "pair": 3,
+      "mode": "profile",
+      "fpsDeltaBminusA": 0.0007120242520919362,
+      "p95DeltaMsBminusA": 1.9000000357627869,
+      "p99DeltaMsBminusA": -5.600000023841858,
+      "updateMeanDeltaMsBminusA": -0.04161490601782469,
+      "prunePerUpdateDeltaMsBminusA": -0.030683229576726877
+    },
+    {
+      "pair": 3,
+      "mode": "plain",
+      "fpsDeltaBminusA": 0.09791968502246107,
+      "p95DeltaMsBminusA": -0.09999996423721313,
+      "p99DeltaMsBminusA": -2.599999964237213
+    }
+  ],
+  "actualStartCount": 6,
+  "failedRecordsRetained": {
+    "A": 0,
+    "B": 0
+  },
+  "limits": [
+    "CPU/profile and plain FPS remain separate",
+    "Three pairs are not a robust significance test",
+    "Prune is nested in update; no addition of inclusive scopes",
+    "No gain verdict inferred from call counts",
+    "Camera/population tolerance gates are preserved from inspected producer validation"
+  ]
+}

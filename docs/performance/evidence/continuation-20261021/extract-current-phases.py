@@ -6,6 +6,7 @@ measurement or source-data modification occurs here.
 """
 from pathlib import Path
 import hashlib
+import gzip
 import json
 import sys
 
@@ -16,8 +17,10 @@ if not output.is_relative_to(owned) or output.exists():
 inputs, rows = [], []
 for variant, argument in zip(("A", "B"), sys.argv[1:3]):
     path = Path(argument).resolve()
-    raw = path.read_bytes()
-    inputs.append({"variant": variant, "path": str(path), "sha256": hashlib.sha256(raw).hexdigest()})
+    stored = path.read_bytes()
+    raw = gzip.decompress(stored) if path.suffix == ".gz" else stored
+    inputs.append({"variant": variant, "path": str(path), "sha256": hashlib.sha256(raw).hexdigest(),
+                   "storedSha256": hashlib.sha256(stored).hexdigest()})
     bundle = json.loads(raw)
     for record in bundle["acceptedRecords"]:
         data = record["receipt"]["raw"]
