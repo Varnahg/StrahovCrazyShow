@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-measurement-20261021",
+  "title": "KEY-22: explicitní QA ovládání a důkazy skutečné migrace bez změn zmrazených zdrojů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/performance/evidence/webgpu-completion-20261021/measurement/",
+    "docs/agents/handoffs/webgpu-completion-measurement-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Znovupoužít přijatý Vite build-only transform a přesnou identitu zdrojů/testů/assetů, helperů, transformů i bundle; původní snapshot zůstává neměnný.",
+    "Explicitní QA panel před skutečným Game.start zachová i neúspěšný startup, ukazuje jen whitelisted technické kopie a nemění readiness, timeout, scheduler ani renderer.",
+    "Plain měření skutečné plné hry s HUD, různými MP avatary, raw frame series a doloženými rozměry/backendem/health; diagnostické instrumentace jsou oddělené.",
+    "CLI nepoužívá automatizaci browseru, porty či procesy bez samostatné validační rezervace. Testy helperu ověří přesné transformy, odmítnutí driftu a zachování neúspěšných důkazů."
+  ],
+  "verification": [
+    "Lehké cílené node testy helperů uvnitř vlastního prefixu; žádný build/server/GPU běh v tomto tasku.",
+    "Předat kompletní soubory, konkrétní příkazy a důkazy; kořenový koordinátor vlastní build, porty a skutečnou GPU přejímku."
+  ],
+  "notes": [
+    "Dva nezměněné main preflighty mají 1Hz RAF a řízený light timeout; jejich výsledky nejsou výkonová přejímka. Pro první rozlišení stačí existující session recorder a profileEnvironment.",
+    "Nenahrazovat produkční renderer/simulaci, nezpřístupňovat Game/device do window, nepollovat mutující pipeline.isReady navíc a neodstraňovat světla, stíny nebo materiály pro lepší FPS.",
+    "Žádné zápisy do předchozího transit-calendar helperu ani jeho původní cache; nové výstupy spouští koordinátor pouze ve svém validačním scope."
+  ]
+}
