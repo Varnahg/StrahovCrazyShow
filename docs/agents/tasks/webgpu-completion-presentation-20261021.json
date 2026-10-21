@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-presentation-20261021",
+  "title": "KEY-22: oddělený diagnostický endpoint prezentace startupu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["docs/agents/handoffs/webgpu-completion-presentation-20261021.md"],
+  "resources": ["port:4212"],
+  "acceptance": [
+    "Zachovat původní neměnný baseline endpoint4211; CSS-only diagnostický derivát servírovat na samostatném4212.",
+    "Výstupy, GPU a heavy-validation vlastní současně kořenový validační task. Pro jeden skutečný GPU běh je aktivní právě jedna vlastní herní scéna.",
+    "Ověřit PID/start/path vlastního procesu, port a bundle SHA; ukončit pouze vlastní proces po předání."
+  ],
+  "verification": ["HTTP health/identity a konkrétní CSS/JS SHA; původní dist i jeho endpoint zůstávají nezměněné."],
+  "notes": ["Pouze lokální diagnostika příčiny1Hz RAF, nikoli konečná obrazová nebo výkonová přejímka."]
+}
