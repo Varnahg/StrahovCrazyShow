@@ -1,0 +1,147 @@
+diff --git "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v12\\common.mjs" "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v13\\common.mjs"
+index 10f6a77c..bd0d3e83 100644
+--- "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v12\\common.mjs"
++++ "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v13\\common.mjs"
+@@ -52,7 +52,7 @@ export async function directoryHashes(directory) {
+ }
+ export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs',
+   'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'weather-fixture.mjs', 'startup-latency.mjs',
+-  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'README.md'];
++  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'entry-routine-cost.mjs', 'entry-routine-cost.test.mjs', 'README.md'];
+ export function parseBuildOptions(args) {
+   const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false, bufferLifecycle:false, lifecycleControls: false };
+   let loadingSeen = false;
+diff --git "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v12\\harness.mjs" "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v13\\harness.mjs"
+index cbc73699..b8a270b7 100644
+--- "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v12\\harness.mjs"
++++ "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v13\\harness.mjs"
+@@ -147,6 +147,7 @@ export async function run(command, input, output, label, option = 'original', ..
+     const transitClock = await readFile(join(helperDirectory, 'transit-clock.mjs'), 'utf8');
+     const startupLatency = await readFile(join(helperDirectory, 'startup-latency.mjs'), 'utf8');
+     const lifecycleControls = await readFile(join(helperDirectory, 'lifecycle-controls.mjs'), 'utf8');
++    const entryRoutine = await readFile(join(helperDirectory, 'entry-routine-cost.mjs'), 'utf8');
+     const entryRender = await readFile(join(helperDirectory, 'entry-render-cost.mjs'), 'utf8');
+     const entryClasses = 'export { Game } from ' + JSON.stringify(join(snapshot, 'client/game.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { Scene } from "@babylonjs/core/scene.js";export { GltfLightBudget } from ' + JSON.stringify(join(snapshot, 'client/gltf-light-budget.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { StableLightState } from ' + JSON.stringify(join(snapshot, 'client/stable-light-state.ts').replaceAll(String.fromCharCode(92), '/')) + ';';
+     const routineCore = await readFile(join(helperDirectory, 'routine-cost-core.mjs'), 'utf8');
+@@ -188,6 +189,7 @@ export async function run(command, input, output, label, option = 'original', ..
+       build: { outDir: join(directory, 'dist'), emptyOutDir: false, copyPublicDir: false, sourcemap: true },
+       plugins: [{ name: 'explicit-webgpu-completion-qa', enforce: 'pre',
+         resolveId(id) {
++          if (id === 'virtual:webgpu-completion-entry-routine') return '\0virtual:webgpu-completion-entry-routine';
+           if (id === 'virtual:webgpu-completion-entry-render') return '\0virtual:webgpu-completion-entry-render';
+           if (id === 'virtual:webgpu-completion-entry-classes') return '\0virtual:webgpu-completion-entry-classes';
+           if (id === 'virtual:webgpu-completion-qa') return virtual;
+@@ -206,6 +208,7 @@ export async function run(command, input, output, label, option = 'original', ..
+           if (id === 'virtual:webgpu-completion-simulation') return join(snapshot, 'shared/simulation.ts').replaceAll('\\', '/');
+         },
+         load(id) {
++          if (id === '\0virtual:webgpu-completion-entry-routine') return entryRoutine;
+           if (id === '\0virtual:webgpu-completion-entry-render') return entryRender;
+           if (id === '\0virtual:webgpu-completion-entry-classes') return entryClasses;
+           if (id === virtual) return overlay;
+diff --git "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v12\\qa-overlay.mjs" "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v13\\qa-overlay.mjs"
+index 89840fdb..19f02c5f 100644
+--- "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v12\\qa-overlay.mjs"
++++ "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v13\\qa-overlay.mjs"
+@@ -6,6 +6,7 @@ import { observeStartupLatency } from 'virtual:webgpu-completion-startup-latency
+ import { createShaderAttributionWindow, projectShaderInventory } from 'virtual:webgpu-completion-shader-attribution';
+ import { captureRoutineCost } from 'virtual:webgpu-completion-routine-cost';
+ import { captureEntryRenderCost } from 'virtual:webgpu-completion-entry-render';
++import { captureEntryRoutineCost } from 'virtual:webgpu-completion-entry-routine';
+ import { Game, Scene, GltfLightBudget, StableLightState } from 'virtual:webgpu-completion-entry-classes';
+ import { observeBufferLifecycle } from 'virtual:webgpu-completion-buffer-lifecycle';
+ import { createLifecycleControls, createVisibilityAnchor } from 'virtual:webgpu-completion-lifecycle-controls';
+@@ -141,7 +142,7 @@ export async function observeStartup(game, canvas, start) {
+   download.style.cssText = 'display:block;color:#b8e5ff'; download.hidden = true;
+   controls.append(disclosure, status, download); panel.append(title, controls, output); document.body.append(panel);
+   let gameRef = game, startupTimer, sampleOverflow = false, busy = false, disposed = false, downloadURL, interruptBenchmark;
+-  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, preparationOwner, attributionWindow, routineOwner, entryOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
++  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, preparationOwner, attributionWindow, routineOwner, entryOwner, entryRoutineOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
+   const clockAbort = new AbortController();
+   const samples = [], observerErrors = [], buttons = [];
+   const ownerId = crypto.randomUUID();
+@@ -338,6 +339,28 @@ export async function observeStartup(game, canvas, start) {
+       await persist(raw);
+     });
+   }
++  if (identity.routineCost) {
++    const routineExpected = { classes: { Game, Scene, GltfLightBudget, StableLightState }, methods: {
++      prepareFrame: GltfLightBudget.prototype.prepareFrame, render: Scene.prototype.render } };
++    action('Diagnostic · první vstup do auta /8 framů /8 CPU rutin', async () => {
++      controls.open = false;
++      const raw = { ...envelope('routine-cost'), completed: false, before: snapshot(), after: null, routineProfile: null, entryTrigger: null, validationErrors: [],
++        scope: 'Restore one prepare waiter at first observed accepted vehicle transition, then original8 routine capture. Coldness requires fresh Game/session. Diagnostic wall costs, never FPS/GPU.' };
++      try {
++        entryRoutineOwner = captureEntryRoutineCost(gameRef, { enabled: identity.routineCost, expected: routineExpected,
++          startCapture: captureRoutineCost, signal: clockAbort.signal, isCurrent: () => !disposed && gameRef === game });
++        const result = await entryRoutineOwner.done;
++        raw.entryTrigger = result.entryTrigger; raw.routineProfile = result.routineProfile; raw.completed = result.entryTrigger.complete;
++        if (!raw.completed) raw.validationErrors.push('Entry routine incomplete: ' + result.entryTrigger.reason);
++      } catch (error) { raw.failure = errorText(error); raw.validationErrors.push(raw.failure.message); }
++      finally {
++        entryRoutineOwner?.dispose(); const result = entryRoutineOwner?.snapshot();
++        raw.entryTrigger ??= result?.entryTrigger ?? null; raw.routineProfile ??= result?.routineProfile ?? null; entryRoutineOwner = undefined;
++        raw.after = snapshot(); raw.observerErrors = [...observerErrors];
++      }
++      await persist(raw);
++    });
++  }
+   if (identity.clock?.config.benchmarkAtUTC !== undefined) action('Naplánovat jediný 10s benchmark UTC', async () => {
+     const armedBefore = snapshot(), config = identity.clock.config;
+     const invalid = plan => persist({ ...envelope('benchmark'), completed: false, plannedStart: plan,
+@@ -394,7 +417,7 @@ export async function observeStartup(game, canvas, start) {
+     if (!clockAbort.signal.aborted) {
+       const abort = new Error('Clock QA owner stopped'); abort.name = 'AbortError'; clockAbort.abort(abort);
+     }
+-    attributionWindow?.dispose(); clockOwner?.dispose(); latencyOwner?.dispose(); routineOwner?.dispose('owner-stopped'); entryOwner?.dispose('owner-stopped');bufferOwner?.dispose('owner-stopped');
++    attributionWindow?.dispose(); clockOwner?.dispose(); latencyOwner?.dispose(); routineOwner?.dispose('owner-stopped'); entryOwner?.dispose('owner-stopped'); entryRoutineOwner?.dispose('owner-stopped');bufferOwner?.dispose('owner-stopped');
+     lifecycleOwner?.dispose(); preparationOwner?.dispose();
+     unsubscribeTransfers(); buttons.forEach(button => button.disabled = true); gameRef = undefined;
+   };
+diff --git "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v12\\receipt.mjs" "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v13\\receipt.mjs"
+index cdd29416..779dcbd3 100644
+--- "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v12\\receipt.mjs"
++++ "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v13\\receipt.mjs"
+@@ -4,6 +4,7 @@ import { join } from 'node:path';
+ import { sha256 } from './common.mjs';
+ import { validateRoutineProfile } from './routine-cost-core.mjs';
+ import { validateEntryRenderProfile } from './entry-render-cost.mjs';
++import { validateEntryTrigger } from './entry-routine-cost.mjs';
+ import { validateBufferTrace } from './buffer-lifecycle-core.mjs';
+ 
+ export const MAX_RECEIPT_BYTES = 2 * 1024 * 1024;
+@@ -15,6 +16,7 @@ export function validateReceipt(value, identity) {
+       !['plain', 'diagnostic'].includes(value.mode)) throw new Error('Receipt identity/schema mismatch');
+   if (typeof identity.lifecycleControls !== 'boolean' || value.lifecycleControls !== identity.lifecycleControls ||
+       (identity.lifecycleControls && value.mode !== 'diagnostic')) throw new Error('Receipt lifecycle-controls identity mismatch');
++  if (value.entryTrigger !== undefined && value.kind !== 'routine-cost') throw new Error('Entry trigger kind mismatch');
+   if (value.lifecycleControl !== undefined) {
+     const control = value.lifecycleControl;
+     if (!identity.lifecycleControls || value.kind !== 'state' || !control ||
+@@ -46,6 +48,14 @@ export function validateReceipt(value, identity) {
+         !Array.isArray(value.validationErrors) || typeof value.completed !== 'boolean') throw new Error('Routine diagnostic identity/evidence missing');
+     if (value.routineProfile) validateRoutineProfile(value.routineProfile);
+     if (value.completed && value.routineProfile?.complete !== true) throw new Error('Routine completion missing');
++    if (value.entryTrigger !== undefined) {
++      if (value.entryTrigger === null) {
++        if (value.completed || !value.failure || !value.validationErrors.length) throw new Error('Entry trigger refusal missing');
++      } else {
++        validateEntryTrigger(value.entryTrigger, value.routineProfile);
++        if (value.completed !== value.entryTrigger.complete) throw new Error('Entry trigger completion differs');
++      }
++    }
+   }
+   if (value.kind === 'benchmark') {
+     if (!Array.isArray(value.rawGameFrameMs) || !Array.isArray(value.rawRafFrameMs) ||
+diff --git "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v12\\README.md" "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v13\\README.md"
+index 4d7188a3..35d5fdc1 100644
+--- "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v12\\README.md"
++++ "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v13\\README.md"
+@@ -1,3 +1,7 @@
++# V13 accepted-entry original8 routine diagnostic
++
++Separate button under existing --routine-cost installs one own Gltf.prepareFrame waiter. At accepted Actor false-to-true it restores the exact waiter descriptor before synchronously starting the original captureRoutineCost, then calls original prepare once. One arm-time30s deadline covers standby+8 frames including a post-done synchronous check. Original3scope and8routine modules/buttons are byte-exact; they are never generally layered. New optional scalar entryTrigger in existing routine-cost receipt records arm/deadline/trigger/install/terminal times and SceneID correlation; install time is not Scene start. Original routineProfile remains truthful even when its eight frames complete after the outer deadline. Invalid/refused/aborted/foreign/error attempts remain evidence. Coldness needs fresh Game/original session, and profiling includes observer/JIT overhead, not FPS/GPU execution. Existing lifecycle-controls behavior is unchanged. New entry-routine-helper evidence contains primary research, hashes, tests and handoff; root alone builds/runs actual capture.
++
+ # V12 correction
+ 
+ Same-index nested recursion under Scene is incomplete phase-error evidence; original calls/return/falsy throws still pass through once. Legitimate first nested prepare/stable remain supported. V11 emitted false complete for five recursive2ms bodies (nested30 vsScene18) and was never built forGPU. The immutable old v11 donor replacement covered SHA+two middle orders only; its equivalence wording was too broad. This v12 fixture adds version9.30.0, all8 selected own-method descriptors and all4 ordering checks. Other29 helper inputs are byte-exact. New reentry-correction evidence retains originalRED and exact byte hashes; no runtime/Game/GPU/performance claim follows.
