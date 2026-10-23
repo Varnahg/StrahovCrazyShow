@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-car-preparation-20261023",
+  "title": "KEY-22: úplná native příprava auta v aktuálním startup/view lifecycle",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/game.ts",
+    "client/light-preparation.ts",
+    "client/render-quality-preparation.ts",
+    "tests/game-authored-light-preparation.test.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/game-low-vehicle-preparation.test.ts",
+    "tests/game-quality-preparation.test.ts",
+    "tests/render-quality-preparation.test.ts",
+    "docs/performance/evidence/webgpu-completion-20261021/car-preparation/",
+    ".cache/webgpu-completion-car-preparation-20261023/",
+    "docs/agents/handoffs/webgpu-completion-car-preparation-20261023.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před implementací zapsat source8 actual375ms firstcarentry/CPU364.8/render317.2/LoAF374.1 důkaz, hypotézy a chybějící attribution. Root-origin0 hypotéza je vyvrácená: skutečný assetdriving+parked máCAR_SPAWN110,16. Nedělat z cumulative11programů přímou atribuci všechentryshaderů.",
+    "Projít celou současnou prepareAllRenderQualities→prepareLightingVariants→prepareLightVariants→authored selection→VehicleLighting/camera/world/street/revision/restore chain a current startup-view2c3a+PCF1b2a. Porovnat všechny rozumné varianty: allquality0/1/2, selectedqualityonly/restart, lazyentrygate, shadowgeneratorcache, NCMswitch a actualvehicleview coverage. Vybrat nejmenší doložené řešení, náklady/timeouts/cache/lifecycle/vzhled výslovně.",
+    "Starší copied candidate medium-vehicle-qa/helper je předaný readonly input s152CPU a nepřijatou GPU performance, nikoli kód k hromadnému převzetí. Root autorizuje přesný port a refaktor do současných3runtime souborů, pokud aktuální reprodukce potvrdí coverage gap. Zachovat nové startup authority-foot/submitted-frame anchor a všechny původní30/90s budgety, async readiness, ownership, no physics/input/network changes.",
+    "Native actualVehicleLighting Medium256/High512/zero-one-two mapped POINT a SHADOW/SPOT varianty připravit před hraním včetně pravdivého requested-quality restoration/tail pokud nutné; Low redundancy a WebGL původní9stages zachovat/doložit. Nepřidávat nové proxy lights, generátor/Effect cache, timer/fence nebo prodloužené limity. Nedělat nedoložené camera/actor změny.",
+    "Meaningful actual Game/helper/VehicleLighting/Scene/ShadowGenerator CPU RED→GREEN a lifecycle/revision/late quality/retiredroots/originalerror testy; nové testy do přesných5fixturefiles, další soubor nejdřív dohodnout. Oldcopied original logy neměnit. Same stable source SHA, own manifest, refaktor a relevantní lehké ověření společně; actual GPU stále root acceptance.",
+    "Pouze vlastní writePaths a vlastní cache tooling, nainstalované/frozen trees/helper/v7/v6/assets/package/lock/patch beze změny. Přenosné testy nesmí mít environment bypass. Rootoldinstalled deps nesmí změnit; pro scoped CPU lze explicitní cache-only loader na readonly fresh source8/source7 native package. Žádné install/fullsuite/build/GPU/server/commit ani rekurzivní BMAD."
+  ],
+  "verification": [
+    "Current nativeMedium/High missingvehicle RED, real shadows256/512 and meaningful twoPOINT, same requestedfinalmap/Effect reuse no phantom stages; WebGL9 unchanged, Lowclamp truthful.",
+    "Cílené actual Game/light/quality/author/vehicle tests a current startup/view regression relevance; source/installed pins beforeafter immutable, exact owned manifest and scopedTS. Root pořídí nový reviewed commit/frozen source/fullchecks/actual firstentry/frame hitches+shader evidence před main."
+  ],
+  "notes": [
+    "Explicitní pokračování uživatelského KEY22; rootcoordinator ownvalidation heavy/GPU/ports. Current worktree .cache/player-feedback-20261020 HEADdae5cf70, source8 frozen921f57b9; root dělá diagnostiku proti tomuto immutable inputu, ne HMR."
+  ]
+}
