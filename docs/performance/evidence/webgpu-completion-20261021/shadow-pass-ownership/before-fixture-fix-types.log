@@ -1,0 +1,25 @@
+[96mtests/game-leaf-shadow-preparation.test.ts[0m:[93m53[0m:[93m41[0m - [91merror[0m[90m TS2683: [0m'this' implicitly has type 'any' because it does not have a type annotation.
+
+[7m53[0m     const texture = new InternalTexture(this, InternalTextureSource.DepthStencil);
+[7m  [0m [91m                                        ~~~~[0m
+[96mtests/game-leaf-shadow-preparation.test.ts[0m:[93m112[0m:[93m71[0m - [91merror[0m[90m TS2683: [0m'this' implicitly has type 'any' because it does not have a type annotation.
+
+[7m112[0m     const effect = Reflect.apply(WebGPUEngine.prototype.createEffect, this, args);
+[7m   [0m [91m                                                                      ~~~~[0m
+[96mtests/game-leaf-shadow-preparation.test.ts[0m:[93m131[0m:[93m43[0m - [91merror[0m[90m TS2322: [0mType 'string' is not assignable to type '"medium" | "high"'.
+
+[7m131[0m     applyRenderQuality(quality: string) { this.quality = quality; currentQuality = quality; }, updateWorldPresentation() {}, updateCameraFollow() {},
+[7m   [0m [91m                                          ~~~~~~~~~~~~[0m
+[96mtests/game-leaf-shadow-preparation.test.ts[0m:[93m141[0m:[93m105[0m - [91merror[0m[90m TS2339: [0mProperty 'filter' does not exist on type 'IShadowGenerator'.
+
+[7m141[0m     if (beam.light.isEnabled() && game.quality !== "low") assert.equal(beam.light.getShadowGenerator()!.filter, 6, "actual PCF path must not downgrade to NullEngine Poisson");
+[7m   [0m [91m                                                                                                        ~~~~~~[0m
+[96mtests/webgpu-shadow-pass-ownership.test.ts[0m:[93m26[0m:[93m41[0m - [91merror[0m[90m TS2683: [0m'this' implicitly has type 'any' because it does not have a type annotation.
+
+[7m26[0m     const texture = new InternalTexture(this, InternalTextureSource.DepthStencil);
+[7m  [0m [91m                                        ~~~~[0m
+
+  [96mtests/webgpu-shadow-pass-ownership.test.ts[0m:[93m25[0m:[93m38[0m
+    [7m25[0m   engine.createDepthStencilTexture = function (size: any, options: any) {
+    [7m  [0m [96m                                     ~~~~~~~~[0m
+    An outer value of 'this' is shadowed by this container.

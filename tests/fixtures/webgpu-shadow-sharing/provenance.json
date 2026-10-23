@@ -1,10 +1,13 @@
 {
   "package": "@babylonjs/core",
   "version": "9.30.0",
-  "source": "webgpu-shadow-share-helper-20261019",
+  "source": "webgpu-completion-shadow-pass-ownership-20261023",
+  "predecessor": "webgpu-shadow-share-helper-20261019",
   "helperManifestSha256": "2fca0004c5dc5ec9186a419f695c646af7f00e21db2e7359e4143e893382e657",
   "originalModuleSha256": "bd2bfe313728751f375d613492e7210adb09733556dcb8e6f2d8e720b55f122c",
-  "acceptedModuleSha256": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
-  "scope": "Nineteen unchanged CPU assertions from the reviewed helper. Fixture resolves actual installed modules without an overlay. Uses actual pinned WebGPU engine cache/refcount methods on a NullEngine substrate and real draw/material contexts. Not a GPU, WGSL compiler, image or frame-time proof.",
-  "transfer": "fixture.mjs and shadow-share.test.mjs are exact reviewed helper bytes. Only loader.mjs is replaced with portable import.meta.resolve; the top-level TypeScript wrapper registers the existing tests."
+  "previousAcceptedModuleSha256": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+  "acceptedModuleSha256": "5494233c8746aba81081f03981e8f957330d83aedd6c36c2d9b4ee36a3511761",
+  "scope": "Nineteen predecessor CPU cases plus fourteen per-pass ownership/lifecycle cases. Fixture resolves installed modules without overlays. Uses actual pinned WebGPU cache/acquire/refcount and draw/material contexts on a NullEngine substrate. Actual ObjectRenderer/ShadowGenerator constructors and RTT retirement are covered. Not a GPU, WGSL compiler, image or frame-time proof.",
+  "transfer": "Portable loader stays byte-exact. Existing fixture notify may explicitly select and restore a pass; the predecessor two-generator case now notifies that pass instead of relying on a global-base fallback. No old assertion is removed. New pass-ownership.test.mjs is registered by the TypeScript wrapper.",
+  "metadata": "Provenance only; no test/runtime imports this JSON. Updated after the stable 201-case CPU run; runtime and executed test bytes remain identical."
 }

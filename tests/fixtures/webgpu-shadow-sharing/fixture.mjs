@@ -17,7 +17,7 @@ export async function fixture({gpu=true,options={doNotInjectCode:true}}={}){
  const original=await base(),material=new ShaderMaterial('owned base',scene,{vertexSource:vertex,fragmentSource:fragment},{attributes:['position'],uniforms:['world']});
  const wrappers=[];function wrapper(opts=options){const w=new ShadowDepthWrapper(material,scene,opts);wrappers.push(w);return w;}
  const meshes=[];function mesh(effect=original){const m=MeshBuilder.CreateBox('receiver-'+meshes.length,{},scene);m.material=material;meshes.push(m);const sub=m.subMeshes[0];material.onEffectCreatedObservable.notifyObservers({effect,subMesh:sub});return{mesh:m,sub};}
- function notify(sub,effect){material.onEffectCreatedObservable.notifyObservers({effect,subMesh:sub});}
+ function notify(sub,effect,pass=engine.currentRenderPassId){const previous=engine.currentRenderPassId;try{engine.currentRenderPassId=pass;material.onEffectCreatedObservable.notifyObservers({effect,subMesh:sub});}finally{engine.currentRenderPassId=previous;}}
  const generator={label:'opaque generator identity'},depth=['#define SM_LIGHTTYPE_SPOTLIGHT'];
  function dispose(){for(const w of wrappers)w.dispose();for(const m of meshes)m.dispose();for(const e of new Set(Object.values(engine._compiledEffects)))e.dispose(true);scene.dispose();engine.dispose();}
  return{engine,scene,material,original,wrapper,mesh,notify,base,generator,depth,creates,contexts,dispose};

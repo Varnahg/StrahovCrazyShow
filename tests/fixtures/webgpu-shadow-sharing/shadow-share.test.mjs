@@ -46,7 +46,7 @@ test('complete source and ordered ABI/index parameters isolate actual engine pro
 
 test('generator entries share only within the wrapper; distinct wrapper and original Effect identities remain isolated',async t=>{
  const f=await fixture();t.after(f.dispose);const w=f.wrapper(),other=f.wrapper(),a=f.mesh();
- const first=await ready(w._makeEffect(a.sub,f.depth,f.generator,0));const secondGenerator={};assert.equal(await ready(w._makeEffect(a.sub,f.depth,secondGenerator,2)),first);assert.equal(first._refCount,2);
+ const first=await ready(w._makeEffect(a.sub,f.depth,f.generator,0));const secondGenerator={};f.notify(a.sub,f.original,2);assert.equal(await ready(w._makeEffect(a.sub,f.depth,secondGenerator,2)),first);assert.equal(first._refCount,2);
  const separate=await ready(other._makeEffect(a.sub,f.depth,f.generator,0));assert.notEqual(separate,first);w._deleteDepthWrapperEffect(a.sub);assert.equal(first.isDisposed,true);assert.equal(separate.isDisposed,false);
 });
 
