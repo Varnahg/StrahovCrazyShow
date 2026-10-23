@@ -1,0 +1,105 @@
+TAP version 13
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# Subtest: donor nested timing preserves receiver/return/false/throw/Promise with selected-only self
+ok 1 - donor nested timing preserves receiver/return/false/throw/Promise with selected-only self
+  ---
+  duration_ms: 3.2958
+  type: 'test'
+  ...
+# Subtest: foreign receiver bypasses all clocks/phase checks, stale disposal and faulty clocks preserve primary result
+ok 2 - foreign receiver bypasses all clocks/phase checks, stale disposal and faulty clocks preserve primary result
+  ---
+  duration_ms: 0.4698
+  type: 'test'
+  ...
+# Subtest: transaction bounds/unsupported descriptors/ownership and foreign descriptor restoration
+ok 3 - transaction bounds/unsupported descriptors/ownership and foreign descriptor restoration
+  ---
+  duration_ms: 0.4629
+  type: 'test'
+  ...
+# Subtest: stack32 and call budgets are bounded, explicit and do not suppress original calls
+ok 4 - stack32 and call budgets are bounded, explicit and do not suppress original calls
+  ---
+  duration_ms: 13.5284
+  type: 'test'
+  ...
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# BJS - [22:54:40]: Babylon.js v9.30.0 - Null engine
+# Subtest: defaultoff touches no game/descriptor and actual scene captures exactly8 native frames then restores
+ok 5 - defaultoff touches no game/descriptor and actual scene captures exactly8 native frames then restores
+  ---
+  duration_ms: 341.1907
+  type: 'test'
+  ...
+# Subtest: actual native material readiness false early return is timed without retry/readiness injection
+ok 6 - actual native material readiness false early return is timed without retry/readiness injection
+  ---
+  duration_ms: 11.1856
+  type: 'test'
+  ...
+# Subtest: actual pinned PBR synchronous readiness throw keeps original Error and records failed frame without retries
+ok 7 - actual pinned PBR synchronous readiness throw keeps original Error and records failed frame without retries
+  ---
+  duration_ms: 9.3336
+  type: 'test'
+  ...
+# Subtest: partial defineProperty failure rolls back transaction, hardened foreign flags are retained
+ok 8 - partial defineProperty failure rolls back transaction, hardened foreign flags are retained
+  ---
+  duration_ms: 0.4515
+  type: 'test'
+  ...
+# Subtest: dispose and fresh owner inside original call cannot clock or mutate new frame generation
+ok 9 - dispose and fresh owner inside original call cannot clock or mutate new frame generation
+  ---
+  duration_ms: 0.42
+  type: 'test'
+  ...
+# Subtest: actual receiver filtering excludes a second scene sharing native prototypes
+ok 10 - actual receiver filtering excludes a second scene sharing native prototypes
+  ---
+  duration_ms: 26.7956
+  type: 'test'
+  ...
+# Subtest: actual ObjectRenderer public phase scopes distinguish RTT/active/main/other and detect unbalanced bounds
+ok 11 - actual ObjectRenderer public phase scopes distinguish RTT/active/main/other and detect unbalanced bounds
+  ---
+  duration_ms: 18.7566
+  type: 'test'
+  ...
+# Subtest: original render throw, scene dispose, abort, retirement and rejoin retain failed evidence and restore ownership
+ok 12 - original render throw, scene dispose, abort, retirement and rejoin retain failed evidence and restore ownership
+  ---
+  duration_ms: 20.9488
+  type: 'test'
+  ...
+# Subtest: foreign render/prototype replacement survives cleanup and marks evidence incomplete
+ok 13 - foreign render/prototype replacement survives cleanup and marks evidence incomplete
+  ---
+  duration_ms: 2.3754
+  type: 'test'
+  ...
+# Subtest: new flag is defaultoff, strict explicit CLI, canonical/sealed/browser identity and receipt bounds
+ok 14 - new flag is defaultoff, strict explicit CLI, canonical/sealed/browser identity and receipt bounds
+  ---
+  duration_ms: 2.9507
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1739.2298

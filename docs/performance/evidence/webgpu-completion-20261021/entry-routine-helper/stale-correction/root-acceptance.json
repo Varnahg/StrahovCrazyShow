@@ -1,0 +1,29 @@
+{
+  "atUTC": "2026-10-23T20:59:00.636Z",
+  "decision": "Accepted bounded QA CPU/source deliverable; actual browser capture and parentKEY22/main acceptance remain pending",
+  "helperSha256": "38479a98cbd4dd7fbccd7c03942c78435a6a99700d88c44ff743f1e820a1b702",
+  "authorManifestSha256": "aee9dd687d45c8eee25398a6fd6d24b6b0e73198d0fae0325655b0c4863014f7",
+  "rootVerifiedFiles": 54,
+  "reconstructedSourceFiles": 34,
+  "independentReviews": [
+    {
+      "reviewer": "webgpu_renderer_audit",
+      "findings": [],
+      "closed": "P2 retained waiter after handoff"
+    },
+    {
+      "reviewer": "webgpu_editor_audit",
+      "findings": [],
+      "scope": "source/lifecycle/coverage/final seals"
+    }
+  ],
+  "cpu": {
+    "pass": 166,
+    "fail": 0,
+    "explicitFixed32MetadataSkip": 1,
+    "new34MetadataBridge": true,
+    "syntaxModules": 33,
+    "uiParseErrors": 0
+  },
+  "scope": "Waiting-phase passthrough only; original source12/product/native and v13 failure evidence unchanged. No GPU/FPS/Scene optimization claim from CPU."
+}
