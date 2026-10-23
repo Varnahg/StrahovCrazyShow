@@ -1,0 +1,33 @@
+{
+  "atUTC": "2026-10-23T23:28:08.192Z",
+  "decision": "Accepted bounded QA CPU/source deliverable; actual B6 first-F caller/slot capture and KEY22/main acceptance remain pending",
+  "helperSha256": "02afa252ae635b189f6a743f9977e27a012fc1d0662729a306ae613082aa19d1",
+  "authorManifestSha256": "9c5814edf532c755ea353e372d209da5e329093a79e94dfd582ae6eac80dfe2a",
+  "rootVerifiedFiles": 70,
+  "reconstructedSourceFiles": 36,
+  "independentReviews": [
+    {
+      "reviewer": "webgpu_editor_audit",
+      "findings": [],
+      "closed": "Material registration versus liveness, cached PBR deadline, collected weak identities"
+    },
+    {
+      "reviewer": "webgpu_renderer_audit",
+      "findings": [],
+      "scope": "Exact PBR caller and existing local shadow-pass context associations, native AssetContainer and descriptor lifecycle"
+    }
+  ],
+  "cpu": {
+    "pass": 230,
+    "fail": 0,
+    "tapSkipped": 0,
+    "explicitMetadataExclusions": 2,
+    "currentPipelineContracts": 65,
+    "syntaxModules": 35,
+    "uiParseErrors": 0,
+    "nativeStable": 677,
+    "immutableStable": 335,
+    "protectedStable": 13
+  },
+  "scope": "Original compiler inputs plus positive exact PBR caller and scoped local shadow-slot links, no raw names/shader/key, draw proof or exhaustive owners. Completion covers bounded window/hash/settlement, selectedDefines is not a complete semantic projection. Four sequential30s bounded windows; existing routineCost flag/defaultoff. No actual browser/GPU/FPS claim from CPU."
+}
