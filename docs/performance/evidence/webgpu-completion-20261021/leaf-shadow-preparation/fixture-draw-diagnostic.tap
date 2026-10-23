@@ -1,0 +1,57 @@
+TAP version 13
+# BJS - [18:56:06]: Babylon.js v9.30.0 - Null engine
+# BJS - [18:56:07]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game medium complete preparation retains leaf car shadow programs through restore and first visibility
+not ok 1 - actual Game medium complete preparation retains leaf car shadow programs through restore and first visibility
+  ---
+  duration_ms: 964.7204
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:7320'
+  failureType: 'testCodeFailure'
+  error: 'the actual in-frustum car caster, not only its far duplicate, must draw during loading'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:162:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# {"scope":"native Effect/cache identities with terminal GLSL IO, not GPU program timing","before":42,"after":42,"delta":0,"preBase":[7,7],"postMain":7,"vehicleDraws":0,"afterFrames":[{"stage":"restore","quality":"medium","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"medium","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"medium","actualDrawn":true,"actualForced":false,"farForced":false}]}
+# BJS - [18:56:08]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game high complete preparation retains leaf car shadow programs through restore and first visibility
+not ok 2 - actual Game high complete preparation retains leaf car shadow programs through restore and first visibility
+  ---
+  duration_ms: 409.5125
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:7320'
+  failureType: 'testCodeFailure'
+  error: 'the actual in-frustum car caster, not only its far duplicate, must draw during loading'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:162:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# {"scope":"native Effect/cache identities with terminal GLSL IO, not GPU program timing","before":35,"after":35,"delta":0,"preBase":[49,13],"postMain":49,"vehicleDraws":0,"afterFrames":[{"stage":"restore","quality":"high","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"high","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"high","actualDrawn":true,"actualForced":false,"farForced":false}]}
+# Subtest: async leaf arrival in the last vehicle stage is reacquired by the original Game revision/apply path
+ok 3 - async leaf arrival in the last vehicle stage is reacquired by the original Game revision/apply path
+  ---
+  duration_ms: 174.1594
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 1
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4696.5107

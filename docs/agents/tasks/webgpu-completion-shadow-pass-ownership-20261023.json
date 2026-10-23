@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-shadow-pass-ownership-20261023",
+  "title": "KEY-22: skutečné per-pass vlastnictví WebGPU shadow base a derived efektů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/webgpu-shadow-pass-ownership.test.ts",
+    "tests/game-leaf-shadow-preparation.test.ts",
+    "tests/webgpu-shadow-sharing.test.ts",
+    "tests/fixtures/webgpu-shadow-sharing/",
+    "docs/performance/evidence/webgpu-completion-20261021/shadow-pass-ownership/",
+    ".cache/webgpu-shadow-pass-ownership-20261023/",
+    "docs/agents/handoffs/webgpu-completion-shadow-pass-ownership-20261023.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejdřív předcode zapsat výzkum actual source10 shadow13 DEPTH/main2 nonDEPTH ready epochs, původní native witness a validní whole-chain RED i odmítnutý leaf selection-only candidate. Exact release callback fullchain zatím není zachycený; neprezentovat odvozenou hypotézu jako naměřený trace. Primární pinned native PBR/ShadowDepthWrapper/Effect/SubMesh/Engine release source a varianty jsou nutné.",
+    "Root vybírá minimální native WebGPU-only per-pass canonical NOTIFIED base ownership a provenance depth entries. Main pass notification nesmí invalidovat připravenou shadow pass entry. StejnýEffect v jiném passu musí být evidovaný, cache readiness bez notification zůstane správná. Nepřebírat installed drawWrapper jako canonical při hot-swap pending novémEffectu. Fresh caller/layout/colorWrite guard, hotswap flags, shader code, tokentuple/exact-sharing a legacy WebGL chování zůstávají.",
+    "Explicitní same/different baseEffect ve více passech a generator/RTT aliasech. Canonical base je pouze borrowed reference; nereferencovat/neDisposeovat jako nový owner. Každá derivedentry vlastní1createEffect acquire; alias drawcontexts release jednou bez extraEffectref. Dvě různéentry se stejným sdílenýmEffectem mají stále2acquire/release. Invalidace změněného base/passu nesmí poškodit nezávislou entry nebo scénu.",
+    "Použít existující _onReleaseRenderPassObservable nativním způsobem, odstranit svůj observer při dispose; pass release vyčistí příslušné borrowedbase/ownedentry/aliascontexts bez nové Engine hook implementace. Mesh/wrapper disposal idempotentní a úplné. Reentrant create callback notify/passrelease/dispose nesmí instalovat staleEffect nebo leaknout acquiredref. Ready/disposed/pending guard zachovat.",
+    "Native patch jen Materials/shadowDepthWrapper.js a nutné vlastní private deklarace .d.ts. Žádné installed/frozen/root node_modules writes. Baseline číst/kopírovat z readonly freshsource7 (source10 na něj odkazuje), všechny ostatní současné nativepatchsekce byteexact; lock pouze hashref této změny s inverse proof. Izolovaný native overlay pouze v owncache pro lightCPU RED/GREEN, root provede novýfreshinstall až po review.",
+    "Dva nové předané tests jsou původní doložený leaf WIP; adopt-dirty pouze s handoff. Zachovat skutečný PBR/configureTree/TreeWind/Fresh/PCF6/actual WebGPU color getter/nativeEffect a wholeGame57/76stage restore→firstvisibility coverage včetně delayed leaf. Selection-only forcing assertions nahradit relevantním cache ownership kontraktem až po explicitním vysvětlení změněného řešení; zero-newEffects neoslabit. Původní fails a exactinputs zůstanou public leaf evidence.",
+    "Portable installed-native default tests nesmějí vyžadovat overlay/env. Relevantní staré sharing/freshness/PCF/quality tests + scopedTS, actual module hashes, reverse/forward patch a lock inverse, protected inputs before/after, cílený refaktoring a ownmanifest/handoff společně. Žádný fullsuite/install/build/server/GPU/commit/rekurzivníBMAD. Pokud minimální oprava nestačí, před další API/path/scope změnou stop a předat rootovi. Root vlastní praktickou novou source11 přejímku a integraci."
+  ],
+  "verification": [
+    "Actual native Effect/cache RED→GREEN, main/shadow epochs, pending/hot-swap/disposed, multi-pass/generator aliases, passrelease/mesh/wrapper cleanup, reentrancy and exact refcounts; wholeGame High57/Medium76+late leaf no newEffect after ready. GL branch/read-only pins unchanged.",
+    "Lehké cílené CPU/TS nad vlastní nativecopy; portabletest paths, raw output a před/po SHA. Full build/GPU/performance není tímto CPU důkazem nahrazen."
+  ],
+  "notes": [
+    "Explicitní rootdelegace pokračování uživatelského KEY22. Source10 8e7d6661/cf725594, patch e82638ea, lock8e6b4519; source7 freshMesh7ceb readonly. Root installedMesh e9dd je starý a nesmí být základem reverse ani změněn. Native API/patch rozsah koordinátorem výslovně povolen výše.",
+    "Leaf selection failed WIP handoff root rollback → nový příjemce pouze dva testy. AuthoredLightPreparation je obnovené committed baseline a readonly. Root právě validuje v10 helper/source10 editor/summary v izolovaném4213/2597, proto žádný souběžný GPU/heavy/install."
+  ]
+}
