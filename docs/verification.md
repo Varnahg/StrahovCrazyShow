@@ -16,6 +16,8 @@ Skutečný no-query WebGPU multiplayer Mia/Medium/2040×986 dokončil76 etap za6
 
 Vlastní device.destroy vyvolal správný failure/restart overlay,0unhandled rejection; normální odchod přes overlay do editoru a nový Game dokončil76etap za54,9843s, ready/valid/error0/pending0. Celá původní relace má5očekávaných fault records a2výslovné recording gaps; starý disabled QA export po loss není čerstvý health důkaz. Všechny vlastní procesy této přejímky byly zastavené.
 
+[Source12 in-session editor](performance/evidence/webgpu-completion-20261021/validation/resume-source12/verification.json), nový no-clock build`193b7391`, prakticky prošel: po skutečném W pohybu se Tvoje postava otevřela uvnitř stejné připojené relace, Niki+vousy preview dosáhlo ready a bylo vizuálně prohlédnuté. Zavření panelu zachovalo stejného hráče/renderer2/generaci1 a polohu s rozdílem0,004651m; následné D posunulo postavu3,306845m. Health stále ready/valid/error0/pending0, konzole bez warning/error, původní uzavřená relace724records/0fault/0unhandled. Čtyři raw exporty jsou byteexact proti receipts. Jde o okolí spawnu, nikoli zachování patra B6 nebo výkonový vzorek; auto kvalita směla změnit interní rozlišení.
+
 Otevřené zůstávají přiřazení zbytkového prvního-entry hitch, obrazová otázka fasády, opakovaná řízená CM/NCM/GL série s1 a≥3 reálnými relacemi, zbývající aktuální funkční matice a přesné head/base přijetí/integrace do main. Cíle60FPS/p95≤20ms/p99≤33,3ms se nemění; žádný z uvedených CPU nebo funkčních pilotů je sám nepřijal. True hidden→visible důkazy si zachovávají své výslovné limity.
 
 ## KEY-22 · průběžný kandidát · 21. října 2026
