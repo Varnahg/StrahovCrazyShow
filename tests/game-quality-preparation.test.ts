@@ -158,18 +158,18 @@ test("quality initialization works before the constructor creates its scene", ()
   assert.equal(f.scaling, MANUAL_HARDWARE_SCALING.high);
 });
 
-test("actual Game prepares three render qualities without changing requested auto state", async () => {
+test("actual Game prepares progressive qualities then the requested final quality without changing requested auto state", async () => {
   const f = fixture(),
     requested = f.adaptive.state;
   const result = await f.start();
   assert.equal(result.status, "complete");
   assert.deepEqual(
     f.passes.map((p) => p.quality),
-    ["low", "high", "medium"],
+    ["low", "medium", "high", "medium"],
   );
   assert.deepEqual(
     f.passes.map((p) => p.finalRestore),
-    [false, false, true],
+    [false, false, false, true],
   );
   assert.ok(f.passes.every((p) => p.timeoutMs! > 0 && p.timeoutMs! <= 30_000));
   assert.equal(
@@ -189,7 +189,7 @@ test("actual Game puts each manual requested quality last and restores its scali
     const f = fixture(mode),
       requested = f.adaptive.state;
     assert.equal((await f.start()).status, "complete");
-    assert.equal(f.passes.length, 3);
+    assert.equal(f.passes.length, mode === "high" ? 3 : 4);
     assert.equal(new Set(f.passes.map((p) => p.quality)).size, 3);
     assert.equal(f.passes.at(-1)!.quality, mode);
     assert.equal(f.adaptive.state, requested);
@@ -221,7 +221,7 @@ test("late quality and FPS requests survive temporary rendering and are restored
   assert.equal(f.adaptive.state.mode, "high");
   assert.equal(f.adaptive.state.targetFps, 120);
   assert.equal(f.applied.at(-1), "high");
-  assert.equal(f.passes.length, 4);
+  assert.equal(f.passes.length, 5);
 });
 
 test("returned failure stops further quality passes and restores requested rendering", async () => {

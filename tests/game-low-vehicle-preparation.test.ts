@@ -216,6 +216,7 @@ function fixture(
     vehicle: false,
   });
   const requested = { quality, revision: 17, hardwareScaling: 1 };
+  const qualityPasses: { quality: string; final: boolean }[] = [];
   const gameEngine = {
     isWebGPU: webgpu,
     get currentRenderPassId() {
@@ -339,6 +340,11 @@ function fixture(
       assert.ok(!stage.startsWith("vehicle-"));
     },
   });
+  const originalPrepare = game.prepareLightingVariants;
+  game.prepareLightingVariants = function (...args: any[]) {
+    qualityPasses.push({ quality: this.quality, final: typeof args[2]?.restoreQuality === "function" });
+    return Reflect.apply(originalPrepare, this, args);
+  };
   const grassPack = withGrass ? JSON.parse(readFileSync(new URL("../public/models/vegetation/grass/geometry.json", import.meta.url), "utf8")) : undefined;
   const grassRecipe = withGrass ? JSON.parse(readFileSync(new URL("../public/models/vegetation/grass/material.json", import.meta.url), "utf8")) : undefined;
   const acquireGrass = () => acquireGrassResources(scene, grassPack, grassRecipe, 1024, (channel,gamma) => {
@@ -443,6 +449,7 @@ function fixture(
     streets,
     stages,
     requested,
+    qualityPasses,
     invariant,
     initial,
     draw,
@@ -707,11 +714,11 @@ test("final restore applies latest quality/time/profile before accepted readines
   );
 });
 
-test("WebGPU preparation includes the actual FAR helper in all57 stages and all3 quality passes", async t => {
+test("WebGPU preparation includes the actual FAR helper in all76 stages and all4 quality passes", async t => {
   const f=fixture(t,"medium",true,true), requested={...f.requested};
   const result=await f.finish(f.startAllQualities());
-  assert.equal(result.status,"complete");assert.equal(result.stages.length,57);
-  assert.deepEqual(result.qualities.map((q:any)=>[q.quality,q.stageCount]),[["low",19],["high",19],["medium",19]]);
+  assert.equal(result.status,"complete");assert.equal(result.stages.length,76);
+  assert.deepEqual(result.qualities.map((q:any)=>[q.quality,q.stageCount]),[["low",19],["medium",19],["high",19],["medium",19]]);
   for(const entry of result.stages){
     const frames=f.grassFrames.filter(frame=>frame.stage===entry.stage&&frame.quality===entry.passQuality&&frame.enabled&&frame.drawn&&frame.ready&&frame.count===1);
     assert.ok(frames.length>=2,`${entry.passQuality}/${entry.stage} has two actual ready FAR draws`);
@@ -798,8 +805,8 @@ test("Low vehicle2 is explicitly the same clamped one-POINT state without shadow
 for (const requested of ["medium", "high"] as const)
   test(`all qualities finish with requested ${requested} car shadow map retained before entry`, async (t) => {
     const f = fixture(t, requested), result = await f.finish(f.startAllQualities());
-    assert.equal(result.status, "complete"); assert.equal(result.stages.length, 57);
-    assert.deepEqual(result.qualities.map((q: any) => [q.quality, q.stageCount]), requested === "medium" ? [["low",19],["high",19],["medium",19]] : [["low",19],["medium",19],["high",19]]);
+    assert.equal(result.status, "complete"); assert.equal(result.stages.length, requested === "high" ? 57 : 76);
+    assert.deepEqual(result.qualities.map((q: any) => [q.quality, q.stageCount]), requested === "medium" ? [["low",19],["medium",19],["high",19],["medium",19]] : [["low",19],["medium",19],["high",19]]);
     assert.equal(f.game.quality, requested); assert.equal(f.game.preparingRenderQuality, false);
     const shadow = f.beam.light.getShadowGenerator() as ShadowGenerator;
     assert.equal(shadow.mapSize, requested === "medium" ? 256 : 512);
@@ -813,7 +820,7 @@ test("late requested quality during final pass prepares its actual map before ga
   const f = fixture(t, "medium"); let changed = false;
   f.game.adaptive = new AdaptiveQualityController({ mode: "medium" });
   f.hook(() => {
-    if (!changed && f.game.quality === "medium" && f.stage() === "current-off") {
+    if (!changed && f.game.quality === "medium" && f.stage() === "current-off" && f.qualityPasses.at(-1)?.final) {
       changed = true;
       assert.equal(f.game.preparingRenderQuality, true);
       f.game.setQuality("high");
@@ -823,10 +830,13 @@ test("late requested quality during final pass prepares its actual map before ga
   });
   const result = await f.finish(f.startAllQualities());
   assert.equal(result.status, "complete"); assert.equal(changed, true);
+  assert.deepEqual(f.qualityPasses.slice(0, 4), [
+    {quality:"low",final:false},{quality:"medium",final:false},{quality:"high",final:false},{quality:"medium",final:true},
+  ], "late request occurred in the second Medium, after progressive High");
   assert.equal((f.beam.light.getShadowGenerator() as ShadowGenerator).mapSize, 512, "latest requested High must be prepared rather than retain Medium256");
-  assert.equal(result.stages.length, 76);
-  assert.deepEqual(result.qualities.map((q: any) => q.quality), ["low", "high", "medium", "high"]);
-  assert.deepEqual(result.qualities.map((q: any) => q.finalPass), [false, false, true, true]);
+  assert.equal(result.stages.length, 95);
+  assert.deepEqual(result.qualities.map((q: any) => q.quality), ["low", "medium", "high", "medium", "high"]);
+  assert.deepEqual(result.qualities.map((q: any) => q.finalPass), [false, false, false, true, true]);
   assert.equal(f.game.quality, "high");
   const shadow = f.beam.light.getShadowGenerator() as ShadowGenerator;
   assert.equal(shadow.mapSize, 512, "inactive requested restore must not leave the earlier256 map for first entry to resize");

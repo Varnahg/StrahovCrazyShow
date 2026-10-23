@@ -87,12 +87,11 @@ function fixture(overrides: Partial<RenderQualityPreparationOptions> = {}) {
 }
 
 for (const initial of ["low", "medium", "high"] as const)
-  test(`three qualities run once with initial ${initial} last and one final-pass flag`, async () => {
+  test(`progressive three qualities precede requested ${initial} restoration with one final-pass flag`, async () => {
     const f = fixture({ initialQuality: initial }),
       outcome = await f.run();
-    const expected = (["low", "medium", "high"] as const)
-      .filter((q) => q !== initial)
-      .concat(initial);
+    const expected: RenderQuality[] = ["low", "medium", "high"];
+    if (initial !== "high") expected.push(initial);
     assert.deepEqual(f.applied, expected);
     assert.deepEqual(
       f.passes.map((p) => p.quality),
@@ -100,21 +99,21 @@ for (const initial of ["low", "medium", "high"] as const)
     );
     assert.deepEqual(
       f.passes.map((p) => p.finalPass),
-      [false, false, true],
+      expected.map((_, index) => index === expected.length - 1),
     );
     assert.deepEqual(
       f.passes.map((p) => p.timeoutMs),
-      [29995, 29995, 29995],
+      expected.map(() => 29995),
     );
     assert.equal(outcome.status, "complete");
-    assert.equal(outcome.elapsedMs, 322);
-    assert.equal(outcome.activeElapsedMs, 322);
+    assert.equal(outcome.elapsedMs, expected.length * 105 + 7);
+    assert.equal(outcome.activeElapsedMs, expected.length * 105 + 7);
     assert.equal(outcome.pausedMs, 0);
     assert.equal(outcome.failureStep, null);
     assert.equal(f.restored.length, 1);
     assert.deepEqual(
       outcome.qualities.map((p) => p.elapsedMs),
-      [105, 105, 112],
+      expected.map((_, index) => index === expected.length - 1 ? 112 : 105),
     );
     assert.deepEqual(
       outcome.stages.map((s) => s.passQuality),
@@ -146,7 +145,7 @@ test("stage fields are preserved and attributed without mutating the original re
   }
   assert.deepEqual(
     outcome.qualities.map((p) => p.stageCount),
-    [1, 1, 1],
+    [1, 1, 1, 1],
   );
 });
 
@@ -160,16 +159,16 @@ test("only reported hidden pause is deducted; apply and final restore remain act
   });
   const outcome = await f.run();
   assert.equal(outcome.status, "complete");
-  assert.equal(outcome.elapsedMs, 180322);
-  assert.equal(outcome.pausedMs, 180000);
-  assert.equal(outcome.activeElapsedMs, 322);
+  assert.equal(outcome.elapsedMs, 240427);
+  assert.equal(outcome.pausedMs, 240000);
+  assert.equal(outcome.activeElapsedMs, 427);
   assert.deepEqual(
     outcome.qualities.map((p) => p.activeElapsedMs),
-    [105, 105, 112],
+    [105, 105, 105, 112],
   );
   assert.deepEqual(
     f.passes.map((p) => p.timeoutMs),
-    [29995, 29995, 29995],
+    [29995, 29995, 29995, 29995],
   );
 });
 
@@ -181,8 +180,8 @@ test("reported pauses cannot subtract apply time or more time than the observed 
     },
   });
   const outcome = await f.run();
-  assert.equal(outcome.pausedMs, 300);
-  assert.equal(outcome.activeElapsedMs, 22);
+  assert.equal(outcome.pausedMs, 400);
+  assert.equal(outcome.activeElapsedMs, 27);
   for (const invalid of [NaN, Infinity, -10]) {
     const q = fixture({
       async prepare() {
@@ -192,7 +191,7 @@ test("reported pauses cannot subtract apply time or more time than the observed 
     });
     const r = await q.run();
     assert.equal(r.pausedMs, 0);
-    assert.equal(r.activeElapsedMs, 322);
+    assert.equal(r.activeElapsedMs, 427);
   }
 });
 
@@ -227,7 +226,7 @@ test("a complete callback cannot hide a synchronous per-pass overrun", async () 
   assert.equal(outcome.stages.length, 1);
 });
 
-test("the total budget includes time between passes and reduces the next timeout", async () => {
+test("the total budget includes time between passes and also bounds the requested-final pass", async () => {
   let between = false;
   const f = fixture({
     isDisposed() {
@@ -247,14 +246,17 @@ test("the total budget includes time between passes and reduces the next timeout
   // isDisposed after the first completed pass is still charged to the global
   // clock; it must not reset the next pass to a fresh unrestricted30 seconds.
   const outcome = await f.run();
-  assert.equal(outcome.status, "complete");
-  assert.equal(outcome.activeElapsedMs, 80022);
+  assert.equal(outcome.status, "timeout");
+  assert.equal(outcome.activeElapsedMs, 90027);
   assert.ok(f.passes[2].timeoutMs < 30000);
   assert.equal(f.passes[2].timeoutMs, 19985);
+  assert.equal(f.passes[3].timeoutMs, 9980);
+  assert.equal(outcome.qualities.at(-1)!.status, "timeout");
 });
 
 test("restoration cost can turn apparent completion into timeout", async () => {
   const f = fixture({
+    initialQuality: "high",
     async prepare(pass) {
       f.passes.push(pass);
       f.advance(29990);
@@ -330,7 +332,7 @@ test("an otherwise successful restoration failure rejects without fabricating a 
       },
     });
   await assert.rejects(f.run(), (value) => value === error);
-  assert.equal(f.applied.length, 3);
+  assert.equal(f.applied.length, 4);
 });
 
 test("retirement before, during apply, during prepare or final restore never advances or restores a dead owner", async () => {
@@ -355,7 +357,7 @@ test("retirement before, during apply, during prepare or final restore never adv
     assert.equal(outcome.status, "disposed", at);
     assert.equal(
       f.applied.length,
-      at === "before" ? 0 : at === "restore" ? 3 : 1,
+      at === "before" ? 0 : at === "restore" ? 4 : 1,
       at,
     );
     assert.equal(f.restored.length, at === "restore" ? 1 : 0, at);
@@ -395,7 +397,7 @@ test("late requested state is read at final restoration without changing the fix
   });
   const outcome = await f.run();
   assert.equal(outcome.status, "complete");
-  assert.deepEqual(f.applied, ["low", "high", "medium"]);
+  assert.deepEqual(f.applied, ["low", "medium", "high", "medium"]);
   assert.equal(effective, "high");
   assert.deepEqual(requested, { mode: "auto", quality: "high", revision: 5 });
   assert.equal(
@@ -405,7 +407,7 @@ test("late requested state is read at final restoration without changing the fix
   );
 });
 
-test("actual light helper completes all39 attributed stages with its original draws and cleanup", async () => {
+test("actual light helper completes all52 attributed stages with its original draws and cleanup", async () => {
   let now = 0,
     tick: (() => void) | undefined,
     timer: unknown,
@@ -476,11 +478,11 @@ test("actual light helper completes all39 attributed stages with its original dr
     },
   });
   assert.equal(outcome.status, "complete");
-  assert.deepEqual(applied, ["low", "high", "medium"]);
-  assert.deepEqual(finalized, [false, false, true]);
-  assert.equal(outcome.stages.length, 39);
-  assert.equal(renders, 117);
-  assert.equal(detachCount, 3);
+  assert.deepEqual(applied, ["low", "medium", "high", "medium"]);
+  assert.deepEqual(finalized, [false, false, false, true]);
+  assert.equal(outcome.stages.length, 52);
+  assert.equal(renders, 156);
+  assert.equal(detachCount, 4);
   assert.ok(outcome.stages.every((s) => s.renders === 3 && s.checks === 2));
 });
 
@@ -488,11 +490,11 @@ test("a late requested quality appends a final attempt without changing historic
   const f = fixture({ requestedQuality: () => "high" });
   const outcome = await f.run();
   assert.equal(outcome.status, "complete");
-  assert.deepEqual(f.passes.map(p => p.quality), ["low", "high", "medium", "high"]);
-  assert.deepEqual(f.passes.map(p => p.finalPass), [false, false, true, true]);
-  assert.deepEqual(outcome.qualities.map(p => p.finalPass), [false, false, true, true]);
+  assert.deepEqual(f.passes.map(p => p.quality), ["low", "medium", "high", "medium", "high"]);
+  assert.deepEqual(f.passes.map(p => p.finalPass), [false, false, false, true, true]);
+  assert.deepEqual(outcome.qualities.map(p => p.finalPass), [false, false, false, true, true]);
   assert.equal(f.restored.length, 1);
-  assert.equal(outcome.elapsedMs, 427);
+  assert.equal(outcome.elapsedMs, 532);
 });
 
 test("repeated late requests spend the original90second deadline instead of resetting it", async () => {
@@ -507,7 +509,7 @@ test("repeated late requests spend the original90second deadline instead of rese
   });
   const outcome = await f.run();
   assert.equal(outcome.status, "timeout");
-  assert.deepEqual(f.passes.map(p => p.quality), ["low", "high", "medium", "high", "medium"]);
+  assert.deepEqual(f.passes.map(p => p.quality), ["low", "medium", "high", "medium", "high"]);
   assert.equal(f.passes[3].timeoutMs, 29_980, "remaining total already includes all earlier apply costs");
   assert.equal(f.passes[4].timeoutMs, 9_975);
   assert.equal(outcome.activeElapsedMs, 100_032, "synchronous overrun is charged, never subtracted");
@@ -517,26 +519,26 @@ test("repeated late requests spend the original90second deadline instead of rese
 test("tail apply retirement stops without restoring or starting another preparation", async () => {
   const f = fixture({ requestedQuality: () => "high", applyQuality(quality) {
     f.applied.push(quality); f.advance(5);
-    if (f.applied.length === 4) f.dispose();
+    if (f.applied.length === 5) f.dispose();
   }});
   const outcome = await f.run();
-  assert.equal(outcome.status, "disposed"); assert.equal(f.applied.length, 4);
-  assert.equal(f.passes.length, 3); assert.equal(f.restored.length, 0);
+  assert.equal(outcome.status, "disposed"); assert.equal(f.applied.length, 5);
+  assert.equal(f.passes.length, 4); assert.equal(f.restored.length, 0);
 });
 
 test("a tail preparation error survives a later restore error with its original identity", async () => {
   const original = new Error("tail preparation"), cleanup = new Error("cleanup");
   const f = fixture({ requestedQuality: () => "high", async prepare(pass) {
     f.passes.push(pass); f.advance(100);
-    if (f.passes.length === 4) throw original;
+    if (f.passes.length === 5) throw original;
     return result();
   }, restore() { throw cleanup; }});
   await assert.rejects(f.run(), error => error === original);
-  assert.equal(f.passes.length, 4);
+  assert.equal(f.passes.length, 5);
 });
 
 test("invalid untyped latest request never appends an unknown quality", async () => {
   const f = fixture({ requestedQuality: () => "invalid" as RenderQuality });
   const outcome = await f.run();
-  assert.equal(outcome.status, "complete"); assert.equal(f.passes.length, 3);
+  assert.equal(outcome.status, "complete"); assert.equal(f.passes.length, 4);
 });

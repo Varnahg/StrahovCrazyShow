@@ -149,13 +149,13 @@ test("the actual quality sequencer forwards the same loop to every pass and to t
       },
     });
     const result = await game.prepareLighting(render, pipelines, loop);
-    assert.equal(result.status, "complete"); assert.equal(calls.length, webgpu ? 3 : 1);
+    assert.equal(result.status, "complete"); assert.equal(calls.length, webgpu ? 4 : 1);
     for (const args of calls) {
       assert.equal(args[0], render); assert.equal(args[1], pipelines); assert.equal(args[3], loop);
     }
     if (webgpu) {
-      assert.equal(calls[0][2].restoreQuality, undefined);
-      assert.equal(typeof calls[2][2].restoreQuality, "function");
+      assert.ok(calls.slice(0, 3).every(args => args[2].restoreQuality === undefined));
+      assert.equal(typeof calls[3][2].restoreQuality, "function");
     }
   }
 });

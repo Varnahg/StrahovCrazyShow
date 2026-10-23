@@ -1,0 +1,55 @@
+{
+  "kind": "Scope expansion WIP; not final acceptance",
+  "task": "webgpu-completion-car-preparation-20261023",
+  "owner": "webgpu-completion-01a15a3e-car-preparation-renderer-audit-v1",
+  "rootBase": "d7b90c9d",
+  "source": {
+    "client/render-quality-preparation.ts": "906ce163a0be50e837dc36ea213a13ee95320a682bf26eab0741a24035b04c9c",
+    "tests/render-quality-preparation.test.ts": "6b76a2c4572ce0641ef480b28ede9a6b901947ad5443e84f908c7d5e7773e187",
+    "tests/game-quality-preparation.test.ts": "f46f8230b9aaf6181f9e9a066a9bb952cdd60c59ee36f798ac8616f4bc45bd80",
+    "tests/game-low-vehicle-preparation.test.ts": "f885a9a851315e188e9aaf0d6c8f479e0d68c18caefb84ff206fd1a973345f42",
+    "tests/game-authored-light-preparation.test.ts": "fd613fae699a64590072de5fee8f0906e36f6eb6ab7ef56f7f4f1bdef121bc39"
+  },
+  "rootFilesUnchanged": [
+    "client/game.ts",
+    "client/light-preparation.ts",
+    "tests/game-light-preparation.test.ts",
+    "tests/startup-preparation-loop.test.ts"
+  ],
+  "pendingAdditionalTestPaths": [
+    "tests/game-preparation-baseline.test.ts",
+    "tests/game-preparation-scheduler.test.ts"
+  ],
+  "extraFilesNotEdited": true,
+  "results": {
+    "fullRed": {
+      "tests": 99,
+      "pass": 76,
+      "fail": 23,
+      "log": "92113b651aaf048439c7a8ca5fc48c81bc7df4a269deb3e4a8627bede1c944f6"
+    },
+    "green": {
+      "tests": 99,
+      "pass": 99,
+      "fail": 0,
+      "log": "cb2f57473d8993c6a3d58af2a13c35c2ff24b4c680ab9ce3b7c99c31da699b13"
+    },
+    "broader": {
+      "tests": 272,
+      "pass": 269,
+      "fail": 3,
+      "log": "1b3609caec60eadd838c0a02f96442cbb32e84d727b84b6b4c7890029a188bda",
+      "failures": "Only old quality-order/count/total-time expectations in two pending test paths"
+    },
+    "scopedTypeScript": {
+      "roots": 5,
+      "diagnostics": 0,
+      "declarations": 2780,
+      "log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "native": "Source9 read-only JS loader; 707 actually used native modules stable before/after in broader run; no installed writes",
+  "artifacts": "Only new quality-order evidence/cache prefix; original35documentation/manifest artifacts protected",
+  "processes": "All owned targeted CPU/TS processes finished; no own GPU/build/install/server/port/helper process",
+  "coordination": "Writes/CPU stop after this WIP. Wait for root release/metadata instruction, then same documented original owner may reclaim adopt-dirty. Do not interpret release as completion."
+}

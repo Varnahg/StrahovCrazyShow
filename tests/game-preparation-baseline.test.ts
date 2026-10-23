@@ -35,15 +35,16 @@ function fixture(initial='medium') {
 }
 
 {
-  test(`native Game: one requested-state sync before temporary qualities, original order and restore`,async()=>{
+  test(`native Game: one requested-state sync before temporary qualities, progressive order and restore`,async()=>{
     for(const initial of ['low','medium','high']){
       const f=fixture(initial);const out=await f.run();
       assert.equal(out.status,'complete');assert.equal(f.samples.length,1);
       const seed=f.samples[0];assert.equal(seed.quality,initial);assert.equal(seed.scale,f.requested.hardwareScaling);assert.equal(seed.requested,f.requested);assert.equal(seed.locked,true);
       assert.equal(seed.weather,f.weather);assert.equal(seed.time,12345);assert.equal(seed.flashlight,true);
       assert.equal(seed.args[0],f.pos);assert.equal(seed.args[1],f.self);assert.deepEqual(seed.args.slice(2),[false,0,0]);
-      assert.deepEqual(f.passes.map(p=>p.quality),[...['low','medium','high'].filter(q=>q!==initial),initial]);
-      assert.deepEqual(f.passes.map(p=>p.final),[false,false,true]);
+      const expected=['low','medium','high'];if(initial!=='high')expected.push(initial);
+      assert.deepEqual(f.passes.map(p=>p.quality),expected);
+      assert.deepEqual(f.passes.map(p=>p.final),expected.map((_,index)=>index===expected.length-1));
       assert.equal(f.game.quality,initial);assert.equal(f.scale,f.requested.hardwareScaling);assert.equal(f.game.adaptive.state,f.requested);assert.equal(f.game.appliedQualityRevision,7);assert.equal(f.game.preparingRenderQuality,false);assert.equal(f.game.camera,f.camera);assert.equal(f.game.actor.position,f.pos);
     }
   });
@@ -55,7 +56,7 @@ function fixture(initial='medium') {
     const f=fixture();f.onEnvironment(()=>f.advance(125));const out=await f.run();
     assert.equal(out.status,'complete');assert.equal(f.passes[0].timeout,29875);assert.equal(out.activeElapsedMs,125);assert.equal(out.qualities[0].activeElapsedMs,125);
     const timeout=fixture();timeout.onEnvironment(()=>timeout.advance(30000));assert.equal((await timeout.run()).status,'timeout');assert.equal(timeout.passes.length,0);assert.equal(timeout.game.preparingRenderQuality,false);assert.equal(timeout.game.quality,'medium');
-    const global=fixture();global.onEnvironment(()=>global.advance(100));global.onPass(()=>global.advance(29000));const bounded=await global.run();assert.equal(bounded.status,'complete');assert.equal(bounded.activeElapsedMs,87100);assert.equal(bounded.qualities[0].activeElapsedMs,29100);assert.equal(bounded.qualities[1].activeElapsedMs,29000);assert.equal(bounded.qualities[2].activeElapsedMs,29000);
+    const global=fixture();global.onEnvironment(()=>global.advance(100));global.onPass(()=>global.advance(29000));const bounded=await global.run();assert.equal(bounded.status,'timeout');assert.equal(bounded.activeElapsedMs,116100);assert.equal(global.passes.length,4);assert.equal(global.passes[3].timeout,2900,'requested-final pass keeps the original remaining90s budget');assert.equal(bounded.qualities[3].status,'timeout');assert.equal(bounded.qualities[3].activeElapsedMs,29000,'a synchronous29s overrun is charged rather than hidden');assert.equal(bounded.qualities[0].activeElapsedMs,29100);assert.equal(bounded.qualities[1].activeElapsedMs,29000);assert.equal(bounded.qualities[2].activeElapsedMs,29000);
   });
   test(`native Game: latest quality/scaling/time request survives seed and final restoration`,async()=>{
     const f=fixture();const latest={quality:'high',hardwareScaling:1.4,revision:9};

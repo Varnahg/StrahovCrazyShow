@@ -172,8 +172,8 @@ for(const initialQuality of ["low","medium"] as const) test(`native cold opposit
   const deadline=performance.now()+35000;
   while(!complete&&performance.now()<deadline){callback?.();await turn();}
   assert.ok(complete,"bounded whole preparation finished");row.preparation=await preparation;row.stages=[...stageMap.values()];
-  assert.equal(row.preparation.status,"complete");assert.equal(row.preparation.stages.length,57);assert.deepEqual(row.preparation.qualities.map((x:any)=>x.quality),initialQuality==="low"?["medium","high","low"]:["low","high","medium"]);
-  assert.equal(row.stages.length,57);assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>family.cap===4)));
+  assert.equal(row.preparation.status,"complete");assert.equal(row.preparation.stages.length,76);assert.deepEqual(row.preparation.qualities.map((x:any)=>x.quality),["low","medium","high",initialQuality]);
+  assert.equal(row.stages.length,57,"Map is a unique quality/stage projection; actual preparation reports76 passes/stages above");assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>family.cap===4)));
   assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>s.label.startsWith("vehicle-")?(family.drawn&&family.ready):!family.drawn)));
   assert.ok(f.target.every(mesh=>!mesh.alwaysSelectAsActiveMesh),"all scoped flags restored before gameplay");
   assert.equal(game.yaw,startYaw);assert.equal(actor.vehicle,false);assert.equal(car.isEnabled(),false);assert.equal(parked.isEnabled(),true);assert.equal(game.adaptive.state,requested);

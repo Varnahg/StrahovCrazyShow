@@ -51,14 +51,11 @@ export async function prepareRenderQualities(
   options: RenderQualityPreparationOptions,
 ): Promise<RenderQualityPreparationResult> {
   const started = options.now();
-  const order = QUALITIES.filter(
-    (quality) => quality !== options.initialQuality,
-  );
-  // The initial traversal contains only known qualities. Valid late requests
-  // may append another final attempt inside the same total deadline.
-  order.push(
-    ...QUALITIES.filter((quality) => quality === options.initialQuality),
-  );
+  // Prepare shared work progressively, then prove the requested final state.
+  // Extra final attempts spend the same total deadline; unknown values never run.
+  const order = [...QUALITIES];
+  if (QUALITIES.includes(options.initialQuality) && options.initialQuality !== order.at(-1))
+    order.push(options.initialQuality);
   const stages: RenderQualityPreparationResult["stages"] = [];
   const qualities: QualityResult[] = [];
   let status: LightPreparationResult["status"] = "complete";
