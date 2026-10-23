@@ -2,7 +2,13 @@
 
 Owner: `webgpu-migration-01a14497-root`, 2026-10-16. User authorized the complete migration, separate issues, implementation and integration. [Parent issue](https://linear.app/gigeconomy/issue/KEY-22/premigrovat-celou-produkcni-hru-a-editor-na-plynule-webgpu) is the current delivery record; this document fixes the engineering contract. An individual CPU test is not graphical acceptance.
 
-## Current candidate — 21 October 2026
+## Current candidate — 23 October 2026
+
+Main9341bcef remains WebGL2; PR23 is draft. The immutable source10 actual editor/game/B6 proof is [editor-summary-source10](evidence/webgpu-completion-20261021/validation/editor-summary-source10/verification.json):6ready presets/accessories/resize, original Guest+2newMP startup76stages in65.614/66.456/69.197s under unchanged30/90s budgets, northB6 entry/reception/bothflights tofloor1 and first/repeatF healthy. The actual source10 car165.6ms/two-derived-program hitch remains unaccepted. These functional observations are not a controlled FPS comparison; newjoin after leaving a session does not prove in-session profile-edit resume.
+
+Native per-pass checkpoint432e197d/source11 74dbc7a7 has a separate fresh frozen install39pins/singleton,201installed tests, TypeScript/build18.29s and isolated integration PASS; [CI39997771403](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39997771403) passed2126/2126/build/integration. Root then found a real broader nonstandalone source/draw-pass compatibility regression before GPU acceptance. [Primary research and decision](evidence/webgpu-completion-20261021/research/shadow-nonstandalone-compatibility.md) restores that original public contract without caller/standalone/cache-history changes. Source11 and all old seals stay immutable; the correction needs a new source12/fresh install and actual GPU/image/first-entry evidence. Final18controlledbackend/cohort slots and exact-head main acceptance remain open. Current detailed status is [verification](../verification.md).
+
+## Historical candidate — 21 October 2026
 
 Latest startup acceptance: PCF correction1b2a6829, immutable source36c134e1/build63ca, changes final shader jobs812→0 while retaining the actual leaf owner and original complete gate. Both CM and NCM now resolve startup with healthy0pending/errors. [GPU before/after](evidence/webgpu-completion-20261021/validation/pcf-fixed-5/verification.json), CPU37/37 and [exact-head CI07c15f34](evidence/webgpu-completion-20261021/validation/ci-07c15f34.json):1961/1961, production build, full isolated integration and secret hygiene PASS. Actual GPU colorWrite bit was not exported; source+CPU reproduction+actual before/after support the narrow mechanism, not a universal FPS gain.
 

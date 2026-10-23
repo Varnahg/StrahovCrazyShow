@@ -1,5 +1,17 @@
 # Ověření dema a známá omezení
 
+## KEY-22 · aktuální přejímka · 23. října 2026
+
+Main `9341bcef` stále používá výchozí WebGL2; [PR23](https://github.com/Varnahg/StrahovCrazyShow/pull/23) je draft. Kandidátní WebGPU default hry a editoru se nepovažuje za integrovaný podle dílčího CPU výsledku. Níže uvedené záznamy z21.října jsou historické checkpointy.
+
+[Aktuální source10 funkční důkazy](performance/evidence/webgpu-completion-20261021/validation/editor-summary-source10/verification.json) vážou source`8e7d6661`, build`e29bce81`, helper`49662229` a29 skutečně servírovaných shodných bundle hashů. Všech6 editorových předloh, brýle/vousy, detail tváře/otočení, barva oděvu a resize dosáhly ready; skutečná konzole uvádí WebGPU1 a0chyb. Guest a dva nové multiplayerové starty dokončily76 etap za65,614/66,456/69,197s původní přípravy, s původními30s/pass a90s celkem, ready/valid/error0/pending0. Souhrn uchovává skutečný lokální výsledek přípravy; původní3 recording gaps z velkého stage záznamu nejsou domýšlené.
+
+Skutečná trasa WASD prošla severním vstupem B6, recepcí a oběma rameny severního schodiště do prvního patra. První/opakované F při pevné noci zůstalo zdravé; snímky byly vizuálně prohlédnuté. Jde o funkční smoke test, nikoli celý jižní core/floor matrix nebo FPS. Opustit demo ukončilo relaci a následující nový join začal na spawnu; tento test neprokazuje zachování polohy při in-session úpravě postavy. [Source10 první auto](performance/evidence/webgpu-completion-20261021/validation/car-epoch-source10/) stále má165,6ms zásek a2 nové derived efekty. Automatický náhled feedbacku1920×928 bez HUD/minimapy/menu/QA byl skutečně ověřen; hlášení se neposílalo.
+
+[Source11 CPU checkpoint](performance/evidence/webgpu-completion-20261021/validation/candidate11-checks/verification.json), source`74dbc7a7`/runtime`432e197d`, má vlastní frozen install39pinů/singleton,201/201 obyčejných installed testů bez overlay, celý TypeScript/build18,29s a izolovanou integraci PASS. Exact-head [CI39997771403](https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39997771403) prošla2126/2126/build/integrací; source-secret-hygiene PASS. GPU source11 nebylo přijato: root následně odhalil skutečnou nonstandalone native source-pass/draw-pass regresi, kterou původní změna alias fixture omylem nepokrývala. [Primární výzkum a oprava kompatibility](performance/evidence/webgpu-completion-20261021/research/shadow-nonstandalone-compatibility.md) zachovávají původní failed/passed důkazy a vyžadují nový source12.
+
+Otevřené zůstávají nové skutečné první auto/obraz/GPU výsledky, opakovaná řízená CM/NCM/GL série s1 a≥3 reálnými relacemi, zbývající aktuální funkční/obrazová matice a přesné head/base přijetí/integrace do main. Cíle60FPS/p95≤20ms/p99≤33,3ms se nemění; žádný z uvedených CPU nebo funkčních pilotů je sám nepřijal. Starší device-loss a true hidden→visible důkazy si zachovávají své výslovné limity.
+
 ## KEY-22 · průběžný kandidát · 21. října 2026
 
 Publikovaný `main` zůstává `9341bcef` s výchozím WebGL2. Migrační větev v [draft PR23](https://github.com/Varnahg/StrahovCrazyShow/pull/23) obsahuje kandidátní společný WebGPU default a opravu konečné startup přípravy; úplná migrace a změna produkčního defaultu dosud nejsou přijaté.
