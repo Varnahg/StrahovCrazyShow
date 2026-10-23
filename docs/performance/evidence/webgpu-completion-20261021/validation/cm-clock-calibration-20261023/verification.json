@@ -1,0 +1,945 @@
+{
+  "recordedAtUTC": "2026-10-23T14:53:59.172Z",
+  "sourceSnapshotId": "921f57b9328a98e0eb3026b95708b3e72a192ce65d054123eff6783449427ee1",
+  "buildId": "1d12adb4506e0861f6a0e91447e1c753f369c94532d31f419a1ee1fe0f570d3a",
+  "helperSha256": "a5b3dc0000956b9abcd77dab55e06ae8c31f7f6c12ffb1ba5840f19562f933f9",
+  "kind": "calibration, not a final series repetition",
+  "benchmark": {
+    "date": "2026-10-23T14:05:36.514Z",
+    "sourceSnapshotId": "921f57b9328a98e0eb3026b95708b3e72a192ce65d054123eff6783449427ee1",
+    "durationSeconds": 10.01,
+    "frames": 577,
+    "averageFps": 57.7,
+    "p95FrameMs": 20.899999976158142,
+    "p99FrameMs": 26.100000023841858,
+    "renderErrorCount": 0,
+    "assetLoadErrorCount": 0,
+    "renderHealth": {
+      "start": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      },
+      "end": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      },
+      "valid": true
+    },
+    "avatars": 1,
+    "viewport": {
+      "width": 2040,
+      "height": 986
+    },
+    "renderResolution": {
+      "width": 2040,
+      "height": 986
+    },
+    "quality": "medium",
+    "triangles": 1283479,
+    "triangleCountScope": "all-render-passes",
+    "drawCalls": 419,
+    "avatarLod": {
+      "near": 1,
+      "medium": 0,
+      "far": 0
+    },
+    "grassClumps": 0,
+    "sceneView": {
+      "position": {
+        "x": 110,
+        "y": -2.323899984359741,
+        "z": 12.00003433227539
+      },
+      "yaw": 3.141592653589793,
+      "pitch": 0.28,
+      "lightingInstant": 1792533600000,
+      "camera": {
+        "position": {
+          "x": 110,
+          "y": 1.396100401878357,
+          "z": 20.00003433227539
+        },
+        "fov": 0.85,
+        "minZ": 0.08,
+        "maxZ": 1100,
+        "viewMatrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0.9316545724868774,
+          0.36334526538848877,
+          0,
+          0,
+          -0.36334526538848877,
+          0.9316545724868774,
+          0,
+          -110,
+          5.9662346839904785,
+          -19.140390396118164,
+          1
+        ],
+        "projectionMatrix": [
+          1.0679436922073364,
+          0,
+          0,
+          0,
+          0,
+          2.209538698196411,
+          0,
+          0,
+          0,
+          0,
+          -1.000072717666626,
+          -1,
+          0,
+          0,
+          -0.08000581711530685,
+          0
+        ]
+      }
+    },
+    "frameBreakdownMs": {
+      "simulation": 0.2972270382545643,
+      "world": 0.08076256358644165,
+      "avatarsAndCamera": 0.168457539903849,
+      "environment": 0.5467937620715004,
+      "render": 15.23067590847379,
+      "labels": 0.02634315370893561
+    },
+    "engineCpuBreakdownMs": {
+      "activeMeshes": 4.2223570216673085,
+      "mainDraw": 8.941941073490387,
+      "renderTargets": 1.4743500863245496
+    },
+    "engineCpuBreakdownScope": {
+      "clock": "performance.now monotonic milliseconds",
+      "activeMeshes": "sum of Scene before/after active-mesh evaluation intervals in this frame",
+      "mainDraw": "sum of Scene before/after draw-phase intervals; excludes target draw callbacks and postprocess finalization",
+      "renderTargets": "sum of every ObjectRenderer init/finish interval, including multiple targets and repeated passes",
+      "relationship": "nested in frameBreakdownMs.render; inclusive intervals can overlap each other and must not be added as a whole-frame total",
+      "incompleteIntervals": "unpaired intervals interrupted by renderer removal or frame termination are not counted"
+    },
+    "frameWork": {
+      "cpuMs": 17.299999952316284,
+      "gpuMs": null,
+      "webgpuMainPassMs": null,
+      "webgpuMainPassScope": "main-render-pass-only"
+    },
+    "compilation": {
+      "start": {
+        "active": true,
+        "backend": "webgpu",
+        "generation": 1,
+        "attachedAfterDeviceCreation": true,
+        "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+        "metrics": {
+          "glslToSpirv": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "spirvToWgsl": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "compilerLoad": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "shaderPreparation": {
+            "calls": 580,
+            "completed": 580,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 453.19999969005585,
+            "cpuMaxMs": 3.600000023841858,
+            "asyncTotalMs": 183037.3999992609,
+            "asyncMaxMs": 891.3999999761581
+          },
+          "shaderModule": {
+            "calls": 1160,
+            "completed": 1160,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 256.90000092983246,
+            "cpuMaxMs": 2.700000047683716,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "shaderValidation": {
+            "calls": 1160,
+            "completed": 1160,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 16.79999840259552,
+            "cpuMaxMs": 0.20000004768371582,
+            "asyncTotalMs": 651514.7000007629,
+            "asyncMaxMs": 1317.2999999523163
+          },
+          "syncPipeline": {
+            "calls": 30,
+            "completed": 30,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0.9999998807907104,
+            "cpuMaxMs": 0.20000004768371582,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "asyncPipeline": {
+            "calls": 1035,
+            "completed": 1035,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 48.00000023841858,
+            "cpuMaxMs": 0.20000004768371582,
+            "asyncTotalMs": 956345.3999962807,
+            "asyncMaxMs": 1977.4000000953674
+          },
+          "submit": {
+            "calls": 72181,
+            "completed": 72181,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 1170.9999965429306,
+            "cpuMaxMs": 1.1999999284744263,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          }
+        },
+        "hooks": {
+          "engine._initializeLimits": "installed",
+          "engine._compileRawShaderToSpirV": "installed",
+          "engine.prepareGlslangAndTintAsync": "installed",
+          "engine._preparePipelineContextAsync": "installed",
+          "engine._createPipelineStageDescriptor": "installed",
+          "tint.convertSpirV2WGSL": "not-created",
+          "device.createShaderModule": "installed",
+          "device.createRenderPipeline": "installed",
+          "device.createRenderPipelineAsync": "installed",
+          "queue.submit": "installed",
+          "module.getCompilationInfo": "installed"
+        },
+        "observerErrors": 0,
+        "bundleCountersLastFrame": {
+          "numEnableEffects": 0,
+          "numEnableDrawWrapper": 419,
+          "numBundleCreationNonCompatMode": 0,
+          "numBundleReuseNonCompatMode": 0
+        },
+        "sharedCacheCounters": {
+          "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+          "values": {
+            "NumCacheHitWithoutHash": 3018524,
+            "NumCacheHitWithHash": 633655,
+            "NumCacheMiss": 1069,
+            "NumPipelineCreationLastFrame": 0
+          }
+        }
+      },
+      "end": {
+        "active": true,
+        "backend": "webgpu",
+        "generation": 1,
+        "attachedAfterDeviceCreation": true,
+        "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+        "metrics": {
+          "glslToSpirv": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "spirvToWgsl": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "compilerLoad": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "shaderPreparation": {
+            "calls": 580,
+            "completed": 580,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 453.19999969005585,
+            "cpuMaxMs": 3.600000023841858,
+            "asyncTotalMs": 183037.3999992609,
+            "asyncMaxMs": 891.3999999761581
+          },
+          "shaderModule": {
+            "calls": 1160,
+            "completed": 1160,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 256.90000092983246,
+            "cpuMaxMs": 2.700000047683716,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "shaderValidation": {
+            "calls": 1160,
+            "completed": 1160,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 16.79999840259552,
+            "cpuMaxMs": 0.20000004768371582,
+            "asyncTotalMs": 651514.7000007629,
+            "asyncMaxMs": 1317.2999999523163
+          },
+          "syncPipeline": {
+            "calls": 30,
+            "completed": 30,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0.9999998807907104,
+            "cpuMaxMs": 0.20000004768371582,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "asyncPipeline": {
+            "calls": 1035,
+            "completed": 1035,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 48.00000023841858,
+            "cpuMaxMs": 0.20000004768371582,
+            "asyncTotalMs": 956345.3999962807,
+            "asyncMaxMs": 1977.4000000953674
+          },
+          "submit": {
+            "calls": 77373,
+            "completed": 77373,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 1259.1999967098236,
+            "cpuMaxMs": 1.1999999284744263,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          }
+        },
+        "hooks": {
+          "engine._initializeLimits": "installed",
+          "engine._compileRawShaderToSpirV": "installed",
+          "engine.prepareGlslangAndTintAsync": "installed",
+          "engine._preparePipelineContextAsync": "installed",
+          "engine._createPipelineStageDescriptor": "installed",
+          "tint.convertSpirV2WGSL": "not-created",
+          "device.createShaderModule": "installed",
+          "device.createRenderPipeline": "installed",
+          "device.createRenderPipelineAsync": "installed",
+          "queue.submit": "installed",
+          "module.getCompilationInfo": "installed"
+        },
+        "observerErrors": 0,
+        "bundleCountersLastFrame": {
+          "numEnableEffects": 0,
+          "numEnableDrawWrapper": 419,
+          "numBundleCreationNonCompatMode": 0,
+          "numBundleReuseNonCompatMode": 0
+        },
+        "sharedCacheCounters": {
+          "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+          "values": {
+            "NumCacheHitWithoutHash": 3215858,
+            "NumCacheHitWithHash": 678084,
+            "NumCacheMiss": 1069,
+            "NumPipelineCreationLastFrame": 0
+          }
+        }
+      }
+    },
+    "weatherAtStart": {
+      "temperature": 12.3,
+      "cloud": 0.86,
+      "rain": 0,
+      "wind": 1.8,
+      "windDirection": 337.5,
+      "observedAt": 1792579930000,
+      "fetchedAt": 1792579957998,
+      "stale": true,
+      "cloudStale": true,
+      "status": "fallback",
+      "sourceKind": "station",
+      "source": "Řízené testovací počasí · uložený záznam",
+      "cloudSource": "Řízený meteorologický model · benchmark",
+      "cloudObservedAt": 1792579500000,
+      "cloudWindSource": "Řízené modelové proudění · benchmark",
+      "cloudLayers": {
+        "low": 0,
+        "mid": 0.78,
+        "high": 0.34
+      },
+      "cloudWinds": {
+        "low": {
+          "speed": 9.2,
+          "direction": 148
+        },
+        "mid": {
+          "speed": 15.04,
+          "direction": 193
+        },
+        "high": {
+          "speed": 24.18,
+          "direction": 195
+        }
+      },
+      "humidity": 78,
+      "snowfall": 0,
+      "precipitationType": "none",
+      "windGust": 3.5,
+      "visibility": 36360,
+      "liquidPrecipitation": 0,
+      "fieldSources": {
+        "windGust": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "humidity": {
+          "kind": "station",
+          "source": "Meteostanice Silicon Hill",
+          "observedAt": 1792579930000,
+          "stale": true
+        },
+        "visibility": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "snowfall": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "liquidPrecipitation": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "precipitationType": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        }
+      }
+    },
+    "weatherAtEnd": {
+      "temperature": 12.3,
+      "cloud": 0.86,
+      "rain": 0,
+      "wind": 1.8,
+      "windDirection": 337.5,
+      "observedAt": 1792579930000,
+      "fetchedAt": 1792579957998,
+      "stale": true,
+      "cloudStale": true,
+      "status": "fallback",
+      "sourceKind": "station",
+      "source": "Řízené testovací počasí · uložený záznam",
+      "cloudSource": "Řízený meteorologický model · benchmark",
+      "cloudObservedAt": 1792579500000,
+      "cloudWindSource": "Řízené modelové proudění · benchmark",
+      "cloudLayers": {
+        "low": 0,
+        "mid": 0.78,
+        "high": 0.34
+      },
+      "cloudWinds": {
+        "low": {
+          "speed": 9.2,
+          "direction": 148
+        },
+        "mid": {
+          "speed": 15.04,
+          "direction": 193
+        },
+        "high": {
+          "speed": 24.18,
+          "direction": 195
+        }
+      },
+      "humidity": 78,
+      "snowfall": 0,
+      "precipitationType": "none",
+      "windGust": 3.5,
+      "visibility": 36360,
+      "liquidPrecipitation": 0,
+      "fieldSources": {
+        "windGust": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "humidity": {
+          "kind": "station",
+          "source": "Meteostanice Silicon Hill",
+          "observedAt": 1792579930000,
+          "stale": true
+        },
+        "visibility": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "snowfall": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "liquidPrecipitation": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "precipitationType": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        }
+      }
+    }
+  },
+  "raw": {
+    "game": 577,
+    "raf": 575,
+    "maxGameMs": 35.39999997615814,
+    "hitches100": 0,
+    "planned": {
+      "plannedUTC": 1792764326499,
+      "latenessToleranceMs": 50,
+      "armedUTC": 1792764312320,
+      "callbackUTC": 1792764326506,
+      "latenessMs": 8,
+      "actualStartUTC": 1792764326507,
+      "attemptedAtUTC": 1792764326507
+    },
+    "exactReceipt": true
+  },
+  "originalSession": {
+    "bytes": 6949423,
+    "sha256": "54a31fcced0c394dc1805f55e175478ee62c1d76c154d34914405e2980d430fb",
+    "file": "original-session.jsonl.gz",
+    "carEntry375ms": true,
+    "renderErrors": 0,
+    "unhandled": 0
+  },
+  "files": {
+    "actual-states.jsonl": {
+      "bytes": 433184,
+      "sha256": "7491ad64034e7f5326c46d4927e76f5ce6492f3e28b961fab10bf937ea9f38ff",
+      "sourceName": "actual-states.jsonl"
+    },
+    "after-benchmark.jpg": {
+      "bytes": 35936,
+      "sha256": "461cfd258bdb89f7f61a9bb2afc895ff0d034a6054804e8d23ac2c40c6110149",
+      "sourceName": "after-benchmark.png",
+      "mimeType": "image/jpeg"
+    },
+    "before-arm.jpg": {
+      "bytes": 35931,
+      "sha256": "e88ab2034b17b8ba81d78d8bd4826bc9a1755a6081d111c96cf978b3880c6dc6",
+      "sourceName": "before-arm.png",
+      "mimeType": "image/jpeg"
+    },
+    "benchmark-export.json": {
+      "bytes": 45448,
+      "sha256": "ec0fae877e9d103e57a829ba1d2107a382059e56aaf8e60e50b1e62fa75976b1",
+      "sourceName": "benchmark-export.json"
+    },
+    "canvas-proofs.jsonl": {
+      "bytes": 21689,
+      "sha256": "987ea16d7af1c8d11611e1896bf3b6ec44d3c314a34f71476ee085efd04590e2",
+      "sourceName": "canvas-proofs.jsonl"
+    },
+    "car-day-left.jpg": {
+      "bytes": 90761,
+      "sha256": "fbf2d97e774167a1b732f9ce14d9a0ada9a2df13d2bb40e645ae147610945788",
+      "sourceName": "car-day-left.png",
+      "mimeType": "image/jpeg"
+    },
+    "car-day-right.jpg": {
+      "bytes": 88282,
+      "sha256": "8f16fd53d2b5397a79134b3b3d1103d5803080f474c8d14ecd89cb79f1b2eb0f",
+      "sourceName": "car-day-right.png",
+      "mimeType": "image/jpeg"
+    },
+    "car-entered.jpg": {
+      "bytes": 46001,
+      "sha256": "8ce04a4ce0d60e2d0c3e7d4936ad15de76dae51ae9cbbe1aaf018239be73355f",
+      "sourceName": "car-entered.png",
+      "mimeType": "image/jpeg"
+    },
+    "car-exited.jpg": {
+      "bytes": 87923,
+      "sha256": "cf2bb387fa2548c2a2aa644996683c36e40b3e58d904073aa08575d8c045d368",
+      "sourceName": "car-exited.png",
+      "mimeType": "image/jpeg"
+    },
+    "car-forward.jpg": {
+      "bytes": 43772,
+      "sha256": "97ae119efb10ece696de934a94957b215d2fead254fd2346f0158f99fa2c9e2f",
+      "sourceName": "car-forward.png",
+      "mimeType": "image/jpeg"
+    },
+    "car-left.jpg": {
+      "bytes": 38388,
+      "sha256": "3c925dbd2e783e53d79fdc16c13cdb23680342edffa58d92316e6bb15990edee",
+      "sourceName": "car-left.png",
+      "mimeType": "image/jpeg"
+    },
+    "final-car-foot-full.jpg": {
+      "bytes": 200532,
+      "sha256": "a06a60863277f13a1afdd850ce4e1b17b5e86add5f785d79f590f38b94ad1e2e",
+      "sourceName": "final-car-foot-full.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "foot-steering-projection.json": {
+      "bytes": 6481,
+      "sha256": "1088fb497cacc75fdd4afcabcc05547b65901e47c0ad4d5f9a79ee7d9039a2d0",
+      "sourceName": "foot-steering-projection.json"
+    },
+    "foot-view-2.jpg": {
+      "bytes": 191877,
+      "sha256": "3fbc48389bbde0817aa69eb615502f72640041fcd1a15139165a1a5f45dc7e15",
+      "sourceName": "foot-view-2.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "foot-view-4.jpg": {
+      "bytes": 186435,
+      "sha256": "3715a38ba8825aaac45eb03d68628ea6d48a736d452a6cc8492d4815f1f4a955",
+      "sourceName": "foot-view-4.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "foot-view-6.jpg": {
+      "bytes": 191641,
+      "sha256": "15611f5b25dfc7dc87cfbd6f07185c50673d1b1ecd48897bed042c320e5480c1",
+      "sourceName": "foot-view-6.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "foot-view-8.jpg": {
+      "bytes": 200002,
+      "sha256": "58c4e19f23855f9b63b8789b5c139705e01e69eaf288bdb41caa816a09c2369b",
+      "sourceName": "foot-view-8.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "http-identity.json": {
+      "bytes": 4757,
+      "sha256": "12ee9de56a9b76395baba51016ba321cbd23cdface1abbee5826317dcd050274",
+      "sourceName": "http-identity.json"
+    },
+    "identity.json": {
+      "bytes": 12523,
+      "sha256": "461f6685990ebba6760ebabeefe50f9e9a03d540cc95df7bdf10325070beedf4",
+      "sourceName": "identity.json"
+    },
+    "receipts/097806c8-2a4a-4b20-a102-6405e9d6af57.json": {
+      "bytes": 12768,
+      "sha256": "155c185bc5face10c9a62eb7b05276c965be9078ee2452ff1e4c66d51b78a954",
+      "sourceName": "receipts/097806c8-2a4a-4b20-a102-6405e9d6af57.json"
+    },
+    "receipts/0a72ee35-2e64-47bb-a99d-ce280cde02a5.json": {
+      "bytes": 12744,
+      "sha256": "83d708353e9038955b445b4b9ab7d34bf965d679ab977b27d17165ba05b7209b",
+      "sourceName": "receipts/0a72ee35-2e64-47bb-a99d-ce280cde02a5.json"
+    },
+    "receipts/10195d0b-100d-4370-b187-9eb696769d23.json": {
+      "bytes": 12743,
+      "sha256": "ed8a8edb65d323818e00e1252519c49ba5b25a97325f3ab6be5db19e6fd88f05",
+      "sourceName": "receipts/10195d0b-100d-4370-b187-9eb696769d23.json"
+    },
+    "receipts/166937e3-3ca9-45be-a46e-9b87c37f8a19.json": {
+      "bytes": 12753,
+      "sha256": "987935a089771e39ce62fe14c290c54fa1494d202a5451e64b08904de23f5f9f",
+      "sourceName": "receipts/166937e3-3ca9-45be-a46e-9b87c37f8a19.json"
+    },
+    "receipts/23b81d37-d6c5-4f69-9ac4-30a8f6091045.json": {
+      "bytes": 12748,
+      "sha256": "525b55bc2f2f75907efc692e41eb1d2a753d2288f226cd5245377222ea20cc4e",
+      "sourceName": "receipts/23b81d37-d6c5-4f69-9ac4-30a8f6091045.json"
+    },
+    "receipts/2cdf218e-8cdf-4a2a-8eb8-b4a1fde618e0.json": {
+      "bytes": 12734,
+      "sha256": "a95be7ae1d400a2b5c761b959c6c640b83d83b2b56860bddcc394f0a2f2a4d09",
+      "sourceName": "receipts/2cdf218e-8cdf-4a2a-8eb8-b4a1fde618e0.json"
+    },
+    "receipts/4a54499a-3490-4598-8150-e045a274e1e9.json": {
+      "bytes": 12732,
+      "sha256": "b8405f5a89aa3b1c4ab0bd431e8530f6762aba60af8b6ed17ce85be96ab0866f",
+      "sourceName": "receipts/4a54499a-3490-4598-8150-e045a274e1e9.json"
+    },
+    "receipts/5a62aaab-f3af-4af4-a022-9876b6c2b727.json": {
+      "bytes": 12755,
+      "sha256": "41bd9057d5d15edd7f262729b14d5a06158a9a99f37d8ceb8581a038a438f129",
+      "sourceName": "receipts/5a62aaab-f3af-4af4-a022-9876b6c2b727.json"
+    },
+    "receipts/5fe2f46d-558f-4536-a307-caaff041eb8b.json": {
+      "bytes": 281143,
+      "sha256": "0bc1b5c4618ee5ec2005e0a8aae031096a88df28c87836839a365324612b9d1d",
+      "sourceName": "receipts/5fe2f46d-558f-4536-a307-caaff041eb8b.json"
+    },
+    "receipts/69da1528-0714-49ea-bb31-851a963f4070.json": {
+      "bytes": 12757,
+      "sha256": "417fd61e6886b9fb394f2ad66a0cb63658a1ff54c1f18659b98e0a1e25808324",
+      "sourceName": "receipts/69da1528-0714-49ea-bb31-851a963f4070.json"
+    },
+    "receipts/6c79c658-0095-4bf1-8191-20e0d152fe1d.json": {
+      "bytes": 12755,
+      "sha256": "7aa8bc7e6e929f7908fb06ae1973f6b4adfb28f5a2d8f7c46ee50292ac3edb37",
+      "sourceName": "receipts/6c79c658-0095-4bf1-8191-20e0d152fe1d.json"
+    },
+    "receipts/70a356c0-3aed-429c-9d5b-1ca26007166e.json": {
+      "bytes": 12615,
+      "sha256": "fbb527c96b6bd2d298f91d8fd5f6db95888699b9dd241d5d701bd196d7132e90",
+      "sourceName": "receipts/70a356c0-3aed-429c-9d5b-1ca26007166e.json"
+    },
+    "receipts/7655c042-baf7-43ac-bdca-303bd6329c37.json": {
+      "bytes": 12742,
+      "sha256": "56cae738ea21f2976834f003ee9acb9aaa013caa6d238f4e6dd96920ff2aeec1",
+      "sourceName": "receipts/7655c042-baf7-43ac-bdca-303bd6329c37.json"
+    },
+    "receipts/863de0e6-dc43-46f7-a534-2b237b064931.json": {
+      "bytes": 12740,
+      "sha256": "1be005b2741f011fedf1191d51b420e51bd4a9b8c2b9424085eeae58add1c6e8",
+      "sourceName": "receipts/863de0e6-dc43-46f7-a534-2b237b064931.json"
+    },
+    "receipts/8993d7b8-d3b7-4e62-9b3f-5f34ab5b9450.json": {
+      "bytes": 45447,
+      "sha256": "4aa633ce143f7c0f3dc8779086390cc135aac3cfddd966959201b83a19de274d",
+      "sourceName": "receipts/8993d7b8-d3b7-4e62-9b3f-5f34ab5b9450.json"
+    },
+    "receipts/90169399-27a6-47b1-9907-71aff66e18db.json": {
+      "bytes": 12768,
+      "sha256": "ea4202e15bab416f4d0b94c112f51ee6596836b1e2bbb549070bd054f7fbefba",
+      "sourceName": "receipts/90169399-27a6-47b1-9907-71aff66e18db.json"
+    },
+    "receipts/93a7b5e4-e6cb-4b93-a032-04103eccdb30.json": {
+      "bytes": 12757,
+      "sha256": "10c6df195db9d4623d308d6bdd85964be96f0e5989a28dc90770e28f11b7ac83",
+      "sourceName": "receipts/93a7b5e4-e6cb-4b93-a032-04103eccdb30.json"
+    },
+    "receipts/94fe129d-75e7-4b3b-8aa8-3d0ef4ad2be5.json": {
+      "bytes": 12763,
+      "sha256": "ef5b1002d6e7715f1cf0a2436240fddc249ea0d31e882debb6ba87a3f4633adb",
+      "sourceName": "receipts/94fe129d-75e7-4b3b-8aa8-3d0ef4ad2be5.json"
+    },
+    "receipts/95c86c6e-ee13-4a90-a244-94f94161a248.json": {
+      "bytes": 12633,
+      "sha256": "47191dd9d044cf78ceda3cf1e9eccf2e80dcfb4d3621b4622ffb2ee86c5370bc",
+      "sourceName": "receipts/95c86c6e-ee13-4a90-a244-94f94161a248.json"
+    },
+    "receipts/9eaa9b4b-f2ca-4a26-8ed2-127ff62dfac1.json": {
+      "bytes": 12754,
+      "sha256": "4c37a5785517376a627d2c3cde3db2fed892d604b641277c9829b7165b4a1d13",
+      "sourceName": "receipts/9eaa9b4b-f2ca-4a26-8ed2-127ff62dfac1.json"
+    },
+    "receipts/adf38af1-3715-4955-8d97-475aac735741.json": {
+      "bytes": 12748,
+      "sha256": "b11698d2415f225f14b886d688842b9de67c18e6bdda731406168cf7712617e7",
+      "sourceName": "receipts/adf38af1-3715-4955-8d97-475aac735741.json"
+    },
+    "receipts/b5e96399-36ce-4924-8886-d1d60ea09b77.json": {
+      "bytes": 12761,
+      "sha256": "cb12ed546c5ec50d42f68c3476b212f50319a9e9b3df620941180cbdd73c3408",
+      "sourceName": "receipts/b5e96399-36ce-4924-8886-d1d60ea09b77.json"
+    },
+    "receipts/b9eec48f-c561-4d16-b499-681a4c868039.json": {
+      "bytes": 12731,
+      "sha256": "57c9b91e8aed0d27475debff693142e101bee08445c53513b804cdd22d7987df",
+      "sourceName": "receipts/b9eec48f-c561-4d16-b499-681a4c868039.json"
+    },
+    "receipts/c042ee15-526f-413a-aa53-a3e03601ea47.json": {
+      "bytes": 12765,
+      "sha256": "fdd5f7ae6cbafa306875ddd2c87176947f8807ae14b22dd4eeb978b492fc4e6b",
+      "sourceName": "receipts/c042ee15-526f-413a-aa53-a3e03601ea47.json"
+    },
+    "receipts/c4b9e3ee-c7d3-421c-92d4-df194cc14675.json": {
+      "bytes": 12767,
+      "sha256": "697339c69f57f0e67978304fac75b3ede86e2a136fd4f8922737e2e5d0da7748",
+      "sourceName": "receipts/c4b9e3ee-c7d3-421c-92d4-df194cc14675.json"
+    },
+    "receipts/c6b8881f-ab5c-490d-bcde-63368d8f9337.json": {
+      "bytes": 12750,
+      "sha256": "d30155f0c2322d845f0c7b1294c0161f97721c19161df764edca8864a24f3ed4",
+      "sourceName": "receipts/c6b8881f-ab5c-490d-bcde-63368d8f9337.json"
+    },
+    "receipts/cc94275f-6ea9-4806-bc50-8e9831ba00bc.json": {
+      "bytes": 12644,
+      "sha256": "a9a59b9440f5d0bd385c15a9aec024e78ba7b6e4e20e70c9b93cb73323e78a17",
+      "sourceName": "receipts/cc94275f-6ea9-4806-bc50-8e9831ba00bc.json"
+    },
+    "receipts/d19ed37d-009a-4e52-88e9-1e13c62c09d7.json": {
+      "bytes": 12757,
+      "sha256": "e777086c9a83c31f63d7d4a42ec7b9e189716b912b27ee560f5efff7771c1457",
+      "sourceName": "receipts/d19ed37d-009a-4e52-88e9-1e13c62c09d7.json"
+    },
+    "receipts/d70c4ca7-9015-4f4c-966b-b4e6874936c0.json": {
+      "bytes": 12744,
+      "sha256": "9c31ed3eef9a892edd28e1ecf78c3fb0c634b31263ad72c4ae17be7577f7ae46",
+      "sourceName": "receipts/d70c4ca7-9015-4f4c-966b-b4e6874936c0.json"
+    },
+    "receipts/d9ce094a-9333-4470-8e58-f10e3c36548f.json": {
+      "bytes": 12720,
+      "sha256": "b7cc223d7b537072ecf9bd476104c717471f639c6dc90523c09fd84f181a6411",
+      "sourceName": "receipts/d9ce094a-9333-4470-8e58-f10e3c36548f.json"
+    },
+    "receipts/da802a52-f4ce-415d-b1a5-41c82861dc28.json": {
+      "bytes": 12740,
+      "sha256": "68ccb0be9c41bd9372893ed1fbc4174c0175e767c9cb7aa29ac443698b9b3d1a",
+      "sourceName": "receipts/da802a52-f4ce-415d-b1a5-41c82861dc28.json"
+    },
+    "receipts/dd7840d4-2ef7-430b-ba6d-3b4085089b15.json": {
+      "bytes": 12751,
+      "sha256": "0a11b7e1feb921c1e3a2a77f3bfd44d1ebd3609e3a586d567fb1ea2074f0ec2c",
+      "sourceName": "receipts/dd7840d4-2ef7-430b-ba6d-3b4085089b15.json"
+    },
+    "receipts/e017c7c4-332f-4896-b1d5-49774e7c6693.json": {
+      "bytes": 12750,
+      "sha256": "70b1555b401fdba5dd1f8f80adb1edb85c3c0f3a34e64c3fa2285193de7a32f7",
+      "sourceName": "receipts/e017c7c4-332f-4896-b1d5-49774e7c6693.json"
+    },
+    "receipts/e5a877bf-4a64-4a94-8b6b-48608f3f0648.json": {
+      "bytes": 12755,
+      "sha256": "1b1e8f7316a4958352a0243568199203e8200f220a93d431a5f8cb1def8be9f2",
+      "sourceName": "receipts/e5a877bf-4a64-4a94-8b6b-48608f3f0648.json"
+    },
+    "receipts/fdd23406-c6f4-4d52-b725-57e7eabba36f.json": {
+      "bytes": 12740,
+      "sha256": "253154bce3a93cf42c96f589ec9bc6655d17d4d669eddb7a7bb404c057ce03e2",
+      "sourceName": "receipts/fdd23406-c6f4-4d52-b725-57e7eabba36f.json"
+    },
+    "receipts/fe6f15b8-6d5f-4c39-b660-4c587a1d67f9.json": {
+      "bytes": 12766,
+      "sha256": "7a6796618ba5bd9ba3b9e4d71781e441dfc874cdd45f0e8e3467706c09c34435",
+      "sourceName": "receipts/fe6f15b8-6d5f-4c39-b660-4c587a1d67f9.json"
+    },
+    "viewport-max-full.jpg": {
+      "bytes": 191892,
+      "sha256": "76ea1cc9083ab82c309e9fb21b5357a4edf5f5df2bddf50f892ae7a1f176576b",
+      "sourceName": "viewport-max-full.jpg",
+      "mimeType": "image/jpeg"
+    },
+    "visibility-tab-state.json": {
+      "bytes": 1306,
+      "sha256": "12b67bc60cf5733a6ecacaaa682f702c6c8535d5f49d34295ff04b422f5f7fc8",
+      "sourceName": "visibility-tab-state.json"
+    },
+    "clock-config.json": {
+      "bytes": 155,
+      "sha256": "3e89c0c52ea9bbf8852edb70eb3f1e5022e559af2cd48fcc0f2549048c2bfcdd"
+    },
+    "runtime.json": {
+      "bytes": 1426,
+      "sha256": "27afe3deed9917ab18d79dcaebb3cb0b41d6eb4fd85afee44803693e6561fcab"
+    },
+    "gpu-driver.txt": {
+      "bytes": 43,
+      "sha256": "1fb025f182130a4827cda956da48b9d7829a24345c70cc603ef46a7e0dc5e681"
+    },
+    "original-session.jsonl.gz": {
+      "bytes": 806841,
+      "sha256": "73171ef2ef5a9949b1961f765b8cc17ddbb33f9183710211ee83073593c7c167"
+    },
+    "car-entry-events.json": {
+      "bytes": 22574,
+      "sha256": "6d6947548da1a3dd003a6caeecfc70128c7c9f9b281c7c252aa59aaa0bc7c2dd"
+    },
+    "collector-runtime.json": {
+      "bytes": 1486,
+      "sha256": "82137fe76025ce8ce98065e473a77ca05f813ecf60e85a342720f391603d43fd"
+    },
+    "telemetry-window-projection.json": {
+      "bytes": 15401,
+      "sha256": "c2d608a54f6f2b482616fda1515bd5ecbe7699d2b3455dc7f3d5c99af127adf8"
+    }
+  },
+  "limitations": [
+    "Parameters were stable only about A−36s, rather than planned A−90s. Calibration is excluded from final18run series.",
+    "p95=20.9ms exceeds20ms; p99=26.1ms meets33.3ms. No migration acceptance from this one stationary interval.",
+    "Actual GPU/mainpass time unavailable; inclusive/nested CPU scopes must not be added or treated as GPU time.",
+    "Five telemetry samples are windows, not a continuous no-throttle proof; collector overhead is not subtracted from FPS.",
+    "Visible native viewport captures were JPEG1893x804 despite .png filenames; public names corrected to .jpg without pixel changes. Full-page screenshot is the complete2040x986 DOM/HUD image; emulated CSS viewport differs from physical browser tab bounds.",
+    "Car direct firstentry375ms is a separate failure after this benchmark. Cumulative11newprograms cannot all be attributed to entry. Later exact frozen-transit diagnostic observed1program instead.",
+    "Foot A/D projection uses actual pre-input camera matrices and observed physical positions at4orientations; car W/W+A/W+D/space/E steps are actual controls, not a sign-only CPU fixture."
+  ]
+}
