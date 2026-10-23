@@ -16,6 +16,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Light } from "@babylonjs/core/Lights/light";
+import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlayerFlashlight } from "../client/flashlight";
@@ -24,12 +25,14 @@ import { StableLightState } from "../client/stable-light-state";
 import { GltfLightBudget } from "../client/gltf-light-budget";
 import { prepareLightVariants } from "../client/light-preparation";
 import { prepareRenderQualities } from "../client/render-quality-preparation";
-import { MANUAL_HARDWARE_SCALING } from "../shared/render-quality";
+import { AdaptiveQualityController } from "../client/adaptive-quality";
+import { MANUAL_HARDWARE_SCALING, isRenderQualityMode } from "../shared/render-quality";
 import { PhotographicGrass } from "../client/photographic-grass";
 import { acquireGrassResources } from "../client/photo-grass-resources";
 import { VegetationController } from "../client/vegetation";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
-import { applyArtLighting } from "../client/art-lighting";
+import { WebGpuCompilationProfile } from "../client/webgpu-compilation-profile";
+import { applyArtLighting, sampleArtLighting } from "../client/art-lighting";
 import { selectLightingPreview } from "../client/lighting-preview";
 import { sunState, moonState } from "../shared/weather";
 import "../client/render-shaders";
@@ -54,6 +57,8 @@ const methods = declaration.members.filter(
   (n) =>
     n.name &&
     [
+      "setQuality",
+      "applyAdaptiveQuality",
       "prepareLighting",
       "prepareLightingVariants",
       "isMeshReadyForCamera",
@@ -64,17 +69,18 @@ const methods = declaration.members.filter(
       "startupPreparationCoverage",
     ].includes(n.name.getText(source)),
 );
-assert.equal(methods.length, 8);
+assert.equal(methods.length, 10);
 const code = ts.transpileModule(
   `class TestGame {${methods.map((n) => n.getText(source)).join("\n")}}`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(
-  `(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,applyArtLighting,performance,window,document}=env;${code};return TestGame;}`,
+  `(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,isRenderQualityMode,arePreparationEffectsReady,selectLightingPreview,applyArtLighting,performance,window,document}=env;${code};return TestGame;}`,
 ).runInThisContext();
 const anchor = Date.parse("2026-10-18T12:45:00Z");
 const select = (mode: Parameters<typeof selectLightingPreview>[0]) =>
   selectLightingPreview(mode, anchor);
+const vehicleStages = ["vehicle-0", "vehicle-1", "vehicle-2", "vehicle-keyed-0", "vehicle-keyed-1", "vehicle-keyed-2"];
 const originalStages = [
   "current-off",
   "current-on",
@@ -96,7 +102,9 @@ function fixture(
   quality = "low",
   webgpu = true,
   withGrass = false,
+  previewAnchor = anchor,
 ) {
+  const selectAt = (mode: Parameters<typeof selectLightingPreview>[0]) => selectLightingPreview(mode, previewAnchor);
   const engine = new NullEngine();
   if (withGrass) engine.getCaps().instancedArrays = true;
   const
@@ -171,7 +179,8 @@ function fixture(
     now = 0,
     draws = 0,
     programs = 0,
-    visualWrites = 0;
+    visualWrites = 0,
+    environmentInstant = NaN;
   let afterDraw: (() => void) | undefined;
   const originalProgram = engine.createShaderProgram;
   engine.createShaderProgram = function (...args) {
@@ -193,6 +202,8 @@ function fixture(
       parked: boolean;
       beam: boolean;
       shadow: boolean;
+      shadowMapSize?: number;
+      nonStreet: number;
       points: number;
       quality: string;
       instant: number;
@@ -231,8 +242,9 @@ function fixture(
     prepareLightVariants,
     prepareRenderQualities,
     MANUAL_HARDWARE_SCALING,
+    isRenderQualityMode,
     arePreparationEffectsReady: () => arePreparationEffectsReady(engine),
-    selectLightingPreview: select,
+    selectLightingPreview: selectAt,
     applyArtLighting,
     performance: { now: () => now },
     window: { setTimeout, clearTimeout },
@@ -263,7 +275,7 @@ function fixture(
     avatars: new Map([["local", rig]]),
     profile: Object.freeze({ preset: 0 }),
     weather: Object.freeze({ cloud: 0.99, rain: 0, wind: 0 }),
-    timeOverride: select("night").instant,
+    timeOverride: selectAt("night").instant,
     flashlightOn: false,
     disposed: false,
     rendererFailed: false,
@@ -293,6 +305,7 @@ function fixture(
     skyWeather: {
       atmosphere: { material: skyMaterial, update() {}, dispose() {} },
       update({ instant }: { instant: number }) {
+        environmentInstant = instant;
         return {
           sun: sunState(instant),
           moon: moonState(instant),
@@ -391,9 +404,11 @@ function fixture(
         parked: game.parkedCar.isEnabled(false),
         beam: beam.light.isEnabled(),
         shadow: beam.light.shadowEnabled,
+        shadowMapSize: (beam.light.getShadowGenerator() as ShadowGenerator | null)?.mapSize,
+        nonStreet: scene.lights.filter(light => light.isEnabled() && !streets.includes(light as PointLight)).length,
         points: streets.filter((l) => l.isEnabled()).length,
         quality: game.quality,
-        instant: game.timeOverride,
+        instant: environmentInstant,
         profile: game.profile,
         draws: (old?.draws ?? 0) + 1,
       });
@@ -487,13 +502,13 @@ function fixture(
   };
 }
 
-test("low WebGPU actual Game prepares two car variants before original13 and subsequent driving reuses Effects", async (t) => {
+test("low WebGPU actual Game prepares three bounded car requests before original13 and subsequent driving reuses Effects", async (t) => {
   const f = fixture(t),
     result = await f.finish(f.start());
   assert.equal(result.status, "complete");
   assert.deepEqual(
     result.stages.map((s: any) => s.stage),
-    ["vehicle-0", "vehicle-1", ...originalStages],
+    [...vehicleStages, ...originalStages],
   );
   assert.equal(f.invariant(), f.initial);
   for (const n of [0, 1]) {
@@ -518,9 +533,8 @@ test("low WebGPU actual Game prepares two car variants before original13 and sub
   assert.equal(f.counts().programs, before);
 });
 
-test("medium WebGPU and low WebGL retain original13/9 without leasing vehicle roots", async (t) => {
+test("WebGL retains original9 without leasing vehicle roots", async (t) => {
   for (const [quality, gpu, count] of [
-    ["medium", true, 13],
     ["low", false, 9],
   ] as const) {
     const f = fixture(t, quality, gpu),
@@ -533,6 +547,7 @@ test("medium WebGPU and low WebGL retain original13/9 without leasing vehicle ro
   }
 });
 
+for (const quality of ["low", "medium", "high"])
 for (const ending of [
   "cancel",
   "disposed",
@@ -540,8 +555,8 @@ for (const ending of [
   "timeout",
   "throw",
 ] as const)
-  test(`vehicle lease releases correctly on ${ending}`, async (t) => {
-    const f = fixture(t),
+  test(`${quality} vehicle lease releases correctly on ${ending}`, async (t) => {
+    const f = fixture(t, quality),
       pending = f.start({ timeoutMs: 1000 });
     await f.until("vehicle-0");
     assert.equal(f.car.isEnabled(), true);
@@ -583,9 +598,10 @@ for (const ending of [
     assert.equal(f.invariant(), f.initial);
   });
 
+for (const quality of ["low", "medium", "high"])
 for (const disposedRoot of ["car", "parked"] as const)
-  test(`single live-scene root disposal fails closed: ${disposedRoot}`, async (t) => {
-    const f = fixture(t), pending = f.start();
+  test(`${quality} single live-scene root disposal fails closed: ${disposedRoot}`, async (t) => {
+    const f = fixture(t, quality), pending = f.start();
     await f.until("vehicle-0");
     const dead = f[disposedRoot];
     dead.dispose();
@@ -612,8 +628,9 @@ for (const disposedRoot of ["car", "parked"] as const)
     assert.equal(f.invariant(), f.initial);
   });
 
-test("replacement roots restart the vehicle stage and never receive the old lease flags", async (t) => {
-  const f = fixture(t),
+for (const quality of ["low", "medium", "high"])
+test(`${quality} replacement roots restart the vehicle stage and never receive the old lease flags`, async (t) => {
+  const f = fixture(t, quality),
     pending = f.start();
   await f.until("vehicle-0");
   const replacementCar = new TransformNode("replacement driving", f.scene),
@@ -685,16 +702,16 @@ test("final restore applies latest quality/time/profile before accepted readines
       "submitted-frame",
       "ready",
     ]).size,
-    19,
-    "19 named opt-in inventory labels fit maxStages21 including overflow",
+    23,
+    "23 requested labels exceed maxStages21; the actual inventory must explicitly aggregate overflow",
   );
 });
 
-test("WebGPU preparation includes the actual FAR helper in all41 stages and all3 quality passes", async t => {
+test("WebGPU preparation includes the actual FAR helper in all57 stages and all3 quality passes", async t => {
   const f=fixture(t,"medium",true,true), requested={...f.requested};
   const result=await f.finish(f.startAllQualities());
-  assert.equal(result.status,"complete");assert.equal(result.stages.length,41);
-  assert.deepEqual(result.qualities.map((q:any)=>[q.quality,q.stageCount]),[["low",15],["high",13],["medium",13]]);
+  assert.equal(result.status,"complete");assert.equal(result.stages.length,57);
+  assert.deepEqual(result.qualities.map((q:any)=>[q.quality,q.stageCount]),[["low",19],["high",19],["medium",19]]);
   for(const entry of result.stages){
     const frames=f.grassFrames.filter(frame=>frame.stage===entry.stage&&frame.quality===entry.passQuality&&frame.enabled&&frame.drawn&&frame.ready&&frame.count===1);
     assert.ok(frames.length>=2,`${entry.passQuality}/${entry.stage} has two actual ready FAR draws`);
@@ -714,7 +731,7 @@ test("same-count grass resource replacement restarts actual Game preparation and
   f.replaceGrassResources();const stale=f.grass!.beginShaderPreparation()!;const next=f.grassMesh()!;
   assert.equal(old.isDisposed(),true);assert.notEqual(next,old);assert.equal(f.scene.meshes.length,count);assert.equal(f.scene.materials.length,materials);
   await f.tick();stale();assert.equal(next.isEnabled(),true);
-  const result=await f.finish(pending);assert.equal(result.status,"complete");assert.ok(result.stages[0].restartReasons.grassResources>=1);assert.equal(next.isEnabled(),false);
+  const result=await f.finish(pending);assert.equal(result.status,"complete");assert.ok(result.stages.find((stage:any)=>stage.stage==="current-off")!.restartReasons.grassResources>=1);assert.equal(next.isEnabled(),false);
 });
 
 for(const ending of ["cancel","disposed","fault","timeout","throw"] as const)test(`actual FAR activation is disabled on ${ending}`,async t=>{
@@ -732,4 +749,173 @@ test("actual Game failed FAR initialization cannot leak a clone or report comple
   resource.clone=(level:string,name:string)=>{const mesh=clone(level,name);mesh.makeGeometryUnique=()=>{throw Error("unique geometry failure");};return mesh;};
   const result=await f.finish(f.start());assert.equal(result.status,"failed");assert.equal(f.grassMesh(),undefined);assert.equal(f.scene.meshes.length,before);
   resource.clone=clone;
+});
+
+for (const quality of ["medium", "high"] as const)
+  test(`${quality} WebGPU prepares zero/one/two actual POINTs with the real car shadow`, async (t) => {
+    // Actual Strahov astronomy on this moonless night leaves ambient + car,
+    // hence two available POINT slots. This must not be a clamped one-POINT test.
+    const f = fixture(t, quality, true, false, Date.parse("2026-10-10T12:00:00Z"));
+    const result = await f.finish(f.start());
+    assert.equal(result.status, "complete");
+    assert.deepEqual(result.stages.map((s: any) => s.stage), [...vehicleStages, ...originalStages]);
+    for (const count of [0, 1, 2]) {
+      const state = f.stages.get(`vehicle-${count}`)!;
+      assert.ok(state, "actual vehicle stage drew both Standard and PBR receivers");
+      assert.equal(state.quality, quality);
+      assert.equal(state.car, true); assert.equal(state.parked, false);
+      assert.equal(state.beam, true); assert.equal(state.shadow, true);
+      assert.equal(state.shadowMapSize, quality === "medium" ? 256 : 512);
+      assert.equal(state.nonStreet, 2, "actual below-horizon celestial key leaves ambient and car");
+      assert.equal(state.points, count);
+      assert.equal(state.nonStreet + state.points, 2 + count);
+      assert.ok(state.draws >= 2);
+      assert.ok(result.stages.find((s: any) => s.stage === `vehicle-${count}`).renders >= 3);
+      for (const effect of state.effects as { defines: string }[]) {
+        assert.match(effect.defines, /^#define SPOTLIGHT\d+$/m);
+        assert.match(effect.defines, /^#define SHADOW\d+$/m);
+        assert.equal((effect.defines.match(/^#define POINTLIGHT\d+$/gm) ?? []).length, count);
+      }
+    }
+    const generator = f.beam.light.getShadowGenerator()!, map = generator.getShadowMap()!, before = f.counts().programs;
+    for (const count of [0, 1, 2]) assert.deepEqual(await f.drive(count), f.stages.get(`vehicle-${count}`)!.effects);
+    assert.equal(f.beam.light.getShadowGenerator(), generator);
+    assert.equal(generator.getShadowMap(), map, "entering the prepared quality must retain the actual RTT/pass");
+    assert.equal(f.counts().programs, before);
+    assert.equal(f.invariant(), f.initial);
+  });
+
+test("Low vehicle2 is explicitly the same clamped one-POINT state without shadows", async (t) => {
+  const f = fixture(t), result = await f.finish(f.start());
+  assert.equal(result.status, "complete");
+  const one = f.stages.get("vehicle-1")!, two = f.stages.get("vehicle-2")!;
+  assert.ok(one && two, "both clamped Low vehicle states must actually draw");
+  assert.equal(one.points, 1); assert.equal(two.points, 1);
+  assert.equal(one.shadow, false); assert.equal(two.shadow, false);
+  assert.deepEqual(two.effects, one.effects, "redundant Low request adds no different main material variant");
+});
+
+for (const requested of ["medium", "high"] as const)
+  test(`all qualities finish with requested ${requested} car shadow map retained before entry`, async (t) => {
+    const f = fixture(t, requested), result = await f.finish(f.startAllQualities());
+    assert.equal(result.status, "complete"); assert.equal(result.stages.length, 57);
+    assert.deepEqual(result.qualities.map((q: any) => [q.quality, q.stageCount]), requested === "medium" ? [["low",19],["high",19],["medium",19]] : [["low",19],["medium",19],["high",19]]);
+    assert.equal(f.game.quality, requested); assert.equal(f.game.preparingRenderQuality, false);
+    const shadow = f.beam.light.getShadowGenerator() as ShadowGenerator;
+    assert.equal(shadow.mapSize, requested === "medium" ? 256 : 512);
+    const map = shadow.getShadowMap()!, pass = map.renderPassId;
+    assert.equal(f.beam.light.isEnabled(), false);
+    await f.drive(1);
+    assert.equal(shadow.getShadowMap(), map); assert.equal(map.renderPassId, pass);
+  });
+
+test("late requested quality during final pass prepares its actual map before gameplay entry", async (t) => {
+  const f = fixture(t, "medium"); let changed = false;
+  f.game.adaptive = new AdaptiveQualityController({ mode: "medium" });
+  f.hook(() => {
+    if (!changed && f.game.quality === "medium" && f.stage() === "current-off") {
+      changed = true;
+      assert.equal(f.game.preparingRenderQuality, true);
+      f.game.setQuality("high");
+      assert.equal(f.game.adaptive.state.quality, "high");
+      assert.equal(f.game.quality, "medium", "request is deferred during temporary quality pass");
+    }
+  });
+  const result = await f.finish(f.startAllQualities());
+  assert.equal(result.status, "complete"); assert.equal(changed, true);
+  assert.equal((f.beam.light.getShadowGenerator() as ShadowGenerator).mapSize, 512, "latest requested High must be prepared rather than retain Medium256");
+  assert.equal(result.stages.length, 76);
+  assert.deepEqual(result.qualities.map((q: any) => q.quality), ["low", "high", "medium", "high"]);
+  assert.deepEqual(result.qualities.map((q: any) => q.finalPass), [false, false, true, true]);
+  assert.equal(f.game.quality, "high");
+  const shadow = f.beam.light.getShadowGenerator() as ShadowGenerator;
+  assert.equal(shadow.mapSize, 512, "inactive requested restore must not leave the earlier256 map for first entry to resize");
+  const map = shadow.getShadowMap()!; await f.drive(1);
+  assert.equal(shadow.getShadowMap(), map);
+});
+
+for (const quality of ["medium", "high"]) for (const extra of [1, 2])
+test(`${quality} vehicle POINT requests respect actual extra-source budget${extra}`, async t => {
+  const f = fixture(t, quality, true, false, Date.parse("2026-10-10T12:00:00Z"));
+  for (let i=0;i<extra;i++) new PointLight("enabled interior source "+i, Vector3.Up(), f.scene);
+  const result=await f.finish(f.start()); assert.equal(result.status,"complete");
+  for (const n of [0,1,2]) { const state=f.stages.get("vehicle-"+n)!; assert.ok(state, "requested vehicle budget stage must actually draw"); assert.equal(state.nonStreet,2+extra); assert.equal(state.points,Math.min(n,2-extra)); assert.ok(state.points+state.nonStreet<=4); assert.equal(state.shadow,true); }
+});
+
+for (const initial of ["medium", "high"]) test(`${initial} vehicle preparation reapplies current stage on quality and profile revision`,async t=>{
+ const f=fixture(t,initial),pending=f.start();await f.until("vehicle-0");
+ f.game.quality=initial==="medium"?"high":"medium";f.game.profile={preset:5};f.game.weather={cloud:.2,rain:0,wind:0};
+ await f.tick();const result=await f.finish(pending);assert.equal(result.status,"complete");
+ const first=result.stages[0];assert.ok(first.restartReasons.quality>=1);assert.ok(first.restartReasons.profile>=1);assert.ok(first.restartReasons.weather>=1);
+ assert.equal((f.beam.light.getShadowGenerator() as ShadowGenerator).mapSize,f.game.quality==="medium"?256:512);
+ assert.equal(f.car.isEnabled(false),false);assert.equal(f.parked.isEnabled(false),true);
+});
+
+
+for (const quality of ["medium", "high"] as const)
+  test("current23Oct " + quality + " prepares both physical car profiles independently of today's keyed preview", async t => {
+    const current = Date.parse("2026-10-23T12:00:00Z"), keyed = Date.parse("2026-10-23T22:00:00Z"), keyless = Date.parse("2026-10-10T22:00:00Z");
+    assert.equal(selectLightingPreview("night", current).instant, keyed);
+    const source = (instant: number) => { const sun=sunState(instant),moon=moonState(instant);return sampleArtLighting(sun.altitude,.99,0,moon.altitude,moon.fraction,moon.distance).keySource; };
+    assert.equal(source(keyed), "moon"); assert.equal(source(keyless), "none");
+    const f=fixture(t,quality,true,false,current), requestedTime=f.game.timeOverride;
+    const result=await f.finish(f.start()); assert.equal(result.status,"complete");
+    for(const [prefix,instant,nonStreet] of [["vehicle-",keyless,2],["vehicle-keyed-",keyed,3]] as const) {
+      for(const n of [0,1,2]) {
+        const label=prefix+n,state=f.stages.get(label);assert.ok(state,"both physical profile stages must actually draw: "+label);
+        assert.equal(state.instant,instant,"sky/environment receives the real selected UTC");assert.equal(state.nonStreet,nonStreet);
+        assert.equal(state.points,Math.min(n,4-nonStreet));assert.equal(state.beam,true);assert.equal(state.shadow,true);assert.equal(state.shadowMapSize,quality==="medium"?256:512);
+        assert.ok(state.draws>=2);assert.ok(result.stages.find((s:any)=>s.stage===label).renders>=3);
+        for(const effect of state.effects as {defines:string}[]) {assert.match(effect.defines,/^#define SPOTLIGHT\d+$/m);assert.match(effect.defines,/^#define SHADOW\d+$/m);assert.equal((effect.defines.match(/^#define POINTLIGHT\d+$/gm)??[]).length,Math.min(n,4-nonStreet));}
+      }
+    }
+    assert.equal(f.game.timeOverride,requestedTime);assert.equal(f.stages.get("restore")!.instant,requestedTime);assert.equal(f.invariant(),f.initial);
+    const generator=f.beam.light.getShadowGenerator()!,map=generator.getShadowMap()!,before=f.counts().programs;
+    for(const [prefix,instant,capacity] of [["vehicle-",keyless,2],["vehicle-keyed-",keyed,1]] as const) {
+      f.game.timeOverride=instant;
+      for(const n of [0,1,2]) assert.deepEqual(await f.drive(Math.min(n,capacity)),f.stages.get(prefix+n)!.effects);
+    }
+    assert.equal(f.counts().programs,before,"both physically reachable prepared layouts reuse Effects");assert.equal(generator.getShadowMap(),map);f.game.timeOverride=requestedTime;
+  });
+
+
+for(const ending of ["cancel","timeout","throw"] as const)
+  test("keyed car profile restores concrete roots and actual requested time on "+ending, async t => {
+    const f=fixture(t,"medium",true,false,Date.parse("2026-10-23T12:00:00Z")),requested=f.game.timeOverride;
+    const pending=f.start({timeoutMs:1000});await f.until("vehicle-keyed-0");
+    if(ending==="cancel") f.game.cancelLightPreparation();
+    if(ending==="timeout") f.advanceClock(1001);
+    if(ending==="throw") f.hook(()=>{f.hook();throw Error("keyed original draw failure");});
+    const result=await f.finish(pending);assert.equal(result.status,ending==="cancel"?"disposed":ending==="timeout"?"timeout":"failed");
+    assert.equal(f.car.isEnabled(false),false);assert.equal(f.parked.isEnabled(false),true);assert.equal(f.game.timeOverride,requested);assert.equal(f.game.cancelLightPreparation,undefined);
+  });
+
+test("keyed car profile revision reapplies real sky and restores latest current requests",async t=>{
+  const f=fixture(t,"medium",true,false,Date.parse("2026-10-23T12:00:00Z")),pending=f.start();await f.until("vehicle-keyed-0");
+  const current=Date.parse("2026-10-23T10:00:00Z");f.game.timeOverride=current;f.game.flashlightOn=true;f.game.quality="high";f.game.weather={cloud:.4,rain:0,wind:0};
+  await f.tick();const result=await f.finish(pending);assert.equal(result.status,"complete");const stage=result.stages.find((s:any)=>s.stage==="vehicle-keyed-0");
+  assert.ok(stage.restartReasons.timeOverride>=1);assert.ok(stage.restartReasons.quality>=1);assert.ok(stage.restartReasons.weather>=1);
+  assert.equal(f.stages.get("vehicle-keyed-0")!.instant,Date.parse("2026-10-23T22:00:00Z"));assert.equal(f.stages.get("vehicle-keyed-0")!.nonStreet,3);
+  assert.equal(f.stages.get("restore")!.instant,current);assert.equal(f.game.timeOverride,current);assert.equal(f.game.flashlightOn,true);assert.equal((f.beam.light.getShadowGenerator() as ShadowGenerator).mapSize,512);
+});
+
+test("actual bounded shader inventory truthfully aggregates the23 requested preparation/lifecycle labels",()=>{
+  const observable={add:()=>({remove(){}})},engine={isWebGPU:true,onDisposeObservable:observable,onContextRestoredObservable:observable};
+  const profile=new WebGpuCompilationProfile(engine,{captureShaderInventory:true,shaderInventoryLimits:{maxStages:21}});
+  try {
+    const labels=["construction","assets",...vehicleStages,...originalStages,"submitted-frame","ready"];
+    assert.equal(new Set(labels).size,23);for(const label of labels)profile.setStage(label);
+    const inventory=profile.snapshot().shaderInventory!;assert.equal(inventory.limits.maxStages,21);assert.equal(inventory.stages.length,21);
+    assert.equal(inventory.stages[0].name,"unassigned");assert.equal(inventory.stages.at(-1)!.name,"overflow");assert.equal(inventory.stageOverflow,4);
+    assert.equal(inventory.stages.filter(s=>!["unassigned","overflow"].includes(s.name)).length,19,"bounded evidence does not pretend every physical stage is individually retained");
+  } finally {profile.dispose();}
+});
+
+
+test("fixed car nights restore real clock without publishing either preparation UTC",async t=>{
+  const f=fixture(t,"medium",true,false,Date.parse("2026-10-23T12:00:00Z"));f.game.timeOverride=null;
+  const before=Date.now(),result=await f.finish(f.start()),after=Date.now();assert.equal(result.status,"complete");
+  assert.equal(f.game.timeOverride,null);const restored=f.stages.get("restore")!.instant;
+  assert.ok(restored>=before&&restored<=after);assert.notEqual(restored,Date.parse("2026-10-10T22:00:00Z"));assert.notEqual(restored,Date.parse("2026-10-23T22:00:00Z"));
+  assert.equal(f.car.isEnabled(false),false);assert.equal(f.parked.isEnabled(false),true);
 });

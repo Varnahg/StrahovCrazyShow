@@ -172,9 +172,9 @@ for(const initialQuality of ["low","medium"] as const) test(`native cold opposit
   const deadline=performance.now()+35000;
   while(!complete&&performance.now()<deadline){callback?.();await turn();}
   assert.ok(complete,"bounded whole preparation finished");row.preparation=await preparation;row.stages=[...stageMap.values()];
-  assert.equal(row.preparation.status,"complete");assert.equal(row.preparation.stages.length,41);assert.deepEqual(row.preparation.qualities.map((x:any)=>x.quality),initialQuality==="low"?["medium","high","low"]:["low","high","medium"]);
-  assert.equal(row.stages.length,41);assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>family.cap===4)));
-  assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>s.quality==="low"&&s.label.startsWith("vehicle-")?(family.drawn&&family.ready):!family.drawn)));
+  assert.equal(row.preparation.status,"complete");assert.equal(row.preparation.stages.length,57);assert.deepEqual(row.preparation.qualities.map((x:any)=>x.quality),initialQuality==="low"?["medium","high","low"]:["low","high","medium"]);
+  assert.equal(row.stages.length,57);assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>family.cap===4)));
+  assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>s.label.startsWith("vehicle-")?(family.drawn&&family.ready):!family.drawn)));
   assert.ok(f.target.every(mesh=>!mesh.alwaysSelectAsActiveMesh),"all scoped flags restored before gameplay");
   assert.equal(game.yaw,startYaw);assert.equal(actor.vehicle,false);assert.equal(car.isEnabled(),false);assert.equal(parked.isEnabled(),true);assert.equal(game.adaptive.state,requested);
   assert.ok(Vector3.Distance(camera.position,initialCamera.position)<1e-9);assert.ok(Vector3.Distance(camera.rotation,initialCamera.rotation)<1e-9);
@@ -252,7 +252,7 @@ test("actual inner Game selects target light membership after environment and pr
     let settled=false;void f.pending.then(()=>{settled=true;});
     for(let i=0;!settled&&i<150;i++){f.tick();await turn();}
     const result=await f.pending;
-    assert.equal(result.status,"complete");assert.equal(result.stages.length,webgpu?15:9);
+    assert.equal(result.status,"complete");assert.equal(result.stages.length,webgpu?19:9);
     assert.ok(f.draws.every(d=>d.flags.every(flag=>flag===(webgpu&&d.stage.startsWith("vehicle-")))));
     assert.ok(f.meshes.every(m=>!m.alwaysSelectAsActiveMesh));
   }

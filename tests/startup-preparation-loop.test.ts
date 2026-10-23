@@ -123,15 +123,15 @@ test("the actual finite light catalog preserves all stages, bounded checks and r
       render: () => f.loop.render(() => {}), run: callback => f.loop.run(callback), stop: callback => f.loop.stop(callback),
       onDispose: () => () => {}, isDisposed: () => false, revision: () => [], now: () => ticks,
       setTimer: () => 1, clearTimer() { timerCleared = true; },
-      batchSize: 2, includeDayPointVariants: true, includeLowVehicleVariants: true,
+      batchSize: 2, includeDayPointVariants: true, includeVehicleVariants: true,
     });
     while (f.tasks.size && ticks < 200) { ticks++; await f.task(); }
     assert.ok(ticks < 200, "the finite task catalog must not spin");
     const complete = await result; await f.loop.waitForIdle();
-    assert.equal(complete.status, "complete"); assert.equal(complete.stages.length, 15);
+    assert.equal(complete.status, "complete"); assert.equal(complete.stages.length, 19);
     assert.ok(complete.stages.every(stage => stage.renders === 3 && stage.checks === 10));
-    assert.equal(checks, 150); assert.equal(f.counts().begins, 45); assert.equal(f.counts().ends, 45);
-    assert.equal(f.counts().submits, 45); assert.equal(f.counts().fences, 45); assert.equal(timerCleared, true);
+    assert.equal(checks, 190); assert.equal(f.counts().begins, 57); assert.equal(f.counts().ends, 57);
+    assert.equal(f.counts().submits, 57); assert.equal(f.counts().fences, 57); assert.equal(timerCleared, true);
     assert.equal(f.tasks.size, 0); assert.equal(f.health.snapshot().pendingOperations, 0);
   } finally { f.dispose(); }
 });

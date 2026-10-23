@@ -221,7 +221,7 @@ test("late quality and FPS requests survive temporary rendering and are restored
   assert.equal(f.adaptive.state.mode, "high");
   assert.equal(f.adaptive.state.targetFps, 120);
   assert.equal(f.applied.at(-1), "high");
-  assert.equal(f.passes.length, 3);
+  assert.equal(f.passes.length, 4);
 });
 
 test("returned failure stops further quality passes and restores requested rendering", async () => {

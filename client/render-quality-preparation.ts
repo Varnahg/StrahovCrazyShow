@@ -4,12 +4,14 @@ import type { LightPreparationResult } from "./light-preparation";
 export type RenderQualityPreparationPass = {
   quality: RenderQuality;
   timeoutMs: number;
-  /** The caller must prove the latest requested restore in this pass. */
+  /** Final attempt: a newer requested quality may require another bounded pass. */
   finalPass: boolean;
 };
 
 export type RenderQualityPreparationOptions = {
   initialQuality: RenderQuality;
+  /** Latest request, checked after a complete final attempt without resetting clocks. */
+  requestedQuality?(): RenderQuality;
   /** Temporary render state only; do not change the adaptive requested mode. */
   applyQuality(quality: RenderQuality): void;
   prepare(pass: RenderQualityPreparationPass): Promise<LightPreparationResult>;
@@ -52,8 +54,8 @@ export async function prepareRenderQualities(
   const order = QUALITIES.filter(
     (quality) => quality !== options.initialQuality,
   );
-  // Filtering the fixed list also prevents an invalid untyped caller adding a
-  // fourth pass. The typed contract supplies one of the three known qualities.
+  // The initial traversal contains only known qualities. Valid late requests
+  // may append another final attempt inside the same total deadline.
   order.push(
     ...QUALITIES.filter((quality) => quality === options.initialQuality),
   );
@@ -137,6 +139,14 @@ export async function prepareRenderQualities(
           status = pass.status = "timeout";
       }
       if (status !== "complete") break;
+      // Restoring an inactive vehicle can apply a newer quality while retaining
+      // the previous map/pass. Prove that quality through the same finite work.
+      // Keep historical finalPass flags: those callbacks already ran as final.
+      if (finalPass && options.requestedQuality) {
+        const requested = options.requestedQuality();
+        if (QUALITIES.includes(requested) && requested !== quality)
+          order.push(requested);
+      }
     }
   } catch (error) {
     hasError = true;

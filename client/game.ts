@@ -2571,6 +2571,7 @@ export class Game {
     let synchronizeEnvironment = true;
     return prepareRenderQualities({
       initialQuality: this.adaptive.state.quality,
+      requestedQuality: () => this.adaptive.state.quality,
       applyQuality: (quality) => {
         this.preparingRenderQuality = true;
         if (synchronizeEnvironment) {
@@ -2634,8 +2635,12 @@ export class Game {
     const night = selectLightingPreview("night").instant!;
     const includeDayPointVariants = this.engine.isWebGPU;
     const day = includeDayPointVariants ? selectLightingPreview("day").instant! : null;
-    const includeLowVehicleVariants = this.engine.isWebGPU && this.quality === "low";
-    const authoredPreparation = includeLowVehicleVariants ? new AuthoredLightPreparation(this.scene) : undefined;
+    const includeVehicleVariants = this.engine.isWebGPU;
+    // Physically valid Strahov nights cover both light-slot layouts regardless
+    // of today's Moon. Only hidden preparation uses these fixed UTC instants.
+    const vehicleNight = Date.parse("2026-10-10T22:00:00Z");
+    const vehicleKeyedNight = Date.parse("2026-10-23T22:00:00Z");
+    const authoredPreparation = includeVehicleVariants ? new AuthoredLightPreparation(this.scene) : undefined;
     let stopAuthoredPreparation: (() => void) | undefined;
     const restoreAuthoredPreparation = () => {
       const stop = stopAuthoredPreparation;
@@ -2734,7 +2739,7 @@ export class Game {
     const restore = () => {
       restoreVehicle();
       if (!isRetired()) {
-        if (includeLowVehicleVariants && !vehicleRootsLive()) {
+        if (includeVehicleVariants && !vehicleRootsLive()) {
           // Inactive update never reads the disposed root's world matrix. Stop
           // this owned beam, but do not run normal presentation on dead roots.
           this.vehicleLighting?.update(this.car, 0, false, this.quality);
@@ -2748,14 +2753,17 @@ export class Game {
     return prepareLightVariants({
       timeoutMs: options?.timeoutMs,
       includeDayPointVariants,
-      includeLowVehicleVariants,
+      includeVehicleVariants,
       apply: (stage) => {
         if (stage === "restore") return restore();
         const vehicle = stage.startsWith("vehicle-");
         if (vehicle) showVehicle();
         else restoreVehicle();
         this.compilationProfile.setStage(stage);
-        if (vehicle) return apply(night, false, Number(stage.split("-")[1]), true);
+        if (vehicle) return apply(
+          stage.startsWith("vehicle-keyed-") ? vehicleKeyedNight : vehicleNight,
+          false, Number(stage.split("-").at(-1)), true,
+        );
         const isNight = stage.startsWith("night-");
         const isDay = stage.startsWith("day-");
         apply(

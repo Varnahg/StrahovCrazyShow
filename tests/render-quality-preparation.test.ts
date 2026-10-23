@@ -483,3 +483,60 @@ test("actual light helper completes all39 attributed stages with its original dr
   assert.equal(detachCount, 3);
   assert.ok(outcome.stages.every((s) => s.renders === 3 && s.checks === 2));
 });
+
+test("a late requested quality appends a final attempt without changing historical final flags", async () => {
+  const f = fixture({ requestedQuality: () => "high" });
+  const outcome = await f.run();
+  assert.equal(outcome.status, "complete");
+  assert.deepEqual(f.passes.map(p => p.quality), ["low", "high", "medium", "high"]);
+  assert.deepEqual(f.passes.map(p => p.finalPass), [false, false, true, true]);
+  assert.deepEqual(outcome.qualities.map(p => p.finalPass), [false, false, true, true]);
+  assert.equal(f.restored.length, 1);
+  assert.equal(outcome.elapsedMs, 427);
+});
+
+test("repeated late requests spend the original90second deadline instead of resetting it", async () => {
+  let requested: RenderQuality = "medium";
+  const f = fixture({
+    requestedQuality: () => requested,
+    async prepare(pass) {
+      f.passes.push(pass); f.advance(20_000);
+      if (pass.finalPass) requested = pass.quality === "medium" ? "high" : "medium";
+      return result();
+    },
+  });
+  const outcome = await f.run();
+  assert.equal(outcome.status, "timeout");
+  assert.deepEqual(f.passes.map(p => p.quality), ["low", "high", "medium", "high", "medium"]);
+  assert.equal(f.passes[3].timeoutMs, 29_980, "remaining total already includes all earlier apply costs");
+  assert.equal(f.passes[4].timeoutMs, 9_975);
+  assert.equal(outcome.activeElapsedMs, 100_032, "synchronous overrun is charged, never subtracted");
+  assert.equal(f.restored.length, 1);
+});
+
+test("tail apply retirement stops without restoring or starting another preparation", async () => {
+  const f = fixture({ requestedQuality: () => "high", applyQuality(quality) {
+    f.applied.push(quality); f.advance(5);
+    if (f.applied.length === 4) f.dispose();
+  }});
+  const outcome = await f.run();
+  assert.equal(outcome.status, "disposed"); assert.equal(f.applied.length, 4);
+  assert.equal(f.passes.length, 3); assert.equal(f.restored.length, 0);
+});
+
+test("a tail preparation error survives a later restore error with its original identity", async () => {
+  const original = new Error("tail preparation"), cleanup = new Error("cleanup");
+  const f = fixture({ requestedQuality: () => "high", async prepare(pass) {
+    f.passes.push(pass); f.advance(100);
+    if (f.passes.length === 4) throw original;
+    return result();
+  }, restore() { throw cleanup; }});
+  await assert.rejects(f.run(), error => error === original);
+  assert.equal(f.passes.length, 4);
+});
+
+test("invalid untyped latest request never appends an unknown quality", async () => {
+  const f = fixture({ requestedQuality: () => "invalid" as RenderQuality });
+  const outcome = await f.run();
+  assert.equal(outcome.status, "complete"); assert.equal(f.passes.length, 3);
+});

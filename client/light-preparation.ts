@@ -1,6 +1,7 @@
 /** Startup-only preparation of actual scene variants. No physics or input. */
 export type LightPreparationStage =
-  | `vehicle-${0 | 1}`
+  | `vehicle-${0 | 1 | 2}`
+  | `vehicle-keyed-${0 | 1 | 2}`
   | "current-off"
   | "current-on"
   | `night-${0 | 1 | 2}-${"off" | "on"}`
@@ -79,8 +80,8 @@ export type LightPreparationOptions = {
   batchMs?: number;
   /** Existing spawn presentation with zero/one mapped POINT, OFF and ON. */
   includeDayPointVariants?: boolean;
-  /** Real low-quality vehicle SPOT, without its shadow, before player variants. */
-  includeLowVehicleVariants?: boolean;
+  /** Real vehicle SPOT/shadow in keyless and keyed nights, with mapped POINTs. */
+  includeVehicleVariants?: boolean;
 };
 
 const baselineStages: readonly LightPreparationStage[] = [
@@ -108,8 +109,8 @@ export function prepareLightVariants(
   const playerStages: readonly LightPreparationStage[] = options.includeDayPointVariants
     ? [...baselineStages.slice(0, -1), "day-0-off", "day-0-on", "day-1-off", "day-1-on", "restore"]
     : baselineStages;
-  const stages: readonly LightPreparationStage[] = options.includeLowVehicleVariants
-    ? ["vehicle-0", "vehicle-1", ...playerStages]
+  const stages: readonly LightPreparationStage[] = options.includeVehicleVariants
+    ? ["vehicle-0", "vehicle-1", "vehicle-2", "vehicle-keyed-0", "vehicle-keyed-1", "vehicle-keyed-2", ...playerStages]
     : playerStages;
   const started = options.now();
   const timeout = Math.max(1, options.timeoutMs ?? 30_000);
