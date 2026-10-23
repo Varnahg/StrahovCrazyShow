@@ -64,10 +64,8 @@ function fixture(guarded = false, options: { standalone?: boolean } = {}) {
     captures.push(options);
     return { defines: options.defines, isReady: () => true, dispose() {} } as unknown as Effect;
   }) as typeof engine.createEffect;
-  if (guarded) engine.currentRenderPassId = 9;
-  // The WebGPU canonical notification belongs to the pass whose readiness is
-  // requested. Keep the unguarded historical WebGL0→9 case unchanged.
   material.onEffectCreatedObservable.notifyObservers({ effect: original, subMesh });
+  if (guarded) engine.currentRenderPassId = 9;
   const generator = {} as ShadowGenerator;
   const ready = (instances = false) => wrapper.isReadyForSubMesh(subMesh, ["#define SM_FLOAT 1"], generator, instances, 9);
   const bindCurrentLights = () => {

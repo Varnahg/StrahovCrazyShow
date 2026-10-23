@@ -166,7 +166,7 @@ function fixture(t: TestContext, requested: "medium" | "high" = "medium") {
       const bases = wrapper._subMeshToEffectByPass?.get(sub);
       const generators = wrapper._subMeshToDepthWrapperByPass?.get(sub);
       return {
-        bases: bases ? [...bases].map(([pass, effect]: any) => ({ pass, ...flags(effect) })) : [],
+        bases: bases ? [...bases].map(([pass, source]: any) => ({ pass, ...flags(source[0]) })) : [],
         entries: generators ? [...generators].flatMap(([generator, entries]: any) =>
           [...entries].map(([pass, entry]: any) => ({
             pass, car: Reflect.get(generator, "_light")?.metadata?.simulatedVehicleLight,

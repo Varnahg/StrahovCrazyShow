@@ -1,0 +1,165 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { fixture, ready } from './fixture.mjs';
+import { moduleAt } from './loader.mjs';
+const { NullEngine } = await moduleAt('Engines/nullEngine.js');
+const { WebGPUEngine } = await moduleAt('Engines/webgpuEngine.js');
+const { Scene } = await moduleAt('scene.js');
+const { ShaderMaterial } = await moduleAt('Materials/shaderMaterial.js');
+const { ShadowDepthWrapper } = await moduleAt('Materials/shadowDepthWrapper.js');
+const { MeshBuilder } = await moduleAt('Meshes/meshBuilder.js');
+const { SpotLight } = await moduleAt('Lights/spotLight.js');
+const { ShadowGenerator } = await moduleAt('Lights/Shadows/shadowGenerator.js');
+const { FreeCamera } = await moduleAt('Cameras/freeCamera.js');
+const { Vector3 } = await moduleAt('Maths/math.vector.js');
+const entry = (w, sub, generator, source) => w._subMeshToDepthWrapperByPass.get(sub)?.get(generator)?.get(source);
+const releases = (f, draw) => f.contexts.find(row => row.context === draw.drawContext).releases();
+
+test('actual nonstandalone ShaderMaterial main notification prepares native ShadowGenerator RTT with production remaps', async t => {
+  const engine = new NullEngine(), scene = new Scene(engine);
+  new FreeCamera('main', new Vector3(0, 2, -4), scene);
+  engine.createEffect = WebGPUEngine.prototype.createEffect;
+  engine._releaseEffect = WebGPUEngine.prototype._releaseEffect;
+  const material = new ShaderMaterial('native wind-compatible source', scene, {
+    vertexSource: 'attribute vec3 position;varying vec3 worldPosition;varying vec3 vNormal;void main(void){worldPosition=position;vNormal=vec3(0.,1.,0.);gl_Position=vec4(position,1.);}',
+    fragmentSource: 'varying vec3 worldPosition;varying vec3 vNormal;void main(void){gl_FragColor=vec4(1.);}',
+  }, { attributes: ['position'], uniforms: ['world'] });
+  engine._isWebGPU = true;
+  const wrapper = new ShadowDepthWrapper(material, scene, { remappedVariables: ['worldPos', 'worldPosition', 'vNormalW', 'vNormal'] });
+  engine._isWebGPU = false; material.shadowDepthWrapper = wrapper;
+  const mesh = MeshBuilder.CreateBox('real nonstandalone caster', {}, scene); mesh.material = material;
+  const sub = mesh.subMeshes[0];
+  const light = new SpotLight('native shadow', new Vector3(0, 3, -2), new Vector3(0, -.1, 1), .8, 2, scene);
+  const generator = new ShadowGenerator(16, light); generator.getShadowMap().renderList = [mesh];
+  t.after(() => { wrapper.dispose(); generator.dispose(); scene.dispose(); engine.dispose(); });
+  const notifications = [];
+  material.onEffectCreatedObservable.add(params => notifications.push({ pass: engine.currentRenderPassId, effect: params.effect }));
+  const settle = async fn => {
+    for (let index = 0; index < 100; index++) {
+      scene.incrementRenderId(); if (fn()) return true;
+      await new Promise(resolve => setTimeout(resolve, 1));
+    }
+    return false;
+  };
+  engine.currentRenderPassId = 0;
+  assert.equal(await settle(() => material.isReadyForSubMesh(mesh, sub, false)), true);
+  assert.equal(notifications.length, 1); assert.equal(notifications[0].pass, 0); assert.equal(wrapper.standalone, false);
+  const target = generator.getShadowMap().renderPassId; assert.notEqual(target, 0); engine.currentRenderPassId = target;
+  assert.equal(await settle(() => generator.isReady(sub, false, false)), true,
+    'nonstandalone may use its legitimate main source without shadow-pass base notification');
+  const draw = wrapper.getEffect(sub, generator, target), owned = entry(wrapper, sub, generator, 0);
+  assert.ok(draw.effect?.isReady()); assert.equal(owned.originalEffect, notifications[0].effect);
+  assert.equal(owned.origPass, 0); assert.equal(owned.drawWrapper[0], owned.mainDrawWrapper);
+  assert.notEqual(draw, owned.mainDrawWrapper); assert.equal(draw.effect, owned.mainDrawWrapper.effect);
+  assert.equal(notifications.length, 1, 'no extra material readiness or shadow notification is introduced');
+});
+
+test('public alias current0/request2 owns source0 and target-only retirement cannot release its acquire', async t => {
+  const f = await fixture(); t.after(f.dispose);
+  const w = f.wrapper(), a = f.mesh(); f.engine.currentRenderPassId = 0;
+  const effect = await ready(w._makeEffect(a.sub, f.depth, f.generator, 2));
+  const owned = entry(w, a.sub, f.generator, 0), draw = w.getEffect(a.sub, f.generator, 2);
+  const source = w._subMeshToEffectByPass.get(a.sub).get(0);
+  for (let index = 0; index < 20; index++) {
+    assert.equal(w._getDepthSource(a.sub, 2), source, 'alias reads reuse the existing notification tuple');
+    assert.equal(w._getDepthSource(a.sub, 0), source, 'canonical reads reuse the same tuple without allocation');
+  }
+  assert.equal(owned.originalEffect, f.original); assert.equal(owned.origPass, 0);
+  assert.equal(owned.mainDrawWrapper, owned.drawWrapper[0]); assert.notEqual(draw, owned.mainDrawWrapper);
+  assert.equal(draw.effect, effect); assert.equal(effect._refCount, 1);
+  f.engine.releaseRenderPassId(2);
+  assert.equal(draw.effect, null); assert.equal(releases(f, draw), 1);
+  assert.equal(effect.isDisposed, false); assert.equal(effect._refCount, 1);
+  assert.equal(w.getEffect(a.sub, f.generator, 0), owned.mainDrawWrapper);
+  assert.equal(w.getEffect(a.sub, f.generator, 2), null);
+  f.engine.releaseRenderPassId(0); assert.equal(effect.isDisposed, true); assert.equal(effect._refCount, 0);
+  assert.equal(releases(f, owned.mainDrawWrapper), 1); assert.equal(f.original.isDisposed, false);
+});
+
+test('known pending or disposed requested source cannot borrow another ready notified pass', async t => {
+  const f = await fixture(); t.after(f.dispose);
+  const w = f.wrapper(), a = f.mesh(), pending = await f.base(), originalReady = pending.isReady;
+  pending.isReady = () => false; f.notify(a.sub, pending, 2); f.notify(a.sub, f.original, 0);
+  assert.equal(w._makeEffect(a.sub, f.depth, f.generator, 2), null); assert.equal(w.getEffect(a.sub, f.generator, 2), null);
+  pending.isReady = originalReady; pending.dispose(true);
+  assert.equal(w._makeEffect(a.sub, f.depth, f.generator, 2), null); assert.equal(w.getEffect(a.sub, f.generator, 2), null);
+  assert.ok(await ready(w._makeEffect(a.sub, f.depth, f.generator, 0)));
+});
+
+test('binding chooses the same source as readiness rather than the first older target alias', async t => {
+  const f = await fixture(); t.after(f.dispose);
+  const w = f.wrapper(), a = f.mesh(), first = await ready(w._makeEffect(a.sub, f.depth, f.generator, 2));
+  const oldAlias = w.getEffect(a.sub, f.generator, 2), newer = await f.base(); f.notify(a.sub, newer, 3);
+  const second = await ready(w._makeEffect(a.sub, f.depth, f.generator, 2));
+  assert.notEqual(second, first); assert.equal(first.isDisposed, false);
+  const current = w.getEffect(a.sub, f.generator, 2);
+  assert.notEqual(current, oldAlias); assert.equal(current.effect, second);
+  assert.equal(entry(w, a.sub, f.generator, 3).originalEffect, newer);
+  assert.equal(w.getEffect(a.sub, f.generator, 0).effect, first, 'known canonical0 wins over newer fallback3');
+  f.engine.releaseRenderPassId(0);
+  assert.equal(first.isDisposed, true); assert.equal(second.isDisposed, false); assert.equal(current.effect, second);
+});
+
+test('promotion of an alias target to its own canonical pass detaches only the foreign context', async t => {
+  const f = await fixture(); t.after(f.dispose);
+  const w = f.wrapper(), a = f.mesh(), first = await ready(w._makeEffect(a.sub, f.depth, f.generator, 2));
+  const alias = w.getEffect(a.sub, f.generator, 2), secondBase = await f.base(); f.notify(a.sub, secondBase, 2);
+  assert.equal(alias.effect, null); assert.equal(releases(f, alias), 1); assert.equal(first.isDisposed, false);
+  const own = await ready(w._makeEffect(a.sub, f.depth, f.generator, 2));
+  assert.notEqual(own, first); assert.equal(entry(w, a.sub, f.generator, 2).mainDrawWrapper, w.getEffect(a.sub, f.generator, 2));
+  f.engine.releaseRenderPassId(2); assert.equal(own.isDisposed, true); assert.equal(first.isDisposed, false);
+  assert.equal(w.getEffect(a.sub, f.generator, 0).effect, first);
+});
+
+test('same-Effect notification order follows latest real notify, and released latest source falls back only to a live tuple', async t => {
+  const f = await fixture(); t.after(f.dispose);
+  const w = f.wrapper(), a = f.mesh(), other = await f.base();
+  f.notify(a.sub, other, 3); f.notify(a.sub, f.original, 0); f.notify(a.sub, other, 4);
+  f.engine.releaseRenderPassId(4);
+  const effect = await ready(w._makeEffect(a.sub, f.depth, f.generator, 2));
+  assert.equal(entry(w, a.sub, f.generator, 0).originalEffect, f.original);
+  assert.equal(w.getEffect(a.sub, f.generator, 2).effect, effect);
+  assert.deepEqual([...w._subMeshToEffectByPass.get(a.sub).keys()], [3, 0]);
+  w._subMeshToEffect.set(a.sub, [f.original, 8]);
+  assert.equal(w._makeEffect(a.sub, f.depth, f.generator, 5), null, 'unmatched stale facade tuple is not a canonical source');
+  assert.equal(w.getEffect(a.sub, f.generator, 5), null);
+});
+
+test('two actual RTTs can borrow one main source; resize/target disposal retire aliases and source disposal releases both acquires', async t => {
+  const f = await fixture(); t.after(f.dispose);
+  const w = f.wrapper(), a = f.mesh();
+  const left = new ShadowGenerator(16, new SpotLight('left RTT', Vector3.Up(), Vector3.Down(), .8, 2, f.scene));
+  const right = new ShadowGenerator(16, new SpotLight('right RTT', Vector3.Up(), Vector3.Down(), .8, 2, f.scene));
+  const onePass = left.getShadowMap().renderPassId, twoPass = right.getShadowMap().renderPassId;
+  const effect = await ready(w._makeEffect(a.sub, f.depth, left, onePass));
+  assert.equal(await ready(w._makeEffect(a.sub, f.depth, right, twoPass)), effect); assert.equal(effect._refCount, 2);
+  const one = w.getEffect(a.sub, left, onePass), two = w.getEffect(a.sub, right, twoPass);
+  left.mapSize = 32;
+  assert.equal(one.effect, null); assert.equal(releases(f, one), 1); assert.equal(two.effect, effect); assert.equal(effect._refCount, 2);
+  const newPass = left.getShadowMap().renderPassId; assert.notEqual(newPass, onePass);
+  assert.equal(w._makeEffect(a.sub, f.depth, left, newPass), effect);
+  const again = w.getEffect(a.sub, left, newPass); assert.notEqual(again, one);
+  left.dispose(); right.dispose(); assert.equal(again.effect, null); assert.equal(two.effect, null);
+  assert.equal(effect._refCount, 2, 'source entry owns acquires until source/mesh/wrapper retirement, as in nonstandalone native lifetime');
+  f.engine.releaseRenderPassId(0); assert.equal(effect._refCount, 0); assert.equal(effect.isDisposed, true);
+});
+
+for (const change of ['different-fallback', 'same-effect-other-source', 'promote-target', 'release-source', 'release-target'])
+  test(`reentrant ${change} rejects an in-flight alias acquire without installing stale source/target ownership`, async t => {
+    const f = await fixture(); t.after(f.dispose);
+    const w = f.wrapper(), a = f.mesh(), replacement = await f.base(), create = f.engine.createEffect;
+    let acquired;
+    f.engine.createEffect = function (...args) {
+      acquired = Reflect.apply(create, this, args); f.engine.createEffect = create;
+      if (change === 'different-fallback') f.notify(a.sub, replacement, 3);
+      if (change === 'same-effect-other-source') f.notify(a.sub, f.original, 3);
+      if (change === 'promote-target') f.notify(a.sub, replacement, 2);
+      if (change === 'release-source') f.engine.releaseRenderPassId(0);
+      if (change === 'release-target') f.engine.releaseRenderPassId(2);
+      return acquired;
+    };
+    assert.equal(w._makeEffect(a.sub, f.depth, f.generator, 2), null);
+    assert.equal(acquired._refCount, 0); assert.equal(acquired.isDisposed, true);
+    assert.equal(w.getEffect(a.sub, f.generator, 2), null);
+    await new Promise(resolve => setTimeout(resolve, 5));
+  });

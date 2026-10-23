@@ -150,7 +150,7 @@ test('reentrant unrelated main notify preserves the in-flight shadow acquire and
   };
   const effect = await ready(w._makeEffect(a.sub, f.depth, f.generator, 0));
   assert.equal(effect._refCount, 1); assert.equal(entry(w, a.sub, f.generator, 0).originalEffect, f.original);
-  assert.equal(w._subMeshToEffectByPass.get(a.sub).get(2), main);
+  assert.equal(w._subMeshToEffectByPass.get(a.sub).get(2)[0], main);
 });
 
 test('best-effort release balances every acquired entry/context and preserves a first falsy cleanup error', async t => {

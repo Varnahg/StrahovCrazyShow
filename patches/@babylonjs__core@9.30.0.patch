@@ -56,7 +56,7 @@ index c1a7836d3fa0752b5af76534049d23f63080d88a..52afa346cb94cd6d1309ac5c2742d089
              /**
               * Serializes the post process to a JSON object
 diff --git a/Materials/shadowDepthWrapper.js b/Materials/shadowDepthWrapper.js
-index 517e24c3..70fab662 100644
+index 517e24c3..2833444d 100644
 --- a/Materials/shadowDepthWrapper.js
 +++ b/Materials/shadowDepthWrapper.js
 @@ -2,6 +2,7 @@ import { Effect } from "./effect.js";
@@ -91,7 +91,7 @@ index 517e24c3..70fab662 100644
              const mesh = params.subMesh?.getMesh();
              if (mesh && !this._meshes.has(mesh)) {
                  // Register for mesh onDispose to clean up our internal maps when a mesh is disposed
-@@ -65,27 +77,179 @@ export class ShadowDepthWrapper {
+@@ -65,27 +77,193 @@ export class ShadowDepthWrapper {
                          const subMesh = key.value;
                          if (subMesh?.getMesh() === mesh) {
                              this._subMeshToEffect.delete(subMesh);
@@ -109,9 +109,12 @@ index 517e24c3..70fab662 100644
 +                let passes = this._subMeshToEffectByPass.get(params.subMesh);
 +                if (!passes) this._subMeshToEffectByPass.set(params.subMesh, (passes = new Map()));
 +                const previous = passes.get(pass);
-+                passes.set(pass, params.effect);
-+                this._subMeshToEffect.set(params.subMesh, [params.effect, pass]);
-+                if (previous !== params.effect) this._deleteDepthWrapperEffect(params.subMesh, pass);
++                const source = previous?.[0] === params.effect ? previous : [params.effect, pass];
++                // Keep real notification order without allocating on reads.
++                passes.delete(pass);
++                passes.set(pass, source);
++                this._subMeshToEffect.set(params.subMesh, source);
++                if (previous?.[0] !== params.effect) this._deleteDepthWrapperEffect(params.subMesh, pass);
 +            }
 +            else if (this._subMeshToEffect.get(params.subMesh)?.[0] !== params.effect) {
                  this._subMeshToEffect.set(params.subMesh, [params.effect, this._scene.getEngine().currentRenderPassId]);
@@ -198,6 +201,17 @@ index 517e24c3..70fab662 100644
 +        if (!entries && create) generators.set(generator, (entries = new Map()));
 +        return entries;
 +    }
++    _getDepthSource(subMesh, requestedPass) {
++        if (this._depthDisposed || this._isDepthPassReleased(requestedPass)) return undefined;
++        const passes = this._subMeshToEffectByPass.get(subMesh);
++        // A known requested source wins even when pending: never substitute an
++        // older ready Effect for a notified hot-swap that has not settled yet.
++        if (passes?.has(requestedPass)) return passes.get(requestedPass);
++        // Nonstandalone custom materials prepare their base in a normal pass.
++        // Requested draw contexts can borrow only that exact live notification.
++        const source = this._subMeshToEffect.get(subMesh);
++        return source && passes?.get(source[1]) === source && !this._isDepthPassReleased(source[1]) ? source : undefined;
++    }
 +    _updateDepthFacade(subMesh, generator, entries) {
 +        let current;
 +        for (const entry of entries.values()) current = entry;
@@ -222,8 +236,8 @@ index 517e24c3..70fab662 100644
 +            bases?.delete(pass);
 +            if (!bases?.size) this._subMeshToEffectByPass.delete(subMesh);
 +            if (this._subMeshToEffect.get(subMesh)?.[1] === pass) {
-+                const latest = bases && [...bases].at(-1);
-+                if (latest) this._subMeshToEffect.set(subMesh, [latest[1], latest[0]]);
++                const latest = bases && [...bases.values()].at(-1);
++                if (latest) this._subMeshToEffect.set(subMesh, latest);
 +                else this._subMeshToEffect.delete(subMesh);
 +            }
 +            try { this._deleteDepthWrapperEffect(subMesh, pass); }
@@ -274,24 +288,23 @@ index 517e24c3..70fab662 100644
      /**
       * Gets the effect to use to generate the depth map
       * @param subMesh subMesh to get the effect for
-@@ -94,7 +258,15 @@ export class ShadowDepthWrapper {
+@@ -94,7 +272,14 @@ export class ShadowDepthWrapper {
       * @returns the effect to use to generate the depth map for the subMesh + shadow generator specified
       */
      getEffect(subMesh, shadowGenerator, passIdForDrawWrapper) {
 -        const entry = this._subMeshToDepthWrapper.mm.get(subMesh)?.get(shadowGenerator);
-+        let entry = this._subMeshToDepthWrapper.mm.get(subMesh)?.get(shadowGenerator);
++        let entry;
 +        if (this._depthTokens) {
-+            if (this._depthDisposed || this._isDepthPassReleased(passIdForDrawWrapper)) return null;
-+            const entries = this._depthEntries(subMesh, shadowGenerator);
-+            const canonical = entries?.get(passIdForDrawWrapper);
-+            if (canonical) entry = canonical;
-+            else if (this._subMeshToEffectByPass.get(subMesh)?.has(passIdForDrawWrapper)) return null;
-+            else entry = [...(entries?.values() ?? [])].find((candidate) => candidate.drawWrapper[passIdForDrawWrapper]) ?? entry;
++            const source = this._getDepthSource(subMesh, passIdForDrawWrapper);
++            if (!source) return null;
++            entry = this._depthEntries(subMesh, shadowGenerator)?.get(source[1]);
++            if (entry?.originalEffect !== source[0]) return null;
 +        }
++        else entry = this._subMeshToDepthWrapper.mm.get(subMesh)?.get(shadowGenerator);
          if (!entry) {
              return null;
          }
-@@ -115,6 +287,7 @@ export class ShadowDepthWrapper {
+@@ -115,6 +300,7 @@ export class ShadowDepthWrapper {
       * @returns a boolean indicating that the submesh is ready or not
       */
      isReadyForSubMesh(subMesh, defines, shadowGenerator, useInstances, passIdForDrawWrapper) {
@@ -299,7 +312,7 @@ index 517e24c3..70fab662 100644
          if (this.standalone) {
              // will ensure the effect is (re)created for the base material
              if (!this._baseMaterial.isReadyForSubMesh(subMesh.getMesh(), subMesh, useInstances)) {
-@@ -127,6 +300,8 @@ export class ShadowDepthWrapper {
+@@ -127,6 +313,8 @@ export class ShadowDepthWrapper {
       * Disposes the resources
       */
      dispose() {
@@ -308,7 +321,7 @@ index 517e24c3..70fab662 100644
          this._baseMaterial.onEffectCreatedObservable.remove(this._onEffectCreatedObserver);
          this._onEffectCreatedObserver = null;
          const iterator = this._meshes.entries();
-@@ -134,18 +309,37 @@ export class ShadowDepthWrapper {
+@@ -134,18 +322,37 @@ export class ShadowDepthWrapper {
              const [mesh, observer] = entry.value;
              mesh.onDisposeObservable.remove(observer);
          }
@@ -332,7 +345,7 @@ index 517e24c3..70fab662 100644
          const engine = this._scene.getEngine();
 -        const origEffectAndRenderPassId = this._subMeshToEffect.get(subMesh);
 +        const origEffectAndRenderPassId = this._depthTokens
-+            ? (this._isDepthPassReleased(passIdForDrawWrapper) ? undefined : [this._subMeshToEffectByPass.get(subMesh)?.get(passIdForDrawWrapper), passIdForDrawWrapper])
++            ? this._getDepthSource(subMesh, passIdForDrawWrapper)
 +            : this._subMeshToEffect.get(subMesh);
          if (!origEffectAndRenderPassId) {
              return null;
@@ -349,9 +362,12 @@ index 517e24c3..70fab662 100644
          if (!params) {
              const mainDrawWrapper = new DrawWrapper(engine);
              const originalDefines = subMesh._getDrawWrapper(origRenderPassId)?.defines;
-@@ -158,15 +352,20 @@ export class ShadowDepthWrapper {
+@@ -156,17 +363,22 @@ export class ShadowDepthWrapper {
+                 depthDefines: "",
+                 token: RandomGUID(),
              };
-             params.drawWrapper[passIdForDrawWrapper] = mainDrawWrapper;
+-            params.drawWrapper[passIdForDrawWrapper] = mainDrawWrapper;
++            params.drawWrapper[this._depthTokens ? origRenderPassId : passIdForDrawWrapper] = mainDrawWrapper;
              this._subMeshToDepthWrapper.set(subMesh, shadowGenerator, params);
 +            if (this._depthTokens) {
 +                params.origPass = origRenderPassId;
@@ -372,7 +388,7 @@ index 517e24c3..70fab662 100644
          const uniforms = origEffect.getUniformNames().slice();
          // the depth effect is either out of date or has not been created yet
          let vertexCode = origEffect.vertexSourceCodeBeforeMigration, fragmentCode = origEffect.fragmentSourceCodeBeforeMigration;
-@@ -175,8 +374,13 @@ export class ShadowDepthWrapper {
+@@ -175,8 +387,13 @@ export class ShadowDepthWrapper {
          }
          if (!this.doNotInjectCode) {
              // Declare the shadow map includes
@@ -388,7 +404,7 @@ index 517e24c3..70fab662 100644
                  : `#include<shadowMapVertexNormalBias>`, vertexMetricCode = this._options && this._options.remappedVariables
                  ? `#include<shadowMapVertexMetric>(${this._options.remappedVariables.join(",")})`
                  : `#include<shadowMapVertexMetric>`, fragmentSoftTransparentShadow = this._options && this._options.remappedVariables
-@@ -207,7 +411,12 @@ export class ShadowDepthWrapper {
+@@ -207,7 +424,12 @@ export class ShadowDepthWrapper {
              else {
                  fragmentCode = fragmentCode.replace(/#define SHADOWDEPTH_SOFTTRANSPARENTSHADOW|#define CUSTOM_FRAGMENT_BEFORE_FOG/g, fragmentSoftTransparentShadow);
              }
@@ -402,7 +418,7 @@ index 517e24c3..70fab662 100644
              if (hasLocationForFragment) {
                  fragmentCode = fragmentCode.replace(/#define SHADOWDEPTH_FRAGMENT/g, fragmentBlockCode);
              }
-@@ -219,12 +428,7 @@ export class ShadowDepthWrapper {
+@@ -219,12 +441,7 @@ export class ShadowDepthWrapper {
              }
              uniforms.push("biasAndScaleSM", "depthValuesSM", "lightDataSM", "softTransparentShadowSM");
          }
@@ -416,7 +432,7 @@ index 517e24c3..70fab662 100644
              attributes: origEffect.getAttributesNames(),
              uniformsNames: uniforms,
              uniformBuffersNames: origEffect.getUniformBuffersNames(),
-@@ -232,7 +436,30 @@ export class ShadowDepthWrapper {
+@@ -232,7 +449,30 @@ export class ShadowDepthWrapper {
              defines: join + "\n" + origEffect.defines.replace("#define SHADOWS", "").replace(/#define SHADOW\d/g, ""),
              indexParameters: origEffect.getIndexParameters(),
              shaderLanguage: origEffect.shaderLanguage,
@@ -433,7 +449,7 @@ index 517e24c3..70fab662 100644
 +        }, effectOptions, engine);
 +        if (this._depthTokens) {
 +            // A synchronous engine callback may retire the current entry.
-+            if (this._depthDisposed || this._isDepthPassReleased(origRenderPassId) || this._depthEntries(subMesh, shadowGenerator)?.get(origRenderPassId) !== params || this._subMeshToEffectByPass.get(subMesh)?.get(origRenderPassId) !== origEffect || origEffect.isDisposed) {
++            if (this._getDepthSource(subMesh, passIdForDrawWrapper) !== origEffectAndRenderPassId || this._depthEntries(subMesh, shadowGenerator)?.get(origRenderPassId) !== params || origEffect.isDisposed) {
 +                if (!nextEffect.isDisposed) nextEffect.dispose();
 +                return null;
 +            }
@@ -448,7 +464,7 @@ index 517e24c3..70fab662 100644
          for (let id = 0; id < params.drawWrapper.length; ++id) {
              if (id !== passIdForDrawWrapper) {
                  params.drawWrapper[id]?.setEffect(params.mainDrawWrapper.effect, params.mainDrawWrapper.defines);
-@@ -241,4 +468,4 @@ export class ShadowDepthWrapper {
+@@ -241,4 +481,4 @@ export class ShadowDepthWrapper {
          return params.mainDrawWrapper.effect;
      }
  }
@@ -1436,7 +1452,7 @@ index b055ce36..27366e22 100644
      private readonly _renderEncoderDescriptor;
      /** @internal */
 diff --git a/Materials/shadowDepthWrapper.d.ts b/Materials/shadowDepthWrapper.d.ts
-index a867115c..6ec0e6fa 100644
+index a867115c..ac921b39 100644
 --- a/Materials/shadowDepthWrapper.d.ts
 +++ b/Materials/shadowDepthWrapper.d.ts
 @@ -31,6 +31,11 @@ export declare class ShadowDepthWrapper {
@@ -1451,7 +1467,7 @@ index a867115c..6ec0e6fa 100644
      private _meshes;
      /** Gets the standalone status of the wrapper */
      get standalone(): boolean;
-@@ -49,6 +54,13 @@ export declare class ShadowDepthWrapper {
+@@ -49,6 +54,14 @@ export declare class ShadowDepthWrapper {
       */
      constructor(baseMaterial: Material, scene?: Scene, options?: IIOptionShadowDepthMaterial);
      private _deleteDepthWrapperEffect;
@@ -1459,6 +1475,7 @@ index a867115c..6ec0e6fa 100644
 +    private _releaseDepthResources;
 +    private _isDepthPassReleased;
 +    private _depthEntries;
++    private _getDepthSource;
 +    private _updateDepthFacade;
 +    private _releaseDepthPass;
 +    private _getDepthProgramToken;
