@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-completion-entry-render-helper-20261023",
   "title": "KEY-22: bounded observer skutečného vstupu do auta a render prelude",
-  "status": "ready",
+  "status": "blocked",
   "dependsOn": [],
   "writePaths": [
     ".cache/webgpu-completion-20261021/entry-render/helper/v11/",
@@ -24,6 +24,7 @@
     "Root nezávislé peer review a fresh immutable source12 diagnostic build + skutečný první entry před jakoukoli produktovou opravou. Helper není FPS acceptance build."
   ],
   "notes": [
+    "Final independent review found P2 nested same-index recursion false-complete and P3 donor coverage wording; root-review.json preserves exact counterexample. V11 remains immutable CPU artifact, no GPU build. Narrow correction assigned new task webgpu-completion-entry-reentry-20261023 / helperv12. Do not treat87PASS as completed helper acceptance.",
     "Výslovná root delegace navazující na read-only návrh /root/webgpu_performance_audit. Worktree .cache/player-feedback-20261020. Author unique owner webgpu-completion-01a15a3e-entry-helper-v11.",
     "Výchozí v10 helper hash49662229acfc4211503c277d4d22c029024877e5717aa5b367f93792af693009, source12 053501f0cee4c2bf6c81ab39339fa82a84f91370cc86f7907781b0c0b2098e43 readonly. Najít přesnou v10 cache path podle validation build records, neměnit.",
     "Source12 CM131.2ms/render114.6 a GL149.1/render113.7 první entry. Starý eight-frame routine bracket173052.6–173286.4 měl vehiclefalse před/po; miss zůstane zachovaný. glTF onBeforeRender volá refresh(false), nikoli prepareFrame. Příčina neprokázaná, žádný fix bez profilu.",
