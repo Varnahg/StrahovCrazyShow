@@ -1,0 +1,64 @@
+{
+  "variant": "v11",
+  "inputSha256": "332cd4f0d8716a923d877c506f5a060057dee5b1b7235dea87e9587499dcda4d",
+  "originalModuleStable": true,
+  "scope": "Deterministic CPU fixture, not actual Game/GPU/performance",
+  "calls": [
+    48,
+    16,
+    8
+  ],
+  "complete": true,
+  "reason": "complete",
+  "firstFrame": {
+    "index": 0,
+    "startedAtMs": 100,
+    "endedAtMs": 123,
+    "chainWallMs": 23,
+    "engineFrameId": 10,
+    "engineFrameIdAfterRender": 10,
+    "sceneFrameIdBefore": 20,
+    "sceneFrameIdAfter": 21,
+    "vehicleBeforePrelude": true,
+    "vehicleBeforeScene": true,
+    "vehicleAfterScene": true,
+    "scopes": [
+      {
+        "calls": 1,
+        "startedAtMs": 100,
+        "endedAtMs": 102,
+        "wallMs": 2,
+        "threw": false
+      },
+      {
+        "calls": 1,
+        "startedAtMs": 102,
+        "endedAtMs": 105,
+        "wallMs": 3,
+        "threw": false
+      },
+      {
+        "calls": 1,
+        "startedAtMs": 105,
+        "endedAtMs": 123,
+        "wallMs": 18,
+        "threw": false
+      }
+    ],
+    "nested": [
+      {
+        "calls": 5,
+        "wallMs": 30,
+        "throws": 0
+      },
+      {
+        "calls": 1,
+        "wallMs": 3,
+        "throws": 0
+      }
+    ],
+    "progressed": true
+  },
+  "validatorAccepted": false,
+  "validatorError": "Entry completed scope ordering"
+}

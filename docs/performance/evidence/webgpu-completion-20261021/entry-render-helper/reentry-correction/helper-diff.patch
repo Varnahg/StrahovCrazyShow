@@ -1,0 +1,57 @@
+diff --git a/.cache/webgpu-completion-20261021/entry-render/helper/v11/entry-render-cost.mjs b/.cache/webgpu-completion-20261021/entry-render/helper/v12/entry-render-cost.mjs
+index 75aa64bd..ede1c796 100644
+--- a/.cache/webgpu-completion-20261021/entry-render/helper/v11/entry-render-cost.mjs
++++ b/.cache/webgpu-completion-20261021/entry-render/helper/v12/entry-render-cost.mjs
+@@ -100,7 +100,7 @@ export function captureEntryRenderCost(game, { enabled = false, expected, signal
+     const vehicle = state.actor.vehicle;
+     if (typeof vehicle !== 'boolean') { failPhase(); return null; }
+     if (depth.some(Boolean)) {
+-      if (frame && depth[2] && index !== 2) {
++      if (frame && depth[2] && index !== 2 && depth[index] === 0) {
+         const nested = frame.nested[index];
+         if (nested.calls >= ENTRY_LIMITS.nestedCalls) { overflow = true; stop('overflow'); return null; }
+         nested.calls++;
+diff --git a/.cache/webgpu-completion-20261021/entry-render/helper/v11/entry-render-cost.test.mjs b/.cache/webgpu-completion-20261021/entry-render/helper/v12/entry-render-cost.test.mjs
+index 183286c4..0714322c 100644
+--- a/.cache/webgpu-completion-20261021/entry-render/helper/v11/entry-render-cost.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-render/helper/v12/entry-render-cost.test.mjs
+@@ -170,7 +170,25 @@ test('v10 routine modules/original button are byte-exact and UI transform remain
+  const oldOverlay=await readFile(join(old,'qa-overlay.mjs'),'utf8'),overlay=await readFile(join(directory,'qa-overlay.mjs'),'utf8');const block=s=>s.slice(s.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),s.indexOf("  if (identity.clock?.config.benchmarkAtUTC"));assert.ok(overlay.includes(block(oldOverlay)));
+  const ui=await readFile(join(root,'client/ui.tsx')),before=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),before);assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);
+ });
+-test('unchanged old donor test relative path is bridged explicitly without editing its bytes',async()=>{
++test('donor/pin selected8 method descriptors and all four original Mesh observer ordering assertions',async()=>{
+  const donor=gunzipSync(await readFile(join(root,'docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz')));assert.equal(sha256(donor),'ee3c3280de69ee61dcbf433dcf2a259d07a4efa80a711f822056da331168289f');
+- const{Mesh}=await import('@babylonjs/core/Meshes/mesh.js');const body=Mesh.prototype.render.toString();assert.ok(body.indexOf('_onBeforeRenderObservable.notifyObservers')<body.indexOf('material.isReadyForSubMesh'));assert.ok(body.indexOf('material.isReadyForSubMesh')<body.indexOf('_onBeforeBindObservable.notifyObservers'));
++ const pin=JSON.parse(await readFile(join(root,'.cache/performance-snapshot/webgpu-completion-20261023-candidate-12/node_modules/@babylonjs/core/package.json'),'utf8'));assert.equal(pin.version,'9.30.0');
++ const{Mesh}=await import('@babylonjs/core/Meshes/mesh.js'),{Scene}=await import('@babylonjs/core/scene.js'),{NullEngine}=await import('@babylonjs/core/Engines/nullEngine.js'),{TransformNode}=await import('@babylonjs/core/Meshes/transformNode.js'),{PBRBaseMaterial}=await import('@babylonjs/core/Materials/PBR/pbrBaseMaterial.js'),{StandardMaterial}=await import('@babylonjs/core/Materials/standardMaterial.js');
++ const engine=new NullEngine(),scene=new Scene(engine);try{
++  for(const[target,key]of [[scene,'getActiveMeshCandidates'],[Scene.prototype,'_activeMesh'],[TransformNode.prototype,'computeWorldMatrix'],[Mesh.prototype,'getLOD'],[PBRBaseMaterial.prototype,'isReadyForSubMesh'],[StandardMaterial.prototype,'isReadyForSubMesh'],[PBRBaseMaterial.prototype,'bindForSubMesh'],[StandardMaterial.prototype,'bindForSubMesh']]){const descriptor=Object.getOwnPropertyDescriptor(target,key);assert.equal(typeof descriptor?.value,'function');assert.equal(descriptor.configurable||descriptor.writable,true);}
++  const body=Mesh.prototype.render.toString(),markers=['_getInstancesRenderList','_onBeforeRenderObservable.notifyObservers','material.isReadyForSubMesh','_onBeforeBindObservable.notifyObservers','effectiveMaterial.bindForSubMesh'];const positions=markers.map(s=>body.indexOf(s));for(const p of positions)assert.ok(p>=0);for(let i=1;i<positions.length;i++)assert.ok(positions[i-1]<positions[i]);
++ }finally{scene.dispose();engine.dispose();}
++});
++
++for(const index of [0,1])test('five same-index2ms/3ms selfnested bodies under Scene are partial, never false complete: '+index,async()=>{
++ const f=fixture(),owner=f.install();f.game.actor.vehicle=true;f.work.nested=true;let level=0;const replies=[],value={original:true};f.work.returns=[value,value,value];
++ f.work.during=i=>{if(i!==index||!['nested','recursive'].includes(f.calls.at(-1).args[0]))return;level++;try{if(level<5)replies.push((index===0?f.game.gltfLightBudget.prepareFrame:f.game.stableLights.update).call(index===0?f.game.gltfLightBudget:f.game.stableLights,'recursive'));}finally{level--;}};
++ const returned=f.frame(),p=await owner.done;assert.deepEqual(returned,[value,value,value]);assert.equal(replies.length,4);assert.equal(replies.every(r=>r===value),true);
++ assert.equal(p.reason,'phase-error');assert.equal(p.complete,false);assert.equal(p.phaseErrors,1);assert.equal(p.remainingHooks,0);assert.equal(f.timers.size,0);assert.equal(f.disposeCallbacks.size,0);assert.deepEqual([0,1,2].map(i=>f.calls.filter(c=>c.index===i).length),index===0?[6,2,1]:[2,6,1]);validateEntryRenderProfile(p);
++ const identity={buildId:'build',sourceSnapshotId:'source',helperSha256:'helper',routineCost:true,lifecycleControls:false},raw={schemaVersion:1,...identity,attemptId:'8e9e7e15-6011-438d-96a2-53be43f17792',kind:'vehicle-entry-cost',mode:'diagnostic',atMs:1,timeOrigin:1,observerErrors:[],before:{vehicle:false},after:{vehicle:true},completed:false,validationErrors:['phase-error'],entryProfile:p};assert.equal(validateReceipt(raw,identity),raw);
++});
++for(const index of [0,1])for(const thrown of [undefined,null,false,0,'',new Error('selfnested primary')])test('same-index recursive original throw remains exact after diagnostic retirement: '+index+'/'+String(thrown),async()=>{
++ const f=fixture(),owner=f.install();f.game.actor.vehicle=true;f.work.nested=true;let level=0;
++ f.work.during=i=>{if(i!==index||!['nested','recursive'].includes(f.calls.at(-1).args[0]))return;level++;try{if(level<5)(index===0?f.game.gltfLightBudget.prepareFrame:f.game.stableLights.update).call(index===0?f.game.gltfLightBudget:f.game.stableLights,'recursive');if(level===5)throw thrown;}finally{level--;}};
++ let caught=false;try{f.frame();}catch(e){caught=true;assert.equal(e,thrown);}assert.equal(caught,true);const p=await owner.done;assert.equal(p.reason,'phase-error');assert.equal(p.complete,false);assert.equal(p.remainingHooks,0);assert.equal(f.timers.size,0);assert.equal(f.disposeCallbacks.size,0);assert.equal(Object.hasOwn(f.scene,'render'),false);validateEntryRenderProfile(p);
+ });
+diff --git a/.cache/webgpu-completion-20261021/entry-render/helper/v11/README.md b/.cache/webgpu-completion-20261021/entry-render/helper/v12/README.md
+index 70ad60f2..4d7188a3 100644
+--- a/.cache/webgpu-completion-20261021/entry-render/helper/v11/README.md
++++ b/.cache/webgpu-completion-20261021/entry-render/helper/v12/README.md
+@@ -1,3 +1,7 @@
++# V12 correction
++
++Same-index nested recursion under Scene is incomplete phase-error evidence; original calls/return/falsy throws still pass through once. Legitimate first nested prepare/stable remain supported. V11 emitted false complete for five recursive2ms bodies (nested30 vsScene18) and was never built forGPU. The immutable old v11 donor replacement covered SHA+two middle orders only; its equivalence wording was too broad. This v12 fixture adds version9.30.0, all8 selected own-method descriptors and all4 ordering checks. Other29 helper inputs are byte-exact. New reentry-correction evidence retains originalRED and exact byte hashes; no runtime/Game/GPU/performance claim follows.
++
+ # V11 entry/prelude diagnostic
+ 
+ Existing --routine-cost additionally offers a separate first-observed-entry button. It waits for the original accepted Actor false→true at outer prepareFrame and captures8 original prepare→stable→Scene chains under one30s deadline. First/cold is a fresh-session claim, never inferred from this observer alone. Original eight-routine button/modules are unchanged. New vehicle-entry-cost receipt records per-frame wall timestamps, engine and scene IDs, vehicle flags, three outer scopes, overlapping nested work and explicit failure/restoration evidence. glTF direct refresh inside Scene is included in Scene only. Engine ID stays unchanged inside render; Scene progresses1. No product/GPU/readiness/input/network calls are added. Exact snapshot singleton classes/methods, lifecycle and foreign-descriptor guards; defaultoff no hooks or Game reads. Only one installed attempt per Game.
