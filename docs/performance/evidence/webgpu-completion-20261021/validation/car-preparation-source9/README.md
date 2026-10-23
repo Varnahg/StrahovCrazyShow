@@ -1,0 +1,3 @@
+# Source9 real first-entry follow-up
+
+Reviewed a35b071b has272 local targeted and2108 exact-head CI passes, full TypeScript/build/integration. Actual noquery CM Game completes57stages in63.331s under original limits; High29.2495s. Entry is healthy and drive/steer/brake/exit work, but2newprograms and158ms hitch remain. This is retained negative acceptance evidence, not a completed migration or controlled improvement over source8. See verification.json and original-session.jsonl.gz. Screenshots are full2040x986 JPEG. Next diagnostic records only post-ready original jobs to identify the missing material owners.
