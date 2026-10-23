@@ -1,0 +1,18 @@
+# Progressive quality order after actual High timeout
+
+Source9 original noquery CM startup failed before any post-ready attribution was armed: Low19stages22,246.7ms, High19stages30,012ms (timeout), total52,258.8ms,paused0. Earlier High29,249.5ms had only750.5ms margin. No system telemetry was collected for the failure, so thermal/scheduling/driver cause is unknown. Native shader, readiness and source bytes remain the reviewed source9. The actual failed run and full source/helper proof are retained in validation/car-epoch-startup-failure-source9.
+
+Primary chain prepareAllRenderQualities→quality helper→real lighting stages/controllers shows Low omits the expensive alpha-shadow path; Medium first introduces the shared PBR/leaf PCF/material work, Cinematic1024/PCF_LOW and car256; High adds Cinematic2048/PCF_MEDIUM, car512 and wider LOD. Current requestedMedium order Low→High→Medium concentrates new shadow/material work in High. The shared-work hypothesis is source-supported but its GPU benefit is unmeasured.
+
+| Choice | Cost, cache, lifecycle and behavior | Decision |
+| --- | --- | --- |
+| Raise30s/pass or90s total | Hides current measured failure, longer waits | Reject |
+| Drop quality/light profiles or warm requested only | Leaves supported later variants cold, changes established coverage | Reject |
+| Remove repeated clamped stages only | Saves some redundant frames; no evidence that one High duplicate is sufficient headroom | May evaluate later, not this repair |
+| Split/reset High clocks | Changes the original bounded-work guarantee | Reject |
+| New permanent Effect/generator cache | Broad ownership/disposal/reflection risks before actual epoch discriminator | Reject |
+| Fixed progressive Low→Medium→High, then requested final if needed | Reuses existing complete passes and resource owners; potentially distributes shared work. Extra final pass has a real cost, still inside original shared30/90 clocks | Selected smallest product change |
+
+Only render-quality-preparation.ts sequencing changes. Stable High remains3passes57stages; stable Low/Medium4passes76stages; a late final requested-quality change may need5passes95stages, still within the original total90s and per-pass30s without reset. The existing finalPass flags, dynamic requested getter, restoration, cancellation/error/paused clocks and final submitted-view gate stay unchanged. WebGL calls its original single19? No: original WebGL9stage lighting path bypasses this all-native-quality sequencing and must remain9.
+
+The native GPU improvement is a hypothesis until root measures a new immutable source. CPU regressions should prove order/coverage/restoration and unchanged deadlines, not manufacture timing/FPS claims. Existing six allocated tests are sufficient: two single-pass fixtures stay unchanged; all-quality fixtures update only real pass counts/order/final callbacks. A Map keyed by quality/stage still has57unique projections when actual work is76; never conflate these counts. Late request regressions must trigger on the actual final Medium, not its new earlier progressive occurrence. No Actor/camera/input/physics/light/shader/backend/asset/dependency changes are authorized by this decision.
