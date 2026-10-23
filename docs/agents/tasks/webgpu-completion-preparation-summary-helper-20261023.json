@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-completion-preparation-summary-helper-20261023",
   "title": "KEY-22: omezený QA souhrn původních průchodů přípravy",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     ".cache/webgpu-completion-20261021/preparation-summary/helper/v10/",
@@ -15,13 +15,14 @@
     "Vytvořit novou disjunktní helperv10 kopii exact rootvalidation/helper-runtimes/v9 ze sealu9dc789c8. Zachovat fixed depth5 kořen; všechny existující cap/receipt/clock/shader-window/lifecycle funkce bezezměny. Změna jen pure bounded projection v startup-observer.mjs, qa-overlay import+startupraw field, common sourceFiles a vlastníREADME+novýCPUtest.",
     "Source audit předcode zjistil, že Game.lightPreparation neexistuje; skutečný prepareLighting výsledek je pouze lokální v Game.start. QA-only instance observer původního prepareLighting smí připojit právě jeden pasivní native Promise.then sideobserver a okamžitě promítnout skutečný výsledek: status/elapsed/active/paused/failureStep/stageCount a max16quality scalarrows, totalqualityCount/truncation. Vrací přesně původní Promise/return identity, receiver/args/sync aasync errors včetněfalsy. Obědiagnostic sidechainvětve musíkonzumovat svéerrors/rejections; beznového await/timer/GPU/readiness/render nebo UI/state change. Jeden .then derived Promise je výslovná deklarovanáalokace, nikoli nový preparationPromise.",
     "Instance hook smí trvat pouze kolem originálníhostartu a musí seobnovitpřistartterminal/stop/abort; foreignmethodreplacementnepřepsat. Nezadržetpůvodnístageobjects/Effect/Promise/Game po projekci a retirement; nedeformovatGamevýsledek. Summary jejednounastartupraw, ne každýframe/1Hz. Globaldiagnostic.event observer byl zvažován, ale vyžaduješiršísharedproducer/singletonimport a ownership.",
-    "Meaningful CPU tests large76stage source→tiny truthful summary, finite/missing/invalid/overflow data, own-data reads bezgetter sideeffects; původníPromiseidentity/receiver/args/sync+asyncfalsyerrors/observerexceptions/latefulfilafterretirement/foreignrestore a tatsächnéterminalordering. Přesné původní sourcebytes mimoúzkéanchors. Syntax/checkseal/ownedmanifest předhandoff; žádné build/GPU/install/server/fullsuite/commit/recursiveBMAD ani testtmpoutput mimo vlastníprefix. Rootověří helperbuild/integration/actualcapture."
+    "Meaningful CPU tests large76stage source→tiny truthful summary, finite/missing/invalid/overflow data, own-data reads bezgetter sideeffects; původníPromiseidentity/receiver/args/sync+asyncfalsyerrors/observerexceptions/latefulfilafterretirement/foreignrestore a skutečné terminální pořadí. Přesné původní sourcebytes mimoúzkéanchors. Syntax/checkseal/ownedmanifest předhandoff; žádné build/GPU/install/server/fullsuite/commit/recursiveBMAD ani testtmpoutput mimo vlastníprefix. Rootověří helperbuild/integration/actualcapture."
   ],
   "verification": [
     "Pure new projection CPU + relevantní existing read-only helper tests s kontrolovaným vlastním temp pokud potřeba; report explicitní rozsah, source9 seal unchanged, finitecap/flag honesty, newseal/diff/ownmanifest."
   ],
   "notes": [
     "16:53 root zvolil instance-local passive Promise result acquisition po explicitnímWIP handoff/release; stejnýowner smípřevzítjenown29-filecopy+evidence--adopt-dirty. Původní29helperSHA předcode stále9dc789c8, žádnýproductfield/getternepřidávat.",
-    "Explicitní rootdelegace v rámciKEY22 performance foundation. Novýhelperadresář má5levelů jako starývalidation/helper-runtimes/v9, takže stávajícírootresolution v immutableharness zůstává. Build/runoutputs nadále píše pouzeroot do svéhovalidation scope."
+    "Explicitní rootdelegace v rámciKEY22 performance foundation. Novýhelperadresář má5levelů jako starývalidation/helper-runtimes/v9, takže stávajícírootresolution v immutableharness zůstává. Build/runoutputs nadále píše pouzeroot do svéhovalidation scope.",
+    "23Oct root accepted only delegated QA helper CPU/syntax/ownership deliverable after clean independent editor-audit review and all42 manifest SHA checks; commit4adf255d. Seal49662229/30,59+2PASS. Actual immutable helper build/GPU summary capture remains an explicit root validation acceptance; this leaf Done does not complete KEY22."
   ]
 }
