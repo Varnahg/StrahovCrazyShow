@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-b1-20261024",
+  "title": "KEY-59: dokončit Blender model bloku 1 podle CAD a připravit herní integraci",
+  "status": "done",
+  "dependsOn": [
+    "cad-buildings-research-20261024"
+  ],
+  "writePaths": [
+    "scripts/cad-buildings/build_model.py",
+    "scripts/cad-buildings/audit_model.py",
+    "scripts/cad-buildings/model_io.py",
+    "scripts/cad-buildings/test_model_io.py",
+    "scripts/cad-buildings/model_geometry.py",
+    "scripts/cad-buildings/test_model_geometry.py",
+    "scripts/cad-buildings/rapier_model.mjs",
+    "scripts/cad-buildings/verify_routes.mjs",
+    "scripts/cad-buildings/verify_doors.mjs",
+    "scripts/cad-buildings/test_rapier_model.mjs",
+    "assets/blender/cad-buildings/b01.blend",
+    "public/models/cad-buildings/b01.glb",
+    "shared/data/cad-buildings/b01.json",
+    ".cache/cad-buildings-20261024/b01-build/",
+    "docs/reality-pack/cad-buildings/b01/model-audit.json",
+    "docs/reality-pack/cad-buildings/b01/README.md",
+    "docs/agents/handoffs/cad-buildings-b1-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Editovatelný samostatný model B1 se suterénem, třemi podlažími, střechou, otvory a schodišti podle ověřených plánů.",
+    "Znovuotevření skutečného .blend a kontrola exportu, materiálů, metrického měřítka a návaznosti pater.",
+    "Před další budovou dokončit B1 včetně cíleného refaktoringu a doloženého ověření."
+  ],
+  "verification": [
+    "Blender reopen a geometrický audit; přesné příkazy doplnit po průzkumu před aktivací.",
+    "Skutečné průchody dveřmi, schodišti a vstupy v následném GPU/integračním tasku."
+  ],
+  "notes": [
+    "R5 fyzikální průzkum: přidán čistý geometrický pomocník a lehké testy pro doložené stěny pod šikmým podhledem; žádné rozšíření runtime hry. Vlastní WIP a hash checkpointu jsou doložené v B1 handoffu.",
+    "Po prvním checkpointu rozděleno vlastnictví souborů a výpočtového okna. Blender/exporty/render vyžadují navíc platný claim cad-buildings-validation-window-20261024; bez něj pouze lehké editace a CPU jednotkové testy.",
+    "Výzkum přijat koordinátorem 24.10.2026; BMAD specifikace _bmad-output/implementation-artifacts/cad-buildings-20261024/spec-key-59-b01.md.",
+    "Příprava receptury patří disjunktnímu cad-buildings-b1-extraction-20261024. Vstupní přípravu číst až po předání. Tento task vytváří model bez aktivace runtime; všech 16 modelů je stále společným cílem.",
+    "Žádné původní CAD dokumenty ani jejich kopie v Gitu. Herní geometrie musí odpovídat modelu; samotný archiv není herní integrace.",
+    "24.10.2026 09:26 UTC: koordinátor převzal B1 R10 po native/visual/spatial auditu a třech nezávislých review. Čerstvá příprava je geometricky i všemi daty kromě nového generatorSha256 shodná s R10;162 strict Python +28 Node fixture PASS. Přijetí stavebního modelu/jeho nástrojů není herní integrace; terrain a celé KEY-59 zůstávají otevřené. Evidence docs/reality-pack/cad-buildings/b01/."
+  ]
+}

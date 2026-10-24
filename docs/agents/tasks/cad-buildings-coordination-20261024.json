@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-coordination-20261024",
+  "title": "KEY-59: vést BMAD rekonstrukci budov podle CAD po jednotlivých modelech",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "_bmad/render/bmad-build/strahovcrazyshow-2b285d12a449/",
+    "_bmad-output/implementation-artifacts/cad-buildings-20261024/",
+    "docs/agents/handoffs/cad-buildings-coordination-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Postup vychází z projektových overrides, výzkumu skutečných plánů a existujícího runtime.",
+    "Každá budova má samostatný dokončený Blender model před přechodem na další; společný cíl zahrnuje všech 16 budov a herní integraci.",
+    "Doložené části plánů a modelářské odhady zůstávají odlišené; dodané soubory nejsou v Gitu."
+  ],
+  "verification": [
+    "Oficiální resolver a renderer BMAD; kontrola vazeb specifikace na rezervované tasky a skutečné výsledky."
+  ],
+  "notes": [
+    "Linear KEY-59; chat 01a16b37-1237-7583-af49-52c29a82272d.",
+    "Přesný root-hash rendereru vypočten oficiálním algoritmem z Path.cwd().resolve(): 2b285d12a449.",
+    "Vlastník WebGPU 24.10.2026 potvrdil zastavení služeb a uzavření vlastní GPU karty a zúžil vlastní BMAD prefix. Před Blenderem/GPU znovu ověřit skutečný registr a procesy."
+  ]
+}

@@ -1,0 +1,27 @@
+# Výpočtové okno CAD budov
+
+Koordinátor `cad-buildings-01a16b37-root`; procesní vlastník `cad-buildings-01a16b37-validation`. Rezervace se týká zdroje `heavy-validation`, nikoli převodu modelových souborů jinému chatu. GPU CAD nepoužil.
+
+24. 10. 2026 02:29 UTC: stabilní kandidát B1 R5 uložen, nikoli finálně přijat. Blender build, self-test, reopen, šest CPU renderů, native export ručně upravené kopie a malé fyzikální zkoušky skončily. Konkrétní hashe a výsledky jsou v `cad-buildings-b1-20261024.md`. Před release ověřit nepřítomnost vlastního blender.exe. Žádný vlastní server, GPU scéna ani port nebyly spuštěné.
+
+Po release je okno domluveno s chatem „Navrhni hlášení chyb a feedbacku“ (01a15a3e-59e3-73f1-9173-357f36b3985a) na přibližně 40 minut. CAD pokračuje pouze lehkým kódem, jednotlivými čtecími dotazy a syntetickými testy. Před dalším Blenderem/bulk převodem znovu získá skutečný claim. Přesný čas předání je potvrzen zprávou po úspěšném release; tento soubor sám nezakládá vlastnictví registru.
+
+03:06 UTC: WebGPU chat předčasně vrátil zdroje a doložil STOP svých procesů/portů. Root znovu získal heavy-validation a dokončil R6/R7/R7a kontroly. R7a má 93 testů a36/36 modelových tras PASS; žádný herní/GPU PASS. Build, self-test, route probe a šest CPU renderů skončily (poslední session53383 exit0). Kolem03:35UTC se připravuje třetí předání na40minut po kontrole nulového počtu blender.exe a skutečném release. Externí západní příprava je samostatný files-only claim, bez oprávnění spustit bulk během cizího okna.
+
+05:21 UTC: další okno dokončilo lokální checkpoint R8b všech šesti venkovních tras. První R8 byl správně odmítnut pro stěnu1D2/1D3 místnosti s146 nad posledním schodem. Opravená receptura4ae5fee5… má89 přípravných testů PASS;24 čistých geometrických testů a7 Rapier testů PASS. R8b native build/reopen/primitive test,44/44 celých tras a544/604 dveřních pokusů PASS; zbylých60 má chybějící venkovní podlahu, žádný blocked/invalid-start. Šest CPU renderů dokončeno a prohlédnuto. Jde o geometrii se starým výškovým odhadem; finální výšková varianta C ještě nebyla implementovaná.
+
+R8b zůstává v lokální rezervované cache `b01-build/all-exterior-r8b/`: Blender ad92712474059ec83e78cf072ed9945944b1f24422f0c71d26fd678f779089a4, GLB567201e8c687cc07ca3e0856f052c387c46bb13fbbb1cf2e011d32357350df25. Native export bez CAD zachoval přesné bajty masteru i konstrukční části podle ID,302 dveřních anotací,6 výřezů terénu,patra a schody. Seznam částí změnil pouze pořadí, nikoli obsah. Důkaz `native-roundtrip-r8b.json`; poslední Blender session96264 exit0. Původní pracovní asset soubory zatím obsahují R7a.
+
+Všechny vlastní Blender/QA procesy skončily, žádný vlastní server ani GPU scéna neběží. Po kontrole a skutečném release se heavy-validation předává druhému chatu na90minut, přibližně05:21–06:51UTC. Čas sám zdroj nevrací; před dalším Blenderem nebo bulk přípravou je nutné výslovné STOP druhého chatu a nový úspěšný claim. CAD mezitím může provádět lehkou implementaci výškových vazeb, čtecí výzkum a malé syntetické testy.
+
+08:15UTC: navazující okno vrácené již06:44 dokončilo R9/R9a/R10. R10 je skutečně publikovaný do pracovních asset cest: Blender5d415c1f4866a04adce944ac5e38002fc6c9c8f372186f3e36e917fa736422b1, GLB93aa01ddf02ef5710ac53dda7847c312e51223e1f83b60603d6d941c93a089e1, collision629ca3a8c25579c3e85e682dd1ca5032526a8cb74ee5d1f189e73d6bffaeff6d. Native export z uloženého masteru zachoval všechny tři soubory byteově shodné.154Python testů,11 fyzikálních fixture testů a15 accessibility fixture testů PASS; native/44tras/552dveřních průchodů/30směrových kontrol15fixních prosklení PASS.22směrů nemá venkovní podlahu, zůstává pro terénní integraci.
+
+Souvislý průchod ze3 konkrétních doložených venkovních schodišťových vstupů dosáhl561/563 konečných dveřních bodů. Zbývající2 jsou uvnitř zvláštního připojeného prostoru za28D2/28EB. Primární CAD potvrzuje souvislou zadní stěnu160A/1698 bez vnitřního portálu; prostor je přístupný jen zvenčí a čeká na terén, není důvod prorážet stěnu či přidávat vnitřní seed. Tato kategorie se doplní při čtecím review.
+
+R10 celkový render i konkrétní nový podhled nadN01 room29 byly prohlédnuté. R9a kompletní patra a4 perspektivy zůstávají označené svým checkpointem. P01s146 je podle skutečných spodních N01 stair/landing trojúhelníků uzavřený se světlostí nejméně2,4659m; zbylý0,241mm spoj leží v1mm modelové přesnosti. Žádná další deska se tam nevyrábí. Všechny vlastní procesy včetně poslední render session51236 skončilyexit0, Blender0 potvrzen. Žádný vlastní server/GPU nebyl spuštěn. Po skutečném release se předává druhému chatu60min okno08:15–09:15UTC; další CAD práce je pouze čtecí review, metadata a malé cílené CPU kontroly, bezBlenderu/bulk do potvrzeného vrácení.
+
+## Skutečné převzetí09:22UTC a kontrola B1 po review
+
+Druhý chat potvrdil STOP preview/API, zavření vlastní GPU karty a listeners2568/4215/2599=0, Blender0; jeho resource claim byl skutečně uvolněn. Root úspěšně získal heavy-validation a ověřil Blender0. Nepřebírá cizí procesy/GPU/porty; žádný vlastní síťový proces neběží.
+
+Fullprep session90890 skončil exit0. Strict162Python testů bez skip PASS,28Node fixture PASS. Celá fresh recipe kromě nového generatorSha256 přesně odpovídá původní R10, publikované tři assety byteově beze změny. CPU přípravné/testovací procesy skončily. Heavy zatím zůstává rootovi pro koordinovanou B1 integraci a navazující B2; nepovažovat tento záznam za release.
