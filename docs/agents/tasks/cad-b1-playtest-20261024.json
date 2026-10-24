@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-b1-playtest-20261024",
+  "title": "KEY-59: neměnná testovací hra B1+B6",
+  "status": "ready",
+  "dependsOn": [
+    "cad-buildings-b1-20261024"
+  ],
+  "writePaths": [
+    ".cache/cad-buildings-20261024/b01-playtest/",
+    "docs/agents/handoffs/cad-b1-playtest-20261024.md"
+  ],
+  "resources": [
+    "port:2590"
+  ],
+  "acceptance": [
+    "Jeden izolovaný produkční server a build s ověřenou URL/identitou, žádné HMR změny pod uživatelem.",
+    "Během uživatelského testu se další modely ani tuto testovací kopii nemění; původní server/GPU procesy jiných chatů se neukončují."
+  ],
+  "verification": [
+    "Ověřit aktuální port před startem; skutečný browserový průchod, GPU/resolution/FPS evidence a stav hosta/multiplayeru dle rozsahu.",
+    "Zaznamenat vlastní PID/session, URL, source hash a instrukce k pozdějšímu STOP; release až po skutečném zastavení."
+  ],
+  "notes": [
+    "Výslovný pokyn uživatele: po B1 commitu pozastavit další modely a připravit hru k vyzkoušení. KEY-59.",
+    "Přijatý základ origin/main2a7b1998 plus asset-only cherry-pick6dd89606; žádný primary-main WIP nebo frozen source15 se nepřebírá.",
+    "Před zápisem vlastní claim; Blender/fullprep/build/integrace vyžadují navíc root heavy-validation, GPU a porty samostatné rezervace.",
+    "Původní CAD ani jejich kopie se nevkládají do Gitu. Závazný model je uložený B1 R10, žádná výroba B2.",
+    "GPU přejímku nyní navíc chrání cad-buildings-validation-window-20261024 společně s heavy; user změnil scope na B1+B6."
+  ]
+}

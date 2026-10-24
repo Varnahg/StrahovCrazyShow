@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-physics-regressions-20261024",
+  "title": "Převést staré capsule/model fixtures na skutečný B1+B6 kontrakt, neoslabit skutečné fyzikální záruky",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/physics.test.ts",
+    "tests/stability.test.ts",
+    "tests/helpers/jump-animation-fixture.ts",
+    "tests/jump-animation.test.ts",
+    "tests/ground-turn-animation.test.ts",
+    "tests/local-avatar-presentation.test.ts",
+    ".cache/cad-buildings-20261024/cad-buildings-physics-regressions-20261024/",
+    "docs/agents/handoffs/cad-buildings-physics-regressions-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze doložené regresní návaznosti B1+B6; primární příčina před změnou, žádná plošná tolerance nebo smazání testu.",
+    "Cílené CPU testy a předání s omezeními; runtime změnu mimo scope konzultovat s root."
+  ],
+  "verification": [
+    "Cílené testy přesných souborů; žádná plná sada, Blender, GPU, build, síťové procesy."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Root již provedl fullsuite:1943tests,1914pass,27fail,1622.65s. Log .cache/cad-buildings-20261024/b01-runtime-integration/full-tests-first.log.",
+    "Explicitní přímé zadání, bez BMAD rendereru/dalších agentů. Own cwd cad-building-models. Před zápisem vlastní claim; root nic do tohoto disjunktního scope nepíše."
+  ]
+}

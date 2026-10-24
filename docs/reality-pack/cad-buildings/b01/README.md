@@ -77,3 +77,6 @@ Přípravná přejímka vyžaduje nejprve skutečný nový běh `prepare_b01.py`
 `build_model.py --from-blend <uložený.blend>` exportuje skutečně upravený master bez CAD. Ponechat identitu, patra a role objektů; modifikátory před exportem aplikovat. Při změně schodů/otvorů upravit jejich anotace a zopakovat prostorovou přejímku. Každý export nejprve vytvoří dočasnou sadu a ověří ji; publikace má zálohu/žurnál a obnovu po přerušení. Cizí neočekávaný obsah cíle nepřepisuje.
 
 Herní integrace musí společně nahradit starý render, kolize a základy, připojit terénní výřezy a vnitřní zóny, sjednotit klient/server fyziku a zajistit načítání/úklid modelu. Poté následují skutečné vstupy, jízda/kamera, testy/build/izolovaná integrace a produkční GPU profil. Tyto budoucí kroky nejsou vydávány za splněné tímto stavebním modelem.
+
+
+Finální stav24.10.2026: Produkční přejímka je doložená v [runtime záznamu](runtime.md). Model je zapojený a uložený v samostatném commitu; dřívější pending formulace výše zachycují průběžnou přejímku.

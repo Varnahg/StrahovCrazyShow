@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-b1-runtime-integration-20261024",
+  "title": "KEY-59: zapojit CAD B1+B6 do skutečné hry pro oddělený uživatelský test",
+  "status": "done",
+  "dependsOn": [
+    "cad-buildings-b1-20261024"
+  ],
+  "writePaths": [
+    "shared/cad-buildings.ts",
+    "client/cad-buildings.ts",
+    "client/game.ts",
+    "client/ui.tsx",
+    "client/i18n-messages.ts",
+    "client/world-renderer.ts",
+    "shared/simulation.ts",
+    "shared/terrain.ts",
+    "shared/world.ts",
+    "shared/netcode.ts",
+    "scripts/rebuild-campus-transit-navigation.ts",
+    "shared/data/transit-navigation.json",
+    "tests/cad-building-loader.test.ts",
+    "tests/cad-building-world.test.ts",
+    "tests/terrain.test.ts",
+    "tests/transit-navigation-source.test.ts",
+    "tests/locomotion-quality.test.ts",
+    "docs/reality-pack/cad-buildings/b01/runtime.md",
+    "docs/agents/handoffs/cad-b1-runtime-integration-20261024.md",
+    ".cache/cad-buildings-20261024/b01-runtime-integration/",
+    "scripts/cad-buildings/rapier_model.mjs",
+    "scripts/cad-buildings/test_rapier_model.mjs",
+    "tests/building-roofs.test.ts",
+    "shared/transit.ts",
+    "tests/transit.test.ts",
+    "tests/transit-route-reality.test.ts",
+    "tests/helpers/transit-route-audit.ts",
+    "client/transit-renderer.ts",
+    "tests/transit-pool-pruning.test.ts",
+    "tests/b6-reality.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Hra načítá skutečný B1 GLB a stejnou konstrukční geometrii se shodným transformem; starý obvod/střecha/foundation/fasáda se nedublují.",
+    "Vstupy, sklepy, schodiště a indoor zóny odpovídají přijatému modelu; rendering i kolize používají stejné terénní výřezy.",
+    "Loader je vlastněný scénou, kritická chyba načtení nevpustí hráče do neviditelných kolizí; startup/cancel/dispose nevytváří úniky nebo pozdní obsah.",
+    "Kapsle zachová výšku1,6m, její nové rozměry a autostep jsou stejné na klientu/serveru a projdou také B6 regresí.",
+    "Ověřený neměnný snapshot hry zahrnuje testy, potřebné assety a konkrétní identitu zdrojů; původní testovaný build zůstává nedotčený."
+  ],
+  "verification": [
+    "Cílené testy nových modulů, source identity, B1 průchody a B6 locomotion; pnpm test, pnpm build, izolovaný pnpm test:integration nad stabilním checkpointem.",
+    "Praktická celá produkční hra: nový B1, terénní nástupy, řízení/kamera, skutečná URL a klientská identita; GPU kontrola pouze s rezervací."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Jediná legacy whole-world B6 portal fixture selhala v přesném starém waypointu3,-71.95, kde je nyní CAD stěna. Ostatní legacy isolated fixtures zůstávají; aktuální whole-world scénář se váže na skutečné nativní vstupní dveře a návrat.",
+    "Read-only finalreview doložilo, že transit renderer přepisuje shared NPCY starým B6 samplem. Přidává se přesně client/transit-renderer.ts pro stejný native support helper.",
+    "Root přebírá vlastní runtime WIP po release. Návazná B6 navigace musí použít nativní vstup, schody a výšku opory pro simulované cestující; starý schematický sampler by je po výměně modelu potápěl. Přidávají se pouze příslušné transit zdroje/testy.",
+    "Rozšíření13:05UTC: vlastní UI location-pill musí poznat b01/b06 CAD patra; dosavadní startsWithb6 by oba nové modely vydával za venkovní Mezi bloky. Jen úzký formatter a překlady, žádný cizí UIWIP. Root tentýž runtimeWIP přebírá po doloženém vlastním release.",
+    "Aktualizace24.10 po uživatelském zúžení: tentýž vlastník a stejné writePaths integrují pouze B1+B6, fotogrammetrický vzhled/usazení a úplné praktické průchody. Dřívější B1-only poznámky níže jsou historické; další budovy se nezačínají. Modelové assety má samostatný models task.",
+    "Výslovný pokyn uživatele: po B1 commitu pozastavit další modely a připravit hru k vyzkoušení. KEY-59.",
+    "Přijatý základ origin/main2a7b1998 plus asset-only cherry-pick6dd89606; žádný primary-main WIP nebo frozen source15 se nepřebírá.",
+    "Před zápisem vlastní claim; Blender/fullprep/build/integrace vyžadují navíc root heavy-validation, GPU a porty samostatné rezervace.",
+    "Původní CAD ani jejich kopie se nevkládají do Gitu. Závazný model je uložený B1 R10, žádná výroba B2.",
+    "Koordinátor druhého chatu výslovně uvolnil game.ts pro tento úzký integration hook. client/landmark-reality.ts není potřeba měnit a nebyl převzat.",
+    "Site helper/data a terrain clipping helper mají vlastní disjunktní tasky. Žádné cizí light/receiver/vehicle helpery se nemění.",
+    "Root10:22UTC převádí svůj vlastní popsaný runtimeWIP do rozšířené rezervace. Modelový probe current a jeho Actor guard musí následovat záměrně změněný fyzikální kontrakt; generic-roof testy musí odlišit nahrazený nativeB1. Žádná změna původních tří modelových assetů."
+  ]
+}

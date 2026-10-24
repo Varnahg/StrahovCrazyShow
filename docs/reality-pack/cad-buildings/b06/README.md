@@ -34,3 +34,6 @@ Geometry digest před a po texturování je shodný `73a0f4ed02ae743d933dbf860d6
 | Kolize/anotace | `a7f62e9a066c8bd5076f29fe8f061509c32dc0a14656a931b1841f2a7530940e` |
 
 Žádný CPU/Blender výsledek není měření FPS nebo přejímka ovládání a kamery v celé produkční hře. Současný stav této přejímky a integrace patří do [ověření hry](../../../verification.md).
+
+
+Finální stav24.10.2026: Produkční přejímka je doložená ve [společném runtime záznamu](../b01/runtime.md). Model je zapojený a uložený v samostatném commitu; dřívější pending formulace výše zachycují průběžnou přejímku.

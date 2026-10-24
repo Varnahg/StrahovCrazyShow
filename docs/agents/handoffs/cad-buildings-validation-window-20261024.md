@@ -25,3 +25,9 @@ R10 celkový render i konkrétní nový podhled nadN01 room29 byly prohlédnuté
 Druhý chat potvrdil STOP preview/API, zavření vlastní GPU karty a listeners2568/4215/2599=0, Blender0; jeho resource claim byl skutečně uvolněn. Root úspěšně získal heavy-validation a ověřil Blender0. Nepřebírá cizí procesy/GPU/porty; žádný vlastní síťový proces neběží.
 
 Fullprep session90890 skončil exit0. Strict162Python testů bez skip PASS,28Node fixture PASS. Celá fresh recipe kromě nového generatorSha256 přesně odpovídá původní R10, publikované tři assety byteově beze změny. CPU přípravné/testovací procesy skončily. Heavy zatím zůstává rootovi pro koordinovanou B1 integraci a navazující B2; nepovažovat tento záznam za release.
+
+## STOP a pevné okno10:00–10:25UTC
+
+Po přijetí B1 a uživatelském požadavku na testovací hru se připravuje runtime v čistém základu2a7+vlastní asset6dd89606. Vlastní pnpm install --frozen-lockfile skončil exit0, Node24.19/pnpm11.25, žádné package/lock změny. Nyní jen lehká implementace a malé analytické fixtures; všechny root pomocné procesy skončily, Blender/GPU/server rootu neběží. Heavy a build/port2568 se skutečně uvolňují pro přesné nové25min okno druhého chatu10:00–10:25UTC, bez rolling prodloužení. Do skutečného STOP/release a opětovného claimu root nespouští Blender/fullprep/fullsuite/build/integraci/GPU. Původní scope rootu, modely a input snapshoty zůstávají chráněné souborovými tasky; runtime data export po převzetí dítěte provede root až po navrácení zdroje.
+
+24.10.2026 nový pokyn: pouze B1+B6 CAD, fotogrammetrické textury/detaily/usazení a hráčské cesty. Všechny root pomocné procesy jsou ukončené, Blender0; bez běžícího serveru/GPU. Před úpravou vlastní rezervace se heavy krátce release a znovu převezme společně s GPU. Nejde o předání cizímu chatu; další cizí okna nejsou autorizována v tomto pracovním plánu.

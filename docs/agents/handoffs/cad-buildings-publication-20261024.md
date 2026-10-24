@@ -19,3 +19,6 @@ Původní main má cizí necommitnutý WIP; přečtený index byl prázdný. Do 
 B1 R10 přijat. Čerstvý převod a strict162Python+28Node fixture testů PASS, celá receptura kromě nového generatorSha256 přesně shodná s původním vstupem R10. Původní modelový, exportní a vizuální důkaz proto zůstává platný bez regenerace meshů. Checkpoint19 zdrojových souborů včetně všech testů, tří assetů a dvou auditů: .cache/cad-buildings-20261024/publication/b01-source-checkpoint.json, SHA c13b05ac350e9f8d31790e827b755cab69516c7e3d892cb6ff3a361ca38eb215. Přesné hashe assetů a hraniční případy obsahuje modelový handoff/README. B1 modelový, přípravný a accessibility task převzaty jako done; koordinace a publikace všech16 budov pokračují.
 
 Po modelovém přijetí uživatel změnil pořadí: dokončit tento commit, pozastavit další budovy a připravit oddělenou hru k vyzkoušení. Samostatná B1 runtime integrace nyní předchází B2; není součástí tohoto modelového commitu. Její task/snapshot vznikne až po koordinaci skutečných vlastníků vstupů.
+
+
+Poslední zadání zúžilo scope na B1+B6. Přijaty samostatné modelové commity30c13354/dea1b67f a runtimea31f743a; ostatní budovy nezačínají. Aktuální přejímku obsahuje docs/reality-pack/cad-buildings/b01/runtime.md. Dřívější pending/16budov poznámky výše jsou historické. Primary-main134foreignWIPfiles nebyly převzaté ani stagované.

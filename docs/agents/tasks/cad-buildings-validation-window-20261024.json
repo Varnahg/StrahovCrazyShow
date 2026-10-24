@@ -3,9 +3,16 @@
   "id": "cad-buildings-validation-window-20261024",
   "title": "KEY-59: sériové výpočtové okno pro Blender a modelové ověření",
   "status": "ready",
-  "dependsOn": ["cad-buildings-research-20261024"],
-  "writePaths": ["docs/agents/handoffs/cad-buildings-validation-window-20261024.md"],
-  "resources": ["heavy-validation"],
+  "dependsOn": [
+    "cad-buildings-research-20261024"
+  ],
+  "writePaths": [
+    "docs/agents/handoffs/cad-buildings-validation-window-20261024.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu"
+  ],
   "acceptance": [
     "Blender, náročnější příprava modelů a CPU rendery běží pouze při současném vlastnictví všech výstupů příslušným modelovým taskem.",
     "Před release skončí všechny vlastní pomocné procesy a je předáno konkrétní okno s výsledky a omezeními."
@@ -17,6 +24,7 @@
   "notes": [
     "Modelové soubory vlastní cad-buildings-b1-20261024, tento task přiděluje pouze společný výpočtový zdroj a jeho předání.",
     "24.10 po prvním B1 checkpointu přednost domluvenému cca30min WebGPU oknu, nové získání až po uvolnění druhým chatem.",
-    "Vlastník jednoho chatu nesmí přebírat zámky druhého. Uživatel výslovně povolil vzájemnou koordinační zprávu."
+    "Vlastník jednoho chatu nesmí přebírat zámky druhého. Uživatel výslovně povolil vzájemnou koordinační zprávu.",
+    "Nový výslovný pokyn24.10: výpočty pouze B1+B6, včetně fotogrammetrických textur/usazení a skutečné hry; root drží heavy i GPU souvisle, bez dalších cizích oken."
   ]
 }

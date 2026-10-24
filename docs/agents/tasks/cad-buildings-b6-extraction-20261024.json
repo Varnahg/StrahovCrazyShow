@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-b6-extraction-20261024",
+  "title": "KEY-59: připravit B6 podle vlastních osmi CAD plánů",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/cad-buildings/prepare_b06.py",
+    "scripts/cad-buildings/test_prepare_b06.py",
+    ".cache/cad-buildings-20261024/b06-preparation/",
+    "docs/reality-pack/cad-buildings/b06/preparation-audit.json",
+    "docs/reality-pack/cad-buildings/b06/preparation.md",
+    "docs/agents/handoffs/cad-buildings-b6-extraction-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Každé patro používá doložené vlastní stěny/otvory/podesty a společnou původní soustavu; B1 ani B2 výjimky se nesmějí slepě přenést.",
+    "Měřítko, střechy, mezipatra a schodové hrany jsou podložené konkrétními zdroji; chybějící Z zůstává označeným odhadem.",
+    "Receptura je svázána s úplnou identitou generátoru a použitých helperů; nedovolí starou cache jako aktuální přejímku."
+  ],
+  "verification": [
+    "Čtecí analýza vlastních B6 DXF a cílené syntetické regrese; plný převod/overlay až root pod heavy.",
+    "Předat konkrétní floor/stair/window/door kontrakt společnému builderu, source handles a skutečné výsledky."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Výslovný pokyn24.10: pouze B1+B6 podle lokálních CAD, poté fotogrammetrie pro textury/detaily/usazení a ověření cest; ostatní modely mimo současný scope.",
+    "Původní CAD a jejich kopie zůstávají mimo Git, nativní modely jsou zdroj; zdrojové odhady odlišit od měření.",
+    "Krátký postup bez dalšího BMAD rendereru/checkpointů; AGENTS vlastnictví/zdroje a ověřování zůstávají závazné.",
+    "Cwd cad-building-models, větev codex/b1-playtest-20261024, přijatý základ6dd89606; nepřebírat primarymainWIP nebo source15.",
+    "Zdroj C:/Users/rezac/Downloads/strahov autocad/strahov autocad/strahov blok6. Číst původní soubory, nepřepisovat.",
+    "B1 prepare_b01.py je čtecí knihovna pouze prověřených obecných funkcí; B1 explicitní korekce/height zóny nepřebírat. Nutnou společnou změnu předat rootovi.",
+    "Agent dodá implementaci/refaktoring/lehká ověření; plný převod a Blender spustí root po doloženém předání."
+  ]
+}

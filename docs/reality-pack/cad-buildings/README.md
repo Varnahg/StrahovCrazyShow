@@ -1,5 +1,7 @@
 # Rekonstrukce budov podle dodaných CAD plánů
 
+**Aktuální dokončený rozsah24.10.2026: pouze [B1](b01/README.md) a [B6](b06/README.md), včetně interiérů, fotogrammetrie a [herní přejímky](b01/runtime.md).** Původní inventář16budov níže zůstává historickým průzkumem, nikoli tvrzením jejich dokončení.
+
 Zadání 24. 10. 2026, [KEY-59](https://linear.app/gigeconomy/issue/KEY-59): dokončit postupně každý model, včetně interiérů a schodišť, potom modely zapojit do hry. Zdrojové dokumenty zůstávají pouze v uživatelově lokální složce `Downloads/strahov autocad/strahov autocad`. Nejsou součástí repozitáře ani se nepřibalují do modelu jako textové či obrazové přílohy. Odvozená editovatelná geometrie, její herní exporty a vlastní implementační kód jsou výsledkem práce.
 
 ## Ověřený inventář

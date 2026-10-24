@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-b1-runtime-terrain-20261024",
+  "title": "KEY-59: přesně odečítat stavební výřezy z trojúhelníků terénu",
+  "status": "done",
+  "dependsOn": [
+    "cad-buildings-b1-20261024"
+  ],
+  "writePaths": [
+    "shared/terrain-cutouts.ts",
+    "tests/terrain-cutouts.test.ts",
+    "docs/agents/handoffs/cad-b1-runtime-terrain-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Čistá geometrická funkce odečte konkávní polygon s vnitřními prstenci z trojúhelníkové plochy bez změny výškové roviny a bez děr mimo výřez.",
+    "Výsledek zachová orientaci, konečná data a shodné hranice; neovlivněné trojúhelníky zůstávají stejné."
+  ],
+  "verification": [
+    "Analytické fixture pro zásah hrany, úplné pokrytí, konkávní výřez, díru ve výřezu, obě orientace a nakloněnou výškovou rovinu."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Výslovný pokyn uživatele: po B1 commitu pozastavit další modely a připravit hru k vyzkoušení. KEY-59.",
+    "Přijatý základ origin/main2a7b1998 plus asset-only cherry-pick6dd89606; žádný primary-main WIP nebo frozen source15 se nepřebírá.",
+    "Před zápisem vlastní claim; Blender/fullprep/build/integrace vyžadují navíc root heavy-validation, GPU a porty samostatné rezervace.",
+    "Původní CAD ani jejich kopie se nevkládají do Gitu. Závazný model je uložený B1 R10, žádná výroba B2.",
+    "Pouze čistý helper a jeho testy. shared/terrain.ts a zapojení patří rootovi; žádné renderer/game soubory."
+  ]
+}

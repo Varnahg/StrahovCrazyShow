@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-b1-runtime-site-20261024",
+  "title": "KEY-59: odvodit půdorysy a prostorová data B1 ze skutečného uloženého modelu",
+  "status": "done",
+  "dependsOn": [
+    "cad-buildings-b1-20261024"
+  ],
+  "writePaths": [
+    "scripts/cad-buildings/export_site.py",
+    "scripts/cad-buildings/test_export_site.py",
+    "shared/cad-building-geometry.ts",
+    "shared/data/cad-buildings/b01-site.json",
+    "tests/cad-building-geometry.test.ts",
+    ".cache/cad-buildings-20261024/b01-runtime-site/",
+    "docs/reality-pack/cad-buildings/b01/runtime-site.md",
+    "docs/agents/handoffs/cad-b1-runtime-site-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Geometrie obalů, otvorů a podlah vychází z exportovaných meshů a je svázána s jejich SHA, nikoli z druhého ručního půdorysu.",
+    "Společný dopředný a inverzní transform má metry, stejné natočení ve fyzice a Babylon rendereru, včetně nenulové Y rotace.",
+    "Odvozené footprinty zachovávají dvory/šachty; rozdílné hladiny a meziprostory se nevydávají za jedinou plnou krabici."
+  ],
+  "verification": [
+    "Malé analytické Python/TypeScript fixture včetně děr, rozdílných výšek a rotace.",
+    "Úplné odvození B1 jen v koordinované heavy rezervaci, původní tři assety musí zůstat byteově stejné."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Výslovný pokyn uživatele: po B1 commitu pozastavit další modely a připravit hru k vyzkoušení. KEY-59.",
+    "Přijatý základ origin/main2a7b1998 plus asset-only cherry-pick6dd89606; žádný primary-main WIP nebo frozen source15 se nepřebírá.",
+    "Před zápisem vlastní claim; Blender/fullprep/build/integrace vyžadují navíc root heavy-validation, GPU a porty samostatné rezervace.",
+    "Původní CAD ani jejich kopie se nevkládají do Gitu. Závazný model je uložený B1 R10, žádná výroba B2.",
+    "Podagent dodá implementaci, cílený refaktoring, testy a handoff; žádný další BMAD workflow. Produkční těžký export provede root po převzetí."
+  ]
+}

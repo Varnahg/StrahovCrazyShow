@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-world-paths-20261024",
+  "title": "KEY-59: přehrát důkazy dosažitelnosti B1+B6 skutečnou herní simulací",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/cad-buildings/verify_world_paths.ts",
+    "tests/cad-world-paths.test.ts",
+    ".cache/cad-buildings-20261024/world-paths/",
+    "docs/reality-pack/cad-buildings/world-paths.md",
+    "docs/agents/handoffs/cad-buildings-world-paths-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Přenosný ověřovač přehraje všechny souvislé proofSessions z identifikovaného verify_accessibility reportu skutečným Actor v celé Simulation a registrovaném world placementu.",
+    "Kontrola identity modelu/profilu/anotovaných vstupů a úplnosti trace odmítne cizí nebo neúplné důkazy; průchod nesmí teleportovat/recoverovat mezi cíli.",
+    "Report oddělí fyzicky ověřené cíle od nedosažených/neověřených a zaznamená skutečné výsledky, hash zdrojů a omezení."
+  ],
+  "verification": [
+    "Malé fixtures validace trace/identity; cílený refaktoring společné logiky a cleanup Simulation/Actor.",
+    "Plné B1+B6 trasy spouští root po předání a po vytvoření aktuálních modelových reportů; nezapisovat do cizích výstupů."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Přímé delegované zadání bez dalšího BMAD. Pouze B1+B6 dle uživatele. Cwd cad-building-models, HEAD6dd89606.",
+    "Čti verify_accessibility.mjs/rapier_model.mjs/cad-buildings.ts a tests/cad-building-world.test.ts; jejich soubory se nemění.",
+    "Původní CAD ani cache source kopie nepatří do Gitu. Runtime data jsou nativní model a anotace. Žádný server/GPU/Blender."
+  ]
+}

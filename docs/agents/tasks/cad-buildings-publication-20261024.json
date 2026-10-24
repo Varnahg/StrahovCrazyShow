@@ -3,12 +3,15 @@
   "id": "cad-buildings-publication-20261024",
   "title": "KEY-59: převzít a průběžně integrovat ověřené samostatné modely",
   "status": "ready",
-  "dependsOn": ["cad-buildings-research-20261024"],
+  "dependsOn": [
+    "cad-buildings-research-20261024"
+  ],
   "writePaths": [
     "docs/reality-pack/cad-buildings/README.md",
     "docs/agents/handoffs/cad-buildings-research-20261024.md",
     "docs/agents/handoffs/cad-buildings-publication-20261024.md",
-    ".cache/cad-buildings-20261024/publication/"
+    ".cache/cad-buildings-20261024/publication/",
+    "docs/verification.md"
   ],
   "resources": [],
   "acceptance": [
@@ -22,6 +25,7 @@
     "node scripts/agent-tasks.mjs validate"
   ],
   "notes": [
+    "Po explicitním release druhého chatu je rezervován společný verification záznam pro B1+B6. Zachovat existující evidenci a rozlišit CPU/GPU a omezení.",
     "Koordinátor tohoto uživatelského zadání přebírá své dříve dokončené výzkumné README a handoff, nikoli celý široký historický výzkumný scope.",
     "Root může přijmout tento doložený vlastní WIP přes --adopt-dirty. Ostatní podadresáře a modelové skripty mají nadále samostatné aktivní rezervace.",
     "Linear KEY-59; původní main WIP zůstává cizí. Žádná změna hraného immutable buildu nebo automatický push."
