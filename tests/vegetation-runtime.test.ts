@@ -8,12 +8,19 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
+import { ImportMeshAsync } from "@babylonjs/core/Loading/sceneLoader";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import {
   decodeTreeRuntimeChunk,
   VegetationController,
+  attachAuthoredTreeMesh,
 } from "../client/vegetation";
 import { TREES } from "../shared/world";
 import manifest from "../public/models/vegetation/runtime/manifest.json";
+import b6Placement from "../shared/data/cad-buildings/b06-tree-placement.json";
+import { groundHeight } from "../shared/terrain";
+import { treeTrunkCollision } from "../shared/vegetation";
 const sha = (bytes: Uint8Array) =>
   createHash("sha256").update(bytes).digest("hex");
 const master = readFileSync(manifest.source);
@@ -153,4 +160,80 @@ test("independent transform API refreshes frozen tree geometry and world bounds"
   );
   scene.dispose();
   engine.dispose();
+});
+
+test("actual B6 conifer bootstrap and streamed LOD vertices share the corrected trunk placement", async (t) => {
+  const placement=TREES.find(tree=>tree.osmId===b6Placement.treeId)!;
+  assert.ok(placement);
+  const engine=new NullEngine(),scene=new Scene(engine);scene.useRightHandedSystem=true;
+  t.after(()=>{scene.dispose();engine.dispose();});
+  const position={x:placement.x,y:groundHeight(placement.x,placement.z),z:placement.z};
+  const root=new TransformNode('current shared B6 placement',scene);
+  root.position.set(position.x,position.y,position.z);
+  const bytes=readFileSync('public'+manifest.bootstrap);
+  // Real published GLB and actual Babylon node transforms, but only this
+  // tree's two meshes and no image materials/GPU rendering are loaded.
+  const names=['bark','leaves'].map(part=>`tree__${placement.osmId}__lod2__${part}`);
+  const loaded=await ImportMeshAsync(new Uint8Array(bytes),scene,{
+    pluginExtension:'.glb',meshNames:names,pluginOptions:{gltf:{skipMaterials:true}},
+  });
+  const far=loaded.meshes.filter((mesh):mesh is Mesh=>mesh instanceof Mesh&&mesh.getTotalVertices()>0);
+  assert.equal(far.length,2);
+  function assertPlacement(mesh:Mesh,expected:typeof position,yaw=0) {
+    const vertices=mesh.getVerticesData(VertexBuffer.PositionKind)!;
+    const minimum=[Infinity,Infinity,Infinity],maximum=[-Infinity,-Infinity,-Infinity];
+    let nearestRoot=Infinity;
+    for(let i=0;i<vertices.length;i+=3){
+      const local=new Vector3(vertices[i],vertices[i+1],vertices[i+2]);
+      const world=Vector3.TransformCoordinates(local,mesh.getWorldMatrix());
+      const wanted=[expected.x+Math.cos(yaw)*local.x+Math.sin(yaw)*local.z,
+        expected.y+local.y,expected.z-Math.sin(yaw)*local.x+Math.cos(yaw)*local.z];
+      for(const [axis,value] of [world.x,world.y,world.z].entries()){
+        assert.ok(Math.abs(value-wanted[axis])<2e-5,`${mesh.name}: vertex ${i/3}/${axis}`);
+        minimum[axis]=Math.min(minimum[axis],value);maximum[axis]=Math.max(maximum[axis],value);
+      }
+      if(local.y<.2)nearestRoot=Math.min(nearestRoot,Math.hypot(world.x-expected.x,world.z-expected.z));
+    }
+    const bounds=mesh.getBoundingInfo().boundingBox;
+    // Yaw-zero transformed AABBs are exact extrema of every authored vertex.
+    if(yaw===0)for(const [axis,key] of ['x','y','z'].entries()){
+      assert.ok(Math.abs(bounds.minimumWorld[key as 'x']-minimum[axis])<3e-5);
+      assert.ok(Math.abs(bounds.maximumWorld[key as 'x']-maximum[axis])<3e-5);
+    }
+    if(mesh.name.endsWith('__bark'))assert.ok(nearestRoot<treeTrunkCollision(placement).radius+.05);
+    assert.ok(mesh.isWorldMatrixFrozen);
+  }
+  for(const mesh of far){
+    assert.ok(Math.abs(mesh.position.x-b6Placement.originalPosition.x)<1e-4);
+    assert.ok(Math.abs(mesh.position.z-b6Placement.originalPosition.z)<1e-4);
+    mesh.computeWorldMatrix(true);mesh.freezeWorldMatrix();
+    attachAuthoredTreeMesh(mesh,root);assertPlacement(mesh,position);
+  }
+  const trunk=treeTrunkCollision(placement);
+  assert.deepEqual({x:trunk.x,z:trunk.z},{x:root.position.x,z:root.position.z});
+  const controller=Object.create(VegetationController.prototype) as VegetationController;
+  const group={id:placement.osmId,x:placement.x,z:placement.z,root,lods:[[],[],far] as Mesh[][],active:2,desired:0};
+  Object.assign(controller,{scene,disposed:false,treeRuntime:manifest,treeGroups:[group],trees:[...far],
+    player:{x:placement.x,z:placement.z},loadingTrees:new Set(),failedTrees:new Set(),loadControllers:new Set(),
+    sharedTreeMaterials:manifest.materialNames.map(name=>new PBRMaterial(name,scene)),detailCache:new Map(),stats:{}});
+  t.mock.method(globalThis,'fetch',async (url:unknown)=>{
+    assert.ok(typeof url==='string'&&url.includes(placement.osmId));
+    return new Response(readFileSync('public'+url));
+  });
+  for(const lod of [0,1]){
+    group.desired=lod;
+    (controller as any).startDetailLoads();
+    for(let tick=0;tick<100&&(controller as any).loadingTrees.size;tick++)await new Promise(resolve=>setTimeout(resolve,0));
+    assert.equal((controller as any).loadingTrees.size,0);
+    assert.equal((controller as any).failedTrees.size,0);
+    assert.equal(group.lods[lod].length,2);
+    for(const mesh of group.lods[lod])assertPlacement(mesh,{x:root.position.x,y:root.position.y,z:root.position.z});
+    if(lod===0){
+      // The next detail load must attach to the CURRENT root, not resurrect
+      // the old glTF/source location after an independent editor transform.
+      assert.equal(controller.setTreeTransform(placement.osmId,{...position,x:position.x+1}),true);
+      for(const existing of [...far,...group.lods[0]])assertPlacement(existing,{...position,x:position.x+1});
+    }
+  }
+  assert.equal((controller as any).loadControllers.size,0);
 });

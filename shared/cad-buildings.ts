@@ -57,7 +57,7 @@ export const CAD_BUILDINGS = [
   building(b01 as CadBuildingModel, b01Site, "53929063",
     "d1202adf453178e8abeeab3096315efd74d99857e68b1182d33cc64c0248ac42", photoAlignment.buildings.b01.placement),
   building(b06 as CadBuildingModel, b06Site, "53929071",
-    "f3cd31d0f91460740b5b543b9e8067c5ba50949774a7ba8b92514a0114900d61", photoAlignment.buildings.b06.placement),
+    "e533bb5d7df909746f4f0dc171de8cc332b85ba10e25f4b76958e9f53db8dee8", photoAlignment.buildings.b06.placement),
 ] as const;
 
 const replacements = new Set<string>(CAD_BUILDINGS.map((building) => building.osmId));

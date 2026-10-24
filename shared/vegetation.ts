@@ -1,6 +1,8 @@
 import rawLandcover from "./data/landcover.json";
 import surveyedTrees from "./data/surveyed-trees.json";
 import treeReconstruction from "./data/tree-reconstruction.json";
+import b6TreePlacement from "./data/cad-buildings/b06-tree-placement.json";
+import { hasCadBuilding } from "./cad-buildings";
 import { isStreetSurface } from "./streets";
 import { isRealityGroundSurface } from "./terrain";
 import { renderBudget } from "./render-quality";
@@ -26,6 +28,7 @@ export type TreePlacement = {
   osmId: string;
   crownDiameter?: number;
   positionUncertaintyMetres?: number;
+  placementSource?: string;
   reconstruction?: TreeReconstruction;
 };
 export type TreeReconstruction = (typeof treeReconstruction.trees)[number];
@@ -321,7 +324,12 @@ export function createMappedTrees(
       positionUncertaintyMetres: tree.positionUncertaintyMetres,
     });
   }
-  for (const tree of treeReconstruction.additionalPlacements) {
+  for (const source of treeReconstruction.additionalPlacements) {
+    // Correct one evidenced crown location before the same street/building/
+    // duplication checks. Model identity and all original assets stay intact.
+    const corrected = source.osmId === b6TreePlacement.treeId && hasCadBuilding(b6TreePlacement.cadBuildingOsmId);
+    const tree = corrected ? { ...source, ...b6TreePlacement.position,
+      positionUncertaintyMetres: b6TreePlacement.positionUncertaintyMetres } : source;
     if (!inBounds(tree.x, tree.z, bounds) || !classify.tree(tree.x, tree.z))
       continue;
     if (
@@ -339,6 +347,7 @@ export function createMappedTrees(
       crownDiameter: tree.crownDiameter,
       provenance: "reference-interpreted-not-surveyed",
       positionUncertaintyMetres: tree.positionUncertaintyMetres,
+      ...(corrected ? { placementSource: b6TreePlacement.id } : {}),
     });
   }
   for (const tree of trees)

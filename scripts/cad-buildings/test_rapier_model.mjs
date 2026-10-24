@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, writeFileSync, unlinkSync, rmdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { loadRapier, makeScene, profileSettings, doorApproachGeometry } from './rapier_model.mjs';
-import { fixedGlazingHit, fixedGlazingCoverage, verifyDoors } from './verify_doors.mjs';
+import { fixedGlazingHit, fixedGlazingCoverage, fixedOpeningCoverage, verifyDoors } from './verify_doors.mjs';
 import { verifyRoutes } from './verify_routes.mjs';
 
 const R=await loadRapier(process.env.CAD_MODEL_DEPENDENCY_ROOT);
 async function fixtureFiles(files, run) {
-  const parent=resolve('.cache/cad-buildings-20261024/b01-runtime-integration/rapier-fixtures');
+  const parent=resolve(process.env.CAD_VERIFY_FIXTURE_ROOT??'.cache/b6-photo-routes-20261024/rapier-fixtures');
   mkdirSync(parent,{recursive:true});
   const directory=mkdtempSync(join(parent,'rapier-fixture-')),written=[];
   try {
@@ -178,6 +178,25 @@ test('Vadný vstup overrides se odmítne ještě před načítáním fyzikální
     const missing=join(directory,'absent-overrides.json');args.set('--access-overrides',missing);
     await assert.rejects(()=>verifyRoutes(args),error=>error.code==='ENOENT'&&error.path===missing);
   });
+});
+
+test('Pevné druhé křídlo chrání přesný otvor ve vlastní roli, nikoli jako fasádní sklo',async()=>{
+  for(const [variant,role,extent,offset] of [['full','fixed-door-leaf',.31,-.05],['wrong-role','facade-glass',.31,-.05],
+    ['stripe','fixed-door-leaf',.025,-.05],['wrong-plane','fixed-door-leaf',.31,.20]]) {
+    const value=model();value.id='fixture';
+    value.parts.push({...box('closed-leaf',[offset-.019,.015,-extent],[offset+.019,2.08,extent],role),floor:'n01'});
+    value.doors=[{id:'fixed',floor:'n01',hinge:[-.3125,0],closedEnd:[.3125,0],depth:.1,normalOffset:.05,bottom:0,top:2.1,
+      openingClassification:'fixed-paired-door-leaf'}];
+    await fixtureFiles({'model.json':JSON.stringify(value)},async paths=>{
+      const args=new Map([['--model',paths['model.json']],['--profile','current']]);
+      if(process.env.CAD_MODEL_DEPENDENCY_ROOT)args.set('--dependency-root',process.env.CAD_MODEL_DEPENDENCY_ROOT);
+      const report=await verifyDoors(args),passed=variant==='full';
+      assert.equal(report.status,passed?'pass':'issues',variant);
+      assert.equal(report.protectedGlazing,0);assert.equal(report.protectedDoorLeaves,passed?2:0);
+      assert.ok(report.results.every(row=>row.testKind==='fixed-door-leaf-protection'));
+      assert.ok(report.results.every(row=>row.category===(passed?'fixed-door-leaf':'missing-fixed-door-leaf')));
+    });
+  }
 });
 
 test('Sjednocení šikmých překřížených trojúhelníků zachová skutečnou díru i po otočení ostění',()=>{

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-photo-routes-20261024",
+  "title": "B6 fixed bedroom leaf protection and furnished room traversal proof",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/cad-buildings/verify_doors.mjs",
+    "scripts/cad-buildings/verify_accessibility.mjs",
+    "scripts/cad-buildings/verify_world_paths.ts",
+    "scripts/cad-buildings/rapier_model.mjs",
+    "tests/cad-building-world.test.ts",
+    "tests/cad-world-paths.test.ts",
+    "scripts/cad-buildings/verify_room_paths.mjs",
+    "scripts/cad-buildings/test_accessibility.mjs",
+    "scripts/cad-buildings/test_rapier_model.mjs",
+    "scripts/cad-buildings/test_room_paths.mjs",
+    ".cache/b6-photo-routes-20261024/",
+    "docs/agents/handoffs/b6-photo-routes-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Only B6 user-authorized room-leaf and furnished route proofs; no weakening capsule/collision requirements.",
+    "Root hands original clean verification files to dedicated child. Root handles native builder/export only."
+  ],
+  "verification": [
+    "Targeted fixture tests; actual room run after root produces native model."
+  ],
+  "notes": [
+    "No nested BMAD; no heavy validation/GPU/server."
+  ]
+}

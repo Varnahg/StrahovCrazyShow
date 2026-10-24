@@ -2,8 +2,9 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { argumentsMap, required, openModel, sha256, writeReport, doorApproachGeometry } from './rapier_model.mjs';
+import { argumentsMap, required, openModel, sha256, writeReport, doorApproachGeometry, fixedOpeningSpec } from './rapier_model.mjs';
 import { routePath } from './verify_routes.mjs';
+import { fixedOpeningProtection } from './verify_doors.mjs';
 
 const finitePoint = p => p && [p.x,p.z,p.floor].every(Number.isFinite);
 const samePoint = (a,b) => a && b && ['x','z','floor'].every(k => a[k]===null ? b[k]===null : Number.isFinite(a[k])&&Number.isFinite(b[k])&&Math.abs(a[k]-b[k])<1e-6);
@@ -68,8 +69,14 @@ export function prepareEvidence(scene,metadata,doorReport,routeReport) {
         throw new Error('Podpůrná výška dveřního bodu neodpovídá anotované úrovni: '+door.id);
       }
     }
-    if (door.openingClassification==='facade-opening-unconfirmed-access') {
-      excluded.push({id:door.id,category:'fixed-facade-glazing',protectionVerified:rows.every(row=>row.passed&&row.category==='fixed-glazing'&&row.coverage?.passed)});
+    const fixed=fixedOpeningSpec(door);
+    if (fixed) {
+      const proof=fixedOpeningProtection(scene,door);
+      const reported=rows.every((row,side)=>proof.hits[side]&&row.passed&&row.category===fixed.category&&row.testKind===fixed.testKind&&row.coverage?.passed&&
+        row.coverage.role===fixed.role&&row.protection?.part===proof.hits[side]?.part&&row.protection?.role===fixed.role&&
+        Number.isFinite(row.protection?.distance)&&Math.abs(row.protection.distance-proof.hits[side].distance)<1e-5);
+      if(!proof.passed||!reported)throw new Error('Neověřená pevná výplň: '+door.id);
+      excluded.push({id:door.id,category:fixed.exclusionCategory,protectionVerified:true,role:fixed.role});
       continue;
     }
     for (let side=0;side<2;side++) {
@@ -301,7 +308,7 @@ export function probeAccessibility(scene,evidence,seeds,options={}) {
     category:reached.has(target.id)?'reachable':parents.has(target.id)?'candidate-path-not-verified':candidates.has(target.id)&&!candidates.get(target.id)?'invalid-door-anchor':'not-reached-in-grid',
     passed:reached.has(target.id),proof:reached.get(target.id)??null}));
   const excluded=evidence.excluded??[];
-  const pending=excluded.filter(row=>row.category!=='fixed-facade-glazing'||!row.protectionVerified);
+  const pending=excluded.filter(row=>!['fixed-facade-glazing','fixed-paired-door-leaf'].includes(row.category)||!row.protectionVerified);
   return {scope:'Souvislá dosažitelnost dveřních bodů od výslovně zadaných vstupů; samostatná CPU kapsle, bez hry a venkovního terénu',
     status:results.length>0&&results.every(row=>row.passed)&&!pending.length&&!seedFailures.length?'pass':'partial',
     options:config,seeds,cases:results.length,passed:reached.size,results,excluded,seedFailures,failures,stats,proofSessions,

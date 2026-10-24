@@ -11,6 +11,7 @@ import {
 } from "../shared/vegetation";
 import pack from "../public/models/vegetation/realistic/manifest.json";
 import textures from "../public/models/vegetation/realistic/texture-manifest.json";
+import b6Placement from "../shared/data/cad-buildings/b06-tree-placement.json";
 import { TreeWindPlugin } from "../client/vegetation";
 const sha = (bytes: Uint8Array) =>
   createHash("sha256").update(bytes).digest("hex");
@@ -90,8 +91,13 @@ test("all photographic material channels preserve official CC0 bytes and alpha s
 test("reference interpretation stays auditable, roots use native terrain and collision radius matches authored trunk", () => {
   for (const tree of TREES) {
     const shape = tree.reconstruction!;
-    assert.equal(shape.x, tree.x);
-    assert.equal(shape.z, tree.z);
+    if(tree.osmId===b6Placement.treeId){
+      assert.deepEqual({x:shape.x,z:shape.z},b6Placement.originalPosition,'the authored source pack is preserved');
+      assert.deepEqual({x:tree.x,z:tree.z},{x:-10.5,z:-76.5},'only the identified B6 tree uses the independently documented crown correction');
+    }else{
+      assert.equal(shape.x, tree.x);
+      assert.equal(shape.z, tree.z);
+    }
     assert.equal(shape.reference.crownCaptureDate, "2024-06-08");
     assert.equal(shape.radialOutline.length, 16);
     assert.ok(shape.radialOutline.every((n) => n >= 0.35 && n <= 1.08));
