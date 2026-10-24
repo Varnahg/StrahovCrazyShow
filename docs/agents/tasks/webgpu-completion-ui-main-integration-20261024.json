@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-completion-ui-main-integration-20261024",
   "title": "KEY-22: samostatně integrovat převzatý UI startup Room cleanup s původním main backendem",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "client/ui.tsx",
@@ -13,14 +13,7 @@
     "node_modules/",
     "dist/"
   ],
-  "resources": [
-    "heavy-validation",
-    "gpu",
-    "workspace-build",
-    "port:2568",
-    "port:4214",
-    "port:2598"
-  ],
+  "resources": [],
   "acceptance": [
     "Přesný čtecí dependency audit je research/main-ui-integration-decision.md. Ze stabilního aktuálního main připravit samostatnou izolovanou větev přes vyhrazený GIT_INDEX_FILE a přesné historické blobs; původní workingtree/HEAD/realindex/primárníforeignWIP zůstanou bezezměny. CI může ověřit tuto novou větev vzdáleně. Místní pracovníkopie a vlastnídeps před praktickou přejímkou až v dalším CADresourceokně.",
     "Přenést jen přesné historické UI a room-callbacks testy02fdf68b2ec739b51088b2cdf7c1c11b7157719d, jejich doložené vlastní podklady a nové integrační důkazy. Base main9341 UIblob b91c6be0/test45a21b78, targetUIb2f1da84/test1c784400. Dnešní HEAD UI má jiné závislosti a nesmí se přenést. Žádný Game/native/package/lock/server/shared/default edit.",
@@ -38,6 +31,8 @@
     "Rootcoordinator bude zapisovat jen v nové izolované kopii po ověření identity/claim. V současné .cache/player-feedback větvi probíhá jiný disjunktní probe; taskready sám není start cizí práce.",
     "24Oct03UTC CAD máheavy pro B1 novéprůchodovéprimivivy/export; další40min předání očekává ažpo stabilnímcheckpointu, nikoli automaticky. Do té doby jenčtení/plánování bez setupinstalace či GPU.",
     "24Oct03:35UTC rootkoordinátor volí nejprve izolovanou branch přípravu pomocí privateGitindex v owncache místo managedsetup během CADheavy. Primární Gitdocs ověřeny GIT_INDEX_FILE/read-tree bez-u/commit-tree; source2blobs+ownmetadata/historicalproofs pouze, guardrealindex/HEAD/currentUI/test před/po. Žádný branchswitch/worktreecheckout/install/GPU/mainmerge. Claim rootcwd platí pro vzdálenou přípravnou větev; před lokálními zápisy se rezervace retargetuje do samostatné pracovníkopie. Mainmerge ažpo požadovaném review/CI/projectacceptance/resourcewindow.",
-    "24Oct03:36UTC explicitCADR7a stable checkpoint/93tests/36of36 route/export/reopen, ownBlenderallSTOP andactualheavyreleased. Rootindependently noBlender/noother3D/no2568-4214-2598listeners and noheavy/gpuclaims. Reacquire6resources for isolatedUI main preparation/setup/freshvalidation/browser until04:16UTC/06:16Prague; actualSTOP/release bydeadline or explicitextensionbeforeend."
+    "24Oct03:36UTC explicitCADR7a stable checkpoint/93tests/36of36 route/export/reopen, ownBlenderallSTOP andactualheavyreleased. Rootindependently noBlender/noother3D/no2568-4214-2598listeners and noheavy/gpuclaims. Reacquire6resources for isolatedUI main preparation/setup/freshvalidation/browser until04:16UTC/06:16Prague; actualSTOP/release bydeadline or explicitextensionbeforeend.",
+    "24Oct04:09UTC PR24 exact a94/base9341 accepted by two independent reviews,64local/1874CI PASS, build/integration/browser3healthy runs; protected expected-head merge main2a7b1998. Original own server/tab STOP and2568/4214/2598 empty. Heavy/gpu/build/ports released before04:16UTC; file-only metadata reservation, exact merged-main CI still pending observation.",
+    "24Oct04:19UTC actual merged-main CI40061211841 SUCCESS on exact2a7b1998, mainsecret40061211838 SUCCESS. Narrow UI unit complete after two peer reviews, source-bound browser/CPU acceptance, expected-head protected merge and actualmain checks. Shared resources already returned04:10; remaining metadata will be committed and file claim released. WiderKEY22/default remains open."
   ]
 }
