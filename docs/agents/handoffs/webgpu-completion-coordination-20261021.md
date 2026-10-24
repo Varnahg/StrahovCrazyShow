@@ -165,6 +165,14 @@ Root předává /root/diagnostics_edge_review vlastní startup-stage-routines ta
 
 CAD výslovně potvrdil, že client/landmark-reality.ts nebude měnit; změna pouze přes filtrovaný seznam při volání world rendereru. Po skutečném CADadminrelease rootadmin claim/adopt svých3dirtydefinic, receiverrelease, návrat pouze původní landmark cesty a receiverreclaim. Game.ts nadále vypůjčen přesný CAD B1runtime task; root v něm nezapisuje. Root source15 a všechny starší builds immutable. B1branch čistě2a7 + assetcherry-pick6dd89606, bez c713merge; CAD má vlastní deps a další runtime/přejímku předává zvlášť.
 
+## Uzavřený diagnostický checkpoint a předání volných souborů ·24Oct12:21UTC
+
+Hotový QA celek je pushnutý v3bdb1836e9df0c04f80556469a9e7eea2b584789; předchozí koordinace v d33d4b56. Vlastní pracovní strom je čistý, kromě tohoto závěrečného předání. Celé nové helper corpora539/539 a512/512, immutablebuildy i actualGuestentry8framů a startup7stageframů dokončené; všechny důkazy a omezení v validation/diagnostics-window3-20261024. Root nepřijal celý KEY22, default/main ani FPS; přetrvává205.2ms interakčníinterval a předchozí MP/recovery timeouty. Nová data nejsou produktová oprava.
+
+Vlastní služby/scény skončily v10:24UTC a žádné další nebyly spuštěné. Zdrojové snapshoty, node_modules, pomocné buildy, původní receipty a sealy zůstávají neměnné i po konci této relace. AktuálníB1+B6 koordinátor vlastní další GPU/heavy/build/server okna. Žádný vlastní dosud běžící helper nemá být příjemcem zastavovaný podle portu.
+
+Po commitu tohoto předání root skutečným CLI release uvolní svých18zbývajících file-onlyclaims, aby neblokoval B6/verification práci během čekání na nový společný checkpoint. Stav registry a následné potvrzení CAD jsou zdrojem skutečného dokončení release; tento odstavec není předčasným tvrzením výsledku příkazu. Release neznamená Done ani přijetí produktového WIP. Žádný primary-main WIP není předán; pro pokračování použít přesnýcommittedbaseline/diff a nové vlastní claims. Případný další zásah KEY22 vyžaduje nové rezervace a aktuální resourcehandoff. Taskdefinitions se tím nemění na Done.
+
 # Review patch úzké předání ·24Oct10:05UTC
 
 Po všech3nezávislýchreview root předává původním autorům pouze2lokálnípatches. Entry task příjemce /root/diagnostics_blind_review owner webgpu-completion-01a15a3e-entry-effect-v21-fix: novýhelper/v21 a review-fix-v21prefix, oldV20 immutable. Startup task příjemce /root/diagnostics_edge_review owner webgpu-completion-01a15a3e-startup-effect-v22-fix: novýhelper/v22 a review-fix-v22prefix, oldV21/final immutable. Root ukončil zápisy a skutečně release obouclaims; adopt-dirty je doložené převzetí vlastních přijatých payloadů65/118, nikoli cizíWIP. Research/spec/validation zůstává root. Jen cílené lightCPU testy, žádnýwhole/build/GPU/server/subagent/recursiveBMAD/staging/commit. Výsledek novéexacthashdiff/handoff aactualrelease. Root má pevnéGPUokno10:00–10:25, autoopravy limity nesmějí měnit.
