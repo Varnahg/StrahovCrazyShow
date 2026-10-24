@@ -394,6 +394,36 @@ export function App() {
     game.current?.networkTimeline.resetRttSelection();
     game.current?.resetDiagnosticContext();
   };
+  const disconnectRoom = (
+    reason: "leave" | "startup-failure",
+    expected?: { room: Room | null; attempt: number },
+  ) => {
+    if (expected && room.current !== expected.room) return false;
+    // A newer pending join owns its own attempt, even while the failed Game
+    // still owns the old Room. Retire that Room without cancelling the join.
+    if (!expected || connectionAttempt.current === expected.attempt)
+      connectionAttempt.current++;
+    const previousRoom = room.current;
+    // The SDK retains listeners until its leave handshake finishes. Retire this
+    // owner first so synchronous or delayed callbacks cannot mutate a new one.
+    room.current = null;
+    connectedRef.current = false;
+    inputBuffer.current?.reset(reason);
+    bootstrapAuthorityRef.current = null;
+    authorityBufferRef.current?.reset();
+    resetConnectionDiagnostics();
+    playersRef.current = [];
+    playersById.current.clear();
+    carState.current = null;
+    setConnected(false);
+    setPlayers([]);
+    setMessages([]);
+    setSocial({ attendance: [], contacts: [], requests: [], blocked: [] });
+    setWorldSelection(null);
+    try { void previousRoom?.leave().catch(() => {}); }
+    catch { /* A transport teardown cannot replace the original startup error. */ }
+    return true;
+  };
   const applyReceivedAuthority = ({
     packet,
     receivedAt,
@@ -571,6 +601,16 @@ export function App() {
     sessionDiagnostics.event("mode-change", { mode });
     let cancelled = false;
     const startupAbort = new AbortController();
+    const startupConnection = mode === "multi"
+      ? { room: room.current, attempt: connectionAttempt.current }
+      : undefined;
+    let ownedGame: Game | undefined;
+    const disposeOwnedGame = () => {
+      const owned = ownedGame;
+      ownedGame = undefined;
+      if (game.current === owned) game.current = null;
+      owned?.dispose();
+    };
     modeRef.current = mode;
     (async () => {
       let pendingEngine: AbstractEngine | undefined;
@@ -595,6 +635,7 @@ export function App() {
         });
         const g = new Game(startupCanvas, profileRef.current, pendingEngine);
         pendingEngine = undefined;
+        ownedGame = g;
         game.current = g;
         g.onRendererFailure = (message) => {
           if (cancelled || game.current !== g) return;
@@ -643,6 +684,7 @@ export function App() {
         g.onPredictionReset = (priority) =>
           inputBuffer.current?.reset("prediction-reset", { priority });
         g.onAction = (action, data) => {
+          if (game.current !== g) return false;
           if (action === "reward") {
             reward(String(data));
             return true;
@@ -685,12 +727,17 @@ export function App() {
       } catch (e) {
         pendingEngine?.dispose();
         if (cancelled) return;
+        if (canvas.current !== startupCanvas || modeRef.current !== mode ||
+            game.current !== (ownedGame ?? null)) {
+          disposeOwnedGame();
+          return;
+        }
         sessionDiagnostics.event("startup-error", {
           message: String(e),
           stack: e instanceof Error ? e.stack?.slice(0, 2000) : undefined,
         });
-        game.current?.dispose();
-        game.current = null;
+        if (startupConnection) disconnectRoom("startup-failure", startupConnection);
+        disposeOwnedGame();
         setError(
           t("3D scénu se nepodařilo spustit: {error}", { error: String(e) }),
         );
@@ -700,8 +747,7 @@ export function App() {
       cancelled = true;
       startupAbort.abort();
       userBenchmark.current = false;
-      game.current?.dispose();
-      game.current = null;
+      disposeOwnedGame();
     };
   }, [mode]);
   const bind = (r: Room) => {
@@ -941,27 +987,13 @@ export function App() {
   };
   const leave = () => {
     sessionDiagnostics.event("network-left", {});
-    connectionAttempt.current++;
-    const previousRoom = room.current;
-    // SDK leave waits for the server handshake while keeping its listeners.
-    // Invalidate first, including callbacks fired synchronously by leave().
-    room.current = null;
-    connectedRef.current = false;
-    inputBuffer.current?.reset("leave");
-    bootstrapAuthorityRef.current = null;
-    authorityBufferRef.current?.reset();
-    resetConnectionDiagnostics();
-    void previousRoom?.leave().catch(() => {});
+    disconnectRoom("leave");
     modeRef.current = "menu";
     setMode("menu");
     setBusy(false);
     setReady(false);
-    setConnected(false);
-    setMessages([]);
-    setSocial({ attendance: [], contacts: [], requests: [], blocked: [] });
     setJournalOpen(false);
     setEmotesOpen(false);
-    setWorldSelection(null);
   };
   const send = (action: string, data?: unknown) => {
     if (mode !== "multi" || !connected) {
