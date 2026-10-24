@@ -120,3 +120,10 @@ Full `pnpm test`, `pnpm build`, isolated `pnpm test:integration` and actual Edge
 Verified startup-only async pipeline preparation is integrated: native8d20cecc72066b498e735b8b2524fd23baa19eff → main232cffb1fd67b47766fedd2b27c933ddf786e617. Native1296/1296 and combined production1352/1352 tests, both builds and isolated integration passed. The protected played4193/C5 stays unchanged. [Evidence and limits](evidence/webgpu-migration-20261016/hitches-v5/README.md) retain three diagnostic startup pairs, a production pair, the slower41s production smoke, cancellation/reentry, and all source identities.
 
 This is partial progress. First F in B6 still causes a6.2s interval after about1.17s CPU and59new synchronous pipelines. Default renderer and final FPS/visual/multiplayer acceptance are unchanged. Next research targets the actual B6 presentation/regular-instance coverage missing from spawn-only preparation; no extra cache is approved by the current duplicate inventory.
+
+
+## Checkpoint 2026-10-24: source15 a otevřený startup
+
+[Source15 actual evidence](evidence/webgpu-completion-20261021/validation/avatar-source15-v17/README.md) accepts the narrow avatar-shadow fix: Mia firstF0, Robin+glasses firstF0 and repeat0 in three valid windows, six editor presets and isolated Guest. Fresh39,228targeted/fullTS/build/integration and exact7b1CI2179PASS are recorded. Actual startup also failed Low30.0448s; own-device-loss/restart reached a new renderer but failed the90.1113s total budget. The valid first-entry diagnostic has a210.9ms hitch with zero new compiler calls, not FPS/GPU-time evidence. All negative attempts remain.
+
+Main still defaults to WebGL2; migration PR23 remains draft. The final controlled performance matrix, reliable startup/recovery and main/default acceptance are open. [Next diagnostic decision](evidence/webgpu-completion-20261021/research/source15-blocking-costs-decision.md) keeps existing budgets, coverage, cache and production behavior. GPU/heavy was actually returned at06:44UTC; future runs require another coordinated resource claim.
