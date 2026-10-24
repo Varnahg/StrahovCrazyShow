@@ -21,7 +21,7 @@ from mathutils.geometry import tessellate_polygon
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from model_io import contained, publish_files, recover_pending
-from model_geometry import ceiling_clipped_faces, quantized_face, stair_profile, stair_levels, skew_stair
+from model_geometry import BUILDING_OSM_IDS, building_identity, ceiling_clipped_faces, quantized_face, stair_profile, stair_levels, skew_stair
 
 
 MATERIALS = {
@@ -149,7 +149,7 @@ class Geometry:
         for face in [(3,2,1,0),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)]:
             self.face(key, [p[i] for i in reversed(face)])
 
-    def glazed_panel(self, floor, a, b, bottom, top, prefix='window', lower_infill=0):
+    def glazed_panel(self, floor, a, b, bottom, top, prefix='window', lower_infill=0, glass_collision=True):
         """Rámovaná sestava; spodní světlá výplň není automaticky čiré sklo."""
         direction = Vector((b[0]-a[0], b[1]-a[1]))
         length = direction.length
@@ -161,7 +161,7 @@ class Geometry:
         def inset(distance):
             return [a[0]+direction.x*distance, a[1]+direction.y*distance]
         frame = (floor, prefix+"-frame", "frame", False)
-        glass = (floor, prefix+"-glass", "glass", True)
+        glass = (floor, prefix+"-glass", "glass", glass_collision)
         gasket = (floor, prefix+"-gasket", "gasket", False)
         trim = 0.045
         for start, end in [(a, inset(trim)), (inset(length-trim), b)]:
@@ -219,7 +219,13 @@ class Geometry:
             self.counts['fixedFacadeGlazing']+=1
             self.counts['doors']+=1
             return
-        self.prism((floor, "door-leaf", "door", False), hinge, opened, 0.038, bottom+0.015, top-0.02)
+        if door.get('leafMaterial')=='glass':
+            # An open glazed leaf follows the same measured hinge/open end as
+            # the other doors. It is not a fixed panel across the passage.
+            self.glazed_panel(floor,hinge,opened,bottom+0.015,top-0.02,
+                              prefix='door-leaf',glass_collision=False)
+        else:
+            self.prism((floor, "door-leaf", "door", False), hinge, opened, 0.038, bottom+0.015, top-0.02)
         leaf = Vector((opened[0]-hinge[0], opened[1]-hinge[1])).normalized()
         handle = [opened[0]-leaf.x*0.12, opened[1]-leaf.y*0.12]
         normal = [-leaf.y, leaf.x]
@@ -306,9 +312,9 @@ class Geometry:
                 'heightProvenance':'modelářský odhad; přesné půdorysné hrany CAD'}
 
 
-def make_material(name):
+def make_material(name, building_id):
     color, roughness, metallic = MATERIALS.get(name, MATERIALS["plaster"])
-    material = bpy.data.materials.new("B01 / " + name)
+    material = bpy.data.materials.new(building_id.upper() + " / " + name)
     material.use_nodes = True
     shader = material.node_tree.nodes.get("Principled BSDF")
     shader.inputs["Base Color"].default_value = color
@@ -325,17 +331,19 @@ def make_material(name):
 
 
 def create_meshes(geometry, root):
-    materials = {name:make_material(name) for name in MATERIALS}
+    building_id = root['buildingId']
+    building_identity(building_id)
+    materials = {name:make_material(name, building_id) for name in MATERIALS}
     collections = {}
     objects = []
     for key, group in geometry.groups.items():
         floor, role, material, collision = key
         collection = collections.get(floor)
         if collection is None:
-            collection = bpy.data.collections.new("B01 / " + floor)
+            collection = bpy.data.collections.new(building_id.upper() + " / " + floor)
             bpy.context.scene.collection.children.link(collection)
             collections[floor] = collection
-        mesh = bpy.data.meshes.new(f"b01:{floor}:{role}:{material}")
+        mesh = bpy.data.meshes.new(f"{building_id}:{floor}:{role}:{material}")
         mesh.from_pydata(group["vertices"], [], [face for face in group["faces"] if face is not None])
         mesh.update(calc_edges=True)
         if mesh.validate(verbose=False):
@@ -343,7 +351,7 @@ def create_meshes(geometry, root):
         obj = bpy.data.objects.new(mesh.name, mesh)
         collection.objects.link(obj)
         obj.parent = root
-        obj["buildingId"] = "b01"
+        obj["buildingId"] = building_id
         obj["floorId"] = floor
         obj["role"] = role
         obj["collision"] = collision
@@ -362,6 +370,8 @@ def create_meshes(geometry, root):
 
 
 def export_collision(objects, recipe, stairs):
+    building_id = recipe['buildingId']
+    identity = building_identity(building_id)
     parts = []
     depsgraph = bpy.context.evaluated_depsgraph_get()
     # Blender po reopen vrací databázi objektů v jiném pořadí než při tvorbě.
@@ -399,7 +409,19 @@ def export_collision(objects, recipe, stairs):
         terrain_cutouts.append({'id':void['id'],'loops':loops,'bottom':min(bottoms),'openAbove':max(tops),
                                 'coordinateSpace':'model local XZ metres','provenance':void['provenance'],
                                 'terrainValidationPending':void.get('terrainValidationPending',True)})
-    result={"schemaVersion":1,"id":"b01","identity":"building:osm:way:53929063","coordinateSystem":"metres; +X east, +Y up, +Z south; local CAD origin, placement pending game integration","cadOrigin":recipe["cadOrigin"],"status":"model-candidate-not-integrated","floors":floor_metadata(recipe),"stairs":stairs,"terrainCutouts":terrain_cutouts,"parts":parts}
+    result={"schemaVersion":1,"id":building_id,"identity":identity,"coordinateSystem":"metres; +X east, +Y up, +Z south; local CAD origin, placement pending game integration","cadOrigin":recipe["cadOrigin"],"status":"model-candidate-not-integrated","floors":floor_metadata(recipe),"stairs":stairs,"terrainCutouts":terrain_cutouts,"parts":parts}
+    preserved=[]
+    for region in recipe.get('terrainPreservationAreas',[]):
+        loops=[]
+        for ring in region['loops']:
+            loop=[]
+            for x,y in ring:
+                point=root_matrix@Vector((-(y-origin[1]),x-origin[0],0))
+                loop.append([round(point.x,6),round(-point.y,6)])
+            loops.append(loop)
+        preserved.append({**{k:v for k,v in region.items() if k!='loops'},'loops':loops,
+                          'coordinateSpace':'model local XZ metres'})
+    if preserved:result['terrainPreservationAreas']=preserved
     if recipe.get('heightModel') is not None:result['heightModel']=recipe['heightModel']
     doors=door_metadata(recipe)
     if doors is not None:result['doors']=doors
@@ -408,7 +430,8 @@ def export_collision(objects, recipe, stairs):
 
 def floor_metadata(recipe):
     fields = {'id','elevation','wingElevation','floorWingOffset','heightRationale',
-              'ceilingElevation','wingCeilingElevation','wingRegions','levelKind','roofHeadFootprint'}
+              'ceilingElevation','wingCeilingElevation','wingRegions','levelKind','roofHeadFootprint',
+              'levelElevations','levelCeilings','levelRegions'}
     return [{key:value for key,value in floor.items() if key in fields} for floor in recipe['floors']]
 
 
@@ -417,7 +440,8 @@ def door_metadata(recipe):
     if not any('doors' in floor for floor in recipe['floors']):return None
     fields={'id','hinge','closedEnd','openEnd','bottom','top','depth','normalOffset','sourceEntities',
             'openingClassification','accessConfirmed','fixedGlazing','classificationBasis','levelKey','levelBasis',
-            'approachBoundaryCad','approachBasis','accessClassification'}
+            'approachBoundaryCad','approachBasis','accessClassification','leafMaterial',
+            'outsideSupportId','outsideSupportTop','outsideStepEstimate','outsideTraversalStatus'}
     return [{key:value for key,value in door.items() if key in fields}|{'floor':floor['id']}
             for floor in recipe['floors'] for door in floor.get('doors',[])]
 
@@ -427,7 +451,7 @@ def add_stairs(geometry, recipe):
     stairs=[]
     floors={floor['id']:floor for floor in recipe['floors']}
     interior=recipe.get('interiorStairPlans');exterior=recipe.get('exteriorStairRoutes')
-    if not interior or not exterior:
+    if not isinstance(interior,list) or not interior or not isinstance(exterior,list):
         raise ValueError('Chybí přijaté jednotlivé schodišťové trasy; nelze opakovat univerzální rameno')
     routes=interior+exterior
     anchors=recipe.get('exteriorLevelAnchors',{})
@@ -488,27 +512,31 @@ def add_stairs(geometry, recipe):
                     minimum_riser=incoming_risers.get(item['levelKey'],0))
     # Stejná zdrojová hranice zón určuje desky, otvory i čelo střešního zlomu.
     transitions=recipe.get('roofTransitions')
-    if not transitions:raise ValueError('Chybí doložené styky střešních úrovní')
+    if not isinstance(transitions,list):raise ValueError('Chybí doložené styky střešních úrovní')
     for transition in transitions:
         lower=levels[transition['lowerLevelKey']];upper=levels[transition['upperLevelKey']]
         thickness=transition['thickness']
         if not all(math.isfinite(v) for v in [lower,upper,thickness]) or upper<=lower or thickness<=0:
             raise ValueError('Neplatný střešní zlom')
-        geometry.prism(('n04','roof-step-wall','plaster',True),transition['a'],transition['b'],thickness,lower,upper)
+        floor=transition.get('ownerFloor','n04')
+        if floor not in floors:raise ValueError('Neznámé podlaží střešního zlomu '+floor)
+        geometry.prism((floor,'roof-step-wall','plaster',True),transition['a'],transition['b'],thickness,lower,upper)
     # Střešní nástavba již má vlastní strop v n04 solids; nepřidávat druhou desku.
     return stairs
 
 
 def create_from_recipe(path):
     recipe=json.loads(path.read_text(encoding="utf-8"))
-    if recipe.get("buildingId")!="b01" or recipe.get("schemaVersion")!=1:
-        raise ValueError("Tento krok smí vytvořit pouze rezervovaný model B01")
+    building_id=recipe.get('buildingId')
+    identity=building_identity(building_id)
+    if recipe.get("schemaVersion")!=1:
+        raise ValueError("Neplatné schéma CAD receptury")
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene=bpy.context.scene
     scene.unit_settings.system='METRIC';scene.unit_settings.scale_length=1
-    root=bpy.data.objects.new("building:osm:way:53929063",None)
+    root=bpy.data.objects.new(identity,None)
     scene.collection.objects.link(root)
-    root["buildingId"]="b01";root["osmId"]="53929063"
+    root["buildingId"]=building_id;root["osmId"]=BUILDING_OSM_IDS[building_id]
     provenance=dict(recipe.get("sourceProvenance",{}))
     # Rozpiska patří pouze do ignorovaného lokálního průzkumu, ne do masteru.
     provenance['files']=[{k:v for k,v in item.items() if k in {'file','name','sha256','bytes','sourceVersion'}} for item in provenance.get('files',[])]
@@ -528,6 +556,8 @@ def create_from_recipe(path):
     root['stairAnnotations']=json.dumps(stairs,ensure_ascii=False)
     root['exteriorVoids']=json.dumps(recipe.get('exteriorVoids',[]),ensure_ascii=False)
     root['terrainCutoutsCad']=json.dumps(recipe.get('terrainCutouts',[]),ensure_ascii=False)
+    if recipe.get('terrainPreservationAreas'):
+        root['terrainPreservationAreasCad']=json.dumps(recipe['terrainPreservationAreas'],ensure_ascii=False)
     root['doorAnnotations']=json.dumps(door_metadata(recipe),ensure_ascii=False)
     root['initialBuildCounts']=json.dumps(dict(geometry.counts))
     objects=create_meshes(geometry,root)
@@ -554,9 +584,11 @@ def create_from_recipe(path):
 def open_master(path):
     """Herní export čte skutečný uložený model, nikoli znovu původní půdorysy."""
     bpy.ops.wm.open_mainfile(filepath=str(path.resolve()))
-    root=bpy.data.objects.get('building:osm:way:53929063')
-    if root is None or root.get('buildingId')!='b01':
-        raise ValueError('Master nemá očekávanou identitu B01')
+    roots=[obj for obj in bpy.data.objects if obj.get('buildingId') in BUILDING_OSM_IDS
+           and obj.name==building_identity(obj.get('buildingId'))]
+    if len(roots)!=1:
+        raise ValueError('Master musí obsahovat právě jednu rezervovanou identitu B01/B06')
+    root=roots[0]
     for key in ['cadOrigin','floorMetadata','stairAnnotations']:
         if key not in root:raise ValueError('Master nemá exportní metadata '+key)
     objects=[obj for obj in bpy.data.objects if obj.type=='MESH']
@@ -565,9 +597,10 @@ def open_master(path):
             raise ValueError('Část nemá vlastníka/podlaží/roli: '+obj.name)
         if obj.modifiers:
             raise ValueError('Před exportem aplikujte geometrické modifikátory v masteru: '+obj.name)
-    metadata={'cadOrigin':list(root['cadOrigin']),'floors':json.loads(root['floorMetadata']),
+    metadata={'buildingId':root['buildingId'],'cadOrigin':list(root['cadOrigin']),'floors':json.loads(root['floorMetadata']),
               'exteriorVoids':json.loads(root.get('exteriorVoids','[]')),
               'terrainCutouts':json.loads(root.get('terrainCutoutsCad','[]')),
+              'terrainPreservationAreas':json.loads(root.get('terrainPreservationAreasCad','[]')),
               'heightModel':json.loads(root.get('heightModel','null'))}
     if 'doorAnnotations' in root:metadata['doors']=json.loads(root['doorAnnotations'])
     stairs=json.loads(root['stairAnnotations'])
@@ -583,7 +616,7 @@ def main():
     recover_pending(staging,workspace,targets)
     root,objects,recipe,stairs,counts=create_from_recipe(args.recipe) if args.recipe else open_master(args.from_blend)
     collision=export_collision(objects,recipe,stairs)
-    transaction=Path(tempfile.mkdtemp(prefix='b01-',dir=staging))
+    transaction=Path(tempfile.mkdtemp(prefix=root['buildingId']+'-',dir=staging))
     staged_blend=transaction/args.blend.name
     staged_glb=transaction/args.glb.name
     staged_collision=transaction/args.collision.name
@@ -601,7 +634,7 @@ def main():
     collision["glbSha256"]=hashlib.sha256(staged_glb.read_bytes()).hexdigest()
     collision["blendSha256"]=hashlib.sha256(staged_blend.read_bytes()).hexdigest()
     staged_collision.write_text(json.dumps(collision,separators=(',',':'),ensure_ascii=False),encoding='utf-8')
-    audit={"status":"created-not-yet-accepted","buildingId":"b01","sourceMode":"native-blend" if args.from_blend else "initial-recipe","recipeSha256":root.get("sourceRecipeSha256"),"blendSha256":collision["blendSha256"],"glbSha256":collision["glbSha256"],"counts":counts,"objects":len(objects),"collisionParts":len(collision["parts"]),"collisionTriangles":sum(len(p["indices"])//3 for p in collision["parts"]),"stairs":stairs}
+    audit={"status":"created-not-yet-accepted","buildingId":root['buildingId'],"sourceMode":"native-blend" if args.from_blend else "initial-recipe","recipeSha256":root.get("sourceRecipeSha256"),"blendSha256":collision["blendSha256"],"glbSha256":collision["glbSha256"],"counts":counts,"objects":len(objects),"collisionParts":len(collision["parts"]),"collisionTriangles":sum(len(p["indices"])//3 for p in collision["parts"]),"stairs":stairs}
     audit['builderSha256']=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     # Reopen a úplná kontrola proběhnou PŘED výměnou předchozí sady souborů.
     check_path=Path(__file__).with_name('audit_model.py')

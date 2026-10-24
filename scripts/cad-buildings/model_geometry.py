@@ -3,13 +3,31 @@ import math
 import struct
 
 
+BUILDING_OSM_IDS = {'b01': '53929063', 'b06': '53929071'}
+
+
+def building_identity(building_id):
+    if building_id not in BUILDING_OSM_IDS:
+        raise ValueError('Unsupported reserved CAD building: ' + str(building_id))
+    return 'building:osm:way:' + BUILDING_OSM_IDS[building_id]
+
+
 def stair_levels(floors, routes, additional_anchors=None):
     """Resolve explicit floor levels and weighted intermediate L landings."""
     levels = {}
     for floor in floors:
-        levels[floor['id'] + '.main'] = floor['elevation']
-        for side in ['west', 'east']:
-            levels[floor['id'] + '.' + side + 'Wing'] = floor['wingElevation']
+        explicit_levels = floor.get('levelElevations')
+        if explicit_levels is None:
+            explicit_levels = {'main': floor['elevation']}
+            if 'wingElevation' in floor:
+                explicit_levels.update({side + 'Wing': floor['wingElevation'] for side in ['west', 'east']})
+        if not explicit_levels or 'main' not in explicit_levels or explicit_levels['main'] != floor['elevation']:
+            raise ValueError('Inconsistent explicit floor levels: ' + floor['id'])
+        for name, value in explicit_levels.items():
+            key = floor['id'] + '.' + name
+            if not name or '.' in name or key in levels:
+                raise ValueError('Invalid or repeated floor level: ' + key)
+            levels[key] = value
     if not all(math.isfinite(value) for value in levels.values()):
         raise ValueError('Invalid floor elevation')
     for key,value in (additional_anchors or {}).items():

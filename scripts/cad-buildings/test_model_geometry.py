@@ -136,6 +136,22 @@ class StairProfileTests(unittest.TestCase):
 
 
 class StairLevelTests(unittest.TestCase):
+    def test_explicit_mezzanine_levels_do_not_invent_B1_wings(self):
+        floors=[{'id':'n01','elevation':0,'levelElevations':{'main':0,'mezzanine':1.5}},
+                {'id':'n02','elevation':3,'levelElevations':{'main':3}}]
+        routes=[{'id':'side','lowerLevelKey':'n01.main','upperLevelKey':'n01.mezzanine',
+                 'segments':[{'lowerLevelKey':'n01.main','upperLevelKey':'n01.mezzanine','riserPositions':list(range(10))}]},
+                {'id':'center','lowerLevelKey':'n01.mezzanine','upperLevelKey':'n02.main',
+                 'segments':[{'lowerLevelKey':'n01.mezzanine','upperLevelKey':'n02.main','riserPositions':list(range(10))}]}]
+        self.assertEqual(stair_levels(floors,routes),{'n01.main':0,'n01.mezzanine':1.5,'n02.main':3})
+
+    def test_conflicting_or_repeated_explicit_floors_fail(self):
+        for values in [{},{'main':1},{'main':0,'mezzanine':math.nan},{'main':0,'bad.key':1}]:
+            with self.assertRaises(ValueError):
+                stair_levels([{'id':'n01','elevation':0,'levelElevations':values}],[])
+        with self.assertRaisesRegex(ValueError,'repeated floor'):
+            stair_levels([{'id':'n01','elevation':0}]*2,[])
+
     def fixture(self, middle='L:turn'):
         floors=[{'id':'n02','elevation':3.2,'wingElevation':1.4},
                 {'id':'n03','elevation':6.4,'wingElevation':4.6}]

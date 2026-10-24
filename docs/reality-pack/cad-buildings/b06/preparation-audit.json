@@ -1,0 +1,4877 @@
+{
+  "schemaVersion": 1,
+  "buildingId": "b06",
+  "status": "prepared-not-native-accepted",
+  "generatorDependenciesSha256": {
+    "prepare_b06.py": "fdfd08d852419a0e1733161ef92024d10ab177f7f6182bb39ced96b6c1288bf0",
+    "prepare_b01.py": "942b9463f7f1f894a5fc61ba8b3caa91e3a38a7d061501d40ddbd7196f81588a"
+  },
+  "heightModel": {
+    "id": "b06-cad2005-half-storey-hypothesis-v1",
+    "levels": {
+      "p01": {
+        "main": -3.0,
+        "mezzanine": -1.5
+      },
+      "n01": {
+        "main": 0.0,
+        "mezzanine": 1.5
+      },
+      "n02": {
+        "main": 3.0,
+        "mezzanine": 4.5
+      },
+      "n03": {
+        "main": 6.0,
+        "mezzanine": 7.5
+      },
+      "n04": {
+        "main": 9.0,
+        "mezzanine": 10.5
+      },
+      "n05": {
+        "main": 12.0,
+        "mezzanine": 13.5
+      },
+      "n06": {
+        "main": 15.0
+      },
+      "n07": {
+        "main": 18.0,
+        "annexRoof": 18.0,
+        "westHeadRoof": 21.41,
+        "eastHeadRoof": 20.5
+      }
+    },
+    "basis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
+    "cadMeasuredZ": false,
+    "photogrammetryCalibrationPending": true
+  },
+  "floors": [
+    {
+      "id": "p01",
+      "roomCount": 44,
+      "solidCount": 293,
+      "sourceBounds": [
+        0.369,
+        -6.944,
+        69.539,
+        16.314
+      ],
+      "doorCount": 52,
+      "windowCount": 54,
+      "wallPairCount": 5289,
+      "unresolvedStrongEdges": [],
+      "earlyBoundaryCandidates": [
+        {
+          "entity": "38F",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "3EF",
+          "length": 3.7955,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "4A4",
+          "length": 3.415,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "57B",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "66C",
+          "length": 3.425,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "6E0",
+          "length": 2.95,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "6E3",
+          "length": 1.375,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "705",
+          "length": 1.375,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "resolvedByLaterConstruction": [
+        {
+          "entity": "38F",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "3EF",
+          "length": 3.7955,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "4A4",
+          "length": 3.415,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "57B",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "66C",
+          "length": 3.425,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "6E0",
+          "length": 2.95,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "6E3",
+          "length": 1.375,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "705",
+          "length": 1.375,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        }
+      ],
+      "inferredBoundaries": [
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "265",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "292",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "46E",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "4A5",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "6E2",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "726",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "7DA",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "7DC",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "7DD",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "7DE",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "7DF",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        }
+      ],
+      "wallRoomConflicts": [
+        {
+          "entities": [
+            "285",
+            "3A8"
+          ],
+          "area": 0.2077,
+          "reason": "two long strong wall edges override inconsistent room fill"
+        },
+        {
+          "entities": [
+            "286",
+            "3A9"
+          ],
+          "area": 0.1119,
+          "reason": "two long strong wall edges override inconsistent room fill"
+        }
+      ],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "26A",
+            "26B",
+            "3AC",
+            "40A",
+            "40B"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            4.879,
+            10.229,
+            4.979,
+            10.354
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "187",
+            "39C",
+            "39D"
+          ],
+          "area": 0.005,
+          "bounds": [
+            10.379,
+            6.115,
+            10.479,
+            6.165
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "2A1",
+            "2A2",
+            "39C",
+            "39D"
+          ],
+          "area": 0.015,
+          "bounds": [
+            10.379,
+            4.365,
+            10.479,
+            4.515
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "262",
+            "263",
+            "266",
+            "267"
+          ],
+          "area": 0.0625,
+          "bounds": [
+            0.394,
+            7.289,
+            0.644,
+            7.539
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "29F",
+            "2A0",
+            "3DA",
+            "3DD",
+            "3DE"
+          ],
+          "area": 0.015625,
+          "bounds": [
+            16.116,
+            0.364,
+            16.241,
+            0.489
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3A2",
+            "3A3",
+            "3F9",
+            "3FA",
+            "3FB"
+          ],
+          "area": 0.01875,
+          "bounds": [
+            29.929,
+            6.364,
+            30.079,
+            6.489
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3C8",
+            "3C9",
+            "679",
+            "67A",
+            "67B"
+          ],
+          "area": 0.01875,
+          "bounds": [
+            34.874,
+            6.364,
+            35.024,
+            6.489
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "446",
+            "718",
+            "72F",
+            "737",
+            "738"
+          ],
+          "area": 0.01,
+          "bounds": [
+            49.949,
+            6.264,
+            50.049,
+            6.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "446",
+            "69A",
+            "69B",
+            "717",
+            "718"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            49.949,
+            7.077,
+            50.049,
+            7.202
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "49E",
+            "5BE",
+            "796",
+            "7B6"
+          ],
+          "area": 0.01,
+          "bounds": [
+            65.126,
+            13.274,
+            65.226,
+            13.374
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "784",
+            "79D",
+            "79E",
+            "7AB"
+          ],
+          "area": 0.01,
+          "bounds": [
+            62.954,
+            12.049,
+            63.054,
+            12.149
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "796",
+            "79D",
+            "79E",
+            "7B6"
+          ],
+          "area": 0.01,
+          "bounds": [
+            62.954,
+            13.274,
+            63.054,
+            13.374
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "4A1",
+            "4B4"
+          ],
+          "area": 0.025,
+          "bounds": [
+            57.329,
+            10.159,
+            57.579,
+            10.259
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "4A0",
+            "4A1",
+            "674",
+            "675"
+          ],
+          "area": 0.09375,
+          "bounds": [
+            57.329,
+            16.284,
+            57.579,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "694",
+            "695",
+            "6D6",
+            "6D8",
+            "6DF"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            57.275,
+            7.077,
+            57.375,
+            7.202
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "57C",
+            "57D",
+            "66E",
+            "66F"
+          ],
+          "area": 0.0375,
+          "bounds": [
+            65.126,
+            16.284,
+            65.226,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "743",
+            "744",
+            "7AE",
+            "7AF"
+          ],
+          "area": 0.01,
+          "bounds": [
+            60.659,
+            12.049,
+            60.759,
+            12.149
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "6DA",
+            "6DB",
+            "6E7",
+            "6E8",
+            "6E9"
+          ],
+          "area": 0.01,
+          "bounds": [
+            59.894,
+            0.934,
+            59.994,
+            1.034
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "6DA",
+            "6DB",
+            "6DC",
+            "6DD",
+            "6DE"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            59.894,
+            7.077,
+            59.994,
+            7.202
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "6E5",
+            "6E6",
+            "6E8",
+            "6E9"
+          ],
+          "area": 0.01,
+          "bounds": [
+            61.239,
+            0.934,
+            61.339,
+            1.034
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "729",
+            "72A",
+            "731",
+            "740"
+          ],
+          "area": 0.015,
+          "bounds": [
+            47.276,
+            4.314,
+            47.426,
+            4.414
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "excludedStairGraphics": [
+        "2440",
+        "2441",
+        "2442",
+        "2443",
+        "2444",
+        "2445",
+        "2446",
+        "2447",
+        "2448",
+        "248E",
+        "248F",
+        "2490",
+        "2491",
+        "2492",
+        "2493",
+        "2494",
+        "2495",
+        "2496",
+        "24DC",
+        "24DD",
+        "24DE",
+        "24DF",
+        "24E0",
+        "24E1",
+        "24E2",
+        "24E3",
+        "24E4",
+        "24E5",
+        "24E6",
+        "24E7",
+        "24E8",
+        "24E9",
+        "24EA",
+        "24EB",
+        "24EC",
+        "24EE",
+        "24EF",
+        "24F0",
+        "24F1",
+        "24F2",
+        "24F3",
+        "24F4",
+        "24F5",
+        "24F6",
+        "24F7",
+        "24F8",
+        "24F9",
+        "24FA",
+        "24FB",
+        "24FC",
+        "24FD",
+        "24FE",
+        "24FF",
+        "2500",
+        "2501",
+        "2502",
+        "2503",
+        "2504",
+        "2505",
+        "2541",
+        "2542",
+        "2543",
+        "2544",
+        "2545",
+        "B66",
+        "B67",
+        "B68",
+        "B69",
+        "B6A",
+        "B6B",
+        "B6C",
+        "B6D",
+        "B6E",
+        "BB4",
+        "BB5",
+        "BB6",
+        "BB7",
+        "BB8",
+        "BB9",
+        "BBA",
+        "BBB",
+        "BBC",
+        "C02",
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07",
+        "C08",
+        "C09",
+        "C0A",
+        "C0B",
+        "C0C",
+        "C0D",
+        "C0E",
+        "C0F",
+        "C10",
+        "C11",
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C1A",
+        "C1B",
+        "C1C",
+        "C1D",
+        "C1E",
+        "C1F",
+        "C20",
+        "C21",
+        "D2C",
+        "D2D",
+        "D2E",
+        "D2F",
+        "D30",
+        "D31",
+        "D32",
+        "D33",
+        "D34",
+        "D35",
+        "E08",
+        "E09",
+        "E0A",
+        "E0B"
+      ],
+      "sourceBoundedJoins": [
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "38F",
+            "3EF",
+            "390",
+            "38E"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            -0.006,
+            -0.011,
+            0.369,
+            0.364
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "57B",
+            "66C",
+            "57A",
+            "608"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            69.539,
+            16.284,
+            69.914,
+            16.659
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "6E3",
+            "6E0",
+            "6E2",
+            "6E1"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            68.814,
+            3.339,
+            69.189,
+            3.714
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "705",
+            "6E0",
+            "706",
+            "6E1"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            68.814,
+            5.914,
+            69.189,
+            6.289
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "66C",
+            "795",
+            "794"
+          ],
+          "area": 0.0375,
+          "bounds": [
+            69.539,
+            13.274,
+            69.914,
+            13.374
+          ],
+          "basis": "measured transverse partition T at continuous outer facade; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "609",
+            "60A",
+            "66C"
+          ],
+          "area": 0.015,
+          "bounds": [
+            69.539,
+            13.234,
+            69.914,
+            13.274
+          ],
+          "basis": "measured 40mm facade frame return; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "4A4",
+            "683",
+            "703",
+            "70A",
+            "6EA"
+          ],
+          "area": 0.24375,
+          "bounds": [
+            67.439,
+            0.384,
+            67.814,
+            1.034
+          ],
+          "basis": "local continuation of the measured375mm exterior facade; no door arc, not a fill of the wider window recess; only existing missing piece added before door/window cuts"
+        }
+      ],
+      "retainingPanel": null,
+      "crossFloorPortals": [],
+      "exteriorFeatures": [],
+      "terrainPreservationAreas": [
+        {
+          "id": "b06-s201-preserve-ground",
+          "floor": "p01",
+          "sourceEntity": "A5A",
+          "role": "buried-chamber",
+          "sourceWallEntities": [
+            "7DC",
+            "7DD",
+            "7DE",
+            "7DF"
+          ],
+          "bottom": -3.0,
+          "coverTop": -2.29627770931185,
+          "coverThickness": 0.2,
+          "terrainPreservationRequired": true,
+          "coordinateSpace": "CAD XY metres; no origin subtraction or game-axis transform",
+          "provenance": "IPR2023 continuous grassy slope, minimum of9 source samples world-1.439; selected coverworld-1.60,0.20m thickness, existing inferred0.10m enclosure retained; nonhabitable, no source entry, not CAD Z",
+          "loops": [
+            [
+              [
+                46.276,
+                -6.944
+              ],
+              [
+                46.276,
+                -7.044
+              ],
+              [
+                43.296,
+                -7.044
+              ],
+              [
+                43.296,
+                -6.944
+              ],
+              [
+                43.196,
+                -6.944
+              ],
+              [
+                43.196,
+                -0.984
+              ],
+              [
+                43.296,
+                -0.984
+              ],
+              [
+                43.296,
+                -0.884
+              ],
+              [
+                46.276,
+                -0.884
+              ],
+              [
+                46.276,
+                -0.984
+              ],
+              [
+                46.376,
+                -0.984
+              ],
+              [
+                46.376,
+                -6.944
+              ]
+            ]
+          ]
+        }
+      ],
+      "duplicateWindowEntities": [],
+      "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
+      "doorSourceCorrections": [
+        {
+          "arc": "AB3",
+          "leaf": "AD0",
+          "circleFitMismatch": 0.070658,
+          "endpointMismatch": 7.6e-05,
+          "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
+        },
+        {
+          "arc": "AC6",
+          "leaf": "AD2",
+          "circleFitMismatch": 0.174407,
+          "endpointMismatch": 5.3e-05,
+          "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
+        },
+        {
+          "arc": "23D9",
+          "leaf": "23F6",
+          "circleFitMismatch": 0.070663,
+          "endpointMismatch": 7.9e-05,
+          "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
+        },
+        {
+          "arc": "23EC",
+          "leaf": "23F8",
+          "circleFitMismatch": 0.174409,
+          "endpointMismatch": 5.3e-05,
+          "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
+        }
+      ]
+    },
+    {
+      "id": "n01",
+      "roomCount": 59,
+      "solidCount": 261,
+      "sourceBounds": [
+        0.369,
+        -5.501,
+        69.539,
+        16.284
+      ],
+      "doorCount": 125,
+      "windowCount": 35,
+      "wallPairCount": 3569,
+      "unresolvedStrongEdges": [],
+      "earlyBoundaryCandidates": [
+        {
+          "entity": "29C",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "3F0",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "7E6",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "963",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "resolvedByLaterConstruction": [
+        {
+          "entity": "29C",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "3F0",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "7E6",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "963",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        }
+      ],
+      "inferredBoundaries": [],
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "968",
+            "973"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            63.499,
+            16.284,
+            63.624,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "29A",
+            "29B",
+            "3F1",
+            "3F2"
+          ],
+          "area": 0.015625,
+          "bounds": [
+            63.499,
+            10.409,
+            63.624,
+            10.534
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "36E",
+            "36F",
+            "3AE",
+            "3AF"
+          ],
+          "area": 0.015,
+          "bounds": [
+            59.429,
+            12.134,
+            59.529,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3A2",
+            "3AE",
+            "3AF",
+            "977"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            59.429,
+            10.159,
+            59.529,
+            10.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "36E",
+            "36F",
+            "3AD",
+            "3E2",
+            "3E5"
+          ],
+          "area": 0.0375,
+          "bounds": [
+            57.329,
+            12.134,
+            57.579,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "645",
+            "646",
+            "7FB",
+            "7FC"
+          ],
+          "area": 0.015,
+          "bounds": [
+            10.379,
+            4.365,
+            10.479,
+            4.515
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "565",
+            "7F0"
+          ],
+          "area": 0.015876,
+          "bounds": [
+            6.284,
+            6.113,
+            6.41,
+            6.239
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "805",
+            "806",
+            "80E",
+            "83B",
+            "83C"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            24.929,
+            6.364,
+            25.029,
+            6.489
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "excludedStairGraphics": [
+        "1114",
+        "1115",
+        "1116",
+        "1117",
+        "1118",
+        "1119",
+        "111A",
+        "111B",
+        "111C",
+        "111D",
+        "1163",
+        "1164",
+        "1165",
+        "1166",
+        "1167",
+        "1168",
+        "1169",
+        "11AF",
+        "11B0",
+        "11B1",
+        "11B2",
+        "11B3",
+        "11B4",
+        "11B5",
+        "11B6",
+        "11B7",
+        "11B8",
+        "11B9",
+        "11BA",
+        "11BB",
+        "11BC",
+        "11BD",
+        "11BE",
+        "11BF",
+        "11C0",
+        "11C1",
+        "11C2",
+        "11C3",
+        "11C4",
+        "1216",
+        "1217",
+        "1218",
+        "1219",
+        "121A",
+        "121B",
+        "121C",
+        "121D",
+        "121E",
+        "121F",
+        "1220",
+        "1221",
+        "1222",
+        "1224",
+        "1225",
+        "1226",
+        "1227",
+        "1228",
+        "1229",
+        "122A",
+        "122B",
+        "122C",
+        "122D",
+        "122E",
+        "122F",
+        "1230",
+        "1231",
+        "1232",
+        "1233",
+        "1234",
+        "1235",
+        "1236",
+        "12BD",
+        "12BE",
+        "12BF",
+        "12F7",
+        "12F8",
+        "12F9",
+        "12FA",
+        "12FB",
+        "12FC",
+        "12FD",
+        "12FE",
+        "13D1",
+        "13D2",
+        "13D3",
+        "13D4",
+        "13D5",
+        "13D6",
+        "13D7",
+        "13D8",
+        "13D9",
+        "13DA",
+        "13DB",
+        "13DC",
+        "13DD",
+        "13DE",
+        "13DF",
+        "13E0",
+        "13E1",
+        "13E2",
+        "13E3",
+        "13E4",
+        "13E5",
+        "13E6",
+        "13E7",
+        "13E8",
+        "13E9",
+        "13EA",
+        "13EB",
+        "13EC",
+        "13ED",
+        "13EE",
+        "13EF",
+        "13F0",
+        "13F1",
+        "13F2",
+        "13F3",
+        "13F4",
+        "13F5",
+        "13F6",
+        "13F7",
+        "13F8",
+        "13F9",
+        "13FA",
+        "13FB",
+        "13FC",
+        "13FD",
+        "13FE",
+        "13FF",
+        "1400",
+        "1401",
+        "1402",
+        "1403",
+        "1404",
+        "1405",
+        "1406",
+        "1407",
+        "1408",
+        "1409",
+        "140A",
+        "140B",
+        "140C",
+        "140D",
+        "140E",
+        "140F",
+        "1410",
+        "1411",
+        "1412",
+        "1413",
+        "1414",
+        "1415",
+        "1416",
+        "1417",
+        "1418",
+        "1419",
+        "141A",
+        "141B",
+        "141C",
+        "141D",
+        "141E",
+        "141F",
+        "1420",
+        "1421",
+        "1422",
+        "1423",
+        "1424",
+        "1425",
+        "1426",
+        "1427",
+        "1428",
+        "1429",
+        "142A",
+        "142B",
+        "142C",
+        "142D",
+        "142E",
+        "142F",
+        "1430",
+        "1431",
+        "1432",
+        "1433",
+        "1434",
+        "1435",
+        "1436",
+        "1437",
+        "1438",
+        "1439",
+        "143A",
+        "143B",
+        "143C",
+        "143D",
+        "143E",
+        "143F",
+        "1440",
+        "1441",
+        "1442",
+        "1443",
+        "1444",
+        "22F6",
+        "22F7",
+        "22F8",
+        "22F9",
+        "4DCF",
+        "500B",
+        "500C",
+        "500D",
+        "500E",
+        "500F",
+        "5010",
+        "5011",
+        "5012",
+        "D82",
+        "D83",
+        "D85",
+        "D8A",
+        "D8B",
+        "D8C",
+        "D90",
+        "DA6",
+        "DA7",
+        "DA8",
+        "DA9",
+        "DAA",
+        "DAB",
+        "DAC",
+        "DAD",
+        "DAE",
+        "DAF",
+        "DB0",
+        "DBC",
+        "DBD",
+        "DBE",
+        "DBF",
+        "DC0",
+        "DC1",
+        "E08",
+        "E09",
+        "E0A",
+        "E0B",
+        "E0C",
+        "E0D",
+        "E0E",
+        "E0F",
+        "E10",
+        "E56",
+        "E57",
+        "E58",
+        "E59",
+        "E5A",
+        "E5B",
+        "E5C",
+        "E5D",
+        "E5E",
+        "E5F",
+        "E60",
+        "E61",
+        "E62",
+        "E63",
+        "E64",
+        "E65",
+        "EAB",
+        "EAC",
+        "EAD",
+        "EAE",
+        "EAF",
+        "EB0",
+        "EB1",
+        "EB2",
+        "EB3",
+        "EB4",
+        "EB5",
+        "EB6",
+        "EB7",
+        "EB8",
+        "EB9",
+        "EBA",
+        "EBB",
+        "EBC",
+        "EBD",
+        "EBE",
+        "EBF",
+        "EC0",
+        "EC1",
+        "EC2",
+        "F63"
+      ],
+      "sourceBoundedJoins": [
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "7E6",
+            "963",
+            "7E2",
+            "7E5"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            -0.006,
+            -0.011,
+            0.369,
+            0.364
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "3F0",
+            "29C",
+            "10D",
+            "29D"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            69.539,
+            16.284,
+            69.914,
+            16.659
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "28D",
+            "29C",
+            "28E",
+            "290"
+          ],
+          "area": 0.022801,
+          "bounds": [
+            69.763,
+            10.159,
+            69.914,
+            10.31
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "29C",
+            "203",
+            "205"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            69.539,
+            11.884,
+            69.914,
+            12.009
+          ],
+          "basis": "measured transverse partition T at continuous outer facade; only existing missing piece added before door/window cuts"
+        }
+      ],
+      "retainingPanel": {
+        "id": "n01-ipr-low-retaining-panel",
+        "bottom": -3.0,
+        "top": -1.05,
+        "sourceEntities": [
+          "1072",
+          "1073",
+          "1066"
+        ],
+        "heightBasis": "IPR Praha 2023 panel cap world -0.441..-0.316m (two near-horizontal triangles,1.348m2); selected local cap-1.05, buried bottom p01.main; interpretation, not CAD Z",
+        "photogrammetrySource": "b06-exterior-panel-source.json",
+        "sourceManifestSha256": "d556d38d5c32d9d039479e492d7937e2c358df90cf94f7aee232f5e1ba330d93"
+      },
+      "crossFloorPortals": [],
+      "exteriorFeatures": [
+        {
+          "id": "b06-entry-canopy",
+          "floor": "n01",
+          "role": "canopy",
+          "material": "roof",
+          "bottom": 3.6540823,
+          "top": 3.7540823,
+          "sourceFloor": "n01",
+          "sourceEntities": [
+            "142A",
+            "143C",
+            "143D"
+          ],
+          "basis": "actual outer CAD entry frame22m2 retained instead of enlarging to the laterally different IPR roof envelope26.607m2; capworld4.45036 and0.10m thickness interpreted, not another floor",
+          "photogrammetryBasis": "IPR Praha 2023; source-exteriors images reviewed; vertical dimensions and construction thickness are explicit interpretations",
+          "loops": [
+            [
+              [
+                12.511,
+                -1.323
+              ],
+              [
+                12.999,
+                -5.293
+              ],
+              [
+                7.54,
+                -5.963
+              ],
+              [
+                7.052,
+                -1.993
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "b06-canopy-south-frame",
+          "floor": "n01",
+          "role": "canopy",
+          "material": "metal",
+          "bottom": 3.5540822999999997,
+          "top": 3.6540823,
+          "sourceFloor": "n01",
+          "sourceEntities": [
+            "143C",
+            "143B"
+          ],
+          "basis": "two measured longitudinal frame bands only;0.10m beam depth estimated; no inferred repeated posts",
+          "photogrammetryBasis": "IPR Praha 2023; source-exteriors images reviewed; vertical dimensions and construction thickness are explicit interpretations",
+          "loops": [
+            [
+              [
+                8.428,
+                -5.784
+              ],
+              [
+                12.99,
+                -5.224
+              ],
+              [
+                12.999,
+                -5.293
+              ],
+              [
+                8.437,
+                -5.853
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "b06-canopy-north-frame",
+          "floor": "n01",
+          "role": "canopy",
+          "material": "metal",
+          "bottom": 3.5540822999999997,
+          "top": 3.6540823,
+          "sourceFloor": "n01",
+          "sourceEntities": [
+            "143D",
+            "143E"
+          ],
+          "basis": "two measured longitudinal frame bands only;0.10m beam depth estimated; no inferred repeated posts",
+          "photogrammetryBasis": "IPR Praha 2023; source-exteriors images reviewed; vertical dimensions and construction thickness are explicit interpretations",
+          "loops": [
+            [
+              [
+                12.511,
+                -1.323
+              ],
+              [
+                12.52,
+                -1.392
+              ],
+              [
+                7.958,
+                -1.953
+              ],
+              [
+                7.949,
+                -1.883
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "b06-east-mezz-terrace",
+          "floor": "n01",
+          "role": "canopy",
+          "material": "concrete",
+          "bottom": 0.8687223000000001,
+          "top": 1.0187223,
+          "sourceFloor": "n01",
+          "sourceEntities": [
+            "D85",
+            "D90",
+            "F63",
+            "D83",
+            "4D65",
+            "4D66",
+            "4D67",
+            "4DCF"
+          ],
+          "basis": "CAD outer terrace/cover outline takes precedence over smoothed scan area; topworld1.715,0.15m thickness interpreted; below n01.mezzanine by0.4812777m, jump/terrain acceptance required",
+          "photogrammetryBasis": "IPR Praha 2023; source-exteriors images reviewed; vertical dimensions and construction thickness are explicit interpretations",
+          "loops": [
+            [
+              [
+                49.925,
+                17.908
+              ],
+              [
+                57.504,
+                17.527
+              ],
+              [
+                57.504,
+                16.284
+              ],
+              [
+                49.925,
+                16.284
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "b06-west-portico",
+          "floor": "n01",
+          "role": "slab",
+          "material": "floor",
+          "bottom": -0.2,
+          "top": 0,
+          "sourceFloor": "n01",
+          "sourceEntities": [
+            "10E2",
+            "5E5",
+            "22B6",
+            "22CB",
+            "22D7",
+            "22EB"
+          ],
+          "basis": "source corridor recess from measured door line to adjacent building front; actual raised portico visible in IPR; main0 top and buried plinth bottom-1 are interpretations, no invented steps",
+          "photogrammetryBasis": "IPR Praha 2023; source-exteriors images reviewed; vertical dimensions and construction thickness are explicit interpretations",
+          "loops": [
+            [
+              [
+                -0.006,
+                6.489
+              ],
+              [
+                -0.006,
+                10.229
+              ],
+              [
+                2.369,
+                10.229
+              ],
+              [
+                2.369,
+                6.489
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "b06-west-portico-plinth",
+          "floor": "n01",
+          "role": "slab",
+          "material": "concrete",
+          "bottom": -1,
+          "top": -0.2,
+          "sourceFloor": "n01",
+          "sourceEntities": [
+            "10E2",
+            "5E5",
+            "22B6",
+            "22CB",
+            "22D7",
+            "22EB"
+          ],
+          "basis": "source corridor recess from measured door line to adjacent building front; actual raised portico visible in IPR; main0 top and buried plinth bottom-1 are interpretations, no invented steps",
+          "photogrammetryBasis": "IPR Praha 2023; source-exteriors images reviewed; vertical dimensions and construction thickness are explicit interpretations",
+          "loops": [
+            [
+              [
+                -0.006,
+                6.489
+              ],
+              [
+                -0.006,
+                10.229
+              ],
+              [
+                2.369,
+                10.229
+              ],
+              [
+                2.369,
+                6.489
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "b06-east-portico",
+          "floor": "n01",
+          "role": "slab",
+          "material": "floor",
+          "bottom": -0.2,
+          "top": 0,
+          "sourceFloor": "n01",
+          "sourceEntities": [
+            "D7C",
+            "28D",
+            "2303",
+            "2318",
+            "2324",
+            "2339"
+          ],
+          "basis": "source corridor recess from measured door line to adjacent building front; actual raised portico visible in IPR; main0 top and buried plinth bottom-1 are interpretations, no invented steps",
+          "photogrammetryBasis": "IPR Praha 2023; source-exteriors images reviewed; vertical dimensions and construction thickness are explicit interpretations",
+          "loops": [
+            [
+              [
+                67.539,
+                6.489
+              ],
+              [
+                67.539,
+                10.159
+              ],
+              [
+                69.913,
+                10.159
+              ],
+              [
+                69.913,
+                6.489
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "b06-east-portico-plinth",
+          "floor": "n01",
+          "role": "slab",
+          "material": "concrete",
+          "bottom": -1,
+          "top": -0.2,
+          "sourceFloor": "n01",
+          "sourceEntities": [
+            "D7C",
+            "28D",
+            "2303",
+            "2318",
+            "2324",
+            "2339"
+          ],
+          "basis": "source corridor recess from measured door line to adjacent building front; actual raised portico visible in IPR; main0 top and buried plinth bottom-1 are interpretations, no invented steps",
+          "photogrammetryBasis": "IPR Praha 2023; source-exteriors images reviewed; vertical dimensions and construction thickness are explicit interpretations",
+          "loops": [
+            [
+              [
+                67.539,
+                6.489
+              ],
+              [
+                67.539,
+                10.159
+              ],
+              [
+                69.913,
+                10.159
+              ],
+              [
+                69.913,
+                6.489
+              ]
+            ]
+          ]
+        }
+      ],
+      "terrainPreservationAreas": [],
+      "duplicateWindowEntities": [],
+      "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
+      "doorSourceCorrections": [
+        {
+          "arc": "123F",
+          "leaf": "124A",
+          "circleFitMismatch": 0.346392,
+          "endpointMismatch": 3.2e-05,
+          "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
+        },
+        {
+          "arc": "124B",
+          "leaf": "123D",
+          "circleFitMismatch": 0.053538,
+          "endpointMismatch": 1.7e-05,
+          "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
+        },
+        {
+          "arc": "128E",
+          "leaf": "129B",
+          "circleFitMismatch": 0.313927,
+          "endpointMismatch": 5.4e-05,
+          "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
+        },
+        {
+          "arc": "12B0",
+          "leaf": "12AD",
+          "circleFitMismatch": 0.313978,
+          "endpointMismatch": 5.2e-05,
+          "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
+        },
+        {
+          "arc": "65C8",
+          "leaf": "65D3",
+          "circleFitMismatch": 0.346493,
+          "endpointMismatch": 6.1e-05,
+          "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
+        },
+        {
+          "arc": "65D4",
+          "leaf": "65C6",
+          "circleFitMismatch": 0.053611,
+          "endpointMismatch": 9.1e-05,
+          "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
+        }
+      ]
+    },
+    {
+      "id": "n02",
+      "roomCount": 58,
+      "solidCount": 241,
+      "sourceBounds": [
+        0.369,
+        -5.501,
+        69.539,
+        16.284
+      ],
+      "doorCount": 106,
+      "windowCount": 47,
+      "wallPairCount": 3601,
+      "unresolvedStrongEdges": [],
+      "earlyBoundaryCandidates": [
+        {
+          "entity": "27E",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "3D2",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "79B",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "918",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "resolvedByLaterConstruction": [
+        {
+          "entity": "27E",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "3D2",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "79B",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "918",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        }
+      ],
+      "inferredBoundaries": [],
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "91D",
+            "928"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            63.499,
+            16.284,
+            63.624,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "27C",
+            "27D",
+            "3D3",
+            "3D4"
+          ],
+          "area": 0.015625,
+          "bounds": [
+            63.499,
+            10.409,
+            63.624,
+            10.534
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "350",
+            "351",
+            "390",
+            "391"
+          ],
+          "area": 0.015,
+          "bounds": [
+            59.429,
+            12.134,
+            59.529,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "384",
+            "390",
+            "391",
+            "92C"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            59.429,
+            10.159,
+            59.529,
+            10.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "350",
+            "351",
+            "38F",
+            "3C4",
+            "3C7"
+          ],
+          "area": 0.0375,
+          "bounds": [
+            57.329,
+            12.134,
+            57.579,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "611",
+            "612",
+            "7B0",
+            "7B1"
+          ],
+          "area": 0.015,
+          "bounds": [
+            10.379,
+            4.365,
+            10.479,
+            4.515
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "545",
+            "7A5"
+          ],
+          "area": 0.0155,
+          "bounds": [
+            6.284,
+            6.115,
+            6.409,
+            6.239
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "7BA",
+            "7BB",
+            "7C3",
+            "7F0",
+            "7F1"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            24.929,
+            6.364,
+            25.029,
+            6.489
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "7A1",
+            "7A2",
+            "90A",
+            "90B"
+          ],
+          "area": 0.09915,
+          "bounds": [
+            12.329,
+            -0.011,
+            12.648154,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "excludedStairGraphics": [
+        "5069",
+        "506A",
+        "506B",
+        "506C",
+        "506D",
+        "506E",
+        "506F",
+        "5070",
+        "5071",
+        "5072",
+        "5073",
+        "5074",
+        "5075",
+        "5076",
+        "5077",
+        "5078",
+        "5079",
+        "507A",
+        "507B",
+        "507C",
+        "507D",
+        "507E",
+        "507F",
+        "5080",
+        "5081",
+        "5082",
+        "5083",
+        "50C9",
+        "50CA",
+        "50CB",
+        "50CC",
+        "50CD",
+        "50CE",
+        "50CF",
+        "50D0",
+        "50D1",
+        "50D2",
+        "50D3",
+        "50D4",
+        "50D5",
+        "50D6",
+        "50D7",
+        "50D8",
+        "50D9",
+        "50DA",
+        "5120",
+        "5121",
+        "5122",
+        "5123",
+        "5124",
+        "5125",
+        "5126",
+        "5127",
+        "5128",
+        "5129",
+        "512A",
+        "512B",
+        "512C",
+        "512D",
+        "512E",
+        "512F",
+        "5130",
+        "5131",
+        "5177",
+        "5178",
+        "5179",
+        "517A",
+        "517B",
+        "517C",
+        "517D",
+        "517E",
+        "517F",
+        "5180",
+        "5181",
+        "5182",
+        "51C8",
+        "51C9",
+        "51CA",
+        "51CB",
+        "51CC",
+        "51CD",
+        "51CE",
+        "51CF",
+        "51D0",
+        "51D1",
+        "51D2",
+        "51D3",
+        "51D4",
+        "51D5",
+        "51D6",
+        "51D7",
+        "51D8",
+        "51D9",
+        "51DA",
+        "51DB",
+        "5221",
+        "5222",
+        "5223",
+        "5224",
+        "5225",
+        "5226",
+        "5227",
+        "5228",
+        "5229",
+        "522A",
+        "522B",
+        "522C",
+        "522D",
+        "522E",
+        "522F",
+        "5230",
+        "5231",
+        "5232",
+        "5233",
+        "5234",
+        "5235",
+        "5236",
+        "5237",
+        "5238",
+        "5239",
+        "523A",
+        "523B",
+        "523C",
+        "523D",
+        "523E",
+        "523F",
+        "5240",
+        "5241",
+        "5242",
+        "5243",
+        "5244",
+        "5245",
+        "5246",
+        "5247",
+        "5248",
+        "5249",
+        "524A",
+        "524B",
+        "524C",
+        "524D",
+        "524E",
+        "524F",
+        "5250",
+        "5251",
+        "5252",
+        "5253",
+        "5254",
+        "5255",
+        "529B"
+      ],
+      "sourceBoundedJoins": [
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "79B",
+            "918",
+            "797",
+            "79A"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            -0.006,
+            -0.011,
+            0.369,
+            0.364
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "3D2",
+            "27E",
+            "103",
+            "27F"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            69.539,
+            16.284,
+            69.914,
+            16.659
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "26F",
+            "27E",
+            "270",
+            "272"
+          ],
+          "area": 0.022801,
+          "bounds": [
+            69.763,
+            10.159,
+            69.914,
+            10.31
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "27E",
+            "1F9",
+            "1FB"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            69.539,
+            11.884,
+            69.914,
+            12.009
+          ],
+          "basis": "measured transverse partition T at continuous outer facade; only existing missing piece added before door/window cuts"
+        }
+      ],
+      "retainingPanel": null,
+      "crossFloorPortals": [],
+      "exteriorFeatures": [],
+      "terrainPreservationAreas": [],
+      "duplicateWindowEntities": [],
+      "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
+      "doorSourceCorrections": []
+    },
+    {
+      "id": "n03",
+      "roomCount": 58,
+      "solidCount": 251,
+      "sourceBounds": [
+        0.369,
+        -5.501,
+        69.539,
+        16.284
+      ],
+      "doorCount": 106,
+      "windowCount": 46,
+      "wallPairCount": 1199,
+      "unresolvedStrongEdges": [],
+      "earlyBoundaryCandidates": [
+        {
+          "entity": "27E",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "3CF",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "798",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "915",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "resolvedByLaterConstruction": [
+        {
+          "entity": "27E",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "3CF",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "798",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "915",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        }
+      ],
+      "inferredBoundaries": [],
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "91A",
+            "925"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            63.499,
+            16.284,
+            63.624,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "27C",
+            "27D",
+            "3D0",
+            "3D1"
+          ],
+          "area": 0.015625,
+          "bounds": [
+            63.499,
+            10.409,
+            63.624,
+            10.534
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "34D",
+            "34E",
+            "38D",
+            "38E"
+          ],
+          "area": 0.015,
+          "bounds": [
+            59.429,
+            12.134,
+            59.529,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "381",
+            "38D",
+            "38E",
+            "929"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            59.429,
+            10.159,
+            59.529,
+            10.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "34D",
+            "34E",
+            "38C",
+            "3C1",
+            "3C4"
+          ],
+          "area": 0.0375,
+          "bounds": [
+            57.329,
+            12.134,
+            57.579,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3C4",
+            "91D",
+            "91E"
+          ],
+          "area": 0.09375,
+          "bounds": [
+            57.329,
+            16.284,
+            57.579,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "60E",
+            "60F",
+            "7AD",
+            "7AE"
+          ],
+          "area": 0.015,
+          "bounds": [
+            10.379,
+            4.365,
+            10.479,
+            4.515
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "542",
+            "7A2"
+          ],
+          "area": 0.01575,
+          "bounds": [
+            6.284,
+            6.113,
+            6.409,
+            6.239
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "7B7",
+            "7B8",
+            "7C0",
+            "7ED",
+            "7EE"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            24.929,
+            6.364,
+            25.029,
+            6.489
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "63F",
+            "909",
+            "93C"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            9.079,
+            -0.011,
+            9.204,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "79E",
+            "79F",
+            "907",
+            "908"
+          ],
+          "area": 0.09915,
+          "bounds": [
+            12.329,
+            -0.011,
+            12.648154,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "796",
+            "90D"
+          ],
+          "area": 0.065625,
+          "bounds": [
+            4.629,
+            -0.011,
+            4.804,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "90C",
+            "910"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            6.284,
+            -0.011,
+            6.409,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "excludedStairGraphics": [
+        "49BE",
+        "49BF",
+        "49C0",
+        "49C1",
+        "49C2",
+        "49C3",
+        "49C4",
+        "49C5",
+        "49C6",
+        "49C7",
+        "49C8",
+        "49C9",
+        "49CA",
+        "49CB",
+        "49CC",
+        "49CD",
+        "49CE",
+        "49CF",
+        "49D0",
+        "49D1",
+        "49D2",
+        "49D3",
+        "49D4",
+        "49D5",
+        "49D6",
+        "49D7",
+        "49D8",
+        "4A1E",
+        "4A1F",
+        "4A20",
+        "4A21",
+        "4A22",
+        "4A23",
+        "4A24",
+        "4A25",
+        "4A26",
+        "4A27",
+        "4A28",
+        "4A29",
+        "4A2A",
+        "4A2B",
+        "4A2C",
+        "4A2D",
+        "4A2E",
+        "4A2F",
+        "4A75",
+        "4A76",
+        "4A77",
+        "4A78",
+        "4A79",
+        "4A7A",
+        "4A7B",
+        "4A7C",
+        "4A7D",
+        "4A7E",
+        "4A7F",
+        "4A80",
+        "4A81",
+        "4A82",
+        "4A83",
+        "4A84",
+        "4A85",
+        "4A86",
+        "4ACC",
+        "4ACD",
+        "4ACE",
+        "4ACF",
+        "4AD0",
+        "4AD1",
+        "4AD2",
+        "4AD3",
+        "4AD4",
+        "4AD5",
+        "4AD6",
+        "4AD7",
+        "4B1D",
+        "4B1E",
+        "4B1F",
+        "4B20",
+        "4B21",
+        "4B22",
+        "4B23",
+        "4B24",
+        "4B25",
+        "4B26",
+        "4B27",
+        "4B28",
+        "4B29",
+        "4B2A",
+        "4B2B",
+        "4B2C",
+        "4B2D",
+        "4B2E",
+        "4B2F",
+        "4B30",
+        "4B76",
+        "4B77",
+        "4B78",
+        "4B79",
+        "4B7A",
+        "4B7B",
+        "4B7C",
+        "4B7D",
+        "4B7E",
+        "4B7F",
+        "4B80",
+        "4B81",
+        "4B82",
+        "4B83",
+        "4B84",
+        "4B85",
+        "4B86",
+        "4B87",
+        "4B88",
+        "4B89",
+        "4B8A",
+        "4B8B",
+        "4B8C",
+        "4B8D",
+        "4B8E",
+        "4B8F",
+        "4B90",
+        "4B91",
+        "4B92",
+        "4B93",
+        "4B94",
+        "4B95",
+        "4B96",
+        "4B97",
+        "4B98",
+        "4B99",
+        "4B9A",
+        "4B9B",
+        "4B9C",
+        "4B9D",
+        "4B9E",
+        "4B9F",
+        "4BA0",
+        "4BA1",
+        "4BA2",
+        "4BA3",
+        "4BA4",
+        "4BA5",
+        "4BA6",
+        "4BA7",
+        "4BA8",
+        "4BA9",
+        "4BAA",
+        "4BF0"
+      ],
+      "sourceBoundedJoins": [
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "798",
+            "915",
+            "794",
+            "797"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            -0.006,
+            -0.011,
+            0.369,
+            0.364
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "3CF",
+            "27E",
+            "103",
+            "27F"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            69.539,
+            16.284,
+            69.914,
+            16.659
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "26F",
+            "27E",
+            "270",
+            "272"
+          ],
+          "area": 0.022801,
+          "bounds": [
+            69.763,
+            10.159,
+            69.914,
+            10.31
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "27E",
+            "1F9",
+            "1FB"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            69.539,
+            11.884,
+            69.914,
+            12.009
+          ],
+          "basis": "measured transverse partition T at continuous outer facade; only existing missing piece added before door/window cuts"
+        }
+      ],
+      "retainingPanel": null,
+      "crossFloorPortals": [],
+      "exteriorFeatures": [],
+      "terrainPreservationAreas": [],
+      "duplicateWindowEntities": [],
+      "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
+      "doorSourceCorrections": []
+    },
+    {
+      "id": "n04",
+      "roomCount": 58,
+      "solidCount": 251,
+      "sourceBounds": [
+        0.369,
+        -5.501,
+        69.539,
+        16.284
+      ],
+      "doorCount": 106,
+      "windowCount": 46,
+      "wallPairCount": 1199,
+      "unresolvedStrongEdges": [],
+      "earlyBoundaryCandidates": [
+        {
+          "entity": "27E",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "3CF",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "798",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "915",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "resolvedByLaterConstruction": [
+        {
+          "entity": "27E",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "3CF",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "798",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "915",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        }
+      ],
+      "inferredBoundaries": [],
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "91A",
+            "925"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            63.499,
+            16.284,
+            63.624,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "27C",
+            "27D",
+            "3D0",
+            "3D1"
+          ],
+          "area": 0.015625,
+          "bounds": [
+            63.499,
+            10.409,
+            63.624,
+            10.534
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "34D",
+            "34E",
+            "38D",
+            "38E"
+          ],
+          "area": 0.015,
+          "bounds": [
+            59.429,
+            12.134,
+            59.529,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "381",
+            "38D",
+            "38E",
+            "929"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            59.429,
+            10.159,
+            59.529,
+            10.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "34D",
+            "34E",
+            "38C",
+            "3C1",
+            "3C4"
+          ],
+          "area": 0.0375,
+          "bounds": [
+            57.329,
+            12.134,
+            57.579,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3C4",
+            "91D",
+            "91E"
+          ],
+          "area": 0.09375,
+          "bounds": [
+            57.329,
+            16.284,
+            57.579,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "60E",
+            "60F",
+            "7AD",
+            "7AE"
+          ],
+          "area": 0.015,
+          "bounds": [
+            10.379,
+            4.365,
+            10.479,
+            4.515
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "542",
+            "7A2"
+          ],
+          "area": 0.01575,
+          "bounds": [
+            6.284,
+            6.113,
+            6.409,
+            6.239
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "7B7",
+            "7B8",
+            "7C0",
+            "7ED",
+            "7EE"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            24.929,
+            6.364,
+            25.029,
+            6.489
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "63F",
+            "909",
+            "93C"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            9.079,
+            -0.011,
+            9.204,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "79E",
+            "79F",
+            "907",
+            "908"
+          ],
+          "area": 0.09915,
+          "bounds": [
+            12.329,
+            -0.011,
+            12.648154,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "796",
+            "90D"
+          ],
+          "area": 0.065625,
+          "bounds": [
+            4.629,
+            -0.011,
+            4.804,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "90C",
+            "910"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            6.284,
+            -0.011,
+            6.409,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "excludedStairGraphics": [
+        "4F71",
+        "4F72",
+        "4F73",
+        "4F74",
+        "4F75",
+        "4F76",
+        "4F77",
+        "4F78",
+        "4F79",
+        "4F7A",
+        "4F7B",
+        "4F7C",
+        "4F7D",
+        "4F7E",
+        "4F7F",
+        "4F80",
+        "4F81",
+        "4F82",
+        "4F83",
+        "4F84",
+        "4F85",
+        "4F86",
+        "4F87",
+        "4F88",
+        "4F89",
+        "4F8A",
+        "4F8B",
+        "4FD1",
+        "4FD2",
+        "4FD3",
+        "4FD4",
+        "4FD5",
+        "4FD6",
+        "4FD7",
+        "4FD8",
+        "4FD9",
+        "4FDA",
+        "4FDB",
+        "4FDC",
+        "4FDD",
+        "4FDE",
+        "4FDF",
+        "4FE0",
+        "4FE1",
+        "4FE2",
+        "5028",
+        "5029",
+        "502A",
+        "502B",
+        "502C",
+        "502D",
+        "502E",
+        "502F",
+        "5030",
+        "5031",
+        "5032",
+        "5033",
+        "5034",
+        "5035",
+        "5036",
+        "5037",
+        "5038",
+        "5039",
+        "507F",
+        "5080",
+        "5081",
+        "5082",
+        "5083",
+        "5084",
+        "5085",
+        "5086",
+        "5087",
+        "5088",
+        "5089",
+        "508A",
+        "50D0",
+        "50D1",
+        "50D2",
+        "50D3",
+        "50D4",
+        "50D5",
+        "50D6",
+        "50D7",
+        "50D8",
+        "50D9",
+        "50DA",
+        "50DB",
+        "50DC",
+        "50DD",
+        "50DE",
+        "50DF",
+        "50E0",
+        "50E1",
+        "50E2",
+        "50E3",
+        "5129",
+        "512A",
+        "512B",
+        "512C",
+        "512D",
+        "512E",
+        "512F",
+        "5130",
+        "5131",
+        "5132",
+        "5133",
+        "5134",
+        "5135",
+        "5136",
+        "5137",
+        "5138",
+        "5139",
+        "513A",
+        "513B",
+        "513C",
+        "513D",
+        "513E",
+        "513F",
+        "5140",
+        "5141",
+        "5142",
+        "5143",
+        "5144",
+        "5145",
+        "5146",
+        "5147",
+        "5148",
+        "5149",
+        "514A",
+        "514B",
+        "514C",
+        "514D",
+        "514E",
+        "514F",
+        "5150",
+        "5151",
+        "5152",
+        "5153",
+        "5154",
+        "5155",
+        "5156",
+        "5157",
+        "5158",
+        "5159",
+        "515A",
+        "515B",
+        "515C",
+        "515D",
+        "51A3"
+      ],
+      "sourceBoundedJoins": [
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "798",
+            "915",
+            "794",
+            "797"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            -0.006,
+            -0.011,
+            0.369,
+            0.364
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "3CF",
+            "27E",
+            "103",
+            "27F"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            69.539,
+            16.284,
+            69.914,
+            16.659
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "26F",
+            "27E",
+            "270",
+            "272"
+          ],
+          "area": 0.022801,
+          "bounds": [
+            69.763,
+            10.159,
+            69.914,
+            10.31
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "27E",
+            "1F9",
+            "1FB"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            69.539,
+            11.884,
+            69.914,
+            12.009
+          ],
+          "basis": "measured transverse partition T at continuous outer facade; only existing missing piece added before door/window cuts"
+        }
+      ],
+      "retainingPanel": null,
+      "crossFloorPortals": [],
+      "exteriorFeatures": [],
+      "terrainPreservationAreas": [],
+      "duplicateWindowEntities": [],
+      "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
+      "doorSourceCorrections": []
+    },
+    {
+      "id": "n05",
+      "roomCount": 58,
+      "solidCount": 251,
+      "sourceBounds": [
+        0.369,
+        -5.501,
+        69.539,
+        16.284
+      ],
+      "doorCount": 106,
+      "windowCount": 46,
+      "wallPairCount": 1199,
+      "unresolvedStrongEdges": [],
+      "earlyBoundaryCandidates": [
+        {
+          "entity": "27E",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "3CF",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "798",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "915",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "resolvedByLaterConstruction": [
+        {
+          "entity": "27E",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "3CF",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "798",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "915",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        }
+      ],
+      "inferredBoundaries": [],
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "91A",
+            "925"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            63.499,
+            16.284,
+            63.624,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "27C",
+            "27D",
+            "3D0",
+            "3D1"
+          ],
+          "area": 0.015625,
+          "bounds": [
+            63.499,
+            10.409,
+            63.624,
+            10.534
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "34D",
+            "34E",
+            "38D",
+            "38E"
+          ],
+          "area": 0.015,
+          "bounds": [
+            59.429,
+            12.134,
+            59.529,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "381",
+            "38D",
+            "38E",
+            "929"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            59.429,
+            10.159,
+            59.529,
+            10.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "34D",
+            "34E",
+            "38C",
+            "3C1",
+            "3C4"
+          ],
+          "area": 0.0375,
+          "bounds": [
+            57.329,
+            12.134,
+            57.579,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3C4",
+            "91D",
+            "91E"
+          ],
+          "area": 0.09375,
+          "bounds": [
+            57.329,
+            16.284,
+            57.579,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "60E",
+            "60F",
+            "7AD",
+            "7AE"
+          ],
+          "area": 0.015,
+          "bounds": [
+            10.379,
+            4.365,
+            10.479,
+            4.515
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "542",
+            "7A2"
+          ],
+          "area": 0.01575,
+          "bounds": [
+            6.284,
+            6.113,
+            6.409,
+            6.239
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "7B7",
+            "7B8",
+            "7C0",
+            "7ED",
+            "7EE"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            24.929,
+            6.364,
+            25.029,
+            6.489
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "63F",
+            "909",
+            "93C"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            9.079,
+            -0.011,
+            9.204,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "79E",
+            "79F",
+            "907",
+            "908"
+          ],
+          "area": 0.09915,
+          "bounds": [
+            12.329,
+            -0.011,
+            12.648154,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "796",
+            "90D"
+          ],
+          "area": 0.065625,
+          "bounds": [
+            4.629,
+            -0.011,
+            4.804,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "90C",
+            "910"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            6.284,
+            -0.011,
+            6.409,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "excludedStairGraphics": [
+        "4DBD",
+        "4DBE",
+        "4DBF",
+        "4DC0",
+        "4DC1",
+        "4DC2",
+        "4DC3",
+        "4DC4",
+        "4DC5",
+        "4DC6",
+        "4DC7",
+        "4DC8",
+        "4DC9",
+        "4DCA",
+        "4DCB",
+        "4DCC",
+        "4DCD",
+        "4DCE",
+        "4DCF",
+        "4DD0",
+        "4DD1",
+        "4DD2",
+        "4DD3",
+        "4DD4",
+        "4DD5",
+        "4DD6",
+        "4DD7",
+        "4E1D",
+        "4E1E",
+        "4E1F",
+        "4E20",
+        "4E21",
+        "4E22",
+        "4E23",
+        "4E24",
+        "4E25",
+        "4E26",
+        "4E27",
+        "4E28",
+        "4E29",
+        "4E2A",
+        "4E2B",
+        "4E2C",
+        "4E2D",
+        "4E2E",
+        "4E74",
+        "4E75",
+        "4E76",
+        "4E77",
+        "4E78",
+        "4E79",
+        "4E7A",
+        "4E7B",
+        "4E7C",
+        "4E7D",
+        "4E7E",
+        "4E7F",
+        "4E80",
+        "4E81",
+        "4E82",
+        "4E83",
+        "4E84",
+        "4E85",
+        "4ECB",
+        "4ECC",
+        "4ECD",
+        "4ECE",
+        "4ECF",
+        "4ED0",
+        "4ED1",
+        "4ED2",
+        "4ED3",
+        "4ED4",
+        "4ED5",
+        "4ED6",
+        "4F1C",
+        "4F1D",
+        "4F1E",
+        "4F1F",
+        "4F20",
+        "4F21",
+        "4F22",
+        "4F23",
+        "4F24",
+        "4F25",
+        "4F26",
+        "4F27",
+        "4F28",
+        "4F29",
+        "4F2A",
+        "4F2B",
+        "4F2C",
+        "4F2D",
+        "4F2E",
+        "4F2F",
+        "4F75",
+        "4F76",
+        "4F77",
+        "4F78",
+        "4F79",
+        "4F7A",
+        "4F7B",
+        "4F7C",
+        "4F7D",
+        "4F7E",
+        "4F7F",
+        "4F80",
+        "4F81",
+        "4F82",
+        "4F83",
+        "4F84",
+        "4F85",
+        "4F86",
+        "4F87",
+        "4F88",
+        "4F89",
+        "4F8A",
+        "4F8B",
+        "4F8C",
+        "4F8D",
+        "4F8E",
+        "4F8F",
+        "4F90",
+        "4F91",
+        "4F92",
+        "4F93",
+        "4F94",
+        "4F95",
+        "4F96",
+        "4F97",
+        "4F98",
+        "4F99",
+        "4F9A",
+        "4F9B",
+        "4F9C",
+        "4F9D",
+        "4F9E",
+        "4F9F",
+        "4FA0",
+        "4FA1",
+        "4FA2",
+        "4FA3",
+        "4FA4",
+        "4FA5",
+        "4FA6",
+        "4FA7",
+        "4FA8",
+        "4FA9",
+        "4FEF"
+      ],
+      "sourceBoundedJoins": [
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "798",
+            "915",
+            "794",
+            "797"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            -0.006,
+            -0.011,
+            0.369,
+            0.364
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "3CF",
+            "27E",
+            "103",
+            "27F"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            69.539,
+            16.284,
+            69.914,
+            16.659
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "26F",
+            "27E",
+            "270",
+            "272"
+          ],
+          "area": 0.022801,
+          "bounds": [
+            69.763,
+            10.159,
+            69.914,
+            10.31
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "27E",
+            "1F9",
+            "1FB"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            69.539,
+            11.884,
+            69.914,
+            12.009
+          ],
+          "basis": "measured transverse partition T at continuous outer facade; only existing missing piece added before door/window cuts"
+        }
+      ],
+      "retainingPanel": null,
+      "crossFloorPortals": [],
+      "exteriorFeatures": [],
+      "terrainPreservationAreas": [],
+      "duplicateWindowEntities": [],
+      "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
+      "doorSourceCorrections": []
+    },
+    {
+      "id": "n06",
+      "roomCount": 55,
+      "solidCount": 245,
+      "sourceBounds": [
+        0.369,
+        0.364,
+        69.539,
+        16.284
+      ],
+      "doorCount": 102,
+      "windowCount": 43,
+      "wallPairCount": 1185,
+      "unresolvedStrongEdges": [],
+      "earlyBoundaryCandidates": [
+        {
+          "entity": "278",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "3C9",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "78A",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "907",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "resolvedByLaterConstruction": [
+        {
+          "entity": "278",
+          "length": 6.4995,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "3C9",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "78A",
+          "length": 2.485,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "907",
+          "length": 2.25,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        }
+      ],
+      "inferredBoundaries": [],
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "90C",
+            "917"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            63.499,
+            16.284,
+            63.624,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "276",
+            "277",
+            "3CA",
+            "3CB"
+          ],
+          "area": 0.015625,
+          "bounds": [
+            63.499,
+            10.409,
+            63.624,
+            10.534
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "347",
+            "348",
+            "387",
+            "388"
+          ],
+          "area": 0.015,
+          "bounds": [
+            59.429,
+            12.134,
+            59.529,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "37B",
+            "387",
+            "388",
+            "91B"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            59.429,
+            10.159,
+            59.529,
+            10.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "347",
+            "348",
+            "386",
+            "3BB",
+            "3BE"
+          ],
+          "area": 0.0375,
+          "bounds": [
+            57.329,
+            12.134,
+            57.579,
+            12.284
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3BE",
+            "90F",
+            "910"
+          ],
+          "area": 0.09375,
+          "bounds": [
+            57.329,
+            16.284,
+            57.579,
+            16.659
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "608",
+            "609",
+            "79F",
+            "7A0"
+          ],
+          "area": 0.015,
+          "bounds": [
+            10.379,
+            4.365,
+            10.479,
+            4.515
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "53C",
+            "794"
+          ],
+          "area": 0.015625,
+          "bounds": [
+            6.284,
+            6.114,
+            6.409,
+            6.239
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "7A9",
+            "7AA",
+            "7B2",
+            "7DF",
+            "7E0"
+          ],
+          "area": 0.0125,
+          "bounds": [
+            24.929,
+            6.364,
+            25.029,
+            6.489
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "637",
+            "970",
+            "971"
+          ],
+          "area": 0.04925,
+          "bounds": [
+            19.782,
+            -0.086,
+            19.979,
+            0.164
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "790",
+            "791",
+            "8F9",
+            "8FA",
+            "970",
+            "971"
+          ],
+          "area": 0.10875,
+          "bounds": [
+            12.329,
+            -0.086,
+            12.579,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "636",
+            "8FB",
+            "92E"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            9.079,
+            -0.011,
+            9.204,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "788",
+            "8FF"
+          ],
+          "area": 0.065625,
+          "bounds": [
+            4.629,
+            -0.011,
+            4.804,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "8FE",
+            "902"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            6.284,
+            -0.011,
+            6.409,
+            0.364
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "excludedStairGraphics": [
+        "21A2",
+        "21A3",
+        "21A4",
+        "21A5",
+        "4D96",
+        "4D97:0",
+        "4D97:1",
+        "4D97:10",
+        "4D97:11",
+        "4D97:12",
+        "4D97:13",
+        "4D97:14",
+        "4D97:15",
+        "4D97:2",
+        "4D97:3",
+        "4D97:4",
+        "4D97:5",
+        "4D97:6",
+        "4D97:7",
+        "4D97:8",
+        "4D97:9",
+        "4DAB:1",
+        "4DAB:10",
+        "4DAB:11",
+        "4DAB:12",
+        "4DAB:13",
+        "4DAB:14",
+        "4DAB:15",
+        "4DAB:16",
+        "4DAB:2",
+        "4DAB:3",
+        "4DAB:4",
+        "4DAB:5",
+        "4DAB:6",
+        "4DAB:7",
+        "4DAB:8",
+        "4DAB:9",
+        "4DC0:0",
+        "4DC0:1",
+        "4DC0:10",
+        "4DC0:11",
+        "4DC0:12",
+        "4DC0:13",
+        "4DC0:14",
+        "4DC0:15",
+        "4DC0:2",
+        "4DC0:3",
+        "4DC0:4",
+        "4DC0:5",
+        "4DC0:6",
+        "4DC0:7",
+        "4DC0:8",
+        "4DC0:9",
+        "4DD4",
+        "4DD5:0",
+        "4DD5:1",
+        "4DD5:10",
+        "4DD5:11",
+        "4DD5:12",
+        "4DD5:13",
+        "4DD5:14",
+        "4DD5:15",
+        "4DD5:2",
+        "4DD5:3",
+        "4DD5:4",
+        "4DD5:5",
+        "4DD5:6",
+        "4DD5:7",
+        "4DD5:8",
+        "4DD5:9",
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "D06",
+        "D07",
+        "D08",
+        "D14",
+        "D15",
+        "D16",
+        "D17",
+        "D18",
+        "D19",
+        "D1B",
+        "D1C",
+        "D1D",
+        "D1E",
+        "D1F",
+        "D20",
+        "D21",
+        "D22",
+        "D24",
+        "D25",
+        "D26",
+        "D27",
+        "D28",
+        "D29",
+        "D2A",
+        "D2B",
+        "D2C",
+        "D2D",
+        "D2E",
+        "D2F",
+        "D30",
+        "D31",
+        "D32",
+        "D33",
+        "D34",
+        "D36",
+        "D37",
+        "D38",
+        "D39",
+        "D3A",
+        "D3B",
+        "D3C",
+        "D3D",
+        "D3F",
+        "D40",
+        "D41",
+        "D42",
+        "D43",
+        "D44",
+        "D45",
+        "D46",
+        "D47",
+        "D48",
+        "F65",
+        "F66",
+        "F67",
+        "F68",
+        "F69",
+        "F6A",
+        "F6B",
+        "F6C",
+        "F6D",
+        "F6E",
+        "F6F",
+        "F70",
+        "F71",
+        "F72",
+        "F73",
+        "F74",
+        "F75",
+        "F76",
+        "F77",
+        "F78",
+        "F79",
+        "F7A",
+        "F7B",
+        "F7C",
+        "F7D",
+        "F7E",
+        "F7F",
+        "F80",
+        "F81",
+        "F82",
+        "F83",
+        "F84",
+        "F85",
+        "F86",
+        "F87",
+        "F88",
+        "F95",
+        "F96",
+        "F97",
+        "F98",
+        "F99",
+        "F9A",
+        "F9B",
+        "F9C",
+        "F9D",
+        "F9F",
+        "FA0",
+        "FA1",
+        "FA2",
+        "FA3",
+        "FA4",
+        "FA5",
+        "FA6",
+        "FA7",
+        "FA8",
+        "FA9",
+        "FAA",
+        "FAB",
+        "FAC",
+        "FAD"
+      ],
+      "sourceBoundedJoins": [
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "78A",
+            "907",
+            "786",
+            "789"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            -0.006,
+            -0.011,
+            0.369,
+            0.364
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "3C9",
+            "278",
+            "FD",
+            "279"
+          ],
+          "area": 0.140625,
+          "bounds": [
+            69.539,
+            16.284,
+            69.914,
+            16.659
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "269",
+            "278",
+            "26A",
+            "26C"
+          ],
+          "area": 0.022801,
+          "bounds": [
+            69.763,
+            10.159,
+            69.914,
+            10.31
+          ],
+          "basis": "measured outer L corner; only existing missing piece added before door/window cuts"
+        },
+        {
+          "kind": "sourceBoundedB6Join",
+          "entities": [
+            "278",
+            "1F3",
+            "1F5"
+          ],
+          "area": 0.046875,
+          "bounds": [
+            69.539,
+            11.884,
+            69.914,
+            12.009
+          ],
+          "basis": "measured transverse partition T at continuous outer facade; only existing missing piece added before door/window cuts"
+        }
+      ],
+      "retainingPanel": null,
+      "crossFloorPortals": [
+        {
+          "id": "n06-through-n05-door-4D34",
+          "floor": "n06",
+          "sourceFloor": "n05",
+          "sourceDoorId": "n05-door-4D34",
+          "sourceEntities": [
+            "4D34",
+            "4D3D",
+            "970",
+            "971"
+          ],
+          "bottom": 13.5,
+          "top": 15.6,
+          "basis": "existing lower mezzanine doorway, same measured X span; remove only overlapping upper wall/slab up to the existing door head; N06 sides and upper lintel retained",
+          "loops": [
+            [
+              [
+                14.414,
+                -0.086
+              ],
+              [
+                14.414,
+                0.364
+              ],
+              [
+                15.254,
+                0.364
+              ],
+              [
+                15.254,
+                -0.086
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "n06-through-n05-door-4D3E",
+          "floor": "n06",
+          "sourceFloor": "n05",
+          "sourceDoorId": "n05-door-4D3E",
+          "sourceEntities": [
+            "4D3E",
+            "4D53",
+            "970",
+            "971"
+          ],
+          "bottom": 13.5,
+          "top": 15.6,
+          "basis": "existing lower mezzanine doorway, same measured X span; remove only overlapping upper wall/slab up to the existing door head; N06 sides and upper lintel retained",
+          "loops": [
+            [
+              [
+                15.254,
+                -0.086
+              ],
+              [
+                15.254,
+                0.364
+              ],
+              [
+                16.094,
+                0.364
+              ],
+              [
+                16.094,
+                -0.086
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "n06-through-n05-door-4D61",
+          "floor": "n06",
+          "sourceFloor": "n05",
+          "sourceDoorId": "n05-door-4D61",
+          "sourceEntities": [
+            "4D61",
+            "4D60",
+            "970",
+            "971"
+          ],
+          "bottom": 13.5,
+          "top": 15.6,
+          "basis": "existing lower mezzanine doorway, same measured X span; remove only overlapping upper wall/slab up to the existing door head; N06 sides and upper lintel retained",
+          "loops": [
+            [
+              [
+                16.174,
+                -0.086
+              ],
+              [
+                16.174,
+                0.364
+              ],
+              [
+                17.014,
+                0.364
+              ],
+              [
+                17.014,
+                -0.086
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "n06-through-n05-door-4D77",
+          "floor": "n06",
+          "sourceFloor": "n05",
+          "sourceDoorId": "n05-door-4D77",
+          "sourceEntities": [
+            "4D77",
+            "4D76",
+            "970",
+            "971"
+          ],
+          "bottom": 13.5,
+          "top": 15.6,
+          "basis": "existing lower mezzanine doorway, same measured X span; remove only overlapping upper wall/slab up to the existing door head; N06 sides and upper lintel retained",
+          "loops": [
+            [
+              [
+                17.014,
+                -0.086
+              ],
+              [
+                17.014,
+                0.364
+              ],
+              [
+                17.854,
+                0.364
+              ],
+              [
+                17.854,
+                -0.086
+              ]
+            ]
+          ]
+        }
+      ],
+      "exteriorFeatures": [],
+      "terrainPreservationAreas": [],
+      "duplicateWindowEntities": [],
+      "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
+      "doorSourceCorrections": []
+    },
+    {
+      "id": "n07",
+      "roomCount": 2,
+      "solidCount": 9,
+      "sourceBounds": [
+        9.379,
+        4.362,
+        60.504,
+        13.593
+      ],
+      "doorCount": 0,
+      "windowCount": 2,
+      "wallPairCount": 16,
+      "unresolvedStrongEdges": [],
+      "earlyBoundaryCandidates": [
+        {
+          "entity": "3D",
+          "length": 3.63,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "3E",
+          "length": 3.63,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "41",
+          "length": 3.26,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "4E",
+          "length": 3.63,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "4F",
+          "length": 3.26,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "50",
+          "length": 3.63,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "resolvedByLaterConstruction": [
+        {
+          "entity": "3D",
+          "length": 3.63,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "3E",
+          "length": 3.63,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "41",
+          "length": 3.26,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "4E",
+          "length": 3.63,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "4F",
+          "length": 3.26,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        },
+        {
+          "entity": "50",
+          "length": 3.63,
+          "reason": "no-nearby-room-boundary",
+          "remainingLength": 0.0,
+          "coverageTolerance": 0.002,
+          "coverageBasis": "final wall XY projection after junctions/openings; not a vertical clearance assertion"
+        }
+      ],
+      "inferredBoundaries": [],
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3D",
+            "3F",
+            "41",
+            "42"
+          ],
+          "area": 0.04,
+          "bounds": [
+            57.444,
+            10.163,
+            57.644,
+            10.363
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3D",
+            "3F",
+            "43",
+            "44"
+          ],
+          "area": 0.04,
+          "bounds": [
+            57.444,
+            13.593,
+            57.644,
+            13.793
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3E",
+            "40",
+            "46",
+            "47"
+          ],
+          "area": 0.04,
+          "bounds": [
+            60.504,
+            13.593,
+            60.704,
+            13.793
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3E",
+            "40",
+            "41",
+            "42"
+          ],
+          "area": 0.04,
+          "bounds": [
+            60.504,
+            10.163,
+            60.704,
+            10.363
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "4A",
+            "4E",
+            "53",
+            "54"
+          ],
+          "area": 0.04,
+          "bounds": [
+            12.239,
+            7.592,
+            12.439,
+            7.792
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "4A",
+            "4B",
+            "4E",
+            "4F"
+          ],
+          "area": 0.04,
+          "bounds": [
+            12.239,
+            4.162,
+            12.439,
+            4.362
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "4B",
+            "4C",
+            "4F",
+            "50"
+          ],
+          "area": 0.04,
+          "bounds": [
+            9.179,
+            4.162,
+            9.379,
+            4.362
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "49",
+            "4C",
+            "4D",
+            "50"
+          ],
+          "area": 0.04,
+          "bounds": [
+            9.179,
+            7.592,
+            9.379,
+            7.792
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "excludedStairGraphics": [],
+      "sourceBoundedJoins": [],
+      "retainingPanel": null,
+      "crossFloorPortals": [],
+      "exteriorFeatures": [],
+      "terrainPreservationAreas": [],
+      "duplicateWindowEntities": [],
+      "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
+      "doorSourceCorrections": []
+    }
+  ],
+  "limitations": [
+    "No measured interior section; heights pending IPR calibration",
+    "Roof heads do not imply accessible invented roof flights",
+    "Original CAD is historical and explicitly not newly surveyed",
+    "Native model/doorway/stair/terrain acceptance is required; preparation does not prove player reachability"
+  ],
+  "recipeSha256": "f3cd31d0f91460740b5b543b9e8067c5ba50949774a7ba8b92514a0114900d61"
+}

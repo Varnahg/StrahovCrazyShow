@@ -19,6 +19,7 @@ from mathutils.bvhtree import BVHTree
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from model_io import oriented_triangle
+from model_geometry import building_identity
 
 
 def arguments():
@@ -29,7 +30,7 @@ def arguments():
     parser.add_argument('--collision',type=Path)
     parser.add_argument('--output',type=Path)
     parser.add_argument('--render-dir',type=Path)
-    parser.add_argument('--render-floor',default='all',choices=['all','plans','overall','p01','n01','n02','n03','n04','interiors','roof-interior'])
+    parser.add_argument('--render-floor',default='all',choices=['all','plans','overall','p01','n01','n02','n03','n04','n05','n06','n07','interiors','roof-interior'])
     args=parser.parse_args(sys.argv[sys.argv.index('--')+1:])
     if not args.self_test and not all([args.blend,args.glb,args.collision,args.output]):
         parser.error('Audit potřebuje --blend, --glb, --collision a --output')
@@ -60,6 +61,7 @@ def primitive_tests():
     geometry.window('n02',{'id':'high-wing-window','a':[265,731],'b':[266,731],
                            'bottom':3.3,'top':6.05,'lowerInfillHeight':0.75})
     root=bpy.data.objects.new('probe',None);bpy.context.scene.collection.objects.link(root)
+    root['buildingId']='b01'
     results=[]
     for obj in module.create_meshes(geometry,root):
         obj.data.calc_loop_triangles();volume=0
@@ -102,13 +104,14 @@ def primitive_tests():
     stair_geometry.landing('n01','skew-upper-landing',[ring],
                            [[ring[0],ring[1],ring[2]],[ring[0],ring[2],ring[3]]],1.4,skew['riser'])
     stair_root=bpy.data.objects.new('stair-probe',None);bpy.context.scene.collection.objects.link(stair_root)
+    stair_root['buildingId']='b01'
     stair_objects=module.create_meshes(stair_geometry,stair_root)
     for obj in stair_objects:
         obj.data.calc_loop_triangles()
         for triangle in obj.data.loop_triangles:
             a,b,c=[obj.data.vertices[i].co for i in triangle.vertices]
             assert (b-a).cross(c-a).length>1e-10,('Degenerovaný schodišťový probe',obj.name)
-    recipe={'cadOrigin':[250,731],'floors':[{'id':'n01','elevation':0}]}
+    recipe={'buildingId':'b01','cadOrigin':[250,731],'floors':[{'id':'n01','elevation':0}]}
     bpy.context.view_layer.update()
     exported=module.export_collision(stair_objects,recipe,[flight,measured,skew])
     current=stair_clearance(exported)
@@ -119,7 +122,35 @@ def primitive_tests():
     bpy.context.view_layer.update()
     moved=stair_clearance(module.export_collision(stair_objects,recipe,[flight,measured,skew]))
     assert moved['missingSupport'],'Zastaralé anotace po posunu masteru musí selhat'
-    print(json.dumps({'status':'primitive-tests-pass','parts':results,'staleStairAnnotationsRejected':True}))
+    # A synthetic packed PNG checks the new audit path without source imagery.
+    material=module.make_material('plaster','b06')
+    shader=material.node_tree.nodes.get('Principled BSDF')
+    image=bpy.data.images.new('synthetic-photo-audit-fixture',width=2,height=2)
+    image.pixels[:]=[.2,.3,.4,1]*4
+    image.pack();packed=bytes(image.packed_file.data)
+    for data in [material,image]:
+        data['provenance']='IPR2023-derived';data['sourceManifestSha256']='0'*64
+    image['imageSha256']=hashlib.sha256(packed).hexdigest()
+    texture=material.node_tree.nodes.new('ShaderNodeTexImage');texture.image=image
+    material.node_tree.links.new(texture.outputs['Color'],shader.inputs['Base Color'])
+    spec={'textures':[{'source':0}],'images':[{'bufferView':0,'mimeType':'image/png'}],
+          'bufferViews':[{'byteLength':len(packed)}]}
+    portable={'name':material.name,'extras':{'sourceManifestSha256':'0'*64},
+              'pbrMetallicRoughness':{'baseColorTexture':{'index':0},
+                  'roughnessFactor':shader.inputs['Roughness'].default_value,
+                  'metallicFactor':shader.inputs['Metallic'].default_value}}
+    audit_material(material,portable,spec,packed)
+    try:
+        audit_material(material,portable,spec,bytes([packed[0]^1])+packed[1:])
+    except AssertionError:pass
+    else:raise AssertionError('Změněné GLB pixely nesmějí projít auditem')
+    try:
+        audit_material(material,{**portable,'pbrMetallicRoughness':{
+            **portable['pbrMetallicRoughness'],'baseColorTexture':{'index':0,'texCoord':1}}},spec,packed)
+    except AssertionError:pass
+    else:raise AssertionError('Jiný UV kanál nesmí projít auditem')
+    print(json.dumps({'status':'primitive-tests-pass','parts':results,'staleStairAnnotationsRejected':True,
+                      'packedPhotoFixtureVerified':True,'changedPhotoPixelsAndUvChannelRejected':True}))
 
 
 def glb_data(path):
@@ -230,23 +261,71 @@ def stair_clearance(expected):
             'scope':'Opora a svislá světlost nad středy stupňů; nenahrazuje prostorový průchod herního controlleru.'}
 
 
+def audit_material(material, portable_material, spec, binary):
+    """Check the actual assigned PBR slot, including portable photo pixels."""
+    shader=material.node_tree.nodes.get('Principled BSDF')
+    assert shader is not None,('Chybí Principled shader',material.name)
+    pbr=portable_material.get('pbrMetallicRoughness',{})
+    alpha=shader.inputs['Alpha'].default_value
+    assert not shader.inputs['Alpha'].is_linked,'Neověřená texturovaná průhlednost'
+    color=tuple(shader.inputs['Base Color'].default_value)
+    if shader.inputs['Base Color'].is_linked:
+        links=list(shader.inputs['Base Color'].links)
+        assert len(links)==1 and links[0].from_node.type=='TEX_IMAGE' and links[0].from_socket.name=='Color'
+        node=links[0].from_node;image=node.image
+        assert image is not None and image.packed_file,'Fototextura není přenosně zabalená'
+        if node.inputs['Vector'].is_linked:
+            vector_links=list(node.inputs['Vector'].links)
+            assert len(vector_links)==1 and vector_links[0].from_node.type=='UVMAP'
+            assert vector_links[0].from_node.uv_map=='UVMap','Jiný nativní UV kanál'
+        assert material.get('provenance')==image.get('provenance')=='IPR2023-derived'
+        source_hash=material.get('sourceManifestSha256')
+        assert isinstance(source_hash,str) and len(source_hash)==64 and source_hash==image.get('sourceManifestSha256')
+        packed=bytes(image.packed_file.data)
+        assert image.get('imageSha256')==hashlib.sha256(packed).hexdigest(),'Jiný obsah původní packed fototextury'
+        texture=pbr.get('baseColorTexture')
+        assert texture and texture.get('texCoord',0)==0 and not texture.get('extensions'),'Jiná mapa fototextury'
+        portable_image=spec['images'][spec['textures'][texture['index']]['source']]
+        assert 'uri' not in portable_image and portable_image.get('mimeType')=='image/png','Fototextura musí být embedded PNG'
+        view=spec['bufferViews'][portable_image['bufferView']]
+        offset=view.get('byteOffset',0)
+        assert binary[offset:offset+view['byteLength']]==packed,'GLB změnil packed foto pixely'
+        assert portable_material.get('extras',{}).get('sourceManifestSha256')==source_hash
+        expected_color=(1,1,1,alpha)
+    else:
+        assert 'baseColorTexture' not in pbr,'Nečekaná GLB textura'
+        expected_color=(*color[:3],alpha)
+    assert max(abs(a-b) for a,b in zip(expected_color,pbr.get('baseColorFactor',[1,1,1,1])))<0.000001,(material.name,'Jiná PBR barva')
+    for field,input_name in [('roughnessFactor','Roughness'),('metallicFactor','Metallic')]:
+        assert not shader.inputs[input_name].is_linked,('Neověřená PBR mapa',input_name)
+        assert abs(shader.inputs[input_name].default_value-pbr.get(field,1))<0.000001,(material.name,field)
+    assert 'metallicRoughnessTexture' not in pbr and 'normalTexture' not in portable_material,'Neověřená foto změna povrchu'
+    assert portable_material.get('doubleSided',False)==(not material.use_backface_culling),(material.name,'Jiné backface culling')
+    assert portable_material.get('alphaMode','OPAQUE')==('BLEND' if alpha<1 else 'OPAQUE'),(material.name,'Jiný alpha režim')
+
+
 def audit(args):
     expected=json.loads(args.collision.read_text(encoding='utf-8'))
     assert expected['blendSha256']==hashlib.sha256(args.blend.read_bytes()).hexdigest(),'Změněný Blender master'
     assert expected['glbSha256']==hashlib.sha256(args.glb.read_bytes()).hexdigest(),'Změněný GLB'
     bpy.ops.wm.open_mainfile(filepath=str(args.blend.resolve()))
-    root=bpy.data.objects.get('building:osm:way:53929063')
-    assert root is not None and root.get('buildingId')=='b01'
+    assert expected['identity']==building_identity(expected['id']),'Nesprávná identita budovy'
+    root=bpy.data.objects.get(expected['identity'])
+    assert root is not None and root.get('buildingId')==expected['id']
     assert 'titleBlock' not in root.get('sourceProvenance',''),'Původní rozpiska nesmí být přibalena'
     objects=[o for o in bpy.data.objects if o.type=='MESH']
     assert objects and all(o.parent==root for o in objects),'Cizí nebo nepřipojené části'
-    assert {o.get('floorId') for o in objects}=={'p01','n01','n02','n03','n04'},'Chybějící podlaží'
-    assert not bpy.data.images or all(not image.filepath for image in bpy.data.images),'Model nesmí záviset na původních výkresech'
+    assert {o.get('floorId') for o in objects}=={floor['id'] for floor in expected['floors']},'Chybějící podlaží'
+    assert json.loads(root['floorMetadata'])==expected['floors'],'Jiná metadata podlaží'
+    assert all(o.get('buildingId')==expected['id'] for o in objects),'Cizí vlastník části'
+    assert all(not image.filepath and image.packed_file and image.get('provenance')=='IPR2023-derived'
+               for image in bpy.data.images),'Povolené jsou pouze zabalené odvozené fototextury; žádné původní výkresy'
     assert not bpy.data.texts,'Model nesmí balit původní dokumenty jako Text'
     all_points=[];mesh_report=[];native={}
     for obj in objects:
         assert obj.scale==Vector((1,1,1)),obj.name
         mesh=obj.data;mesh.calc_loop_triangles()
+        assert mesh.uv_layers.active==mesh.uv_layers[0] and mesh.uv_layers[0].name=='UVMap','Nejednoznačný aktivní UV kanál'
         points=[obj.matrix_world@v.co for v in mesh.vertices]
         assert all(all(math.isfinite(v) for v in p) for p in points)
         zero=0;volume=0.0;normals={}
@@ -261,7 +340,9 @@ def audit(args):
             for index in t.loops:
                 normal=(normal_matrix@mesh.corner_normals[index].vector).normalized()
                 corner.append((normal.x,normal.z,-normal.y))
-            normals.setdefault(key,[]).append(corner[offset:]+corner[:offset])
+            uv=[tuple(mesh.uv_layers.active.data[index].uv) for index in t.loops]
+            normals.setdefault(key,[]).append({'normals':corner[offset:]+corner[:offset],
+                'uv':uv[offset:]+uv[:offset],'material':mesh.materials[t.material_index].name})
         assert zero==0,(obj.name,'nulové trojúhelníky',zero)
         assert volume>0,(obj.name,'obrácený nebo prázdný objem',volume)
         all_points.extend(points)
@@ -283,25 +364,19 @@ def audit(args):
         normal_matrix=matrices[index].inverted().transposed().to_3x3()
         for primitive in spec['meshes'][node['mesh']]['primitives']:
             assert primitive.get('mode',4)==4
-            material=native[key]['object'].data.materials[0]
-            shader=material.node_tree.nodes.get('Principled BSDF')
             portable_material=spec['materials'][primitive['material']]
-            pbr=portable_material.get('pbrMetallicRoughness',{})
-            color=tuple(shader.inputs['Base Color'].default_value)
-            alpha=shader.inputs['Alpha'].default_value
-            expected_color=(*color[:3],alpha)
-            assert max(abs(a-b) for a,b in zip(expected_color,pbr.get('baseColorFactor',[1,1,1,1])))<0.000001,(key,'Jiná PBR barva')
-            for field,input_name in [('roughnessFactor','Roughness'),('metallicFactor','Metallic')]:
-                assert abs(shader.inputs[input_name].default_value-pbr.get(field,1))<0.000001,(key,field)
-            assert portable_material.get('doubleSided',False)==(not material.use_backface_culling),(key,'Jiné backface culling')
-            assert portable_material.get('alphaMode','OPAQUE')==('BLEND' if alpha<1 else 'OPAQUE'),(key,'Jiný alpha režim')
+            material=native[key]['object'].data.materials.get(portable_material.get('name',''))
+            assert material is not None,(key,'GLB má cizí materiál')
+            audit_material(material,portable_material,spec,binary)
             points=[tuple(matrices[index]@Vector(p)) for p in accessor(spec,binary,primitive['attributes']['POSITION'])]
             indices=[r[0] for r in accessor(spec,binary,primitive['indices'])]
             raw_normals=accessor(spec,binary,primitive['attributes']['NORMAL'])
             assert len(raw_normals)==len(points)
             assert all(abs(Vector(n).length-1)<0.001 for n in raw_normals),('Nenormalizované GLB normály',key)
             normals=[tuple((normal_matrix@Vector(n)).normalized()) for n in raw_normals]
-            primitives.append((points,indices,normals))
+            uvs=accessor(spec,binary,primitive['attributes']['TEXCOORD_0'])
+            assert len(uvs)==len(points) and all(all(math.isfinite(v) for v in uv) for uv in uvs)
+            primitives.append((points,indices,normals,uvs,material.name))
         portable[key]=primitives
     assert set(portable)==set(native),'Jiná sada částí native/GLB (včetně dveří a rámů)'
     export_comparisons=[]
@@ -310,9 +385,9 @@ def audit(args):
         triangles=canonical_triangles(vertices,part['indices'])
         tree=KDTree(len(vertices))
         for index,position in enumerate(vertices):tree.insert(position,index)
-        tree.balance();actual=Counter();max_glb_error=0;max_normal_error=0
+        tree.balance();actual=Counter();max_glb_error=0;max_normal_error=0;max_uv_error=0
         available={key:list(values) for key,values in part['normals'].items()}
-        for points,indices,normals in portable[name]:
+        for points,indices,normals,uvs,material_name in portable[name]:
             mapped=[]
             for point in points:
                 _,index,distance=tree.find(point)
@@ -326,14 +401,21 @@ def audit(args):
                 assert available.get(key),(name,'Chybějící nebo obrácený GLB trojúhelník',key)
                 actual_normals=[normals[i] for i in ids]
                 actual_normals=actual_normals[offset:]+actual_normals[:offset]
-                errors=[max((Vector(a)-Vector(b)).length for a,b in zip(actual_normals,candidate)) for candidate in available[key]]
+                actual_uv=[(uvs[i][0],1-uvs[i][1]) for i in ids]
+                actual_uv=actual_uv[offset:]+actual_uv[:offset]
+                errors=[max((Vector(a)-Vector(b)).length for a,b in zip(actual_normals,candidate['normals']))
+                        if candidate['material']==material_name else math.inf for candidate in available[key]]
                 best=min(range(len(errors)),key=errors.__getitem__)
                 error=errors[best];max_normal_error=max(max_normal_error,error)
                 assert error<0.0002,(name,'GLB normály se liší od Blenderu',error)
+                uv_error=max((Vector(a)-Vector(b)).length for a,b in zip(actual_uv,available[key][best]['uv']))
+                max_uv_error=max(max_uv_error,uv_error)
+                assert uv_error<0.00002,(name,'GLB UV se liší od Blenderu',uv_error)
                 available[key].pop(best)
         mismatch=sum((triangles-actual).values())+sum((actual-triangles).values())
         assert mismatch==0,(name,'GLB/native jiné orientované trojúhelníky',mismatch)
-        export_comparisons.append({'id':name,'maxGlbErrorMetres':max_glb_error,'maxCornerNormalError':max_normal_error,'triangles':len(part['indices'])//3,'glbTriangleMismatch':mismatch})
+        export_comparisons.append({'id':name,'maxGlbErrorMetres':max_glb_error,'maxCornerNormalError':max_normal_error,
+                                   'maxCornerUvError':max_uv_error,'triangles':len(part['indices'])//3,'glbTriangleMismatch':mismatch})
     assert {p['id'] for p in expected['parts']}=={name for name,part in native.items() if part['object'].get('collision')},'Jiná sada konstrukčních kolizí'
     comparisons=[]
     for part in expected['parts']:
@@ -347,7 +429,7 @@ def audit(args):
     clearance=stair_clearance(expected)
     result={
         'status':'geometry-pass-visual-acceptance-separate' if not clearance['blocked'] and not clearance['missingSupport'] else 'stair-clearance-failed',
-        'buildingId':'b01','blenderVersion':bpy.app.version_string,
+        'buildingId':expected['id'],'blenderVersion':bpy.app.version_string,
         'blendSha256':expected['blendSha256'],'glbSha256':expected['glbSha256'],
         'boundsBlender':bounds,'meshes':mesh_report,
         'exportComparisons':export_comparisons,'collisionComparisons':comparisons,
@@ -365,6 +447,9 @@ def audit(args):
 
 
 def render(args,objects,bounds):
+    root=objects[0].parent
+    building_id=root['buildingId']
+    floor_ids=[floor['id'] for floor in json.loads(root['floorMetadata'])]
     scene=bpy.context.scene
     scene.render.engine='CYCLES';scene.cycles.device='CPU';scene.cycles.samples=16
     scene.cycles.use_denoising=True
@@ -386,20 +471,20 @@ def render(args,objects,bounds):
         scene.render.filepath=str((args.render_dir/(name+'.png')).resolve())
         bpy.ops.render.render(write_still=True)
     if args.render_floor in ['all','overall']:
-        shot('b01-overall',center+Vector((58,-76,52)),center,87)
+        shot(building_id+'-overall',center+Vector((58,-76,52)),center,87)
     if args.render_floor not in ['overall','interiors','roof-interior']:
-        floors=['p01','n01','n02','n03','n04'] if args.render_floor in ['all','plans'] else [args.render_floor]
+        floors=floor_ids if args.render_floor in ['all','plans'] else [args.render_floor]
         for floor in floors:
+            if floor not in floor_ids:raise ValueError('Neznámé podlaží pro render '+floor)
             for obj in objects:obj.hide_render=obj.get('floorId')!=floor
             # Záběr půdorysu v původní orientaci výkresu pro audit dveří/příček.
             # ortho_scale je při landscape renderu vodorovný rozsah kamery.
             span_x=bounds['max'][1]-bounds['min'][1]
             span_y=bounds['max'][0]-bounds['min'][0]
             scale=max(span_x,span_y*scene.render.resolution_x/scene.render.resolution_y)+8
-            shot('b01-'+floor,Vector((center.x,center.y,90)),Vector((center.x,center.y,0)),scale,math.pi/2)
+            shot(building_id+'-'+floor,Vector((center.x,center.y,90)),Vector((center.x,center.y,0)),scale,math.pi/2)
     for obj in objects:obj.hide_render=False
     if args.render_floor in ['interiors','roof-interior']:
-        root=bpy.data.objects['building:osm:way:53929063']
         floors={floor['id']:floor for floor in json.loads(root['floorMetadata'])}
         stairs=json.loads(root['stairAnnotations']);origin=list(root['cadOrigin'])
         def at(cad,z):return Vector((-(cad[1]-origin[1]),cad[0]-origin[0],z))
@@ -412,25 +497,28 @@ def render(args,objects,bounds):
             fill.location=position;fill.rotation_euler=camera.rotation_euler
             scene.render.filepath=str((args.render_dir/(name+'.png')).resolve())
             bpy.ops.render.render(write_still=True)
-        if args.render_floor=='roof-interior':
+        if args.render_floor=='roof-interior' and building_id=='b01':
             # N01 room29/2131: the eye is inside the measured wider lower wing,
             # outside the upper-storey footprint. Inspect its added roof soffit.
             interior('b01-interior-room29-roof',at([218.1,747.5],floors['n01']['wingElevation']+1.60),
                      at([217.3,748.15],floors['n01']['wingElevation']+2.05))
             return
-        interior('b01-interior-main-corridor',at([250,731],floors['n02']['elevation']+1.65),
-                 at([275,731],floors['n02']['elevation']+1.5))
-        # N02 room106/1F8E centroid; window2403/2406, confirmed from source.
-        interior('b01-interior-room106',at([249.737,735.462],floors['n02']['elevation']+1.60),
-                 at([249.739461,738.893721],floors['n02']['elevation']+1.55))
-        for route_id in ['n01-east-side-east','n02-n03-east-u']:
+        if building_id=='b01':
+            interior('b01-interior-main-corridor',at([250,731],floors['n02']['elevation']+1.65),
+                     at([275,731],floors['n02']['elevation']+1.5))
+            # N02 room106/1F8E centroid; window2403/2406, confirmed from source.
+            interior('b01-interior-room106',at([249.737,735.462],floors['n02']['elevation']+1.60),
+                     at([249.739461,738.893721],floors['n02']['elevation']+1.55))
+        route_ids=(['n01-east-side-east','n02-n03-east-u'] if building_id=='b01' else
+                   list(dict.fromkeys(flight['routeId'] for flight in stairs if flight['floor'] in {'n01','n02'})))
+        for route_id in route_ids:
             flight=next((item for item in stairs if item.get('routeId')==route_id and item.get('routeIndex')==0),None)
             if flight is None:raise ValueError('Chybí schodiště pro interiérový QA pohled '+route_id)
             access=flight.get('routeAccessPath',{});offset=access.get('offsetCad',[0,0])
             a=[v+offset[i] for i,v in enumerate(flight['a'])];b=[v+offset[i] for i,v in enumerate(flight['b'])]
             length=math.dist(a,b);lower=[a[i]-(b[i]-a[i])/length*.4 for i in range(2)]
             lower=access.get('lowerApproachCad',lower)
-            interior('b01-interior-'+route_id,at(lower,flight['bottom']+1.65),at(b,flight['top']+1.0))
+            interior(building_id+'-interior-'+route_id,at(lower,flight['bottom']+1.65),at(b,flight['top']+1.0))
 
 
 def main():
