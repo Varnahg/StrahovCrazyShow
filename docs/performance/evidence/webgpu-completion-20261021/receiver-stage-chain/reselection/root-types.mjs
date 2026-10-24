@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import ts from 'typescript';
+const roots = ['client/authored-light-preparation.ts', 'tests/receiver-light-preparation.test.ts', 'tests/receiver-stage-chain.test.ts', 'tests/fixtures/receiver-stage-chain/production.ts', 'tests/fixtures/receiver-stage-chain/probe.ts'];
+const hash = p => crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const before = Object.fromEntries(roots.map(p => [p, hash(p)]));
+const config = ts.readConfigFile('tsconfig.json', ts.sys.readFile).config;
+const options = ts.convertCompilerOptionsFromJson(config.compilerOptions, process.cwd()).options;
+const program = ts.createProgram(roots, options);
+const diagnostics = ts.getPreEmitDiagnostics(program).map(d => ({ file: d.file ? path.relative(process.cwd(), d.file.fileName).replaceAll('\\', '/') : null, code: d.code, message: ts.flattenDiagnosticMessageText(d.messageText, ' ') }));
+const syntax = roots.map(p => ({ path: p, diagnostics: ts.transpileModule(fs.readFileSync(p, 'utf8'), { compilerOptions: options, reportDiagnostics: true, fileName: p }).diagnostics?.length ?? 0 }));
+const after = Object.fromEntries(roots.map(p => [p, hash(p)]));
+const proof = { atUTC: new Date().toISOString(), roots, diagnostics, syntax, before, after, drift: JSON.stringify(before) !== JSON.stringify(after), sourceFiles: program.getSourceFiles().length, declarationFiles: program.getSourceFiles().filter(f => f.isDeclarationFile).length, scope: 'Five explicit roots plus all their transitive diagnostics; not whole-project TypeScript or build.' };
+fs.writeFileSync('.cache/webgpu-completion-20261021/validation/receiver-reselection-types.json', JSON.stringify(proof, null, 2) + '\n');
+console.log(JSON.stringify({ roots: roots.length, diagnostics: diagnostics.length, syntax: syntax.map(s => s.diagnostics), drift: proof.drift, sourceFiles: proof.sourceFiles }));
+if (diagnostics.length || syntax.some(s => s.diagnostics) || proof.drift) process.exitCode = 1;

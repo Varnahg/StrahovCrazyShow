@@ -12,6 +12,7 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { MorphTargetManager } from "@babylonjs/core/Morph/morphTargetManager";
+import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import "@babylonjs/core/Meshes/instancedMesh";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { AuthoredLightPreparation } from "../client/authored-light-preparation";
@@ -71,6 +72,46 @@ test("actual native Scene/PBR instance batch prepares useInstances without chang
   assert.ok(f.scene.getActiveMeshes().data.slice(0, f.scene.getActiveMeshes().length).includes(instance));
   assert.equal(source.isVisible, false); assert.deepEqual(f.camera.position, originalCamera);
   release(); source._processRendering = native;
+});
+
+for (const storage of ["mono", "per-pass"] as const)
+  test(`declared receiver is selected again after native ${storage} draw`, async t => {
+    const f = fixture(t), source = f.source(), instance = f.instance(source), helper = f.helper();
+    // NullEngine remains GLSL; select the actual WebGPU storage branch explicitly.
+    if (storage === "per-pass") (source as any)._instanceDataStorage.useMonoDataStorageRenderPass = false;
+    const native = source._processRendering;
+    let nativeInstanceDraws = 0;
+    source._processRendering = function (...args) {
+      if (args[5] && args[4].visibleInstances[args[1]._id]?.includes(instance)) nativeInstanceDraws++;
+      return Reflect.apply(native, this, args);
+    };
+    const release = helper.begin();
+    await f.material.forceCompilationAsync(source, { useInstances: true });
+    f.scene.render();
+    assert.ok(nativeInstanceDraws > 0, "first original draw must create a hardware instance batch");
+    assert.ok(source.getVerticesDataKinds().includes("world0"), "native matrix overlay must exist after the real draw");
+    assert.equal(source.getVerticesDataKinds(true).includes("world0"), false);
+    release();
+    assert.equal(instance.isEnabled(false), false);
+    assert.equal(f.scene.meshes.includes(instance), false);
+    const again = helper.begin();
+    assert.deepEqual(helper.selection, { selected: 1, unsupported: 0 });
+    const before = nativeInstanceDraws;
+    f.scene.render();
+    assert.ok(nativeInstanceDraws > before, "reacquired lease must reach the original native instance batch");
+    again(); source._processRendering = native;
+    assert.equal(instance.isEnabled(false), false);
+    assert.equal(f.scene.meshes.includes(instance), false);
+    assert.equal(source.isVisible, false);
+  });
+
+test("genuine instanced geometry named world0 remains explicitly unsupported", t => {
+  const f = fixture(t), source = f.source(); f.instance(source);
+  source.setVerticesBuffer(new VertexBuffer(f.engine, new Float32Array([1, 0, 0, 0]), "world0", false, false, 4, true));
+  assert.ok(source.getVerticesDataKinds(true).includes("world0"));
+  assert.equal(source.getVertexBuffer("world0", true)!.getInstanceDivisor(), 1);
+  const helper = f.helper(); helper.begin();
+  assert.deepEqual(helper.selection, { selected: 0, unsupported: 1 });
 });
 
 test("road-face instances and enabled stadium glass use producer declarations while unrelated and disabled tiers stay untouched", t => {

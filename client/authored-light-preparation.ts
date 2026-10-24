@@ -153,8 +153,10 @@ export class AuthoredLightPreparation {
             (instanced && node.instancedBuffers && Object.keys(node.instancedBuffers).length)) {
           this.selection.unsupported++; continue;
         }
-        const attributes = node.getVerticesDataKinds().sort().map(kind => {
-          const buffer = node.getVertexBuffer(kind)!;
+        // Native instance draws add world-matrix buffers to the mesh overlay,
+        // including the per-pass WebGPU path. Compare the source geometry ABI.
+        const attributes = node.getVerticesDataKinds(true).sort().map(kind => {
+          const buffer = node.getVertexBuffer(kind, true)!;
           return [kind, buffer.getSize(), buffer.type, buffer.normalized, buffer.byteStride, buffer.byteOffset, buffer.getInstanceDivisor()];
         });
         if (attributes.some(attribute => attribute[6] !== 0)) { this.selection.unsupported++; continue; }
