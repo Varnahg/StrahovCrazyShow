@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "webgpu-completion-main-sync-20261024",
   "title": "KEY-22: zahrnout ověřený main PR24 před novým source15",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "client/ui.tsx",
@@ -13,7 +13,7 @@
     ".cache/webgpu-main-sync-20261024/",
     "docs/agents/handoffs/webgpu-completion-main-sync-20261024.md"
   ],
-  "resources": ["heavy-validation"],
+  "resources": [],
   "acceptance": [
     "Před actual merge přečíst research/main-merge-source15-analysis.json a main-merge-source15-decision.json. Object-only Git preview zachoval HEAD/index/source; jediný konflikt je startupViewsRef.current?.reset() přidaný migrací do již společného disconnectRoom.",
     "Porovnat varianty: ponechat migrační reset a společný cleanup (volba), vynechat reset (ztráta lifecycle invalidace), slepé ours/theirs celého UI (riziko ztráty opravy). Přesné odstranění jediného marker bloku s ponecháním resetu dává BYTEEXACT současný UI blob44f49c84; další runtime/test delta v merge preview není.",
@@ -28,6 +28,7 @@
   ],
   "notes": [
     "Root koordinuje výslovně přidělený KEY22. Main PR24 merged2a7b1998; migrační avatar product8e111af9 přijat source/CPU. UI task333 je stále files-only do dokončení metadata/mainCI; před main-sync claim se výslovně uvolní.",
-    "CAD znovu vlastní heavy od04:10 a plánuje45–60min nativního B1 checkpointu; teprve potom výslovné předání na přibližně90min. Žádný čas sám nezakládá release."
+    "CAD znovu vlastní heavy od04:10 a plánuje45–60min nativního B1 checkpointu; teprve potom výslovné předání na přibližně90min. Žádný čas sám nezakládá release.",
+    "24Oct05:26UTC actual main2a7 merge7b1b5bae committed/pushed with two parents,66targetedPASS, actualindex/source17 equality and independent findings[]. No runtime delta. Ownprocesses complete, integration heavy released; next source15 validation uses its own resource claim."
   ]
 }
