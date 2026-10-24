@@ -737,3 +737,12 @@ Nejde o performanceA/B: proti předchozímu grassB1 se liší5NPC proti0, pořad
 ## WebGPU: neměnný uživatelský build4199 s resetem neaktivních příznaků
 
 18.10.2026: http://127.0.0.1:4199/?renderBackend=webgpu, API2594, immutable3d405db9. Source598/dist17 hashově ověřeno, actualEdge vstup/obraz/healthvalid/errors0 a disposal; karta vmenu. Normální počasí a Auto, prostřední neaktivní okno neníFPSdůkaz; závěrečnýhealthsmoke764×325 se nesrovnává s jízdou1175×500. Samostatná QA kombinovaná jízda0programů/2sync,max202,5ms,stále4intervaly>100ms. Runtime main6a7f7554, native1446/combined1506 a oba build/integracePASS. Hrané4198 a staršíbezezměny, služby4199/2594 běží pod vlastnírezervací. [Důkazy a omezení](performance/evidence/webgpu-migration-20261016/image-processing-user-build-4199/README.md).
+
+
+## KEY-49: oba zaznamenané průchody v testovací vrstvě — přejímka čeká
+
+20.10.2026: připraveny sampled render scénáře B6 (584 vzorků/24 změn) a venkovní auto (166/19), bez změny produkčního klienta/serveru/shared/API. 20/20 cílených testů, TypeScript/produkční build a všechny4 izolované SDK scénáře PASS; normální produkční bundle bez testových hooků. Lokální full suite byla výslovně ukončena jako neúplná, finální plná CI zatím chybí. Tři GPU starty v nezobrazeném/neaktivním panelu skončily před trasou; nejsou přejímkou ani důkazem nové produktové regrese. Otevření tohoto chatu/prohlížeče aplikace pouze zařadila do fronty. Skutečné přehrání obou tras i negativní kontrola čekají na aktivní panel; KEY-49 zůstává otevřené. Vlastní testovací karty/server byly ukončené, cizí WIP a hrané snapshoty zachované. [Důkazy, omezení a pokračování](performance/evidence/recorded-walkthrough-20261020/README.md).
+
+Doplnění KEY-49 po review:24/24 cílených PASS, znovu TS/produkční i testový build PASS a SHA-ověřený HTTP smoke obou fixture. Root opravil uložené počasí, terminální cleanup, skutečné render-state orákulum a bounded start/fixture IO. GPU obou průchodů a obou negativních kontrol nadále čeká na viditelný panel; původní20/20 výše je historický první checkpoint.
+
+KEY-49 po kontrole finálního endFrame:25/25 cílených PASS, znovu normální/testový build PASS. B3 je ošetřené post-frame health kontrolou a WebGPU queue fence s timeoutem; skutečné GPU průchody a negativní varianty nadále nejsou přijaté.
