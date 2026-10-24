@@ -73,6 +73,37 @@ test("trace identity, current profile and every expected door side are mandatory
   assert.throws(() => validateWorldTrace(omitted, context), /omitted model door/);
 });
 
+test("repeated native anchor tolerates sub-0.1mm ray height rounding but not displacement", async () => {
+  const {context,trace}=await fixture(),session=trace.proofSessions[0],start=session.start;
+  const delta=.0000223;
+  session.steps.push({passed:true,context:{from:session.steps[0].context.to,to:session.seed},legs:[{
+    target:{...start,floor:start.floor!+delta},passed:true,
+    finish:{x:start.x,y:.82+delta,z:start.z},remaining:0,footError:0}]});
+  trace.stats.moves++;
+  validateWorldTrace(trace,context);
+  const moved=structuredClone(trace);moved.proofSessions[0].steps[1].legs[0].target.floor=.0002;
+  moved.proofSessions[0].steps[1].legs[0].finish.y=.8202;
+  assert.throws(()=>validateWorldTrace(moved,context),/changes position/);
+  const sideways=structuredClone(trace);sideways.proofSessions[0].steps[1].legs[0].target.x+=.0002;
+  sideways.proofSessions[0].steps[1].legs[0].finish.x+=.0002;
+  assert.throws(()=>validateWorldTrace(sideways,context),/Anchor XY differs/);
+});
+
+test("a fixed paired leaf is excluded only with matching native coverage and verified protection", async () => {
+  const {context:original,trace}=await fixture(),b=original.building;
+  b.model.doors.push({id:'fixed',floor:'n01',hinge:[-.3125,-2],closedEnd:[.3125,-2],depth:.1,bottom:0,top:2.1,
+    openingClassification:'fixed-paired-door-leaf'});
+  b.model.parts=[{id:'closed-leaf',floor:'n01',role:'fixed-door-leaf',positions:[2,.015,-.3125,2,2.08,-.3125,2,2.08,.3125,2,.015,.3125],indices:[0,1,2,0,2,3]}];
+  const context=await createTraceContext(b,identity);
+  const evidence={...trace,excluded:[{id:'fixed',category:'fixed-paired-door-leaf',protectionVerified:true,role:'fixed-door-leaf'}]};
+  validateWorldTrace(evidence,context);assert.equal(context.expectedDoorIds.length,2);
+  assert.throws(()=>validateWorldTrace({...evidence,excluded:[{...evidence.excluded[0],protectionVerified:false}]},context),/verified native protection/);
+  assert.throws(()=>validateWorldTrace({...evidence,excluded:[{...evidence.excluded[0],category:'fixed-facade-glazing'}]},context),/misclassified/);
+  b.model.parts=[];
+  const missing=await createTraceContext(b,identity);
+  assert.throws(()=>validateWorldTrace(evidence,missing),/verified native protection/);
+});
+
 // Both sides were reached by walking downhill; the truthful local trace ends
 // with a FAILED return uphill. A world jump must solve it without resetting.
 async function jumpReturnFixture(height: number, declared = true) {

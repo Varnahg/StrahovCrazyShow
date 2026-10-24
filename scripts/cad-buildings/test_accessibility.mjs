@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { loadRapier,makeScene,profileSettings,doorApproachGeometry } from './rapier_model.mjs';
 import { prepareEvidence,probeAccessibility,validateReportIdentity } from './verify_accessibility.mjs';
 import { routePath } from './verify_routes.mjs';
+import { fixedOpeningProtection } from './verify_doors.mjs';
 
 const R=await loadRapier(process.env.CAD_MODEL_DEPENDENCY_ROOT);
 const settings=profileSettings('cad-compact');
@@ -172,10 +173,32 @@ test('Prosklení, doložený exteriér bez terénu a neurčený otvor zůstávaj
     door.accessConfirmed=false;evidence=prepareEvidence(scene,metadata,doors,routes);
     assert.ok(evidence.excluded.some(e=>e.category==='unclassified-missing-support'));
     door.openingClassification='facade-opening-unconfirmed-access';
-    const protectedDoors={...doors,results:doors.results.map(row=>({...row,category:'fixed-glazing',passed:true,coverage:{passed:true}}))};
+    const forged={...doors,results:doors.results.map(row=>({...row,category:'fixed-glazing',passed:true,coverage:{passed:true}}))};
+    assert.throws(()=>prepareEvidence(scene,metadata,forged,routes),/Neověřená pevná/);
+    const pane={...box('pane',[-3.004,.015,-1],[ -2.996,2.08,1],'facade-glass'),floor:'n01'};
+    scene.model.parts.push(pane);const collider=scene.world.createCollider(R.ColliderDesc.trimesh(Float32Array.from(pane.positions),Uint32Array.from(pane.indices)));
+    scene.parts.set(collider.handle,pane);scene.world.step();
+    const proof=fixedOpeningProtection(scene,door);
+    const protectedDoors={...doors,results:doors.results.map((row,side)=>({...row,category:proof.category,testKind:proof.testKind,passed:true,coverage:proof.coverage,protection:proof.hits[side]}))};
     evidence=prepareEvidence(scene,metadata,protectedDoors,routes);
     assert.equal(evidence.nodes.length,0);assert.equal(evidence.links.length,0);
     assert.equal(evidence.excluded[0].category,'fixed-facade-glazing');assert.equal(evidence.excluded[0].protectionVerified,true);
+  } finally {scene.free();}
+});
+
+test('Pevné dveřní křídlo se vyřadí jen po nezávislém ověření skutečné ochrany',()=>{
+  const door={id:'fixed',floor:'n01',hinge:[-.3125,0],closedEnd:[.3125,0],bottom:0,top:2.1,depth:.1,openingClassification:'fixed-paired-door-leaf'};
+  const pane={...box('leaf',[-.019,.015,-.3125],[.019,2.08,.3125],'fixed-door-leaf'),floor:'n01'};
+  const scene=makeScene(R,{cadOrigin:[0,0],parts:[floor(),pane],doors:[door],stairs:[]},settings);
+  try {
+    const [report,routes]=reports(scene,door),proof=fixedOpeningProtection(scene,door);
+    report.results=report.results.map((row,side)=>({...row,passed:true,category:proof.category,testKind:proof.testKind,coverage:proof.coverage,protection:proof.hits[side]}));
+    const evidence=prepareEvidence(scene,metadata,report,routes);
+    assert.deepEqual(evidence.nodes,[]);assert.equal(evidence.excluded[0].category,'fixed-paired-door-leaf');
+    assert.equal(evidence.excluded[0].protectionVerified,true);
+    const bad=structuredClone(report);bad.results[1].protection=null;
+    assert.throws(()=>prepareEvidence(scene,metadata,bad,routes),/Neověřená pevná/);
+    pane.role='facade-glass';assert.throws(()=>prepareEvidence(scene,metadata,report,routes),/Neověřená pevná/);
   } finally {scene.free();}
 });
 

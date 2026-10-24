@@ -9,7 +9,9 @@ export type { Input } from "./types";
 
 // V11 input seq identifies a scheduled simulation tick inside a server epoch.
 // V10 command-count acknowledgements cannot predict this timeline safely.
-export const PROTOCOL_VERSION = 12;
+// V13 includes the source-aligned B6 fixed leaves, furnishings and rear stairs.
+// Older clients predict against different collision meshes and must reconnect.
+export const PROTOCOL_VERSION = 13;
 export const SIM_HZ = 60;
 export const FIXED_DT = 1 / SIM_HZ;
 export const MAX_CATCHUP_STEPS = 8;

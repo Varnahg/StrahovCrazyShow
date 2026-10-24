@@ -2,16 +2,18 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { argumentsMap, required, openModel, sha256, writeReport, doorApproachGeometry } from './rapier_model.mjs';
+import { argumentsMap, required, openModel, sha256, writeReport, doorApproachGeometry, fixedOpeningSpec } from './rapier_model.mjs';
 
-export function fixedGlazingHit(scene,start,target,height) {
+export function fixedOpeningHit(scene,start,target,height,role) {
+  if(!['facade-glass','fixed-door-leaf'].includes(role))throw new Error('Neplatná role pevné výplně');
   const dx=target.x-start.x,dz=target.z-start.z,distance=Math.hypot(dx,dz);
   if(!Number.isFinite(height)||!(distance>0))throw new Error('Neplatná zkouška pevné výplně');
   const hit=scene.world.castRayAndGetNormal(new scene.R.Ray({x:start.x,y:height,z:start.z},
     {x:dx/distance,y:0,z:dz/distance}),distance,false,undefined,undefined,undefined,undefined,
-    collider=>scene.parts.get(collider.handle)?.role==='facade-glass');
-  return hit?{part:scene.parts.get(hit.collider.handle).id,distance:hit.timeOfImpact}:null;
+    collider=>scene.parts.get(collider.handle)?.role===role);
+  return hit?{part:scene.parts.get(hit.collider.handle).id,role,distance:hit.timeOfImpact}:null;
 }
+export const fixedGlazingHit=(scene,start,target,height)=>fixedOpeningHit(scene,start,target,height,'facade-glass');
 
 function clippedPolygon(points,bounds) {
   let polygon=points;
@@ -61,14 +63,15 @@ function coveredArea(polygons) {
   return area;
 }
 
-export function fixedGlazingCoverage(scene,door) {
+export function fixedOpeningCoverage(scene,door,spec=fixedOpeningSpec(door)) {
+  if(!spec||!['facade-glass','fixed-door-leaf'].includes(spec.role))throw new Error('Chybí klasifikace pevné výplně');
   const dx=door.closedEnd[0]-door.hinge[0],dy=door.closedEnd[1]-door.hinge[1],width=Math.hypot(dx,dy);
   const bounds=[.055,door.bottom+.055,width-.055,door.top-.055];
-  if(!(bounds[2]>bounds[0]&&bounds[3]>bounds[1]))throw new Error('Neplatný rozsah pevného prosklení');
+  if(![...bounds,width,door.normalOffset??0].every(Number.isFinite)||!(bounds[2]>bounds[0]&&bounds[3]>bounds[1]))throw new Error('Neplatný rozsah pevné výplně');
   const normal=[-dy/width,dx/width],base=scene.local(door.hinge.map((value,i)=>value+normal[i]*(door.normalOffset??0)));
   const tangent={x:-dy/width,z:-dx/width},polygons=[];
-  for(const part of scene.model.parts) {
-    if(part.role!=='facade-glass'||part.floor!==door.floor)continue;
+  for(const part of scene.model.parts??[]) {
+    if(part.role!==spec.role||part.floor!==door.floor)continue;
     for(let i=0;i<part.indices.length;i+=3) {
       const triangle=[];let inPlane=true;
       for(const index of part.indices.slice(i,i+3)) {
@@ -85,7 +88,15 @@ export function fixedGlazingCoverage(scene,door) {
   const expectedArea=(bounds[2]-bounds[0])*(bounds[3]-bounds[1]),actualArea=coveredArea(polygons);
   const missingArea=Math.max(0,expectedArea-actualArea);
   return {passed:missingArea<=Math.max(1e-6,expectedArea*1e-6),expectedArea,coveredArea:actualArea,missingArea,
-    frameMargin:.055,planeTolerance:.02,scope:'Pokrytí plochy otvoru skutečnými skleněnými trojúhelníky v ostění'};
+    role:spec.role,frameMargin:.055,planeTolerance:.02,scope:'Pokrytí plochy otvoru skutečnými kolizními trojúhelníky odpovídající pevné výplně v ostění'};
+}
+export const fixedGlazingCoverage=(scene,door)=>fixedOpeningCoverage(scene,door,{role:'facade-glass'});
+
+export function fixedOpeningProtection(scene,door) {
+  const spec=fixedOpeningSpec(door);if(!spec)throw new Error('Otvor není pevná výplň');
+  const {points}=doorApproachGeometry(scene,door),coverage=fixedOpeningCoverage(scene,door,spec);
+  const hits=[0,1].map(side=>fixedOpeningHit(scene,points[side],points[1-side],(door.bottom+door.top)/2,spec.role));
+  return {...spec,coverage,hits,passed:coverage.passed&&hits.every(Boolean)};
 }
 
 export async function verifyDoors(args) {
@@ -109,15 +120,15 @@ export async function verifyDoors(args) {
         const support=scene.floorAt(point,door.bottom);
         return {...point,floor:support?.height??null,support};
       });
-      const coverage=door.openingClassification==='facade-opening-unconfirmed-access'?fixedGlazingCoverage(scene,door):null;
+      const fixed=fixedOpeningSpec(door),proof=fixed?fixedOpeningProtection(scene,door):null;
       for(const direction of [0,1]) {
         const start=sides[direction],target=sides[1-direction];
         const row={id:door.id,floor:door.floor,direction,width,openingBottom:door.bottom,start,target};
-        if(door.openingClassification==='facade-opening-unconfirmed-access') {
-          const protection=fixedGlazingHit(scene,start,target,(door.bottom+door.top)/2);
+        if(fixed) {
+          const protection=proof.hits[direction],coverage=proof.coverage;
           const passed=!!protection&&coverage.passed;
-          results.push({...row,testKind:'fixed-facade-protection',protection,coverage,
-            category:passed?'fixed-glazing':'missing-glazing',passed});continue;
+          results.push({...row,testKind:fixed.testKind,protection,coverage,
+            category:passed?fixed.category:fixed.missingCategory,passed});continue;
         }
         if(start.floor===null||target.floor===null) {
           results.push({...row,category:'missing-model-floor',setupValid:false,passed:false});continue;
@@ -138,7 +149,8 @@ export async function verifyDoors(args) {
   return {scope:'Přímé průchody měřenými dveřmi; neplatný start vyžaduje posouzení skutečné přístupové trasy',...metadata,
     doorSourceMode,doorSourceSha256,cases:results.length,passed:categories.passed??0,categories,
     protectedGlazing:categories['fixed-glazing']??0,
-    status:categories.blocked||categories['missing-glazing']?'issues':categories['invalid-start']||categories['missing-model-floor']?'partial':'pass',results};
+    protectedDoorLeaves:categories['fixed-door-leaf']??0,
+    status:categories.blocked||categories['missing-glazing']||categories['missing-fixed-door-leaf']?'issues':categories['invalid-start']||categories['missing-model-floor']?'partial':'pass',results};
 }
 
 if(process.argv[1]&&fileURLToPath(import.meta.url)===resolve(process.argv[1])) {

@@ -2,11 +2,11 @@
   "status": "geometry-pass-visual-acceptance-separate",
   "buildingId": "b06",
   "blenderVersion": "5.2.2 LTS",
-  "blendSha256": "749464558ebcab5ca582f875b4582093ac567496fffa410213e4a87c4f7f544e",
-  "glbSha256": "54ef5d20819b841765af1801a5337f9a34ae83302b174b27de72541c093569b7",
+  "blendSha256": "a55952f16c3006a85d15d3f6638db64628b4cb5079b0790a85a06c607ed207a5",
+  "glbSha256": "a8aa5242b63b7ecf11caf6ce9fc54f2cdb516238e3268e03649aae7d0e327b9a",
   "boundsBlender": {
     "min": [
-      -11.71399974822998,
+      -14.677000045776367,
       -37.47100067138672,
       -3.200000047683716
     ],
@@ -19,9 +19,9 @@
   "meshes": [
     {
       "name": "b06:n01:canopy:concrete",
-      "vertices": 8,
-      "triangles": 12,
-      "signedVolume": 1.6296753883361816,
+      "vertices": 20,
+      "triangles": 36,
+      "signedVolume": 3.953880290190379,
       "collision": true
     },
     {
@@ -54,9 +54,9 @@
     },
     {
       "name": "b06:n01:door-handle:metal",
-      "vertices": 2000,
-      "triangles": 3000,
-      "signedVolume": 0.010925752566739277,
+      "vertices": 1392,
+      "triangles": 2088,
+      "signedVolume": 0.00757988934249928,
       "collision": false
     },
     {
@@ -82,9 +82,233 @@
     },
     {
       "name": "b06:n01:door-leaf:door",
-      "vertices": 952,
-      "triangles": 1428,
-      "signedVolume": 6.189256946609639,
+      "vertices": 648,
+      "triangles": 972,
+      "signedVolume": 4.3256036818784125,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:fixed-door-leaf:door",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.863588236893216,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:floor-finish:floor",
+      "vertices": 1040,
+      "triangles": 1852,
+      "signedVolume": 1.7941623785675898,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-ceiling-diffuser:b6_ceramic",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.024366761247316956,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-ceiling-fixture:b6_radiator",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.28560272604227005,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-furniture/bed:b6_fabric_cream",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 14.806626736807315,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-furniture/bed:b6_fabric_cream.001",
+      "vertices": 3192,
+      "triangles": 5928,
+      "signedVolume": 1.8252939727244726,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-furniture/bed:b6_fabric_teal",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.196998544658223,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-furniture/bed:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 27.359984700645636,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-furniture/bed:b6_wood.001",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 2.308471399417614,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-furniture/curtain:b6_curtain",
+      "vertices": 4864,
+      "triangles": 7296,
+      "signedVolume": 0.11062835274424271,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-furniture/desk:b6_metal",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.6453868482421967,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-furniture/desk:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 1.652974328336615,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-furniture/radiator:b6_radiator",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.0588353890925641,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-furniture/radiator:b6_radiator.001",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.25657653699939476,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-furniture/seating:b6_fabric_blue",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 1.377619581685091,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-furniture/seating:b6_metal",
+      "vertices": 1824,
+      "triangles": 2736,
+      "signedVolume": 0.16470090934793297,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-furniture/storage:b6_wood",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 12.129603213708243,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-furniture/storage:b6_wood.001",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 6.005630384509761,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-sanitary/basin:b6_ceramic",
+      "vertices": 1184,
+      "triangles": 2304,
+      "signedVolume": 0.425432105859121,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-sanitary/basin:b6_chrome",
+      "vertices": 384,
+      "triangles": 576,
+      "signedVolume": 0.03401205688714973,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-sanitary/basin:b6_mirror",
+      "vertices": 128,
+      "triangles": 192,
+      "signedVolume": 0.06620878477891279,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-sanitary/service-sink:b6_ceramic",
+      "vertices": 148,
+      "triangles": 288,
+      "signedVolume": 0.04325095377862459,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-sanitary/service-sink:b6_chrome",
+      "vertices": 48,
+      "triangles": 72,
+      "signedVolume": 0.004163770625988668,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-sanitary/service-sink:b6_mirror",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.008273641268412298,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-sanitary/shower:b6_ceramic",
+      "vertices": 144,
+      "triangles": 216,
+      "signedVolume": 0.5833313135275056,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-sanitary/shower:b6_chrome",
+      "vertices": 372,
+      "triangles": 648,
+      "signedVolume": 0.010147898457944346,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-sanitary/shower:b6_shower_curtain",
+      "vertices": 768,
+      "triangles": 1152,
+      "signedVolume": 0.008989053390298478,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-sanitary/toilet:b6_ceramic",
+      "vertices": 1440,
+      "triangles": 2736,
+      "signedVolume": 0.4685793584988779,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-sanitary/urinal:b6_ceramic",
+      "vertices": 370,
+      "triangles": 720,
+      "signedVolume": 0.10180477704852839,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:interior-sanitary/urinal:b6_chrome",
+      "vertices": 40,
+      "triangles": 60,
+      "signedVolume": 0.001314491033554105,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-sanitary/ventilation:b6_metal",
+      "vertices": 32,
+      "triangles": 48,
+      "signedVolume": 0.005746165911356613,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:interior-sanitary/ventilation:b6_radiator",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.26097597678502327,
       "collision": false
     },
     {
@@ -110,65 +334,86 @@
     },
     {
       "name": "b06:n01:stair-baluster:metal",
-      "vertices": 688,
-      "triangles": 1032,
-      "signedVolume": 0.05284788490583507,
+      "vertices": 848,
+      "triangles": 1272,
+      "signedVolume": 0.06506352064510199,
       "collision": true
     },
     {
       "name": "b06:n01:stair-handrail:metal",
-      "vertices": 724,
-      "triangles": 1252,
-      "signedVolume": 0.09868929519628485,
+      "vertices": 884,
+      "triangles": 1528,
+      "signedVolume": 0.12517068963885913,
       "collision": true
     },
     {
       "name": "b06:n01:stair-landing:concrete",
-      "vertices": 64,
-      "triangles": 104,
-      "signedVolume": 11.09327153488994,
+      "vertices": 80,
+      "triangles": 128,
+      "signedVolume": 11.48493961617351,
       "collision": true
     },
     {
       "name": "b06:n01:stair:concrete",
-      "vertices": 404,
-      "triangles": 780,
-      "signedVolume": 13.436094387123978,
+      "vertices": 492,
+      "triangles": 948,
+      "signedVolume": 15.737819520756586,
       "collision": true
     },
     {
+      "name": "b06:n01:venue-sign-board:b6_white_paint",
+      "vertices": 8,
+      "triangles": 12,
+      "signedVolume": 0.09038949757814399,
+      "collision": false
+    },
+    {
+      "name": "b06:n01:venue-sign-guard:b6_exterior_rail",
+      "vertices": 32,
+      "triangles": 48,
+      "signedVolume": 0.011945441365242018,
+      "collision": true
+    },
+    {
+      "name": "b06:n01:venue-sign-lettering:b6_metal",
+      "vertices": 1166,
+      "triangles": 2272,
+      "signedVolume": 0.0008904470062892299,
+      "collision": false
+    },
+    {
       "name": "b06:n01:wall:plaster",
-      "vertices": 12155,
-      "triangles": 26008,
-      "signedVolume": 384.19774684596996,
+      "vertices": 12211,
+      "triangles": 26240,
+      "signedVolume": 384.29969802911535,
       "collision": true
     },
     {
       "name": "b06:n01:window-frame:frame",
-      "vertices": 1024,
-      "triangles": 1956,
-      "signedVolume": 1.4868176116142422,
+      "vertices": 1600,
+      "triangles": 3036,
+      "signedVolume": 1.7823127740994027,
       "collision": false
     },
     {
       "name": "b06:n01:window-gasket:gasket",
-      "vertices": 560,
-      "triangles": 840,
-      "signedVolume": 0.043294607972105166,
+      "vertices": 848,
+      "triangles": 1272,
+      "signedVolume": 0.041796195907712365,
       "collision": false
     },
     {
       "name": "b06:n01:window-glass:glass",
-      "vertices": 280,
-      "triangles": 420,
-      "signedVolume": 1.1259773836160591,
+      "vertices": 424,
+      "triangles": 636,
+      "signedVolume": 1.0873879856881075,
       "collision": true
     },
     {
       "name": "b06:n01:window-sill:concrete",
-      "vertices": 280,
-      "triangles": 420,
-      "signedVolume": 1.9200921853383368,
+      "vertices": 424,
+      "triangles": 636,
+      "signedVolume": 1.8855539825744922,
       "collision": false
     },
     {
@@ -187,16 +432,240 @@
     },
     {
       "name": "b06:n02:door-handle:metal",
-      "vertices": 1696,
-      "triangles": 2544,
-      "signedVolume": 0.00985979896116386,
+      "vertices": 1088,
+      "triangles": 1632,
+      "signedVolume": 0.006502572447061585,
       "collision": false
     },
     {
       "name": "b06:n02:door-leaf:door",
-      "vertices": 848,
-      "triangles": 1272,
-      "signedVolume": 5.364212387551869,
+      "vertices": 544,
+      "triangles": 816,
+      "signedVolume": 3.500558088223156,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:fixed-door-leaf:door",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.8635989924271896,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:floor-finish:floor",
+      "vertices": 1012,
+      "triangles": 1800,
+      "signedVolume": 1.7953706523258122,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-ceiling-diffuser:b6_ceramic",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.02437459010009962,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-ceiling-fixture:b6_radiator",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.285595747331778,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-furniture/bed:b6_fabric_cream",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 14.806585845847925,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-furniture/bed:b6_fabric_cream.001",
+      "vertices": 3192,
+      "triangles": 5928,
+      "signedVolume": 1.8240651723851173,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-furniture/bed:b6_fabric_teal",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.1968645329276713,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-furniture/bed:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 27.359988893071847,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-furniture/bed:b6_wood.001",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 2.3088252402376392,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-furniture/curtain:b6_curtain",
+      "vertices": 4864,
+      "triangles": 7296,
+      "signedVolume": 0.10982212523958917,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-furniture/desk:b6_metal",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.645924057345839,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-furniture/desk:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 1.6531400916477024,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-furniture/radiator:b6_radiator",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.0587420091032984,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-furniture/radiator:b6_radiator.001",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.2571751624345747,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-furniture/seating:b6_fabric_blue",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 1.3778610664109368,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-furniture/seating:b6_metal",
+      "vertices": 1824,
+      "triangles": 2736,
+      "signedVolume": 0.16472528626521438,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-furniture/storage:b6_wood",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 12.129845748345044,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-furniture/storage:b6_wood.001",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 6.005735741307337,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-sanitary/basin:b6_ceramic",
+      "vertices": 1480,
+      "triangles": 2880,
+      "signedVolume": 0.531884125433862,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-sanitary/basin:b6_chrome",
+      "vertices": 480,
+      "triangles": 720,
+      "signedVolume": 0.04257644216219581,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-sanitary/basin:b6_mirror",
+      "vertices": 160,
+      "triangles": 240,
+      "signedVolume": 0.08274229367574211,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-sanitary/service-sink:b6_ceramic",
+      "vertices": 148,
+      "triangles": 288,
+      "signedVolume": 0.04328319057822233,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-sanitary/service-sink:b6_chrome",
+      "vertices": 48,
+      "triangles": 72,
+      "signedVolume": 0.004124611616134623,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-sanitary/service-sink:b6_mirror",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.008291780948638992,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-sanitary/shower:b6_ceramic",
+      "vertices": 144,
+      "triangles": 216,
+      "signedVolume": 0.5834224174420086,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-sanitary/shower:b6_chrome",
+      "vertices": 372,
+      "triangles": 648,
+      "signedVolume": 0.010105565190315188,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-sanitary/shower:b6_shower_curtain",
+      "vertices": 768,
+      "triangles": 1152,
+      "signedVolume": 0.009079787259300042,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-sanitary/toilet:b6_ceramic",
+      "vertices": 1440,
+      "triangles": 2736,
+      "signedVolume": 0.46857706736773286,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-sanitary/urinal:b6_ceramic",
+      "vertices": 740,
+      "triangles": 1440,
+      "signedVolume": 0.20398472870389633,
+      "collision": true
+    },
+    {
+      "name": "b06:n02:interior-sanitary/urinal:b6_chrome",
+      "vertices": 80,
+      "triangles": 120,
+      "signedVolume": 0.002442399660746268,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-sanitary/ventilation:b6_metal",
+      "vertices": 32,
+      "triangles": 48,
+      "signedVolume": 0.005760033925374344,
+      "collision": false
+    },
+    {
+      "name": "b06:n02:interior-sanitary/ventilation:b6_radiator",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.2610349257787066,
       "collision": false
     },
     {
@@ -236,37 +705,37 @@
     },
     {
       "name": "b06:n02:wall:plaster",
-      "vertices": 11620,
-      "triangles": 25076,
-      "signedVolume": 385.27479850889046,
+      "vertices": 11676,
+      "triangles": 25328,
+      "signedVolume": 385.3766655209203,
       "collision": true
     },
     {
       "name": "b06:n02:window-frame:frame",
-      "vertices": 1336,
-      "triangles": 2568,
-      "signedVolume": 1.7935593323782117,
+      "vertices": 1912,
+      "triangles": 3648,
+      "signedVolume": 2.0888206151624504,
       "collision": false
     },
     {
       "name": "b06:n02:window-gasket:gasket",
-      "vertices": 752,
-      "triangles": 1128,
-      "signedVolume": 0.04945509011546774,
+      "vertices": 1040,
+      "triangles": 1560,
+      "signedVolume": 0.047930341815420725,
       "collision": false
     },
     {
       "name": "b06:n02:window-glass:glass",
-      "vertices": 376,
-      "triangles": 564,
-      "signedVolume": 1.281296423558769,
+      "vertices": 520,
+      "triangles": 780,
+      "signedVolume": 1.2427001879162425,
       "collision": true
     },
     {
       "name": "b06:n02:window-sill:concrete",
-      "vertices": 376,
-      "triangles": 564,
-      "signedVolume": 2.048233148952325,
+      "vertices": 520,
+      "triangles": 780,
+      "signedVolume": 2.0137500576674943,
       "collision": false
     },
     {
@@ -285,16 +754,240 @@
     },
     {
       "name": "b06:n03:door-handle:metal",
-      "vertices": 1696,
-      "triangles": 2544,
-      "signedVolume": 0.009077361668460104,
+      "vertices": 1088,
+      "triangles": 1632,
+      "signedVolume": 0.005883776272336656,
       "collision": false
     },
     {
       "name": "b06:n03:door-leaf:door",
-      "vertices": 848,
-      "triangles": 1272,
-      "signedVolume": 5.363773231705025,
+      "vertices": 544,
+      "triangles": 816,
+      "signedVolume": 3.500115657846117,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:fixed-door-leaf:door",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.8635616153478622,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:floor-finish:floor",
+      "vertices": 1012,
+      "triangles": 1800,
+      "signedVolume": 1.7951434461864986,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-ceiling-diffuser:b6_ceramic",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.02433523070067185,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-ceiling-fixture:b6_radiator",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.2856113091111182,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-furniture/bed:b6_fabric_cream",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 14.806280108789602,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-furniture/bed:b6_fabric_cream.001",
+      "vertices": 3192,
+      "triangles": 5928,
+      "signedVolume": 1.8255227194228283,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-furniture/bed:b6_fabric_teal",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.1968744092931363,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-furniture/bed:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 27.36020691568651,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-furniture/bed:b6_wood.001",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 2.3087712863149754,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-furniture/curtain:b6_curtain",
+      "vertices": 4864,
+      "triangles": 7296,
+      "signedVolume": 0.10670120179323417,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-furniture/desk:b6_metal",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.6446259409810086,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-furniture/desk:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 1.6531591496119888,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-furniture/radiator:b6_radiator",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.0588651994864136,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-furniture/radiator:b6_radiator.001",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.25348342706759797,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-furniture/seating:b6_fabric_blue",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 1.3786665598551433,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-furniture/seating:b6_metal",
+      "vertices": 1824,
+      "triangles": 2736,
+      "signedVolume": 0.1654056416203575,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-furniture/storage:b6_wood",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 12.129844615856817,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-furniture/storage:b6_wood.001",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 6.005216055239252,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-sanitary/basin:b6_ceramic",
+      "vertices": 1480,
+      "triangles": 2880,
+      "signedVolume": 0.5331027377481721,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-sanitary/basin:b6_chrome",
+      "vertices": 480,
+      "triangles": 720,
+      "signedVolume": 0.04234846433003746,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-sanitary/basin:b6_mirror",
+      "vertices": 160,
+      "triangles": 240,
+      "signedVolume": 0.08268346389134955,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-sanitary/service-sink:b6_ceramic",
+      "vertices": 148,
+      "triangles": 288,
+      "signedVolume": 0.04322473580638547,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-sanitary/service-sink:b6_chrome",
+      "vertices": 48,
+      "triangles": 72,
+      "signedVolume": 0.004151860872904464,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-sanitary/service-sink:b6_mirror",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.008312861124674518,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-sanitary/shower:b6_ceramic",
+      "vertices": 144,
+      "triangles": 216,
+      "signedVolume": 0.58329890668392,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-sanitary/shower:b6_chrome",
+      "vertices": 372,
+      "triangles": 648,
+      "signedVolume": 0.0100447821120421,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-sanitary/shower:b6_shower_curtain",
+      "vertices": 768,
+      "triangles": 1152,
+      "signedVolume": 0.00928165763616547,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-sanitary/toilet:b6_ceramic",
+      "vertices": 1440,
+      "triangles": 2736,
+      "signedVolume": 0.469259502987067,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-sanitary/urinal:b6_ceramic",
+      "vertices": 740,
+      "triangles": 1440,
+      "signedVolume": 0.2044965525468192,
+      "collision": true
+    },
+    {
+      "name": "b06:n03:interior-sanitary/urinal:b6_chrome",
+      "vertices": 80,
+      "triangles": 120,
+      "signedVolume": 0.002597431341807066,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-sanitary/ventilation:b6_metal",
+      "vertices": 32,
+      "triangles": 48,
+      "signedVolume": 0.005850076675415046,
+      "collision": false
+    },
+    {
+      "name": "b06:n03:interior-sanitary/ventilation:b6_radiator",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.26096685727437485,
       "collision": false
     },
     {
@@ -334,37 +1027,37 @@
     },
     {
       "name": "b06:n03:wall:plaster",
-      "vertices": 11223,
-      "triangles": 24100,
-      "signedVolume": 363.0140856484282,
+      "vertices": 11279,
+      "triangles": 24344,
+      "signedVolume": 363.11607198580316,
       "collision": true
     },
     {
       "name": "b06:n03:window-frame:frame",
-      "vertices": 1312,
-      "triangles": 2520,
-      "signedVolume": 1.7680604724834372,
+      "vertices": 1888,
+      "triangles": 3600,
+      "signedVolume": 2.0632496314744166,
       "collision": false
     },
     {
       "name": "b06:n03:window-gasket:gasket",
-      "vertices": 736,
-      "triangles": 1104,
-      "signedVolume": 0.049497336149215844,
+      "vertices": 1024,
+      "triangles": 1536,
+      "signedVolume": 0.047979748497406625,
       "collision": false
     },
     {
       "name": "b06:n03:window-glass:glass",
-      "vertices": 368,
-      "triangles": 552,
-      "signedVolume": 1.2688218976060357,
+      "vertices": 512,
+      "triangles": 768,
+      "signedVolume": 1.2303377117496015,
       "collision": true
     },
     {
       "name": "b06:n03:window-sill:concrete",
-      "vertices": 368,
-      "triangles": 552,
-      "signedVolume": 2.04199020067851,
+      "vertices": 512,
+      "triangles": 768,
+      "signedVolume": 2.0077003479624786,
       "collision": false
     },
     {
@@ -383,16 +1076,240 @@
     },
     {
       "name": "b06:n04:door-handle:metal",
-      "vertices": 1696,
-      "triangles": 2544,
-      "signedVolume": 0.008840409029896057,
+      "vertices": 1088,
+      "triangles": 1632,
+      "signedVolume": 0.005690451711416262,
       "collision": false
     },
     {
       "name": "b06:n04:door-leaf:door",
-      "vertices": 848,
-      "triangles": 1272,
-      "signedVolume": 5.364416112502431,
+      "vertices": 544,
+      "triangles": 816,
+      "signedVolume": 3.500694458683338,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:fixed-door-leaf:door",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.8635984957218181,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:floor-finish:floor",
+      "vertices": 1012,
+      "triangles": 1800,
+      "signedVolume": 1.7960760976953838,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-ceiling-diffuser:b6_ceramic",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.024409759479264253,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-ceiling-fixture:b6_radiator",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.28560022264718954,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-furniture/bed:b6_fabric_cream",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 14.806880138814455,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-furniture/bed:b6_fabric_cream.001",
+      "vertices": 3192,
+      "triangles": 5928,
+      "signedVolume": 1.8268345700829154,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-furniture/bed:b6_fabric_teal",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.1967997131869204,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-furniture/bed:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 27.35941590989634,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-furniture/bed:b6_wood.001",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 2.309269015056387,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-furniture/curtain:b6_curtain",
+      "vertices": 4864,
+      "triangles": 7296,
+      "signedVolume": 0.11293937920224176,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-furniture/desk:b6_metal",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.6428758601347586,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-furniture/desk:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 1.653131105626624,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-furniture/radiator:b6_radiator",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.0588142325480798,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-furniture/radiator:b6_radiator.001",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.24992513159910834,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-furniture/seating:b6_fabric_blue",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 1.3770796420673537,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-furniture/seating:b6_metal",
+      "vertices": 1824,
+      "triangles": 2736,
+      "signedVolume": 0.1645193497339887,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-furniture/storage:b6_wood",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 12.129126707712809,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-furniture/storage:b6_wood.001",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 6.0060430796196,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-sanitary/basin:b6_ceramic",
+      "vertices": 1480,
+      "triangles": 2880,
+      "signedVolume": 0.5321910803516711,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-sanitary/basin:b6_chrome",
+      "vertices": 480,
+      "triangles": 720,
+      "signedVolume": 0.042675892512003454,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-sanitary/basin:b6_mirror",
+      "vertices": 160,
+      "triangles": 240,
+      "signedVolume": 0.08253333965937355,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-sanitary/service-sink:b6_ceramic",
+      "vertices": 148,
+      "triangles": 288,
+      "signedVolume": 0.043342840547362524,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-sanitary/service-sink:b6_chrome",
+      "vertices": 48,
+      "triangles": 72,
+      "signedVolume": 0.004067500432332366,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-sanitary/service-sink:b6_mirror",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.00826553503672281,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-sanitary/shower:b6_ceramic",
+      "vertices": 144,
+      "triangles": 216,
+      "signedVolume": 0.5832640528678841,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-sanitary/shower:b6_chrome",
+      "vertices": 372,
+      "triangles": 648,
+      "signedVolume": 0.009992818658550593,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-sanitary/shower:b6_shower_curtain",
+      "vertices": 768,
+      "triangles": 1152,
+      "signedVolume": 0.009105448921521968,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-sanitary/toilet:b6_ceramic",
+      "vertices": 1440,
+      "triangles": 2736,
+      "signedVolume": 0.4683965013052024,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-sanitary/urinal:b6_ceramic",
+      "vertices": 740,
+      "triangles": 1440,
+      "signedVolume": 0.20528631905714653,
+      "collision": true
+    },
+    {
+      "name": "b06:n04:interior-sanitary/urinal:b6_chrome",
+      "vertices": 80,
+      "triangles": 120,
+      "signedVolume": 0.0022323926289876464,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-sanitary/ventilation:b6_metal",
+      "vertices": 32,
+      "triangles": 48,
+      "signedVolume": 0.00588432947794594,
+      "collision": false
+    },
+    {
+      "name": "b06:n04:interior-sanitary/ventilation:b6_radiator",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.260943730672202,
       "collision": false
     },
     {
@@ -432,37 +1349,37 @@
     },
     {
       "name": "b06:n04:wall:plaster",
-      "vertices": 11228,
-      "triangles": 24110,
-      "signedVolume": 363.01432724064364,
+      "vertices": 11284,
+      "triangles": 24354,
+      "signedVolume": 363.1166713300831,
       "collision": true
     },
     {
       "name": "b06:n04:window-frame:frame",
-      "vertices": 1312,
-      "triangles": 2520,
-      "signedVolume": 1.7663722025851414,
+      "vertices": 1888,
+      "triangles": 3600,
+      "signedVolume": 2.061034047044813,
       "collision": false
     },
     {
       "name": "b06:n04:window-gasket:gasket",
-      "vertices": 736,
-      "triangles": 1104,
-      "signedVolume": 0.049893064424395575,
+      "vertices": 1024,
+      "triangles": 1536,
+      "signedVolume": 0.0483381412923337,
       "collision": false
     },
     {
       "name": "b06:n04:window-glass:glass",
-      "vertices": 368,
-      "triangles": 552,
-      "signedVolume": 1.2685153599207621,
+      "vertices": 512,
+      "triangles": 768,
+      "signedVolume": 1.2294803338785032,
       "collision": true
     },
     {
       "name": "b06:n04:window-sill:concrete",
-      "vertices": 368,
-      "triangles": 552,
-      "signedVolume": 2.0428661207358028,
+      "vertices": 512,
+      "triangles": 768,
+      "signedVolume": 2.0086619627351565,
       "collision": false
     },
     {
@@ -481,16 +1398,240 @@
     },
     {
       "name": "b06:n05:door-handle:metal",
-      "vertices": 1696,
-      "triangles": 2544,
-      "signedVolume": 0.009057182741040998,
+      "vertices": 1088,
+      "triangles": 1632,
+      "signedVolume": 0.005808669452865952,
       "collision": false
     },
     {
       "name": "b06:n05:door-leaf:door",
-      "vertices": 848,
-      "triangles": 1272,
-      "signedVolume": 5.364668930570285,
+      "vertices": 544,
+      "triangles": 816,
+      "signedVolume": 3.5009059707323815,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:fixed-door-leaf:door",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.8634691039721174,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:floor-finish:floor",
+      "vertices": 1012,
+      "triangles": 1800,
+      "signedVolume": 1.7955509196035608,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-ceiling-diffuser:b6_ceramic",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.024408589427670054,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-ceiling-fixture:b6_radiator",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.2856273005406058,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-furniture/bed:b6_fabric_cream",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 14.80655497560899,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-furniture/bed:b6_fabric_cream.001",
+      "vertices": 3192,
+      "triangles": 5928,
+      "signedVolume": 1.8247246762815241,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-furniture/bed:b6_fabric_teal",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.19702077563852,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-furniture/bed:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 27.360280103981523,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-furniture/bed:b6_wood.001",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 2.3084352243070825,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-furniture/curtain:b6_curtain",
+      "vertices": 4864,
+      "triangles": 7296,
+      "signedVolume": 0.10955751154688109,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-furniture/desk:b6_metal",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.6482121543958788,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-furniture/desk:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 1.6516223642975079,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-furniture/radiator:b6_radiator",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.0580357809861507,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-furniture/radiator:b6_radiator.001",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.25750746826330845,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-furniture/seating:b6_fabric_blue",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 1.3768226678172724,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-furniture/seating:b6_metal",
+      "vertices": 1824,
+      "triangles": 2736,
+      "signedVolume": 0.1645276558895902,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-furniture/storage:b6_wood",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 12.128925045331316,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-furniture/storage:b6_wood.001",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 6.005583033586543,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-sanitary/basin:b6_ceramic",
+      "vertices": 1480,
+      "triangles": 2880,
+      "signedVolume": 0.5269892642778963,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-sanitary/basin:b6_chrome",
+      "vertices": 480,
+      "triangles": 720,
+      "signedVolume": 0.04296239217122393,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-sanitary/basin:b6_mirror",
+      "vertices": 160,
+      "triangles": 240,
+      "signedVolume": 0.08216860890388385,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-sanitary/service-sink:b6_ceramic",
+      "vertices": 148,
+      "triangles": 288,
+      "signedVolume": 0.04364612698554984,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-sanitary/service-sink:b6_chrome",
+      "vertices": 48,
+      "triangles": 72,
+      "signedVolume": 0.004221717516581222,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-sanitary/service-sink:b6_mirror",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.00832168261210136,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-sanitary/shower:b6_ceramic",
+      "vertices": 144,
+      "triangles": 216,
+      "signedVolume": 0.583267082770659,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-sanitary/shower:b6_chrome",
+      "vertices": 372,
+      "triangles": 648,
+      "signedVolume": 0.009740915149450156,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-sanitary/shower:b6_shower_curtain",
+      "vertices": 768,
+      "triangles": 1152,
+      "signedVolume": 0.00799634431799287,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-sanitary/toilet:b6_ceramic",
+      "vertices": 1440,
+      "triangles": 2736,
+      "signedVolume": 0.4676028229296213,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-sanitary/urinal:b6_ceramic",
+      "vertices": 740,
+      "triangles": 1440,
+      "signedVolume": 0.2036976989669107,
+      "collision": true
+    },
+    {
+      "name": "b06:n05:interior-sanitary/urinal:b6_chrome",
+      "vertices": 80,
+      "triangles": 120,
+      "signedVolume": 0.0020206371943155763,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-sanitary/ventilation:b6_metal",
+      "vertices": 32,
+      "triangles": 48,
+      "signedVolume": 0.005673249562581376,
+      "collision": false
+    },
+    {
+      "name": "b06:n05:interior-sanitary/ventilation:b6_radiator",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.2609705924987784,
       "collision": false
     },
     {
@@ -530,37 +1671,37 @@
     },
     {
       "name": "b06:n05:wall:plaster",
-      "vertices": 11223,
-      "triangles": 24100,
-      "signedVolume": 379.0013790999853,
+      "vertices": 11279,
+      "triangles": 24344,
+      "signedVolume": 379.10288740411244,
       "collision": true
     },
     {
       "name": "b06:n05:window-frame:frame",
-      "vertices": 1312,
-      "triangles": 2520,
-      "signedVolume": 1.7678170446306438,
+      "vertices": 1888,
+      "triangles": 3600,
+      "signedVolume": 2.061341170842447,
       "collision": false
     },
     {
       "name": "b06:n05:window-gasket:gasket",
-      "vertices": 736,
-      "triangles": 1104,
-      "signedVolume": 0.05092428686718152,
+      "vertices": 1024,
+      "triangles": 1536,
+      "signedVolume": 0.04920543303402765,
       "collision": false
     },
     {
       "name": "b06:n05:window-glass:glass",
-      "vertices": 368,
-      "triangles": 552,
-      "signedVolume": 1.2679154348249235,
+      "vertices": 512,
+      "triangles": 768,
+      "signedVolume": 1.2291761552138958,
       "collision": true
     },
     {
       "name": "b06:n05:window-sill:concrete",
-      "vertices": 368,
-      "triangles": 552,
-      "signedVolume": 2.041905085245767,
+      "vertices": 512,
+      "triangles": 768,
+      "signedVolume": 2.0076307617127904,
       "collision": false
     },
     {
@@ -579,16 +1720,240 @@
     },
     {
       "name": "b06:n06:door-handle:metal",
-      "vertices": 1632,
-      "triangles": 2448,
-      "signedVolume": 0.009947228478267775,
+      "vertices": 1024,
+      "triangles": 1536,
+      "signedVolume": 0.006604465345541662,
       "collision": false
     },
     {
       "name": "b06:n06:door-leaf:door",
-      "vertices": 816,
-      "triangles": 1224,
-      "signedVolume": 5.1003402223189696,
+      "vertices": 512,
+      "triangles": 768,
+      "signedVolume": 3.236595471700023,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:fixed-door-leaf:door",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.8635736008485149,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:floor-finish:floor",
+      "vertices": 984,
+      "triangles": 1748,
+      "signedVolume": 1.7200825134933093,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-ceiling-diffuser:b6_ceramic",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.024397577624767804,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-ceiling-fixture:b6_radiator",
+      "vertices": 112,
+      "triangles": 168,
+      "signedVolume": 0.2855953313410289,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-furniture/bed:b6_fabric_cream",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 14.8065095692873,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-furniture/bed:b6_fabric_cream.001",
+      "vertices": 3192,
+      "triangles": 5928,
+      "signedVolume": 1.8276188645977531,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-furniture/bed:b6_fabric_teal",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.1970998430624606,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-furniture/bed:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 27.360509920244432,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-furniture/bed:b6_wood.001",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 2.3103046954298976,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-furniture/curtain:b6_curtain",
+      "vertices": 4864,
+      "triangles": 7296,
+      "signedVolume": 0.11053410109404285,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-furniture/desk:b6_metal",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.6443304531276208,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-furniture/desk:b6_wood",
+      "vertices": 608,
+      "triangles": 912,
+      "signedVolume": 1.6533824522048197,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-furniture/radiator:b6_radiator",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 1.0585401157538101,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-furniture/radiator:b6_radiator.001",
+      "vertices": 3648,
+      "triangles": 5472,
+      "signedVolume": 0.25777325034141535,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-furniture/seating:b6_fabric_blue",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 1.3790905947486574,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-furniture/seating:b6_metal",
+      "vertices": 1824,
+      "triangles": 2736,
+      "signedVolume": 0.16510185102621655,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-furniture/storage:b6_wood",
+      "vertices": 304,
+      "triangles": 456,
+      "signedVolume": 12.129951437314357,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-furniture/storage:b6_wood.001",
+      "vertices": 1216,
+      "triangles": 1824,
+      "signedVolume": 6.006660303721823,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-sanitary/basin:b6_ceramic",
+      "vertices": 1480,
+      "triangles": 2880,
+      "signedVolume": 0.5294395685195908,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-sanitary/basin:b6_chrome",
+      "vertices": 480,
+      "triangles": 720,
+      "signedVolume": 0.04213194052378334,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-sanitary/basin:b6_mirror",
+      "vertices": 160,
+      "triangles": 240,
+      "signedVolume": 0.08237885435422307,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-sanitary/service-sink:b6_ceramic",
+      "vertices": 148,
+      "triangles": 288,
+      "signedVolume": 0.04309018949667627,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-sanitary/service-sink:b6_chrome",
+      "vertices": 48,
+      "triangles": 72,
+      "signedVolume": 0.004155556360880545,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-sanitary/service-sink:b6_mirror",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.008284330368041909,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-sanitary/shower:b6_ceramic",
+      "vertices": 150,
+      "triangles": 228,
+      "signedVolume": 0.5756070911884361,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-sanitary/shower:b6_chrome",
+      "vertices": 372,
+      "triangles": 648,
+      "signedVolume": 0.010631844401359615,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-sanitary/shower:b6_shower_curtain",
+      "vertices": 768,
+      "triangles": 1152,
+      "signedVolume": 0.009349055588245603,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-sanitary/toilet:b6_ceramic",
+      "vertices": 1440,
+      "triangles": 2736,
+      "signedVolume": 0.4686348602796595,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-sanitary/urinal:b6_ceramic",
+      "vertices": 740,
+      "triangles": 1440,
+      "signedVolume": 0.20113456249237088,
+      "collision": true
+    },
+    {
+      "name": "b06:n06:interior-sanitary/urinal:b6_chrome",
+      "vertices": 80,
+      "triangles": 120,
+      "signedVolume": 0.0023829936981201102,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-sanitary/ventilation:b6_metal",
+      "vertices": 32,
+      "triangles": 48,
+      "signedVolume": 0.005931059519449881,
+      "collision": false
+    },
+    {
+      "name": "b06:n06:interior-sanitary/ventilation:b6_radiator",
+      "vertices": 16,
+      "triangles": 24,
+      "signedVolume": 0.26084033648172955,
       "collision": false
     },
     {
@@ -628,37 +1993,37 @@
     },
     {
       "name": "b06:n06:wall:plaster",
-      "vertices": 12823,
-      "triangles": 27158,
-      "signedVolume": 351.5449106395285,
+      "vertices": 12847,
+      "triangles": 27346,
+      "signedVolume": 351.64658309535173,
       "collision": true
     },
     {
       "name": "b06:n06:window-frame:frame",
-      "vertices": 1216,
-      "triangles": 2340,
-      "signedVolume": 1.6655616195251544,
+      "vertices": 1792,
+      "triangles": 3420,
+      "signedVolume": 1.9602505036940203,
       "collision": false
     },
     {
       "name": "b06:n06:window-gasket:gasket",
-      "vertices": 688,
-      "triangles": 1032,
-      "signedVolume": 0.05003700653711942,
+      "vertices": 976,
+      "triangles": 1464,
+      "signedVolume": 0.04826075319821657,
       "collision": false
     },
     {
       "name": "b06:n06:window-glass:glass",
-      "vertices": 344,
-      "triangles": 516,
-      "signedVolume": 1.2091957274824285,
+      "vertices": 488,
+      "triangles": 732,
+      "signedVolume": 1.1710249504152146,
       "collision": true
     },
     {
       "name": "b06:n06:window-sill:concrete",
-      "vertices": 344,
-      "triangles": 516,
-      "signedVolume": 1.9737408459186514,
+      "vertices": 488,
+      "triangles": 732,
+      "signedVolume": 1.9394361781887695,
       "collision": false
     },
     {
@@ -725,6 +2090,27 @@
       "collision": false
     },
     {
+      "name": "b06:p01:floor-finish:floor",
+      "vertices": 848,
+      "triangles": 1532,
+      "signedVolume": 1.9811795052628431,
+      "collision": false
+    },
+    {
+      "name": "b06:p01:interior-ceiling-diffuser:b6_ceramic",
+      "vertices": 48,
+      "triangles": 72,
+      "signedVolume": 0.010439722183946279,
+      "collision": false
+    },
+    {
+      "name": "b06:p01:interior-ceiling-fixture:b6_radiator",
+      "vertices": 48,
+      "triangles": 72,
+      "signedVolume": 0.12240024450390298,
+      "collision": false
+    },
+    {
       "name": "b06:p01:slab:concrete",
       "vertices": 24,
       "triangles": 44,
@@ -775,9 +2161,9 @@
     },
     {
       "name": "b06:p01:wall:plaster",
-      "vertices": 9004,
-      "triangles": 19600,
-      "signedVolume": 277.55980303315096,
+      "vertices": 9026,
+      "triangles": 19684,
+      "signedVolume": 277.5576436318614,
       "collision": true
     },
     {
@@ -813,9 +2199,9 @@
     {
       "id": "b06:n01:canopy:concrete",
       "maxGlbErrorMetres": 0,
-      "maxCornerNormalError": 5.031069026490231e-06,
-      "maxCornerUvError": 2.8798240236938e-08,
-      "triangles": 12,
+      "maxCornerNormalError": 3.8089046978546684e-05,
+      "maxCornerUvError": 0,
+      "triangles": 36,
       "glbTriangleMismatch": 0
     },
     {
@@ -846,7 +2232,7 @@
       "id": "b06:n01:door-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 5.529262950615286e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
+      "maxCornerUvError": 1.9073486328125e-06,
       "triangles": 4468,
       "glbTriangleMismatch": 0
     },
@@ -855,7 +2241,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 5.101960009298674e-05,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 3000,
+      "triangles": 2088,
       "glbTriangleMismatch": 0
     },
     {
@@ -885,9 +2271,265 @@
     {
       "id": "b06:n01:door-leaf:door",
       "maxGlbErrorMetres": 0,
-      "maxCornerNormalError": 3.758497057288532e-05,
+      "maxCornerNormalError": 3.6124201299146373e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 972,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:fixed-door-leaf:door",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1428,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:floor-finish:floor",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 4.841148086053864e-05,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1852,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-ceiling-diffuser:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-ceiling-fixture:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/bed:b6_fabric_cream",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/bed:b6_fabric_cream.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 8.096376140287467e-05,
+      "maxCornerUvError": 7.62939453125e-06,
+      "triangles": 5928,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/bed:b6_fabric_teal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/bed:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/bed:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/curtain:b6_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.031121981443116e-05,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 7296,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/desk:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/desk:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/radiator:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 2.384185791015625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/radiator:b6_radiator.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/seating:b6_fabric_blue",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.1920928955078125e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/seating:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/storage:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-furniture/storage:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/basin:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.911755642600129e-05,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 2304,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/basin:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 2.9802322387695312e-08,
+      "triangles": 576,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/basin:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 192,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/service-sink:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.62316771280781e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 288,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/service-sink:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 72,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/service-sink:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 24,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/shower:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.3969838619232178e-08,
+      "triangles": 216,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/shower:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 5.980936299296564e-05,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 648,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/shower:b6_shower_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 5.7376864579172457e-05,
+      "maxCornerUvError": 1.4901161193847656e-08,
+      "triangles": 1152,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/toilet:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 8.19688389269683e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/urinal:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.226482471259743e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 720,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/urinal:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 60,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/ventilation:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 48,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:interior-sanitary/ventilation:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 24,
       "glbTriangleMismatch": 0
     },
     {
@@ -919,47 +2561,71 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1032,
+      "triangles": 1272,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n01:stair-handrail:metal",
       "maxGlbErrorMetres": 0,
-      "maxCornerNormalError": 4.828139225267544e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1252,
+      "maxCornerNormalError": 6.169841582376884e-05,
+      "maxCornerUvError": 5.960464477539063e-08,
+      "triangles": 1528,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n01:stair-landing:concrete",
       "maxGlbErrorMetres": 0,
-      "maxCornerNormalError": 4.820276903252802e-05,
+      "maxCornerNormalError": 6.329454807746866e-05,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 104,
+      "triangles": 128,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n01:stair:concrete",
       "maxGlbErrorMetres": 0,
-      "maxCornerNormalError": 4.565221894635204e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 780,
+      "maxCornerNormalError": 4.865093123417481e-05,
+      "maxCornerUvError": 1.1920928955078125e-07,
+      "triangles": 948,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:venue-sign-board:b6_white_paint",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 2.0533886633858236e-05,
+      "maxCornerUvError": 0,
+      "triangles": 12,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:venue-sign-guard:b6_exterior_rail",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.984687841076971e-06,
+      "maxCornerUvError": 0,
+      "triangles": 48,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n01:venue-sign-lettering:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 8.15071791829193e-05,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 2272,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n01:wall:plaster",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 5.101218350193125e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 26008,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 26240,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n01:window-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1956,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 3036,
       "glbTriangleMismatch": 0
     },
     {
@@ -967,7 +2633,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 840,
+      "triangles": 1272,
       "glbTriangleMismatch": 0
     },
     {
@@ -975,7 +2641,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 420,
+      "triangles": 636,
       "glbTriangleMismatch": 0
     },
     {
@@ -983,7 +2649,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 420,
+      "triangles": 636,
       "glbTriangleMismatch": 0
     },
     {
@@ -998,24 +2664,280 @@
       "id": "b06:n02:door-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
+      "maxCornerUvError": 1.9073486328125e-06,
       "triangles": 3784,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n02:door-handle:metal",
       "maxGlbErrorMetres": 0,
-      "maxCornerNormalError": 4.998001405968792e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 2544,
+      "maxCornerNormalError": 3.945089109778033e-05,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 1632,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n02:door-leaf:door",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.1610029839688544e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 816,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:fixed-door-leaf:door",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1272,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:floor-finish:floor",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 4.6362263741957264e-05,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1800,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-ceiling-diffuser:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-ceiling-fixture:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/bed:b6_fabric_cream",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/bed:b6_fabric_cream.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.965743776090003e-05,
+      "maxCornerUvError": 7.62939453125e-06,
+      "triangles": 5928,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/bed:b6_fabric_teal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/bed:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/bed:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/curtain:b6_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.022140912437477e-05,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 7296,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/desk:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/desk:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/radiator:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 2.384185791015625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/radiator:b6_radiator.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/seating:b6_fabric_blue",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.1920928955078125e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/seating:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/storage:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-furniture/storage:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/basin:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.980132091664553e-05,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 2880,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/basin:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 720,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/basin:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 240,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/service-sink:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.8500650974104e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 288,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/service-sink:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 72,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/service-sink:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 24,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/shower:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 216,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/shower:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.292822827583196e-05,
+      "maxCornerUvError": 2.384185791015625e-07,
+      "triangles": 648,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/shower:b6_shower_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 5.734795663942644e-05,
+      "maxCornerUvError": 0,
+      "triangles": 1152,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/toilet:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.899265072035201e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/urinal:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.822284734523585e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 1440,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/urinal:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 120,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/ventilation:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 48,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n02:interior-sanitary/ventilation:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 24,
       "glbTriangleMismatch": 0
     },
     {
@@ -1030,7 +2952,7 @@
       "id": "b06:n02:stair-baluster:metal",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 864,
       "glbTriangleMismatch": 0
     },
@@ -1046,7 +2968,7 @@
       "id": "b06:n02:stair-landing:concrete",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 48,
       "glbTriangleMismatch": 0
     },
@@ -1062,16 +2984,16 @@
       "id": "b06:n02:wall:plaster",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 5.3607198183179e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 25076,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 25328,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n02:window-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.812878070998426e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 2568,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 3648,
       "glbTriangleMismatch": 0
     },
     {
@@ -1079,7 +3001,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.035881510403568e-05,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1128,
+      "triangles": 1560,
       "glbTriangleMismatch": 0
     },
     {
@@ -1087,7 +3009,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 3.771961929617738e-05,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 564,
+      "triangles": 780,
       "glbTriangleMismatch": 0
     },
     {
@@ -1095,7 +3017,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 3.712795582633534e-05,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 564,
+      "triangles": 780,
       "glbTriangleMismatch": 0
     },
     {
@@ -1110,24 +3032,280 @@
       "id": "b06:n03:door-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
+      "maxCornerUvError": 1.9073486328125e-06,
       "triangles": 3784,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n03:door-handle:metal",
       "maxGlbErrorMetres": 0,
-      "maxCornerNormalError": 4.998005848634734e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 2544,
+      "maxCornerNormalError": 4.998001405968792e-05,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 1632,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n03:door-leaf:door",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.1610029839688544e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 816,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:fixed-door-leaf:door",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1272,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:floor-finish:floor",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 4.6362263741957264e-05,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1800,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-ceiling-diffuser:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-ceiling-fixture:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/bed:b6_fabric_cream",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/bed:b6_fabric_cream.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.941385651806769e-05,
+      "maxCornerUvError": 7.62939453125e-06,
+      "triangles": 5928,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/bed:b6_fabric_teal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/bed:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/bed:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/curtain:b6_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.0283402239865546e-05,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 7296,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/desk:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/desk:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/radiator:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 2.384185791015625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/radiator:b6_radiator.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/seating:b6_fabric_blue",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.1920928955078125e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/seating:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/storage:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-furniture/storage:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/basin:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.827096244503385e-05,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 2880,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/basin:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 720,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/basin:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 240,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/service-sink:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.919001157223738e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 288,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/service-sink:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 72,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/service-sink:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 24,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/shower:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 216,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/shower:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.806103703292971e-05,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 648,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/shower:b6_shower_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 5.734795663942644e-05,
+      "maxCornerUvError": 0,
+      "triangles": 1152,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/toilet:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.80971436138666e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/urinal:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.186313597890026e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 1440,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/urinal:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 120,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/ventilation:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 48,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n03:interior-sanitary/ventilation:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 24,
       "glbTriangleMismatch": 0
     },
     {
@@ -1142,7 +3320,7 @@
       "id": "b06:n03:stair-baluster:metal",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 864,
       "glbTriangleMismatch": 0
     },
@@ -1158,7 +3336,7 @@
       "id": "b06:n03:stair-landing:concrete",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 48,
       "glbTriangleMismatch": 0
     },
@@ -1174,16 +3352,16 @@
       "id": "b06:n03:wall:plaster",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.768444457465833e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 24100,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 24344,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n03:window-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 2520,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 3600,
       "glbTriangleMismatch": 0
     },
     {
@@ -1191,7 +3369,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1104,
+      "triangles": 1536,
       "glbTriangleMismatch": 0
     },
     {
@@ -1199,7 +3377,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 552,
+      "triangles": 768,
       "glbTriangleMismatch": 0
     },
     {
@@ -1207,7 +3385,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 552,
+      "triangles": 768,
       "glbTriangleMismatch": 0
     },
     {
@@ -1222,7 +3400,7 @@
       "id": "b06:n04:door-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
+      "maxCornerUvError": 1.9073486328125e-06,
       "triangles": 3784,
       "glbTriangleMismatch": 0
     },
@@ -1230,16 +3408,272 @@
       "id": "b06:n04:door-handle:metal",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.998001405968792e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 2544,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 1632,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n04:door-leaf:door",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.179662825764988e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 816,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:fixed-door-leaf:door",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1272,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:floor-finish:floor",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 4.6362263741957264e-05,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1800,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-ceiling-diffuser:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-ceiling-fixture:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/bed:b6_fabric_cream",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/bed:b6_fabric_cream.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 8.302983177177238e-05,
+      "maxCornerUvError": 7.62939453125e-06,
+      "triangles": 5928,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/bed:b6_fabric_teal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/bed:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/bed:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/curtain:b6_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.0283402239865546e-05,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 7296,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/desk:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/desk:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/radiator:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 2.384185791015625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/radiator:b6_radiator.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/seating:b6_fabric_blue",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.1920928955078125e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/seating:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/storage:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-furniture/storage:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/basin:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.704927126623058e-05,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 2880,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/basin:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 720,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/basin:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 240,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/service-sink:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.227217412069734e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 288,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/service-sink:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 72,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/service-sink:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 24,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/shower:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 216,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/shower:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.806103703292971e-05,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 648,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/shower:b6_shower_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 5.7420228203434626e-05,
+      "maxCornerUvError": 0,
+      "triangles": 1152,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/toilet:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 8.388406826507633e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/urinal:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.782075759011522e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 1440,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/urinal:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 120,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/ventilation:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 48,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n04:interior-sanitary/ventilation:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 24,
       "glbTriangleMismatch": 0
     },
     {
@@ -1254,7 +3688,7 @@
       "id": "b06:n04:stair-baluster:metal",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 864,
       "glbTriangleMismatch": 0
     },
@@ -1270,7 +3704,7 @@
       "id": "b06:n04:stair-landing:concrete",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 48,
       "glbTriangleMismatch": 0
     },
@@ -1286,16 +3720,16 @@
       "id": "b06:n04:wall:plaster",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.710884218043179e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 24110,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 24354,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n04:window-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 2520,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 3600,
       "glbTriangleMismatch": 0
     },
     {
@@ -1303,7 +3737,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1104,
+      "triangles": 1536,
       "glbTriangleMismatch": 0
     },
     {
@@ -1311,7 +3745,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 552,
+      "triangles": 768,
       "glbTriangleMismatch": 0
     },
     {
@@ -1319,7 +3753,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 552,
+      "triangles": 768,
       "glbTriangleMismatch": 0
     },
     {
@@ -1334,7 +3768,7 @@
       "id": "b06:n05:door-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
+      "maxCornerUvError": 1.9073486328125e-06,
       "triangles": 3784,
       "glbTriangleMismatch": 0
     },
@@ -1342,16 +3776,272 @@
       "id": "b06:n05:door-handle:metal",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.998001405968792e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 2544,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 1632,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n05:door-leaf:door",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.179662825764988e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 816,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:fixed-door-leaf:door",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1272,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:floor-finish:floor",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 4.6362263741957264e-05,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1800,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-ceiling-diffuser:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-ceiling-fixture:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/bed:b6_fabric_cream",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/bed:b6_fabric_cream.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 8.302983177177238e-05,
+      "maxCornerUvError": 7.62939453125e-06,
+      "triangles": 5928,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/bed:b6_fabric_teal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/bed:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/bed:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/curtain:b6_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.0283402239865546e-05,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 7296,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/desk:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/desk:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/radiator:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 2.384185791015625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/radiator:b6_radiator.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/seating:b6_fabric_blue",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.1920928955078125e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/seating:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/storage:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-furniture/storage:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/basin:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.826443130970801e-05,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 2880,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/basin:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 720,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/basin:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 240,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/service-sink:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.227217412069734e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 288,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/service-sink:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 72,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/service-sink:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 24,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/shower:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 216,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/shower:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.806103703292971e-05,
+      "maxCornerUvError": 2.384185791015625e-07,
+      "triangles": 648,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/shower:b6_shower_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 5.74925054714241e-05,
+      "maxCornerUvError": 0,
+      "triangles": 1152,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/toilet:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.839187069886583e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/urinal:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.45325353478784e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 1440,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/urinal:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 120,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/ventilation:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 48,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n05:interior-sanitary/ventilation:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 24,
       "glbTriangleMismatch": 0
     },
     {
@@ -1366,7 +4056,7 @@
       "id": "b06:n05:stair-baluster:metal",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 864,
       "glbTriangleMismatch": 0
     },
@@ -1382,7 +4072,7 @@
       "id": "b06:n05:stair-landing:concrete",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 48,
       "glbTriangleMismatch": 0
     },
@@ -1398,16 +4088,16 @@
       "id": "b06:n05:wall:plaster",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 5.1796847847729216e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 24100,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 24344,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n05:window-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 2520,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 3600,
       "glbTriangleMismatch": 0
     },
     {
@@ -1415,7 +4105,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1104,
+      "triangles": 1536,
       "glbTriangleMismatch": 0
     },
     {
@@ -1423,7 +4113,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 552,
+      "triangles": 768,
       "glbTriangleMismatch": 0
     },
     {
@@ -1431,7 +4121,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 552,
+      "triangles": 768,
       "glbTriangleMismatch": 0
     },
     {
@@ -1446,24 +4136,280 @@
       "id": "b06:n06:door-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
+      "maxCornerUvError": 1.9073486328125e-06,
       "triangles": 3640,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n06:door-handle:metal",
       "maxGlbErrorMetres": 0,
-      "maxCornerNormalError": 4.363601454244968e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 2448,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 1536,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n06:door-leaf:door",
       "maxGlbErrorMetres": 0,
-      "maxCornerNormalError": 4.015479888986498e-05,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 768,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:fixed-door-leaf:door",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1224,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:floor-finish:floor",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 4.453565465694973e-05,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1748,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-ceiling-diffuser:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-ceiling-fixture:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 168,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/bed:b6_fabric_cream",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/bed:b6_fabric_cream.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 8.302983177177238e-05,
+      "maxCornerUvError": 7.62939453125e-06,
+      "triangles": 5928,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/bed:b6_fabric_teal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/bed:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/bed:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/curtain:b6_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.0493106065316196e-05,
+      "maxCornerUvError": 3.814697265625e-06,
+      "triangles": 7296,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/desk:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/desk:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 912,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/radiator:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 2.384185791015625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/radiator:b6_radiator.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 5472,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/seating:b6_fabric_blue",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.1920928955078125e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/seating:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/storage:b6_wood",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 456,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-furniture/storage:b6_wood.001",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1824,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/basin:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.966085035620664e-05,
+      "maxCornerUvError": 4.76837158203125e-07,
+      "triangles": 2880,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/basin:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 720,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/basin:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 240,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/service-sink:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.227217412069734e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 288,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/service-sink:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 72,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/service-sink:b6_mirror",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 24,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/shower:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 228,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/shower:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.806103703292971e-05,
+      "maxCornerUvError": 2.384185791015625e-07,
+      "triangles": 648,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/shower:b6_shower_curtain",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 5.74925054714241e-05,
+      "maxCornerUvError": 0,
+      "triangles": 1152,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/toilet:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 7.80971436138666e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 2736,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/urinal:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 6.679593060744398e-05,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 1440,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/urinal:b6_chrome",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 120,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/ventilation:b6_metal",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 48,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:n06:interior-sanitary/ventilation:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 0,
+      "triangles": 24,
       "glbTriangleMismatch": 0
     },
     {
@@ -1494,7 +4440,7 @@
       "id": "b06:n06:stair-landing:concrete",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 0,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 24,
       "glbTriangleMismatch": 0
     },
@@ -1510,16 +4456,16 @@
       "id": "b06:n06:wall:plaster",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.334491405874591e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 27158,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 27346,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:n06:window-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 2340,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 3420,
       "glbTriangleMismatch": 0
     },
     {
@@ -1527,7 +4473,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 1032,
+      "triangles": 1464,
       "glbTriangleMismatch": 0
     },
     {
@@ -1535,7 +4481,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 516,
+      "triangles": 732,
       "glbTriangleMismatch": 0
     },
     {
@@ -1543,7 +4489,7 @@
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
       "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 516,
+      "triangles": 732,
       "glbTriangleMismatch": 0
     },
     {
@@ -1558,7 +4504,7 @@
       "id": "b06:n07:wall:plaster",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
+      "maxCornerUvError": 0,
       "triangles": 584,
       "glbTriangleMismatch": 0
     },
@@ -1566,7 +4512,7 @@
       "id": "b06:n07:window-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
+      "maxCornerUvError": 0,
       "triangles": 96,
       "glbTriangleMismatch": 0
     },
@@ -1598,7 +4544,7 @@
       "id": "b06:p01:door-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.918795892056522e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
+      "maxCornerUvError": 1.9073486328125e-06,
       "triangles": 1872,
       "glbTriangleMismatch": 0
     },
@@ -1614,8 +4560,32 @@
       "id": "b06:p01:door-leaf:door",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 4.941983308221667e-05,
-      "maxCornerUvError": 1.1920928955078125e-07,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 624,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:p01:floor-finish:floor",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 4.96860959103516e-05,
+      "maxCornerUvError": 9.5367431640625e-07,
+      "triangles": 1532,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:p01:interior-ceiling-diffuser:b6_ceramic",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 5.960464477539063e-08,
+      "triangles": 72,
+      "glbTriangleMismatch": 0
+    },
+    {
+      "id": "b06:p01:interior-ceiling-fixture:b6_radiator",
+      "maxGlbErrorMetres": 0,
+      "maxCornerNormalError": 0,
+      "maxCornerUvError": 5.960464477539063e-08,
+      "triangles": 72,
       "glbTriangleMismatch": 0
     },
     {
@@ -1638,7 +4608,7 @@
       "id": "b06:p01:stair-baluster:metal",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 1.1920928955078125e-07,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 576,
       "glbTriangleMismatch": 0
     },
@@ -1646,7 +4616,7 @@
       "id": "b06:p01:stair-handrail:metal",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 1.579627461516153e-05,
-      "maxCornerUvError": 1.1920928955078125e-07,
+      "maxCornerUvError": 2.384185791015625e-07,
       "triangles": 720,
       "glbTriangleMismatch": 0
     },
@@ -1654,7 +4624,7 @@
       "id": "b06:p01:stair-landing:concrete",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 1.1920928955078125e-07,
+      "maxCornerUvError": 9.5367431640625e-07,
       "triangles": 64,
       "glbTriangleMismatch": 0
     },
@@ -1662,7 +4632,7 @@
       "id": "b06:p01:stair:concrete",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 2.265760637372519e-06,
-      "maxCornerUvError": 1.1920928955078125e-07,
+      "maxCornerUvError": 2.384185791015625e-07,
       "triangles": 432,
       "glbTriangleMismatch": 0
     },
@@ -1670,7 +4640,7 @@
       "id": "b06:p01:wall:concrete",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 1.1920928955078125e-07,
+      "maxCornerUvError": 5.960464477539063e-08,
       "triangles": 48,
       "glbTriangleMismatch": 0
     },
@@ -1678,15 +4648,15 @@
       "id": "b06:p01:wall:plaster",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 5.9893444879021355e-05,
-      "maxCornerUvError": 9.5367431640625e-07,
-      "triangles": 19600,
+      "maxCornerUvError": 1.9073486328125e-06,
+      "triangles": 19684,
       "glbTriangleMismatch": 0
     },
     {
       "id": "b06:p01:window-frame:frame",
       "maxGlbErrorMetres": 0,
       "maxCornerNormalError": 0,
-      "maxCornerUvError": 9.5367431640625e-07,
+      "maxCornerUvError": 1.9073486328125e-06,
       "triangles": 3072,
       "glbTriangleMismatch": 0
     },
@@ -1718,8 +4688,8 @@
   "collisionComparisons": [
     {
       "id": "b06:n01:canopy:concrete",
-      "maxNativeErrorMetres": 4.272460945031753e-07,
-      "triangles": 12
+      "maxNativeErrorMetres": 4.730224603122224e-07,
+      "triangles": 36
     },
     {
       "id": "b06:n01:canopy:metal",
@@ -1735,6 +4705,66 @@
       "id": "b06:n01:column:concrete",
       "maxNativeErrorMetres": 4.882812518758328e-07,
       "triangles": 252
+    },
+    {
+      "id": "b06:n01:fixed-door-leaf:door",
+      "maxNativeErrorMetres": 4.761962895116767e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n01:interior-furniture/bed:b6_fabric_cream",
+      "maxNativeErrorMetres": 4.796142576424245e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n01:interior-furniture/bed:b6_wood",
+      "maxNativeErrorMetres": 4.730224603122224e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n01:interior-furniture/desk:b6_wood",
+      "maxNativeErrorMetres": 4.956054695526291e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n01:interior-furniture/radiator:b6_radiator",
+      "maxNativeErrorMetres": 4.882812483231191e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n01:interior-furniture/seating:b6_fabric_blue",
+      "maxNativeErrorMetres": 4.872436525360513e-07,
+      "triangles": 1824
+    },
+    {
+      "id": "b06:n01:interior-furniture/storage:b6_wood",
+      "maxNativeErrorMetres": 4.974975578164731e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n01:interior-sanitary/basin:b6_ceramic",
+      "maxNativeErrorMetres": 4.9902343590702e-07,
+      "triangles": 2304
+    },
+    {
+      "id": "b06:n01:interior-sanitary/service-sink:b6_ceramic",
+      "maxNativeErrorMetres": 4.990844728602895e-07,
+      "triangles": 288
+    },
+    {
+      "id": "b06:n01:interior-sanitary/shower:b6_ceramic",
+      "maxNativeErrorMetres": 4.866409302195507e-07,
+      "triangles": 216
+    },
+    {
+      "id": "b06:n01:interior-sanitary/toilet:b6_ceramic",
+      "maxNativeErrorMetres": 4.998779310483314e-07,
+      "triangles": 2736
+    },
+    {
+      "id": "b06:n01:interior-sanitary/urinal:b6_ceramic",
+      "maxNativeErrorMetres": 4.964599611412268e-07,
+      "triangles": 720
     },
     {
       "id": "b06:n01:retaining-wall:concrete",
@@ -1754,37 +4784,102 @@
     {
       "id": "b06:n01:stair-baluster:metal",
       "maxNativeErrorMetres": 4.984130868024295e-07,
-      "triangles": 1032
+      "triangles": 1272
     },
     {
       "id": "b06:n01:stair-handrail:metal",
-      "maxNativeErrorMetres": 4.984130868024295e-07,
-      "triangles": 1252
+      "maxNativeErrorMetres": 4.998779310483314e-07,
+      "triangles": 1528
     },
     {
       "id": "b06:n01:stair-landing:concrete",
       "maxNativeErrorMetres": 4.964599611412268e-07,
-      "triangles": 104
+      "triangles": 128
     },
     {
       "id": "b06:n01:stair:concrete",
-      "maxNativeErrorMetres": 4.737548842115302e-07,
-      "triangles": 780
+      "maxNativeErrorMetres": 4.980468766291324e-07,
+      "triangles": 948
+    },
+    {
+      "id": "b06:n01:venue-sign-guard:b6_exterior_rail",
+      "maxNativeErrorMetres": 4.978027341451252e-07,
+      "triangles": 48
     },
     {
       "id": "b06:n01:wall:plaster",
       "maxNativeErrorMetres": 4.964599611412268e-07,
-      "triangles": 26008
+      "triangles": 26240
     },
     {
       "id": "b06:n01:window-glass:glass",
-      "maxNativeErrorMetres": 4.7387695190082013e-07,
-      "triangles": 420
+      "maxNativeErrorMetres": 4.97863769766127e-07,
+      "triangles": 636
     },
     {
       "id": "b06:n02:column:concrete",
       "maxNativeErrorMetres": 4.882812518758328e-07,
       "triangles": 252
+    },
+    {
+      "id": "b06:n02:fixed-door-leaf:door",
+      "maxNativeErrorMetres": 4.761962895116767e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n02:interior-furniture/bed:b6_fabric_cream",
+      "maxNativeErrorMetres": 4.796142576424245e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n02:interior-furniture/bed:b6_wood",
+      "maxNativeErrorMetres": 4.730224603122224e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n02:interior-furniture/desk:b6_wood",
+      "maxNativeErrorMetres": 4.956054695526291e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n02:interior-furniture/radiator:b6_radiator",
+      "maxNativeErrorMetres": 4.882812483231191e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n02:interior-furniture/seating:b6_fabric_blue",
+      "maxNativeErrorMetres": 4.872436525360513e-07,
+      "triangles": 1824
+    },
+    {
+      "id": "b06:n02:interior-furniture/storage:b6_wood",
+      "maxNativeErrorMetres": 4.974975578164731e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n02:interior-sanitary/basin:b6_ceramic",
+      "maxNativeErrorMetres": 4.9902343590702e-07,
+      "triangles": 2880
+    },
+    {
+      "id": "b06:n02:interior-sanitary/service-sink:b6_ceramic",
+      "maxNativeErrorMetres": 4.990844728602895e-07,
+      "triangles": 288
+    },
+    {
+      "id": "b06:n02:interior-sanitary/shower:b6_ceramic",
+      "maxNativeErrorMetres": 4.929885863980132e-07,
+      "triangles": 216
+    },
+    {
+      "id": "b06:n02:interior-sanitary/toilet:b6_ceramic",
+      "maxNativeErrorMetres": 4.998779310483314e-07,
+      "triangles": 2736
+    },
+    {
+      "id": "b06:n02:interior-sanitary/urinal:b6_ceramic",
+      "maxNativeErrorMetres": 4.984130868024295e-07,
+      "triangles": 1440
     },
     {
       "id": "b06:n02:slab:floor",
@@ -1814,17 +4909,77 @@
     {
       "id": "b06:n02:wall:plaster",
       "maxNativeErrorMetres": 4.964599611412268e-07,
-      "triangles": 25076
+      "triangles": 25328
     },
     {
       "id": "b06:n02:window-glass:glass",
       "maxNativeErrorMetres": 4.99328614012029e-07,
-      "triangles": 564
+      "triangles": 780
     },
     {
       "id": "b06:n03:column:concrete",
       "maxNativeErrorMetres": 4.882812518758328e-07,
       "triangles": 252
+    },
+    {
+      "id": "b06:n03:fixed-door-leaf:door",
+      "maxNativeErrorMetres": 4.761962895116767e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n03:interior-furniture/bed:b6_fabric_cream",
+      "maxNativeErrorMetres": 4.796142576424245e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n03:interior-furniture/bed:b6_wood",
+      "maxNativeErrorMetres": 4.730224603122224e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n03:interior-furniture/desk:b6_wood",
+      "maxNativeErrorMetres": 4.956054695526291e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n03:interior-furniture/radiator:b6_radiator",
+      "maxNativeErrorMetres": 4.882812483231191e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n03:interior-furniture/seating:b6_fabric_blue",
+      "maxNativeErrorMetres": 4.872436525360513e-07,
+      "triangles": 1824
+    },
+    {
+      "id": "b06:n03:interior-furniture/storage:b6_wood",
+      "maxNativeErrorMetres": 4.974975578164731e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n03:interior-sanitary/basin:b6_ceramic",
+      "maxNativeErrorMetres": 4.9902343590702e-07,
+      "triangles": 2880
+    },
+    {
+      "id": "b06:n03:interior-sanitary/service-sink:b6_ceramic",
+      "maxNativeErrorMetres": 4.990844728602895e-07,
+      "triangles": 288
+    },
+    {
+      "id": "b06:n03:interior-sanitary/shower:b6_ceramic",
+      "maxNativeErrorMetres": 4.866409302195507e-07,
+      "triangles": 216
+    },
+    {
+      "id": "b06:n03:interior-sanitary/toilet:b6_ceramic",
+      "maxNativeErrorMetres": 4.998779310483314e-07,
+      "triangles": 2736
+    },
+    {
+      "id": "b06:n03:interior-sanitary/urinal:b6_ceramic",
+      "maxNativeErrorMetres": 4.992675783910272e-07,
+      "triangles": 1440
     },
     {
       "id": "b06:n03:slab:floor",
@@ -1854,17 +5009,77 @@
     {
       "id": "b06:n03:wall:plaster",
       "maxNativeErrorMetres": 4.964599611412268e-07,
-      "triangles": 24100
+      "triangles": 24344
     },
     {
       "id": "b06:n03:window-glass:glass",
-      "maxNativeErrorMetres": 4.7387695190082013e-07,
-      "triangles": 552
+      "maxNativeErrorMetres": 4.97863769766127e-07,
+      "triangles": 768
     },
     {
       "id": "b06:n04:column:concrete",
       "maxNativeErrorMetres": 4.882812518758328e-07,
       "triangles": 252
+    },
+    {
+      "id": "b06:n04:fixed-door-leaf:door",
+      "maxNativeErrorMetres": 4.761962895116767e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n04:interior-furniture/bed:b6_fabric_cream",
+      "maxNativeErrorMetres": 4.796142576424245e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n04:interior-furniture/bed:b6_wood",
+      "maxNativeErrorMetres": 4.730224603122224e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n04:interior-furniture/desk:b6_wood",
+      "maxNativeErrorMetres": 4.956054695526291e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n04:interior-furniture/radiator:b6_radiator",
+      "maxNativeErrorMetres": 4.882812483231191e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n04:interior-furniture/seating:b6_fabric_blue",
+      "maxNativeErrorMetres": 4.872436525360513e-07,
+      "triangles": 1824
+    },
+    {
+      "id": "b06:n04:interior-furniture/storage:b6_wood",
+      "maxNativeErrorMetres": 4.974975578164731e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n04:interior-sanitary/basin:b6_ceramic",
+      "maxNativeErrorMetres": 4.9902343590702e-07,
+      "triangles": 2880
+    },
+    {
+      "id": "b06:n04:interior-sanitary/service-sink:b6_ceramic",
+      "maxNativeErrorMetres": 4.990844728602895e-07,
+      "triangles": 288
+    },
+    {
+      "id": "b06:n04:interior-sanitary/shower:b6_ceramic",
+      "maxNativeErrorMetres": 4.866409302195507e-07,
+      "triangles": 216
+    },
+    {
+      "id": "b06:n04:interior-sanitary/toilet:b6_ceramic",
+      "maxNativeErrorMetres": 4.998779310483314e-07,
+      "triangles": 2736
+    },
+    {
+      "id": "b06:n04:interior-sanitary/urinal:b6_ceramic",
+      "maxNativeErrorMetres": 4.9902343590702e-07,
+      "triangles": 1440
     },
     {
       "id": "b06:n04:slab:floor",
@@ -1894,17 +5109,77 @@
     {
       "id": "b06:n04:wall:plaster",
       "maxNativeErrorMetres": 4.964599611412268e-07,
-      "triangles": 24110
+      "triangles": 24354
     },
     {
       "id": "b06:n04:window-glass:glass",
-      "maxNativeErrorMetres": 4.7387695190082013e-07,
-      "triangles": 552
+      "maxNativeErrorMetres": 4.97863769766127e-07,
+      "triangles": 768
     },
     {
       "id": "b06:n05:column:concrete",
       "maxNativeErrorMetres": 4.882812518758328e-07,
       "triangles": 252
+    },
+    {
+      "id": "b06:n05:fixed-door-leaf:door",
+      "maxNativeErrorMetres": 4.761962895116767e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n05:interior-furniture/bed:b6_fabric_cream",
+      "maxNativeErrorMetres": 4.796142576424245e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n05:interior-furniture/bed:b6_wood",
+      "maxNativeErrorMetres": 4.730224603122224e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n05:interior-furniture/desk:b6_wood",
+      "maxNativeErrorMetres": 4.956054695526291e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n05:interior-furniture/radiator:b6_radiator",
+      "maxNativeErrorMetres": 4.882812483231191e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n05:interior-furniture/seating:b6_fabric_blue",
+      "maxNativeErrorMetres": 4.872436525360513e-07,
+      "triangles": 1824
+    },
+    {
+      "id": "b06:n05:interior-furniture/storage:b6_wood",
+      "maxNativeErrorMetres": 4.974975578164731e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n05:interior-sanitary/basin:b6_ceramic",
+      "maxNativeErrorMetres": 4.9902343590702e-07,
+      "triangles": 2880
+    },
+    {
+      "id": "b06:n05:interior-sanitary/service-sink:b6_ceramic",
+      "maxNativeErrorMetres": 4.990844728602895e-07,
+      "triangles": 288
+    },
+    {
+      "id": "b06:n05:interior-sanitary/shower:b6_ceramic",
+      "maxNativeErrorMetres": 4.866409302195507e-07,
+      "triangles": 216
+    },
+    {
+      "id": "b06:n05:interior-sanitary/toilet:b6_ceramic",
+      "maxNativeErrorMetres": 4.998779310483314e-07,
+      "triangles": 2736
+    },
+    {
+      "id": "b06:n05:interior-sanitary/urinal:b6_ceramic",
+      "maxNativeErrorMetres": 4.997558562536142e-07,
+      "triangles": 1440
     },
     {
       "id": "b06:n05:slab:floor",
@@ -1934,17 +5209,77 @@
     {
       "id": "b06:n05:wall:plaster",
       "maxNativeErrorMetres": 4.964599611412268e-07,
-      "triangles": 24100
+      "triangles": 24344
     },
     {
       "id": "b06:n05:window-glass:glass",
-      "maxNativeErrorMetres": 4.7387695190082013e-07,
-      "triangles": 552
+      "maxNativeErrorMetres": 4.97863769766127e-07,
+      "triangles": 768
     },
     {
       "id": "b06:n06:column:concrete",
       "maxNativeErrorMetres": 4.882812518758328e-07,
       "triangles": 252
+    },
+    {
+      "id": "b06:n06:fixed-door-leaf:door",
+      "maxNativeErrorMetres": 4.761962895116767e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n06:interior-furniture/bed:b6_fabric_cream",
+      "maxNativeErrorMetres": 4.796142576424245e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n06:interior-furniture/bed:b6_wood",
+      "maxNativeErrorMetres": 4.730224603122224e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n06:interior-furniture/desk:b6_wood",
+      "maxNativeErrorMetres": 4.956054695526291e-07,
+      "triangles": 912
+    },
+    {
+      "id": "b06:n06:interior-furniture/radiator:b6_radiator",
+      "maxNativeErrorMetres": 4.882812483231191e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n06:interior-furniture/seating:b6_fabric_blue",
+      "maxNativeErrorMetres": 4.872436525360513e-07,
+      "triangles": 1824
+    },
+    {
+      "id": "b06:n06:interior-furniture/storage:b6_wood",
+      "maxNativeErrorMetres": 4.974975578164731e-07,
+      "triangles": 456
+    },
+    {
+      "id": "b06:n06:interior-sanitary/basin:b6_ceramic",
+      "maxNativeErrorMetres": 4.9902343590702e-07,
+      "triangles": 2880
+    },
+    {
+      "id": "b06:n06:interior-sanitary/service-sink:b6_ceramic",
+      "maxNativeErrorMetres": 4.990844728602895e-07,
+      "triangles": 288
+    },
+    {
+      "id": "b06:n06:interior-sanitary/shower:b6_ceramic",
+      "maxNativeErrorMetres": 4.866409302195507e-07,
+      "triangles": 228
+    },
+    {
+      "id": "b06:n06:interior-sanitary/toilet:b6_ceramic",
+      "maxNativeErrorMetres": 4.998779310483314e-07,
+      "triangles": 2736
+    },
+    {
+      "id": "b06:n06:interior-sanitary/urinal:b6_ceramic",
+      "maxNativeErrorMetres": 4.97192381487821e-07,
+      "triangles": 1440
     },
     {
       "id": "b06:n06:slab:floor",
@@ -1974,12 +5309,12 @@
     {
       "id": "b06:n06:wall:plaster",
       "maxNativeErrorMetres": 4.964599611412268e-07,
-      "triangles": 27158
+      "triangles": 27346
     },
     {
       "id": "b06:n06:window-glass:glass",
-      "maxNativeErrorMetres": 4.7387695190082013e-07,
-      "triangles": 516
+      "maxNativeErrorMetres": 4.97863769766127e-07,
+      "triangles": 732
     },
     {
       "id": "b06:n07:slab:roof",
@@ -2034,7 +5369,7 @@
     {
       "id": "b06:p01:wall:plaster",
       "maxNativeErrorMetres": 4.964599611412268e-07,
-      "triangles": 19600
+      "triangles": 19684
     },
     {
       "id": "b06:p01:window-glass:glass",
@@ -2044,7 +5379,7 @@
   ],
   "stairClearance": {
     "requiredHeadroom": 1.9,
-    "samples": 372,
+    "samples": 388,
     "blocked": [],
     "missingSupport": [],
     "scope": "Opora a svislá světlost nad středy stupňů; nenahrazuje prostorový průchod herního controlleru."

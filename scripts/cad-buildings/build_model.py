@@ -53,8 +53,9 @@ def parse_args():
 
 class Geometry:
     """Jedna editovatelná síť na podlaží/roli/materiál, nikoli objekt na každý šroub."""
-    def __init__(self, origin):
+    def __init__(self, origin, finishes=None):
         self.origin = origin
+        self.finishes = finishes
         self.groups = {}
         self.counts = defaultdict(int)
 
@@ -66,7 +67,7 @@ class Geometry:
         if not points:
             self.counts['removedCollapsedFaces'] += 1
             return
-        group = self.groups.setdefault(key, {"vertices": [], "faces": [], "lookup": {}, "faceLookup": {}})
+        group = self.groups.setdefault(key, {"vertices": [], "faces": [], "faceMaterials": [], "lookup": {}, "faceLookup": {}})
         indices = []
         for point in points:
             if point not in group["lookup"]:
@@ -90,6 +91,7 @@ class Geometry:
                 return
             group['faceLookup'][identity]=len(group['faces'])
             group["faces"].append(indices)
+            group['faceMaterials'].append(self.finishes.face_material(key[0],key[1],points,key[2]) if self.finishes else key[2])
 
     def solid(self, floor, spec):
         bottom, top = spec["bottom"], spec["top"]
@@ -184,6 +186,11 @@ class Geometry:
 
     def window(self, floor, window):
         a,b=window['a'],window['b'];bottom,top=window['bottom'],window['top']
+        plane_offset=window.get('windowPlaneNormalOffset',0)
+        if plane_offset:
+            direction=Vector((b[0]-a[0],b[1]-a[1])).normalized()
+            a=[a[0]-direction.y*plane_offset,a[1]+direction.x*plane_offset]
+            b=[b[0]-direction.y*plane_offset,b[1]+direction.x*plane_offset]
         self.glazed_panel(floor,a,b,bottom,top,lower_infill=window.get('lowerInfillHeight',0))
         direction=Vector((b[0]-a[0],b[1]-a[1])).normalized()
         sill_depth = min(0.65, max(0.2, window.get("depth", 0.38)+0.1))
@@ -217,6 +224,11 @@ class Geometry:
             # výplně bez balkonů. Viditelná výplň je zároveň skutečnou kolizí.
             self.glazed_panel(floor,jamb_a,jamb_b,bottom,top,prefix='facade')
             self.counts['fixedFacadeGlazing']+=1
+            self.counts['doors']+=1
+            return
+        if door.get('openingClassification')=='fixed-paired-door-leaf':
+            self.prism((floor,'fixed-door-leaf','door',True),jamb_a,jamb_b,.038,bottom+.015,top-.02)
+            self.counts['fixedBedroomLeaves']+=1
             self.counts['doors']+=1
             return
         if door.get('leafMaterial')=='glass':
@@ -334,6 +346,7 @@ def create_meshes(geometry, root):
     building_id = root['buildingId']
     building_identity(building_id)
     materials = {name:make_material(name, building_id) for name in MATERIALS}
+    if geometry.finishes:materials.update(geometry.finishes.create_materials())
     collections = {}
     objects = []
     for key, group in geometry.groups.items():
@@ -344,7 +357,8 @@ def create_meshes(geometry, root):
             bpy.context.scene.collection.children.link(collection)
             collections[floor] = collection
         mesh = bpy.data.meshes.new(f"{building_id}:{floor}:{role}:{material}")
-        mesh.from_pydata(group["vertices"], [], [face for face in group["faces"] if face is not None])
+        faces=[(face,material_key) for face,material_key in zip(group['faces'],group['faceMaterials']) if face is not None]
+        mesh.from_pydata(group["vertices"], [], [face for face,_ in faces])
         mesh.update(calc_edges=True)
         if mesh.validate(verbose=False):
             raise ValueError("Blender musel opravit geometrii: " + mesh.name)
@@ -355,15 +369,20 @@ def create_meshes(geometry, root):
         obj["floorId"] = floor
         obj["role"] = role
         obj["collision"] = collision
-        mesh.materials.append(materials.get(material, materials["plaster"]))
+        slots=list(dict.fromkeys(material_key for _,material_key in faces))
+        for material_key in slots:mesh.materials.append(materials.get(material_key,materials['plaster']))
         uv = mesh.uv_layers.new(name="UVMap")
         for polygon in mesh.polygons:
+            material_key=faces[polygon.index][1]
+            polygon.material_index=slots.index(material_key)
             normal = polygon.normal
             axis = max(range(3),key=lambda i:abs(normal[i]))
             pair = [(1,2),(0,2),(0,1)][axis]
-            for loop in polygon.loop_indices:
+            points=[mesh.vertices[index].co for index in polygon.vertices]
+            mapped=geometry.finishes.uv_for_face(floor,role,points,material_key) if geometry.finishes else None
+            for corner,loop in enumerate(polygon.loop_indices):
                 v = mesh.vertices[mesh.loops[loop].vertex_index].co
-                uv.data[loop].uv = (v[pair[0]]/1.5,v[pair[1]]/1.5)
+                uv.data[loop].uv = mapped[corner] if mapped is not None else (v[pair[0]]/1.5,v[pair[1]]/1.5)
             polygon.use_smooth = role=="column" and abs(normal.z)<0.01
         objects.append(obj)
     return objects
@@ -425,6 +444,7 @@ def export_collision(objects, recipe, stairs):
     if recipe.get('heightModel') is not None:result['heightModel']=recipe['heightModel']
     doors=door_metadata(recipe)
     if doors is not None:result['doors']=doors
+    if recipe.get('roomWalkPaths') is not None:result['roomWalkPaths']=recipe['roomWalkPaths']
     return result
 
 
@@ -441,7 +461,8 @@ def door_metadata(recipe):
     fields={'id','hinge','closedEnd','openEnd','bottom','top','depth','normalOffset','sourceEntities',
             'openingClassification','accessConfirmed','fixedGlazing','classificationBasis','levelKey','levelBasis',
             'approachBoundaryCad','approachBasis','accessClassification','leafMaterial',
-            'outsideSupportId','outsideSupportTop','outsideStepEstimate','outsideTraversalStatus'}
+            'outsideSupportId','outsideSupportTop','outsideStepEstimate','outsideTraversalStatus','outsideHeightBasis',
+            'pairedDoorId','pairedDoorRole','roomSourceEntity'}
     return [{key:value for key,value in door.items() if key in fields}|{'floor':floor['id']}
             for floor in recipe['floors'] for door in floor.get('doors',[])]
 
@@ -502,6 +523,11 @@ def add_stairs(geometry, recipe):
                            'routeIndex':index,'routeSegmentCount':len(route['segments']),
                            'lowerLevelKey':segment['lowerLevelKey'],'upperLevelKey':segment['upperLevelKey'],
                            'riserCountInterpretation':segment['riserCountInterpretation']})
+            if segment.get('sourceFrontsMeasured') is False:
+                flight.update({'measuredRiserPositions':False,'riserPositionBasis':segment['planBasis'],
+                               'heightProvenance':segment['verticalBasis'],'sourceKind':segment['sourceKind'],
+                               'sourceManifestSha256':segment['sourceManifestSha256']})
+            if route.get('upperSupportSolidId'):flight['upperSupportSolidId']=route['upperSupportSolidId']
             if route.get('accessPath'):
                 flight['routeAccessPath']=route['accessPath']
             if route.get('terrainValidationPending'):
@@ -525,6 +551,41 @@ def add_stairs(geometry, recipe):
     return stairs
 
 
+def add_exterior_signs(geometry, recipe):
+    """Legible source-identified venue names, authored closed mesh lettering."""
+    for sign in recipe.get('exteriorSigns',[]):
+        floor=sign.get('floor','n01');a,b=sign['a'],sign['b'];bottom,top=sign['bottom'],sign['top']
+        geometry.prism((floor,'venue-sign-board','b6_white_paint',False),a,b,.025,bottom,top)
+        along=(Vector(geometry.at(b,0))-Vector(geometry.at(a,0))).normalized()
+        up=Vector((0,0,1));normal=along.cross(up)
+        center=(Vector(geometry.at(a,0))+Vector(geometry.at(b,0)))/2
+        # The photographed banner hangs on the outer deck guard; its frame
+        # does not extend down through the lower club entrance.
+        for fraction in (0,.5,1):
+            point=[a[i]+(b[i]-a[i])*fraction for i in range(2)]
+            geometry.beam((floor,'venue-sign-guard','b6_exterior_rail',True),
+                geometry.at(point,bottom-.25),geometry.at(point,top+.05),.035)
+        geometry.beam((floor,'venue-sign-guard','b6_exterior_rail',True),
+            geometry.at(a,top+.05),geometry.at(b,top+.05),.04)
+        row_height=(top-bottom)/len(sign['lines'])
+        for row,label in enumerate(sign['lines']):
+            curve=bpy.data.curves.new('temporary venue lettering','FONT')
+            curve.body=label;curve.align_x='CENTER';curve.size=1;curve.extrude=.006;curve.resolution_u=4
+            obj=bpy.data.objects.new('temporary venue lettering',curve);bpy.context.scene.collection.objects.link(obj)
+            bpy.context.view_layer.update()
+            evaluated=obj.evaluated_get(bpy.context.evaluated_depsgraph_get());mesh=evaluated.to_mesh()
+            try:
+                xs=[v.co.x for v in mesh.vertices];ys=[v.co.y for v in mesh.vertices]
+                scale=min(math.dist(a,b)*.90/(max(xs)-min(xs)),row_height*.73/(max(ys)-min(ys)))
+                baseline=top-row_height*(row+.5)-(max(ys)+min(ys))*scale/2
+                points=[center+along*(v.co.x*scale)+up*(baseline+v.co.y*scale)+normal*(.014+v.co.z*scale) for v in mesh.vertices]
+                for polygon in mesh.polygons:
+                    geometry.face((floor,'venue-sign-lettering','b6_metal',False),[points[i] for i in polygon.vertices])
+            finally:
+                evaluated.to_mesh_clear();bpy.data.objects.remove(obj,do_unlink=True);bpy.data.curves.remove(curve)
+        geometry.counts['venue-signs']+=1
+
+
 def create_from_recipe(path):
     recipe=json.loads(path.read_text(encoding="utf-8"))
     building_id=recipe.get('buildingId')
@@ -545,12 +606,33 @@ def create_from_recipe(path):
     root["dimensionsMeasured"]=False
     root["modelStatus"]="candidate; native reopen and visual acceptance required"
     root["cadOrigin"]=recipe["cadOrigin"]
-    geometry=Geometry(recipe["cadOrigin"])
+    finishes=None
+    if building_id=='b06':
+        from b6_finishes import B6Finishes
+        finishes=B6Finishes(recipe)
+    geometry=Geometry(recipe["cadOrigin"],finishes)
     for floor in recipe["floors"]:
         for spec in floor["solids"]:geometry.solid(floor["id"],spec)
         for window in floor.get("windows",[]):geometry.window(floor["id"],window)
         for door in floor.get("doors",[]):geometry.door(floor["id"],door)
+        if finishes:
+            for room in floor.get('rooms',[]):
+                height=floor['levelElevations'][room['levelKey'].split('.')[-1]]
+                for index,triangle in enumerate(room.get('finishTriangles',[])):
+                    geometry.solid(floor['id'],{'id':f"finish-{room['id']}-{index}",'role':'floor-finish',
+                        'material':'floor','collision':False,'bottom':height+.001,'top':height+.003,
+                        'loops':[triangle],'triangles':[triangle]})
     stairs=add_stairs(geometry,recipe)
+    if finishes:
+        from b6_furnishings import add_b06_furnishings
+        furnishing_audit=add_b06_furnishings(geometry,recipe)
+        recipe['roomWalkPaths']=furnishing_audit['rooms']
+        root['furnishingsAudit']=json.dumps(furnishing_audit,ensure_ascii=False)
+        root['roomWalkPaths']=json.dumps(recipe['roomWalkPaths'],ensure_ascii=False)
+        dependencies=['build_model.py','model_geometry.py','b6_finishes.py','b6_furnishings.py']
+        root['authoringDependenciesSha256']=json.dumps({name:hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest() for name in dependencies})
+        add_exterior_signs(geometry,recipe)
+        root['exteriorSigns']=json.dumps(recipe.get('exteriorSigns',[]),ensure_ascii=False)
     root['floorMetadata']=json.dumps(floor_metadata(recipe),ensure_ascii=False)
     root['heightModel']=json.dumps(recipe.get('heightModel'),ensure_ascii=False)
     root['stairAnnotations']=json.dumps(stairs,ensure_ascii=False)
@@ -603,6 +685,7 @@ def open_master(path):
               'terrainPreservationAreas':json.loads(root.get('terrainPreservationAreasCad','[]')),
               'heightModel':json.loads(root.get('heightModel','null'))}
     if 'doorAnnotations' in root:metadata['doors']=json.loads(root['doorAnnotations'])
+    if 'roomWalkPaths' in root:metadata['roomWalkPaths']=json.loads(root['roomWalkPaths'])
     stairs=json.loads(root['stairAnnotations'])
     return root,objects,metadata,stairs,{}
 

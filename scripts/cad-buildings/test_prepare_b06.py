@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 
 import numpy as np
-from shapely.geometry import GeometryCollection, Point, Polygon, box
+from shapely.geometry import GeometryCollection, LineString, Point, Polygon, box
 from shapely.ops import unary_union
 
 import prepare_b06 as b6
@@ -235,7 +235,7 @@ class B6SourcePrimitiveTests(unittest.TestCase):
 
     def test_east_cover_preserves_lower_door_head_and_records_real_drop(self):
         _,head=b6.geom.opening_vertical_span('door',b6.level('p01.mezzanine'),b6.ceiling('p01.mezzanine'))
-        self.assertGreater(b6.EAST_TERRACE_TOP-.15-head,.20)
+        self.assertGreater(b6.EAST_TERRACE_TOP-.20-head,.20)
         self.assertAlmostEqual(b6.level('n01.mezzanine')-b6.EAST_TERRACE_TOP,.4812777)
 
     def test_portico_support_replaces_same_level_once_not_canopy_shadow(self):
@@ -305,10 +305,185 @@ class B6SourcePrimitiveTests(unittest.TestCase):
         self.assertFalse(any(s['role']=='wall' and s['bottom']<height<s['top'] and Polygon(s['loops'][0],s['loops'][1:]).covers(point) for s in floor['solids']))
 
 
+class B6PhotoShellTests(unittest.TestCase):
+    def window_fixture(self, cap=True):
+        data={'rooms':[
+            {'id':'104','sourceEntity':'A31','geometry':box(27.628804,.384403,29.928803,6.364403)},
+            {'id':'105','sourceEntity':'A26','geometry':box(30.028803,.384403,32.328803,6.364403)}],
+            'lines':[line('F5A',[27.751002,.239404],[32.151002,.239404],'3-OKNA'),
+                     line('F5B',[27.751002,.189403],[32.151002,.189403],'3-OKNA'),
+                     line('5EC',[30.028803,.189403],[30.028803,5.054403],b6.geom.STRONG),
+                     line('5ED',[29.928803,.189403],[29.928803,5.054403],b6.geom.STRONG)]}
+        if cap:data['lines'].append(line('94C',[29.928803,.189403],[30.028803,.189403],b6.geom.STRONG))
+        b6.annotate_room_usage(data,'n02')
+        return data,{'id':'n02-window-F5A','a':[27.751002,.2144035],'b':[32.151002,.2144035],
+                     'sourceEntities':['F5A','F5B']}
+
+    def test_room_usage_does_not_turn_annex_sink_only_or_basement_into_bedrooms(self):
+        room={'id':'104','sourceEntity':'source','geometry':box(27.629,.384,29.929,6.364)}
+        self.assertEqual(b6.room_usage('n02',room)[0],'bedroom')
+        self.assertEqual(b6.room_usage('p01',room)[0],'other')
+        for identifier in ('143','145a','147'):
+            self.assertEqual(b6.room_usage('n02',{**room,'id':identifier})[0],'other')
+        self.assertEqual(b6.room_usage('n02',{**room,'geometry':box(0,0,2.3,6)})[0],'other')
+        for identifier,usage in [('144b','bathroom'),('121a','wc'),('191','corridor')]:
+            self.assertEqual(b6.room_usage('n02',{**room,'id':identifier})[0],usage)
+
+    def test_measured_sanitary_strokes_group_without_merging_adjacent_basins(self):
+        room={'id':'144b','geometry':box(0,0,3,6)}
+        equipment=[]
+        for i,y in enumerate((1,1.70425)):
+            for label,shape in [('outer',box(.1,y-.3,.55,y+.3)),('inner',box(.14,y-.26,.51,y+.26))]:
+                equipment.append((f'{i}-{label}',LineString(shape.exterior.coords)))
+        fixtures=b6.sanitary_fixtures(room,equipment)
+        self.assertEqual(len(fixtures),2)
+        for i,item in enumerate(fixtures):
+            self.assertEqual(item['kind'],'basin');self.assertEqual(item['size'],[.6,.45])
+            self.assertEqual(item['facingCad'],[1,0])
+            self.assertEqual(item['sourceEntities'],[f'{i}-inner',f'{i}-outer'])
+        self.assertEqual(fixtures[0]['boundsCad'],[.1,.7,.55,1.3])
+
+    def test_unknown_sanitary_symbol_is_not_invented_or_repeated(self):
+        with self.assertRaisesRegex(ValueError,'Unknown B6 sanitary symbol'):
+            b6.sanitary_fixtures({'id':'144b','geometry':box(0,0,3,6)},[('unknown',LineString(box(.1,.1,1.1,1.1).exterior.coords))])
+
+    def test_source_room_pair_retains_only_the_full_swing_as_active(self):
+        room={'id':'104','sourceEntity':'A31','usage':'bedroom','geometry':box(0,0,2.3,6)}
+        data={'rooms':[room,{'usage':'corridor','geometry':box(0,6.125,2.3,8)}]}
+        doors=[{'id':'short','hinge':[.5,6.125],'closedEnd':[1.125,6.125],'openEnd':[1.059017,6.404508]},
+               {'id':'full','hinge':[1.75,6.125],'closedEnd':[1.125,6.125],'openEnd':[1.75,6.75]},
+               {'id':'entry','hinge':[8,6.125],'closedEnd':[9,6.125],'openEnd':[8,7.125]}]
+        b6.annotate_bedroom_door_pairs(data,doors)
+        self.assertEqual(doors[0]['openingClassification'],'fixed-paired-door-leaf')
+        self.assertEqual(doors[0]['pairedDoorId'],'full');self.assertEqual(doors[1]['pairedDoorId'],'short')
+        self.assertNotIn('openingClassification',doors[1]);self.assertNotIn('pairedDoorRole',doors[2])
+        self.assertEqual(doors[0]['closedEnd'],[1.125,6.125])
+        doors[0]['openEnd']=[.5,6.75]
+        with self.assertRaisesRegex(ValueError,'Ambiguous active bedroom leaf'):b6.annotate_bedroom_door_pairs(data,doors)
+
+    def test_two_room_window_keeps_actual_100mm_partition_and_frame_plane(self):
+        data,window=self.window_fixture()
+        children,keep=b6.split_bedroom_window(window,data)
+        self.assertEqual(len(children),2)
+        self.assertEqual([c['roomId'] for c in children],['104','105'])
+        self.assertEqual([c['paneCount'] for c in children],[2,2])
+        self.assertAlmostEqual(children[1]['a'][0]-children[0]['b'][0],.1)
+        for c in children:
+            self.assertEqual(c['windowPlaneNormalOffset'],0)
+            self.assertAlmostEqual(c['a'][1],window['a'][1],delta=.000001)
+            self.assertEqual(c['parentWindowId'],window['id'])
+        self.assertTrue(keep.covers(Point(29.978803,.214404)))
+        self.assertFalse(keep.covers(Point(29.978803,.14)), 'do not extend the source wall to the outer sill face')
+
+    def test_partition_without_cap_requires_both_faces_end_at_source_frame(self):
+        data,window=self.window_fixture(cap=False)
+        children,keep=b6.split_bedroom_window(window,data)
+        self.assertEqual(len(children),2);self.assertIn('F5B',children[0]['partitionSourceEntities'])
+        data['lines'][2]=line('5EC',[30.028803,.20],[30.028803,5.054403],b6.geom.STRONG)
+        children,keep=b6.split_bedroom_window(window,data)
+        self.assertEqual(len(children),1);self.assertTrue(keep.is_empty)
+
+    def test_window_cut_preserves_source_wall_instead_of_only_changing_labels(self):
+        data,window=self.window_fixture()
+        _,partition=b6.split_bedroom_window(window,data)
+        wall=partition.union(box(27.151,-.060596,32.751,.384403))
+        openings,windows,_=b6.opening_descriptors('n02',data,wall,GeometryCollection(),[])
+        self.assertEqual(len(windows),2);self.assertEqual(len(openings),1)
+        witness=Point(29.978803,.214404)
+        self.assertTrue(openings[0]['bridge'].covers(witness))
+        self.assertFalse(openings[0]['cut'].covers(witness))
+        bands=b6.geom.wall_bands(wall,openings,3,5.8,'fixture')
+        solid=unary_union([Polygon(s['loops'][0],s['loops'][1:]) for s in bands if s['bottom']<4.5<s['top']])
+        self.assertTrue(solid.covers(witness))
+        self.assertFalse(solid.covers(Point(29,.214404)))
+        self.assertFalse(solid.covers(Point(31,.214404)))
+
+    def test_sanitary_or_single_room_windows_do_not_acquire_bedroom_split(self):
+        data,window=self.window_fixture()
+        for room in data['rooms']:room['usage']='bathroom'
+        children,keep=b6.split_bedroom_window(window,data)
+        self.assertEqual(len(children),1);self.assertTrue(keep.is_empty)
+
+    def test_room_finish_covers_exact_slab_intersection_without_stair_or_other_level(self):
+        room={'levelKey':'n02.main','loops':[[[0,0],[4,0],[4,4],[0,4]]]}
+        hole=box(1,1,2,3);supported=box(0,0,4,4).difference(hole)
+        solids=b6.geom.serialize_solids(supported,'floor','slab',2.8,3,'floor')
+        solids+=b6.geom.serialize_solids(hole,'lower-floor','slab',1.3,1.5,'floor')
+        solids+=b6.geom.serialize_solids(hole,'landing','stair-landing',2.8,3,'floor')
+        b6.room_floor_finishes([room],solids)
+        triangles=unary_union([Polygon(t) for t in room['finishTriangles']])
+        self.assertAlmostEqual(room['finishAreaM2'],14)
+        self.assertAlmostEqual(triangles.symmetric_difference(supported).area,0)
+        self.assertAlmostEqual(triangles.intersection(hole).area,0)
+        self.assertEqual(room['loops'],[[[0,0],[4,0],[4,4],[0,4]]])
+
+
+    def test_understairs_finish_has_one_owner_without_changing_accounting_rooms(self):
+        corridor={'sourceEntity':'8F6','usage':'corridor','levelKey':'n02.main','loops':[[[0,0],[4,0],[4,4],[0,4]]]}
+        under={'sourceEntity':'8EB','usage':'other','levelKey':'n02.main','loops':[[[1,1],[2,1],[2,3],[1,3]]]}
+        solids=b6.geom.serialize_solids(box(0,0,4,4),'floor','slab',2.8,3,'floor')
+        b6.room_floor_finishes([corridor,under],solids)
+        a=unary_union([Polygon(t) for t in corridor['finishTriangles']])
+        b=unary_union([Polygon(t) for t in under['finishTriangles']])
+        self.assertAlmostEqual(a.intersection(b).area,0)
+        self.assertAlmostEqual(a.union(b).area,16)
+        self.assertEqual(corridor['loops'],[[[0,0],[4,0],[4,4],[0,4]]])
+
+
+class B6RearSourceTests(unittest.TestCase):
+    def test_two_observed_slopes_have_explicit_estimated_counts_and_ground_foot(self):
+        rear=b6.rear_exterior_metadata();route=rear['plans'][0]
+        self.assertEqual(len(route['segments']),2)
+        self.assertAlmostEqual(rear['anchors']['exterior.rear.lower']+b6.B6_PHOTO_ORIGIN_Y,-1.0655)
+        self.assertAlmostEqual(rear['anchors']['exterior.rear.mid']+b6.B6_PHOTO_ORIGIN_Y,.32)
+        for segment in route['segments']:
+            self.assertFalse(segment['sourceFrontsMeasured']);self.assertEqual(len(segment['frontEdgesCad']),8)
+            self.assertGreater(min(np.diff(segment['riserPositions'])),.2)
+            rise=(rear['anchors'][segment['upperLevelKey']]-rear['anchors'][segment['lowerLevelKey']])/8
+            self.assertTrue(.17<rise<.18)
+        self.assertEqual(route['upperSupportSolidId'],'b06-east-mezz-terrace')
+        self.assertEqual(len(route['landings']),2,'canopy is not duplicated as another upper landing')
+
+    def test_terrace_reaches_ipr_envelope_and_supports_terminal_without_covering_last_tread(self):
+        route=b6.rear_exterior_metadata()['plans'][0];segment=route['segments'][-1];edges=segment['frontEdgesCad']
+        deck=b6.rear_terrace_shape();last=Polygon([edges[-2][0],edges[-2][1],edges[-1][1],edges[-1][0]])
+        self.assertGreater(deck.bounds[3],20.2);self.assertTrue(19<deck.area<21)
+        self.assertLess(LineString(edges[-1]).difference(deck.buffer(.001)).length,.001)
+        self.assertLess(deck.intersection(last).area,.002)
+        self.assertTrue(deck.covers(Point(53.7,17.5)))
+
+    def test_rear_terrain_mask_does_not_erase_terrace_shadow_or_surrounding_lawn(self):
+        rear=b6.rear_exterior_metadata();cut=unary_union([Polygon(q['loops'][0]) for q in rear['terrainCutouts']])
+        self.assertLess(cut.area,11)
+        self.assertFalse(cut.covers(Point(53.7,18)))
+        self.assertFalse(cut.covers(Point(64,22)))
+        sign=b6.rear_sign();self.assertGreater(sign['a'][0],sign['b'][0]);self.assertAlmostEqual(sign['top']-sign['bottom'],.7)
+
+    def test_shower_cap_keeps_perimeter_and_measured_half_metre_openings(self):
+        lines=[];shapes=[]
+        for i,(lo,hi,slo,shi) in enumerate([(6.908802,7.493768,7.232103,7.332103),(7.993767,8.578803,8.155502,8.255502)]):
+            for suffix,a,c in [('bar',[lo,5.114403],[hi,5.114403]),('left',[lo,5.114403],[lo,5.214403]),
+                               ('right',[hi,5.114403],[hi,5.214403]),('stem-a',[slo,5.214403],[slo,6.114403]),('stem-b',[shi,5.214403],[shi,6.114403])]:
+                lines.append(line(str(i)+suffix,a,c,b6.geom.STRONG))
+            shapes += [box(lo,5.114403,hi,5.214403),box(slo,5.214403,shi,6.114403)]
+        room={'id':'144b','sourceEntity':'A80','usage':'bathroom','geometry':box(6.409,.364,9.079,6.114),
+              'sanitaryFixtures':[{'kind':'shower','centerCad':[x,5.664403],'boundsCad':[x-.36165,5.264403,x+.36165,6.064403],'facingCad':[0,-1]}
+                                  for x in (6.820453,7.743803,8.667153)]}
+        perimeter=unary_union([box(6.309,.264,6.409,6.314),box(9.079,.264,9.179,6.314),box(6.409,6.114403,9.079,6.314)])
+        wall=unary_union(shapes+[perimeter]);before=room['geometry'].wkt
+        remaining,solids,notes=b6.capped_shower_walls('n02',{'rooms':[room],'lines':lines},wall,GeometryCollection(),[])
+        self.assertEqual(len(notes),2);self.assertTrue(all(abs(s['top']-5.05)<1e-6 for s in solids))
+        self.assertTrue(remaining.covers(Point(6.36,5.16)));self.assertTrue(remaining.covers(Point(8,6.25)))
+        self.assertFalse(remaining.covers(Point(7.28,5.5)))
+        retained=remaining.union(unary_union([Polygon(s['loops'][0],s['loops'][1:]) for s in solids]))
+        self.assertLess(retained.symmetric_difference(wall).area,.001)
+        self.assertFalse(retained.covers(Point(6.65,5.1644)));self.assertEqual(room['geometry'].wkt,before)
+
+
 class LocalB6RecipeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        path=b6.ROOT/'.cache/cad-buildings-20261024/b06-preparation/recipe.json'
+        path=Path(os.environ.get('B06_RECIPE_PATH',str(b6.ROOT/'.cache/cad-buildings-20261024/b06-preparation/recipe.json')))
         strict=os.environ.get('B06_RECIPE_ACCEPTANCE')=='1'
         if not path.exists():
             if strict:raise AssertionError('B6 recipe absent; full generation is required')
@@ -318,6 +493,39 @@ class LocalB6RecipeTests(unittest.TestCase):
             if strict:raise AssertionError('B6 generator/helper cache is stale')
             raise unittest.SkipTest('B6 recipe is stale')
 
+    def test_photo_usage_and_single_bedroom_leaf_are_source_scoped(self):
+        for floor in self.recipe['floors']:
+            bedrooms=[room for room in floor['rooms'] if room['usage']=='bedroom']
+            fixed=[door for door in floor['doors'] if door.get('openingClassification')=='fixed-paired-door-leaf']
+            expected=38 if floor['id'] in b6.FLOORS[1:7] else 0
+            self.assertEqual(len(bedrooms),expected);self.assertEqual(len(fixed),expected)
+            by_id={door['id']:door for door in floor['doors']}
+            for door in fixed:
+                active=by_id[door['pairedDoorId']]
+                self.assertEqual(active['pairedDoorId'],door['id']);self.assertEqual(active['pairedDoorRole'],'active')
+                self.assertEqual(active['roomSourceEntity'],door['roomSourceEntity'])
+            for room in floor['rooms']:
+                self.assertIn(room['usage'],('bedroom','bathroom','wc','corridor','other'))
+                self.assertIn(room['sourceEntity'],room['usageSourceEntities'])
+                self.assertIn('finishTriangles',room)
+        n01=next(f for f in self.recipe['floors'] if f['id']=='n01')
+        n02=next(f for f in self.recipe['floors'] if f['id']=='n02')
+        self.assertEqual(sum(q['kind']=='urinal' for r in n01['rooms'] for q in r.get('sanitaryFixtures',[])),5)
+        self.assertEqual(sum(q['kind']=='urinal' for r in n02['rooms'] for q in r.get('sanitaryFixtures',[])),10)
+
+    def test_photo_window_parts_preserve_the_measured_thin_partition(self):
+        for floor in self.recipe['floors'][1:7]:
+            windows=[w for w in floor['windows'] if 'roomId' in w]
+            self.assertEqual(len(windows),38)
+            self.assertEqual(len({w['roomId'] for w in windows}),38)
+            self.assertTrue(all(w['paneCount']==2 and w['windowPlaneNormalOffset']==0 for w in windows))
+        floor=next(f for f in self.recipe['floors'] if f['id']=='n02')
+        wall=unary_union([Polygon(s['loops'][0],s['loops'][1:]) for s in floor['solids']
+                         if s['role']=='wall' and s['bottom']<4.5<s['top']])
+        self.assertTrue(wall.covers(Point(29.978803,.214403)))
+        self.assertFalse(wall.covers(Point(29,.214403)))
+        self.assertFalse(wall.covers(Point(31,.214403)))
+
     def test_all_eight_source_floors_and_room_counts(self):
         self.assertEqual(self.recipe['buildingId'],'b06')
         self.assertEqual(self.recipe['osmId'],53929071)
@@ -325,12 +533,14 @@ class LocalB6RecipeTests(unittest.TestCase):
         self.assertEqual([len(f['rooms']) for f in self.recipe['floors']],[44,59,58,58,58,58,55,2])
         self.assertEqual(sum(len(f['doors']) for f in self.recipe['floors']),703)
 
-    def test_all_physical_flights_have_measured_edges_and_explicit_levels(self):
+    def test_all_physical_flights_have_source_or_estimated_edges_and_explicit_levels(self):
         plans=self.recipe['interiorStairPlans']+self.recipe['exteriorStairRoutes']
         segments=[s for p in plans for s in p['segments']]
-        self.assertEqual(len(segments),37)
-        self.assertEqual(len({s['id'] for s in segments}),37)
-        self.assertEqual(sorted(len(s['frontEdgesCad']) for s in segments),[10]*36+[12])
+        self.assertEqual(len(segments),39)
+        self.assertEqual(len({s['id'] for s in segments}),39)
+        self.assertEqual(sorted(len(s['frontEdgesCad']) for s in segments),[8,8]+[10]*36+[12])
+        estimated=[s for s in segments if s.get('sourceFrontsMeasured') is False]
+        self.assertEqual(len(estimated),2)
 
     def test_roof_heads_are_independent_and_no_seventh_room_floor(self):
         roof=self.recipe['floors'][-1]

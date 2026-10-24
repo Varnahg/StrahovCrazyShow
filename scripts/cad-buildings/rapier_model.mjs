@@ -53,6 +53,15 @@ export function doorApproachGeometry(scene,door) {
   });
   return {width,normalCad,centerCad,distances,points};
 }
+
+const FIXED_OPENINGS=Object.freeze({
+  'facade-opening-unconfirmed-access':Object.freeze({role:'facade-glass',category:'fixed-glazing',missingCategory:'missing-glazing',
+    exclusionCategory:'fixed-facade-glazing',testKind:'fixed-facade-protection'}),
+  'fixed-paired-door-leaf':Object.freeze({role:'fixed-door-leaf',category:'fixed-door-leaf',missingCategory:'missing-fixed-door-leaf',
+    exclusionCategory:'fixed-paired-door-leaf',testKind:'fixed-door-leaf-protection'}),
+});
+/** One classification contract for physical protection, graph and world proof. */
+export function fixedOpeningSpec(door) { return FIXED_OPENINGS[door.openingClassification]??null; }
 export async function loadRapier(dependencyRoot=process.cwd()) {
   const require=createRequire(resolve(dependencyRoot,'package.json'));
   const R=require('@dimforge/rapier3d-compat');
