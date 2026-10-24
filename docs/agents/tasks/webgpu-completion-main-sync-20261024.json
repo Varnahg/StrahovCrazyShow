@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-main-sync-20261024",
+  "title": "KEY-22: zahrnout ověřený main PR24 před novým source15",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/ui.tsx",
+    "tests/room-callbacks.test.ts",
+    "docs/agents/handoffs/webgpu-completion-ui-main-integration-20261024.md",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/",
+    "docs/performance/evidence/webgpu-main-sync-20261024/",
+    ".cache/webgpu-main-sync-20261024/",
+    "docs/agents/handoffs/webgpu-completion-main-sync-20261024.md"
+  ],
+  "resources": ["heavy-validation"],
+  "acceptance": [
+    "Před actual merge přečíst research/main-merge-source15-analysis.json a main-merge-source15-decision.json. Object-only Git preview zachoval HEAD/index/source; jediný konflikt je startupViewsRef.current?.reset() přidaný migrací do již společného disconnectRoom.",
+    "Porovnat varianty: ponechat migrační reset a společný cleanup (volba), vynechat reset (ztráta lifecycle invalidace), slepé ours/theirs celého UI (riziko ztráty opravy). Přesné odstranění jediného marker bloku s ponecháním resetu dává BYTEEXACT současný UI blob44f49c84; další runtime/test delta v merge preview není.",
+    "Skutečný merge až po výslovném novém CAD STOP/release, heavy claim a předání UI task333 souborů původním root vlastníkem. Chránit primární checkout, staré snapshoty a všechny cizí rezervace. Ready není startovní povolení.",
+    "Na stabilním vlastním checkoutu zahrnout aktuální origin/main2a7b1998 nebo znovu prozkoumat nový main. Řešit pouze doložený jediný UI konflikt, zachovat aktuální migrační runtime/test blobs přesně, žádné plošné ours/theirs ani změna backend/default.",
+    "Po sloučení ověřit všechny client/server/shared/scripts/tests/assets/public/package/lock/patch vstupy proti předchozímu HEAD; očekává se pouze dokumentační delta. Actual UI effect/network cílené regrese, exact nový head/base, nezávislé review a samostatný merge commit. Následující source15 zmrazit až z této výsledné kombinace."
+  ],
+  "verification": [
+    "Před/po exact Git HEAD/parents, source/test bytes, dirty/index scope. Původní preview exit1 kvůli konfliktu zachován; není označen jako actual merge PASS.",
+    "node --import tsx --test --test-reporter=tap tests/room-callbacks.test.ts tests/game-render-engine.test.ts tests/network-input-buffer.test.ts; žádné širší testy bez dalších důvodů, fullsuite/build/integration součást nového immutable15 checkpointu.",
+    "Main CI2a7 a PR24 praktická přejímka platí jen pro úzkou main UI jednotku, nikoli pro kombinovaný WebGPU source15."
+  ],
+  "notes": [
+    "Root koordinuje výslovně přidělený KEY22. Main PR24 merged2a7b1998; migrační avatar product8e111af9 přijat source/CPU. UI task333 je stále files-only do dokončení metadata/mainCI; před main-sync claim se výslovně uvolní.",
+    "CAD znovu vlastní heavy od04:10 a plánuje45–60min nativního B1 checkpointu; teprve potom výslovné předání na přibližně90min. Žádný čas sám nezakládá release."
+  ]
+}
