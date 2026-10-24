@@ -134,6 +134,7 @@ type Managed = {
   prop: boolean;
   visibilityGroup: "exterior-entry" | "opaque-envelope" | "interior-detail";
   attached: boolean;
+  preparationAttachment?: { attached: boolean };
 };
 export type B6RealityInput = { player: Vec3; quality: string; floor?: number };
 export type B6RealityOptions = {
@@ -513,6 +514,7 @@ export class B6RealityController {
           );
           if (!source) continue;
           source.name = "b6 shared asset " + asset.id;
+          source.metadata = { ...source.metadata, authoredLightReceiver: "b6-prop-source" };
           source.isVisible = false;
           source.isPickable = false;
           sources.push(source);
@@ -532,7 +534,9 @@ export class B6RealityController {
             instance.rotation.y = placement.yaw;
             instance.isVisible = true;
             instance.isPickable = false;
+            const preparationAttachment = { attached: false };
             instance.metadata = {
+              b6PreparationAttachment: preparationAttachment,
               b6Reality: true,
               visibilityGroup:"interior-detail",
               sourceId: placement.id,
@@ -550,6 +554,7 @@ export class B6RealityController {
               prop: true,
               visibilityGroup:"interior-detail",
               attached: false,
+              preparationAttachment,
             });
           }
         this.stats.loadedAssets++;
@@ -614,13 +619,16 @@ export class B6RealityController {
         (!entry.prop || Math.hypot(entry.x - p.x, entry.z - p.z) < range);
       if (visible !== entry.attached) {
         if (visible) {
-          this.scene.addMesh(entry.mesh);
+          // A preparation lease can already have registered this exact world
+          // instance. The controller commits ownership without duplicating it.
+          if (!this.scene.meshes.includes(entry.mesh)) this.scene.addMesh(entry.mesh);
           entry.mesh.setEnabled(true);
         } else {
           entry.mesh.setEnabled(false);
           this.scene.removeMesh(entry.mesh);
         }
         entry.attached = visible;
+        if (entry.preparationAttachment) entry.preparationAttachment.attached = visible;
       }
       if (visible) this.stats.activeMeshes++;
     }

@@ -297,7 +297,7 @@ export function buildRoadDetails(scene: Scene) {
       m.roughness = 0.65;
       face.material = m;
       face.isVisible = false;
-      face.metadata = { depthCaster: false };
+      face.metadata = { depthCaster: false, authoredLightReceiver: "road-sign-face" };
       templates.set(key, face);
     }
     let back = backs.get(sign.kind);

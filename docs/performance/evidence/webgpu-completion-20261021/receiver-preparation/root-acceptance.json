@@ -1,0 +1,47 @@
+{
+  "atUTC": "2026-10-24T01:00:41.509Z",
+  "decision": "Accept exact source/test deliverable for separate commit. Fresh current-dependency checks and actual GPU acceptance remain pending.",
+  "authorManifestSha256": "27727fabd06d8a77db1ad244cee404457fe0615045785231274ae15d47f96b4c",
+  "verifiedFiles": 220,
+  "historicalProofSha256": "336cf1f3354a6aa52f3c1ed46712c5f070cac040cd8ed4244b55b4adbd5f9974",
+  "historicalCpu": {
+    "pass": 48,
+    "fail": 0,
+    "skip": 0,
+    "normalRunnerWithoutExposeGc": true,
+    "actualGcChildPass": 1,
+    "scopedTypeDiagnostics": 0,
+    "syntaxFiles": 9,
+    "nativeJsStableDuringThatRun": 565
+  },
+  "postIncidentReadOnlySha256": "e53f32828bc8598bf6789af7c585ddbcc78985c65c5698f6ccd55e767a4375b4",
+  "postIncident": {
+    "currentPinsMatchSource12": 39,
+    "sourceTestChanges": 0,
+    "protectedChanges": 0,
+    "helperChanges": 0,
+    "incident": "Accidental pnpm wrapper dependency sync after historical proof; no rollback. Current guard is not new test execution. Earlier c1–5 root dependency junctions now resolve new dependencies; source/bundle history is preserved."
+  },
+  "independentReviews": [
+    {
+      "reviewer": "webgpu_editor_audit",
+      "findings": []
+    },
+    {
+      "reviewer": "webgpu_renderer_audit",
+      "findings": []
+    }
+  ],
+  "closedFindings": [
+    "Native release reentry and later receiver mutation transfer",
+    "B6 controller takeover during enabled callback",
+    "Externally disabled acquisition cannot advertise coverage",
+    "Portable GC test uses actual one-case isolated child without changing normal runner"
+  ],
+  "limits": [
+    "CPU/native batch tests are not GPU execution, image or performance proof.",
+    "Controlled GC equivalence to native deferred Observable retention, not universal zero retention or VRAM.",
+    "Unknown fourth SM program and Robin skinned shadowMap/cache mechanism remain separate.",
+    "Task remains ready; KEY22/default/main not accepted."
+  ]
+}

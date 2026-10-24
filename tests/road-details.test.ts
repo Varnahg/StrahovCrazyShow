@@ -216,3 +216,14 @@ test("Right-handed camera reads sign UVs left to right and pole stays behind the
   scene.dispose();
   engine.dispose();
 });
+
+test("road face producers declare only actual shared PBR face sources, retaining real instances and original sign resources",()=>{
+  const engine=new NullEngine(),scene=new Scene(engine),built=buildRoadDetails(scene);
+  try{
+    const sources=scene.meshes.filter(mesh=>mesh.metadata?.authoredLightReceiver==="road-sign-face");
+    const recipes=new Set(built.signs.map(sign=>sign.kind+":"+sign.name+":"+sign.routes));
+    assert.equal(sources.length,recipes.size);
+    for(const source of sources){assert.equal(source.isVisible,false);assert.ok(source.material);assert.ok(source.getTotalVertices()>0);assert.ok(source.metadata.depthCaster===false);const instances=(source as import("@babylonjs/core/Meshes/mesh").Mesh).instances;assert.ok(instances.length>0);for(const node of instances){assert.equal(node.material,source.material);assert.equal(node.sourceMesh,source);assert.equal(node.metadata.depthCaster,false);assert.equal(node.parent?.metadata.roadSign,true);}}
+    for(const mesh of scene.meshes.filter(mesh=>mesh.name.startsWith("sign source back")||mesh.name==="sign source pole"||mesh.metadata?.roadPaint))assert.equal(mesh.metadata.authoredLightReceiver,undefined);
+  }finally{scene.dispose();engine.dispose();}
+});

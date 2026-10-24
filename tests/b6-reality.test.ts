@@ -1,3 +1,4 @@
+import { AuthoredLightPreparation } from "../client/authored-light-preparation";
 import test from "node:test";
 import type { PointLight } from "@babylonjs/core/Lights/pointLight";
 import assert from "node:assert/strict";
@@ -14,7 +15,7 @@ import {
   b6StairRoute,
   B6_ENTRY_PACK,
 } from "../shared/b6-interior";
-import { B6_PROP_COLLISIONS, B6_ASSET_MANIFEST } from "../shared/b6-props";
+import { B6_PROP_COLLISIONS, B6_ASSET_MANIFEST, B6_PROP_PLACEMENTS } from "../shared/b6-props";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { Ray } from "@babylonjs/core/Culling/ray";
@@ -494,6 +495,7 @@ test("walking around B6 only resynchronizes scene lighting when crossing its int
 
 test("exterior B6 entry stays visible from the north approach at every quality before and after actual GLB loading and root attachment",async()=>{
   const engine=new NullEngine(),scene=new Scene(engine);
+  engine.getCaps().instancedArrays=true; // Terminal CPU fixture capability, not GPU acceptance.
   scene.useRightHandedSystem=true;
   const camera=new FreeCamera("approach test",new Vector3(-4.85,1.7,-110),scene);
   camera.setTarget(new Vector3(-4.85,2,-77));
@@ -535,6 +537,37 @@ test("exterior B6 entry stays visible from the north approach at every quality b
     check();
     assert.ok(Vector3.Distance(before,entryMeshes[0].getBoundingInfo().boundingBox.minimumWorld)<1e-5,"attachment must preserve entry world geometry");
     assert.ok(scene.meshes.filter(mesh=>mesh.metadata?.visibilityGroup==="opaque-envelope").every(mesh=>mesh.isEnabled()),"outside floor−1 cannot hide upper opaque floors/roof");
+    const sources=scene.meshes.filter((mesh):mesh is Mesh=>mesh instanceof Mesh&&mesh.metadata?.authoredLightReceiver==="b6-prop-source");
+    assert.ok(sources.length>=B6_ASSET_MANIFEST.assets.length,"each real material-merged GLB source declares receiver coverage");
+    for(const source of sources){assert.equal(source.isVisible,false);for(const node of source.instances)assert.equal(typeof node.metadata.b6PreparationAttachment?.attached,"boolean");}
+    assert.ok(sources.some(source=>source.instances.length>0),"actual placed resources exist alongside unused retained source recipes");
+    controller.update({player:{x:110,y:0,z:12},quality:"medium"});
+    const preparation=new AuthoredLightPreparation(scene),release=preparation.begin();
+    try{
+      const borrowed=sources.flatMap(source=>source.instances).find(node=>node.alwaysSelectAsActiveMesh&&node.metadata.b6PreparationAttachment.attached===false)!;
+      assert.ok(borrowed,"actual disabled/removed B6 prop is borrowed, not just its hidden source");
+      const producer=borrowed.metadata.b6PreparationAttachment;
+      const placement=B6_PROP_PLACEMENTS.find(p=>borrowed.name==="b6 prop "+p.id)!;assert.ok(placement);
+      borrowed.metadata={externalReplacement:true};controller.attachToBuilding(root);
+      assert.equal(producer.attached,false,"common metadata copy does not commit the producer carrier");
+      controller.update({player:{x:placement.x,y:placement.y+B6_LAYOUT.foundationOffset+.82,z:placement.z},quality:"medium",floor:placement.level});
+      assert.equal(producer.attached,true);assert.equal(scene.meshes.filter(mesh=>mesh===borrowed).length,1,"normal takeover must not duplicate borrowed registration");
+      release();assert.equal(borrowed.isEnabled(),true);assert.equal(scene.meshes.filter(mesh=>mesh===borrowed).length,1);
+      assert.equal(borrowed.metadata.externalReplacement,true);assert.equal(borrowed.alwaysSelectAsActiveMesh,false);
+      controller.update({player:{x:110,y:0,z:12},quality:"medium"});
+      assert.equal(producer.attached,false);assert.equal(borrowed.isEnabled(false),false);assert.ok(!scene.meshes.includes(borrowed));
+      const releaseFromCallback=preparation.begin();
+      const callbackNode=sources.flatMap(source=>source.instances).find(node=>node.alwaysSelectAsActiveMesh&&node.metadata.b6PreparationAttachment?.attached===false)!;
+      assert.ok(callbackNode);const callbackProducer=callbackNode.metadata.b6PreparationAttachment;
+      const callbackPlacement=B6_PROP_PLACEMENTS.find(p=>callbackNode.name==="b6 prop "+p.id)!;let tookOver=false;
+      const observer=callbackNode.onEnabledStateChangedObservable.add(enabled=>{
+        if(!enabled&&!tookOver){tookOver=true;controller.update({player:{x:callbackPlacement.x,y:callbackPlacement.y+B6_LAYOUT.foundationOffset+.82,z:callbackPlacement.z},quality:"high",floor:callbackPlacement.level});}
+      });
+      try{releaseFromCallback();assert.equal(tookOver,true);assert.equal(callbackProducer.attached,true);assert.equal(callbackNode.isEnabled(),true);assert.equal(scene.meshes.filter(mesh=>mesh===callbackNode).length,1,"native release callback takeover retains controller registry agreement");}
+      finally{callbackNode.onEnabledStateChangedObservable.remove(observer);releaseFromCallback();}
+
+    }finally{release();preparation.dispose();}
+
   }finally{if(renderTimer)clearInterval(renderTimer);controller.dispose();scene.dispose();engine.dispose();}
 });
 

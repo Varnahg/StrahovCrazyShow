@@ -1,0 +1,4 @@
+Running Node v24.19.0 primary internal/test_runner/runner selected lines:
+    const env = { __proto__: null, NODE_TEST_CONTEXT: 'child-v8', ...(opts.env || process.env) };
+    if (process.env.NODE_TEST_CONTEXT !== undefined) {
+      process.emitWarning('node:test run() is being called recursively within a test file. skipping running files.');
