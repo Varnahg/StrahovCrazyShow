@@ -61,11 +61,25 @@ context:
 
 ## Spec Change Log
 
+-24Oct09:38UTC po Low6frame capture: V21 přidá oddělený defaultoff startup-effect-routines/strictstartupStageEffects10target stack do původních selectedstageoptions.render. V20/old8byteexact, cap16/304/8/256KiB a stage-endpartialcompletekontrakt zachovaný. Actual886msCPU +overlapping1065msfence/105pending vyžaduje měřeníprepare/create, ne blindproductfix. Podrobnévarianty a nativechain v research rozhodnutí. Whole/build/GPU stále vyžadují nové CADokno.
+
 -24Oct09:30UTC po prvním skutečném entry: V19 retired po1accepted framu; rawpozději pendingValidation2, failing predicate chybí. Nová V20 effect-only cesta ponechá legacy8modulybyteexact; admission pending0, poaccepted instalaci pending obou explicitních kindů zaznamenává jako práci, zachová phase/error/identity/lifecycle guardy. Nový strict bounded witness/perframecounts a native RenderHealth regressions dle rozhodnutí source15-blocking-costs-decision.md. Scope zůstává QA, žádná produktová či timeout změna. V19výsledek zůstává incomplete.
 
 ## Review Triage Log
 
+### V20/V21 review:24Oct10:05UTC
+
+- blind-hunter:[] nad přesným combineddiff240907B/SHA5cb32bab; reviewprovedené.
+- edge-1: medium/patch. Nový validateEntryEffectTrigger uzavírá jen topobject; p.limits předává legacy JSON.stringify validátoru před own-data normalizací. Accessory/toJSON na limits mohou být vykonané a accessorvalue přijata. Potvrzeno callerem a původním validateEntryTrigger. Nejmenší oprava interně closed-normalizovat limits ještě před legacycall, přidat getter/toJSONregresi; žádné API.
+- verification-1: medium/patch. Nový native foreignscene test nemá assertions na exportedrows/profileNowreads; odstranění receiverfiltru by zůstalo nezachycené. Předověřená verificationgap přijatá z test/search důkazů. Rozšířit původní native test porovnáním ownrows/calls a fakeprofileclockreads s/bezforeignrender; netvrdit odečtení skutečného nestedwalltime. Žádná změna runtimeAPI.
+
+Původní předané V20entry/V21startup a jejich sealy zůstávají immutable; autoopravy vzniknou jen v sousedních entryhelper/v21 a startuphelper/v22. Starší úspěšná/failedCPUevidence se nepřepisuje. Další cílené testy, rootreviewdelta a whole/build/GPU teprve nad navazujícími hashy.
+
 ## Verification
+
+- Root actual přejímka24Oct10:00–10:24UTC: entryV21/helper9a594e60 celýcorpus539/539, startupV22/helpera6294c4b512/512, dvaimmutablebuildyPASS. Původnílimits/getter a foreignscene testgap opravené v novýchkopiích, všechny3patchreviewvrstvy[]; legacy/source15sealy zachované.
+- ActualGuestentry8frames2646→2654 fixedMedium1/2040×986/night23Oct22/pending0/error0/hook0; raw902f944f jecomplete. ActualGueststartup71.212s/76etap/Low7frames175→182 complete, rawd9ed0db9. Diagnostika odlišila carprepare residual48ms od startupengineAPI625.9ms; nevyřešila produktovýhitch205.2ms ani nepotvrdilaFPS. Celá migrace/main/default zůstávajíotevřené.
+- Evidence validation/diagnostics-window3-20261024 včetněaudit29payloadů; entryoriginal chybísession-end a obaoriginals mají1recordSizegap. STOP/release6resources10:24UTC předhardend10:25, B1+B6 nyní drží výpočty. ŽádnýdalšíGPU/build/server beznovéhopředání.
 
 - Nové cílené `node --import tsx --test` moduly, exact transform/pin/schema/lifecycle kontroly; všechny spuštěné příkazy a omezení v task handoffu.
 - Celý helper corpus, build a GPU nesmí běžet bez přiděleného heavy okna. NullEngine/syntetické časy nejsou GPU důkaz.

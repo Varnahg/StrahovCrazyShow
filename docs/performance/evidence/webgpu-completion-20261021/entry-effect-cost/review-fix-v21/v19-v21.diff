@@ -1,0 +1,765 @@
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/README.md b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/README.md
+index de944fa4..e05b05cc 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/README.md
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/README.md
+@@ -1,5 +1,21 @@
+ # První vstup: dvě vnitřní effect hranice
+ 
++## V21: own-data normalizace trigger limits
++
++Úzký review patch normalizuje uzavřená scalar `limits` před legacy validací. Getter, vlastní/inherited toJSON i toJSON v hodnotě limitu se odmítají bez spuštění. Veřejná signatura, return identity i schema zůstávají V20. Ostatní runtime soubory jsou byteexact V20; nové cílené regrese a evidence jsou v `entry-effect-cost/review-fix-v21/`. Původní V20 helper c9f68706 a jeho65payloadů jsou immutable.
++
++## V20: pending práce během accepted capture
++
++V20 je nová immutable kopie. Samostatný `entry-effect-trigger.mjs` nahrazuje controller pouze nové10target akce; `entry-routine-cost.mjs`, routine/core, entry-render a celé původní8target/3scope akce zůstávají byteexact V19. Source pack má42 vstupů. UI i receipt používají nový trigger/profile schemaVersion2; stará schemata a product zůstávají původní.
++
++Arm, accepted trigger a synchronní installed boundary vyžadují oba pending počty0. Po úspěšné instalaci jsou validní nezáporné safeinteger počty preparation i shader-validation měřenou aktivitou, včetně legitimních původních shaderPreparation/pipeline jobs. Přísné same Game/actor/Scene/engine/device/health/generation/renderer/startup/current, ready phase/error0, vehicle, abort, deadline, benchmark/quality-preparation/lease a foreign descriptor guardy zůstávají. Nevzniká čekání, přeskočení framu, extra render/readiness/GPU volání ani health proxy.
++
++Každý původní frame má uzavřené scalar `healthBefore/healthAfter`; trigger i profil mají `pendingAtTerminal` a nejvýše jeden `firstFailure` s source/boundary/code/time/frame/current identity/pending/mismatch mask. Getter, invalid counter, neznámé/extra pole i rozporná complete evidence se odmítají. Witness vzniká před cleanupem. Osm souvislých původních framů může být diagnostic complete i při nenulovém terminal pending; NENÍ to renderer health/FPS/async acceptance.
++
++Společný guard má bounded scalar alokace pouze na hranicích nejvýše8 framů. Method wrapper factory je mimo konstrukční transaction scope: retained engine wrapper po dispose nepřidržuje Scene-owned candidate closure. State/callback/timer reference a listeners se při stop nulují/odpojují. Skutečný GC důkaz pokrývá retained owner/waiter/engine wrapper po accepted instalaci před prvním draw. Full-draw native kontrola také zadržela Scene; tento širší native lifecycle není prohlášen za vyřešený.
++
++Nový skutečný `RenderHealth.track` + native Scene + controller/factory RED reprodukuje V19 one-frame abort samostatně pro oba kinds. V20 cílené kontroly ověřují8exact frames, pending before/after/terminal, původní rejection, strict retirement a getter/schema/receipt tamper. Původní skutečný Guest V19 raw neobsahoval failing predicate; nový witness ho teprve zachytí. Přesné příkazy, zachované failures, diff a sealy: `entry-effect-cost/pending-capture-v20/`. Celý corpus/build/GPU náleží koordinátorovi po CAD handoffu.
++
+ Task `webgpu-completion-entry-effect-cost-20261024`; vlastník `webgpu-completion-01a15a3e-entry-effect-cost`. Výchozí754dde6a, vlastní depth5 kopie V18 z neměnného V17/36/helper37646a00. Produkt, native dependency, starý helper a raw se nemění. Pouze cílené lehké CPU kontroly; žádné pnpm, build, server, GPU nebo celý helper corpus.
+ 
+ ## Podklady a rozhodnutí před kódem
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/common.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/common.mjs
+index c48463d5..0e588d22 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/common.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/common.mjs
+@@ -52,7 +52,7 @@ export async function directoryHashes(directory) {
+ }
+ export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs',
+   'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'weather-fixture.mjs', 'startup-latency.mjs',
+-  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'entry-routine-cost.mjs', 'entry-routine-cost.test.mjs', 'pipeline-input-window.mjs', 'pipeline-input-window.test.mjs', 'entry-effect-cost-core.mjs', 'entry-effect-cost.mjs', 'entry-effect-cost.test.mjs', 'README.md'];
++  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'entry-routine-cost.mjs', 'entry-routine-cost.test.mjs', 'pipeline-input-window.mjs', 'pipeline-input-window.test.mjs', 'entry-effect-cost-core.mjs', 'entry-effect-cost.mjs', 'entry-effect-cost.test.mjs', 'entry-effect-guard.mjs', 'entry-effect-trigger.mjs', 'pending-capture.test.mjs', 'README.md'];
+ export function parseBuildOptions(args) {
+   const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false, bufferLifecycle:false, lifecycleControls: false };
+   let loadingSeen = false;
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-effect-cost-core.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-cost-core.mjs
+index b6d5235b..3d89646b 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-effect-cost-core.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-cost-core.mjs
+@@ -1,3 +1,4 @@
++import { validateGuardFailure, validateGuardSample } from './entry-effect-guard.mjs';
+ /** Fixed ten-routine diagnostic; independent of the immutable eight-routine schema. */
+ export const EFFECT_LIMITS = Object.freeze({ routines: 10, frames: 8, stack: 32, callsPerFrame: 100000, phaseEvents: 128, renderers: 64, bytes: 256*1024 });
+ export const EFFECT_REASONS = Object.freeze(['complete','disposed','owner-stopped','external-dispose','aborted','observer-error','retired','foreign-routine','original-render-threw','no-native-frame-progress','installation-failed',
+@@ -7,6 +8,7 @@ export const EFFECT_IDS = Object.freeze(['scene.getActiveMeshCandidates', 'Scene
+   'PBRBaseMaterial.isReadyForSubMesh', 'StandardMaterial.isReadyForSubMesh', 'PBRBaseMaterial.bindForSubMesh', 'StandardMaterial.bindForSubMesh',
+   'PBRBaseMaterial._prepareEffect', 'engine.createEffect']);
+ export const EFFECT_SCOPE = Object.freeze({
++  activity: 'Idle admission; after synchronous accepted install, both pending kinds are observed activity. Eight-frame diagnostic completion does not assert renderer health or asynchronous completion.',
+   clock: 'Selected synchronous wall time including observer/JIT/GC/scheduling, not GPU execution.',
+   nesting: 'One shared ten-target stack; selfSelected subtracts selected children only. Inclusive rows overlap.',
+   engine: 'Own engine createEffect only under a selected own-scene material readiness or PBR prepare ancestor. No cache/key inspection or hit/miss claim.',
+@@ -15,6 +17,9 @@ export const EFFECT_SCOPE = Object.freeze({
+ const owners = new WeakMap();
+ const flags = (a,b) => !!a === !!b && (!a || ['value','get','set','writable','configurable','enumerable'].every(k => a[k] === b[k]));
+ const rows = () => EFFECT_IDS.flatMap(id => EFFECT_PHASES.map(phase => ({ id, phase, calls: 0, inclusiveMs: 0, selfSelectedMs: 0, falseReturns: 0, nullReturns: 0, throws: 0 })));
++// A retained native wrapper must not retain the constructor's validated target
++// transaction, which also contains the Scene-owned candidate function.
++function methodWrapper(profile,index,original,accepts){return function(){return profile.invoke(index,original,this,arguments,accepts);};}
+ 
+ export class EffectCallProfile {
+   hooks = []; frame; disposed = false; errors = 0; restoreConflicts = 0;
+@@ -32,8 +37,7 @@ export class EffectCallProfile {
+     });
+     try {
+       checked.forEach(({target,key,descriptor,original,accepts}, index) => {
+-        const profile=this;
+-        const wrapper=function(){ return profile.invoke(index,original,this,arguments,accepts); };
++        const wrapper=methodWrapper(this,index,original,accepts);
+         this.hooks.push({target,key,descriptor,wrapper});
+         const keys=owners.get(target)??new Map();keys.set(key,this);owners.set(target,keys);
+         Object.defineProperty(target,key,{...(descriptor??{configurable:true,writable:true,enumerable:false}),value:wrapper});
+@@ -111,8 +115,8 @@ function array(o,max){const n=data(o,'length');if(!Array.isArray(o)||!Number.isS
+   for(let i=0;i<n;i++){const v=data(o,String(i));if(v===invalid)throw Error('Effect array own data');a.push(v);}return a;}
+ const count=x=>Number.isSafeInteger(x)&&x>=0;
+ export function validateEntryEffectProfile(value) {
+-  const p=exact(value,['schemaVersion','scope','limits','targets','engineOrigin','rendererId','generation','frames','complete','reason','errors','phaseErrors','restoreConflicts','installedRoutineHooks','remainingRoutineHooks','active']);
+-  if(p.schemaVersion!==1||!['webgpu-own','thinengine-inherited'].includes(p.engineOrigin)||!count(p.rendererId)||p.rendererId<1||!count(p.generation)||p.generation<1||p.active!==false||typeof p.complete!=='boolean'||
++  const p=exact(value,['schemaVersion','scope','limits','targets','engineOrigin','rendererId','generation','frames','complete','reason','errors','phaseErrors','restoreConflicts','installedRoutineHooks','remainingRoutineHooks','active','firstFailure','pendingAtTerminal']);
++  if(p.schemaVersion!==2||!['webgpu-own','thinengine-inherited'].includes(p.engineOrigin)||!count(p.rendererId)||p.rendererId<1||!count(p.generation)||p.generation<1||p.active!==false||typeof p.complete!=='boolean'||
+       !EFFECT_REASONS.includes(p.reason)||['errors','phaseErrors','restoreConflicts','installedRoutineHooks','remainingRoutineHooks'].some(k=>!count(p[k]))||p.installedRoutineHooks>10||p.remainingRoutineHooks>10)throw Error('Effect profile scalar');
+   const scope=exact(p.scope,Object.keys(EFFECT_SCOPE)),limits=exact(p.limits,Object.keys(EFFECT_LIMITS));
+   for(const[k,v]of Object.entries(EFFECT_SCOPE))if(scope[k]!==v)throw Error('Effect scope');
+@@ -120,8 +124,10 @@ export function validateEntryEffectProfile(value) {
+   const targets=array(p.targets,10);if(targets.length!==10||targets.some((x,i)=>x!==EFFECT_IDS[i]))throw Error('Effect targets');
+   const frames=array(p.frames,8);
+   let previousAfter;const safeFrames=[];
+-  for(const raw of frames){const f=exact(raw,['frameId','rows','errors','depthSkipped','callsSkipped','nativeFrameIdAfter','progressed','threw']);
++  for(const raw of frames){const f=exact(raw,['frameId','rows','errors','depthSkipped','callsSkipped','nativeFrameIdAfter','progressed','threw','healthBefore','healthAfter']);
+     if(['frameId','errors','depthSkipped','callsSkipped'].some(k=>!count(f[k]))||!(f.nativeFrameIdAfter===null||count(f.nativeFrameIdAfter))||typeof f.progressed!=='boolean'||typeof f.threw!=='boolean')throw Error('Effect frame');
++    f.healthBefore=validateGuardSample(f.healthBefore);f.healthAfter=validateGuardSample(f.healthAfter);
++    if(p.complete&&[f.healthBefore,f.healthAfter].some(h=>!h.dataValid||h.identityMismatchMask||h.phase!=='ready'||h.errorCount||h.rendererId!==p.rendererId||h.generation!==p.generation))throw Error('Effect unhealthy complete frame');
+     const rs=array(f.rows,40);if(rs.length!==40)throw Error('Effect row count');
+     const safeRows=[];
+     for(let i=0;i<40;i++){const r=exact(rs[i],['id','phase','calls','inclusiveMs','selfSelectedMs','falseReturns','nullReturns','throws']);
+@@ -131,6 +137,10 @@ export function validateEntryEffectProfile(value) {
+     previousAfter=f.nativeFrameIdAfter;
+     f.rows=safeRows;safeFrames.push(f);
+   }
++  const terminal=validateGuardSample(p.pendingAtTerminal);validateGuardFailure(p.firstFailure);
++  if(p.firstFailure&&p.firstFailure.source!=='adapter')throw Error('Effect profile witness source');
++  if(p.reason!=='complete'&&!p.firstFailure)throw Error('Effect profile missing failure witness');
++  if(p.complete&&(p.firstFailure||!terminal.dataValid||terminal.identityMismatchMask||terminal.phase!=='ready'||terminal.errorCount||terminal.rendererId!==p.rendererId||terminal.generation!==p.generation))throw Error('Effect unhealthy complete terminal');
+   if(p.complete&&(frames.length!==8||p.reason!=='complete'||p.errors||p.phaseErrors||p.restoreConflicts||p.remainingRoutineHooks||p.installedRoutineHooks!==10))throw Error('Effect incomplete profile');
+   p.scope=scope;p.limits=limits;p.targets=targets;p.frames=safeFrames;
+   if(JSON.stringify(p).length>EFFECT_LIMITS.bytes)throw Error('Effect byte bound');
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-effect-cost.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-cost.mjs
+index e918ab35..9337270a 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-effect-cost.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-cost.mjs
+@@ -1,3 +1,4 @@
++import { effectContext, inspectEffectGuard, GUARD_CODES, count, time, own } from './entry-effect-guard.mjs';
+ import { Scene } from '@babylonjs/core/scene.js';
+ import { Mesh } from '@babylonjs/core/Meshes/mesh.js';
+ import { TransformNode } from '@babylonjs/core/Meshes/transformNode.js';
+@@ -22,21 +23,23 @@ function origin(engine){let p=engine;while(p){const d=Object.getOwnPropertyDescr
+ /** Driven exclusively by the original Game Scene.render. No render/readiness call is added. */
+ export function captureEntryEffects(game,{enabled=false,now,signal,isRetired=()=>false}={}){
+   if(!enabled)return;
+-  const scene=game.scene,engine=game.engine;
+-  if(!(scene instanceof Scene)||scene._engine!==engine||sceneOwners.has(scene)||scene.isDisposed||game.disposed||!game.ready||isRetired()||signal?.aborted)throw Error('Effect capture requires ready unowned Game');
++  const scene=own(game,'scene'),engine=own(game,'engine'),health=own(game,'renderHealth');
++  if(!(scene instanceof Scene)||scene._engine!==engine||sceneOwners.has(scene)||scene.isDisposed||own(game,'disposed')===true||own(game,'ready')!==true||isRetired()||signal?.aborted)throw Error('Effect capture requires ready unowned Game');
+   const engineOrigin=origin(engine),ownEngine=Object.getOwnPropertyDescriptor(engine,'createEffect'),oldRender=Object.getOwnPropertyDescriptor(scene,'render');
+   // The original is inherited from a pinned native class, never a guessed own wrapper.
+   if(ownEngine||scene.render!==nativeRender||(oldRender&&(!Object.hasOwn(oldRender,'value')||(!oldRender.configurable&&!oldRender.writable)))||!Object.isExtensible(engine))throw Error('Effect instance descriptor/ownership');
+-  const rendererId=game.renderHealth?.rendererId,generation=game.renderHealth?.generation;
+-  if(!Number.isSafeInteger(rendererId)||rendererId<1||!Number.isSafeInteger(generation)||generation<1||game.renderHealth.phase!=='ready'||game.renderHealth.errorCount!==0||
+-      game.renderHealth.pendingByKind?.preparation!==0||game.renderHealth.pendingByKind?.['shader-validation']!==0)throw Error('Effect renderer identity/readiness');
+-  const state={game,scene,engine,health:game.renderHealth,device:engine._device,startup:game.startupAbort,actor:game.actor,retired:isRetired,signal};game=null;isRetired=null;signal=null;
+-  const frames=[],phases=[],detaches=[],renderers=new Map();let core,closed=false,rendering=false,phaseEvents=0,phaseErrors=0,restoreConflicts=0,reason=null,sealed;
++  const rendererId=own(health,'rendererId'),generation=own(health,'generation');
++  if(!Number.isSafeInteger(rendererId)||rendererId<1||!Number.isSafeInteger(generation)||generation<1)throw Error('Effect renderer identity/readiness');
++  const state={...effectContext(game,{signal,rendererId,generation}),retired:isRetired};
++  const admission=inspectEffectGuard(state,{source:'adapter',boundary:'installed',allowPending:false});
++  if(admission.failure)throw Error('Effect capture admission '+admission.failure.code);
++  game=null;isRetired=null;signal=null;
++  const frames=[],phases=[],detaches=[],renderers=new Map();let core,closed=false,rendering=false,phaseEvents=0,phaseErrors=0,restoreConflicts=0,reason=null,sealed,firstFailure=null,pendingAtTerminal=null;
+   let resolveDone;const done=new Promise(resolve=>{resolveDone=resolve;});
+   const owner={done,dispose:why=>stop(why??'disposed'),snapshot:()=>sealed??snapshot()};sceneOwners.set(scene,owner);
+   const phase=()=>phases.at(-1)?.phase??'other';
+-  function snapshot(){return{schemaVersion:1,scope:EFFECT_SCOPE,limits:EFFECT_LIMITS,targets:[...EFFECT_IDS],engineOrigin:engineOrigin.name,rendererId,generation,frames:structuredClone(frames),
+-    complete:closed&&reason==='complete'&&frames.length===8&&!core?.errors&&!phaseErrors&&!restoreConflicts&&!core?.restoreConflicts&&frames.every(f=>f.progressed&&!f.threw&&!f.errors&&!f.depthSkipped&&!f.callsSkipped),
++  function snapshot(){return{schemaVersion:2,scope:EFFECT_SCOPE,limits:EFFECT_LIMITS,targets:[...EFFECT_IDS],engineOrigin:engineOrigin.name,rendererId,generation,frames:structuredClone(frames),
++    firstFailure,pendingAtTerminal,complete:closed&&reason==='complete'&&!firstFailure&&frames.length===8&&!core?.errors&&!phaseErrors&&!restoreConflicts&&!core?.restoreConflicts&&frames.every(f=>f.progressed&&!f.threw&&!f.errors&&!f.depthSkipped&&!f.callsSkipped),
+     reason,errors:core?.errors??0,phaseErrors,restoreConflicts:restoreConflicts+(core?.restoreConflicts??0),installedRoutineHooks:core?10:0,remainingRoutineHooks:core?.hooks.length??0,active:!closed};}
+   function enter(name,token){if(!rendering||closed)return;if(++phaseEvents>EFFECT_LIMITS.phaseEvents||phases.length>=32){phaseErrors++;return;}phases.push({phase:name,token});}
+   function leave(token){if(!rendering||closed)return;if(phases.at(-1)?.token!==token){phaseErrors++;return;}phases.pop();}
+@@ -46,7 +49,11 @@ export function captureEntryEffects(game,{enabled=false,now,signal,isRetired=()=
+       b=renderer.onFinishRenderingObservable.add(()=>leave(renderer));if(!b)throw Error('Effect RTT after observer unavailable');
+       renderers.set(renderer,()=>{try{renderer.onInitRenderingObservable.remove(a);}finally{renderer.onFinishRenderingObservable.remove(b);}});
+     }catch(error){try{if(a)renderer.onInitRenderingObservable.remove(a);}catch{phaseErrors++;}throw error;}}
+-  function stop(why){if(closed)return;closed=true;reason=EFFECT_REASONS.includes(why)?why:'external-dispose';core?.dispose();
++  function guardTime(){try{const at=(now??(()=>performance.now()))();return time(at)?at:null;}catch{return null;}}
++  function stop(why){if(closed)return;
++    const observed=inspectEffectGuard(state,{source:'adapter',boundary:'terminal',atMs:guardTime(),allowPending:true});pendingAtTerminal=observed.sample;
++    if(why!=='complete')firstFailure??=observed.failure??{source:'adapter',boundary:'terminal',code:GUARD_CODES.includes(why)?why:'observer-error',atMs:guardTime(),frameId:count(state.scene?._frameId)?state.scene._frameId:null,...observed.sample};
++    closed=true;reason=EFFECT_REASONS.includes(why)?why:'external-dispose';core?.dispose();
+     for(const detach of [...detaches.splice(0),...renderers.values()])try{detach();}catch{phaseErrors++;}renderers.clear();phases.length=0;
+     const liveScene=state.scene;
+     try{state.signal?.removeEventListener('abort',aborted);}catch{phaseErrors++;}
+@@ -54,26 +61,24 @@ export function captureEntryEffects(game,{enabled=false,now,signal,isRetired=()=
+       if(oldRender)Object.defineProperty(liveScene,'render',oldRender);else delete liveScene.render;
+     }else if(!same(d,oldRender))restoreConflicts++;}catch{restoreConflicts++;}
+     if(sceneOwners.get(liveScene)===owner)sceneOwners.delete(liveScene);
+-    state.game=state.scene=state.engine=state.health=state.device=state.startup=state.actor=state.retired=state.signal=null;
++    for(const key of Object.keys(state))state[key]=null;now=null;
+     sealed=snapshot();resolveDone(sealed);
+   }
+   const aborted=()=>stop('aborted');
+   function render(){if(closed||this!==state.scene)return Reflect.apply(nativeRender,this,arguments);
+-    let retired;try{retired=state.retired()||state.game.disposed||state.scene.isDisposed||state.engine.isDisposed===true||state.game.scene!==state.scene||state.game.engine!==state.engine||
+-      state.game.renderHealth!==state.health||state.health.rendererId!==rendererId||state.health.generation!==generation||state.engine._device!==state.device||
+-      state.health.phase!=='ready'||state.health.errorCount!==0||state.health.pendingByKind?.preparation!==0||state.health.pendingByKind?.['shader-validation']!==0||
+-      state.game.startupAbort!==state.startup||state.startup?.signal.aborted||state.game.actor!==state.actor||state.game.ready!==true||state.game.rendererFailed||state.game.benchmark||state.game.startupPresentationLease||state.game.preparingRenderQuality;}
++    try{if(state.retired()){stop('retired');return Reflect.apply(nativeRender,this,arguments);}}
+     catch{phaseErrors++;stop('observer-error');return Reflect.apply(nativeRender,this,arguments);}
+-    if(retired){stop('retired');return Reflect.apply(nativeRender,this,arguments);}
++    const beforeGuard=inspectEffectGuard(state,{source:'adapter',boundary:'before-render',atMs:guardTime(),allowPending:true});
++    if(beforeGuard.failure){firstFailure??=beforeGuard.failure;stop('retired');return Reflect.apply(nativeRender,this,arguments);}
+     if(rendering){phaseErrors++;return Reflect.apply(nativeRender,this,arguments);}
+     if(!core.ownsHooks()){phaseErrors++;stop('foreign-routine');return Reflect.apply(nativeRender,this,arguments);}
+     try{for(const r of state.scene.objectRenderers)track(r);}catch{phaseErrors++;stop('observer-error');return Reflect.apply(nativeRender,this,arguments);}
+     const before=state.scene._frameId;if(!Number.isSafeInteger(before)||before<0){phaseErrors++;stop('no-native-frame-progress');return Reflect.apply(nativeRender,this,arguments);}
+     rendering=true;phaseEvents=0;phases.length=0;core.beginFrame(before);let threw=true;
+     try{const result=Reflect.apply(nativeRender,this,arguments);threw=false;return result;}
+-    finally{if(!closed){const f=core.endFrame(),after=state.scene._frameId;f.nativeFrameIdAfter=Number.isSafeInteger(after)&&after>=0?after:null;f.progressed=f.nativeFrameIdAfter===before+1;f.threw=threw;
++    finally{if(!closed){const f=core.endFrame(),after=state.scene._frameId;const afterGuard=inspectEffectGuard(state,{source:'adapter',boundary:'after-render',atMs:guardTime(),allowPending:true});f.healthBefore=beforeGuard.sample;f.healthAfter=afterGuard.sample;f.nativeFrameIdAfter=Number.isSafeInteger(after)&&after>=0?after:null;f.progressed=f.nativeFrameIdAfter===before+1;f.threw=threw;
+       if(phases.length)phaseErrors++;frames.push(f);rendering=false;phases.length=0;
+-      if(threw)stop('original-render-threw');else if(!f.progressed)stop('no-native-frame-progress');else if(frames.length===8)stop('complete');}}
++      if(threw)stop('original-render-threw');else if(afterGuard.failure){firstFailure??=afterGuard.failure;stop('retired');}else if(!f.progressed)stop('no-native-frame-progress');else if(frames.length===8)stop('complete');}}
+   }
+   try{
+     core=new EffectCallProfile([{id:EFFECT_IDS[0],target:scene,key:'getActiveMeshCandidates',expected:scene.getActiveMeshCandidates,accepts:r=>r===state.scene},
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-effect-cost.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-cost.test.mjs
+index 2ce80b58..8cb80c75 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-effect-cost.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-cost.test.mjs
+@@ -1,3 +1,4 @@
++import { captureEntryEffectTrigger, validateEntryEffectTrigger } from './entry-effect-trigger.mjs';
+ import test from 'node:test';
+ import assert from 'node:assert/strict';
+ import fs from 'node:fs';
+@@ -164,30 +165,30 @@ test('receipt is distinct/strict while original schema and default-off identity
+   for(const alter of [p=>p.targets.pop(),p=>p.frames[0].rows[0].nullReturns=-1,p=>p.frames[0].rows[0].extra='raw',p=>p.remainingRoutineHooks=1,p=>p.frames[0].nativeFrameIdAfter+=1,p=>{p.frames[1].frameId+=10;p.frames[1].nativeFrameIdAfter+=10;}]){
+     const p=structuredClone(profile);alter(p);assert.throws(()=>validateEntryEffectProfile(p));}
+   let reads=0;const p=structuredClone(profile);Object.defineProperty(p.frames[0].rows[0],'inclusiveMs',{get(){reads++;return 0;}});assert.throws(()=>validateEntryEffectProfile(p));assert.equal(reads,0);
+-  assert.equal(parseBuildOptions([]).routineCost,false);assert.equal((await helperIdentity(directory)).sha256.length,64);assert.equal(sourceFiles.length,39);
++  assert.equal(parseBuildOptions([]).routineCost,false);assert.equal((await helperIdentity(directory)).sha256.length,64);assert.equal(sourceFiles.length,42);
+   for(const name of ['routine-cost.mjs','routine-cost-core.mjs','entry-render-cost.mjs','entry-routine-cost.mjs'])assert.deepEqual(fs.readFileSync(join(directory,name)),fs.readFileSync(join(donorDirectory,name)));
+ });
+ 
+ test('actual native entry waiter hands off once, captures first Scene and retained waiter does not retrigger',async t=>{
+-  const f=entryFixture(t);await warm(f);const owner=captureEntryRoutineCost(f.game,f.options),saved=f.game.gltfLightBudget.prepareFrame;t.after(()=>owner.dispose());
++  const f=entryFixture(t);await warm(f);const owner=captureEntryEffectTrigger(f.game,f.options),saved=f.game.gltfLightBudget.prepareFrame;t.after(()=>owner.dispose());
+   f.frame();assert.equal(f.factories(),0);const first=f.scene._frameId;f.game.actor.vehicle=true;f.frame();
+   const trigger=owner.snapshot().entryTrigger;assert.equal(Reflect.apply(saved,f.game.gltfLightBudget,[]),undefined);assert.equal(f.factories(),1);
+   assert.deepEqual(owner.snapshot().entryTrigger,trigger);for(let i=0;i<7;i++)f.frame();const result=await owner.done;
+-  validateEntryTrigger(result.entryTrigger,result.routineProfile);validateEntryEffectProfile(result.routineProfile);
++  validateEntryEffectTrigger(result.entryTrigger,result.routineProfile);validateEntryEffectProfile(result.routineProfile);
+   assert.equal(result.entryTrigger.complete,true);assert.equal(result.entryTrigger.sceneFrameIdAtTrigger,first);assert.equal(result.routineProfile.frames[0].frameId,first);
+   assert.equal(result.entryTrigger.sceneFrameIdAtTerminal,first+8);assert.equal(result.routineProfile.remainingRoutineHooks,0);assert.equal(f.timer(),null);
+   assert.equal(Object.hasOwn(f.game.gltfLightBudget,'prepareFrame'),false);assert.equal(Object.hasOwn(f.scene,'render'),false);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);
+   const identity={buildId:'b',sourceSnapshotId:'s',helperSha256:'h',routineCost:true,lifecycleControls:false};
+   const raw={schemaVersion:1,...identity,attemptId:'8e9e7e15-6011-438d-96a2-53be43f17792',kind:'entry-effect-cost',mode:'diagnostic',atMs:1,timeOrigin:1,observerErrors:[],completed:true,before:{},after:{},entryTrigger:result.entryTrigger,entryEffectProfile:result.routineProfile,validationErrors:[]};
+-  validateReceipt(raw,identity);const drift=structuredClone(raw);drift.entryEffectProfile.rendererId++;assert.throws(()=>validateReceipt(drift,identity),/renderer correlation/);
++  validateReceipt(raw,identity);const drift=structuredClone(raw);drift.entryTrigger.rendererId++;drift.entryTrigger.pendingAtTerminal.rendererId++;assert.throws(()=>validateReceipt(drift,identity),/renderer correlation/);
+ });
+ test('unchanged single deadline includes a long original eighth native frame',async t=>{
+-  const f=entryFixture(t);await warm(f);const owner=captureEntryRoutineCost(f.game,f.options);t.after(()=>owner.dispose());f.game.actor.vehicle=true;
++  const f=entryFixture(t);await warm(f);const owner=captureEntryEffectTrigger(f.game,f.options);t.after(()=>owner.dispose());f.game.actor.vehicle=true;
+   for(let i=0;i<7;i++)f.frame();f.scene.onBeforeRenderObservable.addOnce(()=>f.advance(30000));f.frame();const result=await owner.done;
+   assert.equal(result.routineProfile.frames.length,8);assert.equal(result.routineProfile.complete,true);assert.equal(result.entryTrigger.complete,false);assert.equal(result.entryTrigger.reason,'deadline');
+-  validateEntryTrigger(result.entryTrigger,result.routineProfile);assert.equal(f.timer(),null);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);
++  validateEntryEffectTrigger(result.entryTrigger,result.routineProfile);assert.equal(f.timer(),null);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);
+ });
+-for(const [name,change]of Object.entries({generation:f=>f.game.renderHealth.generation++,engine:f=>f.game.engine={},actor:f=>f.game.actor={},device:f=>f.engine._device={},pending:f=>f.game.renderHealth.pendingByKind.preparation++}))
++for(const [name,change]of Object.entries({generation:f=>f.game.renderHealth.generation++,engine:f=>f.game.engine={},actor:f=>f.game.actor={},device:f=>f.engine._device={}}))
+   test('native capture retires replaced '+name,async t=>{
+     const f=nativeFixture(t),owner=captureEntryEffects(f.game,{enabled:true});change(f);f.scene.render();const p=await owner.done;
+     assert.equal(p.complete,false);assert.equal(p.reason,'retired');assert.equal(p.remainingRoutineHooks,0);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);
+@@ -223,7 +224,7 @@ test('native QA ten-routine button uses the actual waiter/factory/receipt and no
+   const URLFixture=class extends URL{static createObjectURL(){return'blob:CPU';}static revokeObjectURL(){}};
+   const hash=b=>createHash('sha256').update(b).digest('hex');
+   const deps={...f.expected.classes,PBRBaseMaterial,
+-    captureEntryRoutineCost:(g,o)=>captureEntryRoutineCost(g,{...o,now:f.options.now,setTimer:f.options.setTimer,clearTimer:f.options.clearTimer}),captureEntryEffects,
++    captureEntryEffectTrigger:(g,o)=>captureEntryEffectTrigger(g,{...o,now:f.options.now,setTimer:f.options.setTimer,clearTimer:f.options.clearTimer}),captureEntryEffects,
+     captureRoutineCost(){throw Error('old8 must not run');},captureEntryRenderCost(){throw Error('old3 must not run');},observeOperation,observePreparationResult,createAttemptQueue,observeStartupLatency,observeBufferLifecycle,
+     installBrowserClock:async()=>undefined,createPlannedBenchmark(){throw Error('no clock');},createShaderAttributionWindow(){throw Error('no shader window');},projectShaderInventory(){return{};},createLifecycleControls(){throw Error('no lifecycle');},createVisibilityAnchor(){throw Error('no lifecycle');},
+     document,window:{addEventListener(){},removeEventListener(){}},location:{hostname:'127.0.0.1',search:''},navigator:{userAgent:'CPU'},crypto:{randomUUID:()=>webcrypto.randomUUID(),subtle:{digest:async(_a,b)=>Buffer.from(hash(b),'hex')}},URL:URLFixture,URLSearchParams,Blob,TextEncoder,performance,innerWidth:2040,innerHeight:986,devicePixelRatio:1,
+@@ -239,11 +240,11 @@ test('native QA ten-routine button uses the actual waiter/factory/receipt and no
+   assert.equal(Object.hasOwn(f.engine,'createEffect'),false);assert.equal(f.timer(),null);assert.equal(intervals.size,0);
+ });
+ test('copied fixture compatibility edits reverse exactly to immutable V17 bytes',()=>{
+-  const edits=[['entry-render-cost.test.mjs','helperIdentity(directory)).files).length,36)','helperIdentity(directory)).files).length,39)',1],
+-    ['entry-routine-cost.test.mjs','helperIdentity(directory)).files).length,36)','helperIdentity(directory)).files).length,39)',2],
+-    ['preparation-summary.test.mjs','Object.keys(identity.files).length, 36','Object.keys(identity.files).length, 39',1],
+-    ['pipeline-input-window.test.mjs','helperIdentity(dir)).files).length,36)','helperIdentity(dir)).files).length,39)',1],
+-    ['helper.test.mjs',"['entry-routine', 'entry-routine-cost.mjs']]","['entry-routine', 'entry-routine-cost.mjs'], ['entry-effects', 'entry-effect-cost.mjs']]",1]];
++  const edits=[['entry-render-cost.test.mjs','helperIdentity(directory)).files).length,36)','helperIdentity(directory)).files).length,42)',1],
++    ['entry-routine-cost.test.mjs','helperIdentity(directory)).files).length,36)','helperIdentity(directory)).files).length,42)',2],
++    ['preparation-summary.test.mjs','Object.keys(identity.files).length, 36','Object.keys(identity.files).length, 42',1],
++    ['pipeline-input-window.test.mjs','helperIdentity(dir)).files).length,36)','helperIdentity(dir)).files).length,42)',1],
++    ['helper.test.mjs',"['entry-routine', 'entry-routine-cost.mjs']]","['entry-routine', 'entry-routine-cost.mjs'], ['entry-effects', 'entry-effect-cost.mjs'], ['entry-effect-trigger', 'entry-effect-trigger.mjs']]",1]];
+   for(const[file,before,after,count]of edits){let text=fs.readFileSync(join(directory,file),'utf8');assert.equal(text.split(after).length-1,count);text=text.split(after).join(before);
+     assert.equal(text,fs.readFileSync(join(donorDirectory,file),'utf8'));}
+   const overlay=fs.readFileSync(join(directory,'qa-overlay.mjs'),'utf8'),donor=fs.readFileSync(join(donorDirectory,'qa-overlay.mjs'),'utf8');
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-guard.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-guard.mjs
+new file mode 100644
+--- /dev/null
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-guard.mjs
+@@ -0,0 +1,42 @@
++/** Closed scalar liveness evidence. Pending is activity after admission, not identity. */
++export const GUARD_SOURCES=Object.freeze(['trigger','adapter']);
++export const GUARD_BOUNDARIES=Object.freeze(['arm','trigger','installed','before-render','after-render','terminal']);
++export const GUARD_IDENTITIES=Object.freeze(['current','actor','scene','engine','device','health','budget','stable','startup','renderer','generation']);
++export const GUARD_CODES=Object.freeze(['invalid-data',...GUARD_IDENTITIES.map(k=>'identity-'+k),'aborted','disposed','game-not-ready','health-phase','health-error','pending-admission','benchmark','quality-preparation','presentation-lease','vehicle','observer-error','invalid-vehicle',"deadline","clock-error","foreign-prepare","foreign-render","foreign-routine","frame-correlation","original-render-threw","original-prepare-threw","prepare-reentry","standby-overflow","installation-failed","factory-error","routine-incomplete","routine-rejected","waiter-restore-failed","no-native-frame-progress","owner-stopped","external-dispose","late-owner","scene-disposed"]);
++export const SAMPLE_KEYS=Object.freeze(['rendererId','generation','phase','errorCount','pendingPreparation','pendingShaderValidation','identityMismatchMask','dataValid']);
++export const FAILURE_KEYS=Object.freeze(['source','boundary','code','atMs','frameId',...SAMPLE_KEYS]);
++export const count=x=>Number.isSafeInteger(x)&&x>=0;
++export const time=x=>typeof x==='number'&&Number.isFinite(x)&&x>=0;
++const invalid=Symbol('invalid');
++export function own(o,k){try{if(o==null)return undefined;const d=Object.getOwnPropertyDescriptor(o,k);return !d?undefined:Object.hasOwn(d,'value')?d.value:invalid;}catch{return invalid;}}
++export function closed(o,keys){if(!o||typeof o!=='object'||Array.isArray(o)||![Object.prototype,null].includes(Object.getPrototypeOf(o)))throw Error('Effect closed object');
++  const names=Reflect.ownKeys(o);if(names.length!==keys.length||names.some(k=>!keys.includes(k)))throw Error('Effect closed fields');const r={};
++  for(const k of keys){const d=Object.getOwnPropertyDescriptor(o,k);if(!d||!Object.hasOwn(d,'value'))throw Error('Effect own data');r[k]=d.value;}return r;}
++const phases=['preparing','ready','invalid','restart-required','disposed'];
++export function validateGuardSample(value){const p=closed(value,SAMPLE_KEYS);
++  if(typeof p.dataValid!=='boolean'||!count(p.identityMismatchMask)||p.identityMismatchMask>=2**GUARD_IDENTITIES.length||
++    ![null,...phases].includes(p.phase)||['rendererId','generation','errorCount','pendingPreparation','pendingShaderValidation'].some(k=>p[k]!==null&&!count(p[k])))throw Error('Effect guard sample');
++  if(p.dataValid&&(!p.rendererId||!p.generation||p.phase===null||['errorCount','pendingPreparation','pendingShaderValidation'].some(k=>p[k]===null)))throw Error('Effect guard valid data');return p;}
++export function validateGuardFailure(value){if(value===null)return null;const p=closed(value,FAILURE_KEYS);validateGuardSample(Object.fromEntries(SAMPLE_KEYS.map(k=>[k,p[k]])));
++  if(!GUARD_SOURCES.includes(p.source)||!GUARD_BOUNDARIES.includes(p.boundary)||!GUARD_CODES.includes(p.code)||!(p.atMs===null||time(p.atMs))||!(p.frameId===null||count(p.frameId)))throw Error('Effect guard witness');return p;}
++export function effectContext(game,{isCurrent=()=>true,signal,rendererId,generation}={}){const health=own(game,'renderHealth');return{game,scene:own(game,'scene'),engine:own(game,'engine'),health,actor:own(game,'actor'),budget:own(game,'gltfLightBudget'),stable:own(game,'stableLights'),startup:own(game,'startupAbort'),device:own(own(game,'engine'),'_device'),isCurrent,signal,rendererId:rendererId??own(health,'rendererId'),generation:generation??own(health,'generation')};}
++export function inspectEffectGuard(s,{source,boundary,atMs=null,allowPending=false,requireVehicle=false}={}){
++  const p=own(s.health,'pendingByKind'),raw={rendererId:own(s.health,'rendererId'),generation:own(s.health,'generation'),phase:own(s.health,'phase'),errorCount:own(s.health,'errorCount'),pendingPreparation:own(p,'preparation'),pendingShaderValidation:own(p,'shader-validation')};
++  let mask=0,observerError=false,current=false;
++  try{current=s.isCurrent()===true;}catch{observerError=true;}
++  const same=[current,own(s.game,'actor')===s.actor,own(s.game,'scene')===s.scene,own(s.game,'engine')===s.engine&&own(s.scene,'_engine')===s.engine,own(s.engine,'_device')===s.device,own(s.game,'renderHealth')===s.health,own(s.game,'gltfLightBudget')===s.budget,own(s.game,'stableLights')===s.stable,own(s.game,'startupAbort')===s.startup,raw.rendererId===s.rendererId,raw.generation===s.generation];
++  same.forEach((v,i)=>{if(!v)mask|=2**i;});
++  const dataValid=count(raw.rendererId)&&raw.rendererId>0&&count(raw.generation)&&raw.generation>0&&phases.includes(raw.phase)&&['errorCount','pendingPreparation','pendingShaderValidation'].every(k=>count(raw[k]));
++  const sample={...Object.fromEntries(Object.entries(raw).map(([k,v])=>[k,k==='phase'?(phases.includes(v)?v:null):(count(v)?v:null)])),identityMismatchMask:mask,dataValid};
++  let code=null;
++  const flags=['disposed','ready','rendererFailed','benchmark','preparingRenderQuality','startupPresentationLease'].map(k=>own(s.game,k));
++  if(!dataValid||p===invalid||flags.includes(invalid)||[own(s.scene,'_isDisposed'),own(s.engine,'_isDisposed')].includes(invalid))code='invalid-data';
++  else if(observerError)code='observer-error';
++  else if(mask)code='identity-'+GUARD_IDENTITIES[same.findIndex(v=>!v)];
++  else{try{if(s.signal?.aborted||s.startup?.signal.aborted)code='aborted';}catch{code='invalid-data';}
++    if(!code){if(flags[0]||own(s.scene,'_isDisposed')||own(s.engine,'_isDisposed'))code='disposed';else if(flags[1]!==true||flags[2])code='game-not-ready';
++      else if(raw.errorCount)code='health-error';else if(raw.phase!=='ready')code='health-phase';else if(!allowPending&&(raw.pendingPreparation||raw.pendingShaderValidation))code='pending-admission';
++      else if(flags[3])code='benchmark';else if(flags[4])code='quality-preparation';else if(flags[5])code='presentation-lease';else if(requireVehicle&&own(s.actor,'vehicle')!==true)code='vehicle';}}
++  const frame=own(s.scene,'_frameId');
++  return{sample,failure:code?{source,boundary,code,atMs:time(atMs)?atMs:null,frameId:count(frame)?frame:null,...sample}:null};
++}
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-trigger.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-trigger.mjs
+new file mode 100644
+--- /dev/null
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-effect-trigger.mjs
+@@ -0,0 +1,165 @@
++import { inspectEffectGuard, validateGuardFailure, validateGuardSample, closed, GUARD_CODES, effectContext, own as ownData } from './entry-effect-guard.mjs';
++import { validateEntryTrigger, ENTRY_ROUTINE_SCOPE } from './entry-routine-cost.mjs';
++/** Pure controller: one prepare waiter, then the original synchronous factory. */
++export const ENTRY_ROUTINE_LIMITS = Object.freeze({ deadlineMs: 30000, frames: 8, standbyCalls: 8192 });
++export const ENTRY_EFFECT_TRIGGER_SCOPE = 'Accepted foot-to-vehicle; idle admission and synchronous install, then eight consecutive original renders permitting pending preparation and shader-validation activity. Diagnostic completion is not renderer health/FPS/async acceptance.';
++export const ENTRY_EFFECT_TRIGGER_REASONS=Object.freeze(['complete','disposed','owner-stopped','external-dispose','clock-error','deadline','retired','foreign-prepare','foreign-render','observer-error','frame-correlation','waiter-restore-failed','late-owner','factory-error','routine-rejected','routine-incomplete','prepare-reentry','standby-overflow','invalid-vehicle','original-prepare-threw','aborted','scene-disposed','installation-failed']);
++const owners = new WeakMap(), attempts = new WeakSet();
++const data = (object, key) => { const d = object && Object.getOwnPropertyDescriptor(object, key); return d && Object.hasOwn(d, 'value') ? d.value : undefined; };
++const count = value => Number.isSafeInteger(value) && value >= 0;
++const time = value => typeof value === 'number' && Number.isFinite(value) && value >= 0;
++const same = (a, b) => !!a === !!b && (!a || ['value','get','set','writable','configurable','enumerable'].every(key => a[key] === b[key]));
++function descriptor(object, key) { let current = object; while (current) { const d = Object.getOwnPropertyDescriptor(current, key); if (d) return d; current = Object.getPrototypeOf(current); } }
++
++
++export function captureEntryEffectTrigger(game, { enabled = false, expected, startCapture, signal, isCurrent = () => true,
++  now = () => performance.now(), setTimer = setTimeout, clearTimer = clearTimeout } = {}) {
++  if (!enabled) return undefined;
++  const classes = expected?.classes, methods = expected?.methods;
++  if (!classes || !methods || !(game instanceof classes.Game) || !(ownData(game,'scene') instanceof classes.Scene) ||
++      !(ownData(game,'gltfLightBudget') instanceof classes.GltfLightBudget) || !(ownData(game,'stableLights') instanceof classes.StableLightState) || typeof startCapture !== 'function') throw Error('Entry routine singleton/factory mismatch');
++  const state = { ...effectContext(game,{isCurrent,signal}),factory:startCapture,active:true,profileOwner:null,timer:null,detach:null };
++  const own = Object.getOwnPropertyDescriptor(state.budget, 'prepareFrame'), original = descriptor(state.budget, 'prepareFrame')?.value;
++  if (original !== methods.prepareFrame || typeof original !== 'function' || (own && (!Object.hasOwn(own, 'value') || (!own.writable && !own.configurable))) ||
++      (!own && !Object.isExtensible(state.budget)) || descriptor(state.scene, 'render')?.value !== methods.render || state.scene._engine !== state.engine ||
++      ownData(state.actor,'vehicle') !== false || owners.has(state.scene) || attempts.has(game)) throw Error('Entry routine requires native unowned foot Game');
++  const rendererId = data(state.health, 'rendererId'), generation = data(state.health, 'generation');
++  if (!count(rendererId) || rendererId < 1 || !count(generation) || generation < 1) throw Error('Entry renderer identity missing');
++  state.rendererId=rendererId;state.generation=generation;
++  let installed, inside = 0, installing = true, handingOff = false, phase = 'waiting', lastClock = -Infinity, routineProfile = null, terminal;
++  let resolveDone; const done = new Promise(resolve => { resolveDone = resolve; });
++  const meta = { schemaVersion: 2, scope: ENTRY_EFFECT_TRIGGER_SCOPE, limits: ENTRY_ROUTINE_LIMITS, active: true, complete: false, reason: null,
++    armedAtMs: null, deadlineAtMs: null, triggeredAtMs: null, captureInstalledAtMs: null, terminalAtMs: null,
++    vehicleAtArm: false, vehicleAtTrigger: null, vehicleAtTerminal: null, sceneFrameIdAtTrigger: null, engineFrameIdAtTrigger: null,
++    sceneFrameIdAtTerminal: null, engineFrameIdAtTerminal: null, rendererId, generation, standbyCalls: 0, errors: 0, restoreConflicts: 0,
++    installedWaiterHooks: 0, remainingWaiterHooks: 0, firstFailure:null, pendingAtTerminal:null };
++  const owner = { done, dispose: why => stop(why ?? 'disposed'), snapshot: () => terminal ?? ({ entryTrigger: structuredClone(meta), routineProfile }) };
++  function clock() { try { const at = now(); if (time(at) && at >= lastClock) { lastClock = at; return at; } } catch {} meta.errors++; return null; }
++  function check(at,boundary='before-render',requireIdle=false) {
++    if (!state.active) return false;
++    try {
++      if (at === null) { stop('clock-error', null); return false; }
++      if (meta.deadlineAtMs !== null && at >= meta.deadlineAtMs) { stop('deadline', at); return false; }
++      const inspected=inspectEffectGuard(state,{source:'trigger',boundary,atMs:at,allowPending:phase==='capturing'&&meta.captureInstalledAtMs!==null&&!requireIdle,requireVehicle:phase==='capturing'});
++      if(inspected.failure){meta.firstFailure??=inspected.failure;stop('retired',at);return false;}
++      if (installed ? !same(Object.getOwnPropertyDescriptor(state.budget, 'prepareFrame'), installed) :
++          !same(Object.getOwnPropertyDescriptor(state.budget, 'prepareFrame'), own) || descriptor(state.budget, 'prepareFrame')?.value !== original) { stop('foreign-prepare', at); return false; }
++      if (phase === 'waiting' && descriptor(state.scene, 'render')?.value !== methods.render) { stop('foreign-render', at); return false; }
++      return true;
++    } catch { meta.errors++; stop('observer-error', at); return false; }
++  }
++  function restoreWaiter() {
++    if (!installed) return;
++    try {
++      const current = Object.getOwnPropertyDescriptor(state.budget, 'prepareFrame');
++      if (same(current, installed)) { if (own) Object.defineProperty(state.budget, 'prepareFrame', own); else delete state.budget.prepareFrame; }
++      else if (!same(current, own)) meta.restoreConflicts++;
++    } catch { meta.restoreConflicts++; }
++    installed = null; meta.remainingWaiterHooks = 0;
++  }
++  function seal() {
++    if (!state.active && !installing && !handingOff && !terminal) {
++      terminal = { entryTrigger: structuredClone(meta), routineProfile }; resolveDone(terminal);
++    }
++  }
++  function stop(reason, at) {
++    if (!state.active) return;
++    reason=ENTRY_EFFECT_TRIGGER_REASONS.includes(reason)?reason:'external-dispose';
++    const terminalTime=at===undefined?clock():at;
++    const observed=inspectEffectGuard(state,{source:'trigger',boundary:'terminal',atMs:terminalTime,allowPending:true,requireVehicle:phase==='capturing'});
++    meta.pendingAtTerminal=observed.sample;
++    if(reason!=='complete')meta.firstFailure??=observed.failure??{source:'trigger',boundary:'terminal',code:GUARD_CODES.includes(reason)?reason:'observer-error',atMs:terminalTime,frameId:count(data(state.scene,'_frameId'))?data(state.scene,'_frameId'):null,...observed.sample};
++    state.active = false; meta.active = false; meta.reason = reason; meta.terminalAtMs = terminalTime;
++    try { meta.vehicleAtTerminal = typeof ownData(state.actor,'vehicle') === 'boolean' ? ownData(state.actor,'vehicle') : null; meta.sceneFrameIdAtTerminal = count(data(state.scene, '_frameId')) ? data(state.scene, '_frameId') : null; meta.engineFrameIdAtTerminal = count(data(state.engine, '_frameId')) ? data(state.engine, '_frameId') : null; } catch { meta.errors++; }
++    restoreWaiter();
++    try { if (state.timer !== null) clearTimer(state.timer); } catch { meta.errors++; }
++    try { state.detach?.(); } catch { meta.errors++; }
++    if (state.profileOwner) {
++      try { state.profileOwner.dispose(reason); } catch { meta.errors++; }
++      if (!routineProfile) { try { routineProfile = state.profileOwner.snapshot(); } catch { meta.errors++; } }
++    }
++    meta.complete = reason === 'complete' && !meta.firstFailure && !meta.errors && !meta.restoreConflicts && routineProfile?.complete === true;
++    if (owners.get(state.scene) === owner) owners.delete(state.scene);
++    state.game = state.actor = state.scene = state.engine = state.health = state.budget = state.stable = state.device = state.startup = null;
++    state.isCurrent = state.factory = state.profileOwner = state.detach = state.signal = null; state.timer = null; game = signal = expected = startCapture = now = setTimer = clearTimer = isCurrent = null;
++    seal();
++  }
++  function profileDone(profile) {
++    if (!state.active) return;
++    routineProfile = profile;
++    const at = clock(); if (!check(at,'terminal')) return;
++    if (!profile || profile.frames?.[0]?.frameId !== meta.sceneFrameIdAtTrigger || profile.frames.at(-1)?.nativeFrameIdAfter !== data(state.scene, '_frameId')) { meta.errors++; stop('frame-correlation', at); return; }
++    stop(profile.complete === true ? 'complete' : 'routine-incomplete', at);
++  }
++  function trigger(at) {
++    meta.triggeredAtMs = at; meta.vehicleAtTrigger = true; meta.sceneFrameIdAtTrigger = data(state.scene, '_frameId'); meta.engineFrameIdAtTrigger = data(state.engine, '_frameId');
++    if (!count(meta.sceneFrameIdAtTrigger) || !count(meta.engineFrameIdAtTrigger)) { meta.errors++; stop('frame-correlation', at); return; }
++    restoreWaiter(); if (meta.restoreConflicts) { stop('waiter-restore-failed', at); return; }
++    phase = 'capturing'; handingOff = true;
++    let returned;
++    try {
++      returned = Reflect.apply(state.factory, undefined, [state.game, { enabled: true, now, signal, isRetired: () => !check(clock()) }]);
++      if (!returned || typeof returned.dispose !== 'function' || typeof returned.snapshot !== 'function') throw Error('Invalid original capture owner');
++      // Both reactions consume only QA-control errors, never a product return.
++      Reflect.apply(Promise.prototype.then, returned.done, [profile => { try { profileDone(profile); } catch { meta.errors++; stop('observer-error'); } }, () => { meta.errors++; stop('routine-rejected'); }]);
++      if (!state.active || !check(clock(),'installed',true)) {
++        try { returned.dispose('late-owner'); if (!routineProfile) routineProfile = returned.snapshot(); } catch { meta.errors++; }
++        return;
++      }
++      state.profileOwner = returned; meta.captureInstalledAtMs = clock();
++      check(meta.captureInstalledAtMs,'installed',true);
++    } catch {
++      meta.errors++;
++      if (returned) { try { returned.dispose('factory-error'); if (!routineProfile) routineProfile = returned.snapshot(); } catch { meta.errors++; } }
++      stop('factory-error');
++    } finally { handingOff = false; seal(); }
++  }
++  const wrapper = function () {
++    if (!state.active || phase !== 'waiting' || this !== state.budget) return Reflect.apply(original, this, arguments);
++    try {
++      const at = clock();
++      if (check(at,ownData(state.actor,'vehicle')===true?'trigger':'arm',true)) {
++        if (inside) { meta.errors++; stop('prepare-reentry', at); }
++        else if (meta.standbyCalls >= ENTRY_ROUTINE_LIMITS.standbyCalls) { meta.errors++; stop('standby-overflow', at); }
++        else { meta.standbyCalls++; if (ownData(state.actor,'vehicle') === true) trigger(at); else if (ownData(state.actor,'vehicle') !== false) { meta.errors++; stop('invalid-vehicle', at); } }
++      }
++    } catch { meta.errors++; stop('observer-error'); }
++    inside++;
++    try { return Reflect.apply(original, this, arguments); }
++    catch (error) { try { stop('original-prepare-threw'); } catch {} throw error; }
++    finally { inside--; }
++  };
++  try {
++    meta.armedAtMs = clock(); meta.deadlineAtMs = meta.armedAtMs === null ? null : meta.armedAtMs + ENTRY_ROUTINE_LIMITS.deadlineMs;
++    if (!check(meta.armedAtMs,'arm',true)) return owner;
++    installed = own ? { ...own, value: wrapper } : { value: wrapper, writable: true, configurable: true, enumerable: false };
++    Object.defineProperty(state.budget, 'prepareFrame', installed); meta.installedWaiterHooks = 1; meta.remainingWaiterHooks = 1;
++    owners.set(state.scene, owner); attempts.add(game);
++    const detaches = [], aborted = () => stop('aborted'), startupSignal = state.startup?.signal;
++    state.detach = () => { for (const detach of detaches.splice(0)) { try { detach(); } catch { meta.errors++; } } };
++    if (signal) { detaches.push(() => signal.removeEventListener('abort', aborted)); signal.addEventListener('abort', aborted, { once: true }); if (!state.active) return owner; }
++    if (startupSignal) { detaches.push(() => startupSignal.removeEventListener('abort', aborted)); startupSignal.addEventListener('abort', aborted, { once: true }); if (!state.active) return owner; }
++    const observer = state.scene.onDisposeObservable.add(() => stop('scene-disposed'));
++    if (!state.active) { observer.remove(true); return owner; } detaches.push(() => observer.remove(true));
++    const timerAt = clock(); if (!check(timerAt)) return owner;
++    const timer = setTimer(() => stop('deadline'), meta.deadlineAtMs - timerAt);
++    if (!state.active) { clearTimer(timer); return owner; } state.timer = timer;
++    check(clock());
++  } catch { meta.errors++; stop('installation-failed'); }
++  finally { installing = false; seal(); }
++  return owner;
++}
++
++const baseKeys='schemaVersion,scope,limits,active,complete,reason,armedAtMs,deadlineAtMs,triggeredAtMs,captureInstalledAtMs,terminalAtMs,vehicleAtArm,vehicleAtTrigger,vehicleAtTerminal,sceneFrameIdAtTrigger,engineFrameIdAtTrigger,sceneFrameIdAtTerminal,engineFrameIdAtTerminal,rendererId,generation,standbyCalls,errors,restoreConflicts,installedWaiterHooks,remainingWaiterHooks'.split(',');
++export function validateEntryEffectTrigger(value,profile){
++  const p=closed(value,[...baseKeys,'firstFailure','pendingAtTerminal']);
++  if(p.schemaVersion!==2||p.scope!==ENTRY_EFFECT_TRIGGER_SCOPE||!ENTRY_EFFECT_TRIGGER_REASONS.includes(p.reason))throw Error('Effect trigger schema/scope');
++  const limits=closed(p.limits,Object.keys(ENTRY_ROUTINE_LIMITS));for(const [key,expected]of Object.entries(ENTRY_ROUTINE_LIMITS))if(limits[key]!==expected)throw Error('Effect trigger limits');
++  const original=Object.fromEntries(baseKeys.map(k=>[k,p[k]]));original.limits=limits;original.schemaVersion=1;original.scope=ENTRY_ROUTINE_SCOPE;validateEntryTrigger(original,profile);
++  validateGuardFailure(p.firstFailure);const terminal=validateGuardSample(p.pendingAtTerminal);
++  if(p.firstFailure&&p.firstFailure.source!=='trigger')throw Error('Effect trigger witness source');
++  if(p.reason!=='complete'&&!p.firstFailure)throw Error('Effect trigger missing failure witness');
++  if(p.complete&&(p.firstFailure||!terminal.dataValid||terminal.identityMismatchMask||terminal.phase!=='ready'||terminal.errorCount||terminal.rendererId!==p.rendererId||terminal.generation!==p.generation))throw Error('Effect trigger false complete');
++  if(p.firstFailure&&p.firstFailure.atMs!==null&&p.terminalAtMs!==null&&p.firstFailure.atMs>p.terminalAtMs)throw Error('Effect trigger witness time');
++  return value;
++}
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-render-cost.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-render-cost.test.mjs
+index 652ca8df..ebb2a1cf 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-render-cost.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-render-cost.test.mjs
+@@ -168,7 +168,7 @@ test('actual QA entry button owns standby, original accepted transition, receipt
+ test('v10 routine modules/original button are byte-exact and UI transform remains exact once',async()=>{
+  const old=join(root,'.cache/webgpu-completion-20261021/preparation-summary/helper/v10');for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from="../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz",to="../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}
+  const oldOverlay=await readFile(join(old,'qa-overlay.mjs'),'utf8'),overlay=await readFile(join(directory,'qa-overlay.mjs'),'utf8');const block=s=>s.slice(s.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),s.indexOf("  if (identity.clock?.config.benchmarkAtUTC"));assert.ok(overlay.includes(block(oldOverlay)));
+- const ui=await readFile(join(root,'client/ui.tsx')),before=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),before);assert.equal(Object.keys((await helperIdentity(directory)).files).length,39);
++ const ui=await readFile(join(root,'client/ui.tsx')),before=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),before);assert.equal(Object.keys((await helperIdentity(directory)).files).length,42);
+ });
+ test('donor/pin selected8 method descriptors and all four original Mesh observer ordering assertions',async()=>{
+  const donor=gunzipSync(await readFile(join(root,'docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz')));assert.equal(sha256(donor),'ee3c3280de69ee61dcbf433dcf2a259d07a4efa80a711f822056da331168289f');
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-routine-cost.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-routine-cost.test.mjs
+index 0ebd5169..513a85a9 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-routine-cost.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/entry-routine-cost.test.mjs
+@@ -76,9 +76,9 @@ test('optional entryTrigger is strict while old standard routine receipts remain
+  assert.throws(()=>validateReceipt({...raw,kind:'state',state:{},compilation:{}},identity));
+ });
+ test('old8/three-scope modules and both old button blocks remain exact; new34 inputs and UI parse sealed',async()=>{
+- const original=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v12');for(const f of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs','entry-render-cost.mjs','entry-render-cost.test.mjs']){let text=(await readFile(join(directory,f))).toString();const edits=f==='routine-cost.test.mjs'?[["../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz","../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz"]]:f==='entry-render-cost.test.mjs'?[["for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from=\"../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\",to=\"../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}","for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,file)),await readFile(join(old,file)));"],["assert.equal(Object.keys((await helperIdentity(directory)).files).length,39);","assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);"]]:[];for(const[from,to]of edits){assert.equal(text.split(from).length,2);text=text.replace(from,to);}assert.deepEqual(Buffer.from(text),await readFile(join(original,f)));}
++ const original=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v12');for(const f of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs','entry-render-cost.mjs','entry-render-cost.test.mjs']){let text=(await readFile(join(directory,f))).toString();const edits=f==='routine-cost.test.mjs'?[["../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz","../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz"]]:f==='entry-render-cost.test.mjs'?[["for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from=\"../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\",to=\"../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}","for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,file)),await readFile(join(old,file)));"],["assert.equal(Object.keys((await helperIdentity(directory)).files).length,42);","assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);"]]:[];for(const[from,to]of edits){assert.equal(text.split(from).length,2);text=text.replace(from,to);}assert.deepEqual(Buffer.from(text),await readFile(join(original,f)));}
+  const before=await readFile(join(original,'qa-overlay.mjs'),'utf8'),after=await readFile(join(directory,'qa-overlay.mjs'),'utf8'),from=before.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),to=before.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(after.includes(before.slice(from,to)));
+- const ui=await readFile(join(root,'client/ui.tsx')),digest=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),digest);assert.equal(Object.keys((await helperIdentity(directory)).files).length,39);
++ const ui=await readFile(join(root,'client/ui.tsx')),digest=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),digest);assert.equal(Object.keys((await helperIdentity(directory)).files).length,42);
+ });
+ test('actual new QA action gates startupACK then owns native-entry waiter/core receipt without clicking either old action',async()=>{
+  const f=fixture(),elements=[],requests=[],intervals=new Set();class Element{constructor(tag){this.tag=tag;this.style={};elements.push(this);}append(){}setAttribute(){}remove(){}}
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/harness.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/harness.mjs
+index 42446dfa..b1aa39fe 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/harness.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/harness.mjs
+@@ -149,9 +149,11 @@ export async function run(command, input, output, label, option = 'original', ..
+     const lifecycleControls = await readFile(join(helperDirectory, 'lifecycle-controls.mjs'), 'utf8');
+     const pipelineInputs = await readFile(join(helperDirectory, 'pipeline-input-window.mjs'), 'utf8');
+     const entryRoutine = await readFile(join(helperDirectory, 'entry-routine-cost.mjs'), 'utf8');
+-    const entryEffectCore = await readFile(join(helperDirectory, 'entry-effect-cost-core.mjs'), 'utf8');
++    const entryEffectGuard = await readFile(join(helperDirectory,'entry-effect-guard.mjs'),'utf8');
++    const entryEffectTrigger = (await readFile(join(helperDirectory,'entry-effect-trigger.mjs'),'utf8')).replace("'./entry-effect-guard.mjs'","'virtual:webgpu-completion-entry-effect-guard'").replace("'./entry-routine-cost.mjs'","'virtual:webgpu-completion-entry-routine'");
++    const entryEffectCore = (await readFile(join(helperDirectory, 'entry-effect-cost-core.mjs'), 'utf8')).replace("'./entry-effect-guard.mjs'","'virtual:webgpu-completion-entry-effect-guard'");
+     const entryEffect = (await readFile(join(helperDirectory, 'entry-effect-cost.mjs'), 'utf8'))
+-      .replace("'./entry-effect-cost-core.mjs'", "'virtual:webgpu-completion-entry-effect-core'");
++      .replace("'./entry-effect-cost-core.mjs'", "'virtual:webgpu-completion-entry-effect-core'").replace("'./entry-effect-guard.mjs'","'virtual:webgpu-completion-entry-effect-guard'");
+     const entryRender = await readFile(join(helperDirectory, 'entry-render-cost.mjs'), 'utf8');
+     const entryClasses = 'export { Game } from ' + JSON.stringify(join(snapshot, 'client/game.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { Scene } from "@babylonjs/core/scene.js";export { GltfLightBudget } from ' + JSON.stringify(join(snapshot, 'client/gltf-light-budget.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { StableLightState } from ' + JSON.stringify(join(snapshot, 'client/stable-light-state.ts').replaceAll(String.fromCharCode(92), '/')) + ';';
+     const routineCore = await readFile(join(helperDirectory, 'routine-cost-core.mjs'), 'utf8');
+@@ -193,6 +195,8 @@ export async function run(command, input, output, label, option = 'original', ..
+       build: { outDir: join(directory, 'dist'), emptyOutDir: false, copyPublicDir: false, sourcemap: true },
+       plugins: [{ name: 'explicit-webgpu-completion-qa', enforce: 'pre',
+         resolveId(id) {
++          if (id === 'virtual:webgpu-completion-entry-effect-trigger') return '\0virtual:webgpu-completion-entry-effect-trigger';
++          if (id === 'virtual:webgpu-completion-entry-effect-guard') return '\0virtual:webgpu-completion-entry-effect-guard';
+           if (id === 'virtual:webgpu-completion-pipeline-inputs') return '\0virtual:webgpu-completion-pipeline-inputs';
+           if (id === 'virtual:webgpu-completion-entry-routine') return '\0virtual:webgpu-completion-entry-routine';
+           if (id === 'virtual:webgpu-completion-entry-effects') return '\0virtual:webgpu-completion-entry-effects';
+@@ -215,6 +219,8 @@ export async function run(command, input, output, label, option = 'original', ..
+           if (id === 'virtual:webgpu-completion-simulation') return join(snapshot, 'shared/simulation.ts').replaceAll('\\', '/');
+         },
+         load(id) {
++          if (id === '\0virtual:webgpu-completion-entry-effect-trigger') return entryEffectTrigger;
++          if (id === '\0virtual:webgpu-completion-entry-effect-guard') return entryEffectGuard;
+           if (id === '\0virtual:webgpu-completion-pipeline-inputs') return pipelineInputs;
+           if (id === '\0virtual:webgpu-completion-entry-routine') return entryRoutine;
+           if (id === '\0virtual:webgpu-completion-entry-effects') return entryEffect;
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/helper.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/helper.test.mjs
+index 795e3440..4c83e0ea 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/helper.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/helper.test.mjs
+@@ -208,7 +208,7 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
+       export {StableLightState} from ${JSON.stringify(pathToFileURL(join(root, 'client/stable-light-state.ts')).href)};
+       export class Game { constructor() { throw Error('Old DOM fixture does not construct an entry Game'); } }`;
+     source = source.replace("'virtual:webgpu-completion-entry-classes'", JSON.stringify('data:text/javascript;base64,' + Buffer.from(entryClasses).toString('base64')));
+-    for (const [virtual, file] of [['pipeline-inputs', 'pipeline-input-window.mjs'], ['entry-render', 'entry-render-cost.mjs'], ['entry-routine', 'entry-routine-cost.mjs'], ['entry-effects', 'entry-effect-cost.mjs']])
++    for (const [virtual, file] of [['pipeline-inputs', 'pipeline-input-window.mjs'], ['entry-render', 'entry-render-cost.mjs'], ['entry-routine', 'entry-routine-cost.mjs'], ['entry-effects', 'entry-effect-cost.mjs'], ['entry-effect-trigger', 'entry-effect-trigger.mjs']])
+       source = source.replace("'virtual:webgpu-completion-" + virtual + "'", JSON.stringify(pathToFileURL(join(directory, file)).href));
+     source = source.replace("'virtual:webgpu-completion-observer'", JSON.stringify(pathToFileURL(join(directory, 'startup-observer.mjs')).href));
+     source = source.replace("'virtual:webgpu-completion-attempts'", JSON.stringify(pathToFileURL(join(directory, 'attempt-queue.mjs')).href));
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/pending-capture.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/pending-capture.test.mjs
+new file mode 100644
+--- /dev/null
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/pending-capture.test.mjs
+@@ -0,0 +1,133 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import {createHash} from 'node:crypto';
++import {NullEngine} from '@babylonjs/core/Engines/nullEngine.js';
++import {EngineStore} from '@babylonjs/core/Engines/engineStore.js';
++import {Scene} from '@babylonjs/core/scene.js';
++import {FreeCamera} from '@babylonjs/core/Cameras/freeCamera.js';
++import {Vector3} from '@babylonjs/core/Maths/math.vector.js';
++import {CreateBox} from '@babylonjs/core/Meshes/Builders/boxBuilder.js';
++import {StandardMaterial} from '@babylonjs/core/Materials/standardMaterial.js';
++import {GltfLightBudget} from '../../../../../client/gltf-light-budget.ts';
++import {StableLightState} from '../../../../../client/stable-light-state.ts';
++import {RenderHealth} from '../../../../../client/render-health.ts';
++import ts from 'typescript';
++import {captureEntryEffectTrigger,validateEntryEffectTrigger} from './entry-effect-trigger.mjs';
++import {captureEntryEffects} from './entry-effect-cost.mjs';
++import {validateEntryEffectProfile} from './entry-effect-cost-core.mjs';
++import {validateReceipt} from './receipt.mjs';
++import {validateGuardFailure,validateGuardSample} from './entry-effect-guard.mjs';
++const baseline=process.env.EFFECT_BASELINE==='v19';
++const oldTrigger=baseline?await import('../v19/entry-routine-cost.mjs'):null;
++const oldAdapter=baseline?await import('../v19/entry-effect-cost.mjs'):null;
++const trigger=oldTrigger?.captureEntryRoutineCost??captureEntryEffectTrigger,adapter=oldAdapter?.captureEntryEffects??captureEntryEffects;
++const limitsValidator=process.env.EFFECT_LIMITS_BASELINE==='v20'?(await import('../v20/entry-effect-trigger.mjs')).validateEntryEffectTrigger:validateEntryEffectTrigger;
++const turn=()=>new Promise(resolve=>setImmediate(resolve));
++const flush=async()=>{for(let i=0;i<8;i++)await Promise.resolve();};
++const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return{promise,resolve,reject};};
++class Game{}
++const gameText=fs.readFileSync(new URL('../../../../../client/game.ts',import.meta.url),'utf8');
++const tree=ts.createSourceFile('game.ts',gameText,ts.ScriptTarget.Latest,true),klass=tree.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='Game'),method=klass.members.find(n=>n.name?.getText(tree)==='frame');
++const names=['this.gltfLightBudget.prepareFrame();','this.stableLights.update();','this.scene.render();'],indices=names.map(n=>method.body.statements.findIndex(s=>s.getText(tree)===n));
++assert.ok(indices[0]>=0);assert.deepEqual(indices,[indices[0],indices[0]+1,indices[0]+2]);
++const prelude=new Function(indices.map(i=>method.body.statements[i].getText(tree)).join('\n'));
++function fixture(){
++ const engine=new NullEngine(),scene=new Scene(engine);new FreeCamera('CPU liveness',new Vector3(0,0,-5),scene);scene.texturesEnabled=false;
++ const mesh=CreateBox('CPU native receiver',{},scene);mesh.material=new StandardMaterial('CPU native material',scene);
++ const health=new RenderHealth(engine,'game');assert.equal(health.markReady(),true);
++ const game=Object.assign(new Game(),{engine,scene,renderHealth:health,ready:true,disposed:false,rendererFailed:false,actor:{vehicle:false},startupAbort:new AbortController(),gltfLightBudget:new GltfLightBudget(scene),stableLights:new StableLightState(scene)});
++ let time=100,timer=null;const abort=new AbortController();
++ const options={enabled:true,expected:{classes:{Game,Scene,GltfLightBudget,StableLightState},methods:{prepareFrame:GltfLightBudget.prototype.prepareFrame,render:Scene.prototype.render}},now:()=>time,setTimer:cb=>(timer=cb),clearTimer(){timer=null;},signal:abort.signal,startCapture:adapter};
++ return{game,scene,engine,health,abort,options,frame(){engine.beginFrame();prelude.call(game);engine.endFrame();},advance(ms){time+=ms;},timer:()=>timer,dispose(){game.gltfLightBudget.dispose();game.stableLights.dispose();health.dispose();scene.dispose();engine.dispose();}};
++}
++function clean(f,result){assert.equal(result.entryTrigger.remainingWaiterHooks,0);if(result.routineProfile)assert.equal(result.routineProfile.remainingRoutineHooks,0);assert.equal(Object.hasOwn(f.scene,'render'),false);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);assert.equal(Object.hasOwn(f.game.gltfLightBudget,'prepareFrame'),false);assert.equal(f.timer(),null);}
++function validate(result){validateEntryEffectTrigger(result.entryTrigger,result.routineProfile);if(result.routineProfile)validateEntryEffectProfile(result.routineProfile);}
++for(const kind of ['shader-validation','preparation'])test('new pending '+kind+' after one native accepted frame retains all eight consecutive original frames',async()=>{
++ const f=fixture(),jobs=[deferred(),deferred()];let owner;
++ try{owner=trigger(f.game,f.options);const start=f.scene._frameId;f.game.actor.vehicle=true;
++   f.scene.onAfterRenderObservable.addOnce(()=>{for(const job of jobs)void f.health.track(job.promise,'shader','controlled original pending',kind).catch(()=>{});});
++   f.frame();assert.equal(owner.snapshot().routineProfile,null);f.frame();
++   assert.equal(owner.snapshot().entryTrigger.active,true,'post-admission pending work must not retire the same renderer');
++   for(const job of jobs)job.resolve();await flush();for(let i=0;i<6;i++)f.frame();const result=await owner.done;validate(result);
++   assert.equal(result.entryTrigger.complete,true);assert.equal(result.routineProfile.complete,true);assert.equal(result.routineProfile.frames.length,8);
++   assert.deepEqual(result.routineProfile.frames.map(x=>[x.frameId,x.nativeFrameIdAfter]),Array.from({length:8},(_,i)=>[start+i,start+i+1]));
++   const key=kind==='preparation'?'pendingPreparation':'pendingShaderValidation';assert.equal(result.routineProfile.frames[0].healthAfter[key],2);assert.equal(result.routineProfile.frames[1].healthBefore[key],2);assert.equal(result.routineProfile.pendingAtTerminal[key],0);
++   assert.equal(result.entryTrigger.firstFailure,null);assert.equal(result.routineProfile.firstFailure,null);clean(f,result);
++ }finally{for(const job of jobs)job.resolve();owner?.dispose();f.dispose();}
++});
++test('eight-frame diagnostic completion preserves pending at terminal without claiming health acceptance',async()=>{
++ const f=fixture(),job=deferred();let owner;
++ try{owner=trigger(f.game,f.options);f.game.actor.vehicle=true;f.scene.onAfterRenderObservable.addOnce(()=>{void f.health.track(job.promise,'pipeline','pending original job','preparation').catch(()=>{});});for(let i=0;i<8;i++)f.frame();const r=await owner.done;validate(r);
++   assert.equal(r.entryTrigger.complete,true);assert.equal(r.routineProfile.pendingAtTerminal.pendingPreparation,1);assert.equal(r.entryTrigger.pendingAtTerminal.pendingPreparation,1);assert.equal(f.health.snapshot().valid,false);assert.match(r.entryTrigger.scope,/not renderer health/);clean(f,r);
++ }finally{job.resolve();await flush();owner?.dispose();f.dispose();}
++});
++for(const kind of ['preparation','shader-validation'])test('admission rejects original pending '+kind+' with exact bounded witness',async()=>{
++ const f=fixture(),job=deferred();try{void f.health.track(job.promise,'shader','admission',kind).catch(()=>{});const owner=trigger(f.game,f.options),r=await owner.done;validate(r);assert.equal(r.entryTrigger.complete,false);assert.equal(r.entryTrigger.firstFailure.code,'pending-admission');assert.equal(r.entryTrigger.firstFailure.boundary,'arm');assert.equal(r.routineProfile,null);clean(f,r);}finally{job.resolve();await flush();f.dispose();}
++});
++const changes={
++ 'identity-actor':f=>{f.game.actor={vehicle:true};},'identity-scene':f=>{f.game.scene={};},'identity-engine':f=>{f.game.engine={};},'identity-device':f=>{f.engine._device={};},'identity-health':f=>{f.game.renderHealth={};},'identity-budget':f=>{f.game.gltfLightBudget={};},'identity-stable':f=>{f.game.stableLights={};},'identity-startup':f=>{f.game.startupAbort=new AbortController();},'identity-generation':f=>{f.health.generation++;},'health-phase':f=>{f.health.phase='preparing';},'health-error':f=>{f.health.report('shader','controlled fault');},'game-not-ready':f=>{f.game.ready=false;},'quality-preparation':f=>{f.game.preparingRenderQuality=true;},benchmark:f=>{f.game.benchmark={};},'presentation-lease':f=>{f.game.startupPresentationLease={};},'invalid-data':f=>{f.health.pendingByKind.preparation=-1;}
++};
++for(const [code,change]of Object.entries(changes))test('pending continuation still rejects '+code,async()=>{
++ const f=fixture(),budget=f.game.gltfLightBudget,stable=f.game.stableLights;let owner;
++ try{owner=trigger(f.game,f.options);f.game.actor.vehicle=true;f.frame();change(f);f.scene.render();const r=await owner.done;validate(r);assert.equal(r.entryTrigger.complete,false);assert.equal(r.entryTrigger.firstFailure.code,code);assert.equal(r.entryTrigger.firstFailure.source,'trigger');assert.equal(r.entryTrigger.firstFailure.boundary,'before-render');
++   assert.equal(r.routineProfile.frames.length,1);assert.equal(r.routineProfile.remainingRoutineHooks,0);assert.equal(Object.hasOwn(f.scene,'render'),false);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);
++ }finally{owner?.dispose();f.game.gltfLightBudget=budget;f.game.stableLights=stable;f.dispose();}
++});
++test('actual tracked rejection becomes health-error and keeps original rejected value',async()=>{
++ const f=fixture(),job=deferred();let owner;try{owner=trigger(f.game,f.options);f.game.actor.vehicle=true;f.frame();const rejection=false;const tracked=f.health.track(job.promise,'shader','controlled rejection','shader-validation');job.reject(rejection);await assert.rejects(tracked,e=>e===rejection);await flush();f.frame();const r=await owner.done;validate(r);assert.equal(r.entryTrigger.firstFailure.code,'health-error');clean(f,r);}finally{owner?.dispose();f.dispose();}
++});
++for(const [name,stop]of Object.entries({abort:f=>f.abort.abort(),deadline:f=>f.advance(30000),foreign:f=>{f.game.gltfLightBudget.prepareFrame=function(){};}}))test('accepted continuation preserves '+name+' retirement',async()=>{
++ const f=fixture();let owner;try{owner=trigger(f.game,f.options);f.game.actor.vehicle=true;f.frame();stop(f);f.frame();const r=await owner.done;validate(r);assert.equal(r.entryTrigger.complete,false);assert.equal(r.entryTrigger.firstFailure.code,name==='abort'?'aborted':name==='foreign'?'foreign-prepare':'deadline');assert.equal(r.routineProfile.remainingRoutineHooks,0);}finally{owner?.dispose();f.dispose();}
++});
++test('getter pending data is refused without invoking the getter',async()=>{
++ const f=fixture();let reads=0,owner;try{owner=trigger(f.game,f.options);f.game.actor.vehicle=true;f.frame();Object.defineProperty(f.health.pendingByKind,'preparation',{configurable:true,get(){reads++;throw Error('getter must not run');}});f.frame();const r=await owner.done;validate(r);assert.equal(reads,0);assert.equal(r.entryTrigger.firstFailure.code,'invalid-data');}finally{Object.defineProperty(f.health.pendingByKind,'preparation',{configurable:true,writable:true,value:0});owner?.dispose();f.dispose();}
++});
++test('independent ten-target adapter permits pending and records its own failing guard',async()=>{
++ const f=fixture(),job=deferred();let owner;try{owner=captureEntryEffects(f.game,{enabled:true});f.scene.render();void f.health.track(job.promise,'shader','adapter pending','preparation').catch(()=>{});f.scene.render();assert.equal(owner.snapshot().frames.length,2);assert.equal(owner.snapshot().frames[1].healthBefore.pendingPreparation,1);
++   f.health.phase='preparing';f.scene.render();const p=await owner.done;validateEntryEffectProfile(p);assert.equal(p.firstFailure.source,'adapter');assert.equal(p.firstFailure.code,'health-phase');assert.equal(p.firstFailure.boundary,'before-render');assert.equal(p.frames.length,2);assert.equal(p.remainingRoutineHooks,0);
++ }finally{job.resolve();await flush();owner?.dispose();f.dispose();}
++});
++test('trigger and installed boundaries remain idle even before accepted capture publication',async()=>{
++ for(const boundary of ['trigger','installed']){const f=fixture(),job=deferred();let owner;try{if(boundary==='installed')f.options.startCapture=(game,options)=>{const result=adapter(game,options);void f.health.track(job.promise,'shader','installation changed','shader-validation').catch(()=>{});return result;};
++   owner=trigger(f.game,f.options);if(boundary==='trigger')void f.health.track(job.promise,'shader','trigger changed','preparation').catch(()=>{});f.game.actor.vehicle=true;f.frame();const r=await owner.done;validate(r);assert.equal(r.entryTrigger.firstFailure.code,'pending-admission');assert.equal(r.entryTrigger.firstFailure.boundary,boundary);assert.equal(r.entryTrigger.complete,false);clean(f,r);
++ }finally{job.resolve();await flush();owner?.dispose();f.dispose();}}
++});
++test('new trigger and profile receipt reject schema, pending, witness and frame tampering',async()=>{
++ const f=fixture();let owner;try{owner=trigger(f.game,f.options);f.game.actor.vehicle=true;for(let i=0;i<8;i++)f.frame();const r=await owner.done;validate(r);
++   const identity={buildId:'b',sourceSnapshotId:'s',helperSha256:'h',lifecycleControls:false,routineCost:true};const raw={schemaVersion:1,...identity,attemptId:'8e9e7e15-6011-438d-96a2-53be43f17792',kind:'entry-effect-cost',mode:'diagnostic',atMs:1,timeOrigin:0,observerErrors:[],completed:true,before:{},after:{},entryTrigger:r.entryTrigger,entryEffectProfile:r.routineProfile,validationErrors:[]};assert.equal(validateReceipt(raw,identity),raw);
++   for(const change of [x=>x.entryTrigger.schemaVersion=1,x=>x.entryTrigger.firstFailure={},x=>x.entryTrigger.pendingAtTerminal.extra='raw',x=>x.entryEffectProfile.frames[0].healthBefore.pendingPreparation=-1,x=>x.entryEffectProfile.frames[0].healthAfter.pendingShaderValidation=Infinity,x=>x.entryEffectProfile.frames[1].frameId++,x=>x.entryEffectProfile.pendingAtTerminal.rendererId++,x=>x.entryEffectProfile.schemaVersion=1,x=>x.entryEffectProfile.firstFailure={...x.entryEffectProfile.pendingAtTerminal,source:'adapter',boundary:'before-render',code:'raw caller',atMs:0,frameId:0}]){const x=structuredClone(raw);change(x);assert.throws(()=>validateReceipt(x,identity));}
++   let reads=0;const p=structuredClone(raw);Object.defineProperty(p.entryEffectProfile.frames[0].healthBefore,'pendingPreparation',{get(){reads++;throw Error('getter');},enumerable:true});assert.throws(()=>validateReceipt(p,identity));assert.equal(reads,0);
++   assert.ok(Buffer.byteLength(JSON.stringify(raw.entryEffectProfile))<256*1024);clean(f,r);
++ }finally{owner?.dispose();f.dispose();}
++});
++for(const shape of ['field-getter','own-toJSON-function','own-toJSON-getter','inherited-toJSON-getter','nested-value-toJSON'])test('limits own-data rejects '+shape+' without executing accessors or toJSON',async()=>{
++ const f=fixture();let owner;try{owner=captureEntryEffectTrigger(f.game,f.options);owner.dispose();const r=await owner.done,p=structuredClone(r.entryTrigger),correct={...p.limits};let reads=0;
++   if(shape==='field-getter')Object.defineProperty(p.limits,'deadlineMs',{enumerable:true,get(){reads++;return correct.deadlineMs;}});
++   if(shape==='own-toJSON-function')p.limits.toJSON=()=>{reads++;return correct;};
++   if(shape==='own-toJSON-getter')Object.defineProperty(p.limits,'toJSON',{get(){reads++;return()=>{reads++;return correct;};}});
++   if(shape==='inherited-toJSON-getter')Object.setPrototypeOf(p.limits,{get toJSON(){reads++;return()=>{reads++;return correct;};}});
++   if(shape==='nested-value-toJSON')p.limits.deadlineMs={toJSON(){reads++;return correct.deadlineMs;}};
++   let rejected=false;try{limitsValidator(p,r.routineProfile);}catch{rejected=true;}
++   assert.equal(reads,0,'nested limit validation must not execute an accessor/toJSON');assert.equal(rejected,true,'non-scalar or accessor-backed limits must be rejected');
++ }finally{owner?.dispose();f.dispose();}
++});
++test('limits own-data preserves the public return and valid scalar limits',async()=>{
++ const f=fixture();let owner;try{owner=captureEntryEffectTrigger(f.game,f.options);owner.dispose();const r=await owner.done;
++   for(const prototype of [Object.prototype,null]){const p=structuredClone(r.entryTrigger),limits=Object.assign(Object.create(prototype),p.limits);p.limits=limits;assert.equal(validateEntryEffectTrigger(p,r.routineProfile),p);assert.equal(p.limits,limits);assert.deepEqual(Reflect.ownKeys(limits),['deadlineMs','frames','standbyCalls']);}
++ }finally{owner?.dispose();f.dispose();}
++});
++test('both disabled new APIs avoid Game reads and legacy controller/runtime bytes remain exact',()=>{
++ const hostile=new Proxy({},{get(){assert.fail('default-off read');},getOwnPropertyDescriptor(){assert.fail('default-off descriptor');}});assert.equal(captureEntryEffectTrigger(hostile),undefined);assert.equal(captureEntryEffects(hostile),undefined);
++ for(const file of ['routine-cost.mjs','routine-cost-core.mjs','entry-render-cost.mjs','entry-routine-cost.mjs'])assert.deepEqual(fs.readFileSync(new URL(file,import.meta.url)),fs.readFileSync(new URL('../v19/'+file,import.meta.url)));
++ const before=fs.readFileSync(new URL('../v19/qa-overlay.mjs',import.meta.url),'utf8'),after=fs.readFileSync(new URL('./qa-overlay.mjs',import.meta.url),'utf8');const start=before.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),end=before.indexOf("  if (identity.routineCost) action('Diagnostic · první vstup do auta /8 framů /10");assert.ok(start>=0&&end>start);assert.ok(after.includes(before.slice(start,end)));
++});
++for(const hold of ['native','none','owner','waiter','engine','all'])test('GC '+hold+' retained stopped control releases Game and Scene before first draw',async()=>{
++ assert.equal(typeof global.gc,'function','run this targeted test with --expose-gc');
++ // Full-draw native control also retained Scene in the original failed probes.
++ // This isolates installed helper closures before any native shader processing.
++ let f=fixture(),game=f.game,scene=f.scene;const gameRef=new WeakRef(game),sceneRef=new WeakRef(scene);let owner=hold==='native'?null:trigger(game,f.options),waiter=game.gltfLightBudget.prepareFrame;game.actor.vehicle=true;game.gltfLightBudget.prepareFrame();let engineWrapper=f.engine.createEffect;if(owner){owner.dispose();validate(await owner.done);}f.dispose();assert.equal(EngineStore.LastCreatedScene,null);assert.equal(EngineStore.Instances.length,0);f=game=scene=null;
++ if(hold!=='all'&&hold!=='owner')owner=null;if(hold!=='all'&&hold!=='waiter')waiter=null;if(hold!=='all'&&hold!=='engine')engineWrapper=null;
++ for(let i=0;i<40;i++){await turn();global.gc();await turn();if(!gameRef.deref()&&!sceneRef.deref())break;}
++ assert.equal(gameRef.deref(),undefined,'retained owner must release Game');assert.equal(sceneRef.deref(),undefined,'retained wrappers must release Scene');if(waiter)assert.equal(typeof waiter,'function');if(engineWrapper)assert.equal(typeof engineWrapper,'function');if(owner)assert.equal(owner.snapshot().entryTrigger.active,false);
++});
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/pipeline-input-window.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/pipeline-input-window.test.mjs
+index 8a50b118..2e137d69 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/pipeline-input-window.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/pipeline-input-window.test.mjs
+@@ -36,7 +36,7 @@ test('strict projection and receipt negative cases, standard routine receipts un
+ });
+ test('pinned actual signature/emptykey/SHADER_NAME AST contract and36sealed inputs preserve old modules/buttons',async()=>{const native=join(root,'.cache/performance-snapshot/webgpu-completion-20261023-candidate-12/node_modules/@babylonjs/core'),source=await readFile(join(native,'Engines/webgpuEngine.pure.js'),'utf8'),ast=ts.createSourceFile('engine.js',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS),klass=ast.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='WebGPUEngine'),method=klass.members.find(n=>n.name?.getText(ast)==='_preparePipelineContextAsync');assert.deepEqual(method.parameters.map(p=>p.name.getText(ast)),['pipelineContext','vertexSourceCode','fragmentSourceCode','createAsRaw','rawVertexSourceCode','rawFragmentSourceCode','_rebuildRebind','defines','_transformFeedbackVaryings','_key','onReady']);
+  const effect=await readFile(join(native,'Materials/effect.functions.js'),'utf8');assert.match(effect,/pipelineContext\._name = options\.name/);assert.match(effect,/_preparePipelineContext\(pipelineContext, options\.vertex, options\.fragment, !!options\.createAsRaw, "", "", options\.rebuildRebind, options\.defines, options\.transformFeedbackVaryings, "",/);assert.match(effect,/#define SHADER_NAME vertex:/);assert.match(effect,/#define SHADER_NAME fragment:/);assert.equal(JSON.parse(await readFile(join(native,'package.json'),'utf8')).version,'9.30.0');
+- const old=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v14');for(const f of['routine-cost.mjs','routine-cost-core.mjs','entry-render-cost.mjs','entry-routine-cost.mjs','lifecycle-controls.mjs'])assert.deepEqual(await readFile(join(dir,f)),await readFile(join(old,f)));const a=await readFile(join(old,'qa-overlay.mjs'),'utf8'),b=await readFile(join(dir,'qa-overlay.mjs'),'utf8'),from=a.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),to=a.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(b.includes(a.slice(from,to)));assert.equal(Object.keys((await helperIdentity(dir)).files).length,39);const ui=await readFile(join(root,'client/ui.tsx'));assert.equal(ts.createSourceFile('qa.tsx',transformUI(ui.toString()),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),sha256(ui));
++ const old=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v14');for(const f of['routine-cost.mjs','routine-cost-core.mjs','entry-render-cost.mjs','entry-routine-cost.mjs','lifecycle-controls.mjs'])assert.deepEqual(await readFile(join(dir,f)),await readFile(join(old,f)));const a=await readFile(join(old,'qa-overlay.mjs'),'utf8'),b=await readFile(join(dir,'qa-overlay.mjs'),'utf8'),from=a.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),to=a.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(b.includes(a.slice(from,to)));assert.equal(Object.keys((await helperIdentity(dir)).files).length,42);const ui=await readFile(join(root,'client/ui.tsx'));assert.equal(ts.createSourceFile('qa.tsx',transformUI(ui.toString()),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),sha256(ui));
+ });
+ 
+ test('actual native processed PBR WGSL inputs pass unchanged through pinned WebGPU compiler with terminal GPU IO substituted',async()=>{
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/preparation-summary.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/preparation-summary.test.mjs
+index e1bd2641..11c06911 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/preparation-summary.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/preparation-summary.test.mjs
+@@ -374,6 +374,6 @@ test('actual source UI exact once transform parses and preserves original bytes;
+   assert.equal(transformed.split('await observeStartup(g, startupCanvas, () => g.start());').length, 2);
+   assert.equal(ts.createSourceFile('qa-ui.tsx', transformed, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX).parseDiagnostics.length, 0);
+   assert.equal(sha256(await readFile(path)), before); assert.throws(() => transformUI(transformed));
+-  const identity = await helperIdentity(directory); assert.equal(Object.keys(identity.files).length, 39);
++  const identity = await helperIdentity(directory); assert.equal(Object.keys(identity.files).length, 42);
+   assert.equal(identity.files['preparation-summary.test.mjs'], sha256(await readFile(fileURLToPath(import.meta.url))));
+ });
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/qa-overlay.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/qa-overlay.mjs
+index cbe20fa6..20d9d6c5 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/qa-overlay.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/qa-overlay.mjs
+@@ -1,3 +1,4 @@
++import { captureEntryEffectTrigger } from 'virtual:webgpu-completion-entry-effect-trigger';
+ import { PBRBaseMaterial } from '@babylonjs/core/Materials/PBR/pbrBaseMaterial.js';
+ import { Effect } from '@babylonjs/core/Materials/effect.js';
+ import { Mesh } from '@babylonjs/core/Meshes/mesh.js';
+@@ -374,7 +375,7 @@ export async function observeStartup(game, canvas, start) {
+     const raw = { ...envelope('entry-effect-cost'), completed:false, before:snapshot(), after:null, entryTrigger:null, entryEffectProfile:null, validationErrors:[],
+       scope:'Accepted first entry; one ten-target stack. Selected inclusive wall time is not GPU duration or cache hit/miss evidence.' };
+     try {
+-      entryEffectOwner = captureEntryRoutineCost(gameRef, { enabled:identity.routineCost,
++      entryEffectOwner = captureEntryEffectTrigger(gameRef, { enabled:identity.routineCost,
+         expected:{classes:{Game,Scene,GltfLightBudget,StableLightState},methods:{prepareFrame:GltfLightBudget.prototype.prepareFrame,render:Scene.prototype.render}},
+         startCapture:captureEntryEffects, signal:clockAbort.signal, isCurrent:()=>!disposed&&gameRef===game });
+       const result=await entryEffectOwner.done;raw.entryTrigger=result.entryTrigger;raw.entryEffectProfile=result.routineProfile;raw.completed=result.entryTrigger.complete;
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/receipt.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/receipt.mjs
+index c6a3fe77..2bd07dfe 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/receipt.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v21/receipt.mjs
+@@ -1,3 +1,4 @@
++import { validateEntryEffectTrigger } from './entry-effect-trigger.mjs';
+ import { validatePipelineInputs } from './pipeline-input-window.mjs';
+ import { open, readFile, mkdir, lstat, link, unlink } from 'node:fs/promises';
+ import { randomUUID } from 'node:crypto';
+@@ -81,7 +82,7 @@ export function validateReceipt(value, identity) {
+         !Array.isArray(value.validationErrors)||value.validationErrors.length>16||typeof value.completed!=='boolean'||value.entryTrigger===undefined||value.entryEffectProfile===undefined)throw new Error('Entry effect diagnostic identity/evidence');
+     if(value.entryEffectProfile!==null)validateEntryEffectProfile(value.entryEffectProfile);
+     if(value.entryTrigger===null){if(value.completed||!value.failure||!value.validationErrors.length)throw new Error('Entry effect refusal missing');}
+-    else{validateEntryTrigger(value.entryTrigger,value.entryEffectProfile);if(value.completed!==value.entryTrigger.complete)throw new Error('Entry effect completion differs');
++    else{validateEntryEffectTrigger(value.entryTrigger,value.entryEffectProfile);if(value.completed!==value.entryTrigger.complete)throw new Error('Entry effect completion differs');
+       if(value.entryEffectProfile&&(value.entryTrigger.rendererId!==value.entryEffectProfile.rendererId||value.entryTrigger.generation!==value.entryEffectProfile.generation))throw new Error('Entry effect renderer correlation');}
+     if(value.completed&&value.entryEffectProfile?.complete!==true)throw new Error('Entry effect completion missing');
+   }

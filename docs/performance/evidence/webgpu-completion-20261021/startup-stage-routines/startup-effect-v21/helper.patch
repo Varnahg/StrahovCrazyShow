@@ -1,0 +1,1110 @@
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/common.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/common.mjs
+index f1e018c1..afd49a89 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/common.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/common.mjs
+@@ -55,6 +55,13 @@ export function transformStartupSource(source,kind,target=null) {
+   if(ts.createSourceFile(kind+'.ts',text,ts.ScriptTarget.Latest,true,ts.ScriptKind.TS).parseDiagnostics.length)throw Error('Transformed startup source parse');
+   return text;
+ }
++export function transformStartupEffectSource(source,kind,target=null){
++  if(target===null)return source;
++  if(source.includes('virtual:webgpu-completion-startup-effects'))throw Error('Startup effect source reinjection');
++  const result=transformStartupSource(source,kind,target);
++  if(result.split(stageImport).length!==2)throw Error('Startup effect import exact count');
++  return result.replace(stageImport,'virtual:webgpu-completion-startup-effects');
++}
+ export const START_MARKER = '        await g.start();';
+ export const UI_IMPORT = 'import { observeStartup } from "virtual:webgpu-completion-qa";\n';
+ export function transformUI(source) {
+@@ -104,13 +111,14 @@ export async function directoryHashes(directory) {
+ }
+ export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs',
+   'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'weather-fixture.mjs', 'startup-latency.mjs',
+-  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'entry-routine-cost.mjs', 'entry-routine-cost.test.mjs', 'pipeline-input-window.mjs', 'pipeline-input-window.test.mjs', 'startup-stage-routines.mjs', 'startup-stage-routines.test.mjs', 'README.md'];
++  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'entry-routine-cost.mjs', 'entry-routine-cost.test.mjs', 'pipeline-input-window.mjs', 'pipeline-input-window.test.mjs', 'startup-stage-routines.mjs', 'startup-stage-routines.test.mjs', 'entry-effect-cost-core.mjs', 'startup-stage-effects.mjs', 'startup-stage-effects.test.mjs', 'README.md'];
+ export function parseBuildOptions(args) {
+-  const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false, bufferLifecycle:false, lifecycleControls: false, startupRoutines: null };
++  const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false, bufferLifecycle:false, lifecycleControls: false, startupRoutines: null, startupEffectRoutines: null };
+   let loadingSeen = false;
+   const assigned = new Set();
+   for (let index = 0; index < args.length; index++) {
+     const token = args[index];
++    if(token==='--startup-effect-routines'){if(assigned.has(token))throw Error('Duplicate startup effect target');assigned.add(token);const target=args[++index];if(!STARTUP_ROUTINE_TARGETS.includes(target))throw Error('Unknown/missing startup effect target');value.startupEffectRoutines=target;continue;}
+     if(token==='--startup-routines'){if(assigned.has(token))throw Error('Duplicate startup target');assigned.add(token);const target=args[++index];if(!STARTUP_ROUTINE_TARGETS.includes(target))throw Error('Unknown/missing startup target');value.startupRoutines=target;continue;}
+     if (['original', 'translucent'].includes(token) && !loadingSeen && index === 0) {
+       value.loading = token; loadingSeen = true; continue;
+@@ -132,6 +140,7 @@ export function parseBuildOptions(args) {
+     }
+     throw new Error('Unknown/ambiguous build option: ' + token);
+   }
++  if(value.startupRoutines!==null&&value.startupEffectRoutines!==null)throw Error('Startup routine modes are mutually exclusive');
+   return Object.freeze(value);
+ }
+ export function previewPort(value = '4211') {
+@@ -160,7 +169,10 @@ export function canonicalJSON(value) {
+ }
+ export function canonicalBuildInput(value) {
+   if (!value || buildKeys.some(key => !Object.hasOwn(value, key))) throw new Error('Missing explicit canonical build input');
++  const effect=value.transforms?.startupEffectRoutines;
++  if(effect!==undefined&&(!effect||Object.getPrototypeOf(effect)!==Object.prototype||!Object.hasOwn(effect,'target')||(effect.target!==null&&!STARTUP_ROUTINE_TARGETS.includes(effect.target))))throw Error('Invalid canonical startup effect target');
+   const startup=value.transforms?.startupRoutines;
++  if(startup?.target!=null&&effect?.target!=null)throw Error('Canonical startup modes are mutually exclusive');
+   if(startup!==undefined&&(!startup||Object.getPrototypeOf(startup)!==Object.prototype||!Object.hasOwn(startup,'target')||(startup.target!==null&&!STARTUP_ROUTINE_TARGETS.includes(startup.target))))throw Error('Invalid canonical startup target');
+   for (const key of ['sourceSnapshotId', 'helperSha256', 'label'])
+     if (typeof value[key] !== 'string' || !value[key]) throw new Error('Invalid canonical build identity field');
+@@ -177,7 +189,7 @@ export function browserBuildIdentity(value) {
+   const buildId = buildDigest(value);
+   return { label: value.label, sourceSnapshotId: value.sourceSnapshotId, helperSha256: value.helperSha256,
+     loading: value.loading, clock: value.clock, weather: value.weather, startupLatency: value.startupLatency, shaderAttribution: value.shaderAttribution, routineCost: value.routineCost,bufferLifecycle:value.bufferLifecycle, lifecycleControls: value.lifecycleControls,
+-    dependencies: value.dependencies, startupRoutines: value.transforms.startupRoutines?.target ?? null, buildId };
++    dependencies: value.dependencies, startupRoutines: value.transforms.startupRoutines?.target ?? null, startupEffectRoutines: value.transforms.startupEffectRoutines?.target ?? null, buildId };
+ }
+ export function resolveBuildOverlay(template, value) {
+   const marker = '__WEBGPU_COMPLETION_IDENTITY__';
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/receipt.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/receipt.mjs
+index 8e43a41f..b8f87812 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/receipt.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/receipt.mjs
+@@ -1,3 +1,4 @@
++import { validateStartupStageEffects, STARTUP_TARGETS } from './startup-stage-effects.mjs';
+ import { validateStartupStageRoutines } from './startup-stage-routines.mjs';
+ import { validatePipelineInputs } from './pipeline-input-window.mjs';
+ import { open, readFile, mkdir, lstat, link, unlink } from 'node:fs/promises';
+@@ -19,6 +20,11 @@ export function validateReceipt(value, identity) {
+       !['plain', 'diagnostic'].includes(value.mode)) throw new Error('Receipt identity/schema mismatch');
+   if (typeof identity.lifecycleControls !== 'boolean' || value.lifecycleControls !== identity.lifecycleControls ||
+       (identity.lifecycleControls && value.mode !== 'diagnostic')) throw new Error('Receipt lifecycle-controls identity mismatch');
++  if(identity.startupEffectRoutines!=null&&!STARTUP_TARGETS.includes(identity.startupEffectRoutines))throw Error('Startup effect target invalid');
++  if(identity.startupRoutines!=null&&identity.startupEffectRoutines!=null)throw Error('Startup modes mutually exclusive');
++  if((value.startupEffectRoutines!==undefined||identity.startupEffectRoutines!=null)&&value.startupEffectRoutines!==(identity.startupEffectRoutines??null))throw Error('Startup effect identity mismatch');
++  if(value.kind==='startup'&&value.outcome==='resolved'&&identity.startupEffectRoutines!=null&&value.startupStageEffects===undefined)throw Error('Resolved startup effect profile missing');
++  if(value.startupStageEffects!==undefined){if(value.kind!=='startup'||value.mode!=='diagnostic'||!identity.startupEffectRoutines)throw Error('Startup effect kind/flag mismatch');validateStartupStageEffects(value.startupStageEffects,identity.startupEffectRoutines);}
+   if((value.startupRoutines!==undefined||identity.startupRoutines!=null)&&value.startupRoutines!==(identity.startupRoutines??null))throw Error('Startup routine identity mismatch');
+   if(value.kind==='startup'&&value.outcome==='resolved'&&identity.startupRoutines!=null&&value.startupStageRoutines===undefined)throw Error('Resolved startup routine profile missing');
+   if(value.startupStageRoutines!==undefined){if(value.kind!=='startup'||value.mode!=='diagnostic'||!identity.startupRoutines)throw Error('Startup routine kind/flag mismatch');validateStartupStageRoutines(value.startupStageRoutines,identity.startupRoutines);}
+@@ -49,7 +55,7 @@ export function validateReceipt(value, identity) {
+     validateBufferTrace(value.bufferTrace);
+   }
+   if (value.kind === 'pipeline-inputs') {
+-    const allowed = new Set('schemaVersion,label,sourceSnapshotId,helperSha256,loading,clock,weather,startupLatency,shaderAttribution,routineCost,bufferLifecycle,lifecycleControls,startupRoutines,dependencies,buildId,attemptId,ownerId,kind,mode,atMs,timeOrigin,capturedAtUTC,userAgent,observerErrors,clockConfigId,completed,before,after,pipelineInputs,validationErrors,scope,failure'.split(','));
++    const allowed = new Set('schemaVersion,label,sourceSnapshotId,helperSha256,loading,clock,weather,startupLatency,shaderAttribution,routineCost,bufferLifecycle,lifecycleControls,startupRoutines,startupEffectRoutines,dependencies,buildId,attemptId,ownerId,kind,mode,atMs,timeOrigin,capturedAtUTC,userAgent,observerErrors,clockConfigId,completed,before,after,pipelineInputs,validationErrors,scope,failure'.split(','));
+     if (Object.keys(value).some(key => !allowed.has(key)) || identity.routineCost !== true || value.routineCost !== true || value.mode !== 'diagnostic' ||
+         !value.before || !value.after || !Array.isArray(value.validationErrors) || value.validationErrors.length > 16 || typeof value.completed !== 'boolean') throw new Error('Pipeline inputs diagnostic evidence missing');
+     if (value.pipelineInputs === null) { if (value.completed || !value.failure || !value.validationErrors.length) throw new Error('Pipeline input refusal missing'); }
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/harness.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/harness.mjs
+index fc415651..9f1aa4ae 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/harness.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/harness.mjs
+@@ -4,7 +4,7 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
+ import { dirname, resolve, join, isAbsolute } from 'node:path';
+ import { fileURLToPath, pathToFileURL } from 'node:url';
+ import { createRequire } from 'node:module';
+-import { sha256, inside, verifySnapshot, helperIdentity, transformUI, transformLoading, transformStartupSource, directoryHashes, previewPort, backendPort, parseBuildOptions,
++import { sha256, inside, verifySnapshot, helperIdentity, transformUI, transformLoading, transformStartupSource, transformStartupEffectSource, directoryHashes, previewPort, backendPort, parseBuildOptions,
+   canonicalJSON, canonicalBuildInput, buildDigest, browserBuildIdentity, resolveBuildOverlay } from './common.mjs';
+ import { MAX_RECEIPT_BYTES, authorizeReceiptRequest, saveReceipt } from './receipt.mjs';
+ import { validateClockConfig } from './transit-clock.mjs';
+@@ -20,7 +20,7 @@ async function dependencyIdentity(snapshot) {
+     '@babylonjs/core/Materials/shadowDepthWrapper.js', '@babylonjs/core/Materials/Textures/texture.pure.js',
+     '@babylonjs/core/Materials/drawWrapper.js', '@babylonjs/core/Materials/material.pure.js', '@babylonjs/core/Materials/effect.pure.js',
+     '@babylonjs/core/Materials/multiMaterial.pure.js', '@babylonjs/core/Materials/effect.functions.js',
+-    '@babylonjs/core/Engines/webgpuEngine.pure.js', '@babylonjs/core/Engines/WebGPU/webgpuPipelineContext.js',
++    '@babylonjs/core/Engines/webgpuEngine.pure.js', '@babylonjs/core/Engines/thinEngine.pure.js', '@babylonjs/core/Engines/WebGPU/webgpuPipelineContext.js',
+     '@babylonjs/core/Lights/Shadows/shadowGenerator.js', '@babylonjs/core/Lights/light.js', '@babylonjs/core/Engines/abstractEngine.pure.js',
+     '@babylonjs/core/scene.pure.js', '@babylonjs/core/Meshes/mesh.pure.js', '@babylonjs/core/Meshes/transformNode.pure.js',
+     '@babylonjs/core/Materials/PBR/pbrBaseMaterial.pure.js', '@babylonjs/core/Materials/standardMaterial.pure.js',
+@@ -48,6 +48,7 @@ async function freshDirectory(input) {
+ export function verifyBuildContract(identity, source, clockBytes) {
+   if (source.snapshotId !== identity.sourceSnapshotId) throw new Error('Build sourceSnapshotId differs from verified manifest');
+   if((identity.startupRoutines??null)!==(identity.transforms?.startupRoutines?.target??null))throw Error('Startup target differs from canonical transforms');
++  if((identity.startupEffectRoutines??null)!==(identity.transforms?.startupEffectRoutines?.target??null))throw Error('Startup effect target differs from canonical transforms');
+   if (!identity.clock) return;
+   if (!Buffer.isBuffer(clockBytes) || sha256(clockBytes) !== identity.clock.configSha256)
+     throw new Error('Clock config bytes changed');
+@@ -62,6 +63,7 @@ export function verifyBuildContract(identity, source, clockBytes) {
+ /** Pure metadata-to-emitted-browser binding, before choosing optional branches.
+  * This is drift detection, not authentication against rewriting all bundles. */
+ export function verifyBuildSeal(identity, input, { inputBytes, overlayBytes, overlayTemplate, bundleFiles, bundleJavaScript }) {
++  if((identity.startupEffectRoutines??null)!==browserBuildIdentity(identity).startupEffectRoutines||(input.startupEffectRoutines??null)!==browserBuildIdentity(input).startupEffectRoutines)throw Error('Derived startup effect target differs');
+   if((identity.startupRoutines??null)!==browserBuildIdentity(identity).startupRoutines||(input.startupRoutines??null)!==browserBuildIdentity(input).startupRoutines)throw Error('Derived startup target differs');
+   if (identity.buildId !== buildDigest(identity) || input.buildId !== buildDigest(input) ||
+       canonicalBuildInput(identity) !== canonicalBuildInput(input)) throw new Error('Canonical build digest/input differs');
+@@ -88,10 +90,12 @@ export function verifyBuildInputs(identity, { source, helper, clockBytes, weathe
+   if (buildDigest({ ...identity, sourceSnapshotId: source.snapshotId, helperSha256: helper.sha256,
+     weather: weather ?? null, transforms, dependencies }) !== identity.buildId) throw new Error('Verified weather/transform/dependency build inputs differ');
+ }
+-function transformedInputs(originalUI, originalCSS, loading, originalGame, originalLight, startupRoutines = null) {
++function transformedInputs(originalUI, originalCSS, loading, originalGame, originalLight, startupRoutines = null, startupEffectRoutines = null) {
+   const ui = transformUI(originalUI), css = transformLoading(originalCSS, loading);
+   const game=transformStartupSource(originalGame,'game',startupRoutines), light=transformStartupSource(originalLight,'light',startupRoutines);
+-  return { ui, css, game, light, transforms: {
++  const emittedGame=transformStartupEffectSource(game,'game',startupEffectRoutines),emittedLight=transformStartupEffectSource(light,'light',startupEffectRoutines);
++  return { ui, css, game:emittedGame, light:emittedLight, transforms: {
++    startupEffectRoutines:{target:startupEffectRoutines,game:{before:sha256(game),after:sha256(emittedGame)},light:{before:sha256(light),after:sha256(emittedLight)}},
+     startupRoutines: {target:startupRoutines,game:{before:sha256(originalGame),after:sha256(game)},light:{before:sha256(originalLight),after:sha256(light)}},
+     ui: { file: 'client/ui.tsx', before: sha256(originalUI), after: sha256(ui),
+       scope: 'Build-only CRLF normalization, import and one observeStartup call in place of original await g.start; original source untouched' },
+@@ -113,7 +117,7 @@ export async function loadBuild(input) {
+   const clockBytes = identity.clock ? await readFile(join(directory, 'clock-config.json')) : undefined;
+   const weather = await verifyBuiltWeather(directory, identity.weather);
+   const transformed = transformedInputs(await readFile(join(identity.snapshot, 'client/ui.tsx'), 'utf8'),
+-    await readFile(join(identity.snapshot, 'client/style.css'), 'utf8'), identity.loading, await readFile(join(identity.snapshot,'client/game.ts'),'utf8'), await readFile(join(identity.snapshot,'client/light-preparation.ts'),'utf8'), identity.startupRoutines);
++    await readFile(join(identity.snapshot, 'client/style.css'), 'utf8'), identity.loading, await readFile(join(identity.snapshot,'client/game.ts'),'utf8'), await readFile(join(identity.snapshot,'client/light-preparation.ts'),'utf8'), identity.startupRoutines, identity.startupEffectRoutines);
+   verifyBuildInputs(identity, { source, helper, clockBytes, weather: weather?.specification, transforms: transformed.transforms,
+     dependencies: await dependencyIdentity(identity.snapshot) });
+   if (sha256(await readFile(join(directory, 'transformed-ui.tsx'))) !== sha256(transformed.ui) ||
+@@ -141,7 +145,7 @@ export async function run(command, input, output, label, option = 'original', ..
+         simulationSourceSha256: typeof simulationEntry === 'string' ? simulationEntry : simulationEntry.sha256 };
+     }
+     const { ui: transformedUI, css: transformedCSS, game: transformedGame, light: transformedLight, transforms } = transformedInputs(await readFile(join(snapshot, 'client/ui.tsx'), 'utf8'),
+-      await readFile(join(snapshot, 'client/style.css'), 'utf8'), loading, await readFile(join(snapshot,'client/game.ts'),'utf8'), await readFile(join(snapshot,'client/light-preparation.ts'),'utf8'), options.startupRoutines);
++      await readFile(join(snapshot, 'client/style.css'), 'utf8'), loading, await readFile(join(snapshot,'client/game.ts'),'utf8'), await readFile(join(snapshot,'client/light-preparation.ts'),'utf8'), options.startupRoutines, options.startupEffectRoutines);
+     const dependencies = await dependencyIdentity(snapshot);
+     const browserIdentity = browserBuildIdentity({ label, sourceSnapshotId: source.snapshotId, helperSha256: helper.sha256,
+       loading, transforms, clock: clock ?? null, weather: weather?.specification ?? null, startupLatency: options.startupLatency, shaderAttribution: options.shaderAttribution, routineCost: options.routineCost,bufferLifecycle:options.bufferLifecycle, lifecycleControls: options.lifecycleControls, dependencies });
+@@ -157,6 +161,8 @@ export async function run(command, input, output, label, option = 'original', ..
+     const entryRender = await readFile(join(helperDirectory, 'entry-render-cost.mjs'), 'utf8');
+     const entryClasses = 'export { Game } from ' + JSON.stringify(join(snapshot, 'client/game.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { Scene } from "@babylonjs/core/scene.js";export { GltfLightBudget } from ' + JSON.stringify(join(snapshot, 'client/gltf-light-budget.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { StableLightState } from ' + JSON.stringify(join(snapshot, 'client/stable-light-state.ts').replaceAll(String.fromCharCode(92), '/')) + ';';
+     const routineCore = await readFile(join(helperDirectory, 'routine-cost-core.mjs'), 'utf8');
++    const startupEffectCore=await readFile(join(helperDirectory,'entry-effect-cost-core.mjs'),'utf8');
++    const startupEffects=(await readFile(join(helperDirectory,'startup-stage-effects.mjs'),'utf8')).replace("'./entry-effect-cost-core.mjs'","'virtual:webgpu-completion-startup-effect-core'");
+     const startupRoutines = (await readFile(join(helperDirectory,'startup-stage-routines.mjs'),'utf8')).replace("'./routine-cost-core.mjs'","'virtual:webgpu-completion-routine-core'");
+     const routineCost = (await readFile(join(helperDirectory, 'routine-cost.mjs'), 'utf8'))
+       .replace("'./routine-cost-core.mjs'", "'virtual:webgpu-completion-routine-core'");
+@@ -198,6 +204,8 @@ export async function run(command, input, output, label, option = 'original', ..
+       build: { outDir: join(directory, 'dist'), emptyOutDir: false, copyPublicDir: false, sourcemap: true },
+       plugins: [{ name: 'explicit-webgpu-completion-qa', enforce: 'pre',
+         resolveId(id) {
++          if(id==='virtual:webgpu-completion-startup-effects')return '\0virtual:webgpu-completion-startup-effects';
++          if(id==='virtual:webgpu-completion-startup-effect-core')return '\0virtual:webgpu-completion-startup-effect-core';
+           if (id === 'virtual:webgpu-completion-startup-routines') return '\0virtual:webgpu-completion-startup-routines';
+           if (id === 'virtual:webgpu-completion-pipeline-inputs') return '\0virtual:webgpu-completion-pipeline-inputs';
+           if (id === 'virtual:webgpu-completion-entry-routine') return '\0virtual:webgpu-completion-entry-routine';
+@@ -219,6 +227,8 @@ export async function run(command, input, output, label, option = 'original', ..
+           if (id === 'virtual:webgpu-completion-simulation') return join(snapshot, 'shared/simulation.ts').replaceAll('\\', '/');
+         },
+         load(id) {
++          if(id==='\0virtual:webgpu-completion-startup-effects')return startupEffects;
++          if(id==='\0virtual:webgpu-completion-startup-effect-core')return startupEffectCore;
+           if (id === '\0virtual:webgpu-completion-startup-routines') return startupRoutines;
+           if (id === '\0virtual:webgpu-completion-pipeline-inputs') return pipelineInputs;
+           if (id === '\0virtual:webgpu-completion-entry-routine') return entryRoutine;
+@@ -240,8 +250,8 @@ export async function run(command, input, output, label, option = 'original', ..
+         },
+         transform(code, id) {
+           const file = id.split('?')[0].replaceAll('\\', '/');
+-          if(options.startupRoutines!==null&&file===join(snapshot,'client/game.ts').replaceAll('\\','/')){if(sha256(code)!==transforms.startupRoutines.game.before)throw Error('Startup Game preimage mismatch');gameHits++;return{code:transformedGame,map:null};}
+-          if(options.startupRoutines!==null&&file===join(snapshot,'client/light-preparation.ts').replaceAll('\\','/')){if(sha256(code)!==transforms.startupRoutines.light.before)throw Error('Startup light preimage mismatch');lightHits++;return{code:transformedLight,map:null};}
++          if((options.startupRoutines!==null||options.startupEffectRoutines!==null)&&file===join(snapshot,'client/game.ts').replaceAll('\\','/')){if(sha256(code)!==transforms.startupRoutines.game.before)throw Error('Startup Game preimage mismatch');gameHits++;return{code:transformedGame,map:null};}
++          if((options.startupRoutines!==null||options.startupEffectRoutines!==null)&&file===join(snapshot,'client/light-preparation.ts').replaceAll('\\','/')){if(sha256(code)!==transforms.startupRoutines.light.before)throw Error('Startup light preimage mismatch');lightHits++;return{code:transformedLight,map:null};}
+           if (file === join(snapshot, 'client/ui.tsx').replaceAll('\\', '/')) {
+             if (sha256(code) !== transforms.ui.before) throw new Error('UI preimage mismatch');
+             uiHits++; return { code: transformUI(code), map: null };
+@@ -251,7 +261,7 @@ export async function run(command, input, output, label, option = 'original', ..
+             cssHits++; return { code: transformLoading(code, loading), map: null };
+           }
+         },
+-        generateBundle() { if(gameHits!==(options.startupRoutines?1:0)||lightHits!==(options.startupRoutines?1:0))throw Error('Startup transform exact hit count'); if (uiHits !== 1 || cssHits !== 1) throw new Error('Exact transform hit count mismatch: ' + uiHits + '/' + cssHits); },
++        generateBundle() { if(gameHits!==((options.startupRoutines||options.startupEffectRoutines)?1:0)||lightHits!==((options.startupRoutines||options.startupEffectRoutines)?1:0))throw Error('Startup transform exact hit count'); if (uiHits !== 1 || cssHits !== 1) throw new Error('Exact transform hit count mismatch: ' + uiHits + '/' + cssHits); },
+       }],
+     }));
+     await verifySnapshot(snapshot);
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/qa-overlay.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/qa-overlay.mjs
+index 9903de97..9ab7ded2 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/qa-overlay.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/qa-overlay.mjs
+@@ -1,3 +1,4 @@
++import { createStartupStageEffects } from 'virtual:webgpu-completion-startup-effects';
+ import { createStartupStageRoutines } from 'virtual:webgpu-completion-startup-routines';
+ import { PBRBaseMaterial } from '@babylonjs/core/Materials/PBR/pbrBaseMaterial.js';
+ import { Effect } from '@babylonjs/core/Materials/effect.js';
+@@ -24,7 +25,7 @@ const finite = value => typeof value === 'number' && Number.isFinite(value) ? va
+ const xyz = value => value ? { x: finite(value.x), y: finite(value.y), z: finite(value.z) } : null;
+ const errorText = error => ({ name: String(error?.name ?? 'Error').slice(0, 80), message: String(error?.message ?? error).slice(0, 2000) });
+ const pick = (value, keys) => Object.fromEntries(keys.filter(key => value?.[key] !== undefined).map(key => [key, value[key]]));
+-const mode = identity.startupRoutines != null || identity.lifecycleControls === true || identity.bufferLifecycle === true || identity.routineCost === true || identity.shaderAttribution === true || identity.startupLatency === true || identity.loading === 'translucent' || new URLSearchParams(location.search).get('profileEnvironment') === '1' ? 'diagnostic' : 'plain';
++const mode = identity.startupEffectRoutines != null || identity.startupRoutines != null || identity.lifecycleControls === true || identity.bufferLifecycle === true || identity.routineCost === true || identity.shaderAttribution === true || identity.startupLatency === true || identity.loading === 'translucent' || new URLSearchParams(location.search).get('profileEnvironment') === '1' ? 'diagnostic' : 'plain';
+ let previousOwner;
+ let sharedTransfers;
+ const weatherKeys = ['temperature', 'cloud', 'rain', 'wind', 'windDirection', 'observedAt', 'fetchedAt', 'stale', 'cloudStale',
+@@ -138,6 +139,7 @@ export async function observeStartup(game, canvas, start) {
+   const disclosure = document.createElement('p');
+   disclosure.textContent = 'Plná hra a HUD. Čas osvětlení nemění reálný čas dopravy. Plain používá standardní Game benchmark a lehký RAF pozorovatel; bez dalších profilovacích wrapperů.';
+   if (identity.weather) disclosure.textContent += ' Počasí: řízený uložený QA záznam, viditelně označený jako fallback.';
++  if(identity.startupEffectRoutines)disclosure.textContent+=' Diagnostic startup effects: '+identity.startupEffectRoutines+'; jeden10target stack, nikoli GPU/cache hit měření.';
+   if(identity.startupRoutines)disclosure.textContent+=' Diagnostic startup routines: '+identity.startupRoutines+'; původní časy a nejvýše8renderů, žádné FPS/GPU měření.';
+   if (identity.shaderAttribution) disclosure.textContent += ' Diagnostic v8: jedno explicitní30s post-ready shader okno; původní jobs a pasivní mapping, žádné nové GPU volání. Nevhodné pro FPS srovnání.';
+   if (identity.startupLatency) disclosure.textContent += ' Diagnostic: pozorované původní popErrorScope/onSubmittedWorkDone pouze při startu; latency není GPU čas.';
+@@ -151,7 +153,7 @@ export async function observeStartup(game, canvas, start) {
+   download.style.cssText = 'display:block;color:#b8e5ff'; download.hidden = true;
+   controls.append(disclosure, status, download); panel.append(title, controls, output); document.body.append(panel);
+   let gameRef = game, startupTimer, sampleOverflow = false, busy = false, disposed = false, downloadURL, interruptBenchmark;
+-  let startupResolved = false, readyAtUTC, startupRoutineOwner, clockOwner, latencyOwner, preparationOwner, attributionWindow, pipelineOwner, routineOwner, entryOwner, entryRoutineOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
++  let startupResolved = false, readyAtUTC, startupEffectOwner, startupRoutineOwner, clockOwner, latencyOwner, preparationOwner, attributionWindow, pipelineOwner, routineOwner, entryOwner, entryRoutineOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
+   const clockAbort = new AbortController();
+   const samples = [], observerErrors = [], buttons = [];
+   const ownerId = crypto.randomUUID();
+@@ -443,7 +445,7 @@ export async function observeStartup(game, canvas, start) {
+       const abort = new Error('Clock QA owner stopped'); abort.name = 'AbortError'; clockAbort.abort(abort);
+     }
+     attributionWindow?.dispose(); pipelineOwner?.dispose('owner-stopped'); clockOwner?.dispose(); latencyOwner?.dispose(); routineOwner?.dispose('owner-stopped'); entryOwner?.dispose('owner-stopped'); entryRoutineOwner?.dispose('owner-stopped');bufferOwner?.dispose('owner-stopped');
+-    lifecycleOwner?.dispose(); preparationOwner?.dispose(); startupRoutineOwner?.dispose();
++    lifecycleOwner?.dispose(); preparationOwner?.dispose(); startupRoutineOwner?.dispose(); startupEffectOwner?.dispose();
+     unsubscribeTransfers(); buttons.forEach(button => button.disabled = true); gameRef = undefined;
+   };
+   const observer = game.scene.onDisposeObservable.addOnce(stop);
+@@ -468,6 +470,7 @@ export async function observeStartup(game, canvas, start) {
+     clockOwner = owner;
+     preparationOwner = observePreparationResult(game, { signal: clockAbort.signal, startupSignal: game.startupAbort?.signal,
+       isCurrent: () => !disposed && gameRef === game, onObserverError: noteError });
++    if(identity.startupEffectRoutines)startupEffectOwner=createStartupStageEffects(game,{target:identity.startupEffectRoutines,signal:clockAbort.signal,isCurrent:()=>!disposed&&gameRef===game});
+     if(identity.startupRoutines)startupRoutineOwner=createStartupStageRoutines(game,{target:identity.startupRoutines??null,signal:clockAbort.signal,isCurrent:()=>!disposed&&gameRef===game});
+     return start();
+   }, {
+@@ -478,10 +481,12 @@ export async function observeStartup(game, canvas, start) {
+       latencyOwner?.dispose(); preparationOwner?.dispose();
+       if(outcome==='rejected')bufferOwner?.dispose('startup-rejected');
+       startupRoutineOwner?.dispose(outcome==='resolved'?'startup-resolved':'startup-rejected');
++      startupEffectOwner?.dispose(outcome==='resolved'?'startup-resolved':'startup-rejected');
+       const terminal = snapshot();
+       const raw = { ...envelope('startup'), outcome, error: error ? errorText(error) : null,
+         samples, sampleOverflow, terminal, compilation: compilationSnapshot(game),
+         startupLatency: latencyOwner?.snapshot() ?? null, shaderAttribution: null,
++        ...(identity.startupEffectRoutines&&startupEffectOwner?{startupStageEffects:startupEffectOwner.snapshot()}:{}),
+         ...(identity.startupRoutines&&startupRoutineOwner?{startupStageRoutines:startupRoutineOwner.snapshot()}:{}),
+         preparationSummary: preparationOwner?.snapshot() ?? { available: false, reason: 'not-installed' },
+         preparationStages: preparationOwner?.stagesSnapshot() ?? { schemaVersion:1, available:false, reason:'not-installed' },
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/helper.test.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/helper.test.mjs
+index cc2ecc06..834ca274 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/helper.test.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/helper.test.mjs
+@@ -208,7 +208,7 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
+       export {StableLightState} from ${JSON.stringify(pathToFileURL(join(root, 'client/stable-light-state.ts')).href)};
+       export class Game { constructor() { throw Error('Old DOM fixture does not construct an entry Game'); } }`;
+     source = source.replace("'virtual:webgpu-completion-entry-classes'", JSON.stringify('data:text/javascript;base64,' + Buffer.from(entryClasses).toString('base64')));
+-    for (const [virtual, file] of [['startup-routines', 'startup-stage-routines.mjs'], ['pipeline-inputs', 'pipeline-input-window.mjs'], ['entry-render', 'entry-render-cost.mjs'], ['entry-routine', 'entry-routine-cost.mjs']])
++    for (const [virtual, file] of [['startup-effects', 'startup-stage-effects.mjs'], ['startup-routines', 'startup-stage-routines.mjs'], ['pipeline-inputs', 'pipeline-input-window.mjs'], ['entry-render', 'entry-render-cost.mjs'], ['entry-routine', 'entry-routine-cost.mjs']])
+       source = source.replace("'virtual:webgpu-completion-" + virtual + "'", JSON.stringify(pathToFileURL(join(directory, file)).href));
+     source = source.replace("'virtual:webgpu-completion-observer'", JSON.stringify(pathToFileURL(join(directory, 'startup-observer.mjs')).href));
+     source = source.replace("'virtual:webgpu-completion-attempts'", JSON.stringify(pathToFileURL(join(directory, 'attempt-queue.mjs')).href));
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/weather-latency.test.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/weather-latency.test.mjs
+index b39e325e..cf930789 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/weather-latency.test.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/weather-latency.test.mjs
+@@ -37,11 +37,11 @@ function deviceFixture() {
+ 
+ test('explicit build flags preserve positional clock and reject duplicate/ambiguous input; default observer off', () => {
+   const clock = resolve(directory, 'clock.json'), weather = resolve(directory, 'weather.json');
+-  assert.deepEqual(parseBuildOptions([]), { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false,bufferLifecycle:false, lifecycleControls:false, startupRoutines:null });
++  assert.deepEqual(parseBuildOptions([]), { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false,bufferLifecycle:false, lifecycleControls:false, startupRoutines:null, startupEffectRoutines:null });
+   assert.deepEqual(parseBuildOptions(['original', clock, '--weather', weather, '--startup-latency']),
+-    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: true, shaderAttribution: false, routineCost: false,bufferLifecycle:false, lifecycleControls:false, startupRoutines:null });
++    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: true, shaderAttribution: false, routineCost: false,bufferLifecycle:false, lifecycleControls:false, startupRoutines:null, startupEffectRoutines:null });
+   assert.deepEqual(parseBuildOptions(['--weather', weather, '--clock', clock]),
+-    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: false, shaderAttribution: false, routineCost: false,bufferLifecycle:false, lifecycleControls:false, startupRoutines:null });
++    { loading: 'original', clockFile: clock, weatherFile: weather, startupLatency: false, shaderAttribution: false, routineCost: false,bufferLifecycle:false, lifecycleControls:false, startupRoutines:null, startupEffectRoutines:null });
+   for (const args of [['--weather'], ['--weather', '--startup-latency'], ['--startup-latency', '--startup-latency'],
+     ['original', clock, '--clock', clock], ['--clock', clock, '--clock', clock], ['--weather', weather, '--weather', weather],
+     ['original', 'relative.json'], ['--unknown'], ['original', 'translucent'], ['--weather=x']]) assert.throws(() => parseBuildOptions(args));
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/preparation-summary.test.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/preparation-summary.test.mjs
+index 0db689cb..2a0240ef 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/preparation-summary.test.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/preparation-summary.test.mjs
+@@ -374,6 +374,6 @@ test('actual source UI exact once transform parses and preserves original bytes;
+   assert.equal(transformed.split('await observeStartup(g, startupCanvas, () => g.start());').length, 2);
+   assert.equal(ts.createSourceFile('qa-ui.tsx', transformed, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX).parseDiagnostics.length, 0);
+   assert.equal(sha256(await readFile(path)), before); assert.throws(() => transformUI(transformed));
+-  const identity = await helperIdentity(directory); assert.equal(Object.keys(identity.files).length, 38);
++  const identity = await helperIdentity(directory); assert.equal(Object.keys(identity.files).length, 41);
+   assert.equal(identity.files['preparation-summary.test.mjs'], sha256(await readFile(fileURLToPath(import.meta.url))));
+ });
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/entry-render-cost.test.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/entry-render-cost.test.mjs
+index 73d78fff..7a4224fd 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/entry-render-cost.test.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/entry-render-cost.test.mjs
+@@ -168,7 +168,7 @@ test('actual QA entry button owns standby, original accepted transition, receipt
+ test('v10 routine modules/original button are byte-exact and UI transform remains exact once',async()=>{
+  const old=join(root,'.cache/webgpu-completion-20261021/preparation-summary/helper/v10');for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from="../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz",to="../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}
+  const oldOverlay=await readFile(join(old,'qa-overlay.mjs'),'utf8'),overlay=await readFile(join(directory,'qa-overlay.mjs'),'utf8');const block=s=>s.slice(s.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),s.indexOf("  if (identity.clock?.config.benchmarkAtUTC"));assert.ok(overlay.includes(block(oldOverlay)));
+- const ui=await readFile(join(root,'client/ui.tsx')),before=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),before);assert.equal(Object.keys((await helperIdentity(directory)).files).length,38);
++ const ui=await readFile(join(root,'client/ui.tsx')),before=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),before);assert.equal(Object.keys((await helperIdentity(directory)).files).length,41);
+ });
+ test('donor/pin selected8 method descriptors and all four original Mesh observer ordering assertions',async()=>{
+  const donor=gunzipSync(await readFile(join(root,'docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz')));assert.equal(sha256(donor),'ee3c3280de69ee61dcbf433dcf2a259d07a4efa80a711f822056da331168289f');
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/entry-routine-cost.test.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/entry-routine-cost.test.mjs
+index ba887811..0097203d 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/entry-routine-cost.test.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/entry-routine-cost.test.mjs
+@@ -76,9 +76,9 @@ test('optional entryTrigger is strict while old standard routine receipts remain
+  assert.throws(()=>validateReceipt({...raw,kind:'state',state:{},compilation:{}},identity));
+ });
+ test('old8/three-scope modules and both old button blocks remain exact; new34 inputs and UI parse sealed',async()=>{
+- const original=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v12');for(const f of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs','entry-render-cost.mjs','entry-render-cost.test.mjs']){let text=(await readFile(join(directory,f))).toString();const edits=f==='routine-cost.test.mjs'?[["../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz","../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz"]]:f==='entry-render-cost.test.mjs'?[["for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from=\"../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\",to=\"../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}","for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,file)),await readFile(join(old,file)));"],["assert.equal(Object.keys((await helperIdentity(directory)).files).length,38);","assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);"]]:[];for(const[from,to]of edits){assert.equal(text.split(from).length,2);text=text.replace(from,to);}assert.deepEqual(Buffer.from(text),await readFile(join(original,f)));}
++ const original=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v12');for(const f of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs','entry-render-cost.mjs','entry-render-cost.test.mjs']){let text=(await readFile(join(directory,f))).toString();const edits=f==='routine-cost.test.mjs'?[["../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz","../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz"]]:f==='entry-render-cost.test.mjs'?[["for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from=\"../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\",to=\"../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}","for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,file)),await readFile(join(old,file)));"],["assert.equal(Object.keys((await helperIdentity(directory)).files).length,41);","assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);"]]:[];for(const[from,to]of edits){assert.equal(text.split(from).length,2);text=text.replace(from,to);}assert.deepEqual(Buffer.from(text),await readFile(join(original,f)));}
+  const before=await readFile(join(original,'qa-overlay.mjs'),'utf8'),after=await readFile(join(directory,'qa-overlay.mjs'),'utf8'),from=before.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),to=before.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(after.includes(before.slice(from,to)));
+- const ui=await readFile(join(root,'client/ui.tsx')),digest=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),digest);assert.equal(Object.keys((await helperIdentity(directory)).files).length,38);
++ const ui=await readFile(join(root,'client/ui.tsx')),digest=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),digest);assert.equal(Object.keys((await helperIdentity(directory)).files).length,41);
+ });
+ test('actual new QA action gates startupACK then owns native-entry waiter/core receipt without clicking either old action',async()=>{
+  const f=fixture(),elements=[],requests=[],intervals=new Set();class Element{constructor(tag){this.tag=tag;this.style={};elements.push(this);}append(){}setAttribute(){}remove(){}}
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/pipeline-input-window.test.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/pipeline-input-window.test.mjs
+index a8985506..84d7e443 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/pipeline-input-window.test.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/pipeline-input-window.test.mjs
+@@ -36,7 +36,7 @@ test('strict projection and receipt negative cases, standard routine receipts un
+ });
+ test('pinned actual signature/emptykey/SHADER_NAME AST contract and36sealed inputs preserve old modules/buttons',async()=>{const native=join(root,'.cache/performance-snapshot/webgpu-completion-20261023-candidate-12/node_modules/@babylonjs/core'),source=await readFile(join(native,'Engines/webgpuEngine.pure.js'),'utf8'),ast=ts.createSourceFile('engine.js',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS),klass=ast.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='WebGPUEngine'),method=klass.members.find(n=>n.name?.getText(ast)==='_preparePipelineContextAsync');assert.deepEqual(method.parameters.map(p=>p.name.getText(ast)),['pipelineContext','vertexSourceCode','fragmentSourceCode','createAsRaw','rawVertexSourceCode','rawFragmentSourceCode','_rebuildRebind','defines','_transformFeedbackVaryings','_key','onReady']);
+  const effect=await readFile(join(native,'Materials/effect.functions.js'),'utf8');assert.match(effect,/pipelineContext\._name = options\.name/);assert.match(effect,/_preparePipelineContext\(pipelineContext, options\.vertex, options\.fragment, !!options\.createAsRaw, "", "", options\.rebuildRebind, options\.defines, options\.transformFeedbackVaryings, "",/);assert.match(effect,/#define SHADER_NAME vertex:/);assert.match(effect,/#define SHADER_NAME fragment:/);assert.equal(JSON.parse(await readFile(join(native,'package.json'),'utf8')).version,'9.30.0');
+- const old=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v14');for(const f of['routine-cost.mjs','routine-cost-core.mjs','entry-render-cost.mjs','entry-routine-cost.mjs','lifecycle-controls.mjs'])assert.deepEqual(await readFile(join(dir,f)),await readFile(join(old,f)));const a=await readFile(join(old,'qa-overlay.mjs'),'utf8'),b=await readFile(join(dir,'qa-overlay.mjs'),'utf8'),from=a.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),to=a.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(b.includes(a.slice(from,to)));assert.equal(Object.keys((await helperIdentity(dir)).files).length,38);const ui=await readFile(join(root,'client/ui.tsx'));assert.equal(ts.createSourceFile('qa.tsx',transformUI(ui.toString()),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),sha256(ui));
++ const old=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v14');for(const f of['routine-cost.mjs','routine-cost-core.mjs','entry-render-cost.mjs','entry-routine-cost.mjs','lifecycle-controls.mjs'])assert.deepEqual(await readFile(join(dir,f)),await readFile(join(old,f)));const a=await readFile(join(old,'qa-overlay.mjs'),'utf8'),b=await readFile(join(dir,'qa-overlay.mjs'),'utf8'),from=a.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),to=a.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(b.includes(a.slice(from,to)));assert.equal(Object.keys((await helperIdentity(dir)).files).length,41);const ui=await readFile(join(root,'client/ui.tsx'));assert.equal(ts.createSourceFile('qa.tsx',transformUI(ui.toString()),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),sha256(ui));
+ });
+ 
+ test('actual native processed PBR WGSL inputs pass unchanged through pinned WebGPU compiler with terminal GPU IO substituted',async()=>{
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/startup-stage-routines.test.mjs b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/startup-stage-routines.test.mjs
+index 758f1e45..ff174b6b 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/startup-stage-routines.test.mjs
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/startup-stage-routines.test.mjs
+@@ -109,8 +109,8 @@ test('strict startup-only receipt/schema guards reject false complete, clocks, g
+     const identity={buildId:'b',sourceSnapshotId:'s',helperSha256:'h',lifecycleControls:false,startupRoutines:STARTUP_ROUTINE_TARGETS[0]};const receipt={...identity,schemaVersion:1,attemptId:'8e9e7e15-6011-438d-96a2-53be43f17792',kind:'startup',outcome:'resolved',mode:'diagnostic',atMs:100,timeOrigin:1000,observerErrors:[],samples:[],terminal:{},startupStageRoutines:raw};validateReceipt(receipt,identity);assert.throws(()=>validateReceipt({...receipt,kind:'state'},identity));assert.throws(()=>validateReceipt({...receipt,startupRoutines:null},identity));assert.ok(Buffer.byteLength(JSON.stringify(receipt))<2*1024*1024);assert.ok(Buffer.byteLength(JSON.stringify(raw))<probe.STARTUP_LIMITS.bytes);
+   }finally{f.dispose();}
+ });
+-test('new pack contains38 exact inputs and keeps old routine/core byteidentical',async()=>{
+-  const path=new URL('.',import.meta.url),id=await helperIdentity(path.pathname.slice(1));assert.equal(Object.keys(id.files).length,38);
++test('current pack contains41 exact inputs and keeps old routine/core byteidentical',async()=>{
++  const path=new URL('.',import.meta.url),id=await helperIdentity(path.pathname.slice(1));assert.equal(Object.keys(id.files).length,41);
+   for(const file of['routine-cost.mjs','routine-cost-core.mjs'])assert.deepEqual(await readFile(new URL(file,import.meta.url)),await readFile(new URL('../../../startup-stage-export/helper/v17/'+file,import.meta.url)));
+ });
+ test('16pass/304stage cap keeps bounded truthful prefix and never substitutes original options',()=>{
+@@ -152,7 +152,7 @@ async function overlayFixtureV19(clockSpecification=null){
+   let body=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='overlayFixture').getText(ast);
+   for(const[from,to]of[['observeOperation, observePreparationResult, createAttemptQueue','createStartupStageRoutines, observeOperation, observePreparationResult, createAttemptQueue'],['startupLatency: false, bufferLifecycle:','startupRoutines: "first-medium-vehicle-0", startupLatency: false, bufferLifecycle:'],["projectShaderInventory() { throw Error('default-off shader inventory'); }",'projectShaderInventory'],['clock: null };','clock: clockSpecification };']]){assert.equal(body.split(from).length,2);body=body.replace(from,to);}
+   const modules=await Promise.all(['startup-observer','attempt-queue','browser-clock','transit-clock','startup-latency','buffer-lifecycle','lifecycle-controls','shader-attribution'].map(name=>import('./'+name+'.mjs')));
+-  const dependencies={readFile,join,directory:dirname(fileURLToPath(import.meta.url)),webcrypto,sha256,clockSpecification,createStartupStageRoutines:probe.createStartupStageRoutines,
++  const dependencies={createStartupStageEffects:()=>{throw Error('old8 fixture must stay default-off');},readFile,join,directory:dirname(fileURLToPath(import.meta.url)),webcrypto,sha256,clockSpecification,createStartupStageRoutines:probe.createStartupStageRoutines,
+     observeOperation:modules[0].observeOperation,observePreparationResult:modules[0].observePreparationResult,createAttemptQueue:modules[1].createAttemptQueue,installBrowserClock:modules[2].installBrowserClock,createPlannedBenchmark:modules[3].createPlannedBenchmark,
+     observeStartupLatency:modules[4].observeStartupLatency,observeBufferLifecycle:modules[5].observeBufferLifecycle,createLifecycleControls:modules[6].createLifecycleControls,createVisibilityAnchor:modules[6].createVisibilityAnchor,projectShaderInventory:modules[7].projectShaderInventory};
+   return new Function(...Object.keys(dependencies),body+';return overlayFixture;')(...Object.values(dependencies))();
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/startup-effect-v21/empty-source b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/entry-effect-cost-core.mjs
+index e69de29b..b6d5235b 100644
+--- /dev/null
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/entry-effect-cost-core.mjs
+@@ -0,0 +1,138 @@
++/** Fixed ten-routine diagnostic; independent of the immutable eight-routine schema. */
++export const EFFECT_LIMITS = Object.freeze({ routines: 10, frames: 8, stack: 32, callsPerFrame: 100000, phaseEvents: 128, renderers: 64, bytes: 256*1024 });
++export const EFFECT_REASONS = Object.freeze(['complete','disposed','owner-stopped','external-dispose','aborted','observer-error','retired','foreign-routine','original-render-threw','no-native-frame-progress','installation-failed',
++  'clock-error','deadline','foreign-prepare','foreign-render','routine-rejected','routine-incomplete','waiter-restore-failed','late-owner','factory-error','original-prepare-threw','prepare-reentry','standby-overflow','invalid-vehicle']);
++export const EFFECT_PHASES = Object.freeze(['active', 'main', 'rtt', 'other']);
++export const EFFECT_IDS = Object.freeze(['scene.getActiveMeshCandidates', 'Scene._activeMesh', 'TransformNode.computeWorldMatrix', 'Mesh.getLOD',
++  'PBRBaseMaterial.isReadyForSubMesh', 'StandardMaterial.isReadyForSubMesh', 'PBRBaseMaterial.bindForSubMesh', 'StandardMaterial.bindForSubMesh',
++  'PBRBaseMaterial._prepareEffect', 'engine.createEffect']);
++export const EFFECT_SCOPE = Object.freeze({
++  clock: 'Selected synchronous wall time including observer/JIT/GC/scheduling, not GPU execution.',
++  nesting: 'One shared ten-target stack; selfSelected subtracts selected children only. Inclusive rows overlap.',
++  engine: 'Own engine createEffect only under a selected own-scene material readiness or PBR prepare ancestor. No cache/key inspection or hit/miss claim.',
++  residual: 'PBR prepare includes defines/ABI/serialization; readiness residual includes unselected notifications/hot-swap/setEffect. Standard internals are not explained by PBR.',
++});
++const owners = new WeakMap();
++const flags = (a,b) => !!a === !!b && (!a || ['value','get','set','writable','configurable','enumerable'].every(k => a[k] === b[k]));
++const rows = () => EFFECT_IDS.flatMap(id => EFFECT_PHASES.map(phase => ({ id, phase, calls: 0, inclusiveMs: 0, selfSelectedMs: 0, falseReturns: 0, nullReturns: 0, throws: 0 })));
++
++export class EffectCallProfile {
++  hooks = []; frame; disposed = false; errors = 0; restoreConflicts = 0;
++  constructor(targets, { now = () => performance.now(), phase = () => 'other' } = {}) {
++    if (!Array.isArray(targets) || targets.length !== 10 || targets.some((t,i) => t.id !== EFFECT_IDS[i])) throw Error('Exact ten effect targets required');
++    this.now = now; this.phase = phase;
++    const checked = targets.map(({target,key,expected,accepts = () => true,allowInherited=false}, i) => {
++      const descriptor = Object.getOwnPropertyDescriptor(target,key);
++      let resolved=descriptor,prototype=Object.getPrototypeOf(target);
++      while(!resolved&&prototype){resolved=Object.getOwnPropertyDescriptor(prototype,key);prototype=Object.getPrototypeOf(prototype);}
++      if ((!descriptor&&(!allowInherited||!Object.isExtensible(target))) || !resolved || !Object.hasOwn(resolved,'value') || typeof resolved.value !== 'function' ||
++          (descriptor&&!descriptor.configurable&&!descriptor.writable) || resolved.value !== expected || owners.get(target)?.has(key) ||
++          targets.slice(0,i).some(t=>t.target===target && t.key===key)) throw Error('Effect native descriptor drift/ownership: '+EFFECT_IDS[i]);
++      return {target,key,descriptor,original:resolved.value,accepts};
++    });
++    try {
++      checked.forEach(({target,key,descriptor,original,accepts}, index) => {
++        const profile=this;
++        const wrapper=function(){ return profile.invoke(index,original,this,arguments,accepts); };
++        this.hooks.push({target,key,descriptor,wrapper});
++        const keys=owners.get(target)??new Map();keys.set(key,this);owners.set(target,keys);
++        Object.defineProperty(target,key,{...(descriptor??{configurable:true,writable:true,enumerable:false}),value:wrapper});
++      });
++    } catch(error) { this.dispose(); throw error; }
++  }
++  fail(frame) { frame.errors++;this.errors++; }
++  clock(frame) { try { const t=this.now();if(typeof t==='number'&&Number.isFinite(t)&&t>=0)return t; }catch{} this.fail(frame); }
++  invoke(index, original, receiver, args, accepts) {
++    const frame=this.frame;
++    if (!frame || this.disposed) return Reflect.apply(original,receiver,args);
++    let accepted=false;try{accepted=accepts(receiver,args);}catch{this.fail(frame);}
++    if(index===9) accepted=accepted && frame.foreignMaterialDepth===0 && frame.stack.some(n=>n.index===4||n.index===5||n.index===8);
++    if(!accepted){
++      // A foreign material nested in a callback cannot borrow an outer own
++      // material's engine association. No diagnostic clock/row for passthrough.
++      const barrier=index===4||index===5||index===8;
++      if(barrier)frame.foreignMaterialDepth++;
++      try{return Reflect.apply(original,receiver,args);}finally{if(barrier)frame.foreignMaterialDepth--;}
++    }
++    if(frame.calls++>=EFFECT_LIMITS.callsPerFrame){frame.callsSkipped++;return Reflect.apply(original,receiver,args);}
++    let phase;try{phase=EFFECT_PHASES.indexOf(this.phase());}catch{phase=-1;}
++    if(phase<0){this.fail(frame);phase=3;}
++    const row=frame.rows[index*4+phase];row.calls++;
++    if(frame.stack.length>=EFFECT_LIMITS.stack){frame.depthSkipped++;return Reflect.apply(original,receiver,args);}
++    const start=this.clock(frame);if(start===undefined)return Reflect.apply(original,receiver,args);
++    const node={index,childMs:0};frame.stack.push(node);let returned=false,result;
++    try{result=Reflect.apply(original,receiver,args);returned=true;return result;}
++    finally{if(this.frame===frame&&!this.disposed){
++      if(!returned)row.throws++;else if(result===false)row.falseReturns++;else if(result===null)row.nullReturns++;
++      frame.stack.pop();const end=this.clock(frame);
++      if(end!==undefined){if(end<start||end-start<node.childMs)this.fail(frame);const elapsed=Math.max(0,end-start);
++        row.inclusiveMs+=elapsed;row.selfSelectedMs+=Math.max(0,elapsed-node.childMs);const parent=frame.stack.at(-1);if(parent)parent.childMs+=elapsed;}
++    }}
++  }
++  beginFrame(frameId) {
++    if(this.disposed)return;
++    if(this.frame?.stack.length)this.fail(this.frame);
++    this.frame={frameId,rows:rows(),errors:0,depthSkipped:0,callsSkipped:0,calls:0,stack:[],foreignMaterialDepth:0};
++  }
++  ownsHooks() {
++    if(this.disposed)return false;
++    try{return this.hooks.every(h=>flags(Object.getOwnPropertyDescriptor(h.target,h.key),{...(h.descriptor??{configurable:true,writable:true,enumerable:false}),value:h.wrapper}));}
++    catch{return false;}
++  }
++  endFrame() {
++    const f=this.frame;this.frame=undefined;if(!f)return null;
++    if(f.stack.length||f.foreignMaterialDepth)this.fail(f);
++    return {frameId:f.frameId,rows:f.rows,errors:f.errors,depthSkipped:f.depthSkipped,callsSkipped:f.callsSkipped};
++  }
++  dispose() {
++    if(this.disposed)return;
++    this.disposed=true;if(this.frame?.stack.length)this.fail(this.frame);this.frame=undefined;
++    for(const h of this.hooks.slice().reverse()){
++      try{const d=Object.getOwnPropertyDescriptor(h.target,h.key);
++        if(flags(d,{...(h.descriptor??{configurable:true,writable:true,enumerable:false}),value:h.wrapper})){
++          if(h.descriptor)Object.defineProperty(h.target,h.key,h.descriptor);else delete h.target[h.key];
++        }
++        else if(!flags(d,h.descriptor))this.restoreConflicts++;
++      }catch{this.errors++;this.restoreConflicts++;}
++      const keys=owners.get(h.target);if(keys?.get(h.key)===this)keys.delete(h.key);
++    }
++    this.hooks.length=0;this.now=this.phase=null;
++  }
++}
++
++const invalid=Symbol('invalid');
++function data(o,k){try{const d=o&&Object.getOwnPropertyDescriptor(o,k);return d&&Object.hasOwn(d,'value')?d.value:invalid;}catch{return invalid;}}
++function exact(o,keys){if(!o||typeof o!=='object'||Array.isArray(o))throw Error('Effect object');const proto=Object.getPrototypeOf(o);if(proto!==Object.prototype&&proto!==null)throw Error('Effect object prototype');const names=Reflect.ownKeys(o);
++  if(names.length!==keys.length||names.some(k=>!keys.includes(k)))throw Error('Effect closed fields');
++  const r={};for(const k of keys){const v=data(o,k);if(v===invalid)throw Error('Effect own data');r[k]=v;}return r;}
++function array(o,max){const n=data(o,'length');if(!Array.isArray(o)||!Number.isSafeInteger(n)||n<0||n>max)throw Error('Effect array bounds');
++  const proto=Object.getPrototypeOf(o);if(proto!==Array.prototype&&proto!==null)throw Error('Effect array prototype');
++  const keys=Reflect.ownKeys(o);if(keys.length!==n+1)throw Error('Effect sparse/extra array');const a=[];
++  for(let i=0;i<n;i++){const v=data(o,String(i));if(v===invalid)throw Error('Effect array own data');a.push(v);}return a;}
++const count=x=>Number.isSafeInteger(x)&&x>=0;
++export function validateEntryEffectProfile(value) {
++  const p=exact(value,['schemaVersion','scope','limits','targets','engineOrigin','rendererId','generation','frames','complete','reason','errors','phaseErrors','restoreConflicts','installedRoutineHooks','remainingRoutineHooks','active']);
++  if(p.schemaVersion!==1||!['webgpu-own','thinengine-inherited'].includes(p.engineOrigin)||!count(p.rendererId)||p.rendererId<1||!count(p.generation)||p.generation<1||p.active!==false||typeof p.complete!=='boolean'||
++      !EFFECT_REASONS.includes(p.reason)||['errors','phaseErrors','restoreConflicts','installedRoutineHooks','remainingRoutineHooks'].some(k=>!count(p[k]))||p.installedRoutineHooks>10||p.remainingRoutineHooks>10)throw Error('Effect profile scalar');
++  const scope=exact(p.scope,Object.keys(EFFECT_SCOPE)),limits=exact(p.limits,Object.keys(EFFECT_LIMITS));
++  for(const[k,v]of Object.entries(EFFECT_SCOPE))if(scope[k]!==v)throw Error('Effect scope');
++  for(const[k,v]of Object.entries(EFFECT_LIMITS))if(limits[k]!==v)throw Error('Effect limits');
++  const targets=array(p.targets,10);if(targets.length!==10||targets.some((x,i)=>x!==EFFECT_IDS[i]))throw Error('Effect targets');
++  const frames=array(p.frames,8);
++  let previousAfter;const safeFrames=[];
++  for(const raw of frames){const f=exact(raw,['frameId','rows','errors','depthSkipped','callsSkipped','nativeFrameIdAfter','progressed','threw']);
++    if(['frameId','errors','depthSkipped','callsSkipped'].some(k=>!count(f[k]))||!(f.nativeFrameIdAfter===null||count(f.nativeFrameIdAfter))||typeof f.progressed!=='boolean'||typeof f.threw!=='boolean')throw Error('Effect frame');
++    const rs=array(f.rows,40);if(rs.length!==40)throw Error('Effect row count');
++    const safeRows=[];
++    for(let i=0;i<40;i++){const r=exact(rs[i],['id','phase','calls','inclusiveMs','selfSelectedMs','falseReturns','nullReturns','throws']);
++      if(r.id!==EFFECT_IDS[Math.floor(i/4)]||r.phase!==EFFECT_PHASES[i%4]||['calls','falseReturns','nullReturns','throws'].some(k=>!count(r[k])||r[k]>EFFECT_LIMITS.callsPerFrame)||
++          ['inclusiveMs','selfSelectedMs'].some(k=>typeof r[k]!=='number'||!Number.isFinite(r[k])||r[k]<0)||r.selfSelectedMs>r.inclusiveMs||r.falseReturns+r.nullReturns+r.throws>r.calls)throw Error('Effect row');safeRows.push(r);}
++    if(p.complete&&(!f.progressed||f.nativeFrameIdAfter!==f.frameId+1||(previousAfter!==undefined&&f.frameId!==previousAfter)||f.threw||f.errors||f.depthSkipped||f.callsSkipped))throw Error('Effect incomplete frame');
++    previousAfter=f.nativeFrameIdAfter;
++    f.rows=safeRows;safeFrames.push(f);
++  }
++  if(p.complete&&(frames.length!==8||p.reason!=='complete'||p.errors||p.phaseErrors||p.restoreConflicts||p.remainingRoutineHooks||p.installedRoutineHooks!==10))throw Error('Effect incomplete profile');
++  p.scope=scope;p.limits=limits;p.targets=targets;p.frames=safeFrames;
++  if(JSON.stringify(p).length>EFFECT_LIMITS.bytes)throw Error('Effect byte bound');
++  return value;
++}
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/startup-effect-v21/empty-source b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/startup-stage-effects.mjs
+index e69de29b..d80ba935 100644
+--- /dev/null
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/startup-stage-effects.mjs
+@@ -0,0 +1,202 @@
++import { Scene } from '@babylonjs/core/scene.js';
++import { Mesh } from '@babylonjs/core/Meshes/mesh.js';
++import { TransformNode } from '@babylonjs/core/Meshes/transformNode.js';
++import { PBRBaseMaterial } from '@babylonjs/core/Materials/PBR/pbrBaseMaterial.js';
++import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial.js';
++import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine.pure.js';
++import { ThinEngine } from '@babylonjs/core/Engines/thinEngine.pure.js';
++import { EffectCallProfile, EFFECT_IDS as ROUTINE_IDS, EFFECT_LIMITS as ROUTINE_LIMITS, EFFECT_SCOPE, validateEntryEffectProfile } from './entry-effect-cost-core.mjs';
++
++export const STARTUP_TARGETS = Object.freeze(['first-medium-vehicle-0','first-low-day-1-on','first-high-day-1-on']);
++export const STARTUP_LIMITS = Object.freeze({ passes:16, stages:304, frames:8, bytes:256*1024 });
++export const STARTUP_SCOPE='Original startup stage/variants boundaries and selected synchronous options.render only. One ten-target inclusive/selfSelected stack includes observer/JIT/GC/scheduling; not GPU, FPS, cache hit/miss or shader ownership.';
++const names=['vehicle-0','vehicle-1','vehicle-2','vehicle-keyed-0','vehicle-keyed-1','vehicle-keyed-2','current-off','current-on','night-0-off','night-0-on','night-1-off','night-1-on','night-2-off','night-2-on','day-0-off','day-0-on','day-1-off','day-1-on','restore'];
++const qualities=['low','medium','high'],statuses=['complete','timeout','failed','disposed'];
++const owners=new WeakMap(),optionsOwners=new WeakMap();
++const bindings=[[Scene.prototype,'_activeMesh'],[TransformNode.prototype,'computeWorldMatrix'],[Mesh.prototype,'getLOD'],[PBRBaseMaterial.prototype,'isReadyForSubMesh'],[StandardMaterial.prototype,'isReadyForSubMesh'],[PBRBaseMaterial.prototype,'bindForSubMesh'],[StandardMaterial.prototype,'bindForSubMesh'],[PBRBaseMaterial.prototype,'_prepareEffect']].map(([target,key])=>({target,key,expected:Object.getOwnPropertyDescriptor(target,key)?.value}));
++const data=(x,k)=>{try{const d=x&&Object.getOwnPropertyDescriptor(x,k);return d&&Object.hasOwn(d,'value')?d.value:undefined;}catch{return undefined;}};
++const time=x=>typeof x==='number'&&Number.isFinite(x)&&x>=0;
++const count=x=>Number.isSafeInteger(x)&&x>=0;
++const fail=s=>{s.errors++;};
++const engineOrigins=[{prototype:WebGPUEngine.prototype,method:WebGPUEngine.prototype.createEffect,name:'webgpu-own'},
++  {prototype:ThinEngine.prototype,method:ThinEngine.prototype.createEffect,name:'thinengine-inherited'}];
++function engineOrigin(engine){
++  let current=engine;
++  while(current){const descriptor=Object.getOwnPropertyDescriptor(current,'createEffect');if(descriptor){
++    const found=engineOrigins.find(origin=>origin.prototype===current&&origin.method===descriptor.value);
++    if(!found||!Object.hasOwn(descriptor,'value'))throw Error('Startup effect engine origin/foreign wrapper');
++    return found;}current=Object.getPrototypeOf(current);}
++  throw Error('Startup effect engine method missing');
++}
++function live(s){
++  if(!s?.active)return false;
++  try{if(s.signal?.aborted||s.startupAbort?.signal.aborted||s.isCurrent?.()===false||s.game.disposed||s.game.rendererFailed||s.scene.isDisposed||s.engine.isDisposed===true||s.scene._engine!==s.engine||data(s.engine,'_device')!==s.device||
++      s.game.scene!==s.scene||s.game.engine!==s.engine||s.game.renderHealth!==s.health||data(s.health,'generation')!==s.generation||
++      data(s.health,'rendererId')!==s.rendererId||data(s.health,'errorCount')!==0||s.game.startupAbort!==s.startupAbort){retire(s,'owner-retired');return false;}return true;}
++  catch{fail(s);retire(s,'observer-error');return false;}
++}
++function detachCore(s){
++  if(s.core){const core=s.core;try{core.dispose();}catch{fail(s);s.restoreConflicts++;}s.errors+=core.errors;s.restoreConflicts+=core.restoreConflicts;s.core=null;}
++  for(const detach of [...s.detaches.splice(0),...s.renderers.values()]){try{detach();}catch{fail(s);}}
++  s.renderers.clear();s.phases.length=0;s.rendering=false;
++}
++function retire(s,reason){
++  if(!s.active)return;
++  s.active=false;s.reason=reason;detachCore(s);
++  if(owners.get(s.game)===s)owners.delete(s.game);
++  try{s.signal?.removeEventListener('abort',s.abort);s.startupAbort?.signal.removeEventListener('abort',s.abort);}catch{fail(s);}
++  for(const c of s.contexts)c.state=null;s.contexts.length=0;
++  s.game=s.scene=s.engine=s.device=s.health=s.signal=s.startupAbort=s.isCurrent=s.abort=s.profileNow=null;
++}
++function snapshot(s){
++  const capture={...s.capture,frames:structuredClone(s.capture.frames)};
++  capture.complete=capture.reached&&capture.ended&&capture.status==='complete'&&capture.frames.length>0&&!capture.capped&&!s.errors&&!s.restoreConflicts&&capture.frames.every(f=>f.progressed&&!f.threw&&!f.errors&&!f.depthSkipped&&!f.callsSkipped);
++  return{schemaVersion:1,target:s.target,limits:STARTUP_LIMITS,scope:STARTUP_SCOPE,effectScope:EFFECT_SCOPE,targets:[...ROUTINE_IDS],engineOrigin:s.engineOrigin,installedRoutineHooks:s.installedRoutineHooks,
++    rendererId:s.rendererId,generation:s.generation,active:s.active,reason:s.reason,complete:!s.active&&s.reason==='startup-resolved'&&capture.complete&&!s.overflow,
++    errors:s.errors,restoreConflicts:s.restoreConflicts,overflow:s.overflow,passCount:s.passCount,stageCount:s.stageCount,
++    passes:structuredClone(s.passes),stages:structuredClone(s.stages),capture,remainingRoutineHooks:s.core?.hooks.length??0};
++}
++export function createStartupStageEffects(game,{target=null,signal,isCurrent,profileNow}={}){
++  if(target===null)return undefined;
++  if(!STARTUP_TARGETS.includes(target))throw Error('Unknown startup routine target');
++  const scene=data(game,'scene'),engine=data(game,'engine'),health=data(game,'renderHealth');
++  if(!(scene instanceof Scene)||scene._engine!==engine||owners.has(game)||!count(data(health,'generation'))||data(health,'generation')<1||!count(data(health,'rendererId'))||data(health,'rendererId')<1)throw Error('Startup routine owner identity');
++  const s={game,scene,engine,device:data(engine,'_device'),engineOrigin:null,installedRoutineHooks:0,health,target,signal,isCurrent,profileNow,startupAbort:data(game,'startupAbort'),rendererId:data(health,'rendererId'),generation:data(health,'generation'),
++    active:true,reason:null,errors:0,restoreConflicts:0,overflow:false,passCount:0,stageCount:0,passes:[],stages:[],contexts:[],core:null,detaches:[],renderers:new Map(),rendererRegistrations:0,captureStopped:false,phases:[],rendering:false,phaseEvents:0,
++    capture:{reached:false,passIndex:null,stageIndex:null,ended:false,status:null,capped:false,frames:[]}};
++  s.abort=()=>retire(s,'aborted');owners.set(game,s);
++  signal?.addEventListener('abort',s.abort,{once:true});s.startupAbort?.signal.addEventListener('abort',s.abort,{once:true});
++  const owner={snapshot:()=>snapshot(s),dispose:(reason='owner-stopped')=>retire(s,reason)};game=null;
++  live(s);return owner;
++}
++// Registration never substitutes options and never reads it. The source call
++// site is exact, and late/unowned calls simply retain their original behavior.
++export function registerStartupOptions(game,options){
++  const s=owners.get(game);if(!s||!live(s))return options;
++  try{
++    if(s.contexts.some(c=>c.pass&&c.pass.endedAtMs===null)){fail(s);return options;}
++    const index=s.passCount++;if(index>=STARTUP_LIMITS.passes){s.overflow=true;return options;}
++    const quality=data(game,'quality');if(!qualities.includes(quality)){fail(s);return options;}
++    const occurrence=s.passes.filter(p=>p.quality===quality).length;
++    const pass={index,quality,startedAtMs:null,endedAtMs:null,status:null};s.passes.push(pass);
++    const c={state:s,pass,occurrence,stage:null};s.contexts.push(c);optionsOwners.set(options,c);
++  }catch{fail(s);}return options;
++}
++function context(options){const c=optionsOwners.get(options);return c&&live(c.state)?c:null;}
++export function startupPassStarted(options,at){const c=context(options);if(!c)return;const s=c.state;try{const previous=s.passes[c.pass.index-1];if(!time(at)||c.pass.startedAtMs!==null||(previous&&previous.endedAtMs!==null&&at<previous.endedAtMs)){fail(s);retire(s,'observer-error');}else c.pass.startedAtMs=at;}catch{fail(s);retire(s,'observer-error');}}
++export function startupStageStarted(options,index,name,at){
++  const c=context(options);if(!c)return;const s=c.state;
++  try{
++    s.stageCount++;if(s.stages.length>=STARTUP_LIMITS.stages){s.overflow=true;return;}
++    if(!count(index)||index>18||!names.includes(name)||!time(at)||c.pass.startedAtMs===null||at<c.pass.startedAtMs||c.stage?.endedAtMs===null){fail(s);return;}
++    c.stage={passIndex:c.pass.index,index,name,startedAtMs:at,endedAtMs:null,terminal:false,status:null};s.stages.push(c.stage);
++    const selected=c.occurrence===0&&((s.target==='first-medium-vehicle-0'&&c.pass.quality==='medium'&&name==='vehicle-0')||
++      (s.target==='first-low-day-1-on'&&c.pass.quality==='low'&&name==='day-1-on')||(s.target==='first-high-day-1-on'&&c.pass.quality==='high'&&name==='day-1-on'));
++    if(selected){if(s.capture.reached){fail(s);return;}s.capture.reached=true;s.capture.passIndex=c.pass.index;s.capture.stageIndex=index;}
++  }catch{fail(s);}
++}
++export function startupStageSaved(options,index,at,terminal){
++  const c=context(options);if(!c)return;const s=c.state,row=c.stage;
++  try{
++    if(!row||row.index!==index||row.endedAtMs!==null||!time(at)||at<row.startedAtMs||typeof terminal!=='boolean'){fail(s);return;}
++    row.endedAtMs=at;row.terminal=terminal;row.status=terminal?null:'complete';
++    if(row.passIndex===s.capture.passIndex&&row.index===s.capture.stageIndex){s.capture.ended=true;s.capture.status=row.status;detachCore(s);}
++  }catch{fail(s);}
++}
++export function startupPassFinished(options,at,status){
++  const c=context(options);if(!c)return;const s=c.state;
++  try{
++    if(!time(at)||c.pass.startedAtMs===null||at<c.pass.startedAtMs||c.pass.endedAtMs!==null||!statuses.includes(status)){fail(s);return;}
++    c.pass.endedAtMs=at;c.pass.status=status;if(c.stage?.terminal)c.stage.status=status;
++    if(c.stage?.passIndex===s.capture.passIndex&&c.stage?.index===s.capture.stageIndex&&s.capture.ended)s.capture.status=c.stage.status;
++  }catch{fail(s);}
++}
++function installCore(s){
++  const scene=s.scene,origin=engineOrigin(s.engine);
++  if(Object.getOwnPropertyDescriptor(s.engine,'createEffect'))throw Error('Startup engine must retain inherited native method');
++  s.engineOrigin=origin.name;
++  const phase=()=>s.phases.at(-1)?.phase??'other';
++  const enter=(phase,token)=>{if(!s.rendering)return;if(++s.phaseEvents>ROUTINE_LIMITS.phaseEvents||s.phases.length>=32){fail(s);return;}s.phases.push({phase,token});};
++  const leave=token=>{if(!s.rendering)return;if(s.phases.at(-1)?.token!==token){fail(s);return;}s.phases.pop();};
++  const safe=fn=>(...args)=>{try{return fn(...args);}catch{fail(s);}};
++  const observe=(observable,fn)=>{const observer=observable.add(safe(fn));if(!observer)throw Error('Startup effect observer unavailable');s.detaches.push(()=>observable.remove(observer));};
++  const track=renderer=>{if(s.renderers.has(renderer))return;if(s.rendererRegistrations>=ROUTINE_LIMITS.renderers){fail(s);return;}s.rendererRegistrations++;
++    let before,after;
++    try{before=renderer.onInitRenderingObservable.add(safe(()=>enter('rtt',renderer)));if(!before)throw Error('Startup RTT before unavailable');
++      after=renderer.onFinishRenderingObservable.add(safe(()=>leave(renderer)));if(!after)throw Error('Startup RTT after unavailable');}
++    catch(error){try{if(before)renderer.onInitRenderingObservable.remove(before);}catch{fail(s);s.restoreConflicts++;}throw error;}
++    s.renderers.set(renderer,()=>{try{renderer.onInitRenderingObservable.remove(before);}finally{renderer.onFinishRenderingObservable.remove(after);}});
++  };
++  const targets=[{id:ROUTINE_IDS[0],target:scene,key:'getActiveMeshCandidates',expected:data(scene,'getActiveMeshCandidates'),accepts:receiver=>receiver===s.scene},
++    ...bindings.map((binding,index)=>({...binding,id:ROUTINE_IDS[index+1],accepts:(receiver,args)=>index===0?receiver===s.scene:
++      data(receiver,'_scene')===s.scene&&(index!==7||data(args[0],'_scene')===s.scene)})),
++    {id:ROUTINE_IDS[9],target:s.engine,key:'createEffect',expected:origin.method,allowInherited:true,accepts:receiver=>receiver===s.engine}];
++  // Immutable donor core's validation closures capture its input array. Runtime
++  // wrappers use installed hooks, so release the caller-owned transaction now.
++  try{s.core=new EffectCallProfile(targets,{now:s.profileNow,phase});}finally{targets.length=0;}
++  s.installedRoutineHooks=10;
++  for(const[before,after,name]of[[scene.onBeforeActiveMeshesEvaluationObservable,scene.onAfterActiveMeshesEvaluationObservable,'active'],[scene.onBeforeDrawPhaseObservable,scene.onAfterDrawPhaseObservable,'main']]){observe(before,()=>enter(name,before));observe(after,()=>leave(before));}
++  for(const renderer of scene.objectRenderers)track(renderer);
++  observe(scene.onNewObjectRendererAddedObservable,renderer=>{if(s.scene?.objectRenderers.includes(renderer))track(renderer);});
++  observe(scene.onObjectRendererRemovedObservable,renderer=>{s.renderers.get(renderer)?.();s.renderers.delete(renderer);});
++}
++export function startupRenderBegin(options,at){
++  const c=context(options);if(!c)return null;const s=c.state,row=c.stage;
++  if(!row||row.passIndex!==s.capture.passIndex||row.index!==s.capture.stageIndex||s.capture.ended||s.captureStopped)return null;
++  try{
++    if(!time(at)||at<row.startedAtMs||s.rendering){fail(s);return null;}
++    if(s.capture.frames.length>=STARTUP_LIMITS.frames){s.capture.capped=true;s.captureStopped=true;detachCore(s);return null;}
++    if(!s.core)installCore(s);
++    if(!s.core.ownsHooks()){fail(s);s.captureStopped=true;detachCore(s);return null;}
++    s.rendering=true;s.phases.length=0;s.phaseEvents=0;const frameId=s.scene._frameId;if(!count(frameId))throw Error('Startup native frame id invalid');s.core.beginFrame(frameId);
++    return{state:s,startedAtMs:at,frameId,passIndex:row.passIndex,stageIndex:row.index};
++  }catch{fail(s);s.captureStopped=true;detachCore(s);return null;}
++}
++export function startupRenderEnd(token,at,returned){
++  const s=token?.state;if(!s?.active){if(token)token.state=null;return;}
++  try{
++    if(!live(s))return;const frame=s.core?.endFrame();if(!frame){fail(s);return;}
++    const after=s.scene._frameId,nativeFrameIdAfter=count(after)?after:null;
++    s.capture.frames.push({...frame,startedAtMs:token.startedAtMs,endedAtMs:time(at)?at:null,passIndex:token.passIndex,stageIndex:token.stageIndex,
++      nativeFrameIdAfter,progressed:nativeFrameIdAfter===token.frameId+1,threw:!returned});
++    if(!time(at)||at<token.startedAtMs||typeof returned!=='boolean'||s.phases.length)fail(s);
++    s.rendering=false;s.phases.length=0;
++    if(!returned||nativeFrameIdAfter!==token.frameId+1){s.captureStopped=true;detachCore(s);}
++  }catch{fail(s);detachCore(s);}finally{token.state=null;}
++}
++function closed(v,keys){if(!v||typeof v!=='object'||Array.isArray(v)||(Object.getPrototypeOf(v)!==Object.prototype&&Object.getPrototypeOf(v)!==null)||Reflect.ownKeys(v).length!==keys.length)throw Error('Startup profile closed fields');
++  const o={};for(const k of keys){const d=Object.getOwnPropertyDescriptor(v,k);if(!d||!Object.hasOwn(d,'value'))throw Error('Startup profile data');o[k]=d.value;}return o;}
++function arr(v,max){if(!Array.isArray(v)||(Object.getPrototypeOf(v)!==Array.prototype&&Object.getPrototypeOf(v)!==null)||v.length>max||Reflect.ownKeys(v).length!==v.length+1)throw Error('Startup profile array');return Array.from({length:v.length},(_,i)=>{const d=Object.getOwnPropertyDescriptor(v,String(i));if(!d||!Object.hasOwn(d,'value'))throw Error('Startup profile sparse/getter');return d.value;});}
++export function validateStartupStageEffects(value,target){
++  const p=closed(value,['schemaVersion','target','limits','scope','effectScope','targets','engineOrigin','installedRoutineHooks','rendererId','generation','active','reason','complete','errors','restoreConflicts','overflow','passCount','stageCount','passes','stages','capture','remainingRoutineHooks']);
++  if(p.schemaVersion!==1||p.target!==target||!STARTUP_TARGETS.includes(target)||p.active!==false||!['startup-resolved','startup-rejected','owner-stopped','aborted','owner-retired','observer-error'].includes(p.reason)||typeof p.complete!=='boolean'||typeof p.overflow!=='boolean'||
++      ['rendererId','generation'].some(k=>!count(p[k])||p[k]<1)||['errors','restoreConflicts','passCount','stageCount','remainingRoutineHooks'].some(k=>!count(p[k]))||p.remainingRoutineHooks!==0||p.scope!==STARTUP_SCOPE)throw Error('Startup profile scalar');
++  const targets=arr(p.targets,10);if(targets.length!==10||targets.some((value,index)=>value!==ROUTINE_IDS[index])||![null,'webgpu-own','thinengine-inherited'].includes(p.engineOrigin)||![0,10].includes(p.installedRoutineHooks))throw Error('Startup effect targets/origin');
++  const effectScope=closed(p.effectScope,Object.keys(EFFECT_SCOPE));for(const key of Object.keys(EFFECT_SCOPE))if(effectScope[key]!==EFFECT_SCOPE[key])throw Error('Startup effect scope');
++  const limits=closed(p.limits,Object.keys(STARTUP_LIMITS));for(const k of Object.keys(STARTUP_LIMITS))if(limits[k]!==STARTUP_LIMITS[k])throw Error('Startup profile limits');
++  p.passes=arr(p.passes,16).map((v,index)=>{const r=closed(v,['index','quality','startedAtMs','endedAtMs','status']);if(r.index!==index||!qualities.includes(r.quality)||!(r.status===null||statuses.includes(r.status))||!(r.startedAtMs===null||time(r.startedAtMs))||!(r.endedAtMs===null||time(r.endedAtMs))||(r.endedAtMs!==null&&(r.startedAtMs===null||r.endedAtMs<r.startedAtMs)))throw Error('Startup pass');return r;});
++  p.stages=arr(p.stages,304).map(v=>{const r=closed(v,['passIndex','index','name','startedAtMs','endedAtMs','terminal','status']);const pass=p.passes[r.passIndex];if(!pass||!count(r.index)||r.index>18||!names.includes(r.name)||!time(r.startedAtMs)||pass.startedAtMs===null||r.startedAtMs<pass.startedAtMs||typeof r.terminal!=='boolean'||!(r.status===null||statuses.includes(r.status))||!(r.endedAtMs===null||time(r.endedAtMs))||(r.endedAtMs!==null&&r.endedAtMs<r.startedAtMs))throw Error('Startup stage');return r;});
++  for(let i=1;i<p.passes.length;i++){const a=p.passes[i-1],b=p.passes[i];if(b.startedAtMs!==null&&(a.endedAtMs===null||b.startedAtMs<a.endedAtMs))throw Error('Startup pass sequence');}
++  if(p.passCount<p.passes.length||p.stageCount<p.stages.length||(!p.overflow&&!p.errors&&(p.passCount!==p.passes.length||p.stageCount!==p.stages.length)))throw Error('Startup profile counts');
++  const c=closed(p.capture,['reached','passIndex','stageIndex','ended','status','capped','frames','complete']);for(const k of['reached','ended','capped','complete'])if(typeof c[k]!=='boolean')throw Error('Startup capture bool');
++  if(!(c.status===null||statuses.includes(c.status))||!(c.passIndex===null||count(c.passIndex))||!(c.stageIndex===null||count(c.stageIndex)))throw Error('Startup capture identity');
++  c.frames=arr(c.frames,8).map(v=>{const f=closed(v,['frameId','rows','errors','depthSkipped','callsSkipped','startedAtMs','endedAtMs','passIndex','stageIndex','nativeFrameIdAfter','progressed','threw']);
++    if(!time(f.startedAtMs)||!(f.endedAtMs===null||time(f.endedAtMs))||(f.endedAtMs!==null&&f.endedAtMs<f.startedAtMs)||f.passIndex!==c.passIndex||f.stageIndex!==c.stageIndex)throw Error('Startup frame bounds');
++    f.rows=arr(f.rows,40).map(r=>closed(r,['id','phase','calls','inclusiveMs','selfSelectedMs','falseReturns','nullReturns','throws']));
++    if(p.installedRoutineHooks!==10||p.engineOrigin===null)throw Error('Startup effect frame installation missing');
++    validateEntryEffectProfile({schemaVersion:1,scope:EFFECT_SCOPE,limits:ROUTINE_LIMITS,targets:[...ROUTINE_IDS],engineOrigin:p.engineOrigin,rendererId:p.rendererId,generation:p.generation,frames:[{frameId:f.frameId,rows:f.rows,errors:f.errors,depthSkipped:f.depthSkipped,callsSkipped:f.callsSkipped,nativeFrameIdAfter:f.nativeFrameIdAfter,progressed:f.progressed,threw:f.threw}],active:false,complete:false,reason:'disposed',errors:0,phaseErrors:0,restoreConflicts:0,installedRoutineHooks:10,remainingRoutineHooks:0});
++    if(f.rows.reduce((sum,row)=>sum+row.calls,0)>ROUTINE_LIMITS.callsPerFrame)throw Error('Startup effect total calls bound');return f;});
++  const row=p.stages.find(r=>r.passIndex===c.passIndex&&r.index===c.stageIndex);
++  if(c.reached?(!row||!p.passes[c.passIndex]||c.ended!==(row.endedAtMs!==null)||c.status!==row.status):(c.passIndex!==null||c.stageIndex!==null||c.frames.length||c.ended||c.status!==null))throw Error('Startup target relation');
++  if(c.reached){const q=target==='first-medium-vehicle-0'?'medium':target==='first-low-day-1-on'?'low':'high',name=target==='first-medium-vehicle-0'?'vehicle-0':'day-1-on';
++    if(p.passes[c.passIndex].quality!==q||row.name!==name||p.passes.slice(0,c.passIndex).some(p=>p.quality===q))throw Error('Startup target recipe');}
++  for(const pass of p.passes){const rows=p.stages.filter(r=>r.passIndex===pass.index);let previous;
++    const sequences=[names,names.filter(n=>!n.startsWith('day-')),names.filter(n=>!n.startsWith('vehicle-')),names.filter(n=>!n.startsWith('day-')&&!n.startsWith('vehicle-'))];
++    if(!sequences.some(sequence=>rows.every((r,index)=>r.name===sequence[index])))throw Error('Startup stage recipe order');
++    for(const r of rows){if((previous&&(r.index!==previous.index+1||previous.endedAtMs===null||r.startedAtMs<previous.endedAtMs))||(!previous&&r.index!==0)||(pass.endedAtMs!==null&&(r.endedAtMs===null||r.endedAtMs>pass.endedAtMs)))throw Error('Startup stage order');previous=r;}}
++  if(c.frames.some(f=>f.startedAtMs<row.startedAtMs||(row.endedAtMs!==null&&f.endedAtMs>row.endedAtMs)))throw Error('Startup frame outside stage');
++  for(let i=1;i<c.frames.length;i++){const a=c.frames[i-1],b=c.frames[i];if(b.startedAtMs<a.startedAtMs||(a.endedAtMs!==null&&b.startedAtMs<a.endedAtMs)||b.frameId<a.nativeFrameIdAfter)throw Error('Startup frame sequence');}
++  const ok=c.reached&&c.ended&&c.status==='complete'&&c.frames.length>0&&!c.capped&&!p.errors&&!p.restoreConflicts&&c.frames.every(f=>f.endedAtMs!==null&&f.progressed&&f.nativeFrameIdAfter===f.frameId+1&&!f.threw&&!f.errors&&!f.depthSkipped&&!f.callsSkipped);
++  if(c.complete!==ok||p.complete!==(!p.active&&p.reason==='startup-resolved'&&ok&&!p.overflow))throw Error('Startup false complete');
++  p.capture=c;p.limits=limits;p.targets=targets;p.effectScope=effectScope;if(JSON.stringify(p).length>STARTUP_LIMITS.bytes)throw Error('Startup profile byte cap');return value;
++}
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/startup-effect-v21/empty-source b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/startup-stage-effects.test.mjs
+index e69de29b..c76e664e 100644
+--- /dev/null
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/startup-stage-effects.test.mjs
+@@ -0,0 +1,347 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {readFile} from 'node:fs/promises';
++import {NullEngine} from '@babylonjs/core/Engines/nullEngine.js';
++import {Scene} from '@babylonjs/core/scene.js';
++import {FreeCamera} from '@babylonjs/core/Cameras/freeCamera.js';
++import {Vector3} from '@babylonjs/core/Maths/math.vector.js';
++import {MeshBuilder} from '@babylonjs/core/Meshes/meshBuilder.js';
++import {StandardMaterial} from '@babylonjs/core/Materials/standardMaterial.js';
++import {ObjectRenderer} from '@babylonjs/core/Rendering/objectRenderer.js';
++import {PBRMaterial} from '@babylonjs/core/Materials/PBR/pbrMaterial.js';
++import {PBRBaseMaterial} from '@babylonjs/core/Materials/PBR/pbrBaseMaterial.js';
++import {HemisphericLight} from '@babylonjs/core/Lights/hemisphericLight.js';
++import {ThinEngine} from '@babylonjs/core/Engines/thinEngine.pure.js';
++import {WebGPUEngine} from '@babylonjs/core/Engines/webgpuEngine.pure.js';
++import {EffectCallProfile,EFFECT_IDS} from './entry-effect-cost-core.mjs';
++import ts from 'typescript';
++import {webcrypto} from 'node:crypto';
++import {dirname,join} from 'node:path';
++import {fileURLToPath} from 'node:url';
++import * as probe from './startup-stage-effects.mjs';
++import {transformStartupEffectSource as transformStartupSource,STARTUP_ROUTINE_TARGETS,parseBuildOptions,buildDigest,browserBuildIdentity,helperIdentity,sha256} from './common.mjs';
++import {prepareLightVariants} from '../../../../../client/light-preparation.ts';
++import {validateReceipt} from './receipt.mjs';
++import {verifyBuildContract} from './harness.mjs';
++
++const source=await readFile(new URL('../../../../../client/light-preparation.ts',import.meta.url),'utf8');
++const gameSource=await readFile(new URL('../../../../../client/game.ts',import.meta.url),'utf8');
++function transformed(){let js=ts.transpileModule(transformStartupSource(source,'light',STARTUP_ROUTINE_TARGETS[0]),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022}}).outputText;
++  js=js.replace(/^import .* from "virtual:webgpu-completion-startup-effects";\r?\n/m,'').replace('export function prepareLightVariants','function prepareLightVariants');
++  return new Function(...Object.keys(probe),js+'\nreturn prepareLightVariants;')(...Object.values(probe));}
++const actual=transformed();
++const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
++function fixture(target='first-medium-vehicle-0'){
++  const engine=new NullEngine(),scene=new Scene(engine);new FreeCamera('CPU source fixture',new Vector3(0,0,-8),scene);
++  const mesh=MeshBuilder.CreateBox('CPU fixture box',{},scene);mesh.material=new StandardMaterial('CPU fixture material',scene);
++  const health={rendererId:1,generation:1,errorCount:0,phase:'preparing'},startupAbort=new AbortController();
++  const game={engine,scene,renderHealth:health,startupAbort,quality:'medium',ready:false,disposed:false};
++  let cpuClock=0;const owner=probe.createStartupStageEffects(game,{target,profileNow:()=>cpuClock+=.01});
++  return{game,engine,scene,mesh,owner,dispose(){owner?.dispose();scene.dispose();engine.dispose();}};
++}
++async function run(f,operation=actual,{throwRender,renderReturn,timeoutMs=30000,quality='medium'}={}){
++  f.game.quality=quality;let now=1000,nowReads=0,tick,disposal,done=false,result,renders=0;
++  const options={apply(){},restore(){},meshes:()=>[],beforeChecks(){},check:()=>true,effectsReady:()=>true,
++    render(){renders++;if(throwRender)throw throwRender.value;f.scene.render();return renderReturn;},
++    run(callback){tick=callback;},stop(callback){assert.equal(callback,tick);},onDispose(callback){disposal=callback;return()=>{disposal=undefined;};},isDisposed:()=>false,
++    revision:()=>[],now:()=>{nowReads++;return now;},setTimer:()=>1,clearTimer(){},timeoutMs,includeVehicleVariants:true,includeDayPointVariants:true};
++  assert.equal(probe.registerStartupOptions(f.game,options),options);
++  const promise=operation(options);assert.ok(promise instanceof Promise);promise.then(value=>{result=value;done=true;});
++  for(let i=0;i<1000&&!done;i++){now+=10;tick();await flush();}
++  assert.ok(done,'finite original light state machine completed');assert.equal(disposal,undefined);
++  return{result,options,renders,nowReads,promise};
++}
++test('defaultoff has no owner/source transform, proxy reads, hooks or new options identity',()=>{
++  const hostile=new Proxy({},{get(){throw Error('defaultoff read');},getOwnPropertyDescriptor(){throw Error('defaultoff descriptor');}});
++  assert.equal(probe.createStartupStageEffects(hostile),undefined);assert.equal(transformStartupSource(source,'light'),source);assert.equal(transformStartupSource(gameSource,'game'),gameSource);
++  const options={};assert.equal(probe.registerStartupOptions(hostile,options),options);
++});
++test('new closed flag is mutually exclusive in both CLI orders, canonical metadata and receipt identity',()=>{
++  const target=STARTUP_ROUTINE_TARGETS[0];
++  for(const args of[['--startup-routines',target,'--startup-effect-routines',target],['--startup-effect-routines',target,'--startup-routines',target]])assert.throws(()=>parseBuildOptions(args),/mutually exclusive/);
++  const seed={sourceSnapshotId:'s',helperSha256:'h',label:'l',loading:'original',transforms:{startupRoutines:{target},startupEffectRoutines:{target}},clock:null,weather:null,startupLatency:false,shaderAttribution:false,routineCost:false,bufferLifecycle:false,lifecycleControls:false,dependencies:{}};
++  assert.throws(()=>buildDigest(seed),/mutually exclusive/);
++  assert.throws(()=>validateReceipt({schemaVersion:1,buildId:'b',sourceSnapshotId:'s',helperSha256:'h',attemptId:'8e9e7e15-6011-438d-96a2-53be43f17792',kind:'startup',mode:'diagnostic',lifecycleControls:false},
++    {buildId:'b',sourceSnapshotId:'s',helperSha256:'h',lifecycleControls:false,startupRoutines:target,startupEffectRoutines:target}),/mutually exclusive/);
++});
++test('V20 old runtime modules stay exact and ten-target core is the immutable V19 donor',async()=>{
++  for(const name of['startup-stage-routines.mjs','routine-cost-core.mjs','routine-cost.mjs','entry-routine-cost.mjs','entry-render-cost.mjs'])assert.deepEqual(await readFile(new URL(name,import.meta.url)),await readFile(new URL('../v20/'+name,import.meta.url)));
++  assert.deepEqual(await readFile(new URL('./entry-effect-cost-core.mjs',import.meta.url)),await readFile(new URL('../../../entry-effect-cost/helper/v19/entry-effect-cost-core.mjs',import.meta.url)));
++});
++test('one ten-target stack subtracts PBR prepare/engine children and the direct Standard-to-engine child',()=>{
++  for(const parent of[4,5]){let now=0;const targets=EFFECT_IDS.map(id=>{const target={run(){}};return{id,target,key:'run',expected:target.run};});
++    targets[9].target.run=()=>{now+=3;return {};};targets[9].expected=targets[9].target.run;
++    targets[8].target.run=()=>{now++;targets[9].target.run();now++;return null;};targets[8].expected=targets[8].target.run;
++    targets[parent].target.run=()=>{now++;targets[parent===4?8:9].target.run();now++;return true;};targets[parent].expected=targets[parent].target.run;
++    const core=new EffectCallProfile(targets,{now:()=>now,phase:()=> 'main'});core.beginFrame(0);assert.equal(targets[parent].target.run(),true);const frame=core.endFrame();core.dispose();
++    const row=index=>frame.rows.find(r=>r.id===EFFECT_IDS[index]&&r.phase==='main');assert.equal(row(parent).selfSelectedMs,2);assert.equal(row(9).inclusiveMs,3);assert.equal(row(9).selfSelectedMs,3);
++    if(parent===4){assert.equal(row(8).inclusiveMs,5);assert.equal(row(8).selfSelectedMs,2);assert.equal(row(8).nullReturns,1);}else assert.equal(row(8).calls,0);
++    assert.equal(frame.errors,0);
++  }
++});
++for(const MaterialClass of[PBRMaterial,StandardMaterial])test('actual native '+MaterialClass.name+' dirty/cache reuse, six-frame stage and inherited engine API',async()=>{
++  const f=fixture();try{f.scene.texturesEnabled=false;f.mesh.material.dispose();const material=new MaterialClass('native startup receiver',f.scene);f.mesh.material=material;
++    const light=new HemisphericLight('native startup key',Vector3.Up(),f.scene);
++    for(let i=0;i<25;i++){f.scene.render();await new Promise(setImmediate);if(material.isReadyForSubMesh(f.mesh,f.mesh.subMeshes[0],false))break;}
++    assert.equal(material.isReadyForSubMesh(f.mesh,f.mesh.subMeshes[0],false),true);const previous=f.mesh.subMeshes[0].effect;
++    light.setEnabled(false);light.setEnabled(true);const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);
++    for(let i=0;i<6;i++){const token=probe.startupRenderBegin(options,3+i*2);assert.ok(token);f.scene.render();probe.startupRenderEnd(token,4+i*2,true);await new Promise(setImmediate);}
++    probe.startupStageSaved(options,0,20,false);probe.startupPassFinished(options,21,'complete');f.owner.dispose('startup-resolved');const p=f.owner.snapshot();probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++    const rows=p.capture.frames.flatMap(frame=>frame.rows),calls=id=>rows.filter(row=>row.id===id).reduce((n,row)=>n+row.calls,0);
++    assert.equal(p.complete,true);assert.equal(p.capture.frames.length,6);assert.equal(p.engineOrigin,'thinengine-inherited');assert.equal(p.installedRoutineHooks,10);assert.ok(calls(EFFECT_IDS[9])>0);
++    assert.equal(f.mesh.subMeshes[0].effect,previous);assert.equal(f.engine.createEffect,ThinEngine.prototype.createEffect);assert.equal(Object.hasOwn(f.engine,'createEffect'),false);assert.equal(Object.hasOwn(f.scene,'render'),false);
++    if(MaterialClass===PBRMaterial){assert.ok(calls(EFFECT_IDS[8])>0);assert.ok(rows.filter(row=>row.id===EFFECT_IDS[8]).some(row=>row.nullReturns>0));}else{assert.equal(calls(EFFECT_IDS[4]),0);assert.equal(calls(EFFECT_IDS[8]),0);assert.ok(calls(EFFECT_IDS[5])>0);}
++  }finally{f.dispose();}
++});
++test('actual WebGPU own prototype origin installs only on its concrete engine and retires without device work',()=>{
++  const f=fixture(),native=f.engine,host=Object.create(WebGPUEngine.prototype);f.scene._engine=host;f.game.engine=host;f.owner.dispose();
++  const owner=probe.createStartupStageEffects(f.game,{target:STARTUP_ROUTINE_TARGETS[0]});try{const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);assert.ok(probe.startupRenderBegin(options,3));
++    assert.ok(Object.hasOwn(host,'createEffect'));owner.dispose('owner-stopped');const p=owner.snapshot();assert.equal(p.engineOrigin,'webgpu-own');assert.equal(p.complete,false);assert.equal(p.remainingRoutineHooks,0);assert.equal(Object.hasOwn(host,'createEffect'),false);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++  }finally{owner.dispose();f.scene._engine=native;f.game.engine=native;f.dispose();}
++});
++test('foreign engine descriptor is preserved and prevents instrumentation before prototype writes',()=>{
++  const f=fixture(),native=PBRBaseMaterial.prototype._prepareEffect,foreign=()=>{};try{f.engine.createEffect=foreign;const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);
++    assert.equal(probe.startupRenderBegin(options,3),null);assert.equal(PBRBaseMaterial.prototype._prepareEffect,native);assert.equal(f.engine.createEffect,foreign);f.owner.dispose();const p=f.owner.snapshot();assert.ok(p.errors>0);assert.equal(p.remainingRoutineHooks,0);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++  }finally{delete f.engine.createEffect;f.dispose();}
++});
++test('native engine descriptor drift during selected stage stops capture and never clobbers the replacement',()=>{
++  const f=fixture(),foreign=function(){return Reflect.apply(ThinEngine.prototype.createEffect,this,arguments);};try{const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);
++    const token=probe.startupRenderBegin(options,3);f.scene.render();probe.startupRenderEnd(token,4,true);f.engine.createEffect=foreign;assert.equal(probe.startupRenderBegin(options,5),null);assert.equal(f.engine.createEffect,foreign);
++    probe.startupStageSaved(options,0,6,false);probe.startupPassFinished(options,7,'complete');f.owner.dispose('startup-resolved');const p=f.owner.snapshot();assert.equal(p.complete,false);assert.ok(p.restoreConflicts>0);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++  }finally{delete f.engine.createEffect;f.dispose();}
++});
++test('invalid native frame ID remains explicit partial without adding or repairing native work',()=>{
++  const f=fixture();try{const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);const token=probe.startupRenderBegin(options,3);
++    f.scene.onAfterRenderObservable.addOnce(()=>{f.scene._frameId=NaN;});f.scene.render();probe.startupRenderEnd(token,4,true);f.owner.dispose();const p=f.owner.snapshot();assert.equal(p.capture.frames[0].nativeFrameIdAfter,null);assert.equal(p.complete,false);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++  }finally{f.dispose();}
++});
++test('new schema rejects origin/target/null/row/call tamper and inherited serialization accessors',async()=>{
++  const f=fixture();try{await run(f);f.owner.dispose('startup-resolved');const p=f.owner.snapshot();for(const change of[q=>q.engineOrigin=null,q=>q.targets.pop(),q=>q.installedRoutineHooks=0,q=>q.capture.frames[0].rows[0].nullReturns=-1,q=>q.capture.frames[0].rows[0].nullReturns=100001,q=>{for(const row of q.capture.frames[0].rows)row.calls=100000;},q=>q.effectScope.engine='cache hit',q=>q.targets[8]='arbitrary']){const q=structuredClone(p);change(q);assert.throws(()=>probe.validateStartupStageEffects(q,STARTUP_ROUTINE_TARGETS[0]));}
++    let reads=0;const inherited=Object.create({get toJSON(){reads++;throw Error('inherited serialization getter');}},Object.getOwnPropertyDescriptors(p));assert.throws(()=>probe.validateStartupStageEffects(inherited,STARTUP_ROUTINE_TARGETS[0]));assert.equal(reads,0);
++  }finally{f.dispose();}
++});
++test('disposed owner and retained engine/prototype wrappers release Game, Scene and engine',async()=>{
++  assert.equal(typeof global.gc,'function','targeted command must enable the explicit GC check');
++  let retained;
++  function allocate(){const f=fixture(),options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);const token=probe.startupRenderBegin(options,3);
++    retained={owner:f.owner,engineWrapper:f.engine.createEffect,prototypeWrapper:PBRBaseMaterial.prototype._prepareEffect,token,game:new WeakRef(f.game),scene:new WeakRef(f.scene),engine:new WeakRef(f.engine)};
++    f.dispose();return retained;}
++  allocate();await new Promise(setImmediate);
++  for(let i=0;i<24;i++){global.gc();await new Promise(resolve=>setTimeout(resolve,0));}
++  assert.equal(retained.game.deref()===undefined,true,'retired Game collected');assert.equal(retained.scene.deref()===undefined,true,'retired Scene collected');assert.equal(retained.engine.deref()===undefined,true,'retired engine collected');assert.equal(retained.owner.snapshot().remainingRoutineHooks,0);
++  probe.startupRenderEnd(retained.token,4,true);assert.equal(retained.token.state,null);
++});
++test('borrowed core depth/call/clock caps preserve every original call and original falsy throws',()=>{
++  const make=()=>EFFECT_IDS.map(id=>{const target={run(){}};return{id,target,key:'run',expected:target.run};});
++  const deep=make();let originals=0;deep[8].target.run=function(depth){originals++;if(depth)this.run(depth-1);return 7;};deep[8].expected=deep[8].target.run;
++  const core=new EffectCallProfile(deep,{now:()=>0});core.beginFrame(0);assert.equal(deep[8].target.run(40),7);const f=core.endFrame();core.dispose();assert.equal(originals,41);assert.ok(f.depthSkipped>0);
++  const many=make();originals=0;many[5].target.run=()=>++originals;many[5].expected=many[5].target.run;const capped=new EffectCallProfile(many,{now:()=>0});capped.beginFrame(0);
++  for(let i=0;i<100001;i++)many[5].target.run();const g=capped.endFrame();capped.dispose();assert.equal(originals,100001);assert.equal(g.callsSkipped,1);
++  for(const thrown of[undefined,null,false,0,'']){const ts=make();let calls=0;ts[8].target.run=()=>{calls++;throw thrown;};ts[8].expected=ts[8].target.run;const p=new EffectCallProfile(ts,{now(){throw 0;}});p.beginFrame(0);assert.throws(()=>ts[8].target.run(),error=>error===thrown);const h=p.endFrame();p.dispose();assert.equal(calls,1);assert.ok(h.errors>0);}
++});
++test('phase and renderer registration overflow remain explicit partial and detach every subscription',()=>{
++  const f=fixture(),renderers=[];try{for(let i=0;i<65;i++)renderers.push(new ObjectRenderer('bounded CPU renderer'+i,f.scene));const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);
++    const token=probe.startupRenderBegin(options,3);assert.ok(token);for(let i=0;i<129;i++)f.scene.onBeforeDrawPhaseObservable.notifyObservers(f.scene);
++    f.scene.render();probe.startupRenderEnd(token,4,true);f.owner.dispose();const p=f.owner.snapshot();assert.equal(p.complete,false);assert.ok(p.errors>0);assert.equal(p.remainingRoutineHooks,0);
++    for(const renderer of renderers)assert.equal(renderer.onInitRenderingObservable.observers.filter(observer=>!observer._willBeUnregistered).length,0);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++  }finally{for(const renderer of renderers)renderer.dispose();f.dispose();}
++});
++test('actual harness transform function seals separate off/old8/new10 source bytes without layering',async()=>{
++  const text=await readFile(new URL('./harness.mjs',import.meta.url),'utf8'),tree=ts.createSourceFile('harness.mjs',text,ts.ScriptTarget.Latest,true),fn=tree.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='transformedInputs');
++  const common=await import('./common.mjs'),fnSource=fn.getText(tree);
++  const transform=new Function('transformUI','transformLoading','transformStartupSource','transformStartupEffectSource','sha256',fnSource+';return transformedInputs;')(common.transformUI,common.transformLoading,common.transformStartupSource,common.transformStartupEffectSource,sha256);
++  const ui=await readFile(new URL('../../../../../client/ui.tsx',import.meta.url),'utf8'),css=await readFile(new URL('../../../../../client/style.css',import.meta.url),'utf8');
++  for(const[oldTarget,newTarget]of[[null,null],[STARTUP_ROUTINE_TARGETS[0],null],[null,STARTUP_ROUTINE_TARGETS[0]]]){const out=transform(ui,css,'original',gameSource,source,oldTarget,newTarget);
++    assert.equal(out.transforms.startupRoutines.target,oldTarget);assert.equal(out.transforms.startupEffectRoutines.target,newTarget);
++    const expected=oldTarget?'startup-routines':newTarget?'startup-effects':null;for(const[kind,result,original]of[['game',out.game,gameSource],['light',out.light,source]]){
++      if(expected){assert.equal(result.split('virtual:webgpu-completion-'+expected).length,2);assert.equal(result.includes('virtual:webgpu-completion-'+(oldTarget?'startup-effects':'startup-routines')),false);}else assert.equal(result,original);
++      assert.equal(sha256(result),out.transforms[newTarget?'startupEffectRoutines':'startupRoutines'][kind].after);
++    }
++  }
++  assert.match(text,/'@babylonjs\/core\/Engines\/thinEngine\.pure\.js'/);assert.match(text,/if\(id==='virtual:webgpu-completion-startup-effects'\)/);
++});
++test('late engine installation failure rolls back all nine prior targets and preserves the original falsy error',()=>{
++  const f=fixture(),nativeEngine=f.engine,nativePrepare=PBRBaseMaterial.prototype._prepareEffect,nativeScene=f.scene.getActiveMeshCandidates;f.owner.dispose();
++  const proxy=new Proxy(nativeEngine,{defineProperty(_target,key){if(key==='createEffect')throw false;throw Error('unexpected mutation');}});f.game.engine=proxy;f.scene._engine=proxy;
++  const owner=probe.createStartupStageEffects(f.game,{target:STARTUP_ROUTINE_TARGETS[0]});try{const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);
++    assert.equal(probe.startupRenderBegin(options,3),null);assert.equal(PBRBaseMaterial.prototype._prepareEffect,nativePrepare);assert.equal(f.scene.getActiveMeshCandidates,nativeScene);assert.equal(Object.hasOwn(nativeEngine,'createEffect'),false);
++    owner.dispose();const p=owner.snapshot();assert.equal(p.remainingRoutineHooks,0);assert.equal(p.installedRoutineHooks,0);assert.ok(p.errors>0);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++  }finally{owner.dispose();f.game.engine=nativeEngine;f.scene._engine=nativeEngine;f.dispose();}
++});
++test('between-render passthrough performs no diagnostic clock reads; retired wrappers only call the original',()=>{
++  const f=fixture();f.owner.dispose();let reads=0;const owner=probe.createStartupStageEffects(f.game,{target:STARTUP_ROUTINE_TARGETS[0],profileNow:()=>++reads});
++  try{const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);const token=probe.startupRenderBegin(options,3);f.scene.render();probe.startupRenderEnd(token,4,true);
++    const measured=reads;f.scene.render();assert.equal(reads,measured);const stale=f.engine.createEffect;owner.dispose();const before=reads;
++    const effect={_refCount:1,isReady:()=>true},host={_compiledEffects:{'v+f@':effect},_getGlobalDefines:()=>''};assert.equal(Reflect.apply(stale,host,[{vertex:'v',fragment:'f'},{attributes:[],defines:''},host]),effect);assert.equal(effect._refCount,2);assert.equal(reads,before);
++  }finally{owner.dispose();f.dispose();}
++});
++test('actual Game/light exact transforms parse, preserve original call points and reject reinjection/drift',()=>{
++  for(const kind of['game','light']){const raw=kind==='game'?gameSource:source,out=transformStartupSource(raw,kind,STARTUP_ROUTINE_TARGETS[0]);
++    assert.equal(ts.createSourceFile(kind+'.ts',out,ts.ScriptTarget.Latest,true).parseDiagnostics.length,0);assert.throws(()=>transformStartupSource(out,kind,STARTUP_ROUTINE_TARGETS[0]));}
++  assert.throws(()=>transformStartupSource(source.replace('stageStarted = options.now();','stageStarted = Date.now();'),'light',STARTUP_ROUTINE_TARGETS[0]));
++  assert.throws(()=>transformStartupSource(gameSource.replace('return prepareLightVariants({','return foreignVariants({'),'game',STARTUP_ROUTINE_TARGETS[0]));
++  assert.equal((transformStartupSource(source,'light',STARTUP_ROUTINE_TARGETS[0]).match(/new Promise\(/g)||[]).length,(source.match(/new Promise\(/g)||[]).length);
++});
++test('canonical closed target lives in sealed transforms and explicit parser cannot be query/unknown/duplicate',()=>{
++  assert.deepEqual(STARTUP_ROUTINE_TARGETS,probe.STARTUP_TARGETS);
++  assert.equal(parseBuildOptions([]).startupEffectRoutines,null);
++  for(const target of STARTUP_ROUTINE_TARGETS)assert.equal(parseBuildOptions(['--startup-effect-routines',target]).startupEffectRoutines,target);
++  for(const args of[['--startup-effect-routines'],['--startup-effect-routines','unknown'],['--startup-effect-routines',STARTUP_ROUTINE_TARGETS[0],'--startup-effect-routines',STARTUP_ROUTINE_TARGETS[0]]])assert.throws(()=>parseBuildOptions(args));
++  const seed={sourceSnapshotId:'source',helperSha256:'helper',label:'label',loading:'original',transforms:{startupEffectRoutines:{target:null}},clock:null,weather:null,startupLatency:false,shaderAttribution:false,routineCost:false,bufferLifecycle:false,lifecycleControls:false,dependencies:{}};
++  const changed={...seed,transforms:{startupEffectRoutines:{target:STARTUP_ROUTINE_TARGETS[0]}}};assert.notEqual(buildDigest(seed),buildDigest(changed));assert.equal(browserBuildIdentity(changed).startupEffectRoutines,STARTUP_ROUTINE_TARGETS[0]);
++  assert.throws(()=>buildDigest({...seed,transforms:{startupEffectRoutines:{target:'arbitrary'}}}));assert.throws(()=>buildDigest({...seed,transforms:{startupEffectRoutines:{}}}));
++  const id={...changed,sourceSnapshotId:'s',startupEffectRoutines:STARTUP_ROUTINE_TARGETS[0]};verifyBuildContract(id,{snapshotId:'s'});
++  const missing={...id};delete missing.startupEffectRoutines;assert.throws(()=>verifyBuildContract(missing,{snapshotId:'s'}));assert.throws(()=>verifyBuildContract({...id,startupEffectRoutines:STARTUP_ROUTINE_TARGETS[1]},{snapshotId:'s'}));
++});
++test('actual original state machine + native GLSL Scene give exact boundaries and fewer-than8 valid routine frames',async()=>{
++  const f=fixture();try{assert.equal(f.engine.isWebGPU,false,'Null GLSL is not hardware/WebGPU evidence');const {result}=await run(f);f.owner.dispose('startup-resolved');
++    const raw=f.owner.snapshot();assert.equal(raw.complete,true);assert.equal(raw.capture.complete,true);assert.equal(raw.stages.length,19);assert.equal(raw.capture.frames.length,3);assert.equal(raw.remainingRoutineHooks,0);
++    assert.equal(raw.passes[0].quality,'medium');for(const r of raw.stages)assert.equal(r.endedAtMs-r.startedAtMs,result.stages[r.index].elapsedMs);
++    assert.ok(raw.capture.frames.every(r=>r.nativeFrameIdAfter===r.frameId+1&&r.rows.length===40));assert.ok(raw.capture.frames.some(f=>f.rows.some(r=>r.id==='Scene._activeMesh'&&r.calls>0)));
++    probe.validateStartupStageEffects(raw,STARTUP_ROUTINE_TARGETS[0]);assert.equal(Object.hasOwn(f.scene,'render'),false);
++  }finally{f.dispose();}
++});
++test('both day targets use actual original stages and exact first quality occurrence',async()=>{
++  for(const[target,quality]of[['first-low-day-1-on','low'],['first-high-day-1-on','high']]){const f=fixture(target);try{await run(f,actual,{quality});f.owner.dispose('startup-resolved');const p=f.owner.snapshot();assert.equal(p.complete,true);assert.equal(p.capture.stageIndex,17);assert.equal(p.stages[17].name,'day-1-on');assert.equal(p.capture.frames.length,3);probe.validateStartupStageEffects(p,target);}finally{f.dispose();}}
++});
++test('instrumentation preserves original now/callback counts, Promise-return callbacks and falsy render errors',async()=>{
++  for(const value of[false,0,'',undefined]){const a=fixture(null),b=fixture();try{const before=await run(a,prepareLightVariants,{throwRender:{value}}),after=await run(b,actual,{throwRender:{value}});assert.deepEqual(after.result,before.result);assert.equal(after.nowReads,before.nowReads);assert.equal(after.renders,before.renders);b.owner.dispose('startup-rejected');assert.equal(b.owner.snapshot().complete,false);}finally{a.dispose();b.dispose();}}
++  const a=fixture(null),b=fixture();try{const never=new Promise(()=>{});Object.defineProperty(never,'then',{get(){throw Error('original callback Promise must not be inspected');}});const original=await run(a,prepareLightVariants,{renderReturn:never}),observed=await run(b,actual,{renderReturn:never});assert.equal(original.nowReads,observed.nowReads);assert.equal(original.renders,observed.renders);assert.deepEqual(original.result,observed.result);}finally{a.dispose();b.dispose();}
++});
++test('unreached/partial targets and repeated Medium keep truthful pass indices/status without new budgets',async()=>{
++  const f=fixture('first-high-day-1-on');try{await run(f);f.game.quality='high';const {result}=await run(f,actual,{quality:'high',timeoutMs:100});assert.equal(result.status,'timeout');f.owner.dispose('startup-rejected');const p=f.owner.snapshot();assert.equal(p.complete,false);assert.equal(p.capture.reached,false);assert.equal(p.passes.length,2);probe.validateStartupStageEffects(p,'first-high-day-1-on');}finally{f.dispose();}
++  const b=fixture();try{await run(b);const frameIds=b.owner.snapshot().capture.frames.map(f=>f.frameId);await run(b);b.owner.dispose('startup-resolved');const p=b.owner.snapshot();assert.equal(p.passes.length,2);assert.deepEqual(p.capture.frames.map(f=>f.frameId),frameIds);assert.equal(p.capture.passIndex,0);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);}finally{b.dispose();}
++});
++test('foreign scenes pass through selected prototype hooks and abort/rejoin retire late options',()=>{
++  const f=fixture(),other=fixture(null);try{const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);const token=probe.startupRenderBegin(options,3);other.scene.render();f.scene.render();probe.startupRenderEnd(token,4,true);
++    f.game.startupAbort.abort();const old=f.owner.snapshot();assert.equal(old.active,false);assert.equal(old.remainingRoutineHooks,0);probe.startupStageSaved(options,0,8,false);assert.deepEqual(f.owner.snapshot(),old);
++    const fresh=probe.createStartupStageEffects(f.game,{target:STARTUP_ROUTINE_TARGETS[0]});assert.equal(fresh.snapshot().active,false,'aborted identity cannot restart');fresh.dispose();
++  }finally{f.dispose();other.dispose();}
++});
++test('frame cap and foreign descriptor restoration are explicit without consuming original operations',()=>{
++  const f=fixture();try{const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);
++    for(let i=0;i<9;i++){const t=probe.startupRenderBegin(options,3+i*2);f.scene.render();if(t)probe.startupRenderEnd(t,4+i*2,true);}
++    probe.startupStageSaved(options,0,30,false);probe.startupPassFinished(options,31,'complete');f.owner.dispose('startup-resolved');const p=f.owner.snapshot();assert.equal(p.capture.frames.length,8);assert.equal(p.capture.capped,true);assert.equal(p.complete,false);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++  }finally{f.dispose();}
++  const b=fixture();let foreign;try{const options={};probe.registerStartupOptions(b.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);const t=probe.startupRenderBegin(options,3);
++    const own=Object.getOwnPropertyDescriptor(b.scene,'getActiveMeshCandidates');foreign=function(){return {data:[],length:0};};Object.defineProperty(b.scene,'getActiveMeshCandidates',{...own,value:foreign});b.scene.render();probe.startupRenderEnd(t,4,true);b.owner.dispose();assert.equal(b.scene.getActiveMeshCandidates,foreign);assert.ok(b.owner.snapshot().restoreConflicts>0);
++  }finally{b.dispose();}
++});
++test('strict startup-only receipt/schema guards reject false complete, clocks, getter rows, identity and cap tamper',async()=>{
++  const f=fixture();try{await run(f);f.owner.dispose('startup-resolved');const raw=f.owner.snapshot();const clone=()=>structuredClone(raw);
++    for(const mutate of[p=>p.capture.frames[0].endedAtMs=null,p=>p.capture.frames[0].nativeFrameIdAfter++,p=>p.stages[0].endedAtMs=null,p=>p.target='arbitrary',p=>p.limits.bytes++,p=>p.passes[0].quality='high',p=>p.capture.frames.reverse(),p=>p.capture.frames[1]=structuredClone(p.capture.frames[0]),p=>p.stages[1].name='vehicle-0']){const p=clone();mutate(p);assert.throws(()=>probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]));}
++    const getter=clone();Object.defineProperty(getter.capture.frames[0].rows[0],'calls',{get(){throw Error('getter invoked');},enumerable:true});assert.throws(()=>probe.validateStartupStageEffects(getter,STARTUP_ROUTINE_TARGETS[0]),e=>!/getter invoked/.test(e.message));
++    const identity={buildId:'b',sourceSnapshotId:'s',helperSha256:'h',lifecycleControls:false,startupEffectRoutines:STARTUP_ROUTINE_TARGETS[0]};const receipt={...identity,schemaVersion:1,attemptId:'8e9e7e15-6011-438d-96a2-53be43f17792',kind:'startup',outcome:'resolved',mode:'diagnostic',atMs:100,timeOrigin:1000,observerErrors:[],samples:[],terminal:{},startupStageEffects:raw};validateReceipt(receipt,identity);assert.throws(()=>validateReceipt({...receipt,kind:'state'},identity));assert.throws(()=>validateReceipt({...receipt,startupEffectRoutines:null},identity));assert.ok(Buffer.byteLength(JSON.stringify(receipt))<2*1024*1024);assert.ok(Buffer.byteLength(JSON.stringify(raw))<probe.STARTUP_LIMITS.bytes);
++  }finally{f.dispose();}
++});
++test('current pack contains41 exact inputs and keeps old routine/core byteidentical',async()=>{
++  const path=new URL('.',import.meta.url),id=await helperIdentity(path.pathname.slice(1));assert.equal(Object.keys(id.files).length,41);
++  for(const file of['routine-cost.mjs','routine-cost-core.mjs'])assert.deepEqual(await readFile(new URL(file,import.meta.url)),await readFile(new URL('../../../startup-stage-export/helper/v17/'+file,import.meta.url)));
++});
++test('16pass/304stage cap keeps bounded truthful prefix and never substitutes original options',()=>{
++  const f=fixture();try{let at=0;
++    for(let p=0;p<17;p++){const o={};assert.equal(probe.registerStartupOptions(f.game,o),o);probe.startupPassStarted(o,++at);
++      for(let i=0;i<19;i++){const name=['vehicle-0','vehicle-1','vehicle-2','vehicle-keyed-0','vehicle-keyed-1','vehicle-keyed-2','current-off','current-on','night-0-off','night-0-on','night-1-off','night-1-on','night-2-off','night-2-on','day-0-off','day-0-on','day-1-off','day-1-on','restore'][i];probe.startupStageStarted(o,i,name,++at);probe.startupStageSaved(o,i,++at,false);}
++      probe.startupPassFinished(o,++at,'complete');}
++    f.owner.dispose('startup-resolved');const p=f.owner.snapshot();assert.equal(p.passCount,17);assert.equal(p.passes.length,16);assert.equal(p.stages.length,304);assert.equal(p.overflow,true);assert.equal(p.complete,false);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);assert.ok(Buffer.byteLength(JSON.stringify(p))<probe.STARTUP_LIMITS.bytes);
++  }finally{f.dispose();}
++});
++test('sameScene recursion and options reentry preserve original native work but cannot become complete',()=>{
++  const f=fixture();try{const o={};probe.registerStartupOptions(f.game,o);probe.startupPassStarted(o,1);probe.startupStageStarted(o,0,'vehicle-0',2);const t=probe.startupRenderBegin(o,3);
++    const reentrant={};assert.equal(probe.registerStartupOptions(f.game,reentrant),reentrant);let entered=false;const obs=f.scene.onBeforeRenderObservable.add(()=>{if(!entered){entered=true;f.scene.render();}});f.scene.render();f.scene.onBeforeRenderObservable.remove(obs);probe.startupRenderEnd(t,4,true);
++    probe.startupStageSaved(o,0,5,false);probe.startupPassFinished(o,6,'complete');f.owner.dispose('startup-resolved');const p=f.owner.snapshot();assert.equal(entered,true);assert.equal(p.capture.frames[0].nativeFrameIdAfter,p.capture.frames[0].frameId+2);assert.equal(p.complete,false);assert.ok(p.errors>0);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++  }finally{f.dispose();}
++});
++test('owner retirement during native render and fresh sameGame generation reject late source callbacks',()=>{
++  const f=fixture();try{const o={};probe.registerStartupOptions(f.game,o);probe.startupPassStarted(o,1);probe.startupStageStarted(o,0,'vehicle-0',2);const t=probe.startupRenderBegin(o,3);f.owner.dispose();
++    const old=f.owner.snapshot();f.game.renderHealth.generation++;f.game.startupAbort=new AbortController();const fresh=probe.createStartupStageEffects(f.game,{target:STARTUP_ROUTINE_TARGETS[0]});
++    probe.startupRenderEnd(t,4,true);probe.startupStageSaved(o,0,5,false);assert.deepEqual(f.owner.snapshot(),old);assert.equal(fresh.snapshot().active,true);fresh.dispose();assert.equal(fresh.snapshot().remainingRoutineHooks,0);
++  }finally{f.dispose();}
++});
++test('descriptor preflight failure is atomic, getters stay uncalled and later calls do not retry instrumentation',()=>{
++  const f=fixture();const before=Object.getOwnPropertyDescriptor(f.scene,'getActiveMeshCandidates');let reads=0;const primary=false;
++  try{Object.defineProperty(f.scene,'getActiveMeshCandidates',{configurable:true,get(){reads++;throw primary;}});const o={};probe.registerStartupOptions(f.game,o);probe.startupPassStarted(o,1);probe.startupStageStarted(o,0,'vehicle-0',2);
++    assert.equal(probe.startupRenderBegin(o,3),null);assert.equal(reads,0);const errors=f.owner.snapshot().errors;assert.equal(probe.startupRenderBegin(o,4),null);assert.equal(f.owner.snapshot().errors,errors);assert.throws(()=>f.scene.render(),e=>e===primary);
++    f.owner.dispose();const p=f.owner.snapshot();assert.equal(p.remainingRoutineHooks,0);assert.ok(p.errors>0);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++  }finally{if(before)Object.defineProperty(f.scene,'getActiveMeshCandidates',before);else delete f.scene.getActiveMeshCandidates;f.dispose();}
++});
++test('cross-pass clock rollback retires only diagnostic state and retains a valid partial prefix',()=>{
++  const f=fixture();try{const a={},b={};probe.registerStartupOptions(f.game,a);probe.startupPassStarted(a,10);probe.startupStageStarted(a,0,'vehicle-0',11);probe.startupStageSaved(a,0,12,false);probe.startupPassFinished(a,13,'complete');
++    assert.equal(probe.registerStartupOptions(f.game,b),b);probe.startupPassStarted(b,9);const p=f.owner.snapshot();assert.equal(p.reason,'observer-error');assert.equal(p.active,false);assert.equal(p.passes[1].startedAtMs,null);assert.equal(p.complete,false);assert.equal(f.game.disposed,false);assert.equal(f.game.ready,false);probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);
++  }finally{f.dispose();}
++});
++async function overlayFixtureV19(clockSpecification=null){
++  // Reuse the complete pre-existing DOM/transport fixture body; only inject
++  // the new diagnostic binding/flag. Never import its test registration.
++  const file=await readFile(new URL('./preparation-summary.test.mjs',import.meta.url),'utf8'),ast=ts.createSourceFile('fixture.mjs',file,ts.ScriptTarget.Latest,true);
++  let body=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='overlayFixture').getText(ast);
++  for(const[from,to]of[['observeOperation, observePreparationResult, createAttemptQueue','createStartupStageEffects, observeOperation, observePreparationResult, createAttemptQueue'],['startupLatency: false, bufferLifecycle:','startupEffectRoutines: "first-medium-vehicle-0", startupLatency: false, bufferLifecycle:'],["projectShaderInventory() { throw Error('default-off shader inventory'); }",'projectShaderInventory'],['clock: null };','clock: clockSpecification };']]){assert.equal(body.split(from).length,2);body=body.replace(from,to);}
++  const modules=await Promise.all(['startup-observer','attempt-queue','browser-clock','transit-clock','startup-latency','buffer-lifecycle','lifecycle-controls','shader-attribution'].map(name=>import('./'+name+'.mjs')));
++  const dependencies={readFile,join,directory:dirname(fileURLToPath(import.meta.url)),webcrypto,sha256,clockSpecification,createStartupStageEffects:probe.createStartupStageEffects,
++    observeOperation:modules[0].observeOperation,observePreparationResult:modules[0].observePreparationResult,createAttemptQueue:modules[1].createAttemptQueue,installBrowserClock:modules[2].installBrowserClock,createPlannedBenchmark:modules[3].createPlannedBenchmark,
++    observeStartupLatency:modules[4].observeStartupLatency,observeBufferLifecycle:modules[5].observeBufferLifecycle,createLifecycleControls:modules[6].createLifecycleControls,createVisibilityAnchor:modules[6].createVisibilityAnchor,projectShaderInventory:modules[7].projectShaderInventory};
++  return new Function(...Object.keys(dependencies),body+';return overlayFixture;')(...Object.values(dependencies))();
++}
++test('actual overlay exports the startup trace once before UI continuation and original stage summary stays present',async()=>{
++  const overlay=await overlayFixtureV19();
++  const f=fixture(null);try{Object.assign(f.game,{avatars:new Map(),adaptive:{state:{}},gpu:{},renderErrorCount:0,assetLoadErrorCount:0,compilationProfile:{snapshot:()=>({active:true,metrics:{}})}});
++    f.game.renderHealth.snapshot=()=>({phase:f.game.ready?'ready':'preparing',valid:f.game.ready,rendererId:1,generation:1,errorCount:0,pendingOperations:0});
++    f.game.prepareLighting=async()=>{const value=await run(f);return{...value.result,qualities:[{quality:'medium',finalPass:true,status:'complete',elapsedMs:value.result.elapsedMs,activeElapsedMs:value.result.activeElapsedMs,pausedMs:0,failureStep:null,stageCount:19}],stages:value.result.stages.map(s=>({...s,passQuality:'medium'}))};};
++    const result=await overlay.observeStartup(f.game,{dataset:{}},async()=>{await f.game.prepareLighting();f.game.ready=true;return 42;});overlay.events.push('UI-continuation');assert.equal(result,42);
++    const raw=overlay.raw();assert.equal(raw.mode,'diagnostic');assert.equal(raw.startupEffectRoutines,STARTUP_ROUTINE_TARGETS[0]);assert.equal(raw.startupStageEffects.complete,true);assert.equal(raw.preparationStages.capturedCount,19);assert.equal(raw.startupStageEffects.remainingRoutineHooks,0);assert.equal(overlay.intervals.size,0);
++    assert.ok(overlay.events.indexOf('terminal-raw')<overlay.events.indexOf('UI-continuation'));assert.ok(raw.samples.every(s=>!Object.hasOwn(s,'startupStageEffects')));
++    for(let i=0;i<100&&overlay.requests.length===0;i++)await new Promise(setImmediate);assert.equal(overlay.requests.length,1);
++    const without={...raw};delete without.startupStageEffects;assert.throws(()=>validateReceipt(without,raw),'active resolved startup requires its existing profile');
++  }finally{f.dispose();}
++});
++test('actual pre-owner clock refusals retain original rejected raw without fabricating an optional profile',async()=>{
++  for(const mode of['guest','expired']){const clock={config:{schemaVersion:1,scenarioEpochUTC:0,armAtUTC:mode==='expired'?0:Date.now()+60000},configId:'clock-fixture',configSha256:'clock-bytes',simulationSourceSha256:'simulation'};
++    const overlay=await overlayFixtureV19(clock),f=fixture(null);let starts=0,primary;
++    try{Object.assign(f.game,{network:mode!=='guest',camera:f.scene.activeCamera,trafficInstant:()=>0,avatars:new Map(),adaptive:{state:{}},gpu:{},renderErrorCount:0,assetLoadErrorCount:0,compilationProfile:{snapshot:()=>({active:true,metrics:{}})}});
++      f.game.renderHealth.snapshot=()=>({phase:'preparing',valid:false,rendererId:1,generation:1,errorCount:0,pendingOperations:0});
++      await assert.rejects(overlay.observeStartup(f.game,{dataset:{}},()=>{starts++;}),error=>{primary=error;return mode==='guest'?/guest start refused/.test(error.message):/after static arm deadline/.test(error.message);});
++      const raw=overlay.raw();assert.equal(starts,0);assert.equal(raw.outcome,'rejected');assert.equal(raw.error.message,primary.message);assert.equal(Object.hasOwn(raw,'startupStageEffects'),false);assert.deepEqual(raw.observerErrors,[]);validateReceipt(raw,raw);
++      assert.throws(()=>validateReceipt({...raw,startupStageEffects:null},raw));assert.throws(()=>validateReceipt({...raw,startupStageEffects:{}},raw));
++      for(let i=0;i<100&&overlay.requests.length===0;i++)await new Promise(setImmediate);assert.equal(overlay.requests.length,1);assert.equal(overlay.requests[0].outcome,'rejected');
++    }finally{f.dispose();}
++  }
++});
++test('pipeline action closed envelope admits only the already validated startup target, null and active',()=>{
++  for(const target of[null,STARTUP_ROUTINE_TARGETS[0]]){const identity={buildId:'b',sourceSnapshotId:'s',helperSha256:'h',lifecycleControls:false,routineCost:true,startupEffectRoutines:target};
++    const raw={...identity,schemaVersion:1,attemptId:'8e9e7e15-6011-438d-96a2-53be43f17792',kind:'pipeline-inputs',mode:'diagnostic',atMs:1,timeOrigin:0,observerErrors:[],completed:false,before:{},after:{},pipelineInputs:null,failure:{message:'original refusal'},validationErrors:['refused']};
++    assert.equal(validateReceipt(raw,identity),raw);assert.throws(()=>validateReceipt({...raw,arbitraryField:true},identity));assert.throws(()=>validateReceipt({...raw,startupEffectRoutines:target===null?STARTUP_ROUTINE_TARGETS[0]:null},identity));assert.throws(()=>validateReceipt({...raw,startupEffectRoutines:{}},identity));
++  }
++});
++test('second native RTT observer add failure rolls back the first own observer and preserves notifications/render',async()=>{
++  const f=fixture(),renderer=new ObjectRenderer('CPU rollback',f.scene),events=[];
++  const initBefore=renderer.onInitRenderingObservable.add(()=>events.push('init-original')),finishBefore=renderer.onFinishRenderingObservable.add(()=>events.push('finish-original'));
++  const countBefore=renderer.onInitRenderingObservable.observers.length,original=Object.getOwnPropertyDescriptor(renderer.onFinishRenderingObservable,'add');
++  try{Object.defineProperty(renderer.onFinishRenderingObservable,'add',{configurable:true,writable:true,value(){throw false;}});
++    const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);assert.equal(probe.startupRenderBegin(options,3),null);
++    assert.equal(renderer.onInitRenderingObservable.observers.filter(o=>!o._willBeUnregistered).length,countBefore,'no active orphan init observer after failed second add');assert.equal(f.owner.snapshot().remainingRoutineHooks,0);
++    renderer.onInitRenderingObservable.notifyObservers(renderer);renderer.onFinishRenderingObservable.notifyObservers(renderer);assert.deepEqual(events,['init-original','finish-original']);const before=f.scene._frameId;f.scene.render();assert.equal(f.scene._frameId,before+1);
++    await new Promise(resolve=>setTimeout(resolve,0));assert.equal(renderer.onInitRenderingObservable.observers.length,countBefore,'original native deferred removal finished');
++  }finally{if(original)Object.defineProperty(renderer.onFinishRenderingObservable,'add',original);else delete renderer.onFinishRenderingObservable.add;initBefore.remove();finishBefore.remove();renderer.dispose();f.dispose();}
++});
++test('actual transformed Game callsite executes its original options literal and registration, without manual registration',async()=>{
++  for(const transformedGame of[true,false]){const f=fixture(),engineFlag=Object.getOwnPropertyDescriptor(f.engine,'isWebGPU');let tick,clock=1000,done=false,result,failure,captured,renders=0,authoredDisposed=0;
++    try{f.game.flashlight={};f.game.compilationProfile={setStage(){}};f.game.startupPreparationCoverage=()=>'';
++      // Technical routing seam only while the real Game options literal is
++      // built. Restore native NullEngine/GLSL before any actual Scene.render.
++      Object.defineProperty(f.engine,'isWebGPU',{configurable:true,value:true});
++      const render=()=>{assert.equal(f.engine.isWebGPU,false);renders++;f.scene.render();};
++      const prepare=options=>{captured=options;assert.equal(options.includeVehicleVariants,true);assert.equal(options.includeDayPointVariants,true);assert.equal(options.render,render);assert.equal(options.revisionKeys.length,14);assert.match(options.apply.toString(),/setStage/);assert.match(options.check.toString(),/isMeshReadyForCamera/);
++        if(engineFlag)Object.defineProperty(f.engine,'isWebGPU',engineFlag);else delete f.engine.isWebGPU;assert.equal(f.engine.isWebGPU,false);
++        Object.assign(options,{apply(){},restore(){},meshes:()=>[],check:()=>true,effectsReady:()=>true,run:callback=>{tick=callback;},stop:callback=>assert.equal(callback,tick),isVisible:()=>true,onVisibilityChange:()=>()=>{},now:()=>clock,setTimer:()=>1,clearTimer(){}});
++        return actual(options);};
++      const text=transformedGame?transformStartupSource(gameSource,'game',STARTUP_ROUTINE_TARGETS[0]):gameSource;
++      const ast=ts.createSourceFile('game.ts',text,ts.ScriptTarget.Latest,true),klass=ast.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='Game'),method=klass.members.find(n=>n.name?.getText(ast)==='prepareLightingVariants').getText(ast);
++      const js=ts.transpileModule('class ActualGameMethod{'+method+'}',{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
++      const invoke=new Function('registerStartupOptions','prepareLightVariants','selectLightingPreview','AuthoredLightPreparation',js+';return ActualGameMethod.prototype.prepareLightingVariants;')(probe.registerStartupOptions,prepare,()=>({instant:1}),class{dispose(){authoredDisposed++;}});
++      const operation=invoke.call(f.game,render);operation.then(value=>{result=value;done=true;},error=>{failure=error;done=true;});
++      for(let i=0;i<1000&&!done;i++){clock+=10;tick();await flush();}if(failure)throw failure;assert.equal(done,true);assert.equal(result.status,'complete');assert.equal(result.stages.length,19);assert.ok(captured);assert.equal(renders,57);assert.equal(authoredDisposed,1);
++      f.owner.dispose('startup-resolved');const p=f.owner.snapshot();if(transformedGame){assert.equal(p.complete,true);assert.equal(p.passes.length,1);assert.equal(p.stages.length,19);assert.equal(p.capture.frames.length,3);assert.equal(p.passes[0].quality,'medium');probe.validateStartupStageEffects(p,STARTUP_ROUTINE_TARGETS[0]);}
++      else{assert.equal(p.passes.length,0);assert.equal(p.stages.length,0);assert.equal(p.capture.frames.length,0);assert.equal(p.complete,false,'untransformed callsite cannot accidentally receive manual registration');}
++    }finally{if(engineFlag)Object.defineProperty(f.engine,'isWebGPU',engineFlag);else delete f.engine.isWebGPU;f.dispose();}
++  }
++});
+diff --git a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/README.md b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/README.md
+index f1fec1b2..6aaf6e15 100644
+--- a/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v20/README.md
++++ b/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v21/README.md
+@@ -1,3 +1,17 @@
++# V21: startup stage effect split
++
++New explicit `--startup-effect-routines TARGET` defaults to null/off and accepts only `first-medium-vehicle-0`, `first-low-day-1-on`, or `first-high-day-1-on`. It is mutually exclusive with legacy `--startup-routines`; CLI, canonical transforms, browser/build seal and receipts enforce this. The immutable V18–V20 packs and legacy eight-target module/core/actions remain unchanged. This new pack has41 sealed inputs, including tests.
++
++Exact Game/light source transforms reuse the original options object and already-read pass/stage/render clocks. Only the selected stage installs one shared ten-target stack: the original eight routines plus PBR._prepareEffect and the concrete engine instance's native createEffect. There is no Scene.render wrapper. Both native WebGPUEngine own and inherited ThinEngine origins are checked. PBR and direct Standard readiness ancestry can reach the engine row; foreign scenes/material branches are passthrough. The output does not inspect cache keys, claim hit/miss, or explain Standard internals with PBR spans.
++
++The distinct startup-only raw field is `startupStageEffects`. It contains fixed targets, phase rows with nullReturns/inclusiveMs/selfSelectedMs, original boundaries, renderer/generation, origin, installation/cleanup and partial/cap evidence. Limits remain16passes/304stages/8selected original renders/256KiB and the enclosing receipt remains2MiB. A genuinely ended stage with six valid frames can be complete; this is not the eight-frame entry schema. Unreached/aborted/overflow/foreign/error states remain partial. Rejected startup before observer installation omits the optional profile; a resolved enabled startup must include it.
++
++No render/readiness/GPU/original-clock/await/timer/scheduler/cache scan is added. Startup ready=false and legitimate pending preparation/shader-validation work are permitted. The existing source15 30s/90s limits, quality/coverage and scope/fence operations are preserved. These are synchronous diagnostic wall spans including observer/JIT/GC/scheduling, not GPU execution or a performance acceptance result.
++
++The ten-target core is byteexact from entry-effect-cost/helper/v19; the post-ready capture adapter is not used. The new stage adapter releases its caller-owned target transaction array immediately after constructor validation, so retained lower-core engine/PBR wrappers do not retain Game/Scene/engine. It also provides exact descriptor rollback, partial RTT registration rollback, owner/device/generation/abort guards, native frame progress, bounded phase/renderer registration and terminal scalar state.
++
++Only targeted light CPU regressions were run here. They execute the actual transformed Game options literal and original light state machine, native PBR/Standard/ThinEngine, WebGPU-origin installation without device work, nesting/null/falsy throws/Promise identity, caps, strict receipts, legacy compatibility, and retained-wrapper GC. RED and intermediate failures are preserved in the new startup-effect-v21 evidence; whole corpus/build/server/GPU remain pending with the coordinator/CAD resource window. Historical text below describes earlier packs.
++
+ # V18: startup stage routines (diagnostika)
+ 
+ Nová volba --startup-routines TARGET je výchozí null/vypnuto. Uzavřené cíle: first-medium-vehicle-0, first-low-day-1-on, first-high-day-1-on. Target je v canonical transforms.startupRoutines; browser/sidecar identity jej odvozuje a loadBuild ověřuje target i oba původní/transformed Game/light zdroje. Default-off nechává jejich bytes beze změny a nezakládá owner/hooks/čtení Game. Všechny takto aktivované běhy jsou diagnostic.

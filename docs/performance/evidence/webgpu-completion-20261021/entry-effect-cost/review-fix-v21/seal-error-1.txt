@@ -1,0 +1,6 @@
+Preserved packaging failure (not a runtime/test failure):
+Command: node .cache/webgpu-completion-20261021/entry-effect-cost/review-fix-v21/seal.mjs
+Exit: 1
+Error: ENOENT opening helper/v19/entry-effect-guard.mjs.
+Cause: initial three-way mapper used V21's42input helperIdentity closure for every version, although immutable V19 has39inputs.
+Correction: import each version's own common.mjs/helperIdentity for its unchanged sourceFiles list. No helper/runtime/test files were changed for this packaging correction.
