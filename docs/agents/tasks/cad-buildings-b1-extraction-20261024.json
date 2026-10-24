@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-b1-extraction-20261024",
+  "title": "KEY-59: převést ověřené půdorysy B1 na stavební recepturu bez kopírování CAD",
+  "status": "done",
+  "dependsOn": [
+    "cad-buildings-research-20261024"
+  ],
+  "writePaths": [
+    "scripts/cad-buildings/prepare_b01.py",
+    "scripts/cad-buildings/test_prepare_b01.py",
+    ".cache/cad-buildings-20261024/b01-preparation/",
+    "docs/reality-pack/cad-buildings/b01/preparation-audit.json",
+    "docs/agents/handoffs/cad-buildings-b1-extraction-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Ověřený lokální DXF převod rozliší stavební hrany, sloupy, dveře, okna a schodišťové značky.",
+    "Receptura používá společnou soustavu všech pěti výkresů, jedno měřítko a explicitní výškové odhady; nevytváří kopie CAD v Gitu.",
+    "Syntetické testy ověřují párování, otevřené dveře/okna a odmítnutí vadného či chybějícího vstupu. Cílený refaktoring a skutečný audit B1 patří do předání."
+  ],
+  "verification": [
+    "uv run --no-project --with ezdxf==1.4.5 --with shapely python -m unittest discover -s scripts/cad-buildings -p test_prepare_b01.py",
+    "Lokální příprava B1 a 2D overlay všech pater v .cache/cad-buildings-20261024/b01-preparation/; žádný Blender/GPU."
+  ],
+  "notes": [
+    "Specifikace _bmad-output/implementation-artifacts/cad-buildings-20261024/spec-key-59-b01.md. Přímé implementační zadání podagentovi; nespouštět vlastní BMAD.",
+    "Původní DXF pouze číst C:/Users/rezac/Downloads/strahov autocad/strahov autocad/strahov blok1. Náhledy a dočasná receptura zůstávají ignorované.",
+    "Předání exportní smlouvy koordinátorovi; nepřepisovat Blender, runtime, výstupy builderu ani společné soubory.",
+    "24.10.2026 09:26 UTC: koordinátor převzal B1 R10 po native/visual/spatial auditu a třech nezávislých review. Čerstvá příprava je geometricky i všemi daty kromě nového generatorSha256 shodná s R10;162 strict Python +28 Node fixture PASS. Přijetí stavebního modelu/jeho nástrojů není herní integrace; terrain a celé KEY-59 zůstávají otevřené. Evidence docs/reality-pack/cad-buildings/b01/."
+  ]
+}

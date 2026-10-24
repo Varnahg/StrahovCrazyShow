@@ -3,6 +3,7 @@ import rawNavigation from "./data/transit-navigation.json";
 import { groundHeight } from "./terrain";
 import { groundRotation, rotateGroundVector } from "./terrain-entities";
 import { b6EntranceHeight } from "./b6-interior";
+import { hasCadBuilding, cadB6EntranceHeight } from "./cad-buildings";
 import {commonEntranceHeight} from './landmark-reality';
 import type { Vec3, AvatarConfig } from "./types";
 
@@ -327,6 +328,11 @@ export function passengerCount(
     hour >= 15 && hour <= 23 ? 10 : hour >= 6 && hour <= 9 ? 5 : 7;
   return Math.floor(r() * (maximum + 1));
 }
+export function passengerSupportHeight(x: number, z: number, terrainY = groundHeight(x, z)) {
+  return Math.max(terrainY,
+    (hasCadBuilding("53929071") ? cadB6EntranceHeight(x, z) : b6EntranceHeight(x, z)) ?? -Infinity,
+    commonEntranceHeight(x, z) ?? -Infinity);
+}
 export function sampleWalkingPath(points: TransitPoint[], distance: number) {
   let remaining = Math.max(0, distance);
   for (let i = 1; i < points.length; i++) {
@@ -338,14 +344,7 @@ export function sampleWalkingPath(points: TransitPoint[], distance: number) {
       return {
         position: {
           x: a[0] + (b[0] - a[0]) * t,
-          y: Math.max(
-            groundHeight(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t),
-            b6EntranceHeight(
-              a[0] + (b[0] - a[0]) * t,
-              a[1] + (b[1] - a[1]) * t,
-            ) ?? -Infinity,
-            commonEntranceHeight(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t)??-Infinity,
-          ),
+          y: passengerSupportHeight(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t),
           z: a[1] + (b[1] - a[1]) * t,
         },
         yaw: Math.atan2(b[0] - a[0], b[1] - a[1]),
@@ -359,11 +358,7 @@ export function sampleWalkingPath(points: TransitPoint[], distance: number) {
   return {
     position: {
       x: b[0],
-      y: Math.max(
-        groundHeight(b[0], b[1]),
-        b6EntranceHeight(b[0], b[1]) ?? -Infinity,
-        commonEntranceHeight(b[0],b[1])??-Infinity,
-      ),
+      y: passengerSupportHeight(b[0], b[1]),
       z: b[1],
     },
     yaw: Math.atan2(b[0] - a[0], b[1] - a[1]),

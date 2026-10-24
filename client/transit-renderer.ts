@@ -10,13 +10,12 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { groundRotation } from "../shared/terrain-entities";
 import { groundHeight } from "../shared/terrain";
-import { b6EntranceHeight } from "../shared/b6-interior";
-import { commonEntranceHeight } from "../shared/landmark-reality";
 import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import "@babylonjs/core/Meshes/instancedMesh";
 import "@babylonjs/loaders/glTF";
 import {
   sampleTransit,
+  passengerSupportHeight,
   type TransitFrame,
   type TransitBus,
 } from "../shared/transit";
@@ -401,11 +400,7 @@ export class TransitRenderer {
       }
       const position = {
         ...p.position,
-        y: Math.max(
-          this.sourceGround(p.position.x, p.position.z),
-          b6EntranceHeight(p.position.x, p.position.z) ?? -Infinity,
-          commonEntranceHeight(p.position.x, p.position.z) ?? -Infinity,
-        ),
+        y: passengerSupportHeight(p.position.x, p.position.z, this.sourceGround(p.position.x, p.position.z)),
       };
       npc.rig.root.position.set(position.x, position.y, position.z);
       const eye = this.scene.activeCamera?.globalPosition ?? player;

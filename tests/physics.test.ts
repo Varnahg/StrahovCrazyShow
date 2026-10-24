@@ -10,6 +10,8 @@ import {
 } from "../shared/simulation";
 import { BOUNDS, BUILDINGS, B6_BOXES } from "../shared/world";
 import { groundHeight, groundNormal } from "../shared/terrain";
+import { CAD_TERRAIN_CUTOUTS } from "../shared/cad-buildings";
+import { legacyB6Simulation } from "./helpers/jump-animation-fixture";
 import {
   B6_LAYOUT,
   B6_ROOM_AREAS,
@@ -55,8 +57,7 @@ function nearEdge(
   margin = 1,
 ) {
   return points.some((b, i) => {
-    if (!i) return false;
-    const a = points[i - 1],
+    const a = points[(i + points.length - 1) % points.length],
       dx = b[0] - a[0],
       dz = b[1] - a[1],
       t = Math.max(
@@ -106,6 +107,11 @@ test("sampled accessible outdoor ground follows actual DEM heights without holes
         )
       )
         continue;
+      // Native basements/shafts replace DEM here; test their support in the
+      // actual CAD all-door/all-stair suite, not as hypothetical outdoor DEM.
+      if (CAD_TERRAIN_CUTOUTS.some(polygon =>
+        (contains(polygon.loops[0], x, z) && !polygon.loops.slice(1).some(hole => contains(hole, x, z))) ||
+        polygon.loops.some(loop => nearEdge(loop, x, z, CHARACTER_RADIUS + .02)))) continue;
       if (x > -13 && x < 21 && z > -97 && z < -15) continue;
       const ground = groundHeight(x, z),
         initial = { x, y: ground + 1, z };
@@ -241,11 +247,11 @@ test("terrain-relative outer barriers retain walkers and the car below the old a
   sim.dispose();
 });
 
-test("B6 exterior north twelve-step entry and first-floor route are continuously walkable without teleporting", () => {
-  const sim = new Simulation(),
+test("legacy photogrammetry B6 twelve-step entry and first-floor route are continuously walkable without teleporting", () => {
+  const sim = legacyB6Simulation(),
     a = sim.add("entrance-probe", {
       ...B6_LAYOUT.outsideSpawn,
-      y: groundHeight(B6_LAYOUT.outsideSpawn.x, B6_LAYOUT.outsideSpawn.z) + 1,
+      y: sim.surfaceHeight(B6_LAYOUT.outsideSpawn.x, B6_LAYOUT.outsideSpawn.z) + 1,
     });
   forbidFallback(a);
   settle(sim, a);
@@ -254,7 +260,7 @@ test("B6 exterior north twelve-step entry and first-floor route are continuously
     const p = a.position,
       expectedFoot =
         b6EntranceHeight(p.x, p.z) ??
-        (p.x < B6_LAYOUT.lobby.maxX && p.z < B6_LAYOUT.lobby.minZ ? groundHeight(p.x, p.z) : foundation);
+        (p.x < B6_LAYOUT.lobby.maxX && p.z < B6_LAYOUT.lobby.minZ ? sim.surfaceHeight(p.x, p.z) : foundation);
     assert.ok(
       p.y >= expectedFoot + height - 0.04,
       `unsupported entry/stair route at ${x},${z}: ${JSON.stringify(p)}`,
@@ -267,8 +273,8 @@ test("B6 exterior north twelve-step entry and first-floor route are continuously
   sim.dispose();
 });
 
-test("every catalogued B6 room has a supported doorway approach and passage into that actual room", () => {
-  const sim = new Simulation(),
+test("every legacy photogrammetry B6 room has a supported doorway approach and passage into that actual room", () => {
+  const sim = legacyB6Simulation(),
     a = sim.add("door-probe"),
     place = a.setPosition.bind(a),
     failures = [];
@@ -304,8 +310,8 @@ test("every catalogued B6 room has a supported doorway approach and passage into
   sim.dispose();
 });
 
-test("B6 catalogued room floors, basement and every stair flight remain supported at the raised foundation", () => {
-  const sim = new Simulation(),
+test("legacy photogrammetry B6 room floors, basement and every stair flight remain supported at the raised foundation", () => {
+  const sim = legacyB6Simulation(),
     a = sim.add("floor-probe"),
     place = a.setPosition.bind(a);
   forbidFallback(a);
@@ -332,8 +338,8 @@ test("B6 catalogued room floors, basement and every stair flight remain supporte
   sim.dispose();
 });
 
-test("B6 real glass collider prevents a window exit above furniture and roof stops a genuine jump", () => {
-  const sim = new Simulation(),
+test("legacy photogrammetry B6 glass collider prevents a window exit above furniture and roof stops a genuine jump", () => {
+  const sim = legacyB6Simulation(),
     room = B6_ROOM_AREAS.find(
       (r) =>
         r.side === "east" &&

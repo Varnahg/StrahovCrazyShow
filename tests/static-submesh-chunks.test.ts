@@ -130,15 +130,13 @@ test("static chunks retain original VBO identities, every attribute bit, winding
     ...bounds.maximumWorld.asArray(),
   ];
   const data = Object.fromEntries(
-    mesh
-      .getVerticesDataKinds()
-      .map((kind) => [
-        kind,
-        {
-          buffer: mesh.getVertexBuffer(kind),
-          hash: hash(new Float32Array(mesh.getVerticesData(kind)!)),
-        },
-      ]),
+    mesh.getVerticesDataKinds().map((kind) => [
+      kind,
+      {
+        buffer: mesh.getVertexBuffer(kind),
+        hash: hash(new Float32Array(mesh.getVerticesData(kind)!)),
+      },
+    ]),
   );
   const indices = new Uint32Array(mesh.getIndices()!);
   try {
@@ -242,8 +240,63 @@ test("actual terrain builder keeps canonical floor triangles and bounds while na
   }
 });
 
-test("all eleven actual terrain/road/landcover outputs preserve independently frozen pre-K5 vertex and original primitive hashes", () => {
+test("all eleven actual terrain/road/landcover outputs preserve their pre-chunk buffers and every original primitive", (context) => {
   const { engine, scene } = fixture();
+  // The historical fixture retains the pre-CAD geometry hashes. CAD cutouts
+  // and source entrance grades intentionally changed those inputs; compare
+  // chunking to the actual builders' independent input snapshots instead.
+  const names = new Set(sourceFixture.sources.map((source) => source.name));
+  const originals = new Map<
+    string,
+    {
+      mesh: Mesh;
+      geometry: Mesh["geometry"];
+      vertices: number;
+      indices: Uint32Array;
+      attributes: Map<
+        string,
+        { buffer: ReturnType<Mesh["getVertexBuffer"]>; values: Float32Array }
+      >;
+    }
+  >();
+  const freeze = Mesh.prototype.freezeWorldMatrix;
+  // Each of these builders freezes its completed geometry immediately before
+  // calling chunkStaticMesh. Capture before the chunker can alter or record it.
+  const capture = context.mock.method(
+    Mesh.prototype,
+    "freezeWorldMatrix",
+    function (this: Mesh, ...args: Parameters<Mesh["freezeWorldMatrix"]>) {
+      const result = freeze.apply(this, args);
+      if (names.has(this.name)) {
+        assert.equal(
+          staticChunkSource(this),
+          undefined,
+          this.name + " capture precedes chunking",
+        );
+        assert.equal(
+          originals.has(this.name),
+          false,
+          this.name + " captured exactly once",
+        );
+        originals.set(this.name, {
+          mesh: this,
+          geometry: this.geometry,
+          vertices: this.getTotalVertices(),
+          indices: new Uint32Array(this.getIndices()!),
+          attributes: new Map(
+            this.getVerticesDataKinds().map((kind) => [
+              kind,
+              {
+                buffer: this.getVertexBuffer(kind),
+                values: new Float32Array(this.getVerticesData(kind)!),
+              },
+            ]),
+          ),
+        });
+      }
+      return result;
+    },
+  );
   try {
     buildTerrain({ scene, rects: GROUND_RECTS, bounds: TERRAIN_COVERAGE });
     buildLandcover(
@@ -251,39 +304,51 @@ test("all eleven actual terrain/road/landcover outputs preserve independently fr
       new Set(buildCampusExteriorPlan().courts.map((court) => court.osmId)),
     );
     buildStreets({ scene, lights: [] });
-    assert.equal(sourceFixture.sources.length, 11);
-    for (const expected of sourceFixture.sources) {
-      const mesh = scene.getMeshByName(expected.name) as Mesh;
-      assert.ok(mesh, expected.name);
+    capture.mock.restore();
+    assert.equal(names.size, 11);
+    assert.deepEqual([...originals.keys()].sort(), [...names].sort());
+    assert.deepEqual(
+      scene.meshes
+        .filter((mesh) => staticChunkSource(mesh as Mesh))
+        .map((mesh) => mesh.name)
+        .sort(),
+      [...names].sort(),
+    );
+    for (const [name, expected] of originals) {
+      const mesh = scene.getMeshByName(name) as Mesh;
+      assert.equal(mesh, expected.mesh);
+      assert.equal(mesh.geometry, expected.geometry);
       assert.equal(mesh.getTotalVertices(), expected.vertices);
-      assert.equal(mesh.getTotalIndices() / 3, expected.triangles);
+      assert.equal(mesh.getTotalIndices(), expected.indices.length);
       const source = staticChunkSource(mesh);
-      assert.ok(source, expected.name + " retains source master");
+      assert.ok(source, name + " retains source master");
       assert.equal(
         hash(source.indices),
-        expected.indexValueSha256,
-        expected.name + " original master",
+        hash(expected.indices),
+        name + " original master",
       );
       assert.equal(
         hash(restored(mesh)),
-        expected.indexValueSha256,
-        expected.name + " exact original triangles/winding",
+        hash(expected.indices),
+        name + " exact original triangles/winding",
       );
       assert.deepEqual(
         mesh.getVerticesDataKinds().sort(),
-        Object.keys(expected.attributes).sort(),
+        [...expected.attributes.keys()].sort(),
       );
-      for (const [kind, attribute] of Object.entries(expected.attributes)) {
+      for (const [kind, attribute] of expected.attributes) {
         const data = new Float32Array(mesh.getVerticesData(kind)!);
-        assert.equal(data.length, attribute.count);
         assert.equal(
-          hash(data),
-          attribute.float32Sha256,
-          expected.name + " " + kind,
+          mesh.getVertexBuffer(kind),
+          attribute.buffer,
+          name + " " + kind + " buffer identity",
         );
+        assert.equal(data.length, attribute.values.length);
+        assert.equal(hash(data), hash(attribute.values), name + " " + kind);
       }
     }
   } finally {
+    capture.mock.restore();
     scene.dispose();
     engine.dispose();
   }

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-navigation-regressions-20261024",
+  "title": "Ověřit navigační clearance skutečné kapsle a vědomou změnu terrain fixtures po CAD cutouts",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "client/map-navigation.ts",
+    "tests/map-navigation.test.ts",
+    "tests/static-submesh-chunks.test.ts",
+    ".cache/cad-buildings-20261024/cad-buildings-navigation-regressions-20261024/",
+    "docs/agents/handoffs/cad-buildings-navigation-regressions-20261024.md",
+    "client/navigation-physics.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze doložené regresní návaznosti B1+B6; primární příčina před změnou, žádná plošná tolerance nebo smazání testu.",
+    "Cílené CPU testy a předání s omezeními; runtime změnu mimo scope konzultovat s root."
+  ],
+  "verification": [
+    "Cílené testy přesných souborů; žádná plná sada, Blender, GPU, build, síťové procesy."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Root již provedl fullsuite:1943tests,1914pass,27fail,1622.65s. Log .cache/cad-buildings-20261024/b01-runtime-integration/full-tests-first.log.",
+    "Explicitní přímé zadání, bez BMAD rendereru/dalších agentů. Own cwd cad-building-models. Před zápisem vlastní claim; root nic do tohoto disjunktního scope nepíše.",
+    "Rozšířeno po explicitním handoff/release: skutečný navigation clearance ponechal .43radius prostarou .42kapsli; musí následovat novou .25+.02. Root schválil úzkouprodukčníopravu ve sdílenémkontraktu."
+  ]
+}

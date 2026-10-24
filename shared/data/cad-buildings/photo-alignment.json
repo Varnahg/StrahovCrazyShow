@@ -1,0 +1,1550 @@
+{
+  "schemaVersion": 1,
+  "coordinateSystem": "model/game XYZ metres; +Y up; placement rotation is Babylon-compatible; no scaling",
+  "source": {
+    "provider": "IPR Praha",
+    "capture": "summer 2023",
+    "license": "CC BY",
+    "attribution": "datový podklad © IPR Praha",
+    "source": "https://tiles.arcgis.com/tiles/SBTXIEUGWbqzUecw/arcgis/rest/services/praha2023_merged_WM/SceneServer/layers/0",
+    "sourceItem": "https://www.arcgis.com/home/item.html?id=92d2d376599c4fd2b6600ed46db7402e",
+    "manifestPath": "shared/data/photogrammetry.json",
+    "manifestSha256": "d556d38d5c32d9d039479e492d7937e2c358df90cf94f7aee232f5e1ba330d93",
+    "sourceMasterPath": "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "sourceMasterSha256": "020eb74ce4b5068ceb9c5d7ff55ae9413e441fc582c088879940425123370ecf",
+    "sourceMasterBytes": 233080977,
+    "horizontalCRS": "EPSG:3857",
+    "verticalCRS": "Baltic 1957 / Bpv",
+    "worldHeightReference": 326.392,
+    "uvConvention": "Original I3S u,v addresses top-left JPEG; Blender UVMap is u,1-v; derived atlas is independently rasterized into target UVMap"
+  },
+  "buildings": {
+    "b01": {
+      "cadOrigin": [
+        250,
+        731
+      ],
+      "identity": "building:osm:way:53929063",
+      "sourceBlendSha256": "5d415c1f4866a04adce944ac5e38002fc6c9c8f372186f3e36e917fa736422b1",
+      "sourceCollisionSha256": "629ca3a8c25579c3e85e682dd1ca5032526a8cb74ee5d1f189e73d6bffaeff6d",
+      "placement": {
+        "yaw": -3.1251629196638517,
+        "translation": {
+          "x": -86.806769185171,
+          "y": 4.219841912814184,
+          "z": 77.74954203422622
+        }
+      },
+      "sourceTileIds": [
+        "1125522",
+        "1125526",
+        "1125530",
+        "1125532",
+        "1125534",
+        "1125535",
+        "1125536",
+        "1125537",
+        "1125550",
+        "1125551",
+        "1125552",
+        "1125553",
+        "1127356",
+        "1127358",
+        "1127360",
+        "1127361",
+        "1127362",
+        "1127363",
+        "1127366",
+        "1127370",
+        "1127371",
+        "1127372",
+        "1127373",
+        "1127376",
+        "1127377",
+        "1127378",
+        "1127379",
+        "1127386",
+        "1127387",
+        "1127388"
+      ],
+      "registration": {
+        "status": "candidate-not-survey",
+        "method": "explicit main facade/roof plane associations, robust 4DOF no scale",
+        "initialOsmFitRmsMetres": 1.4,
+        "planeRmsMetres": 0.7155950389977155,
+        "planeMedianAbsoluteMetres": 0.27714760198987176,
+        "uncertainty": "main long facades several decimetres; end facades residual about1m cannot be fixed rigidly",
+        "endFacadesExcludedFromPhotoTransfer": true
+      },
+      "patches": [
+        {
+          "id": "n01-main-negative-x",
+          "partIds": [
+            "b01:n01:wall:plaster"
+          ],
+          "origin": [
+            -8.023,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -32.45,
+            0,
+            20.95,
+            2.65
+          ],
+          "planeToleranceMetres": 0.006,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual main exterior CAD wall plane with outward normal; joining wing region excluded; target triangles preserve openings",
+          "sourceSemanticStatus": "Candidate primary facade projection; visual occlusion review required"
+        },
+        {
+          "id": "n01-main-positive-x",
+          "partIds": [
+            "b01:n01:wall:plaster"
+          ],
+          "origin": [
+            8.145,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -33.05,
+            0,
+            20.6,
+            2.65
+          ],
+          "planeToleranceMetres": 0.006,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual main exterior CAD wall plane with outward normal; joining wing region excluded; target triangles preserve openings",
+          "sourceSemanticStatus": "Candidate primary facade projection; visual occlusion review required"
+        },
+        {
+          "id": "n02-main-negative-x",
+          "partIds": [
+            "b01:n02:wall:plaster"
+          ],
+          "origin": [
+            -8.043,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -32.45,
+            2.85,
+            20.95,
+            5.5
+          ],
+          "planeToleranceMetres": 0.006,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual main exterior CAD wall plane with outward normal; joining wing region excluded; target triangles preserve openings",
+          "sourceSemanticStatus": "Candidate primary facade projection; visual occlusion review required"
+        },
+        {
+          "id": "n02-main-positive-x",
+          "partIds": [
+            "b01:n02:wall:plaster"
+          ],
+          "origin": [
+            8.141,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -33.05,
+            2.85,
+            20.6,
+            5.5
+          ],
+          "planeToleranceMetres": 0.006,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual main exterior CAD wall plane with outward normal; joining wing region excluded; target triangles preserve openings",
+          "sourceSemanticStatus": "Candidate primary facade projection; visual occlusion review required"
+        },
+        {
+          "id": "n03-main-negative-x",
+          "partIds": [
+            "b01:n03:wall:plaster"
+          ],
+          "origin": [
+            -8.043,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -32.45,
+            5.7,
+            20.95,
+            8.8
+          ],
+          "planeToleranceMetres": 0.006,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual main exterior CAD wall plane with outward normal; joining wing region excluded; target triangles preserve openings",
+          "sourceSemanticStatus": "Candidate primary facade projection; visual occlusion review required"
+        },
+        {
+          "id": "n03-main-positive-x",
+          "partIds": [
+            "b01:n03:wall:plaster"
+          ],
+          "origin": [
+            8.141,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -33.05,
+            5.7,
+            20.6,
+            8.8
+          ],
+          "planeToleranceMetres": 0.006,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual main exterior CAD wall plane with outward normal; joining wing region excluded; target triangles preserve openings",
+          "sourceSemanticStatus": "Candidate primary facade projection; visual occlusion review required"
+        },
+        {
+          "id": "main-roof",
+          "partIds": [
+            "b01:n04:slab:roof"
+          ],
+          "origin": [
+            0,
+            9,
+            0
+          ],
+          "u": [
+            1,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            0,
+            -1
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "bounds": [
+            -8.116,
+            -32.974,
+            8.142,
+            32.395001
+          ],
+          "planeToleranceMetres": 0.002,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.6,
+          "basis": "Actual upward roof triangles at identified model height; no whole-bbox geometry or hole fill",
+          "sourceSemanticStatus": "Candidate primary roof projection; visual comparison required"
+        },
+        {
+          "id": "wing-roofs",
+          "partIds": [
+            "b01:n04:slab:roof"
+          ],
+          "origin": [
+            0,
+            8.05,
+            0
+          ],
+          "u": [
+            1,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            0,
+            -1
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "bounds": [
+            -25.3,
+            -32.515999,
+            25.432999000000002,
+            32.079999
+          ],
+          "planeToleranceMetres": 0.002,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.6,
+          "basis": "Actual upward roof triangles at identified model height; no whole-bbox geometry or hole fill",
+          "sourceSemanticStatus": "Candidate primary roof projection; visual comparison required"
+        },
+        {
+          "id": "head-roof",
+          "partIds": [
+            "b01:n04:slab:roof"
+          ],
+          "origin": [
+            0,
+            11.55,
+            0
+          ],
+          "u": [
+            1,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            0,
+            -1
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "bounds": [
+            -2.323,
+            -30.692,
+            1.309,
+            -27.43
+          ],
+          "planeToleranceMetres": 0.002,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.6,
+          "basis": "Actual upward roof triangles at identified model height; no whole-bbox geometry or hole fill",
+          "sourceSemanticStatus": "Candidate primary roof projection; visual comparison required"
+        }
+      ]
+    },
+    "b06": {
+      "cadOrigin": [
+        35,
+        8
+      ],
+      "identity": "building:osm:way:53929071",
+      "sourceBlendSha256": "969036d616fb87408e0af56e106d36b3248cd3c812068c81dd257a734066453d",
+      "placement": {
+        "yaw": -3.1233667855768164,
+        "translation": {
+          "x": 6.702656726398903,
+          "y": 0.6962777093118497,
+          "z": -55.04815187265829
+        }
+      },
+      "sourceTileIds": [
+        "1127320",
+        "1127328",
+        "1127330",
+        "1127335",
+        "1127336",
+        "1127343",
+        "1127344",
+        "1127345",
+        "1127346",
+        "1127445",
+        "1127446",
+        "1127447",
+        "1127448",
+        "1127455",
+        "1127456",
+        "1127458",
+        "1127461",
+        "1127462",
+        "1127463",
+        "1127464",
+        "1127471",
+        "1127472",
+        "1127473",
+        "1127474"
+      ],
+      "registration": {
+        "status": "candidate-not-survey",
+        "method": "N07 actual roof outline1036 OSM seed, then primary roof-edge/roof planes; no scale",
+        "initialOsmFitRmsMetres": 0.10911517764239721,
+        "planeRmsMetres": 0.20075877880895265,
+        "planeMedianAbsoluteMetres": 0.06212737704233015,
+        "uncertainty": "rounded photo roof edges: several decimetres, requires native overlay/entry review",
+        "orientationBasis": "CAD entry nearX12.93,Y-3.45 corresponds to north-west annex; westHead near entry is north photo head",
+        "photoRoofWorldY": {
+          "main": 18.730394,
+          "annexApprox": 18.75,
+          "westHead": 22.139592,
+          "eastHead": 21.226864
+        }
+      },
+      "patches": [
+        {
+          "id": "n01-main-ym0p061",
+          "partIds": [
+            "b06:n01:wall:plaster"
+          ],
+          "origin": [
+            8.061,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -15.022,
+            0.0,
+            32.81499999999999,
+            2.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.061; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n01-main-ym0p011",
+          "partIds": [
+            "b06:n01:wall:plaster"
+          ],
+          "origin": [
+            8.011,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -35.007,
+            0.0,
+            -22.669999999999998,
+            2.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.011; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n01-main-y16p659",
+          "partIds": [
+            "b06:n01:wall:plaster"
+          ],
+          "origin": [
+            -8.658999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -34.915,
+            0.0,
+            27.814,
+            2.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.659; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n02-main-ym0p061",
+          "partIds": [
+            "b06:n02:wall:plaster"
+          ],
+          "origin": [
+            8.061,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -15.022,
+            3.0,
+            32.81499999999999,
+            5.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.061; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n02-main-y16p284",
+          "partIds": [
+            "b06:n02:wall:plaster"
+          ],
+          "origin": [
+            -8.283999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -30.279999999999998,
+            3.0,
+            -15.124,
+            7.3
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.284; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n02-main-y16p659",
+          "partIds": [
+            "b06:n02:wall:plaster"
+          ],
+          "origin": [
+            -8.658999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -34.915,
+            3.0,
+            27.814,
+            5.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.659; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n03-main-ym0p061",
+          "partIds": [
+            "b06:n03:wall:plaster"
+          ],
+          "origin": [
+            8.061,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -15.022,
+            6.0,
+            32.81499999999999,
+            8.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.061; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n03-main-ym0p011",
+          "partIds": [
+            "b06:n03:wall:plaster"
+          ],
+          "origin": [
+            8.011,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -35.007,
+            6.0,
+            -22.648999999999997,
+            10.3
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.011; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n03-main-y16p284",
+          "partIds": [
+            "b06:n03:wall:plaster"
+          ],
+          "origin": [
+            -8.283999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -30.279999999999998,
+            6.0,
+            -15.124,
+            10.3
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.284; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n03-main-y16p659",
+          "partIds": [
+            "b06:n03:wall:plaster"
+          ],
+          "origin": [
+            -8.658999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -34.915,
+            6.0,
+            27.814,
+            8.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.659; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n04-main-ym0p061",
+          "partIds": [
+            "b06:n04:wall:plaster"
+          ],
+          "origin": [
+            8.061,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -15.022,
+            9.0,
+            32.81499999999999,
+            11.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.061; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n04-main-ym0p011",
+          "partIds": [
+            "b06:n04:wall:plaster"
+          ],
+          "origin": [
+            8.011,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -35.007,
+            9.0,
+            -22.648999999999997,
+            13.3
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.011; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n04-main-y16p284",
+          "partIds": [
+            "b06:n04:wall:plaster"
+          ],
+          "origin": [
+            -8.283999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -30.279999999999998,
+            9.0,
+            -15.124,
+            13.3
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.284; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n04-main-y16p659",
+          "partIds": [
+            "b06:n04:wall:plaster"
+          ],
+          "origin": [
+            -8.658999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -34.915,
+            9.0,
+            27.814,
+            11.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.659; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n05-main-ym0p061",
+          "partIds": [
+            "b06:n05:wall:plaster"
+          ],
+          "origin": [
+            8.061,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -15.022,
+            12.0,
+            32.81499999999999,
+            14.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.061; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n05-main-ym0p011",
+          "partIds": [
+            "b06:n05:wall:plaster"
+          ],
+          "origin": [
+            8.011,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -35.007,
+            12.0,
+            -22.648999999999997,
+            17.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.011; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n05-main-y16p284",
+          "partIds": [
+            "b06:n05:wall:plaster"
+          ],
+          "origin": [
+            -8.283999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -30.279999999999998,
+            12.0,
+            -15.124,
+            17.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.284; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n05-main-y16p659",
+          "partIds": [
+            "b06:n05:wall:plaster"
+          ],
+          "origin": [
+            -8.658999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -34.915,
+            12.0,
+            27.814,
+            14.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.659; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n06-main-ym0p086",
+          "partIds": [
+            "b06:n06:wall:plaster"
+          ],
+          "origin": [
+            8.086,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -22.422,
+            15.0,
+            -15.217,
+            17.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.086; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n06-main-ym0p061",
+          "partIds": [
+            "b06:n06:wall:plaster"
+          ],
+          "origin": [
+            8.061,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -15.022,
+            15.0,
+            32.81499999999999,
+            17.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.061; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n06-main-ym0p011",
+          "partIds": [
+            "b06:n06:wall:plaster"
+          ],
+          "origin": [
+            8.011,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            -1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "bounds": [
+            -35.007,
+            15.0,
+            -22.62,
+            17.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=-0.011; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n06-main-y16p284",
+          "partIds": [
+            "b06:n06:wall:plaster"
+          ],
+          "origin": [
+            -8.283999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -30.279999999999998,
+            15.0,
+            -15.124,
+            17.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.284; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n06-main-y16p659",
+          "partIds": [
+            "b06:n06:wall:plaster"
+          ],
+          "origin": [
+            -8.658999999999999,
+            0,
+            0
+          ],
+          "u": [
+            0,
+            0,
+            1
+          ],
+          "v": [
+            0,
+            1,
+            0
+          ],
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "bounds": [
+            -34.915,
+            15.0,
+            27.814,
+            17.8
+          ],
+          "planeToleranceMetres": 0.004,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.5,
+          "basis": "Actual extruded exterior wall boundary plane from B6 per-floor solids, CAD y=16.659; outward normal and part select faces, not roof overhang",
+          "sourceSemanticStatus": "Candidate; native target selection and primary facade render required"
+        },
+        {
+          "id": "n07-main-roof-slab-17.800-0000",
+          "partIds": [
+            "b06:n07:slab:roof"
+          ],
+          "origin": [
+            0,
+            18.0,
+            0
+          ],
+          "u": [
+            1,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            0,
+            -1
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "bounds": [
+            -8.729999999999999,
+            -35.007,
+            14.267,
+            34.915
+          ],
+          "planeToleranceMetres": 0.002,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.6,
+          "basis": "Actual N07 roof slab n07-main-roof-slab-17.800-0000; source CAD room/roof geometry, interpreted Z calibrated to IPR",
+          "sourceSemanticStatus": "Candidate; native target and primary roof render required"
+        },
+        {
+          "id": "n07-west-head-roof-slab-21.210-0000",
+          "partIds": [
+            "b06:n07:slab:roof"
+          ],
+          "origin": [
+            0,
+            21.41,
+            0
+          ],
+          "u": [
+            1,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            0,
+            -1
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "bounds": [
+            0.20700000000000018,
+            -25.822,
+            3.839,
+            -22.56
+          ],
+          "planeToleranceMetres": 0.002,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.6,
+          "basis": "Actual N07 roof slab n07-west-head-roof-slab-21.210-0000; source CAD room/roof geometry, interpreted Z calibrated to IPR",
+          "sourceSemanticStatus": "Candidate; native target and primary roof render required"
+        },
+        {
+          "id": "n07-east-head-roof-slab-20.300-0000",
+          "partIds": [
+            "b06:n07:slab:roof"
+          ],
+          "origin": [
+            0,
+            20.5,
+            0
+          ],
+          "u": [
+            1,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            0,
+            -1
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "bounds": [
+            -5.794,
+            22.443,
+            -2.1620000000000004,
+            25.705000000000002
+          ],
+          "planeToleranceMetres": 0.002,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.6,
+          "basis": "Actual N07 roof slab n07-east-head-roof-slab-20.300-0000; source CAD room/roof geometry, interpreted Z calibrated to IPR",
+          "sourceSemanticStatus": "Candidate; native target and primary roof render required"
+        },
+        {
+          "id": "b06-entry-canopy",
+          "partIds": [
+            "b06:n01:canopy:roof"
+          ],
+          "origin": [
+            0,
+            3.7540823,
+            0
+          ],
+          "u": [
+            1,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            0,
+            -1
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "bounds": [
+            9.322000000000001,
+            -27.949,
+            13.964,
+            -21.999999999999996
+          ],
+          "planeToleranceMetres": 0.002,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.6,
+          "basis": "actual outer CAD entry frame22m2 retained instead of enlarging to the laterally different IPR roof envelope26.607m2; capworld4.45036 and0.10m thickness interpreted, not another floor",
+          "sourceSemanticStatus": "explicit exterior canopy top; preserve underside and frames"
+        },
+        {
+          "id": "b06-east-mezz-terrace",
+          "partIds": [
+            "b06:n01:canopy:concrete"
+          ],
+          "origin": [
+            0,
+            1.0187223,
+            0
+          ],
+          "u": [
+            1,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            0,
+            -1
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "bounds": [
+            -9.909,
+            14.923999999999998,
+            -8.283,
+            22.505
+          ],
+          "planeToleranceMetres": 0.002,
+          "maxDistanceMetres": 0.45,
+          "sourceNormalCosine": 0.94,
+          "minimumCoverage": 0.6,
+          "basis": "CAD outer terrace/cover outline takes precedence over smoothed scan area; topworld1.715,0.15m thickness interpreted; below n01.mezzanine by0.4812777m, jump/terrain acceptance required",
+          "sourceSemanticStatus": "explicit exterior canopy top; preserve underside and frames"
+        }
+      ],
+      "sourceCollisionSha256": "af15ec302774ed24ff3f0e6149f672398936998d9694d03c7d8271f0ca293799",
+      "sourceRecipeSha256": "f3cd31d0f91460740b5b543b9e8067c5ba50949774a7ba8b92514a0114900d61"
+    }
+  }
+}

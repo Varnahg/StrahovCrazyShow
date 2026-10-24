@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-entry-grade-20261024",
+  "title": "KEY-59: doložené lokální napojení B1+B6 vstupů na DMR a IPR terén",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/cad-buildings/export_grade.py",
+    "scripts/cad-buildings/test_export_grade.py",
+    "shared/terrain-patches.ts",
+    "shared/data/cad-buildings/b06-entry-grade.json",
+    "shared/data/cad-buildings/b01-entry-grade.json",
+    "tests/cad-entry-grade.test.ts",
+    ".cache/cad-buildings-20261024/entry-grade/",
+    "docs/reality-pack/cad-buildings/b06/entry-grade.md",
+    "docs/reality-pack/cad-buildings/b01/entry-grade.md",
+    "docs/agents/handoffs/cad-buildings-entry-grade-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Jediný sdílený malý triangulovaný terénní patch napojí B6 vstup na primární IPR approach plane a původní DMR bez nových schodů nebo neviditelných kolizí.",
+    "Původní severní terrain patch se zachová. Nový patch je aktivní pouze při registrovaném native B6 a používá stejný shared height/cell/intersection kontrakt pro obraz i fyziku.",
+    "Měření, interpolaci a krátkou odhadnutou přechodovou oblast výslovně odlišit; hranice původních DMR buněk zachovat bez trhlin."
+  ],
+  "verification": [
+    "Malé CPU testy triangulace, původní DMR boundary height, společných hran, datové identity a podmíněné aktivace. Žádný Blender/GPU/server/fullsuite.",
+    "Skutečné nástupy Actorem ověří root po přijetí native B6. Finální model/workspace nevydávat za přijatý podle syntetického testu."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Rozšíření13:20UTC po doloženém STOP/release grade ownera: stejný generátor přidá dva B1 prahy30F4/312B. První má přímou IPR ground triangle1127362:665, druhý je výslovný odhad ze sousedních1127370:666/655 přes zakryté místo do1.051m. Nejde o přidaný schod nebo změnu CAD. Manifest vlastního převáděnéhoWIP je entry-grade/wip-before-b01-extension.json.",
+    "B6 variantaB byla rootem konkretizovaně přijata: minimální interpolovaný hull16sample envelope+prvnífronta, mimo skutečnou source mask označit modelovou interpretaci; rozsah~0.5m vpřed/~0.93m vpravo a0.5m blendapron. Nevyrovnávat skutečnýsvažitýgradekvůlifalešnému walkPASS.",
+    "Přímá delegovaná implementace bez dalšího BMAD. Pouze B1+B6, vlastní worktree cad-building-models, HEAD6dd89606.",
+    "Primární čtecí vstupy: photogrammetry/b06-entry-ground.json, b06-approach-patch-proposal.json, source terrain-grid a photo-alignment B6 pose. Source ground plane16samples,RMS.0079m; není dokladem celé plochy.",
+    "Root decision: zrušit starý B6flatten0 při native B6 a zachovat3m main stack;12CADriserfronts mají odhadlowerlocal−.60, rise.175. Celkový posun budovy, falešný schod a plošné zvýšení terénu jsou nevhodné vůči zdrojům.",
+    "Vymezit minimální approach oblast: zdrojovou plane uvnitř interpolace, malý přechod do DMR; případné doplnění max~0.2m k první frontě a okraje šířky jsou explicitní herní interpretace, ne nové měření. Umožnit rootovi posoudit konkrétní geometrii před aplikací.",
+    "Shared terrain.ts a runtime entrypoints patří rootovi, v tomto tasku se nemění. Dataset používá stávající cell-triangle API."
+  ]
+}

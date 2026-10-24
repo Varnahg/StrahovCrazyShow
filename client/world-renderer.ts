@@ -12,6 +12,7 @@ import {
   HUNT_POINTS,
   GROUND_RECTS,
   blockNumber,
+  B6_ENTRY,
 } from "../shared/world";
 import type { Building } from "../shared/types";
 import { buildStreets } from "./streets-renderer";
@@ -31,6 +32,7 @@ import {
 import { B6_LAYOUT } from "../shared/b6-interior";
 import { buildLandmarkReality } from "./landmark-reality";
 import { LANDMARK_BUILDING_REPLACEMENTS } from "../shared/landmark-reality";
+import { hasCadBuilding, CAD_BUILDINGS, cadCollisionParts, cadLevelHeight } from "../shared/cad-buildings";
 import { TERRAIN_COVERAGE } from "../shared/world";
 import { buildPhotogrammetryEntranceRepair } from "./photogrammetry-repairs";
 import { buildPhotogrammetryGroundRepairs } from "./photogrammetry-ground";
@@ -147,12 +149,13 @@ export function buildWorld(
         scene: context.scene,
         baseElevation: (_x, _z, b) => base(b),
         buildings: BUILDINGS.filter(
-          (b) => !LANDMARK_BUILDING_REPLACEMENTS.has(b.id),
+          (b) => !LANDMARK_BUILDING_REPLACEMENTS.has(b.id) && !hasCadBuilding(b.id),
         ),
       });
   const foundation = context.mat("#797c75");
   foundation.metadata = { surfaceKind: "concrete", uvMetresPerRepeat: 4 };
   for (const b of options.photogrammetry ? [] : BUILDINGS) {
+    if (hasCadBuilding(b.id)) continue;
     const mesh = new Mesh("building foundation " + b.id, context.scene);
     applyTerrainData(mesh, buildingFoundationData(b.points, base(b)));
     mesh.material = foundation;
@@ -183,7 +186,7 @@ export function buildWorld(
       indices: number[];
     }
   >();
-  for (const b of B6_BOXES) {
+  for (const b of !options.photogrammetry && hasCadBuilding("53929071") ? [] : B6_BOXES) {
     if ((b.kind as string) === "glass") continue;
     const color =
       b.kind === "floor"
@@ -225,25 +228,37 @@ export function buildWorld(
     };
     mesh.parent = b6Fallback;
   }
-  for (const mesh of createB6StairMeshes(
+  for (const mesh of !options.photogrammetry && hasCadBuilding("53929071") ? [] : createB6StairMeshes(
     context.scene,
     B6_LAYOUT.foundationOffset,
   ))
     mesh.parent = b6Fallback;
   attachWorldAssetNode(b6Fallback, b6Root);
-  context.label("B6", 8, 19.1 + B6_LAYOUT.foundationOffset, -55, 5);
-  context.label(
+  for (const building of options.photogrammetry ? [] : CAD_BUILDINGS) {
+    let top = -Infinity;
+    for (const part of cadCollisionParts()) if (part.buildingId === building.id)
+      for (let i = 1; i < part.positions.length; i += 3) top = Math.max(top, part.positions[i]);
+    context.label(`B${Number(building.id.slice(1))}`, building.placement.translation.x,
+      top + 1.1, building.placement.translation.z, 5);
+  }
+  const cadEntryHeight = cadLevelHeight("b06", "n01", "mezzanine");
+  if (!options.photogrammetry && cadEntryHeight !== undefined)
+    context.label("VSTUP B6", B6_ENTRY.x, cadEntryHeight + 2.8, B6_ENTRY.z, 3);
+  if (options.photogrammetry || !hasCadBuilding("53929071")) {
+    context.label("B6", 8, 19.1 + B6_LAYOUT.foundationOffset, -55, 5);
+    context.label(
     "VSTUP B6",
     B6_LAYOUT.entry.x,
     3 + B6_LAYOUT.foundationOffset,
     B6_LAYOUT.entry.z,
     3,
-  );
+    );
+  }
   const landmarks = options.photogrammetry
     ? undefined
     : buildLandmarkReality({
         scene: context.scene,
-        buildings: BUILDINGS,
+        buildings: BUILDINGS.filter((building) => !hasCadBuilding(building.id)),
         baseElevation: base,
       });
   const campusExterior = exteriorPlan

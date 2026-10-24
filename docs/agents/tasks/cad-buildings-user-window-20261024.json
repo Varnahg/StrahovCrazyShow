@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-user-window-20261024",
+  "title": "B1+B6: rezervované GPU pro uživatelské hraní neměnné verze",
+  "status": "ready",
+  "dependsOn": [
+    "cad-b1-runtime-integration-20261024"
+  ],
+  "writePaths": [
+    "docs/agents/handoffs/cad-buildings-user-window-20261024.md"
+  ],
+  "resources": [
+    "gpu"
+  ],
+  "acceptance": [
+    "Uživatelská verze2590 zůstane neměnná; žádná další modelová práce či souběžnéGPUměření."
+  ],
+  "verification": [
+    "Před dalšímGPUúkonem ověřit, zda uživatel test ukončil a kteréscény skutečněběží."
+  ],
+  "notes": [
+    "Přímé uživatelské zadání připravit hru k vyzkoušení. Port2590 aNodePID26016 má samostatný cad-b1-playtest task.",
+    "Claim se převádí z validation window po ukončení všech vlastních měření; release ažpo skončeníuživatelskéhotestu. Žádný automatický proces či heartbeat scheduler se nevytváří."
+  ]
+}

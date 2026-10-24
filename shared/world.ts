@@ -8,6 +8,7 @@ import stadiumStops from "./data/stadium-stops.json";
 import { landmarkBuildingHeight } from "./landmark-reality";
 import { PROJECT_PLACES } from "./journal";
 import { groundHeight } from "./terrain";
+import { cadZoneAt, hasCadBuilding, CAD_B6_ENTRY } from "./cad-buildings";
 import type { WorldMap, Place, Vec3, Building } from "./types";
 const sourceMap = rawMap as unknown as WorldMap;
 export const MAP: WorldMap = {
@@ -30,7 +31,14 @@ export const TERRAIN_COVERAGE = {
   minZ: Math.floor((BOUNDS.minZ - 5) / 4) * 4,
   maxZ: Math.ceil((BOUNDS.maxZ + 5) / 4) * 4,
 };
-export const GROUND_RECTS = [
+// The CAD site clips its actual footprint, including shifted annexes. Retain
+// the original rectangular B6 cutout only while the legacy model is active.
+export const GROUND_RECTS = hasCadBuilding("53929071") ? [{
+  x: (TERRAIN_COVERAGE.minX + TERRAIN_COVERAGE.maxX) / 2,
+  z: (TERRAIN_COVERAGE.minZ + TERRAIN_COVERAGE.maxZ) / 2,
+  w: TERRAIN_COVERAGE.maxX - TERRAIN_COVERAGE.minX,
+  d: TERRAIN_COVERAGE.maxZ - TERRAIN_COVERAGE.minZ,
+}] : [
   {
     x: (TERRAIN_COVERAGE.minX - 7) / 2,
     z: (TERRAIN_COVERAGE.minZ + TERRAIN_COVERAGE.maxZ) / 2,
@@ -68,12 +76,13 @@ export const GROUND_RECTS = [
     d: B6_LAYOUT.bounds.maxZ - B6_LAYOUT.lobby.maxZ,
   },
 ];
+export const B6_ENTRY = hasCadBuilding("53929071") ? CAD_B6_ENTRY : B6_LAYOUT.entry;
 export const PLACES: Place[] = [
   {
     id: "b6",
     name: "Blok 6",
-    x: B6_LAYOUT.entry.x,
-    z: B6_LAYOUT.entry.z,
+    x: B6_ENTRY.x,
+    z: B6_ENTRY.z,
     description:
       "Vstup do B6. Rozvržení vychází z OSM a orientačního plánu SH; rozměry interiéru jsou přibližné.",
     source: "https://wiki.sh.cvut.cz/kolej/bloky/blok_6",
@@ -276,6 +285,9 @@ export function nearestPlace(x: number, z: number) {
   )[0];
 }
 export function zoneAt(p: Vec3) {
+  const cadZone = cadZoneAt(p);
+  if (cadZone) return cadZone;
+  if (hasCadBuilding("53929071")) return "outside";
   const inPart = (r: {
     minX: number;
     maxX: number;

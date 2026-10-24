@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-publication-20261024",
+  "title": "KEY-59: převzít a průběžně integrovat ověřené samostatné modely",
+  "status": "ready",
+  "dependsOn": [
+    "cad-buildings-research-20261024"
+  ],
+  "writePaths": [
+    "docs/reality-pack/cad-buildings/README.md",
+    "docs/agents/handoffs/cad-buildings-research-20261024.md",
+    "docs/agents/handoffs/cad-buildings-publication-20261024.md",
+    ".cache/cad-buildings-20261024/publication/",
+    "docs/verification.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Každý přijatý model má vlastní ověřený checkpoint a samostatný commit bez původních CAD nebo cizího WIP.",
+    "Před integrací přesný diff a identita zdrojů, skutečné rezervace všech měněných cest a heavy-validation; tento task sám neopravňuje měnit assety nebo runtime.",
+    "Publikovaný přehled rozlišuje přijatý Blender model, neověřený terén a následnou herní integraci všech 16 budov."
+  ],
+  "verification": [
+    "Ověřit přesný seznam a SHA vlastních změn, prázdný cizí index, absenci původních dokumentů a existujících kolizí cest na main.",
+    "Zkontrolovat přijaté modelové testy a handoff; herní runtime ověřit až po skutečném zapojení v samostatné rezervaci.",
+    "node scripts/agent-tasks.mjs validate"
+  ],
+  "notes": [
+    "Po explicitním release druhého chatu je rezervován společný verification záznam pro B1+B6. Zachovat existující evidenci a rozlišit CPU/GPU a omezení.",
+    "Koordinátor tohoto uživatelského zadání přebírá své dříve dokončené výzkumné README a handoff, nikoli celý široký historický výzkumný scope.",
+    "Root může přijmout tento doložený vlastní WIP přes --adopt-dirty. Ostatní podadresáře a modelové skripty mají nadále samostatné aktivní rezervace.",
+    "Linear KEY-59; původní main WIP zůstává cizí. Žádná změna hraného immutable buildu nebo automatický push."
+  ]
+}

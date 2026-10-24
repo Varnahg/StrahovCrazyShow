@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-baseline-assets-20261024",
+  "title": "KEY-59: materializovat přesné baseline LFS assety pro úplný test hry B1+B6",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "assets/blender/buildings/source-plan.json",
+    "assets/blender/photogrammetry/strahov-ipr2023-master.blend",
+    "assets/blender/vegetation/strahov-individual-trees.blend",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_alpha_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_arm_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_diff_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_dry_diff_8k.png",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.exr",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_nor_gl_8k.jpg",
+    "assets/sources/vegetation/grass_medium_01/source-highest/textures/grass_medium_01_rough_8k.exr",
+    "public/models/vegetation/realistic/strahov-individual-trees.glb",
+    "public/models/vegetation/runtime/far.glb",
+    "docs/agents/handoffs/cad-buildings-baseline-assets-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Materializovat pouze přesné již stažené LFS objekty současného HEAD; žádná regenerace nebo změna assetů.",
+    "Všechny výsledné velikosti a SHA256 musí odpovídat baseline pointerům, Git diff zůstane prázdný pro tyto cesty."
+  ],
+  "verification": [
+    "git lfs checkout pro explicitní seznam, node scripts/check-lfs-assets.mjs, hash všech12 souborů."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Pouze prerequisite úplného běhu hry B1+B6; nespouští další obsahové zadání.",
+    "Ownworktree codex/b1-playtest-20261024, root; žádné primary-main WIP nebo source15 se nepřebírá.",
+    "12 baseline souborů má lokálně stažené objekty, aktuální checkout obsahuje pouze pointery."
+  ]
+}

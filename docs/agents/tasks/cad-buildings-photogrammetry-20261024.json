@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-photogrammetry-20261024",
+  "title": "KEY-59: fotogrammetrický vzhled a usazení B1+B6",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/cad-buildings/photo_projection.py",
+    "scripts/cad-buildings/test_photo_projection.py",
+    "scripts/cad-buildings/photogrammetry_bake.py",
+    "shared/data/cad-buildings/photo-alignment.json",
+    ".cache/cad-buildings-20261024/photogrammetry/",
+    "docs/reality-pack/cad-buildings/photogrammetry.md",
+    "docs/agents/handoffs/cad-buildings-photogrammetry-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Identifikovat původní IPR2023 zdroje/textury a soustavy, doložit registraci obou CAD modelů a nejistotu.",
+    "Přenos vzhledu je omezený na skutečné odpovídající vnější povrchy; interiéry, otvory, sklo a zdrojová konstrukční geometrie se nezaslepí texturovaným skenem.",
+    "Pipeline nevymýšlí foto detaily, zachová provenance a editovatelný výsledek s přenosnými zabalenými texturami."
+  ],
+  "verification": [
+    "Malé geometrické/UV/registrace regrese a porovnání rozumných variant přenosu vzhledu.",
+    "Skutečný Blender bake/render a fotometrické porovnání vykoná root v serializovaném heavy/GPU okně po předání."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Výslovný pokyn24.10: pouze B1+B6 podle lokálních CAD, poté fotogrammetrie pro textury/detaily/usazení a ověření cest; ostatní modely mimo současný scope.",
+    "Původní CAD a jejich kopie zůstávají mimo Git, nativní modely jsou zdroj; zdrojové odhady odlišit od měření.",
+    "Krátký postup bez dalšího BMAD rendereru/checkpointů; AGENTS vlastnictví/zdroje a ověřování zůstávají závazné.",
+    "Cwd cad-building-models, větev codex/b1-playtest-20261024, přijatý základ6dd89606; nepřebírat primarymainWIP nebo source15.",
+    "Uživatel výslovně zvolil fotogrammetrii pro textury, detaily a přesné usazení CAD modelů, nikoli samostatný sken okolí.",
+    "Původní fotogrammetrický Blender master a zdrojové dlaždice pouze číst. Modelové výstupy B1/B6 publikuje root modelový task; foto agent je nevlastní.",
+    "Nezavírat stavební chyby pouhým promítnutým obrázkem. Konzervativně vynechat nedoložené/occludované texely a uvést omezení."
+  ]
+}

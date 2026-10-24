@@ -26,6 +26,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { B6RealityController, createB6StairMeshes, createB6BoxFaceParts } from "../client/b6-reality";
 import { b6AuthoredStairPixels } from "../shared/b6-stair-materials";
 import {groundHeight} from "../shared/terrain";
+import {CAD_B6_ENTRY,cadZoneAt} from "../shared/cad-buildings";
 import {B6_FACADE_PLAN} from "../shared/b6-facade-plan";
 import {b6ExteriorEdges,planFacadeOpenings} from "../client/architecture-reality";
 await initPhysics();
@@ -538,10 +539,15 @@ test("exterior B6 entry stays visible from the north approach at every quality b
   }finally{if(renderTimer)clearInterval(renderTimer);controller.dispose();scene.dispose();engine.dispose();}
 });
 
-test("photo-interpreted covered B6 portal preserves a continuous whole-world KCC arrival at reception and return to outdoor terrain",()=>{
+test("native CAD B6 portal preserves a continuous whole-world KCC arrival inside and return to outdoor terrain",()=>{
   const simulation=new Simulation(),actor=simulation.add("covered-entry",{x:B6_LAYOUT.entry.x,y:groundHeight(B6_LAYOUT.entry.x,-110)+.9,z:-110});
   actor.setPosition=()=>assert.fail("covered entry walk must not teleport");
-  const path:[number,number][]=[[-4.85,-100],[-4.85,-90],[B6_LAYOUT.outsideSpawn.x,B6_LAYOUT.outsideSpawn.z],...B6_LAYOUT.approachRoute,[-3.5,-73],[-1,-71.95],[3,-71.95]];
+  const e=CAD_B6_ENTRY;
+  const length=Math.hypot(e.end.x-e.start.x,e.end.z-e.start.z);
+  const path:[number,number][]=[[-4.85,-100],[-4.85,-90],[-4.85,-85],
+    [e.start.x+(e.start.x-e.end.x)/length*.6,e.start.z+(e.start.z-e.end.z)/length*.6],
+    [e.start.x,e.start.z],[e.end.x,e.end.z],
+    [e.x+e.nx*.6,e.z+e.nz*.6],[e.x-e.nx*.7,e.z-e.nz*.7]];
   try{
     for(let tick=0;tick<30;tick++){actor.step(idle);simulation.tick(0);}
     for(const [x,z]of[...path,...path.slice(0,-1).reverse(),[-4.85,-110]]as[number,number][]){
@@ -553,6 +559,7 @@ test("photo-interpreted covered B6 portal preserves a continuous whole-world KCC
         assert.ok(Number.isFinite(actor.position.y));
       }
       assert.ok(reached,`covered portal blocked before ${x},${z}: ${JSON.stringify(actor.position)}`);
+      if(x===path.at(-1)![0]&&z===path.at(-1)![1]) assert.equal(cadZoneAt(actor.position),"b06:n01");
     }
     assert.ok(Math.abs(actor.position.y-(groundHeight(actor.position.x,actor.position.z)+.82))<.06,"returned to actual outdoor terrain");
     assert.equal(B6_ENTRY_PACK.measured,false);

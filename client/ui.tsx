@@ -267,6 +267,7 @@ export function App() {
       () => readRenderPreferences().targetFps,
     ),
     [connected, setConnected] = useState(false);
+  const cadLocation = /^b0?([16]):([pn])(\d{2})$/.exec(stats?.zone ?? "");
   useEffect(() => {
     try {
       localStorage.setItem(
@@ -1280,7 +1281,13 @@ export function App() {
         <span>↗</span>
         <div>
           <strong>
-            {stats?.zone.startsWith("b6")
+            {cadLocation
+              ? t(cadLocation[2] === "p"
+                  ? "Blok {block} · {level}. podzemní podlaží"
+                  : "Blok {block} · {level}. nadzemní podlaží", {
+                    block: cadLocation[1], level: Number(cadLocation[3]),
+                  })
+              : stats?.zone.startsWith("b6")
               ? t("Blok 6 · {level}. úroveň", {
                   level: stats.zone.split(":")[1],
                 })

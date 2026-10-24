@@ -9,7 +9,7 @@ export type { Input } from "./types";
 
 // V11 input seq identifies a scheduled simulation tick inside a server epoch.
 // V10 command-count acknowledgements cannot predict this timeline safely.
-export const PROTOCOL_VERSION = 11;
+export const PROTOCOL_VERSION = 12;
 export const SIM_HZ = 60;
 export const FIXED_DT = 1 / SIM_HZ;
 export const MAX_CATCHUP_STEPS = 8;

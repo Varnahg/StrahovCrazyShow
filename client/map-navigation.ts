@@ -10,7 +10,7 @@ import {
   isClosedStadiumInterior,
   STADIUM_CLOSED_BOUNDARY,
 } from "../shared/landmark-reality";
-import { B6_LAYOUT } from "../shared/b6-interior";
+import { CAD_B6_ENTRY } from "../shared/cad-buildings";
 import type { MapPoint } from "./minimap-math";
 import type { NavigationClearance } from "./navigation-physics";
 
@@ -65,6 +65,16 @@ const unavailable = (target: MapPoint): MapNavigation => ({
 const distance = (a: MapPoint, b: MapPoint) => Math.hypot(a.x - b.x, a.z - b.z);
 const point = (p: StreetPoint): MapPoint => ({ x: p[0], z: p[1] });
 const copyPoint = (p: MapPoint): MapPoint => ({ x: p.x, z: p.z });
+// The shared entry is already in world coordinates. Stop on the source grade
+// just before its measured first stair front, not at the old schematic route.
+const b6Approach = (() => {
+  const { start, end } = CAD_B6_ENTRY;
+  const length = distance(start, end);
+  return {
+    x: start.x - (0.6 * (end.x - start.x)) / length,
+    z: start.z - (0.6 * (end.z - start.z)) / length,
+  };
+})();
 const outsideStadiumBounds = (p: MapPoint) =>
   p.x < stadiumBounds.minX ||
   p.x > stadiumBounds.maxX ||
@@ -164,7 +174,7 @@ export function resolveNavigationTarget(target: NavigationTarget) {
     target.id === "club6" ||
     building?.name.endsWith("blok 6")
   )
-    return { point: point(B6_LAYOUT.approachRoute[0]), toEntrance: true };
+    return { point: copyPoint(b6Approach), toEntrance: true };
   const entrance =
     building && COMMON_DORM_ENTRANCES.find((e) => e.buildingId === building.id);
   if (entrance)

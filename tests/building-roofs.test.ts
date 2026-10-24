@@ -16,6 +16,8 @@ import {
 } from "../shared/landmark-reality";
 import { buildCampusExteriorPlan } from "../shared/campus-exterior";
 import { buildArchitectureReality } from "../client/architecture-reality";
+import { CAD_BUILDINGS } from "../shared/cad-buildings";
+import { cadWorldToLocal, cadSurfaceHeightAtXZ } from "../shared/cad-building-geometry";
 await initPhysics();
 const building = BUILDINGS.find((b) => b.id === "53921692")!;
 const baseY = buildingBaseHeight(building.points);
@@ -48,13 +50,24 @@ test("actual B1 and market roofs stop the chassis from above and below without f
     landmarks = buildLandmarkPlan(),
     exterior = buildCampusExteriorPlan();
   try {
-    const b1 = landmarks.b1Roof!;
+    const b1 = CAD_BUILDINGS.find((building) => building.id === "b01")!;
+    const local = cadWorldToLocal({ x: -87, y: 0, z: 80 }, b1.placement);
+    const heights = (surfaces: typeof b1.site.supportSurfaces) => surfaces
+      .filter((surface) => surface.floor === "n04" && surface.role === "slab")
+      .map((surface) => cadSurfaceHeightAtXZ(surface, local.x, local.z))
+      .filter((height): height is number => height !== undefined)
+      .map((height) => height + b1.placement.translation.y);
+    const top = Math.max(...heights(b1.site.supportSurfaces));
+    const underside = Math.min(...heights(b1.site.coverSurfaces));
+    assert.ok(Number.isFinite(top) && Number.isFinite(underside) && top > underside,
+      "native CAD roof has distinct upper and lower construction faces");
     for (const point of [
-      { id: "b1", x: -87, z: 80, y: b1.baseY + b1.height },
-      { id: "market", x: 114, z: -63, y: exterior.shopRoof.y },
+      { id: "b1", x: -87, z: 80, top, underside },
+      { id: "market", x: 114, z: -63, top: exterior.shopRoof.y, underside: exterior.shopRoof.y },
     ]) {
       for (const direction of [-1, 1]) {
-        const origin = { x: point.x, y: point.y - direction * 0.5, z: point.z };
+        const surfaceY = direction < 0 ? point.top : point.underside;
+        const origin = { x: point.x, y: surfaceY - direction * 0.5, z: point.z };
         const rayHit = sim.world.castRay(
           new RAPIER.Ray(origin, { x: 0, y: direction, z: 0 }),
           1,
@@ -65,7 +78,7 @@ test("actual B1 and market roofs stop the chassis from above and below without f
           `${point.id} roof ray ${direction}`,
         );
         sim.car.reset(
-          { x: point.x, y: point.y - direction * 2, z: point.z },
+          { x: point.x, y: surfaceY - direction * 2, z: point.z },
           0,
         );
         sim.car.unpark("roof-probe");
@@ -80,12 +93,12 @@ test("actual B1 and market roofs stop the chassis from above and below without f
         }
         if (direction < 0)
           assert.ok(
-            sim.car.position.y > point.y - 0.1,
+            sim.car.position.y > surfaceY - 0.1,
             `${point.id} fell through top`,
           );
         else
           assert.ok(
-            maximumTop < point.y + 0.08,
+            maximumTop < surfaceY + 0.08,
             `${point.id} penetrated underside`,
           );
       }
@@ -94,7 +107,7 @@ test("actual B1 and market roofs stop the chassis from above and below without f
       assert.equal(
         sim.world.castRay(
           new RAPIER.Ray(
-            { x, y: b1.baseY + b1.height + 1, z: 80 },
+            { x, y: top + 1, z: 80 },
             { x: 0, y: -1, z: 0 },
           ),
           2,

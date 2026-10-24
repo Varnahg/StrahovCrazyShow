@@ -1,5 +1,9 @@
 import RAPIER from "@dimforge/rapier3d-compat";
-import type { Simulation } from "../shared/simulation";
+import {
+  CHARACTER_RADIUS,
+  CHARACTER_HALF_HEIGHT,
+  type Simulation,
+} from "../shared/simulation";
 import type { MapPoint } from "./minimap-math";
 
 /** Planner clearance, not another physics world. The reduced torso capsule
@@ -13,21 +17,28 @@ export type NavigationClearance = ((a: MapPoint, b: MapPoint) => boolean) & {
   /** Small bounded work units used by the browser's cooperative planner. */
   steps?: (a: MapPoint, b: MapPoint) => Generator<void, boolean>;
 };
+const contactMargin = 0.01;
+const maximumStepUp = 0.22;
+// Half of the Actor's 2cm controller offset is in the shape, half in the query.
+// Keep its full upper extent while lifting the underside to the stair limit.
+const torsoRadius = CHARACTER_RADIUS + contactMargin;
+const torsoBottom = maximumStepUp + contactMargin;
+const torsoTop = 2 * (CHARACTER_HALF_HEIGHT + CHARACTER_RADIUS) + contactMargin;
 export const NAVIGATION_CLEARANCE = {
-  radius: 0.43,
-  contactMargin: 0.01,
-  halfHeight: 0.32,
-  centreHeight: 0.98,
+  radius: torsoRadius,
+  contactMargin,
+  halfHeight: (torsoTop - torsoBottom) / 2 - torsoRadius,
+  centreHeight: (torsoTop + torsoBottom) / 2,
   maximumSweepLength: 1.5,
   terrainSampleSpacing: 0.15,
-  maximumStepUp: 0.22,
+  maximumStepUp,
   maximumStepDown: 0.25,
   maximumGrade: 0.62,
 } as const;
 export function createNavigationClearance(sim: NavigationPhysics) {
-  // 43cm plus a 1cm query margin matches the production radius42cm + KCC
-  // offset2cm. The raised lower hemisphere remains a conservative torso query,
-  // not a substitute for the actual autostep controller.
+  // The radius and upper envelope follow the shared character dimensions.
+  // The raised lower hemisphere remains a conservative torso query, not a
+  // substitute for the actual autostep controller and support-height checks.
   const shape = new RAPIER.Capsule(
     NAVIGATION_CLEARANCE.halfHeight,
     NAVIGATION_CLEARANCE.radius,

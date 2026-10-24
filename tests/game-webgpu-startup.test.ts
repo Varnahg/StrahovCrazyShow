@@ -1,6 +1,7 @@
 import test, { type TestContext } from "node:test";
 import assert from "node:assert/strict";
 import { Script } from "node:vm";
+import { setImmediate as nextTurn } from "node:timers/promises";
 import ts from "typescript";
 import { readGameSource } from "./helpers/game-source";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
@@ -18,6 +19,7 @@ const methods = selectMembers([
   "disposeStartupAsset",
   "disposeStartupAssets",
   "trackStartupAsset",
+  "loadCadBuildingsForStartup",
   "applyAdaptiveQuality",
   "setQuality",
   "setTargetFps",
@@ -51,7 +53,7 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(`(function(env) {
-  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady } = env;
+  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, CAD_BUILDINGS, hasCadBuilding, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady } = env;
   ${compiled}
   return StartupGame;
 })`).runInThisContext();
@@ -80,7 +82,9 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 async function settle() {
-  for (let i = 0; i < 24; i++) await Promise.resolve();
+  // Drain the actual chained health/asset gates without guessing their number
+  // of microtasks. Held fixture promises remain held across this event-loop turn.
+  await nextTurn();
 }
 
 /** Runs the actual production start body. Replaces module/asset/GPU IO only;
@@ -91,6 +95,8 @@ function fixture(
     preparation?: "complete" | "timeout";
     holdPhysics?: boolean;
     holdAssets?: boolean;
+    holdCad?: boolean;
+    nativeB6?: boolean;
     faultAfterGate?: boolean;
   } = {},
 ) {
@@ -108,11 +114,18 @@ function fixture(
     gate = deferred<void>();
   const interior = deferred<any>(),
     vegetation = deferred<any>(),
-    car = deferred<any>();
+    car = deferred<any>(),
+    cad = deferred<any>();
   let disposedAssets = 0,
     gateCalls = 0,
     simulations = 0,
-    failures = 0;
+    failures = 0,
+    interiorLoads = 0,
+    cadLoads = 0;
+  const cadBuildings = [
+    { id: "b01", osmId: "53929063" },
+    ...(options.nativeB6 === false ? [] : [{ id: "b06", osmId: "53929071" }]),
+  ];
   const events: { kind: string; data: unknown }[] = [];
   const shaderStages: string[] = [];
   let gateReadiness: (() => boolean) | undefined;
@@ -130,12 +143,14 @@ function fixture(
   };
   const interiorAsset = disposable(),
     vegetationAsset = disposable();
+  const cadAsset = { ...disposable(), stats: { buildings: cadBuildings.length, meshes: 2, materials: 2 } };
   if (!options.holdPhysics) physics.resolve();
   if (!options.holdAssets) {
     interior.resolve(interiorAsset);
     vegetation.resolve(vegetationAsset);
     car.resolve(carAsset);
   }
+  if (!options.holdCad) cad.resolve(cadAsset);
   let game: any, health: RenderHealth;
   const StartupGame = make({
     arePreparationEffectsReady,
@@ -158,11 +173,23 @@ function fixture(
         "./assets": { loadCar: () => car.promise },
         "./vegetation": { loadVegetation: () => vegetation.promise },
         "./transit-renderer": { TransitRenderer: class {} },
-        "./b6-reality": { loadB6Reality: () => interior.promise },
+        "./b6-reality": { loadB6Reality: () => { interiorLoads++; return interior.promise; } },
+        "./cad-buildings": {
+          loadCadBuildings: (scene: unknown, assets: unknown, input: { signal: AbortSignal }) => {
+            assert.equal(scene, game.scene);
+            assert.equal(assets, cadBuildings);
+            assert.equal(input.signal, game.startupAbort.signal);
+            cadLoads++;
+            return cad.promise;
+          },
+        },
       };
+      assert.ok(name in modules, `Fixture must model the requested startup import: ${name}`);
       return modules[name];
     },
     B6_LAYOUT: { foundationOffset: 0 },
+    CAD_BUILDINGS: cadBuildings,
+    hasCadBuilding: (osmId: string) => cadBuildings.some(building => building.osmId === osmId),
     SurfacePack: class {
       update() {}
     },
@@ -277,7 +304,9 @@ function fixture(
     },
     completeInterior: () => interior.resolve(interiorAsset),
     completeVegetation: () => vegetation.resolve(vegetationAsset),
-    stats: () => ({ disposedAssets, gateCalls, simulations, failures }),
+    completeCad: () => cad.resolve(cadAsset),
+    rejectCad: (error: Error) => cad.reject(error),
+    stats: () => ({ disposedAssets, gateCalls, simulations, failures, interiorLoads, cadLoads }),
   };
 }
 
@@ -285,6 +314,9 @@ test("actual Game start cannot become playable until the submitted-frame gate su
   const f = fixture(t),
     start = f.game.start();
   await settle();
+  assert.equal(f.stats().interiorLoads, 0, "native B6 bypasses its legacy optional asset");
+  assert.equal(f.stats().cadLoads, 1);
+  assert.equal(f.game.canvas.dataset.cadStage, "ready");
   assert.equal(f.stats().gateCalls, 1);
   assert.equal(f.game.ready, false);
   assert.equal(f.game.canvas.dataset.bootStage, "submitted-frame");
@@ -297,6 +329,41 @@ test("actual Game start cannot become playable until the submitted-frame gate su
   assert.equal(f.shaderStages.at(-1), "ready");
   assert.equal(f.loops.size, 1);
   assert.equal(f.pipelineScopes[0].disposed, 1, "scope ends before interactive frames");
+});
+
+test("actual Game waits for critical CAD IO before lighting and the submitted-frame gate", async (t) => {
+  const f = fixture(t, { holdCad: true }), start = f.game.start();
+  await settle();
+  assert.equal(f.stats().cadLoads, 1);
+  assert.equal(f.game.canvas.dataset.bootStage, "cad-buildings");
+  assert.equal(f.game.canvas.dataset.cadStage, undefined);
+  assert.equal(f.game.cadBuildings, undefined);
+  assert.equal(f.pipelineScopes.length, 0);
+  assert.equal(f.stats().gateCalls, 0);
+  assert.equal(f.game.ready, false);
+  assert.equal(f.loops.size, 1, "asset readiness still has its preload render loop");
+  f.completeCad(); await settle();
+  assert.equal(f.game.canvas.dataset.cadStage, "ready");
+  assert.equal(f.game.startupAssets.size, 0, "controller ownership transfers to Game");
+  assert.equal(f.stats().gateCalls, 1);
+  assert.equal(f.game.ready, false, "CAD completion alone cannot bypass the final gate");
+  f.gate.resolve(); await start;
+  assert.equal(f.game.ready, true);
+});
+
+test("actual Game propagates critical CAD failure past optional fallbacks without entering the final gate", async (t) => {
+  const f = fixture(t, { holdCad: true }), start = f.game.start();
+  const rejected = assert.rejects(start, /CAD fixture download failed/);
+  await settle();
+  assert.equal(f.stats().cadLoads, 1);
+  f.rejectCad(new Error("CAD fixture download failed"));
+  await rejected;
+  assert.equal(f.game.startupAssetErrors, 0, "CAD is not an optional car/vegetation failure");
+  assert.equal(f.game.canvas.dataset.cadStage, undefined);
+  assert.equal(f.game.cadBuildings, undefined);
+  assert.equal(f.pipelineScopes.length, 0);
+  assert.equal(f.stats().gateCalls, 0);
+  assert.equal(f.game.ready, false);
 });
 
 test("actual Game rejects an incomplete light preparation instead of announcing ready", async (t) => {
@@ -382,7 +449,7 @@ test("device loss during physics loading promptly rejects and cannot restart the
 });
 
 test("late asset controllers from a failed Game are disposed without changing a replacement canvas", async (t) => {
-  const f = fixture(t, { holdAssets: true }),
+  const f = fixture(t, { holdAssets: true, nativeB6: false }),
     start = f.game.start();
   await settle();
   assert.equal(f.loops.size, 1);
@@ -401,7 +468,7 @@ test("late asset controllers from a failed Game are disposed without changing a 
 });
 
 test("one stuck loader cannot retain other abandoned controllers", async (t) => {
-  const f = fixture(t, { holdAssets: true }),
+  const f = fixture(t, { holdAssets: true, nativeB6: false }),
     start = f.game.start();
   await settle();
   f.completeInterior();
@@ -453,7 +520,8 @@ test("render fault rejects pending Game startup and releases late assets", async
   assert.equal(f.loops.size, 0);
   assert.equal(f.stats().failures, 1);
   f.completeAssets(); await settle();
-  assert.equal(f.stats().disposedAssets, 3);
+  assert.equal(f.stats().disposedAssets, 2, "native B6 leaves only the car and vegetation optional");
+  assert.equal(f.stats().cadLoads, 0, "failed optional startup never reaches CAD IO");
   assert.equal(f.game.ready, false);
 });
 

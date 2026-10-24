@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-b1-accessibility-20261024",
+  "title": "KEY-59: ověřit souvislou dosažitelnost interiérových dveří B1",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/cad-buildings/verify_accessibility.mjs",
+    "scripts/cad-buildings/test_accessibility.mjs",
+    ".cache/cad-buildings-20261024/b01-accessibility/",
+    "docs/agents/handoffs/cad-buildings-b1-accessibility-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Dosažitelnost skutečných vnitřních dveřních bodů vychází z týchž konstrukčních kolizí a kapsle jako ostatní modelová přejímka.",
+    "Oddělená místnost nebo přerušená chodba nemůže projít jen proto, že izolovaný dveřní otvor je průchozí.",
+    "Chybějící terén a uzavřené fasádní prosklení jsou rozlišené, nikoli automaticky přijaté jako průchod.",
+    "Cílené testy zahrnují skutečně spojenou a oddělenou geometrii i průchod kolem překážky; předání zaznamená limity vzorkování."
+  ],
+  "verification": [
+    "Malé cílené CPU geometrické/Rapier fixture testy bez hry a Blenderu.",
+    "Celý B1 probe pouze po návratu a rezervaci heavy-validation; žádný GPU důkaz se z něj nevyvozuje."
+  ],
+  "notes": [
+    "Koordinátor výslovně přidělil tuto součást uživatelova požadavku na použitelné interiéry, nejde o novou produktovou funkci.",
+    "Žádný další BMAD workflow; číst projektové AGENTS/bmad-policy. Implementaci, cílený refaktoring a testy předat společně.",
+    "rapier_model.mjs, verify_routes.mjs a verify_doors.mjs jsou jen čtecí závislosti, zůstávají rootovi. Požadovanou změnu API domluvit předem.",
+    "Od05:21 do přibližně06:51UTC má heavy druhý chat. Do jeho skutečného STOP/release a nového root claimu pouze lehký kód a malé fixture testy, nikoli celý model.",
+    "Původní CAD dokumenty nevkládat do Gitu. Probe nesmí vytvářet druhý odhad stavební geometrie ani tvrdit průchod celé hry.",
+    "24.10.2026 09:26 UTC: koordinátor převzal B1 R10 po native/visual/spatial auditu a třech nezávislých review. Čerstvá příprava je geometricky i všemi daty kromě nového generatorSha256 shodná s R10;162 strict Python +28 Node fixture PASS. Přijetí stavebního modelu/jeho nástrojů není herní integrace; terrain a celé KEY-59 zůstávají otevřené. Evidence docs/reality-pack/cad-buildings/b01/."
+  ]
+}

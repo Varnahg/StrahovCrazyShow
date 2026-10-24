@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-b1-runtime-build-20261024",
+  "title": "KEY-59: izolované závislosti, build a integrační test B1",
+  "status": "done",
+  "dependsOn": [
+    "cad-buildings-b1-20261024"
+  ],
+  "writePaths": [
+    "node_modules/",
+    "dist/",
+    ".cache/cad-buildings-20261024/b01-runtime-build/",
+    "docs/agents/handoffs/cad-b1-runtime-build-20261024.md"
+  ],
+  "resources": [
+    "workspace-build",
+    "port:2568"
+  ],
+  "acceptance": [
+    "Závislosti odpovídají přijatému lockfilu bez změny jeho obsahu a bez připojení k mutable node_modules jiného chatu.",
+    "Build a testy běží pouze nad vlastním checkpointem, nikoli nad primary-main WIP."
+  ],
+  "verification": [
+    "pnpm install --frozen-lockfile; pnpm test; pnpm build; izolovaný pnpm test:integration s rezervací heavy-validation.",
+    "Před release ukončit vlastní integrační pomocné procesy a ověřit port2568."
+  ],
+  "notes": [
+    "Koordinátor přijal lokální implementaci a odpovídající důkazy24.10.2026. Modelovécommity30c13354/dea1b67f, runtimea31f743a, frozen841637d9. Veřejný přehled docs/reality-pack/cad-buildings/b01/runtime.md; Git publikace má samostatný task.",
+    "Výslovný pokyn uživatele: po B1 commitu pozastavit další modely a připravit hru k vyzkoušení. KEY-59.",
+    "Přijatý základ origin/main2a7b1998 plus asset-only cherry-pick6dd89606; žádný primary-main WIP nebo frozen source15 se nepřebírá.",
+    "Před zápisem vlastní claim; Blender/fullprep/build/integrace vyžadují navíc root heavy-validation, GPU a porty samostatné rezervace.",
+    "Původní CAD ani jejich kopie se nevkládají do Gitu. Závazný model je uložený B1 R10, žádná výroba B2."
+  ]
+}
