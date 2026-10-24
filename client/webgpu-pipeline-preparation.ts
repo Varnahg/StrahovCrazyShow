@@ -47,6 +47,7 @@ function sameIdentity(a: Identity, b: Identity | undefined): boolean {
 export class WebGpuPipelinePreparation {
   private engine?: Host;
   private device?: Host;
+  private compatibilityMode?: boolean;
   private mainCache?: Host;
   private clear?: Host;
   private clearCache?: Host;
@@ -74,7 +75,9 @@ export class WebGpuPipelinePreparation {
     this.limit = Math.min(64, Math.max(1, Math.floor(options.maxEntries ?? 64) || 1));
     this.retry = options.retryIncompleteFrame;
     const host = engine as Host;
-    this.inert = host.isWebGPU !== true || host.compatibilityMode !== true || host.snapshotRendering !== false;
+    const webgpu = host.isWebGPU === true;
+    this.compatibilityMode = webgpu ? host.compatibilityMode : undefined;
+    this.inert = !webgpu || typeof this.compatibilityMode !== "boolean" || host.snapshotRendering !== false;
     if (options.signal?.aborted) { this.disposed = true; return; }
     if (this.inert) return;
     if (owners.has(engine)) throw new Error("WebGPU startup pipeline preparation already has an owner.");
@@ -129,13 +132,18 @@ export class WebGpuPipelinePreparation {
     this.install(target, name, (original) => {
       const owner = this;
       return function (this: Host, ...args: unknown[]) {
-        if (!owner.active || !owner.rendering || this !== target || (name === "clear" && !args[0]))
+        if (!owner.active || !owner.rendering || this !== target)
           return original.apply(this, args);
         owner.check();
         const previous = owner.boundary;
         owner.boundary = cache;
         try { return original.apply(this, args); }
-        catch (error) { if (error !== owner.pendingSignal) throw error; }
+        catch (error) {
+          if (error !== owner.pendingSignal) throw error;
+          // NCM ClearQuad.clear(null) may have allocated a still-empty encoder.
+          // Never finish/cache/publish it; the native bundle list ignores null.
+          if (name === "clear") return null;
+        }
         finally { owner.boundary = previous; }
       };
     });
@@ -147,7 +155,7 @@ export class WebGpuPipelinePreparation {
     if (this.hasFault) throw this.fault;
     const e = this.engine;
     if (!this.active || !e || e.isDisposed === true || e._isDisposed === true ||
-        e.compatibilityMode !== true || e.snapshotRendering !== false || e._device !== this.device ||
+        e.compatibilityMode !== this.compatibilityMode || e.snapshotRendering !== false || e._device !== this.device ||
         e._cacheRenderPipeline !== this.mainCache || e._clearQuad !== this.clear ||
         this.clear?._cacheRenderPipeline !== this.clearCache ||
         this.mainCache?._device !== this.device || this.clearCache?._device !== this.device ||

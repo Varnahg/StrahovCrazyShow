@@ -226,3 +226,13 @@ test("the actual game capsule continuously climbs B2's twelve exterior steps on 
   assert.ok(maxStep < 0.25, "no sudden teleport-like vertical step");
   sim.dispose();
 });
+
+test("stadium glass producer declares exact near/far PBR receivers without changing tier visibility, alpha or geometry",()=>{
+  const engine=new NullEngine(),scene=new Scene(engine),controller=buildLandmarkReality({scene,plan});
+  try{
+    const receivers=controller.meshes.filter(mesh=>mesh.metadata.authoredLightReceiver==="stadium-glass");assert.ok(receivers.length>=2);
+    assert.deepEqual(new Set(receivers.map(mesh=>mesh.metadata.lod)),new Set(["near","far"]));
+    for(const mesh of receivers){assert.equal(mesh.metadata.landmark,"stadium");assert.equal(mesh.metadata.sourcePack,"landmark-reality");assert.equal(mesh.material!.metadata.authoredLightReceiver,"stadium-glass");assert.equal(mesh.material!.metadata.landmarkGlass,true);assert.equal(mesh.material!.alpha,1);assert.equal(mesh.metadata.depthCaster,false);assert.ok(mesh.getTotalIndices()>0);assert.equal(mesh.isEnabled(),mesh.metadata.lod==="far");}
+    for(const mesh of controller.meshes.filter(mesh=>!receivers.includes(mesh)))assert.equal(mesh.metadata.authoredLightReceiver,undefined);
+  }finally{controller.dispose();scene.dispose();engine.dispose();}
+});

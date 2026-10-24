@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-native-instance-buffer-20261021",
+  "title": "KEY-22: invalidovat NCM instance bundle při změně skutečných matrix bufferů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "patches/@babylonjs__core@9.30.0.patch",
+    "pnpm-lock.yaml",
+    "tests/webgpu-instance-buffers.test.ts",
+    "tests/fixtures/webgpu-instance-buffers/",
+    "docs/performance/evidence/webgpu-completion-20261021/native-instance-buffer/",
+    ".cache/webgpu-completion-native-instance-buffer-20261021/",
+    "docs/agents/handoffs/webgpu-completion-native-instance-buffer-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před zápisem zapsat celý pinned Mesh.render→Material preBind→regular-instance update→Geometry.bind→NCM draw chain, primární buffer lifecycle pravidlo a všechny porovnané varianty s náklady/cache/lifecycle. Skutečný CPU base-Material chain prokázal2048→4096 stale bundle a destroy; původní actual37326 owner zůstává nedoložený.",
+    "Zvolený úzký native pinpatch pro běžné regular-instance vertex bindings: per aktivní DrawContext porovnat skutečné current a previous matrix DataBuffer identity před KAŽDÝM skutečným draw; na změně zahodit pouze jeho fastBundle. Žádný mesh.resetDrawCache/context.reset/dispose aktivních UBO/indirect slots, žádný delaydestroy/fence/timeout/readiness/cache-disable. Per-pass i externí shadow override contexts musí být chráněny lazy před vlastním replay, nikoli jen current context v jednorázové growth větvi.",
+    "Pokrýt také prvotní current buffer a zapnutí previousWorld při stejné capacity, missing/disposed/null identity a případné další side-effect free varianty z pinned source. Zachovat přesnou původní aktualizaci dat, receiver/return/throw, material bindings, resource refcounts a deferred destroy. Dvě scalar identity porovnání, bez per-draw alokace či scanů mesh/context/atributů; skutečný výkon až root GPU.",
+    "WebGL a WebGPU CM zůstanou beze změny. useVertexPulling=true není běžný app kontrakt; samotný fastBundle clear neopravuje jeho storage binding vadu. Tuto větev explicitně zachovat/vyloučit s negativní fixture a otevřeným omezením, nebo před rozšířením požádat root o rozhodnutí. Neslibovat obecnou opravu custom/thin/index/geometry buffer změn.",
+    "Upravit pouze relevantní native patch sekce a přesné související hash reference v locku; ostatní patch sekce byte-exact. Prokázat reverse starého + apply nového patche ve vlastní izolované fixture a inverse lock bytes, zachovat existující native optimizace. Žádná změna package/config/version ani lokálních shared node_modules a žádný pnpm install do hraného/root stromu.",
+    "Portable tests čtou skutečnou installed pinned knihovnu bez QA overlay/env v běžném runneru; isolated own source overlay je pouze red/green důkaz leafu. Full native Mesh.render chain a další passes/contexts + stable reuse/current+previous/first previous/throw/refcounts/UBO/indirect/regime controls. Fake je pouze terminální device/encoder IO a explicitní ready Effect; rozlišit base Material a actual Standard/PBR coverage, žádný GPUvalidátor/FPS/actual37326claim.",
+    "Předat implementaci+cílený refaktor+smysluplné lightweight CPU a scopedTS+native hash/patch identity společně. Žádný child fullsuite/build/install/server/GPU/commit, žádný rekurzivní BMAD. Root integruje pouze exact vlastní payload a fresh-install/GPU přejímku."
+  ],
+  "verification": [
+    "Bounded red na přesném původním installed9.30: první native draw skutečně zaznamená bundle se starými raw handles; druhý normální growth draw jej přehraje a oldraw se původním deferred postupem zničí. Green na isolated candidate musí nově encode current raw, zachovat stabilní třetí reuse a všechny bindings.",
+    "Další actual DrawContext/pass a shadow override lazy replay, current/previous toggles i same-capacity replacement, no-effect preparation/no-draw branch, WebGL/CM a vertex-pulling exclusions, effect/material/UBO lifecycle a native exceptions. Žádný seeded fastBundle či manuální release v hlavním kauzálním důkazu.",
+    "Všechny relevantní patch pre/post/source/test/lock SHA, portable resolver bez sourceoverlay/env v repo; targeted lightweight CPU/scopedTS/diff a čitelné peer předání. Root teprve provede fresh frozen-lock install, fullsuite/build/integration a actual nové Game repro/trace."
+  ],
+  "notes": [
+    "Root vede user KEY22, delegace je výslovný implementační leaf v tomto taskscope. Autor už provedl read-only primary/native research a bounded inline CPU chain; jeho přesná úspěšná verze se nyní zachová ve vlastních výstupech. Připravený default-off helpera5/frozenv6/GPU source5 zůstávají neměnné.",
+    "Root drží heavy-validation/gpu/build/porty; jiný child vlastní Game/UI/startup-view opravu. Neměnit tyto soubory ani jejich pinned dependency bytes pod jejich běžícími CPU proofy. Native pinpatch/lock jsou samostatný disjunktní zdroj, aplikuje se až root fresh install přejímkou.",
+    "Primární precedent portable pin/lock/isolated reverse+apply je docs/agents/handoffs/webgpu-shadow-share-native-20261019.md. Není to svolení kopírovat nesouvisející patche nebo číst archiv hromadně. Původní render-fault37326 je otevřený; nezávislá oprava stejného class mechanismu jej sama nepřiřazuje."
+  ]
+}

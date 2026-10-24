@@ -1,0 +1,89 @@
+TAP version 13
+# BJS - [18:53:23]: Babylon.js v9.30.0 - Null engine
+# BJS - [18:53:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game medium complete preparation retains leaf car shadow programs through restore and first visibility
+not ok 1 - actual Game medium complete preparation retains leaf car shadow programs through restore and first visibility
+  ---
+  duration_ms: 54.6239
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:7156'
+  failureType: 'testCodeFailure'
+  error: 'state.sky.update is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    applyArtLighting (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\client\art-lighting.ts:337:13)
+    Subject.updateRenderEnvironment (evalmachine.<anonymous>:274:26)
+    Object.applyQuality (evalmachine.<anonymous>:32:26)
+    prepareRenderQualities (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\client\render-quality-preparation.ts:101:15)
+    Subject.prepareLighting (evalmachine.<anonymous>:21:16)
+    Object.start (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:132:23)
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:147:37)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.start (node:internal/test_runner/test:1242:17)
+  ...
+# BJS - [18:53:23]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game high complete preparation retains leaf car shadow programs through restore and first visibility
+not ok 2 - actual Game high complete preparation retains leaf car shadow programs through restore and first visibility
+  ---
+  duration_ms: 57.8275
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:7156'
+  failureType: 'testCodeFailure'
+  error: 'state.sky.update is not a function'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    applyArtLighting (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\client\art-lighting.ts:337:13)
+    Subject.updateRenderEnvironment (evalmachine.<anonymous>:274:26)
+    Object.applyQuality (evalmachine.<anonymous>:32:26)
+    prepareRenderQualities (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\client\render-quality-preparation.ts:101:15)
+    Subject.prepareLighting (evalmachine.<anonymous>:21:16)
+    Object.start (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:132:23)
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:147:37)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+  ...
+# Subtest: async leaf arrival in the last vehicle stage is reacquired by the original Game revision/apply path
+not ok 3 - async leaf arrival in the last vehicle stage is reacquired by the original Game revision/apply path
+  ---
+  duration_ms: 22.5029
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:8427'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'failed'
+    - 'complete'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'complete'
+  actual: 'failed'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:167:50)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# BJS - [18:53:20]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual cached per-pass PBR and native last-notified base create the observed two shadow epochs
+ok 4 - actual cached per-pass PBR and native last-notified base create the observed two shadow epochs
+  ---
+  duration_ms: 520.8597
+  type: 'test'
+  ...
+# {"scope":"CPU native state/Effect lifetime; terminal GLSL IO, no GPU pixels","shadowPass":2,"mainPass":1,"firstBase":0,"mainBase":2,"firstDepth":1,"secondDepth":3,"masks":8}
+1..4
+# tests 4
+# suites 0
+# pass 1
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5444.9145

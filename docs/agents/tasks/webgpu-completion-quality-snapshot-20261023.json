@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-quality-snapshot-20261023",
+  "title": "KEY-22: neměnný source10 pro ověření progresivní přípravy kvalit",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/webgpu-completion-20261023-candidate-10/",
+    "docs/agents/handoffs/webgpu-completion-quality-snapshot-20261023.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Root vytvoří source10 teprve ze stabilního peer-reviewed a commitovaného quality-order checkpointu, včetně testů/assetů. Source9 a starší helper/build/reference zůstanou neměnné.",
+    "Stejný package/lock/native patch dovoluje guarded nonrecursive unlink pouze nově vytvořeného source10 node_modules junction a nový readonly junction na vlastní fresh source7 deps. Znovu ověřit38pinů a core/loaders singleton; žádný install nebo změna sdílených starých deps.",
+    "Zapsat celý source9→10 diff a source/build identity. Actual source9 High30.012s fail,57stage63.331s předchozípass a car/native158ms/GL145.5ms zůstanou zachované; žádný CPU výsledek nenahradí nový GPU startup/performance/image/main."
+  ],
+  "verification": [
+    "Before/after/frozen manifest SHA včetně testů, IPR7038 reuse, deps38+singleton, relevantní rootCPU/fullTS/build/integration/exactCI. Actual30/90s startup/pass timing a final requested restore, původní epoch-discriminator navázaný na skutečný přijatý startup, pak další celková přejímka."
+  ],
+  "notes": [
+    "Pouze root navazující uživatelské KEY22. Přesný source10 prefix neslouží neobjednané práci. Heavy/GPU/workspace-build/4213/2597/2568 a veřejné helper/validation výstupy mají samostatné rootclaims."
+  ]
+}

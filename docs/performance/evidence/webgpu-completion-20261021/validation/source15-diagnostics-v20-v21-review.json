@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "scope": "Two own QA helper deltas only; no foreign WIP or product source delta",
+  "round1": {
+    "diffBytes":240907,
+    "diffSha256":"5cb32bab7d63daa6665dc774ac6ae4f47371c205a1074fedba965094262330aa",
+    "blindFindings":[],
+    "triage":[
+      {"id":"edge-1","verdict":"medium","route":"patch","evidence":"Nested limits reached legacy JSON validation before own-data normalization; accessors could execute. Fixed in new entry helperV21, originalV20 sealed."},
+      {"id":"verification-1","verdict":"medium","route":"patch","evidence":"Native foreign-scene test lacked exported row/profile-clock assertions. Fixed in new startup helperV22, originalV21 sealed."}
+    ]
+  },
+  "round2": {
+    "diffBytes":11913,
+    "diffSha256":"cd2ab7a973456d3f3cb38594d61308ac1d611418f4fd3d64747191ac5e400977",
+    "blindFindings":[],
+    "edgeFindings":[],
+    "verificationFindings":[],
+    "verificationEvidence":"Limits V20 RED0/5 versus V21 GREEN7/7; foreign-scene mutant passes old test but fails new test at22 vs12 clock reads, ordinary new test passes. Reviewers read existing proof; no reviewer test execution."
+  },
+  "rootChecks": {
+    "entryWholeCorpus":{"helperSha256":"9a594e60aaecefbbad5b96da606d5de5c5f327e5fcc02994b51c08c2ce0aebde","tests":539,"pass":539,"fail":0,"skip":0},
+    "startupWholeCorpus":{"helperSha256":"a6294c4b303b7c63f7d8a3f0d261184a7447873522a276624332541056c5590a","tests":512,"pass":512,"fail":0,"skip":0},
+    "actualDiagnostics":"Entry8consecutive frames and startup7stage frames completed in Guest/source15. Distinct from FPS/main migration acceptance."
+  }
+}

@@ -1,6 +1,6 @@
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { OnDemandRender } from "./on-demand-render";
-import type { RenderHealth } from "./render-health";
+import type { RenderHealth, RenderHealthSnapshot } from "./render-health";
 
 export type RenderStartupHost = {
   requestFrame(callback: () => void): number;
@@ -19,6 +19,10 @@ export type RenderStartupOptions = {
   isReady(): boolean;
   signal?: AbortSignal;
   timeoutMs?: number;
+  /** Explicit final-view revalidation of the same already-ready renderer.
+   * All submission/readiness gates remain; only the initial state transition
+   * is not performed twice. The caller owns the remaining original budget. */
+  revalidate?: Pick<RenderHealthSnapshot, "rendererId" | "generation">;
 };
 type SubmissionDevice = {
   pushErrorScope(filter: "validation"): void;
@@ -76,7 +80,9 @@ export function waitForRenderStartup(
     if (finished || signal?.aborted) throw aborted();
     // A fault may arrive in the microtask between guard settlement and this
     // continuation. The outer guard retains its original rejection identity.
-    const phase = health.snapshot().phase;
+    const state = health.snapshot(), phase = state.phase;
+    if (options.revalidate && (state.rendererId !== options.revalidate.rendererId || state.generation !== options.revalidate.generation || phase !== "ready"))
+      throw new Error("Startup view renderer generation is no longer ready");
     if (phase === "disposed") throw aborted();
     if (phase !== "preparing" && phase !== "ready")
       throw new Error("Renderer is no longer usable");
@@ -218,7 +224,7 @@ export function waitForRenderStartup(
     const state = health.snapshot();
     if (!beforeReady || !afterReady || state.pendingOperations !== 0)
       return true;
-    if (!health.markReady())
+    if (options.revalidate ? !state.valid : !health.markReady())
       throw new Error("Renderer cannot enter ready state");
     finished = true;
     resolve();

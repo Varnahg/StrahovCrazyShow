@@ -1,0 +1,16 @@
+node:internal/fs/promises:697
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\.cache\webgpu-completion-20261021\startup-stage-export\helper\v17\startup-stage-routines.mjs'
+    at async open (node:internal/fs/promises:697:25)
+    at async readFile (node:internal/fs/promises:1348:14)
+    at async helperIdentity (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v18/common.mjs:149:56)
+    at async file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/docs/performance/evidence/webgpu-completion-20261021/startup-stage-routines/verify.mjs:10:13 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\startup-stage-routines.mjs'
+}
+
+Node.js v24.19.0

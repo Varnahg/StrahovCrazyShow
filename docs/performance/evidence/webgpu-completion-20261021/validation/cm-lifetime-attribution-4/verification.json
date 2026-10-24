@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUTC": "2026-10-21T14:34:22.528Z",
+  "sourceSnapshotId": "8039555366d3fc977ecfb18e155f30000e9e8faeb36469a9e110481a2feefb93",
+  "buildId": "2cbf4a05e5b321ec6d122bfac206d2bc2f0874de9bbe11b1ad617e441270ceff",
+  "helperSha256": "c9519c21acb9e6fd576fed1962b170853ee0b1e4d4016af11690313685a1063c",
+  "files": {
+    "startup.json": {
+      "bytes": 651402,
+      "sha256": "696034236a08885cd6f40894a73310c435d0db0f6a73105446f4a6b66ad6f136"
+    },
+    "http-identity.json": {
+      "bytes": 6566,
+      "sha256": "f091d0cc97f943377edbb9fbff2e92547f1860ca9be23926c22ce04b8472f61b"
+    },
+    "build-identity.json": {
+      "bytes": 9435,
+      "sha256": "76d341f3f3548fa9622d11166f85dcca813e9353670e9543752d0cec73d6a96f"
+    }
+  },
+  "outcome": "rejected",
+  "error": {
+    "name": "RenderStartupTimeoutError",
+    "message": "Renderer startup exceeded its visible-time deadline"
+  },
+  "jobTraceComplete": true,
+  "jobs": 2020,
+  "finalJobs": 812,
+  "pendingAtTerminal": 2,
+  "issues": {
+    "observerErrors": 0,
+    "overflow": 1564,
+    "traceOverflow": 0,
+    "mappingOverflow": 1564,
+    "mappingErrors": 0,
+    "unknownRole": 0,
+    "unknownStage": 0,
+    "unmatchedJobs": 0,
+    "unsupportedPromise": 0,
+    "ownerChanged": 0,
+    "unexpectedReceivers": 0,
+    "restoreConflicts": 0,
+    "restoreFailures": 0,
+    "contract": 0
+  },
+  "lifetimeIssues": {
+    "observerErrors": 0,
+    "overflow": 829,
+    "unknown": 0,
+    "foreign": 0,
+    "restoreConflicts": 0,
+    "restoreFailures": 0,
+    "unexpectedReceiver": 0
+  },
+  "lifetimeCoverage": {
+    "finalModules": 812,
+    "linkedFinalModules": 812,
+    "unresolvedOwnerLinks": 0,
+    "unlinkedFinalModules": 0
+  },
+  "lifetimeStats": {
+    "scopedCreateReturns": 17084,
+    "unscopedCreateReturns": 31327,
+    "createWithModules": 17084,
+    "createWithoutModules": 0,
+    "releaseCalls": 438,
+    "untrackedReleaseCalls": 2,
+    "releaseWithoutModules": 0,
+    "cacheReleaseSame": 440,
+    "cacheReleaseOther": 0,
+    "cacheReleaseMissing": 0,
+    "cacheReleaseUnknown": 0,
+    "bridgeInstalled": 0,
+    "bridgeBound": 0,
+    "lateCompiledDisposed": 0,
+    "generatorRegistrations": 2,
+    "shadowRegistrations": 1,
+    "registrationScans": 62
+  },
+  "finalTarget": {
+    "owners": [
+      {
+        "id": 757,
+        "kind": "shadow-derived",
+        "meshID": 1364,
+        "subMeshID": 1428,
+        "materialID": 507,
+        "generatorID": 5,
+        "passID": 9,
+        "useInstances": 0,
+        "meshName": "tree__ipr-crown-029__lod1__leaves",
+        "materialName": null,
+        "regularInstances": 0,
+        "thinInstances": 0,
+        "cachedVisibleBatchCount": null,
+        "baseInstances": 0,
+        "baseThin": 0
+      }
+    ],
+    "derivedEffects": 406,
+    "linkCount": 406,
+    "releaseCacheIdentityCodes": {
+      "unknown": -1,
+      "missingOrFalsy": 0,
+      "sameEffect": 1,
+      "otherTruthyEntry": 2
+    },
+    "releaseCount": 406,
+    "lateDisposedBindCount": 0,
+    "releaseRefCounts": [
+      0
+    ]
+  },
+  "acceptedStartup": false,
+  "acceptedPerformance": false,
+  "acceptedGpuCause": false,
+  "conclusion": "All812 final modules are linked to406 original derived shadow Effects for one actual PBR leaf owner; useInstances/regular/thin are0. These are released with same cache identity and refCount0, while base161/163 repeatedly return from cache. No late compile or stale-cache-other release is observed. This distinguishes actual lifetime replacement from earlier unsupported instancing/orphan hypotheses.",
+  "limitations": [
+    "Historical terminal mapping overflow1564 and lifetime history overflow829 remain explicit; final target module coverage812/812 is complete.",
+    "Original receipt does not include actual colorWrite/DEPTHPREPASS bits. Pinned source and CPU reproducer motivate PCF candidate; actual before/after GPU must establish acceptance.",
+    "No screenshot retained for this run; raw observer receipt and byte-verified HTTP/build identities are authoritative."
+  ]
+}

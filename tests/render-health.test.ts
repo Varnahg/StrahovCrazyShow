@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Observable } from "@babylonjs/core/Misc/observable";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine.pure";
 import type { Effect } from "@babylonjs/core/Materials/effect";
 import {
@@ -28,6 +29,18 @@ function pendingCounts(health: RenderHealth) {
     state.pendingShaderValidationOperations,
   ];
 }
+
+test("unpatched WebGPU query error producer invalidates health; WebGL is unaffected", () => {
+  const engine = new NullEngine();
+  (engine as unknown as { _isWebGPU: boolean })._isWebGPU = true;
+  Object.assign(engine, { _device: Object.assign(new EventTarget(), { lost: new Promise(() => {}) }) });
+  const health = new RenderHealth(engine, "game");
+  assert.equal(health.snapshot().phase, "invalid");
+  assert.equal(health.snapshot().counts.render, 1);
+  assert.equal(health.markReady(), false);
+  assert.match(health.snapshot().firstErrors[0].message, /query read error monitoring unavailable/);
+  engine.dispose();
+});
 
 type FrameMethod = (this: unknown, ...args: unknown[]) => unknown;
 type FrameInternals = {
@@ -58,6 +71,7 @@ function profiledHealth(f: ReturnType<typeof frameFixture>, healthFirst: boolean
   onFault?: () => void) {
   // Profiling reads only structural fields; no GPU is created by this fixture.
   Object.defineProperty(f.engine, "isWebGPU", { value: true, configurable: true });
+  Object.assign(f.engine, { onQueryReadErrorObservable: new Observable() });
   const lost = deferred<{ message: string; reason: string }>();
   Object.assign(f.engine, { _device: Object.assign(new EventTarget(), { lost: lost.promise }) });
   let health = healthFirst ? new RenderHealth(f.engine, "game", onFault) : undefined;
@@ -644,6 +658,7 @@ test("native device loss works without Babylon auto-restore and is not double-co
   const engine = new NullEngine(),
     lost = deferred<{ message: string; reason: string }>();
   (engine as unknown as { _isWebGPU: boolean })._isWebGPU = true;
+  Object.assign(engine, { onQueryReadErrorObservable: new Observable() });
   (
     engine as unknown as { _device: EventTarget & { lost: Promise<unknown> } }
   )._device = Object.assign(new EventTarget(), { lost: lost.promise });

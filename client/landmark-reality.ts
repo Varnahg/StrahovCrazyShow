@@ -67,6 +67,7 @@ export function buildLandmarkReality(options: {
       m.metadata = {
         sourcePack: "landmark-reality",
         landmarkGlass: kind === "stadium-glass",
+        ...(kind === "stadium-glass" ? { authoredLightReceiver: "stadium-glass" } : {}),
         sourceMeasured: false,
         sourceDetail:
           "OSM/IPR/photo exterior; interior closure is a pilot adaptation",
@@ -192,6 +193,7 @@ export function buildLandmarkReality(options: {
           ? false
           : "opaque",
       sourcePack: "landmark-reality",
+      ...(part.material === "stadium-glass" ? { authoredLightReceiver: "stadium-glass" } : {}),
       landmark: part.group,
       lod: part.lod,
       sourceMeasured: false,

@@ -1,0 +1,130 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/shared/simulation.ts:61
+  readonly buildingRoofColliders = new Map<string, RAPIER.Collider>();
+  constructor(public readonly photogrammetry?: PhotogrammetryCollision) {
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    this.world = new RAPIER.World({ x: 0, y: -18, z: 0 });
+
+SyntaxError [ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX]: TypeScript parameter property is not supported in strip-only mode
+    at parseTypeScript (node:internal/modules/typescript:68:40)
+    at processTypeScriptCode (node:internal/modules/typescript:146:42)
+    at stripTypeScriptModuleTypes (node:internal/modules/typescript:215:22)
+    at ModuleLoader.<anonymous> (node:internal/modules/esm/translators:680:29)
+    at #translate (node:internal/modules/esm/loader:434:20)
+    at afterLoad (node:internal/modules/esm/loader:502:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:507:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:560:36)
+    at afterResolve (node:internal/modules/esm/loader:607:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:613:12) {
+  code: 'ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX'
+}
+
+Node.js v24.19.0
+✖ docs\performance\evidence\webgpu-completion-20261021\measurement\clock.test.mjs (317.7358ms)
+✔ actual UI transform is exact once, retains outer catch/dispose and original input bytes (128.0412ms)
+✔ loading experiment changes exactly one declaration, original is byte identical, drift fails (9.1755ms)
+✔ startup terminal capture precedes original UI teardown and keeps the same thrown object (2.6252ms)
+✔ observer faults never replace startup failure/success and operation is called once (1.5184ms)
+✔ receipt keeps rejected startup evidence, repeated bytes are idempotent and conflict preserves original (63.2335ms)
+✔ same-origin loopback POST, identity, array and byte bounds are enforced (3.3724ms)
+✔ snapshot verifies all original files, rejects drift/path escape; bundle/helper hashes are real (79.4685ms)
+✔ overlay forbids browser engine exposure, extra readiness/render and periodic dumps during interval (3.1233ms)
+✔ immutable attempt queue keeps every pending/failed body until an exact ACK and supports retry (3.2753ms)
+✔ explicit preview port validation and derived origin authorization preserve immutable baseline ports (1.2649ms)
+✔ actual overlay failure produces terminal export before teardown using a DOM/transport fixture, no engine (31.6642ms)
+✔ diagnostic overlay observes original startup calls and restores before failure receipt without replacing primary error (17.3599ms)
+✔ diagnostic latency stop during pending start and rejoin cannot release fresh device hooks or mutate old receipt (11.3123ms)
+✔ delayed/failed startup ACK blocks measurement and pending downloads survive rejoin unchanged (13.3958ms)
+✔ refused, thrown and disposed benchmark attempts preserve raw failure despite cleanup errors (44.3028ms)
+✔ weather arrays/layers, precipitation and independent benchmark start/end snapshots are retained (11.8404ms)
+✔ clock overlay refuses Guest before its start and leaves Simulation unwrapped, retaining failed receipt (13.2539ms)
+✔ clock planned button uses the actual adapter, then disposal preserves a failed attempt and restores hook (14.6366ms)
+✔ clock import deferred across dispose/rejoin cannot install a late Game owner or poison the next startup (34.6093ms)
+✔ shader attribution overlay stays diagnostic, restores original methods and retains scalar inventory before the original failure (19.3119ms)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\@babylonjs\core\Misc\observable' imported from C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\docs\performance\evidence\webgpu-completion-20261021\measurement\shader-attribution.test.mjs
+Did you mean to import "@babylonjs/core/Misc/observable.js"?
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    at #resolve (node:internal/modules/esm/loader:683:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:253:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/node_modules/@babylonjs/core/Misc/observable'
+}
+
+Node.js v24.19.0
+✖ docs\performance\evidence\webgpu-completion-20261021\measurement\shader-attribution.test.mjs (195.0274ms)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\@babylonjs\core\Misc\observable' imported from C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\docs\performance\evidence\webgpu-completion-20261021\measurement\shader-lifetime.test.mjs
+Did you mean to import "@babylonjs/core/Misc/observable.js"?
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    at #resolve (node:internal/modules/esm/loader:683:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:253:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/node_modules/@babylonjs/core/Misc/observable'
+}
+
+Node.js v24.19.0
+✖ docs\performance\evidence\webgpu-completion-20261021\measurement\shader-lifetime.test.mjs (984.6398ms)
+✔ explicit build flags preserve positional clock and reject duplicate/ambiguous input; default observer off (6.2101ms)
+✔ recorded weather changes only original preview QA labels and preserves every numeric/null/nested value (3.0504ms)
+✔ weather byte/UTF8/known-shape/value bounds fail closed without clamping values (4.3096ms)
+✔ explicit weather path, raw/emitted identity, provenance and postbuild drift are verified (106.0895ms)
+✔ weather middleware default leaves API proxy untouched; explicit fixture returns exact no-store bytes only at existing route (2.0686ms)
+✔ latency default off never reads engine/device or installs methods; non-WebGPU enabled is explicit invalid diagnostic (1.2762ms)
+✔ latency returns the exact original Promises, receivers/args and independent completion channels with no extra calls (2.1241ms)
+✔ latency preserves synchronous throws and unsupported outputs despite faulty observer clock (0.7912ms)
+✔ latency retains pending calls at stop; late settlements cannot mutate sealed evidence or a fresh owner (2.3577ms)
+✔ latency abort, retirement and device replacement restore only owned hooks and permit rejoin (2.5021ms)
+✔ latency late retirement during installation never leaves a wrapper; foreign wrapper and overlapping owner are retained safely (1.267ms)
+✔ latency cap is bounded, original calls continue, overflow invalidates and scalar trace fits receipt headroom (22.6851ms)
+✔ latency method descriptors and inherited ownership restore exactly; missing/immutable methods are invalid (0.6037ms)
+✔ canonical digest covers every required build input, explicit null/off and nested key order deterministically (4.005ms)
+✔ load seal rejects deletion/null/tamper of weather, clock and diagnostic flag before optional branch selection (3.0732ms)
+✔ coherently recomputed sidecars/overlay cannot relabel the old verified browser JavaScript (1.7646ms)
+✔ verified source/helper/config/weather/transforms/dependencies must belong to the same sealed branch (2.7862ms)
+✔ seal refuses mismatched actual JavaScript bytes/hashes and source proof metadata (2.6093ms)
+ℹ tests 41
+ℹ suites 0
+ℹ pass 38
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1671.3881
+
+✖ failing tests:
+
+test at docs\performance\evidence\webgpu-completion-20261021\measurement\clock.test.mjs:1:1
+✖ docs\performance\evidence\webgpu-completion-20261021\measurement\clock.test.mjs (317.7358ms)
+  'test failed'
+
+test at docs\performance\evidence\webgpu-completion-20261021\measurement\shader-attribution.test.mjs:1:1
+✖ docs\performance\evidence\webgpu-completion-20261021\measurement\shader-attribution.test.mjs (195.0274ms)
+  'test failed'
+
+test at docs\performance\evidence\webgpu-completion-20261021\measurement\shader-lifetime.test.mjs:1:1
+✖ docs\performance\evidence\webgpu-completion-20261021\measurement\shader-lifetime.test.mjs (984.6398ms)
+  'test failed'

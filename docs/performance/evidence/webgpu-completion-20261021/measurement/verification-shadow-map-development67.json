@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 8,
+  "checkedAtUTC": "2026-10-21T13:08:17.472Z",
+  "node": "v24.19.0",
+  "scope": "Targeted actual TS profiler plus controlled IO/Promise, metadata/bytes/DOM/transport and Simulation/Rapier CPU fixtures. No production build/browser/server/GPU or fabricated performance.",
+  "command": "node --import tsx --test --test-reporter=tap docs/performance/evidence/webgpu-completion-20261021/measurement/helper.test.mjs docs/performance/evidence/webgpu-completion-20261021/measurement/clock.test.mjs docs/performance/evidence/webgpu-completion-20261021/measurement/weather-latency.test.mjs docs/performance/evidence/webgpu-completion-20261021/measurement/shader-attribution.test.mjs",
+  "exitCode": 0,
+  "tests": 67,
+  "pass": 67,
+  "fail": 0,
+  "skipped": 0,
+  "logSha256": "aaceb852653bd6acf78625906a94238e8514e7c22c5364311298ef5b86c4ccd1",
+  "helperSha256": "71c0452fbdac3dec1a0e3957f6230544f787c8f184a34b900bd10e3d08b930d8",
+  "helperFiles": {
+    "common.mjs": "75249d2e38043e4b37a16c4cb21e4e4464180bf5084e4ea92e37bf9c0f02b439",
+    "startup-observer.mjs": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+    "attempt-queue.mjs": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+    "receipt.mjs": "6aebee76673b51ed19a1af98e1942aa6716324167321293e7e42bcfd6c7ffbbf",
+    "harness.mjs": "0d3517803cc3133760f91e819bfbe765da283afc36d4ccded5f89cc368b50dc3",
+    "qa-overlay.mjs": "92d1e2c54e3a9fca02a209686476cfa278bfdc6f5e53b929a8013dc93a2be5c2",
+    "transit-clock.mjs": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+    "browser-clock.mjs": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+    "server-bootstrap.mjs": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+    "weather-fixture.mjs": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+    "startup-latency.mjs": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+    "shader-attribution.mjs": "2234fbb5300ae144503c74539c5d071f76613f24bcb211519c68e37a9e956108",
+    "helper.test.mjs": "3e901768c9aebe1768e4d04e267e0b6cd595d52a32d90831748b5dfb4e8baf40",
+    "clock.test.mjs": "67031042ca1fce5ecfc377dc1320e0d74f91dd87eebbe2926eaf41a60196d08b",
+    "weather-latency.test.mjs": "0024954a2177ca60c78e51d0e4ebc65fc1071a83586d8fe30040721963a700bf",
+    "shader-attribution.test.mjs": "18bbbe7ee7646c61500667f9bdd5f8c44787b86423e554f28d0aef304c80ec24",
+    "README.md": "5d116600add29a9554e4f8da98f7fdd62172b74351b695c73e29e8485c4b337d"
+  },
+  "helperSourceStable": true,
+  "selectedSourceBefore": {
+    "client/ui.tsx": "6aa94cf9ecd4278ef68c1e5a98377503f5bd96c667fe51e24e3ef5ac941562fe",
+    "client/game.ts": "c3ad05b05d8d64e7a5b0033303a4fa7e330f793ea8bb54a8a0fec976a1384395",
+    "client/webgpu-compilation-profile.ts": "cbeef371271c44f4e55d7c4aafe3a47f3d1cc123caa254c3817a3f5c6d308876",
+    "client/render-health.ts": "7a5027922feb2292e9238917a7af58a2371187446d8cc36f0324562e49d583a4",
+    "client/render-startup.ts": "8cba9b39c2448bd81f11bdf0fbd90634c0d8ef0450878bbe005e9a8adc7fcc54",
+    "node_modules/@babylonjs/core/package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79",
+    "node_modules/@babylonjs/core/Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+    "node_modules/@babylonjs/core/Engines/WebGPU/webgpuPipelineContext.js": "f4a867eee34c2d12f70d5f0a8800ea78e8248a993fb00ffb2ebc483364905620",
+    "node_modules/@babylonjs/core/Meshes/subMesh.pure.js": "d9b6f61a0f5ad773ab23c67393a8bad278dea133f539887458d1e208f8df1458",
+    "node_modules/@babylonjs/core/Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+    "node_modules/@babylonjs/core/node.js": "e4859368dbf13688644adb6a17bb3dc65220133d3a979889a4f8ae8e95bafad7",
+    "node_modules/@babylonjs/core/Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "node_modules/@babylonjs/core/Materials/drawWrapper.js": "ecf5bc98dda701b691bc4e2ea0fe4a9a37a5dd82e2c4bd5c18c4a830aed6d297",
+    "node_modules/@babylonjs/core/Materials/material.pure.js": "57ea7fa9a4c31d7cefa2fbbfa5c7c53db85f1ea783447f0146b8b9b101343676",
+    "node_modules/@babylonjs/core/Materials/effect.pure.js": "8bffd8b31a0ef5afd663c8c2234ed7064f87c617d22de5a1933a34e566aa0539"
+  },
+  "selectedSourceAfter": {
+    "client/ui.tsx": "6aa94cf9ecd4278ef68c1e5a98377503f5bd96c667fe51e24e3ef5ac941562fe",
+    "client/game.ts": "c3ad05b05d8d64e7a5b0033303a4fa7e330f793ea8bb54a8a0fec976a1384395",
+    "client/webgpu-compilation-profile.ts": "cbeef371271c44f4e55d7c4aafe3a47f3d1cc123caa254c3817a3f5c6d308876",
+    "client/render-health.ts": "7a5027922feb2292e9238917a7af58a2371187446d8cc36f0324562e49d583a4",
+    "client/render-startup.ts": "8cba9b39c2448bd81f11bdf0fbd90634c0d8ef0450878bbe005e9a8adc7fcc54",
+    "node_modules/@babylonjs/core/package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79",
+    "node_modules/@babylonjs/core/Engines/webgpuEngine.pure.js": "4550614ef07cf36b8ab194e19f3321c03416bfa14407568c2cdb0ab7fc89bf16",
+    "node_modules/@babylonjs/core/Engines/WebGPU/webgpuPipelineContext.js": "f4a867eee34c2d12f70d5f0a8800ea78e8248a993fb00ffb2ebc483364905620",
+    "node_modules/@babylonjs/core/Meshes/subMesh.pure.js": "d9b6f61a0f5ad773ab23c67393a8bad278dea133f539887458d1e208f8df1458",
+    "node_modules/@babylonjs/core/Meshes/mesh.pure.js": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+    "node_modules/@babylonjs/core/node.js": "e4859368dbf13688644adb6a17bb3dc65220133d3a979889a4f8ae8e95bafad7",
+    "node_modules/@babylonjs/core/Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "node_modules/@babylonjs/core/Materials/drawWrapper.js": "ecf5bc98dda701b691bc4e2ea0fe4a9a37a5dd82e2c4bd5c18c4a830aed6d297",
+    "node_modules/@babylonjs/core/Materials/material.pure.js": "57ea7fa9a4c31d7cefa2fbbfa5c7c53db85f1ea783447f0146b8b9b101343676",
+    "node_modules/@babylonjs/core/Materials/effect.pure.js": "8bffd8b31a0ef5afd663c8c2234ed7064f87c617d22de5a1933a34e566aa0539"
+  },
+  "selectedSourceStable": true,
+  "syntaxChecks": [
+    {
+      "file": "common.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "startup-observer.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "attempt-queue.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "receipt.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "harness.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "qa-overlay.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "transit-clock.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "browser-clock.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "server-bootstrap.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "weather-fixture.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "startup-latency.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "shader-attribution.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "helper.test.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "clock.test.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "weather-latency.test.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "file": "shader-attribution.test.mjs",
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "tsxParseDiagnostics": [],
+  "typeScriptScope": "TSX syntax parse of exact transformed current UI only; no semantic whole-project tsc claim",
+  "baselineHelperSha256": "63d576ff976601d044b2aa4f7498ff9d2c8d6a298e5aa6cff0e008213cd55f20",
+  "retainedPrevious": [
+    "v",
+    "e",
+    "r",
+    "i",
+    "f",
+    "i",
+    "c",
+    "a",
+    "t",
+    "i",
+    "o",
+    "n",
+    "-",
+    "b",
+    "e",
+    "f",
+    "o",
+    "r",
+    "e",
+    "-",
+    "s",
+    "h",
+    "a",
+    "d",
+    "e",
+    "r",
+    "-",
+    "a",
+    "t",
+    "t",
+    "r",
+    "i",
+    "b",
+    "u",
+    "t",
+    "i",
+    "o",
+    "n",
+    "5",
+    "1",
+    ".",
+    "j",
+    "s",
+    "o",
+    "n",
+    " ",
+    "+",
+    " ",
+    "h",
+    "e",
+    "l",
+    "p",
+    "e",
+    "r",
+    "-",
+    "t",
+    "e",
+    "s",
+    "t",
+    "s",
+    "-",
+    "b",
+    "e",
+    "f",
+    "o",
+    "r",
+    "e",
+    "-",
+    "s",
+    "h",
+    "a",
+    "d",
+    "e",
+    "r",
+    "-",
+    "a",
+    "t",
+    "t",
+    "r",
+    "i",
+    "b",
+    "u",
+    "t",
+    "i",
+    "o",
+    "n",
+    "5",
+    "1",
+    ".",
+    "t",
+    "a",
+    "p",
+    "verification-before-attribution-priority63.json",
+    "helper-tests-before-attribution-priority63.tap",
+    "verification-before-shadow-map64.json",
+    "helper-tests-before-shadow-map64.tap"
+  ],
+  "developmentIterations": [
+    {
+      "tests": 9,
+      "pass": 5,
+      "fail": 4,
+      "reason": "New CPU world fixture typo Array.assign; fixed to Object.assign. Observer behavior tests already passed."
+    },
+    {
+      "tests": 60,
+      "pass": 60,
+      "fail": 0,
+      "log": "helper-tests-attribution-development.tap"
+    },
+    {
+      "tests": 63,
+      "pass": 63,
+      "fail": 0,
+      "log": "helper-tests-attribution-development2.tap"
+    }
+  ],
+  "newContracts": [
+    "Default-off leaves Game/engine/profile untouched; actual inspectShader/observe/setStage wrappers preserve receiver/args/original validated Promise and original return/throw; no extra query or readiness/GPU call",
+    "Bounded job/module/stage and passive terminal Effect/context/submesh/material/regular-instance/last-batch data slots, with explicit unknown/overflow/drift/redacted names",
+    "Pending/abort/generation/foreign descriptors/dispose/rejoin sealed data and exact origin error; scalar max JSON under1MiB",
+    "Existing diagnostic shaderInventory scalar projection without shader text/define names; actual DOM terminal original error/restore/immutable receipt",
+    "Required shaderAttribution bool in canonical metadata digest/browser overlay/emitted-JS seal and CLI; previous51 CPU cases retained",
+    "One bounded terminal mesh scan prioritizes pending then completed submitted-frame before history within original output caps; current Effect rows selected before lower-priority cache",
+    "Actual pinned ShadowDepthWrapper own native maps expose pending main/alias and pre-hot-swap original base; same main/alias ownership deduplicated; native APIs/Map overrides never invoked",
+    "Original validated jobTraceComplete separate from bounded history/map unknown/error; pending coverage and own Effect readyFlag do not claim runtime readiness"
+  ],
+  "actualAttributionCauseProven": false,
+  "actualGPUHookProven": false,
+  "requiredRootEvidence": "Fresh immutable build over unchanged source80395553, --shader-attribution and profileEnvironment=1, actual focused CM startup trace and mapping/inventory correlation; no causal inference from these CPU tests",
+  "attributionPriorityReview": {
+    "finding": "First history meshes could exhaust mapping before late pending/final-gate mesh",
+    "resolution": "One bounded mesh pass; original pending jobs before completed submitted-frame before completed history, same total1024 candidate/link and512mesh/2048effect outputs",
+    "fixture": "3355 meshes, final pending mesh after1200history and2154completed submitted-frame; exactly3355 numeric mesh slot reads; pending first, no history displacement of submitted-frame, caps/overflow explicit",
+    "developmentTargeted": {
+      "tests": 12,
+      "pass": 12,
+      "fail": 0,
+      "toolChunk": "23e977"
+    }
+  },
+  "shadowMapResearch": {
+    "source": "Actual source80395553/build60cfd189/trace0968501c: pending2049/2050 -> cachedEffect44 with no mesh link. Missing known ownership branch is proven, actual pending cause unproven",
+    "contract": "Actual pinned9.30 constructor/effect-created native MapMap/_makeEffect/DrawWrapper alias+disposal with controlled engine IO, no GPU",
+    "selection": "Shared1024 candidate/output links,512meshes/2048effects/8192mesh scan unchanged; native generator entries use8192 existing scan cap, alias slots32. Pending before completed final-gate/history",
+    "completeness": "Job trace separately excludes mappingOverflow/mappingErrors; overall evidenceValid remains conservative for unknown/missing maps. Pending module linked/unlinked counts explicit",
+    "development": [
+      {
+        "toolChunk": "954171",
+        "tests": 12,
+        "pass": 11,
+        "fail": 1,
+        "reason": "Expected Effect row width assertion before adapting new passive readyFlag; no behavior failure"
+      },
+      {
+        "toolChunk": "047075",
+        "tests": 15,
+        "pass": 15,
+        "fail": 0
+      },
+      {
+        "toolChunk": "bd1ddd",
+        "tests": 15,
+        "pass": 15,
+        "fail": 0
+      }
+    ]
+  }
+}

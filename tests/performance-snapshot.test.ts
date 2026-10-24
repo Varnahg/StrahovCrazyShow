@@ -21,6 +21,16 @@ const execute = promisify(execFile);
 const freezer = await readFile(
   new URL("../scripts/performance-snapshot.mjs", import.meta.url),
 );
+// These real static inputs are read by diagnostics-report and feedback-
+// deployment regressions after the full test tree has been frozen.
+const consumerInputs = [
+  "docs/performance/evidence/diagnostic-identity-20261020/input.jsonl",
+  "Dockerfile",
+  "compose.yaml",
+];
+const consumerBytes = Object.fromEntries(await Promise.all(
+  consumerInputs.map(async file => [file, await readFile(new URL("../" + file, import.meta.url))] as const),
+));
 const prerequisites = [
   "AGENTS.md",
   "docs/agents/bmad-policy.md",
@@ -28,6 +38,16 @@ const prerequisites = [
   ".agents/skills/bmad-build/spec-template.md",
   "patches/@babylonjs__core@9.30.0.patch",
   "patches/nested/additional.patch",
+  ...consumerInputs,
+];
+const excluded = [
+  "docs/verification.md",
+  "docs/agents/current-work.md",
+  "docs/performance/evidence/diagnostic-identity-20261020/live-report.json",
+  "docs/performance/evidence/diagnostic-identity-20261020/unrelated.jsonl",
+  ".agents/skills/unrelated/SKILL.md",
+  "assets/blender/master.blend1",
+  "assets/__pycache__/cached.pyc",
 ];
 const reference = "public/models/photogrammetry/tile.bin";
 const sha = (bytes: Uint8Array | string) =>
@@ -74,18 +94,12 @@ async function fixture(t: TestContext): Promise<Fixture> {
     "vite.config.ts": Buffer.from("export default {};\n"),
   };
   for (const file of prerequisites)
-    inputs[file] = Buffer.from("Statický fixture: " + file + "\r\n");
+    inputs[file] = consumerBytes[file] ?? Buffer.from("Statický fixture: " + file + "\r\n");
   for (const [file, bytes] of Object.entries(inputs)) {
     await mkdir(dirname(join(root, file)), { recursive: true });
     await writeFile(join(root, file), bytes);
   }
-  for (const file of [
-    "docs/verification.md",
-    "docs/agents/current-work.md",
-    ".agents/skills/unrelated/SKILL.md",
-    "assets/blender/master.blend1",
-    "assets/__pycache__/cached.pyc",
-  ]) {
+  for (const file of excluded) {
     await mkdir(dirname(join(root, file)), { recursive: true });
     await writeFile(join(root, file), "excluded mutable/local fixture\n");
   }
@@ -169,13 +183,7 @@ test("snapshot CLI copies and hashes static regression/build prerequisites witho
     recorded.files["tests/preserved.test.ts"],
     sha(f.inputs["tests/preserved.test.ts"]),
   );
-  for (const file of [
-    "docs/verification.md",
-    "docs/agents/current-work.md",
-    ".agents/skills/unrelated/SKILL.md",
-    "assets/blender/master.blend1",
-    "assets/__pycache__/cached.pyc",
-  ]) {
+  for (const file of excluded) {
     assert.equal(recorded.files[file], undefined, file);
     await assert.rejects(access(join(snapshot(f, "complete"), file)), {
       code: "ENOENT",
@@ -246,7 +254,8 @@ test("snapshot CLI refuses an existing name without overwriting any frozen bytes
   );
 });
 
-test("snapshot CLI rejects a source mutation during copying before publishing a manifest", async (t) => {
+for (const file of ["AGENTS.md", ...consumerInputs])
+test(`snapshot CLI rejects ${file} mutation during copying before publishing a manifest`, async (t) => {
   const f = await fixture(t);
   const preload = join(f.root, "mutate-freezer.mjs");
   await writeFile(
@@ -255,7 +264,7 @@ test("snapshot CLI rejects a source mutation during copying before publishing a 
 import fsPromises from "node:fs/promises";
 import { syncBuiltinESMExports } from "node:module";
 import { join, resolve } from "node:path";
-const input = join(import.meta.dirname, "AGENTS.md");
+const input = join(import.meta.dirname, ${JSON.stringify(file)});
 const original = fsPromises.cp;
 let changed = false;
 fsPromises.cp = async function(source, ...args) {
@@ -263,7 +272,7 @@ fsPromises.cp = async function(source, ...args) {
   if (!changed && resolve(String(source)) === input) {
     changed = true;
     await fsPromises.writeFile(input, "deterministic mutation after copy\\n");
-    process.stderr.write("fixture mutation after AGENTS copy\\n");
+    process.stderr.write("fixture mutation after static input copy\\n");
   }
   return result;
 };
@@ -272,7 +281,7 @@ syncBuiltinESMExports();
   );
   const result = await run(f, "interrupted", { preload });
   assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /fixture mutation after AGENTS copy/);
+  assert.match(result.stderr, /fixture mutation after static input copy/);
   assert.match(result.stderr, /Sources changed while freezing/);
   assert.equal((await stat(snapshot(f, "interrupted"))).isDirectory(), true);
   await assert.rejects(
@@ -284,18 +293,36 @@ syncBuiltinESMExports();
     { code: "ENOENT" },
   );
   assert.deepEqual(
-    await readFile(join(snapshot(f, "interrupted"), "AGENTS.md")),
-    f.inputs["AGENTS.md"],
+    await readFile(join(snapshot(f, "interrupted"), file)),
+    f.inputs[file],
   );
   const retry = await capture(f, "fresh-attempt");
   assert.equal(
-    retry.files["AGENTS.md"],
+    retry.files[file],
     sha("deterministic mutation after copy\n"),
   );
   await assert.rejects(
     access(join(snapshot(f, "interrupted"), "source-manifest.json")),
     { code: "ENOENT" },
   );
+});
+
+test("snapshot CLI rejects each missing consumer input and preserves earlier complete snapshots", async (t) => {
+  const f = await fixture(t), original = await capture(f, "before-missing");
+  const originalManifest = await readFile(join(snapshot(f, "before-missing"), "source-manifest.json"));
+  for (const [index, file] of consumerInputs.entries()) {
+    await rm(join(f.root, file));
+    try {
+      const name = "missing-" + index, result = await run(f, name);
+      assert.notEqual(result.code, 0, file);
+      assert.match(result.stderr, /ENOENT/);
+      await assert.rejects(access(join(snapshot(f, name), "source-manifest.json")), { code: "ENOENT" });
+      await assert.rejects(access(join(snapshot(f, name), "node_modules")), { code: "ENOENT" });
+      assert.deepEqual(await readFile(join(snapshot(f, "before-missing"), file)), f.inputs[file]);
+      assert.deepEqual(await readFile(join(snapshot(f, "before-missing"), "source-manifest.json")), originalManifest);
+    } finally { await writeFile(join(f.root, file), f.inputs[file]); }
+  }
+  assert.equal((await capture(f, "after-restored")).snapshotId, original.snapshotId);
 });
 
 test("snapshot CLI reuses only byte-matching historical IPR references through the previous snapshot", async (t) => {

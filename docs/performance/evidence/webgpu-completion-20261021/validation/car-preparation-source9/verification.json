@@ -1,0 +1,174 @@
+{
+  "capturedUTC": "2026-10-23T15:27:04.663Z",
+  "sourceSnapshotId": "59377f509828914543d8235194465090bb24f497e53de029bbd493a7e7df13fc",
+  "buildId": "5f0f167add9f7b24373aeff1766bfac9ccd407e0966ff550afb05bd90c90ff81",
+  "helperSha256": "a5b3dc0000956b9abcd77dab55e06ae8c31f7f6c12ffb1ba5840f19562f933f9",
+  "scope": "Actual noquery CM Game, manual Medium, real23Oct22Z night, fixed transit E0, recorded QA weather, one Mia,2040x986 CSS/internal. Functional diagnostic, not matched A/B FPS.",
+  "startup": {
+    "resolved": true,
+    "navigationToTerminalMs": 88910.20000004768,
+    "preparationMs": 63331.3,
+    "stages": 57,
+    "qualities": {
+      "lowMs": 22638.9,
+      "highMs": 29249.5,
+      "mediumMs": 11442.9
+    },
+    "unchangedPerPassBudgetMs": 30000,
+    "unchangedTotalBudgetMs": 90000,
+    "healthValid": true,
+    "pending": 0
+  },
+  "firstEntry": {
+    "actionSeq": 438,
+    "atMs": 125777.5,
+    "vehicleAfter": true,
+    "health": {
+      "rendererId": 2,
+      "purpose": "game",
+      "generation": 1,
+      "phase": "ready",
+      "valid": true,
+      "errorCount": 0,
+      "pendingOperations": 0,
+      "pendingPreparationOperations": 0,
+      "pendingShaderValidationOperations": 0,
+      "counts": {
+        "effect": 0,
+        "shader": 0,
+        "pipeline": 0,
+        "validation": 0,
+        "texture": 0,
+        "device": 0,
+        "render": 0
+      },
+      "firstErrors": []
+    },
+    "metricDeltas": {
+      "shaderPreparation": {
+        "calls": 2,
+        "cpuMs": 1.7999999523162842
+      },
+      "shaderModule": {
+        "calls": 4,
+        "cpuMs": 0.7999999523162842
+      },
+      "shaderValidation": {
+        "calls": 4,
+        "cpuMs": 0.10000002384185791
+      },
+      "syncPipeline": {
+        "calls": 2,
+        "cpuMs": 0.19999992847442627
+      },
+      "asyncPipeline": {
+        "calls": 0,
+        "cpuMs": 0
+      }
+    },
+    "hitches": [
+      {
+        "seq": 441,
+        "atMs": 126013,
+        "frameMs": 158,
+        "previousCpuMs": 152.1,
+        "previousPhases": {
+          "simulation": 6,
+          "world": 0.5,
+          "avatarsAndCamera": 1.6,
+          "environment": 7.8,
+          "render": 136.1,
+          "labels": 0.1
+        }
+      },
+      {
+        "seq": 444,
+        "atMs": 126208.6,
+        "frameMs": 138.6,
+        "previousCpuMs": 20.6,
+        "previousPhases": {
+          "simulation": 0.3,
+          "world": 0,
+          "avatarsAndCamera": 0.1,
+          "environment": 1,
+          "render": 19.2,
+          "labels": 0
+        }
+      }
+    ]
+  },
+  "drivingExit": {
+    "vehicleAfter": false,
+    "healthValid": true,
+    "pending": 0
+  },
+  "originalSession": {
+    "records": 707,
+    "last": "session-end",
+    "closed": true
+  },
+  "files": {
+    "identity.json": {
+      "bytes": 12446,
+      "sha256": "92b5b4324b5e02912ec71139708bc383ed00c1e42a3621ed050b5d7fd59c04ab"
+    },
+    "startup-browser.json": {
+      "bytes": 549075,
+      "sha256": "4b0d83a614d0328ae3b9aadea9f7a28c3105d7cf50bbdefe1e335accd9b0077a"
+    },
+    "before-first-entry.json": {
+      "bytes": 16524,
+      "sha256": "a68511e7f1f323d1142329399fdefab813681453c39c470657ac5953db7ce0cd"
+    },
+    "after-first-entry.json": {
+      "bytes": 16690,
+      "sha256": "71261387614bf2b4442255cbedc52aa90fbc90881767d4b00b673763dadb0223"
+    },
+    "after-first-entry-full.jpg": {
+      "bytes": 114548,
+      "sha256": "dbd375fae9ea8e6405447001ee4b69329d60dd26de5e5c6b3205233d250a06c8"
+    },
+    "after-driving-exit.json": {
+      "bytes": 16708,
+      "sha256": "8ff29e62a1e7f96ecdcbcacaeac38b7bbde968220bdab83c6052737eedd12655"
+    },
+    "after-driving-exit-full.jpg": {
+      "bytes": 110208,
+      "sha256": "93a1b33db7b37742eb11cb86cc8843b38a05f82cd3ad279b3bb0191839fca016"
+    },
+    "entry-records.json": {
+      "bytes": 85376,
+      "sha256": "904fce93ca9683f0f8dde6baa7acae4153b8bfa38721d0a6aea459f03cd49d93"
+    },
+    "http-identity.json": {
+      "bytes": 5738,
+      "sha256": "805f510857e4dfa5d9306cdd349670675e4aa24c4dbfadfee86f589917a914d2"
+    },
+    "cleanup.json": {
+      "bytes": 105,
+      "sha256": "c72e20ad831d4b906288b85e0ed94aa1fb07f4c5aca56702d0e9f485e42a8c64"
+    },
+    "build-input.json": {
+      "bytes": 8634,
+      "sha256": "2a6bb57b9c5b7fa14a812f78e321d88f5644e0f2456fa7900b2b0921ca744f88"
+    },
+    "runtime.json": {
+      "bytes": 1463,
+      "sha256": "c6579b54ce329d0f951823743982b072251d078c7c3a1fa8daa13fa7a1fff1c9"
+    },
+    "original-session.jsonl.gz": {
+      "bytes": 136760,
+      "sha256": "a23268cecf7fe5b575502e32eec302e78f543dd8ecf18abb665cfc05020fff17",
+      "originalBytes": 1132270,
+      "originalSha256": "8aa8459ef9c58cdca0a1896f24f42054c6c817141421fd329e9b56ee8beabaa3"
+    }
+  },
+  "limitations": [
+    "Two new programs and158ms/152.1CPU/136.1render hitch remain. This candidate is NOT accepted as complete hitch removal.",
+    "API wrapper CPU delta cannot explain entire nested render phase. A later138.6ms interval has previousCPU20.6; no whole interval CPU attribution.",
+    "375/211.9/158ms separate runs have differing UTC/helper/cache conditions; no measured improvement claim.",
+    "High preparation has only750.5ms margin. Do not increase original budgets or double all views without precise evidence.",
+    "Controller/lighting coverage test is not complete vehicle-camera material coverage.",
+    "Main/default/final controlled18sample/image acceptance remains open."
+  ]
+}

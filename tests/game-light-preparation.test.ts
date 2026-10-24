@@ -15,6 +15,8 @@ import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { VehicleLighting } from "../client/vehicle-lighting";
 import { PlayerFlashlight } from "../client/flashlight";
 import { StableLightState } from "../client/stable-light-state";
 import { prepareLightVariants } from "../client/light-preparation";
@@ -25,7 +27,7 @@ import { selectLightingPreview } from "../client/lighting-preview";
 const { source, gameClass: declaration, selectMembers } = readGameSource(
   process.env.GAME_PREPARATION_SOURCE,
 );
-const members = selectMembers(["prepareLightingVariants", "isMeshReadyForCamera"]);
+const members = selectMembers(["prepareLightingVariants", "isMeshReadyForCamera", "applyPreparationView", "preparationPosition", "refreshStartupPreparationView", "startupPreparationCoverage"]);
 const compiled = ts.transpileModule(
   `class PreparationGame { ${members.map((node) => node.getText(source)).join("\n")} };`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
@@ -118,7 +120,11 @@ function fixture(t: import("node:test").TestContext) {
     pendingShaderValidationOperations: 0,
     phase: "preparing",
   };
+  const car = new TransformNode("preparation car", scene), parkedCar = new TransformNode("preparation parked", scene);
+  car.setEnabled(false);
+  const vehicleLighting = new VehicleLighting(scene);
   const game = Object.assign(new Game(), {
+    car, parkedCar, vehicleLighting,
     scene,
     camera,
     engine,
@@ -223,6 +229,7 @@ function fixture(t: import("node:test").TestContext) {
   };
   t.after(() => {
     game.flashlight?.dispose();
+    vehicleLighting.dispose();
     stableLights.dispose();
     scene.dispose();
     realEngine.dispose();
@@ -565,7 +572,7 @@ test("production startup awaits preparation before ready and records its outcome
   const start = declaration.members
     .find((node) => node.name?.getText(source) === "start")!
     .getText(source);
-  const prepare = start.search(/await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(preloadRender, pipelinePreparation\)/);
+  const prepare = start.search(/await\s+this\.renderHealth\.guard\(\s*this\.prepareLighting\(\s*preloadRender,\s*pipelinePreparation,\s*lightPreparationLoop,?\s*\)/);
   assert.ok(prepare > start.indexOf("this.updatePlayers([this.localPlayer])"));
   assert.ok(
     prepare > start.indexOf("this.engine.stopRenderLoop(preloadRender)"),
@@ -655,7 +662,7 @@ test("native WebGPU day0/day1 keeps the full spawn presentation and actual OFF/O
   }
   f.finish(); const result = await pending;
   assert.equal(result.status, "complete");
-  assert.equal(result.stages.length, 13);
+  assert.equal(result.stages.length, 19);
   assert.deepEqual(result.stages.slice(-5).map((s: { stage: string }) => s.stage), ["day-0-off", "day-0-on", "day-1-off", "day-1-on", "restore"]);
   assert.ok(result.stages.every((s: { renders: number }) => s.renders >= 3));
   assert.equal(f.game.ready, false);

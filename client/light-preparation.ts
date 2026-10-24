@@ -1,6 +1,7 @@
 /** Startup-only preparation of actual scene variants. No physics or input. */
 export type LightPreparationStage =
-  | `vehicle-${0 | 1}`
+  | `vehicle-${0 | 1 | 2}`
+  | `vehicle-keyed-${0 | 1 | 2}`
   | "current-off"
   | "current-on"
   | `night-${0 | 1 | 2}-${"off" | "on"}`
@@ -60,8 +61,9 @@ export type LightPreparationOptions = {
   check(mesh: ReadyMesh): boolean;
   effectsReady(): boolean;
   render(): void;
-  run(callback: () => void): void;
-  stop(callback: () => void): void;
+  /** True permits submission only after the complete synchronous tick, including cleanup. */
+  run(callback: () => boolean): void;
+  stop(callback: () => boolean): void;
   onDispose(callback: () => void): () => void;
   isDisposed(): boolean;
   /** Settings/asset identity changes restart only the current bounded stage. */
@@ -78,8 +80,8 @@ export type LightPreparationOptions = {
   batchMs?: number;
   /** Existing spawn presentation with zero/one mapped POINT, OFF and ON. */
   includeDayPointVariants?: boolean;
-  /** Real low-quality vehicle SPOT, without its shadow, before player variants. */
-  includeLowVehicleVariants?: boolean;
+  /** Real vehicle SPOT/shadow in keyless and keyed nights, with mapped POINTs. */
+  includeVehicleVariants?: boolean;
 };
 
 const baselineStages: readonly LightPreparationStage[] = [
@@ -107,8 +109,8 @@ export function prepareLightVariants(
   const playerStages: readonly LightPreparationStage[] = options.includeDayPointVariants
     ? [...baselineStages.slice(0, -1), "day-0-off", "day-0-on", "day-1-off", "day-1-on", "restore"]
     : baselineStages;
-  const stages: readonly LightPreparationStage[] = options.includeLowVehicleVariants
-    ? ["vehicle-0", "vehicle-1", ...playerStages]
+  const stages: readonly LightPreparationStage[] = options.includeVehicleVariants
+    ? ["vehicle-0", "vehicle-1", "vehicle-2", "vehicle-keyed-0", "vehicle-keyed-1", "vehicle-keyed-2", ...playerStages]
     : playerStages;
   const started = options.now();
   const timeout = Math.max(1, options.timeoutMs ?? 30_000);
@@ -116,6 +118,7 @@ export function prepareLightVariants(
   const batchMs = Math.max(0.1, options.batchMs ?? 4);
   return new Promise((resolve) => {
     const results: LightPreparationResult["stages"] = [];
+    let settledStatus: LightPreparationResult["status"] | undefined;
     let done = false,
       index = -1,
       stageStarted = started;
@@ -219,11 +222,11 @@ export function prepareLightVariants(
       }
       const at = options.now();
       const elapsed = clock(at);
+      settledStatus = status === "complete" && elapsed.activeElapsedMs >= timeout
+        ? "timeout"
+        : status;
       resolve({
-        status:
-          status === "complete" && elapsed.activeElapsedMs >= timeout
-            ? "timeout"
-            : status,
+        status: settledStatus,
         elapsedMs: at - started,
         ...elapsed,
         failureStep,
@@ -354,7 +357,7 @@ export function prepareLightVariants(
       }
       collect();
     };
-    function tick() {
+    function advance() {
       if (done) return;
       const at = options.now();
       const gap = Math.max(0, at - lastTickAt);
@@ -448,6 +451,23 @@ export function prepareLightVariants(
         failureStep = operation;
         finish(options.isDisposed() ? "disposed" : "failed");
       }
+    }
+    function tick(): boolean {
+      // A callback already dequeued before stop must not submit a later frame.
+      if (done) return false;
+      advance();
+      // The last effects/revision/mesh callback can itself exhaust the budget.
+      // Settle through the normal timeout/disposal path before approving submit.
+      if (!done) {
+        try { canWork(); }
+        catch {
+          failureStep = "lifecycle";
+          finish(options.isDisposed() ? "disposed" : "failed");
+        }
+      }
+      // finish can change the outcome while stopping, restoring or checking its
+      // final visible-time budget. Do not approve a frame before it has unwound.
+      return !options.isDisposed() && (!done || settledStatus === "complete");
     }
     if (options.isDisposed()) return finish("disposed");
     try {

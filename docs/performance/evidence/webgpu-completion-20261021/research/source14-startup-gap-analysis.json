@@ -1,0 +1,448 @@
+{
+  "atUTC": "2026-10-24T04:27:37.902Z",
+  "sourceCommit": "ee108d955c448b147b9bc5b3701ec1ea2a4f5c58",
+  "sourceSnapshotId": "cb6fff55579a33a6228615eb539c9aab6f306d948fd822d028fd252acbf8a8eb",
+  "method": "Read-only exact original receipts and decompressed server records; no new run.",
+  "runs": [
+    {
+      "receipt": "validation/receiver-source14-v16/receipts/99c27c5a-5070-4254-b26b-36ba81aaf3bf.json",
+      "receiptSha256": "c259aa9796de12da91708107f3759d00f2c5bd5f0d76031f7a4ce6bfee2f558c",
+      "original": "validation/receiver-source14-v16/b818562e-cda5-4855-a557-906806f2d1b1.jsonl.gz",
+      "originalBytes": 3101795,
+      "originalSha256": "fadf403c5bc69c6094fa9c52fcfd8ec14727137b44ffcbc248949bd1be554f55",
+      "elapsedMs": 74859.10000002384,
+      "pausedMs": 0,
+      "qualityPasses": [
+        {
+          "quality": "low",
+          "finalPass": false,
+          "status": "complete",
+          "elapsedMs": 26302.299999952316,
+          "activeElapsedMs": 26302.299999952316,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stageCount": 19,
+          "valid": true
+        },
+        {
+          "quality": "medium",
+          "finalPass": false,
+          "status": "complete",
+          "elapsedMs": 26689.800000071526,
+          "activeElapsedMs": 26689.800000071526,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stageCount": 19,
+          "valid": true
+        },
+        {
+          "quality": "high",
+          "finalPass": false,
+          "status": "complete",
+          "elapsedMs": 16451.199999928474,
+          "activeElapsedMs": 16451.199999928474,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stageCount": 19,
+          "valid": true
+        },
+        {
+          "quality": "medium",
+          "finalPass": true,
+          "status": "complete",
+          "elapsedMs": 5415.800000071526,
+          "activeElapsedMs": 5415.800000071526,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stageCount": 19,
+          "valid": true
+        }
+      ],
+      "lowAndFirstMediumShare": 0.7078912249814246,
+      "minimumPassMarginMs": 3310.1999999284744,
+      "totalMarginMs": 15140.899999976158,
+      "terminal": {
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "requestedRendering": {
+          "mode": "auto",
+          "quality": "medium",
+          "hardwareScaling": 1,
+          "targetFps": 60,
+          "revision": 0
+        },
+        "viewport": {
+          "width": 2040,
+          "height": 986,
+          "dpr": 1.0000000149011612
+        },
+        "backbuffer": {
+          "width": 2040,
+          "height": 986,
+          "scaling": 1
+        },
+        "health": {
+          "rendererId": 2,
+          "purpose": "game",
+          "generation": 1,
+          "phase": "ready",
+          "valid": true,
+          "errorCount": 0,
+          "pendingOperations": 0,
+          "pendingPreparationOperations": 0,
+          "pendingShaderValidationOperations": 0,
+          "counts": {
+            "effect": 0,
+            "shader": 0,
+            "pipeline": 0,
+            "validation": 0,
+            "texture": 0,
+            "device": 0,
+            "render": 0
+          },
+          "firstErrors": []
+        }
+      },
+      "lightingPreparationRecords": 0,
+      "recordingGaps": [
+        {
+          "seq": 476,
+          "data": {
+            "droppedTotal": 1,
+            "sinceLastReport": 1,
+            "reason": "see cumulative droppedByReason",
+            "droppedByReason": {
+              "queueCapacity": 0,
+              "recordSize": 1,
+              "eventRate": 0
+            }
+          }
+        }
+      ],
+      "profile": {
+        "seq": 464,
+        "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+        "metrics": {
+          "glslToSpirv": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "spirvToWgsl": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "compilerLoad": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "shaderPreparation": {
+            "calls": 828,
+            "completed": 828,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 1242.9000008106232,
+            "cpuMaxMs": 336.2000000476837,
+            "asyncTotalMs": 395439.20000243187,
+            "asyncMaxMs": 2049.5
+          },
+          "shaderModule": {
+            "calls": 1656,
+            "completed": 1656,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 378.10000002384186,
+            "cpuMaxMs": 10.700000047683716,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "shaderValidation": {
+            "calls": 1656,
+            "completed": 1656,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 29.600001573562622,
+            "cpuMaxMs": 2.600000023841858,
+            "asyncTotalMs": 1125515.499997735,
+            "asyncMaxMs": 2052.100000023842
+          },
+          "syncPipeline": {
+            "calls": 25,
+            "completed": 25,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 1,
+            "cpuMaxMs": 0.10000002384185791,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "asyncPipeline": {
+            "calls": 1267,
+            "completed": 1267,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 74.70000147819519,
+            "cpuMaxMs": 3,
+            "asyncTotalMs": 1310136.1999964714,
+            "asyncMaxMs": 2601.0999999046326
+          },
+          "submit": {
+            "calls": 3030,
+            "completed": 3030,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 108.20000195503235,
+            "cpuMaxMs": 25.600000023841858,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          }
+        },
+        "shaderInventory": null
+      },
+      "startupLatency": null
+    },
+    {
+      "receipt": "validation/receiver-source14-v16/receipts/02e3300d-bad7-46bf-b55f-14be21b385f5.json",
+      "receiptSha256": "f65c6bd6b2be0327cafaaadb5c6a1dd902c64e6fa4d391e14cdbc301fa6a14e2",
+      "original": "validation/receiver-source14-v16/f92e59c1-61b5-4b06-8e76-39c291aeaf19.jsonl.gz",
+      "originalBytes": 3450340,
+      "originalSha256": "b0ae933b9485f747c18525b36296905cc709c5ee3c48865c195b682a0d3fe3e0",
+      "elapsedMs": 80247.60000002384,
+      "pausedMs": 0,
+      "qualityPasses": [
+        {
+          "quality": "low",
+          "finalPass": false,
+          "status": "complete",
+          "elapsedMs": 26995,
+          "activeElapsedMs": 26995,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stageCount": 19,
+          "valid": true
+        },
+        {
+          "quality": "medium",
+          "finalPass": false,
+          "status": "complete",
+          "elapsedMs": 29128.600000023842,
+          "activeElapsedMs": 29128.600000023842,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stageCount": 19,
+          "valid": true
+        },
+        {
+          "quality": "high",
+          "finalPass": false,
+          "status": "complete",
+          "elapsedMs": 18499.699999928474,
+          "activeElapsedMs": 18499.699999928474,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stageCount": 19,
+          "valid": true
+        },
+        {
+          "quality": "medium",
+          "finalPass": true,
+          "status": "complete",
+          "elapsedMs": 5624.100000023842,
+          "activeElapsedMs": 5624.100000023842,
+          "pausedMs": 0,
+          "failureStep": null,
+          "stageCount": 19,
+          "valid": true
+        }
+      ],
+      "lowAndFirstMediumShare": 0.6993804176075941,
+      "minimumPassMarginMs": 871.3999999761581,
+      "totalMarginMs": 9752.399999976158,
+      "terminal": {
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "requestedRendering": {
+          "mode": "auto",
+          "quality": "medium",
+          "hardwareScaling": 1,
+          "targetFps": 60,
+          "revision": 0
+        },
+        "viewport": {
+          "width": 2040,
+          "height": 986,
+          "dpr": 1.0000000149011612
+        },
+        "backbuffer": {
+          "width": 2040,
+          "height": 986,
+          "scaling": 1
+        },
+        "health": {
+          "rendererId": 4,
+          "purpose": "game",
+          "generation": 1,
+          "phase": "ready",
+          "valid": true,
+          "errorCount": 0,
+          "pendingOperations": 0,
+          "pendingPreparationOperations": 0,
+          "pendingShaderValidationOperations": 0,
+          "counts": {
+            "effect": 0,
+            "shader": 0,
+            "pipeline": 0,
+            "validation": 0,
+            "texture": 0,
+            "device": 0,
+            "render": 0
+          },
+          "firstErrors": []
+        }
+      },
+      "lightingPreparationRecords": 0,
+      "recordingGaps": [
+        {
+          "seq": 436,
+          "data": {
+            "droppedTotal": 1,
+            "sinceLastReport": 1,
+            "reason": "see cumulative droppedByReason",
+            "droppedByReason": {
+              "queueCapacity": 0,
+              "recordSize": 1,
+              "eventRate": 0
+            }
+          }
+        }
+      ],
+      "profile": {
+        "seq": 426,
+        "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+        "metrics": {
+          "glslToSpirv": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "spirvToWgsl": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "compilerLoad": {
+            "calls": 0,
+            "completed": 0,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0,
+            "cpuMaxMs": 0,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "shaderPreparation": {
+            "calls": 828,
+            "completed": 828,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 767.9999986886978,
+            "cpuMaxMs": 39.299999952316284,
+            "asyncTotalMs": 336872.3000077009,
+            "asyncMaxMs": 1444.5
+          },
+          "shaderModule": {
+            "calls": 1656,
+            "completed": 1656,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 382.2000002861023,
+            "cpuMaxMs": 3.899999976158142,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "shaderValidation": {
+            "calls": 1656,
+            "completed": 1656,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 59.999998807907104,
+            "cpuMaxMs": 30.199999928474426,
+            "asyncTotalMs": 1061153.0999952555,
+            "asyncMaxMs": 1786.6000000238419
+          },
+          "syncPipeline": {
+            "calls": 25,
+            "completed": 25,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 0.6000001430511475,
+            "cpuMaxMs": 0.10000002384185791,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          },
+          "asyncPipeline": {
+            "calls": 1267,
+            "completed": 1267,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 74.99999940395355,
+            "cpuMaxMs": 3,
+            "asyncTotalMs": 1274697.1000037193,
+            "asyncMaxMs": 2042
+          },
+          "submit": {
+            "calls": 3016,
+            "completed": 3016,
+            "failures": 0,
+            "pending": 0,
+            "cpuTotalMs": 90.49999964237213,
+            "cpuMaxMs": 5.800000071525574,
+            "asyncTotalMs": 0,
+            "asyncMaxMs": 0
+          }
+        },
+        "shaderInventory": null
+      },
+      "startupLatency": null
+    }
+  ],
+  "findings": [
+    "Low plus first Medium is approximately70% of total preparation; second Medium has871.4ms margin to unchanged30s deadline.",
+    "Both originals lack lighting-preparation; recording-gap reports recordSize1. Existing QA quality-only summary does not read stage entries; per-stage CPU/check/render/restart/rafGap is unavailable.",
+    "Metrics are cumulative since Game construction and asset preload, not light-only delta; overlapping async completion durations are not GPU execution.",
+    "Terminal is Auto/Medium2040x986; later fixedLow F windows must not be mislabeled as startup settings."
+  ],
+  "nextMeasurement": "New isolated helper version: bounded one-time numeric projection of original prepareLighting result from the existing fulfilled observer; retain stages in exact startup receipt, no production logger cap/timeout change, no additional GPU/readiness/render calls. Existing optional startup-latency observer reserved for a separate diagnostic run.",
+  "limits": [
+    "No ranking of concrete76stages or causal cache/timeout fix is supported.",
+    "No source13AutoLow vs source14fixedLow performance A/B or FPS/GPU claim."
+  ],
+  "peer": "/root/webgpu_performance_audit independently found the same loss and attribution limits."
+}

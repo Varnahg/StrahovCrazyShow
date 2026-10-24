@@ -1,0 +1,5 @@
+# Source12 first vehicle entry and GPU recovery
+
+Actual no-query native WebGPU CM now creates zero new observed shader preparations/modules/sync orasync pipelines across first vehicle entry, healthy0errors/pending. The original entry still has131.2ms/CPU127.1/render114.6ms. Same source/build/scenario WebGL2 reference at matching2040x986 has149.1/139.4/113.7ms; a prior1528x651 trial is explicitly excluded. This pair suggests a remaining shared render-side cost but proves neither its exact cause nor a statistical gain. GL unavailable compilation hooks are not a zero-compilation result.
+
+Actual own device.destroy produced expected restart-required UI; ordinary overlayleave→editor→newGame4 recovered with76complete stages/healthy0errors/pending. No original unhandled-rejection in the closed CMpage. Last QA export saved as device-loss-browser was stale pre-loss state and is not presented as failure telemetry; DOM/visibleoverlay/originalfaults prove the loss. All raw sessions, receipts, exactcounts andinvalidtrial retained. GPUtime null is not0. Main acceptance and final18series remain open.

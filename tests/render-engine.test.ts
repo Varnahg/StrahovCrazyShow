@@ -85,33 +85,53 @@ function fixture() {
   };
 }
 
-test("backend selection is explicit, loopback-only and rejects ambiguous addresses", () => {
-  assert.equal(
-    selectRenderBackend({ hostname: "example.com", search: "" }),
-    "webgl2",
-  );
-  for (const hostname of ["localhost", "127.0.0.1", "[::1]", "::1"])
-    for (const backend of ["webgl2", "webgpu", "webgpu-fast"] as const)
+test("native WebGPU is the default and explicit production choice on every host", () => {
+  for (const hostname of [
+    "example.com", "localhost", "LOCALHOST", "127.0.0.1", "[::1]", "::1",
+    "localhost.example.com", "127.0.0.1.example.com", "192.168.1.1",
+  ]) {
+    for (const search of ["", "?unrelated=1", "?renderBackend=webgpu"])
+      assert.equal(selectRenderBackend({ hostname, search }), "webgpu");
+  }
+});
+
+test("reference WebGL2 and experimental NCM require an exact loopback host", () => {
+  for (const backend of ["webgl2", "webgpu-fast"] as const) {
+    for (const hostname of ["localhost", "LOCALHOST", "127.0.0.1", "[::1]", "::1"])
       assert.equal(
         selectRenderBackend({ hostname, search: `?renderBackend=${backend}` }),
         backend,
       );
-  for (const hostname of [
-    "example.com",
-    "localhost.example.com",
-    "127.0.0.1.example.com",
-    "192.168.1.1",
-  ])
-    assert.throws(
-      () => selectRenderBackend({ hostname, search: "?renderBackend=webgpu" }),
-      /loopback/,
-    );
-  for (const search of [
-    "?renderBackend=bad",
-    "?renderBackend=",
-    "?renderBackend=webgl2&renderBackend=webgpu",
-  ])
-    assert.throws(() => selectRenderBackend({ hostname: "localhost", search }));
+    for (const hostname of [
+      "example.com", "localhost.example.com", "127.0.0.1.example.com", "192.168.1.1",
+    ])
+      assert.throws(
+        () => selectRenderBackend({ hostname, search: `?renderBackend=${backend}` }),
+        /loopback/,
+      );
+  }
+});
+
+test("backend selection rejects empty unknown and repeated values before engine creation", () => {
+  for (const hostname of ["example.com", "localhost"])
+    for (const search of [
+      "?renderBackend=bad", "?renderBackend=", "?renderBackend=WebGPU",
+      "?renderBackend=webgpu&renderBackend=webgpu",
+      "?renderBackend=webgl2&renderBackend=webgpu",
+    ])
+      assert.throws(() => selectRenderBackend({ hostname, search }));
+});
+
+test("the production default initializes native compatibility mode without creating a reference engine", async () => {
+  const f = fixture();
+  const backend = selectRenderBackend({ hostname: "example.com", search: "" });
+  const result = initializeRenderEngine(canvas, backend, f.runtime);
+  await f.started.promise;
+  f.initialized.resolve();
+  assert.equal(await result, f.gpu);
+  assert.equal(f.gpu.compatibilityMode, true);
+  assert.equal(f.gpu.snapshotRendering, false);
+  assert.deepEqual(f.counts(), { webGLCreations: 0, webGPUCreations: 1 });
 });
 
 test("WebGL2 is the only accepted baseline; a WebGL1 fallback is disposed", async () => {

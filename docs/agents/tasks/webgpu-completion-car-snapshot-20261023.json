@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-car-snapshot-20261023",
+  "title": "KEY-22: nový neměnný source9 po opravě úplné přípravy auta",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/webgpu-completion-20261023-candidate-9/",
+    "docs/agents/handoffs/webgpu-completion-car-snapshot-20261023.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Root vytvoří source9 až ze stabilního peer-reviewed commit checkpointu car-preparation, včetně testů a assetů. Source8 a všechny staré helper/source/bundle byty zůstanou neměnné.",
+    "Při přesně shodných package/lock/patch bytes lze po guarded ne-rekurzivním unlink pouze vlastního newlycreated source9 dependency junction vytvořit readonly junction na vlastní fresh source7 dependencies. Všech38native pinů/singleton ověřit znovu; rootold shared native tree se nepoužije ani nezmění.",
+    "Zapsat kompletní source8→9 diff/runtime/test counts, source SHA a actual production build identity. Současnécar375ms a diagnostic211.9ms zůstanou zachované; samotný CPUtest není skutečné odstraněníhitch ani celá KEY22 přejímka."
+  ],
+  "verification": [
+    "Snapshot before/after SHA včetnětestů, manifest/reusedIPR provenience, deps38+core singleton, relevantní rootfullTS/test/build/integration/CI a actualcarfirstentry/jízda/GPU/frame evidence před main."
+  ],
+  "notes": [
+    "Pouze root explicitní navazující KEY22 zadání. Helper build/run/telemetry/public evidence patří existing rootvalidation scope; heavy/GPU/build/4213/2597/2568 mají samostatné rootclaims. Ready neopravňuje neobjednaný zápis cizíhoagenta."
+  ]
+}

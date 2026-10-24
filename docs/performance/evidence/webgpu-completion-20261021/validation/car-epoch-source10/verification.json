@@ -1,0 +1,1356 @@
+{
+  "capturedUTC": "2026-10-23T16:55:57.813Z",
+  "sourceSnapshotId": "8e7d66616d0ac593e537d6ccf0e12fadd152a5b985e4fb3932c1e22afd1e4b5e",
+  "buildId": "11abb5cf56a101fc3dd7c750510ed7585cde511fb28451cab8d52b0b7c7283ef",
+  "helperSha256": "9dc789c8041c6e17526a467ea328f81228e628c54a8822ae4fbfc7132d834773",
+  "url": "http://127.0.0.1:4213/",
+  "scope": "Actual noquery CM, source10/progressive quality order, full Game/HUD,oneMia,2040x986. Fixed23Oct22Z/Foff/weather/E0 for entry. Diagnostic hook armed only after startup; NOT FPS comparison.",
+  "startup": {
+    "resolved": true,
+    "terminalNavigationMs": 96777.39999997616,
+    "health": {
+      "rendererId": 2,
+      "purpose": "game",
+      "generation": 1,
+      "phase": "ready",
+      "valid": true,
+      "errorCount": 0,
+      "pendingOperations": 0,
+      "pendingPreparationOperations": 0,
+      "pendingShaderValidationOperations": 0,
+      "counts": {
+        "effect": 0,
+        "shader": 0,
+        "pipeline": 0,
+        "validation": 0,
+        "texture": 0,
+        "device": 0,
+        "render": 0
+      },
+      "firstErrors": []
+    },
+    "intendedStages": 76,
+    "actualDetailedStageRecordUnavailable": true,
+    "sampledWallIntervals": [
+      {
+        "quality": "low",
+        "firstObservedMs": 30988,
+        "lastObservedMs": 52013.200000047684,
+        "previousSampleMs": 28985.700000047684,
+        "firstObservedUTC": "2026-10-23T16:27:32.541Z",
+        "lastObservedUTC": "2026-10-23T16:27:53.566Z",
+        "samples": 22,
+        "nextQualityFirstObservedMs": 53618.5,
+        "observedSpanMs": 21025.200000047684
+      },
+      {
+        "quality": "medium",
+        "firstObservedMs": 53618.5,
+        "lastObservedMs": 75970.89999997616,
+        "previousSampleMs": 52013.200000047684,
+        "firstObservedUTC": "2026-10-23T16:27:55.172Z",
+        "lastObservedUTC": "2026-10-23T16:28:17.524Z",
+        "samples": 24,
+        "nextQualityFirstObservedMs": 76972.60000002384,
+        "observedSpanMs": 22352.399999976158
+      },
+      {
+        "quality": "high",
+        "firstObservedMs": 76972.60000002384,
+        "lastObservedMs": 91056.89999997616,
+        "previousSampleMs": 75970.89999997616,
+        "firstObservedUTC": "2026-10-23T16:28:18.526Z",
+        "lastObservedUTC": "2026-10-23T16:28:32.610Z",
+        "samples": 14,
+        "nextQualityFirstObservedMs": 91971.5,
+        "observedSpanMs": 14084.299999952316
+      },
+      {
+        "quality": "medium",
+        "firstObservedMs": 91971.5,
+        "lastObservedMs": 96022.89999997616,
+        "previousSampleMs": 91056.89999997616,
+        "firstObservedUTC": "2026-10-23T16:28:33.525Z",
+        "lastObservedUTC": "2026-10-23T16:28:37.576Z",
+        "samples": 5,
+        "nextQualityFirstObservedMs": 96777.39999997616,
+        "observedSpanMs": 4051.399999976158
+      }
+    ],
+    "originalClockChecks": "Successful original prepareRenderQualities result enforces every30s pass and total90s. Sampled intervals are not exact active timings.",
+    "recordingGaps": [
+      {
+        "seq": 459,
+        "atMs": 97597.4,
+        "kind": "recording-gap",
+        "data": {
+          "droppedTotal": 1,
+          "sinceLastReport": 1,
+          "reason": "see cumulative droppedByReason",
+          "droppedByReason": {
+            "queueCapacity": 0,
+            "recordSize": 1,
+            "eventRate": 0
+          }
+        }
+      }
+    ]
+  },
+  "entry": {
+    "window": {
+      "reason": "explicit",
+      "startedAtMs": 317840.2999999523,
+      "endedAtMs": 319983.39999997616,
+      "before": {
+        "state": {
+          "atMs": 317840.10000002384,
+          "utc": "2026-10-23T16:32:19.393Z",
+          "visibility": "visible",
+          "focused": true,
+          "ready": true,
+          "disposed": false,
+          "preparingRenderQuality": false,
+          "stages": {
+            "bootStage": "ready",
+            "lightPreparation": "complete",
+            "physicsStage": "ready",
+            "b6Stage": "ready",
+            "carStage": "ready",
+            "renderHealth": "ready"
+          },
+          "backend": "webgpu",
+          "compatibilityMode": true,
+          "quality": "medium",
+          "requestedRendering": {
+            "mode": "medium",
+            "quality": "medium",
+            "hardwareScaling": 1,
+            "targetFps": 60,
+            "revision": 3
+          },
+          "viewport": {
+            "width": 2040,
+            "height": 986,
+            "dpr": 1.0000000149011612
+          },
+          "backbuffer": {
+            "width": 2040,
+            "height": 986,
+            "scaling": 1
+          },
+          "gpu": {
+            "backend": "webgpu",
+            "compatibilityMode": true,
+            "gpuTimingScope": "main-render-pass-only",
+            "renderer": "pascal",
+            "vendor": "nvidia",
+            "version": "unknown version",
+            "classification": "unknown",
+            "context": {
+              "requestedAntialias": true,
+              "actualAntialias": null,
+              "defaultFramebuffer": null,
+              "sampleBuffers": null,
+              "samples": null
+            }
+          },
+          "health": {
+            "rendererId": 2,
+            "purpose": "game",
+            "generation": 1,
+            "phase": "ready",
+            "valid": true,
+            "errorCount": 0,
+            "pendingOperations": 0,
+            "pendingPreparationOperations": 0,
+            "pendingShaderValidationOperations": 0,
+            "counts": {
+              "effect": 0,
+              "shader": 0,
+              "pipeline": 0,
+              "validation": 0,
+              "texture": 0,
+              "device": 0,
+              "render": 0
+            },
+            "firstErrors": []
+          },
+          "renderErrors": 0,
+          "assetErrors": 0,
+          "network": true,
+          "avatarCount": 1,
+          "avatars": [
+            {
+              "id": "0bb015c9-d837-4b97-a187-09b0afb0c56a",
+              "local": true,
+              "avatar": {
+                "preset": 4,
+                "skin": "#bf8f72",
+                "hair": "#211e1d",
+                "shirt": "#b3a374",
+                "trousers": "#334047",
+                "glasses": true,
+                "beard": false,
+                "face": 0.4
+              },
+              "position": {
+                "x": 110,
+                "y": -2.323899984359741,
+                "z": 12.00003433227539
+              },
+              "lod": "near"
+            }
+          ],
+          "avatarsOmitted": 0,
+          "actor": {
+            "x": 110,
+            "y": -2.323899984359741,
+            "z": 12.00003433227539
+          },
+          "vehicle": false,
+          "yaw": 3.141592653589793,
+          "pitch": 0.28,
+          "distance": 8,
+          "camera": {
+            "position": {
+              "x": 110,
+              "y": 1.396100401878357,
+              "z": 20.00003433227539
+            },
+            "fov": 0.85,
+            "view": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0.9316545724868774,
+              0.36334526538848877,
+              0,
+              0,
+              -0.36334526538848877,
+              0.9316545724868774,
+              0,
+              -110,
+              5.9662346839904785,
+              -19.140390396118164,
+              1
+            ],
+            "projection": [
+              1.0679436922073364,
+              0,
+              0,
+              0,
+              0,
+              2.209538698196411,
+              0,
+              0,
+              0,
+              0,
+              -1.000072717666626,
+              -1,
+              0,
+              0,
+              -0.08000581711530685,
+              0
+            ]
+          },
+          "lightingInstant": 1792792800000,
+          "trafficInstant": 1792598400000,
+          "flashlight": false,
+          "transitClock": {
+            "configId": "734c4031eec28b6a8fcc2133f0dfb0aae956b33f90a8dd1d769a6da367ed5b91",
+            "configSha256": "f2c3ecfd75984fa04191d64eff876ba456590ac5b447036270b90f196237d7eb",
+            "simulationSourceSha256": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
+            "active": true,
+            "actualSimulationMatches": true,
+            "physics": {
+              "configId": "734c4031eec28b6a8fcc2133f0dfb0aae956b33f90a8dd1d769a6da367ed5b91",
+              "active": true,
+              "methodOwned": true,
+              "restoreConflict": false,
+              "calls": 13266,
+              "originalThrows": 0,
+              "preArmCalls": 13266,
+              "postArmCalls": 0,
+              "rewindCalls": 0,
+              "instancesObserved": 1,
+              "unexpectedReceivers": 0,
+              "lastOriginalUTC": 1792773139468.6667,
+              "lastMappedUTC": 1792598400000
+            },
+            "rendering": {
+              "configId": "734c4031eec28b6a8fcc2133f0dfb0aae956b33f90a8dd1d769a6da367ed5b91",
+              "active": true,
+              "methodOwned": true,
+              "restoreConflict": false,
+              "calls": 13386,
+              "originalThrows": 0,
+              "preArmCalls": 13386,
+              "postArmCalls": 0,
+              "rewindCalls": 0,
+              "instancesObserved": 1,
+              "unexpectedReceivers": 0,
+              "lastOriginalUTC": 1792773139364.0532,
+              "lastMappedUTC": 1792598400000
+            }
+          },
+          "weather": {
+            "temperature": 12.3,
+            "cloud": 0.86,
+            "rain": 0,
+            "wind": 1.8,
+            "windDirection": 337.5,
+            "observedAt": 1792579930000,
+            "fetchedAt": 1792579957998,
+            "stale": true,
+            "cloudStale": true,
+            "status": "fallback",
+            "sourceKind": "station",
+            "source": "Řízené testovací počasí · uložený záznam",
+            "cloudSource": "Řízený meteorologický model · benchmark",
+            "cloudObservedAt": 1792579500000,
+            "cloudWindSource": "Řízené modelové proudění · benchmark",
+            "cloudLayers": {
+              "low": 0,
+              "mid": 0.78,
+              "high": 0.34
+            },
+            "cloudWinds": {
+              "low": {
+                "speed": 9.2,
+                "direction": 148
+              },
+              "mid": {
+                "speed": 15.04,
+                "direction": 193
+              },
+              "high": {
+                "speed": 24.18,
+                "direction": 195
+              }
+            },
+            "humidity": 78,
+            "snowfall": 0,
+            "precipitationType": "none",
+            "windGust": 3.5,
+            "visibility": 36360,
+            "liquidPrecipitation": 0,
+            "fieldSources": {
+              "windGust": {
+                "kind": "model",
+                "source": "Open-Meteo · model",
+                "observedAt": 1792579500000,
+                "stale": true
+              },
+              "humidity": {
+                "kind": "station",
+                "source": "Meteostanice Silicon Hill",
+                "observedAt": 1792579930000,
+                "stale": true
+              },
+              "visibility": {
+                "kind": "model",
+                "source": "Open-Meteo · model",
+                "observedAt": 1792579500000,
+                "stale": true
+              },
+              "snowfall": {
+                "kind": "model",
+                "source": "Open-Meteo · model",
+                "observedAt": 1792579500000,
+                "stale": true
+              },
+              "liquidPrecipitation": {
+                "kind": "model",
+                "source": "Open-Meteo · model",
+                "observedAt": 1792579500000,
+                "stale": true
+              },
+              "precipitationType": {
+                "kind": "model",
+                "source": "Open-Meteo · model",
+                "observedAt": 1792579500000,
+                "stale": true
+              }
+            }
+          },
+          "scene": {
+            "meshes": 3363,
+            "materials": 224,
+            "geometries": 2476,
+            "activeMeshes": 551,
+            "waitingItems": 0
+          },
+          "ambient": {
+            "buses": 1,
+            "passengers": 0,
+            "cars": 1
+          }
+        },
+        "compilation": {
+          "active": true,
+          "backend": "webgpu",
+          "generation": 1,
+          "attachedAfterDeviceCreation": true,
+          "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+          "metrics": {
+            "glslToSpirv": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "spirvToWgsl": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "compilerLoad": {
+              "calls": 0,
+              "completed": 0,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0,
+              "cpuMaxMs": 0,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "shaderPreparation": {
+              "calls": 792,
+              "completed": 792,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 587.9000028371811,
+              "cpuMaxMs": 10.600000023841858,
+              "asyncTotalMs": 228194.80000591278,
+              "asyncMaxMs": 943.9000000953674
+            },
+            "shaderModule": {
+              "calls": 1584,
+              "completed": 1584,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 328.3999993801117,
+              "cpuMaxMs": 4,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "shaderValidation": {
+              "calls": 1584,
+              "completed": 1584,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 28.200000047683716,
+              "cpuMaxMs": 5.099999904632568,
+              "asyncTotalMs": 764037.6999977827,
+              "asyncMaxMs": 1166.6000000238419
+            },
+            "syncPipeline": {
+              "calls": 25,
+              "completed": 25,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 0.5999997854232788,
+              "cpuMaxMs": 0.10000002384185791,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            },
+            "asyncPipeline": {
+              "calls": 1231,
+              "completed": 1231,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 53.3000009059906,
+              "cpuMaxMs": 0.7000000476837158,
+              "asyncTotalMs": 1056299.4999986887,
+              "asyncMaxMs": 1800
+            },
+            "submit": {
+              "calls": 108605,
+              "completed": 108605,
+              "failures": 0,
+              "pending": 0,
+              "cpuTotalMs": 1591.0999999046326,
+              "cpuMaxMs": 0.8999999761581421,
+              "asyncTotalMs": 0,
+              "asyncMaxMs": 0
+            }
+          },
+          "hooks": {
+            "engine._initializeLimits": "installed",
+            "engine._compileRawShaderToSpirV": "installed",
+            "engine.prepareGlslangAndTintAsync": "installed",
+            "engine._preparePipelineContextAsync": "installed",
+            "engine._createPipelineStageDescriptor": "installed",
+            "tint.convertSpirV2WGSL": "not-created",
+            "device.createShaderModule": "installed",
+            "device.createRenderPipeline": "installed",
+            "device.createRenderPipelineAsync": "installed",
+            "queue.submit": "installed",
+            "module.getCompilationInfo": "installed"
+          },
+          "observerErrors": 0,
+          "bundleCountersLastFrame": {
+            "numEnableEffects": 0,
+            "numEnableDrawWrapper": 396,
+            "numBundleCreationNonCompatMode": 0,
+            "numBundleReuseNonCompatMode": 0
+          },
+          "sharedCacheCounters": {
+            "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+            "values": {
+              "NumCacheHitWithoutHash": 4822501,
+              "NumCacheHitWithHash": 959125,
+              "NumCacheMiss": 1262,
+              "NumPipelineCreationLastFrame": 0
+            }
+          },
+          "shaderInventory": null
+        }
+      },
+      "shaderAttribution": {
+        "enabled": true,
+        "active": false,
+        "evidenceValid": false,
+        "jobTraceComplete": true,
+        "limits": {
+          "jobs": 4096,
+          "modules": 4096,
+          "effects": 2048,
+          "meshes": 512,
+          "links": 1024,
+          "meshScan": 8192,
+          "instanceScan": 8192,
+          "stages": 24
+        },
+        "availability": {
+          "inspectShader": "installed",
+          "observe": "installed",
+          "setStage": "installed"
+        },
+        "issues": {
+          "observerErrors": 0,
+          "overflow": 2,
+          "traceOverflow": 0,
+          "mappingOverflow": 2,
+          "mappingErrors": 0,
+          "unknownRole": 0,
+          "unknownStage": 0,
+          "unmatchedJobs": 0,
+          "unsupportedPromise": 0,
+          "ownerChanged": 0,
+          "unexpectedReceivers": 0,
+          "restoreConflicts": 0,
+          "restoreFailures": 0,
+          "contract": 0
+        },
+        "generation": 1,
+        "stages": [
+          "unobserved-before-start"
+        ],
+        "moduleColumns": [
+          "moduleID",
+          "roleBits",
+          "inspectionCalls"
+        ],
+        "modules": [
+          [
+            1,
+            1,
+            1
+          ],
+          [
+            2,
+            2,
+            1
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            4,
+            2,
+            1
+          ]
+        ],
+        "jobs": [
+          [
+            1,
+            1,
+            1,
+            0,
+            1,
+            318516.89999997616,
+            318693.2999999523,
+            1
+          ],
+          [
+            2,
+            2,
+            2,
+            0,
+            1,
+            318517.5,
+            318693.2999999523,
+            1
+          ],
+          [
+            3,
+            3,
+            1,
+            0,
+            1,
+            318670.60000002384,
+            318719.7999999523,
+            1
+          ],
+          [
+            4,
+            4,
+            2,
+            0,
+            1,
+            318671,
+            318743.2000000477,
+            1
+          ]
+        ],
+        "jobColumns": [
+          "jobID",
+          "moduleID",
+          "role",
+          "stageID",
+          "profileGeneration",
+          "startedAtMs",
+          "settledAtMs",
+          "outcome"
+        ],
+        "roleCodes": {
+          "unknown": 0,
+          "vertex": 1,
+          "fragment": 2,
+          "bothModuleRoles": 3
+        },
+        "flagCodes": {
+          "unknown": -1,
+          "false": 0,
+          "true": 1
+        },
+        "outcomeCodes": {
+          "pendingAtStop": 0,
+          "fulfilled": 1,
+          "rejected": 2,
+          "synchronousObserveThrow": 3,
+          "unsupportedPromise": 4
+        },
+        "stoppedAtMs": 319941.5,
+        "mapping": {
+          "effectColumns": [
+            "effectID",
+            "pipelineContextID",
+            "vertexModuleID",
+            "fragmentModuleID",
+            "disposedFlag",
+            "readyFlag"
+          ],
+          "effects": [
+            [
+              1,
+              1,
+              3,
+              4,
+              0,
+              1
+            ]
+          ],
+          "meshes": [
+            {
+              "id": 1,
+              "name": "tree__ipr-crown-047__lod0__leaves",
+              "regularInstances": 0,
+              "localVisibleInstances": 0,
+              "localHiddenInstances": 0,
+              "unknownInstances": 0,
+              "localVisible": 1,
+              "localEnabled": 1,
+              "parentEnabled": 1,
+              "thinInstances": 0
+            }
+          ],
+          "links": [
+            {
+              "meshID": 1,
+              "subMeshIndex": 0,
+              "passID": 13,
+              "effectID": 1,
+              "materialID": 1,
+              "materialName": null,
+              "sourceKind": "shadow-main",
+              "shadowWrapperID": 1,
+              "generatorID": 1,
+              "aliasPassIDs": [
+                13
+              ],
+              "shadowDisposed": 0,
+              "shadowOwnerMatches": 1,
+              "previouslyUsingInstances": -1,
+              "cachedVisibleBatchCount": null,
+              "cachedHardwareInstancing": 0
+            }
+          ],
+          "cacheEntries": 729,
+          "meshEntries": 3350,
+          "meshesScanned": 3350,
+          "instancesScanned": 0,
+          "unobservedEffects": 728,
+          "unknownSlots": 0,
+          "redactedNames": 0,
+          "shadowEntriesScanned": 2,
+          "shadowSubMeshLookups": 138,
+          "shadowOwnerMismatches": 0,
+          "legacySubMaterialSlots": 0,
+          "selection": "Pending original jobs first, then submitted-frame, then completed history; bounded candidate links and one bounded mesh scan",
+          "pendingModuleCoverage": {
+            "observed": 0,
+            "linked": 0,
+            "unlinked": 0
+          },
+          "boundedScanComplete": false
+        },
+        "lifetime": {
+          "enabled": true,
+          "active": false,
+          "evidenceComplete": false,
+          "availability": {
+            "createEffect": "installed",
+            "releaseEffect": "installed",
+            "camera": "installed",
+            "generatorRegistry": "available",
+            "weakCleanup": "available"
+          },
+          "issues": {
+            "observerErrors": 0,
+            "overflow": 0,
+            "unknown": 0,
+            "foreign": 0,
+            "restoreConflicts": 0,
+            "restoreFailures": 0,
+            "unexpectedReceiver": 0
+          },
+          "stats": {
+            "scopedCreateReturns": 3,
+            "unscopedCreateReturns": 503,
+            "createWithModules": 2,
+            "createWithoutModules": 1,
+            "releaseCalls": 1,
+            "untrackedReleaseCalls": 1,
+            "releaseWithoutModules": 0,
+            "cacheReleaseSame": 2,
+            "cacheReleaseOther": 0,
+            "cacheReleaseMissing": 0,
+            "cacheReleaseUnknown": 0,
+            "bridgeInstalled": 1,
+            "bridgeBound": 0,
+            "lateCompiledDisposed": 0,
+            "generatorRegistrations": 3,
+            "shadowRegistrations": 1,
+            "registrationScans": 1
+          },
+          "coverage": {
+            "finalModules": 0,
+            "linkedFinalModules": 0,
+            "unresolvedOwnerLinks": 1,
+            "unlinkedFinalModules": 0
+          },
+          "limits": {
+            "owners": 512,
+            "links": 1024,
+            "effectIdentities": 2048,
+            "weakHooks": 2048,
+            "registrationEntries": 8192,
+            "defineCodeUnits": 8192
+          },
+          "owners": [
+            {
+              "id": 1,
+              "kind": "shadow-base",
+              "meshID": 59,
+              "subMeshID": 60,
+              "materialID": 61,
+              "generatorID": 4,
+              "passID": 13,
+              "useInstances": 0,
+              "meshName": "tree__ipr-crown-047__lod0__leaves",
+              "materialName": null,
+              "regularInstances": 0,
+              "thinInstances": 0,
+              "cachedVisibleBatchCount": null,
+              "baseInstances": 0,
+              "baseThin": 0
+            },
+            {
+              "id": 2,
+              "kind": "shadow-derived",
+              "meshID": 59,
+              "subMeshID": 60,
+              "materialID": 61,
+              "generatorID": 4,
+              "passID": 13,
+              "useInstances": 0,
+              "meshName": "tree__ipr-crown-047__lod0__leaves",
+              "materialName": null,
+              "regularInstances": 0,
+              "thinInstances": 0,
+              "cachedVisibleBatchCount": null,
+              "baseInstances": 0,
+              "baseThin": 0
+            }
+          ],
+          "depthInputProjection": {
+            "entries": 4,
+            "overflow": 0,
+            "unavailable": 0,
+            "maxEntries": 32,
+            "maxCodeUnits": 8192
+          },
+          "programInputs": [
+            {
+              "effectID": 2,
+              "vertexModuleID": 1,
+              "fragmentModuleID": 2,
+              "releaseScope": null,
+              "originalEffectID": 62,
+              "originalContextID": 63,
+              "originalPassID": 13,
+              "originalReady": 1,
+              "originalDisposed": 0,
+              "entryID": 64,
+              "previousDepthEffectID": 0,
+              "originalDefines": {
+                "id": 1,
+                "chars": 3554,
+                "flags": [
+                  [
+                    "ALPHATEST",
+                    ""
+                  ],
+                  [
+                    "DEPTHPREPASS",
+                    ""
+                  ],
+                  [
+                    "DIRLIGHT2",
+                    ""
+                  ],
+                  [
+                    "FOG",
+                    ""
+                  ],
+                  [
+                    "HEMILIGHT3",
+                    ""
+                  ],
+                  [
+                    "LIGHT0",
+                    ""
+                  ],
+                  [
+                    "LIGHT1",
+                    ""
+                  ],
+                  [
+                    "LIGHT2",
+                    ""
+                  ],
+                  [
+                    "LIGHT3",
+                    ""
+                  ],
+                  [
+                    "NORMAL",
+                    ""
+                  ],
+                  [
+                    "NUM_BONE_INFLUENCERS",
+                    "0"
+                  ],
+                  [
+                    "NUM_MORPH_INFLUENCERS",
+                    "0"
+                  ],
+                  [
+                    "POINTLIGHT1",
+                    ""
+                  ],
+                  [
+                    "SHADOW0",
+                    ""
+                  ],
+                  [
+                    "SHADOWLOWQUALITY0",
+                    ""
+                  ],
+                  [
+                    "SHADOWPCF0",
+                    ""
+                  ],
+                  [
+                    "SPOTLIGHT0",
+                    ""
+                  ],
+                  [
+                    "UV1",
+                    ""
+                  ]
+                ]
+              },
+              "incomingDepthDefines": {
+                "id": 2,
+                "chars": 210,
+                "flags": [
+                  [
+                    "SM_FLOAT",
+                    "1"
+                  ],
+                  [
+                    "SM_ESM",
+                    "0"
+                  ],
+                  [
+                    "SM_DEPTHTEXTURE",
+                    "1"
+                  ],
+                  [
+                    "SM_NORMALBIAS",
+                    "1"
+                  ],
+                  [
+                    "SM_DIRECTIONINLIGHTDATA",
+                    "0"
+                  ],
+                  [
+                    "SM_USEDISTANCE",
+                    "0"
+                  ],
+                  [
+                    "SM_SOFTTRANSPARENTSHADOW",
+                    "0"
+                  ]
+                ]
+              },
+              "previousDepthDefines": {
+                "id": 3,
+                "chars": 0,
+                "flags": []
+              },
+              "generatorOwner": {
+                "simulatedVehicleLight": 1,
+                "localFlashlight": 0,
+                "filter": 6
+              },
+              "colorWrite": 1,
+              "sceneRenderID": 29709,
+              "subDefinesRenderID": 29709,
+              "subAreLightsDirty": 0,
+              "materialHotSwapping": -1
+            },
+            {
+              "effectID": 3,
+              "vertexModuleID": 3,
+              "fragmentModuleID": 4,
+              "releaseScope": null,
+              "originalEffectID": 65,
+              "originalContextID": 66,
+              "originalPassID": 2,
+              "originalReady": 1,
+              "originalDisposed": 0,
+              "entryID": 67,
+              "previousDepthEffectID": 0,
+              "originalDefines": {
+                "id": 4,
+                "chars": 3533,
+                "flags": [
+                  [
+                    "ALPHATEST",
+                    ""
+                  ],
+                  [
+                    "DIRLIGHT2",
+                    ""
+                  ],
+                  [
+                    "FOG",
+                    ""
+                  ],
+                  [
+                    "HEMILIGHT3",
+                    ""
+                  ],
+                  [
+                    "LIGHT0",
+                    ""
+                  ],
+                  [
+                    "LIGHT1",
+                    ""
+                  ],
+                  [
+                    "LIGHT2",
+                    ""
+                  ],
+                  [
+                    "LIGHT3",
+                    ""
+                  ],
+                  [
+                    "NORMAL",
+                    ""
+                  ],
+                  [
+                    "NUM_BONE_INFLUENCERS",
+                    "0"
+                  ],
+                  [
+                    "NUM_MORPH_INFLUENCERS",
+                    "0"
+                  ],
+                  [
+                    "POINTLIGHT1",
+                    ""
+                  ],
+                  [
+                    "SHADOW0",
+                    ""
+                  ],
+                  [
+                    "SHADOWLOWQUALITY0",
+                    ""
+                  ],
+                  [
+                    "SHADOWPCF0",
+                    ""
+                  ],
+                  [
+                    "SPOTLIGHT0",
+                    ""
+                  ],
+                  [
+                    "UV1",
+                    ""
+                  ]
+                ]
+              },
+              "incomingDepthDefines": {
+                "id": 2,
+                "chars": 210,
+                "flags": [
+                  [
+                    "SM_FLOAT",
+                    "1"
+                  ],
+                  [
+                    "SM_ESM",
+                    "0"
+                  ],
+                  [
+                    "SM_DEPTHTEXTURE",
+                    "1"
+                  ],
+                  [
+                    "SM_NORMALBIAS",
+                    "1"
+                  ],
+                  [
+                    "SM_DIRECTIONINLIGHTDATA",
+                    "0"
+                  ],
+                  [
+                    "SM_USEDISTANCE",
+                    "0"
+                  ],
+                  [
+                    "SM_SOFTTRANSPARENTSHADOW",
+                    "0"
+                  ]
+                ]
+              },
+              "previousDepthDefines": {
+                "id": 3,
+                "chars": 0,
+                "flags": []
+              },
+              "generatorOwner": {
+                "simulatedVehicleLight": 1,
+                "localFlashlight": 0,
+                "filter": 6
+              },
+              "colorWrite": 1,
+              "sceneRenderID": 29713,
+              "subDefinesRenderID": 29713,
+              "subAreLightsDirty": 0,
+              "materialHotSwapping": -1
+            }
+          ],
+          "releaseCacheIdentityCodes": {
+            "unknown": -1,
+            "missingOrFalsy": 0,
+            "sameEffect": 1,
+            "otherTruthyEntry": 2
+          },
+          "linkColumns": [
+            "ownerID",
+            "effectID",
+            "contextID",
+            "vertexModuleID",
+            "fragmentModuleID",
+            "createdAtMs",
+            "lastBindAtMs",
+            "bindKind",
+            "creates",
+            "releases",
+            "releasedAtMs",
+            "disposedAtBind",
+            "instances",
+            "thin",
+            "releaseCacheIdentity",
+            "releasedRefCount"
+          ],
+          "links": [
+            [
+              1,
+              1,
+              0,
+              0,
+              0,
+              318503,
+              null,
+              null,
+              1,
+              0,
+              null,
+              -1,
+              -1,
+              -1,
+              -1,
+              null
+            ],
+            [
+              2,
+              2,
+              1,
+              1,
+              2,
+              318518.2000000477,
+              318634.10000002384,
+              "release",
+              1,
+              1,
+              318634.10000002384,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              2,
+              3,
+              2,
+              3,
+              4,
+              318671.2999999523,
+              318671.2999999523,
+              "create",
+              1,
+              0,
+              null,
+              0,
+              0,
+              0,
+              -1,
+              null
+            ]
+          ],
+          "scope": "Original scoped calls only; shared owner/link budgets with terminal map. Unknown contexts are not absent owners. Effect/context IDs local to lifetime. No strong Effect/resource retention, new Promise/await/GPU/readiness calls, source/defines exports or frame snapshots."
+        },
+        "scope": "Observed original validated shader Promise jobs only. IDs are local technical identities. Terminal mapping reads current data slots; last cached batches are not new visibility/readiness evaluation. Missing earlier/retired modules stay unobserved. No shader text/defines/GPU objects, new getCompilationInfo/render/await or whole-scene dump."
+      },
+      "scope": "One post-ready diagnostic window; original shader jobs only. Not an FPS sample."
+    },
+    "health": {
+      "rendererId": 2,
+      "purpose": "game",
+      "generation": 1,
+      "phase": "ready",
+      "valid": true,
+      "errorCount": 0,
+      "pendingOperations": 0,
+      "pendingPreparationOperations": 0,
+      "pendingShaderValidationOperations": 0,
+      "counts": {
+        "effect": 0,
+        "shader": 0,
+        "pipeline": 0,
+        "validation": 0,
+        "texture": 0,
+        "device": 0,
+        "render": 0
+      },
+      "firstErrors": []
+    },
+    "diagnosticOnly": true
+  },
+  "semantics": {
+    "carPcfConfirmed": true,
+    "sameIncomingDepthID": true,
+    "originalEffectChanged": true,
+    "originalPasses": [
+      13,
+      2
+    ],
+    "depthPrepassPresentThenAbsent": true,
+    "globalEvidenceValid": false,
+    "jobTraceComplete": true,
+    "projection": {
+      "entries": 4,
+      "overflow": 0,
+      "unavailable": 0,
+      "maxEntries": 32,
+      "maxCodeUnits": 8192
+    },
+    "limitation": "Own abstract engine._colorWrite field is not WebGPU getColorWrite/_colorWriteLocal. Flags/21-char difference do not prove full unexported define equivalence. Native last-notified base identity invalidation is source-consistent, not a whole CPU cost attribution."
+  },
+  "feedbackCapture": {
+    "automatic": true,
+    "previewComplete": true,
+    "width": 1920,
+    "height": 928,
+    "hudFreeVisuallyVerified": true,
+    "colorVisuallyVerified": true,
+    "submitted": false,
+    "originalBlobDownloadUnsupported": true,
+    "proof": "feedback-dialog-full.jpg"
+  },
+  "telemetry": {
+    "projectedRows": 36,
+    "collectorStatus": "stopped",
+    "reason": "duration",
+    "cleanupErrors": []
+  },
+  "originalSession": {
+    "records": 1871,
+    "lastKind": "session-end",
+    "closed": true
+  },
+  "files": {
+    "startup-browser.json": {
+      "bytes": 571979,
+      "sha256": "e3ff327839c107bf2552d59649113e98dd8a41d4824cd1f5311c9c06666449f1"
+    },
+    "before-entry.json": {
+      "bytes": 16576,
+      "sha256": "458fcca4fefd33802776267c0e8121a7f349c6c63f932c38313b7d8e601d442b"
+    },
+    "after-entry.json": {
+      "bytes": 16733,
+      "sha256": "0ae328c6b24ab0c4e078de60edae570c93083dbee048977d0ea9e6c6cdcab75f"
+    },
+    "shader-window.json": {
+      "bytes": 45912,
+      "sha256": "9b03a064c8d4a40368c190731fe90819f0c2f4ccc3da0056060a52e597242ea1"
+    },
+    "car-full.jpg": {
+      "bytes": 127441,
+      "sha256": "61d4c6811710eff1edc74a34cd64721f0eb17913fc6b3ace9e3cf9389e2405b4"
+    },
+    "entry-records-full.json": {
+      "bytes": 126747,
+      "sha256": "2c6c9f1b5e10d9c36305d2180b959a42c1cd6a2871f724b3d7537b2bb3b2f49b"
+    },
+    "quality-sampled-intervals.json": {
+      "bytes": 2431,
+      "sha256": "0f32d7853f8c5bd337256d8562d738ef8bf3471a294863dd0afbfb1d51cf84ee"
+    },
+    "after-feedback-capture.json": {
+      "bytes": 16708,
+      "sha256": "493437a067f7f129543348227dfbbea0047858ae83246f782ea9317209165337"
+    },
+    "feedback-preview-metadata.json": {
+      "bytes": 166,
+      "sha256": "cd237c695a8c8313355a98bed10f38bc1603949e6bd3e19873d03d69f524ec26"
+    },
+    "feedback-dialog-full.jpg": {
+      "bytes": 97669,
+      "sha256": "f9bbec8b5bd0f615134f3ddf4b45ab3d912cd41af91e74b19a687430463fa6e7"
+    },
+    "identity.json": {
+      "bytes": 12872,
+      "sha256": "f87687c3c8d0bf8db28de5eb9995f267a80cd49e81bf49aa64ced6e492d3636f"
+    },
+    "cleanup.json": {
+      "bytes": 105,
+      "sha256": "02c6ff878847af58255b1869df5ecae16fee156fca6f0def88a50aec68d59317"
+    },
+    "build-input.json": {
+      "bytes": 9060,
+      "sha256": "a89f4f7f6f9d568e0424172d364b43bb2d384136f2681b03e14b4331f02a2e3d"
+    },
+    "runtime.json": {
+      "bytes": 1497,
+      "sha256": "c2fd9dae1e25edcfff900c4fd7903c0fbeef834864ef8edc4d5bd3016727576c"
+    },
+    "collector-runtime.json": {
+      "bytes": 1468,
+      "sha256": "9675357246ec2189f9692da5e76cee68fe4c01d650023de7659ff2911e99ecf7"
+    },
+    "helper-seal.json": {
+      "bytes": 2853,
+      "sha256": "1ea140b299aa78d66b2c52b90144581a32ed69feb69353222dd982e2fe7c8320"
+    },
+    "receipts/1259b86f-b027-435c-a33f-e6ccfab337a1.json": {
+      "bytes": 12685,
+      "sha256": "8c8936dd423bd70fb9d87ef43c3298dd31c7a4a02983e901d31e6df35281c396"
+    },
+    "receipts/188cc313-66b8-4ce7-ab0b-4b82de1b37f3.json": {
+      "bytes": 12710,
+      "sha256": "797d8331efb7e9e722c5aed77341c285d458d5c129201d69251a10f03475baa8"
+    },
+    "receipts/5ac44b41-8ecf-49e0-ab4b-0750209830f6.json": {
+      "bytes": 344244,
+      "sha256": "e894b7cda29c270147c4d1da1638a9c73585326074ae8f9f50d850511bf4d21c"
+    },
+    "receipts/8a23bcdd-9c5a-479e-b831-2b7587734c37.json": {
+      "bytes": 27523,
+      "sha256": "43f0894400311ccc13780d25043baa0e19ea5f6a523db18d957095e58aee809b"
+    },
+    "receipts/ea81d029-9bad-4cba-9bcd-51397c33d5f1.json": {
+      "bytes": 12553,
+      "sha256": "b29a4d948470409439ffe9d5da6fd33a0319752238314a0f3d14eafc2400b6d2"
+    },
+    "original-session.jsonl.gz": {
+      "bytes": 519560,
+      "sha256": "06153a772f4af21a43c30abf7ce43056a8a870c8a40ad48ea72c95dec06c9832",
+      "originalBytes": 4455549,
+      "originalSha256": "3f951258c610e0e5c42c783fed6ab9d828d863d94fbbbdb7e8111663679fd806"
+    }
+  },
+  "limitations": [
+    "Two new derived programs still occur; this is not complete first-entry hitch acceptance.",
+    "Instrumented entry165.6ms/CPU160.1/render147.5 and later124.9ms withpreviousCPU22.1 are not plain A/B performance data.",
+    "Exact pass/result data exceeded original diagnosticrecordsize; capturegap1 is retained. No exact pass durations invented.",
+    "Global mapping incomplete(alias cap2/pre-existingbase/unscopedcreates); targeted positive links only.",
+    "No final18sample/image/editor/guest/B6/main acceptance."
+  ]
+}

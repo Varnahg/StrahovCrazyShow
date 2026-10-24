@@ -1,0 +1,46 @@
+# Native query readback lifecycle — research and decision
+
+Owner: `webgpu-completion-01a15a3e-query-native-v1`. Baseline metadata `132ed926`; pinned Babylon 9.30.0, fresh source6 dependency tree read only. This decision was recorded before native/app edits.
+
+The actual source6 session `6bac2f61-f001-485e-87f7-2b3554bb317e` recorded an intentional own-device destroy at 19:21:08 UTC, the correct device render fault and UI stop, then 34 unhandled rejections (27 unmapped-buffer and 7 device-loss messages). Original evidence remains root-owned at `.cache/webgpu-completion-20261021/validation/lifecycle-run-1/device-loss-console.json` and candidate3 `.cache/game-diagnostics/6bac2f61-*.jsonl`. These strings do not attribute every one of the 34 errors to a QuerySet. No GPU work is performed by this task.
+
+Pinned source chain: `WebGPUTimestampQuery.endFrame/endPass` → `WebGPUDurationMeasure.stop/stopPass` → `WebGPUQuerySet.readTwoValuesAndSubtract`. Occlusion is the other native consumer (`readValues`); `readValue` remains a public internal API. All consumers attach success-only Promise handlers. QuerySet borrows buffers outside its try, never owns pending maps in disposal, returns artificial zero on two retired paths, and does not know explicit disposal/device loss. Timestamp callbacks have no measure epoch; occlusion callbacks have no replacement identity. Engine disposal omits its occlusion query. App uses `doNotHandleContextLost:true`, so native auto-restore's loss flag is unavailable by design.
+
+Variants considered:
+
+| Variant | Behavior, cache and lifecycle cost | Decision |
+| --- | --- | --- |
+| Dispose whole engine earlier | Conceals the rejection behind fake zero; changes scene/UI ownership and recovery ordering | Reject |
+| Disable GPU timing or swallow all errors | Removes real measurements or hides active renderer faults | Reject |
+| QuerySet disposal only | Pending maps are not pooled; success-only child Promises still reject | Insufficient |
+| Per-QuerySet device.lost callbacks | Retains retired QuerySets/engines for the device lifetime | Reject |
+| Shared weak device loss state + owned borrowed buffers + consumer epochs + explicit engine error event | One passive loss reaction per device; no strong QuerySet history, no extra render/queue/fence/timer work; active failures remain visible | Chosen |
+
+The shared WeakMap state holds scalars only; a device Promise reaction captures that state, never QuerySets or engines. Retirement means own disposal, engine disposal/replacement, device replacement or known device loss. All three public reads return null after retirement; genuine zero remains a sample. A rejection seen before loss is known is still an active error: do not wait indefinitely for device.lost to classify it. Internal fire-and-forget consumers consume both outcomes and report active failures through `onQueryReadErrorObservable` into RenderHealth's existing `render` channel, preserving the original error object. Late old callbacks cannot write new counters/results or reset a newer frame cycle. Existing occlusion delayed destruction timing is not extended or used as the fix.
+
+Application availability is explicit: WebGL never reads the new observable; a WebGPU engine without a valid producer API invalidates RenderHealth once. Fake WebGPU engines must supply an actual Observable. Existing validation/device-loss watcher and Game/UI lifecycle remain unchanged.
+
+Primary platform references: [GPUDevice.lost](https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/lost), [GPUDevice.destroy](https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/destroy), [GPUBuffer.mapAsync](https://developer.mozilla.org/en-US/docs/Web/API/GPUBuffer/mapAsync). Destroy unmaps mapped buffers; no ordering guarantee between map rejection and the lost reaction was established by this research. Pinned native source and preserved terminal-IO witnesses are the causal CPU evidence, not a GPU performance claim.
+
+Verification and final hashes will be appended after the implementation and independent review. All ten pre-existing patch sections, especially Mesh `7ceb79d2…`, must remain byte exact; only related lock hash references may change.
+
+## Implementation and CPU acceptance
+
+The native patch changes exactly QuerySet, TimestampQuery, OcclusionQuery and WebGPUEngine `.js`/`.d.ts`. QuerySet unifies the three read paths and owns each borrowed destination before encode/submit. Completion/disposal detaches ownership before cleanup and preserves the first thrown value, including falsy values. Partial construction cleans already-created resources. Known retired timestamp/occlusion owners perform no further query writes/binding and expose no stale result. Consumer epoch/current-query guards suppress old samples and rejection callbacks after replacement. The ordinary engine disposal keeps the previous cleanup order, includes both query owners before the buffer sweep, attempts every already-owned step and then rethrows its exact first failure.
+
+One review counterexample showed that a foreign observer could throw or set `skipNextObservers` before RenderHealth received the original error. A local `QueryReadErrorObservable` now broadcasts only this new fatal event, isolating each observer; pinned mask/scope/once/deferred removal/callback identity and cleanup during dispatch are preserved. Other Babylon Observable channels are unchanged. Both observer orders, throw/skip, original guard identity and zero unhandled child Promises are covered by actual native consumer → actual RenderHealth tests. The reviewer independently repeated the counterexample after the fix and confirmed its closure; final hash confirmation is in the handoff exchange.
+
+Final `proof.mjs`: **162/162 targeted CPU PASS**, 12 syntax checks, scoped TypeScript semantic check of 8 roots plus 4 declaration overlays with **0 diagnostics**, scoped diff check PASS. The unchanged installed package intentionally remains red: **2 PASS / 52 FAIL of 54**, while the explicit cache-only candidate passes all 54 native tests and the 108 targeted client/startup regressions. Default portable tests have no environment toggle or overlay/cache dependency. The standalone preserved original native endPass witness still gives active rejection 1 unhandled, QuerySet-dispose-only 1 unhandled, engine-disposed 0 unhandled but artificial sample `[8,0]`.
+
+`verification.json` raw SHA-256: `7a33c2e10e7f41d90daba1ae1021acbda0e34229276756521fb8fa1c94ac8184`.
+Patch: `e82638ea49de7d93b13e1a5e5c57beb92e2d083ec5a7617f978e28a0dac8c43f`.
+Lock: `8e6b4519cfc712b4a83a6fd893ddc37192836f582e6c4a2b95d187e03a277936`.
+The proof verifies 12 selected source hashes, 29 pinned native paths in both fresh source6 and original installed trees, and all 8 candidate native files before/after execution. Complete old-patch reverse/new-patch apply is exact; ten old sections and six inverse lock references remain byte exact. Neither dependency tree nor any running frozen build was modified.
+
+Development evidence is retained: the first 146/147 run exposed a fixture that tried to reuse the intentionally terminal single-buffer occlusion owner; the fixture now uses a separate real owner for its disposal case. A new original-native negative read-after-replacement fixture initially held its fake map forever; the verified own helper process tree was stopped, and the fixture now completes any erroneously started terminal IO before asserting behavior. One getter test required an explicit `return` for TypeScript. These are test/tool development failures, not successful GPU measurements. The final proof reran the current red, green and semantic checks over stable bytes.
+
+## Partial initialization and remaining limits
+
+Read-only audit of `client/render-engine.ts:139` confirms the separate failed-initialization path runs before Game/Scene/RenderHealth. It marks the engine disposed, releases timestamp resources, sweeps buffers, destroys the device, then runs common/base disposal and removes EngineStore ownership. The new error observable is then empty. An occlusion preallocated pool buffer is also destroyed by device destruction; the new shared loss reaction contains only scalar state and cannot retain the engine/QuerySet. No pending render query reads start during init. No new partial-init leak was demonstrated, so `render-engine.ts` and its tests remain outside this change. A foreign observer deliberately retaining a disposed engine remains that observer's ownership. Failed cleanup attempts do not prove an individual third-party resource was freed.
+
+No install, full suite, build, server, browser, GPU, FPS or recovery acceptance was performed by this leaf. Root must freshly install the patch, run the stable full checks and repeat actual own-device loss plus normal leave/editor/rejoin on a new immutable source. The original 34 errors are source evidence, not a claim that all 34 were these query reads. The previous destroyed vertex buffer fault and native Mesh patch are independent and unchanged. CPU overhead of ownership tracking and the error broadcast was not benchmarked; no cache/render algorithm, timing availability, physics/network clock, readiness threshold or runtime auto-restore policy changed.

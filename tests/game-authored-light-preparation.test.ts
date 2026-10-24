@@ -95,7 +95,7 @@ test("actual authored factories retain browser texture metadata in bounded IO ad
 
 const gameSource=fs.readFileSync(new URL("../client/game.ts",import.meta.url),"utf8");
 const tree=ts.createSourceFile("game.ts",gameSource,ts.ScriptTarget.Latest,true),declaration=tree.statements.find((n):n is ts.ClassDeclaration=>ts.isClassDeclaration(n)&&n.name?.text==="Game")!;
-const selected=["prepareLighting","prepareLightingVariants","isMeshReadyForCamera","updateRenderEnvironment","applyRenderQuality","updateCameraFollow","alignVehicleCamera","footFirstPerson"];
+const selected=["prepareLighting","prepareLightingVariants","isMeshReadyForCamera","updateRenderEnvironment","applyRenderQuality","updateCameraFollow","alignVehicleCamera","footFirstPerson","applyPreparationView","preparationPosition","refreshStartupPreparationView","startupPreparationCoverage"];
 const methods=declaration.members.filter(n=>n.name&&selected.includes(n.name.getText(tree)));assert.equal(methods.length,selected.length);
 report.methods=methods.map(n=>({name:n.name!.getText(tree),sha256:sha(n.getText(tree))}));
 const code=ts.transpileModule(`class ProofGame {${methods.map(n=>n.getText(tree)).join("\n")}}`,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
@@ -172,9 +172,9 @@ for(const initialQuality of ["low","medium"] as const) test(`native cold opposit
   const deadline=performance.now()+35000;
   while(!complete&&performance.now()<deadline){callback?.();await turn();}
   assert.ok(complete,"bounded whole preparation finished");row.preparation=await preparation;row.stages=[...stageMap.values()];
-  assert.equal(row.preparation.status,"complete");assert.equal(row.preparation.stages.length,41);assert.deepEqual(row.preparation.qualities.map((x:any)=>x.quality),initialQuality==="low"?["medium","high","low"]:["low","high","medium"]);
-  assert.equal(row.stages.length,41);assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>family.cap===4)));
-  assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>s.quality==="low"&&s.label.startsWith("vehicle-")?(family.drawn&&family.ready):!family.drawn)));
+  assert.equal(row.preparation.status,"complete");assert.equal(row.preparation.stages.length,76);assert.deepEqual(row.preparation.qualities.map((x:any)=>x.quality),["low","medium","high",initialQuality]);
+  assert.equal(row.stages.length,57,"Map is a unique quality/stage projection; actual preparation reports76 passes/stages above");assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>family.cap===4)));
+  assert.ok(row.stages.every((s:any)=>s.families.every((family:any)=>s.label.startsWith("vehicle-")?(family.drawn&&family.ready):!family.drawn)));
   assert.ok(f.target.every(mesh=>!mesh.alwaysSelectAsActiveMesh),"all scoped flags restored before gameplay");
   assert.equal(game.yaw,startYaw);assert.equal(actor.vehicle,false);assert.equal(car.isEnabled(),false);assert.equal(parked.isEnabled(),true);assert.equal(game.adaptive.state,requested);
   assert.ok(Vector3.Distance(camera.position,initialCamera.position)<1e-9);assert.ok(Vector3.Distance(camera.rotation,initialCamera.rotation)<1e-9);
@@ -252,7 +252,7 @@ test("actual inner Game selects target light membership after environment and pr
     let settled=false;void f.pending.then(()=>{settled=true;});
     for(let i=0;!settled&&i<150;i++){f.tick();await turn();}
     const result=await f.pending;
-    assert.equal(result.status,"complete");assert.equal(result.stages.length,webgpu?15:9);
+    assert.equal(result.status,"complete");assert.equal(result.stages.length,webgpu?19:9);
     assert.ok(f.draws.every(d=>d.flags.every(flag=>flag===(webgpu&&d.stage.startsWith("vehicle-")))));
     assert.ok(f.meshes.every(m=>!m.alwaysSelectAsActiveMesh));
   }

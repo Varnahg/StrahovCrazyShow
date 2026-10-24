@@ -1,0 +1,143 @@
+diff --git "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v14\\common.mjs" "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\pipeline-inputs\\helper\\v15\\common.mjs"
+index bd0d3e83..ed365362 100644
+--- "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v14\\common.mjs"
++++ "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\pipeline-inputs\\helper\\v15\\common.mjs"
+@@ -52,7 +52,7 @@ export async function directoryHashes(directory) {
+ }
+ export const sourceFiles = ['common.mjs', 'startup-observer.mjs', 'attempt-queue.mjs', 'receipt.mjs', 'harness.mjs', 'qa-overlay.mjs',
+   'transit-clock.mjs', 'browser-clock.mjs', 'server-bootstrap.mjs', 'weather-fixture.mjs', 'startup-latency.mjs',
+-  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'entry-routine-cost.mjs', 'entry-routine-cost.test.mjs', 'README.md'];
++  'shader-attribution.mjs', 'shader-lifetime.mjs', 'routine-cost-core.mjs', 'routine-cost.mjs', 'routine-cost.test.mjs', 'buffer-lifecycle-core.mjs', 'buffer-lifecycle.mjs', 'buffer-lifecycle.test.mjs', 'lifecycle-controls.mjs', 'lifecycle-controls.test.mjs', 'helper.test.mjs', 'clock.test.mjs', 'weather-latency.test.mjs', 'shader-attribution.test.mjs', 'shader-lifetime.test.mjs', 'shader-window.test.mjs', 'depth-inputs.test.mjs', 'preparation-summary.test.mjs', 'entry-render-cost.mjs', 'entry-render-cost.test.mjs', 'entry-routine-cost.mjs', 'entry-routine-cost.test.mjs', 'pipeline-input-window.mjs', 'pipeline-input-window.test.mjs', 'README.md'];
+ export function parseBuildOptions(args) {
+   const value = { loading: 'original', clockFile: undefined, weatherFile: undefined, startupLatency: false, shaderAttribution: false, routineCost: false, bufferLifecycle:false, lifecycleControls: false };
+   let loadingSeen = false;
+diff --git "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v14\\harness.mjs" "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\pipeline-inputs\\helper\\v15\\harness.mjs"
+index b8a270b7..3cb987b3 100644
+--- "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v14\\harness.mjs"
++++ "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\pipeline-inputs\\helper\\v15\\harness.mjs"
+@@ -147,6 +147,7 @@ export async function run(command, input, output, label, option = 'original', ..
+     const transitClock = await readFile(join(helperDirectory, 'transit-clock.mjs'), 'utf8');
+     const startupLatency = await readFile(join(helperDirectory, 'startup-latency.mjs'), 'utf8');
+     const lifecycleControls = await readFile(join(helperDirectory, 'lifecycle-controls.mjs'), 'utf8');
++    const pipelineInputs = await readFile(join(helperDirectory, 'pipeline-input-window.mjs'), 'utf8');
+     const entryRoutine = await readFile(join(helperDirectory, 'entry-routine-cost.mjs'), 'utf8');
+     const entryRender = await readFile(join(helperDirectory, 'entry-render-cost.mjs'), 'utf8');
+     const entryClasses = 'export { Game } from ' + JSON.stringify(join(snapshot, 'client/game.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { Scene } from "@babylonjs/core/scene.js";export { GltfLightBudget } from ' + JSON.stringify(join(snapshot, 'client/gltf-light-budget.ts').replaceAll(String.fromCharCode(92), '/')) + ';export { StableLightState } from ' + JSON.stringify(join(snapshot, 'client/stable-light-state.ts').replaceAll(String.fromCharCode(92), '/')) + ';';
+@@ -189,6 +190,7 @@ export async function run(command, input, output, label, option = 'original', ..
+       build: { outDir: join(directory, 'dist'), emptyOutDir: false, copyPublicDir: false, sourcemap: true },
+       plugins: [{ name: 'explicit-webgpu-completion-qa', enforce: 'pre',
+         resolveId(id) {
++          if (id === 'virtual:webgpu-completion-pipeline-inputs') return '\0virtual:webgpu-completion-pipeline-inputs';
+           if (id === 'virtual:webgpu-completion-entry-routine') return '\0virtual:webgpu-completion-entry-routine';
+           if (id === 'virtual:webgpu-completion-entry-render') return '\0virtual:webgpu-completion-entry-render';
+           if (id === 'virtual:webgpu-completion-entry-classes') return '\0virtual:webgpu-completion-entry-classes';
+@@ -208,6 +210,7 @@ export async function run(command, input, output, label, option = 'original', ..
+           if (id === 'virtual:webgpu-completion-simulation') return join(snapshot, 'shared/simulation.ts').replaceAll('\\', '/');
+         },
+         load(id) {
++          if (id === '\0virtual:webgpu-completion-pipeline-inputs') return pipelineInputs;
+           if (id === '\0virtual:webgpu-completion-entry-routine') return entryRoutine;
+           if (id === '\0virtual:webgpu-completion-entry-render') return entryRender;
+           if (id === '\0virtual:webgpu-completion-entry-classes') return entryClasses;
+diff --git "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v14\\qa-overlay.mjs" "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\pipeline-inputs\\helper\\v15\\qa-overlay.mjs"
+index 19f02c5f..394c9b9f 100644
+--- "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v14\\qa-overlay.mjs"
++++ "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\pipeline-inputs\\helper\\v15\\qa-overlay.mjs"
+@@ -1,3 +1,5 @@
++import { capturePipelineInputs } from 'virtual:webgpu-completion-pipeline-inputs';
++import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine.js';
+ import { observeOperation, observePreparationResult } from 'virtual:webgpu-completion-observer';
+ import { createAttemptQueue } from 'virtual:webgpu-completion-attempts';
+ import { installBrowserClock } from 'virtual:webgpu-completion-browser-clock';
+@@ -142,7 +144,7 @@ export async function observeStartup(game, canvas, start) {
+   download.style.cssText = 'display:block;color:#b8e5ff'; download.hidden = true;
+   controls.append(disclosure, status, download); panel.append(title, controls, output); document.body.append(panel);
+   let gameRef = game, startupTimer, sampleOverflow = false, busy = false, disposed = false, downloadURL, interruptBenchmark;
+-  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, preparationOwner, attributionWindow, routineOwner, entryOwner, entryRoutineOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
++  let startupResolved = false, readyAtUTC, clockOwner, latencyOwner, preparationOwner, attributionWindow, pipelineOwner, routineOwner, entryOwner, entryRoutineOwner,bufferOwner, planned, lifecycleOwner, lifecycleButton;
+   const clockAbort = new AbortController();
+   const samples = [], observerErrors = [], buttons = [];
+   const ownerId = crypto.randomUUID();
+@@ -400,6 +402,22 @@ export async function observeStartup(game, canvas, start) {
+       },
+     });
+   }
++  if (identity.routineCost) action('Diagnostic ·30s původní compiler vstupy', async () => {
++    const raw = { ...envelope('pipeline-inputs'), completed: false, before: snapshot(), after: null, pipelineInputs: null, validationErrors: [],
++      scope: 'Original post-ready compiler inputs only; hashes and fixed family/define flags. No raw text/owner inference or extra compiler/GPU calls.' };
++    try {
++      pipelineOwner = capturePipelineInputs(gameRef, { enabled: identity.routineCost,
++        expected: { classes: { Game, Scene, WebGPUEngine }, methods: { render: Scene.prototype.render, preparePipeline: WebGPUEngine.prototype._preparePipelineContextAsync } },
++        signal: clockAbort.signal, isCurrent: () => !disposed && gameRef === game });
++      raw.pipelineInputs = await pipelineOwner.done; raw.completed = raw.pipelineInputs.completed;
++      if (!raw.completed) raw.validationErrors.push('Pipeline inputs incomplete: ' + raw.pipelineInputs.reason);
++    } catch (error) { raw.failure = errorText(error); raw.validationErrors.push(raw.failure.message); }
++    finally {
++      pipelineOwner?.dispose('owner-stopped'); raw.pipelineInputs ??= pipelineOwner?.snapshot() ?? null; pipelineOwner = undefined;
++      raw.after = snapshot(); raw.observerErrors = [...observerErrors];
++    }
++    await persist(raw);
++  });
+   for (const quality of ['low', 'medium', 'high', 'auto']) action('Kvalita ' + quality, () => { gameRef.setQuality(quality); tell(snapshot()); });
+   action('Cíl 60 FPS', () => { gameRef.setTargetFps(60); tell(snapshot()); });
+   action('Svítilna', () => { gameRef.toggleFlashlight(); tell(snapshot()); });
+@@ -417,7 +435,7 @@ export async function observeStartup(game, canvas, start) {
+     if (!clockAbort.signal.aborted) {
+       const abort = new Error('Clock QA owner stopped'); abort.name = 'AbortError'; clockAbort.abort(abort);
+     }
+-    attributionWindow?.dispose(); clockOwner?.dispose(); latencyOwner?.dispose(); routineOwner?.dispose('owner-stopped'); entryOwner?.dispose('owner-stopped'); entryRoutineOwner?.dispose('owner-stopped');bufferOwner?.dispose('owner-stopped');
++    attributionWindow?.dispose(); pipelineOwner?.dispose('owner-stopped'); clockOwner?.dispose(); latencyOwner?.dispose(); routineOwner?.dispose('owner-stopped'); entryOwner?.dispose('owner-stopped'); entryRoutineOwner?.dispose('owner-stopped');bufferOwner?.dispose('owner-stopped');
+     lifecycleOwner?.dispose(); preparationOwner?.dispose();
+     unsubscribeTransfers(); buttons.forEach(button => button.disabled = true); gameRef = undefined;
+   };
+diff --git "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v14\\receipt.mjs" "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\pipeline-inputs\\helper\\v15\\receipt.mjs"
+index 779dcbd3..bc5706cd 100644
+--- "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v14\\receipt.mjs"
++++ "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\pipeline-inputs\\helper\\v15\\receipt.mjs"
+@@ -1,3 +1,4 @@
++import { validatePipelineInputs } from './pipeline-input-window.mjs';
+ import { open, readFile, mkdir, lstat, link, unlink } from 'node:fs/promises';
+ import { randomUUID } from 'node:crypto';
+ import { join } from 'node:path';
+@@ -12,10 +13,11 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{1
+ export function validateReceipt(value, identity) {
+   if (!value || value.schemaVersion !== 1 || !uuid.test(value.attemptId ?? '') ||
+       value.buildId !== identity.buildId || value.sourceSnapshotId !== identity.sourceSnapshotId ||
+-      value.helperSha256 !== identity.helperSha256 || !['startup', 'benchmark', 'state', 'routine-cost','buffer-lifecycle','vehicle-entry-cost'].includes(value.kind) ||
++      value.helperSha256 !== identity.helperSha256 || !['startup', 'benchmark', 'state', 'routine-cost','buffer-lifecycle','vehicle-entry-cost','pipeline-inputs'].includes(value.kind) ||
+       !['plain', 'diagnostic'].includes(value.mode)) throw new Error('Receipt identity/schema mismatch');
+   if (typeof identity.lifecycleControls !== 'boolean' || value.lifecycleControls !== identity.lifecycleControls ||
+       (identity.lifecycleControls && value.mode !== 'diagnostic')) throw new Error('Receipt lifecycle-controls identity mismatch');
++  if (value.pipelineInputs !== undefined && value.kind !== 'pipeline-inputs') throw new Error('Pipeline inputs kind mismatch');
+   if (value.entryTrigger !== undefined && value.kind !== 'routine-cost') throw new Error('Entry trigger kind mismatch');
+   if (value.lifecycleControl !== undefined) {
+     const control = value.lifecycleControl;
+@@ -37,6 +39,16 @@ export function validateReceipt(value, identity) {
+     if(identity.bufferLifecycle!==true||value.bufferLifecycle!==true||value.mode!=='diagnostic'||!value.bufferTrace||value.bufferTrace.active!==false)throw new Error('Buffer lifecycle diagnostic identity/evidence missing');
+     validateBufferTrace(value.bufferTrace);
+   }
++  if (value.kind === 'pipeline-inputs') {
++    const allowed = new Set('schemaVersion,label,sourceSnapshotId,helperSha256,loading,clock,weather,startupLatency,shaderAttribution,routineCost,bufferLifecycle,lifecycleControls,dependencies,buildId,attemptId,ownerId,kind,mode,atMs,timeOrigin,capturedAtUTC,userAgent,observerErrors,clockConfigId,completed,before,after,pipelineInputs,validationErrors,scope,failure'.split(','));
++    if (Object.keys(value).some(key => !allowed.has(key)) || identity.routineCost !== true || value.routineCost !== true || value.mode !== 'diagnostic' ||
++        !value.before || !value.after || !Array.isArray(value.validationErrors) || value.validationErrors.length > 16 || typeof value.completed !== 'boolean') throw new Error('Pipeline inputs diagnostic evidence missing');
++    if (value.pipelineInputs === null) { if (value.completed || !value.failure || !value.validationErrors.length) throw new Error('Pipeline input refusal missing'); }
++    else {
++      validatePipelineInputs(value.pipelineInputs); if (value.completed !== value.pipelineInputs.completed) throw new Error('Pipeline input completion differs');
++      if(value.completed)for(const state of [value.before,value.after])if(state.ready!==true||state.disposed!==false||state.health?.valid!==true||state.health.rendererId!==value.pipelineInputs.rendererId||state.health.generation!==value.pipelineInputs.generation||state.health.errorCount!==0||state.health.pendingOperations!==0)throw new Error('Pipeline input completed renderer/health mismatch');
++    }
++  }
+   if (value.kind === 'vehicle-entry-cost') {
+     if (identity.routineCost !== true || value.routineCost !== true || value.mode !== 'diagnostic' || !value.before || !value.after ||
+         !Array.isArray(value.validationErrors) || value.validationErrors.length > 16 || typeof value.completed !== 'boolean') throw new Error('Entry diagnostic identity/evidence missing');
+diff --git "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v14\\README.md" "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\pipeline-inputs\\helper\\v15\\README.md"
+index 46b3a3bf..97109bbe 100644
+--- "a/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-render\\helper\\v14\\README.md"
++++ "b/C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\pipeline-inputs\\helper\\v15\\README.md"
+@@ -278,3 +278,7 @@ Diagnostic tree47-only original-base/entry/define-equality/generator/epoch input
+ 
+ ## v14 retained waiter retirement
+ V13 remains immutable and was not accepted/built for GPU after review found a retained prepareFrame reference could retrigger during active original8 capture. V14 adds only waiting-phase passthrough before observer clock/check/trigger. Restored stale calls preserve original receiver/args/result/Promise/falsy throw with zero extra observer work; the original core keeps its first trigger and completes its remaining frames. No new state/cache/closure or product/native/old profiler change. Only entry-routine-cost.mjs/test and this README differ;31 inputs remain exact. Research/actual-native RED and targeted GREEN proof live in public entry-routine-helper/stale-correction/. Prior152PASS/one metadata skip stays historical; practical cold-browser/GPU acceptance remains root work.
++
++
++## v15 post-ready pipeline inputs
++Existing --routine-cost enables a separate button Diagnostic ·30s původní compiler vstupy. It passively observes original engine instance _preparePipelineContextAsync during one30s window, max4 sequential/Game, no startupinventory or owner mapping.32calls/512KiBcall/4MiBtotal encodedinputs; actual source/defines/context-name lengths+SHA only, fixed SHADER_NAME family categories and bounded selected define flags. No raw shader/key/name export. Original args/receiver/return/Promise/falsy errors unchanged; native-Promise side observer guarded against species/getters. Pending original jobs insidewindow are allowed, pending/hash/overflow/retirement atdeadline remain explicit incomplete. New kind pipeline-inputs has strict projection/receipt checks. Native argument9_key is empty; actual owncontext._name is hashonly. Old34input modules/actions remain except common/harness/UI/receipt/README;36inputs total. Public research/tests/proof: pipeline-input-helper/. Not FPS/GPU/owner/coldbrowser acceptance.

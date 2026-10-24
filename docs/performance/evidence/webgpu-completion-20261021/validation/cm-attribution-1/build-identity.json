@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "label": "cm-shader-attribution-1",
+  "sourceSnapshotId": "8039555366d3fc977ecfb18e155f30000e9e8faeb36469a9e110481a2feefb93",
+  "helperSha256": "19d33c4d3025df1f9bdeaaf6bd120e857d21945df31d1f116d60990536d45621",
+  "loading": "original",
+  "clock": null,
+  "weather": {
+    "schemaVersion": 1,
+    "sourceSha256": "4db0f84d2f928998bde5a1ae12a2016e93ea19e6e2e22c06beb923d2e16126e2",
+    "emittedSha256": "9a07e2934e7b54a36167b22cd4f140a75dfd395d777d508cc79834c1b97020cc",
+    "sourceBytes": 1784,
+    "emittedBytes": 1357,
+    "provenance": {
+      "mechanism": "scripts/performance-preview.mjs recorded-audit-weather",
+      "numericPolicy": "All supplied Weather numeric/null/nested values preserved exactly; no clamping or workload reduction",
+      "labelPolicy": "Only status/source/cloudSource/cloudWindSource replaced with explicit recorded QA fallback labels"
+    }
+  },
+  "startupLatency": true,
+  "shaderAttribution": true,
+  "dependencies": {
+    "@babylonjs/core/package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79",
+    "@babylonjs/core/Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    "@babylonjs/core/Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "@babylonjs/core/Materials/Textures/texture.pure.js": "f27fd4a566579ea2cc99c43ae056e48546b3d433aded037ab97c997c6299a976"
+  },
+  "buildId": "60cfd189f0a77eed6eeaabd600c89d43f1ac7155da034aed72277f21442dc25c",
+  "snapshot": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\performance-snapshot\\webgpu-completion-20261021-candidate-3",
+  "sourceFiles": 8564,
+  "helperFiles": {
+    "common.mjs": "75249d2e38043e4b37a16c4cb21e4e4464180bf5084e4ea92e37bf9c0f02b439",
+    "startup-observer.mjs": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+    "attempt-queue.mjs": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+    "receipt.mjs": "6aebee76673b51ed19a1af98e1942aa6716324167321293e7e42bcfd6c7ffbbf",
+    "harness.mjs": "edf1b3da4453b5efbec21efc36e0af1390e0e3f086085e440a3049721a4cbf80",
+    "qa-overlay.mjs": "92d1e2c54e3a9fca02a209686476cfa278bfdc6f5e53b929a8013dc93a2be5c2",
+    "transit-clock.mjs": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+    "browser-clock.mjs": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+    "server-bootstrap.mjs": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+    "weather-fixture.mjs": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+    "startup-latency.mjs": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+    "shader-attribution.mjs": "e3ca7427c19d8fc67d597807a920fd32c571935bf5512df8ef879730a8c36f40",
+    "helper.test.mjs": "3e901768c9aebe1768e4d04e267e0b6cd595d52a32d90831748b5dfb4e8baf40",
+    "clock.test.mjs": "67031042ca1fce5ecfc377dc1320e0d74f91dd87eebbe2926eaf41a60196d08b",
+    "weather-latency.test.mjs": "0024954a2177ca60c78e51d0e4ebc65fc1071a83586d8fe30040721963a700bf",
+    "shader-attribution.test.mjs": "e93c12b2c36b06b6c362480c885da426ce251d183ee93d7e5c5dedccf752b7d1",
+    "README.md": "5e95b32d20199a64751815539b1e2f7053a53f389a6b5744017aeb83db79bbdf"
+  },
+  "transforms": {
+    "ui": {
+      "file": "client/ui.tsx",
+      "before": "6aa94cf9ecd4278ef68c1e5a98377503f5bd96c667fe51e24e3ef5ac941562fe",
+      "after": "33f23b97a07dedd3fc2f44cd52bfd572fed3ae674300a5af73910a10450ba18c",
+      "scope": "Build-only CRLF normalization, import and one observeStartup call in place of original await g.start; original source untouched"
+    },
+    "loading": {
+      "file": "client/style.css",
+      "variant": "original",
+      "before": "bcb01da92cdadde5fb35969f0b70c9754f9e0e12fdaabdfb0e0bf451ee94819f",
+      "after": "bcb01da92cdadde5fb35969f0b70c9754f9e0e12fdaabdfb0e0bf451ee94819f",
+      "scope": "Byte-identical original CSS"
+    }
+  },
+  "transformHits": {
+    "ui": 1,
+    "css": 1
+  },
+  "overlaySha256": "825efdc8d13e22e3858336d287d5ba70deb721378e47254ac2ab9ee22a9dda3d",
+  "observerSha256": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+  "buildInputSha256": "1085ef3162de2053aa4a288d4df66fe28fbeaf045f1f5379895a9611c8572b96",
+  "bundleFiles": {
+    "assets/assets-DrMqpa3V.js": "eb487d43c3e387b5d8db37ca8798e4103afdbd41726e374b0d1b0ca3eb941226",
+    "assets/assets-DrMqpa3V.js.map": "886b35c418889bf196e814d12cc46feed5c0207dc2d3f53cebfb40d3398251a3",
+    "assets/avatar-preview-Cvs-prvE.js": "308264932bad01f684d8f4f6468659e6a187bb7583e447127f5dc1bf26833338",
+    "assets/avatar-preview-Cvs-prvE.js.map": "97c2a14422512ecd7a1c63b8dd280d73c1affddfe94ad4737b02f6a5fd9459b2",
+    "assets/avatar-renderer-Dl_QXDz6.js": "12022d2489136834984b33236e0f33f3e96c038109c3f584e782d1ef76fe4032",
+    "assets/avatar-renderer-Dl_QXDz6.js.map": "f21c3a88ce9a78e44f7eab766e6027525f220caa3f8d69240936e1c618a6755b",
+    "assets/b6-reality-CjZtn28L.js": "26ff86802f8f22512182193285dfdd854cf9ed7806bda1c0d17f942ae064b1b3",
+    "assets/babylon-s9aBA_yc.js": "7a826179e8613997a0acd95eb2498494419c5318527b9f745986ac777fefa611",
+    "assets/babylon-s9aBA_yc.js.map": "74890ea38cb2c80131ce64d162e5286045e6cdf810eb8e73c8b790a1897a56ec",
+    "assets/car-pack-CGlojtUO.js": "ac3a824fb14638cd7554f2a24a1c8f75fa4ac982649d53df1ee29e23bb3d11d7",
+    "assets/car-pack-CGlojtUO.js.map": "e9ac611e63aadcd3deceddf2f5409767da9cee8bf07e98a29eda7c73bb33b9cb",
+    "assets/environment-manifest-Bkq6KwiW.js": "6dddfba6cef4f582ed87e43f6346e99f42bf14acc66eae36232f12af84a417f4",
+    "assets/environment-manifest-Bkq6KwiW.js.map": "d002f66816b93b717d78283753a853431273961d000c1d39e471d0f46d7dfd81",
+    "assets/game-BOywOys3.js": "4b6ac201104d91af12958209527f876acca7d1fb00c5843e3dd38824992a703a",
+    "assets/game-BOywOys3.js.map": "d0692d9f933ec23d2f75f53b60575bcc9b93b48eb0ed5a3aa7fe08a97fac556d",
+    "assets/index-LyDiB5yh.css": "0d5f411e118685c10439b9e3ae79439edeeb5758ee2713523619a7dfee00dbfa",
+    "assets/index-WgjB59gg.js": "cc07bf0e404f8cb1a448001b80d96ac5018be33a5a23844450f4a75d0f93cec1",
+    "assets/index-WgjB59gg.js.map": "0c32e563745f7619e3ead4b6e699b664081ab2e6b2cee6ba0b8743d75660726b",
+    "assets/landmark-reality-DbRJ3f-Q.js": "a463c9e83eee643fef3fa2ff0cc99d4f391323973e8335b3b499f9eb13ec3dc4",
+    "assets/landmark-reality-DbRJ3f-Q.js.map": "a5d84fdcc6560acff6e06af080d0dd3d7adfe50f30349df0bc670a29832d194c",
+    "assets/on-demand-render-D5VM_IqL.js": "bdd520a928f9355237b6439c9e57d8db400538f6395d213369cf37573aa004ed",
+    "assets/on-demand-render-D5VM_IqL.js.map": "38f46446e3f0357253537d65c017e9c7f60cb73fc83d2f0257a8720b6827f7fe",
+    "assets/render-engine-Cn5qVY6C.js": "df070032706b9e845cc027c8ab0f024f336da0d6ef268d156f59a84379c2e453",
+    "assets/render-engine-Cn5qVY6C.js.map": "64f316274446c2cd83fb7775bab93f7941e4ece39305d5ea20dea5a346e18d63",
+    "assets/render-shaders-Bwidt6TM.js": "669bb36dfc21bc6a29d74ed7162d7e96dccd09a4b85e3646b87d9b1ff5094425",
+    "assets/rolldown-runtime-hePW80VL.js": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+    "assets/simulation-Dwr5173P.js": "848ebfa652192d50044956fbdec1ad4f826ed5854c6a91a4ac8db585d26249f4",
+    "assets/simulation-Dwr5173P.js.map": "3ad46074362e7f68855590511be605d89b201d72fd0c10666ec09a4ea86176aa",
+    "assets/transit-renderer-D-LIH1kG.js": "f9aaf6fad2bb86d7f97acf90ff5e7b7cbb3e91d2af29392932a76499e4c44f39",
+    "assets/transit-renderer-D-LIH1kG.js.map": "fa7e2fc50f3efbee2cd50a37a992803ff1e5488ed20bff37e5c65e7c601f5f6a",
+    "assets/vegetation-2brqhS0M.js": "eb0d0c0ad32dfc07fc45f2d06e22d920bfcc171a5d06221bf254f7311f51d45e",
+    "index.html": "401069d2a51ed2c593691ea1cbfe06c6b0a6b1a6a649b29bda85ce811d2663fa"
+  },
+  "builtAt": "2026-10-21T12:53:26.977Z",
+  "limitation": "No GPU acceptance from build. Browser exports buildId; sidecar binds that ID to actual bundle hashes. Public assets served from exact verified original snapshot, no mutation/copy."
+}

@@ -10,6 +10,7 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
+import {MorphTargetManager} from "@babylonjs/core/Morph/morphTargetManager";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
@@ -18,6 +19,116 @@ import { VehicleLighting } from "../client/vehicle-lighting";
 import manifest from "../shared/data/assets/vehicles-manifest.json";
 import { applyArtLighting } from "../client/art-lighting";
 import { sunState, moonState } from "../shared/weather";
+import {localPreparation,settleLocal} from "./fixtures/avatar-shadow-preparation/local-preparation";
+
+test("local OFF shadow quality uses exact current native maps without light or caster changes",async t=>{
+  const f=localPreparation(t);await settleLocal(f);
+  const light=f.torch.beam.light,generator=light.getShadowGenerator() as ShadowGenerator;
+  const flags=[light.isEnabled(),light.intensity,light.shadowEnabled],old=generator.getShadowMap()!;
+  const originalCasterList=old.renderList;
+  for(const [quality,size]of [["high",512],["medium",256],["low",128]] as const){
+    await settleLocal(f,quality);const map=generator.getShadowMap()!;
+    assert.equal(generator.mapSize,size);assert.deepEqual([light.isEnabled(),light.intensity,light.shadowEnabled],flags);
+    assert.equal(map.renderList?.length??0,originalCasterList?.length??0,"OFF preparation never scans/selects world casters");
+    for(const mesh of f.rig.skinnedBody!.near)assert.ok((mesh.subMeshes[0] as any)._drawWrappers[map.renderPassId]?.effect);
+  }
+  assert.equal(light.getShadowGenerator(),generator);assert.equal(generator.bias,.0007);assert.equal(generator.normalBias,.015);assert.equal(generator.filteringQuality,ShadowGenerator.QUALITY_LOW);
+});
+
+test("local pending work spends at most3 calls in32 batches and does not restart exhausted identity",async t=>{
+  const f=localPreparation(t);await settleLocal(f);
+  const generator=f.torch.beam.light.getShadowGenerator() as ShadowGenerator,original=generator.isReady,newRig=f.add(1);
+  let calls=0;generator.isReady=()=>{calls++;return false;};
+  try{
+    for(let i=0;i<32;i++){
+      const before=calls,status=f.torch.beam.prepareLocalShadow(newRig.root,newRig.skinnedBody!.near,"low");
+      assert.equal(calls-before,3);assert.equal(status,i===31?"unavailable":"pending");
+    }
+    assert.equal(calls,96);
+    const work=(f.torch.beam as any).localShadowWork;
+    for(let i=0;i<20;i++)assert.equal(f.torch.beam.prepareLocalShadow(newRig.root,newRig.skinnedBody!.near,"low"),"unavailable");
+    assert.equal(calls,96);assert.equal((f.torch.beam as any).localShadowWork,work);
+    newRig.skinnedBody!.near[0].material=new PBRMaterial("new actual opaque identity",f.scene);
+    assert.equal(f.torch.beam.prepareLocalShadow(newRig.root,newRig.skinnedBody!.near,"low"),"pending");assert.equal(calls,99);
+  }finally{generator.isReady=original;}
+});
+
+test("completed local preparation has no new native calls, work allocations or scene scans",async t=>{
+  const f=localPreparation(t);await settleLocal(f);
+  const beam=f.torch.beam,generator=beam.light.getShadowGenerator() as ShadowGenerator,original=generator.isReady;
+  const work=(beam as any).localShadowWork,descriptor=Object.getOwnPropertyDescriptor(f.scene,"meshes")!;
+  const map=generator.getShadowMap(),textureCount=f.scene.textures.length,observers=f.scene.onNewTextureAddedObservable.observers.length;
+  generator.isReady=()=>{assert.fail("completed preparation may not ask readiness again");};
+  Object.defineProperty(f.scene,"meshes",{configurable:true,get(){assert.fail("completed preparation may not scan scene meshes");}});
+  try{for(let i=0;i<100;i++){assert.equal(beam.prepareLocalShadow(f.rig.root,f.rig.skinnedBody!.near,"low"),"ready");assert.equal((beam as any).localShadowWork,work);}}
+  finally{Object.defineProperty(f.scene,"meshes",descriptor);generator.isReady=original;}
+  assert.equal(generator.getShadowMap(),map);assert.equal(f.scene.textures.length,textureCount);assert.equal(f.scene.onNewTextureAddedObservable.observers.length,observers);
+});
+
+test("local preparation rejects unsupported and foreign targets without pretending ready",async t=>{
+  const f=localPreparation(t);await settleLocal(f);const beam=f.torch.beam,near=f.rig.skinnedBody!.near,mesh=near[0],material=mesh.material as PBRMaterial;
+  const before=(beam as any).localShadowWork;
+  material.alpha=.5;assert.equal(beam.prepareLocalShadow(f.rig.root,near,"low"),"unsupported");material.alpha=1;
+  assert.equal(beam.prepareLocalShadow(f.rig.root,[near[0],near[0],near[2]],"low"),"unsupported");
+  assert.equal(beam.prepareLocalShadow(f.rig.root,near.slice(0,2),"low"),"unsupported");
+  const skeleton=mesh.skeleton;mesh.skeleton=null;assert.equal(beam.prepareLocalShadow(f.rig.root,near,"low"),"unsupported");mesh.skeleton=skeleton;
+  const morph=new MorphTargetManager(f.scene);mesh.morphTargetManager=morph;assert.equal(beam.prepareLocalShadow(f.rig.root,near,"low"),"unsupported");mesh.morphTargetManager=null;morph.dispose();
+  const instance=mesh.createInstance("unsupported own instance");assert.equal(beam.prepareLocalShadow(f.rig.root,near,"low"),"unsupported");instance.dispose();
+  const wrapper=new ShadowDepthWrapper(material,f.scene,{standalone:true,doNotInjectCode:true});material.shadowDepthWrapper=wrapper;
+  assert.equal(beam.prepareLocalShadow(f.rig.root,near,"low"),"unsupported");material.shadowDepthWrapper=null;wrapper.dispose();
+  mesh.computeBonesUsingShaders=false;assert.equal(beam.prepareLocalShadow(f.rig.root,near,"low"),"unsupported");mesh.computeBonesUsingShaders=true;
+  const generator=beam.light.getShadowGenerator() as ShadowGenerator,pass=generator.getShadowMap()!.renderPassId;
+  mesh.setMaterialForRenderPass(pass,new PBRMaterial("foreign pass override",f.scene));assert.equal(beam.prepareLocalShadow(f.rig.root,near,"low"),"unsupported");mesh.setMaterialForRenderPass(pass,undefined);
+  const ownGet=beam.light.getShadowGenerator;beam.light.getShadowGenerator=()=>null;
+  try{assert.equal(beam.prepareLocalShadow(f.rig.root,near,"low"),"unavailable");assert.equal((beam as any).localShadowWork,undefined);}finally{beam.light.getShadowGenerator=ownGet;}
+  assert.notEqual((beam as any).localShadowWork,before);
+  const car=new VehicleLighting(f.scene);t.after(()=>car.dispose());const textures=f.scene.textures.length;
+  assert.equal(car.prepareLocalShadow(f.rig.root,near,"low"),"unavailable");assert.equal(car.light.getShadowGenerator(),null);assert.equal(f.scene.textures.length,textures);
+});
+
+test("local stale callback preserves newer owner without recursively spending another batch",async t=>{
+  const f=localPreparation(t);await settleLocal(f);const beam=f.torch.beam,generator=beam.light.getShadowGenerator() as ShadowGenerator,original=generator.isReady;
+  const old=f.add(1),next=f.add(4),pass=f.engine.currentRenderPassId;let calls=0,entered=false;
+  generator.isReady=function(...args){calls++;if(!entered){entered=true;assert.equal(beam.prepareLocalShadow(next.root,next.skinnedBody!.near,"low"),"pending");}return Reflect.apply(original,this,args);};
+  try{
+    assert.equal(beam.prepareLocalShadow(old.root,old.skinnedBody!.near,"low"),"unavailable");assert.equal(calls,1);assert.equal(f.engine.currentRenderPassId,pass);
+    assert.equal((beam as any).localShadowWork.owner,next.root);assert.equal((beam as any).localShadowWork.batches,0);
+    assert.equal(beam.prepareLocalShadow(next.root,next.skinnedBody!.near,"low"),"ready");assert.equal(calls,4);
+  }finally{generator.isReady=original;}
+});
+
+test("local same-owner reentry, native falsy throw, map replacement and dispose always restore pass",async t=>{
+  const f=localPreparation(t);await settleLocal(f);const beam=f.torch.beam,generator=beam.light.getShadowGenerator() as ShadowGenerator,original=generator.isReady;
+  const next=f.add(1),pass=f.engine.currentRenderPassId;let inner=0;
+  generator.isReady=function(...args){inner++;assert.equal(beam.prepareLocalShadow(next.root,next.skinnedBody!.near,"low"),"pending");return Reflect.apply(original,this,args);};
+  assert.equal(beam.prepareLocalShadow(next.root,next.skinnedBody!.near,"low"),"ready");assert.equal(inner,3);assert.equal(f.engine.currentRenderPassId,pass);generator.isReady=original;
+  for(const failure of [undefined,null,false,0,""]){
+    const another=f.add(1);generator.isReady=()=>{throw failure;};
+    assert.throws(()=>beam.prepareLocalShadow(another.root,another.skinnedBody!.near,"low"),value=>value===failure);assert.equal(f.engine.currentRenderPassId,pass);
+    assert.equal(beam.prepareLocalShadow(another.root,another.skinnedBody!.near,"low"),"unavailable");
+  }
+  generator.isReady=original;
+  const last=f.add(4);let resize=true;
+  generator.isReady=function(...args){const value=Reflect.apply(original,this,args);if(resize){resize=false;generator.mapSize=512;}return value;};
+  assert.equal(beam.prepareLocalShadow(last.root,last.skinnedBody!.near,"low"),"unavailable");assert.equal(f.engine.currentRenderPassId,pass);
+  generator.isReady=original;assert.equal(beam.prepareLocalShadow(last.root,last.skinnedBody!.near,"low"),"ready");
+  assert.equal(beam.prepareLocalShadow(undefined,undefined,"low"),"unavailable");assert.equal((beam as any).localShadowWork,undefined);
+  last.root.dispose(false,false);assert.equal(beam.prepareLocalShadow(last.root,last.skinnedBody!.near,"low"),"unavailable");
+  beam.dispose();assert.equal((beam as any).localShadowWork,undefined);assert.equal(beam.prepareLocalShadow(f.rig.root,f.rig.skinnedBody!.near,"low"),"unavailable");
+});
+
+test("local configuration throws restore pass once and disposed callback owners are released",async t=>{
+  const f=localPreparation(t),beam=f.torch.beam,pass=f.engine.currentRenderPassId,original=(beam as any).configureShadow;
+  let calls=0;const failure=false;
+  (beam as any).configureShadow=()=>{calls++;f.engine.currentRenderPassId=pass+500;throw failure;};
+  assert.throws(()=>beam.prepareLocalShadow(f.rig.root,f.rig.skinnedBody!.near,"low"),value=>value===failure);
+  assert.equal(f.engine.currentRenderPassId,pass);assert.equal(beam.prepareLocalShadow(f.rig.root,f.rig.skinnedBody!.near,"low"),"unavailable");assert.equal(calls,1);
+  (beam as any).configureShadow=original;await settleLocal(f,"medium");
+  const generator=beam.light.getShadowGenerator() as ShadowGenerator,native=generator.isReady,next=f.add(1);
+  generator.isReady=function(...args){const result=Reflect.apply(native,this,args);next.root.dispose(false,false);return result;};
+  try{assert.equal(beam.prepareLocalShadow(next.root,next.skinnedBody!.near,"medium"),"unavailable");assert.equal(f.engine.currentRenderPassId,pass);assert.equal((beam as any).localShadowWork,undefined);}
+  finally{generator.isReady=native;}
+});
 
 function fixture(
   t: import("node:test").TestContext,

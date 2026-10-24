@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Observable } from "@babylonjs/core/Misc/observable";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine.pure";
 import { RenderHealth } from "../client/render-health";
 import { WebGpuCompilationProfile } from "../client/webgpu-compilation-profile";
@@ -74,6 +75,7 @@ function fixture(native = true, onFault?: () => void) {
     },
   });
   if (native) {
+    Object.assign(engine, { onQueryReadErrorObservable: new Observable() });
     (engine as unknown as { _isWebGPU: boolean })._isWebGPU = true;
     (engine as unknown as { _device: unknown })._device = device;
   }
@@ -180,6 +182,51 @@ function shaderDiagnostics(f: ReturnType<typeof fixture>) {
   });
   return { info, profile, create: () => device.createShaderModule() };
 }
+
+test("explicit ready-generation revalidation still submits and waits for scope/fence/pending readiness without another state transition", async (t) => {
+  const f = fixture(); assert.equal(f.health.markReady(), true);
+  const owner = f.health.snapshot(), fence = deferred<void>(), pending = deferred<void>();
+  t.mock.method(f.health, "markReady", () => { throw new Error("must not transition ready twice"); });
+  f.setQueue(fence.promise); f.health.track(pending.promise, "shader", "existing validation", "shader-validation");
+  let checks = 0, complete = false;
+  const gate = waitForRenderStartup({ ...f, revalidate: owner, timeoutMs: 7000, isReady: () => { checks++; return true; } }, f.host);
+  void gate.then(() => { complete = true; });
+  try {
+    await f.frame(); assert.equal(complete, false); assert.equal(f.counts().renders, 1); assert.equal(f.counts().submissions, 1);
+    fence.resolve(); await flush(); assert.equal(complete, false, "pending shader validation still blocks ready");
+    pending.resolve(); await flush(); await f.frame(); await gate;
+    assert.equal(complete, true); assert.ok(checks >= 4); assert.equal(f.counts().pushes, f.counts().pops);
+    assert.equal(f.health.snapshot().valid, true); f.idle();
+  } finally { f.dispose(); }
+});
+
+test("ready revalidation refuses foreign generation and a generation changed while the original fence is pending", async () => {
+  for (const late of [false, true]) {
+    const f = fixture(); assert.equal(f.health.markReady(), true); const owner = f.health.snapshot(), fence = deferred<void>();
+    f.setQueue(fence.promise);
+    const token = { rendererId: owner.rendererId, generation: owner.generation + (late ? 0 : 1) };
+    const gate = waitForRenderStartup({ ...f, revalidate: token, isReady: () => true }, f.host);
+    const rejection = assert.rejects(gate, /generation|ready/);
+    try {
+      if (late) await f.frame();
+      else assert.equal(f.counts().renders, 0, "foreign generation refuses before GPU IO");
+      if (late) { Object.defineProperty(f.health, "generation", { value: owner.generation + 1, writable: true, configurable: true }); fence.resolve(); await flush(); }
+      await rejection; f.idle();
+    } finally { fence.resolve(); f.dispose(); }
+  }
+});
+
+test("ready revalidation preserves original validation error and the caller's remaining deadline", async () => {
+  for (const failure of ["validation", "deadline"] as const) {
+    const f = fixture(); assert.equal(f.health.markReady(), true); const owner = f.health.snapshot(), fence = deferred<void>();
+    f.setQueue(fence.promise); if (failure === "validation") f.setValidation(Promise.resolve({ message: "same original scoped failure" }));
+    const gate = waitForRenderStartup({ ...f, revalidate: owner, timeoutMs: 25, isReady: () => true }, f.host);
+    const rejected = assert.rejects(gate, failure === "validation" ? /same original scoped failure/ : /timeout|deadline|čas/i);
+    try {
+      await f.frame(); if (failure === "deadline") f.advance(26); fence.resolve(); await flush(); await rejected; f.idle();
+    } finally { fence.resolve(); f.dispose(); }
+  }
+});
 
 test("final submission waits for diagnostic-only shader work created by that same frame", async () => {
   const f = fixture(),

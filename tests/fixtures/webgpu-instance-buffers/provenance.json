@@ -1,0 +1,12 @@
+{
+  "scope": "Portable CPU regressions for the installed Babylon9.30 regular-instance matrix VBO identity guard",
+  "baselineCommit": "77efa9d1",
+  "nativeBeforeSha256": "e9ddcb55af0e64211628fcb3938c50271cc672836737618e1ec023e208400bc1",
+  "nativeCandidateSha256": "7ceb79d2f4eaa72665e5084ffc6e752bbbb93dd84a7f97801c9cf2431afa459a",
+  "candidatePatchSha256": "597beca732c25cbb128271fad6681fd0176726962ede3218db41057359ea9b72",
+  "contract": "Every actual regular-instance draw lazily validates active DrawContext current+previous DataBuffer identity; only fastBundle is invalidated. No reset/dispose/scans/per-draw allocation. WebGL/CM/vertex-pulling explicitly excluded.",
+  "actual": ["Mesh.render", "Material._preBind/isReadyForSubMesh/bindForSubMesh", "Geometry", "InstancedMesh", "Buffer/refcount/deferred destroy", "WebGPU pipeline/bind-group caches", "WebGPUEngine._draw", "SubMesh/DrawWrapper/render-pass and temporary shadow-style override"],
+  "fake": ["ready Effect/shader metadata", "terminal device/pipeline/encoder IO", "raster state application"],
+  "limitations": ["No Standard/PBR complete material binding or whole Game GPU proof", "No GPU validation or performance claim", "Original actual DataBuffer37326 owner remains unknown", "Vertex-pulling storage refresh, custom/thin/index/geometry mutations are outside this fix"],
+  "resolver": "loader.mjs uses import.meta.resolve against the installed package; no normal-run overlay, env override or QA-cache path"
+}

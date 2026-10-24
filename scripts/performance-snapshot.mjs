@@ -47,6 +47,12 @@ const entries = [
   "docs/reality-pack/building-window-kit-20261012/blender-export-audit.json",
   "docs/reality-pack/b4-facade-panels-20261012/blender-export-audit.json",
   "docs/building-modeling-20261012/references/market-kit-blender-audit.json",
+  // Exact static input consumed by the diagnostic identity CLI regression;
+  // its neighbouring live evidence/report files stay outside the snapshot.
+  "docs/performance/evidence/diagnostic-identity-20261020/input.jsonl",
+  // Deployment regressions read both root inputs without launching Docker.
+  "Dockerfile",
+  "compose.yaml",
   "index.html",
   "package.json",
   "pnpm-lock.yaml",

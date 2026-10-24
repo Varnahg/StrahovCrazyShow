@@ -15,6 +15,8 @@ export function requireNativeWebGpuShaders(engine: {
   };
 }
 
+/** Game and avatar preview share native WebGPU CM in production. Reference
+ * WebGL2 and experimental NCM remain explicit local choices, never fallbacks. */
 export function selectRenderBackend(location: {
   hostname: string;
   search: string;
@@ -22,17 +24,17 @@ export function selectRenderBackend(location: {
   const values = new URLSearchParams(location.search).getAll("renderBackend");
   if (values.length > 1)
     throw new Error("renderBackend smí být v adrese pouze jednou.");
-  const backend = values[0] ?? "webgl2";
+  const backend = values[0] ?? "webgpu";
   if (backend !== "webgl2" && backend !== "webgpu" && backend !== "webgpu-fast")
     throw new Error("Neznámý renderBackend: " + backend);
   if (
-    backend !== "webgl2" &&
+    backend !== "webgpu" &&
     !["localhost", "127.0.0.1", "[::1]", "::1"].includes(
       location.hostname.toLowerCase(),
     )
   )
     throw new Error(
-      "Experiment WebGPU je dostupný pouze na místním loopbacku.",
+      "Referenční WebGL2 a experimentální WebGPU NCM jsou dostupné pouze na místním loopbacku.",
     );
   return backend;
 }

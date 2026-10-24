@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "/root/webgpu_editor_audit",
+  "findings": [],
+  "scope": "Čtecí přejímka zveřejněných důkazů, bez zápisů, testů, buildu či GPU.",
+  "rootSealSha256": "3c60815fe8b2aecc7d1547b887358313d7a9eae45dfbd558caa17b22a3a480b6",
+  "canonicalSha256": "74387e94143baeaa5f118191eec22f60289ac33f58767b54829085bd18bcc055",
+  "payloadFiles": 155,
+  "payloadBytes": 12005086,
+  "mainFiles": 126,
+  "latencyFiles": 29,
+  "unlistedPayloads": 0,
+  "originalsByteExactAfterGunzip": 5,
+  "originalEventCounts": [890, 749, 3201, 2337, 231],
+  "missingSessionEnd": ["38bad714-4e3d-4ea7-9fac-2142048929c2"],
+  "credentialPatternMatches": 0,
+  "accepted": [
+    "B6 tři dokončená false→true okna: compiler calls0/0/0.",
+    "První skutečný car profil osm framů, doložená compiler delta0 a210.9ms hitch.",
+    "Low timeout a90s recovery timeout zůstávají negativními výsledky.",
+    "Zavádějící historické aliasy jsou výslovně rozlišené od druhu raw a completed."
+  ],
+  "limitations": [
+    "ActorY a skutečná view matice mají jitter.",
+    "Diagnostika zahrnuje vlastní režii; nejde o plain FPS či GPU execution.",
+    "Dva startup timeouty, obnova nepřijatá, celá migrace/default/main otevřené."
+  ],
+  "rootAdditionalChecks": {
+    "stagedPayloadsByteExact": 155,
+    "postGpuNativePinsUnchanged": 39,
+    "sourceFilesUnchanged": 8588,
+    "sourceSnapshotId": "d38b63a6ac6c4c252b6137a9c5c54d2fd6298a9d65363b289186c3070466b43c",
+    "rawCrlfWhitespaceExceptions": [
+      "avatar-source15-v17/ci-7b1b5bae.json",
+      "avatar-source15-v17/source15-gpu-preflight.csv"
+    ],
+    "rawTapLogTextWhitespacePreserved": true,
+    "remainingSourceDocWhitespaceCheck": "passed",
+    "mainRuntimeUnchangedSinceCi7b1b5bae": true
+  }
+}

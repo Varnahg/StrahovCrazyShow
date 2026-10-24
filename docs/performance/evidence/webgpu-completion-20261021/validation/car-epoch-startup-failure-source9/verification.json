@@ -1,0 +1,1910 @@
+{
+  "capturedUTC": "2026-10-23T15:59:33.843Z",
+  "sourceSnapshotId": "59377f509828914543d8235194465090bb24f497e53de029bbd493a7e7df13fc",
+  "buildId": "cda72fb5bb8a3a99813526410172fa83830a5d1436256f7cb39137df2d583c42",
+  "helperSha256": "9dc789c8041c6e17526a467ea328f81228e628c54a8822ae4fbfc7132d834773",
+  "url": "http://127.0.0.1:4213/",
+  "outcome": "rejected",
+  "error": {
+    "name": "Error",
+    "message": "Přípravu 3D scény se nepodařilo dokončit (timeout)."
+  },
+  "terminal": {
+    "atMs": 73977.60000002384,
+    "utc": "2026-10-23T15:55:12.327Z",
+    "visibility": "visible",
+    "focused": true,
+    "ready": false,
+    "disposed": false,
+    "preparingRenderQuality": false,
+    "stages": {
+      "bootStage": "light-preparation",
+      "lightPreparation": "timeout",
+      "physicsStage": "ready",
+      "b6Stage": "ready",
+      "carStage": "ready",
+      "renderHealth": "invalid"
+    },
+    "backend": "webgpu",
+    "compatibilityMode": true,
+    "quality": "medium",
+    "requestedRendering": {
+      "mode": "auto",
+      "quality": "medium",
+      "hardwareScaling": 1,
+      "targetFps": 60,
+      "revision": 1
+    },
+    "viewport": {
+      "width": 2040,
+      "height": 986,
+      "dpr": 1.0000000149011612
+    },
+    "backbuffer": {
+      "width": 2040,
+      "height": 986,
+      "scaling": 1
+    },
+    "gpu": {
+      "backend": "webgpu",
+      "compatibilityMode": true,
+      "gpuTimingScope": "main-render-pass-only",
+      "renderer": "pascal",
+      "vendor": "nvidia",
+      "version": "unknown version",
+      "classification": "unknown",
+      "context": {
+        "requestedAntialias": true,
+        "actualAntialias": null,
+        "defaultFramebuffer": null,
+        "sampleBuffers": null,
+        "samples": null
+      }
+    },
+    "health": {
+      "rendererId": 2,
+      "purpose": "game",
+      "generation": 1,
+      "phase": "invalid",
+      "valid": false,
+      "errorCount": 1,
+      "pendingOperations": 5,
+      "pendingPreparationOperations": 1,
+      "pendingShaderValidationOperations": 4,
+      "counts": {
+        "effect": 0,
+        "shader": 0,
+        "pipeline": 1,
+        "validation": 0,
+        "texture": 0,
+        "device": 0,
+        "render": 0
+      },
+      "firstErrors": [
+        {
+          "channel": "pipeline",
+          "message": "Příprava světel: timeout",
+          "generation": 1
+        }
+      ]
+    },
+    "renderErrors": 1,
+    "assetErrors": 0,
+    "network": true,
+    "avatarCount": 1,
+    "avatars": [
+      {
+        "id": "d5c5e1c3-0566-4889-abcc-1f2930e984ac",
+        "local": true,
+        "avatar": {
+          "preset": 4,
+          "skin": "#bf8f72",
+          "hair": "#211e1d",
+          "shirt": "#b3a374",
+          "trousers": "#334047",
+          "glasses": true,
+          "beard": false,
+          "face": 0.4
+        },
+        "position": {
+          "x": 110,
+          "y": -2.324,
+          "z": 12
+        },
+        "lod": "near"
+      }
+    ],
+    "avatarsOmitted": 0,
+    "actor": {
+      "x": 110,
+      "y": -2.1440000534057617,
+      "z": 12
+    },
+    "vehicle": false,
+    "yaw": 3.141592653589793,
+    "pitch": 0.28,
+    "distance": 8,
+    "camera": {
+      "position": {
+        "x": 110,
+        "y": 1.396100401878357,
+        "z": 20.00003433227539
+      },
+      "fov": 0.85,
+      "view": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0.9316545724868774,
+        0.36334526538848877,
+        0,
+        0,
+        -0.36334526538848877,
+        0.9316545724868774,
+        0,
+        -110,
+        5.9662346839904785,
+        -19.140390396118164,
+        1
+      ],
+      "projection": [
+        1.0679436922073364,
+        0,
+        0,
+        0,
+        0,
+        2.209538698196411,
+        0,
+        0,
+        0,
+        0,
+        -1.000072717666626,
+        -1,
+        0,
+        0,
+        -0.08000581711530685,
+        0
+      ]
+    },
+    "lightingInstant": null,
+    "trafficInstant": 1792598400000,
+    "flashlight": false,
+    "transitClock": {
+      "configId": "12d1168753beeb8ade46423d55d216b7aa23609a1accbd371de1d3ac84c26e6c",
+      "configSha256": "447b2c1eb03e1539f1fbf24718010f79c6ac88e4aa095c3acb956f98c73a89f7",
+      "simulationSourceSha256": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
+      "active": true,
+      "actualSimulationMatches": true,
+      "physics": {
+        "configId": "12d1168753beeb8ade46423d55d216b7aa23609a1accbd371de1d3ac84c26e6c",
+        "active": true,
+        "methodOwned": true,
+        "restoreConflict": false,
+        "calls": 0,
+        "originalThrows": 0,
+        "preArmCalls": 0,
+        "postArmCalls": 0,
+        "rewindCalls": 0,
+        "instancesObserved": 0,
+        "unexpectedReceivers": 0,
+        "lastOriginalUTC": null,
+        "lastMappedUTC": null
+      },
+      "rendering": {
+        "configId": "12d1168753beeb8ade46423d55d216b7aa23609a1accbd371de1d3ac84c26e6c",
+        "active": true,
+        "methodOwned": true,
+        "restoreConflict": false,
+        "calls": 169,
+        "originalThrows": 0,
+        "preArmCalls": 169,
+        "postArmCalls": 0,
+        "rewindCalls": 0,
+        "instancesObserved": 1,
+        "unexpectedReceivers": 0,
+        "lastOriginalUTC": 1792770912221.8567,
+        "lastMappedUTC": 1792598400000
+      }
+    },
+    "weather": {
+      "temperature": 12.3,
+      "cloud": 0.86,
+      "rain": 0,
+      "wind": 1.8,
+      "windDirection": 337.5,
+      "observedAt": 1792579930000,
+      "fetchedAt": 1792579957998,
+      "stale": true,
+      "cloudStale": true,
+      "status": "fallback",
+      "sourceKind": "station",
+      "source": "Řízené testovací počasí · uložený záznam",
+      "cloudSource": "Řízený meteorologický model · benchmark",
+      "cloudObservedAt": 1792579500000,
+      "cloudWindSource": "Řízené modelové proudění · benchmark",
+      "cloudLayers": {
+        "low": 0,
+        "mid": 0.78,
+        "high": 0.34
+      },
+      "cloudWinds": {
+        "low": {
+          "speed": 9.2,
+          "direction": 148
+        },
+        "mid": {
+          "speed": 15.04,
+          "direction": 193
+        },
+        "high": {
+          "speed": 24.18,
+          "direction": 195
+        }
+      },
+      "humidity": 78,
+      "snowfall": 0,
+      "precipitationType": "none",
+      "windGust": 3.5,
+      "visibility": 36360,
+      "liquidPrecipitation": 0,
+      "fieldSources": {
+        "windGust": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "humidity": {
+          "kind": "station",
+          "source": "Meteostanice Silicon Hill",
+          "observedAt": 1792579930000,
+          "stale": true
+        },
+        "visibility": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "snowfall": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "liquidPrecipitation": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        },
+        "precipitationType": {
+          "kind": "model",
+          "source": "Open-Meteo · model",
+          "observedAt": 1792579500000,
+          "stale": true
+        }
+      }
+    },
+    "scene": {
+      "meshes": 3380,
+      "materials": 224,
+      "geometries": 2479,
+      "activeMeshes": 589,
+      "waitingItems": 0
+    },
+    "ambient": {
+      "buses": 2,
+      "passengers": 0,
+      "cars": 1
+    }
+  },
+  "preparation": {
+    "seq": 296,
+    "atMs": 73974.7,
+    "kind": "lighting-preparation",
+    "data": {
+      "status": "timeout",
+      "elapsedMs": 52258.799999952316,
+      "activeElapsedMs": 52258.799999952316,
+      "pausedMs": 0,
+      "failureStep": null,
+      "stages": [
+        {
+          "stage": "vehicle-0",
+          "elapsedMs": 1560.5,
+          "activeElapsedMs": 1560.5,
+          "pausedMs": 0,
+          "tickCount": 19,
+          "rafGap": {
+            "count": 19,
+            "totalMs": 1569.3999999761581,
+            "maxMs": 848.7000000476837
+          },
+          "cpu": {
+            "apply": {
+              "calls": 4,
+              "totalMs": 61.799999952316284,
+              "maxMs": 25.799999952316284
+            },
+            "checkBatch": {
+              "calls": 15,
+              "totalMs": 98.69999980926514,
+              "maxMs": 16.199999928474426
+            },
+            "render": {
+              "calls": 7,
+              "totalMs": 881.299999833107,
+              "maxMs": 423.2999999523163
+            }
+          },
+          "restartReasons": {
+            "meshes": 3,
+            "presentationCoverage": 3
+          },
+          "checks": 740,
+          "renders": 7,
+          "restarts": 3,
+          "passQuality": "low"
+        },
+        {
+          "stage": "vehicle-1",
+          "elapsedMs": 1423.7000000476837,
+          "activeElapsedMs": 1423.7000000476837,
+          "pausedMs": 0,
+          "tickCount": 29,
+          "rafGap": {
+            "count": 29,
+            "totalMs": 1425.6000000238419,
+            "maxMs": 849.2999999523163
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 8.699999928474426,
+              "maxMs": 3.899999976158142
+            },
+            "checkBatch": {
+              "calls": 26,
+              "totalMs": 195.700000166893,
+              "maxMs": 30.199999928474426
+            },
+            "render": {
+              "calls": 12,
+              "totalMs": 693.2999999523163,
+              "maxMs": 444
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1110,
+          "renders": 12,
+          "restarts": 2,
+          "passQuality": "low"
+        },
+        {
+          "stage": "vehicle-2",
+          "elapsedMs": 75.09999990463257,
+          "activeElapsedMs": 75.09999990463257,
+          "pausedMs": 0,
+          "tickCount": 7,
+          "rafGap": {
+            "count": 7,
+            "totalMs": 73.59999990463257,
+            "maxMs": 24.90000009536743
+          },
+          "cpu": {
+            "apply": {
+              "calls": 1,
+              "totalMs": 1,
+              "maxMs": 1
+            },
+            "checkBatch": {
+              "calls": 6,
+              "totalMs": 5.1000001430511475,
+              "maxMs": 1.4000000953674316
+            },
+            "render": {
+              "calls": 3,
+              "totalMs": 37.60000014305115,
+              "maxMs": 13.700000047683716
+            }
+          },
+          "restartReasons": {},
+          "checks": 740,
+          "renders": 3,
+          "restarts": 0,
+          "passQuality": "low"
+        },
+        {
+          "stage": "vehicle-keyed-0",
+          "elapsedMs": 1385.2000000476837,
+          "activeElapsedMs": 1385.2000000476837,
+          "pausedMs": 0,
+          "tickCount": 26,
+          "rafGap": {
+            "count": 26,
+            "totalMs": 1387,
+            "maxMs": 851
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 13.399999976158142,
+              "maxMs": 6.800000071525574
+            },
+            "checkBatch": {
+              "calls": 24,
+              "totalMs": 192.5,
+              "maxMs": 31.200000047683716
+            },
+            "render": {
+              "calls": 7,
+              "totalMs": 647.2999999523163,
+              "maxMs": 375.8000000715256
+            }
+          },
+          "restartReasons": {
+            "startupView": 1
+          },
+          "checks": 1110,
+          "renders": 7,
+          "restarts": 1,
+          "passQuality": "low"
+        },
+        {
+          "stage": "vehicle-keyed-1",
+          "elapsedMs": 1551.1999999284744,
+          "activeElapsedMs": 1551.1999999284744,
+          "pausedMs": 0,
+          "tickCount": 35,
+          "rafGap": {
+            "count": 35,
+            "totalMs": 1552.1000000238419,
+            "maxMs": 865.0999999046326
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 7.699999928474426,
+              "maxMs": 3.399999976158142
+            },
+            "checkBatch": {
+              "calls": 32,
+              "totalMs": 195.20000004768372,
+              "maxMs": 31.699999928474426
+            },
+            "render": {
+              "calls": 16,
+              "totalMs": 760.1999999284744,
+              "maxMs": 439.1999999284744
+            }
+          },
+          "restartReasons": {
+            "startupView": 2
+          },
+          "checks": 1480,
+          "renders": 16,
+          "restarts": 2,
+          "passQuality": "low"
+        },
+        {
+          "stage": "vehicle-keyed-2",
+          "elapsedMs": 69.30000007152557,
+          "activeElapsedMs": 69.30000007152557,
+          "pausedMs": 0,
+          "tickCount": 7,
+          "rafGap": {
+            "count": 7,
+            "totalMs": 69.39999997615814,
+            "maxMs": 22.700000047683716
+          },
+          "cpu": {
+            "apply": {
+              "calls": 1,
+              "totalMs": 0.8999999761581421,
+              "maxMs": 0.8999999761581421
+            },
+            "checkBatch": {
+              "calls": 6,
+              "totalMs": 5.700000166893005,
+              "maxMs": 2
+            },
+            "render": {
+              "calls": 3,
+              "totalMs": 31.09999990463257,
+              "maxMs": 10.799999952316284
+            }
+          },
+          "restartReasons": {},
+          "checks": 740,
+          "renders": 3,
+          "restarts": 0,
+          "passQuality": "low"
+        },
+        {
+          "stage": "current-off",
+          "elapsedMs": 1787,
+          "activeElapsedMs": 1787,
+          "pausedMs": 0,
+          "tickCount": 34,
+          "rafGap": {
+            "count": 34,
+            "totalMs": 1783.7000000476837,
+            "maxMs": 1232.1000000238419
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 10,
+              "maxMs": 6.200000047683716
+            },
+            "checkBatch": {
+              "calls": 31,
+              "totalMs": 197.80000030994415,
+              "maxMs": 29.600000023841858
+            },
+            "render": {
+              "calls": 11,
+              "totalMs": 808.5000001192093,
+              "maxMs": 564.4000000953674
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1416,
+          "renders": 11,
+          "restarts": 2,
+          "passQuality": "low"
+        },
+        {
+          "stage": "current-on",
+          "elapsedMs": 1502.5999999046326,
+          "activeElapsedMs": 1502.5999999046326,
+          "pausedMs": 0,
+          "tickCount": 31,
+          "rafGap": {
+            "count": 31,
+            "totalMs": 1500.6000000238419,
+            "maxMs": 885.1000000238419
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 38.60000002384186,
+              "maxMs": 20.600000023841858
+            },
+            "checkBatch": {
+              "calls": 29,
+              "totalMs": 83.69999992847443,
+              "maxMs": 14.200000047683716
+            },
+            "render": {
+              "calls": 14,
+              "totalMs": 737.4000002145767,
+              "maxMs": 384.7999999523163
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 948,
+          "renders": 14,
+          "restarts": 1,
+          "passQuality": "low"
+        },
+        {
+          "stage": "night-0-off",
+          "elapsedMs": 1742.9000000953674,
+          "activeElapsedMs": 1742.9000000953674,
+          "pausedMs": 0,
+          "tickCount": 32,
+          "rafGap": {
+            "count": 32,
+            "totalMs": 1743,
+            "maxMs": 1197.8000000715256
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 20.5,
+              "maxMs": 10.200000047683716
+            },
+            "checkBatch": {
+              "calls": 29,
+              "totalMs": 169.59999978542328,
+              "maxMs": 23.800000071525574
+            },
+            "render": {
+              "calls": 6,
+              "totalMs": 859.3000000715256,
+              "maxMs": 570.8999999761581
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1416,
+          "renders": 6,
+          "restarts": 2,
+          "passQuality": "low"
+        },
+        {
+          "stage": "night-0-on",
+          "elapsedMs": 1257.5999999046326,
+          "activeElapsedMs": 1257.5999999046326,
+          "pausedMs": 0,
+          "tickCount": 23,
+          "rafGap": {
+            "count": 23,
+            "totalMs": 1258.7999999523163,
+            "maxMs": 855.6000000238419
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 35.49999988079071,
+              "maxMs": 22.199999928474426
+            },
+            "checkBatch": {
+              "calls": 21,
+              "totalMs": 43.59999990463257,
+              "maxMs": 8
+            },
+            "render": {
+              "calls": 11,
+              "totalMs": 535.299999833107,
+              "maxMs": 298.7999999523163
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 948,
+          "renders": 11,
+          "restarts": 1,
+          "passQuality": "low"
+        },
+        {
+          "stage": "night-1-off",
+          "elapsedMs": 176.5,
+          "activeElapsedMs": 176.5,
+          "pausedMs": 0,
+          "tickCount": 16,
+          "rafGap": {
+            "count": 16,
+            "totalMs": 178.39999997615814,
+            "maxMs": 68.10000002384186
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 4.9999998807907104,
+              "maxMs": 4.399999976158142
+            },
+            "checkBatch": {
+              "calls": 14,
+              "totalMs": 36.39999985694885,
+              "maxMs": 7.299999952316284
+            },
+            "render": {
+              "calls": 4,
+              "totalMs": 93.5,
+              "maxMs": 52.799999952316284
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 944,
+          "renders": 4,
+          "restarts": 1,
+          "passQuality": "low"
+        },
+        {
+          "stage": "night-1-on",
+          "elapsedMs": 192.80000007152557,
+          "activeElapsedMs": 192.80000007152557,
+          "pausedMs": 0,
+          "tickCount": 16,
+          "rafGap": {
+            "count": 16,
+            "totalMs": 190.40000009536743,
+            "maxMs": 79.5
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 7.399999976158142,
+              "maxMs": 6.899999976158142
+            },
+            "checkBatch": {
+              "calls": 14,
+              "totalMs": 36.00000023841858,
+              "maxMs": 5.600000023841858
+            },
+            "render": {
+              "calls": 4,
+              "totalMs": 105.80000007152557,
+              "maxMs": 59.60000002384186
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 948,
+          "renders": 4,
+          "restarts": 1,
+          "passQuality": "low"
+        },
+        {
+          "stage": "night-2-off",
+          "elapsedMs": 167.79999995231628,
+          "activeElapsedMs": 167.79999995231628,
+          "pausedMs": 0,
+          "tickCount": 16,
+          "rafGap": {
+            "count": 16,
+            "totalMs": 169,
+            "maxMs": 58.800000071525574
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 2.8000000715255737,
+              "maxMs": 2.3000000715255737
+            },
+            "checkBatch": {
+              "calls": 14,
+              "totalMs": 35.299999952316284,
+              "maxMs": 5.399999976158142
+            },
+            "render": {
+              "calls": 4,
+              "totalMs": 89.89999985694885,
+              "maxMs": 47.699999928474426
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 944,
+          "renders": 4,
+          "restarts": 1,
+          "passQuality": "low"
+        },
+        {
+          "stage": "night-2-on",
+          "elapsedMs": 181.10000002384186,
+          "activeElapsedMs": 181.10000002384186,
+          "pausedMs": 0,
+          "tickCount": 16,
+          "rafGap": {
+            "count": 16,
+            "totalMs": 180.39999997615814,
+            "maxMs": 70.89999997615814
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 7.899999976158142,
+              "maxMs": 7.399999976158142
+            },
+            "checkBatch": {
+              "calls": 14,
+              "totalMs": 34.799999952316284,
+              "maxMs": 6.5
+            },
+            "render": {
+              "calls": 4,
+              "totalMs": 98.50000011920929,
+              "maxMs": 53.60000002384186
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 948,
+          "renders": 4,
+          "restarts": 1,
+          "passQuality": "low"
+        },
+        {
+          "stage": "day-0-off",
+          "elapsedMs": 1950.5,
+          "activeElapsedMs": 1950.5,
+          "pausedMs": 0,
+          "tickCount": 26,
+          "rafGap": {
+            "count": 26,
+            "totalMs": 1948.3999999761581,
+            "maxMs": 1537
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 12.400000095367432,
+              "maxMs": 11
+            },
+            "checkBatch": {
+              "calls": 23,
+              "totalMs": 138.60000002384186,
+              "maxMs": 21.799999952316284
+            },
+            "render": {
+              "calls": 6,
+              "totalMs": 732.8000001907349,
+              "maxMs": 586.6000000238419
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1416,
+          "renders": 6,
+          "restarts": 2,
+          "passQuality": "low"
+        },
+        {
+          "stage": "day-0-on",
+          "elapsedMs": 2158.600000023842,
+          "activeElapsedMs": 2158.600000023842,
+          "pausedMs": 0,
+          "tickCount": 30,
+          "rafGap": {
+            "count": 30,
+            "totalMs": 2157.399999976158,
+            "maxMs": 1644.8999999761581
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 16.100000023841858,
+              "maxMs": 6.700000047683716
+            },
+            "checkBatch": {
+              "calls": 27,
+              "totalMs": 165.39999961853027,
+              "maxMs": 29.5
+            },
+            "render": {
+              "calls": 8,
+              "totalMs": 829.6999999284744,
+              "maxMs": 658.6000000238419
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1422,
+          "renders": 8,
+          "restarts": 2,
+          "passQuality": "low"
+        },
+        {
+          "stage": "day-1-off",
+          "elapsedMs": 2208.6999999284744,
+          "activeElapsedMs": 2208.6999999284744,
+          "pausedMs": 0,
+          "tickCount": 30,
+          "rafGap": {
+            "count": 30,
+            "totalMs": 2210.600000023842,
+            "maxMs": 1645.3999999761581
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 17.59999990463257,
+              "maxMs": 9.200000047683716
+            },
+            "checkBatch": {
+              "calls": 27,
+              "totalMs": 158.90000009536743,
+              "maxMs": 24.799999952316284
+            },
+            "render": {
+              "calls": 6,
+              "totalMs": 848.4000000953674,
+              "maxMs": 534.8999999761581
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1416,
+          "renders": 6,
+          "restarts": 2,
+          "passQuality": "low"
+        },
+        {
+          "stage": "day-1-on",
+          "elapsedMs": 2429.5,
+          "activeElapsedMs": 2429.5,
+          "pausedMs": 0,
+          "tickCount": 33,
+          "rafGap": {
+            "count": 33,
+            "totalMs": 2428.5,
+            "maxMs": 1744.2000000476837
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 29.300000071525574,
+              "maxMs": 14.5
+            },
+            "checkBatch": {
+              "calls": 30,
+              "totalMs": 186.40000009536743,
+              "maxMs": 25.200000047683716
+            },
+            "render": {
+              "calls": 7,
+              "totalMs": 1023.6000000238419,
+              "maxMs": 651
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1422,
+          "renders": 7,
+          "restarts": 2,
+          "passQuality": "low"
+        },
+        {
+          "stage": "restore",
+          "elapsedMs": 171.70000004768372,
+          "activeElapsedMs": 171.70000004768372,
+          "pausedMs": 0,
+          "tickCount": 16,
+          "rafGap": {
+            "count": 16,
+            "totalMs": 175.20000004768372,
+            "maxMs": 63.60000002384186
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 5.6000001430511475,
+              "maxMs": 5.200000047683716
+            },
+            "checkBatch": {
+              "calls": 14,
+              "totalMs": 35.40000021457672,
+              "maxMs": 6.400000095367432
+            },
+            "render": {
+              "calls": 4,
+              "totalMs": 88.90000009536743,
+              "maxMs": 47.5
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 944,
+          "renders": 4,
+          "restarts": 1,
+          "passQuality": "low"
+        },
+        {
+          "stage": "vehicle-0",
+          "elapsedMs": 2889.100000023842,
+          "activeElapsedMs": 2889.100000023842,
+          "pausedMs": 0,
+          "tickCount": 23,
+          "rafGap": {
+            "count": 23,
+            "totalMs": 2877.899999976158,
+            "maxMs": 2084.7000000476837
+          },
+          "cpu": {
+            "apply": {
+              "calls": 4,
+              "totalMs": 274.60000002384186,
+              "maxMs": 216.70000004768372
+            },
+            "checkBatch": {
+              "calls": 19,
+              "totalMs": 122.30000007152557,
+              "maxMs": 19.299999952316284
+            },
+            "render": {
+              "calls": 6,
+              "totalMs": 1135.4000000953674,
+              "maxMs": 650.3000000715256
+            }
+          },
+          "restartReasons": {
+            "meshes": 3,
+            "presentationCoverage": 1
+          },
+          "checks": 1200,
+          "renders": 6,
+          "restarts": 3,
+          "passQuality": "high"
+        },
+        {
+          "stage": "vehicle-1",
+          "elapsedMs": 2522.399999976158,
+          "activeElapsedMs": 2522.399999976158,
+          "pausedMs": 0,
+          "tickCount": 29,
+          "rafGap": {
+            "count": 29,
+            "totalMs": 2515.7999999523163,
+            "maxMs": 1867
+          },
+          "cpu": {
+            "apply": {
+              "calls": 4,
+              "totalMs": 36.799999952316284,
+              "maxMs": 11
+            },
+            "checkBatch": {
+              "calls": 25,
+              "totalMs": 184.99999976158142,
+              "maxMs": 31.40000009536743
+            },
+            "render": {
+              "calls": 8,
+              "totalMs": 939.8999999761581,
+              "maxMs": 686.2000000476837
+            }
+          },
+          "restartReasons": {
+            "meshes": 3,
+            "presentationCoverage": 2
+          },
+          "checks": 1209,
+          "renders": 8,
+          "restarts": 3,
+          "passQuality": "high"
+        },
+        {
+          "stage": "vehicle-2",
+          "elapsedMs": 3238.7000000476837,
+          "activeElapsedMs": 3238.7000000476837,
+          "pausedMs": 0,
+          "tickCount": 26,
+          "rafGap": {
+            "count": 26,
+            "totalMs": 3236.3000000715256,
+            "maxMs": 1941.8000000715256
+          },
+          "cpu": {
+            "apply": {
+              "calls": 7,
+              "totalMs": 113.09999990463257,
+              "maxMs": 20.299999952316284
+            },
+            "checkBatch": {
+              "calls": 19,
+              "totalMs": 124.80000007152557,
+              "maxMs": 22.5
+            },
+            "render": {
+              "calls": 9,
+              "totalMs": 1739.5999999046326,
+              "maxMs": 879.7000000476837
+            }
+          },
+          "restartReasons": {
+            "meshes": 6,
+            "presentationCoverage": 6
+          },
+          "checks": 1200,
+          "renders": 9,
+          "restarts": 6,
+          "passQuality": "high"
+        },
+        {
+          "stage": "vehicle-keyed-0",
+          "elapsedMs": 2276,
+          "activeElapsedMs": 2276,
+          "pausedMs": 0,
+          "tickCount": 36,
+          "rafGap": {
+            "count": 36,
+            "totalMs": 2281.399999976158,
+            "maxMs": 1564
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 23.59999990463257,
+              "maxMs": 11.799999952316284
+            },
+            "checkBatch": {
+              "calls": 34,
+              "totalMs": 243.99999964237213,
+              "maxMs": 32.299999952316284
+            },
+            "render": {
+              "calls": 6,
+              "totalMs": 973.0999999046326,
+              "maxMs": 617.5
+            }
+          },
+          "restartReasons": {
+            "startupView": 1
+          },
+          "checks": 1800,
+          "renders": 6,
+          "restarts": 1,
+          "passQuality": "high"
+        },
+        {
+          "stage": "vehicle-keyed-1",
+          "elapsedMs": 2466,
+          "activeElapsedMs": 2466,
+          "pausedMs": 0,
+          "tickCount": 37,
+          "rafGap": {
+            "count": 37,
+            "totalMs": 2470,
+            "maxMs": 1651.3000000715256
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 10.800000071525574,
+              "maxMs": 7.600000023841858
+            },
+            "checkBatch": {
+              "calls": 35,
+              "totalMs": 213.4999998807907,
+              "maxMs": 40.60000002384186
+            },
+            "render": {
+              "calls": 12,
+              "totalMs": 882.7999999523163,
+              "maxMs": 553.8999999761581
+            }
+          },
+          "restartReasons": {
+            "startupView": 1
+          },
+          "checks": 1800,
+          "renders": 12,
+          "restarts": 1,
+          "passQuality": "high"
+        },
+        {
+          "stage": "vehicle-keyed-2",
+          "elapsedMs": 115.70000004768372,
+          "activeElapsedMs": 115.70000004768372,
+          "pausedMs": 0,
+          "tickCount": 11,
+          "rafGap": {
+            "count": 11,
+            "totalMs": 113.89999997615814,
+            "maxMs": 36.699999928474426
+          },
+          "cpu": {
+            "apply": {
+              "calls": 1,
+              "totalMs": 6.299999952316284,
+              "maxMs": 6.299999952316284
+            },
+            "checkBatch": {
+              "calls": 10,
+              "totalMs": 9.599999904632568,
+              "maxMs": 2.5
+            },
+            "render": {
+              "calls": 3,
+              "totalMs": 55.799999952316284,
+              "maxMs": 20.399999976158142
+            }
+          },
+          "restartReasons": {},
+          "checks": 1200,
+          "renders": 3,
+          "restarts": 0,
+          "passQuality": "high"
+        },
+        {
+          "stage": "current-off",
+          "elapsedMs": 1396,
+          "activeElapsedMs": 1396,
+          "pausedMs": 0,
+          "tickCount": 43,
+          "rafGap": {
+            "count": 43,
+            "totalMs": 1392.2000000476837,
+            "maxMs": 237.79999995231628
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 5.799999952316284,
+              "maxMs": 3.6999999284744263
+            },
+            "checkBatch": {
+              "calls": 40,
+              "totalMs": 79.90000033378601,
+              "maxMs": 12.399999976158142
+            },
+            "render": {
+              "calls": 23,
+              "totalMs": 884.3000001907349,
+              "maxMs": 118.10000002384186
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1767,
+          "renders": 23,
+          "restarts": 2,
+          "passQuality": "high"
+        },
+        {
+          "stage": "current-on",
+          "elapsedMs": 382.60000002384186,
+          "activeElapsedMs": 382.60000002384186,
+          "pausedMs": 0,
+          "tickCount": 20,
+          "rafGap": {
+            "count": 20,
+            "totalMs": 389.2999999523163,
+            "maxMs": 164.40000009536743
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 26,
+              "maxMs": 25.200000047683716
+            },
+            "checkBatch": {
+              "calls": 18,
+              "totalMs": 60.09999990463257,
+              "maxMs": 13.600000023841858
+            },
+            "render": {
+              "calls": 6,
+              "totalMs": 184.40000009536743,
+              "maxMs": 100.30000007152557
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 1182,
+          "renders": 6,
+          "restarts": 1,
+          "passQuality": "high"
+        },
+        {
+          "stage": "night-0-off",
+          "elapsedMs": 1379,
+          "activeElapsedMs": 1379,
+          "pausedMs": 0,
+          "tickCount": 43,
+          "rafGap": {
+            "count": 43,
+            "totalMs": 1379.6000000238419,
+            "maxMs": 219.19999992847443
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 22.59999990463257,
+              "maxMs": 10.199999928474426
+            },
+            "checkBatch": {
+              "calls": 40,
+              "totalMs": 98.59999978542328,
+              "maxMs": 12.100000023841858
+            },
+            "render": {
+              "calls": 18,
+              "totalMs": 955.900000333786,
+              "maxMs": 154.30000007152557
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1767,
+          "renders": 18,
+          "restarts": 2,
+          "passQuality": "high"
+        },
+        {
+          "stage": "night-0-on",
+          "elapsedMs": 391.7999999523163,
+          "activeElapsedMs": 391.7999999523163,
+          "pausedMs": 0,
+          "tickCount": 18,
+          "rafGap": {
+            "count": 18,
+            "totalMs": 384.2000000476837,
+            "maxMs": 153.10000002384186
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 18.5,
+              "maxMs": 12.600000023841858
+            },
+            "checkBatch": {
+              "calls": 16,
+              "totalMs": 35.09999990463257,
+              "maxMs": 6.199999928474426
+            },
+            "render": {
+              "calls": 5,
+              "totalMs": 235.80000007152557,
+              "maxMs": 104.10000002384186
+            }
+          },
+          "restartReasons": {
+            "weather": 1,
+            "presentationCoverage": 1
+          },
+          "checks": 1182,
+          "renders": 5,
+          "restarts": 1,
+          "passQuality": "high"
+        },
+        {
+          "stage": "night-1-off",
+          "elapsedMs": 238.89999997615814,
+          "activeElapsedMs": 238.89999997615814,
+          "pausedMs": 0,
+          "tickCount": 17,
+          "rafGap": {
+            "count": 17,
+            "totalMs": 248.19999992847443,
+            "maxMs": 107.10000002384186
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 5.399999976158142,
+              "maxMs": 5
+            },
+            "checkBatch": {
+              "calls": 15,
+              "totalMs": 33.89999997615814,
+              "maxMs": 6
+            },
+            "render": {
+              "calls": 4,
+              "totalMs": 125.5,
+              "maxMs": 79.60000002384186
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 1178,
+          "renders": 4,
+          "restarts": 1,
+          "passQuality": "high"
+        },
+        {
+          "stage": "night-1-on",
+          "elapsedMs": 259,
+          "activeElapsedMs": 259,
+          "pausedMs": 0,
+          "tickCount": 17,
+          "rafGap": {
+            "count": 17,
+            "totalMs": 256.10000002384186,
+            "maxMs": 115.70000004768372
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 7.200000047683716,
+              "maxMs": 6.600000023841858
+            },
+            "checkBatch": {
+              "calls": 15,
+              "totalMs": 37.99999988079071,
+              "maxMs": 5.699999928474426
+            },
+            "render": {
+              "calls": 4,
+              "totalMs": 137.9999998807907,
+              "maxMs": 85.69999992847443
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 1182,
+          "renders": 4,
+          "restarts": 1,
+          "passQuality": "high"
+        },
+        {
+          "stage": "night-2-off",
+          "elapsedMs": 2203.7000000476837,
+          "activeElapsedMs": 2203.7000000476837,
+          "pausedMs": 0,
+          "tickCount": 38,
+          "rafGap": {
+            "count": 38,
+            "totalMs": 2205.399999976158,
+            "maxMs": 1348.1999999284744
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 23,
+              "maxMs": 9.600000023841858
+            },
+            "checkBatch": {
+              "calls": 35,
+              "totalMs": 239.2999997138977,
+              "maxMs": 30.5
+            },
+            "render": {
+              "calls": 7,
+              "totalMs": 1096.299999833107,
+              "maxMs": 622.3999999761581
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1767,
+          "renders": 7,
+          "restarts": 2,
+          "passQuality": "high"
+        },
+        {
+          "stage": "night-2-on",
+          "elapsedMs": 245.5,
+          "activeElapsedMs": 245.5,
+          "pausedMs": 0,
+          "tickCount": 17,
+          "rafGap": {
+            "count": 17,
+            "totalMs": 246.20000004768372,
+            "maxMs": 103.29999995231628
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 9.700000047683716,
+              "maxMs": 9.100000023841858
+            },
+            "checkBatch": {
+              "calls": 15,
+              "totalMs": 33.700000047683716,
+              "maxMs": 5.400000095367432
+            },
+            "render": {
+              "calls": 4,
+              "totalMs": 125.79999995231628,
+              "maxMs": 74.89999997615814
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 1182,
+          "renders": 4,
+          "restarts": 1,
+          "passQuality": "high"
+        },
+        {
+          "stage": "day-0-off",
+          "elapsedMs": 2110.2000000476837,
+          "activeElapsedMs": 2110.2000000476837,
+          "pausedMs": 0,
+          "tickCount": 24,
+          "rafGap": {
+            "count": 24,
+            "totalMs": 2107.5,
+            "maxMs": 1610.7999999523163
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 10.799999952316284,
+              "maxMs": 9.600000023841858
+            },
+            "checkBatch": {
+              "calls": 22,
+              "totalMs": 168.39999961853027,
+              "maxMs": 29.59999990463257
+            },
+            "render": {
+              "calls": 7,
+              "totalMs": 916.3999999761581,
+              "maxMs": 735.1999999284744
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 1178,
+          "renders": 7,
+          "restarts": 1,
+          "passQuality": "high"
+        },
+        {
+          "stage": "day-0-on",
+          "elapsedMs": 2578.1999999284744,
+          "activeElapsedMs": 2578.1999999284744,
+          "pausedMs": 0,
+          "tickCount": 31,
+          "rafGap": {
+            "count": 31,
+            "totalMs": 2577.7999999523163,
+            "maxMs": 1917.2000000476837
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 14.500000238418579,
+              "maxMs": 7.400000095367432
+            },
+            "checkBatch": {
+              "calls": 28,
+              "totalMs": 186.20000004768372,
+              "maxMs": 33.10000002384186
+            },
+            "render": {
+              "calls": 8,
+              "totalMs": 892.8999999761581,
+              "maxMs": 665.1999999284744
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1773,
+          "renders": 8,
+          "restarts": 2,
+          "passQuality": "high"
+        },
+        {
+          "stage": "day-1-off",
+          "elapsedMs": 2458.399999976158,
+          "activeElapsedMs": 2458.399999976158,
+          "pausedMs": 0,
+          "tickCount": 31,
+          "rafGap": {
+            "count": 31,
+            "totalMs": 2458.100000023842,
+            "maxMs": 1764.2000000476837
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 21.09999990463257,
+              "maxMs": 10.5
+            },
+            "checkBatch": {
+              "calls": 28,
+              "totalMs": 166.19999980926514,
+              "maxMs": 26.59999990463257
+            },
+            "render": {
+              "calls": 6,
+              "totalMs": 1118,
+              "maxMs": 717.1000000238419
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1767,
+          "renders": 6,
+          "restarts": 2,
+          "passQuality": "high"
+        },
+        {
+          "stage": "day-1-on",
+          "elapsedMs": 2646.3000000715256,
+          "activeElapsedMs": 2646.3000000715256,
+          "pausedMs": 0,
+          "tickCount": 32,
+          "rafGap": {
+            "count": 32,
+            "totalMs": 2645.899999976158,
+            "maxMs": 1840
+          },
+          "cpu": {
+            "apply": {
+              "calls": 3,
+              "totalMs": 33.59999990463257,
+              "maxMs": 16.699999928474426
+            },
+            "checkBatch": {
+              "calls": 29,
+              "totalMs": 187.200000166893,
+              "maxMs": 29.600000023841858
+            },
+            "render": {
+              "calls": 7,
+              "totalMs": 1158.1999999284744,
+              "maxMs": 700.8999999761581
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1,
+            "startupView": 1
+          },
+          "checks": 1773,
+          "renders": 7,
+          "restarts": 2,
+          "passQuality": "high"
+        },
+        {
+          "stage": "restore",
+          "elapsedMs": 202.89999997615814,
+          "activeElapsedMs": 202.89999997615814,
+          "pausedMs": 0,
+          "tickCount": 13,
+          "rafGap": {
+            "count": 13,
+            "totalMs": 208.30000007152557,
+            "maxMs": 85.19999992847443
+          },
+          "cpu": {
+            "apply": {
+              "calls": 2,
+              "totalMs": 6.299999952316284,
+              "maxMs": 5.799999952316284
+            },
+            "checkBatch": {
+              "calls": 11,
+              "totalMs": 50.60000014305115,
+              "maxMs": 21.200000047683716
+            },
+            "render": {
+              "calls": 3,
+              "totalMs": 89.59999990463257,
+              "maxMs": 62.199999928474426
+            }
+          },
+          "restartReasons": {
+            "presentationCoverage": 1
+          },
+          "checks": 589,
+          "renders": 3,
+          "restarts": 1,
+          "passQuality": "high"
+        }
+      ],
+      "qualities": [
+        {
+          "quality": "low",
+          "finalPass": false,
+          "status": "complete",
+          "failureStep": null,
+          "elapsedMs": 22246.699999928474,
+          "activeElapsedMs": 22246.699999928474,
+          "pausedMs": 0,
+          "stageCount": 19
+        },
+        {
+          "quality": "high",
+          "finalPass": false,
+          "status": "timeout",
+          "failureStep": null,
+          "elapsedMs": 30012,
+          "activeElapsedMs": 30012,
+          "pausedMs": 0,
+          "stageCount": 19
+        }
+      ]
+    }
+  },
+  "diagnosticWindowArmed": false,
+  "originalSession": {
+    "records": 310,
+    "lastKind": "session-end",
+    "closed": true
+  },
+  "cleanup": {
+    "apiExecSession": 14094,
+    "previewExecSession": 23719,
+    "normalOwnHandlesStopped": true,
+    "browserClosed": true,
+    "temporaryViewportReset": true
+  },
+  "checks": {
+    "helperTargetedPass": 43,
+    "fail": 0,
+    "peerFindings": [],
+    "mjsSyntax": 0
+  },
+  "files": {
+    "startup-browser.json": {
+      "bytes": 473744,
+      "sha256": "1940d0bcb1f6e23c5a2f0995f5cd4c63db51258eb0255814e233c1038ba6c061"
+    },
+    "startup-failure-full.jpg": {
+      "bytes": 83840,
+      "sha256": "b9c221b5bfdbc3f6dcae1aa8f4a63709e83ac941b30b91d2a13282a5c2b1d8de"
+    },
+    "preparation-record.json": {
+      "bytes": 38986,
+      "sha256": "829dc21bca14ae4fcd17e6ed6282f3caa2527b6c6ef869dc10949a14207599f0"
+    },
+    "identity.json": {
+      "bytes": 12871,
+      "sha256": "4cc20c49fd59147c35de059fb93bc60c76699231180305d2f111494072a5784d"
+    },
+    "cleanup.json": {
+      "bytes": 105,
+      "sha256": "e1a55929861c27adee7d2c4a51852afdf65f3f756907d98d5fdcbb39660fb979"
+    },
+    "runtime.json": {
+      "bytes": 1463,
+      "sha256": "171d05e54ddb19ed5f0a55f66e860b2928349ab423cf87ea5748336efeea9b8c"
+    },
+    "helper-seal.json": {
+      "bytes": 2853,
+      "sha256": "1ea140b299aa78d66b2c52b90144581a32ed69feb69353222dd982e2fe7c8320"
+    },
+    "helper-targeted.log": {
+      "bytes": 5153,
+      "sha256": "dfd399c001c5f614dc59674ddcfa7e20e9031d1824fb041bafaf2baa3b2a1d41"
+    },
+    "build-input.json": {
+      "bytes": 9059,
+      "sha256": "7eb517212b724d7d7ba739c0eedc4085ee69fe6ae975b7fd7b2a877c69f2570c"
+    },
+    "helper/common.mjs": {
+      "bytes": 9051,
+      "sha256": "1cd3938cf19e821148024a4989ec7b3c65c552da4badef723690db0ec1289370"
+    },
+    "helper/startup-observer.mjs": {
+      "bytes": 601,
+      "sha256": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac"
+    },
+    "helper/attempt-queue.mjs": {
+      "bytes": 2596,
+      "sha256": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0"
+    },
+    "helper/receipt.mjs": {
+      "bytes": 5838,
+      "sha256": "ebc7f36ce74b76e58c90fced8539bb2628884102f2002ed5fc0ef00bc7b1bc94"
+    },
+    "helper/harness.mjs": {
+      "bytes": 24990,
+      "sha256": "3d1bbbf38b42197a934de2296337d584160e046b0857a2f8cb060310ddcfa6a0"
+    },
+    "helper/qa-overlay.mjs": {
+      "bytes": 30819,
+      "sha256": "41dac105128ec8a23dad9f168868be3ae7c2eb8bdb7b0085f37f098a14620278"
+    },
+    "helper/transit-clock.mjs": {
+      "bytes": 7034,
+      "sha256": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac"
+    },
+    "helper/browser-clock.mjs": {
+      "bytes": 2673,
+      "sha256": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057"
+    },
+    "helper/server-bootstrap.mjs": {
+      "bytes": 6299,
+      "sha256": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2"
+    },
+    "helper/weather-fixture.mjs": {
+      "bytes": 7804,
+      "sha256": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b"
+    },
+    "helper/startup-latency.mjs": {
+      "bytes": 7718,
+      "sha256": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5"
+    },
+    "helper/shader-attribution.mjs": {
+      "bytes": 27130,
+      "sha256": "62af23e40accd197d70eb960b72371de160cff1e7d46077ce3e5aef57a92d0ac"
+    },
+    "helper/shader-lifetime.mjs": {
+      "bytes": 22849,
+      "sha256": "dcc19246cd0dbb19d265e3036da72025e19a4ecc6181227723978f9d81938979"
+    },
+    "helper/routine-cost-core.mjs": {
+      "bytes": 8617,
+      "sha256": "89391fd7e7699a4a194e3773dd138ab3aab2be15baca340322d4cce4e174a728"
+    },
+    "helper/routine-cost.mjs": {
+      "bytes": 7568,
+      "sha256": "ab09861aa008f82aee91c0ae48a2ba36dede1fdfb07e13c1ae0b221f907efe33"
+    },
+    "helper/routine-cost.test.mjs": {
+      "bytes": 20559,
+      "sha256": "ad7a1261172e453e7dc42087bb75c83511b50a4c28ecabb747a60f03365a4e96"
+    },
+    "helper/buffer-lifecycle-core.mjs": {
+      "bytes": 2319,
+      "sha256": "69f8ccb492672f5ae38cdcf679003d50d001240747b8a331d719bd392d1372b3"
+    },
+    "helper/buffer-lifecycle.mjs": {
+      "bytes": 19570,
+      "sha256": "b459444570c9c0e283be40abceb007530cabf8bae9c280d6a559681020afd3c4"
+    },
+    "helper/buffer-lifecycle.test.mjs": {
+      "bytes": 23455,
+      "sha256": "d39e5c9fa4906f22b5b91d944fdc7cb8d6c97808f30239bcf194602154bf7a46"
+    },
+    "helper/lifecycle-controls.mjs": {
+      "bytes": 3937,
+      "sha256": "98a3e7654ef82de854fa186d6cbbfe52c2991df70ec6eaebdddd4aa225b90740"
+    },
+    "helper/lifecycle-controls.test.mjs": {
+      "bytes": 9122,
+      "sha256": "60768ff901ecee5ca6c674c7ba63020b6afe8ba9a41285e6bc0c627984bbce42"
+    },
+    "helper/helper.test.mjs": {
+      "bytes": 43591,
+      "sha256": "007dde501728c057d26b62b419f3f71c0e06af8c1c6139301063417fa4f66a40"
+    },
+    "helper/clock.test.mjs": {
+      "bytes": 19217,
+      "sha256": "b459a005783686fbef5e8c0abce1369f88dc251d0285bff8dbf54ffc7eee0638"
+    },
+    "helper/weather-latency.test.mjs": {
+      "bytes": 28306,
+      "sha256": "3221232a5d2ff35ed7bfa429c1dca40864987188e88b06156d334ba52ad8c80b"
+    },
+    "helper/shader-attribution.test.mjs": {
+      "bytes": 27960,
+      "sha256": "59e0fa30437d5b6103666ef599aa5cfc350084a5ebd28412f36236b20b337761"
+    },
+    "helper/shader-lifetime.test.mjs": {
+      "bytes": 25885,
+      "sha256": "e6c051fbf3f8e918940351de7c9ed0e030f9a3ff9786631b8e075a5793acdd5a"
+    },
+    "helper/shader-window.test.mjs": {
+      "bytes": 3385,
+      "sha256": "f3290bc97c02f811ad9200a38328d7d29075c22201d679b9316dc5b535d35bf4"
+    },
+    "helper/depth-inputs.test.mjs": {
+      "bytes": 2094,
+      "sha256": "36ff58b6beaae82448a9f8ec976a4035f1bf0682f7d984d930857e1f7008068b"
+    },
+    "helper/README.md": {
+      "bytes": 57286,
+      "sha256": "8a9b82c5e0051822ca0bf2d87593cab9749d88204fad114861a61a8090994c85"
+    },
+    "receipts/f7826b75-770c-43c4-b8f8-acda82190b5c.json": {
+      "bytes": 285453,
+      "sha256": "bc3acab27189e583f0c07108ca8922fa63d49762a611f3df620affa6b33e1887"
+    },
+    "original-session.jsonl.gz": {
+      "bytes": 16850,
+      "sha256": "3875d3dfc3072fbac159e476bfb30aecd0c26cd452aa6eeb8b33c91fb2fb9840",
+      "originalBytes": 128038,
+      "originalSha256": "8cb0bd814a663c01e493e2db844db0625b471a5786f2e3c44ffdb9d1dc81aa6f"
+    }
+  },
+  "limitations": [
+    "No v9 epoch/GPU program-input evidence was captured: actual startup failed first. Do not invent define/base-effect conclusions from CPU tests.",
+    "Low19stages22,246.7ms,High19stages30,012ms timeout,total52,258.8ms,paused0. Terminal Medium is restoration after High failure, not successful Medium pass.",
+    "No GPU/system telemetry was captured for this attempt; do not assign thermal/scheduling/cache cause.",
+    "V9 attribution/lifetime hooks install only after explicit post-ready UI begin and were never active here.",
+    "Original30/90 budgets remain unchanged; source9 is not accepted as a reliable final startup."
+  ]
+}

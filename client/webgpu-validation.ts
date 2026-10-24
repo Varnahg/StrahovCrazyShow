@@ -22,6 +22,64 @@ export type WebGpuValidationEngine = {
 
 const MAX_MESSAGE_LENGTH = 2000;
 
+export type WebGpuQueryReadErrorSource = "timestamp-frame" | "timestamp-pass" | "occlusion";
+type QueryReadErrorEvent = { error: unknown; source: WebGpuQueryReadErrorSource };
+type QueryReadErrorObservable = {
+  add(callback: (event: QueryReadErrorEvent) => void): LifecycleObserver | null;
+};
+type QueryReadErrorEngine = Pick<WebGpuValidationEngine, "isWebGPU" | "onDisposeObservable"> & {
+  readonly onQueryReadErrorObservable?: unknown;
+};
+
+/** A missing native producer cannot count as a healthy zero-error WebGPU run.
+ * Kept separate from GPU validation/device-loss so its original error is kept. */
+export function watchWebGpuQueryReadErrors(
+  engine: QueryReadErrorEngine,
+  callback: (error: unknown, source: WebGpuQueryReadErrorSource) => void,
+  unavailable: (error: Error) => void,
+): () => void {
+  if (!engine.isWebGPU) return () => {};
+  let active = true, unavailableReported = false;
+  let queryObserver: LifecycleObserver | null | undefined;
+  let disposeObserver: LifecycleObserver | undefined;
+  const fail = () => {
+    if (!active || unavailableReported) return;
+    unavailableReported = true;
+    unavailable(new Error("WebGPU query read error monitoring unavailable."));
+  };
+  const cleanup = () => {
+    if (!active) return;
+    active = false;
+    // Attempt both removals even if an incompatible producer throws on one.
+    try { queryObserver?.remove(true); } catch {}
+    try { disposeObserver?.remove(true); } catch {}
+  };
+  try {
+    const observable = engine.onQueryReadErrorObservable as QueryReadErrorObservable | undefined;
+    if (!observable || typeof observable.add !== "function") { fail(); cleanup(); return cleanup; }
+    queryObserver = observable.add((event) => {
+      if (!active) return;
+      let error: unknown, source: unknown;
+      try {
+        const errorSlot = event && Object.getOwnPropertyDescriptor(event, "error");
+        const sourceSlot = event && Object.getOwnPropertyDescriptor(event, "source");
+        if (!errorSlot || !("value" in errorSlot) || !sourceSlot || !("value" in sourceSlot)) { fail(); return; }
+        error = errorSlot.value;
+        source = sourceSlot.value;
+      } catch { fail(); return; }
+      if (source !== "timestamp-frame" && source !== "timestamp-pass" && source !== "occlusion") { fail(); return; }
+      callback(error, source);
+    });
+    if (!queryObserver || typeof queryObserver.remove !== "function") { fail(); cleanup(); return cleanup; }
+    disposeObserver = engine.onDisposeObservable.add(cleanup);
+    if (!active) {
+      queryObserver.remove(true);
+      disposeObserver.remove(true);
+    }
+  } catch { fail(); cleanup(); }
+  return cleanup;
+}
+
 /** Attach after engine initialization and before scene/resource creation.
  * Every delivered error reaches the callback, including repeated errors; the
  * caller may bound diagnostic logs while still counting every error.

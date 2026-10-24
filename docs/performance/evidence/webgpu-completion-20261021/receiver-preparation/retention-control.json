@@ -1,0 +1,98 @@
+{
+  "scope": "Controlled CPU GC comparison retaining exact disposed Scene/Engine in every branch. No product/native writes or claimed VRAM/runtime leak.",
+  "labels": [
+    "source",
+    "instance",
+    "material",
+    "parent"
+  ],
+  "result": [
+    {
+      "mode": "no-helper",
+      "alive": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "sceneRemovedEventRetainsSource": false,
+      "leaseLedgerSize": null,
+      "retainedSource": null
+    },
+    {
+      "mode": "helper-without-begin",
+      "alive": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "sceneRemovedEventRetainsSource": false,
+      "leaseLedgerSize": 0,
+      "retainedSource": null
+    },
+    {
+      "mode": "begin-no-retained-release",
+      "alive": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "sceneRemovedEventRetainsSource": true,
+      "leaseLedgerSize": 0,
+      "retainedSource": {
+        "disposed": true,
+        "geometryAbsent": true,
+        "materialAbsent": true,
+        "subMeshCount": 0
+      }
+    },
+    {
+      "mode": "begin-retained-release",
+      "alive": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "sceneRemovedEventRetainsSource": true,
+      "leaseLedgerSize": 0,
+      "retainedSource": {
+        "disposed": true,
+        "geometryAbsent": true,
+        "materialAbsent": true,
+        "subMeshCount": 0
+      }
+    },
+    {
+      "mode": "native-observer",
+      "alive": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "sceneRemovedEventRetainsSource": false,
+      "leaseLedgerSize": null,
+      "retainedSource": null
+    },
+    {
+      "mode": "native-deferred-removal",
+      "alive": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "sceneRemovedEventRetainsSource": true,
+      "leaseLedgerSize": null,
+      "retainedSource": {
+        "disposed": true,
+        "geometryAbsent": true,
+        "materialAbsent": true,
+        "subMeshCount": 0
+      }
+    }
+  ]
+}

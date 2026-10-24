@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUTC": "2026-10-21T19:04:15.355Z",
+  "sourceSnapshotId": "2b88fe581a06781cee5aec8242b8b09dbf5abd3541e45f0ce9c4f08c3e385663",
+  "sourceFiles": 8573,
+  "runtimeCommits": [
+    "2c3a365e",
+    "34aacb82"
+  ],
+  "files": {
+    "windows-targeted.log": {
+      "bytes": 30729,
+      "sha256": "9a27e69d1417175898673a3c92623fd0e126bf4f7b4bc5f61c7051600529415f"
+    },
+    "typescript.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build.log": {
+      "bytes": 3139,
+      "sha256": "0efca016ffdf1a15d5af4dc615152828f447cfb8aa7aad563ead236250d65694"
+    },
+    "integration.log": {
+      "bytes": 2231,
+      "sha256": "8388a08e9ab362e57465990f05380a17a138d85f2346005cadf8fb432f03ed2d"
+    },
+    "windows-whole-suite-cancel.json": {
+      "bytes": 1254,
+      "sha256": "04647805f32c2c563bcd1cb39b49477e65e96e2bea1bbdf074a900d0013152c5"
+    }
+  },
+  "windows": {
+    "targeted": {
+      "command": "pnpm --config.verify-deps-before-run=false exec tsx --test <12 startup-view files> tests/webgpu-instance-buffers.test.ts",
+      "tests": 215,
+      "pass": 215,
+      "fail": 0,
+      "skip": 0,
+      "durationMs": 10559.7328,
+      "exit": 0,
+      "scope": "Actual fresh installed Mesh7ceb, no source overlay; CPU/null-device tests."
+    },
+    "typescript": {
+      "command": "pnpm --config.verify-deps-before-run=false exec tsc --noEmit",
+      "exit": 0
+    },
+    "build": {
+      "command": "pnpm --config.verify-deps-before-run=false build",
+      "exit": 0,
+      "includesAnotherFullTypecheck": true,
+      "viteSeconds": 17.89
+    },
+    "integration": {
+      "command": "pnpm --config.verify-deps-before-run=false test:integration",
+      "exit": 0,
+      "port": 2568,
+      "checks": [
+        "Queued vehicle respawn/epoch/presence/foreign driver/cleanup",
+        "Singleton world,guest boundary,walking,physicalcarcontrols,chat/events/session/weather",
+        "12authenticatedpeers/globalworld/keyframe recovery/privacy",
+        "FeedbackPOST/durable receipt/duplicate-conflict/malformed metadata"
+      ],
+      "linearProviderDisabled": true
+    },
+    "wholeSuite": {
+      "completed": false,
+      "outcome": "cancelled duplicate after exact-runtime CI success; partial log preserved in ignored own validation cache",
+      "partialLogBytes": 33941,
+      "partialLogSha256": "a62b03339bdaf298e3981195a00693a059f783ca3b3d9e7073739648bab24349",
+      "neverClaimPass": true
+    }
+  },
+  "wholeSuiteCI": {
+    "headSha": "34aacb826f5449bd3609f2b003e75b07fd80d997",
+    "run": 39651132346,
+    "tests": 2004,
+    "pass": 2004,
+    "fail": 0,
+    "skip": 0,
+    "build": "pass",
+    "integration": "pass",
+    "url": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/39651132346"
+  },
+  "limitations": [
+    "CPU/build/network verification is not GPU/image/FPS acceptance.",
+    "Windows duplicate whole-suite was cancelled; its partial output is never represented as2004PASS.",
+    "The first integration launcher Select-String used a wrong relative path for the already completed build log; that read error did not alter sources or the separately captured successful integration process/output."
+  ]
+}

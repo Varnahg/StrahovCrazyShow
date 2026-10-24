@@ -1,0 +1,542 @@
+TAP version 13
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: default-off returns without even reading Game
+ok 1 - default-off returns without even reading Game
+  ---
+  duration_ms: 1.9657
+  type: 'test'
+  ...
+# Subtest: one ten-target hierarchy subtracts prepare/create children and counts clean null
+ok 2 - one ten-target hierarchy subtracts prepare/create children and counts clean null
+  ---
+  duration_ms: 2.5698
+  type: 'test'
+  ...
+# Subtest: Standard direct readiness-to-engine hierarchy counts createEffect and subtracts its selected time
+ok 3 - Standard direct readiness-to-engine hierarchy counts createEffect and subtracts its selected time
+  ---
+  duration_ms: 0.4519
+  type: 'test'
+  ...
+# Subtest: original return identity undefined
+ok 4 - original return identity undefined
+  ---
+  duration_ms: 0.3277
+  type: 'test'
+  ...
+# Subtest: original return identity null
+ok 5 - original return identity null
+  ---
+  duration_ms: 0.2074
+  type: 'test'
+  ...
+# Subtest: original return identity false
+ok 6 - original return identity false
+  ---
+  duration_ms: 0.1574
+  type: 'test'
+  ...
+# Subtest: original return identity 0
+ok 7 - original return identity 0
+  ---
+  duration_ms: 0.1847
+  type: 'test'
+  ...
+# Subtest: original return identity 
+ok 8 - original return identity 
+  ---
+  duration_ms: 0.1784
+  type: 'test'
+  ...
+# Subtest: original return identity [object Promise]
+ok 9 - original return identity [object Promise]
+  ---
+  duration_ms: 0.1642
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw undefined
+ok 10 - original falsy/error throw undefined
+  ---
+  duration_ms: 0.7024
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw null
+ok 11 - original falsy/error throw null
+  ---
+  duration_ms: 0.2014
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw false
+ok 12 - original falsy/error throw false
+  ---
+  duration_ms: 0.1428
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw 0
+ok 13 - original falsy/error throw 0
+  ---
+  duration_ms: 0.1483
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw 
+ok 14 - original falsy/error throw 
+  ---
+  duration_ms: 0.1147
+  type: 'test'
+  ...
+# Subtest: original falsy/error throw Error: original
+ok 15 - original falsy/error throw Error: original
+  ---
+  duration_ms: 0.104
+  type: 'test'
+  ...
+# Subtest: foreign material barrier and standalone engine calls do not borrow an own parent association
+ok 16 - foreign material barrier and standalone engine calls do not borrow an own parent association
+  ---
+  duration_ms: 0.2981
+  type: 'test'
+  ...
+# Subtest: transaction rejects drift before writes and rolls back a late defineProperty failure exactly
+ok 17 - transaction rejects drift before writes and rolls back a late defineProperty failure exactly
+  ---
+  duration_ms: 0.3386
+  type: 'test'
+  ...
+# Subtest: retained method references pass through after dispose and foreign replacement is never clobbered
+ok 18 - retained method references pass through after dispose and foreign replacement is never clobbered
+  ---
+  duration_ms: 0.1468
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: native PBR dirty/cache reuse and clean-null branches use actual inherited ThinEngine API
+ok 19 - native PBR dirty/cache reuse and clean-null branches use actual inherited ThinEngine API
+  ---
+  duration_ms: 216.6125
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: native StandardMaterial readiness captures its actual inherited ThinEngine createEffect call without a PBR ancestor
+ok 20 - native StandardMaterial readiness captures its actual inherited ThinEngine createEffect call without a PBR ancestor
+  ---
+  duration_ms: 51.3788
+  type: 'test'
+  ...
+# Subtest: native WebGPUEngine cache-hit ABI returns exact record/refcount and positional callback
+ok 21 - native WebGPUEngine cache-hit ABI returns exact record/refcount and positional callback
+  ---
+  duration_ms: 0.3999
+  type: 'test'
+  ...
+# Subtest: engine own/foreign origin refuses before prototype mutation; abort restores live hooks
+ok 22 - engine own/foreign origin refuses before prototype mutation; abort restores live hooks
+  ---
+  duration_ms: 3.2647
+  type: 'test'
+  ...
+# Subtest: actual WebGPU own prototype origin can be installed/retired without device work
+ok 23 - actual WebGPU own prototype origin can be installed/retired without device work
+  ---
+  duration_ms: 2.7101
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: receipt is distinct/strict while original schema and default-off identity remain unchanged
+ok 24 - receipt is distinct/strict while original schema and default-off identity remain unchanged
+  ---
+  duration_ms: 54.1574
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual native entry waiter hands off once, captures first Scene and retained waiter does not retrigger
+ok 25 - actual native entry waiter hands off once, captures first Scene and retained waiter does not retrigger
+  ---
+  duration_ms: 33.9564
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# Subtest: unchanged single deadline includes a long original eighth native frame
+ok 26 - unchanged single deadline includes a long original eighth native frame
+  ---
+  duration_ms: 21.4849
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced generation
+ok 27 - native capture retires replaced generation
+  ---
+  duration_ms: 11.1795
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced engine
+ok 28 - native capture retires replaced engine
+  ---
+  duration_ms: 11.2778
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced actor
+ok 29 - native capture retires replaced actor
+  ---
+  duration_ms: 11.556
+  type: 'test'
+  ...
+# Subtest: native capture retires replaced device
+ok 30 - native capture retires replaced device
+  ---
+  duration_ms: 10.1301
+  type: 'test'
+  ...
+# Subtest: depth/call caps and diagnostic clock failure never repair or repeat original calls
+ok 31 - depth/call caps and diagnostic clock failure never repair or repeat original calls
+  ---
+  duration_ms: 12.4808
+  type: 'test'
+  ...
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# Subtest: same-scene recursive render remains original work and is explicitly incomplete
+ok 32 - same-scene recursive render remains original work and is explicitly incomplete
+  ---
+  duration_ms: 17.7613
+  type: 'test'
+  ...
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# Subtest: foreign same-engine Scene materials are passthrough, not attributed to the selected Scene
+ok 33 - foreign same-engine Scene materials are passthrough, not attributed to the selected Scene
+  ---
+  duration_ms: 13.2407
+  type: 'test'
+  ...
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# Subtest: native QA ten-routine button uses the actual waiter/factory/receipt and no old action
+ok 34 - native QA ten-routine button uses the actual waiter/factory/receipt and no old action
+  ---
+  duration_ms: 25.1958
+  type: 'test'
+  ...
+# Subtest: copied fixture compatibility edits reverse exactly to immutable V17 bytes
+ok 35 - copied fixture compatibility edits reverse exactly to immutable V17 bytes
+  ---
+  duration_ms: 3.429
+  type: 'test'
+  ...
+# Subtest: descriptor drift during capture retires without clobbering the foreign engine method
+ok 36 - descriptor drift during capture retires without clobbering the foreign engine method
+  ---
+  duration_ms: 9.2082
+  type: 'test'
+  ...
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:13]: Babylon.js v9.30.0 - Null engine
+# Subtest: disposed owner snapshots and retained instance wrappers do not query resources again
+ok 37 - disposed owner snapshots and retained instance wrappers do not query resources again
+  ---
+  duration_ms: 9.5214
+  type: 'test'
+  ...
+# Subtest: phase registration failure rolls back all ten native descriptors before publishing an owner
+ok 38 - phase registration failure rolls back all ten native descriptors before publishing an owner
+  ---
+  duration_ms: 1.9627
+  type: 'test'
+  ...
+# Subtest: partial RTT observer failure removes its first subscription and does not escape native notification
+ok 39 - partial RTT observer failure removes its first subscription and does not escape native notification
+  ---
+  duration_ms: 1.7191
+  type: 'test'
+  ...
+# Subtest: native Scene throw preserves exact undefined and restores all descriptors
+ok 40 - native Scene throw preserves exact undefined and restores all descriptors
+  ---
+  duration_ms: 1.8568
+  type: 'test'
+  ...
+# Subtest: native Scene throw preserves exact 0 and restores all descriptors
+ok 41 - native Scene throw preserves exact 0 and restores all descriptors
+  ---
+  duration_ms: 1.6631
+  type: 'test'
+  ...
+# Subtest: invalid native frame IDs stay explicit partial without adding or repairing a render
+ok 42 - invalid native frame IDs stay explicit partial without adding or repairing a render
+  ---
+  duration_ms: 9.1997
+  type: 'test'
+  ...
+# Subtest: maximal scalar profile remains bounded and validation never invokes inherited toJSON
+ok 43 - maximal scalar profile remains bounded and validation never invokes inherited toJSON
+  ---
+  duration_ms: 17.1338
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: new pending shader-validation after one native accepted frame retains all eight consecutive original frames
+ok 44 - new pending shader-validation after one native accepted frame retains all eight consecutive original frames
+  ---
+  duration_ms: 152.8388
+  type: 'test'
+  ...
+# Subtest: new pending preparation after one native accepted frame retains all eight consecutive original frames
+ok 45 - new pending preparation after one native accepted frame retains all eight consecutive original frames
+  ---
+  duration_ms: 15.0372
+  type: 'test'
+  ...
+# Subtest: eight-frame diagnostic completion preserves pending at terminal without claiming health acceptance
+ok 46 - eight-frame diagnostic completion preserves pending at terminal without claiming health acceptance
+  ---
+  duration_ms: 10.6025
+  type: 'test'
+  ...
+# Subtest: admission rejects original pending preparation with exact bounded witness
+ok 47 - admission rejects original pending preparation with exact bounded witness
+  ---
+  duration_ms: 2.0254
+  type: 'test'
+  ...
+# Subtest: admission rejects original pending shader-validation with exact bounded witness
+ok 48 - admission rejects original pending shader-validation with exact bounded witness
+  ---
+  duration_ms: 1.8091
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects identity-actor
+ok 49 - pending continuation still rejects identity-actor
+  ---
+  duration_ms: 5.8664
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects identity-scene
+ok 50 - pending continuation still rejects identity-scene
+  ---
+  duration_ms: 5.7378
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects identity-engine
+ok 51 - pending continuation still rejects identity-engine
+  ---
+  duration_ms: 5.3831
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects identity-device
+ok 52 - pending continuation still rejects identity-device
+  ---
+  duration_ms: 6.0051
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects identity-health
+ok 53 - pending continuation still rejects identity-health
+  ---
+  duration_ms: 7.0169
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects identity-budget
+ok 54 - pending continuation still rejects identity-budget
+  ---
+  duration_ms: 5.3321
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects identity-stable
+ok 55 - pending continuation still rejects identity-stable
+  ---
+  duration_ms: 5.5639
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects identity-startup
+ok 56 - pending continuation still rejects identity-startup
+  ---
+  duration_ms: 5.165
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects identity-generation
+ok 57 - pending continuation still rejects identity-generation
+  ---
+  duration_ms: 4.9776
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects health-phase
+ok 58 - pending continuation still rejects health-phase
+  ---
+  duration_ms: 4.965
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects health-error
+ok 59 - pending continuation still rejects health-error
+  ---
+  duration_ms: 5.5826
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects game-not-ready
+ok 60 - pending continuation still rejects game-not-ready
+  ---
+  duration_ms: 4.9239
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects quality-preparation
+ok 61 - pending continuation still rejects quality-preparation
+  ---
+  duration_ms: 5.678
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects benchmark
+ok 62 - pending continuation still rejects benchmark
+  ---
+  duration_ms: 5.1747
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects presentation-lease
+ok 63 - pending continuation still rejects presentation-lease
+  ---
+  duration_ms: 4.5588
+  type: 'test'
+  ...
+# Subtest: pending continuation still rejects invalid-data
+ok 64 - pending continuation still rejects invalid-data
+  ---
+  duration_ms: 4.711
+  type: 'test'
+  ...
+# Subtest: actual tracked rejection becomes health-error and keeps original rejected value
+ok 65 - actual tracked rejection becomes health-error and keeps original rejected value
+  ---
+  duration_ms: 6.8099
+  type: 'test'
+  ...
+# Subtest: accepted continuation preserves abort retirement
+ok 66 - accepted continuation preserves abort retirement
+  ---
+  duration_ms: 5.7003
+  type: 'test'
+  ...
+# Subtest: accepted continuation preserves deadline retirement
+ok 67 - accepted continuation preserves deadline retirement
+  ---
+  duration_ms: 4.7868
+  type: 'test'
+  ...
+# Subtest: accepted continuation preserves foreign retirement
+ok 68 - accepted continuation preserves foreign retirement
+  ---
+  duration_ms: 5.2021
+  type: 'test'
+  ...
+# Subtest: getter pending data is refused without invoking the getter
+ok 69 - getter pending data is refused without invoking the getter
+  ---
+  duration_ms: 4.7124
+  type: 'test'
+  ...
+# Subtest: independent ten-target adapter permits pending and records its own failing guard
+ok 70 - independent ten-target adapter permits pending and records its own failing guard
+  ---
+  duration_ms: 5.6896
+  type: 'test'
+  ...
+# Subtest: trigger and installed boundaries remain idle even before accepted capture publication
+ok 71 - trigger and installed boundaries remain idle even before accepted capture publication
+  ---
+  duration_ms: 9.635
+  type: 'test'
+  ...
+# Subtest: new trigger and profile receipt reject schema, pending, witness and frame tampering
+ok 72 - new trigger and profile receipt reject schema, pending, witness and frame tampering
+  ---
+  duration_ms: 28.0381
+  type: 'test'
+  ...
+# Subtest: both disabled new APIs avoid Game reads and legacy controller/runtime bytes remain exact
+ok 73 - both disabled new APIs avoid Game reads and legacy controller/runtime bytes remain exact
+  ---
+  duration_ms: 2.3016
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: GC native retained stopped control releases Game and Scene before first draw
+ok 74 - GC native retained stopped control releases Game and Scene before first draw
+  ---
+  duration_ms: 27.6256
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: GC none retained stopped control releases Game and Scene before first draw
+ok 75 - GC none retained stopped control releases Game and Scene before first draw
+  ---
+  duration_ms: 25.7348
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: GC owner retained stopped control releases Game and Scene before first draw
+ok 76 - GC owner retained stopped control releases Game and Scene before first draw
+  ---
+  duration_ms: 14.5588
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: GC waiter retained stopped control releases Game and Scene before first draw
+ok 77 - GC waiter retained stopped control releases Game and Scene before first draw
+  ---
+  duration_ms: 16.2383
+  type: 'test'
+  ...
+# BJS - [11:45:12]: Babylon.js v9.30.0 - Null engine
+# Subtest: GC engine retained stopped control releases Game and Scene before first draw
+ok 78 - GC engine retained stopped control releases Game and Scene before first draw
+  ---
+  duration_ms: 14.0502
+  type: 'test'
+  ...
+# Subtest: GC all retained stopped control releases Game and Scene before first draw
+ok 79 - GC all retained stopped control releases Game and Scene before first draw
+  ---
+  duration_ms: 26.6055
+  type: 'test'
+  ...
+1..79
+# tests 79
+# suites 0
+# pass 79
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2603.8438

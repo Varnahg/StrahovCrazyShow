@@ -1,10 +1,14 @@
 {
   "package": "@babylonjs/core",
   "version": "9.30.0",
-  "source": "webgpu-shadow-share-helper-20261019",
+  "source": "webgpu-completion-shadow-pass-compatibility-20261023",
+  "predecessor": "webgpu-completion-shadow-pass-ownership-20261023",
   "helperManifestSha256": "2fca0004c5dc5ec9186a419f695c646af7f00e21db2e7359e4143e893382e657",
   "originalModuleSha256": "bd2bfe313728751f375d613492e7210adb09733556dcb8e6f2d8e720b55f122c",
-  "acceptedModuleSha256": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
-  "scope": "Nineteen unchanged CPU assertions from the reviewed helper. Fixture resolves actual installed modules without an overlay. Uses actual pinned WebGPU engine cache/refcount methods on a NullEngine substrate and real draw/material contexts. Not a GPU, WGSL compiler, image or frame-time proof.",
-  "transfer": "fixture.mjs and shadow-share.test.mjs are exact reviewed helper bytes. Only loader.mjs is replaced with portable import.meta.resolve; the top-level TypeScript wrapper registers the existing tests."
+  "previousAcceptedModuleSha256": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+  "priorPassOwnershipModuleSha256": "5494233c8746aba81081f03981e8f957330d83aedd6c36c2d9b4ee36a3511761",
+  "acceptedModuleSha256": "f197d247b355cfc397489bab4bedbc00546b4579c83ca4b304ac372caea0b415",
+  "scope": "Nineteen predecessor cases, fourteen per-pass ownership/lifecycle cases and twelve nonstandalone source/draw compatibility cases. Installed portable modules, actual pinned WebGPU cache/acquire/refcount and draw/material contexts on NullEngine terminal IO. Includes actual ShaderMaterial main readiness, ShadowGenerator RTT readiness, ObjectRenderer first creation and two RTT retirement. Not a GPU, WGSL compiler, image or frame-time proof.",
+  "transfer": "Portable loader stays byte-exact. Original second-generator draw2 case is restored without synthetic notify2; separate canonical2 coverage remains. Original guarded freshness main0-notify/shadow9 readiness contract is restored. Source/draw compatibility cases are registered by the TypeScript wrapper; no assertion is weakened.",
+  "metadata": "Nonexecuted provenance finalized before the final compatibility CPU run. Historical 201 proof and its provenance exception remain immutable."
 }

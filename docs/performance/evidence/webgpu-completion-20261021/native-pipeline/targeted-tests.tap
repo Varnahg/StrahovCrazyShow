@@ -1,0 +1,246 @@
+TAP version 13
+# Subtest: NCM actual draw miss → Promise completion → native insertion → persistent fastBundle replay across real pass reset
+ok 1 - NCM actual draw miss → Promise completion → native insertion → persistent fastBundle replay across real pass reset
+  ---
+  duration_ms: 27.7571
+  type: 'test'
+  ...
+# Subtest: NCM actual null-pass ClearQuad keeps pending encoders/cache unpublished and native bundle replay/RTT inversion intact
+ok 2 - NCM actual null-pass ClearQuad keeps pending encoders/cache unpublished and native bundle replay/RTT inversion intact
+  ---
+  duration_ms: 9.8046
+  type: 'test'
+  ...
+# Subtest: NCM actual dirty buffer/material rebinding invalidates fastBundle without recompiling an identical native descriptor
+ok 3 - NCM actual dirty buffer/material rebinding invalidates fastBundle without recompiling an identical native descriptor
+  ---
+  duration_ms: 6.7083
+  type: 'test'
+  ...
+# Subtest: NCM regular instances retain actual vertex stepMode, override binding and indirect count updates
+ok 4 - NCM regular instances retain actual vertex stepMode, override binding and indirect count updates
+  ---
+  duration_ms: 9.229
+  type: 'test'
+  ...
+# Subtest: NCM thin instances retain actual vertex stepMode, override binding and indirect count updates
+ok 5 - NCM thin instances retain actual vertex stepMode, override binding and indirect count updates
+  ---
+  duration_ms: 4.5129
+  type: 'test'
+  ...
+# Subtest: NCM sample/color/MRT changes on a dirty draw and null-clear stay in separate native token/descriptor/bundle variants
+ok 6 - NCM sample/color/MRT changes on a dirty draw and null-clear stay in separate native token/descriptor/bundle variants
+  ---
+  duration_ms: 7.2292
+  type: 'test'
+  ...
+# Subtest: NCM incomplete once-only RTT uses actual refresh-counter retry, never accepts an unconsumed completion
+ok 7 - NCM incomplete once-only RTT uses actual refresh-counter retry, never accepts an unconsumed completion
+  ---
+  duration_ms: 5.2157
+  type: 'test'
+  ...
+# Subtest: NCM bounds pending and completed entries at64 while preserving native misses and no global cache reset
+ok 8 - NCM bounds pending and completed entries at64 while preserving native misses and no global cache reset
+  ---
+  duration_ms: 14.1488
+  type: 'test'
+  ...
+# Subtest: NCM rejection, abort/dispose and mode/device/context replacement never publish a late result or Promise
+ok 9 - NCM rejection, abort/dispose and mode/device/context replacement never publish a late result or Promise
+  ---
+  duration_ms: 12.5629
+  type: 'test'
+  ...
+# Subtest: NCM pending null-clear rejection/abort never publishes or finishes a partial bundle
+ok 10 - NCM pending null-clear rejection/abort never publishes or finishes a partial bundle
+  ---
+  duration_ms: 4.1256
+  type: 'test'
+  ...
+# Subtest: actual pinned miss defers draw, consumes completion only at the next native miss, then hits
+ok 11 - actual pinned miss defers draw, consumes completion only at the next native miss, then hits
+  ---
+  duration_ms: 31.6001
+  type: 'test'
+  ...
+# BJS - [14:43:30]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual clearQuad has its own cache and catches only its own pending miss before binding/drawing
+ok 12 - actual clearQuad has its own cache and catches only its own pending miss before binding/drawing
+  ---
+  duration_ms: 6.089
+  type: 'test'
+  ...
+# Subtest: actual cache descriptors retain MSAA, texture state, MRT, stencil and native/instance override layout
+ok 13 - actual cache descriptors retain MSAA, texture state, MRT, stencil and native/instance override layout
+  ---
+  duration_ms: 15.9013
+  type: 'test'
+  ...
+# Subtest: bounded work skips excess misses and allows later discovery without a deferred descriptor queue
+ok 14 - bounded work skips excess misses and allows later discovery without a deferred descriptor queue
+  ---
+  duration_ms: 5.3622
+  type: 'test'
+  ...
+# Subtest: once-only renderer is reset for a real retry and a live inactive ready orphan cannot deadlock
+ok 15 - once-only renderer is reset for a real retry and a live inactive ready orphan cannot deadlock
+  ---
+  duration_ms: 3.4507
+  type: 'test'
+  ...
+# Subtest: without owned target retry, a ready unconsumed result conservatively blocks readiness
+ok 16 - without owned target retry, a ready unconsumed result conservatively blocks readiness
+  ---
+  duration_ms: 2.4148
+  type: 'test'
+  ...
+# Subtest: inactive ready results cannot fill the bound and starve new visible pipelines
+ok 17 - inactive ready results cannot fill the bound and starve new visible pipelines
+  ---
+  duration_ms: 2.2385
+  type: 'test'
+  ...
+# Subtest: changed Effect context/stage/disposal retires stale work and requires another complete frame
+ok 18 - changed Effect context/stage/disposal retires stale work and requires another complete frame
+  ---
+  duration_ms: 2.2214
+  type: 'test'
+  ...
+# Subtest: async rejection is observed once, preserves the error, restores hooks and never becomes an unhandled rejection
+ok 19 - async rejection is observed once, preserves the error, restores hooks and never becomes an unhandled rejection
+  ---
+  duration_ms: 2.5152
+  type: 'test'
+  ...
+# Subtest: foreign synchronous draw/clear errors propagate and outside render uses the native synchronous path
+ok 20 - foreign synchronous draw/clear errors propagate and outside render uses the native synchronous path
+  ---
+  duration_ms: 1.7251
+  type: 'test'
+  ...
+# Subtest: disabled cache never uses a stale native token
+ok 21 - disabled cache never uses a stale native token
+  ---
+  duration_ms: 1.0493
+  type: 'test'
+  ...
+# Subtest: replacement of device fails closed without late cache writes or deleting later owners
+ok 22 - replacement of device fails closed without late cache writes or deleting later owners
+  ---
+  duration_ms: 3.9147
+  type: 'test'
+  ...
+# Subtest: replacement of main cache fails closed without late cache writes or deleting later owners
+ok 23 - replacement of main cache fails closed without late cache writes or deleting later owners
+  ---
+  duration_ms: 2.0955
+  type: 'test'
+  ...
+# Subtest: replacement of clear cache fails closed without late cache writes or deleting later owners
+ok 24 - replacement of clear cache fails closed without late cache writes or deleting later owners
+  ---
+  duration_ms: 1.687
+  type: 'test'
+  ...
+# Subtest: replacement of hook fails closed without late cache writes or deleting later owners
+ok 25 - replacement of hook fails closed without late cache writes or deleting later owners
+  ---
+  duration_ms: 1.8129
+  type: 'test'
+  ...
+# Subtest: replacement of descriptor builder fails closed without late cache writes or deleting later owners
+ok 26 - replacement of descriptor builder fails closed without late cache writes or deleting later owners
+  ---
+  duration_ms: 1.5841
+  type: 'test'
+  ...
+# Subtest: replacement of lookup fails closed without late cache writes or deleting later owners
+ok 27 - replacement of lookup fails closed without late cache writes or deleting later owners
+  ---
+  duration_ms: 0.9186
+  type: 'test'
+  ...
+# Subtest: replacement of mode fails closed without late cache writes or deleting later owners
+ok 28 - replacement of mode fails closed without late cache writes or deleting later owners
+  ---
+  duration_ms: 1.3787
+  type: 'test'
+  ...
+# Subtest: signal/engine disposal and retained wrappers are safe, idempotent and release late Promise writes
+ok 29 - signal/engine disposal and retained wrappers are safe, idempotent and release late Promise writes
+  ---
+  duration_ms: 3.415
+  type: 'test'
+  ...
+# Subtest: WebGL, unknown mode and snapshot hosts are inert without touching device hooks
+ok 30 - WebGL, unknown mode and snapshot hosts are inert without touching device hooks
+  ---
+  duration_ms: 0.5267
+  type: 'test'
+  ...
+# Subtest: abort inside render stops acceptance and late rejection is consumed without touching a newer owner
+ok 31 - abort inside render stops acceptance and late rejection is consumed without touching a newer owner
+  ---
+  duration_ms: 2.9042
+  type: 'test'
+  ...
+# Subtest: synchronous device failure keeps its identity and rolls back adapter ownership
+ok 32 - synchronous device failure keeps its identity and rolls back adapter ownership
+  ---
+  duration_ms: 1.2572
+  type: 'test'
+  ...
+# Subtest: a full frame before Promise completion cannot authorize readiness after completion
+ok 33 - a full frame before Promise completion cannot authorize readiness after completion
+  ---
+  duration_ms: 2.6169
+  type: 'test'
+  ...
+# BJS - [14:43:30]: Babylon.js v9.30.0 - Null engine
+# Subtest: pending entries retired by a disabled cache still bound outstanding work until settlement
+ok 34 - pending entries retired by a disabled cache still bound outstanding work until settlement
+  ---
+  duration_ms: 2.0519
+  type: 'test'
+  ...
+# Subtest: native descriptor construction that reprocesses an Effect cannot enqueue an old-stage pipeline
+ok 35 - native descriptor construction that reprocesses an Effect cannot enqueue an old-stage pipeline
+  ---
+  duration_ms: 2.0807
+  type: 'test'
+  ...
+# Subtest: cleanup continues after a foreign hardened descriptor and records a meaningful fault
+ok 36 - cleanup continues after a foreign hardened descriptor and records a meaningful fault
+  ---
+  duration_ms: 2.2524
+  type: 'test'
+  ...
+# Subtest: a structurally missing shader module fails immediately rather than waiting through startup timeout
+ok 37 - a structurally missing shader module fails immediately rather than waiting through startup timeout
+  ---
+  duration_ms: 1.1753
+  type: 'test'
+  ...
+# Subtest: existing compilation profile observes the original async request exactly once
+ok 38 - existing compilation profile observes the original async request exactly once
+  ---
+  duration_ms: 6.4243
+  type: 'test'
+  ...
+# Subtest: dispose releases the scene retry callback while the original pipeline Promise is still pending
+ok 39 - dispose releases the scene retry callback while the original pipeline Promise is still pending
+  ---
+  duration_ms: 3.2131
+  type: 'test'
+  ...
+1..39
+# tests 39
+# suites 0
+# pass 39
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1875.8167

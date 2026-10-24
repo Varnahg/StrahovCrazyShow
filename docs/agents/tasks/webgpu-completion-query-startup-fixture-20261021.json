@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-query-startup-fixture-20261021",
+  "title": "KEY-22: doplnit nový query error producer do skutečné Game startup testovací fixture",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/game-webgpu-startup.test.ts",
+    "tests/avatar-preview-webgpu.test.ts",
+    "docs/performance/evidence/webgpu-completion-20261021/query-startup-fixture/",
+    ".cache/webgpu-completion-query-startup-fixture-20261021/",
+    "docs/agents/handoffs/webgpu-completion-query-startup-fixture-20261021.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před editací doložit root fresh source7 skutečný targeted274/278,4FAIL: native Game fixture bez nového onQueryReadErrorObservable končí monitoring unavailable před očekávaným fence. Rozlišit testfixture od runtime chyby; žádný health bypass.",
+    "Přesná minimální fixture změna poskytne skutečný Babylon Observable pro validní fake WebGPU engine; WebGL se nemění a negativní absence query producer zůstane testovaná ve webgpu-validation.test.ts.",
+    "Lehký cílený actual Game test běží proti rootfresh source7 installed dependency read-only explicitní loader/tooling, protože rootsharedinstalled old runtime je úmyslně bezezměny. Žádná změna client/patch/lock/installed/frozen sources/helper ani globalenv.",
+    "Předat vlastní přesné soubory/SHA, redgreen evidence, refaktor posouzení a handoff; CPUonly, žádný fullsuite/install/build/GPU/commit/rekurzivníBMAD. Další potřebný soubor nejprve dohodnout s root.",
+    "Čtecí audit navíc doložil stejný chybějící producer ve valid native preview fixture před skutečným createAvatarPreview. Doplnit pouze tuto fixture, zachovat původní testy a přidat úzké Game/preview integration negatives pro absent producer s okamžitým zachycením rejection a cleanup důkazem. Nález preview je doložen zdrojem, ne zatím dokončeným CI failure."
+  ],
+  "verification": [
+    "Původní root source7 red log uchovat read-only; cílený actual Game whole-startup/fence/abort/device-loss/authority-view tests green a full scopedTS bez oslabení assertů."
+  ],
+  "notes": [
+    "Explicitní root navazující zadání po přijetí query lifecycle296876f4. Zdroj7 .cache/performance-snapshot/webgpu-completion-20261021-candidate-7 má vlastní fresh installed candidate a je neměnný. Výstup root začlení do nového source8 včetně testů."
+  ]
+}

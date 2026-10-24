@@ -114,6 +114,11 @@ export class PlayerFlashlight {
       }
     }
     this.beam.updateFromPose(this.position, this.direction, active, quality);
+    this.beam.prepareLocalShadow(
+      rig && !rig.root.isDisposed() && !rig.rightElbow.isDisposed() ? rig.root : undefined,
+      rig?.skinnedBody?.near,
+      quality,
+    );
   }
   dispose() {
     if (this.disposed) return;

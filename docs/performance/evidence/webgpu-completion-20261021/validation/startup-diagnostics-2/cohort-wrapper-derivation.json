@@ -1,0 +1,9 @@
+{
+  "source": "scripts/performance-diverse.mjs",
+  "sourceSha256": "4ed130702245dcebfb5934744cc27a425728399e68b5a06b28f115baa5da5d97",
+  "derivedSha256": "4c622ca834e704bd0ab72a4b8492e20ad92268659c73db2d6c339d83bae2f2c8",
+  "failedOriginalAttempt": "Legacy canonicalInput direct-import assertion rejected before any API request; current performance-network uses actual protocol11 ScriptTimelineClient instead.",
+  "decision": "Verify the actual current transitive producer imports and their frozen bytes. Do not edit frozen sources or add a fake unused canonicalInput import merely to satisfy the old assertion.",
+  "changed": "Only that single provenance assertion; profiles/SDK/network producer/lifecycle/statistics and all other guards unchanged.",
+  "limitations": "Functional moving cohort only; join-relative movement is not matched FPS workload."
+}

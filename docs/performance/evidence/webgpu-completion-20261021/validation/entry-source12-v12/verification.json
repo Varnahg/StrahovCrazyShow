@@ -1,0 +1,154 @@
+{
+  "atUTC": "2026-10-23T20:43:46.287Z",
+  "results": [
+    {
+      "label": "cm",
+      "backend": "webgpu",
+      "buildId": "511b1e72f4a645cbd025f952f2783b8345dc27545d3900c4393ecf431e50393d",
+      "sourceSnapshotId": "053501f0cee4c2bf6c81ab39339fa82a84f91370cc86f7907781b0c0b2098e43",
+      "helperSha256": "afccfcbd77b56758384cd1b215706302035d805e0bd6ceea14cc61a28288bf37",
+      "viewport": {
+        "width": 2040,
+        "height": 986,
+        "dpr": 1.0000000149011612
+      },
+      "backbuffer": {
+        "width": 2040,
+        "height": 986,
+        "scaling": 1
+      },
+      "lightingInstant": 1792792800000,
+      "trafficInstant": 1792598400000,
+      "entryUtc": "2026-10-23T20:23:05.022Z",
+      "chainMs": 127.10000002384186,
+      "scopes": [
+        {
+          "target": "gltfLightBudget.prepareFrame.outer",
+          "wallMs": 0.2999999523162842
+        },
+        {
+          "target": "stableLights.update.outer",
+          "wallMs": 4.400000095367432
+        },
+        {
+          "target": "Scene.render",
+          "wallMs": 122.39999997615814
+        }
+      ],
+      "frames": 8,
+      "afterHealth": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      },
+      "remainingHooks": 0,
+      "originalSession": {
+        "session": "3634758f-3d85-4f83-81b5-06263af72531",
+        "records": 1787,
+        "unhandled": 0,
+        "faultRecords": 0,
+        "recordingGaps": 2
+      },
+      "telemetryRows": 12
+    },
+    {
+      "label": "gl",
+      "backend": "webgl2",
+      "buildId": "511b1e72f4a645cbd025f952f2783b8345dc27545d3900c4393ecf431e50393d",
+      "sourceSnapshotId": "053501f0cee4c2bf6c81ab39339fa82a84f91370cc86f7907781b0c0b2098e43",
+      "helperSha256": "afccfcbd77b56758384cd1b215706302035d805e0bd6ceea14cc61a28288bf37",
+      "viewport": {
+        "width": 2040,
+        "height": 986,
+        "dpr": 1.0000000149011612
+      },
+      "backbuffer": {
+        "width": 2040,
+        "height": 986,
+        "scaling": 1
+      },
+      "lightingInstant": 1792792800000,
+      "trafficInstant": 1792598400000,
+      "entryUtc": "2026-10-23T20:36:18.871Z",
+      "chainMs": 136.19999992847443,
+      "scopes": [
+        {
+          "target": "gltfLightBudget.prepareFrame.outer",
+          "wallMs": 0.3999999761581421
+        },
+        {
+          "target": "stableLights.update.outer",
+          "wallMs": 5.100000023841858
+        },
+        {
+          "target": "Scene.render",
+          "wallMs": 130.69999992847443
+        }
+      ],
+      "frames": 8,
+      "afterHealth": {
+        "rendererId": 2,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      },
+      "remainingHooks": 0,
+      "originalSession": {
+        "session": "03738c50-45fd-45e4-a639-7f9c335d8cd4",
+        "records": 643,
+        "unhandled": 0,
+        "faultRecords": 0,
+        "recordingGaps": 0
+      },
+      "telemetryRows": 12
+    }
+  ],
+  "footCameraViewMatches": true,
+  "footProjectionScope": "Backend NDC depth conventions differ; viewport/FOV/pose match.",
+  "decision": "Actual first-entry light prelude is small, Scene.render dominates both diagnostic observations. Deep routine attribution required before a product fix.",
+  "limits": [
+    "Single instrumented pair, not statistical gain, FPS acceptance, GPU execution or identical internal cause proof.",
+    "CM firstchain127.1 =glTF0.3+Stable4.4+Scene122.4; GL136.2 =0.4+5.1+130.7.",
+    "Native GL compilation hooks unavailable; do not infer zero GL compile from absent counters.",
+    "GL early entry-profile-early-stale-state.json is prior state before receipt ACK, not entry profile; final file is byteexact original vehicle-entry-cost receipt.",
+    "Minimized window retained visible/focused in actual Game snapshot; rejected as hidden/visible evidence.",
+    "Day/night facade images differ, car pose has slight drift; far backing/glass8mm depth competition is source-supported hypothesis, not measured driver/depthbits proof.",
+    "V12 imports exact Game class statically, changes chunk loading:21servedcodehashes match but diagnostic build not FPS acceptance.",
+    "No source12 product fix, final18series or main integration from this evidence."
+  ],
+  "cleanup": "Both own pages closed, viewport reset; CM API92735/preview88391 and GL57282/12274 stopped through original CtrlC; collectors57217/19013 finished0, GL STOP requested.",
+  "telemetryParserCorrection": "telemetry-parser-correction.json",
+  "fileHashes": "See final manifest.json; original empty-parser proof/seal retained separately.",
+  "thermalLimitation": "Entry +/-12s: CM GTX1060 P0 73–74C with graphics1556/1252MHz; GL P0 76–77C with1215/1316MHz. Different clocks/thermal histories further preclude causal backend speedup from this diagnostic pair."
+}

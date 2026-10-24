@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-shadow-compat-snapshot-20261023",
+  "title": "KEY-22: neměnný source12 pro source/draw-pass kompatibilitu stínů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/webgpu-completion-20261023-candidate-12/",
+    "docs/agents/handoffs/webgpu-completion-shadow-compat-snapshot-20261023.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Freeze pouze stabilní přijatý a peer-reviewed nativecompatibility follow-up včetně testů. Source11 74dbc7a7 a starší snapshoty/instally zůstanou neměnné.",
+    "Vlastní nový frozen install při novém patchhashi; source/hashdiff/singleton a chráněné native před/po. Build/GPU/server ověření patří root validation/revisions, nikoli tomuto claimu."
+  ],
+  "verification": [
+    "Manifest/source11→12 diff, IPR reuse11, testfixtures, nativepins a aktuální relevantní plné kontroly; GPU výsledky explicitně mimo CPU přijetí."
+  ],
+  "notes": [
+    "Pokračování výslovného KEY22 po rootově skutečném broadernative API nálezu, source12 ještě není vytvořen. Ready není neobjednaná práce."
+  ]
+}

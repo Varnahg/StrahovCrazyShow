@@ -3,8 +3,78 @@ import assert from "node:assert/strict";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import {
   watchWebGpuValidation,
+  watchWebGpuQueryReadErrors,
   type WebGpuValidationEngine,
 } from "../client/webgpu-validation";
+
+test("query error watcher leaves WebGL property and lifecycle untouched", () => {
+  const engine = fixture(false);
+  Object.defineProperty(engine, "onQueryReadErrorObservable", { get() { assert.fail("WebGL query property read"); } });
+  const cleanup = watchWebGpuQueryReadErrors(engine, () => assert.fail(), () => assert.fail());
+  cleanup(); cleanup();
+  assert.equal(engine.onDisposeObservable.hasObservers(), false);
+});
+
+test("query error producer is required for WebGPU including registration and malformed observer", () => {
+  for (const producer of [undefined, {}, { add() { throw 0; } }, { add() { return null; } }]) {
+    const engine = Object.assign(fixture(), { onQueryReadErrorObservable: producer });
+    const errors: Error[] = [];
+    const cleanup = watchWebGpuQueryReadErrors(engine, () => assert.fail(), e => errors.push(e));
+    assert.equal(errors.length, 1);
+    assert.match(errors[0].message, /unavailable/);
+    cleanup(); cleanup();
+  }
+});
+
+test("query error watcher forwards exact falsy error and source, detaches and rejects drift once", () => {
+  const observable = new Observable<{ error: unknown; source: "timestamp-pass" }>();
+  const engine = Object.assign(fixture(), { onQueryReadErrorObservable: observable });
+  const received: unknown[] = [], unavailable: Error[] = [];
+  const cleanup = watchWebGpuQueryReadErrors(engine, (error, source) => received.push([error, source]), e => unavailable.push(e));
+  observable.notifyObservers({ error: 0, source: "timestamp-pass" });
+  assert.deepEqual(received, [[0, "timestamp-pass"]]);
+  observable.notifyObservers({ error: false, source: "unknown" } as never);
+  observable.notifyObservers({ error: false, source: "unknown" } as never);
+  assert.equal(unavailable.length, 1);
+  cleanup(); cleanup();
+  observable.notifyObservers({ error: 1, source: "timestamp-pass" });
+  assert.equal(received.length, 1);
+  assert.equal(observable.hasObservers(), false);
+  assert.equal(engine.onDisposeObservable.hasObservers(), false);
+});
+
+test("query watcher attempts lifecycle cleanup after producer removal throws", () => {
+  const engine = Object.assign(fixture(), { onQueryReadErrorObservable: { add() { return { remove() { throw new Error("foreign cleanup"); } }; } } });
+  const cleanup = watchWebGpuQueryReadErrors(engine, () => {}, () => assert.fail());
+  cleanup(); cleanup();
+  assert.equal(engine.onDisposeObservable.hasObservers(), false);
+});
+
+test("malformed producer cannot deliver after failed registration and event getters are not invoked", () => {
+  let retained!: (event: unknown) => void;
+  const engine = Object.assign(fixture(), { onQueryReadErrorObservable: { add(callback: typeof retained) { retained = callback; return null; } } });
+  let unavailable = 0;
+  watchWebGpuQueryReadErrors(engine, () => assert.fail(), () => unavailable++);
+  retained({ error: 0, source: "timestamp-frame" });
+  assert.equal(unavailable, 1);
+  const observable = new Observable<{ error: unknown; source: "occlusion" }>();
+  const valid = Object.assign(fixture(), { onQueryReadErrorObservable: observable });
+  const cleanup = watchWebGpuQueryReadErrors(valid, () => assert.fail(), () => unavailable++);
+  observable.notifyObservers({ get error() { return assert.fail("error getter invoked"); }, source: "occlusion" });
+  assert.equal(unavailable, 2);
+  cleanup();
+});
+
+test("query watcher handles replayed disposal and retained callback after cleanup", () => {
+  const observable = new Observable<{ error: unknown; source: "occlusion" }>();
+  const engine = Object.assign(fixture(), { onQueryReadErrorObservable: observable });
+  engine.onDisposeObservable.notifyIfTriggered = true;
+  engine.onDisposeObservable.notifyObservers();
+  const cleanup = watchWebGpuQueryReadErrors(engine, () => assert.fail(), () => assert.fail());
+  cleanup();
+  assert.equal(observable.hasObservers(), false);
+  assert.equal(engine.onDisposeObservable.hasObservers(), false);
+});
 
 function fixture(webGPU = true) {
   return {

@@ -1,0 +1,7 @@
+# Source8 stable validation checkpoint
+
+Root `webgpu-completion-01a15a3e-final-snapshot` vytvořil source8 `921f57b9328a98e0eb3026b95708b3e72a192ce65d054123eff6783449427ee1`,8577files včetně testů/assetů. Celý manifest diff proti source7 má přesně dvě testovací fixtures: avatar-preview-webgpu a game-webgpu-startup. Runtime/patch/lock jsou byte exact. Ověřený nový readonly junction používá vlastní fresh source7 dependencies; všech38pinů a app/loaders singleton sedí. Původní newlycreated junction do rootolddeps byl odstraněný jen nonrecursively po kontrole přesného targetu; žádný target se neměnil.
+
+Windows302targeted/302PASS, fullTypeScript v production build0, build28.75s, následující isolated integration0 na2568. Exact runtime/test CIcb5f8cbf39673558237 má2067/2067/build/integrationPASS. Původní red i zrušená duplicitní Windows full suite source6 zůstávají zachované a nejsou prezentované jako PASS. Viz `validation/candidate8-checks/verification.json` a `candidate8-dependencies.json`.
+
+Praktický source7 GPUquery/loss/recovery důkaz platí pro stejný runtime; source8 bude základem kontrolovaného clock pilotu. Funkční zbytek, document-hidden, kontrolovaný výkon a main/default přijetí zůstávají otevřené. Rezervace pokračuje kvůli source8 produkčnímu serveru a dalšímu ověření. Porty/heavy/GPU vlastní samostatné rootclaims. Žádný cizí WIP ani aktuálně hraná produkční karta nebyly převzaté.

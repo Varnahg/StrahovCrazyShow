@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-entry-render-helper-20261023",
+  "title": "KEY-22: bounded observer skutečného vstupu do auta a render prelude",
+  "status": "blocked",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/webgpu-completion-20261021/entry-render/helper/v11/",
+    "docs/performance/evidence/webgpu-completion-20261021/entry-render-helper/",
+    "docs/agents/handoffs/webgpu-completion-entry-render-helper-20261023.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejdřív výzkum actual Game prelude, MP transition, Scene/Engine frame IDs, helper lifecycle a variant; původní v10 a source12 byteexact readonly.",
+    "Nová depth5 v11 copy, původní osmiframový capture byteexact. Samostatné QA tlačítko pod existujícím routine-cost default-off, bez product writes.",
+    "Jediný 30s deadline zahrne standby i osm skutečných frame řetězců. Trigger první pozorovaný false→true na vnějším gltfLightBudget.prepareFrame; studenost dokládá až fresh Game/session evidence.",
+    "Pouze tři instance wrappers prepareFrame, stableLights.update, scene.render; přesné singleton class/instance identity. Reflect.apply právě jednou zachová receiver/args/return/falsy throw. Žádné readiness/render/input/network/GPU extra calls, žádný product state write.",
+    "Raw per-frame timestamps, vehicle flags, engine/scene IDs, prelude/stable/render wall scopes, nested scopes zvlášť, phase/overflow/restore conflicts a hooks. Engine ID uvnitř render finally stejný, Scene +1. Žádný GPU duration/submission claim.",
+    "Preflight descriptorů před mutation, owner/generation/Game/Actor/Scene/engine/device/health guardy, finite bound, synchronous deadline, abort/rejoin/dispose/foreign replacement cleanup pouze vlastních hooks; partial/error pokusy pravdivě uložit.",
+    "Cílený refaktoring a smysluplné lehké CPU testy, bytehash input proof, raw logs, manifest a handoff. Žádný install/fullsuite/build/GPU/server/commit či recursive BMAD."
+  ],
+  "verification": [
+    "Node cílené tests normal capture/MP delay/phase ordering/nested/reentry/falsy return+throw/clock deadline/abort/foreign descriptor/rejoin/dispose/identity/partial restore/repeated arm limits/default-off a receipt reject malformed raw.",
+    "Root nezávislé peer review a fresh immutable source12 diagnostic build + skutečný první entry před jakoukoli produktovou opravou. Helper není FPS acceptance build."
+  ],
+  "notes": [
+    "Final independent review found P2 nested same-index recursion false-complete and P3 donor coverage wording; root-review.json preserves exact counterexample. V11 remains immutable CPU artifact, no GPU build. Narrow correction assigned new task webgpu-completion-entry-reentry-20261023 / helperv12. Do not treat87PASS as completed helper acceptance.",
+    "Výslovná root delegace navazující na read-only návrh /root/webgpu_performance_audit. Worktree .cache/player-feedback-20261020. Author unique owner webgpu-completion-01a15a3e-entry-helper-v11.",
+    "Výchozí v10 helper hash49662229acfc4211503c277d4d22c029024877e5717aa5b367f93792af693009, source12 053501f0cee4c2bf6c81ab39339fa82a84f91370cc86f7907781b0c0b2098e43 readonly. Najít přesnou v10 cache path podle validation build records, neměnit.",
+    "Source12 CM131.2ms/render114.6 a GL149.1/render113.7 první entry. Starý eight-frame routine bracket173052.6–173286.4 měl vehiclefalse před/po; miss zůstane zachovaný. glTF onBeforeRender volá refresh(false), nikoli prepareFrame. Příčina neprokázaná, žádný fix bez profilu.",
+    "Minimální changed files common.mjs/harness.mjs/qa-overlay.mjs/receipt.mjs/README.md a nové entry-render-cost.mjs/test.mjs. Ostatní soubory v11 copy původní, zejména původní routine moduly; případnou potřebu širšího scope předat před zápisem rootovi.",
+    "Žádné čtení/publikace secretů, LINEAR_API_KEY ani environment dump. Původní helpery/frozen/node_modules/root produktové zdroje a cizí WIP readonly."
+  ]
+}

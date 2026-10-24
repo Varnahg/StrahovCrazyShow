@@ -1,0 +1,45 @@
+TAP version 13
+# BJS - [19:48:29]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:48:29]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game/RenderStartup finite remote frame passes50ms fences with same-pose packet identities
+ok 1 - actual Game/RenderStartup finite remote frame passes50ms fences with same-pose packet identities
+  ---
+  duration_ms: 48.2345
+  type: 'test'
+  ...
+# {"status":"ready","failure":null,"simulatedVisibleMs":100,"draws":2,"submits":2,"acceptedPackets":2,"scope":"controlled CPU scheduling, not GPU/performance data"}
+# Subtest: actual Game/RenderStartup finite remote frame passes50ms fences with continuous20Hz target movement
+not ok 2 - actual Game/RenderStartup finite remote frame passes50ms fences with continuous20Hz target movement
+  ---
+  duration_ms: 270.7615
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-webgpu-startup.test.ts:9:23804'
+  failureType: 'testCodeFailure'
+  error: |-
+    RenderStartupTimeoutError: Renderer startup exceeded its visible-time deadline
+    + actual - expected
+    
+    + 'rejected'
+    - 'ready'
+         ^
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'ready'
+  actual: 'rejected'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-webgpu-startup.test.ts:790:10)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# {"status":"rejected","failure":"RenderStartupTimeoutError","simulatedVisibleMs":30000,"draws":600,"submits":600,"acceptedPackets":600,"scope":"controlled CPU scheduling, not GPU/performance data"}
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5657.9313

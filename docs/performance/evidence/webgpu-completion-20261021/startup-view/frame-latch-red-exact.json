@@ -1,0 +1,30 @@
+{
+  "sourceSha256": "16f053b172e56f45549b6603901eb69e91327755cb3676530dac3867a2cf4a52",
+  "testSha256": "fa578ce858fed3b2fe1b8115c5eafc04904e8abe03e090404192b862b71f5773",
+  "stable": true,
+  "exit": 1,
+  "tests": 2,
+  "failures": 1,
+  "controls": [
+    {
+      "status": "ready",
+      "failure": null,
+      "simulatedVisibleMs": 100,
+      "draws": 2,
+      "submits": 2,
+      "acceptedPackets": 2,
+      "scope": "controlled CPU scheduling, not GPU/performance data"
+    },
+    {
+      "status": "rejected",
+      "failure": "RenderStartupTimeoutError",
+      "simulatedVisibleMs": 30000,
+      "draws": 600,
+      "submits": 600,
+      "acceptedPackets": 600,
+      "scope": "controlled CPU scheduling, not GPU/performance data"
+    }
+  ],
+  "logSha256": "b6adac3e0f41457f34b7d8f17f9ac754a11d87e52ef3266c3435cbc679376f68",
+  "scope": "Actual Game/RenderStartup controlled CPU scheduling; no GPU/network/FPS measurement"
+}

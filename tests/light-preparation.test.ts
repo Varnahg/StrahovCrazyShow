@@ -10,7 +10,7 @@ function fixture(overrides: Partial<LightPreparationOptions> = {}) {
   let now = 0,
     disposed = false,
     settings = 0;
-  let loop: (() => void) | undefined,
+  let loop: (() => boolean) | undefined,
     timer: (() => void) | undefined,
     abort: (() => void) | undefined;
   let runs = 0,
@@ -78,7 +78,7 @@ function fixture(overrides: Partial<LightPreparationOptions> = {}) {
     start: () => prepareLightVariants(options),
     tick() {
       now++;
-      loop?.();
+      return loop?.();
     },
     finish() {
       for (let i = 0; loop && i < 90; i++) {
@@ -87,6 +87,7 @@ function fixture(overrides: Partial<LightPreparationOptions> = {}) {
       }
       assert.equal(loop, undefined);
     },
+    callback: () => loop,
     timeout() {
       now = 100;
       timer?.();
@@ -584,3 +585,203 @@ test("stage diagnostics retain real callback gaps, named restart causes and incl
   assert.equal(result.pausedMs, 0);
   assert.equal(result.activeElapsedMs, result.elapsedMs);
 });
+
+// Read the synchronous verdict before observing the already-resolved Promise.
+function finishWithVerdicts(f: ReturnType<typeof fixture>) {
+  const verdicts: boolean[] = [];
+  for (let index = 0; f.state().loop && index < 90; index++) {
+    const verdict = f.tick();
+    assert.ok(typeof verdict === "boolean");
+    verdicts.push(verdict);
+  }
+  assert.equal(f.state().loop, false);
+  return verdicts;
+}
+
+test("healthy progress, CPU-only batches and final completion approve only their current tick", async () => {
+  const f = fixture();
+  const pending = f.start();
+  const selected = f.callback()!;
+  assert.equal(f.tick(), true);
+  assert.equal(f.tick(), true);
+  assert.equal(f.state().renders, 1, "a CPU-only check batch does not add a draw");
+  const verdicts = finishWithVerdicts(f);
+  assert.ok(verdicts.length > 0);
+  assert.ok(verdicts.every((verdict) => verdict === true));
+  assert.equal((await pending).status, "complete");
+  const before = f.state();
+  assert.equal(selected(), false, "a callback selected before stop cannot submit later");
+  assert.deepEqual(f.state(), before);
+});
+
+for (const [point, failureStep] of [
+  ["apply", "apply"], ["meshes", "meshes"], ["beforeChecks", "check"],
+  ["check", "check"], ["effectsReady", "effects"], ["render", "render"],
+] as const) {
+  test(`synchronous ${point} failure vetoes the current tick before Promise observers`, async () => {
+    const f = fixture({ batchSize: 5 });
+    f.options[point] = () => { throw new Error(`failed ${point}`); };
+    const pending = f.start();
+    const selected = f.callback()!;
+    let verdict = f.tick();
+    if (f.state().loop) verdict = f.tick();
+    assert.equal(verdict, false);
+    assert.equal(selected(), false);
+    const result = await pending;
+    assert.equal(result.status, "failed");
+    assert.equal(result.failureStep, failureStep);
+    assert.equal(f.state().loop || f.state().timer || f.state().abort, false);
+  });
+}
+
+test("an exception after the actual draw vetoes submission and still restores state", async () => {
+  const f = fixture();
+  const render = f.options.render;
+  f.options.render = () => { render(); throw new Error("after draw"); };
+  const pending = f.start();
+  assert.equal(f.tick(), false);
+  assert.equal(f.state().renders, 1);
+  assert.equal(f.state().restores, 1);
+  const result = await pending;
+  assert.equal(result.status, "failed");
+  assert.equal(result.failureStep, "render");
+});
+
+test("a post-draw effects or revision error cannot retain the earlier healthy verdict", async () => {
+  for (const point of ["effectsReady", "revision"] as const) {
+    const f = fixture({ batchSize: 5 });
+    const failOnCall = <T>(read: () => T, failureAt: number) => {
+      let calls = 0;
+      return () => {
+        if (++calls === failureAt) throw new Error(`post-draw ${point}`);
+        return read();
+      };
+    };
+    // Initial revision is sampled after apply and before the progress draw.
+    // The third sample is after the next actual acceptance draw.
+    if (point === "revision") f.options.revision = failOnCall(f.options.revision, 3);
+    else f.options.effectsReady = failOnCall(f.options.effectsReady, 2);
+    const pending = f.start();
+    assert.equal(f.tick(), true);
+    assert.equal(f.tick(), false);
+    assert.equal(f.state().renders, 2);
+    const result = await pending;
+    assert.equal(result.status, "failed");
+    assert.equal(result.failureStep, point === "revision" ? "render" : "effects");
+  }
+});
+
+for (const point of ["stop", "clearTimer", "detachDispose", "detachVisibility", "restore"] as const) {
+  test(`final ${point} failure vetoes the tick after all cleanup was attempted`, async () => {
+    const f = fixture({ batchSize: 5 });
+    const fail = () => { throw new Error(`cleanup ${point}`); };
+    if (point === "stop") {
+      const stop = f.options.stop;
+      f.options.stop = (callback) => { stop(callback); fail(); };
+    } else if (point === "clearTimer") {
+      const clear = f.options.clearTimer;
+      f.options.clearTimer = (timer) => { clear(timer); fail(); };
+    } else if (point === "detachDispose") {
+      const observe = f.options.onDispose;
+      f.options.onDispose = (callback) => {
+        const detach = observe(callback);
+        return () => { detach(); fail(); };
+      };
+    } else if (point === "detachVisibility") {
+      f.options.onVisibilityChange = () => fail;
+    } else {
+      const restore = f.options.restore;
+      f.options.restore = () => { restore(); fail(); };
+    }
+    const pending = f.start();
+    const verdicts = finishWithVerdicts(f);
+    assert.equal(verdicts.at(-1), false);
+    assert.ok(verdicts.slice(0, -1).every((verdict) => verdict));
+    const result = await pending;
+    assert.equal(result.status, "failed");
+    assert.equal(result.failureStep, point === "restore" ? "restore" : "cleanup");
+    assert.equal(f.state().restores, 1);
+    assert.equal(f.state().loop || f.state().timer || f.state().abort, false);
+  });
+}
+
+for (const point of ["stop", "restore"] as const) {
+  test(`the final deadline includes synchronous ${point} before granting submission`, async () => {
+    const f = fixture({ batchSize: 5 });
+    if (point === "stop") {
+      const stop = f.options.stop;
+      f.options.stop = (callback) => { stop(callback); f.jump(150); };
+    } else {
+      const restore = f.options.restore;
+      f.options.restore = () => { restore(); f.jump(150); };
+    }
+    const pending = f.start();
+    const verdicts = finishWithVerdicts(f);
+    assert.equal(verdicts.at(-1), false);
+    const result = await pending;
+    assert.equal(result.status, "timeout");
+    assert.ok(result.activeElapsedMs >= 150);
+    assert.equal(result.failureStep, null);
+  });
+}
+
+test("timeout or disposal during the current tick vetoes it and all stale callbacks", async () => {
+  for (const point of ["deadline", "apply", "render"] as const) {
+    const f = fixture();
+    if (point === "apply") f.options.apply = () => f.dispose();
+    if (point === "render") {
+      const render = f.options.render;
+      f.options.render = () => { render(); f.dispose(); };
+    }
+    const pending = f.start();
+    const selected = f.callback()!;
+    if (point === "deadline") f.jump(100);
+    assert.equal(f.tick(), false);
+    assert.equal(selected(), false);
+    assert.equal((await pending).status, point === "deadline" ? "timeout" : "disposed");
+  }
+});
+
+test("disposal during final cleanup vetoes submission without changing the legacy Promise outcome", async () => {
+  const f = fixture({ batchSize: 5 });
+  const stop = f.options.stop;
+  f.options.stop = (callback) => { stop(callback); f.dispose(); };
+  const pending = f.start();
+  const verdicts = finishWithVerdicts(f);
+  assert.equal(verdicts.at(-1), false);
+  assert.equal((await pending).status, "complete");
+  assert.equal(f.state().restores, 0, "disposed scene never receives restore mutations");
+});
+
+for (const point of ["effects", "revision", "collect"] as const) {
+  test(`a late ${point} overrun settles timeout and restores before returning the veto`, async () => {
+    const f = fixture({ batchSize: 5 });
+    let calls = 0;
+    if (point === "effects") {
+      const effects = f.options.effectsReady;
+      f.options.effectsReady = () => {
+        if (++calls === 2) f.jump(150);
+        return effects();
+      };
+    } else if (point === "revision") {
+      const revision = f.options.revision;
+      f.options.revision = () => {
+        if (++calls === 3) f.jump(150);
+        return revision();
+      };
+    } else {
+      const meshes = f.options.meshes;
+      f.options.meshes = () => { f.jump(150); return meshes(); };
+    }
+    const pending = f.start();
+    if (point !== "collect") assert.equal(f.tick(), true);
+    assert.equal(f.tick(), false);
+    assert.equal(f.state().restores, 1, "restore already ran synchronously");
+    assert.equal(f.state().loop || f.state().timer || f.state().abort, false);
+    const result = await pending;
+    assert.equal(result.status, "timeout");
+    assert.equal(result.failureStep, null);
+    assert.ok(result.activeElapsedMs >= 150);
+    assert.equal(result.stages[0].renders, point === "collect" ? 1 : 2);
+  });
+}

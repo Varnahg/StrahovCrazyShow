@@ -1,0 +1,194 @@
+TAP version 13
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:33]: Babylon.js v9.30.0 - Null engine
+# Subtest: selection uses real source/material metadata and leaves resources and unrelated flags intact
+ok 1 - selection uses real source/material metadata and leaves resources and unrelated flags intact
+  ---
+  duration_ms: 35.6167
+  type: 'test'
+  ...
+# Subtest: camera-masked and degenerate candidates cannot hide a drawable representative
+ok 2 - camera-masked and degenerate candidates cannot hide a drawable representative
+  ---
+  duration_ms: 4.8617
+  type: 'test'
+  ...
+# Subtest: disabled, invisible and parent-disabled objects are never activated
+ok 3 - disabled, invisible and parent-disabled objects are never activated
+  ---
+  duration_ms: 3.8586
+  type: 'test'
+  ...
+# Subtest: deduplication keeps material identities, vertex attributes and shadow inputs distinct
+ok 4 - deduplication keeps material identities, vertex attributes and shadow inputs distinct
+  ---
+  duration_ms: 5.039
+  type: 'test'
+  ...
+# Subtest: same material/layout with distinct actual light membership is not collapsed
+ok 5 - same material/layout with distinct actual light membership is not collapsed
+  ---
+  duration_ms: 3.5376
+  type: 'test'
+  ...
+# Subtest: real regular/thin instances and instanced vertex attributes are explicitly unsupported
+ok 6 - real regular/thin instances and instanced vertex attributes are explicitly unsupported
+  ---
+  duration_ms: 3.634
+  type: 'test'
+  ...
+# Subtest: skinned, morph and baked-animation meshes remain explicitly outside the scope
+ok 7 - skinned, morph and baked-animation meshes remain explicitly outside the scope
+  ---
+  duration_ms: 2.6667
+  type: 'test'
+  ...
+# Subtest: the active camera render-pass material controls eligibility
+ok 8 - the active camera render-pass material controls eligibility
+  ---
+  duration_ms: 2.5862
+  type: 'test'
+  ...
+# Subtest: missing geometry and MultiMaterial are not advertised as covered
+ok 9 - missing geometry and MultiMaterial are not advertised as covered
+  ---
+  duration_ms: 2.9443
+  type: 'test'
+  ...
+# Subtest: prior true flags and external false writes survive release and repeated disposal
+ok 10 - prior true flags and external false writes survive release and repeated disposal
+  ---
+  duration_ms: 3.6277
+  type: 'test'
+  ...
+# Subtest: a stale release cannot disable a newer activation of the same helper
+ok 11 - a stale release cannot disable a newer activation of the same helper
+  ---
+  duration_ms: 1.6101
+  type: 'test'
+  ...
+# Subtest: LOD and same-count replacement are selected anew without touching disposed predecessors
+ok 12 - LOD and same-count replacement are selected anew without touching disposed predecessors
+  ---
+  duration_ms: 1.9574
+  type: 'test'
+  ...
+# Subtest: partial selection failure rolls back earlier flags and preserves the original exception
+ok 13 - partial selection failure rolls back earlier flags and preserves the original exception
+  ---
+  duration_ms: 2.4932
+  type: 'test'
+  ...
+# Subtest: cleanup continues after one flag setter fails and retains its exact exception
+ok 14 - cleanup continues after one flag setter fails and retains its exact exception
+  ---
+  duration_ms: 2.9389
+  type: 'test'
+  ...
+# Subtest: scene disposal during a lease is safe and releases the helper lifecycle
+ok 15 - scene disposal during a lease is safe and releases the helper lifecycle
+  ---
+  duration_ms: 1.5878
+  type: 'test'
+  ...
+# BJS - [19:02:34]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:02:35]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game medium complete preparation retains leaf car shadow programs through restore and first visibility
+not ok 16 - actual Game medium complete preparation retains leaf car shadow programs through restore and first visibility
+  ---
+  duration_ms: 888.7779
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:8058'
+  failureType: 'testCodeFailure'
+  error: |-
+    first main visibility/beam activation must not create additional native Effects
+    
+    53 !== 51
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 51
+  actual: 53
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:174:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# {"scope":"native Effect/cache identities with terminal GLSL IO, not GPU program timing","before":51,"after":53,"delta":2,"preMain":7,"preBase":[7,1],"postMain":7,"vehicleDraws":54,"afterFrames":[{"stage":"restore","quality":"medium","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"medium","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"medium","actualDrawn":true,"actualForced":false,"farForced":false}]}
+# BJS - [19:02:35]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual Game high complete preparation retains leaf car shadow programs through restore and first visibility
+not ok 17 - actual Game high complete preparation retains leaf car shadow programs through restore and first visibility
+  ---
+  duration_ms: 375.8896
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:8058'
+  failureType: 'testCodeFailure'
+  error: |-
+    first main visibility/beam activation must not create additional native Effects
+    
+    42 !== 40
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 40
+  actual: 42
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:174:12)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# {"scope":"native Effect/cache identities with terminal GLSL IO, not GPU program timing","before":40,"after":42,"delta":2,"preMain":60,"preBase":[60,9],"postMain":60,"vehicleDraws":36,"afterFrames":[{"stage":"restore","quality":"high","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"high","actualDrawn":true,"actualForced":false,"farForced":false},{"stage":"restore","quality":"high","actualDrawn":true,"actualForced":false,"farForced":false}]}
+# Subtest: async leaf arrival in the last vehicle stage is reacquired by the original Game revision/apply path
+not ok 18 - async leaf arrival in the last vehicle stage is reacquired by the original Game revision/apply path
+  ---
+  duration_ms: 232.5839
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\game-leaf-shadow-preparation.test.ts:3:9947'
+  failureType: 'testCodeFailure'
+  error: |-
+    fully configured asynchronous leaf must also be prepared before first visibility
+    
+    31 !== 27
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 27
+  actual: 31
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\game-leaf-shadow-preparation.test.ts:191:10)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# BJS - [19:02:34]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual cached per-pass PBR and native last-notified base create the observed two shadow epochs
+ok 19 - actual cached per-pass PBR and native last-notified base create the observed two shadow epochs
+  ---
+  duration_ms: 280.6227
+  type: 'test'
+  ...
+# {"scope":"CPU native state/Effect lifetime; terminal GLSL IO, no GPU pixels","shadowPass":2,"mainPass":1,"firstBase":0,"mainBase":2,"firstDepth":1,"secondDepth":3,"masks":8}
+1..19
+# tests 19
+# suites 0
+# pass 16
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5242.0728

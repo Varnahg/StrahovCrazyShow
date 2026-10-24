@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-startup-verdict-20261021",
+  "title": "KEY-31: synchronní light tick submit verdict po celém cleanup",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/light-preparation.ts", "tests/light-preparation.test.ts", "docs/agents/handoffs/webgpu-completion-startup-verdict-20261021.md"],
+  "resources": [],
+  "acceptance": [
+    "run/stop callback nově vrací boolean: zdravý průběžný nebo dokončený tick true; failed, timeout, disposed nebo již dokončený starý callback false.",
+    "Verdict musí vzniknout po původní práci, finish, restore a cleanup včetně timeout přesaženého během nich. Původní výsledek Promise, stage/check/draw/restart/revision a30s deadline se nezmění.",
+    "Nezavádět scheduler, render/navíc ani novou readiness/cache. Cíleně refaktorovat sdílenou finalizaci a ověřit všechny synchronní failure body, včetně chyby po skutečném draw."
+  ],
+  "verification": ["pnpm --config.verify-deps-before-run=false exec tsx --test tests/light-preparation.test.ts", "Žádný build/server/GPU/fullsuite; root vlastní integrační přejímku."],
+  "notes": ["Spec KEY22 a research/startup-scheduling-decision.md. Původní voidtick polykal chybu do Promise; nový manuální frame potřebuje synchronní souhlas před endFrame. Žádné převzetí Game/helper WIP."]
+}

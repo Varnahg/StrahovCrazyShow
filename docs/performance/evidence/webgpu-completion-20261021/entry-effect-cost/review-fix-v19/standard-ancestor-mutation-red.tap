@@ -1,0 +1,69 @@
+TAP version 13
+# (node:37344) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+# --import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("file%3A///C%3A/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/entry-effect-cost/review-fix-v19/mutation-loader.mjs", pathToFileURL("./")); register("file%3A///C%3A/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/entry-effect-cost/review-fix-v19/mutation-loader.mjs", pathToFileURL("./"));'
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# BJS - [09:52:33]: Babylon.js v9.30.0 - Null engine
+# Subtest: Standard direct readiness-to-engine hierarchy counts createEffect and subtracts its selected time
+not ok 1 - Standard direct readiness-to-engine hierarchy counts createEffect and subtracts its selected time
+  ---
+  duration_ms: 5.5764
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-effect-cost\\helper\\v19\\entry-effect-cost.test.mjs:78:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+        1,
+        6,
+    +   6
+    -   3
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 1
+    1: 6
+    2: 3
+  actual:
+    0: 1
+    1: 6
+    2: 6
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-effect-cost.test.mjs:83:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.start (node:internal/test_runner/test:1242:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+  ...
+# Subtest: native StandardMaterial readiness captures its actual inherited ThinEngine createEffect call without a PBR ancestor
+not ok 2 - native StandardMaterial readiness captures its actual inherited ThinEngine createEffect call without a PBR ancestor
+  ---
+  duration_ms: 1697.2685
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\entry-effect-cost\\helper\\v19\\entry-effect-cost.test.mjs:124:1'
+  failureType: 'testCodeFailure'
+  error: 'actual native Standard readiness reached the original engine API'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-effect-cost.test.mjs:132:10)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 14090.2457

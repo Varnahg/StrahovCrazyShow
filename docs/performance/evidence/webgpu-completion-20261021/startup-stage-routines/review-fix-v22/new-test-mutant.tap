@@ -1,0 +1,37 @@
+TAP version 13
+# Receiver-filter mutant applied to file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/.cache/webgpu-completion-20261021/startup-stage-routines/helper/v22/startup-stage-effects.mjs
+# BJS - [12:10:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [12:10:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [12:10:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [12:10:47]: Babylon.js v9.30.0 - Null engine
+# Subtest: foreign scenes pass through selected prototype hooks and abort/rejoin retire late options
+not ok 1 - foreign scenes pass through selected prototype hooks and abort/rejoin retire late options
+  ---
+  duration_ms: 343.0344
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v22\\startup-stage-effects.test.mjs:215:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    foreign receivers add no profile clock reads
+    
+    22 !== 12
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 12
+  actual: 22
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\.cache\webgpu-completion-20261021\startup-stage-routines\helper\v22\startup-stage-effects.test.mjs:240:10)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3944.0386

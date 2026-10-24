@@ -1,0 +1,131 @@
+TAP version 13
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# BJS - [19:55:21]: Babylon.js v9.30.0 - Null engine
+# Subtest: full native cold Mesh.render records current and previous handles; growth rerecords instead of replaying destroyed buffers
+ok 1 - full native cold Mesh.render records current and previous handles; growth rerecords instead of replaying destroyed buffers
+  ---
+  duration_ms: 50.7974
+  type: 'test'
+  ...
+# Subtest: stable native draws retain bundle and do not alter context, bindings, indirect or UBO-slot lifecycle
+ok 2 - stable native draws retain bundle and do not alter context, bindings, indirect or UBO-slot lifecycle
+  ---
+  duration_ms: 8.7545
+  type: 'test'
+  ...
+# Subtest: later actual DrawContext and temporary SubMesh shadow override invalidate lazily after another context grows storage
+ok 3 - later actual DrawContext and temporary SubMesh shadow override invalidate lazily after another context grows storage
+  ---
+  duration_ms: 5.4835
+  type: 'test'
+  ...
+# Subtest: separate native render passes keep separate storage, invalidate their own changed matrix identities and keep stable reuse
+ok 4 - separate native render passes keep separate storage, invalidate their own changed matrix identities and keep stable reuse
+  ---
+  duration_ms: 5.0936
+  type: 'test'
+  ...
+# Subtest: first previous matrices at unchanged capacity replace current and previous identities without disturbing ready Effect
+not ok 5 - first previous matrices at unchanged capacity replace current and previous identities without disturbing ready Effect
+  ---
+  duration_ms: 4.9113
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:32:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'effectiveBuffer')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    WebGPUCacheRenderPipelineTree._setVertexState (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Engines\WebGPU\webgpuCacheRenderPipeline.ts:910:41)
+    WebGPUCacheRenderPipelineTree._lookupRenderPipeline (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Engines\WebGPU\webgpuCacheRenderPipeline.ts:213:14)
+    WebGPUCacheRenderPipelineTree.getRenderPipeline (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Engines\WebGPU\webgpuCacheRenderPipeline.ts:254:29)
+    NullEngine._draw (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Engines\webgpuEngine.pure.ts:3918:52)
+    NullEngine.drawElementsType (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Engines\webgpuEngine.pure.ts:3993:14)
+    Mesh._draw (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2147:20)
+    Mesh._updateInstancedBuffers (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2419:12)
+    Mesh._renderWithInstances (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2459:14)
+    Mesh._processRendering (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2525:17)
+    Mesh.render (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\node_modules\.pnpm\@babylonjs+core@9.30.0_patc_ec0223dc912d7ca51d5b4cb0e2b21f6d\dev\core\src\Meshes\mesh.pure.ts:2903:19)
+  ...
+# Subtest: no-effect native preparation grows resources without touching an unrelated draw cache; next actual draw still validates identity
+ok 6 - no-effect native preparation grows resources without touching an unrelated draw cache; next actual draw still validates identity
+  ---
+  duration_ms: 5.3758
+  type: 'test'
+  ...
+# Subtest: unknown current or previous DataBuffer IDs never authorize a cached replay, including repeated null identities
+ok 7 - unknown current or previous DataBuffer IDs never authorize a cached replay, including repeated null identities
+  ---
+  duration_ms: 10.2592
+  type: 'test'
+  ...
+# Subtest: disposed current buffer in a frozen native branch cannot replay a cached old raw handle
+ok 8 - disposed current buffer in a frozen native branch cannot replay a cached old raw handle
+  ---
+  duration_ms: 10.2175
+  type: 'test'
+  ...
+# Subtest: actual native terminal draw and allocation exceptions keep exact original falsy values and resource refcounts
+ok 9 - actual native terminal draw and allocation exceptions keep exact original falsy values and resource refcounts
+  ---
+  duration_ms: 6.0926
+  type: 'test'
+  ...
+# Subtest: WebGPU compatibility mode is unchanged and never installs regular-instance bundle bookkeeping
+ok 10 - WebGPU compatibility mode is unchanged and never installs regular-instance bundle bookkeeping
+  ---
+  duration_ms: 3.2037
+  type: 'test'
+  ...
+# Subtest: actual NullEngine WebGL native mesh path stays without WebGPU context bookkeeping
+not ok 11 - actual NullEngine WebGL native mesh path stays without WebGPU context bookkeeping
+  ---
+  duration_ms: 5.1142
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\fixtures\\webgpu-instance-buffers\\instance-buffers.test.mjs:59:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 4096
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 4096
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/rezac/Documents/GitHub/StrahovCrazyShow/.cache/player-feedback-20261020/tests/fixtures/webgpu-instance-buffers/instance-buffers.test.mjs:60:161)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: vertex-pulling native path is explicitly unchanged; this pin fix does not claim its storage-refresh defect
+ok 12 - vertex-pulling native path is explicitly unchanged; this pin fix does not claim its storage-refresh defect
+  ---
+  duration_ms: 5.1971
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 10
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1699.8533

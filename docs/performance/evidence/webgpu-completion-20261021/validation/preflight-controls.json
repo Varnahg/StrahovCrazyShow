@@ -1,0 +1,2325 @@
+{
+  "schemaVersion": 1,
+  "sourceSnapshotId": "bc38843693a9ccf591e500657d9e506d7d64e4a1788ccb4a6f9571eefa78a8bd",
+  "purpose": "Kontrolní diagnostika; oba běhy mají1Hz/timeout, nikoli FPS přejímku",
+  "cases": [
+    {
+      "label": "webgl2-original-diagnostic",
+      "rawSha256": "18751b349aa34ad123015c6a67fb585bd2999d2d4853a81e6f53a77f7f7ef3b1",
+      "rawBytes": 80111,
+      "sequence": {
+        "first": 0,
+        "last": 166,
+        "gaps": []
+      },
+      "events": [
+        {
+          "seq": 2,
+          "atMs": 628.9,
+          "kind": "browser-state",
+          "data": {
+            "reason": "start",
+            "visibility": "visible",
+            "focused": true
+          }
+        },
+        {
+          "seq": 3,
+          "atMs": 632.7,
+          "kind": "browser-state",
+          "data": {
+            "reason": "pageshow",
+            "visibility": "visible",
+            "focused": true
+          }
+        },
+        {
+          "seq": 22,
+          "atMs": 34824.3,
+          "kind": "renderer-ready",
+          "data": {
+            "durationMs": 33.700000047683716,
+            "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1060 (0x00001C20) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+            "vendor": "Google Inc. (NVIDIA)",
+            "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+            "backend": "webgl2"
+          }
+        },
+        {
+          "seq": 31,
+          "atMs": 40241.8,
+          "kind": "presentation-rate",
+          "data": {
+            "observedBrowserHz": 59.9,
+            "reliable": true,
+            "samples": 72,
+            "p10FrameMs": 16.5,
+            "medianFrameMs": 16.69999999999709,
+            "p95FrameMs": 16.900000000001455,
+            "reason": "ok",
+            "rendererId": 2,
+            "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+          }
+        },
+        {
+          "seq": 72,
+          "atMs": 47572.1,
+          "kind": "engine-frame-profile",
+          "data": {
+            "stage": "preparation-start",
+            "rendererId": 2,
+            "timing": {
+              "active": false,
+              "generation": 1,
+              "scope": {
+                "cpu": "Inclusive synchronous CPU wall calls, including nested work; never sum parent and child phases. Not GPU execution time.",
+                "async": "Async completion is unobserved. Return values are never inspected for then or given settlement handlers; original Promise rejection handling stays with the caller. Returned/thrown count only synchronous call outcomes.",
+                "cadence": "Concurrent raw host RAF, engine _processFrame and render-loop callback intervals are distinct; none is a gameplay FPS benchmark.",
+                "recent": "Cadence quantiles describe only the latest 128 valid intervals; count/total/max cover this engine generation or raw-probe epoch. Compare deltas only within matching owners/epochs."
+              },
+              "phases": {
+                "processFrame": null,
+                "beginFrame": null,
+                "renderFrame": null,
+                "endFrame": null,
+                "queueFrame": null,
+                "flush": null,
+                "endCurrentPass": null,
+                "timestampStart": null,
+                "timestampEnd": null,
+                "timestampPassEnd": null,
+                "destroyTextures": null,
+                "destroyBuffers": null,
+                "createEncoder": null,
+                "encoderFinish": null,
+                "beginRenderPass": null,
+                "passEnd": null,
+                "currentTexture": null,
+                "writeBuffer": null,
+                "writeTexture": null,
+                "copyExternalImage": null
+              },
+              "hooks": {
+                "encoder.finish": {
+                  "availability": "not-created",
+                  "observedObjects": 0,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "encoder.beginRenderPass": {
+                  "availability": "not-created",
+                  "observedObjects": 0,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "pass.end": {
+                  "availability": "not-created",
+                  "observedObjects": 0,
+                  "missedObjects": 0,
+                  "reason": null
+                }
+              },
+              "runtime": {
+                "frameId": 10,
+                "maxFPS": null,
+                "maxFPSDefined": false,
+                "activeRenderLoops": 0,
+                "customRequester": false,
+                "contextLost": false,
+                "skipFrameRender": false,
+                "windowIsBackground": false,
+                "renderEvenInBackground": true,
+                "hostWindowAvailable": true,
+                "hostWindowIsGlobal": true,
+                "rawProbeUsesCurrentHost": false,
+                "enableGPUTimingMeasurements": null,
+                "timerQueryCapability": true,
+                "timestampQueryFeature": null
+              },
+              "observerErrors": 0,
+              "invalidClocks": 0,
+              "resources": {
+                "tracked": 0,
+                "peak": 0,
+                "limit": 512,
+                "missed": 0
+              },
+              "rawRaf": {
+                "availability": "stopped",
+                "epoch": 0,
+                "source": "engine-host",
+                "deliveryClock": "origin-unverified",
+                "callbacks": 0,
+                "intervals": null,
+                "deliveryDelay": null
+              },
+              "engineCadence": {
+                "processIntervals": null,
+                "renderCallbackIntervals": null,
+                "timestampIntervals": null,
+                "queueToProcess": null,
+                "skippedByMaxFPS": 0
+              }
+            }
+          }
+        },
+        {
+          "seq": 124,
+          "atMs": 77598,
+          "kind": "lighting-preparation",
+          "data": {
+            "status": "timeout",
+            "elapsedMs": 30014.19999998808,
+            "activeElapsedMs": 30014.19999998808,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stages": [
+              {
+                "stage": "current-off",
+                "elapsedMs": 29995.5,
+                "activeElapsedMs": 29995.5,
+                "pausedMs": 0,
+                "tickCount": 30,
+                "rafGap": {
+                  "count": 30,
+                  "totalMs": 29975.30000001192,
+                  "maxMs": 1666
+                },
+                "cpu": {
+                  "apply": {
+                    "calls": 8,
+                    "totalMs": 317.10000002384186,
+                    "maxMs": 298.69999998807907
+                  },
+                  "checkBatch": {
+                    "calls": 22,
+                    "totalMs": 145.90000021457672,
+                    "maxMs": 20.30000001192093
+                  },
+                  "render": {
+                    "calls": 11,
+                    "totalMs": 1174.0999999642372,
+                    "maxMs": 629.1000000238419
+                  }
+                },
+                "restartReasons": {
+                  "meshes": 6,
+                  "weather": 1
+                },
+                "checks": 1184,
+                "renders": 11,
+                "restarts": 7
+              },
+              {
+                "stage": "current-on",
+                "elapsedMs": 3.5,
+                "activeElapsedMs": 3.5,
+                "pausedMs": 0,
+                "tickCount": 0,
+                "rafGap": {
+                  "count": 0,
+                  "totalMs": 0,
+                  "maxMs": 0
+                },
+                "cpu": {
+                  "apply": {
+                    "calls": 0,
+                    "totalMs": 0,
+                    "maxMs": 0
+                  },
+                  "checkBatch": {
+                    "calls": 0,
+                    "totalMs": 0,
+                    "maxMs": 0
+                  },
+                  "render": {
+                    "calls": 0,
+                    "totalMs": 0,
+                    "maxMs": 0
+                  }
+                },
+                "restartReasons": {},
+                "checks": 0,
+                "renders": 0,
+                "restarts": 0
+              }
+            ]
+          }
+        },
+        {
+          "seq": 125,
+          "atMs": 77598.4,
+          "kind": "webgpu-preparation-profile",
+          "data": {
+            "active": true,
+            "backend": "other",
+            "generation": 1,
+            "attachedAfterDeviceCreation": false,
+            "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+            "metrics": {
+              "glslToSpirv": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "spirvToWgsl": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "compilerLoad": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "shaderPreparation": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "shaderModule": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "shaderValidation": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "syncPipeline": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "asyncPipeline": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "submit": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              }
+            },
+            "hooks": {
+              "engine._initializeLimits": "unavailable",
+              "engine._compileRawShaderToSpirV": "unavailable",
+              "engine.prepareGlslangAndTintAsync": "unavailable",
+              "engine._preparePipelineContextAsync": "unavailable",
+              "engine._createPipelineStageDescriptor": "unavailable",
+              "tint.convertSpirV2WGSL": "unavailable",
+              "device.createShaderModule": "unavailable",
+              "device.createRenderPipeline": "unavailable",
+              "device.createRenderPipelineAsync": "unavailable",
+              "queue.submit": "unavailable",
+              "module.getCompilationInfo": "unavailable"
+            },
+            "observerErrors": 0,
+            "shaderInventory": null,
+            "bundleCountersLastFrame": null,
+            "sharedCacheCounters": {
+              "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+              "values": null
+            }
+          }
+        },
+        {
+          "seq": 126,
+          "atMs": 77598.7,
+          "kind": "engine-frame-profile",
+          "data": {
+            "stage": "preparation-end",
+            "rendererId": 2,
+            "timing": {
+              "active": false,
+              "generation": 1,
+              "scope": {
+                "cpu": "Inclusive synchronous CPU wall calls, including nested work; never sum parent and child phases. Not GPU execution time.",
+                "async": "Async completion is unobserved. Return values are never inspected for then or given settlement handlers; original Promise rejection handling stays with the caller. Returned/thrown count only synchronous call outcomes.",
+                "cadence": "Concurrent raw host RAF, engine _processFrame and render-loop callback intervals are distinct; none is a gameplay FPS benchmark.",
+                "recent": "Cadence quantiles describe only the latest 128 valid intervals; count/total/max cover this engine generation or raw-probe epoch. Compare deltas only within matching owners/epochs."
+              },
+              "phases": {
+                "processFrame": null,
+                "beginFrame": null,
+                "renderFrame": null,
+                "endFrame": null,
+                "queueFrame": null,
+                "flush": null,
+                "endCurrentPass": null,
+                "timestampStart": null,
+                "timestampEnd": null,
+                "timestampPassEnd": null,
+                "destroyTextures": null,
+                "destroyBuffers": null,
+                "createEncoder": null,
+                "encoderFinish": null,
+                "beginRenderPass": null,
+                "passEnd": null,
+                "currentTexture": null,
+                "writeBuffer": null,
+                "writeTexture": null,
+                "copyExternalImage": null
+              },
+              "hooks": {
+                "encoder.finish": {
+                  "availability": "not-created",
+                  "observedObjects": 0,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "encoder.beginRenderPass": {
+                  "availability": "not-created",
+                  "observedObjects": 0,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "pass.end": {
+                  "availability": "not-created",
+                  "observedObjects": 0,
+                  "missedObjects": 0,
+                  "reason": null
+                }
+              },
+              "runtime": {
+                "frameId": 40,
+                "maxFPS": null,
+                "maxFPSDefined": false,
+                "activeRenderLoops": 0,
+                "customRequester": false,
+                "contextLost": false,
+                "skipFrameRender": false,
+                "windowIsBackground": false,
+                "renderEvenInBackground": true,
+                "hostWindowAvailable": true,
+                "hostWindowIsGlobal": true,
+                "rawProbeUsesCurrentHost": false,
+                "enableGPUTimingMeasurements": null,
+                "timerQueryCapability": true,
+                "timestampQueryFeature": null
+              },
+              "observerErrors": 0,
+              "invalidClocks": 0,
+              "resources": {
+                "tracked": 0,
+                "peak": 0,
+                "limit": 512,
+                "missed": 0
+              },
+              "rawRaf": {
+                "availability": "stopped",
+                "epoch": 0,
+                "source": "engine-host",
+                "deliveryClock": "origin-unverified",
+                "callbacks": 0,
+                "intervals": null,
+                "deliveryDelay": null
+              },
+              "engineCadence": {
+                "processIntervals": null,
+                "renderCallbackIntervals": null,
+                "timestampIntervals": null,
+                "queueToProcess": null,
+                "skippedByMaxFPS": 0
+              }
+            }
+          }
+        },
+        {
+          "seq": 127,
+          "atMs": 77599.1,
+          "kind": "render-fault",
+          "data": {
+            "channel": "pipeline",
+            "message": "Příprava světel: timeout",
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game",
+            "count": 1
+          }
+        },
+        {
+          "seq": 128,
+          "atMs": 77600.6,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at ld.start (http://127.0.0.1:4211/assets/game-U2uLk4M3.js:584:25188)\n    at async http://127.0.0.1:4211/assets/index-UZMAnCvc.js:16:4492714"
+          }
+        },
+        {
+          "seq": 130,
+          "atMs": 77992,
+          "kind": "engine-frame-profile",
+          "data": {
+            "stage": "engine-disposed",
+            "rendererId": 2,
+            "timing": {
+              "active": false,
+              "generation": 1,
+              "scope": {
+                "cpu": "Inclusive synchronous CPU wall calls, including nested work; never sum parent and child phases. Not GPU execution time.",
+                "async": "Async completion is unobserved. Return values are never inspected for then or given settlement handlers; original Promise rejection handling stays with the caller. Returned/thrown count only synchronous call outcomes.",
+                "cadence": "Concurrent raw host RAF, engine _processFrame and render-loop callback intervals are distinct; none is a gameplay FPS benchmark.",
+                "recent": "Cadence quantiles describe only the latest 128 valid intervals; count/total/max cover this engine generation or raw-probe epoch. Compare deltas only within matching owners/epochs."
+              },
+              "phases": {
+                "processFrame": null,
+                "beginFrame": null,
+                "renderFrame": null,
+                "endFrame": null,
+                "queueFrame": null,
+                "flush": null,
+                "endCurrentPass": null,
+                "timestampStart": null,
+                "timestampEnd": null,
+                "timestampPassEnd": null,
+                "destroyTextures": null,
+                "destroyBuffers": null,
+                "createEncoder": null,
+                "encoderFinish": null,
+                "beginRenderPass": null,
+                "passEnd": null,
+                "currentTexture": null,
+                "writeBuffer": null,
+                "writeTexture": null,
+                "copyExternalImage": null
+              },
+              "hooks": {
+                "encoder.finish": {
+                  "availability": "not-created",
+                  "observedObjects": 0,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "encoder.beginRenderPass": {
+                  "availability": "not-created",
+                  "observedObjects": 0,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "pass.end": {
+                  "availability": "not-created",
+                  "observedObjects": 0,
+                  "missedObjects": 0,
+                  "reason": null
+                }
+              },
+              "runtime": {
+                "frameId": 40,
+                "maxFPS": null,
+                "maxFPSDefined": false,
+                "activeRenderLoops": 0,
+                "customRequester": false,
+                "contextLost": false,
+                "skipFrameRender": false,
+                "windowIsBackground": false,
+                "renderEvenInBackground": true,
+                "hostWindowAvailable": true,
+                "hostWindowIsGlobal": true,
+                "rawProbeUsesCurrentHost": false,
+                "enableGPUTimingMeasurements": null,
+                "timerQueryCapability": true,
+                "timestampQueryFeature": null
+              },
+              "observerErrors": 0,
+              "invalidClocks": 0,
+              "resources": {
+                "tracked": 0,
+                "peak": 0,
+                "limit": 512,
+                "missed": 0
+              },
+              "rawRaf": {
+                "availability": "stopped",
+                "epoch": 0,
+                "source": "engine-host",
+                "deliveryClock": "origin-unverified",
+                "callbacks": 0,
+                "intervals": null,
+                "deliveryDelay": null
+              },
+              "engineCadence": {
+                "processIntervals": null,
+                "renderCallbackIntervals": null,
+                "timestampIntervals": null,
+                "queueToProcess": null,
+                "skippedByMaxFPS": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "webgpu-translucent-diagnostic",
+      "rawSha256": "6f1a0b72b7cd79b5a5364a1583434bc208b267ab4b604216080e327e4e1df1a1",
+      "rawBytes": 103264,
+      "sequence": {
+        "first": 0,
+        "last": 189,
+        "gaps": []
+      },
+      "events": [
+        {
+          "seq": 2,
+          "atMs": 587.2,
+          "kind": "browser-state",
+          "data": {
+            "reason": "start",
+            "visibility": "visible",
+            "focused": true
+          }
+        },
+        {
+          "seq": 3,
+          "atMs": 590,
+          "kind": "browser-state",
+          "data": {
+            "reason": "pageshow",
+            "visibility": "visible",
+            "focused": true
+          }
+        },
+        {
+          "seq": 26,
+          "atMs": 26072.5,
+          "kind": "renderer-ready",
+          "data": {
+            "durationMs": 50.60000002384186,
+            "renderer": "pascal",
+            "vendor": "nvidia",
+            "version": "unknown version",
+            "backend": "webgpu"
+          }
+        },
+        {
+          "seq": 33,
+          "atMs": 31308.4,
+          "kind": "presentation-rate",
+          "data": {
+            "observedBrowserHz": 59.9,
+            "reliable": true,
+            "samples": 85,
+            "p10FrameMs": 16.5,
+            "medianFrameMs": 16.69999999999709,
+            "p95FrameMs": 16.799999999999272,
+            "reason": "ok",
+            "rendererId": 2,
+            "scope": "idle browser cadence before the Game render loop; not gameplay FPS or a certified display limit"
+          }
+        },
+        {
+          "seq": 85,
+          "atMs": 37934.9,
+          "kind": "engine-frame-profile",
+          "data": {
+            "stage": "preparation-start",
+            "rendererId": 2,
+            "timing": {
+              "active": true,
+              "generation": 1,
+              "scope": {
+                "cpu": "Inclusive synchronous CPU wall calls, including nested work; never sum parent and child phases. Not GPU execution time.",
+                "async": "Async completion is unobserved. Return values are never inspected for then or given settlement handlers; original Promise rejection handling stays with the caller. Returned/thrown count only synchronous call outcomes.",
+                "cadence": "Concurrent raw host RAF, engine _processFrame and render-loop callback intervals are distinct; none is a gameplay FPS benchmark.",
+                "recent": "Cadence quantiles describe only the latest 128 valid intervals; count/total/max cover this engine generation or raw-probe epoch. Compare deltas only within matching owners/epochs."
+              },
+              "phases": {
+                "processFrame": {
+                  "calls": 7,
+                  "returned": 7,
+                  "thrown": 0,
+                  "timingSamples": 7,
+                  "cpuTotalMs": 664.4000000357628,
+                  "cpuMaxMs": 185.30000001192093,
+                  "asyncCompletion": "unobserved"
+                },
+                "beginFrame": {
+                  "calls": 7,
+                  "returned": 7,
+                  "thrown": 0,
+                  "timingSamples": 7,
+                  "cpuTotalMs": 0.10000002384185791,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "renderFrame": {
+                  "calls": 7,
+                  "returned": 7,
+                  "thrown": 0,
+                  "timingSamples": 7,
+                  "cpuTotalMs": 660.6000000238419,
+                  "cpuMaxMs": 183.60000002384186,
+                  "asyncCompletion": "unobserved"
+                },
+                "endFrame": {
+                  "calls": 7,
+                  "returned": 7,
+                  "thrown": 0,
+                  "timingSamples": 7,
+                  "cpuTotalMs": 2.399999976158142,
+                  "cpuMaxMs": 1.0999999642372131,
+                  "asyncCompletion": "unobserved"
+                },
+                "queueFrame": {
+                  "calls": 8,
+                  "returned": 8,
+                  "thrown": 0,
+                  "timingSamples": 8,
+                  "cpuTotalMs": 0.2999999523162842,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "flush": {
+                  "calls": 7,
+                  "returned": 7,
+                  "thrown": 0,
+                  "timingSamples": 7,
+                  "cpuTotalMs": 0.7000000476837158,
+                  "cpuMaxMs": 0.19999998807907104,
+                  "asyncCompletion": "unobserved"
+                },
+                "endCurrentPass": {
+                  "calls": 74,
+                  "returned": 74,
+                  "thrown": 0,
+                  "timingSamples": 74,
+                  "cpuTotalMs": 1,
+                  "cpuMaxMs": 0.20000004768371582,
+                  "asyncCompletion": "unobserved"
+                },
+                "timestampStart": {
+                  "calls": 7,
+                  "returned": 7,
+                  "thrown": 0,
+                  "timingSamples": 7,
+                  "cpuTotalMs": 0,
+                  "cpuMaxMs": 0,
+                  "asyncCompletion": "unobserved"
+                },
+                "timestampEnd": {
+                  "calls": 7,
+                  "returned": 7,
+                  "thrown": 0,
+                  "timingSamples": 7,
+                  "cpuTotalMs": 0,
+                  "cpuMaxMs": 0,
+                  "asyncCompletion": "unobserved"
+                },
+                "timestampPassEnd": {
+                  "calls": 8,
+                  "returned": 8,
+                  "thrown": 0,
+                  "timingSamples": 8,
+                  "cpuTotalMs": 1,
+                  "cpuMaxMs": 0.20000004768371582,
+                  "asyncCompletion": "unobserved"
+                },
+                "destroyTextures": {
+                  "calls": 7,
+                  "returned": 7,
+                  "thrown": 0,
+                  "timingSamples": 7,
+                  "cpuTotalMs": 0.09999996423721313,
+                  "cpuMaxMs": 0.09999996423721313,
+                  "asyncCompletion": "unobserved"
+                },
+                "destroyBuffers": {
+                  "calls": 7,
+                  "returned": 7,
+                  "thrown": 0,
+                  "timingSamples": 7,
+                  "cpuTotalMs": 1.5,
+                  "cpuMaxMs": 0.800000011920929,
+                  "asyncCompletion": "unobserved"
+                },
+                "createEncoder": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 0.20000004768371582,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "encoderFinish": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 0.30000001192092896,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "beginRenderPass": {
+                  "calls": 1095,
+                  "returned": 1095,
+                  "thrown": 0,
+                  "timingSamples": 1095,
+                  "cpuTotalMs": 7.400000154972076,
+                  "cpuMaxMs": 0.40000003576278687,
+                  "asyncCompletion": "unobserved"
+                },
+                "passEnd": {
+                  "calls": 1095,
+                  "returned": 1095,
+                  "thrown": 0,
+                  "timingSamples": 1095,
+                  "cpuTotalMs": 1.1000001430511475,
+                  "cpuMaxMs": 0.30000001192092896,
+                  "asyncCompletion": "unobserved"
+                },
+                "currentTexture": {
+                  "calls": 7,
+                  "returned": 7,
+                  "thrown": 0,
+                  "timingSamples": 7,
+                  "cpuTotalMs": 0.09999996423721313,
+                  "cpuMaxMs": 0.09999996423721313,
+                  "asyncCompletion": "unobserved"
+                },
+                "writeBuffer": {
+                  "calls": 24609,
+                  "returned": 24609,
+                  "thrown": 0,
+                  "timingSamples": 24609,
+                  "cpuTotalMs": 274.00000059604645,
+                  "cpuMaxMs": 22.900000035762787,
+                  "asyncCompletion": "unobserved"
+                },
+                "writeTexture": {
+                  "calls": 6,
+                  "returned": 6,
+                  "thrown": 0,
+                  "timingSamples": 6,
+                  "cpuTotalMs": 0.10000002384185791,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "copyExternalImage": {
+                  "calls": 116,
+                  "returned": 116,
+                  "thrown": 0,
+                  "timingSamples": 116,
+                  "cpuTotalMs": 44.900000154972076,
+                  "cpuMaxMs": 6.199999988079071,
+                  "asyncCompletion": "unobserved"
+                }
+              },
+              "hooks": {
+                "encoder.finish": {
+                  "availability": "installed",
+                  "observedObjects": 41,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "encoder.beginRenderPass": {
+                  "availability": "installed",
+                  "observedObjects": 41,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "pass.end": {
+                  "availability": "installed",
+                  "observedObjects": 1095,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "lifecycle.dispose": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "lifecycle.restore": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._processFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine.beginFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._renderFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine.endFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._queueNewFrameForRenderLoop": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine.flushFramebuffer": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._endCurrentRenderPass": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._isOverFrameTime": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._initializeLimits": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "context.getCurrentTexture": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "device.createCommandEncoder": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "queue.writeBuffer": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "queue.writeTexture": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "queue.copyExternalImageToTexture": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                }
+              },
+              "runtime": {
+                "frameId": 7,
+                "maxFPS": null,
+                "maxFPSDefined": false,
+                "activeRenderLoops": 0,
+                "customRequester": false,
+                "contextLost": false,
+                "skipFrameRender": false,
+                "windowIsBackground": false,
+                "renderEvenInBackground": true,
+                "hostWindowAvailable": true,
+                "hostWindowIsGlobal": true,
+                "rawProbeUsesCurrentHost": true,
+                "enableGPUTimingMeasurements": true,
+                "timerQueryCapability": true,
+                "timestampQueryFeature": true
+              },
+              "observerErrors": 0,
+              "invalidClocks": 0,
+              "resources": {
+                "tracked": 2,
+                "peak": 3,
+                "limit": 512,
+                "missed": 0
+              },
+              "rawRaf": {
+                "availability": "observing",
+                "epoch": 1,
+                "source": "engine-host",
+                "deliveryClock": "same-window-or-explicit-injection",
+                "callbacks": 101,
+                "intervals": {
+                  "count": 100,
+                  "totalMs": 6424.651999999998,
+                  "maxMs": 1015.8000000000029,
+                  "recentSamples": 100,
+                  "recentP50Ms": 16.69999999999709,
+                  "recentP95Ms": 83.20000000000073
+                },
+                "deliveryDelay": {
+                  "count": 101,
+                  "totalMs": 894.6039978542394,
+                  "maxMs": 383.49999996423867,
+                  "recentSamples": 101,
+                  "recentP50Ms": 0.2999999761595973,
+                  "recentP95Ms": 38.099999999998545
+                }
+              },
+              "engineCadence": {
+                "processIntervals": {
+                  "count": 6,
+                  "totalMs": 4522.600000023842,
+                  "maxMs": 1120.1000000238419,
+                  "recentSamples": 6,
+                  "recentP50Ms": 936.5,
+                  "recentP95Ms": 1080.3999999761581
+                },
+                "renderCallbackIntervals": {
+                  "count": 6,
+                  "totalMs": 4522.600000023842,
+                  "maxMs": 1120.2000000476837,
+                  "recentSamples": 6,
+                  "recentP50Ms": 936.3999999761581,
+                  "recentP95Ms": 1080.5
+                },
+                "timestampIntervals": {
+                  "count": 6,
+                  "totalMs": 4795.9000000000015,
+                  "maxMs": 1015.8000000000029,
+                  "recentSamples": 6,
+                  "recentP50Ms": 1015.7999999999956,
+                  "recentP95Ms": 1015.8000000000029
+                },
+                "queueToProcess": {
+                  "count": 7,
+                  "totalMs": 3917.699999988079,
+                  "maxMs": 1042.5,
+                  "recentSamples": 7,
+                  "recentP50Ms": 771.5,
+                  "recentP95Ms": 1004.0999999642372
+                },
+                "skippedByMaxFPS": 0
+              }
+            }
+          }
+        },
+        {
+          "seq": 151,
+          "atMs": 67988,
+          "kind": "lighting-preparation",
+          "data": {
+            "status": "timeout",
+            "elapsedMs": 30052.399999976158,
+            "activeElapsedMs": 30052.399999976158,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stages": [
+              {
+                "stage": "vehicle-0",
+                "elapsedMs": 21227.599999964237,
+                "activeElapsedMs": 21227.599999964237,
+                "pausedMs": 0,
+                "tickCount": 22,
+                "rafGap": {
+                  "count": 22,
+                  "totalMs": 21209.600000023842,
+                  "maxMs": 1016.2000000476837
+                },
+                "cpu": {
+                  "apply": {
+                    "calls": 4,
+                    "totalMs": 89.19999992847443,
+                    "maxMs": 53.19999998807907
+                  },
+                  "checkBatch": {
+                    "calls": 18,
+                    "totalMs": 169.5999999642372,
+                    "maxMs": 30
+                  },
+                  "render": {
+                    "calls": 6,
+                    "totalMs": 1180.5999999046326,
+                    "maxMs": 655.2999999523163
+                  }
+                },
+                "restartReasons": {
+                  "meshes": 3
+                },
+                "checks": 830,
+                "renders": 6,
+                "restarts": 3,
+                "passQuality": "low"
+              },
+              {
+                "stage": "vehicle-1",
+                "elapsedMs": 8402.599999964237,
+                "activeElapsedMs": 8402.599999964237,
+                "pausedMs": 0,
+                "tickCount": 8,
+                "rafGap": {
+                  "count": 8,
+                  "totalMs": 8126.199999988079,
+                  "maxMs": 1016
+                },
+                "cpu": {
+                  "apply": {
+                    "calls": 2,
+                    "totalMs": 26.30000001192093,
+                    "maxMs": 22.80000001192093
+                  },
+                  "checkBatch": {
+                    "calls": 6,
+                    "totalMs": 42.19999998807907,
+                    "maxMs": 12
+                  },
+                  "render": {
+                    "calls": 2,
+                    "totalMs": 1004.6999999880791,
+                    "maxMs": 905.2999999523163
+                  }
+                },
+                "restartReasons": {
+                  "weather": 1
+                },
+                "checks": 136,
+                "renders": 2,
+                "restarts": 1,
+                "passQuality": "low"
+              }
+            ],
+            "qualities": [
+              {
+                "quality": "low",
+                "finalPass": false,
+                "status": "timeout",
+                "failureStep": null,
+                "elapsedMs": 30052.30000001192,
+                "activeElapsedMs": 30052.30000001192,
+                "pausedMs": 0,
+                "stageCount": 2
+              }
+            ]
+          }
+        },
+        {
+          "seq": 152,
+          "atMs": 67988.6,
+          "kind": "webgpu-preparation-profile",
+          "data": {
+            "active": true,
+            "backend": "webgpu",
+            "generation": 1,
+            "attachedAfterDeviceCreation": true,
+            "timingScope": "Inclusive CPU API calls (nested scopes overlap); async durations are completion latency, not GPU execution time",
+            "metrics": {
+              "glslToSpirv": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "spirvToWgsl": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "compilerLoad": {
+                "calls": 0,
+                "completed": 0,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0,
+                "cpuMaxMs": 0,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "shaderPreparation": {
+                "calls": 78,
+                "completed": 78,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 485.1999999284744,
+                "cpuMaxMs": 14.599999964237213,
+                "asyncTotalMs": 22942.500000715256,
+                "asyncMaxMs": 877.1000000238419
+              },
+              "shaderModule": {
+                "calls": 156,
+                "completed": 156,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 25.09999978542328,
+                "cpuMaxMs": 1.5,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "shaderValidation": {
+                "calls": 156,
+                "completed": 156,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 2.8000001907348633,
+                "cpuMaxMs": 0.10000002384185791,
+                "asyncTotalMs": 63577.499999821186,
+                "asyncMaxMs": 880.1999999880791
+              },
+              "syncPipeline": {
+                "calls": 25,
+                "completed": 25,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 0.40000009536743164,
+                "cpuMaxMs": 0.10000002384185791,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              },
+              "asyncPipeline": {
+                "calls": 77,
+                "completed": 77,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 3.399999976158142,
+                "cpuMaxMs": 0.20000004768371582,
+                "asyncTotalMs": 40939.69999933243,
+                "asyncMaxMs": 879
+              },
+              "submit": {
+                "calls": 94,
+                "completed": 94,
+                "failures": 0,
+                "pending": 0,
+                "cpuTotalMs": 2.5000001192092896,
+                "cpuMaxMs": 0.10000002384185791,
+                "asyncTotalMs": 0,
+                "asyncMaxMs": 0
+              }
+            },
+            "hooks": {
+              "engine._initializeLimits": "installed",
+              "engine._compileRawShaderToSpirV": "installed",
+              "engine.prepareGlslangAndTintAsync": "installed",
+              "engine._preparePipelineContextAsync": "installed",
+              "engine._createPipelineStageDescriptor": "installed",
+              "tint.convertSpirV2WGSL": "not-created",
+              "device.createShaderModule": "installed",
+              "device.createRenderPipeline": "installed",
+              "device.createRenderPipelineAsync": "installed",
+              "queue.submit": "installed",
+              "module.getCompilationInfo": "installed",
+              "engine._getWGSLShader": "installed",
+              "engine._getShaderProcessor": "installed",
+              "processor._convertDefinesToConst": "installed",
+              "processor.postProcessor": "installed",
+              "processor.finalizeShaders": "installed"
+            },
+            "observerErrors": 0,
+            "shaderInventory": {
+              "enabled": true,
+              "scope": "Per-device successful module calls; exact text equality confirms duplicates. Body identity only from observed pinned WGSL prefix construction. Unknown/limited calls are not evidence of uniqueness.",
+              "overheadScope": "Text capture/setStage CPU only; nested inside engine timings. Hook entry/cleanup and snapshot/serialization excluded. Text limit counts retained UTF-16 code units (raw plus pending provenance), not total JavaScript heap. Diagnostic overhead, not a performance improvement.",
+              "limits": {
+                "maxEntries": 1024,
+                "maxCodeUnits": 33554432,
+                "maxStages": 21,
+                "maxRows": 16
+              },
+              "calls": 156,
+              "rawKnown": 156,
+              "rawRepeated": 0,
+              "bodyKnown": 156,
+              "bodyRepeated": 0,
+              "descriptorUnknown": 0,
+              "bodyUnknown": 0,
+              "limited": 0,
+              "rawHashConflicts": 0,
+              "bodyHashConflicts": 0,
+              "unrecognizedPrefix": 0,
+              "stageOverflow": 0,
+              "ambiguousBodies": 0,
+              "evidenceTruncated": false,
+              "retainedEntries": 156,
+              "retainedCodeUnits": 5439806,
+              "released": false,
+              "cpuTotalMs": 446.20000046491623,
+              "cpuMaxMs": 10.5,
+              "stages": [
+                {
+                  "name": "unassigned",
+                  "calls": 0,
+                  "rawKnown": 0,
+                  "rawRepeated": 0,
+                  "bodyKnown": 0,
+                  "bodyRepeated": 0,
+                  "descriptorUnknown": 0,
+                  "bodyUnknown": 0,
+                  "limited": 0
+                },
+                {
+                  "name": "construction",
+                  "calls": 4,
+                  "rawKnown": 4,
+                  "rawRepeated": 0,
+                  "bodyKnown": 4,
+                  "bodyRepeated": 0,
+                  "descriptorUnknown": 0,
+                  "bodyUnknown": 0,
+                  "limited": 0
+                },
+                {
+                  "name": "assets",
+                  "calls": 40,
+                  "rawKnown": 40,
+                  "rawRepeated": 0,
+                  "bodyKnown": 40,
+                  "bodyRepeated": 0,
+                  "descriptorUnknown": 0,
+                  "bodyUnknown": 0,
+                  "limited": 0
+                },
+                {
+                  "name": "vehicle-0",
+                  "calls": 58,
+                  "rawKnown": 58,
+                  "rawRepeated": 0,
+                  "bodyKnown": 58,
+                  "bodyRepeated": 0,
+                  "descriptorUnknown": 0,
+                  "bodyUnknown": 0,
+                  "limited": 0
+                },
+                {
+                  "name": "vehicle-1",
+                  "calls": 54,
+                  "rawKnown": 54,
+                  "rawRepeated": 0,
+                  "bodyKnown": 54,
+                  "bodyRepeated": 0,
+                  "descriptorUnknown": 0,
+                  "bodyUnknown": 0,
+                  "limited": 0
+                },
+                {
+                  "name": "restore",
+                  "calls": 0,
+                  "rawKnown": 0,
+                  "rawRepeated": 0,
+                  "bodyKnown": 0,
+                  "bodyRepeated": 0,
+                  "descriptorUnknown": 0,
+                  "bodyUnknown": 0,
+                  "limited": 0
+                }
+              ],
+              "rawDuplicateGroups": 0,
+              "bodyDuplicateGroups": 0,
+              "exportTruncated": false,
+              "rawDuplicates": [],
+              "bodyDuplicates": [],
+              "unusedDefines": {
+                "scope": "Observed owned convert/post/finalize provenance; exact derived equality omits only unreferenced generated uppercase non-reserved bool/small decimal-int declarations. Newlines and all other text remain. Candidate only, not semantic equivalence or a runtime/cache change. Counts per analyzed module call; names per distinct analyzed raw text.",
+                "analyzed": 156,
+                "unknown": 0,
+                "repeated": 0,
+                "removedDeclarations": 10856,
+                "retainedDeclarations": 3044,
+                "unsafeDeclarations": 3044,
+                "provenanceUnknown": 0,
+                "provenanceLimited": 0,
+                "analysisUnknown": 0,
+                "hashConflicts": 0,
+                "pendingEntries": 0,
+                "ambiguous": 0,
+                "evidenceTruncated": false,
+                "pendingCodeUnits": 0,
+                "duplicateGroups": 0,
+                "exportTruncated": true,
+                "names": [
+                  {
+                    "name": "IS_NDC_HALF_ZRANGE",
+                    "omitted": 156,
+                    "retained": 0
+                  },
+                  {
+                    "name": "ALBEDODIRECTUV",
+                    "omitted": 86,
+                    "retained": 0
+                  },
+                  {
+                    "name": "ALPHATESTVALUE",
+                    "omitted": 0,
+                    "retained": 86
+                  },
+                  {
+                    "name": "AMBIENTDIRECTUV",
+                    "omitted": 136,
+                    "retained": 0
+                  },
+                  {
+                    "name": "ANISOTROPIC_TEXTUREDIRECTUV",
+                    "omitted": 86,
+                    "retained": 0
+                  },
+                  {
+                    "name": "AREALIGHTSUPPORTED",
+                    "omitted": 136,
+                    "retained": 0
+                  },
+                  {
+                    "name": "BASE_DIFFUSE_MODEL",
+                    "omitted": 86,
+                    "retained": 0
+                  },
+                  {
+                    "name": "BASE_DIFFUSE_ROUGHNESSDIRECTUV",
+                    "omitted": 86,
+                    "retained": 0
+                  },
+                  {
+                    "name": "BASE_WEIGHTDIRECTUV",
+                    "omitted": 86,
+                    "retained": 0
+                  },
+                  {
+                    "name": "BRDF_V_HEIGHT_CORRELATED",
+                    "omitted": 86,
+                    "retained": 0
+                  },
+                  {
+                    "name": "BUMPDIRECTUV",
+                    "omitted": 136,
+                    "retained": 0
+                  },
+                  {
+                    "name": "BonesPerMesh",
+                    "omitted": 0,
+                    "retained": 136
+                  },
+                  {
+                    "name": "CAMERA_PERSPECTIVE",
+                    "omitted": 136,
+                    "retained": 0
+                  },
+                  {
+                    "name": "CLEARCOAT_BUMPDIRECTUV",
+                    "omitted": 86,
+                    "retained": 0
+                  },
+                  {
+                    "name": "CLEARCOAT_TEXTUREDIRECTUV",
+                    "omitted": 86,
+                    "retained": 0
+                  },
+                  {
+                    "name": "CLEARCOAT_TEXTURE_ROUGHNESSDIRECTUV",
+                    "omitted": 86,
+                    "retained": 0
+                  }
+                ],
+                "duplicates": []
+              }
+            },
+            "bundleCountersLastFrame": {
+              "numEnableEffects": 0,
+              "numEnableDrawWrapper": 0,
+              "numBundleCreationNonCompatMode": 0,
+              "numBundleReuseNonCompatMode": 0
+            },
+            "sharedCacheCounters": {
+              "scope": "Babylon static counters shared by all engines in this JavaScript realm",
+              "values": {
+                "NumCacheHitWithoutHash": 5280,
+                "NumCacheHitWithHash": 450,
+                "NumCacheMiss": 99,
+                "NumPipelineCreationLastFrame": 0
+              }
+            }
+          }
+        },
+        {
+          "seq": 153,
+          "atMs": 67989.3,
+          "kind": "engine-frame-profile",
+          "data": {
+            "stage": "preparation-end",
+            "rendererId": 2,
+            "timing": {
+              "active": true,
+              "generation": 1,
+              "scope": {
+                "cpu": "Inclusive synchronous CPU wall calls, including nested work; never sum parent and child phases. Not GPU execution time.",
+                "async": "Async completion is unobserved. Return values are never inspected for then or given settlement handlers; original Promise rejection handling stays with the caller. Returned/thrown count only synchronous call outcomes.",
+                "cadence": "Concurrent raw host RAF, engine _processFrame and render-loop callback intervals are distinct; none is a gameplay FPS benchmark.",
+                "recent": "Cadence quantiles describe only the latest 128 valid intervals; count/total/max cover this engine generation or raw-probe epoch. Compare deltas only within matching owners/epochs."
+              },
+              "phases": {
+                "processFrame": {
+                  "calls": 37,
+                  "returned": 37,
+                  "thrown": 0,
+                  "timingSamples": 37,
+                  "cpuTotalMs": 3185.9000002145767,
+                  "cpuMaxMs": 928.1999999880791,
+                  "asyncCompletion": "unobserved"
+                },
+                "beginFrame": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 0.40000009536743164,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "renderFrame": {
+                  "calls": 37,
+                  "returned": 37,
+                  "thrown": 0,
+                  "timingSamples": 37,
+                  "cpuTotalMs": 3176,
+                  "cpuMaxMs": 928.0999999642372,
+                  "asyncCompletion": "unobserved"
+                },
+                "endFrame": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 7.200000047683716,
+                  "cpuMaxMs": 1.0999999642372131,
+                  "asyncCompletion": "unobserved"
+                },
+                "queueFrame": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 0.5999999642372131,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "flush": {
+                  "calls": 41,
+                  "returned": 41,
+                  "thrown": 0,
+                  "timingSamples": 41,
+                  "cpuTotalMs": 4.300000071525574,
+                  "cpuMaxMs": 0.20000004768371582,
+                  "asyncCompletion": "unobserved"
+                },
+                "endCurrentPass": {
+                  "calls": 193,
+                  "returned": 193,
+                  "thrown": 0,
+                  "timingSamples": 193,
+                  "cpuTotalMs": 3.800000011920929,
+                  "cpuMaxMs": 0.20000004768371582,
+                  "asyncCompletion": "unobserved"
+                },
+                "timestampStart": {
+                  "calls": 41,
+                  "returned": 41,
+                  "thrown": 0,
+                  "timingSamples": 41,
+                  "cpuTotalMs": 0.10000002384185791,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "timestampEnd": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 0.09999996423721313,
+                  "cpuMaxMs": 0.09999996423721313,
+                  "asyncCompletion": "unobserved"
+                },
+                "timestampPassEnd": {
+                  "calls": 34,
+                  "returned": 34,
+                  "thrown": 0,
+                  "timingSamples": 34,
+                  "cpuTotalMs": 3.200000047683716,
+                  "cpuMaxMs": 0.20000004768371582,
+                  "asyncCompletion": "unobserved"
+                },
+                "destroyTextures": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 0.2999999523162842,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "destroyBuffers": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 1.600000023841858,
+                  "cpuMaxMs": 0.800000011920929,
+                  "asyncCompletion": "unobserved"
+                },
+                "createEncoder": {
+                  "calls": 135,
+                  "returned": 135,
+                  "thrown": 0,
+                  "timingSamples": 135,
+                  "cpuTotalMs": 1.0000000596046448,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "encoderFinish": {
+                  "calls": 135,
+                  "returned": 135,
+                  "thrown": 0,
+                  "timingSamples": 135,
+                  "cpuTotalMs": 0.5999999642372131,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "beginRenderPass": {
+                  "calls": 1427,
+                  "returned": 1427,
+                  "thrown": 0,
+                  "timingSamples": 1427,
+                  "cpuTotalMs": 9.400000035762787,
+                  "cpuMaxMs": 0.40000003576278687,
+                  "asyncCompletion": "unobserved"
+                },
+                "passEnd": {
+                  "calls": 1427,
+                  "returned": 1427,
+                  "thrown": 0,
+                  "timingSamples": 1427,
+                  "cpuTotalMs": 1.2000001668930054,
+                  "cpuMaxMs": 0.30000001192092896,
+                  "asyncCompletion": "unobserved"
+                },
+                "currentTexture": {
+                  "calls": 25,
+                  "returned": 25,
+                  "thrown": 0,
+                  "timingSamples": 25,
+                  "cpuTotalMs": 0.5,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "writeBuffer": {
+                  "calls": 26775,
+                  "returned": 26775,
+                  "thrown": 0,
+                  "timingSamples": 26775,
+                  "cpuTotalMs": 289.7000005841255,
+                  "cpuMaxMs": 22.900000035762787,
+                  "asyncCompletion": "unobserved"
+                },
+                "writeTexture": {
+                  "calls": 27,
+                  "returned": 27,
+                  "thrown": 0,
+                  "timingSamples": 27,
+                  "cpuTotalMs": 0.5000000596046448,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "copyExternalImage": {
+                  "calls": 136,
+                  "returned": 136,
+                  "thrown": 0,
+                  "timingSamples": 136,
+                  "cpuTotalMs": 64.10000026226044,
+                  "cpuMaxMs": 6.199999988079071,
+                  "asyncCompletion": "unobserved"
+                }
+              },
+              "hooks": {
+                "encoder.finish": {
+                  "availability": "installed",
+                  "observedObjects": 137,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "encoder.beginRenderPass": {
+                  "availability": "installed",
+                  "observedObjects": 137,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "pass.end": {
+                  "availability": "installed",
+                  "observedObjects": 1427,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "lifecycle.dispose": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "lifecycle.restore": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._processFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine.beginFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._renderFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine.endFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._queueNewFrameForRenderLoop": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine.flushFramebuffer": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._endCurrentRenderPass": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._isOverFrameTime": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._initializeLimits": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "context.getCurrentTexture": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "device.createCommandEncoder": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "queue.writeBuffer": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "queue.writeTexture": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "queue.copyExternalImageToTexture": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                }
+              },
+              "runtime": {
+                "frameId": 37,
+                "maxFPS": null,
+                "maxFPSDefined": false,
+                "activeRenderLoops": 0,
+                "customRequester": false,
+                "contextLost": false,
+                "skipFrameRender": false,
+                "windowIsBackground": false,
+                "renderEvenInBackground": true,
+                "hostWindowAvailable": true,
+                "hostWindowIsGlobal": true,
+                "rawProbeUsesCurrentHost": true,
+                "enableGPUTimingMeasurements": true,
+                "timerQueryCapability": true,
+                "timestampQueryFeature": true
+              },
+              "observerErrors": 0,
+              "invalidClocks": 0,
+              "resources": {
+                "tracked": 2,
+                "peak": 3,
+                "limit": 512,
+                "missed": 0
+              },
+              "rawRaf": {
+                "availability": "observing",
+                "epoch": 1,
+                "source": "engine-host",
+                "deliveryClock": "same-window-or-explicit-injection",
+                "callbacks": 131,
+                "intervals": {
+                  "count": 130,
+                  "totalMs": 37913.852,
+                  "maxMs": 2031.6000000000058,
+                  "recentSamples": 128,
+                  "recentP50Ms": 16.700000000000728,
+                  "recentP95Ms": 1015.8999999999942
+                },
+                "deliveryDelay": {
+                  "count": 131,
+                  "totalMs": 2056.1039970436104,
+                  "maxMs": 1144.999999988082,
+                  "recentSamples": 128,
+                  "recentP50Ms": 0.2999999761595973,
+                  "recentP95Ms": 20.69999995231774
+                }
+              },
+              "engineCadence": {
+                "processIntervals": {
+                  "count": 36,
+                  "totalMs": 35901.80000001192,
+                  "maxMs": 2050.399999976158,
+                  "recentSamples": 36,
+                  "recentP50Ms": 1015.6999999880791,
+                  "recentP95Ms": 1080.3999999761581
+                },
+                "renderCallbackIntervals": {
+                  "count": 36,
+                  "totalMs": 35901.69999998808,
+                  "maxMs": 2050.2999999523163,
+                  "recentSamples": 36,
+                  "recentP50Ms": 1015.7999999523163,
+                  "recentP95Ms": 1080.5
+                },
+                "timestampIntervals": {
+                  "count": 36,
+                  "totalMs": 36285.1,
+                  "maxMs": 2031.6000000000058,
+                  "recentSamples": 36,
+                  "recentP50Ms": 1015.7999999999956,
+                  "recentP95Ms": 1016
+                },
+                "queueToProcess": {
+                  "count": 37,
+                  "totalMs": 30734.199999809265,
+                  "maxMs": 1042.5,
+                  "recentSamples": 37,
+                  "recentP50Ms": 1003.6000000238419,
+                  "recentP95Ms": 1014.1999999880791
+                },
+                "skippedByMaxFPS": 0
+              }
+            }
+          }
+        },
+        {
+          "seq": 154,
+          "atMs": 67990,
+          "kind": "render-fault",
+          "data": {
+            "channel": "pipeline",
+            "message": "Příprava světel: timeout",
+            "generation": 1,
+            "rendererId": 2,
+            "purpose": "game",
+            "count": 1
+          }
+        },
+        {
+          "seq": 155,
+          "atMs": 67991.6,
+          "kind": "startup-error",
+          "data": {
+            "message": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).",
+            "stack": "Error: Přípravu 3D scény se nepodařilo dokončit (timeout).\n    at ld.start (http://127.0.0.1:4212/assets/game-U2uLk4M3.js:584:25188)\n    at async http://127.0.0.1:4212/assets/index-UZMAnCvc.js:16:4492714"
+          }
+        },
+        {
+          "seq": 157,
+          "atMs": 68382.8,
+          "kind": "engine-frame-profile",
+          "data": {
+            "stage": "engine-disposed",
+            "rendererId": 2,
+            "timing": {
+              "active": false,
+              "generation": 1,
+              "scope": {
+                "cpu": "Inclusive synchronous CPU wall calls, including nested work; never sum parent and child phases. Not GPU execution time.",
+                "async": "Async completion is unobserved. Return values are never inspected for then or given settlement handlers; original Promise rejection handling stays with the caller. Returned/thrown count only synchronous call outcomes.",
+                "cadence": "Concurrent raw host RAF, engine _processFrame and render-loop callback intervals are distinct; none is a gameplay FPS benchmark.",
+                "recent": "Cadence quantiles describe only the latest 128 valid intervals; count/total/max cover this engine generation or raw-probe epoch. Compare deltas only within matching owners/epochs."
+              },
+              "phases": {
+                "processFrame": {
+                  "calls": 37,
+                  "returned": 37,
+                  "thrown": 0,
+                  "timingSamples": 37,
+                  "cpuTotalMs": 3185.9000002145767,
+                  "cpuMaxMs": 928.1999999880791,
+                  "asyncCompletion": "unobserved"
+                },
+                "beginFrame": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 0.40000009536743164,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "renderFrame": {
+                  "calls": 37,
+                  "returned": 37,
+                  "thrown": 0,
+                  "timingSamples": 37,
+                  "cpuTotalMs": 3176,
+                  "cpuMaxMs": 928.0999999642372,
+                  "asyncCompletion": "unobserved"
+                },
+                "endFrame": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 7.200000047683716,
+                  "cpuMaxMs": 1.0999999642372131,
+                  "asyncCompletion": "unobserved"
+                },
+                "queueFrame": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 0.5999999642372131,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "flush": {
+                  "calls": 41,
+                  "returned": 41,
+                  "thrown": 0,
+                  "timingSamples": 41,
+                  "cpuTotalMs": 4.300000071525574,
+                  "cpuMaxMs": 0.20000004768371582,
+                  "asyncCompletion": "unobserved"
+                },
+                "endCurrentPass": {
+                  "calls": 193,
+                  "returned": 193,
+                  "thrown": 0,
+                  "timingSamples": 193,
+                  "cpuTotalMs": 3.800000011920929,
+                  "cpuMaxMs": 0.20000004768371582,
+                  "asyncCompletion": "unobserved"
+                },
+                "timestampStart": {
+                  "calls": 41,
+                  "returned": 41,
+                  "thrown": 0,
+                  "timingSamples": 41,
+                  "cpuTotalMs": 0.10000002384185791,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "timestampEnd": {
+                  "calls": 39,
+                  "returned": 39,
+                  "thrown": 0,
+                  "timingSamples": 39,
+                  "cpuTotalMs": 0.09999996423721313,
+                  "cpuMaxMs": 0.09999996423721313,
+                  "asyncCompletion": "unobserved"
+                },
+                "timestampPassEnd": {
+                  "calls": 34,
+                  "returned": 34,
+                  "thrown": 0,
+                  "timingSamples": 34,
+                  "cpuTotalMs": 3.200000047683716,
+                  "cpuMaxMs": 0.20000004768371582,
+                  "asyncCompletion": "unobserved"
+                },
+                "destroyTextures": {
+                  "calls": 40,
+                  "returned": 40,
+                  "thrown": 0,
+                  "timingSamples": 40,
+                  "cpuTotalMs": 0.2999999523162842,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "destroyBuffers": {
+                  "calls": 40,
+                  "returned": 40,
+                  "thrown": 0,
+                  "timingSamples": 40,
+                  "cpuTotalMs": 5.700000047683716,
+                  "cpuMaxMs": 4.100000023841858,
+                  "asyncCompletion": "unobserved"
+                },
+                "createEncoder": {
+                  "calls": 135,
+                  "returned": 135,
+                  "thrown": 0,
+                  "timingSamples": 135,
+                  "cpuTotalMs": 1.0000000596046448,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "encoderFinish": {
+                  "calls": 135,
+                  "returned": 135,
+                  "thrown": 0,
+                  "timingSamples": 135,
+                  "cpuTotalMs": 0.5999999642372131,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "beginRenderPass": {
+                  "calls": 1427,
+                  "returned": 1427,
+                  "thrown": 0,
+                  "timingSamples": 1427,
+                  "cpuTotalMs": 9.400000035762787,
+                  "cpuMaxMs": 0.40000003576278687,
+                  "asyncCompletion": "unobserved"
+                },
+                "passEnd": {
+                  "calls": 1427,
+                  "returned": 1427,
+                  "thrown": 0,
+                  "timingSamples": 1427,
+                  "cpuTotalMs": 1.2000001668930054,
+                  "cpuMaxMs": 0.30000001192092896,
+                  "asyncCompletion": "unobserved"
+                },
+                "currentTexture": {
+                  "calls": 25,
+                  "returned": 25,
+                  "thrown": 0,
+                  "timingSamples": 25,
+                  "cpuTotalMs": 0.5,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "writeBuffer": {
+                  "calls": 26775,
+                  "returned": 26775,
+                  "thrown": 0,
+                  "timingSamples": 26775,
+                  "cpuTotalMs": 289.7000005841255,
+                  "cpuMaxMs": 22.900000035762787,
+                  "asyncCompletion": "unobserved"
+                },
+                "writeTexture": {
+                  "calls": 27,
+                  "returned": 27,
+                  "thrown": 0,
+                  "timingSamples": 27,
+                  "cpuTotalMs": 0.5000000596046448,
+                  "cpuMaxMs": 0.10000002384185791,
+                  "asyncCompletion": "unobserved"
+                },
+                "copyExternalImage": {
+                  "calls": 136,
+                  "returned": 136,
+                  "thrown": 0,
+                  "timingSamples": 136,
+                  "cpuTotalMs": 64.10000026226044,
+                  "cpuMaxMs": 6.199999988079071,
+                  "asyncCompletion": "unobserved"
+                }
+              },
+              "hooks": {
+                "encoder.finish": {
+                  "availability": "installed",
+                  "observedObjects": 137,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "encoder.beginRenderPass": {
+                  "availability": "installed",
+                  "observedObjects": 137,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "pass.end": {
+                  "availability": "installed",
+                  "observedObjects": 1427,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "lifecycle.dispose": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "lifecycle.restore": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._processFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine.beginFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._renderFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine.endFrame": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._queueNewFrameForRenderLoop": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine.flushFramebuffer": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._endCurrentRenderPass": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._isOverFrameTime": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "engine._initializeLimits": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "context.getCurrentTexture": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "device.createCommandEncoder": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "queue.writeBuffer": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "queue.writeTexture": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                },
+                "queue.copyExternalImageToTexture": {
+                  "availability": "installed",
+                  "observedObjects": 1,
+                  "missedObjects": 0,
+                  "reason": null
+                }
+              },
+              "runtime": {
+                "frameId": 37,
+                "maxFPS": null,
+                "maxFPSDefined": false,
+                "activeRenderLoops": 0,
+                "customRequester": false,
+                "contextLost": false,
+                "skipFrameRender": false,
+                "windowIsBackground": false,
+                "renderEvenInBackground": true,
+                "hostWindowAvailable": true,
+                "hostWindowIsGlobal": true,
+                "rawProbeUsesCurrentHost": false,
+                "enableGPUTimingMeasurements": true,
+                "timerQueryCapability": true,
+                "timestampQueryFeature": true
+              },
+              "observerErrors": 0,
+              "invalidClocks": 0,
+              "resources": {
+                "tracked": 0,
+                "peak": 3,
+                "limit": 512,
+                "missed": 0
+              },
+              "rawRaf": {
+                "availability": "stopped",
+                "epoch": 2,
+                "source": "engine-host",
+                "deliveryClock": "same-window-or-explicit-injection",
+                "callbacks": 131,
+                "intervals": {
+                  "count": 130,
+                  "totalMs": 37913.852,
+                  "maxMs": 2031.6000000000058,
+                  "recentSamples": 128,
+                  "recentP50Ms": 16.700000000000728,
+                  "recentP95Ms": 1015.8999999999942
+                },
+                "deliveryDelay": {
+                  "count": 131,
+                  "totalMs": 2056.1039970436104,
+                  "maxMs": 1144.999999988082,
+                  "recentSamples": 128,
+                  "recentP50Ms": 0.2999999761595973,
+                  "recentP95Ms": 20.69999995231774
+                }
+              },
+              "engineCadence": {
+                "processIntervals": {
+                  "count": 36,
+                  "totalMs": 35901.80000001192,
+                  "maxMs": 2050.399999976158,
+                  "recentSamples": 36,
+                  "recentP50Ms": 1015.6999999880791,
+                  "recentP95Ms": 1080.3999999761581
+                },
+                "renderCallbackIntervals": {
+                  "count": 36,
+                  "totalMs": 35901.69999998808,
+                  "maxMs": 2050.2999999523163,
+                  "recentSamples": 36,
+                  "recentP50Ms": 1015.7999999523163,
+                  "recentP95Ms": 1080.5
+                },
+                "timestampIntervals": {
+                  "count": 36,
+                  "totalMs": 36285.1,
+                  "maxMs": 2031.6000000000058,
+                  "recentSamples": 36,
+                  "recentP50Ms": 1015.7999999999956,
+                  "recentP95Ms": 1016
+                },
+                "queueToProcess": {
+                  "count": 37,
+                  "totalMs": 30734.199999809265,
+                  "maxMs": 1042.5,
+                  "recentSamples": 37,
+                  "recentP50Ms": 1003.6000000238419,
+                  "recentP95Ms": 1014.1999999880791
+                },
+                "skippedByMaxFPS": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

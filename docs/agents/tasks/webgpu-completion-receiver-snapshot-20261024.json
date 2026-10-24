@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-receiver-snapshot-20261024",
+  "title": "KEY-22: neměnný source13 checkpoint po cílené přípravě skutečných PBR přijímačů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/performance-snapshot/webgpu-completion-20261024-candidate-13/",
+    "docs/agents/handoffs/webgpu-completion-receiver-snapshot-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Po přijetí konkrétních receiver source/test bajtů vytvořit jediný nový neměnný snapshot včetně všech testů a authoring assetů; source12 a předchozí buildy/helpery neměnit.",
+    "Použít existující performance-snapshot --reuse-ipr-from ověřený source12; IPR reference sdílet pouze přes tento kontrakt. Doložit before/after source/test/asset SHA a skutečný commit.",
+    "Čerstvá frozen instalace ověří všech39 native pinů/singleton včetně Mesh7ceb; root staré node_modules e9dd se nepřepisují. Instalace a další náročné procesy teprve v novém koordinovaném resource okně.",
+    "Task rezervuje pouze přesný výstupní adresář a handoff. Nedává autoritu pro build/fullsuite/fullprojectTS/integraci/GPU/server; ty musí mít navazující explicitní resources po předání CAD koordinátorem."
+  ],
+  "verification": [
+    "Před copy ověřit stabilní accepted product/tests, git status/worktree/registry, source12 identity a vlastní disjunktní claim.",
+    "Zkontrolovat exact source identity a all39 freshinstalled pinů po skutečné instalaci; CPU kopie sama není runtime či GPU přejímka.",
+    "Budoucí actual běh musí ověřit novou URL/bundle/source/helper identitu, původní76stages/30/90limity, main-pass instance draw, prvníF a správné B6 visibility po release."
+  ],
+  "notes": [
+    "Koordinátor root navazuje na autorizovanou migraci KEY22 a přesný receiver task328; nejde o neobjednané asset změny.",
+    "Vytvoření definice není začátek runtime měření. Aktuální resources mají CAD modely; žádné cizí zámky/procesy neukončovat ani neodvozovat právo z ready stavu.",
+    "Neznámý4.program SM/ALPHATEST/DEPTHPREPASS a Robin skinned shadowMap/eviction zůstávají samostatné otevřené mechanismy. Finální performance/main/default se podle tohoto checkpointu neuzavírají."
+  ]
+}

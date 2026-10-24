@@ -1,0 +1,202 @@
+TAP version 13
+# BJS - [07:40:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:46]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:46]: Skeleton "avatar local continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# Subtest: OFF update prepares actual own shadow before the first main base frame
+ok 1 - OFF update prepares actual own shadow before the first main base frame
+  ---
+  duration_ms: 92.3092
+  type: 'test'
+  ...
+# BJS - [07:40:47]: Skeleton "avatar local continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [07:40:47]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:47]: Skeleton "avatar local continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# Subtest: actual edit OFF shadow preparation / default Null caps / current lazy flow
+ok 2 - actual edit OFF shadow preparation / default Null caps / current lazy flow
+  ---
+  duration_ms: 360.2294
+  type: 'test'
+  ...
+# BJS - [07:40:47]: Skeleton "avatar local continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [07:40:47]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual edit OFF shadow preparation / default Null caps / targeted experiment
+ok 3 - actual edit OFF shadow preparation / default Null caps / targeted experiment
+  ---
+  duration_ms: 222.9014
+  type: 'test'
+  ...
+# BJS - [07:40:47]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual edit OFF shadow preparation / bone-texture caps / current lazy flow
+ok 4 - actual edit OFF shadow preparation / bone-texture caps / current lazy flow
+  ---
+  duration_ms: 198.8079
+  type: 'test'
+  ...
+# Subtest: actual edit OFF shadow preparation / bone-texture caps / targeted experiment
+ok 5 - actual edit OFF shadow preparation / bone-texture caps / targeted experiment
+  ---
+  duration_ms: 171.3679
+  type: 'test'
+  ...
+# Subtest: targeted pass scope restores the original pass and falsy rejection
+ok 6 - targeted pass scope restores the original pass and falsy rejection
+  ---
+  duration_ms: 0.9248
+  type: 'test'
+  ...
+# BJS - [07:40:49]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:50]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:50]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:50]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:50]: Babylon.js v9.30.0 - Null engine
+# Subtest: third-person torch follows actual right-hand FK for six builds, all headings and parent transforms
+ok 7 - third-person torch follows actual right-hand FK for six builds, all headings and parent transforms
+  ---
+  duration_ms: 164.767
+  type: 'test'
+  ...
+# Subtest: first-person hidden rig uses the displayed RH camera direction and a projected lower-right origin
+ok 8 - first-person hidden rig uses the displayed RH camera direction and a projected lower-right origin
+  ---
+  duration_ms: 17.8257
+  type: 'test'
+  ...
+# Subtest: steady torch updates reuse the prop/light and do not repeat enabled or light-source resynchronization
+ok 9 - steady torch updates reuse the prop/light and do not repeat enabled or light-source resynchronization
+  ---
+  duration_ms: 14.425
+  type: 'test'
+  ...
+# Subtest: profile replacement and missing/disposed rigs do not recreate orphan props or lose controller-owned materials
+ok 10 - profile replacement and missing/disposed rigs do not recreate orphan props or lose controller-owned materials
+  ---
+  duration_ms: 29.5318
+  type: 'test'
+  ...
+# Subtest: 128/256/512 torch shadows share one generator and real scene scheduling emits zero shadow passes while off
+ok 11 - 128/256/512 torch shadows share one generator and real scene scheduling emits zero shadow passes while off
+  ---
+  duration_ms: 71.5803
+  type: 'test'
+  ...
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# Subtest: local OFF shadow quality uses exact current native maps without light or caster changes
+ok 12 - local OFF shadow quality uses exact current native maps without light or caster changes
+  ---
+  duration_ms: 80.5174
+  type: 'test'
+  ...
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# Subtest: local pending work spends at most3 calls in32 batches and does not restart exhausted identity
+ok 13 - local pending work spends at most3 calls in32 batches and does not restart exhausted identity
+  ---
+  duration_ms: 35.1853
+  type: 'test'
+  ...
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# Subtest: completed local preparation has no new native calls, work allocations or scene scans
+ok 14 - completed local preparation has no new native calls, work allocations or scene scans
+  ---
+  duration_ms: 21.2594
+  type: 'test'
+  ...
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# Subtest: local preparation rejects unsupported and foreign targets without pretending ready
+ok 15 - local preparation rejects unsupported and foreign targets without pretending ready
+  ---
+  duration_ms: 20.7541
+  type: 'test'
+  ...
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# Subtest: local stale callback preserves newer owner without recursively spending another batch
+ok 16 - local stale callback preserves newer owner without recursively spending another batch
+  ---
+  duration_ms: 27.9506
+  type: 'test'
+  ...
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# Subtest: local same-owner reentry, native falsy throw, map replacement and dispose always restore pass
+ok 17 - local same-owner reentry, native falsy throw, map replacement and dispose always restore pass
+  ---
+  duration_ms: 36.9984
+  type: 'test'
+  ...
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# BJS - [07:40:53]: Babylon.js v9.30.0 - Null engine
+# Subtest: local configuration throws restore pass once and disposed callback owners are released
+ok 18 - local configuration throws restore pass once and disposed callback owners are released
+  ---
+  duration_ms: 17.6101
+  type: 'test'
+  ...
+# Subtest: model-derived beam follows translation, 90 degree yaw, pitch and parent transforms in actual world metres
+ok 19 - model-derived beam follows translation, 90 degree yaw, pitch and parent transforms in actual world metres
+  ---
+  duration_ms: 2.5097
+  type: 'test'
+  ...
+# Subtest: day, parking and invalid input disable the bounded beam; steady updates never repeat whole-scene light resync
+ok 20 - day, parking and invalid input disable the bounded beam; steady updates never repeat whole-scene light resync
+  ---
+  duration_ms: 3.4072
+  type: 'test'
+  ...
+# Subtest: medium and high use one 256/512 shadow target, low has no pass, and resized maps keep the real culling callback
+ok 21 - medium and high use one 256/512 shadow target, low has no pass, and resized maps keep the real culling callback
+  ---
+  duration_ms: 4.593
+  type: 'test'
+  ...
+# Subtest: off/on reuses configured shadows without a second global light-dirty pass or an off light slot
+ok 22 - off/on reuses configured shadows without a second global light-dirty pass or an off light slot
+  ---
+  duration_ms: 2.5925
+  type: 'test'
+  ...
+# Subtest: shadow candidates reuse storage while empty transitions and moved/reenabled casters remain current
+ok 23 - shadow candidates reuse storage while empty transitions and moved/reenabled casters remain current
+  ---
+  duration_ms: 2.374
+  type: 'test'
+  ...
+# Subtest: actual shadow frustum rejects behind/lateral/far/glass/faded/disabled casters while retaining crossing large bounds
+ok 24 - actual shadow frustum rejects behind/lateral/far/glass/faded/disabled casters while retaining crossing large bounds
+  ---
+  duration_ms: 5.9185
+  type: 'test'
+  ...
+# Subtest: reactivation, low-to-shadow return, large pose changes and new meshes invalidate stale broad phase immediately
+ok 25 - reactivation, low-to-shadow return, large pose changes and new meshes invalidate stale broad phase immediately
+  ---
+  duration_ms: 2.2417
+  type: 'test'
+  ...
+# Subtest: wind depth ownership and disposal are safe, idempotent and do not delete a replacement owner's wrapper
+ok 26 - wind depth ownership and disposal are safe, idempotent and do not delete a replacement owner's wrapper
+  ---
+  duration_ms: 2.1358
+  type: 'test'
+  ...
+# Subtest: exact 02:00 moonless night frees zero celestial key so hemisphere, two streets and headlight fit four material slots
+ok 27 - exact 02:00 moonless night frees zero celestial key so hemisphere, two streets and headlight fit four material slots
+  ---
+  duration_ms: 75.861
+  type: 'test'
+  ...
+1..27
+# tests 27
+# suites 0
+# pass 27
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9798.117

@@ -18,7 +18,9 @@ import { StableLightState } from "./stable-light-state";
 import { GltfLightBudget } from "./gltf-light-budget";
 import { prepareLightVariants } from "./light-preparation";
 import { prepareRenderQualities } from "./render-quality-preparation";
+import { startupViewKey, StartupViewGateBudget, type StartupPreparationSource, type StartupPreparationSnapshot } from "./startup-preparation-view";
 import { WebGpuPipelinePreparation } from "./webgpu-pipeline-preparation";
+import { StartupPreparationLoop } from "./startup-preparation-loop";
 import { arePreparationEffectsReady } from "./strict-material-preparation";
 import { selectLightingPreview } from "./lighting-preview";
 import {
@@ -390,6 +392,12 @@ export class Game {
   };
   network = false;
   ready = false;
+  startupPreparationSource?: StartupPreparationSource;
+  private startupPreparationSnapshot?: StartupPreparationSnapshot;
+  private startupPreparationRosterKey?: string;
+  private startupPreparationReapply?: () => void;
+  private startupPreparationRendered = "";
+  private startupPresentationLease?: { complete(): Promise<void>; dispose(): void };
   firstPerson = false;
   get footFirstPerson() {
     return this.firstPerson && !this.actor?.vehicle;
@@ -788,6 +796,7 @@ export class Game {
     this.benchmark = undefined;
     attempt("abort", () => this.startupAbort.abort());
     attempt("startup-assets", () => this.disposeStartupAssets());
+    attempt("startup-view", () => this.startupPresentationLease?.dispose());
     attempt("light-preparation", () => this.cancelLightPreparation?.());
     attempt("render-loop", () => this.engine.stopRenderLoop());
     attempt("benchmark", () => benchmark?.profile.dispose());
@@ -833,7 +842,81 @@ export class Game {
     try { return mesh.isReady(true); }
     finally { this.engine.currentRenderPassId = previousPass; }
   }
+  /** Read-only network presentation. The real authority queue and Actor remain
+   * owned by the original post-start UI drain/reconcile path. */
+  private refreshStartupPreparationView() {
+    if (!this.network || !this.startupPreparationSource) return false;
+    const next = this.startupPreparationSource();
+    if (!next || next.selfId !== this.localId) {
+      this.startupAbort.abort();
+      this.assertStartupActive();
+      return false;
+    }
+    const previous = this.startupPreparationSnapshot;
+    this.startupPreparationSnapshot = next;
+    const rosterChanged = this.startupPreparationRosterKey !== next.rosterKey;
+    if (rosterChanged) {
+      this.startupPreparationRosterKey = next.rosterKey;
+      const own = next.players.find(player => player.id === this.localId) ?? this.localPlayer;
+      this.updatePlayers([...next.players.filter(player => player.id !== this.localId), { ...own, ...this.profile, id: this.localId }]);
+    }
+    const a = previous?.authority, b = next.authority;
+    const changed = rosterChanged || previous?.ownerGeneration !== next.ownerGeneration || a?.inputEpoch !== b?.inputEpoch ||
+      a?.vehicle !== b?.vehicle || a?.position.x !== b?.position.x || a?.position.y !== b?.position.y || a?.position.z !== b?.position.z || a?.yaw !== b?.yaw;
+    if (changed) {
+      this.canvas.dataset.preparationView = !b ? "pending-authority" : b.vehicle ? "vehicle-unchanged" : "authority-foot";
+      this.canvas.dataset.preparationViewGeneration = String(next.ownerGeneration);
+      this.canvas.dataset.preparationViewEpoch = String(b?.inputEpoch ?? -1);
+      this.canvas.dataset.preparationViewPosition = b ? [b.position.x, b.position.y, b.position.z].join(",") : "";
+    }
+    return changed;
+  }
+  private preparationPosition() {
+    const view = this.startupPreparationSnapshot?.authority;
+    return view && !view.vehicle && !this.actor.vehicle ? view.position : this.actor.position;
+  }
+  private startupPreparationStamp() {
+    if (!this.startupPreparationSnapshot) return "";
+    const snapshot = this.startupPreparationSnapshot, view = snapshot.authority;
+    return JSON.stringify([snapshot.ownerGeneration, snapshot.selfId, view?.inputEpoch, view?.vehicle, view?.position, view?.yaw, view?.grounded,
+      snapshot.rosterKey, this.quality, this.timeOverride, this.flashlightOn, this.yaw, this.pitch, this.distance, this.firstPerson,
+      [...this.avatars].filter(([id]) => id !== this.localId).map(([id, avatar]) => [id, avatar.root.uniqueId,
+        avatar.root.position.x, avatar.root.position.y, avatar.root.position.z, avatar.root.rotation.y]),
+      this.startupPreparationCoverage()]);
+  }
+  private startupPreparationCoverage() {
+    if (!this.startupPreparationSnapshot) return "";
+    const active = this.scene.getActiveMeshes();
+    return JSON.stringify([zoneAt(this.preparationPosition()), this.b6Reality?.interiorLightEnabled ?? false,
+      this.localAvatarPresentation.state.visible, this.localAvatarPresentation.state.cameraLight,
+      [...this.avatars].filter(([id]) => id !== this.localId).map(([id, avatar]) => [id, avatar.lod.level, avatar.root.isEnabled()]),
+      this.scene.lights.filter(light => light.isEnabled()).map(light => [light.uniqueId, light.shadowEnabled]),
+      active.data.slice(0, active.length).map(mesh => [mesh.uniqueId, mesh.material?.uniqueId, mesh.skeleton?.uniqueId,
+        mesh instanceof Mesh ? mesh.hasThinInstances : false, mesh.morphTargetManager?.numInfluencers ?? 0])]);
+  }
+  async completeStartupPreparation() {
+    const lease = this.startupPresentationLease;
+    if (!lease) { this.assertStartupActive(); return; }
+    let failed = false;
+    try { await lease.complete(); }
+    catch (error) {
+      failed = true;
+      this.ready = false;
+      try { this.engine.stopRenderLoop(); } catch { /* Preserve the gate error. */ }
+      throw error;
+    } finally {
+      if (this.startupPresentationLease === lease) {
+        try { lease.dispose(); }
+        catch (error) { if (!failed) throw error; }
+      }
+    }
+  }
   async start() {
+    if (this.startupPresentationLease) throw new Error("Previous startup view handoff is still active");
+    if (this.network && this.startupPreparationSource) {
+      this.canvas.dataset.preparationViewReleased = "false";
+      this.canvas.dataset.preparationRemoteBoundary = "submitted-frame";
+    }
     this.assertStartupActive();
     this.canvas.dataset.bootStage = "presentation";
     this.presentationRate = await this.renderHealth.guard(measurePresentationRate());
@@ -868,14 +951,25 @@ export class Game {
     let pipelinePreparation: WebGpuPipelinePreparation | undefined;
     const renderPreloadScene = () => {
       if (!this.disposed) {
+        const changed = this.refreshStartupPreparationView();
+        if (changed || (this.startupPreparationSnapshot && this.startupPreparationRendered !== this.startupPreparationStamp())) this.startupPreparationReapply?.();
+        // Capture each real frame from accepted remote targets. Later packets
+        // keep their normal target/timeline ownership while this frame fences.
+        if (this.startupPreparationSnapshot) for (const [id, avatar] of this.avatars) {
+          if (id === this.localId) continue;
+          const target = avatar.target;
+          this.updateAvatarPresentation(id, avatar, new Vector3(target.x, target.y - 0.8, target.z), 0, !target.vehicle);
+        }
         this.gltfLightBudget.prepareFrame();
         this.stableLights.update();
         this.scene.render();
+        this.startupPreparationRendered = this.startupPreparationStamp();
       }
     };
     const preloadRender = () => pipelinePreparation
       ? pipelinePreparation.render(renderPreloadScene)
       : renderPreloadScene();
+    const gameplayRender = () => this.frame();
     this.engine.runRenderLoop(preloadRender);
     try {
       const [
@@ -965,7 +1059,8 @@ export class Game {
     this.surfacePack.update(1, this.quality, this.weather?.rain ?? 0);
     this.cinematic = new CinematicAtmosphere(this.scene, this.camera, this.sun);
     this.vehicleLighting = new VehicleLighting(this.scene);
-    this.updatePlayers([this.localPlayer]);
+    if (this.network && this.startupPreparationSource) this.refreshStartupPreparationView();
+    else this.updatePlayers([this.localPlayer]);
     this.engine.stopRenderLoop(preloadRender);
     // Only hidden startup draws may wait for a pipeline without drawing it.
     // Keep the scope through restore and the final submitted-frame gate.
@@ -979,14 +1074,44 @@ export class Game {
           renderer.resetRefreshCounter();
       },
     });
+    let lightPreparationLoop: StartupPreparationLoop | undefined;
+    let keepPresentationLease = false;
+    let preparationSucceeded = false;
+    let preparationDisposed = false;
+    let resumeGameplay = false;
+    let stopGateClock = () => {};
+    let handoffWaiting = false;
+    let handoffTimer: ReturnType<typeof setTimeout> | undefined;
+    const disposePreparation = () => {
+      if (preparationDisposed) return;
+      preparationDisposed = true;
+      handoffWaiting = false;
+      clearTimeout(handoffTimer);
+      this.startupPresentationLease = undefined;
+      stopGateClock();
+      stopGateClock = () => {};
+      this.startupPreparationReapply = undefined;
+      this.startupPreparationSource = undefined;
+      this.startupPreparationSnapshot = undefined;
+      this.startupPreparationRosterKey = undefined;
+      try { lightPreparationLoop?.dispose(); }
+      finally { pipelinePreparation?.dispose(); pipelinePreparation = undefined; }
+      if (resumeGameplay && this.ready && !this.disposed && !this.rendererFailed)
+        this.engine.runRenderLoop(gameplayRender);
+    };
     try {
+      lightPreparationLoop = new StartupPreparationLoop(this.engine, this.renderHealth, {
+        signal: this.startupAbort.signal,
+      });
       this.canvas.dataset.bootStage = "light-preparation";
       if (this.frameLifecycleProfile)
         sessionDiagnostics.event("engine-frame-profile", {
           stage: "preparation-start", rendererId: this.renderHealth.rendererId,
           timing: this.frameLifecycleProfile.snapshot(),
         });
-      const preparation = await this.renderHealth.guard(this.prepareLighting(preloadRender, pipelinePreparation));
+      const preparation = await this.renderHealth.guard(this.prepareLighting(
+        preloadRender, pipelinePreparation, lightPreparationLoop,
+      ));
       this.assertStartupActive();
       sessionDiagnostics.event("lighting-preparation", preparation);
       sessionDiagnostics.event("webgpu-preparation-profile", this.compilationProfile.snapshot());
@@ -1000,13 +1125,42 @@ export class Game {
         this.renderHealth.report("pipeline", `Příprava světel: ${preparation.status}`);
         throw new Error(`Přípravu 3D scény se nepodařilo dokončit (${preparation.status}).`);
       }
+      // The light state machine settles synchronously in its last tick. Its
+      // actual submission must finish before the separate RAF gate owns frames.
+      await this.renderHealth.guard(lightPreparationLoop.waitForIdle());
+      this.assertStartupActive();
       this.canvas.dataset.bootStage = "submitted-frame";
       this.compilationProfile.setStage("submitted-frame");
-      await waitForRenderStartup({
+      this.startupPreparationReapply = () => this.applyPreparationView(this.timeOverride ?? Date.now(), this.flashlightOn);
+      const budget = this.startupPreparationSource ? new StartupViewGateBudget(() => performance.now(), !document.hidden) : undefined;
+      const armHandoff = () => {
+        clearTimeout(handoffTimer);
+        handoffTimer = undefined;
+        if (!budget || !handoffWaiting || document.hidden || this.disposed) return;
+        handoffTimer = setTimeout(() => {
+          handoffTimer = undefined;
+          if (!handoffWaiting || this.disposed) return;
+          if (budget.remaining() > 0) return armHandoff();
+          handoffWaiting = false;
+          this.renderHealth.report("pipeline", new Error("Startup view submitted-frame budget exhausted"));
+        }, budget.remaining());
+      };
+      if (budget) {
+        const visibility = () => { budget.visibility(!document.hidden); armHandoff(); };
+        document.addEventListener("visibilitychange", visibility);
+        stopGateClock = () => document.removeEventListener("visibilitychange", visibility);
+      }
+      const gateOwner = this.startupPreparationSource ? this.renderHealth.snapshot() : undefined;
+      const gate = (revalidate = false) => waitForRenderStartup({
         engine: this.engine,
         health: this.renderHealth,
         render: preloadRender,
+        timeoutMs: budget?.remaining(),
+        revalidate: revalidate ? gateOwner : undefined,
         isReady: () => {
+          if (this.refreshStartupPreparationView()) this.startupPreparationReapply?.();
+          if (this.startupPreparationSnapshot && (!this.startupPreparationSnapshot.authority ||
+              this.startupPreparationRendered !== this.startupPreparationStamp())) return false;
           if (!pipelinePreparation!.isReady()) return false;
           const meshes = this.scene.getActiveMeshes();
           for (let index = 0; index < meshes.length; index++)
@@ -1015,16 +1169,50 @@ export class Game {
         },
         signal: this.startupAbort.signal,
       });
+      await gate();
       this.assertStartupActive();
+      if (this.network && this.startupPreparationSource) {
+        let completion: Promise<void> | undefined;
+        const lease = {
+          complete: () => completion ??= (async () => {
+            handoffWaiting = false;
+            clearTimeout(handoffTimer);
+            // The manual gate must be the only owner submitting this scene.
+            // Stop only our held callback, retaining any unrelated engine work.
+            this.engine.stopRenderLoop(preloadRender);
+            this.assertStartupActive();
+            this.refreshStartupPreparationView();
+            if (budget && budget.remaining() <= 0) throw new Error("Startup view submitted-frame budget exhausted");
+            // Vehicle preparation retains its original behavior/coverage. A
+            // foot view is never projected onto vehicle physics or headlamps.
+            if (this.startupPreparationSnapshot?.authority?.vehicle !== true) {
+              this.startupPreparationReapply?.();
+              await gate(true);
+              this.assertStartupActive();
+            }
+            this.canvas.dataset.preparationViewReleased = "true";
+            this.canvas.dataset.bootStage = "ready";
+            resumeGameplay = true;
+          })(),
+          dispose: disposePreparation,
+        };
+        this.startupPresentationLease = lease;
+        handoffWaiting = true;
+        armHandoff();
+        keepPresentationLease = true;
+      }
+      preparationSucceeded = true;
     } finally {
-      pipelinePreparation.dispose();
-      pipelinePreparation = undefined;
+      if (!keepPresentationLease) {
+        try { disposePreparation(); }
+        catch (error) { if (preparationSucceeded) throw error; }
+      }
     }
     this.canvas.dataset.renderHealth = "ready";
     this.compilationProfile.setStage("ready");
     this.ready = true;
-    this.canvas.dataset.bootStage = "ready";
-    this.engine.runRenderLoop(() => this.frame());
+    this.canvas.dataset.bootStage = this.startupPresentationLease ? "startup-view-handoff" : "ready";
+    this.engine.runRenderLoop(this.startupPresentationLease ? preloadRender : gameplayRender);
   }
   mat(hex: string) {
     if (this.materials.has(hex)) return this.materials.get(hex)!;
@@ -1516,7 +1704,7 @@ export class Game {
       this.applyAdaptiveQuality(this.adaptive.setTargetFps(fps));
   }
   startBenchmark() {
-    if (!this.ready || this.disposed || this.rendererFailed) return false;
+    if (!this.ready || this.disposed || this.rendererFailed || this.startupPresentationLease) return false;
     // Faulted renderers retain automatic diagnostic records, but cannot start
     // another performance sample until a fresh Game has completed preparation.
     this.benchmark?.profile.dispose();
@@ -1909,10 +2097,12 @@ export class Game {
     resetAnimation = false,
   ) {
     const local = id === this.localId;
-    const p = avatar.target;
+    const preparation = local && !this.actor.vehicle && this.startupPreparationSnapshot?.authority?.vehicle === false
+      ? this.startupPreparationSnapshot.authority : undefined;
+    const p = preparation ? { ...avatar.target, yaw: preparation.yaw, vehicle: false } : avatar.target;
     // Remote position and contact come from the same SnapshotBuffer sample.
     // Unknown legacy contact stays unknown; height motion is not a jump flag.
-    const grounded = local ? this.actor.grounded : p.grounded;
+    const grounded = local ? preparation?.grounded ?? this.actor.grounded : p.grounded;
     const distance = Vector3.Distance(this.camera.position, target);
     writeVector3(avatar.root.position, target.x, target.y, target.z);
     const lod = avatar.lod.update({
@@ -2361,8 +2551,12 @@ export class Game {
     }
     return lighting;
   }
-  private prepareLighting(render: () => void, pipelines?: Pick<WebGpuPipelinePreparation, "isReady">) {
-    if (!this.engine.isWebGPU) return this.prepareLightingVariants(render, pipelines);
+  private prepareLighting(
+    render: () => void,
+    pipelines?: Pick<WebGpuPipelinePreparation, "isReady">,
+    loop?: Pick<StartupPreparationLoop, "run" | "stop" | "render">,
+  ) {
+    if (!this.engine.isWebGPU) return this.prepareLightingVariants(render, pipelines, undefined, loop);
     const isDisposed = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
     const restoreQuality = () => {
       if (!this.preparingRenderQuality) return;
@@ -2377,6 +2571,7 @@ export class Game {
     let synchronizeEnvironment = true;
     return prepareRenderQualities({
       initialQuality: this.adaptive.state.quality,
+      requestedQuality: () => this.adaptive.state.quality,
       applyQuality: (quality) => {
         this.preparingRenderQuality = true;
         if (synchronizeEnvironment) {
@@ -2386,7 +2581,7 @@ export class Game {
           const requested = this.adaptive.state;
           this.applyRenderQuality(requested.quality, requested.hardwareScaling);
           this.updateRenderEnvironment(
-            this.actor.position,
+            this.preparationPosition(),
             this.avatars.get(this.localId),
             false,
             0,
@@ -2400,16 +2595,39 @@ export class Game {
         render,
         pipelines,
         { timeoutMs, restoreQuality: finalPass ? restoreQuality : undefined },
+        loop,
       ),
       restore: restoreQuality,
       isDisposed,
       now: () => performance.now(),
     });
   }
+  /** Shared real presentation path for startup variants and the exact final
+   * network view. No Actor/physics/input/timeline state is changed here. */
+  private applyPreparationView(instant: number, flashlightOn: boolean, vehicle = false) {
+    const pos = this.preparationPosition();
+    this.updateWorldPresentation(pos);
+    const self = this.avatars.get(this.localId);
+    let cameraLight = false;
+    if (!vehicle) {
+      const position = new Vector3(pos.x, pos.y, pos.z);
+      const feet = position.add(new Vector3(0, -0.8, 0));
+      this.updateCameraFollow(position, self?.eyeHeight ?? 1.63, 1);
+      const view = this.localAvatarPresentation.update({
+        camera: this.camera.position, feet, bodyHeight: self?.bodyHeight ?? 1.8,
+        bodyWidthScale: self ? self.measurements.legSpacing / 0.105 : 1,
+        nearPlane: this.camera.minZ, firstPerson: this.firstPerson, vehicle: this.actor.vehicle,
+      });
+      if (self) this.updateAvatarPresentation(this.localId, self, feet, 0, view.visible, view.resetAnimation);
+      cameraLight = view.cameraLight;
+    }
+    return this.updateRenderEnvironment(pos, self, cameraLight, 0, performance.now() / 1000, instant, flashlightOn);
+  }
   private prepareLightingVariants(
     render: () => void,
     pipelines?: Pick<WebGpuPipelinePreparation, "isReady">,
     options?: { timeoutMs: number; restoreQuality?: () => void },
+    loop?: Pick<StartupPreparationLoop, "run" | "stop" | "render">,
   ) {
     const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
     // The same controller/materials survive into gameplay; no proxy shaders.
@@ -2417,8 +2635,12 @@ export class Game {
     const night = selectLightingPreview("night").instant!;
     const includeDayPointVariants = this.engine.isWebGPU;
     const day = includeDayPointVariants ? selectLightingPreview("day").instant! : null;
-    const includeLowVehicleVariants = this.engine.isWebGPU && this.quality === "low";
-    const authoredPreparation = includeLowVehicleVariants ? new AuthoredLightPreparation(this.scene) : undefined;
+    const includeVehicleVariants = this.engine.isWebGPU;
+    // Physically valid Strahov nights cover both light-slot layouts regardless
+    // of today's Moon. Only hidden preparation uses these fixed UTC instants.
+    const vehicleNight = Date.parse("2026-10-10T22:00:00Z");
+    const vehicleKeyedNight = Date.parse("2026-10-23T22:00:00Z");
+    const authoredPreparation = includeVehicleVariants ? new AuthoredLightPreparation(this.scene) : undefined;
     let stopAuthoredPreparation: (() => void) | undefined;
     const restoreAuthoredPreparation = () => {
       const stop = stopAuthoredPreparation;
@@ -2426,6 +2648,7 @@ export class Game {
       stop?.();
     };
     let deactivateGrass: (() => void) | undefined;
+    let ownedViewApply: (() => void) | undefined;
     const stopGrassPreparation = () => {
       const stop = deactivateGrass;
       deactivateGrass = undefined;
@@ -2475,48 +2698,17 @@ export class Game {
       flashlightOn: boolean,
       streetCount?: number,
       vehicle = false,
+      refreshOnly = false,
     ) => {
-      beginGrassPreparation();
-      restoreAuthoredPreparation();
-      const pos = this.actor.position;
-      this.updateWorldPresentation(pos);
-      const self = this.avatars.get(this.localId);
-      let cameraLight = false;
-      if (!vehicle) {
-        const position = new Vector3(pos.x, pos.y, pos.z);
-        const feet = position.add(new Vector3(0, -0.8, 0));
-        // Settle the same collision-aware follow camera behind the loading cover.
-        // This is presentation only; no simulation or animation time advances.
-        this.updateCameraFollow(position, self?.eyeHeight ?? 1.63, 1);
-        const view = this.localAvatarPresentation.update({
-          camera: this.camera.position,
-          feet,
-          bodyHeight: self?.bodyHeight ?? 1.8,
-          bodyWidthScale: self ? self.measurements.legSpacing / 0.105 : 1,
-          nearPlane: this.camera.minZ,
-          firstPerson: this.firstPerson,
-          vehicle: this.actor.vehicle,
-        });
-        if (self)
-          this.updateAvatarPresentation(
-            this.localId,
-            self,
-            feet,
-            0,
-            view.visible,
-            view.resetAnimation,
-          );
-        cameraLight = view.cameraLight;
+      if (!refreshOnly) {
+        beginGrassPreparation();
+        restoreAuthoredPreparation();
       }
-      const lighting = this.updateRenderEnvironment(
-        pos,
-        self,
-        cameraLight,
-        0,
-        performance.now() / 1000,
-        instant,
-        flashlightOn,
-      );
+      this.refreshStartupPreparationView();
+      const pos = this.preparationPosition();
+      const lighting = this.applyPreparationView(instant, flashlightOn, vehicle);
+      ownedViewApply = () => apply(instant, flashlightOn, streetCount, vehicle, true);
+      this.startupPreparationReapply = ownedViewApply;
       if (streetCount !== undefined) {
         // A first walk can leave the last lamp's range and change POINT defines.
         // Prepare each allowed count using existing mapped lamps, only while
@@ -2542,12 +2734,12 @@ export class Game {
         }
       }
       // Select after environment and forced street membership describe this stage.
-      if (vehicle) stopAuthoredPreparation = authoredPreparation?.begin();
+      if (vehicle && !refreshOnly) stopAuthoredPreparation = authoredPreparation?.begin();
     };
     const restore = () => {
       restoreVehicle();
       if (!isRetired()) {
-        if (includeLowVehicleVariants && !vehicleRootsLive()) {
+        if (includeVehicleVariants && !vehicleRootsLive()) {
           // Inactive update never reads the disposed root's world matrix. Stop
           // this owned beam, but do not run normal presentation on dead roots.
           this.vehicleLighting?.update(this.car, 0, false, this.quality);
@@ -2561,14 +2753,17 @@ export class Game {
     return prepareLightVariants({
       timeoutMs: options?.timeoutMs,
       includeDayPointVariants,
-      includeLowVehicleVariants,
+      includeVehicleVariants,
       apply: (stage) => {
         if (stage === "restore") return restore();
         const vehicle = stage.startsWith("vehicle-");
         if (vehicle) showVehicle();
         else restoreVehicle();
         this.compilationProfile.setStage(stage);
-        if (vehicle) return apply(night, false, Number(stage.split("-")[1]), true);
+        if (vehicle) return apply(
+          stage.startsWith("vehicle-keyed-") ? vehicleKeyedNight : vehicleNight,
+          false, Number(stage.split("-").at(-1)), true,
+        );
         const isNight = stage.startsWith("night-");
         const isDay = stage.startsWith("day-");
         apply(
@@ -2594,14 +2789,15 @@ export class Game {
         // Real preparation and newly requested effects must settle before this
         // variant advances, even if a material can still draw its old effect.
         return (
+          (!this.startupPreparationSnapshot || this.startupPreparationSnapshot.authority !== null) &&
           (pipelines?.isReady() ?? true) &&
           health.pendingPreparationOperations === 0 &&
           arePreparationEffectsReady(this.engine)
         );
       },
-      render,
-      run: (callback) => this.engine.runRenderLoop(callback),
-      stop: (callback) => this.engine.stopRenderLoop(callback),
+      render: loop ? () => loop.render(render) : render,
+      run: (callback) => loop ? loop.run(callback) : this.engine.runRenderLoop(callback),
+      stop: (callback) => loop ? loop.stop(callback) : this.engine.stopRenderLoop(callback),
       onDispose: (callback) => {
         this.cancelLightPreparation = callback;
         const observer = this.scene.onDisposeObservable.add(callback);
@@ -2625,8 +2821,10 @@ export class Game {
         this.parkedCar?.isDisposed(),
         this.vegetation,
         this.vegetation?.grassPreparationRevision,
+        this.startupPreparationSnapshot ? startupViewKey(this.startupPreparationSnapshot) : "",
+        this.startupPreparationCoverage(),
       ],
-      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials", "car", "parkedCar", "carDisposed", "parkedCarDisposed", "vegetation", "grassResources"],
+      revisionKeys: ["quality", "timeOverride", "profile", "weather", "meshes", "materials", "car", "parkedCar", "carDisposed", "parkedCarDisposed", "vegetation", "grassResources", "startupView", "presentationCoverage"],
       isVisible: () => !document.hidden,
       onVisibilityChange: (callback) => {
         document.addEventListener("visibilitychange", callback);
@@ -2637,6 +2835,7 @@ export class Game {
         window.setTimeout(callback, milliseconds),
       clearTimer: (timer) => window.clearTimeout(timer as number),
     }).finally(() => {
+      if (this.startupPreparationReapply === ownedViewApply) this.startupPreparationReapply = undefined;
       try { restoreVehicle(); } finally {
         try { restoreAuthoredPreparation(); } finally {
           try { authoredPreparation?.dispose(); } finally { stopGrassPreparation(); }
@@ -3109,6 +3308,11 @@ export class Game {
     this.disposed = true;
     this.ready = false;
     this.startupAbort.abort();
+    try { this.startupPresentationLease?.dispose(); }
+    catch { /* The remaining original Game teardown must still run. */ }
+    this.startupPreparationSource = undefined;
+    this.startupPreparationSnapshot = undefined;
+    this.startupPreparationReapply = undefined;
     this.renderHealth.dispose();
     this.disposeStartupAssets();
     this.cancelLightPreparation?.();

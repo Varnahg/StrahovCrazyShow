@@ -1,0 +1,1430 @@
+{
+  "atUTC": "2026-10-24T03:08:43.600Z",
+  "sourceCommit": "ee108d955c448b147b9bc5b3701ec1ea2a4f5c58",
+  "sourceSnapshotId": "cb6fff55579a33a6228615eb539c9aab6f306d948fd822d028fd252acbf8a8eb",
+  "buildId": "0fdab610ce73918a83dda152eef16e24691643f69ae526935e385ac88c3529b2",
+  "helperSha256": "02afa252ae635b189f6a743f9977e27a012fc1d0662729a306ae613082aa19d1",
+  "sourceFiles": 8585,
+  "httpMatched": 21,
+  "currentChecks": {
+    "nativePins": 39,
+    "coreSingleton": true,
+    "targetedCpu": 147,
+    "fullTypesBuild": "PASS",
+    "isolatedIntegration": "PASS",
+    "exactHeadCi": "https://github.com/Varnahg/StrahovCrazyShow/actions/runs/40054285924"
+  },
+  "startup": [
+    {
+      "file": "receipts/02e3300d-bad7-46bf-b55f-14be21b385f5.json",
+      "outcome": "resolved",
+      "error": null,
+      "terminal": {
+        "atMs": 242425.30000007153,
+        "utc": "2026-10-24T02:58:01.600Z",
+        "visibility": "visible",
+        "focused": true,
+        "ready": true,
+        "disposed": false,
+        "preparingRenderQuality": false,
+        "stages": {
+          "bootStage": "startup-view-handoff",
+          "lightPreparation": "complete",
+          "physicsStage": "ready",
+          "b6Stage": "ready",
+          "carStage": "ready",
+          "renderHealth": "ready"
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "quality": "medium",
+        "requestedRendering": {
+          "mode": "auto",
+          "quality": "medium",
+          "hardwareScaling": 1,
+          "targetFps": 60,
+          "revision": 0
+        },
+        "viewport": {
+          "width": 2040,
+          "height": 986,
+          "dpr": 1.0000000149011612
+        },
+        "backbuffer": {
+          "width": 2040,
+          "height": 986,
+          "scaling": 1
+        },
+        "gpu": {
+          "backend": "webgpu",
+          "compatibilityMode": true,
+          "gpuTimingScope": "main-render-pass-only",
+          "renderer": "pascal",
+          "vendor": "nvidia",
+          "version": "unknown version",
+          "classification": "unknown",
+          "context": {
+            "requestedAntialias": true,
+            "actualAntialias": null,
+            "defaultFramebuffer": null,
+            "sampleBuffers": null,
+            "samples": null
+          }
+        },
+        "health": {
+          "rendererId": 4,
+          "purpose": "game",
+          "generation": 1,
+          "phase": "ready",
+          "valid": true,
+          "errorCount": 0,
+          "pendingOperations": 0,
+          "pendingPreparationOperations": 0,
+          "pendingShaderValidationOperations": 0,
+          "counts": {
+            "effect": 0,
+            "shader": 0,
+            "pipeline": 0,
+            "validation": 0,
+            "texture": 0,
+            "device": 0,
+            "render": 0
+          },
+          "firstErrors": []
+        },
+        "renderErrors": 0,
+        "assetErrors": 0,
+        "network": true,
+        "avatarCount": 1,
+        "avatars": [
+          {
+            "id": "05b5492d-332c-4a18-80a6-8fced9209c42",
+            "local": true,
+            "avatar": {
+              "preset": 4,
+              "skin": "#bf8f72",
+              "hair": "#211e1d",
+              "shirt": "#b3a374",
+              "trousers": "#334047",
+              "glasses": false,
+              "beard": false,
+              "face": 0.4
+            },
+            "position": {
+              "x": 110,
+              "y": -2.324,
+              "z": 12
+            },
+            "lod": "near"
+          }
+        ],
+        "avatarsOmitted": 0,
+        "actor": {
+          "x": 110,
+          "y": -2.1440000534057617,
+          "z": 12
+        },
+        "vehicle": false,
+        "yaw": 3.141592653589793,
+        "pitch": 0.28,
+        "distance": 8,
+        "camera": {
+          "position": {
+            "x": 110,
+            "y": 1.396100401878357,
+            "z": 20.00003433227539
+          },
+          "fov": 0.85,
+          "view": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0.9316545724868774,
+            0.36334526538848877,
+            0,
+            0,
+            -0.36334526538848877,
+            0.9316545724868774,
+            0,
+            -110,
+            5.9662346839904785,
+            -19.140390396118164,
+            1
+          ],
+          "projection": [
+            1.0679436922073364,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000072717666626,
+            -1,
+            0,
+            0,
+            -0.08000581711530685,
+            0
+          ]
+        },
+        "lightingInstant": null,
+        "trafficInstant": 1792598400000,
+        "flashlight": false,
+        "transitClock": {
+          "configId": "1eb1927f8ae0b338bf4cb85bc643e7485f65214e3026692d5e8a4fe2dbf99fd6",
+          "configSha256": "7edb895903252c6836062229b6d2df9613589d6c6d09ac9578473278eb6fc9b3",
+          "simulationSourceSha256": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
+          "active": true,
+          "actualSimulationMatches": true,
+          "physics": {
+            "configId": "1eb1927f8ae0b338bf4cb85bc643e7485f65214e3026692d5e8a4fe2dbf99fd6",
+            "active": true,
+            "methodOwned": true,
+            "restoreConflict": false,
+            "calls": 0,
+            "originalThrows": 0,
+            "preArmCalls": 0,
+            "postArmCalls": 0,
+            "rewindCalls": 0,
+            "instancesObserved": 0,
+            "unexpectedReceivers": 0,
+            "lastOriginalUTC": null,
+            "lastMappedUTC": null
+          },
+          "rendering": {
+            "configId": "1eb1927f8ae0b338bf4cb85bc643e7485f65214e3026692d5e8a4fe2dbf99fd6",
+            "active": true,
+            "methodOwned": true,
+            "restoreConflict": false,
+            "calls": 260,
+            "originalThrows": 0,
+            "preArmCalls": 260,
+            "postArmCalls": 0,
+            "rewindCalls": 0,
+            "instancesObserved": 1,
+            "unexpectedReceivers": 0,
+            "lastOriginalUTC": 1792810681496.6062,
+            "lastMappedUTC": 1792598400000
+          }
+        },
+        "weather": {
+          "temperature": 12.3,
+          "cloud": 0.86,
+          "rain": 0,
+          "wind": 1.8,
+          "windDirection": 337.5,
+          "observedAt": 1792579930000,
+          "fetchedAt": 1792579957998,
+          "stale": true,
+          "cloudStale": true,
+          "status": "fallback",
+          "sourceKind": "station",
+          "source": "Řízené testovací počasí · uložený záznam",
+          "cloudSource": "Řízený meteorologický model · benchmark",
+          "cloudObservedAt": 1792579500000,
+          "cloudWindSource": "Řízené modelové proudění · benchmark",
+          "cloudLayers": {
+            "low": 0,
+            "mid": 0.78,
+            "high": 0.34
+          },
+          "cloudWinds": {
+            "low": {
+              "speed": 9.2,
+              "direction": 148
+            },
+            "mid": {
+              "speed": 15.04,
+              "direction": 193
+            },
+            "high": {
+              "speed": 24.18,
+              "direction": 195
+            }
+          },
+          "humidity": 78,
+          "snowfall": 0,
+          "precipitationType": "none",
+          "windGust": 3.5,
+          "visibility": 36360,
+          "liquidPrecipitation": 0,
+          "fieldSources": {
+            "windGust": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "humidity": {
+              "kind": "station",
+              "source": "Meteostanice Silicon Hill",
+              "observedAt": 1792579930000,
+              "stale": true
+            },
+            "visibility": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "snowfall": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "liquidPrecipitation": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "precipitationType": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            }
+          }
+        },
+        "scene": {
+          "meshes": 3360,
+          "materials": 223,
+          "geometries": 2475,
+          "activeMeshes": 550,
+          "waitingItems": 0
+        },
+        "ambient": {
+          "buses": 1,
+          "passengers": 0,
+          "cars": 1
+        }
+      },
+      "preparationSummary": {
+        "available": true,
+        "status": "complete",
+        "elapsedMs": 80247.60000002384,
+        "activeElapsedMs": 80247.60000002384,
+        "pausedMs": 0,
+        "failureStep": null,
+        "stageCount": 76,
+        "qualityCount": 4,
+        "qualitiesTruncated": false,
+        "qualities": [
+          {
+            "quality": "low",
+            "finalPass": false,
+            "status": "complete",
+            "elapsedMs": 26995,
+            "activeElapsedMs": 26995,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stageCount": 19,
+            "valid": true
+          },
+          {
+            "quality": "medium",
+            "finalPass": false,
+            "status": "complete",
+            "elapsedMs": 29128.600000023842,
+            "activeElapsedMs": 29128.600000023842,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stageCount": 19,
+            "valid": true
+          },
+          {
+            "quality": "high",
+            "finalPass": false,
+            "status": "complete",
+            "elapsedMs": 18499.699999928474,
+            "activeElapsedMs": 18499.699999928474,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stageCount": 19,
+            "valid": true
+          },
+          {
+            "quality": "medium",
+            "finalPass": true,
+            "status": "complete",
+            "elapsedMs": 5624.100000023842,
+            "activeElapsedMs": 5624.100000023842,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stageCount": 19,
+            "valid": true
+          }
+        ],
+        "valid": true,
+        "invalidFields": 0
+      }
+    },
+    {
+      "file": "receipts/801dc7ff-1492-4a51-934a-bb842c9ffa25.json",
+      "outcome": "rejected",
+      "error": {
+        "name": "AbortError",
+        "message": "Renderer disposed"
+      },
+      "terminal": {
+        "atMs": 827434.1000000238,
+        "unavailable": true,
+        "error": {
+          "name": "TypeError",
+          "message": "Cannot read properties of undefined (reading 'avatars')"
+        }
+      },
+      "preparationSummary": {
+        "available": false,
+        "reason": "not-observed"
+      }
+    },
+    {
+      "file": "receipts/99c27c5a-5070-4254-b26b-36ba81aaf3bf.json",
+      "outcome": "resolved",
+      "error": null,
+      "terminal": {
+        "atMs": 131966.60000002384,
+        "utc": "2026-10-24T02:42:22.104Z",
+        "visibility": "visible",
+        "focused": true,
+        "ready": true,
+        "disposed": false,
+        "preparingRenderQuality": false,
+        "stages": {
+          "bootStage": "startup-view-handoff",
+          "lightPreparation": "complete",
+          "physicsStage": "ready",
+          "b6Stage": "ready",
+          "carStage": "ready",
+          "renderHealth": "ready"
+        },
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "quality": "medium",
+        "requestedRendering": {
+          "mode": "auto",
+          "quality": "medium",
+          "hardwareScaling": 1,
+          "targetFps": 60,
+          "revision": 0
+        },
+        "viewport": {
+          "width": 2040,
+          "height": 986,
+          "dpr": 1.0000000149011612
+        },
+        "backbuffer": {
+          "width": 2040,
+          "height": 986,
+          "scaling": 1
+        },
+        "gpu": {
+          "backend": "webgpu",
+          "compatibilityMode": true,
+          "gpuTimingScope": "main-render-pass-only",
+          "renderer": "pascal",
+          "vendor": "nvidia",
+          "version": "unknown version",
+          "classification": "unknown",
+          "context": {
+            "requestedAntialias": true,
+            "actualAntialias": null,
+            "defaultFramebuffer": null,
+            "sampleBuffers": null,
+            "samples": null
+          }
+        },
+        "health": {
+          "rendererId": 2,
+          "purpose": "game",
+          "generation": 1,
+          "phase": "ready",
+          "valid": true,
+          "errorCount": 0,
+          "pendingOperations": 0,
+          "pendingPreparationOperations": 0,
+          "pendingShaderValidationOperations": 0,
+          "counts": {
+            "effect": 0,
+            "shader": 0,
+            "pipeline": 0,
+            "validation": 0,
+            "texture": 0,
+            "device": 0,
+            "render": 0
+          },
+          "firstErrors": []
+        },
+        "renderErrors": 0,
+        "assetErrors": 0,
+        "network": true,
+        "avatarCount": 1,
+        "avatars": [
+          {
+            "id": "ed353043-fe60-439c-b753-f804ecaae53f",
+            "local": true,
+            "avatar": {
+              "preset": 4,
+              "skin": "#bf8f72",
+              "hair": "#211e1d",
+              "shirt": "#b3a374",
+              "trousers": "#334047",
+              "glasses": false,
+              "beard": false,
+              "face": 0.4
+            },
+            "position": {
+              "x": 110,
+              "y": -2.324,
+              "z": 12
+            },
+            "lod": "near"
+          }
+        ],
+        "avatarsOmitted": 0,
+        "actor": {
+          "x": 110,
+          "y": -2.1440000534057617,
+          "z": 12
+        },
+        "vehicle": false,
+        "yaw": 3.141592653589793,
+        "pitch": 0.28,
+        "distance": 8,
+        "camera": {
+          "position": {
+            "x": 110,
+            "y": 1.396100401878357,
+            "z": 20.00003433227539
+          },
+          "fov": 0.85,
+          "view": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0.9316545724868774,
+            0.36334526538848877,
+            0,
+            0,
+            -0.36334526538848877,
+            0.9316545724868774,
+            0,
+            -110,
+            5.9662346839904785,
+            -19.140390396118164,
+            1
+          ],
+          "projection": [
+            1.0679436922073364,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000072717666626,
+            -1,
+            0,
+            0,
+            -0.08000581711530685,
+            0
+          ]
+        },
+        "lightingInstant": null,
+        "trafficInstant": 1792598400000,
+        "flashlight": false,
+        "transitClock": {
+          "configId": "1eb1927f8ae0b338bf4cb85bc643e7485f65214e3026692d5e8a4fe2dbf99fd6",
+          "configSha256": "7edb895903252c6836062229b6d2df9613589d6c6d09ac9578473278eb6fc9b3",
+          "simulationSourceSha256": "3ce273b85b99c9fa7014482a1822d15476aecd40ef841687004f3fe2cfe69c88",
+          "active": true,
+          "actualSimulationMatches": true,
+          "physics": {
+            "configId": "1eb1927f8ae0b338bf4cb85bc643e7485f65214e3026692d5e8a4fe2dbf99fd6",
+            "active": true,
+            "methodOwned": true,
+            "restoreConflict": false,
+            "calls": 0,
+            "originalThrows": 0,
+            "preArmCalls": 0,
+            "postArmCalls": 0,
+            "rewindCalls": 0,
+            "instancesObserved": 0,
+            "unexpectedReceivers": 0,
+            "lastOriginalUTC": null,
+            "lastMappedUTC": null
+          },
+          "rendering": {
+            "configId": "1eb1927f8ae0b338bf4cb85bc643e7485f65214e3026692d5e8a4fe2dbf99fd6",
+            "active": true,
+            "methodOwned": true,
+            "restoreConflict": false,
+            "calls": 258,
+            "originalThrows": 0,
+            "preArmCalls": 258,
+            "postArmCalls": 0,
+            "rewindCalls": 0,
+            "instancesObserved": 1,
+            "unexpectedReceivers": 0,
+            "lastOriginalUTC": 1792809742007.4353,
+            "lastMappedUTC": 1792598400000
+          }
+        },
+        "weather": {
+          "temperature": 12.3,
+          "cloud": 0.86,
+          "rain": 0,
+          "wind": 1.8,
+          "windDirection": 337.5,
+          "observedAt": 1792579930000,
+          "fetchedAt": 1792579957998,
+          "stale": true,
+          "cloudStale": true,
+          "status": "fallback",
+          "sourceKind": "station",
+          "source": "Řízené testovací počasí · uložený záznam",
+          "cloudSource": "Řízený meteorologický model · benchmark",
+          "cloudObservedAt": 1792579500000,
+          "cloudWindSource": "Řízené modelové proudění · benchmark",
+          "cloudLayers": {
+            "low": 0,
+            "mid": 0.78,
+            "high": 0.34
+          },
+          "cloudWinds": {
+            "low": {
+              "speed": 9.2,
+              "direction": 148
+            },
+            "mid": {
+              "speed": 15.04,
+              "direction": 193
+            },
+            "high": {
+              "speed": 24.18,
+              "direction": 195
+            }
+          },
+          "humidity": 78,
+          "snowfall": 0,
+          "precipitationType": "none",
+          "windGust": 3.5,
+          "visibility": 36360,
+          "liquidPrecipitation": 0,
+          "fieldSources": {
+            "windGust": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "humidity": {
+              "kind": "station",
+              "source": "Meteostanice Silicon Hill",
+              "observedAt": 1792579930000,
+              "stale": true
+            },
+            "visibility": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "snowfall": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "liquidPrecipitation": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "precipitationType": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            }
+          }
+        },
+        "scene": {
+          "meshes": 3360,
+          "materials": 223,
+          "geometries": 2475,
+          "activeMeshes": 550,
+          "waitingItems": 0
+        },
+        "ambient": {
+          "buses": 1,
+          "passengers": 0,
+          "cars": 1
+        }
+      },
+      "preparationSummary": {
+        "available": true,
+        "status": "complete",
+        "elapsedMs": 74859.10000002384,
+        "activeElapsedMs": 74859.10000002384,
+        "pausedMs": 0,
+        "failureStep": null,
+        "stageCount": 76,
+        "qualityCount": 4,
+        "qualitiesTruncated": false,
+        "qualities": [
+          {
+            "quality": "low",
+            "finalPass": false,
+            "status": "complete",
+            "elapsedMs": 26302.299999952316,
+            "activeElapsedMs": 26302.299999952316,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stageCount": 19,
+            "valid": true
+          },
+          {
+            "quality": "medium",
+            "finalPass": false,
+            "status": "complete",
+            "elapsedMs": 26689.800000071526,
+            "activeElapsedMs": 26689.800000071526,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stageCount": 19,
+            "valid": true
+          },
+          {
+            "quality": "high",
+            "finalPass": false,
+            "status": "complete",
+            "elapsedMs": 16451.199999928474,
+            "activeElapsedMs": 16451.199999928474,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stageCount": 19,
+            "valid": true
+          },
+          {
+            "quality": "medium",
+            "finalPass": true,
+            "status": "complete",
+            "elapsedMs": 5415.800000071526,
+            "activeElapsedMs": 5415.800000071526,
+            "pausedMs": 0,
+            "failureStep": null,
+            "stageCount": 19,
+            "valid": true
+          }
+        ],
+        "valid": true,
+        "invalidFields": 0
+      }
+    },
+    {
+      "file": "receipts/f716ab99-afe5-42a8-ad63-c19a9bc26df2.json",
+      "outcome": "rejected",
+      "error": {
+        "name": "Error",
+        "message": "Clock QA requires multiplayer; guest start refused"
+      },
+      "terminal": {
+        "atMs": 32431.700000047684,
+        "utc": "2026-10-24T02:54:31.606Z",
+        "visibility": "visible",
+        "focused": true,
+        "ready": false,
+        "disposed": false,
+        "preparingRenderQuality": false,
+        "stages": {},
+        "backend": "webgpu",
+        "compatibilityMode": true,
+        "quality": "medium",
+        "requestedRendering": {
+          "mode": "auto",
+          "quality": "medium",
+          "hardwareScaling": 1,
+          "targetFps": 60,
+          "revision": 0
+        },
+        "viewport": {
+          "width": 2040,
+          "height": 986,
+          "dpr": 1.0000000149011612
+        },
+        "backbuffer": {
+          "width": 2040,
+          "height": 986,
+          "scaling": 1
+        },
+        "gpu": {
+          "backend": "webgpu",
+          "compatibilityMode": true,
+          "gpuTimingScope": "main-render-pass-only",
+          "renderer": "pascal",
+          "vendor": "nvidia",
+          "version": "unknown version",
+          "classification": "unknown",
+          "context": {
+            "requestedAntialias": true,
+            "actualAntialias": null,
+            "defaultFramebuffer": null,
+            "sampleBuffers": null,
+            "samples": null
+          }
+        },
+        "health": {
+          "rendererId": 2,
+          "purpose": "game",
+          "generation": 1,
+          "phase": "preparing",
+          "valid": false,
+          "errorCount": 0,
+          "pendingOperations": 2,
+          "pendingPreparationOperations": 0,
+          "pendingShaderValidationOperations": 2,
+          "counts": {
+            "effect": 0,
+            "shader": 0,
+            "pipeline": 0,
+            "validation": 0,
+            "texture": 0,
+            "device": 0,
+            "render": 0
+          },
+          "firstErrors": []
+        },
+        "renderErrors": 0,
+        "assetErrors": 0,
+        "network": false,
+        "avatarCount": 0,
+        "avatars": [],
+        "avatarsOmitted": 0,
+        "actor": null,
+        "vehicle": null,
+        "yaw": 3.141592653589793,
+        "pitch": 0.28,
+        "distance": 8,
+        "camera": {
+          "position": {
+            "x": 110,
+            "y": 0.8560000658035278,
+            "z": 20
+          },
+          "fov": 0.85,
+          "view": [
+            -1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            -1,
+            0,
+            110,
+            -0.8560000658035278,
+            20,
+            1
+          ],
+          "projection": [
+            1.0679436922073364,
+            0,
+            0,
+            0,
+            0,
+            2.209538698196411,
+            0,
+            0,
+            0,
+            0,
+            -1.000072717666626,
+            -1,
+            0,
+            0,
+            -0.08000581711530685,
+            0
+          ]
+        },
+        "lightingInstant": null,
+        "trafficInstant": 1792810471606,
+        "flashlight": false,
+        "transitClock": null,
+        "weather": {
+          "temperature": 12.3,
+          "cloud": 0.86,
+          "rain": 0,
+          "wind": 1.8,
+          "windDirection": 337.5,
+          "observedAt": 1792579930000,
+          "fetchedAt": 1792579957998,
+          "stale": true,
+          "cloudStale": true,
+          "status": "fallback",
+          "sourceKind": "station",
+          "source": "Řízené testovací počasí · uložený záznam",
+          "cloudSource": "Řízený meteorologický model · benchmark",
+          "cloudObservedAt": 1792579500000,
+          "cloudWindSource": "Řízené modelové proudění · benchmark",
+          "cloudLayers": {
+            "low": 0,
+            "mid": 0.78,
+            "high": 0.34
+          },
+          "cloudWinds": {
+            "low": {
+              "speed": 9.2,
+              "direction": 148
+            },
+            "mid": {
+              "speed": 15.04,
+              "direction": 193
+            },
+            "high": {
+              "speed": 24.18,
+              "direction": 195
+            }
+          },
+          "humidity": 78,
+          "snowfall": 0,
+          "precipitationType": "none",
+          "windGust": 3.5,
+          "visibility": 36360,
+          "liquidPrecipitation": 0,
+          "fieldSources": {
+            "windGust": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "humidity": {
+              "kind": "station",
+              "source": "Meteostanice Silicon Hill",
+              "observedAt": 1792579930000,
+              "stale": true
+            },
+            "visibility": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "snowfall": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "liquidPrecipitation": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            },
+            "precipitationType": {
+              "kind": "model",
+              "source": "Open-Meteo · model",
+              "observedAt": 1792579500000,
+              "stale": true
+            }
+          }
+        },
+        "scene": {
+          "meshes": 1989,
+          "materials": 133,
+          "geometries": 1965,
+          "activeMeshes": 0,
+          "waitingItems": 21
+        },
+        "ambient": null
+      },
+      "preparationSummary": {
+        "available": false,
+        "reason": "not-installed"
+      }
+    }
+  ],
+  "windows": [
+    {
+      "file": "mia-first-f-valid.json",
+      "index": 1,
+      "calls": 0,
+      "fullActualRenderingBefore": {
+        "mode": "low",
+        "quality": "low",
+        "hardwareScaling": 1.3,
+        "targetFps": 60,
+        "revision": 2
+      },
+      "backbuffer": {
+        "width": 1569,
+        "height": 758,
+        "scaling": 1.3
+      },
+      "completed": true,
+      "flashlightTransition": [
+        false,
+        true
+      ],
+      "owner": "dedfe6c1-f189-4060-be32-100c960f7015",
+      "renderer": 4,
+      "positiveLinks": [],
+      "families": [],
+      "records": [],
+      "counts": {
+        "syncThrows": 0,
+        "rejections": 0,
+        "unsupportedPromises": 0,
+        "badArgs": 0,
+        "callOverflow": 0,
+        "byteOverflow": 0,
+        "projectionLimited": 0,
+        "hashErrors": 0,
+        "observerErrors": 0,
+        "foreignCalls": 0,
+        "restoreConflicts": 0
+      },
+      "health": {
+        "rendererId": 4,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      }
+    },
+    {
+      "file": "robin-first-f-valid.json",
+      "index": 2,
+      "calls": 1,
+      "fullActualRenderingBefore": {
+        "mode": "low",
+        "quality": "low",
+        "hardwareScaling": 1.3,
+        "targetFps": 60,
+        "revision": 2
+      },
+      "backbuffer": {
+        "width": 1569,
+        "height": 758,
+        "scaling": 1.3
+      },
+      "completed": true,
+      "flashlightTransition": [
+        false,
+        true
+      ],
+      "owner": "dedfe6c1-f189-4060-be32-100c960f7015",
+      "renderer": 4,
+      "positiveLinks": [
+        3
+      ],
+      "families": [
+        {
+          "vertex": "shadowMap",
+          "fragment": "shadowMap"
+        }
+      ],
+      "records": [
+        {
+          "id": 1,
+          "contextID": 1,
+          "atMs": 523479.7000000477,
+          "createAsRaw": false,
+          "inputStatus": "captured",
+          "inputs": {
+            "vertex": {
+              "chars": 9175,
+              "bytes": 9175,
+              "sha256": "25ce3f820e8d9c25cb778c2ca896e54075731b2664751788dde5274611716a26"
+            },
+            "fragment": {
+              "chars": 1351,
+              "bytes": 1351,
+              "sha256": "0cb955f2857193e2e489bc267d02b5994b12b6cc36f56308549ded0f5f47e6b5"
+            },
+            "defines": {
+              "chars": 302,
+              "bytes": 302,
+              "sha256": "921107e0bf05b3d4782c8e2ef787d17629234b644ff2c65558918af2303ff4a7"
+            },
+            "contextName": {
+              "chars": 349,
+              "bytes": 349,
+              "sha256": "07bcada038524d08dd161ee8620e8bd3a087797643346b9758c259810a76b137"
+            }
+          },
+          "families": {
+            "vertex": "shadowMap",
+            "fragment": "shadowMap"
+          },
+          "selectedDefines": {
+            "flags": [
+              [
+                "SM_FLOAT",
+                "1"
+              ],
+              [
+                "SM_ESM",
+                "0"
+              ],
+              [
+                "SM_DEPTHTEXTURE",
+                "1"
+              ],
+              [
+                "SM_NORMALBIAS",
+                "1"
+              ],
+              [
+                "SM_DIRECTIONINLIGHTDATA",
+                "0"
+              ],
+              [
+                "SM_USEDISTANCE",
+                "0"
+              ],
+              [
+                "SM_SOFTTRANSPARENTSHADOW",
+                "0"
+              ],
+              [
+                "NORMAL",
+                ""
+              ],
+              [
+                "NUM_BONE_INFLUENCERS",
+                "4"
+              ]
+            ],
+            "withheld": 0,
+            "truncated": false
+          },
+          "outcome": "fulfilled",
+          "settledAtMs": 523610.2000000477,
+          "latencyMs": 130.5,
+          "owners": [
+            {
+              "kind": "local-shadow-slot",
+              "association": "original-settlement",
+              "associationAtMs": 523611.10000002384,
+              "callerID": 0,
+              "meshID": 392,
+              "renderingMeshID": 392,
+              "materialID": 391,
+              "effectID": 462,
+              "passID": 19,
+              "useInstances": -1,
+              "materialRegistration": "registered",
+              "materialRelation": "mesh-material-slot",
+              "meshClass": "Mesh",
+              "renderingClass": "Mesh",
+              "role": "local-skinned-near",
+              "renderingRole": "local-skinned-near",
+              "alpha": 1,
+              "transparencyMode": null,
+              "characterSurface": "skin",
+              "avatarBodyLod": "near",
+              "names": {
+                "mesh": {
+                  "chars": 56,
+                  "bytes": 56,
+                  "sha256": "1a66949ea0cb008006a583dc18721efd9c534d2a5ea4750dcfa1b40c4bfd1297"
+                },
+                "material": {
+                  "chars": 22,
+                  "bytes": 22,
+                  "sha256": "619e952b00c00fec1e37c83554a3d98064139e8b2b1717e7a50b9c0288ed2042"
+                },
+                "parent": {
+                  "chars": 43,
+                  "bytes": 43,
+                  "sha256": "cec2649d4f4735f13abca545973863dd0daadf3129d6f98d6ed635b47a5b3d00"
+                }
+              }
+            },
+            {
+              "kind": "local-shadow-slot",
+              "association": "original-settlement",
+              "associationAtMs": 523611.5,
+              "callerID": 0,
+              "meshID": 398,
+              "renderingMeshID": 398,
+              "materialID": 399,
+              "effectID": 462,
+              "passID": 19,
+              "useInstances": -1,
+              "materialRegistration": "registered",
+              "materialRelation": "mesh-material-slot",
+              "meshClass": "Mesh",
+              "renderingClass": "Mesh",
+              "role": "local-garment-near",
+              "renderingRole": "local-garment-near",
+              "alpha": 1,
+              "transparencyMode": 0,
+              "characterSurface": "cloth",
+              "avatarBodyLod": "near",
+              "names": {
+                "mesh": {
+                  "chars": 57,
+                  "bytes": 57,
+                  "sha256": "6b1efef79b956551da7cf8eb91c721aa5f9b868836462c5b12f2a1d95a9d7071"
+                },
+                "material": {
+                  "chars": 44,
+                  "bytes": 44,
+                  "sha256": "c21ab4ebb4389000a80167c10982c6cb645a5fcdd81ed82ff4de9e846f86266d"
+                },
+                "parent": {
+                  "chars": 43,
+                  "bytes": 43,
+                  "sha256": "cec2649d4f4735f13abca545973863dd0daadf3129d6f98d6ed635b47a5b3d00"
+                }
+              }
+            },
+            {
+              "kind": "local-shadow-slot",
+              "association": "original-settlement",
+              "associationAtMs": 523611.7000000477,
+              "callerID": 0,
+              "meshID": 400,
+              "renderingMeshID": 400,
+              "materialID": 401,
+              "effectID": 462,
+              "passID": 19,
+              "useInstances": -1,
+              "materialRegistration": "registered",
+              "materialRelation": "mesh-material-slot",
+              "meshClass": "Mesh",
+              "renderingClass": "Mesh",
+              "role": "local-garment-near",
+              "renderingRole": "local-garment-near",
+              "alpha": 1,
+              "transparencyMode": 0,
+              "characterSurface": "denim",
+              "avatarBodyLod": "near",
+              "names": {
+                "mesh": {
+                  "chars": 57,
+                  "bytes": 57,
+                  "sha256": "3052cc812c565e3522ccf0135ce725ac388a1e2ecee93d5725a23e3e4f9cfc3a"
+                },
+                "material": {
+                  "chars": 47,
+                  "bytes": 47,
+                  "sha256": "8cc197b6540da764665eecf52206c1c3691ae408ebf1f11775113a3a32035e79"
+                },
+                "parent": {
+                  "chars": 43,
+                  "bytes": 43,
+                  "sha256": "cec2649d4f4735f13abca545973863dd0daadf3129d6f98d6ed635b47a5b3d00"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "syncThrows": 0,
+        "rejections": 0,
+        "unsupportedPromises": 0,
+        "badArgs": 0,
+        "callOverflow": 0,
+        "byteOverflow": 0,
+        "projectionLimited": 0,
+        "hashErrors": 0,
+        "observerErrors": 0,
+        "foreignCalls": 0,
+        "restoreConflicts": 0
+      },
+      "health": {
+        "rendererId": 4,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      }
+    },
+    {
+      "file": "robin-repeat-f-valid.json",
+      "index": 3,
+      "calls": 0,
+      "fullActualRenderingBefore": {
+        "mode": "low",
+        "quality": "low",
+        "hardwareScaling": 1.3,
+        "targetFps": 60,
+        "revision": 2
+      },
+      "backbuffer": {
+        "width": 1569,
+        "height": 758,
+        "scaling": 1.3
+      },
+      "completed": true,
+      "flashlightTransition": [
+        false,
+        true
+      ],
+      "owner": "dedfe6c1-f189-4060-be32-100c960f7015",
+      "renderer": 4,
+      "positiveLinks": [],
+      "families": [],
+      "records": [],
+      "counts": {
+        "syncThrows": 0,
+        "rejections": 0,
+        "unsupportedPromises": 0,
+        "badArgs": 0,
+        "callOverflow": 0,
+        "byteOverflow": 0,
+        "projectionLimited": 0,
+        "hashErrors": 0,
+        "observerErrors": 0,
+        "foreignCalls": 0,
+        "restoreConflicts": 0
+      },
+      "health": {
+        "rendererId": 4,
+        "purpose": "game",
+        "generation": 1,
+        "phase": "ready",
+        "valid": true,
+        "errorCount": 0,
+        "pendingOperations": 0,
+        "pendingPreparationOperations": 0,
+        "pendingShaderValidationOperations": 0,
+        "counts": {
+          "effect": 0,
+          "shader": 0,
+          "pipeline": 0,
+          "validation": 0,
+          "texture": 0,
+          "device": 0,
+          "render": 0
+        },
+        "firstErrors": []
+      }
+    }
+  ],
+  "receiptMatches": 37,
+  "originals": [
+    {
+      "file": "b818562e-cda5-4855-a557-906806f2d1b1.jsonl",
+      "bytes": 3101795,
+      "sha256": "fadf403c5bc69c6094fa9c52fcfd8ec14727137b44ffcbc248949bd1be554f55",
+      "records": 1566,
+      "last": "longtask",
+      "sessionEnd": false,
+      "faults": 0,
+      "unhandled": 0,
+      "gaps": 1
+    },
+    {
+      "file": "f92e59c1-61b5-4b06-8e76-39c291aeaf19.jsonl",
+      "bytes": 3450340,
+      "sha256": "b0ae933b9485f747c18525b36296905cc709c5ee3c48865c195b682a0d3fe3e0",
+      "records": 1938,
+      "last": "session-end",
+      "sessionEnd": true,
+      "faults": 0,
+      "unhandled": 0,
+      "gaps": 1
+    }
+  ],
+  "initialMissedWindow": {
+    "file": "mia-first-f-inputs-attempt1.json",
+    "validFirstToggleWindow": false,
+    "reason": "Keyboard F did not toggle while QA focus; native checkbox was activated after the window ended.",
+    "actualCounterInterval": {
+      "before": "b6-mia-before-first-f.json",
+      "after": "mia-after-uncaptured-first-f.json",
+      "flashlightTransition": [
+        false,
+        true
+      ],
+      "shaderPreparation": [
+        837,
+        837
+      ],
+      "shaderModule": [
+        1674,
+        1674
+      ]
+    }
+  },
+  "decision": "Finite receiver reselection source/CPU correction now has actual Low B6 first-toggle0 evidence. Robin new-avatar first1 shadowMap/repeat0 remains open; KEY22/default/main NOT complete.",
+  "limits": [
+    "No controlled FPS/GPU execution/performance A-B claim; no system collector in this diagnostic.",
+    "Source13 used Auto/Low/internal1020x493; source14 uses fixed Low/internal1569x758. Corrective route/camera and different scene histories preclude causal/pixel/FPS A-B.",
+    "First run physically traversed north entrance, both north flights, floor1 and both south flights; second valid compiler run used the shorter ground corridor route.",
+    "First original lacks session-end despite normal UI leave/close; second original ends session-end. Both have0fault/0unhandled/1gap.",
+    "Cancelled same-page Game4 inherited UI flashlight state and was not accepted as cold-first control. A later Guest attempt was deliberately refused by the clock QA multiplayer guard; neither is a product failure or successful Game start.",
+    "Same-session Robin edit preserves renderer/generation/player and XZ; tiny grounded-Y differences are retained, not claimed exact XYZ.",
+    "Native JPEG dimensions differ from CSS/internal backbuffer and must be stated separately.",
+    "Mia first global counters0 was outside the bounded input window; separate fresh-page multiplayer valid window demonstrates false→true with0records."
+  ],
+  "cleanup": {
+    "atUTC": "2026-10-24T03:06:31Z",
+    "ownApiSession": 73044,
+    "ownPreviewSession": 60158,
+    "originalCtrlCExitCodes": [
+      1,
+      1
+    ],
+    "closedOwnTabs": [
+      "2070823886",
+      "2070823889"
+    ],
+    "normalUiLeave": true,
+    "viewportReset": true,
+    "listeners2568_4213_2597": 0,
+    "resourcesReturnedToCad": true,
+    "claimFilesOnly": true
+  }
+}

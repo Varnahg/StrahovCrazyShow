@@ -188,7 +188,10 @@ test("steady torch updates reuse the prop/light and do not repeat enabled or lig
   const { scene, rig, camera, torch } = fixture(t);
   torch.update(rig, camera, false, false, "low");
   assert.equal(scene.getMeshByName("torch casing"), null);
-  assert.equal(torch.beam.light.getShadowGenerator(), null);
+  assert.ok(torch.beam.light.getShadowGenerator(), "OFF prepares the real local shadow map without creating a visible prop");
+  assert.equal(torch.beam.light.isEnabled(), false);
+  assert.equal(torch.beam.light.intensity, 0);
+  assert.equal(torch.beam.light.shadowEnabled, false);
   torch.update(rig, camera, true, false, "low");
   const body = scene.getMeshByName("torch casing")!;
   const meshes = scene.meshes.length,

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "label": "cm-shadow-attribution-3",
+  "sourceSnapshotId": "8039555366d3fc977ecfb18e155f30000e9e8faeb36469a9e110481a2feefb93",
+  "helperSha256": "16c21daa50808ef87f9aa3003b6818460a0a85b92e69f34657354054ec68c4ab",
+  "loading": "original",
+  "clock": null,
+  "weather": {
+    "schemaVersion": 1,
+    "sourceSha256": "4db0f84d2f928998bde5a1ae12a2016e93ea19e6e2e22c06beb923d2e16126e2",
+    "emittedSha256": "9a07e2934e7b54a36167b22cd4f140a75dfd395d777d508cc79834c1b97020cc",
+    "sourceBytes": 1784,
+    "emittedBytes": 1357,
+    "provenance": {
+      "mechanism": "scripts/performance-preview.mjs recorded-audit-weather",
+      "numericPolicy": "All supplied Weather numeric/null/nested values preserved exactly; no clamping or workload reduction",
+      "labelPolicy": "Only status/source/cloudSource/cloudWindSource replaced with explicit recorded QA fallback labels"
+    }
+  },
+  "startupLatency": false,
+  "shaderAttribution": true,
+  "dependencies": {
+    "@babylonjs/core/package.json": "1b9a9bddc7f335463954a7b81860b7d1b45158c9a8f1811c0438910441895e79",
+    "@babylonjs/core/Materials/materialDefines.js": "3cc739bea27f7ec1f1b0f43e089d72d63ab15952166e7d3557c88af10ed34768",
+    "@babylonjs/core/Materials/shadowDepthWrapper.js": "f8a8c6091af9caa96ba897f28d7d490f3607d7856dee86b3a05321e1477aba29",
+    "@babylonjs/core/Materials/Textures/texture.pure.js": "f27fd4a566579ea2cc99c43ae056e48546b3d433aded037ab97c997c6299a976",
+    "@babylonjs/core/Materials/drawWrapper.js": "ecf5bc98dda701b691bc4e2ea0fe4a9a37a5dd82e2c4bd5c18c4a830aed6d297",
+    "@babylonjs/core/Materials/material.pure.js": "57ea7fa9a4c31d7cefa2fbbfa5c7c53db85f1ea783447f0146b8b9b101343676",
+    "@babylonjs/core/Materials/effect.pure.js": "8bffd8b31a0ef5afd663c8c2234ed7064f87c617d22de5a1933a34e566aa0539",
+    "@babylonjs/core/Materials/multiMaterial.pure.js": "acb4586add3b34aa7906efdfb84e2eeccbb7436c9ba3a2dcb1817cc8ebef9d9c"
+  },
+  "buildId": "c09485f4666986660733bf94092751b8b3451a292113a97e1aad4eecd7a2453d",
+  "snapshot": "C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\.cache\\performance-snapshot\\webgpu-completion-20261021-candidate-3",
+  "sourceFiles": 8564,
+  "helperFiles": {
+    "common.mjs": "75249d2e38043e4b37a16c4cb21e4e4464180bf5084e4ea92e37bf9c0f02b439",
+    "startup-observer.mjs": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+    "attempt-queue.mjs": "4c2f21c5e98009d5a94f42aa447a96ae07893394ddcc4028250ca311a3ebbde0",
+    "receipt.mjs": "6aebee76673b51ed19a1af98e1942aa6716324167321293e7e42bcfd6c7ffbbf",
+    "harness.mjs": "60bc011f56a1b7f40d5afdfd34e59db0c48b5dd8f0ab892e48a4c6f7a783d34d",
+    "qa-overlay.mjs": "92d1e2c54e3a9fca02a209686476cfa278bfdc6f5e53b929a8013dc93a2be5c2",
+    "transit-clock.mjs": "c300d77fc016a1586db0f0ed7fc82e990e5b9c390e7b5d9e6e78a73e9238d3ac",
+    "browser-clock.mjs": "a40045ceb6122e5e6f4a23d06a1221f60037e78fe28967cd778aee1c59b75057",
+    "server-bootstrap.mjs": "8fcb79d5375b83edab972c771ac94abe1d8958370324b597ea7272c33983beb2",
+    "weather-fixture.mjs": "3e6fd6e71923f2d65ed026ba5d818935c668657170bb3d2c4687e740ca0de62b",
+    "startup-latency.mjs": "53d5837b4de8a039f38f1cb81fb92728a6398e2556607cd4d8866e918f3ef9a5",
+    "shader-attribution.mjs": "2c1873b340ee19852109805a16fa57a6f6f30652acbd735e1614d3c3596a3179",
+    "helper.test.mjs": "3e901768c9aebe1768e4d04e267e0b6cd595d52a32d90831748b5dfb4e8baf40",
+    "clock.test.mjs": "67031042ca1fce5ecfc377dc1320e0d74f91dd87eebbe2926eaf41a60196d08b",
+    "weather-latency.test.mjs": "0024954a2177ca60c78e51d0e4ebc65fc1071a83586d8fe30040721963a700bf",
+    "shader-attribution.test.mjs": "acda4d8f5e839578c3dd1a23e1836e3df228d593ca73fefa36562fc88d906750",
+    "README.md": "50878eb2f01fca3dca41308eb330461b894c9be38269e604cfc27336af13a960"
+  },
+  "transforms": {
+    "ui": {
+      "file": "client/ui.tsx",
+      "before": "6aa94cf9ecd4278ef68c1e5a98377503f5bd96c667fe51e24e3ef5ac941562fe",
+      "after": "33f23b97a07dedd3fc2f44cd52bfd572fed3ae674300a5af73910a10450ba18c",
+      "scope": "Build-only CRLF normalization, import and one observeStartup call in place of original await g.start; original source untouched"
+    },
+    "loading": {
+      "file": "client/style.css",
+      "variant": "original",
+      "before": "bcb01da92cdadde5fb35969f0b70c9754f9e0e12fdaabdfb0e0bf451ee94819f",
+      "after": "bcb01da92cdadde5fb35969f0b70c9754f9e0e12fdaabdfb0e0bf451ee94819f",
+      "scope": "Byte-identical original CSS"
+    }
+  },
+  "transformHits": {
+    "ui": 1,
+    "css": 1
+  },
+  "overlaySha256": "998c8bef2b29170aa216767d0742b7a61d52b477df72f702a2b70ddeb299aeef",
+  "observerSha256": "cead4dc0f76a1389675dbac3e8365ecdff84946d0b22fc5304d6b2b30bb21cac",
+  "buildInputSha256": "97a84a3a7c4a9a8aea0bfecbabed388840b99b01d617eea02deceb20bb4837e1",
+  "bundleFiles": {
+    "assets/assets-DSttB0zd.js": "5bd8c389a65ad85ca79bcc5d614eb0fc709ceaa64e446623147f6a682831ff40",
+    "assets/assets-DSttB0zd.js.map": "c63e1a37e8c259ef79d0e87a3102bc8c83f09404e461bfd7536531ac588fb9a6",
+    "assets/avatar-preview-DOnmYilB.js": "bd4a58b0e8ffdc86d6934b372e04cbf29984a2d776c660fc60fab038c986d135",
+    "assets/avatar-preview-DOnmYilB.js.map": "ad96e74a65247a3b5296cd39e89b53afec913fc0f10d2e4e3e057edcb724e7af",
+    "assets/avatar-renderer-il1Cq4kx.js": "e5e8435b484bce9315dc6745252492eba6368f0d9e80e8166cca642ec04c33b2",
+    "assets/avatar-renderer-il1Cq4kx.js.map": "2cee716b4f2e9c70ece8c729290674eda704c381ec5dd0c35d96c0fa18013054",
+    "assets/b6-reality-CWSxEchz.js": "659b999f497f66d665e4ad78a8f9aae538c813cabed6e3de27e5adca041e41ac",
+    "assets/babylon-s9aBA_yc.js": "7a826179e8613997a0acd95eb2498494419c5318527b9f745986ac777fefa611",
+    "assets/babylon-s9aBA_yc.js.map": "74890ea38cb2c80131ce64d162e5286045e6cdf810eb8e73c8b790a1897a56ec",
+    "assets/car-pack-34SLr0i_.js": "9e0744c76f0b0323bfc282e5f41a208d89562f95fdc145210f36a65daf6e07f7",
+    "assets/car-pack-34SLr0i_.js.map": "116e7d74ccab1c70ede5f45c912c5c2cc2e14dcbfc4d37ae511f2da384537091",
+    "assets/environment-manifest-Bkq6KwiW.js": "6dddfba6cef4f582ed87e43f6346e99f42bf14acc66eae36232f12af84a417f4",
+    "assets/environment-manifest-Bkq6KwiW.js.map": "d002f66816b93b717d78283753a853431273961d000c1d39e471d0f46d7dfd81",
+    "assets/game-DEKW2lZV.js": "a28c59baec971762ecd9c635951b51e7c1ddd992c081eaac1699d218df988c88",
+    "assets/game-DEKW2lZV.js.map": "e6c3b7a408d93a819d0d922546fe05642de69632e18f7fbaece590b7251ac892",
+    "assets/index-BYrNFF_Y.js": "d3e1f08dc9998a8ac611821c3442058971239480d8b47a41c534657ba906cb8c",
+    "assets/index-BYrNFF_Y.js.map": "d35f677664931ebfc4ff96504a519d327351bc9531778d10269dccb112d6c573",
+    "assets/index-LyDiB5yh.css": "0d5f411e118685c10439b9e3ae79439edeeb5758ee2713523619a7dfee00dbfa",
+    "assets/landmark-reality-DbRJ3f-Q.js": "a463c9e83eee643fef3fa2ff0cc99d4f391323973e8335b3b499f9eb13ec3dc4",
+    "assets/landmark-reality-DbRJ3f-Q.js.map": "a5d84fdcc6560acff6e06af080d0dd3d7adfe50f30349df0bc670a29832d194c",
+    "assets/on-demand-render-D5VM_IqL.js": "bdd520a928f9355237b6439c9e57d8db400538f6395d213369cf37573aa004ed",
+    "assets/on-demand-render-D5VM_IqL.js.map": "38f46446e3f0357253537d65c017e9c7f60cb73fc83d2f0257a8720b6827f7fe",
+    "assets/render-engine-zQcBRRLd.js": "dc23043d0fd15eca31bda88df76c594d19bd088b112ed34d7bd3a66ad62d53a7",
+    "assets/render-engine-zQcBRRLd.js.map": "612a3d24c8fda102a685646b63aa9be53b1844e903349816efe405a50cc8db87",
+    "assets/render-shaders-Bwidt6TM.js": "669bb36dfc21bc6a29d74ed7162d7e96dccd09a4b85e3646b87d9b1ff5094425",
+    "assets/rolldown-runtime-hePW80VL.js": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+    "assets/simulation-BQ2fzZbI.js": "ca450161ea3724ae81130d9413e162a5282b8c1be54793915de4072133372192",
+    "assets/simulation-BQ2fzZbI.js.map": "6587229905dcad298677d0df57f27c81f4a718dca1fe9c094c309bd6ce11ec84",
+    "assets/transit-renderer-C1Ryh6m8.js": "f6189f63f401c067e25df8ff52d56539fb8a56b72b4c1856054ac368262d97f5",
+    "assets/transit-renderer-C1Ryh6m8.js.map": "8788da7162bcab301ffa6a5ddb41434f6bf898f77efe62fb7aa18195028cd97f",
+    "assets/vegetation-CgKwRvh6.js": "3f2cfa4f3c274d583f9437ca9118259a7485648a092d05afa25ce6092399ff85",
+    "index.html": "c5fdcd59004352c926dbf6789cda60894022fd14b993c3617d63803336cdc7a1"
+  },
+  "builtAt": "2026-10-21T13:15:40.640Z",
+  "limitation": "No GPU acceptance from build. Browser exports buildId; sidecar binds that ID to actual bundle hashes. Public assets served from exact verified original snapshot, no mutation/copy."
+}
