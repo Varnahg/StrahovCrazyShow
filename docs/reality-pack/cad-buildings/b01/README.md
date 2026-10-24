@@ -1,6 +1,6 @@
 # Blok 1 podle historických půdorysů
 
-Stav 24. 10. 2026: **R10 je přijatý jako samostatný stavební Blender model po nativní, obrazové a prostorové přejímce a nezávislém review. Hra ho zatím nenačítá.** [KEY-59](https://linear.app/gigeconomy/issue/KEY-59) zahrnuje všech 16 budov; ostatních 15 ještě nebylo modelováno.
+Stav 24. 10. 2026: **Stavební geometrie R10 je zachovaná; současný master má osm odvozených packed IPR textur a runtime loader se společnými kolizemi. Produkční herní/GPU přejímka ještě není dokončená.** Aktuální uživatelský rozsah [KEY-59](https://linear.app/gigeconomy/issue/KEY-59) je pouze B1 a B6; další budovy se v této etapě nezačínají.
 
 Editovatelným zdrojem je `assets/blender/cad-buildings/b01.blend`. `public/models/cad-buildings/b01.glb` a `shared/data/cad-buildings/b01.json` jsou odvozené z jeho skutečných meshů. Uložený model má samostatné podlažní kolekce a části podle role/materiálu, metrické jednotky a výchozí záběr celé budovy. Kontrolní kamery a světla nejsou zabalené v masteru. Starý hromadný generátor jej nepřepisuje.
 
@@ -20,7 +20,24 @@ Chybějící řezy doplňuje výslovná interpretace C, ověřená vůči počt�
 | N03 | 5,70m | 4,35m |
 | Střecha | 9,00m | 8,05m |
 
-Nástavba končí v 11,55 m. Pracovní odhad světového N01 počátku 4,20 m je zatím pouze metadata pro pozdější umístění. IPR podporuje střechy přibližně 13,2/12,25 m, hlavní vstupní podestu 4,2 m a N02 boční podestu 5,3 m. Historické venkovní schody, především osm zakreslených hran u N02, mohou zachycovat odlišný či neúplný stav proti roku 2023; napojení na terén zůstává výslovně neověřené.
+Nástavba končí v 11,55 m. Současné sdílené umístění z rigidního IPR fitu má translation `[-86.806769185171,4.219841912814184,77.74954203422622]`, yaw `−3.1251629196638517`, bez škálování. IPR podporuje střechy přibližně 13,2/12,25 m, hlavní vstupní podestu 4,2 m a N02 boční podestu 5,3 m. Historické venkovní schody, především osm zakreslených hran u N02, mohou zachycovat odlišný či neúplný stav proti roku 2023. Plane fit median0,277 m/RMS0,716 m není nové zaměření; obě čelní fasády nelze současně ztotožnit bez změny CAD délky.
+
+## Současný fotogrammetrický master
+
+Šest podélných hlavních fasád a dvě střešní úrovně dostaly explicitně vymezené atlasové textury z IPR2023,16px/m,max2048. Nejistá čela, sklo, rámy, ostění a interiéry si ponechaly původní materiály. Střecha malé nástavby nedosáhla požadovaného pokrytí, takže není označená za texturovanou. Zdrojové snímky jsou omezeně ostré a mají zachycené osvětlení; nejde o oddělené fyzikální albedo. Podrobnosti a licence jsou v [fotogrammetrii](../photogrammetry.md).
+
+Zkušební4px/m a16px/m rendery včetně shodné kamery nad původním IPR mesh byly prohlédnuté. Ostré přechody mezi ověřenými texely a původní barvou zmírňuje výslovný pás nejvýše0,15m pouze uvnitř validní geometrie. Zdrojový core, fallback, masky a samotná stavební geometrie se nemění. Validní/rejected pixely ani reach se kvůli vzhledu nerozšiřují. Raw JPEG/CAD kopie se nebalí; v masteru jsou jen odvozené bezztrátové PNG s proveniencí.
+
+Nativní předpublikační audit ověřil83 částí/50 kolizních částí, všechny orientované trojúhelníky, rohové normály/UV, přiřazení více materiálů, PBR a přesné embedded PNG bytes vGLB. Kolize/anotace jsou oproti R10 byteově stejné po vyloučení pouze dvou odkazových hashů assetů. Blender i GLB jsou vzájemně přenosné bez lokálních fototextur.
+
+| Soubor | SHA-256 současné foto verze |
+| --- | --- |
+| Blender | `df9af6d517d12f47971d8910be66f6ef284939076871fa53a106cb994ddc016f` |
+| GLB | `bf61d29cbaa89637db7362ca2d053b6e1f51381c1bf4438a7d6b082b13194e69` |
+| Kolize/anotace | `dd71a7306096042083bea9533b744e14ad03c1b5fb0164beadbdf63cd5656112` |
+| Site | `383bfddead0b57f559d379505a8488cca9284369588d72e8c9f6708dfc5859ef` |
+
+Native/GLB evidence je v `model-audit.json`; původní R10 a jeho historické výsledky zůstávají níže a v commitu6dd89606. Nové world výsledky jsou oddělené od původní samostatné kapsle.
 
 Přesné zóny respektují celé místnosti, nosné stěny, podesty a portály. Dřívější nekonečné Y pásy nesprávně snižovaly 84 hlavních fasádních oken; R10 tuto chybu neobsahuje. 95 doložených podélných okenních sestav křídel má vyšší profil a světlé dolní výplně. Jejich materiál je interpretace snímku, nikoli určení panelu proti matnému sklu. Hlavní střešní atika má odhad 0,40 m nad střechou a tloušťku 0,15 m; zvýšený obvod je v IPR doložen, stavební tloušťka není.
 
