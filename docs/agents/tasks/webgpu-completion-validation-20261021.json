@@ -4,21 +4,15 @@
   "dependsOn": [
     "webgpu-completion-assets-20261021"
   ],
-  "resources": [
-    "heavy-validation",
-    "gpu",
-    "workspace-build",
-    "port:4211",
-    "port:2596",
-    "port:2568"
-  ],
+  "resources": [],
   "verification": [
     "pnpm build v rezervovaném izolovaném snapshotu; plná pnpm test a test:integration nad dokončeným stabilním kandidátem, actual browser GPU image a performance gates.",
     "Před GPU actual inventory běžících scén/portů; žádné ad hoc browser automation/CDP. Použít CUA a skutečné UI/explicitní QA build.",
     "První neupravený main preflight je diagnostický, nikoli přijatý A/B gain nebo splnění performance cíle; meze metodiky výslovně."
   ],
   "notes": [
-    "Výslovná autorizovaná práce na dokončení KEY22, taskový koordinátor webgpu-completion-01a15a3e-root, pracovní kopie .cache/player-feedback-20261020. Žádný cizí WIP/hraný snapshot nepřebírat."
+    "Výslovná autorizovaná práce na dokončení KEY22, taskový koordinátor webgpu-completion-01a15a3e-root, pracovní kopie .cache/player-feedback-20261020. Žádný cizí WIP/hraný snapshot nepřebírat.",
+    "24Oct2026 resourcehandoff to CADbuilding coordinator thread01a16b37-1237-7583-af49-52c29a82272d after root GPU/controlcapture finished: own15585/21886stopped, tab3874automaticallyclosedonturninterrupt, viewportreset; no4211/2596/2568/4213/2597listeners. Release heavy-validation/gpu/workspace-build/unusedports; retainfilesonly. Any new heavy/GPU/build/server work requires new explicit resource claim and coordination; ready/status is not resource authority. BMAD prefix narrowed to actually existing root-worktree hash, no otherworktree output ownership."
   ],
   "id": "webgpu-completion-validation-20261021",
   "title": "KEY22: současná produkční GPU reprodukce a přejímka",

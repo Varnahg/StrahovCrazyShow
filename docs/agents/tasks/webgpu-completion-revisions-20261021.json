@@ -10,13 +10,18 @@
     ".cache/performance-snapshot/webgpu-completion-20261021-candidate-4/",
     "docs/agents/handoffs/webgpu-completion-revisions-20261021.md"
   ],
-  "resources": ["port:4213", "port:2597"],
+  "resources": [],
   "acceptance": [
     "Každá zdrojová oprava dostane nový immutable snapshot včetně testů/asset SHA. Baseline4211, diagnostika4212 a první40a363 zůstanou neměnné.",
     "Heavy-validation/gpu/workspace-build a API2596/integrační2568 současně vlastní root webgpu-completion-validation-20261021; výstupy QA helperu jsou v jeho validation cache. Tento rozšiřující task tyto resources nepřebírá.",
     "QA4213 běží jen nad konkrétním ověřeným buildem, bundle/source/helper identity se ověří skutečnýmHTTP i browserem. ŽádnéHMR nebo neoznačená výměna hraných bajtů.",
     "Read-only IPR reference lze sdílet pouze existujícím ověřeným performance-snapshot --reuse-ipr-from kontraktem; ostatní zdroje/asset authoring se nemění."
   ],
-  "verification": ["Source/asset/test before/after/frozen SHA, cílené/full testy podle změny, build/integrace a skutečnáGPU přejímka; všechnyneúspěšnépokysy zachovat."],
-  "notes": ["Druhý snapshot je nutný po konkrétní nezávisle nalezené source-errorpriority regresi adapteru; prvníběh a jeho log se nezahazují. Další dva scopes jsou pouze kapacita pro případné doložené opravy, nikoli pokyn vytvářet nepotřebné kopie."]
+  "verification": [
+    "Source/asset/test before/after/frozen SHA, cílené/full testy podle změny, build/integrace a skutečnáGPU přejímka; všechnyneúspěšnépokysy zachovat."
+  ],
+  "notes": [
+    "Druhý snapshot je nutný po konkrétní nezávisle nalezené source-errorpriority regresi adapteru; prvníběh a jeho log se nezahazují. Další dva scopes jsou pouze kapacita pro případné doložené opravy, nikoli pokyn vytvářet nepotřebné kopie.",
+    "24Oct2026 resourcehandoff to CADbuilding coordinator thread01a16b37-1237-7583-af49-52c29a82272d after root GPU/controlcapture finished: own15585/21886stopped, tab3874automaticallyclosedonturninterrupt, viewportreset; no4211/2596/2568/4213/2597listeners. Release heavy-validation/gpu/workspace-build/unusedports; retainfilesonly. Any new heavy/GPU/build/server work requires new explicit resource claim and coordination; ready/status is not resource authority. BMAD prefix narrowed to actually existing root-worktree hash, no otherworktree output ownership."
+  ]
 }
