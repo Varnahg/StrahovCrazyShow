@@ -1,0 +1,5966 @@
+{
+  "schemaVersion": 1,
+  "buildingId": "b01",
+  "status": "prepared-for-model-review",
+  "dependencies": {
+    "ezdxf": "1.4.5",
+    "shapely": "2.2.0"
+  },
+  "sourceFiles": [
+    {
+      "name": "strahov blok1 p01.dxf",
+      "sha256": "8c2971c621bfddba237ae2da0f8bfe14b68f301b080ff29c859862e3c853d883",
+      "unitsDeclared": 0,
+      "cadUnitsPerMeter": 1000
+    },
+    {
+      "name": "strahov blok1 n01.dxf",
+      "sha256": "3fe52f40c158035597314e48825bcac8dace878df53b1a9bea3f9ecd6b4bd815",
+      "unitsDeclared": 0,
+      "cadUnitsPerMeter": 1000
+    },
+    {
+      "name": "strahov blok1 n02.dxf",
+      "sha256": "54c8760c0843e050d5427e9f2f3425864f1ca0233e8d09c65630d936e8bbf067",
+      "unitsDeclared": 0,
+      "cadUnitsPerMeter": 1000
+    },
+    {
+      "name": "strahov blok1 n03.dxf",
+      "sha256": "df352f48614e7f47a12376340e74fdf6aeb2855f1971646629292e2699fc339e",
+      "unitsDeclared": 0,
+      "cadUnitsPerMeter": 1000
+    },
+    {
+      "name": "strahov blok1 n04.dxf",
+      "sha256": "141fb6aae250d4de0142b78f04c6ceddb3cc5bd57dc73d7e73452d0eb3378dd2",
+      "unitsDeclared": 0,
+      "cadUnitsPerMeter": 1000
+    }
+  ],
+  "estimates": {
+    "heightModel": {
+      "id": "b01-C-cad2005-ipr2023-hypothesis",
+      "status": "interpretation-not-surveyed",
+      "levels": {
+        "p01": {
+          "main": -3.0,
+          "westWing": -4.65,
+          "eastWing": -4.65
+        },
+        "n01": {
+          "main": 0.0,
+          "westWing": -1.95,
+          "eastWing": -1.95
+        },
+        "n02": {
+          "main": 2.85,
+          "westWing": 1.05,
+          "eastWing": 1.05
+        },
+        "n03": {
+          "main": 5.7,
+          "westWing": 4.35,
+          "eastWing": 4.35
+        },
+        "n04": {
+          "main": 9.0,
+          "westWing": 8.05,
+          "eastWing": 8.05
+        }
+      },
+      "ceilingBounds": {
+        "p01": {
+          "main": -0.2,
+          "westWing": -2.15,
+          "eastWing": -2.15
+        },
+        "n01": {
+          "main": 2.65,
+          "westWing": 0.85,
+          "eastWing": 0.85
+        },
+        "n02": {
+          "main": 5.5,
+          "westWing": 4.15,
+          "eastWing": 4.15
+        },
+        "n03": {
+          "main": 8.8,
+          "westWing": 7.85,
+          "eastWing": 7.85
+        },
+        "n04": {
+          "main": 11.35,
+          "westWing": null,
+          "eastWing": null
+        }
+      },
+      "roofHeadTop": 11.55,
+      "slabThickness": 0.2,
+      "worldN01OriginEstimate": 4.2,
+      "interiorRiserEstimate": 0.15,
+      "terrainValidationPending": true,
+      "rationale": "Coordinator-selected variant C: explicit per-floor main and wing levels give 0.15m rises across the 22 measured interior segments. Main/wing roofs and roof head are separate surfaces, not another inferred occupied storey. CAD 2005 XY and IPR Praha summer 2023 facade/platform bands support this interpretation, but do not constitute a measured interior section or as-built survey. The world N01 origin 4.20m and all vertical dimensions remain modeling estimates.",
+      "evidenceDates": {
+        "cad": 2005,
+        "ipr": "summer 2023"
+      }
+    },
+    "floorElevations": {
+      "p01": -3.0,
+      "n01": 0.0,
+      "n02": 2.85,
+      "n03": 5.7,
+      "n04": 9.0
+    },
+    "entryElevation": -1.95,
+    "floorWingOffsets": {
+      "p01": -1.65,
+      "n01": -1.95,
+      "n02": -1.8,
+      "n03": -1.35,
+      "n04": -0.95
+    },
+    "heightRationale": "Coordinator-selected variant C: explicit per-floor main and wing levels give 0.15m rises across the 22 measured interior segments. Main/wing roofs and roof head are separate surfaces, not another inferred occupied storey. CAD 2005 XY and IPR Praha summer 2023 facade/platform bands support this interpretation, but do not constitute a measured interior section or as-built survey. The world N01 origin 4.20m and all vertical dimensions remain modeling estimates.",
+    "slabThickness": 0.2,
+    "doorHeight": 2.1,
+    "windowSill": 0.9,
+    "windowHead": 2.4,
+    "roofHeadTop": 11.55,
+    "wingFacadeProfiles": {
+      "n02": [
+        0.3,
+        3.05
+      ],
+      "n03": [
+        0.1,
+        3.15
+      ]
+    },
+    "exteriorProtectionHeight": 1.0,
+    "columnCoverHeight": "same estimated vertical extent as enclosed measured column"
+  },
+  "method": "Measured parallel-boundary strips, semantic openings, separately measured columns, constrained polygon triangulation",
+  "limitations": [
+    "Historical plans explicitly not newly surveyed",
+    "Single boundary thickness and all vertical dimensions are estimates",
+    "Stair direction/count is partly obscured by drawing breaks; builder and section review must validate all landings",
+    "No Blender reopen, practical collision or game GPU test performed by preparation",
+    "P01 s146 is covered by the underside of the main entry stair and upper landing; its clearance is verified by native acceptance, independently of the N01 exposed-wing flat roof repair"
+  ],
+  "floors": [
+    {
+      "id": "p01",
+      "roomCount": 52,
+      "roomArea": 1313.7675,
+      "roomOverlapArea": 5.7554,
+      "wallPairCount": 757,
+      "wallArea": 156.4803,
+      "columnCount": 86,
+      "windowCount": 94,
+      "doorCount": 70,
+      "duplicateWindowEntities": [
+        "2860"
+      ],
+      "solidCount": 1285,
+      "triangleCount": 12787,
+      "footprintArea": 1501.8651,
+      "footprintBounds": [
+        217.105,
+        704.437,
+        284.412,
+        757.32
+      ],
+      "corrections": [
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "244",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "247",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "24D",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "13C4",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "151C",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "18A5",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1AB0",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1B54",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1B56",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1B74",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1CE4",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1D03",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1DFA",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1DFB",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1DFD",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1EA8",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        }
+      ],
+      "unresolvedStrongEdges": [
+        {
+          "entity": "A8",
+          "length": 7.2643,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "A9",
+          "length": 15.9694,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "AA",
+          "length": 4.1744,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "AC",
+          "length": 9.3876,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "AD",
+          "length": 1.0094,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1D3",
+          "length": 4.3439,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1D4",
+          "length": 2.0625,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1D7",
+          "length": 2.0625,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1D8",
+          "length": 5.8425,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "78B",
+          "length": 0.8639,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "78C",
+          "length": 0.8881,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "78E",
+          "length": 0.8678,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "78F",
+          "length": 0.8974,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1076",
+          "length": 0.8757,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1077",
+          "length": 0.9026,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "13E1",
+          "length": 0.6598,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "13E3",
+          "length": 0.9634,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "13E4",
+          "length": 1.0822,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "13E5",
+          "length": 0.7896,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "13E6",
+          "length": 0.85,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1447",
+          "length": 21.1476,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "150B",
+          "length": 1.1185,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1523",
+          "length": 25.5114,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "189A",
+          "length": 3.7023,
+          "reason": "stair-boundary-needs-section"
+        },
+        {
+          "entity": "189C",
+          "length": 3.7139,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "18A0",
+          "length": 0.8538,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1AFA",
+          "length": 0.8573,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1AFB",
+          "length": 0.8809,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1B33",
+          "length": 0.8771,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1B34",
+          "length": 0.8689,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1B46",
+          "length": 3.6023,
+          "reason": "stair-boundary-needs-section"
+        },
+        {
+          "entity": "1B5E",
+          "length": 3.78,
+          "reason": "stair-boundary-needs-section"
+        },
+        {
+          "entity": "1DE1",
+          "length": 2.41,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1DE2",
+          "length": 2.3591,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1DE4",
+          "length": 0.9894,
+          "reason": "stair-boundary-needs-section"
+        }
+      ],
+      "filtered": {
+        "stairDirectionSymbols": 16,
+        "nonConstructionEntities": 4,
+        "remoteSegments": 0,
+        "stairTreadSegments": 78,
+        "semanticExteriorStairGraphics": [
+          "26A0",
+          "26A1",
+          "26A2",
+          "26A3",
+          "26A4",
+          "26A5",
+          "26A6",
+          "26A7",
+          "26A8",
+          "26A9",
+          "26AA",
+          "26AB",
+          "26AC",
+          "26AD",
+          "26AE",
+          "2A06",
+          "2A07",
+          "2A08",
+          "2A09",
+          "2A0A",
+          "2A0B",
+          "2A0C",
+          "2A0D",
+          "2A0E",
+          "2A0F",
+          "2A10",
+          "2A11",
+          "2A12",
+          "2A13",
+          "2A14",
+          "2A7D"
+        ],
+        "westExteriorGraphics": [
+          "2742",
+          "2743",
+          "2744",
+          "2749",
+          "274A",
+          "274B",
+          "274C",
+          "274D",
+          "274E",
+          "274F",
+          "2750",
+          "2751",
+          "2752",
+          "2753",
+          "2754",
+          "279A",
+          "279F",
+          "27A0",
+          "27A1",
+          "27A2",
+          "27A3",
+          "27A4",
+          "27A5",
+          "27A6",
+          "27A7",
+          "27A8",
+          "27A9",
+          "27AA",
+          "27F0"
+        ],
+        "westExteriorReplacedRetaining": [
+          "1524",
+          "1525",
+          "1526",
+          "1527",
+          "1528",
+          "1529",
+          "152B",
+          "152C",
+          "152D",
+          "152E",
+          "152F",
+          "1530",
+          "1531",
+          "1533",
+          "1534",
+          "AE",
+          "AF",
+          "B0",
+          "B1",
+          "B3",
+          "B4",
+          "B5",
+          "B6",
+          "B7",
+          "B8"
+        ],
+        "newExteriorRouteGraphics": []
+      },
+      "wallRoomConflicts": [
+        {
+          "entities": [
+            "13DF",
+            "13E0"
+          ],
+          "area": 0.4337,
+          "reason": "two long strong wall edges override inconsistent room fill"
+        },
+        {
+          "entities": [
+            "189A",
+            "1DE2"
+          ],
+          "area": 0.3534,
+          "reason": "two long strong wall edges override inconsistent room fill"
+        },
+        {
+          "entities": [
+            "189C",
+            "1DE1"
+          ],
+          "area": 0.3663,
+          "reason": "two long strong wall edges override inconsistent room fill"
+        },
+        {
+          "entities": [
+            "189E",
+            "189F"
+          ],
+          "area": 0.353,
+          "reason": "two long strong wall edges override inconsistent room fill"
+        }
+      ],
+      "junctionRepairs": [],
+      "constructionDomain": {
+        "method": "room bounding box with full entity containment",
+        "margin": 6.0,
+        "bounds": [
+          211.56,
+          698.872,
+          290.13,
+          762.88
+        ]
+      },
+      "columnCovers": [],
+      "unresolvedProfiles": [],
+      "protectiveProfiles": [],
+      "exteriorVoids": [],
+      "exteriorStairExits": [],
+      "facadeOpeningClassifications": [],
+      "underStairMasks": [
+        {
+          "id": "p01-west-center-bearing-cap",
+          "sourceEntities": [
+            "189E",
+            "189F"
+          ],
+          "bounds": [
+            221.133,
+            736.266,
+            225.183,
+            736.349
+          ],
+          "ceilingPlane": [
+            0,
+            0,
+            -2.15
+          ]
+        },
+        {
+          "id": "p01-west-center-bearing-soffit",
+          "sourceEntities": [
+            "189E",
+            "189F"
+          ],
+          "bounds": [
+            221.184,
+            736.259,
+            225.133,
+            736.266
+          ],
+          "ceilingPlane": [
+            0.0,
+            0.498127593722696,
+            -369.05459771768216
+          ]
+        },
+        {
+          "id": "p01-east-center-bearing-soffit",
+          "sourceEntities": [
+            "13DF",
+            "13E0"
+          ],
+          "bounds": [
+            274.364,
+            725.491,
+            278.599,
+            725.599
+          ],
+          "ceilingPlane": [
+            0.0,
+            -0.4645998169476789,
+            334.7326845971272
+          ]
+        },
+        {
+          "id": "p01-s133-north-cap",
+          "sourceEntities": [
+            "1B5C",
+            "1B5D",
+            "444E"
+          ],
+          "bounds": [
+            217.482,
+            738.294,
+            220.121,
+            738.524
+          ],
+          "ceilingPlane": [
+            0,
+            0,
+            -2.15
+          ]
+        },
+        {
+          "id": "p01-s133-overhead-soffit",
+          "sourceEntities": [
+            "1B5B",
+            "205E"
+          ],
+          "bounds": [
+            217.482,
+            734.702,
+            219.867,
+            738.297
+          ],
+          "ceilingPlane": [
+            0.0,
+            -0.5007086418139108,
+            367.52151688292946
+          ]
+        },
+        {
+          "id": "p01-s135-overhead-soffit",
+          "sourceEntities": [
+            "1899",
+            "1A6A",
+            "2186"
+          ],
+          "bounds": [
+            226.374,
+            734.702,
+            228.304,
+            737.881
+          ],
+          "ceilingPlane": [
+            0.0,
+            -0.5007086418139108,
+            367.52151688292946
+          ]
+        },
+        {
+          "id": "p01-s144-landing-enclosure",
+          "sourceEntities": [
+            "189C",
+            "189E",
+            "1DE1",
+            "1DE2",
+            "1DE3",
+            "1DE6",
+            "1DE7",
+            "1DE8",
+            "1DE9",
+            "1DEA",
+            "1DEB",
+            "1DEC",
+            "1DF4",
+            "1DF5",
+            "1DF6",
+            "1DF7",
+            "1DF8",
+            "1DF9",
+            "1DFC",
+            "208C",
+            "21F8"
+          ],
+          "bounds": [
+            220.933,
+            736.266,
+            225.194,
+            738.958
+          ],
+          "ceilingPlane": [
+            0,
+            0,
+            -2.15
+          ]
+        },
+        {
+          "id": "p01-s146-exterior-main-east-flight-soffit-9",
+          "sourceEntities": [
+            "1D2",
+            "1D3",
+            "1D4",
+            "1D5",
+            "1D6",
+            "1D7",
+            "2A7A",
+            "2A87",
+            "2A86",
+            "2A85",
+            "2A84",
+            "2A83",
+            "2A82",
+            "2A81",
+            "2A80",
+            "2A7F",
+            "2A7E",
+            "2A7D",
+            "2A7C"
+          ],
+          "bounds": [
+            284.407,
+            728.909,
+            284.412,
+            732.779
+          ],
+          "ceilingPlane": [
+            -0.5420335394867551,
+            -0.0,
+            153.47367358585356
+          ]
+        },
+        {
+          "id": "p01-s146-exterior-main-east-flight-soffit-10",
+          "sourceEntities": [
+            "1D2",
+            "1D3",
+            "1D4",
+            "1D5",
+            "1D6",
+            "1D7",
+            "2A7A",
+            "2A87",
+            "2A86",
+            "2A85",
+            "2A84",
+            "2A83",
+            "2A82",
+            "2A81",
+            "2A80",
+            "2A7F",
+            "2A7E",
+            "2A7D",
+            "2A7C"
+          ],
+          "bounds": [
+            284.109,
+            728.909,
+            284.407,
+            733.007
+          ],
+          "ceilingPlane": [
+            -0.5420335394867551,
+            -0.0,
+            153.47367358585353
+          ]
+        },
+        {
+          "id": "p01-s146-exterior-main-east-flight-soffit-11",
+          "sourceEntities": [
+            "1D2",
+            "1D3",
+            "1D4",
+            "1D5",
+            "1D6",
+            "1D7",
+            "2A7A",
+            "2A87",
+            "2A86",
+            "2A85",
+            "2A84",
+            "2A83",
+            "2A82",
+            "2A81",
+            "2A80",
+            "2A7F",
+            "2A7E",
+            "2A7D",
+            "2A7C"
+          ],
+          "bounds": [
+            283.811,
+            728.909,
+            284.109,
+            733.007
+          ],
+          "ceilingPlane": [
+            -0.542031720728742,
+            -0.0,
+            153.4731568598512
+          ]
+        },
+        {
+          "id": "p01-s146-exterior-main-east-upper-landing-soffit",
+          "sourceEntities": [
+            "1D2",
+            "1D3",
+            "1D4",
+            "1D5",
+            "1D6",
+            "1D7",
+            "2A79",
+            "2A7B",
+            "2A7C"
+          ],
+          "bounds": [
+            282.343,
+            728.909,
+            283.811,
+            733.007
+          ],
+          "ceilingPlane": [
+            0,
+            0,
+            -0.2
+          ]
+        }
+      ],
+      "heightRegions": [
+        {
+          "id": "west",
+          "levelKey": "p01.westWing",
+          "junctionCoordinate": 738.4885,
+          "junctionSourceEntities": [
+            "1FEE",
+            "2081"
+          ],
+          "sourceRoomEntities": [
+            "2081",
+            "208C",
+            "2097",
+            "20A0",
+            "20BB",
+            "20C4",
+            "20E4",
+            "20FF",
+            "2114",
+            "211F"
+          ],
+          "sourceFloor": "p01",
+          "connectedSourceFeatures": [],
+          "wallCoverageMargin": 0.5,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                228.569,
+                738.489
+              ],
+              [
+                228.568,
+                738.876
+              ],
+              [
+                228.668,
+                738.877
+              ],
+              [
+                228.668,
+                738.876
+              ],
+              [
+                228.95,
+                738.877
+              ],
+              [
+                228.95,
+                738.489
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "west",
+          "levelKey": "p01.westWing",
+          "junctionCoordinate": 738.4885,
+          "junctionSourceEntities": [
+            "1FEE",
+            "2081"
+          ],
+          "sourceRoomEntities": [
+            "2081",
+            "208C",
+            "2097",
+            "20A0",
+            "20BB",
+            "20C4",
+            "20E4",
+            "20FF",
+            "2114",
+            "211F"
+          ],
+          "sourceFloor": "p01",
+          "connectedSourceFeatures": [],
+          "wallCoverageMargin": 0.5,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                217.751,
+                738.489
+              ],
+              [
+                217.751,
+                738.524
+              ],
+              [
+                217.584,
+                738.524
+              ],
+              [
+                217.129,
+                738.523
+              ],
+              [
+                217.126,
+                740.718
+              ],
+              [
+                217.584,
+                740.718
+              ],
+              [
+                217.584,
+                740.818
+              ],
+              [
+                219.99,
+                740.819
+              ],
+              [
+                219.99,
+                740.719
+              ],
+              [
+                220.094,
+                740.496
+              ],
+              [
+                220.094,
+                740.375
+              ],
+              [
+                220.194,
+                740.375
+              ],
+              [
+                220.531,
+                740.546
+              ],
+              [
+                220.726,
+                740.707
+              ],
+              [
+                220.74,
+                740.925
+              ],
+              [
+                220.653,
+                741.026
+              ],
+              [
+                220.537,
+                741.33
+              ],
+              [
+                220.493,
+                741.461
+              ],
+              [
+                220.464,
+                741.562
+              ],
+              [
+                220.464,
+                741.652
+              ],
+              [
+                220.451,
+                741.652
+              ],
+              [
+                220.451,
+                741.806
+              ],
+              [
+                220.449,
+                741.806
+              ],
+              [
+                220.445,
+                742.267
+              ],
+              [
+                220.313,
+                742.255
+              ],
+              [
+                220.286,
+                742.134
+              ],
+              [
+                220.145,
+                741.825
+              ],
+              [
+                219.957,
+                741.562
+              ],
+              [
+                219.511,
+                741.396
+              ],
+              [
+                219.511,
+                741.296
+              ],
+              [
+                217.58,
+                741.296
+              ],
+              [
+                217.58,
+                741.396
+              ],
+              [
+                217.125,
+                741.396
+              ],
+              [
+                217.116,
+                748.37
+              ],
+              [
+                217.471,
+                748.37
+              ],
+              [
+                217.471,
+                748.66
+              ],
+              [
+                217.116,
+                748.659
+              ],
+              [
+                217.116,
+                748.918
+              ],
+              [
+                217.115,
+                749.155
+              ],
+              [
+                217.114,
+                749.564
+              ],
+              [
+                217.113,
+                749.986
+              ],
+              [
+                217.113,
+                749.994
+              ],
+              [
+                217.114,
+                749.994
+              ],
+              [
+                217.113,
+                750.587
+              ],
+              [
+                217.113,
+                750.596
+              ],
+              [
+                217.112,
+                750.885
+              ],
+              [
+                217.11,
+                751.672
+              ],
+              [
+                217.112,
+                751.672
+              ],
+              [
+                217.111,
+                752.412
+              ],
+              [
+                217.108,
+                753.466
+              ],
+              [
+                217.108,
+                753.497
+              ],
+              [
+                217.11,
+                753.497
+              ],
+              [
+                217.109,
+                753.726
+              ],
+              [
+                217.111,
+                753.726
+              ],
+              [
+                217.109,
+                753.826
+              ],
+              [
+                217.109,
+                753.993
+              ],
+              [
+                217.108,
+                754.412
+              ],
+              [
+                217.107,
+                754.734
+              ],
+              [
+                217.107,
+                754.806
+              ],
+              [
+                217.106,
+                754.958
+              ],
+              [
+                217.562,
+                754.959
+              ],
+              [
+                217.562,
+                755.059
+              ],
+              [
+                217.108,
+                755.058
+              ],
+              [
+                217.105,
+                756.878
+              ],
+              [
+                217.56,
+                756.879
+              ],
+              [
+                217.56,
+                757.318
+              ],
+              [
+                218.801,
+                757.318
+              ],
+              [
+                218.801,
+                756.879
+              ],
+              [
+                218.893,
+                756.879
+              ],
+              [
+                218.893,
+                757.318
+              ],
+              [
+                220.363,
+                757.318
+              ],
+              [
+                221.213,
+                757.319
+              ],
+              [
+                222.303,
+                757.319
+              ],
+              [
+                222.303,
+                757.265
+              ],
+              [
+                222.403,
+                757.265
+              ],
+              [
+                222.403,
+                757.319
+              ],
+              [
+                222.536,
+                757.319
+              ],
+              [
+                222.536,
+                757.32
+              ],
+              [
+                224.875,
+                757.32
+              ],
+              [
+                224.875,
+                757.319
+              ],
+              [
+                226.121,
+                757.32
+              ],
+              [
+                228.537,
+                757.32
+              ],
+              [
+                228.537,
+                756.88
+              ],
+              [
+                228.964,
+                756.881
+              ],
+              [
+                228.966,
+                756.031
+              ],
+              [
+                228.537,
+                756.03
+              ],
+              [
+                228.537,
+                755.88
+              ],
+              [
+                228.966,
+                755.881
+              ],
+              [
+                228.968,
+                755.228
+              ],
+              [
+                228.971,
+                754.143
+              ],
+              [
+                228.973,
+                753.531
+              ],
+              [
+                228.537,
+                753.53
+              ],
+              [
+                228.537,
+                753.38
+              ],
+              [
+                228.973,
+                753.381
+              ],
+              [
+                228.977,
+                752.012
+              ],
+              [
+                228.537,
+                752.011
+              ],
+              [
+                228.537,
+                751.884
+              ],
+              [
+                228.714,
+                751.884
+              ],
+              [
+                228.714,
+                751.866
+              ],
+              [
+                228.977,
+                751.866
+              ],
+              [
+                228.98,
+                750.572
+              ],
+              [
+                228.981,
+                750.054
+              ],
+              [
+                228.983,
+                749.544
+              ],
+              [
+                228.983,
+                749.536
+              ],
+              [
+                228.986,
+                748.559
+              ],
+              [
+                228.714,
+                748.558
+              ],
+              [
+                228.714,
+                748.474
+              ],
+              [
+                228.546,
+                748.474
+              ],
+              [
+                228.547,
+                748.269
+              ],
+              [
+                228.986,
+                748.27
+              ],
+              [
+                229.006,
+                740.918
+              ],
+              [
+                228.566,
+                740.917
+              ],
+              [
+                228.566,
+                740.817
+              ],
+              [
+                226.296,
+                740.817
+              ],
+              [
+                226.296,
+                740.922
+              ],
+              [
+                226.13,
+                741.044
+              ],
+              [
+                225.895,
+                741.197
+              ],
+              [
+                225.601,
+                741.338
+              ],
+              [
+                225.225,
+                741.417
+              ],
+              [
+                225.225,
+                741.319
+              ],
+              [
+                225.317,
+                741.299
+              ],
+              [
+                225.348,
+                740.668
+              ],
+              [
+                225.731,
+                740.668
+              ],
+              [
+                225.731,
+                740.568
+              ],
+              [
+                225.831,
+                740.568
+              ],
+              [
+                225.831,
+                738.858
+              ],
+              [
+                225.731,
+                738.858
+              ],
+              [
+                225.731,
+                738.489
+              ],
+              [
+                225.183,
+                738.489
+              ],
+              [
+                225.183,
+                736.349
+              ],
+              [
+                221.133,
+                736.348
+              ],
+              [
+                221.133,
+                738.489
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "east",
+          "levelKey": "p01.eastWing",
+          "junctionCoordinate": 723.154,
+          "junctionSourceEntities": [
+            "1F1E",
+            "1EE0"
+          ],
+          "sourceRoomEntities": [
+            "1EBD",
+            "1ED4",
+            "1EE0",
+            "1FD5",
+            "21B5",
+            "21C0",
+            "21CA",
+            "21D3",
+            "21DC",
+            "21E5",
+            "21EE"
+          ],
+          "sourceFloor": "p01",
+          "connectedSourceFeatures": [],
+          "wallCoverageMargin": 0.5,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                270.512,
+                711.698
+              ],
+              [
+                270.512,
+                704.825
+              ],
+              [
+                268.631,
+                704.825
+              ],
+              [
+                268.631,
+                711.698
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "east",
+          "levelKey": "p01.eastWing",
+          "junctionCoordinate": 723.154,
+          "junctionSourceEntities": [
+            "1F1E",
+            "1EE0"
+          ],
+          "sourceRoomEntities": [
+            "1EBD",
+            "1ED4",
+            "1EE0",
+            "1FD5",
+            "21B5",
+            "21C0",
+            "21CA",
+            "21D3",
+            "21DC",
+            "21E5",
+            "21EE"
+          ],
+          "sourceFloor": "p01",
+          "connectedSourceFeatures": [],
+          "wallCoverageMargin": 0.5,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                270.5,
+                723.154
+              ],
+              [
+                270.974,
+                723.154
+              ],
+              [
+                270.974,
+                724.111
+              ],
+              [
+                281.924,
+                724.111
+              ],
+              [
+                281.924,
+                723.154
+              ],
+              [
+                282.357,
+                723.154
+              ],
+              [
+                282.357,
+                723.135
+              ],
+              [
+                281.922,
+                723.134
+              ],
+              [
+                281.922,
+                723.026
+              ],
+              [
+                282.357,
+                723.027
+              ],
+              [
+                282.358,
+                722.167
+              ],
+              [
+                281.923,
+                722.166
+              ],
+              [
+                281.923,
+                722.058
+              ],
+              [
+                282.358,
+                722.059
+              ],
+              [
+                282.359,
+                721.195
+              ],
+              [
+                281.925,
+                721.194
+              ],
+              [
+                281.925,
+                721.086
+              ],
+              [
+                282.359,
+                721.087
+              ],
+              [
+                282.361,
+                720.213
+              ],
+              [
+                281.926,
+                720.213
+              ],
+              [
+                281.926,
+                720.105
+              ],
+              [
+                282.361,
+                720.105
+              ],
+              [
+                282.369,
+                713.503
+              ],
+              [
+                281.934,
+                713.503
+              ],
+              [
+                281.934,
+                713.395
+              ],
+              [
+                282.369,
+                713.395
+              ],
+              [
+                282.376,
+                707.845
+              ],
+              [
+                281.941,
+                707.845
+              ],
+              [
+                281.941,
+                707.737
+              ],
+              [
+                282.376,
+                707.737
+              ],
+              [
+                282.376,
+                706.021
+              ],
+              [
+                282.377,
+                706.021
+              ],
+              [
+                282.377,
+                712.033
+              ],
+              [
+                284.109,
+                712.033
+              ],
+              [
+                284.109,
+                704.874
+              ],
+              [
+                284.14,
+                704.874
+              ],
+              [
+                284.14,
+                704.437
+              ],
+              [
+                282.38,
+                704.437
+              ],
+              [
+                282.38,
+                704.825
+              ],
+              [
+                282.377,
+                704.825
+              ],
+              [
+                282.377,
+                704.873
+              ],
+              [
+                281.945,
+                704.872
+              ],
+              [
+                281.945,
+                704.437
+              ],
+              [
+                279.346,
+                704.437
+              ],
+              [
+                279.346,
+                704.874
+              ],
+              [
+                279.237,
+                704.874
+              ],
+              [
+                279.237,
+                704.437
+              ],
+              [
+                277.217,
+                704.437
+              ],
+              [
+                277.217,
+                704.874
+              ],
+              [
+                277.108,
+                704.874
+              ],
+              [
+                277.108,
+                704.437
+              ],
+              [
+                270.971,
+                704.437
+              ],
+              [
+                270.971,
+                704.874
+              ],
+              [
+                270.53,
+                704.874
+              ],
+              [
+                270.53,
+                706.73
+              ],
+              [
+                270.531,
+                707.737
+              ],
+              [
+                270.972,
+                707.737
+              ],
+              [
+                270.972,
+                707.845
+              ],
+              [
+                270.531,
+                707.845
+              ],
+              [
+                270.532,
+                711.398
+              ],
+              [
+                270.973,
+                711.398
+              ],
+              [
+                270.973,
+                711.508
+              ],
+              [
+                270.532,
+                711.508
+              ],
+              [
+                270.533,
+                713.395
+              ],
+              [
+                270.974,
+                713.395
+              ],
+              [
+                270.974,
+                713.503
+              ],
+              [
+                270.533,
+                713.503
+              ],
+              [
+                270.535,
+                721.181
+              ],
+              [
+                270.976,
+                721.181
+              ],
+              [
+                270.976,
+                721.289
+              ],
+              [
+                270.535,
+                721.289
+              ],
+              [
+                270.536,
+                722.862
+              ],
+              [
+                270.479,
+                722.862
+              ],
+              [
+                270.48,
+                723.154
+              ]
+            ]
+          ]
+        }
+      ],
+      "windowVerticalProfiles": {
+        "generic": 94
+      },
+      "explicitJambCorrections": [],
+      "shallowBayVoids": [],
+      "ceilingClippedOpenings": []
+    },
+    {
+      "id": "n01",
+      "roomCount": 40,
+      "roomArea": 1326.8652,
+      "roomOverlapArea": 0.0,
+      "wallPairCount": 696,
+      "wallArea": 146.8046,
+      "columnCount": 91,
+      "windowCount": 92,
+      "doorCount": 72,
+      "duplicateWindowEntities": [],
+      "solidCount": 754,
+      "triangleCount": 13465,
+      "footprintArea": 1490.6164,
+      "footprintBounds": [
+        217.1,
+        704.546,
+        284.389,
+        757.314
+      ],
+      "corrections": [
+        {
+          "kind": "singleFacadeEdge",
+          "entity": "1CF2",
+          "thicknessMeters": 0.372529,
+          "basis": "adjacent measured west facade"
+        },
+        {
+          "kind": "singleFacadeEdge",
+          "entity": "1D0A",
+          "thicknessMeters": 0.372529,
+          "basis": "adjacent measured west facade"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "983",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1990",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1A81",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1CEA",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1CEB",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1EC1",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1F00",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "shortDoorArc",
+          "entity": "4064",
+          "leaf": "406D",
+          "fitErrorMeters": 0.226772
+        }
+      ],
+      "unresolvedStrongEdges": [
+        {
+          "entity": "984",
+          "length": 5.9046,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "13B7",
+          "length": 6.9477,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "13BE",
+          "length": 6.0908,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "15A2",
+          "length": 0.8196,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "15A4",
+          "length": 0.8196,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "15A5",
+          "length": 0.8196,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "15A7",
+          "length": 0.8196,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "172A",
+          "length": 0.8196,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "172C",
+          "length": 0.8196,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "17B7",
+          "length": 0.6892,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "17B8",
+          "length": 0.8196,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "17B9",
+          "length": 0.6892,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "17BA",
+          "length": 0.8196,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "17BB",
+          "length": 1.0431,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "17BC",
+          "length": 1.0431,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "184F",
+          "length": 0.8009,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1850",
+          "length": 0.9686,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1851",
+          "length": 1.8626,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1852",
+          "length": 0.9686,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1991",
+          "length": 5.7183,
+          "reason": "stair-boundary-needs-section"
+        },
+        {
+          "entity": "1D05",
+          "length": 7.856,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1D06",
+          "length": 11.7719,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1EE7",
+          "length": 1.9185,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1EEC",
+          "length": 0.8196,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "filtered": {
+        "stairDirectionSymbols": 24,
+        "remoteSegments": 0,
+        "stairTreadSegments": 143,
+        "semanticExteriorStairGraphics": [
+          "286D",
+          "286E",
+          "286F",
+          "2870",
+          "2871",
+          "2872",
+          "2873",
+          "2874",
+          "2875",
+          "2876",
+          "2877",
+          "2878",
+          "2879",
+          "287A",
+          "287B",
+          "287C"
+        ],
+        "westExteriorGraphics": [
+          "3180",
+          "3181",
+          "3182",
+          "3183",
+          "3184",
+          "3185",
+          "3186",
+          "3187",
+          "3188",
+          "3189",
+          "318A",
+          "318B",
+          "318C",
+          "318D",
+          "318E",
+          "318F",
+          "31E3",
+          "31E4",
+          "31E5",
+          "31E6",
+          "31E7",
+          "31E8",
+          "31E9",
+          "31EA",
+          "31EB",
+          "31EC",
+          "31ED"
+        ],
+        "westExteriorReplacedRetaining": [
+          "317C",
+          "317D",
+          "317E",
+          "317F",
+          "31DD",
+          "31DE",
+          "31DF",
+          "31E0",
+          "31E1",
+          "31E2"
+        ],
+        "newExteriorRouteGraphics": [
+          "2A79",
+          "2A7A",
+          "2A7B",
+          "2A7C",
+          "2A7D",
+          "2A7E",
+          "2A7F",
+          "2A80",
+          "2A81",
+          "2A82",
+          "2A83",
+          "2A84",
+          "2A85",
+          "2A86",
+          "2A87",
+          "2A88"
+        ]
+      },
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "15FD",
+            "15FE",
+            "15FF",
+            "1600"
+          ],
+          "area": 0.008649,
+          "bounds": [
+            279.49,
+            726.953,
+            279.583,
+            727.046
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "160A",
+            "1698",
+            "185F",
+            "1860"
+          ],
+          "area": 0.02418,
+          "bounds": [
+            270.512,
+            717.193,
+            270.698,
+            717.323
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "160A",
+            "1698",
+            "1859",
+            "185B",
+            "185C"
+          ],
+          "area": 0.01703,
+          "bounds": [
+            270.512,
+            715.628,
+            270.642,
+            715.759
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "160B",
+            "160C",
+            "1697",
+            "1699"
+          ],
+          "area": 0.01456,
+          "bounds": [
+            282.265,
+            717.193,
+            282.377,
+            717.323
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "160B",
+            "1699",
+            "169E",
+            "169F"
+          ],
+          "area": 0.012432,
+          "bounds": [
+            282.265,
+            704.546,
+            282.377,
+            704.657
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1698",
+            "169E",
+            "169F",
+            "185C"
+          ],
+          "area": 0.01443,
+          "bounds": [
+            270.512,
+            704.546,
+            270.642,
+            704.657
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1AAB",
+            "1CF3",
+            "1D00",
+            "1EDF"
+          ],
+          "area": 0.034689,
+          "bounds": [
+            228.509,
+            750.739,
+            228.882,
+            750.832
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1CFE",
+            "1CFF",
+            "1D02",
+            "1ED6"
+          ],
+          "area": 0.034596,
+          "bounds": [
+            217.11,
+            750.739,
+            217.482,
+            750.832
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1EBB",
+            "1EBC",
+            "1ECF",
+            "1ED0"
+          ],
+          "area": 0.055428,
+          "bounds": [
+            217.11,
+            753.999,
+            217.482,
+            754.148
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "constructionDomain": {
+        "method": "room bounding box with full entity containment",
+        "margin": 6.0,
+        "bounds": [
+          211.427,
+          698.657,
+          288.265,
+          762.942
+        ]
+      },
+      "columnCovers": [],
+      "unresolvedProfiles": [],
+      "protectiveProfiles": [
+        {
+          "id": "east-wing-east-side",
+          "sourceEntities": [
+            "2868",
+            "2869",
+            "286A",
+            "286B",
+            "286C"
+          ],
+          "facadeEntity": "160B",
+          "height": 1.0,
+          "heightBasis": "coordinator-selected unmeasured protective height above the corresponding floor",
+          "planBasis": "measured exterior weak outlines; attachment ends close on the dwelling facade plane",
+          "bounds": [
+            282.377,
+            704.546,
+            284.389,
+            712.033
+          ],
+          "area": 2.579588
+        },
+        {
+          "id": "east-wing-west-side",
+          "sourceEntities": [
+            "28CA",
+            "28CB",
+            "28CC",
+            "28CD",
+            "28CE",
+            "28CF"
+          ],
+          "facadeEntity": "185C",
+          "height": 1.0,
+          "heightBasis": "coordinator-selected unmeasured protective height above the corresponding floor",
+          "planBasis": "measured exterior weak outlines; attachment ends close on the dwelling facade plane",
+          "bounds": [
+            268.351,
+            704.546,
+            270.512,
+            711.996
+          ],
+          "area": 3.171337
+        }
+      ],
+      "exteriorVoids": [
+        {
+          "id": "b01-east-wing-east-side-void",
+          "bounds": [
+            282.377,
+            704.825,
+            284.109,
+            712.033
+          ],
+          "area": 12.484256,
+          "bottom": -4.65,
+          "openAbove": -1.95,
+          "boundaryBasis": "inner sides of the measured L outline and dwelling facade; open end bounded by the plane through measured terminal cap 286A"
+        },
+        {
+          "id": "b01-east-wing-west-side-void",
+          "bounds": [
+            268.631,
+            704.825,
+            270.512,
+            711.698
+          ],
+          "area": 12.928113,
+          "bottom": -4.65,
+          "openAbove": -1.95,
+          "boundaryBasis": "inner sides of the measured U outline, closed at its attachment plane on the dwelling facade"
+        }
+      ],
+      "exteriorStairExits": [
+        {
+          "id": "west-shaft-upper-exit",
+          "bounds": [
+            268.631,
+            711.698,
+            270.512,
+            711.996
+          ],
+          "bottom": -1.95,
+          "top": -0.95,
+          "basis": "Modeled pedestrian clearance above measured retaining wall; stair/door plan fixes the route, height is estimated"
+        }
+      ],
+      "facadeOpeningClassifications": [
+        {
+          "id": "n01-door-2A37",
+          "openingClassification": "exterior-door-with-measured-landing",
+          "accessConfirmed": true,
+          "classificationBasis": "source door leaf/arc and directly adjoining exterior landing and full flight"
+        },
+        {
+          "id": "n01-door-2A4F",
+          "openingClassification": "exterior-door-with-measured-landing",
+          "accessConfirmed": true,
+          "classificationBasis": "source door leaf/arc and directly adjoining exterior landing and full flight"
+        },
+        {
+          "id": "n01-door-2A66",
+          "openingClassification": "exterior-door-with-measured-landing",
+          "accessConfirmed": true,
+          "classificationBasis": "source door leaf/arc and directly adjoining exterior landing and full flight"
+        },
+        {
+          "id": "n01-door-404E",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n01-door-4064",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n01-door-406E",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        }
+      ],
+      "underStairMasks": [
+        {
+          "id": "n01-below-n02-east-cross",
+          "sourceEntities": [
+            "15FD",
+            "1600",
+            "26E2",
+            "26E1",
+            "26E0",
+            "26DF",
+            "17EF"
+          ],
+          "bounds": [
+            279.49,
+            723.22,
+            279.583,
+            725.355
+          ],
+          "ceilingPlane": [
+            0.5339484419384583,
+            0.0,
+            -147.9085340979508
+          ]
+        }
+      ],
+      "heightRegions": [
+        {
+          "id": "west",
+          "levelKey": "n01.westWing",
+          "junctionCoordinate": 738.818,
+          "junctionSourceEntities": [
+            "1F0A",
+            "2131"
+          ],
+          "sourceRoomEntities": [
+            "2131",
+            "213A",
+            "2143",
+            "214C",
+            "2155",
+            "2160",
+            "216D"
+          ],
+          "sourceFloor": "n01",
+          "connectedSourceFeatures": [],
+          "wallCoverageMargin": 0.4,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                228.911,
+                738.818
+              ],
+              [
+                228.911,
+                739.023
+              ],
+              [
+                228.95,
+                739.023
+              ],
+              [
+                228.95,
+                738.818
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "west",
+          "levelKey": "n01.westWing",
+          "junctionCoordinate": 738.818,
+          "junctionSourceEntities": [
+            "1F0A",
+            "2131"
+          ],
+          "sourceRoomEntities": [
+            "2131",
+            "213A",
+            "2143",
+            "214C",
+            "2155",
+            "2160",
+            "216D"
+          ],
+          "sourceFloor": "n01",
+          "connectedSourceFeatures": [],
+          "wallCoverageMargin": 0.4,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                217.113,
+                738.967
+              ],
+              [
+                217.11,
+                738.967
+              ],
+              [
+                217.11,
+                741.658
+              ],
+              [
+                217.104,
+                742.187
+              ],
+              [
+                217.1,
+                742.482
+              ],
+              [
+                217.1,
+                742.493
+              ],
+              [
+                217.104,
+                742.865
+              ],
+              [
+                217.11,
+                743.336
+              ],
+              [
+                217.11,
+                754.334
+              ],
+              [
+                217.389,
+                754.334
+              ],
+              [
+                217.389,
+                755.191
+              ],
+              [
+                217.11,
+                755.191
+              ],
+              [
+                217.11,
+                756.942
+              ],
+              [
+                217.482,
+                756.942
+              ],
+              [
+                217.482,
+                757.314
+              ],
+              [
+                219.923,
+                757.314
+              ],
+              [
+                219.923,
+                756.942
+              ],
+              [
+                220.034,
+                756.942
+              ],
+              [
+                220.034,
+                757.314
+              ],
+              [
+                221.953,
+                757.314
+              ],
+              [
+                221.953,
+                756.942
+              ],
+              [
+                222.046,
+                756.942
+              ],
+              [
+                222.046,
+                757.314
+              ],
+              [
+                228.509,
+                757.314
+              ],
+              [
+                228.509,
+                756.942
+              ],
+              [
+                228.882,
+                756.942
+              ],
+              [
+                228.882,
+                743.326
+              ],
+              [
+                228.877,
+                742.89
+              ],
+              [
+                228.872,
+                742.487
+              ],
+              [
+                228.877,
+                742.108
+              ],
+              [
+                228.882,
+                741.668
+              ],
+              [
+                228.882,
+                739.023
+              ],
+              [
+                228.509,
+                739.023
+              ],
+              [
+                228.509,
+                738.967
+              ],
+              [
+                228.304,
+                738.967
+              ],
+              [
+                228.304,
+                738.52
+              ],
+              [
+                228.306,
+                738.52
+              ],
+              [
+                228.306,
+                738.295
+              ],
+              [
+                225.196,
+                738.295
+              ],
+              [
+                225.196,
+                736.264
+              ],
+              [
+                220.796,
+                736.264
+              ],
+              [
+                220.796,
+                738.295
+              ],
+              [
+                217.48,
+                738.295
+              ],
+              [
+                217.48,
+                738.818
+              ],
+              [
+                217.113,
+                738.818
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "east",
+          "levelKey": "n01.eastWing",
+          "junctionCoordinate": 723.11617,
+          "junctionSourceEntities": [
+            "20D0",
+            "portal:283A"
+          ],
+          "sourceRoomEntities": [
+            "20F8",
+            "210E"
+          ],
+          "sourceFloor": "n01",
+          "connectedSourceFeatures": [
+            {
+              "id": "n01-east-portal-region",
+              "levelKey": "n01.eastWing",
+              "sourceEntities": [
+                "1854",
+                "1855",
+                "1856",
+                "1857",
+                "1858",
+                "1859",
+                "185A",
+                "185B"
+              ],
+              "basis": "attached vestibule of doors28D2/28EB; measured perimeter outside the body X bound"
+            }
+          ],
+          "wallCoverageMargin": 0.4,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                269.44,
+                717.499
+              ],
+              [
+                269.45,
+                717.499
+              ],
+              [
+                269.45,
+                717.603
+              ],
+              [
+                270.512,
+                717.603
+              ],
+              [
+                270.512,
+                717.491
+              ],
+              [
+                270.695,
+                717.491
+              ],
+              [
+                270.695,
+                717.603
+              ],
+              [
+                270.586,
+                717.603
+              ],
+              [
+                270.586,
+                717.725
+              ],
+              [
+                270.576,
+                718.917
+              ],
+              [
+                270.576,
+                718.933
+              ],
+              [
+                270.586,
+                720.107
+              ],
+              [
+                270.586,
+                720.229
+              ],
+              [
+                270.512,
+                720.229
+              ],
+              [
+                270.512,
+                722.855
+              ],
+              [
+                270.466,
+                722.855
+              ],
+              [
+                270.466,
+                723.116
+              ],
+              [
+                270.5,
+                723.116
+              ],
+              [
+                270.864,
+                723.116
+              ],
+              [
+                270.864,
+                723.453
+              ],
+              [
+                274.105,
+                723.453
+              ],
+              [
+                274.105,
+                725.428
+              ],
+              [
+                278.765,
+                725.428
+              ],
+              [
+                278.765,
+                723.453
+              ],
+              [
+                282.062,
+                723.453
+              ],
+              [
+                282.062,
+                723.116
+              ],
+              [
+                282.377,
+                723.116
+              ],
+              [
+                282.377,
+                722.781
+              ],
+              [
+                282.219,
+                722.781
+              ],
+              [
+                282.215,
+                722.234
+              ],
+              [
+                282.209,
+                721.626
+              ],
+              [
+                282.209,
+                720.182
+              ],
+              [
+                282.219,
+                720.18
+              ],
+              [
+                282.214,
+                719.545
+              ],
+              [
+                282.209,
+                718.944
+              ],
+              [
+                282.214,
+                718.344
+              ],
+              [
+                282.219,
+                717.726
+              ],
+              [
+                282.209,
+                717.726
+              ],
+              [
+                282.209,
+                717.323
+              ],
+              [
+                282.377,
+                717.323
+              ],
+              [
+                282.377,
+                712.033
+              ],
+              [
+                282.377,
+                704.825
+              ],
+              [
+                284.109,
+                704.825
+              ],
+              [
+                284.109,
+                712.033
+              ],
+              [
+                284.389,
+                712.033
+              ],
+              [
+                284.389,
+                704.546
+              ],
+              [
+                268.351,
+                704.546
+              ],
+              [
+                268.351,
+                711.996
+              ],
+              [
+                270.512,
+                711.996
+              ],
+              [
+                270.512,
+                715.628
+              ],
+              [
+                269.45,
+                715.628
+              ],
+              [
+                269.45,
+                715.751
+              ],
+              [
+                269.44,
+                715.751
+              ]
+            ],
+            [
+              [
+                268.631,
+                704.825
+              ],
+              [
+                270.512,
+                704.825
+              ],
+              [
+                270.512,
+                711.698
+              ],
+              [
+                268.631,
+                711.698
+              ]
+            ]
+          ]
+        }
+      ],
+      "windowVerticalProfiles": {
+        "generic": 92
+      },
+      "explicitJambCorrections": [],
+      "shallowBayVoids": [],
+      "ceilingClippedOpenings": [],
+      "exposedWingRoofs": [
+        {
+          "id": "n01-west-exposed-roof",
+          "levelKey": "n02.westWing",
+          "sourceRoomEntities": [
+            "2131",
+            "213A",
+            "2143",
+            "214C",
+            "2155",
+            "2160",
+            "216D"
+          ],
+          "sourceAttachedEntities": [],
+          "sourceFloor": "n01",
+          "upperFloor": "n02",
+          "bottom": 0.85,
+          "top": 1.05,
+          "basis": "occupied historical N01 footprint beyond N02, with measured perimeter; ceiling height and thickness are variant C estimates",
+          "area": 50.642062,
+          "solidCount": 1,
+          "excludedStairVoidOverlap": 0.0,
+          "existingLandingOverlap": 0.0
+        },
+        {
+          "id": "n01-east-exposed-roof",
+          "levelKey": "n02.eastWing",
+          "sourceRoomEntities": [
+            "20F8",
+            "210E"
+          ],
+          "sourceAttachedEntities": [
+            "1854",
+            "1855",
+            "1856",
+            "1857",
+            "1858",
+            "1859",
+            "185A",
+            "185B"
+          ],
+          "sourceFloor": "n01",
+          "upperFloor": "n02",
+          "bottom": 0.85,
+          "top": 1.05,
+          "basis": "occupied historical N01 footprint beyond N02, with measured perimeter; ceiling height and thickness are variant C estimates",
+          "area": 54.758082,
+          "solidCount": 2,
+          "excludedStairVoidOverlap": 0.0,
+          "existingLandingOverlap": 0.0
+        }
+      ]
+    },
+    {
+      "id": "n02",
+      "roomCount": 54,
+      "roomArea": 1213.3337,
+      "roomOverlapArea": 0.0,
+      "wallPairCount": 971,
+      "wallArea": 160.4992,
+      "columnCount": 88,
+      "windowCount": 135,
+      "doorCount": 77,
+      "duplicateWindowEntities": [],
+      "solidCount": 1327,
+      "triangleCount": 18379,
+      "footprintArea": 1379.3825,
+      "footprintBounds": [
+        217.027,
+        705.568,
+        282.432,
+        756.299
+      ],
+      "corrections": [
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "E21",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "FFB",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "17F0",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1B2A",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1B9E",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1BD5",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1D70",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        }
+      ],
+      "unresolvedStrongEdges": [
+        {
+          "entity": "92D",
+          "length": 5.8975,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1307",
+          "length": 6.9473,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "130E",
+          "length": 6.507,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "14F5",
+          "length": 0.7785,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1761",
+          "length": 1.0498,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "17ED",
+          "length": 6.6136,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1826",
+          "length": 9.444,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1B5E",
+          "length": 9.444,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1D4B:0",
+          "length": 0.66,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1D4B:1",
+          "length": 0.83,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1D4B:2",
+          "length": 0.66,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1D4B:3",
+          "length": 0.83,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1D5B",
+          "length": 0.771,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "filtered": {
+        "stairDirectionSymbols": 15,
+        "remoteSegments": 0,
+        "stairTreadSegments": 104,
+        "semanticExteriorStairGraphics": [],
+        "westExteriorGraphics": [],
+        "westExteriorReplacedRetaining": [],
+        "newExteriorRouteGraphics": [
+          "28F5",
+          "28F6",
+          "28F7",
+          "28F8",
+          "28F9",
+          "28FA",
+          "28FB",
+          "28FC",
+          "28FD",
+          "28FE",
+          "28FF",
+          "2900",
+          "2901",
+          "2902",
+          "2903"
+        ]
+      },
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1870",
+            "1874"
+          ],
+          "area": 0.0077,
+          "bounds": [
+            276.332,
+            722.967,
+            276.409,
+            723.067
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1761",
+            "1CFA"
+          ],
+          "area": 0.00492,
+          "bounds": [
+            217.027,
+            729.766,
+            217.15,
+            729.806
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "17EE",
+            "17EF",
+            "1C97",
+            "1C9C"
+          ],
+          "area": 0.01,
+          "bounds": [
+            279.725,
+            726.941,
+            279.825,
+            727.041
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1BAB",
+            "1BAC",
+            "1BC0",
+            "1BC1"
+          ],
+          "area": 0.01,
+          "bounds": [
+            277.606,
+            709.983,
+            277.706,
+            710.083
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1BAC",
+            "1BAD",
+            "1BBF",
+            "1BC0"
+          ],
+          "area": 0.01,
+          "bounds": [
+            277.606,
+            710.803,
+            277.706,
+            710.903
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1BAE",
+            "1BB3",
+            "1BB4",
+            "1BB5"
+          ],
+          "area": 0.021791,
+          "bounds": [
+            276.444284,
+            707.868,
+            276.604,
+            708.103
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1C86",
+            "1C87",
+            "1C88",
+            "1C89"
+          ],
+          "area": 0.01,
+          "bounds": [
+            274.615,
+            718.576,
+            274.715,
+            718.676
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1B5E",
+            "1B93",
+            "1D6B",
+            "1D6C",
+            "1DCC"
+          ],
+          "area": 0.027,
+          "bounds": [
+            223.01,
+            756.029,
+            223.11,
+            756.299
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1DF4",
+            "1DF5",
+            "1DF6",
+            "1DFC"
+          ],
+          "area": 0.01,
+          "bounds": [
+            224.11,
+            751.051,
+            224.21,
+            751.151
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1D6B",
+            "1DCA",
+            "1DCB",
+            "1DF4",
+            "1DF5"
+          ],
+          "area": 0.0163,
+          "bounds": [
+            223.01,
+            750.988,
+            223.11,
+            751.151
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1D84",
+            "1D85",
+            "1D86",
+            "1DC8"
+          ],
+          "area": 0.0176,
+          "bounds": [
+            223.01,
+            749.685,
+            223.11,
+            749.861
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1BD9",
+            "1BDA",
+            "1BDD",
+            "1BE9"
+          ],
+          "area": 0.01,
+          "bounds": [
+            276.409,
+            715.103,
+            276.509,
+            715.203
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1D58",
+            "1D6E",
+            "1D75",
+            "1D76"
+          ],
+          "area": 0.0372,
+          "bounds": [
+            221.218,
+            738.743,
+            221.318,
+            739.115
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "constructionDomain": {
+        "method": "room bounding box with full entity containment",
+        "margin": 6.0,
+        "bounds": [
+          211.424,
+          699.838,
+          288.178,
+          762.029
+        ]
+      },
+      "columnCovers": [
+        {
+          "entity": "1D4B",
+          "column": "1762",
+          "profileArea": 0.5478,
+          "basis": "closed strong rectangular profile enclosing the measured column; vertical extent estimated"
+        }
+      ],
+      "unresolvedProfiles": [],
+      "protectiveProfiles": [],
+      "exteriorVoids": [],
+      "exteriorStairExits": [],
+      "facadeOpeningClassifications": [
+        {
+          "id": "n02-door-25E3",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n02-door-25FB",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n02-door-2612",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n02-door-262D",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n02-door-2643",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n02-door-2650",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n02-door-28DD",
+          "openingClassification": "exterior-door-with-measured-landing",
+          "accessConfirmed": true,
+          "classificationBasis": "source door leaf/arc and directly adjoining exterior landing and full flight"
+        }
+      ],
+      "underStairMasks": [
+        {
+          "id": "n02-137-north-support",
+          "sourceEntities": [
+            "17EE",
+            "1C9C"
+          ],
+          "bounds": [
+            279.725,
+            726.941,
+            282.079,
+            727.041
+          ],
+          "ceilingPlane": [
+            0.0,
+            0.5339484419384403,
+            -385.7023445676041
+          ]
+        },
+        {
+          "id": "n02-137-support-above-n01-2852",
+          "sourceEntities": [
+            "17EE",
+            "1C9C",
+            "1603",
+            "1602",
+            "2852"
+          ],
+          "bounds": [
+            280.421,
+            726.941,
+            281.222,
+            727.041
+          ],
+          "ceilingPlane": [
+            0.0,
+            0.5339484419384403,
+            -385.7023445676041
+          ]
+        },
+        {
+          "id": "n02-137-door-side",
+          "sourceEntities": [
+            "17EF",
+            "1C97",
+            "1C9A",
+            "1C9B",
+            "2DFB",
+            "2DFC"
+          ],
+          "bounds": [
+            279.725,
+            723.22,
+            279.825,
+            727.041
+          ],
+          "ceilingPlane": [
+            0,
+            0,
+            5.5
+          ]
+        }
+      ],
+      "heightRegions": [
+        {
+          "id": "west",
+          "levelKey": "n02.westWing",
+          "junctionCoordinate": 738.929,
+          "junctionSourceEntities": [
+            "1FF2",
+            "20BE"
+          ],
+          "sourceRoomEntities": [
+            "20B5",
+            "20BE",
+            "20C7",
+            "20D8",
+            "20E1",
+            "20EA",
+            "20F3",
+            "20FC",
+            "2105",
+            "212C",
+            "2141",
+            "2176"
+          ],
+          "sourceFloor": "n02",
+          "connectedSourceFeatures": [],
+          "wallCoverageMargin": 0.28,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                217.485,
+                738.929
+              ],
+              [
+                217.485,
+                739.115
+              ],
+              [
+                218.505,
+                739.115
+              ],
+              [
+                218.505,
+                740.62
+              ],
+              [
+                218.397,
+                740.62
+              ],
+              [
+                218.397,
+                756.299
+              ],
+              [
+                220.119,
+                756.299
+              ],
+              [
+                220.119,
+                756.029
+              ],
+              [
+                220.346,
+                755.861
+              ],
+              [
+                220.446,
+                755.861
+              ],
+              [
+                220.446,
+                755.893
+              ],
+              [
+                220.545,
+                756.029
+              ],
+              [
+                220.545,
+                756.299
+              ],
+              [
+                227.841,
+                756.299
+              ],
+              [
+                227.841,
+                740.62
+              ],
+              [
+                227.733,
+                740.62
+              ],
+              [
+                227.733,
+                739.115
+              ],
+              [
+                228.95,
+                739.115
+              ],
+              [
+                228.95,
+                738.929
+              ],
+              [
+                227.85,
+                738.929
+              ],
+              [
+                225.194,
+                738.929
+              ],
+              [
+                225.194,
+                736.562
+              ],
+              [
+                220.872,
+                736.562
+              ],
+              [
+                220.872,
+                738.929
+              ],
+              [
+                218.388,
+                738.929
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "east",
+          "levelKey": "n02.eastWing",
+          "junctionCoordinate": 723.001,
+          "junctionSourceEntities": [
+            "2001",
+            "2037"
+          ],
+          "sourceRoomEntities": [
+            "202E",
+            "2037",
+            "2040",
+            "2049",
+            "2056",
+            "2067",
+            "2072",
+            "207D",
+            "2092",
+            "20AA"
+          ],
+          "sourceFloor": "n02",
+          "connectedSourceFeatures": [
+            {
+              "id": "n02-east-portal-region",
+              "levelKey": "n02.eastWing",
+              "sourceEntities": [
+                "14F3",
+                "14F6"
+              ],
+              "basis": "measured wall-depth passage from191c to central wing landing"
+            },
+            {
+              "id": "n02-connected-bay",
+              "levelKey": "n02.eastWing",
+              "sourceEntities": [
+                "1864",
+                "1865",
+                "1868",
+                "1869",
+                "2745",
+                "2746",
+                "2747"
+              ],
+              "basis": "measured jamb-to-rear closure footprint; connected wing room, purpose unconfirmed"
+            }
+          ],
+          "wallCoverageMargin": 0.28,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                274.799,
+                723.001
+              ],
+              [
+                274.799,
+                723.065
+              ],
+              [
+                274.318,
+                723.065
+              ],
+              [
+                274.318,
+                725.357
+              ],
+              [
+                278.639,
+                725.357
+              ],
+              [
+                278.639,
+                723.065
+              ],
+              [
+                278.059,
+                723.065
+              ],
+              [
+                278.059,
+                723.001
+              ],
+              [
+                280.452,
+                723.001
+              ],
+              [
+                282.079,
+                723.001
+              ],
+              [
+                282.079,
+                722.782
+              ],
+              [
+                280.972,
+                722.782
+              ],
+              [
+                280.972,
+                721.247
+              ],
+              [
+                281.217,
+                721.247
+              ],
+              [
+                281.217,
+                705.568
+              ],
+              [
+                279.494,
+                705.568
+              ],
+              [
+                279.494,
+                705.838
+              ],
+              [
+                279.069,
+                705.838
+              ],
+              [
+                279.069,
+                705.568
+              ],
+              [
+                271.773,
+                705.568
+              ],
+              [
+                271.773,
+                721.247
+              ],
+              [
+                272.018,
+                721.247
+              ],
+              [
+                272.018,
+                722.782
+              ],
+              [
+                270.878,
+                722.782
+              ],
+              [
+                270.878,
+                723.001
+              ],
+              [
+                271.875,
+                723.001
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "east",
+          "levelKey": "n02.eastWing",
+          "junctionCoordinate": 723.001,
+          "junctionSourceEntities": [
+            "2001",
+            "2037"
+          ],
+          "sourceRoomEntities": [
+            "202E",
+            "2037",
+            "2040",
+            "2049",
+            "2056",
+            "2067",
+            "2072",
+            "207D",
+            "2092",
+            "20AA"
+          ],
+          "sourceFloor": "n02",
+          "connectedSourceFeatures": [
+            {
+              "id": "n02-east-portal-region",
+              "levelKey": "n02.eastWing",
+              "sourceEntities": [
+                "14F3",
+                "14F6"
+              ],
+              "basis": "measured wall-depth passage from191c to central wing landing"
+            },
+            {
+              "id": "n02-connected-bay",
+              "levelKey": "n02.eastWing",
+              "sourceEntities": [
+                "1864",
+                "1865",
+                "1868",
+                "1869",
+                "2745",
+                "2746",
+                "2747"
+              ],
+              "basis": "measured jamb-to-rear closure footprint; connected wing room, purpose unconfirmed"
+            }
+          ],
+          "wallCoverageMargin": 0.28,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                270.536,
+                723.001
+              ],
+              [
+                270.536,
+                722.859
+              ],
+              [
+                270.5,
+                722.859
+              ],
+              [
+                270.5,
+                723.001
+              ]
+            ]
+          ]
+        }
+      ],
+      "windowVerticalProfiles": {
+        "generic": 88,
+        "ipr2023-n02-wing-tall": 47
+      },
+      "explicitJambCorrections": [
+        {
+          "id": "n02-door-2753",
+          "depth": 0.1,
+          "normalOffset": 0.05,
+          "depthSourceEntities": [
+            "1864",
+            "1865"
+          ]
+        },
+        {
+          "id": "n02-door-276A",
+          "depth": 0.1,
+          "normalOffset": -0.05,
+          "depthSourceEntities": [
+            "1868",
+            "1869"
+          ]
+        }
+      ],
+      "shallowBayVoids": [
+        {
+          "id": "n02-shallow-bay",
+          "frontX": 280.2715115249157,
+          "rearX": 280.8338142931461,
+          "sourceEntities": [
+            "2745",
+            "2746",
+            "2747",
+            "2750"
+          ],
+          "basis": "measured free space between the 0.10m front jamb and inner rear closure; purpose unconfirmed",
+          "loops": [
+            [
+              [
+                280.272,
+                721.247
+              ],
+              [
+                280.272,
+                722.782
+              ],
+              [
+                280.834,
+                722.782
+              ],
+              [
+                280.834,
+                721.247
+              ]
+            ]
+          ]
+        }
+      ],
+      "ceilingClippedOpenings": [
+        {
+          "id": "n02-window-274A",
+          "bottom": 3.75,
+          "top": 4.1,
+          "requestedTop": 5.25,
+          "ceilingElevation": 4.15,
+          "ceilingLevelKeys": [
+            "n02.eastWing",
+            "n02.main"
+          ]
+        },
+        {
+          "id": "n02-window-274E",
+          "bottom": 3.75,
+          "top": 4.1,
+          "requestedTop": 5.25,
+          "ceilingElevation": 4.15,
+          "ceilingLevelKeys": [
+            "n02.eastWing",
+            "n02.main"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "n03",
+      "roomCount": 58,
+      "roomArea": 1197.8736,
+      "roomOverlapArea": 0.0,
+      "wallPairCount": 1031,
+      "wallArea": 173.3343,
+      "columnCount": 83,
+      "windowCount": 136,
+      "doorCount": 83,
+      "duplicateWindowEntities": [],
+      "solidCount": 1306,
+      "triangleCount": 17914,
+      "footprintArea": 1379.0835,
+      "footprintBounds": [
+        217.027,
+        705.568,
+        282.394,
+        756.299
+      ],
+      "corrections": [
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "DE5",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "FC1",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1035",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "118C",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1196",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "119B",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "14E8",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "14F4",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1C1A",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        },
+        {
+          "kind": "singleBoundaryEdge",
+          "entity": "1C5C",
+          "thicknessMeters": 0.1,
+          "basis": "measured strong boundary; thickness estimated"
+        }
+      ],
+      "unresolvedStrongEdges": [
+        {
+          "entity": "2C4",
+          "length": 5.8975,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "97E",
+          "length": 6.9473,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "985",
+          "length": 6.507,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "B6C",
+          "length": 0.7785,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "DE4",
+          "length": 6.6136,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "E19",
+          "length": 9.444,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "FF5",
+          "length": 9.444,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1038",
+          "length": 0.7378,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "103A",
+          "length": 0.7378,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1106",
+          "length": 0.771,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "1C25",
+          "length": 0.8671,
+          "reason": "inside-room-or-stair"
+        },
+        {
+          "entity": "1C27",
+          "length": 0.8671,
+          "reason": "inside-room-or-stair"
+        }
+      ],
+      "filtered": {
+        "stairDirectionSymbols": 2,
+        "remoteSegments": 0,
+        "stairTreadSegments": 92,
+        "semanticExteriorStairGraphics": [],
+        "westExteriorGraphics": [],
+        "westExteriorReplacedRetaining": [],
+        "newExteriorRouteGraphics": []
+      },
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "14EE",
+            "E55",
+            "E56"
+          ],
+          "area": 0.0438,
+          "bounds": [
+            274.615,
+            722.782,
+            274.715,
+            723.22
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "10DA",
+            "10DB",
+            "1C49",
+            "1C4A",
+            "1C4C"
+          ],
+          "area": 0.01,
+          "bounds": [
+            276.409,
+            718.545,
+            276.509,
+            718.645
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "103E",
+            "103F",
+            "1C4D",
+            "1C4E"
+          ],
+          "area": 0.01,
+          "bounds": [
+            276.409,
+            712.102,
+            276.509,
+            712.202
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1181",
+            "1184",
+            "1185",
+            "1187"
+          ],
+          "area": 0.01,
+          "bounds": [
+            221.218,
+            743.253,
+            221.318,
+            743.353
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "102A",
+            "110F",
+            "1110",
+            "1151",
+            "FF5"
+          ],
+          "area": 0.027,
+          "bounds": [
+            223.01,
+            756.029,
+            223.11,
+            756.299
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "1C3B",
+            "1C3E",
+            "1C3F",
+            "1C45"
+          ],
+          "area": 0.04213,
+          "bounds": [
+            224.66,
+            740.62,
+            224.862,
+            740.89
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "10FF",
+            "118A",
+            "1194"
+          ],
+          "area": 0.0075,
+          "bounds": [
+            221.26,
+            733.027,
+            221.41,
+            733.077
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "10FF",
+            "1111",
+            "1117",
+            "1118",
+            "118A",
+            "1C3D"
+          ],
+          "area": 0.084072,
+          "bounds": [
+            221.218,
+            738.743,
+            221.444,
+            739.115
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "110A",
+            "110C",
+            "1192",
+            "1193",
+            "1C42",
+            "1C43"
+          ],
+          "area": 0.086304,
+          "bounds": [
+            224.63,
+            738.743,
+            224.862,
+            739.115
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "constructionDomain": {
+        "method": "room bounding box with full entity containment",
+        "margin": 6.0,
+        "bounds": [
+          211.428,
+          699.838,
+          288.178,
+          762.029
+        ]
+      },
+      "columnCovers": [],
+      "unresolvedProfiles": [],
+      "protectiveProfiles": [],
+      "exteriorVoids": [],
+      "exteriorStairExits": [],
+      "unmodeledDetails": [
+        {
+          "entities": [
+            "1038",
+            "1039",
+            "103A",
+            "103B"
+          ],
+          "reason": "Closed rectangular outline has no enclosed measured round column; purpose unconfirmed, no automatic extrusion"
+        }
+      ],
+      "facadeOpeningClassifications": [
+        {
+          "id": "n03-door-21D6",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n03-door-21EE",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n03-door-2205",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n03-door-221E",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n03-door-2234",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        },
+        {
+          "id": "n03-door-2241",
+          "openingClassification": "facade-opening-unconfirmed-access",
+          "accessConfirmed": false,
+          "classificationBasis": "CAD leaf/arc on 3-DVERE; IPR Praha summer 2023 shows closed glazed facade rows, including N01 west above a solid parapet; no measured sill or opening height"
+        }
+      ],
+      "underStairMasks": [],
+      "heightRegions": [
+        {
+          "id": "west",
+          "levelKey": "n03.westWing",
+          "junctionCoordinate": 738.929,
+          "junctionSourceEntities": [
+            "1F1B",
+            "2016"
+          ],
+          "sourceRoomEntities": [
+            "1F82",
+            "1F8B",
+            "1FB2",
+            "1FE7",
+            "1FF8",
+            "2001",
+            "200B",
+            "2016",
+            "201F",
+            "2030",
+            "203C"
+          ],
+          "sourceFloor": "n03",
+          "connectedSourceFeatures": [
+            {
+              "id": "n03-west-portal-region",
+              "levelKey": "n03.westWing",
+              "sourceEntities": [
+                "1100",
+                "1101"
+              ],
+              "basis": "open passage between292 and291b, no additional drawn step"
+            }
+          ],
+          "wallCoverageMargin": 0.28,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                221.442,
+                738.929
+              ],
+              [
+                218.388,
+                738.929
+              ],
+              [
+                217.485,
+                738.929
+              ],
+              [
+                217.485,
+                739.115
+              ],
+              [
+                218.505,
+                739.115
+              ],
+              [
+                218.505,
+                740.62
+              ],
+              [
+                218.397,
+                740.62
+              ],
+              [
+                218.397,
+                756.299
+              ],
+              [
+                220.119,
+                756.299
+              ],
+              [
+                220.119,
+                756.029
+              ],
+              [
+                220.346,
+                755.861
+              ],
+              [
+                220.446,
+                755.861
+              ],
+              [
+                220.446,
+                755.893
+              ],
+              [
+                220.545,
+                756.029
+              ],
+              [
+                220.545,
+                756.299
+              ],
+              [
+                227.841,
+                756.299
+              ],
+              [
+                227.841,
+                740.62
+              ],
+              [
+                227.733,
+                740.62
+              ],
+              [
+                227.733,
+                739.115
+              ],
+              [
+                228.95,
+                739.115
+              ],
+              [
+                228.95,
+                738.929
+              ],
+              [
+                227.052,
+                738.929
+              ],
+              [
+                224.632,
+                738.929
+              ],
+              [
+                224.632,
+                738.745
+              ],
+              [
+                224.648,
+                738.745
+              ],
+              [
+                224.648,
+                737.191
+              ],
+              [
+                221.408,
+                737.191
+              ],
+              [
+                221.408,
+                738.745
+              ],
+              [
+                221.442,
+                738.745
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "east",
+          "levelKey": "n03.eastWing",
+          "junctionCoordinate": 723.001,
+          "junctionSourceEntities": [
+            "1EF6",
+            "1EC6"
+          ],
+          "sourceRoomEntities": [
+            "1E63",
+            "1E6C",
+            "1E76",
+            "1E7F",
+            "1E8B",
+            "1E94",
+            "1E9D",
+            "1EA9",
+            "1EB2",
+            "1EBC",
+            "1EC6",
+            "1ECF"
+          ],
+          "sourceFloor": "n03",
+          "connectedSourceFeatures": [
+            {
+              "id": "n03-east-portal-region",
+              "levelKey": "n03.eastWing",
+              "sourceEntities": [
+                "B6A",
+                "B6D"
+              ],
+              "basis": "door-lined wall-depth passage from291c to U landing"
+            },
+            {
+              "id": "n03-connected-bay",
+              "levelKey": "n03.eastWing",
+              "sourceEntities": [
+                "E57",
+                "E58",
+                "E5B",
+                "E5C",
+                "22C0",
+                "22C1",
+                "22C2"
+              ],
+              "basis": "measured jamb-to-rear closure footprint; connected wing room, purpose unconfirmed"
+            }
+          ],
+          "wallCoverageMargin": 0.28,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                274.814,
+                723.001
+              ],
+              [
+                274.814,
+                723.065
+              ],
+              [
+                274.814,
+                723.222
+              ],
+              [
+                274.814,
+                724.773
+              ],
+              [
+                278.053,
+                724.773
+              ],
+              [
+                278.053,
+                723.222
+              ],
+              [
+                278.053,
+                723.065
+              ],
+              [
+                278.053,
+                723.001
+              ],
+              [
+                280.452,
+                723.001
+              ],
+              [
+                282.079,
+                723.001
+              ],
+              [
+                282.079,
+                722.782
+              ],
+              [
+                280.972,
+                722.782
+              ],
+              [
+                280.972,
+                721.247
+              ],
+              [
+                281.217,
+                721.247
+              ],
+              [
+                281.217,
+                705.568
+              ],
+              [
+                279.494,
+                705.568
+              ],
+              [
+                279.494,
+                705.838
+              ],
+              [
+                279.069,
+                705.838
+              ],
+              [
+                279.069,
+                705.568
+              ],
+              [
+                276.509,
+                705.568
+              ],
+              [
+                276.509,
+                705.838
+              ],
+              [
+                276.409,
+                705.838
+              ],
+              [
+                276.409,
+                705.568
+              ],
+              [
+                273.843,
+                705.568
+              ],
+              [
+                273.843,
+                705.838
+              ],
+              [
+                273.417,
+                705.838
+              ],
+              [
+                273.417,
+                705.568
+              ],
+              [
+                271.773,
+                705.568
+              ],
+              [
+                271.773,
+                721.247
+              ],
+              [
+                272.018,
+                721.247
+              ],
+              [
+                272.018,
+                722.782
+              ],
+              [
+                270.878,
+                722.782
+              ],
+              [
+                270.878,
+                723.001
+              ],
+              [
+                271.875,
+                723.001
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "east",
+          "levelKey": "n03.eastWing",
+          "junctionCoordinate": 723.001,
+          "junctionSourceEntities": [
+            "1EF6",
+            "1EC6"
+          ],
+          "sourceRoomEntities": [
+            "1E63",
+            "1E6C",
+            "1E76",
+            "1E7F",
+            "1E8B",
+            "1E94",
+            "1E9D",
+            "1EA9",
+            "1EB2",
+            "1EBC",
+            "1EC6",
+            "1ECF"
+          ],
+          "sourceFloor": "n03",
+          "connectedSourceFeatures": [
+            {
+              "id": "n03-east-portal-region",
+              "levelKey": "n03.eastWing",
+              "sourceEntities": [
+                "B6A",
+                "B6D"
+              ],
+              "basis": "door-lined wall-depth passage from291c to U landing"
+            },
+            {
+              "id": "n03-connected-bay",
+              "levelKey": "n03.eastWing",
+              "sourceEntities": [
+                "E57",
+                "E58",
+                "E5B",
+                "E5C",
+                "22C0",
+                "22C1",
+                "22C2"
+              ],
+              "basis": "measured jamb-to-rear closure footprint; connected wing room, purpose unconfirmed"
+            }
+          ],
+          "wallCoverageMargin": 0.28,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                270.536,
+                723.001
+              ],
+              [
+                270.536,
+                722.859
+              ],
+              [
+                270.5,
+                722.859
+              ],
+              [
+                270.5,
+                723.001
+              ]
+            ]
+          ]
+        }
+      ],
+      "windowVerticalProfiles": {
+        "generic": 88,
+        "ipr2023-n03-wing-tall": 48
+      },
+      "explicitJambCorrections": [
+        {
+          "id": "n03-door-22CE",
+          "depth": 0.1,
+          "normalOffset": 0.05,
+          "depthSourceEntities": [
+            "E57",
+            "E58"
+          ]
+        },
+        {
+          "id": "n03-door-22E5",
+          "depth": 0.1,
+          "normalOffset": -0.05,
+          "depthSourceEntities": [
+            "E5B",
+            "E5C"
+          ]
+        }
+      ],
+      "shallowBayVoids": [
+        {
+          "id": "n03-shallow-bay",
+          "frontX": 280.2715115249157,
+          "rearX": 280.8338142931461,
+          "sourceEntities": [
+            "22C0",
+            "22C1",
+            "22C2",
+            "22CB"
+          ],
+          "basis": "measured free space between the 0.10m front jamb and inner rear closure; purpose unconfirmed",
+          "loops": [
+            [
+              [
+                280.272,
+                721.247
+              ],
+              [
+                280.272,
+                722.782
+              ],
+              [
+                280.834,
+                722.782
+              ],
+              [
+                280.834,
+                721.247
+              ]
+            ]
+          ]
+        }
+      ],
+      "ceilingClippedOpenings": [
+        {
+          "id": "n03-window-22C5",
+          "bottom": 6.6,
+          "top": 7.8,
+          "requestedTop": 8.1,
+          "ceilingElevation": 7.85,
+          "ceilingLevelKeys": [
+            "n03.eastWing",
+            "n03.main"
+          ]
+        },
+        {
+          "id": "n03-window-22C9",
+          "bottom": 6.6,
+          "top": 7.8,
+          "requestedTop": 8.1,
+          "ceilingElevation": 7.85,
+          "ceilingLevelKeys": [
+            "n03.eastWing",
+            "n03.main"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "n04",
+      "roomCount": 1,
+      "roomArea": 9.2378,
+      "roomOverlapArea": 0.0,
+      "wallPairCount": 8,
+      "wallArea": 2.6535,
+      "columnCount": 0,
+      "windowCount": 1,
+      "doorCount": 0,
+      "duplicateWindowEntities": [],
+      "solidCount": 10,
+      "triangleCount": 436,
+      "footprintArea": 11.8338,
+      "footprintBounds": [
+        219.309,
+        729.692,
+        222.569,
+        733.322
+      ],
+      "corrections": [],
+      "unresolvedStrongEdges": [
+        {
+          "entity": "41",
+          "length": 3.63,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "42",
+          "length": 3.26,
+          "reason": "no-nearby-room-boundary"
+        },
+        {
+          "entity": "43",
+          "length": 3.63,
+          "reason": "no-nearby-room-boundary"
+        }
+      ],
+      "filtered": {
+        "stairDirectionSymbols": 2,
+        "remoteSegments": 0,
+        "stairTreadSegments": 0,
+        "semanticExteriorStairGraphics": [],
+        "westExteriorGraphics": [],
+        "westExteriorReplacedRetaining": [],
+        "newExteriorRouteGraphics": []
+      },
+      "wallRoomConflicts": [],
+      "junctionRepairs": [
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3D",
+            "41",
+            "46",
+            "47"
+          ],
+          "area": 0.04,
+          "bounds": [
+            222.369,
+            733.122,
+            222.569,
+            733.322
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3D",
+            "3E",
+            "41",
+            "42"
+          ],
+          "area": 0.04,
+          "bounds": [
+            222.369,
+            729.692,
+            222.569,
+            729.892
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3E",
+            "3F",
+            "42",
+            "43"
+          ],
+          "area": 0.04,
+          "bounds": [
+            219.309,
+            729.692,
+            219.509,
+            729.892
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        },
+        {
+          "kind": "closedSourceWallJunction",
+          "entities": [
+            "3C",
+            "3F",
+            "40",
+            "43"
+          ],
+          "area": 0.04,
+          "bounds": [
+            219.309,
+            733.122,
+            219.509,
+            733.322
+          ],
+          "basis": "local closed source face, majority measured wall coverage, two nonparallel established strong runs"
+        }
+      ],
+      "constructionDomain": {
+        "method": "room bounding box with full entity containment",
+        "margin": 6.0,
+        "bounds": [
+          213.509,
+          723.892,
+          228.369,
+          739.122
+        ]
+      },
+      "columnCovers": [],
+      "unresolvedProfiles": [],
+      "protectiveProfiles": [],
+      "exteriorVoids": [],
+      "exteriorStairExits": [],
+      "facadeOpeningClassifications": [],
+      "underStairMasks": [],
+      "heightRegions": [
+        {
+          "id": "west",
+          "levelKey": "n04.westWing",
+          "junctionCoordinate": 738.929,
+          "junctionSourceEntities": [
+            "1F1B",
+            "2016"
+          ],
+          "sourceRoomEntities": [
+            "1F82",
+            "1F8B",
+            "1FB2",
+            "1FE7",
+            "1FF8",
+            "2001",
+            "200B",
+            "2016",
+            "201F",
+            "2030",
+            "203C"
+          ],
+          "sourceFloor": "n03",
+          "connectedSourceFeatures": [],
+          "wallCoverageMargin": 0.28,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                227.052,
+                738.929
+              ],
+              [
+                218.388,
+                738.929
+              ],
+              [
+                217.485,
+                738.929
+              ],
+              [
+                217.485,
+                739.115
+              ],
+              [
+                218.505,
+                739.115
+              ],
+              [
+                218.505,
+                740.62
+              ],
+              [
+                218.397,
+                740.62
+              ],
+              [
+                218.397,
+                756.299
+              ],
+              [
+                220.119,
+                756.299
+              ],
+              [
+                220.119,
+                756.029
+              ],
+              [
+                220.346,
+                755.861
+              ],
+              [
+                220.446,
+                755.861
+              ],
+              [
+                220.446,
+                755.893
+              ],
+              [
+                220.545,
+                756.029
+              ],
+              [
+                220.545,
+                756.299
+              ],
+              [
+                227.841,
+                756.299
+              ],
+              [
+                227.841,
+                740.62
+              ],
+              [
+                227.733,
+                740.62
+              ],
+              [
+                227.733,
+                739.115
+              ],
+              [
+                228.95,
+                739.115
+              ],
+              [
+                228.95,
+                738.929
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "east",
+          "levelKey": "n04.eastWing",
+          "junctionCoordinate": 723.001,
+          "junctionSourceEntities": [
+            "1EF6",
+            "1EC6"
+          ],
+          "sourceRoomEntities": [
+            "1E63",
+            "1E6C",
+            "1E76",
+            "1E7F",
+            "1E8B",
+            "1E94",
+            "1E9D",
+            "1EA9",
+            "1EB2",
+            "1EBC",
+            "1EC6",
+            "1ECF"
+          ],
+          "sourceFloor": "n03",
+          "connectedSourceFeatures": [],
+          "wallCoverageMargin": 0.28,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                280.452,
+                723.001
+              ],
+              [
+                282.079,
+                723.001
+              ],
+              [
+                282.079,
+                722.782
+              ],
+              [
+                280.972,
+                722.782
+              ],
+              [
+                280.972,
+                721.247
+              ],
+              [
+                281.217,
+                721.247
+              ],
+              [
+                281.217,
+                705.568
+              ],
+              [
+                279.494,
+                705.568
+              ],
+              [
+                279.494,
+                705.838
+              ],
+              [
+                279.069,
+                705.838
+              ],
+              [
+                279.069,
+                705.568
+              ],
+              [
+                276.509,
+                705.568
+              ],
+              [
+                276.509,
+                705.838
+              ],
+              [
+                276.409,
+                705.838
+              ],
+              [
+                276.409,
+                705.568
+              ],
+              [
+                273.843,
+                705.568
+              ],
+              [
+                273.843,
+                705.838
+              ],
+              [
+                273.417,
+                705.838
+              ],
+              [
+                273.417,
+                705.568
+              ],
+              [
+                271.773,
+                705.568
+              ],
+              [
+                271.773,
+                721.247
+              ],
+              [
+                272.018,
+                721.247
+              ],
+              [
+                272.018,
+                722.782
+              ],
+              [
+                270.878,
+                722.782
+              ],
+              [
+                270.878,
+                723.001
+              ],
+              [
+                271.875,
+                723.001
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "east",
+          "levelKey": "n04.eastWing",
+          "junctionCoordinate": 723.001,
+          "junctionSourceEntities": [
+            "1EF6",
+            "1EC6"
+          ],
+          "sourceRoomEntities": [
+            "1E63",
+            "1E6C",
+            "1E76",
+            "1E7F",
+            "1E8B",
+            "1E94",
+            "1E9D",
+            "1EA9",
+            "1EB2",
+            "1EBC",
+            "1EC6",
+            "1ECF"
+          ],
+          "sourceFloor": "n03",
+          "connectedSourceFeatures": [],
+          "wallCoverageMargin": 0.28,
+          "basis": "bounded body wing beyond the source separating wall, attached source rooms and explicit stair/portal footprints; ordinary main room interiors excluded",
+          "loops": [
+            [
+              [
+                270.536,
+                723.001
+              ],
+              [
+                270.536,
+                722.859
+              ],
+              [
+                270.5,
+                722.859
+              ],
+              [
+                270.5,
+                723.001
+              ]
+            ]
+          ]
+        }
+      ],
+      "windowVerticalProfiles": {
+        "generic": 1
+      },
+      "explicitJambCorrections": [],
+      "shallowBayVoids": [],
+      "ceilingClippedOpenings": [
+        {
+          "id": "n04-window-FFA",
+          "bottom": 9.9,
+          "top": 11.3,
+          "requestedTop": 11.4,
+          "ceilingElevation": 11.35,
+          "ceilingLevelKeys": [
+            "n04.main"
+          ]
+        }
+      ]
+    }
+  ],
+  "exteriorWest": {
+    "canonicalFloor": "n01",
+    "referenceFloor": "p01",
+    "anchors": {
+      "westExterior.nw.top": -1.85,
+      "westExterior.ne.top": -2.45
+    },
+    "derivedLevels": {
+      "p01-west-exterior-nw:turn": -3.45
+    },
+    "planCount": 2,
+    "segmentRisers": {
+      "p01-west-exterior-nw-first": 6,
+      "p01-west-exterior-nw-second": 8,
+      "p01-west-exterior-ne-flight": 11
+    },
+    "terrainValidationPending": true,
+    "retainingProfiles": [
+      {
+        "id": "west-exterior-retaining-317C",
+        "sourceEntities": [
+          "317C",
+          "B0",
+          "B1"
+        ],
+        "thickness": 0.29037235917339477,
+        "p01EndpointNormalOffsets": {
+          "B0": [
+            0.105641,
+            -0.066202
+          ],
+          "B1": [
+            0.393068,
+            0.245089
+          ]
+        },
+        "sourceFloor": "n01+p01",
+        "top": -1.65,
+        "bottom": -4.65,
+        "basis": "N01 canonical clear face with measured P01 pair thickness; estimated common retaining crest 0.20m above the higher western exit endpoint; local inter-plan interpretation, not survey",
+        "loops": [
+          [
+            [
+              217.062661,
+              757.600766
+            ],
+            [
+              215.255895,
+              757.302743
+            ],
+            [
+              215.303153,
+              757.016242
+            ],
+            [
+              217.109919,
+              757.314265
+            ]
+          ]
+        ]
+      },
+      {
+        "id": "west-exterior-retaining-317D",
+        "sourceEntities": [
+          "317D",
+          "AE",
+          "AF"
+        ],
+        "thickness": 0.28167499145316793,
+        "p01EndpointNormalOffsets": {
+          "AE": [
+            0.05566,
+            0.06403
+          ],
+          "AF": [
+            -0.226365,
+            -0.218051
+          ]
+        },
+        "sourceFloor": "n01+p01",
+        "top": -1.65,
+        "bottom": -4.65,
+        "basis": "N01 canonical clear face with measured P01 pair thickness; estimated common retaining crest 0.20m above the higher western exit endpoint; local inter-plan interpretation, not survey",
+        "loops": [
+          [
+            [
+              215.021478,
+              757.016242
+            ],
+            [
+              215.021478,
+              750.366598
+            ],
+            [
+              215.303153,
+              750.366598
+            ],
+            [
+              215.303153,
+              757.016242
+            ]
+          ]
+        ]
+      },
+      {
+        "id": "west-exterior-retaining-317E",
+        "sourceEntities": [
+          "317E",
+          "B5",
+          "B6",
+          "B7"
+        ],
+        "thickness": 0.28826138345342234,
+        "p01EndpointNormalOffsets": {
+          "B5": [
+            0.019052,
+            0.121875
+          ],
+          "B6": [
+            -0.255265,
+            -0.16502
+          ]
+        },
+        "sourceFloor": "n01+p01",
+        "top": -1.65,
+        "bottom": -4.65,
+        "basis": "N01 canonical clear face with measured P01 pair thickness; estimated common retaining crest 0.20m above the higher western exit endpoint; local inter-plan interpretation, not survey",
+        "loops": [
+          [
+            [
+              215.339752,
+              750.652527
+            ],
+            [
+              213.011445,
+              750.95055
+            ],
+            [
+              212.974846,
+              750.664622
+            ],
+            [
+              215.303153,
+              750.366598
+            ]
+          ]
+        ]
+      },
+      {
+        "id": "west-exterior-retaining-317F",
+        "sourceEntities": [
+          "317F",
+          "B3",
+          "B4",
+          "B8"
+        ],
+        "thickness": 0.28826153432142476,
+        "p01EndpointNormalOffsets": {
+          "B3": [
+            0.206048,
+            0.39041
+          ],
+          "B4": [
+            -0.080815,
+            0.103548
+          ]
+        },
+        "sourceFloor": "n01+p01",
+        "top": -1.65,
+        "bottom": -4.65,
+        "basis": "N01 canonical clear face with measured P01 pair thickness; estimated common retaining crest 0.20m above the higher western exit endpoint; local inter-plan interpretation, not survey",
+        "loops": [
+          [
+            [
+              217.109919,
+              748.578459
+            ],
+            [
+              212.918967,
+              749.118626
+            ],
+            [
+              212.882118,
+              748.83273
+            ],
+            [
+              217.07307,
+              748.292562
+            ]
+          ]
+        ]
+      },
+      {
+        "id": "west-exterior-retaining-31DD",
+        "sourceEntities": [
+          "31DD",
+          "1524",
+          "1525"
+        ],
+        "thickness": 0.2798897082527479,
+        "p01EndpointNormalOffsets": {
+          "1524": [
+            -0.062115,
+            0.024003
+          ],
+          "1525": [
+            -0.341782,
+            -0.257806
+          ]
+        },
+        "sourceFloor": "n01+p01",
+        "top": -1.65,
+        "bottom": -4.65,
+        "basis": "N01 canonical clear face with measured P01 pair thickness; estimated common retaining crest 0.20m above the higher western exit endpoint; local inter-plan interpretation, not survey",
+        "loops": [
+          [
+            [
+              228.881836,
+              757.314265
+            ],
+            [
+              240.411609,
+              756.047666
+            ],
+            [
+              240.442173,
+              756.325882
+            ],
+            [
+              228.912399,
+              757.592481
+            ]
+          ]
+        ]
+      },
+      {
+        "id": "west-exterior-retaining-31DE",
+        "sourceEntities": [
+          "31DE",
+          "1526",
+          "1527",
+          "1533",
+          "1534"
+        ],
+        "thickness": 0.29098374986499254,
+        "p01EndpointNormalOffsets": {
+          "1526": [
+            0.265745,
+            0.246296
+          ],
+          "1527": [
+            -0.025975,
+            -0.033095
+          ]
+        },
+        "sourceFloor": "n01+p01",
+        "top": -1.65,
+        "bottom": -4.65,
+        "basis": "N01 canonical clear face with measured P01 pair thickness; estimated common retaining crest 0.20m above the higher western exit endpoint; local inter-plan interpretation, not survey",
+        "loops": [
+          [
+            [
+              240.411609,
+              756.047666
+            ],
+            [
+              240.411609,
+              748.727471
+            ],
+            [
+              240.702593,
+              748.727471
+            ],
+            [
+              240.702593,
+              756.047666
+            ]
+          ]
+        ]
+      },
+      {
+        "id": "west-exterior-retaining-31DF",
+        "sourceEntities": [
+          "31DF",
+          "1528",
+          "1529"
+        ],
+        "thickness": 0.2883803300389315,
+        "p01EndpointNormalOffsets": {
+          "1528": [
+            -0.236835,
+            -0.126791
+          ],
+          "1529": [
+            0.048814,
+            0.161667
+          ]
+        },
+        "sourceFloor": "n01+p01",
+        "top": -1.65,
+        "bottom": -4.65,
+        "basis": "N01 canonical clear face with measured P01 pair thickness; estimated common retaining crest 0.20m above the higher western exit endpoint; local inter-plan interpretation, not survey",
+        "loops": [
+          [
+            [
+              240.411609,
+              748.727471
+            ],
+            [
+              228.881836,
+              748.429447
+            ],
+            [
+              228.889288,
+              748.141163
+            ],
+            [
+              240.419061,
+              748.439187
+            ]
+          ]
+        ]
+      },
+      {
+        "id": "west-exterior-retaining-31E0",
+        "sourceEntities": [
+          "31E0",
+          "1530",
+          "1531"
+        ],
+        "thickness": 0.14688224061878113,
+        "p01EndpointNormalOffsets": {
+          "1530": [
+            0.358911,
+            0.363668
+          ],
+          "1531": [
+            0.212122,
+            0.216786
+          ]
+        },
+        "sourceFloor": "n01+p01",
+        "top": -1.65,
+        "bottom": -4.65,
+        "basis": "N01 canonical clear face with measured P01 pair thickness; estimated common retaining crest 0.20m above the higher western exit endpoint; local inter-plan interpretation, not survey",
+        "loops": [
+          [
+            [
+              231.489539,
+              752.376126
+            ],
+            [
+              228.881836,
+              752.376126
+            ],
+            [
+              228.881836,
+              752.229244
+            ],
+            [
+              231.489539,
+              752.229244
+            ]
+          ]
+        ]
+      },
+      {
+        "id": "west-exterior-retaining-31E1",
+        "sourceEntities": [
+          "31E1",
+          "152E",
+          "152F"
+        ],
+        "thickness": 0.14983701190101292,
+        "p01EndpointNormalOffsets": {
+          "152E": [
+            -0.517377,
+            -0.049561
+          ],
+          "152F": [
+            -0.370242,
+            0.099274
+          ]
+        },
+        "sourceFloor": "n01+p01",
+        "top": -1.65,
+        "bottom": -4.65,
+        "basis": "N01 canonical clear face with measured P01 pair thickness; estimated common retaining crest 0.20m above the higher western exit endpoint; local inter-plan interpretation, not survey",
+        "loops": [
+          [
+            [
+              231.489539,
+              752.229244
+            ],
+            [
+              240.411609,
+              756.047666
+            ],
+            [
+              240.352655,
+              756.185418
+            ],
+            [
+              231.430585,
+              752.366995
+            ]
+          ]
+        ]
+      },
+      {
+        "id": "west-exterior-retaining-31E2",
+        "sourceEntities": [
+          "31E2",
+          "152B",
+          "152C",
+          "152D"
+        ],
+        "thickness": 0.15108898449324049,
+        "p01EndpointNormalOffsets": {
+          "152B": [
+            -0.65126,
+            -0.568615
+          ],
+          "152C": [
+            -0.501945,
+            -0.41918
+          ]
+        },
+        "sourceFloor": "n01+p01",
+        "top": -1.65,
+        "bottom": -4.65,
+        "basis": "N01 canonical clear face with measured P01 pair thickness; estimated common retaining crest 0.20m above the higher western exit endpoint; local inter-plan interpretation, not survey",
+        "loops": [
+          [
+            [
+              237.862582,
+              751.140064
+            ],
+            [
+              240.470285,
+              752.239025
+            ],
+            [
+              240.411609,
+              752.378255
+            ],
+            [
+              237.803906,
+              751.279294
+            ]
+          ]
+        ]
+      }
+    ],
+    "basis": "local N01/P01 interpretation; NE lower retaining outline differs by up to 0.6513m normal to canonical N01 face; residential facade and doors remain unchanged"
+  },
+  "exteriorRoutes": {
+    "routeCount": 6,
+    "anchors": {
+      "westExterior.nw.top": -1.85,
+      "westExterior.ne.top": -2.45,
+      "exterior.mainEast.lower": -2.1,
+      "exterior.n02East.lower": -0.55
+    },
+    "derivedLevels": {
+      "p01-west-exterior-nw:turn": -3.45
+    },
+    "terrainValidationPending": true,
+    "segments": [
+      {
+        "id": "p01-west-exterior-nw-first",
+        "ownerFloor": "p01",
+        "sourceFloor": "n01",
+        "lowerLevelKey": "p01.westWing",
+        "upperLevelKey": "p01-west-exterior-nw:turn",
+        "modeledRiserCount": 6,
+        "sourceEntities": [
+          "3180",
+          "3181",
+          "3182",
+          "3183",
+          "3184",
+          "3185"
+        ],
+        "maxRiserHeight": 0.22,
+        "estimatedRiserHeight": 0.20000000000000004
+      },
+      {
+        "id": "p01-west-exterior-nw-second",
+        "ownerFloor": "p01",
+        "sourceFloor": "n01",
+        "lowerLevelKey": "p01-west-exterior-nw:turn",
+        "upperLevelKey": "westExterior.nw.top",
+        "modeledRiserCount": 8,
+        "sourceEntities": [
+          "3186",
+          "3187",
+          "3188",
+          "3189",
+          "318A",
+          "318B",
+          "318C",
+          "318D"
+        ],
+        "maxRiserHeight": 0.22,
+        "estimatedRiserHeight": 0.2
+      },
+      {
+        "id": "p01-west-exterior-ne-flight",
+        "ownerFloor": "p01",
+        "sourceFloor": "n01",
+        "lowerLevelKey": "p01.westWing",
+        "upperLevelKey": "westExterior.ne.top",
+        "modeledRiserCount": 11,
+        "sourceEntities": [
+          "31E3",
+          "31E4",
+          "31E5",
+          "31E6",
+          "31E7",
+          "31E8",
+          "31E9",
+          "31EA",
+          "31EB",
+          "31EC",
+          "31DE",
+          "31E1",
+          "31E2"
+        ],
+        "maxRiserHeight": 0.22,
+        "estimatedRiserHeight": 0.2
+      },
+      {
+        "id": "exterior-east-shaft-west-flight",
+        "ownerFloor": "n01",
+        "sourceFloor": "p01",
+        "lowerLevelKey": "p01.eastWing",
+        "upperLevelKey": "n01.eastWing",
+        "modeledRiserCount": 14,
+        "sourceEntities": [
+          "2A06",
+          "2A07",
+          "2A08",
+          "2A09",
+          "2A0A",
+          "2A0B",
+          "2A0C",
+          "2A0D",
+          "2A0E",
+          "2A0F",
+          "2A10",
+          "2A11",
+          "2A12",
+          "2A13"
+        ],
+        "maxRiserHeight": 0.22,
+        "estimatedRiserHeight": 0.19285714285714287
+      },
+      {
+        "id": "exterior-east-shaft-east-flight",
+        "ownerFloor": "n01",
+        "sourceFloor": "n01",
+        "lowerLevelKey": "p01.eastWing",
+        "upperLevelKey": "n01.eastWing",
+        "modeledRiserCount": 15,
+        "sourceEntities": [
+          "286D",
+          "286E",
+          "286F",
+          "2870",
+          "2871",
+          "2872",
+          "2873",
+          "2874",
+          "2875",
+          "2876",
+          "2877",
+          "2878",
+          "2879",
+          "287A",
+          "287B"
+        ],
+        "maxRiserHeight": 0.22,
+        "estimatedRiserHeight": 0.18000000000000002
+      },
+      {
+        "id": "exterior-main-east-flight",
+        "ownerFloor": "n01",
+        "sourceFloor": "n01",
+        "lowerLevelKey": "exterior.mainEast.lower",
+        "upperLevelKey": "n01.main",
+        "modeledRiserCount": 13,
+        "sourceEntities": [
+          "2A7A",
+          "2A87",
+          "2A86",
+          "2A85",
+          "2A84",
+          "2A83",
+          "2A82",
+          "2A81",
+          "2A80",
+          "2A7F",
+          "2A7E",
+          "2A7D",
+          "2A7C"
+        ],
+        "maxRiserHeight": 0.22,
+        "estimatedRiserHeight": 0.16153846153846155
+      },
+      {
+        "id": "exterior-n02-east-flight",
+        "ownerFloor": "n02",
+        "sourceFloor": "n02",
+        "lowerLevelKey": "exterior.n02East.lower",
+        "upperLevelKey": "n02.eastWing",
+        "modeledRiserCount": 8,
+        "sourceEntities": [
+          "2900",
+          "28FF",
+          "28FE",
+          "28FD",
+          "28FC",
+          "28FB",
+          "28FA",
+          "28F7"
+        ],
+        "maxRiserHeight": 0.22,
+        "estimatedRiserHeight": 0.2
+      }
+    ]
+  },
+  "generatorSha256": "942b9463f7f1f894a5fc61ba8b3caa91e3a38a7d061501d40ddbd7196f81588a",
+  "recipeSha256": "677b8f7d1cdd361f313e242375624a8dffdd70b9032d1538960afea07bb128b3"
+}

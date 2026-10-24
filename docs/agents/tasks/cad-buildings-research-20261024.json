@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "cad-buildings-research-20261024",
+  "title": "KEY-59: ověřit CAD podklady všech budov a rekonstruovat plán bloku 1",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/cad-buildings-20261024/",
+    "docs/reality-pack/cad-buildings/",
+    "docs/agents/handoffs/cad-buildings-research-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Úplný inventář 100 lokálních DXF pro 16 budov, hashe a provenience; žádné dodané soubory ani jejich kopie do Gitu.",
+    "B1: ověřené jednotky, význam vrstev, podlaží, schodiště, otvory, odlehlé a poškozené entity; rozlišit plán a odhady.",
+    "Porovnat ruční rekonstrukci, slepý import a kalibrovanou rekonstrukci se společnými daty renderu a kolizí.",
+    "Předat konkrétní integrační smlouvu a návazný rozsah první budovy; nepovažovat průzkum za hotové modely."
+  ],
+  "verification": [
+    "Čtecí analýza DXF s ezdxf a nezávislé ověření měřítka grafickou stupnicí.",
+    "Lokální 2D náhledy vrstev a půdorysů; nelze vydávat za Blender nebo GPU důkaz.",
+    "Kontrola Git diffu a absence .dxf/.dwg a dodaných textových souborů."
+  ],
+  "notes": [
+    "Zadání uživatele z 24.10.2026, potvrzené exteriéry i průchozí interiéry. Sekvenčně dokončit jednu budovu před další; začít B1.",
+    "Zdroj: C:/Users/rezac/Downloads/strahov autocad/strahov autocad; číst lokálně, nepřepisovat.",
+    "Linear https://linear.app/gigeconomy/issue/KEY-59. Vlastník chatu 01a16b37-1237-7583-af49-52c29a82272d.",
+    "Samostatná worktree cad-building-models z main c713c2ae. Cizí hlavní WIP nepřebírat.",
+    "Blender, build, GPU ani BMAD renderer tento výzkumný task nespouští; jejich zdroje vyžadují navazující rezervaci."
+  ]
+}
