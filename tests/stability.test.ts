@@ -7,6 +7,7 @@ import {
   CHARACTER_RADIUS,
 } from "../shared/simulation";
 import { groundHeight, groundNormal, TERRAIN } from "../shared/terrain";
+import { cadB6EntranceHeight } from "../shared/cad-buildings";
 import { updateRainSegments } from "../client/weather-particles";
 await initPhysics();
 const idle = { x: 0, z: 0, yaw: 0, jump: false, seq: 0 };
@@ -18,8 +19,9 @@ function expectedContact(x: number, z: number) {
   const radius = CHARACTER_RADIUS,
     n = groundNormal(x, z);
   let y = -Infinity;
-  for (let ix = -21; ix <= 21; ix++)
-    for (let iz = -21; iz <= 21; iz++) {
+  const samples = Math.ceil(radius / .02);
+  for (let ix = -samples; ix <= samples; ix++)
+    for (let iz = -samples; iz <= samples; iz++) {
       const dx = ix * 0.02,
         dz = iz * 0.02,
         r2 = dx * dx + dz * dz;
@@ -68,13 +70,17 @@ test("resting walkable DEM contact stays within three millimetres at former trou
     [36.01, -130],
     [32.01, -116],
     [16.01, -100],
-    [-7.05, -80],
+    // -7.05,-80 is now a native CAD stair/riser, not outdoor DEM. Keep this
+    // approach-area probe on actual DEM just outside the native entry bounds;
+    // cad-building-world.test.ts covers the current native stairs separately.
+    [-8.5, -80],
     [36, 20],
   ]) {
     assert.ok(
       groundNormal(x, z).y > 0.9,
       "rest fixtures must be walkable ground, not a steep sliding embankment",
     );
+    assert.equal(cadB6EntranceHeight(x, z), undefined, "DEM fixture must not be a native stair surface");
     place({ x, y: groundHeight(x, z) + 1, z });
     for (let i = 0; i < 60; i++) {
       a.step(idle);

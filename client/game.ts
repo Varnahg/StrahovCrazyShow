@@ -69,6 +69,8 @@ import { SurfacePack } from "./surface-pack";
 import { B6_LAYOUT } from "../shared/b6-interior";
 import { groundHeight, PARKING_SLOTS } from "../shared/terrain";
 import type { B6RealityController } from "./b6-reality";
+import type { CadBuildingsController } from "./cad-buildings";
+import { CAD_BUILDINGS, hasCadBuilding, cadLevelHeight } from "../shared/cad-buildings";
 import { applyArtLighting } from "./art-lighting";
 import { VehicleLighting } from "./vehicle-lighting";
 import { PlayerFlashlight } from "./flashlight";
@@ -118,6 +120,7 @@ import {
   PLACES,
   SPAWN,
   CAR_SPAWN,
+  B6_ENTRY,
   HUNT_POINTS,
   zoneAt,
 } from "../shared/world";
@@ -258,6 +261,7 @@ export type Benchmark = {
     campusExterior: unknown;
     outdoorArtifacts: unknown;
     b6: unknown;
+    cadBuildings: unknown;
     parkedCars: number;
   };
   modelReview: ReturnType<typeof captureModelReview>;
@@ -313,6 +317,7 @@ export class Game {
   cinematic?: CinematicAtmosphere;
   surfacePack?: SurfacePack;
   b6Reality?: B6RealityController;
+  cadBuildings?: CadBuildingsController;
   cameraArm = 8;
   private readonly localAvatarPresentation = new LocalAvatarPresentation();
   sim!: Simulation;
@@ -827,6 +832,16 @@ export class Game {
       return asset;
     });
   }
+  private async loadCadBuildingsForStartup(load: typeof import("./cad-buildings").loadCadBuildings) {
+    this.assertStartupActive();
+    const controller = await this.renderHealth.guard(this.trackStartupAsset(
+      load(this.scene, CAD_BUILDINGS, { signal: this.startupAbort.signal }),
+    ));
+    this.assertStartupActive();
+    this.cadBuildings = controller;
+    this.startupAssets.delete(controller);
+    this.canvas.dataset.cadStage = "ready";
+  }
   private isMeshReadyForCamera(mesh: { isReady(check: boolean): boolean }) {
     const previousPass = this.engine.currentRenderPassId;
     this.engine.currentRenderPassId = this.camera.renderPassId;
@@ -894,7 +909,7 @@ export class Game {
         this.sim.surfaceHeight(x, z),
       );
       const [interior, vegetation, car] = await this.renderHealth.guard(Promise.allSettled([
-        this.trackStartupAsset(loadB6Reality(this.scene, {
+        hasCadBuilding("53929071") ? Promise.resolve(undefined) : this.trackStartupAsset(loadB6Reality(this.scene, {
           foundationY: B6_LAYOUT.foundationOffset,
         }).then(
           (value) => {
@@ -920,11 +935,13 @@ export class Game {
       ]));
       this.assertStartupActive();
       if (interior.status === "fulfilled") {
-        this.b6Reality = interior.value;
-        this.startupAssets.delete(interior.value);
-        if (this.worldControllers)
-          this.b6Reality.attachToBuilding(this.worldControllers.b6Root);
-        this.worldControllers?.b6Fallback.dispose();
+        if (interior.value) {
+          this.b6Reality = interior.value;
+          this.startupAssets.delete(interior.value);
+          if (this.worldControllers)
+            this.b6Reality.attachToBuilding(this.worldControllers.b6Root);
+          this.worldControllers?.b6Fallback.dispose();
+        }
       } else {
         this.startupAssetErrors++;
         console.error("B6 interior models", interior.reason);
@@ -961,6 +978,11 @@ export class Game {
       console.warn("Používám geometrickou zálohu auta.", error);
     }
     this.assertStartupActive();
+    // This model has structural colliders and no legacy facade fallback.
+    // Its failure must escape the optional car/vegetation fallback above.
+    this.canvas.dataset.bootStage = "cad-buildings";
+    const { loadCadBuildings } = await this.renderHealth.guard(import("./cad-buildings"));
+    await this.loadCadBuildingsForStartup(loadCadBuildings);
     this.surfacePack = new SurfacePack(this.scene);
     this.surfacePack.update(1, this.quality, this.weather?.rain ?? 0);
     this.cinematic = new CinematicAtmosphere(this.scene, this.camera, this.sun);
@@ -1618,7 +1640,7 @@ export class Game {
       );
     } else if (
       this.soloDelivery === 1 &&
-      Math.hypot(p.x - B6_LAYOUT.entry.x, p.z - B6_LAYOUT.entry.z) < 5
+      Math.hypot(p.x - B6_ENTRY.x, p.z - B6_ENTRY.z) < 5
     ) {
       this.soloDelivery = 2;
       this.notice("Doručeno! Odemčená kosmetická odměna.");
@@ -1838,10 +1860,11 @@ export class Game {
         feet: {
           x: place.x,
           y:
-            place.floor == null
+            (place.id === "b6" ? cadLevelHeight("b06", "n01", "mezzanine")
+              : place.id === "club6" ? cadLevelHeight("b06", "n05", "mezzanine") : undefined) ?? (place.floor == null
               ? groundHeight(place.x, place.z)
               : B6_LAYOUT.foundationOffset +
-                place.floor * B6_LAYOUT.floorHeight,
+                place.floor * B6_LAYOUT.floorHeight),
           z: place.z,
         },
         height: 2.2,
@@ -2960,6 +2983,7 @@ export class Game {
               this.worldControllers?.outdoorArtifacts?.stats ?? null,
             landmarks: this.worldControllers?.landmarks?.metrics ?? null,
             b6: this.b6Reality?.stats ?? null,
+            cadBuildings: this.cadBuildings?.stats ?? null,
             parkedCars: PARKING_SLOTS.length,
           },
           renderCost: {
@@ -3145,6 +3169,7 @@ export class Game {
     this.cinematic?.dispose();
     this.surfacePack?.dispose();
     this.b6Reality?.dispose();
+    this.cadBuildings?.dispose();
     this.worldControllers?.architecture?.dispose();
     this.worldControllers?.landmarks?.dispose();
     this.worldControllers?.campusExterior?.dispose();

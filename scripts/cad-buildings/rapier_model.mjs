@@ -20,7 +20,7 @@ export function required(args,key) {
   return value;
 }
 export function profileSettings(profile,speed=4.6) {
-  const bodies={current:[0.42,0.38,0.20],'cad-candidate':[0.28,0.52,0.10],'cad-compact':[0.25,0.55,0.10],'cad-plan':[0.25,0.55,0.10]};
+  const bodies={current:[0.25,0.55,0.10],'cad-candidate':[0.28,0.52,0.10],'cad-compact':[0.25,0.55,0.10],'cad-plan':[0.25,0.55,0.10]};
   if (!bodies[profile] || !Number.isFinite(speed) || speed<=0 || speed>10) throw new Error('Neplatný profil/rychlost');
   const [radius,halfHeight,autostepWidth]=bodies[profile];
   return {radius,halfHeight,autostepWidth,offset:0.02,autostepHeight:profile==='cad-plan'?0.24:0.22,snap:0.25,gravity:18,dt:1/60,speed};
@@ -82,7 +82,7 @@ export function makeScene(R,model,settings) {
     world.step();
   } catch(error) { world.free();throw error; }
   const local=([x,y])=>({x:-(y-model.cadOrigin[1]),z:-(x-model.cadOrigin[0])});
-  const supports=c=>['slab','stair','stair-landing'].includes(parts.get(c.handle)?.role);
+  const supports=c=>['slab','stair','stair-landing','canopy'].includes(parts.get(c.handle)?.role);
   const footOffset=settings.radius+settings.halfHeight+settings.offset;
   const capsule=new R.Capsule(settings.halfHeight,settings.radius);
   const expectedFloor=point=>point.support?.capsuleFootHeight??point.floor;
@@ -170,7 +170,7 @@ export function makeScene(R,model,settings) {
 export async function openModel(args) {
   const bytes=readFileSync(resolve(required(args,'--model'))),model=JSON.parse(bytes);
   const actor=readFileSync(resolve(args.get('--actor-source')??'shared/simulation.ts'),'utf8');
-  if(!actor.includes('CHARACTER_RADIUS = 0.42')||!actor.includes('CHARACTER_HALF_HEIGHT = 0.38')||!actor.includes('enableAutostep(0.22, 0.2, false)')) {
+  if(!actor.includes('CHARACTER_RADIUS = 0.25')||!actor.includes('CHARACTER_HALF_HEIGHT = 0.55')||!actor.includes('enableAutostep(0.22, 0.1, false)')) {
     throw new Error('Actor kontrakt se změnil; přejímku je nutné znovu odvodit');
   }
   const profile=required(args,'--profile'),settings=profileSettings(profile,Number(args.get('--speed')??4.6));

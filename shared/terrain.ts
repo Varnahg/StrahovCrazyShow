@@ -1,4 +1,6 @@
 import raw from "./data/terrain-grid.json";
+import { CAD_TERRAIN_CUTOUTS, hasCadBuilding } from "./cad-buildings";
+import { compileTerrainCutouts, subtractTerrainTriangle, type TerrainCutoutVertex } from "./terrain-cutouts";
 import realityRaw from "./data/reality-ground.json";
 import {terrainPatchCellTriangles,terrainPatchHeight,terrainPatchIntersects} from "./terrain-patches";
 
@@ -36,6 +38,9 @@ function sourceVertex(column: number, row: number) {
   return TERRAIN.heights[row * grid.columns + column] - TERRAIN_REFERENCE_BPV;
 }
 function adaptedVertex(column: number, row: number) {
+  // The schematic B6 needed a flat artificial foundation. Native CAD uses
+  // its georeferenced storeys and exact footprint; retain measured DMR here.
+  if (hasCadBuilding("53929071")) return sourceVertex(column, row);
   const x = grid.minX + column * grid.step,
     z = grid.minZ + row * grid.step;
   const distance = Math.max(
@@ -175,7 +180,7 @@ export function createTerrainTiles(
           aligned(zs.min, grid.minZ) &&
           aligned(zs.max, grid.minZ)
             && !terrainPatchIntersects(xs.min,xs.max,zs.min,zs.max) ? undefined
-            : drapeTriangles(
+            : drapeBaseTriangles(
                 [
                   [xs.min, zs.min],
                   [xs.max, zs.min],
@@ -240,7 +245,52 @@ export function terrainMeshData(tiles: TerrainTile[]): TerrainMeshData {
         indices.push(nw, ne, sw, sw, ne, se);
       }
   }
-  return { positions, normals, indices, uvs };
+  return cutCadBuildingFootprints({ positions, normals, indices, uvs });
+}
+
+const cadGroundCutouts = compileTerrainCutouts(CAD_TERRAIN_CUTOUTS);
+
+/** Keep the original terrain planes and UVs. Only intersecting triangles are
+ * split; unchanged vertices remain shared. Both Rapier and Babylon use this
+ * result, including pavement overlays that could otherwise reseal a cellar. */
+function cutCadBuildingFootprints(data: TerrainMeshData): TerrainMeshData {
+  const bounds = cadGroundCutouts.bounds;
+  if (!bounds || !data.indices.length) return data;
+  let positions: number[] | undefined, normals: number[] | undefined, uvs: number[] | undefined;
+  const indices: number[] = [];
+  for (let i = 0; i < data.indices.length; i += 3) {
+    const a = data.indices[i], b = data.indices[i + 1], c = data.indices[i + 2];
+    const ax = data.positions[a * 3], az = data.positions[a * 3 + 2];
+    const bx = data.positions[b * 3], bz = data.positions[b * 3 + 2];
+    const cx = data.positions[c * 3], cz = data.positions[c * 3 + 2];
+    if (Math.max(ax, bx, cx) <= bounds.minX || Math.min(ax, bx, cx) >= bounds.maxX ||
+        Math.max(az, bz, cz) <= bounds.minZ || Math.min(az, bz, cz) >= bounds.maxZ) {
+      indices.push(a, b, c); continue;
+    }
+    const triangle: TerrainCutoutVertex[] = [a, b, c].map((index) => [
+      data.positions[index * 3], data.positions[index * 3 + 1], data.positions[index * 3 + 2],
+    ]);
+    const pieces = subtractTerrainTriangle(triangle, cadGroundCutouts);
+    if (pieces.length === 1 && pieces[0] === triangle) {
+      indices.push(a, b, c); continue;
+    }
+    positions ??= data.positions.slice(); normals ??= data.normals.slice(); uvs ??= data.uvs.slice();
+    for (const piece of pieces) {
+      const [p, q, r] = piece;
+      // TIN breaklines meeting a rotated CAD edge can leave sub-micrometre
+      // slivers that collapse in the shared Float32 renderer/physics buffers.
+      if (Math.abs((q[0] - p[0]) * (r[2] - p[2]) - (q[2] - p[2]) * (r[0] - p[0])) < 1e-10) continue;
+      for (const [x, y, z] of piece) {
+        indices.push(positions.length / 3);
+        positions.push(x, y, z);
+        const normal = groundNormal(x, z);
+        normals.push(normal.x, normal.y, normal.z); uvs.push(x / 4, z / 4);
+      }
+    }
+  }
+  if (!positions) return data;
+  if (!indices.length) return { positions: [], normals: [], indices: [], uvs: [] };
+  return { positions, normals: normals!, indices, uvs: uvs! };
 }
 
 /** One exact shared collision mesh is a simpler integration alternative to
@@ -296,6 +346,14 @@ function clipConvex(subject: GroundPoint[], clip: GroundPoint[]) {
  * the caller's job (e.g. earcut); existing street polygons retain their holes.
  */
 export function drapeTriangles(
+  points: GroundPoint[],
+  triangles: ArrayLike<number>,
+  offset = 0,
+): TerrainMeshData {
+  return cutCadBuildingFootprints(drapeBaseTriangles(points, triangles, offset));
+}
+
+function drapeBaseTriangles(
   points: GroundPoint[],
   triangles: ArrayLike<number>,
   offset = 0,

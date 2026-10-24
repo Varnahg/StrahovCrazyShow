@@ -22,6 +22,7 @@ import { b6EntranceHeight } from "../shared/b6-interior";
 import { commonEntranceHeight } from "../shared/landmark-reality";
 import {
   transitStatus,
+  passengerSupportHeight,
   type TransitFrame,
   type TransitPassenger,
 } from "../shared/transit";
@@ -66,7 +67,7 @@ const compiled = ts.transpileModule(rendererClass.getText(source), {
 const makeRenderer = new Script(`(function(env) {
   const { TransformNode, Mesh, MeshBuilder, LoadAssetContainerAsync,
     StandardMaterial, DynamicTexture, Texture, Color3, Quaternion,
-    groundRotation, groundHeight, b6EntranceHeight, commonEntranceHeight,
+    groundRotation, groundHeight, b6EntranceHeight, commonEntranceHeight, passengerSupportHeight,
     sampleTransit, AvatarPrimitivePool, createAvatarRig, AvatarAnimator,
     AvatarLodController, acquireCarPack, CAR_PACK_MANIFEST, busManifest } = env;
   const exports = {};
@@ -152,6 +153,7 @@ function fixture(t: TestContext, holdAssets = false) {
     groundHeight,
     b6EntranceHeight,
     commonEntranceHeight,
+    passengerSupportHeight,
     AvatarPrimitivePool,
     createAvatarRig,
     AvatarAnimator,
@@ -548,4 +550,13 @@ test("loaders completed after dispose release their containers and handle withou
   assert.equal(f.samples, 0);
   assert.equal(f.sweeps.mock.callCount(), 0);
   assert.equal(f.renderer.counts.passengers, 0);
+});
+
+test("actual NPC renderer stands on native B6 landing instead of legacy entrance height", async (t) => {
+  const f = fixture(t), p = passenger("native-b6");
+  await f.renderer.ready;
+  p.position = {x: -4.91535, y: 0, z: -77.63486};
+  f.frame.passengers = [p];
+  f.update({player: p.position});
+  assert.ok(Math.abs(f.npc(p.id).rig.root.position.y - 2.1962777093118495) < 1e-5);
 });

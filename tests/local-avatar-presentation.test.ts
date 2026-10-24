@@ -163,8 +163,12 @@ test("real KCC parked-car obstruction preserves the collision-safe camera and re
     if (state.visible !== wasVisible) transitions++;
     wasVisible = state.visible;
     if (tick === 314) {
-      assert.ok(Math.abs(actor.position.x - 110.071907) < 0.01);
-      assert.ok(Math.abs(actor.position.z - 13.786036) < 0.01);
+      // A narrower capsule stops closer to the chassis. Prove contact with
+      // the actual parked car instead of a coordinate frozen for radius .42.
+      const contact = actor.collider.contactCollider(sim.car.collider, .03);
+      assert.ok(contact, "the walking capsule must actually reach the parked car");
+      assert.ok(contact.distance >= -.003 && contact.distance <= .03,
+        `parked-car penetration/hover: ${contact.distance}`);
       assert.ok(Vector3.Distance(camera.position, target) < 0.22);
       assert.equal(
         state.visible,

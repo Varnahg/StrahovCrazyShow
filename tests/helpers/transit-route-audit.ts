@@ -4,6 +4,7 @@ import { MAP, TREES, CAR_SPAWN } from "../../shared/world";
 import { PARKING_SLOTS, groundHeight } from "../../shared/terrain";
 import { STREET_COLLISIONS } from "../../shared/streets";
 import { B6_LAYOUT, b6EntranceHeight } from "../../shared/b6-interior";
+import { CAD_B6_ENTRY, cadB6EntranceHeight, hasCadBuilding } from "../../shared/cad-buildings";
 import { B6_PROP_COLLISIONS } from "../../shared/b6-props";
 import {
   COMMON_DORM_ENTRANCES,
@@ -92,7 +93,7 @@ export async function createFixedCampusPropProbe() {
     });
   }
   for (const p of STREET_COLLISIONS) box(p.id, p);
-  for (const [i, p] of B6_PROP_COLLISIONS.entries())
+  for (const [i, p] of (hasCadBuilding("53929071") ? [] : B6_PROP_COLLISIONS).entries())
     box(`b6-prop:${i}`, { ...p, y: p.y + B6_LAYOUT.foundationOffset });
   for (const slot of [
     ...PARKING_SLOTS,
@@ -134,13 +135,13 @@ export function northEntries() {
     {
       block: 6,
       buildingId: "53929071",
-      x: B6_LAYOUT.entry.x,
-      z: B6_LAYOUT.entry.z,
-      nx: B6_LAYOUT.entry.outward.x,
-      nz: B6_LAYOUT.entry.outward.z,
-      baseY: 0,
-      rise: B6_LAYOUT.entranceRise,
-      steps: B6_LAYOUT.entry.stepCount,
+      x: CAD_B6_ENTRY.x,
+      z: CAD_B6_ENTRY.z,
+      nx: CAD_B6_ENTRY.nx,
+      nz: CAD_B6_ENTRY.nz,
+      baseY: CAD_B6_ENTRY.baseY,
+      rise: CAD_B6_ENTRY.rise,
+      steps: CAD_B6_ENTRY.steps,
     },
   ];
 }
@@ -244,7 +245,7 @@ export async function walkNorthEntranceApproaches(nav: NavigationAuditInput) {
         (j) => j.buildingId === entry.buildingId,
       )!;
       assert(journey, `Missing route to B${entry.block}`);
-      const points = journey.points.slice(-3) as [number, number][],
+      const points = journey.points.slice(entry.block === 6 ? -7 : -3) as [number, number][],
         start = points[0],
         actor = sim.add(`entrance-${entry.block}`, {
           x: start[0],
@@ -320,23 +321,20 @@ export async function walkNorthEntranceApproaches(nav: NavigationAuditInput) {
         // Each centre of an actual tread must agree with the NPC analytic
         // height and the shared production collider, independent of path pose.
         let maxTreadError = 0;
-        for (let i = 0; i < entry.steps; i++) {
+        for (let i = 0; i < (entry.block === 6 ? CAD_B6_ENTRY.treads.length : entry.steps); i++) {
           const out =
             entry.block === 6
               ? undefined
               : 0.48 + (entry.steps - i - 0.5) * 0.29;
-          const x = entry.block === 6 ? entry.x : entry.x + entry.nx * out!,
+          const x = entry.block === 6 ? CAD_B6_ENTRY.treads[i].x : entry.x + entry.nx * out!,
             z =
               entry.block === 6
-                ? B6_LAYOUT.entry.stepsFromZ +
-                  ((i + 0.5) *
-                    (B6_LAYOUT.entry.stepsToZ - B6_LAYOUT.entry.stepsFromZ)) /
-                    entry.steps
+                ? CAD_B6_ENTRY.treads[i].z
                 : entry.z + entry.nz * out!;
-          const expected = entry.baseY + ((i + 1) * entry.rise) / entry.steps,
+          const expected = entry.block === 6 ? CAD_B6_ENTRY.treads[i].y : entry.baseY + ((i + 1) * entry.rise) / entry.steps,
             analytic =
               entry.block === 6
-                ? b6EntranceHeight(x, z)
+                ? cadB6EntranceHeight(x, z)
                 : commonEntranceHeight(x, z);
           assert(analytic !== undefined);
           assert(

@@ -192,6 +192,8 @@ export const messages = {
   "Ukázkové akce jsou fiktivní. Přítomnost ve hře neznamená skutečnou návštěvu místa.":
     "Demo events are fictional. Presence in the game does not mean a real visit to a place.",
   "Blok 6 · {level}. úroveň": "Block 6 · level {level}",
+  "Blok {block} · {level}. podzemní podlaží": "Block {block} · basement level {level}",
+  "Blok {block} · {level}. nadzemní podlaží": "Block {block} · above-ground level {level}",
   "Mezi bloky": "Between the halls",
   "Zpátečka · ": "Reversing · ",
   "Za volantem · ": "Driving · ",

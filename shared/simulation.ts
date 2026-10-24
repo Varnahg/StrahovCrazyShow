@@ -39,8 +39,9 @@ import type { PhotogrammetryCollision } from "./photogrammetry-gameplay";
 import { photogrammetryEntranceRepair } from "./photogrammetry-repairs";
 import { getPhotogrammetryGroundPatchGeometry } from "./photogrammetry-ground";
 import { buildingRoofGeometry } from "./building-roofs";
-export const CHARACTER_RADIUS = 0.42,
-  CHARACTER_HALF_HEIGHT = 0.38;
+import { cadCollisionParts, hasCadBuilding } from "./cad-buildings";
+export const CHARACTER_RADIUS = 0.25,
+  CHARACTER_HALF_HEIGHT = 0.55;
 let initialized: Promise<void> | undefined;
 export const initPhysics = () => (initialized ??= RAPIER.init());
 export class Simulation {
@@ -103,7 +104,7 @@ export class Simulation {
       this.groundColliders.add(ground.handle);
       for (const plan of [
         buildLandmarkPlan({
-          buildings: BUILDINGS,
+          buildings: BUILDINGS.filter((building) => !hasCadBuilding(building.id)),
           baseElevation: (b) => buildingBaseHeight(b.points),
         }),
         buildCampusExteriorPlan(),
@@ -126,7 +127,7 @@ export class Simulation {
           this.createTwoSidedSurfaceCollider(plan.twoSidedExteriorCollision);
       }
       for (const b of BUILDINGS) {
-        if (b.name.endsWith("blok 6")) continue;
+        if (b.name.endsWith("blok 6") || hasCadBuilding(b.id)) continue;
         const baseY = buildingBaseHeight(b.points);
         for (let i = 1; i < b.points.length; i++) {
           const [x, z] = b.points[i - 1],
@@ -153,8 +154,16 @@ export class Simulation {
             this.createTwoSidedSurfaceCollider(roof),
           );
       }
+      for (const part of cadCollisionParts())
+        this.world.createCollider(
+          RAPIER.ColliderDesc.trimesh(
+            part.positions,
+            part.indices,
+            RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES,
+          ),
+        );
     }
-    for (const b of B6_BOXES)
+    for (const b of !photogrammetry && hasCadBuilding("53929071") ? [] : B6_BOXES)
       this.solid(
         b.x,
         b.y + B6_LAYOUT.foundationOffset,
@@ -164,7 +173,7 @@ export class Simulation {
         b.d,
         b.yaw,
       );
-    for (const stair of B6_STAIR_MESHES)
+    for (const stair of !photogrammetry && hasCadBuilding("53929071") ? [] : B6_STAIR_MESHES)
       if (stair.collides && stair.indices.length)
         this.world.createCollider(
           RAPIER.ColliderDesc.trimesh(
@@ -192,7 +201,7 @@ export class Simulation {
       for (const b of buildOutdoorWorldPlan().colliders)
         this.solid(b.x, b.y, b.z, b.w, b.h, b.d, b.yaw);
     }
-    for (const b of B6_PROP_COLLISIONS)
+    for (const b of !photogrammetry && hasCadBuilding("53929071") ? [] : B6_PROP_COLLISIONS)
       this.solid(
         b.x,
         b.y + B6_LAYOUT.foundationOffset,
@@ -597,7 +606,7 @@ export class Actor {
     );
     sim.walkingColliders.add(this.collider.handle);
     this.controller = sim.world.createCharacterController(0.02);
-    this.controller.enableAutostep(0.22, 0.2, false);
+    this.controller.enableAutostep(0.22, 0.1, false);
     this.controller.enableSnapToGround(0.25);
     this.controller.setSlideEnabled(true);
   }
@@ -758,7 +767,9 @@ export class Actor {
           CHARACTER_HALF_HEIGHT +
           CHARACTER_RADIUS +
           0.0201;
-        if (Math.abs(p.y + delta.y - expected) < 0.015) {
+        // Stay within one 20mm skin plus the 5mm grounded downward step.
+        // The nearest support must still be actual near-flat terrain.
+        if (Math.abs(p.y + delta.y - expected) < 0.025) {
           delta.y = expected - p.y;
           this.grounded = true;
         }

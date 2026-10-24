@@ -1,7 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import RAPIER from "@dimforge/rapier3d-compat";
-import { Actor, Simulation, initPhysics } from "../shared/simulation";
+import {
+  Actor,
+  Simulation,
+  initPhysics,
+  CHARACTER_RADIUS,
+  CHARACTER_HALF_HEIGHT,
+} from "../shared/simulation";
 import { stepRigidWorld } from "../shared/physics-step";
 import { FIXED_DT } from "../shared/netcode";
 import { BUILDINGS, PLACES, SPAWN, BOUNDS } from "../shared/world";
@@ -9,14 +15,17 @@ import {
   STADIUM_PLAN,
   isClosedStadiumInterior,
 } from "../shared/landmark-reality";
-import { B6_LAYOUT } from "../shared/b6-interior";
+import { CAD_B6_ENTRY } from "../shared/cad-buildings";
 import {
   MapNavigator,
   insideMapPolygon,
   resolveNavigationTarget,
   type NavigationScheduling,
 } from "../client/map-navigation";
-import { createNavigationClearance } from "../client/navigation-physics";
+import {
+  createNavigationClearance,
+  NAVIGATION_CLEARANCE,
+} from "../client/navigation-physics";
 import {
   mapToScreen,
   screenToMap,
@@ -40,11 +49,20 @@ test("navigation target policy refuses closed stadium/unknown interiors and send
   for (const id of ["b6", "club6"]) {
     const p = PLACES.find((p) => p.id === id)!;
     const resolved = resolveNavigationTarget(p)!;
-    assert.deepEqual(resolved.point, {
-      x: B6_LAYOUT.approachRoute[0][0],
-      z: B6_LAYOUT.approachRoute[0][1],
-    });
+    const { start, end } = CAD_B6_ENTRY;
+    const dx = resolved.point.x - start.x,
+      dz = resolved.point.z - start.z;
+    assert.ok(Math.abs(Math.hypot(dx, dz) - 0.6) < 1e-10);
+    assert.ok(
+      Math.abs(dx * (end.z - start.z) - dz * (end.x - start.x)) < 1e-10,
+    );
+    assert.ok(dx * (end.x - start.x) + dz * (end.z - start.z) < 0);
     assert.equal(resolved.toEntrance, true);
+    resolved.point.x += 100;
+    assert.ok(
+      d(resolveNavigationTarget(p)!.point, start) < 0.61,
+      "callers cannot mutate the cached source approach",
+    );
   }
   const unknown = BUILDINGS.find(
     (b) => b.name && !b.name.includes("blok") && b.points.length >= 4,
@@ -554,11 +572,43 @@ async function synthetic(
   return { clear, walked };
 }
 
+test("clearance envelope follows the actual character width, height and stair allowance", () => {
+  const nav = NAVIGATION_CLEARANCE;
+  assert.ok(
+    Math.abs(nav.radius + nav.contactMargin - CHARACTER_RADIUS - 0.02) < 1e-10,
+  );
+  assert.ok(
+    Math.abs(
+      nav.centreHeight +
+        nav.halfHeight +
+        nav.radius +
+        nav.contactMargin -
+        (2 * (CHARACTER_HALF_HEIGHT + CHARACTER_RADIUS) + 0.02),
+    ) < 1e-10,
+  );
+  assert.ok(
+    Math.abs(
+      nav.centreHeight -
+        nav.halfHeight -
+        nav.radius -
+        nav.contactMargin -
+        nav.maximumStepUp,
+    ) < 1e-10,
+  );
+});
+
 test("clearance agrees with actual KCC on representative headroom, capsule margin, ledges and slopes", async () => {
+  const width = 2 * (CHARACTER_RADIUS + 0.02);
+  const height = 2 * (CHARACTER_HALF_HEIGHT + CHARACTER_RADIUS) + 0.02;
   for (const [kind, value, expected] of [
     ["headroom", 1.55, false],
+    ["headroom", height - 0.02, false],
+    ["headroom", height + 0.02, true],
     ["headroom", 1.9, true],
-    ["corridor", 0.87, false],
+    ["corridor", width - 0.02, false],
+    ["corridor", width + 0.02, true],
+    ["corridor", 0.7, true],
+    ["corridor", 0.87, true],
     ["corridor", 0.94, true],
     ["step", 0.35, false],
     ["step", 0.15, true],

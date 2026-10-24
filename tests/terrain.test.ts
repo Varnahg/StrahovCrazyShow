@@ -4,6 +4,8 @@ import RAPIER from "@dimforge/rapier3d-compat";
 import earcut from "earcut";
 import { GROUND_RECTS } from "../shared/world";
 import { B6_LAYOUT } from "../shared/b6-interior";
+import { CAD_BUILDINGS, hasCadBuilding } from "../shared/cad-buildings";
+import { cadWorldToLocal, cadPolygonContainsXZ } from "../shared/cad-building-geometry";
 import { STREET_SURFACES, streetSurfaceAt } from "../shared/streets";
 import {
   TERRAIN,
@@ -43,8 +45,8 @@ test("terrain contains georeferenced public F32 DMR5G samples and explicit B6 ad
         TERRAIN.reference.absoluteHeight,
     ) < 0.12,
   );
-  assert.equal(groundHeight(-7, -73), 0);
-  assert.equal(groundHeight(8, -55), 0);
+  for (const [x, z] of [[-7, -73], [8, -55]])
+    assert.ok(Math.abs(groundHeight(x, z) - (hasCadBuilding("53929071") ? sourceGroundHeight(x, z) : 0)) < 1e-6);
   assert.notEqual(groundHeight(320, 80), 0);
   for (const [x, z] of [
     [22, -14],
@@ -85,7 +87,11 @@ test("real Rapier collision mesh agrees with rendering and interpolation without
       const insideWest = inBounds(B6_LAYOUT.lobby);
       const ray = new RAPIER.Ray({ x, y: 80, z }, { x: 0, y: -1, z: 0 });
       const hit = world.castRay(ray, 160, true);
-      if (insideMain || insideWest) {
+      const insideCad = CAD_BUILDINGS.some(building => {
+        const local = cadWorldToLocal({ x, y: 0, z }, building.placement);
+        return building.site.terrainCutouts.some(polygon => cadPolygonContainsXZ(polygon, local.x, local.z));
+      });
+      if (insideCad || (!hasCadBuilding("53929071") && (insideMain || insideWest))) {
         assert.equal(hit, null, `basement incorrectly closed at ${x},${z}`);
         continue;
       }

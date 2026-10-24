@@ -144,9 +144,10 @@ test("actual grounded starts and 90/180 degree KCC turns land where the visible 
                 ),
               );
               if (wasPlanted[side]) {
-                // Active stance is exactly anchored. After input stops the
-                // final idle settle follows micrometre KCC/root quantization.
-                const tolerance = time <= 3.5 ? 1e-9 : 2e-5;
+                // Active stance is exactly anchored. Both INITIAL idle and
+                // final idle follow micrometre Float32 KCC/root quantization;
+                // the fixture starts moving only after tick 50 (0.833 s).
+                const tolerance = animator.gait === "idle" ? 2e-5 : 1e-9;
                 assert.ok(
                   Math.hypot(
                     contact.support.x - previousSupport[side].x,

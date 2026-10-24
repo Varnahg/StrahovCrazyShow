@@ -2,7 +2,7 @@
  * the same north-facing entrances used by rendering and physics. */
 import { readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { B6_LAYOUT } from "../shared/b6-interior";
+import { CAD_B6_ENTRY } from "../shared/cad-buildings";
 import { COMMON_DORM_ENTRANCES } from "../shared/landmark-reality";
 import { findCampusWalkRoute } from "../shared/campus-routes";
 import { TRANSIT_FEED } from "../shared/transit";
@@ -26,6 +26,16 @@ const files = [
   "shared/data/terrain-grid.json",
   "shared/data/reality-ground.json",
   "shared/terrain.ts",
+  "shared/cad-buildings.ts",
+  "shared/cad-building-geometry.ts",
+  "shared/terrain-cutouts.ts",
+  "shared/data/cad-buildings/b01.json",
+  "shared/data/cad-buildings/b01-site.json",
+  "shared/data/cad-buildings/b06.json",
+  "shared/data/cad-buildings/b06-site.json",
+  "shared/data/cad-buildings/b01-entry-grade.json",
+  "shared/data/cad-buildings/b06-entry-grade.json",
+  "shared/data/cad-buildings/photo-alignment.json",
   "shared/terrain-patches.ts",
   "shared/data/north-court-terrain-patch.json",
   "shared/data/north-court-style.json",
@@ -57,13 +67,13 @@ const entries = [
   {
     block: 6,
     buildingId: "53929071",
-    x: B6_LAYOUT.entry.x,
-    z: B6_LAYOUT.entry.z,
-    nx: B6_LAYOUT.entry.outward.x,
-    nz: B6_LAYOUT.entry.outward.z,
-    baseY: 0,
-    rise: B6_LAYOUT.entranceRise,
-    steps: B6_LAYOUT.entry.stepCount,
+    x: CAD_B6_ENTRY.x,
+    z: CAD_B6_ENTRY.z,
+    nx: CAD_B6_ENTRY.nx,
+    nz: CAD_B6_ENTRY.nz,
+    baseY: CAD_B6_ENTRY.baseY,
+    rise: CAD_B6_ENTRY.rise,
+    steps: CAD_B6_ENTRY.steps,
   },
 ];
 const destinations = entries.map((e) => ({
@@ -74,7 +84,7 @@ const destinations = entries.map((e) => ({
   ),
   entranceConfidence:
     e.block === 6
-      ? "confirmed-north-orientation-metric-interpreted"
+      ? "CAD2005-native-entry-IPR2023-rigid-placement"
       : "north-OSM-projection-official-photo-typology",
   source: "https://www.openstreetmap.org/way/" + e.buildingId,
 }));
@@ -111,6 +121,10 @@ for (const [stopId, stop] of Object.entries(TRANSIT_FEED.stops).filter(
     const points: StreetPoint[] = route.points.map((p) => [...p]);
     for(const point of entryPaving?.slice(1)??[])
       if(Math.hypot(points.at(-1)![0]-point[0],points.at(-1)![1]-point[1])>.001)points.push(point);
+    if (e.block === 6) {
+      for (const point of [CAD_B6_ENTRY.start, CAD_B6_ENTRY.end,
+        {x: e.x + e.nx * 1.1, z: e.z + e.nz * 1.1}]) points.push([point.x, point.z]);
+    }
     const end = destinations.find((d) => d.buildingId === e.buildingId)!
       .threshold as StreetPoint;
     if (
@@ -159,7 +173,7 @@ const data = {
   destinations,
   journeys,
   limitations:
-    "North-facing doors and shared twelve-step geometry. Metric entrance dimensions are interpreted, not surveyed. Passengers stop on the landing; no full interior navigation.",
+    "North-facing doors; B6 follows native CAD stair fronts and measured model placement. Metric entrance dimensions are interpreted, not surveyed. Passengers stop on the landing; no full interior navigation.",
   skipped,
 };
 await writeFile(output, JSON.stringify(data) + "\n");

@@ -8,7 +8,7 @@ import { verifyRoutes } from './verify_routes.mjs';
 
 const R=await loadRapier(process.env.CAD_MODEL_DEPENDENCY_ROOT);
 async function fixtureFiles(files, run) {
-  const parent=resolve('.cache/cad-buildings-20261024/b01-build');
+  const parent=resolve('.cache/cad-buildings-20261024/b01-runtime-integration/rapier-fixtures');
   mkdirSync(parent,{recursive:true});
   const directory=mkdtempSync(join(parent,'rapier-fixture-')),written=[];
   try {

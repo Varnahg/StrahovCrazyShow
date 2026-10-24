@@ -1,4 +1,4 @@
-import { Simulation, initPhysics } from "../../shared/simulation";
+import { Simulation, initPhysics, CHARACTER_HALF_HEIGHT, CHARACTER_RADIUS } from "../../shared/simulation";
 import { stepRigidWorld } from "../../shared/physics-step";
 import { FIXED_DT } from "../../shared/netcode";
 import { SPAWN } from "../../shared/world";
@@ -28,6 +28,17 @@ export type JumpClip = {
   dispose: () => void;
 };
 
+/** Explicit legacy B6 context, still used by photogrammetry gameplay. This
+ * small synthetic OUTSIDE plane meets the existing photo approach repair;
+ * it never fills the basement or replaces any B6 room/stair collider.
+ * Current CAD building coverage belongs to cad-building-world.test.ts. */
+export function legacyB6Simulation() {
+  return new Simulation({
+    positions: new Float32Array([-8, -.16, -87, -2, -.16, -87, -8, -.16, -82.1, -2, -.16, -82.1]),
+    indices: new Uint32Array([0, 2, 1, 1, 2, 3]),
+  });
+}
+
 /** Browser-compatible fixture: original Actor/KCC, one initial placement only.
  * Each sample is captured AFTER step+world advance, so position and flags have
  * the same timestamp. No animation code changes or drives this trajectory. */
@@ -35,8 +46,8 @@ export async function createJumpClip(
   options: JumpClipOptions = {},
 ): Promise<JumpClip> {
   await initPhysics();
-  const sim = new Simulation(),
-    mode = options.mode ?? "run",
+  const mode = options.mode ?? "run",
+    sim = mode === "stairs" ? legacyB6Simulation() : new Simulation(),
     jumpTick = options.jumpTick ?? 94;
   const start =
     mode === "stairs"
@@ -69,7 +80,7 @@ export async function createJumpClip(
     const p = actor.position;
     frames.push({
       time: (tick + 1) * FIXED_DT,
-      position: { x: p.x, y: p.y - 0.8, z: p.z },
+      position: { x: p.x, y: p.y - CHARACTER_HALF_HEIGHT - CHARACTER_RADIUS, z: p.z },
       yaw: actor.yaw,
       grounded: actor.grounded,
       vertical: actor.vertical,
