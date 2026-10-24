@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-receiver-preparation-20261024",
+  "title": "KEY-22: připravit doložené PBR přijímače B6, značek a stadionu v původních etapách",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/authored-light-preparation.ts",
+    "client/b6-reality.ts",
+    "client/road-details.ts",
+    "client/landmark-reality.ts",
+    "tests/authored-light-preparation.test.ts",
+    "tests/receiver-light-preparation.test.ts",
+    "tests/b6-reality.test.ts",
+    "tests/road-details.test.ts",
+    "tests/landmark-reality.test.ts",
+    "docs/performance/evidence/webgpu-completion-20261021/receiver-preparation/",
+    ".cache/webgpu-receiver-preparation-20261024/",
+    "docs/agents/handoffs/webgpu-completion-receiver-preparation-20261024.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před implementací projít skutečný řetězec výroba assetu→source/instance/material→registrace a B6 managed.attached→původní stage visibility→active Mesh batch→PBR defines/context/draw pipeline→release. Actual source12/v16-b má přímé vazby PBR pass2: B6 merged sources/19caller links, road sign source3links a stadium-glass far1link; vertex/fragment/defines/context hashes record2/3 přesněmatchv15Mia oldrows1/2. Rodina ani společné jméno samo není owner. Všechny geometry/material/source podklady zachovat.",
+    "Porovnat předcode cílený lease skutečných resources v existující AuthoredLightPreparation vs effect-only forceCompilation, lazy první pohled, proxy scéna/přesunActor/kamery a persistent cache. Vybrat nejmenší skutečně odpovídající main-pass instanced/noninstanced draw coverage bez nové shadercache, timerů, extraRAF, etap nebo zvýšení původních30/90timeoutů. Výkonovou optimálnost netvrdit z CPU; root později ověří GPU.",
+    "Zachovat veřejný Scene constructor/begin release API a existující architecture exterior glass/outdoor PBR coverage. Doplňovat jen doložené zdrojové přijímače. Preferovat úzké stabilní producer metadata na B6 mergedsource, road sign face source a stadium-glass mesh/material před runtime parsováním jmen či gltfLightBudget membership. Projít konzumenty metadata před přidáním; nesmí se měnit povrchy, alpha/texture/mipmap, light budgets, shader/native/asset bytes, mapa ani kolize. Žádné náhodné assety nebo plošné přejmenování.",
+    "Instanced path musí použít skutečný source a skutečnou existující world instance se stejnou geometry/material/vertex+index layout, instancing a orderedlight sources. B6 instances mohou být disabled+odebrané zeScene, ale žijí v source.instances; prosté alwaysSelect na neviditelném source nic nepřipraví. Ověřit skutečný Scene batch path před volbou lease. Pokud nutné, jen přesný dočasný enable/Scene registration/alwaysSelect lease vybraného skutečného instance, nikdy nový proxy clone, přesun nebo globální cull změna. Dedup konzervativně per actual material+vertex/index/instance layout+light identity; source skupiny/sdílené recipes nezaměnit za jednu placement.",
+    "Lease vrací všechny vlastní visibility/enabled/Scene-registration/alwaysSelect změny i při throw/abort/dispose/reentry/quality revision a respektem k novější externí změně. B6 managed.attached musí po release stále souhlasit se skutečným registry; nepřepisovat jeho privátní stav. Žádné resource refs po dispose, perframe fullscan, alokace/cache v gameplay nebo změna normálních světel/caster selection. Vše jde v původním startup stage scope a pravdivém readiness/pipeline gate. Unsupported subtype/skeleton/morph/thin-instance nebo chybějící živý candidate explicitně odlišit, ne vydávat za připravené.",
+    "Implementace+cílenýrefaktor+smysluplné levné CPU testy spolu. ActualBabylon Mesh/InstancedMesh/Scene producer fixtures ověří viditelný aktivní batch/useInstances a obnovu registrace/flags; borrowed flags, foreign writes, disposed/replaced roots, exceptions/nested generation, mixed geometry/light layouts, no proxy/Actor/camera/cache/stage/timeout change, starácoveragebezezměny. Producer tests pro každou novou deklaraci. Nelze-li API splnit uvnitřscope, konzultovat předzápisem do Game/worldrenderer/shared/assetů.",
+    "Root-owned Game/light-preparation/core tests nejsou vchildscope; žádný Game či pipeline/native/lockfile edit. Žádný build/fullsuite/fullprojectTS/integration/GPU/Blender/server/commit/BMADrecursion: heavy-validation/gpu/workspace-build root předal CADcoordinatorovi. Jen lehké cílené netiming CPU a scopedsyntax/types dle potřeby. Proof/sourceguard/diff/handoff uvádí skutečné výsledky a omezení, snapshot12/v16/hranýbuild bezezměny."
+  ],
+  "verification": [
+    "Cílené relevantní CPU a native producer/instance batch fixtures, zachovat předchozí vstupy a testy; refaktor bez weakening. Původní AuthoredLightPreparation testy musí zůstat významově kryté.",
+    "Root2peer source acceptance→samostatnýcommit→po dohoděGPU zdrojů novýimmutablekandidát včetnětestů/freshdeps, fulltest/build/integration a skutečnýfirstF/bothquality/oldcoverage/controllerrelease/count/image/perf. CPU/NullEngine nebudehlášen zaGPUneboKEY22Done."
+  ],
+  "notes": [
+    "Explicitnírootdelegaceperformanceauthor implementovat/refaktor/ověřit společně; cleanowner webgpu-completion-01a15a3e-receiver-preparation. Worktree .cache/player-feedback-20261020, latestpushed48d36e96, runtimef3/source12. Claim předprvnímwrite, neadoptcizíWIP.",
+    "Actual inputs read-only .cache/webgpu-completion-20261021/validation/pipeline-source12-v16-b/mia-first-f-inputs.json a-static-lookup.json. B6 source.class Mesh, useInstances1, unregisteredMaterial identityvalid; PBRnativecallassociation neunique/exhaustive world draw. Roadactualkeys/source material hashes matchbuildRoadDetailPlan. Stadiumexactmesh34nameSHA971ad121…,mat22SHA9fddd20e…,parent41SHA617ab9d7… potvrzeny3staticstrings: landmark stadium stadium-glass far /landmark:stadium-glass/world-asset:building:osm:relation:1515034. Primarylandmark-reality source40/157–170/shared483–486.",
+    "PBRrecord4 familyother SM/ALPHATEST/DEPTHPREPASS zůstává unlinked a je jiná shadow větev; v15Robin +v16window2 positive nearbody+2garment shadowMapbones4 také SEPARÁTNÍ. Tento task je nepředstírá opravit. Currentnativef197 source/passownership se nemění, cache/history nevylučuje legitimateEffecteviction. Žádná aritmetickádekompozicehistorických5.",
+    "Rootpublikujeactualv16originals/receipts+limits paralelně, příslušnévalidation/researchpathsnejsouchildwrite. Source12frozen/helperoldv15/16/manifests arootprivate indices read-only. GPUresourcesreleasedforCADchat01a16b37…; jakýkoliheavy/GPUneed musíkoordinovatroot, nechildselfstart."
+  ]
+}

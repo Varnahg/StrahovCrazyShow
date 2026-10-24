@@ -1,0 +1,60 @@
+{
+  "atUTC": "2026-10-24T00:29:30.148Z",
+  "reviewer": "webgpu_editor_audit independent readonly",
+  "findings": [],
+  "reviewedManifestSha256": "7310cdb07c2bda7103972af989b048baab4672096ebf3e9aa4d31df210650273",
+  "verifiedFiles": 109,
+  "exactRawReceiptPairs": {
+    "interrupted": 9,
+    "actual": 28
+  },
+  "mia": {
+    "calls": 4,
+    "positiveLinks": [
+      1,
+      19,
+      3,
+      0
+    ],
+    "ownershipComplete": false
+  },
+  "robin": {
+    "calls": 1,
+    "roles": [
+      "local-skinned-near",
+      "local-garment-near",
+      "local-garment-near"
+    ],
+    "pass": 15,
+    "receipt": "997de5b8-eaf4-4c27-9afc-111f40391602"
+  },
+  "originals": {
+    "records": [
+      1186,
+      3069
+    ],
+    "faults": [
+      0,
+      0
+    ],
+    "unhandled": [
+      0,
+      0
+    ],
+    "gaps": [
+      1,
+      1
+    ],
+    "sessionEnd": [
+      true,
+      false
+    ]
+  },
+  "limits": [
+    "Diagnostic scoped positive caller/slot association; not exhaustive ownership, actual draw or cause.",
+    "Original clock-window files retain exact time brackets but only selected hitch/longtask/LoAF/gap events:110/80 of156/127 total interval records. Original raw logs retain the other records.",
+    "Mia cumulative5 differs from4 captured requests; one request outside window.",
+    "Robin recovered original backend receipt is not a new browser export. No retained afterRobinstate or final session-end.",
+    "Native focused input changed camera; no pixel/FPS A-B or GPU execution proof. No main/default acceptance."
+  ]
+}
