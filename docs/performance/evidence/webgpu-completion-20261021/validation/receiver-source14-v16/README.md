@@ -1,0 +1,5 @@
+# Source14 receiver reselection: finite practical result
+
+Sourceee108d95/cb6fff55/build0fdab610/helper02af,21HTTP matches, ownfresh39/singleton/147targetedCPU/fullTS/build/integration/exactCI PASS. Valid fixedLow1569x758 atCSS2040x986 B6 firstMia toggle captures0compiler inputs, Robin new-avatar first1shadowMap, repeat0; allfalse-to-true windows complete/health0/pending0. This accepts the finite receiver correction in this scenario, not KEY22/default/main or performance.
+
+The original first capture ended before the actual checkbox activation. It is preserved and not a valid first-toggle window; its surrounding true before/after global counters nevertheless stay837/837 and1674/1674. A separate fresh-page MP window correctly captures the first toggle. Cancelled inherited-state start and clock-QA Guest refusal remain explicit. First run traversed B6 floor1/bothstaircores; valid repeat usedgroundroute. Originals1566(no session-end)/1938(session-end), both0fault/0unhandled/1gap. FixedLow differs from oldAutoLow; noFPS/pixel/causalA-B. Ownservices/tabs stopped, viewportreset andresourcesreturnedCAD03:06UTC before03:10deadline.
