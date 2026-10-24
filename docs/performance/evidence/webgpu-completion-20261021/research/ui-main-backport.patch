@@ -1,0 +1,381 @@
+diff --git a/client/ui.tsx b/client/ui.tsx
+index b91c6be0..b2f1da84 100644
+--- a/client/ui.tsx
++++ b/client/ui.tsx
+@@ -394,6 +394,36 @@ export function App() {
+     game.current?.networkTimeline.resetRttSelection();
+     game.current?.resetDiagnosticContext();
+   };
++  const disconnectRoom = (
++    reason: "leave" | "startup-failure",
++    expected?: { room: Room | null; attempt: number },
++  ) => {
++    if (expected && room.current !== expected.room) return false;
++    // A newer pending join owns its own attempt, even while the failed Game
++    // still owns the old Room. Retire that Room without cancelling the join.
++    if (!expected || connectionAttempt.current === expected.attempt)
++      connectionAttempt.current++;
++    const previousRoom = room.current;
++    // The SDK retains listeners until its leave handshake finishes. Retire this
++    // owner first so synchronous or delayed callbacks cannot mutate a new one.
++    room.current = null;
++    connectedRef.current = false;
++    inputBuffer.current?.reset(reason);
++    bootstrapAuthorityRef.current = null;
++    authorityBufferRef.current?.reset();
++    resetConnectionDiagnostics();
++    playersRef.current = [];
++    playersById.current.clear();
++    carState.current = null;
++    setConnected(false);
++    setPlayers([]);
++    setMessages([]);
++    setSocial({ attendance: [], contacts: [], requests: [], blocked: [] });
++    setWorldSelection(null);
++    try { void previousRoom?.leave().catch(() => {}); }
++    catch { /* A transport teardown cannot replace the original startup error. */ }
++    return true;
++  };
+   const applyReceivedAuthority = ({
+     packet,
+     receivedAt,
+@@ -571,6 +601,16 @@ export function App() {
+     sessionDiagnostics.event("mode-change", { mode });
+     let cancelled = false;
+     const startupAbort = new AbortController();
++    const startupConnection = mode === "multi"
++      ? { room: room.current, attempt: connectionAttempt.current }
++      : undefined;
++    let ownedGame: Game | undefined;
++    const disposeOwnedGame = () => {
++      const owned = ownedGame;
++      ownedGame = undefined;
++      if (game.current === owned) game.current = null;
++      owned?.dispose();
++    };
+     modeRef.current = mode;
+     (async () => {
+       let pendingEngine: AbstractEngine | undefined;
+@@ -595,6 +635,7 @@ export function App() {
+         });
+         const g = new Game(startupCanvas, profileRef.current, pendingEngine);
+         pendingEngine = undefined;
++        ownedGame = g;
+         game.current = g;
+         g.onRendererFailure = (message) => {
+           if (cancelled || game.current !== g) return;
+@@ -643,6 +684,7 @@ export function App() {
+         g.onPredictionReset = (priority) =>
+           inputBuffer.current?.reset("prediction-reset", { priority });
+         g.onAction = (action, data) => {
++          if (game.current !== g) return false;
+           if (action === "reward") {
+             reward(String(data));
+             return true;
+@@ -685,12 +727,17 @@ export function App() {
+       } catch (e) {
+         pendingEngine?.dispose();
+         if (cancelled) return;
++        if (canvas.current !== startupCanvas || modeRef.current !== mode ||
++            game.current !== (ownedGame ?? null)) {
++          disposeOwnedGame();
++          return;
++        }
+         sessionDiagnostics.event("startup-error", {
+           message: String(e),
+           stack: e instanceof Error ? e.stack?.slice(0, 2000) : undefined,
+         });
+-        game.current?.dispose();
+-        game.current = null;
++        if (startupConnection) disconnectRoom("startup-failure", startupConnection);
++        disposeOwnedGame();
+         setError(
+           t("3D scénu se nepodařilo spustit: {error}", { error: String(e) }),
+         );
+@@ -700,8 +747,7 @@ export function App() {
+       cancelled = true;
+       startupAbort.abort();
+       userBenchmark.current = false;
+-      game.current?.dispose();
+-      game.current = null;
++      disposeOwnedGame();
+     };
+   }, [mode]);
+   const bind = (r: Room) => {
+@@ -941,27 +987,13 @@ export function App() {
+   };
+   const leave = () => {
+     sessionDiagnostics.event("network-left", {});
+-    connectionAttempt.current++;
+-    const previousRoom = room.current;
+-    // SDK leave waits for the server handshake while keeping its listeners.
+-    // Invalidate first, including callbacks fired synchronously by leave().
+-    room.current = null;
+-    connectedRef.current = false;
+-    inputBuffer.current?.reset("leave");
+-    bootstrapAuthorityRef.current = null;
+-    authorityBufferRef.current?.reset();
+-    resetConnectionDiagnostics();
+-    void previousRoom?.leave().catch(() => {});
++    disconnectRoom("leave");
+     modeRef.current = "menu";
+     setMode("menu");
+     setBusy(false);
+     setReady(false);
+-    setConnected(false);
+-    setMessages([]);
+-    setSocial({ attendance: [], contacts: [], requests: [], blocked: [] });
+     setJournalOpen(false);
+     setEmotesOpen(false);
+-    setWorldSelection(null);
+   };
+   const send = (action: string, data?: unknown) => {
+     if (mode !== "multi" || !connected) {
+diff --git a/tests/room-callbacks.test.ts b/tests/room-callbacks.test.ts
+index 45a21b78..1c784400 100644
+--- a/tests/room-callbacks.test.ts
++++ b/tests/room-callbacks.test.ts
+@@ -37,6 +37,7 @@ const declarations = app.body!.statements.flatMap((node) =>
+ );
+ const callbackNames = [
+   "resetConnectionDiagnostics",
++  "disconnectRoom",
+   "applyReceivedAuthority",
+   "drainAuthorities",
+   "syncNetworkStage",
+@@ -1442,3 +1443,235 @@ for (const outcome of [
+     assert.equal(engineDisposals, 1, "startup failure or cleanup releases the engine once");
+   });
+ }
++
++function startOwnedGame(ui: ReturnType<typeof fixture>, options: { mode?: "multi" | "guest"; factoryError?: Error; pendingFactory?: Promise<void> } = {}) {
++  const starting = deferred<void>(), game = ui.game;
++  let starts = 0, gameDisposals = 0, engineDisposals = 0;
++  const engine = { isWebGPU: false, dispose() { engineDisposals++; } };
++  Object.assign(game, {
++    ready: false, disposed: false, scene: { meshes: [], materials: [] },
++    renderHealth: { snapshot: () => ({ valid: game.ready, firstErrors: [] }) },
++    setQuality() {}, setTargetFps() {},
++    async start() { starts++; await starting.promise; game.ready = true; },
++    dispose() { if (game.disposed) return; game.disposed = true; gameDisposals++; engine.dispose(); },
++  });
++  ui.environment.game.current = null;
++  Object.assign(ui.environment, {
++    AbortController,
++    testLoadGame: async () => ({ Game: class {
++      constructor(canvas: unknown, _profile: unknown, prepared: unknown) {
++        assert.equal(canvas, game.canvas); assert.equal(prepared, engine); return game;
++      }
++    } }),
++    testLoadRenderEngine: async () => ({ createGameEngine: async () => {
++      await options.pendingFactory;
++      if (options.factoryError) throw options.factoryError;
++      return engine;
++    } }),
++    getRendererInfo: () => ({ renderer: "fixture", vendor: "fixture", version: "fixture" }),
++    mode: options.mode ?? "multi", canvas: { current: game.canvas },
++    lightingPreviewRef: { current: { instant: null } }, weatherRef: { current: null },
++    userBenchmark: { current: false }, quality: "medium", targetFps: 60, activity: { hunt: [] }, setStats() {},
++    t: (text: string, values?: Record<string, unknown>) => text.replace(/\{(\w+)\}/g, (match, key) => String(values?.[key] ?? match)),
++  });
++  const cleanup = startupScript.runInContext(ui.context) as () => void;
++  return { starting, cleanup, game, counts: () => ({ starts, gameDisposals, engineDisposals }) };
++}
++
++for (const stage of ["factory", "start"] as const)
++  test(`terminal startup ${stage} failure releases its joined Room without replacing the original error`, async () => {
++    const ui = fixture(), room = new FakeRoom(), failure = new Error(`original ${stage} failure`);
++    ui.bind(room);
++    const startup = startOwnedGame(ui, stage === "factory" ? { factoryError: failure } : {});
++    await setImmediate();
++    if (stage === "start") { startup.starting.reject(failure); await setImmediate(); }
++    assert.deepEqual(room.leaveRequests, [true]);
++    assert.equal(ui.room.current, null);
++    assert.equal(ui.connectedRef.current, false);
++    assert.equal(ui.state.connected, false);
++    assert.match(ui.state.error, new RegExp(failure.message));
++    assert.equal(ui.modeRef.current, "multi", "the original startup error screen stays in place");
++    assert.equal(ui.state.mode, undefined, "network retirement must not navigate to menu");
++    startup.cleanup();
++    assert.deepEqual(room.leaveRequests, [true], "effect cleanup cannot close the Room twice");
++    room.close();
++  });
++
++test("terminal startup clears owned buffers and send gates before synchronous or retained Room callbacks", async () => {
++  const ui = fixture(), room = new FakeRoom();
++  ui.bind(room);
++  const startup = startOwnedGame(ui);
++  ui.inputBuffer.current.enqueue({ seq: 1, x: 1, z: 0, yaw: 0, jump: false, run: false, vehicle: false });
++  room.message("authoritative", { ...payloads().authoritative, resync: true });
++  room.message("authoritative", { ...payloads().authoritative, resync: false, ack: 2, tick: 2 });
++  room.message("presence", payloads().presence);
++  room.message("car", payloads().car);
++  assert.equal(ui.inputBuffer.current.snapshot().queued, 1);
++  assert.ok(ui.bootstrapAuthorityRef.current);
++  assert.equal(ui.authorityBufferRef.current.snapshot().pending, true);
++  room.duringLeave = () => {
++    assert.equal(ui.room.current, null);
++    assert.equal(ui.connectedRef.current, false);
++    assert.equal(ui.inputBuffer.current.snapshot().queued, 0);
++    const before = ui.snapshot();
++    dispatchMessages(room); room.error(); room.close();
++    assert.equal(ui.snapshot(), before, "no callback runs while sending consented leave");
++  };
++  await setImmediate();
++  const oldInput = startup.game.onInput, oldAction = startup.game.onAction;
++  startup.starting.reject(new Error("owned startup failed"));
++  await setImmediate();
++  assert.equal(ui.inputBuffer.current.snapshot().queued, 0);
++  assert.equal(ui.bootstrapAuthorityRef.current, null);
++  assert.equal(ui.authorityBufferRef.current.snapshot().pending, false);
++  assert.equal(ui.playersRef.current.length, 0);
++  assert.equal(ui.playersById.current.size, 0);
++  assert.equal(ui.carState.current, null);
++  assert.equal(ui.state.players.length, 0);
++  assert.equal(ui.state.messages.length, 0);
++  assert.equal(ui.state.social.contacts.length, 0);
++  oldInput({ seq: 2, x: 1, z: 0, yaw: 0, jump: false, run: false, vehicle: false });
++  assert.equal(oldAction("vehicle"), false);
++  assert.equal(ui.inputBuffer.current.flush("timer"), 0);
++  assert.equal(room.sent.length, 0);
++  startup.cleanup();
++  assert.deepEqual(room.leaveRequests, [true]);
++});
++
++test("deferred consented leave from a failed startup cannot disconnect or send through the rejoined Room", async () => {
++  const ui = fixture(), oldRoom = new FakeRoom(), nextRoom = new FakeRoom();
++  ui.bind(oldRoom);
++  const startup = startOwnedGame(ui);
++  await setImmediate();
++  const oldAction = startup.game.onAction;
++  startup.starting.reject(new Error("first start failed"));
++  await setImmediate();
++  assert.deepEqual(oldRoom.leaveRequests, [true]);
++  assert.ok(oldRoom.resolveLeave, "handshake is still pending");
++  const connecting = ui.connect();
++  await advanceToJoin(ui);
++  ui.joins[0].result.resolve(nextRoom);
++  assert.equal(await connecting, true);
++  const nextGame = { ...startup.game, ready: true, disposed: false };
++  ui.environment.game.current = nextGame;
++  const before = ui.snapshot();
++  oldRoom.close(); oldRoom.error(); dispatchMessages(oldRoom);
++  await setImmediate();
++  assert.equal(ui.snapshot(), before);
++  assert.equal(ui.room.current, nextRoom);
++  assert.equal(ui.connectedRef.current, true);
++  assert.equal(oldAction("vehicle"), false);
++  assert.equal(nextRoom.sent.length, 0);
++  startup.cleanup();
++  assert.equal(ui.environment.game.current, nextGame);
++  assert.deepEqual(nextRoom.leaveRequests, []);
++  ui.leave(); nextRoom.close();
++});
++
++test("a stale Game failure and cleanup cannot dispose the replacement Game or retire its Room", async () => {
++  const ui = fixture(), oldRoom = new FakeRoom(), nextRoom = new FakeRoom();
++  ui.bind(oldRoom);
++  const startup = startOwnedGame(ui);
++  await setImmediate();
++  const connecting = ui.connect();
++  await advanceToJoin(ui);
++  ui.joins[0].result.resolve(nextRoom);
++  assert.equal(await connecting, true);
++  let replacementDisposals = 0;
++  const replacement = { ...startup.game, ready: true, disposed: false, dispose() { replacementDisposals++; } };
++  ui.environment.game.current = replacement;
++  const before = ui.snapshot();
++  startup.starting.reject(new Error("stale Game failed"));
++  await setImmediate();
++  assert.equal(ui.snapshot(), before);
++  assert.equal(startup.counts().gameDisposals, 1, "only the obsolete Game is released");
++  assert.equal(ui.environment.game.current, replacement);
++  assert.equal(replacementDisposals, 0);
++  assert.equal(ui.room.current, nextRoom);
++  assert.deepEqual(oldRoom.leaveRequests, [false], "connect already retired the previous transport");
++  assert.deepEqual(nextRoom.leaveRequests, []);
++  startup.cleanup();
++  assert.equal(replacementDisposals, 0);
++  ui.leave(); oldRoom.close(); nextRoom.close();
++});
++
++test("startup failure retires its old Room while a newer pending join keeps its own generation", async () => {
++  const ui = fixture(), oldRoom = new FakeRoom(), nextRoom = new FakeRoom();
++  ui.bind(oldRoom);
++  const startup = startOwnedGame(ui);
++  await setImmediate();
++  const connecting = ui.connect(), nextAttempt = ui.connectionAttempt.current;
++  startup.starting.reject(new Error("old startup failed during replacement join"));
++  await setImmediate();
++  assert.equal(ui.connectionAttempt.current, nextAttempt);
++  assert.equal(ui.room.current, null);
++  assert.deepEqual(oldRoom.leaveRequests, [true]);
++  await advanceToJoin(ui);
++  ui.joins[0].result.resolve(nextRoom);
++  assert.equal(await connecting, true);
++  oldRoom.close(); await setImmediate();
++  assert.equal(ui.room.current, nextRoom);
++  assert.equal(ui.connectedRef.current, true);
++  assert.deepEqual(nextRoom.leaveRequests, []);
++  startup.cleanup(); ui.leave(); nextRoom.close();
++});
++
++for (const failureMode of ["reject", "throw"] as const)
++  test(`Room leave ${failureMode} cannot replace a terminal startup error`, async () => {
++    const ui = fixture(), room = new FakeRoom();
++    ui.bind(room);
++    if (failureMode === "reject") room.leaveError = new Error("leave rejected");
++    else room.leave = (consented = true) => { room.leaveRequests.push(consented); throw new Error("leave threw"); };
++    const startup = startOwnedGame(ui);
++    await setImmediate();
++    startup.starting.reject(new Error("original startup reason"));
++    await setImmediate();
++    assert.match(ui.state.error, /original startup reason/);
++    assert.equal(ui.room.current, null);
++    assert.equal(ui.connectedRef.current, false);
++    assert.equal(startup.counts().gameDisposals, 1);
++    assert.deepEqual(room.leaveRequests, [true]);
++    startup.cleanup(); room.close();
++  });
++
++test("a Guest startup failure cannot retire an unrelated multiplayer Room", async () => {
++  const ui = fixture(), room = new FakeRoom();
++  ui.bind(room);
++  const attempt = ui.connectionAttempt.current;
++  const startup = startOwnedGame(ui, { mode: "guest" });
++  await setImmediate();
++  startup.starting.reject(new Error("Guest renderer failed"));
++  await setImmediate();
++  assert.equal(ui.room.current, room);
++  assert.equal(ui.connectedRef.current, true);
++  assert.equal(ui.connectionAttempt.current, attempt);
++  assert.deepEqual(room.leaveRequests, []);
++  assert.match(ui.state.error, /Guest renderer failed/);
++  startup.cleanup(); ui.leave(); room.close();
++});
++
++test("a late factory rejection cannot publish an error into a replacement Game or disconnect its Room", async () => {
++  const ui = fixture(), oldRoom = new FakeRoom(), nextRoom = new FakeRoom(), factory = deferred<void>();
++  ui.bind(oldRoom);
++  const startup = startOwnedGame(ui, { factoryError: new Error("retired factory rejected"), pendingFactory: factory.promise });
++  await setImmediate();
++  assert.equal(startup.counts().starts, 0);
++  const connecting = ui.connect();
++  await advanceToJoin(ui);
++  ui.joins[0].result.resolve(nextRoom);
++  assert.equal(await connecting, true);
++  let replacementDisposals = 0;
++  const replacement = { ...startup.game, ready: true, disposed: false, dispose() { replacementDisposals++; } };
++  ui.environment.game.current = replacement;
++  const before = ui.snapshot();
++  factory.resolve(); await setImmediate();
++  assert.equal(ui.snapshot(), before);
++  assert.equal(ui.environment.game.current, replacement);
++  assert.equal(ui.room.current, nextRoom);
++  assert.equal(ui.connectedRef.current, true);
++  assert.deepEqual(nextRoom.leaveRequests, []);
++  startup.cleanup();
++  assert.equal(replacementDisposals, 0);
++  assert.equal(startup.counts().gameDisposals, 0);
++  ui.leave(); oldRoom.close(); nextRoom.close();
++});

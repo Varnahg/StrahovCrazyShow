@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "webgpu-completion-ui-main-integration-20261024",
+  "title": "KEY-22: samostatně integrovat převzatý UI startup Room cleanup s původním main backendem",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/ui.tsx",
+    "tests/room-callbacks.test.ts",
+    "docs/agents/handoffs/webgpu-completion-ui-main-integration-20261024.md",
+    "docs/performance/evidence/webgpu-ui-main-integration-20261024/",
+    ".cache/webgpu-ui-main-integration-20261024/",
+    "node_modules/",
+    "dist/"
+  ],
+  "resources": [
+    "heavy-validation",
+    "gpu",
+    "workspace-build",
+    "port:2568",
+    "port:4214",
+    "port:2598"
+  ],
+  "acceptance": [
+    "Přesný čtecí dependency audit je research/main-ui-integration-decision.md. Ze stabilního aktuálního main připravit samostatnou izolovanou větev přes vyhrazený GIT_INDEX_FILE a přesné historické blobs; původní workingtree/HEAD/realindex/primárníforeignWIP zůstanou bezezměny. CI může ověřit tuto novou větev vzdáleně. Místní pracovníkopie a vlastnídeps před praktickou přejímkou až v dalším CADresourceokně.",
+    "Přenést jen přesné historické UI a room-callbacks testy02fdf68b2ec739b51088b2cdf7c1c11b7157719d, jejich doložené vlastní podklady a nové integrační důkazy. Base main9341 UIblob b91c6be0/test45a21b78, targetUIb2f1da84/test1c784400. Dnešní HEAD UI má jiné závislosti a nesmí se přenést. Žádný Game/native/package/lock/server/shared/default edit.",
+    "Oprava uvolní vlastní Room/Game při startup failure a stale callbacky nesmí ukončit novější Room/Game nebo pendingjoin. Zachovat původní veřejné API, WebGL2 default a loopback omezení. TargetUI SHA2566aa94cf9ecd4278ef68c1e5a98377503f5bd96c667fe51e24e3ef5ac941562fe a test24645eda0e42414f614cc84ecc5cce68a1f0d3143bcd8bbeaa06bb560d701f23.",
+    "Vlastní fresh dependencies podle main lock/patch965f9774, nikoli migrační root/patch1dac. Managedworktree setup/freshinstall/build/fullsuite/integrace/browser až v novém výslovném CADresourceokně se skutečným heavy/gpu/build/port claim; resources[] teď nedává procesní autoritu.",
+    "Po cílených room-callbacks/game-render-engine/network-input-buffer testech, fullsuite/TS/build/integraci a relevantní praktické přejímce vytvořit samostatný PR. Nezávislé review, exacthead/base CI/project-acceptance a očekávanýhead merge, pak hlavní ověření. Důkazy source14 firstF0 do této nové kombinace nepřenášet."
+  ],
+  "verification": [
+    "Historické64PASS/scopedTS0/RED0-2 je podklad, nikoli nový běh. Znovu ověřit vlastní izolovanou main+UI kombinaci a zachovat všechny failures.",
+    "Browser MPstart→leave→rejoin a Guest; kontrolovaný startupfailure/cleanup musí mít konkrétní původní UIeffect reprodukci. Pokud je doložen pouze CPU fixture, výslovně to uvést a nezaměnit za browser failure.",
+    "Default/backend/caches/native beze změny porovnat smain. Žádný postup nesmí přebít cizí live claims, zdroje ani neznámý WIP."
+  ],
+  "notes": [
+    "Výslovně navazuje na uživatelský KEY22 a požadavek průběžné samostatné integrace ověřených celků. Tato jednotka je nezávislá na dokončeníavatarshadow/performance/defaultWebGPU.",
+    "Rootcoordinator bude zapisovat jen v nové izolované kopii po ověření identity/claim. V současné .cache/player-feedback větvi probíhá jiný disjunktní probe; taskready sám není start cizí práce.",
+    "24Oct03UTC CAD máheavy pro B1 novéprůchodovéprimivivy/export; další40min předání očekává ažpo stabilnímcheckpointu, nikoli automaticky. Do té doby jenčtení/plánování bez setupinstalace či GPU.",
+    "24Oct03:35UTC rootkoordinátor volí nejprve izolovanou branch přípravu pomocí privateGitindex v owncache místo managedsetup během CADheavy. Primární Gitdocs ověřeny GIT_INDEX_FILE/read-tree bez-u/commit-tree; source2blobs+ownmetadata/historicalproofs pouze, guardrealindex/HEAD/currentUI/test před/po. Žádný branchswitch/worktreecheckout/install/GPU/mainmerge. Claim rootcwd platí pro vzdálenou přípravnou větev; před lokálními zápisy se rezervace retargetuje do samostatné pracovníkopie. Mainmerge ažpo požadovaném review/CI/projectacceptance/resourcewindow.",
+    "24Oct03:36UTC explicitCADR7a stable checkpoint/93tests/36of36 route/export/reopen, ownBlenderallSTOP andactualheavyreleased. Rootindependently noBlender/noother3D/no2568-4214-2598listeners and noheavy/gpuclaims. Reacquire6resources for isolatedUI main preparation/setup/freshvalidation/browser until04:16UTC/06:16Prague; actualSTOP/release bydeadline or explicitextensionbeforeend."
+  ]
+}
