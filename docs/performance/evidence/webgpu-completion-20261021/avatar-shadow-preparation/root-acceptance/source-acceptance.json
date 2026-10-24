@@ -1,0 +1,52 @@
+{
+  "atUTC": "2026-10-24T04:12:04.041Z",
+  "accepted": "Source/refactor/finite CPU checkpoint only, pending fresh combined source15 and actual WebGPU validation.",
+  "authorManifest": {
+    "path": "docs/performance/evidence/webgpu-completion-20261021/avatar-shadow-preparation/owned-files.json",
+    "sha256": "bbca384c64b620eb12d2cc2104ac9575eadc60c790e43c256710e207c5aefb1c",
+    "files": 47
+  },
+  "verification": {
+    "path": "docs/performance/evidence/webgpu-completion-20261021/avatar-shadow-preparation/verification.json",
+    "sha256": "4078e0aa879be6f45f8f3c6904d2bce6cc64a347abb6d08524cdd280b53ac672",
+    "pass": 37,
+    "fail": 0,
+    "skip": 0,
+    "scopedRoots": 7,
+    "transitiveTypeDiagnostics": 0
+  },
+  "currentGuardCounts": {
+    "own": 7,
+    "protectedSources": 20,
+    "native39": 39,
+    "helper36": 36,
+    "source14": 113,
+    "historical332": 22,
+    "preserved332": 2
+  },
+  "portablePrivateInputs": 27,
+  "reviewers": [
+    {
+      "name": "/root/webgpu_editor_audit",
+      "findings": [],
+      "scope": "Exact source SHA,47file seal, actual four CPU traces/lifecycle and guards."
+    },
+    {
+      "name": "/root/webgpu_renderer_audit",
+      "findings": [],
+      "scope": "Second independent source/CPU/47file seal and native/helper/source14/history review."
+    }
+  ],
+  "runtime": {
+    "flashlight": "1171f16f3616f1bf2c463e5dee27c858ffd21b430aeac37c1886ffde136ae621",
+    "vehicleLighting": "07fa1248693c56a6382612e0f884671cafa708d655678156c944919e834fbba4"
+  },
+  "result": "Four actual CPU scenarios first-own-shadow0/repeat0; aggregate first1 remains explicit. No old-rig retention cache. Production isReady calls synchronous in exact living shadow pass with finally restoration; max3calls/update/32batches/identity.",
+  "limitations": [
+    "NullEngine/GLSL/Poisson is not actual WGSL, GPU effect retirement, startup/image/performance evidence.",
+    "Immediate F before completed preparation and all-zero aggregate first draw are not guaranteed.",
+    "No default/main/whole KEY22 completion claim."
+  ],
+  "handoff": "docs/agents/handoffs/webgpu-completion-avatar-shadow-preparation-20261024.md",
+  "handoffSha256": "35f916acf580241e12a59e0db49d3336476bd192f332fc902777bb87e90c9d8a"
+}

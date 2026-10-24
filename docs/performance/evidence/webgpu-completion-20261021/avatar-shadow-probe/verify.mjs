@@ -1,0 +1,24 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import ts from 'typescript';
+const prefix='docs/performance/evidence/webgpu-completion-20261021/avatar-shadow-probe',root=process.cwd(),sha=p=>createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const before=JSON.parse(fs.readFileSync(prefix+'/before.json')),cap=JSON.parse(fs.readFileSync(prefix+'/capability-source-guard.json'));
+const own=['tests/avatar-shadow-preparation.test.ts','tests/fixtures/avatar-shadow-preparation/probe.ts'];
+const snapshot=()=>({own:Object.fromEntries(own.map(p=>[p,sha(p)])),sources:Object.fromEntries(Object.keys(before.sources).map(p=>[p,sha(p)])),native39:Object.fromEntries(Object.keys(before.native.files).map(p=>[p,sha('node_modules/'+p)])),helper36:Object.fromEntries(Object.keys(before.helper36).map(p=>[p,sha(p)])),source14:Object.fromEntries(Object.keys(before.source14.files).map(p=>[p,sha(before.source14.prefix+'/'+p)])),nativeMap:sha(before.native.path),source14Manifest:sha(before.source14.prefix+'/manifest.json'),capabilitySources:Object.fromEntries(Object.keys(cap.files).map(p=>[p,sha(p)]))});
+const drift=(actual,expected)=>Object.keys(expected).filter(p=>actual[p]!==expected[p]);
+const start=snapshot();
+const proof={atUTC:new Date().toISOString(),scope:'Finite actual native avatar edit probe. Expected lazy-flow RED is preserved; targeted alternative is CPU only, not product implementation/GPU proof.',before:start,baselineDrift:{sources:drift(start.sources,before.sources),native39:drift(start.native39,before.native.files),helper36:drift(start.helper36,before.helper36),source14:drift(start.source14,Object.fromEntries(Object.entries(before.source14.files).map(([p,f])=>[p,f.sha256]))),capabilitySources:drift(start.capabilitySources,cap.files),nativeMap:start.nativeMap!==before.native.sha256,source14Manifest:start.source14Manifest!==before.source14.manifestSha256}};
+const config=ts.readConfigFile('tsconfig.json',ts.sys.readFile).config,options=ts.convertCompilerOptionsFromJson(config.compilerOptions,root).options;
+const program=ts.createProgram(own,options),diagnostics=ts.getPreEmitDiagnostics(program);
+proof.types={roots:own,allTransitiveDiagnostics:diagnostics.length,diagnostics:diagnostics.map(d=>({file:d.file?path.relative(root,d.file.fileName).replaceAll('\\','/'):null,code:d.code,message:ts.flattenDiagnosticMessageText(d.messageText,' ')}))};
+proof.syntax=own.map(p=>({path:p,diagnostics:ts.transpileModule(fs.readFileSync(p,'utf8'),{compilerOptions:options,fileName:p,reportDiagnostics:true}).diagnostics?.length??0}));
+const dir='.cache/webgpu-avatar-shadow-probe-20261024/final';fs.mkdirSync(dir,{recursive:true});
+const args=['--import','tsx','--test','--test-reporter=tap',own[0]],run=spawnSync(process.execPath,args,{cwd:root,encoding:'utf8',env:{...process.env,AVATAR_SHADOW_REPORT_DIR:dir},timeout:60000});
+fs.writeFileSync(prefix+'/final.tap',run.stdout+run.stderr,{flag:'wx'});
+proof.cpu={command:[process.execPath,...args],exitCode:run.status,signal:run.signal,error:run.error?.message??null,log:prefix+'/final.tap',logSha256:sha(prefix+'/final.tap'),expectedLazyRed:run.status===1&&/# fail 2\b/.test(run.stdout)&&/# pass 3\b/.test(run.stdout)&&/desired coverage:/.test(run.stdout)};
+for(const bone of ['default-null','bone-texture'])for(const mode of ['lazy','targeted']){const f=`${bone}-${mode}.json`;if(fs.existsSync(dir+'/'+f))fs.copyFileSync(dir+'/'+f,prefix+'/'+f,fs.constants.COPYFILE_EXCL);}
+proof.after=snapshot();proof.executionInputDrift=JSON.stringify(proof.before)!==JSON.stringify(proof.after);
+fs.writeFileSync(prefix+'/verification.json',JSON.stringify(proof,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({baselineDrift:proof.baselineDrift,types:proof.types,syntax:proof.syntax,cpu:proof.cpu,executionInputDrift:proof.executionInputDrift}));

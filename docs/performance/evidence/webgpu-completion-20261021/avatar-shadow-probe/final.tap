@@ -1,0 +1,80 @@
+TAP version 13
+# BJS - [05:18:54]: Babylon.js v9.30.0 - Null engine
+# BJS - [05:18:54]: Skeleton "avatar local continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [05:18:55]: Skeleton "avatar local continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [05:18:55]: Babylon.js v9.30.0 - Null engine
+# BJS - [05:18:55]: Skeleton "avatar local continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# Subtest: actual edit OFF shadow preparation / default Null caps / current lazy flow
+not ok 1 - actual edit OFF shadow preparation / default Null caps / current lazy flow
+  ---
+  duration_ms: 429.392
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\avatar-shadow-preparation.test.ts:1:228'
+  failureType: 'testCodeFailure'
+  error: |-
+    desired coverage: first torch after the normal OFF edit must require no new native shadow program
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\avatar-shadow-preparation.test.ts:27:10)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# BJS - [05:18:55]: Skeleton "avatar local continuous anatomy": 13 bones stored as vertex uniforms use 56 of ~0 usable uniform vectors on a device reporting 16. This can exceed the GPU vertex-uniform limit and make the mesh silently fail to render. Set skeleton.useTextureToStoreBoneMatrices = true to store bone matrices in a texture.
+# BJS - [05:18:55]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual edit OFF shadow preparation / default Null caps / targeted experiment
+ok 2 - actual edit OFF shadow preparation / default Null caps / targeted experiment
+  ---
+  duration_ms: 222.338
+  type: 'test'
+  ...
+# BJS - [05:18:55]: Babylon.js v9.30.0 - Null engine
+# Subtest: actual edit OFF shadow preparation / bone-texture caps / current lazy flow
+not ok 3 - actual edit OFF shadow preparation / bone-texture caps / current lazy flow
+  ---
+  duration_ms: 197.4714
+  type: 'test'
+  location: 'C:\\Users\\rezac\\Documents\\GitHub\\StrahovCrazyShow\\.cache\\player-feedback-20261020\\tests\\avatar-shadow-preparation.test.ts:1:228'
+  failureType: 'testCodeFailure'
+  error: |-
+    desired coverage: first torch after the normal OFF edit must require no new native shadow program
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\rezac\Documents\GitHub\StrahovCrazyShow\.cache\player-feedback-20261020\tests\avatar-shadow-preparation.test.ts:27:10)
+    async Test.run (node:internal/test_runner/test:1389:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: actual edit OFF shadow preparation / bone-texture caps / targeted experiment
+ok 4 - actual edit OFF shadow preparation / bone-texture caps / targeted experiment
+  ---
+  duration_ms: 193.874
+  type: 'test'
+  ...
+# Subtest: targeted pass scope restores the original pass and falsy rejection
+ok 5 - targeted pass scope restores the original pass and falsy rejection
+  ---
+  duration_ms: 0.686
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 3
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4626.2217
