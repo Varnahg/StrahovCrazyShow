@@ -1,0 +1,553 @@
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\README.md" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\README.md"
+index 8d9cdbf6..bfbb246c 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\README.md"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\README.md"
+@@ -1,3 +1,13 @@
++# V17 bounded startup stage result export
++
++This version adds preparationStages once to the existing startup raw, alongside preparationSummary, using the same original prepareLighting Promise fulfilment side reaction. There is still one native.then call per original operation. No new wrapper, timer, polling, renderer/readiness/GPU call or product change. Original Promise/value/receiver/arguments/falsy errors are unchanged. The owner restores on terminal/abort/rejoin and retains only the closed scalar evidence after disposal.
++
++The closed projection exports original stage names, passQuality, elapsed/active/paused times, tick/check/render/restart counts, original CPU apply/checkBatch/render aggregates, rafGap aggregates and the14 known Game revision reasons plus revision-length. It never exports arbitrary strings, shaders, resources, user data or invented per-stage compiler counters. Limits are16quality passes,304rows and256KiB. Cumulative qualities.stageCount plus each stage.passQuality determines passIndex, including repeated Medium. Missing/invalid/partial/truncated layouts have explicit flags and null indices. Own data descriptors only; getters are not invoked. preparationStages is optional in legacy envelopes, accepted only on startup under the unchanged2MiB receipt cap.
++
++The two source14 recordings lost their original stage records to the existing recorder cap. This version cannot recover those missing values. A new immutable build and actual startup must supply future evidence; CPU tests are not GPU or performance acceptance.
++
++All36 original V16 files remain immutable. This new36file pack updates only observer/overlay/receipt, this README and copied tests. Copies retain behavioral/pin/order assertions, with explicit version-count/path corrections and exact normalization in historical test-byte guards. Old DOM bindings resolve today's imports; the buffer fixture supplies its missing query-error Observable; explicit post-ready shader-window behavior replaces an obsolete startup-window expectation while preserving original failure/inventory/restoration checks. Temp output is confined to this task. Public startup-stage-export evidence records the exact metadata changes, failures, guards and verification. The sections below document inherited historical capabilities; V10's no-stage projection description applies to V10, not this V17 extension.
++
+ # V13 accepted-entry original8 routine diagnostic
+ 
+ Separate button under existing --routine-cost installs one own Gltf.prepareFrame waiter. At accepted Actor false-to-true it restores the exact waiter descriptor before synchronously starting the original captureRoutineCost, then calls original prepare once. One arm-time30s deadline covers standby+8 frames including a post-done synchronous check. Original3scope and8routine modules/buttons are byte-exact; they are never generally layered. New optional scalar entryTrigger in existing routine-cost receipt records arm/deadline/trigger/install/terminal times and SceneID correlation; install time is not Scene start. Original routineProfile remains truthful even when its eight frames complete after the outer deadline. Invalid/refused/aborted/foreign/error attempts remain evidence. Coldness needs fresh Game/original session, and profiling includes observer/JIT overhead, not FPS/GPU execution. Existing lifecycle-controls behavior is unchanged. New entry-routine-helper evidence contains primary research, hashes, tests and handoff; root alone builds/runs actual capture.
+
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\buffer-lifecycle.test.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\buffer-lifecycle.test.mjs"
+index 10541947..55903ba8 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\buffer-lifecycle.test.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\buffer-lifecycle.test.mjs"
+@@ -5,6 +5,7 @@ import { Scene } from '@babylonjs/core/scene.js';
+ import { Mesh } from '@babylonjs/core/Meshes/mesh.js';
+ import { SubMesh } from '@babylonjs/core/Meshes/subMesh.js';
+ import { Matrix } from '@babylonjs/core/Maths/math.vector.js';
++import { Observable } from '@babylonjs/core/Misc/observable.js';
+ import { WebGPUEngine } from '@babylonjs/core/Engines/webgpuEngine.js';
+ import { WebGPUBufferManager } from '@babylonjs/core/Engines/WebGPU/webgpuBufferManager.js';
+ import { WebGPUDrawContext } from '@babylonjs/core/Engines/WebGPU/webgpuDrawContext.js';
+@@ -191,10 +192,15 @@ test('owner window eviction is explicit for a retained matrix target even after
+ test('actual Game onFault and RenderHealth uncaptured-error chain retain numeric target before its friendly handler argument',()=>{
+   const f=fixture(),events=[],nativeEvents=new EventTarget();let health,collector;try{
+     f.collector.dispose();f.game.canvas={dataset:{}};f.game.renderErrorCount=0;
++    // NullEngine has no native WebGPU query producer. This terminal-event
++    // fixture supplies that original observable rather than accepting a
++    // monitoring-unavailable setup fault before the error being tested.
++    f.engine.onQueryReadErrorObservable=new Observable();
+     Object.assign(f.device,{addEventListener:nativeEvents.addEventListener.bind(nativeEvents),removeEventListener:nativeEvents.removeEventListener.bind(nativeEvents),lost:new Promise(()=>{})});
+     nativeEvents.addEventListener('uncapturederror',()=>events.push('existing-before'));
+     const callback=createActualHealthCallback.call(f.game,{event(kind){assert.equal(kind,'render-fault');events.push('original-diagnostics');}});
+     f.game.renderHealth=health=new RenderHealth(f.engine,'game',callback);
++    assert.equal(health.snapshot().errorCount,0);assert.deepEqual(events,[]);
+     f.game.handleRendererFailure=function(message){assert.equal(this,f.game);assert.equal(message,'Vykreslování se zastavilo. Opusť demo a spusť scénu znovu.');events.push('original-friendly-handler');this.originalFailure=message;};
+     collector=observeBufferLifecycle(f.game,{enabled:true,onTerminal:trace=>{events.push('buffer-terminal');f.traces.push(trace);}});
+     nativeEvents.addEventListener('uncapturederror',()=>events.push('existing-after'));
+
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\entry-render-cost.test.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\entry-render-cost.test.mjs"
+index 0714322c..050f9518 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\entry-render-cost.test.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\entry-render-cost.test.mjs"
+@@ -166,9 +166,9 @@ test('actual QA entry button owns standby, original accepted transition, receipt
+  for(const cb of [...f.disposeCallbacks])cb();assert.equal(Object.hasOwn(f.scene,'render'),false);
+ });
+ test('v10 routine modules/original button are byte-exact and UI transform remains exact once',async()=>{
+- const old=join(root,'.cache/webgpu-completion-20261021/preparation-summary/helper/v10');for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,file)),await readFile(join(old,file)));
++ const old=join(root,'.cache/webgpu-completion-20261021/preparation-summary/helper/v10');for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from="../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz",to="../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}
+  const oldOverlay=await readFile(join(old,'qa-overlay.mjs'),'utf8'),overlay=await readFile(join(directory,'qa-overlay.mjs'),'utf8');const block=s=>s.slice(s.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),s.indexOf("  if (identity.clock?.config.benchmarkAtUTC"));assert.ok(overlay.includes(block(oldOverlay)));
+- const ui=await readFile(join(root,'client/ui.tsx')),before=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),before);assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);
++ const ui=await readFile(join(root,'client/ui.tsx')),before=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),before);assert.equal(Object.keys((await helperIdentity(directory)).files).length,36);
+ });
+ test('donor/pin selected8 method descriptors and all four original Mesh observer ordering assertions',async()=>{
+  const donor=gunzipSync(await readFile(join(root,'docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz')));assert.equal(sha256(donor),'ee3c3280de69ee61dcbf433dcf2a259d07a4efa80a711f822056da331168289f');
+
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\entry-routine-cost.test.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\entry-routine-cost.test.mjs"
+index a6f73dd2..11ef328d 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\entry-routine-cost.test.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\entry-routine-cost.test.mjs"
+@@ -76,9 +76,9 @@ test('optional entryTrigger is strict while old standard routine receipts remain
+  assert.throws(()=>validateReceipt({...raw,kind:'state',state:{},compilation:{}},identity));
+ });
+ test('old8/three-scope modules and both old button blocks remain exact; new34 inputs and UI parse sealed',async()=>{
+- const original=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v12');for(const f of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs','entry-render-cost.mjs','entry-render-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,f)),await readFile(join(original,f)));
++ const original=join(root,'.cache/webgpu-completion-20261021/entry-render/helper/v12');for(const f of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs','entry-render-cost.mjs','entry-render-cost.test.mjs']){let text=(await readFile(join(directory,f))).toString();const edits=f==='routine-cost.test.mjs'?[["../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz","../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz"]]:f==='entry-render-cost.test.mjs'?[["for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from=\"../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\",to=\"../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}","for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,file)),await readFile(join(old,file)));"],["assert.equal(Object.keys((await helperIdentity(directory)).files).length,36);","assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);"]]:[];for(const[from,to]of edits){assert.equal(text.split(from).length,2);text=text.replace(from,to);}assert.deepEqual(Buffer.from(text),await readFile(join(original,f)));}
+  const before=await readFile(join(original,'qa-overlay.mjs'),'utf8'),after=await readFile(join(directory,'qa-overlay.mjs'),'utf8'),from=before.indexOf("  if (identity.routineCost) action('Diagnostic ·8"),to=before.indexOf("  if (identity.clock?.config.benchmarkAtUTC");assert.ok(after.includes(before.slice(from,to)));
+- const ui=await readFile(join(root,'client/ui.tsx')),digest=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),digest);assert.equal(Object.keys((await helperIdentity(directory)).files).length,34);
++ const ui=await readFile(join(root,'client/ui.tsx')),digest=sha256(ui),transformed=transformUI(ui.toString());assert.equal(ts.createSourceFile('qa.tsx',transformed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);assert.equal(sha256(await readFile(join(root,'client/ui.tsx'))),digest);assert.equal(Object.keys((await helperIdentity(directory)).files).length,36);
+ });
+ test('actual new QA action gates startupACK then owns native-entry waiter/core receipt without clicking either old action',async()=>{
+  const f=fixture(),elements=[],requests=[],intervals=new Set();class Element{constructor(tag){this.tag=tag;this.style={};elements.push(this);}append(){}setAttribute(){}remove(){}}
+
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\helper.test.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\helper.test.mjs"
+index 00a8a45a..9ae215b2 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\helper.test.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\helper.test.mjs"
+@@ -11,7 +11,7 @@ import { authorizeReceiptRequest, validateReceipt, saveReceipt, MAX_RECEIPT_BYTE
+ 
+ const directory = dirname(fileURLToPath(import.meta.url));
+ const root = resolve(directory, '../../../../..');
+-const temporaryRoot = join(root, '.cache/webgpu-completion-lifecycle-controls-20261021');
++const temporaryRoot = join(root, '.cache/webgpu-completion-20261021/startup-stage-export/test-temp');
+ const identity = { buildId: 'test-build', sourceSnapshotId: 'test-source', helperSha256: 'test-helper', lifecycleControls: false };
+ const startup = () => ({ schemaVersion: 1, ...identity, attemptId: '8e9e7e15-6011-438d-96a2-53be43f17792', kind: 'startup', mode: 'plain',
+   atMs: 12, timeOrigin: 1000, observerErrors: [], samples: [], terminal: { ready: false }, outcome: 'rejected', error: { message: 'real failure fixture' } });
+@@ -198,6 +198,18 @@ async function browserFixture(run, transport = async bytes => ack(bytes), browse
+     const adapterURL = 'data:text/javascript;base64,' + Buffer.from(adapterSource).toString('base64');
+     const { FixtureSimulation, deferSimulationImport } = await import(adapterURL);
+     let source = await readFile(join(directory, 'qa-overlay.mjs'), 'utf8');
++    // A data: module has no package-resolution base. Bind the current native
++    // imports explicitly; the separate entry fixtures exercise actual Game
++    // methods, while these older DOM cases never invoke an entry action.
++    source = source.replace(/from '(@babylonjs\/core\/[^']+)'/g,
++      (_match, specifier) => 'from ' + JSON.stringify(import.meta.resolve(specifier)));
++    const entryClasses = `export {Scene} from ${JSON.stringify(import.meta.resolve('@babylonjs/core/scene.js'))};
++      export {GltfLightBudget} from ${JSON.stringify(pathToFileURL(join(root, 'client/gltf-light-budget.ts')).href)};
++      export {StableLightState} from ${JSON.stringify(pathToFileURL(join(root, 'client/stable-light-state.ts')).href)};
++      export class Game { constructor() { throw Error('Old DOM fixture does not construct an entry Game'); } }`;
++    source = source.replace("'virtual:webgpu-completion-entry-classes'", JSON.stringify('data:text/javascript;base64,' + Buffer.from(entryClasses).toString('base64')));
++    for (const [virtual, file] of [['pipeline-inputs', 'pipeline-input-window.mjs'], ['entry-render', 'entry-render-cost.mjs'], ['entry-routine', 'entry-routine-cost.mjs']])
++      source = source.replace("'virtual:webgpu-completion-" + virtual + "'", JSON.stringify(pathToFileURL(join(directory, file)).href));
+     source = source.replace("'virtual:webgpu-completion-observer'", JSON.stringify(pathToFileURL(join(directory, 'startup-observer.mjs')).href));
+     source = source.replace("'virtual:webgpu-completion-attempts'", JSON.stringify(pathToFileURL(join(directory, 'attempt-queue.mjs')).href));
+     source = source.replace("'virtual:webgpu-completion-browser-clock'", JSON.stringify(adapterURL));
+@@ -520,7 +532,7 @@ test('clock import deferred across dispose/rejoin cannot install a late Game own
+   }
+ });
+ 
+-test('shader attribution overlay stays diagnostic, restores original methods and retains scalar inventory before the original failure',()=>browserFixture(async context=>{
++test('shader attribution startup stays diagnostic without hooks and retains scalar inventory before the original failure',()=>browserFixture(async context=>{
+   const game=context.makeGame(),device={};game.engine._isWebGPU=true;game.engine._device=device;game.engine._compiledEffects={};
+   const inventory={enabled:true,calls:2,stages:[{name:'submitted-frame',calls:2}],rawDuplicates:[],bodyDuplicates:[],unusedDefines:{names:['never export']}};
+   const profile={engine:game.engine,device,active:true,generation:1,metrics:{shaderValidation:{}},
+@@ -530,12 +542,32 @@ test('shader attribution overlay stays diagnostic, restores original methods and
+   game.compilationProfile=profile;
+   const inspect=profile.inspectShader,observe=profile.observe,stage=profile.setStage,primary=new Error('same failed startup');
+   await assert.rejects(context.observeStartup(game,{dataset:{}},async()=>{
++    assert.equal(profile.inspectShader,inspect);assert.equal(profile.observe,observe);assert.equal(profile.setStage,stage);
+     profile.setStage('submitted-frame');const operation=profile.inspectShader({},'vertex');assert.equal(operation instanceof Promise,true);
+     await operation;throw primary;
+   }),error=>error===primary);
+   await until(()=>context.posted.length===1);
+   const raw=context.posted[0];assert.equal(raw.mode,'diagnostic');assert.equal(raw.outcome,'rejected');
+-  assert.equal(raw.shaderAttribution.active,false);assert.equal(raw.shaderAttribution.jobs[0][7],1);
++  assert.equal(raw.shaderAttribution,null,'V8+ installs only the explicit post-ready window');
+   assert.equal(raw.compilation.shaderInventory.calls,2);assert.doesNotMatch(JSON.stringify(raw.compilation.shaderInventory),/never export|unusedDefines/);
+   assert.equal(profile.inspectShader,inspect);assert.equal(profile.observe,observe);assert.equal(profile.setStage,stage);
+ },async value=>ack(value),{...identity,shaderAttribution:true}));
++
++test('explicit post-ready shader UI window captures the original job and restores before immutable receipt',()=>browserFixture(async context=>{
++  const game=context.makeGame(),device={};game.engine._isWebGPU=true;game.engine._device=device;game.engine._compiledEffects={};
++  const profile={engine:game.engine,device,active:true,generation:1,metrics:{shaderValidation:{}},
++    setStage(){},observe(operation){return operation;},
++    inspectShader(module,label){return this.observe(Promise.resolve({messages:[]}), 'shaderValidation',this.metrics.shaderValidation,1,performance.now(),label);},
++    snapshot:()=>({active:true,metrics:{}})};
++  game.compilationProfile=profile;const inspect=profile.inspectShader,observe=profile.observe,stage=profile.setStage;
++  await context.observeStartup(game,{dataset:{}},async()=>{game.ready=true;});
++  await until(()=>context.measureButton().disabled===false);
++  await context.all().find(value=>value.textContent==='Diagnostic · začít30s shader okno').onclick();
++  assert.notEqual(profile.inspectShader,inspect);profile.setStage('submitted-frame');
++  const operation=profile.inspectShader({},'vertex');assert.ok(operation instanceof Promise);await operation;
++  await context.all().find(value=>value.textContent==='Diagnostic · uzavřít shader okno').onclick();
++  await until(()=>context.posted.some(raw=>raw.shaderWindow));
++  const raw=context.posted.find(raw=>raw.shaderWindow);assert.equal(raw.mode,'diagnostic');
++  assert.equal(raw.shaderWindow.shaderAttribution.active,false);assert.equal(raw.shaderWindow.shaderAttribution.jobs[0][7],1);
++  assert.equal(profile.inspectShader,inspect);assert.equal(profile.observe,observe);assert.equal(profile.setStage,stage);
++},async value=>ack(value),{...identity,shaderAttribution:true}));
+
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\preparation-summary.test.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\preparation-summary.test.mjs"
+index 55df6d90..7e8b085e 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\preparation-summary.test.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\preparation-summary.test.mjs"
+@@ -5,7 +5,8 @@ import { readFile } from 'node:fs/promises';
+ import { dirname, resolve, join } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+ import { webcrypto } from 'node:crypto';
+-import { observeOperation, observePreparationResult, projectPreparationSummary } from './startup-observer.mjs';
++import { observeOperation, observePreparationResult, projectPreparationSummary, projectPreparationStages, validatePreparationStages, STAGE_LIMITS } from './startup-observer.mjs';
++import {validateReceipt,MAX_RECEIPT_BYTES} from './receipt.mjs';
+ import { createAttemptQueue } from './attempt-queue.mjs';
+ import { installBrowserClock } from './browser-clock.mjs';
+ import { createPlannedBenchmark } from './transit-clock.mjs';
+@@ -21,6 +22,11 @@ const row = (quality = 'medium', finalPass = false) => ({ quality, finalPass, st
+   activeElapsedMs: 11.5, pausedMs: .75, failureStep: null, stageCount: 19 });
+ const result = () => ({ status: 'complete', elapsedMs: 12345.625, activeElapsedMs: 12000.5, pausedMs: 345.125,
+   failureStep: null, stages: new Array(76), qualities: [row('low'), row(), row('high'), row('medium', true)] });
++const stageNames=['vehicle-0','vehicle-1','vehicle-2','vehicle-keyed-0','vehicle-keyed-1','vehicle-keyed-2','current-off','current-on','night-0-off','night-0-on','night-1-off','night-1-on','night-2-off','night-2-on','day-0-off','day-0-on','day-1-off','day-1-on','restore'];
++const stageRow=(quality='medium',stage='restore')=>({passQuality:quality,stage,elapsedMs:12.5,activeElapsedMs:11.25,pausedMs:1.25,
++  tickCount:3,checks:512,renders:3,restarts:1,cpu:{apply:{calls:1,totalMs:.75,maxMs:.75},checkBatch:{calls:2,totalMs:3.5,maxMs:2.25},render:{calls:3,totalMs:5.25,maxMs:2}},
++  rafGap:{count:3,totalMs:14.5,maxMs:6.25},restartReasons:{materials:1}});
++const stageResult=()=>({...result(),stages:['low','medium','high','medium'].flatMap(q=>stageNames.map(s=>stageRow(q,s)))});
+ function fixture(original) {
+   let current = true;
+   const errors = [], signal = new AbortController(), startupAbort = new AbortController();
+@@ -33,6 +39,72 @@ function fixture(original) {
+     install: () => observePreparationResult(game, options) };
+ }
+ 
++test('stage export preserves76 numeric rows, repeated Medium pass identity and partial failure',()=>{
++  const input=stageResult(),p=projectPreparationStages(input);validatePreparationStages(p);
++  assert.equal(p.capturedCount,76);assert.equal(p.stageCount,76);assert.equal(p.mapping.valid,true);assert.equal(p.valid,true);
++  assert.deepEqual(p.rows.filter(r=>r.stage==='restore').map(r=>[r.passIndex,r.passQuality]),[[0,'low'],[1,'medium'],[2,'high'],[3,'medium']]);
++  assert.equal(p.rows[0].cpu.checkBatch.totalMs,3.5);assert.equal(p.rows[0].rafGap.totalMs,14.5);assert.deepEqual(p.rows[0].restartReasons,{materials:1});
++  input.stages[0].cpu.apply.totalMs=999;assert.equal(p.rows[0].cpu.apply.totalMs,.75,'only copied scalar data survives');
++  const partial=stageResult();partial.status='timeout';partial.failureStep='effects';partial.stages=partial.stages.slice(0,26);partial.qualities=[row('low'),{...row('medium'),stageCount:7,status:'timeout'}];
++  const failed=projectPreparationStages(partial);validatePreparationStages(failed);assert.equal(failed.status,'timeout');assert.equal(failed.failureStep,'effects');assert.equal(failed.mapping.valid,true);assert.equal(failed.rows[25].passIndex,1);
++  const basic={...partial,stages:[stageRow()]};delete basic.qualities;delete basic.stages[0].passQuality;
++  const unassigned=projectPreparationStages(basic);validatePreparationStages(unassigned);assert.equal(unassigned.mapping.reason,'qualities-unavailable');assert.equal(unassigned.rows[0].passIndex,null);
++});
++
++test('stage export bounds304rows16passes and256KiB without walking overflow or arbitrary reason keys',()=>{
++  const input=stageResult();input.qualities=Array.from({length:16},()=>row('medium'));input.stages=Array.from({length:304},()=>stageRow());
++  const full=projectPreparationStages(input);validatePreparationStages(full);assert.equal(full.capturedCount,304);assert.equal(full.mapping.valid,true);
++  input.stages.length=4294967295;Object.defineProperty(input.stages,'304',{get(){assert.fail('overflow stage getter');}});
++  const sparse=projectPreparationStages(input);validatePreparationStages(sparse);assert.equal(sparse.capturedCount,304);assert.equal(sparse.stageCount,4294967295);assert.equal(sparse.truncated,true);
++  input.qualities=new Array(4294967295);for(let i=0;i<16;i++)input.qualities[i]=row();Object.defineProperty(input.qualities,'16',{get(){assert.fail('overflow quality getter');}});
++  assert.equal(projectPreparationStages(input).mapping.reason,'pass-limit');
++  const huge=stageResult();huge.qualities=Array.from({length:16},()=>row());
++  const keys=['quality','timeOverride','profile','weather','meshes','materials','car','parkedCar','carDisposed','parkedCarDisposed','vegetation','grassResources','startupView','presentationCoverage','revision-length'];
++  huge.stages=Array.from({length:304},()=>{const r=stageRow();for(const k of ['elapsedMs','activeElapsedMs','pausedMs'])r[k]=Number.MAX_VALUE;
++    for(const t of Object.values(r.cpu)){t.calls=Number.MAX_SAFE_INTEGER;t.totalMs=t.maxMs=Number.MAX_VALUE;}r.rafGap={count:Number.MAX_SAFE_INTEGER,totalMs:Number.MAX_VALUE,maxMs:Number.MAX_VALUE};
++    r.restartReasons=Object.fromEntries(keys.map(k=>[k,Number.MAX_SAFE_INTEGER]));return r;});
++  const limited=projectPreparationStages(huge);validatePreparationStages(limited);assert.equal(limited.byteLimited,true);assert.equal(limited.truncated,true);assert.ok(limited.capturedCount<304);assert.ok(Buffer.byteLength(JSON.stringify(limited))<=STAGE_LIMITS.bytes);
++});
++
++test('stage export own getter, sparse, proxy and nonfinite failures stay explicit with closed output',()=>{
++  const input=stageResult();let reads=0;
++  Object.defineProperty(input.stages[0].cpu,'apply',{get(){reads++;throw Error('getter');}});
++  Object.defineProperty(input.stages[1].restartReasons,'weather',{get(){reads++;throw Error('reason getter');}});
++  input.stages[2].elapsedMs=Infinity;delete input.stages[3];
++  input.stages[4].restartReasons=new Proxy({materials:2,secret:'not exported'},{ownKeys(){throw Error('must not enumerate raw reasons');}});
++  const p=projectPreparationStages(input);validatePreparationStages(p);assert.equal(reads,0);assert.equal(p.valid,false);assert.ok(p.invalidFields>0);assert.equal(p.rows[0].cpu.apply.totalMs,null);assert.equal(p.rows[2].elapsedMs,null);assert.equal('secret' in p.rows[4].restartReasons,false);
++  const revoked=Proxy.revocable({},{});revoked.revoke();assert.equal(projectPreparationStages(revoked.proxy).available,false);
++});
++
++test('stage receipt rejects invented mapping/fields/kinds/getters and accepts actual startup envelope headroom',async()=>{
++  const p=projectPreparationStages(stageResult());
++  const bads=[x=>x.rows[0].passIndex=3,x=>x.mapping.stageCounts[0]=18,x=>x.mapping.valid=false,x=>x.rows[0].hidden='raw',x=>x.rows[0].elapsedMs=-1,x=>x.capturedCount=75,x=>x.rows[0].elapsedMs=null];
++  for(const alter of bads){const x=structuredClone(p);alter(x);assert.throws(()=>validatePreparationStages(x));}
++  let reads=0;const getter=structuredClone(p);Object.defineProperty(getter.rows[0],'elapsedMs',{get(){reads++;return 1;}});assert.throws(()=>validatePreparationStages(getter));assert.equal(reads,0);
++  for(const name of ['99c27c5a-5070-4254-b26b-36ba81aaf3bf','02e3300d-bad7-46bf-b55f-14be21b385f5']){
++    const raw=JSON.parse(await readFile(join(root,'docs/performance/evidence/webgpu-completion-20261021/validation/receiver-source14-v16/receipts/'+name+'.json'),'utf8'));
++    const extended={...raw,preparationStages:p};validateReceipt(raw,raw);validateReceipt(extended,raw);assert.ok(Buffer.byteLength(JSON.stringify(extended))<MAX_RECEIPT_BYTES);
++    assert.throws(()=>validateReceipt({...extended,kind:'state',state:{},compilation:{}},raw),/kind mismatch/);
++  }
++});
++
++test('stagesSnapshot shares the original observer reaction, preserves Promise identity and scalar evidence after dispose',async()=>{
++  const pending=Promise.withResolvers(),input=stageResult(),f=fixture(function(...args){assert.equal(this,f.game);assert.deepEqual(args,[1,2]);return pending.promise;}),owner=f.install();
++  const actual=f.game.prepareLighting(1,2);assert.equal(actual,pending.promise);pending.resolve(input);assert.equal(await actual,input);await flush();
++  const data=owner.stagesSnapshot();validatePreparationStages(data);assert.equal(data.capturedCount,76);owner.dispose();assert.equal(owner.stagesSnapshot(),data);
++  const source=await readFile(join(directory,'startup-observer.mjs'),'utf8');assert.equal(source.match(/Reflect\.apply\(NATIVE_THEN, result/g)?.length,1,'the same single native side reaction observes both projections');
++  const late=Promise.withResolvers(),g=fixture(()=>late.promise),retired=g.install();const original=g.game.prepareLighting(),lateResult=stageResult();retired.dispose();late.resolve(lateResult);assert.equal(await original,lateResult);await flush();assert.equal(retired.stagesSnapshot().available,false);
++  const h=fixture(()=>Promise.resolve(new Proxy(stageResult(),{getOwnPropertyDescriptor(target,key){if(key==='stages')h.retire();return Reflect.getOwnPropertyDescriptor(target,key);}}))),stale=h.install();await h.game.prepareLighting();await flush();assert.equal(stale.stagesSnapshot().available,false);assert.equal(stale.snapshot().available,false);
++});
++
++test('actual overlay exports stage projection once at terminal before teardown, never into startup samples',async()=>{
++  const f=await overlayFixture(),g=overlayGame(f);const operation=f.observeStartup(g.game,g.canvas,async()=>{await g.game.prepareLighting();return 42;});
++  await flush();g.pending.resolve(stageResult());assert.equal(await operation,42);await flush();const raw=f.raw();
++  validatePreparationStages(raw.preparationStages);assert.equal(raw.preparationStages.capturedCount,76);assert.equal(raw.preparationStages.mapping.valid,true);
++  assert.ok(f.events.indexOf('terminal-raw')>=0);assert.equal(g.game.prepareLighting,g.original);for(const sample of raw.samples)assert.equal('preparationStages' in sample,false);
++  for(const callback of [...g.callbacks])callback();
++});
++
+ test('76 original stages produce truthful scalar summary without reading even one stage or shader/resource getter', () => {
+   const input = result(); let reads = 0;
+   for (let index = 0; index < 76; index++) Object.defineProperty(input.stages, index, { get() { reads++; throw Error('stage read'); } });
+@@ -302,6 +374,6 @@ test('actual source UI exact once transform parses and preserves original bytes;
+   assert.equal(transformed.split('await observeStartup(g, startupCanvas, () => g.start());').length, 2);
+   assert.equal(ts.createSourceFile('qa-ui.tsx', transformed, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX).parseDiagnostics.length, 0);
+   assert.equal(sha256(await readFile(path)), before); assert.throws(() => transformUI(transformed));
+-  const identity = await helperIdentity(directory); assert.equal(Object.keys(identity.files).length, 30);
++  const identity = await helperIdentity(directory); assert.equal(Object.keys(identity.files).length, 36);
+   assert.equal(identity.files['preparation-summary.test.mjs'], sha256(await readFile(fileURLToPath(import.meta.url))));
+ });
+
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\qa-overlay.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\qa-overlay.mjs"
+index 0fd832a8..32d46b25 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\qa-overlay.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\qa-overlay.mjs"
+@@ -479,7 +479,8 @@ export async function observeStartup(game, canvas, start) {
+         samples, sampleOverflow, terminal, compilation: compilationSnapshot(game),
+         startupLatency: latencyOwner?.snapshot() ?? null, shaderAttribution: null,
+         preparationSummary: preparationOwner?.snapshot() ?? { available: false, reason: 'not-installed' },
+-        scope: '1Hz technical startup observer only; stopped before gameplay measurement. Existing production compilation/health hooks unchanged.' };
++        preparationStages: preparationOwner?.stagesSnapshot() ?? { schemaVersion:1, available:false, reason:'not-installed' },
++        scope: '1Hz technical startup samples plus one bounded result-only preparation projection; stopped before gameplay measurement. Existing production compilation/health hooks unchanged.' };
+       startupResolved = outcome === 'resolved';
+       if (startupResolved && terminal.ready) readyAtUTC = Date.now();
+       void persist(raw);
+
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\receipt.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\receipt.mjs"
+index bc5706cd..803b9d8f 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\receipt.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\receipt.mjs"
+@@ -7,6 +7,7 @@ import { validateRoutineProfile } from './routine-cost-core.mjs';
+ import { validateEntryRenderProfile } from './entry-render-cost.mjs';
+ import { validateEntryTrigger } from './entry-routine-cost.mjs';
+ import { validateBufferTrace } from './buffer-lifecycle-core.mjs';
++import { validatePreparationStages } from './startup-observer.mjs';
+ 
+ export const MAX_RECEIPT_BYTES = 2 * 1024 * 1024;
+ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+@@ -19,6 +20,10 @@ export function validateReceipt(value, identity) {
+       (identity.lifecycleControls && value.mode !== 'diagnostic')) throw new Error('Receipt lifecycle-controls identity mismatch');
+   if (value.pipelineInputs !== undefined && value.kind !== 'pipeline-inputs') throw new Error('Pipeline inputs kind mismatch');
+   if (value.entryTrigger !== undefined && value.kind !== 'routine-cost') throw new Error('Entry trigger kind mismatch');
++  if (value.preparationStages !== undefined) {
++    if(value.kind!=='startup')throw new Error('Preparation stages kind mismatch');
++    validatePreparationStages(value.preparationStages);
++  }
+   if (value.lifecycleControl !== undefined) {
+     const control = value.lifecycleControl;
+     if (!identity.lifecycleControls || value.kind !== 'state' || !control ||
+
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\routine-cost.test.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\routine-cost.test.mjs"
+index e935efb1..245c383f 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\routine-cost.test.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\routine-cost.test.mjs"
+@@ -33,7 +33,7 @@ const selected = (profile, id, phase) => profile.frames.flatMap(frame => frame.r
+ const calls = rows => rows.reduce((sum, row) => sum + row.calls, 0);
+ 
+ test('donor source identity, pin9.30 own methods and precise readiness observer order', async () => {
+-  const donor = gunzipSync(await readFile(new URL('../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz', import.meta.url)));
++  const donor = gunzipSync(await readFile(new URL('../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz', import.meta.url)));
+   assert.equal(sha256(donor), 'ee3c3280de69ee61dcbf433dcf2a259d07a4efa80a711f822056da331168289f');
+   const pin = JSON.parse(await readFile(new URL('../../../../../node_modules/@babylonjs/core/package.json', import.meta.url)));
+   assert.equal(pin.version, '9.30.0');
+
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\startup-observer.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\startup-observer.mjs"
+index 22d893af..b1b8a48e 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\startup-observer.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\startup-observer.mjs"
+@@ -36,6 +36,148 @@ function arrayLength(value) {
+   } catch { return null; }
+ }
+ const unavailable = reason => ({ available: false, reason });
++export const STAGE_LIMITS = Object.freeze({ passes: 16, rows: 304, bytes: 256 * 1024 });
++const INVALID = Symbol('invalid own data');
++const STAGE_NAMES = ['vehicle-0','vehicle-1','vehicle-2','vehicle-keyed-0','vehicle-keyed-1','vehicle-keyed-2',
++  'current-off','current-on','night-0-off','night-0-on','night-1-off','night-1-on','night-2-off','night-2-on',
++  'day-0-off','day-0-on','day-1-off','day-1-on','restore'];
++const QUALITY_NAMES = ['low','medium','high'];
++const RESTART_NAMES = ['quality','timeOverride','profile','weather','meshes','materials','car','parkedCar','carDisposed',
++  'parkedCarDisposed','vegetation','grassResources','startupView','presentationCoverage','revision-length'];
++const STAGE_REASONS = ['no-result','stages-unavailable','not-observed','original-rejected','not-installed','projection-error',
++  'owner-identity-unavailable','missing-method','unsupported-promise','non-native-promise','observer-unavailable'];
++const MAP_REASONS = ['valid','qualities-unavailable','invalid-quality-layout','pass-limit','stage-total-mismatch','pass-quality-mismatch','truncated'];
++const finiteTime = x => typeof x === 'number' && Number.isFinite(x) && x >= 0;
++const finiteCount = x => Number.isSafeInteger(x) && x >= 0;
++const stageUnavailable = reason => ({ schemaVersion: 1, available: false, reason });
++function stageData(object, key) {
++  try {
++    const d = object != null && Object.getOwnPropertyDescriptor(object, key);
++    return !d ? MISSING : Object.hasOwn(d, 'value') ? d.value : INVALID;
++  } catch { return INVALID; }
++}
++function mappingReason(mapping, stageCount, rows, truncated) {
++  if (mapping.passCount === null) return mapping.reason === 'qualities-unavailable' ? 'qualities-unavailable' : 'invalid-quality-layout';
++  if (mapping.passCount > STAGE_LIMITS.passes) return 'pass-limit';
++  if (mapping.qualities.length !== mapping.passCount || mapping.stageCounts.length !== mapping.passCount ||
++      mapping.qualities.some(x => !QUALITY_NAMES.includes(x)) || mapping.stageCounts.some(x => !finiteCount(x) || x > 19)) return 'invalid-quality-layout';
++  if (mapping.stageCounts.reduce((a,b)=>a+b,0) !== stageCount) return 'stage-total-mismatch';
++  let pass = 0, end = mapping.stageCounts[0] ?? 0;
++  for (const row of rows) {
++    while (pass < mapping.passCount && row.index >= end) end += mapping.stageCounts[++pass] ?? 0;
++    if (row.passQuality !== mapping.qualities[pass]) return 'pass-quality-mismatch';
++  }
++  return truncated ? 'truncated' : 'valid';
++}
++
++/** One bounded copy of existing result scalars. No raw object enumeration,
++ * getter, shader/resource string, readiness call or original result reference. */
++export function projectPreparationStages(value) {
++  if (value == null || (typeof value !== 'object' && typeof value !== 'function')) return stageUnavailable('no-result');
++  const stages = stageData(value, 'stages'), stageCount = arrayLength(stages);
++  if (stageCount === null) return stageUnavailable('stages-unavailable');
++  let invalidFields = 0;
++  const scalar = (object,key,valid) => { const x = stageData(object,key); if (valid(x)) return x; invalidFields++; return null; };
++  const status = scalar(value,'status',x=>STATUSES.includes(x));
++  const failureStep = scalar(value,'failureStep',x=>x===null||FAILURE_STEPS.includes(x));
++  const rawQualities = stageData(value,'qualities'), passCount = arrayLength(rawQualities);
++  const mapping = { valid: false, reason: rawQualities === MISSING ? 'qualities-unavailable' : 'invalid-quality-layout',
++    passCount, qualities: [], stageCounts: [] };
++  if (rawQualities !== MISSING && passCount === null) invalidFields++;
++  for (let i=0;i<Math.min(passCount ?? 0,STAGE_LIMITS.passes);i++) {
++    const q=stageData(rawQualities,String(i));
++    mapping.qualities.push(scalar(q,'quality',x=>QUALITY_NAMES.includes(x)));
++    mapping.stageCounts.push(scalar(q,'stageCount',x=>finiteCount(x)&&x<=19));
++  }
++  const out = { schemaVersion:1, available:true, status, failureStep, stageCount, capturedCount:0, truncated:false,
++    byteLimited:false, valid:false, invalidFields:0, restartReasonsScope:'game-revision-whitelist', mapping, rows:[] };
++  // Reserve a fixed header allowance. All exported text is closed ASCII and
++  // the at-most16-pass header is under4096 bytes, including final flags.
++  let bytes=4096;
++  for(let i=0;i<Math.min(stageCount,STAGE_LIMITS.rows);i++) {
++    const before=invalidFields, input=stageData(stages,String(i));
++    const passQuality=stageData(input,'passQuality');
++    const quality = passQuality === MISSING && rawQualities === MISSING ? null : scalar(input,'passQuality',x=>QUALITY_NAMES.includes(x));
++    const row={index:i,passIndex:null,passQuality:quality,stage:scalar(input,'stage',x=>STAGE_NAMES.includes(x))};
++    for(const key of ['elapsedMs','activeElapsedMs','pausedMs']) row[key]=scalar(input,key,finiteTime);
++    for(const key of ['tickCount','checks','renders','restarts']) row[key]=scalar(input,key,finiteCount);
++    row.cpu={}; const cpu=stageData(input,'cpu');
++    for(const key of ['apply','checkBatch','render']) {
++      const source=stageData(cpu,key);
++      row.cpu[key]={calls:scalar(source,'calls',finiteCount),totalMs:scalar(source,'totalMs',finiteTime),maxMs:scalar(source,'maxMs',finiteTime)};
++    }
++    const gap=stageData(input,'rafGap');
++    row.rafGap={count:scalar(gap,'count',finiteCount),totalMs:scalar(gap,'totalMs',finiteTime),maxMs:scalar(gap,'maxMs',finiteTime)};
++    row.restartReasons={}; const reasons=stageData(input,'restartReasons');
++    if(!reasons || typeof reasons!=='object' || reasons===INVALID) invalidFields++;
++    else for(const key of RESTART_NAMES) {
++      const count=stageData(reasons,key);
++      if(count===MISSING)continue;
++      if(finiteCount(count)) row.restartReasons[key]=count;
++      else {row.restartReasons[key]=null;invalidFields++;}
++    }
++    row.invalidFields=invalidFields-before;row.valid=row.invalidFields===0;
++    const length=JSON.stringify(row).length+1;
++    if(bytes+length>STAGE_LIMITS.bytes){invalidFields=before;out.byteLimited=true;break;}
++    bytes+=length;out.rows.push(row);
++  }
++  out.capturedCount=out.rows.length;out.truncated=out.capturedCount<stageCount;
++  mapping.reason=mappingReason(mapping,stageCount,out.rows,out.truncated);mapping.valid=mapping.reason==='valid';
++  if(mapping.valid){let pass=0,end=mapping.stageCounts[0]??0;for(const row of out.rows){while(row.index>=end)end+=mapping.stageCounts[++pass]??0;row.passIndex=pass;}}
++  out.invalidFields=invalidFields;out.valid=invalidFields===0;
++  return out;
++}
++
++// Transport validation reads descriptors into a closed scalar copy before any
++// serialization. A hostile getter/toJSON cannot execute as validation work.
++function closedData(value,keys) {
++  if(!value||typeof value!=='object'||Array.isArray(value))throw Error('Stage object missing');
++  const names=Reflect.ownKeys(value);
++  if(names.length!==keys.length||names.some(k=>typeof k!=='string'||!keys.includes(k)))throw Error('Stage object fields');
++  const copy={};for(const key of keys){const x=stageData(value,key);if(x===MISSING||x===INVALID)throw Error('Stage own data missing');copy[key]=x;}return copy;
++}
++function closedArray(value,max) {
++  const n=arrayLength(value);if(n===null||n>max)throw Error('Stage array bounds');
++  const keys=Reflect.ownKeys(value);if(keys.length!==n+1||keys.some(k=>k!=='length'&&(!/^(0|[1-9][0-9]*)$/.test(String(k))||Number(k)>=n)))throw Error('Stage array fields');
++  const rows=[];for(let i=0;i<n;i++){const x=stageData(value,String(i));if(x===MISSING||x===INVALID)throw Error('Stage sparse/getter array');rows.push(x);}return rows;
++}
++export function validatePreparationStages(value) {
++  if(stageData(value,'available')===false){const p=closedData(value,['schemaVersion','available','reason']);if(p.schemaVersion!==1||!STAGE_REASONS.includes(p.reason))throw Error('Stage unavailable schema');return value;}
++  const p=closedData(value,['schemaVersion','available','status','failureStep','stageCount','capturedCount','truncated','byteLimited','valid','invalidFields','restartReasonsScope','mapping','rows']);
++  if(p.schemaVersion!==1||p.available!==true||!finiteCount(p.stageCount)||!finiteCount(p.capturedCount)||p.capturedCount>STAGE_LIMITS.rows||
++      p.restartReasonsScope!=='game-revision-whitelist'||typeof p.truncated!=='boolean'||typeof p.byteLimited!=='boolean'||
++      !finiteCount(p.invalidFields)||p.valid!==(p.invalidFields===0)||!(p.status===null||STATUSES.includes(p.status))||
++      !(p.failureStep===null||FAILURE_STEPS.includes(p.failureStep))||(p.status===null&&p.invalidFields===0))throw Error('Stage scalar schema');
++  const m=closedData(p.mapping,['valid','reason','passCount','qualities','stageCounts']);
++  if(typeof m.valid!=='boolean'||!MAP_REASONS.includes(m.reason)||!(m.passCount===null||finiteCount(m.passCount)))throw Error('Stage mapping schema');
++  m.qualities=closedArray(m.qualities,STAGE_LIMITS.passes);m.stageCounts=closedArray(m.stageCounts,STAGE_LIMITS.passes);
++  if(m.qualities.length!==Math.min(m.passCount??0,16)||m.stageCounts.length!==m.qualities.length||
++      m.qualities.some(x=>x!==null&&!QUALITY_NAMES.includes(x))||m.stageCounts.some(x=>x!==null&&(!finiteCount(x)||x>19)))throw Error('Stage mapping bounds');
++  p.rows=closedArray(p.rows,STAGE_LIMITS.rows).map((raw,index)=>{
++    const r=closedData(raw,['index','passIndex','passQuality','stage','elapsedMs','activeElapsedMs','pausedMs','tickCount','checks','renders','restarts','cpu','rafGap','restartReasons','invalidFields','valid']);
++    if(r.index!==index||!(r.passIndex===null||finiteCount(r.passIndex))||!(r.passQuality===null||QUALITY_NAMES.includes(r.passQuality))||!(r.stage===null||STAGE_NAMES.includes(r.stage))||
++        !finiteCount(r.invalidFields)||r.valid!==(r.invalidFields===0))throw Error('Stage row schema');
++    let invalid=0;const numeric=(x,valid)=>{if(x===null){invalid++;return;}if(!valid(x))throw Error('Stage numeric scalar');};
++    for(const k of ['elapsedMs','activeElapsedMs','pausedMs'])numeric(r[k],finiteTime);
++    for(const k of ['tickCount','checks','renders','restarts'])numeric(r[k],finiteCount);
++    if(r.stage===null)invalid++;
++    if(r.passQuality===null&&m.reason!=='qualities-unavailable')invalid++;
++    r.cpu=closedData(r.cpu,['apply','checkBatch','render']);
++    for(const k of ['apply','checkBatch','render']){const t=closedData(r.cpu[k],['calls','totalMs','maxMs']);numeric(t.calls,finiteCount);numeric(t.totalMs,finiteTime);numeric(t.maxMs,finiteTime);r.cpu[k]=t;}
++    r.rafGap=closedData(r.rafGap,['count','totalMs','maxMs']);numeric(r.rafGap.count,finiteCount);numeric(r.rafGap.totalMs,finiteTime);numeric(r.rafGap.maxMs,finiteTime);
++    const keys=Reflect.ownKeys(r.restartReasons??{});if(keys.length>15||keys.some(k=>!RESTART_NAMES.includes(k)))throw Error('Stage restart whitelist');
++    r.restartReasons=closedData(r.restartReasons,keys);for(const x of Object.values(r.restartReasons))numeric(x,finiteCount);
++    if(r.invalidFields<invalid)throw Error('Stage invalidity concealed');return r;
++  });
++  if(p.capturedCount!==p.rows.length||p.capturedCount>p.stageCount||p.truncated!==(p.capturedCount<p.stageCount)||
++      (p.capturedCount<Math.min(p.stageCount,304)&&!p.byteLimited)||(p.byteLimited&&!p.truncated)||
++      p.invalidFields<p.rows.reduce((n,r)=>n+r.invalidFields,0)+(p.status===null?1:0)+
++        (m.passCount===null&&m.reason!=='qualities-unavailable'?1:0)+m.qualities.filter(x=>x===null).length+m.stageCounts.filter(x=>x===null).length)throw Error('Stage capture flags');
++  const reason=mappingReason(m,p.stageCount,p.rows,p.truncated);if(m.reason!==reason||m.valid!==(reason==='valid'))throw Error('Stage mapping validity');
++  let pass=0,end=m.stageCounts[0]??0;
++  for(const r of p.rows){if(m.valid){while(r.index>=end)end+=m.stageCounts[++pass]??0;if(r.passIndex!==pass)throw Error('Stage pass index');}else if(r.passIndex!==null)throw Error('Invented stage pass index');}
++  p.mapping=m;if(JSON.stringify(p).length>STAGE_LIMITS.bytes)throw Error('Stage JSON byte cap');return value;
++}
+ 
+ /** Copies at most16 quality rows using only own data descriptors. Stage entries
+  * are never read. Missing/invalid data stays null with explicit invalidity. */
+@@ -87,7 +229,7 @@ export function projectPreparationSummary(value) {
+  * Cleanup drops owner refs and restores only our own instance descriptor. */
+ export function observePreparationResult(game, { signal, startupSignal, isCurrent, onObserverError } = {}) {
+   const state = { game, signals: [signal, startupSignal].filter(Boolean), isCurrent, onObserverError, active: true,
+-    summary: unavailable('not-observed'), restore: null, abort: null,
++    summary: unavailable('not-observed'), stages: stageUnavailable('not-observed'), restore: null, abort: null,
+     health: ownData(game, 'renderHealth'), scene: ownData(game, 'scene'), engine: ownData(game, 'engine'),
+     startupAbort: ownData(game, 'startupAbort'), wrapper: null };
+   const generation = ownData(state.health, 'generation'), rendererId = ownData(state.health, 'rendererId');
+@@ -118,17 +260,22 @@ export function observePreparationResult(game, { signal, startupSignal, isCurren
+       return true;
+     } catch (error) { report(error); dispose(); return false; }
+   };
++  const fail = reason => { state.summary=unavailable(reason);state.stages=stageUnavailable(reason); };
+   const fulfilled = value => {
+     if (!current(state.game)) return;
+-    try { state.summary = projectPreparationSummary(value); }
+-    catch (error) { state.summary = unavailable('projection-error'); report(error); }
++    let summary,stages;
++    try { summary=projectPreparationSummary(value); }
++    catch(error){summary=unavailable('projection-error');report(error);}
++    try { stages=projectPreparationStages(value); }
++    catch(error){stages=stageUnavailable('projection-error');report(error);}
++    if(current(state.game)){state.summary=summary;state.stages=stages;}
+   };
+-  const rejected = () => { if (current(state.game)) state.summary = unavailable('original-rejected'); };
+-  const owner = { snapshot: () => state.summary, dispose };
++  const rejected = () => { if (current(state.game))fail('original-rejected'); };
++  const owner = { snapshot: () => state.summary, stagesSnapshot: () => state.stages, dispose };
+   try {
+     if (!Number.isSafeInteger(generation) || generation < 1 || !Number.isSafeInteger(rendererId) || rendererId < 1 ||
+         state.scene === MISSING || state.engine === MISSING) {
+-      state.summary = unavailable('owner-identity-unavailable'); dispose(); return owner;
++      fail('owner-identity-unavailable'); dispose(); return owner;
+     }
+     if (!current(game)) return owner;
+     const own = Object.getOwnPropertyDescriptor(game, 'prepareLighting');
+@@ -139,7 +286,7 @@ export function observePreparationResult(game, { signal, startupSignal, isCurren
+     }
+     const original = descriptor && Object.hasOwn(descriptor, 'value') ? descriptor.value : undefined;
+     if (typeof original !== 'function') {
+-      state.summary = unavailable('missing-method'); dispose(); return owner;
++      fail('missing-method'); dispose(); return owner;
+     }
+     const wrapper = function () {
+       const observe = current(this);
+@@ -156,10 +303,10 @@ export function observePreparationResult(game, { signal, startupSignal, isCurren
+               ownData(NATIVE_PROMISE.prototype, 'constructor') !== NATIVE_PROMISE ||
+               species?.get !== NATIVE_SPECIES?.get || species?.set !== NATIVE_SPECIES?.set ||
+               species?.value !== NATIVE_SPECIES?.value) {
+-            state.summary = unavailable('unsupported-promise');
++            fail('unsupported-promise');
+           } else Reflect.apply(NATIVE_THEN, result, [fulfilled, rejected]);
+         }
+-        catch (error) { state.summary = unavailable('non-native-promise'); report(error); }
++        catch (error) { fail('non-native-promise'); report(error); }
+       }
+       return result;
+     };
+@@ -174,6 +321,6 @@ export function observePreparationResult(game, { signal, startupSignal, isCurren
+     state.abort = dispose;
+     for (const signal of state.signals) signal.addEventListener('abort', state.abort, { once: true });
+     if (state.signals.some(signal => signal.aborted)) dispose();
+-  } catch (error) { state.summary = unavailable('observer-unavailable'); report(error); dispose(); }
++  } catch (error) { fail('observer-unavailable'); report(error); dispose(); }
+   return owner;
+ }
+
+diff --git "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\weather-latency.test.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\weather-latency.test.mjs"
+index 3b7ff9af..b9920b48 100644
+--- "a/.cache\\webgpu-completion-20261021\\pipeline-owner\\helper\\v16\\weather-latency.test.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-export\\helper\\v17\\weather-latency.test.mjs"
+@@ -10,7 +10,7 @@ import { MAX_WEATHER_BYTES, WEATHER_LABELS, weatherFixture, validateWeather, loa
+ import { MAX_LATENCY_CALLS, observeStartupLatency } from './startup-latency.mjs';
+ 
+ const directory = dirname(fileURLToPath(import.meta.url));
+-const temporaryRoot = resolve(directory, '../../../../../.cache/webgpu-completion-lifecycle-controls-20261021');
++const temporaryRoot = resolve(directory, '../../../../../.cache/webgpu-completion-20261021/startup-stage-export/test-temp');
+ const recorded = () => ({ temperature: 8.375, wind: 0.9, windDirection: 287.125, rain: 0, cloud: 0.86,
+   observedAt: 1792533600000, fetchedAt: 1792533612345, source: 'Station fixture', cloudSource: 'Model fixture',
+   status: 'live', stale: false, sourceKind: 'station', cloudObservedAt: 1792533600000, cloudStale: false,

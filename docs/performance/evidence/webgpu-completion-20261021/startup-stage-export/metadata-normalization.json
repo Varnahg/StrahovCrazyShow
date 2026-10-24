@@ -1,0 +1,47 @@
+{
+  "scope": "Only exact approved donor URL and version count edits; equality guards normalize just these plus their own exact guard insertion, leaving runtime and all pin/order assertions intact",
+  "changes": [
+    {
+      "file": "routine-cost.test.mjs",
+      "from": "../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz",
+      "to": "../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz",
+      "beforeSha": "ad7a1261172e453e7dc42087bb75c83511b50a4c28ecabb747a60f03365a4e96",
+      "afterSha": "c038685ffe29b8ddb9f8cb67204bffd730d71d4e129fba9448cdd960f94a4e67"
+    },
+    {
+      "file": "entry-render-cost.test.mjs",
+      "from": "for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,file)),await readFile(join(old,file)));",
+      "to": "for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from=\"../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\",to=\"../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}",
+      "beforeSha": "d9928b8d9701a60af015aaf43bd309153af23ba26e0755e4e19a3e0295772c0c",
+      "afterSha": "c8e42bd95021c81793848055f3386d10ecfd9b4961cb458ee3e437bd33959255"
+    },
+    {
+      "file": "entry-render-cost.test.mjs",
+      "from": "assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);",
+      "to": "assert.equal(Object.keys((await helperIdentity(directory)).files).length,36);",
+      "beforeSha": "c8e42bd95021c81793848055f3386d10ecfd9b4961cb458ee3e437bd33959255",
+      "afterSha": "27ca836b3455b028b791c6322534bf144bc749bbe2f118b2691daf4ab1b0e4c5"
+    },
+    {
+      "file": "entry-routine-cost.test.mjs",
+      "from": "for(const f of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs','entry-render-cost.mjs','entry-render-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,f)),await readFile(join(original,f)));",
+      "to": "for(const f of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs','entry-render-cost.mjs','entry-render-cost.test.mjs']){let text=(await readFile(join(directory,f))).toString();const edits=f==='routine-cost.test.mjs'?[[\"../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\",\"../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\"]]:f==='entry-render-cost.test.mjs'?[[\"for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs']){let bytes=await readFile(join(directory,file));if(file==='routine-cost.test.mjs'){const from=\\\"../../../../../docs/performance/evidence/webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\\\",to=\\\"../../webgpu-migration-20261016/f3-routine-profile/overlay/client/qa-routine-profile.ts.gz\\\";const text=bytes.toString();assert.equal(text.split(from).length,2);bytes=Buffer.from(text.replace(from,to));}assert.deepEqual(bytes,await readFile(join(old,file)));}\",\"for(const file of ['routine-cost.mjs','routine-cost-core.mjs','routine-cost.test.mjs'])assert.deepEqual(await readFile(join(directory,file)),await readFile(join(old,file)));\"],[\"assert.equal(Object.keys((await helperIdentity(directory)).files).length,36);\",\"assert.equal(Object.keys((await helperIdentity(directory)).files).length,32);\"]]:[];for(const[from,to]of edits){assert.equal(text.split(from).length,2);text=text.replace(from,to);}assert.deepEqual(Buffer.from(text),await readFile(join(original,f)));}",
+      "beforeSha": "795da6e58dbc68684469b2b79d53adc2248e3281805e8eaa60abfca3f4da8ddd",
+      "afterSha": "0bdad92bbbf9da14c11943e3cfed200399cf550dbef1f6fdde6db805b95353f2"
+    },
+    {
+      "file": "entry-routine-cost.test.mjs",
+      "from": "assert.equal(Object.keys((await helperIdentity(directory)).files).length,34);",
+      "to": "assert.equal(Object.keys((await helperIdentity(directory)).files).length,36);",
+      "beforeSha": "0bdad92bbbf9da14c11943e3cfed200399cf550dbef1f6fdde6db805b95353f2",
+      "afterSha": "98cecaa52098d5afec81c73c769dec7dd22cd33b4b236cb23039d2f5dd5a8038"
+    },
+    {
+      "file": "preparation-summary.test.mjs",
+      "from": "assert.equal(Object.keys(identity.files).length, 30);",
+      "to": "assert.equal(Object.keys(identity.files).length, 36);",
+      "beforeSha": "36b948ca00f1ca990761706a579d1e6e0b79752b719f5132f1e5ed17136800c6",
+      "afterSha": "c3168a6cb8a2432449f132a5708213775feae4fc12f5fe56c2e9cdff51be1c71"
+    }
+  ]
+}
