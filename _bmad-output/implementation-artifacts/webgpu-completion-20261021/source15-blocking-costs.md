@@ -2,7 +2,7 @@
 title: 'KEY22: lokalizace blokujících nákladů startupu a prvního vstupu'
 type: 'chore'
 created: '2026-10-24'
-status: 'in-progress'
+status: 'in-review'
 route: 'dispatch'
 baseline_commit: '754dde6ad665070f6d46c52e755eaa2a24e0df69'
 review_loop_iteration: 0
@@ -61,9 +61,32 @@ context:
 
 ## Spec Change Log
 
+-24Oct09:30UTC po prvním skutečném entry: V19 retired po1accepted framu; rawpozději pendingValidation2, failing predicate chybí. Nová V20 effect-only cesta ponechá legacy8modulybyteexact; admission pending0, poaccepted instalaci pending obou explicitních kindů zaznamenává jako práci, zachová phase/error/identity/lifecycle guardy. Nový strict bounded witness/perframecounts a native RenderHealth regressions dle rozhodnutí source15-blocking-costs-decision.md. Scope zůstává QA, žádná produktová či timeout změna. V19výsledek zůstává incomplete.
+
 ## Review Triage Log
 
 ## Verification
 
 - Nové cílené `node --import tsx --test` moduly, exact transform/pin/schema/lifecycle kontroly; všechny spuštěné příkazy a omezení v task handoffu.
 - Celý helper corpus, build a GPU nesmí běžet bez přiděleného heavy okna. NullEngine/syntetické časy nejsou GPU důkaz.
+
+Root: oba source packy předané a claims převzaté po release. Startup38/92577509 má41 cílených PASS, entry39/509888eb má42 PASS. Celé corpora, build a GPU stále pending; formální review čte jen vlastní helper delta proti immutable V17.
+
+
+### Review round1
+
+Všechny tři čtecí vrstvy dokončené.
+
+| Nález | Verdikt/cesta | Důkaz |
+|---|---|---|
+| blind-1 | medium/patch | Clock odmítne Guest před ownerem; null profil pak zneplatní původní rejected receipt. |
+| edge-1 | medium/patch | Nová identita startupRoutines není v pipeline-inputs whitelistu. |
+| edge-2 | medium/patch | Druhý RTT add může selhat před zaznamenáním prvního cleanupu. |
+| verification-1 | medium/patch | Skutečný transformovaný Game callsite není vykonaný bez ruční registrace. |
+| verification-2 | medium/patch | Chybí přímý Standard readiness→engine řetězec a native Standard fixture. |
+
+Root ověřil první tři větve v source/caller řetězci; obě verification mezery mají předověřený test/search důkaz. Všechny opravy jsou lokální bez nového veřejného API. V18/helper92577509 a509888eb i jejich118/174seals zůstanou immutable; autor vytvoří sousední helper/v19 a nové review-fix-v19 důkazy. Původní handoffy také nepřepisovat.
+
+### Review patch follow-up
+
+V19 startup má4úzké source/test změny a21cílených PASS po RED17/4. V19 entry mění pouze test+README:2nové Standard regrese PASS a obě selžou po izolované ancestor5 mutaci. Všechny3čtecí vrstvy opraveného diffu vrátily[]. Verification-1/2 uzavřeny skutečnými Game/Standard callsite testy; root nezávisle rehashoval staré118/174 i nové62/90payloady. PůvodníV18/HDF bezezměny. Celé corpora, nové buildy a skutečná GPU přejímka zůstávají pending; nejde o uzavření KEY22.

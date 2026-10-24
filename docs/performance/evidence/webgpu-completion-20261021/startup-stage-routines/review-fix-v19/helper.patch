@@ -1,0 +1,147 @@
+diff --git "a/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v18\\receipt.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v19\\receipt.mjs"
+index c10886e6..8e43a41f 100644
+--- "a/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v18\\receipt.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v19\\receipt.mjs"
+@@ -20,6 +20,7 @@ export function validateReceipt(value, identity) {
+   if (typeof identity.lifecycleControls !== 'boolean' || value.lifecycleControls !== identity.lifecycleControls ||
+       (identity.lifecycleControls && value.mode !== 'diagnostic')) throw new Error('Receipt lifecycle-controls identity mismatch');
+   if((value.startupRoutines!==undefined||identity.startupRoutines!=null)&&value.startupRoutines!==(identity.startupRoutines??null))throw Error('Startup routine identity mismatch');
++  if(value.kind==='startup'&&value.outcome==='resolved'&&identity.startupRoutines!=null&&value.startupStageRoutines===undefined)throw Error('Resolved startup routine profile missing');
+   if(value.startupStageRoutines!==undefined){if(value.kind!=='startup'||value.mode!=='diagnostic'||!identity.startupRoutines)throw Error('Startup routine kind/flag mismatch');validateStartupStageRoutines(value.startupStageRoutines,identity.startupRoutines);}
+   if (value.pipelineInputs !== undefined && value.kind !== 'pipeline-inputs') throw new Error('Pipeline inputs kind mismatch');
+   if (value.entryTrigger !== undefined && value.kind !== 'routine-cost') throw new Error('Entry trigger kind mismatch');
+@@ -48,7 +49,7 @@ export function validateReceipt(value, identity) {
+     validateBufferTrace(value.bufferTrace);
+   }
+   if (value.kind === 'pipeline-inputs') {
+-    const allowed = new Set('schemaVersion,label,sourceSnapshotId,helperSha256,loading,clock,weather,startupLatency,shaderAttribution,routineCost,bufferLifecycle,lifecycleControls,dependencies,buildId,attemptId,ownerId,kind,mode,atMs,timeOrigin,capturedAtUTC,userAgent,observerErrors,clockConfigId,completed,before,after,pipelineInputs,validationErrors,scope,failure'.split(','));
++    const allowed = new Set('schemaVersion,label,sourceSnapshotId,helperSha256,loading,clock,weather,startupLatency,shaderAttribution,routineCost,bufferLifecycle,lifecycleControls,startupRoutines,dependencies,buildId,attemptId,ownerId,kind,mode,atMs,timeOrigin,capturedAtUTC,userAgent,observerErrors,clockConfigId,completed,before,after,pipelineInputs,validationErrors,scope,failure'.split(','));
+     if (Object.keys(value).some(key => !allowed.has(key)) || identity.routineCost !== true || value.routineCost !== true || value.mode !== 'diagnostic' ||
+         !value.before || !value.after || !Array.isArray(value.validationErrors) || value.validationErrors.length > 16 || typeof value.completed !== 'boolean') throw new Error('Pipeline inputs diagnostic evidence missing');
+     if (value.pipelineInputs === null) { if (value.completed || !value.failure || !value.validationErrors.length) throw new Error('Pipeline input refusal missing'); }
+
+diff --git "a/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v18\\qa-overlay.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v19\\qa-overlay.mjs"
+index a15933d3..9903de97 100644
+--- "a/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v18\\qa-overlay.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v19\\qa-overlay.mjs"
+@@ -482,7 +482,7 @@ export async function observeStartup(game, canvas, start) {
+       const raw = { ...envelope('startup'), outcome, error: error ? errorText(error) : null,
+         samples, sampleOverflow, terminal, compilation: compilationSnapshot(game),
+         startupLatency: latencyOwner?.snapshot() ?? null, shaderAttribution: null,
+-        ...(identity.startupRoutines?{startupStageRoutines:startupRoutineOwner?.snapshot()??null}:{}),
++        ...(identity.startupRoutines&&startupRoutineOwner?{startupStageRoutines:startupRoutineOwner.snapshot()}:{}),
+         preparationSummary: preparationOwner?.snapshot() ?? { available: false, reason: 'not-installed' },
+         preparationStages: preparationOwner?.stagesSnapshot() ?? { schemaVersion:1, available:false, reason:'not-installed' },
+         scope: '1Hz technical startup samples plus one bounded result-only preparation projection; stopped before gameplay measurement. Existing production compilation/health hooks unchanged.' };
+
+diff --git "a/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v18\\startup-stage-routines.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v19\\startup-stage-routines.mjs"
+index 2adf22e8..ccfa9165 100644
+--- "a/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v18\\startup-stage-routines.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v19\\startup-stage-routines.mjs"
+@@ -107,7 +107,9 @@ function installCore(s){
+   const safe=fn=>(...args)=>{try{return fn(...args);}catch{fail(s);}};
+   const observe=(o,fn)=>{const observer=o.add(safe(fn));s.detaches.push(()=>o.remove(observer));};
+   const track=r=>{if(s.renderers.has(r))return;if(s.rendererRegistrations>=ROUTINE_LIMITS.renderers){fail(s);return;}s.rendererRegistrations++;
+-    const a=r.onInitRenderingObservable.add(safe(()=>enter('rtt',r))),b=r.onFinishRenderingObservable.add(safe(()=>leave(r)));
++    const a=r.onInitRenderingObservable.add(safe(()=>enter('rtt',r)));let b;
++    try{b=r.onFinishRenderingObservable.add(safe(()=>leave(r)));}
++    catch(error){try{r.onInitRenderingObservable.remove(a);}catch{fail(s);}throw error;}
+     const stop=()=>{r.onInitRenderingObservable.remove(a);r.onFinishRenderingObservable.remove(b);};s.renderers.set(r,stop);};
+   s.core=new RoutineCallProfile([{id:ROUTINE_IDS[0],target:scene,key:'getActiveMeshCandidates',accepts:r=>r===scene},
+     ...bindings.map((b,i)=>({...b,id:ROUTINE_IDS[i+1],accepts:r=>i===0?r===scene:r?._scene===scene}))],{now:s.profileNow,phase});
+
+diff --git "a/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v18\\startup-stage-routines.test.mjs" "b/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v19\\startup-stage-routines.test.mjs"
+index 45307496..758f1e45 100644
+--- "a/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v18\\startup-stage-routines.test.mjs"
++++ "b/.cache\\webgpu-completion-20261021\\startup-stage-routines\\helper\\v19\\startup-stage-routines.test.mjs"
+@@ -7,6 +7,7 @@ import {FreeCamera} from '@babylonjs/core/Cameras/freeCamera.js';
+ import {Vector3} from '@babylonjs/core/Maths/math.vector.js';
+ import {MeshBuilder} from '@babylonjs/core/Meshes/meshBuilder.js';
+ import {StandardMaterial} from '@babylonjs/core/Materials/standardMaterial.js';
++import {ObjectRenderer} from '@babylonjs/core/Rendering/objectRenderer.js';
+ import ts from 'typescript';
+ import {webcrypto} from 'node:crypto';
+ import {dirname,join} from 'node:path';
+@@ -144,17 +145,20 @@ test('cross-pass clock rollback retires only diagnostic state and retains a vali
+     assert.equal(probe.registerStartupOptions(f.game,b),b);probe.startupPassStarted(b,9);const p=f.owner.snapshot();assert.equal(p.reason,'observer-error');assert.equal(p.active,false);assert.equal(p.passes[1].startedAtMs,null);assert.equal(p.complete,false);assert.equal(f.game.disposed,false);assert.equal(f.game.ready,false);probe.validateStartupStageRoutines(p,STARTUP_ROUTINE_TARGETS[0]);
+   }finally{f.dispose();}
+ });
+-test('actual overlay exports the startup trace once before UI continuation and original stage summary stays present',async()=>{
++async function overlayFixtureV19(clockSpecification=null){
+   // Reuse the complete pre-existing DOM/transport fixture body; only inject
+   // the new diagnostic binding/flag. Never import its test registration.
+   const file=await readFile(new URL('./preparation-summary.test.mjs',import.meta.url),'utf8'),ast=ts.createSourceFile('fixture.mjs',file,ts.ScriptTarget.Latest,true);
+   let body=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='overlayFixture').getText(ast);
+-  for(const[from,to]of[['observeOperation, observePreparationResult, createAttemptQueue','createStartupStageRoutines, observeOperation, observePreparationResult, createAttemptQueue'],['startupLatency: false, bufferLifecycle:','startupRoutines: "first-medium-vehicle-0", startupLatency: false, bufferLifecycle:'],["projectShaderInventory() { throw Error('default-off shader inventory'); }",'projectShaderInventory']]){assert.equal(body.split(from).length,2);body=body.replace(from,to);}
++  for(const[from,to]of[['observeOperation, observePreparationResult, createAttemptQueue','createStartupStageRoutines, observeOperation, observePreparationResult, createAttemptQueue'],['startupLatency: false, bufferLifecycle:','startupRoutines: "first-medium-vehicle-0", startupLatency: false, bufferLifecycle:'],["projectShaderInventory() { throw Error('default-off shader inventory'); }",'projectShaderInventory'],['clock: null };','clock: clockSpecification };']]){assert.equal(body.split(from).length,2);body=body.replace(from,to);}
+   const modules=await Promise.all(['startup-observer','attempt-queue','browser-clock','transit-clock','startup-latency','buffer-lifecycle','lifecycle-controls','shader-attribution'].map(name=>import('./'+name+'.mjs')));
+-  const dependencies={readFile,join,directory:dirname(fileURLToPath(import.meta.url)),webcrypto,sha256,createStartupStageRoutines:probe.createStartupStageRoutines,
++  const dependencies={readFile,join,directory:dirname(fileURLToPath(import.meta.url)),webcrypto,sha256,clockSpecification,createStartupStageRoutines:probe.createStartupStageRoutines,
+     observeOperation:modules[0].observeOperation,observePreparationResult:modules[0].observePreparationResult,createAttemptQueue:modules[1].createAttemptQueue,installBrowserClock:modules[2].installBrowserClock,createPlannedBenchmark:modules[3].createPlannedBenchmark,
+     observeStartupLatency:modules[4].observeStartupLatency,observeBufferLifecycle:modules[5].observeBufferLifecycle,createLifecycleControls:modules[6].createLifecycleControls,createVisibilityAnchor:modules[6].createVisibilityAnchor,projectShaderInventory:modules[7].projectShaderInventory};
+-  const overlay=await new Function(...Object.keys(dependencies),body+';return overlayFixture;')(...Object.values(dependencies))();
++  return new Function(...Object.keys(dependencies),body+';return overlayFixture;')(...Object.values(dependencies))();
++}
++test('actual overlay exports the startup trace once before UI continuation and original stage summary stays present',async()=>{
++  const overlay=await overlayFixtureV19();
+   const f=fixture(null);try{Object.assign(f.game,{avatars:new Map(),adaptive:{state:{}},gpu:{},renderErrorCount:0,assetLoadErrorCount:0,compilationProfile:{snapshot:()=>({active:true,metrics:{}})}});
+     f.game.renderHealth.snapshot=()=>({phase:f.game.ready?'ready':'preparing',valid:f.game.ready,rendererId:1,generation:1,errorCount:0,pendingOperations:0});
+     f.game.prepareLighting=async()=>{const value=await run(f);return{...value.result,qualities:[{quality:'medium',finalPass:true,status:'complete',elapsedMs:value.result.elapsedMs,activeElapsedMs:value.result.activeElapsedMs,pausedMs:0,failureStep:null,stageCount:19}],stages:value.result.stages.map(s=>({...s,passQuality:'medium'}))};};
+@@ -162,5 +166,57 @@ test('actual overlay exports the startup trace once before UI continuation and o
+     const raw=overlay.raw();assert.equal(raw.mode,'diagnostic');assert.equal(raw.startupRoutines,STARTUP_ROUTINE_TARGETS[0]);assert.equal(raw.startupStageRoutines.complete,true);assert.equal(raw.preparationStages.capturedCount,19);assert.equal(raw.startupStageRoutines.remainingRoutineHooks,0);assert.equal(overlay.intervals.size,0);
+     assert.ok(overlay.events.indexOf('terminal-raw')<overlay.events.indexOf('UI-continuation'));assert.ok(raw.samples.every(s=>!Object.hasOwn(s,'startupStageRoutines')));
+     for(let i=0;i<100&&overlay.requests.length===0;i++)await new Promise(setImmediate);assert.equal(overlay.requests.length,1);
++    const without={...raw};delete without.startupStageRoutines;assert.throws(()=>validateReceipt(without,raw),'active resolved startup requires its existing profile');
+   }finally{f.dispose();}
+ });
++test('actual pre-owner clock refusals retain original rejected raw without fabricating an optional profile',async()=>{
++  for(const mode of['guest','expired']){const clock={config:{schemaVersion:1,scenarioEpochUTC:0,armAtUTC:mode==='expired'?0:Date.now()+60000},configId:'clock-fixture',configSha256:'clock-bytes',simulationSourceSha256:'simulation'};
++    const overlay=await overlayFixtureV19(clock),f=fixture(null);let starts=0,primary;
++    try{Object.assign(f.game,{network:mode!=='guest',camera:f.scene.activeCamera,trafficInstant:()=>0,avatars:new Map(),adaptive:{state:{}},gpu:{},renderErrorCount:0,assetLoadErrorCount:0,compilationProfile:{snapshot:()=>({active:true,metrics:{}})}});
++      f.game.renderHealth.snapshot=()=>({phase:'preparing',valid:false,rendererId:1,generation:1,errorCount:0,pendingOperations:0});
++      await assert.rejects(overlay.observeStartup(f.game,{dataset:{}},()=>{starts++;}),error=>{primary=error;return mode==='guest'?/guest start refused/.test(error.message):/after static arm deadline/.test(error.message);});
++      const raw=overlay.raw();assert.equal(starts,0);assert.equal(raw.outcome,'rejected');assert.equal(raw.error.message,primary.message);assert.equal(Object.hasOwn(raw,'startupStageRoutines'),false);assert.deepEqual(raw.observerErrors,[]);validateReceipt(raw,raw);
++      assert.throws(()=>validateReceipt({...raw,startupStageRoutines:null},raw));assert.throws(()=>validateReceipt({...raw,startupStageRoutines:{}},raw));
++      for(let i=0;i<100&&overlay.requests.length===0;i++)await new Promise(setImmediate);assert.equal(overlay.requests.length,1);assert.equal(overlay.requests[0].outcome,'rejected');
++    }finally{f.dispose();}
++  }
++});
++test('pipeline action closed envelope admits only the already validated startup target, null and active',()=>{
++  for(const target of[null,STARTUP_ROUTINE_TARGETS[0]]){const identity={buildId:'b',sourceSnapshotId:'s',helperSha256:'h',lifecycleControls:false,routineCost:true,startupRoutines:target};
++    const raw={...identity,schemaVersion:1,attemptId:'8e9e7e15-6011-438d-96a2-53be43f17792',kind:'pipeline-inputs',mode:'diagnostic',atMs:1,timeOrigin:0,observerErrors:[],completed:false,before:{},after:{},pipelineInputs:null,failure:{message:'original refusal'},validationErrors:['refused']};
++    assert.equal(validateReceipt(raw,identity),raw);assert.throws(()=>validateReceipt({...raw,arbitraryField:true},identity));assert.throws(()=>validateReceipt({...raw,startupRoutines:target===null?STARTUP_ROUTINE_TARGETS[0]:null},identity));assert.throws(()=>validateReceipt({...raw,startupRoutines:{}},identity));
++  }
++});
++test('second native RTT observer add failure rolls back the first own observer and preserves notifications/render',async()=>{
++  const f=fixture(),renderer=new ObjectRenderer('CPU rollback',f.scene),events=[];
++  const initBefore=renderer.onInitRenderingObservable.add(()=>events.push('init-original')),finishBefore=renderer.onFinishRenderingObservable.add(()=>events.push('finish-original'));
++  const countBefore=renderer.onInitRenderingObservable.observers.length,original=Object.getOwnPropertyDescriptor(renderer.onFinishRenderingObservable,'add');
++  try{Object.defineProperty(renderer.onFinishRenderingObservable,'add',{configurable:true,writable:true,value(){throw false;}});
++    const options={};probe.registerStartupOptions(f.game,options);probe.startupPassStarted(options,1);probe.startupStageStarted(options,0,'vehicle-0',2);assert.equal(probe.startupRenderBegin(options,3),null);
++    assert.equal(renderer.onInitRenderingObservable.observers.filter(o=>!o._willBeUnregistered).length,countBefore,'no active orphan init observer after failed second add');assert.equal(f.owner.snapshot().remainingRoutineHooks,0);
++    renderer.onInitRenderingObservable.notifyObservers(renderer);renderer.onFinishRenderingObservable.notifyObservers(renderer);assert.deepEqual(events,['init-original','finish-original']);const before=f.scene._frameId;f.scene.render();assert.equal(f.scene._frameId,before+1);
++    await new Promise(resolve=>setTimeout(resolve,0));assert.equal(renderer.onInitRenderingObservable.observers.length,countBefore,'original native deferred removal finished');
++  }finally{if(original)Object.defineProperty(renderer.onFinishRenderingObservable,'add',original);else delete renderer.onFinishRenderingObservable.add;initBefore.remove();finishBefore.remove();renderer.dispose();f.dispose();}
++});
++test('actual transformed Game callsite executes its original options literal and registration, without manual registration',async()=>{
++  for(const transformedGame of[true,false]){const f=fixture(),engineFlag=Object.getOwnPropertyDescriptor(f.engine,'isWebGPU');let tick,clock=1000,done=false,result,failure,captured,renders=0,authoredDisposed=0;
++    try{f.game.flashlight={};f.game.compilationProfile={setStage(){}};f.game.startupPreparationCoverage=()=>'';
++      // Technical routing seam only while the real Game options literal is
++      // built. Restore native NullEngine/GLSL before any actual Scene.render.
++      Object.defineProperty(f.engine,'isWebGPU',{configurable:true,value:true});
++      const render=()=>{assert.equal(f.engine.isWebGPU,false);renders++;f.scene.render();};
++      const prepare=options=>{captured=options;assert.equal(options.includeVehicleVariants,true);assert.equal(options.includeDayPointVariants,true);assert.equal(options.render,render);assert.equal(options.revisionKeys.length,14);assert.match(options.apply.toString(),/setStage/);assert.match(options.check.toString(),/isMeshReadyForCamera/);
++        if(engineFlag)Object.defineProperty(f.engine,'isWebGPU',engineFlag);else delete f.engine.isWebGPU;assert.equal(f.engine.isWebGPU,false);
++        Object.assign(options,{apply(){},restore(){},meshes:()=>[],check:()=>true,effectsReady:()=>true,run:callback=>{tick=callback;},stop:callback=>assert.equal(callback,tick),isVisible:()=>true,onVisibilityChange:()=>()=>{},now:()=>clock,setTimer:()=>1,clearTimer(){}});
++        return actual(options);};
++      const text=transformedGame?transformStartupSource(gameSource,'game',STARTUP_ROUTINE_TARGETS[0]):gameSource;
++      const ast=ts.createSourceFile('game.ts',text,ts.ScriptTarget.Latest,true),klass=ast.statements.find(n=>ts.isClassDeclaration(n)&&n.name?.text==='Game'),method=klass.members.find(n=>n.name?.getText(ast)==='prepareLightingVariants').getText(ast);
++      const js=ts.transpileModule('class ActualGameMethod{'+method+'}',{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
++      const invoke=new Function('registerStartupOptions','prepareLightVariants','selectLightingPreview','AuthoredLightPreparation',js+';return ActualGameMethod.prototype.prepareLightingVariants;')(probe.registerStartupOptions,prepare,()=>({instant:1}),class{dispose(){authoredDisposed++;}});
++      const operation=invoke.call(f.game,render);operation.then(value=>{result=value;done=true;},error=>{failure=error;done=true;});
++      for(let i=0;i<1000&&!done;i++){clock+=10;tick();await flush();}if(failure)throw failure;assert.equal(done,true);assert.equal(result.status,'complete');assert.equal(result.stages.length,19);assert.ok(captured);assert.equal(renders,57);assert.equal(authoredDisposed,1);
++      f.owner.dispose('startup-resolved');const p=f.owner.snapshot();if(transformedGame){assert.equal(p.complete,true);assert.equal(p.passes.length,1);assert.equal(p.stages.length,19);assert.equal(p.capture.frames.length,3);assert.equal(p.passes[0].quality,'medium');probe.validateStartupStageRoutines(p,STARTUP_ROUTINE_TARGETS[0]);}
++      else{assert.equal(p.passes.length,0);assert.equal(p.stages.length,0);assert.equal(p.capture.frames.length,0);assert.equal(p.complete,false,'untransformed callsite cannot accidentally receive manual registration');}
++    }finally{if(engineFlag)Object.defineProperty(f.engine,'isWebGPU',engineFlag);else delete f.engine.isWebGPU;f.dispose();}
++  }
++});

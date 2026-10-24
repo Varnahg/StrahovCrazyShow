@@ -1,0 +1,81 @@
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/README.md b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/README.md
+index f6cd59ed..de944fa4 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/README.md
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/README.md
+@@ -36,3 +36,7 @@ Nový core validuje všech10 descriptorů před prvním zápisem včetně inheri
+ RTT before/after registrace má dílčí rollback; diagnostická chyba z notifikace nepřepíše původní notifikaci. Cleanup nuluje owner state a uvolňuje hook/listener seznamy. Retained wrapper po dispose volá pouze originál; test getteru zaniklého Game nesmí být znovu čten. Nejde o obecný důkaz nulové GC/VRAM retence nativního enginu.
+ 
+ Ve V18 jsou změněny pouze pět copied-test kompatibilitních count/import míst (6výskytů) a jsou reverzibilně ověřeny vůči veřejné donor-v17 kopii. Staré routine-cost/core, entry-render-cost a entry-routine-cost runtime moduly a celé původní bloky tlačítek jsou byteexact. Nové helper vstupy39, staré36 zůstávají neměnné. Native WebGPU cache ABI CPU případ má explicitní terminal cached record a neinstancuje GPU/device.
++
++## V19 – testový followup review
++
++Runtime je byteexact V18; přidané jsou pouze dvě StandardMaterial regrese v entry-effect-cost.test.mjs. Finální V19 důkaz je v public entry-effect-cost/review-fix-v19/. Původní V18 proof se nezaměňuje za spuštění nových testů.
+diff --git a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost.test.mjs b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-effect-cost.test.mjs
+index e3ba37ca..2ce80b58 100644
+--- a/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v18/entry-effect-cost.test.mjs
++++ b/.cache/webgpu-completion-20261021/entry-effect-cost/helper/v19/entry-effect-cost.test.mjs
+@@ -12,6 +12,7 @@ import { Vector3 } from '@babylonjs/core/Maths/math.vector.js';
+ import { CreateBox } from '@babylonjs/core/Meshes/Builders/boxBuilder.js';
+ import { PBRMaterial } from '@babylonjs/core/Materials/PBR/pbrMaterial.js';
+ import { PBRBaseMaterial } from '@babylonjs/core/Materials/PBR/pbrBaseMaterial.js';
++import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial.js';
+ import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight.js';
+ import { GltfLightBudget } from '../../../../../client/gltf-light-budget.ts';
+ import { StableLightState } from '../../../../../client/stable-light-state.ts';
+@@ -39,14 +40,14 @@ const preludeIndices=preludeNames.map(name=>actualFrame.body.statements.findInde
+ assert.ok(preludeIndices[0]>=0);assert.equal(preludeIndices[1],preludeIndices[0]+1);assert.equal(preludeIndices[2],preludeIndices[1]+1);
+ const actualPrelude=new Function(preludeIndices.map(i=>actualFrame.body.statements[i].getText(gameTree)).join('\n'));
+ function targets(){return EFFECT_IDS.map(id=>{const target={run(){}};return{id,target,key:'run',expected:target.run};});}
+-function nativeFixture(t){
++function nativeFixture(t,MaterialClass=PBRMaterial){
+   const engine=new NullEngine(),scene=new Scene(engine);scene.texturesEnabled=false;
+   const camera=new FreeCamera('actual CPU camera',new Vector3(0,0,-5),scene);camera.setTarget(Vector3.Zero());scene.activeCamera=camera;
+-  const light=new HemisphericLight('actual CPU lamp',Vector3.Up(),scene),mesh=CreateBox('actual CPU receiver',{},scene),material=new PBRMaterial('actual CPU PBR',scene);mesh.material=material;
++  const light=new HemisphericLight('actual CPU lamp',Vector3.Up(),scene),mesh=CreateBox('actual CPU receiver',{},scene),material=new MaterialClass('actual CPU material',scene);mesh.material=material;
+   const game={scene,engine,ready:true,disposed:false,renderHealth:{rendererId:7,generation:2,phase:'ready',errorCount:0,pendingByKind:{preparation:0,'shader-validation':0}}};
+   t.after(()=>{scene.dispose();engine.dispose();});return{engine,scene,camera,light,mesh,material,game};
+ }
+-async function warm(f){for(let i=0;i<20;i++){f.scene.render();await turn();if(f.material.isReadyForSubMesh(f.mesh,f.mesh.subMeshes[0],false))return;}assert.fail('Actual native PBR ready');}
++async function warm(f){for(let i=0;i<20;i++){f.scene.render();await turn();if(f.material.isReadyForSubMesh(f.mesh,f.mesh.subMeshes[0],false))return;}assert.fail('Actual native material ready');}
+ function entryFixture(t){
+   const f=nativeFixture(t);class Game{}Object.setPrototypeOf(f.game,Game.prototype);
+   const budget=new GltfLightBudget(f.scene),stable=new StableLightState(f.scene);t.after(()=>{budget.dispose();stable.dispose();});
+@@ -74,6 +75,16 @@ test('one ten-target hierarchy subtracts prepare/create children and counts clea
+   assert.deepEqual([row(f,EFFECT_IDS[9]).inclusiveMs,row(f,EFFECT_IDS[9]).selfSelectedMs],[3,3]);
+   assert.equal(f.errors,0);assert.equal(row(f,EFFECT_IDS[4]).selfSelectedMs+row(f,EFFECT_IDS[8]).selfSelectedMs+row(f,EFFECT_IDS[9]).selfSelectedMs,7);
+ });
++test('Standard direct readiness-to-engine hierarchy counts createEffect and subtracts its selected time',()=>{
++  let time=0;const ts=targets(),effect={};
++  ts[9].target.run=function(){time+=3;return effect;};ts[9].expected=ts[9].target.run;
++  ts[5].target.run=function(){time+=2;assert.equal(ts[9].target.run(),effect);time+=1;return true;};ts[5].expected=ts[5].target.run;
++  const p=new EffectCallProfile(ts,{now:()=>time,phase:()=> 'main'});p.beginFrame(20);assert.equal(ts[5].target.run(),true);const f=p.endFrame();p.dispose();
++  assert.deepEqual([row(f,EFFECT_IDS[5]).calls,row(f,EFFECT_IDS[5]).inclusiveMs,row(f,EFFECT_IDS[5]).selfSelectedMs],[1,6,3]);
++  assert.deepEqual([row(f,EFFECT_IDS[9]).calls,row(f,EFFECT_IDS[9]).inclusiveMs,row(f,EFFECT_IDS[9]).selfSelectedMs],[1,3,3]);
++  assert.equal(row(f,EFFECT_IDS[4]).calls,0);assert.equal(row(f,EFFECT_IDS[8]).calls,0);
++  assert.equal(row(f,EFFECT_IDS[5]).selfSelectedMs+row(f,EFFECT_IDS[9]).selfSelectedMs,6);assert.equal(f.errors,0);
++});
+ for(const value of [undefined,null,false,0,'',Promise.resolve(3)])test('original return identity '+String(value),()=>{
+   const ts=targets(),args=[{},2],receiver=ts[8].target;ts[8].target.run=function(...a){assert.equal(this,receiver);assert.deepEqual(a,args);return value;};ts[8].expected=ts[8].target.run;
+   const p=new EffectCallProfile(ts,{now:()=>0});p.beginFrame(1);assert.equal(receiver.run(...args),value);const f=p.endFrame();p.dispose();assert.equal(row(f,EFFECT_IDS[8],'other').nullReturns,Number(value===null));
+@@ -110,6 +121,21 @@ test('native PBR dirty/cache reuse and clean-null branches use actual inherited
+   assert.equal(Object.hasOwn(f.engine,'createEffect'),false);assert.equal(f.engine.createEffect,ThinEngine.prototype.createEffect);assert.equal(f.material._prepareEffect,PBRBaseMaterial.prototype._prepareEffect);
+   assert.equal(p.remainingRoutineHooks,0);assert.equal(p.errors,0);
+ });
++test('native StandardMaterial readiness captures its actual inherited ThinEngine createEffect call without a PBR ancestor',async t=>{
++  const f=nativeFixture(t,StandardMaterial);await warm(f);const old=f.mesh.subMeshes[0].effect;
++  assert.ok(f.material instanceof StandardMaterial);assert.equal(f.material.isReadyForSubMesh,StandardMaterial.prototype.isReadyForSubMesh);
++  const owner=captureEntryEffects(f.game,{enabled:true});t.after(()=>owner.dispose());
++  f.light.setEnabled(false);f.light.setEnabled(true);
++  for(let i=0;i<8;i++){f.scene.render();await turn();}
++  const p=await owner.done;validateEntryEffectProfile(p);assert.equal(p.complete,true);assert.equal(p.engineOrigin,'thinengine-inherited');
++  const first=p.frames[0];assert.ok(row(first,EFFECT_IDS[5]).calls>0,'actual native Standard readiness ran');
++  assert.ok(row(first,EFFECT_IDS[9]).calls>0,'actual native Standard readiness reached the original engine API');
++  assert.equal(p.frames.flatMap(frame=>frame.rows).filter(r=>r.id===EFFECT_IDS[4]||r.id===EFFECT_IDS[8]).reduce((n,r)=>n+r.calls,0),0,'no PBR ancestor can provide the engine association');
++  assert.equal(f.mesh.subMeshes[0].effect,old,'native cached Effect identity is preserved');
++  assert.equal(p.frames[0].frameId+8,p.frames.at(-1).nativeFrameIdAfter);assert.equal(p.remainingRoutineHooks,0);assert.equal(p.errors,0);
++  assert.equal(Object.hasOwn(f.engine,'createEffect'),false);assert.equal(f.engine.createEffect,ThinEngine.prototype.createEffect);
++  assert.equal(f.material.isReadyForSubMesh,StandardMaterial.prototype.isReadyForSubMesh);
++});
+ test('native WebGPUEngine cache-hit ABI returns exact record/refcount and positional callback',()=>{
+   const record={_refCount:1,isReady:()=>true},host=Object.create(WebGPUEngine.prototype);host._compiledEffects={'v+f@#define TEST':record};host._getGlobalDefines=()=>'';
+   let callback=0;const result=Reflect.apply(WebGPUEngine.prototype.createEffect,host,[{vertex:'v',fragment:'f'},{attributes:[],defines:'#define TEST'},host,undefined,undefined,undefined,e=>{assert.equal(e,record);callback++;}]);
