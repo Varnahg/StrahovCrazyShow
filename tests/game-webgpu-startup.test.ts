@@ -8,12 +8,16 @@ import { doorLifecycleFixture } from "./helpers/weather-door-render-fixture";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { RenderHealth } from "../client/render-health";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
+import { resolveTerrainReview, terrainReviewPose, terrainReviewIdentity } from "../client/terrain-review";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 const { source, gameClass, selectMembers } = readGameSource(
   process.env.GAME_STARTUP_SOURCE,
 );
 const methods = selectMembers([
   "start",
+  "createStartupActor",
+  "prepareTerrainReviewCamera",
   "handleRendererFailure",
   "isMeshReadyForCamera",
   "assertStartupActive",
@@ -56,7 +60,7 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(`(function(env) {
-  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, CAD_BUILDINGS, hasCadBuilding, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady } = env;
+  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, CAD_BUILDINGS, hasCadBuilding, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady, resolveTerrainReview, terrainReviewPose, terrainReviewIdentity, CHARACTER_RADIUS, CHARACTER_HALF_HEIGHT, window } = env;
   ${compiled}
   return StartupGame;
 })`).runInThisContext();
@@ -101,6 +105,9 @@ function fixture(
     holdCad?: boolean;
     nativeB6?: boolean;
     faultAfterGate?: boolean;
+    location?: { hostname: string; search: string };
+    network?: boolean;
+    eyeHeight?: number;
   } = {},
 ) {
   const engine = new NullEngine();
@@ -130,6 +137,7 @@ function fixture(
     ...(options.nativeB6 === false ? [] : [{ id: "b06", osmId: "53929071" }]),
   ];
   const events: { kind: string; data: unknown }[] = [];
+  const actorStarts: { id: string; position?: { x: number; y: number; z: number } }[] = [];
   const shaderStages: string[] = [];
   let gateReadiness: (() => boolean) | undefined;
   let gateRender: (() => void) | undefined;
@@ -169,6 +177,9 @@ function fixture(
       observedBrowserHz: 60,
     }),
     initPhysics: () => physics.promise,
+    resolveTerrainReview, terrainReviewPose, terrainReviewIdentity,
+    CHARACTER_RADIUS: .25, CHARACTER_HALF_HEIGHT: .55,
+    window: { location: options.location ?? { hostname: "localhost", search: "" } },
     Simulation: class {
       doorPhysics = { applyStates(states: unknown) {
         assert.deepEqual(states, game.guestDoors.snapshot().states);
@@ -176,8 +187,10 @@ function fixture(
       constructor() {
         simulations++;
       }
-      add() {
-        return { position: { x: 0, y: 1, z: 0 } };
+      surfaceHeight() { return 4; }
+      add(id: string, position?: { x: number; y: number; z: number }) {
+        actorStarts.push({ id, ...(position ? { position: { ...position } } : {}) });
+        return { position: position ?? { x: 0, y: 1, z: 0 }, yaw: 0, controller: { offset: () => .02 } };
       }
     },
     loadModule: async (name: string) => {
@@ -258,6 +271,10 @@ function fixture(
     rendererFailed: false,
     disposed: false,
     ready: false,
+    network: options.network ?? false,
+    localId: "guest", localPlayer: { x: 110, y: 0, z: 12 },
+    avatars: new Map([["guest", { eyeHeight: options.eyeHeight ?? 1.63 }]]),
+    previousPosition: new Vector3(110, 0, 12), visualOffset: new Vector3(), keys: new Set(),
     canvas: { dataset: {} },
     adaptive: { setPresentationHz: () => ({}) },
     applyAdaptiveQuality() {},
@@ -269,7 +286,7 @@ function fixture(
     },
     car: { dispose() {} },
     parkedCar: { dispose() {} },
-    camera: {},
+    camera: { fov: .85 },
     sun: {},
     quality: "medium",
     startupAssetErrors: 0,
@@ -304,6 +321,7 @@ function fixture(
     gate,
     loops,
     events,
+    actorStarts,
     shaderStages,
     gateReadiness: () => gateReadiness!(),
     renderGate: () => gateRender!(),
@@ -324,6 +342,36 @@ function fixture(
     stats: () => ({ disposedAssets, gateCalls, simulations, failures, interiorLoads, cadLoads }),
   };
 }
+
+test("actual Game creates a fixed guest Actor before asset preparation and preserves the ordinary render gate", async (t) => {
+  const f = fixture(t, { location: { hostname: "127.0.0.1", search: "?terrainReview=b6-rear-path" }, eyeHeight: 1.8 });
+  const start = f.game.start(); await settle();
+  assert.deepEqual(f.actorStarts, [{ id: "local", position: { x: 36, y: 5, z: -64 } }]);
+  assert.deepEqual(f.game.previousPosition.asArray(), [36, 5, -64]);
+  assert.deepEqual(f.game.localPlayer, { x: 36, y: 5, z: -64, yaw: -Math.PI / 2, speed: 0, vehicle: false });
+  assert.equal(f.game.firstPerson, true); assert.equal(f.game.camera.fov, .85);
+  assert.ok(Math.abs(f.game.pitch - 1.77 / 6.76) < 1e-10, "selected avatar eye height drives the actual first-person slope");
+  assert.equal(f.game.canvas.dataset.terrainReview, "b6-rear-path");
+  assert.equal(f.game.ready, false); assert.equal(f.loops.size, 0);
+  f.gate.resolve(); await start;
+  assert.equal(f.game.ready, true); assert.equal(f.actorStarts.length, 1);
+  assert.equal(f.events.filter(e => e.kind === "terrain-review-start").length, 1);
+});
+
+test("actual Game keeps ordinary spawn for multiplayer, remote origin and a later fresh Game without the QA parameter", async (t) => {
+  for (const options of [
+    { network: true, location: { hostname: "localhost", search: "?terrainReview=b6-rear-path" } },
+    { location: { hostname: "strahov.example", search: "?terrainReview=b6-rear-path" } },
+    { location: { hostname: "localhost", search: "" } },
+  ]) {
+    const f = fixture(t, options); f.game.canvas.dataset.terrainReview = "old-canvas-view";
+    const start = f.game.start(); await settle(); f.gate.resolve(); await start;
+    assert.deepEqual(f.actorStarts, [{ id: "local" }]);
+    assert.equal(f.game.terrainReview, null); assert.equal(f.game.canvas.dataset.terrainReview, undefined);
+    assert.deepEqual(f.game.previousPosition.asArray(), [110, 0, 12]);
+    assert.equal(f.events.some(e => e.kind === "terrain-review-start"), false);
+  }
+});
 
 test("actual Game start cannot become playable until the submitted-frame gate succeeds", async (t) => {
   const f = fixture(t),

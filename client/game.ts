@@ -28,6 +28,7 @@ import {
 } from "./avatar-renderer";
 import { buildWorld } from "./world-renderer";
 import { captureModelReview } from "./model-review";
+import { resolveTerrainReview, terrainReviewPose, terrainReviewIdentity, type TerrainReviewPreset } from "./terrain-review";
 import { captureRenderCostInventory } from "./render-cost";
 import { snapshotBenchmarkDiagnostics } from "./benchmark-snapshot";
 import { EnabledMeshCandidates } from "./active-mesh-candidates";
@@ -116,7 +117,7 @@ import {
   type WorldSelection,
 } from "./interaction";
 import earcut from "earcut";
-import { Simulation, initPhysics, type Actor } from "../shared/simulation";
+import { Simulation, initPhysics, CHARACTER_RADIUS, CHARACTER_HALF_HEIGHT, type Actor } from "../shared/simulation";
 import {
   PLACES,
   SPAWN,
@@ -215,6 +216,7 @@ export type GameStats = {
 export type Benchmark = {
   date: string;
   sourceSnapshotId: string | null;
+  terrainReview?: ReturnType<typeof terrainReviewIdentity>;
   durationSeconds: number;
   frames: number;
   averageFps: number;
@@ -396,6 +398,7 @@ export class Game {
     compilationAtStart: ReturnType<WebGpuCompilationProfile["snapshot"]>;
   };
   network = false;
+  terrainReview: TerrainReviewPreset | null = null;
   ready = false;
   firstPerson = false;
   get footFirstPerson() {
@@ -561,6 +564,7 @@ export class Game {
       : Date.now() + (this.snapshots.offset ?? 0);
   }
   previewTransit() {
+    if (this.terrainReview) return null;
     if (this.network) {
       this.notice("Ukázka dopravy je dostupná v samostatné prohlídce.");
       return null;
@@ -844,6 +848,31 @@ export class Game {
     try { return mesh.isReady(true); }
     finally { this.engine.currentRenderPassId = previousPass; }
   }
+  private createStartupActor() {
+    this.terrainReview = resolveTerrainReview(window.location, this.network);
+    delete this.canvas.dataset.terrainReview;
+    if (!this.terrainReview) {
+      this.actor = this.sim.add("local");
+      return;
+    }
+    const pose = terrainReviewPose(this.terrainReview, (x, z) => this.sim.surfaceHeight(x, z));
+    this.actor = this.sim.add("local", pose.position);
+    this.actor.yaw = this.yaw = pose.yaw;
+    this.firstPerson = true;
+    this.pitch = pose.pitch;
+    this.keys.clear();
+    this.previousPosition.copyFromFloats(pose.position.x, pose.position.y, pose.position.z);
+    this.visualOffset.setAll(0);
+    Object.assign(this.localPlayer, pose.position, { yaw: pose.yaw, speed: 0, vehicle: false });
+    this.canvas.dataset.terrainReview = this.terrainReview.id;
+    sessionDiagnostics.event("terrain-review-start", terrainReviewIdentity(this.terrainReview));
+  }
+  private prepareTerrainReviewCamera() {
+    if (!this.terrainReview) return;
+    const eyeHeight = this.avatars.get(this.localId)?.eyeHeight ?? 1.63;
+    const eyeAboveGround = CHARACTER_RADIUS + CHARACTER_HALF_HEIGHT + this.actor.controller.offset() - 0.8 + eyeHeight;
+    this.pitch = terrainReviewPose(this.terrainReview, (x, z) => this.sim.surfaceHeight(x, z), eyeAboveGround).pitch;
+  }
   async start() {
     this.assertStartupActive();
     this.canvas.dataset.bootStage = "presentation";
@@ -873,7 +902,7 @@ export class Game {
     this.canvas.dataset.physicsStage = "ready";
     this.canvas.dataset.bootStage = "avatar-and-props";
     this.compilationProfile.setStage("assets");
-    this.actor = this.sim.add("local");
+    this.createStartupActor();
     // Streamed materials must be rendered while glTF assets finish their
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
     let pipelinePreparation: WebGpuPipelinePreparation | undefined;
@@ -984,6 +1013,7 @@ export class Game {
     this.cinematic = new CinematicAtmosphere(this.scene, this.camera, this.sun);
     this.vehicleLighting = new VehicleLighting(this.scene);
     this.updatePlayers([this.localPlayer]);
+    this.prepareTerrainReviewCamera();
     this.engine.stopRenderLoop(preloadRender);
     // Only hidden startup draws may wait for a pipeline without drawing it.
     // Keep the scope through restore and the final submitted-frame gate.
@@ -1621,6 +1651,7 @@ export class Game {
   /** One path for R and the GUI. Ordered transport sees old inputs before the
    * request; no fresh input is predicted or queued until the forced reply. */
   requestRespawn() {
+    if (this.terrainReview) return false;
     sessionDiagnostics.event("action", { action: "respawn" });
     if (!this.ready || this.respawnPending) return false;
     this.clearPendingMovement();
@@ -1800,7 +1831,7 @@ export class Game {
     return true;
   }
   interact() {
-    if (!this.ready) return;
+    if (!this.ready || this.terrainReview) return;
     const p = this.actor.position;
     sessionDiagnostics.event("action", {
       action: "interact",
@@ -1956,7 +1987,7 @@ export class Game {
       })
     )
       return;
-    if (this.respawnPending) return;
+    if (this.respawnPending || this.terrainReview) return;
     if (
       ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
         e.code,
@@ -1983,6 +2014,7 @@ export class Game {
   };
   keyUp = (e: KeyboardEvent) => this.keys.delete(e.code);
   lock = () => {
+    if (this.terrainReview) return;
     this.canvas.focus();
     if (!this.footFirstPerson || this.uiModal) return;
     const unavailable = () => {
@@ -2001,7 +2033,7 @@ export class Game {
   };
   contextMenu = (e: MouseEvent) => e.preventDefault();
   pointerDown = (e: PointerEvent) => {
-    if (!this.ready || this.uiModal || (e.button !== 0 && e.button !== 2))
+    if (!this.ready || this.terrainReview || this.uiModal || (e.button !== 0 && e.button !== 2))
       return;
     this.canvas.focus();
     this.pointerPress = {
@@ -2112,6 +2144,7 @@ export class Game {
     if (document.pointerLockElement === this.canvas) this.moveCamera(e);
   };
   moveCamera = (e: MouseEvent) => {
+    if (this.terrainReview) return;
     let deltaX = e.movementX,
       deltaY = e.movementY;
     if (this.pointerPress) {
@@ -2147,7 +2180,7 @@ export class Game {
     }
   };
   wheel = (e: WheelEvent) => {
-    if (this.uiModal) return;
+    if (this.uiModal || this.terrainReview) return;
     e.preventDefault();
     this.lastCameraInput = performance.now();
     this.distance = Math.max(3, Math.min(15, this.distance + e.deltaY * 0.006));
@@ -3224,6 +3257,7 @@ export class Game {
           ...diagnostics,
           date: new Date().toISOString(),
           sourceSnapshotId: import.meta.env.VITE_SOURCE_SNAPSHOT_ID || null,
+          terrainReview: terrainReviewIdentity(this.terrainReview),
           durationSeconds,
           frames: b.frames.length,
           averageFps: Number(((1000 * b.frames.length) / sum).toFixed(1)),

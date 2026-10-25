@@ -1,5 +1,15 @@
 # Ověření dema a známá omezení
 
+## Terén B6 a potlačení dlaždic · 25. října 2026
+
+Přidané trávníky vycházejí z konzervativní foto/ortho interpretace, půda a řídké květiny mají dohledané CC0 zdroje. Původní CAD a soukromé fotografie nejsou v Git změně. Native hex sampling potlačuje opakovaný motiv; samostatně je opravená shader cache kolize s betonovým chodníkem a samostínování tenké landcover vrstvy. Mikrotranslace stojící postavy už zbytečně neobnovuje výběr trávy. [Výzkum](terrain/20261025/research.md), [výsledky, snímky a jejich meze](verification-evidence/terrain-20261025/README.md), [nezávislé review](verification-evidence/terrain-20261025/review.md).
+
+Finální source snapshot v7 `3d2c6c6d0133fd4b6b20a9ed44f2021ad6784d66330fc6d4af962b9f978ce62d` obsahuje také testy a assety. Cílené testy/controller regrese43/43 a TypeScript PASS, produkční build PASS; úplná izolovaná integrace v6 i finální v7 PASS. Plná lokální sada v2 měla2098PASS/1časovýFAIL/3platformní či volitelnéSKIP; samostatné opakování dotčené nezměněné fixture prošlo. Není to vydáváno za čistý plný PASS. Aktuální CI a integraci přesného head eviduje [KEY-61](https://linear.app/gigeconomy/issue/KEY-61/teren-realistictejsi-travniky-puda-a-kvetiny-podle-strahova).
+
+Skutečný Edge/GTX1060/WebGL2, CSS1280×720, nízká kvalita interně984×553: statické zadní B6 pohledy low/medium/high44,4/38,5/36,4FPS; front medium39,5; OSM kontrola34,2. P95/p99 a odpovídající baseline jsou v reportu. Všechny čtyři vizuální pohledy přijaty bez původních dlaždic/pruhů, s šedým chodníkem, dokončenou přípravou a0render/asset chybami. WebGPU materiály rovněž prošly skutečným startupem/vykreslením, ale jeho přechodový22,1FPS interval není výkonová přejímka. Čtyři skutečné multiplayerové relace u běžného spawnu:58,4FPS, p95/p99 20,4/23,4ms, čtyři blízké různé avatary a0chyb; tento záběr neobsahuje nový B6 detail a nedokládá jeho davový výkon. Vše pouze staticky, bez WASD/chůze/jízdy či otáčení kamery.
+
+Verze2592 zůstává neměnná. Stromy nejsou součást této etapy, původní rozdíl zadní terasy B6 0,481m a36 neověřených sprchových cílů zůstávají otevřené. Výsledek není slib60FPS ve všech scénách ani úplné fotografické shody.
+
 ## B6 po ruční prohlídce · 25. října 2026
 
 Samostatný B6 checkpoint používá protokol **14**: 475 pohyblivých křídel začíná zavřených, E požaduje změnu od autority a 228 menších pokojových křídel zůstává pevných. Klient přehrává historii pohybu se správným historickým stavem dveří; host má samostatný stav. [Podrobné změny a omezení](reality-pack/cad-buildings/b06/playtest-corrections.md) oddělují průchod při otevřeném křídle od skutečně ověřené interakce.

@@ -240,12 +240,16 @@ test("actual terrain builder keeps canonical floor triangles and bounds while na
   }
 });
 
-test("all eleven actual terrain/road/landcover outputs preserve their pre-chunk buffers and every original primitive", (context) => {
+test("all twelve actual terrain/road/landcover outputs preserve their pre-chunk buffers and every original primitive", (context) => {
   const { engine, scene } = fixture();
   // The historical fixture retains the pre-CAD geometry hashes. CAD cutouts
   // and source entrance grades intentionally changed those inputs; compare
   // chunking to the actual builders' independent input snapshots instead.
-  const names = new Set(sourceFixture.sources.map((source) => source.name));
+  const delta = sourceFixture.terrain20261025;
+  const names = new Set([
+    ...sourceFixture.sources.map((source) => source.name),
+    ...delta.addedMeshNames,
+  ]);
   const originals = new Map<
     string,
     {
@@ -305,7 +309,7 @@ test("all eleven actual terrain/road/landcover outputs preserve their pre-chunk 
     );
     buildStreets({ scene, lights: [] });
     capture.mock.restore();
-    assert.equal(names.size, 11);
+    assert.equal(names.size, 12);
     assert.deepEqual([...originals.keys()].sort(), [...names].sort());
     assert.deepEqual(
       scene.meshes
@@ -347,6 +351,110 @@ test("all eleven actual terrain/road/landcover outputs preserve their pre-chunk 
         assert.equal(hash(data), hash(attribute.values), name + " " + kind);
       }
     }
+    // Separate, current-input witnesses. The old pre-K5 snapshots above are
+    // historical data, never stamped as if they described today's CAD terrain.
+    for (const expected of [
+      ...delta.soilSplit,
+      { name: delta.referenceGrass.name, ...delta.referenceGrass.after },
+    ]) {
+      const actual = originals.get(expected.name)!;
+      assert.equal(actual.vertices, expected.vertices, expected.name);
+      assert.equal(
+        actual.indices.length / 3,
+        expected.triangles,
+        expected.name,
+      );
+      assert.equal(
+        hash(actual.indices),
+        expected.indexValueSha256,
+        expected.name,
+      );
+      for (const [kind, fixtureKey] of [
+        ["position", "positions"],
+        ["normal", "normals"],
+        ["uv", "uvs"],
+      ] as const) {
+        const values = actual.attributes.get(kind)!.values,
+          witness = expected.attributes[fixtureKey];
+        assert.equal(values.length, witness.count, expected.name + " " + kind);
+        assert.equal(
+          hash(values),
+          witness.float32Sha256,
+          expected.name + " " + kind,
+        );
+      }
+    }
+    const grass = originals.get(delta.referenceGrass.name)!;
+    // This is a campus-wide draped material layer. Its large elevation range
+    // used to trigger the generic opaque-caster fallback, despite its 2.5 mm
+    // offset above the canonical terrain. Keep the real mesh visible/receiving.
+    const groundMesh = grass.mesh,
+      metadata = groundMesh.metadata;
+    const groundBounds = groundMesh.getBoundingInfo().boundingBox;
+    assert.ok(
+      groundBounds.maximumWorld.y - groundBounds.minimumWorld.y > 0.12,
+      "actual landcover is tall enough to reproduce the former caster fallback",
+    );
+    assert.equal(metadata.shadowCaster, false);
+    assert.equal(shadowCasterKind(groundMesh), false);
+    assert.equal(groundMesh.isVisible, true);
+    assert.equal(groundMesh.isEnabled(), true);
+    assert.notEqual(
+      metadata.receiveShadows,
+      false,
+      "normal shadow receiving remains enabled by Cinematic policy",
+    );
+    assert.equal(
+      groundMesh.material!.disableDepthWrite,
+      false,
+      "not a depth-write workaround",
+    );
+    try {
+      groundMesh.metadata = { ...metadata, shadowCaster: undefined };
+      assert.equal(
+        shadowCasterKind(groundMesh),
+        "opaque",
+        "without producer metadata this exact source mesh casts onto itself",
+      );
+    } finally {
+      groundMesh.metadata = metadata;
+    }
+    assert.equal(shadowCasterKind(groundMesh), false);
+    const before = delta.referenceGrass.before,
+      after = delta.referenceGrass.after;
+    assert.equal(
+      after.vertices - before.vertices,
+      delta.referenceGrass.addedVertices,
+    );
+    assert.equal(
+      after.triangles - before.triangles,
+      delta.referenceGrass.addedTriangles,
+    );
+    assert.deepEqual(
+      grass.mesh.metadata.sourceFootprints
+        .filter((source: { referenceId?: string }) => source.referenceId)
+        .map((source: { id: string }) => source.id),
+      delta.referenceGrass.referenceIds,
+    );
+    for (const [kind, fixtureKey] of [
+      ["position", "positions"],
+      ["normal", "normals"],
+      ["uv", "uvs"],
+    ] as const) {
+      const witness = before.attributes[fixtureKey];
+      assert.equal(
+        hash(grass.attributes.get(kind)!.values.slice(0, witness.count)),
+        witness.float32Sha256,
+        "all original landcover " +
+          kind +
+          " bytes retained before the two appended references",
+      );
+    }
+    assert.equal(
+      hash(grass.indices.slice(0, before.triangles * 3)),
+      before.indexValueSha256,
+      "all original landcover indices retained before the two appended references",
+    );
   } finally {
     capture.mock.restore();
     scene.dispose();

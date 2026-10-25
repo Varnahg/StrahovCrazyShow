@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-bootstrap",
+  "title": "KEY-61: isolated D-drive terrain research and verified workspace setup",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/terrain-20261025/",
+    "docs/terrain/20261025/",
+    "_bmad/render/bmad-build/",
+    "_bmad-output/implementation-artifacts/terrain-20261025/",
+    "docs/agents/handoffs/terrain-20261025-bootstrap.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Use D-drive worktree from accepted main ff13fa2b with the original common Git coordination registry; preserve played2592 and all existing claims.",
+    "Verify D capacity before large baseline copies; restore only exact HEAD LFS content from existing verified C files, with hashes and no source regeneration.",
+    "Shared dependencies are an explicit read-only junction; no package installation or package writes through it. Temporary, UV and per-command LFS storage are on D.",
+    "Research actual Strahov references and the full current rendering chain before implementation; compare appearance, performance, tier, cache and lifecycle choices.",
+    "Record provenance, uncertainty, storage evidence and planned static-camera-only practical acceptance. Trees are outside this stage."
+  ],
+  "verification": [
+    "Git source/lock/patch identities, LFS OID and size checks, capacity checks, task catalog validation.",
+    "Read-only code and primary-source research; this task does not claim GPU appearance or performance acceptance."
+  ],
+  "notes": [
+    "Explicit user stage TEREN-20261025 delivered by the authorized monitor; Linear KEY-61.",
+    "Node_modules junction creation is setup only; its target C dependencies remain read-only. Baseline Git/LFS restoration is not a model regeneration.",
+    "Before any build, tests or GPU acceptance obtain separate process reservations; do not use WASD, walking or driving for visual validation.",
+    "C is nearly full. Large outputs and all temporary storage belong on D; common Git metadata remains on C and must be checked before commits.",
+    "Baseline LFS restoration reserves the exact12 HEAD paths (1.14GiB) explicitly; copy hashes must match pinned LFS OIDs. No tree/model authoring occurs. D baseline plus LFS cache is about4.44GiB against98GiB available.",
+    "25.10 setup dokončen: read-only node_modules junction a12 HEAD LFS souborů jsou ověřené a dále se nezapisují; scope zúžen po release. Původní root explicitně přijímá vlastní research/spec WIP beze změny vlastníka. Receipt .cache/terrain-20261025/baseline-lfs-receipt.json.",
+    "Implementace a důkazy převzaty koordinátorem25.10; viz docs/verification-evidence/terrain-20261025/README.md. Externí CI/project-acceptance/main merge mají samostatnou integrační bránu."
+  ]
+}

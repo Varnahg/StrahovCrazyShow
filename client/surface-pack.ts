@@ -8,7 +8,12 @@ import type { Material } from "@babylonjs/core/Materials/material";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Observer } from "@babylonjs/core/Misc/observable";
 import manifest from "../shared/data/assets/surfaces-manifest.json";
+import terrainManifest from "../shared/data/assets/terrain-materials-manifest.json";
 import { campusSurfaceArt, CampusSurfaceArtPlugin } from "./cinematic-art";
+import {
+  GroundCoverMaterialPlugin,
+  GROUND_SOIL_RESPONSE,
+} from "./ground-cover-material";
 
 type SurfaceMetadata = {
   surfaceKind?: string;
@@ -19,12 +24,21 @@ type SurfaceMetadata = {
   preserveAuthoredPavingJoints?: boolean;
 };
 
-const FAMILIES = new Map(manifest.assets.map((asset) => [asset.kind, asset]));
+type SurfaceFamily =
+  (typeof manifest.assets)[number] | (typeof terrainManifest.assets)[number];
+const FAMILIES = new Map<string, SurfaceFamily>(
+  [...manifest.assets, ...terrainManifest.assets].map((asset) => [
+    asset.kind,
+    asset,
+  ]),
+);
 const SURFACE_ALIASES: Readonly<Record<string, string>> = {
   paving_stones: "paving",
   stone: "sett",
   cobblestone: "sett",
   compacted: "gravel",
+  dirt: "soil",
+  earth: "soil",
 };
 
 /** Canonical family drives both the texture and its response to weather. */
@@ -35,6 +49,7 @@ const WET_RESPONSE: Readonly<Record<string, readonly [number, number]>> = {
   sett: [0.1, 0.23],
   gravel: [0.18, 0.04],
   grass: [0.05, 0.02],
+  soil: [GROUND_SOIL_RESPONSE.darken, GROUND_SOIL_RESPONSE.smooth],
 };
 
 /** Mesh UVs are authored in metres / uvMetresPerRepeat, not per object. */
@@ -75,6 +90,7 @@ export class SurfacePack {
   private originals = new Map<PBRMaterial, Material>();
   private textures = new Map<string, Texture>();
   private dryAlbedos = new Map<PBRMaterial, Color3>();
+  private groundPlugins = new Map<PBRMaterial, GroundCoverMaterialPlugin>();
   private pending = new Set<AbstractMesh>();
   private materialObservers = new Map<AbstractMesh, Observer<AbstractMesh>>();
   private added: Observer<AbstractMesh>;
@@ -145,7 +161,8 @@ export class SurfacePack {
     const plan = surfaceTexturePlan(original.metadata);
     if (!plan || original.alpha < 0.99) return original;
     const { family, kind, uScale, vScale } = plan;
-    const art = campusSurfaceArt(family.kind)!;
+    const art =
+      kind === "soil" ? GROUND_SOIL_RESPONSE : campusSurfaceArt(kind)!;
     const material = new PBRMaterial(original.name, this.scene);
     original.name += ":legacy";
     material.metadata = {
@@ -208,7 +225,39 @@ export class SurfacePack {
     material.zOffset = original.zOffset;
     material.zOffsetUnits = original.zOffsetUnits;
     material.sideOrientation = original.sideOrientation;
-    new CampusSurfaceArtPlugin(material, art, plan.retainPavingJoints);
+    if (kind === "grass" || kind === "soil") {
+      const opposite = FAMILIES.get(kind === "grass" ? "soil" : "grass")!;
+      const otherArt =
+        opposite.kind === "soil"
+          ? GROUND_SOIL_RESPONSE
+          : campusSurfaceArt("grass")!;
+      const [darken, smooth] = WET_RESPONSE[opposite.kind];
+      this.groundPlugins.set(
+        material,
+        new GroundCoverMaterialPlugin(material, kind === "soil", {
+          maps: {
+            color: this.texture(opposite.channels.color.url, true, 1, 1),
+            normal: this.texture(opposite.channels.normalgl.url, false, 1, 1),
+            roughness: this.texture(
+              opposite.channels.roughness.url,
+              false,
+              1,
+              1,
+            ),
+          },
+          repeat: opposite.metresPerRepeat,
+          tint: otherArt.tint,
+          normalStrength: otherArt.normalStrength,
+          darken,
+          smooth,
+        }),
+      );
+    } else
+      new CampusSurfaceArtPlugin(
+        material,
+        campusSurfaceArt(kind)!,
+        plan.retainPavingJoints,
+      );
     this.converted.set(original, material);
     this.originals.set(material, original);
     this.dryAlbedos.set(material, material.albedoColor.clone());
@@ -245,6 +294,7 @@ export class SurfacePack {
     const updates = changed ? this.converted.values() : this.fresh.values();
     for (const material of updates) {
       this.stats.materialUpdates++;
+      this.groundPlugins.get(material)?.setWetness(wet);
       if (material.metadata.wettable) {
         const [darken, smooth] =
           WET_RESPONSE[material.metadata.materialSurfaceKind];
@@ -282,6 +332,7 @@ export class SurfacePack {
     this.originals.clear();
     this.textures.clear();
     this.dryAlbedos.clear();
+    this.groundPlugins.clear();
     this.fresh.clear();
   }
 

@@ -35,11 +35,12 @@ export class PhotoGrassBatch {
   private sourceRadius: number;
   constructor(
     readonly level: CandidateLevel,
-    resources: GrassResources,
+    resources: Pick<GrassResources, "clone">,
+    private options: { maximumRoots?: number; name?: string; metadata?: Record<string, unknown> } = {},
   ) {
     this.mesh = resources.clone(
       level,
-      "photographic lawn · " + level + " batch",
+      (options.name ?? "photographic lawn") + " · " + level + " batch",
     );
     this.mesh.metadata = {
       ...this.mesh.metadata,
@@ -51,6 +52,7 @@ export class PhotoGrassBatch {
       osmMapped: true,
       shadowCaster: false,
       depthCaster: false,
+      ...options.metadata,
     };
     this.sourceRadius =
       Math.max(
@@ -67,7 +69,7 @@ export class PhotoGrassBatch {
   }
   reserve(count: number) {
     if (count <= this.capacity) return;
-    const maximum = Math.floor(
+    const maximum = this.options.maximumRoots ?? Math.floor(
       CANDIDATE_GRASS_LIMITS.high.triangles /
         CANDIDATE_LOD_TRIANGLES[this.level],
     );

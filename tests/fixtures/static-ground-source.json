@@ -222,5 +222,137 @@
       },
       "indexValueSha256": "d657835d22d3b22545a1960d823ea9ce1ea52727e5e076df7c7157ffe5c5034e"
     }
-  ]
+  ],
+  "terrain20261025": {
+    "id": "terrain-20261025",
+    "baselineCommit": "ff13fa2b3b47363378ce55d34ed12eb5beec1ede",
+    "basis": "Material-only split of existing gravel geometry and two source-interpreted B6 lawn envelopes. Pre-K5 historical hashes above remain untouched; these are separate current input witnesses.",
+    "addedMeshNames": [
+      "mapped-surfaces:soil"
+    ],
+    "soilSplit": [
+      {
+        "name": "mapped-surfaces:gravel",
+        "sourcePolygonIndices": [
+          1,
+          4,
+          5,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "vertices": 32775,
+        "triangles": 10911,
+        "attributes": {
+          "positions": {
+            "count": 98325,
+            "float32Sha256": "3f5f0b32988d43eddca669096b10a5cd64d5b33b69660b7cf68741bdab8f6dc6"
+          },
+          "normals": {
+            "count": 98325,
+            "float32Sha256": "64be83c3cb7e0fa8bf26fc36387911b3a32a07f5f3b2dfbcc2de48f67a4d9c10"
+          },
+          "uvs": {
+            "count": 65550,
+            "float32Sha256": "ec4b8ed38e10c7c808fcc5a5ea8300f29fb85a2418054080c199b56572565e33"
+          }
+        },
+        "indexValueSha256": "40fc9a6e6fbdc8dabd4a436cb7ef3c706acabc59ccc5799d5e936e290721e504"
+      },
+      {
+        "name": "mapped-surfaces:soil",
+        "sourcePolygonIndices": [
+          0,
+          2,
+          3,
+          6,
+          7,
+          8
+        ],
+        "vertices": 4356,
+        "triangles": 1452,
+        "attributes": {
+          "positions": {
+            "count": 13068,
+            "float32Sha256": "d67ecc7f10995bba2de1ec3f296edc25cd9dc57ec6270532d74e3e1318c15584"
+          },
+          "normals": {
+            "count": 13068,
+            "float32Sha256": "0d31c94859bfeffca739b170f0e2127d9976ef18151d88f98d6e83e589325a93"
+          },
+          "uvs": {
+            "count": 8712,
+            "float32Sha256": "e9c0abb791b0e794b1342e5b9337a89eb9e4d4a922350660e46e0d9dfaede9a9"
+          }
+        },
+        "indexValueSha256": "2071b647c8da4bce07ae75d95710911ca2a5e9c589acc47e91a3e620e2e42fba"
+      }
+    ],
+    "referenceGrass": {
+      "name": "mapped surface #788268",
+      "referenceIds": [
+        "reference:b6-front-lawn-20261025",
+        "reference:b6-rear-lawn-20261025"
+      ],
+      "before": {
+        "vertices": 96249,
+        "triangles": 32056,
+        "attributes": {
+          "positions": {
+            "count": 288747,
+            "float32Sha256": "47f72196b2752dcb8718d39dc4be52f3c8f3d2e301934b0b9cef97f80ed442e2"
+          },
+          "normals": {
+            "count": 288747,
+            "float32Sha256": "f5fb71408ae7e47720464a43c8a0f379d0c6a160bd02877766e53b16f3787e73"
+          },
+          "uvs": {
+            "count": 192498,
+            "float32Sha256": "7cbceed0754ed593cc25e9eaa78433252b73882fa83898e8f1b555bce9d9282c"
+          }
+        },
+        "indexValueSha256": "be7194970fb2140f95b085d0cd5af59220f1e5b44affef514db635031e66eae3"
+      },
+      "after": {
+        "vertices": 100158,
+        "triangles": 33217,
+        "attributes": {
+          "positions": {
+            "count": 300474,
+            "float32Sha256": "edf5b8dce12f4a51aa54015a14c910037424af93709801baca2abffcacd93e6d"
+          },
+          "normals": {
+            "count": 300474,
+            "float32Sha256": "3c1dd2f03ead9c4807f1b175c11a4b780712ae99ab04e7812c4d49edf0e3541a"
+          },
+          "uvs": {
+            "count": 200316,
+            "float32Sha256": "7d992959c73cd7eabc02d16df0153274a68abf062512dba6b607e345c9b24cea"
+          }
+        },
+        "indexValueSha256": "b9655ebd9cb3f95f8a9735a27eebf8a39a651446b91af7cf2761937696d8fad9"
+      },
+      "addedVertices": 3909,
+      "addedTriangles": 1161,
+      "originalAttributeAndIndexPrefixUnchanged": true
+    }
+  }
 }

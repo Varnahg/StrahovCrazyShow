@@ -191,12 +191,15 @@ test("native photographic grass keeps per-rendering-mesh ownership, fallback and
       ["photoGrassWind", 2, 3, -4],
       ["photoGrassView", 5, 6, 9, 10],
       ["photoGrassFocus", 7, 8, GRASS_FADE_SECONDS],
+      ["photoGrassShape", .06, .001, 0],
       ["photoGrassWind", 11, -12, 0],
       ["photoGrassView", 13, 14, 6, 9],
       ["photoGrassFocus", 0, 0, GRASS_FADE_SECONDS],
+      ["photoGrassShape", .06, .001, 0],
       ["photoGrassWind", 17, 0, 0],
       ["photoGrassView", 0, 0, 6, 9],
       ["photoGrassFocus", 0, 0, GRASS_FADE_SECONDS],
+      ["photoGrassShape", .06, .001, 0],
     ]);
     const attributes: string[] = [];
     plugin.getAttributes(attributes, f.scene, f.mesh);

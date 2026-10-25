@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-ground",
+  "title": "KEY-61: zdrojové trávníky, půda a přechody povrchů",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/ground-cover.ts",
+    "shared/data/ground-cover-reference.json",
+    "shared/vegetation.ts",
+    "client/terrain-renderer.ts",
+    "client/vegetation.ts",
+    "client/surface-pack.ts",
+    "client/cinematic-art.ts",
+    "client/streets-renderer.ts",
+    "client/ground-cover-material.ts",
+    "shared/data/assets/terrain-materials-manifest.json",
+    "public/textures/terrain/",
+    "assets/sources/terrain/",
+    "scripts/import-terrain-materials.mjs",
+    "tests/ground-cover.test.ts",
+    "tests/terrain-materials.test.ts",
+    "tests/cinematic-art.test.ts",
+    "tests/wgsl-surface-materials.test.ts",
+    "tests/surface-transitions.test.ts",
+    "tests/surface-pilot.test.ts",
+    "tests/vegetation.test.ts",
+    "tests/vegetation-runtime.test.ts",
+    "docs/agents/handoffs/terrain-20261025-ground.md",
+    ".cache/terrain-ground-20261025/",
+    "tests/streets.test.ts",
+    "tests/static-submesh-chunks.test.ts",
+    "tests/fixtures/static-ground-source.json"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Doplnit konzervativní foto/ortho interpretované trávníky u B6 s datem a nejistotou, zachovat RAW OSM a výluky, výšky a kolize.",
+    "Společné čisté pole variace/opotřebení používají povrchy i následný scatter; přesný API kontrakt předat koordinátorovi před závislými změnami.",
+    "Samostatná doložená CC0 fotografická půda brown_mud1K, skutečné rozměry/MD5/SHA, cache/disposal, GLSL+WGSL; světový přechod na existující dirt pěšině bez falešného posunu trasy.",
+    "Žádná změna stromů ani nového runtime API Game; cílený refaktoring a relevantní testy spolu."
+  ],
+  "verification": [
+    "Lehké cílené CPU testy přidělených modulů; uložení skutečných výsledků, omezení a přesného diffu do předání.",
+    "Celkový build/test/integrace a GPU přejímka patří root se samostatnými resources."
+  ],
+  "notes": [
+    "25.10 root vrací autorovi ground WIP pro izolovanou opravu samostínování tenkého landcover overlay v client/vegetation.ts a relevantní static chunk test. Bez změny geometrie, UV, materiálu nebo globálního bias. První experiment přidá pouze shadowCaster:false; další receiver/depth metadata musí být odlišena od kauzálního checkpointu. Root vlastní GPU ověření.",
+    "Přímé implementační zadání TERÉN-20261025/KEY-61 od koordinátora; žádný rekurzivní BMAD ani další podagenti.",
+    "Pracovní kopie D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, baseline ff13fa2b. Před shellem načíst .cache/terrain-20261025/activate.ps1; node_modules je pouze čtecí junction, nic neinstalovat.",
+    "Hraná2592 se nemění; žádné GPU/browser/procesní testy ani WASD. Jen lehké cílené CPU testy bez heavy-validation.",
+    "Před zápisem vlastní claim, po dokončení předání a release. Koordinátor provede celkové testy/review/commity/integraci.",
+    "Spec: _bmad-output/implementation-artifacts/terrain-20261025/spec-key-61-teren.md; výzkum docs/terrain/20261025/research.md.",
+    "25.10 root předává autorovi pouze review opravy: wetness UBO regrese a zachování přesných očekávání street/soil/chunk fixtures. Předchozí ground WIP z manifestu b9e1d924 byl explicitně převzat integrátorem a nyní vrácen autorovi; --adopt-dirty pouze pro tento doložený rozsah. Produkční zdroje měnit jen při prokázané chybě.",
+    "25.10 uživatelská vizuální zpětná vazba: čitelný pravidelný rastr trávy; nezávislý snímek také prokázal černý chodník. Root vrací vlastní převzatý WIP autorovi k dvěma odděleným checkpointům: nejprve pouze unikátní Ground getClassName, poté obnovení původního detail/saturation a společná bounded antitiling sampling cesta obou vrstev. Produkční kopie a raw předlohy zůstávají nedotčené.",
+    "Implementace a důkazy převzaty koordinátorem25.10; viz docs/verification-evidence/terrain-20261025/README.md. Externí CI/project-acceptance/main merge mají samostatnou integrační bránu."
+  ]
+}

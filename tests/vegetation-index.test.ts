@@ -11,6 +11,7 @@ import {
 } from "../shared/streets";
 import {
   LANDCOVER,
+  RAW_LANDCOVER,
   createGrassPatches,
   placementClassifier,
   pointInPolygon,
@@ -23,6 +24,7 @@ import {
 import { isRealityGroundSurface } from "../shared/terrain";
 import { BOUNDS, BUILDINGS, MAP } from "../shared/world";
 import type { Building, WorldMap } from "../shared/types";
+import { GROUND_COVER_AREAS } from "../shared/ground-cover";
 
 /** Compatibility oracle: the original exhaustive edge scan, before indexing. */
 function originalRing(x: number, z: number, ring: StreetPoint[]) {
@@ -256,15 +258,42 @@ test("spatial vegetation candidates preserve exhaustive grass, forest and tree d
   }
 });
 
-test("expanded-campus grass retains the reviewed buffered-placement fingerprint", () => {
+test("expanded-campus grass retains the original OSM fingerprint and adds only the two source-backed B6 lawns", () => {
   const grass = createGrassPatches(BOUNDS, BUILDINGS, MAP.paths);
-  assert.equal(grass.length, 597);
+  const originalGrassAreas = RAW_LANDCOVER.areas.filter(grassSurface);
+  const original = [], added = [];
+  for (const patch of grass) {
+    const oldPoints = [], newPoints = [];
+    for (const point of patch.points) {
+      const x = patch.x + point.x, z = patch.z + point.z;
+      if (originalGrassAreas.some(area => pointInPolygon(x, z, area.points))) oldPoints.push(point);
+      else {
+        assert.ok(GROUND_COVER_AREAS.some(area => pointInPolygon(x, z, area.points)),
+          `new point outside the two explicitly sourced lawns: ${x},${z}`);
+        newPoints.push(point);
+      }
+    }
+    if (oldPoints.length) original.push({ ...patch, points: oldPoints });
+    if (newPoints.length) added.push({ ...patch, points: newPoints });
+  }
+  // Do not re-stamp the campus hash after adding coverage. The original OSM
+  // population, ordering, local positions, sizes and yaw retain their full hash.
+  assert.equal(original.length, 597);
   assert.equal(
-    grass.reduce((n, p) => n + p.points.length, 0),
+    original.reduce((n, p) => n + p.points.length, 0),
     80576,
   );
   assert.equal(
-    createHash("sha256").update(JSON.stringify(grass)).digest("hex"),
+    createHash("sha256").update(JSON.stringify(original)).digest("hex"),
     "c852a5980990694f5fced980ce3b980babc6b838e9805fa70f74987f4d3742bd",
   );
+  assert.deepEqual(GROUND_COVER_AREAS.map(area => area.referenceId),
+    ["b6-front-lawn-20261025", "b6-rear-lawn-20261025"]);
+  assert.equal(added.length, 20);
+  assert.equal(added.reduce((n, p) => n + p.points.length, 0), 2294);
+  assert.equal(createHash("sha256").update(JSON.stringify(added)).digest("hex"),
+    "4e8fef0f38eacfa5d087deada2809179269d648981bd4fc49713ea40cd44479d",
+    "separate reviewed B6 addition, not a replacement for the original campus fingerprint");
+  assert.equal(grass.length, original.length + added.length, "new source tiles are disjoint from the historic OSM tiles");
+  assert.equal(grass.reduce((n, p) => n + p.points.length, 0), 80576 + 2294);
 });

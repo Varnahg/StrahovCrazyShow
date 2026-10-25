@@ -4,6 +4,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
 import map from "../shared/data/map.json";
 import transit from "../shared/data/transit.json";
+import groundFixture from "./fixtures/static-ground-source.json";
 import {
   STREETS,
   STREET_FEATURES,
@@ -18,6 +19,7 @@ import {
   CALIBRATED_ROAD_FEATURES,
 } from "../shared/streets";
 import { streetVertexData, buildStreets } from "../client/streets-renderer";
+import { staticChunkSource } from "../client/static-submesh-chunks";
 const buildingBounds = map.buildings.map((building) => ({
   building,
   minX: Math.min(...building.points.map((p) => p[0])),
@@ -306,6 +308,7 @@ test("mapped and photo-interpreted lamps share exact pole/base collisions and un
       "mapped-surfaces:sett",
       "mapped-surfaces:paving",
       "mapped-surfaces:gravel",
+      "mapped-surfaces:soil",
       "mapped-flush-material-joints",
       "mapped-lamp-pools",
       "mapped-lamp-lenses",
@@ -313,6 +316,43 @@ test("mapped and photo-interpreted lamps share exact pole/base collisions and un
       "mapped-crossing-markings",
     ].sort(),
   );
+  const originalGravel = STREET_SURFACES.find(
+    (surface) => surface.material === "gravel",
+  )!;
+  const split = groundFixture.terrain20261025.soilSplit;
+  const polygonIndices = split
+    .flatMap((entry) => entry.sourcePolygonIndices)
+    .sort((a, b) => a - b);
+  assert.deepEqual(
+    polygonIndices,
+    originalGravel.polygons.map((_, index) => index),
+    "every original gravel polygon belongs to exactly one new material group",
+  );
+  for (const entry of split) {
+    const mesh = result.meshes.find(
+      (candidate) => candidate.name === entry.name,
+    )!;
+    const canonical = streetVertexData(
+      entry.sourcePolygonIndices.map((index) => originalGravel.polygons[index]),
+    );
+    assert.equal(mesh.getTotalVertices(), entry.vertices);
+    assert.equal(mesh.getTotalIndices() / 3, entry.triangles);
+    for (const [kind, values] of [
+      ["position", canonical.positions],
+      ["normal", canonical.normals],
+      ["uv", canonical.uvs],
+    ] as const)
+      assert.deepEqual(
+        new Float32Array(mesh.getVerticesData(kind)!),
+        new Float32Array(values!),
+        entry.name + " exact source " + kind,
+      );
+    assert.deepEqual(
+      staticChunkSource(mesh)!.indices,
+      new Uint32Array(canonical.indices!),
+      entry.name + " source triangles and winding",
+    );
+  }
   assert.equal(result.crossings, CROSSING_MARKINGS.length);
   // Four explicitly marked nodes plus two legacy uncontrolled nodes; the OSM
   // definition of uncontrolled includes road paint. Explicit no stays absent.

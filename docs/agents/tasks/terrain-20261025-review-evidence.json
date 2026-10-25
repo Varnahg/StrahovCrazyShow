@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-review-evidence",
+  "title": "KEY-61: zachovat statický pohled v uloženém benchmarku",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/local-benchmark.ts",
+    "tests/local-benchmarks.test.ts",
+    "docs/agents/handoffs/terrain-20261025-review-evidence.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "ProjectLocalBenchmark zachová pouze whitelist statickéhoQA ID/version/scope a omezené číselné souřadnice, nikoli volný source text.",
+    "Počet avatars je skutečná populace rendereru, nikoli jen historické režimy1/30; validovat omezené kladné celé číslo podle skutečného kontraktu a pokrýt browser+3SDK scénář4.",
+    "Cílené testy serverového i UI sdíleného projector helperu, ostatní allowlisty a ochrany beze změn."
+  ],
+  "verification": [
+    "node node_modules/tsx/dist/cli.mjs --test tests/local-benchmarks.test.ts",
+    "Žádný skutečný server/GPU ani pohyb hráče; celkovou integraci provede root."
+  ],
+  "notes": [
+    "Navazující přidělení terrain-static-01a16b37 po zjištění, že UI i server zahazují terrainReview.",
+    "Game.startBenchmark počítá minAvatars=this.avatars.size, proto3SDK+browser znamená4, ne3. Rozsah čísel doložit s helperem, netvrdit dosažený MP výkon.",
+    "Implementace a důkazy převzaty koordinátorem25.10; viz docs/verification-evidence/terrain-20261025/README.md. Externí CI/project-acceptance/main merge mají samostatnou integrační bránu."
+  ]
+}
