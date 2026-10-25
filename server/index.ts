@@ -17,6 +17,11 @@ import {
 } from "./session-lifecycle";
 import { sanitizeProfile, cleanText } from "../shared/profile";
 import { initPhysics, Simulation } from "../shared/simulation";
+import {
+  CAD_DOOR_DEFINITIONS,
+  CAD_DOOR_DEFINITION_HASH,
+} from "../shared/cad-buildings";
+import { ServerDoorInteractions } from "./door-interactions";
 import { SPAWN } from "../shared/world";
 import { groundHeight } from "../shared/terrain";
 import { vehicleExitAllowed } from "../shared/vehicle";
@@ -89,12 +94,24 @@ class StrahovRoom extends Room {
     );
   }
   emoteExpiry = new Map<string, number>();
+  doorInteractions!: ServerDoorInteractions<Client>;
   onCreate() {
     if (singletonRoomId)
       throw new Error(
         "Demo používá jediný společný svět. Připoj se k existující instanci.",
       );
     singletonRoomId = this.roomId;
+    this.doorInteractions = new ServerDoorInteractions(
+      this.sim,
+      CAD_DOOR_DEFINITIONS,
+      { worldEpoch: this.roomId, definitionHash: CAD_DOOR_DEFINITION_HASH },
+      {
+        isCurrentConnection: (client, id) =>
+          this.connections.get(id) === client && this.inputQueues.has(id),
+        sendResult: (client, result) => client.send("doorResult", result),
+        broadcastDelta: (delta) => this.broadcast("doorDelta", delta),
+      },
+    );
     const receiveInputs = (c: Client, raws: unknown[]) => {
       if (!store.rate(c.auth.id, "input-packet", 90, 1000)) return;
       const queue = this.inputQueues.get(c.auth.id);
@@ -107,6 +124,19 @@ class StrahovRoom extends Room {
     this.onMessage("input", (c, raw) => receiveInputs(c, [raw]));
     this.onMessage("inputs", (c, raw) => {
       if (Array.isArray(raw)) receiveInputs(c, raw);
+    });
+    this.onMessage("doorRequest", (c, raw: unknown) => {
+      this.doorInteractions.receive(c, c.auth.id, raw);
+    });
+    this.onMessage("doorResync", (c) => {
+      if (
+        this.connections.get(c.auth.id) !== c ||
+        !this.inputQueues.has(c.auth.id) ||
+        !store.rate(c.auth.id, "door-resync", 2, 1000)
+      )
+        return;
+      this.resetInputEpoch(c.auth.id, this.inputQueues.get(c.auth.id)!);
+      this.sendAuthority(c, true, "client-request");
     });
     this.onMessage("resync", (c) => {
       if (store.rate(c.auth.id, "resync", 2, 1000)) {
@@ -260,7 +290,11 @@ class StrahovRoom extends Room {
         if (!recovery) return;
         recovery.authority.resyncReason = "respawn";
         recovery.authority.network = this.captureNetworkDiagnostics(queue);
+        recovery.authority.doorRevision = this.doorInteractions.revision;
+        recovery.authority.doorWorldEpoch =
+          this.doorInteractions.identity.worldEpoch;
         // Send immediately, even if the next motion tick has not occurred.
+        this.sendDoorSnapshot(c);
         c.send("authoritative", recovery.authority);
         if (recovery.carRecovered)
           this.broadcast("car", {
@@ -318,6 +352,7 @@ class StrahovRoom extends Room {
             a.step(input, dt);
             store.players.get(id)!.ack = queue.ack;
           }
+          this.doorInteractions.flush(tick, now);
           this.sim.tick(time);
         },
         (plan) => {
@@ -422,6 +457,7 @@ class StrahovRoom extends Room {
     };
     synchronizePlayer(p, actor);
     store.players.set(p.id, p);
+    this.sendDoorSnapshot(client);
     client.send("welcome", {
       id: p.id,
       players: [...store.players.values()],
@@ -465,6 +501,7 @@ class StrahovRoom extends Room {
       });
     }
     this.connections.delete(id);
+    this.doorInteractions.forgetActor(id);
     this.emoteExpiry.delete(id);
     this.sim.remove(id);
     store.players.delete(id);
@@ -475,6 +512,7 @@ class StrahovRoom extends Room {
     this.syncSocial();
   }
   onDispose() {
+    this.doorInteractions?.dispose();
     this.sim.dispose();
     if (singletonRoomId === this.roomId) singletonRoomId = undefined;
   }
@@ -496,15 +534,30 @@ class StrahovRoom extends Room {
     const actor = this.sim.actors.get(c.auth.id),
       queue = this.inputQueues.get(c.auth.id);
     if (!actor || !queue) return;
+    // Join already sends its complete snapshot before welcome.
+    if (resync && resyncReason !== "join") this.sendDoorSnapshot(c);
     const authority: Authority = {
       ...queue.frontier(),
       time: this.simulationClock.time,
       state: actor.capture(),
       resync,
       network: this.captureNetworkDiagnostics(queue),
+      doorRevision: this.doorInteractions.revision,
+      doorWorldEpoch: this.doorInteractions.identity.worldEpoch,
     };
     if (resyncReason) authority.resyncReason = resyncReason;
     c.send("authoritative", authority);
+  }
+  private sendDoorSnapshot(c: Client) {
+    if (
+      this.connections.get(c.auth.id) !== c ||
+      !this.inputQueues.has(c.auth.id)
+    )
+      return;
+    c.send(
+      "doorSnapshot",
+      this.doorInteractions.snapshot(this.simulationClock.tick),
+    );
   }
   private resetInputEpoch(id: string, queue: TimelineInputQueue) {
     queue.reset(++this.nextInputEpoch, this.simulationClock.tick);

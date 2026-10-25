@@ -388,10 +388,12 @@ class B6PhotoShellTests(unittest.TestCase):
         _,partition=b6.split_bedroom_window(window,data)
         wall=partition.union(box(27.151,-.060596,32.751,.384403))
         openings,windows,_=b6.opening_descriptors('n02',data,wall,GeometryCollection(),[])
-        self.assertEqual(len(windows),2);self.assertEqual(len(openings),1)
+        self.assertEqual(len(windows),2)
+        self.assertEqual(sum(o['kind']=='window-sill-cut' for o in openings),2)
+        opening=next(o for o in openings if o['kind']=='window')
         witness=Point(29.978803,.214404)
-        self.assertTrue(openings[0]['bridge'].covers(witness))
-        self.assertFalse(openings[0]['cut'].covers(witness))
+        self.assertTrue(opening['bridge'].covers(witness))
+        self.assertFalse(opening['cut'].covers(witness))
         bands=b6.geom.wall_bands(wall,openings,3,5.8,'fixture')
         solid=unary_union([Polygon(s['loops'][0],s['loops'][1:]) for s in bands if s['bottom']<4.5<s['top']])
         self.assertTrue(solid.covers(witness))
@@ -453,10 +455,9 @@ class B6RearSourceTests(unittest.TestCase):
         self.assertTrue(deck.covers(Point(53.7,17.5)))
 
     def test_rear_terrain_mask_does_not_erase_terrace_shadow_or_surrounding_lawn(self):
-        rear=b6.rear_exterior_metadata();cut=unary_union([Polygon(q['loops'][0]) for q in rear['terrainCutouts']])
-        self.assertLess(cut.area,11)
-        self.assertFalse(cut.covers(Point(53.7,18)))
-        self.assertFalse(cut.covers(Point(64,22)))
+        rear=b6.rear_exterior_metadata()
+        self.assertEqual(rear['terrainCutouts'],[], 'raised open flights must retain ground beneath their whole footprint')
+        self.assertTrue(rear['plans'][0]['terrainValidationPending'])
         sign=b6.rear_sign();self.assertGreater(sign['a'][0],sign['b'][0]);self.assertAlmostEqual(sign['top']-sign['bottom'],.7)
 
     def test_shower_cap_keeps_perimeter_and_measured_half_metre_openings(self):
@@ -480,6 +481,216 @@ class B6RearSourceTests(unittest.TestCase):
         self.assertFalse(retained.covers(Point(6.65,5.1644)));self.assertEqual(room['geometry'].wkt,before)
 
 
+class B6ShellRevision2Tests(unittest.TestCase):
+    def test_slab_top_partitions_cover_rooms_and_remainder_once_with_holes(self):
+        slab=box(0,0,6,4).difference(box(2,1,4,3));solids=b6.geom.serialize_solids(slab,'floor','slab',2.8,3,'floor')
+        original=json.loads(json.dumps(solids[0]));rooms=[]
+        for ident,shape,usage in [('left',box(0,0,3,4),'bedroom'),('right',box(3,0,5,4),'corridor')]:
+            rooms.append({'id':ident,'sourceEntity':ident,'levelKey':'n02.main','usage':usage,
+                          'finishTriangles':b6.surface_triangles(shape.intersection(slab))})
+        floor={'id':'n02','rooms':rooms,'solids':solids};b6.partition_slab_tops(floor)
+        parts=solids[0]['topSurfacePartitions'];triangles=[Polygon(t) for p in parts for t in p['triangles']]
+        whole=unary_union(triangles)
+        self.assertAlmostEqual(whole.symmetric_difference(slab).area,0)
+        self.assertAlmostEqual(sum(t.area for t in triangles),20)
+        self.assertAlmostEqual(whole.intersection(box(2,1,4,3)).area,0)
+        self.assertEqual(sum(p['role']=='floor-finish' for p in parts),2)
+        self.assertAlmostEqual(sum(Polygon(t).area for p in parts if p['role']=='slab' for t in p['triangles']),4)
+        self.assertEqual({k:solids[0][k] for k in original},original,'original volume, side/bottom inputs and height stay unchanged')
+
+    def test_slab_top_keeps_tiny_remainder_and_ignores_other_elevations(self):
+        shape=box(0,0,1,1);tiny=box(.999,.999,1,1);solid=b6.geom.serialize_solids(shape,'tiny','slab',2.8,3,'floor')[0]
+        room={'id':'room','sourceEntity':'room','usage':'bedroom','levelKey':'n02.main',
+              'finishTriangles':b6.surface_triangles(shape.difference(tiny))}
+        floor={'id':'n02','rooms':[room],'solids':[solid]};b6.partition_slab_tops(floor)
+        remainder=[Polygon(t) for p in solid['topSurfacePartitions'] if p['role']=='slab' for t in p['triangles']]
+        self.assertAlmostEqual(sum(t.area for t in remainder),.000001,places=10)
+        room['levelKey']='n01.main';b6.partition_slab_tops(floor)
+        self.assertEqual(len(solid['topSurfacePartitions']),1)
+        self.assertEqual(solid['topSurfacePartitions'][0]['role'],'slab')
+
+    def test_slab_top_rejects_conflicting_accepted_room_finishes(self):
+        floor={'id':'n02','solids':b6.geom.serialize_solids(box(0,0,3,2),'overlap','slab',2.8,3,'floor'),
+               'rooms':[{'id':str(i),'sourceEntity':str(i),'usage':'bedroom','levelKey':'n02.main',
+                         'finishTriangles':b6.surface_triangles(shape)} for i,shape in enumerate([box(0,0,2,2),box(1,0,3,2)])]}
+        with self.assertRaisesRegex(ValueError,'Overlapping accepted'):b6.partition_slab_tops(floor)
+
+    def test_sill_volume_replaces_wall_cap_and_retains_the_thin_room_partition(self):
+        data,window=B6PhotoShellTests().window_fixture()
+        _,partition=b6.split_bedroom_window(window,data)
+        wall=b6.geom.clean(partition.union(box(27.151,-.060596,32.751,.384403)))
+        openings,windows,_=b6.opening_descriptors('n02',data,wall,GeometryCollection(),[])
+        solids=b6.geom.wall_bands(wall,openings,3,5.8,'fixture')
+        caps=unary_union([Polygon(s['loops'][0],s['loops'][1:]) for s in solids if s['top']==3.9])
+        at_sill=unary_union([Polygon(s['loops'][0],s['loops'][1:]) for s in solids if s['bottom']<3.88<s['top']])
+        self.assertTrue(at_sill.covers(Point(29.978803,.214403)))
+        for child in windows:
+            sill=child['sill'];shape=Polygon(sill['loops'][0],sill['loops'][1:])
+            self.assertAlmostEqual(caps.intersection(shape).area,0)
+            self.assertAlmostEqual(at_sill.intersection(shape).area,0)
+            self.assertAlmostEqual(shape.intersection(partition).area,0)
+            self.assertAlmostEqual(sum(Polygon(t).area for t in sill['triangles']),shape.area)
+            self.assertEqual((sill['bottom'],sill['top']),(3.865,3.9))
+
+    def test_annex_short_jambs_do_not_use_parallel_half_metre_projection(self):
+        w={'id':'n05-window-F7D','a':[15.241349,-5.563095],'b':[17.116256,-5.563095],
+           'sourceEntities':['F7D','F7E'],'depth':.5,'normalOffset':-.1879,'bottom':14.4,'top':15.9}
+        lines=[line('F77',[15.241349,-5.500594],[15.241349,-5.625594]),
+               line('F73',[17.116256,-5.500594],[17.116256,-5.618433]),
+               line('F7F',[13.388023,-6.000595],[18.969584,-6.000595]),
+               line('F7B',[13.357326,-5.750595],[19.000279,-5.750595])]
+        w['frameJamb']=b6.measured_window_jamb(w,lines)
+        sill,shape=b6.window_sill(w)
+        self.assertEqual(set(w['frameJamb']['sourceEntities']),{'F77','F73'})
+        self.assertAlmostEqual(w['frameJamb']['depth'],.125)
+        self.assertAlmostEqual(sill['width'],.225)
+        self.assertAlmostEqual(sill['a'][1],-5.563094,places=6)
+        self.assertEqual(w['depth'],.5,'surrounding reveal is a separate retained observation')
+        self.assertGreater(shape.bounds[1],-5.68)
+
+    def last_facade_fixture(self):
+        profile=box(50.125,16.034,57.329,16.284);floors=[]
+        for fid,base in [('n05',14.4),('n06',15.9)]:
+            windows=[];openings=[]
+            for i,(a,c) in enumerate([(54.853803,52.600304),(52.450303,50.200304),(57.253802,55.003803)]):
+                source=(['D17','D19','D1B'] if fid=='n05' else ['CE6','CE8','CEA'])[i]
+                w={'id':fid+'-'+source,'sourceEntities':[source],'a':[a,16.209403],'b':[c,16.209403],
+                   'bottom':base,'top':base+1.5,'normalOffset':.0504,'depth':.25}
+                w['sill']=b6.window_sill(w)[0] if fid=='n05' else None
+                windows.append(w);openings.append({'cut':b6.geom.opening_cut(w['a'],w['b'],-.0746,.1754,True),'bottom':base,'top':base+1.5})
+            solids=b6.geom.wall_bands(profile,openings,13.5 if fid=='n05' else 15,17.8,fid)
+            if fid=='n06':solids+=b6.geom.serialize_solids(profile,'n06-front','slab',14.8,15,'floor')
+            untouched=b6.geom.serialize_solids(box(60,5,61,6),fid+'-untouched','wall',15,17.8)
+            solids+=untouched
+            floors.append({'id':fid,'rooms':[],'windows':windows,'solids':solids,
+                           'levelRegions':[{'levelKey':'n05.mezzanine','loops':[[[49.875,14.499],[57.579,14.499],[57.579,16.6],[49.875,16.6]]]}]})
+        return floors
+
+    def test_last_facade_opens_all_existing_z_and_removes_only_duplicate_owned_volume(self):
+        floors=self.last_facade_fixture();before=[next(s for s in f['solids'] if 'untouched' in s['id']) for f in floors]
+        note=b6.resolve_last_east_facade(floors)
+        self.assertGreater(note['openingRemovedVolumeM3'],0);self.assertGreater(note['duplicateRemovedVolumeM3'],0)
+        for z in [14.5,14.9,15.4,15.95,16.5,17.3]:
+            self.assertFalse(any(Polygon(s['loops'][0],s['loops'][1:]).covers(Point(51.3253,16.209403))
+                for f in floors for s in f['solids'] if s['bottom']<z<s['top']))
+        for z in [15.1,15.8,16.5,17.6]:
+            shapes=[unary_union([Polygon(s['loops'][0],s['loops'][1:]) for s in f['solids'] if s['bottom']<z<s['top']]) for f in floors]
+            self.assertAlmostEqual(shapes[0].intersection(shapes[1]).intersection(box(49,14,58,17)).area,0)
+        for f,original in zip(floors,before):self.assertIn(original,f['solids'])
+        self.assertTrue(all(w['sill'] is None and w['facadeOwnerFloor']=='n05' for w in floors[1]['windows']))
+        self.assertEqual([(w['bottom'],w['top']) for w in floors[0]['windows']],[(14.4,15.9)]*3)
+
+    def test_last_facade_refuses_unmatched_source_positions(self):
+        floors=self.last_facade_fixture();floors[1]['windows'][0]['a'][1]+=.1
+        with self.assertRaisesRegex(ValueError,'continuity'):b6.resolve_last_east_facade(floors)
+
+
+class B6DoorFrameOwnershipTests(unittest.TestCase):
+    @staticmethod
+    def source_pair():
+        return [
+            {'id':'n02-door-468B','hinge':[21.940103,6.489404],'closedEnd':[21.315103,6.489404],
+             'openEnd':[21.940103,7.114403],'sourceEntities':['468B','468A'],'pairedDoorId':'n02-door-46A1',
+             'bottom':3,'top':5.1,'depth':.125,'normalOffset':.0629},
+            {'id':'n02-door-46A1','hinge':[20.690104,6.489404],'closedEnd':[21.315064,6.489404],
+             'openEnd':[21.249121,6.768912],'sourceEntities':['46A1','46A0'],'pairedDoorId':'n02-door-468B',
+             'bottom':3,'top':5.1,'depth':.125,'normalOffset':-.0629,'openingClassification':'fixed-paired-door-leaf'}]
+
+    @staticmethod
+    def entry():
+        return {'id':'n01-door-12E1','hinge':[12.975616,-3.462369],'closedEnd':[12.828549,-2.674438],
+            'openEnd':[12.131954,-3.565958],'sourceEntities':['12E1','12C0'],
+            'bottom':1.5,'top':3.6,'depth':.356,'normalOffset':.0251}
+
+    @staticmethod
+    def shape(solid):return Polygon(solid['loops'][0],solid['loops'][1:])
+
+    def test_measured_12e1_header_replaces_wall_volume_across_floor_and_keeps_rest(self):
+        door=self.entry();before=json.dumps(door,sort_keys=True)
+        floor={'id':'n01','doors':[door],'rooms':[],'solids':[]}
+        raw=b6.door_frame_profiles(floor)
+        header=next(p for p in raw if p['bottom']==3.6)
+        wall=header['geometry'].buffer(.20,join_style=2)
+        # Legacy header occupies 100% of this uncut structural fixture.
+        self.assertAlmostEqual(wall.intersection(header['geometry']).area/header['geometry'].area,1)
+        upper={'id':'n02','doors':[],'rooms':[],'solids':b6.serialize_exact_solids(wall,'upper','wall',3.4,4,'plaster')}
+        b6.reserve_door_frames([floor,upper])
+        removed=upper['crossFloorDoorFrameRemovedVolumeM3']
+        expected=sum(p['geometry'].intersection(wall).area*max(0,min(4,p['top'])-max(3.4,p['bottom'])) for p in raw)
+        self.assertAlmostEqual(removed,expected,places=8)
+        for solid in upper['solids']:
+            for p in raw:
+                if min(solid['top'],p['top'])>max(solid['bottom'],p['bottom']):
+                    self.assertLess(self.shape(solid).intersection(p['geometry']).area,1e-12)
+        after={k:v for k,v in door.items() if k not in ('frameOwnership','frameSolidIds')}
+        self.assertEqual(json.dumps(after,sort_keys=True),before)
+        self.assertEqual(door['frameOwnership'],'recipe-solids')
+        self.assertTrue(door['frameSolidIds'])
+        retained_above=unary_union([self.shape(s) for s in upper['solids'] if s['bottom']<3.8<s['top']])
+        self.assertLess(retained_above.symmetric_difference(wall).area,1e-12)
+
+    def test_source_paired_frame_has_one_header_and_no_center_post_or_opening_pinch(self):
+        doors=self.source_pair();floor={'id':'n02','doors':doors,'rooms':[],'solids':[]}
+        b6.reserve_door_frames([floor])
+        self.assertEqual(len(floor['solids']),3)
+        self.assertEqual(doors[0]['frameSolidIds'],doors[1]['frameSolidIds'])
+        low=unary_union([self.shape(s) for s in floor['solids'] if s['bottom']<4<s['top']])
+        self.assertFalse(low.covers(Point(21.3151,6.426504)))
+        for d in doors:
+            a,b,_,depth=b6.door_frame_span(d)
+            self.assertLess(low.intersection(LineString([a,b]).buffer(depth/2,cap_style=2)).area,1e-12)
+        headers=[s for s in floor['solids'] if s['bottom']==5.1]
+        self.assertEqual(len(headers),1)
+        self.assertEqual(headers[0]['sourceDoorIds'],sorted(d['id'] for d in doors))
+        self.assertEqual(doors[1]['openingClassification'],'fixed-paired-door-leaf')
+
+    def test_only_unique_shared_end_reverse_collinear_same_reveal_pairs_are_combined(self):
+        first,second=self.source_pair()
+        for d in (first,second):d.pop('pairedDoorId')
+        self.assertEqual(len(b6.door_frame_groups([first,second])),1)
+        for patch_values in ({'top':5.2},{'depth':.15},{'normalOffset':-.08},
+                             {'closedEnd':[21.32,6.489404]},{'hinge':[21.315064,5.864404]}):
+            self.assertEqual(len(b6.door_frame_groups([first,{**second,**patch_values}])),2,patch_values)
+        duplicate={**second,'id':'ambiguous-other','sourceEntities':['other']}
+        self.assertEqual(len(b6.door_frame_groups([first,second,duplicate])),3)
+
+    def test_invalid_declared_pair_and_nonfinite_source_are_rejected(self):
+        first,second=self.source_pair()
+        with self.assertRaisesRegex(ValueError,'paired frame'):b6.door_frame_groups([first,{**second,'top':5.2}])
+        with self.assertRaisesRegex(ValueError,'Invalid source door'):b6.door_frame_span({**first,'depth':float('nan')})
+
+    def test_intersecting_source_frame_profiles_have_one_volume_owner_per_z_band(self):
+        first=self.entry();duplicate={**first,'id':'n02-source-projection'}
+        floors=[{'id':'n01','doors':[first],'rooms':[],'solids':[]},
+                {'id':'n02','doors':[duplicate],'rooms':[],'solids':[]}]
+        b6.reserve_door_frames(floors)
+        solids=[s for f in floors for s in f['solids']]
+        for i,s in enumerate(solids):
+            self.assertTrue(s['collision']);self.assertEqual(s['material'],'frame')
+            self.assertAlmostEqual(sum(Polygon(t).area for t in s['triangles']),self.shape(s).area)
+            for other in solids[:i]:
+                if min(s['top'],other['top'])>max(s['bottom'],other['bottom']):
+                    self.assertLess(self.shape(s).intersection(self.shape(other)).area,1e-12)
+        self.assertEqual(first['frameSolidIds'],duplicate['frameSolidIds'])
+        self.assertFalse(floors[1]['solids'])
+
+    def test_structural_insert_refreshes_floor_finish_before_top_partitioning(self):
+        door={**self.entry(),'hinge':[0,0],'closedEnd':[1,0],'bottom':-.2,'top':2,'normalOffset':0,'depth':.2}
+        slab=b6.serialize_exact_solids(box(-1,-1,2,1),'floor','slab',-.2,0,'floor')
+        room={'id':'1','sourceEntity':'room','geometry':box(-1,-1,2,1),'loops':[[[-1,-1],[2,-1],[2,1],[-1,1]]],
+              'levelKey':'n01.main','usage':'bedroom'}
+        floor={'id':'n01','rooms':[room],'doors':[door],'solids':slab}
+        b6.reserve_door_frames([floor]);b6.partition_slab_tops(floor)
+        support=unary_union([self.shape(s) for s in floor['solids'] if s['role']=='slab' and s['top']==0])
+        finish=unary_union([Polygon(t) for t in room['finishTriangles']])
+        self.assertLess(support.symmetric_difference(finish).area,1e-8)
+        self.assertLess(support.area,6)
+        for s in floor['solids']:
+            if s['role']=='slab':
+                surface=unary_union([Polygon(t) for p in s['topSurfacePartitions'] for t in p['triangles']])
+                self.assertLess(self.shape(s).symmetric_difference(surface).area,1e-8)
+
+
 class LocalB6RecipeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -492,6 +703,89 @@ class LocalB6RecipeTests(unittest.TestCase):
         if not b6.validate_cache(cls.recipe,strict=False):
             if strict:raise AssertionError('B6 generator/helper cache is stale')
             raise unittest.SkipTest('B6 recipe is stale')
+
+    def test_all_source_door_frames_own_disjoint_structural_volumes_including_12e1(self):
+        from shapely.strtree import STRtree
+        frames=[s for f in self.recipe['floors'] for s in f['solids'] if s['role']=='door-frame']
+        self.assertTrue(frames)
+        others=[s for f in self.recipe['floors'] for s in f['solids'] if s['role'] in ('wall','slab','door-frame')]
+        shapes=[Polygon(s['loops'][0],s['loops'][1:]) for s in others];tree=STRtree(shapes)
+        by_id={s['id']:s for s in frames}
+        for frame in frames:
+            shape=Polygon(frame['loops'][0],frame['loops'][1:])
+            self.assertTrue(frame['collision']);self.assertEqual(frame['material'],'frame')
+            for index in tree.query(shape):
+                other=others[index]
+                if other['id']==frame['id']:continue
+                overlap=min(frame['top'],other['top'])-max(frame['bottom'],other['bottom'])
+                if overlap>1e-9:self.assertLess(shape.intersection(shapes[index]).area,1e-9,(frame['id'],other['id']))
+        doors=[d for f in self.recipe['floors'] for d in f['doors']]
+        entry=next(d for d in doors if d['id']=='n01-door-12E1')
+        self.assertEqual((entry['bottom'],entry['top']),(1.5,3.6))
+        for door in doors:
+            self.assertEqual(door['frameOwnership'],'recipe-solids')
+            self.assertTrue(door['frameSolidIds'])
+            self.assertTrue(all(door['id'] in by_id[i]['sourceDoorIds'] for i in door['frameSolidIds']))
+
+    def test_actual_paired_door_openings_are_not_narrowed_by_center_jambs(self):
+        paired=0
+        for floor in self.recipe['floors']:
+            frames={s['id']:s for s in floor['solids'] if s['role']=='door-frame'}
+            for door in floor['doors']:
+                if not door.get('pairedDoorId'):continue
+                paired+=1;a,b,_,depth=b6.door_frame_span(door)
+                clear=LineString([a,b]).buffer(depth/2,cap_style=2)
+                for identifier in door['frameSolidIds']:
+                    frame=frames[identifier]
+                    if frame['bottom']<door['top']-1e-9:
+                        self.assertLess(Polygon(frame['loops'][0],frame['loops'][1:]).intersection(clear).area,1e-9,door['id'])
+        self.assertEqual(paired,456)
+
+    def test_revision2_keeps_rear_ground_and_clears_the_shared_east_window_stack(self):
+        self.assertNotIn('b06-rear-stair-terrain',[c['id'] for c in self.recipe['terrainCutouts']])
+        floors=[f for f in self.recipe['floors'] if f['id'] in ('n05','n06')]
+        self.assertEqual(len(floors),2)
+        for f in floors:self.assertEqual(f['sharedEastFacade']['ownerFloor'],'n05')
+        for z in [14.5,14.9,15.4,15.95,16.5,17.3]:
+            self.assertFalse(any(Polygon(s['loops'][0],s['loops'][1:]).covers(Point(51.3253,16.209403))
+                for f in floors for s in f['solids'] if s['role'] in ('wall','slab') and s['bottom']<z<s['top']))
+        for z in [15.1,16.5,17.6]:
+            shapes=[unary_union([Polygon(s['loops'][0],s['loops'][1:]) for s in f['solids']
+                    if s['role'] in ('wall','slab') and s['bottom']<z<s['top']]) for f in floors]
+            self.assertLess(shapes[0].intersection(shapes[1]).intersection(box(50.125,16.034,57.329,16.284)).area,1e-6)
+        upper=[w for w in floors[1]['windows'] if set(w['sourceEntities']) & {'CE6','CE8','CEA'}]
+        self.assertEqual(len(upper),3);self.assertTrue(all(w['sill'] is None and w['sillOmissionBasis'] for w in upper))
+
+    def test_revision2_every_sill_has_one_profile_and_no_same_facing_wall_cap(self):
+        caps={}
+        for floor in self.recipe['floors']:
+            for solid in floor['solids']:
+                if solid['role']=='wall' and 'ceilingPlane' not in solid:
+                    caps.setdefault(solid['top'],[]).append(Polygon(solid['loops'][0],solid['loops'][1:]))
+        caps={height:unary_union(parts) for height,parts in caps.items()}
+        for floor in self.recipe['floors']:
+            for window in floor['windows']:
+                self.assertIn('sill',window)
+                if window['sill'] is None:continue
+                sill=window['sill'];shape=Polygon(sill['loops'][0],sill['loops'][1:])
+                self.assertAlmostEqual(sill['top'],window['bottom']);self.assertAlmostEqual(sill['top']-sill['bottom'],.035)
+                self.assertLess(shape.intersection(caps.get(sill['top'],GeometryCollection())).area,1e-6,window['id'])
+                self.assertAlmostEqual(sum(Polygon(t).area for t in sill['triangles']),shape.area,places=5)
+        middle=next(w for f in self.recipe['floors'] if f['id']=='n05' for w in f['windows'] if w['id']=='n05-window-F7D')
+        self.assertAlmostEqual(middle['depth'],.5)
+        self.assertAlmostEqual(middle['frameJamb']['depth'],.125)
+        self.assertAlmostEqual(middle['sill']['width'],.225)
+
+    def test_revision2_structural_slab_tops_are_disjoint_complete_partitions(self):
+        for floor in self.recipe['floors']:
+            for solid in floor['solids']:
+                if solid['role']!='slab':continue
+                parts=solid['topSurfacePartitions'];triangles=[Polygon(t) for p in parts for t in p['triangles']]
+                shape=Polygon(solid['loops'][0],solid['loops'][1:]);whole=unary_union(triangles)
+                tolerance=max(1e-5,shape.area*1e-7)
+                self.assertLessEqual(shape.symmetric_difference(whole).area,tolerance,solid['id'])
+                self.assertLessEqual(sum(t.area for t in triangles)-whole.area,tolerance,solid['id'])
+                self.assertTrue(all(p['triangles'] and p['material'] and p['role'] for p in parts))
 
     def test_photo_usage_and_single_bedroom_leaf_are_source_scoped(self):
         for floor in self.recipe['floors']:

@@ -5,6 +5,7 @@ import b06Site from "./data/cad-buildings/b06-site.json";
 import photoAlignment from "./data/cad-buildings/photo-alignment.json";
 import { osmAssetIdentity } from "./world-asset-identity";
 import type { Vec3 } from "./types";
+import { placeCadDoorDefinition, type CadDoorDefinition } from "./cad-doors";
 import {
   cadLocalToWorld,
   cadWorldToLocal,
@@ -21,6 +22,8 @@ export type CadBuildingModel = {
   cadOrigin: number[];
   glbSha256: string;
   blendSha256: string;
+  interactiveDoors?: CadDoorDefinition[];
+  doorDefinitionHash?: string;
   floors: { id: string; elevation: number; levelElevations?: Partial<Record<string, number>>; [key: string]: unknown }[];
   parts: { id: string; floor: string; role: string; positions: number[]; indices: number[] }[];
   stairs: {
@@ -57,8 +60,15 @@ export const CAD_BUILDINGS = [
   building(b01 as CadBuildingModel, b01Site, "53929063",
     "d1202adf453178e8abeeab3096315efd74d99857e68b1182d33cc64c0248ac42", photoAlignment.buildings.b01.placement),
   building(b06 as CadBuildingModel, b06Site, "53929071",
-    "e533bb5d7df909746f4f0dc171de8cc332b85ba10e25f4b76958e9f53db8dee8", photoAlignment.buildings.b06.placement),
+    "14bfbffadd7a7d96729d9fb5205b54b8dbcccc87153b807621280a8550949275", photoAlignment.buildings.b06.placement),
 ] as const;
+
+/** Both the native render batches and Rapier use these exact authored poses. */
+export const CAD_DOOR_DEFINITIONS = CAD_BUILDINGS.flatMap(building =>
+  (building.model.interactiveDoors ?? []).map(door => placeCadDoorDefinition(door, building.placement)),
+);
+export const CAD_DOOR_DEFINITION_HASH = CAD_BUILDINGS.find(building => building.id === "b06")!
+  .model.doorDefinitionHash ?? "0".repeat(64);
 
 const replacements = new Set<string>(CAD_BUILDINGS.map((building) => building.osmId));
 export const hasCadBuilding = (osmId: string) => replacements.has(osmId);

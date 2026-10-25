@@ -36,15 +36,57 @@ def bathroom():
 
 
 class Capture:
-    def __init__(self):self.counts=defaultdict(int);self.faces=[];self.prisms=[]
+    def __init__(self):self.counts=defaultdict(int);self.faces=[];self.prisms=[];self.uv_frames=[]
     def at(self,p,z):return (-p[1],p[0],z)
-    def face(self,key,points):self.faces.append((key,[tuple(p) for p in points]))
+    def face(self,key,points,uv_frame=None):self.faces.append((key,[tuple(p) for p in points]));self.uv_frames.append(uv_frame)
     def prism(self,key,a,b,width,bottom,top):
         # Test the adapter contract; the production Geometry owns box meshing.
         self.prisms.append((key,a,b,width,bottom,top))
 
 
 class FurnishingTests(unittest.TestCase):
+    def test_beveled_panel_is_closed_outward_and_stays_inside_old_collision_envelope(self):
+        bounds=(1.,2.,3.,1.018,2.65,4.40)
+        vertices,faces=furnishing.beveled_box(bounds)
+        edges=Counter();volume=0
+        for face in faces:
+            for a,b in zip(face,face[1:]+face[:1]):edges[tuple(sorted((a,b)))]+=1
+            a=vertices[face[0]]
+            for j in range(1,len(face)-1):
+                b,c=vertices[face[j]],vertices[face[j+1]]
+                volume+=sum(a[k]*(b[(k+1)%3]*c[(k+2)%3]-b[(k+2)%3]*c[(k+1)%3]) for k in range(3))/6
+        self.assertEqual(len(faces),26);self.assertTrue(all(v==2 for v in edges.values()))
+        self.assertGreater(volume,.018*.65*1.4*.97);self.assertLess(volume,.018*.65*1.4)
+        self.assertTrue(all(bounds[i]-1e-10<=p[i]<=bounds[i+3]+1e-10 for p in vertices for i in range(3)))
+
+    def test_cabinet_has_real_panels_open_upper_cavity_and_ivory_lower_door(self):
+        plan=furnishing.plan_b06_furnishings(recipe())
+        cabinet=next(i for i in plan['items'] if i['shape']=='cabinet-open-top')
+        panels=furnishing.cabinet_panels(cabinet)
+        self.assertEqual({p['name'] for p in panels},{'left','right','bottom','top','back','shelf','door'})
+        door=next(p for p in panels if p['name']=='door')
+        self.assertEqual(door['material'],'b6_laminate_ivory')
+        self.assertLess(door['bounds'][5],cabinet['bottom']+(cabinet['top']-cabinet['bottom'])*.51)
+        # Panels meet at seams, never overlap volumes or replace the open cavity
+        # with the former whole box. The old planner footprint stays intact.
+        for i,a in enumerate(panels):
+            for b in panels[i+1:]:
+                overlap=math.prod(max(0,min(a['bounds'][j+3],b['bounds'][j+3])-max(a['bounds'][j],b['bounds'][j])) for j in range(3))
+                self.assertLess(overlap,1e-10)
+        g=Capture();audit=furnishing.add_b06_furnishings(g,recipe())
+        self.assertIn('b6_laminate_ivory',audit['materialKeys'])
+        self.assertGreater(sum(frame is not None for frame in g.uv_frames),100)
+        self.assertLess(len({key for key,_ in g.faces}),20)
+
+    def test_panel_frame_tracks_room_orientation_and_long_grain_axis(self):
+        g=Capture();bounds=(.2,.4,3.,.218,1.0,4.4)
+        for frame in ({'origin':(0,0),'u':(1,0),'v':(0,1)}, {'origin':(0,6),'u':(1,0),'v':(0,-1)}):
+            uv=furnishing.panel_uv_frame(g,frame,bounds)
+            self.assertEqual(uv['axes'][1],[0,0,1])
+            self.assertEqual(len(uv['origin']),3)
+            for i,a in enumerate(uv['axes']):
+                for j,b in enumerate(uv['axes']):self.assertAlmostEqual(sum(x*y for x,y in zip(a,b)),1 if i==j else 0)
+
     def test_corridor_lights_respect_holes_and_do_not_populate_bedrooms(self):
         r=recipe('corridor',45,3);floor=r['floors'][0];floor['levelCeilings']={'main':5.8}
         room=floor['rooms'][0];room['loops'].append([[19,0],[27,0],[27,3],[19,3]])

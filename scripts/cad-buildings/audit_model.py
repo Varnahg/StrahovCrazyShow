@@ -19,7 +19,7 @@ from mathutils.bvhtree import BVHTree
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from model_io import oriented_triangle
-from model_geometry import building_identity
+from model_geometry import building_identity, signed_mesh_volume
 
 
 def arguments():
@@ -340,6 +340,10 @@ def audit(args):
     assert 'titleBlock' not in root.get('sourceProvenance',''),'Původní rozpiska nesmí být přibalena'
     objects=[o for o in bpy.data.objects if o.type=='MESH']
     assert objects and all(o.parent==root for o in objects),'Cizí nebo nepřipojené části'
+    from build_model import audit_interactive_doors
+    native_doors=json.loads(root['interactiveDoors']) if 'interactiveDoors' in root else None
+    assert native_doors==expected.get('interactiveDoors'),'Dveřní definice masteru a kolizního exportu se liší'
+    door_audit=audit_interactive_doors(objects,{'interactiveDoors':native_doors})
     assert {o.get('floorId') for o in objects}=={floor['id'] for floor in expected['floors']},'Chybějící podlaží'
     assert json.loads(root['floorMetadata'])==expected['floors'],'Jiná metadata podlaží'
     assert all(o.get('buildingId')==expected['id'] for o in objects),'Cizí vlastník části'
@@ -353,13 +357,12 @@ def audit(args):
         assert mesh.uv_layers.active==mesh.uv_layers[0] and mesh.uv_layers[0].name=='UVMap','Nejednoznačný aktivní UV kanál'
         points=[obj.matrix_world@v.co for v in mesh.vertices]
         assert all(all(math.isfinite(v) for v in p) for p in points)
-        zero=0;volume=0.0;normals={}
+        zero=0;volume=signed_mesh_volume(points,[tuple(t.vertices) for t in mesh.loop_triangles]);normals={}
         positions=[(p.x,p.z,-p.y) for p in points]
         normal_matrix=obj.matrix_world.inverted().transposed().to_3x3()
         for t in mesh.loop_triangles:
             a,b,c=[points[i] for i in t.vertices]
             if (b-a).cross(c-a).length<1e-10:zero+=1
-            volume+=a.dot(b.cross(c))/6
             key,offset=oriented_triangle([positions[i] for i in t.vertices])
             corner=[]
             for index in t.loops:
@@ -459,6 +462,7 @@ def audit(args):
         'boundsBlender':bounds,'meshes':mesh_report,
         'exportComparisons':export_comparisons,'collisionComparisons':comparisons,
         'stairClearance':clearance,
+        'interactiveDoorGeometry':door_audit,
         'limitations':['Numerická shoda není stavební zaměření.',
                        'Tento audit nedokazuje průchod herním controllerem ani GPU výkon.',
                        'Vizuální správnost všech pater a schodišť musí posoudit navazující kontrola.'],

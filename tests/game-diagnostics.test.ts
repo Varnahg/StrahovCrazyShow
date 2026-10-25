@@ -1,4 +1,5 @@
 import test from "node:test";
+import { doorLifecycleFixture } from "./helpers/weather-door-render-fixture";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { Script } from "node:vm";
@@ -50,6 +51,7 @@ const members = declaration.members.filter(
       "frame",
       "updateWorldPresentation",
       "updateRenderEnvironment",
+
       "environmentProfileMetadata",
       "diagnosticContext",
       "diagnosticNetworkContext",
@@ -154,6 +156,7 @@ function fixture(hostname = "localhost") {
     isEnabled: () => false,
   });
   const game = Object.assign(new FrameGame(), {
+    ...doorLifecycleFixture(),
     ready: true,
     disposed: false,
     startupAbort: new AbortController(),
@@ -421,7 +424,7 @@ test("actual Game lifecycle timing survives the real diagnostic privacy filter",
 });
 
 test("real Game frames survive recorder, validator, local collector and report with bounded own telemetry", async (t) => {
-  const base = resolve(".cache/game-frame-feature");
+  const base = resolve(process.env.GAME_DIAGNOSTICS_TEST_CACHE ?? ".cache/game-frame-feature");
   await mkdir(base, { recursive: true });
   const directory = await mkdtemp(join(base, "collector-"));
   t.after(async () => {

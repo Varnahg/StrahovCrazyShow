@@ -10,6 +10,7 @@ from functools import lru_cache
 import hashlib
 import json
 import math
+from pathlib import Path
 import struct
 import zlib
 
@@ -67,7 +68,8 @@ FINISHES = {
     'b6_handrail_wood': FinishSpec((112, 72, 46), .43, pattern='wood', sources=('b3-stair-typology',)),
     'b6_exterior_concrete': FinishSpec((159, 161, 153), .85, pattern='mineral', sources=('b6-front', 'b6-rear')),
     'b6_exterior_rail': FinishSpec((180, 185, 178), .46, .5, sources=('b6-front', 'b6-rear')),
-    'b6_wood': FinishSpec((153, 117, 77), .52, pattern='wood', sources=('room',)),
+    'b6_wood': FinishSpec((132, 89, 52), .48, pattern='wood', resolution=(512,512), sources=('room',)),
+    'b6_laminate_ivory': FinishSpec((224, 221, 207), .43, sources=('room',)),
     'b6_fabric_cream': FinishSpec((211, 208, 184), .94, pattern='fabric', period=(.2, .2), sources=('room',)),
     'b6_fabric_teal': FinishSpec((37, 165, 180), .91, pattern='fabric', period=(.2, .2), sources=('room',)),
     'b6_fabric_blue': FinishSpec((31, 67, 108), .91, pattern='fabric', period=(.2, .2), sources=('room',)),
@@ -126,8 +128,32 @@ def _usage(room):
     return 'bathroom' if usage == 'wc' else usage
 
 
+def texture_override(spec):
+    """Read immutable original PNG bytes, without crop/resize/color conversion."""
+    path = Path(spec['path'])
+    if not path.is_absolute():
+        raise ValueError('Texture override path must be absolute')
+    packed = path.read_bytes()
+    if len(packed)>32*1024*1024 or hashlib.sha256(packed).hexdigest()!=spec['sha256']:
+        raise ValueError('Texture override byte hash/size mismatch')
+    if packed[:8]!=b'\x89PNG\r\n\x1a\n' or packed[12:16]!=b'IHDR':
+        raise ValueError('Texture override must be an original PNG')
+    width,height,depth,color=struct.unpack('>IIBB',packed[16:26])
+    if not (1<=width<=4096 and 1<=height<=4096 and depth==8 and color==2):
+        raise ValueError('Texture override requires opaque 8-bit RGB PNG up to 4096px')
+    provenance=spec.get('sourceProvenance')
+    if not isinstance(provenance,dict) or not provenance.get('generator') or not provenance.get('referenceSha256') or not provenance.get('prompt'):
+        raise ValueError('Texture override requires generator/reference/prompt provenance')
+    period=spec.get('periodMetres',(1.,1.))
+    if len(period)!=2 or not all(isinstance(v,(int,float)) and math.isfinite(v) and v>0 for v in period):
+        raise ValueError('Invalid texture override metric period')
+    # No absolute source file path enters the model's exported provenance.
+    return {'bytes':packed,'width':width,'height':height,'period':tuple(period),
+            'sha256':spec['sha256'],'sourceProvenance':json.loads(json.dumps(provenance))}
+
+
 class B6Finishes:
-    def __init__(self, recipe):
+    def __init__(self, recipe, texture_overrides=None):
         if recipe.get('buildingId') != 'b06':
             raise ValueError('B6 finishes must not change another building')
         self.origin = tuple(recipe['cadOrigin'])
@@ -135,6 +161,10 @@ class B6Finishes:
         self.rooms, self.cells, self.envelopes = {}, {}, {}
         self.cell_size = 4.
         self._materials = None
+        overrides=texture_overrides or {}
+        if set(overrides)-{'b6_wood','b6_bedroom_floor'}:
+            raise ValueError('Only the explicitly authored wood/linoleum overrides are supported')
+        self.texture_overrides={key:texture_override(value) for key,value in overrides.items()}
         # The cache belongs to this recipe instance. A class-level decorated
         # bound method would retain recipes from previous native build runs.
         self._room_at = lru_cache(maxsize=32768)(self._find_room)
@@ -238,6 +268,8 @@ class B6Finishes:
         front, back, exterior, center = self._context(floor, points, normal)
         if default_material == 'roof' or role.endswith('-glass') or role.endswith('-gasket'):
             return default_material
+        if role == 'window-sill':
+            return 'b6_laminate_ivory'
         if role == 'floor-finish':
             if normal[2] < .9 or front is None:
                 return default_material
@@ -292,7 +324,7 @@ class B6Finishes:
             return 'b6_white_paint'
         return default_material
 
-    def uv_for_face(self, floor, role, points_blender, material_key):
+    def uv_for_face(self, floor, role, points_blender, material_key, uv_frame=None):
         points = [tuple(map(float, point)) for point in points_blender]
         normal = _normal(points)
         spec = FINISHES.get(material_key)
@@ -300,6 +332,20 @@ class B6Finishes:
             # Let the root keep its established UV path for unchanged roof/IPR,
             # glazing and any original material not owned by this module.
             return None
+        period=self.texture_overrides.get(material_key,{}).get('period',spec.period)
+        if uv_frame is not None:
+            origin=uv_frame['origin'];axes=uv_frame['axes']
+            if len(origin)!=3 or len(axes)!=3 or any(len(a)!=3 for a in axes) or not all(math.isfinite(v) for a in [origin,*axes] for v in a):
+                raise ValueError('Invalid panel UV frame')
+            if any(abs(sum(a[i]*b[i] for i in range(3))-(1 if ai==bi else 0))>1e-6 for ai,a in enumerate(axes) for bi,b in enumerate(axes)):
+                raise ValueError('Panel UV axes must be orthonormal')
+            # axes = across grain, along grain, panel thickness. This frame is
+            # shared by every face/bevel of one panel, never derived from world XY.
+            excluded=max(range(3),key=lambda i:abs(sum(normal[j]*axes[i][j] for j in range(3))))
+            pair=[i for i in range(3) if i!=excluded]
+            if 1 in pair:pair=[next(i for i in pair if i!=1),1]
+            return [(sum((p[j]-origin[j])*axes[pair[0]][j] for j in range(3))/period[0],
+                     sum((p[j]-origin[j])*axes[pair[1]][j] for j in range(3))/period[1]) for p in points]
         base = 0.
         if spec.band_height:
             front, _, _, _ = self._context(floor, points, normal)
@@ -309,12 +355,12 @@ class B6Finishes:
             if min(p[2]-base for p in points) < -.04 or max(p[2]-base for p in points) >= spec.period[1]:
                 raise ValueError('Banded wall exceeds its single, floor-relative atlas interval')
         if abs(normal[2]) > .7:
-            return [(point[0]/spec.period[0], point[1]/spec.period[1]) for point in points]
+            return [(point[0]/period[0], point[1]/period[1]) for point in points]
         length = math.hypot(normal[0], normal[1])
         u = (-normal[1]/length, normal[0]/length, 0)
         v = _cross(normal, u)
-        return [(sum(point[i]*u[i] for i in range(3))/spec.period[0],
-                 ((point[2]-base) if spec.band_height else sum(point[i]*v[i] for i in range(3)))/spec.period[1])
+        return [(sum(point[i]*u[i] for i in range(3))/period[0],
+                 ((point[2]-base) if spec.band_height else sum(point[i]*v[i] for i in range(3)))/period[1])
                 for point in points]
 
     def create_materials(self):
@@ -340,12 +386,20 @@ class B6Finishes:
             material.diffuse_color = (*color, spec.alpha)
             material.use_backface_culling = True
             metadata = material_provenance(key)
+            override=self.texture_overrides.get(key)
+            if override:
+                metadata['textureGeneration']=json.dumps(override['sourceProvenance'],sort_keys=True)
+                metadata['textureOverrideSha256']=override['sha256']
+                metadata['texturePeriodMetres']=json.dumps(override['period'])
             for name, value in metadata.items():
                 material[name] = value
             if spec.pattern != 'plain':
-                pixels = texture_pixels(key)
-                packed = png_bytes(pixels)
-                image = bpy.data.images.new(key+'-authored.png', width=pixels.shape[1], height=pixels.shape[0], alpha=False)
+                if override:
+                    packed=override['bytes'];width,height=override['width'],override['height']
+                else:
+                    pixels = texture_pixels(key)
+                    packed = png_bytes(pixels);height,width=pixels.shape[:2]
+                image = bpy.data.images.new(key+'-authored.png', width=width, height=height, alpha=False)
                 image.pack(data=packed, data_len=len(packed))
                 image.source = 'FILE'
                 image.file_format = 'PNG'
@@ -433,8 +487,12 @@ def texture_pixels(key):
     elif spec.pattern in ('paint', 'mineral'):
         color += noise[..., None]*(3 if spec.pattern == 'paint' else 9)
     elif spec.pattern == 'wood':
-        grain = np.sin(xx*140 + np.sin(yy*7)*2)*3 + np.sin(xx*410)*2
-        color += grain[..., None] + noise[..., None]*3
+        # Integer spatial frequencies tile exactly and remain below even the
+        # smallest authored 128px tile's Nyquist limit (no former 65.25cy/m alias).
+        phase=2*np.pi*(xx/spec.period[0])
+        warp=np.sin(2*np.pi*yy/spec.period[1])*.8+np.sin(4*np.pi*yy/spec.period[1])*.25
+        grain=np.sin(phase*17+warp)*3+np.sin(phase*29+warp*.6)*1.5+np.sin(phase*7+warp)*2
+        color += grain[...,None]+noise[...,None]*2
     elif spec.pattern == 'fabric':
         weave = ((pixel_x % 2).astype(float)-(pixel_y % 2).astype(float))*2
         color += weave[..., None]+noise[..., None]*2

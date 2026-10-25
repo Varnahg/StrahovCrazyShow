@@ -25,6 +25,8 @@ import {
   type LightingPreviewSelection,
 } from "./lighting-preview";
 import { currentRoomCallbacks } from "./room-callbacks";
+import { DoorConnection } from "./door-connection";
+import { CAD_DOOR_DEFINITIONS, CAD_DOOR_DEFINITION_HASH } from "../shared/cad-buildings";
 import "./hud.css";
 import { useDialogFocus } from "./use-dialog-focus";
 import {
@@ -227,6 +229,7 @@ export function App() {
     playersById = useRef(new Map<string, Player>()),
     connectedRef = useRef(false);
   const networkProbeRef = useRef<NetworkProbe | null>(null);
+  const doorConnectionRef = useRef<DoorConnection | null>(null);
   const [profile, setProfile] = useState<Profile>(readProfile),
     [mode, setMode] = useState<"menu" | "guest" | "multi">("menu"),
     [busy, setBusy] = useState(false),
@@ -408,6 +411,8 @@ export function App() {
     // The SDK retains listeners until its leave handshake finishes. Retire this
     // owner first so synchronous or delayed callbacks cannot mutate a new one.
     room.current = null;
+    doorConnectionRef.current?.dispose();
+    doorConnectionRef.current = null;
     connectedRef.current = false;
     inputBuffer.current?.reset(reason);
     bootstrapAuthorityRef.current = null;
@@ -467,6 +472,10 @@ export function App() {
     setLightingPreview(selection);
     if (game.current) game.current.timeOverride = selection.instant;
   };
+  useEffect(() => () => {
+    doorConnectionRef.current?.dispose();
+    doorConnectionRef.current = null;
+  }, []);
   const reward = (name: string) => {
     setRewards((previous) => {
       const next = [...new Set([...previous, name])];
@@ -646,6 +655,7 @@ export function App() {
           inputBuffer.current?.reset("renderer-failure");
         };
         g.network = mode === "multi";
+        if (g.network) g.attachDoorTimeline(doorConnectionRef.current?.timeline ?? null);
         syncNetworkStage(g);
         g.timeOverride = lightingPreviewRef.current.instant;
         g.setLocalId(idRef.current);
@@ -690,7 +700,8 @@ export function App() {
             reward(String(data));
             return true;
           }
-          if (!room.current || !connectedRef.current) return false;
+          if (!g.network || modeRef.current !== "multi" || !room.current || !connectedRef.current) return false;
+          if (action === "doorResync") return doorConnectionRef.current?.requestResync() ?? false;
           room.current.send(action, data);
           return true;
         };
@@ -756,6 +767,7 @@ export function App() {
     // Each connection owns its dictionary and baseline; reconnect never reuses it.
     const motionDecoder = new MotionDecoder();
     let lastMotionRecovery = -Infinity;
+    doorConnectionRef.current?.dispose();
     room.current = r;
     authorityBufferRef.current?.reset();
     bootstrapAuthorityRef.current = null;
@@ -763,6 +775,21 @@ export function App() {
     connectedRef.current = true;
     setConnected(true);
     const callbacks = currentRoomCallbacks(r, () => room.current === r);
+    const doors: DoorConnection = new DoorConnection({
+      definitions: CAD_DOOR_DEFINITIONS,
+      definitionHash: CAD_DOOR_DEFINITION_HASH,
+      isCurrent: () => room.current === r && doorConnectionRef.current === doors,
+      onTimeline: timeline => {
+        if (doorConnectionRef.current === doors && game.current?.network)
+          game.current.attachDoorTimeline(timeline);
+      },
+      requestResync: () => r.send("doorResync"),
+      onNotice: message => notice(t(message)),
+    });
+    doorConnectionRef.current = doors;
+    callbacks.onMessage("doorSnapshot", (data: unknown) => doors.receiveSnapshot(data));
+    callbacks.onMessage("doorDelta", (data: unknown) => doors.receiveDelta(data));
+    callbacks.onMessage("doorResult", (data: unknown) => doors.receiveResult(data));
     callbacks.onMessage("networkProbe", (data: NetworkProbeReply) => {
       const measurement = networkProbeRef.current?.receive(data);
       if (!measurement) return;
@@ -864,6 +891,8 @@ export function App() {
     callbacks.onLeave((code) => {
       sessionDiagnostics.event("network-disconnected", { code });
       room.current = null;
+      doors.dispose();
+      if (doorConnectionRef.current === doors) doorConnectionRef.current = null;
       motionDecoder.reset();
       connectedRef.current = false;
       inputBuffer.current?.reset("room-left");
@@ -1236,6 +1265,7 @@ export function App() {
               {t(LIGHTING_PREVIEWS[lighting])} <span aria-hidden="true">×</span>
             </button>
           )}
+
           {trafficPreview && (
             <button
               className="demo-badge"
@@ -1250,6 +1280,7 @@ export function App() {
           )}
         </div>
         <div className="top-right">
+
           <HudWeather weather={weather} label={weatherLabel} />
           <span className="clock">
             {time(previewInstant ?? now)}{" "}
@@ -2472,6 +2503,7 @@ export function App() {
                     )}
                   </p>
                 )}
+
                 <div className="stat-grid">
                   <div>
                     <strong>{stats?.fps || "—"}</strong>
@@ -2706,6 +2738,7 @@ export function App() {
     </main>
   );
 }
+
 function LanguagePicker() {
   const locale = useLocale();
   return (

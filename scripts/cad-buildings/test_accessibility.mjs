@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loadRapier,makeScene,profileSettings,doorApproachGeometry } from './rapier_model.mjs';
+import { loadRapier,makeScene,profileSettings,doorApproachGeometry,doorStateAssumption,requireCoverageDoorState,doorRuntimeSha256 } from './rapier_model.mjs';
 import { prepareEvidence,probeAccessibility,validateReportIdentity } from './verify_accessibility.mjs';
 import { routePath } from './verify_routes.mjs';
-import { fixedOpeningProtection } from './verify_doors.mjs';
+import { fixedOpeningProtection,interactiveDoorPassage } from './verify_doors.mjs';
 
 const R=await loadRapier(process.env.CAD_MODEL_DEPENDENCY_ROOT);
 const settings=profileSettings('cad-compact');
@@ -114,6 +114,33 @@ test('Dveřní report musí souhlasit s anotací a skutečně úspěšnými krok
     assert.throws(()=>prepareEvidence(scene,metadata,shifted,routes),/body neodpovídají/);
     assert.throws(()=>prepareEvidence(scene,metadata,{...doors,results:doors.results.slice(0,1)},routes),/Neúplný/);
     assert.equal(scene.world.bodies.len(),0);
+  } finally {scene.free();}
+});
+
+test('interactive graph accepts only explicit matching open-state evidence and remains conditional',()=>{
+  const door={id:'entry',floor:'n01',hinge:[-.45,0],closedEnd:[.45,0],bottom:0,top:2.1,depth:.12};
+  const model={id:'b06',cadOrigin:[0,0],parts:[floor(),box('left',[-.1,0,-2.5],[.1,3,-.45]),box('right',[-.1,0,.45],[.1,3,2.5])],doors:[door],stairs:[],
+    interactiveDoors:[{id:'b06:entry',buildingId:'b06',floor:'n01',sourceDoorId:'entry',renderPartIds:['native-leaf'],collisionPartIds:[],
+      hingeModel:{x:0,y:.015,z:.45},closedPose:{position:{x:0,y:1.0475,z:0},rotationY:Math.PI/2},
+      collider:{halfExtents:{x:.45,y:1.0325,z:.019}},handleModel:{x:.019,y:1,z:-.3},openAngle:Math.PI/2,defaultOpen:false}]};
+  const scene=makeScene(R,model,settings);
+  try {
+    const sides=doorApproachGeometry(scene,door).points.map(p=>{const support=scene.floorAt(p,door.bottom);return {...p,floor:support.height,support};});
+    const results=[0,1].map(direction=>({id:door.id,direction,start:sides[direction],target:sides[1-direction],
+      ...interactiveDoorPassage(scene,door,sides[direction],sides[1-direction]),category:'passed'}));
+    const runtime=doorRuntimeSha256(),coverage={...metadata,doorRuntimeSha256:runtime,doorStateAssumption:requireCoverageDoorState(model,'all-interactive-open')};
+    const doors={...metadata,doorRuntimeSha256:runtime,doorStateAssumption:doorStateAssumption(model),
+      doorSourceMode:'native-model-annotations',doorSourceSha256:metadata.modelCollisionSha256,results};
+    const routes={...coverage,results:[],accessOverrides:{}};
+    const evidence=prepareEvidence(scene,coverage,doors,routes);
+    assert.throws(()=>probeAccessibility(scene,{...evidence,doorStateAssumption:undefined},['door:entry:side:0'],{spacing:.5}),/explicit/);
+    const stale=structuredClone(doors);delete stale.results[0].stateAssumption;
+    assert.throws(()=>prepareEvidence(scene,coverage,stale,routes),/lacks closed\/open/);
+    assert.throws(()=>prepareEvidence(scene,coverage,doors,{...routes,doorRuntimeSha256:'old'}),/stale shared/);
+    assert.throws(()=>prepareEvidence(scene,coverage,doors,{...routes,doorStateAssumption:doorStateAssumption(model)}),/stavu dveří/);
+    const report=probeAccessibility(scene,evidence,['door:entry:side:0'],{spacing:.5});
+    assert.equal(report.status,'conditional-pass');assert.equal(report.passed,2);
+    assert.equal(report.actorInteractionsVerified,false);assert.equal(report.doorStateAssumption.states[0].open,true);
   } finally {scene.free();}
 });
 

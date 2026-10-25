@@ -1,5 +1,19 @@
 # B6: povrchy podle dodaných fotografií
 
+## Revize kvality R2 — 25. 10. 2026
+
+Předchozí uživatelský pohled nebyl přijat jako konečná kvalita. Nová revize používá dvě sdílené bitmapy vytvořené built-in `image_gen` s celou `room.png` pouze jako referencí. Nejde o přímé fotografické texely. Tool dodal **1254 × 1254 RGB**, nikoli preferovanou1024²; původní PNG jsou beze změny bajtů, bez cropu/resize/editace. Výstupy zůstávají v CODEX_HOME a identické kopie v ignorované `.cache/b6-photo-finishes-20261024/quality-r2/`. PNG ani user fotografie se necommitují.
+
+- `wood-veneer.png`: SHA256 `fcb93758bf8bfe5709f1bdf30807755e3402f2c39a15056fe27d7e90ab7eefa0`, perioda1×1m, vlákna veV.
+- `brown-lino.png`: SHA256 `80c631741555ca9271c9e34493592f703a4e075225c2e2cff46c0a39b045b129`, perioda1,6×1,6m.
+- Přesné prompty, reference SHA a path obsahuje `texture-overrides.json` v této cache. Výstupy byly prohlédnuté. Bezešvé opakování není prohlášeno za dokonalé: MAE protilehlých hran woodX/Y8,52/7,68 a lino20,02/19,24 sRGB úrovní; sousední texely wood8,18/3,08 a lino9,75/9,83. Finální opakování ověří root render. Nejde o kalibrované albedo nebo normal/roughness mapy.
+
+API: `B6Finishes(recipe, texture_overrides=None)`. Jen povolené klíče `b6_wood`/`b6_bedroom_floor`; každý obsahuje absolutní `path`, SHA256 původníchPNGbytes, kladné `periodMetres`, `sourceProvenance` s generator/referenceSha256/prompt. Odmítnut je jiný hash, relativní cesta, ne-RGB/8bitPNG, rozměr nad4096px/32MiB nebo chybějící původ. PNG se beze změny zabalí. Privátní path se do materiálu nezapisuje. `textureGeneration`, `textureOverrideSha256`, `texturePeriodMetres` na material/image doplňují původní manifest; `finishSpecification` popisuje fallback. Explicitní override perioda/zdroj určují použitou bitmapu. Chybný explicitní override se nezamění tiše za fallback.
+
+`uv_for_face(..., uv_frame=None)` přijímá společné panelové `origin` a ortonormální Blender `axes=[acrossGrain,alongGrain,thickness]`. Čela i bevel používají stejný rámec. Nový `b6_laminate_ivory` pokrývá světlá dvířka a parapet; hloubku/duplicitu parapetu vlastní jiný task. Fallback wood má periodické frekvence7/17/29cyklů na tile pod Nyquist i128px rastru; furniturewood fallback má512².
+
+Ověření R2: **21/21 finishes CPU PASS**, poslední1,247s; původní PNGbytes/hash, metrická override perioda, panelová UV při rotaci/translaci. Nativepacking/export a vizuální přejímka patří rootu. Neměnný uživatelský snapshot2591/source-v4 je beze změn.
+
 Stav 24. 10. 2026: implementace klasifikace, metrických UV a autorských PNG; nativní zabalení, export a obrazové ověření provádí integrátor. Jde o rekonstrukci vzhledu podle fotografií, nikoli o kopii fotografických texelů nebo zaměřený katalog povrchů. Tento modul nemění geometrii, půdorys, podlažní výšky ani kolize.
 
 ## Podklady a rozhodnutí

@@ -1,5 +1,19 @@
 # Předání: b6-photo-interiors-20261024
 
+## R2 — 25. 10. 2026, owner b6-quality-r2 → root
+
+Baseline `e7ef3ff63dbb3ed0f771082331d8bb0eee5f2427`; stejný cad-building-models worktree. Po přečtení skill/policy a dvou úspěšných disjunktních claimech upraveny pouze vlastní `b6_furnishings.py`, `test_b6_furnishings.py`, photo-interiors.md, tento handoff a cache `quality-r2/`. Rootovy společné soubory se neměnily. Snapshot2591/source-v4 nedotčen; původní handoff níže je historický.
+
+Skříňky mají skutečné18mm korpusové panely, záda/police, uzavřené světlé dvířko a malý kulatý úchyt; spodní hornípolovina je otevřená. Samostatné police mají backs/end side a neprotínají plnou skříňku. Analytický1,5mm bevel je uzavřený26faces/44tri, bez modifieru/objektu na panel. PanelUV metadata se předávají `Geometry.face(...,uv_frame=...)`; root je už uložil do faceUVFrames. Přibyl jediný material key `b6_laminate_ivory`, sdílený přes patra/role, ostatní batching pokračuje.
+
+Původní planning collision footprint/clearance není rozšířen. Root výslovně přijal skutečné panelové kolize jako podmnožinu původního spodního boxu; horní skříňka/police zůstávají noncollision. Úchytky jsou noncollision a vystupují7mm; neexistuje invisible proxy. Pravá/levá orientace šablony zůstává kvůli zachování source plánovaných cest, nevydává se za změřený inventář.
+
+`py -3.14 -B scripts/cad-buildings/test_b6_furnishings.py -v`: **21/21 PASS**,0,695s,exit0. Uzavření bevelu/kladný objem, panely bez objemových průniků, otevřená dutina, světlé dvířko, rámec v obou směrech místnosti, skutečný AST Geometry a původní source/clearance regrese. Počáteční jediné selhání chybějícího Geometry keyword bylo vyřešeno root integrací; test nebyl vynechán.
+
+`quality-r2/compare-plan.py`: skutečná recipe SHA `e533bb5d7df909746f4f0dc171de8cc332b85ba10e25f4b76958e9f53db8dee8` porovnána proti uloženému baseline helperu z HEAD. **264 roomWalkPaths a3244 planning collision envelopes shodných**, žádné nové skips.13639→14095items, pouze456nových noncollision back/end panels.17,225s čistého CPU,exit0; report `quality-r2/plan-comparison.json`. Toto není native/Actor PASS.
+
+Refaktoring: jeden cabinet_panels/beveled_box/panel_uv_frame emitér, sdílený materiálový kontrakt, žádné zásahy do CAD polohy zařízení nebo root receptury. Oba R2 tasky zahrnuje manifest `.cache/b6-photo-finishes-20261024/quality-r2/manifest.json`. Původní source foto/CAD ani PNG nejsou staged. Všechny vlastní procesy skončily, žádný Blender/GPU/fullsuite/server. Po manifestu následuje release obou claimů; root provede native audit/render/Actor a integraci.
+
 - Vlastník `b6-photo-01a16b37-interiors`; příjemce root koordinátor.
 - Cwd `C:/Users/rezac/.codex/worktrees/cad-building-models/StrahovCrazyShow`, větev `codex/b6-photo-refinement-20261024`, baseline `ed52896aa83e4f18cffb162a9b12b100712d341c`.
 - Vlastní soubory: nový `scripts/cad-buildings/b6_furnishings.py`, `test_b6_furnishings.py`, `docs/reality-pack/cad-buildings/b06/photo-interiors.md`, tento handoff a `.cache/b6-photo-interiors-20261024/`. Žádný zápis do builderu, původní přípravy, shared runtime, nativního assetu ani cizí cache.

@@ -12,6 +12,61 @@ def building_identity(building_id):
     return 'building:osm:way:' + BUILDING_OSM_IDS[building_id]
 
 
+def signed_mesh_volume(points, triangles):
+    """Double-precision tetrahedra about a nearby origin, including tiny parts.
+
+    mathutils cross/dot uses float32: a centimetre handle 30m from the origin
+    can acquire a negative signed volume from catastrophic cancellation.
+    Translation does not alter a closed mesh's true signed volume.
+    """
+    if not points:return 0.0
+    origin=tuple(map(float,points[0]))
+    local=[tuple(float(p[i])-origin[i] for i in range(3)) for p in points]
+    def tetrahedron(triangle):
+        a,b,c=(local[i] for i in triangle)
+        return (a[0]*(b[1]*c[2]-b[2]*c[1])+a[1]*(b[2]*c[0]-b[0]*c[2])+a[2]*(b[0]*c[1]-b[1]*c[0]))/6
+    return math.fsum(tetrahedron(triangle) for triangle in triangles)
+
+
+def interactive_door_definition(origin, floor, door):
+    """Native closed leaf and a functional quarter-turn, in game Y-up metres.
+
+    CAD swing direction is evidence; a partially drawn swing is not a usable
+    open passage. Keep its original angle as provenance instead of claiming
+    that the functional 90-degree stop was measured.
+    """
+    hinge, end, opened = door['hinge'], door['closedEnd'], door['openEnd']
+    dx, dy = end[0]-hinge[0], end[1]-hinge[1]
+    width = math.hypot(dx, dy)
+    if width < .3:
+        raise ValueError('Invalid native door width: '+door['id'])
+    offset = door.get('normalOffset', 0)
+    a = [hinge[0]-dy/width*offset, hinge[1]+dx/width*offset]
+    b = [end[0]-dy/width*offset, end[1]+dx/width*offset]
+    def model(p, height):
+        return {'x': -(p[1]-origin[1]), 'y': height, 'z': -(p[0]-origin[0])}
+    # CAD XY -> game XZ reverses handedness; yaw rotates +X towards -Z.
+    cx, cz = -dy, -dx
+    ox, oz = -(opened[1]-hinge[1]), -(opened[0]-hinge[0])
+    angle = math.atan2(cz*ox-cx*oz, cx*ox+cz*oz)
+    if abs(angle) < .01:
+        raise ValueError('Door has no evidenced swing: '+door['id'])
+    bottom, top = door['bottom']+.015, door['top']-.02
+    thickness = .10 if door.get('leafMaterial') == 'glass' else .038
+    return {
+        'id': 'b06:'+door['id'], 'buildingId': 'b06', 'floor': floor,
+        'sourceDoorId': door['id'], 'renderPartIds': [], 'collisionPartIds': [],
+        'hingeModel': model(a, bottom),
+        'closedPose': {'position': model([(a[0]+b[0])/2, (a[1]+b[1])/2], (bottom+top)/2),
+                       'rotationY': math.atan2(-cz, cx)},
+        'collider': {'halfExtents': {'x': width/2, 'y': (top-bottom)/2, 'z': thickness/2}},
+        'openAngle': math.copysign(math.pi/2, angle), 'measuredSourceAngle': angle,
+        'openAngleBasis': 'CAD swing direction; functional 90-degree open stop is a gameplay interpretation',
+        'handleModel': model([b[0]-dx/width*.12, b[1]-dy/width*.12], door['bottom']+1.0025),
+        'defaultOpen': False,
+    }
+
+
 def stair_levels(floors, routes, additional_anchors=None):
     """Resolve explicit floor levels and weighted intermediate L landings."""
     levels = {}

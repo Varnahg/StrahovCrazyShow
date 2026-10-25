@@ -12,6 +12,10 @@ import {
 } from "../shared/netcode";
 import type { TimelineInput } from "../shared/input-timeline";
 import type { VehicleState } from "../shared/vehicle";
+import { initPhysics } from "../shared/simulation";
+import { installFixtureDoorHistory } from "./helpers/prediction-replay-fixture";
+
+await initPhysics();
 
 const SPEED = 12;
 const ANGULAR_SPEED = 0.24;
@@ -25,8 +29,9 @@ const close = (actual: number, expected: number, message: string) =>
 
 /** Constant-velocity dynamics isolate timing from contacts and input response.
  * All sequence planning, history, Game step bookkeeping and interpolation are
- * production code. This fixture does not start Rapier, a scene or a render loop. */
-function fixture() {
+ * production code. Only the door channel owns a tiny Rapier world; motion stays
+ * analytic. No full Simulation, scene or render loop is constructed. */
+function fixture(t: import("node:test").TestContext) {
   let body = new Vector3(0, 2, 0);
   let angle = 0;
   let physicsSteps = 0;
@@ -135,6 +140,8 @@ function fixture() {
     onPredictionReset() {},
     onAction: (action: string) => { requests.push(action); return true; },
   }) as Game;
+  const doors = installFixtureDoorHistory(game, INITIAL_BASE);
+  t.after(() => game.sim.dispose());
   let lastClockAck = 0;
   function refreshClock(now: number) {
     const ack = Math.floor(now / (FIXED_DT * 1000));
@@ -167,12 +174,12 @@ function fixture() {
     const yaw = Math.atan2(2 * carRotation.w * carRotation.y, 1 - 2 * carRotation.y * carRotation.y);
     return { localPosition, carPosition, yaw };
   }
-  return { game, actor, sent, requests, refreshClock, sample, physicsSteps: () => physicsSteps };
+  return { game, actor, doors, sent, requests, refreshClock, sample, physicsSteps: () => physicsSteps };
 }
 
 for (const fps of [60, 144]) {
-  test(`actual Game interpolation preserves constant movement at ${fps} FPS`, () => {
-    const f = fixture();
+  test(`actual Game interpolation preserves constant movement at ${fps} FPS`, (t) => {
+    const f = fixture(t);
     let previousNow = 0;
     f.game.advanceSimulation(0, 0);
     let previous = f.sample();
@@ -194,8 +201,8 @@ for (const fps of [60, 144]) {
   });
 }
 
-test("actual Game continues interpolation on consecutive zero-step frames", () => {
-  const f = fixture();
+test("actual Game continues interpolation on consecutive zero-step frames", (t) => {
+  const f = fixture(t);
   f.game.advanceSimulation(0, 0);
   f.game.advanceSimulation(0.012, 12);
   let previous = f.sample();
@@ -215,8 +222,8 @@ test("actual Game continues interpolation on consecutive zero-step frames", () =
 });
 
 for (const reason of ["stale-authority", "latency-budget"] as const) {
-  test(`actual Game ${reason} waiting does not rewind the displayed tick pair`, () => {
-    const f = fixture();
+  test(`actual Game ${reason} waiting does not rewind the displayed tick pair`, (t) => {
+    const f = fixture(t);
     f.game.advanceSimulation(0, 0);
     f.game.advanceSimulation(0.005, 5);
     const before = f.sample();
@@ -238,8 +245,8 @@ for (const reason of ["stale-authority", "latency-budget"] as const) {
   });
 }
 
-test("actual Game recovery replaces the interpolation pair before the new epoch advances", () => {
-  const f = fixture();
+test("actual Game recovery replaces the interpolation pair before the new epoch advances", (t) => {
+  const f = fixture(t);
   f.game.advanceSimulation(0, 0);
   f.game.advanceSimulation(0.012, 12);
   const state = f.actor.capture();
@@ -258,7 +265,7 @@ test("actual Game recovery replaces the interpolation pair before the new epoch 
     resyncReason: "client-request",
     state,
   };
-  assert.equal(f.game.reconcile(recovery, 300), true);
+  assert.equal(f.game.reconcile(f.doors.withAuthority(recovery), 300), true);
   const restored = f.sample();
   close(restored.localPosition.z, 100, "old-epoch endpoint cannot leak into the restored root");
   close(restored.yaw, 0.4, "old-epoch rotation cannot leak into the restored car");
@@ -270,19 +277,19 @@ test("actual Game recovery replaces the interpolation pair before the new epoch 
   const fresh = f.sent.slice(sentBefore);
   assert.ok(fresh.length > 0 && fresh.every((input) => input.inputEpoch === 2));
   const beforeOldReply = f.actor.capture();
-  assert.equal(f.game.reconcile({
+  assert.equal(f.game.reconcile(f.doors.withAuthority({
     ...recovery,
     inputEpoch: 1,
     inputTickBase: INITIAL_BASE,
     ack: 1000,
     tick: INITIAL_BASE + 1000,
-  }, 301), false);
+  }), 301), false);
   assert.deepEqual(f.actor.capture(), beforeOldReply);
   close(f.sample().localPosition.z, resumed.localPosition.z, "rejected epoch cannot alter presentation");
 });
 
-test("a lower input lead cannot rewind the same displayed pair while physics waits", () => {
-  const f = fixture();
+test("a lower input lead cannot rewind the same displayed pair while physics waits", (t) => {
+  const f = fixture(t);
   f.game.networkTimeline.setRtt(136);
   f.game.advanceSimulation(0, 0);
   f.game.advanceSimulation(0.001, 1);
@@ -307,12 +314,12 @@ test("a lower input lead cannot rewind the same displayed pair while physics wai
   assert.ok(f.sample().localPosition.z > before.localPosition.z);
 });
 
-test("a replacement timeline cannot inherit alpha from equal epoch and sequence numbers", () => {
-  const previous = fixture();
+test("a replacement timeline cannot inherit alpha from equal epoch and sequence numbers", (t) => {
+  const previous = fixture(t);
   previous.game.advanceSimulation(0, 0);
   previous.game.advanceSimulation(0.02, 20);
   const oldSeq = previous.game.seq;
-  const reference = fixture();
+  const reference = fixture(t);
   reference.actor.restore(previous.actor.capture());
   for (const f of [previous, reference]) {
     const timeline = new NetworkTimeline();
@@ -332,8 +339,8 @@ test("a replacement timeline cannot inherit alpha from equal epoch and sequence 
   close(actual.yaw, expected.yaw, "replacement rotation uses the new timeline phase");
 });
 
-test("actual identity reset cannot render an old endpoint before fresh authority", () => {
-  const f = fixture();
+test("actual identity reset cannot render an old endpoint before fresh authority", (t) => {
+  const f = fixture(t);
   f.game.advanceSimulation(0, 0);
   f.game.advanceSimulation(0.02, 20);
   const oldTimeline = f.game.networkTimeline;
@@ -345,8 +352,8 @@ test("actual identity reset cannot render an old endpoint before fresh authority
     "no valid new-session segment means current pose, not an old pair");
 });
 
-test("actual respawn request retains presentation while clearing transport history", () => {
-  const f = fixture();
+test("actual respawn request retains presentation while clearing transport history", (t) => {
+  const f = fixture(t);
   f.game.advanceSimulation(0, 0);
   f.game.advanceSimulation(0.005, 5);
   const before = f.sample();
@@ -365,8 +372,8 @@ test("actual respawn request retains presentation while clearing transport histo
   close(after.yaw, before.yaw, "pending respawn holds car interpolation");
 });
 
-test("offline Game keeps fixed-step accumulator interpolation even after a network phase", () => {
-  const f = fixture();
+test("offline Game keeps fixed-step accumulator interpolation even after a network phase", (t) => {
+  const f = fixture(t);
   f.game.advanceSimulation(0, 0);
   f.game.network = false;
   f.game.accumulator = 0;

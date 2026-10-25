@@ -184,7 +184,7 @@ test(`skutečná Simulation souvisle projde ${building.id} schodišťové trasy 
   } finally { sim.dispose(); }
 });
 
-test(`všechny otevřené ${building.id} dveře jsou průchozí ve skutečné Simulation v obou směrech`, async () => {
+test(`${building.id} podmíněné průchody jednotlivě otevřenými dveřmi a ochrana pevných křídel ve skutečné Simulation`, async (t) => {
   await initPhysics();
   const { doorApproachGeometry, profileSettings, fixedOpeningSpec } = await import(new URL("../scripts/cad-buildings/rapier_model.mjs", import.meta.url).href);
   const { fixedOpeningCoverage } = await import(new URL("../scripts/cad-buildings/verify_doors.mjs", import.meta.url).href);
@@ -194,8 +194,19 @@ test(`všechny otevřené ${building.id} dveře jsou průchozí ve skutečné Si
   }) };
   const actor = sim.add("cad-exterior-door", { x: 0, y: 30, z: 0 });
   const idle = { x: 0, z: 0, yaw: 0, jump: false, seq: 0 };
-  const results: unknown[] = [], protections:unknown[] = [], failures: string[] = [];
+  const results: {id:string;direction:number;passed:boolean;walkingPassed:boolean;[key:string]:unknown}[] = [], protections:unknown[] = [], failures: string[] = [];
+  const definitions=new Map([...sim.doorPhysics.definitions.values()].filter(d=>d.definition.buildingId===building.id)
+    .map(d=>[d.definition.sourceDoorId,d]));
+  // These exact upward cases have a source-acknowledged 0.481m model height
+  // discrepancy. Their walking failure stays explicit even if a real jump can
+  // traverse the model; neither jumping nor conditional opening validates its
+  // historical source height or proves an E interaction.
+  const sourceHeightDiscrepancyIds=building.id==='b06'?[
+    'n01-door-4D6C:0','n01-door-4D81:1','n01-door-4D8D:0',
+    'n01-door-4DA1:1','n01-door-4DAE:0','n01-door-4DC3:1',
+  ]:[];
   try {
+    for(const definition of definitions.values())assert.equal(sim.doorPhysics.isOpen(definition.id),false,'Fresh Simulation must start with closed doors');
     for (const door of building.model.doors) {
       const approaches=doorApproachGeometry(nativeScene,door);
       const local = approaches.points as { x: number; z: number }[];
@@ -214,6 +225,10 @@ test(`všechny otevřené ${building.id} dveře jsou průchozí ve skutečné Si
         }
         continue;
       }
+      const definition=definitions.get(door.id);
+      // Conditional geometry setup for this independent case only. This is not
+      // an E request and deliberately makes no range/LOS/occupied-sweep claim.
+      if(definition){sim.doorPhysics.apply(definition.id,true);assert.equal(sim.doorPhysics.isOpen(definition.id),true);}
       const exteriorThreshold = local.some(p => !building.site.supportSurfaces.some(surface => {
         const height = cadSurfaceHeightAtXZ(surface, p.x, p.z);
         return height !== undefined && Math.abs(height - door.bottom) < .25;
@@ -238,7 +253,7 @@ test(`všechny otevřené ${building.id} dveře jsou průchozí ve skutečné Si
       });
       for (const direction of [0, 1]) {
         const start = points[direction], target = points[1 - direction];
-        let passed = false, setupError: number | null = null, traversal: "walk" | "jump" = "walk";
+        let passed = false, walkingPassed=false, setupError: number | null = null, traversal: "walk" | "jump" = "walk";
         if (start.floor !== null && target.floor !== null) {
           actor.resetOnFoot({ x: start.x, z: start.z, y: start.floor + 0.9 });
           actor.setPosition = () => assert.fail("Door traversal must not teleport");
@@ -255,6 +270,7 @@ test(`všechny otevřené ${building.id} dveře jsou průchozí ve skutečné Si
                 passed = true; break;
               }
             }
+            walkingPassed=passed;
             if (!passed && target.floor - start.floor > .22 && target.floor - start.floor < 1 &&
                 (door.outsideTraversalStatus === "requires-native-jump-validation" || exteriorThreshold)) {
               // The source-derived terrace is lower than this openable
@@ -273,17 +289,31 @@ test(`všechny otevřené ${building.id} dveře jsou průchozí ve skutečné Si
             }
           }
         }
-        results.push({ id: door.id, direction, passed, traversal, sourceBottom: door.bottom, points, setupError, finish: { ...actor.position } });
+        results.push({ id: door.id, direction, passed, walkingPassed, traversal, sourceBottom: door.bottom, points, setupError, finish: { ...actor.position },
+          doorPhysicsId:definition?.id??null,stateAssumption:definition?'single-interactive-open':'static-opening',actorInteractionsVerified:false });
         if (!passed) failures.push(`${door.id}:${direction}`);
       }
+      if(definition)sim.doorPhysics.apply(definition.id,false);
     }
+    const sourceHeightDiscrepancies=sourceHeightDiscrepancyIds.map(id=>{
+      const row=results.find(r=>`${r.id}:${r.direction}`===id);
+      assert.ok(row,'Every known source-height case must actually execute');
+      assert.equal(row.walkingPassed,false,'Changed source height requires investigation and retirement of the old limitation');
+      assert.equal(row.traversal,'jump');assert.equal(row.passed,true,'Actual held jump must still cross the current model');
+      return {id,walkingPassed:row.walkingPassed,actualTraversal:row.traversal,actualPassed:row.passed,sourceHeightResolved:false,
+        reason:'Native source annotation retains an unresolved 0.481m terrace/mezzanine height discrepancy'};
+    });
     const proof = process.env.CAD_DOOR_PROOF ?? process.env.CAD_EXTERIOR_PROOF;
     if (proof) writeFileSync(proof.replace(/\.json$/, `-${building.id}.json`), JSON.stringify({
       modelSha256: building.site.sourceCollisionSha256, placement: building.placement,
+      status:failures.length||sourceHeightDiscrepancies.length?'partial':'conditional-pass',physicalStatus:failures.length?'partial':'conditional-pass',actorInteractionsVerified:false,initialDoorState:'closed-default',
+      sourceHeightDiscrepancies,walkingFailures:results.filter(r=>!r.walkingPassed).map(r=>`${r.id}:${r.direction}`),
+      scope:'Conditional single-leaf-open geometry, actual full Simulation; no E interaction or source-height acceptance',
       cases: results.length, protectedCases:protections.length, failures, results, protections }, null, 2));
     assert.equal(results.length, building.model.doors.filter(door => !fixedOpeningSpec(door)).length * 2);
     assert.equal(protections.length,building.model.doors.filter(door=>fixedOpeningSpec(door)).length*2);
-    assert.deepEqual(failures, []);
+    assert.deepEqual(failures,[],'Every movable direction and fixed-panel protection must pass its actual physical check');
+    if(sourceHeightDiscrepancies.length)t.diagnostic('PARTIAL source acceptance: six B6 rear directions fail walking and pass only a real jump; the 0.481m source-height discrepancy remains unresolved. All physical checks are conditional on the tested leaf being open.');
   } finally { sim.dispose(); }
 });
 }

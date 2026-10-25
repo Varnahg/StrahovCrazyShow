@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from model_geometry import ceiling_clipped_faces, face_area_vector, quantized_face, stair_profile, stair_levels, skew_stair
+from model_geometry import ceiling_clipped_faces, face_area_vector, quantized_face, stair_profile, stair_levels, skew_stair, interactive_door_definition, signed_mesh_volume
 
 
 def volume(faces):
@@ -16,6 +16,48 @@ def volume(faces):
 
 
 RECT = [[[0, 0], [4, 0], [4, 2]], [[0, 0], [4, 2], [0, 2]]]
+
+
+class InteractiveDoorDefinitionTests(unittest.TestCase):
+    def test_tiny_closed_mesh_volume_keeps_orientation_far_from_origin(self):
+        # Right tetrahedron with millimetre-scale thickness: exact reference.
+        points=[(0,0,0),(.11,0,0),(0,.016,0),(0,0,.025)]
+        triangles=[(0,2,1),(0,1,3),(0,3,2),(1,2,3)]
+        expected=.11*.016*.025/6
+        for offset in (0,30,10000):
+            shifted=[tuple(v+offset for v in p) for p in points]
+            self.assertAlmostEqual(signed_mesh_volume(shifted,triangles),expected,places=12)
+            self.assertAlmostEqual(signed_mesh_volume(shifted,[tuple(reversed(t)) for t in triangles]),-expected,places=12)
+
+    def test_native_closed_pose_includes_measured_reveal_offset(self):
+        door = {'id':'n02-test','hinge':[10,20],'closedEnd':[11,20],
+                'openEnd':[10,21], 'bottom':3, 'top':5, 'normalOffset':.13}
+        definition = interactive_door_definition([10,20], 'N02', door)
+        for axis, value in {'x':-.13,'y':3.015,'z':0}.items():
+            self.assertAlmostEqual(definition['hingeModel'][axis], value)
+        self.assertAlmostEqual(definition['closedPose']['position']['z'], -.5)
+        self.assertAlmostEqual(definition['closedPose']['rotationY'], math.pi/2)
+        self.assertAlmostEqual(definition['openAngle'], math.pi/2)
+        # A positive quarter turn of a -Z leaf points -X, the CAD +Y direction.
+        self.assertFalse(definition['defaultOpen'])
+        self.assertEqual(definition['collisionPartIds'], [])
+
+    def test_partial_cad_arc_retains_angle_but_has_functional_open_stop(self):
+        door = {'id':'partial','hinge':[0,0],'closedEnd':[1,0],
+                'openEnd':[.8,-.4], 'bottom':0, 'top':2, 'leafMaterial':'glass'}
+        definition = interactive_door_definition([0,0], 'N01', door)
+        self.assertAlmostEqual(definition['measuredSourceAngle'], -math.atan(.5))
+        self.assertAlmostEqual(definition['openAngle'], -math.pi/2)
+        self.assertAlmostEqual(definition['collider']['halfExtents']['z'], .05)
+
+    def test_closed_surface_matches_collider_for_oblique_door(self):
+        door = {'id':'oblique','hinge':[3,4],'closedEnd':[3.8,4.6],
+                'openEnd':[2.4,4.8], 'bottom':0, 'top':2}
+        definition = interactive_door_definition([0,0], 'N01', door)
+        pose, h = definition['closedPose'], definition['collider']['halfExtents']
+        hinge = definition['hingeModel']
+        self.assertAlmostEqual(pose['position']['x']-math.cos(pose['rotationY'])*h['x'], hinge['x'])
+        self.assertAlmostEqual(pose['position']['z']+math.sin(pose['rotationY'])*h['x'], hinge['z'])
 
 
 class CeilingClipTests(unittest.TestCase):

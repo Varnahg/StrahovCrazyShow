@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, writeFileSync, unlinkSync, rmdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { loadRapier, makeScene, profileSettings, doorApproachGeometry } from './rapier_model.mjs';
-import { fixedGlazingHit, fixedGlazingCoverage, fixedOpeningCoverage, verifyDoors } from './verify_doors.mjs';
+import { loadRapier, makeScene, profileSettings, doorApproachGeometry, createDoorInteractionProbe, requireCoverageDoorState, applyCoverageDoorState, nativeDoorDefinitions } from './rapier_model.mjs';
+import { fixedGlazingHit, fixedGlazingCoverage, fixedOpeningCoverage, verifyDoors, interactiveDoorPassage } from './verify_doors.mjs';
 import { verifyRoutes } from './verify_routes.mjs';
 
 const R=await loadRapier(process.env.CAD_MODEL_DEPENDENCY_ROOT);
@@ -35,6 +35,73 @@ function model(gap=null) {
   if(gap!==null)parts.push(box('wall-left',[-.1,0,-3],[.1,3,-gap/2]),box('wall-right',[-.1,0,gap/2],[.1,3,3]));
   return {cadOrigin:[0,0],parts};
 }
+function interactiveModel() {
+  return {...model(.9),id:'b06',doors:[{id:'entry',floor:'n01',hinge:[-.45,0],closedEnd:[.45,0],depth:.12,bottom:0,top:2.1}],
+    interactiveDoors:[{id:'b06:entry',buildingId:'b06',floor:'n01',sourceDoorId:'entry',renderPartIds:['native-leaf'],collisionPartIds:[],
+      hingeModel:{x:0,y:.015,z:.45},closedPose:{position:{x:0,y:1.0475,z:0},rotationY:Math.PI/2},
+      collider:{halfExtents:{x:.45,y:1.0325,z:.019}},handleModel:{x:.019,y:1,z:-.3},openAngle:Math.PI/2,defaultOpen:false}]};
+}
+
+test('interactive native leaves start closed, then open passage and occupied guard are independent explicit proofs',()=>{
+  const value=interactiveModel(),scene=makeScene(R,value,profileSettings('current'));
+  try {
+    assert.equal(scene.doorPhysics.isOpen('b06:entry'),false);
+    const sides=doorApproachGeometry(scene,value.doors[0]).points.map(point=>({...point,floor:0}));
+    for(const direction of [0,1]) {
+      const result=interactiveDoorPassage(scene,value.doors[0],sides[direction],sides[1-direction]);
+      assert.equal(result.passed,true,JSON.stringify(result));assert.equal(result.closedBlocking.blocked,true);
+      assert.equal(result.closeOccupiedGuard.allowed,false);assert.equal(result.stateAssumption.mode,'single-interactive-open');
+      assert.equal(scene.doorPhysics.isOpen('b06:entry'),false);
+      assert.equal(result.interactionVerified,direction===0,'opening into an occupied sweep is not a valid interaction');
+    }
+  } finally {scene.free();}
+});
+
+test('conditional open coverage requires exact explicit native state, fixed leaf cannot become interactive',()=>{
+  const value=interactiveModel(),scene=makeScene(R,value,profileSettings('current'));
+  try {
+    assert.throws(()=>requireCoverageDoorState(value),/explicit/);
+    const assumption=requireCoverageDoorState(value,'all-interactive-open');
+    assert.throws(()=>applyCoverageDoorState(scene,value,{...assumption,states:[]}),/incomplete/);
+    assert.equal(scene.doorPhysics.isOpen('b06:entry'),false);
+    applyCoverageDoorState(scene,value,assumption);assert.equal(scene.doorPhysics.isOpen('b06:entry'),true);
+    assert.equal(assumption.actorInteractionsVerified,false);
+    assert.throws(()=>createDoorInteractionProbe(scene.doorPhysics,scene.settings),/closed-default/);
+    const fixed=structuredClone(value);fixed.doors[0].openingClassification='fixed-paired-door-leaf';
+    assert.throws(()=>nativeDoorDefinitions(fixed),/movable native opening/);
+    const omitted=structuredClone(value);omitted.doors.push({...omitted.doors[0],id:'omitted'});
+    assert.throws(()=>nativeDoorDefinitions(omitted),/omitted/);
+    assert.throws(()=>nativeDoorDefinitions({...value,interactiveDoors:[]}),/omitted/);
+  } finally {scene.free();}
+});
+
+test('current-position authority rejects range and LOS before shared physics mutation',()=>{
+  for(const occluded of [false,true]) {
+    const value=interactiveModel();if(occluded)value.parts.push(box('LOS-blocker',[.2,0,-2],[.3,2.5,2]));
+    const scene=makeScene(R,value,profileSettings('current')),probe=createDoorInteractionProbe(scene.doorPhysics,scene.settings);
+    const actor=scene.walker({x:occluded?1:2.8,z:0,floor:0});
+    try {
+      assert.equal(actor.settle().setupValid,true);
+      const event=probe.request(actor,'b06:entry',true);
+      assert.equal(event.result.reason,occluded?'occluded':'out-of-range');
+      assert.equal(scene.doorPhysics.isOpen('b06:entry'),false);
+    } finally {probe.dispose();actor.dispose();scene.free();}
+  }
+});
+
+test('native approach can request from a safe current position before entering the opening sweep',()=>{
+  const value=interactiveModel(),scene=makeScene(R,value,profileSettings('current'));
+  const probe=createDoorInteractionProbe(scene.doorPhysics,scene.settings),actor=scene.walker({x:-1.4,z:0,floor:0});
+  try {
+    assert.equal(actor.settle().setupValid,true);
+    const approach={x:-.45,z:0,floor:0};
+    probe.beforeMove(actor,approach);assert.equal(probe.events.length,0,'grid leg ending before the leaf must not open unrelated doors');
+    probe.beforeMove(actor,approach,'entry');assert.equal(probe.events[0].result.status,'changed');
+    assert.ok(Math.abs(probe.events[0].position.x+1.4)<.01);
+    assert.equal(actor.moveTo(approach).passed,true);
+    assert.equal(actor.moveTo({x:.45,z:0,floor:0}).passed,true);
+  } finally {probe.dispose();actor.dispose();scene.free();}
+});
 function passage(profile,gap) {
   const scene=makeScene(R,model(gap),profileSettings(profile));
   try {

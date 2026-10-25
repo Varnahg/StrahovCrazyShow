@@ -1,5 +1,15 @@
 # B6: foto podložené vybavení interiérů
 
+## Revize kvality R2 — 25. 10. 2026
+
+Původní zjednodušené bloky skříněk uživatel nepřijal. Stejná celá pokojová fotografie byla znovu prohlédnuta: hnědý dřevěný korpus, část otevřených polic a světlá zavřená dvířka s malým kulatým úchytem. Horní skříňka má nyní bočnice, záda, dno, strop, polici a samostatná světlá dvířka; spodní skříňka má otevřenou horní polovinu. Přilehlé police mají záda a bočnici, nepokračují plným materiálem skrz zavřenou skříňku.
+
+Panely18mm, spáry3–4mm, malé osmiúhelníkové úchytky a chamfer1,5mm jsou autorské rozměrové odhady podle fotografie. `beveled_box` vytváří uzavřený analytický panel26faces/44tri, bez Blender modifierů nebo objektu pro každý panel. UV frame je panel-local v Blender metrech; stejný origin/axes přebírají hlavní i bevel plochy. Integrátor ukládá `Geometry.face(...,uv_frame=...)` souběžně s faceMaterials a při UV tvorbě předá finishemu. Existující floor/role/material batches zůstávají.
+
+Plánovací půdorys a kolizní příznak spodní skříňky zůstávají. Skutečné panelové kolize jsou podmnožinou bývalého plného boxu; nevzniká neviditelný proxy collider. Úchytky jsou noncollision a vystupují7mm před původní obálku; police/horní skříňka zachovávají noncollision. Koordinátor tuto interpretaci přijal, skutečný Actor musí ověřit po nativní tvorbě. Orientace umístění šablony zůstává kvůli zachování všech původních průchodů; není tvrzením přesného inventáře každého pokoje.
+
+Ověření: **21/21 interiors CPU PASS** (0,695s), včetně AST skutečné Geometry, uzavření všech hran bevelu, kladného objemu, disjunktních korpusových panelů, světlých dveří/otevřené dutiny a stabilní UV báze. Čisté porovnání proti HEAD e7ef3ff6 na skutečné receptuře SHA `e533bb5d7df909746f4f0dc171de8cc332b85ba10e25f4b76958e9f53db8dee8`:264roomWalkPaths a3244plánovacích kolizních obálek shodných, žádné nové skips; počet items13639→14095 kvůli456noncollision back/end panelům. Evidence `.cache/b6-photo-interiors-20261024/quality-r2/plan-comparison.json`;17,225s čistého CPU, žádný Blender/GPU/physics world. Nativeexport/render a celkový výkon zatím patří rootu; old snapshot2591/source-v4 beze změny.
+
 Implementace `scripts/cad-buildings/b6_furnishings.py` zařizuje pouze explicitně klasifikované místnosti skutečné B6 receptury. Výkres určuje prostor, podlaží, dveře, okna a polohu hygienických předmětů. Fotografie dodané uživatelem 24. 10. 2026 určují vzhled; datum jejich pořízení není známé. Rozměry nábytku a výšky zařizovacích předmětů jsou autorské odhady, nikoli zaměření.
 
 ## Podklady a rozhodnutí

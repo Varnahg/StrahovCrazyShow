@@ -130,11 +130,11 @@ test("probe echoes only a bounded nonce and finite server clock, with a one-per-
   assert.equal(consumeRate(rates, "own:network-probe", 1, 1000, 1000), true);
 });
 
-test("V13 probe wiring is an authenticated own-room reply, never an HTTP/presence broadcast", () => {
+test("V14 probe wiring is an authenticated own-room reply, never an HTTP/presence broadcast", () => {
   assert.equal(
     PROTOCOL_VERSION,
-    13,
-    "B6 fixed leaves, furnishings and rear stairs require V13 while retaining epoch-aware scheduled inputs",
+    14,
+    "Authoritative CAD doors require V14 while retaining epoch-aware scheduled inputs",
   );
   const server = readFileSync(
     new URL("../server/index.ts", import.meta.url),

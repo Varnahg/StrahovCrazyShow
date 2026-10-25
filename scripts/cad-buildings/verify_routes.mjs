@@ -24,7 +24,7 @@ export function routePath(scene,flights,access={}) {
 }
 
 export async function verifyRoutes(args) {
-  const allowed=new Set(['--model','--output','--dependency-root','--actor-source','--profile','--speed','--route','--access-overrides']);
+  const allowed=new Set(['--model','--output','--dependency-root','--actor-source','--profile','--speed','--route','--access-overrides','--door-state']);
   for(const key of args.keys())if(!allowed.has(key))throw new Error('Neznámý argument '+key);
   const accessOverrides=args.has('--access-overrides')?JSON.parse(readFileSync(resolve(args.get('--access-overrides')),'utf8')):{};
   const {scene,metadata}=await openModel(args);
@@ -58,7 +58,7 @@ export async function verifyRoutes(args) {
       }
     }
   } finally { scene.free(); }
-  return {scope:'Celé stavební schodišťové trasy; samostatná CPU scéna',...metadata,accessOverrides,
+  return {scope:'Celé stavební schodišťové trasy; samostatná CPU scéna; při deklarovaných otevřených dveřích jde o podmíněné geometrické pokrytí, interakce se ověřují zvlášť',...metadata,accessOverrides,
     cases:results.length,passed:results.filter(r=>r.passed).length,results};
 }
 

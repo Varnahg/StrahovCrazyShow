@@ -1,5 +1,18 @@
 # Předání: b6-photo-finishes-20261024
 
+## R2 — 25. 10. 2026, owner b6-quality-r2 → root
+
+Nové přidělení po uživatelském odmítnutí R1 kvality; baseline `e7ef3ff63dbb3ed0f771082331d8bb0eee5f2427`, stejný cad-building-models worktree. Implementace a testy v tomto tasku + souběžný vlastní interiors task jsou hotové k převzetí. Snapshot2591/source-v4 zůstal beze změny. Následující původní handoff je historický.
+
+- Změny: `b6_finishes.py`, `test_b6_finishes.py`, `photo-finishes.md`, tento handoff, vlastní cache `quality-r2/`. Rootovy builder/audit/editace nebyly upravovány. Žádný commit/staging.
+- Built-in imagegen skill přečten a použit po view_image celé původní room.png, která je pouze reference. Dva originální výstupy v `C:/Users/rezac/.codex/generated_images/01a16b40-1cc3-7b42-ac8f-637cff967a39/`: `exec-cedda096-9ff6-4fbe-bf28-7052632b5924.png` (wood), `exec-b3e9e8a0-565b-4404-9d75-172eb71c6eae.png` (lino). Zachovány; byte-identické kopie v `.cache/b6-photo-finishes-20261024/quality-r2/{wood-veneer,brown-lino}.png`. PNG1254²RGB, žádný crop/resize/edit. Cache je potvrzeně gitignored.
+- Hashe: wood `fcb93758bf8bfe5709f1bdf30807755e3402f2c39a15056fe27d7e90ab7eefa0` /2663457bytes; lino `80c631741555ca9271c9e34493592f703a4e075225c2e2cff46c0a39b045b129` /3552756bytes. Přesné prompty, reference hash, periody1m/1,6m a generátor jsou v cache `texture-overrides.json`.
+- Integrace: předat JSON mapu jako druhý argument `B6Finishes(recipe, texture_overrides)`. Default záměrně nepoužívá privátní cache implicitně. Explicitní override validuje absolutní cestu, hash, PNG header, RGB8, rozměry/velikost, metriku/provenance a při chybě selže. Uložení zachová původní PNGbytes. Přibyly `textureGeneration`, `textureOverrideSha256`, `texturePeriodMetres` na image/material; ostatní auditní provenance/UV/PBR kontrakt platí. Světlý `b6_laminate_ivory` je pro cabinet fronts a window-sill, bez změny sill geometry.
+- UV kontrakt: `uv_for_face(..., uv_frame=None)` používá panel-local origin+ortogonální axes `[acrossGrain,alongGrain,thickness]` v Blender metrech. Root už připojil faceUVFrames do Geometry; skutečný AST fixture PASS. Procedural wood fallback má frekvence7/17/29cyklů/tile, ne alias nadNyquist; b6_wood fallback512².
+- Testy: `py -3.14 -B scripts/cad-buildings/test_b6_finishes.py -v` **21/21 PASS**,1,247s,exit0. Skutečné generated PNG prošly stejným texture_override validátorem a SHA kontrolou. Výsledný built-in raster byl vizuálně prohlédnut. Seam metriky/omezení jsou v photo-finishes.md; dokonalé opakování ani finální render není tvrzeno.
+- Manifest: společná identita R2 kódu, obou testů/docs/handoffs a ignorované evidence v `.cache/b6-photo-finishes-20261024/quality-r2/manifest.json`; SHA sdělen rootovi v předání. Native packing/re-export, vizuální/game přejímku a výkon provede root.
+- Procesy: všechny vlastní krátké CLI/Python skončily; žádný Blender/GPU/build/server/fullsuite. Původní PNG z CODEX_HOME byly pouze kopírovány. Po zápisu manifestu následuje release obou claimů; finální CLI výsledek předán rootovi. Root převzal builder kontrakt a přijímá panelové kolize podmnožinou dřívější obálky; žádný invisible proxy.
+
 - Vlastník: `b6-photo-01a16b37-finishes` (`/root/cad_runtime_research`); příjemce: koordinátor `/root`.
 - Pracovní kopie: `C:/Users/rezac/.codex/worktrees/cad-building-models/StrahovCrazyShow`; větev `codex/b6-photo-refinement-20261024`; výchozí commit `ed52896aa83e4f18cffb162a9b12b100712d341c`.
 - Výsledek: integrovatelný B6-only helper pro klasifikaci ploch, metrické UV a autorské foto-informované PBR/PNG materiály. 18 CPU regresí PASS. Nativní packing/export/render je výslovně následný krok rootu, nikoli doložený PASS tohoto předání.

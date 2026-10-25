@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { argumentsMap, required, openModel, sha256, writeReport, doorApproachGeometry, fixedOpeningSpec } from './rapier_model.mjs';
+import { argumentsMap, required, openModel, sha256, writeReport, doorApproachGeometry, fixedOpeningSpec, createDoorInteractionProbe } from './rapier_model.mjs';
 
 export function fixedOpeningHit(scene,start,target,height,role) {
   if(!['facade-glass','fixed-door-leaf'].includes(role))throw new Error('Neplatná role pevné výplně');
@@ -99,6 +99,47 @@ export function fixedOpeningProtection(scene,door) {
   return {...spec,coverage,hits,passed:coverage.passed&&hits.every(Boolean)};
 }
 
+/** Independent closed/open cases start at the same measured approach. Within
+ * each case one capsule moves continuously; no reset across a blocked portal. */
+export function interactiveDoorPassage(scene,door,start,target) {
+  const definition=[...scene.doorPhysics.definitions.values()].find(item=>item.definition.sourceDoorId===door.id);
+  if(!definition)throw new Error('No interactive definition for '+door.id);
+  const id=definition.id,physics=scene.doorPhysics;
+  for(const entry of physics.definitions.values())if(physics.isOpen(entry.id))throw new Error('Door cases require closed-default state');
+  const run=operation=>{const walker=scene.walker(start);try{return operation(walker,walker.settle());}finally{walker.dispose();}};
+  const closed=run((walker,setup)=>{
+    const leg=setup.setupValid?walker.moveTo(target):null;
+    return {...setup,leg,blocked:!!leg&&!leg.passed&&leg.contacts.some(contact=>contact.part===id)};
+  });
+  const interaction=run((walker,setup)=>{
+    if(!setup.setupValid)return {setup,verified:false};
+    const probe=createDoorInteractionProbe(physics,scene.settings);
+    try {const event=probe.request(walker,id,true);return {setup,event,verified:event.result.status==='changed'};}
+    finally {probe.dispose();}
+  });
+  physics.apply(id,false);
+  const stateAssumption={mode:'single-interactive-open',doorId:id,actorInteractionsVerified:false,
+    states:[...physics.definitions.keys()].map(key=>({id:key,open:key===id})),purpose:'conditional-geometric-passage'};
+  let opened;
+  try {
+    physics.apply(id,true);
+    opened=run((walker,setup)=>{
+      if(!setup.setupValid)return {...setup,passed:false};
+      const center={x:(start.x+target.x)/2,z:(start.z+target.z)/2};
+      const support=scene.floorAt(center,door.bottom),middle={...center,floor:support?.height??null,support};
+      const toPortal=walker.moveTo(middle);
+      const occupied=toPortal.passed?physics.guardChange(id,false,[{id:walker.id,current:walker.position,next:walker.body.nextTranslation(),
+        radius:scene.settings.radius,halfHeight:scene.settings.halfHeight,skin:scene.settings.offset}]):null;
+      const leg=toPortal.passed?walker.moveTo(target):toPortal;
+      return {...setup,toPortal,closeOccupiedGuard:occupied,leg,
+        passed:leg.passed&&occupied?.allowed===false&&occupied.reason==='occupied'};
+    });
+  } finally {physics.apply(id,false);}
+  return {...opened,closedBlocking:closed,interactionAttempt:interaction,doorPhysicsId:id,stateAssumption,
+    testKind:'interactive-door-closed-open-guard',passed:closed.blocked&&opened.passed===true,
+    interactionVerified:interaction.verified};
+}
+
 export async function verifyDoors(args) {
   const allowed=new Set(['--model','--output','--dependency-root','--actor-source','--profile','--speed','--recipe','--door']);
   for(const key of args.keys())if(!allowed.has(key))throw new Error('Neznámý argument '+key);
@@ -133,6 +174,10 @@ export async function verifyDoors(args) {
         if(start.floor===null||target.floor===null) {
           results.push({...row,category:'missing-model-floor',setupValid:false,passed:false});continue;
         }
+        if([...scene.doorPhysics.definitions.values()].some(item=>item.definition.sourceDoorId===door.id)) {
+          const proof=interactiveDoorPassage(scene,door,start,target);
+          results.push({...row,...proof,category:proof.passed?'passed':!proof.setupValid?'invalid-start':'blocked'});continue;
+        }
         const walker=scene.walker(start);
         try {
           const setup=walker.settle();
@@ -146,11 +191,15 @@ export async function verifyDoors(args) {
     }
   } finally { scene.free(); }
   const categories={};for(const row of results)categories[row.category]=(categories[row.category]??0)+1;
+  const interactions=results.filter(row=>row.testKind==='interactive-door-closed-open-guard');
   return {scope:'Přímé průchody měřenými dveřmi; neplatný start vyžaduje posouzení skutečné přístupové trasy',...metadata,
+    interactiveCases:interactions.length,interactionVerified:interactions.filter(row=>row.interactionVerified).length,
+    interactionStatus:interactions.every(row=>row.interactionVerified)?'pass':'partial',
+    coverageQualification:interactions.length?'Conditional single-door-open geometry; independent current-position interaction attempts are reported separately':'static-native-geometry',
     doorSourceMode,doorSourceSha256,cases:results.length,passed:categories.passed??0,categories,
     protectedGlazing:categories['fixed-glazing']??0,
     protectedDoorLeaves:categories['fixed-door-leaf']??0,
-    status:categories.blocked||categories['missing-glazing']||categories['missing-fixed-door-leaf']?'issues':categories['invalid-start']||categories['missing-model-floor']?'partial':'pass',results};
+    status:categories.blocked||categories['missing-glazing']||categories['missing-fixed-door-leaf']?'issues':categories['invalid-start']||categories['missing-model-floor']||interactions.some(row=>!row.interactionVerified)?'partial':'pass',results};
 }
 
 if(process.argv[1]&&fileURLToPath(import.meta.url)===resolve(process.argv[1])) {

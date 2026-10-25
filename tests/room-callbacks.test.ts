@@ -5,6 +5,8 @@ import { Script, createContext } from "node:vm";
 import { setImmediate } from "node:timers/promises";
 import ts from "typescript";
 import { currentRoomCallbacks } from "../client/room-callbacks";
+import { DoorConnection } from "../client/door-connection";
+import { placeCadDoorDefinition } from "../shared/cad-doors";
 import { MotionDecoder, MotionEncoder } from "../shared/motion-codec";
 import { PROTOCOL_VERSION, FIXED_DT, canonicalInput } from "../shared/netcode";
 import { movementFromKeys } from "../shared/controls";
@@ -18,6 +20,13 @@ import { NetworkProbe } from "../client/network-probe";
 import { NetworkTimeline } from "../client/network-timeline";
 import { readWebGpuMainPassTiming } from "../client/gpu-diagnostics";
 import { snapshotAcceptedAuthorityDiagnostics } from "../client/game-diagnostics";
+
+const fixtureDoor = placeCadDoorDefinition({id:"fixture-door",buildingId:"b06",floor:"N01",sourceDoorId:"fixture-source",
+  renderPartIds:["fixture-leaf"],collisionPartIds:[],hingeModel:{x:0,y:1,z:0},
+  closedPose:{position:{x:.5,y:1,z:0},rotationY:0},collider:{halfExtents:{x:.5,y:1,z:.02}},
+  openAngle:Math.PI/2,handleModel:{x:.9,y:1,z:0},defaultOpen:false},
+  {translation:{x:0,y:0,z:0},yaw:0});
+const doorIdentity={worldEpoch:"fixture-room",definitionHash:"a".repeat(64)};
 
 // Execute the actual UI subscriptions, without booting React/WebGL. This catches
 // a missing guard on any handler, not only the helper's isolated behavior.
@@ -215,6 +224,7 @@ const gameMethodsScript = compileScript(`({
 
 const poseMethodsScript = compileScript(`({
   ${executableGameMethod("capturePreviousCarPose")},
+  ${executableGameMethod("pruneDoorPrediction")},
   ${executableGameMethod("reconcile")},
   ${executableGameMethod("advanceSimulation")}
 })`);
@@ -241,6 +251,7 @@ for (const path of ["simulation", "reconcile"] as const) {
       visualOffset: Vector3.Zero(), carSnapshots: [],
       diagnosticNetwork: { authorityPackets: 0, corrections: 0, resyncs: 0 },
       prediction: { states: new Map(), inputs: [], acknowledge() {} },
+      predictionDoorRevisions: new Map(),
       snapshots: { remove() {} },
       networkTimeline: { acceptAuthority: () => ({ accepted: true, replay: [], rebase: false }) },
       resetPredictionHistory() {},
@@ -405,6 +416,7 @@ function fixture() {
     },
     authorityBufferRef: { current: new AuthorityBuffer() },
     bootstrapAuthorityRef: { current: null as ReceivedAuthority | null },
+    doorConnectionRef: { current: null as DoorConnection | null },
     playersRef: { current: [] },
     playersById: { current: new Map<string, any>() },
     carState: { current: null },
@@ -445,6 +457,7 @@ function fixture() {
     "setEmote",
     "cancelRespawn",
     "selectTarget",
+    "attachDoorTimeline",
   ])
     game[method] = (...args: unknown[]) => {
       if (method === "setLocalId") game.localId = args[0];
@@ -457,6 +470,9 @@ function fixture() {
     ...refs,
     game: { current: game },
     currentRoomCallbacks,
+    DoorConnection,
+    CAD_DOOR_DEFINITIONS: [fixtureDoor],
+    CAD_DOOR_DEFINITION_HASH: doorIdentity.definitionHash,
     sessionDiagnostics: {
       event: (kind: string, data: unknown = {}) =>
         diagnostics.push({ kind, data: structuredClone(data) }),
@@ -571,6 +587,9 @@ function fixture() {
 function payloads(id = "self") {
   const player = { id, x: 1, y: 2, z: 3, emote: "" };
   return {
+    doorSnapshot: {...doorIdentity,revision:0,tick:0,states:[{id:fixtureDoor.id,open:false,revision:0,changedAtTick:0}]},
+    doorDelta: {...doorIdentity,revision:1,tick:1,door:{id:fixtureDoor.id,open:true,revision:1,changedAtTick:1}},
+    doorResult: {...doorIdentity,status:"rejected",reason:"occupied",requestId:1,revision:1},
     welcome: { id, players: [player], events: [], activity: { hunt: [] } },
     presence: [player],
     motion: new MotionEncoder().encode({
@@ -710,7 +729,7 @@ test("leave invalidates before the handshake and all retained callbacks remain i
   assert.equal(ui.state.mode, "menu");
   assert.equal(ui.state.messages.length, 0);
   assert.equal(ui.state.social.contacts.length, 0);
-  assert.equal(room.messages.size, 13, "transport still retains its listeners");
+  assert.equal(room.messages.size, 16, "transport still retains all old and door listeners");
   for (const mode of ["menu", "guest"]) {
     ui.modeRef.current = mode;
     const before = ui.snapshot();
@@ -804,7 +823,7 @@ test("a current multiplayer entry commits identity and token only after its join
   assert.equal(ui.storage.get("strahov.session"), "token-joined-self");
   assert.equal(ui.state.mode, "multi");
   assert.equal(ui.state.busy, false);
-  assert.equal(room.messages.size, 13);
+  assert.equal(room.messages.size, 16);
 });
 
 test("leave then guest cancels a pending session fetch without reading its body or joining", async () => {
@@ -1264,6 +1283,9 @@ test("actual UI hook assignments drain authority before Game simulation and flus
   room.message("authoritative", { ...authority, time: 1000 + FIXED_DT * 1000 });
   assert.equal(f.authorityBufferRef.current.snapshot().pending, true);
   Object.assign(f.environment, {
+    // This legacy frame-order fixture has no CAD colliders; actual populated
+    // door prediction is exercised separately in cad-game-doors.test.ts.
+    CAD_DOOR_DEFINITIONS: [],
     Vector3,
     Quaternion,
     FIXED_DT,

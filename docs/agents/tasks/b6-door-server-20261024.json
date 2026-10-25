@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-door-server-20261024",
+  "title": "Authoritative B6 door server integration",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": [
+    "server/index.ts",
+    "tests/cad-door-network.test.ts",
+    "scripts/integration-cad-doors.ts",
+    "server/door-interactions.ts",
+    ".cache/b6-door-server-20261024/",
+    "docs/agents/handoffs/b6-door-server-20261024.md"
+  ],
+  "acceptance": [
+    "Concrete root delegation, research then implementation/refactoring/tests as one unit; no nested BMAD.",
+    "Keep immutable user playtest2591 untouched; no builds/GPU/servers without coordinated resource."
+  ],
+  "verification": [
+    "Meaningful targeted CPU tests, native model and full integration coordinated by root."
+  ],
+  "notes": [
+    "Disjoint continuation after shared door core; root owns shared/simulation.ts and client Game/UI."
+  ]
+}

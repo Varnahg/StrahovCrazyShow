@@ -1,5 +1,15 @@
 /** Czech source strings are stable typed keys; English never changes content identifiers. */
 export const messages = {
+  "Ve dveřích někdo stojí.": "Someone is in the doorway.",
+  "Ustup z prostoru dveří, aby se mohly pohnout.": "Move clear of the door so it can move.",
+  "E · otevřít dveře": "E · open door",
+  "E · zavřít dveře": "E · close door",
+  "Přistup blíž ke dveřím.": "Move closer to the door.",
+  "Stav dveří se změnil. Zkus to znovu.": "The door state changed. Try again.",
+  "Nejdřív vystup z auta.": "Exit the car first.",
+  "Ke dveřím musíš mít volný výhled.": "You need a clear view of the door.",
+  "Herní verze se změnila. Obnov stránku.": "The game version changed. Reload the page.",
+  "Dveře se nepodařilo ovládat. Zkus to znovu.": "The door could not be operated. Try again.",
   "Modelová dohlednost": "Modelled visibility",
   "Modelové sněžení": "Modelled snowfall",
   "Hvězdy a Měsíc": "Stars and Moon",

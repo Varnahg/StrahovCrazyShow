@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-game-door-validation-20261025",
+  "title": "Verify Game door prediction and connection integration",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": [
+    "tests/room-callbacks.test.ts",
+    "tests/cad-game-doors.test.ts",
+    ".cache/b6-game-door-validation-20261025/",
+    "docs/agents/handoffs/b6-game-door-validation-20261025.md"
+  ],
+  "acceptance": [
+    "Update hand-maintained UI/Game fixtures for real new dependencies; add actual behavior proof, never weaken legacy assertions.",
+    "Review actual Game post-tick collision replay, missing baseline, resync, guest isolation, E closed/open behavior; report runtime changes to root."
+  ],
+  "verification": [
+    "Targeted meaningful tests, no fullsuite/GPU or servers."
+  ],
+  "notes": [
+    "Root owns production Game/netcode/Simulation; direct delegation no recursive BMAD."
+  ]
+}

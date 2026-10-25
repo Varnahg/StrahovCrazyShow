@@ -15,6 +15,24 @@ import {
 
 await initPhysics();
 
+test("V14 fixture does not bypass a missing or foreign door-history authority", () => {
+  const f = createReplayFixture();
+  try {
+    const before = f.actor.capture(), valid = f.authority(3);
+    assert.equal(valid.doorRevision, 0);
+    assert.equal(valid.doorWorldEpoch, f.doors.timeline.identity.worldEpoch);
+    for (const packet of [{ ...valid, doorWorldEpoch: undefined }, { ...valid, doorWorldEpoch: "foreign-world" }]) {
+      assert.equal(f.game.reconcile(packet), false);
+      assert.equal(f.times.length, 0);
+      assert.equal(f.prediction.inputs.length, REPLAY_INPUTS);
+      assert.deepEqual(f.actor.capture(), before);
+    }
+    assert.equal(f.game.reconcile(valid), true);
+    assert.equal(f.times.length, REPLAY_INPUTS - valid.ack);
+    assert.equal(f.doors.rendered.size, f.sim.doorPhysics.size);
+  } finally { f.sim.dispose(); }
+});
+
 test("corrected walking and stationary histories avoid subsequent full-world replays", () => {
   for (const movement of ["walking", "stationary"] as const) {
     const results = [];

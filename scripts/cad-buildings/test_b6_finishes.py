@@ -4,13 +4,15 @@ import hashlib
 import io
 import json
 import math
+from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 import numpy as np
 from PIL import Image
 
-from b6_finishes import B6Finishes, FINISHES, SOURCES, material_provenance, png_bytes, texture_pixels
+from b6_finishes import B6Finishes, FINISHES, SOURCES, material_provenance, png_bytes, texture_pixels, texture_override
 
 
 def rectangle(x0, y0, x1, y1):
@@ -136,6 +138,7 @@ class FinishClassificationTest(unittest.TestCase):
         self.assertEqual(self.finishes.face_material('n01', 'window-frame', exterior, 'frame'), 'b6_frame_bronze')
         self.assertEqual(self.finishes.face_material('n01', 'window-frame', interior, 'frame'), 'b6_frame_white')
         self.assertEqual(self.finishes.face_material('n01', 'window-glass', exterior, 'glass'), 'glass')
+        self.assertEqual(self.finishes.face_material('n01', 'window-sill', top(35.5,7.8,36.5,8.2,.9), 'concrete'), 'b6_laminate_ivory')
         self.assertEqual(self.finishes.face_material('n01', 'window-gasket', exterior, 'gasket'), 'gasket')
         self.assertEqual(self.finishes.face_material('n01', 'slab', top(35, 8, 39, 11, 9), 'roof'), 'roof')
         self.assertIsNone(self.finishes.uv_for_face('n01', 'slab', top(35, 8, 39, 11, 9), 'roof'))
@@ -181,6 +184,35 @@ class FinishClassificationTest(unittest.TestCase):
 
 
 class FinishPixelsTest(unittest.TestCase):
+    def test_original_png_override_is_hash_verified_and_keeps_metric_period(self):
+        cache=Path(__file__).resolve().parents[2]/'.cache/b6-photo-finishes-20261024'
+        cache.mkdir(parents=True,exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=cache) as directory:
+            path=Path(directory)/'fixture.png';raw=png_bytes(np.full((8,8,3),128,dtype=np.uint8));path.write_bytes(raw)
+            spec={'path':str(path),'sha256':hashlib.sha256(raw).hexdigest(),'periodMetres':[1.6,1.6],
+                  'sourceProvenance':{'generator':'fixture','referenceSha256':'1'*64,'prompt':'authored original fixture'}}
+            loaded=texture_override(spec)
+            self.assertEqual(loaded['bytes'],raw);self.assertEqual((loaded['width'],loaded['height']),(8,8))
+            f=B6Finishes(recipe(),{'b6_bedroom_floor':spec})
+            points=top(35.2,8.2,36.8,9.8)
+            uv=f.uv_for_face('n01','floor-finish',points,'b6_bedroom_floor')
+            self.assertAlmostEqual(abs(uv[1][1]-uv[0][1]),1)
+            for bad in ({**spec,'sha256':'0'*64},{**spec,'sourceProvenance':{}},{**spec,'path':'relative.png'}):
+                with self.assertRaises(ValueError):texture_override(bad)
+            self.assertEqual(path.read_bytes(),raw)
+
+    def test_panel_uv_frame_preserves_metric_grain_under_rotation_and_translation(self):
+        f=B6Finishes(recipe())
+        points=[(1,2,3),(1,2.6,3),(1,2.6,4.4),(1,2,4.4)]
+        frame={'origin':[1,2,3],'axes':[[0,1,0],[0,0,1],[1,0,0]]}
+        uv=f.uv_for_face('n01','interior-furniture/storage',points,'b6_wood',frame)
+        self.assertEqual(uv[0],(0,0));self.assertAlmostEqual(uv[1][0],.6);self.assertAlmostEqual(uv[2][1],1.4)
+        rotate=lambda p:(-p[1]+10,p[0]-20,p[2]+4)
+        frame2={'origin':rotate(frame['origin']),'axes':[[-a[1],a[0],a[2]] for a in frame['axes']]}
+        uv2=f.uv_for_face('n01','interior-furniture/storage',[rotate(p) for p in points],'b6_wood',frame2)
+        np.testing.assert_allclose(uv,uv2,atol=1e-12)
+        with self.assertRaises(ValueError):f.uv_for_face('n01','interior-furniture/storage',points,'b6_wood',{**frame,'axes':[[1,0,0]]*3})
+
     def sample(self, key, x, y):
         spec = FINISHES[key]
         pixels = texture_pixels(key)

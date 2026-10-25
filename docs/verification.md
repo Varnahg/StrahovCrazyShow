@@ -1,6 +1,18 @@
 # Ověření dema a známá omezení
 
-## Současný přehled · 20. října 2026
+## B6 po ruční prohlídce · 25. října 2026
+
+Samostatný B6 checkpoint používá protokol **14**: 475 pohyblivých křídel začíná zavřených, E požaduje změnu od autority a 228 menších pokojových křídel zůstává pevných. Klient přehrává historii pohybu se správným historickým stavem dveří; host má samostatný stav. [Podrobné změny a omezení](reality-pack/cad-buildings/b06/playtest-corrections.md) oddělují průchod při otevřeném křídle od skutečně ověřené interakce.
+
+Neměnný B6-only snapshot `94fb29ca7346955dee9fd8caf6e6ea9fdb561c3d64b977fc320d5400423b636c` obsahuje také testy. **317/317 souvisejících testů PASS**, produkční `pnpm build` včetně TypeScriptu PASS a plný izolovaný `pnpm test:integration` PASS (respawn, společný svět, síťové epochy, backlog, feedback). První integrační pokus nestihl nezměněný desetisekundový start; opakování s uvolněnou vlastní GPU scénou prošlo bez změny timeoutu nebo readiness. Logy jsou v `.cache/b6-photo-refinement-20261024/revision2/b6-split-{targeted,build,integration-attempt2}.log`. Nejde o PASS celé projektové sady.
+
+Nativní Blender/GLB/UV/material/collision audit prošel: 1267 objektů, 159 kolizních částí, 548605 trojúhelníků. Master SHA256 `da903433185fd59661337695641cd5ffa94bcbaeaa4fca5b9068bb19ae40bced`, GLB `3318a7b0418b7bf3d46e7abcdee05b7500076f6811b3b88be0868bef8bd39803`, kolizní data `e1391cc8b3647bc353abc22bc8ec06a276f859b10d1ba650ba17dd38a794ea1c`; recipe `14bfbffadd7a7d96729d9fb5205b54b8dbcccc87153b807621280a8550949275`. Zárubně mají vlastní disjunktní objem a zdivo stejný přesný výřez. Nadpraží 12E1 již nemá původní 98,94% překryv. Příprava **78/78 PASS**, nový exportní guard **10/10 PASS** a skutečná kontrola všech 475 dveří/962 nativních částí; nepodporovaná transformace nebo změna křídla proti fyzikálním metadatům se odmítne.
+
+Ve vnějším veřejném SDK testu předchozího kandidátu prošla souvislá chůze 315,94 m od spawnu, otevření, průchod oběma směry, zavření a skutečné blokování i synchronizace více klientů. Ruční browserová prohlídka rovněž ověřila E a vstup. Šest zadních horních průchodů však nadále má nevyřešený rozdíl výšek **0,481 m**: úspěšný skok není správně rekonstruovaný práh. Předchozí kompletní pokojový interakční důkaz je **261/264** a 36 úzkých sprchových cílů není ověřených. Přesné hranice přejímky zůstávají v navazujícím reportu; celek ani PR26 nejsou označeny Done.
+
+Původní hraný snapshot na2591 zůstává neměnný. Nové počasí je oddělený následný celek. Praktické GPU přijetí poslední revize modelu, přesný CI head a celková fotografická věrnost zůstávají otevřené. Dosavadní vlastní IAB kontroly používají Intel UHD630 přes ANGLE/D3D11; jejich HUD FPS není výkonovým důkazem GeForce.
+
+## Výchozí přehled · 20. října 2026
 
 Každý výsledek platí jen pro zaznamenané source ID a podmínky ověření. Číslo portu samo neurčuje právě hraný build; před praktickou kontrolou ověř skutečnou URL, identitu klienta a vlastnictví procesu. [Rozsah přejímky](acceptance.md), [mapa kódu](agents/architecture.md) a [metodika výkonu](performance/README.md) vedou k podrobnostem.
 

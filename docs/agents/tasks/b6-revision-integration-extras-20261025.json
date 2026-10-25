@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-revision-integration-extras-20261025",
+  "title": "New immutable B6/weather candidate and route CLI integration",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [
+    "port:2592"
+  ],
+  "writePaths": [
+    "scripts/cad-buildings/verify_routes.mjs",
+    "docs/agents/handoffs/b6-revision-integration-extras-20261025.md"
+  ],
+  "acceptance": [
+    "Explicit all-open route assumption aligned with new interactive door helper; physical interaction verified separately.",
+    "Serve a new immutable candidate on2592; played2591/source-v4 untouched."
+  ],
+  "verification": [
+    "Targetedroutefixtures, newsource/client identity andhealth."
+  ],
+  "notes": [
+    "Root integration only; heavyvalidation/gpu/workspacebuild independently reserved by same root."
+  ]
+}

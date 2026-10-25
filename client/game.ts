@@ -70,7 +70,9 @@ import { B6_LAYOUT } from "../shared/b6-interior";
 import { groundHeight, PARKING_SLOTS } from "../shared/terrain";
 import type { B6RealityController } from "./b6-reality";
 import type { CadBuildingsController } from "./cad-buildings";
-import { CAD_BUILDINGS, hasCadBuilding, cadLevelHeight } from "../shared/cad-buildings";
+import { CAD_BUILDINGS, CAD_DOOR_DEFINITIONS, CAD_DOOR_DEFINITION_HASH, hasCadBuilding, cadLevelHeight } from "../shared/cad-buildings";
+import { CadDoorStateStore, cadDoorPose, CAD_DOOR_INTERACTION_RANGE, type CadDoorSnapshot, type CadDoorState } from "../shared/cad-doors";
+import type { CadDoorTimeline } from "../shared/cad-door-timeline";
 import { applyArtLighting } from "./art-lighting";
 import { VehicleLighting } from "./vehicle-lighting";
 import { PlayerFlashlight } from "./flashlight";
@@ -437,6 +439,16 @@ export class Game {
   profile: Profile;
   localPlayer: Player;
   weather?: Weather;
+  private doorTimeline: CadDoorTimeline | null = null;
+  private readonly guestDoors = new CadDoorStateStore(CAD_DOOR_DEFINITIONS, {
+    worldEpoch: "guest-local", definitionHash: CAD_DOOR_DEFINITION_HASH,
+  });
+  private doorSnapshot: CadDoorSnapshot | null = null;
+  private readonly doorStates = new Map<string, CadDoorState>();
+  private readonly predictionDoorRevisions = new Map<number, number>();
+  private doorRequestId = 0;
+  private doorInputTickBase = 0;
+  private lastDoorResync = -Infinity;
   sun: DirectionalLight;
   ambient: HemisphericLight;
   clouds: Mesh[] = [];
@@ -1045,6 +1057,7 @@ export class Game {
     this.canvas.dataset.renderHealth = "ready";
     this.compilationProfile.setStage("ready");
     this.ready = true;
+    this.applyDoorSnapshot(this.network ? this.doorTimeline?.currentSnapshot() ?? null : this.guestDoors.snapshot());
     this.canvas.dataset.bootStage = "ready";
     this.engine.runRenderLoop(() => this.frame());
   }
@@ -1277,6 +1290,14 @@ export class Game {
   }
   reconcile(packet: Authority, receivedAt = performance.now()): boolean {
     if (this.disposed || !this.ready || packet.tick < this.lastAuthorityTick) return false;
+    const authoritativeDoors = this.network && CAD_DOOR_DEFINITIONS.length
+      ? packet.doorWorldEpoch === this.doorTimeline?.identity.worldEpoch && Number.isSafeInteger(packet.doorRevision)
+        ? this.doorTimeline!.snapshotAt(packet.tick, packet.doorRevision) : null
+      : null;
+    if (this.network && CAD_DOOR_DEFINITIONS.length && !authoritativeDoors) {
+      this.requestDoorResync();
+      return false;
+    }
     // Respawn is completed by a forced authority, not by replaying a packet
     // already in flight when the user asked to return to the start.
     const respawnReply = packet.resync === true && packet.respawn === true;
@@ -1300,6 +1321,15 @@ export class Game {
       },
     );
     if (!acceptance.accepted) return false;
+    // The server changes doors after Actor.step(T), before world.step(T).
+    // Validate the whole replay range before mutating the local actor.
+    if (authoritativeDoors && !packet.resync && acceptance.replay.some(({input}) =>
+      this.doorTimeline!.revisionAt(packet.inputTickBase + input.seq - 1) === null ||
+      this.doorTimeline!.revisionAt(packet.inputTickBase + input.seq) === null)) {
+      this.requestDoorResync();
+      return false;
+    }
+    this.doorInputTickBase = packet.inputTickBase;
     this.lastAuthorityNetwork = snapshotAcceptedAuthorityDiagnostics(packet);
     this.lastAuthorityAtMs = receivedAt;
     this.diagnosticNetwork.authorityPackets++;
@@ -1307,6 +1337,7 @@ export class Game {
     const expected = this.prediction.states.get(packet.ack);
     const exact =
       expected &&
+      (!authoritativeDoors || this.predictionDoorRevisions.get(packet.ack) === authoritativeDoors.revision) &&
       expected.vehicle === packet.state.vehicle &&
       expected.grounded === packet.state.grounded &&
       Math.abs(expected.speed - packet.state.speed) < 0.01 &&
@@ -1331,9 +1362,12 @@ export class Game {
       exact &&
       !packet.resync &&
       !acceptance.rebase &&
+      (!authoritativeDoors || acceptance.replay.every(({input}) =>
+        this.predictionDoorRevisions.get(input.seq) === this.doorTimeline!.revisionAt(packet.inputTickBase + input.seq))) &&
       acceptance.replay.every((step) => step.source === "input")
     ) {
       this.prediction.acknowledge(packet.ack);
+      this.pruneDoorPrediction(packet.ack);
       this.seq = Math.max(this.seq, packet.ack);
       return true;
     }
@@ -1366,7 +1400,9 @@ export class Game {
       this.snapshots.remove(this.localId);
     } else this.seq = Math.max(this.seq, packet.ack);
     this.prediction.acknowledge(packet.ack);
+    this.pruneDoorPrediction(packet.ack);
     const replay = acceptance.replay;
+    if (authoritativeDoors) this.applyDoorSnapshot(authoritativeDoors);
     this.actor.restore(packet.state, packet.respawn === true);
     if (packet.resync && !packet.state.vehicle && packet.state.vehicleState)
       this.sim.restorePublicCar(packet.state.vehicleState);
@@ -1374,14 +1410,19 @@ export class Game {
       this.alignVehicleCamera();
     if (!packet.resync) {
       for (const { input, time } of replay) {
+        const tick = packet.inputTickBase + input.seq;
+        if (authoritativeDoors) this.restoreDoorTick(tick - 1);
         this.actor.step(input, FIXED_DT);
+        if (authoritativeDoors) this.restoreDoorTick(tick);
         // Anchor replay to the authority's server time, independent of local
         // clock skew and mode-filtered sequence gaps. Dynamic contacts still
         // do not have a full world rollback.
         this.sim.tick(time);
         this.prediction.states.set(input.seq, this.actor.capture());
+        if (this.doorSnapshot) this.predictionDoorRevisions.set(input.seq, this.doorSnapshot.revision);
       }
     }
+    if (authoritativeDoors) this.applyDoorSnapshot(this.doorTimeline!.currentSnapshot());
     const corrected = this.actor.position,
       error = Math.hypot(
         old.x - corrected.x,
@@ -1447,6 +1488,7 @@ export class Game {
   private resetPredictionHistory(priority = false) {
     this.accumulator = 0;
     this.prediction.clear();
+    this.predictionDoorRevisions.clear();
     this.onPredictionReset?.(priority);
   }
   private clearPendingMovement() {
@@ -1507,6 +1549,76 @@ export class Game {
   }
   setWeather(weather: Weather) {
     this.weather = weather;
+  }
+
+  /** The current UI connection owns/disposes this timeline; guests never share it. */
+  attachDoorTimeline(timeline: CadDoorTimeline | null) {
+    if (!this.network || this.disposed) return;
+    if (this.doorTimeline !== timeline) {
+      this.doorSnapshot = null;
+      this.doorStates.clear();
+      this.predictionDoorRevisions.clear();
+    }
+    this.doorTimeline = timeline;
+    if (this.ready) this.applyDoorSnapshot(timeline?.currentSnapshot() ?? null);
+  }
+  private applyDoorSnapshot(snapshot: CadDoorSnapshot | null) {
+    if (!snapshot || !this.sim || !this.cadBuildings) return;
+    if (this.doorSnapshot?.worldEpoch === snapshot.worldEpoch && this.doorSnapshot.revision === snapshot.revision) return;
+    this.sim.doorPhysics.applyStates(snapshot.states);
+    this.cadBuildings.setDoorStates(snapshot.states);
+    this.doorSnapshot = snapshot;
+    this.doorStates.clear();
+    for (const state of snapshot.states) this.doorStates.set(state.id, state);
+  }
+  private restoreDoorTick(tick: number) {
+    const revision = this.doorTimeline?.revisionAt(tick);
+    if (revision == null) return false;
+    if (revision !== this.doorSnapshot?.revision)
+      this.applyDoorSnapshot(this.doorTimeline!.snapshotAt(tick, revision));
+    return true;
+  }
+  private requestDoorResync() {
+    const now = performance.now();
+    if (now - this.lastDoorResync < 1000) return;
+    this.lastDoorResync = now;
+    this.onAction?.("doorResync");
+  }
+  private pruneDoorPrediction(ack: number) {
+    for (const seq of this.predictionDoorRevisions.keys()) if (seq <= ack) this.predictionDoorRevisions.delete(seq);
+  }
+  private nearbyDoor() {
+    if (!this.ready || this.actor.vehicle || (this.network && (!this.doorTimeline?.initialized || this.doorTimeline.needsResync))) return null;
+    const position = this.actor.position, eye = { ...position, y: position.y + .6 };
+    let nearest: { id: string; state: CadDoorState } | null = null, range = CAD_DOOR_INTERACTION_RANGE;
+    for (const door of CAD_DOOR_DEFINITIONS) {
+      const state = this.doorStates.get(door.id);
+      if (!state) continue;
+      const handle = cadDoorPose(door, state.open).handle;
+      const distance = Math.hypot(position.x-handle.x, position.y-handle.y, position.z-handle.z);
+      if (distance >= range || !this.sim.doorPhysics.lineOfSight(eye, door.id, state.open, this.actor.collider)) continue;
+      nearest = { id: door.id, state }; range = distance;
+    }
+    return nearest;
+  }
+  private interactDoor(): boolean {
+    const door = this.nearbyDoor();
+    if (!door) return false;
+    const identity = this.network ? this.doorTimeline!.identity : this.guestDoors.identity;
+    const request = { ...identity, requestId: ++this.doorRequestId, doorId: door.id,
+      expectedRevision: door.state.revision, open: !door.state.open };
+    if (this.network) { this.onAction?.("doorRequest", request); return true; }
+    const position = this.actor.position;
+    const result = this.guestDoors.request(request, {
+      actor: { id: this.actor.id, position, eye: {...position, y:position.y+.6}, vehicle:false },
+      tick: this.seq, nowMs: performance.now(),
+      canSee: (definition,state,eye) => this.sim.doorPhysics.lineOfSight(eye, definition.id, state.open, this.actor.collider),
+      canChange: (definition,_from,open) => this.sim.doorPhysics.guardChange(definition.id,open,this.sim.doorCapsules(),this.sim.doorObstacles()).allowed,
+      apply: (id,open) => this.sim.doorPhysics.apply(id,open),
+    });
+    if (result.status === "changed") this.applyDoorSnapshot(this.guestDoors.snapshot(this.seq));
+    else if (result.status === "rejected" && result.reason === "occupied") this.notice("Ustup z prostoru dveří, aby se mohly pohnout.");
+    return true;
   }
   applyAdaptiveQuality(next: AdaptiveQualitySnapshot) {
     if (this.disposed || this.rendererFailed) return;
@@ -1598,6 +1710,7 @@ export class Game {
       this.actor.setPosition(exit);
       return;
     }
+    if (this.interactDoor()) return;
     const nearby = HUNT_POINTS.findIndex(
       (h, i) =>
         !this.found.has(String(i)) && Math.hypot(h.x - p.x, h.z - p.z) < 4,
@@ -2064,6 +2177,12 @@ export class Game {
   }
 
   advanceSimulation(dt: number, now: number) {
+    if (this.network && CAD_DOOR_DEFINITIONS.length && (!this.doorTimeline?.initialized || this.doorTimeline.needsResync ||
+      this.doorTimeline.revisionAt(this.doorInputTickBase + this.seq) === null)) {
+      this.accumulator = 0;
+      this.requestDoorResync();
+      return;
+    }
     if (this.respawnPending) {
       this.accumulator = 0;
       return;
@@ -2095,7 +2214,10 @@ export class Game {
         this.actor.position.z,
       );
       this.capturePreviousCarPose();
+      const doorTick = this.doorInputTickBase + input.seq;
+      if (this.network && CAD_DOOR_DEFINITIONS.length) this.restoreDoorTick(doorTick - 1);
       this.actor.step(input, FIXED_DT);
+      if (this.network && CAD_DOOR_DEFINITIONS.length) this.restoreDoorTick(doorTick);
       this.sim.tick(time);
       this.seq = input.seq;
     };
@@ -2103,6 +2225,7 @@ export class Game {
       const result = this.networkTimeline.advance(now, makeInput, (step) => {
         applyStep(step.input, step.time);
         this.prediction.push(step.input, this.actor.capture());
+        if (this.doorSnapshot) this.predictionDoorRevisions.set(step.input.seq, this.doorSnapshot.revision);
         // Neutral elapsed prefix is predicted for temporal alignment only.
         // Sending it would create late packets and consume the sender budget.
         if (step.source === "input") this.onInput?.(step.input);
@@ -3108,6 +3231,8 @@ export class Game {
         hint = "E · vyzvednout balíček pro B6";
       if (!this.actor.vehicle && !this.network && this.soloDelivery === 1)
         hint = "Doruč balíček ke vstupu B6 · E";
+      const door = this.nearbyDoor();
+      if (door) hint = door.state.open ? "E · zavřít dveře" : "E · otevřít dveře";
       this.onStats?.({
         fps: Math.round(this.engine.getFps()),
         triangles: Math.round(this.scene.getActiveIndices() / 3),
@@ -3160,6 +3285,10 @@ export class Game {
     this.enabledMeshCandidates.dispose();
     this.mapNavigator?.dispose();
     this.sim?.dispose();
+    this.guestDoors.dispose();
+    this.doorTimeline = null;
+    this.doorStates.clear();
+    this.predictionDoorRevisions.clear();
     this.labels.dispose();
     this.contactShadows.dispose();
     this.benchmark?.profile.dispose();

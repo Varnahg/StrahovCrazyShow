@@ -9,7 +9,8 @@ import {groundHeight,legacyGroundHeight,sourceGroundHeight,buildingBaseHeight,cr
 import {BUILDINGS,GROUND_RECTS,TERRAIN_COVERAGE} from "../shared/world";
 import {Simulation,initPhysics} from "../shared/simulation";
 import {B6_ENTRY_PAVING,streetSurfaceAt,isStreetSurface} from "../shared/streets";
-import {B6_LAYOUT,b6EntranceHeight} from "../shared/b6-interior";
+import {cadEntranceTour} from "./helpers/cad-entrance-tour";
+import {cadZoneAt} from "../shared/cad-buildings";
 const idle={x:0,z:0,yaw:0,jump:false,seq:0};
 test("north court plane is a local reconstruction backed by original red ground and preserves raw DMR bytes",()=>{
   assert.equal(createHash('sha256').update(readFileSync('shared/data/terrain-grid.json')).digest('hex'),TERRAIN_PATCH.rawTerrainSha256);
@@ -50,11 +51,20 @@ test("source-informed B6 paving joins the mapped west footway to the existing no
   for(let segment=1;segment<points.length;segment++)for(let i=0;i<=20;i++){const t=i/20,x=points[segment-1][0]*(1-t)+points[segment][0]*t,z=points[segment-1][1]*(1-t)+points[segment][1]*t;assert.ok(streetSurfaceAt(x,z),`connector gap at${x},${z}`);}
   assert.equal(streetSurfaceAt(-4.85,-87),undefined,'do not invent a straight road-to-door walkway across the lawn');
   await initPhysics();const sim=new Simulation(),actor=sim.add('entry-paving',{x:-9.537,y:groundHeight(-9.537,-89.279)+.9,z:-89.279});actor.setPosition=()=>assert.fail('paved entry route cannot teleport');
-  const route=[...points,[B6_LAYOUT.entry.x,-77.35],[B6_LAYOUT.entry.x,-73]]as[number,number][];
+  const tour=cadEntranceTour(sim,actor),route=[...points,...tour.stairs];
   try{
-    for(let tick=0;tick<30;tick++){actor.step(idle);sim.tick(0);}
-    for(const[x,z]of[...route,...route.slice(0,-1).reverse()]as[number,number][]){let reached=false;for(let tick=0;tick<700;tick++){const dx=x-actor.position.x,dz=z-actor.position.z,d=Math.hypot(dx,dz);if(d<.13){reached=true;break;}actor.step({...idle,x:dx/d,z:dz/d});sim.tick(0);const foot=b6EntranceHeight(actor.position.x,actor.position.z)??(actor.position.z>B6_LAYOUT.entry.z?B6_LAYOUT.foundationOffset:groundHeight(actor.position.x,actor.position.z));assert.ok(actor.position.y>foot+.65);}assert.ok(reached,`paved approach blocked ${x},${z}: ${JSON.stringify(actor.position)}`);}
-  }finally{sim.dispose();}
+    for(let n=0;n<30;n++)tour.step();
+    tour.walk(route);
+    tour.blockedByClosedLeaf();
+    tour.request(true);
+    tour.walk([tour.inside]);
+    assert.equal(cadZoneAt(actor.position),"b06:n01");
+    tour.walk([tour.outside]);
+    tour.request(false);
+    tour.blockedByClosedLeaf();
+    tour.walk([...route].reverse());
+    assert.ok(Math.abs(actor.position.y-groundHeight(actor.position.x,actor.position.z)-.82)<.06,"return to source-supported outdoor paving");
+  }finally{tour.dispose();sim.dispose();}
 });
 test("optional paved edge margin keeps prior point semantics and clears grass only close to real edges",()=>{
   for(let x=-25;x<25;x+=1.17)for(let z=-100;z<-65;z+=1.31)assert.equal(isStreetSurface(x,z,0),streetSurfaceAt(x,z)!==undefined);

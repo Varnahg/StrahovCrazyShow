@@ -10,7 +10,7 @@ import math
 
 MATERIALS = frozenset({"b6_wood", "b6_fabric_cream", "b6_fabric_teal", "b6_fabric_blue",
     "b6_metal", "b6_chrome", "b6_ceramic", "b6_mirror", "b6_curtain",
-    "b6_shower_curtain", "b6_radiator"})
+    "b6_shower_curtain", "b6_radiator", "b6_laminate_ivory"})
 PHOTO_ROOM = "user-photo-room-20261024"
 PHOTO_BATH = "user-photo-bathroom-20261024"
 EPS = 1e-8
@@ -211,10 +211,13 @@ def _bedroom(plan, windows):
     # The photo's right-hand storage: open wooden shelves and one tall narrow
     # bookcase, not a fabricated full-width wardrobe blocking the entrance.
     bx=w-.43;by=far+.16
-    plan.add('bookcase-back',f,(bx,by,w-.05,min(by+.60,d-1.30)),.05,1.45,'b6_wood','interior-furniture/storage',True)
+    plan.add('bookcase-back',f,(bx,by,w-.05,min(by+.60,d-1.30)),.05,1.45,'b6_wood','interior-furniture/storage',True,shape='cabinet-open-top')
+    shelf_start=near+1.10+.004
     for h in (1.35,1.70,2.05):
-        plan.add('wall-shelf-'+str(h),f,(w-.30,near+.65,w-.04,far+.45),h,h+.035,'b6_wood','interior-furniture/storage')
-    plan.add('wall-cupboard',f,(w-.32,near+.55,w-.045,near+1.10),1.38,2.10,'b6_wood','interior-furniture/storage')
+        plan.add('wall-shelf-'+str(h),f,(w-.30,shelf_start,w-.04,far+.45),h,h+.018,'b6_wood','interior-furniture/storage',shape='panel')
+    plan.add('wall-shelf-back',f,(w-.058,shelf_start,w-.04,far+.45),1.368,2.05,'b6_wood','interior-furniture/storage',shape='panel')
+    plan.add('wall-shelf-end',f,(w-.30,far+.45-.018,w-.058,far+.45),1.368,2.05,'b6_wood','interior-furniture/storage',shape='panel')
+    plan.add('wall-cupboard',f,(w-.32,near+.55,w-.045,near+1.10),1.38,2.10,'b6_wood','interior-furniture/storage',shape='cabinet')
     plan.add('radiator',f,(w/2-.43,d-.10,w/2+.43,d-.04),.23,.77,'b6_radiator','interior-furniture/radiator',True)
     for i in range(12):
         x=w/2-.40+i*.071
@@ -507,12 +510,114 @@ def corridor_ceiling_fixtures(recipe):
     return result
 
 
+def beveled_box(bounds, radius=.0015):
+    """Closed analytic 18mm panel chamfer, 26 faces / 44 triangles.
+
+    No Blender modifier/object per panel. All coordinates stay inside the
+    original box. Face winding is normalized outward, including corner caps.
+    """
+    lo=list(bounds[:3]);hi=list(bounds[3:]);dims=[b-a for a,b in zip(lo,hi)]
+    if len(bounds)!=6 or not all(math.isfinite(v) for v in bounds) or min(dims)<=0 or not math.isfinite(radius) or radius<=0:
+        raise ValueError('Invalid bevel panel')
+    r=min(radius,min(dims)/4);center=[(a+b)/2 for a,b in zip(lo,hi)]
+    vertices=[];faces=[];lookup={}
+    def face(points):
+        a,b,c=points[:3];ab=[b[i]-a[i] for i in range(3)];ac=[c[i]-a[i] for i in range(3)]
+        n=[ab[1]*ac[2]-ab[2]*ac[1],ab[2]*ac[0]-ab[0]*ac[2],ab[0]*ac[1]-ab[1]*ac[0]]
+        mid=[sum(p[i] for p in points)/len(points) for i in range(3)]
+        if sum(n[i]*(mid[i]-center[i]) for i in range(3))<0:points=list(reversed(points))
+        ids=[]
+        for p in points:
+            key=tuple(round(v,12) for v in p)
+            if key not in lookup:lookup[key]=len(vertices);vertices.append(key)
+            ids.append(lookup[key])
+        faces.append(ids)
+    def coordinate(axis,sign,inset=False):return (lo[axis]+(r if inset else 0)) if sign<0 else (hi[axis]-(r if inset else 0))
+    for axis in range(3):
+        a,b=[i for i in range(3) if i!=axis]
+        for sign in (-1,1):
+            points=[]
+            for sa,sb in [(-1,-1),(1,-1),(1,1),(-1,1)]:
+                p=[0.,0.,0.];p[axis]=coordinate(axis,sign);p[a]=coordinate(a,sa,True);p[b]=coordinate(b,sb,True);points.append(p)
+            face(points)
+    for a,b in ((0,1),(0,2),(1,2)):
+        c=3-a-b
+        for sa in (-1,1):
+            for sb in (-1,1):
+                points=[]
+                for endpoint,which in [(-1,0),(1,0),(1,1),(-1,1)]:
+                    p=[0.,0.,0.];p[c]=coordinate(c,endpoint,True)
+                    p[a]=coordinate(a,sa,which==1);p[b]=coordinate(b,sb,which==0);points.append(p)
+                face(points)
+    for sx in (-1,1):
+        for sy in (-1,1):
+            for sz in (-1,1):
+                signs=(sx,sy,sz)
+                face([[coordinate(i,signs[i],i!=axis) for i in range(3)] for axis in range(3)])
+    return vertices,faces
+
+
+def cabinet_panels(item):
+    """Photo-derived carcass + ivory door; planning/collision footprint unchanged."""
+    x0,y0,x1,y1=item['bounds'];z0,z1=item['bottom'],item['top'];t=.018;gap=.003;front=x0+.025
+    if min(x1-x0,y1-y0,z1-z0)<4*t:raise ValueError('Cabinet too small for 18mm panels')
+    panels=[]
+    def add(name,box,material='b6_wood'):panels.append({'name':name,'bounds':box,'material':material})
+    add('left',(front,y0,z0,x1,y0+t,z1))
+    add('right',(front,y1-t,z0,x1,y1,z1))
+    add('bottom',(front,y0+t,z0,x1,y1-t,z0+t))
+    add('top',(front,y0+t,z1-t,x1,y1-t,z1))
+    add('back',(x1-t,y0+t,z0+t,x1,y1-t,z1-t))
+    middle=z0+(z1-z0)*.50
+    add('shelf',(front,y0+t,middle,x1-t,y1-t,middle+t))
+    door_top=middle-gap if item['shape']=='cabinet-open-top' else z1-gap
+    add('door',(x0+gap,y0+gap,z0+gap,x0+gap+t,y1-gap,door_top),'b6_laminate_ivory')
+    return panels
+
+
+def panel_uv_frame(geometry, frame, bounds):
+    axes=[(-frame['u'][1],frame['u'][0],0),(-frame['v'][1],frame['v'][0],0),(0,0,1)]
+    dimensions=[bounds[i+3]-bounds[i] for i in range(3)]
+    order=sorted(range(3),key=lambda i:dimensions[i])
+    origin=geometry.at(_at(frame,bounds[0],bounds[1]),bounds[2])
+    return {'origin':list(origin),'axes':[list(axes[order[1]]),list(axes[order[2]]),list(axes[order[0]])],
+            'basis':'panel-local metres; across-grain, along-grain, thickness'}
+
+
+def _emit_panel(geometry,key,frame,bounds):
+    vertices,faces=beveled_box(bounds)
+    mapped=[geometry.at(_at(frame,p[0],p[1]),p[2]) for p in vertices]
+    reverse=frame['u'][0]*frame['v'][1]-frame['u'][1]*frame['v'][0]<0
+    uv_frame=panel_uv_frame(geometry,frame,bounds)
+    for face in faces:
+        geometry.face(key,[mapped[i] for i in (list(reversed(face)) if reverse else face)],uv_frame=uv_frame)
+
+
+def _emit_knob(geometry,key,frame,center):
+    # Small eight-sided circular knob, noncolliding, projecting 7mm ahead of
+    # the old carcass envelope. No per-knob object/material allocation.
+    x,y,z=center;vertices=[]
+    for xx in (x-.010,x):
+        vertices.extend((xx,y+.008*math.cos(i*math.tau/8),z+.008*math.sin(i*math.tau/8)) for i in range(8))
+    faces=[list(reversed(range(8))),list(range(8,16))]+[[i,(i+1)%8,(i+1)%8+8,i+8] for i in range(8)]
+    reverse=frame['u'][0]*frame['v'][1]-frame['u'][1]*frame['v'][0]<0
+    for face in faces:geometry.face(key,[geometry.at(_at(frame,vertices[i][0],vertices[i][1]),vertices[i][2]) for i in (list(reversed(face)) if reverse else face)])
+
+
 def add_b06_furnishings(geometry, recipe):
     plan=plan_b06_furnishings(recipe)
     for item in plan['items']:
         key=(item['floor'],item['role'],item['material'],item['collision'])
         f=item['frame'];x0,y0,x1,y1=item['bounds'];bottom,top=item['bottom'],item['top']
-        if item['shape']=='box':
+        if item['shape'] in ('cabinet','cabinet-open-top'):
+            panels=cabinet_panels(item)
+            for panel in panels:
+                _emit_panel(geometry,(key[0],key[1],panel['material'],key[3]),f,panel['bounds'])
+            door=panels[-1]['bounds']
+            _emit_knob(geometry,(key[0],key[1],'b6_metal',False),f,(door[0],door[1]+.07,(door[2]+door[5])/2))
+        elif item['shape']=='panel':
+            _emit_panel(geometry,key,f,(x0,y0,bottom,x1,y1,top))
+        elif item['shape']=='box':
             geometry.prism(key,_at(f,x0,(y0+y1)/2),_at(f,x1,(y0+y1)/2),y1-y0,bottom,top)
         elif item['shape']=='curtain':
             # Small pleated sheet, hanging to the sides, never across the view.
@@ -540,6 +645,6 @@ def add_b06_furnishings(geometry, recipe):
         for usage,count in counts.items():geometry.counts['furnished-'+usage]+=count
         geometry.counts['furnishing-items']+=len(plan['items'])
     return {'roomCount':len(plan['rooms']),'itemCount':len(plan['items']),'byUsage':dict(counts),
-        'rooms':plan['rooms'],'skipped':plan['skipped'],'materialKeys':sorted({i['material'] for i in plan['items']}),
+        'rooms':plan['rooms'],'skipped':plan['skipped'],'materialKeys':sorted({i['material'] for i in plan['items']}|({'b6_laminate_ivory'} if any(i['shape'].startswith('cabinet') for i in plan['items']) else set())),
         'unfurnishedUsageCounts':plan['unfurnishedUsageCounts'],'corridorCeilingFixtures':fixtures,
         'basis':'CAD room/fixture placement; photo-informed authored 3D proportions, not surveyed furniture dimensions'}

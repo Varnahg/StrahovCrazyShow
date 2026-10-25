@@ -8,8 +8,20 @@ import { FIXED_DT } from "../shared/netcode";
 await initPhysics();
 const idle = { x: 0, z: 0, yaw: 0, jump: false, seq: 0 };
 
+function assertIgnoredColliders(sim: Simulation, baseline: ReadonlySet<number>, actorHandles: number[]) {
+  const expected = new Set([...baseline, ...actorHandles]);
+  assert.deepEqual(sim.walkingColliders, expected, "recovery preserves every baseline door pose and exactly the live actor handles");
+  for (const [id] of sim.doorPhysics.definitions) {
+    const active = sim.doorPhysics.activeCollider(id);
+    for (const collider of sim.doorPhysics.collidersFor(id))
+      assert.equal(sim.walkingColliders.has(collider.handle), collider.handle !== active.handle,
+        "inactive door poses stay ignored; active door geometry stays collidable");
+  }
+}
+
 test("respawn discards invalid chassis/parking and stale kinematic state without sampling either", () => {
   const sim = new Simulation();
+  const ignoredBaseline = new Set(sim.walkingColliders);
   try {
     const actor = sim.add("driver");
     actor.setVehicle(true);
@@ -24,7 +36,7 @@ test("respawn discards invalid chassis/parking and stale kinematic state without
     assert.equal(actor.body.isEnabled(), true);
     assert.equal(actor.vertical, 0);
     assert.equal(actor.yaw, 0);
-    assert.equal(sim.walkingColliders.size, 1);
+    assertIgnoredColliders(sim, ignoredBaseline, [actor.collider.handle]);
     assert.ok(validVehicleState(sim.car.capture()));
     assert.equal(sim.car.driverId, null);
     assert.equal(sim.car.parked, true);
@@ -53,7 +65,7 @@ test("respawn discards invalid chassis/parking and stale kinematic state without
       assert.equal(sim.world.colliders.len(), colliders);
       assert.equal(sim.world.characterControllers.size, 1);
       assert.equal(sim.world.vehicleControllers.size, 1);
-      assert.equal(sim.walkingColliders.size, 1);
+      assertIgnoredColliders(sim, ignoredBaseline, [actor.collider.handle]);
     }
   } finally {
     sim.dispose();
@@ -62,6 +74,7 @@ test("respawn discards invalid chassis/parking and stale kinematic state without
 
 test("hard foot authority ignores a corrupt local driving pose and never resets another driver", () => {
   const sim = new Simulation();
+  const ignoredBaseline = new Set(sim.walkingColliders);
   try {
     const actor = sim.add("local"),
       other = sim.add("other");
@@ -84,7 +97,7 @@ test("hard foot authority ignores a corrupt local driving pose and never resets 
     assert.ok(Math.abs(actor.position.x - SPAWN.x) < 1e-4);
     assert.deepEqual(sim.car.capture(), car);
     assert.equal(sim.car.driverId, "other");
-    assert.equal(sim.walkingColliders.size, 2);
+    assertIgnoredColliders(sim, ignoredBaseline, [actor.collider.handle, other.collider.handle]);
   } finally {
     sim.dispose();
   }
