@@ -13,6 +13,7 @@ import earcut, { deviation as triangulationDeviation } from "earcut";
 import { drapeTriangles, type GroundPoint } from "../shared/terrain";
 import {
   STREET_SURFACES,
+  STREET_FEATURES,
   STREETS,
   STREET_SURFACE_Y,
   LAMP_PLACEMENTS,
@@ -423,11 +424,16 @@ const COLORS: Record<StreetMaterial, string> = {
   gravel: "#a29b86",
 };
 
-function surfaceMaterial(context: StreetBuildContext, kind: StreetMaterial) {
+function surfaceMaterial(
+  context: StreetBuildContext,
+  kind: StreetMaterial | "soil",
+) {
   // Pavement textures/UVs are not shared with unrelated objects of the same
   // palette colour. Their eventual PBR maps still reuse the shared texture cache.
   const material = new StandardMaterial(`street:${kind}`, context.scene);
-  material.diffuseColor = Color3.FromHexString(COLORS[kind]);
+  material.diffuseColor = Color3.FromHexString(
+    kind === "soil" ? "#887c64" : COLORS[kind],
+  );
   material.specularColor.setAll(kind === "asphalt" ? 0.035 : 0.015);
   // Roads follow the SAME source terrain triangles; depth bias avoids coplanar
   // layers fighting on integrated GPUs without introducing blocking curbs.
@@ -496,13 +502,50 @@ function poolMaterial(scene: Scene) {
   return material;
 }
 
+export function isSourceDirtPolygon(polygon: StreetPolygon) {
+  // A joined polygon containing another class remains that original class.
+  // Do not recolour an entire mixed gravel/ground junction from one dirt tag.
+  let found = false;
+  for (const feature of STREET_FEATURES) {
+    if (feature.material !== "gravel") continue;
+    for (let index = 1; index < feature.points.length; index++) {
+      const a = feature.points[index - 1],
+        b = feature.points[index];
+      if (!streetPolygonContains(polygon, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2))
+        continue;
+      if (feature.surface !== "dirt") return false;
+      found = true;
+      break;
+    }
+  }
+  return found;
+}
+
+/** Material grouping only: retain every original polygon object/coordinate. */
+export function sourceStreetSurfaceGroups() {
+  return STREET_SURFACES.flatMap<{
+    material: StreetMaterial | "soil";
+    polygons: StreetPolygon[];
+  }>((surface) => {
+    if (surface.material !== "gravel") return [surface];
+    const dirt: StreetPolygon[] = [],
+      ordinary: StreetPolygon[] = [];
+    for (const polygon of surface.polygons)
+      (isSourceDirtPolygon(polygon) ? dirt : ordinary).push(polygon);
+    return [
+      { material: "gravel" as const, polygons: ordinary },
+      { material: "soil" as const, polygons: dirt },
+    ];
+  });
+}
+
 /** Replace the legacy segment-box road loop AND regularly spaced lamp loop.
  * Ground/landcover and buildings are built by the caller. The 18 mm offset is
  * solely a depth separation above the common DMR5G terrain surface.
  */
 export function buildStreets(context: StreetBuildContext) {
   const meshes: Mesh[] = [];
-  for (const surface of STREET_SURFACES) {
+  for (const surface of sourceStreetSurfaceGroups()) {
     if (!surface.polygons.length) continue;
     const mesh = new Mesh(`mapped-surfaces:${surface.material}`, context.scene);
     streetVertexData(surface.polygons).applyToMesh(mesh);

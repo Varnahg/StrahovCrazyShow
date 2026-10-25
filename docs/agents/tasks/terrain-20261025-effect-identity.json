@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-effect-identity",
+  "title": "KEY-61: regresní důkaz oddělení ground a paving Effectů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/ground-effect-identity.test.ts",
+    ".cache/terrain-effect-identity-20261025/",
+    "docs/agents/handoffs/terrain-20261025-effect-identity.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Reprodukce záměny Effect cache při stejném default getClassName a shodných PBR defines, se skutečným Babylon procesorem/Effect vlastníkem.",
+    "Fix musí oddělit ground/paving identity v obou pořadích přípravy, zachovat sharing stejných ground materiálů a žádné samplery ground v paving Effectu.",
+    "Test nesmí získat úspěch jen tím, že HEX_TILING odliší jinak stejné defines; izolovat class identity s repetition vypnutou nebo jinak shodnou pro oba."
+  ],
+  "verification": [
+    "Lehké cílené CPU testy tohoto modulu; NullEngine není GPU důkaz. Root provede tentýž statický A/B obraz."
+  ],
+  "notes": [
+    "Předaný důkaz read-only autora weather_sky_fixes: default MaterialPluginBase pro GroundCover/Campus, effect key bez customCode; paving UBO by dal záporný barevný faktor.",
+    "Produkční getClassName opravuje ground autor v jiném disjunktním scope; tento task smí psát jen nový test/handoff/cache. Bez dalších agentů, BMAD, serveru či GPU."
+  ]
+}

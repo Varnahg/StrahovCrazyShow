@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "coordinateSystem": "shared game world X/Z metres, +X east, +Z south",
+  "classification": "photo-and-ortho-interpreted-not-surveyed",
+  "interpretedAt": "2026-10-25",
+  "sources": [
+    {
+      "id": "ipr-ortho-2024",
+      "provider": "IPR Praha",
+      "captureDate": "2024-06-08",
+      "sha256": "7db01f50b15dcb55fb12271406608bb847ca8e73411952957612373e0b849473",
+      "georeference": "docs/streets/ortho-georeference.json",
+      "source": "https://gs-pub.praha.eu/imgs/rest/services/ort/letecke_snimkovani/ImageServer",
+      "attribution": "datový podklad © IPR Praha",
+      "license": "CC BY 4.0"
+    },
+    {
+      "id": "user-b6-front",
+      "captureDate": null,
+      "receivedAt": "2026-10-24",
+      "sha256": "748bacdcf689e1ab8706ef9048505e85ef9acd71628c1e340e5a27cd0134366c",
+      "basis": "user photograph: short uneven lawn between facade and paved paths; original remains private"
+    },
+    {
+      "id": "user-b6-rear",
+      "captureDate": null,
+      "receivedAt": "2026-10-24",
+      "sha256": "0a4837870bf3cce7e21ead36ce6ce4f4780562de150d39226a602f4df00e3841",
+      "basis": "user photograph: low uneven lawn, worn dirt path and sparse yellow flowers; species/count/height/season unmeasured"
+    }
+  ],
+  "areas": [
+    {
+      "id": "b6-front-lawn-20261025",
+      "points": [
+        [-23, -90],
+        [-2, -90],
+        [-2, -25],
+        [-22, -25],
+        [-28, -48]
+      ],
+      "sourceIds": ["ipr-ortho-2024", "user-b6-front"],
+      "boundaryUncertaintyMetres": 2,
+      "flowers": false,
+      "basis": "conservative inner lawn envelope west of B6; source road/building/artificial-surface exclusions remain mandatory"
+    },
+    {
+      "id": "b6-rear-lawn-20261025",
+      "points": [
+        [18, -88],
+        [36, -88],
+        [42, -76],
+        [46, -52],
+        [43, -25],
+        [18, -25]
+      ],
+      "sourceIds": ["ipr-ortho-2024", "user-b6-rear"],
+      "boundaryUncertaintyMetres": 2,
+      "flowers": true,
+      "basis": "conservative lawn envelope between B6 and B7, checked against georeferenced ortho and rear photo; source exclusions remove all paved routes and structures"
+    }
+  ],
+  "appearance": {
+    "basis": "artistic interpretation of uneven short grass and sparse yellow flowers; no synthetic concept image is a reality source",
+    "flowerProbabilityPerSquareMetre": [0.025, 0.1],
+    "dirtFringeMetres": [0.65, 0.9]
+  }
+}

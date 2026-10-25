@@ -12,6 +12,7 @@ import type { MaterialPluginBase } from "@babylonjs/core/Materials/materialPlugi
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { GroundCoverMaterialPlugin } from "../client/ground-cover-material";
 import {
   CampusSurfaceArtPlugin,
   campusSurfaceArt,
@@ -24,7 +25,8 @@ import {
 /** Real PBR hooks, shader-store includes, preprocessing and uniform layout.
  * Only pipeline creation stays NullEngine: this is NOT driver WGSL validation. */
 class NativeProcessingEngine extends NullEngine {
-  readonly sources: { vertex: string; fragment: string }[] = [];
+  readonly sources: { vertex: string; fragment: string; defines: string }[] =
+    [];
   constructor(native = true) {
     super();
     this._isWebGPU = native;
@@ -45,7 +47,7 @@ class NativeProcessingEngine extends NullEngine {
   override createShaderProgram(
     ...args: Parameters<NullEngine["createShaderProgram"]>
   ) {
-    this.sources.push({ vertex: args[1], fragment: args[2] });
+    this.sources.push({ vertex: args[1], fragment: args[2], defines: args[3] });
     return super.createShaderProgram(...args);
   }
 }
@@ -108,6 +110,109 @@ const kinds = [
   "sett",
   "gravel",
 ];
+
+test("grass/soil blend passes real PBR shader processing with normal and roughness hooks", async () => {
+  for (const native of [false, true])
+    for (const soilBase of [false, true]) {
+      const f = fixture(native);
+      try {
+        const color = RawTexture.CreateRGBATexture(
+          new Uint8Array([112, 96, 74, 255]),
+          1,
+          1,
+          f.scene,
+        );
+        const normal = RawTexture.CreateRGBATexture(
+          new Uint8Array([128, 128, 255, 255]),
+          1,
+          1,
+          f.scene,
+        );
+        normal.gammaSpace = false;
+        f.material.albedoTexture = color;
+        f.material.bumpTexture = normal;
+        f.material.metallicTexture = normal;
+        new GroundCoverMaterialPlugin(f.material, soilBase, {
+          maps: { color, normal, roughness: normal },
+          repeat: 1.299996018409729,
+          tint: [1.15, 1.1, 0.96],
+          normalStrength: 0.33,
+          darken: 0.18,
+          smooth: 0.23,
+        });
+        await f.material.forceCompilationAsync(f.mesh);
+        assert.equal(f.engine.sources.length, 1);
+        assert.match(
+          f.engine.sources[0].defines,
+          /^#define TEXTURE_REPETITION_MODE 2$/m,
+        );
+        const { fragment } = f.engine.sources[0];
+        assert.match(fragment, /groundHash/);
+        assert.match(fragment, /groundTBN/);
+        assert.match(fragment, /groundOtherRoughness/);
+        assert.match(fragment, /_texRepTriangleGrid/);
+        assert.match(fragment, /_texRepLoadRot2x2/);
+        assert.match(fragment, /groundCompressGrass/);
+        for (const name of ["Albedo", "Normal", "Roughness"])
+          assert.match(
+            fragment,
+            new RegExp("TEXRD\\(groundOther" + name + ","),
+          );
+        for (const sampler of [
+          "albedoSampler",
+          "bumpSampler",
+          "reflectivitySampler",
+        ])
+          assert.match(fragment, new RegExp("TEXRD\\(" + sampler + ","));
+        assert.doesNotMatch(fragment, /texture(?:2D|Sample)\(groundOther/);
+        assert.match(
+          fragment,
+          /metallicRoughness.g=mix\(metallicRoughness.g,groundMixedRoughness,groundBlend\)/,
+        );
+        assert.ok(
+          fragment.indexOf("groundMixedRoughness") <
+            fragment.indexOf(
+              native
+                ? "fn reflectivityBlock"
+                : "reflectivityOutParams reflectivityBlock",
+            ),
+        );
+        if (native) {
+          assert.match(fragment, /@fragment/);
+          assert.match(fragment, /groundCoverConfig\s*:\s*vec4f/);
+          assert.match(
+            fragment,
+            /fragmentInputs.vPositionW.xz\/uniforms.groundCoverConfig.y/,
+          );
+          assert.doesNotMatch(
+            fragment,
+            /sampler2D|texture2D\(|uniform vec|dFdx\(/,
+          );
+          const hexSampler = fragment.slice(
+            fragment.indexOf("fn _texRepSample("),
+            fragment.indexOf("fn TEXRD("),
+          );
+          assert.equal(
+            (hexSampler.match(/textureSampleGrad\(/g) ?? []).length,
+            3,
+            "exactly three native samples per channel, no fallback or Voronoi path",
+          );
+          assert.doesNotMatch(hexSampler, /textureSample\(/);
+        } else {
+          assert.match(fragment, /uniform sampler2D groundOtherAlbedo/);
+          assert.match(fragment, /#define TEXRD\(s,uv\) _texRepSample\(s,uv\)/);
+        }
+        await f.material.forceCompilationAsync(f.mesh);
+        assert.equal(
+          f.engine.sources.length,
+          1,
+          "stable field and wetness reuse the compiled effect",
+        );
+      } finally {
+        f.dispose();
+      }
+    }
+});
 
 test("native surface PBR keeps calibrated uniforms, wet material factors and both arithmetic recipes", () => {
   const f = fixture();

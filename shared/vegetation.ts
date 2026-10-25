@@ -6,6 +6,7 @@ import { hasCadBuilding } from "./cad-buildings";
 import { isStreetSurface } from "./streets";
 import { isRealityGroundSurface } from "./terrain";
 import { renderBudget } from "./render-quality";
+import { GROUND_COVER_AREAS } from "./ground-cover";
 import type { Building, WorldMap } from "./types";
 
 export type LandcoverArea = {
@@ -14,6 +15,8 @@ export type LandcoverArea = {
   surface: string | null;
   points: [number, number][];
   source: string;
+  referenceId?: string;
+  provenance?: string;
 };
 export type Bounds = { minX: number; maxX: number; minZ: number; maxZ: number };
 export type TreePlacement = {
@@ -51,11 +54,19 @@ export function treeDetailLevel(distance: number, quality: string): 0 | 1 | 2 {
   const middle = quality === "high" ? 135 : quality === "medium" ? 100 : 75;
   return distance < near ? 0 : distance < middle ? 1 : 2;
 }
-export const LANDCOVER = rawLandcover as unknown as {
+type LandcoverSource = {
   source: string;
   attribution: string;
   areas: LandcoverArea[];
   trees: { osmId: string; x: number; z: number; species: string | null }[];
+};
+export const RAW_LANDCOVER = rawLandcover as unknown as LandcoverSource;
+export const LANDCOVER: LandcoverSource = {
+  ...RAW_LANDCOVER,
+  attribution:
+    RAW_LANDCOVER.attribution +
+    "; reference lawn interpretation: datový podklad © IPR Praha",
+  areas: [...RAW_LANDCOVER.areas, ...GROUND_COVER_AREAS],
 };
 const NATURAL_GRASS = new Set(["grass", "meadow", "grassland"]);
 const WOODS = new Set(["forest", "wood"]);

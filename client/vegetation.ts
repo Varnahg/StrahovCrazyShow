@@ -125,7 +125,11 @@ export function buildLandcover(
       };
       materials.set(color, material);
     }
-    const mesh = new Mesh("OSM landcover " + area.osmId, scene);
+    const mesh = new Mesh(
+      (area.referenceId ? "reference landcover " : "OSM landcover ") +
+        area.osmId,
+      scene,
+    );
     const data = new VertexData();
     const draped = drapeTriangles(
       area.points,
@@ -139,11 +143,23 @@ export function buildLandcover(
     data.applyToMesh(mesh);
     mesh.material = material;
     mesh.isPickable = false;
+    mesh.metadata = {
+      sourceFootprintId: area.osmId,
+      source: area.source,
+      referenceId: area.referenceId,
+      provenance: area.provenance ?? "OSM mapped surface",
+      rawOsmModified: false,
+    };
     const group = groups.get(color) ?? [];
     group.push(mesh);
     groups.set(color, group);
   }
   for (const [color, meshes] of groups) {
+    const sourceFootprints = meshes.map((mesh) => ({
+      id: mesh.metadata.sourceFootprintId,
+      referenceId: mesh.metadata.referenceId,
+      source: mesh.metadata.source,
+    }));
     const merged = Mesh.MergeMeshes(
       meshes,
       true,
@@ -158,6 +174,8 @@ export function buildLandcover(
         vegetation: "mapped-surface",
         attribution: LANDCOVER.attribution,
         terrainDraped: true,
+        shadowCaster: false,
+        sourceFootprints,
       };
       merged.isPickable = false;
       merged.freezeWorldMatrix();
