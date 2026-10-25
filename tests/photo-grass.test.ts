@@ -38,6 +38,7 @@ import { BUILDINGS, MAP } from "../shared/world";
 import { placementClassifier } from "../shared/vegetation";
 import { groundHeight, groundNormal } from "../shared/terrain";
 import { isStreetSurface } from "../shared/streets";
+import { sampleGroundCover, type GroundCoverSample } from "../shared/ground-cover";
 import {
   GRASS_CACHE_TILES,
   GRASS_PREPARATION,
@@ -49,7 +50,9 @@ const pack = JSON.parse(
 const recipe = JSON.parse(
   readFileSync("public/models/vegetation/grass/material.json", "utf8"),
 );
-function fixture() {
+const fullDensity: typeof sampleGroundCover = (_x, _z, out = {} as GroundCoverSample) =>
+  Object.assign(out, { variation: .5, grassDensity: 1, wear: 0, flowerDensity: 0 });
+function fixture(legacyDensity = false) {
   const engine = new NullEngine({
       renderWidth: 1280,
       renderHeight: 720,
@@ -79,6 +82,10 @@ function fixture() {
       () => new Texture(null, scene),
     ),
     grass = new PhotographicGrass(scene, pack, recipe, resources);
+  if (legacyDensity) {
+    (grass as any).placement.dispose();
+    (grass as any).placement = createPhotoGrassPlacement(GRASS_CACHE_TILES, fullDensity);
+  }
   return {
     engine,
     scene,
@@ -119,7 +126,10 @@ function settle(f: ReturnType<typeof fixture>, quality = "medium", time = 1) {
 
 test("cold work and instance arrivals are bounded per update and converge to the original root set", (t) => {
   fixedPreparationClock(t);
-  const f = fixture();
+  // Keep the historical full-density reference to test the scheduler itself.
+  // Source density thinning has separate coverage below and is not substituted
+  // with a new self-recorded hash merely to accept this runtime change.
+  const f = fixture(true);
   let partialCoverage = false,
     generated = 0,
     maxGenerated = 0,
@@ -234,6 +244,112 @@ test("small continuous camera movements do not starve preparation", (t) => {
   } finally {
     f.dispose();
   }
+});
+
+test("recorded B6 front microtranslation settles actual selection and allocation at the triangle cap", (t) => {
+  fixedPreparationClock(t);
+  const f = fixture(), internal = f.grass as any;
+  const origin = new Vector3(-13.983677864074707, 1.8405628204345703, -64);
+  const focus = { x: -13.98367691040039, y: 1.0193428993225098, z: -64 };
+  f.camera.position.copyFrom(origin); f.camera.fov = .85; f.camera.minZ = .08; f.camera.maxZ = 1100;
+  f.camera.setTarget(origin.add(new Vector3(.1866307109594345, -.3072352111339569, .933153510093689)));
+  let time = 1;
+  const update = () => { f.grass.update({ time: time += 1 / 60, quality: "medium", wind: { x: 2, z: -1 }, focus }); };
+  const settled = () => !f.grass.stats.preparing && !f.grass.stats.transitionRoots;
+  const finish = () => { for (let i = 0; i < 1000 && !settled(); i++) update(); assert.ok(settled(), JSON.stringify(f.grass.stats)); };
+  try {
+    update(); finish();
+    assert.ok(f.grass.stats.instances > 1000);
+    assert.ok(140000 - f.grass.stats.triangles >= 0 && 140000 - f.grass.stats.triangles < 22, JSON.stringify(f.grass.stats));
+    assert.equal(internal.preparation, undefined); assert.equal(internal.allocationDirty, false);
+    assert.equal(internal.selectionRevision, internal.tileRevision); assert.equal(f.grass.stats.pendingTiles, 0);
+    const initialTriangles = f.grass.stats.triangles, initialDepth = internal.viewStability.minimumDepth;
+    const select = t.mock.method(internal, "selectRoots"), commit = t.mock.method(internal, "commitSelection");
+    let uploads = 0;
+    for (const batch of internal.batches.values()) {
+      const original = batch.mesh.thinInstanceBufferUpdated.bind(batch.mesh);
+      t.mock.method(batch.mesh, "thinInstanceBufferUpdated", (...args: [string]) => { uploads++; return original(...args); });
+    }
+    for (let frame = 0; frame < 240; frame++) {
+      const dx = frame % 2 === 0 ? .00001 : -.00001;
+      f.camera.position.set(origin.x + dx, origin.y - dx * .01574, origin.z);
+      focus.x = -13.98367691040039 + dx;
+      update();
+      assert.ok(settled(), `jitter frame ${frame}; conservative depth ${internal.viewStability.minimumDepth}`);
+      assert.equal(internal.allocationDirty, false);
+      assert.equal(internal.wind.viewerX, f.camera.globalPosition.x);
+      assert.equal(internal.wind.focusX, focus.x, "live focus is never frozen to the selection snapshot");
+    }
+    assert.equal(select.mock.callCount(), 0); assert.equal(commit.mock.callCount(), 0); assert.equal(uploads, 0);
+    // The recorded non-zero drift must accumulate, eventually invalidating the
+    // snapshot. The implementation must not silently move the reference pose.
+    for (let frame = 1; frame <= 1200; frame++) {
+      const dx = frame * .00011363606544057275 / 60;
+      f.camera.position.set(origin.x + dx, origin.y - dx * .01574, origin.z);
+      focus.x = -13.98367691040039 + dx; update();
+    }
+    assert.ok(select.mock.callCount() > 0); assert.ok(commit.mock.callCount() > 0);
+    assert.ok(select.mock.callCount() < 20, "recorded idle creep must have long quiet intervals, not repeated continuous scans");
+    finish();
+    const finalSelections = select.mock.callCount(), finalUploads = uploads;
+    for (let i = 0; i < 120; i++) { update(); assert.ok(settled()); }
+    assert.equal(select.mock.callCount(), finalSelections); assert.equal(uploads, finalUploads);
+    assert.equal(internal.preparation, undefined); assert.equal(internal.allocationDirty, false);
+    t.diagnostic(JSON.stringify({ initialTriangles, initialDepth, jitterFrames: 240, jitterSelections: 0, jitterUploads: 0,
+      driftMetres: 1200 * .00011363606544057275 / 60, driftSelections: finalSelections, driftCommits: commit.mock.callCount(),
+      finalPreparing: f.grass.stats.preparing, finalAllocationDirty: internal.allocationDirty }));
+  } finally { f.dispose(); }
+});
+
+test("projection-only changes cancel obsolete pending preparation without changing ordinary movement cadence", t => {
+  let clockTime = 0;
+  const clock = t.mock.method(performance, "now", () => clockTime += 3), f = fixture(), internal = f.grass as any;
+  try {
+    f.grass.update({ time: 1, quality: "medium", wind: { x: 0, z: 0 } });
+    const original = internal.preparation; assert.ok(original);
+    f.camera.minZ += .001;
+    f.grass.update({ time: 1.001, quality: "medium", wind: { x: 0, z: 0 } });
+    assert.ok(internal.preparation); assert.notEqual(internal.preparation, original);
+    clock.mock.mockImplementation(() => 0);
+    const time = settle(f, "medium", 2) + .16;
+    f.grass.update({ time, quality: "medium", wind: { x: 0, z: 0 } });
+    const select = t.mock.method(internal, "selectRoots");
+    f.camera.position.x += .01;
+    f.grass.update({ time: time + .01, quality: "medium", wind: { x: 0, z: 0 } });
+    assert.equal(select.mock.callCount(), 0, "ordinary movement retains the original .15s selection cadence");
+    f.grass.update({ time: time + .16, quality: "medium", wind: { x: 0, z: 0 } });
+    assert.equal(select.mock.callCount(), 1);
+  } finally { f.dispose(); }
+});
+
+test("flower budget events inside the movement cadence immediately refill actual grass allocation", t => {
+  fixedPreparationClock(t);
+  const f = fixture(), internal = f.grass as any;
+  // Drive only the companion controller's published budget boundary. The grass
+  // placement, selection, bounded work, transitions and thin batches are real.
+  const flowers = { stats: { triangles: 2400, draws: 2, allocatedInstanceBytes: 0, preparing: false },
+    submissionRevision: 0, update() {}, dispose() {} };
+  internal.flowers = flowers;
+  try {
+    let time = settle(f, "medium", 1) + .16;
+    f.grass.update({ time, quality: "medium", wind: { x: 0, z: 0 } });
+    assert.equal(internal.preparation, undefined); assert.equal(internal.allocationDirty, false);
+    const before = internal.submittedTriangles, select = t.mock.method(internal, "selectRoots");
+    assert.ok(before <= 140000 - 2400 && before > 130000);
+    // A flower fade can finish on any frame, including immediately after the
+    // last grass selection. Its release cannot be consumed by a skipped tick.
+    flowers.stats.triangles = 0; flowers.submissionRevision++;
+    f.grass.update({ time: time + .01, quality: "medium", wind: { x: 0, z: 0 } });
+    assert.equal(select.mock.callCount(), 1, "budget changes are a hard exception to the movement cadence");
+    time = settle(f, "medium", time + .02);
+    assert.ok(internal.submittedTriangles >= before + 2300, "freed budget must reach actual submitted grass, not only the stats flag");
+    assert.ok(internal.submittedTriangles <= 140000);
+    f.grass.update({ time: time + .16, quality: "medium", wind: { x: 0, z: 0 } });
+    const selections = select.mock.callCount();
+    f.grass.update({ time: time + .17, quality: "low", wind: { x: 0, z: 0 } });
+    assert.equal(select.mock.callCount(), selections + 1, "quality retains its existing hard invalidation");
+    assert.ok(internal.submittedTriangles <= 60000);
+  } finally { f.dispose(); }
 });
 
 test("camera motion at walking/sprinting speeds and sustained rotation completes cold preparations", (t) => {
@@ -733,7 +849,7 @@ test("missing LOD disposes partial geometry before materials and maps without ma
 });
 
 test("source exclusions, world-metre placement and bounded cache survive eviction", () => {
-  const placement = createPhotoGrassPlacement(),
+  const placement = createPhotoGrassPlacement(128, fullDensity),
     classifier = placementClassifier(BUILDINGS, MAP.paths),
     tile = placement.tile(110, 34),
     before = Array.from(tile.matrices);
@@ -761,6 +877,45 @@ test("source exclusions, world-metre placement and bounded cache survive evictio
   assert.deepEqual(Array.from(placement.tile(110, 34).matrices), before);
   placement.dispose();
   assert.equal(placement.cacheSize, 0);
+});
+
+test("shared ground-cover density thins source-valid roots deterministically without moving the terrain", () => {
+  const empty = createPhotoGrassPlacement(128, (x, z, out) => Object.assign(fullDensity(x, z, out), { grassDensity: 0 }));
+  assert.equal(empty.tile(110, 34).count, 0); empty.dispose();
+  const authored = createPhotoGrassPlacement(), original = createPhotoGrassPlacement(128, fullDensity);
+  const first = authored.tile(110, 34), repeated = createPhotoGrassPlacement().tile(110, 34);
+  assert.ok(first.count > 0 && first.count < original.tile(110, 34).count);
+  assert.deepEqual(first.matrices, repeated.matrices);
+  for (let i = 0; i < first.count; i++) {
+    const offset = i * 16, x = first.x + first.matrices[offset + 12], z = first.z + first.matrices[offset + 14];
+    assert.ok(sampleGroundCover(x, z).grassDensity < 1);
+    assert.ok(Math.abs(first.matrices[offset + 13] - groundHeight(x, z) - .0025) < 2e-5);
+  }
+  authored.dispose(); original.dispose();
+});
+
+test("same source geometry cannot alias a different PBR recipe in the resource cache", () => {
+  const engine = new NullEngine(), scene = new Scene(engine);
+  const load = () => new Texture(null, scene);
+  const first = acquireGrassResources(scene, pack, recipe, 1024, load);
+  const reordered = acquireGrassResources(scene, { ...pack, textures: { ...pack.textures, files: Object.fromEntries(Object.entries(pack.textures.files).reverse()) } }, recipe, 1024, load);
+  const changed = acquireGrassResources(scene, pack, { ...recipe, translucency: recipe.translucency + .1 }, 1024, load);
+  try { assert.equal(reordered.material, first.material); assert.notEqual(first.material, changed.material); assert.notEqual(first.maps.albedo, changed.maps.albedo); }
+  finally { first.release(); reordered.release(); changed.release(); scene.dispose(); engine.dispose(); }
+});
+
+test("atlas cache identity distinguishes channel roles and actual image dimensions", () => {
+  const engine = new NullEngine(), scene = new Scene(engine);
+  const load = () => new Texture(null, scene);
+  const first = acquireGrassResources(scene, pack, recipe, 1024, load);
+  // Deliberately retain the old Object.values sequence A,B,... while swapping
+  // semantic roles and insertion order. A values-only key used to collide.
+  const files = { alpha: pack.textures.files.albedo, albedo: pack.textures.files.alpha,
+    normal: pack.textures.files.normal, normalBent: pack.textures.files.normalBent, arm: pack.textures.files.arm };
+  const swapped = acquireGrassResources(scene, { ...pack, textures: { ...pack.textures, files } }, recipe, 1024, load);
+  const larger = acquireGrassResources(scene, { ...pack, textures: { ...pack.textures, width: 2048 } }, recipe, 1024, load);
+  try { assert.notEqual(swapped.material, first.material); assert.notEqual(larger.material, first.material); }
+  finally { first.release(); swapped.release(); larger.release(); scene.dispose(); engine.dispose(); }
 });
 
 test("batch append uploads the new count, compaction keeps native matrix snapshots and world bounds accurate", () => {

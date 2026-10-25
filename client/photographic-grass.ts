@@ -33,6 +33,8 @@ import {
 } from "./photo-grass-wind";
 import { PhotoGrassBatch, type GrassRootState } from "./photo-grass-batch";
 import { PhotoGrassPreparation } from "./photo-grass-preparation";
+import { GroundFlowers } from "./ground-flowers";
+import { VegetationViewStability, VEGETATION_TRANSLATION_GUARD } from "./vegetation-view-stability";
 import type { SourceGrassRecipe } from "./photo-grass-source-material";
 import { grassVisibility, setGrassVisibility } from "./photo-grass-transition";
 import {
@@ -70,6 +72,7 @@ export type PhotoGrassStats = {
   ready: boolean;
   preparing: boolean;
   pendingTiles: number;
+  flowers?: GroundFlowers["stats"];
 };
 const qualityKey = (quality: string): CandidateQuality =>
   quality === "high" ? "high" : quality === "low" ? "low" : "medium";
@@ -127,19 +130,18 @@ export class PhotographicGrass {
   private selectionRevision = -1;
   private preferredLevels = new Map<number, CandidateLevel>();
   private preferredRoots = new Set<number>();
-  private lastFov = 0;
   private vacancyCursor = 0;
   private activeTiles = new Set<string>();
   private pruneRoots: GrassRootState[] = [];
   private planes = Array.from({ length: 6 }, () => new Plane(0, 0, 0, 0));
   private transform = Matrix.Identity();
-  private lastTransform = Matrix.Zero();
+  private viewStability = new VegetationViewStability();
+  private rootRadius = 0;
+  private rootCullRadius = 0.16;
+  private tileCullRadius = 0.95;
   private point = Vector3.Zero();
   private lastUpdate = -Infinity;
   private lastTime = 0;
-  private lastFocusX = Infinity;
-  private lastFocusZ = Infinity;
-  private lastHeight = 0;
   private previousQuality = "";
   private submittedTriangles = 0;
   private statsDirty = true;
@@ -150,13 +152,30 @@ export class PhotographicGrass {
   private wind: PhotoGrassWindState = createPhotoGrassWindState();
   private disposeObserver: Observer<Scene> | null = null;
   private pendingResources = new Set<GrassResources>();
+  private flowers?: GroundFlowers;
+  private flowerBudget = 0;
+  private flowerSubmissionRevision = -1;
 
   constructor(
     private scene: Scene,
     private pack: RenderPack,
     private recipe: SourceGrassRecipe,
     resources?: GrassResources,
+    flowers?: GroundFlowers,
   ) {
+    // Keep the historical, already generous culling fringe where possible.
+    // Its spare space must cover actual geometry, wind and the held translation.
+    for (const level of GRASS_LEVELS) {
+      const positions = pack.levels[level].positions;
+      for (let i = 0; i < positions.length; i += 3)
+        this.rootRadius = Math.max(this.rootRadius, Math.hypot(positions[i], positions[i + 1], positions[i + 2]));
+    }
+    // Placement rotates around the root origin, not the culling sphere centre.
+    this.rootRadius += .025 + .02;
+    this.rootCullRadius = Math.max(this.rootCullRadius, this.rootRadius + VEGETATION_TRANSLATION_GUARD);
+    this.tileCullRadius = Math.max(this.tileCullRadius, Math.SQRT1_2 + this.rootRadius + VEGETATION_TRANSLATION_GUARD);
+    this.flowers = flowers;
+    if (flowers) this.stats.flowers = flowers.stats;
     if (resources) this.installResources(resources);
     this.disposeObserver = scene.onDisposeObservable.addOnce(() =>
       this.dispose(),
@@ -182,6 +201,8 @@ export class PhotographicGrass {
       const controller = new PhotographicGrass(scene, geometry, material);
       try {
         await controller.loadResources();
+        controller.flowers = await GroundFlowers.load(scene);
+        controller.stats.flowers = controller.flowers.stats;
         return controller;
       } catch (error) {
         controller.dispose();
@@ -224,7 +245,11 @@ export class PhotographicGrass {
   beginShaderPreparation(): (() => void) | undefined {
     if (this.disposed || this.scene.isDisposed || !this.resources) return;
     this.shaderPreparation ??= new PhotoGrassPreparation(this.resources);
-    return this.shaderPreparation.begin();
+    const stopGrass = this.shaderPreparation.begin();
+    try {
+      const stopFlowers = this.flowers?.beginPreparation();
+      return () => { try { stopGrass(); } finally { stopFlowers?.(); } };
+    } catch (error) { stopGrass(); throw error; }
   }
   private disposeShaderPreparation() {
     const owned = this.shaderPreparation;
@@ -287,12 +312,22 @@ export class PhotographicGrass {
     if (this.disposed || !this.resources) return;
     const camera = this.scene.activeCamera;
     if (!camera) return;
-    camera.getViewMatrix();
+    const view = camera.getViewMatrix(), projection = camera.getProjectionMatrix();
+    const width = this.scene.getEngine().getRenderWidth(), height = this.scene.getEngine().getRenderHeight();
     const eye = camera.globalPosition,
       focus = input.focus ?? eye,
       quality = qualityKey(input.quality),
       limits = CANDIDATE_GRASS_LIMITS[quality],
       time = Number.isFinite(input.time) ? input.time : 0;
+    this.flowers?.update({ time, quality, wind: input.wind, focus: input.focus });
+    const flowerTriangles = this.flowers?.stats.triangles ?? 0,
+      flowerBudgetChanged = flowerTriangles !== this.flowerBudget,
+      triangleLimit = limits.triangles - flowerTriangles;
+    this.flowerBudget = flowerTriangles;
+    if (this.flowers && this.flowerSubmissionRevision !== this.flowers.submissionRevision) {
+      this.flowerSubmissionRevision = this.flowers.submissionRevision;
+      this.statsDirty = true;
+    }
     if (time < this.lastTime) {
       for (const root of this.transitions) {
         root.fade.startedAt += time - this.lastTime;
@@ -316,7 +351,8 @@ export class PhotographicGrass {
     this.stats.drawLimit = limits.draws;
     this.advanceTransitions(time);
     const qualityChanged = quality !== this.previousQuality;
-    if (qualityChanged && this.submittedTriangles > limits.triangles) {
+    const selectionChanged = qualityChanged || flowerBudgetChanged;
+    if (selectionChanged && this.submittedTriangles > triangleLimit) {
       this.pruneRoots.length = 0;
       for (const root of this.roots.values()) this.pruneRoots.push(root);
       this.pruneRoots.sort(
@@ -325,28 +361,20 @@ export class PhotographicGrass {
           Math.hypot(a.x - eye.x, a.y - eye.y, a.z - eye.z),
       );
       for (const root of this.pruneRoots) {
-        if (this.submittedTriangles <= limits.triangles) break;
+        if (this.submittedTriangles <= triangleLimit) break;
         this.removeRoot(root);
       }
       this.pruneRoots.length = 0;
     }
-    if (this.preparation || qualityChanged || time - this.lastUpdate >= 0.15) {
-      camera
-        .getViewMatrix()
-        .multiplyToRef(camera.getProjectionMatrix(), this.transform);
-      const height = this.scene.getEngine().getRenderHeight();
+    if (this.preparation || selectionChanged || time - this.lastUpdate >= 0.15) {
+      const viewChanged = selectionChanged || this.viewStability.changed(view, projection, eye, focus.x, focus.z, width, height, camera.fov);
+      view.multiplyToRef(projection, this.transform);
       if (
         this.preparation &&
-        this.preparationIsStale(qualityChanged, height, camera.fov, eye, focus)
+        (this.viewStability.projectionChanged(projection, width, height, camera.fov) ||
+          this.preparationIsStale(selectionChanged, eye, focus))
       )
         this.cancelPreparation();
-      const viewChanged =
-        qualityChanged ||
-        !this.lastTransform.equals(this.transform) ||
-        this.lastHeight !== height ||
-        this.lastFov !== camera.fov ||
-        this.lastFocusX !== focus.x ||
-        this.lastFocusZ !== focus.z;
       if (!this.preparation) this.lastUpdate = time;
       if (
         !this.preparation &&
@@ -362,11 +390,7 @@ export class PhotographicGrass {
           }
         }
         this.selectionRevision = this.tileRevision;
-        this.lastTransform.copyFrom(this.transform);
-        this.lastHeight = height;
-        this.lastFov = camera.fov;
-        this.lastFocusX = focus.x;
-        this.lastFocusZ = focus.z;
+        this.viewStability.accept(view, projection, eye, focus.x, focus.z, width, height, camera.fov);
         this.preparationEye.copyFrom(eye);
         this.preparationFocus.set(focus.x, 0, focus.z);
         this.preparationView.copyFrom(camera.getViewMatrix());
@@ -377,13 +401,14 @@ export class PhotographicGrass {
           camera.fov,
           this.preparationEye,
           this.preparationFocus,
+          triangleLimit,
         );
       }
       this.previousQuality = quality;
     }
     this.advancePreparation(time);
     this.advanceTilePreparation(eye, focus, limits.range);
-    this.fillVacancies(time, limits.triangles);
+    this.fillVacancies(time, triangleLimit);
     for (const batch of this.batches.values()) batch.flush();
     this.updateStats();
     this.stats.cachedTiles = this.placement.cacheSize;
@@ -392,13 +417,12 @@ export class PhotographicGrass {
     this.stats.preparing =
       !!this.preparation ||
       this.stats.pendingTiles > 0 ||
+      this.flowers?.stats.preparing === true ||
       this.allocationDirty ||
       this.selectionRevision !== this.tileRevision;
   }
   private preparationIsStale(
     qualityChanged: boolean,
-    height: number,
-    fov: number,
     eye: Vector3,
     focus: { x: number; z: number },
   ) {
@@ -408,8 +432,6 @@ export class PhotographicGrass {
       previous = this.preparationView.m;
     return (
       qualityChanged ||
-      height !== this.lastHeight ||
-      fov !== this.lastFov ||
       Vector3.DistanceSquared(eye, this.preparationEye) > 9 ||
       (focus.x - this.preparationFocus.x) ** 2 +
         (focus.z - this.preparationFocus.z) ** 2 >
@@ -522,9 +544,10 @@ export class PhotographicGrass {
     this.nextWanted.clear();
     this.nextSelected.length = 0;
     for (const record of this.workRecords) record.tile = null;
-    this.lastTransform.reset();
+    this.viewStability.reset();
   }
   private commitSelection(time: number) {
+    this.viewStability.complete();
     [this.records, this.workRecords] = [this.workRecords, this.records];
     [this.selected, this.nextSelected] = [this.nextSelected, this.selected];
     [this.wanted, this.nextWanted] = [this.nextWanted, this.wanted];
@@ -540,7 +563,7 @@ export class PhotographicGrass {
       this.point.set(root.x, root.y + 0.025, root.z);
       if (
         !desired &&
-        this.planes.some((plane) => plane.dotCoordinate(this.point) < -0.16)
+        this.planes.some((plane) => plane.dotCoordinate(this.point) < -this.rootCullRadius)
       ) {
         this.removeRoot(root);
         continue;
@@ -559,11 +582,14 @@ export class PhotographicGrass {
     fov: number,
     eye: Vector3,
     focus: { x: number; z: number },
+    triangleLimit: number = CANDIDATE_GRASS_LIMITS[quality].triangles,
   ) {
     this.nextWanted.clear();
     this.nextSelected.length = 0;
     this.candidates.clear();
-    const range = CANDIDATE_GRASS_LIMITS[quality].range;
+    // The shader keeps its real range/fade; this tiny selection guard lets a
+    // previously hidden edge root enter safely during held subpixel movement.
+    const range = CANDIDATE_GRASS_LIMITS[quality].range + VEGETATION_TRANSLATION_GUARD;
     const minX = Math.floor(Math.min(eye.x, focus.x) - range),
       maxX = Math.floor(Math.max(eye.x, focus.x) + range),
       minZ = Math.floor(Math.min(eye.z, focus.z) - range),
@@ -581,7 +607,7 @@ export class PhotographicGrass {
         }
         this.point.set(x + 0.5, groundHeight(x + 0.5, z + 0.5) + 0.04, z + 0.5);
         if (
-          this.planes.some((plane) => plane.dotCoordinate(this.point) < -0.95)
+          this.planes.some((plane) => plane.dotCoordinate(this.point) < -this.tileCullRadius)
         ) {
           yield 0;
           continue;
@@ -605,9 +631,10 @@ export class PhotographicGrass {
             continue;
           this.point.set(px, py + 0.025, pz);
           if (
-            this.planes.some((plane) => plane.dotCoordinate(this.point) < -0.16)
+            this.planes.some((plane) => plane.dotCoordinate(this.point) < -this.rootCullRadius)
           )
             continue;
+          this.viewStability.includeBounds(px, py + .025, pz, this.rootRadius);
           const id = grassRootId(x, z, index),
             previousLevel = this.preferredLevels.get(id),
             distance = Math.hypot(px - eye.x, py - eye.y, pz - eye.z),
@@ -648,7 +675,7 @@ export class PhotographicGrass {
         }
         yield 0;
       }
-    let remaining = CANDIDATE_GRASS_LIMITS[quality].triangles,
+    let remaining = triangleLimit,
       ranked = 0;
     while (this.candidates.length && remaining >= CANDIDATE_LOD_TRIANGLES.far) {
       const candidate = this.candidates.pop()!,
@@ -757,7 +784,9 @@ export class PhotographicGrass {
       this.stats.allocatedInstanceBytes += batch.allocatedBytes;
       for (const root of batch.roots) this.activeTiles.add(root.tileId);
     }
-    this.stats.triangles = this.submittedTriangles;
+    this.stats.triangles = this.submittedTriangles + (this.flowers?.stats.triangles ?? 0);
+    this.stats.draws += this.flowers?.stats.draws ?? 0;
+    this.stats.allocatedInstanceBytes += this.flowers?.stats.allocatedInstanceBytes ?? 0;
     this.stats.activeTiles = this.activeTiles.size;
     this.stats.cachedTiles = this.placement.cacheSize;
     this.stats.transitionRoots = this.transitions.size;
@@ -765,6 +794,7 @@ export class PhotographicGrass {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.flowers?.dispose();
     this.disposeShaderPreparation();
     if (this.disposeObserver) {
       this.scene.onDisposeObservable.remove(this.disposeObserver);

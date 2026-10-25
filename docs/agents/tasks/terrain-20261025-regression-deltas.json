@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-regression-deltas",
+  "title": "KEY-61: zachovat historické oracly nových coverage a shader uniformů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "tests/material-defines-wgsl-order.test.ts",
+    "tests/vegetation-index.test.ts",
+    "docs/agents/handoffs/terrain-20261025-regression-deltas.md",
+    ".cache/terrain-regression-deltas-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Ověřit a minimálně aktualizovat přesné regresní kontrakty pro nový photoGrassShape a dvě referenční trávníkové plochy; neměnit produkci.",
+    "Zachovat historický baseline.json.gz i původní fingerprint skutečně nezměněné OSM části; explicitně doložit nové delty, ne přerazítkovat celý výsledek nebo vynechat assert.",
+    "Provedení cílených testů, refaktoring pouze dotčené testové logiky, handoff a release."
+  ],
+  "verification": [
+    "Lehké CPU testy pouze přidělených modulů, případně pure numerický odvozený delta audit.",
+    "Bez GPU/server/fullsuite; během root GPU měření po dohodě testy nespouštět."
+  ],
+  "notes": [
+    "Root plná sada candidate-v1: dvěWGSL metadata odchylky photoGrassShape a vegetation617vs597 patches; úplnýlog .cache/terrain-validation-20261025/candidate-v1-tests.log.",
+    "Ostatnírootenvironmentchyby zmissingDocker/compose/input.jsonl aTEMPuvnitřGitu řešíroot v snapshotu; neopravovatkvůlinim product/testkontrakty."
+  ]
+}

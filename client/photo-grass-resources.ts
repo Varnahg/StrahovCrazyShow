@@ -75,7 +75,11 @@ export function acquireGrassResources(
   if (scene.isDisposed) throw Error("Cannot load grass into a disposed scene");
   let cache = scenes.get(scene);
   if (!cache) scenes.set(scene, (cache = new Map()));
-  const key = pack.runtimeGeometryId ?? pack.sourceGeometrySha256;
+  // Geometry identity alone does not distinguish a different material recipe
+  // or atlas over the same vertices (for example a second authored plant).
+  const key = [pack.runtimeGeometryId ?? pack.sourceGeometrySha256, pack.textures.width, pack.textures.height,
+    ...(["albedo", "alpha", "normal", "normalBent", "arm"] as const).map(channel => channel + ":" + pack.textures.files[channel].sha256),
+    recipe.translucency, recipe.normalStrength, recipe.babylonSpecularIntensity, recipe.babylonMetallicF0Factor].join("|");
   let shared = cache.get(key);
   if (!shared) {
     const maps = {} as GrassResources["maps"],

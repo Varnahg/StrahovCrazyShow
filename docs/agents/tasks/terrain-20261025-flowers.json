@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-flowers",
+  "title": "KEY-61: omezené fotografické květiny a návaznost trávy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/photographic-grass.ts",
+    "client/photo-grass-placement.ts",
+    "client/photo-grass-wind.ts",
+    "client/photo-grass-source-material.ts",
+    "client/photo-grass-resources.ts",
+    "client/photo-grass-preparation.ts",
+    "client/photo-grass-budget.ts",
+    "client/photo-grass-selection.ts",
+    "client/photo-grass-transition.ts",
+    "client/photo-grass-batch.ts",
+    "client/ground-flowers.ts",
+    "client/ground-flower-placement.ts",
+    "client/ground-flower-material.ts",
+    "client/vegetation-view-stability.ts",
+    "public/models/vegetation/flowers/",
+    "public/textures/vegetation/flowers/",
+    "assets/sources/vegetation/dandelion_01/",
+    "scripts/import-ground-flowers.mjs",
+    "scripts/derive-ground-flowers.py",
+    "tests/ground-flowers.test.ts",
+    "tests/vegetation-view-stability.test.ts",
+    "tests/photo-grass.test.ts",
+    "tests/photo-grass-selection.test.ts",
+    "tests/photo-grass-preparation.test.ts",
+    "tests/wgsl-vegetation.test.ts",
+    "docs/agents/handoffs/terrain-20261025-flowers.md",
+    ".cache/terrain-flowers-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Fotografický generický CC0 dandelion_01 s přesným zdrojem/hash; interpretace řídkých žlutých květů, nikoli botanický inventář.",
+    "Sdílený omezený rozpočet s trávou, determinismus a všechny tiery, vlastní rozměry/bounds/LOD a alpha-test; bez nových shadow passů.",
+    "Zachovat dosavadní bounded selection/cache, startup/prewarm a cleanup; bez per-frame neomezených alokací a loadu po každé změně kvality.",
+    "Používat společný ground-cover kontrakt po domluvě; půdní renderer a shared/vegetation patří jinému agentovi. Blender se spouští až po dodatečném výslovném přidělení heavy-validation."
+  ],
+  "verification": [
+    "Lehké cílené CPU testy přidělených modulů; uložení skutečných výsledků, omezení a přesného diffu do předání.",
+    "Celkový build/test/integrace a GPU přejímka patří root se samostatnými resources."
+  ],
+  "notes": [
+    "25.10 root předává vlastní přijatý WIP zpět autorovi weather_sky_fixes pro doloženou opravu mikrotranslační invalidace výběru. Rozsah zahrnuje společný helper, obě rostlinné třídy a cílené testy. Volba: maximálně 2 mm a 0,25 interního pixelu vůči přijatému snapshotu, bez tolerance rotace či projekce, s konzervativním okrajem výběru. Doložené převzetí dovoluje --adopt-dirty. Bez GPU a dalších workflow.",
+    "Přímé implementační zadání TERÉN-20261025/KEY-61 od koordinátora; žádný rekurzivní BMAD ani další podagenti.",
+    "Pracovní kopie D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, baseline ff13fa2b. Před shellem načíst .cache/terrain-20261025/activate.ps1; node_modules je pouze čtecí junction, nic neinstalovat.",
+    "Hraná2592 se nemění; žádné GPU/browser/procesní testy ani WASD. Jen lehké cílené CPU testy bez heavy-validation.",
+    "Před zápisem vlastní claim, po dokončení předání a release. Koordinátor provede celkové testy/review/commity/integraci.",
+    "Spec: _bmad-output/implementation-artifacts/terrain-20261025/spec-key-61-teren.md; výzkum docs/terrain/20261025/research.md.",
+    "25.10 root vrací autorovi převzatý WIP digest bc7541d9 pro jedinou review opravu: CPU úspěšná cesta skutečného PhotographicGrass.load + skutečné květiny po update, s náhradou pouze HTTP/Texture IO. --adopt-dirty je doložený převod, nikoli obcházení kolize."
+  ]
+}

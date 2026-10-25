@@ -38,9 +38,9 @@ const WGSL_VERTEX = Object.freeze({
     attribute photoGrassFade: vec4f;
     #endif`,
   CUSTOM_VERTEX_UPDATE_WORLDPOS: `
-    let leafHeight = clamp((positionUpdated.y+0.002)/0.060,0.0,1.0);
+    let leafHeight = clamp((positionUpdated.y+0.002)/uniforms.photoGrassShape.x,0.0,1.0);
     let leafGust = sin(uniforms.photoGrassWind.x*.85+worldPos.x*1.7+worldPos.z*1.1)*.55+sin(uniforms.photoGrassWind.x*1.9+worldPos.z*2.1)*.22;
-    let leafDisplacement = uniforms.photoGrassWind.yz*leafGust*leafHeight*leafHeight*.001;
+    let leafDisplacement = uniforms.photoGrassWind.yz*leafGust*leafHeight*leafHeight*uniforms.photoGrassShape.y;
     worldPos = vec4f(worldPos.x+leafDisplacement.x,worldPos.y,worldPos.z+leafDisplacement.y,worldPos.w);
     vertexOutputs.vPositionW = worldPos.xyz;
     let rootXZ = finalWorld[3].xz;
@@ -72,6 +72,7 @@ export class PhotoGrassWind extends MaterialPluginBase {
   constructor(
     material: PBRMaterial,
     private state: PhotoGrassWindState,
+    private shape = { height: 0.06, strength: 0.001 },
   ) {
     super(material, "PhotographicLeafGrassWind", 220, {}, true, false);
     this.doNotSerialize = true;
@@ -94,10 +95,11 @@ export class PhotoGrassWind extends MaterialPluginBase {
         { name: "photoGrassWind", size: 3, type: "vec3" },
         { name: "photoGrassView", size: 4, type: "vec4" },
         { name: "photoGrassFocus", size: 3, type: "vec3" },
+        { name: "photoGrassShape", size: 3, type: "vec3" },
       ],
       vertex:
         language === ShaderLanguage.GLSL
-          ? "uniform vec3 photoGrassWind; uniform vec4 photoGrassView; uniform vec3 photoGrassFocus;"
+          ? "uniform vec3 photoGrassWind; uniform vec4 photoGrassView; uniform vec3 photoGrassFocus; uniform vec3 photoGrassShape;"
           : undefined,
     };
   }
@@ -124,6 +126,7 @@ export class PhotoGrassWind extends MaterialPluginBase {
       state.focusZ,
       GRASS_FADE_SECONDS,
     );
+    buffer.updateFloat3("photoGrassShape", this.shape.height, this.shape.strength, 0);
   }
   override getCustomCode(
     type: string,
@@ -143,9 +146,9 @@ export class PhotoGrassWind extends MaterialPluginBase {
       attribute vec4 photoGrassFade;
       #endif`,
         CUSTOM_VERTEX_UPDATE_WORLDPOS: `
-        float leafHeight=clamp((positionUpdated.y+0.002)/0.060,0.0,1.0);
+        float leafHeight=clamp((positionUpdated.y+0.002)/photoGrassShape.x,0.0,1.0);
         float leafGust=sin(photoGrassWind.x*.85+worldPos.x*1.7+worldPos.z*1.1)*.55+sin(photoGrassWind.x*1.9+worldPos.z*2.1)*.22;
-        worldPos.xz+=photoGrassWind.yz*leafGust*leafHeight*leafHeight*.001;
+        worldPos.xz+=photoGrassWind.yz*leafGust*leafHeight*leafHeight*photoGrassShape.y;
         vPositionW=worldPos.xyz;
         vec2 rootXZ=finalWorld[3].xz;
         vec2 focusDelta=photoGrassFocus.xy-photoGrassView.xy;

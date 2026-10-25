@@ -19,8 +19,27 @@ assert.equal(createHash('sha256').update(baselineBytes).digest('hex'),'355ec3272
 const baselines=JSON.parse(baselineBytes.toString('utf8'));
 const descriptor=Object.getOwnPropertyDescriptor(MaterialDefines.prototype,'toString');
 const results:any[]=[];
+function replaceOnce(source:string,before:string,after:string) {
+  assert.equal(source.split(before).length,2,'one exact historical shader fragment: '+before);
+  return source.replace(before,after);
+}
+function withPhotoGrassShape(body:{vertex:string;fragment:string}) {
+  const declaration=(source:string)=>replaceOnce(source,'  photoGrassFocus : vec3f,','  photoGrassFocus : vec3f,\n  photoGrassShape : vec3f,');
+  // The native processor removes the extra uniform declaration but retains its
+  // empty line at these stage-specific anchors. Do not normalize whitespace
+  // globally: every other historical byte still participates in the oracle.
+  const vertex=replaceOnce(declaration(body.vertex),'\nstruct Scene {viewProjection','\n\nstruct Scene {viewProjection');
+  const fragment=replaceOnce(declaration(body.fragment),'//#define FROMLINEARSPACE\n','//#define FROMLINEARSPACE\n\n');
+  return {
+    vertex:replaceOnce(replaceOnce(vertex,
+      '(positionUpdated.y+0.002)/0.060','(positionUpdated.y+0.002)/uniforms.photoGrassShape.x'),
+      'leafHeight*leafHeight*.001;','leafHeight*leafHeight*uniforms.photoGrassShape.y;'),
+    fragment,
+  };
+}
 for(const kind of kinds)test('patched distribution actual native WGSL/order reuse '+kind,async()=>{
   const candidate=await scenario(kind);results.push(candidate);const baseline=(baselines as any)[kind].baseline,expected=(baselines as any)[kind].canonical;
+  const photoGrass=kind==='photo-grass'||kind==='photo-grass-thin';
   assert.deepEqual(Object.getOwnPropertyDescriptor(MaterialDefines.prototype,'toString'),descriptor,'no process-local serializer wrapper');
   // The accepted JSON baseline omits undefined-valued properties. Same-engine
   // exact public values (including undefined) are asserted inside scenario.
@@ -35,13 +54,25 @@ for(const kind of kinds)test('patched distribution actual native WGSL/order reus
     const expectedValues = kind === 'standard'
       ? {...historicalValues, LODBASEDMICROSFURACE: false}
       : historicalValues;
-    assert.deepEqual(candidate.states[index].metadata,baseline.states[index].metadata);
-    assert.deepEqual(candidate.states[index].body,baseline.states[index].body);
+    const historicalMetadata=baseline.states[index].metadata;
+    // KEY-61 generalizes the existing wind to another authored plant. Preserve
+    // the complete old oracle; only this appended vec3 and two literal-to-UBO
+    // substitutions (+ native declaration-removal whitespace) are authorized. Bind groups, defines and every other byte
+    // must remain identical, including the non-thin / thin distinction.
+    if(photoGrass)assert.ok(historicalMetadata.leftOverUniforms.every((u:{name:string})=>u.name!=='photoGrassShape'));
+    const expectedMetadata=photoGrass?{...historicalMetadata,leftOverUniforms:[...historicalMetadata.leftOverUniforms,
+      {name:'photoGrassShape',type:'vec3f',length:0}]}:historicalMetadata;
+    assert.deepEqual(candidate.states[index].metadata,expectedMetadata);
+    assert.deepEqual(candidate.states[index].body,photoGrass?withPhotoGrassShape(baseline.states[index].body):baseline.states[index].body);
     assert.deepEqual(JSON.parse(JSON.stringify(candidate.states[index].values)),expectedValues);
     assert.equal(candidate.states[index].defines,expected.states[index].defines);
     for(const stage of [0,1])assert.deepEqual(candidate.states[index].prefixes[stage].split('\n').sort(),baseline.states[index].prefixes[stage].split('\n').sort());
   }
-  assert.deepEqual(candidate.pluginUniforms,baseline.pluginUniforms);assert.equal(candidate.programs,baseline.programs-1);assert.equal(candidate.extraReferenceReleased,true);
+  // Actual hardBind data proves the default grass still has the same 60mm
+  // bending denominator and 0.001 strength; no value is taken from production
+  // constants to make this expectation follow a regression.
+  const expectedUniforms=photoGrass?[...baseline.pluginUniforms,Math.fround(.06),Math.fround(.001),0,0]:baseline.pluginUniforms;
+  assert.deepEqual(candidate.pluginUniforms,expectedUniforms);assert.equal(candidate.programs,baseline.programs-1);assert.equal(candidate.extraReferenceReleased,true);
 });
 test('known unsupported order-sensitive custom processor remains an explicit limitation',async()=>{
   const candidate=await scenario('pbr',true);results.push(candidate);

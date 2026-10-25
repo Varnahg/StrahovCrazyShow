@@ -9,6 +9,7 @@ import {
   surfaceElevation,
 } from "../shared/vegetation";
 import { groundHeight, groundNormal } from "../shared/terrain";
+import { sampleGroundCover, type GroundCoverSample } from "../shared/ground-cover";
 
 export type PhotoGrassTile = {
   id: string;
@@ -21,7 +22,7 @@ export type PhotoGrassTile = {
 };
 /** All locations remain within the existing source-backed grass classification.
  * The 78mm macrogeometry already uses metres; old point.size scaling is forbidden. */
-export function createPhotoGrassPlacement(cacheLimit: 128 | 256 | 1536 = 128) {
+export function createPhotoGrassPlacement(cacheLimit: 128 | 256 | 1536 = 128, coverAt: typeof sampleGroundCover = sampleGroundCover) {
   const classifier = placementClassifier(BUILDINGS, MAP.paths);
   const grassAreas = LANDCOVER.areas.filter(grassSurface),
     grassBounds = grassAreas.map((area) => polygonBounds(area.points));
@@ -35,6 +36,7 @@ export function createPhotoGrassPlacement(cacheLimit: 128 | 256 | 1536 = 128) {
     normal = Vector3.Up(),
     position = Vector3.Zero();
   const cache = new Map<string, PhotoGrassTile>();
+  const cover: GroundCoverSample = { variation: 0, grassDensity: 0, wear: 0, flowerDensity: 0 };
   const footprintAllowed = (x: number, z: number) =>
     classifier.grass(x, z) &&
     classifier.grass(x - 0.08, z - 0.08) &&
@@ -56,7 +58,8 @@ export function createPhotoGrassPlacement(cacheLimit: 128 | 256 | 1536 = 128) {
         z =
           tileZ +
           (Math.floor(i / 13) + 0.15 + 0.7 * sampleHash(itemSeed + 1)) / 13;
-      if (footprintAllowed(x, z))
+      coverAt(x, z, cover);
+      if (sampleHash(itemSeed + 5) < cover.grassDensity && footprintAllowed(x, z))
         points.push({ x, z, key: sampleHash(itemSeed + 2), seed: itemSeed });
       if ((i + 1) % 16 === 0) yield;
     }
