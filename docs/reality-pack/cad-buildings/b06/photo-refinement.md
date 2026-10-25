@@ -1,5 +1,17 @@
 # B6: rekonstrukce podle plánů a fotografií — KEY-60
 
+## Poslední geometrický checkpoint R6 – 25. 10. 2026
+
+Ruční průchod odhalil světlé cikcak hrany zárubní. Přípravná geometrie původně ponechala mikrometrové omítkové vrstvy kvůli zaokrouhleným hloubkám rámu; další čtecí kontrola skutečného GLB zachytila i téměř nulový zbytek s velkou viditelnou plochou po převodu na float32. Finální oprava používá přesný zdrojový reveal, skutečné výškové hranice konstrukcí a jednu společnou 1nm geometrickou přesnost pro oba operandy i boolean operace. Křídla, volné průchody, rozmístění, schodiště a výšková hypotéza zadní terasy se nemění. Renderer nepřidává žádný polygon offset.
+
+Fresh recipe `667197b70fbdff2375f955d0b43603db63d7dcf017e15543e4b21461625f98c1`: **87/87 přípravných testů PASS**, full-source ray i nezávislý float32 plošný guard bez nálezu. Nativní Blender reopen, GLB, kolize a validace zavřených křídel PASS; tři fotogrammetrické textury střech byly znovu promítnuté při totožné geometrii. Finální Blender `53637788956b4d2f20dbe5485d5ed5ea94ffac1793dad351c14cfdca3ded5d70`, GLB `6beab84e812adca126051d0a3fd221612b76e3b984a300a972239caadd62d027`, collision `218ae18f9ef1e737b11e5189a6ce4c59f7099a3d91e2f773441dc7642a179cd4`. Zůstává1267 objektů a159 kolizních částí. Patnáct cílených sond skutečných GLB ploch je čistých; 128E z0,01634067m² a2303 z0,03599818m² na0m². Všech475 interaktivních definic, roomWalkPaths a schodiště jsou proti předchozímu přijatému modelu shodné.
+
+Ochrana původu GLB zůstává přísná: B6 nyní čte očekávaný64hex recipe hash z již verzovaného photo-alignment, místo druhé ručně přepisované konstanty. První v10 test správně odmítl starý pin; po sjednocení zdroje prošly skutečné Babylon obálky B1 i B6 a související identity testy. URL cache dál používá skutečný GLB hash.
+
+Celá actual Actor/E místnostní sada nad finálním R6 modelem má **264/264 tras,1940/1940 povinných bodů a264 návratů**, bez teleportu a změny kapsle. Dřívější144a/344a/544a neselhávaly na návratu, ale u poslední WC kabinky: kapsle si blokovala otevření. Ověřovací průvodce nyní při explicitním room opt-in skutečně ustoupí po navštívené trase a použije z konce křídla odvozený, kolizně i podlahou ověřený roh. Povinný bod se potvrzuje až skutečným Actor pohybem. Přesně tři takové obchvaty stačily; kontrolní244a používá původní trasu. **83/83 fixtures PASS**, včetně zdi, chybějící podlahy a pozdější překážky; nezávislé review bez nálezu. Report `.cache/b6-photo-routes-20261024/room-tip-r5-r6-all264.json`, SHA `388684f7371cc0041351412a53ecbf5e63d621c3d34db77b356a9d911923547f`.
+
+Celkový report je stále `partial` kvůli36 samostatným úzkým sprchovým stáním. Zadní výškový rozdíl0,481m vyžaduje doplnění podkladu; žádné vymyšlené schody ani zmenšení kapsle jej nezakrývají. Následující oddíly zachovávají starší vývojové checkpointy.
+
 Navazující připomínky uživatele z 24. 10. 2026 se týkají B6: návaznosti oken na pokojové příčky, jednoho aktivního křídla pokojových dvojdveří, podlah, schodišť, pokojů, koupelen, zadního vstupu Čajovny/STOH a předního smrku. Fotografie s číslem 2 je pouze typologické srovnání. Originály CAD a fotografií zůstávají mimo Git; manifest šesti nezměněných příloh je v ignorované pracovní cache.
 
 ## Rozhodnutí a podklady

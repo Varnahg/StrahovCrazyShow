@@ -49,6 +49,8 @@ function building(model: CadBuildingModel, siteData: unknown, osmId: string, sou
   // tuple arity. Keep each model/site pair tied to its actual native exports.
   const site = siteData as CadBuildingSite;
   const identity = osmAssetIdentity("building", "way", osmId);
+  if (!/^[a-f0-9]{64}$/.test(sourceRecipeSha256))
+    throw new Error(`CAD model ${model.id} nemá platnou identitu zdrojové receptury.`);
   if (site.id !== model.id || site.sourceGlbSha256 !== model.glbSha256 ||
       site.sourceBlendSha256 !== model.blendSha256 || model.identity !== identity.key)
     throw new Error(`CAD site ${model.id} neodpovídá exportovanému modelu.`);
@@ -60,7 +62,7 @@ export const CAD_BUILDINGS = [
   building(b01 as CadBuildingModel, b01Site, "53929063",
     "d1202adf453178e8abeeab3096315efd74d99857e68b1182d33cc64c0248ac42", photoAlignment.buildings.b01.placement),
   building(b06 as CadBuildingModel, b06Site, "53929071",
-    "14bfbffadd7a7d96729d9fb5205b54b8dbcccc87153b807621280a8550949275", photoAlignment.buildings.b06.placement),
+    photoAlignment.buildings.b06.sourceRecipeSha256, photoAlignment.buildings.b06.placement),
 ] as const;
 
 /** Both the native render batches and Rapier use these exact authored poses. */

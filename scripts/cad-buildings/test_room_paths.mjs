@@ -48,6 +48,9 @@ function runtimeFactory(building,options={}){
           runtime.world.createCollider(RAPIER.ColliderDesc.cuboid(.45,1.5,.02).setTranslation(-.5,41.5,.35));trapped=true;
         }
       }
+      if(options.trapTipCorner&&!trapped&&runtime.doorPhysics.isOpen('b06:wc1')){
+        runtime.world.createCollider(RAPIER.ColliderDesc.cuboid(.11,1.25,.135).setTranslation(-.93,41.25,.305));trapped=true;
+      }
       tick();
     };
     return runtime;
@@ -187,6 +190,64 @@ test('opening can continue backwards along visited points before resuming past t
   assert.ok(maneuver?.completed);assert.ok(maneuver.finishedAtTick>maneuver.changedAtTick);
   assert.ok(maneuver.points.every(p=>p.visitedAtTick<=maneuver.plannedAtTick));
   assert.equal(row.reachedPointIndices.length,b.model.roomWalkPaths[0].walkPath.length);assert.equal(runtime.counts.liveAtDispose,0);
+});
+
+function leafTipFixture(){
+  const b=twoWcFixture(),p=(x,z,sourceDoorId)=>({cad:[-z,-x],height:0,label:'fixture-access',...(sourceDoorId?{sourceDoorId}:{})});
+  b.model.parts=b.model.parts.filter(p=>!['floor','corridor-left'].includes(p.id));
+  b.model.parts.push(box('floor',[-2.5,-.2,-1.9],[1.3,0,1.7],'slab'),box('corridor-left',[-2.55,0,-1.9],[-2.45,2.5,1.7]));
+  const source=b.model.doors[0],d=b.model.interactiveDoors[0];
+  source.hinge=[1.35,2.2];source.closedEnd=[1.35,1.4];
+  d.hingeModel={x:-2.2,y:.015,z:-1.35};d.closedPose.position={x:-1.8,y:1.0475,z:-1.35};d.handleModel={x:-1.52,y:1,z:-1.35};
+  b.model.roomWalkPaths[0].walkPath=[p(-1.8,-.9,'entry'),p(-1.8,-.3,'wc2'),p(-.6,-.15),
+    p(-.5,.3,'wc1'),p(.45,.3,'wc1'),p(.75,.3),p(-.5,.3,'wc1'),p(-1.8,-.9,'entry')];
+  return b;
+}
+
+test('an occupied WC opening uses an actual supported corner beyond its native open-leaf tip',()=>{
+  const b=leafTipFixture(),before=JSON.stringify(b),runtime=runtimeFactory(b);
+  const report=replayRoomTours(validateRoomTours(b,identity,undefined,undefined,'actor-interaction'),runtime.create),row=report.results[0];
+  assert.equal(report.status,'pass',JSON.stringify(report));
+  const m=row.interactionManeuvers.find(m=>m.corner);
+  assert.ok(m?.completed&&m.corner.reached,JSON.stringify(row.interactionManeuvers));
+  assert.ok(m.points.every(p=>p.visitedAtTick<=m.plannedAtTick));
+  assert.ok(m.corner.reachedAtTick>m.changedAtTick);
+  assert.ok(Math.abs(m.corner.position.x+.89)<1e-8&&Math.abs(m.corner.position.z-.309)<1e-8);
+  assert.ok(m.corner.supportSamples.every(p=>Math.abs(p.rayFloor-40)<1e-5&&Math.abs(p.capsuleFloor-40)<.001));
+  assert.equal(m.corner.radius,.25);assert.equal(m.corner.skin,.02);assert.equal(m.corner.planningMargin,.02);
+  assert.ok(Math.hypot(m.corner.actualPosition.x-m.corner.position.x,m.corner.actualPosition.z-m.corner.position.z)<.01);
+  assert.ok(row.doorInteractions.some(e=>e.doorId===m.doorId&&e.requestedOpen&&e.result.status==='changed'&&e.guard.allowed));
+  assert.deepEqual(row.reachedPointIndices,b.model.roomWalkPaths[0].walkPath.map((_,i)=>i));
+  assert.ok(row.legs.every(l=>l.traversal==='walk'));assert.equal(JSON.stringify(b),before);
+  assert.equal(runtime.counts.liveAtDispose,0);
+});
+
+test('an obstructed or unsupported native tip corner cannot replace the mandatory WC approach',()=>{
+  for(const missingFloor of [false,true]){
+    const b=leafTipFixture();
+    if(missingFloor){
+      b.model.parts=b.model.parts.filter(p=>p.id!=='floor');
+      // A real 12cm floor gap under the only derived corner, without changing
+      // the starting/mandatory points or the already visited retreat trail.
+      b.model.parts.push(box('floor-south',[-2.5,-.2,-1.9],[1.3,0,.25],'slab'),
+        box('floor-north',[-2.5,-.2,.37],[1.3,0,1.7],'slab'),
+        box('floor-east',[-.8,-.2,.25],[1.3,0,.37],'slab'),box('floor-west',[-2.5,-.2,.25],[-.98,0,.37],'slab'));
+    }else b.model.parts.push(box('tip-wall',[-1.04,0,.17],[-.82,2.5,.44]));
+    const runtime=runtimeFactory(b),report=replayRoomTours(validateRoomTours(b,identity,undefined,undefined,'actor-interaction'),runtime.create),row=report.results[0];
+    assert.equal(report.status,'partial');assert.ok(!row.reachedPointIndices.includes(4));
+    assert.ok(!row.interactionManeuvers.some(m=>m.corner?.reached));
+    assert.equal(runtime.counts.liveAtDispose,0);
+  }
+});
+
+test('a new obstacle after planning blocks the actual corner walk without accepting the original target',()=>{
+  const b=leafTipFixture(),runtime=runtimeFactory(b,{trapTipCorner:true});
+  const report=replayRoomTours(validateRoomTours(b,identity,undefined,undefined,'actor-interaction'),runtime.create),row=report.results[0];
+  assert.equal(report.status,'partial');assert.ok(!row.reachedPointIndices.includes(3));
+  const m=row.interactionManeuvers.find(m=>m.corner);
+  assert.ok(m&&!m.completed&&!m.corner.reached,JSON.stringify(row.interactionManeuvers));
+  assert.ok(row.doorInteractions.some(e=>e.doorId===m.doorId&&e.requestedOpen&&e.result.status==='changed'));
+  assert.equal(runtime.counts.liveAtDispose,0);
 });
 
 test('an initially occluded native handle can be opened later from a physically reached visible stance',()=>{

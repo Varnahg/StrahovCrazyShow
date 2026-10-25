@@ -621,13 +621,15 @@ class B6DoorFrameOwnershipTests(unittest.TestCase):
         for solid in upper['solids']:
             for p in raw:
                 if min(solid['top'],p['top'])>max(solid['bottom'],p['bottom']):
-                    self.assertLess(self.shape(solid).intersection(p['geometry']).area,1e-12)
+                    self.assertLess(self.shape(solid).intersection(b6.set_precision(p['geometry'],b6.FRAME_OWNERSHIP_GRID)).area,1e-12)
         after={k:v for k,v in door.items() if k not in ('frameOwnership','frameSolidIds')}
         self.assertEqual(json.dumps(after,sort_keys=True),before)
         self.assertEqual(door['frameOwnership'],'recipe-solids')
         self.assertTrue(door['frameSolidIds'])
         retained_above=unary_union([self.shape(s) for s in upper['solids'] if s['bottom']<3.8<s['top']])
-        self.assertLess(retained_above.symmetric_difference(wall).area,1e-12)
+        canonical_wall=b6.set_precision(wall,b6.FRAME_OWNERSHIP_GRID)
+        self.assertLess(retained_above.symmetric_difference(canonical_wall).area,1e-12)
+        self.assertLessEqual(canonical_wall.hausdorff_distance(wall),b6.FRAME_OWNERSHIP_GRID)
 
     def test_source_paired_frame_has_one_header_and_no_center_post_or_opening_pinch(self):
         doors=self.source_pair();floor={'id':'n02','doors':doors,'rooms':[],'solids':[]}
@@ -659,6 +661,139 @@ class B6DoorFrameOwnershipTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'paired frame'):b6.door_frame_groups([first,{**second,'top':5.2}])
         with self.assertRaisesRegex(ValueError,'Invalid source door'):b6.door_frame_span({**first,'depth':float('nan')})
 
+    def test_full_precision_reveal_removes_rounding_skin_without_changing_leaf(self):
+        doors=self.source_pair()
+        base=box(20.5,6.364,22.1,6.489).difference(box(20.690104,6.3,21.940103,6.6))
+        def floor(items):return {'id':'n02','doors':items,'rooms':[],
+            'solids':b6.serialize_exact_solids(base,'source-wall','wall',3,5.1,'plaster')}
+        old=floor(json.loads(json.dumps(doors)))
+        # Reproduce the R3 round-trip through public rounded descriptors.
+        cuts=b6.door_frame_profiles(old)
+        b6.reserve_structural_volumes([old],cuts,'legacy-frame','legacyRemoved')
+        strip=box(21.940104,6.364,21.975102,6.364004)
+        old_wall=unary_union([self.shape(s) for s in old['solids'] if s['role']=='wall'])
+        self.assertGreater(old_wall.intersection(strip).area,1e-7,'original 4um film must reproduce')
+        original=json.dumps(doors,sort_keys=True)
+        for door,lo,hi in [(doors[0],.000404,.125404),(doors[1],-.125404,-.000404)]:
+            door['frameReveal']={'low':lo,'high':hi,'measurementBasis':'adjacent-wall-sections'}
+        fresh=floor(doors);b6.reserve_door_frames([fresh])
+        wall=unary_union([self.shape(s) for s in fresh['solids'] if s['role']=='wall'])
+        self.assertLess(wall.intersection(strip).area,1e-12)
+        for door in doors:
+            a,b,_,depth=b6.door_frame_span(door)
+            self.assertAlmostEqual(min(a[1],b[1])-depth/2,6.364,places=12)
+            self.assertAlmostEqual(max(a[1],b[1])+depth/2,6.489,places=12)
+        restored=[{k:v for k,v in d.items() if k not in ('frameReveal','frameOwnership','frameSolidIds')} for d in doors]
+        self.assertEqual(json.dumps(restored,sort_keys=True),original)
+
+    def test_source_opening_records_the_unrounded_structural_reveal(self):
+        door=self.entry();door.update({'hinge':[2,1.229403],'closedEnd':[3,1.229403]})
+        wall=box(1,1.229,4,1.354)
+        data={'lines':[],'rooms':[]}
+        b6.opening_descriptors('n01',data,wall,GeometryCollection(),[door])
+        self.assertEqual(door['depth'],.125);self.assertEqual(door['normalOffset'],.0621)
+        self.assertAlmostEqual(door['frameReveal']['low'],-.000403,places=12)
+        self.assertAlmostEqual(door['frameReveal']['high'],.124597,places=12)
+        a,_,_,depth=b6.door_frame_span(door)
+        self.assertAlmostEqual(a[1]-depth/2,1.229,places=12)
+        with self.assertRaisesRegex(ValueError,'canonical'):
+            b6.door_frame_span({**door,'frameReveal':{'low':0,'high':float('nan')}})
+
+    def test_final_source_grid_skin_becomes_frame_but_continuing_wall_does_not(self):
+        from shapely.strtree import STRtree
+        # Exact source face 97um beyond the fallback header; no arbitrary buffer
+        # may eat the adjacent thick wall or extend the jamb's axial endpoints.
+        profile={'geometry':box(0,0,.035,.13),'axisStart':np.array([0.,.065]),
+                 'axisEnd':np.array([.035,.065]),'depth':.13,'basis':'fixture'}
+        skin=box(0,.13,.035,.130097);thick=box(0,-.2,.035,0)
+        solids=[{'id':'bounded-source-skin','bottom':2.1,'top':2.145},
+                {'id':'real-thick-wall','bottom':2.1,'top':2.145}]
+        result=b6.conform_frame_profile(profile,solids,[skin,thick],STRtree([skin,thick]),2.12)
+        self.assertLess(result['geometry'].symmetric_difference(box(0,0,.035,.130097)).area,1e-12)
+        self.assertEqual([p['sourceSolidId'] for p in result['conformance']],['bounded-source-skin'])
+        self.assertAlmostEqual(result['conformance'][0]['maximumNormalDeltaMetres'],.000097)
+        self.assertEqual(profile['geometry'].bounds,(0,0,.035,.13))
+        self.assertIs(b6.conform_frame_profile(profile,solids,[skin,thick],STRtree([skin,thick]),1),profile)
+
+        # A neighbouring intersecting header must be considered simultaneously.
+        # Its occupied wall volume otherwise connects a real skin to a thick
+        # portion that disappears during the same CSG (N01 source 12B0).
+        connected=unary_union([skin,box(.02,.13,.035,.2)])
+        self.assertIs(b6.conform_frame_profile(profile,solids[:1],[connected],STRtree([connected]),2.12),profile)
+        occupied=box(.02,0,.04,.2)
+        fixed=b6.conform_frame_profile(profile,solids[:1],[connected],STRtree([connected]),2.12,occupied)
+        self.assertLess(fixed['geometry'].symmetric_difference(unary_union([profile['geometry'],box(0,.13,.02,.130097)])).area,1e-12)
+
+    def assert_partial_height_skin(self, bottom, top):
+        door={**self.entry(),'id':'n01-partial-height','hinge':[.035,.065],'closedEnd':[1.035,.065],
+              'bottom':0,'top':2.1,'depth':.13,'normalOffset':0}
+        shape=box(0,.13,.035,.130097)
+        # Keep the explicit source witness below the ordinary CAD inference
+        # MIN_AREA filter: this test concerns real partial-height volume.
+        source={'id':'source-partial-skin','role':'wall','material':'plaster','collision':True,
+                'bottom':bottom,'top':top,'loops':[[list(p) for p in list(shape.exterior.coords)[:-1]]],
+                'triangles':b6.surface_triangles(shape)}
+        floor={'id':'n01','doors':[door],'rooms':[],'solids':[source]}
+        b6.reserve_door_frames([floor])
+        frames=[s for s in floor['solids'] if s['role']=='door-frame']
+        # Fixed source elevations, deliberately not the implementation's bands.
+        point=Point(.0175,.13005)
+        for z in [.25,.75,1.25,1.75,2.05,2.12]:
+            covering=any(s['bottom']<z<s['top'] and self.shape(s).covers(point) for s in frames)
+            self.assertEqual(covering,bottom<z<top,(bottom,top,z))
+        transferred=sum(self.shape(s).intersection(shape).area*(s['top']-s['bottom']) for s in frames)
+        self.assertAlmostEqual(transferred,shape.area*(top-bottom),places=12)
+        for s in frames:
+            if s.get('sourceGridConformance'):
+                self.assertGreaterEqual(s['bottom'],bottom);self.assertLessEqual(s['top'],top)
+        self.assertFalse(any(s['role']=='wall' and self.shape(s).intersection(shape).area>1e-12 for s in floor['solids']))
+
+    def test_mid_band_source_skin_does_not_extrude_into_absent_lower_or_upper_space(self):
+        self.assert_partial_height_skin(.5,1.5)
+
+    def test_upper_only_source_skin_is_not_missed_by_frame_midpoint(self):
+        self.assert_partial_height_skin(1.5,2.1)
+
+    def test_native_128e_picometre_film_has_large_float32_face_and_shared_precision_removes_it(self):
+        # Exact derived source crop and R5 contours from the independently read
+        # native 128E witness. Near-zero volume is explicitly NOT acceptance.
+        original=Polygon([(12.879,-1.854),(12.581,-1.891),(12.576,-1.849),
+            (12.5736678111588,-1.83),(12.876142857142858,-1.83)])
+        residual=Polygon([(12.5777833543,-1.8639355465),(12.5777781178,-1.8639361894),
+            (12.581,-1.891),(12.576,-1.849),(12.5736678111588,-1.83),
+            (12.85421344034093,-1.83)])
+        frame=Polygon([(12.5777833543,-1.8639355465),(12.5777781178,-1.8639361894),
+            (12.581,-1.891),(12.5811042938,-1.8909870508),(12.5820480633,-1.89867475),
+            (12.8801469133,-1.8620790684),(12.8758822043,-1.827339865)])
+        broken={'cadOrigin':[35,8],'floors':[{'id':'n01','solids':
+            b6.serialize_exact_solids(residual,'R5-128E-wall','wall',1.5,2.1,'plaster')+
+            b6.serialize_exact_solids(frame,'R5-128E-frame','door-frame',1.5,2.1,'frame')}]}
+        self.assertLess(residual.intersection(frame).area,1e-12)
+        failures=float32_frame_wall_projection(broken)
+        self.assertTrue(failures)
+        self.assertGreater(max(f['areaM2'] for f in failures),.016)
+        door={'id':'n01-door-128E','hinge':[12.730999,-1.880389],'closedEnd':[12.828475,-2.674403],
+            'sourceEntities':['128E','129B'],'bottom':1.5,'top':3.6,'depth':.3003,'normalOffset':.0001,
+            'frameReveal':{'low':-.15006915141543192,'high':.15026760670344844}}
+        floor={'id':'n01','rooms':[],'doors':[door],
+            'solids':b6.serialize_exact_solids(original,'source-128E-wall','wall',1.5,2.1,'plaster')}
+        b6.reserve_door_frames([floor])
+        fixed={'cadOrigin':[35,8],'floors':[floor]}
+        self.assertEqual(float32_frame_wall_projection(fixed),[])
+        self.assertEqual(frame_skin_witnesses(fixed),[])
+        self.assertTrue(all(s['boundaryPrecisionMetres']==b6.FRAME_OWNERSHIP_GRID for s in floor['solids']))
+
+    def test_shared_precision_also_owns_ieee_axis_aligned_header_boundary(self):
+        # No conformance addon is involved: 67.614 - .075 is not exactly the
+        # source wall coordinate 67.539 in binary64. Both operands must agree.
+        door={**self.entry(),'hinge':[67.614,6.659403],'closedEnd':[67.614,7.459403],
+            'bottom':0,'top':2.1,'depth':.15,'normalOffset':0,
+            'frameReveal':{'low':-.075,'high':.075}}
+        floor={'id':'n01','rooms':[],'doors':[door],
+            'solids':b6.serialize_exact_solids(box(67.539,6.6,67.689,7.6),'source-axis','wall',2.1,2.145,'plaster')}
+        b6.reserve_door_frames([floor])
+        self.assertEqual(float32_frame_wall_projection({'cadOrigin':[35,8],'floors':[floor]}),[])
+
     def test_intersecting_source_frame_profiles_have_one_volume_owner_per_z_band(self):
         first=self.entry();duplicate={**first,'id':'n02-source-projection'}
         floors=[{'id':'n01','doors':[first],'rooms':[],'solids':[]},
@@ -689,6 +824,113 @@ class B6DoorFrameOwnershipTests(unittest.TestCase):
             if s['role']=='slab':
                 surface=unary_union([Polygon(t) for p in s['topSurfacePartitions'] for t in p['triangles']])
                 self.assertLess(self.shape(s).symmetric_difference(surface).area,1e-8)
+
+
+def float32_frame_wall_projection(recipe):
+    """Project actual exported-precision side faces, including picometre skins.
+
+    Mirror only float32 storage and identical-face cancellation, independently
+    of the recipe Boolean/ray implementation. A skin can have near-zero volume
+    yet retain a large face after float32 conversion. Check every frame face.
+    """
+    from shapely.strtree import STRtree
+    faces={};origin=np.asarray(recipe['cadOrigin'])
+    for floor in recipe['floors']:
+        for solid in floor['solids']:
+            if solid['role'] not in ('wall','slab','door-frame'):continue
+            if 'ceilingPlane' in solid:raise AssertionError('Projection guard requires explicit clipped faces')
+            low,high=np.float32([solid['bottom'],solid['top']]).astype(float)
+            if low==high:continue
+            for index,source in enumerate(solid['loops']):
+                ring=np.asarray(source,dtype=float)
+                if np.array_equal(ring[0],ring[-1]):ring=ring[:-1]
+                area=sum(a[0]*b[1]-a[1]*b[0] for a,b in zip(ring,np.roll(ring,-1,axis=0)))
+                if (area>0)!=(index==0):ring=ring[::-1]
+                # Geometry.at -> float32 Blender vertex -> original CAD XY.
+                model=np.column_stack((origin[1]-ring[:,1],ring[:,0]-origin[0])).astype(np.float32)
+                ring=np.column_stack((model[:,1].astype(float)+origin[0],origin[1]-model[:,0].astype(float)))
+                for a,b in zip(ring,np.roll(ring,-1,axis=0)):
+                    if np.array_equal(a,b):continue
+                    endpoints=tuple(sorted((tuple(a),tuple(b))))
+                    key=(floor['id'],solid['role'],solid['material'],endpoints,low,high)
+                    if key in faces:
+                        if np.array_equal(faces[key]['a'],b):del faces[key]
+                        continue
+                    length=float(np.linalg.norm(b-a));axis=(b-a)/length
+                    ulp=float(np.max(np.abs(np.spacing(model))))
+                    faces[key]={'solid':solid['id'],'role':solid['role'],'a':a,'b':b,'axis':axis,
+                        'normal':np.array([axis[1],-axis[0]]),'length':length,'low':low,'high':high,'ulp':ulp}
+    walls=[f for f in faces.values() if f['role']!='door-frame']
+    lines=[LineString([f['a'],f['b']]) for f in walls];tree=STRtree(lines);failures=[]
+    for frame in faces.values():
+        if frame['role']!='door-frame':continue
+        line=LineString([frame['a'],frame['b']])
+        for index in tree.query(line.buffer(.0001,cap_style=3)):
+            wall=walls[index];height=min(frame['high'],wall['high'])-max(frame['low'],wall['low'])
+            if height<=0 or np.dot(frame['normal'],wall['normal'])<.999999:continue
+            u=np.array([np.dot(p-frame['a'],frame['axis']) for p in (wall['a'],wall['b'])])
+            start=max(0,float(min(u)));end=min(frame['length'],float(max(u)))
+            if end<=start:continue
+            v=np.array([np.dot(p-frame['a'],frame['normal']) for p in (wall['a'],wall['b'])])
+            separation=max(abs(float(v[0]+(v[1]-v[0])*(point-u[0])/(u[1]-u[0]))) for point in (start,end))
+            if separation>.0001:continue
+            area=(end-start)*height
+            # Only a border displacement of two representable coordinate ULPs
+            # is numerical adjacency; a full face cannot hide under this bound.
+            boundary_error=2*max(frame['ulp'],wall['ulp'])*height
+            if area>max(1e-12,boundary_error):
+                failures.append({'frame':frame['solid'],'wall':wall['solid'],'areaM2':area,
+                    'separationM':separation,'float32BorderAreaM2':boundary_error})
+    return failures
+
+
+def frame_skin_witnesses(recipe):
+    """Independent outward ray check, not a Boolean volume-overlap assertion.
+
+    A real wall continuing beyond the 2mm ray is not a microscopic skin. Detect
+    only a connected 0.01um..100um wall layer immediately in front of a frame.
+    Test tolerance never alters the source geometry or the production cutter.
+    """
+    from shapely.strtree import STRtree
+    structural=[s for f in recipe['floors'] for s in f['solids'] if s['role'] in ('wall','slab')]
+    shapes=[Polygon(s['loops'][0],s['loops'][1:]) for s in structural];tree=STRtree(shapes)
+    frames={s['id']:s for f in recipe['floors'] for s in f['solids'] if s['role']=='door-frame'}
+    result=[]
+    for floor in recipe['floors']:
+        for group in b6.door_frame_groups(floor['doors']):
+            for door in group:
+                a,b,axis,depth=b6.door_frame_span(door);normal=np.array([-axis[1],axis[0]])
+                jambs=[a-axis*.0175]+([b+axis*.0175] if len(group)==1 else [])
+                # Independently partition by ALL source structural elevations,
+                # including those not chosen by frame production. Checking only
+                # generated-frame midpoints would share its former blind spot.
+                levels={frames[i][key] for i in door['frameSolidIds'] for key in ('bottom','top')}
+                minimum,maximum=min(levels),max(levels)
+                levels.update(s[key] for s in structural for key in ('bottom','top') if minimum<s[key]<maximum)
+                levels=sorted(levels);heights=[(a+b)/2 for a,b in zip(levels,levels[1:])]
+                for z in heights:
+                    actual=unary_union([Polygon(frames[i]['loops'][0],frames[i]['loops'][1:]) for i in door['frameSolidIds']
+                                        if frames[i]['bottom']<z<frames[i]['top']])
+                    samples=jambs+([(a+b)/2] if z>door['top'] else [])
+                    for sample in samples:
+                        section=LineString([sample-normal*(depth/2+.002),sample+normal*(depth/2+.002)]).intersection(actual)
+                        spans=list(section.geoms) if hasattr(section,'geoms') else [section]
+                        span=next((s for s in spans if s.geom_type=='LineString' and s.distance(Point(sample))<1e-8),None)
+                        if span is None:raise AssertionError('Missing actual frame support at '+door['id'])
+                        for sign in (-1,1):
+                            start=np.array(max(span.coords,key=lambda p:float(np.dot(np.asarray(p)-sample,normal))*sign))
+                            ray=LineString([start,start+sign*normal*.002])
+                            for index in tree.query(ray):
+                                solid=structural[index]
+                                if not solid['bottom']<z<solid['top']:continue
+                                section=ray.intersection(shapes[index])
+                                parts=list(section.geoms) if hasattr(section,'geoms') else [section]
+                                for part in parts:
+                                    if part.geom_type!='LineString' or not 1e-8<part.length<.0001:continue
+                                    if part.distance(Point(start))>1e-8:continue
+                                    result.append({'door':door['id'],'wall':solid['id'],'height':z,
+                                        'facePointCad':[float(v) for v in start],'skinThickness':part.length})
+    return result
 
 
 class LocalB6RecipeTests(unittest.TestCase):
@@ -740,6 +982,24 @@ class LocalB6RecipeTests(unittest.TestCase):
                     if frame['bottom']<door['top']-1e-9:
                         self.assertLess(Polygon(frame['loops'][0],frame['loops'][1:]).intersection(clear).area,1e-9,door['id'])
         self.assertEqual(paired,456)
+
+    def test_all_canonical_frame_faces_have_no_microscopic_structural_skin(self):
+        for floor in self.recipe['floors']:
+            for solid in floor['solids']:
+                for evidence in solid.get('sourceGridConformance',[]):
+                    self.assertTrue(evidence['sourceSolidId'])
+                    self.assertGreater(evidence['areaM2'],0)
+                    self.assertLessEqual(evidence['maximumNormalDeltaMetres'],.001+1e-10)
+            for door in floor['doors']:
+                self.assertIn('frameReveal',door)
+                old_a,_,_,old_depth=b6.door_frame_span(door,canonical=False)
+                new_a,_,_,new_depth=b6.door_frame_span(door)
+                self.assertLessEqual(np.linalg.norm(new_a-old_a),.000051,door['id'])
+                self.assertLessEqual(abs(new_depth-old_depth),.000051,door['id'])
+        self.assertEqual(frame_skin_witnesses(self.recipe),[])
+
+    def test_all_float32_frame_faces_have_no_large_same_facing_wall_projection(self):
+        self.assertEqual(float32_frame_wall_projection(self.recipe),[])
 
     def test_revision2_keeps_rear_ground_and_clears_the_shared_east_window_stack(self):
         self.assertNotIn('b06-rear-stair-terrain',[c['id'] for c in self.recipe['terrainCutouts']])

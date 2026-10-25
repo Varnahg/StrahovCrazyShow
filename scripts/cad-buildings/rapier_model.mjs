@@ -135,7 +135,7 @@ export function requireNativeDoorPhysics(runtime,model) {
 
 /** Shared authority checks at the CURRENT Actor position. This is CPU policy
  * evidence, not transport/latency or a simulated human camera claim. */
-export function createDoorInteractionProbe(physics,settings,capsules,obstacles) {
+export function createDoorInteractionProbe(physics,settings,capsules,obstacles,options={}) {
   if(!physics)throw new Error('Missing shared door physics');
   const definitions=[...physics.definitions.values()];
   if(definitions.some(door=>physics.isOpen(door.id)))throw new Error('Interaction probe requires closed-default state');
@@ -170,11 +170,14 @@ export function createDoorInteractionProbe(physics,settings,capsules,obstacles) 
       undefined,undefined,actor.collider,actor.body,c=>c.handle===handle);
   };
   const desiredLegClear=(actor,from,target,id,open)=>!leafBlocksLeg(actor,from,target,physics.collidersFor(id)[open?1:0].handle);
+  const desiredColliderFilter=(id,open)=>{
+    const [closed,opened]=physics.collidersFor(id),desired=open?opened:closed,excluded=open?closed:opened;
+    return c=>c.handle!==excluded.handle&&(c.handle===desired.handle||
+      !physics.options.ignoredColliders.has(c.handle)&&physics.isActiveCollider(c));
+  };
   const continuationClear=(actor,from,target,id,open)=>{
     if(!desiredLegClear(actor,from,target,id,open))return false;
-    const [closed,opened]=physics.collidersFor(id),desired=open?opened:closed,excluded=open?closed:opened;
-    const active=c=>c.handle!==excluded.handle&&(c.handle===desired.handle||
-      !physics.options.ignoredColliders.has(c.handle)&&physics.isActiveCollider(c));
+    const active=desiredColliderFilter(id,open);
     // Ignore only measured horizontal support contacts in this planning sweep,
     // as in entry preparation. Actual Actor walking still tests every surface.
     const supportHandles=new Set();
@@ -186,6 +189,44 @@ export function createDoorInteractionProbe(physics,settings,capsules,obstacles) 
     return !physics.world.castShape(from,{x:0,y:0,z:0,w:1},{x:target.x-from.x,y:0,z:target.z-from.z},actor.collider.shape,settings.offset,1,true,
       undefined,undefined,actor.collider,actor.body,c=>active(c)&&!supportHandles.has(c.handle));
   };
+  // Optional ROOM-only continuation around one authored open-leaf tip. This
+  // is a candidate, never a visited point or a movement PASS. The whole route
+  // still needs ordinary Actor input after a real authority opening request.
+  const tipCorner=(actor,from,target,id)=>{
+    if(!options.leafTipDetours)return null;
+    const door=physics.definitions.get(id),pose=cadDoorPose(door,true),hinge=door.hinge;
+    const width=2*door.halfExtents.x,tip={x:2*pose.position.x-hinge.x,z:2*pose.position.z-hinge.z};
+    const axis={x:(tip.x-hinge.x)/width,z:(tip.z-hinge.z)/width},normal={x:-axis.z,z:axis.x};
+    const side=Math.sign((target.x-tip.x)*normal.x+(target.z-tip.z)*normal.z);
+    if(!side)return null;
+    const planningMargin=.02,clearance=settings.radius+settings.offset+planningMargin;
+    const position={x:tip.x+axis.x*clearance+normal.x*side*(door.halfExtents.z+clearance),y:from.y,
+      z:tip.z+axis.z*clearance+normal.z*side*(door.halfExtents.z+clearance)};
+    if(!continuationClear(actor,from,position,id,true)||!continuationClear(actor,position,target,id,true))return null;
+    const active=desiredColliderFilter(id,true),footOffset=settings.radius+settings.halfHeight+settings.offset,reference=from.y-footOffset;
+    const samples=[];
+    for(const [a,b] of [[from,position],[position,target]]){
+      const count=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/.15));
+      if(count>40)return null;
+      for(let i=0;i<=count;i++){
+        const x=a.x+(b.x-a.x)*i/count,z=a.z+(b.z-a.z)*i/count;
+        // Both a centre ray and the actual full capsule must have flat support
+        // on the same floor. No floor override, support shrink or stair claim.
+        const rayY=reference+.25,ray=physics.world.castRayAndGetNormal(new RAPIER.Ray({x,y:rayY,z},{x:0,y:-1,z:0}),.5,false,
+          undefined,undefined,actor.collider,actor.body,active);
+        const castY=reference+footOffset+.2,cast=physics.world.castShape({x,y:castY,z},{x:0,y:0,z:0,w:1},{x:0,y:-1,z:0},
+          actor.collider.shape,settings.offset,.4,true,undefined,undefined,actor.collider,actor.body,active);
+        const rayFloor=ray?rayY-ray.timeOfImpact:null,capsuleFloor=cast?castY-cast.time_of_impact-footOffset:null;
+        if(!ray||ray.normal.y<.99||!cast||cast.normal1.y<.99||Math.abs(rayFloor-reference)>.03||Math.abs(capsuleFloor-reference)>.03)return null;
+        samples.push({x,z,rayFloor,capsuleFloor,rayCollider:ray.collider.handle,capsuleCollider:cast.collider.handle});
+      }
+    }
+    const support=samples.find(p=>Math.hypot(p.x-position.x,p.z-position.z)<1e-6);
+    return {position,sourceDoorId:door.definition.sourceDoorId,doorId:id,hinge:{...hinge},openTip:tip,
+      width,halfThickness:door.halfExtents.z,radius:settings.radius,skin:settings.offset,planningMargin,
+      provenance:'Native open hinge/leaf tip plus unchanged capsule radius/skin and 0.02m planning margin; both edges swept against all active geometry and sampled for actual support',
+      support,supportSamples:samples,reached:false};
+  };
   const plannedChangeClear=(actor,position,id,open)=>{
     const hypothetical=probes(actor).map(p=>p.id===actor.id?{...p,current:position,next:position,skin:(p.skin??settings.offset)+.02}:p);
     return physics.guardChange(id,open,hypothetical,obstacles?.()??[]).allowed;
@@ -196,25 +237,36 @@ export function createDoorInteractionProbe(physics,settings,capsules,obstacles) 
       if(!clearCache.has(index))clearCache.set(index,continuationClear(actor,trail[index].position,target,id,open));
       return clearCache.get(index);
     };
-    for(let i=trail.length-2;i>=0;i--){
-      const candidate=trail[i].position;
-      if(!inRange(candidate,id)||!plannedChangeClear(actor,candidate,id,open))continue;
-      const eye={x:candidate.x,y:candidate.y+SERVER_DOOR_EYE_OFFSET,z:candidate.z};
-      if(!physics.lineOfSight(eye,id,physics.isOpen(id),actor.collider))continue;
-      // The safe handle stance need not have a direct path past the opened
-      // tip. Continue backwards along the SAME visited trail until one does.
-      // Each additional segment must clear the desired leaf before planning it.
-      let resumeIndex=i;
-      while(open&&!clearFrom(resumeIndex)&&resumeIndex>0&&
-        desiredLegClear(actor,trail[resumeIndex].position,trail[resumeIndex-1].position,id,open))resumeIndex--;
-      if(!clearFrom(resumeIndex))continue;
-      // Reuse the measured path in reverse, not a straight shortcut through a
-      // wall. Every waypoint was reached by this same Actor in this session.
-      const points=trail.slice(resumeIndex).reverse().map(p=>({position:{...p.position},visitedAtTick:p.tick}));
-      const changeAfterPoint=trail.length-i;
-      const maneuver={id:maneuvers.length+1,actorId:actor.id,doorId:id,plannedAtTick:tick,
-        reason:'retreat-along-visited-trail-for-safe-'+(open?'open':'close'),requestedOpen:open,originalTarget:{...target},points,changeAfterPoint,completed:false};
-      maneuvers.push(maneuver);leg.retreat={doorId:id,open,points,index:0,changeAfterPoint,changed:false,trailIndex:resumeIndex,maneuver};leg.retreatCount++;return true;
+    // Prefer the already visited route. Only if none can continue past the
+    // desired leaf, consider one source-derived corner from a safe trail pose.
+    for(const withCorner of options.leafTipDetours&&open?[false,true]:[false]){
+      if(withCorner){
+        const prior=leg.cornerPlans.get(id),p=actor.position;
+        if(prior&&(prior.count>=maxAttempts||prior.revision===store.revision&&
+          Math.hypot(p.x-prior.position.x,p.y-prior.position.y,p.z-prior.position.z)<.02&&tick-prior.tick<interval))continue;
+        leg.cornerPlans.set(id,{count:(prior?.count??0)+1,position:{...p},revision:store.revision,tick});
+      }
+      for(let i=trail.length-2;i>=0;i--){
+        const candidate=trail[i].position;
+        if(!inRange(candidate,id)||!plannedChangeClear(actor,candidate,id,open))continue;
+        const eye={x:candidate.x,y:candidate.y+SERVER_DOOR_EYE_OFFSET,z:candidate.z};
+        if(!physics.lineOfSight(eye,id,physics.isOpen(id),actor.collider))continue;
+        // The safe handle stance need not have a direct path past the opened
+        // tip. Continue backwards along the SAME visited trail until one does.
+        // Each additional segment must clear the desired leaf before planning it.
+        let resumeIndex=i;
+        while(!withCorner&&open&&!clearFrom(resumeIndex)&&resumeIndex>0&&
+          desiredLegClear(actor,trail[resumeIndex].position,trail[resumeIndex-1].position,id,open))resumeIndex--;
+        const corner=withCorner?tipCorner(actor,candidate,target,id):null;
+        if(withCorner?!corner:!clearFrom(resumeIndex))continue;
+        // Reuse the measured path in reverse, not a straight shortcut through a
+        // wall. Every waypoint was reached by this same Actor in this session.
+        const points=trail.slice(resumeIndex).reverse().map(p=>({position:{...p.position},visitedAtTick:p.tick}));
+        const changeAfterPoint=trail.length-i;
+        const maneuver={id:maneuvers.length+1,actorId:actor.id,doorId:id,plannedAtTick:tick,
+          reason:'retreat-along-visited-trail-for-safe-'+(open?'open':'close'),requestedOpen:open,originalTarget:{...target},points,changeAfterPoint,corner,completed:false};
+        maneuvers.push(maneuver);leg.retreat={doorId:id,open,points,index:0,changeAfterPoint,changed:false,trailIndex:resumeIndex,maneuver,corner,walked:[]};leg.retreatCount++;return true;
+      }
     }
     return false;
   };
@@ -233,14 +285,14 @@ export function createDoorInteractionProbe(physics,settings,capsules,obstacles) 
     attempts.push(event);leg.attempts.set(key,attempts);
     if(event.result.status==='changed'){leg.changed.add(id);return {wait:true,reason:'door-state-changed'};}
   };
-  return {events,maneuvers,policy:{minimumIntervalFrames:interval,maxAttemptsPerDoorStatePerLeg:maxAttempts,maxAttemptsPerDoorStatePerStance:maxStanceAttempts,stanceDistance,maxStateChangesPerDoorPerLeg:1,maxRetreatsPerLeg:maxRetreats,maxTrailPoints:maxTrail},
+  return {events,maneuvers,policy:{minimumIntervalFrames:interval,maxAttemptsPerDoorStatePerLeg:maxAttempts,maxAttemptsPerDoorStatePerStance:maxStanceAttempts,stanceDistance,maxStateChangesPerDoorPerLeg:1,maxRetreatsPerLeg:maxRetreats,maxTrailPoints:maxTrail,leafTipDetours:options.leafTipDetours===true,maxDerivedCornersPerRetreat:1,maxCornerPlansPerDoorPerLeg:maxAttempts},
     request,advance(){tick++;},
     beforeMove(actor,target,sourceDoorId) {
       if(disposed)throw new Error('Interaction probe disposed');
       if(![actor.position.x,actor.position.y,actor.position.z,target.x,target.z].every(Number.isFinite))throw new Error('Invalid Actor interaction target/pose');
       const key=[actor.id,target.x,target.z,sourceDoorId??''].join('|');
       const newLeg=!leg||leg.key!==key;
-      if(newLeg)leg={key,index:++legIndex,attempts:new Map(),changed:new Set(),retreatCount:0,retreat:null};
+      if(newLeg)leg={key,index:++legIndex,attempts:new Map(),cornerPlans:new Map(),changed:new Set(),retreatCount:0,retreat:null};
       if(trailActor!==actor.id){trail=[];trailActor=actor.id;}
       const p=actor.position;
       if(leg.retreat){
@@ -250,7 +302,7 @@ export function createDoorInteractionProbe(physics,settings,capsules,obstacles) 
         if(retreat.index<stop)return {target:retreat.points[retreat.index].position,reason:'visited-trail-retreat',maneuverId:retreat.maneuver.id};
         // Every state change goes through a real request at the ACTUAL returned
         // position; the hypothetical candidate check above never mutates state.
-        if(!retreat.changed&&desiredLegClear(actor,p,retreat.points[retreat.index]?.position??target,retreat.doorId,retreat.open)){
+        if(!retreat.changed&&desiredLegClear(actor,p,retreat.points[retreat.index]?.position??retreat.corner?.position??target,retreat.doorId,retreat.open)){
           const decision=attempt(actor,retreat.doorId,retreat.open,(retreat.open?'open-blocking-closed':'close-blocking-open')+'-leaf-after-retreat',target);
           if(physics.isOpen(retreat.doorId)===retreat.open){
             retreat.changed=true;retreat.maneuver.changedAtTick=tick;
@@ -259,8 +311,20 @@ export function createDoorInteractionProbe(physics,settings,capsules,obstacles) 
         }
         if(retreat.changed){
           if(retreat.index<retreat.points.length)return {target:retreat.points[retreat.index].position,reason:'visited-trail-retreat',maneuverId:retreat.maneuver.id};
+          if(retreat.corner){
+            const corner=retreat.corner;
+            if(!retreat.walked.length||Math.hypot(p.x-retreat.walked.at(-1).position.x,p.z-retreat.walked.at(-1).position.z)>=.07)
+              retreat.walked.push({tick,position:{...p}});
+            if(retreat.walked.length>maxTrail)retreat.walked.shift();
+            if(Math.hypot(p.x-corner.position.x,p.z-corner.position.z)>=.01)
+              return {target:corner.position,reason:'native-leaf-tip-corner',maneuverId:retreat.maneuver.id};
+            const footError=p.y-settings.radius-settings.halfHeight-settings.offset-corner.support.capsuleFloor;
+            if(!actor.grounded||Math.abs(footError)>.03)return {wait:true,reason:'native-leaf-tip-support'};
+            corner.reached=true;corner.reachedAtTick=tick;corner.actualPosition={...p};corner.footError=footError;
+            retreat.walked.push({tick,position:{...p}});
+          }
           retreat.maneuver.completed=true;retreat.maneuver.finishedAtTick=tick;
-          trail=trail.slice(0,retreat.trailIndex+1);leg.retreat=null;
+          trail=[...trail.slice(0,retreat.trailIndex+1),...retreat.walked].slice(-maxTrail);leg.retreat=null;
         }else {retreat.maneuver.error='Safe '+(retreat.open?'open':'close')+' was rejected at the actual retreat position';leg.retreat=null;}
       }
       if(!trail.length||Math.hypot(p.x-trail.at(-1).position.x,p.y-trail.at(-1).position.y,p.z-trail.at(-1).position.z)>=(newLeg?1e-5:.07)){

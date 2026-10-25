@@ -15,6 +15,7 @@ import sys
 
 import ezdxf
 import numpy as np
+from shapely import set_precision, union_all
 from shapely.geometry import GeometryCollection, LineString, Point, Polygon, box
 from shapely.ops import unary_union
 
@@ -24,6 +25,10 @@ ROOT = Path(__file__).resolve().parents[2]
 FLOORS = ("p01", "n01", "n02", "n03", "n04", "n05", "n06", "n07")
 CAD_ORIGIN = [35.0, 8.0]
 SLAB = .20
+FRAME_SOURCE_GRID = .001
+# Shared Boolean coordinate model, one million times finer than the source
+# wall grid. Both operands use it; rounding only the frame left wall films.
+FRAME_OWNERSHIP_GRID = 1e-9
 HEIGHT_MODEL_ID = "b06-cad2005-half-storey-hypothesis-v1"
 LEVELS = {floor: {"main": (index-1)*3.0, **({"mezzanine": (index-1)*3.0+1.5} if index < 6 else {})}
           for index, floor in enumerate(FLOORS[:-1])}
@@ -867,6 +872,13 @@ def opening_descriptors(floor, data, wall, mezz, doors):
             bridge=geom.oriented_rectangle(a,b,lo,hi,extend=.008)
             item.update({"levelKey":key,"bottom":bottom,"top":top,"depth":round(hi-lo,4),"normalOffset":round((lo+hi)/2,4),
                          "depthBasis":basis,"heightBasis":HEIGHT_BASIS,"ceilingElevation":cap})
+            if kind=='door':
+                # The public rounded values also locate existing interactive
+                # leaves. Preserve them, but never reconstruct structural faces
+                # from them: a 3um residual wall skin can still depth-fight.
+                item['frameReveal']={'low':lo,'high':hi,'sourceEntities':list(item['sourceEntities']),
+                    'measurementBasis':basis,
+                    'basis':'full-precision opening-wall span, measured or explicitly estimated by measurementBasis; same canonical span as the opening cut before descriptor rounding; frame only, leaf pose unchanged'}
             cut=geom.opening_cut(a,b,lo,hi,measured_span=True)
             if kind=="window":
                 jamb=measured_window_jamb(item,data['lines'])
@@ -886,12 +898,17 @@ def opening_descriptors(floor, data, wall, mezz, doors):
     return openings, window_descriptors, duplicates
 
 
-def cut_solid_volumes(solid, cuts, tag, exact=False):
+def cut_solid_volumes(solid, cuts, tag, exact=False, precision=None):
     """Subtract exact bounded volumes while keeping every remaining part closed."""
     shape=Polygon(solid['loops'][0],solid['loops'][1:])
+    if precision is not None:shape=set_precision(shape,precision)
     relevant=[cut for cut in cuts if cut['bottom']<solid['top']-.000001 and cut['top']>solid['bottom']+.000001
               and cut['geometry'].intersection(shape).area>1e-8]
-    if not relevant:return [solid],0.0
+    if not relevant:
+        if precision is None:return [solid],0.0
+        parts=serialize_exact_solids(shape,solid['id']+'-canonical-boundary',solid['role'],solid['bottom'],solid['top'],solid['material'])
+        return [{**solid,**part,'id':solid['id'] if len(parts)==1 else part['id'],
+                 'boundaryPrecisionMetres':precision} for part in parts],0.0
     levels=sorted({solid['bottom'],solid['top']}|{max(solid['bottom'],min(solid['top'],cut[key])) for cut in relevant for key in ('bottom','top')})
     result=[];removed=0.0
     for index,(bottom,top) in enumerate(zip(levels,levels[1:])):
@@ -903,7 +920,7 @@ def cut_solid_volumes(solid, cuts, tag, exact=False):
         serializer=serialize_exact_solids if exact else geom.serialize_solids
         for part in serializer(retained,solid['id']+f'-{tag}-{index}',solid['role'],bottom,top,solid['material']):
             result.append({**solid,**part,'sourceSolidId':solid.get('sourceSolidId',solid['id']),
-                           'volumeCorrection':tag})
+                            'volumeCorrection':tag,**({'boundaryPrecisionMetres':precision} if precision is not None else {})})
     return result,removed
 
 
@@ -997,19 +1014,19 @@ def reserve_structural_sills(floors):
     reserve_structural_volumes(floors,cuts,'sill-volume-owner','crossFloorSillRemovedVolumeM3')
 
 
-def reserve_structural_volumes(floors, cuts, tag, audit_key):
+def reserve_structural_volumes(floors, cuts, tag, audit_key, precision=None):
     """One exact cross-floor ownership subtraction for authored insert volumes."""
     for floor in floors:
         solids=[];removed_total=0.0
         for solid in floor['solids']:
-            parts,removed=cut_solid_volumes(solid,cuts,tag,exact=True) if solid['role'] in ('wall','slab') else ([solid],0.0)
+            parts,removed=cut_solid_volumes(solid,cuts,tag,exact=True,precision=precision) if solid['role'] in ('wall','slab') else ([solid],0.0)
             solids+=parts;removed_total+=removed
         floor['solids']=solids
         floor[audit_key]=round(removed_total,9)
-        if removed_total:room_floor_finishes(floor['rooms'],solids)
+        if removed_total or precision is not None:room_floor_finishes(floor['rooms'],solids)
 
 
-def door_frame_span(door):
+def door_frame_span(door, canonical=True):
     """Use the same measured opening/reveal placement as the unchanged leaf pose."""
     hinge,end=np.asarray(door['hinge'],dtype=float),np.asarray(door['closedEnd'],dtype=float)
     width=float(np.linalg.norm(end-hinge))
@@ -1017,8 +1034,15 @@ def door_frame_span(door):
     if not all(math.isfinite(v) for v in values) or width<.3 or door['top']<=door['bottom']:
         raise ValueError('Invalid source door frame: '+door['id'])
     direction=(end-hinge)/width;normal=np.array([-direction[1],direction[0]])
-    offset=normal*door.get('normalOffset',0)
-    return hinge+offset,end+offset,direction,max(.04,door.get('depth',.13))
+    reveal=door.get('frameReveal') if canonical else None
+    if reveal is not None:
+        low,high=reveal['low'],reveal['high']
+        if not math.isfinite(low+high) or high-low<.04 or high-low>.65:
+            raise ValueError('Invalid canonical source frame reveal: '+door['id'])
+        depth=high-low;offset=normal*((low+high)/2)
+    else:
+        depth=max(.04,door.get('depth',.13));offset=normal*door.get('normalOffset',0)
+    return hinge+offset,end+offset,direction,depth
 
 
 def shared_door_frame_pair(first, second):
@@ -1075,6 +1099,7 @@ def door_frame_profiles(floor):
             direction=(b-a)/np.linalg.norm(b-a);normal=np.array([-direction[1],direction[0]])*depth/2
             profiles.append({'geometry':Polygon([a-normal,b-normal,b+normal,a+normal]),
                 'bottom':bottom,'top':top,'ownerFloor':floor['id'],'sourceDoorIds':source_ids,
+                'axisStart':a,'axisEnd':b,'depth':depth,
                 'sourceEntities':sources,'basis':basis+'; 35mm outer jamb and 45mm header are model dimensions, not measured CAD Z'})
         for door in group:
             a,b,d,depth=door_frame_span(door)
@@ -1084,6 +1109,59 @@ def door_frame_profiles(floor):
     return profiles
 
 
+def conform_frame_profile(profile, structural, shapes, tree, height, occupied=None):
+    """Transfer only a bounded source-noding skin to its adjacent frame profile.
+
+    Later source bridges use the 1mm wall grid. An angled/measured or explicitly
+    estimated reveal can therefore still sit behind a 33-97um wall face. Only
+    a complete connected wall sliver ending inside that grid cell is eligible;
+    a wall continuing through the search limit is retained. Axial jamb/header
+    endpoints never move, so this cannot narrow the source clear opening.
+    The output is the exact existing wall polygon, not an inflated cutter.
+    """
+    a,b=profile['axisStart'],profile['axisEnd'];axis=(b-a)/np.linalg.norm(b-a)
+    normal=np.array([-axis[1],axis[0]]);half=profile['depth']/2;source_grid=FRAME_SOURCE_GRID
+    def parts(geometry):
+        # The source wall inference MIN_AREA deliberately drops tiny CAD noise;
+        # here the microscopic remnant is precisely the geometry being owned.
+        if geometry.geom_type=='Polygon':yield geometry
+        else:
+            for child in getattr(geometry,'geoms',[]):yield from parts(child)
+    additions=[];evidence=[]
+    for sign in (-1,1):
+        offset=normal*half*sign;outward=normal*source_grid*sign
+        inner_edge=set_precision(LineString([a+offset,b+offset]),FRAME_OWNERSHIP_GRID)
+        outer_edge=set_precision(LineString([a+offset+outward,b+offset+outward]),FRAME_OWNERSHIP_GRID)
+        strip=set_precision(Polygon([a+offset,b+offset,b+offset+outward,a+offset+outward]),FRAME_OWNERSHIP_GRID)
+        for index in tree.query(strip):
+            solid=structural[index]
+            if not solid['bottom']<height<solid['top']:continue
+            remaining=shapes[index].intersection(strip)
+            if occupied is not None:remaining=remaining.difference(occupied)
+            for part in parts(remaining):
+                if part.area<=1e-12 or part.distance(inner_edge)>1e-10 or part.distance(outer_edge)<1e-10:continue
+                additions.append(part)
+                delta=max(float(np.dot(np.asarray(point)-a,normal))*sign-half for point in part.exterior.coords)
+                evidence.append({'sourceSolidId':solid['id'],'areaM2':part.area,'maximumNormalDeltaMetres':delta})
+    if not additions:return profile
+    return {**profile,'geometry':union_all([profile['geometry'],*additions],grid_size=FRAME_OWNERSHIP_GRID),
+        'conformance':evidence,
+        'basis':profile['basis']+'; exact bounded final source-grid wall skin transferred to the same frame profile before CSG, no cutter inflation'}
+
+
+def frame_height_levels(profiles, structural, shapes, tree):
+    """Every relevant source volume must be constant throughout a frame band."""
+    levels={p[key] for p in profiles for key in ('bottom','top')}
+    for profile in profiles:
+        # Search only: this buffer never becomes a frame or a structural cut.
+        neighborhood=profile['geometry'].buffer(FRAME_SOURCE_GRID,join_style=2)
+        for index in tree.query(neighborhood):
+            solid=structural[index]
+            bottom=max(profile['bottom'],solid['bottom']);top=min(profile['top'],solid['top'])
+            if bottom<top and shapes[index].intersects(neighborhood):levels.update((bottom,top))
+    return sorted(levels)
+
+
 def reserve_door_frames(floors):
     """Union frame profiles per height band before assigning any solid owner.
 
@@ -1091,16 +1169,25 @@ def reserve_door_frames(floors):
     All source doors keep their original leaf/clear-opening coordinates. The
     same resulting polygons reserve wall/slab volume across every CAD floor.
     """
-    profiles=[p for floor in floors for p in door_frame_profiles(floor)]
+    from shapely.strtree import STRtree
+    profiles=[{**p,'geometry':set_precision(p['geometry'],FRAME_OWNERSHIP_GRID)}
+              for floor in floors for p in door_frame_profiles(floor)]
+    structural=[s for floor in floors for s in floor['solids'] if s['role'] in ('wall','slab')]
+    shapes=[set_precision(Polygon(s['loops'][0],s['loops'][1:]),FRAME_OWNERSHIP_GRID) for s in structural];tree=STRtree(shapes)
     floor_by_id={floor['id']:floor for floor in floors}
     door_by_id={door['id']:door for floor in floors for door in floor['doors']}
     for door in door_by_id.values():
         door['frameOwnership']='recipe-solids';door['frameSolidIds']=[]
-    levels=sorted({p[key] for p in profiles for key in ('bottom','top')})
+    levels=frame_height_levels(profiles,structural,shapes,tree)
     cuts=[]
     for band,(bottom,top) in enumerate(zip(levels,levels[1:])):
         middle=(bottom+top)/2
-        active=[p for p in profiles if p['bottom']<middle<p['top']]
+        raw_active=[p for p in profiles if p['bottom']<middle<p['top']]
+        occupied=unary_union([p['geometry'] for p in raw_active])
+        # Intersecting headers already own their base volumes. Assess the
+        # remaining skin after that simultaneous ownership, not sequentially
+        # against a neighbouring frame's not-yet-subtracted wall volume.
+        active=[conform_frame_profile(p,structural,shapes,tree,middle,occupied) for p in raw_active]
         for index,shape in enumerate(sorted(geom.polygons(unary_union([p['geometry'] for p in active])),key=lambda p:(*p.bounds,p.area))):
             members=[p for p in active if shape.intersection(p['geometry']).area>1e-12]
             owner=min((p['ownerFloor'] for p in members),key=FLOORS.index)
@@ -1109,12 +1196,15 @@ def reserve_door_frames(floors):
             solids=serialize_exact_solids(shape,f'{owner}-source-door-frame-{band}-{index}','door-frame',bottom,top,'frame')
             for solid in solids:
                 solid.update({'sourceDoorIds':ids,'sourceEntities':sources,
-                    'frameBasis':'; '.join(sorted({p['basis'] for p in members})),'ownerFloor':owner})
+                    'frameBasis':'; '.join(sorted({p['basis'] for p in members})),'ownerFloor':owner,
+                    'boundaryPrecisionMetres':FRAME_OWNERSHIP_GRID})
+                conformance=[item for p in members for item in p.get('conformance',[])]
+                if conformance:solid['sourceGridConformance']=conformance
                 floor_by_id[owner]['solids'].append(solid)
                 for identifier in ids:door_by_id[identifier]['frameSolidIds'].append(solid['id'])
             cuts.append({'geometry':shape,'bottom':bottom,'top':top})
     if any(not d['frameSolidIds'] for d in door_by_id.values()):raise ValueError('Missing source door frame owner')
-    reserve_structural_volumes(floors,cuts,'door-frame-volume-owner','crossFloorDoorFrameRemovedVolumeM3')
+    reserve_structural_volumes(floors,cuts,'door-frame-volume-owner','crossFloorDoorFrameRemovedVolumeM3',precision=FRAME_OWNERSHIP_GRID)
 
 
 def surface_triangles(shape):

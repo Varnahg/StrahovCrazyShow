@@ -178,3 +178,44 @@ Finální příkaz `node --import tsx --test --test-reporter tap --test-name-pat
 ### Předání a lifecycle
 
 Všechny vlastní CPU procesy skončily. Fullsuite, build, Blender, GPU, server a hrané snapshoty nebyly spuštěny ani změněny. Závěrečný manifest všech převzatých vlastněných souborů včetně testů a tohoto předání: `.cache/b6-photo-routes-20261024/checkpoint-r4.json`; diff je `changes-r4.patch`. Syntax a scoped diff whitespace check byly ověřeny. Po zápisu manifestu následuje release `b6-routes-interactions-r4`; koordinační root může převzít doložený WIP přes `--adopt-dirty`. Celek modelových tras zůstává partial z výše uvedených důvodů, nikoli Done. Další průzkum tří zbývajících room návratů je oddělen od tohoto předaného bounded mechanismu.
+
+## R5: skutečný obchvat konce otevřeného listu — b6-room-tip-r5
+
+Task rezervován bez `--adopt-dirty`, vlastní soubory byly čisté. Výchozí HEAD `726c957de2eaf234465b3134bf31ea58305b8f85`, větev `codex/b6-photo-refinement-20261024`, stejný cad-building-models worktree. Nové změny pouze `scripts/cad-buildings/rapier_model.mjs`, `verify_room_paths.mjs`, `test_room_paths.mjs`, `test_rapier_model.mjs`, toto předání a vlastní cache. Cizí modelové/geometrické R5/R6 změny nebyly přebírány ani upravovány.
+
+### Doložený mechanismus a varianty
+
+Čtení `revision2/frame-r3/rooms-final-model.json` potvrdilo261/264. Zbývající `n02:144a`, `n04:344a` a `n06:544a` selhaly při vstupu do poslední kabinky (body19/19/20), nikoli až při posledním návratu. Závěrečné kolize jsou zavřený list `1122/102A/1063` a podlaha. Poslední list se legitimně otevřel při vstupní přípravě a zavřel kvůli cestě k ostatnímu vybavení; pozdější opening sweep obsazuje sama postava. Stejná XY definice na N03:244a skutečně prošla, když se předchozí pomocný bod dokončil o několik centimetrů dál od sweepu. Jde o neúplný omezený plán, ne důkaz neprůchodné stavební zdi.
+
+Zpřísnění příjezdu k původnímu pomocnému středu `[0.6345452991,-86.2474931881]` není správná oprava: tento střed je blíž opening sweepu než dosažené bezpečné polohy v pozitivním kontrolním patře. Obecný A* nebo změna modelu/kapsle nejsou potřebné. Zvolen jediný volitelný rohový bod odvozený z nativního závěsu, konce listu v otevřeném stavu, poloviny tloušťky, skutečného radius.25/skin.02 a planning margin.02. Pro původní B6 definici odpovídá CAD `[4.192803,2.349005]`, world přibližně `[0.491143,-85.747244]`; tyto souřadnice nejsou v implementaci hardcoded.
+
+### Chování a refaktoring
+
+`createDoorInteractionProbe` má pátý volitelný argument `{leafTipDetours:true}`, zapnutý pouze room verifierem. Default world/grid volání zůstává bez tohoto plánování. Nejprve se stále hledá proveditelná již prošlá stopa. Teprve pokud neexistuje její pokračování, lze z bezpečného dříve dosaženého stanoviště plánovat jeden bod za koncem listu směrem k původnímu cíli. Obě nové hrany ověřuje full-scene sweep skutečné kapsle v požadovaném dveřním stavu; nic se při query nepřepíná. Podél obou hran jsou nejvýše40segmenty/hranou po max.15cm, každý s rayem i vertical sweepem stejné kapsle. Podpora musí být vodorovná a na stejném skutečném patře do.03m. To je konzervativní pokojový plán, nikoli další controller nebo obecná schodišťová navigace.
+
+Postava nejdříve skutečně dojde po vlastní stopě zpět, shared store ověří dosah/LOS/aktuální+next kapsli/obstacles a provede E-equivalent request. Pak se skutečným běžným inputem dojde k rohu s přesností.01m, grounded a podporou do.03m; až potom může pokračovat na původní povinný bod. Corner nikdy nepředstírá předem navštívený trail: má samostatnou provenienci, vzorky podpory, `reachedAtTick` a skutečnou pozici. Teprve vykonaná cesta k němu vstupuje do trailu pro případný bezpečný návrat/zavření. Původní body, pořadí, návrat, capsule a sourceRoom metadata beze změn.
+
+Desired-state filtr colliderů je sdílený horizontálními/svislými query. Cache kandidátů je lokální nebo omezená na leg; nejvýše8cornerplans/door/leg, minimální odstup opakování na stejném stanovišti16frames, nejvýše1corner/retreat a2retreaty/leg. Trail i nově zaznamenaná vykonaná stopa jsou omezené256body a čistí se s probe. Skutečná chůze stále testuje všechny povrchy, takže pozdější překážka způsobí partial.
+
+### Průběžné ověření
+
+- Nová skutečná dvou-WC fixture s obsazeným opening sweepem: bez opt-in **RED**, očekávané `partial !== pass`, uložené `room-tip-r5-controlled-red.log`; po opravě PASS se všemi původními body/návratem a skutečnou shared request změnou.
+- Nové negativní fixtures: statická stěna v rohu, skutečný výřez podlahy pod rohem a překážka přidaná až po plánování/otevření. Všechny zůstávají partial, bez falešně dosaženého cíle, recovery nebo zmenšení kapsle.
+- Room+Rapier **40/40 PASS** před publikací R6, `tsc --noEmit` exit0. Rozšířené opakování `room-tip-r5-fixtures.log` následně zasáhlo rootovo publikační okno:35CPU testů PASS, dva importy správně odmítnuty guardem `CAD site b06 neodpovídá exportovanému modelu`. Tento běh není přijatá zelená evidence a bude po stabilním exportu zopakován.
+- Actual R6 filtered/full-room evidence a konečné předání budou doplněny po stabilní publikaci. Zatím žádný nový actual-model PASS, fullsuite, build, server, Blender ani GPU důkaz.
+
+### Konečný actual R6 výsledek
+
+Root po dokončení publikace výslovně garantoval stabilní native/runtime vstupy a povolil čtyři filtered CPU průchody, poté všech264. Reporty `room-tip-r5-r6-{144a,344a,544a,244a}.json`: **4/4 jednotlivé tours PASS**,26/26/27/27povinných bodů včetně návratu. Každá ze tří předchozích chyb skutečně použila právě jeden nový corner, kontrolní244a prošla beze změny původní cesty. Shodný aktuální collision SHA `218ae18f9ef1e737b11e5189a6ce4c59f7099a3d91e2f773441dc7642a179cd4`, GLB `6beab84e812adca126051d0a3fd221612b76e3b984a300a972239caadd62d027`.
+
+Finální `.cache/b6-photo-routes-20261024/room-tip-r5-r6-all264.json` + `.log`:
+
+- **tourStatus PASS,264/264**, `actorInteractionsVerified:true`,1940/1940povinných bodů a264/264skutečných návratů.
+-59152běžných WALK frames;373změn dveří z391skutečných shared-store žádostí,18pravdivě evidovaných zamítnutí. Žádný jump/recovery/teleport během tour a žádná změna native modelu či kapsle.
+- Přesně3odvozené dokončené corners:144a/1122 (opening tick453,corner tick461),344a/102A a544a/1063. Zbytková výšková chyba na skutečně dosaženém rohu0.10–1.31mm; celá navazující mandatory trasa včetně návratu prošla.
+- Top-level **status partial** zůstává záměrně kvůli36extra shower centres, které toto měření neověřuje. Jde o264nezávislé pokojové prohlídky od dveří, nikoli jednu souvislou trasu od venkovního vstupu nebo GPU/multiplayer důkaz.
+- Model/GLB i celý sourceManifest byly na začátku/konci ověřeny beze změny. Filtered CLI i all264 mají očekávaný exit2 kvůli poctivému partial jmenovateli, nikoli runtime exception.
+
+Po stabilní publikaci zopakovány lehké room/Rapier/accessibility/world-path fixtures: **83/83 PASS**,5.024s, log `room-tip-r5-fixtures-final.log`. Syntax a scoped diff whitespace check PASS. Strict targeted TypeScript s `--allowJs` nad všemi čtyřmi dotčenými skripty/testy a world-path dependency po posledním refaktoringu **PASS exit0**, log `room-tip-r5-typecheck-final.log`. Předchozí odmítnutý publikační běh zůstává uchovaný, nenahrazuje se zeleným logem.
+
+Všechny vlastní fyzikální i typové procesy skončily, žádný server/GPU/Blender/build/fullsuite nebyl spuštěn. Následuje manifest `checkpoint-room-tip-r5.json` a release `b6-room-tip-r5`; integrátor může převzít tento konkrétní WIP přes `--adopt-dirty`. Root již obdržel actual264výsledek a nezávislé čtecí helper review od weather_sky_fixes. Stav katalogu/integraci provede root.

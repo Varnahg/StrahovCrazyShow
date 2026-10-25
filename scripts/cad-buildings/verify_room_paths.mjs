@@ -121,7 +121,7 @@ export function replayRoomTours(validated,createRuntime) {
         // Explicit setup BETWEEN independent tours. No live Actor is moved or
         // has a door state reset underneath it; the static native scene is reused.
         roomPhysics.applyStates(closedStates);
-        interactions=createDoorInteractionProbe(roomPhysics,settings,sim.doorCapsules.bind(sim),sim.doorObstacles?.bind(sim));
+        interactions=createDoorInteractionProbe(roomPhysics,settings,sim.doorCapsules.bind(sim),sim.doorObstacles?.bind(sim),{leafTipDetours:true});
         row.initialDoorState={mode:'closed-default',allLeavesClosed:true,doors:roomPhysics.size};
         row.doorInteractions=interactions.events;row.interactionManeuvers=interactions.maneuvers;row.interactionPolicy=interactions.policy;
       }

@@ -93,6 +93,7 @@ test('native approach can request from a safe current position before entering t
   const value=interactiveModel(),scene=makeScene(R,value,profileSettings('current'));
   const probe=createDoorInteractionProbe(scene.doorPhysics,scene.settings),actor=scene.walker({x:-1.4,z:0,floor:0});
   try {
+    assert.equal(probe.policy.leafTipDetours,false,'World/grid callers do not opt in to room-only derived corners');
     assert.equal(actor.settle().setupValid,true);
     const approach={x:-.45,z:0,floor:0};
     probe.beforeMove(actor,approach);assert.equal(probe.events.length,0,'grid leg ending before the leaf must not open unrelated doors');
