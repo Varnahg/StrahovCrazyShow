@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-owned-cache-archive",
+  "title": "KEY-61: zachovat ukončené vlastní staging zálohy na D",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/b6-photo-refinement-20261024/revision2/frame-r4/staging/b06-jgxq6v6g/previous-1.glb",
+    ".cache/b6-photo-refinement-20261024/revision2/frame-r3/photo-roofs/staging/b06-vsyeoy6t/previous-1.glb",
+    ".cache/b6-photo-refinement-20261024/revision2/frame-r6/photo-roofs/staging/b06-aix8fbxu/previous-1.glb",
+    ".cache/b6-photo-refinement-20261024/revision2/frame-r4/photo-roofs/staging/b06-hjnnnpbq/previous-1.glb",
+    ".cache/b6-photo-refinement-20261024/revision2/frame-r3/staging/b06-jrni1mip/previous-1.glb",
+    ".cache/b6-photo-refinement-20261024/revision2/staging/b06-qf24mbeb/previous-1.glb",
+    ".cache/b6-photo-refinement-20261024/revision2/staging/b06-abfn2g11/previous-1.glb",
+    ".cache/b6-photo-refinement-20261024/terrain-staging-archive-20261025.json",
+    "docs/agents/handoffs/terrain-20261025-owned-cache-archive.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze sedm přesně uvedených vlastních staging záloh po publikaci state committed. Žádný zdrojový/hraný/frozen build ani jiný soubor.",
+    "Nejprve ověřit publikaci, SHA a skutečné cesty v původní C cache; zkopírovat na D do rezervované bootstrap cache, ověřit byte length a SHA, teprve pak odstranit jednotlivou duplicitní staging kopii na C.",
+    "Bez rekurzivního mazání/přesunu. Zůstává recovery receipt s původní/novou cestou a SHA."
+  ],
+  "verification": [
+    "Každý soubor se shoduje s publication.files[].oldSha256 a ověřenou uloženou D kopií.",
+    "Port2592/PID/snapshot beze změny, Git tracked soubory netknuté; skutečné kapacity před/po."
+  ],
+  "notes": [
+    "Výhradně rootovy vytvořené modelovací staging zálohy minulého dokončeného PR26, nikoli uživatelská data.",
+    "C má méně než90MB a průběžné provozní zápisy pokračují; přesná bezpečná archivace zachová data a umožní malé Git operace. Nové D assety nesmí zatížit C.",
+    "D cíle patří terrain-20261025-bootstrap; tento task se claimuje v původní C cad-building-models kopii, kam bylo vlastnictví explicitně vráceno pro tuto jedinou operaci.",
+    "Přijatá evidence publikovaná v D: docs/verification-evidence/terrain-20261025/cache-archive-handoff.md. Přesun ověřen a původní procesy/claim ukončené; další herní práce je oddělená."
+  ]
+}
