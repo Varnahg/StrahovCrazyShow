@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-commit-split-20261025",
+  "title": "Prepare reviewable disjoint B6 and weather commit file versions",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": [".cache/b6-commit-split-20261025/", "docs/agents/handoffs/b6-commit-split-20261025.md"],
+  "acceptance": ["Prepare B6-only versions of genuinely shared integration files from the current owned WIP and HEAD without modifying the live checkout or Git index.", "B6 version retains closed authoritative doors, native geometry, replay and appropriate fixtures; weather implementation and its controls/fixtures remain a separate complete follow-up.", "Exact file versions and diff must be inspectable; root validates staged snapshot and performs commits."],
+  "verification": ["Syntax/type/source dependency checks within scope; no full build/suite/GPU/server or Git mutation."],
+  "notes": ["Explicit root delegation to honor separate verified commits. Preserve all WIP. New intermediate cache files are review artifacts, not published source."]
+}

@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "id": "b06-front-conifer-photo-ipr-20261024",
+  "treeId": "ipr-b6-north-conifer",
+  "cadBuildingOsmId": "53929071",
+  "position": { "x": -10.5, "z": -76.5 },
+  "positionUncertaintyMetres": 2,
+  "classification": "source-interpreted-crown-location-not-surveyed-trunk",
+  "originalPosition": { "x": -10.317, "z": -94.077 },
+  "reason": "Original manually annotated pixel581,325 is on asphalt north of the entrance. IPR2023 crown and the B6 front photograph place the conifer beside the entrance annex about17.6m farther south. All placement filters remain active.",
+  "source": {
+    "orthophoto": {
+      "path": "docs/streets/strahov-ortho-2024.jpg",
+      "georeference": "docs/streets/ortho-georeference.json",
+      "sha256": "7db01f50b15dcb55fb12271406608bb847ca8e73411952957612373e0b849473",
+      "captureDate": "2024-06-08",
+      "candidatePixel": [580.266474, 395.582553],
+      "originalPixel": [581, 325]
+    },
+    "entryOrthophoto": {
+      "path": "docs/reality-pack/facade-study/b6-entry-ortho-2024.jpg",
+      "georeference": "docs/reality-pack/facade-study/b6-entry-path-audit.json",
+      "sha256": "18b6c25987930149d0338aeef5701f1faa98797f3c730f53d319e60d8d584fe2",
+      "candidatePixel": [263.5, 305]
+    },
+    "userPhotograph": {
+      "id": "user-b6-front-20261024",
+      "sha256": "748bacdcf689e1ab8706ef9048505e85ef9acd71628c1e340e5a27cd0134366c",
+      "captureDate": "unknown",
+      "identity": "B6 front facade and entrance conifer; B2 photograph is not used as B6 location evidence"
+    },
+    "ipr2023": {
+      "manifestPath": "shared/data/photogrammetry.json",
+      "captureDate": "summer 2023",
+      "nodes": ["1127463", "1127464", "1127471", "1127472"],
+      "geometrySha256": [
+        "489b11c90998f68002ff98e8629291c9b497899625151d59556b127b1a612ce9",
+        "76a82383172f4e4b53ca9450c982f3eb03ce45e237a8f7dc2e787758dca925ef",
+        "9ffe4985fc437b61bb07e1b603587edbe0335597f55e127dea9a70cb12c6ff3e",
+        "cbdd018bfd3c2dcc164a0b7828472ddc9e04f0e3748b04fe55fda5c13eae595d"
+      ],
+      "crownBandWorldY": [5, 11],
+      "crownBandBoundsXZ": [-12.564, -78.193, -8.752, -74.864],
+      "crownBandMedianXYZ": [-9.855, 8.503, -75.851],
+      "method": "Hash-verified original L16 geometry, original top-down JPEG UV sampling; green vertices in a local entrance ROI. The root is obscured by crown/building shadow, so location is interpretation, not a surveyed stem. An isolated19.466m vertex is not used to resize the tree."
+    }
+  },
+  "placementChecks": {
+    "oldStreetSurface": "asphalt",
+    "oldNearestFootwayId": "25920440",
+    "oldFootwayCentreDistanceMetres": 0.898784,
+    "newStreetSurface": null,
+    "newClassifierAllowed": true,
+    "newPavementEdgeDistanceMetres": 2.151325,
+    "newCadFootprintDistanceMetres": 2.545682
+  },
+  "assetReuse": {
+    "runtimeManifest": "public/models/vegetation/runtime/manifest.json",
+    "sameTreeIdAllLods": true,
+    "vertexCoordinateSpace": "tree-local-metres; discard old glTF node translation before parenting to the current shared placement",
+    "heightEstimateMetres": 12,
+    "crownDiameterEstimateMetres": 6.5,
+    "regenerated": false
+  }
+}

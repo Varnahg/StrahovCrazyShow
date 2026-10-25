@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-v14-prediction-fixtures-20261025",
+  "title": "Update real Game prediction fixtures for authoritative door history",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": ["tests/client-recovery.test.ts", "tests/game-interpolation.test.ts", "tests/prediction-replay.test.ts", "tests/helpers/prediction-replay-fixture.ts", "tests/recovery-physics.test.ts", ".cache/b6-v14-prediction-fixtures-20261025/", "docs/agents/handoffs/b6-v14-prediction-fixtures-20261025.md"],
+  "acceptance": ["Supply the actual initialized V14 door timeline, identity and authority contract to partial Game fixtures without weakening replay, recovery, interpolation or physics assertions.", "Preserve baseline ignored door poses when checking actor collider cleanup; runtime changes require root coordination."],
+  "verification": ["Run targeted affected tests through node --import tsx, refactor repeated fixture setup and hand off exact results."],
+  "notes": ["Root delegated after full snapshot suite exposed 31 fixture failures. No recursive BMAD or full suite/GPU/server work."]
+}

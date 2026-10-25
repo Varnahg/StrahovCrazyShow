@@ -3,6 +3,53 @@ export const STRAHOV_LOCATION = { latitude: 50.08065, longitude: 14.39175 };
 const RAD = Math.PI / 180;
 export type PrecipitationType =
   "none" | "rain" | "snow" | "mixed" | "freezing-rain" | "hail" | "unknown";
+export const WMO_CONDITIONS = {
+  0: "clear",
+  1: "mainly-clear",
+  2: "partly-cloudy",
+  3: "overcast",
+  45: "fog",
+  48: "rime-fog",
+  51: "drizzle",
+  53: "drizzle",
+  55: "drizzle",
+  56: "freezing-drizzle",
+  57: "freezing-drizzle",
+  61: "rain",
+  63: "rain",
+  65: "rain",
+  66: "freezing-rain",
+  67: "freezing-rain",
+  71: "snow",
+  73: "snow",
+  75: "snow",
+  77: "snow-grains",
+  80: "rain-showers",
+  81: "rain-showers",
+  82: "rain-showers",
+  85: "snow-showers",
+  86: "snow-showers",
+  95: "thunderstorm",
+  97: "thunderstorm",
+  96: "thunderstorm-hail",
+  99: "thunderstorm-hail",
+} as const;
+export type WeatherCondition =
+  (typeof WMO_CONDITIONS)[keyof typeof WMO_CONDITIONS] | "unknown";
+/** Open-Meteo's documented WMO subset; unknown codes never mean clear weather. */
+export function weatherConditionFromCode(
+  code: number | undefined,
+): WeatherCondition {
+  return code !== undefined && Object.hasOwn(WMO_CONDITIONS, code)
+    ? WMO_CONDITIONS[code as keyof typeof WMO_CONDITIONS]
+    : "unknown";
+}
+export type StationReading = {
+  label: string;
+  /** Sanitized published text including units/time; not reclassified as a sensor. */
+  value: string;
+  kind: "surface" | "derived" | "daily" | "indoor";
+};
 export type WeatherFieldSource = {
   kind: "station" | "model";
   source: string;
@@ -16,17 +63,32 @@ export type WeatherSupplement =
   | "visibility"
   | "snowfall"
   | "liquidPrecipitation"
-  | "precipitationType";
+  | "precipitationType"
+  | "weatherCode"
+  | "dewPoint"
+  | "pressure"
+  | "solarRadiation"
+  | "rainToday"
+  | "stationReadings";
+/** A bounded clock skew is allowed; missing/nonfinite/future times cannot
+ * compete with a real historical snapshot during cache arbitration. */
+export function isWeatherTimeAdmissible(
+  observedAt: number | null | undefined,
+  now: number,
+): observedAt is number {
+  return (
+    observedAt != null && Number.isFinite(observedAt) &&
+    Number.isFinite(now) && observedAt <= now + 5 * 60000
+  );
+}
 export function isWeatherStale(
   observedAt: number | null | undefined,
   kind: "station" | "model",
   now: number,
 ) {
   return (
-    observedAt == null ||
-    !Number.isFinite(observedAt) ||
-    now - observedAt > (kind === "station" ? 30 : 60) * 60000 ||
-    observedAt > now + 5 * 60000
+    !isWeatherTimeAdmissible(observedAt, now) ||
+    now - observedAt > (kind === "station" ? 30 : 60) * 60000
   );
 }
 export type Weather = {
@@ -56,6 +118,23 @@ export type Weather = {
   cloudWindSource?: string;
   windGust?: number;
   humidity?: number;
+  dewPoint?: number;
+  pressure?: number;
+  solarRadiation?: number;
+  rainToday?: number;
+  /** Entire published station table; daily maxima are never current gusts. */
+  stationReadings?: StationReading[];
+  stationForecastIcon?: string;
+  /** Published astronomical calculation, not a meteorological sensor. Its UTC
+   * belongs to the station page, never to a renderer's time-preview override. */
+  stationAstronomy?: {
+    publishedAt: number;
+    source: string;
+    kind: "calculation";
+    moonPhaseLabel: string;
+    illuminatedPercent?: number;
+    waxing?: boolean;
+  };
   visibility?: number;
   /** Model snowfall intensity, cm/h. A station rain gauge is not a snow sensor. */
   snowfall?: number;
@@ -63,6 +142,10 @@ export type Weather = {
   liquidPrecipitation?: number;
   /** Model phase estimate, never inferred only from ground-level temperature. */
   precipitationType?: PrecipitationType;
+  /** Model WMO condition, including fog/thunder; never a station observation. */
+  weatherCode?: number;
+  /** Render-only scenario. Keep the real snapshot/cache separately. */
+  preview?: { id: string; label: string };
   fieldSources?: Partial<Record<WeatherSupplement, WeatherFieldSource>>;
 };
 /** The browser must age retained data even when it can no longer reach the server.
@@ -209,15 +292,48 @@ export function parseStation(html: string, now = Date.now()): Weather {
   const decoded = html
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
     .replaceAll("&nbsp;", " ");
-  const rows = [...decoded.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((m) =>
-    m[1].replace(/<[^>]*>/g, " ").replace(/\s+/g, " "),
+  const text = (value: string) =>
+    value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  type Section = "outdoor" | "indoor";
+  const headings = [...decoded.matchAll(/<(h[1-6]|strong|b)\b[^>]*>([\s\S]*?)<\/\1>/gi)].flatMap(match => {
+    const label = text(match[2]).toLowerCase();
+    const section: Section | null = label === "serverovna" ? "indoor" : label === "aktuální podmínky" ? "outdoor" : null;
+    return section ? [{ index: match.index!, section }] : [];
+  });
+  let section: Section = "outdoor";
+  let headingIndex = 0;
+  // The real wview page has nested tables and a daily-rain row without <tr>.
+  // Keep each leaf cell's published section: the server-room temperature must
+  // never become an outdoor reading when the outdoor sensor row is missing.
+  const cells = [
+    ...decoded.matchAll(/<td\b[^>]*>((?:(?!<td\b)[\s\S])*?)<\/td>/gi),
+  ].map(match => {
+    while (headingIndex < headings.length && headings[headingIndex].index < match.index!) {
+      section = headings[headingIndex++].section;
+    }
+    return { text: text(match[1]), section };
+  });
+  const rows = cells.flatMap((cell, index) =>
+    cell.text.endsWith(":") && cells[index + 1]?.text && cells[index + 1].section === cell.section
+      ? [{ label: cell.text, value: cells[index + 1].text, section: cell.section }]
+      : [],
   );
+  const outdoorValues = new Map<string, string | undefined>();
+  for (const row of rows) {
+    if (row.section === "outdoor")
+      outdoorValues.set(row.label, outdoorValues.has(row.label) ? undefined : row.value);
+  }
+  // Repeated outdoor labels are ambiguous, not a reason to choose by order.
+  const value = (label: string) => outdoorValues.get(label);
   const read = (label: string) => {
-    const row = rows.find((r) => r.includes(label));
-    const match = row
-      ?.slice(row.indexOf(label) + label.length)
-      .match(/(-?\d+(?:[.,]\d+)?)/);
+    const match = value(label)?.match(/(-?\d+(?:[.,]\d+)?)/);
     return match ? Number(match[1].replace(",", ".")) : null;
+  };
+  const optional = (label: string, min: number, max: number) => {
+    const number = read(label);
+    return number !== null && number >= min && number <= max
+      ? number
+      : undefined;
   };
   const stamp = decoded.match(/\b(20\d\d-\d\d-\d\d) (\d\d:\d\d:\d\d)\b/);
   const observedAt = stamp
@@ -239,11 +355,14 @@ export function parseStation(html: string, now = Date.now()): Weather {
     rain > 500
   )
     throw new Error("Stanice neobsahuje čitelné měření a čas.");
+  const stationForecastIcon = decoded.match(/\bfc-icon-([a-z0-9-]+)/i)?.[1];
   const cloud = decoded.includes("fc-icon-partlycloudy")
     ? 0.45
     : decoded.includes("fc-icon-cloudy")
       ? 0.9
-      : 0.2;
+      : decoded.includes("fc-icon-sunny")
+        ? 0.2
+        : 0.4;
   const compass = [
     "N",
     "NNE",
@@ -262,22 +381,36 @@ export function parseStation(html: string, now = Date.now()): Weather {
     "NW",
     "NNW",
   ];
-  const windRow =
-    rows
-      .find((r) => r.includes("Charakter větru:"))
-      ?.split("Charakter větru:")[1] || "";
+  const windRow = value("Charakter větru:") ?? "";
   const direction = windRow.match(
     /\b(NNE|ENE|ESE|SSE|SSW|WSW|WNW|NNW|NE|SE|SW|NW|N|E|S|W)\b/,
   )?.[1];
   if (wind > 0 && !direction)
     throw new Error("Stanice neobsahuje čitelný směr větru.");
-  const stale = isWeatherStale(observedAt, "station", now),
-    rawHumidity = read("Relativní vlhkost:"),
-    humidity =
-      rawHumidity !== null && rawHumidity >= 0 && rawHumidity <= 100
-        ? rawHumidity
-        : undefined;
-  return {
+  const stale = isWeatherStale(observedAt, "station", now);
+  const moonPhaseLabel = decoded
+    .match(/Fáze měsíce:\s*([^<\r\n]+)/i)?.[1]
+    .trim();
+  const moonPercent = Number(
+    moonPhaseLabel?.match(/(\d+(?:[.,]\d+)?)\s*%/)?.[1].replace(",", "."),
+  );
+  const stationReadings: StationReading[] = rows.map(({ label, value, section }) => ({
+    label,
+    value,
+    kind:
+      section === "indoor"
+        ? "indoor"
+        : /\((?:maximum|minimum)\)|Dnešní|Dnes vál|Nejvyšší|Storm Total/.test(
+              label,
+            )
+          ? "daily"
+          : /Wind Chill|Heat Index|Rosný bod|Hustota|Základna|Výpar|Odhad/.test(
+                label,
+              )
+            ? "derived"
+            : "surface",
+  }));
+  const weather: Weather = {
     temperature,
     wind,
     windDirection: direction ? compass.indexOf(direction) * 22.5 : 0,
@@ -292,20 +425,52 @@ export function parseStation(html: string, now = Date.now()): Weather {
     cloudSource: "Orientační ikona předpovědi stanice",
     stale,
     status: stale ? "fallback" : "live",
-    humidity,
-    fieldSources:
-      humidity === undefined
-        ? {}
-        : {
-            humidity: {
-              kind: "station",
-              source: "Meteostanice Silicon Hill",
-              observedAt,
-              stale,
-            },
-          },
+    humidity: optional("Relativní vlhkost:", 0, 100),
+    dewPoint: optional("Rosný bod:", -100, 65),
+    pressure: optional("Tlak vzduchu:", 800, 1150),
+    solarRadiation: optional("Intenzita slunečního záření:", 0, 1600),
+    rainToday: optional("Dnešní srážky:", 0, 2000),
+    stationReadings,
+    stationForecastIcon,
+    stationAstronomy: moonPhaseLabel
+      ? {
+          publishedAt: observedAt,
+          source:
+            "Meteostanice Silicon Hill · publikovaný astronomický výpočet",
+          kind: "calculation",
+          moonPhaseLabel,
+          illuminatedPercent:
+            Number.isFinite(moonPercent) &&
+            moonPercent >= 0 &&
+            moonPercent <= 100
+              ? moonPercent
+              : undefined,
+          waxing: /Dorůstá/i.test(moonPhaseLabel)
+            ? true
+            : /Ubývá/i.test(moonPhaseLabel)
+              ? false
+              : undefined,
+        }
+      : undefined,
+    fieldSources: {},
     cloudObservedAt: null,
     cloudStale: true,
     cloudWindSource: "Povrchový vítr stanice · přibližný drift mraků",
   };
+  for (const field of [
+    "humidity",
+    "dewPoint",
+    "pressure",
+    "solarRadiation",
+    "rainToday",
+    "stationReadings",
+  ] as const)
+    if (weather[field] !== undefined)
+      weather.fieldSources![field] = {
+        kind: "station",
+        source: "Meteostanice Silicon Hill",
+        observedAt,
+        stale,
+      };
+  return weather;
 }

@@ -1,6 +1,7 @@
 import { MaterialPluginBase } from "@babylonjs/core/Materials/materialPluginBase";
 import { ShaderLanguage } from "@babylonjs/core/Materials/shaderLanguage";
 import { ColorCurves } from "@babylonjs/core/Materials/colorCurves";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import type { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import type { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 import type { ImageProcessingConfiguration } from "@babylonjs/core/Materials/imageProcessingConfiguration";
@@ -150,6 +151,83 @@ export function campusExposure(daylight: number) {
   );
   // Keep practical room lights warm and readable without a magical night sun.
   return 1.08 + (1 - day) * 0.1;
+}
+
+const BLOOM_KNEE = 0.08;
+const BLOOM_DEFINE = "CAMPUS_BLOOM_SOFT_KNEE_V1";
+let bloomExtractionOwner = 0;
+
+/** Brightness response, not a change to exposure or render-target sizes.
+ * Threshold is the already gamma-converted value bound by Babylon's extractor. */
+export function campusBloomExtractionWeight(
+  luminance: number,
+  threshold: number,
+) {
+  const shoulder = Math.min(
+    2 * BLOOM_KNEE,
+    Math.max(0, luminance - threshold + BLOOM_KNEE),
+  );
+  const excess = Math.max(
+    luminance - threshold,
+    (shoulder * shoulder) / (4 * BLOOM_KNEE),
+  );
+  return excess / Math.max(luminance, 0.0001);
+}
+
+/** Apply only to the pin-9.30 extraction expression, after native includes.
+ * Keep the original colour sampling, luminance/exposure and alpha intact. */
+export function softenCampusBloomShader(shaderType: string, code: string) {
+  if (shaderType !== "fragment") return code;
+  const expression = /step\(\s*((?:uniforms\.)?threshold)\s*,\s*luma\s*\)/g;
+  const matches = [...code.matchAll(expression)];
+  const marker = "#define CUSTOM_FRAGMENT_DEFINITIONS";
+  if (matches.length !== 1 || !code.includes(marker))
+    throw new Error(
+      "Babylon bloom extraction source differs from the verified 9.30 recipe.",
+    );
+  const wgsl = matches[0][1].startsWith("uniforms.");
+  const response = wgsl
+    ? `fn campusBloomWeight(luminance: f32, cutoff: f32) -> f32 {
+  let shoulder = clamp(luminance - cutoff + ${BLOOM_KNEE}, 0.0, ${2 * BLOOM_KNEE});
+  let excess = max(luminance - cutoff, shoulder * shoulder / ${4 * BLOOM_KNEE});
+  return excess / max(luminance, 0.0001);
+}`
+    : `float campusBloomWeight(float luminance, float cutoff) {
+  float shoulder = clamp(luminance - cutoff + ${BLOOM_KNEE}, 0.0, ${2 * BLOOM_KNEE});
+  float excess = max(luminance - cutoff, shoulder * shoulder / ${4 * BLOOM_KNEE});
+  return excess / max(luminance, 0.0001);
+}`;
+  return code
+    .replace(marker, `${marker}\n${response}`)
+    .replace(
+      expression,
+      (_match, threshold: string) => `campusBloomWeight(luma,${threshold})`,
+    );
+}
+
+/** Register before pipeline.prepare(). A unique public name confines the hook
+ * to this owned pass; the stable define separates its Effect cache from the
+ * untouched stock extractor without adding one shader variant per owner. */
+export function installCampusBloomExtraction(post: PostProcess) {
+  const name = `campus bloom highlights ${++bloomExtractionOwner}`;
+  post.name = name;
+  PostProcess.RegisterShaderCodeProcessing(name, {
+    defineCustomBindings: (_name, defines) =>
+      defines?.includes(BLOOM_DEFINE)
+        ? defines
+        : `${defines ?? ""}\n#define ${BLOOM_DEFINE}`,
+    processCodeAfterIncludes: (_name, shaderType, code) =>
+      softenCampusBloomShader(shaderType, code),
+  });
+  let disposed = false;
+  const remove = () => {
+    if (disposed) return;
+    disposed = true;
+    PostProcess.RegisterShaderCodeProcessing(name);
+    post.onDisposeObservable.remove(observer);
+  };
+  const observer = post.onDisposeObservable.addOnce(remove);
+  return remove;
 }
 
 const DEFINITIONS = `

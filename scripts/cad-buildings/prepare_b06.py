@@ -15,6 +15,7 @@ import sys
 
 import ezdxf
 import numpy as np
+from shapely import set_precision, union_all
 from shapely.geometry import GeometryCollection, LineString, Point, Polygon, box
 from shapely.ops import unary_union
 
@@ -24,6 +25,10 @@ ROOT = Path(__file__).resolve().parents[2]
 FLOORS = ("p01", "n01", "n02", "n03", "n04", "n05", "n06", "n07")
 CAD_ORIGIN = [35.0, 8.0]
 SLAB = .20
+FRAME_SOURCE_GRID = .001
+# Shared Boolean coordinate model, one million times finer than the source
+# wall grid. Both operands use it; rounding only the frame left wall films.
+FRAME_OWNERSHIP_GRID = 1e-9
 HEIGHT_MODEL_ID = "b06-cad2005-half-storey-hypothesis-v1"
 LEVELS = {floor: {"main": (index-1)*3.0, **({"mezzanine": (index-1)*3.0+1.5} if index < 6 else {})}
           for index, floor in enumerate(FLOORS[:-1])}
@@ -52,6 +57,13 @@ ENTRY_LOWER = -.60
 RETAINING_PANEL_TOP = -1.05
 ENTRY_CANOPY_TOP = 3.7540823
 EAST_TERRACE_TOP = 1.0187223
+B6_PHOTO_ORIGIN_Y = .6962777093118497
+REAR_IPR_MANIFEST_SHA256 = "d556d38d5c32d9d039479e492d7937e2c358df90cf94f7aee232f5e1ba330d93"
+REAR_MID_WORLD = .320
+REAR_FOOT_WORLD = -1.0655
+REAR_STAIR_WIDTH = 1.50
+REAR_STAIR_POINTS = ((62.29399,21.69625),(59.82771,20.15845),(59.27177,19.81181),(57.19903,18.51939))
+REAR_SOURCE_TRIANGLES = ["1127328:"+str(i) for i in (1537,805,1017,251,12,404,233,30,1402,1515,1549,240,377)]
 S201_COVER_TOP = -2.29627770931185
 TERRACE_GRAPHICS = {"D82","D83","D85","D8A","D8B","D8C","D90","F63","4DCF"}
 CORNER_PAIRS = {
@@ -63,6 +75,124 @@ CORNER_PAIRS = {
     "n05": [("798","915",.65),("3CF","27E",.65),("26F","27E",.45)],
     "n06": [("78A","907",.65),("3C9","278",.65),("269","278",.45)],
 }
+USER_ROOM_PHOTO_SHA256 = "a689950942d17ec2ebff17d77cbf45abe2df850aa73381d83ed0fb1963ca90e9"
+USER_CORRIDOR_PHOTO_SHA256 = "79edd7ae4f162235d7f31ffd4769893122d2c38c99755caff3b2da81b89a3bec"
+USER_BATHROOM_PHOTO_SHA256 = "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126"
+
+
+def room_usage(floor, room):
+    """Classify source rooms, never the obsolete schematic room inventory."""
+    identifier=room["id"]
+    if floor=="p01" and identifier in {"s191a","s191b","s191c","s192","s193"}:
+        return "corridor", "source circulation polygon and connected basement portals"
+    if floor not in FLOORS[1:7]:
+        return "other", "source room retained; no evidenced residential or sanitary use assigned"
+    prefix="" if floor=="n01" else str(int(floor[1:])-1)
+    groups=({"bathroom":{"54b","31b"},"wc":{"54a","54c","31a","31"},
+             "corridor":{"54","31c","91","92","93"}} if floor=="n01" else
+            {"bathroom":{prefix+"44b",prefix+"21b"},
+             "wc":{prefix+suffix for suffix in ("44a","44c","21a","21c")},
+             "corridor":{prefix+suffix for suffix in ("44","21","91","92","93")}})
+    for usage,ids in groups.items():
+        if identifier in ids:
+            return usage, ("source sanitary polygon and actual 2-ZARIZENI symbols" if usage!="corridor" else
+                           "source main/hygiene circulation or stair-core polygon and connected portals")
+    numbers=set(range(11,30))|set(range(34,53)) if floor=="n01" else set(range(1,20))|set(range(24,43))
+    number=int(identifier) if identifier.isdigit() else -1
+    xmin,ymin,xmax,ymax=room["geometry"].bounds
+    in_row=(19.9<xmin and xmax<67.5 and .3<ymin<.5 and 6.3<ymax<6.5) or (
+            2.4<xmin and xmax<50 and 10.3<ymin<10.4 and 16.1<ymax<16.3)
+    if number-(0 if floor=="n01" else int(prefix)*100) in numbers and in_row and 2.2<xmax-xmin<2.55 and 5.7<ymax-ymin<6.1:
+        return "bedroom", "source numbered residential row, corridor doorway and facade window; use interpreted with user B6 room/corridor photos, not an occupancy survey"
+    return "other", "source room retained; sink alone, room number or annex location does not establish its use"
+
+
+def source_equipment(document):
+    result=[]
+    for entity in document.modelspace():
+        if entity.dxf.layer!="2-ZARIZENI":continue
+        points=([geom.xy(v) for v in entity.points_in_wcs()] if entity.dxftype()=="POLYLINE" else
+                [geom.xy(entity.dxf.start),geom.xy(entity.dxf.end)] if entity.dxftype()=="LINE" else [])
+        if len(points)>1:result.append((entity.dxf.handle,LineString(points)))
+    return result
+
+
+def sanitary_fixture_kind(width, depth):
+    """Exact B6 drafting-symbol extents, checked against the source drawings."""
+    signatures={"basin":(.60,.45),"toilet":(.352,.50),"urinal":(.3473,.2565),
+                "shower":(.72335,.80),"service-sink":(.55,.40)}
+    for kind,(across,along) in signatures.items():
+        for axis,(x,y) in enumerate(((across,along),(along,across))):
+            if abs(width-x)<.003 and abs(depth-y)<.003:return kind,axis,across,along
+    return None
+
+
+def sanitary_fixtures(room, equipment):
+    selected=[(identifier,shape) for identifier,shape in equipment if room["geometry"].buffer(.002).covers(shape.centroid)]
+    if not selected:return []
+    # Only join strokes of an actual symbol; adjacent sanitary fittings are
+    # separated by more than this 64mm total gap in the supplied drawing.
+    groups=unary_union([shape.buffer(.032) for _,shape in selected])
+    result=[]
+    for group in geom.polygons(groups):
+        members=[(identifier,shape) for identifier,shape in selected if group.covers(shape)]
+        if not members:continue
+        outline=unary_union([shape for _,shape in members]);xmin,ymin,xmax,ymax=outline.bounds
+        if max(xmax-xmin,ymax-ymin)<.18:continue # detached tap/drain details
+        signature=sanitary_fixture_kind(xmax-xmin,ymax-ymin)
+        if signature is None:
+            raise ValueError(f"Unknown B6 sanitary symbol in {room['id']}: {outline.bounds}")
+        kind,axis,_,_=signature;centre=np.array([(xmin+xmax)/2,(ymin+ymax)/2])
+        facing=np.zeros(2);depth_axis=1-axis
+        facing[depth_axis]=1 if room["geometry"].centroid.coords[0][depth_axis]>centre[depth_axis] else -1
+        size=[ymax-ymin,xmax-xmin] if axis else [xmax-xmin,ymax-ymin]
+        result.append({"kind":kind,"centerCad":geom.coords([centre])[0],"boundsCad":[round(v,6) for v in outline.bounds],
+            "size":[round(v,6) for v in size],"facingCad":geom.coords([facing])[0],
+            "sourceEntities":sorted(identifier for identifier,_ in members),
+            "sourceBasis":"measured 2-ZARIZENI symbol footprint; facing follows its depth axis away from the backing side into the source room; vertical dimensions are not CAD measurements"})
+    return sorted(result,key=lambda item:(item["centerCad"][0],item["centerCad"][1],item["kind"]))
+
+
+def annotate_room_usage(data, floor, equipment=()):
+    for room in data["rooms"]:
+        usage,basis=room_usage(floor,room)
+        room.update({"usage":usage,"sourceBasis":basis,"usageBasis":basis,
+                     "usageSourceEntities":[room["sourceEntity"]]})
+        if usage in ("bathroom","wc"):
+            fixtures=sanitary_fixtures(room,equipment)
+            room["sanitaryFixtures"]=fixtures
+            room["usageSourceEntities"]+=sorted({identifier for item in fixtures for identifier in item["sourceEntities"]})
+        elif usage=="bedroom":room["usagePhotoSha256"]=[USER_ROOM_PHOTO_SHA256,USER_CORRIDOR_PHOTO_SHA256]
+
+
+def door_swing_degrees(door):
+    closed=np.asarray(door["closedEnd"])-door["hinge"];opened=np.asarray(door["openEnd"])-door["hinge"]
+    return math.degrees(math.acos(float(np.clip(np.dot(closed,opened)/(np.linalg.norm(closed)*np.linalg.norm(opened)),-1,1))))
+
+
+def annotate_bedroom_door_pairs(data, doors):
+    corridors=geom.union([room["geometry"] for room in data["rooms"] if room.get("usage")=="corridor"])
+    for room in data["rooms"]:
+        if room.get("usage")!="bedroom":continue
+        candidates=[]
+        for door in doors:
+            a,b=np.asarray(door["hinge"]),np.asarray(door["closedEnd"]);mid=(a+b)/2
+            direction=(b-a)/np.linalg.norm(b-a);normal=np.array([-direction[1],direction[0]])
+            sides=[Point(mid+.3*sign*normal) for sign in (-1,1)]
+            if any(room["geometry"].covers(sides[i]) and corridors.covers(sides[1-i]) for i in (0,1)):
+                candidates.append(door)
+        if len(candidates)!=2:raise ValueError(f"Bedroom {room['id']} no longer has its two source corridor leaves")
+        first,second=candidates
+        if np.linalg.norm(np.asarray(first["closedEnd"])-second["closedEnd"])>.002:
+            raise ValueError(f"Bedroom {room['id']} leaf endpoints do not form one door")
+        passive,active=sorted(candidates,key=door_swing_degrees)
+        if not 20<door_swing_degrees(passive)<35 or not 85<door_swing_degrees(active)<95:
+            raise ValueError(f"Ambiguous active bedroom leaf {room['id']}")
+        for door,other,role in [(active,passive,"active"),(passive,active,"fixed")]:
+            door.update({"roomId":room["id"],"roomSourceEntity":room["sourceEntity"],"pairedDoorId":other["id"],
+                "pairedDoorRole":role,"sourceSwingDegrees":round(door_swing_degrees(door),6),
+                "doorPairBasis":"actual common closed endpoint and opposite source hinges; user 2026-10-24 confirms one opening leaf for corridor bedrooms only; the 90-degree source leaf stays active, the 26.565-degree leaf stays closed"})
+        passive["openingClassification"]="fixed-paired-door-leaf"
 
 
 def dependencies():
@@ -123,6 +253,7 @@ def read_sources(source):
     for floor, path in source_files(source).items():
         drawing = geom.read_floor(path)
         drawing["scale"] = measure_scale(path)
+        annotate_room_usage(drawing,floor,source_equipment(ezdxf.readfile(path,encoding="cp1250")))
         result[floor] = drawing
     document=ezdxf.readfile(source_files(source)["n07"],encoding="cp1250")
     outlines=[]
@@ -312,10 +443,58 @@ def exterior_metadata(data, doors):
         "upperLevelKey": high_key, "segments": [segment], "landings": surfaces, "terrainValidationPending": True,
         "sourceDoorIds": [door["id"] for door in portals], "verticalBasis": segment["verticalBasis"]}
     cut = geom.union([lower, upper, Polygon([edges[0][0], edges[0][1], edges[-1][1], edges[-1][0]])])
-    return {"plans": [route], "anchors": anchors, "levels": {**all_levels(), **anchors}, "estimates": {},
-        "terrainCutouts": [{"id": "b06-entry-terrain", "loops": [geom.coords(list(poly.exterior.coords)[:-1])],
+    rear=rear_exterior_metadata();anchors.update(rear['anchors'])
+    return {"plans": [route]+rear['plans'], "anchors": anchors, "levels": {**all_levels(), **anchors}, "estimates": {},
+        "terrainCutouts": rear['terrainCutouts']+[{"id": "b06-entry-terrain", "loops": [geom.coords(list(poly.exterior.coords)[:-1])],
             "bottom": anchors[low_key], "openAbove": level(high_key), "terrainValidationPending": True,
             "coordinateSpace": "CAD XY metres; no origin subtraction or game-axis transform", "provenance": "B6 measured entry flight/platform; elevations and lower approach depth estimated"} for poly in geom.polygons(cut)]}
+
+
+def rear_exterior_metadata():
+    """Two IPR-observed slopes; individual riser count remains an estimate."""
+    keys=['exterior.rear.lower','exterior.rear.mid','exterior.rear.upper']
+    anchors=dict(zip(keys,[REAR_FOOT_WORLD-B6_PHOTO_ORIGIN_Y,REAR_MID_WORLD-B6_PHOTO_ORIGIN_Y,EAST_TERRACE_TOP]))
+    segments=[]
+    for i,(a,b) in enumerate(zip(REAR_STAIR_POINTS[::2],REAR_STAIR_POINTS[1::2])):
+        a,b=np.asarray(a),np.asarray(b);axis=(b-a)/np.linalg.norm(b-a);normal=np.array([-axis[1],axis[0]])
+        edges=[[(p-normal*REAR_STAIR_WIDTH/2).tolist(),(p+normal*REAR_STAIR_WIDTH/2).tolist()] for p in np.linspace(a,b,8)]
+        segment=geom.measured_edge_flight(f'b06-rear-flight-{i+1}',edges,REAR_SOURCE_TRIANGLES,keys[i],keys[i+1],'n01','n01')
+        segment.update({'sourceFrontsMeasured':False,'modeledRiserCount':8,'visibleIntervals':None,
+            'sourceManifestSha256':REAR_IPR_MANIFEST_SHA256,'sourceKind':'IPR2023-reconstruction',
+            'planBasis':'IPR 2023 connected ramp/landing trace in original CAD XY frame; 1.50m conservative width interpreted inside noisy 1.697-2.944m source cross sections; individual nosing positions reconstructed, not CAD measured',
+            'riserCountInterpretation':'eight rises per observed slope are a construction estimate; neither DXF nor available scan resolves individual noses',
+            'verticalBasis':'IPR upper deck world1.715, intermediate landing0.320, actual ground foot-1.0655; subtract explicit pose origin0.6962777093, no change to interior levels'})
+        segments.append(segment)
+    lower=geom.edge_landing(segments[0],False,.65)
+    middle=geom.clean(Polygon([*segments[0]['frontEdgesCad'][-1],*reversed(segments[1]['frontEdgesCad'][0])]))
+    surfaces=landing('b06-rear-lower',lower,'n01',keys[0],'n01',REAR_SOURCE_TRIANGLES[-2:],'IPR ground junction; 0.65m approach depth estimated; DMR differs by about0.154m')
+    surfaces+=landing('b06-rear-mid',middle,'n01',keys[1],'n01',['1127328:404','1127328:233'],'observed flat intermediate surface, not stair foot')
+    route={'id':'b06-rear-entry','ownerFloor':'n01','sourceFloor':'n01','lowerLevelKey':keys[0],'upperLevelKey':keys[2],
+        'segments':segments,'landings':surfaces,'upperSupportSolidId':'b06-east-mezz-terrace',
+        'terrainValidationPending':True,'sourceManifestSha256':REAR_IPR_MANIFEST_SHA256,
+        'sourceDoorIds':['n01-door-4D6C','n01-door-4D81','n01-door-4D8D','n01-door-4DA1','n01-door-4DAE','n01-door-4DC3'],
+        'verticalBasis':segments[0]['verticalBasis'],'upperDoorThresholdStatus':'unresolved0.481m model discrepancy; no invented connecting steps'}
+    route['terrainBasis']='raised open flights retain the ground beneath them; the 0.154m IPR/DMR foot discrepancy requires a local grade/walking check, not removal of the entire stair shadow'
+    return {'plans':[route],'anchors':anchors,'terrainCutouts':[]}
+
+
+def rear_terrace_shape():
+    # Outer up-plane envelope from tiles1127328/1127330, joined to the actual
+    # CAD backline. D85/D90 with a Z-break is not a measured complete outer edge.
+    shape=Polygon([(49.925303,16.284402),(50.760817,17.705821),(55.293123,20.184315),
+        (55.895831,20.302740),(57.784540,17.765501),(57.350615,16.953763),(57.503803,16.284402)])
+    flight=rear_exterior_metadata()['plans'][0]['segments'][-1]
+    a,b=np.asarray(flight['a']),np.asarray(flight['b']);axis=(b-a)/np.linalg.norm(b-a)
+    inside=geom.oriented_rectangle(b,b+axis*40,-40,40)
+    # A single closed canopy supplies the terminal riser; do not duplicate a
+    # stair-landing solid on the same deck or let it overlap the last tread.
+    return geom.clean(shape.intersection(inside).union(geom.edge_landing(flight,True,.25)))
+
+
+def rear_sign():
+    return {'id':'b06-cajovna-stoh-sign','a':[55.293123,20.184315],'b':[50.760817,17.705821],
+        'bottom':EAST_TERRACE_TOP+.25,'top':EAST_TERRACE_TOP+.95,'lines':['Klub Čajovna','Klub STOH'],
+        'basis':'user rear B6 photograph confirms white two-line banner; outer edge follows reconstructed IPR deck envelope, 0.70m panel height and rail-relative placement are estimates, not surveyed signage'}
 
 
 def mezzanine_region(floor, data):
@@ -522,16 +701,11 @@ def n01_exterior_features(data, doors):
         features.append(exterior_feature("b06-canopy-"+identifier+"-frame",band,"canopy","metal",ENTRY_CANOPY_TOP-.20,ENTRY_CANOPY_TOP-.10,
             [outer,inner],"two measured longitudinal frame bands only;0.10m beam depth estimated; no inferred repeated posts"))
     # Two collinear front segments are separated by a source drawing break.
-    front=by_id["D85"];left=float(by_id["F63"].a[0]);right=float(by_id["D83"].a[0])
-    def front_y(x):return float(front.a[1]+(front.b[1]-front.a[1])*(x-front.a[0])/(front.b[0]-front.a[0]))
-    if max(abs(front_y(point[0])-point[1]) for point in (by_id["D90"].a,by_id["D90"].b))>.002:
-        raise ValueError("Terrace front source segments are not one boundary")
-    back=float(by_id["4D65"].a[1])
-    terrace=Polygon([(left,back),(right,back),(right,front_y(right)),(left,front_y(left))])
-    if not 8<terrace.area<14:raise ValueError("Unexpected measured B6 terrace extent")
-    features.append(exterior_feature("b06-east-mezz-terrace",terrace,"canopy","concrete",EAST_TERRACE_TOP-.15,EAST_TERRACE_TOP,
+    if abs(by_id['4D65'].a[1]-16.284402)>.002:raise ValueError('Changed source rear attachment')
+    terrace=rear_terrace_shape()
+    features.append(exterior_feature("b06-east-mezz-terrace",terrace,"canopy","concrete",EAST_TERRACE_TOP-.20,EAST_TERRACE_TOP,
         ["D85","D90","F63","D83","4D65","4D66","4D67","4DCF"],
-        "CAD outer terrace/cover outline takes precedence over smoothed scan area; topworld1.715,0.15m thickness interpreted; below n01.mezzanine by0.4812777m, jump/terrain acceptance required"))
+        "IPR2023 up-plane envelope plus CAD backline; D85/D90 is broken drawing line, not complete outer edge; topworld1.715 and0.20m thickness interpreted, same canopy supplies rear terminal riser; 0.4812777m discrepancy to n01.mezzanine unresolved, no invented threshold steps"))
     glazing={"4D6C","4D81","4D8D","4DA1","4DAE","4DC3"}
     for door in doors:
         if set(door["sourceEntities"]) & glazing:
@@ -539,6 +713,7 @@ def n01_exterior_features(data, doors):
                          "outsideSupportId":"b06-east-mezz-terrace","outsideSupportTop":EAST_TERRACE_TOP,
                          "outsideStepEstimate":level("n01.mezzanine")-EAST_TERRACE_TOP,
                          "outsideTraversalStatus":"requires-native-jump-validation",
+                         "outsideHeightBasis":"unresolved 0.481m model discrepancy; traversal permission tests this model only, not a measured physical threshold",
                          "classificationBasis":"actual CAD opening leaves and IPR openable glazed row above lower concrete terrace; not fixed glass"})
     if sum(bool(set(door["sourceEntities"]) & glazing) for door in doors)!=6:
         raise ValueError("Missing one of six B6 mezzanine glazed leaves")
@@ -587,9 +762,105 @@ def buried_chamber(data, envelope):
         "provenance":"IPR2023 continuous grassy slope, minimum of9 source samples world-1.439; selected coverworld-1.60,0.20m thickness, existing inferred0.10m enclosure retained; nonhabitable, no source entry, not CAD Z"}
 
 
+def bedroom_at_window(window, rooms):
+    a,b=np.asarray(window["a"]),np.asarray(window["b"]);direction=(b-a)/np.linalg.norm(b-a)
+    normal=np.array([-direction[1],direction[0]]);mid=(a+b)/2
+    matches=[room for room in rooms if room.get("usage")=="bedroom" and
+             any(room["geometry"].covers(Point(mid+sign*.45*normal)) for sign in (-1,1))]
+    return matches[0] if len(matches)==1 else None
+
+
+def split_bedroom_window(window, data):
+    """A long 3-OKNA symbol spans two rooms; it must not erase their real wall."""
+    a,b=np.asarray(window["a"]),np.asarray(window["b"]);length=float(np.linalg.norm(b-a))
+    axis=(b-a)/length;normal=np.array([-axis[1],axis[0]]);trace=LineString([a,b])
+    strong=[line for line in data["lines"] if line.layer==geom.STRONG]
+    edges=[line for line in strong if line.length>1 and abs(np.dot(line.direction,normal))>.999 and line.line.distance(trace)<.06]
+    partitions=[]
+    for i,first in enumerate(edges):
+        for second in edges[i+1:]:
+            profile=geom.parallel_strip(first,second,min_width=.07,max_width=.15)
+            if profile is None:continue
+            intersection=profile.intersection(trace)
+            if intersection.is_empty or intersection.length<.07:continue
+            ends=[min((line.a,line.b),key=lambda p:Point(p).distance(trace)) for line in (first,second)]
+            caps=[line for line in strong if line.length<.16 and line.line.hausdorff_distance(LineString(ends))<.002]
+            terminal=LineString(ends)
+            frame_ends=[line for line in data["lines"] if line.id in window["sourceEntities"] and
+                        line.line.buffer(.002,cap_style=2).covers(terminal)]
+            # One original bay omits the short cap stroke, but both real wall
+            # faces end on the same measured frame line. Keep that existing
+            # paired strip; do not invent a width or extend either face.
+            if len(caps)!=1 and not frame_ends:continue
+            lo,hi=sorted(float(np.dot(point-a,axis)) for point in ends)
+            if lo<.5 or hi>length-.5:continue
+            left=bedroom_at_window({"a":a,"b":a+axis*lo},data["rooms"])
+            right=bedroom_at_window({"a":a+axis*hi,"b":b},data["rooms"])
+            if not left or not right or left["sourceEntity"]==right["sourceEntity"]:continue
+            partitions.append({"geometry":profile,"low":lo,"high":hi,
+                               "sourceEntities":[first.id,second.id]+[line.id for line in (caps if len(caps)==1 else frame_ends)]})
+    if len(partitions)>1:raise ValueError("Ambiguous multi-partition B6 window: "+window["id"])
+    spans=[(0,length)] if not partitions else [(0,partitions[0]["low"]),(partitions[0]["high"],length)]
+    children=[]
+    for index,(low,high) in enumerate(spans):
+        child={**window,"a":geom.coords([a+axis*low])[0],"b":geom.coords([a+axis*high])[0],
+               "windowPlaneNormalOffset":0.0,
+               "sourcePlaneBasis":"a/b are the measured midpoint of the two 3-OKNA frame lines; normalOffset describes surrounding wall depth, not window-plane displacement"}
+        if partitions:child.update({"id":window["id"]+f"-part-{index}","parentWindowId":window["id"],
+            "partitionSourceEntities":partitions[0]["sourceEntities"],
+            "splitBasis":"actual paired 100mm source room partition ending at a measured cap/frame line retained inside the long two-room window symbol; wide projecting pilasters remain separate source construction"})
+        room=bedroom_at_window(child,data["rooms"])
+        if room:child.update({"roomId":room["id"],"roomSourceEntity":room["sourceEntity"],"paneCount":2,
+                             "paneBasis":"two vertical panes per room in user B6 room photograph "+USER_ROOM_PHOTO_SHA256})
+        children.append(child)
+    return children,geom.union([item["geometry"] for item in partitions])
+
+
+def measured_window_jamb(window, lines):
+    """Short transverse end returns are distinct from parallel weak ledges."""
+    a,b=np.asarray(window['a']),np.asarray(window['b']);axis=(b-a)/np.linalg.norm(b-a)
+    normal=np.array([-axis[1],axis[0]]);selected=[]
+    for endpoint in (a,b):
+        candidates=[line for line in lines if line.layer in (geom.STRONG,geom.WEAK) and .04<line.length<.66
+                    and abs(np.dot(line.direction,axis))<.02
+                    and max(abs(np.dot(p-endpoint,axis)) for p in (line.a,line.b))<.002
+                    and min(np.dot(p-a,normal) for p in (line.a,line.b))<=.005
+                    and max(np.dot(p-a,normal) for p in (line.a,line.b))>=-.005]
+        if not candidates:return None
+        selected.append(min(candidates,key=lambda line:(line.length,line.id)))
+    offsets=[float(np.dot(p-a,normal)) for line in selected for p in (line.a,line.b)]
+    low,high=min(offsets),max(offsets)
+    return {'low':low,'high':high,'depth':round(high-low,6),'normalOffset':round((low+high)/2,6),
+            'sourceEntities':[line.id for line in selected],
+            'basis':'measured short transverse returns at both source window ends; does not adopt parallel distant weak projection lines'}
+
+
+def window_sill(window, partition=GeometryCollection()):
+    a,b=np.asarray(window['a']),np.asarray(window['b']);axis=(b-a)/np.linalg.norm(b-a)
+    normal=np.array([-axis[1],axis[0]]);offset=window['normalOffset'];span=window['depth']
+    sources=list(window['sourceEntities']);basis='surrounding measured reveal span'
+    # The west annex has actual 118-125mm returns. F7B/F7F and their
+    # counterparts are longer parallel projections, not a 500mm frame return.
+    annex=(13.3<min(a[0],b[0]) and max(a[0],b[0])<19.1 and max(abs(a[1]+5.563095),abs(b[1]+5.563095))<.002)
+    if annex and window.get('frameJamb'):
+        jamb=window['frameJamb']
+        if not .11<jamb['depth']<.13:raise ValueError('Changed source west annex jamb')
+        offset=jamb['normalOffset'];span=jamb['depth'];sources+=jamb['sourceEntities'];basis=jamb['basis']
+    sa,sb=a+normal*offset,b+normal*offset;width=min(.65,max(.2,span+.10))
+    shape=geom.clean(geom.oriented_rectangle(sa,sb,-width/2,width/2).difference(partition))
+    parts=geom.serialize_solids(shape,window['id']+'-sill','window-sill',window['bottom']-.035,window['bottom'],'concrete')
+    if len(parts)!=1:raise ValueError('Window sill no longer has one source profile: '+window['id'])
+    part=parts[0]
+    descriptor={'a':geom.coords([sa])[0],'b':geom.coords([sb])[0],'width':width,
+        'role':'window-sill','material':'concrete','collision':True,
+        'bottom':part['bottom'],'top':part['top'],'loops':part['loops'],'triangles':part['triangles'],
+        'sourceEntities':sources,'basis':basis+'; 35mm sill with 50mm overhang on each side interpreted; exact quantized profile replaces wall volume, preserved room partition excluded; a/b are already positioned in CAD XY'}
+    return descriptor,shape
+
+
 def opening_descriptors(floor, data, wall, mezz, doors):
     windows, duplicates = geom.windows_from_lines(data["lines"], floor)
-    openings = []
+    openings,window_descriptors = [],[]
     for kind, descriptions in [("door", doors), ("window", windows)]:
         for item in descriptions:
             a,b = (item["hinge"],item["closedEnd"]) if kind == "door" else (item["a"],item["b"])
@@ -601,8 +872,384 @@ def opening_descriptors(floor, data, wall, mezz, doors):
             bridge=geom.oriented_rectangle(a,b,lo,hi,extend=.008)
             item.update({"levelKey":key,"bottom":bottom,"top":top,"depth":round(hi-lo,4),"normalOffset":round((lo+hi)/2,4),
                          "depthBasis":basis,"heightBasis":HEIGHT_BASIS,"ceilingElevation":cap})
-            openings.append({**item,"kind":kind,"bridge":bridge,"cut":geom.opening_cut(a,b,lo,hi,measured_span=True)})
-    return openings, windows, duplicates
+            if kind=='door':
+                # The public rounded values also locate existing interactive
+                # leaves. Preserve them, but never reconstruct structural faces
+                # from them: a 3um residual wall skin can still depth-fight.
+                item['frameReveal']={'low':lo,'high':hi,'sourceEntities':list(item['sourceEntities']),
+                    'measurementBasis':basis,
+                    'basis':'full-precision opening-wall span, measured or explicitly estimated by measurementBasis; same canonical span as the opening cut before descriptor rounding; frame only, leaf pose unchanged'}
+            cut=geom.opening_cut(a,b,lo,hi,measured_span=True)
+            if kind=="window":
+                jamb=measured_window_jamb(item,data['lines'])
+                if jamb:item['frameJamb']=jamb
+                children,partition=split_bedroom_window(item,data)
+                for child in children:
+                    if floor=='n06' and set(child['sourceEntities']) & {'CE6','CE8','CEA'}:
+                        child['sill']=None
+                        child['sillOmissionBasis']='upper source field continues directly above the matched N05 window; its lower frame forms the transom, no separate concrete ledge is evidenced'
+                        continue
+                    child['sill'],sill_shape=window_sill(child,partition)
+                    openings.append({'id':child['id']+'-sill-cut','kind':'window-sill-cut','bridge':GeometryCollection(),
+                                     'cut':sill_shape,'bottom':child['sill']['bottom'],'top':child['sill']['top']})
+                window_descriptors+=children
+                cut=geom.clean(cut.difference(partition))
+            openings.append({**item,"kind":kind,"bridge":bridge,"cut":cut})
+    return openings, window_descriptors, duplicates
+
+
+def cut_solid_volumes(solid, cuts, tag, exact=False, precision=None):
+    """Subtract exact bounded volumes while keeping every remaining part closed."""
+    shape=Polygon(solid['loops'][0],solid['loops'][1:])
+    if precision is not None:shape=set_precision(shape,precision)
+    relevant=[cut for cut in cuts if cut['bottom']<solid['top']-.000001 and cut['top']>solid['bottom']+.000001
+              and cut['geometry'].intersection(shape).area>1e-8]
+    if not relevant:
+        if precision is None:return [solid],0.0
+        parts=serialize_exact_solids(shape,solid['id']+'-canonical-boundary',solid['role'],solid['bottom'],solid['top'],solid['material'])
+        return [{**solid,**part,'id':solid['id'] if len(parts)==1 else part['id'],
+                 'boundaryPrecisionMetres':precision} for part in parts],0.0
+    levels=sorted({solid['bottom'],solid['top']}|{max(solid['bottom'],min(solid['top'],cut[key])) for cut in relevant for key in ('bottom','top')})
+    result=[];removed=0.0
+    for index,(bottom,top) in enumerate(zip(levels,levels[1:])):
+        middle=(bottom+top)/2
+        mask=unary_union([cut['geometry'] for cut in relevant if cut['bottom']<middle<cut['top']])
+        retained=shape.difference(mask)
+        if not exact:retained=geom.clean(retained)
+        removed+=(shape.area-retained.area)*(top-bottom)
+        serializer=serialize_exact_solids if exact else geom.serialize_solids
+        for part in serializer(retained,solid['id']+f'-{tag}-{index}',solid['role'],bottom,top,solid['material']):
+            result.append({**solid,**part,'sourceSolidId':solid.get('sourceSolidId',solid['id']),
+                            'volumeCorrection':tag,**({'boundaryPrecisionMetres':precision} if precision is not None else {})})
+    return result,removed
+
+
+def serialize_exact_solids(geometry, identifier, role, bottom, top, material):
+    """Preserve final boolean intersections of already-quantized source edges.
+
+    Re-snapping an angled reveal intersection to the 1mm source grid re-enters
+    its sill by a thin triangle. Only this final ownership subtraction retains
+    the exact intersection vertices; source wall inference still uses 1mm.
+    """
+    result=[]
+    for index,poly in enumerate(sorted(geom.polygons(geometry),key=lambda p:(*p.bounds,p.area))):
+        poly=geom.orient(poly,sign=1.0)
+        triangles=[t for t in geom.constrained_delaunay_triangles(poly).geoms if t.area>1e-12]
+        if not triangles or abs(sum(t.area for t in triangles)-poly.area)>1e-7:
+            raise ValueError('Incomplete exact ownership triangulation: '+identifier)
+        points=lambda ring:[[float(x),float(y)] for x,y in list(ring.coords)[:-1]]
+        result.append({'id':f'{identifier}-{role}-{bottom:.3f}-{index:04d}','role':role,'material':material,
+            'loops':[points(poly.exterior)]+[points(ring) for ring in poly.interiors],
+            'triangles':[points(geom.orient(t,sign=1.0).exterior) for t in triangles],
+            'bottom':bottom,'top':top,'collision':True})
+    return result
+
+
+def resolve_last_east_facade(floors):
+    """One N05 tall enclosure, retaining both floors' real window records/Z."""
+    by_floor={floor['id']:floor for floor in floors};lower=by_floor['n05'];upper=by_floor['n06']
+    region=geom.union([Polygon(r['loops'][0],r['loops'][1:]) for r in lower['levelRegions']
+                       if r['levelKey']=='n05.mezzanine']).intersection(box(49,14,58,17))
+    if region.is_empty:raise ValueError('Missing source last east mezzanine region')
+    windows=[];families=[]
+    for low_source,high_source in [('D17','CE6'),('D19','CE8'),('D1B','CEA')]:
+        pair=[]
+        for floor,source in [(lower,low_source),(upper,high_source)]:
+            matches=[w for w in floor['windows'] if source in w['sourceEntities']]
+            if len(matches)!=1:raise ValueError('Missing source last east window '+source)
+            pair.append(matches[0])
+        low,high=pair
+        if (max(np.linalg.norm(np.asarray(low[key])-high[key]) for key in ('a','b'))>.002
+            or abs(low['top']-high['bottom'])>.001
+            or not region.buffer(.002).covers(LineString([low['a'],low['b']]))):
+            raise ValueError('Changed source last east window continuity')
+        if high.get('sill','missing') is not None:raise ValueError('Stacked upper field must not add a concrete transom sill')
+        for item,other in [(low,high),(high,low)]:
+            item['stackedWindowId']=other['id'];item['facadeOwnerFloor']='n05'
+            item['stackedWindowBasis']='same measured east facade XY in N05/N06; existing estimated Z retained, one enclosing wall owner, no invented mezzanine floor'
+        windows+=pair;families.append([low['id'],high['id']])
+    cuts=[]
+    for window in windows:
+        offset=window['normalOffset'];half=window['depth']/2
+        cuts.append({'geometry':geom.clean(geom.opening_cut(window['a'],window['b'],offset-half,offset+half,measured_span=True)),
+                     'bottom':window['bottom'],'top':window['top']})
+        if window.get('sill'):
+            sill=window['sill'];cuts.append({'geometry':Polygon(sill['loops'][0],sill['loops'][1:]),'bottom':sill['bottom'],'top':sill['top']})
+    removed_openings=0.0
+    for floor in (lower,upper):
+        solids=[]
+        for solid in floor['solids']:
+            parts,removed=cut_solid_volumes(solid,cuts,'shared-east-openings') if solid['role'] in ('wall','slab') else ([solid],0)
+            solids+=parts;removed_openings+=removed
+        floor['solids']=solids
+    owned=[{'geometry':Polygon(s['loops'][0],s['loops'][1:]).intersection(region),'bottom':s['bottom'],'top':s['top']}
+           for s in lower['solids'] if s['role']=='wall']
+    solids=[];removed_duplicates=0.0
+    for solid in upper['solids']:
+        parts,removed=cut_solid_volumes(solid,owned,'n05-facade-owner') if solid['role'] in ('wall','slab') else ([solid],0)
+        solids+=parts;removed_duplicates+=removed
+    upper['solids']=solids
+    note={'ownerFloor':'n05','sourceFloors':['n05','n06'],'windowPairs':families,
+          'sourceEntities':sorted({s for w in windows for s in w['sourceEntities']}),
+          'openingRemovedVolumeM3':round(removed_openings,6),'duplicateRemovedVolumeM3':round(removed_duplicates,6),
+          'basis':'shared last east enclosure; subtract both existing window/sill volumes across wall/slab floors, then remove only N06 wall/slab volume already occupied by N05 walls in the source east mezzanine region; all Z, room loops and source records retained'}
+    for floor in (lower,upper):
+        floor['sharedEastFacade']=note
+        # Refresh existing support-derived metadata after the narrow slab cut.
+        # The builder owns its single-surface finish implementation.
+        room_floor_finishes(floor['rooms'],floor['solids'])
+    return note
+
+
+def reserve_structural_sills(floors):
+    """A sill owns its volume even where another CAD floor overlaps it.
+
+    The source P01 mezzanine and N01 main enclosure share part of the DA3
+    reveal: per-floor opening cuts alone leave a coplanar 0.0125 m² wall cap.
+    Apply the identical authored profiles across floors, with no epsilon plane.
+    """
+    cuts=[{'geometry':Polygon(w['sill']['loops'][0],w['sill']['loops'][1:]),
+           'bottom':w['sill']['bottom'],'top':w['sill']['top'], 'floor':floor['id']}
+          for floor in floors for w in floor.get('windows',[]) if w.get('sill')]
+    reserve_structural_volumes(floors,cuts,'sill-volume-owner','crossFloorSillRemovedVolumeM3')
+
+
+def reserve_structural_volumes(floors, cuts, tag, audit_key, precision=None):
+    """One exact cross-floor ownership subtraction for authored insert volumes."""
+    for floor in floors:
+        solids=[];removed_total=0.0
+        for solid in floor['solids']:
+            parts,removed=cut_solid_volumes(solid,cuts,tag,exact=True,precision=precision) if solid['role'] in ('wall','slab') else ([solid],0.0)
+            solids+=parts;removed_total+=removed
+        floor['solids']=solids
+        floor[audit_key]=round(removed_total,9)
+        if removed_total or precision is not None:room_floor_finishes(floor['rooms'],solids)
+
+
+def door_frame_span(door, canonical=True):
+    """Use the same measured opening/reveal placement as the unchanged leaf pose."""
+    hinge,end=np.asarray(door['hinge'],dtype=float),np.asarray(door['closedEnd'],dtype=float)
+    width=float(np.linalg.norm(end-hinge))
+    values=[*hinge,*end,door['bottom'],door['top'],door.get('depth',.13),door.get('normalOffset',0)]
+    if not all(math.isfinite(v) for v in values) or width<.3 or door['top']<=door['bottom']:
+        raise ValueError('Invalid source door frame: '+door['id'])
+    direction=(end-hinge)/width;normal=np.array([-direction[1],direction[0]])
+    reveal=door.get('frameReveal') if canonical else None
+    if reveal is not None:
+        low,high=reveal['low'],reveal['high']
+        if not math.isfinite(low+high) or high-low<.04 or high-low>.65:
+            raise ValueError('Invalid canonical source frame reveal: '+door['id'])
+        depth=high-low;offset=normal*((low+high)/2)
+    else:
+        depth=max(.04,door.get('depth',.13));offset=normal*door.get('normalOffset',0)
+    return hinge+offset,end+offset,direction,depth
+
+
+def shared_door_frame_pair(first, second):
+    """A common source closed endpoint alone is not sufficient to infer a pair."""
+    if not first.get('sourceEntities') or not second.get('sourceEntities'):return False
+    if any(abs(first[key]-second[key])>1e-6 for key in ('bottom','top')):return False
+    if math.dist(first['closedEnd'],second['closedEnd'])>.002:return False
+    a,b,d,depth=door_frame_span(first);c,e,other,other_depth=door_frame_span(second)
+    return (float(np.dot(d,other))<-.999999 and abs(depth-other_depth)<1e-6 and
+            np.linalg.norm(b-e)<.002 and abs(float(np.dot(c-a,[-d[1],d[0]])))<.002)
+
+
+def door_frame_groups(doors):
+    """Validate declared pairs first, then only unique, exact shared-end pairs.
+
+    The latter keeps actual two-leaf entrances/glazing openable; it does not
+    assign the bedroom-only fixed-leaf classification to other source doors.
+    """
+    by_id={door['id']:door for door in doors}
+    if len(by_id)!=len(doors):raise ValueError('Duplicate door ID in frame ownership')
+    partners={}
+    for door in doors:
+        identifier=door.get('pairedDoorId')
+        if identifier:
+            other=by_id.get(identifier)
+            if other is None or other.get('pairedDoorId')!=door['id'] or not shared_door_frame_pair(door,other):
+                raise ValueError('Invalid source paired frame: '+door['id'])
+            partners[door['id']]=identifier
+    unpaired=[d for d in doors if d['id'] not in partners]
+    candidates={d['id']:[other['id'] for other in unpaired if other is not d and shared_door_frame_pair(d,other)] for d in unpaired}
+    for identifier,matches in candidates.items():
+        if len(matches)==1 and candidates[matches[0]]==[identifier]:partners[identifier]=matches[0]
+    seen=set();groups=[]
+    for door in sorted(doors,key=lambda d:d['id']):
+        if door['id'] in seen:continue
+        group=[door]+([by_id[partners[door['id']]]] if door['id'] in partners else [])
+        seen.update(d['id'] for d in group);groups.append(group)
+    return groups
+
+
+def door_frame_profiles(floor):
+    """Closed rectangular profile volumes, outside the measured clear opening.
+
+    35mm jambs and 45mm header preserve the previous model interpretation.
+    A paired leaf meeting is not a source full-height structural mullion.
+    """
+    profiles=[]
+    for group in door_frame_groups(floor['doors']):
+        source_ids=sorted(d['id'] for d in group)
+        sources=sorted({s for d in group for s in d['sourceEntities']})
+        basis=('validated common source closed endpoint, opposite collinear leaves, identical reveal plane/depth and Z; outer hinge jambs and shared header only'
+               if len(group)==2 else 'single source door hinge/closed endpoint and measured adjacent-wall reveal')
+        def add(a,b,depth,bottom,top):
+            direction=(b-a)/np.linalg.norm(b-a);normal=np.array([-direction[1],direction[0]])*depth/2
+            profiles.append({'geometry':Polygon([a-normal,b-normal,b+normal,a+normal]),
+                'bottom':bottom,'top':top,'ownerFloor':floor['id'],'sourceDoorIds':source_ids,
+                'axisStart':a,'axisEnd':b,'depth':depth,
+                'sourceEntities':sources,'basis':basis+'; 35mm outer jamb and 45mm header are model dimensions, not measured CAD Z'})
+        for door in group:
+            a,b,d,depth=door_frame_span(door)
+            add(a-d*.035,a,depth,door['bottom'],door['top'])
+            if len(group)==1:add(b,b+d*.035,depth,door['bottom'],door['top'])
+            add(a-d*.035,b+d*.035,depth,door['top'],door['top']+.045)
+    return profiles
+
+
+def conform_frame_profile(profile, structural, shapes, tree, height, occupied=None):
+    """Transfer only a bounded source-noding skin to its adjacent frame profile.
+
+    Later source bridges use the 1mm wall grid. An angled/measured or explicitly
+    estimated reveal can therefore still sit behind a 33-97um wall face. Only
+    a complete connected wall sliver ending inside that grid cell is eligible;
+    a wall continuing through the search limit is retained. Axial jamb/header
+    endpoints never move, so this cannot narrow the source clear opening.
+    The output is the exact existing wall polygon, not an inflated cutter.
+    """
+    a,b=profile['axisStart'],profile['axisEnd'];axis=(b-a)/np.linalg.norm(b-a)
+    normal=np.array([-axis[1],axis[0]]);half=profile['depth']/2;source_grid=FRAME_SOURCE_GRID
+    def parts(geometry):
+        # The source wall inference MIN_AREA deliberately drops tiny CAD noise;
+        # here the microscopic remnant is precisely the geometry being owned.
+        if geometry.geom_type=='Polygon':yield geometry
+        else:
+            for child in getattr(geometry,'geoms',[]):yield from parts(child)
+    additions=[];evidence=[]
+    for sign in (-1,1):
+        offset=normal*half*sign;outward=normal*source_grid*sign
+        inner_edge=set_precision(LineString([a+offset,b+offset]),FRAME_OWNERSHIP_GRID)
+        outer_edge=set_precision(LineString([a+offset+outward,b+offset+outward]),FRAME_OWNERSHIP_GRID)
+        strip=set_precision(Polygon([a+offset,b+offset,b+offset+outward,a+offset+outward]),FRAME_OWNERSHIP_GRID)
+        for index in tree.query(strip):
+            solid=structural[index]
+            if not solid['bottom']<height<solid['top']:continue
+            remaining=shapes[index].intersection(strip)
+            if occupied is not None:remaining=remaining.difference(occupied)
+            for part in parts(remaining):
+                if part.area<=1e-12 or part.distance(inner_edge)>1e-10 or part.distance(outer_edge)<1e-10:continue
+                additions.append(part)
+                delta=max(float(np.dot(np.asarray(point)-a,normal))*sign-half for point in part.exterior.coords)
+                evidence.append({'sourceSolidId':solid['id'],'areaM2':part.area,'maximumNormalDeltaMetres':delta})
+    if not additions:return profile
+    return {**profile,'geometry':union_all([profile['geometry'],*additions],grid_size=FRAME_OWNERSHIP_GRID),
+        'conformance':evidence,
+        'basis':profile['basis']+'; exact bounded final source-grid wall skin transferred to the same frame profile before CSG, no cutter inflation'}
+
+
+def frame_height_levels(profiles, structural, shapes, tree):
+    """Every relevant source volume must be constant throughout a frame band."""
+    levels={p[key] for p in profiles for key in ('bottom','top')}
+    for profile in profiles:
+        # Search only: this buffer never becomes a frame or a structural cut.
+        neighborhood=profile['geometry'].buffer(FRAME_SOURCE_GRID,join_style=2)
+        for index in tree.query(neighborhood):
+            solid=structural[index]
+            bottom=max(profile['bottom'],solid['bottom']);top=min(profile['top'],solid['top'])
+            if bottom<top and shapes[index].intersects(neighborhood):levels.update((bottom,top))
+    return sorted(levels)
+
+
+def reserve_door_frames(floors):
+    """Union frame profiles per height band before assigning any solid owner.
+
+    This removes duplicated paired headers and jamb/header corner volumes.
+    All source doors keep their original leaf/clear-opening coordinates. The
+    same resulting polygons reserve wall/slab volume across every CAD floor.
+    """
+    from shapely.strtree import STRtree
+    profiles=[{**p,'geometry':set_precision(p['geometry'],FRAME_OWNERSHIP_GRID)}
+              for floor in floors for p in door_frame_profiles(floor)]
+    structural=[s for floor in floors for s in floor['solids'] if s['role'] in ('wall','slab')]
+    shapes=[set_precision(Polygon(s['loops'][0],s['loops'][1:]),FRAME_OWNERSHIP_GRID) for s in structural];tree=STRtree(shapes)
+    floor_by_id={floor['id']:floor for floor in floors}
+    door_by_id={door['id']:door for floor in floors for door in floor['doors']}
+    for door in door_by_id.values():
+        door['frameOwnership']='recipe-solids';door['frameSolidIds']=[]
+    levels=frame_height_levels(profiles,structural,shapes,tree)
+    cuts=[]
+    for band,(bottom,top) in enumerate(zip(levels,levels[1:])):
+        middle=(bottom+top)/2
+        raw_active=[p for p in profiles if p['bottom']<middle<p['top']]
+        occupied=unary_union([p['geometry'] for p in raw_active])
+        # Intersecting headers already own their base volumes. Assess the
+        # remaining skin after that simultaneous ownership, not sequentially
+        # against a neighbouring frame's not-yet-subtracted wall volume.
+        active=[conform_frame_profile(p,structural,shapes,tree,middle,occupied) for p in raw_active]
+        for index,shape in enumerate(sorted(geom.polygons(unary_union([p['geometry'] for p in active])),key=lambda p:(*p.bounds,p.area))):
+            members=[p for p in active if shape.intersection(p['geometry']).area>1e-12]
+            owner=min((p['ownerFloor'] for p in members),key=FLOORS.index)
+            ids=sorted({identifier for p in members for identifier in p['sourceDoorIds']})
+            sources=sorted({identifier for p in members for identifier in p['sourceEntities']})
+            solids=serialize_exact_solids(shape,f'{owner}-source-door-frame-{band}-{index}','door-frame',bottom,top,'frame')
+            for solid in solids:
+                solid.update({'sourceDoorIds':ids,'sourceEntities':sources,
+                    'frameBasis':'; '.join(sorted({p['basis'] for p in members})),'ownerFloor':owner,
+                    'boundaryPrecisionMetres':FRAME_OWNERSHIP_GRID})
+                conformance=[item for p in members for item in p.get('conformance',[])]
+                if conformance:solid['sourceGridConformance']=conformance
+                floor_by_id[owner]['solids'].append(solid)
+                for identifier in ids:door_by_id[identifier]['frameSolidIds'].append(solid['id'])
+            cuts.append({'geometry':shape,'bottom':bottom,'top':top})
+    if any(not d['frameSolidIds'] for d in door_by_id.values()):raise ValueError('Missing source door frame owner')
+    reserve_structural_volumes(floors,cuts,'door-frame-volume-owner','crossFloorDoorFrameRemovedVolumeM3',precision=FRAME_OWNERSHIP_GRID)
+
+
+def surface_triangles(shape):
+    """Constrained surface triangulation, including tiny partition remainders."""
+    result=[]
+    if shape.is_empty:return result
+    if shape.geom_type!='Polygon':
+        for part in getattr(shape,'geoms',[]):result+=surface_triangles(part)
+        return result
+    if shape.area<=1e-12:return result
+    triangles=list(geom.constrained_delaunay_triangles(shape).geoms)
+    if abs(sum(t.area for t in triangles)-shape.area)>max(1e-8,shape.area*1e-9):
+        raise ValueError('Incomplete slab surface triangulation')
+    if any(t.difference(shape).area>1e-9 for t in triangles):raise ValueError('Slab surface crossed a hole')
+    return [geom.coords(list(geom.orient(t,sign=1).exterior.coords)[:3]) for t in triangles if t.area>1e-12]
+
+
+def partition_slab_tops(floor):
+    """Decompose the existing slab top once; never emit another finish solid."""
+    rooms=[(room,unary_union([Polygon(t) for t in room.get('finishTriangles',[])]),level(room['levelKey']))
+           for room in sorted(floor['rooms'],key=lambda room:(room['sourceEntity'],room['id']))]
+    for solid in floor['solids']:
+        if solid['role']!='slab':continue
+        shape=Polygon(solid['loops'][0],solid['loops'][1:]);assigned=GeometryCollection();parts=[]
+        if solid['material']=='floor':
+            for room,finish,height in rooms:
+                if abs(height-solid['top'])>.001 or finish.is_empty:continue
+                region=shape.intersection(finish)
+                if region.area<=1e-12:continue
+                overlap=region.intersection(assigned).area
+                if overlap>1e-6:raise ValueError('Overlapping accepted room finishes at '+floor['id']+'/'+room['id'])
+                region=region.difference(assigned)
+                triangles=surface_triangles(region)
+                if not triangles:continue
+                parts.append({'material':'floor','role':'floor-finish','roomId':room['id'],
+                              'roomSourceEntity':room['sourceEntity'],'usage':room.get('usage','other'),'triangles':triangles})
+                assigned=unary_union([assigned,region])
+        remaining=surface_triangles(shape.difference(assigned))
+        if remaining:parts.append({'material':solid['material'],'role':solid['role'],'triangles':remaining})
+        triangles=[Polygon(t) for part in parts for t in part['triangles']];covered=unary_union(triangles)
+        tolerance=max(1e-5,shape.area*1e-7)
+        if covered.symmetric_difference(shape).area>tolerance or sum(t.area for t in triangles)-covered.area>tolerance:
+            raise ValueError('Nonpartitioned structural slab top '+solid['id'])
+        solid['topSurfacePartitions']=parts
+        solid['topSurfacePartitionBasis']='one disjoint complete decomposition of this existing top plane by accepted same-level room finishes; remaining original slab material; bottom/sides unchanged, no floating volume'
 
 
 def basement_soffits(data, interior):
@@ -639,6 +1286,80 @@ def terrace_soffit_walls(floor, wall, mezz, openings, features):
                 'basis':'exterior basement wall under the identified CAD/IPR terrace; cap at actual cover underside, no threshold or plan shift'}
         solids+=parts
     return geom.clean(wall.difference(covered)),solids
+
+
+def room_floor_finishes(rooms, solids):
+    """Only actual same-height floor slabs, never accounting stair polygons."""
+    support={}
+    for room in rooms:
+        height=level(room["levelKey"])
+        if height not in support:
+            support[height]=geom.union([Polygon(solid["loops"][0],solid["loops"][1:]) for solid in solids
+                if solid["role"]=="slab" and solid["material"]=="floor" and abs(solid["top"]-height)<.001])
+        shape=geom.clean(Polygon(room["loops"][0],room["loops"][1:]).intersection(support[height]))
+        # The two basement corridor accounting areas include the separate
+        # measured understair rooms. Keep the CAD records, give their finishes
+        # a single owner, and never subtract a room at a different elevation.
+        understair={'8F6':'8EB','865':'872'}.get(room.get('sourceEntity'))
+        if understair and room.get('usage')=='corridor':
+            for other in rooms:
+                if other.get('sourceEntity')==understair and other['levelKey']==room['levelKey']:
+                    shape=geom.clean(shape.difference(Polygon(other['loops'][0],other['loops'][1:])))
+        # Reuse the solid serializer's constrained triangulation and its area /
+        # hole checks; discard the temporary volume descriptor entirely.
+        room["finishTriangles"]=[triangle for part in geom.serialize_solids(shape,"room-finish","surface",0,1)
+                                 for triangle in part["triangles"]]
+        room["finishAreaM2"]=round(sum(Polygon(triangle).area for triangle in room["finishTriangles"]),6)
+        room["finishBasis"]="source room polygon intersected with actual same-elevation floor slab tops; stair holes, landings, canopy and other levels excluded; CAD XY metres"
+        if understair:room['finishBasis']+='; separately identified understair room '+understair+' owns its overlap'
+
+
+def bathroom_shower_dividers(data):
+    """Only the two measured internal T partitions between three source trays."""
+    strong=[line for line in data['lines'] if line.layer==geom.STRONG]
+    result=[]
+    for room in data['rooms']:
+        showers=sorted([q for q in room.get('sanitaryFixtures',[]) if q['kind']=='shower'],key=lambda q:q['centerCad'][0])
+        if room.get('usage')!='bathroom' or not showers:continue
+        if len(showers)!=3:raise ValueError('Changed source shower group '+room['id'])
+        sign=showers[0]['facingCad'][1]
+        if abs(sign)!=1:raise ValueError('Unsupported source shower orientation')
+        front=showers[0]['boundsCad'][3 if sign>0 else 1]
+        for index,(left,right) in enumerate(zip(showers,showers[1:])):
+            mid=(left['centerCad'][0]+right['centerCad'][0])/2
+            bars=[line for line in strong if abs(line.a[1]-line.b[1])<.002 and .50<line.length<.70
+                  and abs((line.a[0]+line.b[0])/2-mid)<.20 and .04<(line.a[1]-front)*sign<.20]
+            if len(bars)!=1:raise ValueError('Unproven shower T crossbar '+room['id'])
+            bar=bars[0];caps=[];back=[]
+            for point in (bar.a,bar.b):
+                options=[line for line in strong if .09<line.length<.11 and abs(line.a[0]-line.b[0])<.002
+                         and min(np.linalg.norm(point-line.a),np.linalg.norm(point-line.b))<.002]
+                if len(options)!=1:raise ValueError('Missing measured shower crossbar cap')
+                cap=options[0];caps.append(cap);back.append(max((cap.a,cap.b),key=lambda p:np.linalg.norm(point-p)))
+            back_y=float(np.mean([p[1] for p in back]))
+            stems=[line for line in strong if .80<line.length<1.01 and abs(line.a[0]-line.b[0])<.002
+                   and abs(line.a[0]-mid)<.10 and min(abs(line.a[1]-back_y),abs(line.b[1]-back_y))<.002]
+            if len(stems)!=2:raise ValueError('Unproven internal shower stem '+room['id'])
+            stem=geom.parallel_strip(*stems,min_width=.09,max_width=.11)
+            if stem is None:raise ValueError('Invalid source shower stem width')
+            shape=geom.clean(Polygon([bar.a,bar.b,back[1],back[0]]).union(stem))
+            result.append({'id':room['id']+f'-shower-divider-{index}','geometry':shape,'room':room,
+                'sourceEntities':[bar.id]+[q.id for q in caps+stems],
+                'photoSha256':USER_BATHROOM_PHOTO_SHA256,'modeledHeight':2.05,
+                'basis':'actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z'})
+    return result
+
+
+def capped_shower_walls(floor,data,wall,mezz,openings):
+    parts=[];notes=[]
+    for divider in bathroom_shower_dividers(data):
+        shape=geom.clean(wall.intersection(divider['geometry']));wall=geom.clean(wall.difference(divider['geometry']))
+        key=floor_key(floor,divider['room']['geometry'].representative_point(),mezz);bottom=level(key);top=min(ceiling(key),bottom+2.05)
+        solids=geom.wall_bands(shape,openings,bottom,top,floor+'-'+divider['id'])
+        note={k:v for k,v in divider.items() if k not in ('geometry','room')}|{'levelKey':key,'top':top,'bounds':list(divider['geometry'].bounds)}
+        for solid in solids:solid['sourceStructure']=note
+        parts+=solids;notes.append(note)
+    return wall,parts,notes
 
 
 def prepare_floor(floor, data, doors, interior, exterior, cross_portals=(), features=()):
@@ -689,6 +1410,8 @@ def prepare_floor(floor, data, doors, interior, exterior, cross_portals=(), feat
             for solid in geom.wall_bands(part,openings,level("p01.main"),ceiling("p01.main"),mask["id"]):
                 solid["ceilingPlane"]=mask["ceilingPlane"];solid["ceilingSourceEntities"]=mask["sourceEntities"]
                 solids.append(solid)
+    wall,shower_parts,shower_notes=capped_shower_walls(floor,data,wall,mezz,openings)
+    solids+=shower_parts
     for shape,lower in geom.split_zone_geometry(wall,mezz):
         if shape.is_empty:continue
         key=floor+(".mezzanine" if lower else ".main")
@@ -725,9 +1448,11 @@ def prepare_floor(floor, data, doors, interior, exterior, cross_portals=(), feat
                 room=mask["room"]
                 solids+=geom.serialize_solids(room["geometry"].intersection(holes),"p01-"+room["id"],"slab",level("p01.main")-SLAB,level("p01.main"),"floor")
     rooms=[{"id":room["id"],"sourceEntity":room["sourceEntity"],"bounds":list(room["geometry"].bounds),
+            **{key:room[key] for key in ("usage","sourceBasis","usageBasis","usageSourceEntities","usagePhotoSha256","sanitaryFixtures") if key in room},
             "levelKey":floor_key(floor,room["geometry"].representative_point(),mezz),
             "loops":[geom.coords(list(poly.exterior.coords)[:-1])]+[geom.coords(list(ring.coords)[:-1]) for ring in poly.interiors]}
            for room in data["rooms"] for poly in geom.polygons(room["geometry"])]
+    room_floor_finishes(rooms,solids)
     metadata={"id":floor,"elevation":LEVELS[floor]["main"],"levelElevations":LEVELS[floor],"levelKind":"roof" if floor=="n07" else "occupied-floor",
         "solids":solids,"doors":doors,"windows":windows,"stairCores":cores,"rooms":rooms,"heightRationale":HEIGHT_BASIS,
         "ceilingElevation":ceiling(floor+".main") if floor!="n07" else None,
@@ -741,6 +1466,7 @@ def prepare_floor(floor, data, doors, interior, exterior, cross_portals=(), feat
                                   | {"loops":[geom.coords(list(poly.exterior.coords)[:-1])]}
                                   for item in features if item["floor"]==floor for poly in geom.polygons(item["geometry"])]
     metadata["terrainPreservationAreas"]=[]
+    metadata['showerPartitionCaps']=shower_notes
     if chamber:
         metadata["terrainPreservationAreas"]=[{key:value for key,value in chamber.items() if key not in ("geometry","roomGeometry")}
             | {"loops":[geom.coords(list(chamber["geometry"].exterior.coords)[:-1])]}]
@@ -754,7 +1480,7 @@ def prepare_floor(floor, data, doors, interior, exterior, cross_portals=(), feat
            "inferredBoundaries":boundary,"wallRoomConflicts":conflicts,"junctionRepairs":junctions,"excludedStairGraphics":sorted(excluded),
            "sourceBoundedJoins":source_joins,"retainingPanel":{key:value for key,value in panel.items() if key!="geometry"} if panel else None,
            "crossFloorPortals":metadata["crossFloorPortals"],
-           "exteriorFeatures":metadata["exteriorFeatures"],"terrainPreservationAreas":metadata["terrainPreservationAreas"],
+           "exteriorFeatures":metadata["exteriorFeatures"],"terrainPreservationAreas":metadata["terrainPreservationAreas"],"showerPartitionCaps":shower_notes,
            "duplicateWindowEntities":duplicates,"heightBasis":HEIGHT_BASIS}
     return metadata,audit,{"wall":wall,"footprint":envelope,"holes":holes,"rooms":data["rooms"],"openings":openings,"mezz":mezz}
 
@@ -785,7 +1511,8 @@ def draw_overlay(floor,drawing,output,roof_outline=None):
         ax.plot(*poly.exterior.xy,color="#26362a",linewidth=.35,zorder=3)
         for ring in poly.interiors:ax.plot(*ring.xy,color="#26362a",linewidth=.35,zorder=3)
     for opening in drawing["openings"]:
-        for poly in geom.polygons(opening["bridge"]):
+        visible_opening=opening["cut"] if opening["kind"]=="window" else opening["bridge"]
+        for poly in geom.polygons(visible_opening):
             ax.fill(*poly.exterior.xy,color="#e2b477" if opening["kind"]=="door" else "#56b8ce",zorder=4)
     for solid in floor["solids"]:
         if solid["role"] in ("column","column-cover","retaining-wall"):
@@ -826,7 +1553,9 @@ def attach_roofs(floors,drawings,roof_source):
 def prepare(source,output,audit_path,overlays=True):
     start_dependencies=dependencies();data=read_sources(source)
     doors,door_audits={},{}
-    for floor in FLOORS:doors[floor],door_audits[floor]=doors_from_source(data[floor],floor)
+    for floor in FLOORS:
+        doors[floor],door_audits[floor]=doors_from_source(data[floor],floor)
+        annotate_bedroom_door_pairs(data[floor],doors[floor])
     interior=stair_metadata(data);exterior=exterior_metadata(data,doors)
     cross_portals=upper_annex_portals(data["n06"],doors["n05"])
     features=n01_exterior_features(data["n01"],doors["n01"])
@@ -837,12 +1566,21 @@ def prepare(source,output,audit_path,overlays=True):
         audit["doorSourceCorrections"]=door_audits[floor]
         print(f"{floor}: {len(prepared['solids'])} solids, {len(doors[floor])} doors",flush=True)
     attach_roofs(floors,drawings,data["n07"])
+    shared_east=resolve_last_east_facade(floors)
+    reserve_structural_sills(floors)
+    reserve_door_frames(floors)
+    for floor in floors:partition_slab_tops(floor)
+    for floor,audit_floor in zip(floors,audits):
+        if floor['id'] in ('n05','n06'):audit_floor['sharedEastFacade']=shared_east
+        audit_floor['doorFrameOwnership']={'solidCount':sum(s['role']=='door-frame' for s in floor['solids']),
+            'removedStructuralVolumeM3':floor['crossFloorDoorFrameRemovedVolumeM3'],
+            'basis':'exact unioned source frame profiles own their volume across floors; leaf poses/opening dimensions are unchanged'}
     height={"id":HEIGHT_MODEL_ID,"levels":LEVELS,"basis":HEIGHT_BASIS,"cadMeasuredZ":False,"photogrammetryCalibrationPending":True}
     recipe={"schemaVersion":1,"buildingId":"b06","osmId":53929071,"cadOrigin":CAD_ORIGIN,"heightModel":height,
         "generatorDependenciesSha256":start_dependencies,"floors":floors,"roofTransitions":[],"exteriorVoids":[],
         "interiorStairPlans":interior["plans"],"interiorStairObservations":interior["observations"],"interiorStairLevelEstimates":interior["levels"],
         "exteriorStairRoutes":exterior["plans"],"exteriorLevelAnchors":exterior["anchors"],"exteriorLevelEstimates":{},"terrainCutouts":exterior["terrainCutouts"],
-        "terrainPreservationAreas":[item for floor in floors for item in floor["terrainPreservationAreas"]],
+        "terrainPreservationAreas":[item for floor in floors for item in floor["terrainPreservationAreas"]],"exteriorSigns":[rear_sign()],
         "sourceProvenance":{"files":[{k:v for k,v in data[f]["provenance"].items() if k!="titleBlock"} for f in FLOORS],
             "scales":{f:data[f]["scale"] for f in FLOORS},"sourceFilesEmbedded":False,"heightBasis":HEIGHT_BASIS,
             "horizontalBasis":"unshifted B6 CAD/1000; common original coordinates; no B1/B2 normalization"}}

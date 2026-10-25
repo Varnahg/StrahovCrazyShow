@@ -9,6 +9,10 @@ import {
   atmosphereStarPixels,
   atmosphereVisibility,
   createAtmosphereSky,
+  cloudShellDistance,
+  atmosphereHaze,
+  sampleCloudRank,
+  CloudLightSampler,
 } from "../client/atmosphere-sky";
 import {
   equatorialDirection,
@@ -22,6 +26,212 @@ const rad = Math.PI / 180;
 function near(a: number, b: number, tolerance = 1e-7) {
   assert.ok(Math.abs(a - b) < tolerance, `${a} ≈ ${b}`);
 }
+
+test("CPU cloud filtering preserves GPU texel centres, bilinear weights and periodic seams", () => {
+  const bytes = new Uint8Array([
+    0, 30, 60, 255, 64, 70, 90, 255, 128, 130, 140, 255, 255, 200, 220, 255,
+  ]);
+  near(sampleCloudRank(bytes, 2, 0.25, 0.25, 0), 0);
+  near(sampleCloudRank(bytes, 2, 0.75, 0.75, 0), 1);
+  near(
+    sampleCloudRank(bytes, 2, 0.5, 0.5, 0),
+    (0 + 64 + 128 + 255) / (4 * 255),
+  );
+  near(sampleCloudRank(bytes, 2, 0, 0.25, 1), 50 / 255);
+  near(sampleCloudRank(bytes, 2, -1, 2.25, 1), 50 / 255);
+  near(
+    sampleCloudRank(bytes, 2, 1 - 1e-8, 0.5, 2),
+    sampleCloudRank(bytes, 2, 1e-8, 0.5, 2),
+    1e-7,
+  );
+});
+
+test("CPU cloud light matches independent shader equations including cirrus transform and layer overlap", () => {
+  const size = 8,
+    pixels = atmosphereNoisePixels(size);
+  const coverage = { x: 0.45, y: 0.6, z: 0.8 };
+  const offsets = [
+    { x: -0.31, y: 0.21 },
+    { x: 0.83, y: -0.12 },
+    { x: -2.1, y: 3.4 },
+  ];
+  const sampler = new CloudLightSampler(pixels, size, coverage, offsets);
+  const smoothstep = (lo: number, hi: number, value: number) => {
+    const t = Math.max(0, Math.min(1, (value - lo) / (hi - lo)));
+    return t * t * (3 - 2 * t);
+  };
+  // Separately express the GLSL equations and LINEAR texel weighting. This is
+  // CPU recipe parity, not a GPU texture or implicit-mipmap readback.
+  const reference = (x: number, y: number, z: number) => {
+    if (y <= 0) return 0;
+    const layers = [coverage.x, coverage.y, coverage.z].map((cover, layer) => {
+      const h = [1400, 3510, 8512][layer],
+        scale = [4000, 9500, 38000][layer];
+      const t =
+        Math.sqrt((6371000 * y) ** 2 + h * (12742000 + h)) - 6371000 * y;
+      let u = (x * t) / scale + offsets[layer].x,
+        v = (z * t) / scale + offsets[layer].y;
+      if (layer === 1) {
+        u += 0.37;
+        v += 0.11;
+      }
+      if (layer === 2) {
+        u = 0.33 * u + 0.53 * v + 0.16;
+        v = 1.42 * v + 0.63;
+      }
+      const fx = u * size - 0.5,
+        fy = v * size - 0.5;
+      let rank = 0;
+      for (let row = 0; row < 2; row++)
+        for (let column = 0; column < 2; column++) {
+          const ix = Math.floor(fx) + column,
+            iy = Math.floor(fy) + row;
+          const weight = (1 - Math.abs(ix - fx)) * (1 - Math.abs(iy - fy));
+          rank +=
+            (pixels[
+              ((((iy % size) + size) % size) * size +
+                (((ix % size) + size) % size)) *
+                4 +
+                layer
+            ] *
+              weight) /
+            255;
+        }
+      return (
+        smoothstep(1 - cover - 0.075, 1 - cover + 0.075, rank) *
+        [1, 0.86, 0.65][layer] *
+        smoothstep(0, 0.025, y)
+      );
+    });
+    return 1 - (1 - layers[0]) * (1 - layers[1]) * (1 - layers[2]);
+  };
+  for (let degree = 1; degree < 90; degree += 3)
+    for (let bearing = 0; bearing < 360; bearing += 19) {
+      const y = Math.sin(degree * rad),
+        horizontal = Math.cos(degree * rad),
+        x = Math.sin(bearing * rad) * horizontal,
+        z = Math.cos(bearing * rad) * horizontal;
+      near(sampler.opacity(x, y, z), reference(x, y, z), 1e-8);
+    }
+});
+
+test("disc quadrature is continuous, uses the whole disc and handles zenith without allocating query state", () => {
+  const pixels = atmosphereNoisePixels(32),
+    coverage = { x: 0.5, y: 0, z: 0 },
+    offsets = [
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+    ];
+  const sampler = new CloudLightSampler(pixels, 32, coverage, offsets);
+  let counted = 0;
+  const opacity = sampler.opacity.bind(sampler);
+  sampler.opacity = (x, y, z) => {
+    counted++;
+    return opacity(x, y, z);
+  };
+  const body = { x: 0, y: 1, z: 0 };
+  const first = sampler.discTransmission(body, 0.533 * rad);
+  assert.equal(counted, 21);
+  assert.ok(first >= 0 && first <= 1);
+  offsets[0].x += 1e-8;
+  near(sampler.discTransmission(body, 0.533 * rad), first, 1e-5);
+  coverage.x = 1;
+  assert.equal(sampler.discTransmission(body, 0.533 * rad), 0);
+  coverage.x = 0;
+  assert.equal(sampler.discTransmission(body, 0.533 * rad), 1);
+});
+
+test("lunar cloud transmission weights the illuminated side and preserves a sub-grid crescent", () => {
+  const sampler = new CloudLightSampler(
+    new Uint8Array(4),
+    1,
+    { x: 1, y: 0, z: 0 },
+    [
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+    ],
+  );
+  const moon = {
+    x: 0,
+    y: 0.7,
+    z: Math.sqrt(0.51),
+    fraction: 0.5,
+    brightLimbAngle: -Math.PI / 2,
+  };
+  sampler.opacity = (x) => (x < 0 ? 1 : 0);
+  near(sampler.discTransmission(moon, 0.01), 0, 1e-5);
+  sampler.opacity = (x) => (x > 0 ? 1 : 0);
+  near(sampler.discTransmission(moon, 0.01), 1);
+  moon.fraction = 0.005;
+  near(sampler.discTransmission(moon, 0.01), 1);
+});
+
+test("spherical cloud projection is finite and monotonic through the former 4.88 degree fold", () => {
+  for (const height of [1400, 3510, 8512]) {
+    near(cloudShellDistance(1, height), height, 1e-6);
+    near(
+      cloudShellDistance(0, height),
+      Math.sqrt(height * (2 * 6371000 + height)),
+      1e-6,
+    );
+    let previous = Infinity;
+    for (let degree = 0; degree <= 89; degree += 0.05) {
+      const angle = degree * rad;
+      const projected =
+        Math.cos(angle) * cloudShellDistance(Math.sin(angle), height);
+      assert.ok(
+        projected < previous,
+        `${height} m at ${degree}° must not fold`,
+      );
+      previous = projected;
+    }
+    const cutoff = Math.asin(0.085);
+    const project = (angle: number) =>
+      Math.cos(angle) * cloudShellDistance(Math.sin(angle), height);
+    const epsilon = 1e-5;
+    const before = (project(cutoff) - project(cutoff - epsilon)) / epsilon;
+    const after = (project(cutoff + epsilon) - project(cutoff)) / epsilon;
+    assert.ok(before < 0 && after < 0);
+    assert.ok(
+      Math.abs(before / after - 1) < 0.001,
+      "smooth motion across the previous cutoff",
+    );
+  }
+});
+
+test("only finite model visibility controls sky haze; a fresh atmosphere updates bound discs too", () => {
+  assert.equal(atmosphereHaze(undefined), 0);
+  assert.equal(atmosphereHaze(NaN), 0);
+  assert.equal(atmosphereHaze(40000), 0);
+  assert.equal(atmosphereHaze(150), 1);
+  assert.ok(atmosphereHaze(400) > atmosphereHaze(5000));
+  const engine = new NullEngine(),
+    scene = new Scene(engine);
+  const sky = createAtmosphereSky(scene, "low");
+  const disc = new ShaderMaterial("test:haze-disc", scene, "not-compiled", {});
+  const unbind = sky.bindClouds(disc);
+  try {
+    sky.update({
+      instant: 1000,
+      sun: { x: 0, y: 1, z: 0, altitude: 1 },
+      cloud: 0.4,
+      rain: 0,
+      weather: { cloud: 0.4, rain: 0, wind: 0, visibility: 400 },
+    });
+    const floats = (material: ShaderMaterial) =>
+      (material as unknown as { _floats: Record<string, number> })._floats;
+    assert.equal(floats(disc).atmosphereHaze, atmosphereHaze(400));
+    assert.equal(floats(sky.material).atmosphereHaze, atmosphereHaze(400));
+  } finally {
+    unbind();
+    disc.dispose();
+    sky.dispose();
+    scene.dispose();
+    engine.dispose();
+  }
+});
 
 test("USNO sidereal epoch and map axes put rising stars east and the pole north", () => {
   near(localSiderealAngle(j2000, 0) / rad, 280.46061837);
@@ -136,6 +346,13 @@ test("cloud noise has deterministic, periodic variation without image seams", ()
   }
   assert.ok(seam / size < (interior / (size * (size - 1))) * 1.6);
   assert.ok(rangeMax - rangeMin > 110);
+});
+
+test("coverage reaches clear and fully overcast continuously at every atlas rank", () => {
+  for (let rank = 0; rank <= 1; rank += 0.01) {
+    near(atmosphereCloudDensity(rank, 1 - 1e-6), 1, 1e-8);
+    near(atmosphereCloudDensity(rank, 1e-6), 0, 1e-8);
+  }
 });
 
 test("calibrated cloud atlas matches requested fractions with filtered samples", () => {

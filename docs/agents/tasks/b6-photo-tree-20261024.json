@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-photo-tree-20261024",
+  "title": "KEY-60: obnovit doložený smrk u B6 bez regenerace treepacku",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/vegetation.ts",
+    "client/vegetation.ts",
+    "shared/data/cad-buildings/b06-tree-placement.json",
+    "tests/vegetation.test.ts",
+    "tests/vegetation-runtime.test.ts",
+    "docs/reality-pack/cad-buildings/b06/photo-tree.md",
+    ".cache/b6-photo-tree-20261024/",
+    "docs/agents/handoffs/b6-photo-tree-20261024.md",
+    "tests/tree-appearance.test.ts",
+    "tests/vegetation-realistic-pack.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Původní nepřítomný conifer jezdrojovělokalizován, zůstávásameid/LODasset a projde všemipůvodnímifiltry mimochodník/budovu.",
+    "Sdílené renderovací i collision placementshodné; žádnýnovýstrom v komunikaci a žádnáregeneraceostatníchassetů."
+  ],
+  "verification": [
+    "Cílené CPU testy reálné runtimeplacementtransform a filtrování, noGPU/Blender/fullsuite."
+  ],
+  "notes": [
+    "Userphoto b6-front vrootcache a IPRleaf1127463/64/71/72; oldpoint−10.317/−94.077 jeasfalt. Candidate−10.5/−76.5±2m, crownextent andprimary evidence předalagent rootovi.",
+    "Rootheldheavy, interiorymodelintegracejendisjunktně. Bez dalšíhoBMAD neboagentů.",
+    "Metadata task byl vytvořen rootem po odmítnutém původním admin claim kvůli jeho čtyřem vlastním dirty taskům; coordinator následně řádně převzal všech pět vlastních definic přes adopt-dirty. Žádné cizí taskové soubory nebyly přepsány.",
+    "Root extends accepted regression scope to old tree-count/placement assumptions identified by full game suite; original pack geometry stays untouched."
+  ]
+}

@@ -70,14 +70,16 @@ import { B6_LAYOUT } from "../shared/b6-interior";
 import { groundHeight, PARKING_SLOTS } from "../shared/terrain";
 import type { B6RealityController } from "./b6-reality";
 import type { CadBuildingsController } from "./cad-buildings";
-import { CAD_BUILDINGS, hasCadBuilding, cadLevelHeight } from "../shared/cad-buildings";
+import { CAD_BUILDINGS, CAD_DOOR_DEFINITIONS, CAD_DOOR_DEFINITION_HASH, hasCadBuilding, cadLevelHeight } from "../shared/cad-buildings";
+import { CadDoorStateStore, cadDoorPose, CAD_DOOR_INTERACTION_RANGE, type CadDoorSnapshot, type CadDoorState } from "../shared/cad-doors";
+import type { CadDoorTimeline } from "../shared/cad-door-timeline";
 import { applyArtLighting } from "./art-lighting";
 import { VehicleLighting } from "./vehicle-lighting";
 import { PlayerFlashlight } from "./flashlight";
 import { localizeText, t } from "./i18n";
 import { MapNavigator, type PlanMapRoute } from "./map-navigation";
 import { createNavigationClearance } from "./navigation-physics";
-import { updateRainSegments } from "./weather-particles";
+import { PrecipitationRenderer } from "./precipitation-renderer";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { getRendererInfo } from "./gpu-diagnostics";
 import { RenderHealth, type RenderHealthSnapshot } from "./render-health";
@@ -103,7 +105,6 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Ray } from "@babylonjs/core/Culling/ray";
-import type { LinesMesh } from "@babylonjs/core/Meshes/linesMesh";
 import { ScreenLabels } from "./labels";
 import {
   pickWorldTarget,
@@ -125,6 +126,7 @@ import {
   zoneAt,
 } from "../shared/world";
 import { type Weather } from "../shared/weather";
+import { createWeatherScenario, type WeatherScenarioId } from "../shared/weather-scenarios";
 import { SkyWeatherController } from "./sky-weather";
 import type { VegetationController } from "./vegetation";
 import type { TransitRenderer } from "./transit-renderer";
@@ -407,7 +409,7 @@ export class Game {
     this.vehicleCameraSnap = true;
     this.lastCameraInput = -Infinity;
   }
-  quality = "medium";
+  quality: RenderQuality = "medium";
   keys = new Set<string>();
   avatars = new Map<string, Avatar>();
   yaw = Math.PI;
@@ -437,12 +439,23 @@ export class Game {
   profile: Profile;
   localPlayer: Player;
   weather?: Weather;
+  private weatherPreview?: Weather;
+  private doorTimeline: CadDoorTimeline | null = null;
+  private readonly guestDoors = new CadDoorStateStore(CAD_DOOR_DEFINITIONS, {
+    worldEpoch: "guest-local", definitionHash: CAD_DOOR_DEFINITION_HASH,
+  });
+  private doorSnapshot: CadDoorSnapshot | null = null;
+  private readonly doorStates = new Map<string, CadDoorState>();
+  private readonly predictionDoorRevisions = new Map<number, number>();
+  private doorRequestId = 0;
+  private doorInputTickBase = 0;
+  private lastDoorResync = -Infinity;
+  private skyDiagnosticPanel?: HTMLElement;
   sun: DirectionalLight;
   ambient: HemisphericLight;
   clouds: Mesh[] = [];
   lamps: StandardMaterial;
-  rain?: LinesMesh;
-  rainLines: Vector3[][] = [];
+  private precipitation?: PrecipitationRenderer;
   car: TransformNode;
   parkedCar: TransformNode;
   found = new Set<string>();
@@ -730,24 +743,7 @@ export class Game {
       CAR_SPAWN.z,
     );
     this.skyWeather = new SkyWeatherController(this.scene);
-    for (let i = 0; i < 160; i++) {
-      const x = ((i * 13.17) % 36) - 18,
-        z = ((i * 7.31) % 36) - 18,
-        y = (i * 3.73) % 18;
-      this.rainLines.push([
-        new Vector3(x, y, z),
-        new Vector3(x + 0.12, y - 0.7, z),
-      ]);
-    }
-    this.rain = MeshBuilder.CreateLineSystem(
-      "rain",
-      { lines: this.rainLines, updatable: true },
-      this.scene,
-    );
-    this.rain.color = new Color3(0.65, 0.77, 0.85);
-    this.rain.alpha = 0.45;
-    this.rain.isPickable = false;
-    this.rain.setEnabled(false);
+    this.precipitation = new PrecipitationRenderer(this.scene);
     this.localPlayer = {
       ...profile,
       ...SPAWN,
@@ -984,7 +980,7 @@ export class Game {
     const { loadCadBuildings } = await this.renderHealth.guard(import("./cad-buildings"));
     await this.loadCadBuildingsForStartup(loadCadBuildings);
     this.surfacePack = new SurfacePack(this.scene);
-    this.surfacePack.update(1, this.quality, this.weather?.rain ?? 0);
+    this.surfacePack.update(1, this.quality, this.effectiveWeather?.rain ?? 0);
     this.cinematic = new CinematicAtmosphere(this.scene, this.camera, this.sun);
     this.vehicleLighting = new VehicleLighting(this.scene);
     this.updatePlayers([this.localPlayer]);
@@ -1029,6 +1025,7 @@ export class Game {
         health: this.renderHealth,
         render: preloadRender,
         isReady: () => {
+          if (this.precipitation && !this.precipitation.prepare()) return false;
           if (!pipelinePreparation!.isReady()) return false;
           const meshes = this.scene.getActiveMeshes();
           for (let index = 0; index < meshes.length; index++)
@@ -1045,8 +1042,136 @@ export class Game {
     this.canvas.dataset.renderHealth = "ready";
     this.compilationProfile.setStage("ready");
     this.ready = true;
+    this.applyDoorSnapshot(this.network ? this.doorTimeline?.currentSnapshot() ?? null : this.guestDoors.snapshot());
     this.canvas.dataset.bootStage = "ready";
+    this.installSkyDiagnostics();
     this.engine.runRenderLoop(() => this.frame());
+  }
+  /** Visible controls for reproducible render isolation in a separate local QA
+   * tab. Normal games have no panel, persisted override or hidden debug state. */
+  private installSkyDiagnostics() {
+    if (!["127.0.0.1", "localhost", "[::1]"].includes(location.hostname) ||
+      new URLSearchParams(location.search).get("skyDiagnostics") !== "1") return;
+    const panel = document.createElement("details"), summary = document.createElement("summary");
+    panel.style.cssText = "position:fixed;right:12px;top:100px;z-index:10000;background:#101d26;color:white;padding:12px;max-width:480px;max-height:65vh;overflow:auto;font:12px monospace";
+    summary.textContent = "QA · izolace oblohy"; panel.append(summary);
+    const report = document.createElement("pre"); report.style.whiteSpace = "pre-wrap";
+    let pipelineReport: unknown = null, precipitationReport: unknown = null;
+    const capturePrecipitation = () => new Promise<unknown>(resolve => {
+      const mesh=this.precipitation?.mesh;
+      if(!mesh){resolve({status:"missing"});return;}
+      const state=()=>({activeCount:this.precipitation?.activeCount,enabled:mesh.isEnabled(),visible:mesh.isVisible,
+        position:mesh.position.asArray(),indexCount:mesh.subMeshes[0]?.indexCount,
+        active:this.scene.getActiveMeshes().data.slice(0,this.scene.getActiveMeshes().length).includes(mesh),
+        bounds:mesh.getBoundingInfo().boundingBox.vectorsWorld.map(p=>p.asArray())});
+      if(!mesh.isEnabled()){resolve({status:"inactive",...state()});return;}
+      let settled=false, observer:ReturnType<typeof mesh.onAfterRenderObservable.add>, timer:ReturnType<typeof setTimeout>;
+      const finish=(value:unknown)=>{
+        if(settled)return;settled=true;
+        mesh.onAfterRenderObservable.remove(observer);clearTimeout(timer);
+        this.startupAbort.signal.removeEventListener("abort",abort);resolve(value);
+      };
+      const abort=()=>finish({status:"disposed"});
+      observer=mesh.onAfterRenderObservable.add(()=>{
+        try {
+          const gl=(this.engine as AbstractEngine & {_gl?:WebGL2RenderingContext})._gl;
+          if(!gl){finish({status:"draw-observed",...state(),backend:"non-WebGL"});return;}
+          const program=gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram|null;
+          if(!program){finish({status:"no-program",...state()});return;}
+          const values=(value:unknown)=>ArrayBuffer.isView(value)?Array.from(value as Float32Array):value;
+          const uniforms=Object.fromEntries(["worldView","view","projection","wind","motionTime","illumination","extinction"].map(name=>{
+            const location=gl.getUniformLocation(program,name);return [name,location===null?null:values(gl.getUniform(program,location))];
+          }));
+          const gpuData:Record<string,Float32Array>={};
+          const attributes=["position","uv","shape"].map(name=>{
+            const location=gl.getAttribLocation(program,name);
+            if(location<0)return {name,location};
+            const buffer=gl.getVertexAttrib(location,gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING),
+              bound=buffer===gl.getParameter(gl.ARRAY_BUFFER_BINDING);
+            let sample:number[]|undefined;
+            if(buffer&&gl.getVertexAttrib(location,gl.VERTEX_ATTRIB_ARRAY_TYPE)===gl.FLOAT){
+              // Explicit one-frame QA read. Restore the exact binding; no VAO,
+              // attribute, element buffer or engine cache is changed.
+              const previous=gl.getParameter(gl.ARRAY_BUFFER_BINDING);
+              try {
+                gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+                const bytes=gl.getBufferParameter(gl.ARRAY_BUFFER,gl.BUFFER_SIZE),
+                  count=name==="position"?(this.precipitation?.activeCount??0)*12:name==="shape"?(this.precipitation?.activeCount??0)*16:16;
+                if(bytes>=64){const data=new Float32Array(Math.min(count,bytes/4));gl.getBufferSubData(gl.ARRAY_BUFFER,0,data);sample=Array.from(data.slice(0,16));gpuData[name]=data;}
+              } finally {gl.bindBuffer(gl.ARRAY_BUFFER,previous);}
+            }
+            return {name,location,enabled:gl.getVertexAttrib(location,gl.VERTEX_ATTRIB_ARRAY_ENABLED),
+              size:gl.getVertexAttrib(location,gl.VERTEX_ATTRIB_ARRAY_SIZE),stride:gl.getVertexAttrib(location,gl.VERTEX_ATTRIB_ARRAY_STRIDE),
+              type:gl.getVertexAttrib(location,gl.VERTEX_ATTRIB_ARRAY_TYPE),offset:gl.getVertexAttribOffset(location,gl.VERTEX_ATTRIB_ARRAY_POINTER),
+              divisor:gl.getVertexAttrib(location,gl.VERTEX_ATTRIB_ARRAY_DIVISOR),constant:values(gl.getVertexAttrib(location,gl.CURRENT_VERTEX_ATTRIB)),
+              currentArrayBuffer:bound,sample};
+          });
+          const widths:number[]=[],heights:number[]=[],wv=uniforms.worldView as number[],projection=uniforms.projection as number[];
+          for(let i=0;i<(this.precipitation?.activeCount??0)&&gpuData.position&&gpuData.shape;i++){
+            const p=i*12,s=i*16,x=gpuData.position[p],y=gpuData.position[p+1],z=gpuData.position[p+2],
+              vx=wv[0]*x+wv[4]*y+wv[8]*z+wv[12],vy=wv[1]*x+wv[5]*y+wv[9]*z+wv[13],vz=wv[2]*x+wv[6]*y+wv[10]*z+wv[14],
+              cx=projection[0]*vx+projection[4]*vy+projection[8]*vz+projection[12],
+              cy=projection[1]*vx+projection[5]*vy+projection[9]*vz+projection[13],
+              cz=projection[2]*vx+projection[6]*vy+projection[10]*vz+projection[14],
+              w=projection[3]*vx+projection[7]*vy+projection[11]*vz+projection[15];
+            if(w<=.0001||Math.abs(cx)>w||Math.abs(cy)>w||Math.abs(cz)>w)continue;
+            widths.push(Math.abs(gpuData.shape[s]*projection[0]/w*this.engine.getRenderWidth()));
+            heights.push(Math.abs(gpuData.shape[s+1]*projection[5]/w*this.engine.getRenderHeight()));
+          }
+          const quantiles=(a:number[])=>{a.sort((x,y)=>x-y);return [.05,.5,.95].map(q=>a[Math.floor((a.length-1)*q)]??null);};
+          finish({status:"draw-observed",phase:"after actual draw",...state(),passId:this.engine.currentRenderPassId,uniforms,attributes,
+            baseQuadBeforeMotionAndWorldOcclusion:{centersInFrustum:widths.length,widthPixelsP05P50P95:quantiles(widths),heightPixelsP05P50P95:quantiles(heights)},
+            viewport:Array.from(gl.getParameter(gl.VIEWPORT)),depthTest:gl.isEnabled(gl.DEPTH_TEST),depthFunction:gl.getParameter(gl.DEPTH_FUNC),
+            depthWrite:gl.getParameter(gl.DEPTH_WRITEMASK),blend:gl.isEnabled(gl.BLEND),cull:gl.isEnabled(gl.CULL_FACE)});
+        }catch(error){finish({status:"capture-error",message:String(error),...state()});}
+      });
+      timer=setTimeout(()=>finish({status:"no-draw-within-5s",...state()}),5000);
+      this.startupAbort.signal.addEventListener("abort",abort,{once:true});
+    });
+    const updateReport = () => {
+      const viewport = this.camera.viewport.toGlobal(this.engine.getRenderWidth(), this.engine.getRenderHeight());
+      const meshes = ["atmosphere backdrop", "astronomical sun", "astronomical moon"].map(name => {
+        const mesh = this.scene.getMeshByName(name);
+        if (!mesh) return { name, missing: true };
+        mesh.computeWorldMatrix(true);
+        const bounds = mesh.getBoundingInfo().boundingBox.vectorsWorld.map(p => Vector3.Project(p,Matrix.Identity(),this.scene.getTransformMatrix(),viewport));
+        return { name, enabled:mesh.isEnabled(), visible:mesh.isVisible,
+          pixels:[Math.max(...bounds.map(p=>p.x))-Math.min(...bounds.map(p=>p.x)),Math.max(...bounds.map(p=>p.y))-Math.min(...bounds.map(p=>p.y))],
+          alphaMode:mesh.material?.alphaMode, depthWriteDisabled:mesh.material?.disableDepthWrite,
+          renderingGroup:mesh.renderingGroupId };
+      });
+      report.textContent = JSON.stringify({ backend:this.engine.isWebGPU?"WebGPU":"WebGL2",
+        css:[this.canvas.clientWidth,this.canvas.clientHeight],render:[this.engine.getRenderWidth(),this.engine.getRenderHeight()],
+        postprocess:this.scene.postProcessesEnabled, instant:this.timeOverride??Date.now(),
+        camera:{position:this.camera.position.asArray(),yaw:this.yaw,pitch:this.pitch},
+        weather:this.effectiveWeather?.preview??"live", cloudTransmission:this.skyWeather.atmosphere.lightTransmission, meshes,
+        precipitation:precipitationReport,pipeline:pipelineReport },null,2);
+    };
+    const controls: [string,(enabled:boolean)=>void][] = [
+      ["Bloom",enabled=>this.cinematic?.setDiagnosticBloom(enabled)],
+      ["Celý postprocessing",enabled=>{this.scene.postProcessesEnabled=enabled;}],
+      ...["atmosphere backdrop", "astronomical sun", "astronomical moon"].map(name =>
+        [name,(enabled:boolean)=>{const mesh=this.scene.getMeshByName(name);if(mesh)mesh.isVisible=enabled;}] as [string,(enabled:boolean)=>void]),
+    ];
+    for (const [name,apply] of controls) {
+      const label=document.createElement("label"), input=document.createElement("input");
+      label.style.display="block"; input.type="checkbox";input.checked=true;
+      input.addEventListener("change",()=>{apply(input.checked);pipelineReport=null;updateReport();},{signal:this.startupAbort.signal});
+      label.append(input,document.createTextNode(" "+name));panel.append(label);
+    }
+    const button=document.createElement("button");button.textContent="Zaznamenat stav vykreslení";
+    const download=document.createElement("button");download.textContent="Stáhnout záznam";download.disabled=true;
+    button.addEventListener("click",async()=>{
+      button.disabled=true;
+      try { [pipelineReport,precipitationReport]=await Promise.all([this.cinematic?.captureDiagnostics(),capturePrecipitation()]); }
+      finally { if(!this.disposed&&report.isConnected){button.disabled=false;download.disabled=!pipelineReport;updateReport();} }
+    },{signal:this.startupAbort.signal});
+    download.addEventListener("click",()=>{
+      const url=URL.createObjectURL(new Blob([report.textContent??""],{type:"application/json"}));
+      const link=document.createElement("a");link.href=url;link.download=`strahov-sky-${Date.now()}.json`;link.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    },{signal:this.startupAbort.signal});panel.append(button,download,report);
+    document.body.append(panel);this.skyDiagnosticPanel=panel;updateReport();
   }
   mat(hex: string) {
     if (this.materials.has(hex)) return this.materials.get(hex)!;
@@ -1277,6 +1402,14 @@ export class Game {
   }
   reconcile(packet: Authority, receivedAt = performance.now()): boolean {
     if (this.disposed || !this.ready || packet.tick < this.lastAuthorityTick) return false;
+    const authoritativeDoors = this.network && CAD_DOOR_DEFINITIONS.length
+      ? packet.doorWorldEpoch === this.doorTimeline?.identity.worldEpoch && Number.isSafeInteger(packet.doorRevision)
+        ? this.doorTimeline!.snapshotAt(packet.tick, packet.doorRevision) : null
+      : null;
+    if (this.network && CAD_DOOR_DEFINITIONS.length && !authoritativeDoors) {
+      this.requestDoorResync();
+      return false;
+    }
     // Respawn is completed by a forced authority, not by replaying a packet
     // already in flight when the user asked to return to the start.
     const respawnReply = packet.resync === true && packet.respawn === true;
@@ -1300,6 +1433,15 @@ export class Game {
       },
     );
     if (!acceptance.accepted) return false;
+    // The server changes doors after Actor.step(T), before world.step(T).
+    // Validate the whole replay range before mutating the local actor.
+    if (authoritativeDoors && !packet.resync && acceptance.replay.some(({input}) =>
+      this.doorTimeline!.revisionAt(packet.inputTickBase + input.seq - 1) === null ||
+      this.doorTimeline!.revisionAt(packet.inputTickBase + input.seq) === null)) {
+      this.requestDoorResync();
+      return false;
+    }
+    this.doorInputTickBase = packet.inputTickBase;
     this.lastAuthorityNetwork = snapshotAcceptedAuthorityDiagnostics(packet);
     this.lastAuthorityAtMs = receivedAt;
     this.diagnosticNetwork.authorityPackets++;
@@ -1307,6 +1449,7 @@ export class Game {
     const expected = this.prediction.states.get(packet.ack);
     const exact =
       expected &&
+      (!authoritativeDoors || this.predictionDoorRevisions.get(packet.ack) === authoritativeDoors.revision) &&
       expected.vehicle === packet.state.vehicle &&
       expected.grounded === packet.state.grounded &&
       Math.abs(expected.speed - packet.state.speed) < 0.01 &&
@@ -1331,9 +1474,12 @@ export class Game {
       exact &&
       !packet.resync &&
       !acceptance.rebase &&
+      (!authoritativeDoors || acceptance.replay.every(({input}) =>
+        this.predictionDoorRevisions.get(input.seq) === this.doorTimeline!.revisionAt(packet.inputTickBase + input.seq))) &&
       acceptance.replay.every((step) => step.source === "input")
     ) {
       this.prediction.acknowledge(packet.ack);
+      this.pruneDoorPrediction(packet.ack);
       this.seq = Math.max(this.seq, packet.ack);
       return true;
     }
@@ -1366,7 +1512,9 @@ export class Game {
       this.snapshots.remove(this.localId);
     } else this.seq = Math.max(this.seq, packet.ack);
     this.prediction.acknowledge(packet.ack);
+    this.pruneDoorPrediction(packet.ack);
     const replay = acceptance.replay;
+    if (authoritativeDoors) this.applyDoorSnapshot(authoritativeDoors);
     this.actor.restore(packet.state, packet.respawn === true);
     if (packet.resync && !packet.state.vehicle && packet.state.vehicleState)
       this.sim.restorePublicCar(packet.state.vehicleState);
@@ -1374,14 +1522,19 @@ export class Game {
       this.alignVehicleCamera();
     if (!packet.resync) {
       for (const { input, time } of replay) {
+        const tick = packet.inputTickBase + input.seq;
+        if (authoritativeDoors) this.restoreDoorTick(tick - 1);
         this.actor.step(input, FIXED_DT);
+        if (authoritativeDoors) this.restoreDoorTick(tick);
         // Anchor replay to the authority's server time, independent of local
         // clock skew and mode-filtered sequence gaps. Dynamic contacts still
         // do not have a full world rollback.
         this.sim.tick(time);
         this.prediction.states.set(input.seq, this.actor.capture());
+        if (this.doorSnapshot) this.predictionDoorRevisions.set(input.seq, this.doorSnapshot.revision);
       }
     }
+    if (authoritativeDoors) this.applyDoorSnapshot(this.doorTimeline!.currentSnapshot());
     const corrected = this.actor.position,
       error = Math.hypot(
         old.x - corrected.x,
@@ -1447,6 +1600,7 @@ export class Game {
   private resetPredictionHistory(priority = false) {
     this.accumulator = 0;
     this.prediction.clear();
+    this.predictionDoorRevisions.clear();
     this.onPredictionReset?.(priority);
   }
   private clearPendingMovement() {
@@ -1508,6 +1662,80 @@ export class Game {
   setWeather(weather: Weather) {
     this.weather = weather;
   }
+  setWeatherPreview(id: WeatherScenarioId | null) {
+    this.weatherPreview = id === null ? undefined : createWeatherScenario(id);
+  }
+  get effectiveWeather() { return this.weatherPreview ?? this.weather; }
+
+  /** The current UI connection owns/disposes this timeline; guests never share it. */
+  attachDoorTimeline(timeline: CadDoorTimeline | null) {
+    if (!this.network || this.disposed) return;
+    if (this.doorTimeline !== timeline) {
+      this.doorSnapshot = null;
+      this.doorStates.clear();
+      this.predictionDoorRevisions.clear();
+    }
+    this.doorTimeline = timeline;
+    if (this.ready) this.applyDoorSnapshot(timeline?.currentSnapshot() ?? null);
+  }
+  private applyDoorSnapshot(snapshot: CadDoorSnapshot | null) {
+    if (!snapshot || !this.sim || !this.cadBuildings) return;
+    if (this.doorSnapshot?.worldEpoch === snapshot.worldEpoch && this.doorSnapshot.revision === snapshot.revision) return;
+    this.sim.doorPhysics.applyStates(snapshot.states);
+    this.cadBuildings.setDoorStates(snapshot.states);
+    this.doorSnapshot = snapshot;
+    this.doorStates.clear();
+    for (const state of snapshot.states) this.doorStates.set(state.id, state);
+  }
+  private restoreDoorTick(tick: number) {
+    const revision = this.doorTimeline?.revisionAt(tick);
+    if (revision == null) return false;
+    if (revision !== this.doorSnapshot?.revision)
+      this.applyDoorSnapshot(this.doorTimeline!.snapshotAt(tick, revision));
+    return true;
+  }
+  private requestDoorResync() {
+    const now = performance.now();
+    if (now - this.lastDoorResync < 1000) return;
+    this.lastDoorResync = now;
+    this.onAction?.("doorResync");
+  }
+  private pruneDoorPrediction(ack: number) {
+    for (const seq of this.predictionDoorRevisions.keys()) if (seq <= ack) this.predictionDoorRevisions.delete(seq);
+  }
+  private nearbyDoor() {
+    if (!this.ready || this.actor.vehicle || (this.network && (!this.doorTimeline?.initialized || this.doorTimeline.needsResync))) return null;
+    const position = this.actor.position, eye = { ...position, y: position.y + .6 };
+    let nearest: { id: string; state: CadDoorState } | null = null, range = CAD_DOOR_INTERACTION_RANGE;
+    for (const door of CAD_DOOR_DEFINITIONS) {
+      const state = this.doorStates.get(door.id);
+      if (!state) continue;
+      const handle = cadDoorPose(door, state.open).handle;
+      const distance = Math.hypot(position.x-handle.x, position.y-handle.y, position.z-handle.z);
+      if (distance >= range || !this.sim.doorPhysics.lineOfSight(eye, door.id, state.open, this.actor.collider)) continue;
+      nearest = { id: door.id, state }; range = distance;
+    }
+    return nearest;
+  }
+  private interactDoor(): boolean {
+    const door = this.nearbyDoor();
+    if (!door) return false;
+    const identity = this.network ? this.doorTimeline!.identity : this.guestDoors.identity;
+    const request = { ...identity, requestId: ++this.doorRequestId, doorId: door.id,
+      expectedRevision: door.state.revision, open: !door.state.open };
+    if (this.network) { this.onAction?.("doorRequest", request); return true; }
+    const position = this.actor.position;
+    const result = this.guestDoors.request(request, {
+      actor: { id: this.actor.id, position, eye: {...position, y:position.y+.6}, vehicle:false },
+      tick: this.seq, nowMs: performance.now(),
+      canSee: (definition,state,eye) => this.sim.doorPhysics.lineOfSight(eye, definition.id, state.open, this.actor.collider),
+      canChange: (definition,_from,open) => this.sim.doorPhysics.guardChange(definition.id,open,this.sim.doorCapsules(),this.sim.doorObstacles()).allowed,
+      apply: (id,open) => this.sim.doorPhysics.apply(id,open),
+    });
+    if (result.status === "changed") this.applyDoorSnapshot(this.guestDoors.snapshot(this.seq));
+    else if (result.status === "rejected" && result.reason === "occupied") this.notice("Ustup z prostoru dveří, aby se mohly pohnout.");
+    return true;
+  }
   applyAdaptiveQuality(next: AdaptiveQualitySnapshot) {
     if (this.disposed || this.rendererFailed) return;
     if (this.preparingRenderQuality) return;
@@ -1565,7 +1793,7 @@ export class Game {
       work: {},
       engineWork: {},
       profile: new BenchmarkRenderProfile(this.scene),
-      weatherAtStart: this.weather ? structuredClone(this.weather) : null,
+      weatherAtStart: this.effectiveWeather ? structuredClone(this.effectiveWeather) : null,
       healthAtStart: this.renderHealth.snapshot(),
       compilationAtStart: this.compilationProfile.snapshot(),
     };
@@ -1598,6 +1826,7 @@ export class Game {
       this.actor.setPosition(exit);
       return;
     }
+    if (this.interactDoor()) return;
     const nearby = HUNT_POINTS.findIndex(
       (h, i) =>
         !this.found.has(String(i)) && Math.hypot(h.x - p.x, h.z - p.z) < 4,
@@ -2064,6 +2293,12 @@ export class Game {
   }
 
   advanceSimulation(dt: number, now: number) {
+    if (this.network && CAD_DOOR_DEFINITIONS.length && (!this.doorTimeline?.initialized || this.doorTimeline.needsResync ||
+      this.doorTimeline.revisionAt(this.doorInputTickBase + this.seq) === null)) {
+      this.accumulator = 0;
+      this.requestDoorResync();
+      return;
+    }
     if (this.respawnPending) {
       this.accumulator = 0;
       return;
@@ -2095,7 +2330,10 @@ export class Game {
         this.actor.position.z,
       );
       this.capturePreviousCarPose();
+      const doorTick = this.doorInputTickBase + input.seq;
+      if (this.network && CAD_DOOR_DEFINITIONS.length) this.restoreDoorTick(doorTick - 1);
       this.actor.step(input, FIXED_DT);
+      if (this.network && CAD_DOOR_DEFINITIONS.length) this.restoreDoorTick(doorTick);
       this.sim.tick(time);
       this.seq = input.seq;
     };
@@ -2103,6 +2341,7 @@ export class Game {
       const result = this.networkTimeline.advance(now, makeInput, (step) => {
         applyStep(step.input, step.time);
         this.prediction.push(step.input, this.actor.capture());
+        if (this.doorSnapshot) this.predictionDoorRevisions.set(step.input.seq, this.doorSnapshot.revision);
         // Neutral elapsed prefix is predicted for temporal alignment only.
         // Sending it would create late packets and consume the sender budget.
         if (step.source === "input") this.onInput?.(step.input);
@@ -2287,9 +2526,10 @@ export class Game {
     if (this.environmentProfile)
       this.profiledPreviousExposure = this.scene.imageProcessingConfiguration.exposure;
     this.environmentProfile?.begin();
+    const weather = this.effectiveWeather;
     const { sun, moon, wind } = this.skyWeather.update({
       instant,
-      weather: this.weather,
+      weather,
       player: pos,
       dt,
       quality: this.quality,
@@ -2303,7 +2543,7 @@ export class Game {
       extraPracticalLightSlots:
         Number(this.b6Reality?.interiorLightEnabled ?? false) +
         Number(flashlightOn && !!self && !this.actor.vehicle),
-      weather: this.weather,
+      weather,
       player: pos,
       dt,
       instant,
@@ -2342,36 +2582,19 @@ export class Game {
       dt,
     });
     this.environmentProfile?.mark("transit");
-    const raining =
-      ((this.weather?.rain ?? 0) > 0.05 ||
-        (this.weather?.snowfall ?? 0) > 0.005) &&
-      zoneAt(pos) === "outside";
-    this.rain?.setEnabled(raining);
-    if (raining && this.rain) {
-      this.rain.position.set(pos.x, pos.y, pos.z);
-      this.rain.alpha = 0.12 + lighting.surfaceIllumination * 0.32;
-      updateRainSegments(
-        this.rainLines,
-        dt,
-        this.weather ?? { rain: 0 },
-        wind,
-        time,
-      );
-      MeshBuilder.CreateLineSystem("rain", {
-        lines: this.rainLines,
-        instance: this.rain,
-      });
-    }
+    this.precipitation?.update({dt,weather,wind,position:pos,quality:this.quality,
+      illumination:lighting.surfaceIllumination,outside:zoneAt(pos)==="outside"});
     this.environmentProfile?.mark("precipitation");
-    this.surfacePack?.update(dt, this.quality, this.weather?.rain ?? 0);
+    this.surfacePack?.update(dt, this.quality, weather?.rain ?? 0);
     this.environmentProfile?.mark("surfaces");
     this.cinematic?.update({
       dt,
       player: pos,
       quality: this.quality,
-      cloud: this.weather?.cloud ?? 0.4,
-      rain: this.weather?.rain ?? 0,
+      cloud: weather?.cloud ?? 0.4,
+      rain: weather?.rain ?? 0,
       keySource: lighting.keySource,
+      cloudOcclusionApplied: true,
       daylight: sun.daylight,
       avatars: this.avatars.values(),
       localId: this.localId,
@@ -2617,6 +2840,7 @@ export class Game {
         // Real preparation and newly requested effects must settle before this
         // variant advances, even if a material can still draw its old effect.
         return (
+          (this.precipitation?.prepare() ?? true) &&
           (pipelines?.isReady() ?? true) &&
           health.pendingPreparationOperations === 0 &&
           arePreparationEffectsReady(this.engine)
@@ -2639,7 +2863,7 @@ export class Game {
         this.quality,
         this.timeOverride,
         this.profile,
-        this.weather,
+        this.effectiveWeather,
         this.scene.meshes.length,
         this.scene.materials.length,
         this.car,
@@ -3074,7 +3298,7 @@ export class Game {
           engineCpuBreakdownScope: BENCHMARK_RENDER_CPU_SCOPE,
           frameIntervalsMs: b.frames,
           weatherAtStart: b.weatherAtStart,
-          weatherAtEnd: this.weather ? structuredClone(this.weather) : null,
+          weatherAtEnd: this.effectiveWeather ? structuredClone(this.effectiveWeather) : null,
         });
       }
     }
@@ -3108,6 +3332,8 @@ export class Game {
         hint = "E · vyzvednout balíček pro B6";
       if (!this.actor.vehicle && !this.network && this.soloDelivery === 1)
         hint = "Doruč balíček ke vstupu B6 · E";
+      const door = this.nearbyDoor();
+      if (door) hint = door.state.open ? "E · zavřít dveře" : "E · otevřít dveře";
       this.onStats?.({
         fps: Math.round(this.engine.getFps()),
         triangles: Math.round(this.scene.getActiveIndices() / 3),
@@ -3133,6 +3359,8 @@ export class Game {
     this.disposed = true;
     this.ready = false;
     this.startupAbort.abort();
+    this.skyDiagnosticPanel?.remove();
+    this.skyDiagnosticPanel = undefined;
     this.renderHealth.dispose();
     this.disposeStartupAssets();
     this.cancelLightPreparation?.();
@@ -3160,6 +3388,10 @@ export class Game {
     this.enabledMeshCandidates.dispose();
     this.mapNavigator?.dispose();
     this.sim?.dispose();
+    this.guestDoors.dispose();
+    this.doorTimeline = null;
+    this.doorStates.clear();
+    this.predictionDoorRevisions.clear();
     this.labels.dispose();
     this.contactShadows.dispose();
     this.benchmark?.profile.dispose();
@@ -3167,6 +3399,7 @@ export class Game {
     this.instrumentation.dispose();
     this.engineInstrumentation.dispose();
     this.cinematic?.dispose();
+    this.precipitation?.dispose();
     this.surfacePack?.dispose();
     this.b6Reality?.dispose();
     this.cadBuildings?.dispose();

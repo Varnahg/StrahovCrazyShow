@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-door-renderer-20261024",
+  "title": "Batch native interactive B6 door rendering",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": [
+    "client/cad-doors.ts",
+    "tests/cad-door-renderer.test.ts",
+    ".cache/b6-door-renderer-20261024/",
+    "docs/agents/handoffs/b6-door-renderer-20261024.md"
+  ],
+  "acceptance": [
+    "Concrete root delegation, research then implementation/refactoring/tests as one unit; no nested BMAD.",
+    "Keep immutable user playtest2591 untouched; no builds/GPU/servers without coordinated resource."
+  ],
+  "verification": [
+    "Meaningful targeted CPU tests, native model and full integration coordinated by root."
+  ],
+  "notes": [
+    "Disjoint continuation after shared door core; root owns shared/simulation.ts and client Game/UI."
+  ]
+}

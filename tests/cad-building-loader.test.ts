@@ -172,7 +172,7 @@ test("skutečný Game převezme vlastnictví jen za aktivního startupu", async 
   let disposed = 0;
   const operation = lateGame.loadCadBuildingsForStartup(() => pending.promise);
   lateGame.disposed = true; lateGame.startupAbort.abort();
-  pending.resolve({ stats: { buildings: 1, meshes: 1, materials: 1 }, dispose() { disposed++; } });
+  pending.resolve({ stats: { buildings: 1, meshes: 1, materials: 1 }, setDoorStates() {}, dispose() { disposed++; } });
   await assert.rejects(operation, { name: "AbortError" });
   assert.equal(disposed, 1); assert.equal(lateGame.cadBuildings, undefined);
   assert.equal(lateGame.startupAssets.size, 0);

@@ -2,6 +2,8 @@ import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
 import type { AssetContainer } from "@babylonjs/core/assetContainer";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
+import type { CadDoorDefinition, CadDoorState } from "../shared/cad-doors";
+import { createCadDoorRenderer } from "./cad-doors";
 import "@babylonjs/loaders/glTF";
 import type { CadPlacement } from "../shared/cad-building-geometry";
 import type { WorldAssetIdentity } from "../shared/world-asset-identity";
@@ -18,11 +20,13 @@ export type CadBuildingAsset = {
   glbSha256: string;
   sourceRecipeSha256: string;
   placement: CadPlacement;
+  model?: { interactiveDoors?: CadDoorDefinition[] };
 };
 
 type ContainerLoader = (url: string, scene: Scene) => Promise<AssetContainer>;
 export type CadBuildingsController = {
   readonly stats: { buildings: number; meshes: number; materials: number };
+  setDoorStates(states: readonly Pick<CadDoorState, "id" | "open">[]): void;
   dispose(): void;
 };
 
@@ -37,6 +41,7 @@ export async function loadCadBuildings(
     throw new Error("CAD model vyžaduje pravotočivou scénu hry.");
   const containers: AssetContainer[] = [];
   const pivots: TransformNode[] = [];
+  const doors: ReturnType<typeof createCadDoorRenderer>[] = [];
   const roots = new Set<TransformNode>();
   const stats = { buildings: 0, meshes: 0, materials: 0 };
   let disposed = false;
@@ -45,6 +50,8 @@ export async function loadCadBuildings(
     disposed = true;
     options.signal?.removeEventListener("abort", dispose);
     scene.onDisposeObservable.remove(sceneObserver);
+    for (const renderer of doors) renderer.dispose();
+    doors.length = 0;
     for (const container of containers) container.dispose();
     for (const pivot of pivots) if (!pivot.isDisposed()) pivot.dispose(false, false);
     disposeEmptyWorldAssetRoots(roots);
@@ -111,12 +118,17 @@ export async function loadCadBuildings(
           buildingId: asset.id,
           sourceGlbSha256: asset.glbSha256,
         };
+      if (asset.model?.interactiveDoors?.length)
+        doors.push(createCadDoorRenderer(scene, pivot, meshes, asset.model.interactiveDoors));
       assertActive();
       stats.buildings++;
       stats.meshes += meshes.length;
       stats.materials += container.materials.length;
     }
-    return { stats, dispose };
+    return { stats, dispose, setDoorStates(states) {
+      if (disposed) return;
+      for (const renderer of doors) renderer.setStates(states);
+    } };
   } catch (error) {
     dispose();
     throw error;

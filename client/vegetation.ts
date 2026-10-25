@@ -42,6 +42,22 @@ import {
 import type { Vec3 } from "../shared/types";
 import { drapeTriangles, groundHeight, groundNormal } from "../shared/terrain";
 
+/** Authored buffers are tree-local in every LOD. Bootstrap glTF nodes carry
+ * the historical world translation; streamed chunks carry only local buffers.
+ * Discard that node transform exactly once and use the same shared root for
+ * both paths, refreshing culling/shadow bounds even for frozen/late meshes. */
+export function attachAuthoredTreeMesh(mesh: Mesh, root: TransformNode) {
+  mesh.unfreezeWorldMatrix();
+  mesh.parent = root;
+  mesh.rotationQuaternion = Quaternion.Identity();
+  mesh.rotation.setAll(0);
+  mesh.scaling.setAll(1);
+  mesh.position.setAll(0);
+  mesh.computeWorldMatrix(true);
+  mesh.refreshBoundingInfo();
+  mesh.freezeWorldMatrix();
+}
+
 function authoredSurfaceTexture(scene: Scene, color: string) {
   const base = Color3.FromHexString(color),
     pixels = new Uint8Array(64 * 64 * 4);
@@ -493,11 +509,6 @@ export class VegetationController {
         }
         const placement = TREES.find((tree) => tree.osmId === match[1])!;
         const lod = Number(match[2]);
-        mesh.parent = group.root;
-        mesh.rotationQuaternion = Quaternion.Identity();
-        mesh.rotation.setAll(0);
-        mesh.scaling.setAll(1);
-        mesh.position.setAll(0);
         mesh.isVisible = true;
         mesh.isPickable = false;
         mesh.receiveShadows = true;
@@ -515,8 +526,7 @@ export class VegetationController {
         };
         applyTreeCrownShading(mesh, placement.reconstruction);
         mesh.setEnabled(lod === 2);
-        mesh.computeWorldMatrix(true);
-        mesh.freezeWorldMatrix();
+        attachAuthoredTreeMesh(mesh, group.root);
         group.lods[lod].push(mesh);
         this.trees.push(mesh);
       }
@@ -600,7 +610,6 @@ export class VegetationController {
             data.uvs = primitive.uvs;
             data.indices = primitive.indices;
             data.applyToMesh(mesh);
-            mesh.parent = tree.root;
             mesh.material = this.sharedTreeMaterials[primitive.material];
             mesh.isPickable = false;
             mesh.receiveShadows = true;
@@ -621,8 +630,7 @@ export class VegetationController {
             };
             applyTreeCrownShading(mesh, placement.reconstruction);
             mesh.setEnabled(false);
-            mesh.computeWorldMatrix(true);
-            mesh.freezeWorldMatrix();
+            attachAuthoredTreeMesh(mesh, tree.root);
             return mesh;
           });
           // Far remains enabled until the complete per-tree branch + leaf pair exists.

@@ -39,7 +39,10 @@ import type { PhotogrammetryCollision } from "./photogrammetry-gameplay";
 import { photogrammetryEntranceRepair } from "./photogrammetry-repairs";
 import { getPhotogrammetryGroundPatchGeometry } from "./photogrammetry-ground";
 import { buildingRoofGeometry } from "./building-roofs";
-import { cadCollisionParts, hasCadBuilding } from "./cad-buildings";
+import { cadCollisionParts, hasCadBuilding, CAD_DOOR_DEFINITIONS } from "./cad-buildings";
+import { CadDoorPhysics, type CadDoorCapsuleProbe, type CadDoorObstacleProbe } from "./cad-door-physics";
+import { cadDoorCollisionPartIds } from "./cad-doors";
+import { multiplyQuaternions, rotateQuaternionVector } from "./quaternion";
 export const CHARACTER_RADIUS = 0.25,
   CHARACTER_HALF_HEIGHT = 0.55;
 let initialized: Promise<void> | undefined;
@@ -59,6 +62,7 @@ export class Simulation {
   walkingColliders = new Set<number>();
   groundColliders = new Set<number>();
   readonly buildingRoofColliders = new Map<string, RAPIER.Collider>();
+  readonly doorPhysics: CadDoorPhysics;
   constructor(public readonly photogrammetry?: PhotogrammetryCollision) {
     this.world = new RAPIER.World({ x: 0, y: -18, z: 0 });
     this.world.timestep = FIXED_DT;
@@ -154,7 +158,8 @@ export class Simulation {
             this.createTwoSidedSurfaceCollider(roof),
           );
       }
-      for (const part of cadCollisionParts())
+      const movingDoorParts = cadDoorCollisionPartIds(CAD_DOOR_DEFINITIONS);
+      for (const part of cadCollisionParts().filter(part => !movingDoorParts.has(part.id)))
         this.world.createCollider(
           RAPIER.ColliderDesc.trimesh(
             part.positions,
@@ -163,6 +168,8 @@ export class Simulation {
           ),
         );
     }
+    this.doorPhysics = new CadDoorPhysics(this.world, photogrammetry ? [] : CAD_DOOR_DEFINITIONS,
+      { ignoredColliders: this.walkingColliders });
     for (const b of !photogrammetry && hasCadBuilding("53929071") ? [] : B6_BOXES)
       this.solid(
         b.x,
@@ -352,7 +359,7 @@ export class Simulation {
           candidate,
           { x: 0, y: 0, z: 0, w: 1 },
           new RAPIER.Capsule(CHARACTER_HALF_HEIGHT, CHARACTER_RADIUS),
-          undefined,
+          RAPIER.QueryFilterFlags.EXCLUDE_SENSORS,
           undefined,
           actor.collider,
           actor.body,
@@ -557,7 +564,42 @@ export class Simulation {
     stepRigidWorld(this.world);
     this.carStepped = false;
   }
+  doorCapsules(): CadDoorCapsuleProbe[] {
+    return [...this.actors.values()].filter(actor => !actor.vehicle).map(actor => ({
+      id: actor.id, current: actor.position, next: actor.body.nextTranslation(),
+      radius: CHARACTER_RADIUS, halfHeight: CHARACTER_HALF_HEIGHT, skin: .02,
+    }));
+  }
+  /** Only interaction events allocate these probes. The parked car remains a
+   * movable gameplay obstacle even when Rapier freezes its body as Fixed. */
+  doorObstacles(): CadDoorObstacleProbe[] {
+    const result: CadDoorObstacleProbe[] = [];
+    const add = (id: string, collider: RAPIER.Collider, body: RAPIER.RigidBody,
+      velocity: Vec3, angular: Vec3, skin: number) => {
+      const p=collider.translation(), rotation=collider.rotation(), origin=body.translation();
+      const speed=Math.hypot(angular.x,angular.y,angular.z), half=speed*FIXED_DT/2;
+      const scale=speed>1e-12?Math.sin(half)/speed:0;
+      const delta={x:angular.x*scale,y:angular.y*scale,z:angular.z*scale,w:Math.cos(half)};
+      const offset=rotateQuaternionVector(delta,{x:p.x-origin.x,y:p.y-origin.y,z:p.z-origin.z});
+      result.push({id,collider,skin,next:{
+        position:{x:origin.x+velocity.x*FIXED_DT+offset.x,y:origin.y+velocity.y*FIXED_DT+offset.y,z:origin.z+velocity.z*FIXED_DT+offset.z},
+        rotation:multiplyQuaternions(delta,rotation),
+      }});
+    };
+    const zero={x:0,y:0,z:0};
+    add("shared-car",this.car.collider,this.car.body,this.car.parked?zero:this.car.body.linvel(),
+      this.car.parked?zero:this.car.body.angvel(),.03);
+    for (const [id,body] of this.trafficBodies) {
+      const velocity=this.trafficVelocities.get(id);
+      // Timetable traffic updates its next pose inside tick(). Cover its last
+      // known velocity and a conservative local margin during this event.
+      for (let i=0;i<body.numColliders();i++) add(id,body.collider(i),body,
+        {x:velocity?.x??0,y:0,z:velocity?.z??0},zero,.25);
+    }
+    return result;
+  }
   dispose() {
+    this.doorPhysics.dispose();
     this.world.free();
   }
 }

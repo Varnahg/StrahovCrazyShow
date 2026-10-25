@@ -19,7 +19,7 @@ from mathutils.bvhtree import BVHTree
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from model_io import oriented_triangle
-from model_geometry import building_identity
+from model_geometry import building_identity, signed_mesh_volume
 
 
 def arguments():
@@ -60,6 +60,9 @@ def primitive_tests():
                          'openingClassification':'facade-opening-unconfirmed-access','accessConfirmed':False})
     geometry.window('n02',{'id':'high-wing-window','a':[265,731],'b':[266,731],
                            'bottom':3.3,'top':6.05,'lowerInfillHeight':0.75})
+    geometry.door('n03',{'id':'fixed-bedroom','hinge':[260,731],'closedEnd':[260.625,731],'openEnd':[260,731.625],
+                         'bottom':6,'top':8.1,'depth':.12,'normalOffset':.06,
+                         'openingClassification':'fixed-paired-door-leaf'})
     root=bpy.data.objects.new('probe',None);bpy.context.scene.collection.objects.link(root)
     root['buildingId']='b01'
     results=[]
@@ -85,11 +88,15 @@ def primitive_tests():
             assert obj['collision']
             zs=[v.co.z for v in obj.data.vertices]
             assert abs(min(zs)-3.345)<1e-5 and abs(max(zs)-4.05)<1e-5
+        if obj['role']=='fixed-door-leaf':
+            assert obj['collision'] and obj['floorId']=='n03'
+            xs=[v.co.x for v in obj.data.vertices]
+            assert abs(min(xs)+.079)<1e-5 and abs(max(xs)+.041)<1e-5,'Fixed leaf must be closed in its measured jamb plane'
         if obj['role']=='door-leaf':
             xs=[v.co.x for v in obj.data.vertices]
             assert abs(min(xs)+1)<1e-5 and abs(max(xs))<1e-5,'Původní CAD pant se nesmí posunout se zárubní'
         results.append({'role':obj['role'],'volume':volume})
-    assert geometry.counts['fixedFacadeGlazing']==1 and geometry.counts['doors']==2
+    assert geometry.counts['fixedFacadeGlazing']==1 and geometry.counts['fixedBedroomLeaves']==1 and geometry.counts['doors']==3
     assert not any(obj['floorId']=='n02' and obj['role']=='door-leaf' for obj in bpy.data.objects if obj.type=='MESH')
     stair_geometry=module.Geometry([250,731])
     flight=stair_geometry.flight('n01','annotation-probe',[260,741],[260,744.2],2,0,1.6,10)
@@ -140,6 +147,14 @@ def primitive_tests():
                   'roughnessFactor':shader.inputs['Roughness'].default_value,
                   'metallicFactor':shader.inputs['Metallic'].default_value}}
     audit_material(material,portable,spec,packed)
+    for data in [material,image]:
+        data['provenance']='B6-photo-informed-authored';data['sourceIds']='["fixture"]';data['sourceHashes']='["'+'1'*64+'"]'
+    audit_material(material,portable,spec,packed)
+    image['provenance']='untrusted-external'
+    try:audit_material(material,portable,spec,packed)
+    except AssertionError:pass
+    else:raise AssertionError('Unknown image provenance must fail')
+    image['provenance']='B6-photo-informed-authored'
     try:
         audit_material(material,portable,spec,bytes([packed[0]^1])+packed[1:])
     except AssertionError:pass
@@ -215,6 +230,12 @@ def stair_clearance(expected):
     tree=BVHTree.FromPolygons(vertices,faces,all_triangles=True,epsilon=1e-7)
     failed=[];missing_support=[];samples=0;origin=expected['cadOrigin']
     metadata={part['id']:part for part in expected['parts']}
+    def landing_support(part,flight):
+        if part is None:return False
+        if part['role'] in {'stair-landing','slab'}:return True
+        # An explicitly annotated exterior deck can be the same physical slab
+        # as the canopy below it. Still require its actual collision hit.
+        return bool(flight.get('upperSupportSolidId') and part['role']=='canopy' and part['floor']==flight['floor'])
     for flight in expected['stairs']:
         length=math.dist(flight['a'],flight['b'])
         surfaces=flight.get('surfaces') or [{'start':i*length/flight['steps'],'end':(i+1)*length/flight['steps'],
@@ -243,7 +264,7 @@ def stair_clearance(expected):
             point=Vector((-(y-origin[1]),x-origin[0],flight['top']+0.04))
             _,_,index,distance=tree.ray_cast(point,Vector((0,0,-1)),0.08)
             support=metadata[owners[index]] if index is not None else None
-            if support is None or support['role'] not in {'stair-landing','slab'} or abs(distance-0.04)>0.002:
+            if not landing_support(support,flight) or abs(distance-0.04)>0.002:
                 missing_support.append({'flight':flight['id'],'step':'upper-landing',
                                         'support':support['id'] if support else None,'distance':distance})
             _,_,index,distance=tree.ray_cast(point-Vector((0,0,0.02)),Vector((0,0,1)),1.88)
@@ -254,7 +275,7 @@ def stair_clearance(expected):
             point=Vector((-(y-origin[1]),x-origin[0],flight['top']-flight['riser']+0.005))
             _,_,index,distance=tree.ray_cast(point,Vector((-dy,dx,0)),0.10)
             support=metadata[owners[index]] if index is not None else None
-            if support is None or support['role'] not in {'stair-landing','slab'}:
+            if not landing_support(support,flight):
                 missing_support.append({'flight':flight['id'],'step':'terminal-riser-front',
                                         'support':support['id'] if support else None,'distance':distance})
     return {'requiredHeadroom':1.9,'samples':samples,'blocked':failed,'missingSupport':missing_support,
@@ -278,7 +299,11 @@ def audit_material(material, portable_material, spec, binary):
             vector_links=list(node.inputs['Vector'].links)
             assert len(vector_links)==1 and vector_links[0].from_node.type=='UVMAP'
             assert vector_links[0].from_node.uv_map=='UVMap','Jiný nativní UV kanál'
-        assert material.get('provenance')==image.get('provenance')=='IPR2023-derived'
+        assert material.get('provenance')==image.get('provenance')
+        assert image.get('provenance') in ('IPR2023-derived','B6-photo-informed-authored')
+        if image.get('provenance')=='B6-photo-informed-authored':
+            assert material.get('sourceIds')==image.get('sourceIds') and image.get('sourceIds')
+            assert material.get('sourceHashes')==image.get('sourceHashes') and image.get('sourceHashes')
         source_hash=material.get('sourceManifestSha256')
         assert isinstance(source_hash,str) and len(source_hash)==64 and source_hash==image.get('sourceManifestSha256')
         packed=bytes(image.packed_file.data)
@@ -315,10 +340,14 @@ def audit(args):
     assert 'titleBlock' not in root.get('sourceProvenance',''),'Původní rozpiska nesmí být přibalena'
     objects=[o for o in bpy.data.objects if o.type=='MESH']
     assert objects and all(o.parent==root for o in objects),'Cizí nebo nepřipojené části'
+    from build_model import audit_interactive_doors
+    native_doors=json.loads(root['interactiveDoors']) if 'interactiveDoors' in root else None
+    assert native_doors==expected.get('interactiveDoors'),'Dveřní definice masteru a kolizního exportu se liší'
+    door_audit=audit_interactive_doors(objects,{'interactiveDoors':native_doors})
     assert {o.get('floorId') for o in objects}=={floor['id'] for floor in expected['floors']},'Chybějící podlaží'
     assert json.loads(root['floorMetadata'])==expected['floors'],'Jiná metadata podlaží'
     assert all(o.get('buildingId')==expected['id'] for o in objects),'Cizí vlastník části'
-    assert all(not image.filepath and image.packed_file and image.get('provenance')=='IPR2023-derived'
+    assert all(not image.filepath and image.packed_file and image.get('provenance') in ('IPR2023-derived','B6-photo-informed-authored')
                for image in bpy.data.images),'Povolené jsou pouze zabalené odvozené fototextury; žádné původní výkresy'
     assert not bpy.data.texts,'Model nesmí balit původní dokumenty jako Text'
     all_points=[];mesh_report=[];native={}
@@ -328,13 +357,12 @@ def audit(args):
         assert mesh.uv_layers.active==mesh.uv_layers[0] and mesh.uv_layers[0].name=='UVMap','Nejednoznačný aktivní UV kanál'
         points=[obj.matrix_world@v.co for v in mesh.vertices]
         assert all(all(math.isfinite(v) for v in p) for p in points)
-        zero=0;volume=0.0;normals={}
+        zero=0;volume=signed_mesh_volume(points,[tuple(t.vertices) for t in mesh.loop_triangles]);normals={}
         positions=[(p.x,p.z,-p.y) for p in points]
         normal_matrix=obj.matrix_world.inverted().transposed().to_3x3()
         for t in mesh.loop_triangles:
             a,b,c=[points[i] for i in t.vertices]
             if (b-a).cross(c-a).length<1e-10:zero+=1
-            volume+=a.dot(b.cross(c))/6
             key,offset=oriented_triangle([positions[i] for i in t.vertices])
             corner=[]
             for index in t.loops:
@@ -434,6 +462,7 @@ def audit(args):
         'boundsBlender':bounds,'meshes':mesh_report,
         'exportComparisons':export_comparisons,'collisionComparisons':comparisons,
         'stairClearance':clearance,
+        'interactiveDoorGeometry':door_audit,
         'limitations':['Numerická shoda není stavební zaměření.',
                        'Tento audit nedokazuje průchod herním controllerem ani GPU výkon.',
                        'Vizuální správnost všech pater a schodišť musí posoudit navazující kontrola.'],

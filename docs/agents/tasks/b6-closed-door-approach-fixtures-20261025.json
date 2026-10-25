@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-closed-door-approach-fixtures-20261025",
+  "title": "Verify existing B6 approach regressions with closed-default CAD doors",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": ["tests/b6-reality.test.ts", "tests/terrain-patch.test.ts", "tests/helpers/cad-entrance-tour.ts", ".cache/b6-closed-door-approach-fixtures-20261025/", "docs/agents/handoffs/b6-closed-door-approach-fixtures-20261025.md"],
+  "acceptance": ["Arrival and return use the current CAD entrance and real actor door interactions; closed doorway blocking remains explicitly tested.", "Preserve terrain and whole-world collision evidence; do not teleport across a failed segment or reduce the player capsule."],
+  "verification": ["Targeted approach tests and comparison with passed public SDK continuous approach."],
+  "notes": ["Root integration scope for stale open-default approach assumptions exposed by full suite."]
+}

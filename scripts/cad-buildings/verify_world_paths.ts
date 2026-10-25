@@ -7,25 +7,27 @@ import RAPIER from "@dimforge/rapier3d-compat";
 import { cadLocalToWorld, cadPolygonContainsXZ, cadSurfaceHeightAtXZ, type CadPlacement, type CadPolygon, type CadSurface } from "../../shared/cad-building-geometry";
 import type { Actor, Simulation } from "../../shared/simulation";
 import type { Input, Vec3 } from "../../shared/types";
+import type { CadDoorDefinition } from "../../shared/cad-doors";
+const doorHelpers = await import(new URL("./rapier_model.mjs", import.meta.url).href);
 
 type Settings = { radius: number; halfHeight: number; offset: number; autostepHeight: number; autostepWidth: number; snap: number; gravity: number; dt: number; speed: number };
 type Point = { x: number; z: number; floor: number | null; support?: { height?: number; capsuleFootHeight?: number } };
 type Door = { id: string; bottom: number; accessConfirmed?: boolean; openingClassification?: string; [key: string]: unknown };
 type Flight = { id: string; routeId?: string; routeIndex?: number; routeSegmentCount?: number; routeAccessPath?: unknown; terrainValidationPending?: boolean; sourcePlanId?: string; sourceEntities?: string[]; lowerLevelKey?: string; upperLevelKey?: string; [key: string]: unknown };
-export type PathBuilding = { id: string; placement: CadPlacement; glbSha256: string; site: { sourceCollisionSha256: string; terrainCutouts?: readonly CadPolygon[]; supportSurfaces?: readonly CadSurface[] }; model: { id: string; cadOrigin: number[]; doors: Door[]; stairs: Flight[] } };
+export type PathBuilding = { id: string; placement: CadPlacement; glbSha256: string; site: { sourceCollisionSha256: string; terrainCutouts?: readonly CadPolygon[]; supportSurfaces?: readonly CadSurface[] }; model: { id: string; cadOrigin: number[]; doors: Door[]; stairs: Flight[]; parts?: unknown[]; interactiveDoors?: readonly CadDoorDefinition[] } };
 export type TraceIdentity = { modelCollisionSha256: string; modelGlbSha256: string; actorSourceSha256: string; validatorSha256: string; rapierHelperSha256: string; settings: Settings };
-type Anchor = { id: string; point: Point; reference: number; kind: "door" | "route"; exterior: boolean; routeId?: string; index?: number };
+type Anchor = { id: string; point: Point; reference: number; kind: "door" | "route"; exterior: boolean; routeId?: string; index?: number; sourceDoorId?: string };
 type Route = { path: Point[]; exterior: boolean; outsideIndices: number[] };
 type Leg = { target: Point; passed: boolean; finish: Vec3; remaining: number; footError: number | null };
 type Step = { passed: boolean; context: { from: string; to: string }; legs: Leg[] };
 type Session = { session: number; seed: string; start: Point; setup: { setupValid: boolean; initialFootError: number; overlaps: unknown[] }; steps: Step[] };
 type Result = { id: string; doorId: string; point: Point; passed: boolean; proof: null | { session: number; seed: string; afterStep: number } };
-type Excluded = { id: string; doorId?: string; category: string };
-type Trace = { profile: string; settings: Settings; modelCollisionSha256: string; modelGlbSha256: string; actorSourceSha256: string; inputSha256: { validator: string; rapierHelper: string }; seeds: string[]; cases: number; passed: number; results: Result[]; excluded: Excluded[]; proofSessions: Session[]; options: { spacing: number }; stats: { moves: number; restarts: number } };
-export type TraceContext = { building: PathBuilding; identity: TraceIdentity; anchors: Map<string, Anchor>; routes: Map<string, Route>; expectedDoorIds: string[]; fixedDoors: Set<string> };
+type Excluded = { id: string; doorId?: string; category: string; protectionVerified?:boolean;role?:string };
+type Trace = { doorRuntimeSha256?: string; doorStateAssumption?: unknown; profile: string; settings: Settings; modelCollisionSha256: string; modelGlbSha256: string; actorSourceSha256: string; inputSha256: { validator: string; rapierHelper: string }; seeds: string[]; cases: number; passed: number; results: Result[]; excluded: Excluded[]; proofSessions: Session[]; options: { spacing: number }; stats: { moves: number; restarts: number } };
+export type TraceContext = { building: PathBuilding; identity: TraceIdentity; anchors: Map<string, Anchor>; routes: Map<string, Route>; expectedDoorIds: string[]; fixedDoors: Set<string>; fixedOpenings: Map<string,{category:string;role:string;coverage:{passed:boolean}}> };
 export type ValidatedTrace = { context: TraceContext; trace: Trace };
 export type ValidatedExteriorDoor = { id: string; outsideId: string; insideId: string; outside: Point; inside: Point; reference: number; sourceEntities: string[]; provenance: string };
-export type WorldRuntime = Pick<Simulation, "world" | "walkingColliders" | "add" | "remove" | "tick" | "dispose">;
+export type WorldRuntime = Pick<Simulation, "world" | "walkingColliders" | "add" | "remove" | "tick" | "dispose"> & Partial<Pick<Simulation,"doorPhysics"|"doorCapsules"|"doorObstacles">>;
 const sha = (data: string | Buffer) => createHash("sha256").update(data).digest("hex");
 const finite = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n);
 const close = (a: number, b: number, tolerance = 1e-5) => Math.abs(a - b) <= tolerance;
@@ -44,20 +46,27 @@ const canonicalSettings = (settings: Settings) => Object.keys(settings).sort().m
 /** Uses the same native annotation helpers as the source report, without
  * constructing a second physics world or character controller. */
 export async function createTraceContext(building: PathBuilding, identity: TraceIdentity): Promise<TraceContext> {
-  const { doorApproachGeometry } = await import(new URL("./rapier_model.mjs", import.meta.url).href);
+  const { doorApproachGeometry, fixedOpeningSpec } = await import(new URL("./rapier_model.mjs", import.meta.url).href);
+  const { fixedOpeningCoverage } = await import(new URL("./verify_doors.mjs", import.meta.url).href);
   const { routePath } = await import(new URL("./verify_routes.mjs", import.meta.url).href);
   need(building.id === building.model.id && building.glbSha256 === identity.modelGlbSha256 && building.site.sourceCollisionSha256 === identity.modelCollisionSha256, "Registered building identity mismatch");
   const local = ([x, y]: number[]) => ({ x: -(y - building.model.cadOrigin[1]), z: -(x - building.model.cadOrigin[0]) });
   const anchors = new Map<string, Anchor>(), routes = new Map<string, Route>(), fixedDoors = new Set<string>(), expectedDoorIds: string[] = [];
+  const fixedOpenings:TraceContext['fixedOpenings']=new Map();
   const doorIds = new Set<string>();
   for (const door of building.model.doors) {
     need(typeof door.id === "string" && door.id.length > 0 && !doorIds.has(door.id), "Invalid or duplicate native door ID"); doorIds.add(door.id);
-    if (door.openingClassification === "facade-opening-unconfirmed-access") { fixedDoors.add(door.id); continue; }
+    const fixed=fixedOpeningSpec(door);
+    if (fixed) {
+      fixedDoors.add(door.id);
+      fixedOpenings.set(door.id,{category:fixed.exclusionCategory,role:fixed.role,coverage:fixedOpeningCoverage({local,model:building.model},door)});
+      continue;
+    }
     const approaches = doorApproachGeometry({ local, settings: identity.settings }, door).points as { x: number; z: number }[];
     for (const [side, p] of approaches.entries()) {
       const id = `door:${door.id}:side:${side}`;
       need(!anchors.has(id), "Duplicate model door ID"); expectedDoorIds.push(id);
-      anchors.set(id, { id, point: { ...p, floor: door.bottom }, reference: door.bottom, kind: "door", exterior: door.accessConfirmed === true });
+      anchors.set(id, { id, point: { ...p, floor: door.bottom }, reference: door.bottom, kind: "door", sourceDoorId:door.id,exterior: door.accessConfirmed === true });
     }
   }
   need(expectedDoorIds.length > 0, "Model has no annotated open door points to verify");
@@ -79,7 +88,7 @@ export async function createTraceContext(building: PathBuilding, identity: Trace
       anchors.set(nodeId, { id: nodeId, point: p, reference: p.floor, kind: "route", exterior: exterior && (index === 0 || index === path.length - 1), routeId: id, index });
     });
   }
-  return { building, identity, anchors, routes, expectedDoorIds, fixedDoors };
+  return { building, identity, anchors, routes, expectedDoorIds, fixedDoors, fixedOpenings };
 }
 
 /** Structural validation is deliberately independent of the world replay.
@@ -87,6 +96,11 @@ export async function createTraceContext(building: PathBuilding, identity: Trace
 export function validateWorldTrace(raw: unknown, context: TraceContext): ValidatedTrace {
   const trace = raw as Trace, identity = context.identity;
   need(trace && trace.profile === "current", "Only a fresh current-profile trace is accepted");
+  if(context.building.model.interactiveDoors?.length) {
+    const expected=doorHelpers.requireCoverageDoorState(context.building.model,'all-interactive-open');
+    need(JSON.stringify(trace.doorStateAssumption)===JSON.stringify(expected),'Missing/stale explicit interactive door-state assumption');
+    need(trace.doorRuntimeSha256===doorHelpers.doorRuntimeSha256(),'Stale shared door runtime trace');
+  }
   for (const key of ["modelCollisionSha256", "modelGlbSha256", "actorSourceSha256"] as const) need(trace[key] === identity[key], `Trace identity mismatch: ${key}`);
   need(canonicalSettings(trace.settings) === canonicalSettings(identity.settings), "Trace controller settings mismatch");
   need(trace.inputSha256?.validator === identity.validatorSha256 && trace.inputSha256?.rapierHelper === identity.rapierHelperSha256, "Trace validator source mismatch");
@@ -106,7 +120,14 @@ export function validateWorldTrace(raw: unknown, context: TraceContext): Validat
       const match = /^grid:(\d+):(-?\d+):(-?\d+)$/.exec(id);
       need(match && close(p.x, Number(match[2]) * spacing) && close(p.z, Number(match[3]) * spacing), `Unknown or displaced trace node: ${id}`);
     }
-    const previous = observed.get(id); if (previous) need(samePoint(p, previous), `Node changes position inside trace: ${id}`);
+    const previous = observed.get(id);
+    if (previous) {
+      // A native annotation and its ray-measured grid connector can differ by
+      // a few tens of micrometres. Use the existing 0.1mm native height bound
+      // for this comparison too; XY and anonymous grid nodes stay strict.
+      const same = native ? sameXZ(p,previous) && finite(p.floor) && finite(previous.floor) && close(p.floor,previous.floor,1e-4) : samePoint(p,previous);
+      need(same, `Node changes position inside trace: ${id}`);
+    }
     observed.set(id, p);
   }
   for (const seed of trace.seeds) need(context.anchors.get(seed)?.exterior, `Seed is not a native exterior entry: ${seed}`);
@@ -161,7 +182,12 @@ export function validateWorldTrace(raw: unknown, context: TraceContext): Validat
     } else need(row.proof === null, "Unreached result carries a success proof");
   }
   for (const row of trace.excluded) {
-    if (row.category === "fixed-facade-glazing") { need(context.fixedDoors.has(row.id) && !fixed.has(row.id), "Unknown or duplicate fixed facade"); fixed.add(row.id); }
+    if (row.category === "fixed-facade-glazing" || row.category === "fixed-paired-door-leaf") {
+      const protection=context.fixedOpenings.get(row.id);
+      need(protection&&protection.category===row.category&&!fixed.has(row.id),"Unknown, misclassified or duplicate fixed opening");
+      need(row.protectionVerified===true && row.role===protection.role && protection.coverage.passed,"Fixed opening has no verified native protection");
+      fixed.add(row.id);
+    }
     else { need(context.expectedDoorIds.includes(row.id) && !accounted.has(row.id) && ["external-pending-terrain", "unclassified-missing-support", "missing-model-floor"].includes(row.category), "Unknown or duplicate excluded door side"); accounted.add(row.id); }
   }
   need(accounted.size === context.expectedDoorIds.length && context.expectedDoorIds.every(id => accounted.has(id)) && fixed.size === context.fixedDoors.size, "Trace omitted model door points");
@@ -185,7 +211,7 @@ export function validateExteriorDoorConfig(raw: unknown, validated: ValidatedTra
     need(typeof entry.provenance === "string" && entry.provenance.trim().length > 0, "Exterior-door entry requires nonempty provenance");
     need(!ids.has(entry.id), "Duplicate exterior-door entry"); ids.add(entry.id);
     const door = building.model.doors.find(d => d.id === entry.id);
-    need(door && door.openingClassification !== "facade-opening-unconfirmed-access", "Exterior-door config names an unknown or fixed-glass opening");
+    need(door && !["facade-opening-unconfirmed-access","fixed-paired-door-leaf"].includes(door.openingClassification??""), "Exterior-door config names an unknown or fixed-glass/door-leaf opening");
     const actual = door.sourceEntities;
     need(Array.isArray(actual) && actual.length > 0 && actual.every(x => typeof x === "string") && Array.isArray(entry.sourceEntities) &&
       entry.sourceEntities.length > 0 && entry.sourceEntities.every(x => typeof x === "string" && x.length > 0) &&
@@ -226,7 +252,7 @@ export function entryPlan(validated: ValidatedTrace, session: Session) {
   return { start, reference, prefix, outdoorEndpointIdentified, terrainApproachVerified: false, limitations };
 }
 
-function supportAt(sim: WorldRuntime, local: Point, reference: number, validated: ValidatedTrace, capsule: RAPIER.Capsule) {
+export function supportAt(sim: WorldRuntime, local: Point, reference: number, validated: ValidatedTrace, capsule: RAPIER.Capsule) {
   const { building, identity: { settings } } = validated.context;
   const world = cadLocalToWorld({ x: local.x, y: reference, z: local.z }, building.placement);
   const filter = (c: RAPIER.Collider) => !sim.walkingColliders.has(c.handle);
@@ -241,29 +267,36 @@ function supportAt(sim: WorldRuntime, local: Point, reference: number, validated
   const capsuleFloor = sweep && sweep.normal1.y > .5 && Math.abs(sweptFloor - height) <= settings.autostepHeight + .02 ? sweptFloor : height;
   return { x: world.x, z: world.z, height, capsuleFloor, collider: hit.collider.handle, capsuleCollider: sweep?.collider.handle ?? null };
 }
-function assertLiveController(actor: Actor, settings: Settings) {
+export function assertLiveController(actor: Actor, settings: Settings) {
   need(close(actor.controller.offset(), settings.offset) && close(actor.controller.autostepMaxHeight()!, settings.autostepHeight) &&
     close(actor.controller.autostepMinWidth()!, settings.autostepWidth) && close(actor.controller.snapToGroundDistance()!, settings.snap) &&
     actor.controller.slideEnabled() && actor.controller.autostepIncludesDynamicBodies() === false, "Live Actor controller differs from source profile");
   const shape = actor.collider.shape as RAPIER.Capsule;
   need(close(shape.radius, settings.radius) && close(shape.halfHeight, settings.halfHeight), "Live Actor capsule differs from source profile");
 }
-function forbidRecovery(actor: Actor) {
+export function forbidRecovery(actor: Actor) {
   const forbid = () => { throw new Error("Forbidden Actor teleport/recovery during continuous replay"); };
   actor.setPosition = forbid; actor.resetOnFoot = forbid; actor.restore = forbid; actor.setVehicle = forbid;
 }
 type DoorJumpEvidence = { targetId: string; doorId: string; reason: "native-declared-threshold" | "missing-support-counterpart" };
-function walkActorLeg(actor: Actor, target: { x: number; z: number }, capsuleFloor: number | null, settings: Settings,
-  tick: (x: number, z: number, jump: boolean) => void, jumpEvidence?: DoorJumpEvidence) {
+export function walkActorLeg(actor: Actor, target: { x: number; z: number }, capsuleFloor: number | null, settings: Settings,
+  tick: (x: number, z: number, jump: boolean) => void, jumpEvidence?: DoorJumpEvidence,
+  interaction?: {beforeMove(actor:Actor,target:{x:number;z:number}):void|{wait?:boolean;target?:{x:number;z:number}}},arrivalTolerance=.1) {
+  need(Number.isFinite(arrivalTolerance)&&arrivalTolerance>0&&arrivalTolerance<=.1,"Arrival tolerance cannot loosen the actual path proof");
   const origin = { ...actor.position }, footOffset = settings.radius + settings.halfHeight + settings.offset;
   const budget = Math.ceil(Math.hypot(target.x - origin.x, target.z - origin.z) / settings.speed / settings.dt) + 180;
   const advance = (jump: boolean) => {
-    const p = actor.position, dx = target.x - p.x, dz = target.z - p.z, scale = Math.max(Math.hypot(dx, dz), .08);
-    tick(dx / scale, dz / scale, jump);
-    return Math.hypot(actor.position.x - target.x, actor.position.z - target.z) < .1 && actor.grounded &&
+    const decision=interaction?.beforeMove(actor,target),moveTarget=decision?.target??target;
+    const p = actor.position, dx = moveTarget.x - p.x, dz = moveTarget.z - p.z, scale = Math.max(Math.hypot(dx, dz), .08);
+    const waiting=decision?.wait===true,detour=!!decision?.target;
+    if(waiting)interactionWaitFrames++;if(detour)interactionDetourFrames++;
+    lastJumpApplied=jump&&!waiting&&!detour;
+    tick(waiting?0:dx / scale, waiting?0:dz / scale, lastJumpApplied);
+    if(waiting||detour)return false;
+    return Math.hypot(actor.position.x - target.x, actor.position.z - target.z) < arrivalTolerance && actor.grounded &&
       (capsuleFloor === null || Math.abs(actor.position.y - capsuleFloor - footOffset) < .14);
   };
-  let passed = false, walkFrames = 0, heldFrames = 0, jumpFrames = 0;
+  let passed = false, walkFrames = 0, heldFrames = 0, heldIterations=0, jumpFrames = 0,interactionWaitFrames=0,interactionDetourFrames=0,lastJumpApplied=false;
   while (walkFrames < budget && !passed) { walkFrames++; passed = advance(false); }
   // Source walking failures stay failures in the input report. Only an actual
   // native door target with evidence may request the same held input as the UI.
@@ -272,11 +305,11 @@ function walkActorLeg(actor: Actor, target: { x: number; z: number }, capsuleFlo
   const jump = !passed && jumpEvidence && rise !== null && rise > settings.autostepHeight && rise < 1
     ? { ...jumpEvidence, fromFoot, targetFloor: capsuleFloor, rise } : null;
   if (jump) {
-    for (; heldFrames < 8; heldFrames++) advance(true);
+    for (; heldFrames < 8&&heldIterations<188; heldIterations++) {advance(true);if(lastJumpApplied)heldFrames++;}
     while (jumpFrames < 180 && !passed) { jumpFrames++; passed = advance(false); }
   }
-  return { passed, traversal: jump ? "jump" : "walk", heldFrames, walkFrames, jumpFrames, jumpEvidence: jump,
-    frames: walkFrames + heldFrames + jumpFrames, finish: { ...actor.position }, grounded: actor.grounded };
+  return { passed, traversal: heldFrames>0 ? "jump" : "walk", heldFrames, walkFrames, jumpFrames, jumpEvidence: heldFrames>0?jump:null,
+    frames: walkFrames + heldIterations + jumpFrames, arrivalTolerance,interactionWaitFrames,interactionDetourFrames, finish: { ...actor.position }, grounded: actor.grounded };
 }
 
 /** One Actor per session; no reset/teleport or recovery is permitted once added.
@@ -296,6 +329,10 @@ export function replayWorldTrace(validated: ValidatedTrace, createSimulation: ()
   }
   const capsule = new RAPIER.Capsule(settings.halfHeight, settings.radius);
   const sim = createSimulation(); let liveId: string | undefined;
+  let interactions: ReturnType<typeof doorHelpers.createDoorInteractionProbe> | undefined;
+  const approachInteraction=(sourceDoorId?:string)=>interactions?{
+    beforeMove:(actor:Actor,target:{x:number;z:number})=>interactions!.beforeMove(actor,target,sourceDoorId),
+  }:undefined;
   const idle: Input = { x: 0, z: 0, yaw: 0, jump: false, seq: 0 };
   const supportError = (target: Point, support: NonNullable<ReturnType<typeof supportAt>>) => {
     if (target.floor !== null && !close(support.height - context.building.placement.translation.y, target.floor, .005)) return "Trace ray floor differs from actual world";
@@ -303,8 +340,12 @@ export function replayWorldTrace(validated: ValidatedTrace, createSimulation: ()
     return null;
   };
   try {
+    if(context.building.model.interactiveDoors?.length) {
+      const physics=doorHelpers.requireNativeDoorPhysics(sim,context.building.model);
+      interactions=doorHelpers.createDoorInteractionProbe(physics,settings,sim.doorCapsules?.bind(sim),sim.doorObstacles?.bind(sim));
+    }
     need(close(sim.world.timestep, settings.dt) && close(sim.world.gravity.y, -settings.gravity) && close(sim.world.gravity.x, 0) && close(sim.world.gravity.z, 0), "World timestep/gravity differs from trace profile");
-    sim.tick(0);
+    sim.tick(0);interactions?.advance();
     for (const source of trace.proofSessions) {
       const plan = entryPlan(validated, source), measured = supportAt(sim, plan.start, plan.reference, validated, capsule);
       const row = { session: source.session, seed: source.seed, entry: plan, support: measured, entrySupportVerified: false, entryPrefixVerified: null as boolean | null,
@@ -317,10 +358,10 @@ export function replayWorldTrace(validated: ValidatedTrace, createSimulation: ()
       try {
         assertLiveController(actor, settings);
         forbidRecovery(actor);
-        const tick = (input: Input) => { actor.step(input, settings.dt); sim.tick(0); frames++; };
+        const tick = (input: Input) => { actor.step(input, settings.dt); sim.tick(0); interactions?.advance();frames++; };
         for (let i = 0; i < 80; i++) tick(idle);
         const overlaps: number[] = [];
-        sim.world.intersectionsWithShape(actor.position, { x: 0, y: 0, z: 0, w: 1 }, actor.collider.shape, c => { overlaps.push(c.handle); return true; }, undefined, undefined, actor.collider, actor.body);
+        sim.world.intersectionsWithShape(actor.position, { x: 0, y: 0, z: 0, w: 1 }, actor.collider.shape, c => { overlaps.push(c.handle); return true; }, undefined, undefined, actor.collider, actor.body,c=>!sim.walkingColliders.has(c.handle));
         const setupError = actor.position.y - measured.capsuleFloor - footOffset;
         row.setup = { position: { ...actor.position }, grounded: actor.grounded, setupError, overlaps };
         if (!actor.grounded || Math.abs(setupError) >= .1 || overlaps.length) { row.error = "Invalid Actor entry setup"; continue; }
@@ -334,7 +375,7 @@ export function replayWorldTrace(validated: ValidatedTrace, createSimulation: ()
           if (disagreement) return { passed: false, target, support, reason: disagreement };
           const world = cadLocalToWorld({ x: target.x, y: 0, z: target.z }, context.building.placement);
           return { ...walkActorLeg(actor, world, support?.capsuleFloor ?? null, settings,
-            (x, z, jump) => tick({ ...idle, x, z, jump, seq: ++sequence }), targetId ? doorJumps.get(targetId) : undefined), target, support };
+            (x, z, jump) => tick({ ...idle, x, z, jump, seq: ++sequence }), targetId ? doorJumps.get(targetId) : undefined,approachInteraction(native?native.sourceDoorId:undefined)), target, support };
         }
         let healthy = true;
         for (const target of plan.prefix) { const leg = move(target); row.prefix.push(leg); if (!leg.passed) { healthy = false; row.error = "Exterior entry prefix failed"; break; } }
@@ -397,16 +438,16 @@ export function replayWorldTrace(validated: ValidatedTrace, createSimulation: ()
       let sequence = 0;
       try {
         assertLiveController(actor, settings); forbidRecovery(actor);
-        const tick = (x: number, z: number, jump = false) => { actor.step({ ...idle, x, z, jump, seq: ++sequence }, settings.dt); sim.tick(0); };
+        const tick = (x: number, z: number, jump = false) => { actor.step({ ...idle, x, z, jump, seq: ++sequence }, settings.dt); sim.tick(0); interactions?.advance(); };
         for (let i = 0; i < 80; i++) tick(0, 0);
         const overlaps: number[] = [];
-        sim.world.intersectionsWithShape(actor.position, { x: 0, y: 0, z: 0, w: 1 }, actor.collider.shape, c => { overlaps.push(c.handle); return true; }, undefined, undefined, actor.collider, actor.body);
+        sim.world.intersectionsWithShape(actor.position, { x: 0, y: 0, z: 0, w: 1 }, actor.collider.shape, c => { overlaps.push(c.handle); return true; }, undefined, undefined, actor.collider, actor.body,c=>!sim.walkingColliders.has(c.handle));
         const setupError = actor.position.y - outsideSupport.capsuleFloor - footOffset;
         row.setup = { position: { ...actor.position }, grounded: actor.grounded, setupError, overlaps };
         if (!actor.grounded || Math.abs(setupError) >= .1 || overlaps.length) { row.error = "Invalid configured exterior setup"; continue; }
-        const inward = { ...walkActorLeg(actor, insideSupport, insideSupport.capsuleFloor, settings, tick, doorJumps.get(entry.insideId)), support: insideSupport }; row.inward = inward;
+        const inward = { ...walkActorLeg(actor, insideSupport, insideSupport.capsuleFloor, settings, tick, doorJumps.get(entry.insideId),approachInteraction(entry.id)), support: insideSupport }; row.inward = inward;
         if (!inward.passed) { row.error = "Configured exterior threshold is blocked"; continue; }
-        const returned = { ...walkActorLeg(actor, outsideSupport, outsideSupport.capsuleFloor, settings, tick, doorJumps.get(entry.outsideId)), support: outsideSupport }; row.return = returned;
+        const returned = { ...walkActorLeg(actor, outsideSupport, outsideSupport.capsuleFloor, settings, tick, doorJumps.get(entry.outsideId),approachInteraction(entry.id)), support: outsideSupport }; row.return = returned;
         if (!returned.passed) { row.error = "Configured exterior return failed without recovery"; continue; }
         row.passed = true;
         covered.set(entry.insideId, { session, afterStep: 1, position: inward.finish, proofKind: "configured-exterior-door" });
@@ -414,18 +455,23 @@ export function replayWorldTrace(validated: ValidatedTrace, createSimulation: ()
       } catch (error) { row.error = error instanceof Error ? error.message : String(error); }
       finally { sim.remove(liveId); liveId = undefined; }
     }
-  } finally { if (liveId) sim.remove(liveId); sim.dispose(); }
+  } finally { if (liveId) sim.remove(liveId); interactions?.dispose();sim.dispose(); }
   const unresolved = context.expectedDoorIds.filter(id => !covered.has(id));
   return { scope: runtimeScope === "full-game" ? "Actual Actor in full Simulation placement; continuous annotated entry sessions; CPU only, no GPU/server claim" : "Actual Actor in a small CPU fixture; not the complete game", runtimeScope,
     building: context.building.id, placement: context.building.placement, profile: "current", ...context.identity,
+    sourceDoorStateAssumption:trace.doorStateAssumption??null,
+    initialDoorState:doorHelpers.doorStateAssumption(context.building.model),doorInteractions:interactions?.events??[],
+    doorInteractionManeuvers:interactions?.maneuvers??[],interactionPolicy:interactions?.policy??null,
+    doorRuntimeSha256:doorHelpers.doorRuntimeSha256(),
+    interactionScope:'Recorded current-Actor requests use shared authority range/LOS/occupied guard. Safe closure may retrace only this Actor’s measured trail; mandatory targets remain unchanged. No open-all override, network or human-playtest claim',
     status: unresolved.length === 0 && sessions.every(s => (s as { passed: boolean }).passed) ? "pass" : "partial",
     expectedDoorPoints: context.expectedDoorIds.length, coveredDoorPoints: [...covered].map(([id, proof]) => ({ id, ...proof })), unresolvedDoorPointIds: unresolved,
     sourceCases: trace.cases, sourcePassed: trace.passed, sourceExcluded: trace.excluded, configuredExteriorDoors: exteriorDoors, sessions,
     limits: ["All expected open door sides are counted, including source-unreached/excluded points.", "A missing-support counterpart is counted only after a new continuous Actor door excursion from a reached source side; source/native annotations are not modified.", "Source support is never used as a movement-height override; actual world ray/capsule support is measured.", "After failed walking, only a native declared door threshold or the counterpart of a missing-support point may use held jump input for an actual rise above autostep and below 1 m; sourcePassed remains unchanged.", "An independent fresh Actor is allowed only at each declared exterior-entry session start.", "Outdoor travel before an annotated entry and time-varying traffic are not covered; tick time is fixed at zero."] };
 }
 
-function sourceManifest() {
-  const paths = ["package.json", "pnpm-lock.yaml", "scripts/cad-buildings/verify_world_paths.ts", "scripts/cad-buildings/verify_accessibility.mjs", "scripts/cad-buildings/rapier_model.mjs", "scripts/cad-buildings/verify_routes.mjs", "tests/cad-world-paths.test.ts"];
+export function sourceManifest() {
+  const paths = ["package.json", "pnpm-lock.yaml", "server/door-interactions.ts", "scripts/cad-buildings/verify_world_paths.ts", "scripts/cad-buildings/verify_accessibility.mjs", "scripts/cad-buildings/rapier_model.mjs", "scripts/cad-buildings/verify_routes.mjs", "scripts/cad-buildings/verify_doors.mjs", "scripts/cad-buildings/verify_room_paths.mjs", "scripts/cad-buildings/test_room_paths.mjs", "tests/cad-world-paths.test.ts"];
   const scan = (dir: string) => { for (const item of readdirSync(dir, { withFileTypes: true })) { const path = `${dir}/${item.name}`; if (item.isDirectory()) scan(path); else if (/\.(ts|json)$/.test(item.name)) paths.push(path); } };
   scan("shared"); const files = paths.sort().map(path => ({ path, sha256: sha(readFileSync(path)) }));
   return { sha256: sha(JSON.stringify(files)), files };

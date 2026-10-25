@@ -25,7 +25,7 @@ import { selectLightingPreview } from "../client/lighting-preview";
 const { source, gameClass: declaration, selectMembers } = readGameSource(
   process.env.GAME_PREPARATION_SOURCE,
 );
-const members = selectMembers(["prepareLightingVariants", "isMeshReadyForCamera"]);
+const members = selectMembers(["prepareLightingVariants", "isMeshReadyForCamera", "effectiveWeather"]);
 const compiled = ts.transpileModule(
   `class PreparationGame { ${members.map((node) => node.getText(source)).join("\n")} };`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
@@ -288,6 +288,20 @@ test("actual Game light stages wait for pipeline and complete-frame readiness", 
   assert.equal(result.status, "complete");
   assert.equal(result.stages.length, 9);
   assert.ok(result.stages.every((stage: { renders: number }) => stage.renders >= 3));
+});
+
+test("clear-weather preparation waits for the disabled precipitation shader before advancing", async (t) => {
+  const f = fixture(t);
+  let ready = false, checks = 0;
+  f.game.precipitation = { prepare() { checks++; return ready; } };
+  const preparation = f.start();
+  for (let i=0;i<12;i++) f.tick();
+  assert.ok(checks > 0, "the inactive weather batch is explicitly prepared");
+  assert.equal(f.states.length, 1, "clear weather must not bypass an uncompiled particle shader");
+  assert.equal(f.game.ready, false);
+  ready = true;
+  f.finish();
+  assert.equal((await preparation).status, "complete");
 });
 
 test("actual inner preparation restores requested quality before its complete restore draws", async (t) => {

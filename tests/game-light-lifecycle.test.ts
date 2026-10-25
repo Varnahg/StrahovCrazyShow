@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { Script } from "node:vm";
 import ts from "typescript";
 import { readGameSource } from "./helpers/game-source";
+import { doorLifecycleFixture } from "./helpers/weather-door-render-fixture";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -254,6 +255,7 @@ test("actual Game disposal detaches controllers before scene teardown and is ide
   });
   const context = new Proxy(
     Object.assign(game, {
+      ...doorLifecycleFixture(),
       disposed: false,
       startupAbort: new AbortController(),
       frameLifecycleProfile: undefined,
@@ -278,10 +280,21 @@ test("actual Game disposal detaches controllers before scene teardown and is ide
       sessionDiagnostics: { event() {} },
     },
   );
+  let panelRemovals = 0;
+  context.skyDiagnosticPanel = { remove() { panelRemovals++; } };
+  const door = context.guestDoors.snapshot().states[0];
+  assert.ok(door);
+  context.doorStates.set(door.id, door);
+  context.predictionDoorRevisions.set(1, 0);
   dispose.call(context);
   dispose.call(context);
   assert.equal(context.startupAbort.signal.aborted, true);
   assert.deepEqual(order, ["health", "stop", "stable", "budget", "scene"]);
+  assert.equal(panelRemovals, 1);
+  assert.equal(context.skyDiagnosticPanel, undefined);
+  assert.equal(context.doorStates.size, 0);
+  assert.equal(context.predictionDoorRevisions.size, 0);
+  assert.throws(() => context.guestDoors.snapshot(), /lifecycle/);
   assert.equal(
     ambient.onEffectiveEnabledStateChangedObservable.observers.filter(
       (observer) => !observer._willBeUnregistered,

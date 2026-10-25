@@ -2,16 +2,18 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { argumentsMap, required, openModel, sha256, writeReport, doorApproachGeometry } from './rapier_model.mjs';
+import { argumentsMap, required, openModel, sha256, writeReport, doorApproachGeometry, fixedOpeningSpec, createDoorInteractionProbe } from './rapier_model.mjs';
 
-export function fixedGlazingHit(scene,start,target,height) {
+export function fixedOpeningHit(scene,start,target,height,role) {
+  if(!['facade-glass','fixed-door-leaf'].includes(role))throw new Error('Neplatná role pevné výplně');
   const dx=target.x-start.x,dz=target.z-start.z,distance=Math.hypot(dx,dz);
   if(!Number.isFinite(height)||!(distance>0))throw new Error('Neplatná zkouška pevné výplně');
   const hit=scene.world.castRayAndGetNormal(new scene.R.Ray({x:start.x,y:height,z:start.z},
     {x:dx/distance,y:0,z:dz/distance}),distance,false,undefined,undefined,undefined,undefined,
-    collider=>scene.parts.get(collider.handle)?.role==='facade-glass');
-  return hit?{part:scene.parts.get(hit.collider.handle).id,distance:hit.timeOfImpact}:null;
+    collider=>scene.parts.get(collider.handle)?.role===role);
+  return hit?{part:scene.parts.get(hit.collider.handle).id,role,distance:hit.timeOfImpact}:null;
 }
+export const fixedGlazingHit=(scene,start,target,height)=>fixedOpeningHit(scene,start,target,height,'facade-glass');
 
 function clippedPolygon(points,bounds) {
   let polygon=points;
@@ -61,14 +63,15 @@ function coveredArea(polygons) {
   return area;
 }
 
-export function fixedGlazingCoverage(scene,door) {
+export function fixedOpeningCoverage(scene,door,spec=fixedOpeningSpec(door)) {
+  if(!spec||!['facade-glass','fixed-door-leaf'].includes(spec.role))throw new Error('Chybí klasifikace pevné výplně');
   const dx=door.closedEnd[0]-door.hinge[0],dy=door.closedEnd[1]-door.hinge[1],width=Math.hypot(dx,dy);
   const bounds=[.055,door.bottom+.055,width-.055,door.top-.055];
-  if(!(bounds[2]>bounds[0]&&bounds[3]>bounds[1]))throw new Error('Neplatný rozsah pevného prosklení');
+  if(![...bounds,width,door.normalOffset??0].every(Number.isFinite)||!(bounds[2]>bounds[0]&&bounds[3]>bounds[1]))throw new Error('Neplatný rozsah pevné výplně');
   const normal=[-dy/width,dx/width],base=scene.local(door.hinge.map((value,i)=>value+normal[i]*(door.normalOffset??0)));
   const tangent={x:-dy/width,z:-dx/width},polygons=[];
-  for(const part of scene.model.parts) {
-    if(part.role!=='facade-glass'||part.floor!==door.floor)continue;
+  for(const part of scene.model.parts??[]) {
+    if(part.role!==spec.role||part.floor!==door.floor)continue;
     for(let i=0;i<part.indices.length;i+=3) {
       const triangle=[];let inPlane=true;
       for(const index of part.indices.slice(i,i+3)) {
@@ -85,7 +88,56 @@ export function fixedGlazingCoverage(scene,door) {
   const expectedArea=(bounds[2]-bounds[0])*(bounds[3]-bounds[1]),actualArea=coveredArea(polygons);
   const missingArea=Math.max(0,expectedArea-actualArea);
   return {passed:missingArea<=Math.max(1e-6,expectedArea*1e-6),expectedArea,coveredArea:actualArea,missingArea,
-    frameMargin:.055,planeTolerance:.02,scope:'Pokrytí plochy otvoru skutečnými skleněnými trojúhelníky v ostění'};
+    role:spec.role,frameMargin:.055,planeTolerance:.02,scope:'Pokrytí plochy otvoru skutečnými kolizními trojúhelníky odpovídající pevné výplně v ostění'};
+}
+export const fixedGlazingCoverage=(scene,door)=>fixedOpeningCoverage(scene,door,{role:'facade-glass'});
+
+export function fixedOpeningProtection(scene,door) {
+  const spec=fixedOpeningSpec(door);if(!spec)throw new Error('Otvor není pevná výplň');
+  const {points}=doorApproachGeometry(scene,door),coverage=fixedOpeningCoverage(scene,door,spec);
+  const hits=[0,1].map(side=>fixedOpeningHit(scene,points[side],points[1-side],(door.bottom+door.top)/2,spec.role));
+  return {...spec,coverage,hits,passed:coverage.passed&&hits.every(Boolean)};
+}
+
+/** Independent closed/open cases start at the same measured approach. Within
+ * each case one capsule moves continuously; no reset across a blocked portal. */
+export function interactiveDoorPassage(scene,door,start,target) {
+  const definition=[...scene.doorPhysics.definitions.values()].find(item=>item.definition.sourceDoorId===door.id);
+  if(!definition)throw new Error('No interactive definition for '+door.id);
+  const id=definition.id,physics=scene.doorPhysics;
+  for(const entry of physics.definitions.values())if(physics.isOpen(entry.id))throw new Error('Door cases require closed-default state');
+  const run=operation=>{const walker=scene.walker(start);try{return operation(walker,walker.settle());}finally{walker.dispose();}};
+  const closed=run((walker,setup)=>{
+    const leg=setup.setupValid?walker.moveTo(target):null;
+    return {...setup,leg,blocked:!!leg&&!leg.passed&&leg.contacts.some(contact=>contact.part===id)};
+  });
+  const interaction=run((walker,setup)=>{
+    if(!setup.setupValid)return {setup,verified:false};
+    const probe=createDoorInteractionProbe(physics,scene.settings);
+    try {const event=probe.request(walker,id,true);return {setup,event,verified:event.result.status==='changed'};}
+    finally {probe.dispose();}
+  });
+  physics.apply(id,false);
+  const stateAssumption={mode:'single-interactive-open',doorId:id,actorInteractionsVerified:false,
+    states:[...physics.definitions.keys()].map(key=>({id:key,open:key===id})),purpose:'conditional-geometric-passage'};
+  let opened;
+  try {
+    physics.apply(id,true);
+    opened=run((walker,setup)=>{
+      if(!setup.setupValid)return {...setup,passed:false};
+      const center={x:(start.x+target.x)/2,z:(start.z+target.z)/2};
+      const support=scene.floorAt(center,door.bottom),middle={...center,floor:support?.height??null,support};
+      const toPortal=walker.moveTo(middle);
+      const occupied=toPortal.passed?physics.guardChange(id,false,[{id:walker.id,current:walker.position,next:walker.body.nextTranslation(),
+        radius:scene.settings.radius,halfHeight:scene.settings.halfHeight,skin:scene.settings.offset}]):null;
+      const leg=toPortal.passed?walker.moveTo(target):toPortal;
+      return {...setup,toPortal,closeOccupiedGuard:occupied,leg,
+        passed:leg.passed&&occupied?.allowed===false&&occupied.reason==='occupied'};
+    });
+  } finally {physics.apply(id,false);}
+  return {...opened,closedBlocking:closed,interactionAttempt:interaction,doorPhysicsId:id,stateAssumption,
+    testKind:'interactive-door-closed-open-guard',passed:closed.blocked&&opened.passed===true,
+    interactionVerified:interaction.verified};
 }
 
 export async function verifyDoors(args) {
@@ -109,18 +161,22 @@ export async function verifyDoors(args) {
         const support=scene.floorAt(point,door.bottom);
         return {...point,floor:support?.height??null,support};
       });
-      const coverage=door.openingClassification==='facade-opening-unconfirmed-access'?fixedGlazingCoverage(scene,door):null;
+      const fixed=fixedOpeningSpec(door),proof=fixed?fixedOpeningProtection(scene,door):null;
       for(const direction of [0,1]) {
         const start=sides[direction],target=sides[1-direction];
         const row={id:door.id,floor:door.floor,direction,width,openingBottom:door.bottom,start,target};
-        if(door.openingClassification==='facade-opening-unconfirmed-access') {
-          const protection=fixedGlazingHit(scene,start,target,(door.bottom+door.top)/2);
+        if(fixed) {
+          const protection=proof.hits[direction],coverage=proof.coverage;
           const passed=!!protection&&coverage.passed;
-          results.push({...row,testKind:'fixed-facade-protection',protection,coverage,
-            category:passed?'fixed-glazing':'missing-glazing',passed});continue;
+          results.push({...row,testKind:fixed.testKind,protection,coverage,
+            category:passed?fixed.category:fixed.missingCategory,passed});continue;
         }
         if(start.floor===null||target.floor===null) {
           results.push({...row,category:'missing-model-floor',setupValid:false,passed:false});continue;
+        }
+        if([...scene.doorPhysics.definitions.values()].some(item=>item.definition.sourceDoorId===door.id)) {
+          const proof=interactiveDoorPassage(scene,door,start,target);
+          results.push({...row,...proof,category:proof.passed?'passed':!proof.setupValid?'invalid-start':'blocked'});continue;
         }
         const walker=scene.walker(start);
         try {
@@ -135,10 +191,15 @@ export async function verifyDoors(args) {
     }
   } finally { scene.free(); }
   const categories={};for(const row of results)categories[row.category]=(categories[row.category]??0)+1;
+  const interactions=results.filter(row=>row.testKind==='interactive-door-closed-open-guard');
   return {scope:'Přímé průchody měřenými dveřmi; neplatný start vyžaduje posouzení skutečné přístupové trasy',...metadata,
+    interactiveCases:interactions.length,interactionVerified:interactions.filter(row=>row.interactionVerified).length,
+    interactionStatus:interactions.every(row=>row.interactionVerified)?'pass':'partial',
+    coverageQualification:interactions.length?'Conditional single-door-open geometry; independent current-position interaction attempts are reported separately':'static-native-geometry',
     doorSourceMode,doorSourceSha256,cases:results.length,passed:categories.passed??0,categories,
     protectedGlazing:categories['fixed-glazing']??0,
-    status:categories.blocked||categories['missing-glazing']?'issues':categories['invalid-start']||categories['missing-model-floor']?'partial':'pass',results};
+    protectedDoorLeaves:categories['fixed-door-leaf']??0,
+    status:categories.blocked||categories['missing-glazing']||categories['missing-fixed-door-leaf']?'issues':categories['invalid-start']||categories['missing-model-floor']||interactions.some(row=>!row.interactionVerified)?'partial':'pass',results};
 }
 
 if(process.argv[1]&&fileURLToPath(import.meta.url)===resolve(process.argv[1])) {

@@ -4,6 +4,9 @@ import RAPIER from "@dimforge/rapier3d-compat";
 import { Actor, Simulation, initPhysics } from "../shared/simulation";
 import { createTraceContext, validateWorldTrace, validateExteriorDoorConfig, entryPlan, replayWorldTrace, type PathBuilding, type TraceIdentity, type WorldRuntime } from "../scripts/cad-buildings/verify_world_paths";
 import type { Vec3 } from "../shared/types";
+import { CadDoorPhysics } from "../shared/cad-door-physics";
+import { placeCadDoorDefinition } from "../shared/cad-doors";
+const {doorStateAssumption,doorRuntimeSha256}=await import(new URL('../scripts/cad-buildings/rapier_model.mjs',import.meta.url).href);
 
 await initPhysics();
 const settings = { radius: .25, halfHeight: .55, offset: .02, autostepHeight: .22, autostepWidth: .1, snap: .25, gravity: 18, dt: 1 / 60, speed: 4.6 };
@@ -71,6 +74,72 @@ test("trace identity, current profile and every expected door side are mandatory
   assert.throws(() => validateWorldTrace({ ...trace, inputSha256: { ...trace.inputSha256, validator: "old" } }, context), /validator source/);
   const omitted = structuredClone(trace); omitted.results.pop(); omitted.cases--; omitted.passed--;
   assert.throws(() => validateWorldTrace(omitted, context), /omitted model door/);
+});
+
+test('conditional source trace must reopen native doors via actual Actor reach/LOS, never open-all',async()=>{
+  for(const obstruction of [false,true]) {
+    const {context:previous,trace}=await fixture(),b=previous.building;b.id=b.model.id='b06';
+    b.model.interactiveDoors=[{id:'b06:entry',buildingId:'b06',floor:'n01',sourceDoorId:'entry',renderPartIds:['native-leaf'],collisionPartIds:[],
+      hingeModel:{x:-1,y:.015,z:.45},closedPose:{position:{x:-1,y:1.0475,z:0},rotationY:Math.PI/2},
+      collider:{halfExtents:{x:.45,y:1.0325,z:.019}},handleModel:{x:-.981,y:1,z:-.3},openAngle:Math.PI/2,defaultOpen:false}];
+    const context=await createTraceContext(b,identity),assumed={...trace,doorRuntimeSha256:doorRuntimeSha256(),doorStateAssumption:doorStateAssumption(b.model,'all-interactive-open')};
+    assert.throws(()=>validateWorldTrace(trace,context),/explicit interactive door-state/);
+    assert.throws(()=>validateWorldTrace({...assumed,doorRuntimeSha256:'old'},context),/Stale shared/);
+    const scene=tinyWorld(obstruction?{wall:true,wallX:-.9}:{}),runtime=scene.runtime;
+    const physics=new CadDoorPhysics(runtime.world,b.model.interactiveDoors.map(d=>placeCadDoorDefinition(d,b.placement)),{ignoredColliders:runtime.walkingColliders});
+    Object.assign(runtime,{doorPhysics:physics});
+    const dispose=runtime.dispose.bind(runtime);runtime.dispose=()=>{physics.dispose();dispose();};
+    const report=replayWorldTrace(validateWorldTrace(assumed,context),()=>runtime);
+    assert.equal(report.status,obstruction?'partial':'pass',JSON.stringify(report));
+    assert.equal(report.initialDoorState.mode,'closed-default');
+    if(!obstruction)assert.ok(report.doorInteractions.some((event:{result:{status:string}})=>event.result.status==='changed'));
+    else assert.ok(report.doorInteractions.some((event:{result:{reason?:string}})=>event.result.reason==='occluded'));
+    assert.deepEqual(scene.counts(),{disposed:1,removed:1,actors:0});
+  }
+});
+
+test('interactive replay rejects a runtime lacking shared doors and an already-open starting world',async()=>{
+  const {context:previous,trace}=await fixture(),b=previous.building;b.id=b.model.id='b06';
+  b.model.interactiveDoors=[{id:'b06:entry',buildingId:'b06',floor:'n01',sourceDoorId:'entry',renderPartIds:['leaf'],collisionPartIds:[],
+    hingeModel:{x:-1,y:.015,z:.45},closedPose:{position:{x:-1,y:1.0475,z:0},rotationY:Math.PI/2},
+    collider:{halfExtents:{x:.45,y:1.0325,z:.019}},handleModel:{x:-.981,y:1,z:-.3},openAngle:Math.PI/2,defaultOpen:false}];
+  const context=await createTraceContext(b,identity),validated=validateWorldTrace({...trace,doorRuntimeSha256:doorRuntimeSha256(),doorStateAssumption:doorStateAssumption(b.model,'all-interactive-open')},context);
+  const missing=tinyWorld();assert.throws(()=>replayWorldTrace(validated,()=>missing.runtime),/requires shared/);
+  const open=tinyWorld(),physics=new CadDoorPhysics(open.runtime.world,b.model.interactiveDoors.map(d=>placeCadDoorDefinition(d,b.placement)),{ignoredColliders:open.runtime.walkingColliders});
+  Object.assign(open.runtime,{doorPhysics:physics});physics.apply('b06:entry',true);
+  const dispose=open.runtime.dispose.bind(open.runtime);open.runtime.dispose=()=>{physics.dispose();dispose();};
+  assert.throws(()=>replayWorldTrace(validated,()=>open.runtime),/closed-default/);
+});
+
+test("repeated native anchor tolerates sub-0.1mm ray height rounding but not displacement", async () => {
+  const {context,trace}=await fixture(),session=trace.proofSessions[0],start=session.start;
+  const delta=.0000223;
+  session.steps.push({passed:true,context:{from:session.steps[0].context.to,to:session.seed},legs:[{
+    target:{...start,floor:start.floor!+delta},passed:true,
+    finish:{x:start.x,y:.82+delta,z:start.z},remaining:0,footError:0}]});
+  trace.stats.moves++;
+  validateWorldTrace(trace,context);
+  const moved=structuredClone(trace);moved.proofSessions[0].steps[1].legs[0].target.floor=.0002;
+  moved.proofSessions[0].steps[1].legs[0].finish.y=.8202;
+  assert.throws(()=>validateWorldTrace(moved,context),/changes position/);
+  const sideways=structuredClone(trace);sideways.proofSessions[0].steps[1].legs[0].target.x+=.0002;
+  sideways.proofSessions[0].steps[1].legs[0].finish.x+=.0002;
+  assert.throws(()=>validateWorldTrace(sideways,context),/Anchor XY differs/);
+});
+
+test("a fixed paired leaf is excluded only with matching native coverage and verified protection", async () => {
+  const {context:original,trace}=await fixture(),b=original.building;
+  b.model.doors.push({id:'fixed',floor:'n01',hinge:[-.3125,-2],closedEnd:[.3125,-2],depth:.1,bottom:0,top:2.1,
+    openingClassification:'fixed-paired-door-leaf'});
+  b.model.parts=[{id:'closed-leaf',floor:'n01',role:'fixed-door-leaf',positions:[2,.015,-.3125,2,2.08,-.3125,2,2.08,.3125,2,.015,.3125],indices:[0,1,2,0,2,3]}];
+  const context=await createTraceContext(b,identity);
+  const evidence={...trace,excluded:[{id:'fixed',category:'fixed-paired-door-leaf',protectionVerified:true,role:'fixed-door-leaf'}]};
+  validateWorldTrace(evidence,context);assert.equal(context.expectedDoorIds.length,2);
+  assert.throws(()=>validateWorldTrace({...evidence,excluded:[{...evidence.excluded[0],protectionVerified:false}]},context),/verified native protection/);
+  assert.throws(()=>validateWorldTrace({...evidence,excluded:[{...evidence.excluded[0],category:'fixed-facade-glazing'}]},context),/misclassified/);
+  b.model.parts=[];
+  const missing=await createTraceContext(b,identity);
+  assert.throws(()=>validateWorldTrace(evidence,missing),/verified native protection/);
 });
 
 // Both sides were reached by walking downhill; the truthful local trace ends

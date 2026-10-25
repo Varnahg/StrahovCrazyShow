@@ -21,7 +21,8 @@ from mathutils.geometry import tessellate_polygon
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from model_io import contained, publish_files, recover_pending
-from model_geometry import BUILDING_OSM_IDS, building_identity, ceiling_clipped_faces, quantized_face, stair_profile, stair_levels, skew_stair
+from model_geometry import BUILDING_OSM_IDS, building_identity, ceiling_clipped_faces, quantized_face, stair_profile, stair_levels, skew_stair, interactive_door_definition
+from door_export_audit import validate_closed_door_export
 
 
 MATERIALS = {
@@ -48,25 +49,31 @@ def parse_args():
     parser.add_argument("--glb", type=Path, required=True)
     parser.add_argument("--collision", type=Path, required=True)
     parser.add_argument("--audit", type=Path, required=True)
+    parser.add_argument("--texture-overrides", type=Path, help="Local authored texture manifest; images are packed in the native master")
     return parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
 
 
 class Geometry:
     """Jedna editovatelná síť na podlaží/roli/materiál, nikoli objekt na každý šroub."""
-    def __init__(self, origin):
+    def __init__(self, origin, finishes=None, interactive_doors=False):
         self.origin = origin
+        self.finishes = finishes
         self.groups = {}
         self.counts = defaultdict(int)
+        self.interactive_doors = {} if interactive_doors else None
+        self.active_door_id = None
 
     def at(self, point, height):
         return (-(point[1] - self.origin[1]), point[0] - self.origin[0], height)
 
-    def face(self, key, points):
+    def face(self, key, points, uv_frame=None, material_override=None):
+        if self.active_door_id is not None:
+            key = (*key, self.active_door_id)
         points = quantized_face(points)
         if not points:
             self.counts['removedCollapsedFaces'] += 1
             return
-        group = self.groups.setdefault(key, {"vertices": [], "faces": [], "lookup": {}, "faceLookup": {}})
+        group = self.groups.setdefault(key, {"vertices": [], "faces": [], "faceMaterials": [], "faceUVFrames": [], "lookup": {}, "faceLookup": {}})
         indices = []
         for point in points:
             if point not in group["lookup"]:
@@ -90,6 +97,8 @@ class Geometry:
                 return
             group['faceLookup'][identity]=len(group['faces'])
             group["faces"].append(indices)
+            group['faceMaterials'].append(material_override or (self.finishes.face_material(key[0],key[1],points,key[2]) if self.finishes else key[2]))
+            group['faceUVFrames'].append(uv_frame)
 
     def solid(self, floor, spec):
         bottom, top = spec["bottom"], spec["top"]
@@ -107,8 +116,20 @@ class Geometry:
             if abs(area) < 1e-10:
                 continue
             triangle = triangle if area > 0 else list(reversed(triangle))
-            self.face(key, [self.at(p, top) for p in triangle])
+            if 'topSurfacePartitions' not in spec:
+                self.face(key, [self.at(p, top) for p in triangle])
             self.face(key, [self.at(p, bottom) for p in reversed(triangle)])
+        for partition in spec.get('topSurfacePartitions', []):
+            for triangle in partition['triangles']:
+                area = sum(triangle[i][0]*triangle[(i+1)%3][1]-triangle[(i+1)%3][0]*triangle[i][1] for i in range(3))
+                if abs(area) < 1e-10:
+                    continue
+                triangle = triangle if area > 0 else list(reversed(triangle))
+                points = [self.at(p, top) for p in triangle]
+                # Same physical slab, one surface. Material role affects only
+                # the top face, never the collision shape or floor height.
+                material = self.finishes.face_material(floor, partition.get('role', role), points, partition['material']) if self.finishes else partition['material']
+                self.face(key, points, material_override=material)
         for ring_index, ring in enumerate(spec["loops"]):
             if ring[0] == ring[-1]:
                 ring = ring[:-1]
@@ -184,7 +205,17 @@ class Geometry:
 
     def window(self, floor, window):
         a,b=window['a'],window['b'];bottom,top=window['bottom'],window['top']
+        plane_offset=window.get('windowPlaneNormalOffset',0)
+        if plane_offset:
+            direction=Vector((b[0]-a[0],b[1]-a[1])).normalized()
+            a=[a[0]-direction.y*plane_offset,a[1]+direction.x*plane_offset]
+            b=[b[0]-direction.y*plane_offset,b[1]+direction.x*plane_offset]
         self.glazed_panel(floor,a,b,bottom,top,lower_infill=window.get('lowerInfillHeight',0))
+        if 'sill' in window:
+            if window['sill'] is not None:
+                self.solid(floor, {**window['sill'], 'id':window['id']+'-sill', 'role':'window-sill', 'material':'concrete', 'collision':True})
+            self.counts['windows'] += 1
+            return
         direction=Vector((b[0]-a[0],b[1]-a[1])).normalized()
         sill_depth = min(0.65, max(0.2, window.get("depth", 0.38)+0.1))
         offset=window.get('normalOffset',0)
@@ -209,9 +240,15 @@ class Geometry:
         jamb_b=[end[0]-direction.y*offset,end[1]+direction.x*offset]
         before = [jamb_a[0]-direction.x*0.035, jamb_a[1]-direction.y*0.035]
         after = [jamb_b[0]+direction.x*0.035, jamb_b[1]+direction.y*0.035]
-        self.prism(frame, before, jamb_a, depth, bottom, top+0.045)
-        self.prism(frame, jamb_b, after, depth, bottom, top+0.045)
-        self.prism(frame, before, after, depth, top, top+0.045)
+        if door.get('frameOwnership') == 'recipe-solids':
+            if not door.get('frameSolidIds'):
+                raise ValueError('Dveře nemají konstrukčního vlastníka zárubně: '+door['id'])
+        elif door.get('frameOwnership') is not None:
+            raise ValueError('Neznámé vlastnictví zárubně: '+door['id'])
+        else:
+            self.prism(frame, before, jamb_a, depth, bottom, top+0.045)
+            self.prism(frame, jamb_b, after, depth, bottom, top+0.045)
+            self.prism(frame, before, after, depth, top, top+0.045)
         if door.get('openingClassification')=='facade-opening-unconfirmed-access':
             # CAD používá dveřní oblouky, IPR2023 ale ukazuje uzavřené prosklené
             # výplně bez balkonů. Viditelná výplň je zároveň skutečnou kolizí.
@@ -219,6 +256,16 @@ class Geometry:
             self.counts['fixedFacadeGlazing']+=1
             self.counts['doors']+=1
             return
+        if door.get('openingClassification')=='fixed-paired-door-leaf':
+            self.prism((floor,'fixed-door-leaf','door',True),jamb_a,jamb_b,.038,bottom+.015,top-.02)
+            self.counts['fixedBedroomLeaves']+=1
+            self.counts['doors']+=1
+            return
+        if self.interactive_doors is not None:
+            definition = interactive_door_definition(self.origin, floor, door)
+            self.interactive_doors[definition['id']] = definition
+            self.active_door_id = definition['id']
+            hinge, opened = jamb_a, jamb_b
         if door.get('leafMaterial')=='glass':
             # An open glazed leaf follows the same measured hinge/open end as
             # the other doors. It is not a fixed panel across the passage.
@@ -233,6 +280,7 @@ class Geometry:
             h1 = [handle[0]+normal[0]*sign*0.032, handle[1]+normal[1]*sign*0.032]
             h2 = [h1[0]-leaf.x*0.11, h1[1]-leaf.y*0.11]
             self.prism((floor, "door-handle", "metal", False), h1, h2, 0.016, bottom+0.99, bottom+1.015)
+        self.active_door_id = None
         self.counts["doors"] += 1
 
     def landing(self, floor, identifier, loops, triangles, height, minimum_riser=0, material='concrete'):
@@ -334,17 +382,20 @@ def create_meshes(geometry, root):
     building_id = root['buildingId']
     building_identity(building_id)
     materials = {name:make_material(name, building_id) for name in MATERIALS}
+    if geometry.finishes:materials.update(geometry.finishes.create_materials())
     collections = {}
     objects = []
     for key, group in geometry.groups.items():
-        floor, role, material, collision = key
+        floor, role, material, collision = key[:4]
+        door_id = key[4] if len(key)>4 else None
         collection = collections.get(floor)
         if collection is None:
             collection = bpy.data.collections.new(building_id.upper() + " / " + floor)
             bpy.context.scene.collection.children.link(collection)
             collections[floor] = collection
-        mesh = bpy.data.meshes.new(f"{building_id}:{floor}:{role}:{material}")
-        mesh.from_pydata(group["vertices"], [], [face for face in group["faces"] if face is not None])
+        mesh = bpy.data.meshes.new(f"{building_id}:{floor}:{role}:{material}" + (':'+door_id if door_id else ''))
+        faces=[(face,material_key,uv_frame) for face,material_key,uv_frame in zip(group['faces'],group['faceMaterials'],group['faceUVFrames']) if face is not None]
+        mesh.from_pydata(group["vertices"], [], [face for face,_,_ in faces])
         mesh.update(calc_edges=True)
         if mesh.validate(verbose=False):
             raise ValueError("Blender musel opravit geometrii: " + mesh.name)
@@ -355,21 +406,60 @@ def create_meshes(geometry, root):
         obj["floorId"] = floor
         obj["role"] = role
         obj["collision"] = collision
-        mesh.materials.append(materials.get(material, materials["plaster"]))
+        if door_id:
+            obj['doorId'] = door_id
+            geometry.interactive_doors[door_id]['renderPartIds'].append(obj.name)
+        slots=list(dict.fromkeys(material_key for _,material_key,_ in faces))
+        slot_indices={key:index for index,key in enumerate(slots)}
+        for material_key in slots:mesh.materials.append(materials.get(material_key,materials['plaster']))
         uv = mesh.uv_layers.new(name="UVMap")
         for polygon in mesh.polygons:
+            material_key=faces[polygon.index][1]
+            polygon.material_index=slot_indices[material_key]
             normal = polygon.normal
             axis = max(range(3),key=lambda i:abs(normal[i]))
             pair = [(1,2),(0,2),(0,1)][axis]
-            for loop in polygon.loop_indices:
+            points=[mesh.vertices[index].co for index in polygon.vertices]
+            mapped=geometry.finishes.uv_for_face(floor,role,points,material_key,uv_frame=faces[polygon.index][2]) if geometry.finishes else None
+            for corner,loop in enumerate(polygon.loop_indices):
                 v = mesh.vertices[mesh.loops[loop].vertex_index].co
-                uv.data[loop].uv = (v[pair[0]]/1.5,v[pair[1]]/1.5)
+                uv.data[loop].uv = mapped[corner] if mapped is not None else (v[pair[0]]/1.5,v[pair[1]]/1.5)
             polygon.use_smooth = role=="column" and abs(normal.z)<0.01
         objects.append(obj)
     return objects
 
 
+def audit_interactive_doors(objects, recipe):
+    """Native geometry and physical metadata must agree before any publication.
+
+    The explicit identity-matrix restriction prevents an edited master from
+    silently exporting stale hinge/pose metadata while moving static geometry.
+    """
+    definitions = recipe.get('interactiveDoors')
+    if definitions is None:return None
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    parts=[]
+    for obj in objects:
+        part={'id':obj.name,'doorId':obj.get('doorId'),'floor':obj.get('floorId'),
+              'role':obj.get('role'),'collision':obj.get('collision')}
+        if obj.get('doorId'):
+            evaluated=obj.evaluated_get(depsgraph)
+            mesh=evaluated.to_mesh()
+            try:
+                mesh.calc_loop_triangles()
+                vertices=[]
+                for vertex in mesh.vertices:
+                    point=evaluated.matrix_world@vertex.co
+                    vertices.append([point.x,point.z,-point.y])
+                part.update(positions=vertices,indices=[i for tri in mesh.loop_triangles for i in tri.vertices],
+                            matrixLocal=[list(row) for row in obj.matrix_local])
+            finally:evaluated.to_mesh_clear()
+        parts.append(part)
+    return validate_closed_door_export(definitions,parts,[list(row) for row in objects[0].parent.matrix_world])
+
+
 def export_collision(objects, recipe, stairs):
+    audit_interactive_doors(objects, recipe)
     building_id = recipe['buildingId']
     identity = building_identity(building_id)
     parts = []
@@ -425,6 +515,10 @@ def export_collision(objects, recipe, stairs):
     if recipe.get('heightModel') is not None:result['heightModel']=recipe['heightModel']
     doors=door_metadata(recipe)
     if doors is not None:result['doors']=doors
+    if recipe.get('roomWalkPaths') is not None:result['roomWalkPaths']=recipe['roomWalkPaths']
+    if recipe.get('interactiveDoors') is not None:
+        result['interactiveDoors'] = recipe['interactiveDoors']
+        result['doorDefinitionHash'] = hashlib.sha256(json.dumps(recipe['interactiveDoors'],sort_keys=True,separators=(',',':')).encode()).hexdigest()
     return result
 
 
@@ -441,7 +535,8 @@ def door_metadata(recipe):
     fields={'id','hinge','closedEnd','openEnd','bottom','top','depth','normalOffset','sourceEntities',
             'openingClassification','accessConfirmed','fixedGlazing','classificationBasis','levelKey','levelBasis',
             'approachBoundaryCad','approachBasis','accessClassification','leafMaterial',
-            'outsideSupportId','outsideSupportTop','outsideStepEstimate','outsideTraversalStatus'}
+            'outsideSupportId','outsideSupportTop','outsideStepEstimate','outsideTraversalStatus','outsideHeightBasis',
+            'pairedDoorId','pairedDoorRole','roomSourceEntity'}
     return [{key:value for key,value in door.items() if key in fields}|{'floor':floor['id']}
             for floor in recipe['floors'] for door in floor.get('doors',[])]
 
@@ -502,6 +597,11 @@ def add_stairs(geometry, recipe):
                            'routeIndex':index,'routeSegmentCount':len(route['segments']),
                            'lowerLevelKey':segment['lowerLevelKey'],'upperLevelKey':segment['upperLevelKey'],
                            'riserCountInterpretation':segment['riserCountInterpretation']})
+            if segment.get('sourceFrontsMeasured') is False:
+                flight.update({'measuredRiserPositions':False,'riserPositionBasis':segment['planBasis'],
+                               'heightProvenance':segment['verticalBasis'],'sourceKind':segment['sourceKind'],
+                               'sourceManifestSha256':segment['sourceManifestSha256']})
+            if route.get('upperSupportSolidId'):flight['upperSupportSolidId']=route['upperSupportSolidId']
             if route.get('accessPath'):
                 flight['routeAccessPath']=route['accessPath']
             if route.get('terrainValidationPending'):
@@ -525,7 +625,42 @@ def add_stairs(geometry, recipe):
     return stairs
 
 
-def create_from_recipe(path):
+def add_exterior_signs(geometry, recipe):
+    """Legible source-identified venue names, authored closed mesh lettering."""
+    for sign in recipe.get('exteriorSigns',[]):
+        floor=sign.get('floor','n01');a,b=sign['a'],sign['b'];bottom,top=sign['bottom'],sign['top']
+        geometry.prism((floor,'venue-sign-board','b6_white_paint',False),a,b,.025,bottom,top)
+        along=(Vector(geometry.at(b,0))-Vector(geometry.at(a,0))).normalized()
+        up=Vector((0,0,1));normal=along.cross(up)
+        center=(Vector(geometry.at(a,0))+Vector(geometry.at(b,0)))/2
+        # The photographed banner hangs on the outer deck guard; its frame
+        # does not extend down through the lower club entrance.
+        for fraction in (0,.5,1):
+            point=[a[i]+(b[i]-a[i])*fraction for i in range(2)]
+            geometry.beam((floor,'venue-sign-guard','b6_exterior_rail',True),
+                geometry.at(point,bottom-.25),geometry.at(point,top+.05),.035)
+        geometry.beam((floor,'venue-sign-guard','b6_exterior_rail',True),
+            geometry.at(a,top+.05),geometry.at(b,top+.05),.04)
+        row_height=(top-bottom)/len(sign['lines'])
+        for row,label in enumerate(sign['lines']):
+            curve=bpy.data.curves.new('temporary venue lettering','FONT')
+            curve.body=label;curve.align_x='CENTER';curve.size=1;curve.extrude=.006;curve.resolution_u=4
+            obj=bpy.data.objects.new('temporary venue lettering',curve);bpy.context.scene.collection.objects.link(obj)
+            bpy.context.view_layer.update()
+            evaluated=obj.evaluated_get(bpy.context.evaluated_depsgraph_get());mesh=evaluated.to_mesh()
+            try:
+                xs=[v.co.x for v in mesh.vertices];ys=[v.co.y for v in mesh.vertices]
+                scale=min(math.dist(a,b)*.90/(max(xs)-min(xs)),row_height*.73/(max(ys)-min(ys)))
+                baseline=top-row_height*(row+.5)-(max(ys)+min(ys))*scale/2
+                points=[center+along*(v.co.x*scale)+up*(baseline+v.co.y*scale)+normal*(.014+v.co.z*scale) for v in mesh.vertices]
+                for polygon in mesh.polygons:
+                    geometry.face((floor,'venue-sign-lettering','b6_metal',False),[points[i] for i in polygon.vertices])
+            finally:
+                evaluated.to_mesh_clear();bpy.data.objects.remove(obj,do_unlink=True);bpy.data.curves.remove(curve)
+        geometry.counts['venue-signs']+=1
+
+
+def create_from_recipe(path, texture_overrides=None):
     recipe=json.loads(path.read_text(encoding="utf-8"))
     building_id=recipe.get('buildingId')
     identity=building_identity(building_id)
@@ -545,12 +680,26 @@ def create_from_recipe(path):
     root["dimensionsMeasured"]=False
     root["modelStatus"]="candidate; native reopen and visual acceptance required"
     root["cadOrigin"]=recipe["cadOrigin"]
-    geometry=Geometry(recipe["cadOrigin"])
+    finishes=None
+    if building_id=='b06':
+        from b6_finishes import B6Finishes
+        finishes=B6Finishes(recipe, texture_overrides=texture_overrides)
+    geometry=Geometry(recipe["cadOrigin"],finishes,interactive_doors=building_id=='b06')
     for floor in recipe["floors"]:
         for spec in floor["solids"]:geometry.solid(floor["id"],spec)
         for window in floor.get("windows",[]):geometry.window(floor["id"],window)
         for door in floor.get("doors",[]):geometry.door(floor["id"],door)
     stairs=add_stairs(geometry,recipe)
+    if finishes:
+        from b6_furnishings import add_b06_furnishings
+        furnishing_audit=add_b06_furnishings(geometry,recipe)
+        recipe['roomWalkPaths']=furnishing_audit['rooms']
+        root['furnishingsAudit']=json.dumps(furnishing_audit,ensure_ascii=False)
+        root['roomWalkPaths']=json.dumps(recipe['roomWalkPaths'],ensure_ascii=False)
+        dependencies=['build_model.py','model_geometry.py','b6_finishes.py','b6_furnishings.py']
+        root['authoringDependenciesSha256']=json.dumps({name:hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest() for name in dependencies})
+        add_exterior_signs(geometry,recipe)
+        root['exteriorSigns']=json.dumps(recipe.get('exteriorSigns',[]),ensure_ascii=False)
     root['floorMetadata']=json.dumps(floor_metadata(recipe),ensure_ascii=False)
     root['heightModel']=json.dumps(recipe.get('heightModel'),ensure_ascii=False)
     root['stairAnnotations']=json.dumps(stairs,ensure_ascii=False)
@@ -561,6 +710,9 @@ def create_from_recipe(path):
     root['doorAnnotations']=json.dumps(door_metadata(recipe),ensure_ascii=False)
     root['initialBuildCounts']=json.dumps(dict(geometry.counts))
     objects=create_meshes(geometry,root)
+    if geometry.interactive_doors is not None:
+        recipe['interactiveDoors'] = sorted(geometry.interactive_doors.values(), key=lambda item:item['id'])
+        root['interactiveDoors'] = json.dumps(recipe['interactiveDoors'],ensure_ascii=False)
     # Výchozí editor ukáže celý nový model. Native export existujícího masteru
     # tuto uživatelovu pracovní konfiguraci ani pohled nepřepisuje.
     bpy.context.view_layer.update()
@@ -603,6 +755,8 @@ def open_master(path):
               'terrainPreservationAreas':json.loads(root.get('terrainPreservationAreasCad','[]')),
               'heightModel':json.loads(root.get('heightModel','null'))}
     if 'doorAnnotations' in root:metadata['doors']=json.loads(root['doorAnnotations'])
+    if 'roomWalkPaths' in root:metadata['roomWalkPaths']=json.loads(root['roomWalkPaths'])
+    if 'interactiveDoors' in root:metadata['interactiveDoors']=json.loads(root['interactiveDoors'])
     stairs=json.loads(root['stairAnnotations'])
     return root,objects,metadata,stairs,{}
 
@@ -614,7 +768,10 @@ def main():
     staging=contained(args.audit.parent/'staging',workspace)
     staging.mkdir(parents=True,exist_ok=True)
     recover_pending(staging,workspace,targets)
-    root,objects,recipe,stairs,counts=create_from_recipe(args.recipe) if args.recipe else open_master(args.from_blend)
+    overrides=json.loads(args.texture_overrides.read_text(encoding='utf-8')) if args.texture_overrides else None
+    if args.from_blend and overrides:
+        raise ValueError('Texture overrides belong to initial authoring; native re-export preserves packed images')
+    root,objects,recipe,stairs,counts=create_from_recipe(args.recipe,overrides) if args.recipe else open_master(args.from_blend)
     collision=export_collision(objects,recipe,stairs)
     transaction=Path(tempfile.mkdtemp(prefix=root['buildingId']+'-',dir=staging))
     staged_blend=transaction/args.blend.name

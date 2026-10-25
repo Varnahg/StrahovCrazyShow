@@ -16,8 +16,32 @@
       "temperature",
       "wind speed",
       "wind bearing",
-      "precipitation intensity"
-    ]
+      "precipitation intensity",
+      "relative humidity",
+      "dew point (derived)",
+      "pressure and published trend",
+      "solar radiation",
+      "daily rain total",
+      "published derived/daily/indoor readouts (separate from surface weather)"
+    ],
+    "verifiedAt": "2026-10-24T22:09:37Z",
+    "publishedSoftware": "wview 5.21.7 / Wired Davis Vantage Pro2 Plus",
+    "noPublishedDirectSensor": [
+      "visibility",
+      "fog",
+      "snowfall",
+      "snow depth",
+      "precipitation phase",
+      "hail",
+      "lightning"
+    ],
+    "research": "docs/weather/conditions-20261024.md",
+    "astronomy": {
+      "kind": "published calculation, not sensor",
+      "capturedPhase": "Dorůstá - 98% úplňku",
+      "publishedAt": "2026-10-24T22:09:10Z",
+      "suncalcFractionSameInstant": 0.9785215873914825
+    }
   },
   "model": {
     "source": "https://open-meteo.com/en/docs",
@@ -29,7 +53,9 @@
       "500hPa",
       "300hPa"
     ],
-    "maxAgeMinutes": 60
+    "maxAgeMinutes": 60,
+    "conditionCodes": "Open-Meteo documented WMO subset, including 45/48 fog and 95/96/97/99 thunderstorms",
+    "currentSchemaVerifiedAt": "2026-10-24T22:12:53Z"
   },
   "moonTexture": {
     "file": "public/textures/sky/moon-lroc-2k.jpg",
@@ -66,5 +92,10 @@
     "source": "https://articles.adsabs.harvard.edu/pdf/1991PASP..103.1033K",
     "equation": 20,
     "note": "normalized phase brightness plus inverse-square distance; final 0.035 scene scale is artistic, not lux"
+  },
+  "scintillation": {
+    "source": "https://starchild.gsfc.nasa.gov/docs/StarChild/questions/question26.html",
+    "kind": "bounded artistic brightness response, amplitude/frequency not measured",
+    "changesStarPositions": false
   }
 }

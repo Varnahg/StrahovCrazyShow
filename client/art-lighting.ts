@@ -1,7 +1,11 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { createAtmosphereSky, type AtmosphereSky } from "./atmosphere-sky";
+import {
+  atmosphereHaze,
+  createAtmosphereSky,
+  type AtmosphereSky,
+} from "./atmosphere-sky";
 import {
   atmosphereFogDensity,
   celestialTransmission,
@@ -28,7 +32,14 @@ export interface ArtLightingContext {
   quality: string;
 }
 export interface ArtLightingInput {
-  sun: { x: number; y: number; z: number; altitude: number; daylight: number };
+  sun: {
+    x: number;
+    y: number;
+    z: number;
+    altitude: number;
+    daylight: number;
+    angularDiameter?: number;
+  };
   moon?: {
     x: number;
     y: number;
@@ -36,6 +47,8 @@ export interface ArtLightingInput {
     altitude: number;
     fraction?: number;
     distance?: number;
+    angularDiameter?: number;
+    brightLimbAngle?: number;
   };
   weather?: Pick<Weather, "cloud" | "rain" | "wind"> & Partial<Weather>;
   /** Shared sky/disc controller; omit for standalone lighting previews. */
@@ -78,6 +91,50 @@ function smooth(from: number, to: number, value: number) {
   return x * x * (3 - 2 * x);
 }
 
+type DirectLightingSample = {
+  clearSunlight: number;
+  clearMoonlight: number;
+  sunlight: number;
+  moonlight: number;
+  sunCloudTransmission: number;
+  moonCloudTransmission: number;
+  keySource: "sun" | "moon" | "none";
+  key: Color3;
+  solarKey: Color3;
+  ambientIntensity: number;
+  surfaceIllumination: number;
+};
+
+/** Update only direct-light state at render cadence; the cached palette stays
+ * intact and no Color3/vector is allocated as a cloud edge crosses a body. */
+export function applyCloudTransmission(
+  sample: DirectLightingSample,
+  sun: number,
+  moon: number,
+) {
+  sample.sunCloudTransmission = clamp(sun);
+  sample.moonCloudTransmission = clamp(moon);
+  sample.sunlight = sample.clearSunlight * sample.sunCloudTransmission;
+  sample.moonlight = sample.clearMoonlight * sample.moonCloudTransmission;
+  sample.keySource =
+    sample.sunlight >= sample.moonlight && sample.sunlight > 0
+      ? "sun"
+      : sample.moonlight > 0
+        ? "moon"
+        : "none";
+  sample.key.copyFrom(
+    sample.keySource === "sun" ? sample.solarKey : palette.nightKey,
+  );
+  sample.surfaceIllumination = clamp(
+    Math.sqrt(
+      sample.ambientIntensity * 0.35 +
+        sample.sunlight * 0.8 +
+        sample.moonlight * 0.35,
+    ),
+  );
+  return sample;
+}
+
 /** Pure state calculation allows deterministic comparisons at fixed sun/weather. */
 export function sampleArtLighting(
   altitude: number,
@@ -114,20 +171,26 @@ export function sampleArtLighting(
   const key = Color3.Lerp(palette.dayKey, palette.cloudKey, cloud);
   Color3.LerpToRef(key, palette.lowKey, low, key);
   const directTransmission =
-    (1 - smooth(0.15, 1, cloud) * 0.98) * (1 - rainfall * 0.35);
-  const sunlight = celestialTransmission(altitude) * directTransmission;
-  const moonlight =
+    (1 - rainfall * 0.35) * (1 - atmosphereHaze(visibility) * 0.98);
+  const clearSunlight = celestialTransmission(altitude) * directTransmission;
+  const clearMoonlight =
     0.035 *
     celestialTransmission(moonAltitude) *
     lunarRelativeIrradiance(moonFraction, moonDistance) *
     (1 - day) *
     directTransmission;
+  // Standalone pure callers retain the historical coverage approximation;
+  // the live path replaces this with actual per-body cloud masks each frame.
+  const cloudTransmission = 1 - smooth(0.15, 1, cloud) * 0.98;
+  const sunlight = clearSunlight * cloudTransmission;
+  const moonlight = clearMoonlight * cloudTransmission;
   const keySource =
     sunlight >= moonlight && sunlight > 0
       ? ("sun" as const)
       : moonlight > 0
         ? ("moon" as const)
         : ("none" as const);
+  const solarKey = key.clone();
   if (keySource !== "sun") key.copyFrom(palette.nightKey);
   const ambient = Color3.Lerp(
     palette.nightAmbient,
@@ -149,11 +212,16 @@ export function sampleArtLighting(
     horizon,
     keySource,
     key,
+    solarKey,
     ambient,
     day,
     twilight,
     sunlight,
     moonlight,
+    clearSunlight,
+    clearMoonlight,
+    sunCloudTransmission: cloudTransmission,
+    moonCloudTransmission: cloudTransmission,
     ambientIntensity,
     // Bounded display response for precipitation, sharing the scene sky/key
     // instead of keeping unrelated bright rain streaks on a moonless night.
@@ -304,6 +372,28 @@ export function applyArtLighting(
     state.sampleVisibility = input.weather?.visibility;
   }
   const sample = state.sample;
+  const instant = input.instant ?? Date.now();
+  // Advance the single cloud state before both uniforms and direct lighting.
+  // This avoids a frame of lag and never advances wind twice in one frame.
+  state.sky.update({
+    instant,
+    dt,
+    quality: context.quality,
+    sun: input.sun,
+    moon: input.moon,
+    topColor: sample.top,
+    horizonColor: sample.horizon,
+    cloud: state.cloud,
+    rain: state.rain,
+    cloudLayers: input.weather?.cloudLayers,
+    weather: input.weather,
+    player: context.scene.activeCamera?.globalPosition ?? input.player,
+  });
+  applyCloudTransmission(
+    sample,
+    state.sky.lightTransmission.sun,
+    state.sky.lightTransmission.moon,
+  );
   context.sun.diffuse.copyFrom(sample.key);
   if (sample.keySource === "sun") {
     context.sun.direction.set(-input.sun.x, -input.sun.y, -input.sun.z);
@@ -333,21 +423,6 @@ export function applyArtLighting(
   context.scene.fogColor.copyFrom(sample.horizon);
   state.fog += (sample.fogDensity - state.fog) * t;
   context.scene.fogDensity = state.fog;
-  const instant = input.instant ?? Date.now();
-  state.sky.update({
-    instant,
-    dt,
-    quality: context.quality,
-    sun: input.sun,
-    moon: input.moon,
-    topColor: sample.top,
-    horizonColor: sample.horizon,
-    cloud: state.cloud,
-    rain: state.rain,
-    cloudLayers: input.weather?.cloudLayers,
-    weather: input.weather,
-    player: context.scene.activeCamera?.globalPosition ?? input.player,
-  });
   context.lamps.emissiveColor.set(
     0.94 * sample.night,
     0.74 * sample.night,

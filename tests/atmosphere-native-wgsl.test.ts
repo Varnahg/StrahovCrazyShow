@@ -22,6 +22,23 @@ import type {
 } from "@babylonjs/core/Maths/math.vector";
 import type { Weather } from "../shared/weather";
 import { SkyWeatherController } from "../client/sky-weather";
+import { Effect } from "@babylonjs/core/Materials/effect";
+
+test("both shader paths use spherical layers, exclude below-horizon clouds and taper the solar quad edge", () => {
+  for (const store of [Effect.ShadersStore, ShaderStore.ShadersStoreWGSL]) {
+    for (const fragment of ["strahovAtmosphere", "strahovSun", "strahovMoon"]) {
+      const shader = store[`${fragment}FragmentShader`];
+      assert.match(shader, /shell \/ \(sqrt\(ry \* ry \+ shell\) \+ ry\)/);
+      assert.doesNotMatch(shader, /max\(direction.y,\s*\.085\)/);
+      assert.match(shader, /direction.y <= 0.0/);
+      assert.match(shader, /atmosphereHaze/);
+    }
+    assert.match(
+      store.strahovSunFragmentShader,
+      /1.0-smoothstep\(4.5,6.0,radius\)/,
+    );
+  }
+});
 
 function fixture(native: boolean, reverseDepth = false) {
   const engine = new NullEngine();

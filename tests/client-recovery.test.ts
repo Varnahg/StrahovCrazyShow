@@ -14,6 +14,7 @@ import {
 import { SPAWN } from "../shared/world";
 import { NetworkClockTiming } from "../shared/network-diagnostics";
 import { TimelineInputQueue } from "../shared/input-timeline";
+import { installFixtureDoorHistory } from "./helpers/prediction-replay-fixture";
 
 await initPhysics();
 function context(network = true) {
@@ -77,6 +78,7 @@ function context(network = true) {
     ]),
     onPredictionReset: () => bufferClears++,
   });
+  const doors = installFixtureDoorHistory(game);
   game.snapshots.push(
     {
       time: 100,
@@ -93,11 +95,13 @@ function context(network = true) {
       { x: 0, z: 1, yaw: 0, seq, vehicle: false, jump: false },
       actor.capture(),
     );
+  doors.rememberPrediction();
   return {
     game,
     simulation,
     actor,
     diagnosticNetwork,
+    doors,
     counts: () => ({ bufferClears, animationResets, avatarDisposals }),
     dispose: () => simulation.dispose(),
   };
@@ -111,31 +115,31 @@ test("actual Game keeps only accepted independent telemetry and optional getters
   const network = { clock: clock.snapshot(), queue: new TimelineInputQueue(1, 0).diagnostics(100) };
   const packet = (tick: number): Authority => ({ inputEpoch: 1, inputTickBase: 0, tick, ack: tick, receivedSeq: tick, time: 1000 + tick * 1000 / 60, resync: true, state: c.actor.capture(), network });
   const read = () => (c.game as any).diagnosticNetworkContext();
-  assert.equal(c.game.reconcile(packet(1), 100), true);
+  assert.equal(c.game.reconcile(c.doors.withAuthority(packet(1)), 100), true);
   const accepted = read().server;
   assert.equal(accepted.clock.droppedTotalMs, 3);
   network.clock.droppedTotalMs = 9999;
   assert.equal(read().server.clock.droppedTotalMs, 3, "accepted telemetry is detached from source mutation");
   let getters = 0;
   const withGetter = (tick: number) => Object.defineProperty(packet(tick), "network", { enumerable: true, get() { getters++; throw new Error("optional telemetry getter"); } });
-  assert.equal(c.game.reconcile(withGetter(0), 101), false);
-  assert.equal(c.game.reconcile(withGetter(1), 102), false);
+  assert.equal(c.game.reconcile(c.doors.withAuthority(withGetter(0)), 101), false);
+  assert.equal(c.game.reconcile(c.doors.withAuthority(withGetter(1)), 102), false);
   assert.equal(read().server, accepted, "both stale tick and stale timeline rejection retain accepted telemetry");
   c.game.respawnPending = true;
-  assert.equal(c.game.reconcile({ ...packet(2), resync: false }, 103), false);
+  assert.equal(c.game.reconcile(c.doors.withAuthority({ ...packet(2), resync: false }), 103), false);
   c.game.respawnPending = false;
   c.game.ready = false;
-  assert.equal(c.game.reconcile(withGetter(2), 104), false);
+  assert.equal(c.game.reconcile(c.doors.withAuthority(withGetter(2)), 104), false);
   c.game.ready = true;
-  assert.equal(c.game.reconcile(withGetter(2), 105), true, "optional telemetry must not prevent a valid correction");
+  assert.equal(c.game.reconcile(c.doors.withAuthority(withGetter(2)), 105), true, "optional telemetry must not prevent a valid correction");
   assert.equal(getters, 0, "neither accepted nor rejected authority invokes optional getters");
   assert.equal(read().server, null);
   const missing = packet(3);
   delete missing.network;
-  assert.equal(c.game.reconcile(missing, 106), true);
+  assert.equal(c.game.reconcile(c.doors.withAuthority(missing), 106), true);
   assert.equal(read().server, null);
   c.game.disposed = true;
-  assert.equal(c.game.reconcile(withGetter(4), 107), false);
+  assert.equal(c.game.reconcile(c.doors.withAuthority(withGetter(4)), 107), false);
   assert.equal(getters, 0);
   assert.equal(read(), null);
 });
@@ -144,7 +148,7 @@ test("diagnostic-only reset clears connection evidence while same identity retai
   const c = context();
   t.after(() => c.dispose());
   const packet: Authority = { inputEpoch: 1, inputTickBase: 0, tick: 10, ack: 10, receivedSeq: 10, time: 1000, resync: true, state: c.actor.capture(), network: { clock: new NetworkClockTiming().snapshot(), queue: new TimelineInputQueue(1, 0).diagnostics() } };
-  c.game.reconcile(packet, 100);
+  c.game.reconcile(c.doors.withAuthority(packet), 100);
   const read = () => (c.game as any).diagnosticNetworkContext();
   const timeline = c.game.networkTimeline;
   const frontier = timeline.snapshot();
@@ -173,7 +177,7 @@ test("forced correction logs the actual displacement and authority frontier", (t
     events.push({ kind, data }),
   );
   const before = { ...c.actor.position };
-  c.game.reconcile({
+  c.game.reconcile(c.doors.withAuthority({
     tick: 50,
     time: 2000,
     ack: 19,
@@ -186,7 +190,7 @@ test("forced correction logs the actual displacement and authority frontier", (t
       ...c.actor.capture(),
       position: { x: before.x + 2, y: before.y, z: before.z },
     },
-  });
+  }));
   const incident = events.find(
     (event) => event.kind === "network-correction",
   )!.data;
@@ -236,7 +240,7 @@ test("network respawn clears held controls and transport history before sending 
   assert.equal(c.game.requestRespawn(), false);
   assert.equal(sent, 1);
   const old = { ...c.actor.position };
-  c.game.reconcile({
+  c.game.reconcile(c.doors.withAuthority({
     tick: 10,
     time: 1000,
     ack: 12,
@@ -244,7 +248,7 @@ test("network respawn clears held controls and transport history before sending 
     inputTickBase: 0,
     receivedSeq: 12,
     state: { ...c.actor.capture(), position: { x: 500, y: 100, z: 500 } },
-  });
+  }));
   assert.deepEqual(
     { ...c.actor.position },
     old,
@@ -289,7 +293,7 @@ test("forced authority restores safely without reading the old vehicle pose, rep
     respawn: true,
     state,
   };
-  assert.doesNotThrow(() => c.game.reconcile(packet));
+  assert.doesNotThrow(() => c.game.reconcile(c.doors.withAuthority(packet)));
   assert.equal(c.actor.vehicle, false);
   assert.deepEqual({ ...c.actor.position }, state.position);
   assert.equal(c.game.seq, 12);
@@ -383,7 +387,7 @@ test("generic forced correction preserves held controls and manual camera intent
     c.game.lastCameraInput = 4567;
     const pointer = c.game.pointerPress,
       keys = [...c.game.keys];
-    c.game.reconcile({
+    c.game.reconcile(c.doors.withAuthority({
       tick: 50,
       time: 2500,
       ack: 12,
@@ -392,7 +396,7 @@ test("generic forced correction preserves held controls and manual camera intent
       receivedSeq: 12,
       resync: true,
       state: c.actor.capture(),
-    });
+    }));
     assert.equal(c.game.respawnPending, false);
     assert.deepEqual([...c.game.keys], keys);
     assert.equal(
@@ -422,7 +426,7 @@ test("generic forced correction preserves held controls and manual camera intent
 
 test("new local identity accepts a low-tick server epoch after a prior tick 100000", () => {
   const c = context();
-  c.game.reconcile({
+  c.game.reconcile(c.doors.withAuthority({
     tick: 100000,
     time: 3000,
     ack: 300,
@@ -431,7 +435,7 @@ test("new local identity accepts a low-tick server epoch after a prior tick 1000
     receivedSeq: 300,
     resync: true,
     state: c.actor.capture(),
-  });
+  }));
   c.game.seq = 301;
   c.game.prediction.push(
     { x: 0, z: 1, yaw: 0, seq: 301, jump: false },
@@ -455,7 +459,7 @@ test("new local identity accepts a low-tick server epoch after a prior tick 1000
     ...c.actor.capture(),
     position: { ...c.actor.position, x: SPAWN.x + 1 },
   };
-  c.game.reconcile({
+  c.game.reconcile(c.doors.withAuthority({
     tick: 1,
     time: 4000,
     ack: 0,
@@ -464,7 +468,7 @@ test("new local identity accepts a low-tick server epoch after a prior tick 1000
     receivedSeq: 0,
     resync: true,
     state: freshState,
-  });
+  }));
   assert.equal(c.game.lastAuthorityTick, 1);
   assert.equal(c.actor.position.x, SPAWN.x + 1);
   c.game.syncMotion({
@@ -480,7 +484,7 @@ test("new local identity accepts a low-tick server epoch after a prior tick 1000
 
 test("same-identity reconnect keeps its tick frontier, prediction and avatar against delayed packets", () => {
   const c = context();
-  c.game.reconcile({
+  c.game.reconcile(c.doors.withAuthority({
     tick: 100000,
     time: 3000,
     ack: 300,
@@ -489,7 +493,7 @@ test("same-identity reconnect keeps its tick frontier, prediction and avatar aga
     receivedSeq: 300,
     resync: true,
     state: c.actor.capture(),
-  });
+  }));
   c.game.seq = 301;
   c.game.prediction.push(
     { x: 0, z: 1, yaw: 0, seq: 301, jump: false },
@@ -501,7 +505,7 @@ test("same-identity reconnect keeps its tick frontier, prediction and avatar aga
     diagnostics = { ...c.diagnosticNetwork },
     position = { ...c.actor.position };
   c.game.setLocalId(c.game.localId);
-  c.game.reconcile({
+  c.game.reconcile(c.doors.withAuthority({
     tick: 1,
     time: 10,
     ack: 0,
@@ -510,7 +514,7 @@ test("same-identity reconnect keeps its tick frontier, prediction and avatar aga
     receivedSeq: 0,
     resync: true,
     state: { ...c.actor.capture(), position: { x: 999, y: 10, z: 999 } },
-  });
+  }));
   c.game.syncMotion({
     tick: 1,
     time: 10,
@@ -541,7 +545,7 @@ test("an unrelated forced resync cannot finish an outstanding respawn or consume
     oldYaw = c.game.yaw;
   c.game.requestRespawn();
   // Already in flight before the request: a normal input-gap/visibility reply.
-  c.game.reconcile({
+  c.game.reconcile(c.doors.withAuthority({
     tick: 40,
     time: 2000,
     ack: 10,
@@ -550,7 +554,7 @@ test("an unrelated forced resync cannot finish an outstanding respawn or consume
     receivedSeq: 10,
     resync: true,
     state: c.actor.capture(),
-  });
+  }));
   assert.equal(c.game.respawnPending, true);
   assert.equal(c.game.seq, 20);
   assert.equal(c.game.vehicleCameraSnap, false);
@@ -577,7 +581,7 @@ test("an unrelated forced resync cannot finish an outstanding respawn or consume
       vehicleState: c.simulation.car.capture(),
     },
   };
-  c.game.reconcile(reply);
+  c.game.reconcile(c.doors.withAuthority(reply));
   assert.equal(c.game.respawnPending, false);
   assert.equal(c.actor.vehicle, false);
   assert.equal(c.game.seq, 12);
@@ -603,7 +607,7 @@ test("generic forced exit keeps the car where it stopped instead of emergency-re
     vertical: 0,
     grounded: false,
   };
-  c.game.reconcile({
+  c.game.reconcile(c.doors.withAuthority({
     tick: 40,
     time: 2000,
     ack: 12,
@@ -612,7 +616,7 @@ test("generic forced exit keeps the car where it stopped instead of emergency-re
     receivedSeq: 12,
     resync: true,
     state,
-  });
+  }));
   assert.equal(c.actor.vehicle, false);
   assert.deepEqual({ ...c.simulation.car.position }, expectedCar);
   assert.equal(c.game.yaw, -2);
@@ -630,7 +634,7 @@ test("marked recovery remains an authoritative hard restore outside pending with
       return Reflect.get(target, key, receiver);
     },
   });
-  c.game.reconcile({
+  c.game.reconcile(c.doors.withAuthority({
     tick: 41,
     time: 2020,
     ack: 12,
@@ -648,7 +652,7 @@ test("marked recovery remains an authoritative hard restore outside pending with
       grounded: false,
       vehicleState: c.simulation.car.capture(),
     },
-  });
+  }));
   assert.equal(c.actor.vehicle, false);
   assert.equal(c.actor.position.x, SPAWN.x);
   assert.equal(c.game.yaw, -2);
@@ -674,7 +678,7 @@ test("a render stall preserves held controls, bounds recovery requests and resum
     resync: true,
     state: start,
   };
-  c.game.reconcile(packet, 0);
+  c.game.reconcile(c.doors.withAuthority(packet), 0);
   const sent: any[] = [];
   c.game.onInput = (input) => sent.push(input);
   const requests: string[] = [];
@@ -699,7 +703,7 @@ test("a render stall preserves held controls, bounds recovery requests and resum
     "recovery is bounded during repeated stale frames",
   );
   c.game.reconcile(
-    { ...packet, inputEpoch: 2, inputTickBase: 190, tick: 190, time: 11500 },
+    c.doors.withAuthority({ ...packet, inputEpoch: 2, inputTickBase: 190, tick: 190, time: 11500 }),
     1550,
   );
   c.game.advanceSimulation(1 / 60, 1550);
@@ -712,7 +716,7 @@ test("a render stall preserves held controls, bounds recovery requests and resum
   );
   const state = c.actor.capture();
   assert.equal(
-    c.game.reconcile({ ...packet, tick: 191, ack: 91, time: 11516 }, 1560),
+    c.game.reconcile(c.doors.withAuthority({ ...packet, tick: 191, ack: 91, time: 11516 }), 1560),
     false,
   );
   assert.deepEqual(
@@ -726,7 +730,7 @@ test("unsupported clean transport latency preserves controls without resetting t
   const c = context();
   t.after(() => c.dispose());
   c.game.reconcile(
-    {
+    c.doors.withAuthority({
       inputEpoch: 1,
       inputTickBase: 100,
       tick: 100,
@@ -735,7 +739,7 @@ test("unsupported clean transport latency preserves controls without resetting t
       time: 10000,
       state: c.actor.capture(),
       resync: true,
-    },
+    }),
     0,
   );
   assert.equal(c.game.networkTimeline.setRtt(3000), true);

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-native-door-export-guard-20261025",
+  "title": "Reject native door geometry diverging from exported physical definitions",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": ["scripts/cad-buildings/door_export_audit.py", "scripts/cad-buildings/test_door_export_audit.py", ".cache/b6-native-door-export-guard-20261025/", "docs/agents/handoffs/b6-native-door-export-guard-20261025.md"],
+  "acceptance": ["Validate actual closed evaluated vertices and ownership against the authoritative door definition before re-export.", "Explicitly reject unsupported root/leaf transforms and vertex edits that would leave stale closed pose, hinge, dimensions or handle metadata; current published B6 master must pass.", "No model mutation or regeneration: pure validator plus actionable door/part errors, root wires native Blender adapter and audit."],
+  "verification": ["Meaningful regression for root translation, per-leaf translation/rotation, edited shape and ownership; current actual exported geometry validation without Blender."],
+  "notes": ["Direct fix for independent read-only review finding; no recursive BMAD, GPU, Blender, fullsuite or server."]
+}

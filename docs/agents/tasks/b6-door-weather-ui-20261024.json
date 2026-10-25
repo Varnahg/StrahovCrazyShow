@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-door-weather-ui-20261024",
+  "title": "Integrate authoritative doors and weather preview UI",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": [
+    "client/ui.tsx",
+    "client/i18n-messages.ts",
+    "client/door-connection.ts",
+    "tests/door-connection.test.ts",
+    "tests/weather-preview-ui.test.ts",
+    ".cache/b6-door-weather-ui-20261024/",
+    "docs/agents/handoffs/b6-door-weather-ui-20261024.md"
+  ],
+  "acceptance": [
+    "UI connection lifecycle preserves guest isolation, validates native definitionHash and full door baseline before authority.",
+    "Explicit DEMO weather previews preserve actual provider snapshot/freshness; do not touch played2591."
+  ],
+  "verification": [
+    "Targeted CPU lifecycle and preview tests; root fullgame GPU and integration."
+  ],
+  "notes": [
+    "Root owns Game, netcode, shared doors, cadBuilding loader. Direct delegation, no nested BMAD."
+  ]
+}

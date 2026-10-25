@@ -1,6 +1,7 @@
 import test from "node:test";
 import surveyedTrees from "../shared/data/surveyed-trees.json";
 import treeReconstruction from "../shared/data/tree-reconstruction.json";
+import b6TreePlacement from "../shared/data/cad-buildings/b06-tree-placement.json";
 import assert from "node:assert/strict";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
@@ -18,6 +19,7 @@ import {
   pointInPolygon,
   segmentDistance,
   windEnvelope,
+  treeTrunkCollision,
   surfaceElevation,
   type LandcoverArea,
 } from "../shared/vegetation";
@@ -104,9 +106,11 @@ test("tree coordinates preserve OSM nodes and audited orthophoto crown centres w
           (t) => t.osmId === tree.osmId,
         )!;
       assert.ok(source);
-      assert.equal(tree.x, source.x);
-      assert.equal(tree.z, source.z);
-      assert.equal(tree.positionUncertaintyMetres, 2.5);
+      const corrected = tree.osmId === b6TreePlacement.treeId;
+      assert.equal(tree.x, corrected ? b6TreePlacement.position.x : source.x);
+      assert.equal(tree.z, corrected ? b6TreePlacement.position.z : source.z);
+      assert.equal(tree.positionUncertaintyMetres, corrected ? b6TreePlacement.positionUncertaintyMetres : 2.5);
+      assert.equal(tree.placementSource, corrected ? b6TreePlacement.id : undefined);
     }
     assert.ok(
       tree.x >= BOUNDS.minX &&
@@ -116,6 +120,25 @@ test("tree coordinates preserve OSM nodes and audited orthophoto crown centres w
     );
     assert.ok(tree.size >= 5 && tree.size <= 15);
   }
+});
+
+test("B6 conifer correction retains its source model and all street/building rejection rules", () => {
+  const {x,z}=b6TreePlacement.position, previous=b6TreePlacement.originalPosition;
+  const classifier=placementClassifier(BUILDINGS,MAP.paths);
+  assert.equal(classifier.tree(previous.x,previous.z),false);
+  assert.equal(isStreetSurface(previous.x,previous.z),true);
+  assert.equal(classifier.tree(x,z),true);
+  assert.equal(isStreetSurface(x,z,.5),false);
+  const tree=TREES.find(t=>t.osmId===b6TreePlacement.treeId)!;
+  assert.ok(tree);assert.equal(TREES.filter(t=>t.osmId===tree.osmId).length,1);
+  assert.equal(tree.reconstruction,treeReconstruction.trees.find(t=>t.id===tree.osmId));
+  assert.deepEqual({x:treeTrunkCollision(tree).x,z:treeTrunkCollision(tree).z},{x,z});
+  const building={...BUILDINGS[0],points:[[x-1,z-1],[x+1,z-1],[x+1,z+1],[x-1,z+1]] as [number,number][]};
+  assert.ok(!createMappedTrees(BOUNDS,[...BUILDINGS,building],MAP.paths).some(t=>t.osmId===tree.osmId));
+  const path={...MAP.paths[0],kind:'footway',points:[[x-4,z],[x+4,z]] as [number,number][]};
+  assert.ok(!createMappedTrees(BOUNDS,BUILDINGS,[...MAP.paths,path]).some(t=>t.osmId===tree.osmId));
+  const cropped={minX:x+1,maxX:x+2,minZ:z+1,maxZ:z+2};
+  assert.ok(!createMappedTrees(cropped,BUILDINGS,MAP.paths).some(t=>t.osmId===tree.osmId));
 });
 
 test("wind is exactly still at zero, finite and capped in extreme weather", () => {

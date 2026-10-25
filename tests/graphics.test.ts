@@ -24,6 +24,14 @@ test("night moonlight is bounded and overcast has lower direct contrast", () => 
   assert.ok(overcast.ambientIntensity > clear.ambientIntensity);
 });
 
+test("dense fog attenuates celestial direct light without manufacturing light below the horizon", () => {
+  const clear = sampleArtLighting(0.7, 0.2, 0, -1, 0, 384400, 40000);
+  const fog = sampleArtLighting(0.7, 0.2, 0, -1, 0, 384400, 150);
+  assert.ok(fog.sunlight < clear.sunlight * 0.03);
+  assert.ok(fog.fogDensity > clear.fogDensity * 100);
+  assert.equal(sampleArtLighting(-0.7, 0.2, 0, -1, 0, 384400, 150).sunlight, 0);
+});
+
 test("weather fog remains bounded and sunrise has no discontinuous lighting step", () => {
   for (const cloud of [-1, 0, 0.5, 1, 5])
     for (const rain of [-1, 0, 0.5, 1, 5]) {

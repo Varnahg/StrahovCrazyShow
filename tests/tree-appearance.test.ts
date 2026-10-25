@@ -273,7 +273,8 @@ test("wind refreshes frozen-material uniforms and keeps the inverse-transpose no
 });
 
 test("normal shading cannot alter surveyed placements or add draw calls", () => {
-  assert.equal(TREES.length, 109);
+  assert.equal(TREES.length, 110, 'the source-corrected B6 entrance conifer now passes the unchanged placement filters');
+  assert.equal(TREES.filter(tree=>tree.osmId==='ipr-b6-north-conifer').length,1);
   const source = readFileSync("client/vegetation.ts", "utf8");
   assert.equal(
     (

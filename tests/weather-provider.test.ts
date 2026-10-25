@@ -186,6 +186,62 @@ test("stale and future station pages never have live status", () => {
   assert.equal(retained.fieldSources?.snowfall?.stale, true);
 });
 
+test("inadmissible future snapshots cannot displace a valid prior or a newer admissible stale reading", () => {
+  const previous = parseStation(stationHtml("2026-10-12 13:50:00"), now);
+  const futureStation = parseStation(stationHtml("2026-10-13 14:00:00"), now);
+  const data = modelData(); data.current.time = now / 1000 + 86400;
+  const futureModel = parseModelWeather(data, now);
+  for (const [station, model] of [[futureStation, null], [null, futureModel], [futureStation, futureModel]] as const) {
+    const result = selectWeather(station, model, previous, now);
+    assert.equal(result.observedAt, previous.observedAt);
+    assert.equal(result.sourceKind, "station"); assert.equal(result.stale, true);
+    assert.equal(result.fieldSources?.humidity?.stale, true);
+  }
+  const staleStation = parseStation(stationHtml("2026-10-12 13:10:00"), now);
+  data.current.time = now / 1000 - 80 * 60;
+  const staleModel = parseModelWeather(data, now);
+  assert.equal(selectWeather(staleStation, staleModel, futureStation, now).observedAt, staleStation.observedAt);
+  data.current.time = now / 1000 - 65 * 60;
+  const newerModel = parseModelWeather(data, now);
+  assert.equal(selectWeather(futureStation, newerModel, staleModel, now).observedAt, newerModel.observedAt);
+  for (const observedAt of [null, NaN, Infinity, now + 86400000]) {
+    const invalidPrevious = { ...previous, observedAt };
+    const unavailable = selectWeather(futureStation, futureModel, invalidPrevious, now);
+    assert.equal(unavailable.status, "unavailable"); assert.equal(unavailable.observedAt, null);
+    assert.equal(unavailable.temperature, null); assert.equal(unavailable.stale, true);
+  }
+  const withinSkew = { ...previous, observedAt: now + 5 * 60000 };
+  assert.equal(selectWeather(withinSkew, null, previous, now).observedAt, withinSkew.observedAt);
+  assert.equal(selectWeather({ ...withinSkew, observedAt: withinSkew.observedAt + 1 }, null, previous, now).observedAt, previous.observedAt);
+});
+
+test("invalid station section falls back to the model or preserves only the real prior as stale", async () => {
+  let broken = true, modelOnline = true;
+  const source = () => '<strong>Aktu&#225;ln&#237; podm&#237;nky</strong>' +
+    (broken ? stationHtml().replace("Teplota:", "Missing:") : stationHtml()) +
+    '<strong>Serverovna</strong><tr><td>Teplota:</td><td>21.8 &#176;C</td></tr>';
+  const provider = createWeatherProvider({ now: () => now, cacheForMs: 0, fetch: (async (url) => {
+    if (String(url).includes("weather.sh")) return new Response(source());
+    if (!modelOnline) throw new Error("model offline");
+    const data = modelData(); data.current.temperature_2m = 9;
+    return new Response(JSON.stringify(data));
+  }) as typeof fetch });
+  const model = await provider();
+  assert.equal(model.sourceKind, "model"); assert.equal(model.temperature, 9);
+  modelOnline = false;
+  const retainedModel = await provider();
+  assert.equal(retainedModel.sourceKind, "model"); assert.equal(retainedModel.temperature, 9);
+  assert.equal(retainedModel.stale, true); assert.equal(retainedModel.observedAt, model.observedAt);
+  broken = false;
+  const station = await provider();
+  assert.equal(station.sourceKind, "station"); assert.equal(station.temperature, 4);
+  broken = true;
+  const retainedStation = await provider();
+  assert.equal(retainedStation.sourceKind, "station"); assert.equal(retainedStation.temperature, 4);
+  assert.equal(retainedStation.stale, true); assert.equal(retainedStation.observedAt, station.observedAt);
+  assert.equal(station.stale, false, "Aging must not mutate the earlier accepted station object");
+});
+
 test("cache hits age station and model fields separately without extra requests or mutating past snapshots", async () => {
   let instant = now,
     calls = 0;

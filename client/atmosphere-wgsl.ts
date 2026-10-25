@@ -5,7 +5,9 @@ import { ShaderStore } from "@babylonjs/core/Engines/shaderStore";
  * Babylon injects entry-point returns and its render-target Y transform. */
 export function registerAtmosphereWgsl(
   cloudEdge: number,
-  rayScales: readonly [number, number, number],
+  heights: readonly [number, number, number],
+  scales: readonly [number, number, number],
+  earthRadius: number,
 ) {
   const clouds = `
 var atmosphereNoiseSampler: sampler;
@@ -15,33 +17,41 @@ uniform atmosphereLowOffset: vec2f;
 uniform atmosphereMidOffset: vec2f;
 uniform atmosphereHighOffset: vec2f;
 uniform atmosphereCloudDetail: f32;
+uniform atmosphereHaze: f32;
+fn atmosphereCloudUV(direction: vec3f, height: f32, scale: f32) -> vec2f {
+  let y = max(direction.y, 0.0);
+  let shell = height * (${2 * earthRadius}.0 + height);
+  let ry = ${earthRadius}.0 * y;
+  let distance = shell / (sqrt(ry * ry + shell) + ry);
+  return direction.xz * distance / scale;
+}
 fn atmosphereDensity(n: f32, coverage: f32) -> f32 {
   if (coverage <= 0.0) { return 0.0; }
   if (coverage >= 1.0) { return 1.0; }
-  return smoothstep(1.0 - coverage - ${cloudEdge}, 1.0 - coverage + ${cloudEdge}, n);
+  let density = smoothstep(1.0 - coverage - ${cloudEdge}, 1.0 - coverage + ${cloudEdge}, n);
+  return mix(density,1.0,smoothstep(${1 - cloudEdge},1.0,coverage))*smoothstep(0.0,${cloudEdge},coverage);
 }
 fn atmosphereLowUV(direction: vec3f) -> vec2f {
-  return direction.xz / max(direction.y, .085) * ${rayScales[0]} + uniforms.atmosphereLowOffset;
+  return atmosphereCloudUV(direction, ${heights[0]}.0, ${scales[0]}.0) + uniforms.atmosphereLowOffset;
 }
 fn atmosphereCloudField(direction: vec3f) -> vec4f {
   if (dot(uniforms.atmosphereCoverage, vec3f(1.0)) < .001) { return vec4f(0.0); }
-  let ray = direction.xz / max(direction.y, .085);
   let lowNoise = textureSample(atmosphereNoise, atmosphereNoiseSampler, atmosphereLowUV(direction));
   let low = atmosphereDensity(lowNoise.r, uniforms.atmosphereCoverage.x);
   var mid = 0.0;
   var high = 0.0;
   if (uniforms.atmosphereCoverage.y > .001) {
-    let midNoise = textureSample(atmosphereNoise, atmosphereNoiseSampler, ray * ${rayScales[1]} + uniforms.atmosphereMidOffset + vec2f(.37, .11));
+    let midNoise = textureSample(atmosphereNoise, atmosphereNoiseSampler, atmosphereCloudUV(direction, ${heights[1]}.0, ${scales[1]}.0) + uniforms.atmosphereMidOffset + vec2f(.37, .11));
     mid = atmosphereDensity(midNoise.g, uniforms.atmosphereCoverage.y) * .86;
   }
   if (uniforms.atmosphereCoverage.z > .001) {
-    let highPosition = ray * ${rayScales[2]} + uniforms.atmosphereHighOffset;
+    let highPosition = atmosphereCloudUV(direction, ${heights[2]}.0, ${scales[2]}.0) + uniforms.atmosphereHighOffset;
     let cirrusRay = vec2f(highPosition.x * .33 + highPosition.y * .53, highPosition.y * 1.42);
     let highNoise = textureSample(atmosphereNoise, atmosphereNoiseSampler, cirrusRay + vec2f(.16, .63));
     high = atmosphereDensity(highNoise.b, uniforms.atmosphereCoverage.z) * .65;
   }
-  if (direction.y < -.025) { return vec4f(0.0); }
-  return vec4f(vec3f(low, mid, high) * smoothstep(-.025, .015, direction.y), lowNoise.r);
+  if (direction.y <= 0.0) { return vec4f(0.0); }
+  return vec4f(vec3f(low, mid, high) * smoothstep(0.0, .025, direction.y), lowNoise.r);
 }
 fn atmosphereCloudLayers(direction: vec3f) -> vec3f {
   return atmosphereCloudField(direction).xyz;
@@ -73,6 +83,7 @@ uniform moonDirection: vec3f;
 uniform atmosphereLight: vec4f;
 uniform atmosphereMood: vec3f;
 uniform worldToCatalog: mat3x3f;
+uniform atmosphereTwinkle: vec2f;
 var atmosphereStarsSampler: sampler;
 var atmosphereStars: texture_2d<f32>;
 ${clouds}
@@ -107,8 +118,11 @@ fn main(input: FragmentInputs) -> FragmentOutputs {
     let uv = vec2f(atan2(equatorial.y,equatorial.x)/6.28318530718+.5,
       asin(clamp(equatorial.z,-1.0,1.0))/3.14159265359+.5);
     let starlight = textureSample(atmosphereStars, atmosphereStarsSampler, uv).rgb;
+    let seed = dot(equatorial,vec3f(17.0,43.0,29.0));
+    let amplitude = .015 + .075 * (1.0-smoothstep(.05,.8,d.y));
+    let twinkle = 1.0 + amplitude * (.6*sin(uniforms.atmosphereTwinkle.x+seed)+.4*sin(uniforms.atmosphereTwinkle.y+seed*1.37));
     let extinction = smoothstep(.025,.34,d.y);
-    if (d.y > 0.0) { color += starlight * stars * extinction * (1.0-.55*moon*pow(towardMoon,5.0)); }
+    if (d.y > 0.0) { color += starlight * twinkle * stars * extinction * (1.0-.55*moon*pow(towardMoon,5.0)); }
   }
   var lightSide = 0.0;
   if (uniforms.atmosphereCloudDetail > .5) {
@@ -141,6 +155,7 @@ fn main(input: FragmentInputs) -> FragmentOutputs {
     cloudColor = mix(cloudColor,uniforms.horizonColor,horizon*.28);
     color = mix(color,cloudColor,opacity);
   }
+  color = mix(color,uniforms.horizonColor,uniforms.atmosphereHaze * (.82 + .18 * horizon));
   fragmentOutputs.color = vec4f(max(color,vec3f(0.0)),1.0);
 }`;
 
@@ -175,10 +190,10 @@ fn main(input: FragmentInputs) -> FragmentOutputs {
   let cloudOpacity = atmosphereCloudOpacity(normalize(fragmentInputs.vSkyRay));
   if (sin(uniforms.altitude)+uniforms.upY*uniforms.angularRadius*p.y<0.0) { discard; }
   let disc = 1.0-smoothstep(.99,1.01,radius);
-  let halo = exp(-radius*radius*.16)*.12;
+  let halo = exp(-radius*radius*.16)*.12*(1.0-smoothstep(4.5,6.0,radius));
   let warm = 1.0-smoothstep(0.0,.28,uniforms.altitude);
   let color = mix(vec3f(1.0,.97,.86),vec3f(1.0,.67,.32),warm*.75);
-  fragmentOutputs.color = vec4f(color,max(disc,halo)*uniforms.strength*(1.0-cloudOpacity));
+  fragmentOutputs.color = vec4f(color,max(disc,halo)*uniforms.strength*(1.0-cloudOpacity)*(1.0-uniforms.atmosphereHaze));
 }`;
 
   ShaderStore.ShadersStoreWGSL.strahovMoonFragmentShader = `
@@ -214,6 +229,6 @@ fn main(input: FragmentInputs) -> FragmentOutputs {
   color = mix(color,uniforms.skyColor+color*.3,uniforms.daylight*.78);
   let edge = 1.0-smoothstep(.992,1.0,sqrt(r2));
   let visibleSurface = mix(1.0,smoothstep(-.006,.04,cosine),uniforms.daylight);
-  fragmentOutputs.color = vec4f(color,edge*visibleSurface*uniforms.strength*(1.0-cloudOpacity));
+  fragmentOutputs.color = vec4f(color,edge*visibleSurface*uniforms.strength*(1.0-cloudOpacity)*(1.0-uniforms.atmosphereHaze));
 }`;
 }

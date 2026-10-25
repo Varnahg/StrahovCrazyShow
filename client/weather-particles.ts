@@ -1,13 +1,14 @@
 import type { Vec3 } from "../shared/types";
-import type { Weather } from "../shared/weather";
+import { weatherConditionFromCode, type Weather } from "../shared/weather";
 type Precipitation = Pick<Weather, "rain"> &
-  Pick<Partial<Weather>, "snowfall" | "precipitationType">;
+  Pick<Partial<Weather>, "snowfall" | "precipitationType" | "weatherCode">;
 const clamp = (v: number) =>
   Math.min(1, Math.max(0, Number.isFinite(v) ? v : 0));
 /** Model type, never temperature alone. Unclassified station precipitation
  * uses rain streaks as an illustrative rendering fallback. */
 export function precipitationAppearance(weather: Precipitation) {
   const type = weather.precipitationType;
+  const condition = weatherConditionFromCode(weather.weatherCode);
   const snowFraction =
     type === "snow"
       ? 1
@@ -21,6 +22,8 @@ export function precipitationAppearance(weather: Precipitation) {
   const intensity = Math.max(0, weather.rain, (weather.snowfall ?? 0) * 2);
   return {
     snowFraction,
+    hail: type === "hail",
+    drizzle: condition === "drizzle" || condition === "freezing-drizzle",
     density: intensity <= 0.005 ? 0 : clamp(0.08 + Math.sqrt(intensity / 12)),
   };
 }
@@ -33,14 +36,29 @@ export function updateRainSegments(
   wind = { x: 0, z: 0 },
   time = 0,
 ) {
-  const { snowFraction, density } = precipitationAppearance(weather);
+  const { snowFraction, density, hail, drizzle } =
+    precipitationAppearance(weather);
   const count = Math.ceil(lines.length * density);
   const step = Math.min(0.1, Math.max(0, dt));
   for (let i = 0; i < lines.length; i++) {
     const [top, bottom] = lines[i];
     const snow = (i * 0.61803398875) % 1 < snowFraction;
-    const speed = snow ? 1.2 + (i % 7) * 0.16 : 11 + (i % 5) * 0.7;
-    const length = snow ? 0.045 + (i % 3) * 0.014 : 0.32 + (i % 4) * 0.11;
+    const speed = snow
+      ? 1.2 + (i % 7) * 0.16
+      : hail
+        ? 8 + (i % 5) * 0.8
+        : drizzle
+          ? 2.5 + (i % 5) * 0.3
+          : 11 + (i % 5) * 0.7;
+    // Freezing rain is liquid in flight. Hail is a compact fast pellet;
+    // no temperature-based ground snow/ice is manufactured by this renderer.
+    const length = snow
+      ? 0.045 + (i % 3) * 0.014
+      : hail
+        ? 0.035 + (i % 3) * 0.01
+        : drizzle
+          ? 0.08 + (i % 3) * 0.02
+          : 0.32 + (i % 4) * 0.11;
     const driftX =
       wind.x * (snow ? 0.8 : 0.55) +
       (snow ? Math.sin(time * 1.6 + i) * 0.6 : 0);

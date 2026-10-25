@@ -4,6 +4,7 @@ import { Script } from "node:vm";
 import { setImmediate as nextTurn } from "node:timers/promises";
 import ts from "typescript";
 import { readGameSource } from "./helpers/game-source";
+import { doorLifecycleFixture } from "./helpers/weather-door-render-fixture";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { RenderHealth } from "../client/render-health";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
@@ -26,6 +27,8 @@ const methods = selectMembers([
   "resize",
   "updatePlayers",
   "setProfile",
+  "effectiveWeather",
+  "applyDoorSnapshot",
 ]);
 const compiled = ts.transpileModule(
   `class StartupGame { ${methods.map((node) => node.getText(source)).join("\n")} };`,
@@ -143,7 +146,13 @@ function fixture(
   };
   const interiorAsset = disposable(),
     vegetationAsset = disposable();
-  const cadAsset = { ...disposable(), stats: { buildings: cadBuildings.length, meshes: 2, materials: 2 } };
+  const cadAsset = {
+    ...disposable(), stats: { buildings: cadBuildings.length, meshes: 2, materials: 2 },
+    setDoorStates(states: unknown) {
+      assert.equal(game.ready, true, "startup applies doors only after the render gate");
+      assert.deepEqual(states, game.guestDoors.snapshot().states);
+    },
+  };
   if (!options.holdPhysics) physics.resolve();
   if (!options.holdAssets) {
     interior.resolve(interiorAsset);
@@ -161,6 +170,9 @@ function fixture(
     }),
     initPhysics: () => physics.promise,
     Simulation: class {
+      doorPhysics = { applyStates(states: unknown) {
+        assert.deepEqual(states, game.guestDoors.snapshot().states);
+      } };
       constructor() {
         simulations++;
       }
@@ -239,6 +251,7 @@ function fixture(
     },
   });
   game = Object.assign(new StartupGame(), {
+    ...doorLifecycleFixture(),
     engine,
     startupAbort: new AbortController(),
     startupAssets: new Set(),
@@ -264,6 +277,7 @@ function fixture(
     frame() {},
     blur() {},
     notice() {},
+    installSkyDiagnostics() { assert.equal(game.ready, true); },
     onRendererFailure: () => failures++,
     compilationProfile: {
       snapshot: () => ({}),
@@ -276,6 +290,7 @@ function fixture(
       return { status: options.preparation ?? "complete", elapsedMs: 1, stages: [] };
     },
   });
+  t.after(() => game.guestDoors.dispose());
   initializeHealth({
     RenderHealth,
     sessionDiagnostics: { event: (kind: string, data: unknown) => events.push({ kind, data }) },
@@ -325,6 +340,8 @@ test("actual Game start cannot become playable until the submitted-frame gate su
   f.gate.resolve();
   await start;
   assert.equal(f.game.ready, true);
+  assert.deepEqual(f.game.doorSnapshot, f.game.guestDoors.snapshot());
+  assert.equal(f.game.doorStates.size, f.game.doorSnapshot.states.length);
   assert.equal(f.health.snapshot().valid, true);
   assert.equal(f.shaderStages.at(-1), "ready");
   assert.equal(f.loops.size, 1);

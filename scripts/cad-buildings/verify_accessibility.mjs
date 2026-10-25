@@ -2,8 +2,9 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { argumentsMap, required, openModel, sha256, writeReport, doorApproachGeometry } from './rapier_model.mjs';
+import { argumentsMap, required, openModel, sha256, writeReport, doorApproachGeometry, fixedOpeningSpec, doorStateAssumption, requireCoverageDoorState, applyCoverageDoorState } from './rapier_model.mjs';
 import { routePath } from './verify_routes.mjs';
+import { fixedOpeningProtection } from './verify_doors.mjs';
 
 const finitePoint = p => p && [p.x,p.z,p.floor].every(Number.isFinite);
 const samePoint = (a,b) => a && b && ['x','z','floor'].every(k => a[k]===null ? b[k]===null : Number.isFinite(a[k])&&Number.isFinite(b[k])&&Math.abs(a[k]-b[k])<1e-6);
@@ -18,6 +19,8 @@ export function validateReportIdentity(report,metadata,label) {
     if (typeof metadata[key]!=='string'||!metadata[key]||report[key]!==metadata[key]) throw new Error(`${label}: neshodná identita ${key}`);
   }
   if (canonical(report.settings)!==canonical(metadata.settings)) throw new Error(`${label}: neshodné nastavení kapsle`);
+  if(metadata.doorStateAssumption&&canonical(report.doorStateAssumption)!==canonical(metadata.doorStateAssumption))throw new Error(`${label}: neshodný předpoklad stavu dveří`);
+  if(metadata.doorRuntimeSha256&&report.doorRuntimeSha256!==metadata.doorRuntimeSha256)throw new Error(`${label}: stale shared door runtime`);
   if (!Array.isArray(report.results)) throw new Error(`${label}: chybí výsledky`);
 }
 
@@ -40,7 +43,7 @@ function successfulRun(row,path,settings) {
 // Reporty dodávají pouze doložené portály. Souřadnice kontrolujeme proti anotacím
 // téhož modelu; graf nikdy neodvozuje místnosti ani další stavební geometrii.
 export function prepareEvidence(scene,metadata,doorReport,routeReport) {
-  validateReportIdentity(doorReport,metadata,'Dveře');
+  validateReportIdentity(doorReport,metadata.doorStateAssumption?{...metadata,doorStateAssumption:doorStateAssumption(scene.model)}:metadata,'Dveře');
   validateReportIdentity(routeReport,metadata,'Schody');
   if (!Array.isArray(scene.model.doors)||!scene.model.doors.length) throw new Error('Model potřebuje vlastní dveřní anotace; původní CAD se nepoužívá');
   if (doorReport.doorSourceMode!=='native-model-annotations'||doorReport.doorSourceSha256!==metadata.modelCollisionSha256) throw new Error('Dveřní report není odvozen ze stejného nativního modelu');
@@ -68,8 +71,14 @@ export function prepareEvidence(scene,metadata,doorReport,routeReport) {
         throw new Error('Podpůrná výška dveřního bodu neodpovídá anotované úrovni: '+door.id);
       }
     }
-    if (door.openingClassification==='facade-opening-unconfirmed-access') {
-      excluded.push({id:door.id,category:'fixed-facade-glazing',protectionVerified:rows.every(row=>row.passed&&row.category==='fixed-glazing'&&row.coverage?.passed)});
+    const fixed=fixedOpeningSpec(door);
+    if (fixed) {
+      const proof=fixedOpeningProtection(scene,door);
+      const reported=rows.every((row,side)=>proof.hits[side]&&row.passed&&row.category===fixed.category&&row.testKind===fixed.testKind&&row.coverage?.passed&&
+        row.coverage.role===fixed.role&&row.protection?.part===proof.hits[side]?.part&&row.protection?.role===fixed.role&&
+        Number.isFinite(row.protection?.distance)&&Math.abs(row.protection.distance-proof.hits[side].distance)<1e-5);
+      if(!proof.passed||!reported)throw new Error('Neověřená pevná výplň: '+door.id);
+      excluded.push({id:door.id,category:fixed.exclusionCategory,protectionVerified:true,role:fixed.role});
       continue;
     }
     for (let side=0;side<2;side++) {
@@ -81,6 +90,14 @@ export function prepareEvidence(scene,metadata,doorReport,routeReport) {
     }
     for (const row of rows) {
       const path=[row.start,row.target],run={...row,legs:row.leg?[row.leg]:[]};
+      const dynamic=[...scene.doorPhysics.definitions.values()].find(item=>item.definition.sourceDoorId===door.id);
+      if(dynamic&&row.category==='passed') {
+        const expected={mode:'single-interactive-open',doorId:dynamic.id,actorInteractionsVerified:false,
+          states:[...scene.doorPhysics.definitions.keys()].map(id=>({id,open:id===dynamic.id})),purpose:'conditional-geometric-passage'};
+        if(canonical(row.stateAssumption)!==canonical(expected)||row.testKind!=='interactive-door-closed-open-guard'||
+          !row.closedBlocking?.blocked||row.closeOccupiedGuard?.allowed!==false||!row.toPortal?.passed)
+          throw new Error('Interactive door lacks closed/open/occupied evidence: '+door.id);
+      }
       if (row.category==='passed'&&successfulRun(run,path,scene.settings)) links.push({from:doorNode(door.id,row.direction),to:doorNode(door.id,1-row.direction),path,source:'verified-door'});
       else sourceFailures.push({kind:'door',id:door.id,direction:row.direction,category:row.category});
     }
@@ -129,7 +146,7 @@ export function prepareEvidence(scene,metadata,doorReport,routeReport) {
     }
   }
   if (routeRows.size!==groups.size*2) throw new Error('Report obsahuje cizí schodiště');
-  return {nodes,links,excluded,sourceFailures};
+  return {nodes,links,excluded,sourceFailures,doorStateAssumption:metadata.doorStateAssumption};
 }
 
 const DEFAULTS={spacing:.75,connectorRadius:1.6,levelTolerance:.035,maxNodes:30000,maxCandidates:100000,maxSweeps:150000,maxMoves:40000};
@@ -144,6 +161,8 @@ function optionsFor(options) {
 // Mřížka je jen optimistický plán. Všechny body a hrany přijaté jako dosažitelné
 // později navštíví jedna nepřerušovaná postava od výslovného vstupu.
 export function probeAccessibility(scene,evidence,seeds,options={}) {
+  const assumption=requireCoverageDoorState(scene.model,evidence.doorStateAssumption?.mode);
+  if(assumption.states.length)applyCoverageDoorState(scene,scene.model,evidence.doorStateAssumption);
   const config=optionsFor(options),anchors=new Map(),levels=[];
   if (!Array.isArray(seeds)||!seeds.length||new Set(seeds).size!==seeds.length) throw new Error('Je nutný neprázdný seznam různých vstupních bodů');
   const stats={candidatePoints:0,acceptedPoints:0,sweeps:0,moves:0,restarts:0,plannerLimited:false,proofLimited:false};
@@ -181,7 +200,7 @@ export function probeAccessibility(scene,evidence,seeds,options={}) {
       const support=scene.floorAt({x,z},reference);
       if(support&&Math.abs(support.height-reference)<=config.levelTolerance) {
         const point={x,z,floor:support.height,support};let blocked=false;
-        scene.world.intersectionsWithShape(position(point),pose,capsule,()=>{blocked=true;return false;});
+        scene.world.intersectionsWithShape(position(point),pose,capsule,()=>{blocked=true;return false;},undefined,undefined,undefined,undefined,scene.activeCollider);
         if(!blocked){node={id,point,level,anchor};stats.acceptedPoints++;}
       }
     }
@@ -197,7 +216,7 @@ export function probeAccessibility(scene,evidence,seeds,options={}) {
     const distance=Math.hypot(velocity.x,velocity.z);
     let clear=Math.abs(a.point.floor-b.point.floor)<=config.levelTolerance;
     if(clear&&distance>1e-8) {
-      const hit=scene.world.castShape(p,pose,velocity,capsule,Math.max(0,scene.settings.offset-.003),1,true);
+      const hit=scene.world.castShape(p,pose,velocity,capsule,Math.max(0,scene.settings.offset-.003),1,true,undefined,undefined,undefined,undefined,scene.activeCollider);
       if(hit&&hit.time_of_impact<1-1e-6)clear=false;
       const samples=Math.ceil(distance/.15);
       for(let i=1;clear&&i<samples;i++) {
@@ -301,22 +320,25 @@ export function probeAccessibility(scene,evidence,seeds,options={}) {
     category:reached.has(target.id)?'reachable':parents.has(target.id)?'candidate-path-not-verified':candidates.has(target.id)&&!candidates.get(target.id)?'invalid-door-anchor':'not-reached-in-grid',
     passed:reached.has(target.id),proof:reached.get(target.id)??null}));
   const excluded=evidence.excluded??[];
-  const pending=excluded.filter(row=>row.category!=='fixed-facade-glazing'||!row.protectionVerified);
+  const pending=excluded.filter(row=>!['fixed-facade-glazing','fixed-paired-door-leaf'].includes(row.category)||!row.protectionVerified);
   return {scope:'Souvislá dosažitelnost dveřních bodů od výslovně zadaných vstupů; samostatná CPU kapsle, bez hry a venkovního terénu',
-    status:results.length>0&&results.every(row=>row.passed)&&!pending.length&&!seedFailures.length?'pass':'partial',
+    doorStateAssumption:assumption,actorInteractionsVerified:false,
+    status:results.length>0&&results.every(row=>row.passed)&&!pending.length&&!seedFailures.length?(assumption.states.length?'conditional-pass':'pass'):'partial',
     options:config,seeds,cases:results.length,passed:reached.size,results,excluded,seedFailures,failures,stats,proofSessions,
     sourceFailures:evidence.sourceFailures??[],
     limits:['Nejde o počet ani pokrytí všech místností.',
       'Nenalezená cesta při konečném rozlišení není důkaz neexistence cesty; vyžaduje jemnější probe nebo posouzení konkrétního bodu.',
       'Mřížka a sweep jsou pouze plán. PASS vyžaduje souvislé kroky skutečného controlleru od uvedeného vstupu.',
-      'Přístup k externím dveřím přes chybějící terén není ověřen.']};
+      'Přístup k externím dveřím přes chybějící terén není ověřen.',
+      'Otevřený stav interaktivních dveří je výslovný předpoklad geometrického pokrytí; tento graf nedokazuje dosah, LOS ani možnost otevření z aktuální postavy.']};
 }
 
 export async function verifyAccessibility(args) {
-  const allowed=new Set(['--model','--output','--dependency-root','--actor-source','--profile','--speed','--door-report','--route-report','--seeds','--spacing','--max-nodes','--max-candidates','--max-sweeps','--max-moves']);
+  const allowed=new Set(['--model','--output','--dependency-root','--actor-source','--profile','--speed','--door-report','--route-report','--seeds','--spacing','--max-nodes','--max-candidates','--max-sweeps','--max-moves','--door-state']);
   for(const key of args.keys())if(!allowed.has(key))throw new Error('Neznámý argument '+key);
   const {scene,metadata}=await openModel(args);
   try {
+    requireCoverageDoorState(scene.model,args.get('--door-state'));
     const read=key=>{const bytes=readFileSync(resolve(required(args,key)));return {value:JSON.parse(bytes),sha256:sha256(bytes)};};
     const doors=read('--door-report'),routes=read('--route-report'),seedInput=read('--seeds');
     const evidence=prepareEvidence(scene,metadata,doors.value,routes.value),options={};
@@ -329,6 +351,6 @@ export async function verifyAccessibility(args) {
 
 if(process.argv[1]&&fileURLToPath(import.meta.url)===resolve(process.argv[1])) {
   const args=argumentsMap(),output=required(args,'--output');
-  verifyAccessibility(args).then(report=>{writeReport(output,report);console.log(JSON.stringify({status:report.status,cases:report.cases,passed:report.passed,stats:report.stats,excluded:report.excluded}));process.exitCode=report.status==='pass'?0:2;})
+  verifyAccessibility(args).then(report=>{writeReport(output,report);console.log(JSON.stringify({status:report.status,cases:report.cases,passed:report.passed,stats:report.stats,excluded:report.excluded}));process.exitCode=['pass','conditional-pass'].includes(report.status)?0:2;})
     .catch(error=>{console.error(error);process.exitCode=1;});
 }

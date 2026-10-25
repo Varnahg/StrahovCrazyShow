@@ -3,7 +3,7 @@
   "buildingId": "b06",
   "status": "prepared-not-native-accepted",
   "generatorDependenciesSha256": {
-    "prepare_b06.py": "fdfd08d852419a0e1733161ef92024d10ab177f7f6182bb39ced96b6c1288bf0",
+    "prepare_b06.py": "69ccb51c82e790342ec7d0a330214bb7da648f96d0f3f69f5da5b368237ab739",
     "prepare_b01.py": "942b9463f7f1f894a5fc61ba8b3caa91e3a38a7d061501d40ddbd7196f81588a"
   },
   "heightModel": {
@@ -51,7 +51,7 @@
     {
       "id": "p01",
       "roomCount": 44,
-      "solidCount": 293,
+      "solidCount": 970,
       "sourceBounds": [
         0.369,
         -6.944,
@@ -946,6 +946,7 @@
           ]
         }
       ],
+      "showerPartitionCaps": [],
       "duplicateWindowEntities": [],
       "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
       "doorSourceCorrections": [
@@ -977,12 +978,17 @@
           "endpointMismatch": 5.3e-05,
           "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
         }
-      ]
+      ],
+      "doorFrameOwnership": {
+        "solidCount": 453,
+        "removedStructuralVolumeM3": 0.866899828,
+        "basis": "exact unioned source frame profiles own their volume across floors; leaf poses/opening dimensions are unchanged"
+      }
     },
     {
       "id": "n01",
       "roomCount": 59,
-      "solidCount": 261,
+      "solidCount": 1578,
       "sourceBounds": [
         0.369,
         -5.501,
@@ -990,7 +996,7 @@
         16.284
       ],
       "doorCount": 125,
-      "windowCount": 35,
+      "windowCount": 53,
       "wallPairCount": 3569,
       "unresolvedStrongEdges": [],
       "earlyBoundaryCandidates": [
@@ -1669,7 +1675,7 @@
           "floor": "n01",
           "role": "canopy",
           "material": "concrete",
-          "bottom": 0.8687223000000001,
+          "bottom": 0.8187223000000001,
           "top": 1.0187223,
           "sourceFloor": "n01",
           "sourceEntities": [
@@ -1682,17 +1688,33 @@
             "4D67",
             "4DCF"
           ],
-          "basis": "CAD outer terrace/cover outline takes precedence over smoothed scan area; topworld1.715,0.15m thickness interpreted; below n01.mezzanine by0.4812777m, jump/terrain acceptance required",
+          "basis": "IPR2023 up-plane envelope plus CAD backline; D85/D90 is broken drawing line, not complete outer edge; topworld1.715 and0.20m thickness interpreted, same canopy supplies rear terminal riser; 0.4812777m discrepancy to n01.mezzanine unresolved, no invented threshold steps",
           "photogrammetryBasis": "IPR Praha 2023; source-exteriors images reviewed; vertical dimensions and construction thickness are explicit interpretations",
           "loops": [
             [
               [
-                49.925,
-                17.908
+                55.896,
+                20.303
               ],
               [
-                57.504,
-                17.527
+                56.766,
+                19.133
+              ],
+              [
+                56.802,
+                19.156
+              ],
+              [
+                57.199,
+                18.519
+              ],
+              [
+                57.731,
+                17.666
+              ],
+              [
+                57.351,
+                16.954
               ],
               [
                 57.504,
@@ -1701,6 +1723,14 @@
               [
                 49.925,
                 16.284
+              ],
+              [
+                50.761,
+                17.706
+              ],
+              [
+                55.293,
+                20.184
               ]
             ]
           ]
@@ -1863,6 +1893,92 @@
         }
       ],
       "terrainPreservationAreas": [],
+      "showerPartitionCaps": [
+        {
+          "id": "31b-shower-divider-0",
+          "sourceEntities": [
+            "3F5",
+            "1F8",
+            "330",
+            "292",
+            "295"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n01.main",
+          "top": 2.05,
+          "bounds": [
+            61.329,
+            10.534,
+            61.914,
+            11.534
+          ]
+        },
+        {
+          "id": "31b-shower-divider-1",
+          "sourceEntities": [
+            "1F9",
+            "1F5",
+            "1F6",
+            "293",
+            "294"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n01.main",
+          "top": 2.05,
+          "bounds": [
+            62.414,
+            10.534,
+            62.999,
+            11.534
+          ]
+        },
+        {
+          "id": "54b-shower-divider-0",
+          "sourceEntities": [
+            "69B",
+            "69D",
+            "69E",
+            "7F8",
+            "7F9"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n01.main",
+          "top": 2.05,
+          "bounds": [
+            6.909,
+            5.114,
+            7.494,
+            6.114
+          ]
+        },
+        {
+          "id": "54b-shower-divider-1",
+          "sourceEntities": [
+            "699",
+            "696",
+            "695",
+            "7F7",
+            "7FA"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n01.main",
+          "top": 2.05,
+          "bounds": [
+            7.994,
+            5.114,
+            8.579,
+            6.114
+          ]
+        }
+      ],
       "duplicateWindowEntities": [],
       "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
       "doorSourceCorrections": [
@@ -1908,12 +2024,17 @@
           "endpointMismatch": 9.1e-05,
           "basis": "identified B6 partial/short leaf; actual hinge and opposite source arc endpoint retained"
         }
-      ]
+      ],
+      "doorFrameOwnership": {
+        "solidCount": 972,
+        "removedStructuralVolumeM3": 1.622843309,
+        "basis": "exact unioned source frame profiles own their volume across floors; leaf poses/opening dimensions are unchanged"
+      }
     },
     {
       "id": "n02",
       "roomCount": 58,
-      "solidCount": 241,
+      "solidCount": 1415,
       "sourceBounds": [
         0.369,
         -5.501,
@@ -1921,7 +2042,7 @@
         16.284
       ],
       "doorCount": 106,
-      "windowCount": 47,
+      "windowCount": 65,
       "wallPairCount": 3601,
       "unresolvedStrongEdges": [],
       "earlyBoundaryCandidates": [
@@ -2359,14 +2480,105 @@
       "crossFloorPortals": [],
       "exteriorFeatures": [],
       "terrainPreservationAreas": [],
+      "showerPartitionCaps": [
+        {
+          "id": "144b-shower-divider-0",
+          "sourceEntities": [
+            "650",
+            "652",
+            "653",
+            "7AD",
+            "7AE"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n02.main",
+          "top": 5.05,
+          "bounds": [
+            6.909,
+            5.114,
+            7.494,
+            6.114
+          ]
+        },
+        {
+          "id": "144b-shower-divider-1",
+          "sourceEntities": [
+            "64E",
+            "64B",
+            "64A",
+            "7AC",
+            "7AF"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n02.main",
+          "top": 5.05,
+          "bounds": [
+            7.994,
+            5.114,
+            8.579,
+            6.114
+          ]
+        },
+        {
+          "id": "121b-shower-divider-0",
+          "sourceEntities": [
+            "3D7",
+            "1EE",
+            "312",
+            "274",
+            "277"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n02.main",
+          "top": 5.05,
+          "bounds": [
+            61.329,
+            10.534,
+            61.914,
+            11.534
+          ]
+        },
+        {
+          "id": "121b-shower-divider-1",
+          "sourceEntities": [
+            "1EF",
+            "1EB",
+            "1EC",
+            "275",
+            "276"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n02.main",
+          "top": 5.05,
+          "bounds": [
+            62.414,
+            10.534,
+            62.999,
+            11.534
+          ]
+        }
+      ],
       "duplicateWindowEntities": [],
       "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
-      "doorSourceCorrections": []
+      "doorSourceCorrections": [],
+      "doorFrameOwnership": {
+        "solidCount": 850,
+        "removedStructuralVolumeM3": 1.273346058,
+        "basis": "exact unioned source frame profiles own their volume across floors; leaf poses/opening dimensions are unchanged"
+      }
     },
     {
       "id": "n03",
       "roomCount": 58,
-      "solidCount": 251,
+      "solidCount": 1436,
       "sourceBounds": [
         0.369,
         -5.501,
@@ -2374,7 +2586,7 @@
         16.284
       ],
       "doorCount": 106,
-      "windowCount": 46,
+      "windowCount": 64,
       "wallPairCount": 1199,
       "unresolvedStrongEdges": [],
       "earlyBoundaryCandidates": [
@@ -2874,14 +3086,105 @@
       "crossFloorPortals": [],
       "exteriorFeatures": [],
       "terrainPreservationAreas": [],
+      "showerPartitionCaps": [
+        {
+          "id": "244b-shower-divider-0",
+          "sourceEntities": [
+            "64D",
+            "64F",
+            "650",
+            "7AA",
+            "7AB"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n03.main",
+          "top": 8.05,
+          "bounds": [
+            6.909,
+            5.114,
+            7.494,
+            6.114
+          ]
+        },
+        {
+          "id": "244b-shower-divider-1",
+          "sourceEntities": [
+            "64B",
+            "648",
+            "647",
+            "7A9",
+            "7AC"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n03.main",
+          "top": 8.05,
+          "bounds": [
+            7.994,
+            5.114,
+            8.579,
+            6.114
+          ]
+        },
+        {
+          "id": "221b-shower-divider-0",
+          "sourceEntities": [
+            "3D4",
+            "1EE",
+            "30F",
+            "274",
+            "277"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n03.main",
+          "top": 8.05,
+          "bounds": [
+            61.329,
+            10.534,
+            61.914,
+            11.534
+          ]
+        },
+        {
+          "id": "221b-shower-divider-1",
+          "sourceEntities": [
+            "1EF",
+            "1EB",
+            "1EC",
+            "275",
+            "276"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n03.main",
+          "top": 8.05,
+          "bounds": [
+            62.414,
+            10.534,
+            62.999,
+            11.534
+          ]
+        }
+      ],
       "duplicateWindowEntities": [],
       "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
-      "doorSourceCorrections": []
+      "doorSourceCorrections": [],
+      "doorFrameOwnership": {
+        "solidCount": 850,
+        "removedStructuralVolumeM3": 1.273355442,
+        "basis": "exact unioned source frame profiles own their volume across floors; leaf poses/opening dimensions are unchanged"
+      }
     },
     {
       "id": "n04",
       "roomCount": 58,
-      "solidCount": 251,
+      "solidCount": 1436,
       "sourceBounds": [
         0.369,
         -5.501,
@@ -2889,7 +3192,7 @@
         16.284
       ],
       "doorCount": 106,
-      "windowCount": 46,
+      "windowCount": 64,
       "wallPairCount": 1199,
       "unresolvedStrongEdges": [],
       "earlyBoundaryCandidates": [
@@ -3389,14 +3692,105 @@
       "crossFloorPortals": [],
       "exteriorFeatures": [],
       "terrainPreservationAreas": [],
+      "showerPartitionCaps": [
+        {
+          "id": "344b-shower-divider-0",
+          "sourceEntities": [
+            "64D",
+            "64F",
+            "650",
+            "7AA",
+            "7AB"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n04.main",
+          "top": 11.05,
+          "bounds": [
+            6.909,
+            5.114,
+            7.494,
+            6.114
+          ]
+        },
+        {
+          "id": "344b-shower-divider-1",
+          "sourceEntities": [
+            "64B",
+            "648",
+            "647",
+            "7A9",
+            "7AC"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n04.main",
+          "top": 11.05,
+          "bounds": [
+            7.994,
+            5.114,
+            8.579,
+            6.114
+          ]
+        },
+        {
+          "id": "321b-shower-divider-0",
+          "sourceEntities": [
+            "3D4",
+            "1EE",
+            "30F",
+            "274",
+            "277"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n04.main",
+          "top": 11.05,
+          "bounds": [
+            61.329,
+            10.534,
+            61.914,
+            11.534
+          ]
+        },
+        {
+          "id": "321b-shower-divider-1",
+          "sourceEntities": [
+            "1EF",
+            "1EB",
+            "1EC",
+            "275",
+            "276"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n04.main",
+          "top": 11.05,
+          "bounds": [
+            62.414,
+            10.534,
+            62.999,
+            11.534
+          ]
+        }
+      ],
       "duplicateWindowEntities": [],
       "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
-      "doorSourceCorrections": []
+      "doorSourceCorrections": [],
+      "doorFrameOwnership": {
+        "solidCount": 850,
+        "removedStructuralVolumeM3": 1.273355442,
+        "basis": "exact unioned source frame profiles own their volume across floors; leaf poses/opening dimensions are unchanged"
+      }
     },
     {
       "id": "n05",
       "roomCount": 58,
-      "solidCount": 251,
+      "solidCount": 1444,
       "sourceBounds": [
         0.369,
         -5.501,
@@ -3404,7 +3798,7 @@
         16.284
       ],
       "doorCount": 106,
-      "windowCount": 46,
+      "windowCount": 64,
       "wallPairCount": 1199,
       "unresolvedStrongEdges": [],
       "earlyBoundaryCandidates": [
@@ -3904,14 +4298,143 @@
       "crossFloorPortals": [],
       "exteriorFeatures": [],
       "terrainPreservationAreas": [],
+      "showerPartitionCaps": [
+        {
+          "id": "444b-shower-divider-0",
+          "sourceEntities": [
+            "64D",
+            "64F",
+            "650",
+            "7AA",
+            "7AB"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n05.main",
+          "top": 14.05,
+          "bounds": [
+            6.909,
+            5.114,
+            7.494,
+            6.114
+          ]
+        },
+        {
+          "id": "444b-shower-divider-1",
+          "sourceEntities": [
+            "64B",
+            "648",
+            "647",
+            "7A9",
+            "7AC"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n05.main",
+          "top": 14.05,
+          "bounds": [
+            7.994,
+            5.114,
+            8.579,
+            6.114
+          ]
+        },
+        {
+          "id": "421b-shower-divider-0",
+          "sourceEntities": [
+            "3D4",
+            "1EE",
+            "30F",
+            "274",
+            "277"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n05.main",
+          "top": 14.05,
+          "bounds": [
+            61.329,
+            10.534,
+            61.914,
+            11.534
+          ]
+        },
+        {
+          "id": "421b-shower-divider-1",
+          "sourceEntities": [
+            "1EF",
+            "1EB",
+            "1EC",
+            "275",
+            "276"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n05.main",
+          "top": 14.05,
+          "bounds": [
+            62.414,
+            10.534,
+            62.999,
+            11.534
+          ]
+        }
+      ],
       "duplicateWindowEntities": [],
       "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
-      "doorSourceCorrections": []
+      "doorSourceCorrections": [],
+      "sharedEastFacade": {
+        "ownerFloor": "n05",
+        "sourceFloors": [
+          "n05",
+          "n06"
+        ],
+        "windowPairs": [
+          [
+            "n05-window-D17",
+            "n06-window-CE6"
+          ],
+          [
+            "n05-window-D19",
+            "n06-window-CE8"
+          ],
+          [
+            "n05-window-D1B",
+            "n06-window-CEA"
+          ]
+        ],
+        "sourceEntities": [
+          "CE6",
+          "CE7",
+          "CE8",
+          "CE9",
+          "CEA",
+          "CEB",
+          "D17",
+          "D18",
+          "D19",
+          "D1A",
+          "D1B",
+          "D1C"
+        ],
+        "openingRemovedVolumeM3": 4.4213,
+        "duplicateRemovedVolumeM3": 3.933847,
+        "basis": "shared last east enclosure; subtract both existing window/sill volumes across wall/slab floors, then remove only N06 wall/slab volume already occupied by N05 walls in the source east mezzanine region; all Z, room loops and source records retained"
+      },
+      "doorFrameOwnership": {
+        "solidCount": 854,
+        "removedStructuralVolumeM3": 1.273355442,
+        "basis": "exact unioned source frame profiles own their volume across floors; leaf poses/opening dimensions are unchanged"
+      }
     },
     {
       "id": "n06",
       "roomCount": 55,
-      "solidCount": 245,
+      "solidCount": 1169,
       "sourceBounds": [
         0.369,
         0.364,
@@ -3919,7 +4442,7 @@
         16.284
       ],
       "doorCount": 102,
-      "windowCount": 43,
+      "windowCount": 61,
       "wallPairCount": 1185,
       "unresolvedStrongEdges": [],
       "earlyBoundaryCandidates": [
@@ -4616,14 +5139,143 @@
       ],
       "exteriorFeatures": [],
       "terrainPreservationAreas": [],
+      "showerPartitionCaps": [
+        {
+          "id": "544b-shower-divider-0",
+          "sourceEntities": [
+            "63F",
+            "641",
+            "642",
+            "79C",
+            "79D"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n06.main",
+          "top": 17.05,
+          "bounds": [
+            6.909,
+            5.114,
+            7.494,
+            6.114
+          ]
+        },
+        {
+          "id": "544b-shower-divider-1",
+          "sourceEntities": [
+            "63D",
+            "63A",
+            "639",
+            "79B",
+            "79E"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n06.main",
+          "top": 17.05,
+          "bounds": [
+            7.994,
+            5.114,
+            8.579,
+            6.114
+          ]
+        },
+        {
+          "id": "521b-shower-divider-0",
+          "sourceEntities": [
+            "3CE",
+            "1E8",
+            "309",
+            "26E",
+            "271"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n06.main",
+          "top": 17.05,
+          "bounds": [
+            61.329,
+            10.534,
+            61.914,
+            11.534
+          ]
+        },
+        {
+          "id": "521b-shower-divider-1",
+          "sourceEntities": [
+            "1E9",
+            "1E5",
+            "1E6",
+            "26F",
+            "270"
+          ],
+          "photoSha256": "8bd41d9646499d743bbcaee6f4e32e2c5acaac40c7dbb3d4e34c1a3bc891d126",
+          "modeledHeight": 2.05,
+          "basis": "actual internal T crossbar and paired stem only; perimeter/back walls and 0.50m plan gaps unchanged; 2.05m height above room floor interpreted from user bathroom photo, not CAD Z",
+          "levelKey": "n06.main",
+          "top": 17.05,
+          "bounds": [
+            62.414,
+            10.534,
+            62.999,
+            11.534
+          ]
+        }
+      ],
       "duplicateWindowEntities": [],
       "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
-      "doorSourceCorrections": []
+      "doorSourceCorrections": [],
+      "sharedEastFacade": {
+        "ownerFloor": "n05",
+        "sourceFloors": [
+          "n05",
+          "n06"
+        ],
+        "windowPairs": [
+          [
+            "n05-window-D17",
+            "n06-window-CE6"
+          ],
+          [
+            "n05-window-D19",
+            "n06-window-CE8"
+          ],
+          [
+            "n05-window-D1B",
+            "n06-window-CEA"
+          ]
+        ],
+        "sourceEntities": [
+          "CE6",
+          "CE7",
+          "CE8",
+          "CE9",
+          "CEA",
+          "CEB",
+          "D17",
+          "D18",
+          "D19",
+          "D1A",
+          "D1B",
+          "D1C"
+        ],
+        "openingRemovedVolumeM3": 4.4213,
+        "duplicateRemovedVolumeM3": 3.933847,
+        "basis": "shared last east enclosure; subtract both existing window/sill volumes across wall/slab floors, then remove only N06 wall/slab volume already occupied by N05 walls in the source east mezzanine region; all Z, room loops and source records retained"
+      },
+      "doorFrameOwnership": {
+        "solidCount": 704,
+        "removedStructuralVolumeM3": 1.257132924,
+        "basis": "exact unioned source frame profiles own their volume across floors; leaf poses/opening dimensions are unchanged"
+      }
     },
     {
       "id": "n07",
       "roomCount": 2,
-      "solidCount": 9,
+      "solidCount": 11,
       "sourceBounds": [
         9.379,
         4.362,
@@ -4862,9 +5514,15 @@
       "crossFloorPortals": [],
       "exteriorFeatures": [],
       "terrainPreservationAreas": [],
+      "showerPartitionCaps": [],
       "duplicateWindowEntities": [],
       "heightBasis": "Working B6 interpretation: two side flights from main to the same drawing's upper mezzanine, one incoming centre from the previous mezzanine to the next main; ten measured fronts modeled as 0.15m rises. Main levels, mezzanines, roof/head levels, opening heights and slab thickness are estimates, not measured CAD elevations. IPR 2023 roof interpretation with provisional world origin +0.73m supports main/annex roof18.0, west head21.41 and east head20.50 locally; rigid site fit is pending. No N06 annex room or extra floor is invented; the last N05 mezzanine room has an interpreted taller ceiling.",
-      "doorSourceCorrections": []
+      "doorSourceCorrections": [],
+      "doorFrameOwnership": {
+        "solidCount": 0,
+        "removedStructuralVolumeM3": 0.0,
+        "basis": "exact unioned source frame profiles own their volume across floors; leaf poses/opening dimensions are unchanged"
+      }
     }
   ],
   "limitations": [
@@ -4873,5 +5531,5 @@
     "Original CAD is historical and explicitly not newly surveyed",
     "Native model/doorway/stair/terrain acceptance is required; preparation does not prove player reachability"
   ],
-  "recipeSha256": "f3cd31d0f91460740b5b543b9e8067c5ba50949774a7ba8b92514a0114900d61"
+  "recipeSha256": "667197b70fbdff2375f955d0b43603db63d7dcf017e15543e4b21461625f98c1"
 }

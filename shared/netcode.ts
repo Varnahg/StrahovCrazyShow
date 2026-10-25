@@ -9,7 +9,9 @@ export type { Input } from "./types";
 
 // V11 input seq identifies a scheduled simulation tick inside a server epoch.
 // V10 command-count acknowledgements cannot predict this timeline safely.
-export const PROTOCOL_VERSION = 12;
+// V14 includes authoritative, closed-by-default B6 doors and collision history.
+// Older clients predict against different collision meshes and must reconnect.
+export const PROTOCOL_VERSION = 14;
 export const SIM_HZ = 60;
 export const FIXED_DT = 1 / SIM_HZ;
 export const MAX_CATCHUP_STEPS = 8;
@@ -34,6 +36,9 @@ export type Authority = {
   inputTickBase: number;
   receivedSeq: number;
   state: ActorState;
+  /** Global post-tick door state for collision replay; sent by V14 rooms. */
+  doorRevision?: number;
+  doorWorldEpoch?: string;
   resync?: boolean;
   /** Own-session diagnostics are optional; the epoch/time frontier is required. */
   resyncReason?: ResyncReason;

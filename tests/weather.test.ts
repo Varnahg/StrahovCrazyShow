@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
 import {
   horizontalDirection,
   moonState,
@@ -48,6 +49,94 @@ const modelData = () => ({
     wind_direction_300hPa: 265,
     snowfall: 0.1,
   },
+});
+
+test("station leaf-cell parser preserves every published readout without treating indoor or daily wind as current", () => {
+  const row = (label: string, value: string, malformed = false) =>
+    `${malformed ? "" : "<tr>"}<td><strong>${label}</strong></td><td>${value}</td></tr>`;
+  const html = `<table><tr><td><table>${row("Teplota:", "4.2 °C")}${row("Charakter větru:", "E<br>2.2 m/s (8.0 km/h)")}${row("Intenzita deště:", "0.00 mm/h")}${row("Rosný bod:", "1.9 °C")}${row("Relativní vlhkost:", "85 %")}${row("Tlak vzduchu:", "1018.1 hPa, tendence -")}${row("Intenzita slunečního záření:", "0 W/m<sup>2</sup>")}${row("Dnešní srážky:", "1.8 mm", true)}${row("Vítr (maximum):", "11.2 m/s v 12:01")}${row("Základna oblačnosti:", "287 m (nad stanicí)")}<h3>Serverovna</h3>${row("Teplota:", "21.7 °C")}</table></td></tr></table>2026-10-10 18:00:00<img src="fc-icon-partlycloudy.gif">`;
+  const station = parseStation(html, now);
+  assert.equal(station.temperature, 4.2);
+  assert.equal(station.wind, 2.2);
+  assert.equal(station.windGust, undefined);
+  assert.equal(station.dewPoint, 1.9);
+  assert.equal(station.pressure, 1018.1);
+  assert.equal(station.solarRadiation, 0);
+  assert.equal(station.rainToday, 1.8);
+  assert.equal(station.stationForecastIcon, "partlycloudy");
+  assert.equal(
+    station.stationReadings?.find((row) => row.kind === "indoor")?.value,
+    "21.7 °C",
+  );
+  assert.equal(
+    station.stationReadings?.find((row) => row.label === "Základna oblačnosti:")
+      ?.kind,
+    "derived",
+  );
+  assert.equal(station.fieldSources?.rainToday?.kind, "station");
+  assert.equal(station.visibility, undefined);
+  assert.equal(station.precipitationType, undefined);
+  assert.equal(station.snowfall, undefined);
+});
+
+test("station section identity, not temperature row order, separates the server room", () => {
+  const indoor = '<center><strong>Serverovna</strong></center><tr><td>Teplota:</td><td>21.8 °C</td></tr><tr><td>Relativní vlhkost:</td><td>40 %</td></tr>';
+  const outdoor = '<center><strong>Aktuální podmínky</strong></center>' + fixture() + '<tr><td>Relativní vlhkost:</td><td>85 %</td></tr>';
+  for (const html of [outdoor + indoor, indoor + outdoor]) {
+    const weather = parseStation(html, now);
+    assert.equal(weather.temperature, 12);
+    assert.equal(weather.humidity, 85);
+    assert.deepEqual(weather.stationReadings?.filter(r => r.kind === "indoor").map(r => r.value), ["21.8 °C", "40 %"]);
+  }
+  assert.throws(() => parseStation(outdoor.replace("Teplota:", "Neplatný údaj:") + indoor, now));
+  assert.throws(() => parseStation(outdoor.replace("12.0&nbsp;°C", "---") + indoor, now));
+  assert.throws(() => parseStation(outdoor + '<tr><td>Teplota:</td><td>22 °C</td></tr>', now), "Ambiguous outdoor readings cannot choose a temperature by order");
+});
+
+test("captured station HTML never promotes Serverovna after an outdoor sensor row disappears", (t) => {
+  const path = new URL("../.cache/weather-sky-revision-20261024/station.html", import.meta.url);
+  if (!existsSync(path)) { t.skip("Local primary station capture unavailable; section fixture remains mandatory"); return; }
+  const html = readFileSync(path, "utf8"), capturedAt = Date.parse("2026-10-24T22:09:37Z");
+  const station = parseStation(html, capturedAt);
+  assert.equal(station.temperature, 4.2);
+  assert.equal(station.stationReadings?.length, 30);
+  assert.equal(station.stationReadings?.find(r => r.kind === "indoor")?.value, "21.8 °C");
+  const missingOutdoor = html.replace("<strong>Teplota:</strong>", "<strong>Teplota senzoru chybí:</strong>");
+  assert.notEqual(missingOutdoor, html);
+  assert.throws(() => parseStation(missingOutdoor, capturedAt));
+});
+
+test("model WMO fog/thunder codes and sources survive station merge and stale retention", () => {
+  const station = parseStation(fixture(), now);
+  for (const weatherCode of [
+    0, 3, 45, 48, 51, 56, 66, 77, 82, 86, 95, 96, 97, 99,
+  ]) {
+    const data = modelData();
+    Object.assign(data.current, { weather_code: weatherCode });
+    const model = parseModelWeather(data, now);
+    assert.equal(model.weatherCode, weatherCode);
+    assert.equal(model.fieldSources?.weatherCode?.kind, "model");
+    const merged = selectWeather(station, model, station, now);
+    assert.equal(merged.weatherCode, weatherCode);
+    assert.equal(merged.fieldSources?.weatherCode?.kind, "model");
+    const retained = selectWeather(null, null, merged, now + 2 * 3600000);
+    assert.equal(retained.weatherCode, weatherCode);
+    assert.equal(retained.fieldSources?.weatherCode?.stale, true);
+  }
+});
+
+test("station lunar phase is a time-stamped published calculation, separate from the renderer instant", () => {
+  const station = parseStation(
+    fixture() + "<br>Fáze m&#283;síce: Dor&#367;stá - 98% úpl&#328;ku<br>",
+    now,
+  );
+  assert.equal(station.stationAstronomy?.kind, "calculation");
+  assert.equal(station.stationAstronomy?.publishedAt, now);
+  assert.equal(station.stationAstronomy?.illuminatedPercent, 98);
+  assert.equal(station.stationAstronomy?.waxing, true);
+  assert.match(station.stationAstronomy?.moonPhaseLabel ?? "", /Dorůstá/);
+  assert.equal(station.fieldSources?.precipitationType, undefined);
+  assert.equal(parseStation(fixture(), now).stationAstronomy, undefined);
 });
 
 test("astronomy and meteorological bearings agree with north/east/south/west of the campus", () => {
