@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { createLocalBenchmarkHandler } from "../server/local-benchmarks";
 import { projectLocalBenchmark } from "../shared/local-benchmark";
+import { terrainReviewIdentity, TERRAIN_REVIEW_PRESETS } from "../client/terrain-review";
 const origin = "http://127.0.0.1:4179",
   snapshot = "a".repeat(64);
 function sample() {
@@ -61,6 +62,51 @@ function sample() {
     },
   };
 }
+
+test("projection retains exact bounded terrain review evidence across both UI and server passes, never source prose", () => {
+  for (const preset of Object.values(TERRAIN_REVIEW_PRESETS)) {
+    const identity = terrainReviewIdentity(preset)!;
+    const raw = { ...sample(), avatars: 1, terrainReview: { ...identity, source: "private source filename", nickname: "private", nested: { path: "private" } } };
+    const browser = projectLocalBenchmark(raw), server = projectLocalBenchmark(browser);
+    const expected = { version: 1, id: preset.id, scope: "static-guest-start", spawnXZ: [...preset.spawnXZ], lookAtXZ: [...preset.lookAtXZ] };
+    assert.deepEqual(browser.terrainReview, expected);
+    assert.deepEqual(server, browser, "second privacy projection must be idempotent");
+    assert.deepEqual(Object.keys(server.terrainReview), ["version", "id", "scope", "spawnXZ", "lookAtXZ"]);
+    assert.ok(!JSON.stringify(server.terrainReview).includes("private"));
+    raw.terrainReview.spawnXZ[0] = 999;
+    assert.deepEqual(server.terrainReview, expected, "neither projection retains incoming coordinate arrays");
+    browser.terrainReview.lookAtXZ[0] = 999;
+    assert.deepEqual(server.terrainReview, expected, "server record is detached from the UI projection too");
+  }
+  assert.equal(Object.hasOwn(projectLocalBenchmark(sample()), "terrainReview"), false);
+  assert.equal(projectLocalBenchmark({ ...sample(), terrainReview: null }).terrainReview, null);
+});
+
+test("projection rejects malformed or falsely multiplayer terrain review claims", () => {
+  const identity = terrainReviewIdentity(TERRAIN_REVIEW_PRESETS["b6-rear-path"])!;
+  for (const invalid of [false, [], {}, { ...identity, id: "unknown" }, { ...identity, id: "constructor" },
+    { ...identity, id: "__proto__" }, { ...identity, version: "1" }, { ...identity, version: 2 },
+    { ...identity, scope: "multiplayer" }, { ...identity, spawnXZ: [0] }, { ...identity, lookAtXZ: [0, 1, 2] },
+    { ...identity, spawnXZ: new Array(2) }, { ...identity, spawnXZ: [NaN, 1] },
+    { ...identity, spawnXZ: [0, Infinity] }, { ...identity, lookAtXZ: [-1000001, 0] },
+    { ...identity, lookAtXZ: [0, 1000001] }, { ...identity, spawnXZ: ["36", -64] }]) {
+    assert.throws(() => projectLocalBenchmark({ ...sample(), avatars: 1, terrainReview: invalid }));
+  }
+  assert.throws(() => projectLocalBenchmark({ ...sample(), avatars: 4, terrainReview: identity }), /terrain review population/);
+  assert.doesNotThrow(() => projectLocalBenchmark({ ...sample(), avatars: 1,
+    terrainReview: { ...identity, spawnXZ: [-1e6, 1e6], lookAtXZ: [1e6, -1e6] } }));
+});
+
+test("projection accepts the actual positive integer avatar population including browser plus three SDK sessions", () => {
+  for (const avatars of [1, 2, 3, 4, 29, 30, 31, 100, 101, 1000, 10000]) {
+    const value = projectLocalBenchmark({ ...sample(), avatars, avatarLod: { near: avatars, medium: 0, far: 0 }, terrainReview: null });
+    assert.equal(value.avatars, avatars);
+    assert.equal(projectLocalBenchmark(value).avatars, avatars);
+  }
+  for (const avatars of [0, -1, .5, 1.5, 29.5, 10001, NaN, Infinity, -Infinity, "4", null, true, undefined]) {
+    assert.throws(() => projectLocalBenchmark({ ...sample(), avatars }));
+  }
+});
 
 test("local CPU and AA diagnostics whitelist numeric stages and real context attributes", () => {
   const context = {
@@ -544,6 +590,9 @@ test("atomic local record contains only whitelisted metrics and trusted metadata
   const f = await fixture(t);
   const raw = {
     ...sample(),
+    avatars: 1,
+    avatarLod: { near: 1, medium: 0, far: 0 },
+    terrainReview: { ...terrainReviewIdentity(TERRAIN_REVIEW_PRESETS["b6-rear-path"]), source: "private source path" },
     date: "client clock",
     mode: "forged",
     receivedAtUTC: "forged",
@@ -564,6 +613,9 @@ test("atomic local record contains only whitelisted metrics and trusted metadata
   assert.equal(stored.sourceSnapshotId, snapshot);
   assert.equal(stored.benchmark.frameWork.cpuMs, 8.555);
   assert.equal(stored.benchmark.rendering.budgets.grassDensity, 0.375);
+  assert.deepEqual(stored.benchmark.terrainReview, {
+    version: 1, id: "b6-rear-path", scope: "static-guest-start", spawnXZ: [36, -64], lookAtXZ: [29.24, -64],
+  });
   assert.equal(
     stored.benchmark.renderCost.inventory.uniqueGeometryTriangles,
     844905.6667,
@@ -612,7 +664,7 @@ test("stale/development/null sources and filename/path/personal payloads cannot 
   }
   assert.deepEqual(await f.files(), []);
 });
-test("finite metrics, cohort 1/30, ten-second duration, JSON content type and 3/min limit are enforced", async (t) => {
+test("finite metrics, bounded integer population, ten-second duration, JSON content type and 3/min limit are enforced", async (t) => {
   const f = await fixture(t);
   for (const changes of [
     { frames: 0 },
@@ -624,7 +676,8 @@ test("finite metrics, cohort 1/30, ten-second duration, JSON content type and 3/
     { assetLoadErrorCount: undefined },
     { averageFps: NaN },
     { p95FrameMs: Infinity },
-    { avatars: 29 },
+    { avatars: 29.5 },
+    { avatars: 10001 },
     { avatars: 0 },
     { renderResolution: { width: 0, height: 1 } },
   ]) {
@@ -642,6 +695,8 @@ test("finite metrics, cohort 1/30, ten-second duration, JSON content type and 3/
   assert.equal((await f.post()).status, 429);
   f.advance();
   assert.equal((await f.post()).status, 201);
+  f.advance();
+  assert.equal((await f.post({ ...sample(), avatars: 4, avatarLod: { near: 4, medium: 0, far: 0 } })).status, 201);
 });
 test("256 KiB limit covers declared and chunked bodies without creating files", async (t) => {
   const f = await fixture(t),

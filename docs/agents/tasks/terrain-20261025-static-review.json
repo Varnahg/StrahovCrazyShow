@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-static-review",
+  "title": "KEY-61: whitelist pevných statických QA počátků",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/terrain-review.ts",
+    "client/game.ts",
+    "client/ui.tsx",
+    "tests/terrain-review.test.ts",
+    "tests/game-webgpu-startup.test.ts",
+    "docs/agents/handoffs/terrain-20261025-static-review.md",
+    ".cache/terrain-static-review-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Pouze loopback host, whitelist4 doložených pevných pohledů; explicitní počátek před sim.add, správná interpolace/Actor/grassfocus, žádné následné přesuny.",
+    "Odmítnout multiplayer/vzdálený host/neznámé ID; bez URL parametru neměnit běžný startup.",
+    "Viditelná QA identita, produkční FOV/osvětlení/HUD/renderloop a existující benchmark; žádná skrytá DEV závislost.",
+    "Cílený refaktoring a testy. Vizuální ani ovládací QA zde nespouštět."
+  ],
+  "verification": [
+    "Lehké cílené CPU testy přidělených modulů; uložení skutečných výsledků, omezení a přesného diffu do předání.",
+    "Celkový build/test/integrace a GPU přejímka patří root se samostatnými resources."
+  ],
+  "notes": [
+    "Přímé implementační zadání TERÉN-20261025/KEY-61 od koordinátora; žádný rekurzivní BMAD ani další podagenti.",
+    "Pracovní kopie D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, baseline ff13fa2b. Před shellem načíst .cache/terrain-20261025/activate.ps1; node_modules je pouze čtecí junction, nic neinstalovat.",
+    "Hraná2592 se nemění; žádné GPU/browser/procesní testy ani WASD. Jen lehké cílené CPU testy bez heavy-validation.",
+    "Před zápisem vlastní claim, po dokončení předání a release. Koordinátor provede celkové testy/review/commity/integraci.",
+    "Spec: _bmad-output/implementation-artifacts/terrain-20261025/spec-key-61-teren.md; výzkum docs/terrain/20261025/research.md."
+  ]
+}

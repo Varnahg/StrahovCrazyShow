@@ -1,5 +1,6 @@
-/** Privacy projection used before HTTP and again before disk. No identities,
- * chat, modelReview, arbitrary map keys, filenames or client timestamps survive. */
+/** Privacy projection used before HTTP and again before disk. No player identities,
+ * chat, modelReview, arbitrary map keys, filenames or client timestamps survive.
+ * The explicit local QA view identity is a finite, versioned whitelist. */
 const object = (value: unknown): Record<string, any> => {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error("object");
@@ -40,6 +41,31 @@ const triple = (value: unknown) => {
   if (!Array.isArray(value) || value.length !== 3) throw new Error("triple");
   return value.map((v) => number(v));
 };
+const avatarCount = (value: unknown) => {
+  // Game records min(this.avatars.size) across the sample, including the local
+  // browser. It is not a 1/30 cohort enum. This is an evidence sanity bound,
+  // not a server capacity limit or a claim that 10,000 avatars perform well.
+  const result = number(value, 1, 10_000);
+  if (!Number.isInteger(result)) throw new Error("avatars");
+  return result;
+};
+function projectTerrainReview(value: unknown) {
+  if (value === null) return null;
+  const view = object(value);
+  const xz = (value: unknown) => {
+    if (!Array.isArray(value) || value.length !== 2) throw new Error("terrain review coordinates");
+    // Explicit indices reject sparse arrays too. The same metre bound is used
+    // by sceneView; neither source prose nor arbitrary metadata is persisted.
+    return [number(value[0], -1e6, 1e6), number(value[1], -1e6, 1e6)];
+  };
+  return {
+    version: choice(view.version, [1]),
+    id: choice(view.id, ["b6-rear-path", "b6-front-lawn", "osm-grass-control", "b6-far-context"]),
+    scope: choice(view.scope, ["static-guest-start"]),
+    spawnXZ: xz(view.spawnXZ),
+    lookAtXZ: xz(view.lookAtXZ),
+  };
+}
 function projectGpu(value: unknown) {
   const gpu = object(value);
   const result: Record<string, any> = {
@@ -226,7 +252,7 @@ export function projectLocalBenchmark(value: unknown) {
     // remains visible in the browser but is never accepted as performance proof.
     renderErrorCount: number(raw.renderErrorCount, 0, 0),
     assetLoadErrorCount: number(raw.assetLoadErrorCount, 0, 0),
-    avatars: choice(raw.avatars, [1, 30]),
+    avatars: avatarCount(raw.avatars),
     viewport: dimensions(raw.viewport),
     renderResolution: dimensions(raw.renderResolution),
     quality: choice(raw.quality, ["low", "medium", "high"]),
@@ -327,5 +353,9 @@ export function projectLocalBenchmark(value: unknown) {
       );
   }
   if (raw.renderCost) result.renderCost = projectRenderCost(raw.renderCost);
+  if (raw.terrainReview !== undefined) {
+    result.terrainReview = projectTerrainReview(raw.terrainReview);
+    if (result.terrainReview && result.avatars !== 1) throw new Error("terrain review population");
+  }
   return result;
 }

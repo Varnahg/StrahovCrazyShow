@@ -1266,6 +1266,14 @@ export function App() {
                 : t("Odpojeno · obnov spojení")}
           </span>
           <span className="demo-badge">DEMO</span>
+          {mode === "guest" && game.current?.terrainReview && (
+            <span className="demo-badge" data-terrain-review={game.current.terrainReview.id}
+              data-client-build-id={CLIENT_BUILD_ID}
+              title={`${game.current.terrainReview.id} · ${CLIENT_BUILD_ID}`}>
+              QA · {game.current.terrainReview.label[feedbackLocale]} · {feedbackLocale === "cs" ? "pevný pohled" : "fixed view"}
+              {" · "}{CLIENT_BUILD_ID.slice(0, 12)}
+            </span>
+          )}
           {lighting !== "real" && (
             <button
               className="demo-badge"
