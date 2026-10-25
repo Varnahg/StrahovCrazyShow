@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "terrain-20261025-effect-identity",
   "title": "KEY-61: regresní důkaz oddělení ground a paving Effectů",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "tests/ground-effect-identity.test.ts",
@@ -20,6 +20,7 @@
   ],
   "notes": [
     "Předaný důkaz read-only autora weather_sky_fixes: default MaterialPluginBase pro GroundCover/Campus, effect key bez customCode; paving UBO by dal záporný barevný faktor.",
-    "Produkční getClassName opravuje ground autor v jiném disjunktním scope; tento task smí psát jen nový test/handoff/cache. Bez dalších agentů, BMAD, serveru či GPU."
+    "Produkční getClassName opravuje ground autor v jiném disjunktním scope; tento task smí psát jen nový test/handoff/cache. Bez dalších agentů, BMAD, serveru či GPU.",
+    "Implementace a důkazy převzaty koordinátorem25.10; viz docs/verification-evidence/terrain-20261025/README.md. Externí CI/project-acceptance/main merge mají samostatnou integrační bránu."
   ]
 }

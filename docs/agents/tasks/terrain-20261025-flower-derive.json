@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-flower-derive",
+  "title": "KEY-61: izolovaná CPU derivace zdrojových květin",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    "docs/agents/handoffs/terrain-20261025-flower-derive.md"
+  ],
+  "resources": [
+    "heavy-validation"
+  ],
+  "acceptance": [
+    "Jeden Blender headless CPU proces pro inspekci a derivaci vlastního dandelion_01 zdroje, žádné GPU, jiné modely ani současný build/fullsuite.",
+    "Skutečné vstupy/výstupy chrání současně task terrain-20261025-flowers. Před spuštěním ověřit cestu, kapacitu, identitu a uložit příkaz/PID/log.",
+    "Po derivaci ukončit vlastní procesy, předat skutečné výsledky a release zdroje."
+  ],
+  "verification": [
+    "Inspekce skutečných objektů/LOD/UV a původních material vazeb; audity exportu a hash.",
+    "Tento task nedokládá vzhled/FPS ve hře."
+  ],
+  "notes": [
+    "Přímé rozšíření koordinátora po žádosti terrain-flowers-01a16b37; user2592 zůstává neměnná.",
+    "GPU zdroj je stále rezervován pro uživatelovu scénu; Cycles musí používat CPU.",
+    "Implementace a důkazy převzaty koordinátorem25.10; viz docs/verification-evidence/terrain-20261025/README.md. Externí CI/project-acceptance/main merge mají samostatnou integrační bránu."
+  ]
+}

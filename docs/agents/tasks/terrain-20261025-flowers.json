@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "terrain-20261025-flowers",
   "title": "KEY-61: omezené fotografické květiny a návaznost trávy",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "client/photographic-grass.ts",
@@ -51,6 +51,7 @@
     "Hraná2592 se nemění; žádné GPU/browser/procesní testy ani WASD. Jen lehké cílené CPU testy bez heavy-validation.",
     "Před zápisem vlastní claim, po dokončení předání a release. Koordinátor provede celkové testy/review/commity/integraci.",
     "Spec: _bmad-output/implementation-artifacts/terrain-20261025/spec-key-61-teren.md; výzkum docs/terrain/20261025/research.md.",
-    "25.10 root vrací autorovi převzatý WIP digest bc7541d9 pro jedinou review opravu: CPU úspěšná cesta skutečného PhotographicGrass.load + skutečné květiny po update, s náhradou pouze HTTP/Texture IO. --adopt-dirty je doložený převod, nikoli obcházení kolize."
+    "25.10 root vrací autorovi převzatý WIP digest bc7541d9 pro jedinou review opravu: CPU úspěšná cesta skutečného PhotographicGrass.load + skutečné květiny po update, s náhradou pouze HTTP/Texture IO. --adopt-dirty je doložený převod, nikoli obcházení kolize.",
+    "Implementace a důkazy převzaty koordinátorem25.10; viz docs/verification-evidence/terrain-20261025/README.md. Externí CI/project-acceptance/main merge mají samostatnou integrační bránu."
   ]
 }

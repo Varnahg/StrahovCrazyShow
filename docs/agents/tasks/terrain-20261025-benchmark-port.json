@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-benchmark-port",
+  "title": "KEY-61: produkční A/B benchmark na lokálním4179",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/terrain-benchmark-server-20261025/",
+    "docs/agents/handoffs/terrain-20261025-benchmark-port.md"
+  ],
+  "resources": [
+    "port:4179"
+  ],
+  "acceptance": [
+    "Lokální diagnostický collector povoluje přesně origin4179; použít postupně oddělené neměnné baseline/kandidát source, nikdy jejich současnou GPU scénu.",
+    "Před každým startem ověřit volný port; zaznamenat cwd, PID, snapshot. Ukončit jen vlastní identifikovaný proces.",
+    "2592 zůstává nedotčená. CPU server nepovoluje GPU bez samostatné rezervace."
+  ],
+  "verification": [
+    "HTTP health/source identity a collector loopback origin; skutečné UI benchmarky později se samostatnou GPU rezervací."
+  ],
+  "notes": [
+    "Parent root drží terrain-validation heavy/workspace-build; snapshoty jsou na D. Žádný cizí proces se neukončuje.",
+    "Vlastní default build má VITE_MULTIPLAYER_URL=/ a VITE_SOURCE_SNAPSHOT_ID; static server revaliduje assety."
+  ]
+}

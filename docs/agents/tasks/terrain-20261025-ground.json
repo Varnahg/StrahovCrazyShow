@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "terrain-20261025-ground",
   "title": "KEY-61: zdrojové trávníky, půda a přechody povrchů",
-  "status": "ready",
+  "status": "done",
   "dependsOn": [],
   "writePaths": [
     "shared/ground-cover.ts",
@@ -51,6 +51,7 @@
     "Před zápisem vlastní claim, po dokončení předání a release. Koordinátor provede celkové testy/review/commity/integraci.",
     "Spec: _bmad-output/implementation-artifacts/terrain-20261025/spec-key-61-teren.md; výzkum docs/terrain/20261025/research.md.",
     "25.10 root předává autorovi pouze review opravy: wetness UBO regrese a zachování přesných očekávání street/soil/chunk fixtures. Předchozí ground WIP z manifestu b9e1d924 byl explicitně převzat integrátorem a nyní vrácen autorovi; --adopt-dirty pouze pro tento doložený rozsah. Produkční zdroje měnit jen při prokázané chybě.",
-    "25.10 uživatelská vizuální zpětná vazba: čitelný pravidelný rastr trávy; nezávislý snímek také prokázal černý chodník. Root vrací vlastní převzatý WIP autorovi k dvěma odděleným checkpointům: nejprve pouze unikátní Ground getClassName, poté obnovení původního detail/saturation a společná bounded antitiling sampling cesta obou vrstev. Produkční kopie a raw předlohy zůstávají nedotčené."
+    "25.10 uživatelská vizuální zpětná vazba: čitelný pravidelný rastr trávy; nezávislý snímek také prokázal černý chodník. Root vrací vlastní převzatý WIP autorovi k dvěma odděleným checkpointům: nejprve pouze unikátní Ground getClassName, poté obnovení původního detail/saturation a společná bounded antitiling sampling cesta obou vrstev. Produkční kopie a raw předlohy zůstávají nedotčené.",
+    "Implementace a důkazy převzaty koordinátorem25.10; viz docs/verification-evidence/terrain-20261025/README.md. Externí CI/project-acceptance/main merge mají samostatnou integrační bránu."
   ]
 }

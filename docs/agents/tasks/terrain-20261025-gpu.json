@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-gpu",
+  "title": "KEY-61: statická produkční GPU přejímka terénu",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/terrain-gpu-20261025/",
+    "docs/agents/handoffs/terrain-20261025-gpu.md"
+  ],
+  "resources": [
+    "gpu"
+  ],
+  "acceptance": [
+    "Uživatel25.10 výslovně potvrdil konec hraní a možnost ověřovat. StarýGPUclaimuvolněn po navigaci IAB2592naabout:blank; server/souboryzůstalybezezměny.",
+    "Pouze pevné statické pohledy, žádný WASD/chůze/jízda. A/B+tiery při stejnéprodukčníscéně, světle, počasí, HUD a rozlišení.",
+    "Předměřením ověřit reálnéGPUscény, žádný Blender/druhýběh ani souběžnéheavyCPUtesty. Zaznamenat identity/GPU/p95/p99/limit."
+  ],
+  "verification": [
+    "Statické skutečné snímky a produkčníbenchmarky; driverchyby/readiness/preparing zachytit pravdivě.",
+    "Fyzikálnípočátky4stanovišťužprošly120idletickybezteleportace; fotografieaGPUjsouoddělenédůkazy."
+  ],
+  "notes": [
+    "Root současnědržíterrain-validationheavy/workspacebuild a4179collectorport; vlastní procesylifecyclepředrelease.",
+    "Tento task nepovoluje přepsat2592.",
+    "Implementace a důkazy převzaty koordinátorem25.10; viz docs/verification-evidence/terrain-20261025/README.md. Externí CI/project-acceptance/main merge mají samostatnou integrační bránu."
+  ]
+}

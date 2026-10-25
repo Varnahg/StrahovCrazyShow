@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "terrain-20261025-validation",
+  "title": "KEY-61: neměnné srovnání a integrace terénu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/terrain-validation-20261025/",
+    "docs/verification-evidence/terrain-20261025/",
+    "docs/verification.md",
+    "docs/agents/handoffs/terrain-20261025-validation.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568",
+    "port:2593",
+    "port:2594"
+  ],
+  "acceptance": [
+    "Neměnné source/test/asset snapshoty baseline a kandidáta na D; žádné přepsání2592.",
+    "Cílené a celkové testy, produkční build a izolovaná integrace s pravdivou identitou a logy; bez cizích WIP.",
+    "Vizuální a GPU fáze čeká na samostatný gpu claim a ověření aktivních scén. Pouze statické pohledy bez pohybových vstupů.",
+    "Nezávislé review a ucelené vlastní commity/integrace do main; Linear a verification označují skutečné výsledky i meze."
+  ],
+  "verification": [
+    "pnpm test; pnpm build; pnpm test:integration nad stabilním checkpointem včetně testů.",
+    "A/B statické scény a všechny tiery, samotný NullEngine není GPU důkaz; produkční MP režie se skutečnými SDK relacemi.",
+    "Snapshot manifest před/po copy, klientský build hash, GPU a rozlišení, p95/p99/FPS, lifecycle/error evidence."
+  ],
+  "notes": [
+    "Koordinátor root; agenti mají disjunktní product scopes. V průběhu jejich změn se nefreezuje live source bez shody před/po.",
+    "GPU není součást tohoto claimu, dosud ho drží uživatelova2592 scéna.",
+    "Všechny velké a dočasné soubory na D; C kapacitu ověřovat před Git operacemi."
+  ]
+}
