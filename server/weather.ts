@@ -1,5 +1,6 @@
 import {
   isWeatherStale,
+  isWeatherTimeAdmissible,
   ageWeatherSnapshot as ageWeather,
   parseStation,
   STRAHOV_LOCATION,
@@ -19,6 +20,7 @@ const SUPPLEMENTS: readonly WeatherSupplement[] = [
   "snowfall",
   "liquidPrecipitation",
   "precipitationType",
+  "weatherCode",
 ];
 const MODEL_URL =
   `https://api.open-meteo.com/v1/forecast?latitude=${STRAHOV_LOCATION.latitude}&longitude=${STRAHOV_LOCATION.longitude}&current=` +
@@ -44,6 +46,15 @@ const MODEL_URL =
     "visibility",
   ].join(",") +
   "&wind_speed_unit=ms&temperature_unit=celsius&precipitation_unit=mm&timeformat=unixtime";
+
+function unavailableWeather(fetchedAt: number): Weather {
+  return {
+    temperature: null, wind: 0, windDirection: 0, rain: 0, cloud: 0.4,
+    observedAt: null, fetchedAt, source: "Počasí zatím nedostupné",
+    cloudSource: "Demonstrační oblačnost", cloudObservedAt: null,
+    cloudStale: true, stale: true, status: "unavailable",
+  };
+}
 
 function finite(value: unknown, min: number, max: number): number | undefined {
   return typeof value === "number" &&
@@ -190,6 +201,7 @@ export function parseModelWeather(data: unknown, now = Date.now()): Weather {
       snowAmount,
       liquidAmount,
     ),
+    weatherCode: read("weather_code", 0, 99, "wmo code"),
     status: "fallback",
     stale,
   };
@@ -231,6 +243,7 @@ export function selectWeather(
       snowfall: model.snowfall,
       liquidPrecipitation: model.liquidPrecipitation,
       precipitationType: model.precipitationType,
+      weatherCode: model.weatherCode,
       fieldSources: { ...model.fieldSources, ...station.fieldSources },
     };
     // Gauge precipitation must not disappear because a model grid cell says dry.
@@ -246,14 +259,15 @@ export function selectWeather(
     return combined;
   }
   if (model && !model.stale) return model;
-  // A newly fetched but old station page must not displace a newer cached model.
+  // Preserve the newest admissible observation. A stale future clock must not
+  // outrank a real cached observation merely because its timestamp is larger.
   const newest = [station, model, previous]
-    .filter((item): item is Weather => item !== null)
-    .reduce((best, item) =>
-      (item.observedAt ?? -Infinity) > (best.observedAt ?? -Infinity)
-        ? item
-        : best,
+    .filter((item): item is Weather => item !== null && isWeatherTimeAdmissible(item.observedAt, now))
+    .reduce<Weather | null>(
+      (best, item) => best === null || item.observedAt! > best.observedAt! ? item : best,
+      null,
     );
+  if (!newest) return unavailableWeather(now);
   const retained = ageWeather(newest, now, true);
   return {
     ...retained,
@@ -273,21 +287,7 @@ export function createWeatherProvider(
 ) {
   const fetcher = options.fetch ?? fetch,
     clock = options.now ?? Date.now;
-  let cached: Weather = {
-    temperature: null,
-    wind: 0,
-    windDirection: 0,
-    rain: 0,
-    cloud: 0.4,
-    observedAt: null,
-    fetchedAt: -Infinity,
-    source: "Počasí zatím nedostupné",
-    cloudSource: "Demonstrační oblačnost",
-    cloudObservedAt: null,
-    cloudStale: true,
-    stale: true,
-    status: "unavailable",
-  };
+  let cached = unavailableWeather(-Infinity);
   let pending: Promise<Weather> | undefined;
   return async function getWeather(): Promise<Weather> {
     const now = clock(),

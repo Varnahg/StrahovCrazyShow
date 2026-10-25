@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "weather-sky-revision-20261024",
+  "title": "Repair sky horizon/glare and map supported weather variants from primary data",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/weather.ts",
+    "server/weather.ts",
+    "client/sky-weather.ts",
+    "client/art-lighting.ts",
+    "client/weather-particles.ts",
+    "client/weather-freshness.ts",
+    "shared/weather-scenarios.ts",
+    "tests/graphics.test.ts",
+    "tests/weather.test.ts",
+    "tests/weather-provider.test.ts",
+    "tests/weather-freshness.test.ts",
+    "tests/sky-weather.test.ts",
+    "tests/weather-scenarios.test.ts",
+    "docs/weather/conditions-20261024.md",
+    "docs/weather/README.md",
+    "docs/weather/sources.json",
+    ".cache/weather-sky-revision-20261024/",
+    "docs/agents/handoffs/weather-sky-revision-20261024.md",
+    "client/atmosphere-sky.ts",
+    "client/atmosphere-wgsl.ts",
+    "tests/atmosphere-sky.test.ts",
+    "tests/atmosphere-native-wgsl.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "User requested24Oct2026: research every actual station field/state, support source-labelled rain/snow/fog/etc variants and more cinematic day/night; repair square glow and descending horizon clouds.",
+    "Do not call model/inferred precipitation type or visibility direct station measurements. Preserve real UTC/location and meteorological FROM wind.",
+    "Keep2591 source-v4 unchanged; no browser control while user tests."
+  ],
+  "verification": [
+    "Primary station and Open-Meteo schema research; targeted classifier/parser/render geometry tests; coordinator handles GPU matrix and integration."
+  ],
+  "notes": [
+    "No new BMAD renderer or nested workflow. No heavy/GPU/server until root coordinates. UI/Game integration remains root-owned."
+  ]
+}

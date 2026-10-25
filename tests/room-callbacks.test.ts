@@ -445,6 +445,7 @@ function fixture() {
       },
       resetRttSelection: () => { state.rttSelectionResets = (state.rttSelectionResets ?? 0) + 1; },
     },
+    setWeatherPreview() {},
   };
   for (const method of [
     "setLocalId",
@@ -1437,6 +1438,7 @@ for (const outcome of [
       canvas: { current: game.canvas },
       lightingPreviewRef: { current: { instant: null } },
       weatherRef: { current: null },
+      weatherPreviewRef: { current: null },
       userBenchmark: { current: false },
       quality: "medium",
       targetFps: 60,
@@ -1492,7 +1494,7 @@ function startOwnedGame(ui: ReturnType<typeof fixture>, options: { mode?: "multi
     } }),
     getRendererInfo: () => ({ renderer: "fixture", vendor: "fixture", version: "fixture" }),
     mode: options.mode ?? "multi", canvas: { current: game.canvas },
-    lightingPreviewRef: { current: { instant: null } }, weatherRef: { current: null },
+    lightingPreviewRef: { current: { instant: null } }, weatherRef: { current: null }, weatherPreviewRef: { current: null },
     userBenchmark: { current: false }, quality: "medium", targetFps: 60, activity: { hunt: [] }, setStats() {},
     t: (text: string, values?: Record<string, unknown>) => text.replace(/\{(\w+)\}/g, (match, key) => String(values?.[key] ?? match)),
   });

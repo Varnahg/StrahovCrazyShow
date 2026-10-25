@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "b6-weather-render-fixtures-20261025",
+  "title": "Align partial renderer fixtures with weather and door lifecycle contracts",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": ["tests/game-authored-light-preparation.test.ts", "tests/game-low-vehicle-preparation.test.ts", "tests/game-light-preparation.test.ts", "tests/game-render-engine.test.ts", "tests/game-webgpu-startup.test.ts", "tests/game-diagnostics.test.ts", "tests/game-light-lifecycle.test.ts", "tests/helpers/weather-door-render-fixture.ts", ".cache/b6-weather-render-fixtures-20261025/", "docs/agents/handoffs/b6-weather-render-fixtures-20261025.md"],
+  "acceptance": ["Partial Game and atmosphere fixtures reproduce initialized production members: cloud transmission, effective weather, door state and diagnostics lifecycle.", "Keep all existing startup, preparation, disposal and readiness assertions; no timeout weakening or production workaround for incomplete mocks."],
+  "verification": ["Affected targeted tests, meaningful refactor of duplicate setup, TypeScript and explicit handoff."],
+  "notes": ["Root delegated after full suite identified 34 cascading fixture failures. No recursive BMAD, GPU, server or full suite."]
+}

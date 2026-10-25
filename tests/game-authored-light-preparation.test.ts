@@ -1,4 +1,5 @@
 import {AuthoredLightPreparation} from "../client/authored-light-preparation";
+import {unoccludedAtmosphereFixture} from "./helpers/weather-door-render-fixture";
 import test, {after} from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -95,7 +96,7 @@ test("actual authored factories retain browser texture metadata in bounded IO ad
 
 const gameSource=fs.readFileSync(new URL("../client/game.ts",import.meta.url),"utf8");
 const tree=ts.createSourceFile("game.ts",gameSource,ts.ScriptTarget.Latest,true),declaration=tree.statements.find((n):n is ts.ClassDeclaration=>ts.isClassDeclaration(n)&&n.name?.text==="Game")!;
-const selected=["prepareLighting","prepareLightingVariants","isMeshReadyForCamera","updateRenderEnvironment","applyRenderQuality","updateCameraFollow","alignVehicleCamera","footFirstPerson"];
+const selected=["prepareLighting","prepareLightingVariants","isMeshReadyForCamera","updateRenderEnvironment","effectiveWeather","applyRenderQuality","updateCameraFollow","alignVehicleCamera","footFirstPerson"];
 const methods=declaration.members.filter(n=>n.name&&selected.includes(n.name.getText(tree)));assert.equal(methods.length,selected.length);
 report.methods=methods.map(n=>({name:n.name!.getText(tree),sha256:sha(n.getText(tree))}));
 const code=ts.transpileModule(`class ProofGame {${methods.map(n=>n.getText(tree)).join("\n")}}`,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
@@ -142,7 +143,7 @@ for(const initialQuality of ["low","medium"] as const) test(`native cold opposit
     timeOverride:select("night").instant,flashlightOn:false,disposed:false,rendererFailed:false,firstPerson:false,yaw:preparedView?0:Math.PI,pitch:.28,distance:8,cameraArm:20,vehicleCameraSnap:true,
     sim:{cameraDistance:(from:Vector3,to:Vector3)=>Vector3.Distance(from,to)},
     renderHealth:{snapshot:()=>({errorCount:0,pendingPreparationOperations:0,phase:"preparing"})},compilationProfile:{setStage(value:string){stage=value;}},
-    skyWeather:{atmosphere:{material:skyMaterial,update(){},dispose(){}},update:({instant}:{instant:number})=>({sun:sunState(instant),moon:moonState(instant),wind:{x:0,z:0}})},
+    skyWeather:{atmosphere:unoccludedAtmosphereFixture(skyMaterial),update:({instant}:{instant:number})=>({sun:sunState(instant),moon:moonState(instant),wind:{x:0,z:0}})},
     updateWorldPresentation(position:typeof pos){assert.equal(position,pos);f.architecture.update(position,game.quality);f.outdoor.update(position.x,position.z,game.quality);for(const mesh of scene.meshes)if(mesh.metadata?.sourcePack!==undefined&&!f.target.includes(mesh))mesh.setEnabled(false);},
     localAvatarPresentation:{update:()=>({visible:true,cameraLight:false,resetAnimation:false})},updateAvatarPresentation(){},
   });

@@ -22,12 +22,17 @@ import type { RenderTargetTexture } from "@babylonjs/core/Materials/Textures/ren
 import type { Scene } from "@babylonjs/core/scene";
 import type { BaseTexture } from "@babylonjs/core/Materials/Textures/baseTexture";
 import type { Camera } from "@babylonjs/core/Cameras/camera";
+import type { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Vec3 } from "../shared/types";
 import { renderBudget } from "../shared/render-quality";
-import { configureCampusGrade, campusExposure } from "./cinematic-art";
+import {
+  configureCampusGrade,
+  campusExposure,
+  installCampusBloomExtraction,
+} from "./cinematic-art";
 import { installStaticSubmeshShadowCull } from "./static-submesh-shadows";
 import { SkyReflectionSampler } from "./sky-reflection";
 export { skyReflectionData } from "./sky-reflection";
@@ -51,11 +56,15 @@ export function campusShadowResponse(
   intensity: number,
   cloud: number,
   rain = 0,
+  cloudOcclusionApplied = false,
 ) {
   const lunar = source === "moon";
   const elevation = smooth(0.006, 0.065, -directionY);
   const direct = smooth(lunar ? 0.001 : 0.008, lunar ? 0.012 : 0.16, intensity);
-  const weather = (1 - smooth(0.2, 1, cloud)) * (1 - clamp(rain / 8) * 0.35);
+  // The live key already contains the visible cloud-mask transmission. Other
+  // callers retain the coverage fallback; keySource alone cannot imply this.
+  const cloudContrast = cloudOcclusionApplied ? 1 : 1 - smooth(0.2, 1, cloud);
+  const weather = cloudContrast * (1 - clamp(rain / 8) * 0.35);
   const strength =
     source === "none"
       ? 0
@@ -317,6 +326,9 @@ type AtmosphereInput = {
   /** Same celestial source selected by art-lighting for this directional light.
    * Omission preserves the legacy solar-only scene fixtures. */
   keySource?: CelestialShadowSource;
+  /** True only when direct-light intensity already includes the current
+   * visible cloud mask. Omission preserves the coverage-based fallback. */
+  cloudOcclusionApplied?: boolean;
   /** Precipitation in mm/h, as reported by the shared weather state. */
   rain?: number;
   avatars?: Iterable<{
@@ -326,10 +338,524 @@ type AtmosphereInput = {
   localId?: string;
 };
 
+export type BloomDiagnostics = {
+  status: "captured" | "incomplete" | "timeout" | "disposed" | "no-pipeline";
+  backend: "webgl" | "webgpu";
+  startedAt: number;
+  frameId: number | null;
+  renderSize: { width: number; height: number };
+  sceneSource?: Record<string, unknown>;
+  passes: {
+    name: string;
+    before?: Record<string, unknown>;
+    after?: Record<string, unknown>;
+  }[];
+};
+
+/** Only reads the already bound READ framebuffer. Restrict formats/types and
+ * pack state before touching readPixels; no temporary GL bindings or errors
+ * are used to probe driver support. Explicit QA only, never a render update. */
+export function readBoundBloomPixels(
+  gl: WebGL2RenderingContext,
+  width: number,
+  height: number,
+) {
+  const format = gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_FORMAT) as number;
+  const type = gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_TYPE) as number;
+  const result: {
+    format: number;
+    type: number;
+    skipped?: string;
+    samples: { uv: number[]; xy: number[]; rgba: (number | string)[] }[];
+  } = { format, type, samples: [] };
+  if (
+    !Number.isInteger(width) ||
+    !Number.isInteger(height) ||
+    width < 1 ||
+    height < 1
+  ) {
+    result.skipped = "no positive target dimensions";
+    return result;
+  }
+  if (
+    gl.getParameter(gl.READ_FRAMEBUFFER_BINDING) !==
+    gl.getParameter(gl.DRAW_FRAMEBUFFER_BINDING)
+  ) {
+    result.skipped =
+      "READ and DRAW framebuffer differ; no binding changes permitted";
+    return result;
+  }
+  if (
+    gl.checkFramebufferStatus(gl.READ_FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE
+  ) {
+    result.skipped = "READ framebuffer incomplete";
+    return result;
+  }
+  if (
+    gl.getParameter(gl.READ_FRAMEBUFFER_BINDING) !== null &&
+    gl.getParameter(gl.SAMPLES) > 0
+  ) {
+    result.skipped =
+      "multisampled offscreen READ framebuffer requires resolve; no state changes permitted";
+    return result;
+  }
+  if (
+    gl.getParameter(gl.PIXEL_PACK_BUFFER_BINDING) !== null ||
+    gl.getParameter(gl.PACK_ROW_LENGTH) !== 0 ||
+    gl.getParameter(gl.PACK_SKIP_PIXELS) !== 0 ||
+    gl.getParameter(gl.PACK_SKIP_ROWS) !== 0
+  ) {
+    result.skipped = "non-default pack/PBO state; no state changes permitted";
+    return result;
+  }
+  if (
+    format !== gl.RGBA ||
+    (type !== gl.UNSIGNED_BYTE && type !== gl.FLOAT && type !== gl.HALF_FLOAT)
+  ) {
+    result.skipped =
+      "implementation read format/type outside verified RGBA byte/float/half-float set";
+    return result;
+  }
+  const pixels =
+    type === gl.FLOAT
+      ? new Float32Array(4)
+      : type === gl.HALF_FLOAT
+        ? new Uint16Array(4)
+        : new Uint8Array(4);
+  const decode = (value: number) => {
+    if (type === gl.UNSIGNED_BYTE) return value / 255;
+    if (type === gl.FLOAT) return value;
+    const sign = value & 0x8000 ? -1 : 1,
+      exponent = (value >> 10) & 31,
+      mantissa = value & 1023;
+    return exponent === 31
+      ? mantissa
+        ? NaN
+        : sign * Infinity
+      : exponent === 0
+        ? sign * 2 ** -14 * (mantissa / 1024)
+        : sign * 2 ** (exponent - 15) * (1 + mantissa / 1024);
+  };
+  for (const v of [0.9, 0.7, 0.5])
+    for (const u of [0.1, 0.3, 0.5, 0.7, 0.9]) {
+      const x = Math.min(width - 1, Math.floor(width * u)),
+        y = Math.min(height - 1, Math.floor(height * v));
+      gl.readPixels(x, y, 1, 1, format, type, pixels);
+      result.samples.push({
+        uv: [u, v],
+        xy: [x, y],
+        rgba: Array.from(pixels, (value) => {
+          const decoded = decode(value);
+          return Number.isFinite(decoded) ? decoded : String(decoded);
+        }),
+      });
+    }
+  return result;
+}
+
+/** Read-only pin-9.30 diagnostics. Opaque GL handles become capture-local IDs;
+ * no activeTexture/bindFramebuffer/viewport calls and no retained GPU objects. */
+function readPostProcessDiagnostics(
+  post: PostProcess,
+  scene: Scene,
+  identify: (value: object | null | undefined) => string | null,
+) {
+  const engine = scene.getEngine();
+  const internals = engine as unknown as {
+    _gl?: WebGL2RenderingContext;
+    _currentRenderTarget?: DiagnosticTarget;
+    _boundTexturesCache?: Record<number, DiagnosticTexture | null>;
+  };
+  type DiagnosticTexture = {
+    uniqueId?: number;
+    label?: string;
+    width?: number;
+    height?: number;
+    type?: number;
+    getEngine?: () => unknown;
+  };
+  type DiagnosticTarget = {
+    width?: number;
+    height?: number;
+    _engine?: unknown;
+    _framebuffer?: object;
+    _MSAAFramebuffer?: object;
+    texture?: DiagnosticTexture;
+  };
+  const internalPost = post as unknown as {
+    _options: number | { width?: number; height?: number };
+    _scaleRatio?: { x: number; y: number };
+    _outputTexture?: DiagnosticTarget;
+  };
+  const texture = (value?: DiagnosticTexture | null) =>
+    value
+      ? {
+          id: value.uniqueId ?? null,
+          label: value.label ?? null,
+          width: value.width ?? null,
+          height: value.height ?? null,
+          type: value.type ?? null,
+          ownerEngine: value.getEngine?.() === engine,
+        }
+      : null;
+  const target = (value?: DiagnosticTarget | null) =>
+    value
+      ? {
+          width: value.width ?? null,
+          height: value.height ?? null,
+          ownerEngine: value._engine === engine,
+          framebuffer: identify(value._framebuffer),
+          msaaFramebuffer: identify(value._MSAAFramebuffer),
+          texture: texture(value.texture),
+        }
+      : null;
+  const effect = post.getEffect();
+  const expectedProgram = (
+    effect?.getPipelineContext() as unknown as { program?: WebGLProgram } | null
+  )?.program;
+  const vertex = effect?.vertexSourceCode ?? "";
+  const result: Record<string, unknown> = {
+    width: post.width,
+    height: post.height,
+    options:
+      typeof internalPost._options === "number"
+        ? internalPost._options
+        : { ...internalPost._options },
+    scaleRatio: internalPost._scaleRatio
+      ? [internalPost._scaleRatio.x, internalPost._scaleRatio.y]
+      : null,
+    enablePixelPerfectMode: post.enablePixelPerfectMode,
+    forceFullscreenViewport: post.forceFullscreenViewport,
+    adaptScaleToCurrentViewport: post.adaptScaleToCurrentViewport,
+    alwaysForcePOT: post.alwaysForcePOT,
+    autoClear: post.autoClear,
+    alphaMode: post.alphaMode,
+    externalTextureSamplerBinding: post.externalTextureSamplerBinding,
+    input: target(post.inputTexture as unknown as DiagnosticTarget),
+    output: target(internalPost._outputTexture),
+    engineTarget: target(internals._currentRenderTarget),
+    effectId: effect?.uniqueId ?? null,
+    expectedProgram: identify(expectedProgram),
+    vertexShader: { length: vertex.length, tail: vertex.slice(-8192) },
+  };
+  const gl = internals._gl;
+  if (!gl || engine.isWebGPU) return result;
+  try {
+    const program = gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram | null;
+    result.gl = {
+      viewport: Array.from(gl.getParameter(gl.VIEWPORT) as Int32Array),
+      scissorEnabled: gl.getParameter(gl.SCISSOR_TEST) as boolean,
+      scissorBox: Array.from(gl.getParameter(gl.SCISSOR_BOX) as Int32Array),
+      framebuffer: identify(gl.getParameter(gl.FRAMEBUFFER_BINDING)),
+      program: identify(program),
+      matchesExpectedProgram: program === expectedProgram,
+      activeTexture: gl.getParameter(gl.ACTIVE_TEXTURE) as number,
+      activeTexture2D: identify(gl.getParameter(gl.TEXTURE_BINDING_2D)),
+      depthTest: gl.getParameter(gl.DEPTH_TEST),
+      stencilTest: gl.getParameter(gl.STENCIL_TEST),
+      colorWriteMask: Array.from(
+        gl.getParameter(gl.COLOR_WRITEMASK) as boolean[],
+      ),
+      blendEnabled: gl.getParameter(gl.BLEND),
+      blendSrcRgb: gl.getParameter(gl.BLEND_SRC_RGB),
+      blendDstRgb: gl.getParameter(gl.BLEND_DST_RGB),
+      blendSrcAlpha: gl.getParameter(gl.BLEND_SRC_ALPHA),
+      blendDstAlpha: gl.getParameter(gl.BLEND_DST_ALPHA),
+      blendEquationRgb: gl.getParameter(gl.BLEND_EQUATION_RGB),
+      blendEquationAlpha: gl.getParameter(gl.BLEND_EQUATION_ALPHA),
+    };
+    const scale = effect?.getUniform("scale");
+    result.boundScale =
+      program && program === expectedProgram && scale
+        ? Array.from(gl.getUniform(program, scale) as Float32Array)
+        : null;
+    result.boundUniforms = Object.fromEntries(
+      ["delta", "threshold", "exposure", "bloomWeight"].map((name) => {
+        const location = effect?.getUniform(name);
+        const value =
+          program && program === expectedProgram && location
+            ? gl.getUniform(program, location)
+            : null;
+        return [
+          name,
+          ArrayBuffer.isView(value)
+            ? Array.from(value as unknown as ArrayLike<number>)
+            : value,
+        ];
+      }),
+    );
+    result.samplers =
+      effect
+        ?.getSamplers()
+        .slice(0, 8)
+        .map((name) => {
+          const location = effect.getUniform(name);
+          const unit =
+            program && program === expectedProgram && location
+              ? (gl.getUniform(program, location) as number)
+              : null;
+          return {
+            name,
+            unit,
+            cachedTexture:
+              unit === null
+                ? null
+                : texture(internals._boundTexturesCache?.[unit]),
+          };
+        }) ?? [];
+    const position = effect?.getAttributeLocationByName("position") ?? -1;
+    result.positionAttribute =
+      position < 0
+        ? null
+        : {
+            location: position,
+            buffer: identify(
+              gl.getVertexAttrib(
+                position,
+                gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
+              ),
+            ),
+            size: gl.getVertexAttrib(position, gl.VERTEX_ATTRIB_ARRAY_SIZE),
+            stride: gl.getVertexAttrib(position, gl.VERTEX_ATTRIB_ARRAY_STRIDE),
+            offset: gl.getVertexAttribOffset(
+              position,
+              gl.VERTEX_ATTRIB_ARRAY_POINTER,
+            ),
+            divisor: gl.getVertexAttrib(
+              position,
+              gl.VERTEX_ATTRIB_ARRAY_DIVISOR,
+            ),
+          };
+    const quad = (
+      scene.postProcessManager as unknown as {
+        _vertexBuffers: Record<
+          string,
+          {
+            getData(): ArrayLike<number> | null;
+            getBuffer(): { underlyingResource?: object } | null;
+          }
+        >;
+      }
+    )._vertexBuffers?.position;
+    const cpuData = quad?.getData();
+    const arrayBuffer = gl.getParameter(
+      gl.ARRAY_BUFFER_BINDING,
+    ) as WebGLBuffer | null;
+    const positionBuffer =
+      position < 0
+        ? null
+        : (gl.getVertexAttrib(
+            position,
+            gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
+          ) as WebGLBuffer | null);
+    const vertexRead: Record<string, unknown> = {
+      expectedCpu: cpuData
+        ? Array.from(
+            { length: Math.min(8, cpuData.length) },
+            (_, index) => cpuData[index],
+          )
+        : null,
+      expectedBuffer: identify(quad?.getBuffer()?.underlyingResource),
+      arrayBuffer: identify(arrayBuffer),
+      positionBuffer: identify(positionBuffer),
+    };
+    if (
+      arrayBuffer &&
+      arrayBuffer === positionBuffer &&
+      gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE) >= 32
+    ) {
+      const data = new Float32Array(8);
+      gl.getBufferSubData(gl.ARRAY_BUFFER, 0, data);
+      vertexRead.actualGpu = Array.from(data);
+    } else
+      vertexRead.skipped =
+        "current ARRAY_BUFFER is not the position buffer or has fewer than 32 bytes";
+    result.quad = vertexRead;
+    const output = internalPost._outputTexture;
+    result.pixels = readBoundBloomPixels(
+      gl,
+      output?.width ?? engine.getRenderWidth(true),
+      output?.height ?? engine.getRenderHeight(true),
+    );
+  } catch (error) {
+    result.readError = String(error).slice(0, 240);
+  }
+  return result;
+}
+
 /** Real cast shadows, restrained highlights and reflection of the current sky.
  * It does not move astronomical bodies or simulate weather independently. */
 export class CinematicAtmosphere {
   private pipeline?: DefaultRenderingPipeline;
+  private diagnosticBloom: boolean | undefined;
+  private diagnosticCapture?: Promise<BloomDiagnostics>;
+  private cancelDiagnosticCapture?: () => void;
+  /** Ephemeral loopback QA control. It never changes saved quality preferences. */
+  setDiagnosticBloom(enabled: boolean) {
+    this.diagnosticBloom = enabled;
+    if (this.pipeline) this.pipeline.bloomEnabled = enabled;
+  }
+  /** Explicit loopback QA action: observe one naturally rendered frame, then
+   * detach every observer. Never submits/skips a frame or modifies GL state. */
+  captureDiagnostics(
+    options: { timeoutMs?: number } = {},
+  ): Promise<BloomDiagnostics> {
+    if (this.diagnosticCapture) return this.diagnosticCapture;
+    const engine = this.scene.getEngine();
+    const posts = this.camera._postProcesses
+      .filter((post): post is PostProcess => post !== null)
+      .slice(0, 8);
+    const report: BloomDiagnostics = {
+      status:
+        this.disposed || this.scene.isDisposed ? "disposed" : "no-pipeline",
+      backend: engine.isWebGPU ? "webgpu" : "webgl",
+      startedAt: Date.now(),
+      frameId: null,
+      renderSize: {
+        width: engine.getRenderWidth(),
+        height: engine.getRenderHeight(),
+      },
+      passes: posts.map((post) => ({ name: post.name })),
+    };
+    if (report.status === "disposed" || !posts.length)
+      return Promise.resolve(report);
+    const handles = new WeakMap<object, string>();
+    let handleCount = 0;
+    const identify = (value: object | null | undefined) => {
+      if (!value) return null;
+      let id = handles.get(value);
+      if (!id) {
+        id = `handle-${++handleCount}`;
+        handles.set(value, id);
+      }
+      return id;
+    };
+    let finish!: (status: BloomDiagnostics["status"]) => void;
+    const capture = new Promise<BloomDiagnostics>((resolve) => {
+      const cleanup: (() => void)[] = [];
+      let active = false,
+        completed = false;
+      finish = (status) => {
+        if (completed) return;
+        completed = true;
+        for (const remove of cleanup) remove();
+        report.status = status;
+        resolve(report);
+      };
+      const beforeScene = this.scene.onBeforeRenderObservable.add(() => {
+        if (active) return;
+        active = true;
+        report.frameId = this.scene.getFrameId();
+      });
+      cleanup.push(() =>
+        this.scene.onBeforeRenderObservable.remove(beforeScene),
+      );
+      const sceneSource = this.scene.onAfterDrawPhaseObservable.add(() => {
+        if (
+          !active ||
+          report.sceneSource ||
+          this.scene.activeCamera !== this.camera
+        )
+          return;
+        try {
+          const sourceEngine = engine as unknown as {
+            _gl?: WebGL2RenderingContext;
+            _currentRenderTarget?: {
+              width: number;
+              height: number;
+              _engine?: unknown;
+              texture?: { uniqueId: number };
+            };
+          };
+          const gl = sourceEngine._gl,
+            target = sourceEngine._currentRenderTarget;
+          const width = target?.width ?? engine.getRenderWidth(true),
+            height = target?.height ?? engine.getRenderHeight(true);
+          report.sceneSource = {
+            width,
+            height,
+            ownerEngine: target?._engine === engine,
+            textureId: target?.texture?.uniqueId ?? null,
+            matchesFirstInput:
+              !!target && (target as unknown) === posts[0].inputTexture,
+            framebuffer: gl
+              ? identify(gl.getParameter(gl.FRAMEBUFFER_BINDING))
+              : null,
+            pixels:
+              gl && !engine.isWebGPU
+                ? readBoundBloomPixels(gl, width, height)
+                : { skipped: "WebGPU readback is not part of this diagnostic" },
+          };
+        } catch (error) {
+          report.sceneSource = { readError: String(error).slice(0, 240) };
+        }
+      });
+      cleanup.push(() =>
+        this.scene.onAfterDrawPhaseObservable.remove(sceneSource),
+      );
+      posts.forEach((post, index) => {
+        const capturePass = (phase: "before" | "after") => {
+          if (!active || report.passes[index][phase]) return;
+          try {
+            report.passes[index][phase] = readPostProcessDiagnostics(
+              post,
+              this.scene,
+              identify,
+            );
+          } catch (error) {
+            report.passes[index][phase] = {
+              readError: String(error).slice(0, 240),
+            };
+          }
+        };
+        const before = post.onBeforeRenderObservable.add(() => {
+          capturePass("before");
+        });
+        const after = post.onAfterRenderObservable.add(() => {
+          capturePass("after");
+        });
+        cleanup.push(() => {
+          post.onBeforeRenderObservable.remove(before);
+          post.onAfterRenderObservable.remove(after);
+        });
+      });
+      const afterScene = this.scene.onAfterRenderObservable.add(() => {
+        if (active)
+          finish(
+            report.sceneSource &&
+              !report.sceneSource.readError &&
+              report.passes.every(
+                (pass) =>
+                  pass.before &&
+                  pass.after &&
+                  !pass.before.readError &&
+                  !pass.after.readError,
+              )
+              ? "captured"
+              : "incomplete",
+          );
+      });
+      cleanup.push(() => this.scene.onAfterRenderObservable.remove(afterScene));
+      const disposed = this.scene.onDisposeObservable.add(() =>
+        finish("disposed"),
+      );
+      cleanup.push(() => this.scene.onDisposeObservable.remove(disposed));
+      const timeoutMs = Number.isFinite(options.timeoutMs)
+        ? Math.max(1, Math.min(5000, options.timeoutMs!))
+        : 2500;
+      const timer = setTimeout(() => finish("timeout"), timeoutMs);
+      cleanup.push(() => clearTimeout(timer));
+    });
+    this.cancelDiagnosticCapture = () => finish("disposed");
+    this.diagnosticCapture = capture;
+    void capture.then(() => {
+      if (this.diagnosticCapture === capture) {
+        this.diagnosticCapture = undefined;
+        this.cancelDiagnosticCapture = undefined;
+      }
+    });
+    return capture;
+  }
   private shadow: ShadowGenerator;
   private environment: RawCubeTexture;
   private readonly reflection = new SkyReflectionSampler();
@@ -533,6 +1059,10 @@ export class CinematicAtmosphere {
       this.pipeline?.dispose();
       this.pipeline = undefined;
     } else if (!this.pipeline) {
+      // The default pipeline keeps its BloomEffect private. Identify only the
+      // extractor newly constructed by this owner in the public engine list.
+      const engine = this.scene.getEngine();
+      const existingPostProcesses = new Set(engine.postProcesses);
       this.pipeline = new DefaultRenderingPipeline(
         "cinematic campus",
         true,
@@ -554,6 +1084,11 @@ export class CinematicAtmosphere {
       this.pipeline.bloomKernel = 32;
       this.pipeline.bloomThreshold = 0.96;
       this.pipeline.bloomWeight = 0.1;
+      const extractors = engine.postProcesses.filter(post =>
+        !existingPostProcesses.has(post) && post.getEffectName() === "extractHighlights");
+      if (extractors.length !== 1)
+        throw new Error("Expected one owned Babylon 9.30 bloom extractor before preparation.");
+      installCampusBloomExtraction(extractors[0]);
       // Compile/attach the final chain once, rather than rebuilding for each
       // option above. Retain automatic updates after this initial transaction.
       this.pipeline.prepare();
@@ -659,6 +1194,7 @@ export class CinematicAtmosphere {
       this.sun.intensity,
       input.cloud,
       input.rain,
+      input.cloudOcclusionApplied,
     );
     this.shadow.setDarkness(response.darkness);
     const shadows = response.enabled && this.sun.isEnabled();
@@ -686,6 +1222,11 @@ export class CinematicAtmosphere {
       this.stats.shadowCasters = this.stats.alphaCasters = 0;
     }
     if (this.pipeline) {
+      if (
+        this.diagnosticBloom !== undefined &&
+        this.pipeline.bloomEnabled !== this.diagnosticBloom
+      )
+        this.pipeline.bloomEnabled = this.diagnosticBloom;
       const bloom = campusBloomResponse(daylight, input.rain);
       this.pipeline.bloomThreshold = bloom.threshold;
       this.pipeline.bloomWeight = bloom.weight;
@@ -727,6 +1268,7 @@ export class CinematicAtmosphere {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.cancelDiagnosticCapture?.();
     this.scene.onNewMaterialAddedObservable.remove(this.addedMaterial);
     this.scene.onMaterialRemovedObservable.remove(this.removedMaterial);
     this.pendingGlass.clear();

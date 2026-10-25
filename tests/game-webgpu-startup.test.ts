@@ -27,7 +27,7 @@ const methods = selectMembers([
   "resize",
   "updatePlayers",
   "setProfile",
-
+  "effectiveWeather",
   "applyDoorSnapshot",
 ]);
 const compiled = ts.transpileModule(
@@ -277,6 +277,7 @@ function fixture(
     frame() {},
     blur() {},
     notice() {},
+    installSkyDiagnostics() { assert.equal(game.ready, true); },
     onRendererFailure: () => failures++,
     compilationProfile: {
       snapshot: () => ({}),

@@ -84,10 +84,11 @@ void main(void) {
   float cloudOpacity=atmosphereCloudOpacity(normalize(vSkyRay));
   if (sin(altitude)+upY*angularRadius*p.y<0.0) discard;
   float disc=1.0-smoothstep(.99,1.01,radius);
-  float halo=exp(-radius*radius*.16)*.12;
+  // Compact radial support reaches exactly zero before every quad boundary.
+  float halo=exp(-radius*radius*.16)*.12*(1.0-smoothstep(4.5,6.0,radius));
   float warm=1.0-smoothstep(0.0,.28,altitude);
   vec3 color=mix(vec3(1.0,.97,.86),vec3(1.0,.67,.32),warm*.75);
-  gl_FragColor=vec4(color,max(disc,halo)*strength*(1.0-cloudOpacity));
+  gl_FragColor=vec4(color,max(disc,halo)*strength*(1.0-cloudOpacity)*(1.0-atmosphereHaze));
 }`;
 Effect.ShadersStore.strahovMoonFragmentShader = `
 precision highp float;
@@ -125,7 +126,7 @@ void main(void) {
   // In daylight the unlit lunar surface is hidden by foreground sky radiance.
   // Reveal the exact backdrop instead of painting a dark circular sky-colour guess.
   float visibleSurface=mix(1.0,smoothstep(-.006,.04,cosine),daylight);
-  gl_FragColor=vec4(color,edge*visibleSurface*strength*(1.0-cloudOpacity));
+  gl_FragColor=vec4(color,edge*visibleSurface*strength*(1.0-cloudOpacity)*(1.0-atmosphereHaze));
 }`;
 
 export class SkyWeatherController {

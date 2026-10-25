@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "weather-precipitation-renderer-20261025",
+  "title": "Improve visible precipitation with bounded reusable particle geometry",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": ["client/precipitation-renderer.ts", "tests/precipitation-renderer.test.ts", "docs/weather/precipitation-renderer-20261025.md", ".cache/weather-precipitation-renderer-20261025/", "docs/agents/handoffs/weather-precipitation-renderer-20261025.md"],
+  "acceptance": ["Research current 160 line segments and compare bounded sprites, billboards and native particle systems before implementation; cite primary runtime sources.", "Distinct soft snowflakes, compact hail, rain and drizzle with meteorological wind and no temperature-only classification; retain real source versus DEMO distinction.", "Reuse bounded buffers/materials without per-frame allocation or mesh creation; avoid screen-long wrapping streaks, maintain depth occlusion, own cleanup and portable WebGL2/WebGPU shader/material support.", "Expose a small controller API for root-owned Game integration; no invented accumulation, stationary indoor rain or new sensor claims."],
+  "verification": ["CPU geometry/classification/lifecycle tests and TypeScript; root serializes actual GPU comparison and Game integration."],
+  "notes": ["Direct delegation from latest expanded weather request; no recursive BMAD or GPU/server/fullsuite. Existing weather-particles helper remains root-owned read-only."]
+}

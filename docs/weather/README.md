@@ -26,6 +26,12 @@ Z čísel oblačnosti a větru nelze určit skutečné rozložení jednotlivých
 
 Dohlednost Open-Meteo řídí EXP mlhu podle metrické optické dráhy; mezi hodnotami mlha plynule přechází. Při absenci modelové dohlednosti nastupuje umírněný výtvarný opar. Déšť/sníh využívají doložený modelový typ srážek, nikoli samotnou teplotu; hustota a délka částic reagují na intenzitu. Chybějící typ staničních srážek má označený odhad vzhledu deště. Sněhová pokrývka se nesimuluje. [Zdrojová a cache pravidla](provider-sources.md), [světlo a mlha](atmosphere-lighting.md).
 
+Revize 24. 10. zachovává WMO kód a celý publikovaný staniční přehled `stationReadings` s rozlišením povrchových, odvozených, denních a vnitřních údajů. Denní maximum větru není aktuální náraz. Parser zvládá skutečnou chybně uzavřenou tabulku wview. [Průzkum, zdrojové hodnoty a matice stavů](conditions-20261024.md) rozlišují fakta a chybějící GPU přejímku. Mraky protínají kulové vrstvy namísto roviny s tvrdým zlomem u obzoru. Modelová mlha tlumí také kotouče, hvězdy a přímé světlo; kroupy mají krátké rychlé částice a mrholení jemnější pomalejší stopy. Mrznoucí déšť je za letu kapalný.
+
+`shared/weather-scenarios.ts` poskytuje 26 výslovně demonstračních scénářů pro všechny podporované rodiny počasí a reprezentativní intenzity. `createWeatherScenario(id)` vytváří samostatný renderový vstup s `preview`, `observedAt: null` a bez tvrzení o měření. Výběr neaktualizuje serverovou cache ani původní živý snapshot; astronomický čas se volí nezávisle. Neobsahuje domnělé živé blesky, kaluže, námrazu či sněhovou pokrývku.
+
+Přímé světlo nyní čte stejné vrstvy mraků jako kotouče: `AtmosphereSky.lightTransmission` poskytuje po `update()` opakovaně používané hodnoty `{sun,moon}`. 21bodový průměr přes skutečný kotouč používá bilineární CPU vzorkování téhož atlasu; u Měsíce se váží osvětlená část terminátoru. Jde o lokální průchod světla pro okolí kamery, nikoli celoplošnou cloud shadow mapu. `applyArtLighting` aktualizuje atmosféru jednou před světly a vrací také `sunCloudTransmission` / `moonCloudTransmission` pro QA. Scénář `cloud-breaks` ukáže přechody během minuty. Jemná scintilace mění pouze jas hvězd, ne jejich polohy ani PSF. Staniční `stationAstronomy` uchovává publikovanou fázi a čas jako výpočet; skutečný renderer dál používá přesný UTC okamžik.
+
 ## Zapojení
 
 ```ts

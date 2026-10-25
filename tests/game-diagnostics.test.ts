@@ -51,7 +51,7 @@ const members = declaration.members.filter(
       "frame",
       "updateWorldPresentation",
       "updateRenderEnvironment",
-
+      "effectiveWeather",
       "environmentProfileMetadata",
       "diagnosticContext",
       "diagnosticNetworkContext",

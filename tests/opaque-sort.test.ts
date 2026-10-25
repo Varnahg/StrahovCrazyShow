@@ -708,6 +708,7 @@ for (const isWebGPU of [false, true]) {
       skyDisposals = 0;
     const atmosphere = {
       material: skyMaterial,
+      lightTransmission: { sun: 1, moon: 1 },
       update: () => skyUpdates++,
       dispose: () => {
         skyDisposals++;

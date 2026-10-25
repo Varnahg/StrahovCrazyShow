@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "weather-cloud-light-integration-20261025",
+  "title": "Integrate cloud-driven key light and shadow response",
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "writePaths": [
+    "client/cinematic.ts",
+    "client/cinematic-art.ts",
+    "tests/cinematic-art.test.ts",
+    "tests/cinematic-atmosphere.test.ts",
+    "tests/opaque-sort.test.ts",
+    "docs/weather/cloud-light-integration-20261025.md",
+    ".cache/weather-cloud-light-integration-20261025/",
+    "docs/agents/handoffs/weather-cloud-light-integration-20261025.md"
+  ],
+  "acceptance": [
+    "Same cloud-mask transmission controls celestial disks and direct key light without double attenuation in shadow response.",
+    "Research square sky artefact via actual source/draw setup; hypotheses stay unverified until root GPU capture."
+  ],
+  "verification": [
+    "Meaningful targeted CPU regressions, preserve old fallback, no build/GPU/fullsuite without root."
+  ],
+  "notes": [
+    "Root owns Game; worker reports any necessary changed input API, no nested BMAD. All played snapshots immutable."
+  ]
+}

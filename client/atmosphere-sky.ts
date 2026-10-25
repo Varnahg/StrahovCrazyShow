@@ -15,7 +15,13 @@ import {
 } from "./atmosphere-light";
 import starCatalog from "./data/bright-stars.json";
 
-type Direction = { x: number; y: number; z: number; altitude: number };
+type Direction = {
+  x: number;
+  y: number;
+  z: number;
+  altitude: number;
+  angularDiameter?: number;
+};
 type Wind = { x: number; z: number };
 type Layers = { low: number; mid: number; high: number };
 type RGB = { r: number; g: number; b: number };
@@ -25,7 +31,11 @@ export interface AtmosphereSkyInput {
   dt?: number;
   quality?: string;
   sun: Direction;
-  moon?: Direction & { fraction?: number; distance?: number };
+  moon?: Direction & {
+    fraction?: number;
+    distance?: number;
+    brightLimbAngle?: number;
+  };
   cloud: number;
   rain: number;
   cloudLayers?: Layers;
@@ -49,20 +59,182 @@ const DAY_TOP = new Color3(0.2, 0.39, 0.65);
 const NIGHT_HORIZON = new Color3(0.045, 0.055, 0.09);
 const DAY_HORIZON = new Color3(0.69, 0.77, 0.84);
 const CLOUD_EDGE = 0.075;
-// Metre scales and ray coefficients preserve nominal layer heights.
+// Metre scales and authored AGL layer heights; not a measured cloud geometry.
 const CLOUD_SCALES = [4000, 9500, 38000] as const;
-const CLOUD_RAY_SCALES = [
-  1400 / CLOUD_SCALES[0],
-  3510 / CLOUD_SCALES[1],
-  8512 / CLOUD_SCALES[2],
-] as const;
-registerAtmosphereWgsl(CLOUD_EDGE, CLOUD_RAY_SCALES);
+const CLOUD_HEIGHTS = [1400, 3510, 8512] as const;
+const EARTH_RADIUS = 6371000;
+registerAtmosphereWgsl(CLOUD_EDGE, CLOUD_HEIGHTS, CLOUD_SCALES, EARTH_RADIUS);
+
+/** Stable positive root for an observer on Earth looking at a spherical layer.
+ * The old max(y,.085) plane projection changed scale abruptly at its cutoff
+ * and folded below the horizon. */
+export function cloudShellDistance(directionY: number, height: number) {
+  const y = Math.max(0, Math.min(1, directionY));
+  const shell = height * (2 * EARTH_RADIUS + height);
+  return (
+    shell / (Math.sqrt(EARTH_RADIUS ** 2 * y ** 2 + shell) + EARTH_RADIUS * y)
+  );
+}
+
+/** Bounded photographic haze response to model visibility. RH is not a sensor
+ * for fog; absent visibility leaves the existing authored clear-sky response. */
+export function atmosphereHaze(visibility: number | undefined) {
+  return visibility !== undefined &&
+    Number.isFinite(visibility) &&
+    visibility >= 0
+    ? 1 - smooth(200, 6000, visibility)
+    : 0;
+}
 
 /** Calibrated atlas ranks make this the requested covered fraction of a layer. */
 export function atmosphereCloudDensity(rank: number, coverage: number) {
   if (coverage <= 0) return 0;
   if (coverage >= 1) return 1;
-  return smooth(1 - coverage - CLOUD_EDGE, 1 - coverage + CLOUD_EDGE, rank);
+  const density = smooth(
+    1 - coverage - CLOUD_EDGE,
+    1 - coverage + CLOUD_EDGE,
+    rank,
+  );
+  const overcast = smooth(1 - CLOUD_EDGE, 1, coverage);
+  return (density + (1 - density) * overcast) * smooth(0, CLOUD_EDGE, coverage);
+}
+
+/** Base-level GL LINEAR/REPEAT sampling of the exact uploaded RGBA8 bytes.
+ * Coordinates address texel centres at (i + .5) / size; no GPU readback. */
+export function sampleCloudRank(
+  pixels: Uint8Array,
+  size: number,
+  u: number,
+  v: number,
+  channel: number,
+) {
+  const x = (u - Math.floor(u)) * size - 0.5,
+    y = (v - Math.floor(v)) * size - 0.5,
+    ix = Math.floor(x),
+    iy = Math.floor(y),
+    tx = x - ix,
+    ty = y - iy,
+    x0 = (ix + size) % size,
+    x1 = (x0 + 1) % size,
+    y0 = (iy + size) % size,
+    y1 = (y0 + 1) % size;
+  const a = pixels[(y0 * size + x0) * 4 + channel],
+    b = pixels[(y0 * size + x1) * 4 + channel],
+    c = pixels[(y1 * size + x0) * 4 + channel],
+    d = pixels[(y1 * size + x1) * 4 + channel];
+  return ((a + (b - a) * tx) * (1 - ty) + (c + (d - c) * tx) * ty) / 255;
+}
+
+/** Numerical irradiance sampling of the retained shader recipe. The regular
+ * disc quadrature below approximates area, while GPU minification keeps mips. */
+export class CloudLightSampler {
+  constructor(
+    private readonly pixels: Uint8Array,
+    private readonly size: number,
+    private readonly coverage: { x: number; y: number; z: number },
+    private readonly offsets: readonly { x: number; y: number }[],
+  ) {}
+
+  opacity(x: number, y: number, z: number) {
+    if (y <= 0 || this.coverage.x + this.coverage.y + this.coverage.z < 0.001)
+      return 0;
+    let transmission = 1;
+    const horizon = smooth(0, 0.025, y);
+    for (let layer = 0; layer < 3; layer++) {
+      const coverage =
+        layer === 0
+          ? this.coverage.x
+          : layer === 1
+            ? this.coverage.y
+            : this.coverage.z;
+      if (layer > 0 && coverage <= 0.001) continue;
+      const distance =
+        cloudShellDistance(y, CLOUD_HEIGHTS[layer]) / CLOUD_SCALES[layer];
+      let u = x * distance + this.offsets[layer].x,
+        v = z * distance + this.offsets[layer].y;
+      if (layer === 1) {
+        u += 0.37;
+        v += 0.11;
+      } else if (layer === 2) {
+        u = u * 0.33 + v * 0.53 + 0.16;
+        v = v * 1.42 + 0.63;
+      }
+      const density = atmosphereCloudDensity(
+        sampleCloudRank(this.pixels, this.size, u, v, layer),
+        coverage,
+      );
+      transmission *=
+        1 - density * (layer === 0 ? 1 : layer === 1 ? 0.86 : 0.65) * horizon;
+    }
+    return 1 - transmission;
+  }
+
+  /** 5×5 midpoint lattice clipped to the disc: 21 regular equal-weight points.
+   * Only scalars in the hot path, including the pole-safe tangent frame. */
+  discTransmission(
+    body: {
+      x: number;
+      y: number;
+      z: number;
+      fraction?: number;
+      brightLimbAngle?: number;
+    },
+    angularDiameter: number,
+  ) {
+    const norm = Math.hypot(body.x, body.y, body.z);
+    if (!Number.isFinite(norm) || norm < 1e-8) return 1;
+    const x = body.x / norm,
+      y = body.y / norm,
+      z = body.z / norm;
+    if (angularDiameter <= 0) return 1 - this.opacity(x, y, z);
+    const horizontal = Math.hypot(x, z),
+      rx = horizontal > 1e-8 ? -z / horizontal : 1,
+      rz = horizontal > 1e-8 ? x / horizontal : 0,
+      ux = -rz * y,
+      uy = rz * x - rx * z,
+      uz = rx * y,
+      radius = Math.tan(angularDiameter / 2);
+    const lunar = body.fraction !== undefined,
+      lightZ = 2 * clamp(body.fraction ?? 1) - 1,
+      transverse = Math.sqrt(Math.max(0, 1 - lightZ * lightZ)),
+      lightX = -Math.sin(body.brightLimbAngle ?? 0) * transverse,
+      lightY = Math.cos(body.brightLimbAngle ?? 0) * transverse;
+    let sum = 0,
+      count = 0;
+    for (let row = -2; row <= 2; row++)
+      for (let column = -2; column <= 2; column++) {
+        const a = column * 0.4,
+          b = row * 0.4;
+        if (a * a + b * b > 1) continue;
+        const dx = x + radius * (rx * a + ux * b),
+          dy = y + radius * uy * b,
+          dz = z + radius * (rz * a + uz * b),
+          length = Math.hypot(dx, dy, dz);
+        // The Moon's unlit half contributes no direct irradiance. Use the
+        // same normal/limb response as the visible lunar shader, not earthshine.
+        const cosine =
+          a * lightX + b * lightY + Math.sqrt(1 - a * a - b * b) * lightZ;
+        const weight = lunar
+          ? Math.max(cosine, 0) ** 0.32 * smooth(-0.006, 0.006, cosine)
+          : 1;
+        sum +=
+          (1 - this.opacity(dx / length, dy / length, dz / length)) * weight;
+        count += weight;
+      }
+    if (count > 1e-8) return sum / count;
+    // A sub-grid crescent can fall between regular samples. Its already tiny
+    // phase-weighted key uses the illuminated limb rather than the dark centre.
+    if (lunar && transverse > 1e-8) {
+      const a = (lightX / transverse) * 0.999,
+        b = (lightY / transverse) * 0.999,
+        dx = x + radius * (rx * a + ux * b),
+        dy = y + radius * uy * b,
+        dz = z + radius * (rz * a + uz * b),
+        length = Math.hypot(dx, dy, dz);
+      return 1 - this.opacity(dx / length, dy / length, dz / length);
+    }
+    return 1;
+  }
 }
 
 /** Rendering limits are authored for a light-polluted city, not measured sky brightness. */
@@ -98,12 +270,13 @@ export const ATMOSPHERE_CLOUD_UNIFORMS = [
   "atmosphereMidOffset",
   "atmosphereHighOffset",
   "atmosphereCloudDetail",
+  "atmosphereHaze",
 ];
 export const ATMOSPHERE_CLOUD_SAMPLERS = ["atmosphereNoise"];
 
 /** Shared by opaque sky and celestial discs: the same clouds occlude all bodies.
  * All positions are camera-relative ray directions, +X east / +Z south.
- * Three curved-horizon planar layers approximate cloud shape, not a forecast image.
+ * Three spherical layers approximate cloud shape, not a forecast image.
  */
 export const ATMOSPHERE_CLOUD_GLSL = `
 uniform sampler2D atmosphereNoise;
@@ -112,35 +285,43 @@ uniform vec2 atmosphereLowOffset;
 uniform vec2 atmosphereMidOffset;
 uniform vec2 atmosphereHighOffset;
 uniform float atmosphereCloudDetail;
+uniform float atmosphereHaze;
+vec2 atmosphereCloudUV(vec3 direction, float height, float scale) {
+  float y = max(direction.y, 0.0);
+  float shell = height * (${2 * EARTH_RADIUS}.0 + height);
+  float ry = ${EARTH_RADIUS}.0 * y;
+  float distance = shell / (sqrt(ry * ry + shell) + ry);
+  return direction.xz * distance / scale;
+}
 float atmosphereDensity(float n, float coverage) {
   if (coverage <= 0.0) return 0.0;
   if (coverage >= 1.0) return 1.0;
-  return smoothstep(1.0 - coverage - ${CLOUD_EDGE}, 1.0 - coverage + ${CLOUD_EDGE}, n);
+  float density = smoothstep(1.0 - coverage - ${CLOUD_EDGE}, 1.0 - coverage + ${CLOUD_EDGE}, n);
+  return mix(density,1.0,smoothstep(${1 - CLOUD_EDGE},1.0,coverage))*smoothstep(0.0,${CLOUD_EDGE},coverage);
 }
 vec2 atmosphereLowUV(vec3 direction) {
-  return direction.xz / max(direction.y, .085) * ${CLOUD_RAY_SCALES[0]} + atmosphereLowOffset;
+  return atmosphereCloudUV(direction, ${CLOUD_HEIGHTS[0]}.0, ${CLOUD_SCALES[0]}.0) + atmosphereLowOffset;
 }
 vec4 atmosphereCloudField(vec3 direction) {
   // Coverage is uniform. Pixel-dependent horizon rejection follows sampling so
   // implicit mip derivatives remain defined across the whole fragment quad.
   if (dot(atmosphereCoverage, vec3(1.0)) < .001) return vec4(0.0);
-  vec2 ray = direction.xz / max(direction.y, .085);
   vec4 lowNoise = texture2D(atmosphereNoise, atmosphereLowUV(direction));
   float low = atmosphereDensity(lowNoise.r, atmosphereCoverage.x);
   float mid = 0.0;
   float high = 0.0;
   if (atmosphereCoverage.y > .001) {
-    vec4 midNoise = texture2D(atmosphereNoise, ray * ${CLOUD_RAY_SCALES[1]} + atmosphereMidOffset + vec2(.37, .11));
+    vec4 midNoise = texture2D(atmosphereNoise, atmosphereCloudUV(direction, ${CLOUD_HEIGHTS[1]}.0, ${CLOUD_SCALES[1]}.0) + atmosphereMidOffset + vec2(.37, .11));
     mid = atmosphereDensity(midNoise.g, atmosphereCoverage.y) * .86;
   }
   if (atmosphereCoverage.z > .001) {
-    vec2 highPosition = ray * ${CLOUD_RAY_SCALES[2]} + atmosphereHighOffset;
+    vec2 highPosition = atmosphereCloudUV(direction, ${CLOUD_HEIGHTS[2]}.0, ${CLOUD_SCALES[2]}.0) + atmosphereHighOffset;
     vec2 cirrusRay = vec2(highPosition.x * .33 + highPosition.y * .53, highPosition.y * 1.42);
     vec4 highNoise = texture2D(atmosphereNoise, cirrusRay + vec2(.16, .63));
     high = atmosphereDensity(highNoise.b, atmosphereCoverage.z) * .65;
   }
-  if (direction.y < -.025) return vec4(0.0);
-  return vec4(vec3(low, mid, high) * smoothstep(-.025, .015, direction.y), lowNoise.r);
+  if (direction.y <= 0.0) return vec4(0.0);
+  return vec4(vec3(low, mid, high) * smoothstep(0.0, .025, direction.y), lowNoise.r);
 }
 vec3 atmosphereCloudLayers(vec3 direction) {
   return atmosphereCloudField(direction).xyz;
@@ -173,6 +354,7 @@ uniform vec3 moonDirection;
 uniform vec4 atmosphereLight;
 uniform vec3 atmosphereMood;
 uniform mat3 worldToCatalog;
+uniform vec2 atmosphereTwinkle;
 uniform sampler2D atmosphereStars;
 ${ATMOSPHERE_CLOUD_GLSL}
 void main(void) {
@@ -208,8 +390,13 @@ void main(void) {
     vec2 uv = vec2(atan(equatorial.y,equatorial.x)/6.28318530718+.5,
       asin(clamp(equatorial.z,-1.0,1.0))/3.14159265359+.5);
     vec3 starlight = texture2D(atmosphereStars,uv).rgb;
+    // Mild atmospheric scintillation: celestial-coordinate seed, no moving
+    // catalogue/PSF and no claim of a measured local turbulence spectrum.
+    float seed = dot(equatorial,vec3(17.0,43.0,29.0));
+    float amplitude = .015 + .075 * (1.0-smoothstep(.05,.8,d.y));
+    float twinkle = 1.0 + amplitude * (.6*sin(atmosphereTwinkle.x+seed)+.4*sin(atmosphereTwinkle.y+seed*1.37));
     float extinction = smoothstep(.025,.34,d.y);
-    if (d.y > 0.0) color += starlight * stars * extinction * (1.0-.55*moon*pow(towardMoon,5.0));
+    if (d.y > 0.0) color += starlight * twinkle * stars * extinction * (1.0-.55*moon*pow(towardMoon,5.0));
   }
   // Keep the uniform quality gate, but sample before cloud opacity/layer tests.
   // Fixed LOD0 would remove the authored trilinear minification at the horizon.
@@ -243,6 +430,9 @@ void main(void) {
     cloudColor = mix(cloudColor,horizonColor,horizon*.28);
     color = mix(color,cloudColor,opacity);
   }
+  // Distant sky radiance is lost in dense fog as well as the scenery. This
+  // photographic response shares the same model visibility as EXP world fog.
+  color = mix(color,horizonColor,atmosphereHaze * (.82 + .18 * horizon));
   gl_FragColor = vec4(max(color,vec3(0.0)),1.0);
 }`;
 
@@ -434,8 +624,9 @@ export function atmosphereStarPixels(
 /** The caller owns its dome mesh; this handle owns material and both GPU textures. */
 export function createAtmosphereSky(scene: Scene, quality: string) {
   const lowQuality = quality === "low";
+  const noisePixels = atmosphereNoisePixels();
   const noise = RawTexture.CreateRGBATexture(
-    atmosphereNoisePixels(),
+    noisePixels,
     256,
     256,
     scene,
@@ -479,6 +670,7 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
         "atmosphereLight",
         "atmosphereMood",
         "worldToCatalog",
+        "atmosphereTwinkle",
         ...ATMOSPHERE_CLOUD_UNIFORMS,
       ],
       samplers: ["atmosphereStars", ...ATMOSPHERE_CLOUD_SAMPLERS],
@@ -490,6 +682,8 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
   const cloudMaterials = new Set<ShaderMaterial>([material]);
   const coverage = new Vector3(),
     offsets = [new Vector2(), new Vector2(), new Vector2()];
+  const cloudLight = new CloudLightSampler(noisePixels, 256, coverage, offsets);
+  const lightTransmission = { sun: 1, moon: 1 };
   const drift = [new Vector2(), new Vector2(), new Vector2()];
   const smoothedWind = [new Vector2(), new Vector2(), new Vector2()];
   const sun = new Vector3(),
@@ -499,22 +693,26 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
   const light = new Vector4(),
     mood = new Vector3();
   const matrix = new Float32Array(9);
+  const twinkle = new Vector2();
   let previousInstant: number | undefined,
     matrixInstant = NaN,
     disposed = false,
-    cloudDetail = lowQuality ? 0 : 1;
+    cloudDetail = lowQuality ? 0 : 1,
+    haze = 0;
   const bind = (target: ShaderMaterial) => {
     target.setVector3("atmosphereCoverage", coverage);
     target.setVector2("atmosphereLowOffset", offsets[0]);
     target.setVector2("atmosphereMidOffset", offsets[1]);
     target.setVector2("atmosphereHighOffset", offsets[2]);
     target.setFloat("atmosphereCloudDetail", cloudDetail);
+    target.setFloat("atmosphereHaze", haze);
   };
   material.setTexture("atmosphereNoise", noise);
   bind(material);
   const update = (input: AtmosphereSkyInput) => {
     if (disposed) return;
     cloudDetail = (input.quality ?? quality) === "low" ? 0 : 1;
+    haze = atmosphereHaze(input.weather?.visibility);
     const visibility = atmosphereVisibility(
       input.sun.altitude,
       input.moon?.altitude ?? -1,
@@ -529,8 +727,8 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
     light.set(
       visibility.day,
       visibility.twilight,
-      visibility.moon,
-      visibility.stars,
+      visibility.moon * (1 - haze),
+      visibility.stars * (1 - haze),
     );
     mood.set(visibility.sunset, clamp(input.rain / 8), clamp(input.cloud));
     material.setVector4("atmosphereLight", light);
@@ -565,6 +763,14 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
     const reset = !Number.isFinite(dt) || Math.abs(dt) > 30;
     const elapsed = Math.max(0, Math.min(0.1, input.dt ?? (reset ? 0 : dt)));
     const response = reset ? 1 : 1 - Math.exp(-elapsed / 5);
+    // Render time keeps clouds/stars alive during a frozen astronomy preview.
+    // Modulo full phases is continuous and keeps long-running float uniforms small.
+    const animationTime = reset
+      ? (((input.instant / 1000) % 86400) + 86400) % 86400
+      : elapsed;
+    twinkle.x = ((reset ? 0 : twinkle.x) + animationTime * 3.1) % TAU;
+    twinkle.y = ((reset ? 0 : twinkle.y) + animationTime * 5.73) % TAU;
+    material.setVector2("atmosphereTwinkle", twinkle);
     coverage.x += (clamp(layers?.low ?? input.cloud) - coverage.x) * response;
     coverage.y +=
       (clamp(layers?.mid ?? input.cloud * 0.7) - coverage.y) * response;
@@ -610,6 +816,21 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
       );
     }
     previousInstant = input.instant;
+    lightTransmission.sun =
+      input.sun.y > 0
+        ? cloudLight.discTransmission(
+            input.sun,
+            input.sun.angularDiameter ?? (0.533 * Math.PI) / 180,
+          )
+        : 1;
+    lightTransmission.moon =
+      input.moon && input.moon.y > 0
+        ? cloudLight.discTransmission(
+            input.moon,
+            input.moon.angularDiameter ??
+              2 * Math.asin(1737.4 / (input.moon.distance ?? 384400)),
+          )
+        : 1;
     for (const target of cloudMaterials) bind(target);
   };
   const dispose = () => {
@@ -625,6 +846,9 @@ export function createAtmosphereSky(scene: Scene, quality: string) {
   return {
     material,
     update,
+    /** Reused values for this frame's observer, computed from the bound cloud
+     * masks. Local irradiance only, not a campus-wide cloud shadow map. */
+    lightTransmission: lightTransmission as Readonly<typeof lightTransmission>,
     /** Register once after adding shared cloud source/uniforms/sampler to a shader. */
     bindClouds(target: ShaderMaterial) {
       if (!disposed) {

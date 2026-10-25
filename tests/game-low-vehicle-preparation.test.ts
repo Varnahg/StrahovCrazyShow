@@ -1,4 +1,5 @@
 import { AuthoredLightPreparation } from "../client/authored-light-preparation";
+import { unoccludedAtmosphereFixture } from "./helpers/weather-door-render-fixture";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -58,9 +59,10 @@ const methods = declaration.members.filter(
       "prepareLightingVariants",
       "isMeshReadyForCamera",
       "updateRenderEnvironment",
+      "effectiveWeather",
     ].includes(n.name.getText(source)),
 );
-assert.equal(methods.length, 4);
+assert.equal(methods.length, 5);
 const code = ts.transpileModule(
   `class TestGame {${methods.map((n) => n.getText(source)).join("\n")}}`,
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
@@ -287,7 +289,7 @@ function fixture(
       },
     },
     skyWeather: {
-      atmosphere: { material: skyMaterial, update() {}, dispose() {} },
+      atmosphere: unoccludedAtmosphereFixture(skyMaterial),
       update({ instant }: { instant: number }) {
         return {
           sun: sunState(instant),

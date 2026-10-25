@@ -27,6 +27,7 @@ import {
 import { currentRoomCallbacks } from "./room-callbacks";
 import { DoorConnection } from "./door-connection";
 import { CAD_DOOR_DEFINITIONS, CAD_DOOR_DEFINITION_HASH } from "../shared/cad-buildings";
+import { WEATHER_SCENARIOS, isWeatherScenarioId, type WeatherScenarioId } from "../shared/weather-scenarios";
 import "./hud.css";
 import { useDialogFocus } from "./use-dialog-focus";
 import {
@@ -219,6 +220,9 @@ export function App() {
       instant: null,
     });
   const lightingPreviewRef = useRef(lightingPreview);
+  const [weatherPreview, setWeatherPreview] = useState<WeatherScenarioId | null>(null);
+  const weatherPreviewRef = useRef(weatherPreview);
+  const previewWeatherLabel = WEATHER_SCENARIOS.find(item => item.id === weatherPreview)?.label;
   const { mode: lighting, instant: previewInstant } = lightingPreview;
   const [trafficPreview, setTrafficPreview] = useState<TransitArrival | null>(
     null,
@@ -472,6 +476,11 @@ export function App() {
     setLightingPreview(selection);
     if (game.current) game.current.timeOverride = selection.instant;
   };
+  const changeWeatherPreview = (selection: WeatherScenarioId | null) => {
+    weatherPreviewRef.current = selection;
+    setWeatherPreview(selection);
+    game.current?.setWeatherPreview(selection);
+  };
   useEffect(() => () => {
     doorConnectionRef.current?.dispose();
     doorConnectionRef.current = null;
@@ -706,6 +715,7 @@ export function App() {
           return true;
         };
         if (weatherRef.current) g.setWeather(weatherRef.current);
+        g.setWeatherPreview(weatherPreviewRef.current);
         g.setQuality(quality);
         g.setTargetFps(targetFps);
         await g.start();
@@ -1265,7 +1275,12 @@ export function App() {
               {t(LIGHTING_PREVIEWS[lighting])} <span aria-hidden="true">×</span>
             </button>
           )}
-
+          {weatherPreview !== null && (
+            <button className="demo-badge" aria-label={t("Vrátit skutečné počasí")}
+              onClick={() => changeWeatherPreview(null)}>
+              DEMO · {localizeText(previewWeatherLabel)} <span aria-hidden="true">×</span>
+            </button>
+          )}
           {trafficPreview && (
             <button
               className="demo-badge"
@@ -1280,7 +1295,7 @@ export function App() {
           )}
         </div>
         <div className="top-right">
-
+          {weatherPreview !== null && <span className="small muted">{t("Údaje o skutečném počasí")}</span>}
           <HudWeather weather={weather} label={weatherLabel} />
           <span className="clock">
             {time(previewInstant ?? now)}{" "}
@@ -2503,7 +2518,7 @@ export function App() {
                     )}
                   </p>
                 )}
-
+                <WeatherPreviewControls selected={weatherPreview} onChange={changeWeatherPreview} />
                 <div className="stat-grid">
                   <div>
                     <strong>{stats?.fps || "—"}</strong>
@@ -2523,7 +2538,7 @@ export function App() {
                   {weather
                     ? formatNumber(weather.wind, { maximumFractionDigits: 1 })
                     : "—"}{" "}
-                  {t("m/s · déšť")} {formatNumber(weather?.rain || 0)} mm/h
+                  {t("m/s · srážky (vodní ekvivalent)")} {formatNumber(weather?.rain || 0)} mm/h
                 </p>
                 <p className="small muted">
                   {weather?.observedAt
@@ -2737,6 +2752,55 @@ export function App() {
       {feedbackDialog}
     </main>
   );
+}
+const WEATHER_PREVIEW_DESCRIPTIONS: Record<WeatherScenarioId, string> = {
+  clear: "Modrá obloha a dobrá dohlednost.",
+  "mainly-clear": "Pár mraků na jinak jasné obloze.",
+  "partly-cloudy": "Mraky se střídají s projasněním.",
+  "cloud-breaks": "Rychlé mraky střídavě zakrývají Slunce a Měsíc.",
+  overcast: "Souvislé mraky a měkké rozptýlené světlo.",
+  haze: "Vzdálené budovy mizí v jemném oparu.",
+  fog: "Hustá mlha zkracuje dohlednost.",
+  "rime-fog": "Mrazivá mlha s velmi malou dohledností. Povrchy nenamrzají.",
+  drizzle: "Jemné drobné kapky.",
+  "dense-drizzle": "Hustší mrholení a kratší dohlednost.",
+  "rain-light": "Řídký lehký déšť.",
+  rain: "Vytrvalý déšť pod zataženou oblohou.",
+  "rain-heavy": "Hustý déšť výrazně omezuje dohlednost.",
+  showers: "Silnější déšť pod roztrhanými mraky.",
+  "freezing-drizzle": "Drobné kapky v mrazu. Led se na zemi netvoří.",
+  "freezing-rain": "Déšť v mrazu. Led se na zemi netvoří.",
+  "snow-light": "Řídké pomalé vločky bez sněhové pokrývky.",
+  snow: "Sněhové vločky unášené větrem.",
+  "snow-heavy": "Husté sněžení s velmi krátkou dohledností.",
+  "snow-grains": "Jemné drobné sněhové částice.",
+  "snow-showers": "Sněžení pod roztrhanými mraky.",
+  mixed: "Déšť a sněhové vločky padají společně.",
+  thunderstorm: "Tmavá obloha, prudký déšť a silný vítr. Blesky nejsou součástí ukázky.",
+  hail: "Rychlé drobné kroupy bez hromadění na zemi.",
+  wind: "Silný západní vítr rozhýbe mraky a srážky.",
+  "unknown-precipitation": "Orientační déšť pro srážky bez známého druhu.",
+};
+
+export function WeatherPreviewControls({selected,onChange}:{selected:WeatherScenarioId|null;onChange:(id:WeatherScenarioId|null)=>void}) {
+  return <>
+    <label>{t("Ukázka počasí")}
+      <select value={selected ?? "real"} onChange={event => {
+        const value = event.target.value;
+        if (value === "real") onChange(null);
+        else if (isWeatherScenarioId(value)) onChange(value);
+      }}>
+        <option value="real">{t("Skutečné počasí")}</option>
+        {WEATHER_SCENARIOS.map(item => <option key={item.id} value={item.id}>{localizeText(item.label)}</option>)}
+      </select>
+    </label>
+    {selected !== null && <p className="fiction">
+      <strong>{t("DEMO · ukázka počasí")}</strong>{" "}
+      {localizeText(WEATHER_PREVIEW_DESCRIPTIONS[selected])}{" "}
+      {t("Skutečná data se dál aktualizují a najdeš je níže.")}{" "}
+      <button onClick={() => onChange(null)}>{t("Vrátit skutečné počasí")}</button>
+    </p>}
+  </>;
 }
 
 function LanguagePicker() {

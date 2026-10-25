@@ -280,6 +280,8 @@ test("actual Game disposal detaches controllers before scene teardown and is ide
       sessionDiagnostics: { event() {} },
     },
   );
+  let panelRemovals = 0;
+  context.skyDiagnosticPanel = { remove() { panelRemovals++; } };
   const door = context.guestDoors.snapshot().states[0];
   assert.ok(door);
   context.doorStates.set(door.id, door);
@@ -288,6 +290,8 @@ test("actual Game disposal detaches controllers before scene teardown and is ide
   dispose.call(context);
   assert.equal(context.startupAbort.signal.aborted, true);
   assert.deepEqual(order, ["health", "stop", "stable", "budget", "scene"]);
+  assert.equal(panelRemovals, 1);
+  assert.equal(context.skyDiagnosticPanel, undefined);
   assert.equal(context.doorStates.size, 0);
   assert.equal(context.predictionDoorRevisions.size, 0);
   assert.throws(() => context.guestDoors.snapshot(), /lifecycle/);

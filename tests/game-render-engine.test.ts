@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { Script } from "node:vm";
 import ts from "typescript";
+import type { WeatherScenarioId } from "../shared/weather-scenarios";
 
 // Execute the actual UI effect. Replace imports/GPU IO, not startup ownership.
 const source = ts.createSourceFile(
@@ -56,11 +57,11 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(
-  `(function(env) { const exports={}; const {mode,canvas,sessionDiagnostics,modeRef,loadModule,profileRef,game,lightingPreviewRef,idRef,setStats,userBenchmark,setBenchmark,benchmarkBuildIdentity,saveLocalBenchmark,setWorldSelection,notice,weatherRef,quality,targetFps,syncNetworkStage,drainAuthorities,setReady,setError,t,getRendererInfo,testImportMeta,inputBuffer}=env; ${compiled}; return runEffect(); })`,
+  `(function(env) { const exports={}; const {mode,canvas,sessionDiagnostics,modeRef,loadModule,profileRef,game,lightingPreviewRef,weatherPreviewRef,idRef,setStats,userBenchmark,setBenchmark,benchmarkBuildIdentity,saveLocalBenchmark,setWorldSelection,notice,weatherRef,quality,targetFps,syncNetworkStage,drainAuthorities,setReady,setError,t,getRendererInfo,testImportMeta,inputBuffer}=env; ${compiled}; return runEffect(); })`,
 ).runInThisContext();
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
-function fixture(options: { constructionError?: boolean; startError?: boolean; loseAfterStart?: boolean } = {}) {
+function fixture(options: { constructionError?: boolean; startError?: boolean; loseAfterStart?: boolean; weatherPreview?: WeatherScenarioId } = {}) {
   let resolveEngine!: (engine: any) => void;
   let rejectEngine!: (reason: Error) => void;
   const promise = new Promise((resolve, reject) => {
@@ -83,6 +84,7 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
   const canvas = { current: {} };
   const initialCanvas = canvas.current;
   class Game {
+    weatherPreview: WeatherScenarioId | null = null;
     onRendererFailure?: (message: string) => void;
     ready = false;
     renderHealth = { snapshot: () => ({ valid: this.ready, firstErrors: [] }) };
@@ -95,6 +97,7 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
     setLocalId() {}
     setQuality() {}
     setTargetFps() {}
+    setWeatherPreview(id: WeatherScenarioId | null) { this.weatherPreview = id; }
     async start() {
       if (options.startError) throw new Error("start failed");
       this.ready = true;
@@ -117,6 +120,7 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
     game: state,
     modeRef: { current: "menu" },
     lightingPreviewRef: { current: { instant: null } },
+    weatherPreviewRef: { current: options.weatherPreview ?? null },
     idRef: { current: "fixture" },
     sessionDiagnostics: { event: (name: string) => events.push(name) },
     loadModule: async (name: string) =>
@@ -167,11 +171,12 @@ test("cancelled UI startup disposes a late engine without constructing Game", as
   assert.deepEqual(f.errors, []);
 });
 test("UI transfers a ready engine to Game and cleanup releases it exactly once", async () => {
-  const f = fixture();
+  const f = fixture({ weatherPreview: "fog" });
   await tick();
   f.resolveEngine(f.engine);
   await tick();
   assert.deepEqual(f.stats(), { gameCount: 1, gameDisposals: 0, ready: true });
+  assert.equal(f.state.current?.weatherPreview, "fog");
   assert.ok(f.events.includes("renderer-ready"));
   assert.ok(f.events.includes("game-ready"));
   f.cleanup();
