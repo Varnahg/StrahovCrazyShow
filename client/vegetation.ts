@@ -1,16 +1,16 @@
 import { PhotographicGrass, type PhotoGrassStats } from "./photographic-grass";
-import { applyTreeCrownShading, configureTreeMaterial } from "./tree-appearance";
-import { TreeWindPlugin, type TreeWindState } from "./tree-wind";
+import { TreeRenderer } from "./tree-renderer";
+import { TreeLitter, type TreeLitterStats } from "./tree-litter";
+import type { TreeRenderStats } from "./tree-renderer";
+import type { TreeAssetFile, TreePilotOptions } from "../shared/tree-asset-types";
+import type { TreeSeasonState } from "../shared/tree-season";
 export { TreeWindPlugin } from "./tree-wind";
-import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
+export { attachAuthoredTreeMesh } from "./tree-renderer";
+export { decodeTreeRuntimeChunk } from "./tree-asset-loader";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
-import type { ShadowDepthWrapper } from "@babylonjs/core/Materials/shadowDepthWrapper";
-import { createWebGpuShadowDepthWrapper } from "./webgpu-shadow-readiness";
-import type { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
 import { Vector3, Quaternion, Matrix } from "@babylonjs/core/Maths/math.vector";
@@ -37,26 +37,14 @@ import {
   surfaceColor,
   surfaceElevation,
   type GrassPatch,
-  treeDetailLevel,
 } from "../shared/vegetation";
 import type { Vec3 } from "../shared/types";
 import { drapeTriangles, groundHeight, groundNormal } from "../shared/terrain";
 
-/** Authored buffers are tree-local in every LOD. Bootstrap glTF nodes carry
- * the historical world translation; streamed chunks carry only local buffers.
- * Discard that node transform exactly once and use the same shared root for
- * both paths, refreshing culling/shadow bounds even for frozen/late meshes. */
-export function attachAuthoredTreeMesh(mesh: Mesh, root: TransformNode) {
-  mesh.unfreezeWorldMatrix();
-  mesh.parent = root;
-  mesh.rotationQuaternion = Quaternion.Identity();
-  mesh.rotation.setAll(0);
-  mesh.scaling.setAll(1);
-  mesh.position.setAll(0);
-  mesh.computeWorldMatrix(true);
-  mesh.refreshBoundingInfo();
-  mesh.freezeWorldMatrix();
-}
+export type VegetationTreeOptions = {
+  treePilot?: TreePilotOptions;
+  treeCatalog?: TreeAssetFile;
+};
 
 function authoredSurfaceTexture(scene: Scene, color: string) {
   const base = Color3.FromHexString(color),
@@ -191,9 +179,10 @@ export type VegetationInput = {
   daylight: number;
   player: Vec3;
   quality: string;
+  season?: TreeSeasonState;
 };
-export type VegetationStats = {
-  treeInstances: number;
+export type VegetationStats = TreeRenderStats & {
+  treeLitter?: TreeLitterStats;
   mappedTrees: number;
   inferredTrees: number;
   photoInterpretedTrees: number;
@@ -201,76 +190,8 @@ export type VegetationStats = {
   grassClumps: number;
   visibleGrassTiles: number;
   visibleGrassClumps: number;
-  uniqueTreeModels?: number;
-  treeDetailCounts?: [number, number, number];
-  activeTreeTriangles?: number;
-  loadedTreeMeshes?: number;
-  pendingTreeLoads?: number;
-  bootstrapBytes?: number;
-  loadError?: string;
   photographicGrass?: PhotoGrassStats;
 };
-
-type TreeChunkAccessor = {
-  componentType: number;
-  count: number;
-  components: number;
-  byteOffset: number;
-  byteLength: number;
-};
-type TreeChunkPrimitive = {
-  name: string;
-  material: number;
-  attributes: Record<string, TreeChunkAccessor>;
-  indices: TreeChunkAccessor;
-};
-type TreeRuntimeManifest = {
-  bootstrap: string;
-  bootstrapBytes: number;
-  materialNames: string[];
-  trees: Record<string, Record<string, { url: string; bytes: number }>>;
-};
-/** Lossless attributes from the authored GLB; no triangle simplification occurs here. */
-export function decodeTreeRuntimeChunk(buffer: ArrayBuffer) {
-  const length = new DataView(buffer).getUint32(0, true);
-  if (length < 1 || length + 4 > buffer.byteLength)
-    throw new Error("Invalid tree chunk header");
-  const metadata = JSON.parse(
-    new TextDecoder().decode(new Uint8Array(buffer, 4, length)),
-  ) as {
-    version: number;
-    id: string;
-    lod: number;
-    primitives: TreeChunkPrimitive[];
-  };
-  if (metadata.version !== 1 || ![0, 1].includes(metadata.lod))
-    throw new Error("Invalid tree chunk version or LOD");
-  const read = (a: TreeChunkAccessor) => {
-    const start = 4 + length + a.byteOffset;
-    if (
-      start + a.byteLength > buffer.byteLength ||
-      a.count * a.components * (a.componentType === 5123 ? 2 : 4) !==
-        a.byteLength
-    )
-      throw new Error("Invalid tree attribute bounds");
-    return a.componentType === 5126
-      ? new Float32Array(buffer, start, a.count * a.components)
-      : a.componentType === 5123
-        ? new Uint16Array(buffer, start, a.count * a.components)
-        : new Uint32Array(buffer, start, a.count * a.components);
-  };
-  return {
-    ...metadata,
-    primitives: metadata.primitives.map((p) => ({
-      name: p.name,
-      material: p.material,
-      positions: read(p.attributes.POSITION) as Float32Array,
-      normals: read(p.attributes.NORMAL) as Float32Array,
-      uvs: read(p.attributes.TEXCOORD_0) as Float32Array,
-      indices: read(p.indices) as Uint16Array | Uint32Array,
-    })),
-  };
-}
 
 function grassSource(scene: Scene, material: PBRMaterial) {
   const mesh = new Mesh("shared curved 16-blade grass clump", scene),
@@ -329,25 +250,9 @@ export class VegetationController {
   private grassSelection?: GrassPatchSelection;
   private photographicGrass?: PhotographicGrass;
   private grassBudget = grassLod("");
-  private trees: Mesh[] = [];
-  private treeContainer?: AssetContainer;
-  private treeGroups: {
-    id: string;
-    x: number;
-    z: number;
-    root: TransformNode;
-    lods: Mesh[][];
-    active: number;
-    desired: number;
-  }[] = [];
-  private treeRuntime?: TreeRuntimeManifest;
-  private sharedTreeMaterials: PBRMaterial[] = [];
-  private loadingTrees = new Set<string>();
-  private failedTrees = new Set<string>();
-  private detailCache = new Map<string, number>();
-  private loadControllers = new Set<AbortController>();
-  private treeWind: TreeWindState = { time: 0, x: 0, z: 0 };
-  private treeShadows: ShadowDepthWrapper[] = [];
+  private readonly treeRenderer: TreeRenderer;
+  private treeLitter?: TreeLitter;
+  private preparationRevision?: { grass?: object; litter?: object };
   private sources: Mesh[] = [];
   private materials: (PBRMaterial | StandardMaterial)[] = [];
   private grassMaterial: PBRMaterial;
@@ -371,7 +276,7 @@ export class VegetationController {
   private previousQuality = "";
   private disposed = false;
 
-  constructor(private scene: Scene, options: { skipLegacyGrass?: boolean } = {}) {
+  constructor(private scene: Scene, options: VegetationTreeOptions & { skipLegacyGrass?: boolean } = {}) {
     this.grassMaterial = createGrassMaterial(scene, this.grassWind);
     this.materials.push(this.grassMaterial);
     const patches = options.skipLegacyGrass ? [] : createGrassPatches(BOUNDS, BUILDINGS, MAP.paths);
@@ -444,6 +349,7 @@ export class VegetationController {
       visibleGrassTiles: 0,
       visibleGrassClumps: 0,
     };
+    this.treeRenderer = new TreeRenderer(scene, { treePilot: options.treePilot, treeCatalog: options.treeCatalog, stats: this.stats });
   }
 
   async loadPhotographicGrass() {
@@ -458,236 +364,26 @@ export class VegetationController {
   }
 
   async loadTrees() {
-    try {
-      const response = await fetch("/models/vegetation/runtime/manifest.json");
-      if (!response.ok)
-        throw new Error("Tree runtime manifest HTTP " + response.status);
-      this.treeRuntime = (await response.json()) as TreeRuntimeManifest;
-      const container = await LoadAssetContainerAsync(
-        this.treeRuntime.bootstrap,
-        this.scene,
-      );
-      if (this.disposed || this.scene.isDisposed) {
-        container.dispose();
-        return;
-      }
-      this.treeContainer = container;
-      container.addAllToScene();
-      const groups = new Map(
-        TREES.map((tree) => {
-          const root = new TransformNode(
-            "Native source tree " + tree.osmId,
-            this.scene,
-          );
-          root.position.set(tree.x, groundHeight(tree.x, tree.z), tree.z);
-          root.metadata = {
-            sourceTreeId: tree.osmId,
-            independentlyAuthored: true,
-            terrainAnchored: true,
-            provenance: tree.provenance,
-          };
-          return [
-            tree.osmId,
-            {
-              id: tree.osmId,
-              x: tree.x,
-              z: tree.z,
-              root,
-              lods: [[], [], []] as Mesh[][],
-              active: 2,
-              desired: 2,
-            },
-          ];
-        }),
-      );
-      for (const material of container.materials) {
-        if (!(material instanceof PBRMaterial)) continue;
-        if (configureTreeMaterial(material)) {
-          new TreeWindPlugin(material, this.treeWind);
-          const wrapper = createWebGpuShadowDepthWrapper(material, this.scene);
-          material.shadowDepthWrapper = wrapper;
-          this.treeShadows.push(wrapper);
-        }
-      }
-      this.sharedTreeMaterials = this.treeRuntime.materialNames.map((name) => {
-        const material = container.materials.find(
-          (candidate) => candidate.name === name,
-        );
-        if (!(material instanceof PBRMaterial))
-          throw new Error("Missing shared tree material " + name);
-        return material;
-      });
-      for (const mesh of container.meshes) {
-        if (!(mesh instanceof Mesh) || !mesh.getTotalVertices()) continue;
-        const match = /^tree__(.+)__lod([012])__(bark|leaves)$/.exec(mesh.name);
-        const group = match ? groups.get(match[1]) : undefined;
-        if (!match || !group) {
-          mesh.setEnabled(false);
-          continue;
-        }
-        const placement = TREES.find((tree) => tree.osmId === match[1])!;
-        const lod = Number(match[2]);
-        mesh.isVisible = true;
-        mesh.isPickable = false;
-        mesh.receiveShadows = true;
-        mesh.metadata = {
-          vegetation: "tree",
-          provenance: placement.provenance,
-          osmId: placement.osmId,
-          terrainAnchored: true,
-          sourceTreeModel: match[1],
-          detailLevel: lod,
-          appearance: placement.reconstruction?.appearance,
-          shadowCaster: true,
-          depthCaster: match[3] === "leaves" ? "alpha-test" : "opaque",
-          windDeformed: match[3] === "leaves",
-        };
-        applyTreeCrownShading(mesh, placement.reconstruction);
-        mesh.setEnabled(lod === 2);
-        attachAuthoredTreeMesh(mesh, group.root);
-        group.lods[lod].push(mesh);
-        this.trees.push(mesh);
-      }
-      this.treeGroups = [...groups.values()];
-      for (const [id, group] of groups)
-        if (!group.lods[2].some((mesh) => mesh.name.endsWith("__bark")))
-          throw new Error(
-            "Clean tree pack is missing retained branch geometry for " + id,
-          );
-      this.stats.treeInstances = TREES.length;
-      this.stats.uniqueTreeModels = this.treeGroups.length;
-      this.stats.treeDetailCounts = [0, 0, this.treeGroups.length];
-      this.stats.loadedTreeMeshes = this.trees.length;
-      this.stats.bootstrapBytes = this.treeRuntime.bootstrapBytes;
-    } catch (error) {
-      this.stats.loadError =
-        error instanceof Error ? error.message : String(error);
-      console.warn("Vegetation tree asset unavailable", error);
-    }
+    await this.treeRenderer.load();
+    if (this.disposed || this.scene.isDisposed || this.treeLitter) return;
+    const materials = this.treeRenderer.litterMaterials;
+    // Baseline comparisons retain the legacy texture/load path. New ground
+    // litter borrows only the successfully loaded photographic tree maps.
+    if (!materials) return;
+    const litter = new TreeLitter(this.scene, materials);
+    try { litter.setTrees(this.treeRenderer.litterSources()); }
+    catch (error) { litter.dispose(); throw error; }
+    this.treeLitter = litter; this.stats.treeLitter = litter.stats;
   }
-
-  /** Independent tree editing refreshes frozen children and their world bounds. */
   setTreeTransform(id: string, position: Vec3, yaw = 0) {
-    const tree = this.treeGroups.find((entry) => entry.id === id);
-    if (!tree) return false;
-    tree.root.position.set(position.x, position.y, position.z);
-    tree.root.rotation.y = yaw;
-    tree.x = position.x;
-    tree.z = position.z;
-    this.refreshTreeTransform(id);
-    return true;
+    const changed = this.treeRenderer.setTreeTransform(id, position, yaw);
+    if (changed) this.treeLitter?.setTrees(this.treeRenderer.litterSources());
+    return changed;
   }
-
   refreshTreeTransform(id: string) {
-    const tree = this.treeGroups.find((entry) => entry.id === id);
-    if (!tree) return false;
-    tree.root.computeWorldMatrix(true);
-    for (const meshes of tree.lods)
-      for (const mesh of meshes) {
-        mesh.unfreezeWorldMatrix();
-        mesh.computeWorldMatrix(true);
-        mesh.refreshBoundingInfo();
-        mesh.freezeWorldMatrix();
-      }
-    return true;
-  }
-
-  private startDetailLoads() {
-    if (!this.treeRuntime || this.disposed) return;
-    const candidates = this.treeGroups
-      .filter((tree) => tree.desired < 2 && !tree.lods[tree.desired].length)
-      .sort(
-        (a, b) =>
-          Math.hypot(a.x - this.player.x, a.z - this.player.z) -
-          Math.hypot(b.x - this.player.x, b.z - this.player.z),
-      );
-    for (const tree of candidates) {
-      if (this.loadingTrees.size >= 2) break;
-      const lod = tree.desired,
-        key = tree.id + ":" + lod;
-      const asset = this.treeRuntime.trees[tree.id]?.[String(lod)];
-      if (!asset || this.loadingTrees.has(key) || this.failedTrees.has(key))
-        continue;
-      const abort = new AbortController();
-      this.loadControllers.add(abort);
-      this.loadingTrees.add(key);
-      void fetch(asset.url, { signal: abort.signal })
-        .then(async (response) => {
-          if (!response.ok)
-            throw new Error("Tree detail HTTP " + response.status);
-          const decoded = decodeTreeRuntimeChunk(await response.arrayBuffer());
-          if (decoded.id !== tree.id || decoded.lod !== lod)
-            throw new Error("Tree detail identity mismatch");
-          if (this.disposed || this.scene.isDisposed) return;
-          const placement = TREES.find((entry) => entry.osmId === tree.id)!;
-          const meshes = decoded.primitives.map((primitive) => {
-            const mesh = new Mesh(primitive.name, this.scene),
-              data = new VertexData();
-            data.positions = primitive.positions;
-            data.normals = primitive.normals;
-            data.uvs = primitive.uvs;
-            data.indices = primitive.indices;
-            data.applyToMesh(mesh);
-            mesh.material = this.sharedTreeMaterials[primitive.material];
-            mesh.isPickable = false;
-            mesh.receiveShadows = true;
-            mesh.metadata = {
-              vegetation: "tree",
-              provenance: placement.provenance,
-              osmId: tree.id,
-              terrainAnchored: true,
-              sourceTreeModel: tree.id,
-              detailLevel: lod,
-              appearance: placement.reconstruction?.appearance,
-              shadowCaster: true,
-              depthCaster: primitive.name.endsWith("__leaves")
-                ? "alpha-test"
-                : "opaque",
-              windDeformed: primitive.name.endsWith("__leaves"),
-              streamedTreeDetail: true,
-            };
-            applyTreeCrownShading(mesh, placement.reconstruction);
-            mesh.setEnabled(false);
-            attachAuthoredTreeMesh(mesh, tree.root);
-            return mesh;
-          });
-          // Far remains enabled until the complete per-tree branch + leaf pair exists.
-          tree.lods[lod] = meshes;
-          this.trees.push(...meshes);
-          this.detailCache.set(key, performance.now());
-          this.stats.loadedTreeMeshes = this.trees.length;
-        })
-        .catch((error) => {
-          if (this.disposed) return;
-          this.failedTrees.add(key);
-          this.stats.loadError =
-            error instanceof Error ? error.message : String(error);
-        })
-        .finally(() => {
-          this.loadingTrees.delete(key);
-          this.loadControllers.delete(abort);
-          this.stats.pendingTreeLoads = this.loadingTrees.size;
-        });
-    }
-    this.stats.pendingTreeLoads = this.loadingTrees.size;
-  }
-
-  private trimDetailCache() {
-    if (this.detailCache.size <= 32) return;
-    for (const [key] of [...this.detailCache].sort((a, b) => a[1] - b[1])) {
-      if (this.detailCache.size <= 32) break;
-      const split = key.lastIndexOf(":"),
-        id = key.slice(0, split),
-        lod = Number(key.slice(split + 1));
-      const tree = this.treeGroups.find((entry) => entry.id === id);
-      if (!tree || tree.active === lod || tree.desired === lod) continue;
-      const removed = new Set(tree.lods[lod]);
-      for (const mesh of removed) mesh.dispose(false, false);
-      this.trees = this.trees.filter((mesh) => !removed.has(mesh));
-      tree.lods[lod] = [];
-      this.detailCache.delete(key);
-    }
-    this.stats.loadedTreeMeshes = this.trees.length;
+    const changed = this.treeRenderer.refreshTreeTransform(id);
+    if (changed) this.treeLitter?.setTrees(this.treeRenderer.litterSources());
+    return changed;
   }
 
   update(input: VegetationInput) {
@@ -702,9 +398,8 @@ export class VegetationController {
       length > 1e-6 ? (input.wind.z / length) * speed : 0,
     );
     this.player.set(input.player.x, input.player.y, input.player.z);
-    this.treeWind.time = Number.isFinite(input.time) ? input.time : 0;
-    this.treeWind.x = this.wind.x;
-    this.treeWind.z = this.wind.z;
+    this.treeRenderer.update(input);
+    this.treeLitter?.update(input);
     const qualityChanged = this.previousQuality !== input.quality;
     if (qualityChanged) {
       this.grassBudget = grassLod(input.quality);
@@ -720,12 +415,12 @@ export class VegetationController {
     }
     const lod = this.grassBudget;
     if (this.photographicGrass) {
-      this.photographicGrass.update({time: input.time, quality: input.quality, wind: {x:this.wind.x,z:this.wind.z}, focus: input.player});
+      this.photographicGrass.update({time: input.time, quality: input.quality, wind: {x:this.wind.x,z:this.wind.z}, focus: input.player, flowerBloom: input.season?.ground.flowerBloom});
       const photo=this.photographicGrass.stats;
       this.stats.grassTiles=photo.cachedTiles;this.stats.grassClumps=photo.instances;
       this.stats.visibleGrassTiles=photo.activeTiles;this.stats.visibleGrassClumps=photo.instances;
     }
-    this.grassWind.time = this.treeWind.time;
+    this.grassWind.time = Number.isFinite(input.time) ? input.time : 0;
     this.grassWind.windX = this.wind.x;
     this.grassWind.windZ = this.wind.z;
     this.grassWind.playerX = input.player.x;
@@ -739,34 +434,6 @@ export class VegetationController {
       return;
     this.lastSelection = input.time;
     this.previousQuality = input.quality;
-    const treeCounts: [number, number, number] = [0, 0, 0];
-    let treeTriangles = 0;
-    for (const tree of this.treeGroups) {
-      tree.desired = treeDetailLevel(
-        Math.hypot(tree.x - input.player.x, tree.z - input.player.z),
-        input.quality,
-      );
-      const lod = tree.lods[tree.desired].length
-        ? tree.desired
-        : tree.desired === 0 && tree.lods[1].length
-          ? 1
-          : 2;
-      if (lod !== tree.active) {
-        for (const mesh of tree.lods[tree.active]) mesh.setEnabled(false);
-        for (const mesh of tree.lods[lod]) mesh.setEnabled(true);
-        tree.active = lod;
-      }
-      treeCounts[lod]++;
-      if (lod < 2) this.detailCache.set(tree.id + ":" + lod, performance.now());
-      treeTriangles += tree.lods[lod].reduce(
-        (n, mesh) => n + mesh.getTotalIndices() / 3,
-        0,
-      );
-    }
-    this.stats.treeDetailCounts = treeCounts;
-    this.stats.activeTreeTriangles = treeTriangles;
-    this.startDetailLoads();
-    this.trimDetailCache();
     if (this.photographicGrass) return;
     const selection = this.grassSelection!;
     if (
@@ -794,37 +461,44 @@ export class VegetationController {
   }
 
   get grassPreparationRevision(): object | undefined {
-    return this.photographicGrass?.shaderPreparationRevision;
+    const grass = this.photographicGrass?.shaderPreparationRevision, litter = this.treeLitter?.preparationRevision;
+    if (!grass && !litter) return undefined;
+    if (this.preparationRevision?.grass !== grass || this.preparationRevision?.litter !== litter)
+      this.preparationRevision = { grass, litter };
+    return this.preparationRevision;
   }
   beginGrassPreparation(): (() => void) | undefined {
     if (this.disposed || this.scene.isDisposed) return;
-    return this.photographicGrass?.beginShaderPreparation();
+    const restoreGrass = this.photographicGrass?.beginShaderPreparation();
+    let restoreLitter: (() => void) | undefined;
+    try { restoreLitter = this.treeLitter?.beginPreparation(); }
+    catch (error) { restoreGrass?.(); throw error; }
+    if (!restoreGrass && !restoreLitter) return undefined;
+    let restored = false;
+    return () => {
+      if (restored) return; restored = true;
+      try { restoreLitter?.(); } finally { restoreGrass?.(); }
+    };
   }
 
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
     this.photographicGrass?.dispose();
-    for (const abort of this.loadControllers) abort.abort();
+    this.treeLitter?.dispose();
+    this.treeRenderer.dispose();
     for (const { mesh } of this.patches) mesh.dispose(false, false);
-    for (const wrapper of this.treeShadows) wrapper.dispose();
-    this.treeContainer?.dispose();
-    for (const mesh of this.trees)
-      if (!mesh.isDisposed()) mesh.dispose(false, false);
-    for (const tree of this.treeGroups) tree.root.dispose();
     for (const source of this.sources) source.dispose(false, false);
     for (const material of this.materials) material.dispose(false, true);
     this.patches = [];
     this.grassSelection = undefined;
-    this.trees = [];
-    this.treeGroups = [];
     this.sources = [];
   }
 }
 
 /** One original tree pack, individual crowns with shared photographic materials. */
-export async function loadVegetation(scene: Scene) {
-  const controller = new VegetationController(scene, {skipLegacyGrass:true});
+export async function loadVegetation(scene: Scene, options: VegetationTreeOptions = {}) {
+  const controller = new VegetationController(scene, {...options, skipLegacyGrass:true});
   try {
     await Promise.all([controller.loadTrees(), controller.loadPhotographicGrass()]);
     return controller;

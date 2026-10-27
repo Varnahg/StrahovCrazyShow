@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-validation",
+  "title": "KEY-62: neměnné snapshoty, pipeline a integrace",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/trees-validation-20261025/",
+    "docs/verification-evidence/trees-20261025/",
+    "docs/verification.md",
+    "docs/agents/handoffs/trees-20261025-validation.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Source/assets/tests immutable snapshot před/po hash, skutečné pnpm test/build/test:integration; žádné změny hraných4179/2592.",
+    "Plná produkční Edge GPU fáze vyžaduje současně vlastní gpu claim; vedlejší3Dscény vyloučit.",
+    "Samostatné ověřené commity, review a exact-head CI/acceptance/main integrace; žádné cizí WIP."
+  ],
+  "verification": [
+    "Před startem ověřit registry a skutečné procesy; logs a failed attempts zachovat, žádný NullEngine jako GPU důkaz."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Aktivace .cache/trees-20261025/activate.ps1; veškerá nová velká data na D, node_modules junction pouze read.",
+    "Koordinátor root; modeler dočasně drží heavy-validation, tento task jej nepřebírá podle stáří. Claim až po skutečném release.",
+    "Procesní okno oddělené do trees-20261025-validation-window. Před každou další heavy operací rezervovat také tento resource-only task; vlastní evidence předána v validation handoff."
+  ]
+}

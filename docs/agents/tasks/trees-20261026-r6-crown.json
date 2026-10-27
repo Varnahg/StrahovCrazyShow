@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-r6-crown",
+  "title": "KEY-62: přirozenější prostorová koruna celého B5 s konzistentními LOD",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/trees-20261026-r6-crown/",
+    "assets/blender/vegetation/seasonal-r6-crown/",
+    "tests/tree-r6-crown.test.ts",
+    "docs/trees/20261025/r6-crown.md",
+    "docs/agents/handoffs/trees-20261026-r6-crown.md",
+    ".cache/trees-r6-crown-20261026/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Navázat na rootem prohlédnutý pilot větve3: zlepšil objem pravého ramene, ostatní dlouhá pravidelná patra zůstala. Pro celou B5 korunu připravit explicitní nepravidelnou tabulku seskupení podstromů; nekopírovat stejné tři shluky na každé rameno.",
+    "Před změnami porovnat rozumné varianty a konkrétní osy. Zachovat hlavní opěrné osy, root, collider, počet/fyzické velikosti listů, ranky, UV a materiály. Všechny přesuny musí nést celé napojené dřevo i listy a mít dohledatelnou transformaci původních dat.",
+    "Kandidát musí být konzistentní přes všechny tři existující LOD. Současný řídký FAR může zůstat označeným omezením pro navazující atlasový krok; nepřidávat nové ztráty komponent, root posuny nebo jiné ranky mezi LOD.",
+    "Samostatný editovatelný blend a source delta/osy/kotvy pro pozdější FAR join. Původní R4/R5 i R6 jednovětevní artefakty/generátory neměnit. Žádný runtime/public export nebo Game změna před přijetím nativního kandidáta.",
+    "Srovnat celou korunu i holou kostru ze shodných0°/45° pohledů; hlídat prostorové mezery, přesahy a silná křížení. Numerické důkazy, reopen a packed image provenance; nevydávat autorskou interpretaci za botanické zaměření."
+  ],
+  "verification": [
+    "Vlastní claim, Blender5.2 Cycles CPU se2threads, žádné GPU/Eevee/build/fullsuite. Root drží GPU claim a Edge je blank.",
+    "Cílené testy transformací/počtů/LOD/UV/ranků, podpory s odůvodněnou Float32 tolerancí a skutečným limitem, bounds a silné křížení s výslovnými limity auditu.",
+    "Znovu otevřít finální blend, ověřit neměnné původní objekty/maps a všechny kandidátní LOD. Handoff se SHA a ukončenými procesy, potom release."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Root explicitně přijal směr změny jedné větve, nikoli dokončení realismu celé koruny. Zachovat geometrické a materiálové experimenty odděleně.",
+    "Read-only vstupy zůstávají pod rootovými rezervacemi: původní R4/R5 a scripts/trees-20261026-r6/, assets/blender/vegetation/seasonal-r6/r6-b5-branch3-comparison.blend, .cache/trees-r6-shape-20261026/. Nová složka je disjunktní a starý experiment musí zůstat reprodukovatelný.",
+    "User preferuje realismus před přesnou kopií fotografie. Druh je neznámý, žádné nové stromy/polohy. Velká data jen naD, readonly node_modules, bez instalace nebo dalšího BMAD. Neměnný v9 server a uložené user buildy chránit.",
+    "Root prohlédl nativní léto0°/45° i kostru0° a přijímá korunu jako herní pilot; nejde o finální přijetí FAR ani celého katalogu. Předané artefakty zůstávají neměnné, runtime export je samostatný task."
+  ]
+}

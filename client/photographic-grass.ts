@@ -308,6 +308,7 @@ export class PhotographicGrass {
     quality: string;
     wind: { x: number; z: number };
     focus?: { x: number; y: number; z: number };
+    flowerBloom?: number;
   }) {
     if (this.disposed || !this.resources) return;
     const camera = this.scene.activeCamera;
@@ -319,7 +320,7 @@ export class PhotographicGrass {
       quality = qualityKey(input.quality),
       limits = CANDIDATE_GRASS_LIMITS[quality],
       time = Number.isFinite(input.time) ? input.time : 0;
-    this.flowers?.update({ time, quality, wind: input.wind, focus: input.focus });
+    this.flowers?.update({ time, quality, wind: input.wind, focus: input.focus, flowerBloom: input.flowerBloom });
     const flowerTriangles = this.flowers?.stats.triangles ?? 0,
       flowerBudgetChanged = flowerTriangles !== this.flowerBudget,
       triangleLimit = limits.triangles - flowerTriangles;

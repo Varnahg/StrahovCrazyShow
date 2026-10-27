@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-wind-oracle",
+  "title": "KEY-62: zachovat historický WGSL oracle se samostatnou identitou TreeWind",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["tests/material-defines-wgsl-order.test.ts", "docs/trees/20261025/wind-oracle.md", "docs/agents/handoffs/trees-20261026-wind-oracle.md", ".cache/trees-wind-oracle-20261026/"],
+  "resources": [],
+  "acceptance": ["Porovnat přesný historický oracle se současnou unikátní TreeWind identitou, včetně MATERIALPLUGIN příznaku a STRAHOV_TREE_WIND; neprohlásit každou změnu za povolenou.", "Původní uložený oracle ponechat beze změny. V testu explicitně vyjádřit jen doložený rozdíl identity/příznaku a ověřit všechny ostatní WGSL bytes, metadata, UBO, order/cache/lifecycle invariance.", "Pokud je odlišný skutečný shader význam, sdělit rootovi místo maskování. Refaktoring úzké transformace a relevantní CPU ověření, handoff/release."],
+  "verification": ["tests/material-defines-wgsl-order.test.ts, případně relevantní tree effect identity/vegetation WGSL tests. Bez GPU/build/fullsuite/instalace. Testové okno po rootově izolovaném autodev repro."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Frozen v9 full log ukazuje wind FAIL pouze podle prvního diffu MATERIALPLUGIN_8→9 a přidaného STRAHOV_TREE_WIND; zbytek assertions je třeba skutečně projít.", "client/tree-wind.ts ani historické fixtures nejsou write scope. Vlastní claim před zápisem a bez rekurzivního BMAD."]
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-webgpu-pipeline-diagnostics",
+  "title": "KEY-62: rozlišit WebGPU pipeline readiness timeout",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/webgpu-pipeline-preparation.ts", "tests/webgpu-pipeline-preparation.test.ts", "docs/trees/20261025/webgpu-pipeline-startup.md", "docs/agents/handoffs/trees-20261026-webgpu-pipeline-diagnostics.md", ".cache/trees-webgpu-startup-20261026/"],
+  "resources": [],
+  "acceptance": ["Bounded opt-in diagnostika skutečného startup adapteru rozliší nedokončený render, pending nebo hotové nevyzvednuté entries, descriptor skip důvody a serial; žádné extra GPU probes nebo změna readiness pravidel.", "Primární pinned zdroj, varianty a cílené lifecycle regresní testy; případná oprava pouze po doložené reprodukci ve stejném rozsahu.", "Game/UI integraci i GPU zajišťuje root. Agent nepouští Blender, build ani jinou GPU scénu."],
+  "verification": ["Přímý node tsx --test tests/webgpu-pipeline-preparation.test.ts; bounded snapshots, cleanup a konvergence keep-context nonfloat větve, pokud relevantní."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. V6 source17685d: current-on low timeout, mesh/precipitation waits0, pipeline waits112, shader/module/pipeline completions bez chyby a pending0. Výsledek není zpomalená karta.", "Před zápisem vlastní claim, handoff a release po dokončení; root převezme. Bez rekurzivního BMAD. Závislosti readonly, žádné pnpm install."]
+}

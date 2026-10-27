@@ -1,5 +1,15 @@
 /** Czech source strings are stable typed keys; English never changes content identifiers. */
 export const messages = {
+  "Používá se kompatibilní režim WebGL2.": "WebGL2 compatibility mode is in use.",
+  "Náhled ročního období": "Season preview",
+  "Vrátit skutečné roční období": "Return to the current season",
+  "Skutečné datum · regionální model": "Current date · regional model",
+  "Jaro · DEMO": "Spring · DEMO",
+  "Léto · DEMO": "Summer · DEMO",
+  "Podzim · DEMO": "Autumn · DEMO",
+  "Zima · DEMO": "Winter · DEMO",
+  "Sezónní vzhled je regionální odhad, nikoli aktuální měření stromů.": "Seasonal appearance is a regional estimate, not a current observation of these trees.",
+  "DEMO · datum pro vegetaci i oblohu je dočasně nahrazené.": "DEMO · the date for vegetation and sky is temporarily overridden.",
   "Ve dveřích někdo stojí.": "Someone is in the doorway.",
   "Ustup z prostoru dveří, aby se mohly pohnout.": "Move clear of the door so it can move.",
   "E · otevřít dveře": "E · open door",
@@ -466,6 +476,7 @@ export const messages = {
     "Map data © OpenStreetMap contributors, ODbL. Tree crowns interpreted from orthophotography: data © IPR Praha, 2024, CC BY 4.0. Moon: NASA SVS / LROC / Arizona State University. Bus model: Innerscene, CC0.",
   "Vrátit se na start": "Return to start",
   "Opustit demo": "Leave demo",
+  "Spustit v kompatibilním režimu (WebGL2)": "Start in compatibility mode (WebGL2)",
   "Měřím 10 sekund…": "Measuring for 10 seconds…",
   "Změřit FPS po dobu 10 sekund": "Measure FPS for 10 seconds",
   "Během měření se automatická kvalita nemění.":

@@ -60,10 +60,12 @@ function projectTerrainReview(value: unknown) {
   };
   return {
     version: choice(view.version, [1]),
-    id: choice(view.id, ["b6-rear-path", "b6-front-lawn", "osm-grass-control", "b6-far-context"]),
+    id: choice(view.id, ["b6-rear-path", "b6-front-lawn", "osm-grass-control", "b6-far-context", "b6-tree-near", "b5-tree-near", "b5-tree-mid", "b5-tree-far", "b5-tree-ground", "b5-tree-hero", "small-tree-close", "b6-tree-far-upper"]),
     scope: choice(view.scope, ["static-guest-start"]),
     spawnXZ: xz(view.spawnXZ),
     lookAtXZ: xz(view.lookAtXZ),
+    ...(view.targetHeight === undefined ? {} : { targetHeight: number(view.targetHeight, 0, 100) }),
+    ...(view.sourceTreeId === undefined ? {} : { sourceTreeId: choice(view.sourceTreeId, ["ipr-crown-014", "ipr-b6-north-conifer", "4314257232"]) }),
   };
 }
 function projectGpu(value: unknown) {
@@ -204,6 +206,17 @@ function projectRenderCost(value: unknown) {
       "bootstrapBytes",
       "activeTreeTriangles",
       "pendingTreeLoads",
+      "legacyTreeInstances",
+      "rankEnabledTreeInstances",
+      "treeDetailCacheEntries",
+      "treeDetailCacheBytes",
+      "treeDetailReservedBytes",
+      "treePilotGeometryBytes",
+      "treePilotSourceBytes",
+      "treePilotSeasonBytes",
+      "treeTextureSourceBytes",
+      "treeFetchedBytes",
+      "treeFetchRequests",
     ],
   };
   for (const [group, names] of Object.entries(keys))
@@ -221,6 +234,15 @@ function projectRenderCost(value: unknown) {
     result.vegetation.treeDetailCounts = triple(
       cost.vegetation.treeDetailCounts,
     );
+  if (cost.vegetation?.treeLitter) {
+    const litter = object(cost.vegetation.treeLitter);
+    result.vegetation.treeLitter = {
+      ...fields(litter, ["activePatches", "activeItems", "triangles", "cachedPatches", "cacheBytes", "generatedPatches", "pendingPatches"]),
+      ready: choice(litter.ready, [true, false]),
+      preparing: choice(litter.preparing, [true, false]),
+      supportsTwigs: choice(litter.supportsTwigs, [true, false]),
+    };
+  }
   return result;
 }
 
@@ -356,6 +378,15 @@ export function projectLocalBenchmark(value: unknown) {
   if (raw.terrainReview !== undefined) {
     result.terrainReview = projectTerrainReview(raw.terrainReview);
     if (result.terrainReview && result.avatars !== 1) throw new Error("terrain review population");
+  }
+  if (raw.treeSeason !== undefined) {
+    const season = object(raw.treeSeason), sampledAt = number(season.sampledAt, -8640000000000000, 8640000000000000), phaseDay = number(season.phaseDay, 0, 365);
+    if (!Number.isInteger(sampledAt) || phaseDay >= 365) throw new Error("tree season sample");
+    result.treeSeason = { sampledAt, source: choice(season.source, ["regional-model", "demo"]), phaseDay };
+  }
+  if (raw.treePilot !== undefined) {
+    result.treePilot = choice(raw.treePilot, ["own", "mtree"]);
+    if (!result.terrainReview) throw new Error("tree pilot requires static review");
   }
   return result;
 }

@@ -37,11 +37,12 @@ export class TreeWindPlugin extends MaterialPluginBase {
     material: PBRMaterial,
     private state: TreeWindState,
   ) {
-    super(material, "StrahovCleanTreeWind", 220, {}, true, false);
+    super(material, "StrahovCleanTreeWind", 220, { STRAHOV_TREE_WIND: true }, true, false);
     this.doNotSerialize = true;
     this.registerForExtraEvents = true;
     this._enable(true);
   }
+  override getClassName() { return "TreeWindPlugin"; }
   override isCompatible(language: ShaderLanguage) {
     return language === ShaderLanguage.GLSL || language === ShaderLanguage.WGSL;
   }

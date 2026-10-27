@@ -18,6 +18,9 @@ import {
 import { NetworkTimeline } from "../client/network-timeline";
 import { readWebGpuMainPassTiming } from "../client/gpu-diagnostics";
 import { createEnvironmentProfile, type EnvironmentProfileSnapshot } from "../client/environment-profile";
+import { getTreeSeasonState } from "../shared/tree-season";
+import { sunState, moonState } from "../shared/weather";
+import type { VegetationInput } from "../client/vegetation";
 import { writeQuaternion, writeVector3 } from "../client/transform-updates";
 import {
   snapshotTransportDiagnostics,
@@ -86,7 +89,7 @@ const compiled = ts.transpileModule(
 // Same-realm object literals exercise the real sanitizer's plain-object policy.
 const script = new Script(`(function(environment) {
   const { exports, Vector3, Quaternion, writeQuaternion, writeVector3, performance, document, window,
-    testImportMeta, sessionDiagnostics, vehicleCameraCanFollow, zoneAt, applyArtLighting, snapshotTransportDiagnostics, snapshotTimelineDiagnostics, readWebGpuMainPassTiming } = environment;
+    testImportMeta, sessionDiagnostics, vehicleCameraCanFollow, zoneAt, applyArtLighting, getTreeSeasonState, snapshotTransportDiagnostics, snapshotTimelineDiagnostics, readWebGpuMainPassTiming } = environment;
   ${compiled}
   return FrameGame;
 })`);
@@ -138,6 +141,7 @@ function fixture(hostname = "localhost") {
     snapshotTransportDiagnostics,
     snapshotTimelineDiagnostics,
     readWebGpuMainPassTiming,
+    getTreeSeasonState,
     performance: { now: () => clock++ },
     document: { hidden: false, removeEventListener() {} },
     window: { devicePixelRatio: 1, removeEventListener() {} },
@@ -188,6 +192,7 @@ function fixture(hostname = "localhost") {
       update: () => ({}),
     },
     quality: "medium",
+    timeOverride: null,
     applyAdaptiveQuality() {},
     stableLights: { update() {}, dispose() {} },
     gltfLightBudget: { prepareFrame() {}, dispose() {} },
@@ -307,6 +312,39 @@ test("actual environment update attributes synchronous work and reports metadata
     quality: "medium", lightingInstant: 1234, daylight: 1,
     previousExposure: 0.75, exposure: 0.8, meshCount: 2, materialCount: 1,
   });
+});
+
+test("actual Game shares one UTC instant across sky and vegetation for real, demo, preparation and restored real time", t => {
+  const f=fixture();t.after(()=>f.recorder.dispose());
+  let now=Date.UTC(2028,1,29,23,59,45,321),clockCalls=0;
+  t.mock.method(Date,"now",()=>{clockCalls++;return now;});
+  const skySamples:number[]=[],vegetationInputs:VegetationInput[]=[];
+  f.game.skyWeather.update=({instant}:{instant:number})=>{
+    skySamples.push(instant);return {sun:sunState(instant),moon:moonState(instant),wind:{x:2,z:-1}};
+  };
+  f.game.vegetation={update:(input:VegetationInput)=>vegetationInputs.push(input)};
+  const pos={x:0,y:1,z:2};
+  const check=(instant:number,source:"regional-model"|"demo")=>{
+    assert.equal(skySamples.at(-1),instant);
+    const input=vegetationInputs.at(-1)!;
+    assert.equal(input.season,getTreeSeasonState(instant,source),"real immutable shared model, not a copied/stub season");
+    assert.equal(input.season!.source,source);assert.equal(input.season!.sampledAt,Math.floor(instant/60000)*60000);
+    assert.equal(input.daylight,sunState(instant).daylight);assert.equal(input.player,pos);
+    assert.deepEqual(input.wind,{x:2,z:-1,speed:Math.sqrt(5)});
+  };
+  assert.equal(f.game.timeOverride,null,"fixture mirrors the actual constructor default");
+  f.game.updateRenderEnvironment(pos,undefined,false,.016,12);check(now,"regional-model");assert.equal(clockCalls,1);
+  const leapSample=vegetationInputs.at(-1)!.season;
+  now=Date.UTC(2028,2,1,0,0,15,777);
+  f.game.updateRenderEnvironment(pos,undefined,false,.016,13);check(now,"regional-model");assert.notEqual(vegetationInputs.at(-1)!.season,leapSample);
+  const demo=Date.UTC(2026,9,20,10,0,18,456);f.game.timeOverride=demo;
+  const beforeDemoClockCalls=clockCalls;
+  f.game.updateRenderEnvironment(pos,undefined,false,.016,14);check(demo,"demo");assert.equal(clockCalls,beforeDemoClockCalls,"fixed preview never consults the wall clock");
+  const preparing=Date.UTC(2026,9,20,22,0,31,999);
+  f.game.updateRenderEnvironment(pos,undefined,false,0,15,preparing);check(preparing,"demo");assert.equal(f.game.timeOverride,demo,"preparation samples cannot overwrite the user's selected preview");
+  f.game.timeOverride=null;now=Date.UTC(2028,2,1,0,1,2,345);
+  f.game.updateRenderEnvironment(pos,undefined,false,.016,16);check(now,"regional-model");
+  assert.equal(skySamples.length,5);assert.equal(vegetationInputs.length,5);
 });
 
 test("actual production Game.frame automatically records intervals, six phases and only fresh GPU samples", async (t) => {

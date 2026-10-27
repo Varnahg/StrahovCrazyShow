@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-runtime",
+  "title": "KEY-62: načítání stromů, sezónní geometrie a materiály",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/vegetation.ts",
+    "tests/vegetation.test.ts",
+    "tests/vegetation-runtime.test.ts",
+    "docs/trees/20261025/runtime.md",
+    "docs/agents/handoffs/trees-20261025-runtime.md",
+    ".cache/trees-runtime-20261025/",
+    "shared/data/assets/tree-bark-material.json"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Před integrací převzít přesný geometry-only GLB/rank contract a skutečné pilotní assety; žádné změny modelářových vstupů či výstupů.",
+    "Celé leaf/twig komponenty se stálým uint16 rank a shodnými pravidly mezi LOD; skutečný index subset a nulové foliage při zimě i po late load. Material.alpha=1, hasVertexAlpha=false pro rank channel.",
+    "Vlastní stabilní shader identity, GLSL/WGSL, fotografie v sRGB a data linear, opacita a normály ověřené. Autorské lokální normály nových modelů nesmí automaticky přepsat starý crown proxy.",
+    "Centralizované load/LOD/season aktivace, abort/cleanup částečných výsledků, rozumná sdílená geometrie a mapy, explicitní paměť/cache metriky. Původní terrain/grass chování zachovat.",
+    "Opad na terénu deterministický a bounded dle korun, výšek a výluk; vlastní rozpočet/retence a stejná sezónní data. Žádné per-frame generování celé scény."
+  ],
+  "verification": [
+    "Lehké cílené CPU/materiálové/shaderové/lifecycle testy nad skutečnými daty a meaningful edge cases.",
+    "Těžké pipeline a Edge přejímka mají samostatnou rezervaci. Žádné přepsání4179 či2592."
+  ],
+  "notes": [
+    "Root implementátor/integrátor STROMY-20261025 po výzkumu a konceptu; nová branch zmain8516c7b1 ve stejné čisté D worktree.",
+    "Material a model tasks jsou disjunktní. Sdílené Game/UI a sezónní pure API patří samostatným úkolům, jejich změnu do tohoto scope nepřidávat bez koordinace.",
+    "Spec _bmad-output/implementation-artifacts/trees-20261025/spec-key-62-stromy.md. Aktivace .cache/trees-20261025/activate.ps1; dependency junction jen číst.",
+    "Koordinátor před prvním produktovým zápisem uvolnil původní široký runtime scope. Tento task nyní patří autorovi loaderu; seasonal geometry/material/wind jsou v odděleném trees-20261025-season-rendering, Game/UI/litter/ground hooks v root integration tasku.",
+    "Root následné vlastní opravy a source metadata adapter viz runtime handoff; immutable R4 modelové vstupy beze změny.",
+    "Čtyři vlastněné WIP soubory předány trees-20261025-streaming; konkrétní převod v runtime handoff. Vegetation a borrowed-resource integration zůstává rootovi."
+  ]
+}

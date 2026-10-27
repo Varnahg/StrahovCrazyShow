@@ -11,6 +11,33 @@ type Identity = {
   vertexEntry: unknown; fragmentEntry: unknown; device: Host;
 };
 type Entry = { token?: object; identity?: Identity; pending: boolean; pipeline?: unknown };
+type SkipReason = "pending-entry" | "capacity" | "descriptor-disabled" | "descriptor-token" | "descriptor-identity";
+type LastSkip = {
+  reason: SkipReason; effectId: number | null; effectName: string | null; identityChanges: string[];
+};
+type DiagnosticCounters = {
+  renders: { total: number; complete: number; incomplete: number };
+  readiness: { checks: number; waits: number; lastResult: boolean | null };
+  skips: Record<SkipReason, number>;
+  retirements: { invalidIdentity: number; disabled: number; unusedReady: number };
+  lastSkip: LastSkip | null;
+};
+export type WebGpuPipelinePreparationSnapshot = DiagnosticCounters & {
+  active: boolean; inert: boolean; disposed: boolean; faulted: boolean;
+  completionSerial: number; provenSerial: number; lastRenderComplete: boolean;
+  entries: { total: number; pending: number; ready: number };
+  work: { total: number; pending: number; retiredPending: number };
+};
+
+function increment<T extends string>(counters: Record<T, number>, key: T) {
+  counters[key] = Math.min(Number.MAX_SAFE_INTEGER, counters[key] + 1);
+}
+function ownValue(target: object, key: string): unknown {
+  try {
+    const descriptor = Object.getOwnPropertyDescriptor(target, key);
+    return descriptor && "value" in descriptor ? descriptor.value : undefined;
+  } catch { return undefined; } // Diagnostics cannot replace the guarded draw outcome.
+}
 
 export type WebGpuPipelinePreparationOptions = {
   signal?: AbortSignal;
@@ -19,6 +46,8 @@ export type WebGpuPipelinePreparationOptions = {
   retryIncompleteFrame?: () => void;
   /** Bounds outstanding work AND completed results, not just pending Promises. */
   maxEntries?: number;
+  /** Bounded local QA evidence only; adds no GPU/readiness probes. */
+  diagnostics?: boolean;
 };
 const owners = new WeakMap<object, WebGpuPipelinePreparation>();
 
@@ -57,6 +86,7 @@ export class WebGpuPipelinePreparation {
   private work = new Set<Entry>();
   private readonly pendingSignal = {};
   private readonly limit: number;
+  private readonly compatibilityMode: boolean | undefined;
   private retry?: () => void;
   private active = false;
   private inert = false;
@@ -69,12 +99,21 @@ export class WebGpuPipelinePreparation {
   private provenSerial = -1;
   private hasFault = false;
   private fault: unknown;
+  private readonly diagnostics?: DiagnosticCounters;
 
   constructor(engine: object, options: WebGpuPipelinePreparationOptions = {}) {
+    if (options.diagnostics) this.diagnostics = {
+      renders: { total: 0, complete: 0, incomplete: 0 },
+      readiness: { checks: 0, waits: 0, lastResult: null },
+      skips: { "pending-entry": 0, capacity: 0, "descriptor-disabled": 0, "descriptor-token": 0, "descriptor-identity": 0 },
+      retirements: { invalidIdentity: 0, disabled: 0, unusedReady: 0 },
+      lastSkip: null,
+    };
     this.limit = Math.min(64, Math.max(1, Math.floor(options.maxEntries ?? 64) || 1));
     this.retry = options.retryIncompleteFrame;
     const host = engine as Host;
-    this.inert = host.isWebGPU !== true || host.compatibilityMode !== true || host.snapshotRendering !== false;
+    this.compatibilityMode = typeof host.compatibilityMode === "boolean" ? host.compatibilityMode : undefined;
+    this.inert = host.isWebGPU !== true || this.compatibilityMode === undefined || host.snapshotRendering !== false;
     if (options.signal?.aborted) { this.disposed = true; return; }
     if (this.inert) return;
     if (owners.has(engine)) throw new Error("WebGPU startup pipeline preparation already has an owner.");
@@ -129,7 +168,11 @@ export class WebGpuPipelinePreparation {
     this.install(target, name, (original) => {
       const owner = this;
       return function (this: Host, ...args: unknown[]) {
-        if (!owner.active || !owner.rendering || this !== target || (name === "clear" && !args[0]))
+        // NCM clearQuad receives no render pass and returns a cached bundle.
+        // A pending miss exits before finish/cache insertion. The native caller
+        // accepts the empty bundle and still restores its stencil reference.
+        if (!owner.active || !owner.rendering || this !== target ||
+            (name === "clear" && !args[0] && owner.compatibilityMode !== false))
           return original.apply(this, args);
         owner.check();
         const previous = owner.boundary;
@@ -147,7 +190,7 @@ export class WebGpuPipelinePreparation {
     if (this.hasFault) throw this.fault;
     const e = this.engine;
     if (!this.active || !e || e.isDisposed === true || e._isDisposed === true ||
-        e.compatibilityMode !== true || e.snapshotRendering !== false || e._device !== this.device ||
+        e.compatibilityMode !== this.compatibilityMode || e.snapshotRendering !== false || e._device !== this.device ||
         e._cacheRenderPipeline !== this.mainCache || e._clearQuad !== this.clear ||
         this.clear?._cacheRenderPipeline !== this.clearCache ||
         this.mainCache?._device !== this.device || this.clearCache?._device !== this.device ||
@@ -158,7 +201,8 @@ export class WebGpuPipelinePreparation {
     }
   }
 
-  private retire(entry: Entry) {
+  private retire(entry: Entry, reason?: keyof DiagnosticCounters["retirements"]) {
+    if (reason && this.diagnostics) increment(this.diagnostics.retirements, reason);
     const bucket = entry.token && this.entries.get(entry.token);
     if (bucket && entry.identity && bucket.get(entry.identity.cache) === entry) {
       bucket.delete(entry.identity.cache);
@@ -171,14 +215,35 @@ export class WebGpuPipelinePreparation {
   private prune() {
     for (const entry of this.records()) {
       const own = entry.identity!;
-      if (own.cache.disabled || !sameIdentity(own, identity(own.cache, own.effect, this.device!))) {
-        this.retire(entry); this.completionSerial++; this.lastComplete = false; this.incomplete = true;
+      const disabled = own.cache.disabled;
+      if (disabled || !sameIdentity(own, identity(own.cache, own.effect, this.device!))) {
+        this.retire(entry, disabled ? "disabled" : "invalidIdentity");
+        this.completionSerial++; this.lastComplete = false; this.incomplete = true;
       }
     }
   }
 
   private *records(): Generator<Entry> {
     for (const bucket of this.entries.values()) yield* bucket.values();
+  }
+
+  private recordSkip(reason: SkipReason, effect: Host, before?: Identity, after?: Identity) {
+    const diagnostics = this.diagnostics;
+    if (!diagnostics) return;
+    increment(diagnostics.skips, reason);
+    const id = ownValue(effect, "uniqueId"), name = ownValue(effect, "name");
+    const vertexName = name && typeof name === "object" ? ownValue(name, "vertex") : undefined;
+    const effectName = typeof name === "string" ? name : typeof vertexName === "string" ? vertexName : null;
+    const last = diagnostics.lastSkip ??= { reason, effectId: null, effectName: null, identityChanges: [] };
+    last.reason = reason;
+    last.effectId = typeof id === "number" && Number.isSafeInteger(id) ? id : null;
+    last.effectName = effectName?.slice(0, 120) ?? null;
+    last.identityChanges.length = 0;
+    if (before) {
+      if (!after) last.identityChanges.push("missing");
+      else for (const key in before)
+        if (before[key as keyof Identity] !== after[key as keyof Identity]) last.identityChanges.push(key);
+    }
   }
 
   private prepare(cache: Host, effect: Host, topology: unknown, samples: number): unknown {
@@ -194,19 +259,24 @@ export class WebGpuPipelinePreparation {
       this.fail(error); throw error;
     }
     let entry = this.entries.get(token)?.get(cache);
-    if (entry && !sameIdentity(entry.identity!, current)) { this.retire(entry); entry = undefined; }
+    if (entry && !sameIdentity(entry.identity!, current)) { this.retire(entry, "invalidIdentity"); entry = undefined; }
     if (entry?.pipeline !== undefined) {
       const pipeline = entry.pipeline;
       this.retire(entry);
       return pipeline; // Original getRenderPipeline owns insertion and counters.
     }
     this.incomplete = true;
-    if (entry || this.work.size >= this.limit) throw this.pendingSignal;
+    if (entry) { this.recordSkip("pending-entry", effect); throw this.pendingSignal; }
+    if (this.work.size >= this.limit) { this.recordSkip("capacity", effect); throw this.pendingSignal; }
     const descriptor = cache._buildRenderPipelineDescriptor(effect, topology, samples);
     this.check();
     // Native non-float vertex checks may reprocess an Effect during construction.
-    if (cache.disabled || cache._parameter.token !== token ||
-        !sameIdentity(current, identity(cache, effect, this.device!))) throw this.pendingSignal;
+    if (cache.disabled) { this.recordSkip("descriptor-disabled", effect); throw this.pendingSignal; }
+    if (cache._parameter.token !== token) { this.recordSkip("descriptor-token", effect); throw this.pendingSignal; }
+    const afterDescriptor = identity(cache, effect, this.device!);
+    if (!sameIdentity(current, afterDescriptor)) {
+      this.recordSkip("descriptor-identity", effect, current, afterDescriptor); throw this.pendingSignal;
+    }
     entry = { token, identity: current, pending: true };
     let bucket = this.entries.get(token);
     if (!bucket) this.entries.set(token, bucket = new Map());
@@ -224,7 +294,7 @@ export class WebGpuPipelinePreparation {
         this.check();
         const own = owned.identity;
         if (!sameIdentity(own, identity(own.cache, own.effect, this.device!))) {
-          this.retire(owned); return;
+          this.retire(owned, "invalidIdentity"); return;
         }
         if (pipeline == null) throw new Error("WebGPU async pipeline returned no pipeline.");
         owned.pipeline = pipeline;
@@ -245,6 +315,7 @@ export class WebGpuPipelinePreparation {
     if (this.inert) { callback(); return true; }
     this.check();
     if (this.rendering) throw new Error("Nested startup preparation render is unsupported.");
+    if (this.diagnostics) increment(this.diagnostics.renders, "total");
     this.incomplete = false; this.lastComplete = false;
     this.prune();
     let ready = false;
@@ -265,21 +336,58 @@ export class WebGpuPipelinePreparation {
       // set of inactive results could starve newly visible pipelines forever.
       // Discarding is not acceptance: pending/misses/serial still gate readiness.
       if (ready && this.retry)
-        for (const entry of this.records()) if (!entry.pending) this.retire(entry);
+        for (const entry of this.records()) if (!entry.pending) this.retire(entry, "unusedReady");
       if (this.lastComplete && serial === this.completionSerial && !this.pending()) {
         if (!this.entries.size) this.provenSerial = serial;
       }
-    } finally { this.rendering = false; this.boundary = undefined; }
+    } finally {
+      this.rendering = false; this.boundary = undefined;
+      if (this.diagnostics) increment(this.diagnostics.renders, this.lastComplete ? "complete" : "incomplete");
+    }
     if (!this.lastComplete) this.retry?.();
     return this.lastComplete;
   }
 
   isReady(): boolean {
     if (this.hasFault) throw this.fault;
-    if (this.disposed) return false;
-    if (this.inert) return true;
+    if (this.disposed) return this.recordReadiness(false);
+    if (this.inert) return this.recordReadiness(true);
     this.check(); this.prune();
-    return this.lastComplete && this.provenSerial === this.completionSerial && this.work.size === 0;
+    return this.recordReadiness(this.lastComplete && this.provenSerial === this.completionSerial && this.work.size === 0);
+  }
+
+  private recordReadiness(ready: boolean): boolean {
+    if (this.diagnostics) {
+      increment(this.diagnostics.readiness, "checks");
+      if (!ready) increment(this.diagnostics.readiness, "waits");
+      this.diagnostics.readiness.lastResult = ready;
+    }
+    return ready;
+  }
+
+  /** Copies current bookkeeping only. In particular, this must not prune stale
+   * entries or call isReady: observation cannot advance or validate preparation. */
+  snapshot(): WebGpuPipelinePreparationSnapshot | null {
+    const d = this.diagnostics;
+    if (!d) return null;
+    const entries = { total: 0, pending: 0, ready: 0 };
+    for (const entry of this.records()) {
+      entries.total++;
+      if (entry.pending) entries.pending++;
+      if (entry.pipeline !== undefined) entries.ready++;
+    }
+    const work = { total: this.work.size, pending: 0, retiredPending: 0 };
+    for (const entry of this.work) if (entry.pending) {
+      work.pending++;
+      if (!entry.identity) work.retiredPending++;
+    }
+    return {
+      active: this.active, inert: this.inert, disposed: this.disposed, faulted: this.hasFault,
+      completionSerial: this.completionSerial, provenSerial: this.provenSerial,
+      lastRenderComplete: this.lastComplete, entries, work,
+      renders: { ...d.renders }, readiness: { ...d.readiness }, skips: { ...d.skips }, retirements: { ...d.retirements },
+      lastSkip: d.lastSkip && { ...d.lastSkip, identityChanges: [...d.lastSkip.identityChanges] },
+    };
   }
 
   private pending(): boolean {

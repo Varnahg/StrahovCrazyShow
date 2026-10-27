@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-bundle-parity",
+  "title": "KEY-62: prokázat a připravit korektní změnu indexového rozsahu ve WebGPU NCM",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/tree-draw-cache.ts", "tests/tree-bundle-parity.test.ts", "docs/trees/20261025/bundle-parity.md", "docs/agents/handoffs/trees-20261026-bundle-parity.md", ".cache/trees-bundle-parity-20261026/"],
+  "resources": [],
+  "acceptance": ["Nejdříve skutečný pinned CPU repro běžného NCM draw bundle po změně subMesh.indexCount; samotná metadata triangles nejsou důkaz nového draw count. Zahrnout počáteční částečné olistění→plné, nejen plné→částečné, které může shader discard vizuálně zakrýt.", "Prozkoumat main i ShadowDepthWrapper draw contexts a jejich vlastnictví. Připravit úzký helper jen pokud je příčina doložená; zachovat Effect/material/textures a nevynucovat nové kompilace nebo globální wipe cache.", "Helper se smí použít pouze při skutečné změně indexového rozsahu a jen v relevantním WebGPU režimu. Stávající CM/WebGL chování a nulové množství/hidden mesh lifecycle musí zůstat korektní.", "Neprovádět nové GPU probes, browser, změnu defaultu na fast ani úpravu node_modules. Zapojení do stávající tree-season-geometry.ts vlastní root; pošlete mu přesný návrh API a podmínky.", "Přenosné malé regrese přes skutečné pinned třídy s explicitním fake GPU IO, cleanup/shared owner/late dispose a konstantní paměť; žádná tvrzení o reálném GPU obrazu/FPS před přejímkou."],
+  "verification": ["Pouze lehké cílené CPU testy a syntax/types vlastních souborů; root/modeler nyní drží heavy/GPU, žádné build/fullsuite/integrace/Blender ani zátěž.", "Čtecí porovnání veřejného resetDrawCache proti úzkému drawContext resetu a shadow aliasům; případný private pinned adapter musí mít přesné verze/guards a coverage, nesmí vytvářet nové shadow aliasy pouhým pozorováním."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Současná výchozí WebGPU CM je funkční; fast zůstává explicitní lokální experiment. Tento krok připravuje paritu, nerozhoduje o defaultu.", "Čtecí hypotéza: applyTreeSeasonGeometry mění pouze indexStart/indexCount; fastBundle může ponechat starý drawIndexed count. mesh.resetDrawCache ničí Effect a nemusí pokrýt privátní ShadowDepthWrapper aliases, proto nevolit slepě nejširší reset.", "Root drží client/tree-season-geometry.ts a stávající testy; nové soubory tohoto tasku jsou disjunktní. Vlastní claim, read-only dependencies, žádný další BMAD, handoff/release."]
+}

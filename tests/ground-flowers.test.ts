@@ -115,6 +115,41 @@ test("actual thin batches stay bounded across tiers and stable views do not uplo
   assert.equal(f.scene.materials.length, materialCount); assert.equal(f.scene.textures.length, textureCount);
 });
 
+test("seasonal bloom removes and restores the same world roots without recreating resources", async t => {
+  const f = fixture(t); await f.flowers.ready;
+  const internal = f.flowers as any;
+  const frame = (time: number, flowerBloom: number) => f.flowers.update({
+    time, quality: "medium", wind: { x: 3, z: -2 },
+    focus: { x: f.x, y: f.y, z: f.z }, flowerBloom,
+  });
+  for (let i = 0; i < 30; i++) f.frame(i * .1);
+  const roots = () => [...internal.roots.values()].map((r: any) => [r.id, r.x, r.y, r.z]).sort((a, b) => a[0] - b[0]);
+  const summer = roots(); assert.ok(summer.length > 0);
+  const materialCount = f.scene.materials.length, textureCount = f.scene.textures.length;
+  let uploads = 0;
+  for (const batch of internal.batches.values()) {
+    const update = batch.mesh.thinInstanceBufferUpdated.bind(batch.mesh);
+    batch.mesh.thinInstanceBufferUpdated = (...args: [string]) => { uploads++; return update(...args); };
+  }
+  f.frame(4);
+  const select = t.mock.method(internal, "select");
+  frame(4.01, 0);
+  assert.equal(select.mock.callCount(), 1, "season change cannot be consumed inside the movement cadence");
+  for (let i = 0; i < 30; i++) frame(4.05 + i * .1, 0);
+  assert.equal(f.flowers.stats.instances, 0); assert.equal(f.flowers.stats.triangles, 0);
+  assert.equal(f.flowers.stats.draws, 0); assert.equal(f.flowers.stats.preparing, false);
+  assert.ok([...internal.batches.values()].every((b: any) => b.mesh.thinInstanceCount === 0));
+  const settledUploads = uploads;
+  for (let i = 0; i < 20; i++) frame(7 + i * .04, 0);
+  assert.equal(uploads, settledUploads, "stable winter does not repeatedly upload empty batches");
+  for (let i = 0; i < 30; i++) frame(8 + i * .1, .35);
+  assert.ok(f.flowers.stats.instances > 0);
+  assert.ok([...internal.roots.values()].every((r: any) => r.seed < .35), "spring uses a stable world cohort");
+  for (let i = 0; i < 30; i++) frame(11 + i * .1, 1);
+  assert.deepEqual(roots(), summer, "returning season restores placement instead of rerolling it");
+  assert.equal(f.scene.materials.length, materialCount); assert.equal(f.scene.textures.length, textureCount);
+});
+
 test("grass and flower transitions share the existing whole vegetation triangle cap", async t => {
   t.mock.method(performance, "now", () => 0);
   const f = fixture(t); await f.flowers.ready;
@@ -125,7 +160,8 @@ test("grass and flower transitions share the existing whole vegetation triangle 
   try {
     for (let i = 0; i < 160; i++) {
       const quality = i < 80 ? "high" : "low";
-      grass.update({ time: i * .03, quality, wind: { x: 0, z: 0 }, focus: { x: f.x, y: f.y, z: f.z } });
+      grass.update({ time: i * .03, quality, wind: { x: 0, z: 0 }, focus: { x: f.x, y: f.y, z: f.z }, flowerBloom: i >= 30 && i < 80 ? 0 : 1 });
+      if (i === 79) assert.equal(f.flowers.stats.triangles, 0, "winter must release the real companion budget through PhotographicGrass");
       const actual = f.scene.meshes.filter(m => m.isEnabled() && m.isVisible && (m.metadata?.groundFlowers || m.metadata?.photographicGrass))
         .reduce((n, m) => n + m.getTotalIndices() / 3 * (m as import("@babylonjs/core/Meshes/mesh").Mesh).thinInstanceCount, 0);
       assert.equal(grass.stats.triangles, actual); assert.ok(actual <= CANDIDATE_GRASS_LIMITS[quality].triangles);

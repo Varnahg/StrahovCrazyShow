@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-r5-bake",
+  "title": "KEY-62: výpočetní okno a nové nativní R5 výstupy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "assets/blender/vegetation/seasonal-r5/",
+    "public/models/vegetation/seasonal-r5/",
+    "public/textures/trees/20261025-r5/",
+    "shared/data/assets/tree-r5-materials-manifest.json",
+    "docs/agents/handoffs/trees-20261025-r5-bake.md",
+    ".cache/trees-r5-bake-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Blender pouzeCPU s omezenými vlákny, žádná souběžná GPU scéna nebo jiné těžké testy. Claim až po rootově skutečném release.",
+    "Generované výstupy nativní/editovatelné a runtime geometry-only s metrickými bounds, source root/radius, zdrojovými hashi a stabilními ranky napříčLOD.",
+    "První výstup omezený na Fir obaly a konkrétní broadleaf shoot, žádný export110stromů bez obrazové/podkladové přejímky.",
+    "Vlastní procesy ukončit a immutable checkpoint předat před release heavy; fotografie a staré snapshoty nedotknuté."
+  ],
+  "verification": [
+    "Přímá delegace, bez rekurzivního BMAD. Implementace, cílený refaktoring, relevantní testy a předání společně; aktuálníCPU/GPU důkazy nezaměňovat."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; aktivace .cache/trees-20261025/activate.ps1; všechna nová velká data naD, node_modules junction pouze read.",
+    "Vyžaduje souběžně vlastnictví r5-authoring vstupních skriptů/tvořených testů. Root v současnosti drží heavy-validation pro skutečnýEdge; nepřebírat podle stáří.",
+    "GPU render není součástí tohoto tasku; jeho přidání vyžaduje další koordinovanou rezervaci.",
+    "Root bude řešit navazující runtime manifest/streaming kontrakt odděleně. Material keys/UV/normal/rank předat včas před výrobnou finálníchassetů.",
+    "Výroba/export skončily a původní owner předal+release; root nyní drží jen hotové výstupy. Další těžká operace vyžaduje samostatně validation-window nebo novou výrobní rezervaci."
+  ]
+}

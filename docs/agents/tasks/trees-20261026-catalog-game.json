@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-catalog-game",
+  "title": "KEY-62: aktivace ověřeného úplného katalogu ve hře",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "shared/data/assets/tree-catalog.json",
+    "docs/trees/20261025/catalog-activation.md",
+    "docs/agents/handoffs/trees-20261026-catalog-game.md",
+    ".cache/trees-catalog-game-20261026/",
+    "docs/trees/20261025/catalog-release.json",
+    "tests/tree-catalog-release.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Integrity descriptor vznikne pouze po atomickém zveřejnění skutečného v4 katalogu všech110známých zdrojů; žádný placeholder nebo poloviční populace.",
+    "Root propojí descriptor přes již vlastněné Game/Vegetation integrační soubory. Běžný host i multiplayer použijí stejné úplné zdroje; výslovné lokální dvojiceQA zůstanou oddělené a neberou URL z uživatelského vstupu.",
+    "Úspěšnýcoldload neimportuje původní76MBlegacybootstrap; chyby mají doloženou kompletní fallback cestu a nezamaskovanou chybovou evidenci.",
+    "Finální snapshot aGit používají pouze přijaté katalogové výstupy z explicitního release seznamu. Zamítnuté pokusy zůstanou v pracovníkopii jako důkaz, ne v publikované hře.",
+    "Skutečné GPU ověření celéhry, source identity/počty/cache a relevantní konečné kontroly se provedou v samostatně rezervovaném heavy/GPU okně.",
+    "Verzovaný přijatý release seznam uzavírá runtime a native dependencies. Jedna integrační regrese ověří skutečně dodaný descriptor,110 source identit a všechny referencované bytes/SHA včetně knihoven, nejen syntetický parser."
+  ],
+  "verification": [
+    "Jen relevantní cílené ověření aktivačního kontraktu; velká regrese/build/integrace po dokončení celku před commity. Žádné falešné přijetí podle samotného descriptoru."
+  ],
+  "notes": [
+    "Root KEY-62, cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Game,Vegetation,QA a jejich stávající testy vlastní root v původních rezervacích; tento task doplňuje jen nový descriptor/evidenci. Hromadnou výrobu provádí catalog_rollout_plan, její soubory jsou read-only dokud nepředá výsledek."
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-streaming",
+  "title": "KEY-62: per-LOD stromový kontrakt, omezený cache a pozdní načítání",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/tree-renderer.ts",
+    "client/tree-asset-loader.ts",
+    "shared/tree-asset-types.ts",
+    "tests/tree-asset-loader.test.ts",
+    "tests/tree-streaming.test.ts",
+    "scripts/tree-seasonal-stream.mjs",
+    "docs/trees/20261025/streaming.md",
+    "docs/agents/handoffs/trees-20261025-streaming.md",
+    ".cache/trees-streaming-20261025/",
+    "docs/trees/20261025/lod-policy.md",
+    "tests/tree-cluster-streaming.test.ts",
+    "tests/tree-catalog-loading.test.ts",
+    "client/asset-sha256.ts",
+    "tests/asset-sha256.test.ts"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Předaná v1/v2 kompatibilita beze změny a v3 s odděleným geometry-only GLB pro každý LOD; skutečné původní údaje/pozice/normály/UV/rank beze změny.",
+    "V3 načte nejprve pouze far, near/mid podle skutečné potřeby, nejvýše dva detailní požadavky; žádné eager načtení všechLOD. Explicitní konečný source-byte/cache budget, ne falešné VRAM tvrzení.",
+    "Pozdní LOD respektuje současný root/season/quality, zimní foliage se nevrací. Abort/dispose/error/partial load cleanup a fallback musí fungovat; žádné každoframové kopie bufferů/meshů/materialů.",
+    "Stejné mapy a efekty jsou sdílené, zachovat CCW/native normals, původní Bark source descriptor a pilot-only tintDirectTranslucency. Public Game/Vegetation/litter API zůstane kompatibilní.",
+    "V3 může validovat celou známou populaci110sourceID, nikoli libovolné URL/ID/obrovské alokace; v2 zůstane malý pilot. Root rozhodne o default adopci až po GPU.",
+    "26.10 navazující v4: sdílená atlasová FAR banka a32B rigidní placementy, jednorázově rozbalené přes nové pure helpery; stávající v1/v2/v3 kompatibilita zachována.",
+    "V4 ponechá source-bound GLB pro každouLOD; FAR GLB nese wood a případný exact fallback, samostatný compact payload přidá karty. Přesná fallback rank coverage z reálné dekódované geometrie, žádné duplicitní/vynechané skupiny.",
+    "Banku/mapy načíst jednou s integritou a explicitním vlastnictvím. Unikátní source-byte budget, oddělené rozbalené GPU/season bytes, abort/dispose/partial failure/legacy fallback bez leaků. Nový atlas material pouze pro karty, původní LeafSet pro přesné listy a opad.",
+    "Použít fixed schema domluvené s far_r6_design; nepřepínat defaultGame ani upravovat root QA/Game. Změny shaderu, wind či sezonních helperů mimo scope nejprve předat root.",
+    "Navazující úplná produkční volba: explicitní integrity descriptor hotového katalogu, přesně110známých source identit a jedna jednoznačná varianta pro každou; bez hardcoded kopiesource mapy vGame.",
+    "Stejná v4load/stream/cache cesta jakoQA, jednou vyřešená immutable selection. Úplnývalidníkatalog nepřenese legacy bootstrap; jakákoli chyba vrátí celou legacy scénu s chybovou evidencí, nikdy napůl hotovou populaci.",
+    "Žádné změny existujícího parseru geometry/GLB ani source generátoru během souběžné výroby. Game aVegetation optionswire vlastníroot, globální katalogovýdescriptor doplní ažpoúspěšném dokončení všech110zdrojů."
+  ],
+  "verification": [
+    "Cílené lehké CPU syntetické lifecycle/decoder/budget regrese a refaktoring; skutečný export vyžaduje také samostatný streaming-export heavy claim.",
+    "Přesné raw accessor bytes rozděleného skutečného R4 assetu proti vstupu; source/hash/test checkpoint. Žádný GPU/Blender/build/full suite."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; aktivace .cache/trees-20261025/activate.ps1, node_modules jen read. Přímá delegace bez dalšíhoBMAD.",
+    "Převod čtyř dirty souborů doložen v runtime handoff; příjemce claim s adopt-dirty. Root vlastní související Game/UI/season/litter integration.",
+    "Rozumné varianty porovnány: monolit75MB/2own versus perLOD far přibližně5.1MB; sdílení geometrie samo nesníží vykreslenétri. Zvolen perLOD bez změny geometrie. V3 ještě neznamená finální110modelovýkatalog.",
+    "Nové R5 atlasovéklíče ani custom AO/packed vertex optimalizaci teď nepřidávat; soustředit se na streamování a zachování kontraktů. Koordinovat rozšíření role/mesh descriptoru pokud nezbytné.",
+    "26.10 root výslovně předává aktuální streaming WIP agentovi ncm_startup_probe pro navazující v4 implementaci. Client tree-cluster-geometry.ts a shared/tree-cluster-types.ts zůstávají readonly root helpery; změny žádat root. NCM fix je dokončený, další práce není nový BMAD.",
+    "26.10 root předává streamingWIP zpět původnímu autorovi pro explicitní loadinghotovéhocatalogu. Novýtests/tree-catalog-loading.test.ts. Bez novýchassetů/GPU/build/fullsuite; přenos schválen rootem po v12 CMpřejímce."
+  ]
+}

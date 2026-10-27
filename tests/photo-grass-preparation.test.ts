@@ -16,6 +16,7 @@ import { PhotographicGrass } from "../client/photographic-grass";
 import { acquireGrassResources, type GrassResources } from "../client/photo-grass-resources";
 import { PhotoGrassBatch, type GrassRootState } from "../client/photo-grass-batch";
 import { VegetationController } from "../client/vegetation";
+import { TreeRenderer } from "../client/tree-renderer";
 import { VehicleLighting } from "../client/vehicle-lighting";
 import { StableLightState } from "../client/stable-light-state";
 import "../client/render-shaders";
@@ -92,9 +93,24 @@ test("generation tokens make old deactivation harmless across newer activation a
 });
 
 test("actual vegetation delegates only activation/revision and disposal owns the retained helper",async t=>{
-  const f=await fixture(t), vegetation=new VegetationController(f.scene,{skipLegacyGrass:true});(vegetation as any).photographicGrass=f.grass;
-  assert.equal(vegetation.grassPreparationRevision,f.grass.shaderPreparationRevision);const stop=vegetation.beginGrassPreparation()!,mesh=f.helper();assert.equal(mesh.isEnabled(),true);
-  vegetation.dispose();stop();assert.equal(mesh.isDisposed(),true);assert.equal(vegetation.beginGrassPreparation(),undefined);assert.equal(f.grass.beginShaderPreparation(),undefined);assert.equal(f.grass.shaderPreparationRevision,undefined);vegetation.dispose();
+  const f=await fixture(t);
+  // This helper-lifetime fixture must never start production tree IO. Keep the
+  // real controller/renderer constructors and disposal, with a failing IO guard.
+  const loadTrees=t.mock.method(TreeRenderer.prototype,"load",()=>{assert.fail("helper ownership fixture must not load the production tree catalogue");});
+  const vegetation=new VegetationController(f.scene,{skipLegacyGrass:true});
+  t.after(()=>vegetation.dispose());
+  (vegetation as any).photographicGrass=f.grass;
+  const revision=vegetation.grassPreparationRevision as {grass?:object;litter?:object}|undefined;
+  assert.ok(revision,"actual controller publishes its composite preparation revision");
+  // Compare identities as booleans: an assertion failure must not expand the
+  // entire cyclic GrassResources/Babylon Scene graph into a diagnostic diff.
+  assert.ok(revision.grass===f.grass.shaderPreparationRevision,"composite revision retains the actual grass resource owner");
+  assert.equal(revision.litter,undefined,"this fixture has no loaded tree litter");
+  assert.ok(vegetation.grassPreparationRevision===revision,"unchanged owners retain one stable composite identity");
+  assert.equal(vegetation.stats.treeInstances,0);assert.equal(vegetation.stats.grassTiles,0);
+  const stop=vegetation.beginGrassPreparation()!,mesh=f.helper();assert.equal(mesh.isEnabled(),true);
+  vegetation.dispose();stop();assert.equal(mesh.isDisposed(),true);assert.equal(vegetation.beginGrassPreparation(),undefined);assert.equal(f.grass.beginShaderPreparation(),undefined);assert.equal(f.grass.shaderPreparationRevision,undefined);assert.equal(vegetation.grassPreparationRevision,undefined);vegetation.dispose();
+  assert.equal(loadTrees.mock.callCount(),0);
 });
 
 test("scene disposal cancels every retained owner and later deactivation is inert",async t=>{

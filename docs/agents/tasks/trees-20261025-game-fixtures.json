@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-game-fixtures",
+  "title": "KEY-62: skutečné Game přípravy se sezónním časem",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["tests/game-low-vehicle-preparation.test.ts", "tests/game-authored-light-preparation.test.ts", "tests/game-diagnostics.test.ts", "docs/trees/20261025/game-fixtures.md", "docs/agents/handoffs/trees-20261025-game-fixtures.md", ".cache/trees-game-fixtures-20261025/"],
+  "resources": [],
+  "acceptance": ["Doplnit skutečný getTreeSeasonState do VM prostředí existujících Game fixture, nikoli stub nebo oslabení původních assertion.", "Reprodukovaný test low-vehicle měl 13 PASS / 8 FAIL, první příčina chybějící getTreeSeasonState binding; zbytek kaskádový restore. Původní log zachovat.", "Doložit stejný UTC instant pro skutečné skyWeather update a vegetation season v Game metodě, source demo při timeOverride, real regional-model při null; žádné runtime změny mimo root scope.", "Lehké cílené CPU testy a lifecycle/preparation regrese včetně posledního root propojení litter. Tsc až po stabilním společném checkpointu."],
+  "verification": ["Jen vyjmenované CPU testy, bez GPU/Blender/build/full suite/síťových serverů; původní a výsledné logy v přidělené cache."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; aktivace .cache/trees-20261025/activate.ps1. Claim owner trees-game-fixtures-01a16b37; bez dalšího BMAD.", "Root owns Game and Vegetation integration; communicate new fixture state requirements. Original reproduction log .cache/trees-integration-20261025/vehicle-season-preparation-before.log."]
+}

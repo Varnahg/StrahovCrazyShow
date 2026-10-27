@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-preview-port",
+  "title": "KEY-62: další neměnný stromový testovací server",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [".cache/trees-server-20261026/", "docs/agents/handoffs/trees-20261026-preview-port.md"],
+  "resources": ["port:4181"],
+  "acceptance": ["Přesný nový frozen source/build na4181; nepřepisovat v3/4180 ani původní uložené buildy.", "VITE_MULTIPLAYER_URL=/ a skutečnýsourceSnapshotId; logy/PID/worldId/readiness. BezHMR či implicitní instalace.", "Služba zůstává pod samostatným port claimem nebo bude vlastním majitelem ukončená."],
+  "verification": ["Předstartem skutečnýlistener/registry a hash zdroje; CPU build/GPU okno se rezervuje odděleně."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; rootkoordinátor. Místnítestovací služba bezLinear/feedbackpublikačníchcredentials."]
+}

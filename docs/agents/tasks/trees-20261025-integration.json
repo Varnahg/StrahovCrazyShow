@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "verification": [
+    "Cílené lehké CPU/GLSL/WGSL/lifecycle testy s pravdivými výsledky, předání a release. Plná pipeline a GPU jsou samostatně koordinované.",
+    "Původní user4179/2592 se nemění; node_modules junction jen číst, žádný implicitní pnpm install."
+  ],
+  "notes": [
+    "STROMY-20261025/KEY-62, autorizovaná implementace po výzkumu a konceptu, bez dalšího BMAD/rendereru/podagentů.",
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, branch codex/trees-realism-20261025. Spec _bmad-output/implementation-artifacts/trees-20261025/spec-key-62-stromy.md; před shellem .cache/trees-20261025/activate.ps1.",
+    "Vlastní claim před zápisem, přesný disjunktní scope. Rozhraní předat navazujícím autorům, nepsat do jejich souborů.",
+    "Ground litter module/test byly před prvním zápisem předané samostatnému trees-20261025-litter; root zachovává jejich Game/Vegetation propojení přes koordinovaný runtime scope. Own dirty převzetí viz integration handoff.",
+    "Čtyři dosud nezměněné QA soubory předány trees-20261025-qa-views; viz handoff. Root integruje resolver a skutečný startup."
+  ],
+  "id": "trees-20261025-integration",
+  "title": "KEY-62: společný čas, menu sezón, opad a statická přejímka",
+  "writePaths": [
+    "client/game.ts",
+    "client/ui.tsx",
+    "client/i18n-messages.ts",
+    "client/ground-flowers.ts",
+    "client/photographic-grass.ts",
+    "tests/ground-flowers.test.ts",
+    "tests/photo-grass.test.ts",
+    "tests/game-webgpu-startup.test.ts",
+    "docs/trees/20261025/integration.md",
+    "docs/agents/handoffs/trees-20261025-integration.md",
+    ".cache/trees-integration-20261025/"
+  ],
+  "acceptance": [
+    "Game posílá stromům a astronomii tentýž effective UTC instant. Původní baseLighting se uchová, DEMO season readout jej nesmí přepsat a pokazit návrat do real.",
+    "Označené real/spring/summer/autumn/winter menu a míra nejistoty regionálního modelu bez změny skutečného počasí. Zachovat přístupnost a CZ/EN UI.",
+    "Bounded opad podle skutečných korunních poloh, výšek/výluk, stejná phenology a retence; winter květy se řídí modelovým flowerBloom. Nepřidávat sníh podle kalendáře.",
+    "Pevné korunní QA kamery navazují na existující static guest harness, žádná pohybová testovací funkce. Záznamy obsahují season/asset identity bez osobních dat.",
+    "Zachovat opravený grass microtranslation gate i flower budget invalidaci, branch/camera/multiplayer chování."
+  ]
+}

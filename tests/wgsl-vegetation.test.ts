@@ -21,6 +21,7 @@ import {
 } from "@babylonjs/core/Engines/Processors/shaderProcessor";
 import type { _IProcessingOptions } from "@babylonjs/core/Engines/Processors/shaderProcessingOptions";
 import { TreeWindPlugin } from "../client/tree-wind";
+import { TreeSeasonMaterialPlugin } from "../client/tree-season-material";
 import { GrassWindPlugin } from "../client/grass-material";
 import {
   PhotoGrassWind,
@@ -225,15 +226,22 @@ test("native photographic grass keeps per-rendering-mesh ownership, fallback and
 /** Run the real plugin manager's UBO and shader injection hooks, then the real
  * native PBR WGSL source processor. No GLSL conversion or fake WGSL compiler. */
 function processNativePbr(
-  kind: "tree" | "grass" | "photo",
+  kind: "tree" | "grass" | "photo" | "season",
   thin: boolean,
   tangent: boolean,
+  directTransmission?: boolean,
 ) {
   const f = fixture(ShaderLanguage.WGSL);
   const ubo = new UniformBuffer(f.engine);
   try {
+    if (directTransmission !== undefined) {
+      f.material.subSurface.isTranslucencyEnabled = true;
+      f.material.subSurface.useAlbedoToTintTranslucency = directTransmission;
+    }
     const plugin =
-      kind === "tree"
+      kind === "season"
+        ? new TreeSeasonMaterialPlugin(f.material, { tintDirectTranslucency: directTransmission })
+        : kind === "tree"
         ? new TreeWindPlugin(f.material, { time: 1, x: 2, z: 3 })
         : kind === "grass"
           ? new GrassWindPlugin(f.material, {
@@ -246,6 +254,7 @@ function processNativePbr(
               range: 7,
             })
           : new PhotoGrassWind(f.material, createPhotoGrassWindState());
+    if (kind === "season") new TreeWindPlugin(f.material, { time: 1, x: 2, z: 3 });
     if (thin)
       f.mesh.thinInstanceSetBuffer(
         "matrix",
@@ -269,13 +278,15 @@ function processNativePbr(
       uniformBuffersNames: [] as string[],
       mesh: f.mesh,
       indexParameters: {
-        maxSimultaneousLights: 0,
+        maxSimultaneousLights: directTransmission === undefined ? 0 : 1,
         maxSimultaneousMorphTargets: 0,
       },
       customCode: undefined as _IProcessingOptions["processCodeAfterIncludes"],
     };
     callback(128, event);
     assert.ok(event.customCode);
+    const pluginDefines: Parameters<typeof plugin.collectDefines>[0] = {};
+    plugin.collectDefines(pluginDefines);
     const context = new WebGPUShaderProcessingContext(ShaderLanguage.WGSL);
     const options: _IProcessingOptions = {
       defines: [
@@ -283,6 +294,10 @@ function processNativePbr(
         "#define UV1",
         "#define METALLICWORKFLOW",
         "#define NUM_BONE_INFLUENCERS 0",
+        "#define DEBUGMODE 0",
+        ...Object.entries(pluginDefines).filter(([, value]) => value.default === true).map(([name]) => `#define ${name}`),
+        ...(directTransmission === undefined ? [] : ["#define SUBSURFACE", "#define SS_TRANSLUCENCY", "#define LIGHT0", "#define DIRLIGHT0"]),
+        ...(kind === "season" ? ["#define VERTEXCOLOR", "#define ALPHATEST", "#define ALPHATESTVALUE 0.5"] : []),
         ...(tangent ? ["#define TANGENT"] : []),
         ...(thin ? ["#define INSTANCES", "#define THIN_INSTANCES"] : []),
       ],
@@ -336,6 +351,13 @@ function processNativePbr(
         output.vertexCode.includes("tangentUpdated = vec4f(normalize"),
         tangent,
       );
+    } else if (kind === "season") {
+      assert.match(output.vertexCode, /vertexOutputs\.vTreeSeasonRank\s*=\s*vertexInputs\.color\.a/);
+      assert.match(output.fragmentCode, /fragmentInputs\.vTreeSeasonRank/);
+      assert.match(output.fragmentCode, /uniforms\.treeSeason/);
+      assert.match(output.vertexCode, /treeGust/);
+      assert.doesNotMatch(output.fragmentCode, /alpha\s*\*=\s*fragmentInputs\.vColor\.a/);
+      assert.equal(context.availableAttributes.color !== undefined, true);
     } else {
       const varying =
         kind === "grass" ? "vCampusGrass" : "vPhotoGrassVisibility";
@@ -355,6 +377,16 @@ function processNativePbr(
       );
       assert.equal(event.attributes.includes("photoGrassFade"), thin);
     }
+    if (directTransmission !== undefined) {
+      const tinted = /diffuseTransmissionBase\s*\+=\s*info\.diffuseTransmission\s*\*\s*surfaceAlbedo\s*\*\s*shadow;/g;
+      const untinted = /diffuseTransmissionBase\s*\+=\s*info\.diffuseTransmission\s*\*\s*shadow;/g;
+      assert.equal([...output.fragmentCode.matchAll(tinted)].length, directTransmission ? 1 : 0);
+      assert.equal([...output.fragmentCode.matchAll(untinted)].length, directTransmission ? 0 : 1);
+      assert.doesNotMatch(output.fragmentCode, /#ifdef STRAHOV_TREE_DIRECT_TRANSLUCENCY_TINT|\$0/, "native preprocessing resolves the actual opt-in branch");
+      assert.match(output.fragmentCode, /const ALPHATESTVALUE = 0\.5;/);
+      assert.ok(/if\s*\(alpha\s*<\s*ALPHATESTVALUE\)\s*\{?\s*discard;/.test(output.fragmentCode), output.fragmentCode.split("\n").filter(line => line.includes("discard") || line.includes("ALPHATESTVALUE")).join("\n"));
+      assert.match(output.fragmentCode, /finalDiffuse\s*\*=\s*surfaceAlbedo;[\s\S]*finalDiffuse\s*\+=\s*diffuseTransmissionBase;/);
+    }
   } finally {
     ubo.dispose();
     f.dispose();
@@ -362,10 +394,15 @@ function processNativePbr(
 }
 
 test("all native vegetation plugins traverse actual PBR WGSL processing with regular/thin instances and tangent branches", () => {
-  for (const kind of ["tree", "grass", "photo"] as const)
+  for (const kind of ["tree", "grass", "photo", "season"] as const)
     for (const thin of [false, true])
       for (const tangent of [false, true])
         processNativePbr(kind, thin, tangent);
   // This checks native generation/bind contracts, not WebGPU validation, image
   // parity or GPU timing. The complete game still needs real-driver acceptance.
+});
+
+test("native PBR selects exactly one direct transmission branch for pilot and legacy without touching alpha/rank", () => {
+  for (const directTransmission of [false, true])
+    processNativePbr("season", false, false, directTransmission);
 });

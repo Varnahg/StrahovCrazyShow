@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-validation-window",
+  "title": "KEY-62: výlučné procesní okno pro stabilní pipeline a GPU",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [],
+  "resources": ["heavy-validation", "workspace-build", "port:2568"],
+  "acceptance": ["Před startem ověřit skutečné procesy a získat tento claim; GPU navíc vyžaduje trees-20261025-gpu a jednu skutečnou scénu.", "Výstupy patří souběžně drženému trees-20261025-validation / gpu scope. Release až po ukončení vlastních těžkých procesů; běžný server má oddělený port claim."],
+  "verification": ["Source hash, odpovídající skutečné testy/build/integrace/GPU a jejich limity v explicitní evidenci."],
+  "notes": ["Resource-only slot koordinátora root. V současnosti se okno předává R5 CPU bake; ready není povolení ke kolizi nebo neobjednané práci."]
+}

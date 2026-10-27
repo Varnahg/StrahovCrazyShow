@@ -1,0 +1,27 @@
+# Předání: trees-20261026-bundle-parity
+
+- Owner: `trees-bundle-parity-01a16b37`; příjemce: root koordinátor `trees-20261025`.
+- Cwd/větev: `D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025`, `codex/trees-realism-20261025`; base HEAD `8516c7b1877ec66c37120d9088264d44c52882f1`.
+- Výsledek: doložený NCM stale direct/indirect draw range a nový úzký helper připravený k root integraci. Default CM beze změny, žádná GPU/fast-default přejímka.
+- Vlastní soubory: nový `client/tree-draw-cache.ts`, nový `tests/tree-bundle-parity.test.ts`, `docs/trees/20261025/bundle-parity.md`, toto předání; `.cache/trees-bundle-parity-20261026/`.
+- Cizí WIP: před claim oba nové code/test soubory neexistovaly. `client/tree-season-geometry.ts` drží root a child do něj nepsal. Tree/runtime/assets, Game/UI a všechny dependencies pouze read-only. Žádný stage/commit.
+- Výzkum/varianty: [bundle-parity.md](../../trees/20261025/bundle-parity.md), pinned WebGPU draw, draw context, bundle list, cache, ordinary wrappers a ShadowDepthWrapper map. Veřejný reset likviduje Effect/UBO ownership a nepokrývá custom shadow aliasy; zvolen pouze command invalidation + indirect sentinel, žádný cache wipe.
+- RED: skutečný pinned Mesh→WebGPU→bundle execute path, fake shader/device IO. Tree partial3→full6 vykonal3, litter6→12 vykonal6; shadow aliases zůstaly3; indirect i po pouhém bundle resetu zůstal3 při stejném instance countu. `red-test.ts`, `red-count.log`, `red-alias-indirect.log` zachovány.
+- API: `invalidateTreeDrawRange(mesh, subMesh, nextIndexStart, nextIndexCount): void`. Root volá po validaci mesh/plan/submesh a před jakoukoli range či dalším stavem. Helper range nemění, při shodě/mimo NCM no-op. Atomic preflight celého owner grafu; teprve pak existující fastBundle undefined a indirect cached `_currentInstanceCount=-1`. Unsupported pinned layout/snapshot selže před range mutací.
+- Refaktoring/lifecycle: sdílené own-data/map/array guards, žádný getEffect ani nové aliasy, ephemeral deduplikace existujících kontextů bez persistentního cache. Efekty, materiály, pipeline, bind groups, UBO slots, textury i indirect buffery přežijí; skutečný následující draw vlastní GPU write. Retired owners se neoživí.
+- Ověření 26. 10. 2026 13:36–13:54 UTC: **15/15 cílených testů PASS**, targeted TypeScript **PASS**, exit 0. Logy `targeted-tests-final.log`, `targeted-types-final.log`. První fixture/type problémy zachované zvlášť, nejsou vydávané za funkční RED.
+- Coverage: partial→full/zero/hidden/shifted start, direct/indirect stejné instance, main+custom shadows, preservation/shared owner, sparse aliases bez creation, atomic late guard failure, missing/foreign manager, snapshot/version/range/owner rejection, CM/WebGL no-op a disposed lifecycle. Nativní GPU obraz ani výkon zde nebyly testovány.
+- Snapshot: `.cache/trees-bundle-parity-20261026/manifest.json`, `source/` obsahuje oba nové code/test soubory i docs. Všechny nové soubory jsou untracked a musí být zahrnuté do root snapshotu/commitu. Není to samostatný celý herní build.
+- Procesy: jen dokončené lehké CPU testy/typecheck; žádný GPU/browser/Blender/build/fullsuite/install ani pomocný server. Nic živého k předání.
+- Další krok: root zapojí API do svého geometry helperu, ověří integrační CPU regresi a později NCM vizuální paritu/benchmark v koordinovaném GPU okně. Task/Linear/verification/commit přebírá root; helper sám není přijetím fast režimu.
+- Rezervace: po závěrečném handoffu a scope snapshotu uvolněna CLI release; další zápisy pod tímto ownerem nejsou plánované.
+
+## Follow-up po skutečném v10 fast guard failure
+
+- Root výslovně předal původní vlastní helper/test zpět bez cizích editací. Owner `trees-bundle-parity-01a16b37` znovu získal claim s autorizovaným `--adopt-dirty`; root geometry wiring zůstalo mimo scope a nedotčené.
+- Regex domněnka vyvrácena: live/frozen v10 měly jeden backslash a shodný SHA `02b245c1d6dc69964426a6f89dcc1b9c882602fd7cc89c57dea49190ecde4b5a`. Žádná regex změna. Přidán pouze rootem schválený bounded error label main/shadow + escaped key ≤80 znaků, bez hodnot/objektů.
+- Následný primární trace + actual ObjectRenderer CPU RED ukázal první release neexistujícího passu → `SubMesh._removeDrawWrapper(undefined)` → vlastní main slot `undefined: undefined`. Root poté výslovně schválil pouze tento přesný prázdný data descriptor s nativními flags. Shadow tabulka, živé/null/accessor/ostatní named sloty zůstávají přísně odmítnuté. Původní placeholder se nemaže/nepřepisuje.
+- Nové regrese: actual allocated nonzero/multi-digit main/shadow IDs, existující sparse 1 000 001, atomic invalid keys s bounded JSON detailem, actual ObjectRenderer constructor→valid pass wrapper→release, null/live/accessor/altered descriptor refusal. Všechny původní invalidation/preservation regrese zachované.
+- Výsledek follow-up: **19/19 PASS**, targeted TypeScript **PASS**, exit 0; `.cache/trees-bundle-parity-20261026/guard-followup/targeted-tests-final.log`, `targeted-types-final.log`. Native tombstone RED je samostatně v `red-native-tombstone.log`.
+- Nový scope manifest/source v `guard-followup/`; původní manifest a první release snapshot nepřepsané. Root provede další immutable GPU start. V10 fast failure zůstává evidovaný, CM je nadále default. Žádný child GPU/build/install/fullsuite.
+- Po tomto doplnění proběhl nový release téhož claimu. Další integraci, GPU přejímku, task status a commit vlastní root.
