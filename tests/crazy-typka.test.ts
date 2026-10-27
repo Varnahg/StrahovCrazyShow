@@ -25,6 +25,7 @@ test("invalid optional AI configuration leaves a disabled service and cannot bre
   for (const extra of [
     { CRAZY_TYPKA_ALLOWED_ORIGINS: "not a valid origin" },
     { CRAZY_TYPKA_GENERATIONS_PER_PROCESS: "unlimited" },
+    { OPENAI_REASONING_EFFORT: "unbounded" },
   ]) {
     let notices = 0;
     const service = createOptionalCrazyTypkaService(

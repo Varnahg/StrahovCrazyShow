@@ -14,6 +14,8 @@ import {
 import {
   createCrazyTypkaProvider,
   CrazyTypkaProviderError,
+  CRAZY_TYPKA_REASONING_EFFORTS,
+  type CrazyTypkaReasoningEffort,
   type AiHistoryMessage,
 } from "./crazy-typka-provider";
 import { retrieveKnowledge } from "./crazy-typka-retrieval";
@@ -217,9 +219,18 @@ export function createCrazyTypkaService(
     !!env.OPENAI_API_KEY?.trim() &&
     !!env.OPENAI_MODEL?.trim();
   const origins = parseOrigins(env.CRAZY_TYPKA_ALLOWED_ORIGINS);
+  const reasoningEffort = env.OPENAI_REASONING_EFFORT?.trim() || undefined;
+  if (
+    reasoningEffort &&
+    !CRAZY_TYPKA_REASONING_EFFORTS.includes(
+      reasoningEffort as CrazyTypkaReasoningEffort,
+    )
+  )
+    throw new Error("Invalid OPENAI_REASONING_EFFORT");
   const provider = createCrazyTypkaProvider({
     apiKey: env.OPENAI_API_KEY?.trim() ?? "",
     model: env.OPENAI_MODEL?.trim() ?? "",
+    reasoningEffort: reasoningEffort as CrazyTypkaReasoningEffort | undefined,
     fetch: options.fetch,
     timeoutMs: limits.providerTimeoutMs,
     responseBytes: limits.providerResponseBytes,

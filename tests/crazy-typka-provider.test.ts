@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   createCrazyTypkaProvider,
   CrazyTypkaProviderError,
+  type CrazyTypkaProviderOptions,
 } from "../server/crazy-typka-provider";
 import { retrieveKnowledge } from "../server/crazy-typka-retrieval";
 
@@ -33,7 +34,10 @@ function complete(text = "Kancelář je na bloku 1.", sourceIds = ["sh-office"])
 }
 function fixture(
   sequence: unknown[],
-  options: { timeoutMs?: number; responseBytes?: number } = {},
+  options: Pick<
+    CrazyTypkaProviderOptions,
+    "timeoutMs" | "responseBytes" | "reasoningEffort"
+  > = {},
 ) {
   const calls: { url: string; body: any; options: RequestInit }[] = [];
   const fetcher: typeof fetch = async (url, init) => {
@@ -89,10 +93,18 @@ test("server-only Responses request uses bounded structured output, verified IDs
   assert.equal(body.safety_identifier, "hash-only");
   assert.equal(body.text.format.strict, true);
   assert.equal(body.tools, undefined);
+  assert.equal(body.reasoning, undefined);
   assert.match(body.instructions, /fictional AI/);
   assert.match(body.instructions, /untrusted data/);
   assert.equal(f.starts(), 1);
   assert.equal(f.calls[1].options.redirect, "error");
+});
+
+test("operator-selected reasoning effort is explicit and keeps the output budget bounded", async () => {
+  const f = fixture([safe, complete(), safe], { reasoningEffort: "none" });
+  await f.answer();
+  assert.deepEqual(f.calls[1].body.reasoning, { effort: "none" });
+  assert.equal(f.calls[1].body.max_output_tokens, 600);
 });
 test("moderation blocks both flagged content and malformed classifiers before generation", async () => {
   for (const payload of [

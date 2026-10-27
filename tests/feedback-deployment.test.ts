@@ -116,6 +116,7 @@ test("isolated integration excludes inherited feedback/Linear/OpenAI settings wh
       FEEDBACK_OTHER_CONFIG: "excluded",
       OPENAI_API_KEY: "fake-ai-key",
       openai_model: "production-model",
+      OPENAI_REASONING_EFFORT: "high",
       CRAZY_TYPKA_ENABLED: "1",
       crazy_typka_allowed_origins: "https://production.example.invalid",
       CRAZY_TYPKA_GENERATIONS_PER_PROCESS: "500",

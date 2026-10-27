@@ -4,11 +4,17 @@ AI je volitelná serverová funkce. Hra, úvod a veřejný souhrnný počet mus�
 
 ## Serverové nastavení
 
-Na serveru nastav `CRAZY_TYPKA_ENABLED=1`, `OPENAI_API_KEY` a `OPENAI_MODEL`. Model musí být dostupný v daném OpenAI projektu a podporovat Responses API se strukturovaným výstupem. Přesná dostupnost modelu a živé odpovědi nebyly v této relaci ověřeny, protože klíč ani model nejsou v prostředí nastavené.
+Na serveru nastav `CRAZY_TYPKA_ENABLED=1`, `OPENAI_API_KEY` a `OPENAI_MODEL`. Model musí být dostupný v daném OpenAI projektu a podporovat Responses API se strukturovaným výstupem. Před nasazením ověř jeho živé odpovědi a limity konkrétního účtu.
+
+Pro první místní ověření byl zvolen `gpt-6-luna` a `OPENAI_REASONING_EFFORT=none`: model podporuje strukturovaný výstup i tento režim a je určený pro úzké, úsporné úlohy. [Oficiální specifikace](https://developers.openai.com/api/docs/models/gpt-6-luna), ověřena 27. 10. 2026. Parametr effort je volitelný a jeho podpora závisí na modelu; bez nastavení se do API neposílá. Změna modelu vyžaduje opakování eval sady.
 
 Klíč patří do správy tajných údajů nasazení nebo necommitovaného `.env`, nikdy do `VITE_*`, klientského bundle, URL, chatu, screenshotu nebo Gitu. Uživateli se před prvním odesláním zobrazí, že zprávu zpracuje OpenAI. Ostatní hráči AI konverzaci nedostávají.
 
+Pro místní práci je vhodnější uložit skutečný soubor s klíčem úplně mimo Git checkout a předat jeho cestu přes `--env-file`. Šablony a názvy proměnných lze verzovat; skutečný soubor ani hodnotu klíče nikdy nekopíruj do repozitáře nebo issue.
+
 `compose.ai.yaml` je samostatný override základního kontejneru. Po vyplnění místních serverových proměnných použij `docker compose -f compose.yaml -f compose.ai.yaml up -d --build`. Toto je návod; příkaz zde nespouští ani nemění existující testovací server.
+
+Při místním běhu bez Dockeru server `.env` automaticky nenačítá. Proměnné předej procesu, nebo z kořene projektu použij `node --env-file=.env --import tsx server/index.ts`; přepínač byl ověřen v nainstalovaném Node 24. Klientský dev server může běžet samostatně přes `pnpm dev:client` se stávající proxy na port 2567.
 
 Při HTTPS reverzní proxy nastav přesný veřejný origin do `CRAZY_TYPKA_ALLOWED_ORIGINS`. Povolují se celé origins, nikoli wildcard nebo uživatelské URL. Server nedůvěřuje libovolnému X-Forwarded-For; za proxy tedy mohou uživatelé sdílet IP limit. Spravované proxy/IP limity řeš na hranici nasazení, ne přijetím podvrhnutelných hlaviček.
 

@@ -10,9 +10,21 @@ export class CrazyTypkaProviderError extends Error {
   }
 }
 export type AiHistoryMessage = { role: "user" | "assistant"; content: string };
+export const CRAZY_TYPKA_REASONING_EFFORTS = [
+  "none",
+  "minimal",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "max",
+] as const;
+export type CrazyTypkaReasoningEffort =
+  (typeof CRAZY_TYPKA_REASONING_EFFORTS)[number];
 export type CrazyTypkaProviderOptions = {
   apiKey: string;
   model: string;
+  reasoningEffort?: CrazyTypkaReasoningEffort;
   fetch?: typeof globalThis.fetch;
   timeoutMs?: number;
   responseBytes?: number;
@@ -173,6 +185,9 @@ export function createCrazyTypkaProvider(options: CrazyTypkaProviderOptions) {
         "responses",
         {
           model: options.model,
+          ...(options.reasoningEffort
+            ? { reasoning: { effort: options.reasoningEffort } }
+            : {}),
           store: false,
           max_output_tokens: 600,
           safety_identifier: input.safetyIdentifier,
