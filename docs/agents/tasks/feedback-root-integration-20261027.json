@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1, "id": "feedback-root-integration-20261027", "title": "Zapojení soukromé feedback diagnostiky do serveru", "status": "ready", "dependsOn": [],
+  "writePaths": ["server/index.ts", "docs/agents/handoffs/feedback-root-integration-20261027.md", ".cache/feedback-root-integration-20261027/"],
+  "resources": [],
+  "acceptance": ["Bezpečné startup/delivery logy bez soukromého obsahu; CLI oddělené od HTTP.", "Server/index.ts předat druhému koordinátorovi až po skončení vlastních úprav."],
+  "verification": ["Statická/type kontrola a izolované fixtures bez hry. Externí nasazení až po identifikaci; žádné změny credential nebo replay bez oprávnění."],
+  "notes": ["Root aktuálního zadání WebGPU/sezóny/feedback27.10, uživatel přebírá herní testování."]
+}
