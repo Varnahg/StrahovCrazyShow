@@ -64,3 +64,48 @@ Manifest osmi zdrojových/testových souborů (včetně corpus JSON) je `.cache/
 Žádný dlouhožijící proces, port, GPU, build ani plná testovací sada nebyly spuštěny. Žádné skutečné OpenAI volání: testy injektují fake fetch. Neověřeny živá kvalita/latence/cena/model-account availability ani skutečná odolnost promptu proti adversarial dialogům. Citace sama nedokazuje faktickou správnost. Tyto limity nesmějí být zaměněny za hotovou produkční přejímku.
 
 Rezervaci vlastník uvolňuje po tomto předání a ukončení všech krátkých CPU procesů. Root přebírá doložený dirty scope přes vlastní integrátor claim; release není stav Done. Další krok: převzít diff, zapojit server/UI, provést společný checkpoint a praktické ověření. Commit, main integraci a stav tasku/Linear provádí root.
+
+## Dodatek: doručení, kontext a první pozdrav (27. 10. 2026)
+
+Vlastník navazujícího claimu `home-ai-server-refine-01a17e9d`; výchozí HEAD `17e811ed43480a67b4f2c90f5d667f116403a330`. Čisté zdroje byly předány rootem v `docs/home-ai/20261027/adoption.md`; původní evidence výše zůstává historickým záznamem první implementace. Příjemce je opět `/root`.
+
+Změněno stejných osm zdrojových/testových souborů uvedených výše a tento dodatek; nové logy používají prefix `.cache/home-ai-20261027-server/refinement-*`. Původní logy/manifest nebyly přepsány. Zachovány rootovy CORS dispatcher/guard, optional-config fallback, volitelný reasoning effort, všechny původní limity a cleanup. Žádné změny entrypointů, konfigurace, katalogu nebo klientských souborů.
+
+### Finální transportní kontrakt
+
+- Chat požadavek obsahuje povinné `requestSeq`, kladné safe integer. Nová session začíná 1, session endpoint nezměněn.
+- `CrazyTypkaChatResponse` rozšiřuje dosavadní prezentační odpověď o potvrzené `requestSeq`; nový validator `isCrazyTypkaChatResponse`. Dosavadní `CrazyTypkaResponse` zůstává pro vykreslení.
+- `CrazyTypkaErrorResponse` má `error`, volitelné `requestSeq` a `retryAfterSeconds`; validator `isCrazyTypkaErrorResponse`. Přijaté terminální chyby potvrzují requestSeq. Pending busy, schema/admission/conflict/out-of-order odmítnutí jej neposílají.
+- Session drží pouze poslední přijatou operaci s SHA-256 přes JSON pole `[trim(message), locale]`. Case, vnitřní whitespace a locale se pro tuto identitu nepřevádějí. Samostatný lowercase dedup proti spamu zůstává nezměněný.
+- Stejné poslední seq/payload vrací uložený terminální HTTP status/body bez další moderace/generování nebo zápisu historie; pending vrací 409 busy. Změněný payload téhož seq → `request-conflict`, jiné staré/přeskočené seq → `request-out-of-order`. Všechny replays stále procházejí ingress limity.
+- Operace je přijata a čítač posunut před moderací. Ukládají se i terminal failures (moderace, timeout, upstream failure, cancel), takže nejisté doručení nezaplatí druhý pokus. Výsledek se uloží před odesláním HTTP odpovědi. Reset/expiry/shutdown jej odstraní; nejde o trvalou ani mezirelační cache.
+- Cited replay po freshness hranici přejde do uloženého 409 `{error:"response-expired",requestSeq}`; nepřegeneruje odpověď. Generation cap se kontroluje až po rozpoznání replay a lokálního greetingu.
+
+### Kontext a tón
+
+Retrieval má nový `retrieveConversationKnowledge`: rozpoznává úzké celé CZ/EN navazující otázky, pracuje nejvýše se třemi předchozími USER pokusy a odvozuje pouze kontrolované tematické termíny. Assistant text není kotva. Novější neznámé téma tvoří stop; dva po sobě navazující dotazy jsou podporované, mimo okno se žádná kotva nedomýšlí.
+
+Každý chunk získal kontrolované topic metadata; zdrojové parafráze, jejich hash a provenience se nezměnily. Sport + cena se filtruje do sportu, obecné členské poplatky se nepřimíchají jako cena fitka. Cena bez rozpoznatelného předmětu vrací prázdnou evidenci. Freshness a čtyřchunkový strop platí i pro kontextové hledání.
+
+Session uchovává odděleně poslední tři přijaté USER dotazy také v případě chyby/moderace: jinak by neúspěšná nová otázka chyběla v úspěšné modelové historii a další „a kolik?“ by nesprávně přeskočilo zpět ke starému tématu. Tato paměť je omezená na 3×1500 znaků, reset/expiry ji mažou a poskytovateli se nepředává jako další historie; zpracuje ji jen deterministická extrakce tématu. Replays do ní nepřidávají další položku.
+
+Pouze první celá allowlisted zpráva prázdné nové relace dostane místní CZ/EN pozdrav bez provideru. Prochází stejnými session/rate/admission kontrolami a funguje pouze při nakonfigurované AI. Pozdrav s otázkou, další zpráva nebo pozdrav po přijatém chybném/blokovaném pokusu používá normální cestu. Persona dostala jedno pravidlo: viditelnou definici AI neopakovat při každé praktické odpovědi, lehký tón ukázat drobným situačním vtipem; přímou otázku identity stále zodpovědět pravdivě.
+
+### Refaktoring a ověření dodatku
+
+Terminální ukládání je soustředěno do jednoho helperu pro úspěch i chybu. Prezentační typ je oddělen od transportního potvrzení. Ranker sdílí filtrování a freshness, společný topic resolver zabraňuje dvěma různým interpretacím tématu. Žádné další modelové volání, databáze, crawler, automatická retry ani odpovědní cache napříč uživateli.
+
+- Finální scoped Prettier: exit 0.
+- Stejný scoped strict TypeScript příkaz jako výše: exit 0, bez diagnostiky, `.cache/home-ai-20261027-server/refinement-types.log`.
+- `node --import tsx --test tests/crazy-typka.test.ts tests/crazy-typka-provider.test.ts tests/crazy-typka-retrieval.test.ts`: **39/39 PASS**, exit 0, 585 ms, `.cache/home-ai-20261027-server/refinement-final-tests.log`.
+- `git diff --check` nad osmi vlastními zdrojovými/testovými soubory: exit 0.
+- Nové regrese: replay úspěchu/chyby/moderačního bloku/timeoutu, souběh, změněný locale/case, neplatná/starší/přeskočená seq, cap/ingress při replay, reset/expiry/freshness, první lokální greeting a vyloučené kombinace, dvě návaznosti, změna tématu, failed newer topic, assistant-only kotva a chybějící kotva.
+- První refinement běh měl 29/30 PASS: stará přesná aserce očekávala error body bez nového potvrzení requestSeq. Aserce byla aktualizována na nový explicitní kontrakt, původní výstup zůstal v `refinement-initial-tests.log`. Meziběh 38/38 je v `refinement-tests-2.log`.
+
+Snapshot včetně osmi zdrojových/testových souborů: `.cache/home-ai-20261027-server/refinement-manifest.json`, SHA-256 nad manifestovým polem:
+
+`412c28b18e7c8fe5716b01b7bc1906b08485c6ef211ad091cd905d9f135d76ae`
+
+Žádný vlastní proces neběží. Test HTTP dispatcheru používá pouze `http.emit` bez `listen`, žádný port nebyl otevřen. Žádná privátní konfigurace nebyla čtena; žádný živý OpenAI request, hra, GPU, build ani full suite nebyly spuštěny. Rootem dříve provedené živé testy uvedené ve specifikaci nejsou důkazem těchto nových změn; současný dodatek dokládá jen fake-provider kontroly a scoped types. Kontextová heuristika je záměrně omezená, nenahrazuje měřenou obecnou konverzační kvalitu.
+
+Vlastník po tomto dodatku uvolňuje claim. Koordinátor převezme dirty scope podle tohoto doloženého předání, integruje nový klientský kontrakt a provede společné testy/přejímku. Commit ani změnu stavu tasku tento podagent neprovádí.

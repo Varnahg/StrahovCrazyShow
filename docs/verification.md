@@ -1,5 +1,16 @@
 # Ověření dema a známá omezení
 
+## Úvodní obrazovka, loader a Crazy Typka · místní checkpoint 28. října 2026
+
+Zdrojový checkpoint včetně testů je `b494fe38ab6472c6cd683c22c7a0d9f89fe664f8`, backend doplnění `52b954123af072ba239c12f0c58ba9baa585ca3c`, přijatá base `752e75fd41b455db7e22453b881eb5f62bc283f0`. [Podrobný záznam KEY-63/64](home-ai/20261027/verification.md) a [review](home-ai/20261027/review.md) oddělují jednotlivé běhy a jejich omezení. Záznam přebírá doložené výsledky koordinátora této etapy; nejde o nové spuštění hry ani o potvrzení nasazení.
+
+- **Cílené kontroly:** 159/159 PASS, bez skipů, včetně skutečných UI/Game/Room effect fixtures a fake provideru. Celý TypeScript a produkční `pnpm build` PASS; klient `index-B5I1OK5k.js`, CSS `index-3rwWxZ13.css`. Celý izolovaný SDK `pnpm test:integration` PASS, včetně singleton světa, host privacy, veřejného agregátu, 12 relací, pohybu/auta/chatu/resume, input backlog a feedback boundary. Tři konečné review nálezy byly opravené; podrobnosti a zpětná kontrola jsou v triage.
+- **Plná místní sada:** původně 2 430 testů, 2 422 PASS / 5 FAIL / 3 SKIP. Pět selhání způsobily nezhmotněné LFS pointery. Po načtení původních objektů prošel preflight 609 souborů a 31/31 dotčených asset regresí. Modely se neregenerovaly. Celá finální sada se místně znovu nespouštěla; povinný plný PR CI a integrační přijetí zatím zbývají.
+- **Úvod v prohlížeči:** finální produkční build na vlastním portu 4268, desktop 1280 × 720 a mobilní viewport 390 × 844, bez horizontálního přetékání a s 0 canvas. CZ/EN, místní první pozdrav, reset a fokus composeru PASS. Editor a 3D hra se nespouštěly; snapshot 4182 zůstal beze změny.
+- **Živé AI ověření:** celkem osm generování se syntetickými dotazy. Poslední proces se stropem jednoho generování vrátil modelovou odpověď za 4 940 ms; identický replay za 3 ms, změněný obsah stejného pořadí HTTP 409 a nový dotaz po vyčerpání limitu HTTP 503. Jde o jednotlivé kontroly, nikoli výkonový či rozsáhlý bezpečnostní benchmark. Klíč zůstal mimo Git; testovací relace i vlastní procesy byly ukončené.
+
+Loader nad běžící GPU scénou, herní AI panel v reálné hře a screen reader jsou **neověřené**. Build nadále hlásí velké chunky a neúčinné dynamické importy; tato etapa nedokládá zrychlení startupu ani FPS. Veřejné nasazení nebylo změněné. AI vyžaduje [nastavení provozovatele](home-ai/20261027/deployment.md), corpus obsahuje 11 kurátorovaných úryvků ze šesti zdrojů a vynucuje kontrolní termín 27. listopadu 2026 UTC. Podklady, omezení a privátní AI kanál nepředstavují úplnou znalost Silicon Hill ani dalšího multiplayerového hráče.
+
 ## Dokončení rendereru a sezón bez spouštění hry · 27. října 2026
 
 Uživatel výslovně převzal herní testování a požádal o implementaci do main bez spouštění hry. Nový fallback preferuje WebGPU CM a při bezpečně uklizeném init odmítnutí jednou vytvoří WebGL2 na novém canvasu; explicitní query zůstává striktní. Preview a hlavní UI zachovávají generace, abort a multiplayerové připojení. Modelový katalog110, opad, sezóny a květy používají společný UTC stav. Hashy se ověřují i bez SubtleCrypto; raw normály odpovídají native síle0,45, baked FAR zůstává podle své kalibrace.

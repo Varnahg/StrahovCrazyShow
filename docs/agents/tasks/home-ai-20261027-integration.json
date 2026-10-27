@@ -8,27 +8,21 @@
   "notes": [
     "Autorizace uživatele v chatu Vylepši úvodní obrazovku a AI chat, thread01a17e9d-dd4a-7fe3-91ac-4f3bc548982d: sdílení zdrojů a následně výslovné ano k přímým zprávám obou chatů. Tasky přiděluje root modelové etapy pod admin claimem; implementaci koordinuje příjemce.",
     "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Předávání UI/server entrypointů zvlášť; nové moduly mohou vznikat paralelně.",
-    "Nepřebírat WIP z primary C checkoutu, který je zachovaný na codex/primary-wip-20261027."
+    "Nepřebírat WIP z primary C checkoutu, který je zachovaný na codex/primary-wip-20261027.",
+    "Root uvolnil UI a oba fixtures po plném dependency checkpointu a9a1e3b5f15a2cee037117752230d5d8b3200c72. Převzít tento commit před zápisem a zachovat fallback/sezóny."
   ],
   "id": "home-ai-20261027-integration",
   "title": "Koordinované propojení landing/AI",
-  "status": "blocked",
+  "status": "ready",
   "writePaths": [
     "client/ui.tsx",
-    "server/index.ts",
-    "server/public-presence.ts",
-    "tests/public-presence.test.ts",
-    "scripts/integration.ts",
-    "scripts/integration-network.ts",
-    "scripts/test-integration.mjs",
-    "tests/feedback-deployment.test.ts",
-    "compose.ai.yaml",
+    "tests/game-render-engine.test.ts",
+    "tests/room-callbacks.test.ts",
     "docs/agents/handoffs/home-ai-20261027-integration.md",
     ".cache/home-ai-20261027-integration/"
   ],
   "acceptance": [
-    "Claim až po výslovném předání UI a server/index.ts současným vlastníkem; nezaměnit čekající zadání za vlastnictví.",
-    "Veřejný pouze souhrnný počet online podle explicitní nové uživatelovy volby, žádné identity nebo soukromá přítomnost.",
-    "Izolovaný harness odstraní OPENAI_/CRAZY_TYPKA_ včetně původních LINEAR_/FEEDBACK_; compose.ai.yaml je samostatný override bez credential hodnot."
+    "UI a oba actual-effect fixtures převzít až po výslovném předání rootova fallback/seasons commitu a uvolnění jeho claims.",
+    "Zachovat fallback, novou canvas generaci, sezóny a všechny původní lifecycle assertions. Loader observer musí sledovat konkrétní DOM node a uklidit starou generaci."
   ]
 }

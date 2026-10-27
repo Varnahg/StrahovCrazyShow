@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "home-ai-20261027-validation",
+  "title": "Stabilní ověření a izolovaný UI/API preview",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "dist/",
+    ".cache/home-ai-20261027-validation/",
+    "docs/agents/handoffs/home-ai-20261027-validation.md"
+  ],
+  "resources": [
+    "heavy-validation",
+    "workspace-build",
+    "port:2568",
+    "port:4268"
+  ],
+  "acceptance": [
+    "Vlastní stabilní checkpoint a přesná identita testů/buildů. Nepřepisovat4182 ani jeho soubory.",
+    "Žádné placené provider API v testech. GPU/scénu nelze spustit bez samostatné koordinované rezervace; tento task GPU nevlastní."
+  ],
+  "verification": [
+    "Před procesy claim a skutečný stav portů; po skončení cleanup vlastních procesů a release."
+  ],
+  "notes": [
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Aktuálně root modelové etapy provádí krátkou type kontrolu, heavy lze získat až po jejím release."
+  ]
+}

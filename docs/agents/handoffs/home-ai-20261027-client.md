@@ -68,3 +68,32 @@ Na úvodu použít `assistant={aiWidget}`, ve hře vlastní AI kanál/panel s t�
 Ještě není potvrzeno skutečné browserové rozložení, fokus a malé rozlišení ani průchod reálným Game startupem. SSR/CPU není vizuální nebo GPU důkaz. Integrátor musí zapojit UI, endpoint, původní health gate a provést dohodnuté praktické kontroly. Zrychlení startu se netvrdí: synchronní buildWorld může blokovat UI stejně jako dříve. Kvalita živých OpenAI odpovědí nebyla ověřena.
 
 Rezervace: po tomto předání bude uvolněna CLI, bez živých procesů. Příjemce přebírá přesné nové soubory výše; neznamená to přijetí celé funkce ani volný neznámý WIP. Stav tasku a integraci mění root.
+
+## Dodatek: potvrzované doručení a obnovení odpovědi
+
+Etapa 27. 10. 2026, dokončena přibližně 23:54 Europe/Prague. Vlastník `home-ai-client-refine-01a17e9d`, příjemce `/root`; stejná pracovní kopie a větev, výchozí HEAD `17e811ed43480a67b4f2c90f5d667f116403a330`. Čisté klientské soubory výslovně předal root v `docs/home-ai/20261027/adoption.md`. Claim získán před zápisem; žádný cizí WIP převzatý. Rootovy mezitím integrované composer/fokus opravy, expiry notice a všechny dosavadní testy zůstaly zachované.
+
+Přesný změnový rozsah této etapy: `client/crazy-typka.tsx`, `client/crazy-typka.css`, `tests/crazy-typka-ui.test.ts`, tento dodatek a nové `.cache/home-ai-20261027-client/refinement-*`. Žádné změny `ui.tsx`, shared/server nebo soukromé konfigurace. Bez commitu.
+
+### Chování a integrační kontrakt
+
+- Klient posílá `requestSeq` od 1 v každé AI session. `nextRequestSeq`, přesný pending payload `(requestSeq,message,locale,token)` i token zůstávají pouze v closure. Snapshot neobsahuje číslo operace, token ani transportní payload; v logu je obvyklý zobrazený uživatelský text.
+- Doručení ověřují serverovým agentem přidané `isCrazyTypkaChatResponse` a `isCrazyTypkaErrorResponse`. Pořadí postupuje jen po validní terminální odpovědi/chybě s přesnou shodou `requestSeq`. Chybějící/nesouhlasné potvrzení, nečitelný body nebo transportní chyba zachovají tutéž pending operaci.
+- `useCrazyTypka()` má navíc `recovery: "none" | "retry" | "reset"` a `retry(): Promise<void>`. App zapojení se nemění, pokud předává celý hook state. `retry()` nemá locale/text argument: explicitní „Obnovit odpověď“ odešle byte-identický payload ve stejné session. Nezaloží další user log entry, nesmaže další rozepsanou otázku a nepřevezme nově zvolený jazyk. Žádný automatický replay ani nová placená send smyčka.
+- Nový send je během nevyřešeného doručení blokovaný i uvnitř controlleru. Textarea dál přijímá další draft. Obnovovací tlačítko vrací fokus do composeru stejně jako původní nabídky/send/reset.
+- Nepotvrzené pending `busy` a admission chyby nabízejí obnovení téže operace. `request-conflict` a `request-out-of-order` vyžadují explicitní reset; klient nehádá nové číslo. Potvrzené `response-expired` ukončí původní operaci bez zobrazení staré odpovědi a dovolí další vědomý dotaz s následujícím číslem.
+- Expirace zjištěná na request/retry/response hranici, reset a dispose zruší pending a číslování; nová session začíná od 1. Pozdní session je revokována a pozdní reply staré generace nemůže obnovit obsah nové konverzace. Expiry notice zůstává viditelný při novém začátku.
+- Privacy text nyní pravdivě uvádí „Zprávy a kontext této konverzace může zpracovat OpenAI“, aby pokrýval místní první pozdrav i jeho možné pozdější zahrnutí do serverové historie. Žádné nízkoúrovňové číslování ani modelové detaily se uživateli nevypisují.
+
+### Refaktoring a ověření této etapy
+
+Odeslání a obnovení sdílejí jedinou funkci `perform` s timeoutem, validací potvrzení a cleanupem. `forgetSession` sjednocuje invalidaci pending pořadí, `confirm` má jediné místo pro jeho posun. Formatter byl spuštěn pouze nad třemi vlastními změněnými soubory.
+
+- První cílený běh AI: **29/29 PASS**, scoped tsc **PASS**, logy `refinement-tests-1.log` a `refinement-types-1.log`.
+- Finální `node --import tsx --test tests/crazy-typka-ui.test.ts tests/welcome-screen.test.ts tests/startup-progress.test.ts`: **43/43 PASS** (31 AI + 12 stávajících home/loader), exit 0, `refinement-tests-final.log`.
+- Cílený `tsc --noEmit` se stejnými explicitními ES2022/Bundler/React/strict volbami jako výše nad `client/crazy-typka.tsx` a `tests/crazy-typka-ui.test.ts`: **PASS**, exit 0, `refinement-types-final.log`.
+- `git diff --check -- client/crazy-typka.tsx client/crazy-typka.css tests/crazy-typka-ui.test.ts`: **PASS**.
+- Nové testy pokrývají ztracenou odpověď, přesný replay po změně jazyka/draftu, potvrzené chyby včetně pozdě doručené cached chyby, pending busy/admission, malformed/missing/wrong-seq odpovědi, konflikty/pořadí, místní/serverovou expiraci, reset/dispose při pending recovery, pozdní odpověď po expiraci a nejistou tvorbu session. Původní focus/composer, transparentnost, zdroje, session a abort testy zůstaly.
+- SHA-256 manifest tří souborů včetně testů: `.cache/home-ai-20261027-client/refinement-files.sha256.json`. Původní logy a manifesty nebyly přepsány.
+
+Všechny HTTP odpovědi v testech byly injektované fake fetch; žádný server, port, OpenAI klíč/endpoint, build, celá sada ani GPU této etapě neběžely. Žádný vlastní proces nezůstává. Browserovou přejímku nového retry/fokusu musí dokončit root; CPU/SSR ji nenahrazují. Po tomto předání podagent uvolní claim a root přebírá pouze uvedený konkrétní diff.

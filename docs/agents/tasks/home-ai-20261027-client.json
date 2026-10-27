@@ -8,7 +8,8 @@
   "notes": [
     "Autorizace uživatele v chatu Vylepši úvodní obrazovku a AI chat, thread01a17e9d-dd4a-7fe3-91ac-4f3bc548982d: sdílení zdrojů a následně výslovné ano k přímým zprávám obou chatů. Tasky přiděluje root modelové etapy pod admin claimem; implementaci koordinuje příjemce.",
     "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Předávání UI/server entrypointů zvlášť; nové moduly mohou vznikat paralelně.",
-    "Nepřebírat WIP z primary C checkoutu, který je zachovaný na codex/primary-wip-20261027."
+    "Nepřebírat WIP z primary C checkoutu, který je zachovaný na codex/primary-wip-20261027.",
+    "Zpřesnění přidělené koordinátorem 27. 10. 2026: navazující dotazy vycházejí pouze z kontextu USER zpráv; doručení chrání idempotentní requestSeq a čistý první pozdrav může dostat místní odpověď. Podrobný kontrakt a předání z revize 17e811ed43480a67b4f2c90f5d667f116403a330 jsou v docs/home-ai/20261027/adoption.md. Bez PostgreSQL, embedding pipeline, Decisions, crawleru či předpokladu RPi; writePaths a resources se nemění. Client/server přebírají navazující děti s vlastními claims; client/ui.tsx a server/index.ts zůstávají integračnímu rootovi."
   ],
   "id": "home-ai-20261027-client",
   "title": "Samostatné landing/loader/AI komponenty",
