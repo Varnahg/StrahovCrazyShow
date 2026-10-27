@@ -27,6 +27,7 @@ const source: CrazyTypkaSource = {
   adaptation: "curated-paraphrase",
 };
 const answer = {
+  requestSeq: 1,
   speaker: CRAZY_TYPKA_SPEAKER,
   text: "Ahoj <script>alert(1)</script>",
   sources: [source],
@@ -57,6 +58,7 @@ test("the composer stays editable during a reply and preserves the next draft wi
     ...client.getSnapshot(),
     setDraft: client.setDraft,
     send: client.send,
+    retry: client.retry,
     reset: client.reset,
     cancel: client.cancel,
     refreshStatus: client.refreshStatus,
@@ -119,6 +121,7 @@ for (const expiry of ["clock", "server"] as const)
       ...snapshot,
       setDraft: client.setDraft,
       send: client.send,
+      retry: client.retry,
       reset: client.reset,
       cancel: client.cancel,
       refreshStatus: client.refreshStatus,
@@ -170,7 +173,7 @@ test("private client uses a server session, sends no client history and keeps it
     JSON.parse(
       String(requests.find((value) => value.url.endsWith("chat"))!.init?.body),
     ),
-    { token, message: "Jak se přidám?", locale: "cs" },
+    { token, requestSeq: 1, message: "Jak se přidám?", locale: "cs" },
   );
   assert.equal(client.getSnapshot().messages.length, 2);
   assert.doesNotMatch(JSON.stringify(client.getSnapshot()), new RegExp(token));
@@ -329,9 +332,11 @@ test("widget is transparent, escaped and localized with source attribution", () 
     draft: "",
     error: null,
     notice: null,
+    recovery: "none",
     messages: [{ id: 1, role: "ai", text: answer.text, sources: [source] }],
     setDraft() {},
     async send() {},
+    async retry() {},
     async reset() {},
     async cancel() {},
     async refreshStatus() {},
@@ -384,4 +389,405 @@ test("retired availability checks cannot update a disposed or remounted client",
   await first;
   assert.equal(client.getSnapshot().availability, "disabled");
   client.dispose();
+});
+
+type ChatPayload = {
+  token: string;
+  requestSeq: number;
+  message: string;
+  locale: "cs" | "en";
+};
+function refinementFixture(
+  reply: (
+    payload: ChatPayload,
+    attempt: number,
+  ) => Response | Promise<Response>,
+  options: { now?: () => number; ttl?: number } = {},
+) {
+  const payloads: ChatPayload[] = [];
+  const bodies: string[] = [];
+  let sessions = 0;
+  const now = options.now ?? Date.now;
+  const client = createCrazyTypkaClient({
+    now,
+    request: (async (input, init) => {
+      if (init?.method === "DELETE") return new Response(null, { status: 204 });
+      if (String(input).endsWith("status"))
+        return Response.json({ enabled: true });
+      if (String(input).endsWith("session")) {
+        sessions++;
+        return Response.json({
+          token: sessions.toString(16).padStart(64, "0"),
+          expiresAt: now() + (options.ttl ?? 60000),
+        });
+      }
+      const body = String(init?.body);
+      const payload = JSON.parse(body) as ChatPayload;
+      bodies.push(body);
+      payloads.push(payload);
+      return await reply(payload, payloads.length);
+    }) as typeof fetch,
+  });
+  return { client, payloads, bodies, sessions: () => sessions };
+}
+function chatState(
+  client: ReturnType<typeof createCrazyTypkaClient>,
+): CrazyTypkaState {
+  return {
+    ...client.getSnapshot(),
+    setDraft: client.setDraft,
+    send: client.send,
+    retry: client.retry,
+    reset: client.reset,
+    cancel: client.cancel,
+    refreshStatus: client.refreshStatus,
+  };
+}
+
+test("lost answer recovery reuses the exact message, locale and sequence while preserving the next draft", async () => {
+  const f = refinementFixture((payload, attempt) => {
+    if (attempt === 1) throw new Error("response lost after server completed");
+    return Response.json({ ...answer, requestSeq: payload.requestSeq });
+  });
+  await f.client.refreshStatus();
+  f.client.setDraft("  Jak se přidám?  ");
+  await f.client.send("cs");
+  assert.equal(f.client.getSnapshot().recovery, "retry");
+  assert.equal(f.payloads.length, 1, "recovery is never automatic");
+  f.client.setDraft("My next question, not the retry");
+  await f.client.send("en");
+  assert.equal(
+    f.payloads.length,
+    1,
+    "new sends cannot skip an unresolved answer",
+  );
+  const html = renderToStaticMarkup(
+    createElement(CrazyTypkaChat, { state: chatState(f.client), locale: "en" }),
+  );
+  assert.match(html, /Recover answer/);
+  assert.match(html.match(/<button\b[^>]*type="submit"[^>]*>/)![0], /disabled/);
+  assert.doesNotMatch(html.match(/<textarea\b[^>]*>/)![0], /disabled/);
+  await f.client.retry();
+  assert.equal(f.bodies[1], f.bodies[0]);
+  assert.equal(f.payloads[1].message, "Jak se přidám?");
+  assert.equal(f.payloads[1].locale, "cs");
+  assert.equal(f.payloads[1].requestSeq, 1);
+  assert.equal(f.client.getSnapshot().draft, "My next question, not the retry");
+  assert.deepEqual(
+    f.client.getSnapshot().messages.map((message) => message.role),
+    ["user", "ai"],
+  );
+  assert.equal(f.client.getSnapshot().recovery, "none");
+  assert.doesNotMatch(
+    JSON.stringify(f.client.getSnapshot()),
+    new RegExp(f.payloads[0].token),
+  );
+  assert.equal("requestSeq" in f.client.getSnapshot(), false);
+  await f.client.send("en");
+  assert.equal(f.payloads[2].requestSeq, 2);
+  assert.equal(f.payloads[2].locale, "en");
+  assert.equal(f.payloads[2].message, "My next question, not the retry");
+  f.client.dispose();
+});
+
+for (const code of [
+  "blocked",
+  "provider-unavailable",
+  "response-expired",
+] as const)
+  test(`a confirmed ${code} ends its operation and the next intentional send advances once`, async () => {
+    const f = refinementFixture((payload, attempt) =>
+      attempt === 1
+        ? Response.json(
+            { error: code, requestSeq: payload.requestSeq },
+            { status: 409 },
+          )
+        : Response.json({ ...answer, requestSeq: payload.requestSeq }),
+    );
+    await f.client.refreshStatus();
+    f.client.setDraft("First");
+    await f.client.send("en");
+    assert.equal(f.client.getSnapshot().error, code);
+    assert.equal(f.client.getSnapshot().recovery, "none");
+    await f.client.retry();
+    assert.equal(
+      f.payloads.length,
+      1,
+      "confirmed errors are not recovered as a new generation",
+    );
+    f.client.setDraft("Second");
+    await f.client.send("en");
+    assert.deepEqual(
+      f.payloads.map((payload) => payload.requestSeq),
+      [1, 2],
+    );
+    assert.equal(f.client.getSnapshot().messages.length, 3);
+    f.client.dispose();
+  });
+
+test("pending busy and unconfirmed admission errors keep one recoverable operation", async () => {
+  const f = refinementFixture((payload, attempt) =>
+    attempt <= 2
+      ? Response.json(
+          { error: attempt === 1 ? "busy" : "rate-limited" },
+          { status: attempt === 1 ? 409 : 429 },
+        )
+      : Response.json({ ...answer, requestSeq: payload.requestSeq }),
+  );
+  await f.client.refreshStatus();
+  f.client.setDraft("Same question");
+  await f.client.send("en");
+  assert.equal(f.client.getSnapshot().recovery, "retry");
+  await f.client.retry();
+  assert.equal(f.client.getSnapshot().recovery, "retry");
+  await f.client.retry();
+  assert.deepEqual(f.bodies, [f.bodies[0], f.bodies[0], f.bodies[0]]);
+  assert.deepEqual(
+    f.client.getSnapshot().messages.map((message) => message.role),
+    ["user", "ai"],
+  );
+  f.client.dispose();
+});
+
+for (const malformed of [
+  "body",
+  "success-sequence",
+  "error-sequence",
+  "missing-sequence",
+] as const)
+  test(`${malformed} uncertainty cannot advance sequence or display an unconfirmed reply`, async () => {
+    const f = refinementFixture((payload, attempt) => {
+      if (attempt > 1)
+        return Response.json({ ...answer, requestSeq: payload.requestSeq });
+      if (malformed === "body") return new Response("{", { status: 200 });
+      if (malformed === "error-sequence")
+        return Response.json(
+          { error: "blocked", requestSeq: 2 },
+          { status: 403 },
+        );
+      if (malformed === "missing-sequence") {
+        const { requestSeq, ...unconfirmed } = answer;
+        return Response.json(unconfirmed);
+      }
+      return Response.json({ ...answer, requestSeq: 2 });
+    });
+    await f.client.refreshStatus();
+    f.client.setDraft("Question");
+    await f.client.send("en");
+    assert.equal(f.client.getSnapshot().recovery, "retry");
+    assert.equal(f.client.getSnapshot().messages.length, 1);
+    f.client.setDraft("Next question");
+    await f.client.send("cs");
+    assert.equal(f.payloads.length, 1);
+    await f.client.retry();
+    assert.equal(f.bodies[1], f.bodies[0]);
+    assert.equal(f.client.getSnapshot().draft, "Next question");
+    assert.equal(f.client.getSnapshot().messages.length, 2);
+    f.client.dispose();
+  });
+
+for (const code of ["request-conflict", "request-out-of-order"] as const)
+  test(`${code} requires reset and never tries a guessed next sequence`, async () => {
+    const f = refinementFixture((payload, attempt) =>
+      attempt === 1
+        ? Response.json({ error: code }, { status: 409 })
+        : Response.json({ ...answer, requestSeq: payload.requestSeq }),
+    );
+    await f.client.refreshStatus();
+    f.client.setDraft("Question");
+    await f.client.send("cs");
+    assert.equal(f.client.getSnapshot().recovery, "reset");
+    f.client.setDraft("Another");
+    await f.client.send("en");
+    await f.client.retry();
+    assert.equal(f.payloads.length, 1);
+    const html = renderToStaticMarkup(
+      createElement(CrazyTypkaChat, {
+        state: chatState(f.client),
+        locale: "cs",
+      }),
+    );
+    assert.match(html, /Začít novou konverzaci/);
+    assert.doesNotMatch(
+      html,
+      /Obnovit odpověď|requestSeq|request-conflict|request-out-of-order/,
+    );
+    await f.client.reset();
+    f.client.setDraft("Fresh");
+    await f.client.send("en");
+    assert.deepEqual(
+      f.payloads.map((payload) => payload.requestSeq),
+      [1, 1],
+    );
+    assert.notEqual(f.payloads[0].token, f.payloads[1].token);
+    f.client.dispose();
+  });
+
+for (const expiry of ["clock", "server"] as const)
+  test(`${expiry} expiry retires an uncertain operation and a fresh session begins at one`, async () => {
+    let instant = 1000;
+    const f = refinementFixture(
+      (payload, attempt) => {
+        if (attempt === 1) throw new Error("lost answer");
+        if (expiry === "server" && attempt === 2)
+          return Response.json({ error: "session-expired" }, { status: 401 });
+        return Response.json({ ...answer, requestSeq: payload.requestSeq });
+      },
+      { now: () => instant, ttl: 100 },
+    );
+    await f.client.refreshStatus();
+    f.client.setDraft("Old");
+    await f.client.send("en");
+    f.client.setDraft("New draft");
+    if (expiry === "clock") instant = 1200;
+    await f.client.retry();
+    assert.equal(f.client.getSnapshot().recovery, "none");
+    assert.equal(f.client.getSnapshot().error, "session-expired");
+    assert.equal(f.client.getSnapshot().draft, "New draft");
+    await f.client.send("cs");
+    assert.equal(f.payloads.at(-1)?.requestSeq, 1);
+    assert.notEqual(f.payloads.at(-1)?.token, f.payloads[0].token);
+    assert.equal(f.client.getSnapshot().notice, "session-restarted");
+    assert.deepEqual(
+      f.client.getSnapshot().messages.map((message) => message.text),
+      ["New draft", answer.text],
+    );
+    assert.equal(f.sessions(), 2);
+    f.client.dispose();
+  });
+
+for (const action of ["reset", "dispose"] as const)
+  test(`${action} invalidates a pending recovery and its late reply cannot alter a replacement session`, async () => {
+    let complete!: (response: Response) => void;
+    const f = refinementFixture((payload, attempt) => {
+      if (attempt === 1) throw new Error("lost answer");
+      if (attempt === 2)
+        return new Promise<Response>((resolve) => {
+          complete = resolve;
+        });
+      return Response.json({
+        ...answer,
+        text: "New reply",
+        requestSeq: payload.requestSeq,
+      });
+    });
+    await f.client.refreshStatus();
+    f.client.setDraft("Old");
+    await f.client.send("en");
+    const recovery = f.client.retry();
+    await tick();
+    await f.client[action]();
+    if (action === "dispose") await f.client.refreshStatus();
+    f.client.setDraft("New");
+    await f.client.send("cs");
+    complete(Response.json(answer));
+    await recovery;
+    assert.equal(f.client.getSnapshot().recovery, "none");
+    assert.deepEqual(
+      f.client.getSnapshot().messages.map((message) => message.text),
+      ["New", "New reply"],
+    );
+    assert.deepEqual(
+      f.payloads.map((payload) => payload.requestSeq),
+      [1, 1, 1],
+    );
+    assert.notEqual(f.payloads[0].token, f.payloads[2].token);
+    f.client.dispose();
+  });
+
+test("an uncertain session creation can be explicitly recovered without adding another user message", async () => {
+  let sessions = 0;
+  let chat: ChatPayload | undefined;
+  const client = createCrazyTypkaClient({
+    request: (async (input, init) => {
+      if (init?.method === "DELETE") return new Response(null, { status: 204 });
+      if (String(input).endsWith("status"))
+        return Response.json({ enabled: true });
+      if (String(input).endsWith("session")) {
+        if (++sessions === 1) throw new Error("session response lost");
+        return Response.json({ token, expiresAt: Date.now() + 60000 });
+      }
+      chat = JSON.parse(String(init?.body)) as ChatPayload;
+      return Response.json(answer);
+    }) as typeof fetch,
+  });
+  await client.refreshStatus();
+  client.setDraft("Original");
+  await client.send("cs");
+  assert.equal(client.getSnapshot().recovery, "retry");
+  client.setDraft("Keep my draft");
+  await client.retry();
+  assert.deepEqual(chat, {
+    token,
+    requestSeq: 1,
+    message: "Original",
+    locale: "cs",
+  });
+  assert.equal(client.getSnapshot().draft, "Keep my draft");
+  assert.equal(client.getSnapshot().messages.length, 2);
+  client.dispose();
+});
+
+test("recovery of a confirmed cached error advances only after that result is delivered", async () => {
+  const f = refinementFixture((payload, attempt) => {
+    if (attempt === 1) throw new Error("cached moderation result was lost");
+    if (attempt === 2)
+      return Response.json(
+        { error: "blocked", requestSeq: payload.requestSeq },
+        { status: 403 },
+      );
+    return Response.json({ ...answer, requestSeq: payload.requestSeq });
+  });
+  await f.client.refreshStatus();
+  f.client.setDraft("First");
+  await f.client.send("en");
+  f.client.setDraft("Next draft");
+  await f.client.retry();
+  assert.equal(f.client.getSnapshot().error, "blocked");
+  assert.equal(f.client.getSnapshot().recovery, "none");
+  assert.equal(f.client.getSnapshot().messages.length, 1);
+  assert.equal(f.client.getSnapshot().draft, "Next draft");
+  await f.client.send("cs");
+  assert.deepEqual(
+    f.payloads.map((payload) => payload.requestSeq),
+    [1, 1, 2],
+  );
+  assert.equal(f.bodies[0], f.bodies[1]);
+  f.client.dispose();
+});
+
+test("an answer arriving after local session expiry cannot revive that conversation", async () => {
+  let instant = 1000;
+  let finish!: (response: Response) => void;
+  const f = refinementFixture(
+    (payload, attempt) =>
+      attempt === 1
+        ? new Promise<Response>((resolve) => {
+            finish = resolve;
+          })
+        : Response.json({ ...answer, requestSeq: payload.requestSeq }),
+    { now: () => instant, ttl: 100 },
+  );
+  await f.client.refreshStatus();
+  f.client.setDraft("Expired question");
+  const first = f.client.send("en");
+  await tick();
+  instant = 1200;
+  finish(Response.json(answer));
+  await first;
+  assert.equal(f.client.getSnapshot().error, "session-expired");
+  assert.equal(f.client.getSnapshot().messages.length, 1);
+  assert.equal(f.client.getSnapshot().recovery, "none");
+  f.client.setDraft("New question");
+  await f.client.send("cs");
+  assert.deepEqual(
+    f.payloads.map((payload) => payload.requestSeq),
+    [1, 1],
+  );
+  assert.notEqual(f.payloads[0].token, f.payloads[1].token);
+  assert.deepEqual(
+    f.client.getSnapshot().messages.map((message) => message.text),
+    ["New question", answer.text],
+  );
+  f.client.dispose();
 });
