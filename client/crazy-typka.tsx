@@ -344,6 +344,7 @@ export function CrazyTypkaChat({
 }) {
   const id = useId();
   const log = useRef<HTMLDivElement>(null);
+  const composer = useRef<HTMLTextAreaElement>(null);
   const followLatest = useRef(true);
   useEffect(() => {
     if (log.current && followLatest.current)
@@ -498,7 +499,10 @@ export function CrazyTypkaChat({
                 type="button"
                 key={prompt}
                 disabled={!enabled}
-                onClick={() => state.setDraft(prompt)}
+                onClick={() => {
+                  state.setDraft(prompt);
+                  composer.current?.focus();
+                }}
               >
                 {prompt}
               </button>
@@ -523,17 +527,19 @@ export function CrazyTypkaChat({
         onSubmit={(event) => {
           event.preventDefault();
           void state.send(locale);
+          composer.current?.focus();
         }}
       >
         <label htmlFor={`${id}-message`}>
           {cs ? "Napiš Crazy Typce" : "Message Crazy Typka"}
         </label>
         <textarea
+          ref={composer}
           id={`${id}-message`}
           rows={2}
           maxLength={CRAZY_TYPKA_LIMITS.messageChars}
           value={state.draft}
-          disabled={!enabled || state.busy}
+          disabled={!enabled}
           onChange={(event) => state.setDraft(event.target.value)}
           placeholder={
             cs
@@ -561,7 +567,10 @@ export function CrazyTypkaChat({
         <button
           type="button"
           className="crazy-reset"
-          onClick={() => void (state.busy ? state.cancel() : state.reset())}
+          onClick={() => {
+            void (state.busy ? state.cancel() : state.reset());
+            composer.current?.focus();
+          }}
         >
           {state.busy
             ? cs

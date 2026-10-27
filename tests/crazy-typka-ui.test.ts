@@ -32,6 +32,48 @@ const answer = {
   sources: [source],
 };
 
+test("the composer stays editable during a reply and preserves the next draft without another request", async () => {
+  let complete!: (response: Response) => void;
+  let chats = 0;
+  const client = createCrazyTypkaClient({
+    request: (async (input, init) => {
+      if (init?.method === "DELETE") return new Response(null, { status: 204 });
+      if (String(input).endsWith("status"))
+        return Response.json({ enabled: true });
+      if (String(input).endsWith("session"))
+        return Response.json({ token, expiresAt: Date.now() + 60000 });
+      chats++;
+      return new Promise<Response>((resolve) => {
+        complete = resolve;
+      });
+    }) as typeof fetch,
+  });
+  await client.refreshStatus();
+  client.setDraft("První otázka");
+  const pending = client.send("cs");
+  await tick();
+  client.setDraft("Rozepsaná další otázka");
+  const state: CrazyTypkaState = {
+    ...client.getSnapshot(),
+    setDraft: client.setDraft,
+    send: client.send,
+    reset: client.reset,
+    cancel: client.cancel,
+    refreshStatus: client.refreshStatus,
+  };
+  const html = renderToStaticMarkup(
+    createElement(CrazyTypkaChat, { state, locale: "cs" }),
+  );
+  assert.doesNotMatch(html.match(/<textarea\b[^>]*>/)![0], /disabled/);
+  assert.match(html.match(/<button\b[^>]*type="submit"[^>]*>/)![0], /disabled/);
+  await client.send("cs");
+  complete(Response.json(answer));
+  await pending;
+  assert.equal(client.getSnapshot().draft, "Rozepsaná další otázka");
+  assert.equal(chats, 1);
+  client.dispose();
+});
+
 for (const expiry of ["clock", "server"] as const)
   test(`a ${expiry}-expired conversation starts visibly fresh and keeps the new message`, async () => {
     let instant = 1000,
