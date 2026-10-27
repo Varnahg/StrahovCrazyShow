@@ -199,17 +199,19 @@ export class TreeAssetLoader {
     const existing = this.inflight.get(key); if (existing) return existing;
     const request = (async () => {
       this.stats.requests++; this.stats.pending++;
+      let response: Response | undefined;
+      let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
       try {
-        const response = await fetch(url, { signal: this.abort.signal }); this.check();
+        response = await fetch(url, { signal: this.abort.signal }); this.check();
         if (!response.ok) throw Error(`Tree HTTP ${response.status}: ${url}`);
         const advertised = Number(response.headers.get("content-length"));
         if (advertised > maxBytes) throw Error("Tree response exceeds budget");
         // Stream with a hard cap; Content-Length is not trusted.
         let buffer: ArrayBuffer;
         if (response.body) {
-          const reader = response.body.getReader(), chunks: Uint8Array[] = []; let length = 0;
-          try { while (true) { const result = await reader.read(); this.check(); if (result.done) break; length += result.value.byteLength; if (length > maxBytes) throw Error("Tree response exceeds budget"); chunks.push(result.value); } }
-          catch (error) { await reader.cancel().catch(() => {}); throw error; }
+          reader = response.body.getReader();
+          const chunks: Uint8Array[] = []; let length = 0;
+          while (true) { const result = await reader.read(); this.check(); if (result.done) break; length += result.value.byteLength; if (length > maxBytes) throw Error("Tree response exceeds budget"); chunks.push(result.value); }
           const joined = new Uint8Array(length); let offset = 0; for (const chunk of chunks) { joined.set(chunk, offset); offset += chunk.length; } buffer = joined.buffer;
         } else { buffer = await response.arrayBuffer(); if (buffer.byteLength > maxBytes) throw Error("Tree response exceeds budget"); }
         this.check(); this.stats.bytesFetched += buffer.byteLength;
@@ -219,7 +221,20 @@ export class TreeAssetLoader {
           this.check();
         }
         return buffer;
-      } finally { this.stats.pending--; }
+      } catch (error) {
+        // Odmítnutí hlaviček či opožděná odpověď po dispose vznikají ještě
+        // před readerem. Rušíme jen toto tělo, nikdy sdílený abort jiných assetů.
+        try {
+          const cancellation = reader ? reader.cancel(error) : response?.body?.cancel(error);
+          // Cancel uzavře stream synchronně; dokončení podkladového cleanupu
+          // nesmí zadržet původní chybu ani další pokus na tutéž URL.
+          void cancellation?.catch(() => {});
+        } catch { /* Chyba úklidu nesmí nahradit původní selhání. */ }
+        throw error;
+      } finally {
+        try { reader?.releaseLock(); } catch { /* best effort pro vadný stream adapter */ }
+        this.stats.pending--;
+      }
     })();
     this.inflight.set(key, request);
     // Promise handlers run after registration even when a fetch adapter throws
