@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-pilot",
+  "title": "KEY-62: věrohodná stromová kostra a dva izolované modelovací piloty",
+  "writePaths": [
+    "scripts/trees-20261025/",
+    "assets/blender/vegetation/seasonal/",
+    "public/models/vegetation/seasonal/",
+    "tests/tree-seasonal-assets.test.ts",
+    "docs/trees/20261025/model-pilot.md",
+    "docs/agents/handoffs/trees-20261025-pilot.md",
+    ".cache/trees-pilot-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejprve malý pilot upraveného vlastního větvení a připnutého MTree5.6.0, porovnat stejný generický listnáč a následně B6 conifer; přirozenost má přednost před přesnou PCA/foto kopií.",
+    "Větve mají skutečnou hierarchii a taper; fotografické listové komponenty jsou připojené ke koncovým větévkám, nezávisle nerozptýlené v objemu. Kontrola holé kostry před zakrytím listy. Kořen/metrické přibližné rozměry a silueta meziLOD konzistentní.",
+    "Blender5.2 použít pouze headless CPU s max2 vlákny; žádný GPU render ani druhá interaktivní scéna. Žádné global addon instalace, balíčky pouze do taskové D cache z připnutého primárního zdroje a s licencí.",
+    "Před generováním převzít immutable kopii čtecích material/reference vstupů do vlastní cache s SHA; každý export má vlastní explicitní složku a nepřepisuje původní runtime/modely.",
+    "Před hromadným exportem předat dva piloty a nechat root vybrat dle vizuálu/skutečného profilu. Výstupy editovatelné .blend i explicitní geometry/LOD metadata pro runtime, source/memory/triangles/alpha coverage audity."
+  ],
+  "verification": [
+    "Smysluplné lokální geometry/unit/UV/source/LOD testy, skutečný Blender import/export a offline CPU snímky holé i olistěné kostry. Žádný plný build či GPU benchmark.",
+    "Předání zahrnuje varianty, skutečné náklady/licence a procesní cleanup; release heavy-validation po pilotu. Provozní PID pouze do vlastní ignorované cache."
+  ],
+  "notes": [
+    "Přímá implementační delegace STROMY-20261025 po výzkumu a označeném konceptu .cache/trees-20261025/concept-seasonal-v1.png. Bez rekurzivního BMAD.",
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; aktivace .cache/trees-20261025/activate.ps1. Legacy generator/reference/runtime jsou pouze čtecí, žádná regenerace starých katalogů.",
+    "Runtime kontrakt musí být předem domluven s rootem: oddělené wood/foliage, třiLOD, stabilní celé listové komponenty a jejich deterministické pořadí pro skutečný sezónní index subset; material.alpha zůstává1. Žádný pevně zvolený111.pseudoměřený strom.",
+    "Materiály z druhého disjunktního tasku převzít až po jeho checkpointu. MTree je comparator; pokud kompatibilita selže, doložit skutečný failure a pokračovat vlastním reprodukovatelným generátorem, neinstalovat nic globálně.",
+    "R4 source převzal root po ukončení všech Blender procesů; frozen source claim bez heavy-validation. Další modelování/Blender vyžaduje novou explicitní rezervaci. Heavy je předán trees-20261025-validation."
+  ],
+  "status": "ready",
+  "dependsOn": []
+}

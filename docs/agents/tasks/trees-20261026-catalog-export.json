@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-catalog-export",
+  "title": "KEY-62: obnovitelná výroba110zdrojových stromů a společný FAR katalog",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/trees-20261026-catalog-export/",
+    "tests/tree-catalog-export.test.ts",
+    "docs/trees/20261025/catalog-export.md",
+    "docs/agents/handoffs/trees-20261026-catalog-export.md",
+    ".cache/trees-catalog-export-20261026/",
+    "assets/blender/vegetation/seasonal-catalog/",
+    "public/models/vegetation/seasonal-catalog/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Jeden obnovitelný postup plán→fitted axes→native→perLOD→sdílený FAR→atomický manifest pro přesně110existujících identit. Kořeny, collider radii, uncertainty a bare strom zachované. Původní dva přijaté piloty se nepřetvářejí.",
+    "Malé koruny zachovají metrickou velikost listů: plošný autorský density rozpočet z hlavních scale párů a prostorový výběr celých skupin s parent-closure pruning jemného dřeva. Rozpočet je interpretace, nikoli měření; extrémy/mezery/napojení se ověří na vybraných skutečných stromech.",
+    "Near/MID mají stejné listové komponenty a ranky, metrické UV a skutečné podpěry. Dřevo z fitted os znovu vytvořit, nepoužít affine scale na hotový radiální mesh. Přenosné čisté helpery místo importu starého skriptu s top-level IO.",
+    "Editovatelné native blend zdroje, původní fotografické mapy sdílené knihovnou nebo jinou doloženou deduplikací. Nové výstupy výhradně ve vlastním scope; žádné přepsání starých modelů.",
+    "FAR se fituje ke stejné zmrazené bance skutečných medoidů, nevyrábí110atlasů. Explicitní přesné fallback skupiny bez ztráty pokrytí; source/GPU/texturové náklady oddělené.",
+    "Výstupy po každém stromu hashované a obnovitelné. Celý runtime manifest atomicky až po všech položkách; žádná poloviční produkční aktivace. GPU/runtime default ovládá root.",
+    "Implementace zahrnuje cílený refaktoring a smysluplné geometrické/exportní kontroly, native reopen/rohů/UV/rank/support a samostatný audit katalogových identit."
+  ],
+  "verification": [
+    "Při implementaci pouze nezbytné úzké CPU kontroly. Žádné plné testovací sady/build/integrace.",
+    "BlenderCPU max2vlákna a hromadná generace jen po výslovném předání heavy-validation. Zatím psát generátor a malé přenosné fixtures; root nejprve ověří dokončený FAR pilot ve hře.",
+    "Před hromadnou výrobou vybrat skutečné5m/24m/odlišně úzké zdroje a bare větev; předat snímky/počty/support důkazy. Nejistoty a neověřená GPU omezení uvést pravdivě."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Přímá navazující implementace catalog_rollout_plan po konkrétním čtecím návrhu. Nový disjunktní task, původní catalog helper vlastní root a je read-only závislost.",
+    "V4 runtime implementuje ncm_startup_probe, FAR banku far_r6_design; koordinovat formát/zmrazené SHA. Žádný rekurzivní BMAD, instalace nebo GPU/server; nové výstupy naD.",
+    "Root koordinátor výslovně schvaluje přípravu pipeline; hromadný výstup naváže na konkrétní přijatou banku a přidělený heavy slot.",
+    "26.10 root výslovně povolil před čekajícím GPU přijetím pouze native geometrii čtyř zdrojů4314257232/ipr-crown-074/ipr-b6-south-conifer/ipr-b6-north-bare. GPU foreground čeká na uživatele; tato nezávislá geometrická kontrola nemění přejímku FAR mipů. Vyžaduje companion claim trees-20261025-validation-window. Hromadný110export zatím nepouštět.",
+    "26.10 ROOT POVOLIL řízenou výrobu zbývajících104zdrojů po přijetí šesti native/decoder/source podkladů, CM FAR/sezónního herního pilotu a nezávislém review publisher/cleanup. Původní zákaz mass je tím pro nový stabilní run nahrazen. Vlastní heavy claim, jedenBlenderCPU2, --compact=yes, bezpečné pauzy mezi zdroji. Neměnit banku, source piny, hotové modely ani96MiB admission limit; při skutečném budget/support selhání zastavit na doložené příčině. Root finální110manifest aktivuje ažpo úspěšné celkové validaci."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261027-main-publication",
+  "title": "Dokončené stromy a PCF: publikace a sjednocení main",
+  "status": "done",
+  "dependsOn": [],
+  "writePaths": [".cache/trees-main-publication-20261027/", "docs/trees/20261025/completed-release.md", "docs/agents/handoffs/trees-20261027-main-publication.md", "_bmad-output/specs/spec-issues-20261019/", "docs/analysis/issues-20261019/", "docs/agents/handoffs/bmad-issues-analysis-20261019.md", "docs/agents/handoffs/bmad-issues-movement-20261019.md", "docs/agents/handoffs/bmad-issues-performance-20261019.md", "docs/agents/handoffs/bmad-issues-rendering-20261019.md"],
+  "resources": [],
+  "acceptance": ["Výslovný požadavek uživatele27.10: dokončené celky commitovat, pushnout a sjednotit main bez ztráty cizího WIP.", "Publikovat přesný pasivní asset release110 a samostatně ověřenou PCF opravu; neaktivovat neověřený katalog110 ani nové NCM/default přepínače.", "Povinné CI a project-acceptance pro přesný head, následný merge a shodné místní/vzdálené main. Původní dirty primary zachovat s identickými soubory/indexem/HEAD pod pojmenovanou WIP větví."],
+  "verification": ["Nezávislé čtecí scope/history review, cílené testy přesného odděleného celku, produkční build a integrace; CI celá sada. Heavy slot a konkrétní asset/source scopes drží root zvlášť."],
+  "notes": ["Koordinátor root pokračuje v existujících vlastních file claims; nový task přidává jen publikaci/evidenci. Izolovaný ověřovací checkout naD je read-only kombinace přijatého commitu. Žádný reset/restore/clean/stash ani checkout nad primary WIP.", "B1b3cf a feedbackc713 jsou patchově ekvivalentní upstream6dd89606/dacb825b. Neduplicitní hotová dokumentační analýza df6b53af se přezkoumá a převezme samostatně. Původní testovací buildy se nemění."]
+}

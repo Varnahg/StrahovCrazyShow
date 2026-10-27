@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-diagnostic-port",
+  "title": "KEY-62: neměnný WebGPU diagnostický server",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [".cache/trees-diagnostic-server-20261026/", "docs/agents/handoffs/trees-20261026-diagnostic-port.md"],
+  "resources": ["port:4182"],
+  "acceptance": ["Stejná explicitní frozen/source identita, bez HMR a bez přepisování4180/4181 nebo původních uloženýchbuildů.", "Pouze loopback s lokálním existujícím diagnostics collectorem; žádná změna origin/auth politiky nebo automatické externí publikování.", "PID/cwd/worldId/sourcehash/logy zaznamenat; proces po práci ukončit nebo ponechat pod claimem."],
+  "verification": ["Skutečnýport/registry/HTTPreadiness; GPU a build okno rezervuje root odděleně."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Nové místo je určeno k identifikaci konkrétní readiness gate, nikoli k obcházení shader kontrol."]
+}

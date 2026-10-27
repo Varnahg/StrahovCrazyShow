@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-gpu",
+  "title": "KEY-62: statická Edge GTX1060 přejímka",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/trees-gpu-20261025/",
+    "docs/agents/handoffs/trees-20261025-gpu.md"
+  ],
+  "resources": [
+    "gpu"
+  ],
+  "acceptance": [
+    "Uživatel výslovně povolil přepnutí karty; skutečný inventory nyní žádnou lokální3Dscénu neukazuje. Pouze Edge, statické pevné kamery bez pohybu.",
+    "Měření vyžaduje současně vlastní heavy-validation, srovnatelný skutečný klient a CSS/interní rozlišení, zdrojhash/GPU/FPS/p95/p99 a limity.",
+    "Originální neměnné4179/2592 se nemění; screenshot a DOM důkaz skutečných sezón/variant."
+  ],
+  "verification": [
+    "Před startem ověřit registry a skutečné procesy; logs a failed attempts zachovat, žádný NullEngine jako GPU důkaz."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Aktivace .cache/trees-20261025/activate.ps1; veškerá nová velká data na D, node_modules junction pouze read.",
+    "Koordinátor root; modeler dočasně drží heavy-validation, tento task jej nepřebírá podle stáří. Claim až po skutečném release."
+  ]
+}

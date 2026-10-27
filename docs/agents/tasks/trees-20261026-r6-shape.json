@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-r6-shape",
+  "title": "KEY-62: malý nativní B5 pilot přirozenějšího prostorového větvení",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/trees-20261026-r6/",
+    "assets/blender/vegetation/seasonal-r6/",
+    "tests/tree-r6-shape.test.ts",
+    "docs/trees/20261025/r6-shape.md",
+    "docs/agents/handoffs/trees-20261026-r6-shape.md",
+    ".cache/trees-r6-shape-20261026/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nejdříve prohlédnout skutečný v9 B5 PNG a původní nativní R5 korunu/kostru; identifikovat konkrétní dominantní větev podle původních os, nikoli odhadnout branch ID. Zaznamenat varianty a zvolenou prostorovou úpravu.",
+    "Změnit pouze jeden doložený větevní podstrom B5: existující koncové výhony seskupit nepravidelně do prostoru s mezerami. Zachovat počet a fyzickou velikost listů, ranky, atlas/UV, materiály, osvětlení a úplné napojení dřeva/listů; žádné náhodné nové listy.",
+    "Použít explicitní deterministické transformace původních větví a potomků s dohledatelnými kotvami. Kořen, kolizní poloměr a ostatní stromy jsou neměnné. Rozlišit autorskou interpretaci od měření; botanický druh zůstává neznámý.",
+    "Uložit samostatný editovatelný blend s control/candidate a původními zabalenými mapami; všechny R4/R5 vstupy zůstanou byteově stejné. Žádný runtime export či změna hry, dokud root nepřijme obrazový pilot.",
+    "Nativní srovnání celé B5 koruny i holé kostry ze současného směru a přibližně45° se stejnou kamerou/materiály/světlem. PNG jsou nativní authoring preview, nikoli screenshot hry. Numerická evidence podpor, rozsahu změn, počtů, ranků, UV, bounds a cleanup."
+  ],
+  "verification": [
+    "Před Blenderem vlastní claim. Pouze Blender5.2 Cycles CPU se2threads; žádnáGPU scéna/Eevee a žádný build/fullsuite/integrace. Root drží samostatný GPU claim a testovací Edge je about:blank.",
+    "Malé cílené CPU regrese transformačního helperu a skutečný source audit; po uložení znovu otevřít blend a ověřit packed image provenance/objekty. Očekávané a skutečné výsledky oddělit.",
+    "Výstup předat se SHA vstupů/výstupů a přesnými příkazy; všechny vlastní procesy ukončit a release až po handoffu."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Uživatelská priorita je realističnost před přesnou kopií fotografie. Čtecí v9 audit identifikoval dlouhá olistěná ramena v patrech a slabé tonální oddělení; tento pilot mění jen geometrii, ne současně materiály.",
+    "Read-only vstupy pod rootovými rezervacemi: assets/blender/vegetation/seasonal-r5/r5-full-coverage-pilots.blend, scripts/trees-20261025-r5/, R4 axes/componentMetadata a R5 GLB. Root po dobu pilotu do těchto vstupů nepíše. Zachovat jejich původní hash.",
+    "Nový FAR helper a ověřený44listý vzorek jsou možné podklady pro dohledatelné rank/UV/branch vazby, nikoli povinnost upravovat právě tento malý subtree. Jeho skutečný probe prošel44listů/9ranků/88MIDtri.",
+    "Všechny velké nové soubory pouze naD. node_modules readonly junction, bez instalací; Blender C:/Program Files/Blender Foundation/Blender 5.2/blender.exe. Bez dalšího BMAD rendereru, publikování, commitů nebo přepínání cizích větví. V9 server a uložené uživatelské buildy se nemění.",
+    "Root po předání přebírá neměnné výstupy jedné větve. Procesy skončily; další rozšíření koruny bude samostatný task, původní control/candidate a jejich generátory zůstanou zachované."
+  ]
+}

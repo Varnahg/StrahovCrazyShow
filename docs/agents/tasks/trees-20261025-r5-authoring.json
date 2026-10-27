@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-r5-authoring",
+  "title": "KEY-62: odvozené výhony a úspornější stromová geometrie R5",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/trees-20261025-r5/",
+    "tests/tree-seasonal-lod.test.ts",
+    "docs/trees/20261025/model-r5.md",
+    "docs/agents/handoffs/trees-20261025-r5-authoring.md",
+    ".cache/trees-r5-authoring-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Navázat na skutečné GPU/obrazové R4 důkazy a immutable R4; žádné přepsání původních modelů, textur nebo generátoru.",
+    "Připravit nejprve fyzicky shodné Fir twig hull/quad varianty a jeden prostorově odvozený leafy shoot z přesně identifikované hierarchie; blízké listy nezvětšovat kvůli čitelnosti.",
+    "Near wood: adaptivní redukce neviditelných jemných ploch, bez uřezání hlavních spojů a zimní siluety; varianty měřit a zobrazit, neprohlašovat automaticky přijaté.",
+    "Baked mapy vzniknou nativním renderem konkrétní 3D geometrie: oddělená neosvětlená barva/opacity/normal/roughness, původní soubory beze změny a plná provenience.",
+    "Žádná Blender/export/render/full suite/GPU operace, dokud agent nezíská samostatný r5-bake claim s heavy-validation. CPU příprava skriptů a lehké algebraické kontroly mohou běžet souběžně."
+  ],
+  "verification": [
+    "Přímá delegace, bez rekurzivního BMAD. Implementace, cílený refaktoring, relevantní testy a předání společně; aktuálníCPU/GPU důkazy nezaměňovat."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; aktivace .cache/trees-20261025/activate.ps1; všechna nová velká data naD, node_modules junction pouze read.",
+    "První celek je porovnávací výroba, ne hromadný katalog. Ukázat omezené varianty před automatickým výběrem.",
+    "Katalog má110 sourceIDs; fyzické listy se nesmějí škálovat s celým stromem. API/export/material key kontrakt domluvit s rootem před propojením.",
+    "R4 je pod root immutable checkpointem .cache/trees-pilot-20261025/r4-optimized; read-only vstup. Design rozhodnutí viz docs/trees/20261025/decision.md a GPUevidence pilot-v3.md."
+  ]
+}

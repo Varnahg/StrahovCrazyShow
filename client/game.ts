@@ -21,6 +21,8 @@ import { prepareRenderQualities } from "./render-quality-preparation";
 import { WebGpuPipelinePreparation } from "./webgpu-pipeline-preparation";
 import { arePreparationEffectsReady } from "./strict-material-preparation";
 import { selectLightingPreview } from "./lighting-preview";
+import { getTreeSeasonState } from "../shared/tree-season";
+import treeCatalog from "../shared/data/assets/tree-catalog.json";
 import {
   AvatarPrimitivePool,
   createAvatarRig,
@@ -28,7 +30,7 @@ import {
 } from "./avatar-renderer";
 import { buildWorld } from "./world-renderer";
 import { captureModelReview } from "./model-review";
-import { resolveTerrainReview, terrainReviewPose, terrainReviewIdentity, type TerrainReviewPreset } from "./terrain-review";
+import { resolveTerrainReview, resolveTreePilot, terrainReviewPose, terrainReviewIdentity, type TerrainReviewPreset } from "./terrain-review";
 import { captureRenderCostInventory } from "./render-cost";
 import { snapshotBenchmarkDiagnostics } from "./benchmark-snapshot";
 import { EnabledMeshCandidates } from "./active-mesh-candidates";
@@ -217,6 +219,8 @@ export type Benchmark = {
   date: string;
   sourceSnapshotId: string | null;
   terrainReview?: ReturnType<typeof terrainReviewIdentity>;
+  treePilot?: "own" | "mtree";
+  treeSeason?: { sampledAt: number; source: "regional-model" | "demo"; phaseDay: number };
   durationSeconds: number;
   frames: number;
   averageFps: number;
@@ -334,6 +338,11 @@ export class Game {
   onRendererFailure?: (message: string) => void;
   onNotice?: (message: string) => void;
   onBenchmark?: (result: Benchmark) => void;
+  private lightingReadiness?: {
+    quality: string; stage: string; lastGate: string | null;
+    mesh: string | null; material: string | null;
+    waits: { mesh: number; precipitation: number; pipeline: number; health: number; effects: number };
+  };
   onSelection?: (selection: WorldSelection | null) => void;
   selectedTarget: WorldSelection | null = null;
   selectionMarker?: Mesh;
@@ -872,6 +881,8 @@ export class Game {
     const eyeHeight = this.avatars.get(this.localId)?.eyeHeight ?? 1.63;
     const eyeAboveGround = CHARACTER_RADIUS + CHARACTER_HALF_HEIGHT + this.actor.controller.offset() - 0.8 + eyeHeight;
     this.pitch = terrainReviewPose(this.terrainReview, (x, z) => this.sim.surfaceHeight(x, z), eyeAboveGround).pitch;
+    const position = this.actor.position;
+    this.updateCameraFollow(new Vector3(position.x, position.y, position.z), eyeHeight, 0);
   }
   async start() {
     this.assertStartupActive();
@@ -903,6 +914,9 @@ export class Game {
     this.canvas.dataset.bootStage = "avatar-and-props";
     this.compilationProfile.setStage("assets");
     this.createStartupActor();
+    // Hidden asset draws and LOD selection must use the same authored view as
+    // the later game frame. Refresh again after the actual avatar eye is known.
+    this.prepareTerrainReviewCamera();
     // Streamed materials must be rendered while glTF assets finish their
     // scene-readiness checks. A non-rendering preload can otherwise deadlock.
     let pipelinePreparation: WebGpuPipelinePreparation | undefined;
@@ -933,6 +947,7 @@ export class Game {
       this.transit = new TransitRenderer(this.scene, (x, z) =>
         this.sim.surfaceHeight(x, z),
       );
+      const treePilot = resolveTreePilot(window.location, this.network);
       const [interior, vegetation, car] = await this.renderHealth.guard(Promise.allSettled([
         hasCadBuilding("53929071") ? Promise.resolve(undefined) : this.trackStartupAsset(loadB6Reality(this.scene, {
           foundationY: B6_LAYOUT.foundationOffset,
@@ -946,7 +961,7 @@ export class Game {
             throw error;
           },
         )),
-        this.trackStartupAsset(loadVegetation(this.scene)),
+        this.trackStartupAsset(loadVegetation(this.scene, treePilot ? { treePilot } : { treeCatalog })),
         this.trackStartupAsset(loadCar(this.scene).then(
           (value) => {
             if (!this.disposed && !this.rendererFailed) this.canvas.dataset.carStage = "ready";
@@ -1019,6 +1034,7 @@ export class Game {
     // Keep the scope through restore and the final submitted-frame gate.
     pipelinePreparation = new WebGpuPipelinePreparation(this.engine, {
       signal: this.startupAbort.signal,
+      diagnostics: !!this.terrainReview && !this.network,
       retryIncompleteFrame: () => {
         // A skipped once-only/periodic target must receive a real retry. This
         // registry also covers shared/standalone ObjectRenderer owners; normal
@@ -1034,7 +1050,13 @@ export class Game {
           stage: "preparation-start", rendererId: this.renderHealth.rendererId,
           timing: this.frameLifecycleProfile.snapshot(),
         });
-      const preparation = await this.renderHealth.guard(this.prepareLighting(preloadRender, pipelinePreparation));
+      const preparation = {
+        ...(await this.renderHealth.guard(this.prepareLighting(preloadRender, pipelinePreparation))),
+        ...(this.lightingReadiness ? {
+          readiness: this.lightingReadiness,
+          pipeline: pipelinePreparation.snapshot(),
+        } : {}),
+      };
       this.assertStartupActive();
       sessionDiagnostics.event("lighting-preparation", preparation);
       sessionDiagnostics.event("webgpu-preparation-profile", this.compilationProfile.snapshot());
@@ -2606,6 +2628,7 @@ export class Game {
       daylight: sun.daylight,
       player: pos,
       quality: this.quality,
+      season: getTreeSeasonState(instant, this.timeOverride === null ? "regional-model" : "demo"),
     });
     this.environmentProfile?.mark("vegetation");
     this.transit?.update({
@@ -2690,6 +2713,27 @@ export class Game {
     pipelines?: Pick<WebGpuPipelinePreparation, "isReady">,
     options?: { timeoutMs: number; restoreQuality?: () => void },
   ) {
+    // Local fixed guest QA only. Reuse the actual gate results; no extra mesh,
+    // Effect or pipeline probes and no retained renderer object references.
+    const readiness = this.terrainReview && !this.network ? {
+      quality: this.quality, stage: "initial", lastGate: null as string | null,
+      mesh: null as string | null, material: null as string | null,
+      waits: { mesh: 0, precipitation: 0, pipeline: 0, health: 0, effects: 0 },
+    } : undefined;
+    this.lightingReadiness = readiness;
+    const gate = (name: "mesh" | "precipitation" | "pipeline" | "health" | "effects", ready: boolean, mesh?: unknown) => {
+      if (!ready && readiness) {
+        readiness.lastGate = name; readiness.waits[name]++;
+        if (name === "mesh") {
+          const m = mesh as { name?: unknown; material?: { name?: unknown } | null } | undefined;
+          readiness.mesh = typeof m?.name === "string" ? m.name.slice(0, 120) : null;
+          readiness.material = typeof m?.material?.name === "string" ? m.material.name.slice(0, 120) : null;
+        } else {
+          readiness.mesh = readiness.material = null;
+        }
+      }
+      return ready;
+    };
     const isRetired = () => this.disposed || this.rendererFailed || this.scene.isDisposed;
     // The same controller/materials survive into gameplay; no proxy shaders.
     this.flashlight ??= new PlayerFlashlight(this.scene);
@@ -2839,9 +2883,16 @@ export class Game {
     };
     return prepareLightVariants({
       timeoutMs: options?.timeoutMs,
+      // Keep the helper's 4ms slice; cheap WebGPU checks should use that slice
+      // rather than yield a whole RAF after only128 meshes. Retain a count cap.
+      batchSize: this.engine.isWebGPU ? 512 : undefined,
       includeDayPointVariants,
       includeLowVehicleVariants,
       apply: (stage) => {
+        if (readiness && readiness.stage !== stage) {
+          readiness.stage = stage; readiness.lastGate = readiness.mesh = readiness.material = null;
+          const w = readiness.waits; w.mesh = w.precipitation = w.pipeline = w.health = w.effects = 0;
+        }
         if (stage === "restore") return restore();
         const vehicle = stage.startsWith("vehicle-");
         if (vehicle) showVehicle();
@@ -2864,8 +2915,11 @@ export class Game {
         return active.data.slice(0, active.length);
       },
       beforeChecks: () => this.scene.incrementRenderId(),
-      check: (mesh) => this.isMeshReadyForCamera(mesh),
+      check: (mesh) => gate("mesh", this.isMeshReadyForCamera(mesh), mesh),
       effectsReady: () => {
+        // Reached only after the entire mesh batch passed. An earlier mesh or
+        // pipeline wait must not masquerade as the currently blocking gate.
+        if (readiness) readiness.lastGate = readiness.mesh = readiness.material = null;
         const health = this.renderHealth.snapshot();
         if (health.errorCount || health.phase === "restart-required")
           throw new Error("Příprava rendereru byla přerušena chybou zařízení nebo shaderu.");
@@ -2873,10 +2927,10 @@ export class Game {
         // Real preparation and newly requested effects must settle before this
         // variant advances, even if a material can still draw its old effect.
         return (
-          (this.precipitation?.prepare() ?? true) &&
-          (pipelines?.isReady() ?? true) &&
-          health.pendingPreparationOperations === 0 &&
-          arePreparationEffectsReady(this.engine)
+          gate("precipitation", this.precipitation?.prepare() ?? true) &&
+          gate("pipeline", pipelines?.isReady() ?? true) &&
+          gate("health", health.pendingPreparationOperations === 0) &&
+          gate("effects", arePreparationEffectsReady(this.engine))
         );
       },
       render,
@@ -3258,6 +3312,8 @@ export class Game {
           date: new Date().toISOString(),
           sourceSnapshotId: import.meta.env.VITE_SOURCE_SNAPSHOT_ID || null,
           terrainReview: terrainReviewIdentity(this.terrainReview),
+          treePilot: this.vegetation?.stats.treePilot,
+          treeSeason: this.vegetation?.stats.treeSeason ? { ...this.vegetation.stats.treeSeason } : undefined,
           durationSeconds,
           frames: b.frames.length,
           averageFps: Number(((1000 * b.frames.length) / sum).toFixed(1)),

@@ -37,13 +37,31 @@ function withPhotoGrassShape(body:{vertex:string;fragment:string}) {
     fragment,
   };
 }
+function withTreeWindValues(values:Record<string,unknown>) {
+  assert.equal(values.MATERIALPLUGIN_8,true,'historical shared plugin identity');
+  assert.equal(Object.hasOwn(values,'MATERIALPLUGIN_9'),false);
+  assert.equal(Object.hasOwn(values,'STRAHOV_TREE_WIND'),false);
+  const {MATERIALPLUGIN_8:_historical,...unchanged}=values;
+  return {...unchanged,MATERIALPLUGIN_9:true,STRAHOV_TREE_WIND:true};
+}
+function withTreeWindIdentity(source:string,format:'defines'|'prefix') {
+  // This fixed scenario order assigns the original MaterialPluginBase class 8
+  // and the new TreeWindPlugin class 9. Change exactly that identity and its
+  // explicit feature declaration; do not strip plugin flags or shader bytes.
+  assert.doesNotMatch(source,/MATERIALPLUGIN_9|STRAHOV_TREE_WIND/);
+  const line=(name:string)=>format==='defines'?`#define ${name}\n`:`const ${name} = true;\n`;
+  const anchor=format==='defines'?'#define TEXTURE_REPETITION_MODE 0\n':'const TEXTURE_REPETITION_MODE = 0;\n';
+  return replaceOnce(replaceOnce(source,line('MATERIALPLUGIN_8'),line('MATERIALPLUGIN_9')),
+    anchor,line('STRAHOV_TREE_WIND')+anchor);
+}
 for(const kind of kinds)test('patched distribution actual native WGSL/order reuse '+kind,async()=>{
   const candidate=await scenario(kind);results.push(candidate);const baseline=(baselines as any)[kind].baseline,expected=(baselines as any)[kind].canonical;
   const photoGrass=kind==='photo-grass'||kind==='photo-grass-thin';
   assert.deepEqual(Object.getOwnPropertyDescriptor(MaterialDefines.prototype,'toString'),descriptor,'no process-local serializer wrapper');
   // The accepted JSON baseline omits undefined-valued properties. Same-engine
   // exact public values (including undefined) are asserted inside scenario.
-  for(const index of [1,2]) {
+  if(kind==='wind')assert.equal(candidate.states.length,5);
+  for(const index of kind==='wind'?[0,1,2,3,4]:[1,2]) {
     const historicalValues = baseline.states[index].values;
     if(kind === 'standard') {
       // The later IBL fix explicitly declares this formerly absent false field.
@@ -53,7 +71,7 @@ for(const kind of kinds)test('patched distribution actual native WGSL/order reus
     }
     const expectedValues = kind === 'standard'
       ? {...historicalValues, LODBASEDMICROSFURACE: false}
-      : historicalValues;
+      : kind==='wind'?withTreeWindValues(historicalValues):historicalValues;
     const historicalMetadata=baseline.states[index].metadata;
     // KEY-61 generalizes the existing wind to another authored plant. Preserve
     // the complete old oracle; only this appended vec3 and two literal-to-UBO
@@ -65,8 +83,11 @@ for(const kind of kinds)test('patched distribution actual native WGSL/order reus
     assert.deepEqual(candidate.states[index].metadata,expectedMetadata);
     assert.deepEqual(candidate.states[index].body,photoGrass?withPhotoGrassShape(baseline.states[index].body):baseline.states[index].body);
     assert.deepEqual(JSON.parse(JSON.stringify(candidate.states[index].values)),expectedValues);
-    assert.equal(candidate.states[index].defines,expected.states[index].defines);
-    for(const stage of [0,1])assert.deepEqual(candidate.states[index].prefixes[stage].split('\n').sort(),baseline.states[index].prefixes[stage].split('\n').sort());
+    assert.equal(candidate.states[index].defines,kind==='wind'?withTreeWindIdentity(expected.states[index].defines,'defines'):expected.states[index].defines);
+    for(const stage of [0,1]) {
+      if(kind==='wind')assert.equal(candidate.states[index].prefixes[stage],withTreeWindIdentity(expected.states[index].prefixes[stage],'prefix'));
+      else assert.deepEqual(candidate.states[index].prefixes[stage].split('\n').sort(),baseline.states[index].prefixes[stage].split('\n').sort());
+    }
   }
   // Actual hardBind data proves the default grass still has the same 60mm
   // bending denominator and 0.001 strength; no value is taken from production

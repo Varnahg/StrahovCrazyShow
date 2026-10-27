@@ -1,0 +1,27 @@
+# Předání: trees-20261026-far-clusters
+
+- Vlastník `trees-far-clusters-01a16b37`; příjemce root koordinátor KEY-62. Cwd `D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025`, větev `codex/trees-realism-20261025`, baseline `8516c7b1877ec66c37120d9088264d44c52882f1`.
+- Výsledek: dokončený čistý podklad pro B5 rankový FAR pilot. Existující branchmapping je identifikovaný v R4 manifestu/osách; GLB per-leaf branch ID nemá. Nový helper explicitně spojuje souvislé listové komponenty podle ranku a jednoznačné fotografické UV footprint s pinovaným metadata řádkem. Nedoplňuje odhadnuté větve ani kotvy z pořadí vertexů. Produkční průchod a obrazová přejímka zůstávají rootovi.
+- Změněné soubory: nové `scripts/trees-20261026-far/rank-clusters.mjs`, `scripts/trees-20261026-far/prepare.mjs`, `tests/tree-far-clusters.test.ts`, `docs/trees/20261025/far-clusters.md`, toto předání a `.cache/trees-far-clusters-20261026/`. Žádné převzaté dirty soubory; claim před prvním zápisem bez adopt-dirty. R4/R5, fotografie, runtime, katalog a cizí WIP jsou beze změny.
+- Podklady: původní `add_foliage.py`, R5 `prepare.mjs`, čistý `geometry.mjs`, `full_coverage.py`, `validate_coverage.mjs`, existující prepared/summary JSON, R4 manifest a osy, současný R5 GLB JSON header. Exact source/hash a tradeoffs jsou v `far-clusters.md`. Kód potvrzuje cyklus9fotografických částí a nejvýše6listů v ranku; skupina44listů má9ranků a nesmí se převést na jeden společný opad.
+- Refaktoring: čistý join/validace/partition/frame oddělený od explicitního filesystem adapteru. Sdílený pinovaný R5 geometrický helper poskytuje vector/sample operace; žádný starý authoring skript s top-level zápisy se neimportuje. Žádná bitmapa, runtime cache, observer, každoframový upload nebo nový collider. Referenční geometrie se necentruje, neškáluje ani nepřepisuje.
+- Ověření: `node node_modules/tsx/dist/cli.mjs --test tests/tree-far-clusters.test.ts`: **8/8 PASS,0fail,0skip**, exit0,0.632s; log `.cache/trees-far-clusters-20261026/fixtures-adapter.log`. První čistě helper sada7/7 je zachována v `fixtures-first.log`. Testy mají malé syntetické near/MID komponenty, ověřují determinismus včetně permutace vertexů/metadata, kotvy/měřítko, bounds, úplné jedinečné členství v rovinách, neplatné vstupy, glTF↔Blender souřadnice/UV a import bez privátní cache.
+- Syntax/type kontrola: `node --check` obou nových `.mjs` exit0. Úzký `node node_modules/typescript/bin/tsc --noEmit --pretty false --strict --skipLibCheck --target ES2023 --module ESNext --moduleResolution Bundler --types node tests/tree-far-clusters.test.ts` exit0; `.cache/trees-far-clusters-20261026/typecheck-targeted.log` prázdný. Nebyl spuštěn celý tsc/fullsuite/build/integrace. `git diff --check` vlastních cest exit0; nové untracked soubory tento Git příkaz neověřuje.
+- Nezávislý čtecí source audit potvrdil join a metrickou rovnici, upozornil na společný Blender Z-up rámec a skutečný `sample(t)` parametr. Finální čtecí review helperu/adapteru nemá další konkrétní nález; reviewer žádné testy ani produkční probe nespouštěl.
+- Checkpoint: `.cache/trees-far-clusters-20261026/checkpoint/checkpoint.json`, **10 souborů včetně testů a čtených kódových/atlasových závislostí**, vytvořeno `2026-10-26T12:13:16.100Z`, source digest **`b5674e17b409aaaa920facc7f5e6534fa73bf758516a1b43fad704f9f6df2e86`**. Kopie jsou v `checkpoint/files/`. Velké produkční modely se nekopírovaly; jejich piny drží adapter. Handoff sám není v digestu.
+- Procesy: všechny malé Node příkazy skončily, žádný vlastní server/port, Blender, GPU ani dlouho běžící pomocný proces. Žádná instalace, staging či commit. `node_modules` jen čten. Rootův frozen v9 a běžící fullsuite zůstaly nedotčené.
+- Omezení: transformace skutečné produkční geometrie **neproběhla na výslovný pokyn rootu**, který ji převezme po uvolnění ověřovacího okna. Úspěch skutečného44/9joinu ani bitmapový atlas/vizuální FAR se netvrdí. Metrická norma dokládá měřítko a vzdálenost od kotvy, ne orientaci/roll. Návrh35°/1–2rovin musí teprve projít obrazovým srovnáním a rozpočtem celého katalogu.
+- Rezervace: po tomto předání authoring owner provede release. Root výslovně přebírá nový WIP i oprávnění k pozdějšímu `--adopt-dirty` reclaimu tohoto scope. Stav tasku/Linear a integraci upravuje root; release není přijetí FAR modelu ani dokončení KEY-62.
+
+## Jednorázový produkční probe pro root
+
+Po převzetí scope a po uvolnění kolidujícího heavy okna:
+
+```powershell
+. .cache/trees-20261025/activate.ps1
+node scripts/trees-20261026-far/prepare.mjs --sample
+```
+
+Výstup `.cache/trees-far-clusters-20261026/b5-subtree-4118.json`, zápis `wx`, maximálně1MiB. Příkaz vyžaduje R5 GLB SHA `9113d99327c52fc7de197cf8857b562a8ad25fa375db39905299a4722b433df7`, R4 GLB `814af0881a54f5f82d101f29161be28e654320f1c09b1d71279981fa72b55d6e`, R4 metadata `8dc3f4554dc729d7baa67a54a5c78e7d524b0888d8ebdbe60fbae5ccf283f2f6`, osy `0351435a583ad136e09ad93a99bb2e997c48a67e36c99ca80eaa5e5b042147a8` a atlasové definice `022533e3a97b5fda8d025914e9137dd8b897dc6199a032b7df60737cf13a50a3`.
+
+Očekávané invarianty: source `ipr-crown-014`, root `[-67.59,-60.96]`, radius0.484; branches4118/4119/4120; **44listů / 9ranků / 176MIDvertexů / 88MIDtri**; ranky1069,7034,10847,24933,28922,32722,36376,55396,57879. Každý list má jediný metadatařádek, přesné UV a kotvu; každá navržená varianta obsahuje každý list jednou. Návrh9–18rovin/18–36tri, konkrétní rozdělení a výsledný SHA určí až skutečný běh. Příkaz nevytváří bitmapy, GLB, Blender master ani runtime asset.

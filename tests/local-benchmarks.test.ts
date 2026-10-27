@@ -68,10 +68,11 @@ test("projection retains exact bounded terrain review evidence across both UI an
     const identity = terrainReviewIdentity(preset)!;
     const raw = { ...sample(), avatars: 1, terrainReview: { ...identity, source: "private source filename", nickname: "private", nested: { path: "private" } } };
     const browser = projectLocalBenchmark(raw), server = projectLocalBenchmark(browser);
-    const expected = { version: 1, id: preset.id, scope: "static-guest-start", spawnXZ: [...preset.spawnXZ], lookAtXZ: [...preset.lookAtXZ] };
+    const expected = { version: 1, id: preset.id, scope: "static-guest-start", spawnXZ: [...preset.spawnXZ], lookAtXZ: [...preset.lookAtXZ],
+      ...(preset.targetHeight===undefined?{}:{targetHeight:preset.targetHeight}),...(preset.sourceTreeId===undefined?{}:{sourceTreeId:preset.sourceTreeId}) };
     assert.deepEqual(browser.terrainReview, expected);
     assert.deepEqual(server, browser, "second privacy projection must be idempotent");
-    assert.deepEqual(Object.keys(server.terrainReview), ["version", "id", "scope", "spawnXZ", "lookAtXZ"]);
+    assert.deepEqual(Object.keys(server.terrainReview), Object.keys(expected));
     assert.ok(!JSON.stringify(server.terrainReview).includes("private"));
     raw.terrainReview.spawnXZ[0] = 999;
     assert.deepEqual(server.terrainReview, expected, "neither projection retains incoming coordinate arrays");
@@ -80,6 +81,31 @@ test("projection retains exact bounded terrain review evidence across both UI an
   }
   assert.equal(Object.hasOwn(projectLocalBenchmark(sample()), "terrainReview"), false);
   assert.equal(projectLocalBenchmark({ ...sample(), terrainReview: null }).terrainReview, null);
+});
+
+test("projection preserves bounded actual tree metrics, pilot and one season sample without private metadata",()=>{
+  const metrics={legacyTreeInstances:108,rankEnabledTreeInstances:2,treeDetailCacheEntries:12,treeDetailCacheBytes:52000000,treeDetailReservedBytes:2000000,treePilotGeometryBytes:95000000,treePilotSourceBytes:86372932,treePilotSeasonBytes:12000000,treeTextureSourceBytes:13744668,treeFetchedBytes:189000000,treeFetchRequests:25};
+  for(const source of ["regional-model","demo"])for(const treePilot of ["own","mtree"]){
+    const raw={...sample(),avatars:1,terrainReview:terrainReviewIdentity(TERRAIN_REVIEW_PRESETS["b5-tree-near"]),treePilot,treeSeason:{sampledAt:Date.UTC(2028,1,29,12),source,phaseDay:59.84,revision:123,groups:{private:"drop"},name:"private"},renderCost:{vegetation:{...metrics,sourceTreeIds:["private"],textureUrl:"private",loadError:"private"}}};
+    const result=projectLocalBenchmark(raw);assert.deepEqual(result.renderCost.vegetation,metrics);assert.equal(result.treePilot,treePilot);
+    assert.deepEqual(result.treeSeason,{sampledAt:Date.UTC(2028,1,29,12),source,phaseDay:59.84});assert.equal(JSON.stringify(result).includes("private"),false);
+    assert.deepEqual(projectLocalBenchmark(result),result);
+  }
+  for(const key of Object.keys(metrics))for(const bad of [-1,NaN,Infinity,1e12+1])assert.throws(()=>projectLocalBenchmark({...sample(),renderCost:{vegetation:{[key]:bad}}}));
+  for(const treePilot of [null,"baseline","own-broadleaf","constructor","http://example.com/private",{},1])assert.throws(()=>projectLocalBenchmark({...sample(),treePilot}));
+  for(const treeSeason of [null,{}, {sampledAt:"2026-10-25T10:00:00Z",source:"demo",phaseDay:100},
+    {sampledAt:NaN,source:"demo",phaseDay:100},{sampledAt:8.64e15+1,source:"demo",phaseDay:100},{sampledAt:.5,source:"demo",phaseDay:100},
+    {sampledAt:0,source:"station",phaseDay:100},{sampledAt:0,source:"demo",phaseDay:-1},{sampledAt:0,source:"demo",phaseDay:365},{sampledAt:0,source:"demo",phaseDay:NaN}])assert.throws(()=>projectLocalBenchmark({...sample(),treeSeason}));
+  const base=projectLocalBenchmark(sample());assert.equal(Object.hasOwn(base,"treeSeason"),false);assert.equal(Object.hasOwn(base,"treePilot"),false);
+  assert.throws(()=>projectLocalBenchmark({...sample(),avatars:1,treePilot:"own"}),/static review/);
+  assert.throws(()=>projectLocalBenchmark({...sample(),avatars:1,terrainReview:null,treePilot:"mtree"}),/static review/);
+});
+
+test("projection bounds elevated crown identity and rejects arbitrary tree identifiers",()=>{
+  const identity=terrainReviewIdentity(TERRAIN_REVIEW_PRESETS["b5-tree-near"])!;
+  for(const targetHeight of [-.01,100.01,NaN,Infinity,"7",null])assert.throws(()=>projectLocalBenchmark({...sample(),avatars:1,terrainReview:{...identity,targetHeight}}));
+  for(const sourceTreeId of ["private","constructor","ipr-crown-999",null,42])assert.throws(()=>projectLocalBenchmark({...sample(),avatars:1,terrainReview:{...identity,sourceTreeId}}));
+  for(const targetHeight of [0,100])assert.equal(projectLocalBenchmark({...sample(),avatars:1,terrainReview:{...identity,targetHeight}}).terrainReview.targetHeight,targetHeight);
 });
 
 test("projection rejects malformed or falsely multiplayer terrain review claims", () => {
@@ -106,6 +132,18 @@ test("projection accepts the actual positive integer avatar population including
   for (const avatars of [0, -1, .5, 1.5, 29.5, 10001, NaN, Infinity, -Infinity, "4", null, true, undefined]) {
     assert.throws(() => projectLocalBenchmark({ ...sample(), avatars }));
   }
+});
+
+test("projection keeps bounded actual litter cost and readiness without source metadata", () => {
+  const litter = { activePatches: 3, activeItems: 128, triangles: 512, cachedPatches: 8,
+    cacheBytes: 32000, generatedPatches: 10, pendingPatches: 0, ready: true, preparing: false, supportsTwigs: true };
+  const raw = { ...sample(), renderCost: { vegetation: { treeLitter: { ...litter, privatePath: "private", sourceIds: ["private"] } } } };
+  const browser = projectLocalBenchmark(raw), server = projectLocalBenchmark(browser);
+  assert.deepEqual(server.renderCost.vegetation.treeLitter, litter);
+  assert.deepEqual(server, browser);
+  assert.ok(!JSON.stringify(server).includes("private"));
+  assert.throws(() => projectLocalBenchmark({ ...raw, renderCost: { vegetation: { treeLitter: { ...litter, triangles: NaN } } } }));
+  assert.throws(() => projectLocalBenchmark({ ...raw, renderCost: { vegetation: { treeLitter: { ...litter, ready: "yes" } } } }));
 });
 
 test("local CPU and AA diagnostics whitelist numeric stages and real context attributes", () => {

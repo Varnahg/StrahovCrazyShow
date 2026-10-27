@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "status": "ready",
+  "dependsOn": [],
+  "resources": [],
+  "verification": [
+    "Cílené lehké CPU/GLSL/WGSL/lifecycle testy s pravdivými výsledky, předání a release. Plná pipeline a GPU jsou samostatně koordinované.",
+    "Původní user4179/2592 se nemění; node_modules junction jen číst, žádný implicitní pnpm install."
+  ],
+  "notes": [
+    "STROMY-20261025/KEY-62, autorizovaná implementace po výzkumu a konceptu, bez dalšího BMAD/rendereru/podagentů.",
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, branch codex/trees-realism-20261025. Spec _bmad-output/implementation-artifacts/trees-20261025/spec-key-62-stromy.md; před shellem .cache/trees-20261025/activate.ps1.",
+    "Vlastní claim před zápisem, přesný disjunktní scope. Rozhraní předat navazujícím autorům, nepsat do jejich souborů.",
+    "Čtyři existující WIP soubory předány trees-20261025-transmission; přesné přijetí původu viz seasonal rendering handoff."
+  ],
+  "id": "trees-20261025-season-rendering",
+  "title": "KEY-62: skutečný sezónní výběr listů a bezpečné stromové shadery",
+  "writePaths": [
+    "client/tree-appearance.ts",
+    "client/tree-wind.ts",
+    "client/tree-season-geometry.ts",
+    "tests/tree-appearance.test.ts",
+    "tests/tree-season-geometry.test.ts",
+    "docs/trees/20261025/season-rendering.md",
+    "docs/agents/handoffs/trees-20261025-season-rendering.md",
+    ".cache/trees-season-rendering-20261025/"
+  ],
+  "acceptance": [
+    "Z geometry-only GLB zachovat source data: COLOR_0.alpha je ověřený normalizovaný uint16 rank1..65534, nikoli průhlednost. Celé trojúhelníky leaf komponent musí mít stejný rank.",
+    "Jednorázový stabilní index sort/prefix plán, následně rychlý bounded výběr celých skupin bez per-frame alokace; rozsahy/typy/NaN/invalid indices odmítnout a původní source arrays neměnit.",
+    "PBR material.alpha zůstane1, vertexAlpha vypnutý; hlavní a shadow pass sdílí skutečný index subset. Nové lokální normály se nepřepíšou legacy72% crown proxy, legacy fallback si zachová chování.",
+    "Unikátní stabilní TreeWind a season plugin identity, nativní GLSL/WGSL. Fotografický detail/žilnatina se při modelovém sezónním tónování zachová; evergreen nesmí přejít celý do oranžové.",
+    "Ve spolupráci s loaderem zajistit leafAmount0 hide i po late load/LOD; shaderové změny nezpůsobují nové kompilace při každém minutovém vzorku."
+  ]
+}

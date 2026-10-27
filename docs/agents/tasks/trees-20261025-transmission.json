@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-transmission",
+  "title": "KEY-62: zdrojová a sezónní barva přímého průsvitu pilotních listů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/tree-season-material.ts", "tests/tree-season-material.test.ts", "tests/tree-effect-identity.test.ts", "tests/wgsl-vegetation.test.ts", "docs/trees/20261025/transmission.md", "docs/agents/handoffs/trees-20261025-transmission.md", ".cache/trees-transmission-20261025/"],
+  "resources": [],
+  "acceptance": ["Původní runtime průzkum potvrzuje, že useAlbedoToTintTranslucency tintuje pouze IBL, pilot s null translucencyColorTexture má bílou direct transmission. Nová opt-in korekce používá aktuální source/season surfaceAlbedo právě jednou.", "Legacy materiály s barevnou transmisní texture zůstanou beze změny; default plugin volba zachová dosavadní chování. Root přidá opt-in pouze v pilotní factory.", "GLSL/WGSL, actual PBR processing, effect identity/cache v obou pořadích instancí, alpha/shadow/rank chování. Žádný nový sampler, atlas ani globální světlo.", "Přesný pinovaný regex hook musí mít důkaz skutečné substituce a správného omezení na direct transmission; žádné tiché neúčinné nahrazení nebo double tint."],
+  "verification": ["Lehké cílené CPU/NullEngine a shader processing testy; root souběžně pouze vizuálně prohlíží zmrazenou GPU verzi, časované FPS běhy budou koordinované.", "Žádný GPU/Blender/build/full suite. Předání implementace, refaktoringu, testů a checkpointu společně."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; aktivace .cache/trees-20261025/activate.ps1. Přímá delegace bez dalšího BMAD.", "Převzetí existujícího WIP doložené docs/agents/handoffs/trees-20261025-season-rendering.md. Claim owner trees-transmission-01a16b37 s adopt-dirty pouze pro tento doložený převod.", "TreeRenderer/Vegetation vlastní root; API constructor options navrhnout včas, jiné soubory neměnit. Skutečný GPU/estetický dopad zatím není potvrzen. AO není součást této opravy."]
+}

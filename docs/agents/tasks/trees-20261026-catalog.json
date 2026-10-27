@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-catalog",
+  "title": "KEY-62: zdrojový plán a přizpůsobení os pro všech110stromů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["scripts/trees-20261026-catalog/", "tests/tree-catalog.test.ts", "docs/trees/20261025/catalog.md", "docs/agents/handoffs/trees-20261026-catalog.md", ".cache/trees-catalog-20261026/"],
+  "resources": [],
+  "acceptance": [
+    "Plán přesně110runtime stromů:107listnáčů,2jehličnany,1referenčně holý. ID, opravené kořeny, výšky/koruny a treeTrunkCollision radius převzít ze skutečných shared dat; nejistoty zachovat, žádné vymyšlené druhy nebo nové stromy.",
+    "Čisté deterministické přizpůsobení přijatých R6 listnatých/R5 jehličnatých os odděleně pro výšku, korunu a kmen. Hierarchie a skutečné napojení dřeva zachované. Fyzická velikost fotografických listů se nemění; přemístění kotev a nové vzorkování doložit.",
+    "Porovnat prosté škálování, osový fitting a plnou regeneraci; explicitní volba z doložených souřadnic a konkrétních vazeb, žádné falešné přesné zaměření.",
+    "Připravit reprodukovatelný zdrojový plán a čistý fit použitelný pro následný export110identit. Holý strom samostatná wood-only větev, nikoli zimní náhrada listnáče.",
+    "Současný runtime, staré piloty a fotografie jsou read-only. Tento task nezapíná nehotový katalog ani neprovádí masový Blender export; navazující heavy okno a výstupy koordinuje root."
+  ],
+  "verification": [
+    "Pouze nezbytné malé přenosné CPU testy: všechny ID/root/radius, finite bounds, napojení a hierarchy, fyzické měřítko listů, identity fit a odmítnutí nesmyslných vstupů.",
+    "Bez fullsuite/build/integrace/GPU/Blender a bez masového generování. Čtení skutečného110source inventáře a vytvoření malého plánového JSON je povolené v tomto scope."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Přímá implementace po čtecím výzkumu catalog_rollout_plan, vlastní claim/handoff/release, žádný rekurzivní BMAD.",
+    "FAR banku vytváří far_r6_design v disjunktním tasku. Budoucí kontrakt oddělí per-source placement/wood od sdílených listových skupin; přesné API řeší root před runtime integrací.",
+    "Všechny nové soubory naD; dependency junction pouze číst, žádné instalace. Hrané immutable snapshoty se nemění."
+  ]
+}

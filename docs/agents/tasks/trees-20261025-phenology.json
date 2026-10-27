@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-phenology",
+  "title": "KEY-62: deterministický regionální roční cyklus stromů a náhledy",
+  "writePaths": [
+    "shared/tree-season.ts",
+    "shared/data/tree-phenology.json",
+    "client/season-preview.ts",
+    "tests/tree-season.test.ts",
+    "tests/season-preview.test.ts",
+    "docs/trees/20261025/phenology.md",
+    "docs/agents/handoffs/trees-20261025-phenology.md",
+    ".cache/trees-phenology-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Jeden UTC instant souhlasný s astronomií; běžně aktuální datum, náhledy real/spring/summer/autumn/winter jasně DEMO a bez přepisování stanice.",
+    "Oddělit opadavý listnáč, stálezelený jehličnan, opadavý jehličnan a referenčně holý strom; druhové přiřazení místním stromům nevymýšlet.",
+    "Čisté bounded hodnoty leafAmount/maturity/senescence/litterPotential, samostatná retence opadu, plynulý roční cyklus včetně přestupného roku/UTC/year wrap. Umělecký offset seedem označený, nikoli živé měření.",
+    "Regionální ČHMÚ opora s přesným popisem missing/444, roky a nejistotou. Jedna aktuální teplota není historie GDD. Před implementací zaznamenat zvolené křivky a proč."
+  ],
+  "verification": [
+    "Lehké testy všech sezón/skupin/hranic/leap year/invalid input/cache identity/preview source a determinismu.",
+    "Žádné Game/UI/vegetation změny, GPU/build/fullsuite. API předat rootovi před navazující integrací."
+  ],
+  "notes": [
+    "Přímá delegace bez nového BMAD; zdrojový výzkum i vizuální koncept již hotové, user realism>přesná kopie.",
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, aktivace .cache/trees-20261025/activate.ps1; nové cache/data naD, neinstalovat do sdílených dependencies.",
+    "Shared API: getTreeSeasonState(instant, source regional-model|demo) a phenologyForTree(state, family, seed). Jména finálně potvrdit rootovi; oddělit stromové fáze od plánovaných UI menu. Ground hooks mohou být součást state jako odvozený model, ne automatický zásah do trávy jiného agenta.",
+    "Náhled zachová čas dne dle existující lighting-preview politiky; root zajistí Game/UI provázání. Konzultovat zásah do lighting-preview, neupravovat jej zde."
+  ],
+  "status": "ready",
+  "dependsOn": []
+}

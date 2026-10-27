@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-r6-export",
+  "title": "KEY-62: přesný runtime export přijaté B5 koruny pro kontrolovaný herní pilot",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/trees-20261026-r6-export/",
+    "public/models/vegetation/seasonal-r6/",
+    "public/models/vegetation/seasonal-r6-streamed/",
+    "tests/tree-r6-export.test.ts",
+    "docs/trees/20261025/r6-export.md",
+    "docs/agents/handoffs/trees-20261026-r6-export.md",
+    ".cache/trees-r6-export-20261026/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Vyjít z přesného předaného native crown blenda SHA1c212a55abf286894c874cd1da1b8f20b0ba30a59d02317c4180ba4580ce596c; root přijímá native podobu jako další herní pilot. Nativní source ani staré artefakty se nepřepisují.",
+    "Exportovat všechny3 B5 LOD s přesnou geometrií/normálami/UV/ranky a source root/radius. COLOR_0 má normalized uint16 rank1..65534 a bílé RGB; žádná ztráta opadových komponent nebo nechtěný alpha blending. Aktualizovat skutečné bounds a pořadí/metadata doložit vůči native.",
+    "Vytvořit v2 whole a v3 per-LOD kontrakt ve vlastních nových adresářích, kompatibilní se současným loaderem. Stable own-broadleaf a source identity se zachovají; vlastní conifer v pilotu odkazuje na přesně nezměněný stávající R5, není to nově modelovaný B6.",
+    "Zachovat sdílené fotografické materiálové mapy a full-coverage MID profil. Řídký FAR je stále známé omezení. Runtime entrypoint, shared typy a Game neměnit; root zapojí nový kontrakt až po předání.",
+    "Byte/strukturální audit všech accessorů, source identity a counts; produkční decoder musí načíst oba piloty a3LOD. Připravit malou přenosnou regresi bez top-level čtení ignorované cache, handoff+manifest+release."
+  ],
+  "verification": [
+    "Vlastní claim, případný Blender pouze background CPU2; žádná GPU scéna, build/fullsuite/integrace nebo instalace. CPU export a cílené testy jsou v tomto heavy okně.",
+    "Porovnat před/po hash všech R4/R5/R6 vstupů a packed textur; export bez přepsání veřejných starých modelů. Nové testy mají být součástí checkpointu."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, nové velké výstupy pouze naD. Root chrání vstupy svými disjunktními rezervacemi a nemění je během exportu.",
+    "Původní R5 conifer descriptor/GLB zůstává přesně stejný; preferovat reference na stávající URL a SHA před zbytečným kopírováním. Pokud současný exporter vyžaduje lokální kopii, doložit její byteovou identitu a důvod.",
+    "Použít existující čistý scripts/tree-seasonal-stream.mjs a číst R5 authoring zdroje; neměnit je. Žádný nový BMAD, staging/commit ani zápis do node_modules. Native crown metadata/osy jsou v .cache/trees-r6-crown-20261026/ a public R5 kontrakty jsou readonly.",
+    "Root přebírá hotové exporty; procesní heavy okno je po skutečném release předáno společné validaci v10. Staré vstupy i v9 jsou neměnné."
+  ]
+}

@@ -36,6 +36,7 @@ import {arePreparationEffectsReady} from "../client/strict-material-preparation"
 import {applyArtLighting} from "../client/art-lighting";
 import {selectLightingPreview} from "../client/lighting-preview";
 import {sunState,moonState} from "../shared/weather";
+import {getTreeSeasonState} from "../shared/tree-season";
 import {clampOrbitPitch} from "../client/camera-look";
 import "../client/render-shaders";
 
@@ -100,7 +101,7 @@ const selected=["prepareLighting","prepareLightingVariants","isMeshReadyForCamer
 const methods=declaration.members.filter(n=>n.name&&selected.includes(n.name.getText(tree)));assert.equal(methods.length,selected.length);
 report.methods=methods.map(n=>({name:n.name!.getText(tree),sha256:sha(n.getText(tree))}));
 const code=ts.transpileModule(`class ProofGame {${methods.map(n=>n.getText(tree)).join("\n")}}`,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
-const make=new Script(`(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,applyArtLighting,clampOrbitPitch,performance,window,document}=env;${code};return ProofGame;}`).runInThisContext();
+const make=new Script(`(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,getTreeSeasonState,applyArtLighting,clampOrbitPitch,performance,window,document}=env;${code};return ProofGame;}`).runInThisContext();
 const anchor=Date.parse("2026-10-18T12:45:00Z"),select=(mode:Parameters<typeof selectLightingPreview>[0])=>selectLightingPreview(mode,anchor);
 
 for(const initialQuality of ["low","medium"] as const) test(`native cold opposite fog view, initial ${initialQuality}`,async (t:import("node:test").TestContext)=>{
@@ -134,7 +135,7 @@ for(const initialQuality of ["low","medium"] as const) test(`native cold opposit
     runRenderLoop(next:()=>void){assert.equal(callback,undefined);callback=next;},stopRenderLoop(next:()=>void){if(callback===next)callback=undefined;},
     getHardwareScalingLevel:()=>engine.getHardwareScalingLevel(),setHardwareScalingLevel:(scale:number)=>engine.setHardwareScalingLevel(scale)};
   const Game=make({AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,
-    arePreparationEffectsReady:()=>arePreparationEffectsReady(engine),selectLightingPreview:select,applyArtLighting,clampOrbitPitch,performance,
+    arePreparationEffectsReady:()=>arePreparationEffectsReady(engine),selectLightingPreview:select,getTreeSeasonState,applyArtLighting,clampOrbitPitch,performance,
     window:{setTimeout,clearTimeout},document:{hidden:false,addEventListener(){},removeEventListener(){},pointerLockElement:null}});
   const requested=Object.freeze({quality:initialQuality,revision:7,hardwareScaling:1});
   const game:any=Object.assign(new Game(),{engine:routing,scene,camera,sun,ambient,lights,lamps:new StandardMaterial("lamp fixture",scene),clouds:[],
@@ -211,7 +212,8 @@ for(const initialQuality of ["low","medium"] as const) test(`native cold opposit
 
 // Real helper/Scene/material lifecycle through the actual inner Game method.
 // Clock/render callbacks are bounded scheduler seams; the native factory cases above own draw proof.
-function innerLifecycle(t: import("node:test").TestContext, webgpu = true) {
+function innerLifecycle(t: import("node:test").TestContext, webgpu = true,
+  configure?: (game: any, meshes: Mesh[]) => { isReady(): boolean } | undefined) {
   const engine = new NullEngine(), scene = new Scene(engine);
   const camera = new FreeCamera("inner pass", new Vector3(0, 1, -4), scene);
   scene.activeCamera = camera;
@@ -228,7 +230,7 @@ function innerLifecycle(t: import("node:test").TestContext, webgpu = true) {
   let now = 0, callback: (() => void) | undefined, stage = "", failEnvironment = false, healthError = false;
   const draws: { stage: string; flags: boolean[] }[] = [];
   const Game = make({AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,
-    MANUAL_HARDWARE_SCALING,arePreparationEffectsReady:()=>true,selectLightingPreview:select,applyArtLighting,clampOrbitPitch,
+    MANUAL_HARDWARE_SCALING,arePreparationEffectsReady:()=>true,selectLightingPreview:select,getTreeSeasonState,applyArtLighting,clampOrbitPitch,
     performance:{now:()=>now},window:{setTimeout:()=>1,clearTimeout(){}},
     document:{hidden:false,addEventListener(){},removeEventListener(){}}});
   const game:any=Object.assign(new Game(),{
@@ -240,11 +242,78 @@ function innerLifecycle(t: import("node:test").TestContext, webgpu = true) {
     localAvatarPresentation:{update:()=>({visible:true,cameraLight:false,resetAnimation:false})},
     updateRenderEnvironment(){point.includedOnlyMeshes=[meshes[0]];if(failEnvironment)throw new Error("environment fault");return{night:1};},
   });
-  const pending=game.prepareLightingVariants(()=>{draws.push({stage,flags:meshes.map(m=>m.alwaysSelectAsActiveMesh)});});
+  const pipelines=configure?.(game,meshes);
+  const pending=game.prepareLightingVariants(()=>{draws.push({stage,flags:meshes.map(m=>m.alwaysSelectAsActiveMesh)});},pipelines);
   t.after(async()=>{game.cancelLightPreparation?.();await pending;scene.dispose();engine.dispose();assert.equal(callback,undefined);});
   return {game,scene,meshes,draws,pending,tick:()=>callback?.(),setNow:(value:number)=>{now=value;},
     fail:()=>{failEnvironment=true;},fault:()=>{healthError=true;},active:()=>!!callback};
 }
+
+test("local fixed-view diagnostics identify the current gate and clear stale mesh labels", t=>{
+  let meshReady=false,pipelineReady=false;
+  const f=innerLifecycle(t,false,(game,meshes)=>{
+    game.terrainReview={id:"b5-tree-near"};
+    game.scene.getActiveMeshes=()=>({data:meshes,length:meshes.length});
+    game.isMeshReadyForCamera=(mesh:Mesh)=>mesh===meshes[0]?meshReady:true;
+    return {isReady:()=>pipelineReady};
+  });
+  const reach=(gate:string|null)=>{
+    for(let i=0;i<30;i++) {f.tick();if(f.game.lightingReadiness.lastGate===gate)return;}
+    assert.fail("diagnostic gate not reached: "+gate);
+  };
+  reach("mesh");
+  assert.equal(f.game.lightingReadiness.mesh,"receiver 0");
+  assert.equal(f.game.lightingReadiness.material,"metadata receiver");
+  assert.ok(f.game.lightingReadiness.waits.mesh>0);
+  meshReady=true;reach("pipeline");
+  assert.equal(f.game.lightingReadiness.mesh,null);
+  assert.equal(f.game.lightingReadiness.material,null);
+  assert.ok(f.game.lightingReadiness.waits.pipeline>0);
+  pipelineReady=true;reach(null);
+  assert.equal(f.game.lightingReadiness.mesh,null);
+  assert.equal(f.game.lightingReadiness.material,null);
+});
+
+test("readiness diagnostics stay disabled outside local fixed guest QA", t=>{
+  const regular=innerLifecycle(t,false);
+  regular.tick();assert.equal(regular.game.lightingReadiness,undefined);
+  const multiplayer=innerLifecycle(t,false,game=>{
+    game.terrainReview={id:"b5-tree-near"};game.network={};return undefined;
+  });
+  multiplayer.tick();assert.equal(multiplayer.game.lightingReadiness,undefined);
+});
+
+test("WebGPU readiness uses the existing time slice while retaining a finite count cap", async t=>{
+  for(const webgpu of [true,false]) for(const checkCost of [.001,.02,.08]) {
+    const f=innerLifecycle(t,webgpu,(game,meshes)=>{
+      const active=Array.from({length:800},(_,i)=>meshes[i%meshes.length]);
+      game.scene.getActiveMeshes=()=>({data:active,length:active.length});
+      return undefined;
+    });
+    let checks=0,elapsed=0;
+    f.game.isMeshReadyForCamera=()=>{checks++;elapsed+=checkCost;f.setNow(elapsed);return true;};
+    f.tick(); // Apply and collect, with no readiness work yet.
+    assert.equal(checks,0);
+    f.tick();
+    const countCap=webgpu?512:128;
+    assert.ok(checks<=countCap);
+    assert.ok(elapsed<=4+checkCost+1e-9,"one non-preemptible check is the only allowed slice overrun");
+    if(checkCost===.001) assert.equal(checks,countCap,"cheap checks stop at the finite count cap");
+    if(webgpu&&checkCost===.02) assert.ok(checks>=199,"use spare time instead of yielding after128 cheap checks");
+    if(checkCost===.08) assert.ok(checks>=49&&checks<=51,"expensive checks retain the4ms slice on either backend");
+    assert.equal(f.draws.length,1,"partial mesh batch never advances to a confirmation draw");
+    assert.equal(f.active(),true);
+    if(checkCost===.001) {
+      let settled=false;void f.pending.then(()=>{settled=true;});
+      for(let i=0;!settled&&i<200;i++){f.tick();await turn();}
+      assert.ok(settled,"finite full preparation completes");
+      const result=await f.pending;
+      assert.equal(result.status,"complete");
+      assert.ok(result.stages.every((stage:any)=>stage.checks===1600&&stage.renders===3),
+        "each stage retains both full mesh confirmations and its progress draw");
+    }
+  }
+});
 
 test("actual inner Game selects target light membership after environment and preserves WebGL scope", async t=>{
   for(const webgpu of [true,false]) {

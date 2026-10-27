@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-bootstrap",
+  "title": "STROMY-20261025: podklady, rozhodnutí a příprava izolované etapy",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/trees-20261025/",
+    "docs/trees/20261025/research.md",
+    "docs/trees/20261025/decision.md",
+    "docs/trees/20261025/source-inventory.json",
+    "docs/trees/20261025/concepts.md",
+    "docs/trees/20261025/baseline.md",
+    "_bmad/render/bmad-build/strahovcrazyshow-terrain-20261025-56e507fae860/",
+    "_bmad-output/implementation-artifacts/trees-20261025/",
+    "docs/agents/handoffs/trees-20261025-bootstrap.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Navázat pouze na výslovně objednanou etapu stromů po main8516c7b1; oddělit skutečné fotografie/mapové údaje, interpretaci a generický asset.",
+    "Před realizací prohlédnout reference a současný řetězec, porovnat rozumné varianty vzhledu/licencí/výkonu/sezón/cache/lifecycle a připravit označený referenční koncept.",
+    "Zachovat neměnné user4179 i2592. Nové velké výstupy a dočasná data pouze naD, existující node_modules junction jen číst, bez instalace.",
+    "Výzkumné výstupy nejsou hotová implementace; následné přesné writePaths a heavy/GPU/build/port resources se přidělí odděleným taskům."
+  ],
+  "verification": [
+    "Aktuální Git/claims/URL/client identity/capacita před zápisy, hash původních referencí a doložený datum/provenience/nejistota.",
+    "Bez GPU/Blender/test serveru či plné pipeline v tomto bootstrap tasku; čtecí rešerše může běžet souběžně."
+  ],
+  "notes": [
+    "Přímé jednorázové předání STROMY-20261025 po dokončeném terénu od uživatelem pověřeného monitoru. Zpětné zprávy jiným chatům nejsou tímto autorizované.",
+    "Reused clean worktree D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, nová branch codex/trees-realism-20261025 z origin/main8516c7b1; původní pracovní branch zůstala zachována a obě herní snapshot složky se nemění.",
+    "GPU přejímka pouze statické pevné kamery v Edge/GTX1060. Aktivní uživatelská scéna4179 zůstává pod předchozím gpu claimem; žádná druhá3D scéna.",
+    "BMAD build pouze jednou pro tuto etapu, bez rekurzivních workflow v podagentech. Provozní PID a rezervace zůstávají mimo Git."
+  ]
+}

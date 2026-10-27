@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-r6-far",
+  "title": "KEY-62: úplná R6 FAR koruna ze sdílených zdrojových skupin",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "scripts/trees-20261026-r6-far/",
+    "tests/tree-r6-far.test.ts",
+    "docs/trees/20261025/r6-far.md",
+    "docs/agents/handoffs/trees-20261026-r6-far.md",
+    ".cache/trees-r6-far-20261026/",
+    "assets/blender/vegetation/seasonal-r6-far/",
+    "public/models/vegetation/seasonal-r6-far/",
+    "public/textures/trees/20261026-r6-far/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Celá přijatá B5 R6 koruna: všech 82100 zdrojových listů a16019ranků zastoupeno, přesná sourceID/rank/kotva, původní kořen a collider beze změny. Aproximace označená a měřená, nikoli údajně přesná fotokopie.",
+    "Omezená banka skutečných medoidních skupin dle54fotografických sekvencí, nejvýše8medoidů na sekvenci; rigidní fit bez změny fyzického měřítka listů. Outlier nesmí zmizet, může zachovat přesnou MID skupinu s výslovně vykázanou cenou.",
+    "Porovnat náklady jedné/dvou karet včetně atlasu, mipů, geometrie, průhledné plochy a fallback skupin. Před drahým bake doložit výstupní rozpočet celého B5 a sdílení pro katalog; neřešit problém prostým zvýšením limitů.",
+    "Výstup zahrnuje editovatelný blend, nový izolovaný model/atlas a kompaktní placement záznamy, původní barevné/normal/opacity podklady a měřítko zachované. Žádné pečené světlo nebo přepsání původních modelů.",
+    "Sezónní rank je společný pro celou source skupinu a shadow pass. Zima ponechá dřevo. Runtime kontrakt domluvit s rootem, žádná změna Game/renderer/shared typů v tomto tasku.",
+    "Cílený refaktoring generátoru, přenosné malé testy bez implicitního čtení cache, skutečné obrazové srovnání celé koruny a přiznané limity před předáním."
+  ],
+  "verification": [
+    "Jen nezbytné malé CPU regrese při implementaci. Velká testovací sada/build/integrace až pro dokončený funkční celek u rootu.",
+    "BlenderCPU max2vlákna, export/bake a plná korunní analýza pouze po výslovném předání a claimu heavy-validation. Žádné GPU/Edge ani server.",
+    "Source hash/provenience, pokrytí a unikátnost listů/ranků, geometrický residual, paměťový rozpočet a skutečné FAR siluety/sezónní snímky. Po dokončení cleanup vlastních procesů a handoff/release."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Přímá delegace root KEY-62 po čtecím průzkumu far_r6_design; bez nového BMAD workflow.",
+    "R6 native/MID/source delta/updated axes, R4 metadata a LeafSet024 jsou read-only piny. Původní44listý FAR plan nelze bez explicitního adaptéru použít na novou R6 geometrii.",
+    "Výchozí WebGPU CM zůstává cílový runtime; NCM přípravu paralelně opravuje jiný agent v disjunktních souborech. Veškeré nové výstupy naD, node_modules junction pouze číst."
+  ]
+}

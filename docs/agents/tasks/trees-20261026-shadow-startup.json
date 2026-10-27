@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-shadow-startup",
+  "title": "KEY-62: reprodukovat a opravit opakované stínové shadery při startupu WebGPU",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/webgpu-shadow-readiness.ts", "tests/tree-shadow-startup-repro.test.ts", "docs/trees/20261025/shadow-startup.md", "docs/agents/handoffs/trees-20261026-shadow-startup.md", ".cache/trees-shadow-startup-repro-20261026/"],
+  "resources": [],
+  "acceptance": ["Nejdříve červený skutečný pinned CPU repro TreeWind/TreeSeason PBR, Fresh wrapper, PCF torch a Mesh.isReady(true) proti actual shadow draw callbacks; odlišit prokázanou příčinu a hypotézu.", "Porovnat varianty, opravit doložený rozdíl render stavu bez obcházení readiness, bez prodlužování timeoutu a bez zápisu do závislostí.", "Zachovat WebGL, lifecycle, barvy/depth stav při success/false/throw/dispose/reentrant a stávající freshness/light-layout kontrakt; cílený refaktoring a regrese.", "Root vlastní Game/UI, GPU a integraci; handoff se zdroji, testy a přesným diffem."],
+  "verification": ["Lehké cílené CPU testy tests/tree-shadow-startup-repro.test.ts a tests/webgpu-shadow-freshness.test.ts; případné další související čtecí testy bez zápisu. Žádný GPU/Blender/build/full suite."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. V7 profileEnvironment evidence .cache/trees-gpu-20261025/v7-webgpu-shader-inventory.json: current-on372modules z toho288byteidenticalrepeated,6raw groups každý49calls (3vertex/fragmentpáry). Fast WebGPU také timeout s HEALTH49 a inert adapterem.", "Zdrojová hypotéza: PCF shadow onBeforeRender setColorWrite(false), Mesh.isReady(true) přepíná jen passId; PBR DEPTHPREPASS zcolorWrite přepíná base effect aShadowDepthWrapper maže depthentry. Ověřit předfixem.", "Vlastníclaim předprvnímzápisem, bez dalšího BMAD; readonly junctiondependencies, žádnáinstalace. Po handoffrelease přebírároot."]
+}

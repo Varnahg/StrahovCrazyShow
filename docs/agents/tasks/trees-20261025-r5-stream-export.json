@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-r5-stream-export",
+  "title": "KEY-62: oddělené LOD soubory přijatých celých R5 pilotů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "public/models/vegetation/seasonal-r5-streamed/",
+    "docs/agents/handoffs/trees-20261025-r5-stream-export.md",
+    ".cache/trees-r5-stream-export-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Spustit pouze po explicitním R5 modeler ready/hash handoff a skutečném release jeho bake procesu; runtime-contract má stabilní own-broadleaf/own-conifer IDs.",
+    "Použít ověřený scripts/tree-seasonal-stream.mjs, neměnit R4 nebo R5 vstupy ani původní seasonal-streamed výstupy. Každý nový LOD jen své buffery.",
+    "Ověřit všechny accessor bytes/metadata against novému R5 vstupu a uvést oba manifestSHA a počáteční far sourcebytes. Žádná vizuální/GPU tvrzení z exportu."
+  ],
+  "verification": [
+    "Lehký Node export a přesná skutečná data, bez Blenderu/GPU/fullsuite/build; ukončit proces a předat/release."
+  ],
+  "notes": [
+    "Explicitní koordinovaná delegace rootovi nebo původnímu streaming autorovi. Source script je read-only stabilní předaný vstup; případnou změnu rezervovat odděleně.",
+    "Input public/models/vegetation/seasonal-r5/runtime-contract.json, output public/models/vegetation/seasonal-r5-streamed. Nová scope chrání immutable R4 export.",
+    "Výroba/export skončily a původní owner předal+release; root nyní drží jen hotové výstupy. Další těžká operace vyžaduje samostatně validation-window nebo novou výrobní rezervaci."
+  ]
+}

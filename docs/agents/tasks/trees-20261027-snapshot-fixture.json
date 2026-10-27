@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261027-snapshot-fixture",
+  "title": "KEY-62: nové statické vstupy ve fixture snapshot testu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["tests/performance-snapshot.test.ts", "docs/agents/handoffs/trees-20261027-snapshot-fixture.md", ".cache/trees-snapshot-fixture-20261027/"],
+  "resources": [],
+  "acceptance": ["Fixture obsahuje skutečné nově požadované statické vstupy catalog-release.json a .gitattributes; původní očekávání integrity, immutable snapshotu a odmítnutí změn se neoslabí."],
+  "verification": ["Pouze tests/performance-snapshot.test.ts a čtecí rozbor pěti ENOENT z full-tests-v13.log. Žádný build, celá sada, GPU ani regenerace."],
+  "notes": ["Explicitní root předání navazující opravy testovací fixture po stabilním v13. Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Source performance-snapshot.mjs již správně zahrnuje nové release vstupy, jeho změna není zadáním. Snapshot v13 zůstává neměnný. Bez dalšího BMAD."]
+}

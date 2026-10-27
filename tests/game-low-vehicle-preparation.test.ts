@@ -28,11 +28,12 @@ import { prepareRenderQualities } from "../client/render-quality-preparation";
 import { MANUAL_HARDWARE_SCALING } from "../shared/render-quality";
 import { PhotographicGrass } from "../client/photographic-grass";
 import { acquireGrassResources } from "../client/photo-grass-resources";
-import { VegetationController } from "../client/vegetation";
+import { VegetationController, type VegetationInput } from "../client/vegetation";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
 import { applyArtLighting } from "../client/art-lighting";
 import { selectLightingPreview } from "../client/lighting-preview";
 import { sunState, moonState } from "../shared/weather";
+import { getTreeSeasonState } from "../shared/tree-season";
 import "../client/render-shaders";
 import "@babylonjs/core/Shaders/shadowMap.vertex";
 import "@babylonjs/core/Shaders/shadowMap.fragment";
@@ -68,7 +69,7 @@ const code = ts.transpileModule(
   { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
 ).outputText;
 const make = new Script(
-  `(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,applyArtLighting,performance,window,document}=env;${code};return TestGame;}`,
+  `(env)=>{const {AuthoredLightPreparation,PlayerFlashlight,Vector3,MeshBuilder,prepareLightVariants,prepareRenderQualities,MANUAL_HARDWARE_SCALING,arePreparationEffectsReady,selectLightingPreview,getTreeSeasonState,applyArtLighting,performance,window,document}=env;${code};return TestGame;}`,
 ).runInThisContext();
 const anchor = Date.parse("2026-10-18T12:45:00Z");
 const select = (mode: Parameters<typeof selectLightingPreview>[0]) =>
@@ -231,6 +232,7 @@ function fixture(
     MANUAL_HARDWARE_SCALING,
     arePreparationEffectsReady: () => arePreparationEffectsReady(engine),
     selectLightingPreview: select,
+    getTreeSeasonState,
     applyArtLighting,
     performance: { now: () => now },
     window: { setTimeout, clearTimeout },
@@ -240,6 +242,7 @@ function fixture(
       removeEventListener() {},
     },
   });
+  let skyInstant: number | undefined;
   const game: any = Object.assign(new Game(), {
     engine: gameEngine,
     scene,
@@ -291,6 +294,7 @@ function fixture(
     skyWeather: {
       atmosphere: unoccludedAtmosphereFixture(skyMaterial),
       update({ instant }: { instant: number }) {
+        skyInstant = instant;
         return {
           sun: sunState(instant),
           moon: moonState(instant),
@@ -334,7 +338,10 @@ function fixture(
   if (grass) {
     // Real forwarding methods/owner. Unrelated live world selection stays out
     // of this bounded Game wiring fixture, as do avatar/world presentation.
-    const vegetation = Object.assign(Object.create(VegetationController.prototype), {scene,disposed:false,photographicGrass:grass,update(){}});
+    const vegetation = Object.assign(Object.create(VegetationController.prototype), {scene,disposed:false,photographicGrass:grass,update(input:VegetationInput){
+      assert.notEqual(skyInstant,undefined);
+      assert.equal(input.season,getTreeSeasonState(skyInstant!,game.timeOverride===null?"regional-model":"demo"),"each actual quality/light stage gives sky and vegetation the same UTC sample");
+    }});
     game.vegetation=vegetation;
   }
   const grassFrames: {stage:string;quality:string;enabled:boolean;drawn:boolean;ready:boolean;count:number}[]=[];

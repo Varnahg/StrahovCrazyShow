@@ -81,6 +81,7 @@ export class GroundFlowers {
   private planes = Frustum.GetPlanes(Matrix.Identity());
   private point = Vector3.Zero();
   private lastQuality = "";
+  private lastBloom = 1;
   private lastTime = 0;
   private lastSelection = -Infinity;
   private helper?: PhotoGrassBatch;
@@ -164,7 +165,7 @@ export class GroundFlowers {
     const generation = ++this.preparationGeneration; this.helper.mesh.setEnabled(true);
     return () => { if (!this.disposed && generation === this.preparationGeneration) { this.preparationGeneration++; this.helper!.mesh.setEnabled(false); } };
   }
-  update(input: { time: number; quality: CandidateQuality; wind: { x: number; z: number }; focus?: { x: number; y: number; z: number } }) {
+  update(input: { time: number; quality: CandidateQuality; wind: { x: number; z: number }; focus?: { x: number; y: number; z: number }; flowerBloom?: number }) {
     if (this.disposed || !this.stats.ready || !this.scene.activeCamera) return;
     const camera = this.scene.activeCamera, view = camera.getViewMatrix(), projection = camera.getProjectionMatrix();
     const width = this.scene.getEngine().getRenderWidth(), height = this.scene.getEngine().getRenderHeight();
@@ -177,22 +178,24 @@ export class GroundFlowers {
     if (time < this.lastTime) for (const root of this.roots.values()) { root.fade.startedAt += time - this.lastTime; this.batches.get(root.level as FlowerLevel)!.updateFade(root); }
     this.lastTime = time;
     const quality = input.quality, limits = FLOWER_LIMITS[quality], range = CANDIDATE_GRASS_LIMITS[quality].range;
+    const bloom = input.flowerBloom === undefined ? 1 : Number.isFinite(input.flowerBloom) ? Math.max(0, Math.min(1, input.flowerBloom)) : 0;
+    const bloomChanged = bloom !== this.lastBloom;
     this.wind.time = time;
     this.wind.windX = Number.isFinite(input.wind.x) ? Math.max(-16, Math.min(16, input.wind.x)) : 0;
     this.wind.windZ = Number.isFinite(input.wind.z) ? Math.max(-16, Math.min(16, input.wind.z)) : 0;
     this.wind.viewerX = eye.x; this.wind.viewerY = eye.y; this.wind.viewerZ = eye.z;
     this.wind.focusX = focusX; this.wind.focusZ = focusZ;
     this.wind.fadeStart = CANDIDATE_GRASS_LIMITS[quality].fadeStart; this.wind.fadeEnd = range;
-    if (quality !== this.lastQuality || time - this.lastSelection >= .15 || time < this.lastSelection) {
-      const viewChanged = quality !== this.lastQuality || this.viewStability.changed(view, projection, eye, focusX, focusZ, width, height, camera.fov);
+    if (bloomChanged || quality !== this.lastQuality || time - this.lastSelection >= .15 || time < this.lastSelection) {
+      const viewChanged = bloomChanged || quality !== this.lastQuality || this.viewStability.changed(view, projection, eye, focusX, focusZ, width, height, camera.fov);
       if (viewChanged) {
         view.multiplyToRef(projection, this.transform);
         Frustum.GetPlanesToRef(this.transform, this.planes);
         this.viewStability.accept(view, projection, eye, focusX, focusZ, width, height, camera.fov);
-        this.select(eye, focusX, focusZ, range, height, camera.fov, quality, time);
+        this.select(eye, focusX, focusZ, range, height, camera.fov, quality, time, bloom);
         this.viewStability.complete();
       }
-      this.lastSelection = time; this.lastQuality = quality;
+      this.lastSelection = time; this.lastQuality = quality; this.lastBloom = bloom;
     }
     for (const root of this.roots.values()) if (root.fade.to === 0 && grassVisibility(root.fade, time) <= 0) this.remove(root);
     // Immediate cap on downgrade; departing roots also occupy budget.
@@ -222,7 +225,7 @@ export class GroundFlowers {
     for (const batch of this.batches.values()) { if (batch.roots.length) this.stats.draws++; this.stats.allocatedInstanceBytes += batch.allocatedBytes;
       if (batch.roots.some(root => grassVisibility(root.fade, time) !== root.fade.to)) this.stats.preparing = true; }
   }
-  private select(eye: Vector3, fx: number, fz: number, range: number, renderHeight: number, fov: number, quality: CandidateQuality, time: number) {
+  private select(eye: Vector3, fx: number, fz: number, range: number, renderHeight: number, fov: number, quality: CandidateQuality, time: number, bloom: number) {
     this.demands.length = 0; this.wanted.clear(); let used = 0, cells = 0;
     // The source rotates about the root. Include the offset of this sphere's
     // centre and the same 2cm wind allowance as PhotoGrassBatch's renderer bounds.
@@ -233,6 +236,9 @@ export class GroundFlowers {
         if (++cells > 1536) break cellLoop;
         if (grassFocusDistance(x + .5, z + .5, eye.x, eye.z, fx, fz) > range + .8) continue;
         const p = this.placement.candidate(x, z); if (!p || grassFocusDistance(p.x, p.z, eye.x, eye.z, fx, fz) >= range) continue;
+        // A world-stable cohort changes density with the regional model without
+        // moving roots or flushing their source cache. Undefined preserves v1.
+        if (bloom < 1 && p.seed >= bloom) continue;
         this.point.set(p.x, p.y + this.pack.height / 2, p.z);
         if (this.planes.some(plane => plane.dotCoordinate(this.point) < -radius - VEGETATION_TRANSLATION_GUARD)) continue;
         this.viewStability.includeBounds(this.point.x, this.point.y, this.point.z, radius);

@@ -7,7 +7,8 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import type { AvatarConfig } from "../shared/types";
 import { AvatarPrimitivePool, createAvatarRig } from "./avatar-renderer";
-import { createGameEngine, selectRenderBackend } from "./render-engine";
+import { createGameEngine, getRenderEngineSelection } from "./render-engine";
+import type { RenderBackendSelection } from "./render-fallback";
 import { RenderHealth, type RenderHealthSnapshot } from "./render-health";
 import { SceneTextureDiagnostics } from "./texture-diagnostics";
 import { OnDemandRender } from "./on-demand-render";
@@ -26,6 +27,7 @@ export type AvatarPreviewOptions = {
   /** React may select another profile while adapter/textures/shaders initialize. */
   getCurrentConfig?: () => AvatarConfig;
   onState?: (state: AvatarPreviewState, error?: Error) => void;
+  onRenderer?: (selection: RenderBackendSelection) => void;
 };
 export type PreviewShaderModule = {
   getCompilationInfo(): Promise<{
@@ -184,9 +186,9 @@ function createSurface(
 }
 
 const browserRuntime: AvatarPreviewRuntime = {
-  unsupported: () =>
-    selectRenderBackend(window.location) !== "webgl2" &&
-    !(navigator as Navigator & { gpu?: unknown }).gpu,
+  // Společná factory rozhodne i při chybějícím navigator.gpu; lokální precheck
+  // by obešel její typed odmítnutí a zabránil řízenému fallbacku v editoru.
+  unsupported: () => false,
   createEngine: (canvas, signal) => createGameEngine(canvas, { signal }),
   createSurface,
   requestFrame: (callback) => requestAnimationFrame(callback),
@@ -393,6 +395,8 @@ export async function createAvatarPreview(
         : Promise.resolve();
   };
   try {
+    const rendererSelection = getRenderEngineSelection(engine);
+    if (rendererSelection) options.onRenderer?.(rendererSelection);
     requested = currentConfig();
     signature = JSON.stringify(requested);
     health = new RenderHealth(engine, "preview", (fault) =>

@@ -1,3 +1,4 @@
+import { TreeRenderer } from "../client/tree-renderer";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -11,9 +12,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { ImportMeshAsync } from "@babylonjs/core/Loading/sceneLoader";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
+import { VegetationController } from "../client/vegetation";
+import { getTreeSeasonState } from "../shared/tree-season";
 import {
   decodeTreeRuntimeChunk,
-  VegetationController,
   attachAuthoredTreeMesh,
 } from "../client/vegetation";
 import { TREES } from "../shared/world";
@@ -29,6 +32,46 @@ const masterJson = JSON.parse(
   master.subarray(20, 20 + masterLength).toString(),
 );
 const masterBin = master.subarray(28 + masterLength);
+
+test("actual vegetation owns litter before borrowed tree maps, includes its preparation and shares current roots", async t => {
+  const engine = new NullEngine(), scene = new Scene(engine);
+  const controller = new VegetationController(scene, { skipLegacyGrass: true });
+  const trees = (controller as any).treeRenderer;
+  t.after(() => { controller.dispose(); scene.dispose(); engine.dispose(); });
+  const texture = RawTexture.CreateRGBATexture(new Uint8Array([96, 120, 40, 255]), 1, 1, scene);
+  const sourceMaterial = new PBRMaterial("borrowed source maps", scene);
+  sourceMaterial.albedoTexture = texture; sourceMaterial.opacityTexture = texture;
+  trees.materials.set("LeafSet024", sourceMaterial); trees.textures.add(texture);
+  const source = TREES.find(tree => tree.osmId === "ipr-crown-014")!;
+  const group = trees.createGroup(source.osmId); trees.treeGroups.push(group);
+  t.mock.method(trees, "load", async () => {}); // IO only; actual materials/controllers/lifecycle below.
+  await controller.loadTrees();
+  const litter = (controller as any).treeLitter;
+  assert.ok(litter); assert.equal(controller.stats.treeLitter, litter.stats);
+  const revision = controller.grassPreparationRevision;
+  assert.ok(revision); assert.equal(controller.grassPreparationRevision, revision);
+  const helpers = scene.meshes.filter(mesh => mesh.metadata?.litterPreparation);
+  assert.equal(helpers.length, 1); assert.ok(helpers.every(mesh => !mesh.isEnabled()));
+  const release = controller.beginGrassPreparation()!;
+  assert.ok(helpers.every(mesh => mesh.isEnabled())); release(); release();
+  assert.ok(helpers.every(mesh => !mesh.isEnabled()));
+  const materialCount = scene.materials.length;
+  await controller.loadTrees(); assert.equal(scene.materials.length, materialCount, "repeated load does not create another litter owner");
+  assert.equal(controller.setTreeTransform(source.osmId, { x: source.x + .5, y: group.root.position.y, z: source.z + .25 }), true);
+  assert.deepEqual(litter.sources.map((tree: any) => [tree.id, tree.x, tree.z]), [[source.osmId, source.x + .5, source.z + .25]]);
+  const season = getTreeSeasonState(Date.UTC(2026, 9, 25), "demo");
+  controller.update({ dt: 0, time: 1, wind: { x: 0, z: 0, speed: 0 }, daylight: 1,
+    player: { x: source.x, y: 0, z: source.z }, quality: "medium", season });
+  assert.equal(trees.stats.treeSeason.sampledAt, season.sampledAt);
+  const originalDispose = litter.dispose.bind(litter);
+  t.mock.method(litter, "dispose", () => {
+    assert.ok(scene.textures.includes(texture), "borrowed maps outlive the dependent ground owner");
+    originalDispose(); assert.ok(scene.textures.includes(texture));
+  });
+  controller.dispose();
+  assert.ok(!scene.textures.includes(texture)); assert.ok(helpers.every(mesh => mesh.isDisposed()));
+  assert.equal(controller.grassPreparationRevision, undefined);
+});
 function attributeBytes(json: any, bin: Uint8Array, id: number) {
   const a = json.accessors[id],
     v = json.bufferViews[a.bufferView];
@@ -123,9 +166,7 @@ test("independent transform API refreshes frozen tree geometry and world bounds"
   mesh.parent = root;
   mesh.computeWorldMatrix(true);
   mesh.freezeWorldMatrix();
-  const controller = Object.create(
-    VegetationController.prototype,
-  ) as VegetationController;
+  const controller = new TreeRenderer(scene);
   (controller as any).treeGroups = [
     {
       id: "source-id",
@@ -195,10 +236,10 @@ test("actual B6 conifer bootstrap and streamed LOD vertices share the corrected 
       if(local.y<.2)nearestRoot=Math.min(nearestRoot,Math.hypot(world.x-expected.x,world.z-expected.z));
     }
     const bounds=mesh.getBoundingInfo().boundingBox;
-    // Yaw-zero transformed AABBs are exact extrema of every authored vertex.
+    // Yaw-zero AABBs enclose every vertex plus the renderer's 10 cm wind pad.
     if(yaw===0)for(const [axis,key] of ['x','y','z'].entries()){
-      assert.ok(Math.abs(bounds.minimumWorld[key as 'x']-minimum[axis])<3e-5);
-      assert.ok(Math.abs(bounds.maximumWorld[key as 'x']-maximum[axis])<3e-5);
+      assert.ok(Math.abs(bounds.minimumWorld[key as 'x']-minimum[axis]+(mesh.metadata?.windDeformed && axis!==1 ? .1 : 0))<3e-5);
+      assert.ok(Math.abs(bounds.maximumWorld[key as 'x']-maximum[axis]-(mesh.metadata?.windDeformed && axis!==1 ? .1 : 0))<3e-5);
     }
     if(mesh.name.endsWith('__bark'))assert.ok(nearestRoot<treeTrunkCollision(placement).radius+.05);
     assert.ok(mesh.isWorldMatrixFrozen);
@@ -211,10 +252,10 @@ test("actual B6 conifer bootstrap and streamed LOD vertices share the corrected 
   }
   const trunk=treeTrunkCollision(placement);
   assert.deepEqual({x:trunk.x,z:trunk.z},{x:root.position.x,z:root.position.z});
-  const controller=Object.create(VegetationController.prototype) as VegetationController;
-  const group={id:placement.osmId,x:placement.x,z:placement.z,root,lods:[[],[],far] as Mesh[][],active:2,desired:0};
+  const controller=new TreeRenderer(scene);
+  const group={id:placement.osmId,x:placement.x,z:placement.z,root,lods:[[],[],far] as Mesh[][],active:2,desired:0,family:"evergreen-conifer",seed:0,pilot:false};
   Object.assign(controller,{scene,disposed:false,treeRuntime:manifest,treeGroups:[group],trees:[...far],
-    player:{x:placement.x,z:placement.z},loadingTrees:new Set(),failedTrees:new Set(),loadControllers:new Set(),
+    player:{x:placement.x,z:placement.z},loadingTrees:new Set(),failedTrees:new Set(),
     sharedTreeMaterials:manifest.materialNames.map(name=>new PBRMaterial(name,scene)),detailCache:new Map(),stats:{}});
   t.mock.method(globalThis,'fetch',async (url:unknown)=>{
     assert.ok(typeof url==='string'&&url.includes(placement.osmId));
@@ -225,7 +266,7 @@ test("actual B6 conifer bootstrap and streamed LOD vertices share the corrected 
     (controller as any).startDetailLoads();
     for(let tick=0;tick<100&&(controller as any).loadingTrees.size;tick++)await new Promise(resolve=>setTimeout(resolve,0));
     assert.equal((controller as any).loadingTrees.size,0);
-    assert.equal((controller as any).failedTrees.size,0);
+    assert.equal((controller as any).failedTrees.size,0, JSON.stringify(controller.stats));
     assert.equal(group.lods[lod].length,2);
     for(const mesh of group.lods[lod])assertPlacement(mesh,{x:root.position.x,y:root.position.y,z:root.position.z});
     if(lod===0){
@@ -235,5 +276,5 @@ test("actual B6 conifer bootstrap and streamed LOD vertices share the corrected 
       for(const existing of [...far,...group.lods[0]])assertPlacement(existing,{...position,x:position.x+1});
     }
   }
-  assert.equal((controller as any).loadControllers.size,0);
+  assert.equal((controller as any).loader.stats.pending,0);
 });

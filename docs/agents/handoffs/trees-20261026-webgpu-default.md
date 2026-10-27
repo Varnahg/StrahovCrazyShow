@@ -1,0 +1,21 @@
+# Předání: trees-20261026-webgpu-default
+
+Aktuální checkpoint 27. 10. 2026: owner `renderer-fallback-engine-agent-20261027` převzal doložený WIP a dokončil typed init failure, výběr podle page preference a immutable metadata skutečného enginu. Plné předání společné engine/preview práce: [renderer-fallback-20261027.md](renderer-fallback-20261027.md). Starší zákaz automatického fallbacku níže je historický; nový výslovný pokyn uživatele jej nahradil. Žádná hra, browser, GPU ani server nebyly spuštěny.
+
+27.10 nové předání: root `trees-webgpu-default-integrator-01a16b37` předává vlastní současný WIP agentovi `webgpu_research_20261027` pro řízený fallback podle nového výslovného zadání. Nový pokyn povoluje automatický WebGL2 fallback a přebírá herní testování; žádná hra ani browser se nespouští. Před zápisem vlastní claim a adopt-dirty podle tohoto předání. UI/Game zůstávají rootovi; preview je v companion tasku renderer-fallback-20261027.
+
+- Vlastník: `trees-webgpu-default-01a16b37`; příjemce: root koordinátor `trees-20261025`.
+- Pracovní kopie: `D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025`, větev `codex/trees-realism-20261025`, výchozí HEAD `8516c7b1877ec66c37120d9088264d44c52882f1`.
+- Výsledek: výběr default backendu implementován a cíleně CPU ověřen. Bez query skutečný `webgpu`, explicitní `webgl2` kompatibilita na libovolném hostu, `webgpu-fast` nadále pouze explicitní loopback experiment. Bez tichého fallbacku a GLSL konverze. GPU/startup přejímka zůstává otevřená.
+- Změněné soubory: `client/render-engine.ts`, `tests/render-engine.test.ts`, `tests/game-render-engine.test.ts`, `docs/trees/20261025/webgpu-default.md`, toto předání; vlastní logy/snapshot v `.cache/trees-webgpu-default-20261026/`.
+- Cizí WIP: existující stromový/season/runtime WIP nebyl převzat ani upraven. `client/game.ts` a `client/ui.tsx` zůstaly jen čtenými vstupy koordinátora. Tři implementační/testové soubory byly před claim čisté. Frozen v5 nebyla upravena.
+- Výzkum a volba: [webgpu-default.md](../../trees/20261025/webgpu-default.md). Explicitní dnešní uživatelský cíl + existující migrační kontrakt; porovnány zachovaný GL default, native GPU default, automatický fallback a fast default. Skutečný timeout v low/current-on řeší root samostatnou diagnostikou.
+- Refaktoring: centralizovaný selector zůstává jediným rozhodovacím místem pro hru a preview; žádný nový runtime stav/cache. Testovací hosty sjednoceny. Stará UI fixture `lightingPreviewRef` opravena na aktuální `seasonPreviewRef`.
+- Baseline: přímý CPU běh před změnou 17/19 PASS; dva lifecycle testy padaly na zastaralé fixture. První pokus přes `pnpm exec` odmítl implicitní install s `ERR_PNPM_UNSAFE_MODULES_DIR`; závislosti nebyly měněny, bypass installu ani úprava junctionu se neprováděla.
+- Ověření 26. 10. 2026 09:56–09:57 UTC: `node node_modules/tsx/dist/cli.mjs --test tests/render-engine.test.ts tests/game-render-engine.test.ts` **23/23 PASS**, exit 0; `node node_modules/tsx/dist/cli.mjs --test tests/avatar-preview-webgpu.test.ts` **22/22 PASS**, exit 0; `git diff --check` nad třemi změněnými kódovými/testovými soubory PASS.
+- Logy: `.cache/trees-webgpu-default-20261026/{baseline-tests,baseline-direct-tests,targeted-tests,avatar-preview-tests}.log`.
+- Snapshot: `.cache/trees-webgpu-default-20261026/manifest.json` zaznamenává SHA-256 konkrétních změněných souborů včetně obou testů a čteného preview testu; `.cache/trees-webgpu-default-20261026/source/` zachovává jejich bajty. Jde o scope snapshot, nikoli identitu celého produkčního buildu.
+- Procesy a zdroje: pouze ukončené lehké CPU CLI testy, bez pomocného serveru, GPU, Blenderu, buildu nebo celé sady. Žádný živý proces k převzetí.
+- Omezení a další krok: root provede společný checkpoint/build/integraci a actual GPU acceptance po vyřešení startupu. Společná `docs/agents/architecture.md` zatím popisuje starý default a musí ji aktualizovat její koordinující vlastník. Případný UI odkaz pro explicitní WebGL2 vlastní root. Bez commit/staging/integrace v child tasku.
+- Rezervace: po dokončení handoffu a snapshotu uvolněna příkazem `release`; konkrétní čas je v CLI a závěrečném předání koordinátorovi. Uvolnění neznamená Done.
+- Integrátor: převzít pouze uvedené vlastní soubory, ověřit diff a výsledky, aktualizovat Linear/verification/task stav ve vlastní rezervaci.

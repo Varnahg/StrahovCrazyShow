@@ -8,8 +8,9 @@ import { doorLifecycleFixture } from "./helpers/weather-door-render-fixture";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { RenderHealth } from "../client/render-health";
 import { arePreparationEffectsReady } from "../client/strict-material-preparation";
-import { resolveTerrainReview, terrainReviewPose, terrainReviewIdentity } from "../client/terrain-review";
+import { resolveTerrainReview, resolveTreePilot, terrainReviewPose, terrainReviewIdentity } from "../client/terrain-review";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import treeCatalog from "../shared/data/assets/tree-catalog.json";
 
 const { source, gameClass, selectMembers } = readGameSource(
   process.env.GAME_STARTUP_SOURCE,
@@ -60,7 +61,7 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(`(function(env) {
-  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, CAD_BUILDINGS, hasCadBuilding, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady, resolveTerrainReview, terrainReviewPose, terrainReviewIdentity, CHARACTER_RADIUS, CHARACTER_HALF_HEIGHT, window } = env;
+  const { exports, measurePresentationRate, initPhysics, Simulation, loadModule, B6_LAYOUT, CAD_BUILDINGS, hasCadBuilding, SurfacePack, CinematicAtmosphere, VehicleLighting, WebGpuPipelinePreparation, sessionDiagnostics, waitForRenderStartup, arePreparationEffectsReady, resolveTerrainReview, resolveTreePilot, terrainReviewPose, terrainReviewIdentity, treeCatalog, CHARACTER_RADIUS, CHARACTER_HALF_HEIGHT, Vector3, window } = env;
   ${compiled}
   return StartupGame;
 })`).runInThisContext();
@@ -138,6 +139,8 @@ function fixture(
   ];
   const events: { kind: string; data: unknown }[] = [];
   const actorStarts: { id: string; position?: { x: number; y: number; z: number } }[] = [];
+  const preloadCameraPositions: number[][] = [];
+  const vegetationOptions: unknown[] = [];
   const shaderStages: string[] = [];
   let gateReadiness: (() => boolean) | undefined;
   let gateRender: (() => void) | undefined;
@@ -177,8 +180,8 @@ function fixture(
       observedBrowserHz: 60,
     }),
     initPhysics: () => physics.promise,
-    resolveTerrainReview, terrainReviewPose, terrainReviewIdentity,
-    CHARACTER_RADIUS: .25, CHARACTER_HALF_HEIGHT: .55,
+    resolveTerrainReview, resolveTreePilot, terrainReviewPose, terrainReviewIdentity, treeCatalog,
+    CHARACTER_RADIUS: .25, CHARACTER_HALF_HEIGHT: .55, Vector3,
     window: { location: options.location ?? { hostname: "localhost", search: "" } },
     Simulation: class {
       doorPhysics = { applyStates(states: unknown) {
@@ -196,7 +199,9 @@ function fixture(
     loadModule: async (name: string) => {
       const modules: Record<string, unknown> = {
         "./assets": { loadCar: () => car.promise },
-        "./vegetation": { loadVegetation: () => vegetation.promise },
+        "./vegetation": { loadVegetation: (scene: unknown, options: unknown) => {
+          assert.equal(scene, game.scene); vegetationOptions.push(options); return vegetation.promise;
+        } },
         "./transit-renderer": { TransitRenderer: class {} },
         "./b6-reality": { loadB6Reality: () => { interiorLoads++; return interior.promise; } },
         "./cad-buildings": {
@@ -225,10 +230,11 @@ function fixture(
     WebGpuPipelinePreparation: class {
       readonly state = { disposed: 0, renders: 0 };
       constructor(_engine: unknown, private options: {
-        signal: AbortSignal; retryIncompleteFrame(): void;
+        signal: AbortSignal; retryIncompleteFrame(): void; diagnostics: boolean;
       }) {
         assert.equal(_engine, engine);
         assert.equal(options.signal, game.startupAbort.signal);
+        assert.equal(options.diagnostics, !!game.terrainReview && !game.network);
         pipelineScopes.push(this.state);
       }
       render(callback: () => void) {
@@ -239,6 +245,7 @@ function fixture(
         return pipelineFrameComplete;
       }
       isReady() { return pipelineReady && pipelineFrameComplete; }
+      snapshot() { return this.options.diagnostics ? { ...this.state } : null; }
       dispose() { this.state.disposed++; }
     },
     sessionDiagnostics: {
@@ -281,12 +288,15 @@ function fixture(
     gltfLightBudget: { prepareFrame() {} },
     stableLights: { update() {} },
     scene: {
-      render() {}, getActiveMeshes: () => ({ length: 0, data: [] }),
+      render() { preloadCameraPositions.push(game.camera.position.asArray()); }, getActiveMeshes: () => ({ length: 0, data: [] }),
       objectRenderers: [{ resetRefreshCounter() { targetRetries++; } }],
     },
     car: { dispose() {} },
     parkedCar: { dispose() {} },
-    camera: { fov: .85 },
+    camera: { fov: .85, position: new Vector3(110, 3, 12) },
+    updateCameraFollow(position: Vector3, eyeHeight: number) {
+      game.camera.position.set(position.x, position.y - .8 + eyeHeight, position.z);
+    },
     sun: {},
     quality: "medium",
     startupAssetErrors: 0,
@@ -322,6 +332,7 @@ function fixture(
     loops,
     events,
     actorStarts,
+    preloadCameraPositions,
     shaderStages,
     gateReadiness: () => gateReadiness!(),
     renderGate: () => gateRender!(),
@@ -339,6 +350,7 @@ function fixture(
     completeVegetation: () => vegetation.resolve(vegetationAsset),
     completeCad: () => cad.resolve(cadAsset),
     rejectCad: (error: Error) => cad.reject(error),
+    vegetationOptions,
     stats: () => ({ disposedAssets, gateCalls, simulations, failures, interiorLoads, cadLoads }),
   };
 }
@@ -358,6 +370,18 @@ test("actual Game creates a fixed guest Actor before asset preparation and prese
   assert.equal(f.events.filter(e => e.kind === "terrain-review-start").length, 1);
 });
 
+test("local startup publishes pipeline evidence before disposing its owner", async t=>{
+  const f=fixture(t,{location:{hostname:"127.0.0.1",search:"?terrainReview=b5-tree-near"}});
+  f.game.lightingReadiness={stage:"current-on",lastGate:"pipeline"};
+  const start=f.game.start();await settle();
+  const event=f.events.find(e=>e.kind==="lighting-preparation")?.data as any;
+  assert.equal(event.readiness.lastGate,"pipeline");
+  assert.deepEqual(event.pipeline,{disposed:0,renders:1});
+  f.gate.resolve();await start;
+  assert.equal(f.pipelineScopes[0].disposed,1);
+  assert.equal(event.pipeline.disposed,0,"collector evidence contains a value snapshot, not the live owner");
+});
+
 test("actual Game keeps ordinary spawn for multiplayer, remote origin and a later fresh Game without the QA parameter", async (t) => {
   for (const options of [
     { network: true, location: { hostname: "localhost", search: "?terrainReview=b6-rear-path" } },
@@ -370,6 +394,43 @@ test("actual Game keeps ordinary spawn for multiplayer, remote origin and a late
     assert.equal(f.game.terrainReview, null); assert.equal(f.game.canvas.dataset.terrainReview, undefined);
     assert.deepEqual(f.game.previousPosition.asArray(), [110, 0, 12]);
     assert.equal(f.events.some(e => e.kind === "terrain-review-start"), false);
+  }
+});
+
+test("static QA assets and hidden prewarm render from the authored Actor camera rather than the constructor spawn", async (t) => {
+  const f=fixture(t,{holdAssets:true,location:{hostname:"127.0.0.1",search:"?terrainReview=b5-tree-far"}});
+  const start=f.game.start();
+  try {
+    await settle();
+    assert.equal(f.loops.size,1);
+    for(const render of f.loops)render();
+    assert.deepEqual(f.preloadCameraPositions[0],[f.game.actor.position.x,f.game.actor.position.y-.8+1.63,f.game.actor.position.z]);
+    assert.equal(f.preloadCameraPositions[0][0],-170.5);
+    assert.equal(f.actorStarts.length,1,"camera initialization must not re-add or teleport the Actor");
+  } finally { f.completeAssets(); await settle(); f.gate.resolve(); await start; }
+});
+
+test("actual Game passes a fixed pilot only to a valid local static guest startup", async (t) => {
+  for (const variant of ["own", "mtree"]) for (const scope of ["static", "ordinary", "remote", "multi"]) {
+    const location = { hostname: scope === "remote" ? "strahov.example" : "127.0.0.1",
+      search: (scope === "ordinary" ? "?" : "?terrainReview=b6-rear-path&") + "treePilot=" + variant };
+    const f = fixture(t, { location, network: scope === "multi" });
+    const start = f.game.start(); await settle(); f.gate.resolve(); await start;
+    const expected = scope === "static" ? { manifestUrl: variant === "own" ? "/models/vegetation/seasonal-r6-far/runtime-contract.json" : "/models/vegetation/seasonal-streamed/runtime-contract.json",
+      selections: { "ipr-crown-014": variant + "-broadleaf", "ipr-b6-north-conifer": variant + "-conifer" } } : undefined;
+    assert.deepEqual(f.vegetationOptions, [expected ? { treePilot: expected } : { treeCatalog }]);
+    assert.equal(f.game.ready, true);
+  }
+});
+
+test("ordinary guest, multiplayer and catalogue-only QA start with the same complete tree catalogue", async (t) => {
+  for (const options of [{}, { network: true }, { location: {
+    hostname: "127.0.0.1", search: "?terrainReview=small-tree-close&treePilot=own",
+  } }]) {
+    const f = fixture(t, options);
+    const start = f.game.start(); await settle(); f.gate.resolve(); await start;
+    assert.deepEqual(f.vegetationOptions, [{ treeCatalog }]);
+    assert.equal(f.game.ready, true);
   }
 });
 

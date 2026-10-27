@@ -7,6 +7,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine.pure";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { DEFAULT_AVATAR } from "../shared/types";
+import { WebGpuInitializationError } from "../client/render-fallback";
 import {
   createAvatarPreview,
   type AvatarPreviewRuntime,
@@ -714,6 +715,12 @@ function editorFixture() {
     setPreviewError(value: string) {
       environment.errors.push(value);
     },
+    setRendererSelection() {},
+    setRendererGeneration() { throw new Error("retired editor must not request a new canvas"); },
+    requestWebGlFallback() { throw new Error("retired editor must not request fallback"); },
+    WebGpuInitializationError,
+    window: { location: { hostname: "example.com", search: "" } },
+    pointer: { current: null },
     loadPreview: () => module.promise,
   };
   const cleanup = new Script(effectJs).runInContext(

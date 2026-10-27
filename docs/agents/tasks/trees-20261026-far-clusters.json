@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-far-clusters",
+  "title": "KEY-62: přesný podklad pilotu FAR rankových skupin B5",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["scripts/trees-20261026-far/", "tests/tree-far-clusters.test.ts", "docs/trees/20261025/far-clusters.md", "docs/agents/handoffs/trees-20261026-far-clusters.md", ".cache/trees-far-clusters-20261026/"],
+  "resources": [],
+  "acceptance": ["Nejdříve identifikovat přesný existující R5/B5 vstup a rank/komponent/branch kotvy; nevymýšlet metadata, která source nemá. Rozlišit doložené podpory a chybějící údaje.", "Připravit čistý deterministický rozklad zdrojových listových komponent do FAR skupin stejného ranku, zachovat jejich úplné pokrytí, fyzické měřítko, UV/source identitu a dohledatelnou vazbu na původní geometrii. Žádné náhodné listy/kořeny nebo změny colliderů.", "Porovnat rozumné atlasové/prostorové varianty a navrhnout nejmenší celý B5 pilot s konkrétním rozpočtem; nevydávat takový podklad za hotový bitmapový atlas nebo hru.", "Čistý testovaný helper jen pokud je vstup dostatečný; jinak předat přesnou chybějící source vazbu. Runtime, Blender, velké exporty a atlasové rendery patří následnému koordinovanému kroku."],
+  "verification": ["Lehké cílené CPU unit regrese na malých fixtures: úplnost/unikátnost komponent a ranku, determinismus, bounds/UV, odmítnutí poškozených vstupů, bez top-level čtení ignorované cache.", "Bez instalace, GPU, Blenderu, buildu, celé sady nebo masového generování. Produkční B5 transformaci domluvit s root až po skončení běžící fullsuite; zatím číst existující JSON/kód/metadata a malé fixtures."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Navazuje na čtecí FAR návrh tree_streaming a poslední část docs/trees/20261025/research.md. R5 MID plné, FAR stále20%subset; katalogový odhad109.7MBfoliage samotné nad96MiB.", "Source a mapy R4/R5 jsou readonly závislosti tohoto tasku, nevytvářet ani nepřepisovat modely. Všechny nové podklady naD. Vlastníclaim/handoff/release, žádný rekurzivní BMAD. Rootdrží GPU/heavy-validation nadv9." ]
+}
