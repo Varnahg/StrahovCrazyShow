@@ -47,10 +47,12 @@ const entries = [
   "docs/reality-pack/building-window-kit-20261012/blender-export-audit.json",
   "docs/reality-pack/b4-facade-panels-20261012/blender-export-audit.json",
   "docs/building-modeling-20261012/references/market-kit-blender-audit.json",
+  "docs/trees/20261025/catalog-release.json",
   "index.html",
   "package.json",
   "pnpm-lock.yaml",
   "pnpm-workspace.yaml",
+  ".gitattributes",
   "tsconfig.json",
   "vite.config.ts",
 ];
