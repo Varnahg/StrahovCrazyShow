@@ -7,6 +7,7 @@ import {
   type ServerResponse,
 } from "node:http";
 import { Community } from "./community";
+import { createPublicPresenceHandler } from "./public-presence";
 import {
   consumeRate,
   expireSessions,
@@ -67,6 +68,7 @@ const issueRates = new Map<string, number[]>();
 let worldId = "";
 let singletonRoomId: string | undefined;
 const store = new Community();
+const publicPresence = createPublicPresenceHandler(() => store.players.size);
 await initPhysics();
 class StrahovRoom extends Room {
   autoDispose = false;
@@ -631,6 +633,7 @@ const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
     readiness.reply(res);
     return;
   }
+  if (publicPresence(req, res)) return;
   if (req.url === "/api/weather") {
     res.end(JSON.stringify(await getWeather()));
     return;

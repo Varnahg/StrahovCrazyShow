@@ -74,6 +74,7 @@ const guest = await fetch(endpoint + "/api/session", {
 assert.equal(guest.status, 403);
 const publicHealth = await (await fetch(endpoint + "/api/health")).json();
 assert.deepEqual(publicHealth, { ok: true, demo: true });
+assert.deepEqual(await (await fetch(endpoint + "/api/presence")).json(), { online: 0 });
 for (const path of ["/api/players", "/api/chat", "/api/community-events"])
   assert.equal((await fetch(endpoint + path)).status, 403);
 evidence.checks.push(
@@ -184,6 +185,7 @@ try {
     producer: inputs?.snapshot(),
   });
   await until(() => stateA.players.length === 2, "presence of both clients");
+  assert.deepEqual(await (await fetch(endpoint + "/api/presence")).json(), { online: 2 });
   const self = () => stateA.motion.find((row: any) => row[0] === sessionA.id);
   const record = (name: string) => {
     const pose = (row: any) =>
@@ -457,6 +459,8 @@ try {
   await until(() => stateB.notices.length > 0, "ownership rejection");
   await a.leave();
   rooms.splice(rooms.indexOf(a), 1);
+  await until(() => stateB.players.length === 1, "public count follows disconnection");
+  assert.deepEqual(await (await fetch(endpoint + "/api/presence")).json(), { online: 1 });
   await sleep(100);
   const resumed = await issue("ignored", sessionA.token);
   assert.equal(resumed.id, sessionA.id);
@@ -466,6 +470,9 @@ try {
   });
   rooms.push(rejoined);
   rejoined.onMessage("*", () => {});
+  await until(() => stateB.players.length === 2, "public count follows resume");
+  assert.deepEqual(await (await fetch(endpoint + "/api/presence")).json(), { online: 2 });
+  evidence.checks.push("public aggregate follows join, leave and resume without exposing identities");
   await sleep(150);
   const weather = await (await fetch(endpoint + "/api/weather")).json();
   assert.ok(["live", "fallback", "unavailable"].includes(weather.status));
