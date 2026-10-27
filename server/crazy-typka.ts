@@ -1,5 +1,10 @@
 import { createHash, randomBytes } from "node:crypto";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type {
+  IncomingMessage,
+  ServerResponse,
+  Server as HttpServer,
+  RequestListener,
+} from "node:http";
 import {
   CRAZY_TYPKA_LIMITS,
   CRAZY_TYPKA_SPEAKER,
@@ -60,6 +65,13 @@ type Session = {
   lastMessage?: { hash: string; at: number };
 };
 type Address = { requests: number[]; sessions: number[] };
+export function isCrazyTypkaPath(url: string | undefined) {
+  return (
+    url === "/api/ai" ||
+    url?.startsWith("/api/ai/") === true ||
+    url?.startsWith("/api/ai?") === true
+  );
+}
 class RequestError extends Error {
   constructor(
     readonly status: number,
@@ -269,12 +281,15 @@ export function createCrazyTypkaService(
     req: IncomingMessage,
     res: ServerResponse,
   ): Promise<boolean> {
-    if (!(
-      req.url === "/api/ai" ||
-      req.url?.startsWith("/api/ai/") ||
-      req.url?.startsWith("/api/ai?")
-    ))
-      return false;
+    if (!isCrazyTypkaPath(req.url)) return false;
+    for (const name of [
+      "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Credentials",
+      "Access-Control-Allow-Methods",
+      "Access-Control-Allow-Headers",
+      "Access-Control-Max-Age",
+    ])
+      res.removeHeader(name);
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.setHeader("Cache-Control", "no-store");
     res.setHeader("Vary", "Origin");
@@ -545,4 +560,35 @@ export function createOptionalCrazyTypkaService(
     }
     return createCrazyTypkaService({ env: {} });
   }
+}
+
+/** Colyseus 0.18 applies CORS/OPTIONS before Express. Give only AI its own dispatcher. */
+export function attachCrazyTypkaHttpRoute(
+  http: HttpServer,
+  service: Pick<ReturnType<typeof createCrazyTypkaService>, "handle">,
+) {
+  const listeners = http.listeners("request");
+  if (listeners.length !== 1)
+    throw new Error(
+      "Expected one initialized HTTP dispatcher before mounting AI",
+    );
+  const forward = listeners[0] as RequestListener;
+  http.removeListener("request", forward);
+  http.on("request", (req, res) => {
+    if (!isCrazyTypkaPath(req.url)) {
+      forward.call(http, req, res);
+      return;
+    }
+    const unavailable = () => {
+      if (res.destroyed || res.writableEnded) return;
+      if (!res.headersSent) {
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.setHeader("Cache-Control", "no-store");
+        res.writeHead(503).end(JSON.stringify({ error: "unavailable" }));
+      } else res.end();
+    };
+    void service.handle(req, res).then((handled) => {
+      if (!handled) unavailable();
+    }, unavailable);
+  });
 }

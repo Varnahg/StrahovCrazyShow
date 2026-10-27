@@ -60,3 +60,11 @@ Crazy Typka je přiznaná fiktivní AI průvodkyně; v herním příběhu 22let�
 ## Chybějící měření
 
 Živá generace, latency/náklady modelu a adversarial eval nad skutečným endpointem zatím neproběhly. Vizuální a lifecycle přejímka nových komponent teprve následuje. Žádný výsledek průzkumu se nevydává za úspěšnou implementaci, výkon nebo konečné přijetí.
+
+## Doplnění z reálné HTTP integrace: CORS
+
+První izolovaný SDK běh doložil, že neznámá AI cesta vracela správné 404, ale stále nesla `Access-Control-Allow-Origin: *`. Přečtený instalovaný primární zdroj `@colyseus/core` 0.18.9, `build/router/index.mjs`, vysvětluje celý řetězec: bindRouterToTransport odstraní původní Express request listener, předřadí vlastní CORS wrapper a ukončí všechny OPTIONS ještě před Express middleware. Pouhé umístění AI handleru před aplikační CORS nestačí.
+
+Porovnány tři varianty: odstranění zděděných hlaviček opraví skutečné odpovědi, ale nedosáhne na předčasně ukončený preflight; změna globálního matchmaking CORS by změnila i ostatní klienty; úzký HTTP dispatcher pro AI oddělí jen její namespace a zachová přesný původní dispatcher pro všechny ostatní routy. Zvolena poslední varianta přes veřejné Node HTTP listener API po inicializaci Colyseus; před změnou ověří právě jeden dispatcher. Nevkládá patch do závislostí a nemění WebSocket upgrade ani matchmaking. Samotná AI service navíc odstraní případné zděděné permissivní hlavičky při jiném vložení do serveru.
+
+Nové regrese ověřují odmítnutý i povolený preflight před frameworkem, zachování původního handleru pro ne-AI cesty a odstranění zděděných hlaviček. Následující skutečný SDK běh musí potvrdit i původní multiplayerové scénáře. První neúspěšný integrační log zůstává zachovaný; nejde o tvrzení, že původní běh prošel.

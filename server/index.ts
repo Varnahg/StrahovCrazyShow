@@ -8,7 +8,7 @@ import {
 } from "node:http";
 import { Community } from "./community";
 import { createPublicPresenceHandler } from "./public-presence";
-import { createOptionalCrazyTypkaService } from "./crazy-typka";
+import { createOptionalCrazyTypkaService, attachCrazyTypkaHttpRoute } from "./crazy-typka";
 import {
   consumeRate,
   expireSessions,
@@ -622,7 +622,6 @@ const feedback = await createFeedbackService({
   },
 });
 const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
-  if (await crazyTypka.handle(req, res)) return;
   if (await feedback.handle(req, res)) return;
   if (await sessionDiagnostics(req, res)) return;
   if (await localBenchmarks(req, res)) return;
@@ -733,6 +732,7 @@ server.onBeforeShutdown(async () => {
 });
 server.define("strahov", StrahovRoom);
 await server.listen(config.port, listenHost);
+attachCrazyTypkaHttpRoute(http, crazyTypka);
 const room = await matchMaker.createRoom("strahov", {});
 worldId = room.roomId;
 readiness.ready();

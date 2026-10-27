@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { createServer } from "node:http";
 import { Readable } from "node:stream";
 import test from "node:test";
 import {
   createCrazyTypkaService,
   createOptionalCrazyTypkaService,
+  attachCrazyTypkaHttpRoute,
   type CrazyTypkaServiceOptions,
 } from "../server/crazy-typka";
 import {
@@ -109,6 +111,9 @@ function response() {
     headers.set(key.toLowerCase(), value);
     return res;
   }) as typeof res.setHeader;
+  res.removeHeader = (key: string) => {
+    headers.delete(key.toLowerCase());
+  };
   res.writeHead = ((value: number) => {
     status = value;
     return res;
@@ -224,6 +229,80 @@ test("namespace, exact origin, method and preflight never fall through wildcard 
   );
   assert.equal(f.calls.length, 0);
   await f.service.close();
+});
+
+test("AI removes permissive CORS headers inherited from an outer HTTP framework", async () => {
+  const f = fixture();
+  for (const path of ["/api/ai/unknown", "/api/ai/session"]) {
+    const reply = response();
+    reply.res.setHeader("Access-Control-Allow-Origin", "*");
+    reply.res.setHeader("Access-Control-Allow-Credentials", "true");
+    reply.res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE");
+    reply.res.setHeader("Access-Control-Max-Age", "2592000");
+    await f.service.handle(
+      request(path, {}, "POST", { origin: "https://evil.invalid" }),
+      reply.res,
+    );
+    for (const header of [
+      "access-control-allow-origin",
+      "access-control-allow-credentials",
+      "access-control-allow-methods",
+      "access-control-max-age",
+    ])
+      assert.equal(reply.result().headers.has(header), false);
+  }
+  await f.service.close();
+});
+
+test("AI dispatch owns preflight before the framework while other routes retain their dispatcher", async () => {
+  let forwarded = 0;
+  const http = createServer((_req, res) => {
+    forwarded++;
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.end(JSON.stringify({ legacy: true }));
+  });
+  const service = createCrazyTypkaService({ env: {} });
+  attachCrazyTypkaHttpRoute(http, service);
+  try {
+    const foreign = response();
+    http.emit(
+      "request",
+      request("/api/ai/chat", undefined, "OPTIONS", {
+        origin: "https://evil.invalid",
+        "access-control-request-method": "POST",
+      }),
+      foreign.res,
+    );
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(foreign.result().status, 403);
+    assert.equal(
+      foreign.result().headers.has("access-control-allow-origin"),
+      false,
+    );
+    const allowed = response();
+    http.emit(
+      "request",
+      request("/api/ai/chat", undefined, "OPTIONS", {
+        "access-control-request-method": "POST",
+        "access-control-request-headers": "content-type",
+      }),
+      allowed.res,
+    );
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(allowed.result().status, 204);
+    assert.equal(
+      allowed.result().headers.get("access-control-allow-methods"),
+      "POST",
+    );
+    assert.equal(forwarded, 0);
+    const health = response();
+    http.emit("request", request("/api/health", undefined, "GET"), health.res);
+    assert.equal(forwarded, 1);
+    assert.deepEqual(health.result().body, { legacy: true });
+  } finally {
+    await service.close();
+    http.removeAllListeners();
+  }
 });
 test("explicit reverse-proxy origin is accepted but forwarded headers are not trusted", async () => {
   const f = fixture({

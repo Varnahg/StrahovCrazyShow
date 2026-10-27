@@ -84,6 +84,17 @@ assert.deepEqual(await disabledAi.json(), { error: "unavailable" });
 const unknownAi = await fetch(endpoint + "/api/ai/unknown");
 assert.equal(unknownAi.status, 404);
 assert.equal(unknownAi.headers.get("access-control-allow-origin"), null);
+const foreignAiPreflight = await fetch(endpoint + "/api/ai/chat", {
+  method: "OPTIONS", headers: { Origin: "https://untrusted.example.invalid", "Access-Control-Request-Method": "POST" },
+});
+assert.equal(foreignAiPreflight.status, 403);
+assert.equal(foreignAiPreflight.headers.get("access-control-allow-origin"), null);
+const allowedAiPreflight = await fetch(endpoint + "/api/ai/chat", {
+  method: "OPTIONS", headers: { Origin: endpoint, "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type" },
+});
+assert.equal(allowedAiPreflight.status, 204);
+assert.equal(allowedAiPreflight.headers.get("access-control-allow-origin"), endpoint);
+assert.equal(allowedAiPreflight.headers.get("access-control-allow-methods"), "POST");
 evidence.checks.push("isolated AI stays disabled without inherited credentials; its namespace does not expose wildcard CORS");
 for (const path of ["/api/players", "/api/chat", "/api/community-events"])
   assert.equal((await fetch(endpoint + path)).status, 403);
