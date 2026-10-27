@@ -74,6 +74,28 @@ const guest = await fetch(endpoint + "/api/session", {
 assert.equal(guest.status, 403);
 const publicHealth = await (await fetch(endpoint + "/api/health")).json();
 assert.deepEqual(publicHealth, { ok: true, demo: true });
+assert.deepEqual(await (await fetch(endpoint + "/api/presence")).json(), { online: 0 });
+assert.deepEqual(await (await fetch(endpoint + "/api/ai/status")).json(), { enabled: false });
+const disabledAi = await fetch(endpoint + "/api/ai/session", {
+  method: "POST", headers: { Origin: endpoint, "Content-Type": "application/json" }, body: "{}",
+});
+assert.equal(disabledAi.status, 503);
+assert.deepEqual(await disabledAi.json(), { error: "unavailable" });
+const unknownAi = await fetch(endpoint + "/api/ai/unknown");
+assert.equal(unknownAi.status, 404);
+assert.equal(unknownAi.headers.get("access-control-allow-origin"), null);
+const foreignAiPreflight = await fetch(endpoint + "/api/ai/chat", {
+  method: "OPTIONS", headers: { Origin: "https://untrusted.example.invalid", "Access-Control-Request-Method": "POST" },
+});
+assert.equal(foreignAiPreflight.status, 403);
+assert.equal(foreignAiPreflight.headers.get("access-control-allow-origin"), null);
+const allowedAiPreflight = await fetch(endpoint + "/api/ai/chat", {
+  method: "OPTIONS", headers: { Origin: endpoint, "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type" },
+});
+assert.equal(allowedAiPreflight.status, 204);
+assert.equal(allowedAiPreflight.headers.get("access-control-allow-origin"), endpoint);
+assert.equal(allowedAiPreflight.headers.get("access-control-allow-methods"), "POST");
+evidence.checks.push("isolated AI stays disabled without inherited credentials; its namespace does not expose wildcard CORS");
 for (const path of ["/api/players", "/api/chat", "/api/community-events"])
   assert.equal((await fetch(endpoint + path)).status, 403);
 evidence.checks.push(
@@ -184,6 +206,7 @@ try {
     producer: inputs?.snapshot(),
   });
   await until(() => stateA.players.length === 2, "presence of both clients");
+  assert.deepEqual(await (await fetch(endpoint + "/api/presence")).json(), { online: 2 });
   const self = () => stateA.motion.find((row: any) => row[0] === sessionA.id);
   const record = (name: string) => {
     const pose = (row: any) =>
@@ -457,6 +480,8 @@ try {
   await until(() => stateB.notices.length > 0, "ownership rejection");
   await a.leave();
   rooms.splice(rooms.indexOf(a), 1);
+  await until(() => stateB.players.length === 1, "public count follows disconnection");
+  assert.deepEqual(await (await fetch(endpoint + "/api/presence")).json(), { online: 1 });
   await sleep(100);
   const resumed = await issue("ignored", sessionA.token);
   assert.equal(resumed.id, sessionA.id);
@@ -466,6 +491,9 @@ try {
   });
   rooms.push(rejoined);
   rejoined.onMessage("*", () => {});
+  await until(() => stateB.players.length === 2, "public count follows resume");
+  assert.deepEqual(await (await fetch(endpoint + "/api/presence")).json(), { online: 2 });
+  evidence.checks.push("public aggregate follows join, leave and resume without exposing identities");
   await sleep(150);
   const weather = await (await fetch(endpoint + "/api/weather")).json();
   assert.ok(["live", "fallback", "unavailable"].includes(weather.status));

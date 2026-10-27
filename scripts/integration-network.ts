@@ -294,8 +294,10 @@ try {
     demo: true,
   });
   checks.push(
-    "guest cannot join or read authored meeting/presence from public HTTP",
+    "guest cannot join or read authored meetings or individual presence from public HTTP",
   );
+  assert.deepEqual(await (await fetch(endpoint + "/api/presence")).json(), { online: 12 });
+  checks.push("public aggregate reports all twelve connected players and no identities");
   const report = {
     completed: true,
     protocol: PROTOCOL_VERSION,

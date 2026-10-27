@@ -7,6 +7,8 @@ import {
   type ServerResponse,
 } from "node:http";
 import { Community } from "./community";
+import { createPublicPresenceHandler } from "./public-presence";
+import { createOptionalCrazyTypkaService, attachCrazyTypkaHttpRoute } from "./crazy-typka";
 import {
   consumeRate,
   expireSessions,
@@ -67,6 +69,7 @@ const issueRates = new Map<string, number[]>();
 let worldId = "";
 let singletonRoomId: string | undefined;
 const store = new Community();
+const publicPresence = createPublicPresenceHandler(() => store.players.size);
 await initPhysics();
 class StrahovRoom extends Room {
   autoDispose = false;
@@ -604,6 +607,9 @@ const http = createServer();
 const listenHost = config.host;
 const sessionDiagnostics = createSessionDiagnosticsHandler({ listenHost });
 const localBenchmarks = createLocalBenchmarkHandler({ listenHost });
+const crazyTypka = createOptionalCrazyTypkaService({}, () => {
+  console.warn("[AI] Invalid configuration; Crazy Typka is disabled.");
+});
 const feedback = await createFeedbackService({
   onDiagnostic(event) {
     // Projekce obsahuje jen stav konfigurace a sanitizované kódy, ne hlášení,
@@ -631,6 +637,7 @@ const handleApi = async (req: IncomingMessage, res: ServerResponse) => {
     readiness.reply(res);
     return;
   }
+  if (publicPresence(req, res)) return;
   if (req.url === "/api/weather") {
     res.end(JSON.stringify(await getWeather()));
     return;
@@ -720,10 +727,12 @@ const server = new Server({
 matchMaker.controller.exposedMethods = ["joinById"];
 server.onBeforeShutdown(async () => {
   readiness.stop();
+  await crazyTypka.close();
   await feedback.close();
 });
 server.define("strahov", StrahovRoom);
 await server.listen(config.port, listenHost);
+attachCrazyTypkaHttpRoute(http, crazyTypka);
 const room = await matchMaker.createRoom("strahov", {});
 worldId = room.roomId;
 readiness.ready();

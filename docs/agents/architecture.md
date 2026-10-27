@@ -1,6 +1,6 @@
 # Mapa architektury a ověřování
 
-Mapa odpovídá kódovému checkpointu `7712edb57cae1ab02841ec70519a7f371240a6b4` z 20. 10. 2026. Popisuje odpovědnosti a vazby jeho souborů. Skutečné výsledky, stav přejímky a identita testované verze patří do [ověření](../verification.md).
+Základ mapy odpovídá kódovému checkpointu `7712edb57cae1ab02841ec70519a7f371240a6b4` z 20. 10. 2026. Cílené doplnění úvodu, loaderu, veřejného agregátu a AI z 28. 10. vychází z `b494fe38ab6472c6cd683c22c7a0d9f89fe664f8` nad base `752e75fd41b455db7e22453b881eb5f62bc283f0`; nejde o potvrzení publikace. Skutečné výsledky, stav přejímky a identita testované verze patří do [ověření](../verification.md).
 
 Pravidla určuje [AGENTS.md](../../AGENTS.md), rozsah task JSON a skutečné vlastníky společný koordinační registr podle [postupu](README.md). Tento dokument není druhý registr rezervací. [current-work.md](current-work.md) zůstává historickým bootstrap inventářem z 12. 10. 2026.
 
@@ -21,9 +21,21 @@ Jde o jednu privátní ESM aplikaci: [pnpm-workspace.yaml](../../pnpm-workspace.
 
 [client/world-renderer.ts](../../client/world-renderer.ts) skládá kanonické továrny světa. `shared/` drží společné prostorové/datové kontrakty, fyziku a manifesty; není obecným odkladištěm pomocníků. Změna rozměru nebo polohy se posuzuje současně pro obraz, kolize, navigaci a generované exporty. Souřadnice jsou metry, +X východ, +Z jih; kamera Babylon je pravotočivá. Historický sloučený IPR scan je referenční vrstva, ne druhá herní scéna.
 
-[server/index.ts](../../server/index.ts) vytvoří právě jednu `StrahovRoom`; matchmaking zveřejňuje `joinById`. Dočasné relace a komunitní stav žijí v paměti. Host multiplayerovou relaci nedostane; veřejné HTTP nevydává multiplayerovou přítomnost. `/api/health` vrací stav připravenosti bez populace a `/api/weather` adaptované počasí.
+[server/index.ts](../../server/index.ts) vytvoří právě jednu `StrahovRoom`; matchmaking zveřejňuje `joinById`. Dočasné relace a komunitní stav žijí v paměti. Host multiplayerovou relaci nedostane. Výslovně schválenou veřejnou výjimkou je `GET /api/presence`: [public-presence](../../server/public-presence.ts) vrací pouze agregát `{ online }` podle připojených hráčských relací, bez identit, pozic a zpráv; AI ani NPC se nezapočítávají. Odpověď se necachuje a nedostupnost se nesmí vydávat za nulu. `/api/health` nadále vrací stav připravenosti bez populace a `/api/weather` adaptované počasí.
 
 [shared/netcode.ts](../../shared/netcode.ts) deklaruje **protokol 11** a **60 Hz**. [shared/input-timeline.ts](../../shared/input-timeline.ts), [client/network-timeline.ts](../../client/network-timeline.ts) a serverové fronty používají plánované tick/epoch vstupy; legacy `InputQueue` v netcode slouží regresním srovnáním. Server posílá motion/authority 20 Hz; [motion-codec](../../shared/motion-codec.ts) přenáší komprimovaný pohyb. [shared/simulation.ts](../../shared/simulation.ts) je společná fyzika autority i predikce. Změna fyziky může vyžadovat společné nasazení/protokol i bez změny tvaru paketu.
+
+## Úvod, načítání a soukromý AI kanál
+
+[WelcomeScreen](../../client/welcome-screen.tsx) drží přístupný CZ/EN úvod, veřejný počet a explicitní otevření editoru. Výchozí úvod nemountuje editor ani herní canvas; editor se připojí až po explicitním otevření. Import editoru zůstává statický. [LoadingScreen](../../client/loading-screen.tsx) a [startup-progress](../../client/startup-progress.ts) zobrazují skutečné milníky pro konkrétní generaci canvasu; cancel-safe double-rAF před synchronní konstrukcí dovoluje vykreslit stav. Nemění se Game readiness ani bezpečný renderer fallback a helper sám není důkazem rychlejšího startu.
+
+[client/crazy-typka.tsx](../../client/crazy-typka.tsx) spravuje jeden AI store v App pro úvod i samostatný AI pohled herního chatu. Crazy Typka je označená AI; konverzace se neposílá ostatním hráčům ani do lidského kanálu. Lidské DM/event vstupy používají společný `openHumanChat`. Reset a expirace ukončují relaci; nejisté doručení dovoluje explicitně obnovit stejnou operaci bez automatické smyčky placených pokusů.
+
+[shared/crazy-typka.ts](../../shared/crazy-typka.ts) definuje kontrakt. [Serverová služba](../../server/crazy-typka.ts) odděluje dočasné AI relace, limity, monotónní `requestSeq`, reset, timeout a shutdown od multiplayeru. Pamatuje jen poslední terminální výsledek pro přesný replay; jiné znění stejného pořadí je konflikt a staré či přeskočené pořadí se odmítne. Místní první čistý pozdrav má přesnou podmínku a neobchází vypnutou službu. [Provider](../../server/crazy-typka-provider.ts) vlastní OpenAI volání a moderaci, serverový klíč se nepřenáší klientovi. Strop generování platí pro běh procesu, není trvalým finančním limitem.
+
+[Retrieval](../../server/crazy-typka-retrieval.ts) používá [kurátorovaný corpus](../../server/data/silicon-hill-knowledge.json), ověřené citace a časovou platnost podkladů; krátký navazující dotaz váže na téma USER zpráv, nikoli na tvrzení bota. Platnost se kontroluje také před publikací odpovědi a při replay. Není zde vektorová databáze, runtime crawler ani načítání uživatelských URL. Změnu zdrojů a jejich kontrolní termín musí provést správce podle [provozního návodu](../home-ai/20261027/deployment.md).
+
+AI namespace má vlastní HTTP dispatcher před CORS wrapperem pinovaného Colyseus; přesné povolené origins určuje `CRAZY_TYPKA_ALLOWED_ORIGINS`. Ostatní HTTP requesty a WebSocket upgrade zachovávají původní handler. Chybějící či vadná AI konfigurace vypne pouze volitelnou AI službu. [compose.ai.yaml](../../compose.ai.yaml) obsahuje volitelný konfigurační override; tajné hodnoty dodává provozovatel. Izolovaná integrace odstraňuje zděděná `OPENAI_`, `CRAZY_TYPKA_`, `LINEAR_` a `FEEDBACK_` nastavení, takže nepoužije skutečný provider ani neodešle reálné hlášení.
 
 ## Mapa oblastí
 

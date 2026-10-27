@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "dependsOn": [],
+  "resources": [],
+  "verification": [
+    "Vlastní claim před zápisem; lehké cílené CPU kontroly. Build, integrace a GPU jen po rezervaci a koordinaci. Žádný placený endpoint v izolovaných testech."
+  ],
+  "notes": [
+    "Autorizace uživatele v chatu Vylepši úvodní obrazovku a AI chat, thread01a17e9d-dd4a-7fe3-91ac-4f3bc548982d: sdílení zdrojů a následně výslovné ano k přímým zprávám obou chatů. Tasky přiděluje root modelové etapy pod admin claimem; implementaci koordinuje příjemce.",
+    "Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Předávání UI/server entrypointů zvlášť; nové moduly mohou vznikat paralelně.",
+    "Nepřebírat WIP z primary C checkoutu, který je zachovaný na codex/primary-wip-20261027.",
+    "Server/index.ts předán po dokončení root callbacku; viz feedback-root-integration-20261027 handoff. UI zůstává v odděleném blocked tasku."
+  ],
+  "id": "home-ai-20261027-server-integration",
+  "title": "Serverové propojení AI a veřejného souhrnného počtu",
+  "status": "ready",
+  "writePaths": [
+    "server/index.ts",
+    "server/public-presence.ts",
+    "tests/public-presence.test.ts",
+    "scripts/integration.ts",
+    "scripts/integration-network.ts",
+    "scripts/test-integration.mjs",
+    "tests/feedback-deployment.test.ts",
+    "compose.ai.yaml",
+    "docs/agents/handoffs/home-ai-20261027-server-integration.md",
+    ".cache/home-ai-20261027-server-integration/"
+  ],
+  "acceptance": [
+    "Před zápisem převzít rootův feedback commit a3c886a7291830415170ea4da7e7906379bf8616; zachovat jeho diagnostický callback.",
+    "Veřejný jen souhrnný počet online podle výslovného uživatelova rozhodnutí, bez soukromé přítomnosti nebo identit.",
+    "Izolace odstraní OPENAI_/CRAZY_TYPKA_ i původní LINEAR_/FEEDBACK_ proměnné. Oddělený compose.ai.yaml bez secret hodnot."
+  ]
+}

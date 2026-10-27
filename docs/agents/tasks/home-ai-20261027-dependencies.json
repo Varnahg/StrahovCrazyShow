@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1, "id": "home-ai-20261027-dependencies", "title": "Vlastní fyzické závislosti pro izolovaný home-ai checkout", "status": "ready", "dependsOn": [],
+  "writePaths": ["node_modules/", ".cache/home-ai-20261027-dependencies/", "docs/agents/handoffs/home-ai-20261027-dependencies.md"],
+  "resources": ["heavy-validation", "dependency-setup"],
+  "acceptance": ["Původní autor nejprve bezpečně odstraní pouze vlastní doložený junction jako dokončení bootstrap cleanupu, bez rekurze a bez zásahu do jeho cíle; pak claim na chybějící cestu.", "Fyzický offline frozen install pouze ve vlastní worktree, bez změny package/lock a bez write-through do sdílených závislostí. Před výměnou pozastavit vlastní čtenáře závislostí.", "Po dokončení ověřit piny, validátor a skutečné ukončení procesu; koordinátor dostane předání a heavy release."],
+  "verification": ["Žádná hra ani placený API endpoint. Instalační log a skutečný výsledek; při chybě cache nepřecházet na změnu manifestu nebo historických pravidel."],
+  "notes": ["Cwd C:/Users/rezac/.codex/worktrees/clean-home-crazy-typka/StrahovCrazyShow. Koordinované schválení lokálního setupu od root modelové etapy, uživatel výslovně povolil sdílení zdrojů. Junction target se nikdy nemaže."]
+}

@@ -79,11 +79,11 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(
-  `(function(env) { const exports={}; const {mode,canvas,sessionDiagnostics,modeRef,loadModule,profileRef,game,seasonPreviewRef,weatherPreviewRef,idRef,setStats,userBenchmark,setBenchmark,benchmarkBuildIdentity,saveLocalBenchmark,setWorldSelection,notice,weatherRef,quality,targetFps,syncNetworkStage,drainAuthorities,setReady,setError,t,getRendererInfo,testImportMeta,inputBuffer,requestWebGlFallback,window,setRendererGeneration,setRendererCompatibility,room,connectionAttempt,disconnectRoom,doorConnectionRef,playersRef,carState,activity,networkProbeRef,connectedRef,reward}=env; ${compiled}; return runEffect(); })`,
+  `(function(env) { const exports={}; const {mode,canvas,sessionDiagnostics,modeRef,loadModule,profileRef,game,seasonPreviewRef,weatherPreviewRef,idRef,setStats,userBenchmark,setBenchmark,benchmarkBuildIdentity,saveLocalBenchmark,setWorldSelection,notice,weatherRef,quality,targetFps,syncNetworkStage,drainAuthorities,setReady,setError,t,getRendererInfo,testImportMeta,inputBuffer,requestWebGlFallback,window,setRendererGeneration,setRendererCompatibility,room,connectionAttempt,disconnectRoom,doorConnectionRef,playersRef,carState,activity,networkProbeRef,connectedRef,reward,setStartupStage,observeStartupProgress,paintStartupStage}=env; ${compiled}; return runEffect(); })`,
 ).runInThisContext();
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
-function fixture(options: { constructionError?: boolean; startError?: boolean; startFailure?: Error; loseAfterStart?: boolean; weatherPreview?: WeatherScenarioId; network?: boolean; search?: string } = {}) {
+function fixture(options: { constructionError?: boolean; startError?: boolean; startFailure?: Error; loseAfterStart?: boolean; weatherPreview?: WeatherScenarioId; network?: boolean; search?: string; pendingPaint?: Promise<void> } = {}) {
   let resolveEngine!: (engine: any) => void;
   let rejectEngine!: (reason: Error) => void;
   const resetPromise = () => new Promise((resolve, reject) => {
@@ -105,6 +105,9 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; s
   const events: string[] = [];
   const eventRecords: { name: string; data: any }[] = [];
   const inputResets: string[] = [];
+  const stages: string[] = [];
+  const observers: { publish: (stage: string) => void; stops: number }[] = [];
+  let publishGameStage = (_stage: string) => {};
   const canvas = { current: { dataset: {} as Record<string, string> } };
   const requestedCanvases: unknown[] = [], disconnects: unknown[][] = [];
   const location = { hostname: "example.com", search: options.search ?? "" }, fallbackSession = new RenderFallbackSession();
@@ -132,6 +135,7 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; s
     setCar() {}
     setFound() {}
     async start() {
+      publishGameStage("physics-library");
       if (options.startFailure) throw options.startFailure;
       if (options.startError) throw new Error("start failed");
       this.ready = true;
@@ -148,6 +152,15 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; s
   const noop = () => {};
   const state = { current: null as Game | null };
   const environment = {
+    setStartupStage: (stage: string) => stages.push(stage),
+    observeStartupProgress: (_canvas: unknown, publish: (stage: string) => void) => {
+      assert.equal(_canvas, canvas.current);
+      const observer = { publish, stops: 0 };
+      observers.push(observer);
+      publishGameStage = publish;
+      return () => { if (!observer.stops) observer.stops++; };
+    },
+    paintStartupStage: async () => { await options.pendingPaint; },
     mode: options.network ? "multi" : "guest",
     canvas,
     profileRef: { current: {} },
@@ -200,6 +213,7 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; s
     events,
     eventRecords,
     inputResets,
+    stages, observers,
     state,
     requestedCanvases, disconnects, room,
     generation: () => generation,
@@ -217,6 +231,37 @@ test("cancelled UI startup disposes a late engine without constructing Game", as
   await tick();
   assert.equal(f.engine.disposed, 1);
   assert.equal(f.stats().gameCount, 0);
+  assert.deepEqual(f.errors, []);
+});
+
+test("actual startup presents observed phases and retires its observer on readiness", async () => {
+  const f = fixture();
+  await tick();
+  f.resolveEngine(f.engine);
+  await tick();
+  assert.deepEqual(f.stages, ["import", "renderer", "world-construction", "physics-library", "ready"]);
+  assert.equal(f.observers[0].stops, 1);
+  f.cleanup();
+  f.observers[0].publish("late-old-stage");
+  assert.equal(f.observers[0].stops, 1);
+  assert.equal(f.stages.at(-1), "ready");
+});
+
+test("leaving during the loader paint releases the pending engine without constructing Game", async () => {
+  let finishPaint!: () => void;
+  const f = fixture({ pendingPaint: new Promise<void>(resolve => { finishPaint = resolve; }) });
+  await tick();
+  f.resolveEngine(f.engine);
+  await tick();
+  assert.equal(f.stats().gameCount, 0);
+  assert.equal(f.stages.at(-1), "world-construction");
+  f.cleanup();
+  f.observers[0].publish("ready");
+  finishPaint();
+  await tick();
+  assert.equal(f.engine.disposed, 1);
+  assert.equal(f.stats().gameCount, 0);
+  assert.equal(f.stages.at(-1), "world-construction");
   assert.deepEqual(f.errors, []);
 });
 test("UI transfers a ready engine to Game and cleanup releases it exactly once", async () => {

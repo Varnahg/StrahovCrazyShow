@@ -1,4 +1,10 @@
 import { HudIcon } from "./hud-icons";
+import { WelcomeScreen } from "./welcome-screen";
+import { LoadingScreen } from "./loading-screen";
+import { observeStartupProgress, paintStartupStage } from "./startup-progress";
+import { CrazyTypkaChat, useCrazyTypka } from "./crazy-typka";
+import "./welcome-screen.css";
+import "./crazy-typka.css";
 import { FeedbackDialog } from "./feedback";
 import { CLIENT_BUILD_ID } from "./build-identity";
 import { sanitizeDiagnosticsText } from "../shared/session-diagnostics";
@@ -157,6 +163,9 @@ const initialActivity: ActivityState = {
 };
 export function App() {
   const feedbackLocale = useLocale();
+  const ai = useCrazyTypka();
+  const [aiChatActive, setAiChatActive] = useState(false);
+  const [startupStage, setStartupStage] = useState("import");
   const feedbackLocaleRef = useRef(feedbackLocale);
   feedbackLocaleRef.current = feedbackLocale;
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -636,6 +645,10 @@ export function App() {
     sessionDiagnostics.event("mode-change", { mode });
     let cancelled = false;
     const startupAbort = new AbortController();
+    setStartupStage("import");
+    const stopStartupProgress = observeStartupProgress(startupCanvas, (stage) => {
+      if (!cancelled && canvas.current === startupCanvas) setStartupStage(stage);
+    });
     const startupConnection = mode === "multi"
       ? { room: room.current, attempt: connectionAttempt.current }
       : undefined;
@@ -655,6 +668,7 @@ export function App() {
           import("./render-engine"),
         ]);
         if (cancelled || canvas.current !== startupCanvas) return;
+        setStartupStage("renderer");
         const engineStarted = performance.now();
         pendingEngine = await createGameEngine(startupCanvas, {
           signal: startupAbort.signal,
@@ -673,12 +687,19 @@ export function App() {
           backend: pendingEngine.isWebGPU ? "webgpu" : "webgl2",
           selection,
         });
+        setStartupStage("world-construction");
+        await paintStartupStage(startupAbort.signal);
+        if (cancelled || canvas.current !== startupCanvas) {
+          pendingEngine.dispose();
+          return;
+        }
         const g = new Game(startupCanvas, profileRef.current, pendingEngine);
         pendingEngine = undefined;
         ownedGame = g;
         game.current = g;
         g.onRendererFailure = (message) => {
           if (cancelled || game.current !== g) return;
+          stopStartupProgress();
           userBenchmark.current = false;
           setReady(false);
           setError(message);
@@ -753,6 +774,8 @@ export function App() {
           const rtt = networkProbeRef.current?.snapshot().predictionRoundTripMs;
           if (rtt !== null && rtt !== undefined) g.networkTimeline.setRtt(rtt);
         }
+        setStartupStage("ready");
+        stopStartupProgress();
         setReady(true);
         // Read-only debug/benchmark entry points, local development only.
         if (import.meta.env.DEV)
@@ -768,6 +791,7 @@ export function App() {
             setWeather: (w: Weather) => g.setWeather(w),
           };
       } catch (e) {
+        stopStartupProgress();
         pendingEngine?.dispose();
         if (cancelled) return;
         if (canvas.current !== startupCanvas || modeRef.current !== mode ||
@@ -780,6 +804,7 @@ export function App() {
         if (!ownedGame && !pendingEngine) {
           const fallback = requestWebGlFallback(e, window.location, startupAbort.signal);
           if (fallback) {
+            setStartupStage("renderer-fallback");
             sessionDiagnostics.event("renderer-fallback", fallback);
             setRendererCompatibility(true);
             setError("");
@@ -801,6 +826,7 @@ export function App() {
     })();
     return () => {
       cancelled = true;
+      stopStartupProgress();
       startupAbort.abort();
       userBenchmark.current = false;
       disposeOwnedGame();
@@ -1076,6 +1102,11 @@ export function App() {
     }
     room.current?.send(action, data);
   };
+  const openHumanChat = (nextChannel: string) => {
+    setAiChatActive(false);
+    setChannel(nextChannel);
+    setPanel("chat");
+  };
   const togglePanel = useCallback((value: string) => {
     if (value === "feedback") {
       openFeedback();
@@ -1157,94 +1188,18 @@ export function App() {
     getContext={feedbackContext} capture={captureFeedback} />;
   if (mode === "menu")
     return (
-      <main className="welcome">
-        <div className="welcome-nav">
-          <a className="brand" href="#">
-            s<span>•</span>trahov
-          </a>
-          <span className="demo-badge">{t("HRATELNÉ DEMO · 0.1")}</span>
-          <LanguagePicker />
-          <button type="button" className="secondary" onClick={openFeedback} aria-keyshortcuts="F8">
+      <>
+        <WelcomeScreen
+          profile={profile} onChange={setProfile} enter={enter} busy={busy}
+          error={error ? localizeNotice(error) : undefined} locale={feedbackLocale}
+          editor={avatarEditor} map={<MapView big />} language={<LanguagePicker />}
+          feedback={<button type="button" className="secondary" onClick={openFeedback} aria-keyshortcuts="F8">
             {feedbackLocale === "cs" ? "Zpětná vazba" : "Feedback"}
-          </button>
-          <a
-            href="https://wiki.sh.cvut.cz/kolej/bloky/blok_6"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {t("Poznej kopec ↗")}
-          </a>
-        </div>
-        <section className="welcome-grid">
-          <div className="welcome-copy">
-            <div className="eyebrow">
-              {t("PRAHA · 50.08065° N, 14.39175° E")}
-            </div>
-            <h1>
-              {t("Na kopci.")}
-              <br />
-              {t("Ve svém živlu.")}
-            </h1>
-            <p>
-              {t(
-                "Tvůj Strahov v prohlížeči. Potkej ostatní, najdi svou partu a objev, co se děje mezi bloky.",
-              )}
-            </p>
-            <div className="welcome-facts">
-              <span>{t("↗ Celý areál")}</span>
-              <span>{t("◉ Společný svět")}</span>
-              <span>{t("☁ Skutečné počasí")}</span>
-            </div>
-            <div className="welcome-map">
-              <MapView big />
-              <div className="map-caption">
-                <span>{t("STRAHOV / KOLEJNÍ AREÁL")}</span>
-                <span>© OpenStreetMap contributors</span>
-              </div>
-            </div>
-            <p className="small muted">
-              {t(
-                "Samostatně modelovaný Strahov podle map a fotografických předloh. Referenční 3D podklad © IPR Praha, 2023, CC BY. Hratelný interiér B6 je rekonstrukce podle plánů a fotografií. Všechny uvedené akce jsou fiktivní.",
-              )}
-            </p>
-          </div>
-          <aside className="join-card">
-            <div className="eyebrow">{t("ZAČNI U SEBE")}</div>
-            <h2>{t("Kdo dnes přijde?")}</h2>
-            {avatarEditor}
-            <button
-              className="primary full"
-              disabled={busy}
-              onClick={() => enter("multi")}
-            >
-              {busy ? t("Připojuji…") : t("Vstoupit do společného světa")}{" "}
-              <span>↗</span>
-            </button>
-            <button
-              className="secondary full"
-              disabled={busy}
-              onClick={() => enter("guest")}
-            >
-              {t("Prohlédnout si Strahov sám")}
-            </button>
-            {error && (
-              <p role="alert" className="error">
-                {localizeNotice(error)}
-              </p>
-            )}
-            <p className="small muted">
-              {t(
-                "Přezdívka není účet ani ověřená identita. Demo neověřuje bydliště. Vzhled se uloží jen v tomto prohlížeči.",
-              )}
-            </p>
-          </aside>
-        </section>
-        <footer>
-          <span>STRAHOV CRAZY SHOW</span>
-          <span>{t("Pro lidi, kteří žijí na kopci.")}</span>
-        </footer>
+          </button>}
+          assistant={<CrazyTypkaChat state={ai} locale={feedbackLocale} />}
+        />
         {feedbackDialog}
-      </main>
+      </>
     );
   return (
     <main className="game-shell">
@@ -1256,30 +1211,15 @@ export function App() {
         style={{ touchAction: "none" }}
       />
       {!ready && (
-        <div className="loading">
-          <div className="brand">
-            s<span>•</span>trahov
-          </div>
-          <p>{t("Připravuji celý kopec…")}</p>
-          {rendererCompatibility && <p role="status">{t("Používá se kompatibilní režim WebGL2.")}</p>}
-          {error && <p className="error">{localizeNotice(error)}</p>}
-          {error && <button type="button" className="secondary" data-renderer-fallback="webgl2" onClick={() => {
+        <LoadingScreen key={rendererGeneration} stage={startupStage} locale={feedbackLocale}
+          error={error ? localizeNotice(error) : undefined} onLeave={leave} onFeedback={openFeedback}
+          rendererNotice={rendererCompatibility ? <p role="status">{t("Používá se kompatibilní režim WebGL2.")}</p> : undefined}
+          recoveryAction={<button type="button" className="secondary" data-renderer-fallback="webgl2" onClick={() => {
             const target = new URL(window.location.href);
             target.searchParams.set("renderBackend", "webgl2");
             window.location.assign(target.toString());
           }}>{t("Spustit v kompatibilním režimu (WebGL2)")}</button>}
-          <button type="button" className="secondary" onClick={openFeedback} aria-keyshortcuts="F8">
-            {feedbackLocale === "cs" ? "Nahlásit problém" : "Report a problem"}
-          </button>
-          <button
-            type="button"
-            className="secondary"
-            style={{ marginTop: 16 }}
-            onClick={leave}
-          >
-            {t("Opustit demo")}
-          </button>
-        </div>
+        />
       )}
       <header className="game-top">
         <button
@@ -1534,8 +1474,7 @@ export function App() {
                 {social.contacts.includes(targetPlayer.id) ? (
                   <button
                     onClick={() => {
-                      setChannel("dm:" + targetPlayer.id);
-                      setPanel("chat");
+                      openHumanChat("dm:" + targetPlayer.id);
                     }}
                   >
                     {t("Soukromá zpráva")}
@@ -1757,8 +1696,7 @@ export function App() {
                           <button
                             className="secondary full"
                             onClick={() => {
-                              setChannel("event:" + event.id);
-                              setPanel("chat");
+                              openHumanChat("event:" + event.id);
                             }}
                           >
                             {t("Otevřít chat události")}
@@ -2140,8 +2078,7 @@ export function App() {
                               {social.contacts.includes(p.id) ? (
                                 <button
                                   onClick={() => {
-                                    setChannel("dm:" + p.id);
-                                    setPanel("chat");
+                                    openHumanChat("dm:" + p.id);
                                   }}
                                 >
                                   {t("Zpráva")}
@@ -2196,7 +2133,11 @@ export function App() {
             )}
             {panel === "chat" && (
               <>
-                {mode === "guest" ? (
+                <div className="crazy-channel-switch" role="group" aria-label={feedbackLocale === "cs" ? "Volba chatu" : "Chat type"}>
+                  <button type="button" aria-pressed={!aiChatActive} onClick={() => setAiChatActive(false)}>{feedbackLocale === "cs" ? "Hráči" : "Players"}</button>
+                  <button type="button" aria-pressed={aiChatActive} onClick={() => setAiChatActive(true)}>Crazy Typka <span className="crazy-ai-badge">AI</span></button>
+                </div>
+                {aiChatActive ? <div className="game-ai-chat"><CrazyTypkaChat state={ai} locale={feedbackLocale} /></div> : mode === "guest" ? (
                   <p className="empty">
                     {t(
                       "Samostatná prohlídka není připojená k žádnému multiplayerovému chatu.",
