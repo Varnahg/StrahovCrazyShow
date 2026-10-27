@@ -8,8 +8,10 @@ import type {
 import {
   CRAZY_TYPKA_LIMITS,
   CRAZY_TYPKA_SPEAKER,
+  isCrazyTypkaRequestSeq,
   type CrazyTypkaErrorCode,
-  type CrazyTypkaResponse,
+  type CrazyTypkaChatResponse,
+  type CrazyTypkaErrorResponse,
 } from "../shared/crazy-typka";
 import {
   createCrazyTypkaProvider,
@@ -18,7 +20,11 @@ import {
   type CrazyTypkaReasoningEffort,
   type AiHistoryMessage,
 } from "./crazy-typka-provider";
-import { retrieveKnowledge } from "./crazy-typka-retrieval";
+import {
+  retrieveConversationKnowledge,
+  isKnowledgeCurrent,
+  KNOWLEDGE_REVIEW_AFTER,
+} from "./crazy-typka-retrieval";
 
 export type CrazyTypkaServiceLimits = {
   requestBytes: number;
@@ -65,8 +71,31 @@ type Session = {
   messages: number[];
   inflight?: AbortController;
   lastMessage?: { hash: string; at: number };
+  nextRequestSeq: number;
+  lastOperation?: Operation;
+  /** Includes accepted failed USER attempts so a newer unknown topic is not skipped. */
+  retrievalUsers: AiHistoryMessage[];
+};
+type TerminalResult = {
+  status: number;
+  body: CrazyTypkaChatResponse | CrazyTypkaErrorResponse;
+};
+type Operation = {
+  seq: number;
+  payloadHash: string;
+  terminal?: TerminalResult;
 };
 type Address = { requests: number[]; sessions: number[] };
+function rememberTerminal(
+  session: Session,
+  operation: Operation,
+  result: TerminalResult,
+) {
+  // A failed newer USER attempt is a topic boundary. Do not let the generator
+  // silently fall back to older successful dialogue, or resend rejected text.
+  if (result.status >= 400) session.history.length = 0;
+  operation.terminal = result;
+}
 export function isCrazyTypkaPath(url: string | undefined) {
   return (
     url === "/api/ai" ||
@@ -83,6 +112,16 @@ class RequestError extends Error {
   }
 }
 const hash = (text: string) => createHash("sha256").update(text).digest("hex");
+function firstGreeting(
+  message: string,
+  locale: "cs" | "en",
+): string | undefined {
+  if (!/^(?:ahoj|čau|cau|nazdar|dobrý den|hello|hi|hey)[!.?]?$/iu.test(message))
+    return undefined;
+  return locale === "cs"
+    ? "Ahoj! Jsem Crazy Typka, fiktivní AI průvodkyně Strahovem. S čím ti pomůžu? Kopec už máme, teď najdeme cestu."
+    : "Hi! I'm Crazy Typka, a fictional AI guide to Strahov. What can I help with? We've got the hill; let's find your way.";
+}
 function object(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -316,6 +355,24 @@ export function createCrazyTypkaService(
       operationTimer: ReturnType<typeof setTimeout> | undefined;
     let inflight: Session | undefined,
       operationTimedOut = false;
+    let accepted:
+      { key: string; session: Session; operation: Operation } | undefined;
+    const terminalReply = (
+      status: number,
+      body: CrazyTypkaChatResponse | CrazyTypkaErrorResponse,
+    ) => {
+      if (
+        accepted &&
+        sessions.get(accepted.key) === accepted.session &&
+        accepted.session.lastOperation === accepted.operation &&
+        accepted.session.expiresAt > now()
+      )
+        rememberTerminal(accepted.session, accepted.operation, {
+          status,
+          body,
+        });
+      return reply(status, body);
+    };
     const disconnected = () => controller?.abort();
     try {
       if (
@@ -379,12 +436,12 @@ export function createCrazyTypkaService(
         sessions.delete(key);
         session.inflight?.abort();
         session.history.length = 0;
+        session.retrievalUsers.length = 0;
+        session.lastOperation = undefined;
         return reply(204);
       }
       const issueSession = req.url === "/api/ai/session";
       admission(req, issueSession); // Before body collection or any paid provider work.
-      if (!issueSession && generations >= limits.generationsPerProcess)
-        throw new RequestError(503, "budget-exhausted");
       if (issueSession && sessions.size >= limits.maxSessions)
         throw new RequestError(503, "busy");
       controller = new AbortController();
@@ -413,40 +470,97 @@ export function createCrazyTypkaService(
           origin,
           history: [],
           messages: [],
+          nextRequestSeq: 1,
+          retrievalUsers: [],
         });
         return reply(201, { token, expiresAt });
       }
       if (
         Object.keys(body).some(
-          (key) => !["token", "message", "locale"].includes(key),
+          (key) => !["token", "requestSeq", "message", "locale"].includes(key),
         ) ||
         typeof body.message !== "string" ||
         !body.message.trim() ||
         body.message.length > CRAZY_TYPKA_LIMITS.messageChars ||
         /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(body.message) ||
-        (body.locale !== "cs" && body.locale !== "en")
+        (body.locale !== "cs" && body.locale !== "en") ||
+        !isCrazyTypkaRequestSeq(body.requestSeq)
       )
         throw new RequestError(400, "invalid-request");
       const { key, session } = sessionFor(body.token, origin);
+      const message = body.message.trim(),
+        payloadHash = hash(JSON.stringify([message, body.locale]));
+      const previous = session.lastOperation;
+      if (previous?.seq === body.requestSeq) {
+        if (previous.payloadHash !== payloadHash)
+          throw new RequestError(409, "request-conflict");
+        if (!previous.terminal) throw new RequestError(409, "busy");
+        const cached = previous.terminal.body;
+        if (
+          "sources" in cached &&
+          cached.sources.some(
+            (source) =>
+              !isKnowledgeCurrent(
+                source.checkedAt,
+                KNOWLEDGE_REVIEW_AFTER,
+                now(),
+              ),
+          )
+        )
+          rememberTerminal(session, previous, {
+            status: 409,
+            body: { error: "response-expired", requestSeq: previous.seq },
+          });
+        return reply(previous.terminal.status, previous.terminal.body);
+      }
+      if (body.requestSeq !== session.nextRequestSeq)
+        throw new RequestError(409, "request-out-of-order");
       if (session.inflight) throw new RequestError(409, "busy");
       trim(session.messages, now());
-      const message = body.message.trim(),
-        digest = hash(message.toLocaleLowerCase("cs"));
+      const digest = hash(message.toLocaleLowerCase("cs"));
       if (
         session.messages.length >= limits.messagesPerMinutePerSession ||
         (session.lastMessage?.hash === digest &&
           now() - session.lastMessage.at < 10000)
       )
         throw new RequestError(429, "rate-limited");
+      const greeting =
+        !previous && session.nextRequestSeq === 1 && !session.history.length
+          ? firstGreeting(message, body.locale)
+          : undefined;
+      if (!greeting && generations >= limits.generationsPerProcess)
+        throw new RequestError(503, "budget-exhausted");
       session.messages.push(now());
       session.lastMessage = { hash: digest, at: now() };
       session.inflight = controller;
       inflight = session;
-      const evidence = retrieveKnowledge(
+      const operation: Operation = { seq: body.requestSeq, payloadHash };
+      session.lastOperation = operation;
+      session.nextRequestSeq++;
+      accepted = { key, session, operation };
+      const evidence = retrieveConversationKnowledge(
         message,
+        session.retrievalUsers,
         CRAZY_TYPKA_LIMITS.sources,
         now(),
       );
+      session.retrievalUsers.push({ role: "user", content: message });
+      session.retrievalUsers.splice(
+        0,
+        Math.max(0, session.retrievalUsers.length - 3),
+      );
+      if (greeting) {
+        session.history.push(
+          { role: "user", content: message },
+          { role: "assistant", content: greeting },
+        );
+        return terminalReply(200, {
+          speaker: CRAZY_TYPKA_SPEAKER,
+          text: greeting,
+          sources: [],
+          requestSeq: operation.seq,
+        });
+      }
       const answer = await provider.answer({
         message,
         locale: body.locale as "cs" | "en",
@@ -472,6 +586,17 @@ export function createCrazyTypkaService(
         session.expiresAt <= now()
       )
         throw new RequestError(409, "cancelled");
+      if (
+        evidence.some(
+          (chunk) =>
+            !isKnowledgeCurrent(
+              chunk.source.checkedAt,
+              KNOWLEDGE_REVIEW_AFTER,
+              now(),
+            ),
+        )
+      )
+        throw new RequestError(409, "response-expired");
       session.history.push(
         { role: "user", content: message },
         { role: "assistant", content: answer.text },
@@ -491,12 +616,13 @@ export function createCrazyTypkaService(
           }),
         ).values(),
       ];
-      const result: CrazyTypkaResponse = {
+      const result: CrazyTypkaChatResponse = {
         speaker: CRAZY_TYPKA_SPEAKER,
         text: answer.text,
         sources,
+        requestSeq: operation.seq,
       };
-      return reply(200, result);
+      return terminalReply(200, result);
     } catch (error) {
       const code = operationTimedOut
         ? "request-timeout"
@@ -516,8 +642,9 @@ export function createCrazyTypkaService(
                 ? 504
                 : 502;
       if (code === "rate-limited") res.setHeader("Retry-After", "60");
-      return reply(status, {
+      return terminalReply(status, {
         error: code,
+        ...(accepted ? { requestSeq: accepted.operation.seq } : {}),
         ...(code === "rate-limited" ? { retryAfterSeconds: 60 } : {}),
       });
     } finally {

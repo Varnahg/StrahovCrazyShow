@@ -5,6 +5,7 @@ import {
   KNOWLEDGE_CHUNKS,
   retrieveKnowledge as findKnowledge,
   isKnowledgeCurrent,
+  retrieveConversationKnowledge,
 } from "../server/crazy-typka-retrieval";
 import {
   isCrazyTypkaSource,
@@ -144,4 +145,110 @@ test("client contract rejects unsafe source URLs and malformed replies", () => {
   );
   assert.ok(isCrazyTypkaSession({ token: "a".repeat(64), expiresAt: 1234 }));
   assert.ok(!isCrazyTypkaSession({ token: "anything", expiresAt: "tomorrow" }));
+});
+
+test("narrow follow-ups retain only the prior user topic, including two successive follow-ups", () => {
+  const user = (content: string) => ({ role: "user", content });
+  const history = [
+    user("Kde najdu posilovnu?"),
+    { role: "assistant", content: "The membership fee is made up" },
+  ];
+  const price = retrieveConversationKnowledge(
+    "A kolik to stojí?",
+    history,
+    4,
+    checkedNow,
+  );
+  assert.ok(price.some((chunk) => chunk.id === "sh-sport"));
+  assert.ok(price.every((chunk) => chunk.topic === "sport"));
+  assert.ok(!price.some((chunk) => chunk.id === "sh-membership-fees"));
+  assert.ok(
+    retrieveConversationKnowledge(
+      "Kolik stojí posilovna?",
+      [],
+      4,
+      checkedNow,
+    ).every((chunk) => chunk.topic === "sport"),
+  );
+  const second = retrieveConversationKnowledge(
+    "Kde to najdu?",
+    [...history, user("A kolik to stojí?")],
+    4,
+    checkedNow,
+  );
+  assert.ok(second.some((chunk) => chunk.id === "sh-sport"));
+  assert.ok(
+    retrieveConversationKnowledge(
+      "How much does it cost?",
+      [user("Is there a gym?")],
+      4,
+      checkedNow,
+    ).every((chunk) => chunk.topic === "sport"),
+  );
+  assert.ok(
+    retrieveConversationKnowledge(
+      "Jak připojím router?",
+      history,
+      4,
+      checkedNow,
+    ).some((chunk) => chunk.topic === "network"),
+  );
+});
+
+test("unknown/new topics and assistant-only facts cannot recover an older user anchor", () => {
+  const user = (content: string) => ({ role: "user", content });
+  assert.deepEqual(
+    retrieveConversationKnowledge("A kolik to stojí?", [], 4, checkedNow),
+    [],
+  );
+  assert.deepEqual(
+    retrieveConversationKnowledge(
+      "A kolik to stojí?",
+      [{ role: "assistant", content: "You asked about the gym" }],
+      4,
+      checkedNow,
+    ),
+    [],
+  );
+  assert.deepEqual(
+    retrieveConversationKnowledge(
+      "A kolik to stojí?",
+      [user("Posilovna"), user("Co víš o Bitcoinu?")],
+      4,
+      checkedNow,
+    ),
+    [],
+  );
+  assert.deepEqual(
+    retrieveConversationKnowledge(
+      "A kolik stojí Bitcoin?",
+      [user("Posilovna")],
+      4,
+      checkedNow,
+    ),
+    [],
+  );
+  assert.deepEqual(
+    retrieveConversationKnowledge(
+      "Kde to najdu?",
+      [
+        user("Posilovna"),
+        user("A kolik to stojí?"),
+        user("Kde to najdu?"),
+        user("A kolik?"),
+      ],
+      4,
+      checkedNow,
+    ),
+    [],
+  );
+  assert.deepEqual(
+    retrieveConversationKnowledge(
+      "Kde to najdu?",
+      [user("Posilovna")],
+      4,
+      Date.parse("2026-11-27T00:00:00Z"),
+    ),
+    [],
+  );
 });

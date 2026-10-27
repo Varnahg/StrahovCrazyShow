@@ -13,6 +13,30 @@ export type KnowledgeChunk = {
   source: CrazyTypkaSource;
   versionNote: string;
   contentSha256: string;
+  topic: KnowledgeTopic;
+};
+export type KnowledgeTopic =
+  "membership" | "network" | "office" | "projects" | "sport" | "documents";
+// Specific services take precedence over generic membership mentioned with them.
+const topicTerms: Record<KnowledgeTopic, ReadonlySet<string>> = {
+  sport: new Set(["sport", "posilovna", "boulder"]),
+  network: new Set(["sit", "router", "zarizeni", "spravce"]),
+  office: new Set(["kancelar"]),
+  projects: new Set([
+    "projekt",
+    "aktivita",
+    "hudebna",
+    "tanec",
+    "3d",
+    "tisk",
+    "gamedev",
+    "macgyver",
+    "sherna",
+    "vcely",
+    "zahradky",
+  ]),
+  membership: new Set(["clenstvi", "registrace", "platba", "ucet", "uid"]),
+  documents: new Set(["dokument", "stanovy", "pravidla", "trest", "sankce"]),
 };
 const stop = new Set(
   "a i v ve na se si s z ze do od pro to je jsou jsem jsme by byt jak jaka jake jaky kde kdo co ci ktery ktera ktere kolik kdy mi me muj moje ma mam muzu chci potrebuji prosim ne nebo ale ten ta toto o u po k ke da at the is a an to of for in on with how what where can i my please help sh silicon hill strahov strahove strahova".split(
@@ -27,7 +51,7 @@ const groups: [RegExp, string][] = [
   [/^(zari|device)/, "zarizeni"],
   [/^(kancel|office)/, "kancelar"],
   [/^(kontakt|contact)/, "kontakt"],
-  [/^(poplat|prispev|cen|price|fee|cost)/, "cena"],
+  [/^(poplat|prispev|cen|price|fee|cost|stoji)/, "cena"],
   [/^(platb|plac|payment|pay)/, "platba"],
   [/^(projekt|project)/, "projekt"],
   [/^(zapoj|dobrovol|volunteer|participat)/, "zapojit"],
@@ -82,6 +106,8 @@ export const KNOWLEDGE_CHUNKS: readonly KnowledgeChunk[] = Object.freeze(
   data.chunks.map((chunk) => {
     const meta = data.sources.find((source) => source.id === chunk.sourceId);
     if (!meta) throw new Error("Unknown knowledge source");
+    if (!Object.hasOwn(topicTerms, chunk.topic))
+      throw new Error("Unknown knowledge topic");
     const source: CrazyTypkaSource = {
       id: meta.id,
       title: meta.title,
@@ -105,6 +131,7 @@ export const KNOWLEDGE_CHUNKS: readonly KnowledgeChunk[] = Object.freeze(
       source: Object.freeze(source),
       versionNote: meta.versionNote,
       contentSha256: chunk.contentSha256,
+      topic: chunk.topic as KnowledgeTopic,
     });
   }),
 );
@@ -136,6 +163,14 @@ export function retrieveKnowledge(
   limit: number = CRAZY_TYPKA_LIMITS.sources,
   now: number = Date.now(),
 ): KnowledgeChunk[] {
+  return rankKnowledge(query, limit, now);
+}
+function rankKnowledge(
+  query: string,
+  limit: number,
+  now: number,
+  topic?: KnowledgeTopic,
+): KnowledgeChunk[] {
   if (
     !Number.isFinite(limit) ||
     limit < 1 ||
@@ -161,6 +196,7 @@ export function retrieveKnowledge(
   }
   const ranked = index
     .map((doc) => {
+      if (topic && doc.chunk.topic !== topic) return { doc, score: 0 };
       // A shared filler word in prose is not sufficient evidence of relevance.
       const matching = tokens.filter((token) => doc.keywords.has(token)).length;
       if (!matching || (tokens.length >= 5 && matching / tokens.length < 0.2))
@@ -189,4 +225,58 @@ export function retrieveKnowledge(
       Math.max(0, Math.min(CRAZY_TYPKA_LIMITS.sources, Math.floor(limit))),
     )
     .map(({ doc }) => doc.chunk);
+}
+
+function isFollowUp(message: string): boolean {
+  if (message.length > 160) return false;
+  const normalized = message
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .trim();
+  return (
+    /^(?:a )?(?:kolik(?: to)? stoji|kolik|kde (?:to|ho|ji) najdu|kde to je|jak se tam dostanu|jaka je oteviraci doba|jaka jsou pravidla|a co cena)[?!.]*$/.test(
+      normalized,
+    ) ||
+    /^(?:and )?(?:how much (?:does (?:it|that) cost|is (?:it|that))|where (?:is (?:it|that)|can i find (?:it|that))|how (?:do|can) i get there|what (?:are the (?:opening hours|rules)|about the price))[?!.]*$/.test(
+      normalized,
+    )
+  );
+}
+function findTopic(tokens: readonly string[]) {
+  return (Object.keys(topicTerms) as KnowledgeTopic[]).find((key) =>
+    tokens.some((token) => topicTerms[key].has(token)),
+  );
+}
+
+/** Only validated USER questions may identify a topic. Bot prose is never evidence. */
+export function retrieveConversationKnowledge(
+  message: string,
+  previous: readonly { role: string; content: string }[],
+  limit: number = CRAZY_TYPKA_LIMITS.sources,
+  now: number = Date.now(),
+): KnowledgeChunk[] {
+  if (!isFollowUp(message)) {
+    const tokens = words(message.slice(0, CRAZY_TYPKA_LIMITS.messageChars));
+    if (tokens.includes("cena")) {
+      const topic = findTopic(tokens);
+      return topic ? rankKnowledge(message, limit, now, topic) : [];
+    }
+    return retrieveKnowledge(message, limit, now);
+  }
+  const users = previous.filter((entry) => entry.role === "user").slice(-3);
+  for (let i = users.length - 1; i >= 0; i--) {
+    const candidate = users[i].content.slice(
+      0,
+      CRAZY_TYPKA_LIMITS.messageChars,
+    );
+    if (isFollowUp(candidate)) continue;
+    const tokens = words(candidate);
+    const topic = findTopic(tokens);
+    // A newer unknown topic is a boundary, not permission to recover an older one.
+    if (!topic) return [];
+    const anchor = tokens.filter((token) => topicTerms[topic].has(token));
+    return rankKnowledge(`${anchor.join(" ")} ${message}`, limit, now, topic);
+  }
+  return [];
 }

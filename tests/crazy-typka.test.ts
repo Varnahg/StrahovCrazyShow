@@ -13,6 +13,8 @@ import {
 import {
   isCrazyTypkaResponse,
   isCrazyTypkaSession,
+  isCrazyTypkaChatResponse,
+  isCrazyTypkaErrorResponse,
 } from "../shared/crazy-typka";
 
 const env = {
@@ -127,6 +129,7 @@ function response() {
   return { res, result: () => ({ status, body, headers }) };
 }
 function fixture(options: CrazyTypkaServiceOptions = {}) {
+  const sequence = new Map<string, number>();
   const calls: { url: string; body: any; signal: AbortSignal }[] = [];
   const fetcher: typeof fetch = async (url, init) => {
     calls.push({
@@ -153,6 +156,23 @@ function fixture(options: CrazyTypkaServiceOptions = {}) {
     headers?: Record<string, string>,
     address?: string,
   ) => {
+    // Old behavioural scenarios use an acknowledged client sequence; explicit
+    // requestSeq in protocol regression cases is never changed by this helper.
+    const token =
+      typeof body === "object" &&
+      body !== null &&
+      "token" in body &&
+      typeof body.token === "string"
+        ? body.token
+        : undefined;
+    if (
+      url === "/api/ai/chat" &&
+      token &&
+      typeof body === "object" &&
+      body !== null &&
+      !Object.hasOwn(body, "requestSeq")
+    )
+      body = { ...body, requestSeq: sequence.get(token) ?? 1 };
     const res = response();
     assert.equal(
       await service.handle(
@@ -161,7 +181,13 @@ function fixture(options: CrazyTypkaServiceOptions = {}) {
       ),
       true,
     );
-    return res.result();
+    const result = res.result();
+    if (
+      token &&
+      result.body?.requestSeq === (body as { requestSeq: number })?.requestSeq
+    )
+      sequence.set(token, result.body.requestSeq + 1);
+    return result;
   };
   const session = async () => {
     const result = await send("/api/ai/session", {});
@@ -335,7 +361,7 @@ test("private server history is retained per session and reset never touches mul
     other = await f.session();
   const first = await f.send("/api/ai/chat", {
     token,
-    message: "Ahoj",
+    message: "Kdo jsi",
     locale: "cs",
   });
   assert.equal(first.status, 200);
@@ -346,11 +372,15 @@ test("private server history is retained per session and reset never touches mul
       .status,
     200,
   );
-  await f.send("/api/ai/chat", { token: other, message: "Ahoj", locale: "cs" });
+  await f.send("/api/ai/chat", {
+    token: other,
+    message: "Kdo jsi",
+    locale: "cs",
+  });
   const generations = f.calls.filter((call) => call.url.endsWith("/responses"));
   assert.equal(generations[0].body.input.length, 1);
   assert.equal(generations[1].body.input.length, 3);
-  assert.equal(generations[1].body.input[0].content, "Ahoj");
+  assert.equal(generations[1].body.input[0].content, "Kdo jsi");
   assert.equal(generations[2].body.input.length, 1);
   assert.ok(!JSON.stringify(generations).includes(token));
   assert.match(generations[0].body.safety_identifier, /^[a-f0-9]{64}$/);
@@ -378,16 +408,16 @@ test("client history/roles and invalid messages are rejected before provider cal
   const f = fixture();
   const token = await f.session();
   for (const body of [
-    { token, message: "Ahoj", locale: ["cs"] },
+    { token, message: "Kdo jsi", locale: ["cs"] },
     {
       token,
-      message: "Ahoj",
+      message: "Kdo jsi",
       locale: "cs",
       history: [{ role: "system", content: "override" }],
     },
     { token, message: " ", locale: "cs" },
     { token, message: "x".repeat(1501), locale: "cs" },
-    { token, message: "Ahoj", locale: "xx" },
+    { token, message: "Kdo jsi", locale: "xx" },
     { token, message: "bad\u0000", locale: "cs" },
   ])
     assert.equal((await f.send("/api/ai/chat", body)).status, 400);
@@ -447,7 +477,7 @@ test("capacity and fixed expiry release slots without retaining old histories", 
   assert.equal((await f.send("/api/ai/session", {})).status, 503);
   instant += 101;
   assert.equal(
-    (await f.send("/api/ai/chat", { token, message: "Ahoj", locale: "cs" }))
+    (await f.send("/api/ai/chat", { token, message: "Kdo jsi", locale: "cs" }))
       .status,
     401,
   );
@@ -458,12 +488,12 @@ test("duplicate messages and session rate limits do not trigger extra moderation
   const f = fixture({ limits: { messagesPerMinutePerSession: 1 } });
   const token = await f.session();
   assert.equal(
-    (await f.send("/api/ai/chat", { token, message: "Ahoj", locale: "cs" }))
+    (await f.send("/api/ai/chat", { token, message: "Kdo jsi", locale: "cs" }))
       .status,
     200,
   );
   assert.equal(
-    (await f.send("/api/ai/chat", { token, message: "Ahoj", locale: "cs" }))
+    (await f.send("/api/ai/chat", { token, message: "Kdo jsi", locale: "cs" }))
       .status,
     429,
   );
@@ -496,11 +526,14 @@ test("process generation cap is consumed on started attempts, including upstream
   const token = await f.session();
   const failed = await f.send("/api/ai/chat", {
     token,
-    message: "Ahoj",
+    message: "Kdo jsi",
     locale: "cs",
   });
   assert.equal(failed.status, 502);
-  assert.deepEqual(failed.body, { error: "provider-unavailable" });
+  assert.deepEqual(failed.body, {
+    error: "provider-unavailable",
+    requestSeq: 1,
+  });
   assert.equal(
     (await f.send("/api/ai/chat", { token, message: "Znovu", locale: "cs" }))
       .body.error,
@@ -523,7 +556,7 @@ test("one inflight per session and reset abort prevent deleted conversation resu
   const token = await f.session();
   const pending = f.send("/api/ai/chat", {
     token,
-    message: "Ahoj",
+    message: "Kdo jsi",
     locale: "cs",
   });
   await started;
@@ -574,8 +607,12 @@ test("concurrent input moderation cannot race past the process generation cap", 
   const first = await f.session(),
     second = await f.session();
   const results = await Promise.all([
-    f.send("/api/ai/chat", { token: first, message: "Ahoj", locale: "cs" }),
-    f.send("/api/ai/chat", { token: second, message: "Nazdar", locale: "cs" }),
+    f.send("/api/ai/chat", { token: first, message: "Kdo jsi", locale: "cs" }),
+    f.send("/api/ai/chat", {
+      token: second,
+      message: "Jak pomáháš?",
+      locale: "cs",
+    }),
   ]);
   assert.deepEqual(results.map((result) => result.status).sort(), [200, 503]);
   assert.equal(
@@ -631,7 +668,12 @@ test("global admission, disconnect, stalled uploads and shutdown clean their res
   const token = await closing.session(),
     chatRes = response();
   const chat = closing.service.handle(
-    request("/api/ai/chat", { token, message: "Ahoj", locale: "cs" }),
+    request("/api/ai/chat", {
+      token,
+      requestSeq: 1,
+      message: "Kdo jsi",
+      locale: "cs",
+    }),
     chatRes.res,
   );
   await started;
@@ -640,6 +682,7 @@ test("global admission, disconnect, stalled uploads and shutdown clean their res
   assert.equal(chatRes.result().body.error, "cancelled");
   const again = closing.send("/api/ai/chat", {
     token,
+    requestSeq: 2,
     message: "Další",
     locale: "cs",
   });
@@ -678,5 +721,445 @@ test("history is bounded to six turns, and source links come only from curated m
   }
   assert.equal(generationBodies[7].input.length, 13);
   assert.equal(generationBodies[7].input[0].content, "Kancelář dotaz 1");
+  await f.service.close();
+});
+
+test("first whole greeting is local and replayable, later greetings and greeting questions use the provider", async () => {
+  let instant = Date.parse("2026-10-27T12:00:00Z");
+  const f = fixture({ now: () => instant });
+  const token = await f.session(),
+    first = { token, requestSeq: 1, message: " Ahoj! ", locale: "cs" };
+  const local = await f.send("/api/ai/chat", first);
+  assert.equal(local.status, 200);
+  assert.ok(isCrazyTypkaChatResponse(local.body));
+  assert.match(local.body.text, /fiktivní AI/);
+  assert.deepEqual(local.body.sources, []);
+  assert.equal(f.calls.length, 0);
+  assert.deepEqual(
+    (await f.send("/api/ai/chat", { ...first, message: "Ahoj!" })).body,
+    local.body,
+  );
+  assert.equal(f.calls.length, 0);
+  instant += 11000;
+  assert.equal(
+    (await f.send("/api/ai/chat", { ...first, requestSeq: 2 })).status,
+    200,
+  );
+  assert.equal(f.calls.length, 3);
+  const generation = f.calls.find((call) => call.url.endsWith("/responses"))!;
+  assert.equal(generation.body.input.length, 3);
+  const other = await f.session();
+  await f.send("/api/ai/chat", {
+    token: other,
+    requestSeq: 1,
+    message: "Ahoj, jak se přidám do klubu?",
+    locale: "cs",
+  });
+  assert.equal(f.calls.length, 6);
+  const english = await f.session();
+  const hello = await f.send("/api/ai/chat", {
+    token: english,
+    requestSeq: 1,
+    message: "Hello!",
+    locale: "en",
+  });
+  assert.match(hello.body.text, /fictional AI/);
+  assert.equal(f.calls.length, 6);
+  await f.service.close();
+});
+
+test("last successful operation replays exactly without charging, appending history or bypassing ingress", async () => {
+  const f = fixture({ limits: { generationsPerProcess: 1 } }),
+    token = await f.session();
+  const question = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
+  const first = await f.send("/api/ai/chat", question),
+    replay = await f.send("/api/ai/chat", question);
+  assert.equal(first.status, 200);
+  assert.deepEqual(replay.body, first.body);
+  assert.equal(f.calls.length, 3);
+  assert.ok(isCrazyTypkaChatResponse(first.body));
+  assert.equal(
+    (
+      await f.send("/api/ai/chat", {
+        ...question,
+        requestSeq: 2,
+        message: "Další otázka",
+      })
+    ).body.error,
+    "budget-exhausted",
+  );
+  const newToken = await f.session();
+  assert.equal(
+    (
+      await f.send("/api/ai/chat", {
+        token: newToken,
+        requestSeq: 1,
+        message: "Ahoj",
+        locale: "cs",
+      })
+    ).status,
+    200,
+  );
+  assert.equal(f.calls.length, 3);
+  await f.service.close();
+
+  const limited = fixture({ limits: { requestsPerMinutePerIp: 2 } }),
+    limitedToken = await limited.session();
+  const local = {
+    token: limitedToken,
+    requestSeq: 1,
+    message: "Ahoj",
+    locale: "cs",
+  };
+  await limited.send("/api/ai/chat", local);
+  const rejected = await limited.send("/api/ai/chat", local);
+  assert.equal(rejected.status, 429);
+  assert.equal(rejected.body.requestSeq, undefined);
+  assert.equal(limited.calls.length, 0);
+  await limited.service.close();
+});
+
+test("operator environment cap limits paid generations without a direct limits override", async () => {
+  const f = fixture({
+    env: { ...env, CRAZY_TYPKA_GENERATIONS_PER_PROCESS: "1" },
+  });
+  try {
+    const token = await f.session();
+    assert.equal(
+      (
+        await f.send("/api/ai/chat", {
+          token,
+          message: "Kdo jsi?",
+          locale: "cs",
+        })
+      ).status,
+      200,
+    );
+    const capped = await f.send("/api/ai/chat", {
+      token,
+      message: "Další otázka",
+      locale: "cs",
+    });
+    assert.equal(capped.status, 503);
+    assert.equal(capped.body.error, "budget-exhausted");
+    assert.equal(
+      f.calls.filter((call) => call.url.endsWith("/responses")).length,
+      1,
+    );
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("sequence rejects invalid, changed, stale or skipped operations without confirming or generating", async () => {
+  const f = fixture(),
+    token = await f.session();
+  const first = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
+  for (const requestSeq of [
+    undefined,
+    null,
+    "1",
+    0,
+    -1,
+    1.5,
+    Number.MAX_SAFE_INTEGER + 1,
+  ]) {
+    const invalid = await f.send("/api/ai/chat", { ...first, requestSeq });
+    assert.equal(invalid.status, 400);
+    assert.equal(invalid.body.requestSeq, undefined);
+  }
+  await f.send("/api/ai/chat", first);
+  for (const changed of [
+    { ...first, message: "kdo jsi?" },
+    { ...first, locale: "en" },
+  ]) {
+    const conflict = await f.send("/api/ai/chat", changed);
+    assert.deepEqual(conflict.body, { error: "request-conflict" });
+  }
+  assert.deepEqual(
+    (await f.send("/api/ai/chat", { ...first, requestSeq: 3 })).body,
+    { error: "request-out-of-order" },
+  );
+  assert.equal(f.calls.length, 3);
+  await f.send("/api/ai/chat", {
+    ...first,
+    requestSeq: 2,
+    message: "Jak pomáháš?",
+  });
+  assert.deepEqual((await f.send("/api/ai/chat", first)).body, {
+    error: "request-out-of-order",
+  });
+  assert.equal(f.calls.length, 6);
+  const secondBody = f.calls.filter((call) =>
+    call.url.endsWith("/responses"),
+  )[1].body;
+  assert.equal(secondBody.input.length, 3);
+  await f.service.close();
+});
+
+test("concurrent same operation is busy without acknowledgement, then replays one result", async () => {
+  let release!: () => void,
+    entered!: () => void,
+    calls = 0;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const started = new Promise<void>((resolve) => {
+    entered = resolve;
+  });
+  const f = fixture({
+    fetch: async (url) => {
+      calls++;
+      if (calls === 1) {
+        entered();
+        await gate;
+      }
+      return String(url).endsWith("/moderations")
+        ? Response.json({
+            results: [{ flagged: false, categories: { harassment: false } }],
+          })
+        : responseText();
+    },
+  });
+  const token = await f.session(),
+    body = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
+  const pending = f.send("/api/ai/chat", body);
+  await started;
+  assert.deepEqual((await f.send("/api/ai/chat", body)).body, {
+    error: "busy",
+  });
+  assert.deepEqual(
+    (await f.send("/api/ai/chat", { ...body, message: "Jiná" })).body,
+    { error: "request-conflict" },
+  );
+  release();
+  const first = await pending;
+  assert.deepEqual((await f.send("/api/ai/chat", body)).body, first.body);
+  assert.equal(calls, 3);
+  await f.service.close();
+});
+
+test("terminal upstream and moderation errors replay without API and cannot re-enable the first greeting shortcut", async () => {
+  for (const failStage of [1, 2, 3]) {
+    let calls = 0;
+    const f = fixture({
+      fetch: async (url) => {
+        calls++;
+        if (calls === failStage) throw new Error("private upstream failure");
+        return String(url).endsWith("/moderations")
+          ? Response.json({
+              results: [{ flagged: false, categories: { harassment: false } }],
+            })
+          : responseText();
+      },
+    });
+    const token = await f.session(),
+      body = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
+    const first = await f.send("/api/ai/chat", body);
+    assert.equal(first.body.requestSeq, 1);
+    assert.ok(isCrazyTypkaErrorResponse(first.body));
+    assert.deepEqual((await f.send("/api/ai/chat", body)).body, first.body);
+    assert.equal(calls, failStage);
+    await f.send("/api/ai/chat", { ...body, requestSeq: 2, message: "Ahoj" });
+    assert.equal(calls, failStage + 3);
+    await f.service.close();
+  }
+});
+
+test("accepted generation timeout is cached and explicit replay cannot start a second paid attempt", async () => {
+  let calls = 0;
+  const f = fixture({
+    limits: { providerTimeoutMs: 10 },
+    fetch: (async (url) => {
+      calls++;
+      if (String(url).endsWith("/moderations"))
+        return Response.json({
+          results: [{ flagged: false, categories: { harassment: false } }],
+        });
+      return new Promise<Response>(() => {});
+    }) as typeof fetch,
+  });
+  const token = await f.session(),
+    body = { token, requestSeq: 1, message: "Kdo jsi?", locale: "cs" };
+  const keepAlive = setTimeout(() => {}, 1000);
+  try {
+    const first = await f.send("/api/ai/chat", body);
+    assert.deepEqual(first.body, { error: "request-timeout", requestSeq: 1 });
+    assert.deepEqual((await f.send("/api/ai/chat", body)).body, first.body);
+    assert.equal(calls, 2);
+  } finally {
+    clearTimeout(keepAlive);
+    await f.service.close();
+  }
+});
+
+test("a moderation block is a confirmed replayable attempt and does not leave a first-greeting bypass", async () => {
+  let calls = 0;
+  const f = fixture({
+    fetch: async (url) => {
+      calls++;
+      if (calls === 1)
+        return Response.json({
+          results: [{ flagged: true, categories: { harassment: true } }],
+        });
+      return String(url).endsWith("/moderations")
+        ? Response.json({
+            results: [{ flagged: false, categories: { harassment: false } }],
+          })
+        : responseText();
+    },
+  });
+  const token = await f.session(),
+    body = { token, requestSeq: 1, message: "Moderovaný vstup", locale: "cs" };
+  const blocked = await f.send("/api/ai/chat", body);
+  assert.deepEqual(blocked.body, { error: "blocked", requestSeq: 1 });
+  assert.deepEqual((await f.send("/api/ai/chat", body)).body, blocked.body);
+  assert.equal(calls, 1);
+  assert.equal(
+    (await f.send("/api/ai/chat", { ...body, requestSeq: 2, message: "Ahoj" }))
+      .status,
+    200,
+  );
+  assert.equal(calls, 4);
+  await f.service.close();
+});
+
+test("evidence expiring during generation is never published and the rejection replays without another call", async () => {
+  const cutoff = Date.parse("2026-11-27T00:00:00Z");
+  let instant = cutoff - 1000,
+    calls = 0;
+  const f = fixture({
+    now: () => instant,
+    fetch: async (url) => {
+      calls++;
+      if (String(url).endsWith("/moderations"))
+        return Response.json({
+          results: [{ flagged: false, categories: { harassment: false } }],
+        });
+      instant = cutoff;
+      return responseText("Kancelář je na bloku 1.", ["sh-office"]);
+    },
+  });
+  try {
+    const token = await f.session(),
+      body = { token, requestSeq: 1, message: "Kancelář", locale: "cs" };
+    const expired = await f.send("/api/ai/chat", body);
+    assert.equal(expired.status, 409);
+    assert.deepEqual(expired.body, {
+      error: "response-expired",
+      requestSeq: 1,
+    });
+    assert.deepEqual((await f.send("/api/ai/chat", body)).body, expired.body);
+    assert.equal(calls, 3);
+  } finally {
+    await f.service.close();
+  }
+});
+
+test("reset and expiry forget operations; cited replay loses freshness without regenerating", async () => {
+  const cutoff = Date.parse("2026-11-27T00:00:00Z");
+  let instant = cutoff - 1000,
+    calls = 0;
+  const f = fixture({
+    now: () => instant,
+    fetch: async (url) => {
+      calls++;
+      return String(url).endsWith("/moderations")
+        ? Response.json({
+            results: [{ flagged: false, categories: { harassment: false } }],
+          })
+        : responseText("Kancelář je na bloku 1.", ["sh-office"]);
+    },
+  });
+  const token = await f.session(),
+    body = { token, requestSeq: 1, message: "Kancelář", locale: "cs" };
+  assert.equal((await f.send("/api/ai/chat", body)).status, 200);
+  instant = cutoff;
+  const expired = await f.send("/api/ai/chat", body);
+  assert.deepEqual(expired.body, { error: "response-expired", requestSeq: 1 });
+  assert.deepEqual((await f.send("/api/ai/chat", body)).body, expired.body);
+  assert.equal(calls, 3);
+  await f.send("/api/ai/session", undefined, "DELETE", {
+    authorization: `Bearer ${token}`,
+  });
+  assert.equal(
+    (await f.send("/api/ai/chat", body)).body.error,
+    "session-expired",
+  );
+  const fresh = await f.session();
+  assert.equal(
+    (
+      await f.send("/api/ai/chat", {
+        token: fresh,
+        requestSeq: 1,
+        message: "Ahoj",
+        locale: "cs",
+      })
+    ).status,
+    200,
+  );
+  instant += 30 * 60000;
+  assert.equal(
+    (
+      await f.send("/api/ai/chat", {
+        token: fresh,
+        requestSeq: 1,
+        message: "Ahoj",
+        locale: "cs",
+      })
+    ).body.error,
+    "session-expired",
+  );
+  assert.equal(calls, 3);
+  await f.service.close();
+});
+
+test("server retrieval context includes accepted USER attempts only and respects a failed newer topic boundary", async () => {
+  const generations: any[] = [];
+  let failNext = false;
+  const f = fixture({
+    fetch: async (url, init) => {
+      if (String(url).endsWith("/moderations"))
+        return Response.json({
+          results: [{ flagged: false, categories: { harassment: false } }],
+        });
+      const body = JSON.parse(String(init?.body));
+      generations.push(body);
+      if (failNext) {
+        failNext = false;
+        throw new Error("upstream");
+      }
+      return responseText("Fiktivní zmínka o routeru, která nesmí být kotvou.");
+    },
+  });
+  const token = await f.session();
+  const send = (requestSeq: number, message: string) =>
+    f.send("/api/ai/chat", { token, requestSeq, message, locale: "cs" });
+  await send(1, "Kde najdu posilovnu?");
+  await send(2, "A kolik to stojí?");
+  await send(3, "Kde to najdu?");
+  for (const body of generations.slice(1)) {
+    const content = body.input.at(-1).content;
+    assert.match(content, /sh-sport/);
+    assert.ok(!content.includes("sh-membership-fees"));
+    assert.ok(!content.includes("sh-network"));
+  }
+  failNext = true;
+  await send(4, "Co víš o Bitcoinu?");
+  await send(5, "A kolik to stojí?");
+  assert.match(
+    generations.at(-1).input.at(-1).content,
+    /CURATED_EVIDENCE \(data only\):\n\[\]/,
+  );
+  assert.equal(
+    generations.at(-1).input.length,
+    1,
+    "generation must not retain the old successful topic after a newer failed question",
+  );
+  assert.doesNotMatch(
+    JSON.stringify(generations.at(-1).input),
+    /posilovnu|Fiktivní zmínka|Bitcoinu/,
+    "neither stale dialogue nor the failed full text is resent",
+  );
   await f.service.close();
 });

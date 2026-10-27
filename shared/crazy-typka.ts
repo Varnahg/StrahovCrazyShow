@@ -32,6 +32,16 @@ export type CrazyTypkaResponse = {
   text: string;
   sources: CrazyTypkaSource[];
 };
+/** Acknowledgement belongs to transport, not to the displayed character message. */
+export type CrazyTypkaChatResponse = CrazyTypkaResponse & {
+  requestSeq: number;
+};
+export type CrazyTypkaErrorResponse = {
+  error: CrazyTypkaErrorCode;
+  /** Present only when this exact operation has a terminal, replayable outcome. */
+  requestSeq?: number;
+  retryAfterSeconds?: number;
+};
 export type CrazyTypkaSession = { token: string; expiresAt: number };
 export type CrazyTypkaErrorCode =
   | "unavailable"
@@ -48,7 +58,57 @@ export type CrazyTypkaErrorCode =
   | "provider-unavailable"
   | "invalid-response"
   | "cancelled"
-  | "budget-exhausted";
+  | "budget-exhausted"
+  | "request-conflict"
+  | "request-out-of-order"
+  | "response-expired";
+
+export function isCrazyTypkaRequestSeq(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value > 0;
+}
+export function isCrazyTypkaChatResponse(
+  value: unknown,
+): value is CrazyTypkaChatResponse {
+  return (
+    isCrazyTypkaResponse(value) &&
+    isCrazyTypkaRequestSeq((value as Record<string, unknown>).requestSeq)
+  );
+}
+const errorCodes: ReadonlySet<string> = new Set<CrazyTypkaErrorCode>([
+  "unavailable",
+  "origin-rejected",
+  "not-found",
+  "method-not-allowed",
+  "invalid-request",
+  "request-too-large",
+  "request-timeout",
+  "rate-limited",
+  "busy",
+  "session-expired",
+  "blocked",
+  "provider-unavailable",
+  "invalid-response",
+  "cancelled",
+  "budget-exhausted",
+  "request-conflict",
+  "request-out-of-order",
+  "response-expired",
+]);
+export function isCrazyTypkaErrorResponse(
+  value: unknown,
+): value is CrazyTypkaErrorResponse {
+  return (
+    record(value) &&
+    typeof value.error === "string" &&
+    errorCodes.has(value.error) &&
+    (value.requestSeq === undefined ||
+      isCrazyTypkaRequestSeq(value.requestSeq)) &&
+    (value.retryAfterSeconds === undefined ||
+      (typeof value.retryAfterSeconds === "number" &&
+        Number.isSafeInteger(value.retryAfterSeconds) &&
+        value.retryAfterSeconds > 0))
+  );
+}
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);

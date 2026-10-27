@@ -95,6 +95,8 @@ test("server-only Responses request uses bounded structured output, verified IDs
   assert.equal(body.tools, undefined);
   assert.equal(body.reasoning, undefined);
   assert.match(body.instructions, /fictional AI/);
+  assert.match(body.instructions, /Do not mechanically repeat/);
+  assert.match(body.instructions, /small situational joke/);
   assert.match(body.instructions, /untrusted data/);
   assert.equal(f.starts(), 1);
   assert.equal(f.calls[1].options.redirect, "error");
