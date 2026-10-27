@@ -55,36 +55,47 @@ class FreshWebGpuShadowDepthWrapper extends ShadowDepthWrapper {
     if (this.released || scene.isDisposed || mesh.isDisposed() ||
         engine.currentRenderPassId !== passId || subMesh._drawWrapperOverride ||
         (!this.standalone && subMesh.getMaterial() !== material)) return false;
-    // Native standalone already performs this exact call; don't do it twice.
-    // Keep the current shadow pass: changing it would mix base/draw ownership.
-    if (!this.standalone && !material.isReadyForSubMesh(mesh, subMesh, useInstances)) return false;
-    if (this.released || scene.isDisposed || mesh.isDisposed() ||
-        engine.currentRenderPassId !== passId || subMesh._drawWrapperOverride ||
-        !super.isReadyForSubMesh(subMesh, defines, generator, useInstances, passId)) return false;
-    if (this.released || scene.isDisposed || mesh.isDisposed() ||
-        engine.currentRenderPassId !== passId || subMesh._drawWrapperOverride) return false;
-    const effect = this.getEffect(subMesh, generator, passId)?.effect;
-    if (!effect || effect.isDisposed || typeof effect.defines !== "string") return false;
-    let layout = this.layouts.get(effect);
-    if (!layout || layout.defines !== effect.defines) {
-      layout = lightLayout(effect.defines);
-      this.layouts.set(effect, layout);
+    // Babylon's PCF onBeforeRender disables color writes, but Mesh.isReady(true)
+    // switches only the pass. Match that real state before preparing the base
+    // effect, otherwise DEPTHPREPASS toggles and retires the depth effect on
+    // every probe/draw pair. PCSS and other filters do not take that callback.
+    const restoreColorWrite = generator.usePercentageCloserFiltering && engine.getColorWrite();
+    try {
+      if (restoreColorWrite) engine.setColorWrite(false);
+      // Native standalone already performs this exact call; don't do it twice.
+      // Keep the current shadow pass: changing it would mix base/draw ownership.
+      if (!this.standalone && !material.isReadyForSubMesh(mesh, subMesh, useInstances)) return false;
+      if (this.released || scene.isDisposed || mesh.isDisposed() ||
+          engine.currentRenderPassId !== passId || subMesh._drawWrapperOverride ||
+          !super.isReadyForSubMesh(subMesh, defines, generator, useInstances, passId)) return false;
+      if (this.released || scene.isDisposed || mesh.isDisposed() ||
+          engine.currentRenderPassId !== passId || subMesh._drawWrapperOverride) return false;
+      const effect = this.getEffect(subMesh, generator, passId)?.effect;
+      if (!effect || effect.isDisposed || typeof effect.defines !== "string") return false;
+      let layout = this.layouts.get(effect);
+      if (!layout || layout.defines !== effect.defines) {
+        layout = lightLayout(effect.defines);
+        this.layouts.set(effect, layout);
+      }
+      if (!layout.slots) return false;
+      const cap = material.maxSimultaneousLights;
+      if (!Number.isSafeInteger(cap) || cap < 0) return false;
+      const supported = GetSupportedSimultaneousLights(scene, cap);
+      if (!Number.isSafeInteger(supported) || supported < 0) return false;
+      // PrepareDefinesForLights clamps the shader slots to device support;
+      // BindLights supplies the corresponding leading mesh.lightSources entries.
+      const count = scene.lightsEnabled && !material.disableLighting
+        ? Math.min(mesh.lightSources.length, supported) : 0;
+      if (layout.slots.length !== count) return false;
+      for (let index = 0; index < count; index++) {
+        const light = mesh.lightSources[index], type = layout.slots[index];
+        if (light.getTypeID() !== type || light.getClassName() !== lightClasses[type]) return false;
+      }
+      return true;
+    } finally {
+      // Restore even when the material throws or retires this wrapper/scene.
+      if (restoreColorWrite) engine.setColorWrite(true);
     }
-    if (!layout.slots) return false;
-    const cap = material.maxSimultaneousLights;
-    if (!Number.isSafeInteger(cap) || cap < 0) return false;
-    const supported = GetSupportedSimultaneousLights(scene, cap);
-    if (!Number.isSafeInteger(supported) || supported < 0) return false;
-    // PrepareDefinesForLights clamps the shader slots to device support;
-    // BindLights supplies the corresponding leading mesh.lightSources entries.
-    const count = scene.lightsEnabled && !material.disableLighting
-      ? Math.min(mesh.lightSources.length, supported) : 0;
-    if (layout.slots.length !== count) return false;
-    for (let index = 0; index < count; index++) {
-      const light = mesh.lightSources[index], type = layout.slots[index];
-      if (light.getTypeID() !== type || light.getClassName() !== lightClasses[type]) return false;
-    }
-    return true;
   }
 
   override dispose() {
