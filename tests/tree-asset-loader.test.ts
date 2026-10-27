@@ -155,10 +155,85 @@ test("raw normal calibration never modifies a borrowed legacy bark material", as
   assert.equal(legacy.bumpTexture.level, .73);
 });
 
+for (const rejected of ["http", "length"] as const) {
+  test(`rejected ${rejected} response cancels its body without cancelling a peer or poisoning retry`, async t => {
+    const data = new Uint8Array([1, 2, 3, 4]), loader = new TreeAssetLoader();
+    const file = { url: "/models/vegetation/rejected.glb", bytes: data.length, sha256: hash(data) };
+    const peer = { ...file, url: "/models/vegetation/peer.glb" };
+    let cancelled = 0, requests = 0, reads = 0;
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) { reads++; controller.enqueue(data); },
+      cancel() { cancelled++; },
+    }, { highWaterMark: 0 });
+    t.after(async () => { loader.dispose(); await body.cancel().catch(() => {}); });
+    t.mock.method(globalThis, "fetch", async (url: unknown) => {
+      if (url === peer.url) return new Response(data);
+      return ++requests === 1
+        ? new Response(body, rejected === "http" ? { status: 503 } : { headers: { "content-length": "5" } })
+        : new Response(data);
+    });
+    const bad = loader.asset(file), good = loader.asset(peer);
+    assert.equal(loader.asset(file), bad, "jedno tělo vlastní společný in-flight požadavek");
+    await assert.rejects(bad, rejected === "http" ? /Tree HTTP 503/ : /exceeds budget/);
+    assert.equal(cancelled, 1, "odmítnuté otevřené tělo musí být zrušené");
+    assert.equal(reads, 0, "odmítnutí hlaviček nesmí číst ani alokovat tělo");
+    assert.equal(body.locked, false);
+    assert.deepEqual(new Uint8Array(await good), data);
+    assert.equal(loader.disposed, false);
+    assert.deepEqual(new Uint8Array(await loader.asset(file)), data);
+    assert.equal(requests, 2); assert.equal(loader.stats.pending, 0);
+  });
+}
+
+test("response cancellation failure cannot replace the original HTTP error", async t => {
+  const loader = new TreeAssetLoader(); t.after(() => loader.dispose()); let cancelled = 0;
+  const body = new ReadableStream<Uint8Array>({ cancel() { cancelled++; throw Error("cleanup failed"); } });
+  t.mock.method(globalThis, "fetch", async () => new Response(body, { status: 503 }));
+  await assert.rejects(loader.bytes("/models/vegetation/rejected.glb", 4), /Tree HTTP 503/);
+  assert.equal(cancelled, 1); assert.equal(body.locked, false); assert.equal(loader.stats.pending, 0);
+});
+
+test("known HTTP failure settles even while underlying cancellation remains pending", async t => {
+  const loader = new TreeAssetLoader(); t.after(() => loader.dispose());
+  let finishCancel!: () => void, cancelled = 0, failure: unknown;
+  const cancellation = new Promise<void>(resolve => { finishCancel = resolve; });
+  const body = new ReadableStream<Uint8Array>({ cancel() { cancelled++; return cancellation; } });
+  t.mock.method(globalThis, "fetch", async () => new Response(body, { status: 503 }));
+  const observed = loader.bytes("/models/vegetation/pending-cancel.glb", 4).catch(error => { failure = error; });
+  try {
+    await new Promise<void>(resolve => setImmediate(resolve));
+    assert.equal(cancelled, 1);
+    assert.ok(failure instanceof Error && /Tree HTTP 503/.test(failure.message), "cleanup nesmí zadržet již známou chybu");
+    assert.equal(loader.stats.pending, 0); assert.equal(body.locked, false);
+  } finally { finishCancel(); await observed; }
+});
+
+test("stream readers release their locks after success, overflow and source failure", async t => {
+  const loader = new TreeAssetLoader(); t.after(() => loader.dispose());
+  for (const outcome of ["success", "overflow", "failure"] as const) {
+    const failure = Error("source read failed"); let cancelled = 0;
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        if (outcome === "failure") controller.error(failure);
+        else { controller.enqueue(new Uint8Array([1, 2, 3, 4])); if (outcome === "success") controller.close(); }
+      }, cancel() { cancelled++; },
+    });
+    t.mock.method(globalThis, "fetch", async () => new Response(body));
+    const request = loader.bytes("/models/vegetation/" + outcome + ".glb", outcome === "overflow" ? 3 : 4);
+    if (outcome === "success") assert.equal((await request).byteLength, 4);
+    else await assert.rejects(request, outcome === "overflow" ? /exceeds budget/ : error => error === failure);
+    assert.equal(cancelled, outcome === "overflow" ? 1 : 0);
+    assert.equal(body.locked, false, outcome); assert.equal(loader.stats.pending, 0);
+  }
+});
+
 test("dispose aborts coalesced fetches and a late ignored-abort response cannot allocate",async t=>{
   const f=fixture(),loader=new TreeAssetLoader();let finish!:(r:Response)=>void,signal:AbortSignal|undefined;
+  let cancelled=0;const body=new ReadableStream<Uint8Array>({start(controller){controller.enqueue(f.bytes);},cancel(){cancelled++;}});
+  t.after(async()=>{await body.cancel().catch(()=>{});});
   t.mock.method(globalThis,"fetch",async(_url:unknown,init?:RequestInit)=>{signal=init?.signal??undefined;return new Promise<Response>(r=>finish=r);});
-  const request=loader.asset(f.file);loader.dispose();assert.ok(signal?.aborted);finish(new Response(f.bytes));await assert.rejects(request,/disposed/);assert.equal(loader.stats.pending,0);
+  const request=loader.asset(f.file);loader.dispose();assert.ok(signal?.aborted);finish(new Response(body));await assert.rejects(request,/disposed/);assert.equal(loader.stats.pending,0);
+  assert.equal(cancelled,1,"opožděná odpověď po dispose nesmí ponechat otevřené tělo");assert.equal(body.locked,false);
 });
 
 test("owned Babylon import succeeds and cleans a partial import rejection without touching peer assets",async t=>{
