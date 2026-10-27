@@ -1,4 +1,10 @@
 import type { FeedbackReport } from "../shared/feedback";
+import {
+  emitFeedbackDiagnostic,
+  feedbackDiagnosticCode,
+  resolveFeedbackLinearConfig,
+  type FeedbackDiagnosticObserver,
+} from "./feedback-config";
 import type {
   FeedbackDelivery,
   FeedbackStore,
@@ -113,6 +119,7 @@ export interface FeedbackLinearOptions {
   random?: () => number;
   requestTimeoutMs?: number;
   onDeliveryError?: (code: string, reportId: string) => void;
+  onDiagnostic?: FeedbackDiagnosticObserver;
 }
 export function createFeedbackLinearWorker(options: FeedbackLinearOptions) {
   const { store } = options,
@@ -123,6 +130,20 @@ export function createFeedbackLinearWorker(options: FeedbackLinearOptions) {
   const controllers = new Set<AbortController>();
   let closed = false,
     running: Promise<void> | undefined;
+  let configurationFingerprint = "";
+  function configuration() {
+    const result = resolveFeedbackLinearConfig(env);
+    const fingerprint = JSON.stringify(result.diagnostic);
+    if (fingerprint !== configurationFingerprint) {
+      configurationFingerprint = fingerprint;
+      emitFeedbackDiagnostic(options.onDiagnostic, {
+        kind: "configuration",
+        configuration: result.diagnostic,
+      });
+    }
+    return result;
+  }
+  configuration();
   async function request(url: string, init: RequestInit) {
     if (closed) throw new DeliveryError("closed", true);
     const controller = new AbortController();
@@ -294,13 +315,10 @@ export function createFeedbackLinearWorker(options: FeedbackLinearOptions) {
       state = { ...state, ...patch };
       await store.update(record.report.id, state);
     };
-    const credential =
-      env.LINEAR_API_KEY?.trim() || env.LINEAR_ACCESS_TOKEN?.trim();
-    const auth =
-      env.LINEAR_API_KEY?.trim() || (credential ? `Bearer ${credential}` : "");
-    const teamId = env.LINEAR_TEAM_ID?.trim(),
-      projectId = env.LINEAR_PROJECT_ID?.trim();
-    if (!credential || !teamId || !projectId) {
+    const {
+      credential, authorization: auth, teamId, projectId, stateId, diagnostic,
+    } = configuration();
+    if (!diagnostic.configured) {
       if (state.stage !== "pending-config")
         await save({ stage: "pending-config", error: "linear-not-configured" });
       return;
@@ -395,9 +413,7 @@ export function createFeedbackLinearWorker(options: FeedbackLinearOptions) {
         id: state.issueId,
         teamId,
         projectId,
-        ...(env.LINEAR_STATUS_ID?.trim()
-          ? { stateId: env.LINEAR_STATUS_ID.trim() }
-          : {}),
+        ...(stateId ? { stateId } : {}),
         title: redactSecrets(
           `[Game ${record.report.kind}] ${record.report.message.split(/\r?\n/)[0].slice(0, 180)}`,
           credential,
@@ -428,16 +444,19 @@ export function createFeedbackLinearWorker(options: FeedbackLinearOptions) {
       const delay =
         Math.min(3600000, 5000 * 2 ** Math.min(state.attempts - 1, 10)) *
         (0.75 + Math.max(0, Math.min(1, random())) * 0.5);
+      const stage = retry
+        ? state.createAttempted ? "verifying" : "pending"
+        : "blocked";
       await save({
-        stage: retry
-          ? state.createAttempted
-            ? "verifying"
-            : "pending"
-          : "blocked",
+        stage,
         error: failure.code,
         nextAttemptAt: retry ? Math.max(now() + delay, failure.resetAt) : 0,
       });
-      options.onDeliveryError?.(failure.code, record.report.id);
+      emitFeedbackDiagnostic(options.onDiagnostic, {
+        kind: "delivery-error", code: feedbackDiagnosticCode(failure.code), stage,
+      });
+      try { options.onDeliveryError?.(failure.code, record.report.id); }
+      catch { /* observer nevlastní frontu */ }
     }
   }
   return {
@@ -445,11 +464,7 @@ export function createFeedbackLinearWorker(options: FeedbackLinearOptions) {
       if (closed) return Promise.resolve();
       if (running) return running;
       running = (async () => {
-        const configured = !!(
-          (env.LINEAR_API_KEY?.trim() || env.LINEAR_ACCESS_TOKEN?.trim()) &&
-          env.LINEAR_TEAM_ID?.trim() &&
-          env.LINEAR_PROJECT_ID?.trim()
-        );
+        const configured = configuration().diagnostic.configured;
         for (const record of store.pending(now(), configured)) {
           if (closed) break;
           await deliver(record);

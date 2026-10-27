@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1, "id": "feedback-diagnostics-20261027", "title": "Soukromá diagnostika doručování feedbacku do Linearu", "status": "ready", "dependsOn": [],
+  "writePaths": ["server/feedback-config.ts", "server/feedback-diagnostics.ts", "server/feedback-linear.ts", "server/feedback.ts", "tests/feedback-config.test.ts", "tests/feedback-diagnostics.test.ts", "tests/feedback-linear.test.ts", "tests/feedback.test.ts", "docs/deployment/feedback.md", "docs/agents/handoffs/feedback-diagnostics-20261027.md", ".cache/feedback-diagnostics-20261027/"],
+  "resources": [],
+  "acceptance": ["Jeden resolver konfigurace a bezpečná diagnostika bez credential hodnot, report textů, screenshotů nebo soukromých URL.", "Read-only CLI dostupné v Docker runtime server/; agregace stage/error bez změny fronty nebo skutečného odesílání.", "Callback pro start a doručovací chyby, root jej zapojí do server/index.ts. Zachovat202 jako potvrzení trvalého místního uložení, pending-config a ruční obnovu blocked.", "Odlišit doloženou izolaci místního4182 od neznámého externího nasazení."],
+  "verification": ["Kontrola typů a pouze úzké CPU/fixture regrese s fake transportem. Uživatel27.10 přebírá herní testování; nespouštět hru, browser, herní server, reálný Linear ticket ani replay reportů."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Přímé předání po průzkumu, bez dalšího BMAD. Server/index.ts vlastní root zvlášť. Žádné veřejné diagnostické endpointy."]
+}

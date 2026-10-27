@@ -13,6 +13,7 @@ import {
   feedbackMarker,
 } from "../server/feedback-linear";
 import type { FeedbackReport } from "../shared/feedback";
+import type { FeedbackDiagnostic } from "../server/feedback-config";
 
 const report = (): FeedbackReport => ({
   version: 1,
@@ -69,6 +70,39 @@ test("missing configuration persists pending-config without any remote request",
     });
     await worker.flush();
     await worker.close();
+    assert.equal(store.list()[0].delivery.stage, "pending-config");
+    assert.equal(store.list()[0].delivery.attempts, 0);
+  }));
+
+test("diagnostics reveal configuration transitions and safe errors without replaying blocked reports", () =>
+  fixture(async store => {
+    const runtimeEnv: NodeJS.ProcessEnv = {}, events: FeedbackDiagnostic[] = [];
+    let requests = 0;
+    const worker = createFeedbackLinearWorker({ store, env: runtimeEnv,
+      onDiagnostic: event => events.push(event),
+      onDeliveryError: () => { throw Error("A logging failure must not reject delivery flush"); },
+      fetch: async () => { requests++; return response({ errors: [{ message: "private-server-response" }] }, 401); },
+    });
+    try {
+      await worker.flush(); await worker.flush();
+      assert.equal(events.length, 1); assert.equal(requests, 0);
+      Object.assign(runtimeEnv, env);
+      await worker.flush();
+      assert.equal(events.length, 3);
+      assert.deepEqual(events[2], { kind: "delivery-error", code: "linear-auth", stage: "blocked" });
+      assert.equal(store.list()[0].delivery.stage, "blocked");
+      runtimeEnv.LINEAR_API_KEY = "replacement-fake-key";
+      await worker.flush();
+      assert.equal(requests, 1, "credentials changing must not replay blocked reports");
+      const output = JSON.stringify(events);
+      for (const secret of [env.LINEAR_API_KEY, "replacement-fake-key", "private-server-response", report().id, report().contact!]) assert.ok(!output.includes(secret));
+    } finally { await worker.close(); }
+  }));
+
+test("a throwing diagnostic observer cannot change persisted pending-config delivery", () =>
+  fixture(async store => {
+    const worker = createFeedbackLinearWorker({ store, env: {}, onDiagnostic: () => { throw Error("observer failed"); } });
+    await worker.flush(); await worker.close();
     assert.equal(store.list()[0].delivery.stage, "pending-config");
     assert.equal(store.list()[0].delivery.attempts, 0);
   }));
