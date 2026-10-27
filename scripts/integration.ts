@@ -75,6 +75,16 @@ assert.equal(guest.status, 403);
 const publicHealth = await (await fetch(endpoint + "/api/health")).json();
 assert.deepEqual(publicHealth, { ok: true, demo: true });
 assert.deepEqual(await (await fetch(endpoint + "/api/presence")).json(), { online: 0 });
+assert.deepEqual(await (await fetch(endpoint + "/api/ai/status")).json(), { enabled: false });
+const disabledAi = await fetch(endpoint + "/api/ai/session", {
+  method: "POST", headers: { Origin: endpoint, "Content-Type": "application/json" }, body: "{}",
+});
+assert.equal(disabledAi.status, 503);
+assert.deepEqual(await disabledAi.json(), { error: "unavailable" });
+const unknownAi = await fetch(endpoint + "/api/ai/unknown");
+assert.equal(unknownAi.status, 404);
+assert.equal(unknownAi.headers.get("access-control-allow-origin"), null);
+evidence.checks.push("isolated AI stays disabled without inherited credentials; its namespace does not expose wildcard CORS");
 for (const path of ["/api/players", "/api/chat", "/api/community-events"])
   assert.equal((await fetch(endpoint + path)).status, 403);
 evidence.checks.push(

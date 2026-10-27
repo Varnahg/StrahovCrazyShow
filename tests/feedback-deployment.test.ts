@@ -97,7 +97,7 @@ test("Docker build runs the frozen dependency tree without an implicit pnpm inst
   }
 });
 
-test("isolated integration excludes inherited feedback/Linear settings while preserving NODE_OPTIONS", () => {
+test("isolated integration excludes inherited feedback/Linear/OpenAI settings while preserving NODE_OPTIONS", () => {
   const directory = join(tmpdir(), "strahov-integration-feedback-unit");
   const env = integration.createIsolatedIntegrationEnvironment(
     {
@@ -114,6 +114,11 @@ test("isolated integration excludes inherited feedback/Linear settings while pre
       FEEDBACK_DIR: "production-spool",
       FEEDBACK_ALLOWED_ORIGINS: "https://production.example.invalid",
       FEEDBACK_OTHER_CONFIG: "excluded",
+      OPENAI_API_KEY: "fake-ai-key",
+      openai_model: "production-model",
+      CRAZY_TYPKA_ENABLED: "1",
+      crazy_typka_allowed_origins: "https://production.example.invalid",
+      CRAZY_TYPKA_GENERATIONS_PER_PROCESS: "500",
     },
     directory,
   );
