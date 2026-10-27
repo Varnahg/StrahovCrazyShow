@@ -5,6 +5,7 @@ import { sanitizeDiagnosticsText } from "../shared/session-diagnostics";
 import type { FeedbackContext } from "../shared/feedback";
 import { sessionDiagnostics } from "./session-diagnostics";
 import { getRendererInfo } from "./gpu-diagnostics";
+import { requestWebGlFallback } from "./render-fallback";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { FrameInputBuffer } from "./network-input-buffer";
 import { AuthorityBuffer, type ReceivedAuthority } from "./authority-buffer";
@@ -24,6 +25,12 @@ import {
   type LightingPreviewMode,
   type LightingPreviewSelection,
 } from "./lighting-preview";
+import {
+  SEASON_PREVIEWS,
+  isSeasonPreviewMode,
+  selectSeasonPreview,
+  type SeasonPreviewMode,
+} from "./season-preview";
 import { currentRoomCallbacks } from "./room-callbacks";
 import { DoorConnection } from "./door-connection";
 import { CAD_DOOR_DEFINITIONS, CAD_DOOR_DEFINITION_HASH } from "../shared/cad-buildings";
@@ -214,16 +221,19 @@ export function App() {
       );
     }
   };
-  const [lightingPreview, setLightingPreview] =
-    useState<LightingPreviewSelection>({
-      mode: "real",
-      instant: null,
-    });
-  const lightingPreviewRef = useRef(lightingPreview);
+  // Preserve the user's base light selection across seasonal dates. The
+  // effective solver result must not overwrite the date restored by "real".
+  const lightingPreviewRef = useRef<LightingPreviewSelection>({
+    mode: "real", instant: null,
+  });
+  const [seasonPreview, setSeasonPreview] = useState(() =>
+    selectSeasonPreview("real", lightingPreviewRef.current));
+  const seasonPreviewRef = useRef(seasonPreview);
   const [weatherPreview, setWeatherPreview] = useState<WeatherScenarioId | null>(null);
   const weatherPreviewRef = useRef(weatherPreview);
   const previewWeatherLabel = WEATHER_SCENARIOS.find(item => item.id === weatherPreview)?.label;
-  const { mode: lighting, instant: previewInstant } = lightingPreview;
+  const { mode: lighting } = seasonPreview.lighting;
+  const previewInstant = seasonPreview.instant;
   const [trafficPreview, setTrafficPreview] = useState<TransitArrival | null>(
     null,
   );
@@ -239,6 +249,8 @@ export function App() {
     [busy, setBusy] = useState(false),
     [ready, setReady] = useState(false),
     [error, setError] = useState("");
+  const [rendererGeneration, setRendererGeneration] = useState(0);
+  const [rendererCompatibility, setRendererCompatibility] = useState(false);
   const [panel, setPanel] = useState(""),
     [events, setEvents] = useState<EventItem[]>(() => makeDemoEvents()),
     [period, setPeriod] = useState("today"),
@@ -470,11 +482,15 @@ export function App() {
         : "connecting"
       : "offline";
   };
-  const changeLightingPreview = (mode: LightingPreviewMode) => {
-    const selection = selectLightingPreview(mode);
-    lightingPreviewRef.current = selection;
-    setLightingPreview(selection);
+  const changeSeasonPreview = (mode: SeasonPreviewMode) => {
+    const selection = selectSeasonPreview(mode, lightingPreviewRef.current);
+    seasonPreviewRef.current = selection;
+    setSeasonPreview(selection);
     if (game.current) game.current.timeOverride = selection.instant;
+  };
+  const changeLightingPreview = (mode: LightingPreviewMode) => {
+    lightingPreviewRef.current = selectLightingPreview(mode);
+    changeSeasonPreview(seasonPreviewRef.current.mode);
   };
   const changeWeatherPreview = (selection: WeatherScenarioId | null) => {
     weatherPreviewRef.current = selection;
@@ -634,7 +650,7 @@ export function App() {
     (async () => {
       let pendingEngine: AbstractEngine | undefined;
       try {
-        const [{ Game }, { createGameEngine }] = await Promise.all([
+        const [{ Game }, { createGameEngine, getRenderEngineSelection }] = await Promise.all([
           import("./game"),
           import("./render-engine"),
         ]);
@@ -647,10 +663,15 @@ export function App() {
           pendingEngine.dispose();
           return;
         }
+        const selection = getRenderEngineSelection(pendingEngine);
+        setRendererCompatibility(!pendingEngine.isWebGPU);
+        startupCanvas.dataset.rendererBackend = selection?.backend ?? (pendingEngine.isWebGPU ? "webgpu" : "webgl2");
+        if (selection?.fallbackReason) startupCanvas.dataset.rendererFallback = selection.fallbackReason;
         sessionDiagnostics.event("renderer-ready", {
           durationMs: performance.now() - engineStarted,
           ...getRendererInfo(pendingEngine),
           backend: pendingEngine.isWebGPU ? "webgpu" : "webgl2",
+          selection,
         });
         const g = new Game(startupCanvas, profileRef.current, pendingEngine);
         pendingEngine = undefined;
@@ -666,7 +687,7 @@ export function App() {
         g.network = mode === "multi";
         if (g.network) g.attachDoorTimeline(doorConnectionRef.current?.timeline ?? null);
         syncNetworkStage(g);
-        g.timeOverride = lightingPreviewRef.current.instant;
+        g.timeOverride = seasonPreviewRef.current.instant;
         g.setLocalId(idRef.current);
         g.onStats = setStats;
         g.onBenchmark = (value) => {
@@ -754,6 +775,19 @@ export function App() {
           disposeOwnedGame();
           return;
         }
+        // Initializace může uzamknout canvas na WebGPU. Retry proto vytvoří
+        // novou React generaci; stávající multiplayerové připojení se zachová.
+        if (!ownedGame && !pendingEngine) {
+          const fallback = requestWebGlFallback(e, window.location, startupAbort.signal);
+          if (fallback) {
+            sessionDiagnostics.event("renderer-fallback", fallback);
+            setRendererCompatibility(true);
+            setError("");
+            setReady(false);
+            setRendererGeneration(value => value + 1);
+            return;
+          }
+        }
         sessionDiagnostics.event("startup-error", {
           message: String(e),
           stack: e instanceof Error ? e.stack?.slice(0, 2000) : undefined,
@@ -771,7 +805,7 @@ export function App() {
       userBenchmark.current = false;
       disposeOwnedGame();
     };
-  }, [mode]);
+  }, [mode, rendererGeneration]);
   const bind = (r: Room) => {
     sessionDiagnostics.event("network-connected", {});
     // Each connection owns its dictionary and baseline; reconnect never reuses it.
@@ -1215,6 +1249,7 @@ export function App() {
   return (
     <main className="game-shell">
       <canvas
+        key={rendererGeneration}
         ref={canvas}
         tabIndex={0}
         aria-label={t("3D hra Strahov")}
@@ -1226,7 +1261,13 @@ export function App() {
             s<span>•</span>trahov
           </div>
           <p>{t("Připravuji celý kopec…")}</p>
+          {rendererCompatibility && <p role="status">{t("Používá se kompatibilní režim WebGL2.")}</p>}
           {error && <p className="error">{localizeNotice(error)}</p>}
+          {error && <button type="button" className="secondary" data-renderer-fallback="webgl2" onClick={() => {
+            const target = new URL(window.location.href);
+            target.searchParams.set("renderBackend", "webgl2");
+            window.location.assign(target.toString());
+          }}>{t("Spustit v kompatibilním režimu (WebGL2)")}</button>}
           <button type="button" className="secondary" onClick={openFeedback} aria-keyshortcuts="F8">
             {feedbackLocale === "cs" ? "Nahlásit problém" : "Report a problem"}
           </button>
@@ -1266,6 +1307,7 @@ export function App() {
                 : t("Odpojeno · obnov spojení")}
           </span>
           <span className="demo-badge">DEMO</span>
+          {rendererCompatibility && <span role="status" title={t("Používá se kompatibilní režim WebGL2.")}>WebGL2</span>}
           {mode === "guest" && game.current?.terrainReview && (
             <span className="demo-badge" data-terrain-review={game.current.terrainReview.id}
               data-client-build-id={CLIENT_BUILD_ID}
@@ -1281,6 +1323,12 @@ export function App() {
               onClick={() => changeLightingPreview("real")}
             >
               {t(LIGHTING_PREVIEWS[lighting])} <span aria-hidden="true">×</span>
+            </button>
+          )}
+          {seasonPreview.mode !== "real" && (
+            <button className="demo-badge" aria-label={t("Vrátit skutečné roční období")}
+              onClick={() => changeSeasonPreview("real")}>
+              {t(SEASON_PREVIEWS[seasonPreview.mode])} <span aria-hidden="true">×</span>
             </button>
           )}
           {weatherPreview !== null && (
@@ -2524,6 +2572,24 @@ export function App() {
                         · {t("Praha")}
                       </time>
                     )}
+                  </p>
+                )}
+                <label>
+                  {t("Náhled ročního období")}
+                  <select value={seasonPreview.mode} onChange={(event) => {
+                    if (isSeasonPreviewMode(event.target.value)) changeSeasonPreview(event.target.value);
+                  }}>
+                    {Object.entries(SEASON_PREVIEWS).map(([value, label]) => (
+                      <option key={value} value={value}>{t(label)}</option>
+                    ))}
+                  </select>
+                </label>
+                <p className="small">
+                  {t("Sezónní vzhled je regionální odhad, nikoli aktuální měření stromů.")}
+                </p>
+                {seasonPreview.mode !== "real" && (
+                  <p className="fiction">
+                    {t("DEMO · datum pro vegetaci i oblohu je dočasně nahrazené.")}
                   </p>
                 )}
                 <WeatherPreviewControls selected={weatherPreview} onChange={changeWeatherPreview} />

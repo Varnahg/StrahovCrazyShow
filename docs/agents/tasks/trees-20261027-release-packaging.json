@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261027-release-packaging",
+  "title": "KEY-62: přenosné modely a testovací release fixture",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".gitattributes",
+    "scripts/performance-snapshot.mjs",
+    "docs/agents/handoffs/trees-20261027-release-packaging.md"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Nové velké editovatelné Blender modely a herní modely používají Git LFS; neměnit existující asset bajty nebo historii.",
+    "Obecný snapshot zahrnuje verzovaný release seznam spotřebovaný novou integrační regresí."
+  ],
+  "verification": [
+    "git check-attr pro konkrétní nové modely, cílená kontrola snapshot entries a git diff --check; staging a commit pouze koordinátorem po ověření celku."
+  ],
+  "notes": [
+    "27.10 root koordinátor: doplnění nezbytných distribučních souborů k dokončenému katalogu110. Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Soubory dosud čisté; ostatní rezervace a původní modely se nemění."
+  ]
+}

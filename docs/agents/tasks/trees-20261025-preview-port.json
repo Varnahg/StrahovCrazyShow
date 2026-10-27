@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-preview-port",
+  "title": "KEY-62: oddělený neměnný testovací server",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    ".cache/trees-server-20261025/",
+    "docs/agents/handoffs/trees-20261025-preview-port.md"
+  ],
+  "resources": [
+    "port:4180"
+  ],
+  "acceptance": [
+    "Server4180 ukazuje jen konkrétní zmrazený testovací build; skutečnýPID/cwd/worldId/sourcehash zaznamenat.",
+    "Běžící server po testu zůstane pod vlastním claimem nebo bude ukončen podle skutečného vlastnictví; nezastavovat jiné porty.",
+    "Žádné změny serverů4179/2592, static output obsahuje VITE_MULTIPLAYER_URL=/ a sourceSnapshotId."
+  ],
+  "verification": [
+    "Před startem ověřit registry a skutečné procesy; logs a failed attempts zachovat, žádný NullEngine jako GPU důkaz."
+  ],
+  "notes": [
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Aktivace .cache/trees-20261025/activate.ps1; veškerá nová velká data na D, node_modules junction pouze read.",
+    "Koordinátor root; modeler dočasně drží heavy-validation, tento task jej nepřebírá podle stáří. Claim až po skutečném release."
+  ]
+}

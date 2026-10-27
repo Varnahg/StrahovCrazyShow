@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-streaming-export",
+  "title": "KEY-62: reprodukovatelné rozdělení neměnné stromové geometrie na LOD",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "public/models/vegetation/seasonal-streamed/",
+    "docs/agents/handoffs/trees-20261025-streaming-export.md",
+    ".cache/trees-streaming-export-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Číst jen identifikované immutable R4 vstupy a psát nové výstupy; bez změny jejich geometrie/textur/sourceIDs. Po exportu porovnat všechny skutečné accessor bytes/metadata a publikovat hash manifest.",
+    "Nesmí zůstat celý původní BIN v každém souboru. Každý LOD obsahuje pouze referencované buffery, zachované zarovnání a role.",
+    "Heavy claim získat až je skutečně volný a uvolnit po ukončení procesu/předání; žádný GPU/Blender."
+  ],
+  "verification": [
+    "Cílené skutečné soubory, node import/export a identity bez plného buildu/testsuite."
+  ],
+  "notes": [
+    "Současně držet authoring scope trees-20261025-streaming pro vstupní skript a testy. Root dodá následnou runtime/GPU přejímku.",
+    "Skutečný R4 export skončil a heavy uvolněno dle exporthandoff; root drží jen immutable outputs. Další export vyžaduje výlučné validation-window nebo samostatný r5-stream-export task."
+  ]
+}

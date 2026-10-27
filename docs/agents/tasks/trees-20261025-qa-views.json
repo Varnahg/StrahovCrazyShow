@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-qa-views",
+  "title": "KEY-62: pevné stromové QA pohledy a bezpečná identita kandidátů",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["client/terrain-review.ts", "shared/local-benchmark.ts", "tests/terrain-review.test.ts", "tests/local-benchmarks.test.ts", "docs/trees/20261025/qa-views.md", "docs/agents/handoffs/trees-20261025-qa-views.md", ".cache/trees-qa-views-20261025/"],
+  "resources": [],
+  "acceptance": ["Zachovat čtyři původní pevné pohledy, přidat korunní statické pohledy B5/B6 s explicitní výškou cíle a doloženými source ID; žádný pohybový harness.", "Pilot own/mtree je konečný allowlist pouze v lokálním guest static QA. Žádná libovolná URL nebo source ID z query; běžná hra zachová baseline až po produkční přejímce.", "Benchmark projekce zachová pouze bounded nové camera/season/tree metriky bez osobních dat; collector origin/port whitelist se nemění.", "CPU geometrie skutečné kamery, ochrany query, skutečné idle physics a lifecycle se ověří; GPU důkaz předá root."],
+  "verification": ["Cílené testy terrain-review/local-benchmarks; jen lehké CPU, bez GPU/Blender/build/full suite."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, aktivace .cache/trees-20261025/activate.ps1. Přímá delegace bez dalšího BMAD.", "Před zápisem vlastní claim trees-qa-views-01a16b37. Root vlastní Game a startup fixture; API koordinovat včas. Čtyři převzaté soubory byly čisté vůči baseline.", "Source pilot IDs ipr-crown-014 a ipr-b6-north-conifer; manifest /models/vegetation/seasonal/runtime-contract.json; own-broadleaf/own-conifer nebo mtree-broadleaf/mtree-conifer. Textury a modely vlastní jiní agenti."]
+}

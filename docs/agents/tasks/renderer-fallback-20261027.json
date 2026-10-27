@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1, "id": "renderer-fallback-20261027", "title": "Řízený WebGPU fallback a nová canvas generace pro preview", "status": "ready", "dependsOn": [],
+  "writePaths": ["client/render-fallback.ts", "client/avatar-preview.ts", "client/avatar-editor.tsx", "tests/render-fallback.test.ts", "tests/avatar-preview-webgpu.test.ts", "tests/avatar-editor-fallback.test.ts", "docs/agents/handoffs/renderer-fallback-20261027.md", ".cache/renderer-fallback-20261027/"],
+  "resources": [],
+  "acceptance": ["WebGPU CM je automatická preference; po odmítnutí inicializace právě jeden řízený WebGL2 pokus na novém canvasu.", "Explicitní query je striktní. Abort, cleanup failure, shader/asset/start timeout a běžící scéna nevyvolají tichý fallback.", "Preview používá společnou politiku a stará generace nepublikuje stav. Preference platí pouze pro stránku.", "Root integruje politiku do hlavního UI, API předat před jeho zápisem."],
+  "verification": ["Jen statické a úzké izolované CPU lifecycle kontroly; žádná hra, browser, GPU, server, build ani celá sada."],
+  "notes": ["Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Engine a jeho existující testy jsou v companion tasku trees-20261026-webgpu-default. Uživatel27.10 nahrazuje starší zákaz automatického fallbacku; herní přejímku provádí sám."]
+}

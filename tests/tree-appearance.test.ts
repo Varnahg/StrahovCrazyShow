@@ -13,8 +13,9 @@ import { TREES } from "../shared/world";
 import { TREE_RECONSTRUCTIONS } from "../shared/vegetation";
 import {
   decodeTreeRuntimeChunk,
-  VegetationController,
 } from "../client/vegetation";
+import { TreeRenderer } from "../client/tree-renderer";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import {
   applyTreeCrownShading,
   configureTreeMaterial,
@@ -148,7 +149,7 @@ test("LOD eviction releases derived buffers and preserves shared foliage materia
     mesh.material = material;
     applyTreeCrownShading(mesh, ref);
     const geometry = mesh.geometry!;
-    const controller = Object.create(VegetationController.prototype) as any;
+    const controller = new TreeRenderer(scene) as any;
     controller.detailCache = new Map([
       [ref.id + ":0", 0],
       ...Array.from(
@@ -157,7 +158,7 @@ test("LOD eviction releases derived buffers and preserves shared foliage materia
       ),
     ]);
     controller.treeGroups = [
-      { id: ref.id, active: 2, desired: 2, lods: [[mesh], [], []] },
+      { id: ref.id, active: 2, desired: 2, root: new TransformNode("eviction source", scene), lods: [[mesh], [], []] },
     ];
     controller.trees = [mesh];
     controller.stats = {};
@@ -167,6 +168,7 @@ test("LOD eviction releases derived buffers and preserves shared foliage materia
     assert.equal(controller.detailCache.size, 32);
     assert.equal(controller.trees.length, 0);
     assert.ok(scene.materials.includes(material));
+    controller.dispose();
   } finally {
     scene.dispose();
     engine.dispose();
@@ -223,6 +225,21 @@ test("foliage retains source alpha/PBR channels and adds bounded non-emissive tr
   }
 });
 
+test("authored local normals bypass legacy crown proxy without modifying any source buffer", () => {
+  const engine = new NullEngine(), scene = new Scene(engine);
+  const reference = TREE_RECONSTRUCTIONS.find(t => t.id === "ipr-crown-026")!;
+  const mesh = createMesh(scene, reference.id, 0);
+  try {
+    mesh.metadata = { treeNormalSource: "authored-local" };
+    const geometry = mesh.geometry, positions = mesh.getVerticesData(VertexBuffer.PositionKind)!, normals = mesh.getVerticesData(VertexBuffer.NormalKind)!;
+    const copy = Array.from(normals);
+    assert.equal(applyTreeCrownShading(mesh, reference), false);
+    assert.equal(mesh.geometry, geometry); assert.equal(mesh.getVerticesData(VertexBuffer.PositionKind), positions);
+    assert.equal(mesh.getVerticesData(VertexBuffer.NormalKind), normals); assert.deepEqual(Array.from(normals), copy);
+    assert.equal(mesh.metadata.treeDerivedShading, undefined);
+  } finally { scene.dispose(); engine.dispose(); }
+});
+
 test("wind refreshes frozen-material uniforms and keeps the inverse-transpose normal/tangent hooks", () => {
   const engine = new NullEngine(),
     scene = new Scene(engine),
@@ -275,19 +292,22 @@ test("wind refreshes frozen-material uniforms and keeps the inverse-transpose no
 test("normal shading cannot alter surveyed placements or add draw calls", () => {
   assert.equal(TREES.length, 110, 'the source-corrected B6 entrance conifer now passes the unchanged placement filters');
   assert.equal(TREES.filter(tree=>tree.osmId==='ipr-b6-north-conifer').length,1);
-  const source = readFileSync("client/vegetation.ts", "utf8");
-  assert.equal(
-    (
-      source.match(
-        /applyTreeCrownShading\(mesh, placement\.reconstruction\)/g,
-      ) ?? []
-    ).length,
-    2,
-    "bootstrap and streamed details share shading",
-  );
-  assert.equal(
-    (source.match(/new TreeWindPlugin/g) ?? []).length,
-    1,
-    "shared material plugin, never per-tree material",
-  );
+  const engine = new NullEngine(), scene = new Scene(engine), controller = new TreeRenderer(scene) as any;
+  const ref = TREE_RECONSTRUCTIONS.find(t => t.id === "ipr-crown-026")!, group = controller.createGroup(ref.id);
+  const material = new PBRMaterial("shared source leaves", scene), meshes = [createMesh(scene, ref.id, 0), createMesh(scene, ref.id, 1)];
+  controller.treeGroups = [group]; controller.trees = meshes;
+  controller.configureFoliage(material);
+  const rootPosition = group.root.position.clone(), meshCount = scene.meshes.length, materials = scene.materials.length;
+  try {
+    for (const [lod, mesh] of meshes.entries()) {
+      mesh.material = material; const indices = Array.from(mesh.getIndices()!);
+      controller.describe(mesh, group, lod, true);
+      group.lods[lod].push(mesh);
+      assert.ok(mesh.metadata.treeDerivedShading, "shared bootstrap/detail description applies the legacy proxy");
+      assert.equal(mesh.material, material); assert.deepEqual(Array.from(mesh.getIndices()!), indices);
+    }
+    assert.deepEqual(group.root.position.asArray(), rootPosition.asArray()); assert.equal(scene.meshes.length, meshCount); assert.equal(scene.materials.length, materials);
+    assert.equal(material.pluginManager!.getPlugin("StrahovCleanTreeWind")!.getClassName(), "TreeWindPlugin");
+    assert.equal(material.pluginManager!._plugins.filter(plugin => plugin.name === "StrahovCleanTreeWind").length, 1);
+  } finally { controller.dispose(); scene.dispose(); engine.dispose(); }
 });

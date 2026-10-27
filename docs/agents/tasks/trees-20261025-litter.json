@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-litter",
+  "title": "KEY-62: omezený sezónní opad na terénu",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": [
+    "client/tree-litter.ts",
+    "tests/tree-litter.test.ts",
+    "docs/trees/20261025/litter.md",
+    "docs/agents/handoffs/trees-20261025-litter.md",
+    ".cache/trees-litter-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Deterministický opad pod doloženými stromovými korunami, source ID, skutečné terrain výšky a pevné výluky budov/komunikací; hustota je označený model, ne měření.",
+    "Stejný TreeSeasonState a family/seed jako stromy; litterPotential × samostatná retence, nikoli1−leafAmount. Stálezelené větvičky/jehlice nejsou velké listy a referenčně holý strom nepředstírá měřený opad.",
+    "Tvrdé počty listů/trojúhelníků/meshů pro low/medium/high, bounded cache a cold/warm lifecycle; žádné každoframové generování či texture load.",
+    "Původní UV komponenty LeafSet024 a zapůjčené mapy z TreeRenderer; nové materiály nesmějí duplicitně načítat nebo disponovat cizí textury. Alpha-test, receiveShadows, shadowCaster:false, bez z-fighting s dokončeným terénem.",
+    "Veškeré mutable vlastní zdroje/dispose/late ready výsledky jasně řízené, koordinační API předat rootovi před integrací."
+  ],
+  "verification": [
+    "Lehké CPU testy determinismu, výluk, výšek, zimní/spring retence, tier cap, culling/cache/dispose a zapůjčených resources.",
+    "Žádný GPU/Blender/build; vzhled a výkon ověří root ve skutečné hře."
+  ],
+  "notes": [
+    "Přímá implementační delegace po původním výzkumu a konceptu; bez rekurzivního BMAD/agentů.",
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025; aktivace .cache/trees-20261025/activate.ps1. Node modules pouze číst.",
+    "Root integration/runtime vlastní Game/UI/Vegetation/TreeRenderer a poskytne borrowed PBR source pro mapy. Domluv konstruktor/update/stats/preparation API včas; jiné soubory neupravuj.",
+    "Preferovat jednoduché stabilní leaf/twig patche a skutečné index subsetting; bez přidávání dalšího samostatného rendereru či neomezených částic. Originální pixely se nemění."
+  ]
+}

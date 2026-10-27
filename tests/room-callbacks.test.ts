@@ -20,6 +20,9 @@ import { NetworkProbe } from "../client/network-probe";
 import { NetworkTimeline } from "../client/network-timeline";
 import { readWebGpuMainPassTiming } from "../client/gpu-diagnostics";
 import { snapshotAcceptedAuthorityDiagnostics } from "../client/game-diagnostics";
+import { selectSeasonPreview } from "../client/season-preview";
+import { requestWebGlFallback } from "../client/render-fallback";
+import type { LightingPreviewSelection } from "../client/lighting-preview";
 
 const fixtureDoor = placeCadDoorDefinition({id:"fixture-door",buildingId:"b06",floor:"N01",sourceDoorId:"fixture-source",
   renderPartIds:["fixture-leaf"],collisionPartIds:[],hingeModel:{x:0,y:1,z:0},
@@ -396,7 +399,10 @@ function fixture() {
   const effects: string[] = [];
   const diagnostics: { kind: string; data: unknown }[] = [];
   const state: Record<string, any> = { messages: [] };
+  const lightingPreviewRef = { current: { mode: "real", instant: null } as LightingPreviewSelection };
   const refs = {
+    lightingPreviewRef,
+    seasonPreviewRef: { current: selectSeasonPreview("real", lightingPreviewRef.current, Date.UTC(2026, 9, 25, 12)) },
     room: { current: null as FakeRoom | null },
     connectionAttempt: { current: 0 },
     connectedRef: { current: false },
@@ -471,6 +477,9 @@ function fixture() {
     ...refs,
     game: { current: game },
     currentRoomCallbacks,
+    requestWebGlFallback,
+    window: { location: { hostname: "localhost", search: "" } },
+    rendererGeneration: 0,
     DoorConnection,
     CAD_DOOR_DEFINITIONS: [fixtureDoor],
     CAD_DOOR_DEFINITION_HASH: doorIdentity.definitionHash,
@@ -530,6 +539,8 @@ function fixture() {
     "EmotesOpen",
     "Busy",
     "Error",
+    "RendererCompatibility",
+    "RendererGeneration",
   ]) {
     const key = name[0].toLowerCase() + name.slice(1);
     environment[`set${name}`] = (value: any) => {
@@ -1379,6 +1390,11 @@ for (const outcome of [
 ] as const) {
   test(`actual Game lifecycle emits game-ready only after successful uncancelled start: ${outcome}`, async () => {
     const f = fixture();
+    if (outcome === "success") {
+      f.seasonPreviewRef.current = selectSeasonPreview("winter", f.lightingPreviewRef.current, Date.UTC(2026, 9, 25, 12));
+      assert.notEqual(f.seasonPreviewRef.current.instant, f.lightingPreviewRef.current.instant,
+        "season selection must distinguish the new startup binding from the old lighting-only ref");
+    }
     const starting = deferred<void>();
     const game = f.game;
     let starts = 0;
@@ -1420,6 +1436,7 @@ for (const outcome of [
         },
       }),
       testLoadRenderEngine: async () => ({
+        getRenderEngineSelection: () => undefined,
         createGameEngine: async (
           canvas: unknown,
           { signal }: { signal: AbortSignal },
@@ -1436,7 +1453,6 @@ for (const outcome of [
       },
       mode: "multi",
       canvas: { current: game.canvas },
-      lightingPreviewRef: { current: { instant: null } },
       weatherRef: { current: null },
       weatherPreviewRef: { current: null },
       userBenchmark: { current: false },
@@ -1450,6 +1466,7 @@ for (const outcome of [
       f.diagnostics.filter((event) => event.kind === "game-ready");
     await setImmediate();
     assert.equal(starts, 1, "actual lifecycle must reach the pending start");
+    assert.equal(game.timeOverride, f.seasonPreviewRef.current.instant, "actual UI startup uses the composed seasonal instant");
     assert.ok(initializationSignal);
     assert.equal(engineDisposals, 0, "Game owns the initialized engine while starting");
     assert.equal(readyEvents().length, 0);
@@ -1487,14 +1504,14 @@ function startOwnedGame(ui: ReturnType<typeof fixture>, options: { mode?: "multi
         assert.equal(canvas, game.canvas); assert.equal(prepared, engine); return game;
       }
     } }),
-    testLoadRenderEngine: async () => ({ createGameEngine: async () => {
+    testLoadRenderEngine: async () => ({ getRenderEngineSelection: () => undefined, createGameEngine: async () => {
       await options.pendingFactory;
       if (options.factoryError) throw options.factoryError;
       return engine;
     } }),
     getRendererInfo: () => ({ renderer: "fixture", vendor: "fixture", version: "fixture" }),
     mode: options.mode ?? "multi", canvas: { current: game.canvas },
-    lightingPreviewRef: { current: { instant: null } }, weatherRef: { current: null }, weatherPreviewRef: { current: null },
+    weatherRef: { current: null }, weatherPreviewRef: { current: null },
     userBenchmark: { current: false }, quality: "medium", targetFps: 60, activity: { hunt: [] }, setStats() {},
     t: (text: string, values?: Record<string, unknown>) => text.replace(/\{(\w+)\}/g, (match, key) => String(values?.[key] ?? match)),
   });

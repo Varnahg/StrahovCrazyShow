@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261025-materials",
+  "title": "KEY-62: fotografické stromové materiály a přesné listové výřezy",
+  "writePaths": [
+    "scripts/import-tree-materials.mjs",
+    "scripts/tree-leaf-components.py",
+    "assets/sources/trees/20261025/",
+    "public/textures/trees/20261025/",
+    "shared/data/assets/tree-materials-manifest.json",
+    "shared/data/tree-leaf-components.json",
+    "tests/tree-materials.test.ts",
+    "docs/trees/20261025/materials.md",
+    "docs/agents/handoffs/trees-20261025-materials.md",
+    ".cache/trees-materials-20261025/"
+  ],
+  "resources": [],
+  "acceptance": [
+    "Připnuté zdrojové CC0 mapy LeafSet024, volitelný LeafSet022/027 pro doložený rozmanitý habitus či opad a Fir Tree01 twig; ne celý vysokopolygonální strom.",
+    "Pro pilot preferovat 2K původní color/NormalGL/roughness JPG a původní PNG opacity, přesně shodná velikost/UV. Zachovat původní pixely, licence, acquisition technique, hash a datum. Žádné vyrobené fotografie či neprokázané místní druhy.",
+    "Z alfa pouze odvodit malé použitelné UV komponenty, rozměry/coverage a kontrolovaný tvar těsně oříznuté listové geometrie; neměnit rastrové originály. Atlasové metry nejsou rozměr každého listu.",
+    "Reprodukovatelný import a smysluplné testy source/hash/channel/units/coverage; předat neměnný manifest a čtecí vstupy pilotu."
+  ],
+  "verification": [
+    "Lehké cílené CPU testy a skutečné hlavičky/pixely/mapová vazba. Žádný Blender/GPU/build/celá sada.",
+    "Vlastní handoff, přesné změněné soubory a SHA; bez instalace/zápisů přes node_modules."
+  ],
+  "notes": [
+    "Přímá delegace STROMY-20261025, bez rekurzivního BMAD. Reference a koncept hotové; user výslovně preferuje realističnost před dokonalým matchingem fotografie.",
+    "Cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025, branch codex/trees-realism-20261025. Před shellem .cache/trees-20261025/activate.ps1. Vlastní claim před zápisem; child cache disjunktní.",
+    "Materiálový kontrakt koordinovat s autorem pilotu před exportem. Do měněných souborů jiného agenta nepsat, původní 4179/2592 nedotýkat."
+  ],
+  "status": "ready",
+  "dependsOn": []
+}

@@ -15,6 +15,7 @@ import {
   avatarPreset,
 } from "./avatar-presets";
 import "./avatar-editor.css";
+import { requestWebGlFallback, WebGpuInitializationError, type RenderBackendSelection } from "./render-fallback";
 
 type AvatarEditorProps = {
   profile: Profile;
@@ -144,6 +145,8 @@ export function AvatarEditor({
   const [previewStatus, setPreviewStatus] =
     useState<AvatarPreviewState>("loading");
   const [previewError, setPreviewError] = useState("");
+  const [rendererGeneration, setRendererGeneration] = useState(0);
+  const [rendererSelection, setRendererSelection] = useState<RenderBackendSelection | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const preview = useRef<AvatarPreviewController | null>(null);
   const previewGeneration = useRef(0);
@@ -173,6 +176,7 @@ export function AvatarEditor({
             .slice(0, 240);
     setPreviewStatus("loading");
     setPreviewError("");
+    setRendererSelection(null);
     // The initial form itself does not eagerly import Babylon or initialize physics.
     import("./avatar-preview")
       .then(({ createAvatarPreview }) => {
@@ -184,6 +188,9 @@ export function AvatarEditor({
             if (!current()) return;
             setPreviewStatus(state);
             setPreviewError(message(error));
+          },
+          onRenderer(selection) {
+            if (current()) setRendererSelection(selection);
           },
         });
       })
@@ -199,9 +206,14 @@ export function AvatarEditor({
       })
       .catch((error: unknown) => {
         if (!current()) return;
+        if (requestWebGlFallback(error, window.location, abort.signal)) {
+          pointer.current = null;
+          setRendererGeneration(value => value + 1);
+          return;
+        }
         setPreviewStatus(
-          error instanceof Error &&
-            error.name === "AvatarPreviewUnsupportedError"
+          (error instanceof Error && error.name === "AvatarPreviewUnsupportedError") ||
+            (error instanceof WebGpuInitializationError && error.reason === "unavailable")
             ? "unsupported"
             : "failed",
         );
@@ -212,7 +224,7 @@ export function AvatarEditor({
       owned?.dispose();
       if (preview.current === owned) preview.current = null;
     };
-  }, []);
+  }, [rendererGeneration]);
 
   useEffect(() => {
     preview.current?.update(config);
@@ -245,12 +257,15 @@ export function AvatarEditor({
         <span className="ae-preview-label">{t("TVOJE POSTAVA")}</span>
         <div className="ae-preview-floor" aria-hidden="true" />
         <canvas
+          key={rendererGeneration}
           ref={canvas}
           aria-label={t(
             "3D náhled postavy. Pro otočení táhni myší nebo použij šipky pod náhledem.",
           )}
           className={previewStatus === "ready" ? "ae-ready" : ""}
           data-preview-state={previewStatus}
+          data-render-backend={rendererSelection?.backend}
+          data-render-fallback-reason={rendererSelection?.fallbackReason ?? undefined}
           onPointerDown={(event) => {
             if (previewStatus !== "ready") return;
             pointer.current = { id: event.pointerId, x: event.clientX };
@@ -277,6 +292,9 @@ export function AvatarEditor({
             pointer.current = null;
           }}
         />
+        {rendererSelection?.backend === "webgl2" && (
+          <span role="status">{t("Používá se kompatibilní režim WebGL2.")}</span>
+        )}
         {previewStatus !== "ready" && (
           <div className="ae-preview-fallback" role="status">
             <Silhouette {...config} hairStyle={preset.hairStyle} />

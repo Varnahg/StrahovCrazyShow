@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "trees-20261026-cluster-runtime",
+  "title": "KEY-62: bezpečný kompaktní FAR kontrakt a jednorázové rozbalení geometrie",
+  "status": "ready",
+  "dependsOn": [],
+  "writePaths": ["shared/tree-cluster-types.ts", "client/tree-cluster-geometry.ts", "tests/tree-cluster-geometry.test.ts", "docs/trees/20261025/cluster-runtime.md", "docs/agents/handoffs/trees-20261026-cluster-runtime.md", ".cache/trees-cluster-runtime-20261026/"],
+  "resources": [],
+  "acceptance": [
+    "V1 bank schema domluvené s modelářem R6 FAR: glTF Y-up/metres, nejvýše432zdrojových prototypů,1–2CCW quad karty, čtyři fotografické mapové integrity deskriptory.",
+    "32B little-endian placement: uint16rank,uint16prototypeID,Float32anchorXYZ,Float32quaternionXYZW; ranky přísně seřazené a unikátní,65535 explicitní exact fallback. Rigidní transform bez scale, žádná změna fyzického měřítka listů.",
+    "Čistý bounded parser a decoder rozbalí jednou při loadu typed geometrii kompatibilní s existujícím sezonním prefixem. Kompletní preflight před alokací, validní UV/winding/normály, žádné tiché vynechání fallbacku či neznámého prototypu.",
+    "Oddělit source-byte, rozbalené geometry-byte a texturové náklady. Parser ani decoder nespouští síť, GPU nebo implicitní cache IO. Runtime Game/renderer wiring až po přijetí skutečných modelových výstupů.",
+    "Refaktoring a smysluplné malé regrese včetně transformované geometrie, ranku, opadu, malformed payloadu a limitů."
+  ],
+  "verification": ["Pouze nezbytné cílené CPU kontroly během implementace; celý build/sady/integrace až nad dokončeným funkčním celkem."],
+  "notes": ["Root KEY-62, cwd D:/CodexWorkspaces/StrahovCrazyShow-terrain-20261025. Přesné schéma potvrzeno far_r6_design26.10.2026. Existing types/renderer/loader jsou readonly dependencies tohoto scope; navazující změny vlastní root v původním streaming claimu."]
+}

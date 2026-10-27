@@ -77,6 +77,7 @@ export function applyTreeCrownShading(
   reference: TreeReconstruction | undefined,
 ): boolean {
   if (
+    mesh.metadata?.treeNormalSource === "authored-local" ||
     !reference ||
     reference.appearance === "bare" ||
     !mesh.name.endsWith("__leaves")

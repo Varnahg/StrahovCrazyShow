@@ -10,7 +10,17 @@ import { FIXED_DT } from "../shared/netcode";
 import { textEntryTarget, worldKeyboardAllowed } from "../client/interaction";
 import { clampOrbitPitch } from "../client/camera-look";
 import { grassFocusDistance } from "../client/photo-grass-budget";
-import { resolveTerrainReview, terrainReviewPose, terrainReviewIdentity, TERRAIN_REVIEW_PRESETS } from "../client/terrain-review";
+import { treeDetailForProjection } from "../client/tree-renderer";
+import { resolveTerrainReview, resolveTreePilot, terrainReviewPose, terrainReviewIdentity, TERRAIN_REVIEW_PRESETS } from "../client/terrain-review";
+import { BOUNDS, BUILDINGS, TREES, GROUND_RECTS } from "../shared/world";
+import { groundHeight, createTerrainTiles, terrainCollisionData } from "../shared/terrain";
+import { pointInPolygon, treeTrunkCollision, treeDetailLevel } from "../shared/vegetation";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Scene } from "@babylonjs/core/scene";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Matrix } from "@babylonjs/core/Maths/math.vector";
+import { Viewport } from "@babylonjs/core/Maths/math.viewport";
+import { STADIUM_PLAN } from "../shared/landmark-reality";
 import { readGameSource } from "./helpers/game-source";
 
 const { source, selectMembers } = readGameSource();
@@ -46,7 +56,7 @@ function fixture(id = "b6-rear-path", height = (x: number, z: number) => 10 + x 
   return { game, starts, events, target: () => target!, height };
 }
 
-test("only four exact loopback guest IDs are accepted, including duplicate/forged URL rejection", () => {
+test("only exact static loopback guest IDs are accepted, including duplicate/forged URL rejection", () => {
   for (const hostname of ["localhost", "127.0.0.1", "[::1]"]) for (const id of Object.keys(TERRAIN_REVIEW_PRESETS)) {
     assert.equal(resolveTerrainReview({ hostname, search: `?terrainReview=${id}` }, false)?.id, id);
     assert.equal(resolveTerrainReview({ hostname, search: `?terrainReview=${id}` }, true), null);
@@ -60,8 +70,104 @@ test("only four exact loopback guest IDs are accepted, including duplicate/forge
   }
 });
 
+test("tree pilot selection is a fixed immutable pair only behind a valid local static guest view",()=>{
+  for(const hostname of ["localhost","127.0.0.1","[::1]"])for(const view of Object.keys(TERRAIN_REVIEW_PRESETS))for(const pilot of ["own","mtree"]){
+    const location={hostname,search:`?terrainReview=${view}&treePilot=${pilot}`},result=resolveTreePilot(location,false)!;
+    if(view==="small-tree-close") { assert.equal(result,undefined,"a two-source pilot cannot substitute the catalogue-only target"); continue; }
+    assert.equal(result.manifestUrl,pilot==="own"?"/models/vegetation/seasonal-r6-far/runtime-contract.json":"/models/vegetation/seasonal-streamed/runtime-contract.json");
+    assert.deepEqual(result.selections,{"ipr-crown-014":pilot+"-broadleaf","ipr-b6-north-conifer":pilot+"-conifer"});
+    assert.equal(Object.isFrozen(result),true);assert.equal(Object.isFrozen(result.selections),true);
+    assert.equal(resolveTreePilot(location,true),undefined);
+    assert.equal(resolveTreePilot({...location,hostname:"example.com"},false),undefined);
+  }
+  for(const search of ["","?treePilot=own","?terrainReview=b5-tree-near","?terrainReview=b5-tree-near&treePilot=", "?terrainReview=unknown&treePilot=own", "?terrainReview=b5-tree-near&terrainReview=b5-tree-near&treePilot=own", ...["constructor","__proto__","Own","own%20","http://example.com/tree.glb","../own"].map(value=>"?terrainReview=b5-tree-near&treePilot="+value), "?terrainReview=b5-tree-near&treePilot=own&treePilot=mtree", "?terrainReview=b5-tree-near&treePilot=own&treePilot=own"])
+    assert.equal(resolveTreePilot({hostname:"localhost",search},false),undefined,search);
+  const injected={hostname:"localhost",search:"?terrainReview=b5-tree-near&treePilot=own&manifestUrl=https://example.com/private&sourceTreeId=other&x=999&z=999"};
+  assert.deepEqual(resolveTreePilot(injected,false),resolveTreePilot({hostname:"localhost",search:"?terrainReview=b5-tree-near&treePilot=own"},false));
+  assert.deepEqual(resolveTerrainReview(injected,false)?.spawnXZ,[-85,-61]);
+});
+
+const crownPresets=()=>Object.values(TERRAIN_REVIEW_PRESETS).filter(p=>p.sourceTreeId);
+function edgeDistance(x:number,z:number,a:readonly number[],b:readonly number[]){
+  const dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz||1)));
+  return Math.hypot(x-a[0]-t*dx,z-a[1]-t*dz);
+}
+
+function segmentDistance(a:readonly number[],b:readonly number[],c:readonly number[],d:readonly number[]) {
+  const rx=b[0]-a[0],rz=b[1]-a[1],sx=d[0]-c[0],sz=d[1]-c[1],cross=rx*sz-rz*sx;
+  if(Math.abs(cross)>1e-9){const t=((c[0]-a[0])*sz-(c[1]-a[1])*sx)/cross,u=((c[0]-a[0])*rz-(c[1]-a[1])*rx)/cross;
+    if(t>=0&&t<=1&&u>=0&&u<=1)return 0;}
+  return Math.min(edgeDistance(a[0],a[1],c,d),edgeDistance(b[0],b[1],c,d),edgeDistance(c[0],c[1],a,b),edgeDistance(d[0],d[1],a,b));
+}
+
+test("far crown view excludes the whole stadium, including the previously missed stand footprint",()=>{
+  const p=TERRAIN_REVIEW_PRESETS["b5-tree-far"],outer=STADIUM_PLAN.outer;
+  assert.equal(pointInPolygon(-180,30,outer),true,"the rejected GPU camera really was inside the canonical stadium");
+  assert.equal(pointInPolygon(p.spawnXZ[0],p.spawnXZ[1],outer),false);
+  const clearance=Math.min(...outer.map((v,i)=>segmentDistance(p.spawnXZ,p.lookAtXZ,v,outer[(i+1)%outer.length])));
+  assert.ok(clearance>5,"the entire sightline needs room for the modeled stadium overhangs, not just a free spawn point");
+  for(const building of BUILDINGS)assert.ok(Math.min(...building.points.map((v,i)=>segmentDistance(p.spawnXZ,p.lookAtXZ,v,building.points[(i+1)%building.points.length])))>1,building.id);
+});
+test("crown starts match shared source roots, avoid real world footprints/trunks and span all three LODs",()=>{
+  const expectedLod={"b6-tree-near":0,"b5-tree-near":0,"b5-tree-mid":1,"b5-tree-far":2,"b5-tree-ground":0,"b5-tree-hero":0,"small-tree-close":0,"b6-tree-far-upper":2};
+  for(const p of crownPresets()){
+    const [x,z]=p.spawnXZ,tree=TREES.find(t=>t.osmId===p.sourceTreeId)!;assert.ok(tree);
+    assert.deepEqual(p.lookAtXZ,[tree.x,tree.z]);assert.ok(p.targetHeight!>0&&p.targetHeight!<tree.reconstruction!.height);
+    assert.ok(x>BOUNDS.minX+1&&x<BOUNDS.maxX-1&&z>BOUNDS.minZ+1&&z<BOUNDS.maxZ-1);
+    for(const b of BUILDINGS){assert.equal(pointInPolygon(x,z,b.points),false,p.id+":"+b.id);
+      assert.ok(Math.min(...b.points.map((v,i)=>edgeDistance(x,z,v,b.points[(i+1)%b.points.length])))>CHARACTER_RADIUS+1,p.id+":"+b.id+" edge");}
+    for(const source of TREES){const trunk=treeTrunkCollision(source);assert.ok(Math.hypot(x-trunk.x,z-trunk.z)>trunk.radius+CHARACTER_RADIUS+1,p.id+":"+source.osmId);}
+    for(const quality of ["low","medium","high"])assert.equal(treeDetailLevel(Math.hypot(tree.x-x,tree.z-z),quality),expectedLod[p.id as keyof typeof expectedLod],p.id+":"+quality);
+  }
+});
+
+test("new inspection cameras exercise the actual full-coverage LOD policy at the measured viewport",()=>{
+  const scale=650/720;
+  for(const id of ["b5-tree-hero","small-tree-close"] as const){
+    const p=TERRAIN_REVIEW_PRESETS[id],distance=Math.hypot(p.spawnXZ[0]-p.lookAtXZ[0],p.spawnXZ[1]-p.lookAtXZ[1]);
+    assert.deepEqual(["low","medium","high"].map(q=>treeDetailForProjection(distance,q,"full-coverage",scale)),[1,0,0],id);
+  }
+  const old=TERRAIN_REVIEW_PRESETS["b5-tree-near"];
+  assert.equal(treeDetailForProjection(Math.hypot(old.spawnXZ[0]-old.lookAtXZ[0],old.spawnXZ[1]-old.lookAtXZ[1]),"medium","full-coverage",scale),1,"historical near view is now MID; it cannot stand in for the hero check");
+  const far=TERRAIN_REVIEW_PRESETS["b6-tree-far-upper"],distance=Math.hypot(far.spawnXZ[0]-far.lookAtXZ[0],far.spawnXZ[1]-far.lookAtXZ[1]);
+  for(const quality of ["low","medium","high"])assert.equal(treeDetailForProjection(distance,quality,"full-coverage",1080/720),2,quality);
+  assert.equal(resolveTreePilot({hostname:"localhost",search:"?terrainReview=small-tree-close&treePilot=own"},false),undefined);
+});
+
+test("actual right-handed camera projection centers each elevated crown target at both avatar eye heights",()=>{
+  const engine=new NullEngine({renderWidth:1280,renderHeight:720,textureSize:1,deterministicLockstep:false,lockstepMaxSteps:4}),scene=new Scene(engine);scene.useRightHandedSystem=true;
+  try {for(const p of crownPresets())for(const eyeHeight of [1.35,1.85]){
+    const pose=terrainReviewPose(p,groundHeight,eyeHeight),camera=new FreeCamera(p.id,new Vector3(pose.position.x,groundHeight(...p.spawnXZ)+eyeHeight,pose.position.z),scene);camera.fov=.85;
+    camera.setTarget(camera.position.add(new Vector3(Math.sin(pose.yaw),-pose.pitch,Math.cos(pose.yaw))));
+    const target=new Vector3(p.lookAtXZ[0],groundHeight(...p.lookAtXZ)+p.targetHeight!,p.lookAtXZ[1]);
+    const projected=Vector3.Project(target,Matrix.Identity(),camera.getViewMatrix().multiply(camera.getProjectionMatrix()),new Viewport(0,0,1280,720));
+    assert.ok(Math.abs(projected.x-640)<.01&&Math.abs(projected.y-360)<.01,p.id+":"+projected.asArray());assert.ok(projected.z>0&&projected.z<1);
+    camera.dispose();
+  }}finally{scene.dispose();engine.dispose();}
+  for(const targetHeight of [-1,101,NaN,Infinity])assert.throws(()=>terrainReviewPose({...TERRAIN_REVIEW_PRESETS["b5-tree-near"],targetHeight},groundHeight),/pose\/support/);
+});
+
+test("each crown Actor settles on the actual local draped terrain without movement input or recovery",async()=>{
+  await initPhysics();
+  for(const preset of crownPresets()){
+    const [x,z]=preset.spawnXZ,world=new RAPIER.World({x:0,y:-18,z:0});world.timestep=FIXED_DT;
+    const terrain=terrainCollisionData(createTerrainTiles(GROUND_RECTS,{minX:x-2,maxX:x+2,minZ:z-2,maxZ:z+2}));
+    const floor=world.createCollider(RAPIER.ColliderDesc.trimesh(terrain.vertices,terrain.indices,RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES));
+    for(const source of TREES){const trunk=treeTrunkCollision(source);world.createCollider(RAPIER.ColliderDesc.cylinder(trunk.height/2,trunk.radius).setTranslation(trunk.x,groundHeight(trunk.x,trunk.z)+trunk.height/2,trunk.z));}
+    const f=fixture(preset.id,groundHeight),g=f.game;
+    const sim={world,walkingColliders:new Set<number>(),groundColliders:new Set([floor.handle]),surfaceHeight:groundHeight,
+      add(id:string,p:{x:number;y:number;z:number}){return new Actor(sim as unknown as Simulation,id,p);}};
+    g.sim=sim;
+    try {g.createStartupActor();const actor:Actor=g.actor;actor.setPosition=()=>{throw Error("Unexpected crown QA recovery/teleport");};
+      for(let i=0;i<120;i++){actor.step({x:0,z:0,yaw:g.yaw,jump:false,seq:i},FIXED_DT);world.step();}
+      assert.ok(actor.grounded,preset.id+":"+JSON.stringify({position:actor.position,ground:groundHeight(actor.position.x,actor.position.z),vertical:actor.vertical}));assert.ok(Math.abs(actor.position.x-x)<.005&&Math.abs(actor.position.z-z)<.005,preset.id+":"+JSON.stringify(actor.position));
+      assert.ok(Math.abs(actor.position.y-groundHeight(actor.position.x,actor.position.z)-.82)<.015,preset.id+":"+JSON.stringify({position:actor.position,ground:groundHeight(actor.position.x,actor.position.z)}));
+    }finally{world.free();}
+  }
+});
+
 test("source-backed preset coordinates stay immutable and captured identity stays detached", () => {
-  assert.deepEqual(Object.values(TERRAIN_REVIEW_PRESETS).map(p => [p.id, p.spawnXZ, p.lookAtXZ]), [
+  assert.deepEqual(Object.values(TERRAIN_REVIEW_PRESETS).slice(0,4).map(p => [p.id, p.spawnXZ, p.lookAtXZ]), [
     ["b6-rear-path", [36, -64], [29.24, -64]], ["b6-front-lawn", [-14, -64], [-13, -59]],
     ["osm-grass-control", [-103, -65], [-100, -60]], ["b6-far-context", [40, -75], [28, -32]],
   ]);
@@ -70,6 +176,7 @@ test("source-backed preset coordinates stay immutable and captured identity stay
   record.spawnXZ[0] = 999; assert.equal(p.spawnXZ[0], 36);
   assert.equal(Reflect.set(p.spawnXZ, "0", 999), false, "preset coordinates cannot be changed at runtime");
   assert.equal(terrainReviewIdentity(null), null);
+  for(const p of Object.values(TERRAIN_REVIEW_PRESETS).slice(0,4))assert.equal(p.targetHeight,undefined,"the four original target elevations stay byte-for-byte compatible");
 });
 
 test("pose uses real ground at both ends and first-person slope, rejects nonfinite support", () => {
@@ -96,7 +203,7 @@ test("actual Game startup, interpolation and follow camera stay at the same pres
     const direction = f.target().subtract(g.camera.position), p = g.terrainReview;
     const dx = p.lookAtXZ[0] - initial.x, dz = p.lookAtXZ[1] - initial.z, distance = Math.hypot(dx, dz);
     assert.ok(Math.abs(direction.x - dx / distance) < 1e-12); assert.ok(Math.abs(direction.z - dz / distance) < 1e-12);
-    assert.ok(Math.abs(g.camera.position.y + direction.y * distance - f.height(p.lookAtXZ[0], p.lookAtXZ[1]) - .05) < 1e-12);
+    assert.ok(Math.abs(g.camera.position.y + direction.y * distance - f.height(p.lookAtXZ[0], p.lookAtXZ[1]) - (p.targetHeight ?? .05)) < 1e-12);
     assert.equal(grassFocusDistance(initial.x, initial.z, g.camera.position.x, g.camera.position.z, initial.x, initial.z), 0);
     if (id === "b6-far-context") assert.ok(grassFocusDistance(p.lookAtXZ[0], p.lookAtXZ[1], initial.x, initial.z, initial.x, initial.z) > 40,
       "distant lookAt never becomes the player's grass focus");

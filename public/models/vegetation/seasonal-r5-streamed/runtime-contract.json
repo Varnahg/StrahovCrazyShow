@@ -1,0 +1,111 @@
+{
+  "version": 3,
+  "units": "metres",
+  "rankEncoding": "uint16-normalized",
+  "coordinateSpace": "root-local glTF Y-up; placement is separate",
+  "usage": "per-LOD geometry streaming; pilot candidates only; explicit runtime selection required",
+  "prototypes": {
+    "own-broadleaf": {
+      "sourceTreeId": "ipr-crown-014",
+      "family": "deciduous-broadleaf",
+      "nominalHeight": 13.55,
+      "nominalCrownDiameter": 17.93,
+      "trunkRadius": 0.484,
+      "dimensionBasis": "same R4 source catalogue estimates; metric source leaf size preserved",
+      "lods": [
+        {
+          "url": "/models/vegetation/seasonal-r5-streamed/own-broadleaf-lod0.glb",
+          "bytes": 30827236,
+          "sha256": "aa044ea21a5b28c58f691479f67dc14aea2054d6259b0c593060295673d7ffe4",
+          "meshNames": [
+            "own-broadleaf__lod0__wood",
+            "own-broadleaf__lod0__foliage"
+          ]
+        },
+        {
+          "url": "/models/vegetation/seasonal-r5-streamed/own-broadleaf-lod1.glb",
+          "bytes": 15671380,
+          "sha256": "c0f2d3312fa1d8f2438cd910ec02578df0cfff3a1f018e4b929b4ae7dc5f4e65",
+          "meshNames": [
+            "own-broadleaf__lod1__wood",
+            "own-broadleaf__lod1__foliage"
+          ]
+        },
+        {
+          "url": "/models/vegetation/seasonal-r5-streamed/own-broadleaf-lod2.glb",
+          "bytes": 2901240,
+          "sha256": "750a38a1ccd20681cad6dad9e1f3ad78633a50987bb6fcdabd8241847ee6854f",
+          "meshNames": [
+            "own-broadleaf__lod2__wood",
+            "own-broadleaf__lod2__foliage"
+          ]
+        }
+      ],
+      "lodProfile": "full-coverage"
+    },
+    "own-conifer": {
+      "sourceTreeId": "ipr-b6-north-conifer",
+      "family": "evergreen-conifer",
+      "nominalHeight": 12,
+      "nominalCrownDiameter": 6.5,
+      "trunkRadius": 0.175,
+      "dimensionBasis": "same R4 source catalogue estimates; metric source leaf size preserved",
+      "lods": [
+        {
+          "url": "/models/vegetation/seasonal-r5-streamed/own-conifer-lod0.glb",
+          "bytes": 14148664,
+          "sha256": "533a8618c096e51a9a569e0beaafd79d8c2c7ce60791bcab420a7dde48cc0191",
+          "meshNames": [
+            "own-conifer__lod0__wood",
+            "own-conifer__lod0__foliage"
+          ]
+        },
+        {
+          "url": "/models/vegetation/seasonal-r5-streamed/own-conifer-lod1.glb",
+          "bytes": 7882428,
+          "sha256": "5ddbbca8f7f91d5222a3fddc0ebfd55b46615ed78471de37829315484556f6a0",
+          "meshNames": [
+            "own-conifer__lod1__wood",
+            "own-conifer__lod1__foliage"
+          ]
+        },
+        {
+          "url": "/models/vegetation/seasonal-r5-streamed/own-conifer-lod2.glb",
+          "bytes": 1354512,
+          "sha256": "f358c2179ab7f67f31f78d778e431cd465e6d2a5dc828dd43b97820c38b8e127",
+          "meshNames": [
+            "own-conifer__lod2__wood",
+            "own-conifer__lod2__foliage"
+          ]
+        }
+      ],
+      "lodProfile": "full-coverage"
+    }
+  },
+  "placements": [
+    {
+      "sourceTreeId": "ipr-crown-014",
+      "sourceRootXZ": [
+        -67.59,
+        -60.96
+      ],
+      "positionUncertaintyMetres": 2.5,
+      "prototypeCandidates": [
+        "own-broadleaf"
+      ],
+      "selectedPrototypeId": null
+    },
+    {
+      "sourceTreeId": "ipr-b6-north-conifer",
+      "sourceRootXZ": [
+        -10.5,
+        -76.5
+      ],
+      "positionUncertaintyMetres": 2,
+      "prototypeCandidates": [
+        "own-conifer"
+      ],
+      "selectedPrototypeId": null
+    }
+  ]
+}

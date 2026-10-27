@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { Script } from "node:vm";
 import ts from "typescript";
 import type { WeatherScenarioId } from "../shared/weather-scenarios";
+import { RenderFallbackSession, WebGpuInitializationError } from "../client/render-fallback";
 
 // Execute the actual UI effect. Replace imports/GPU IO, not startup ownership.
 const source = ts.createSourceFile(
@@ -13,6 +14,27 @@ const source = ts.createSourceFile(
   true,
   ts.ScriptKind.TSX,
 );
+
+test("compatibility retry is an explicit same-origin user action and preserves the QA context", () => {
+  let handler: ts.Expression | undefined;
+  const find = (node: ts.Node) => {
+    if (ts.isJsxElement(node) && node.openingElement.attributes.properties.some(a => ts.isJsxAttribute(a) && a.name.getText(source) === "data-renderer-fallback")) {
+      const attribute = node.openingElement.attributes.properties.find(a => ts.isJsxAttribute(a) && a.name.getText(source) === "onClick") as ts.JsxAttribute;
+      assert.ok(attribute.initializer && ts.isJsxExpression(attribute.initializer)); handler = attribute.initializer.expression;
+    }
+    ts.forEachChild(node, find);
+  };
+  find(source); assert.ok(handler);
+  const script = new Script(ts.transpileModule(`action = (${handler.getText(source)});`, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText);
+  for (const hostname of ["127.0.0.1:4182", "strahov.example"]) {
+    const calls: string[] = [], href = `https://${hostname}/?terrainReview=b5-tree-near&treePilot=own&renderBackend=webgpu&renderBackend=bad#view`;
+    const env = { URL, action: undefined as unknown as () => void, window: { location: { href, assign: (url: string) => calls.push(url) } } };
+    script.runInNewContext(env); assert.equal(calls.length, 0, "failure never silently changes renderer"); env.action();
+    assert.equal(calls.length, 1); const next = new URL(calls[0]); assert.equal(next.origin, new URL(href).origin);
+    assert.deepEqual(next.searchParams.getAll("renderBackend"), ["webgl2"]);
+    assert.equal(next.searchParams.get("treePilot"), "own"); assert.equal(next.searchParams.get("terrainReview"), "b5-tree-near"); assert.equal(next.hash, "#view");
+  }
+});
 let effect: ts.ArrowFunction | undefined;
 function visit(node: ts.Node) {
   if (
@@ -57,17 +79,18 @@ const compiled = ts.transpileModule(
   },
 ).outputText;
 const make = new Script(
-  `(function(env) { const exports={}; const {mode,canvas,sessionDiagnostics,modeRef,loadModule,profileRef,game,lightingPreviewRef,weatherPreviewRef,idRef,setStats,userBenchmark,setBenchmark,benchmarkBuildIdentity,saveLocalBenchmark,setWorldSelection,notice,weatherRef,quality,targetFps,syncNetworkStage,drainAuthorities,setReady,setError,t,getRendererInfo,testImportMeta,inputBuffer}=env; ${compiled}; return runEffect(); })`,
+  `(function(env) { const exports={}; const {mode,canvas,sessionDiagnostics,modeRef,loadModule,profileRef,game,seasonPreviewRef,weatherPreviewRef,idRef,setStats,userBenchmark,setBenchmark,benchmarkBuildIdentity,saveLocalBenchmark,setWorldSelection,notice,weatherRef,quality,targetFps,syncNetworkStage,drainAuthorities,setReady,setError,t,getRendererInfo,testImportMeta,inputBuffer,requestWebGlFallback,window,setRendererGeneration,setRendererCompatibility,room,connectionAttempt,disconnectRoom,doorConnectionRef,playersRef,carState,activity,networkProbeRef,connectedRef,reward}=env; ${compiled}; return runEffect(); })`,
 ).runInThisContext();
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
-function fixture(options: { constructionError?: boolean; startError?: boolean; loseAfterStart?: boolean; weatherPreview?: WeatherScenarioId } = {}) {
+function fixture(options: { constructionError?: boolean; startError?: boolean; startFailure?: Error; loseAfterStart?: boolean; weatherPreview?: WeatherScenarioId; network?: boolean; search?: string } = {}) {
   let resolveEngine!: (engine: any) => void;
   let rejectEngine!: (reason: Error) => void;
-  const promise = new Promise((resolve, reject) => {
+  const resetPromise = () => new Promise((resolve, reject) => {
     resolveEngine = resolve;
     rejectEngine = reject;
   });
+  let promise = resetPromise();
   const engine = {
     disposed: 0,
     isWebGPU: true,
@@ -80,16 +103,22 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
     ready = false;
   const errors: string[] = [];
   const events: string[] = [];
+  const eventRecords: { name: string; data: any }[] = [];
   const inputResets: string[] = [];
-  const canvas = { current: {} };
-  const initialCanvas = canvas.current;
+  const canvas = { current: { dataset: {} as Record<string, string> } };
+  const requestedCanvases: unknown[] = [], disconnects: unknown[][] = [];
+  const location = { hostname: "example.com", search: options.search ?? "" }, fallbackSession = new RenderFallbackSession();
+  let selected = fallbackSession.select(location), generation = 0, compatibility = false;
+  const room = { current: { id: "same-room" } };
   class Game {
     weatherPreview: WeatherScenarioId | null = null;
     onRendererFailure?: (message: string) => void;
     ready = false;
+    network = false;
+    networkTimeline = { setRtt() {} };
     renderHealth = { snapshot: () => ({ valid: this.ready, firstErrors: [] }) };
     constructor(_canvas: unknown, _profile: unknown, prepared: unknown) {
-      assert.equal(_canvas, initialCanvas);
+      assert.equal(_canvas, requestedCanvases.at(-1));
       assert.equal(prepared, engine);
       if (options.constructionError) throw new Error("construction failed");
       gameCount++;
@@ -98,7 +127,12 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
     setQuality() {}
     setTargetFps() {}
     setWeatherPreview(id: WeatherScenarioId | null) { this.weatherPreview = id; }
+    attachDoorTimeline() {}
+    updatePlayers() {}
+    setCar() {}
+    setFound() {}
     async start() {
+      if (options.startFailure) throw options.startFailure;
       if (options.startError) throw new Error("start failed");
       this.ready = true;
       if (options.loseAfterStart) queueMicrotask(() => {
@@ -113,18 +147,27 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
   }
   const noop = () => {};
   const state = { current: null as Game | null };
-  const cleanup = make({
-    mode: "guest",
+  const environment = {
+    mode: options.network ? "multi" : "guest",
     canvas,
     profileRef: { current: {} },
     game: state,
     modeRef: { current: "menu" },
-    lightingPreviewRef: { current: { instant: null } },
+    seasonPreviewRef: { current: { instant: null } },
     weatherPreviewRef: { current: options.weatherPreview ?? null },
     idRef: { current: "fixture" },
-    sessionDiagnostics: { event: (name: string) => events.push(name) },
-    loadModule: async (name: string) =>
-      name === "./game" ? { Game } : { createGameEngine: () => promise },
+    sessionDiagnostics: { event: (name: string, data: unknown) => { events.push(name); eventRecords.push({ name, data }); } },
+    loadModule: async (name: string) => name === "./game" ? { Game } : {
+      createGameEngine: (target: unknown) => { requestedCanvases.push(target); selected = fallbackSession.select(location); return promise; },
+      getRenderEngineSelection: () => selected,
+    },
+    requestWebGlFallback: (error: unknown, value: typeof location, signal: AbortSignal) => fallbackSession.request(error, value, signal),
+    window: { location },
+    setRendererGeneration: (update: (value: number) => number) => generation = update(generation),
+    setRendererCompatibility: (value: boolean) => compatibility = value,
+    room, connectionAttempt: { current: 17 }, disconnectRoom: (...args: unknown[]) => disconnects.push(args),
+    doorConnectionRef: { current: null }, playersRef: { current: [] }, carState: { current: null },
+    activity: { hunt: [] }, networkProbeRef: { current: null }, connectedRef: { current: true }, reward: noop,
     setStats: noop,
     userBenchmark: { current: false },
     inputBuffer: { current: { reset: (reason: string) => inputResets.push(reason) } },
@@ -145,17 +188,23 @@ function fixture(options: { constructionError?: boolean; startError?: boolean; l
     t: (value: string) => value,
     getRendererInfo: () => ({ renderer: "fixture" }),
     testImportMeta: { env: { DEV: false } },
-  }) as () => void;
+  };
+  const cleanup = make(environment) as () => void;
   return {
     engine,
     canvas,
-    resolveEngine,
-    rejectEngine,
+    resolveEngine: (value: unknown) => resolveEngine(value),
+    rejectEngine: (error: Error) => rejectEngine(error),
     cleanup,
     errors,
     events,
+    eventRecords,
     inputResets,
     state,
+    requestedCanvases, disconnects, room,
+    generation: () => generation,
+    compatibility: () => compatibility,
+    restart: () => { promise = resetPromise(); return make(environment) as () => void; },
     stats: () => ({ gameCount, gameDisposals, ready }),
   };
 }
@@ -194,10 +243,65 @@ test("backend initialization failure is reported without constructing a fallback
   f.cleanup();
 });
 
+test("automatic UI fallback remounts the canvas once and preserves the multiplayer connection", async () => {
+  let keyedCanvas = false, generationDependency = false;
+  const inspect = (node: ts.Node) => {
+    if (ts.isJsxSelfClosingElement(node) && node.tagName.getText(source) === "canvas")
+      keyedCanvas ||= node.attributes.properties.some(p => ts.isJsxAttribute(p) && p.name.getText(source) === "key" && p.initializer?.getText(source) === "{rendererGeneration}");
+    if (ts.isCallExpression(node) && node.arguments[0] === effect && ts.isArrayLiteralExpression(node.arguments[1]))
+      generationDependency = node.arguments[1].elements.some(e => e.getText(source) === "rendererGeneration");
+    ts.forEachChild(node, inspect);
+  };
+  inspect(source); assert.ok(keyedCanvas && generationDependency);
+  const f = fixture({ network: true }), originalCanvas = f.canvas.current, originalRoom = f.room.current;
+  await tick(); f.rejectEngine(new WebGpuInitializationError("webgpu", "initialization-failed", new Error("adapter refused"))); await tick();
+  assert.equal(f.generation(), 1); assert.equal(f.compatibility(), true);
+  assert.deepEqual(f.disconnects, []); assert.equal(f.room.current, originalRoom);
+  assert.equal(f.stats().gameCount, 0); assert.equal(f.events.includes("startup-error"), false);
+  f.cleanup(); f.canvas.current = { dataset: {} }; f.engine.isWebGPU = false;
+  const cleanupRetry = f.restart(); await tick(); f.resolveEngine(f.engine); await tick();
+  assert.notEqual(f.requestedCanvases[1], originalCanvas);
+  assert.equal(f.state.current?.network, true); assert.equal(f.stats().ready, true);
+  assert.equal(f.room.current, originalRoom); assert.deepEqual(f.disconnects, []);
+  assert.equal(f.canvas.current.dataset.rendererBackend, "webgl2");
+  assert.equal(f.canvas.current.dataset.rendererFallback, "initialization-failed");
+  const readyRecord = f.eventRecords.find(record => record.name === "renderer-ready")!;
+  assert.equal(readyRecord.data.backend, "webgl2"); assert.equal(readyRecord.data.selection.requested, "webgpu");
+  cleanupRetry(); assert.equal(f.engine.disposed, 1);
+});
+
+test("a rejected WebGL2 retry terminates normally instead of creating a third canvas", async () => {
+  const f = fixture({ network: true }); await tick();
+  f.rejectEngine(new WebGpuInitializationError("webgpu", "unavailable")); await tick();
+  f.cleanup(); f.canvas.current = { dataset: {} }; const cleanupRetry = f.restart(); await tick();
+  f.rejectEngine(new Error("WebGL2 unavailable")); await tick();
+  assert.equal(f.generation(), 1); assert.equal(f.requestedCanvases.length, 2);
+  assert.equal(f.stats().gameCount, 0); assert.equal(f.events.filter(event => event === "renderer-fallback").length, 1);
+  assert.equal(f.events.filter(event => event === "startup-error").length, 1);
+  assert.equal(f.disconnects.length, 1); assert.equal(f.disconnects[0][0], "startup-failure");
+  cleanupRetry();
+});
+
+test("strict query and a cancelled initialization do not request automatic fallback", async () => {
+  const strict = fixture({ network: true, search: "?renderBackend=webgpu" }); await tick();
+  strict.rejectEngine(new WebGpuInitializationError("webgpu", "unavailable")); await tick();
+  assert.equal(strict.generation(), 0); assert.equal(strict.disconnects.length, 1); assert.equal(strict.errors.length, 1); strict.cleanup();
+  const cancelled = fixture(); await tick(); cancelled.cleanup();
+  cancelled.rejectEngine(new WebGpuInitializationError("webgpu", "unavailable")); await tick();
+  assert.equal(cancelled.generation(), 0); assert.deepEqual(cancelled.errors, []);
+});
+
+test("even an initialization-shaped failure from an owned Game cannot trigger backend retry", async () => {
+  const f = fixture({ startFailure: new WebGpuInitializationError("webgpu", "initialization-failed") });
+  await tick(); f.resolveEngine(f.engine); await tick();
+  assert.equal(f.generation(), 0); assert.equal(f.events.includes("renderer-fallback"), false);
+  assert.equal(f.stats().gameDisposals, 1); assert.equal(f.engine.disposed, 1); f.cleanup();
+});
+
 test("replaced canvas never receives an engine prepared for the old canvas", async () => {
   const f = fixture();
   await tick();
-  f.canvas.current = {};
+  f.canvas.current = { dataset: {} };
   f.resolveEngine(f.engine);
   await tick();
   assert.equal(f.stats().gameCount, 0);
